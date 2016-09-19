@@ -1,0 +1,31 @@
+---
+name: Region
+variants:
+  - variant: Amsterdam
+    name: amsterdam
+  - variant: Brazil
+    name: brazil
+  - variant: EuCentral
+    name: eu-central
+  - variant: EuWest
+    name: eu-west
+  - variant: Frankfurt
+    name: frankfurt
+  - variant: London
+    name: london
+  - variant: Syndey
+    name: sydney
+  - variant: UsCentral
+    name: us-central
+  - variant: UsEast
+    name: us-east
+  - variant: UsSouth
+    name: us-south
+  - variant: UsWest
+    name: us-west
+  - variant: VipAmsterdam
+    name: vip-amsterdam
+  - variant: VipUsEast
+    name: vip-us-east
+  - variant: VipUsWest
+    name: vip-us-west

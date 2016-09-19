@@ -1,0 +1,21 @@
+---
+name: Presence
+description: A member's online status
+fields:
+  - name: game
+    optional: true
+    type: Game
+  - name: last_modified
+    optional: true
+    type: u64
+  - name: nick
+    optional: true
+    type: string
+  - name: status
+    type: OnlineStatus
+  - name: user_id
+    type: UserId
+  - name: user
+    optional: true
+    type: User
+decode: false

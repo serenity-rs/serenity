@@ -1,0 +1,16 @@
+---
+name: VoiceRegion
+description: "Information about an available voice region."
+fields:
+  - name: id
+    type: string
+  - name: name
+    type: string
+  - name: optimal
+    type: string
+  - name: sample_hostname
+    type: string
+  - name: sample_port
+    type: u64
+  - name: vip
+    type: bool

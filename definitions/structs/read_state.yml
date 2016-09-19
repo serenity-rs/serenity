@@ -1,0 +1,15 @@
+---
+name: ReadState
+description: "Summary of messages since last login"
+fields:
+  - name: id
+    type: ChannelId
+  - name: last_message_id
+    optional: true
+    type: MessageId
+  - name: last_pin_timestamp
+    optional: true
+    type: string
+  - name: mention_count
+    default: 0
+    type: u64

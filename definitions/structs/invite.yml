@@ -1,0 +1,12 @@
+---
+name: Invite
+description: Information about an invite
+fields:
+  - name: code
+    type: string
+  - name: channel
+    description: "A representation of the minimal amount of info needed about
+      the channel being invited to."
+    type: InviteChannel
+  - name: guild
+    type: InviteGuild

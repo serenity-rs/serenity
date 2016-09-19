@@ -1,0 +1,11 @@
+---
+name: Relationship
+description: "Information about a relationship that this user has with another user."
+fields:
+  - name: id
+    type: UserId
+  - name: kind
+    from: type
+    type: RelationshipType
+  - name: user
+    type: User

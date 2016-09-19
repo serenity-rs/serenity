@@ -1,0 +1,41 @@
+---
+name: Message
+description: "A representation of a message sent over a server's text channel, a group, or a private channel."
+fields:
+   - name: id
+     type: MessageId
+   - name: attachments
+     array: true
+     type: Attachment
+   - name: author
+     type: User
+   - name: channel_id
+     type: ChannelId
+   - name: content
+     type: string
+   - name: edited_timestamp
+     optional: true
+     type: string
+   - name: embeds
+     array: true
+     type: Embed
+   - name: kind
+     from: type
+     type: MessageType
+   - name: mention_everyone
+     type: bool
+   - name: mention_roles
+     array: true
+     type: RoleId
+   - name: mentions
+     array: true
+     type: User
+   - name: nonce
+     optional: true
+     type: string
+   - name: pinned
+     type: bool
+   - name: timestamp
+     type: string
+   - name: tts
+     type: bool

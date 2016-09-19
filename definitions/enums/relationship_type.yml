@@ -1,0 +1,13 @@
+---
+name: RelationshipType
+variants:
+  - variant: Blocked
+    number: 2
+  - variant: Friends
+    number: 1
+  - variant: IncomingRequest
+    number: 3
+  - variant: Ignored
+    number: 0
+  - variant: OutgoingRequest
+    number: 4

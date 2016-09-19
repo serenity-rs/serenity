@@ -1,0 +1,33 @@
+---
+name: PublicChannel
+description: Public voice or text channel within a guild
+fields:
+  - name: id
+    type: ChannelId
+  - name: bitrate
+    optional: true
+    type: u64
+  - name: guild_id
+    type: GuildId
+  - name: kind
+    type: ChannelType
+  - name: last_message_id
+    optional: true
+    type: MessageId
+  - name: last_pin_timestamp
+    optional: true
+    type: string
+  - name: name
+    type: string
+  - name: permission_overwrites
+    array: true
+    type: PermissionOverwrite
+  - name: position
+    type: i64
+  - name: topic
+    optional: true
+    type: string
+  - name: user_limit
+    optional: true
+    type: u64
+decode: false

@@ -1,0 +1,9 @@
+---
+name: EmbedProvider
+description: The provider of an embed
+fields:
+  - name: name
+    type: string
+  - name: url
+    optional: true
+    type: string

@@ -1,0 +1,15 @@
+---
+name: MessageType
+variants:
+  - variant: GroupCallCreation
+    number: 3
+  - variant: GroupIconUpdate
+    number: 5
+  - variant: GroupNameUpdate
+    number: 4
+  - variant: GroupRecipientAddition
+    number: 1
+  - variant: GroupRecipientRemoval
+    number: 2
+  - variant: Regular
+    number: 0

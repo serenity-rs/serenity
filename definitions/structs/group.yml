@@ -1,0 +1,24 @@
+---
+name: Group
+definition: A group channel, potentially including other users, separate from a server.
+fields:
+  - name: channel_id
+    type: ChannelId
+  - name: icon
+    optional: true
+    type: string
+  - name: last_message_id
+    optional: true
+    type: MessageId
+  - name: last_pin_timestamp
+    optional: true
+    type: string
+  - name: name
+    optional: true
+    type: string
+  - name: owner_id
+    type: UserId
+  - name: recipients
+    custom: decode_users
+    t: UserId, User
+    type: hashmap

@@ -1,0 +1,12 @@
+---
+name: EmbedThumbnail
+description: The dimensions and URL of an embed thumbnail
+fields:
+  - name: height
+    type: u64
+  - name: proxy_url
+    type: string
+  - name: url
+    type: string
+  - name: width
+    type: u64

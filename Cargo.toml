@@ -1,0 +1,69 @@
+[package]
+authors = ["Austin Hellyer <hello@austinhellyer.me>"]
+build = "build.rs"
+description = "Ergonomic and high-level Rust library for the Discord API."
+documentation = "http://docs.austinhellyer.me/serenity"
+keywords = ["discord", "api"]
+license = "ISC"
+name = "serenity"
+readme = "README.md"
+repository = "https://github.com/zeyla/serenity.rs"
+version = "0.1.0"
+
+[dependencies]
+base64 = "0.2"
+bitflags = "0.7"
+byteorder = "0.5"
+flate2 = "0.2"
+hyper = "0.9"
+lazy_static = "0.2"
+log = "0.3"
+serde_json = "0.8"
+time = "0.1"
+websocket = "0.17"
+
+[dependencies.cookie]
+default-features = false
+version = "0.2"
+
+[dependencies.multipart]
+default-features = false
+features = ["client", "hyper"]
+version = "0.8"
+
+[build-dependencies]
+yaml-rust = "0.3"
+
+[features]
+default = []
+debug = []
+
+[[bin]]
+doc = false
+name = "example-01"
+path = "./examples/01_basic_ping_bot.rs"
+
+[[bin]]
+doc = false
+name = "example-02"
+path = "./examples/02_transparent_guild_sharding.rs"
+
+[[bin]]
+doc = false
+name = "example-03"
+path = "./examples/03_struct_utilities.rs"
+
+[[bin]]
+doc = false
+name = "example-04"
+path = "./examples/04_message_builder.rs"
+
+[[bin]]
+doc = false
+name = "example-05"
+path = "./examples/05_user_login.rs"
+
+[[bin]]
+doc = false
+name = "example-06"
+path = "./examples/06_command_framework.rs"

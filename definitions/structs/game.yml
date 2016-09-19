@@ -1,0 +1,14 @@
+---
+name: Game
+description: Information about a game that a user is playing
+fields:
+  - name: kind
+    default: GameType::Playing
+    from: type
+    type: GameType
+  - name: name
+    type: string
+  - name: url
+    optional: true
+    type: string
+decode: false

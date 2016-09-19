@@ -1,0 +1,28 @@
+---
+name: CurrentUser
+description: Information about the current user
+fields:
+  - name: id
+    type: UserId
+  - name: avatar
+    optional: true
+    type: string
+  - name: bot
+    default: 'false'
+    type: bool
+  - name: discriminator
+    custom: parse_discriminator
+    type: u16
+  - name: email
+    optional: true
+    type: string
+  - name: mfa_enabled
+    type: bool
+  - name: mobile
+    optional: true
+    type: bool
+  - name: name
+    from: username
+    type: string
+  - name: verified
+    type: bool

@@ -1,0 +1,23 @@
+---
+name: RichInvite
+description: "Detailed information about an invite. This information can only
+  be retrieved by anyone with the 'MANAGE_GUILD' permission."
+fields:
+  - name: channel
+    type: InviteChannel
+  - name: code
+    type: string
+  - name: created_at
+    type: string
+  - name: guild
+    type: InviteGuild
+  - name: inviter
+    type: User
+  - name: max_age
+    type: u64
+  - name: max_uses
+    type: u64
+  - name: temporary
+    type: bool
+  - name: uses
+    type: u64

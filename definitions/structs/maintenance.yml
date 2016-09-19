@@ -1,0 +1,14 @@
+---
+name: Maintenance
+description: "A Discord status maintenance message. This can be either for active maintenances or for scheduled maintenances."
+fields:
+  - name: description
+    type: string
+  - name: id
+    type: string
+  - name: name
+    type: string
+  - name: start
+    type: string
+  - name: stop
+    type: string

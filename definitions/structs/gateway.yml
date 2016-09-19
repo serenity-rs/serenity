@@ -1,0 +1,13 @@
+---
+name: Gateway
+description: "A representation of the data retrieved from the gateway endpoint.
+
+
+  For the bot-specific gateway, refer to [`BotGateway`].
+
+
+  [`BotGateway`]: struct.BotGateway.html"
+fields:
+  - name: url
+    description: "The gateway to connect to."
+    type: string

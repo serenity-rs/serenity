@@ -1,0 +1,14 @@
+---
+name: Ban
+description: A representation of a banning of a user.
+fields:
+  - name: reason
+    description: "The reason given for this ban.
+
+      **Note**: Until the Audit Log feature is completed by Discord, then this
+      will always be None."
+    optional: true
+    type: string
+  - name: user
+    description: "The user that was banned."
+    type: User

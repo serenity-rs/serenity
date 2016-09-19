@@ -1,0 +1,9 @@
+---
+name: Tutorial
+description: "The current user's progress through the Discord tutorial"
+fields:
+  - name: indicators_confirmed
+    array: true
+    type: string
+  - name: indicators_suppressed
+    type: bool

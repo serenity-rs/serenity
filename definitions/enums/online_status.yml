@@ -1,0 +1,13 @@
+---
+name: OnlineStatus
+variants:
+  - variant: DoNotDisturb
+    name: dnd
+  - variant: Idle
+    name: idle
+  - variant: Invisible
+    name: invisible
+  - variant: Offline
+    name: offline
+  - variant: Online
+    name: online

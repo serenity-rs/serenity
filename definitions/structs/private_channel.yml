@@ -1,0 +1,17 @@
+---
+name: PrivateChannel
+description: Private text channel to another user.
+fields:
+  - name: id
+    type: ChannelId
+  - name: last_message_id
+    optional: true
+    type: MessageId
+  - name: last_pin_timestamp
+    optional: true
+    type: string
+  - name: kind
+    type: ChannelType
+  - name: recipient
+    type: User
+decode: false

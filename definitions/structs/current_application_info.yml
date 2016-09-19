@@ -1,0 +1,20 @@
+---
+name: CurrentApplicationInfo
+description: Information about the current application and its owner.
+fields:
+  - name: description
+    type: string
+  - name: flags
+    type: u64
+  - name: icon
+    optional: true
+    type: string
+  - name: id
+    type: UserId
+  - name: name
+    type: string
+  - name: owner
+    type: User
+  - name: rpc_origins
+    array: true
+    type: string

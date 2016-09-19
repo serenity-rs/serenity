@@ -1,0 +1,21 @@
+---
+name: Embed
+description: An embed in a message for a URL
+fields:
+  - name: description
+    optional: true
+    type: string
+  - name: kind
+    from: type
+    type: string
+  - name: provider
+    optional: true
+    type: EmbedProvider
+  - name: url
+    type: string
+  - name: thumbnail
+    optional: true
+    type: EmbedThumbnail
+  - name: title
+    optional: true
+    type: string

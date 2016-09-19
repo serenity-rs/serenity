@@ -1,0 +1,35 @@
+---
+name: Call
+description: "An active group or private call. These are different from
+  [voice channel][`ChannelType::Voice`]s in guilds.
+
+
+  [`ChannelType::Voice`]: enum.ChannelType.html#Voice.v"
+fields:
+  - name: channel_id
+    description: "The group or private channel that the call is associated
+      with."
+    type: ChannelId
+  - name: message_id
+    description: "The Id of the [message][`Message`] denoting that the call is
+      active.
+
+      [`Message`]: struct.Message.html"
+    type: MessageId
+  - name: region
+    description: "The [region][`Region`] that the call is taking place in.
+
+      [`Region`]: enum.Region.html"
+    type: string
+  - name: ringing
+    description: "A list of users that are currently being ringed."
+    array: true
+    type: UserId
+  - name: unavailable
+    description: "Whether the server hosting the call is unavailable."
+    type: bool
+  - name: voice_states
+    custom: decode_voice_states
+    description: "The users present in the call."
+    t: UserId, VoiceState
+    type: hashmap

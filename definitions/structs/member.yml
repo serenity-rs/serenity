@@ -1,0 +1,18 @@
+---
+name: Member
+description: Information about a member of a server
+fields:
+  - name: deaf
+    type: bool
+  - name: joined_at
+    type: string
+  - name: mute
+    type: bool
+  - name: nick
+    optional: true
+    type: string
+  - name: roles
+    array: true
+    type: RoleId
+  - name: user
+    type: User

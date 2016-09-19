@@ -1,0 +1,15 @@
+---
+name: GuildInfo
+description: Basic information about a server
+fields:
+  - name: id
+    type: GuildId
+  - name: icon
+    optional: true
+    type: string
+  - name: name
+    type: string
+  - name: owner
+    type: bool
+  - name: permissions
+    type: Permissions

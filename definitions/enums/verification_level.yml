@@ -1,0 +1,11 @@
+---
+name: VerificationLevel
+variants:
+  - variant: High
+    number: 3
+  - variant: Low
+    number: 1
+  - variant: Medium
+    number: 2
+  - variant: None
+    number: 0

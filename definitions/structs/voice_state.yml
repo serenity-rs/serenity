@@ -1,0 +1,24 @@
+---
+name: VoiceState
+description: "A member's state within a voice channel"
+fields:
+  - name: channel_id
+    optional: true
+    type: ChannelId
+  - name: deaf
+    type: bool
+  - name: mute
+    type: bool
+  - name: self_deaf
+    type: bool
+  - name: self_mute
+    type: bool
+  - name: session_id
+    type: string
+  - name: suppress
+    type: bool
+  - name: token
+    optional: true
+    type: string
+  - name: user_id
+    type: UserId

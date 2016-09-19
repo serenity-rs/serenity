@@ -1,0 +1,18 @@
+---
+name: UserGuildSettings
+description: "Settings about a guild in regards to notification configuration"
+fields:
+  - name: channel_overrides
+    array: true
+    type: ChannelOverride
+  - name: guild_id
+    optional: true
+    type: GuildId
+  - name: message_notifications
+    type: NotificationLevel
+  - name: mobile_push
+    type: bool
+  - name: muted
+    type: bool
+  - name: suppress_everyone
+    type: bool
