@@ -166,10 +166,23 @@ impl Connection {
     }
 
     pub fn set_game(&self, game: Option<Game>) {
+        self.set_presence(game, OnlineStatus::Online, false)
+    }
+
+    pub fn set_presence(&self,
+                        game: Option<Game>,
+                        status: OnlineStatus,
+                        afk: bool) {
+        let status = match status {
+            OnlineStatus::Offline => OnlineStatus::Invisible,
+            other => other,
+        };
         let msg = ObjectBuilder::new()
             .insert("op", 3)
             .insert_object("d", move |mut object| {
-                object = object.insert("idle_since", Value::Null);
+                object = object.insert("since", 0)
+                    .insert("afk", afk)
+                    .insert("status", status.name());
 
                 match game {
                     Some(game) => {
@@ -180,6 +193,7 @@ impl Connection {
                 }
             })
             .build();
+
         let _ = self.keepalive_channel.send(Status::SendMessage(msg));
     }
 

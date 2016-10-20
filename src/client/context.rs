@@ -780,7 +780,18 @@ impl Context {
     }
 
     pub fn set_game(&self, game: Option<Game>) {
-        self.connection.lock().unwrap().set_game(game)
+        self.connection.lock()
+            .unwrap()
+            .set_presence(game, OnlineStatus::Online, false);
+    }
+
+    pub fn set_presence(&self,
+                        game: Option<Game>,
+                        status: OnlineStatus,
+                        afk: bool) {
+        self.connection.lock()
+            .unwrap()
+            .set_presence(game, status, afk)
     }
 
     pub fn start_guild_prune<G>(&self, guild_id: G, days: u16)
