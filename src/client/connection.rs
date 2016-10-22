@@ -21,7 +21,7 @@ use websocket::message::{Message as WsMessage, Type as WsType};
 use websocket::stream::WebSocketStream;
 use websocket::ws::receiver::Receiver as WsReceiver;
 use websocket::ws::sender::Sender as WsSender;
-use ::{constants};
+use ::constants::{self, OpCode};
 use ::model::*;
 use ::prelude::*;
 
@@ -178,7 +178,7 @@ impl Connection {
             other => other,
         };
         let msg = ObjectBuilder::new()
-            .insert("op", 3)
+            .insert("op", OpCode::StatusUpdate.num())
             .insert_object("d", move |mut object| {
                 object = object.insert("since", 0)
                     .insert("afk", afk)
@@ -213,7 +213,7 @@ impl Connection {
             Ok(GatewayEvent::Heartbeat(sequence)) => {
                 let map = ObjectBuilder::new()
                     .insert("d", sequence)
-                    .insert("op", 1)
+                    .insert("op", OpCode::Heartbeat.num())
                     .build();
                 let _ = self.keepalive_channel.send(Status::SendMessage(map));
 
@@ -340,7 +340,7 @@ impl Connection {
                 .insert("seq", self.last_sequence)
                 .insert("token", &self.token)
             )
-            .insert("op", 6)
+            .insert("op", OpCode::Resume.num())
             .build()));
 
         let first_event;
@@ -385,7 +385,7 @@ impl Connection {
 
     pub fn sync_guilds(&self, guild_ids: &[GuildId]) {
         let msg = ObjectBuilder::new()
-            .insert("op", 12)
+            .insert("op", OpCode::SyncGuild.num())
             .insert_array("d", |a| guild_ids.iter().fold(a, |a, s| a.push(s.0)))
             .build();
 
@@ -395,7 +395,7 @@ impl Connection {
     pub fn sync_calls(&self, channels: &[ChannelId]) {
         for &channel in channels {
             let msg = ObjectBuilder::new()
-                .insert("op", 13)
+                .insert("op", OpCode::SyncCall.num())
                 .insert_object("d", |obj| obj
                     .insert("channel_id", channel.0)
                 )
@@ -492,7 +492,7 @@ fn parse_ready(event: GatewayEvent,
 
 fn identify(token: &str, shard_info: Option<[u8; 2]>) -> serde_json::Value {
     ObjectBuilder::new()
-        .insert("op", 2)
+        .insert("op", OpCode::Identify.num())
         .insert_object("d", |mut object| {
             object = identify_compression(object)
                 .insert("large_threshold", 250) // max value
@@ -571,7 +571,7 @@ fn keepalive(interval: u64,
 
             let map = ObjectBuilder::new()
                 .insert("d", last_sequence)
-                .insert("op", 1)
+                .insert("op", OpCode::Heartbeat.num())
                 .build();
 
             match sender.send_json(&map) {

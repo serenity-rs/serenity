@@ -1,6 +1,7 @@
 use std::collections::{BTreeMap, HashMap};
 use super::utils::*;
 use super::*;
+use ::constants::{OpCode, VoiceOpCode};
 use ::prelude::*;
 use ::utils::decode_array;
 
@@ -304,23 +305,29 @@ pub enum GatewayEvent {
 impl GatewayEvent {
     pub fn decode(value: Value) -> Result<Self> {
         let mut value = try!(into_map(value));
-        match req!(value.get("op").and_then(|x| x.as_u64())) {
-            0 => Ok(GatewayEvent::Dispatch(
+
+        let op = req!(value.get("op").and_then(|x| x.as_u64()));
+
+        match try!(OpCode::from_num(op as u8)) {
+            OpCode::Event => Ok(GatewayEvent::Dispatch(
                 req!(try!(remove(&mut value, "s")).as_u64()),
                 try!(Event::decode(
                     try!(remove(&mut value, "t").and_then(into_string)),
                     try!(remove(&mut value, "d"))
                 ))
             )),
-            1 => Ok(GatewayEvent::Heartbeat(req!(try!(remove(&mut value, "s")).as_u64()))),
-            7 => Ok(GatewayEvent::Reconnect),
-            9 => Ok(GatewayEvent::InvalidateSession),
-            10 => {
+            OpCode::Heartbeat => {
+                Ok(GatewayEvent::Heartbeat(req!(try!(remove(&mut value, "s"))
+                    .as_u64())))
+            },
+            OpCode::Reconnect => Ok(GatewayEvent::Reconnect),
+            OpCode::InvalidSession => Ok(GatewayEvent::InvalidateSession),
+            OpCode::Hello => {
                 let mut data = try!(remove(&mut value, "d").and_then(into_map));
                 let interval = req!(try!(remove(&mut data, "heartbeat_interval")).as_u64());
                 Ok(GatewayEvent::Hello(interval))
             },
-            11 => Ok(GatewayEvent::HeartbeatAck),
+            OpCode::HeartbeatAck => Ok(GatewayEvent::HeartbeatAck),
             _ => Err(Error::Decode("Unexpected opcode", Value::Object(value))),
         }
     }
@@ -352,33 +359,35 @@ impl VoiceEvent {
         let mut value = try!(into_map(value));
 
         let op = req!(try!(remove(&mut value, "op")).as_u64());
-        if op == 3 {
+        let op = try!(VoiceOpCode::from_num(op as u8));
+
+        if op == VoiceOpCode::Heartbeat {
             return Ok(VoiceEvent::KeepAlive)
         }
 
         let mut value = try!(remove(&mut value, "d").and_then(into_map));
-        if op == 2 {
+        if op == VoiceOpCode::Hello {
             missing!(value, VoiceEvent::Handshake {
                 heartbeat_interval: req!(try!(remove(&mut value, "heartbeat_interval")).as_u64()),
                 modes: try!(decode_array(try!(remove(&mut value, "modes")), into_string)),
                 port: req!(try!(remove(&mut value, "port")).as_u64()) as u16,
                 ssrc: req!(try!(remove(&mut value, "ssrc")).as_u64()) as u32,
             })
-        } else if op == 4 {
+        } else if op == VoiceOpCode::SessionDescription {
             missing!(value, VoiceEvent::Ready {
                 mode: try!(remove(&mut value, "mode").and_then(into_string)),
                 secret_key: try!(decode_array(try!(remove(&mut value, "secret_key")),
                     |v| Ok(req!(v.as_u64()) as u8)
                 )),
             })
-        } else if op == 5 {
+        } else if op == VoiceOpCode::Speaking {
             missing!(value, VoiceEvent::SpeakingUpdate {
                 user_id: try!(remove(&mut value, "user_id").and_then(UserId::decode)),
                 ssrc: req!(try!(remove(&mut value, "ssrc")).as_u64()) as u32,
                 speaking: req!(try!(remove(&mut value, "speaking")).as_bool()),
             })
         } else {
-            Ok(VoiceEvent::Unknown(op, Value::Object(value)))
+            Ok(VoiceEvent::Unknown(op as u64, Value::Object(value)))
         }
     }
 }
