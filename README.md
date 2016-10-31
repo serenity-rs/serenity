@@ -69,5 +69,5 @@ fn main() {
 [`State`]: ext/state/struct.State.html
 [client's module-level documentation]: client/index.html
 [docs]: https://discordapp.com/developers/docs/intro
-[examples]: https://github.com/zeyla/serenity.rs/tree/master/examples
+[examples]: https://gitlab.com/kalasi/serenity.rs/tree/master/examples
 [state docs]: ext/state/index.html

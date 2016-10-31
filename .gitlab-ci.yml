@@ -1,0 +1,25 @@
+.cargo_test_template: &cargo_test
+  cache:
+    paths:
+      - cargo/
+      - target/
+  stage: test
+  script:
+    - rustc --version && cargo --version
+    - cargo test -v
+
+stable:cargo:
+  image: rustdocker/rust:stable
+  <<: *cargo_test
+
+beta:cargo:
+  image: rustdocker/rust:beta
+  <<: *cargo_test
+
+nightly:cargo:
+  image: rustdocker/rust:nightly
+  <<: *cargo_test
+
+variables:
+  CARGO_HOME: $CI_PROJECT_DIR/cargo
+  GIT_DEPTH: "1"
