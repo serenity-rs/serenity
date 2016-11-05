@@ -232,6 +232,26 @@ impl Context {
         http::create_private_channel(map)
     }
 
+    /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
+    ///
+    /// **Note**: Requires the [Add Reactions] permission.
+    ///
+    /// [`Emoji`]: ../models/struct.Emoji.html
+    /// [`Message`]: ../models/struct.Message.html
+    /// [Add Reactions]: ../models/permissions/constant.ADD_REACTIONS.html
+    pub fn create_reaction<C, M, R>(&self,
+                                    channel_id: C,
+                                    message_id: M,
+                                    reaction_type: R)
+                                    -> Result<()>
+                                    where C: Into<ChannelId>,
+                                          M: Into<MessageId>,
+                                          R: Into<ReactionType> {
+        http::create_reaction(channel_id.into().0,
+                              message_id.into().0,
+                              reaction_type.into())
+    }
+
     pub fn create_role<F, G>(&self, guild_id: G, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole, G: Into<GuildId> {
         let id = guild_id.into().0;
@@ -329,6 +349,30 @@ impl Context {
         };
 
         http::delete_permission(channel_id.into().0, id)
+    }
+
+
+    /// Deletes the given [`Reaction`], but only if the current user is the user
+    /// who made the reaction or has permission to.
+    ///
+    /// **Note**: Requires the [`Manage Messages`] permission, _if_ the current
+    /// user did not perform the reaction.
+    ///
+    /// [`Reaction`]: ../models/struct.Reaction.html
+    /// [Manage Messages]: ../models/permissions/constant.MANAGE_MESSAGES.html
+    pub fn delete_reaction<C, M, R>(&self,
+                                    channel_id: C,
+                                    message_id: M,
+                                    user_id: Option<UserId>,
+                                    reaction_type: R)
+                                    -> Result<()>
+                                    where C: Into<ChannelId>,
+                                          M: Into<MessageId>,
+                                          R: Into<ReactionType> {
+        http::delete_reaction(channel_id.into().0,
+                              message_id.into().0,
+                              user_id.map(|uid| uid.0),
+                              reaction_type.into())
     }
 
     pub fn delete_role<G, R>(&self, guild_id: G, role_id: R) -> Result<()>
@@ -648,6 +692,48 @@ impl Context {
         };
 
         http::get_messages(channel_id.into().0, &query)
+    }
+
+    /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
+    /// certain [`Emoji`].
+    ///
+    /// The default `limit` is `50` - specify otherwise to receive a different
+    /// maximum number of users. The maximum that may be retrieve at a time is
+    /// `100`, if a greater number is provided then it is automatically reduced.
+    ///
+    /// The optional `after` attribute is to retrieve the users after a certain
+    /// user. This is useful for pagination.
+    ///
+    /// **Note**: Requires the [Read Message History] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
+    /// not have the required [permissions].
+    ///
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`Emoji`]: struct.Emoji.html
+    /// [`Message`]: struct.Message.html
+    /// [`User`]: struct.User.html
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    pub fn get_reaction_users<C, M, R, U>(&self,
+                                          channel_id: C,
+                                          message_id: M,
+                                          reaction_type: R,
+                                          limit: Option<u8>,
+                                          after: Option<U>)
+                                          -> Result<Vec<User>>
+                                          where C: Into<ChannelId>,
+                                                M: Into<MessageId>,
+                                                R: Into<ReactionType>,
+                                                U: Into<UserId> {
+        let limit = limit.map(|x| if x > 100 { 100 } else { x }).unwrap_or(50);
+
+        http::get_reaction_users(channel_id.into().0,
+                                 message_id.into().0,
+                                 reaction_type.into(),
+                                 limit,
+                                 after.map(|u| u.into().0))
     }
 
     pub fn get_voice_regions(&self) -> Result<Vec<VoiceRegion>> {

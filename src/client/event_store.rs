@@ -55,6 +55,8 @@ pub struct EventStore {
     pub on_message_ack: Option<Arc<Fn(Context, ChannelId, Option<MessageId>) + Send + Sync + 'static>>,
     pub on_message_delete: Option<Arc<Fn(Context, ChannelId, MessageId) + Send + Sync + 'static>>,
     pub on_message_delete_bulk: Option<Arc<Fn(Context, ChannelId, Vec<MessageId>) + Send + Sync + 'static>>,
+    pub on_reaction_add: Option<Arc<Fn(Context, Reaction) + Send + Sync + 'static>>,
+    pub on_reaction_remove: Option<Arc<Fn(Context, Reaction) + Send + Sync + 'static>>,
     pub on_message_update: Option<Arc<Fn(Context, MessageUpdateEvent) + Send + Sync + 'static>>,
     pub on_note_update: Option<Arc<Fn(Context, UserId, String) + Send + Sync + 'static>>,
     pub on_presence_replace: Option<Arc<Fn(Context, Vec<Presence>) + Send + Sync + 'static>>,

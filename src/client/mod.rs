@@ -685,6 +685,26 @@ impl Client {
             .on_presence_update = Some(Arc::new(handler));
     }
 
+    /// Attached a handler for when a [`ReactionAdd`] is received.
+    ///
+    /// [`ReactionAdd`]: ../model/enum.Event.html#ReactionAdd.v
+    pub fn on_reaction_add<F>(&mut self, handler: F)
+        where F: Fn(Context, Reaction) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_reaction_add = Some(Arc::new(handler))
+    }
+
+    /// Attached a handler for when a [`ReactionRemove`] is received.
+    ///
+    /// [`ReactionRemove`]: ../model/enum.Event.html#ReactionRemove.v
+    pub fn on_reaction_remove<F>(&mut self, handler: F)
+        where F: Fn(Context, Reaction) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_reaction_remove = Some(Arc::new(handler))
+    }
+
     /// Register an event to be called whenever a Ready event is received.
     ///
     /// Registering a handler for the ready event is good for noting when your

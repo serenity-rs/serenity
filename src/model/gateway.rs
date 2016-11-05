@@ -212,6 +212,16 @@ pub struct PresencesReplaceEvent {
     pub presences: Vec<Presence>,
 }
 
+#[derive(Clone, Debug)]
+pub struct ReactionAddEvent {
+    pub reaction: Reaction,
+}
+
+#[derive(Clone, Debug)]
+pub struct ReactionRemoveEvent {
+    pub reaction: Reaction,
+}
+
 /// The "Ready" event, containing initial state
 #[derive(Clone, Debug)]
 pub struct ReadyEvent {
@@ -439,6 +449,18 @@ pub enum Event {
     PresenceUpdate(PresenceUpdateEvent),
     /// The precense list of the user's friends should be replaced entirely
     PresencesReplace(PresencesReplaceEvent),
+    /// A reaction was added to a message.
+    ///
+    /// Fires the [`on_message_reaction_add`] event handler.
+    ///
+    /// [`on_message_reaction_add`]: ../client/struct.Client.html#method.on_message_reaction_add
+    ReactionAdd(ReactionAddEvent),
+    /// A reaction was removed to a message.
+    ///
+    /// Fires the [`on_message_reaction_remove`] event handler.
+    ///
+    /// [`on_message_reaction_remove`]: ../client/struct.Client.html#method.on_message_reaction_remove
+    ReactionRemove(ReactionRemoveEvent),
     /// The first event in a connection, containing the initial state.
     ///
     /// May also be received at a later time in the event of a reconnect.
@@ -628,6 +650,14 @@ impl Event {
             missing!(value, Event::MessageDeleteBulk(MessageDeleteBulkEvent {
                 channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
                 ids: try!(decode_array(try!(remove(&mut value, "ids")), MessageId::decode)),
+            }))
+        } else if kind == "MESSAGE_REACTION_ADD" {
+            Ok(Event::ReactionAdd(ReactionAddEvent {
+                reaction: try!(Reaction::decode(Value::Object(value)))
+            }))
+        } else if kind == "MESSAG_REACTION_REMOVE" {
+            Ok(Event::ReactionRemove(ReactionRemoveEvent {
+                reaction: try!(Reaction::decode(Value::Object(value)))
             }))
         } else if kind == "MESSAGE_UPDATE" {
             missing!(value, Event::MessageUpdate(MessageUpdateEvent {

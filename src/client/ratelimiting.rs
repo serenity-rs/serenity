@@ -22,6 +22,7 @@ pub enum Route {
     ChannelsIdMessages,
     ChannelsIdMessagesBulkDelete,
     ChannelsIdMessagesId,
+    ChannelsIdMessagesIdReactionsUserIdType,
     ChannelsIdPermissionsOverwriteId,
     ChannelsIdPins,
     ChannelsIdPinsMessageId,

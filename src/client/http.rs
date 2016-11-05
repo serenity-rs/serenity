@@ -116,8 +116,7 @@ pub fn create_guild(map: Value) -> Result<Guild> {
     Guild::decode(try!(serde_json::from_reader(response)))
 }
 
-pub fn create_guild_integration(
-                                guild_id: u64,
+pub fn create_guild_integration(guild_id: u64,
                                 integration_id: u64,
                                 map: Value) -> Result<()> {
     let body = try!(serde_json::to_string(&map));
@@ -159,6 +158,18 @@ pub fn create_private_channel(map: Value)
                             "/users/@me/channels");
 
     PrivateChannel::decode(try!(serde_json::from_reader(response)))
+}
+
+pub fn create_reaction(channel_id: u64,
+                       message_id: u64,
+                       reaction_type: ReactionType)
+                       -> Result<()> {
+    verify(204, request!(Route::ChannelsIdMessagesIdReactionsUserIdType,
+                         put,
+                         "/channels/{}/messages/{}/reactions/{}/@me",
+                         channel_id,
+                         message_id,
+                         reaction_type.as_data()))
 }
 
 pub fn create_role(guild_id: u64) -> Result<Role> {
@@ -234,6 +245,22 @@ pub fn delete_permission(channel_id: u64, target_id: u64)
                          "/channels/{}/permissions/{}",
                          channel_id,
                          target_id))
+}
+
+pub fn delete_reaction(channel_id: u64,
+                       message_id: u64,
+                       user_id: Option<u64>,
+                       reaction_type: ReactionType)
+                       -> Result<()> {
+    let user = user_id.map(|uid| uid.to_string()).unwrap_or("@me".to_string());
+
+    verify(204, request!(Route::ChannelsIdMessagesIdReactionsUserIdType,
+                         delete,
+                         "/channels/{}/messages/{}/reactions/{}/{}",
+                         channel_id,
+                         message_id,
+                         reaction_type.as_data(),
+                         user))
 }
 
 pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
@@ -506,6 +533,31 @@ pub fn get_pins(channel_id: u64) -> Result<Vec<Message>> {
                             channel_id);
 
     decode_array(try!(serde_json::from_reader(response)), Message::decode)
+}
+
+pub fn get_reaction_users(channel_id: u64,
+                          message_id: u64,
+                          reaction_type: ReactionType,
+                          limit: u8,
+                          after: Option<u64>)
+                          -> Result<Vec<User>> {
+    let mut uri = format!("/channels/{}/messages/{}/reactions/{}?limit={}",
+                      channel_id,
+                      message_id,
+                      reaction_type.as_data(),
+                      limit);
+
+    if let Some(user_id) = after {
+        uri.push_str("&after=");
+        uri.push_str(&user_id.to_string());
+    }
+
+    let response = request!(Route::ChannelsIdMessagesIdReactionsUserIdType,
+                            get,
+                            "{}",
+                            uri);
+
+    decode_array(try!(serde_json::from_reader(response)), User::decode)
 }
 
 pub fn get_user(user_id: u64) -> Result<CurrentUser> {

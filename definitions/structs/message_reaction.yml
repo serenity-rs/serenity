@@ -1,0 +1,23 @@
+---
+name: MessageReaction
+description: >
+  A representation of a [`Reaction`] to a [`Message`], where multiple of the
+  same [reaction type] are stacked into one `MessageReaction`, with an
+  associated [`count`].
+
+
+    [`Message`]: struct.Message.html
+    [`Reaction`]: struct.Reaction.html
+    [`count`]: #structfield.count
+    [reaction type]: enum.ReactionType.html
+fields:
+  - name: count
+    description: The amount of the type of reaction that have been sent for
+      the associated message.
+    type: u64
+  - name: me
+    description: Whether the current user has sent the type of reaction.
+    type: bool
+  - name: reaction_type
+    description: The type of reaction.
+    type: ReactionType

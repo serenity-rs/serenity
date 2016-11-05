@@ -488,6 +488,30 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
+        Ok(Event::ReactionAdd(event)) => {
+            if let Some(ref handler) = handler!(on_reaction_add, event_store) {
+                let context = context(Some(event.reaction.channel_id),
+                                      conn,
+                                      login_type);
+                let handler = handler.clone();
+
+                thread::spawn(move || {
+                    (handler)(context, event.reaction);
+                });
+            }
+        },
+        Ok(Event::ReactionRemove(event)) => {
+            if let Some(ref handler) = handler!(on_reaction_remove, event_store) {
+                let context = context(Some(event.reaction.channel_id),
+                                      conn,
+                                      login_type);
+                let handler = handler.clone();
+
+                thread::spawn(move || {
+                    (handler)(context, event.reaction);
+                });
+            }
+        },
         Ok(Event::Ready(event)) => {
             if let Some(ref handler) = handler!(on_ready, event_store) {
                 update!(update_with_ready, event);

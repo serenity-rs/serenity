@@ -95,7 +95,8 @@ impl Emoji {
 impl fmt::Display for Emoji {
     /// Formats the emoji into a string that will cause Discord clients to
     /// render the emoji.
-    // This is in the format of: `<:NAME:EMOJI_ID>`.
+    ///
+    /// This is in the format of: `<:NAME:EMOJI_ID>`.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         try!(f.write_str("<:"));
         try!(f.write_str(&self.name));

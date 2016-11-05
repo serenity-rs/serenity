@@ -277,8 +277,8 @@ pub fn remove(map: &mut BTreeMap<String, Value>, key: &str) -> Result<Value> {
 
 #[doc(hidden)]
 pub fn user_has_perms(channel_id: ChannelId,
-                  mut permissions: Permissions)
-                  -> Result<bool> {
+                      mut permissions: Permissions)
+                      -> Result<bool> {
     let state = STATE.lock().unwrap();
     let current_user = &state.user;
 

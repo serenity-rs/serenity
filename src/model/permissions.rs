@@ -42,6 +42,7 @@ use ::prelude::*;
 ///
 /// This includes the following permissions:
 ///
+/// - [Add Reactions]
 /// - [Attach Files]
 /// - [Change Nickname]
 /// - [Connect]
@@ -65,6 +66,7 @@ use ::prelude::*;
 /// permissions::general().toggle(permissions::SEND_TTS_MESSAGES);
 /// ```
 ///
+/// [Add Reactions]: constant.ADD_REACTIONS.html
 /// [Attach Files]: constant.ATTACH_FILES.html
 /// [Change Nickname]: constant.CHANGE_NICKNAME.html
 /// [Connect]: constant.CONNECT.html
@@ -81,9 +83,9 @@ use ::prelude::*;
 pub fn general() -> Permissions {
     use self::*;
 
-    ATTACH_FILES | CHANGE_NICKNAME | CONNECT | CREATE_INVITE | EMBED_LINKS |
-    MENTION_EVERYONE | READ_MESSAGE_HISTORY | READ_MESSAGES | SEND_MESSAGES |
-    SEND_TTS_MESSAGES | SPEAK | USE_VAD | USE_EXTERNAL_EMOJIS
+    ADD_REACTIONS | ATTACH_FILES | CHANGE_NICKNAME | CONNECT | CREATE_INVITE |
+    EMBED_LINKS | MENTION_EVERYONE | READ_MESSAGE_HISTORY | READ_MESSAGES |
+    SEND_MESSAGES | SEND_TTS_MESSAGES | SPEAK | USE_VAD | USE_EXTERNAL_EMOJIS
 }
 
 /// Returns a set of text-only permissions with the original `@everyone`
@@ -91,6 +93,7 @@ pub fn general() -> Permissions {
 ///
 /// This includes the text permissions given via [`general`]:
 ///
+/// - [Add Reactions]
 /// - [Attach Files]
 /// - [Change Nickname]
 /// - [Create Invite]
@@ -103,6 +106,7 @@ pub fn general() -> Permissions {
 /// - [Use External Emojis]
 ///
 /// [`general`]: fn.general.html
+/// [Add Reactions]: constant.ADD_REACTIONS.html
 /// [Attach Files]: constant.ATTACH_FILES.html
 /// [Change Nickname]: constant.CHANGE_NICKNAME.html
 /// [Create Invite]: constant.CREATE_INVITE.html
@@ -116,9 +120,9 @@ pub fn general() -> Permissions {
 pub fn text() -> Permissions {
     use self::*;
 
-    ATTACH_FILES | CHANGE_NICKNAME | CREATE_INVITE | EMBED_LINKS |
-    MENTION_EVERYONE | READ_MESSAGE_HISTORY | READ_MESSAGES | SEND_MESSAGES |
-    SEND_TTS_MESSAGES | USE_EXTERNAL_EMOJIS
+    ADD_REACTIONS | ATTACH_FILES | CHANGE_NICKNAME | CREATE_INVITE |
+    EMBED_LINKS | MENTION_EVERYONE | READ_MESSAGE_HISTORY | READ_MESSAGES |
+    SEND_MESSAGES | SEND_TTS_MESSAGES | USE_EXTERNAL_EMOJIS
 }
 
 /// Returns a set of voice-only permissions with the original `@everyone`
@@ -166,6 +170,14 @@ bitflags! {
         ///
         /// [guild]: ../struct.LiveGuild.html
         const MANAGE_GUILD = 1 << 5,
+        /// [`Member`]s with this permission can add new [`Reaction`]s to a
+        /// [`Message`]. Members can still react using reactions already added
+        /// to messages without this permission.
+        ///
+        /// [`Member`]: ../struct.Member.html
+        /// [`Message`]: ../struct.Message.html
+        /// [`Reaction`]: ../struct.Reaction.html
+        const ADD_REACTIONS = 1 << 6,
         /// Allows reading messages in a guild channel. If a user does not have
         /// this permission, then they will not be able to see the channel.
         const READ_MESSAGES = 1 << 10,
