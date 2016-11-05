@@ -38,6 +38,12 @@ impl Context {
         }
     }
 
+    /// Accepts the given invite.
+    ///
+    /// Refer to the documentation for [`Invite::accept`] for restrictions on
+    /// accepting an invite.
+    ///
+    /// [`Invite::accept`]: ../model/struct.Invite.html#method.accept
     pub fn accept_invite(&self, invite: &str) -> Result<Invite> {
         let code = utils::parse_invite(invite);
 
@@ -292,13 +298,24 @@ impl Context {
                                        integration_id.into().0)
     }
 
-    /*
+    /// Deletes the given invite.
+    ///
+    /// Refer to the documentation for [`Invite::delete`] for restrictions on
+    /// deleting an invite.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
+    /// not have the required [permission].
+    ///
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`Invite::delete`]: ../model/struct.Invite.html#method.delete
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn delete_invite(&self, invite: &str) -> Result<Invite> {
         let code = utils::parse_invite(invite);
 
         http::delete_invite(code)
     }
-    */
 
     /// Deletes a [Message](../model/struct.Message.html) given its ID.
     ///

@@ -1,47 +1,72 @@
 use super::{Invite, RichInvite};
 use ::client::http;
 use ::prelude::*;
+use super::{permissions, utils};
 
 impl Invite {
-    /// Accepts an invite.
+    /// Accepts the invite.
     ///
-    /// Refer to the documentation for [`Context::accept_invite`] for
-    /// restrictions on accepting an invite.
+    /// **Note**: This will fail if you are already in the [`Guild`], or are
+    /// banned. A ban is equivilant to an IP ban.
     ///
-    /// [`Context::accept_invite`]: ../client/struct.Context.html#method.accept_invite
+    /// [`Guild`]: struct.Guild.html
     pub fn accept(&self) -> Result<Invite> {
         http::accept_invite(&self.code)
     }
 
-    /// Deletes an invite.
+    /// Deletes the invite.
     ///
-    /// Refer to the documentation for [`Context::delete_invite`] for more
-    /// information.
+    /// **Note**: Requires the [Manage Guild] permission.
     ///
-    /// [`Context::delete_invite`]: ../client/struct.Context.html#method.delete_invite
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
+    /// not have the required [permission].
+    ///
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn delete(&self) -> Result<Invite> {
+        let req = permissions::MANAGE_GUILD;
+
+        if !try!(utils::user_has_perms(self.channel.id, req)) {
+            return Err(Error::Client(ClientError::InvalidPermissions(req)));
+        }
+
         http::delete_invite(&self.code)
     }
 }
 
 impl RichInvite {
-    /// Accepts an invite.
+    /// Accepts the invite.
     ///
-    /// Refer to the documentation for [`Context::accept_invite`] for
-    /// restrictions on accepting an invite.
+    /// Refer to the documentation for [`Invite::accept`] for restrictions on
+    /// accepting an invite.
     ///
-    /// [`Context::accept_invite`]: ../client/struct.Context.html#method.accept_invite
+    /// [`Invite::accept`]: struct.Invite.html#method.accept
     pub fn accept(&self) -> Result<Invite> {
         http::accept_invite(&self.code)
     }
 
-    /// Deletes an invite.
+    /// Deletes the invite.
     ///
-    /// Refer to the documentation for [`Context::delete_invite`] for more
-    /// information.
+    /// Refer to the documentation for [`Invite::delete`] for restrictions on
+    /// deleting an invite.
     ///
-    /// [`Context::delete_invite`]: ../client/struct.Context.html#method.delete_invite
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
+    /// not have the required [permission].
+    ///
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`Invite::delete`]: struct.Invite.html#method.delete
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn delete(&self) -> Result<Invite> {
+        let req = permissions::MANAGE_GUILD;
+
+        if !try!(utils::user_has_perms(self.channel.id, req)) {
+            return Err(Error::Client(ClientError::InvalidPermissions(req)));
+        }
+
         http::delete_invite(&self.code)
     }
 }

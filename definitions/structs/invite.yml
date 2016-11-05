@@ -1,12 +1,21 @@
 ---
 name: Invite
-description: Information about an invite
+description: Information about an invite.
 fields:
   - name: code
+    description: The unique code for the invite.
     type: string
   - name: channel
-    description: "A representation of the minimal amount of info needed about
-      the channel being invited to."
+    description: >
+      A representation of the minimal amount of information needed about the
+      [`PublicChannel`] being invited to.
+
+        [`PublicChannel`]: struct.PublicChannel.html
     type: InviteChannel
   - name: guild
+    description: >
+      A representation of the minimal amount of information needed about the
+      [`Guild`] being invited to.
+
+        [`Guild`]: struct.Guild.html
     type: InviteGuild
