@@ -54,24 +54,24 @@ pub fn into_array(value: Value) -> Result<Vec<Value>> {
 }
 
 macro_rules! request {
-    ($route:path, $method:ident($body:expr), $url:expr, $($rest:tt)*) => {{
+    ($route:expr, $method:ident($body:expr), $url:expr, $($rest:tt)*) => {{
         let client = HyperClient::new();
         try!(request($route, || client
             .$method(&format!(api!($url), $($rest)*))
             .body(&$body)))
     }};
-    ($route:path, $method:ident($body:expr), $url:expr) => {{
+    ($route:expr, $method:ident($body:expr), $url:expr) => {{
         let client = HyperClient::new();
         try!(request($route, || client
             .$method(api!($url))
             .body(&$body)))
     }};
-    ($route:path, $method:ident, $url:expr, $($rest:tt)*) => {{
+    ($route:expr, $method:ident, $url:expr, $($rest:tt)*) => {{
         let client = HyperClient::new();
         try!(request($route, || client
             .$method(&format!(api!($url), $($rest)*))))
     }};
-    ($route:path, $method:ident, $url:expr) => {{
+    ($route:expr, $method:ident, $url:expr) => {{
         let client = HyperClient::new();
         try!(request($route, || client
             .$method(api_concat!($url))))

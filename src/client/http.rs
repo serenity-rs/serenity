@@ -54,7 +54,7 @@ pub fn accept_invite(code: &str) -> Result<Invite> {
 }
 
 pub fn ack_message(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(204, request!(Route::None,
+    verify(204, request!(Route::ChannelsIdMessagesIdAck(channel_id),
                          post,
                          "/channels/{}/messages/{}/ack",
                          channel_id,
@@ -72,7 +72,7 @@ pub fn add_group_recipient(group_id: u64, user_id: u64)
 
 pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8)
     -> Result<()> {
-    verify(204, request!(Route::GuildsIdBansUserId,
+    verify(204, request!(Route::GuildsIdBansUserId(guild_id),
                          put,
                          "/guilds/{}/bans/{}?delete_message_days={}",
                          guild_id,
@@ -81,7 +81,7 @@ pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8)
 }
 
 pub fn broadcast_typing(channel_id: u64) -> Result<()> {
-    verify(204, request!(Route::ChannelsIdTyping,
+    verify(204, request!(Route::ChannelsIdTyping(channel_id),
                          post,
                          "/channels/{}/typing",
                          channel_id))
@@ -89,7 +89,7 @@ pub fn broadcast_typing(channel_id: u64) -> Result<()> {
 
 pub fn create_channel(guild_id: u64, map: Value) -> Result<Channel> {
     let body = try!(serde_json::to_string(&map));
-    let response = request!(Route::GuildsIdChannels,
+    let response = request!(Route::GuildsIdChannels(guild_id),
                             post(body),
                             "/guilds/{}/channels",
                             guild_id);
@@ -97,11 +97,10 @@ pub fn create_channel(guild_id: u64, map: Value) -> Result<Channel> {
     Channel::decode(try!(serde_json::from_reader(response)))
 }
 
-
 pub fn create_emoji(guild_id: u64, map: Value)
     -> Result<Emoji> {
     let body = try!(serde_json::to_string(&map));
-    let response = request!(Route::GuildsIdEmojis,
+    let response = request!(Route::GuildsIdEmojis(guild_id),
                             post(body),
                             "/guilds/{}/emojis",
                             guild_id);
@@ -121,7 +120,7 @@ pub fn create_guild_integration(guild_id: u64,
                                 map: Value) -> Result<()> {
     let body = try!(serde_json::to_string(&map));
 
-    verify(204, request!(Route::GuildsIdIntegrations,
+    verify(204, request!(Route::GuildsIdIntegrations(guild_id),
                          post(body),
                          "/guilds/{}/integrations/{}",
                          guild_id,
@@ -131,7 +130,7 @@ pub fn create_guild_integration(guild_id: u64,
 pub fn create_invite(channel_id: u64, map: Value)
     -> Result<RichInvite> {
     let body = try!(serde_json::to_string(&map));
-    let response = request!(Route::ChannelsIdInvites,
+    let response = request!(Route::ChannelsIdInvites(channel_id),
                             post(body),
                             "/channels/{}/invites",
                             channel_id);
@@ -143,7 +142,7 @@ pub fn create_permission(channel_id: u64, target_id: u64, map: Value)
     -> Result<()> {
     let body = try!(serde_json::to_string(&map));
 
-    verify(204, request!(Route::ChannelsIdPermissionsOverwriteId,
+    verify(204, request!(Route::ChannelsIdPermissionsOverwriteId(channel_id),
                          put(body),
                          "/channels/{}/permissions/{}",
                          channel_id,
@@ -164,7 +163,7 @@ pub fn create_reaction(channel_id: u64,
                        message_id: u64,
                        reaction_type: ReactionType)
                        -> Result<()> {
-    verify(204, request!(Route::ChannelsIdMessagesIdReactionsUserIdType,
+    verify(204, request!(Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
                          put,
                          "/channels/{}/messages/{}/reactions/{}/@me",
                          channel_id,
@@ -174,7 +173,7 @@ pub fn create_reaction(channel_id: u64,
 
 pub fn create_role(guild_id: u64) -> Result<Role> {
     let body = String::from("{}");
-    let response = request!(Route::GuildsIdRoles,
+    let response = request!(Route::GuildsIdRoles(guild_id),
                             post(body),
                             "/guilds/{}/roles",
                             guild_id);
@@ -182,17 +181,17 @@ pub fn create_role(guild_id: u64) -> Result<Role> {
     Role::decode(try!(serde_json::from_reader(response)))
 }
 
-pub fn delete_channel(guild_id: u64) -> Result<Channel> {
-    let response = request!(Route::ChannelsId,
+pub fn delete_channel(channel_id: u64) -> Result<Channel> {
+    let response = request!(Route::ChannelsId(channel_id),
                             delete,
                             "/channels/{}",
-                            guild_id);
+                            channel_id);
 
     Channel::decode(try!(serde_json::from_reader(response)))
 }
 
 pub fn delete_emoji(guild_id: u64, emoji_id: u64) -> Result<()> {
-    verify(204, request!(Route::GuildsIdEmojisId,
+    verify(204, request!(Route::GuildsIdEmojisId(guild_id),
                          delete,
                          "/guilds/{}/emojis/{}",
                          guild_id,
@@ -200,14 +199,17 @@ pub fn delete_emoji(guild_id: u64, emoji_id: u64) -> Result<()> {
 }
 
 pub fn delete_guild(guild_id: u64) -> Result<Guild> {
-    let response = request!(Route::GuildsId, delete, "/guilds/{}", guild_id);
+    let response = request!(Route::GuildsId(guild_id),
+                            delete,
+                            "/guilds/{}",
+                            guild_id);
 
     Guild::decode(try!(serde_json::from_reader(response)))
 }
 
 pub fn delete_guild_integration(guild_id: u64, integration_id: u64)
     -> Result<()> {
-    verify(204, request!(Route::GuildsIdIntegrationsId,
+    verify(204, request!(Route::GuildsIdIntegrationsId(guild_id),
                          delete,
                          "/guilds/{}/integrations/{}",
                          guild_id,
@@ -222,7 +224,7 @@ pub fn delete_invite(code: &str) -> Result<Invite> {
 
 pub fn delete_message(channel_id: u64, message_id: u64)
     -> Result<()> {
-    verify(204, request!(Route::ChannelsIdMessagesId,
+    verify(204, request!(Route::ChannelsIdMessagesId(channel_id),
                          delete,
                          "/channels/{}/messages/{}",
                          channel_id,
@@ -232,7 +234,7 @@ pub fn delete_message(channel_id: u64, message_id: u64)
 pub fn delete_messages(channel_id: u64, map: Value) -> Result<()> {
     let body = try!(serde_json::to_string(&map));
 
-    verify(204, request!(Route::ChannelsIdMessagesBulkDelete,
+    verify(204, request!(Route::ChannelsIdMessagesBulkDelete(channel_id),
                          post(body),
                          "/channels/{}/messages/bulk_delete",
                          channel_id))
@@ -240,7 +242,7 @@ pub fn delete_messages(channel_id: u64, map: Value) -> Result<()> {
 
 pub fn delete_permission(channel_id: u64, target_id: u64)
     -> Result<()> {
-    verify(204, request!(Route::ChannelsIdPermissionsOverwriteId,
+    verify(204, request!(Route::ChannelsIdPermissionsOverwriteId(channel_id),
                          delete,
                          "/channels/{}/permissions/{}",
                          channel_id,
@@ -254,7 +256,7 @@ pub fn delete_reaction(channel_id: u64,
                        -> Result<()> {
     let user = user_id.map(|uid| uid.to_string()).unwrap_or("@me".to_string());
 
-    verify(204, request!(Route::ChannelsIdMessagesIdReactionsUserIdType,
+    verify(204, request!(Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
                          delete,
                          "/channels/{}/messages/{}/reactions/{}/{}",
                          channel_id,
@@ -264,7 +266,7 @@ pub fn delete_reaction(channel_id: u64,
 }
 
 pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
-    verify(204, request!(Route::GuildsIdRolesId,
+    verify(204, request!(Route::GuildsIdRolesId(guild_id),
                          delete,
                          "/guilds/{}/roles/{}",
                          guild_id,
@@ -274,7 +276,7 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 pub fn edit_channel(channel_id: u64, map: Value)
     -> Result<PublicChannel> {
     let body = try!(serde_json::to_string(&map));
-    let response = request!(Route::ChannelsId,
+    let response = request!(Route::ChannelsId(channel_id),
                             patch(body),
                             "/channels/{}",
                             channel_id);
@@ -285,7 +287,7 @@ pub fn edit_channel(channel_id: u64, map: Value)
 pub fn edit_emoji(guild_id: u64, emoji_id: u64, map: Value)
     -> Result<Emoji> {
     let body = try!(serde_json::to_string(&map));
-    let response = request!(Route::GuildsIdEmojisId,
+    let response = request!(Route::GuildsIdEmojisId(guild_id),
                             patch(body),
                             "/guilds/{}/emojis/{}",
                             guild_id,
@@ -296,7 +298,7 @@ pub fn edit_emoji(guild_id: u64, emoji_id: u64, map: Value)
 
 pub fn edit_guild(guild_id: u64, map: Value) -> Result<Guild> {
     let body = try!(serde_json::to_string(&map));
-    let response = request!(Route::GuildsId,
+    let response = request!(Route::GuildsId(guild_id),
                             patch(body),
                             "/guilds/{}",
                             guild_id);
@@ -308,7 +310,7 @@ pub fn edit_member(guild_id: u64, user_id: u64, map: Value)
     -> Result<()> {
     let body = try!(serde_json::to_string(&map));
 
-    verify(204, request!(Route::GuildsIdMembersId,
+    verify(204, request!(Route::GuildsIdMembersId(guild_id),
                          patch(body),
                          "/guilds/{}/members/{}",
                          guild_id,
@@ -320,7 +322,7 @@ pub fn edit_message(channel_id: u64,
                     map: Value)
                     -> Result<Message> {
     let body = try!(serde_json::to_string(&map));
-    let response = request!(Route::ChannelsIdMessagesId,
+    let response = request!(Route::ChannelsIdMessagesId(channel_id),
                             patch(body),
                             "/channels/{}/messages/{}",
                             channel_id,
@@ -348,7 +350,7 @@ pub fn edit_profile(map: Value) -> Result<CurrentUser> {
 pub fn edit_role(guild_id: u64, role_id: u64, map: Value)
     -> Result<Role> {
     let body = try!(serde_json::to_string(&map));
-    let response = request!(Route::GuildsIdRolesId,
+    let response = request!(Route::GuildsIdRolesId(guild_id),
                             patch(body),
                             "/guilds/{}/roles/{}",
                             guild_id,
@@ -371,7 +373,7 @@ pub fn get_applications() -> Result<Vec<ApplicationInfo>> {
 }
 
 pub fn get_bans(guild_id: u64) -> Result<Vec<Ban>> {
-    let response = request!(Route::GuildsIdBans,
+    let response = request!(Route::GuildsIdBans(guild_id),
                             get,
                             "/guilds/{}/bans",
                             guild_id);
@@ -380,14 +382,14 @@ pub fn get_bans(guild_id: u64) -> Result<Vec<Ban>> {
 }
 
 pub fn get_bot_gateway() -> Result<BotGateway> {
-    let response = request!(Route::Gateway, get, "/gateway/bot");
+    let response = request!(Route::GatewayBot, get, "/gateway/bot");
 
     BotGateway::decode(try!(serde_json::from_reader(response)))
 }
 
 pub fn get_channel_invites(channel_id: u64)
     -> Result<Vec<RichInvite>> {
-    let response = request!(Route::ChannelsIdInvites,
+    let response = request!(Route::ChannelsIdInvites(channel_id),
                             get,
                             "/channels/{}/invites",
                             channel_id);
@@ -397,13 +399,16 @@ pub fn get_channel_invites(channel_id: u64)
 }
 
 pub fn get_channel(channel_id: u64) -> Result<Channel> {
-    let response = request!(Route::ChannelsId, get, "/channels/{}", channel_id);
+    let response = request!(Route::ChannelsId(channel_id),
+                            get,
+                            "/channels/{}",
+                            channel_id);
 
     Channel::decode(try!(serde_json::from_reader(response)))
 }
 
 pub fn get_channels(guild_id: u64) -> Result<Vec<PublicChannel>> {
-    let response = request!(Route::ChannelsId,
+    let response = request!(Route::ChannelsId(guild_id),
                             get,
                             "/guilds/{}/channels",
                             guild_id);
@@ -425,7 +430,7 @@ pub fn get_gateway() -> Result<Gateway> {
 }
 
 pub fn get_emoji(guild_id: u64, emoji_id: u64) -> Result<Emoji> {
-    let response = request!(Route::GuildsIdEmojisId,
+    let response = request!(Route::GuildsIdEmojisId(guild_id),
                             get,
                             "/guilds/{}/emojis/{}",
                             guild_id,
@@ -435,7 +440,7 @@ pub fn get_emoji(guild_id: u64, emoji_id: u64) -> Result<Emoji> {
 }
 
 pub fn get_emojis(guild_id: u64) -> Result<Vec<Emoji>> {
-    let response = request!(Route::GuildsIdEmojis,
+    let response = request!(Route::GuildsIdEmojis(guild_id),
                             get,
                             "/guilds/{}/emojis",
                             guild_id);
@@ -444,14 +449,17 @@ pub fn get_emojis(guild_id: u64) -> Result<Vec<Emoji>> {
 }
 
 pub fn get_guild(guild_id: u64) -> Result<Guild> {
-    let response = request!(Route::GuildsId, get, "/guilds/{}", guild_id);
+    let response = request!(Route::GuildsId(guild_id),
+                            get,
+                            "/guilds/{}",
+                            guild_id);
 
     Guild::decode(try!(serde_json::from_reader(response)))
 }
 
 pub fn get_guild_integrations(guild_id: u64)
     -> Result<Vec<Integration>> {
-    let response = request!(Route::GuildsIdIntegrations,
+    let response = request!(Route::GuildsIdIntegrations(guild_id),
                             get,
                             "/guilds/{}/integrations",
                             guild_id);
@@ -460,7 +468,7 @@ pub fn get_guild_integrations(guild_id: u64)
 }
 
 pub fn get_guild_invites(guild_id: u64) -> Result<Vec<RichInvite>> {
-    let response = request!(Route::GuildsIdInvites,
+    let response = request!(Route::GuildsIdInvites(guild_id),
                             get,
                             "/guilds/{}/invites",
                             guild_id);
@@ -472,7 +480,7 @@ pub fn get_guild_invites(guild_id: u64) -> Result<Vec<RichInvite>> {
 pub fn get_guild_prune_count(guild_id: u64, map: Value)
     -> Result<GuildPrune> {
     let body = try!(serde_json::to_string(&map));
-    let response = request!(Route::GuildsIdPrune,
+    let response = request!(Route::GuildsIdPrune(guild_id),
                             get(body),
                             "/guilds/{}/prune",
                             guild_id);
@@ -481,7 +489,9 @@ pub fn get_guild_prune_count(guild_id: u64, map: Value)
 }
 
 pub fn get_guilds() -> Result<Vec<GuildInfo>> {
-    let response = request!(Route::GuildsId, get, "/users/@me/guilds");
+    let response = request!(Route::UsersMeGuilds,
+                            get,
+                            "/users/@me/guilds");
 
     decode_array(try!(serde_json::from_reader(response)), GuildInfo::decode)
 }
@@ -494,7 +504,7 @@ pub fn get_invite(code: &str) -> Result<Invite> {
 }
 
 pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
-    let response = request!(Route::GuildsIdMembersId,
+    let response = request!(Route::GuildsIdMembersId(guild_id),
                             get,
                             "/guilds/{}/members/{}",
                             guild_id,
@@ -505,7 +515,7 @@ pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
 
 pub fn get_message(channel_id: u64, message_id: u64)
     -> Result<Message> {
-    let response = request!(Route::ChannelsIdMessagesId,
+    let response = request!(Route::ChannelsIdMessagesId(channel_id),
                             get,
                             "/channels/{}/messages/{}",
                             channel_id,
@@ -520,14 +530,14 @@ pub fn get_messages(channel_id: u64, query: &str)
                       channel_id,
                       query);
     let client = HyperClient::new();
-    let response = try!(request(Route::ChannelsIdMessages,
+    let response = try!(request(Route::ChannelsIdMessages(channel_id),
                                 || client.get(&url)));
 
     decode_array(try!(serde_json::from_reader(response)), Message::decode)
 }
 
 pub fn get_pins(channel_id: u64) -> Result<Vec<Message>> {
-    let response = request!(Route::ChannelsIdPins,
+    let response = request!(Route::ChannelsIdPins(channel_id),
                             get,
                             "/channels/{}/pins",
                             channel_id);
@@ -552,7 +562,7 @@ pub fn get_reaction_users(channel_id: u64,
         uri.push_str(&user_id.to_string());
     }
 
-    let response = request!(Route::ChannelsIdMessagesIdReactionsUserIdType,
+    let response = request!(Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
                             get,
                             "{}",
                             uri);
@@ -573,7 +583,7 @@ pub fn get_voice_regions() -> Result<Vec<VoiceRegion>> {
 }
 
 pub fn kick_member(guild_id: u64, user_id: u64) -> Result<()> {
-    verify(204, request!(Route::GuildsIdMembersId,
+    verify(204, request!(Route::GuildsIdMembersId(guild_id),
                          delete,
                          "/guilds/{}/members/{}",
                          guild_id,
@@ -590,7 +600,10 @@ pub fn leave_group(guild_id: u64) -> Result<Group> {
 }
 
 pub fn leave_guild(guild_id: u64) -> Result<Guild> {
-    let response = request!(Route::GuildsId, delete, "/guilds/{}", guild_id);
+    let response = request!(Route::GuildsId(guild_id),
+                            delete,
+                            "/guilds/{}",
+                            guild_id);
 
     Guild::decode(try!(serde_json::from_reader(response)))
 }
@@ -635,7 +648,7 @@ pub fn send_file<R: Read>(channel_id: u64,
 
 pub fn send_message(channel_id: u64, map: Value) -> Result<Message> {
     let body = try!(serde_json::to_string(&map));
-    let response = request!(Route::ChannelsIdMessages,
+    let response = request!(Route::ChannelsIdMessages(channel_id),
                             post(body),
                             "/channels/{}/messages",
                             channel_id);
@@ -644,7 +657,7 @@ pub fn send_message(channel_id: u64, map: Value) -> Result<Message> {
 }
 
 pub fn pin_message(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(204, request!(Route::ChannelsIdPinsMessageId,
+    verify(204, request!(Route::ChannelsIdPinsMessageId(channel_id),
                          put,
                          "/channels/{}/pins/{}",
                          channel_id,
@@ -652,7 +665,7 @@ pub fn pin_message(channel_id: u64, message_id: u64) -> Result<()> {
 }
 
 pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
-    verify(204, request!(Route::GuildsIdBansUserId,
+    verify(204, request!(Route::GuildsIdBansUserId(guild_id),
                          delete,
                          "/guilds/{}/bans/{}",
                          guild_id,
@@ -662,7 +675,7 @@ pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
 pub fn start_guild_prune(guild_id: u64, map: Value)
     -> Result<GuildPrune> {
     let body = try!(serde_json::to_string(&map));
-    let response = request!(Route::GuildsIdPrune,
+    let response = request!(Route::GuildsIdPrune(guild_id),
                             post(body),
                             "/guilds/{}/prune",
                             guild_id);
@@ -672,7 +685,7 @@ pub fn start_guild_prune(guild_id: u64, map: Value)
 
 pub fn start_integration_sync(guild_id: u64, integration_id: u64)
     -> Result<()> {
-    verify(204, request!(Route::GuildsIdIntegrationsId,
+    verify(204, request!(Route::GuildsIdIntegrationsId(guild_id),
                          post,
                          "/guilds/{}/integrations/{}",
                          guild_id,
@@ -680,7 +693,7 @@ pub fn start_integration_sync(guild_id: u64, integration_id: u64)
 }
 
 pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(204, request!(Route::ChannelsIdPinsMessageId,
+    verify(204, request!(Route::ChannelsIdPinsMessageId(channel_id),
                          delete,
                          "/channels/{}/pins/{}",
                          channel_id,
