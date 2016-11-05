@@ -64,7 +64,7 @@
 //! [`Connection`]: client/struct.Connection.html
 //! [`Context`]: client/struct.Context.html
 //! [`Event`]: model/enum.Event.html
-//! [`Event::MessageCreate`]: model/enum.Event.html#MessageCreate.v
+//! [`Event::MessageCreate`]: model/enum.Event.html#variant.MessageCreate
 //! [`State`]: ext/state/struct.State.html
 //! [client's module-level documentation]: client/index.html
 //! [docs]: https://discordapp.com/developers/docs/intro

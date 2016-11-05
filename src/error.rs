@@ -17,9 +17,9 @@ pub type Result<T> = ::std::result::Result<T, Error>;
 /// enums, are both wrapped around this in the form of the [`Client`] and
 /// [`Connection`] variants.
 ///
-/// [`Client`]: #Client.v
+/// [`Client`]: #variant.Client
 /// [`ClientError`]: client/enum.ClientError.html
-/// [`Connection`]: #Connection.v
+/// [`Connection`]: #variant.Connection
 /// [`ConnectionError`]: client/enum.ConnectionError.html
 /// [`Result`]: type.Result.html
 #[derive(Debug)]

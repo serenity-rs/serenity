@@ -114,7 +114,7 @@ lazy_static! {
 /// [`Client`]: struct.Client.html
 /// [`Context`]: struct.Context.html
 /// [`Context::ban_user`]: struct.Context.html#method.ban_user
-/// [`Error::Client`]: ../enum.Error.html#Client.v
+/// [`Error::Client`]: ../enum.Error.html#variant.Client
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum ClientError {
     /// When attempting to delete below or above the minimum and maximum allowed
@@ -366,7 +366,7 @@ impl Client {
 
     /// Attaches a handler for when a [`CallCreate`] is received.
     ///
-    /// [`CallCreate`]: ../model/enum.Event.html#CallCreate.v
+    /// [`CallCreate`]: ../model/enum.Event.html#variant.CallCreate
     pub fn on_call_create<F>(&mut self, handler: F)
         where F: Fn(Context, Call) + Send + Sync + 'static {
         self.event_store.lock()
@@ -376,7 +376,7 @@ impl Client {
 
     /// Attaches a handler for when a [`CallDelete`] is received.
     ///
-    /// [`CallDelete`]: ../model/enum.Event.html#CallDelete.v
+    /// [`CallDelete`]: ../model/enum.Event.html#variant.CallDelete
     pub fn on_call_delete<F>(&mut self, handler: F)
         where F: Fn(Context, Option<Call>) + Send + Sync + 'static {
         self.event_store.lock()
@@ -386,7 +386,7 @@ impl Client {
 
     /// Attaches a handler for when a [`CallUpdate`] is received.
     ///
-    /// [`CallUpdate`]: ../model/enum.Event.html#CallUpdate.v
+    /// [`CallUpdate`]: ../model/enum.Event.html#variant.CallUpdate
     pub fn on_call_update<F>(&mut self, handler: F)
         where F: Fn(Context, Option<Call>, Option<Call>) + Send + Sync + 'static {
         self.event_store.lock()
@@ -396,7 +396,7 @@ impl Client {
 
     /// Attaches a handler for when a [`ChannelCreate`] is received.
     ///
-    /// [`ChannelCreate`]: ../model/enum.Event.html#ChannelCreate.v
+    /// [`ChannelCreate`]: ../model/enum.Event.html#variant.ChannelCreate
     pub fn on_channel_create<F>(&mut self, handler: F)
         where F: Fn(Context, Channel) + Send + Sync + 'static {
         self.event_store.lock()
@@ -406,7 +406,7 @@ impl Client {
 
     /// Attaches a handler for when a [`ChannelDelete`] is received.
     ///
-    /// [`ChannelDelete`]: ../model/enum.Event.html#ChannelDelete.v
+    /// [`ChannelDelete`]: ../model/enum.Event.html#variant.ChannelDelete
     pub fn on_channel_delete<F>(&mut self, handler: F)
         where F: Fn(Context, Channel) + Send + Sync + 'static {
         self.event_store.lock()
@@ -416,7 +416,7 @@ impl Client {
 
     /// Attaches a handler for when a [`ChannelPinsAck`] is received.
     ///
-    /// [`ChannelPinsAck`]: ../model/enum.Event.html#ChannelPinsAck.v
+    /// [`ChannelPinsAck`]: ../model/enum.Event.html#variant.ChannelPinsAck
     pub fn on_channel_pins_ack<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelPinsAckEvent) + Send + Sync + 'static {
         self.event_store.lock()
@@ -426,7 +426,7 @@ impl Client {
 
     /// Attaches a handler for when a [`ChannelPinsUpdate`] is received.
     ///
-    /// [`ChannelPinsUpdate`]: ../model/enum.Event.html#ChannelPinsUpdate.v
+    /// [`ChannelPinsUpdate`]: ../model/enum.Event.html#variant.ChannelPinsUpdate
     pub fn on_channel_pins_update<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelPinsUpdateEvent) + Send + Sync + 'static {
         self.event_store.lock()
@@ -436,7 +436,7 @@ impl Client {
 
     /// Attaches a handler for when a [`ChannelUpdate`] is received.
     ///
-    /// [`ChannelUpdate`]: ../model/enum.Event.html#ChannelUpdate.v
+    /// [`ChannelUpdate`]: ../model/enum.Event.html#variant.ChannelUpdate
     pub fn on_channel_update<F>(&mut self, handler: F)
         where F: Fn(Context, Option<Channel>, Channel) + Send + Sync + 'static {
         self.event_store.lock()
@@ -446,7 +446,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildCreate`] is received.
     ///
-    /// [`GuildCreate`]: ../model/enum.Event.html#GuildCreate.v
+    /// [`GuildCreate`]: ../model/enum.Event.html#variant.GuildCreate
     pub fn on_guild_create<F>(&mut self, handler: F)
         where F: Fn(Context, LiveGuild) + Send + Sync + 'static {
         self.event_store.lock()
@@ -456,7 +456,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuilDelete`] is received.
     ///
-    /// [`GuilDelete`]: ../model/enum.Event.html#GuilDelete.v
+    /// [`GuilDelete`]: ../model/enum.Event.html#variant.GuildDelete
     pub fn on_guild_delete<F>(&mut self, handler: F)
         where F: Fn(Context, Guild) + Send + Sync + 'static {
         self.event_store.lock()
@@ -466,7 +466,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildEmojisUpdate`] is received.
     ///
-    /// [`GuildEmojisUpdate`]: ../model/enum.Event.html#GuildEmojisUpdate.v
+    /// [`GuildEmojisUpdate`]: ../model/enum.Event.html#variant.GuildEmojisUpdate
     pub fn on_guild_emojis_update<F>(&mut self, handler: F)
         where F: Fn(Context, GuildEmojisUpdateEvent) + Send + Sync + 'static {
         self.event_store.lock()
@@ -476,7 +476,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildIntegrationsUpdate`] is received.
     ///
-    /// [`GuildIntegrationsUpdate`]: ../model/enum.Event.html#GuildIntegrationsUpdate.v
+    /// [`GuildIntegrationsUpdate`]: ../model/enum.Event.html#variant.GuildIntegrationsUpdate
     pub fn on_guild_integrations_update<F>(&mut self, handler: F)
         where F: Fn(Context, GuildIntegrationsUpdateEvent) + Send + Sync + 'static {
         self.event_store.lock()
@@ -486,7 +486,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildMemberAdd`] is received.
     ///
-    /// [`GuildMemberAdd`]: ../model/enum.Event.html#GuildMemberAdd.v
+    /// [`GuildMemberAdd`]: ../model/enum.Event.html#variant.GuildMemberAdd
     pub fn on_guild_member_add<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, Member) + Send + Sync + 'static {
         self.event_store.lock()
@@ -496,7 +496,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildMemberRemove`] is received.
     ///
-    /// [`GuildMemberRemove`]: ../model/enum.Event.html#GuildMemberRemove.v
+    /// [`GuildMemberRemove`]: ../model/enum.Event.html#variant.GuildMemberRemove
     pub fn on_guild_member_remove<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, User) + Send + Sync + 'static {
         self.event_store.lock()
@@ -506,7 +506,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildMemberUpdate`] is received.
     ///
-    /// [`GuildMemberUpdate`]: ../model/enum.Event.html#GuildMemberUpdate.v
+    /// [`GuildMemberUpdate`]: ../model/enum.Event.html#variant.GuildMemberUpdate
     pub fn on_guild_member_update<F>(&mut self, handler: F)
         where F: Fn(Context, Option<Member>, Member) + Send + Sync + 'static {
         self.event_store.lock()
@@ -516,7 +516,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildMembersChunk`] is received.
     ///
-    /// [`GuildMembersChunk`]: ../model/enum.Event.html#GuildMembersChunk.v
+    /// [`GuildMembersChunk`]: ../model/enum.Event.html#variant.GuildMembersChunk
     pub fn on_guild_members_chunk<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, HashMap<UserId, Member>) + Send + Sync + 'static {
         self.event_store.lock()
@@ -526,7 +526,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildRoleCreate`] is received.
     ///
-    /// [`GuildRoleCreate`]: ../model/enum.Event.html#GuildRoleCreate.v
+    /// [`GuildRoleCreate`]: ../model/enum.Event.html#variant.GuildRoleCreate
     pub fn on_guild_role_create<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, Role) + Send + Sync + 'static {
         self.event_store.lock()
@@ -536,7 +536,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildRoleDelete`] is received.
     ///
-    /// [`GuildRoleDelete`]: ../model/enum.Event.html#GuildRoleDelete.v
+    /// [`GuildRoleDelete`]: ../model/enum.Event.html#variant.GuildRoleDelete
     pub fn on_guild_role_delete<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, RoleId) + Send + Sync + 'static {
         self.event_store.lock()
@@ -546,7 +546,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildRoleUpdate`] is received.
     ///
-    /// [`GuildRoleUpdate`]: ../model/enum.Event.html#GuildRoleUpdate.v
+    /// [`GuildRoleUpdate`]: ../model/enum.Event.html#variant.GuildRoleUpdate
     pub fn on_guild_role_update<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, Role) + Send + Sync + 'static {
         self.event_store.lock()
@@ -556,7 +556,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildRoleSync`] is received.
     ///
-    /// [`GuildRoleSync`]: ../model/enum.Event.html#GuildRoleSync.v
+    /// [`GuildRoleSync`]: ../model/enum.Event.html#variant.GuildRoleSync
     pub fn on_guild_sync<F>(&mut self, handler: F)
         where F: Fn(Context, GuildSyncEvent) + Send + Sync + 'static {
         self.event_store.lock()
@@ -566,7 +566,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildUnavailable`] is received.
     ///
-    /// [`GuildUnavailable`]: ../model/enum.Event.html#GuildUnavailable.v
+    /// [`GuildUnavailable`]: ../model/enum.Event.html#variant.GuildUnavailable
     pub fn on_guild_unavailable<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId) + Send + Sync + 'static {
         self.event_store.lock()
@@ -576,7 +576,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildUpdate`] is received.
     ///
-    /// [`GuildUpdate`]: ../model/enum.Event.html#GuildUpdate.v
+    /// [`GuildUpdate`]: ../model/enum.Event.html#variant.GuildUpdate
     pub fn on_guild_update<F>(&mut self, handler: F)
         where F: Fn(Context, Option<LiveGuild>, Guild) + Send + Sync + 'static {
         self.event_store.lock()
@@ -586,7 +586,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildBan`] is received.
     ///
-    /// [`GuildBan`]: ../model/enum.Event.html#GuildBan.v
+    /// [`GuildBan`]: ../model/enum.Event.html#variant.GuildBan
     pub fn on_member_ban<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, User) + Send + Sync + 'static {
         self.event_store.lock()
@@ -596,7 +596,7 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildUnban`] is received.
     ///
-    /// [`GuildUnban`]: ../model/enum.Event.html#GuildUnban.v
+    /// [`GuildUnban`]: ../model/enum.Event.html#variant.GuildUnban
     pub fn on_member_unban<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, User) + Send + Sync + 'static {
         self.event_store.lock()
@@ -606,7 +606,7 @@ impl Client {
 
     /// Attaches a handler for when a [`MessageCreate`] is received.
     ///
-    /// [`MessageCreate`]: ../model/enum.Event.html#MessageCreate.v
+    /// [`MessageCreate`]: ../model/enum.Event.html#variant.MessageCreate
     pub fn on_message<F>(&mut self, handler: F)
         where F: Fn(Context, Message) + Send + Sync + 'static {
 
@@ -617,7 +617,7 @@ impl Client {
 
     /// Attaches a handler for when a [`MessageAck`] is received.
     ///
-    /// [`MessageAck`]: ../model/enum.Event.html#MessageAck.v
+    /// [`MessageAck`]: ../model/enum.Event.html#variant.MessageAck
     pub fn on_message_ack<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelId, Option<MessageId>) + Send + Sync + 'static {
         self.event_store.lock()
@@ -627,7 +627,7 @@ impl Client {
 
     /// Attaches a handler for when a [`MessageDelete`] is received.
     ///
-    /// [`MessageDelete`]: ../model/enum.Event.html#MessageDelete.v
+    /// [`MessageDelete`]: ../model/enum.Event.html#variant.MessageDelete
     pub fn on_message_delete<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelId, MessageId) + Send + Sync + 'static {
         self.event_store.lock()
@@ -637,7 +637,7 @@ impl Client {
 
     /// Attaches a handler for when a [`MessageDeleteBulk`] is received.
     ///
-    /// [`MessageDeleteBulk`]: ../model/enum.Event.html#MessageDeleteBulk.v
+    /// [`MessageDeleteBulk`]: ../model/enum.Event.html#variant.MessageDeleteBulk
     pub fn on_message_delete_bulk<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelId, Vec<MessageId>) + Send + Sync + 'static {
         self.event_store.lock()
@@ -647,7 +647,7 @@ impl Client {
 
     /// Attaches a handler for when a [`MessageUpdate`] is received.
     ///
-    /// [`MessageUpdate`]: ../model/enum.Event.html#MessageUpdate.v
+    /// [`MessageUpdate`]: ../model/enum.Event.html#variant.MessageUpdate
     pub fn on_message_update<F>(&mut self, handler: F)
         where F: Fn(Context, MessageUpdateEvent) + Send + Sync + 'static {
         self.event_store.lock()
@@ -657,7 +657,7 @@ impl Client {
 
     /// Attaches a handler for when a [`UserNoteUpdate`] is received.
     ///
-    /// [`UserNoteUpdate`]: ../model/enum.Event.html#UserNoteUpdate.v
+    /// [`UserNoteUpdate`]: ../model/enum.Event.html#variant.UserNoteUpdate
     pub fn on_note_update<F>(&mut self, handler: F)
         where F: Fn(Context, UserId, String) + Send + Sync + 'static {
         self.event_store.lock()
@@ -667,7 +667,7 @@ impl Client {
 
     /// Attaches a handler for when a [`PresencesReplace`] is received.
     ///
-    /// [`PresencesReplace`]: ../model/enum.Event.html#PresencesReplace.v
+    /// [`PresencesReplace`]: ../model/enum.Event.html#variant.PresencesReplace
     pub fn on_presence_replace<F>(&mut self, handler: F)
         where F: Fn(Context, Vec<Presence>) + Send + Sync + 'static {
         self.event_store.lock()
@@ -677,7 +677,7 @@ impl Client {
 
     /// Attaches a handler for when a [`PresenceUpdate`] is received.
     ///
-    /// [`PresenceUpdate`]: ../model/enum.Event.html#PresenceUpdate.v
+    /// [`PresenceUpdate`]: ../model/enum.Event.html#variant.PresenceUpdate
     pub fn on_presence_update<F>(&mut self, handler: F)
         where F: Fn(Context, PresenceUpdateEvent) + Send + Sync + 'static {
         self.event_store.lock()
@@ -687,7 +687,7 @@ impl Client {
 
     /// Attached a handler for when a [`ReactionAdd`] is received.
     ///
-    /// [`ReactionAdd`]: ../model/enum.Event.html#ReactionAdd.v
+    /// [`ReactionAdd`]: ../model/enum.Event.html#variant.ReactionAdd
     pub fn on_reaction_add<F>(&mut self, handler: F)
         where F: Fn(Context, Reaction) + Send + Sync + 'static {
         self.event_store.lock()
@@ -697,7 +697,7 @@ impl Client {
 
     /// Attached a handler for when a [`ReactionRemove`] is received.
     ///
-    /// [`ReactionRemove`]: ../model/enum.Event.html#ReactionRemove.v
+    /// [`ReactionRemove`]: ../model/enum.Event.html#variant.ReactionRemove
     pub fn on_reaction_remove<F>(&mut self, handler: F)
         where F: Fn(Context, Reaction) + Send + Sync + 'static {
         self.event_store.lock()
@@ -734,7 +734,7 @@ impl Client {
 
     /// Attaches a handler for when a [`ChannelRecipientAdd`] is received.
     ///
-    /// [`ChannelRecipientAdd`]: ../model/enum.Event.html#ChannelRecipientAdd.v
+    /// [`ChannelRecipientAdd`]: ../model/enum.Event.html#variant.ChannelRecipientAdd
     pub fn on_recipient_add<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelId, User) + Send + Sync + 'static {
         self.event_store.lock()
@@ -744,7 +744,7 @@ impl Client {
 
     /// Attaches a handler for when a [`ChannelRecipientRemove`] is received.
     ///
-    /// [`ChannelRecipientRemove`]: ../model/enum.Event.html#ChannelRecipientRemove.v
+    /// [`ChannelRecipientRemove`]: ../model/enum.Event.html#variant.ChannelRecipientRemove
     pub fn on_recipient_remove<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelId, User) + Send + Sync + 'static {
         self.event_store.lock()
@@ -754,7 +754,7 @@ impl Client {
 
     /// Attaches a handler for when a [`RelationshipAdd`] is received.
     ///
-    /// [`RelationshipAdd`]: ../model/enum.Event.html#RelationshipAdd.v
+    /// [`RelationshipAdd`]: ../model/enum.Event.html#variant.RelationshipAdd
     pub fn on_relationship_add<F>(&mut self, handler: F)
         where F: Fn(Context, Relationship) + Send + Sync + 'static {
         self.event_store.lock()
@@ -764,7 +764,7 @@ impl Client {
 
     /// Attaches a handler for when a [`RelationshipRemove`] is received.
     ///
-    /// [`RelationshipRemove`]: ../model/enum.Event.html#RelationshipRemove.v
+    /// [`RelationshipRemove`]: ../model/enum.Event.html#variant.RelationshipRemove
     pub fn on_relationship_remove<F>(&mut self, handler: F)
         where F: Fn(Context, UserId, RelationshipType) + Send + Sync + 'static {
         self.event_store.lock()
@@ -774,7 +774,7 @@ impl Client {
 
     /// Attaches a handler for when a [`Resumed`] is received.
     ///
-    /// [`Resumed`]: ../model/enum.Event.html#Resumed.v
+    /// [`Resumed`]: ../model/enum.Event.html#variant.Resumed
     pub fn on_resume<F>(&mut self, handler: F)
         where F: Fn(Context, ResumedEvent) + Send + Sync + 'static {
         self.event_store.lock()
@@ -784,7 +784,7 @@ impl Client {
 
     /// Attaches a handler for when a [`TypingStart`] is received.
     ///
-    /// [`TypingStart`]: ../model/enum.Event.html#TypingStart.v
+    /// [`TypingStart`]: ../model/enum.Event.html#variant.TypingStart
     pub fn on_typing_start<F>(&mut self, handler: F)
         where F: Fn(Context, TypingStartEvent) + Send + Sync + 'static {
         self.event_store.lock()
@@ -794,7 +794,7 @@ impl Client {
 
     /// Attaches a handler for when an [`Unknown`] is received.
     ///
-    /// [`Unknown`]: ../model/enum.Event.html#Unknown.v
+    /// [`Unknown`]: ../model/enum.Event.html#variant.Unknown
     pub fn on_unknown<F>(&mut self, handler: F)
         where F: Fn(Context, String, BTreeMap<String, Value>) + Send + Sync + 'static {
         self.event_store.lock()
@@ -804,7 +804,7 @@ impl Client {
 
     /// Attaches a handler for when a [`UserGuildSettingsUpdate`] is received.
     ///
-    /// [`UserGuildSettingsUpdate`]: ../model/enum.Event.html#UserGuildSettingsUpdate.v
+    /// [`UserGuildSettingsUpdate`]: ../model/enum.Event.html#variant.UserGuildSettingsUpdate
     pub fn on_user_guild_settings_update<F>(&mut self, handler: F)
         where F: Fn(Context, Option<UserGuildSettings>, UserGuildSettings) + Send + Sync + 'static {
         self.event_store.lock()
@@ -814,7 +814,7 @@ impl Client {
 
     /// Attaches a handler for when a [`UserUpdate`] is received.
     ///
-    /// [`UserUpdate`]: ../model/enum.Event.html#UserUpdate.v
+    /// [`UserUpdate`]: ../model/enum.Event.html#variant.UserUpdate
     pub fn on_user_update<F>(&mut self, handler: F)
         where F: Fn(Context, CurrentUser, CurrentUser) + Send + Sync + 'static {
         self.event_store.lock()
@@ -824,7 +824,7 @@ impl Client {
 
     /// Attaches a handler for when a [`UserSettingsUpdate`] is received.
     ///
-    /// [`UserSettingsUpdate`]: ../model/enum.Event.html#UserSettingsUpdate.v
+    /// [`UserSettingsUpdate`]: ../model/enum.Event.html#variant.UserSettingsUpdate
     pub fn on_user_settings_update<F>(&mut self, handler: F)
         where F: Fn(Context, UserSettings, UserSettings) + Send + Sync + 'static {
         self.event_store.lock()
@@ -834,7 +834,7 @@ impl Client {
 
     /// Attaches a handler for when a [`VoiceStateUpdate`] is received.
     ///
-    /// [`VoiceStateUpdate`]: ../model/enum.Event.html#VoiceStateUpdate.v
+    /// [`VoiceStateUpdate`]: ../model/enum.Event.html#variant.VoiceStateUpdate
     pub fn on_voice_state_update<F>(&mut self, handler: F)
         where F: Fn(Context, VoiceStateUpdateEvent) + Send + Sync + 'static {
         self.event_store.lock()
@@ -844,7 +844,7 @@ impl Client {
 
     /// Attaches a handler for when a [`VoiceServerUpdate`] is received.
     ///
-    /// [`VoiceServerUpdate`]: ../model/enum.Event.html#VoiceServerUpdate.v
+    /// [`VoiceServerUpdate`]: ../model/enum.Event.html#variant.VoiceServerUpdate
     pub fn on_voice_server_update<F>(&mut self, handler: F)
         where F: Fn(Context, VoiceServerUpdateEvent) + Send + Sync + 'static {
         self.event_store.lock()
@@ -965,7 +965,7 @@ fn login(token: &str, login_type: LoginType) -> Client {
 /// # Errors
 ///
 /// Returns a
-/// [ClientError::InvalidToken](enum.ClientError.html#InvalidToken.v) when one
+/// [ClientError::InvalidToken](enum.ClientError.html#variant.InvalidToken) when one
 /// of the above checks fail. The type of failure is not specified.
 pub fn validate_token(token: &str) -> Result<()> {
     if token.is_empty() {

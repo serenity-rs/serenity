@@ -164,8 +164,8 @@ impl LiveGuild {
     /// Returns a [`ClientError::DeleteMessageDaysAmount`] if the number of
     /// days' worth of messages to delete is over the maximum.
     ///
-    /// [`ClientError::DeleteMessageDaysAmount`]: ../client/enum.ClientError.html#DeleteMessageDaysAmount.v
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#InvalidPermissions.v
+    /// [`ClientError::DeleteMessageDaysAmount`]: ../client/enum.ClientError.html#variant.DeleteMessageDaysAmount
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8)
@@ -193,7 +193,7 @@ impl LiveGuild {
     /// not have permission to perform bans.
     ///
     /// [`Ban`]: struct.Ban.html
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#InvalidPermissions.v
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     pub fn bans(&self) -> Result<Vec<Ban>> {
         let req = permissions::BAN_MEMBERS;
@@ -223,7 +223,7 @@ impl LiveGuild {
     /// not have permission to perform bans.
     ///
     /// [`Channel`]: struct.Channel.html
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#InvalidPermissions.v
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Channels]: permissions/constants.MANAGE_CHANNELS.html
     pub fn create_channel(&mut self, name: &str, kind: ChannelType)
         -> Result<Channel> {
@@ -254,7 +254,7 @@ impl LiveGuild {
     /// Returns a [`ClientError::InvalidPermissions`] if the current user does
     /// not have permission to perform bans.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#InvalidPermissions.v
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`Context::create_role`]: ../client/struct.Context.html#method.create_role
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constants.MANAGE_ROLES.html
@@ -329,7 +329,7 @@ impl LiveGuild {
     /// Returns a [`ClientError::InvalidUser`] if the current user is not the
     /// guild owner.
     ///
-    /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#InvalidUser.v
+    /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
     pub fn delete(&self) -> Result<Guild> {
         if self.owner_id != STATE.lock().unwrap().user.id {
             let req = permissions::MANAGE_GUILD;
@@ -351,7 +351,7 @@ impl LiveGuild {
     /// Returns a [`ClientError::InvalidPermissions`] if the current user does
     /// not have permission to perform bans.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#InvalidPermissions.v
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`Context::edit_guild`]: ../client/struct.Context.html#method.edit_guild
     /// [Manage Guild]: permissions/constants.MANAGE_GUILD.html
     pub fn edit<F>(&mut self, f: F) -> Result<()>
@@ -403,7 +403,7 @@ impl LiveGuild {
     /// Returns a [`ClientError::InvalidPermissions`] if the current user does
     /// not have permission to perform bans.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#InvalidPermissions.v
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
         let req = permissions::MANAGE_GUILD;
@@ -606,7 +606,7 @@ impl LiveGuild {
     /// Returns a [`ClientError::InvalidPermissions`] if the current user does
     /// not have permission to perform bans.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#InvalidPermissions.v
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
@@ -635,7 +635,7 @@ impl LiveGuild {
     /// Returns a [`ClientError::InvalidPermissions`] if the current user does
     /// not have permission to perform bans.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#InvalidPermissions.v
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
@@ -662,7 +662,7 @@ impl LiveGuild {
     /// Returns a [`ClientError::InvalidPermissions`] if the current user does
     /// not have permission to perform bans.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#InvalidPermissions.v
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     pub fn unban<U: Into<UserId>>(&self, user: U) -> Result<()> {
@@ -889,7 +889,7 @@ impl Role {
     /// Returns a [`ClientError::GuildNotFound`] if a guild is not in the state
     /// that contains the role.
     ///
-    /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#GuildNotFound.v
+    /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
     pub fn find_guild(&self) -> Result<GuildId> {
         STATE.lock()
             .unwrap()

@@ -142,7 +142,7 @@ impl Group {
     /// [`ClientError::DeleteMessageDaysAmount`] if the number of messages to
     /// delete is not within the valid range.
     ///
-    /// [`ClientError::DeleteMessageDaysAmount`]: ../client/enum.ClientError.html#DeleteMessageDaysAmount.v
+    /// [`ClientError::DeleteMessageDaysAmount`]: ../client/enum.ClientError.html#variant.DeleteMessageDaysAmount
     /// [`Context::delete_messages`]: ../client/struct.Context.html#delete_messages
     pub fn delete_messages(&self, message_ids: &[MessageId]) -> Result<()> {
         if message_ids.len() < 2 || message_ids.len() > 100 {
@@ -248,8 +248,8 @@ impl Message {
     /// Returns a [`ClientError::InvalidPermissions`] if the current user does
     /// not have the required permissions.
     ///
-    /// [`ClientError::InvalidPermissions]: ../client/enum.ClientError.html#InvalidPermissions.v
-    /// [`ClientError::InvalidUser]: ../client/enum.ClientError.html#InvalidUser.v
+    /// [`ClientError::InvalidPermissions]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ClientError::InvalidUser]: ../client/enum.ClientError.html#variant.InvalidUser
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn delete(&self) -> Result<()> {
         let req = permissions::MANAGE_MESSAGES;
@@ -275,7 +275,7 @@ impl Message {
     /// Returns a
     /// [`ClientError::InvalidUser`] if the current user is not the author.
     ///
-    /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#InvalidUser.v
+    /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
     pub fn edit(&mut self, new_content: &str) -> Result<()> {
         if self.author.id != STATE.lock().unwrap().user.id {
             return Err(Error::Client(ClientError::InvalidUser));
@@ -305,7 +305,7 @@ impl Message {
     /// [`ClientError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#InvalidPermissions.v
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn pin(&self) -> Result<()> {
         let req = permissions::MANAGE_MESSAGES;
@@ -355,7 +355,7 @@ impl Message {
     /// [`ClientError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#InvalidPermissions.v
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn reply(&self, content: &str) -> Result<Message> {
         let req = permissions::SEND_MESSAGES;
@@ -388,7 +388,7 @@ impl Message {
     /// [`ClientError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#InvalidPermissions.v
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn unpin(&self) -> Result<()> {
         let req = permissions::MANAGE_MESSAGES;
@@ -452,7 +452,7 @@ impl PrivateChannel {
     /// Returns a
     /// [`ClientError::InvalidUser`] if the current user is not a bot user.
     ///
-    /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#InvalidOperationAsUser.v
+    /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
     pub fn delete_messages(&self, message_ids: &[MessageId]) -> Result<()> {
         if !STATE.lock().unwrap().user.bot {
             return Err(Error::Client(ClientError::InvalidOperationAsUser));
@@ -514,7 +514,7 @@ impl PublicChannel {
     /// [ClientError::InvalidPermissions] if the current user does not have the
     /// required permissions.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#InvalidPermissions.v
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Send Messages]: permissions/constants.SEND_MESSAGES.html
     pub fn broadcast_typing(&self) -> Result<()> {
         http::broadcast_typing(self.id.0)

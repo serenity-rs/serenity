@@ -100,8 +100,8 @@ pub enum Channel {
     /// A [text] or [voice] channel within a [`Guild`].
     ///
     /// [`Guild`]: struct.Guild.html
-    /// [text]: enum.ChannelType.html#Text.v
-    /// [voice]: enum.ChannelType.html#Voice.v
+    /// [text]: enum.ChannelType.html#variant.Text
+    /// [voice]: enum.ChannelType.html#variant.Voice
     Public(PublicChannel),
 }
 

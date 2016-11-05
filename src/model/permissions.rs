@@ -224,7 +224,7 @@ bitflags! {
         /// If this is disabled, then [`Member`]s must use push-to-talk.
         ///
         /// [`Member`]: ../struct.Member.html
-        /// [voice]: ../enum.ChannelType.html#Voice.v
+        /// [voice]: ../enum.ChannelType.html#variant.Voice
         const USE_VAD = 1 << 25,
         /// Allows members to change their own nickname in the guild.
         const CHANGE_NICKNAME = 1 << 26,

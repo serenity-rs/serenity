@@ -63,7 +63,7 @@ impl Context {
     /// # Errors
     ///
     /// Returns a
-    /// [ClientError::InvalidOperationAsBot](../enum.ClientError.html#InvalidOperationAsUser.v)
+    /// [ClientError::InvalidOperationAsBot](../enum.ClientError.html#variant.InvalidOperationAsUser)
     /// if this is a bot.
     pub fn ack_message<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
@@ -101,7 +101,7 @@ impl Context {
     /// # Errors
     ///
     /// Returns a
-    /// [ClientError::DeleteMessageDaysAmount](./enum.ClientError.html#DeleteMessageDaysAmount.v)
+    /// [ClientError::DeleteMessageDaysAmount](./enum.ClientError.html#variant.DeleteMessageDaysAmount)
     /// if the number of days given is over the maximum allowed.
     pub fn ban_user<G, U>(&self, guild_id: G, user_id: U, delete_message_days: u8)
         -> Result<()> where G: Into<GuildId>, U: Into<UserId> {
@@ -672,7 +672,7 @@ impl Context {
     /// # Errors
     ///
     /// Returns a
-    /// [ClientError::InvalidOperationAsUser](../enum.ClientError.html#InvalidOperationAsUser.v)
+    /// [ClientError::InvalidOperationAsUser](../enum.ClientError.html#variant.InvalidOperationAsUser)
     /// if this is a user.
     pub fn get_message<C, M>(&self, channel_id: C, message_id: M)
         -> Result<Message> where C: Into<ChannelId>, M: Into<MessageId> {
