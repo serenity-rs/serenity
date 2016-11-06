@@ -42,7 +42,7 @@ Serenity requires the following dependencies:
 
 A basic ping-pong bot looks like:
 
-```rust,ignore
+```rust,no-run
 extern crate serenity;
 
 use serenity::Client;

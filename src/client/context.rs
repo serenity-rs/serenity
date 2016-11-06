@@ -90,11 +90,11 @@ impl Context {
     /// `0` days is equivilant to not removing any messages. Up to `7` days'
     /// worth of messages may be deleted.
     ///
-    /// Requires that you have the [Ban Members] permission.
+    /// **Note**: Requires that you have the [Ban Members] permission.
     ///
     /// # Examples
     ///
-    /// Ban a user that sent a message for `7` days:
+    /// Ban the user that sent a message for `7` days:
     ///
     /// ```rust,ignore
     /// // assuming you are in a context
@@ -130,6 +130,7 @@ impl Context {
     /// # Examples
     ///
     /// ```rust,ignore
+    /// // assuming you are in a context
     /// context.broadcast_typing(context.channel_id);
     /// ```
     pub fn broadcast_typing<C>(&self, channel_id: C) -> Result<()>
@@ -336,11 +337,19 @@ impl Context {
     ///
     /// # Examples
     ///
-    /// Deleting a message that was received by its Id:
+    /// Deleting every message that is received:
     ///
     /// ```rust,ignore
-    /// context.delete_message(context.message.id);
+    /// use serenity::Client;
+    /// use std::env;
+    ///
+    /// let client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN").unwrap());
+    /// client.on_message(|context, message| {
+    ///     context.delete_message(message);
+    /// });
     /// ```
+    ///
+    /// (in practice, please do not do this)
     ///
     /// [`Message`]: ../model/struct.Message.html
     pub fn delete_message<C, M>(&self, channel_id: C, message_id: M)
@@ -422,29 +431,42 @@ impl Context {
     /// There are three ways to send a direct message to someone, the first
     /// being an unrelated, although equally helpful method.
     ///
-    /// Sending a message via a [`User`]:
+    /// Sending a message via [`User::dm`]:
     ///
     /// ```rust,ignore
-    /// context.message.author.dm("Hello!");
+    /// // assuming you are in a context
+    /// let _ = context.message.author.dm("Hello!");
     /// ```
     ///
-    /// Sending a message to a PrivateChannel:
+    /// Sending a message to a `PrivateChannel`:
     ///
     /// ```rust,ignore
+    /// assuming you are in a context
     /// let private_channel = context.create_private_channel(context.message.author.id);
     ///
-    /// context.direct_message(private_channel, "Test!");
+    /// let _ = context.direct_message(private_channel, "Test!");
     /// ```
     ///
-    /// Sending a message to a PrivateChannel given its ID:
+    /// Sending a message to a `PrivateChannel` given its ID:
     ///
     /// ```rust,ignore
-    /// let private_channel = context.create_private_channel(context.message.author.id);
+    /// use serenity::Client;
+    /// use std::env;
     ///
-    /// context.direct_message(private_channel.id, "Test!");
+    /// let mut client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN").unwrap());
+    ///
+    /// client.on_message(|context, message| {
+    ///     if message.content == "!pm-me" {
+    ///         let channel = context.create_private_channel(message.author.id)
+    ///             .unwrap();
+    ///
+    ///         let _ = channel.send_message("test!");
+    ///     }
+    /// });
     /// ```
     ///
-    /// [`User`]: ../model/struct.User.html
+    /// [`PrivateChannel`]: ../model/struct.PrivateChannel.html
+    /// [`User::dm`]: ../model/struct.User.html#method.dm
     pub fn direct_message<C>(&self, target_id: C, content: &str)
         -> Result<Message> where C: Into<ChannelId> {
         self.send_message(target_id.into(), content, "", false)
@@ -782,9 +804,9 @@ impl Context {
     ///
     /// Requires the [Kick Members] permission.
     ///
-    /// [Kick Members]: ../model/permissions/constant.KICK_MEMBERS.html
     /// [`Guild`]: ../model/struct.Guild.html
     /// [`Member`]: ../model/struct.Member.html
+    /// [Kick Members]: ../model/permissions/constant.KICK_MEMBERS.html
     pub fn kick_member<G, U>(&self, guild_id: G, user_id: U) -> Result<()>
         where G: Into<GuildId>, U: Into<UserId> {
         http::kick_member(guild_id.into().0, user_id.into().0)
@@ -859,15 +881,16 @@ impl Context {
     /// Sends a message with just the given message content in the channel that
     /// a message was received from.
     ///
-    /// **Note**: This will only work when a Message is received.
+    /// **Note**: This will only work when a [`Message`] is received.
     ///
     /// # Errors
     ///
     /// Returns a [`ClientError::NoChannelId`] when there is no [`ChannelId`]
     /// directly available.
     ///
-    /// [`ChannelId`]: ../models/struct.ChannelId.html
+    /// [`ChannelId`]: ../../models/struct.ChannelId.html
     /// [`ClientError::NoChannelId`]: ../enum.ClientError.html#NoChannelId
+    /// [`Message`]: ../model/struct.Message.html
     pub fn say(&self, text: &str) -> Result<Message> {
         if let Some(channel_id) = self.channel_id {
             self.send_message(channel_id, text, "", false)
@@ -905,6 +928,7 @@ impl Context {
     /// # Example
     ///
     /// ```rust,ignore
+    /// // assuming you are in a context
     /// let _ = context.send_message(message.channel_id, "Hello!", "", false);
     /// ```
     ///
@@ -959,7 +983,7 @@ impl Context {
 
     /// This is an alias of [`remove_ban`].
     ///
-    /// [`remove_ban`]: #method.remove_ban
+    /// [`#method.remove_ban`]: #method.remove_ban
     pub fn unban<G, U>(&self, guild_id: G, user_id: U) -> Result<()>
         where G: Into<GuildId>, U: Into<UserId> {
         self.remove_ban(guild_id.into().0, user_id.into().0)

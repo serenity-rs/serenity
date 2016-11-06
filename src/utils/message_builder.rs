@@ -14,10 +14,12 @@ use ::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 /// ```rust,ignore
 /// use serenity::utils::MessageBuilder;
 ///
+/// // assuming an `emoji` and `user` have already been bound
+///
 /// let content = MessageBuilder::new()
 ///     .push("You sent a message, ")
 ///     .mention(user)
-///     .push("! ");
+///     .push("! ")
 ///     .mention(emoji)
 ///     .build();
 /// ```

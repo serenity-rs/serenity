@@ -1,10 +1,10 @@
 ---
 name: Attachment
-description: "A file uploaded with a message. Not to be confused with
-  [embed][`Embed`]s.
+description: >
+  A file uploaded with a message. Not to be confused with [embed][`Embed`]s.
 
 
-  [`Embed`]: struct.Embed.html"
+  [`Embed`]: struct.Embed.html
 fields:
   - name: id
     description: "The unique ID given to this attachment."

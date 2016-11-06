@@ -18,7 +18,7 @@
 //! ```rust,ignore
 //! use serenity::Client;
 //!
-//! let client = Client::login_bot("my token here");
+//! let mut client = Client::login_bot("my token here");
 //!
 //! client.on_message(|context, message| {
 //!     if message.content == "!ping" {
@@ -43,11 +43,11 @@ mod login_type;
 
 pub use self::connection::{Connection, ConnectionError};
 pub use self::context::Context;
+pub use self::login_type::LoginType;
 
 use hyper::status::StatusCode;
 use self::dispatch::dispatch;
 use self::event_store::EventStore;
-use self::login_type::LoginType;
 use serde_json::builder::ObjectBuilder;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::{Arc, Mutex};
@@ -97,11 +97,13 @@ lazy_static! {
 /// use serenity::client::ClientError;
 /// use serenity::Error;
 ///
+/// // assuming you are in a context and a `guild_id` has been bound
+///
 /// match context.ban_user(context.guild_id, context.message.author, 8) {
 ///     Ok(()) => {
 ///         // Ban successful.
 ///     },
-///     Err(Error::Client(ClientError::DeleteMessageDaysAmount(amount)) => {
+///     Err(Error::Client(ClientError::DeleteMessageDaysAmount(amount))) => {
 ///         println!("Tried deleting {} days' worth of messages", amount);
 ///     },
 ///     Err(why) => {
@@ -352,7 +354,12 @@ impl Client {
     /// For a bot using a total of 10 shards, initialize shards 4 through 7:
     ///
     /// ```rust,ignore
-    /// // assumes a `client` has already been initialized
+    /// use serenity::Client;
+    /// use std::env;
+    ///
+    /// let mut client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN")
+    ///     .unwrap());
+    ///
     /// let _ = client.start_shard_range([4, 7], 10);
     /// ```
     ///
@@ -718,7 +725,12 @@ impl Client {
     /// Print the [current user][`CurrentUser`]'s name on ready:
     ///
     /// ```rust,ignore
-    /// // assuming a `client` has been bound
+    /// use serenity::Client;
+    /// use std::env;
+    ///
+    /// let mut client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN")
+    ///     .unwrap());
+    ///
     /// client.on_ready(|_context, ready| {
     ///     println!("{} is connected", ready.user.name);
     /// });

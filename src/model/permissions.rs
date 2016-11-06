@@ -61,7 +61,7 @@ use ::prelude_internal::*;
 /// setting this to `false`, via:
 ///
 /// ```rust,ignore
-/// use serenity::models::permissions;
+/// use serenity::model::permissions;
 ///
 /// permissions::general().toggle(permissions::SEND_TTS_MESSAGES);
 /// ```

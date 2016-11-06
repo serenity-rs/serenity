@@ -212,7 +212,9 @@ impl LiveGuild {
     /// # Examples
     ///
     /// ```rust,ignore
-    /// use serenity::models::ChannelType;
+    /// use serenity::model::ChannelType;
+    ///
+    /// // assuming a `guild` has already been bound
     ///
     /// let _ = guild.create_channel("my-test-channel", ChannelType::Text);
     /// ```
@@ -241,13 +243,11 @@ impl LiveGuild {
         http::create_channel(self.id.0, map)
     }
 
-    /// Creates a new [`Role`] in the guild with the data set,
-    /// if any.
+    /// Creates a new [`Role`] in the guild with the data set, if any.
     ///
     /// See the documentation for [`Context::create_role`] on how to use this.
     ///
-    /// **Note**: Requires the
-    /// [Manage Roles] permission.
+    /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// # Errors
     ///
@@ -812,6 +812,7 @@ impl fmt::Display for Member {
     /// // assumes a `member` has already been bound
     /// println!("{} is a member!", member);
     /// ```
+    ///
     // This is in the format of `<@USER_ID>`.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.user.mention(), f)

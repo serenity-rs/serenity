@@ -95,11 +95,31 @@ impl Display for ConnectionError {
 ///
 /// **Note**: User accounts can not shard. Use [`Client::start`].
 ///
+/// # Stand-alone connections
+///
+/// You may instantiate a connection yourself if you need to, which is
+/// completely decoupled from the client. For most use cases, you will not need
+/// to do this, and you can leave the client to do it.
+///
+/// This can be done by passing in the required parameters to [`new`]. You can
+/// then manually handle the connection yourself and receive events via
+/// [`receive`].
+///
+/// **Note**: You _really_ do not need to do this. Just call one of the
+/// appropriate methods on the [`Client`].
+///
+/// # Examples
+///
+/// See the documentation for [`new`] on how to use this.
+///
+/// [`Client`]: struct.Client.html
 /// [`Client::start`]: struct.Client.html#method.start
-/// [`Client::start_auosharded`]: struct.Client.html#method.start_autosharded
+/// [`Client::start_autosharded`]: struct.Client.html#method.start_autosharded
 /// [`Client::start_shard`]: struct.Client.html#method.start_shard
 /// [`Client::start_shard_range`]: struct.Client.html#method.start_shard_range
 /// [`Client::start_shards`]: struct.Client.html#method.start_shards
+/// [`new`]: #method.new
+/// [`receive`]: #method.receive
 /// [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 pub struct Connection {
     keepalive_channel: MpscSender<Status>,
@@ -113,6 +133,28 @@ pub struct Connection {
 }
 
 impl Connection {
+    /// Instantiates a new instance of a connection, bypassing the client.
+    ///
+    /// **Note**: You should likely never need to do this yourself.
+    ///
+    /// # Examples
+    ///
+    /// Instantiating a new Connection manually for a bot with no shards, and
+    /// then listening for events:
+    ///
+    /// ```rust,ignore
+    /// use serenity::client::{Connection, LoginType, http};
+    /// use std::env;
+    ///
+    /// let token = env::var("DISCORD_BOT_TOKEN").expect("Token in environment");
+    /// // retrieve the gateway response, which contains the URL to connect to
+    /// let gateway = http::get_gateway().expect("Valid gateway response").url;
+    /// let connection = Connection::new(&gateway, &token, None, LoginType::Bot)
+    ///     .expect("Working connection");
+    ///
+    /// // at this point, you can create a `loop`, and receive events and match
+    /// // their variants
+    /// ```
     pub fn new(base_url: &str,
                token: &str,
                shard_info: Option<[u8; 2]>,

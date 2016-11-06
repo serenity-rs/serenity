@@ -30,7 +30,11 @@ use ::model::{
 /// Create an invite with a max age of 3600 seconds and 10 max uses:
 ///
 /// ```rust,ignore
-/// // assuming a `client` has been bound
+/// use serenity::Client;
+/// use std::env;
+///
+/// let mut client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN").unwrap());
+///
 /// client.on_message(|context, message| {
 ///     if message.content == "!invite" {
 ///         let invite = context.create_invite(message.channel_id, |i| i

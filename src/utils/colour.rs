@@ -17,7 +17,7 @@ macro_rules! colour {
 /// as the API works with an integer value instead of an RGB value.
 ///
 /// Instances can be created by using the struct's associated functions. These
-/// produce values equivilant to those found in the official client's colour
+/// produce presets equivilant to those found in the official client's colour
 /// picker.
 ///
 /// # Examples
@@ -36,12 +36,14 @@ macro_rules! colour {
 /// println!("The green component is: {}", green);
 /// ```
 ///
-/// Creating an instance with the [`dark_teal`] value:
+/// Creating an instance with the [`dark_teal`] presets:
 ///
 /// ```rust,ignore
 /// use serenity::utils::Colour;
 ///
 /// let colour = Colour::dark_teal();
+///
+/// assert_eq!(colour.get_tuple(), (17, 128, 106));
 /// ```
 ///
 /// [`Role`]: ../model/struct.Role.html

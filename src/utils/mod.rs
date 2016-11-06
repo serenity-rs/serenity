@@ -83,10 +83,12 @@ macro_rules! request {
 /// # Examples
 /// Retrieving the code from the URL `https://discord.gg/0cDvIgU2voY8RSYL`:
 ///
-/// ```rust
+/// ```rust,ignore
 /// use serenity::utils;
 ///
-/// assert!(utils::parse_invite("https://discord.gg/0cDvIgU2voY8RSYL") == "0cDvIgU2voY8RSYL");
+/// let url = "https://discord.gg/0cDvIgU2voY8RSYL";
+///
+/// assert!(utils::parse_invite(url) == "0cDvIgU2voY8RSYL");
 /// ```
 ///
 /// [`RichInvite`]: ../model/struct.RichInvite.html
@@ -117,6 +119,8 @@ pub fn parse_invite(code: &str) -> &str {
 ///     Ok(image) => image,
 ///     Err(why) => {
 ///         // properly handle the error
+///
+///         return;
 ///     },
 /// };
 /// ```

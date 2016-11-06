@@ -44,13 +44,13 @@
 //! extern crate serenity;
 //!
 //! use serenity::Client;
+//! use std::env;
 //!
 //! fn main() {
 //!     // Login with a bot token from the environment
-//!     let client = Client::login_bot(env::var("DISCORD_TOKEN").expect("token"));
+//!     let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").expect("token"));
 //!     client.with_framework(|f| f
-//!         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
-//!         .prefix("~")
+//!         .configure(|c| c.prefix("~")) // set the bot's prefix to '~'
 //!         .on("ping", |_context, message| drop(message.reply("Pong!"))));
 //!
 //!     let _ = client.start(); // start listening for events by starting a connection

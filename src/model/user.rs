@@ -80,7 +80,7 @@ impl User {
     /// Check if a guild has a [`Role`] by Id:
     ///
     /// ```rust,ignore
-    /// // Assumes a 'guild' and `role_id` have already been defined
+    /// // Assumes a 'guild' and `role_id` have already been bound
     /// context.message.author.has_role(guild, role_id);
     /// ```
     ///
