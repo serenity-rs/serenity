@@ -796,10 +796,6 @@ impl Context {
                                  after.map(|u| u.into().0))
     }
 
-    pub fn get_voice_regions(&self) -> Result<Vec<VoiceRegion>> {
-        http::get_voice_regions()
-    }
-
     /// Kicks a [`Member`] from the specified [`Guild`] if they are in it.
     ///
     /// Requires the [Kick Members] permission.
