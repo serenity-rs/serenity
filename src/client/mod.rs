@@ -187,8 +187,9 @@ pub enum ClientError {
     /// from UTF-8.
     RateLimitUtf8,
     /// When attempting to find a required record from the State could not be
-    /// found. This is required in methods such as
-    /// [Context::edit_role](struct.Context.html#method.edit_role).
+    /// found. This is required in methods such as [`Context::edit_role`].
+    ///
+    /// [`Context::edit_role`]: struct.Context.html#method.edit_role
     RecordNotFound,
     /// When a function such as [`Context::edit_channel`] did not expect the
     /// received [`ChannelType`].
@@ -964,9 +965,10 @@ fn login(token: &str, login_type: LoginType) -> Client {
 ///
 /// # Errors
 ///
-/// Returns a
-/// [ClientError::InvalidToken](enum.ClientError.html#variant.InvalidToken) when one
-/// of the above checks fail. The type of failure is not specified.
+/// Returns a [`ClientError::InvalidToken`] when one of the above checks fail.
+/// The type of failure is not specified.
+///
+/// [`ClientError::InvalidToken`]: enum.ClientError.html#variant.InvalidToken
 pub fn validate_token(token: &str) -> Result<()> {
     if token.is_empty() {
         return Err(Error::Client(ClientError::InvalidToken));

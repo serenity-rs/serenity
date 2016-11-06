@@ -50,7 +50,9 @@ impl Context {
         http::accept_invite(code)
     }
 
-    /// This is an alias of [ack_message](#method.ack_message).
+    /// This is an alias of [`ack_message`].
+    ///
+    /// [`ack_message`]: #method.ack_message
     pub fn ack<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
         self.ack_message(channel_id.into(), message_id.into())
@@ -62,9 +64,9 @@ impl Context {
     ///
     /// # Errors
     ///
-    /// Returns a
-    /// [ClientError::InvalidOperationAsBot](../enum.ClientError.html#variant.InvalidOperationAsUser)
-    /// if this is a bot.
+    /// Returns a [`ClientError::InvalidOperationAsBot`] if this is a bot.
+    ///
+    /// [`ClientError::InvalidOperationAsBot`]: ../enum.ClientError.html#variant.InvalidOperationAsUser
     pub fn ack_message<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
         if self.login_type == LoginType::User {
@@ -74,35 +76,40 @@ impl Context {
         http::ack_message(channel_id.into().0, message_id.into().0)
     }
 
-    /// This is an alias of [ban](#method.ban).
+    /// This is an alias of [`ban`].
+    ///
+    /// [`ban`]: #method.ban
     pub fn ban<G, U>(&self, guild_id: G, user_id: U, delete_message_days: u8)
         -> Result<()> where G: Into<GuildId>, U: Into<UserId> {
         self.ban_user(guild_id.into(), user_id.into(), delete_message_days)
     }
 
-    /// Ban a user from a guild, removing their messages sent in the last X
-    /// number of days.
+    /// Ban a [`User`] from a [`Guild`], removing their messages sent in the
+    /// last X number of days.
     ///
-    /// 0 days is equivilant to not removing any messages. Up to 7 days' worth
-    /// of messages may be deleted.
+    /// `0` days is equivilant to not removing any messages. Up to `7` days'
+    /// worth of messages may be deleted.
     ///
-    /// Requires that you have the
-    /// [Ban Members](../model/permissions/constant.BAN_MEMBERS.html)
-    /// permission.
+    /// Requires that you have the [Ban Members] permission.
     ///
     /// # Examples
     ///
-    /// Ban the user that sent a message for 7 days:
+    /// Ban a user that sent a message for `7` days:
     ///
     /// ```rust,ignore
+    /// // assuming you are in a context
     /// context.ban_user(context.guild_id, context.message.author, 7);
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns a
-    /// [ClientError::DeleteMessageDaysAmount](./enum.ClientError.html#variant.DeleteMessageDaysAmount)
-    /// if the number of days given is over the maximum allowed.
+    /// Returns a [`ClientError::DeleteMessageDaysAmount`] if the number of days
+    /// given is over the maximum allowed.
+    ///
+    /// [`ClientError::DeleteMessageDaysAmount`]: enum.ClientError.html#variant.DeleteMessageDaysAmount
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`User`]: ../model/struct.User.html
+    /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
     pub fn ban_user<G, U>(&self, guild_id: G, user_id: U, delete_message_days: u8)
         -> Result<()> where G: Into<GuildId>, U: Into<UserId> {
         if delete_message_days > 7 {
@@ -130,22 +137,23 @@ impl Context {
         http::broadcast_typing(channel_id.into().0)
     }
 
-    /// Creates a [PublicChannel](../model/struct.PublicChannel.html) in the
-    /// given [Guild](../model/struct.Guild.html).
+    /// Creates a [`PublicChannel`] in the given [`Guild`].
     ///
-    /// Requires that you have the
-    /// [Manage Channels](../model/permissions/constant.MANAGE_CHANNELS.html)
-    /// permission.
+    /// Requires that you have the [Manage Channels] permission.
     ///
     /// # Examples
     ///
-    /// Create a voice channel in a guild with the name "test":
+    /// Create a voice channel in a guild with the name `test`:
     ///
     /// ```rust,ignore
     /// use serenity::model::ChannelType;
     ///
     /// context.create_channel(context.guild_id, "test", ChannelType::Voice);
     /// ```
+    ///
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`PublicChannel`]: ../model/struct.PublicChannel.html
+    /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
     pub fn create_channel<G>(&self, guild_id: G, name: &str, kind: ChannelType)
         -> Result<Channel> where G: Into<GuildId> {
         let map = ObjectBuilder::new()
@@ -166,17 +174,20 @@ impl Context {
         http::create_emoji(guild_id.into().0, map)
     }
 
-    /// Creates a [Guild](../model/struct.Guild.html) with the data provided.
+    /// Creates a [`Guild`] with the data provided.
     ///
     /// # Examples
     ///
-    /// Create a guild called "test" in the US West region with no icon:
+    /// Create a guild called `test` in the [US West region] with no icon:
     ///
     /// ```rust,ignore
     /// use serenity::model::Region;
     ///
     /// context.create_guild("test", Region::UsWest, None);
     /// ```
+    ///
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [US West region]: ../model/enum.Region.html#variant.UsWest
     pub fn create_guild(&self, name: &str, region: Region, icon: Option<&str>)
         -> Result<Guild> {
         let map = ObjectBuilder::new()
@@ -269,13 +280,15 @@ impl Context {
         http::edit_role(id, role.id.0, map)
     }
 
-    /// Deletes a [Channel](../model/enum.Channel.html) based on the id given.
+    /// Deletes a [`Channel`] based on the Id given.
     ///
-    /// If the channel being deleted is a
-    /// [PublicChannel](../model/struct.PublicChannel.html) (a guild's channel),
-    /// then the
-    /// [Manage Channels](../model/permissions/constant.MANAGE_CHANNELS.html)
-    /// permission is required.
+    /// If the channel being deleted is a [`PublicChannel`] (a [`Guild`]'s
+    /// channel), then the [Manage Channels] permission is required.
+    ///
+    /// [`Channel`]: ../model/enum.Channel.html
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`PublicChannel`]: ../model/struct.PublicChannel.html
+    /// [Manage Messages]: ../model/permissions/constant.MANAGE_CHANNELS.html
     pub fn delete_channel<C>(&self, channel_id: C) -> Result<Channel>
         where C: Into<ChannelId> {
         http::delete_channel(channel_id.into().0)
@@ -286,8 +299,10 @@ impl Context {
         http::delete_emoji(guild_id.into().0, emoji_id.into().0)
     }
 
-    /// Deletes a [Guild](../model/struct.Guild.html). You must be the guild
-    /// owner to be able to delete the guild.
+    /// Deletes a [`Guild`]. You must be the guild owner to be able to delete
+    /// the guild.
+    ///
+    /// [`Guild`]: ../model/struct.Guild.html
     pub fn delete_guild<G: Into<GuildId>>(&self, guild_id: G) -> Result<Guild> {
         http::delete_guild(guild_id.into().0)
     }
@@ -317,15 +332,17 @@ impl Context {
         http::delete_invite(code)
     }
 
-    /// Deletes a [Message](../model/struct.Message.html) given its ID.
+    /// Deletes a [`Message`] given its Id.
     ///
     /// # Examples
     ///
-    /// Deleting a message that was received by its ID:
+    /// Deleting a message that was received by its Id:
     ///
     /// ```rust,ignore
     /// context.delete_message(context.message.id);
     /// ```
+    ///
+    /// [`Message`]: ../model/struct.Message.html
     pub fn delete_message<C, M>(&self, channel_id: C, message_id: M)
         -> Result<()> where C: Into<ChannelId>, M: Into<MessageId> {
         http::delete_message(channel_id.into().0, message_id.into().0)
@@ -402,10 +419,10 @@ impl Context {
     ///
     /// # Examples
     ///
-    /// There are three ways to send a direct message to someone, the first being
-    /// an unrelated, although equally helpful method.
+    /// There are three ways to send a direct message to someone, the first
+    /// being an unrelated, although equally helpful method.
     ///
-    /// Sending a message via a [User](../../model/struct.User.html):
+    /// Sending a message via a [`User`]:
     ///
     /// ```rust,ignore
     /// context.message.author.dm("Hello!");
@@ -426,12 +443,16 @@ impl Context {
     ///
     /// context.direct_message(private_channel.id, "Test!");
     /// ```
+    ///
+    /// [`User`]: ../model/struct.User.html
     pub fn direct_message<C>(&self, target_id: C, content: &str)
         -> Result<Message> where C: Into<ChannelId> {
         self.send_message(target_id.into(), content, "", false)
     }
 
-    /// This is an alias of [direct_message](#method.direct_message).
+    /// This is an alias of [`direct_message`].
+    ///
+    /// [`direct_message`]: #method.direct_message
     pub fn dm<C: Into<ChannelId>>(&self, target_id: C, content: &str)
         -> Result<Message> {
         self.direct_message(target_id.into(), content)
@@ -662,18 +683,18 @@ impl Context {
         http::get_member(guild_id.0, user_id.0)
     }
 
-    /// Retrieves a single [Message](../../model/struct.Message.html) from a
-    /// [Channel](../../model/struct.Channel.html).
+    /// Retrieves a single [`Message`] from a [`Channel`].
     ///
-    /// Requires the
-    /// [Read Message History](../../model/permissions/constant.READ_MESSAGE_HISTORY.html)
-    /// permission.
+    /// Requires the [Read Message History] permission.
     ///
     /// # Errors
     ///
-    /// Returns a
-    /// [ClientError::InvalidOperationAsUser](../enum.ClientError.html#variant.InvalidOperationAsUser)
-    /// if this is a user.
+    /// Returns a [`ClientError::InvalidOperationAsUser`] if this is a user.
+    ///
+    /// [`Channel`]: ../model/struct.Channel.html
+    /// [`ClientError::InvalidOperationAsUser`]: ../enum.ClientError.html#variant.InvalidOperationAsUser
+    /// [`Message`]: ../model/struct.Message.html
+    /// [Read Message History]: ../model/permissions/constant.READ_MESSAGE_HISTORY.html
     pub fn get_message<C, M>(&self, channel_id: C, message_id: M)
         -> Result<Message> where C: Into<ChannelId>, M: Into<MessageId> {
         if self.login_type == LoginType::User {
@@ -757,12 +778,13 @@ impl Context {
         http::get_voice_regions()
     }
 
-    /// Kicks a [Member](../../model/struct.Member.html) from the specified
-    /// [Guild](../../model/struct.Guild.html) if they are in it.
+    /// Kicks a [`Member`] from the specified [`Guild`] if they are in it.
     ///
-    /// Requires the
-    /// [Kick Members](../../model/permissions/constant.KICK_MEMBERS.html)
-    /// permission.
+    /// Requires the [Kick Members] permission.
+    ///
+    /// [Kick Members]: ../model/permissions/constant.KICK_MEMBERS.html
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`Member`]: ../model/struct.Member.html
     pub fn kick_member<G, U>(&self, guild_id: G, user_id: U) -> Result<()>
         where G: Into<GuildId>, U: Into<UserId> {
         http::kick_member(guild_id.into().0, user_id.into().0)
@@ -783,20 +805,27 @@ impl Context {
         http::edit_member(guild_id.into().0, user_id.into().0, map)
     }
 
-    /// This is an alias of [get_pins](#method.get_pins).
+    /// This is an alias of [`get_pins`].
+    ///
+    /// [`get_pins`]: #method.get_pins
     pub fn pins<C>(&self, channel_id: C) -> Result<Vec<Message>>
         where C: Into<ChannelId> {
         self.get_pins(channel_id.into())
     }
 
-    /// Retrieves the list of [Message](../../model/struct.Message.html)s which
-    /// are pinned to the specified [Channel](../../model/enum.Channel.html).
+    /// Retrieves the list of [`Message`]s which are pinned to the specified
+    /// [`Channel`].
+    ///
+    /// [`Channel`]: ../model/enum.Channel.html
+    /// [`Message`]: ../model/struct.Message.html
     pub fn get_pins<C>(&self, channel_id: C) -> Result<Vec<Message>>
         where C: Into<ChannelId> {
         http::get_pins(channel_id.into().0)
     }
 
-    /// This is an alias of [pin_message](#method.pin_message).
+    /// This is an alias of [`pin_message`].
+    ///
+    /// [`pin_message`]: #method.pin_message
     pub fn pin<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
         self.pin_message(channel_id.into(), message_id.into())
@@ -807,17 +836,21 @@ impl Context {
         http::pin_message(channel_id.into().0, message_id.into().0)
     }
 
-    /// This is an alias of [direct_message](#method.direct_message).
+    /// This is an alias of [`direct_message`].
+    ///
+    /// [`direct_message`]: #method.direct_message
     pub fn pm<C: Into<ChannelId>>(&self, target_id: C, content: &str)
         -> Result<Message> {
         self.direct_message(target_id.into(), content)
     }
 
-    /// Unbans a [User](../../model/struct.User.html) from a guild.
+    /// Unbans a [`User`] from a [`Guild`].
     ///
-    /// Requires the
-    /// [Ban Members](../../model/permissions/constant.BAN_MEMBERS.html)
-    /// permission.
+    /// Requires the [Ban Members] permission.
+    ///
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`User`]: ../model/struct.User.html
+    /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
     pub fn remove_ban<G, U>(&self, guild_id: G, user_id: U) -> Result<()>
         where G: Into<GuildId>, U: Into<UserId> {
         http::remove_ban(guild_id.into().0, user_id.into().0)
@@ -830,10 +863,11 @@ impl Context {
     ///
     /// # Errors
     ///
-    /// Returns a
-    /// [ClientError::NoChannelId](../enum.ClientError.html#NoChannelId) when
-    /// there is no [ChannelId](../../models/struct.ChannelId.html) directly
-    /// available.
+    /// Returns a [`ClientError::NoChannelId`] when there is no [`ChannelId`]
+    /// directly available.
+    ///
+    /// [`ChannelId`]: ../models/struct.ChannelId.html
+    /// [`ClientError::NoChannelId`]: ../enum.ClientError.html#NoChannelId
     pub fn say(&self, text: &str) -> Result<Message> {
         if let Some(channel_id) = self.channel_id {
             self.send_message(channel_id, text, "", false)
@@ -842,7 +876,9 @@ impl Context {
         }
     }
 
-    /// This is an alias of [send_message](#method.send_message).
+    /// This is an alias of [`send_message`].
+    ///
+    /// [`send_message`]: #method.send_message
     pub fn send<C>(&self, channel_id: C, content: &str, nonce: &str, tts: bool)
         -> Result<Message> where C: Into<ChannelId> {
         self.send_message(channel_id.into(),
@@ -861,7 +897,7 @@ impl Context {
         http::send_file(channel_id.into().0, content, file, filename)
     }
 
-    /// Sends a message to a [Channel](../../model/enum.Channel.html).
+    /// Sends a message to a [`Channel`].
     ///
     /// Note that often a nonce is not required and can be omitted in most
     /// situations.
@@ -871,6 +907,8 @@ impl Context {
     /// ```rust,ignore
     /// let _ = context.send_message(message.channel_id, "Hello!", "", false);
     /// ```
+    ///
+    /// [`Channel`]: ../model/enum.Channel.html
     pub fn send_message<C>(&self, channel_id: C, content: &str, nonce: &str, tts: bool)
         -> Result<Message> where C: Into<ChannelId> {
         let map = ObjectBuilder::new()
@@ -911,19 +949,25 @@ impl Context {
         http::start_integration_sync(guild_id.into().0, integration_id.into().0)
     }
 
-    /// This is an alias of [broadcast_typing](#method.broadcast_typing).
+    /// This is an alias of [`broadcast_typing`].
+    ///
+    /// [`broadcast_typing`]: #method.broadcast_typing
     pub fn typing<C>(&self, channel_id: C) -> Result<()>
         where C: Into<ChannelId> {
         self.broadcast_typing(channel_id.into().0)
     }
 
-    /// This is an alias of [remove_ban](#method.remove_ban).
+    /// This is an alias of [`remove_ban`].
+    ///
+    /// [`remove_ban`]: #method.remove_ban
     pub fn unban<G, U>(&self, guild_id: G, user_id: U) -> Result<()>
         where G: Into<GuildId>, U: Into<UserId> {
         self.remove_ban(guild_id.into().0, user_id.into().0)
     }
 
-    /// This is an alias of [unpin_message](#method.unpin_message).
+    /// This is an alias of [`unpin_message`].
+    ///
+    /// [`unpin_message`]: #method.unpin_message
     pub fn unpin<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
         self.unpin_message(channel_id.into().0, message_id.into().0)

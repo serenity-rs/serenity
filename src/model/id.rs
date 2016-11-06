@@ -18,8 +18,10 @@ impl ChannelId {
         http::get_channel(self.0)
     }
 
-    /// Returns a [Mention](struct.Mention.html) which will link to the
-    /// channel.
+    /// Returns a [`Mention`] which will link to the [`Channel`].
+    ///
+    /// [`Channel`]: enum.Channel.html
+    /// [`Mention`]: struct.Mention.html
     pub fn mention(&self) -> Mention {
         Mention {
             id: self.0,
@@ -70,7 +72,9 @@ impl GuildId {
         http::get_guild(self.0)
     }
 
-    /// Mentions the [Guild](struct.Guild.html)'s default channel.
+    /// Mentions the [`Guild`]'s default channel.
+    ///
+    /// [`Guild`]: struct.Guild.html
     pub fn mention(&self) -> Mention {
         Mention {
             id: self.0,
@@ -137,8 +141,9 @@ impl RoleId {
             .cloned()
     }
 
-    /// Returns a [Mention](struct.Mention.html) which will ping members of the
-    /// role.
+    /// Returns a [`Mention`] which will ping members of the role.
+    ///
+    /// [`Mention`]: struct.Mention.html
     pub fn mention(&self) -> Mention {
         Mention {
             id: self.0,
@@ -166,7 +171,9 @@ impl From<User> for UserId {
 }
 
 impl UserId {
-    /// Returns a [Mention](struct.Mention.html) which will ping the user.
+    /// Returns a [`Mention`] which will ping the user.
+    ///
+    /// [`Mention`]: struct.Mention.html
     pub fn mention(&self) -> Mention {
         Mention {
             id: self.0,

@@ -49,8 +49,9 @@ impl MessageBuilder {
         self
     }
 
-    /// Mentions something that implements the
-    /// [Mentionable](../model/trait.Mentionable.html) trait.
+    /// Mentions something that implements the [`Mentionable`] trait.
+    ///
+    /// [`Mentionable`]: ../model/trait.Mentionable.html
     pub fn mention<M: Mentionable>(mut self, item: M) -> Self {
         self.0.push_str(&item.mention());
 
