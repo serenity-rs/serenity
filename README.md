@@ -69,13 +69,13 @@ fn main() {
 [`Event`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/model/enum.Event.html
 [`Event::MessageCreate`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/model/enum.Event.html#MessageCreate.v
 [`State`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/ext/state/struct.State.html
-[ci]: https://gitlab.com/kalasi/serenity.rs/pipelines
-[ci-badge]: https://gitlab.com/kalasi/serenity.rs/badges/master/build.svg
+[ci]: https://travis-ci.org/zeyla/serenity.rs
+[ci-badge]: https://travis-ci.org/zeyla/serenity.rs.svg?branch=master
 [client's module-level documentation]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/index.html
 [discord docs]: https://discordapp.com/developers/docs/intro
 [docs]: https://docs.austinhellyer.me/serenity.rs/latest/serenity
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
-[examples]: https://gitlab.com/kalasi/serenity.rs/tree/master/examples
+[examples]: https://github.com/zeyla/serenity.rs/tree/master/examples
 [license]: https://opensource.org/licenses/ISC
 [license-badge]: https://img.shields.io/badge/license-ISC-blue.svg?style=flat-square
 [state docs]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/ext/state/index.html
