@@ -50,14 +50,6 @@ impl Context {
         http::accept_invite(code)
     }
 
-    /// This is an alias of [`ack_message`].
-    ///
-    /// [`ack_message`]: #method.ack_message
-    pub fn ack<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
-        where C: Into<ChannelId>, M: Into<MessageId> {
-        self.ack_message(channel_id.into(), message_id.into())
-    }
-
     /// Mark a message as being read in a channel. This will mark up to the
     /// given message as read. Any messages created after that message will not
     /// be marked as read.
@@ -67,21 +59,13 @@ impl Context {
     /// Returns a [`ClientError::InvalidOperationAsBot`] if this is a bot.
     ///
     /// [`ClientError::InvalidOperationAsBot`]: ../enum.ClientError.html#variant.InvalidOperationAsUser
-    pub fn ack_message<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
+    pub fn ack<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
         if self.login_type == LoginType::User {
             return Err(Error::Client(ClientError::InvalidOperationAsUser))
         }
 
         http::ack_message(channel_id.into().0, message_id.into().0)
-    }
-
-    /// This is an alias of [`ban`].
-    ///
-    /// [`ban`]: #method.ban
-    pub fn ban<G, U>(&self, guild_id: G, user_id: U, delete_message_days: u8)
-        -> Result<()> where G: Into<GuildId>, U: Into<UserId> {
-        self.ban_user(guild_id.into(), user_id.into(), delete_message_days)
     }
 
     /// Ban a [`User`] from a [`Guild`], removing their messages sent in the
@@ -110,7 +94,7 @@ impl Context {
     /// [`Guild`]: ../model/struct.Guild.html
     /// [`User`]: ../model/struct.User.html
     /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
-    pub fn ban_user<G, U>(&self, guild_id: G, user_id: U, delete_message_days: u8)
+    pub fn ban<G, U>(&self, guild_id: G, user_id: U, delete_message_days: u8)
         -> Result<()> where G: Into<GuildId>, U: Into<UserId> {
         if delete_message_days > 7 {
             return Err(Error::Client(ClientError::DeleteMessageDaysAmount(delete_message_days)));
@@ -467,17 +451,9 @@ impl Context {
     ///
     /// [`PrivateChannel`]: ../model/struct.PrivateChannel.html
     /// [`User::dm`]: ../model/struct.User.html#method.dm
-    pub fn direct_message<C>(&self, target_id: C, content: &str)
-        -> Result<Message> where C: Into<ChannelId> {
-        self.send_message(target_id.into(), content, "", false)
-    }
-
-    /// This is an alias of [`direct_message`].
-    ///
-    /// [`direct_message`]: #method.direct_message
     pub fn dm<C: Into<ChannelId>>(&self, target_id: C, content: &str)
         -> Result<Message> {
-        self.direct_message(target_id.into(), content)
+        self.send_message(target_id.into(), content, "", false)
     }
 
     pub fn edit_channel<C, F>(&self, channel_id: C, f: F)
@@ -823,14 +799,6 @@ impl Context {
         http::edit_member(guild_id.into().0, user_id.into().0, map)
     }
 
-    /// This is an alias of [`get_pins`].
-    ///
-    /// [`get_pins`]: #method.get_pins
-    pub fn pins<C>(&self, channel_id: C) -> Result<Vec<Message>>
-        where C: Into<ChannelId> {
-        self.get_pins(channel_id.into())
-    }
-
     /// Retrieves the list of [`Message`]s which are pinned to the specified
     /// [`Channel`].
     ///
@@ -841,37 +809,9 @@ impl Context {
         http::get_pins(channel_id.into().0)
     }
 
-    /// This is an alias of [`pin_message`].
-    ///
-    /// [`pin_message`]: #method.pin_message
     pub fn pin<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
-        self.pin_message(channel_id.into(), message_id.into())
-    }
-
-    pub fn pin_message<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
-        where C: Into<ChannelId>, M: Into<MessageId> {
         http::pin_message(channel_id.into().0, message_id.into().0)
-    }
-
-    /// This is an alias of [`direct_message`].
-    ///
-    /// [`direct_message`]: #method.direct_message
-    pub fn pm<C: Into<ChannelId>>(&self, target_id: C, content: &str)
-        -> Result<Message> {
-        self.direct_message(target_id.into(), content)
-    }
-
-    /// Unbans a [`User`] from a [`Guild`].
-    ///
-    /// Requires the [Ban Members] permission.
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`User`]: ../model/struct.User.html
-    /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
-    pub fn remove_ban<G, U>(&self, guild_id: G, user_id: U) -> Result<()>
-        where G: Into<GuildId>, U: Into<UserId> {
-        http::remove_ban(guild_id.into().0, user_id.into().0)
     }
 
     /// Sends a message with just the given message content in the channel that
@@ -893,17 +833,6 @@ impl Context {
         } else {
             Err(Error::Client(ClientError::NoChannelId))
         }
-    }
-
-    /// This is an alias of [`send_message`].
-    ///
-    /// [`send_message`]: #method.send_message
-    pub fn send<C>(&self, channel_id: C, content: &str, nonce: &str, tts: bool)
-        -> Result<Message> where C: Into<ChannelId> {
-        self.send_message(channel_id.into(),
-                          content,
-                          nonce,
-                          tts)
     }
 
     pub fn send_file<C, R>(&self,
@@ -969,32 +898,20 @@ impl Context {
         http::start_integration_sync(guild_id.into().0, integration_id.into().0)
     }
 
-    /// This is an alias of [`broadcast_typing`].
+    /// Unbans a [`User`] from a [`Guild`].
     ///
-    /// [`broadcast_typing`]: #method.broadcast_typing
-    pub fn typing<C>(&self, channel_id: C) -> Result<()>
-        where C: Into<ChannelId> {
-        self.broadcast_typing(channel_id.into().0)
-    }
-
-    /// This is an alias of [`remove_ban`].
+    /// Requires the [Ban Members] permission.
     ///
-    /// [`#method.remove_ban`]: #method.remove_ban
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`User`]: ../model/struct.User.html
+    /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
     pub fn unban<G, U>(&self, guild_id: G, user_id: U) -> Result<()>
         where G: Into<GuildId>, U: Into<UserId> {
-        self.remove_ban(guild_id.into().0, user_id.into().0)
+        http::remove_ban(guild_id.into().0, user_id.into().0)
     }
 
-    /// This is an alias of [`unpin_message`].
-    ///
-    /// [`unpin_message`]: #method.unpin_message
     pub fn unpin<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
-        self.unpin_message(channel_id.into().0, message_id.into().0)
-    }
-
-    pub fn unpin_message<C, M>(&self, channel_id: C, message_id: M)
-        -> Result<()> where C: Into<ChannelId>, M: Into<MessageId> {
         http::unpin_message(channel_id.into().0, message_id.into().0)
     }
 }
