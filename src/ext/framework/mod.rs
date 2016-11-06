@@ -33,26 +33,17 @@ impl Framework {
     pub fn dispatch(&mut self, context: Context, message: Message) {
         // Determine the point at which the prefix ends, and the command starts.
         let pos = if let Some(ref prefix) = self.configuration.prefix {
-            let mut mention_ends = None;
-
-            if let Some(ref mentions) = self.configuration.on_mention {
-                for mention in mentions {
-                    if !message.content.starts_with(&mention[..]) {
-                        continue;
-                    }
-
-                    mention_ends = Some(mention.len() + 1);
-
-                    break;
-                }
-            }
-
-            if let Some(mention_ends) = mention_ends {
+            if let Some(mention_ends) = self.find_mention_end(&message.content) {
                 mention_ends
             } else if !message.content.starts_with(prefix) {
                 return;
             } else {
                 prefix.len()
+            }
+        } else if self.configuration.on_mention.is_some() {
+            match self.find_mention_end(&message.content) {
+                Some(mention_end) => mention_end,
+                None => return,
             }
         } else {
             0
@@ -118,5 +109,19 @@ impl Framework {
         self.initialized = true;
 
         self
+    }
+
+    fn find_mention_end(&self, content: &str) -> Option<usize> {
+        if let Some(ref mentions) = self.configuration.on_mention {
+            for mention in mentions {
+                if !content.starts_with(&mention[..]) {
+                    continue;
+                }
+
+                return Some(mention.len() + 1);
+            }
+        }
+
+        None
     }
 }
