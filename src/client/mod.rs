@@ -40,7 +40,6 @@ mod context;
 mod dispatch;
 mod event_store;
 mod login_type;
-mod ratelimiting;
 
 pub use self::connection::{Connection, ConnectionError};
 pub use self::context::Context;

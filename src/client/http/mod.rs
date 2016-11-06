@@ -18,6 +18,8 @@
 //!
 //! [`Client`]: ../struct.Client.html
 
+mod ratelimiting;
+
 use hyper::client::{
     Client as HyperClient,
     RequestBuilder,
@@ -28,11 +30,11 @@ use hyper::method::Method;
 use hyper::status::StatusCode;
 use hyper::{Error as HyperError, Result as HyperResult, Url, header};
 use multipart::client::Multipart;
+use self::ratelimiting::Route;
 use serde_json;
 use std::default::Default;
 use std::io::{ErrorKind as IoErrorKind, Read};
 use std::sync::{Arc, Mutex};
-use super::ratelimiting::{self, Route};
 use ::constants;
 use ::model::*;
 use ::prelude_internal::*;
@@ -48,7 +50,7 @@ pub fn set_token(token: &str) {
 }
 
 pub fn accept_invite(code: &str) -> Result<Invite> {
-    let response = request!(Route::InvitesCode, post, "/invite/{}", code);
+    let response = request!(Route::InvitesCode, post, "/invites/{}", code);
 
     Invite::decode(try!(serde_json::from_reader(response)))
 }

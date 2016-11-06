@@ -6,7 +6,6 @@ use std::str;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
-use super::http;
 use time;
 use ::prelude_internal::*;
 
@@ -126,7 +125,7 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
             route.pre_hook();
         }
 
-        let response = try!(http::retry(&f));
+        let response = try!(super::retry(&f));
 
         // Check if the request got ratelimited by checking for status 429,
         // and if so, sleep for the value of the header 'retry-after' -
