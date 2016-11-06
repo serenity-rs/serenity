@@ -32,63 +32,92 @@ impl Framework {
     #[doc(hidden)]
     pub fn dispatch(&mut self, context: Context, message: Message) {
         // Determine the point at which the prefix ends, and the command starts.
-        let pos = if let Some(ref prefix) = self.configuration.prefix {
-            if let Some(mention_ends) = self.find_mention_end(&message.content) {
+        let positions = if let Some(ref prefix) = self.configuration.prefix {
+            let pos = if let Some(mention_ends) = self.find_mention_end(&message.content) {
                 mention_ends
             } else if !message.content.starts_with(prefix) {
                 return;
             } else {
                 prefix.len()
+            };
+
+            let mut positions = vec![pos];
+
+            if self.configuration.allow_whitespace {
+                positions.push(pos - 1);
             }
+
+            positions
         } else if self.configuration.on_mention.is_some() {
             match self.find_mention_end(&message.content) {
-                Some(mention_end) => mention_end,
+                Some(mention_end) => {
+                    let mut positions = vec![mention_end];
+
+                    if self.configuration.allow_whitespace {
+                        positions.push(mention_end - 1);
+                    }
+
+                    positions
+                },
                 None => return,
             }
         } else {
-            0
+            vec![0]
         };
 
         // Ensure that the message length is at least longer than the prefix
         // length. There's no point in checking further ahead if there's nothing
         // to check.
-        if message.content.len() <= pos {
+        let mut less_than = true;
+
+        for position in &positions {
+            if message.content.len() > *position {
+                less_than = false;
+
+                break;
+            }
+        }
+
+        if less_than {
             return;
         }
 
-        let mut built = String::new();
+        for position in positions {
+            let mut built = String::new();
 
-        for i in 0..self.configuration.depth {
-            if i > 0 {
-                built.push(' ');
-            }
-
-            built.push_str(match {
-                message.content
-                    .split_at(pos)
-                    .1
-                    .split_whitespace()
-                    .collect::<Vec<&str>>()
-                    .get(i)
-            } {
-                Some(piece) => piece,
-                None => return,
-            });
-
-            if let Some(command) = self.commands.get(&built) {
-                if let Some(check) = self.checks.get(&built) {
-                    if !(check)(&context, &message) {
-                        return;
-                    }
+            for i in 0..self.configuration.depth {
+                if i > 0 {
+                    built.push(' ');
                 }
 
-                let command = command.clone();
-
-                thread::spawn(move || {
-                    (command)(context, message)
+                built.push_str(match {
+                    message.content
+                        .split_at(position)
+                        .1
+                        .trim()
+                        .split_whitespace()
+                        .collect::<Vec<&str>>()
+                        .get(i)
+                } {
+                    Some(piece) => piece,
+                    None => continue,
                 });
 
-                return;
+                if let Some(command) = self.commands.get(&built) {
+                    if let Some(check) = self.checks.get(&built) {
+                        if !(check)(&context, &message) {
+                            continue;
+                        }
+                    }
+
+                    let command = command.clone();
+
+                    thread::spawn(move || {
+                        (command)(context, message)
+                    });
+
+                    return;
+                }
             }
         }
     }

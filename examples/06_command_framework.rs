@@ -28,6 +28,7 @@ fn main() {
     client.with_framework(|f| f
         .configure(|c| c
             .on_mention(true)
+            .allow_whitespace(true)
             .prefix("~"))
         .on("ping", ping_command)
         .set_check("ping", owner_check) // Ensure only the owner can run this
