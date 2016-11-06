@@ -1,4 +1,4 @@
-use ::prelude::*;
+use ::prelude_internal::*;
 
 /// The base URI for the API.
 pub const API_BASE: &'static str = "https://discordapp.com/api/v6";

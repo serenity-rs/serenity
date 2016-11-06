@@ -7,7 +7,7 @@ use std::ffi::OsStr;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
-use ::prelude::*;
+use ::prelude_internal::*;
 
 mod colour;
 mod message_builder;

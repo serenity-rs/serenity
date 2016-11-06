@@ -8,7 +8,7 @@ use std::thread;
 use std::time::Duration;
 use super::http;
 use time;
-use ::prelude::*;
+use ::prelude_internal::*;
 
 lazy_static! {
     static ref GLOBAL: Arc<Mutex<RateLimit>> = Arc::new(Mutex::new(RateLimit::default()));

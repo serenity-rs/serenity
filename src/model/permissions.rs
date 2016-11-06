@@ -35,7 +35,7 @@
 //! [Manage Messages]: constant.MANAGE_MESSAGES.html
 //! [Manage Roles]: constant.MANAGE_ROLES.html
 
-use ::prelude::*;
+use ::prelude_internal::*;
 
 /// Returns a set of permissions with the original @everyone permissions set
 /// to true.

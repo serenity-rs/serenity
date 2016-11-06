@@ -1,9 +1,19 @@
-//! These prelude re-exports are a set of exports that are commonly used from
-//! within the library.
+//! A set of exports which can be helpful to use.
 //!
-//! These are not publicly re-exported to the end user, and must stay as a
-//! private module.
+//! Note that the `SerenityError` re-export is equivilant to
+//! [`serenity::Error`], although is re-exported as a separate name to remove
+//! likely ambiguity with other crate error enums.
+//!
+//! # Examples
+//!
+//! Import all of the exports:
+//!
+//! ```rust
+//! use discord::prelude::*;
+//! ```
+//!
+//! [`serenity::Error`]: ../enum.Error.html
 
-pub use serde_json::Value;
-pub use ::error::{Error, Result};
-pub use ::client::ClientError;
+pub use ::client::{Client, ClientError};
+pub use ::error::{Error as SerenityError};
+pub use ::model::Mentionable;

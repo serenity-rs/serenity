@@ -1,6 +1,6 @@
 use super::*;
 use ::client::{STATE, http};
-use ::prelude::*;
+use ::prelude_internal::*;
 
 impl ChannelId {
     /// Search the state for the channel with the Id.

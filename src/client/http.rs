@@ -35,7 +35,7 @@ use std::sync::{Arc, Mutex};
 use super::ratelimiting::{self, Route};
 use ::constants;
 use ::model::*;
-use ::prelude::*;
+use ::prelude_internal::*;
 use ::utils::decode_array;
 
 lazy_static! {

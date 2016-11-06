@@ -14,7 +14,7 @@ use super::*;
 use super::utils;
 use ::builder::{CreateInvite, EditChannel};
 use ::client::{STATE, http};
-use ::prelude::*;
+use ::prelude_internal::*;
 use ::utils::decode_array;
 
 impl Attachment {

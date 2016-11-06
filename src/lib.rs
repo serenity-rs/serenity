@@ -96,10 +96,11 @@ pub mod builder;
 pub mod client;
 pub mod ext;
 pub mod model;
+pub mod prelude;
 
 mod constants;
 mod error;
-mod prelude;
+mod prelude_internal;
 
 pub use client::Client;
 pub use error::{Error, Result};

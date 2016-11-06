@@ -1,6 +1,6 @@
 use super::{Invite, RichInvite};
 use ::client::http;
-use ::prelude::*;
+use ::prelude_internal::*;
 use super::{permissions, utils};
 
 impl Invite {

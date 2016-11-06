@@ -16,7 +16,7 @@ use super::utils::{
 use super::*;
 use ::builder::{EditGuild, EditMember, EditRole};
 use ::client::{STATE, http};
-use ::prelude::*;
+use ::prelude_internal::*;
 use ::utils::{Colour, decode_array};
 
 impl From<Guild> for GuildContainer {

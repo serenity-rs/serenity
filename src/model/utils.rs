@@ -17,7 +17,7 @@ use super::{
     VoiceState,
 };
 use ::client::STATE;
-use ::prelude::*;
+use ::prelude_internal::*;
 use ::utils::{decode_array, into_array};
 
 #[macro_escape]

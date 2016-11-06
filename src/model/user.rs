@@ -12,7 +12,7 @@ use super::{
     User
 };
 use ::client::{STATE, http};
-use ::prelude::*;
+use ::prelude_internal::*;
 use ::utils::decode_array;
 
 impl User {

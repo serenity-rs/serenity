@@ -15,7 +15,7 @@ use ::builder::{
     GetMessages
 };
 use ::model::*;
-use ::prelude::*;
+use ::prelude_internal::*;
 use ::utils;
 
 #[derive(Clone)]
