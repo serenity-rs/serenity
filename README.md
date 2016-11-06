@@ -1,3 +1,5 @@
+[![ci-badge][]][ci] [![license-badge][]][license] [![docs-badge][]][docs]
+
 # serenity.rs
 
 Serenity is an ergonomic and high-level Rust library for the Discord API.
@@ -28,8 +30,8 @@ to avoid unnecessary HTTP requests to the Discord API. For more information,
 see the [state's module-level documentation][state docs].
 
 Note that - although this documentation will try to be as up-to-date and
-accurate as possible - Discord hosts [official documentation][docs]. If you
-need to be sure that some information piece is accurate, refer to their
+accurate as possible - Discord hosts [official documentation][discord docs]. If
+you need to be sure that some information piece is accurate, refer to their
 docs.
 
 # Dependencies
@@ -58,16 +60,22 @@ fn main() {
 }
 ```
 
-[`Client::login_bot`]: client/struct.Client.html#method.login_bot
-[`Client::login_user`]: client/struct.Client.html#method.login_user
-[`Client::on_message`]: client/struct.Client.html#method.on_message
-[`validate_token`]: client/fn.validate_token.html
-[`Connection`]: client/struct.Connection.html
-[`Context`]: client/struct.Context.html
-[`Event`]: model/enum.Event.html
-[`Event::MessageCreate`]: model/enum.Event.html#MessageCreate.v
-[`State`]: ext/state/struct.State.html
-[client's module-level documentation]: client/index.html
-[docs]: https://discordapp.com/developers/docs/intro
+[`Client::login_bot`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/struct.Client.html#method.login_bot
+[`Client::login_user`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/struct.Client.html#method.login_user
+[`Client::on_message`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/struct.Client.html#method.on_message
+[`validate_token`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/fn.validate_token.html
+[`Connection`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/struct.Connection.html
+[`Context`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/struct.Context.html
+[`Event`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/model/enum.Event.html
+[`Event::MessageCreate`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/model/enum.Event.html#MessageCreate.v
+[`State`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/ext/state/struct.State.html
+[ci]: https://gitlab.com/kalasi/serenity.rs/pipelines
+[ci-badge]: https://gitlab.com/kalasi/serenity.rs/badges/master/build.svg
+[client's module-level documentation]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/index.html
+[discord docs]: https://discordapp.com/developers/docs/intro
+[docs]: https://docs.austinhellyer.me/serenity.rs
+[docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
 [examples]: https://gitlab.com/kalasi/serenity.rs/tree/master/examples
-[state docs]: ext/state/index.html
+[license]: https://opensource.org/licenses/ISC
+[license-badge]: https://img.shields.io/badge/license-ISC-blue.svg?style=flat-square
+[state docs]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/ext/state/index.html
