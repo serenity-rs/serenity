@@ -24,7 +24,7 @@ fn main() {
     // "~ping"
     // "~emoji cat"
     // "~emoji dog"
-    // "~some complex group"
+    // "~some complex command"
     client.with_framework(|f| f
         .configure(|c| c
             .on_mention(true)
