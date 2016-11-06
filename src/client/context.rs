@@ -573,14 +573,6 @@ impl Context {
         http::edit_note(user_id.into().0, map)
     }
 
-    pub fn get_application_info(&self) -> Result<CurrentApplicationInfo> {
-        http::get_application_info()
-    }
-
-    pub fn get_applications(&self) -> Result<Vec<ApplicationInfo>> {
-        http::get_applications()
-    }
-
     pub fn get_bans<G: Into<GuildId>>(&self, guild_id: G) -> Result<Vec<Ban>> {
         http::get_bans(guild_id.into().0)
     }
