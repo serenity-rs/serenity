@@ -9,7 +9,7 @@
 //! Import all of the exports:
 //!
 //! ```rust
-//! use discord::prelude::*;
+//! use serenity::prelude::*;
 //! ```
 //!
 //! [`serenity::Error`]: ../enum.Error.html
