@@ -172,7 +172,16 @@ impl RateLimit {
             return;
         }
 
-        let diff = (self.reset - time::get_time().sec) as u64;
+        let current_time = time::get_time().sec;
+
+        // The reset was in the past, so we're probably good.
+        if current_time > self.reset {
+            self.remaining = self.limit;
+
+            return;
+        }
+
+        let diff = (self.reset - current_time) as u64;
 
         if self.remaining == 0 {
             let delay = (diff * 1000) + 500;
