@@ -417,13 +417,14 @@ pub fn dispatch(event: Result<Event>,
             let context = context(Some(event.message.channel_id),
                                   conn,
                                   login_type);
+            let mut framework = framework.lock().expect("framework poisoned");
 
-            if framework.lock().unwrap().initialized {
+            if framework.initialized {
                 dispatch_message(context.clone(),
                                  event.message.clone(),
                                  event_store);
 
-                framework.lock().unwrap().dispatch(context, event.message);
+                framework.dispatch(context, event.message);
             } else {
                 dispatch_message(context, event.message, event_store);
             }
