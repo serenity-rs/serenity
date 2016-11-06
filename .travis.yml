@@ -1,0 +1,15 @@
+language: rust
+rust:
+    - beta
+    - nightly
+    - stable
+sudo: false
+os:
+    - linux
+cache:
+    directories:
+        - $TRAVIS_BUILD_DIR/target
+        - $HOME/.cargo
+
+script:
+    - cargo build
