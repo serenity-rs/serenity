@@ -73,7 +73,7 @@ fn main() {
 [ci-badge]: https://gitlab.com/kalasi/serenity.rs/badges/master/build.svg
 [client's module-level documentation]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/index.html
 [discord docs]: https://discordapp.com/developers/docs/intro
-[docs]: https://docs.austinhellyer.me/serenity.rs
+[docs]: https://docs.austinhellyer.me/serenity.rs/latest/serenity
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
 [examples]: https://gitlab.com/kalasi/serenity.rs/tree/master/examples
 [license]: https://opensource.org/licenses/ISC
