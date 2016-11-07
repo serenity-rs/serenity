@@ -1,0 +1,47 @@
+---
+name: Webhook
+description: >
+  A representation of a webhook, which is a low-effort way to post messages to
+  channels. They do not necessarily require a bot user or authentication to use.
+fields:
+  - name: id
+    description: The Id of the webhook.
+    type: WebhookId
+  - name: avatar
+    description: >
+      The default avatar of the webhook. Note that this can be modified with a
+      payload.
+    optional: true
+    type: string
+  - name: channel_id
+    description: >
+      The Id of the [channel][`PublicChannel`] that owns the webhook.
+
+
+        [`PublicChannel`]: struct.PublicChannel.html
+    type: ChannelId
+  - name: guild_id
+    description: >
+      The Id of the [`Guild`] that owns the webhook.
+
+
+        [`Guild`]: struct.Guild.html
+    optional: true
+    type: GuildId
+  - name: name
+    description: >
+      The default name of the webhook. Note that this can be modified in a
+      payload.
+    optional: true
+    type: string
+  - name: token
+    description: The webhook's secure token.
+    type: string
+  - name: user
+    description: >
+      The user that created the webhook.
+
+
+      **Note**: This is not returned when getting a webhook by its token.
+    optional: true
+    type: User

@@ -72,4 +72,5 @@ pub struct EventStore {
     pub on_user_settings_update: Option<Arc<Fn(Context, UserSettings, UserSettings) + Send + Sync + 'static>>,
     pub on_voice_state_update: Option<Arc<Fn(Context, VoiceStateUpdateEvent) + Send + Sync + 'static>>,
     pub on_voice_server_update: Option<Arc<Fn(Context, VoiceServerUpdateEvent) + Send + Sync + 'static>>,
+    pub on_webhook_update: Option<Arc<Fn(Context, GuildId, ChannelId) + Send + Sync + 'static>>,
 }

@@ -1,0 +1,17 @@
+---
+name: EmbedField
+description: >
+  A field object in an [`Embed`].
+
+
+    [`Embed`]: struct.Embed.html
+fields:
+  - name: inline
+    description: Whether or not the field should display as inline.
+    type: bool
+  - name: name
+    description: The name of the field.
+    type: string
+  - name: value
+    description: The value of the field.
+    type: string

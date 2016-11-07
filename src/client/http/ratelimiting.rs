@@ -67,6 +67,7 @@ pub enum Route {
     ChannelsIdPins(u64),
     ChannelsIdPinsMessageId(u64),
     ChannelsIdTyping(u64),
+    ChannelsIdWebhooks(u64),
     Gateway,
     GatewayBot,
     Global,
@@ -88,6 +89,7 @@ pub enum Route {
     GuildsIdRegions(u64),
     GuildsIdRoles(u64),
     GuildsIdRolesId(u64),
+    GuildsIdWebhooks(u64),
     InvitesCode,
     Users,
     UsersId,
@@ -97,6 +99,8 @@ pub enum Route {
     UsersMeGuilds,
     UsersMeGuildsId,
     VoiceRegions,
+    WebhooksId,
+    WebhooksIdToken,
     None,
 }
 

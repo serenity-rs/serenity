@@ -11,6 +11,7 @@ mod invite;
 mod misc;
 mod user;
 mod voice;
+mod webhook;
 
 pub use self::channel::*;
 pub use self::gateway::*;
@@ -21,6 +22,7 @@ pub use self::misc::*;
 pub use self::permissions::Permissions;
 pub use self::user::*;
 pub use self::voice::*;
+pub use self::webhook::*;
 
 use self::utils::*;
 use std::collections::HashMap;
@@ -87,6 +89,8 @@ id! {
     RoleId;
     /// An identifier for a User
     UserId;
+    /// An identifier for a [`Webhook`](struct.Webhook.html).
+    WebhookId;
 }
 
 /// A container for any channel.

@@ -665,6 +665,16 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
+        Ok(Event::WebhookUpdate(event)) => {
+            if let Some(ref handler) = handler!(on_webhook_update, event_store) {
+                let context = context(None, conn, login_type);
+                let handler = handler.clone();
+
+                thread::spawn(move || {
+                    (handler)(context, event.guild_id, event.channel_id);
+                });
+            }
+        },
         Err(_why) => {},
     }
 }

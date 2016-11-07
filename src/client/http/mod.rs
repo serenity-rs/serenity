@@ -183,6 +183,46 @@ pub fn create_role(guild_id: u64) -> Result<Role> {
     Role::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Creates a webhook for the given [channel][`PublicChannel`]'s Id, passing in
+/// the given data.
+///
+/// This method requires authentication.
+///
+/// The Value is a map with the values of:
+///
+/// - **avatar**: base64-encoded 128x128 image for the webhook's default avatar
+///   (_optional_);
+/// - **name**: the name of the webhook, limited to between 2 and 100 characters
+///   long.
+///
+/// # Examples
+///
+/// Creating a webhook named `test`:
+///
+/// ```rust,ignore
+/// extern crate serde_json;
+/// extern crate serenity;
+///
+/// use serde_json::builder::ObjectBuilder;
+/// use serenity::client::http;
+///
+/// let channel_id = 81384788765712384;
+/// let map = ObjectBuilder::new().insert("name", "test").build();
+///
+/// let webhook = http::create_webhook(channel_id, map).expect("err creating");
+/// ```
+///
+/// [`PublicChannel`]: ../../model/struct.PublicChannel.html
+pub fn create_webhook(channel_id: u64, map: Value) -> Result<Webhook> {
+    let body = try!(serde_json::to_string(&map));
+    let response = request!(Route::ChannelsIdWebhooks(channel_id),
+                            post(body),
+                            "/channels/{}/webhooks",
+                            channel_id);
+
+    Webhook::decode(try!(serde_json::from_reader(response)))
+}
+
 pub fn delete_channel(channel_id: u64) -> Result<Channel> {
     let response = request!(Route::ChannelsId(channel_id),
                             delete,
@@ -275,6 +315,56 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
                          role_id))
 }
 
+/// Deletes a [`Webhook`] given its Id.
+///
+/// This method requires authentication, whereas [`delete_webhook_with_token`]
+/// does not.
+///
+/// # Examples
+///
+/// Delete a webhook given its Id:
+///
+/// ```rust,no_run
+/// use serenity::client::{Client, http};
+/// use std::env;
+///
+/// // Due to the `delete_webhook` function requiring you to authenticate, you
+/// // must have initialized a client first.
+/// let client = Client::login_user(&env::var("DISCORD_TOKEN").unwrap());
+///
+/// http::delete_webhook(245037420704169985).expect("err deleting webhook");
+/// ```
+///
+/// [`Webhook`]: ../../model/struct.Webhook.html
+/// [`delete_webhook_with_token`]: fn.delete_webhook_with_token.html
+pub fn delete_webhook(webhook_id: u64) -> Result<()> {
+    verify(204, request!(Route::WebhooksId, delete, "/webhooks/{}", webhook_id))
+}
+
+/// Deletes a [`Webhook`] given its Id and unique token.
+///
+/// This method does _not_ require authentication.
+///
+/// # Examples
+///
+/// Delete a webhook given its Id and unique token:
+///
+/// ```rust,no_run
+/// use serenity::client::http;
+///
+/// let id = 245037420704169985;
+/// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+///
+/// http::delete_webhook_with_token(id, token).expect("err deleting webhook");
+///
+/// [`Webhook`]: ../../model/struct.Webhook.html
+pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
+    let client = HyperClient::new();
+    verify(204, try!(retry(|| client
+        .delete(&format!(api!("/webhooks/{}/{}"), webhook_id, token)))
+        .map_err(Error::Hyper)))
+}
+
 pub fn edit_channel(channel_id: u64, map: Value)
     -> Result<PublicChannel> {
     let body = try!(serde_json::to_string(&map));
@@ -361,6 +451,155 @@ pub fn edit_role(guild_id: u64, role_id: u64, map: Value)
     Role::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Edits a the webhook with the given data.
+///
+/// The Value is a map with optional values of:
+///
+/// - **avatar**: base64-encoded 128x128 image for the webhook's default avatar
+///   (_optional_);
+/// - **name**: the name of the webhook, limited to between 2 and 100 characters
+///   long.
+///
+/// Note that, unlike with [`create_webhook`], _all_ values are optional.
+///
+/// This method requires authentication, whereas [`edit_webhook_with_token`]
+/// does not.
+///
+/// # Examples
+///
+/// Edit the image of a webhook given its Id and unique token:
+///
+/// ```rust,ignore
+/// extern crate serde_json;
+/// extern crate serenity;
+///
+/// use serde_json::builder::ObjectBuilder;
+/// use serenity::client::http;
+///
+/// let id = 245037420704169985;
+/// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+/// let image = serenity::utils::read_image("./webhook_img.png")
+///     .expect("err reading image");
+/// let map = ObjectBuilder::new().insert("avatar", image).build();
+///
+/// let edited = http::edit_webhook_with_token(id, token, map)
+///     .expect("err editing webhook");
+/// ```
+///
+/// [`create_webhook`]: fn.create_webhook.html
+/// [`edit_webhook_with_token`]: fn.edit_webhook_with_token.html
+// The tests are ignored, rather than no_run'd, due to rustdoc tests with
+// external crates being incredibly messy and misleading in the end user's view.
+pub fn edit_webhook(webhook_id: u64, map: Value) -> Result<Webhook> {
+    let body = try!(serde_json::to_string(&map));
+    let response = request!(Route::WebhooksId,
+                            patch(body),
+                            "/webhooks/{}",
+                            webhook_id);
+
+    Webhook::decode(try!(serde_json::from_reader(response)))
+}
+
+/// Edits the webhook with the given data.
+///
+/// Refer to the documentation for [`edit_webhook`] for more information.
+///
+/// This method does _not_ require authentication.
+///
+/// # Examples
+///
+/// Edit the name of a webhook given its Id and unique token:
+///
+/// ```rust,ignore
+/// extern crate serde_json;
+/// extern crate serenity;
+///
+/// use serde_json::builder::ObjectBuilder;
+/// use serenity::client::http;
+///
+/// let id = 245037420704169985;
+/// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+/// let map = ObjectBuilder::new().insert("name", "new name").build();
+///
+/// let edited = http::edit_webhook_with_token(id, token, map)
+///     .expect("err editing webhook");
+/// ```
+///
+/// [`edit_webhook`]: fn.edit_webhook.html
+pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: Value)
+    -> Result<Webhook> {
+    let body = try!(serde_json::to_string(&map));
+    let client = HyperClient::new();
+    let response = try!(retry(|| client
+        .patch(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
+        .body(&body))
+        .map_err(Error::Hyper));
+
+    Webhook::decode(try!(serde_json::from_reader(response)))
+}
+
+/// Executes a webhook, posting a [`Message`] in the webhook's associated
+/// [`Channel`].
+///
+/// This method does _not_ require authentication.
+///
+/// Pass `true` to `wait` to wait for server confirmation of the message sending
+/// before receiving a response. From the [Discord docs]:
+///
+/// > waits for server confirmation of message send before response, and returns
+/// > the created message body (defaults to false; when false a message that is
+/// > not saved does not return an error)
+///
+/// The map can _optionally_ contain the following data:
+///
+/// - **avatar_url**: Override the default avatar of the webhook with a URL.
+/// - **tts**: Whether this is a text-to-speech message (defaults to `false`).
+/// - **username**: Override the default username of the webhook.
+///
+/// Additionally, _at least one_ of the following must be given:
+///
+/// - **content**: The content of the message.
+/// - **embeds**: An array of rich embeds.
+///
+/// **Note**: For embed objects, all fields are registered by Discord except for
+/// `height`, `provider`, `proxy_url`, `type` (it will always be `rich`),
+/// `video`, and `width`. The rest will be determined by Discord.
+///
+/// # Examples
+///
+/// Sending a webhook with message content of `test`:
+///
+/// ```rust,ignore
+/// extern crate serde_json;
+/// extern crate serenity;
+///
+/// use serde_json::builder::ObjectBuilder;
+/// use serenity::client::http;
+///
+/// let id = 245037420704169985;
+/// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+/// let map = ObjectBuilder::new().insert("content", "test").build();
+///
+/// let message = match http::execute_webhook(id, token, map) {
+///     Ok(message) => message,
+///     Err(why) => {
+///         println!("Error executing webhook: {:?}", why);
+///
+///         return;
+///     },
+/// };
+pub fn execute_webhook(webhook_id: u64, token: &str, map: Value)
+    -> Result<Message> {
+    let body = try!(serde_json::to_string(&map));
+    let client = HyperClient::new();
+    let response = try!(retry(|| client
+        .patch(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
+        .body(&body))
+        .map_err(Error::Hyper));
+
+    Message::decode(try!(serde_json::from_reader(response)))
+}
+
 pub fn get_application_info() -> Result<CurrentApplicationInfo> {
     let response = request!(Route::None, get, "/oauth2/applications/@me");
 
@@ -398,6 +637,33 @@ pub fn get_channel_invites(channel_id: u64)
 
     decode_array(try!(serde_json::from_reader(response)),
                  RichInvite::decode)
+}
+
+/// Retrieves the webhooks for the given [channel][`PublicChannel`]'s Id.
+///
+/// This method requires authentication.
+///
+/// # Examples
+///
+/// Retrieve all of the webhooks owned by a channel:
+///
+/// ```rust,no_run
+/// use serenity::client::http;
+///
+/// let channel_id = 81384788765712384;
+///
+/// let webhooks = http::get_channel_webhooks(channel_id)
+///     .expect("err getting channel webhooks");
+/// ```
+///
+/// [`PublicChannel`]: ../../model/struct.PublicChannel.html
+pub fn get_channel_webhooks(channel_id: u64) -> Result<Vec<Webhook>> {
+    let response = request!(Route::ChannelsIdWebhooks(channel_id),
+                            get,
+                            "/channels/{}/webhooks",
+                            channel_id);
+
+    decode_array(try!(serde_json::from_reader(response)), Webhook::decode)
 }
 
 pub fn get_channel(channel_id: u64) -> Result<Channel> {
@@ -488,6 +754,33 @@ pub fn get_guild_prune_count(guild_id: u64, map: Value)
                             guild_id);
 
     GuildPrune::decode(try!(serde_json::from_reader(response)))
+}
+
+/// Retrieves the webhooks for the given [guild][`Guild`]'s Id.
+///
+/// This method requires authentication.
+///
+/// # Examples
+///
+/// Retrieve all of the webhooks owned by a guild:
+///
+/// ```rust,no_run
+/// use serenity::client::http;
+///
+/// let guild_id = 81384788765712384;
+///
+/// let webhooks = http::get_guild_webhooks(guild_id)
+///     .expect("err getting guild webhooks");
+/// ```
+///
+/// [`Guild`]: ../../model/struct.Guild.html
+pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
+    let response = request!(Route::GuildsIdWebhooks(guild_id),
+                            get,
+                            "/guilds/{}/webhooks",
+                            guild_id);
+
+    decode_array(try!(serde_json::from_reader(response)), Webhook::decode)
 }
 
 pub fn get_guilds() -> Result<Vec<GuildInfo>> {
@@ -582,6 +875,55 @@ pub fn get_voice_regions() -> Result<Vec<VoiceRegion>> {
     let response = request!(Route::VoiceRegions, get, "/voice/regions");
 
     decode_array(try!(serde_json::from_reader(response)), VoiceRegion::decode)
+}
+
+/// Retrieves a webhook given its Id.
+///
+/// This method requires authentication, whereas [`get_webhook_with_token`] does
+/// not.
+///
+/// # Examples
+///
+/// Retrieve a webhook by Id:
+///
+/// ```rust,no_run
+/// use serenity::client::http;
+///
+/// let id = 245037420704169985;
+/// let webhook = http::get_webhook(id).expect("err getting webhook");
+/// ```
+///
+/// [`get_webhook_with_token`]: fn.get_webhook_with_token.html
+pub fn get_webhook(webhook_id: u64) -> Result<Webhook> {
+    let response = request!(Route::WebhooksId, get, "/webhooks/{}", webhook_id);
+
+    Webhook::decode(try!(serde_json::from_reader(response)))
+}
+
+/// Retrieves a webhook given its Id and unique token.
+///
+/// This method does _not_ require authentication.
+///
+/// # Examples
+///
+/// Retrieve a webhook by Id and its unique token:
+///
+/// ```rust,no_run
+/// use serenity::client::http;
+///
+/// let id = 245037420704169985;
+/// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+///
+/// let webhook = http::get_webhook_with_token(id, token)
+///     .expect("err getting webhook");
+/// ```
+pub fn get_webhook_with_token(webhook_id: u64, token: &str) -> Result<Webhook> {
+    let client = HyperClient::new();
+    let response = try!(retry(|| client
+        .get(&format!(api!("/webhooks/{}/{}"), webhook_id, token)))
+        .map_err(Error::Hyper));
+
+    Webhook::decode(try!(serde_json::from_reader(response)))
 }
 
 pub fn kick_member(guild_id: u64, user_id: u64) -> Result<()> {

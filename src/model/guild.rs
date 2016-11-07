@@ -125,6 +125,16 @@ impl Guild {
         self.icon.as_ref().map(|icon|
             format!(cdn_concat!("/icons/{}/{}.jpg"), self.id, icon))
     }
+
+    /// Retrieves the guild's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[inline]
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
+        http::get_guild_webhooks(self.id.0)
+    }
 }
 
 impl LiveGuild {
@@ -673,6 +683,16 @@ impl LiveGuild {
         }
 
         http::remove_ban(self.id.0, user.into().0)
+    }
+
+    /// Retrieves the guild's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[inline]
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
+        http::get_guild_webhooks(self.id.0)
     }
 }
 

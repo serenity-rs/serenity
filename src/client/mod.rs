@@ -864,6 +864,16 @@ impl Client {
             .on_voice_server_update = Some(Arc::new(handler));
     }
 
+    /// Attaches a handler for when a [`WebhookUpdate`] is received.
+    ///
+    /// [`WebhookUpdate`]: ../model/enum.Event.html#variant.WebhookUpdate
+    pub fn on_webhook_update<F>(&mut self, handler: F)
+        where F: Fn(Context, GuildId, ChannelId) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_webhook_update = Some(Arc::new(handler));
+    }
+
     // Shard data layout is:
     // 0: first shard number to initialize
     // 1: shard number to initialize up to and including

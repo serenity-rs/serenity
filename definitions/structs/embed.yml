@@ -1,21 +1,48 @@
 ---
 name: Embed
-description: An embed in a message for a URL
+description: An embed in a message, such as for a URL or an attachment.
 fields:
+  - name: author
+    description: Author information about the embed.
+    type: EmbedAuthor
+  - name: colour
+    description: The color code of the embed.
+    from: color
+    type: u64
   - name: description
+    description: The description of the embed. This is the long string of text.
     optional: true
     type: string
+  - name: fields
+    array: true
+    description: The array of fields of the embed.
+    type: EmbedField
+  - name: image
+    description: The image information of the embed.
+    type: EmbedImage
   - name: kind
+    description: >
+      The type of the embed. For webhook embeds, this is always `rich`.
     from: type
     type: string
   - name: provider
+    description: The provider information for the embed.
     optional: true
     type: EmbedProvider
+  - name: timestamp
+    description: Timestamp of embed content.
+    type: string
   - name: url
+    description: The URL of the embed.
     type: string
   - name: thumbnail
+    description: The thumbnail provided for the embed.
     optional: true
     type: EmbedThumbnail
   - name: title
+    description: The title of the embed.
     optional: true
     type: string
+  - name: video
+    description: The embed's video information.
+    type: EmbedVideo

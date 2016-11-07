@@ -302,6 +302,12 @@ pub struct VoiceStateUpdateEvent {
     pub voice_state: VoiceState,
 }
 
+#[derive(Clone, Debug)]
+pub struct WebhookUpdateEvent {
+    pub channel_id: ChannelId,
+    pub guild_id: GuildId,
+}
+
 #[derive(Debug, Clone)]
 pub enum GatewayEvent {
     Dispatch(u64, Event),
@@ -483,6 +489,11 @@ pub enum Event {
     VoiceStateUpdate(VoiceStateUpdateEvent),
     /// Voice server information is available
     VoiceServerUpdate(VoiceServerUpdateEvent),
+    /// A webhook for a [channel][`PublicChannel`] was updated in a [`Guild`].
+    ///
+    /// [`Guild`]: struct.Guild.html
+    /// [`PublicChannel`]: struct.PublicChannel.html
+    WebhookUpdate(WebhookUpdateEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
 }
@@ -747,6 +758,11 @@ impl Event {
             Ok(Event::VoiceStateUpdate(VoiceStateUpdateEvent {
                 guild_id: try!(opt(&mut value, "guild_id", GuildId::decode)),
                 voice_state: try!(VoiceState::decode(Value::Object(value))),
+            }))
+        } else if kind == "WEBHOOKS_UPDATE" {
+            Ok(Event::WebhookUpdate(WebhookUpdateEvent {
+                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
+                guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
             }))
         } else {
             Ok(Event::Unknown(UnknownEvent {

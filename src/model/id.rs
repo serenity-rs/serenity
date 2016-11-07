@@ -28,6 +28,15 @@ impl ChannelId {
             prefix: "<#",
         }
     }
+
+    /// Retrieves the channel's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
+        http::get_channel_webhooks(self.0)
+    }
 }
 
 impl From<Channel> for ChannelId {
@@ -80,6 +89,15 @@ impl GuildId {
             id: self.0,
             prefix: "<#",
         }
+    }
+
+    /// Retrieves the guild's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
+        http::get_guild_webhooks(self.0)
     }
 }
 
@@ -179,5 +197,16 @@ impl UserId {
             id: self.0,
             prefix: "<@",
         }
+    }
+}
+
+impl WebhookId {
+    /// Retrieves the webhook by the Id.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    pub fn webhooks(&self) -> Result<Webhook> {
+        http::get_webhook(self.0)
     }
 }

@@ -20,6 +20,46 @@ use ::model::{
     permissions,
 };
 
+/// A builder to create a fake [`Embed`] object, for use with the
+/// [`ExecuteWebhook::embeds`] method.
+///
+/// [`Embed`]: ../model/struct.Embed.html
+/// [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
+pub struct CreateEmbed(pub ObjectBuilder);
+
+impl CreateEmbed {
+    /// Set the colour of the left-hand side of the embed.
+    pub fn colour(self, colour: u64) -> Self {
+        CreateEmbed(self.0.insert("color", colour))
+    }
+
+    /// Set the description.
+    pub fn description(self, description: &str) -> Self {
+        CreateEmbed(self.0.insert("description", description))
+    }
+
+    /// Set the timestamp.
+    pub fn timestamp(self, timestamp: &str) -> Self {
+        CreateEmbed(self.0.insert("timestamp", timestamp))
+    }
+
+    /// Set the title.
+    pub fn title(self, title: &str) -> Self {
+        CreateEmbed(self.0.insert("title", title))
+    }
+
+    /// Set the URL.
+    pub fn url(self, url: &str) -> Self {
+        CreateEmbed(self.0.insert("url", url))
+    }
+}
+
+impl Default for CreateEmbed {
+    fn default() -> CreateEmbed {
+        CreateEmbed(ObjectBuilder::new())
+    }
+}
+
 /// A builder to create a [`RichInvite`] for use via [`Context::create_invite`].
 ///
 /// This is a structured and cleaner way of creating an invite, as all
@@ -85,6 +125,58 @@ impl CreateInvite {
 impl Default for CreateInvite {
     fn default() -> CreateInvite {
         CreateInvite(ObjectBuilder::new().insert("validate", Value::Null))
+    }
+}
+
+/// A builder to create the inner content of a [`Webhook`]'s execution.
+///
+/// This is a structured way of cleanly creating the inner execution payload,
+/// to reduce potential argument counts.
+///
+/// Refer to the documentation for [`execute_webhook`] on restrictions with
+/// execution payloads and its fields.
+///
+/// [`Webhook`]: ../model/struct.Webhook.html
+/// [`execute_webhook`]: ../client/http/fn.execute_webhook.html
+pub struct ExecuteWebhook(pub ObjectBuilder);
+
+impl ExecuteWebhook {
+    /// Override the default avatar of the webhook with an image URL.
+    pub fn avatar_url(self, avatar_url: &str) -> Self {
+        ExecuteWebhook(self.0.insert("avatar_url", avatar_url))
+    }
+
+    /// Set the content of the message.
+    pub fn content(self, content: &str) -> Self {
+        ExecuteWebhook(self.0.insert("content", content))
+    }
+
+    // Set the embeds associated with the message.
+    pub fn embeds(self, embeds: Vec<Value>) -> Self {
+        ExecuteWebhook(self.0.insert("embeds", embeds))
+    }
+
+    /// Whether the message is a text-to-speech message.
+    ///
+    /// Think carefully before setting this to `true`.
+    pub fn tts(self, tts: bool) -> Self {
+        ExecuteWebhook(self.0.insert("tts", tts))
+    }
+
+    /// Override the default username of the webhook.
+    pub fn username(self, username: &str) -> Self {
+        ExecuteWebhook(self.0.insert("username", username))
+    }
+}
+
+impl Default for ExecuteWebhook {
+    /// Returns a default set of values for a [`Webhook`] execution.
+    ///
+    /// The only default value is `tts` being set to `true`. In the event that
+    /// there is a bug that Discord defaults `tts` to `true`, at least
+    /// serenity.rs won't be a part of it.
+    fn default() -> ExecuteWebhook {
+        ExecuteWebhook(ObjectBuilder::new().insert("tts", false))
     }
 }
 

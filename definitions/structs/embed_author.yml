@@ -1,0 +1,20 @@
+---
+name: EmbedAuthor
+description: >
+  An author object in an [`Embed`].
+
+
+    [`Embed`]: struct.Embed.html
+fields:
+  - name: icon_url
+    description: The URL of the author icon. Note this only supports HTTP(s).
+    type: string
+  - name: name
+    description: The name of the author.
+    type: string
+  - name: proxy_icon_url
+    description: A proxied URL of the author icon.
+    type: string
+  - name: url
+    description: The URL of the author.
+    type: string

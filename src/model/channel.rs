@@ -16,7 +16,7 @@ use super::utils::{
 };
 use super::*;
 use super::utils;
-use ::builder::{CreateInvite, EditChannel};
+use ::builder::{CreateEmbed, CreateInvite, EditChannel};
 use ::client::{STATE, http};
 use ::prelude_internal::*;
 use ::utils::decode_array;
@@ -248,6 +248,18 @@ impl fmt::Display for Channel {
         };
 
         fmt::Display::fmt(&out, f)
+    }
+}
+
+impl Embed {
+    /// Creates a fake Embed, giving back a `serde_json` map.
+    ///
+    /// This should only be useful in conjunction with [`Webhook::execute`].
+    ///
+    /// [`Webhook::execute`]: struct.Webhook.html
+    #[inline(always)]
+    pub fn fake<F>(f: F) -> Value where F: FnOnce(CreateEmbed) -> CreateEmbed {
+        f(CreateEmbed::default()).0.build()
     }
 }
 
@@ -763,6 +775,15 @@ impl PublicChannel {
             .build();
 
         http::send_message(self.id.0, map)
+    }
+
+    /// Retrieves the channel's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
+        http::get_channel_webhooks(self.id.0)
     }
 }
 
