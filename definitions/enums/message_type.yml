@@ -1,17 +1,17 @@
 ---
 name: MessageType
 variants:
-  - variant: GroupCallCreation
-    number: 3
-  - variant: GroupIconUpdate
-    number: 5
-  - variant: GroupNameUpdate
-    number: 4
+  - variant: Regular
+    number: 0
   - variant: GroupRecipientAddition
     number: 1
   - variant: GroupRecipientRemoval
     number: 2
+  - variant: GroupCallCreation
+    number: 3
+  - variant: GroupNameUpdate
+    number: 4
+  - variant: GroupIconUpdate
+    number: 5
   - variant: PinsAdd
     number: 6
-  - variant: Regular
-    number: 0
