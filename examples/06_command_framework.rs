@@ -36,20 +36,20 @@ fn main() {
         .on("emoji dog", dog_command)
         .on("some complex command", some_complex_command)
         // Commands can be in closure-form as well
-        .on("about", |context, _message| drop(context.say("A test bot"))));
+        .on("about", |context, _message, _args| drop(context.say("A test bot"))));
 
     let _ = client.start();
 }
 
-fn cat_command(context: Context, _message: Message) {
+fn cat_command(context: Context, _msg: Message, _args: Vec<String>) {
     let _ = context.say(":cat:");
 }
 
-fn dog_command(context: Context, _message: Message) {
+fn dog_command(context: Context, _msg: Message, _args: Vec<String>) {
     let _ = context.say(":dog:");
 }
 
-fn ping_command(_context: Context, message: Message) {
+fn ping_command(_context: Context, message: Message, _args: Vec<String>) {
     let _ = message.reply("Pong!");
 }
 
@@ -58,6 +58,6 @@ fn owner_check(_context: &Context, message: &Message) -> bool {
     message.author.id.0 == 7u64
 }
 
-fn some_complex_command(context: Context, _message: Message) {
-    let _ = context.say("This is a command in a complex group");
+fn some_complex_command(context: Context, _msg: Message, args: Vec<String>) {
+    let _ = context.say(&format!("Arguments: {:?}", args));
 }

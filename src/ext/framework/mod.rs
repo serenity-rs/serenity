@@ -113,7 +113,12 @@ impl Framework {
                     let command = command.clone();
 
                     thread::spawn(move || {
-                        (command)(context, message)
+                        let args = message.content[built.len() + 1..]
+                            .split_whitespace()
+                            .map(|arg| arg.to_owned())
+                            .collect::<Vec<String>>();
+
+                        (command)(context, message, args)
                     });
 
                     return;
@@ -123,7 +128,7 @@ impl Framework {
     }
 
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(Context, Message) + Send + Sync + 'static,
+        where F: Fn(Context, Message, Vec<String>) + Send + Sync + 'static,
               S: Into<String> {
         self.commands.insert(command_name.into(), Arc::new(f));
         self.initialized = true;
