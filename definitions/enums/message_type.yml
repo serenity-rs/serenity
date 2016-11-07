@@ -11,5 +11,7 @@ variants:
     number: 1
   - variant: GroupRecipientRemoval
     number: 2
+  - variant: PinsAdd
+    number: 6
   - variant: Regular
     number: 0
