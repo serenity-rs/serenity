@@ -1,7 +1,11 @@
+use hyper::Client as HyperClient;
 use serde_json::builder::ObjectBuilder;
 use std::borrow::Cow;
 use std::fmt::{self, Write};
+use std::fs::File;
+use std::io::{Read, Write as IoWrite};
 use std::mem;
+use std::path::{Path, PathBuf};
 use super::utils::{
     decode_id,
     into_map,
@@ -26,6 +30,146 @@ impl Attachment {
         } else {
             None
         }
+    }
+
+    /// Downloads the attachment, returning back a vector of bytes.
+    ///
+    /// # Examples
+    ///
+    /// Download all of the attachments associated with a [`Message`]:
+    ///
+    /// ```rust,no_run
+    /// use serenity::Client;
+    /// use std::env;
+    /// use std::fs::File;
+    /// use std::io::Write;
+    /// use std::path::Path;
+    ///
+    /// let token = env::var("DISCORD_TOKEN").expect("token in environment");
+    /// let mut client = Client::login_bot(&token);
+    ///
+    /// client.on_message(|context, message| {
+    ///     for attachment in message.attachments {
+    ///         let content = match attachment.download() {
+    ///             Ok(content) => content,
+    ///             Err(why) => {
+    ///                 println!("Error downloading attachment: {:?}", why);
+    ///                 let _ = context.say("Error downloading attachment");
+    ///
+    ///                 return;
+    ///             },
+    ///         };
+    ///
+    ///         let mut file = match File::create(&attachment.filename) {
+    ///             Ok(file) => file,
+    ///             Err(why) => {
+    ///                 println!("Error creating file: {:?}", why);
+    ///                 let _ = context.say("Error creating file");
+    ///
+    ///                 return;
+    ///             },
+    ///         };
+    ///
+    ///         if let Err(why) = file.write(&content) {
+    ///             println!("Error writing to file: {:?}", why);
+    ///
+    ///             return;
+    ///         }
+    ///
+    ///         let _ = context.say(&format!("Saved {:?}", attachment.filename));
+    ///     }
+    /// });
+    ///
+    /// client.on_ready(|_context, ready| {
+    ///     println!("{} is connected!", ready.user.name);
+    /// });
+    ///
+    /// let _ = client.start();
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Io`] when there is a problem reading the contents
+    /// of the HTTP response.
+    ///
+    /// Returns an [`Error::Hyper`] when there is a problem retrieving the
+    /// attachment.
+    ///
+    /// [`Error::Hyper`]: ../enum.Error.html#variant.Hyper
+    /// [`Error::Io`]: ../enum.Error.html#variant.Io
+    /// [`Message`]: struct.Message.html
+    pub fn download(&self) -> Result<Vec<u8>> {
+        let hyper = HyperClient::new();
+        let mut response = try!(hyper.get(&self.url).send());
+
+        let mut bytes = vec![];
+        try!(response.read_to_end(&mut bytes));
+
+        Ok(bytes)
+    }
+
+    /// Downloads the attachment, saving it to the provided directory path.
+    /// Returns a path to the saved file.
+    ///
+    /// # Examples
+    ///
+    /// Download all of the attachments associated with a [`Message`] to a
+    /// given folder:
+    ///
+    /// ```rust,no_run
+    /// use serenity::Client;
+    /// use std::env;
+    /// use std::fs;
+    ///
+    /// // Make sure that the directory to store images in exists.
+    /// fs::create_dir_all("./attachment_downloads")
+    ///     .expect("err making directory");
+    ///
+    /// let token = env::var("DISCORD_TOKEN").expect("token in environment");
+    /// let mut client = Client::login_bot(&token);
+    ///
+    /// client.on_message(|context, message| {
+    ///     for attachment in message.attachments {
+    ///         let dir = "./attachment_downloads";
+    ///
+    ///         let _ = match attachment.download_to_directory(dir) {
+    ///             Ok(_saved_filepath) => {
+    ///                 context.say(&format!("Saved {:?}", attachment.filename))
+    ///             },
+    ///             Err(why) => {
+    ///                 println!("Error saving attachment: {:?}", why);
+    ///                 context.say("Error saving attachment")
+    ///             },
+    ///         };
+    ///     }
+    /// });
+    ///
+    /// client.on_ready(|_context, ready| {
+    ///     println!("{} is connected!", ready.user.name);
+    /// });
+    ///
+    /// let _ = client.start();
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Io`] when there is a problem reading the contents of
+    /// the HTTP response, creating the file, or writing to the file.
+    ///
+    /// Returns an [`Error::Hyper`] when there is a problem retrieving the
+    /// attachment.
+    ///
+    /// [`Error::Hyper`]: ../enum.Error.html#variant.Hyper
+    /// [`Error::Io`]: ../enum.Error.html#variant.Io
+    /// [`Message`]: struct.Message.html
+    pub fn download_to_directory<P: AsRef<Path>>(&self, path: P) -> Result<PathBuf> {
+        let bytes = try!(self.download());
+
+        let filepath: PathBuf = path.as_ref().join(&self.filename);
+        let mut file = try!(File::create(&filepath));
+        try!(file.write(&bytes));
+
+        Ok(filepath)
     }
 }
 
