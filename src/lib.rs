@@ -48,12 +48,16 @@
 //!
 //! fn main() {
 //!     // Login with a bot token from the environment
-//!     let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").expect("token"));
+//!     let mut client = Client::login_bot(&env::var("DISCORD_TOKEN")
+//!         .expect("token"));
 //!     client.with_framework(|f| f
-//!         .configure(|c| c.prefix("~")) // set the bot's prefix to '~'
-//!         .on("ping", |_context, message| drop(message.reply("Pong!"))));
+//!         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
+//!         .on("ping", |_context, message, _arguments| {
+//!             let _ = message.reply("Pong!");
+//!         }));
 //!
-//!     let _ = client.start(); // start listening for events by starting a connection
+//!     // start listening for events by starting a connection
+//!     let _ = client.start();
 //! }
 //! ```
 //!
