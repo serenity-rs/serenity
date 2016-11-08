@@ -9,7 +9,7 @@ fields:
   - name: colour
     description: The color code of the embed.
     from: color
-    optional: true
+    default: "0"
     type: u64
   - name: description
     description: The description of the embed. This is the long string of text.

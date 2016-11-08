@@ -353,6 +353,11 @@ impl {0} {{
                             custom,
                             default)
                 },
+                ("u64", false, false, Some(default), None, Some(from), None) => {
+                    format!(r#"try!(opt(&mut map, "{}", |v| Ok(req!(v.as_u64())))).unwrap_or({})"#,
+                            from,
+                            default.parse::<u64>().unwrap())
+                },
                 ("u64", false, false, None, None, Some(from), None) => {
                     format!(r#"req!(try!(remove(&mut map, "{}")).as_u64())"#,
                             from)
