@@ -2,12 +2,13 @@
 authors = ["Austin Hellyer <hello@austinhellyer.me>"]
 build = "build.rs"
 description = "Ergonomic and high-level Rust library for the Discord API."
-documentation = "http://docs.austinhellyer.me/serenity"
+documentation = "http://serenity.zey.moe"
+homepage = "https://github.com/zeyla/serenity.rs"
 keywords = ["discord", "api"]
 license = "ISC"
 name = "serenity"
 readme = "README.md"
-repository = "https://gitlab.com/kalasi/serenity.rs"
+repository = "https://github.com/zeyla/serenity.rs.git"
 version = "0.1.0"
 
 [dependencies]
@@ -37,6 +38,7 @@ yaml-rust = "0.3"
 [features]
 default = []
 debug = []
+voice = []
 
 [[bin]]
 doc = false

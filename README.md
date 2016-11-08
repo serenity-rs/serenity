@@ -64,22 +64,22 @@ fn main() {
 }
 ```
 
-[`Client::login_bot`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/struct.Client.html#method.login_bot
-[`Client::login_user`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/struct.Client.html#method.login_user
-[`Client::on_message`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/struct.Client.html#method.on_message
-[`validate_token`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/fn.validate_token.html
-[`Connection`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/struct.Connection.html
-[`Context`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/struct.Context.html
-[`Event`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/model/enum.Event.html
-[`Event::MessageCreate`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/model/enum.Event.html#MessageCreate.v
-[`State`]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/ext/state/struct.State.html
+[`Client::login_bot`]: https://serenity.zey.moe/serenity/client/struct.Client.html#method.login_bot
+[`Client::login_user`]: https://serenity.zey.moe/serenity/client/struct.Client.html#method.login_user
+[`Client::on_message`]: https://serenity.zey.moe/serenity/client/struct.Client.html#method.on_message
+[`validate_token`]: https://serenity.zey.moe/serenity/client/fn.validate_token.html
+[`Connection`]: https://serenity.zey.moe/serenity/client/struct.Connection.html
+[`Context`]: https://serenity.zey.moe/serenity/client/struct.Context.html
+[`Event`]: https://serenity.zey.moe/serenity/model/enum.Event.html
+[`Event::MessageCreate`]: https://serenity.zey.moe/serenity/model/enum.Event.html#MessageCreate.v
+[`State`]: https://serenity.zey.moe/serenity/ext/state/struct.State.html
 [ci]: https://travis-ci.org/zeyla/serenity.rs
 [ci-badge]: https://travis-ci.org/zeyla/serenity.rs.svg?branch=master
-[client's module-level documentation]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/client/index.html
+[client's module-level documentation]: https://serenity.zey.moe/serenity/client/index.html
 [discord docs]: https://discordapp.com/developers/docs/intro
-[docs]: https://docs.austinhellyer.me/serenity.rs/latest/serenity
+[docs]: https://serenity.zey.moe/
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
 [examples]: https://github.com/zeyla/serenity.rs/tree/master/examples
 [license]: https://opensource.org/licenses/ISC
 [license-badge]: https://img.shields.io/badge/license-ISC-blue.svg?style=flat-square
-[state docs]: https://docs.austinhellyer.me/serenity.rs/latest/serenity/ext/state/index.html
+[state docs]: https://serenity.zey.moe/serenity/ext/state/index.html
