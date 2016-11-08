@@ -11,6 +11,13 @@ use std::thread;
 use ::client::Context;
 use ::model::Message;
 
+#[derive(Clone, Copy, Debug)]
+pub enum CommandType {
+    Mention,
+    None,
+    Prefix,
+}
+
 #[allow(type_complexity)]
 #[derive(Default)]
 pub struct Framework {
@@ -31,54 +38,17 @@ impl Framework {
 
     #[doc(hidden)]
     pub fn dispatch(&mut self, context: Context, message: Message) {
-        // Determine the point at which the prefix ends, and the command starts.
-        let positions = if let Some(ref prefix) = self.configuration.prefix {
-            let pos = if let Some(mention_ends) = self.find_mention_end(&message.content) {
-                mention_ends
-            } else if !message.content.starts_with(prefix) {
-                return;
-            } else {
-                prefix.len()
-            };
+        let res = command::positions(&message.content, &self.configuration);
 
-            let mut positions = vec![pos];
-
-            if self.configuration.allow_whitespace {
-                positions.push(pos - 1);
-            }
-
-            positions
-        } else if self.configuration.on_mention.is_some() {
-            match self.find_mention_end(&message.content) {
-                Some(mention_end) => {
-                    let mut positions = vec![mention_end];
-
-                    if self.configuration.allow_whitespace {
-                        positions.push(mention_end - 1);
-                    }
-
-                    positions
-                },
-                None => return,
-            }
-        } else {
-            vec![0]
+        let (positions, kind) = match res {
+            Some((positions, kind)) => (positions, kind),
+            None => return,
         };
 
-        // Ensure that the message length is at least longer than the prefix
+        // Ensure that the message length is at least longer than a prefix
         // length. There's no point in checking further ahead if there's nothing
-        // to check.
-        let mut less_than = true;
-
-        for position in &positions {
-            if message.content.len() > *position {
-                less_than = false;
-
-                break;
-            }
-        }
-
-        if less_than {
+        // _to_ check.
+        if positions.iter().all(|p| message.content.len() <= *p) {
             return;
         }
 
@@ -86,7 +56,7 @@ impl Framework {
             let mut built = String::new();
 
             for i in 0..self.configuration.depth {
-                if i > 0 {
+                if i != 0 {
                     built.push(' ');
                 }
 
@@ -113,7 +83,7 @@ impl Framework {
                     let command = command.clone();
 
                     thread::spawn(move || {
-                        let args = message.content[built.len() + 1..]
+                        let args = message.content[position + built.len()..]
                             .split_whitespace()
                             .map(|arg| arg.to_owned())
                             .collect::<Vec<String>>();

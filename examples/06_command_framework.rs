@@ -21,9 +21,9 @@ fn main() {
 
     // Commands are equivilant to:
     // "~about"
-    // "~ping"
     // "~emoji cat"
     // "~emoji dog"
+    // "~ping"
     // "~some complex command"
     client.with_framework(|f| f
         .configure(|c| c
