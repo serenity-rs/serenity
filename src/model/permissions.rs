@@ -26,6 +26,7 @@
 //! - [Manage Guild]
 //! - [Manage Messages]
 //! - [Manage Roles]
+//! - [Manage Webhooks]
 //!
 //! [Administrator]: constant.ADMINISTRATOR.html
 //! [Ban Members]: constant.BAN_MEMBERS.html
@@ -34,6 +35,7 @@
 //! [Manage Guild]: constant.MANAGE_GUILD.html
 //! [Manage Messages]: constant.MANAGE_MESSAGES.html
 //! [Manage Roles]: constant.MANAGE_ROLES.html
+//! [Manage Webhooks]: constant.MANAGE_WEBHOOKS.html
 
 use ::prelude_internal::*;
 
