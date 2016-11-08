@@ -4,10 +4,12 @@ description: An embed in a message, such as for a URL or an attachment.
 fields:
   - name: author
     description: Author information about the embed.
+    optional: true
     type: EmbedAuthor
   - name: colour
     description: The color code of the embed.
     from: color
+    optional: true
     type: u64
   - name: description
     description: The description of the embed. This is the long string of text.
@@ -16,9 +18,11 @@ fields:
   - name: fields
     array: true
     description: The array of fields of the embed.
+    optional: true
     type: EmbedField
   - name: image
     description: The image information of the embed.
+    optional: true
     type: EmbedImage
   - name: kind
     description: >
@@ -31,9 +35,11 @@ fields:
     type: EmbedProvider
   - name: timestamp
     description: Timestamp of embed content.
+    optional: true
     type: string
   - name: url
     description: The URL of the embed.
+    optional: true
     type: string
   - name: thumbnail
     description: The thumbnail provided for the embed.
@@ -45,4 +51,5 @@ fields:
     type: string
   - name: video
     description: The embed's video information.
+    optional: true
     type: EmbedVideo
