@@ -20,4 +20,5 @@ fields:
     type: bool
   - name: reaction_type
     description: The type of reaction.
+    from: emoji
     type: ReactionType
