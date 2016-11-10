@@ -309,7 +309,7 @@ impl LiveGuild {
             channels: public_channels,
             default_message_notifications: req!(try!(remove(&mut map, "default_message_notifications")).as_u64()),
             emojis: try!(remove(&mut map, "emojis").and_then(decode_emojis)),
-            features: try!(remove(&mut map, "features").and_then(|v| decode_array(v, into_string))),
+            features: try!(remove(&mut map, "features").and_then(|v| decode_array(v, Feature::decode_str))),
             icon: try!(opt(&mut map, "icon", into_string)),
             id: id,
             joined_at: try!(remove(&mut map, "joined_at").and_then(into_string)),

@@ -22,7 +22,8 @@ fields:
     type: hashmap
   - name: features
     array: true
-    type: string
+    custom: Feature::decode_str
+    type: Feature
   - name: icon
     optional: true
     type: string

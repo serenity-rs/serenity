@@ -18,7 +18,7 @@ fields:
     type: hashmap
   - name: features
     array: true
-    type: string
+    type: Feature
   - name: icon
     optional: true
     type: string
