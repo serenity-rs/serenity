@@ -456,6 +456,30 @@ impl Connection {
     }
 }
 
+impl Drop for Connection {
+    fn drop(&mut self) {
+        match self.shutdown() {
+            Ok(()) => {
+                if let Some([shard, shards]) = self.shard_info {
+                    println!("Correctly shutdown shard {}/{}", shard, shards - 1);
+                } else {
+                    println!("Correctly shutdown connection");
+                }
+            },
+            Err(why) => {
+                if let Some([shard, shards]) = self.shard_info {
+                    println!("Failed to shutdown shard {}/{}: {:?}",
+                           shard,
+                           shards - 1,
+                           why);
+                } else {
+                    println!("Failed to shutdown connection: {:?}", why);
+                }
+            }
+        }
+    }
+}
+
 trait ReceiverExt {
     fn recv_json<F, T>(&mut self, decode: F) -> Result<T>
         where F: FnOnce(Value) -> Result<T>;
