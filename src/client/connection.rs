@@ -2,6 +2,7 @@ use flate2::read::ZlibDecoder;
 use serde_json::builder::ObjectBuilder;
 use serde_json;
 use std::fmt::{self, Display};
+use std::io::Write;
 use std::net::Shutdown;
 use std::sync::mpsc::{
     self,
@@ -416,11 +417,18 @@ impl Connection {
         Ok(first_event)
     }
 
-    pub fn shutdown(mut self) -> Result<()> {
-        try!(self.receiver
-            .get_mut()
-            .get_mut()
-            .shutdown(Shutdown::Both));
+    pub fn shutdown(&mut self) -> Result<()> {
+        let stream = self.receiver.get_mut().get_mut();
+
+        {
+            let mut sender = Sender::new(stream.by_ref(), true);
+            let message = WsMessage::close_because(1000, "");
+
+            try!(sender.send_message(&message));
+        }
+
+        try!(stream.flush());
+        try!(stream.shutdown(Shutdown::Both));
 
         Ok(())
     }
