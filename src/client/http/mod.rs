@@ -1029,7 +1029,7 @@ pub fn start_guild_prune(guild_id: u64, map: Value)
 
 pub fn start_integration_sync(guild_id: u64, integration_id: u64)
     -> Result<()> {
-    verify(204, request!(Route::GuildsIdIntegrationsId(guild_id),
+    verify(204, request!(Route::GuildsIdIntegrationsIdSync(guild_id),
                          post,
                          "/guilds/{}/integrations/{}",
                          guild_id,
