@@ -460,17 +460,17 @@ impl Drop for Connection {
     fn drop(&mut self) {
         match self.shutdown() {
             Ok(()) => {
-                if let Some([shard, shards]) = self.shard_info {
-                    println!("Correctly shutdown shard {}/{}", shard, shards - 1);
+                if let Some(info) = self.shard_info {
+                    println!("Correctly shutdown shard {}/{}", info[0], info[1] - 1);
                 } else {
                     println!("Correctly shutdown connection");
                 }
             },
             Err(why) => {
-                if let Some([shard, shards]) = self.shard_info {
+                if let Some(info) = self.shard_info {
                     println!("Failed to shutdown shard {}/{}: {:?}",
-                           shard,
-                           shards - 1,
+                           info[0],
+                           info[1] - 1,
                            why);
                 } else {
                     println!("Failed to shutdown connection: {:?}", why);

@@ -76,7 +76,6 @@
 //! [state docs]: ext/state/index.html
 #![allow(doc_markdown, unknown_lints)]
 #![allow(dead_code)]
-#![feature(slice_patterns)]
 
 #[macro_use]
 extern crate bitflags;
