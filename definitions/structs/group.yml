@@ -3,6 +3,7 @@ name: Group
 definition: A group channel, potentially including other users, separate from a server.
 fields:
   - name: channel_id
+    from: id
     type: ChannelId
   - name: icon
     optional: true
