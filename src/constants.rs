@@ -28,45 +28,21 @@ pub enum OpCode {
     SyncCall,
 }
 
-impl OpCode {
-    pub fn from_num(num: u8) -> Result<OpCode> {
-        match num {
-            0 => Ok(OpCode::Event),
-            1 => Ok(OpCode::Heartbeat),
-            2 => Ok(OpCode::Identify),
-            3 => Ok(OpCode::StatusUpdate),
-            4 => Ok(OpCode::VoiceStateUpdate),
-            5 => Ok(OpCode::VoiceServerPing),
-            6 => Ok(OpCode::Resume),
-            7 => Ok(OpCode::Reconnect),
-            8 => Ok(OpCode::GetGuildMembers),
-            9 => Ok(OpCode::InvalidSession),
-            10 => Ok(OpCode::Hello),
-            11 => Ok(OpCode::HeartbeatAck),
-            12 => Ok(OpCode::SyncGuild),
-            13 => Ok(OpCode::SyncCall),
-            other => Err(Error::Decode("Unknown op", Value::U64(other as u64))),
-        }
-    }
-
-    pub fn num(&self) -> u8 {
-        match *self {
-            OpCode::Event => 0,
-            OpCode::Heartbeat => 1,
-            OpCode::Identify => 2,
-            OpCode::StatusUpdate => 3,
-            OpCode::VoiceStateUpdate => 4,
-            OpCode::VoiceServerPing => 5,
-            OpCode::Resume => 6,
-            OpCode::Reconnect => 7,
-            OpCode::GetGuildMembers => 8,
-            OpCode::InvalidSession => 9,
-            OpCode::Hello => 10,
-            OpCode::HeartbeatAck => 11,
-            OpCode::SyncGuild => 12,
-            OpCode::SyncCall => 13,
-        }
-    }
+map_nums! { OpCode;
+    Event 0,
+    Heartbeat 1,
+    Identify 2,
+    StatusUpdate 3,
+    VoiceStateUpdate 4,
+    VoiceServerPing 5,
+    Resume 6,
+    Reconnect 7,
+    GetGuildMembers 8,
+    InvalidSession 9,
+    Hello 10,
+    HeartbeatAck 11,
+    SyncGuild 12,
+    SyncCall 13,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -79,29 +55,11 @@ pub enum VoiceOpCode {
     Speaking,
 }
 
-impl VoiceOpCode {
-    pub fn from_num(num: u8) -> Result<VoiceOpCode> {
-        match num {
-            0 => Ok(VoiceOpCode::Identify),
-            1 => Ok(VoiceOpCode::SelectProtocol),
-            2 => Ok(VoiceOpCode::Hello),
-            3 => Ok(VoiceOpCode::Heartbeat),
-            4 => Ok(VoiceOpCode::SessionDescription),
-            5 => Ok(VoiceOpCode::Speaking),
-            other => Err(Error::Decode("Unknown voice op", Value::U64(other as u64))),
-        }
-    }
-
-    pub fn num(&self) -> u8 {
-        use self::*;
-
-        match *self {
-            VoiceOpCode::Identify => 0,
-            VoiceOpCode::SelectProtocol => 1,
-            VoiceOpCode::Hello => 2,
-            VoiceOpCode::Heartbeat => 3,
-            VoiceOpCode::SessionDescription => 4,
-            VoiceOpCode::Speaking => 5,
-        }
-    }
+map_nums! { VoiceOpCode;
+    Identify 0,
+    SelectProtocol 1,
+    Hello 2,
+    Heartbeat 3,
+    SessionDescription 4,
+    Speaking 5,
 }

@@ -324,7 +324,7 @@ impl GatewayEvent {
 
         let op = req!(value.get("op").and_then(|x| x.as_u64()));
 
-        match try!(OpCode::from_num(op as u8)) {
+        match try!(OpCode::from_num(op).ok_or(Error::Client(ClientError::InvalidOpCode))) {
             OpCode::Event => Ok(GatewayEvent::Dispatch(
                 req!(try!(remove(&mut value, "s")).as_u64()),
                 try!(Event::decode(
@@ -375,7 +375,7 @@ impl VoiceEvent {
         let mut value = try!(into_map(value));
 
         let op = req!(try!(remove(&mut value, "op")).as_u64());
-        let op = try!(VoiceOpCode::from_num(op as u8));
+        let op = try!(VoiceOpCode::from_num(op).ok_or(Error::Client(ClientError::InvalidOpCode)));
 
         if op == VoiceOpCode::Heartbeat {
             return Ok(VoiceEvent::KeepAlive)

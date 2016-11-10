@@ -40,6 +40,32 @@ macro_rules! status_concat {
     }
 }
 
+macro_rules! map_nums {
+    ($item:ident; $($entry:ident $value:expr,)*) => {
+        impl $item {
+            pub fn num(&self) -> u64 {
+                match *self {
+                    $($item::$entry => $value,)*
+                }
+            }
+
+            pub fn from_num(num: u64) -> Option<Self> {
+                match num {
+                    $($value => Some($item::$entry),)*
+                    _ => None,
+                }
+            }
+
+            fn decode(value: Value) -> Result<Self> {
+                value.as_u64().and_then(Self::from_num).ok_or(Error::Decode(
+                    concat!("Expected valid ", stringify!($item)),
+                    value
+                ))
+            }
+        }
+    }
+}
+
 #[doc(hidden)]
 pub fn decode_array<T, F: Fn(Value) -> Result<T>>(value: Value, f: F) -> Result<Vec<T>> {
     into_array(value).and_then(|x| x.into_iter().map(f).collect())

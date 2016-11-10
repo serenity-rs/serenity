@@ -144,6 +144,7 @@ pub enum ClientError {
     /// [`LiveGuild`]: ../model/struct.LiveGuild.html
     /// [`State`]: ../ext/state/struct.State.html
     GuildNotFound,
+    InvalidOpCode,
     /// When attempting to perform an action which is only available to user
     /// accounts.
     InvalidOperationAsBot,
