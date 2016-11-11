@@ -977,9 +977,9 @@ pub fn leave_group(guild_id: u64) -> Result<Group> {
 }
 
 pub fn leave_guild(guild_id: u64) -> Result<Guild> {
-    let response = request!(Route::GuildsId(guild_id),
+    let response = request!(Route::UsersMeGuildsId,
                             delete,
-                            "/guilds/{}",
+                            "/users/@me/guilds/{}",
                             guild_id);
 
     Guild::decode(try!(serde_json::from_reader(response)))
