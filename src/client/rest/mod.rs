@@ -44,7 +44,7 @@ use std::default::Default;
 use std::fmt::Write as FmtWrite;
 use std::io::{ErrorKind as IoErrorKind, Read};
 use std::sync::{Arc, Mutex};
-use ::constants;
+use ::constants::{self, ErrorCode};
 use ::internal::prelude::*;
 use ::model::*;
 use ::utils::decode_array;
@@ -1427,6 +1427,73 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64)
                          "/channels/{}/recipients/{}",
                          group_id,
                          user_id))
+}
+
+/// Searches a [`Channel`] for [`Message`]s that meet provided requirements.
+///
+/// **Note**: Bot users can not search.
+///
+/// [`Channel`]: ../../model/enum.Channel.html
+/// [`Message`]: ../../model/struct.Message.html
+pub fn search_channel_messages(channel_id: u64, map: BTreeMap<&str, String>)
+    -> Result<SearchResult> {
+    let mut uri = format!("/channels/{}/messages/search?", channel_id);
+
+    for (k, v) in map {
+        uri.push('&');
+        uri.push_str(k);
+        uri.push('=');
+        uri.push_str(&v);
+    }
+
+    let response = request!(Route::ChannelsIdMessagesSearch(channel_id),
+                            get,
+                            "{}",
+                            uri);
+
+    if response.status == StatusCode::Accepted {
+        return Err(Error::Client(ClientError::ErrorCode(ErrorCode::SearchIndexUnavailable)));
+    }
+
+    let content = try!(serde_json::from_reader(response));
+
+    SearchResult::decode(content)
+}
+
+/// Searches a [`Guild`] - and optionally specific [channel][`GuildChannel`]s
+/// within it - for messages that meet provided requirements.
+///
+/// **Note**: Bot users can not search.
+///
+/// [`Guild`]: ../../model/struct.Guild.html
+/// [`GuildChannel`]: ../../model/struct.GuildChannel.html
+pub fn search_guild_messages(guild_id: u64,
+                             channel_ids: &[u64],
+                             map: BTreeMap<&str, String>)
+                             -> Result<SearchResult> {
+    let mut uri = format!("/guilds/{}/messages/search?", guild_id);
+
+    for (k, v) in map {
+        uri.push('&');
+        uri.push_str(k);
+        uri.push('=');
+        uri.push_str(&v);
+    }
+
+    for channel_id in channel_ids {
+        write!(uri, "&channel_id={}", channel_id)?;
+    }
+
+    let response = request!(Route::GuildsIdMessagesSearch(guild_id),
+                            get,
+                            "{}",
+                            uri);
+
+    if response.status == StatusCode::Accepted {
+        return Err(Error::Client(ClientError::ErrorCode(ErrorCode::SearchIndexUnavailable)));
+    }
+
+    SearchResult::decode(try!(serde_json::from_reader(response)))
 }
 
 /// Sends a file to a channel.

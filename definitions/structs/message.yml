@@ -29,6 +29,13 @@ fields:
     description: Array of embeds a message has.
     array: true
     type: Embed
+  - name: hit
+    default: "false"
+    description: >
+      Whether the message is the "found" message in a search. Note that this is
+      only relevant in the context of searches, and will otherwise always be
+      `false`.
+    type: bool
   - name: kind
     description: Lets you differentiate system messages and regular messages.
     from: type

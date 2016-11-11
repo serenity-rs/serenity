@@ -128,7 +128,7 @@ id! {
 }
 
 /// A container for any channel.
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub enum Channel {
     /// A group. A group comprises of only one channel.
     Group(Group),
@@ -159,7 +159,7 @@ pub enum GuildContainer {
 /// This is for use with methods such as `Context::create_permission`.
 ///
 /// [`Context::create_permission`]: ../client/
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum PermissionOverwriteType {
     /// A member which is having its permission overwrites edited.
     Member(UserId),
@@ -168,11 +168,29 @@ pub enum PermissionOverwriteType {
 }
 
 /// A guild which may or may not currently be available.
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub enum PossibleGuild<T> {
     /// An indicator that a guild is currently unavailable for at least one of
     /// a variety of reasons.
     Offline(GuildId),
     /// An indicator that a guild is currently available.
     Online(T),
+}
+
+#[derive(Copy, Clone, Debug)]
+pub enum SearchTarget {
+    Channel(ChannelId),
+    Guild(GuildId),
+}
+
+impl From<ChannelId> for SearchTarget {
+    fn from(channel_id: ChannelId) -> SearchTarget {
+        SearchTarget::Channel(channel_id)
+    }
+}
+
+impl From<GuildId> for SearchTarget {
+    fn from(guild_id: GuildId) -> SearchTarget {
+        SearchTarget::Guild(guild_id)
+    }
 }
