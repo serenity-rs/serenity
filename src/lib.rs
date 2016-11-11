@@ -74,8 +74,8 @@
 //! [docs]: https://discordapp.com/developers/docs/intro
 //! [examples]: https://github.com/zeyla/serenity.rs/tree/master/examples
 //! [state docs]: ext/state/index.html
-#![allow(doc_markdown, unknown_lints)]
-#![allow(dead_code)]
+#![allow(doc_markdown, inline_always, unknown_lints)]
+#![warn(dead_code)]
 
 #[macro_use]
 extern crate bitflags;

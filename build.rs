@@ -159,6 +159,7 @@ pub enum {} {{", description, name);
 
             if !numbers.is_empty() {
                 enum_.push_str("
+    #[allow(dead_code)]
     pub fn num(&self) -> u64 {
         match *self {");
 
@@ -179,6 +180,7 @@ pub enum {} {{", description, name);
         }
     }
 
+    #[allow(dead_code)]
     pub fn from_num(num: u64) -> Option<Self> {
         match num {");
 
@@ -200,6 +202,7 @@ pub enum {} {{", description, name);
         }}
     }}
 
+    #[allow(dead_code)]
     fn decode(value: Value) -> Result<Self> {{
         into_u64(value)
             .ok()

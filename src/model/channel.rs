@@ -966,7 +966,7 @@ impl fmt::Display for ReactionType {
                 try!(fmt::Display::fmt(&id, f));
                 f.write_char('>')
             },
-            ReactionType::Unicode(ref unicode) => f.write_str(&unicode),
+            ReactionType::Unicode(ref unicode) => f.write_str(unicode),
         }
     }
 }

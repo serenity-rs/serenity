@@ -40,8 +40,8 @@ impl Framework {
     pub fn dispatch(&mut self, context: Context, message: Message) {
         let res = command::positions(&message.content, &self.configuration);
 
-        let (positions, kind) = match res {
-            Some((positions, kind)) => (positions, kind),
+        let positions = match res {
+            Some((positions, _kind)) => positions,
             None => return,
         };
 
@@ -113,19 +113,5 @@ impl Framework {
         self.initialized = true;
 
         self
-    }
-
-    fn find_mention_end(&self, content: &str) -> Option<usize> {
-        if let Some(ref mentions) = self.configuration.on_mention {
-            for mention in mentions {
-                if !content.starts_with(&mention[..]) {
-                    continue;
-                }
-
-                return Some(mention.len() + 1);
-            }
-        }
-
-        None
     }
 }

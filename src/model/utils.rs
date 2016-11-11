@@ -7,7 +7,6 @@ use super::{
     EmojiId,
     Member,
     Presence,
-    PublicChannel,
     ReadState,
     Relationship,
     Role,
@@ -144,17 +143,6 @@ pub fn decode_private_channels(value: Value)
     }
 
     Ok(private_channels)
-}
-
-pub fn decode_public_channels(value: Value)
-    -> Result<HashMap<ChannelId, PublicChannel>> {
-    let mut public_channels = HashMap::new();
-
-    for public_channel in try!(decode_array(value, PublicChannel::decode)) {
-        public_channels.insert(public_channel.id, public_channel);
-    }
-
-    Ok(public_channels)
 }
 
 pub fn decode_read_states(value: Value)

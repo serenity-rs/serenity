@@ -71,7 +71,7 @@ impl Webhook {
         let mut map = ObjectBuilder::new();
 
         if let Some(avatar) = avatar {
-            map = map.insert("avatar", if avatar.len() == 0 {
+            map = map.insert("avatar", if avatar.is_empty() {
                 Value::Null
             } else {
                 Value::String(avatar.to_owned())

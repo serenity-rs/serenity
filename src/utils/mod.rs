@@ -43,12 +43,14 @@ macro_rules! status_concat {
 macro_rules! map_nums {
     ($item:ident; $($entry:ident $value:expr,)*) => {
         impl $item {
+            #[allow(dead_code)]
             pub fn num(&self) -> u64 {
                 match *self {
                     $($item::$entry => $value,)*
                 }
             }
 
+            #[allow(dead_code)]
             pub fn from_num(num: u64) -> Option<Self> {
                 match num {
                     $($value => Some($item::$entry),)*
@@ -56,6 +58,7 @@ macro_rules! map_nums {
                 }
             }
 
+            #[allow(dead_code)]
             fn decode(value: Value) -> Result<Self> {
                 value.as_u64().and_then(Self::from_num).ok_or(Error::Decode(
                     concat!("Expected valid ", stringify!($item)),
