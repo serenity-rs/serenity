@@ -282,6 +282,34 @@ pub fn delete_messages(channel_id: u64, map: Value) -> Result<()> {
                          channel_id))
 }
 
+/// Delete all of the [`Reaction`]s associated with a [`Message`].
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use serenity::client::http;
+/// use serenity::model::{ChannelId, MessageId};
+///
+/// let channel_id = ChannelId(7);
+/// let message_id = MessageId(8);
+///
+/// match http::delete_message_reactions(channel_id.0, message_id.0) {
+///     Ok(()) => println!("Reactions deleted"),
+///     Err(why) => println!("Error deleting reactions: {:?}", why),
+/// }
+/// ```
+///
+/// [`Message`]: ../../model/struct.Message.html
+/// [`Reaction`]: ../../model/struct.Reaction.html
+pub fn delete_message_reactions(channel_id: u64, message_id: u64)
+    -> Result<()> {
+    verify(204, request!(Route::ChannelsIdMessagesIdReactions(channel_id),
+                         delete,
+                         "/channels/{}/messages/{}/reactions",
+                         channel_id,
+                         message_id))
+}
+
 pub fn delete_permission(channel_id: u64, target_id: u64)
     -> Result<()> {
     verify(204, request!(Route::ChannelsIdPermissionsOverwriteId(channel_id),

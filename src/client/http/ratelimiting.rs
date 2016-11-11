@@ -62,6 +62,7 @@ pub enum Route {
     ChannelsIdMessagesBulkDelete(u64),
     ChannelsIdMessagesId(u64),
     ChannelsIdMessagesIdAck(u64),
+    ChannelsIdMessagesIdReactions(u64),
     ChannelsIdMessagesIdReactionsUserIdType(u64),
     ChannelsIdPermissionsOverwriteId(u64),
     ChannelsIdPins(u64),

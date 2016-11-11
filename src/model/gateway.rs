@@ -222,6 +222,12 @@ pub struct ReactionRemoveEvent {
     pub reaction: Reaction,
 }
 
+#[derive(Clone, Copy, Debug)]
+pub struct ReactionRemoveAllEvent {
+    pub channel_id: ChannelId,
+    pub message_id: MessageId,
+}
+
 /// The "Ready" event, containing initial state
 #[derive(Clone, Debug)]
 pub struct ReadyEvent {
@@ -467,6 +473,14 @@ pub enum Event {
     ///
     /// [`on_message_reaction_remove`]: ../client/struct.Client.html#method.on_message_reaction_remove
     ReactionRemove(ReactionRemoveEvent),
+    /// A request was issued to remove all [`Reaction`]s from a [`Message`].
+    ///
+    /// Fires the [`on_reaction_remove_all`] event handler.
+    ///
+    /// [`Message`]: struct.Message.html
+    /// [`Reaction`]: struct.Reaction.html
+    /// [`on_reaction_remove_all`]: ../client/struct.Clint.html#method.on_reaction_remove_all
+    ReactionRemoveAll(ReactionRemoveAllEvent),
     /// The first event in a connection, containing the initial state.
     ///
     /// May also be received at a later time in the event of a reconnect.
@@ -669,6 +683,11 @@ impl Event {
         } else if kind == "MESSAG_REACTION_REMOVE" {
             Ok(Event::ReactionRemove(ReactionRemoveEvent {
                 reaction: try!(Reaction::decode(Value::Object(value)))
+            }))
+        } else if kind == "MESSAGE_REACTION_REMOVE_ALL" {
+            Ok(Event::ReactionRemoveAll(ReactionRemoveAllEvent {
+                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
+                message_id: try!(remove(&mut value, "message_id").and_then(MessageId::decode)),
             }))
         } else if kind == "MESSAGE_UPDATE" {
             missing!(value, Event::MessageUpdate(MessageUpdateEvent {

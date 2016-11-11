@@ -713,6 +713,16 @@ impl Client {
             .on_reaction_remove = Some(Arc::new(handler))
     }
 
+    /// Attached a handler for when a [`ReactionRemoveAll`] is received.
+    ///
+    /// [`ReactionRemoveAll`]: ../model/enum.Event.html#variant.ReactionRemoveAll
+    pub fn on_reaction_remove_all<F>(&mut self, handler: F)
+        where F: Fn(Context, ChannelId, MessageId) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_reaction_remove_all = Some(Arc::new(handler))
+    }
+
     /// Register an event to be called whenever a Ready event is received.
     ///
     /// Registering a handler for the ready event is good for noting when your

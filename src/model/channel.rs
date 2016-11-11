@@ -404,8 +404,8 @@ impl Message {
     /// Returns a [`ClientError::InvalidPermissions`] if the current user does
     /// not have the required permissions.
     ///
-    /// [`ClientError::InvalidPermissions]: ../client/enum.ClientError.html#variant.InvalidPermissions
-    /// [`ClientError::InvalidUser]: ../client/enum.ClientError.html#variant.InvalidUser
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn delete(&self) -> Result<()> {
         let req = permissions::MANAGE_MESSAGES;
@@ -420,6 +420,28 @@ impl Message {
         }
 
         http::delete_message(self.channel_id.0, self.id.0)
+    }
+
+    /// Deletes all of the [`Reaction`]s associated with the message.
+    ///
+    /// **Note**: Requires the [Manage Messages] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
+    /// not have the required permissions.
+    ///
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`Reaction`]: struct.Reaction.html
+    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    pub fn delete_reactions(&self) -> Result<()> {
+        let req = permissions::MANAGE_MESSAGES;
+
+        if !try!(utils::user_has_perms(self.channel_id, req)) {
+            return Err(Error::Client(ClientError::InvalidPermissions(req)));
+        }
+
+        http::delete_message_reactions(self.channel_id.0, self.id.0)
     }
 
     /// Edits this message, replacing the original content with new content.
