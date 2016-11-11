@@ -552,14 +552,14 @@ pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: Value)
 ///
 /// The map can _optionally_ contain the following data:
 ///
-/// - **avatar_url**: Override the default avatar of the webhook with a URL.
-/// - **tts**: Whether this is a text-to-speech message (defaults to `false`).
-/// - **username**: Override the default username of the webhook.
+/// - `avatar_url`: Override the default avatar of the webhook with a URL.
+/// - `tts`: Whether this is a text-to-speech message (defaults to `false`).
+/// - `username`: Override the default username of the webhook.
 ///
 /// Additionally, _at least one_ of the following must be given:
 ///
-/// - **content**: The content of the message.
-/// - **embeds**: An array of rich embeds.
+/// - `content`: The content of the message.
+/// - `embeds`: An array of rich embeds.
 ///
 /// **Note**: For embed objects, all fields are registered by Discord except for
 /// `height`, `provider`, `proxy_url`, `type` (it will always be `rich`),

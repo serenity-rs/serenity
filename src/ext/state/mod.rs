@@ -615,10 +615,7 @@ impl State {
                                           event: &VoiceStateUpdateEvent) {
         if let Some(guild_id) = event.guild_id {
             if let Some(guild) = self.guilds.get_mut(&guild_id) {
-                if !event.voice_state.channel_id.is_some() {
-                    // Remove the user from the voice state list
-                    guild.voice_states.remove(&event.voice_state.user_id);
-                } else {
+                if event.voice_state.channel_id.is_some() {
                     // Update or add to the voice state list
                     {
                         let finding = guild.voice_states
@@ -633,6 +630,9 @@ impl State {
 
                     guild.voice_states.insert(event.voice_state.user_id,
                                               event.voice_state.clone());
+                } else {
+                    // Remove the user from the voice state list
+                    guild.voice_states.remove(&event.voice_state.user_id);
                 }
             }
 
