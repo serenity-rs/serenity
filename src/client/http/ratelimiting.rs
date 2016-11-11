@@ -91,16 +91,14 @@ pub enum Route {
     GuildsIdRolesId(u64),
     GuildsIdWebhooks(u64),
     InvitesCode,
-    Users,
     UsersId,
     UsersMe,
     UsersMeChannels,
-    USersMeConnections,
+    UsersMeConnections,
     UsersMeGuilds,
     UsersMeGuildsId,
     VoiceRegions,
     WebhooksId,
-    WebhooksIdToken,
     None,
 }
 

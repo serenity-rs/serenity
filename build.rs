@@ -409,6 +409,11 @@ impl {0} {{
                             field_name,
                             custom)
                 },
+                (_struct_name, false, false, None, Some(custom), Some(from), None) => {
+                    format!(r#"try!(remove(&mut map, "{}").and_then({}))"#,
+                            from,
+                            custom)
+                },
                 (struct_name, false, false, None, None, Some(from), None) => {
                     format!(r#"try!(remove(&mut map, "{}").and_then({}::decode))"#,
                             from,

@@ -725,8 +725,16 @@ pub fn get_guild(guild_id: u64) -> Result<Guild> {
     Guild::decode(try!(serde_json::from_reader(response)))
 }
 
-pub fn get_guild_integrations(guild_id: u64)
-    -> Result<Vec<Integration>> {
+pub fn get_guild_embed(guild_id: u64) -> Result<GuildEmbed> {
+    let response = request!(Route::GuildsIdEmbed(guild_id),
+                            get,
+                            "/guilds/{}/embeds",
+                            guild_id);
+
+    GuildEmbed::decode(try!(serde_json::from_reader(response)))
+}
+
+pub fn get_guild_integrations(guild_id: u64) -> Result<Vec<Integration>> {
     let response = request!(Route::GuildsIdIntegrations(guild_id),
                             get,
                             "/guilds/{}/integrations",
@@ -754,6 +762,15 @@ pub fn get_guild_prune_count(guild_id: u64, map: Value)
                             guild_id);
 
     GuildPrune::decode(try!(serde_json::from_reader(response)))
+}
+
+pub fn get_guild_regions(guild_id: u64) -> Result<Vec<VoiceRegion>> {
+    let response = request!(Route::GuildsIdRegions(guild_id),
+                            get,
+                            "/guilds/{}/regions",
+                            guild_id);
+
+    decode_array(try!(serde_json::from_reader(response)), VoiceRegion::decode)
 }
 
 /// Retrieves the webhooks for the given [guild][`Guild`]'s Id.
@@ -869,6 +886,22 @@ pub fn get_user(user_id: u64) -> Result<CurrentUser> {
     let response = request!(Route::UsersId, get, "/users/{}", user_id);
 
     CurrentUser::decode(try!(serde_json::from_reader(response)))
+}
+
+pub fn get_user_connections() -> Result<Vec<UserConnection>> {
+    let response = request!(Route::UsersMeConnections,
+                            get,
+                            "/users/@me/connections");
+
+    decode_array(try!(serde_json::from_reader(response)),
+                      UserConnection::decode)
+}
+
+pub fn get_user_dm_channels() -> Result<Vec<PrivateChannel>> {
+    let response = request!(Route::UsersMeChannels, get, "/users/@me/channels");
+
+    decode_array(try!(serde_json::from_reader(response)),
+                      PrivateChannel::decode)
 }
 
 pub fn get_voice_regions() -> Result<Vec<VoiceRegion>> {
