@@ -16,7 +16,8 @@ use ::utils::builder::{
     EditMember,
     EditProfile,
     EditRole,
-    GetMessages
+    GetMessages,
+    Search,
 };
 use ::internal::prelude::*;
 use ::model::*;
@@ -1442,6 +1443,86 @@ impl Context {
         } else {
             Err(Error::Client(ClientError::NoChannelId))
         }
+    }
+
+    /// Searches a [`Channel`]'s messages by providing query parameters via the
+    /// search builder.
+    ///
+    /// Refer to the documentation for the [`Search`] builder for restrictions
+    /// and defaults parameters, as well as potentially advanced usage.
+    ///
+    /// **Note**: Bot users can not search.
+    ///
+    /// # Examples
+    ///
+    /// Refer to the [`Search`] builder's documentation for examples,
+    /// specifically the section on [searching a channel][search channel].
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
+    ///
+    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
+    /// [`Channel`]: ../model/enum.Channel.html
+    /// [`Search`]: ../utils/builder/struct.Search.html
+    /// [search channel]: ../../utils/builder/struct.Search.html#searching-a-channel
+    pub fn search_channel<C, F>(&self, channel_id: C, f: F)
+        -> Result<SearchResult> where C: Into<ChannelId>,
+                                      F: FnOnce(Search) -> Search {
+        #[cfg(feature="cache")]
+        {
+            if CACHE.read().unwrap().user.bot {
+                return Err(Error::Client(ClientError::InvalidOperationAsBot));
+            }
+        }
+
+        let map = f(Search::default()).0;
+
+        rest::search_channel_messages(channel_id.into().0, map)
+    }
+
+    /// Searches a [`Guild`]'s messages by providing query parameters via the
+    /// search builder, with the ability to narrow down channels to search.
+    ///
+    /// Refer to the documentation for the [`Search`] builder for restrictions
+    /// and default parameters, as well as potentially advanced usage.
+    ///
+    /// **Note**: Bot users can not search.
+    ///
+    /// # Examples
+    ///
+    /// Refer to the [`Search`] builder's documentation for more examples,
+    /// specifically the section on
+    /// [searching a guild's channels][search guild].
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
+    ///
+    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`Search`]: ../utils/builder/struct.Search.html
+    /// [search guild]: ../../utils/builder/struct.Search.html#searching-a-guilds-channels
+    pub fn search_guild<F, G>(&self,
+                              guild_id: G,
+                              channel_ids: Vec<ChannelId>,
+                              f: F)
+                              -> Result<SearchResult>
+                              where F: FnOnce(Search) -> Search,
+                                    G: Into<GuildId> {
+        #[cfg(feature="cache")]
+        {
+            if CACHE.read().unwrap().user.bot {
+                return Err(Error::Client(ClientError::InvalidOperationAsBot));
+            }
+        }
+
+        let map = f(Search::default()).0;
+        let ids = channel_ids.iter().map(|ch| ch.0).collect::<Vec<u64>>();
+
+        rest::search_guild_messages(guild_id.into().0, &ids, map)
     }
 
     /// Sends a file along with optional message contents. The filename _must_

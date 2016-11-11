@@ -1,4 +1,5 @@
 use hyper::status::StatusCode;
+use ::constants::ErrorCode;
 use ::model::{ChannelType, Permissions};
 
 /// An error returned from the [`Client`] or the [`Context`], or model instance.
@@ -46,6 +47,7 @@ use ::model::{ChannelType, Permissions};
 /// [`Context`]: struct.Context.html
 /// [`Context::ban`]: struct.Context.html#method.ban
 /// [`Error::Client`]: ../enum.Error.html#variant.Client
+#[allow(enum_variant_names)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Error {
     /// When attempting to delete below or above the minimum and maximum allowed
@@ -54,6 +56,7 @@ pub enum Error {
     /// When attempting to delete a number of days' worth of messages that is
     /// not allowed.
     DeleteMessageDaysAmount(u8),
+    ErrorCode(ErrorCode),
     /// When there was an error retrieving the gateway URI from the REST API.
     Gateway,
     /// An indication that a [guild][`Guild`] could not be found by

@@ -27,14 +27,14 @@ use std::path::{Path, PathBuf};
 #[cfg(all(feature="cache", feature="methods"))]
 use super::utils;
 
-#[cfg(feature="methods")]
-use ::utils::builder::{CreateEmbed, CreateInvite, EditChannel};
 #[cfg(all(feature="cache", feature="methods"))]
 use ::client::CACHE;
 #[cfg(all(feature="methods"))]
 use ::client::rest;
 #[cfg(all(feature="cache", feature="methods"))]
 use ::ext::cache::ChannelRef;
+#[cfg(feature = "methods")]
+use ::utils::builder::{CreateEmbed, CreateInvite, EditChannel, Search};
 
 impl Attachment {
     /// If this attachment is an image, then a tuple of the width and height
@@ -243,6 +243,41 @@ impl Channel {
             Channel::Private(ref channel) => channel.id,
         }
     }
+
+    /// Performs a search request to the API for the inner channel's
+    /// [`Message`]s.
+    ///
+    /// Refer to the documentation for the [`Search`] builder for examples and
+    /// more information.
+    ///
+    /// **Note**: Bot users can not search.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
+    ///
+    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
+    /// [`Message`]: struct.Message.html
+    /// [`Search`]: ../utils/builder/struct.Search.html
+    #[cfg(feature = "methods")]
+    pub fn search<F>(&self, f: F) -> Result<SearchResult>
+        where F: FnOnce(Search) -> Search {
+        #[cfg(feature="cache")]
+        {
+            if CACHE.read().unwrap().user.bot {
+                return Err(Error::Client(ClientError::InvalidOperationAsBot));
+            }
+        }
+
+        let id = match *self {
+            Channel::Group(ref group) => group.channel_id.0,
+            Channel::Guild(ref channel) => channel.id.0,
+            Channel::Private(ref channel) => channel.id.0,
+        };
+
+        rest::search_channel_messages(id, f(Search::default()).0)
+    }
 }
 
 impl fmt::Display for Channel {
@@ -398,6 +433,28 @@ impl Group {
         }
 
         rest::remove_group_recipient(self.channel_id.0, user.0)
+    }
+
+    /// Performs a search request to the API for the group's channel's
+    /// [`Message`]s.
+    ///
+    /// Refer to the documentation for the [`Search`] builder for examples and
+    /// more information.
+    ///
+    /// **Note**: Bot users can not search.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
+    ///
+    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
+    /// [`Message`]: struct.Message.html
+    /// [`Search`]: ../utils/builder/struct.Search.html
+    #[cfg(feature = "methods")]
+    pub fn search<F>(&self, f: F) -> Result<SearchResult>
+        where F: FnOnce(Search) -> Search {
+        rest::search_channel_messages(self.channel_id.0, f(Search::default()).0)
     }
 
     /// Sends a message to the group with the given content.
@@ -822,6 +879,34 @@ impl PrivateChannel {
         rest::get_pins(self.id.0)
     }
 
+    /// Performs a search request to the API for the channel's [`Message`]s.
+    ///
+    /// Refer to the documentation for the [`Search`] builder for examples and
+    /// more information.
+    ///
+    /// **Note**: Bot users can not search.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
+    ///
+    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
+    /// [`Message`]: struct.Message.html
+    /// [`Search`]: ../utils/builder/struct.Search.html
+    #[cfg(feature = "methods")]
+    pub fn search<F>(&self, f: F) -> Result<SearchResult>
+        where F: FnOnce(Search) -> Search {
+        #[cfg(feature="cache")]
+        {
+            if CACHE.read().unwrap().user.bot {
+                return Err(Error::Client(ClientError::InvalidOperationAsBot));
+            }
+        }
+
+        rest::search_channel_messages(self.id.0, f(Search::default()).0)
+    }
+
     /// Sends a message to the channel with the given content.
     ///
     /// **Note**: This will only work when a [`Message`] is received.
@@ -1002,6 +1087,34 @@ impl GuildChannel {
     #[cfg(feature="methods")]
     pub fn pins(&self) -> Result<Vec<Message>> {
         rest::get_pins(self.id.0)
+    }
+
+    /// Performs a search request for the channel's [`Message`]s.
+    ///
+    /// Refer to the documentation for the [`Search`] builder for examples and
+    /// more information.
+    ///
+    /// **Note**: Bot users can not search.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
+    ///
+    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
+    /// [`Message`]: struct.Message.html
+    /// [`Search`]: ../utils/builder/struct.Search.html
+    #[cfg(feature = "methods")]
+    pub fn search<F>(&self, f: F) -> Result<SearchResult>
+        where F: FnOnce(Search) -> Search {
+        #[cfg(feature="cache")]
+        {
+            if CACHE.read().unwrap().user.bot {
+                return Err(Error::Client(ClientError::InvalidOperationAsBot));
+            }
+        }
+
+        rest::search_channel_messages(self.id.0, f(Search::default()).0)
     }
 
     /// Sends a message to the channel with the given content.

@@ -5,6 +5,7 @@ use super::{
     Emoji,
     EmojiId,
     Member,
+    Message,
     Presence,
     ReadState,
     Relationship,
@@ -171,6 +172,35 @@ pub fn decode_roles(value: Value) -> Result<HashMap<RoleId, Role>> {
     }
 
     Ok(roles)
+}
+
+pub fn decode_search_results(value: Value) -> Result<Vec<Vec<Message>>> {
+    let array = match value {
+        Value::Array(v) => v,
+        value => return Err(Error::Decode("Expected message set array", value)),
+    };
+
+    let mut sets: Vec<Vec<Message>> = vec![];
+
+    for arr in array {
+        let arr = match arr {
+            Value::Array(v) => v,
+            value => return Err(Error::Decode("Expected message set array", value)),
+        };
+
+        let mut messages: Vec<Message> = vec![];
+
+        for item in arr {
+            messages.push(match item {
+                Value::Object(v) => try!(Message::decode(Value::Object(v))),
+                value => return Err(Error::Decode("Expected search message", value)),
+            });
+        }
+
+        sets.push(messages);
+    }
+
+    Ok(sets)
 }
 
 pub fn decode_shards(value: Value) -> Result<[u64; 2]> {
