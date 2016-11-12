@@ -813,10 +813,15 @@ impl Context {
     ///
     /// # Errors
     ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
     /// Returns a [`ClientError::NoChannelId`] when there is no [`ChannelId`]
     /// directly available.
     ///
-    /// [`ChannelId`]: ../../models/struct.ChannelId.html
+    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
     /// [`ClientError::NoChannelId`]: ../enum.ClientError.html#NoChannelId
     /// [`Message`]: ../model/struct.Message.html
     pub fn say(&self, text: &str) -> Result<Message> {
@@ -827,6 +832,20 @@ impl Context {
         }
     }
 
+    /// Sends a file along with optional message contents. The filename _must_
+    /// be specified.
+    ///
+    /// Pass an empty string to send no message contents.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// If the content of the message is over the above limit, then a
+    /// [`ClientError::MessageTooLong`] will be returned, containing the number
+    /// of unicode code points over the limit.
+    ///
+    /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
     pub fn send_file<C, R>(&self,
                            channel_id: C,
                            content: &str,
@@ -834,6 +853,10 @@ impl Context {
                            filename: &str)
                            -> Result<Message> where C: Into<ChannelId>,
                                                     R: Read {
+        if let Some(length_over) = Message::overflow_length(content) {
+            return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+        }
+
         http::send_file(channel_id.into().0, content, file, filename)
     }
 
@@ -842,6 +865,8 @@ impl Context {
     /// Note that often a nonce is not required and can be omitted in most
     /// situations.
     ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
     /// # Example
     ///
     /// ```rust,ignore
@@ -849,9 +874,20 @@ impl Context {
     /// let _ = context.send_message(message.channel_id, "Hello!", "", false);
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
     /// [`Channel`]: ../model/enum.Channel.html
+    /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
     pub fn send_message<C>(&self, channel_id: C, content: &str, nonce: &str, tts: bool)
         -> Result<Message> where C: Into<ChannelId> {
+        if let Some(length_over) = Message::overflow_length(content) {
+            return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+        }
+
         let map = ObjectBuilder::new()
             .insert("content", content)
             .insert("nonce", nonce)

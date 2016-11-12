@@ -18,6 +18,7 @@ use super::*;
 use super::utils;
 use ::builder::{CreateEmbed, CreateInvite, EditChannel};
 use ::client::{STATE, http};
+use ::constants;
 use ::prelude_internal::*;
 use ::utils::decode_array;
 
@@ -448,13 +449,24 @@ impl Message {
     ///
     /// **Note**: You must be the author of the message to be able to do this.
     ///
+    /// **Note**: Messages must be under 2000 unicode code points.
+    ///
     /// # Errors
     ///
-    /// Returns a
-    /// [`ClientError::InvalidUser`] if the current user is not the author.
+    /// Returns a [`ClientError::InvalidUser`] if the current user is not the
+    /// author.
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
     ///
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
+    /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
     pub fn edit(&mut self, new_content: &str) -> Result<()> {
+        if let Some(length_over) = Message::overflow_length(new_content) {
+            return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+        }
+
         if self.author.id != STATE.lock().unwrap().user.id {
             return Err(Error::Client(ClientError::InvalidUser));
         }
@@ -470,6 +482,25 @@ impl Message {
                 Ok(())
             },
             Err(why) => Err(why),
+        }
+    }
+
+    /// Checks the length of a string to ensure that it is within Discord's
+    /// maximum message length limit.
+    ///
+    /// Returns `None` if the message is within the limit, otherwise returns
+    /// `Some` with an inner value of how many unicode code points the message
+    /// is over.
+    pub fn overflow_length(content: &str) -> Option<u64> {
+        // Check if the content is over the maximum number of unicode code
+        // points.
+        let count = content.chars().count() as u64;
+        let diff = count - constants::MESSAGE_CODE_LIMIT as u64;
+
+        if diff > 0 {
+            Some(diff)
+        } else {
+            None
         }
     }
 
@@ -527,15 +558,25 @@ impl Message {
     ///
     /// **Note**: Requires the [Send Messages] permission.
     ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
     /// # Errors
     ///
-    /// Returns a
-    /// [`ClientError::InvalidPermissions`] if the current user does not have
-    /// the required permissions.
+    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
+    /// not have the required permissions.
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn reply(&self, content: &str) -> Result<Message> {
+        if let Some(length_over) = Message::overflow_length(content) {
+            return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+        }
+
         let req = permissions::SEND_MESSAGES;
 
         if !try!(utils::user_has_perms(self.channel_id, req)) {
@@ -660,8 +701,22 @@ impl PrivateChannel {
         http::get_pins(self.id.0)
     }
 
-    /// Sends a message to the recipient with the given content.
+    /// Sends a message to the channel with the given content.
+    ///
+    /// **Note**: This will only work when a [`Message`] is received.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
     pub fn send_message(&self, content: &str) -> Result<Message> {
+        if let Some(length_over) = Message::overflow_length(content) {
+            return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+        }
+
         let map = ObjectBuilder::new()
             .insert("content", content)
             .insert("nonce", "")
@@ -783,7 +838,29 @@ impl PublicChannel {
         http::get_pins(self.id.0)
     }
 
+    /// Sends a message to the channel with the given content.
+    ///
+    /// **Note**: This will only work when a [`Message`] is received.
+    ///
+    /// **Note**: Requires the [Send Messages] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
+    /// not have the required permissions.
+    ///
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn send_message(&self, content: &str) -> Result<Message> {
+        if let Some(length_over) = Message::overflow_length(content) {
+            return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+        }
+
         let req = permissions::SEND_MESSAGES;
 
         if !try!(utils::user_has_perms(self.id, req)) {

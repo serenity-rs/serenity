@@ -175,6 +175,13 @@ pub enum ClientError {
     ///
     /// [`State`]: ../ext/state/struct.State.html
     ItemMissing,
+    /// Indicates that a [`Message`]s content was too long and will not
+    /// successfully send, as the length is over 2000 codepoints, or 4000 bytes.
+    ///
+    /// The number of bytes larger than the limit is provided.
+    ///
+    /// [`Message`]: ../model/struct.Message.html
+    MessageTooLong(u64),
     /// When attempting to use a [`Context`] helper method which requires a
     /// contextual [`ChannelId`], but the current context is not appropriate for
     /// the action.

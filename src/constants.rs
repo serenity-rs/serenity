@@ -3,6 +3,8 @@ use ::prelude_internal::*;
 /// The gateway version used by the library. The gateway URI is retrieved via
 /// the REST API.
 pub const GATEWAY_VERSION: u8 = 6;
+/// The maximum unicode code points allowed within a message by Discord.
+pub const MESSAGE_CODE_LIMIT: u16 = 2000;
 /// The [UserAgent] sent along with every request.
 ///
 /// [UserAgent]: ../hyper/header/struct.UserAgent.html
