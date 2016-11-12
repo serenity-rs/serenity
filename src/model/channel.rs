@@ -494,11 +494,11 @@ impl Message {
     pub fn overflow_length(content: &str) -> Option<u64> {
         // Check if the content is over the maximum number of unicode code
         // points.
-        let count = content.chars().count() as u64;
-        let diff = count - constants::MESSAGE_CODE_LIMIT as u64;
+        let count = content.chars().count() as i64;
+        let diff = count - (constants::MESSAGE_CODE_LIMIT as i64);
 
         if diff > 0 {
-            Some(diff)
+            Some(diff as u64)
         } else {
             None
         }
