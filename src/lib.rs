@@ -96,7 +96,6 @@ extern crate websocket;
 #[macro_use]
 pub mod utils;
 
-pub mod builder;
 pub mod client;
 pub mod ext;
 pub mod model;

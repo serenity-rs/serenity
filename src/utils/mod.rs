@@ -2,6 +2,8 @@
 //! A set of utilities to help with common use cases that are not required to
 //! fully use the library.
 
+pub mod builder;
+
 use base64;
 use std::ffi::OsStr;
 use std::fs::File;

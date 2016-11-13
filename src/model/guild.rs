@@ -14,7 +14,7 @@ use super::utils::{
     warn_field
 };
 use super::*;
-use ::builder::{EditGuild, EditMember, EditRole};
+use ::utils::builder::{EditGuild, EditMember, EditRole};
 use ::client::{STATE, http};
 use ::prelude_internal::*;
 use ::utils::{Colour, decode_array};

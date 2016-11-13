@@ -5,7 +5,7 @@ use std::sync::{Arc, Mutex};
 use super::connection::Connection;
 use super::{STATE, http};
 use super::login_type::LoginType;
-use ::builder::{
+use ::utils::builder::{
     CreateInvite,
     EditChannel,
     EditGuild,

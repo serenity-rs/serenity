@@ -16,7 +16,7 @@ use super::utils::{
 };
 use super::*;
 use super::utils;
-use ::builder::{CreateEmbed, CreateInvite, EditChannel};
+use ::utils::builder::{CreateEmbed, CreateInvite, EditChannel};
 use ::client::{STATE, http};
 use ::constants;
 use ::prelude_internal::*;
