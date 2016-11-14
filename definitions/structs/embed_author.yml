@@ -17,4 +17,5 @@ fields:
     type: string
   - name: url
     description: The URL of the author.
+    optional: true
     type: string
