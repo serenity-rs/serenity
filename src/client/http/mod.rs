@@ -36,8 +36,8 @@ use std::default::Default;
 use std::io::{ErrorKind as IoErrorKind, Read};
 use std::sync::{Arc, Mutex};
 use ::constants;
-use ::model::*;
 use ::internal::prelude::*;
+use ::model::*;
 use ::utils::decode_array;
 
 lazy_static! {

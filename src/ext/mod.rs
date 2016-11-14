@@ -10,4 +10,5 @@
 
 pub mod framework;
 pub mod state;
+#[cfg(feature="voice")]
 pub mod voice;

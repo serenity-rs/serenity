@@ -8,7 +8,7 @@ pub const MESSAGE_CODE_LIMIT: u16 = 2000;
 /// The [UserAgent] sent along with every request.
 ///
 /// [UserAgent]: ../hyper/header/struct.UserAgent.html
-pub const USER_AGENT: &'static str = concat!("DiscordBot (https://github.com/zeyla/serenity, ", env!("CARGO_PKG_VERSION"), ")");
+pub const USER_AGENT: &'static str = concat!("DiscordBot (https://github.com/zeyla/serenity.rs, ", env!("CARGO_PKG_VERSION"), ")");
 
 #[allow(dead_code)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -136,9 +136,10 @@ map_nums! { OpCode;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum VoiceOpCode {
     Identify,
-    SelectProtocol,
-    Hello,
     Heartbeat,
+    Hello,
+    KeepAlive,
+    SelectProtocol,
     SessionDescription,
     Speaking,
 }
@@ -147,7 +148,8 @@ map_nums! { VoiceOpCode;
     Identify 0,
     SelectProtocol 1,
     Hello 2,
-    Heartbeat 3,
+    KeepAlive 3,
     SessionDescription 4,
     Speaking 5,
+    Heartbeat 8,
 }

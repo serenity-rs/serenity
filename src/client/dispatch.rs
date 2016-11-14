@@ -4,8 +4,8 @@ use super::event_store::EventStore;
 use super::login_type::LoginType;
 use super::{STATE, Connection, Context};
 use ::ext::framework::Framework;
-use ::model::{ChannelId, Event, Message};
 use ::internal::prelude::*;
+use ::model::{ChannelId, Event, Message};
 
 macro_rules! handler {
     ($field:ident, $event_store:ident) => {

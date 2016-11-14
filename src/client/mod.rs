@@ -41,7 +41,11 @@ mod dispatch;
 mod event_store;
 mod login_type;
 
-pub use self::connection::{Connection, ConnectionError};
+pub use self::connection::{
+    Connection,
+    ConnectionError,
+    Status as ConnectionStatus
+};
 pub use self::context::Context;
 pub use self::login_type::LoginType;
 
@@ -53,10 +57,10 @@ use std::collections::{BTreeMap, HashMap};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
-use ::model::*;
-use ::internal::prelude::*;
 use ::ext::framework::Framework;
 use ::ext::state::State;
+use ::internal::prelude::*;
+use ::model::*;
 
 lazy_static! {
     /// The STATE is a mutable lazily-initialized static binding. It can be

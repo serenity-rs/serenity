@@ -14,8 +14,8 @@ use ::utils::builder::{
     EditRole,
     GetMessages
 };
-use ::model::*;
 use ::internal::prelude::*;
+use ::model::*;
 use ::utils;
 
 #[derive(Clone)]

@@ -1,4 +1,3 @@
-
 //! A set of utilities to help with common use cases that are not required to
 //! fully use the library.
 
@@ -107,6 +106,56 @@ macro_rules! request {
         try!(request($route, || client
             .$method(api_concat!($url))))
     }};
+}
+
+// Enable/disable check for voice
+macro_rules! feature_voice {
+    ($enabled:block) => {
+        {
+            feature_voice_enabled! {{
+                $enabled
+            }}
+        }
+    };
+    ($enabled:block $disabled:block) => {
+        {
+            feature_voice_enabled! {{
+                $enabled
+            }}
+
+            feature_voice_disabled! {{
+                $disabled
+            }}
+        }
+    };
+}
+
+#[cfg(feature="voice")]
+macro_rules! feature_voice_enabled {
+    ($enabled:block) => {
+        {
+            $enabled
+        }
+    }
+}
+
+#[cfg(not(feature="voice"))]
+macro_rules! feature_voice_enabled {
+    ($enabled:block) => {}
+}
+
+#[cfg(feature="voice")]
+macro_rules! feature_voice_disabled {
+    ($disabled:block) => {}
+}
+
+#[cfg(not(feature="voice"))]
+macro_rules! feature_voice_disabled {
+    ($disabled:block) => {
+        {
+            $disabled
+        }
+    }
 }
 
 /// Retrieves the "code" part of an [invite][`RichInvite`] out of a URL.

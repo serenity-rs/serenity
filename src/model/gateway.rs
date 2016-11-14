@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, HashMap};
 use super::utils::*;
 use super::*;
-use ::constants::{OpCode, VoiceOpCode};
+use ::constants::OpCode;
 use ::internal::prelude::*;
 use ::utils::decode_array;
 
@@ -351,65 +351,6 @@ impl GatewayEvent {
             },
             OpCode::HeartbeatAck => Ok(GatewayEvent::HeartbeatAck),
             _ => Err(Error::Decode("Unexpected opcode", Value::Object(value))),
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum VoiceEvent {
-    Handshake {
-        heartbeat_interval: u64,
-        port: u16,
-        ssrc: u32,
-        modes: Vec<String>,
-    },
-    Ready {
-        mode: String,
-        secret_key: Vec<u8>,
-    },
-    SpeakingUpdate {
-        user_id: UserId,
-        ssrc: u32,
-        speaking: bool,
-    },
-    KeepAlive,
-    Unknown(u64, Value)
-}
-
-impl VoiceEvent {
-    pub fn decode(value: Value) -> Result<VoiceEvent> {
-        let mut value = try!(into_map(value));
-
-        let op = req!(try!(remove(&mut value, "op")).as_u64());
-        let op = try!(VoiceOpCode::from_num(op).ok_or(Error::Client(ClientError::InvalidOpCode)));
-
-        if op == VoiceOpCode::Heartbeat {
-            return Ok(VoiceEvent::KeepAlive)
-        }
-
-        let mut value = try!(remove(&mut value, "d").and_then(into_map));
-        if op == VoiceOpCode::Hello {
-            missing!(value, VoiceEvent::Handshake {
-                heartbeat_interval: req!(try!(remove(&mut value, "heartbeat_interval")).as_u64()),
-                modes: try!(decode_array(try!(remove(&mut value, "modes")), into_string)),
-                port: req!(try!(remove(&mut value, "port")).as_u64()) as u16,
-                ssrc: req!(try!(remove(&mut value, "ssrc")).as_u64()) as u32,
-            })
-        } else if op == VoiceOpCode::SessionDescription {
-            missing!(value, VoiceEvent::Ready {
-                mode: try!(remove(&mut value, "mode").and_then(into_string)),
-                secret_key: try!(decode_array(try!(remove(&mut value, "secret_key")),
-                    |v| Ok(req!(v.as_u64()) as u8)
-                )),
-            })
-        } else if op == VoiceOpCode::Speaking {
-            missing!(value, VoiceEvent::SpeakingUpdate {
-                user_id: try!(remove(&mut value, "user_id").and_then(UserId::decode)),
-                ssrc: req!(try!(remove(&mut value, "ssrc")).as_u64()) as u32,
-                speaking: req!(try!(remove(&mut value, "speaking")).as_bool()),
-            })
-        } else {
-            Ok(VoiceEvent::Unknown(op as u64, Value::Object(value)))
         }
     }
 }

@@ -32,13 +32,22 @@ default-features = false
 features = ["client", "hyper"]
 version = "0.8"
 
+[dependencies.opus]
+optional = true
+version = "0.1"
+
+[dependencies.sodiumoxide]
+default-features = false
+optional = true
+version = "0.0.12"
+
 [build-dependencies]
 yaml-rust = "0.3"
 
 [features]
 default = []
 debug = []
-voice = []
+voice = ["opus", "sodiumoxide"]
 
 [[bin]]
 doc = false
@@ -69,3 +78,9 @@ path = "./examples/05_user_login.rs"
 doc = false
 name = "example-06"
 path = "./examples/06_command_framework.rs"
+
+[[bin]]
+doc = false
+features = ["voice"]
+name = "example-07"
+path = "./examples/07_voice.rs"

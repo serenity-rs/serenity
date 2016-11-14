@@ -93,6 +93,11 @@ extern crate serde_json;
 extern crate time;
 extern crate websocket;
 
+#[cfg(feature="voice")]
+extern crate opus;
+#[cfg(feature="voice")]
+extern crate sodiumoxide;
+
 #[macro_use]
 pub mod utils;
 

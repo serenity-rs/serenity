@@ -35,7 +35,11 @@ macro_rules! missing {
 #[macro_escape]
 macro_rules! req {
     ($opt:expr) => {
-        try!($opt.ok_or(Error::Decode(concat!("Type mismatch in model:", line!(), ": ", stringify!($opt)), Value::Null)))
+        try!($opt.ok_or(Error::Decode(concat!("Type mismatch in model:",
+                                              line!(),
+                                              ": ",
+                                              stringify!($opt)),
+                                      Value::Null)))
     }
 }
 

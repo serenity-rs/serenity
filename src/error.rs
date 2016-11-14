@@ -6,6 +6,8 @@ use serde_json::Error as JsonError;
 use serde_json::Value;
 use websocket::result::WebSocketError;
 use ::client::{ClientError, ConnectionError};
+#[cfg(feature="voice")]
+use ::ext::voice::VoiceError;
 
 /// The common result type between most library functions.
 pub type Result<T> = ::std::result::Result<T, Error>;
@@ -40,6 +42,9 @@ pub enum Error {
     Other(&'static str),
     /// An error from the `url` crate.
     Url(String),
+    /// Indicating an error within the voice module.
+    #[cfg(feature="voice")]
+    Voice(VoiceError),
     /// An error from the `rust-websocket` crate.
     WebSocket(WebSocketError),
 }
@@ -91,6 +96,8 @@ impl StdError for Error {
             Error::Json(ref inner) => inner.description(),
             Error::Url(ref inner) => inner,
             Error::WebSocket(ref inner) => inner.description(),
+            #[cfg(feature = "voice")]
+            Error::Voice(_) => "Voice error",
         }
     }
 
