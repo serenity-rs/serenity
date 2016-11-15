@@ -2,10 +2,19 @@
 
 extern crate serenity;
 
+#[cfg(feature = "voice")]
 use serenity::client::{STATE, Client, Context};
+#[cfg(feature = "voice")]
 use serenity::model::{Channel, ChannelId, Message};
+#[cfg(feature = "voice")]
 use std::env;
 
+#[cfg(not(feature = "voice"))]
+fn main() {
+    panic!("Voice not enabled");
+}
+
+#[cfg(feature = "voice")]
 fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
@@ -27,6 +36,7 @@ fn main() {
     let _ = client.start();
 }
 
+#[cfg(feature = "voice")]
 fn deafen(context: Context, message: Message, _args: Vec<String>) {
     let guild_id = match STATE.lock().unwrap().find_channel(message.channel_id) {
         Some(Channel::Public(channel)) => channel.guild_id,
@@ -62,6 +72,7 @@ fn deafen(context: Context, message: Message, _args: Vec<String>) {
     }
 }
 
+#[cfg(feature = "voice")]
 fn join(context: Context, message: Message, args: Vec<String>) {
     let connect_to = match args.get(0) {
         Some(arg) => match arg.parse::<u64>() {
@@ -101,6 +112,7 @@ fn join(context: Context, message: Message, args: Vec<String>) {
     let _ = context.say(&format!("Joined {}", connect_to.mention()));
 }
 
+#[cfg(feature = "voice")]
 fn leave(context: Context, message: Message, _args: Vec<String>) {
     let guild_id = match STATE.lock().unwrap().find_channel(message.channel_id) {
         Some(Channel::Public(channel)) => channel.guild_id,
@@ -130,6 +142,7 @@ fn leave(context: Context, message: Message, _args: Vec<String>) {
     }
 }
 
+#[cfg(feature = "voice")]
 fn mute(context: Context, message: Message, _args: Vec<String>) {
     let guild_id = match STATE.lock().unwrap().find_channel(message.channel_id) {
         Some(Channel::Public(channel)) => channel.guild_id,
@@ -165,6 +178,7 @@ fn mute(context: Context, message: Message, _args: Vec<String>) {
     }
 }
 
+#[cfg(feature = "voice")]
 fn ping(context: Context, _message: Message, _args: Vec<String>) {
     let _ = context.say("Pong!");
 }
