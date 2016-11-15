@@ -1,3 +1,5 @@
+// Requires the feature "voice" be enabled.
+
 extern crate serenity;
 
 use serenity::client::{STATE, Client, Context};

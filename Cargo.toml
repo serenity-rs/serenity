@@ -81,6 +81,5 @@ path = "./examples/06_command_framework.rs"
 
 [[bin]]
 doc = false
-features = ["voice"]
 name = "example-07"
 path = "./examples/07_voice.rs"

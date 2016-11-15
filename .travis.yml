@@ -12,4 +12,4 @@ cache:
         - $HOME/.cargo
 
 script:
-    - cargo build
+    - cargo build --features voice
