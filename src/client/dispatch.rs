@@ -1,5 +1,5 @@
 use std::sync::{Arc, Mutex};
-use std::{mem, thread};
+use std::thread;
 use super::event_store::EventStore;
 use super::login_type::LoginType;
 use super::{STATE, Connection, Context};

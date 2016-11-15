@@ -7,6 +7,7 @@ use super::{STATE, http};
 use super::login_type::LoginType;
 use ::utils::builder::{
     CreateInvite,
+    CreateMessage,
     EditChannel,
     EditGuild,
     EditMember,
@@ -453,7 +454,7 @@ impl Context {
     /// [`User::dm`]: ../model/struct.User.html#method.dm
     pub fn dm<C: Into<ChannelId>>(&self, target_id: C, content: &str)
         -> Result<Message> {
-        self.send_message(target_id.into(), content, "", false)
+        self.send_message(target_id.into(), |m| m.content(content))
     }
 
     pub fn edit_channel<C, F>(&self, channel_id: C, f: F)
@@ -838,9 +839,9 @@ impl Context {
     /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
     /// [`ClientError::NoChannelId`]: ../enum.ClientError.html#NoChannelId
     /// [`Message`]: ../model/struct.Message.html
-    pub fn say(&self, text: &str) -> Result<Message> {
+    pub fn say(&self, content: &str) -> Result<Message> {
         if let Some(channel_id) = self.channel_id {
-            self.send_message(channel_id, text, "", false)
+            self.send_message(channel_id, |m| m.content(content))
         } else {
             Err(Error::Client(ClientError::NoChannelId))
         }
@@ -896,19 +897,19 @@ impl Context {
     ///
     /// [`Channel`]: ../model/enum.Channel.html
     /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
-    pub fn send_message<C>(&self, channel_id: C, content: &str, nonce: &str, tts: bool)
-        -> Result<Message> where C: Into<ChannelId> {
-        if let Some(length_over) = Message::overflow_length(content) {
-            return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+    pub fn send_message<C, F>(&self, channel_id: C, f: F) -> Result<Message>
+        where C: Into<ChannelId>, F: FnOnce(CreateMessage) -> CreateMessage {
+        let map = f(CreateMessage::default()).0;
+
+        if let Some(ref content) = map.get(&"content".to_owned()) {
+            if let &&Value::String(ref content) = content {
+                if let Some(length_over) = Message::overflow_length(&content) {
+                    return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+                }
+            }
         }
 
-        let map = ObjectBuilder::new()
-            .insert("content", content)
-            .insert("nonce", nonce)
-            .insert("tts", tts)
-            .build();
-
-        http::send_message(channel_id.into().0, map)
+        http::send_message(channel_id.into().0, Value::Object(map))
     }
 
     pub fn set_game(&self, game: Option<Game>) {
