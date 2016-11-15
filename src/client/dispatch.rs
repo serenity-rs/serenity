@@ -20,7 +20,10 @@ macro_rules! handler {
 macro_rules! update {
     ($method:ident, $event:expr) => {
         STATE.lock().unwrap().$method(&$event);
-    }
+    };
+    ($method:ident, $event:expr, $old:expr) => {
+        STATE.lock().unwrap().$method(&$event, $old);
+    };
 }
 
 fn context(channel_id: Option<ChannelId>,
@@ -71,13 +74,7 @@ pub fn dispatch(event: Result<Event>,
         },
         Ok(Event::CallUpdate(event)) => {
             if let Some(ref handler) = handler!(on_call_update, event_store) {
-                let before = STATE
-                    .lock()
-                    .unwrap()
-                    .calls
-                    .get(&event.channel_id)
-                    .cloned();
-                update!(update_with_call_update, event);
+                let before = update!(update_with_call_update, event, true);
                 let after = STATE
                     .lock()
                     .unwrap()
@@ -92,7 +89,7 @@ pub fn dispatch(event: Result<Event>,
                     (handler)(context, before, after);
                 });
             } else {
-                update!(update_with_call_update, event);
+                update!(update_with_call_update, event, false);
             }
         },
         Ok(Event::ChannelCreate(event)) => {
@@ -226,15 +223,16 @@ pub fn dispatch(event: Result<Event>,
             }
         },
         Ok(Event::GuildDelete(event)) => {
-            update!(update_with_guild_delete, event);
-
             if let Some(ref handler) = handler!(on_guild_delete, event_store) {
+                let full = update!(update_with_guild_delete, event);
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
                 thread::spawn(move || {
-                    (handler)(context, event.guild);
+                    (handler)(context, event.guild, full);
                 });
+            } else {
+                let _full = update!(update_with_guild_delete, event);
             }
         },
         Ok(Event::GuildEmojisUpdate(event)) => {
@@ -245,7 +243,7 @@ pub fn dispatch(event: Result<Event>,
                 let handler = handler.clone();
 
                 thread::spawn(move || {
-                    (handler)(context, event);
+                    (handler)(context, event.guild_id, event.emojis);
                 });
             }
         },
@@ -255,7 +253,7 @@ pub fn dispatch(event: Result<Event>,
                 let handler = handler.clone();
 
                 thread::spawn(move || {
-                    (handler)(context, event);
+                    (handler)(context, event.guild_id);
                 });
             }
         },
@@ -272,30 +270,21 @@ pub fn dispatch(event: Result<Event>,
             }
         },
         Ok(Event::GuildMemberRemove(event)) => {
-            update!(update_with_guild_member_remove, event);
-
             if let Some(ref handler) = handler!(on_guild_member_removal, event_store) {
+                let member = update!(update_with_guild_member_remove, event);
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
                 thread::spawn(move || {
-                    (handler)(context, event.guild_id, event.user);
+                    (handler)(context, event.guild_id, event.user, member);
                 });
+            } else {
+                let _member = update!(update_with_guild_member_remove, event);
             }
         },
         Ok(Event::GuildMemberUpdate(event)) => {
             if let Some(ref handler) = handler!(on_guild_member_update, event_store) {
-                let before = STATE.lock()
-                    .unwrap()
-                    .guilds
-                    .get_mut(&event.guild_id)
-                    .map(|mut guild| {
-                        guild.members.remove(&event.user.id)
-                    }).and_then(|x| match x {
-                        Some(x) => Some(x),
-                        _ => None,
-                    });
-                update!(update_with_guild_member_update, event);
+                let before = update!(update_with_guild_member_update, event, true);
 
                 // This is safe, as the update would have created the member
                 // if it did not exist. Thus, there _should_ be no way that this
@@ -311,6 +300,8 @@ pub fn dispatch(event: Result<Event>,
                 thread::spawn(move || {
                     (handler)(context, before, after);
                 });
+            } else {
+                let _ = update!(update_with_guild_member_update, event, false);
             }
         },
         Ok(Event::GuildMembersChunk(event)) => {
@@ -338,26 +329,25 @@ pub fn dispatch(event: Result<Event>,
             }
         },
         Ok(Event::GuildRoleDelete(event)) => {
-            update!(update_with_guild_role_delete, event);
-
             if let Some(ref handler) = handler!(on_guild_role_delete, event_store) {
+                let role = update!(update_with_guild_role_delete, event);
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
                 thread::spawn(move || {
-                    (handler)(context, event.guild_id, event.role_id);
+                    (handler)(context, event.guild_id, event.role_id, role);
                 });
             }
         },
         Ok(Event::GuildRoleUpdate(event)) => {
-            update!(update_with_guild_role_update, event);
+            let before = update!(update_with_guild_role_update, event);
 
             if let Some(ref handler) = handler!(on_guild_role_update, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
                 thread::spawn(move || {
-                    (handler)(context, event.guild_id, event.role);
+                    (handler)(context, event.guild_id, before, event.role);
                 });
             }
         },
@@ -596,13 +586,9 @@ pub fn dispatch(event: Result<Event>,
             }
         },
         Ok(Event::UserGuildSettingsUpdate(event)) => {
-            if let Some(ref handler) = handler!(on_user_guild_settings_update, event_store) {
-                let before = STATE.lock()
-                    .unwrap()
-                    .guild_settings
-                    .remove(&event.settings.guild_id);
-                update!(update_with_user_guild_settings_update, event);
+            let before = update!(update_with_user_guild_settings_update, event);
 
+            if let Some(ref handler) = handler!(on_user_guild_settings_update, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
@@ -612,19 +598,20 @@ pub fn dispatch(event: Result<Event>,
             }
         },
         Ok(Event::UserNoteUpdate(event)) => {
+            let before = update!(update_with_user_note_update, event);
+
             if let Some(ref handler) = handler!(on_note_update, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
                 thread::spawn(move || {
-                    (handler)(context, event.user_id, event.note);
+                    (handler)(context, event.user_id, before, event.note);
                 });
             }
         },
         Ok(Event::UserSettingsUpdate(event)) => {
             if let Some(ref handler) = handler!(on_user_settings_update, event_store) {
-                let before = STATE.lock().unwrap().settings.clone();
-                update!(update_with_user_settings_update, event);
+                let before = update!(update_with_user_settings_update, event, true);
                 let after = STATE.lock().unwrap().settings.clone();
 
                 let context = context(None, conn, login_type);
@@ -634,19 +621,13 @@ pub fn dispatch(event: Result<Event>,
                     (handler)(context, before.unwrap(), after.unwrap());
                 });
             } else {
-                update!(update_with_user_settings_update, event);
+                update!(update_with_user_settings_update, event, false);
             }
         },
         Ok(Event::UserUpdate(event)) => {
+            let before = update!(update_with_user_update, event);
+
             if let Some(ref handler) = handler!(on_user_update, event_store) {
-                // This is equivilant to performing a
-                // `update_with_voice_state_update`, and will be more efficient.
-                let before = {
-                    let mut state = STATE.lock().unwrap();
-
-                    mem::replace(&mut state.user, event.current_user.clone())
-                };
-
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
@@ -673,7 +654,7 @@ pub fn dispatch(event: Result<Event>,
                 let handler = handler.clone();
 
                 thread::spawn(move || {
-                    (handler)(context, event);
+                    (handler)(context, event.guild_id, event.voice_state);
                 });
             }
         },

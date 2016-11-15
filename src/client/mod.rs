@@ -475,9 +475,19 @@ impl Client {
 
     /// Attaches a handler for when a [`GuilDelete`] is received.
     ///
-    /// [`GuilDelete`]: ../model/enum.Event.html#variant.GuildDelete
+    /// Returns a partial guild as well as - optionally - the full guild, with
+    /// data like [`Role`]s. This can be `None` in the event that it was not in
+    /// the [`State`].
+    ///
+    /// **Note**: The relevant guild is _removed_ from the State when this event
+    /// is received. If you need to keep it, you can either re-insert it
+    /// yourself back into the State or manage it in another way.
+    ///
+    /// [`GuildDelete`]: ../model/enum.Event.html#variant.GuildDelete
+    /// [`Role`]: ../model/struct.Role.html
+    /// [`State`]: ../ext/state/struct.State.html
     pub fn on_guild_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, Guild) + Send + Sync + 'static {
+        where F: Fn(Context, Guild, Option<LiveGuild>) + Send + Sync + 'static {
         self.event_store.lock()
             .unwrap()
             .on_guild_delete = Some(Arc::new(handler));
@@ -485,9 +495,11 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildEmojisUpdate`] is received.
     ///
+    /// The `HashMap` of emojis is the new full list of emojis.
+    ///
     /// [`GuildEmojisUpdate`]: ../model/enum.Event.html#variant.GuildEmojisUpdate
     pub fn on_guild_emojis_update<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildEmojisUpdateEvent) + Send + Sync + 'static {
+        where F: Fn(Context, GuildId, HashMap<EmojiId, Emoji>) + Send + Sync + 'static {
         self.event_store.lock()
             .unwrap()
             .on_guild_emojis_update = Some(Arc::new(handler));
@@ -497,7 +509,7 @@ impl Client {
     ///
     /// [`GuildIntegrationsUpdate`]: ../model/enum.Event.html#variant.GuildIntegrationsUpdate
     pub fn on_guild_integrations_update<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildIntegrationsUpdateEvent) + Send + Sync + 'static {
+        where F: Fn(Context, GuildId) + Send + Sync + 'static {
         self.event_store.lock()
             .unwrap()
             .on_guild_integrations_update = Some(Arc::new(handler));
@@ -515,9 +527,12 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildMemberRemove`] is received.
     ///
+    /// Returns the user's associated `Member` object, _if_ it existed in the
+    /// state.
+    ///
     /// [`GuildMemberRemove`]: ../model/enum.Event.html#variant.GuildMemberRemove
     pub fn on_guild_member_remove<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, User) + Send + Sync + 'static {
+        where F: Fn(Context, GuildId, User, Option<Member>) + Send + Sync + 'static {
         self.event_store.lock()
             .unwrap()
             .on_guild_member_removal = Some(Arc::new(handler));
@@ -557,7 +572,7 @@ impl Client {
     ///
     /// [`GuildRoleDelete`]: ../model/enum.Event.html#variant.GuildRoleDelete
     pub fn on_guild_role_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, RoleId) + Send + Sync + 'static {
+        where F: Fn(Context, GuildId, RoleId, Option<Role>) + Send + Sync + 'static {
         self.event_store.lock()
             .unwrap()
             .on_guild_role_delete = Some(Arc::new(handler));
@@ -565,9 +580,13 @@ impl Client {
 
     /// Attaches a handler for when a [`GuildRoleUpdate`] is received.
     ///
+    /// The optional `Role` is the role prior to updating. This can be `None` if
+    /// it did not exist in the [`State`] before the update.
+    ///
     /// [`GuildRoleUpdate`]: ../model/enum.Event.html#variant.GuildRoleUpdate
+    /// [`State`]: ../ext/state/struct.State.html
     pub fn on_guild_role_update<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, Role) + Send + Sync + 'static {
+        where F: Fn(Context, GuildId, Option<Role>, Role) + Send + Sync + 'static {
         self.event_store.lock()
             .unwrap()
             .on_guild_role_update = Some(Arc::new(handler));
@@ -676,9 +695,12 @@ impl Client {
 
     /// Attaches a handler for when a [`UserNoteUpdate`] is received.
     ///
+    /// Optionally returns the old note for the [`User`], if one existed.
+    ///
+    /// [`User`]: ../model/struct.User.html
     /// [`UserNoteUpdate`]: ../model/enum.Event.html#variant.UserNoteUpdate
     pub fn on_note_update<F>(&mut self, handler: F)
-        where F: Fn(Context, UserId, String) + Send + Sync + 'static {
+        where F: Fn(Context, UserId, Option<String>, String) + Send + Sync + 'static {
         self.event_store.lock()
             .unwrap()
             .on_note_update = Some(Arc::new(handler));
@@ -866,16 +888,6 @@ impl Client {
             .on_user_settings_update = Some(Arc::new(handler));
     }
 
-    /// Attaches a handler for when a [`VoiceStateUpdate`] is received.
-    ///
-    /// [`VoiceStateUpdate`]: ../model/enum.Event.html#variant.VoiceStateUpdate
-    pub fn on_voice_state_update<F>(&mut self, handler: F)
-        where F: Fn(Context, VoiceStateUpdateEvent) + Send + Sync + 'static {
-        self.event_store.lock()
-            .unwrap()
-            .on_voice_state_update = Some(Arc::new(handler));
-    }
-
     /// Attaches a handler for when a [`VoiceServerUpdate`] is received.
     ///
     /// [`VoiceServerUpdate`]: ../model/enum.Event.html#variant.VoiceServerUpdate
@@ -884,6 +896,16 @@ impl Client {
         self.event_store.lock()
             .unwrap()
             .on_voice_server_update = Some(Arc::new(handler));
+    }
+
+    /// Attaches a handler for when a [`VoiceStateUpdate`] is received.
+    ///
+    /// [`VoiceStateUpdate`]: ../model/enum.Event.html#variant.VoiceStateUpdate
+    pub fn on_voice_state_update<F>(&mut self, handler: F)
+        where F: Fn(Context, Option<GuildId>, VoiceState) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_voice_state_update = Some(Arc::new(handler));
     }
 
     /// Attaches a handler for when a [`WebhookUpdate`] is received.

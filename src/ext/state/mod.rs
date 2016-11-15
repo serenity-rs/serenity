@@ -1,6 +1,7 @@
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::default::Default;
+use std::mem;
 use ::model::*;
 
 /// Known state composed from received events.
@@ -35,11 +36,6 @@ impl State {
 
             if guild.member_count > members {
                 total += guild.member_count - members;
-            } else if guild.member_count < members {
-                warn!("Inconsistent member count for {:?}: {} < {}",
-                      guild.id,
-                      guild.member_count,
-                      members);
             }
         }
 
@@ -130,11 +126,11 @@ impl State {
             Event::CallCreate(ref event) => {
                 self.update_with_call_create(event);
             },
-            Event::CallUpdate(ref event) => {
-                self.update_with_call_update(event);
-            },
             Event::CallDelete(ref event) => {
                 self.update_with_call_delete(event);
+            },
+            Event::CallUpdate(ref event) => {
+                self.update_with_call_update(event, false);
             },
             Event::ChannelCreate(ref event) => {
                 self.update_with_channel_create(event);
@@ -170,7 +166,7 @@ impl State {
                 self.update_with_guild_member_remove(event);
             },
             Event::GuildMemberUpdate(ref event) => {
-                self.update_with_guild_member_update(event);
+                self.update_with_guild_member_update(event, false);
             },
             Event::GuildMembersChunk(ref event) => {
                 self.update_with_guild_members_chunk(event);
@@ -215,7 +211,7 @@ impl State {
                 self.update_with_user_note_update(event);
             },
             Event::UserSettingsUpdate(ref event) => {
-                self.update_with_user_settings_update(event);
+                self.update_with_user_settings_update(event, false);
             },
             Event::UserUpdate(ref event) => {
                 self.update_with_user_update(event);
@@ -223,7 +219,23 @@ impl State {
             Event::VoiceStateUpdate(ref event) => {
                 self.update_with_voice_state_update(event);
             },
-            _ => {},
+            Event::ChannelPinsAck(_) |
+            Event::GuildBanAdd(_) |
+            Event::GuildBanRemove(_) |
+            Event::GuildIntegrationsUpdate(_) |
+            Event::MessageAck(_) |
+            Event::MessageCreate(_) |
+            Event::MessageDelete(_) |
+            Event::MessageDeleteBulk(_) |
+            Event::MessageUpdate(_) |
+            Event::ReactionAdd(_) |
+            Event::ReactionRemove(_) |
+            Event::ReactionRemoveAll(_) |
+            Event::Resumed(_) |
+            Event::TypingStart(_) |
+            Event::VoiceServerUpdate(_) |
+            Event::WebhookUpdate(_) |
+            Event::Unknown(_) => {},
         }
     }
 
@@ -238,48 +250,78 @@ impl State {
         }
     }
 
-    pub fn update_with_call_delete(&mut self, event: &CallDeleteEvent) {
-        self.calls.remove(&event.channel_id);
+    pub fn update_with_call_delete(&mut self, event: &CallDeleteEvent)
+        -> Option<Call> {
+        self.calls.remove(&event.channel_id)
     }
 
-    pub fn update_with_call_update(&mut self, event: &CallUpdateEvent) {
+    pub fn update_with_call_update(&mut self, event: &CallUpdateEvent, old: bool)
+        -> Option<Call> {
+        let item = if old {
+            self.calls.get(&event.channel_id).cloned()
+        } else {
+            None
+        };
+
         self.calls
             .get_mut(&event.channel_id)
             .map(|call| {
                 call.region.clone_from(&event.region);
                 call.ringing.clone_from(&event.ringing);
             });
+
+        item
     }
 
-    pub fn update_with_channel_create(&mut self, event: &ChannelCreateEvent) {
+    pub fn update_with_channel_create(&mut self, event: &ChannelCreateEvent)
+        -> Option<Channel> {
         match event.channel {
             Channel::Group(ref group) => {
-                self.groups.insert(group.channel_id, group.clone());
+                let ch = self.groups.insert(group.channel_id, group.clone());
+
+                ch.map(|x| Channel::Group(x))
             },
             Channel::Private(ref channel) => {
-                self.private_channels.insert(channel.id, channel.clone());
+                let ch = self.private_channels.insert(channel.id, channel.clone());
+
+                ch.map(|x| Channel::Private(x))
             },
             Channel::Public(ref channel) => {
-                self.guilds
+                let ch = self.guilds
                     .get_mut(&channel.guild_id)
-                    .map(|guild| guild.channels.insert(channel.id,
-                                                       channel.clone()));
+                    .map(|guild| {
+                        guild.channels.insert(channel.id, channel.clone())
+                    });
+
+                let ch = match ch {
+                    Some(Some(ch)) => Some(ch),
+                    _ => None,
+                };
+
+                ch.map(|x| Channel::Public(x))
             },
         }
     }
 
-    pub fn update_with_channel_delete(&mut self, event: &ChannelDeleteEvent) {
+    pub fn update_with_channel_delete(&mut self, event: &ChannelDeleteEvent)
+        -> Option<Channel> {
         match event.channel {
             Channel::Group(ref group) => {
-                self.groups.remove(&group.channel_id);
+                self.groups.remove(&group.channel_id).map(|x| Channel::Group(x))
             },
             Channel::Private(ref channel) => {
-                self.private_channels.remove(&channel.id);
+                self.private_channels.remove(&channel.id)
+                    .map(|private| Channel::Private(private))
             },
             Channel::Public(ref channel) => {
-                self.guilds
+                let ch = self.guilds
                     .get_mut(&channel.guild_id)
                     .map(|guild| guild.channels.remove(&channel.id));
+
+                match ch {
+                    Some(Some(ch)) => Some(Channel::Public(ch)),
+                    _ => None,
+                }
             },
         }
     }
@@ -335,10 +377,12 @@ impl State {
                     },
                     Entry::Occupied(mut e) => {
                         let dest = e.get_mut();
+
                         if group.recipients.is_empty() {
-                            // if the update omits the recipient list, preserve it
-                            let recipients = ::std::mem::replace(&mut dest.recipients, HashMap::new());
+                            let recipients = mem::replace(&mut dest.recipients, HashMap::new());
+
                             dest.clone_from(group);
+
                             dest.recipients = recipients;
                         } else {
                             dest.clone_from(group);
@@ -349,7 +393,7 @@ impl State {
             Channel::Private(ref channel) => {
                 self.private_channels
                     .get_mut(&channel.id)
-                    .map(|chan| chan.clone_from(channel));
+                    .map(|private| private.clone_from(channel));
             },
             Channel::Public(ref channel) => {
                 self.guilds
@@ -364,8 +408,9 @@ impl State {
         self.guilds.insert(event.guild.id, event.guild.clone());
     }
 
-    pub fn update_with_guild_delete(&mut self, event: &GuildDeleteEvent) {
-        self.guilds.remove(&event.guild.id);
+    pub fn update_with_guild_delete(&mut self, event: &GuildDeleteEvent)
+        -> Option<LiveGuild> {
+        self.guilds.remove(&event.guild.id)
     }
 
     pub fn update_with_guild_emojis_update(&mut self,
@@ -387,41 +432,58 @@ impl State {
     }
 
     pub fn update_with_guild_member_remove(&mut self,
-                                           event: &GuildMemberRemoveEvent) {
-        self.guilds
+                                           event: &GuildMemberRemoveEvent)
+                                           -> Option<Member> {
+        let member = self.guilds
             .get_mut(&event.guild_id)
             .map(|guild| {
                 guild.member_count -= 1;
-                guild.members.remove(&event.user.id);
+                guild.members.remove(&event.user.id)
             });
+
+        match member {
+            Some(Some(member)) => Some(member),
+            _ => None,
+        }
     }
 
     pub fn update_with_guild_member_update(&mut self,
-                                           event: &GuildMemberUpdateEvent) {
-        self.guilds
-            .get_mut(&event.guild_id)
-            .map(|guild| {
-                let mut found = false;
+                                           event: &GuildMemberUpdateEvent,
+                                           old: bool)
+                                           -> Option<Member> {
 
-                if let Some(member) = guild.members.get_mut(&event.user.id) {
-                    member.nick.clone_from(&event.nick);
-                    member.roles.clone_from(&event.roles);
-                    member.user.clone_from(&event.user);
+        if let Some(guild) = self.guilds.get_mut(&event.guild_id) {
+            let mut found = false;
 
-                    found = true;
-                }
+            let item = if let Some(member) = guild.members.get_mut(&event.user.id) {
+                let item = Some(member.clone());
 
-                if !found {
-                    guild.members.insert(event.user.id, Member {
-                        deaf: false,
-                        joined_at: String::default(),
-                        mute: false,
-                        nick: event.nick.clone(),
-                        roles: event.roles.clone(),
-                        user: event.user.clone(),
-                    });
-                }
-            });
+                member.nick.clone_from(&event.nick);
+                member.roles.clone_from(&event.roles);
+                member.user.clone_from(&event.user);
+
+                found = true;
+
+                item
+            } else {
+                None
+            };
+
+            if !found {
+                guild.members.insert(event.user.id, Member {
+                    deaf: false,
+                    joined_at: String::default(),
+                    mute: false,
+                    nick: event.nick.clone(),
+                    roles: event.roles.clone(),
+                    user: event.user.clone(),
+                });
+            }
+
+            item
+        } else {
+            None
+        }
     }
 
     pub fn update_with_guild_members_chunk(&mut self,
@@ -439,19 +501,31 @@ impl State {
     }
 
     pub fn update_with_guild_role_delete(&mut self,
-                                         event: &GuildRoleDeleteEvent) {
-        self.guilds
+                                         event: &GuildRoleDeleteEvent)
+                                         -> Option<Role> {
+        let role = self.guilds
             .get_mut(&event.guild_id)
             .map(|guild| guild.roles.remove(&event.role_id));
+
+        match role {
+            Some(Some(x)) => Some(x),
+            _ => None,
+        }
     }
 
     pub fn update_with_guild_role_update(&mut self,
-                                         event: &GuildRoleUpdateEvent) {
-        self.guilds
+                                         event: &GuildRoleUpdateEvent)
+                                         -> Option<Role> {
+        let item = self.guilds
             .get_mut(&event.guild_id)
             .map(|guild| guild.roles
                 .get_mut(&event.role.id)
-                .map(|role| role.clone_from(&event.role)));
+                .map(|role| mem::replace(role, event.role.clone())));
+
+        match item {
+            Some(Some(x)) => Some(x),
+            _ => None,
+        }
     }
 
     pub fn update_with_guild_sync(&mut self, event: &GuildSyncEvent) {
@@ -475,7 +549,6 @@ impl State {
         self.guilds
             .get_mut(&event.guild.id)
             .map(|guild| {
-                // todo: embed
                 guild.afk_timeout = event.guild.afk_timeout;
                 guild.afk_channel_id.clone_from(&event.guild.afk_channel_id);
                 guild.icon.clone_from(&event.guild.icon);
@@ -574,23 +647,32 @@ impl State {
     }
 
     pub fn update_with_user_guild_settings_update(&mut self,
-                                                  event: &UserGuildSettingsUpdateEvent) {
+                                                  event: &UserGuildSettingsUpdateEvent)
+                                                  -> Option<UserGuildSettings> {
         self.guild_settings
             .get_mut(&event.settings.guild_id)
-            .map(|guild_setting| guild_setting.clone_from(&event.settings));
+            .map(|guild_setting| mem::replace(guild_setting, event.settings.clone()))
     }
 
     pub fn update_with_user_note_update(&mut self,
-                                        event: &UserNoteUpdateEvent) {
+                                        event: &UserNoteUpdateEvent)
+                                        -> Option<String> {
         if event.note.is_empty() {
-            self.notes.remove(&event.user_id);
+            self.notes.remove(&event.user_id)
         } else {
-            self.notes.insert(event.user_id, event.note.clone());
+            self.notes.insert(event.user_id, event.note.clone())
         }
     }
 
     pub fn update_with_user_settings_update(&mut self,
-                                            event: &UserSettingsUpdateEvent) {
+                                            event: &UserSettingsUpdateEvent,
+                                            old: bool)
+                                            -> Option<UserSettings> {
+        let item = match old {
+            true => self.settings.clone(),
+            false => None,
+        };
+
         self.settings
             .as_mut()
             .map(|settings| {
@@ -605,10 +687,13 @@ impl State {
                 opt_modify(&mut settings.convert_emoticons, &event.convert_emoticons);
                 opt_modify(&mut settings.friend_source_flags, &event.friend_source_flags);
             });
+
+        item
     }
 
-    pub fn update_with_user_update(&mut self, event: &UserUpdateEvent) {
-        self.user = event.current_user.clone();
+    pub fn update_with_user_update(&mut self, event: &UserUpdateEvent)
+        -> CurrentUser {
+        mem::replace(&mut self.user, event.current_user.clone())
     }
 
     pub fn update_with_voice_state_update(&mut self,
