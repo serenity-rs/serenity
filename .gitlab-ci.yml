@@ -6,7 +6,7 @@
   stage: test
   script:
     - rustc --version && cargo --version
-    - cargo test -v
+    - cargo test -v --features voice
 
 stable:cargo:
   image: rustdocker/rust:stable
