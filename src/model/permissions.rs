@@ -251,6 +251,14 @@ impl Permissions {
     }
 
     /// Shorthand for checking that the set of permissions contains the
+    /// [Add Reactions] permission.
+    ///
+    /// [Add Reactions]: constant.ADD_REACTIONS.html
+    pub fn add_reactions(&self) -> bool {
+        self.contains(self::ADD_REACTIONS)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
     /// [Administrator] permission.
     ///
     /// [Administrator]: constant.ADMINISTRATOR.html
@@ -448,6 +456,14 @@ impl Permissions {
     /// [Speak]: constant.SPEAK.html
     pub fn speak(&self) -> bool {
         self.contains(self::SPEAK)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Use External Emojis] permission.
+    ///
+    /// [Use External Emojis]: constant.USE_EXTERNAL_EMOJIS.html
+    pub fn use_external_emojis(&self) -> bool {
+        self.contains(self::USE_EXTERNAL_EMOJIS)
     }
 
     /// Shorthand for checking that the set of permissions contains the
