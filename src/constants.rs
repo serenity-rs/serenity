@@ -1,4 +1,4 @@
-use ::prelude_internal::*;
+use ::internal::prelude::*;
 
 /// The gateway version used by the library. The gateway URI is retrieved via
 /// the REST API.

@@ -7,7 +7,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 use time;
-use ::prelude_internal::*;
+use ::internal::prelude::*;
 
 lazy_static! {
     static ref GLOBAL: Arc<Mutex<RateLimit>> = Arc::new(Mutex::new(RateLimit::default()));

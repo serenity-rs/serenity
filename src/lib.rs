@@ -103,7 +103,7 @@ pub mod prelude;
 
 mod constants;
 mod error;
-mod prelude_internal;
+mod internal;
 
 pub use client::Client;
 pub use error::{Error, Result};

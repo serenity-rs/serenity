@@ -37,7 +37,7 @@
 //! [Manage Roles]: constant.MANAGE_ROLES.html
 //! [Manage Webhooks]: constant.MANAGE_WEBHOOKS.html
 
-use ::prelude_internal::*;
+use ::internal::prelude::*;
 
 /// Returns a set of permissions with the original @everyone permissions set
 /// to true.

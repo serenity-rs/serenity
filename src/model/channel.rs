@@ -19,7 +19,7 @@ use super::utils;
 use ::utils::builder::{CreateEmbed, CreateInvite, EditChannel};
 use ::client::{STATE, http};
 use ::constants;
-use ::prelude_internal::*;
+use ::internal::prelude::*;
 use ::utils::decode_array;
 
 impl Attachment {

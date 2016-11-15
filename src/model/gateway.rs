@@ -2,7 +2,7 @@ use std::collections::{BTreeMap, HashMap};
 use super::utils::*;
 use super::*;
 use ::constants::{OpCode, VoiceOpCode};
-use ::prelude_internal::*;
+use ::internal::prelude::*;
 use ::utils::decode_array;
 
 #[derive(Clone, Debug)]

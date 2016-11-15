@@ -3,7 +3,7 @@ use std::mem;
 use super::{Message, Webhook};
 use ::utils::builder::ExecuteWebhook;
 use ::client::http;
-use ::prelude_internal::*;
+use ::internal::prelude::*;
 
 impl Webhook {
     /// Deletes the webhook.

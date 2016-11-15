@@ -24,7 +24,7 @@ use websocket::ws::receiver::Receiver as WsReceiver;
 use websocket::ws::sender::Sender as WsSender;
 use ::constants::{self, OpCode};
 use ::model::*;
-use ::prelude_internal::*;
+use ::internal::prelude::*;
 
 enum Status {
     SendMessage(Value),

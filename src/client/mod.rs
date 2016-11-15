@@ -54,7 +54,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 use ::model::*;
-use ::prelude_internal::*;
+use ::internal::prelude::*;
 use ::ext::framework::Framework;
 use ::ext::state::State;
 

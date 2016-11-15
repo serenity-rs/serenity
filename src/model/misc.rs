@@ -10,7 +10,7 @@ use super::{
     User,
     IncidentStatus
 };
-use ::prelude_internal::*;
+use ::internal::prelude::*;
 
 pub trait Mentionable {
     fn mention(&self) -> String;
