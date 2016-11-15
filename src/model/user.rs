@@ -1,4 +1,3 @@
-use serde_json::builder::ObjectBuilder;
 use std::fmt;
 use super::utils::{into_map, into_string, remove, warn_field};
 use super::{
@@ -6,14 +5,22 @@ use super::{
     GuildContainer,
     GuildId,
     Mention,
-    Message,
     RoleId,
     UserSettings,
     User
 };
-use ::client::{STATE, http};
 use ::internal::prelude::*;
 use ::utils::decode_array;
+
+#[cfg(feature = "methods")]
+use serde_json::builder::ObjectBuilder;
+#[cfg(feature = "methods")]
+use super::Message;
+#[cfg(feature = "methods")]
+use ::client::http;
+
+#[cfg(feature = "state")]
+use ::client::STATE;
 
 impl User {
     /// Returns the formatted URL of the user's icon, if one exists.
@@ -25,6 +32,7 @@ impl User {
     /// This is an alias of [direct_message].
     ///
     /// [direct_message]: #method.direct_message
+    #[cfg(feature="methods")]
     pub fn dm(&self, content: &str) -> Result<Message> {
         self.direct_message(content)
     }
@@ -32,6 +40,7 @@ impl User {
     /// Send a direct message to a user. This will create or retrieve the
     /// PrivateChannel over REST if one is not already in the State, and then
     /// send a message to it.
+    #[cfg(feature="methods")]
     pub fn direct_message(&self, content: &str)
         -> Result<Message> {
         let private_channel_id = {
@@ -94,12 +103,16 @@ impl User {
 
         match guild.into() {
             GuildContainer::Guild(guild) => {
-                guild.find_role(role_id).is_some()
+                guild.roles.get(&role_id).is_some()
             },
             GuildContainer::Id(guild_id) => {
-                let state = STATE.lock().unwrap();
+                feature_state! {{
+                    let state = STATE.lock().unwrap();
 
-                state.find_role(guild_id, role_id).is_some()
+                    state.find_role(guild_id, role_id).is_some()
+                } else {
+                    true
+                }}
             },
         }
     }

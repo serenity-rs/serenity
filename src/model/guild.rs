@@ -1,6 +1,5 @@
-use serde_json::builder::ObjectBuilder;
 use std::collections::HashMap;
-use std::{fmt, mem};
+use std::fmt;
 use super::utils::{
     decode_emojis,
     decode_members,
@@ -14,10 +13,20 @@ use super::utils::{
     warn_field
 };
 use super::*;
-use ::utils::builder::{EditGuild, EditMember, EditRole};
-use ::client::{STATE, http};
 use ::internal::prelude::*;
 use ::utils::decode_array;
+
+#[cfg(feature = "methods")]
+use serde_json::builder::ObjectBuilder;
+#[cfg(feature = "methods")]
+use std::mem;
+#[cfg(feature = "methods")]
+use ::utils::builder::{EditGuild, EditMember, EditRole};
+#[cfg(feature = "methods")]
+use ::client::http;
+
+#[cfg(feature = "state")]
+use ::client::STATE;
 
 impl From<Guild> for GuildContainer {
     fn from(guild: Guild) -> GuildContainer {
@@ -41,6 +50,7 @@ impl Emoji {
     /// Finds the [`Guild`] that owns the emoji by looking through the state.
     ///
     /// [`Guild`]: struct.Guild.html
+    #[cfg(feature = "methods")]
     pub fn find_guild_id(&self) -> Option<GuildId> {
         STATE.lock()
             .unwrap()
@@ -57,6 +67,7 @@ impl Emoji {
     /// **Note**: Only user accounts may use this method.
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<()> {
         match self.find_guild_id() {
             Some(guild_id) => http::delete_emoji(guild_id.0, self.id.0),
@@ -71,6 +82,7 @@ impl Emoji {
     /// **Note**: Only user accounts may use this method.
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[cfg(feature = "methods")]
     pub fn edit(&mut self, name: &str) -> Result<()> {
         match self.find_guild_id() {
             Some(guild_id) => {
@@ -116,6 +128,7 @@ impl GuildInfo {
 
 impl Guild {
     /// Finds a role by Id within the guild.
+    #[cfg(feature = "methods")]
     pub fn find_role<R: Into<RoleId>>(&self, role_id: R) -> Option<&Role> {
         self.roles.get(&role_id.into())
     }
@@ -127,6 +140,7 @@ impl Guild {
     /// **Note**: Requires the [Change Nickname] permission.
     ///
     /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
+    #[cfg(feature = "methods")]
     #[inline]
     pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
         http::edit_nickname(self.id.0, new_nickname)
@@ -143,6 +157,7 @@ impl Guild {
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[cfg(feature = "methods")]
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
         http::get_guild_webhooks(self.id.0)
@@ -150,6 +165,7 @@ impl Guild {
 }
 
 impl LiveGuild {
+    #[cfg(feature = "state")]
     fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
         let member = match self.get_member(STATE.lock().unwrap().user.id) {
             Some(member) => member,
@@ -161,6 +177,11 @@ impl LiveGuild {
         permissions.remove(perms);
 
         Ok(permissions.is_empty())
+    }
+
+    #[cfg(not(feature = "state"))]
+    fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
+        Ok(true)
     }
 
     /// Ban a [`User`] from the guild. All messages by the
@@ -190,6 +211,7 @@ impl LiveGuild {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    #[cfg(feature = "methods")]
     pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8)
         -> Result<()> {
         if delete_message_days > 7 {
@@ -217,6 +239,7 @@ impl LiveGuild {
     /// [`Ban`]: struct.Ban.html
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    #[cfg(feature = "methods")]
     pub fn bans(&self) -> Result<Vec<Ban>> {
         let req = permissions::BAN_MEMBERS;
 
@@ -249,6 +272,7 @@ impl LiveGuild {
     /// [`Channel`]: struct.Channel.html
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Channels]: permissions/constants.MANAGE_CHANNELS.html
+    #[cfg(feature = "methods")]
     pub fn create_channel(&mut self, name: &str, kind: ChannelType)
         -> Result<Channel> {
         let req = permissions::MANAGE_CHANNELS;
@@ -280,6 +304,7 @@ impl LiveGuild {
     /// [`Context::create_role`]: ../client/struct.Context.html#method.create_role
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constants.MANAGE_ROLES.html
+    #[cfg(feature = "methods")]
     pub fn create_role<F>(&self, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole {
         let req = permissions::MANAGE_ROLES;
@@ -352,6 +377,7 @@ impl LiveGuild {
     /// guild owner.
     ///
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
+    #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<Guild> {
         if self.owner_id != STATE.lock().unwrap().user.id {
             let req = permissions::MANAGE_GUILD;
@@ -376,6 +402,7 @@ impl LiveGuild {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`Context::edit_guild`]: ../client/struct.Context.html#method.edit_guild
     /// [Manage Guild]: permissions/constants.MANAGE_GUILD.html
+    #[cfg(feature = "methods")]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditGuild) -> EditGuild {
         let req = permissions::MANAGE_GUILD;
@@ -421,6 +448,7 @@ impl LiveGuild {
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
+    #[cfg(feature = "methods")]
     pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
         let req = permissions::CHANGE_NICKNAME;
 
@@ -450,6 +478,7 @@ impl LiveGuild {
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[cfg(feature = "methods")]
     pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
         let req = permissions::MANAGE_GUILD;
 
@@ -526,6 +555,7 @@ impl LiveGuild {
     }
 
     /// Leaves the guild.
+    #[cfg(feature = "methods")]
     pub fn leave(&self) -> Result<Guild> {
         http::leave_guild(self.id.0)
     }
@@ -655,6 +685,7 @@ impl LiveGuild {
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    #[cfg(feature = "methods")]
     pub fn prune_count(&self, days: u16) -> Result<GuildPrune> {
         let req = permissions::KICK_MEMBERS;
 
@@ -684,6 +715,7 @@ impl LiveGuild {
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    #[cfg(feature = "methods")]
     pub fn start_prune(&self, days: u16) -> Result<GuildPrune> {
         let req = permissions::KICK_MEMBERS;
 
@@ -710,6 +742,7 @@ impl LiveGuild {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    #[cfg(feature = "methods")]
     pub fn unban<U: Into<UserId>>(&self, user: U) -> Result<()> {
         let req = permissions::BAN_MEMBERS;
 
@@ -725,6 +758,7 @@ impl LiveGuild {
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[cfg(feature = "methods")]
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
         http::get_guild_webhooks(self.id.0)
@@ -739,6 +773,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[cfg(feature = "methods")]
     pub fn add_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
         self.add_roles(&[role_id.into()])
     }
@@ -750,6 +785,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[cfg(feature = "methods")]
     pub fn add_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         let guild_id = try!(self.find_guild());
         self.roles.extend_from_slice(role_ids);
@@ -772,6 +808,7 @@ impl Member {
     /// **Note**: Requires the [Ban Members] role.
     ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    #[cfg(feature = "methods")]
     pub fn ban(&self, delete_message_days: u8) -> Result<()> {
         let guild_id = try!(self.find_guild());
 
@@ -795,6 +832,7 @@ impl Member {
     ///
     /// [`Context::edit_member`]: ../client/struct.Context.html#method.edit_member
     /// [`EditMember`]: ../builder/struct.EditMember.html
+    #[cfg(feature = "methods")]
     pub fn edit<F>(&self, f: F) -> Result<()>
         where F: FnOnce(EditMember) -> EditMember {
         let guild_id = try!(self.find_guild());
@@ -806,6 +844,7 @@ impl Member {
     /// Finds the Id of the [`Guild`] that the member is in.
     ///
     /// [`Guild`]: struct.Guild.html
+    #[cfg(feature = "methods")]
     pub fn find_guild(&self) -> Result<GuildId> {
         STATE.lock()
             .unwrap()
@@ -831,6 +870,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[cfg(feature = "methods")]
     pub fn remove_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
         self.remove_roles(&[role_id.into()])
     }
@@ -841,6 +881,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[cfg(feature = "methods")]
     pub fn remove_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         let guild_id = try!(self.find_guild());
         self.roles.retain(|r| !role_ids.contains(r));
@@ -924,6 +965,7 @@ impl Role {
     /// **Note** Requires the [Manage Roles] permission.
     ///
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<()> {
         let guild_id = try!(self.find_guild());
 
@@ -938,6 +980,7 @@ impl Role {
     /// that contains the role.
     ///
     /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
+    #[cfg(feature = "methods")]
     pub fn find_guild(&self) -> Result<GuildId> {
         STATE.lock()
             .unwrap()

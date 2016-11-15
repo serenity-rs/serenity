@@ -89,6 +89,7 @@ impl fmt::Display for Mention {
 }
 
 impl IncidentStatus {
+    #[doc(hidden)]
     pub fn decode(value: Value) -> Result<Self> {
         Self::decode_str(value)
     }

@@ -734,6 +734,7 @@ impl Event {
 }
 
 impl Game {
+    #[cfg(feature="methods")]
     pub fn playing(name: String) -> Game {
         Game {
             kind: GameType::Playing,
@@ -742,6 +743,7 @@ impl Game {
         }
     }
 
+    #[cfg(feature="methods")]
     pub fn streaming(name: String, url: String) -> Game {
         Game {
             kind: GameType::Streaming,
@@ -750,6 +752,7 @@ impl Game {
         }
     }
 
+    #[doc(hidden)]
     pub fn decode(value: Value) -> Result<Option<Game>> {
         let mut map = try!(into_map(value));
 
@@ -771,6 +774,7 @@ impl Game {
 }
 
 impl Presence {
+    #[doc(hidden)]
     pub fn decode(value: Value) -> Result<Presence> {
         let mut value = try!(into_map(value));
         let mut user_map = try!(remove(&mut value, "user").and_then(into_map));

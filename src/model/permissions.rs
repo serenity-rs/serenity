@@ -82,6 +82,7 @@ use ::internal::prelude::*;
 /// [Speak]: constant.SPEAK.html
 /// [Use External Emojis]: constant.USE_EXTERNAL_EMOJIS.html
 /// [Use VAD]: constant.USE_VAD.html
+#[cfg(feature="extras")]
 pub fn general() -> Permissions {
     use self::*;
 
@@ -119,6 +120,7 @@ pub fn general() -> Permissions {
 /// [Send Messages]: constant.SEND_MESSAGES.html
 /// [Send TTS Messages]: constant.SEND_TTS_MESSAGES.html
 /// [Use External Emojis]: constant.USE_EXTERNAL_EMOJIS.html
+#[cfg(feature="extras")]
 pub fn text() -> Permissions {
     use self::*;
 
@@ -140,6 +142,7 @@ pub fn text() -> Permissions {
 /// [Connect]: constant.CONNECT.html
 /// [Speak]: constant.SPEAK.html
 /// [Use VAD]: constant.USE_VAD.html
+#[cfg(feature="extras")]
 pub fn voice() -> Permissions {
     use self::*;
 

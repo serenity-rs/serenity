@@ -10,6 +10,7 @@ impl Invite {
     /// banned. A ban is equivilant to an IP ban.
     ///
     /// [`Guild`]: struct.Guild.html
+    #[cfg(feature="methods")]
     pub fn accept(&self) -> Result<Invite> {
         http::accept_invite(&self.code)
     }
@@ -25,6 +26,7 @@ impl Invite {
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<Invite> {
         let req = permissions::MANAGE_GUILD;
 
@@ -43,6 +45,7 @@ impl RichInvite {
     /// accepting an invite.
     ///
     /// [`Invite::accept`]: struct.Invite.html#method.accept
+    #[cfg(feature="methods")]
     pub fn accept(&self) -> Result<Invite> {
         http::accept_invite(&self.code)
     }
@@ -60,6 +63,7 @@ impl RichInvite {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`Invite::delete`]: struct.Invite.html#method.delete
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<Invite> {
         let req = permissions::MANAGE_GUILD;
 

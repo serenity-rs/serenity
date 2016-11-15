@@ -45,8 +45,12 @@ version = "0.0.12"
 yaml-rust = "0.3"
 
 [features]
-default = []
+default = ["extras", "framework", "methods", "state"]
 debug = []
+extras = []
+framework = []
+methods = []
+state = []
 voice = ["opus", "sodiumoxide"]
 
 [[bin]]

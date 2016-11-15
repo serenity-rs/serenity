@@ -12,6 +12,7 @@ impl Webhook {
     /// authentication is not required.
     ///
     /// [`http::delete_webhook_with_token`]: ../client/http/fn.delete_webhook_with_token.html
+    #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<()> {
         http::delete_webhook_with_token(self.id.0, &self.token)
     }
@@ -62,6 +63,7 @@ impl Webhook {
     ///
     /// [`http::edit_webhook`]: ../client/http/fn.edit_webhook.html
     /// [`http::edit_webhook_with_token`]: ../client/http/fn.edit_webhook_with_token.html
+    #[cfg(feature="methods")]
     pub fn edit(&mut self, name: Option<&str>, avatar: Option<&str>)
         -> Result<()> {
         if name.is_none() && avatar.is_none() {
@@ -141,6 +143,7 @@ impl Webhook {
     ///     .embeds(vec![embed]))
     ///     .expect("err executing");
     /// ```
+    #[cfg(feature="methods")]
     pub fn execute<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(ExecuteWebhook) -> ExecuteWebhook {
         let map = f(ExecuteWebhook::default()).0.build();
@@ -155,6 +158,7 @@ impl Webhook {
     /// authentication is not required.
     ///
     /// [`http::get_webhook_with_token`]: ../client/http/fn.get_webhook_with_token.html
+    #[cfg(feature="methods")]
     pub fn refresh(&mut self) -> Result<()> {
         match http::get_webhook_with_token(self.id.0, &self.token) {
             Ok(replacement) => {

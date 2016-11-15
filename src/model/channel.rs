@@ -1,11 +1,5 @@
-use hyper::Client as HyperClient;
-use serde_json::builder::ObjectBuilder;
 use std::borrow::Cow;
 use std::fmt::{self, Write};
-use std::fs::File;
-use std::io::{Read, Write as IoWrite};
-use std::mem;
-use std::path::{Path, PathBuf};
 use super::utils::{
     decode_id,
     into_map,
@@ -15,16 +9,34 @@ use super::utils::{
     warn_field,
 };
 use super::*;
-use super::utils;
-use ::utils::builder::{CreateEmbed, CreateInvite, EditChannel};
-use ::client::{STATE, http};
 use ::constants;
 use ::internal::prelude::*;
 use ::utils::decode_array;
 
+#[cfg(feature = "methods")]
+use hyper::Client as HyperClient;
+#[cfg(feature = "methods")]
+use serde_json::builder::ObjectBuilder;
+#[cfg(feature = "methods")]
+use std::fs::File;
+#[cfg(feature = "methods")]
+use std::io::{Read, Write as IoWrite};
+#[cfg(feature = "methods")]
+use std::mem;
+#[cfg(feature = "methods")]
+use std::path::{Path, PathBuf};
+#[cfg(feature = "methods")]
+use super::utils;
+
+#[cfg(feature = "methods")]
+use ::utils::builder::{CreateEmbed, CreateInvite, EditChannel};
+#[cfg(feature = "methods")]
+use ::client::{STATE, http};
+
 impl Attachment {
     /// If this attachment is an image, then a tuple of the width and height
     /// in pixels is returned.
+    #[cfg(feature = "methods")]
     pub fn dimensions(&self) -> Option<(u64, u64)> {
         if let (Some(width), Some(height)) = (self.width, self.height) {
             Some((width, height))
@@ -99,6 +111,7 @@ impl Attachment {
     /// [`Error::Hyper`]: ../enum.Error.html#variant.Hyper
     /// [`Error::Io`]: ../enum.Error.html#variant.Io
     /// [`Message`]: struct.Message.html
+    #[cfg(feature = "methods")]
     pub fn download(&self) -> Result<Vec<u8>> {
         let hyper = HyperClient::new();
         let mut response = try!(hyper.get(&self.url).send());
@@ -163,6 +176,7 @@ impl Attachment {
     /// [`Error::Hyper`]: ../enum.Error.html#variant.Hyper
     /// [`Error::Io`]: ../enum.Error.html#variant.Io
     /// [`Message`]: struct.Message.html
+    #[cfg(feature = "methods")]
     pub fn download_to_directory<P: AsRef<Path>>(&self, path: P) -> Result<PathBuf> {
         let bytes = try!(self.download());
 
@@ -196,6 +210,7 @@ impl Channel {
     /// closest functionality is leaving it.
     ///
     /// [`Group`]: struct.Group.html
+    #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<()> {
         match *self {
             Channel::Group(ref group) => {
@@ -258,6 +273,7 @@ impl Embed {
     /// This should only be useful in conjunction with [`Webhook::execute`].
     ///
     /// [`Webhook::execute`]: struct.Webhook.html
+    #[cfg(feature = "methods")]
     #[inline(always)]
     pub fn fake<F>(f: F) -> Value where F: FnOnce(CreateEmbed) -> CreateEmbed {
         f(CreateEmbed::default()).0.build()
@@ -270,6 +286,7 @@ impl Group {
     ///
     /// **Note**: Groups have a limit of 10 recipients, including the current
     /// user.
+    #[cfg(feature = "methods")]
     pub fn add_recipient<U: Into<UserId>>(&self, user: U) -> Result<()> {
         let user = user.into();
 
@@ -282,6 +299,7 @@ impl Group {
     }
 
     /// Broadcasts that the current user is typing in the group.
+    #[cfg(feature = "methods")]
     pub fn broadcast_typing(&self) -> Result<()> {
         http::broadcast_typing(self.channel_id.0)
     }
@@ -301,6 +319,7 @@ impl Group {
     ///
     /// [`ClientError::DeleteMessageDaysAmount`]: ../client/enum.ClientError.html#variant.DeleteMessageDaysAmount
     /// [`Context::delete_messages`]: ../client/struct.Context.html#delete_messages
+    #[cfg(feature = "methods")]
     pub fn delete_messages(&self, message_ids: &[MessageId]) -> Result<()> {
         if message_ids.len() < 2 || message_ids.len() > 100 {
             return Err(Error::Client(ClientError::BulkDeleteAmount));
@@ -324,6 +343,7 @@ impl Group {
     }
 
     /// Leaves the group.
+    #[cfg(feature = "methods")]
     pub fn leave(&self) -> Result<Group> {
         http::leave_group(self.channel_id.0)
     }
@@ -352,6 +372,7 @@ impl Group {
     }
 
     /// Retrieves the list of messages that have been pinned in the group.
+    #[cfg(feature = "methods")]
     pub fn pins(&self) -> Result<Vec<Message>> {
         http::get_pins(self.channel_id.0)
     }
@@ -360,6 +381,7 @@ impl Group {
     /// the group, then nothing is done.
     ///
     /// **Note**: This is only available to the group owner.
+    #[cfg(feature = "methods")]
     pub fn remove_recipient<U: Into<UserId>>(&self, user: U) -> Result<()> {
         let user = user.into();
 
@@ -378,6 +400,7 @@ impl Group {
     /// **Note**: Requires the [Send Messages] permission.
     ///
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[cfg(feature = "methods")]
     pub fn send_message(&self, content: &str) -> Result<Message> {
         let map = ObjectBuilder::new()
             .insert("content", content)
@@ -408,6 +431,7 @@ impl Message {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<()> {
         let req = permissions::MANAGE_MESSAGES;
         let is_author = self.author.id != STATE.lock().unwrap().user.id;
@@ -435,6 +459,7 @@ impl Message {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    #[cfg(feature = "methods")]
     pub fn delete_reactions(&self) -> Result<()> {
         let req = permissions::MANAGE_MESSAGES;
 
@@ -462,6 +487,7 @@ impl Message {
     ///
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
     /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
+    #[cfg(feature = "methods")]
     pub fn edit(&mut self, new_content: &str) -> Result<()> {
         if let Some(length_over) = Message::overflow_length(new_content) {
             return Err(Error::Client(ClientError::MessageTooLong(length_over)));
@@ -516,6 +542,7 @@ impl Message {
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    #[cfg(feature = "methods")]
     pub fn pin(&self) -> Result<()> {
         let req = permissions::MANAGE_MESSAGES;
 
@@ -539,6 +566,7 @@ impl Message {
     /// [`Emoji`]: struct.Emoji.html
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     /// [permissions]: permissions
+    #[cfg(feature = "methods")]
     pub fn react<R: Into<ReactionType>>(&self, reaction_type: R) -> Result<()> {
         let req = permissions::ADD_REACTIONS;
 
@@ -572,6 +600,7 @@ impl Message {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[cfg(feature = "methods")]
     pub fn reply(&self, content: &str) -> Result<Message> {
         if let Some(length_over) = Message::overflow_length(content) {
             return Err(Error::Client(ClientError::MessageTooLong(length_over)));
@@ -609,6 +638,7 @@ impl Message {
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    #[cfg(feature = "methods")]
     pub fn unpin(&self) -> Result<()> {
         let req = permissions::MANAGE_MESSAGES;
 
@@ -621,6 +651,7 @@ impl Message {
 }
 
 impl PermissionOverwrite {
+    #[doc(hidden)]
     pub fn decode(value: Value) -> Result<PermissionOverwrite> {
         let mut map = try!(into_map(value));
         let id = try!(remove(&mut map, "id").and_then(decode_id));
@@ -641,6 +672,7 @@ impl PermissionOverwrite {
 
 impl PrivateChannel {
     /// Broadcasts that the current user is typing to the recipient.
+    #[cfg(feature = "methods")]
     pub fn broadcast_typing(&self) -> Result<()> {
         http::broadcast_typing(self.id.0)
     }
@@ -672,6 +704,7 @@ impl PrivateChannel {
     /// [`ClientError::InvalidUser`] if the current user is not a bot user.
     ///
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
+    #[cfg(feature = "methods")]
     pub fn delete_messages(&self, message_ids: &[MessageId]) -> Result<()> {
         if !STATE.lock().unwrap().user.bot {
             return Err(Error::Client(ClientError::InvalidOperationAsUser));
@@ -691,12 +724,14 @@ impl PrivateChannel {
     /// Deletes the channel. This does not delete the contents of the channel,
     /// and is equivilant to closing a private channel on the client, which can
     /// be re-opened.
+    #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<Channel> {
         http::delete_channel(self.id.0)
     }
 
     /// Retrieves the list of messages that have been pinned in the private
     /// channel.
+    #[cfg(feature = "methods")]
     pub fn pins(&self) -> Result<Vec<Message>> {
         http::get_pins(self.id.0)
     }
@@ -712,6 +747,7 @@ impl PrivateChannel {
     /// over the limit.
     ///
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    #[cfg(feature = "methods")]
     pub fn send_message(&self, content: &str) -> Result<Message> {
         if let Some(length_over) = Message::overflow_length(content) {
             return Err(Error::Client(ClientError::MessageTooLong(length_over)));
@@ -749,10 +785,12 @@ impl PublicChannel {
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Send Messages]: permissions/constants.SEND_MESSAGES.html
+    #[cfg(feature = "methods")]
     pub fn broadcast_typing(&self) -> Result<()> {
         http::broadcast_typing(self.id.0)
     }
 
+    #[cfg(feature = "methods")]
     pub fn create_invite<F>(&self, f: F) -> Result<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
         let req = permissions::CREATE_INVITE;
@@ -766,6 +804,7 @@ impl PublicChannel {
         http::create_invite(self.id.0, map)
     }
 
+    #[doc(hidden)]
     pub fn decode(value: Value) -> Result<PublicChannel> {
         let mut map = try!(into_map(value));
 
@@ -774,6 +813,7 @@ impl PublicChannel {
         PublicChannel::decode_guild(Value::Object(map), id)
     }
 
+    #[doc(hidden)]
     pub fn decode_guild(value: Value, guild_id: GuildId) -> Result<PublicChannel> {
         let mut map = try!(into_map(value));
         missing!(map, PublicChannel {
@@ -792,6 +832,7 @@ impl PublicChannel {
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
+    #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<Channel> {
         let req = permissions::MANAGE_CHANNELS;
 
@@ -801,8 +842,9 @@ impl PublicChannel {
 
         http::delete_channel(self.id.0)
     }
-    pub fn edit<F>(&mut self, f: F) -> Result<()>
 
+    #[cfg(feature = "methods")]
+    pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
         let req = permissions::MANAGE_CHANNELS;
 
@@ -834,6 +876,7 @@ impl PublicChannel {
         self.id.mention()
     }
 
+    #[cfg(feature = "methods")]
     pub fn pins(&self) -> Result<Vec<Message>> {
         http::get_pins(self.id.0)
     }
@@ -856,6 +899,7 @@ impl PublicChannel {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[cfg(feature = "methods")]
     pub fn send_message(&self, content: &str) -> Result<Message> {
         if let Some(length_over) = Message::overflow_length(content) {
             return Err(Error::Client(ClientError::MessageTooLong(length_over)));
@@ -881,6 +925,7 @@ impl PublicChannel {
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[cfg(feature = "methods")]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
         http::get_channel_webhooks(self.id.0)
     }
@@ -908,6 +953,7 @@ impl Reaction {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     /// [permissions]: permissions
+    #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<()> {
         let user = if self.user_id == STATE.lock().unwrap().user.id {
             None
@@ -958,6 +1004,7 @@ impl Reaction {
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     /// [permissions]: permissions
+    #[cfg(feature = "methods")]
     pub fn users<R, U>(&self,
                        reaction_type: R,
                        limit: Option<u8>,
@@ -1013,6 +1060,7 @@ impl ReactionType {
         }
     }
 
+    #[doc(hidden)]
     pub fn decode(value: Value) -> Result<Self> {
         let mut map = try!(into_map(value));
         let name = try!(remove(&mut map, "name").and_then(into_string));

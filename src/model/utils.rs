@@ -1,5 +1,4 @@
 use std::collections::{BTreeMap, HashMap};
-use super::permissions::{self, Permissions};
 use super::{
     Channel,
     ChannelId,
@@ -15,9 +14,13 @@ use super::{
     UserId,
     VoiceState,
 };
-use ::client::STATE;
 use ::internal::prelude::*;
 use ::utils::{decode_array, into_array};
+
+#[cfg(feature = "methods")]
+use super::permissions::{self, Permissions};
+#[cfg(feature = "methods")]
+use ::client::STATE;
 
 #[macro_escape]
 macro_rules! missing {
@@ -268,6 +271,7 @@ pub fn remove(map: &mut BTreeMap<String, Value>, key: &str) -> Result<Value> {
 }
 
 #[doc(hidden)]
+#[cfg(feature="methods")]
 pub fn user_has_perms(channel_id: ChannelId,
                       mut permissions: Permissions)
                       -> Result<bool> {

@@ -2,10 +2,15 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use super::event_store::EventStore;
 use super::login_type::LoginType;
-use super::{STATE, Connection, Context};
-use ::ext::framework::Framework;
+use super::{Connection, Context};
 use ::internal::prelude::*;
 use ::model::{ChannelId, Event, Message};
+
+#[cfg(feature="framework")]
+use ::ext::framework::Framework;
+
+#[cfg(feature = "state")]
+use super::STATE;
 
 macro_rules! handler {
     ($field:ident, $event_store:ident) => {
@@ -19,10 +24,14 @@ macro_rules! handler {
 
 macro_rules! update {
     ($method:ident, $event:expr) => {
-        STATE.lock().unwrap().$method(&$event);
+        feature_state_enabled! {{
+            STATE.lock().unwrap().$method(&$event)
+        }}
     };
     ($method:ident, $event:expr, $old:expr) => {
-        STATE.lock().unwrap().$method(&$event, $old);
+        feature_state_enabled! {{
+            STATE.lock().unwrap().$method(&$event, $old)
+        }}
     };
 }
 
@@ -32,14 +41,72 @@ fn context(channel_id: Option<ChannelId>,
     Context::new(channel_id, conn, login_type)
 }
 
-#[allow(cyclomatic_complexity)]
+#[cfg(feature="framework")]
 pub fn dispatch(event: Result<Event>,
                 conn: Arc<Mutex<Connection>>,
                 framework: Arc<Mutex<Framework>>,
                 login_type: LoginType,
                 event_store: Arc<Mutex<EventStore>>) {
     match event {
-        Ok(Event::CallCreate(event)) => {
+        Ok(Event::MessageCreate(event)) => {
+            let context = context(Some(event.message.channel_id),
+                                  conn,
+                                  login_type);
+            let mut framework = framework.lock().expect("framework poisoned");
+
+            if framework.initialized {
+                dispatch_message(context.clone(),
+                                 event.message.clone(),
+                                 event_store);
+
+                framework.dispatch(context, event.message);
+            } else {
+                dispatch_message(context, event.message, event_store);
+            }
+        },
+        Ok(other) => handle_event(other, conn, login_type, event_store),
+        Err(_why) => {},
+    }
+}
+
+#[cfg(not(feature="framework"))]
+pub fn dispatch(event: Result<Event>,
+                conn: Arc<Mutex<Connection>>,
+                login_type: LoginType,
+                event_store: Arc<Mutex<EventStore>>) {
+    match event {
+        Ok(Event::MessageCreate(event)) => {
+            let context = context(Some(event.message.channel_id),
+                                  conn,
+                                  login_type);
+            dispatch_message(context.clone(),
+                             event.message.clone(),
+                             event_store);
+        },
+        Ok(other) => handle_event(other, conn, login_type, event_store),
+        Err(_why) => {},
+    }
+}
+
+fn dispatch_message(context: Context,
+                    message: Message,
+                    event_store: Arc<Mutex<EventStore>>) {
+    if let Some(ref handler) = handler!(on_message, event_store) {
+        let handler = handler.clone();
+
+        thread::spawn(move || {
+            (handler)(context, message);
+        });
+    }
+}
+
+#[allow(cyclomatic_complexity)]
+fn handle_event(event: Event,
+                conn: Arc<Mutex<Connection>>,
+                login_type: LoginType,
+                event_store: Arc<Mutex<EventStore>>) {
+    match event {
+        Event::CallCreate(event) => {
             if let Some(ref handler) = handler!(on_call_create, event_store) {
                 update!(update_with_call_create, event);
 
@@ -53,7 +120,7 @@ pub fn dispatch(event: Result<Event>,
                 update!(update_with_call_create, event);
             }
         },
-        Ok(Event::CallDelete(event)) => {
+        Event::CallDelete(event) => {
             if let Some(ref handler) = handler!(on_call_delete, event_store) {
                 let call = STATE
                     .lock()
@@ -72,27 +139,35 @@ pub fn dispatch(event: Result<Event>,
                 update!(update_with_call_delete, event);
             }
         },
-        Ok(Event::CallUpdate(event)) => {
+        Event::CallUpdate(event) => {
             if let Some(ref handler) = handler!(on_call_update, event_store) {
-                let before = update!(update_with_call_update, event, true);
-                let after = STATE
-                    .lock()
-                    .unwrap()
-                    .calls
-                    .get(&event.channel_id)
-                    .cloned();
-
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, before, after);
-                });
+                feature_state! {{
+                    let before = update!(update_with_call_update, event, true);
+                    let after = STATE
+                        .lock()
+                        .unwrap()
+                        .calls
+                        .get(&event.channel_id)
+                        .cloned();
+
+                    thread::spawn(move || {
+                        (handler)(context, before, after);
+                    });
+                } else {
+                    thread::spawn(move || {
+                        (handler)(context, event);
+                    });
+                }}
             } else {
-                update!(update_with_call_update, event, false);
+                feature_state_enabled! {{
+                    update!(update_with_call_update, event, false);
+                }}
             }
         },
-        Ok(Event::ChannelCreate(event)) => {
+        Event::ChannelCreate(event) => {
             if let Some(ref handler) = handler!(on_channel_create, event_store) {
                 update!(update_with_channel_create, event);
                 let context = context(Some(event.channel.id()),
@@ -107,7 +182,7 @@ pub fn dispatch(event: Result<Event>,
                 update!(update_with_channel_create, event);
             }
         },
-        Ok(Event::ChannelDelete(event)) => {
+        Event::ChannelDelete(event) => {
             if let Some(ref handler) = handler!(on_channel_delete, event_store) {
                 update!(update_with_channel_delete, event);
                 let context = context(None, conn, login_type);
@@ -120,7 +195,7 @@ pub fn dispatch(event: Result<Event>,
                 update!(update_with_channel_delete, event);
             }
         },
-        Ok(Event::ChannelPinsAck(event)) => {
+        Event::ChannelPinsAck(event) => {
             if let Some(ref handler) = handler!(on_channel_pins_ack, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
@@ -132,7 +207,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::ChannelPinsUpdate(event)) => {
+        Event::ChannelPinsUpdate(event) => {
             if let Some(ref handler) = handler!(on_channel_pins_update, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
@@ -144,7 +219,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::ChannelRecipientAdd(event)) => {
+        Event::ChannelRecipientAdd(event) => {
             update!(update_with_channel_recipient_add, event);
 
             if let Some(ref handler) = handler!(on_channel_recipient_addition, event_store) {
@@ -158,7 +233,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::ChannelRecipientRemove(event)) => {
+        Event::ChannelRecipientRemove(event) => {
             update!(update_with_channel_recipient_remove, event);
 
             if let Some(ref handler) = handler!(on_channel_recipient_removal, event_store) {
@@ -172,7 +247,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::ChannelUpdate(event)) => {
+        Event::ChannelUpdate(event) => {
             if let Some(ref handler) = handler!(on_channel_update, event_store) {
                 let before = STATE.lock()
                     .unwrap()
@@ -190,7 +265,7 @@ pub fn dispatch(event: Result<Event>,
                 update!(update_with_channel_update, event);
             }
         },
-        Ok(Event::GuildBanAdd(event)) => {
+        Event::GuildBanAdd(event) => {
             if let Some(ref handler) = handler!(on_guild_ban_addition, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
@@ -200,7 +275,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::GuildBanRemove(event)) => {
+        Event::GuildBanRemove(event) => {
             if let Some(ref handler) = handler!(on_guild_ban_removal, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
@@ -210,7 +285,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::GuildCreate(event)) => {
+        Event::GuildCreate(event) => {
             update!(update_with_guild_create, event);
 
             if let Some(ref handler) = handler!(on_guild_create, event_store) {
@@ -222,20 +297,29 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::GuildDelete(event)) => {
+        Event::GuildDelete(event) => {
             if let Some(ref handler) = handler!(on_guild_delete, event_store) {
-                let full = update!(update_with_guild_delete, event);
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild, full);
-                });
+                feature_state! {{
+                    let full = update!(update_with_guild_delete, event);
+
+                    thread::spawn(move || {
+                        (handler)(context, event.guild, full);
+                    });
+                } else {
+                    thread::spawn(move || {
+                        (handler)(context, event.guild);
+                    });
+                }}
             } else {
-                let _full = update!(update_with_guild_delete, event);
+                feature_state_enabled! {{
+                    let _full = update!(update_with_guild_delete, event);
+                }}
             }
         },
-        Ok(Event::GuildEmojisUpdate(event)) => {
+        Event::GuildEmojisUpdate(event) => {
             update!(update_with_guild_emojis_update, event);
 
             if let Some(ref handler) = handler!(on_guild_emojis_update, event_store) {
@@ -247,7 +331,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::GuildIntegrationsUpdate(event)) => {
+        Event::GuildIntegrationsUpdate(event) => {
             if let Some(ref handler) = handler!(on_guild_integrations_update, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
@@ -257,7 +341,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::GuildMemberAdd(event)) => {
+        Event::GuildMemberAdd(event) => {
             update!(update_with_guild_member_add, event);
 
             if let Some(ref handler) = handler!(on_guild_member_addition, event_store) {
@@ -269,42 +353,58 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::GuildMemberRemove(event)) => {
+        Event::GuildMemberRemove(event) => {
             if let Some(ref handler) = handler!(on_guild_member_removal, event_store) {
-                let member = update!(update_with_guild_member_remove, event);
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild_id, event.user, member);
-                });
+                feature_state! {{
+                    let member = update!(update_with_guild_member_remove, event);
+
+                    thread::spawn(move || {
+                        (handler)(context, event.guild_id, event.user, member);
+                    });
+                } else {
+                    thread::spawn(move || {
+                        (handler)(context, event.guild_id, event.user);
+                    });
+                }}
             } else {
-                let _member = update!(update_with_guild_member_remove, event);
+                feature_state_enabled! {{
+                    let _member = update!(update_with_guild_member_remove, event);
+                }}
             }
         },
-        Ok(Event::GuildMemberUpdate(event)) => {
+        Event::GuildMemberUpdate(event) => {
             if let Some(ref handler) = handler!(on_guild_member_update, event_store) {
-                let before = update!(update_with_guild_member_update, event, true);
-
-                // This is safe, as the update would have created the member
-                // if it did not exist. Thus, there _should_ be no way that this
-                // could fail under any circumstance.
-                let after = STATE.lock()
-                    .unwrap()
-                    .find_member(event.guild_id, event.user.id)
-                    .unwrap()
-                    .clone();
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, before, after);
-                });
+                feature_state! {{
+                    let before = update!(update_with_guild_member_update, event);
+
+                    // This is safe, as the update would have created the member
+                    // if it did not exist. Thus, there _should_ be no way that this
+                    // could fail under any circumstance.
+                    let after = STATE.lock()
+                        .unwrap()
+                        .find_member(event.guild_id, event.user.id)
+                        .unwrap()
+                        .clone();
+
+                    thread::spawn(move || {
+                        (handler)(context, before, after);
+                    });
+                } else {
+                    thread::spawn(move || {
+                        (handler)(context, event);
+                    });
+                }}
             } else {
-                let _ = update!(update_with_guild_member_update, event, false);
+                let _ = update!(update_with_guild_member_update, event);
             }
         },
-        Ok(Event::GuildMembersChunk(event)) => {
+        Event::GuildMembersChunk(event) => {
             update!(update_with_guild_members_chunk, event);
 
             if let Some(ref handler) = handler!(on_guild_members_chunk, event_store) {
@@ -316,7 +416,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::GuildRoleCreate(event)) => {
+        Event::GuildRoleCreate(event) => {
             update!(update_with_guild_role_create, event);
 
             if let Some(ref handler) = handler!(on_guild_role_create, event_store) {
@@ -328,30 +428,51 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::GuildRoleDelete(event)) => {
+        Event::GuildRoleDelete(event) => {
             if let Some(ref handler) = handler!(on_guild_role_delete, event_store) {
-                let role = update!(update_with_guild_role_delete, event);
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild_id, event.role_id, role);
-                });
+                feature_state! {{
+                    let role = update!(update_with_guild_role_delete, event);
+
+                    thread::spawn(move || {
+                        (handler)(context, event.guild_id, event.role_id, role);
+                    });
+                } else {
+                    thread::spawn(move || {
+                        (handler)(context, event.guild_id, event.role_id);
+                    });
+                }}
+            } else {
+                feature_state_enabled! {{
+                    let _role = update!(update_with_guild_role_delete, event);
+                }}
             }
         },
-        Ok(Event::GuildRoleUpdate(event)) => {
-            let before = update!(update_with_guild_role_update, event);
-
+        Event::GuildRoleUpdate(event) => {
             if let Some(ref handler) = handler!(on_guild_role_update, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild_id, before, event.role);
-                });
+                feature_state! {{
+                    let before = update!(update_with_guild_role_update, event);
+
+                    thread::spawn(move || {
+                        (handler)(context, event.guild_id, before, event.role);
+                    });
+                } else {
+                    thread::spawn(move || {
+                        (handler)(context, event.guild_id, event.role);
+                    });
+                }}
+            } else {
+                feature_state_enabled! {{
+                    let _before = update!(update_with_guild_role_update, event);
+                }}
             }
         },
-        Ok(Event::GuildSync(event)) => {
+        Event::GuildSync(event) => {
             if let Some(ref handler) = handler!(on_guild_sync, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
@@ -361,7 +482,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::GuildUnavailable(event)) => {
+        Event::GuildUnavailable(event) => {
             update!(update_with_guild_unavailable, event);
 
             if let Some(ref handler) = handler!(on_guild_unavailable, event_store) {
@@ -373,7 +494,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::GuildUpdate(event)) => {
+        Event::GuildUpdate(event) => {
             if let Some(ref handler) = handler!(on_guild_update, event_store) {
                 let before = STATE.lock()
                     .unwrap()
@@ -391,7 +512,7 @@ pub fn dispatch(event: Result<Event>,
                 update!(update_with_guild_update, event);
             }
         }
-        Ok(Event::MessageAck(event)) => {
+        Event::MessageAck(event) => {
             if let Some(ref handler) = handler!(on_message_ack, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
@@ -403,23 +524,9 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::MessageCreate(event)) => {
-            let context = context(Some(event.message.channel_id),
-                                  conn,
-                                  login_type);
-            let mut framework = framework.lock().expect("framework poisoned");
-
-            if framework.initialized {
-                dispatch_message(context.clone(),
-                                 event.message.clone(),
-                                 event_store);
-
-                framework.dispatch(context, event.message);
-            } else {
-                dispatch_message(context, event.message, event_store);
-            }
-        },
-        Ok(Event::MessageDeleteBulk(event)) => {
+        // Already handled by the framework check macro
+        Event::MessageCreate(_event) => {},
+        Event::MessageDeleteBulk(event) => {
             if let Some(ref handler) = handler!(on_message_delete_bulk, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
@@ -431,7 +538,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::MessageDelete(event)) => {
+        Event::MessageDelete(event) => {
             if let Some(ref handler) = handler!(on_message_delete, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
@@ -443,7 +550,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::MessageUpdate(event)) => {
+        Event::MessageUpdate(event) => {
             if let Some(ref handler) = handler!(on_message_update, event_store) {
                 let context = context(Some(event.channel_id),
                                            conn,
@@ -455,7 +562,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::PresencesReplace(event)) => {
+        Event::PresencesReplace(event) => {
             update!(update_with_presences_replace, event);
 
             if let Some(handler) = handler!(on_presence_replace, event_store) {
@@ -467,7 +574,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::PresenceUpdate(event)) => {
+        Event::PresenceUpdate(event) => {
             update!(update_with_presence_update, event);
 
             if let Some(handler) = handler!(on_presence_update, event_store) {
@@ -479,7 +586,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::ReactionAdd(event)) => {
+        Event::ReactionAdd(event) => {
             if let Some(ref handler) = handler!(on_reaction_add, event_store) {
                 let context = context(Some(event.reaction.channel_id),
                                       conn,
@@ -491,7 +598,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::ReactionRemove(event)) => {
+        Event::ReactionRemove(event) => {
             if let Some(ref handler) = handler!(on_reaction_remove, event_store) {
                 let context = context(Some(event.reaction.channel_id),
                                       conn,
@@ -503,7 +610,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::ReactionRemoveAll(event)) => {
+        Event::ReactionRemoveAll(event) => {
             if let Some(ref handler) = handler!(on_reaction_remove_all, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
@@ -515,7 +622,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::Ready(event)) => {
+        Event::Ready(event) => {
             if let Some(ref handler) = handler!(on_ready, event_store) {
                 update!(update_with_ready, event);
 
@@ -529,7 +636,7 @@ pub fn dispatch(event: Result<Event>,
                 update!(update_with_ready, event);
             }
         },
-        Ok(Event::RelationshipAdd(event)) => {
+        Event::RelationshipAdd(event) => {
             update!(update_with_relationship_add, event);
 
             if let Some(ref handler) = handler!(on_relationship_addition, event_store) {
@@ -541,7 +648,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::RelationshipRemove(event)) => {
+        Event::RelationshipRemove(event) => {
             update!(update_with_relationship_remove, event);
 
             if let Some(ref handler) = handler!(on_relationship_removal, event_store) {
@@ -553,7 +660,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::Resumed(event)) => {
+        Event::Resumed(event) => {
             if let Some(ref handler) = handler!(on_resume, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
@@ -563,7 +670,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::TypingStart(event)) => {
+        Event::TypingStart(event) => {
             if let Some(ref handler) = handler!(on_typing_start, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
@@ -575,7 +682,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::Unknown(event)) => {
+        Event::Unknown(event) => {
             if let Some(ref handler) = handler!(on_unknown, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
@@ -585,58 +692,96 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::UserGuildSettingsUpdate(event)) => {
-            let before = update!(update_with_user_guild_settings_update, event);
-
+        Event::UserGuildSettingsUpdate(event) => {
             if let Some(ref handler) = handler!(on_user_guild_settings_update, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, before, event.settings);
-                });
+                feature_state! {{
+                    let before = update!(update_with_user_guild_settings_update, event);
+
+                    thread::spawn(move || {
+                        (handler)(context, before, event.settings);
+                    });
+                } else {
+                    thread::spawn(move || {
+                        (handler)(context, event.settings);
+                    });
+                }}
+            } else {
+                feature_state_enabled! {{
+                    let _before = update!(update_with_user_guild_settings_update, event);
+                }}
             }
         },
-        Ok(Event::UserNoteUpdate(event)) => {
-            let before = update!(update_with_user_note_update, event);
-
+        Event::UserNoteUpdate(event) => {
             if let Some(ref handler) = handler!(on_note_update, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.user_id, before, event.note);
-                });
+                feature_state! {{
+                    let before = update!(update_with_user_note_update, event);
+
+                    thread::spawn(move || {
+                        (handler)(context, event.user_id, before, event.note);
+                    });
+                } else {
+                    thread::spawn(move || {
+                        (handler)(context, event.user_id, event.note);
+                    });
+                }}
+            } else {
+                feature_state_enabled! {{
+                    let _before = update!(update_with_user_note_update, event);
+                }}
             }
         },
-        Ok(Event::UserSettingsUpdate(event)) => {
+        Event::UserSettingsUpdate(event) => {
             if let Some(ref handler) = handler!(on_user_settings_update, event_store) {
-                let before = update!(update_with_user_settings_update, event, true);
-                let after = STATE.lock().unwrap().settings.clone();
-
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, before.unwrap(), after.unwrap());
-                });
+                feature_state! {{
+                    let before = update!(update_with_user_settings_update, event, true);
+                    let after = STATE.lock().unwrap().settings.clone();
+
+                    thread::spawn(move || {
+                        (handler)(context, before.unwrap(), after.unwrap());
+                    });
+                } else {
+                    thread::spawn(move || {
+                        (handler)(context, event);
+                    });
+                }}
             } else {
-                update!(update_with_user_settings_update, event, false);
+                feature_state_enabled! {{
+                    update!(update_with_user_settings_update, event, false);
+                }}
             }
         },
-        Ok(Event::UserUpdate(event)) => {
-            let before = update!(update_with_user_update, event);
-
+        Event::UserUpdate(event) => {
             if let Some(ref handler) = handler!(on_user_update, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, before, event.current_user);
-                });
+                feature_state! {{
+                    let before = update!(update_with_user_update, event);
+
+                    thread::spawn(move || {
+                        (handler)(context, before, event.current_user);
+                    });
+                } else {
+                    thread::spawn(move || {
+                        (handler)(context, event.current_user);
+                    });
+                }}
+            } else {
+                feature_state_enabled! {{
+                    let _before = update!(update_with_user_update, event);
+                }}
             }
         },
-        Ok(Event::VoiceServerUpdate(event)) => {
+        Event::VoiceServerUpdate(event) => {
             if let Some(ref handler) = handler!(on_voice_server_update, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
@@ -646,7 +791,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::VoiceStateUpdate(event)) => {
+        Event::VoiceStateUpdate(event) => {
             update!(update_with_voice_state_update, event);
 
             if let Some(ref handler) = handler!(on_voice_state_update, event_store) {
@@ -658,7 +803,7 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Ok(Event::WebhookUpdate(event)) => {
+        Event::WebhookUpdate(event) => {
             if let Some(ref handler) = handler!(on_webhook_update, event_store) {
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
@@ -668,18 +813,5 @@ pub fn dispatch(event: Result<Event>,
                 });
             }
         },
-        Err(_why) => {},
-    }
-}
-
-fn dispatch_message(context: Context,
-                    message: Message,
-                    event_store: Arc<Mutex<EventStore>>) {
-    if let Some(ref handler) = handler!(on_message, event_store) {
-        let handler = handler.clone();
-
-        thread::spawn(move || {
-            (handler)(context, message);
-        });
     }
 }

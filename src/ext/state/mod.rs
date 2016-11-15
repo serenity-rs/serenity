@@ -166,7 +166,7 @@ impl State {
                 self.update_with_guild_member_remove(event);
             },
             Event::GuildMemberUpdate(ref event) => {
-                self.update_with_guild_member_update(event, false);
+                self.update_with_guild_member_update(event);
             },
             Event::GuildMembersChunk(ref event) => {
                 self.update_with_guild_members_chunk(event);
@@ -448,10 +448,8 @@ impl State {
     }
 
     pub fn update_with_guild_member_update(&mut self,
-                                           event: &GuildMemberUpdateEvent,
-                                           old: bool)
+                                           event: &GuildMemberUpdateEvent)
                                            -> Option<Member> {
-
         if let Some(guild) = self.guilds.get_mut(&event.guild_id) {
             let mut found = false;
 

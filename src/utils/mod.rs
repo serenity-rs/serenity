@@ -1,7 +1,17 @@
 //! A set of utilities to help with common use cases that are not required to
 //! fully use the library.
 
+#[macro_use]
+pub mod macros;
+
 pub mod builder;
+
+mod colour;
+
+#[cfg(feature = "extras")]
+mod message_builder;
+
+pub use self::colour::Colour;
 
 use base64;
 use std::ffi::OsStr;
@@ -10,10 +20,7 @@ use std::io::Read;
 use std::path::Path;
 use ::internal::prelude::*;
 
-mod colour;
-mod message_builder;
-
-pub use self::colour::Colour;
+#[cfg(feature = "extras")]
 pub use self::message_builder::MessageBuilder;
 
 macro_rules! cdn_concat {
@@ -80,81 +87,6 @@ pub fn into_array(value: Value) -> Result<Vec<Value>> {
     match value {
         Value::Array(v) => Ok(v),
         value => Err(Error::Decode("Expected array", value)),
-    }
-}
-
-macro_rules! request {
-    ($route:expr, $method:ident($body:expr), $url:expr, $($rest:tt)*) => {{
-        let client = HyperClient::new();
-        try!(request($route, || client
-            .$method(&format!(api!($url), $($rest)*))
-            .body(&$body)))
-    }};
-    ($route:expr, $method:ident($body:expr), $url:expr) => {{
-        let client = HyperClient::new();
-        try!(request($route, || client
-            .$method(api!($url))
-            .body(&$body)))
-    }};
-    ($route:expr, $method:ident, $url:expr, $($rest:tt)*) => {{
-        let client = HyperClient::new();
-        try!(request($route, || client
-            .$method(&format!(api!($url), $($rest)*))))
-    }};
-    ($route:expr, $method:ident, $url:expr) => {{
-        let client = HyperClient::new();
-        try!(request($route, || client
-            .$method(api_concat!($url))))
-    }};
-}
-
-// Enable/disable check for voice
-macro_rules! feature_voice {
-    ($enabled:block) => {
-        {
-            feature_voice_enabled! {{
-                $enabled
-            }}
-        }
-    };
-    ($enabled:block $disabled:block) => {
-        {
-            feature_voice_enabled! {{
-                $enabled
-            }}
-
-            feature_voice_disabled! {{
-                $disabled
-            }}
-        }
-    };
-}
-
-#[cfg(feature="voice")]
-macro_rules! feature_voice_enabled {
-    ($enabled:block) => {
-        {
-            $enabled
-        }
-    }
-}
-
-#[cfg(not(feature="voice"))]
-macro_rules! feature_voice_enabled {
-    ($enabled:block) => {}
-}
-
-#[cfg(feature="voice")]
-macro_rules! feature_voice_disabled {
-    ($disabled:block) => {}
-}
-
-#[cfg(not(feature="voice"))]
-macro_rules! feature_voice_disabled {
-    ($disabled:block) => {
-        {
-            $disabled
-        }
     }
 }
 

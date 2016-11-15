@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::io::Read;
 use std::sync::{Arc, Mutex};
 use super::connection::Connection;
-use super::{STATE, http};
+use super::http;
 use super::login_type::LoginType;
 use ::utils::builder::{
     CreateInvite,
@@ -18,6 +18,9 @@ use ::utils::builder::{
 use ::internal::prelude::*;
 use ::model::*;
 use ::utils;
+
+#[cfg(feature = "state")]
+use super::STATE;
 
 #[derive(Clone)]
 pub struct Context {
@@ -553,7 +556,7 @@ impl Context {
         let guild_id = guild_id.into();
         let role_id = role_id.into();
 
-        let map = {
+        let map = feature_state! {{
             let state = STATE.lock().unwrap();
 
             let role = if let Some(role) = {
@@ -565,7 +568,9 @@ impl Context {
             };
 
             f(EditRole::new(role)).0.build()
-        };
+        } else {
+            f(EditRole::default()).0.build()
+        }};
 
         http::edit_role(guild_id.0, role_id.0, map)
     }
@@ -601,9 +606,11 @@ impl Context {
         where C: Into<ChannelId> {
         let channel_id = channel_id.into();
 
-        if let Some(channel) = STATE.lock().unwrap().find_channel(channel_id) {
-            return Ok(channel.clone())
-        }
+        feature_state_enabled! {{
+            if let Some(channel) = STATE.lock().unwrap().find_channel(channel_id) {
+                return Ok(channel.clone())
+            }
+        }}
 
         http::get_channel(channel_id.0)
     }
@@ -612,13 +619,13 @@ impl Context {
         -> Result<HashMap<ChannelId, PublicChannel>> where G: Into<GuildId> {
         let guild_id = guild_id.into();
 
-        {
+        feature_state_enabled! {{
             let state = STATE.lock().unwrap();
 
             if let Some(guild) = state.find_guild(guild_id) {
                 return Ok(guild.channels.clone());
             }
-        }
+        }}
 
         let mut channels = HashMap::new();
 
@@ -677,13 +684,13 @@ impl Context {
         let guild_id = guild_id.into();
         let user_id = user_id.into();
 
-        {
+        feature_state_enabled! {{
             let state = STATE.lock().unwrap();
 
             if let Some(member) = state.find_member(guild_id, user_id) {
                 return Ok(member.clone());
             }
-        }
+        }}
 
         http::get_member(guild_id.0, user_id.0)
     }

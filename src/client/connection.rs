@@ -36,25 +36,6 @@ use ::model::{
 #[cfg(feature="voice")]
 use ::ext::voice::Manager as VoiceManager;
 
-#[cfg(feature="voice")]
-macro_rules! connection {
-    ($($name1:ident: $val1:expr),*; $($name2:ident: $val2:expr,)*) => {
-        Connection {
-            $($name1: $val1,)*
-            $($name2: $val2,)*
-        }
-    }
-}
-
-#[cfg(not(feature="voice"))]
-macro_rules! connection {
-    ($($name1:ident: $val1:expr),*; $($name2:ident: $val2:expr,)*) => {
-        Connection {
-            $($name1: $val1,)*
-        }
-    }
-}
-
 #[doc(hidden)]
 pub enum Status {
     SendMessage(Value),

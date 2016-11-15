@@ -93,12 +93,18 @@ impl Default for EditRole {
     ///
     /// [general permissions set]: ../model/permissions/fn.general.html
     fn default() -> EditRole {
-        EditRole(ObjectBuilder::new()
+        let mut map = ObjectBuilder::new()
             .insert("color", 10070709)
             .insert("hoist", false)
             .insert("mentionable", false)
-            .insert("name", String::from("new role"))
-            .insert("permissions", permissions::general().bits())
-            .insert("position", 1))
+            .insert("name", "new role".to_owned());
+
+        feature_extras_enabled! {{
+            map = map.insert("permissions", permissions::general().bits());
+        }}
+
+        map = map.insert("position", 1);
+
+        EditRole(map)
     }
 }

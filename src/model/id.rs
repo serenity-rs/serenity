@@ -1,15 +1,20 @@
 use super::*;
+
+#[cfg(feature = "methods")]
 use ::client::{STATE, http};
+#[cfg(feature = "methods")]
 use ::internal::prelude::*;
 
 impl ChannelId {
     /// Search the state for the channel with the Id.
+    #[cfg(feature="methods")]
     pub fn find(&self) -> Option<Channel> {
         STATE.lock().unwrap().find_channel(*self)
     }
 
     /// Search the state for the channel. If it can't be found, the channel is
     /// requested over REST.
+    #[cfg(feature="methods")]
     pub fn get(&self) -> Result<Channel> {
         if let Some(channel) = STATE.lock().unwrap().find_channel(*self) {
             return Ok(channel);
@@ -34,6 +39,7 @@ impl ChannelId {
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[cfg(feature="methods")]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
         http::get_channel_webhooks(self.0)
     }
@@ -69,6 +75,7 @@ impl From<Emoji> for EmojiId {
 
 impl GuildId {
     /// Search the state for the guild.
+    #[cfg(feature="methods")]
     pub fn find(&self) -> Option<LiveGuild> {
         STATE.lock().unwrap().find_guild(*self).cloned()
     }
@@ -77,6 +84,7 @@ impl GuildId {
     ///
     /// Note that this will not be a complete guild, as REST does not send
     /// all data with a guild retrieval.
+    #[cfg(feature="methods")]
     pub fn get(&self) -> Result<Guild> {
         http::get_guild(self.0)
     }
@@ -96,6 +104,7 @@ impl GuildId {
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[cfg(feature="methods")]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
         http::get_guild_webhooks(self.0)
     }
@@ -145,6 +154,7 @@ impl From<Role> for RoleId {
 
 impl RoleId {
     /// Search the state for the role.
+    #[cfg(feature="methods")]
     pub fn find(&self) -> Option<Role> {
         STATE.lock()
             .unwrap()
@@ -206,6 +216,7 @@ impl WebhookId {
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[cfg(feature="methods")]
     pub fn webhooks(&self) -> Result<Webhook> {
         http::get_webhook(self.0)
     }
