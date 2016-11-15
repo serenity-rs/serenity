@@ -17,7 +17,7 @@ use super::*;
 use ::utils::builder::{EditGuild, EditMember, EditRole};
 use ::client::{STATE, http};
 use ::internal::prelude::*;
-use ::utils::{Colour, decode_array};
+use ::utils::decode_array;
 
 impl From<Guild> for GuildContainer {
     fn from(guild: Guild) -> GuildContainer {
@@ -919,14 +919,6 @@ impl PossibleGuild<Guild> {
 }
 
 impl Role {
-    /// Generates a colour representation of the role. See
-    /// [the documentation] on Colour for more information.
-    ///
-    /// [the documentation]: ../utils/struct.Colour.html
-    pub fn colour(&self) -> Colour {
-        Colour::new(self.colour as u32)
-    }
-
     /// Deletes the role.
     ///
     /// **Note** Requires the [Manage Roles] permission.

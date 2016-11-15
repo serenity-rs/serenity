@@ -28,7 +28,7 @@ use self::utils::*;
 use std::collections::HashMap;
 use std::fmt;
 use ::internal::prelude::*;
-use ::utils::decode_array;
+use ::utils::{Colour, decode_array};
 
 // All of the enums and structs are imported here. These are built from the
 // build script located at `./build.rs`.

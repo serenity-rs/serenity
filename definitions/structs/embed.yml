@@ -7,10 +7,10 @@ fields:
     optional: true
     type: EmbedAuthor
   - name: colour
-    description: The color code of the embed.
+    description: The colour code of the embed.
     from: color
-    default: "0"
-    type: u64
+    default: Colour::default()
+    type: Colour
   - name: description
     description: The description of the embed. This is the long string of text.
     optional: true

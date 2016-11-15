@@ -6,9 +6,10 @@ fields:
     type: RoleId
   - name: colour
     from: color
-    description: "The colour of the role in 0xRRGGBB format. Use `role.colour()`
-      to retrieve an ergonomic color representation."
-    type: u64
+    description: >
+      The colour of the role in 0xRRGGBB format. This is an ergonomic
+      representation of the inner value.
+    type: Colour
   - name: hoist
     description: "Whether the role is pinned above lesser roles, causing members
       in the role to be seen above others."

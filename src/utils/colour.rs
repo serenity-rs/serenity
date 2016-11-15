@@ -1,4 +1,5 @@
 use std::default::Default;
+use ::internal::prelude::*;
 
 macro_rules! colour {
     ($struct_:ident; $($name:ident, $val:expr;)*) => {
@@ -49,6 +50,7 @@ macro_rules! colour {
 /// [`Role`]: ../model/struct.Role.html
 /// [`dark_teal`]: #method.dark_teal
 /// [`get_g`]: #method.get_g
+#[derive(Clone, Copy, Debug)]
 pub struct Colour {
     /// The raw inner integer value of this Colour. This is worked with to
     /// generate values such as the red component value.
@@ -60,6 +62,15 @@ impl Colour {
     pub fn new(value: u32) -> Colour {
         Colour {
             value: value,
+        }
+    }
+
+    #[doc(hidden)]
+    pub fn decode(value: Value) -> Result<Colour> {
+        match value {
+            Value::U64(v) => Ok(Colour::new(v as u32)),
+            Value::I64(v) => Ok(Colour::new(v as u32)),
+            other => Err(Error::Decode("Expected valid colour", other)),
         }
     }
 
