@@ -120,6 +120,18 @@ impl Guild {
         self.roles.get(&role_id.into())
     }
 
+    /// Edits the current user's nickname for the guild.
+    ///
+    /// Pass `None` to reset the nickname.
+    ///
+    /// **Note**: Requires the [Change Nickname] permission.
+    ///
+    /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
+    #[inline]
+    pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
+        http::edit_nickname(self.id.0, new_nickname)
+    }
+
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
@@ -394,6 +406,29 @@ impl LiveGuild {
             },
             Err(why) => Err(why),
         }
+    }
+
+    /// Edits the current user's nickname for the guild.
+    ///
+    /// Pass `None` to reset the nickname.
+    ///
+    /// **Note**: Requires the [Change Nickname] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
+    /// not have permission to change their own nickname.
+    ///
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
+    pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
+        let req = permissions::CHANGE_NICKNAME;
+
+        if !try!(self.has_perms(req)) {
+            return Err(Error::Client(ClientError::InvalidPermissions(req)));
+        }
+
+        http::edit_nickname(self.id.0, new_nickname)
     }
 
     /// Attempts to retrieve a [`PublicChannel`] with the given Id.

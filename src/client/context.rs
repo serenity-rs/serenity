@@ -514,6 +514,20 @@ impl Context {
         http::edit_member(guild_id.into().0, user_id.into().0, map)
     }
 
+    /// Edits the current user's nickname for the provided [`Guild`] via its Id.
+    ///
+    /// Pass `None` to reset the nickname.
+    ///
+    /// **Note**: Requires the [Change Nickname] permission.
+    ///
+    /// [`Guild`]: ../../model/struct.Guild.html
+    /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
+    #[inline]
+    pub fn edit_nickname<G>(&self, guild_id: G, new_nickname: Option<&str>)
+        -> Result<()> where G: Into<GuildId> {
+        http::edit_nickname(guild_id.into().0, new_nickname)
+    }
+
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&mut self, f: F)
         -> Result<CurrentUser> {
         let user = try!(http::get_current_user());

@@ -84,6 +84,7 @@ pub enum Route {
     GuildsIdIntegrationsIdSync(u64),
     GuildsIdInvites(u64),
     GuildsIdMembersId(u64),
+    GuildsIdMembersMeNick(u64),
     GuildsIdPrune(u64),
     GuildsIdRegions(u64),
     GuildsIdRoles(u64),

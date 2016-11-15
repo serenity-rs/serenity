@@ -31,6 +31,7 @@ use hyper::status::StatusCode;
 use hyper::{Error as HyperError, Result as HyperResult, Url, header};
 use multipart::client::Multipart;
 use self::ratelimiting::Route;
+use serde_json::builder::ObjectBuilder;
 use serde_json;
 use std::default::Default;
 use std::io::{ErrorKind as IoErrorKind, Read};
@@ -449,6 +450,23 @@ pub fn edit_message(channel_id: u64,
                             message_id);
 
     Message::decode(try!(serde_json::from_reader(response)))
+}
+
+/// Edits the current user's nickname for the provided [`Guild`] via its Id.
+///
+/// Pass `None` to reset the nickname.
+///
+/// [`Guild`]: ../../model/struct.Guild.html
+pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>)
+    -> Result<()> {
+    let map = ObjectBuilder::new().insert("nick", new_nickname).build();
+    let body = try!(serde_json::to_string(&map));
+    let response = request!(Route::GuildsIdMembersMeNick(guild_id),
+                            patch(body),
+                            "/guilds/{}/members/@me/nick",
+                            guild_id);
+
+    verify(200, response)
 }
 
 pub fn edit_note(user_id: u64, map: Value) -> Result<()> {
@@ -1130,6 +1148,7 @@ fn verify(expected_status_code: u16,
           mut response: HyperResponse)
           -> Result<()> {
     let expected_status = match expected_status_code {
+        200 => StatusCode::Ok,
         204 => StatusCode::NoContent,
         401 => StatusCode::Unauthorized,
         _ => {
