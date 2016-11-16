@@ -9,6 +9,9 @@ cache:
   directories:
     - $TRAVIS_BUILD_DIR/target
     - $HOME/.cargo
+matrix:
+  allow_failures:
+    - nightly
 before_script:
   - git clone git://github.com/jedisct1/libsodium.git
   - cd libsodium
