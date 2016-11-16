@@ -1,15 +1,21 @@
 language: rust
 rust:
-    - beta
-    - nightly
-    - stable
-sudo: false
+  - stable
+  - beta
+  - nightly
 os:
-    - linux
+  - linux
 cache:
-    directories:
-        - $TRAVIS_BUILD_DIR/target
-        - $HOME/.cargo
-
+  directories:
+    - $TRAVIS_BUILD_DIR/target
+    - $HOME/.cargo
+before_script:
+  - git clone git://github.com/jedisct1/libsodium.git
+  - cd libsodium
+  - ./autogen.sh
+  - ./configure && make
+  - sudo make install
+  - sudo ldconfig
+  - cd ..
 script:
-    - cargo build --features voice
+  - cargo test --all-features
