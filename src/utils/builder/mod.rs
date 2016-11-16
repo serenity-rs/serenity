@@ -16,7 +16,13 @@ mod edit_role;
 mod execute_webhook;
 mod get_messages;
 
-pub use self::create_embed::CreateEmbed;
+pub use self::create_embed::{
+    CreateEmbed,
+    CreateEmbedAuthor,
+    CreateEmbedField,
+    CreateEmbedThumbnail,
+    CreateEmbedVideo,
+};
 pub use self::create_invite::CreateInvite;
 pub use self::create_message::CreateMessage;
 pub use self::edit_channel::EditChannel;

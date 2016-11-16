@@ -1,13 +1,14 @@
 use std::fmt;
 use super::utils::{into_map, into_string, remove, warn_field};
 use super::{
+    CurrentUser,
     FriendSourceFlags,
     GuildContainer,
     GuildId,
     Mention,
     RoleId,
     UserSettings,
-    User
+    User,
 };
 use ::internal::prelude::*;
 use ::utils::decode_array;
@@ -21,6 +22,14 @@ use ::client::http;
 
 #[cfg(feature = "state")]
 use ::client::STATE;
+
+impl CurrentUser {
+    /// Returns the formatted URL of the user's icon, if one exists.
+    pub fn avatar_url(&self) -> Option<String> {
+        self.avatar.as_ref().map(|av|
+            format!(cdn_concat!("/avatars/{}/{}.jpg"), self.id, av))
+    }
+}
 
 impl User {
     /// Returns the formatted URL of the user's icon, if one exists.

@@ -276,7 +276,7 @@ impl Embed {
     #[cfg(feature = "methods")]
     #[inline(always)]
     pub fn fake<F>(f: F) -> Value where F: FnOnce(CreateEmbed) -> CreateEmbed {
-        f(CreateEmbed::default()).0.build()
+        Value::Object(f(CreateEmbed::default()).0)
     }
 }
 
