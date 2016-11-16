@@ -472,6 +472,13 @@ impl Message {
 
     /// Edits this message, replacing the original content with new content.
     ///
+    /// If editing a message and not using an embed, just return the embed
+    /// builder directly, via:
+    ///
+    /// ```rust,ignore
+    /// message.edit("new content", |f| f);
+    /// ```
+    ///
     /// **Note**: You must be the author of the message to be able to do this.
     ///
     /// **Note**: Messages must be under 2000 unicode code points.
@@ -488,7 +495,8 @@ impl Message {
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
     /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
     #[cfg(feature = "methods")]
-    pub fn edit(&mut self, new_content: &str) -> Result<()> {
+    pub fn edit<F>(&mut self, new_content: &str, embed: F) -> Result<()>
+        where F: FnOnce(CreateEmbed) -> CreateEmbed {
         if let Some(length_over) = Message::overflow_length(new_content) {
             return Err(Error::Client(ClientError::MessageTooLong(length_over)));
         }
@@ -497,11 +505,15 @@ impl Message {
             return Err(Error::Client(ClientError::InvalidUser));
         }
 
-        let map = ObjectBuilder::new()
-            .insert("content", new_content)
-            .build();
+        let mut map = ObjectBuilder::new().insert("content", new_content);
 
-        match http::edit_message(self.channel_id.0, self.id.0, map) {
+        let embed = embed(CreateEmbed::default()).0;
+
+        if !embed.is_empty() {
+            map = map.insert("embed", Value::Object(embed));
+        }
+
+        match http::edit_message(self.channel_id.0, self.id.0, map.build()) {
             Ok(edited) => {
                 mem::replace(self, edited);
 

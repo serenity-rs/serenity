@@ -6,6 +6,7 @@ use super::connection::Connection;
 use super::http;
 use super::login_type::LoginType;
 use ::utils::builder::{
+    CreateEmbed,
     CreateInvite,
     CreateMessage,
     EditChannel,
@@ -575,10 +576,17 @@ impl Context {
         http::edit_role(guild_id.0, role_id.0, map)
     }
 
-    pub fn edit_message<C, M>(&self, channel_id: C, message_id: M, text: &str)
-        -> Result<Message> where C: Into<ChannelId>, M: Into<MessageId> {
+    /// Edit a message given its Id and the Id of the channel it belongs to.
+    ///
+    /// Pass an empty string (`""`) to `text` if you are editing a message with
+    /// an embed but no content. Otherwise, `text` must be given.
+    pub fn edit_message<C, F, M>(&self, channel_id: C, message_id: M, text: &str, f: F)
+        -> Result<Message> where C: Into<ChannelId>,
+                                 F: FnOnce(CreateEmbed) -> CreateEmbed,
+                                 M: Into<MessageId> {
         let map = ObjectBuilder::new()
             .insert("content", text)
+            .insert("embed", Value::Object(f(CreateEmbed::default()).0))
             .build();
 
         http::edit_message(channel_id.into().0, message_id.into().0, map)
