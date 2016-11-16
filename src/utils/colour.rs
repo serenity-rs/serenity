@@ -65,6 +65,40 @@ impl Colour {
         }
     }
 
+    /// Generates a new Colour from an RGB value, creating an inner u32
+    /// representation.
+    ///
+    /// # Examples
+    ///
+    /// Creating a `Colour` via its RGB values will set its inner u32 correctly:
+    ///
+    /// ```rust
+    /// use serenity::utils::Colour;
+    ///
+    /// assert!(Colour::from_rgb(255, 0, 0).value == 0xFF0000);
+    /// assert!(Colour::from_rgb(217, 23, 211).value == 0xD917D3);
+    /// ```
+    ///
+    /// And you can then retrieve those same RGB values via its methods:
+    ///
+    /// ```rust
+    /// use serenity::utils::Colour;
+    ///
+    /// let colour = Colour::from_rgb(217, 45, 215);
+    ///
+    /// assert_eq!(colour.get_r(), 217);
+    /// assert_eq!(colour.get_g(), 45);
+    /// assert_eq!(colour.get_b(), 215);
+    /// assert_eq!(colour.get_tuple(), (217, 45, 215));
+    /// ```
+    pub fn from_rgb(r: u8, g: u8, b: u8) -> Colour {
+        let mut uint = r as u32;
+        uint = (uint << 8) | (g as u32);
+        uint = (uint << 8) | (b as u32);
+
+        Colour::new(uint)
+    }
+
     #[doc(hidden)]
     pub fn decode(value: Value) -> Result<Colour> {
         match value {
