@@ -279,12 +279,12 @@ impl State {
             Channel::Group(ref group) => {
                 let ch = self.groups.insert(group.channel_id, group.clone());
 
-                ch.map(|x| Channel::Group(x))
+                ch.map(Channel::Group)
             },
             Channel::Private(ref channel) => {
                 let ch = self.private_channels.insert(channel.id, channel.clone());
 
-                ch.map(|x| Channel::Private(x))
+                ch.map(Channel::Private)
             },
             Channel::Public(ref channel) => {
                 let ch = self.guilds
@@ -298,7 +298,7 @@ impl State {
                     _ => None,
                 };
 
-                ch.map(|x| Channel::Public(x))
+                ch.map(Channel::Public)
             },
         }
     }
@@ -307,11 +307,11 @@ impl State {
         -> Option<Channel> {
         match event.channel {
             Channel::Group(ref group) => {
-                self.groups.remove(&group.channel_id).map(|x| Channel::Group(x))
+                self.groups.remove(&group.channel_id).map(Channel::Group)
             },
             Channel::Private(ref channel) => {
                 self.private_channels.remove(&channel.id)
-                    .map(|private| Channel::Private(private))
+                    .map(Channel::Private)
             },
             Channel::Public(ref channel) => {
                 let ch = self.guilds
@@ -666,9 +666,10 @@ impl State {
                                             event: &UserSettingsUpdateEvent,
                                             old: bool)
                                             -> Option<UserSettings> {
-        let item = match old {
-            true => self.settings.clone(),
-            false => None,
+        let item = if old {
+            self.settings.clone()
+        } else {
+            None
         };
 
         self.settings
