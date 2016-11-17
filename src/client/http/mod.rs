@@ -73,6 +73,24 @@ pub fn add_group_recipient(group_id: u64, user_id: u64)
                          user_id))
 }
 
+/// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
+///
+/// **Note**: Requires the [Manage Roles] permission and respect of role
+/// hierarchy.
+///
+/// [`Guild`]: ../../model/struct.Guild.html
+/// [`Member`]: ../../model/struct.Member.html
+/// [`Role`]: ../../model/struct.Role.html
+/// [Manage Roles]: ../../model/permissions/constant.MANAGE_ROLES.html
+pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
+    verify(204, request!(Route::GuildsIdMembersIdRolesId(guild_id),
+                         put,
+                         "/guilds/{}/members/{}/roles/{}",
+                         guild_id,
+                         user_id,
+                         role_id))
+}
+
 pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8)
     -> Result<()> {
     verify(204, request!(Route::GuildsIdBansUserId(guild_id),
@@ -1093,6 +1111,24 @@ pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
                          "/guilds/{}/bans/{}",
                          guild_id,
                          user_id))
+}
+
+/// Removes a single [`Role`] from a [`Member`] in a [`Guild`].
+///
+/// **Note**: Requires the [Manage Roles] permission and respect of role
+/// hierarchy.
+///
+/// [`Guild`]: ../../model/struct.Guild.html
+/// [`Member`]: ../../model/struct.Member.html
+/// [`Role`]: ../../model/struct.Role.html
+/// [Manage Roles]: ../../model/permissions/constant.MANAGE_ROLES.html
+pub fn remove_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
+    verify(204, request!(Route::GuildsIdMembersIdRolesId(guild_id),
+                         delete,
+                         "/guilds/{}/members/{}/roles/{}",
+                         guild_id,
+                         user_id,
+                         role_id))
 }
 
 pub fn start_guild_prune(guild_id: u64, map: Value)

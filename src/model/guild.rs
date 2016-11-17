@@ -766,8 +766,8 @@ impl LiveGuild {
 }
 
 impl Member {
-    /// Adds a [`Role`] to the member, editing its roles
-    /// in-place if the request was successful.
+    /// Adds a [`Role`] to the member, editing its roles in-place if the request
+    /// was successful.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
@@ -775,7 +775,22 @@ impl Member {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature = "methods")]
     pub fn add_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
-        self.add_roles(&[role_id.into()])
+        let role_id = role_id.into();
+
+        if self.roles.contains(&role_id) {
+            return Ok(());
+        }
+
+        let guild_id = try!(self.find_guild());
+
+        match http::add_member_role(guild_id.0, self.user.id.0, role_id.0) {
+            Ok(()) => {
+                self.roles.push(role_id);
+
+                Ok(())
+            },
+            Err(why) => Err(why),
+        }
     }
 
     /// Adds one or multiple [`Role`]s to the member, editing
@@ -864,7 +879,8 @@ impl Member {
             .ok_or(Error::Client(ClientError::GuildNotFound))
     }
 
-    /// Removes a [`Role`] from the member.
+    /// Removes a [`Role`] from the member, editing its roles in-place if the
+    /// request was successful.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
@@ -872,7 +888,22 @@ impl Member {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature = "methods")]
     pub fn remove_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
-        self.remove_roles(&[role_id.into()])
+        let role_id = role_id.into();
+
+        if !self.roles.contains(&role_id) {
+            return Ok(());
+        }
+
+        let guild_id = try!(self.find_guild());
+
+        match http::remove_member_role(guild_id.0, self.user.id.0, role_id.0) {
+            Ok(()) => {
+                self.roles.retain(|r| r.0 != role_id.0);
+
+                Ok(())
+            },
+            Err(why) => Err(why),
+        }
     }
 
     /// Removes one or multiple [`Role`]s from the member.
