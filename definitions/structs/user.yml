@@ -11,8 +11,7 @@ fields:
     default: 'false'
     type: bool
   - name: discriminator
-    custom: parse_discriminator
-    type: u16
+    type: string
   - name: name
     from: username
     type: string

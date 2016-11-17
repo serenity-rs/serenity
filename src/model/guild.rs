@@ -517,14 +517,9 @@ impl LiveGuild {
         let (name, discrim) = if let Some(pos) = hash_pos {
             let split = name.split_at(pos);
 
-            let discrim = match split.1.parse::<u16>() {
-                Ok(discrim) => discrim,
-                Err(_why) => return None,
-            };
-
-            (split.0, Some(discrim))
+            (split.0, Some(split.1))
         } else {
-            (&name[..], None::<u16>)
+            (&name[..], None)
         };
 
         self.members
