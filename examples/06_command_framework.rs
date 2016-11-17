@@ -55,7 +55,7 @@ fn ping_command(_context: Context, message: Message, _args: Vec<String>) {
 
 fn owner_check(_context: &Context, message: &Message) -> bool {
     // Replace 7 with your ID
-    message.author.id.0 == 7u64
+    message.author.id == 7
 }
 
 fn some_complex_command(context: Context, _msg: Message, args: Vec<String>) {

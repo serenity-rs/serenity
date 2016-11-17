@@ -56,7 +56,7 @@ macro_rules! id {
     ($(#[$attr:meta] $name:ident;)*) => {
         $(
             #[$attr]
-            #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+            #[derive(Copy, Clone, Debug, Eq, Hash, PartialOrd, Ord)]
             pub struct $name(pub u64);
 
             impl $name {
@@ -74,6 +74,18 @@ macro_rules! id {
             impl From<u64> for $name {
                 fn from(id_as_u64: u64) -> $name {
                     $name(id_as_u64)
+                }
+            }
+
+            impl PartialEq for $name {
+                fn eq(&self, other: &Self) -> bool {
+                    self.0 == other.0
+                }
+            }
+
+            impl PartialEq<u64> for $name {
+                fn eq(&self, u: &u64) -> bool {
+                    self.0 == *u
                 }
             }
         )*
