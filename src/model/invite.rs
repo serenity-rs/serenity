@@ -3,15 +3,39 @@ use ::client::http;
 use ::internal::prelude::*;
 use super::{permissions, utils};
 
+#[cfg(feature = "state")]
+use ::client::STATE;
+
 impl Invite {
-    /// Accepts the invite.
+    /// Accepts the invite, placing the current user in the [`Guild`] that the
+    /// invite was for. This will fire the [`Client::on_guild_create`] handler
+    /// once the associated event is received.
     ///
-    /// **Note**: This will fail if you are already in the [`Guild`], or are
+    /// **Note**: This will fail if you are already in the `Guild`, or are
     /// banned. A ban is equivilant to an IP ban.
     ///
+    /// **Note**: Requires that the current user be a user account. Bots can not
+    /// accept invites. Instead they must be accepted via OAuth2 authorization
+    /// links. These are in the format of:
+    ///
+    /// `https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::InvalidOperationAsBot`] if the current user is
+    /// a bot user.
+    ///
+    /// [`ClientError::InvalidOperationAsBot`]: enum.ClientError.html#variant.InvalidOperationAsBot
+    /// [`Client::on_guild_create`]: ../client/struct.Client.html#method.on_guild_create
     /// [`Guild`]: struct.Guild.html
     #[cfg(feature="methods")]
     pub fn accept(&self) -> Result<Invite> {
+        feature_state_enabled! {{
+            if STATE.lock().unwrap().user.bot {
+                return Err(Error::Client(ClientError::InvalidOperationAsBot));
+            }
+        }}
+
         http::accept_invite(&self.code)
     }
 
@@ -39,14 +63,30 @@ impl Invite {
 }
 
 impl RichInvite {
-    /// Accepts the invite.
+    /// Accepts the invite, placing the current user in the [`Guild`] that the
+    /// invite was for. This will fire the [`Client::on_guild_create`] handler
+    /// once the associated event is received.
     ///
     /// Refer to the documentation for [`Invite::accept`] for restrictions on
     /// accepting an invite.
     ///
+    /// **Note**: Requires that the current user be a user account.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::InvalidOperationAsBot`] if the current user is
+    /// a bot user.
+    ///
+    /// [`ClientError::InvalidOperationAsBot`]: enum.ClientError.html#variant.InvalidOperationAsBot
     /// [`Invite::accept`]: struct.Invite.html#method.accept
     #[cfg(feature="methods")]
     pub fn accept(&self) -> Result<Invite> {
+        feature_state_enabled! {{
+            if STATE.lock().unwrap().user.bot {
+                return Err(Error::Client(ClientError::InvalidOperationAsBot));
+            }
+        }}
+
         http::accept_invite(&self.code)
     }
 

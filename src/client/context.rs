@@ -48,8 +48,24 @@ impl Context {
     /// Refer to the documentation for [`Invite::accept`] for restrictions on
     /// accepting an invite.
     ///
+    /// **Note**: Requires that the current user be a user account. Bots can not
+    /// accept invites. Instead they must be accepted via OAuth2 authorization
+    /// links. These are in the format of:
+    ///
+    /// `https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::InvalidOperationAsBot`] if the current user is
+    /// a bot user.
+    ///
+    /// [`ClientError::InvalidOperationAsBot`]: enum.ClientError.html#variant.InvalidOperationAsBot
     /// [`Invite::accept`]: ../model/struct.Invite.html#method.accept
     pub fn accept_invite(&self, invite: &str) -> Result<Invite> {
+        if self.login_type == LoginType::Bot {
+            return Err(Error::Client(ClientError::InvalidOperationAsBot));
+        }
+
         let code = utils::parse_invite(invite);
 
         http::accept_invite(code)
