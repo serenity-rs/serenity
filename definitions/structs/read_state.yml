@@ -11,5 +11,5 @@ fields:
     optional: true
     type: string
   - name: mention_count
-    default: 0
+    default: '0'
     type: u64
