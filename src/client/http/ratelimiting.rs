@@ -124,8 +124,10 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
         // - then, perform the request
         global.pre_hook();
 
-        if let Some(route) = ROUTES.lock().expect("routes poisoned").get_mut(&route) {
-            route.pre_hook();
+        if route != Route::None {
+            if let Some(route) = ROUTES.lock().expect("routes poisoned").get_mut(&route) {
+                route.pre_hook();
+            }
         }
 
         let response = try!(super::retry(&f));
@@ -144,18 +146,20 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
         // so check if it did from the value of the 'x-ratelimit-limit'
         // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
 
-        let redo = if response.headers.get_raw("x-ratelimit-global").is_some() {
-            global.post_hook(&response)
-        } else {
-            ROUTES.lock()
-                .expect("routes poisoned")
-                .entry(route)
-                .or_insert_with(RateLimit::default)
-                .post_hook(&response)
-        };
+        if route != Route::None {
+            let redo = if response.headers.get_raw("x-ratelimit-global").is_some() {
+                global.post_hook(&response)
+            } else {
+                ROUTES.lock()
+                    .expect("routes poisoned")
+                    .entry(route)
+                    .or_insert_with(RateLimit::default)
+                    .post_hook(&response)
+            };
 
-        if redo.unwrap_or(false) {
-            continue;
+            if redo.unwrap_or(false) {
+                continue;
+            }
         }
 
         return Ok(response);
