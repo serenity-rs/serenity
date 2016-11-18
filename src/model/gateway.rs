@@ -63,6 +63,17 @@ pub struct ChannelUpdateEvent {
 }
 
 #[derive(Clone, Debug)]
+pub struct FriendSuggestionCreateEvent {
+    pub reasons: Vec<SuggestionReason>,
+    pub suggested_user: User,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct FriendSuggestionDeleteEvent {
+    pub suggested_user_id: UserId,
+}
+
+#[derive(Clone, Debug)]
 pub struct GuildBanAddEvent {
     pub guild_id: GuildId,
     pub user: User,
@@ -373,6 +384,13 @@ pub enum Event {
     /// A user has been removed from a group
     ChannelRecipientRemove(ChannelRecipientRemoveEvent),
     ChannelUpdate(ChannelUpdateEvent),
+    /// When a suggestion for a friend is created, due to a connection like
+    /// [`Skype`].
+    ///
+    /// [`Connection::Skype`]: enum.Connection.html#variant.Skype
+    FriendSuggestionCreate(FriendSuggestionCreateEvent),
+    /// When a suggestion for a friend is removed.
+    FriendSuggestionDelete(FriendSuggestionDeleteEvent),
     GuildBanAdd(GuildBanAddEvent),
     GuildBanRemove(GuildBanRemoveEvent),
     GuildCreate(GuildCreateEvent),
@@ -510,6 +528,15 @@ impl Event {
         } else if kind == "CHANNEL_UPDATE" {
             Ok(Event::ChannelUpdate(ChannelUpdateEvent {
                 channel: try!(Channel::decode(Value::Object(value))),
+            }))
+        } else if kind == "FRIEND_SUGGESTION_CREATE" {
+            missing!(value, Event::FriendSuggestionCreate(FriendSuggestionCreateEvent {
+                reasons: try!(decode_array(try!(remove(&mut value, "reasons")), SuggestionReason::decode)),
+                suggested_user: try!(remove(&mut value, "suggested_user").and_then(User::decode)),
+            }))
+        } else if kind == "FRIEND_SUGGESTION_DELETE" {
+            missing!(value, Event::FriendSuggestionDelete(FriendSuggestionDeleteEvent {
+                suggested_user_id: try!(remove(&mut value, "suggested_user_id").and_then(UserId::decode)),
             }))
         } else if kind == "GUILD_BAN_ADD" {
             missing!(value, Event::GuildBanAdd(GuildBanAddEvent {

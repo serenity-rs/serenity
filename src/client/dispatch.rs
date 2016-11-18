@@ -265,6 +265,26 @@ fn handle_event(event: Event,
                 update!(update_with_channel_update, event);
             }
         },
+        Event::FriendSuggestionCreate(event) => {
+            if let Some(ref handler) = handler!(on_friend_suggestion_create, event_store) {
+                let context = context(None, conn, login_type);
+                let handler = handler.clone();
+
+                thread::spawn(move || {
+                    (handler)(context, event.suggested_user, event.reasons);
+                });
+            }
+        },
+        Event::FriendSuggestionDelete(event) => {
+            if let Some(ref handler) = handler!(on_friend_suggestion_delete, event_store) {
+                let context = context(None, conn, login_type);
+                let handler = handler.clone();
+
+                thread::spawn(move || {
+                    (handler)(context, event.suggested_user_id);
+                });
+            }
+        },
         Event::GuildBanAdd(event) => {
             if let Some(ref handler) = handler!(on_guild_ban_addition, event_store) {
                 let context = context(None, conn, login_type);

@@ -520,6 +520,26 @@ impl Client {
             .on_channel_update = Some(Arc::new(handler));
     }
 
+    /// Attaches a handler for when a [`FriendSuggestionCreate`] is received.
+    ///
+    /// [`FriendSuggestionCreate`]: ../model/enum.Event.html#variant.FriendSuggestionCreate
+    pub fn on_friend_suggestion_create<F>(&mut self, handler: F)
+        where F: Fn(Context, User, Vec<SuggestionReason>) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_friend_suggestion_create = Some(Arc::new(handler));
+    }
+
+    /// Attaches a handler for when a [`FriendSuggestionDelete`] is received.
+    ///
+    /// [`FriendSuggestionDelete`]: ../model/enum.Event.html#variant.FriendSuggestionDelete
+    pub fn on_friend_suggestion_delete<F>(&mut self, handler: F)
+        where F: Fn(Context, UserId) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_friend_suggestion_delete = Some(Arc::new(handler));
+    }
+
     /// Attaches a handler for when a [`GuildCreate`] is received.
     ///
     /// [`GuildCreate`]: ../model/enum.Event.html#variant.GuildCreate

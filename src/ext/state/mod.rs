@@ -258,6 +258,8 @@ impl State {
                 self.update_with_voice_state_update(event);
             },
             Event::ChannelPinsAck(_) |
+            Event::FriendSuggestionCreate(_) |
+            Event::FriendSuggestionDelete(_) |
             Event::GuildBanAdd(_) |
             Event::GuildBanRemove(_) |
             Event::GuildIntegrationsUpdate(_) |

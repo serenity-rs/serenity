@@ -38,6 +38,8 @@ pub struct EventStore {
     pub on_channel_recipient_addition: Option<Arc<Fn(Context, ChannelId, User) + Send + Sync + 'static>>,
     pub on_channel_recipient_removal: Option<Arc<Fn(Context, ChannelId, User) + Send + Sync + 'static>>,
     pub on_channel_update: Option<Arc<Fn(Context, Option<Channel>, Channel) + Send + Sync + 'static>>,
+    pub on_friend_suggestion_create: Option<Arc<Fn(Context, User, Vec<SuggestionReason>) + Send + Sync + 'static>>,
+    pub on_friend_suggestion_delete: Option<Arc<Fn(Context, UserId) + Send + Sync + 'static>>,
     pub on_guild_ban_addition: Option<Arc<Fn(Context, GuildId, User) + Send + Sync + 'static>>,
     pub on_guild_ban_removal: Option<Arc<Fn(Context, GuildId, User) + Send + Sync + 'static>>,
     pub on_guild_create: Option<Arc<Fn(Context, LiveGuild) + Send + Sync + 'static>>,
