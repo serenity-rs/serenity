@@ -861,7 +861,7 @@ impl Client {
                                          self.framework.clone(),
                                          self.login_type,
                                          self.event_store.clone());
-                            } {
+                            } else {
                                 dispatch(Ok(Event::Ready(ready)),
                                          connection.clone(),
                                          self.login_type,
@@ -881,7 +881,7 @@ impl Client {
                                                       login_type,
                                                       event_store)
                                 });
-                            } {
+                            } else {
                                 thread::spawn(move || {
                                     handle_connection(connection_clone,
                                                       login_type,
@@ -1161,7 +1161,7 @@ fn login(token: &str, login_type: LoginType) -> Client {
             login_type: login_type,
             token: token.to_owned(),
         }
-    } {
+    } else {
         Client {
             connections: Vec::default(),
             event_store: Arc::new(Mutex::new(EventStore::default())),

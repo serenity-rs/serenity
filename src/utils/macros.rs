@@ -57,7 +57,7 @@ macro_rules! feature_extras {
             }}
         }
     };
-    ($enabled:block $disabled:block) => {
+    ($enabled:block else $disabled:block) => {
         {
             feature_extras_enabled! {{
                 $enabled
@@ -107,7 +107,7 @@ macro_rules! feature_framework {
             }}
         }
     };
-    ($enabled:block $disabled:block) => {
+    ($enabled:block else $disabled:block) => {
         {
             feature_framework_enabled! {{
                 $enabled
@@ -157,7 +157,7 @@ macro_rules! feature_methods {
             }}
         }
     };
-    ($enabled:block $disabled:block) => {
+    ($enabled:block else $disabled:block) => {
         {
             feature_methods_enabled! {{
                 $enabled
@@ -258,7 +258,7 @@ macro_rules! feature_voice {
             }}
         }
     };
-    ($enabled:block $disabled:block) => {
+    ($enabled:block else $disabled:block) => {
         {
             feature_voice_enabled! {{
                 $enabled

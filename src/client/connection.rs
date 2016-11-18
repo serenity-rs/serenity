@@ -223,7 +223,7 @@ impl Connection {
                 ws_url: base_url.to_owned(),
                 manager: VoiceManager::new(tx, ready.ready.user.id.0),
             }
-        } {
+        } else {
             Connection {
                 keepalive_channel: tx.clone(),
                 last_sequence: sequence,
