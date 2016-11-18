@@ -284,6 +284,8 @@ impl Group {
     /// Adds the given user to the group. If the user is already in the group,
     /// then nothing is done.
     ///
+    /// Refer to [`http::add_group_recipient`] for more information.
+    ///
     /// **Note**: Groups have a limit of 10 recipients, including the current
     /// user.
     #[cfg(feature = "methods")]
@@ -1066,7 +1068,7 @@ impl ReactionType {
     pub fn as_data(&self) -> String {
         match *self {
             ReactionType::Custom { id, ref name } => {
-                format!("{}:{}", id, name)
+                format!("{}:{}", name, id)
             },
             ReactionType::Unicode(ref unicode) => unicode.clone(),
         }

@@ -31,7 +31,9 @@ fields:
   - name: name
     description: >
       The default name of the webhook. Note that this can be modified in a
-      payload.
+      payload via [`ExecuteWebhook::username`].
+
+        [`ExecuteWebhook::username`]: ../utils/builder/struct.ExecuteWebhook.html#method.username
     optional: true
     type: string
   - name: token

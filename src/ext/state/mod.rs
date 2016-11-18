@@ -4,10 +4,48 @@ use std::default::Default;
 use std::mem;
 use ::model::*;
 
-/// Known state composed from received events.
+/// A state of all events received over a [`Connection`], where storing at least
+/// some data from the event is possible.
+///
+/// This acts as a cache, to avoid making requests over the REST API through the
+/// [`http`] module where possible. All fields are public, and do not have
+/// getters, to allow you more flexibility with the stored data. However, this
+/// allows data to be "corrupted", and _may or may not_ cause misfunctions
+/// within the library. Mutate data at your own discretion.
+///
+/// # Use by the Context
+///
+/// The [`Context`] will automatically attempt to pull from the state for you.
+/// For example, the [`Context::get_channel`] method will attempt to find the
+/// channel in the state. If it can not find it, it will perform a request
+/// through the REST API, and then insert a clone of the channel - if found -
+/// into the State.
+///
+/// This allows you to only need to perform the `Context::get_channel` call,
+/// and not need to first search through the state - and if not found - _then_
+/// perform an HTTP request through the Context or `http` module.
+///
+/// Additionally, note that some information received through events can _not_
+/// be retrieved through the REST API. This is information such as [`Role`]s in
+/// [`LiveGuild`]s.
+///
+/// [`Connection`]: ../../client/struct.Connection.html
+/// [`Context`]: ../../client/struct.Context.html
+/// [`Context::get_channel`]: ../../client/struct.Context.html#method.get_channel
+/// [`LiveGuild`]: ../../model/struct.LiveGuild.html
+/// [`Role`]: ../../model/struct.Role.html
+/// [`http`]: ../../client/http/index.html
 #[derive(Debug, Clone)]
 pub struct State {
+    /// A map of the currently active calls that the current user knows about,
+    /// where the key is the Id of the [`PrivateChannel`] or [`Group`] hosting
+    /// the call.
+    ///
+    /// For bot users this will almost always be empty.
     pub calls: HashMap<ChannelId, Call>,
+    /// A map of the groups that the current user is in.
+    ///
+    /// For bot users this will almost always be empty.
     pub groups: HashMap<ChannelId, Group>,
     /// Settings specific to a guild.
     ///

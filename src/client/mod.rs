@@ -1,37 +1,25 @@
-//! The Client contains information about a single bot or user's "session" with
-//! Discord. Event handers and starting the connection are handled directly via
-//! the client. In addition, the [http module] and [`State`] are also
-//! automatically handled by the Client module for you.
+//! The Client contains information about a single bot or user's token, as well
+//! as event handlers. Dispatching events to configured handlers and starting
+//! the connection are handled directly via the client. In addition, the
+//! [`http`] module and [`State`] are also automatically handled by the Client
+//! module for you.
 //!
-//! A [`Context`] is provided for every handler. The
-//! context is an ergonomic way of accessing the lower-level Http struct's
-//! methods.
+//! A [`Context`] is provided for every handler. The context is an ergonomic
+//! method of accessing the lower-level http functions.
 //!
-//! The Http struct is the lower-level method of accessing the Discord REST API.
-//! Realistically there should be little reason to use this yourself, as the
-//! Context will do this for you. A possible use case of using the Http struct
-//! is if you do not have a state for purposes such as low memory requirements.
+//! The `http` module is the lower-level method of interacting with the Discord
+//! REST API. Realistically, there should be little reason to use this yourself,
+//! as the Context will do this for you. A possible use case of using the `http`
+//! module is if you do not have a State, for purposes such as low memory
+//! requirements.
 //!
-//! Creating a Client instance and adding a handler on every message
-//! receive, acting as a "ping-pong" bot is simple:
+//! Click [here][Client examples] for an example on how to use a `Client`.
 //!
-//! ```rust,ignore
-//! use serenity::Client;
-//!
-//! let mut client = Client::login_bot("my token here");
-//!
-//! client.on_message(|context, message| {
-//!     if message.content == "!ping" {
-//!         context.say("Pong!");
-//!     }
-//! });
-//!
-//! client.start();
-//! ```
-//!
+//! [`Client`]: struct.Client.html#examples
 //! [`Context`]: struct.Context.html
-//! [`State`]: ext/state/index.html
-//! [http module]: client/http/index.html
+//! [`State`]: ../ext/state/index.html
+//! [`http`]: http/index.html
+//! [Client examples]: struct.Client.html#examples
 
 pub mod http;
 
@@ -100,30 +88,45 @@ lazy_static! {
 /// # Examples
 ///
 /// Matching an [`Error`] with this variant may look something like the
-/// following for the [`Context::ban_user`] method:
+/// following for the [`Client::ban`] method, which in this example is used to
+/// re-ban all members with an odd discriminator:
 ///
-/// ```rust,ignore
-/// use serenity::client::ClientError;
+/// ```rust,no_run
+/// use serenity::client::{Client, ClientError};
 /// use serenity::Error;
+/// use std::env;
 ///
-/// // assuming you are in a context and a `guild_id` has been bound
+/// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
+/// let mut client = Client::login_bot(&token);
 ///
-/// match context.ban_user(context.guild_id, context.message.author, 8) {
-///     Ok(()) => {
-///         // Ban successful.
-///     },
-///     Err(Error::Client(ClientError::DeleteMessageDaysAmount(amount))) => {
-///         println!("Tried deleting {} days' worth of messages", amount);
-///     },
-///     Err(why) => {
-///         println!("Unexpected error: {:?}", why);
-///     },
-/// }
+/// client.on_member_unban(|context, guild_id, user| {
+///     let discriminator = match user.discriminator.parse::<u16>() {
+///         Ok(discriminator) => discriminator,
+///         Err(_why) => return,
+///     };
+///
+///     // If the user has an even discriminator, don't re-ban them.
+///     if discriminator % 2 == 0 {
+///         return;
+///     }
+///
+///     match context.ban(guild_id, user, 8) {
+///         Ok(()) => {
+///             // Ban successful.
+///         },
+///         Err(Error::Client(ClientError::DeleteMessageDaysAmount(amount))) => {
+///             println!("Failed deleting {} days' worth of messages", amount);
+///         },
+///         Err(why) => {
+///             println!("Unexpected error: {:?}", why);
+///         },
+///     }
+/// });
 /// ```
 ///
 /// [`Client`]: struct.Client.html
 /// [`Context`]: struct.Context.html
-/// [`Context::ban_user`]: struct.Context.html#method.ban_user
+/// [`Context::ban`]: struct.Context.html#method.ban
 /// [`Error::Client`]: ../enum.Error.html#variant.Client
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum ClientError {
@@ -222,7 +225,50 @@ pub enum ClientError {
     UnknownStatus(u16),
 }
 
+/// The Client is the way to "login" and be able to start sending authenticated
+/// requests over the REST API, as well as initializing a WebSocket
+/// [`Connection`]. Refer to `Connection`'s [information on using sharding] for
+/// more information.
+///
+/// # Event Handlers
+///
+/// Event handlers can be configured. For example, the event handler
+/// [`on_message`] will be dispatched to whenever a [`Event::MessageCreate`] is
+/// received over the connection.
+///
+/// Note that you do not need to manually handle events, as they are handled
+/// internally and then dispatched to your event handlers.
+///
+/// # Examples
+///
+/// Creating a Client instance and adding a handler on every message
+/// receive, acting as a "ping-pong" bot is simple:
+///
+/// ```rust,ignore
+/// use serenity::Client;
+///
+/// let mut client = Client::login_bot("my token here");
+///
+/// client.on_message(|context, message| {
+///     if message.content == "!ping" {
+///         context.say("Pong!");
+///     }
+/// });
+///
+/// client.start();
+/// ```
+///
+/// [`Connection`]: struct.Connection.html
+/// [`on_message`]: #method.on_message
+/// [`Event::MessageCreate`]: ../model/enum.Event.html#variant.MessageCreate
+/// [information on using sharding]: struct.Connection.html#sharding
 pub struct Client {
+    /// A vector of all active connections that have received their
+    /// [`Event::Ready`] payload, and have dispatched to [`on_ready`] if an
+    /// event handler was configured.
+    ///
+    /// [`Event::Ready`]: ../model/enum.Event.html#variant.Ready
+    /// [`on_ready`]: #method.on_ready
     pub connections: Vec<Arc<Mutex<Connection>>>,
     event_store: Arc<Mutex<EventStore>>,
     #[cfg(feature="framework")]
@@ -233,19 +279,33 @@ pub struct Client {
 
 #[allow(type_complexity)]
 impl Client {
-    /// Creates a Client for a bot.
+    /// Creates a Client for a bot user.
+    ///
+    /// Discord has a requirement of prefixing bot tokens with `"Bot "`, which
+    /// this function will automatically do for you.
     pub fn login_bot(bot_token: &str) -> Client {
         let token = format!("Bot {}", bot_token);
 
         login(&token, LoginType::Bot)
     }
-    /// Create an instance from "raw values"
+
+    /// Create an instance from "raw values". This allows you to manually
+    /// specify whether to login as a [`Bot`] or [`User`], and does not modify
+    /// the token in any way regardless.
+    ///
+    /// [`Bot`]: enum.LoginType.html#variant.Bot
+    /// [`User`]: enum.LoginType.html#variant.User
     #[doc(hidden)]
     pub fn login_raw(token: &str, login_type: LoginType) -> Client {
         login(&token.to_owned(), login_type)
     }
 
     /// Creates a Client for a user.
+    ///
+    /// **Note**: Read the notes for [`LoginType::User`] prior to using this, as
+    /// there are restrictions on usage.
+    ///
+    /// [`LoginType::User`]: enum.LoginType.html#variant.User
     pub fn login_user(user_token: &str) -> Client {
         login(&user_token.to_owned(), LoginType::User)
     }
@@ -376,8 +436,8 @@ impl Client {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN")
-    ///     .unwrap());
+    /// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
+    /// let mut client = Client::login_bot(&token);
     ///
     /// let _ = client.start_shard_range([4, 7], 10);
     /// ```
@@ -699,12 +759,12 @@ impl Client {
     ///
     /// Print the [current user][`CurrentUser`]'s name on ready:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN")
-    ///     .unwrap());
+    /// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
+    /// let mut client = Client::login_bot(&token);
     ///
     /// client.on_ready(|_context, ready| {
     ///     println!("{} is connected", ready.user.name);

@@ -16,7 +16,13 @@
 //!
 //! If a request spuriously fails, it will be retried once.
 //!
+//! Note that you may want to perform requests through a [`Context`] or through
+//! [model]s' instance methods where possible, as they each offer different
+//! levels of a high-level interface to the HTTP module.
+//!
 //! [`Client`]: ../struct.Client.html
+//! [`Context`]: ../struct.Context.html
+//! [model]: ../../model/index.html
 
 mod ratelimiting;
 
@@ -45,17 +51,68 @@ lazy_static! {
     static ref TOKEN: Arc<Mutex<String>> = Arc::new(Mutex::new(String::default()));
 }
 
+/// Sets the token to be used across all requests which require authentication.
+///
+/// This is really only for internal use, and if you are reading this as a user,
+/// you should _not_ use this yourself.
 #[doc(hidden)]
 pub fn set_token(token: &str) {
     TOKEN.lock().unwrap().clone_from(&token.to_owned());
 }
 
+/// Accepts the [`Invite`] given its code, placing the current user in the
+/// [`Guild`] that the invite was for.
+///
+/// Use [`utils::parse_invite`] to retrieve codes from URLs.
+///
+/// Refer to the documentation for [`Context::accept_invite`] for restrictions on
+/// accepting an invite.
+///
+/// This will fire the [`Client::on_guild_create`] handler once the associated
+/// event is received.
+///
+/// **Note**: This will fail if you are already in the guild, or are banned. A
+/// ban is equivilant to an IP ban.
+///
+/// **Note**: Requires that the current user be a user account. Bots can not
+/// accept invites. Instead, they must be accepted via OAuth2 authorization
+/// links. These are in the format of:
+///
+/// `https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
+///
+/// # Examples
+///
+/// Accept an invite given a code from a URL:
+///
+/// ```rust,no_run
+/// use serenity::client::http;
+/// use serenity::utils;
+///
+/// let url = "https://discord.gg/0cDvIgU2voY8RSYL";
+/// let code = utils::parse_invite(url);
+///
+/// let _result = http::accept_invite(code);
+/// ```
+///
+/// [`Context::accept_invite`]: ../struct.Context.html#method.accept_invite
+/// [`Invite`]: ../../model/struct.Invite.html
+/// [`utils::parse_invite`]: ../../utils/fn.parse_invite.html
 pub fn accept_invite(code: &str) -> Result<Invite> {
     let response = request!(Route::InvitesCode, post, "/invites/{}", code);
 
     Invite::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Marks a [`Channel`] as being "read" up to a certain [`Message`]. Any
+/// message past the given one will not be marked as read.
+///
+/// Usually you should use this to mark the latest message as being read.
+///
+/// **Note**: Bot users should not use this, as it has no bearing on them
+/// whatsoever.
+///
+/// [`Channel`]: ../../model/enum.Channel.html
+/// [`Message`]: ../../model/struct.Message.html
 pub fn ack_message(channel_id: u64, message_id: u64) -> Result<()> {
     verify(204, request!(Route::ChannelsIdMessagesIdAck(channel_id),
                          post,
@@ -64,6 +121,13 @@ pub fn ack_message(channel_id: u64, message_id: u64) -> Result<()> {
                          message_id))
 }
 
+/// Adds a [`User`] as a recipient to a [`Group`].
+///
+/// **Note**: Groups have a limit of 10 recipients, including the current user.
+///
+/// [`Group`]: ../../model/struct.Group.html
+/// [`Group::add_recipient`]: ../../model/struct.Group.html#method.add_recipient
+/// [`User`]: ../../model/struct.User.html
 pub fn add_group_recipient(group_id: u64, user_id: u64)
     -> Result<()> {
     verify(204, request!(Route::None,
@@ -91,6 +155,17 @@ pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> 
                          role_id))
 }
 
+/// Bans a [`User`] from a [`Guild`], removing their messages sent in the last
+/// X number of days.
+///
+/// Passing a `delete_message_days` of `0` is equivilant to not removing any
+/// messages. Up to `7` days' worth of messages may be deleted.
+///
+/// **Note**: Requires that you have the [Ban Members] permission.
+///
+/// [`Guild`]: ../../model/struct.Guild.html
+/// [`User`]: ../../model/struct.User.html
+/// [Ban Members]: ../../model/permissions/constant.BAN_MEMBERS.html
 pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8)
     -> Result<()> {
     verify(204, request!(Route::GuildsIdBansUserId(guild_id),
@@ -101,6 +176,15 @@ pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8)
                          delete_message_days))
 }
 
+/// Broadcasts that the current user is typing in the given [`Channel`].
+///
+/// This lasts for about 10 seconds, and will then need to be renewed to
+/// indicate that the current user is still typing.
+///
+/// This should rarely be used for bots, although it is a good indicator that a
+/// long-running command is still being processed.
+///
+/// [`Channel`]: ../../model/enum.Channel.html
 pub fn broadcast_typing(channel_id: u64) -> Result<()> {
     verify(204, request!(Route::ChannelsIdTyping(channel_id),
                          post,
@@ -108,6 +192,16 @@ pub fn broadcast_typing(channel_id: u64) -> Result<()> {
                          channel_id))
 }
 
+/// Creates a [`PublicChannel`] in the [`Guild`] given its Id.
+///
+/// Refer to the Discord's [docs] for information on what fields this requires.
+///
+/// **Note**: Requires the [Manage Channels] permission.
+///
+/// [`Guild`]: ../../model/struct.Guild.html
+/// [`PublicChannel`]: ../../model/struct.PublicChannel.html
+/// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-channel
+/// [Manage Channels]: ../../model/permissions/constant.MANAGE_CHANNELS.html
 pub fn create_channel(guild_id: u64, map: Value) -> Result<Channel> {
     let body = try!(serde_json::to_string(&map));
     let response = request!(Route::GuildsIdChannels(guild_id),
@@ -118,6 +212,16 @@ pub fn create_channel(guild_id: u64, map: Value) -> Result<Channel> {
     Channel::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Creates an emoji in the given [`Guild`] with the given data.
+///
+/// View the source code for [`Context::create_emoji`] to see what fields this
+/// requires.
+///
+/// **Note**: Requires the [Manage Emojis] permission.
+///
+/// [`Context::create_emoji`]: ../struct.Context.html#method.create_emoji
+/// [`Guild`]: ../../model/struct.Guild.html
+/// [Manage Emojis]: ../../model/permissions/constant.MANAGE_EMOJIS.html
 pub fn create_emoji(guild_id: u64, map: Value)
     -> Result<Emoji> {
     let body = try!(serde_json::to_string(&map));
@@ -129,6 +233,35 @@ pub fn create_emoji(guild_id: u64, map: Value)
     Emoji::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Creates a [`Guild`] with the data provided.
+///
+/// **Note**: This endpoint is usually only available for user accounts. Refer
+/// to Discord's documentation for the endpoint [here][whitelist] for more
+/// information. If your bot requires this, re-think what you are doing and
+/// whether it _really_ needs to be doing this.
+///
+/// # Examples
+///
+/// Create a guild called `"test"` in the [US West region]:
+///
+/// ```rust,ignore
+/// extern crate serde_json;
+///
+/// use serde_json::builder::ObjectBuilder;
+/// use serde_json::Value;
+/// use serenity::client::http;
+///
+/// let map = ObjectBuilder::new()
+///     .insert("name", "test")
+///     .insert("region", "us-west")
+///     .build();
+///
+/// let _result = http::create_guild(map);
+/// ```
+///
+/// [`Guild`]: ../../model/struct.Guild.html
+/// [US West Region]: ../../model/enum.Region.html#variant.UsWest
+/// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
 pub fn create_guild(map: Value) -> Result<Guild> {
     let body = try!(serde_json::to_string(&map));
     let response = request!(Route::Guilds, post(body), "/guilds");
@@ -136,9 +269,18 @@ pub fn create_guild(map: Value) -> Result<Guild> {
     Guild::decode(try!(serde_json::from_reader(response)))
 }
 
-pub fn create_guild_integration(guild_id: u64,
-                                integration_id: u64,
-                                map: Value) -> Result<()> {
+/// Creates an [`Integration`] for a [`Guild`].
+///
+/// Refer to Discord's [docs] for field information.
+///
+/// **Note**: Requires the [Manage Guild] permission.
+///
+/// [`Guild`]: ../../model/struct.Guild.html
+/// [`Integration`]: ../../model/struct.Integration.html
+/// [Manage Guild]: ../../model/permissions/constant.MANAGE_GUILD.html
+/// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-integration
+pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: Value)
+    -> Result<()> {
     let body = try!(serde_json::to_string(&map));
 
     verify(204, request!(Route::GuildsIdIntegrations(guild_id),
@@ -148,6 +290,18 @@ pub fn create_guild_integration(guild_id: u64,
                          integration_id))
 }
 
+/// Creates a [`RichInvite`] for the given [channel][`PublicChannel`].
+///
+/// Refer to Discord's [docs] for field information.
+///
+/// All fields are optional.
+///
+/// **Note**: Requires the [Create Invite] permission.
+///
+/// [`PublicChannel`]: ../../model/struct.PublicChannel.html
+/// [`RichInvite`]: ../../model/struct.RichInvite.html
+/// [Create Invite]: ../../model/permissions/constant.CREATE_INVITE.html
+/// [docs]: https://discordapp.com/developers/docs/resources/channel#create-channel-invite
 pub fn create_invite(channel_id: u64, map: Value)
     -> Result<RichInvite> {
     let body = try!(serde_json::to_string(&map));

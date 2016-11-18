@@ -23,15 +23,76 @@ use ::utils;
 #[cfg(feature = "state")]
 use super::STATE;
 
+/// The context is a general utility struct provided on event dispatches, which
+/// helps with dealing with the current "context" of the event dispatch,
+/// and providing helper methods where possible. The context also acts as a
+/// general high-level interface over the associated [`Connection`] which
+/// received the event, or the low-level [`http`] module.
+///
+/// For example, when the [`Client::on_message`] handler is dispatched to, the
+/// context will contain the Id of the [`Channel`] that the message was created
+/// for. This allows for using shortcuts like [`say`], which will
+/// post its given argument to the associated channel for you as a [`Message`].
+///
+/// Additionally, the context contains "shortcuts", like for interacting with
+/// the connection. Methods like [`set_game`] will unlock the connection and
+/// perform an update for you to save a bit of work.
+///
+/// A context will only live for the event it was dispatched for. After the
+/// event handler finished, it is destroyed and will not be re-used.
+///
+/// # Automatically using the State
+///
+/// The context makes use of the [`State`] being global, and will first check
+/// the state for associated data before hitting the REST API. This is to save
+/// Discord requests, and ultimately save your bot bandwidth and time. This also
+/// acts as a clean interface for retrieving from the state without needing to
+/// check it yourself first, and then performing a request if it does not exist.
+/// The context ultimately acts as a means to simplify these two operations into
+/// one.
+///
+/// For example, if you are needing information about a
+/// [channel][`PublicChannel`] within a [guild][`LiveGuild`], then you can
+/// use [`get_channel`] to retrieve it. Under most circumstances, the guild and
+/// its channels will be cached within the state, and `get_channel` will just
+/// pull from the state. If it does not exist, it will make a request to the
+/// REST API, and then insert a clone of the channel into the state, returning
+/// you the channel.
+///
+/// In this scenario, now that the state has the channel, performing the same
+/// request to `get_channel` will instead pull from the state, as it is now
+/// cached.
+///
+/// [`Channel`]: ../model/enum.Channel.html
+/// [`Client::on_message`]: struct.Client.html#method.on_message
+/// [`Connection`]: struct.Connection.html
+/// [`LiveGuild`]: ../model/struct.LiveGuild.html
+/// [`Message`]: ../model/struct.Message.html
+/// [`PublicChannel`]: ../model/struct.PublicChannel.html
+/// [`State`]: ../ext/state/struct.State.html
+/// [`get_channel`]: #method.get_channel
+/// [`http`]: http/index.html
+/// [`say`]: #method.say
+/// [`set_game`]: #method.set_game
 #[derive(Clone)]
 pub struct Context {
     channel_id: Option<ChannelId>,
+    /// The associated connection which dispatched the event handler.
+    ///
+    /// Note that if you are sharding, in relevant terms, this is the shard
+    /// which received the event being dispatched.
     pub connection: Arc<Mutex<Connection>>,
     login_type: LoginType,
 }
 
 impl Context {
     /// Create a new Context to be passed to an event handler.
+    ///
+    /// There's no real reason to use this yourself. But the option is there.
+    /// Highly re-consider _not_ using this if you're tempted.
+    ///
+    /// Or don't do what I say. I'm just a comment hidden from the generated
+    /// documentation.
     #[doc(hidden)]
     pub fn new(channel_id: Option<ChannelId>,
                connection: Arc<Mutex<Connection>>,
@@ -45,14 +106,10 @@ impl Context {
 
     /// Accepts the given invite.
     ///
-    /// Refer to the documentation for [`Invite::accept`] for restrictions on
-    /// accepting an invite.
+    /// Refer to the documentation for [`http::accept_invite`] for restrictions
+    /// on accepting an invite.
     ///
-    /// **Note**: Requires that the current user be a user account. Bots can not
-    /// accept invites. Instead they must be accepted via OAuth2 authorization
-    /// links. These are in the format of:
-    ///
-    /// `https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
+    /// **Note**: Requires that the current user be a user account.
     ///
     /// # Errors
     ///
@@ -71,19 +128,23 @@ impl Context {
         http::accept_invite(code)
     }
 
-    /// Mark a message as being read in a channel. This will mark up to the
-    /// given message as read. Any messages created after that message will not
-    /// be marked as read.
+    /// Mark a [`Channel`] as being read up to a certain [`Message`].
+    ///
+    /// Refer to the documentation for [`http::ack_message`] for more
+    /// information.
     ///
     /// # Errors
     ///
     /// Returns a [`ClientError::InvalidOperationAsBot`] if this is a bot.
     ///
+    /// [`Channel`]: ../../model/enum.Channel.html
     /// [`ClientError::InvalidOperationAsBot`]: ../enum.ClientError.html#variant.InvalidOperationAsUser
+    /// [`Message`]: ../../model/struct.Message.html
+    /// [`http::ack_message`]: http/fn.ack_message.html
     pub fn ack<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
         if self.login_type == LoginType::User {
-            return Err(Error::Client(ClientError::InvalidOperationAsUser))
+            return Err(Error::Client(ClientError::InvalidOperationAsUser));
         }
 
         http::ack_message(channel_id.into().0, message_id.into().0)
@@ -92,8 +153,7 @@ impl Context {
     /// Ban a [`User`] from a [`Guild`], removing their messages sent in the
     /// last X number of days.
     ///
-    /// `0` days is equivilant to not removing any messages. Up to `7` days'
-    /// worth of messages may be deleted.
+    /// Refer to the documentation for [`http::ban_user`] for more information.
     ///
     /// **Note**: Requires that you have the [Ban Members] permission.
     ///
@@ -145,7 +205,9 @@ impl Context {
 
     /// Creates a [`PublicChannel`] in the given [`Guild`].
     ///
-    /// Requires that you have the [Manage Channels] permission.
+    /// Refer to [`http::create_channel`] for more information.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission.
     ///
     /// # Examples
     ///
@@ -159,6 +221,7 @@ impl Context {
     ///
     /// [`Guild`]: ../model/struct.Guild.html
     /// [`PublicChannel`]: ../model/struct.PublicChannel.html
+    /// [`http::create_channel`]: http/fn.create_channel.html
     /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
     pub fn create_channel<G>(&self, guild_id: G, name: &str, kind: ChannelType)
         -> Result<Channel> where G: Into<GuildId> {
@@ -170,6 +233,22 @@ impl Context {
         http::create_channel(guild_id.into().0, map)
     }
 
+    /// Creates an emoji in the given guild with a name and base64-encoded
+    /// image. The [`utils::read_image`] function is provided for you as a
+    /// simple method to read an image and encode it into base64, if you are
+    /// reading from the filesystem.
+    ///
+    /// **Note**: Requires the [Manage Emojis] permission.
+    ///
+    /// # Examples
+    ///
+    /// See the [`EditProfile::avatar`] example for an in-depth example as to
+    /// how to read an image from the filesystem and encode it as base64. Most
+    /// of the example can be applied similarly for this method.
+    ///
+    /// [`EditProfile::avatar`]: ../utils/builder/struct.EditProfile.html#method.avatar
+    /// [`utils::read_image`]: ../utils/fn.read_image.html
+    /// [Manage Emojis]: ../model/permissions/constant.MANAGE_EMOJIS.html
     pub fn create_emoji<G>(&self, guild_id: G, name: &str, image: &str)
         -> Result<Emoji> where G: Into<GuildId> {
         let map = ObjectBuilder::new()
@@ -182,9 +261,14 @@ impl Context {
 
     /// Creates a [`Guild`] with the data provided.
     ///
+    /// **Note**: This endpoint is usually only available for user accounts.
+    /// Refer to Discord's information for the endpoint [here][whitelist] for
+    /// more information. If you require this as a bot, re-think what you are
+    /// doing and if it _really_ needs to be doing this.
+    ///
     /// # Examples
     ///
-    /// Create a guild called `test` in the [US West region] with no icon:
+    /// Create a guild called `"test"` in the [US West region] with no icon:
     ///
     /// ```rust,ignore
     /// use serenity::model::Region;
@@ -194,6 +278,7 @@ impl Context {
     ///
     /// [`Guild`]: ../model/struct.Guild.html
     /// [US West region]: ../model/enum.Region.html#variant.UsWest
+    /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
     pub fn create_guild(&self, name: &str, region: Region, icon: Option<&str>)
         -> Result<Guild> {
         let map = ObjectBuilder::new()
@@ -205,6 +290,13 @@ impl Context {
         http::create_guild(map)
     }
 
+    /// Creates an [`Integration`] for a [`Guild`].
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`Integration`]: ../model/struct.Integration.html
+    /// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
     pub fn create_integration<G, I>(&self,
                                     guild_id: G,
                                     integration_id: I,
@@ -220,6 +312,16 @@ impl Context {
         http::create_guild_integration(guild_id.into().0, integration_id.0, map)
     }
 
+    /// Creates an invite for the channel, providing a builder so that fields
+    /// may optionally be set.
+    ///
+    /// See the documentation for the [`CreateInvite`] builder for information
+    /// on how to use this and the default values that it provides.
+    ///
+    /// **Note**: Requires the [Create Invite] permission.
+    ///
+    /// [`CreateInvite`]: ../utils/builder/struct.CreateInvite.html
+    /// [Create Invite]: ../model/permissions/constant.CREATE_INVITE.html
     pub fn create_invite<C, F>(&self, channel_id: C, f: F) -> Result<RichInvite>
         where C: Into<ChannelId>, F: FnOnce(CreateInvite) -> CreateInvite {
         let map = f(CreateInvite::default()).0.build();
@@ -227,6 +329,72 @@ impl Context {
         http::create_invite(channel_id.into().0, map)
     }
 
+    /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
+    /// single [`Member`] or [`Role`] within a [`Channel`].
+    ///
+    /// Refer to the documentation for [`PermissionOverwrite`]s for more
+    /// information.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission.
+    ///
+    /// # Examples
+    ///
+    /// Creating a permission overwrite for a member by specifying the
+    /// [`PermissionOverwrite::Member`] variant, allowing it the [Send Messages]
+    /// permission, but denying the [Send TTS Messages] and [Attach Files]
+    /// permissions:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::{ChannelId, PermissionOverwrite, permissions};
+    ///
+    /// // assuming you are in a context
+    ///
+    /// let channel_id = 7;
+    /// let user_id = 8;
+    ///
+    /// let allow = permissions::SEND_MESSAGES;
+    /// let deny = permissions::SEND_TTS_MESSAGES | permissions::ATTACH_FILES;
+    /// let overwrite = PermissionOverwrite {
+    ///     allow: allow,
+    ///     deny: deny,
+    ///     kind: PermissionOverwriteType::Member(user_id),
+    /// };
+    ///
+    /// let _result = context.create_permission(channel_id, overwrite);
+    /// ```
+    ///
+    /// Creating a permission overwrite for a role by specifying the
+    /// [`PermissionOverwrite::Role`] variant, allowing it the [Manage Webhooks]
+    /// permission, but denying the [Send TTS Messages] and [Attach Files]
+    /// permissions:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::{ChannelId, PermissionOverwrite, permissions};
+    ///
+    /// // assuming you are in a context
+    ///
+    /// let channel_id = 7;
+    /// let user_id = 8;
+    ///
+    /// let allow = permissions::SEND_MESSAGES;
+    /// let deny = permissions::SEND_TTS_MESSAGES | permissions::ATTACH_FILES;
+    /// let overwrite = PermissionOverwrite {
+    ///     allow: allow,
+    ///     deny: deny,
+    ///     kind: PermissionOverwriteType::Member(user_id),
+    /// };
+    ///
+    /// let _result = context.create_permission(channel_id, overwrite);
+    /// ```
+    ///
+    /// [`Channel`]: ../model/enum.Channel.html
+    /// [`Member`]: ../model/struct.Member.html
+    /// [`PermissionOverwrite`]: ../model/struct.PermissionOverWrite.html
+    /// [`PermissionOverwrite::Member`]: ../model/struct.PermissionOverwrite.html#variant.Member
+    /// [`Role`]: ../model/struct.Role.html
+    /// [Attach Files]: ../model/permissions/constant.ATTACH_FILES.html
+    /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
+    /// [Send TTS Messages]: ../model/permissions/constant.SEND_TTS_MESSAGES.html
     pub fn create_permission<C>(&self,
                                 channel_id: C,
                                 target: PermissionOverwrite)
@@ -246,7 +414,12 @@ impl Context {
         http::create_permission(channel_id.into().0, id, map)
     }
 
-    pub fn create_private_channel<U>(&self, user_id: U)
+    /// Creates a direct message channel between the [current user] and another
+    /// [`User`]. This can also retrieve the channel if one already exists.
+    ///
+    /// [`User`]: ../model/struct.User.html
+    /// [current user]: ../model/struct.CurrentUser.html
+    pub fn create_direct_message_channel<U>(&self, user_id: U)
         -> Result<PrivateChannel> where U: Into<UserId> {
         let map = ObjectBuilder::new()
             .insert("recipient_id", user_id.into().0)
@@ -257,11 +430,16 @@ impl Context {
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
     ///
-    /// **Note**: Requires the [Add Reactions] permission.
+    /// [`Message::react`] may be a more suited method of reacting in most
+    /// cases.
     ///
-    /// [`Emoji`]: ../models/struct.Emoji.html
-    /// [`Message`]: ../models/struct.Message.html
-    /// [Add Reactions]: ../models/permissions/constant.ADD_REACTIONS.html
+    /// **Note**: Requires the [Add Reactions] permission, _if_ the current user
+    /// is the first user to perform a react with a certain emoji.
+    ///
+    /// [`Emoji`]: ../model/struct.Emoji.html
+    /// [`Message`]: ../model/struct.Message.html
+    /// [`Message::react`]: ../model/struct.Message.html#method.react
+    /// [Add Reactions]: ../model/permissions/constant.ADD_REACTIONS.html
     pub fn create_reaction<C, M, R>(&self,
                                     channel_id: C,
                                     message_id: M,
@@ -300,6 +478,12 @@ impl Context {
         http::delete_channel(channel_id.into().0)
     }
 
+    /// Deletes an emoji in a [`Guild`] given its Id.
+    ///
+    /// **Note**: Requires the [Manage Emojis] permission.
+    ///
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [Manage Emojis]: ../model/permissions/constant.MANAGE_EMOJIS.html
     pub fn delete_emoji<E, G>(&self, guild_id: G, emoji_id: E) -> Result<()>
         where E: Into<EmojiId>, G: Into<GuildId> {
         http::delete_emoji(guild_id.into().0, emoji_id.into().0)
@@ -406,8 +590,8 @@ impl Context {
     /// **Note**: Requires the [`Manage Messages`] permission, _if_ the current
     /// user did not perform the reaction.
     ///
-    /// [`Reaction`]: ../models/struct.Reaction.html
-    /// [Manage Messages]: ../models/permissions/constant.MANAGE_MESSAGES.html
+    /// [`Reaction`]: ../model/struct.Reaction.html
+    /// [Manage Messages]: ../model/permissions/constant.MANAGE_MESSAGES.html
     pub fn delete_reaction<C, M, R>(&self,
                                     channel_id: C,
                                     message_id: M,

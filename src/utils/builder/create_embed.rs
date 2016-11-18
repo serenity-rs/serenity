@@ -197,6 +197,7 @@ impl CreateEmbedAuthor {
 }
 
 impl Default for CreateEmbedAuthor {
+    /// Creates a builder with no default values.
     fn default() -> CreateEmbedAuthor {
         CreateEmbedAuthor(ObjectBuilder::new())
     }
@@ -259,6 +260,7 @@ impl CreateEmbedFooter {
 }
 
 impl Default for CreateEmbedFooter {
+    /// Creates a builder with no default values.
     fn default() -> CreateEmbedFooter {
         CreateEmbedFooter(ObjectBuilder::new())
     }
@@ -294,6 +296,7 @@ impl CreateEmbedThumbnail {
 }
 
 impl Default for CreateEmbedThumbnail {
+    /// Creates a builder with no default values.
     fn default() -> CreateEmbedThumbnail {
         CreateEmbedThumbnail(ObjectBuilder::new())
     }
@@ -329,6 +332,7 @@ impl CreateEmbedVideo {
 }
 
 impl Default for CreateEmbedVideo {
+    /// Creates a builder with no default values.
     fn default() -> CreateEmbedVideo {
         CreateEmbedVideo(ObjectBuilder::new())
     }

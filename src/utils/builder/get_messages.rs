@@ -75,6 +75,7 @@ impl GetMessages {
 }
 
 impl Default for GetMessages {
+    /// Creates a builder with no default values.
     fn default() -> GetMessages {
         GetMessages(BTreeMap::default())
     }

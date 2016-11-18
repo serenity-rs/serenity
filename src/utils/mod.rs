@@ -93,14 +93,37 @@ pub fn into_array(value: Value) -> Result<Vec<Value>> {
 /// Retrieves the "code" part of an [invite][`RichInvite`] out of a URL.
 ///
 /// # Examples
-/// Retrieving the code from the URL `https://discord.gg/0cDvIgU2voY8RSYL`:
 ///
-/// ```rust,ignore
+/// Three formats of codes are supported:
+///
+/// 1. Retrieving the code from the URL `"https://discord.gg/0cDvIgU2voY8RSYL"`:
+///
+/// ```rust
 /// use serenity::utils;
 ///
 /// let url = "https://discord.gg/0cDvIgU2voY8RSYL";
 ///
-/// assert!(utils::parse_invite(url) == "0cDvIgU2voY8RSYL");
+/// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
+/// ```
+///
+/// 2. Retrieving the code from the URL `"http://discord.gg/0cDvIgU2voY8RSYL"`:
+///
+/// ```rust
+/// use serenity::utils;
+///
+/// let url = "http://discord.gg/0cDvIgU2voY8RSYL";
+///
+/// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
+/// ```
+///
+/// 3. Retrieving the code from the URL `"discord.gg/0cDvIgU2voY8RSYL"`:
+///
+/// ```rust
+/// use serenity::utils;
+///
+/// let url = "discord.gg/0cDvIgU2voY8RSYL";
+///
+/// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
 /// ```
 ///
 /// [`RichInvite`]: ../model/struct.RichInvite.html
@@ -124,7 +147,7 @@ pub fn parse_invite(code: &str) -> &str {
 ///
 /// Reads an image located at `./cat.png` into a base64-encoded string:
 ///
-/// ```rust,ignore
+/// ```rust,no_run
 /// use serenity::utils;
 ///
 /// let image = match utils::read_image("./cat.png") {

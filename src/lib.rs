@@ -40,7 +40,7 @@
 //!
 //! A basic ping-pong bot looks like:
 //!
-//! ```rust,ignore
+//! ```rust,no_run
 //! extern crate serenity;
 //!
 //! use serenity::Client;

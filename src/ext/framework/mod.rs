@@ -11,8 +11,29 @@ use std::thread;
 use ::client::Context;
 use ::model::Message;
 
+/// The type of command being received.
+///
+/// The [`Mention`] variant is emitted if the bot is being commanded via a
+/// mention (`<@USER_ID>` or `<@!USER_ID>`). This can only be emitted if
+/// [`Configuration::on_mention`] is set to `true`.
+///
+/// The [`Prefix`] variant is emitted if a message starts with the prefix set
+/// via [`Configuration::prefix`].
+///
+/// [`Mention`]: #variant.Mention
+/// [`Prefix`]: #variant.Prefix
+// This is public due to being leaked by [`command::positions`], which is used
+// in [`Framework::dispatch`]. It therefore is hidden from the docs, due to
+// having no use to users.
+//
+// [`Framework::dispatch`]: struct.Framework.html#method.dispatch
+// [`command::positions`]: command/fn.positions.html
 #[derive(Clone, Copy, Debug)]
+#[doc(hidden)]
 pub enum CommandType {
+    /// This is emitted if the bot is being commanded via a mention
+    /// (`<@USER_ID>` or `<@!USER_ID>`). This can only be emitted if
+    /// [`Configuration::on_mention`] is set to `true`.
     Mention,
     None,
     Prefix,
@@ -24,10 +45,51 @@ pub struct Framework {
     configuration: Configuration,
     commands: HashMap<String, InternalCommand>,
     checks: HashMap<String, Arc<Fn(&Context, &Message) -> bool + Send + Sync + 'static>>,
+    /// Whether the framework has been "initialized".
+    ///
+    /// The framework is initialized once one of the following occurs:
+    ///
+    /// - configuration has been set;
+    /// - a command handler has been set;
+    /// - a command check has been set.
+    ///
+    /// This is used internally to determine whether or not - in addition to
+    /// dispatching to the [`Client::on_message`] handler - to have the
+    /// framework check if a [`Event::MessageCreate`] should be processed by
+    /// itself.
+    ///
+    /// [`Client::on_message`]: ../../client/struct.Client.html#method.on_message
+    /// [`Event::MessageCreate`]: ../../model/enum.Event.html#variant.MessageCreate
     pub initialized: bool,
 }
 
 impl Framework {
+    /// Configures the framework, setting non-default values. All fields are
+    /// optional. Refer to [`Configuration::default`] for more information on
+    /// the default values.
+    ///
+    /// # Examples
+    ///
+    /// Configuring the framework for a [`Client`], setting the [`depth`] to 3,
+    /// [allowing whitespace], and setting the [`prefix`] to `"~"`:
+    ///
+    /// ```rust,no_run
+    /// use serenity::Client;
+    /// use std::env;
+    ///
+    /// let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").unwrap());
+    /// client.with_framework(|f| f
+    ///     .configure(|c| c
+    ///         .depth(3)
+    ///         .allow_whitespace(true)
+    ///         .prefix("~")));
+    /// ```
+    ///
+    /// [`Client`]: ../../client/struct.Client.html
+    /// [`Configuration::default`]: struct.Configuration.html#method.default
+    /// [`depth`]: struct.Configuration.html#method.depth
+    /// [`prefix`]: struct.Configuration.html#method.prefix
+    /// [allowing whitespace]: struct.Configuration.html#method.allow_whitespace
     pub fn configure<F>(mut self, f: F) -> Self
         where F: FnOnce(Configuration) -> Configuration {
         self.configuration = f(self.configuration);

@@ -10,10 +10,17 @@ use ::client::{ClientError, ConnectionError};
 use ::ext::voice::VoiceError;
 
 /// The common result type between most library functions.
+///
+/// The library exposes functions which, for a result type, exposes only one
+/// type, rather than the usual 2 (`Result<T, Error>`). This is because all
+/// functions that return a result return serenity's [`Error`], so this is
+/// implied, and a "simpler" result is used.
+///
+/// [`Error`]: enum.Error.html
 pub type Result<T> = ::std::result::Result<T, Error>;
 
 /// A common error enum returned by most of the library's functionality within a
-/// [`Result`].
+/// custom [`Result`].
 ///
 /// The most common error types, the [`ClientError`] and [`ConnectionError`]
 /// enums, are both wrapped around this in the form of the [`Client`] and
@@ -26,9 +33,14 @@ pub type Result<T> = ::std::result::Result<T, Error>;
 /// [`Result`]: type.Result.html
 #[derive(Debug)]
 pub enum Error {
-    /// An Http or Client error.
+    /// An [http] or [client] error.
+    ///
+    /// [client]: client/index.html
+    /// [http]: client/http/index.html
     Client(ClientError),
-    /// An error with the WebSocket connection.
+    /// An error with the WebSocket [`Connection`].
+    ///
+    /// [`Connection`]: client/struct.Connection.html
     Connection(ConnectionError),
     /// An error while decoding a payload.
     Decode(&'static str, Value),
@@ -38,11 +50,17 @@ pub enum Error {
     Io(IoError),
     /// An error from the `serde_json` crate.
     Json(JsonError),
-    /// Some other error.
+    /// Some other error. This is only used for "Expected value <TYPE>" errors,
+    /// when a more detailed error can not be easily provided via the
+    /// [`Error::Decode`] variant.
+    ///
+    /// [`Error::Decode`]: #variant.Decode
     Other(&'static str),
     /// An error from the `url` crate.
     Url(String),
-    /// Indicating an error within the voice module.
+    /// Indicating an error within the [voice module].
+    ///
+    /// [voice module]: ext/voice/index.html
     #[cfg(feature="voice")]
     Voice(VoiceError),
     /// An error from the `rust-websocket` crate.

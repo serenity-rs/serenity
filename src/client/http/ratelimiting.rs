@@ -1,3 +1,44 @@
+//! Routes are used for ratelimiting. These are to differentiate between the
+//! different _types_ of routes - such as getting the current user's channels -
+//! for the most part, with the exception being major parameters.
+//!
+//! [Taken from] the Discord docs, major parameters are:
+//!
+//! > Additionally, rate limits take into account major parameters in the URL.
+//! > For example, `/channels/:channel_id` and
+//! > `/channels/:channel_id/messages/:message_id` both take `channel_id` into
+//! > account when generating rate limits since it's the major parameter. The
+//! only current major parameters are `channel_id` and `guild_id`.
+//!
+//! This results in the two URIs of `GET /channels/4/messages/7` and
+//! `GET /channels/5/messages/8` being rate limited _separately_. However, the
+//! two URIs of `GET /channels/10/messages/11` and
+//! `GET /channels/10/messages/12` will count towards the "same ratelimit", as
+//! the major parameter - `10` is equivilant in both URIs' format.
+//!
+//! # Examples
+//!
+//! First: taking the first two URIs - `GET /channels/4/messages/7` and
+//! `GET /channels/5/messages/8` - and assuming both buckets have a `limit` of
+//! `10`, requesting the first URI will result in the response containing a
+//! `remaining` of `9`. Immediately after - prior to buckets resetting -
+//! performing a request to the _second_ URI will also contain a `remaining` of
+//! `9` in the response, as the major parameter - `channel_id` - is different
+//! in the two requests (`4` and `5`).
+//!
+//! Second: take for example the last two URIs. Assuming the bucket's `limit` is
+//! `10`, requesting the first URI will return a `remaining` of `9` in the
+//! response. Immediately after - prior to buckets resetting - performing a
+//! request to the _second_ URI will return a `remaining` of `8` in the
+//! response, as the major parameter - `channel_id` - is equivilant for the two
+//! requests (`10`).
+//!
+//!
+//! With the examples out of the way: major parameters are why some variants
+//! (i.e. all of the channel/guild variants) have an associated u64 as data.
+//! This is the Id of the parameter, differentiating between different
+//! ratelimits.
+
 use hyper::client::{RequestBuilder, Response};
 use hyper::header::Headers;
 use hyper::status::StatusCode;
@@ -14,46 +55,6 @@ lazy_static! {
     static ref ROUTES: Arc<Mutex<HashMap<Route, RateLimit>>> = Arc::new(Mutex::new(HashMap::default()));
 }
 
-/// Routes are used for ratelimiting. These are to differentiate between the
-/// different _types_ of routes - such as getting the current user's channels -
-/// for the most part, with the exception being major parameters.
-///
-/// [Taken from] the Discord docs, major parameters are:
-///
-/// > Additionally, rate limits take into account major parameters in the URL.
-/// > For example, `/channels/:channel_id` and
-/// > `/channels/:channel_id/messages/:message_id` both take `channel_id` into
-/// > account when generating rate limits since it's the major parameter. The
-/// only current major parameters are `channel_id` and `guild_id`.
-///
-/// This results in the two URIs of `GET /channels/4/messages/7` and
-/// `GET /channels/5/messages/8` being rate limited _separately_. However, the
-/// two URIs of `GET /channels/10/messages/11` and
-/// `GET /channels/10/messages/12` will count towards the "same ratelimit", as
-/// the major parameter - `10` is equivilant in both URIs.
-///
-/// # Examples
-///
-/// First: taking the first two URIs - `GET /channels/4/messages/7` and
-/// `GET /channels/5/messages/8` - and assuming both buckets have a `limit` of
-/// `10`, requesting the first URI will result in the response containing a
-/// `remaining` of `9`. Immediately after - prior to buckets resetting -
-/// performing a request to the _second_ URI will also contain a `remaining` of
-/// `9` in the response, as the major parameter - `channel_id` - is different
-/// in the two requests (`4` and `5`).
-///
-/// Second: take for example the last two URIs. Assuming the bucket's `limit` is
-/// `10`, requesting the first URI will return a `remaining` of `9` in the
-/// response. Immediately after - prior to buckets resetting - performing a
-/// request to the _second_ URI will return a `remaining` of `8` in the
-/// response, as the major parameter - `channel_id` - is equivilant for the two
-/// requests (`10`).
-///
-///
-/// With the examples out of the way: major parameters are why some variants
-/// (i.e. all of the channel/guild variants) have an associated u64 as data.
-/// This is the Id of the parameter, differentiating between different
-/// ratelimits.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Route {
     ChannelsId(u64),

@@ -65,6 +65,7 @@ impl CreateInvite {
 }
 
 impl Default for CreateInvite {
+    /// Creates a builder with default values, setting `validate` to `null`.
     fn default() -> CreateInvite {
         CreateInvite(ObjectBuilder::new().insert("validate", Value::Null))
     }
