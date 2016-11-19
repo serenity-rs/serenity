@@ -74,6 +74,7 @@ impl From<Emoji> for EmojiId {
 }
 
 impl GuildId {
+
     /// Search the state for the guild.
     #[cfg(feature="methods")]
     pub fn find(&self) -> Option<LiveGuild> {
@@ -97,6 +98,13 @@ impl GuildId {
             id: self.0,
             prefix: "<#",
         }
+    }
+
+    /// Returns this Id as a `ChannelId`, which is useful when needing to use
+    /// the guild Id to send a message to the default channel.
+    #[cfg(feature = "methods")]
+    pub fn to_channel(&self) -> ChannelId {
+        ChannelId(self.0)
     }
 
     /// Retrieves the guild's webhooks.
