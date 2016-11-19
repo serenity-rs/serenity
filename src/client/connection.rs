@@ -137,7 +137,6 @@ pub struct Connection {
     keepalive_channel: MpscSender<Status>,
     last_sequence: u64,
     login_type: LoginType,
-    receiver: Receiver<WebSocketStream>,
     session_id: Option<String>,
     shard_info: Option<[u8; 2]>,
     token: String,
@@ -173,7 +172,7 @@ impl Connection {
                token: &str,
                shard_info: Option<[u8; 2]>,
                login_type: LoginType)
-               -> Result<(Connection, ReadyEvent)> {
+               -> Result<(Connection, ReadyEvent, Receiver<WebSocketStream>)> {
         let url = try!(build_gateway_url(base_url));
 
         let response = try!(try!(WsClient::connect(url)).send());
@@ -216,7 +215,6 @@ impl Connection {
                 keepalive_channel: tx.clone(),
                 last_sequence: sequence,
                 login_type: login_type,
-                receiver: receiver,
                 token: token.to_owned(),
                 session_id: Some(ready.ready.session_id.clone()),
                 shard_info: shard_info,
@@ -228,13 +226,12 @@ impl Connection {
                 keepalive_channel: tx.clone(),
                 last_sequence: sequence,
                 login_type: login_type,
-                receiver: receiver,
                 token: token.to_owned(),
                 session_id: Some(ready.ready.session_id.clone()),
                 shard_info: shard_info,
                 ws_url: base_url.to_owned(),
             }
-        }}, ready))
+        }}, ready, receiver))
     }
 
     pub fn shard_info(&self) -> Option<[u8; 2]> {
@@ -273,13 +270,18 @@ impl Connection {
         let _ = self.keepalive_channel.send(Status::SendMessage(msg));
     }
 
-    pub fn receive(&mut self) -> Result<Event> {
-        match self.receiver.recv_json(GatewayEvent::decode) {
+    pub fn handle_event(&mut self,
+                        event: Result<GatewayEvent>,
+                        mut receiver: &mut Receiver<WebSocketStream>)
+                        -> Result<Option<(Event, Option<Receiver<WebSocketStream>>)>> {
+        match event {
             Ok(GatewayEvent::Dispatch(sequence, event)) => {
                 let status = Status::Sequence(sequence);
                 let _ = self.keepalive_channel.send(status);
 
-                Ok(self.handle_dispatch(event))
+                self.handle_dispatch(&event);
+
+                Ok(Some((event, None)))
             },
             Ok(GatewayEvent::Heartbeat(sequence)) => {
                 let map = ObjectBuilder::new()
@@ -288,15 +290,15 @@ impl Connection {
                     .build();
                 let _ = self.keepalive_channel.send(Status::SendMessage(map));
 
-                self.receive()
+                Ok(None)
             },
             Ok(GatewayEvent::HeartbeatAck) => {
-                self.receive()
+                Ok(None)
             },
             Ok(GatewayEvent::Hello(interval)) => {
                 let _ = self.keepalive_channel.send(Status::ChangeInterval(interval));
 
-                self.receive()
+                Ok(None)
             },
             Ok(GatewayEvent::InvalidateSession) => {
                 self.session_id = None;
@@ -307,10 +309,10 @@ impl Connection {
 
                 let _ = self.keepalive_channel.send(status);
 
-                self.receive()
+                Ok(None)
             },
             Ok(GatewayEvent::Reconnect) => {
-                self.reconnect()
+                self.reconnect(receiver).map(|(ev, rec)| Some((ev, Some(rec))))
             },
             Err(Error::Connection(ConnectionError::Closed(num, message))) => {
                 warn!("Closing with {:?}: {:?}", num, message);
@@ -322,14 +324,14 @@ impl Connection {
                 // Otherwise, fallback to reconnecting.
                 if num != Some(1000) {
                     if let Some(session_id) = self.session_id.clone() {
-                        match self.resume(session_id) {
-                            Ok(event) => return Ok(event),
+                        match self.resume(session_id, receiver) {
+                            Ok((ev, rec)) => return Ok(Some((ev, Some(rec)))),
                             Err(why) => debug!("Err resuming: {:?}", why),
                         }
                     }
                 }
 
-                self.reconnect()
+                self.reconnect(receiver).map(|(ev, rec)| Some((ev, Some(rec))))
             },
             Err(Error::WebSocket(why)) => {
                 warn!("Websocket error: {:?}", why);
@@ -341,27 +343,27 @@ impl Connection {
                 //
                 // Otherwise, fallback to reconnecting.
                 if let Some(session_id) = self.session_id.clone() {
-                    match self.resume(session_id) {
-                        Ok(event) => return Ok(event),
+                    match self.resume(session_id, &mut receiver) {
+                        Ok((ev, rec)) => return Ok(Some((ev, Some(rec)))),
                         Err(why) => debug!("Err resuming: {:?}", why),
                     }
                 }
 
-                self.reconnect()
+                self.reconnect(receiver).map(|(ev, rec)| Some((ev, Some(rec))))
             },
             Err(error) => Err(error),
         }
     }
 
-    fn handle_dispatch(&mut self, event: Event) -> Event {
-        if let Event::Resumed(ref ev) = event {
+    fn handle_dispatch(&mut self, event: &Event) {
+        if let &Event::Resumed(ref ev) = event {
             let status = Status::ChangeInterval(ev.heartbeat_interval);
 
             let _ = self.keepalive_channel.send(status);
         }
 
         feature_voice_enabled! {{
-            if let Event::VoiceStateUpdate(ref update) = event {
+            if let &Event::VoiceStateUpdate(ref update) = event {
                 if let Some(guild_id) = update.guild_id {
                     if let Some(handler) = self.manager.get(guild_id) {
                         handler.update_state(&update.voice_state);
@@ -369,7 +371,7 @@ impl Connection {
                 }
             }
 
-            if let Event::VoiceServerUpdate(ref update) = event {
+            if let &Event::VoiceServerUpdate(ref update) = event {
                 if let Some(guild_id) = update.guild_id {
                     if let Some(handler) = self.manager.get(guild_id) {
                         handler.update_server(&update.endpoint, &update.token);
@@ -377,11 +379,9 @@ impl Connection {
                 }
             }
         }}
-
-        event
     }
 
-    fn reconnect(&mut self) -> Result<Event> {
+    fn reconnect(&mut self, mut receiver: &mut Receiver<WebSocketStream>) -> Result<(Event, Receiver<WebSocketStream>)> {
         debug!("Reconnecting");
 
         // Take a few attempts at reconnecting; otherwise fall back to
@@ -392,12 +392,12 @@ impl Connection {
                                              self.shard_info,
                                              self.login_type);
 
-            if let Ok((connection, ready)) = connection {
-                try!(mem::replace(self, connection).shutdown());
+            if let Ok((connection, ready, receiver_new)) = connection {
+                try!(mem::replace(self, connection).shutdown(&mut receiver));
 
                 self.session_id = Some(ready.ready.session_id.clone());
 
-                return Ok(Event::Ready(ready));
+                return Ok((Event::Ready(ready), receiver_new));
             }
 
             thread::sleep(StdDuration::from_secs(1));
@@ -409,7 +409,7 @@ impl Connection {
         // Client. This client _does not_ replace the current client(s) that the
         // user has. This client will then connect to gateway. This new
         // connection will be used to replace _this_ connection.
-        let (connection, ready) = {
+        let (connection, ready, receiver_new) = {
             let mut client = Client::login_raw(&self.token.clone(),
                                                self.login_type);
 
@@ -418,15 +418,16 @@ impl Connection {
 
         // Replace this connection with a new one, and shutdown the now-old
         // connection.
-        try!(mem::replace(self, connection).shutdown());
+        try!(mem::replace(self, connection).shutdown(&mut receiver));
 
         self.session_id = Some(ready.ready.session_id.clone());
 
-        Ok(Event::Ready(ready))
+        Ok((Event::Ready(ready), receiver_new))
     }
 
-    fn resume(&mut self, session_id: String) -> Result<Event> {
-        try!(self.receiver.get_mut().get_mut().shutdown(Shutdown::Both));
+    fn resume(&mut self, session_id: String, receiver: &mut Receiver<WebSocketStream>)
+        -> Result<(Event, Receiver<WebSocketStream>)> {
+        try!(receiver.get_mut().get_mut().shutdown(Shutdown::Both));
         let url = try!(build_gateway_url(&self.ws_url));
 
         let response = try!(try!(WsClient::connect(url)).send());
@@ -468,14 +469,14 @@ impl Connection {
             }
         }
 
-        self.receiver = receiver;
         let _ = self.keepalive_channel.send(Status::ChangeSender(sender));
 
-        Ok(first_event)
+        Ok((first_event, receiver))
     }
 
-    pub fn shutdown(&mut self) -> Result<()> {
-        let stream = self.receiver.get_mut().get_mut();
+    pub fn shutdown(&mut self, receiver: &mut Receiver<WebSocketStream>)
+        -> Result<()> {
+        let stream = receiver.get_mut().get_mut();
 
         {
             let mut sender = Sender::new(stream.by_ref(), true);
@@ -509,30 +510,6 @@ impl Connection {
                 .build();
 
             let _ = self.keepalive_channel.send(Status::SendMessage(msg));
-        }
-    }
-}
-
-impl Drop for Connection {
-    fn drop(&mut self) {
-        match self.shutdown() {
-            Ok(()) => {
-                if let Some(info) = self.shard_info {
-                    println!("Correctly shutdown shard {}/{}", info[0], info[1] - 1);
-                } else {
-                    println!("Correctly shutdown connection");
-                }
-            },
-            Err(why) => {
-                if let Some(info) = self.shard_info {
-                    println!("Failed to shutdown shard {}/{}: {:?}",
-                           info[0],
-                           info[1] - 1,
-                           why);
-                } else {
-                    println!("Failed to shutdown connection: {:?}", why);
-                }
-            }
         }
     }
 }

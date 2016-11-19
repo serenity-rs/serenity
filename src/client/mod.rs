@@ -45,7 +45,10 @@ use std::collections::{BTreeMap, HashMap};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
+use websocket::client::Receiver;
+use websocket::stream::WebSocketStream;
 use ::internal::prelude::*;
+use ::internal::ws_impl::ReceiverExt;
 use ::model::*;
 
 #[cfg(feature = "framework")]
@@ -870,7 +873,7 @@ impl Client {
                                              shard_data.map(|s| [i, s[2]]),
                                              self.login_type);
             match connection {
-                Ok((connection, ready)) => {
+                Ok((connection, ready, receiver)) => {
                     self.connections.push(Arc::new(Mutex::new(connection)));
 
                     feature_state_enabled! {{
@@ -882,13 +885,13 @@ impl Client {
                     match self.connections.last() {
                         Some(connection) => {
                             feature_framework! {{
-                                dispatch(Ok(Event::Ready(ready)),
+                                dispatch(Event::Ready(ready),
                                          connection.clone(),
                                          self.framework.clone(),
                                          self.login_type,
                                          self.event_store.clone());
                             } else {
-                                dispatch(Ok(Event::Ready(ready)),
+                                dispatch(Event::Ready(ready),
                                          connection.clone(),
                                          self.login_type,
                                          self.event_store.clone());
@@ -905,13 +908,15 @@ impl Client {
                                     handle_connection(connection_clone,
                                                       framework,
                                                       login_type,
-                                                      event_store)
+                                                      event_store,
+                                                      receiver)
                                 });
                             } else {
                                 thread::spawn(move || {
                                     handle_connection(connection_clone,
                                                       login_type,
-                                                      event_store)
+                                                      event_store,
+                                                      receiver)
                                 });
                             }}
                         },
@@ -935,7 +940,7 @@ impl Client {
     #[doc(hidden)]
     pub fn boot_connection(&mut self,
                            shard_info: Option<[u8; 2]>)
-                           -> Result<(Connection, ReadyEvent)> {
+                           -> Result<(Connection, ReadyEvent, Receiver<WebSocketStream>)> {
         let gateway_url = try!(http::get_gateway()).url;
 
         Connection::new(&gateway_url, &self.token, shard_info, self.login_type)
@@ -1250,12 +1255,21 @@ impl Client {
 fn handle_connection(connection: Arc<Mutex<Connection>>,
                      framework: Arc<Mutex<Framework>>,
                      login_type: LoginType,
-                     event_store: Arc<Mutex<EventStore>>) {
+                     event_store: Arc<Mutex<EventStore>>,
+                     mut receiver: Receiver<WebSocketStream>) {
     loop {
-        let event = {
-            let mut connection = connection.lock().unwrap();
+        let event = receiver.recv_json(GatewayEvent::decode);
 
-            connection.receive()
+        let event = match connection.lock().unwrap().handle_event(event, &mut receiver) {
+            Ok(Some(x)) => match x {
+                (event, Some(new_receiver)) => {
+                    receiver = new_receiver;
+
+                    event
+                },
+                (event, None) => event,
+            },
+            _ => continue,
         };
 
         dispatch(event,
@@ -1269,7 +1283,8 @@ fn handle_connection(connection: Arc<Mutex<Connection>>,
 #[cfg(not(feature="framework"))]
 fn handle_connection(connection: Arc<Mutex<Connection>>,
                      login_type: LoginType,
-                     event_store: Arc<Mutex<EventStore>>) {
+                     event_store: Arc<Mutex<EventStore>>,
+                     receiver: Receiver<WebSocketStream>) {
     loop {
         let event = {
             let mut connection = connection.lock().unwrap();

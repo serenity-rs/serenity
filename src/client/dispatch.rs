@@ -3,7 +3,6 @@ use std::thread;
 use super::event_store::EventStore;
 use super::login_type::LoginType;
 use super::{Connection, Context};
-use ::internal::prelude::*;
 use ::model::{ChannelId, Event, Message};
 
 #[cfg(feature="framework")]
@@ -42,13 +41,13 @@ fn context(channel_id: Option<ChannelId>,
 }
 
 #[cfg(feature="framework")]
-pub fn dispatch(event: Result<Event>,
+pub fn dispatch(event: Event,
                 conn: Arc<Mutex<Connection>>,
                 framework: Arc<Mutex<Framework>>,
                 login_type: LoginType,
                 event_store: Arc<Mutex<EventStore>>) {
     match event {
-        Ok(Event::MessageCreate(event)) => {
+        Event::MessageCreate(event) => {
             let context = context(Some(event.message.channel_id),
                                   conn,
                                   login_type);
@@ -64,8 +63,7 @@ pub fn dispatch(event: Result<Event>,
                 dispatch_message(context, event.message, event_store);
             }
         },
-        Ok(other) => handle_event(other, conn, login_type, event_store),
-        Err(_why) => {},
+        other => handle_event(other, conn, login_type, event_store),
     }
 }
 
@@ -75,7 +73,7 @@ pub fn dispatch(event: Result<Event>,
                 login_type: LoginType,
                 event_store: Arc<Mutex<EventStore>>) {
     match event {
-        Ok(Event::MessageCreate(event)) => {
+        Event::MessageCreate(event) => {
             let context = context(Some(event.message.channel_id),
                                   conn,
                                   login_type);
@@ -83,8 +81,7 @@ pub fn dispatch(event: Result<Event>,
                              event.message.clone(),
                              event_store);
         },
-        Ok(other) => handle_event(other, conn, login_type, event_store),
-        Err(_why) => {},
+        other => handle_event(other, conn, login_type, event_store),
     }
 }
 
