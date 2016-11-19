@@ -883,6 +883,15 @@ impl PublicChannel {
         }
     }
 
+    /// Attempts to find this channel's guild in the State.
+    ///
+    /// **Note**: Right now this performs a clone of the guild. This will be
+    /// optimized in the future.
+    #[cfg(all(feature = "methods", feature = "state"))]
+    pub fn guild(&self) -> Option<LiveGuild> {
+        STATE.lock().unwrap().find_guild(self.guild_id).cloned()
+    }
+
     /// Return a [`Mention`] which will link to this channel.
     ///
     /// [`Mention`]: struct.Mention.html
