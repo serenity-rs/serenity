@@ -1218,6 +1218,24 @@ impl Context {
             .set_presence(game, OnlineStatus::Online, false);
     }
 
+    /// Set the current game, passing in only its name. This will automatically
+    /// set the current user's [`OnlineStatus`] to [`Online`], and its
+    /// [`GameType`] as [`Playing`].
+    ///
+    /// Pass `None` to remove the current user's current game.
+    ///
+    /// [`GameType`]: ../model/enum.GameType.html
+    /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
+    /// [`OnlineStatus`]: ../model/enum.OnlineStatus.html
+    /// [`Playing`]: ../model/enum.GameType.html#variant.Playing
+    pub fn set_game_name(&self, game: Option<&str>) {
+        self.connection.lock()
+            .unwrap()
+            .set_presence(game.map(|x| Game::playing(x.to_owned())),
+                          OnlineStatus::Online,
+                          false);
+    }
+
     pub fn set_presence(&self,
                         game: Option<Game>,
                         status: OnlineStatus,
