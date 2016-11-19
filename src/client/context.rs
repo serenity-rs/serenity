@@ -784,12 +784,16 @@ impl Context {
         -> Result<Message> where C: Into<ChannelId>,
                                  F: FnOnce(CreateEmbed) -> CreateEmbed,
                                  M: Into<MessageId> {
-        let map = ObjectBuilder::new()
-            .insert("content", text)
-            .insert("embed", Value::Object(f(CreateEmbed::default()).0))
-            .build();
+        let mut map = ObjectBuilder::new()
+            .insert("content", text);
 
-        http::edit_message(channel_id.into().0, message_id.into().0, map)
+        let embed = f(CreateEmbed::default()).0;
+
+        if embed.len() > 1 {
+            map = map.insert("embed", Value::Object(embed));
+        }
+
+        http::edit_message(channel_id.into().0, message_id.into().0, map.build())
     }
 
     pub fn edit_note<U: Into<UserId>>(&self, user_id: U, note: &str)

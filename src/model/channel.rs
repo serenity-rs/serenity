@@ -511,7 +511,7 @@ impl Message {
 
         let embed = embed(CreateEmbed::default()).0;
 
-        if !embed.is_empty() {
+        if embed.len() > 1 {
             map = map.insert("embed", Value::Object(embed));
         }
 
