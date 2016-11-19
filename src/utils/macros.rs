@@ -49,23 +49,22 @@ macro_rules! status_concat {
 }
 
 // Enable/disable check for extras
+#[cfg(feature = "extras")]
 macro_rules! feature_extras {
-    ($enabled:block) => {
-        {
-            feature_extras_enabled! {{
-                $enabled
-            }}
-        }
-    };
     ($enabled:block else $disabled:block) => {
         {
             feature_extras_enabled! {{
                 $enabled
             }}
+        }
+    }
+}
 
-            feature_extras_disabled! {{
-                $disabled
-            }}
+#[cfg(not(feature = "extras"))]
+macro_rules! feature_extras {
+    ($enabled:block else $disabled:block) => {
+        {
+            $disabled
         }
     };
 }
@@ -81,12 +80,12 @@ macro_rules! feature_extras_enabled {
 
 #[cfg(not(feature = "extras"))]
 macro_rules! feature_extras_enabled {
-    ($enabled:block) => {}
+    ($enabled:block) => {{}}
 }
 
 #[cfg(feature = "extras")]
 macro_rules! feature_extras_disabled {
-    ($disabled:block) => {}
+    ($disabled:block) => {{}}
 }
 
 #[cfg(not(feature = "extras"))]
@@ -99,25 +98,22 @@ macro_rules! feature_extras_disabled {
 }
 
 // Enable/disable check for framework
+#[cfg(feature = "framework")]
 macro_rules! feature_framework {
-    ($enabled:block) => {
-        {
-            feature_framework_enabled! {{
-                $enabled
-            }}
-        }
-    };
     ($enabled:block else $disabled:block) => {
         {
-            feature_framework_enabled! {{
-                $enabled
-            }}
-
-            feature_framework_disabled! {{
-                $disabled
-            }}
+            $enabled
         }
-    };
+    }
+}
+
+#[cfg(not(feature = "framework"))]
+macro_rules! feature_framework {
+    ($enabled:block else $disabled:block) => {
+        {
+            $disabled
+        }
+    }
 }
 
 #[cfg(feature = "framework")]
@@ -131,12 +127,12 @@ macro_rules! feature_framework_enabled {
 
 #[cfg(not(feature = "framework"))]
 macro_rules! feature_framework_enabled {
-    ($enabled:block) => {}
+    ($enabled:block) => {{}}
 }
 
 #[cfg(feature = "framework")]
 macro_rules! feature_framework_disabled {
-    ($disabled:block) => {}
+    ($disabled:block) => {{}}
 }
 
 #[cfg(not(feature = "framework"))]
@@ -149,25 +145,22 @@ macro_rules! feature_framework_disabled {
 }
 
 // Enable/disable check for methods
+#[cfg(feature = "methods")]
 macro_rules! feature_methods {
-    ($enabled:block) => {
-        {
-            feature_methods_enabled! {{
-                $enabled
-            }}
-        }
-    };
     ($enabled:block else $disabled:block) => {
         {
-            feature_methods_enabled! {{
-                $enabled
-            }}
-
-            feature_methods_disabled! {{
-                $disabled
-            }}
+            $enabled
         }
-    };
+    }
+}
+
+#[cfg(not(feature = "methods"))]
+macro_rules! feature_methods {
+    ($enabled:block else $disabled:block) => {
+        {
+            $disabled
+        }
+    }
 }
 
 #[cfg(feature = "methods")]
@@ -181,12 +174,12 @@ macro_rules! feature_methods_enabled {
 
 #[cfg(not(feature = "methods"))]
 macro_rules! feature_methods_enabled {
-    ($enabled:block) => {}
+    ($enabled:block) => {{}}
 }
 
 #[cfg(feature = "methods")]
 macro_rules! feature_methods_disabled {
-    ($disabled:block) => {}
+    ($disabled:block) => {{}}
 }
 
 #[cfg(not(feature = "methods"))]
@@ -201,24 +194,20 @@ macro_rules! feature_methods_disabled {
 // Enable/disable check for state
 #[cfg(feature = "state")]
 macro_rules! feature_state {
-    ($enabled:block) => {
-        {
-            feature_state_enabled! {{
-                $enabled
-            }}
-        }
-    };
     ($enabled:block else $disabled:block) => {
         {
-            feature_state_enabled! {{
-                $enabled
-            }}
-
-            feature_state_disabled! {{
-                $disabled
-            }}
+            $enabled
         }
-    };
+    }
+}
+
+#[cfg(not(feature = "state"))]
+macro_rules! feature_state {
+    ($enabled:block else $disabled:block) => {
+        {
+            $disabled
+        }
+    }
 }
 
 #[cfg(feature = "state")]
@@ -232,12 +221,12 @@ macro_rules! feature_state_enabled {
 
 #[cfg(not(feature = "state"))]
 macro_rules! feature_state_enabled {
-    ($enabled:block) => {}
+    ($enabled:block) => {{}}
 }
 
 #[cfg(feature = "state")]
 macro_rules! feature_state_disabled {
-    ($disabled:block) => {}
+    ($disabled:block) => {{}}
 }
 
 #[cfg(not(feature = "state"))]
@@ -250,25 +239,22 @@ macro_rules! feature_state_disabled {
 }
 
 // Enable/disable check for voice
+#[cfg(feature = "voice")]
 macro_rules! feature_voice {
-    ($enabled:block) => {
-        {
-            feature_voice_enabled! {{
-                $enabled
-            }}
-        }
-    };
     ($enabled:block else $disabled:block) => {
         {
-            feature_voice_enabled! {{
-                $enabled
-            }}
-
-            feature_voice_disabled! {{
-                $disabled
-            }}
+            $enabled
         }
-    };
+    }
+}
+
+#[cfg(not(feature = "voice"))]
+macro_rules! feature_voice {
+    ($enabled:block else $disabled:block) => {
+        {
+            $disabled
+        }
+    }
 }
 
 #[cfg(feature = "voice")]
@@ -282,12 +268,12 @@ macro_rules! feature_voice_enabled {
 
 #[cfg(not(feature = "voice"))]
 macro_rules! feature_voice_enabled {
-    ($enabled:block) => {}
+    ($enabled:block) => {{}}
 }
 
 #[cfg(feature = "voice")]
 macro_rules! feature_voice_disabled {
-    ($disabled:block) => {}
+    ($disabled:block) => {{}}
 }
 
 #[cfg(not(feature = "voice"))]

@@ -122,19 +122,20 @@ fn handle_event(event: Event,
         },
         Event::CallDelete(event) => {
             if let Some(ref handler) = handler!(on_call_delete, event_store) {
-                let call = STATE
-                    .lock()
-                    .unwrap()
-                    .calls
-                    .remove(&event.channel_id);
-                update!(update_with_call_delete, event);
-
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, call);
-                });
+                feature_state! {{
+                    let call = update!(update_with_call_delete, event);
+
+                    thread::spawn(move || {
+                        (handler)(context, event.channel_id, call);
+                    });
+                } else {
+                    thread::spawn(move || {
+                        (handler)(context, event.channel_id);
+                    });
+                }}
             } else {
                 update!(update_with_call_delete, event);
             }
@@ -249,18 +250,25 @@ fn handle_event(event: Event,
         },
         Event::ChannelUpdate(event) => {
             if let Some(ref handler) = handler!(on_channel_update, event_store) {
-                let before = STATE.lock()
-                    .unwrap()
-                    .find_channel(event.channel.id());
-                update!(update_with_channel_update, event);
                 let context = context(Some(event.channel.id()),
                                       conn,
                                       login_type);
                 let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, before, event.channel);
-                });
+                feature_state! {{
+                    let before = STATE.lock()
+                        .unwrap()
+                        .find_channel(event.channel.id());
+                    update!(update_with_channel_update, event);
+
+                    thread::spawn(move || {
+                        (handler)(context, before, event.channel);
+                    });
+                } else {
+                    thread::spawn(move || {
+                        (handler)(context, event.channel);
+                    });
+                }}
             } else {
                 update!(update_with_channel_update, event);
             }
@@ -516,18 +524,25 @@ fn handle_event(event: Event,
         },
         Event::GuildUpdate(event) => {
             if let Some(ref handler) = handler!(on_guild_update, event_store) {
-                let before = STATE.lock()
-                    .unwrap()
-                    .guilds
-                    .get(&event.guild.id)
-                    .cloned();
-                update!(update_with_guild_update, event);
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, before, event.guild);
-                });
+                feature_state! {{
+                    let before = STATE.lock()
+                        .unwrap()
+                        .guilds
+                        .get(&event.guild.id)
+                        .cloned();
+                    update!(update_with_guild_update, event);
+
+                    thread::spawn(move || {
+                        (handler)(context, before, event.guild);
+                    });
+                } else {
+                    thread::spawn(move || {
+                        (handler)(context, event.guild);
+                    });
+                }}
             } else {
                 update!(update_with_guild_update, event);
             }

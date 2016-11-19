@@ -757,7 +757,7 @@ impl Context {
         let guild_id = guild_id.into();
         let role_id = role_id.into();
 
-        let map = feature_state! {{
+        feature_state! {{
             let state = STATE.lock().unwrap();
 
             let role = if let Some(role) = {
@@ -768,12 +768,14 @@ impl Context {
                 return Err(Error::Client(ClientError::RecordNotFound));
             };
 
-            f(EditRole::new(role)).0.build()
-        } else {
-            f(EditRole::default()).0.build()
-        }};
+            let map = f(EditRole::new(role)).0.build();
 
-        http::edit_role(guild_id.0, role_id.0, map)
+            return http::edit_role(guild_id.0, role_id.0, map);
+        } else {
+            let map = f(EditRole::default()).0.build();
+
+            return http::edit_role(guild_id.0, role_id.0, map);
+        }}
     }
 
     /// Edit a message given its Id and the Id of the channel it belongs to.
@@ -1233,11 +1235,15 @@ impl Context {
     /// [`OnlineStatus`]: ../model/enum.OnlineStatus.html
     /// [`Playing`]: ../model/enum.GameType.html#variant.Playing
     pub fn set_game_name(&self, game: Option<&str>) {
+        let game = game.map(|x| Game {
+            kind: GameType::Playing,
+            name: x.to_owned(),
+            url: None,
+        });
+
         self.connection.lock()
             .unwrap()
-            .set_presence(game.map(|x| Game::playing(x.to_owned())),
-                          OnlineStatus::Online,
-                          false);
+            .set_presence(game, OnlineStatus::Online, false);
     }
 
     pub fn set_presence(&self,

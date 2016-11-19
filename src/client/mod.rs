@@ -460,16 +460,6 @@ impl Client {
             .on_call_create = Some(Arc::new(handler));
     }
 
-    /// Attaches a handler for when a [`CallDelete`] is received.
-    ///
-    /// [`CallDelete`]: ../model/enum.Event.html#variant.CallDelete
-    pub fn on_call_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, Option<Call>) + Send + Sync + 'static {
-        self.event_store.lock()
-            .unwrap()
-            .on_call_delete = Some(Arc::new(handler));
-    }
-
     /// Attaches a handler for when a [`ChannelCreate`] is received.
     ///
     /// [`ChannelCreate`]: ../model/enum.Event.html#variant.ChannelCreate
@@ -508,16 +498,6 @@ impl Client {
         self.event_store.lock()
             .unwrap()
             .on_channel_pins_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`ChannelUpdate`] is received.
-    ///
-    /// [`ChannelUpdate`]: ../model/enum.Event.html#variant.ChannelUpdate
-    pub fn on_channel_update<F>(&mut self, handler: F)
-        where F: Fn(Context, Option<Channel>, Channel) + Send + Sync + 'static {
-        self.event_store.lock()
-            .unwrap()
-            .on_channel_update = Some(Arc::new(handler));
     }
 
     /// Attaches a handler for when a [`FriendSuggestionCreate`] is received.
@@ -602,20 +582,6 @@ impl Client {
             .on_guild_role_create = Some(Arc::new(handler));
     }
 
-    /// Attaches a handler for when a [`GuildRoleUpdate`] is received.
-    ///
-    /// The optional `Role` is the role prior to updating. This can be `None` if
-    /// it did not exist in the [`State`] before the update.
-    ///
-    /// [`GuildRoleUpdate`]: ../model/enum.Event.html#variant.GuildRoleUpdate
-    /// [`State`]: ../ext/state/struct.State.html
-    pub fn on_guild_role_update<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, Option<Role>, Role) + Send + Sync + 'static {
-        self.event_store.lock()
-            .unwrap()
-            .on_guild_role_update = Some(Arc::new(handler));
-    }
-
     /// Attaches a handler for when a [`GuildRoleSync`] is received.
     ///
     /// [`GuildRoleSync`]: ../model/enum.Event.html#variant.GuildRoleSync
@@ -634,16 +600,6 @@ impl Client {
         self.event_store.lock()
             .unwrap()
             .on_guild_unavailable = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildUpdate`] is received.
-    ///
-    /// [`GuildUpdate`]: ../model/enum.Event.html#variant.GuildUpdate
-    pub fn on_guild_update<F>(&mut self, handler: F)
-        where F: Fn(Context, Option<LiveGuild>, Guild) + Send + Sync + 'static {
-        self.event_store.lock()
-            .unwrap()
-            .on_guild_update = Some(Arc::new(handler));
     }
 
     /// Attaches a handler for when a [`GuildBan`] is received.
@@ -869,16 +825,6 @@ impl Client {
             .on_unknown = Some(Arc::new(handler));
     }
 
-    /// Attaches a handler for when a [`UserGuildSettingsUpdate`] is received.
-    ///
-    /// [`UserGuildSettingsUpdate`]: ../model/enum.Event.html#variant.UserGuildSettingsUpdate
-    pub fn on_user_guild_settings_update<F>(&mut self, handler: F)
-        where F: Fn(Context, Option<UserGuildSettings>, UserGuildSettings) + Send + Sync + 'static {
-        self.event_store.lock()
-            .unwrap()
-            .on_user_guild_settings_update = Some(Arc::new(handler));
-    }
-
     /// Attaches a handler for when a [`VoiceServerUpdate`] is received.
     ///
     /// [`VoiceServerUpdate`]: ../model/enum.Event.html#variant.VoiceServerUpdate
@@ -998,6 +944,19 @@ impl Client {
 
 #[cfg(feature = "state")]
 impl Client {
+    /// Attaches a handler for when a [`CallDelete`] is received.
+    ///
+    /// The `ChannelId` is the Id of the channel hosting the call. Returns the
+    /// call from the state - optionally - if the call was in it.
+    ///
+    /// [`CallDelete`]: ../model/enum.Event.html#variant.CallDelete
+    pub fn on_call_delete<F>(&mut self, handler: F)
+        where F: Fn(Context, ChannelId, Option<Call>) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_call_delete = Some(Arc::new(handler));
+    }
+
     /// Attaches a handler for when a [`CallUpdate`] is received.
     ///
     /// [`CallUpdate`]: ../model/enum.Event.html#variant.CallUpdate
@@ -1006,6 +965,18 @@ impl Client {
         self.event_store.lock()
             .unwrap()
             .on_call_update = Some(Arc::new(handler));
+    }
+
+    /// Attaches a handler for when a [`ChannelUpdate`] is received.
+    ///
+    /// Optionally provides the version of the channel before the update.
+    ///
+    /// [`ChannelUpdate`]: ../model/enum.Event.html#variant.ChannelUpdate
+    pub fn on_channel_update<F>(&mut self, handler: F)
+        where F: Fn(Context, Option<Channel>, Channel) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_channel_update = Some(Arc::new(handler));
     }
 
     /// Attaches a handler for when a [`GuildDelete`] is received.
@@ -1061,6 +1032,40 @@ impl Client {
             .on_guild_role_delete = Some(Arc::new(handler));
     }
 
+    /// Attaches a handler for when a [`GuildRoleUpdate`] is received.
+    ///
+    /// The optional `Role` is the role prior to updating. This can be `None` if
+    /// it did not exist in the [`State`] before the update.
+    ///
+    /// [`GuildRoleUpdate`]: ../model/enum.Event.html#variant.GuildRoleUpdate
+    /// [`State`]: ../ext/state/struct.State.html
+    pub fn on_guild_role_update<F>(&mut self, handler: F)
+        where F: Fn(Context, GuildId, Option<Role>, Role) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_guild_role_update = Some(Arc::new(handler));
+    }
+
+    /// Attaches a handler for when a [`UserGuildSettingsUpdate`] is received.
+    ///
+    /// [`UserGuildSettingsUpdate`]: ../model/enum.Event.html#variant.UserGuildSettingsUpdate
+    pub fn on_user_guild_settings_update<F>(&mut self, handler: F)
+        where F: Fn(Context, Option<UserGuildSettings>, UserGuildSettings) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_user_guild_settings_update = Some(Arc::new(handler));
+    }
+
+    /// Attaches a handler for when a [`GuildUpdate`] is received.
+    ///
+    /// [`GuildUpdate`]: ../model/enum.Event.html#variant.GuildUpdate
+    pub fn on_guild_update<F>(&mut self, handler: F)
+        where F: Fn(Context, Option<LiveGuild>, Guild) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_guild_update = Some(Arc::new(handler));
+    }
+
     /// Attaches a handler for when a [`UserNoteUpdate`] is received.
     ///
     /// Optionally returns the old note for the [`User`], if one existed.
@@ -1101,6 +1106,16 @@ impl Client {
 
 #[cfg(not(feature = "state"))]
 impl Client {
+    /// Attaches a handler for when a [`CallDelete`] is received.
+    ///
+    /// [`CallDelete`]: ../model/enum.Event.html#variant.CallDelete
+    pub fn on_call_delete<F>(&mut self, handler: F)
+        where F: Fn(Context, ChannelId) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_call_delete = Some(Arc::new(handler));
+    }
+
     /// Attaches a handler for when a [`CallUpdate`] is received.
     ///
     /// [`CallUpdate`]: ../model/enum.Event.html#variant.CallUpdate
@@ -1111,13 +1126,23 @@ impl Client {
             .on_call_update = Some(Arc::new(handler));
     }
 
+    /// Attaches a handler for when a [`ChannelUpdate`] is received.
+    ///
+    /// [`ChannelUpdate`]: ../model/enum.Event.html#variant.ChannelUpdate
+    pub fn on_channel_update<F>(&mut self, handler: F)
+        where F: Fn(Context, Channel) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_channel_update = Some(Arc::new(handler));
+    }
+
     /// Attaches a handler for when a [`GuildDelete`] is received.
     ///
     /// [`GuildDelete`]: ../model/enum.Event.html#variant.GuildDelete
     /// [`Role`]: ../model/struct.Role.html
     /// [`State`]: ../ext/state/struct.State.html
     pub fn on_guild_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, Guild, Option<LiveGuild>) + Send + Sync + 'static {
+        where F: Fn(Context, Guild) + Send + Sync + 'static {
         self.event_store.lock()
             .unwrap()
             .on_guild_delete = Some(Arc::new(handler));
@@ -1156,6 +1181,37 @@ impl Client {
             .on_guild_role_delete = Some(Arc::new(handler));
     }
 
+    /// Attaches a handler for when a [`GuildRoleUpdate`] is received.
+    ///
+    /// [`GuildRoleUpdate`]: ../model/enum.Event.html#variant.GuildRoleUpdate
+    /// [`State`]: ../ext/state/struct.State.html
+    pub fn on_guild_role_update<F>(&mut self, handler: F)
+        where F: Fn(Context, GuildId, Role) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_guild_role_update = Some(Arc::new(handler));
+    }
+
+    /// Attaches a handler for when a [`UserGuildSettingsUpdate`] is received.
+    ///
+    /// [`UserGuildSettingsUpdate`]: ../model/enum.Event.html#variant.UserGuildSettingsUpdate
+    pub fn on_user_guild_settings_update<F>(&mut self, handler: F)
+        where F: Fn(Context, UserGuildSettings) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_user_guild_settings_update = Some(Arc::new(handler));
+    }
+
+    /// Attaches a handler for when a [`GuildUpdate`] is received.
+    ///
+    /// [`GuildUpdate`]: ../model/enum.Event.html#variant.GuildUpdate
+    pub fn on_guild_update<F>(&mut self, handler: F)
+        where F: Fn(Context, Guild) + Send + Sync + 'static {
+        self.event_store.lock()
+            .unwrap()
+            .on_guild_update = Some(Arc::new(handler));
+    }
+
     /// Attaches a handler for when a [`UserNoteUpdate`] is received.
     ///
     /// Optionally returns the old note for the [`User`], if one existed.
@@ -1173,7 +1229,7 @@ impl Client {
     ///
     /// [`UserSettingsUpdate`]: ../model/enum.Event.html#variant.UserSettingsUpdate
     pub fn on_user_settings_update<F>(&mut self, handler: F)
-        where F: Fn(Context, UserSettingsEvent) + Send + Sync + 'static {
+        where F: Fn(Context, UserSettingsUpdateEvent) + Send + Sync + 'static {
         self.event_store.lock()
             .unwrap()
             .on_user_settings_update = Some(Arc::new(handler));
