@@ -68,7 +68,7 @@ pub fn dispatch(event: Event,
 }
 
 #[cfg(not(feature="framework"))]
-pub fn dispatch(event: Result<Event>,
+pub fn dispatch(event: Event,
                 conn: Arc<Mutex<Connection>>,
                 login_type: LoginType,
                 event_store: Arc<Mutex<EventStore>>) {

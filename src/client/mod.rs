@@ -1284,12 +1284,20 @@ fn handle_connection(connection: Arc<Mutex<Connection>>,
 fn handle_connection(connection: Arc<Mutex<Connection>>,
                      login_type: LoginType,
                      event_store: Arc<Mutex<EventStore>>,
-                     receiver: Receiver<WebSocketStream>) {
+                     mut receiver: Receiver<WebSocketStream>) {
     loop {
-        let event = {
-            let mut connection = connection.lock().unwrap();
+        let event = receiver.recv_json(GatewayEvent::decode);
 
-            connection.receive()
+        let event = match connection.lock().unwrap().handle_event(event, &mut receiver) {
+            Ok(Some(x)) => match x {
+                (event, Some(new_receiver)) => {
+                    receiver = new_receiver;
+
+                    event
+                },
+                (event, None) => event,
+            },
+            _ => continue,
         };
 
         dispatch(event,
