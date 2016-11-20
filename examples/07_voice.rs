@@ -38,7 +38,7 @@ fn main() {
 
 #[cfg(feature = "voice")]
 fn deafen(context: Context, message: Message, _args: Vec<String>) {
-    let guild_id = match STATE.lock().unwrap().find_channel(message.channel_id) {
+    let guild_id = match STATE.lock().unwrap().get_channel(message.channel_id) {
         Some(Channel::Public(channel)) => channel.guild_id,
         Some(_) => {
             let _ = message.reply("Groups and DMs not supported");
@@ -90,7 +90,7 @@ fn join(context: Context, message: Message, args: Vec<String>) {
         },
     };
 
-    let guild_id = match STATE.lock().unwrap().find_channel(message.channel_id) {
+    let guild_id = match STATE.lock().unwrap().get_channel(message.channel_id) {
         Some(Channel::Public(channel)) => channel.guild_id,
         Some(_) => {
             let _ = context.say("Groups and DMs not supported");
@@ -114,7 +114,7 @@ fn join(context: Context, message: Message, args: Vec<String>) {
 
 #[cfg(feature = "voice")]
 fn leave(context: Context, message: Message, _args: Vec<String>) {
-    let guild_id = match STATE.lock().unwrap().find_channel(message.channel_id) {
+    let guild_id = match STATE.lock().unwrap().get_channel(message.channel_id) {
         Some(Channel::Public(channel)) => channel.guild_id,
         Some(_) => {
             let _ = context.say("Groups and DMs not supported");
@@ -144,7 +144,7 @@ fn leave(context: Context, message: Message, _args: Vec<String>) {
 
 #[cfg(feature = "voice")]
 fn mute(context: Context, message: Message, _args: Vec<String>) {
-    let guild_id = match STATE.lock().unwrap().find_channel(message.channel_id) {
+    let guild_id = match STATE.lock().unwrap().get_channel(message.channel_id) {
         Some(Channel::Public(channel)) => channel.guild_id,
         Some(_) => {
             let _ = message.reply("Groups and DMs not supported");
