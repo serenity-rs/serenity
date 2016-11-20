@@ -1218,34 +1218,97 @@ impl Context {
         http::send_message(channel_id.into().0, Value::Object(map))
     }
 
-    pub fn set_game(&self, game: Option<Game>) {
+    /// "Resets" the current user's presence, by setting the game to `None`,
+    /// the online status to [`Online`], and `afk` to `false`.
+    ///
+    /// Use [`set_presence`] for fine-grained control over individual details.
+    ///
+    /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
+    /// [`set_presence`]: #method.set_presence
+    pub fn reset_presence(&self) {
         self.connection.lock()
             .unwrap()
-            .set_presence(game, OnlineStatus::Online, false);
+            .set_presence(None, OnlineStatus::Online, false)
     }
 
-    /// Set the current game, passing in only its name. This will automatically
+    /// Sets the current game, defaulting to an online status of [`Online`], and
+    /// setting `afk` to `false`.
+    ///
+    /// # Examples
+    ///
+    /// Set the current user as playing "Heroes of the Storm":
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::Game;
+    ///
+    /// // assuming you are in a context
+    ///
+    /// context.set_game(Game::playing("Heroes of the Storm"));
+    /// ```
+    ///
+    /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
+    pub fn set_game(&self, game: Game) {
+        self.connection.lock()
+            .unwrap()
+            .set_presence(Some(game), OnlineStatus::Online, false);
+    }
+
+    /// Sets the current game, passing in only its name. This will automatically
     /// set the current user's [`OnlineStatus`] to [`Online`], and its
     /// [`GameType`] as [`Playing`].
     ///
-    /// Pass `None` to remove the current user's current game.
+    /// Use [`reset_presence`] to clear the current game, or [`set_presence`]
+    /// for more fine-grained control.
     ///
     /// [`GameType`]: ../model/enum.GameType.html
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     /// [`OnlineStatus`]: ../model/enum.OnlineStatus.html
     /// [`Playing`]: ../model/enum.GameType.html#variant.Playing
-    pub fn set_game_name(&self, game: Option<&str>) {
-        let game = game.map(|x| Game {
+    /// [`reset_presence`]: #method.reset_presence
+    /// [`set_presence`]: #method.set_presence
+    pub fn set_game_name(&self, game_name: &str) {
+        let game = Game {
             kind: GameType::Playing,
-            name: x.to_owned(),
+            name: game_name.to_owned(),
             url: None,
-        });
+        };
 
         self.connection.lock()
             .unwrap()
-            .set_presence(game, OnlineStatus::Online, false);
+            .set_presence(Some(game), OnlineStatus::Online, false);
     }
 
+    /// Sets the current user's presence, providing all fields to be passed.
+    ///
+    /// # Examples
+    ///
+    /// Setting the current user as having no game, being [`Idle`],
+    /// and setting `afk` to `true`:
+    ///
+    /// ```rust,no_run
+    /// use serenity::model::OnlineStatus;
+    ///
+    /// // assuming you are in a context
+    ///
+    /// context.set_game(None, OnlineStatus::Idle, true);
+    /// ```
+    ///
+    /// Setting the current user as playing "Heroes of the Storm", being
+    /// [`DoNotDisturb`], and setting `afk` to `false`:
+    ///
+    /// ```rust,no_run
+    /// use serenity::model::OnlineStatus;
+    ///
+    /// // assuming you are in a context
+    ///
+    /// let game = Game::playing("Heroes of the Storm");
+    /// let status = OnlineStatus::DoNotDisturb;
+    ///
+    /// context.set_game(Some(game), status, false);
+    /// ```
+    ///
+    /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
+    /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
     pub fn set_presence(&self,
                         game: Option<Game>,
                         status: OnlineStatus,

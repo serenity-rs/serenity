@@ -762,20 +762,20 @@ impl Event {
 
 impl Game {
     #[cfg(feature="methods")]
-    pub fn playing(name: String) -> Game {
+    pub fn playing(name: &str) -> Game {
         Game {
             kind: GameType::Playing,
-            name: name,
+            name: name.to_owned(),
             url: None,
         }
     }
 
     #[cfg(feature="methods")]
-    pub fn streaming(name: String, url: String) -> Game {
+    pub fn streaming(name: &str, url: &str) -> Game {
         Game {
             kind: GameType::Streaming,
-            name: name,
-            url: Some(url),
+            name: name.to_owned(),
+            url: Some(url.to_owned()),
         }
     }
 
