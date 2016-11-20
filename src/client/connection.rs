@@ -70,6 +70,8 @@ impl Display for ConnectionError {
     }
 }
 
+type CurrentPresence = (Option<Game>, OnlineStatus, bool);
+
 /// A connection is a handler for a websocket connection to Discord's gateway.
 /// The connection allows for sending and receiving messages over the websocket,
 /// such as setting the active game, reconnecting, syncing guilds, and more.
@@ -134,6 +136,7 @@ impl Display for ConnectionError {
 /// [`receive`]: #method.receive
 /// [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 pub struct Connection {
+    current_presence: CurrentPresence,
     keepalive_channel: MpscSender<Status>,
     last_sequence: u64,
     login_type: LoginType,
@@ -212,6 +215,7 @@ impl Connection {
 
         Ok((feature_voice! {{
             Connection {
+                current_presence: (None, OnlineStatus::Online, false),
                 keepalive_channel: tx.clone(),
                 last_sequence: sequence,
                 login_type: login_type,
@@ -223,6 +227,7 @@ impl Connection {
             }
         } else {
             Connection {
+                current_presence: (None, OnlineStatus::Online, false),
                 keepalive_channel: tx.clone(),
                 last_sequence: sequence,
                 login_type: login_type,
@@ -238,11 +243,62 @@ impl Connection {
         self.shard_info
     }
 
-    pub fn set_game(&self, game: Option<Game>) {
-        self.set_presence(game, OnlineStatus::Online, false)
+    /// Sets whether the current user is afk. This helps Discord determine where
+    /// to send notifications.
+    ///
+    /// Other presence settings are maintained.
+    pub fn set_afk(&mut self, afk: bool) {
+        self.current_presence.2 = afk;
+
+        self.update_presence();
     }
 
-    pub fn set_presence(&self,
+    /// Sets the user's current game, if any.
+    ///
+    /// Other presence settings are maintained.
+    pub fn set_game(&mut self, game: Option<Game>) {
+        self.current_presence.0 = game;
+
+        self.update_presence();
+    }
+
+    /// Sets the user's current online status.
+    ///
+    /// Note that [`Offline`] is not a valid presence, so it is automatically
+    /// converted to [`Invisible`].
+    ///
+    /// Other presence settings are maintained.
+    pub fn set_status(&mut self, online_status: OnlineStatus) {
+        self.current_presence.1 = match online_status {
+            OnlineStatus::Offline => OnlineStatus::Invisible,
+            other => other,
+        };
+
+        self.update_presence();
+    }
+
+    /// Sets the user's full presence information.
+    ///
+    /// Consider using the individual setters if you only need to modify one of
+    /// these.
+    ///
+    /// # Examples
+    ///
+    /// Set the current user as playing `"Heroes of the Storm"`, being online,
+    /// and not being afk:
+    ///
+    /// ```rust,no_run
+    /// use serenity::model::{Game, OnlineStatus};
+    ///
+    /// // assuming you are in a context
+    ///
+    /// context.connection.lock()
+    ///     .unwrap()
+    ///     .set_presence(Game::playing("Heroes of the Storm"),
+    ///                   OnlineStatus::Online,
+    ///                   false);
+    /// ```
+    pub fn set_presence(&mut self,
                         game: Option<Game>,
                         status: OnlineStatus,
                         afk: bool) {
@@ -250,6 +306,15 @@ impl Connection {
             OnlineStatus::Offline => OnlineStatus::Invisible,
             other => other,
         };
+
+        self.current_presence = (game, status, afk);
+
+        self.update_presence();
+    }
+
+    fn update_presence(&self) {
+        let (ref game, status, afk) = self.current_presence;
+
         let msg = ObjectBuilder::new()
             .insert("op", OpCode::StatusUpdate.num())
             .insert_object("d", move |mut object| {
@@ -257,10 +322,10 @@ impl Connection {
                     .insert("afk", afk)
                     .insert("status", status.name());
 
-                match game {
-                    Some(game) => {
+                match game.as_ref() {
+                    Some(ref game) => {
                         object.insert_object("game", move |o| o
-                            .insert("name", game.name))
+                            .insert("name", &game.name))
                     },
                     None => object.insert("game", Value::Null),
                 }

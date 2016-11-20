@@ -1218,6 +1218,38 @@ impl Context {
         http::send_message(channel_id.into().0, Value::Object(map))
     }
 
+    /// Sets the current user as being [`Online`]. This maintains the current
+    /// game and `afk` setting.
+    ///
+    /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
+    pub fn online(&self) {
+        self.connection.lock().unwrap().set_status(OnlineStatus::Online);
+    }
+
+    /// Sets the current user as being [`Idle`]. This maintains the current
+    /// game and `afk` setting.
+    ///
+    /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
+    pub fn idle(&self) {
+        self.connection.lock().unwrap().set_status(OnlineStatus::Idle);
+    }
+
+    /// Sets the current user as being [`DoNotDisturb`]. This maintains the
+    /// current game and `afk` setting.
+    ///
+    /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
+    pub fn dnd(&self) {
+        self.connection.lock().unwrap().set_status(OnlineStatus::DoNotDisturb);
+    }
+
+    /// Sets the current user as being [`Invisible`]. This maintains the current
+    /// game and `afk` setting.
+    ///
+    /// [`Invisible`]: ../model/enum.OnlineStatus.html#variant.Invisible
+    pub fn invisible(&self) {
+        self.connection.lock().unwrap().set_status(OnlineStatus::Invisible);
+    }
+
     /// "Resets" the current user's presence, by setting the game to `None`,
     /// the online status to [`Online`], and `afk` to `false`.
     ///
