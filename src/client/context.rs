@@ -1146,7 +1146,7 @@ impl Context {
     ///
     /// fn ping(context: Context, message: Message, _arguments: Vec<String>) {
     ///     let state = STATE.lock().unwrap();
-    ///     let ch = state.find_channel(message.channel_id);
+    ///     let ch = state.get_channel(message.channel_id);
     ///     let name = match ch {
     ///         Some(Channel::Public(ch)) => ch.name.clone(),
     ///         _ => "Unknown".to_owned(),
@@ -1285,7 +1285,7 @@ impl Context {
     /// Setting the current user as having no game, being [`Idle`],
     /// and setting `afk` to `true`:
     ///
-    /// ```rust,no_run
+    /// ```rust,ignore
     /// use serenity::model::OnlineStatus;
     ///
     /// // assuming you are in a context
@@ -1296,8 +1296,8 @@ impl Context {
     /// Setting the current user as playing "Heroes of the Storm", being
     /// [`DoNotDisturb`], and setting `afk` to `false`:
     ///
-    /// ```rust,no_run
-    /// use serenity::model::OnlineStatus;
+    /// ```rust,ignore
+    /// use serenity::model::{Game, OnlineStatus};
     ///
     /// // assuming you are in a context
     ///
