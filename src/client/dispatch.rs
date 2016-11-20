@@ -255,7 +255,7 @@ fn handle_event(event: Event,
                 feature_state! {{
                     let before = STATE.lock()
                         .unwrap()
-                        .find_channel(event.channel.id());
+                        .get_channel(event.channel.id());
                     update!(update_with_channel_update, event);
 
                     thread::spawn(move || {
@@ -413,7 +413,7 @@ fn handle_event(event: Event,
                     // could fail under any circumstance.
                     let after = STATE.lock()
                         .unwrap()
-                        .find_member(event.guild_id, event.user.id)
+                        .get_member(event.guild_id, event.user.id)
                         .unwrap()
                         .clone();
 

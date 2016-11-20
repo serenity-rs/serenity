@@ -278,7 +278,7 @@ pub fn user_has_perms(channel_id: ChannelId,
     let state = STATE.lock().unwrap();
     let current_user = &state.user;
 
-    let channel = match state.find_channel(channel_id) {
+    let channel = match state.get_channel(channel_id) {
         Some(channel) => channel,
         None => return Err(Error::Client(ClientError::ItemMissing)),
     };
@@ -290,7 +290,7 @@ pub fn user_has_perms(channel_id: ChannelId,
         Channel::Public(channel) => channel.guild_id,
     };
 
-    let guild = match state.find_guild(guild_id) {
+    let guild = match state.get_guild(guild_id) {
         Some(guild) => guild,
         None => return Err(Error::Client(ClientError::ItemMissing)),
     };

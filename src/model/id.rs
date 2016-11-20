@@ -9,15 +9,15 @@ impl ChannelId {
     /// Search the state for the channel with the Id.
     #[cfg(feature="methods")]
     pub fn find(&self) -> Option<Channel> {
-        STATE.lock().unwrap().find_channel(*self)
+        STATE.lock().unwrap().get_channel(*self)
     }
 
     /// Search the state for the channel. If it can't be found, the channel is
     /// requested over REST.
     #[cfg(feature="methods")]
     pub fn get(&self) -> Result<Channel> {
-        if let Some(channel) = STATE.lock().unwrap().find_channel(*self) {
-            return Ok(channel);
+        if let Some(channel) = STATE.lock().unwrap().get_channel(*self) {
+            return Ok(channel.clone());
         }
 
         http::get_channel(self.0)
@@ -74,11 +74,10 @@ impl From<Emoji> for EmojiId {
 }
 
 impl GuildId {
-
     /// Search the state for the guild.
     #[cfg(feature="methods")]
     pub fn find(&self) -> Option<LiveGuild> {
-        STATE.lock().unwrap().find_guild(*self).cloned()
+        STATE.lock().unwrap().get_guild(*self).cloned()
     }
 
     /// Requests the guild over REST.

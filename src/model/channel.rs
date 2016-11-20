@@ -889,7 +889,7 @@ impl PublicChannel {
     /// optimized in the future.
     #[cfg(all(feature = "methods", feature = "state"))]
     pub fn guild(&self) -> Option<LiveGuild> {
-        STATE.lock().unwrap().find_guild(self.guild_id).cloned()
+        STATE.lock().unwrap().get_guild(self.guild_id).cloned()
     }
 
     /// Return a [`Mention`] which will link to this channel.

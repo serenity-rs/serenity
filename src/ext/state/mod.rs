@@ -109,11 +109,11 @@ impl State {
             .collect::<Vec<_>>()
     }
 
-    pub fn find_call<C: Into<ChannelId>>(&self, group_id: C) -> Option<&Call> {
+    pub fn get_call<C: Into<ChannelId>>(&self, group_id: C) -> Option<&Call> {
         self.calls.get(&group_id.into())
     }
 
-    pub fn find_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
+    pub fn get_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
         let id = id.into();
 
         for guild in self.guilds.values() {
@@ -127,16 +127,16 @@ impl State {
         None
     }
 
-    pub fn find_guild<G: Into<GuildId>>(&self, id: G) -> Option<&LiveGuild> {
+    pub fn get_guild<G: Into<GuildId>>(&self, id: G) -> Option<&LiveGuild> {
         self.guilds.get(&id.into())
     }
 
-    pub fn find_group<C: Into<ChannelId>>(&self, id: C) -> Option<&Group> {
+    pub fn get_group<C: Into<ChannelId>>(&self, id: C) -> Option<&Group> {
         self.groups.get(&id.into())
     }
 
-    pub fn find_member<G, U>(&self, guild_id: G, user_id: U)
-        -> Option<&Member> where G: Into<GuildId>, U: Into<UserId> {
+    pub fn get_member<G, U>(&self, guild_id: G, user_id: U) -> Option<&Member>
+        where G: Into<GuildId>, U: Into<UserId> {
         self.guilds
             .get(&guild_id.into())
             .map(|guild| {
@@ -147,7 +147,7 @@ impl State {
             })
     }
 
-    pub fn find_role<G, R>(&self, guild_id: G, role_id: R) -> Option<&Role>
+    pub fn get_role<G, R>(&self, guild_id: G, role_id: R) -> Option<&Role>
         where G: Into<GuildId>, R: Into<RoleId> {
         if let Some(guild) = self.guilds.get(&guild_id.into()) {
             guild.roles.get(&role_id.into())

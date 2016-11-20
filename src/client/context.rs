@@ -761,7 +761,7 @@ impl Context {
             let state = STATE.lock().unwrap();
 
             let role = if let Some(role) = {
-                state.find_role(guild_id.0, role_id.0)
+                state.get_role(guild_id.0, role_id.0)
             } {
                 role
             } else {
@@ -821,8 +821,8 @@ impl Context {
         let channel_id = channel_id.into();
 
         feature_state_enabled! {{
-            if let Some(channel) = STATE.lock().unwrap().find_channel(channel_id) {
-                return Ok(channel.clone())
+            if let Some(channel) = STATE.lock().unwrap().get_channel(channel_id) {
+                return Ok(channel.clone());
             }
         }}
 
@@ -836,7 +836,7 @@ impl Context {
         feature_state_enabled! {{
             let state = STATE.lock().unwrap();
 
-            if let Some(guild) = state.find_guild(guild_id) {
+            if let Some(guild) = state.get_guild(guild_id) {
                 return Ok(guild.channels.clone());
             }
         }}
@@ -901,7 +901,7 @@ impl Context {
         feature_state_enabled! {{
             let state = STATE.lock().unwrap();
 
-            if let Some(member) = state.find_member(guild_id, user_id) {
+            if let Some(member) = state.get_member(guild_id, user_id) {
                 return Ok(member.clone());
             }
         }}
