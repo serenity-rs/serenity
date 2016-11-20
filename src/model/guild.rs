@@ -923,6 +923,26 @@ impl Member {
             },
         }
     }
+
+    /// Retrieves the full role data for the user's roles.
+    ///
+    /// This is shorthand for manually searching through the state.
+    ///
+    /// If role data can not be found for the member, then `None` is returned.
+    #[cfg(all(feature = "methods", feature = "state"))]
+    pub fn roles(&self) -> Option<Vec<Role>> {
+        STATE.lock().unwrap()
+            .guilds
+            .values()
+            .find(|g| g.members
+                .values()
+                .any(|m| m.user.id == self.user.id && m.joined_at == *self.joined_at))
+            .map(|g| g.roles
+                .values()
+                .filter(|r| self.roles.contains(&r.id))
+                .cloned()
+                .collect())
+    }
 }
 
 impl fmt::Display for Member {
