@@ -106,13 +106,6 @@ pub enum Route {
 
 pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
     where F: Fn() -> RequestBuilder<'a> {
-    // Keeping the global lock poisoned here for the duration of the function
-    // will ensure that requests are synchronous, which will further ensure
-    // that 429s are _never_ hit.
-    //
-    // This would otherwise cause the potential for 429s to be hit while
-    // requests are open.
-    let mut global = GLOBAL.lock().expect("global route lock poisoned");
 
     loop {
         // Perform pre-checking here:
@@ -123,7 +116,10 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
         // - get the global rate;
         // - sleep if there is 0 remaining
         // - then, perform the request
-        global.pre_hook();
+        {
+            let mut global = GLOBAL.lock().expect("global route lock poisoned");
+            global.pre_hook();
+        }
 
         if route != Route::None {
             if let Some(route) = ROUTES.lock().expect("routes poisoned").get_mut(&route) {
@@ -149,6 +145,7 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
 
         if route != Route::None {
             let redo = if response.headers.get_raw("x-ratelimit-global").is_some() {
+                let mut global = GLOBAL.lock().expect("global route lock poisoned");
                 global.post_hook(&response)
             } else {
                 ROUTES.lock()
