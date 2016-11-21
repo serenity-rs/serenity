@@ -287,7 +287,7 @@ impl Connection {
     /// Set the current user as playing `"Heroes of the Storm"`, being online,
     /// and not being afk:
     ///
-    /// ```rust,no_run
+    /// ```rust,ignore
     /// use serenity::model::{Game, OnlineStatus};
     ///
     /// // assuming you are in a context
