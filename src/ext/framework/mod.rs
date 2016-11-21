@@ -11,6 +11,29 @@ use std::thread;
 use ::client::Context;
 use ::model::Message;
 
+#[macro_export]
+macro_rules! command {
+    ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
+        fn $fname($c: Context, $m: Message, $a: Vec<String>) {
+            let mut i = $a.iter();
+
+            $(
+                let $name = match i.next() {
+                    Some(v) => match v.parse::<$t>() {
+                        Ok(v) => v,
+                        Err(_why) => return,
+                    },
+                    None => return,
+                };
+            )*
+
+            drop(i);
+
+            $b
+        }
+    }
+}
+
 /// The type of command being received.
 ///
 /// The [`Mention`] variant is emitted if the bot is being commanded via a

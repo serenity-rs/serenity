@@ -1,3 +1,4 @@
+#[macro_use]
 extern crate serenity;
 
 use serenity::client::Context;
@@ -34,6 +35,7 @@ fn main() {
         .set_check("ping", owner_check) // Ensure only the owner can run this
         .on("emoji cat", cat_command)
         .on("emoji dog", dog_command)
+        .on("multiply", multiply)
         .on("some complex command", some_complex_command)
         // Commands can be in closure-form as well
         .on("about", |context, _message, _args| drop(context.say("A test bot"))));
@@ -61,3 +63,11 @@ fn owner_check(_context: &Context, message: &Message) -> bool {
 fn some_complex_command(context: Context, _msg: Message, args: Vec<String>) {
     let _ = context.say(&format!("Arguments: {:?}", args));
 }
+
+command!(multiply(context, _message, args, first: f64, second: f64) {
+    let res = first * second;
+
+    let _ = context.say(&res.to_string());
+
+    println!("{:?}", args);
+});
