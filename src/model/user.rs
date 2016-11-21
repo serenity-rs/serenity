@@ -18,6 +18,8 @@ use serde_json::builder::ObjectBuilder;
 #[cfg(feature = "methods")]
 use super::Message;
 #[cfg(feature = "methods")]
+use time::Timespec;
+#[cfg(feature = "methods")]
 use ::client::http;
 
 #[cfg(feature = "state")]
@@ -36,6 +38,13 @@ impl User {
     pub fn avatar_url(&self) -> Option<String> {
         self.avatar.as_ref().map(|av|
             format!(cdn_concat!("/avatars/{}/{}.jpg"), self.id, av))
+    }
+
+    /// Retrieves the time that this user was created at.
+    #[cfg(feature = "methods")]
+    #[inline]
+    pub fn created_at(&self) -> Timespec {
+        self.id.created_at()
     }
 
     /// This is an alias of [direct_message].
