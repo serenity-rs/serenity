@@ -76,7 +76,11 @@ use super::STATE;
 /// [`set_game`]: #method.set_game
 #[derive(Clone)]
 pub struct Context {
-    channel_id: Option<ChannelId>,
+    /// The Id of the relevant channel, if there is one. This is present on the
+    /// [`on_message`] handler, for example.
+    ///
+    /// [`on_message`]: struct.Client.html#method.on_message
+    pub channel_id: Option<ChannelId>,
     /// The associated connection which dispatched the event handler.
     ///
     /// Note that if you are sharding, in relevant terms, this is the shard
