@@ -282,7 +282,7 @@ impl Handler {
     /// You probably shouldn't use this if you're reading the source code.
     #[doc(hidden)]
     pub fn update_server(&mut self, endpoint: &Option<String>, token: &str) {
-        if let &Some(ref endpoint) = endpoint {
+        if let Some(ref endpoint) = *endpoint {
             let endpoint = endpoint.clone();
             let token = token.to_owned();
             let session_id = match self.session_id {

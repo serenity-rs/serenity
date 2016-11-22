@@ -127,9 +127,9 @@ impl User {
                 feature_state! {{
                     let state = STATE.lock().unwrap();
 
-                    return state.get_role(guild_id, role_id).is_some();
+                    state.get_role(guild_id, role_id).is_some()
                 } else {
-                    return true;
+                    true
                 }}
             },
         }

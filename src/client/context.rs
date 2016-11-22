@@ -774,11 +774,11 @@ impl Context {
 
             let map = f(EditRole::new(role)).0.build();
 
-            return http::edit_role(guild_id.0, role_id.0, map);
+            http::edit_role(guild_id.0, role_id.0, map)
         } else {
             let map = f(EditRole::default()).0.build();
 
-            return http::edit_role(guild_id.0, role_id.0, map);
+            http::edit_role(guild_id.0, role_id.0, map)
         }}
     }
 

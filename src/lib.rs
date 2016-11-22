@@ -74,7 +74,7 @@
 //! [docs]: https://discordapp.com/developers/docs/intro
 //! [examples]: https://github.com/zeyla/serenity.rs/tree/master/examples
 //! [state docs]: ext/state/index.html
-#![allow(inline_always, unknown_lints)]
+#![allow(doc_markdown, inline_always, unknown_lints)]
 #![warn(dead_code, enum_glob_use, if_not_else)]
 
 #[macro_use]

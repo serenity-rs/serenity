@@ -58,6 +58,7 @@ macro_rules! id {
         $(
             #[$attr]
             #[derive(Copy, Clone, Debug, Eq, Hash, PartialOrd, Ord)]
+            #[allow(derive_hash_xor_eq)]
             pub struct $name(pub u64);
 
             impl $name {

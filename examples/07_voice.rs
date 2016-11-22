@@ -105,7 +105,7 @@ fn join(context: Context, message: Message, args: Vec<String>) {
     };
 
     let mut shard = context.shard.lock().unwrap();
-    let ref mut manager = shard.manager;
+    let mut manager = &mut shard.manager;
 
     let _handler = manager.join(Some(guild_id), connect_to);
 

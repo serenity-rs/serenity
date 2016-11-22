@@ -1212,7 +1212,7 @@ pub fn validate_token(token: &str) -> Result<()> {
     }
 
     // Check that the second part is at least 6 characters long.
-    if parts.get(1).unwrap().len() < 6 {
+    if parts[1].len() < 6 {
         return Err(Error::Client(ClientError::InvalidToken));
     }
 

@@ -363,14 +363,14 @@ impl Shard {
     }
 
     fn handle_dispatch(&mut self, event: &Event) {
-        if let &Event::Resumed(ref ev) = event {
+        if let Event::Resumed(ref ev) = *event {
             let status = GatewayStatus::ChangeInterval(ev.heartbeat_interval);
 
             let _ = self.keepalive_channel.send(status);
         }
 
         feature_voice_enabled! {{
-            if let &Event::VoiceStateUpdate(ref update) = event {
+            if let Event::VoiceStateUpdate(ref update) = *event {
                 if let Some(guild_id) = update.guild_id {
                     if let Some(handler) = self.manager.get(guild_id) {
                         handler.update_state(&update.voice_state);
@@ -378,7 +378,7 @@ impl Shard {
                 }
             }
 
-            if let &Event::VoiceServerUpdate(ref update) = event {
+            if let Event::VoiceServerUpdate(ref update) = *event {
                 if let Some(guild_id) = update.guild_id {
                     if let Some(handler) = self.manager.get(guild_id) {
                         handler.update_server(&update.endpoint, &update.token);
@@ -492,7 +492,7 @@ impl Shard {
                     .insert("status", status.name());
 
                 match game.as_ref() {
-                    Some(ref game) => {
+                    Some(game) => {
                         object.insert_object("game", move |o| o
                             .insert("name", &game.name))
                     },
