@@ -138,11 +138,11 @@ pub enum Channel {
 /// A container for guilds.
 ///
 /// This is used to differentiate whether a guild itself can be used or whether
-/// a guild needs to be retrieved from the state.
+/// a guild needs to be retrieved from the cache.
 pub enum GuildContainer {
     /// A guild which can have its contents directly searched.
     Guild(Guild),
-    /// A guild's id, which can be used to search the state for a guild.
+    /// A guild's id, which can be used to search the cache for a guild.
     Id(GuildId),
 }
 

@@ -3,8 +3,8 @@ use ::client::http;
 use ::internal::prelude::*;
 use super::{permissions, utils};
 
-#[cfg(feature = "state")]
-use ::client::STATE;
+#[cfg(feature = "cache")]
+use ::client::CACHE;
 
 impl Invite {
     /// Accepts the invite, placing the current user in the [`Guild`] that the
@@ -19,7 +19,7 @@ impl Invite {
     ///
     /// # Errors
     ///
-    /// If the `state` features is enabled, then this returns a
+    /// If the `cache` features is enabled, then this returns a
     /// [`ClientError::InvalidOperationAsBot`] if the current user does not have
     /// the required [permission].
     ///
@@ -29,8 +29,8 @@ impl Invite {
     /// [permission]: permissions/index.html
     #[cfg(feature="methods")]
     pub fn accept(&self) -> Result<Invite> {
-        feature_state_enabled! {{
-            if STATE.lock().unwrap().user.bot {
+        feature_cache_enabled! {{
+            if CACHE.lock().unwrap().user.bot {
                 return Err(Error::Client(ClientError::InvalidOperationAsBot));
             }
         }}
@@ -83,8 +83,8 @@ impl RichInvite {
     /// [`http::accept_invite`]: ../client/http/fn.accept_invite.html
     #[cfg(feature="methods")]
     pub fn accept(&self) -> Result<Invite> {
-        feature_state_enabled! {{
-            if STATE.lock().unwrap().user.bot {
+        feature_cache_enabled! {{
+            if CACHE.lock().unwrap().user.bot {
                 return Err(Error::Client(ClientError::InvalidOperationAsBot));
             }
         }}
@@ -100,7 +100,7 @@ impl RichInvite {
     ///
     /// # Errors
     ///
-    /// If the `state` feature is enabled, then this returns a
+    /// If the `cache` feature is enabled, then this returns a
     /// [`ClientError::InvalidPermissions`] if the current user does not have
     /// the required [permission].
     ///

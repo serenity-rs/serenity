@@ -14,7 +14,7 @@ use websocket::client::{
     Sender as WsSender
 };
 use websocket::stream::WebSocketStream;
-use ::client::STATE;
+use ::client::CACHE;
 use ::constants::VoiceOpCode;
 use ::internal::prelude::*;
 use ::internal::ws_impl::{ReceiverExt, SenderExt};
@@ -210,7 +210,7 @@ fn identify(info: &ConnectionInfo) -> Value {
             .insert("server_id", info.server_id)
             .insert("session_id", &info.session_id)
             .insert("token", &info.token)
-            .insert("user_id", STATE.lock().unwrap().user.id.0))
+            .insert("user_id", CACHE.lock().unwrap().user.id.0))
         .build()
 }
 

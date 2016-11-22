@@ -60,11 +60,11 @@ pub enum Error {
     /// When there was an error retrieving the gateway URI from the REST API.
     Gateway,
     /// An indication that a [guild][`LiveGuild`] could not be found by
-    /// [Id][`GuildId`] in the [`State`].
+    /// [Id][`GuildId`] in the [`Cache`].
     ///
     /// [`GuildId`]: ../model/struct.GuildId.html
     /// [`LiveGuild`]: ../model/struct.LiveGuild.html
-    /// [`State`]: ../ext/state/struct.State.html
+    /// [`Cache`]: ../ext/cache/struct.Cache.html
     GuildNotFound,
     InvalidOpCode,
     /// When attempting to perform an action which is only available to user
@@ -92,10 +92,10 @@ pub enum Error {
     ///
     /// [current user]: ../model/struct.CurrentUser.html
     InvalidUser,
-    /// An indicator that an item is missing from the [`State`], and the action
+    /// An indicator that an item is missing from the [`Cache`], and the action
     /// can not be continued.
     ///
-    /// [`State`]: ../ext/state/struct.State.html
+    /// [`Cache`]: ../ext/cache/struct.Cache.html
     ItemMissing,
     /// Indicates that a [`Message`]s content was too long and will not
     /// successfully send, as the length is over 2000 codepoints, or 4000 bytes.
@@ -117,7 +117,7 @@ pub enum Error {
     /// When the decoding of a ratelimit header could not be properly decoded
     /// from UTF-8.
     RateLimitUtf8,
-    /// When attempting to find a required record from the State could not be
+    /// When attempting to find a required record from the Cache could not be
     /// found. This is required in methods such as [`Context::edit_role`].
     ///
     /// [`Context::edit_role`]: struct.Context.html#method.edit_role

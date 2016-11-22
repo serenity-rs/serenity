@@ -6,8 +6,8 @@ use std::env;
 // Serenity implements transparent sharding in a way that you do not need to
 // manually handle separate processes or connections manually.
 //
-// Transparent sharding is useful for a shared state. Instead of having states
-// with duplicated data, a shared state means all your data can be easily
+// Transparent sharding is useful for a shared cache. Instead of having caches
+// with duplicated data, a shared cache means all your data can be easily
 // accessible across all shards.
 //
 // If your bot is on many guilds - or over the maximum of 2500 - then you
@@ -19,7 +19,7 @@ use std::env;
 //
 // Taking a scenario of 2 guilds, try saying "!ping" in one guild. It should
 // print either "0" or "1" in the console. Saying "!ping" in the other guild,
-// it should state the other number in the console. This confirms that guild
+// it should cache the other number in the console. This confirms that guild
 // sharding works.
 fn main() {
     // Configure the client with your Discord bot token in the environment.

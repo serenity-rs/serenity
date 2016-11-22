@@ -22,8 +22,8 @@ use time::Timespec;
 #[cfg(feature = "methods")]
 use ::client::http;
 
-#[cfg(feature = "state")]
-use ::client::STATE;
+#[cfg(feature = "cache")]
+use ::client::CACHE;
 
 impl CurrentUser {
     /// Returns the formatted URL of the user's icon, if one exists.
@@ -56,13 +56,13 @@ impl User {
     }
 
     /// Send a direct message to a user. This will create or retrieve the
-    /// PrivateChannel over REST if one is not already in the State, and then
+    /// PrivateChannel over REST if one is not already in the cache, and then
     /// send a message to it.
     #[cfg(feature="methods")]
     pub fn direct_message(&self, content: &str)
         -> Result<Message> {
         let private_channel_id = {
-            let finding = STATE.lock()
+            let finding = CACHE.lock()
                 .unwrap()
                 .private_channels
                 .values()
@@ -90,11 +90,11 @@ impl User {
     }
 
     /// Check if a user has a [`Role`]. This will retrieve the
-    /// [`Guild`] from the [`State`] if
-    /// it is available, and then check if that guild has the given [`Role`].
+    /// [`Guild`] from the [`Cache`] if it is available, and then check if that
+    /// guild has the given [`Role`].
     ///
     /// If the [`Guild`] is not present, then the guild will be retrieved from
-    /// the API and the state will be updated with it.
+    /// the API and the cache will be updated with it.
     ///
     /// If there are issues with requesting the API, then `false` will be
     /// returned.
@@ -114,7 +114,7 @@ impl User {
     /// [`Guild`]: struct.Guild.html
     /// [`GuildId`]: struct.GuildId.html
     /// [`Role`]: struct.Role.html
-    /// [`State`]: ../ext/state/struct.State.html
+    /// [`Cache`]: ../ext/cache/struct.Cache.html
     pub fn has_role<G, R>(&self, guild: G, role: R) -> bool
         where G: Into<GuildContainer>, R: Into<RoleId> {
         let role_id = role.into();
@@ -124,10 +124,10 @@ impl User {
                 guild.roles.get(&role_id).is_some()
             },
             GuildContainer::Id(guild_id) => {
-                feature_state! {{
-                    let state = STATE.lock().unwrap();
+                feature_cache! {{
+                    let cache = CACHE.lock().unwrap();
 
-                    state.get_role(guild_id, role_id).is_some()
+                    cache.get_role(guild_id, role_id).is_some()
                 } else {
                     true
                 }}

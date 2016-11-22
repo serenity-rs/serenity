@@ -4,7 +4,7 @@ use std::default::Default;
 use std::mem;
 use ::model::*;
 
-/// A state of all events received over a [`Connection`], where storing at least
+/// A cache of all events received over a [`Connection`], where storing at least
 /// some data from the event is possible.
 ///
 /// This acts as a cache, to avoid making requests over the REST API through the
@@ -15,14 +15,14 @@ use ::model::*;
 ///
 /// # Use by the Context
 ///
-/// The [`Context`] will automatically attempt to pull from the state for you.
+/// The [`Context`] will automatically attempt to pull from the cache for you.
 /// For example, the [`Context::get_channel`] method will attempt to find the
-/// channel in the state. If it can not find it, it will perform a request
+/// channel in the cache. If it can not find it, it will perform a request
 /// through the REST API, and then insert a clone of the channel - if found -
-/// into the State.
+/// into the Cache.
 ///
 /// This allows you to only need to perform the `Context::get_channel` call,
-/// and not need to first search through the state - and if not found - _then_
+/// and not need to first search through the cache - and if not found - _then_
 /// perform an HTTP request through the Context or `http` module.
 ///
 /// Additionally, note that some information received through events can _not_
@@ -36,7 +36,7 @@ use ::model::*;
 /// [`Role`]: ../../model/struct.Role.html
 /// [`http`]: ../../client/http/index.html
 #[derive(Debug, Clone)]
-pub struct State {
+pub struct Cache {
     /// A map of the currently active calls that the current user knows about,
     /// where the key is the Id of the [`PrivateChannel`] or [`Group`] hosting
     /// the call.
@@ -65,7 +65,7 @@ pub struct State {
     pub user: CurrentUser,
 }
 
-impl State {
+impl Cache {
     pub fn unknown_members(&self) -> u64 {
         let mut total = 0;
 
@@ -156,7 +156,7 @@ impl State {
         }
     }
 
-    /// Update the state according to the changes described in the given event.
+    /// Update the cache according to the changes described in the given event.
     #[allow(cyclomatic_complexity)]
     #[allow(unneeded_field_pattern)]
     pub fn update(&mut self, event: &Event) {
@@ -789,9 +789,9 @@ impl State {
     }
 }
 
-impl Default for State {
-    fn default() -> State {
-        State {
+impl Default for Cache {
+    fn default() -> Cache {
+        Cache {
             calls: HashMap::default(),
             groups: HashMap::default(),
             guild_settings: HashMap::default(),

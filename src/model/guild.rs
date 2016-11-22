@@ -25,8 +25,8 @@ use ::utils::builder::{EditGuild, EditMember, EditRole};
 #[cfg(feature = "methods")]
 use ::client::http;
 
-#[cfg(feature = "state")]
-use ::client::STATE;
+#[cfg(feature = "cache")]
+use ::client::CACHE;
 
 impl From<Guild> for GuildContainer {
     fn from(guild: Guild) -> GuildContainer {
@@ -47,12 +47,12 @@ impl From<u64> for GuildContainer {
 }
 
 impl Emoji {
-    /// Finds the [`Guild`] that owns the emoji by looking through the state.
+    /// Finds the [`Guild`] that owns the emoji by looking through the Cache.
     ///
     /// [`Guild`]: struct.Guild.html
     #[cfg(feature = "methods")]
     pub fn find_guild_id(&self) -> Option<GuildId> {
-        STATE.lock()
+        CACHE.lock()
             .unwrap()
             .guilds
             .values()
@@ -165,9 +165,9 @@ impl Guild {
 }
 
 impl LiveGuild {
-    #[cfg(feature = "state")]
+    #[cfg(feature = "cache")]
     fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
-        let member = match self.get_member(STATE.lock().unwrap().user.id) {
+        let member = match self.get_member(CACHE.lock().unwrap().user.id) {
             Some(member) => member,
             None => return Err(Error::Client(ClientError::ItemMissing)),
         };
@@ -179,7 +179,7 @@ impl LiveGuild {
         Ok(permissions.is_empty())
     }
 
-    #[cfg(not(feature = "state"))]
+    #[cfg(not(feature = "cache"))]
     fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
         Ok(true)
     }
@@ -379,7 +379,7 @@ impl LiveGuild {
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
     #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<Guild> {
-        if self.owner_id != STATE.lock().unwrap().user.id {
+        if self.owner_id != CACHE.lock().unwrap().user.id {
             let req = permissions::MANAGE_GUILD;
 
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
@@ -856,7 +856,7 @@ impl Member {
     /// [`Guild`]: struct.Guild.html
     #[cfg(feature = "methods")]
     pub fn find_guild(&self) -> Result<GuildId> {
-        STATE.lock()
+        CACHE.lock()
             .unwrap()
             .guilds
             .values()
@@ -926,12 +926,12 @@ impl Member {
 
     /// Retrieves the full role data for the user's roles.
     ///
-    /// This is shorthand for manually searching through the state.
+    /// This is shorthand for manually searching through the CACHE.
     ///
     /// If role data can not be found for the member, then `None` is returned.
-    #[cfg(all(feature = "methods", feature = "state"))]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn roles(&self) -> Option<Vec<Role>> {
-        STATE.lock().unwrap()
+        CACHE.lock().unwrap()
             .guilds
             .values()
             .find(|g| g.members
@@ -1018,17 +1018,17 @@ impl Role {
         http::delete_role(guild_id.0, self.id.0)
     }
 
-    /// Searches the state for the guild that owns the role.
+    /// Searches the cache for the guild that owns the role.
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::GuildNotFound`] if a guild is not in the state
+    /// Returns a [`ClientError::GuildNotFound`] if a guild is not in the cache
     /// that contains the role.
     ///
     /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
     #[cfg(feature = "methods")]
     pub fn find_guild(&self) -> Result<GuildId> {
-        STATE.lock()
+        CACHE.lock()
             .unwrap()
             .guilds
             .values()

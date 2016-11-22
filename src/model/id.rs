@@ -1,22 +1,22 @@
 use super::*;
 
 #[cfg(feature = "methods")]
-use ::client::{STATE, http};
+use ::client::{CACHE, http};
 #[cfg(feature = "methods")]
 use ::internal::prelude::*;
 
 impl ChannelId {
-    /// Search the state for the channel with the Id.
+    /// Search the cache for the channel with the Id.
     #[cfg(feature="methods")]
     pub fn find(&self) -> Option<Channel> {
-        STATE.lock().unwrap().get_channel(*self)
+        CACHE.lock().unwrap().get_channel(*self)
     }
 
-    /// Search the state for the channel. If it can't be found, the channel is
+    /// Search the cache for the channel. If it can't be found, the channel is
     /// requested over REST.
     #[cfg(feature="methods")]
     pub fn get(&self) -> Result<Channel> {
-        if let Some(channel) = STATE.lock().unwrap().get_channel(*self) {
+        if let Some(channel) = CACHE.lock().unwrap().get_channel(*self) {
             return Ok(channel.clone());
         }
 
@@ -74,10 +74,10 @@ impl From<Emoji> for EmojiId {
 }
 
 impl GuildId {
-    /// Search the state for the guild.
+    /// Search the cache for the guild.
     #[cfg(feature="methods")]
     pub fn find(&self) -> Option<LiveGuild> {
-        STATE.lock().unwrap().get_guild(*self).cloned()
+        CACHE.lock().unwrap().get_guild(*self).cloned()
     }
 
     /// Requests the guild over REST.
@@ -160,10 +160,10 @@ impl From<Role> for RoleId {
 }
 
 impl RoleId {
-    /// Search the state for the role.
+    /// Search the cache for the role.
     #[cfg(feature="methods")]
     pub fn find(&self) -> Option<Role> {
-        STATE.lock()
+        CACHE.lock()
             .unwrap()
             .guilds
             .values()

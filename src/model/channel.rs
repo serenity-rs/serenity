@@ -31,7 +31,7 @@ use super::utils;
 #[cfg(feature = "methods")]
 use ::utils::builder::{CreateEmbed, CreateInvite, EditChannel};
 #[cfg(feature = "methods")]
-use ::client::{STATE, http};
+use ::client::{CACHE, http};
 
 impl Attachment {
     /// If this attachment is an image, then a tuple of the width and height
@@ -436,7 +436,7 @@ impl Message {
     #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<()> {
         let req = permissions::MANAGE_MESSAGES;
-        let is_author = self.author.id != STATE.lock().unwrap().user.id;
+        let is_author = self.author.id != CACHE.lock().unwrap().user.id;
 
         if is_author {
             return Err(Error::Client(ClientError::InvalidUser));
@@ -503,7 +503,7 @@ impl Message {
             return Err(Error::Client(ClientError::MessageTooLong(length_over)));
         }
 
-        if self.author.id != STATE.lock().unwrap().user.id {
+        if self.author.id != CACHE.lock().unwrap().user.id {
             return Err(Error::Client(ClientError::InvalidUser));
         }
 
@@ -720,7 +720,7 @@ impl PrivateChannel {
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
     #[cfg(feature = "methods")]
     pub fn delete_messages(&self, message_ids: &[MessageId]) -> Result<()> {
-        if !STATE.lock().unwrap().user.bot {
+        if !CACHE.lock().unwrap().user.bot {
             return Err(Error::Client(ClientError::InvalidOperationAsUser));
         }
 
@@ -883,13 +883,13 @@ impl PublicChannel {
         }
     }
 
-    /// Attempts to find this channel's guild in the State.
+    /// Attempts to find this channel's guild in the Cache.
     ///
     /// **Note**: Right now this performs a clone of the guild. This will be
     /// optimized in the future.
-    #[cfg(all(feature = "methods", feature = "state"))]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn guild(&self) -> Option<LiveGuild> {
-        STATE.lock().unwrap().get_guild(self.guild_id).cloned()
+        CACHE.lock().unwrap().get_guild(self.guild_id).cloned()
     }
 
     /// Return a [`Mention`] which will link to this channel.
@@ -978,7 +978,7 @@ impl Reaction {
     /// [permissions]: permissions
     #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<()> {
-        let user = if self.user_id == STATE.lock().unwrap().user.id {
+        let user = if self.user_id == CACHE.lock().unwrap().user.id {
             None
         } else {
             Some(self.user_id.0)

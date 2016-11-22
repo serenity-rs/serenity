@@ -9,8 +9,8 @@ use ::model::{ChannelId, Event, Message};
 #[cfg(feature="framework")]
 use ::ext::framework::Framework;
 
-#[cfg(feature = "state")]
-use super::STATE;
+#[cfg(feature = "cache")]
+use super::CACHE;
 
 macro_rules! handler {
     ($field:ident, $event_store:ident) => {
@@ -24,13 +24,13 @@ macro_rules! handler {
 
 macro_rules! update {
     ($method:ident, $event:expr) => {
-        feature_state_enabled! {{
-            STATE.lock().unwrap().$method(&$event)
+        feature_cache_enabled! {{
+            CACHE.lock().unwrap().$method(&$event)
         }}
     };
     ($method:ident, $event:expr, $old:expr) => {
-        feature_state_enabled! {{
-            STATE.lock().unwrap().$method(&$event, $old)
+        feature_cache_enabled! {{
+            CACHE.lock().unwrap().$method(&$event, $old)
         }}
     };
 }
@@ -123,7 +123,7 @@ fn handle_event(event: Event,
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                feature_state! {{
+                feature_cache! {{
                     let call = update!(update_with_call_delete, event);
 
                     thread::spawn(move || {
@@ -143,9 +143,9 @@ fn handle_event(event: Event,
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                feature_state! {{
+                feature_cache! {{
                     let before = update!(update_with_call_update, event, true);
-                    let after = STATE
+                    let after = CACHE
                         .lock()
                         .unwrap()
                         .calls
@@ -161,7 +161,7 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_state_enabled! {{
+                feature_cache_enabled! {{
                     update!(update_with_call_update, event, false);
                 }}
             }
@@ -253,8 +253,8 @@ fn handle_event(event: Event,
                                       login_type);
                 let handler = handler.clone();
 
-                feature_state! {{
-                    let before = STATE.lock()
+                feature_cache! {{
+                    let before = CACHE.lock()
                         .unwrap()
                         .get_channel(event.channel.id());
                     update!(update_with_channel_update, event);
@@ -328,7 +328,7 @@ fn handle_event(event: Event,
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                feature_state! {{
+                feature_cache! {{
                     let full = update!(update_with_guild_delete, event);
 
                     thread::spawn(move || {
@@ -340,7 +340,7 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_state_enabled! {{
+                feature_cache_enabled! {{
                     let _full = update!(update_with_guild_delete, event);
                 }}
             }
@@ -384,7 +384,7 @@ fn handle_event(event: Event,
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                feature_state! {{
+                feature_cache! {{
                     let member = update!(update_with_guild_member_remove, event);
 
                     thread::spawn(move || {
@@ -396,7 +396,7 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_state_enabled! {{
+                feature_cache_enabled! {{
                     let _member = update!(update_with_guild_member_remove, event);
                 }}
             }
@@ -406,13 +406,13 @@ fn handle_event(event: Event,
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                feature_state! {{
+                feature_cache! {{
                     let before = update!(update_with_guild_member_update, event);
 
                     // This is safe, as the update would have created the member
                     // if it did not exist. Thus, there _should_ be no way that this
                     // could fail under any circumstance.
-                    let after = STATE.lock()
+                    let after = CACHE.lock()
                         .unwrap()
                         .get_member(event.guild_id, event.user.id)
                         .unwrap()
@@ -459,7 +459,7 @@ fn handle_event(event: Event,
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                feature_state! {{
+                feature_cache! {{
                     let role = update!(update_with_guild_role_delete, event);
 
                     thread::spawn(move || {
@@ -471,7 +471,7 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_state_enabled! {{
+                feature_cache_enabled! {{
                     let _role = update!(update_with_guild_role_delete, event);
                 }}
             }
@@ -481,7 +481,7 @@ fn handle_event(event: Event,
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                feature_state! {{
+                feature_cache! {{
                     let before = update!(update_with_guild_role_update, event);
 
                     thread::spawn(move || {
@@ -493,7 +493,7 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_state_enabled! {{
+                feature_cache_enabled! {{
                     let _before = update!(update_with_guild_role_update, event);
                 }}
             }
@@ -525,8 +525,8 @@ fn handle_event(event: Event,
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                feature_state! {{
-                    let before = STATE.lock()
+                feature_cache! {{
+                    let before = CACHE.lock()
                         .unwrap()
                         .guilds
                         .get(&event.guild.id)
@@ -730,7 +730,7 @@ fn handle_event(event: Event,
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                feature_state! {{
+                feature_cache! {{
                     let before = update!(update_with_user_guild_settings_update, event);
 
                     thread::spawn(move || {
@@ -742,7 +742,7 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_state_enabled! {{
+                feature_cache_enabled! {{
                     let _before = update!(update_with_user_guild_settings_update, event);
                 }}
             }
@@ -752,7 +752,7 @@ fn handle_event(event: Event,
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                feature_state! {{
+                feature_cache! {{
                     let before = update!(update_with_user_note_update, event);
 
                     thread::spawn(move || {
@@ -764,7 +764,7 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_state_enabled! {{
+                feature_cache_enabled! {{
                     let _before = update!(update_with_user_note_update, event);
                 }}
             }
@@ -774,9 +774,9 @@ fn handle_event(event: Event,
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                feature_state! {{
+                feature_cache! {{
                     let before = update!(update_with_user_settings_update, event, true);
-                    let after = STATE.lock().unwrap().settings.clone();
+                    let after = CACHE.lock().unwrap().settings.clone();
 
                     thread::spawn(move || {
                         (handler)(context, before.unwrap(), after.unwrap());
@@ -787,7 +787,7 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_state_enabled! {{
+                feature_cache_enabled! {{
                     update!(update_with_user_settings_update, event, false);
                 }}
             }
@@ -797,7 +797,7 @@ fn handle_event(event: Event,
                 let context = context(None, conn, login_type);
                 let handler = handler.clone();
 
-                feature_state! {{
+                feature_cache! {{
                     let before = update!(update_with_user_update, event);
 
                     thread::spawn(move || {
@@ -809,7 +809,7 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_state_enabled! {{
+                feature_cache_enabled! {{
                     let _before = update!(update_with_user_update, event);
                 }}
             }

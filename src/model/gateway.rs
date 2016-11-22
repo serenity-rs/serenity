@@ -239,7 +239,7 @@ pub struct ReactionRemoveAllEvent {
     pub message_id: MessageId,
 }
 
-/// The "Ready" event, containing initial state
+/// The "Ready" event, containing initial ready cache
 #[derive(Clone, Debug)]
 pub struct ReadyEvent {
     pub ready: Ready,
@@ -440,7 +440,7 @@ pub enum Event {
     /// [`Reaction`]: struct.Reaction.html
     /// [`on_reaction_remove_all`]: ../client/struct.Clint.html#method.on_reaction_remove_all
     ReactionRemoveAll(ReactionRemoveAllEvent),
-    /// The first event in a connection, containing the initial state.
+    /// The first event in a connection, containing the initial ready cache.
     ///
     /// May also be received at a later time in the event of a reconnect.
     Ready(ReadyEvent),

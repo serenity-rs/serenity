@@ -19,8 +19,8 @@ use ::utils::{decode_array, into_array};
 
 #[cfg(feature = "methods")]
 use super::permissions::{self, Permissions};
-#[cfg(feature = "methods")]
-use ::client::STATE;
+#[cfg(all(feature = "cache", feature = "methods"))]
+use ::client::CACHE;
 
 #[macro_escape]
 macro_rules! missing {
@@ -271,14 +271,14 @@ pub fn remove(map: &mut BTreeMap<String, Value>, key: &str) -> Result<Value> {
 }
 
 #[doc(hidden)]
-#[cfg(feature="methods")]
+#[cfg(all(feature = "cache", feature="methods"))]
 pub fn user_has_perms(channel_id: ChannelId,
                       mut permissions: Permissions)
                       -> Result<bool> {
-    let state = STATE.lock().unwrap();
-    let current_user = &state.user;
+    let cache = CACHE.lock().unwrap();
+    let current_user = &cache.user;
 
-    let channel = match state.get_channel(channel_id) {
+    let channel = match cache.get_channel(channel_id) {
         Some(channel) => channel,
         None => return Err(Error::Client(ClientError::ItemMissing)),
     };
@@ -290,7 +290,7 @@ pub fn user_has_perms(channel_id: ChannelId,
         Channel::Public(channel) => channel.guild_id,
     };
 
-    let guild = match state.get_guild(guild_id) {
+    let guild = match cache.get_guild(guild_id) {
         Some(guild) => guild,
         None => return Err(Error::Client(ClientError::ItemMissing)),
     };

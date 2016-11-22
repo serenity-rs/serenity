@@ -19,11 +19,11 @@
 //! you. See the [Connection's documentation][`Connection`] for more
 //! information.
 //!
-//! A [`State`] is also provided for you. This will be updated automatically for
+//! A [`Cache`] is also provided for you. This will be updated automatically for
 //! you as data is received from the Discord API via events. When calling a
-//! method on a [`Context`], the state will first be searched for relevant data
+//! method on a [`Context`], the cache will first be searched for relevant data
 //! to avoid unnecessary HTTP requests to the Discord API. For more information,
-//! see the [state's module-level documentation][state docs].
+//! see the [cache's module-level documentation][cache docs].
 //!
 //! Note that - although this documentation will try to be as up-to-date and
 //! accurate as possible - Discord hosts [official documentation][docs]. If you
@@ -69,11 +69,11 @@
 //! [`Context`]: client/struct.Context.html
 //! [`Event`]: model/enum.Event.html
 //! [`Event::MessageCreate`]: model/enum.Event.html#variant.MessageCreate
-//! [`State`]: ext/state/struct.State.html
+//! [`Cache`]: ext/cache/struct.Cache.html
 //! [client's module-level documentation]: client/index.html
 //! [docs]: https://discordapp.com/developers/docs/intro
 //! [examples]: https://github.com/zeyla/serenity.rs/tree/master/examples
-//! [state docs]: ext/state/index.html
+//! [cache docs]: ext/cache/index.html
 #![allow(doc_markdown, inline_always, unknown_lints)]
 #![warn(dead_code, enum_glob_use, if_not_else)]
 

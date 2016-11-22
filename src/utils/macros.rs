@@ -48,6 +48,53 @@ macro_rules! status_concat {
     }
 }
 
+// Enable/disable check for cache
+#[cfg(feature = "cache")]
+macro_rules! feature_cache {
+    ($enabled:block else $disabled:block) => {
+        {
+            $enabled
+        }
+    }
+}
+
+#[cfg(not(feature = "cache"))]
+macro_rules! feature_cache {
+    ($enabled:block else $disabled:block) => {
+        {
+            $disabled
+        }
+    }
+}
+
+#[cfg(feature = "cache")]
+macro_rules! feature_cache_enabled {
+    ($enabled:block) => {
+        {
+            $enabled
+        }
+    }
+}
+
+#[cfg(not(feature = "cache"))]
+macro_rules! feature_cache_enabled {
+    ($enabled:block) => {{}}
+}
+
+#[cfg(feature = "cache")]
+macro_rules! feature_cache_disabled {
+    ($disabled:block) => {{}}
+}
+
+#[cfg(not(feature = "cache"))]
+macro_rules! feature_cache_disabled {
+    ($disabled:block) => {
+        {
+            $disabled
+        }
+    }
+}
+
 // Enable/disable check for extras
 #[cfg(feature = "extras")]
 macro_rules! feature_extras {
@@ -184,53 +231,6 @@ macro_rules! feature_methods_disabled {
 
 #[cfg(not(feature = "methods"))]
 macro_rules! feature_methods_disabled {
-    ($disabled:block) => {
-        {
-            $disabled
-        }
-    }
-}
-
-// Enable/disable check for state
-#[cfg(feature = "state")]
-macro_rules! feature_state {
-    ($enabled:block else $disabled:block) => {
-        {
-            $enabled
-        }
-    }
-}
-
-#[cfg(not(feature = "state"))]
-macro_rules! feature_state {
-    ($enabled:block else $disabled:block) => {
-        {
-            $disabled
-        }
-    }
-}
-
-#[cfg(feature = "state")]
-macro_rules! feature_state_enabled {
-    ($enabled:block) => {
-        {
-            $enabled
-        }
-    }
-}
-
-#[cfg(not(feature = "state"))]
-macro_rules! feature_state_enabled {
-    ($enabled:block) => {{}}
-}
-
-#[cfg(feature = "state")]
-macro_rules! feature_state_disabled {
-    ($disabled:block) => {{}}
-}
-
-#[cfg(not(feature = "state"))]
-macro_rules! feature_state_disabled {
     ($disabled:block) => {
         {
             $disabled

@@ -1,7 +1,7 @@
 //! The Client contains information about a single bot or user's token, as well
 //! as event handlers. Dispatching events to configured handlers and starting
 //! the shards' connections are handled directly via the client. In addition,
-//! the [`http`] module and [`State`] are also automatically handled by the
+//! the [`http`] module and [`Cache`] are also automatically handled by the
 //! Client module for you.
 //!
 //! A [`Context`] is provided for every handler. The context is an ergonomic
@@ -10,14 +10,14 @@
 //! The `http` module is the lower-level method of interacting with the Discord
 //! REST API. Realistically, there should be little reason to use this yourself,
 //! as the Context will do this for you. A possible use case of using the `http`
-//! module is if you do not have a State, for purposes such as low memory
+//! module is if you do not have a Cache, for purposes such as low memory
 //! requirements.
 //!
 //! Click [here][Client examples] for an example on how to use a `Client`.
 //!
 //! [`Client`]: struct.Client.html#examples
 //! [`Context`]: struct.Context.html
-//! [`State`]: ../ext/state/index.html
+//! [`Cache`]: ../ext/cache/index.html
 //! [`http`]: http/index.html
 //! [Client examples]: struct.Client.html#examples
 
@@ -51,33 +51,33 @@ use ::model::*;
 #[cfg(feature = "framework")]
 use ::ext::framework::Framework;
 
-#[cfg(feature = "state")]
-use ::ext::state::State;
+#[cfg(feature = "cache")]
+use ::ext::cache::Cache;
 
-#[cfg(feature = "state")]
+#[cfg(feature = "cache")]
 lazy_static! {
-    /// The STATE is a mutable lazily-initialized static binding. It can be
+    /// The CACHE is a mutable lazily-initialized static binding. It can be
     /// accessed across any function and in any context.
     ///
-    /// This [`State`] instance is updated for every event received, so you do
-    /// not need to maintain your own state.
+    /// This [`Cache`] instance is updated for every event received, so you do
+    /// not need to maintain your own cache.
     ///
-    /// See the [state module documentation] for more details.
+    /// See the [cache module documentation] for more details.
     ///
     /// # Examples
     ///
     /// Retrieve the [current user][`CurrentUser`]'s Id:
     ///
     /// ```rust,ignore
-    /// use serenity::client::STATE;
+    /// use serenity::client::CACHE;
     ///
-    /// println!("{}", STATE.lock().unwrap().user.id);
+    /// println!("{}", CACHE.lock().unwrap().user.id);
     /// ```
     ///
     /// [`CurrentUser`]: ../model/struct.CurrentUser.html
-    /// [`State`]: ../ext/state/struct.State.html
-    /// [state module documentation]: ../ext/state/index.html
-    pub static ref STATE: Arc<Mutex<State>> = Arc::new(Mutex::new(State::default()));
+    /// [`Cache`]: ../ext/cache/struct.Cache.html
+    /// [cache module documentation]: ../ext/cache/index.html
+    pub static ref CACHE: Arc<Mutex<Cache>> = Arc::new(Mutex::new(Cache::default()));
 }
 
 /// The Client is the way to "login" and be able to start sending authenticated
@@ -729,8 +729,8 @@ impl Client {
                 Ok((shard, ready, receiver)) => {
                     self.shards.push(Arc::new(Mutex::new(shard)));
 
-                    feature_state_enabled! {{
-                        STATE.lock()
+                    feature_cache_enabled! {{
+                        CACHE.lock()
                             .unwrap()
                             .update_with_ready(&ready);
                     }}
@@ -801,12 +801,12 @@ impl Client {
     }
 }
 
-#[cfg(feature = "state")]
+#[cfg(feature = "cache")]
 impl Client {
     /// Attaches a handler for when a [`CallDelete`] is received.
     ///
     /// The `ChannelId` is the Id of the channel hosting the call. Returns the
-    /// call from the state - optionally - if the call was in it.
+    /// call from the cache - optionally - if the call was in it.
     ///
     /// [`CallDelete`]: ../model/enum.Event.html#variant.CallDelete
     pub fn on_call_delete<F>(&mut self, handler: F)
@@ -842,15 +842,15 @@ impl Client {
     ///
     /// Returns a partial guild as well as - optionally - the full guild, with
     /// data like [`Role`]s. This can be `None` in the event that it was not in
-    /// the [`State`].
+    /// the [`Cache`].
     ///
-    /// **Note**: The relevant guild is _removed_ from the State when this event
+    /// **Note**: The relevant guild is _removed_ from the Cache when this event
     /// is received. If you need to keep it, you can either re-insert it
-    /// yourself back into the State or manage it in another way.
+    /// yourself back into the Cache or manage it in another way.
     ///
     /// [`GuildDelete`]: ../model/enum.Event.html#variant.GuildDelete
     /// [`Role`]: ../model/struct.Role.html
-    /// [`State`]: ../ext/state/struct.State.html
+    /// [`Cache`]: ../ext/cache/struct.Cache.html
     pub fn on_guild_delete<F>(&mut self, handler: F)
         where F: Fn(Context, Guild, Option<LiveGuild>) + Send + Sync + 'static {
         self.event_store.lock()
@@ -861,7 +861,7 @@ impl Client {
     /// Attaches a handler for when a [`GuildMemberRemove`] is received.
     ///
     /// Returns the user's associated `Member` object, _if_ it existed in the
-    /// state.
+    /// cache.
     ///
     /// [`GuildMemberRemove`]: ../model/enum.Event.html#variant.GuildMemberRemove
     pub fn on_guild_member_remove<F>(&mut self, handler: F)
@@ -894,10 +894,10 @@ impl Client {
     /// Attaches a handler for when a [`GuildRoleUpdate`] is received.
     ///
     /// The optional `Role` is the role prior to updating. This can be `None` if
-    /// it did not exist in the [`State`] before the update.
+    /// it did not exist in the [`Cache`] before the update.
     ///
     /// [`GuildRoleUpdate`]: ../model/enum.Event.html#variant.GuildRoleUpdate
-    /// [`State`]: ../ext/state/struct.State.html
+    /// [`Cache`]: ../ext/cache/struct.Cache.html
     pub fn on_guild_role_update<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, Option<Role>, Role) + Send + Sync + 'static {
         self.event_store.lock()
@@ -963,7 +963,7 @@ impl Client {
     }
 }
 
-#[cfg(not(feature = "state"))]
+#[cfg(not(feature = "cache"))]
 impl Client {
     /// Attaches a handler for when a [`CallDelete`] is received.
     ///
@@ -999,7 +999,7 @@ impl Client {
     ///
     /// [`GuildDelete`]: ../model/enum.Event.html#variant.GuildDelete
     /// [`Role`]: ../model/struct.Role.html
-    /// [`State`]: ../ext/state/struct.State.html
+    /// [`Cache`]: ../ext/cache/struct.Cache.html
     pub fn on_guild_delete<F>(&mut self, handler: F)
         where F: Fn(Context, Guild) + Send + Sync + 'static {
         self.event_store.lock()
@@ -1010,7 +1010,7 @@ impl Client {
     /// Attaches a handler for when a [`GuildMemberRemove`] is received.
     ///
     /// Returns the user's associated `Member` object, _if_ it existed in the
-    /// state.
+    /// cache.
     ///
     /// [`GuildMemberRemove`]: ../model/enum.Event.html#variant.GuildMemberRemove
     pub fn on_guild_member_remove<F>(&mut self, handler: F)
@@ -1043,7 +1043,7 @@ impl Client {
     /// Attaches a handler for when a [`GuildRoleUpdate`] is received.
     ///
     /// [`GuildRoleUpdate`]: ../model/enum.Event.html#variant.GuildRoleUpdate
-    /// [`State`]: ../ext/state/struct.State.html
+    /// [`Cache`]: ../ext/cache/struct.Cache.html
     pub fn on_guild_role_update<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, Role) + Send + Sync + 'static {
         self.event_store.lock()
