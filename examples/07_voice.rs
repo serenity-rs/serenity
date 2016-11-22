@@ -52,9 +52,9 @@ fn deafen(context: Context, message: Message, _args: Vec<String>) {
         },
     };
 
-    let mut connection = context.connection.lock().unwrap();
+    let mut shard = context.shard.lock().unwrap();
 
-    let handler = match connection.manager.get(guild_id) {
+    let handler = match shard.manager.get(guild_id) {
         Some(handler) => handler,
         None => {
             let _ = message.reply("Not in a voice channel");
@@ -104,8 +104,8 @@ fn join(context: Context, message: Message, args: Vec<String>) {
         },
     };
 
-    let mut connection = context.connection.lock().unwrap();
-    let ref mut manager = connection.manager;
+    let mut shard = context.shard.lock().unwrap();
+    let ref mut manager = shard.manager;
 
     let _handler = manager.join(Some(guild_id), connect_to);
 
@@ -128,13 +128,13 @@ fn leave(context: Context, message: Message, _args: Vec<String>) {
         },
     };
 
-    let is_connected = match context.connection.lock().unwrap().manager.get(guild_id) {
+    let is_connected = match context.shard.lock().unwrap().manager.get(guild_id) {
         Some(handler) => handler.channel().is_some(),
         None => false,
     };
 
     if is_connected {
-        context.connection.lock().unwrap().manager.remove(guild_id);
+        context.shard.lock().unwrap().manager.remove(guild_id);
 
         let _ = context.say("Left voice channel");
     } else {
@@ -158,9 +158,9 @@ fn mute(context: Context, message: Message, _args: Vec<String>) {
         },
     };
 
-    let mut connection = context.connection.lock().unwrap();
+    let mut shard = context.shard.lock().unwrap();
 
-    let handler = match connection.manager.get(guild_id) {
+    let handler = match shard.manager.get(guild_id) {
         Some(handler) => handler,
         None => {
             let _ = message.reply("Not in a voice channel");

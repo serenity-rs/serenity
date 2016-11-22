@@ -30,9 +30,9 @@ fn main() {
     client.on_message(|context, message| {
         if message.content == "!ping" {
             {
-                let connection = context.connection.lock().unwrap();
+                let shard = context.shard.lock().unwrap();
 
-                if let Some(shard_info) = connection.shard_info() {
+                if let Some(shard_info) = shard.shard_info() {
                     println!("Shard {}", shard_info[0]);
                 }
             }
@@ -46,7 +46,7 @@ fn main() {
     });
 
     // The total number of shards to use. The "current shard number" of a
-    // connection - that is, the shard it is assigned to - is indexed at 0,
+    // shard - that is, the shard it is assigned to - is indexed at 0,
     // while the total shard count is indexed at 1.
     //
     // This means if you have 5 shards, your total shard count will be 5, while

@@ -2,7 +2,8 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use super::event_store::EventStore;
 use super::login_type::LoginType;
-use super::{Connection, Context};
+use super::Context;
+use super::gateway::Shard;
 use ::model::{ChannelId, Event, Message};
 
 #[cfg(feature="framework")]
@@ -35,14 +36,14 @@ macro_rules! update {
 }
 
 fn context(channel_id: Option<ChannelId>,
-           conn: Arc<Mutex<Connection>>,
+           conn: Arc<Mutex<Shard>>,
            login_type: LoginType) -> Context {
     Context::new(channel_id, conn, login_type)
 }
 
 #[cfg(feature="framework")]
 pub fn dispatch(event: Event,
-                conn: Arc<Mutex<Connection>>,
+                conn: Arc<Mutex<Shard>>,
                 framework: Arc<Mutex<Framework>>,
                 login_type: LoginType,
                 event_store: Arc<Mutex<EventStore>>) {
@@ -69,7 +70,7 @@ pub fn dispatch(event: Event,
 
 #[cfg(not(feature="framework"))]
 pub fn dispatch(event: Event,
-                conn: Arc<Mutex<Connection>>,
+                conn: Arc<Mutex<Shard>>,
                 login_type: LoginType,
                 event_store: Arc<Mutex<EventStore>>) {
     match event {
@@ -99,7 +100,7 @@ fn dispatch_message(context: Context,
 
 #[allow(cyclomatic_complexity)]
 fn handle_event(event: Event,
-                conn: Arc<Mutex<Connection>>,
+                conn: Arc<Mutex<Shard>>,
                 login_type: LoginType,
                 event_store: Arc<Mutex<EventStore>>) {
     match event {

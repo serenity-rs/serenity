@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::mpsc::Sender as MpscSender;
 use super::{Handler, Target};
-use ::client::ConnectionStatus;
+use ::client::gateway::GatewayStatus;
 use ::model::{ChannelId, GuildId};
 
 /// A manager is a struct responsible for managing [`Handler`]s which belong to
@@ -23,12 +23,12 @@ use ::model::{ChannelId, GuildId};
 pub struct Manager {
     handlers: HashMap<Target, Handler>,
     user_id: u64,
-    ws: MpscSender<ConnectionStatus>,
+    ws: MpscSender<GatewayStatus>,
 }
 
 impl Manager {
     #[doc(hidden)]
-    pub fn new(ws: MpscSender<ConnectionStatus>, user_id: u64) -> Manager {
+    pub fn new(ws: MpscSender<GatewayStatus>, user_id: u64) -> Manager {
         Manager {
             handlers: HashMap::new(),
             user_id: user_id,

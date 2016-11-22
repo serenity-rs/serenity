@@ -2,7 +2,7 @@ use serde_json::builder::ObjectBuilder;
 use std::collections::HashMap;
 use std::io::Read;
 use std::sync::{Arc, Mutex};
-use super::connection::Connection;
+use super::gateway::Shard;
 use super::http;
 use super::login_type::LoginType;
 use ::utils::builder::{
@@ -26,7 +26,7 @@ use super::STATE;
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch,
 /// and providing helper methods where possible. The context also acts as a
-/// general high-level interface over the associated [`Connection`] which
+/// general high-level interface over the associated [`Shard`] which
 /// received the event, or the low-level [`http`] module.
 ///
 /// For example, when the [`Client::on_message`] handler is dispatched to, the
@@ -35,8 +35,8 @@ use super::STATE;
 /// post its given argument to the associated channel for you as a [`Message`].
 ///
 /// Additionally, the context contains "shortcuts", like for interacting with
-/// the connection. Methods like [`set_game`] will unlock the connection and
-/// perform an update for you to save a bit of work.
+/// the shard. Methods like [`set_game`] will unlock the shard and perform an
+/// update for you to save a bit of work.
 ///
 /// A context will only live for the event it was dispatched for. After the
 /// event handler finished, it is destroyed and will not be re-used.
@@ -65,10 +65,10 @@ use super::STATE;
 ///
 /// [`Channel`]: ../model/enum.Channel.html
 /// [`Client::on_message`]: struct.Client.html#method.on_message
-/// [`Connection`]: struct.Connection.html
 /// [`LiveGuild`]: ../model/struct.LiveGuild.html
 /// [`Message`]: ../model/struct.Message.html
 /// [`PublicChannel`]: ../model/struct.PublicChannel.html
+/// [`Shard`]: gateway/struct.Shard.html
 /// [`State`]: ../ext/state/struct.State.html
 /// [`get_channel`]: #method.get_channel
 /// [`http`]: http/index.html
@@ -81,11 +81,11 @@ pub struct Context {
     ///
     /// [`on_message`]: struct.Client.html#method.on_message
     pub channel_id: Option<ChannelId>,
-    /// The associated connection which dispatched the event handler.
+    /// The associated shard which dispatched the event handler.
     ///
     /// Note that if you are sharding, in relevant terms, this is the shard
     /// which received the event being dispatched.
-    pub connection: Arc<Mutex<Connection>>,
+    pub shard: Arc<Mutex<Shard>>,
     login_type: LoginType,
 }
 
@@ -99,11 +99,11 @@ impl Context {
     /// documentation.
     #[doc(hidden)]
     pub fn new(channel_id: Option<ChannelId>,
-               connection: Arc<Mutex<Connection>>,
+               shard: Arc<Mutex<Shard>>,
                login_type: LoginType) -> Context {
         Context {
             channel_id: channel_id,
-            connection: connection,
+            shard: shard,
             login_type: login_type,
         }
     }
@@ -1227,7 +1227,7 @@ impl Context {
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     pub fn online(&self) {
-        self.connection.lock().unwrap().set_status(OnlineStatus::Online);
+        self.shard.lock().unwrap().set_status(OnlineStatus::Online);
     }
 
     /// Sets the current user as being [`Idle`]. This maintains the current
@@ -1235,7 +1235,7 @@ impl Context {
     ///
     /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
     pub fn idle(&self) {
-        self.connection.lock().unwrap().set_status(OnlineStatus::Idle);
+        self.shard.lock().unwrap().set_status(OnlineStatus::Idle);
     }
 
     /// Sets the current user as being [`DoNotDisturb`]. This maintains the
@@ -1243,7 +1243,7 @@ impl Context {
     ///
     /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
     pub fn dnd(&self) {
-        self.connection.lock().unwrap().set_status(OnlineStatus::DoNotDisturb);
+        self.shard.lock().unwrap().set_status(OnlineStatus::DoNotDisturb);
     }
 
     /// Sets the current user as being [`Invisible`]. This maintains the current
@@ -1251,7 +1251,7 @@ impl Context {
     ///
     /// [`Invisible`]: ../model/enum.OnlineStatus.html#variant.Invisible
     pub fn invisible(&self) {
-        self.connection.lock().unwrap().set_status(OnlineStatus::Invisible);
+        self.shard.lock().unwrap().set_status(OnlineStatus::Invisible);
     }
 
     /// "Resets" the current user's presence, by setting the game to `None`,
@@ -1262,7 +1262,7 @@ impl Context {
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     /// [`set_presence`]: #method.set_presence
     pub fn reset_presence(&self) {
-        self.connection.lock()
+        self.shard.lock()
             .unwrap()
             .set_presence(None, OnlineStatus::Online, false)
     }
@@ -1284,7 +1284,7 @@ impl Context {
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     pub fn set_game(&self, game: Game) {
-        self.connection.lock()
+        self.shard.lock()
             .unwrap()
             .set_presence(Some(game), OnlineStatus::Online, false);
     }
@@ -1309,7 +1309,7 @@ impl Context {
             url: None,
         };
 
-        self.connection.lock()
+        self.shard.lock()
             .unwrap()
             .set_presence(Some(game), OnlineStatus::Online, false);
     }
@@ -1349,7 +1349,7 @@ impl Context {
                         game: Option<Game>,
                         status: OnlineStatus,
                         afk: bool) {
-        self.connection.lock()
+        self.shard.lock()
             .unwrap()
             .set_presence(game, status, afk)
     }

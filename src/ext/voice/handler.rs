@@ -2,7 +2,7 @@ use serde_json::builder::ObjectBuilder;
 use std::sync::mpsc::{self, Sender};
 use super::connection_info::ConnectionInfo;
 use super::{Status as VoiceStatus, Target};
-use ::client::ConnectionStatus;
+use ::client::gateway::GatewayStatus;
 use ::constants::VoiceOpCode;
 use ::model::{ChannelId, GuildId, VoiceState};
 use super::threading;
@@ -39,7 +39,7 @@ pub struct Handler {
     sender: Sender<VoiceStatus>,
     session_id: Option<String>,
     user_id: u64,
-    ws: Sender<ConnectionStatus>,
+    ws: Sender<GatewayStatus>,
 }
 
 impl Handler {
@@ -52,7 +52,7 @@ impl Handler {
     ///
     /// [`Manager::join`]: struct.Manager.html#method.join
     #[doc(hidden)]
-    pub fn new(target: Target, ws: Sender<ConnectionStatus>, user_id: u64)
+    pub fn new(target: Target, ws: Sender<GatewayStatus>, user_id: u64)
         -> Self {
         let (tx, rx) = mpsc::channel();
 
@@ -260,7 +260,7 @@ impl Handler {
                 .insert("self_mute", self.self_mute))
             .build();
 
-        let _ = self.ws.send(ConnectionStatus::SendMessage(map));
+        let _ = self.ws.send(GatewayStatus::SendMessage(map));
     }
 
     fn send(&mut self, status: VoiceStatus) {

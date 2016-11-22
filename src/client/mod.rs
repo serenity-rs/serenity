@@ -1,8 +1,8 @@
 //! The Client contains information about a single bot or user's token, as well
 //! as event handlers. Dispatching events to configured handlers and starting
-//! the connection are handled directly via the client. In addition, the
-//! [`http`] module and [`State`] are also automatically handled by the Client
-//! module for you.
+//! the shards' connections are handled directly via the client. In addition,
+//! the [`http`] module and [`State`] are also automatically handled by the
+//! Client module for you.
 //!
 //! A [`Context`] is provided for every handler. The context is an ergonomic
 //! method of accessing the lower-level http functions.
@@ -22,24 +22,21 @@
 //! [Client examples]: struct.Client.html#examples
 
 pub mod http;
+pub mod gateway;
 
-mod connection;
 mod context;
 mod dispatch;
+mod error;
 mod event_store;
 mod login_type;
 
-pub use self::connection::{
-    Connection,
-    ConnectionError,
-    Status as ConnectionStatus
-};
 pub use self::context::Context;
+pub use self::error::Error as ClientError;
 pub use self::login_type::LoginType;
 
-use hyper::status::StatusCode;
 use self::dispatch::dispatch;
 use self::event_store::EventStore;
+use self::gateway::Shard;
 use serde_json::builder::ObjectBuilder;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::{Arc, Mutex};
@@ -47,7 +44,7 @@ use std::thread;
 use std::time::Duration;
 use websocket::client::Receiver;
 use websocket::stream::WebSocketStream;
-use ::internal::prelude::*;
+use ::internal::prelude::{Error, Result, Value};
 use ::internal::ws_impl::ReceiverExt;
 use ::model::*;
 
@@ -83,155 +80,10 @@ lazy_static! {
     pub static ref STATE: Arc<Mutex<State>> = Arc::new(Mutex::new(State::default()));
 }
 
-/// An error returned from the [`Client`] or the [`Context`], or model instance.
-///
-/// This is always wrapped within the library's generic [`Error::Client`]
-/// variant.
-///
-/// # Examples
-///
-/// Matching an [`Error`] with this variant may look something like the
-/// following for the [`Client::ban`] method, which in this example is used to
-/// re-ban all members with an odd discriminator:
-///
-/// ```rust,no_run
-/// use serenity::client::{Client, ClientError};
-/// use serenity::Error;
-/// use std::env;
-///
-/// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
-/// let mut client = Client::login_bot(&token);
-///
-/// client.on_member_unban(|context, guild_id, user| {
-///     let discriminator = match user.discriminator.parse::<u16>() {
-///         Ok(discriminator) => discriminator,
-///         Err(_why) => return,
-///     };
-///
-///     // If the user has an even discriminator, don't re-ban them.
-///     if discriminator % 2 == 0 {
-///         return;
-///     }
-///
-///     match context.ban(guild_id, user, 8) {
-///         Ok(()) => {
-///             // Ban successful.
-///         },
-///         Err(Error::Client(ClientError::DeleteMessageDaysAmount(amount))) => {
-///             println!("Failed deleting {} days' worth of messages", amount);
-///         },
-///         Err(why) => {
-///             println!("Unexpected error: {:?}", why);
-///         },
-///     }
-/// });
-/// ```
-///
-/// [`Client`]: struct.Client.html
-/// [`Context`]: struct.Context.html
-/// [`Context::ban`]: struct.Context.html#method.ban
-/// [`Error::Client`]: ../enum.Error.html#variant.Client
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub enum ClientError {
-    /// When attempting to delete below or above the minimum and maximum allowed
-    /// number of messages.
-    BulkDeleteAmount,
-    /// When the connection being retrieved from within the Client could not be
-    /// found after being inserted into the Client's internal vector of
-    /// [`Connection`]s.
-    ///
-    /// This can be returned from one of the options for starting one or
-    /// multiple connections.
-    ///
-    /// **This should never be received.**
-    ///
-    /// [`Connection`]: struct.Connection.html
-    ConnectionUnknown,
-    /// When attempting to delete a number of days' worth of messages that is
-    /// not allowed.
-    DeleteMessageDaysAmount(u8),
-    /// When there was an error retrieving the gateway URI from the REST API.
-    Gateway,
-    /// An indication that a [guild][`LiveGuild`] could not be found by
-    /// [Id][`GuildId`] in the [`State`].
-    ///
-    /// [`GuildId`]: ../model/struct.GuildId.html
-    /// [`LiveGuild`]: ../model/struct.LiveGuild.html
-    /// [`State`]: ../ext/state/struct.State.html
-    GuildNotFound,
-    InvalidOpCode,
-    /// When attempting to perform an action which is only available to user
-    /// accounts.
-    InvalidOperationAsBot,
-    /// When attempting to perform an action which is only available to bot
-    /// accounts.
-    InvalidOperationAsUser,
-    /// Indicates that you do not have the required permissions to perform an
-    /// operation.
-    ///
-    /// The provided [`Permission`]s is the set of required permissions
-    /// required.
-    ///
-    /// [`Permission`]: ../model/permissions/struct.Permissions.html
-    InvalidPermissions(Permissions),
-    /// An indicator that the shard data received from the gateway is invalid.
-    InvalidShards,
-    /// When the token provided is invalid. This is returned when validating a
-    /// token through the [`validate_token`] function.
-    ///
-    /// [`validate_token`]: fn.validate_token.html
-    InvalidToken,
-    /// An indicator that the [current user] can not perform an action.
-    ///
-    /// [current user]: ../model/struct.CurrentUser.html
-    InvalidUser,
-    /// An indicator that an item is missing from the [`State`], and the action
-    /// can not be continued.
-    ///
-    /// [`State`]: ../ext/state/struct.State.html
-    ItemMissing,
-    /// Indicates that a [`Message`]s content was too long and will not
-    /// successfully send, as the length is over 2000 codepoints, or 4000 bytes.
-    ///
-    /// The number of bytes larger than the limit is provided.
-    ///
-    /// [`Message`]: ../model/struct.Message.html
-    MessageTooLong(u64),
-    /// When attempting to use a [`Context`] helper method which requires a
-    /// contextual [`ChannelId`], but the current context is not appropriate for
-    /// the action.
-    ///
-    /// [`ChannelId`]: ../model/struct.ChannelId.html
-    /// [`Context`]: struct.Context.html
-    NoChannelId,
-    /// When the decoding of a ratelimit header could not be properly decoded
-    /// into an `i64`.
-    RateLimitI64,
-    /// When the decoding of a ratelimit header could not be properly decoded
-    /// from UTF-8.
-    RateLimitUtf8,
-    /// When attempting to find a required record from the State could not be
-    /// found. This is required in methods such as [`Context::edit_role`].
-    ///
-    /// [`Context::edit_role`]: struct.Context.html#method.edit_role
-    RecordNotFound,
-    /// When a function such as [`Context::edit_channel`] did not expect the
-    /// received [`ChannelType`].
-    ///
-    /// [`ChannelType`]: ../model/enum.ChannelType.html
-    /// [`Context::edit_channel`]: struct.Context.html#method.edit_channel
-    UnexpectedChannelType(ChannelType),
-    /// When a status code was unexpectedly received for a request's status.
-    UnexpectedStatusCode(StatusCode),
-    /// When a status is received, but the verification to ensure the response
-    /// is valid does not recognize the status.
-    UnknownStatus(u16),
-}
-
 /// The Client is the way to "login" and be able to start sending authenticated
-/// requests over the REST API, as well as initializing a WebSocket
-/// [`Connection`]. Refer to `Connection`'s [information on using sharding] for
-/// more information.
+/// requests over the REST API, as well as initializing a WebSocket connection
+/// through [`Shard`]s. Refer to the
+/// [documentation on using sharding][sharding docs] for more information.
 ///
 /// # Event Handlers
 ///
@@ -261,22 +113,22 @@ pub enum ClientError {
 /// client.start();
 /// ```
 ///
-/// [`Connection`]: struct.Connection.html
+/// [`Shard`]: gateway/struct.Shard.html
 /// [`on_message`]: #method.on_message
 /// [`Event::MessageCreate`]: ../model/enum.Event.html#variant.MessageCreate
-/// [information on using sharding]: struct.Connection.html#sharding
+/// [sharding docs]: gateway/index.html#sharding
 pub struct Client {
-    /// A vector of all active connections that have received their
-    /// [`Event::Ready`] payload, and have dispatched to [`on_ready`] if an
-    /// event handler was configured.
+    /// A vector of all active shards that have received their [`Event::Ready`]
+    /// payload, and have dispatched to [`on_ready`] if an event handler was
+    /// configured.
     ///
     /// [`Event::Ready`]: ../model/enum.Event.html#variant.Ready
     /// [`on_ready`]: #method.on_ready
-    pub connections: Vec<Arc<Mutex<Connection>>>,
     event_store: Arc<Mutex<EventStore>>,
     #[cfg(feature="framework")]
     framework: Arc<Mutex<Framework>>,
     login_type: LoginType,
+    pub shards: Vec<Arc<Mutex<Shard>>>,
     token: String,
 }
 
@@ -355,10 +207,10 @@ impl Client {
     /// less than 2500 guilds. If you have a reason for sharding and/or are in
     /// more than 2500 guilds, use one of these depending on your use case:
     ///
-    /// Refer to the [module-level documentation][connection docs] for more
-    /// information on effectively using sharding.
+    /// Refer to the [Gateway documentation][gateway docs] for more information
+    /// on effectively using sharding.
     ///
-    /// [connection docs]: struct.Connection.html#sharding
+    /// [gateway docs]: gateway/index.html#sharding
     pub fn start(&mut self) -> Result<()> {
         self.start_connection(None)
     }
@@ -372,10 +224,10 @@ impl Client {
     /// from the API - determined by Discord - and then open a number of shards
     /// equivilant to that amount.
     ///
-    /// Refer to the [module-level documentation][connection docs] for more
-    /// information on effectively using sharding.
+    /// Refer to the [Gateway documentation][gateway docs] for more information
+    /// on effectively using sharding.
     ///
-    /// [connection docs]: struct.Connection.html#sharding
+    /// [gateway docs]: gateway/index.html#sharding
     pub fn start_autosharded(&mut self) -> Result<()> {
         let res = try!(http::get_bot_gateway());
 
@@ -391,10 +243,10 @@ impl Client {
     /// you will need to start other processes with the other shard IDs in some
     /// way.
     ///
-    /// Refer to the [module-level documentation][connection docs] for more
-    /// information on effectively using sharding.
+    /// Refer to the [Gateway documentation][gateway docs] for more information
+    /// on effectively using sharding.
     ///
-    /// [connection docs]: struct.Connection.html#sharding
+    /// [gateway docs]: gateway/index.html#sharding
     pub fn start_shard(&mut self, shard: u8, shards: u8) -> Result<()> {
         self.start_connection(Some([shard, shard, shards]))
     }
@@ -408,12 +260,12 @@ impl Client {
     /// you only need to start a single shard within the process, or a range of
     /// shards, use [`start_shard`] or [`start_shard_range`], respectively.
     ///
-    /// Refer to the [module-level documentation][connection docs] for more
-    /// information on effectively using sharding.
+    /// Refer to the [Gateway documentation][gateway docs] for more information
+    /// on effectively using sharding.
     ///
     /// [`start_shard`]: #method.start_shard
     /// [`start_shard_range`]: #method.start_shards
-    /// [connection docs]: struct.Connection.html#sharding
+    /// [Gateway docs]: gateway/index.html#sharding
     pub fn start_shards(&mut self, total_shards: u8) -> Result<()> {
         self.start_connection(Some([0, total_shards - 1, total_shards]))
     }
@@ -428,7 +280,7 @@ impl Client {
     /// process, or all shards within the process, use [`start_shard`] or
     /// [`start_shards`], respectively.
     ///
-    /// Refer to the [module-level documentation][connection docs] for more
+    /// Refer to the [Gateway documentation][gateway docs] for more
     /// information on effectively using sharding.
     ///
     /// # Examples
@@ -447,7 +299,7 @@ impl Client {
     ///
     /// [`start_shard`]: #method.start_shard
     /// [`start_shards`]: #method.start_shards
-    /// [connection docs]: struct.Connection.html#sharding
+    /// [Gateway docs]: gateway/index.html#sharding
     pub fn start_shard_range(&mut self, range: [u8; 2], total_shards: u8)
         -> Result<()> {
         self.start_connection(Some([range[0], range[1], total_shards]))
@@ -729,7 +581,7 @@ impl Client {
     /// Register an event to be called whenever a Ready event is received.
     ///
     /// Registering a handler for the ready event is good for noting when your
-    /// bot has established a connection to the gateway.
+    /// bot has established a connection to the gateway through a [`Shard`].
     ///
     /// **Note**: The Ready event is not guarenteed to be the first event you
     /// will receive by Discord. Do not actively rely on it.
@@ -751,6 +603,7 @@ impl Client {
     /// ```
     ///
     /// [`CurrentUser`]: ../model/struct.CurrentUser.html
+    /// [`Shard`]: gateway/struct.Shard.html
     pub fn on_ready<F>(&mut self, handler: F)
         where F: Fn(Context, Ready) + Send + Sync + 'static {
         self.event_store.lock()
@@ -868,13 +721,13 @@ impl Client {
         let gateway_url = try!(http::get_gateway()).url;
 
         for i in 0..shard_data.map_or(1, |x| x[1] + 1) {
-            let connection = Connection::new(&gateway_url,
-                                             &self.token,
-                                             shard_data.map(|s| [i, s[2]]),
-                                             self.login_type);
-            match connection {
-                Ok((connection, ready, receiver)) => {
-                    self.connections.push(Arc::new(Mutex::new(connection)));
+            let shard = Shard::new(&gateway_url,
+                                        &self.token,
+                                        shard_data.map(|s| [i, s[2]]),
+                                        self.login_type);
+            match shard {
+                Ok((shard, ready, receiver)) => {
+                    self.shards.push(Arc::new(Mutex::new(shard)));
 
                     feature_state_enabled! {{
                         STATE.lock()
@@ -882,22 +735,22 @@ impl Client {
                             .update_with_ready(&ready);
                     }}
 
-                    match self.connections.last() {
-                        Some(connection) => {
+                    match self.shards.last() {
+                        Some(shard) => {
                             feature_framework! {{
                                 dispatch(Event::Ready(ready),
-                                         connection.clone(),
+                                         shard.clone(),
                                          self.framework.clone(),
                                          self.login_type,
                                          self.event_store.clone());
                             } else {
                                 dispatch(Event::Ready(ready),
-                                         connection.clone(),
+                                         shard.clone(),
                                          self.login_type,
                                          self.event_store.clone());
                             }}
 
-                            let connection_clone = connection.clone();
+                            let shard_clone = shard.clone();
                             let event_store = self.event_store.clone();
                             let login_type = self.login_type;
 
@@ -905,22 +758,22 @@ impl Client {
                                 let framework = self.framework.clone();
 
                                 thread::spawn(move || {
-                                    handle_connection(connection_clone,
-                                                      framework,
-                                                      login_type,
-                                                      event_store,
-                                                      receiver)
+                                    handle_shard(shard_clone,
+                                                 framework,
+                                                 login_type,
+                                                 event_store,
+                                                 receiver)
                                 });
                             } else {
                                 thread::spawn(move || {
-                                    handle_connection(connection_clone,
-                                                      login_type,
-                                                      event_store,
-                                                      receiver)
+                                    handle_shard(shard_clone,
+                                                 login_type,
+                                                 event_store,
+                                                 receiver)
                                 });
                             }}
                         },
-                        None => return Err(Error::Client(ClientError::ConnectionUnknown)),
+                        None => return Err(Error::Client(ClientError::ShardUnknown)),
                     }
                 },
                 Err(why) => return Err(why),
@@ -934,16 +787,17 @@ impl Client {
         }
     }
 
-    // Boot up a new connection. This is used primarily in the scenario of
-    // re-instantiating a connection in the reconnect logic in another
-    // Connection.
+    // Boot up a new shard. This is used primarily in the scenario of
+    // re-instantiating a shard in the reconnect logic in another [`Shard`].
+    //
+    // [`Shard`]: gateway/struct.Shard.html
     #[doc(hidden)]
-    pub fn boot_connection(&mut self,
-                           shard_info: Option<[u8; 2]>)
-                           -> Result<(Connection, ReadyEvent, Receiver<WebSocketStream>)> {
+    pub fn boot_shard(&mut self,
+                      shard_info: Option<[u8; 2]>)
+                      -> Result<(Shard, ReadyEvent, Receiver<WebSocketStream>)> {
         let gateway_url = try!(http::get_gateway()).url;
 
-        Connection::new(&gateway_url, &self.token, shard_info, self.login_type)
+        Shard::new(&gateway_url, &self.token, shard_info, self.login_type)
     }
 }
 
@@ -1252,15 +1106,15 @@ impl Client {
 }
 
 #[cfg(feature="framework")]
-fn handle_connection(connection: Arc<Mutex<Connection>>,
-                     framework: Arc<Mutex<Framework>>,
-                     login_type: LoginType,
-                     event_store: Arc<Mutex<EventStore>>,
-                     mut receiver: Receiver<WebSocketStream>) {
+fn handle_shard(shard: Arc<Mutex<Shard>>,
+                framework: Arc<Mutex<Framework>>,
+                login_type: LoginType,
+                event_store: Arc<Mutex<EventStore>>,
+                mut receiver: Receiver<WebSocketStream>) {
     loop {
         let event = receiver.recv_json(GatewayEvent::decode);
 
-        let event = match connection.lock().unwrap().handle_event(event, &mut receiver) {
+        let event = match shard.lock().unwrap().handle_event(event, &mut receiver) {
             Ok(Some(x)) => match x {
                 (event, Some(new_receiver)) => {
                     receiver = new_receiver;
@@ -1273,7 +1127,7 @@ fn handle_connection(connection: Arc<Mutex<Connection>>,
         };
 
         dispatch(event,
-                 connection.clone(),
+                 shard.clone(),
                  framework.clone(),
                  login_type,
                  event_store.clone());
@@ -1281,14 +1135,14 @@ fn handle_connection(connection: Arc<Mutex<Connection>>,
 }
 
 #[cfg(not(feature="framework"))]
-fn handle_connection(connection: Arc<Mutex<Connection>>,
+fn handle_shard(shard: Arc<Mutex<Shard>>,
                      login_type: LoginType,
                      event_store: Arc<Mutex<EventStore>>,
                      mut receiver: Receiver<WebSocketStream>) {
     loop {
         let event = receiver.recv_json(GatewayEvent::decode);
 
-        let event = match connection.lock().unwrap().handle_event(event, &mut receiver) {
+        let event = match shard.lock().unwrap().handle_event(event, &mut receiver) {
             Ok(Some(x)) => match x {
                 (event, Some(new_receiver)) => {
                     receiver = new_receiver;
@@ -1301,7 +1155,7 @@ fn handle_connection(connection: Arc<Mutex<Connection>>,
         };
 
         dispatch(event,
-                 connection.clone(),
+                 shard.clone(),
                  login_type,
                  event_store.clone());
     }
@@ -1314,7 +1168,7 @@ fn login(token: &str, login_type: LoginType) -> Client {
 
     feature_framework! {{
         Client {
-            connections: Vec::default(),
+            shards: Vec::default(),
             event_store: Arc::new(Mutex::new(EventStore::default())),
             framework: Arc::new(Mutex::new(Framework::default())),
             login_type: login_type,
@@ -1322,7 +1176,7 @@ fn login(token: &str, login_type: LoginType) -> Client {
         }
     } else {
         Client {
-            connections: Vec::default(),
+            shards: Vec::default(),
             event_store: Arc::new(Mutex::new(EventStore::default())),
             login_type: login_type,
             token: token.to_owned(),

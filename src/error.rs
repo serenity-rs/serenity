@@ -5,7 +5,8 @@ use hyper::Error as HyperError;
 use serde_json::Error as JsonError;
 use serde_json::Value;
 use websocket::result::WebSocketError;
-use ::client::{ClientError, ConnectionError};
+use ::client::gateway::GatewayError;
+use ::client::ClientError;
 #[cfg(feature="voice")]
 use ::ext::voice::VoiceError;
 
@@ -22,14 +23,14 @@ pub type Result<T> = ::std::result::Result<T, Error>;
 /// A common error enum returned by most of the library's functionality within a
 /// custom [`Result`].
 ///
-/// The most common error types, the [`ClientError`] and [`ConnectionError`]
+/// The most common error types, the [`ClientError`] and [`GatewayError`]
 /// enums, are both wrapped around this in the form of the [`Client`] and
-/// [`Connection`] variants.
+/// [`Gateway`] variants.
 ///
 /// [`Client`]: #variant.Client
 /// [`ClientError`]: client/enum.ClientError.html
-/// [`Connection`]: #variant.Connection
-/// [`ConnectionError`]: client/enum.ConnectionError.html
+/// [`Gateway`]: #variant.Gateway
+/// [`GatewayError`]: client/enum.GatewayError.html
 /// [`Result`]: type.Result.html
 #[derive(Debug)]
 pub enum Error {
@@ -38,10 +39,10 @@ pub enum Error {
     /// [client]: client/index.html
     /// [http]: client/http/index.html
     Client(ClientError),
-    /// An error with the WebSocket [`Connection`].
+    /// An error with the WebSocket [`Gateway`].
     ///
-    /// [`Connection`]: client/struct.Connection.html
-    Connection(ConnectionError),
+    /// [`Gateway`]: client/gateway/index.html
+    Gateway(GatewayError),
     /// An error while decoding a payload.
     Decode(&'static str, Value),
     /// An error from the `hyper` crate.
@@ -107,7 +108,7 @@ impl StdError for Error {
     fn description(&self) -> &str {
         match *self {
             Error::Client(_) => "Client refused a request",
-            Error::Connection(ref _inner) => "Connection error",
+            Error::Gateway(ref _inner) => "Gateway error",
             Error::Decode(msg, _) | Error::Other(msg) => msg,
             Error::Hyper(ref inner) => inner.description(),
             Error::Io(ref inner) => inner.description(),
