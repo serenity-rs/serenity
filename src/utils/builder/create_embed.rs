@@ -132,7 +132,7 @@ impl CreateEmbed {
         where F: FnOnce(CreateEmbedImage) -> CreateEmbedImage {
         let image = f(CreateEmbedImage::default()).0.build();
 
-        self.0.insert("thumbnail".to_owned(), image);
+        self.0.insert("image".to_owned(), image);
 
         CreateEmbed(self.0)
     }
