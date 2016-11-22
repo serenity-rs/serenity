@@ -122,6 +122,21 @@ impl CreateEmbed {
         CreateEmbed(self.0)
     }
 
+    /// Set the image associated with the embed.
+    ///
+    /// Refer to the documentation for [`CreateEmbedImage`] for more
+    /// information.
+    ///
+    /// [`CreateEmbedImage`]: struct.CreateEmbedImage.html
+    pub fn image<F>(mut self, f: F) -> Self
+        where F: FnOnce(CreateEmbedImage) -> CreateEmbedImage {
+        let image = f(CreateEmbedImage::default()).0.build();
+
+        self.0.insert("thumbnail".to_owned(), image);
+
+        CreateEmbed(self.0)
+    }
+
     /// Set the thumbnail of the embed.
     ///
     /// Refer to the documentation for [`CreateEmbedThumbnail`] for more
@@ -263,6 +278,39 @@ impl Default for CreateEmbedFooter {
     /// Creates a builder with no default values.
     fn default() -> CreateEmbedFooter {
         CreateEmbedFooter(ObjectBuilder::new())
+    }
+}
+
+/// A builder to create a fake [`Embed`] object's image, for use with the
+/// [`CreateEmbed::image`] method.
+///
+/// This does not require any field be set.
+///
+/// [`Embed`]: ../../model/struct.Embed.html
+/// [`CreateEmbed::image`]: struct.CreateEmbed.html#method.image
+pub struct CreateEmbedImage(pub ObjectBuilder);
+
+impl CreateEmbedImage {
+    /// Set the display height of the image.
+    pub fn height(self, height: u64) -> Self {
+        CreateEmbedImage(self.0.insert("height", height))
+    }
+
+    /// Set the image's URL. This only supports HTTP(S).
+    pub fn url(self, url: &str) -> Self {
+        CreateEmbedImage(self.0.insert("url", url))
+    }
+
+    /// Set the display width of the image.
+    pub fn width(self, width: u64) -> Self {
+        CreateEmbedImage(self.0.insert("widht", width))
+    }
+}
+
+impl Default for CreateEmbedImage {
+    /// Creates a builder with no default values.
+    fn default() -> CreateEmbedImage {
+        CreateEmbedImage(ObjectBuilder::new())
     }
 }
 

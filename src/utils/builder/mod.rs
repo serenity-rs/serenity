@@ -20,6 +20,7 @@ pub use self::create_embed::{
     CreateEmbed,
     CreateEmbedAuthor,
     CreateEmbedField,
+    CreateEmbedImage,
     CreateEmbedThumbnail,
     CreateEmbedVideo,
 };
