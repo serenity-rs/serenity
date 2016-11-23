@@ -10,6 +10,7 @@ use super::super::Client;
 use super::{GatewayError, GatewayStatus, prep};
 use websocket::client::{Client as WsClient, Sender, Receiver};
 use websocket::message::Message as WsMessage;
+use websocket::result::WebSocketError;
 use websocket::stream::WebSocketStream;
 use websocket::ws::sender::Sender as WsSender;
 use ::constants::OpCode;
@@ -301,6 +302,7 @@ impl Shard {
 
                 self.reconnect(receiver).map(|(ev, rec)| Some((ev, Some(rec))))
             },
+            Err(Error::WebSocket(WebSocketError::NoDataAvailable)) => Ok(None),
             Err(Error::WebSocket(why)) => {
                 warn!("Websocket error: {:?}", why);
                 info!("Reconnecting");
