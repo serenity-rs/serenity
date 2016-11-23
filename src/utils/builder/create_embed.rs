@@ -249,7 +249,7 @@ impl Default for CreateEmbedField {
     /// Creates a builder with default values, setting the value of `inline` to
     /// `true`.
     fn default() -> CreateEmbedField {
-        CreateEmbedField(ObjectBuilder::new())
+        CreateEmbedField(ObjectBuilder::new().insert("inline", true))
     }
 }
 
