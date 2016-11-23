@@ -275,7 +275,7 @@ pub fn remove(map: &mut BTreeMap<String, Value>, key: &str) -> Result<Value> {
 pub fn user_has_perms(channel_id: ChannelId,
                       mut permissions: Permissions)
                       -> Result<bool> {
-    let cache = CACHE.lock().unwrap();
+    let cache = CACHE.read().unwrap();
     let current_user = &cache.user;
 
     let channel = match cache.get_channel(channel_id) {

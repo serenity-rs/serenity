@@ -39,7 +39,7 @@ use self::event_store::EventStore;
 use self::gateway::Shard;
 use serde_json::builder::ObjectBuilder;
 use std::collections::{BTreeMap, HashMap};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, RwLock};
 use std::thread;
 use std::time::Duration;
 use websocket::client::Receiver;
@@ -77,7 +77,7 @@ lazy_static! {
     /// [`CurrentUser`]: ../model/struct.CurrentUser.html
     /// [`Cache`]: ../ext/cache/struct.Cache.html
     /// [cache module documentation]: ../ext/cache/index.html
-    pub static ref CACHE: Arc<Mutex<Cache>> = Arc::new(Mutex::new(Cache::default()));
+    pub static ref CACHE: RwLock<Cache> = RwLock::new(Cache::default());
 }
 
 /// The Client is the way to "login" and be able to start sending authenticated
@@ -730,7 +730,7 @@ impl Client {
                     self.shards.push(Arc::new(Mutex::new(shard)));
 
                     feature_cache_enabled! {{
-                        CACHE.lock()
+                        CACHE.write()
                             .unwrap()
                             .update_with_ready(&ready);
                     }}

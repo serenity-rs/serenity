@@ -62,7 +62,7 @@ impl User {
     pub fn direct_message(&self, content: &str)
         -> Result<Message> {
         let private_channel_id = {
-            let finding = CACHE.lock()
+            let finding = CACHE.read()
                 .unwrap()
                 .private_channels
                 .values()
@@ -125,7 +125,7 @@ impl User {
             },
             GuildContainer::Id(guild_id) => {
                 feature_cache! {{
-                    let cache = CACHE.lock().unwrap();
+                    let cache = CACHE.read().unwrap();
 
                     cache.get_role(guild_id, role_id).is_some()
                 } else {

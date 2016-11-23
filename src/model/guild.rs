@@ -52,7 +52,7 @@ impl Emoji {
     /// [`Guild`]: struct.Guild.html
     #[cfg(feature = "methods")]
     pub fn find_guild_id(&self) -> Option<GuildId> {
-        CACHE.lock()
+        CACHE.read()
             .unwrap()
             .guilds
             .values()
@@ -167,7 +167,7 @@ impl Guild {
 impl LiveGuild {
     #[cfg(feature = "cache")]
     fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
-        let member = match self.get_member(CACHE.lock().unwrap().user.id) {
+        let member = match self.get_member(CACHE.read().unwrap().user.id) {
             Some(member) => member,
             None => return Err(Error::Client(ClientError::ItemMissing)),
         };
@@ -379,7 +379,7 @@ impl LiveGuild {
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
     #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<Guild> {
-        if self.owner_id != CACHE.lock().unwrap().user.id {
+        if self.owner_id != CACHE.read().unwrap().user.id {
             let req = permissions::MANAGE_GUILD;
 
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
@@ -856,7 +856,7 @@ impl Member {
     /// [`Guild`]: struct.Guild.html
     #[cfg(feature = "methods")]
     pub fn find_guild(&self) -> Result<GuildId> {
-        CACHE.lock()
+        CACHE.read()
             .unwrap()
             .guilds
             .values()
@@ -931,7 +931,7 @@ impl Member {
     /// If role data can not be found for the member, then `None` is returned.
     #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn roles(&self) -> Option<Vec<Role>> {
-        CACHE.lock().unwrap()
+        CACHE.read().unwrap()
             .guilds
             .values()
             .find(|g| g.members
@@ -1028,7 +1028,7 @@ impl Role {
     /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
     #[cfg(feature = "methods")]
     pub fn find_guild(&self) -> Result<GuildId> {
-        CACHE.lock()
+        CACHE.read()
             .unwrap()
             .guilds
             .values()

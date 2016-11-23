@@ -762,7 +762,7 @@ impl Context {
         let role_id = role_id.into();
 
         feature_cache! {{
-            let cache = CACHE.lock().unwrap();
+            let cache = CACHE.read().unwrap();
 
             let role = if let Some(role) = {
                 cache.get_role(guild_id.0, role_id.0)
@@ -825,7 +825,7 @@ impl Context {
         let channel_id = channel_id.into();
 
         feature_cache_enabled! {{
-            if let Some(channel) = CACHE.lock().unwrap().get_channel(channel_id) {
+            if let Some(channel) = CACHE.read().unwrap().get_channel(channel_id) {
                 return Ok(channel.clone());
             }
         }}
@@ -838,7 +838,7 @@ impl Context {
         let guild_id = guild_id.into();
 
         feature_cache_enabled! {{
-            let cache = CACHE.lock().unwrap();
+            let cache = CACHE.read().unwrap();
 
             if let Some(guild) = cache.get_guild(guild_id) {
                 return Ok(guild.channels.clone());
@@ -903,7 +903,7 @@ impl Context {
         let user_id = user_id.into();
 
         feature_cache_enabled! {{
-            let cache = CACHE.lock().unwrap();
+            let cache = CACHE.read().unwrap();
 
             if let Some(member) = cache.get_member(guild_id, user_id) {
                 return Ok(member.clone());

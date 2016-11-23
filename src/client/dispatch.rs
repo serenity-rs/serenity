@@ -25,12 +25,12 @@ macro_rules! handler {
 macro_rules! update {
     ($method:ident, $event:expr) => {
         feature_cache_enabled! {{
-            CACHE.lock().unwrap().$method(&$event)
+            CACHE.write().unwrap().$method(&$event)
         }}
     };
     ($method:ident, $event:expr, $old:expr) => {
         feature_cache_enabled! {{
-            CACHE.lock().unwrap().$method(&$event, $old)
+            CACHE.write().unwrap().$method(&$event, $old)
         }}
     };
 }
@@ -146,7 +146,7 @@ fn handle_event(event: Event,
                 feature_cache! {{
                     let before = update!(update_with_call_update, event, true);
                     let after = CACHE
-                        .lock()
+                        .read()
                         .unwrap()
                         .calls
                         .get(&event.channel_id)
@@ -254,7 +254,7 @@ fn handle_event(event: Event,
                 let handler = handler.clone();
 
                 feature_cache! {{
-                    let before = CACHE.lock()
+                    let before = CACHE.read()
                         .unwrap()
                         .get_channel(event.channel.id());
                     update!(update_with_channel_update, event);
@@ -412,7 +412,7 @@ fn handle_event(event: Event,
                     // This is safe, as the update would have created the member
                     // if it did not exist. Thus, there _should_ be no way that this
                     // could fail under any circumstance.
-                    let after = CACHE.lock()
+                    let after = CACHE.read()
                         .unwrap()
                         .get_member(event.guild_id, event.user.id)
                         .unwrap()
@@ -526,7 +526,7 @@ fn handle_event(event: Event,
                 let handler = handler.clone();
 
                 feature_cache! {{
-                    let before = CACHE.lock()
+                    let before = CACHE.read()
                         .unwrap()
                         .guilds
                         .get(&event.guild.id)
@@ -776,7 +776,7 @@ fn handle_event(event: Event,
 
                 feature_cache! {{
                     let before = update!(update_with_user_settings_update, event, true);
-                    let after = CACHE.lock().unwrap().settings.clone();
+                    let after = CACHE.read().unwrap().settings.clone();
 
                     thread::spawn(move || {
                         (handler)(context, before.unwrap(), after.unwrap());

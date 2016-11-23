@@ -30,7 +30,7 @@ impl Invite {
     #[cfg(feature="methods")]
     pub fn accept(&self) -> Result<Invite> {
         feature_cache_enabled! {{
-            if CACHE.lock().unwrap().user.bot {
+            if CACHE.read().unwrap().user.bot {
                 return Err(Error::Client(ClientError::InvalidOperationAsBot));
             }
         }}
@@ -84,7 +84,7 @@ impl RichInvite {
     #[cfg(feature="methods")]
     pub fn accept(&self) -> Result<Invite> {
         feature_cache_enabled! {{
-            if CACHE.lock().unwrap().user.bot {
+            if CACHE.read().unwrap().user.bot {
                 return Err(Error::Client(ClientError::InvalidOperationAsBot));
             }
         }}

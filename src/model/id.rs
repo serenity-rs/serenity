@@ -9,14 +9,14 @@ impl ChannelId {
     /// Search the cache for the channel with the Id.
     #[cfg(feature="methods")]
     pub fn find(&self) -> Option<Channel> {
-        CACHE.lock().unwrap().get_channel(*self)
+        CACHE.read().unwrap().get_channel(*self)
     }
 
     /// Search the cache for the channel. If it can't be found, the channel is
     /// requested over REST.
     #[cfg(feature="methods")]
     pub fn get(&self) -> Result<Channel> {
-        if let Some(channel) = CACHE.lock().unwrap().get_channel(*self) {
+        if let Some(channel) = CACHE.read().unwrap().get_channel(*self) {
             return Ok(channel.clone());
         }
 
@@ -77,7 +77,7 @@ impl GuildId {
     /// Search the cache for the guild.
     #[cfg(feature="methods")]
     pub fn find(&self) -> Option<LiveGuild> {
-        CACHE.lock().unwrap().get_guild(*self).cloned()
+        CACHE.read().unwrap().get_guild(*self).cloned()
     }
 
     /// Requests the guild over REST.
@@ -163,7 +163,7 @@ impl RoleId {
     /// Search the cache for the role.
     #[cfg(feature="methods")]
     pub fn find(&self) -> Option<Role> {
-        CACHE.lock()
+        CACHE.read()
             .unwrap()
             .guilds
             .values()
