@@ -1149,7 +1149,7 @@ impl Context {
     /// let _ = client.start();
     ///
     /// fn ping(context: Context, message: Message, _arguments: Vec<String>) {
-    ///     let cache = CACHE.lock().unwrap();
+    ///     let cache = CACHE.read().unwrap();
     ///     let ch = cache.get_channel(message.channel_id);
     ///     let name = match ch {
     ///         Some(Channel::Public(ch)) => ch.name.clone(),
