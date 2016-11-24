@@ -888,7 +888,7 @@ impl PublicChannel {
     /// **Note**: Right now this performs a clone of the guild. This will be
     /// optimized in the future.
     #[cfg(all(feature = "cache", feature = "methods"))]
-    pub fn guild(&self) -> Option<LiveGuild> {
+    pub fn guild(&self) -> Option<Guild> {
         CACHE.read().unwrap().get_guild(self.guild_id).cloned()
     }
 

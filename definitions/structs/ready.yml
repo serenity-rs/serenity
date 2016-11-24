@@ -14,8 +14,8 @@ fields:
     type: u64
   - name: guilds
     array: true
-    custom: PossibleGuild::<LiveGuild>::decode
-    type: PossibleGuild<LiveGuild>
+    custom: PossibleGuild::<Guild>::decode
+    type: PossibleGuild<Guild>
   - name: notes
     custom: decode_notes
     default: HashMap::default()

@@ -141,7 +141,7 @@ pub enum Channel {
 /// a guild needs to be retrieved from the cache.
 pub enum GuildContainer {
     /// A guild which can have its contents directly searched.
-    Guild(Guild),
+    Guild(PartialGuild),
     /// A guild's id, which can be used to search the cache for a guild.
     Id(GuildId),
 }

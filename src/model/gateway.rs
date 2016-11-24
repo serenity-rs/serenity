@@ -87,12 +87,12 @@ pub struct GuildBanRemoveEvent {
 
 #[derive(Clone, Debug)]
 pub struct GuildCreateEvent {
-    pub guild: LiveGuild,
+    pub guild: Guild,
 }
 
 #[derive(Clone, Debug)]
 pub struct GuildDeleteEvent {
-    pub guild: Guild,
+    pub guild: PartialGuild,
 }
 
 #[derive(Clone, Debug)]
@@ -165,7 +165,7 @@ pub struct GuildUnavailableEvent {
 
 #[derive(Clone, Debug)]
 pub struct GuildUpdateEvent {
-    pub guild: Guild,
+    pub guild: PartialGuild,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -555,7 +555,7 @@ impl Event {
                 }))
             } else {
                 Ok(Event::GuildCreate(GuildCreateEvent {
-                    guild: try!(LiveGuild::decode(Value::Object(value))),
+                    guild: try!(Guild::decode(Value::Object(value))),
                 }))
             }
         } else if kind == "GUILD_DELETE" {
@@ -565,7 +565,7 @@ impl Event {
                 }))
             } else {
                 Ok(Event::GuildDelete(GuildDeleteEvent {
-                    guild: try!(Guild::decode(Value::Object(value))),
+                    guild: try!(PartialGuild::decode(Value::Object(value))),
                 }))
             }
         } else if kind == "GUILD_EMOJIS_UPDATE" {
@@ -623,7 +623,7 @@ impl Event {
             }))
         } else if kind == "GUILD_UPDATE" {
             Ok(Event::GuildUpdate(GuildUpdateEvent {
-                guild: try!(Guild::decode(Value::Object(value))),
+                guild: try!(PartialGuild::decode(Value::Object(value))),
             }))
         } else if kind == "MESSAGE_ACK" {
             missing!(value, Event::MessageAck(MessageAckEvent {

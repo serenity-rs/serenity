@@ -9,7 +9,7 @@ use ::model::{Permissions, Role, permissions};
 ///
 /// - [`Context::create_role`]
 /// - [`Context::edit_role`]
-/// - [`LiveGuild::create_role`]
+/// - [`Guild::create_role`]
 /// - [`Role::edit`]
 ///
 /// Defaults are provided for each parameter on role creation.
@@ -28,7 +28,7 @@ use ::model::{Permissions, Role, permissions};
 ///
 /// [`Context::create_role`]: ../client/struct.Context.html#method.create_role
 /// [`Context::edit_role`]: ../client/struct.Context.html#method.edit_role
-/// [`LiveGuild::create_role`]: ../model/struct.LiveGuild.html#method.create_role
+/// [`Guild::create_role`]: ../model/struct.Guild.html#method.create_role
 /// [`Role`]: ../model/struct.Role.html
 /// [`Role::edit`]: ../model/struct.Role.html#method.edit
 pub struct EditRole(pub ObjectBuilder);

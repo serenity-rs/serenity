@@ -173,7 +173,7 @@ bitflags! {
         const MANAGE_CHANNELS = 1 << 4,
         /// Allows management and editing of the [guild].
         ///
-        /// [guild]: ../struct.LiveGuild.html
+        /// [guild]: ../struct.Guild.html
         const MANAGE_GUILD = 1 << 5,
         /// [`Member`]s with this permission can add new [`Reaction`]s to a
         /// [`Message`]. Members can still react using reactions already added

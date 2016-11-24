@@ -233,7 +233,10 @@ pub fn create_emoji(guild_id: u64, map: Value)
     Emoji::decode(try!(serde_json::from_reader(response)))
 }
 
-/// Creates a [`Guild`] with the data provided.
+/// Creates a guild with the data provided.
+///
+/// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`]
+/// will be received over a [`Shard`], if at least one is running.
 ///
 /// **Note**: This endpoint is usually only available for user accounts. Refer
 /// to Discord's documentation for the endpoint [here][whitelist] for more
@@ -260,13 +263,15 @@ pub fn create_emoji(guild_id: u64, map: Value)
 /// ```
 ///
 /// [`Guild`]: ../../model/struct.Guild.html
+/// [`PartialGuild`]: ../../model/struct.PartialGuild.html
+/// [`Shard`]: ../gateway/struct.Shard.html
 /// [US West Region]: ../../model/enum.Region.html#variant.UsWest
 /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
-pub fn create_guild(map: Value) -> Result<Guild> {
+pub fn create_guild(map: Value) -> Result<PartialGuild> {
     let body = try!(serde_json::to_string(&map));
     let response = request!(Route::Guilds, post(body), "/guilds");
 
-    Guild::decode(try!(serde_json::from_reader(response)))
+    PartialGuild::decode(try!(serde_json::from_reader(response)))
 }
 
 /// Creates an [`Integration`] for a [`Guild`].
@@ -413,13 +418,13 @@ pub fn delete_emoji(guild_id: u64, emoji_id: u64) -> Result<()> {
                          emoji_id))
 }
 
-pub fn delete_guild(guild_id: u64) -> Result<Guild> {
+pub fn delete_guild(guild_id: u64) -> Result<PartialGuild> {
     let response = request!(Route::GuildsId(guild_id),
                             delete,
                             "/guilds/{}",
                             guild_id);
 
-    Guild::decode(try!(serde_json::from_reader(response)))
+    PartialGuild::decode(try!(serde_json::from_reader(response)))
 }
 
 pub fn delete_guild_integration(guild_id: u64, integration_id: u64)
@@ -589,14 +594,14 @@ pub fn edit_emoji(guild_id: u64, emoji_id: u64, map: Value)
     Emoji::decode(try!(serde_json::from_reader(response)))
 }
 
-pub fn edit_guild(guild_id: u64, map: Value) -> Result<Guild> {
+pub fn edit_guild(guild_id: u64, map: Value) -> Result<PartialGuild> {
     let body = try!(serde_json::to_string(&map));
     let response = request!(Route::GuildsId(guild_id),
                             patch(body),
                             "/guilds/{}",
                             guild_id);
 
-    Guild::decode(try!(serde_json::from_reader(response)))
+    PartialGuild::decode(try!(serde_json::from_reader(response)))
 }
 
 pub fn edit_member(guild_id: u64, user_id: u64, map: Value)
@@ -934,13 +939,13 @@ pub fn get_emojis(guild_id: u64) -> Result<Vec<Emoji>> {
     decode_array(try!(serde_json::from_reader(response)), Emoji::decode)
 }
 
-pub fn get_guild(guild_id: u64) -> Result<Guild> {
+pub fn get_guild(guild_id: u64) -> Result<PartialGuild> {
     let response = request!(Route::GuildsId(guild_id),
                             get,
                             "/guilds/{}",
                             guild_id);
 
-    Guild::decode(try!(serde_json::from_reader(response)))
+    PartialGuild::decode(try!(serde_json::from_reader(response)))
 }
 
 pub fn get_guild_embed(guild_id: u64) -> Result<GuildEmbed> {
@@ -1194,13 +1199,13 @@ pub fn leave_group(guild_id: u64) -> Result<Group> {
     Group::decode(try!(serde_json::from_reader(response)))
 }
 
-pub fn leave_guild(guild_id: u64) -> Result<Guild> {
+pub fn leave_guild(guild_id: u64) -> Result<PartialGuild> {
     let response = request!(Route::UsersMeGuildsId,
                             delete,
                             "/users/@me/guilds/{}",
                             guild_id);
 
-    Guild::decode(try!(serde_json::from_reader(response)))
+    PartialGuild::decode(try!(serde_json::from_reader(response)))
 }
 
 pub fn logout(map: Value) -> Result<()> {

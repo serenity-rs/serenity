@@ -27,12 +27,12 @@ use ::model::*;
 ///
 /// Additionally, note that some information received through events can _not_
 /// be retrieved through the REST API. This is information such as [`Role`]s in
-/// [`LiveGuild`]s.
+/// [`Guild`]s.
 ///
 /// [`Connection`]: ../../client/struct.Connection.html
 /// [`Context`]: ../../client/struct.Context.html
 /// [`Context::get_channel`]: ../../client/struct.Context.html#method.get_channel
-/// [`LiveGuild`]: ../../model/struct.LiveGuild.html
+/// [`Guild`]: ../../model/struct.Guild.html
 /// [`Role`]: ../../model/struct.Role.html
 /// [`http`]: ../../client/http/index.html
 #[derive(Debug, Clone)]
@@ -51,7 +51,7 @@ pub struct Cache {
     ///
     /// This will always be empty for bot accounts.
     pub guild_settings: HashMap<Option<GuildId>, UserGuildSettings>,
-    pub guilds: HashMap<GuildId, LiveGuild>,
+    pub guilds: HashMap<GuildId, Guild>,
     /// A list of notes that a user has made for individual users.
     ///
     /// This will always be empty for bot accounts.
@@ -127,7 +127,7 @@ impl Cache {
         None
     }
 
-    pub fn get_guild<G: Into<GuildId>>(&self, id: G) -> Option<&LiveGuild> {
+    pub fn get_guild<G: Into<GuildId>>(&self, id: G) -> Option<&Guild> {
         self.guilds.get(&id.into())
     }
 
@@ -449,7 +449,7 @@ impl Cache {
     }
 
     pub fn update_with_guild_delete(&mut self, event: &GuildDeleteEvent)
-        -> Option<LiveGuild> {
+        -> Option<Guild> {
         self.guilds.remove(&event.guild.id)
     }
 
@@ -843,7 +843,7 @@ pub enum ChannelRef<'a> {
     /// A group channel
     Group(&'a Group),
     /// A public channel and its guild
-    Public(&'a LiveGuild, &'a PublicChannel),
+    Public(&'a Guild, &'a PublicChannel),
 }
 
 fn opt_modify<T: Clone>(dest: &mut T, src: &Option<T>) {

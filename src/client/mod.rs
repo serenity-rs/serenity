@@ -379,7 +379,7 @@ impl Client {
     ///
     /// [`GuildCreate`]: ../model/enum.Event.html#variant.GuildCreate
     pub fn on_guild_create<F>(&mut self, handler: F)
-        where F: Fn(Context, LiveGuild) + Send + Sync + 'static {
+        where F: Fn(Context, Guild) + Send + Sync + 'static {
         self.event_store.lock()
             .unwrap()
             .on_guild_create = Some(Arc::new(handler));
@@ -852,7 +852,7 @@ impl Client {
     /// [`Role`]: ../model/struct.Role.html
     /// [`Cache`]: ../ext/cache/struct.Cache.html
     pub fn on_guild_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, Guild, Option<LiveGuild>) + Send + Sync + 'static {
+        where F: Fn(Context, PartialGuild, Option<Guild>) + Send + Sync + 'static {
         self.event_store.lock()
             .unwrap()
             .on_guild_delete = Some(Arc::new(handler));
@@ -919,7 +919,7 @@ impl Client {
     ///
     /// [`GuildUpdate`]: ../model/enum.Event.html#variant.GuildUpdate
     pub fn on_guild_update<F>(&mut self, handler: F)
-        where F: Fn(Context, Option<LiveGuild>, Guild) + Send + Sync + 'static {
+        where F: Fn(Context, Option<Guild>, PartialGuild) + Send + Sync + 'static {
         self.event_store.lock()
             .unwrap()
             .on_guild_update = Some(Arc::new(handler));
@@ -1001,7 +1001,7 @@ impl Client {
     /// [`Role`]: ../model/struct.Role.html
     /// [`Cache`]: ../ext/cache/struct.Cache.html
     pub fn on_guild_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, Guild) + Send + Sync + 'static {
+        where F: Fn(Context, PartialGuild) + Send + Sync + 'static {
         self.event_store.lock()
             .unwrap()
             .on_guild_delete = Some(Arc::new(handler));
@@ -1065,7 +1065,7 @@ impl Client {
     ///
     /// [`GuildUpdate`]: ../model/enum.Event.html#variant.GuildUpdate
     pub fn on_guild_update<F>(&mut self, handler: F)
-        where F: Fn(Context, Guild) + Send + Sync + 'static {
+        where F: Fn(Context, PartialGuild) + Send + Sync + 'static {
         self.event_store.lock()
             .unwrap()
             .on_guild_update = Some(Arc::new(handler));

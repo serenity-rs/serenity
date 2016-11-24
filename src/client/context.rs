@@ -52,7 +52,7 @@ use super::CACHE;
 /// one.
 ///
 /// For example, if you are needing information about a
-/// [channel][`PublicChannel`] within a [guild][`LiveGuild`], then you can
+/// [channel][`PublicChannel`] within a [guild][`Guild`], then you can
 /// use [`get_channel`] to retrieve it. Under most circumstances, the guild and
 /// its channels will be cached within the cache, and `get_channel` will just
 /// pull from the cache. If it does not exist, it will make a request to the
@@ -65,7 +65,7 @@ use super::CACHE;
 ///
 /// [`Channel`]: ../model/enum.Channel.html
 /// [`Client::on_message`]: struct.Client.html#method.on_message
-/// [`LiveGuild`]: ../model/struct.LiveGuild.html
+/// [`Guild`]: ../model/struct.Guild.html
 /// [`Message`]: ../model/struct.Message.html
 /// [`PublicChannel`]: ../model/struct.PublicChannel.html
 /// [`Shard`]: gateway/struct.Shard.html
@@ -263,7 +263,10 @@ impl Context {
         http::create_emoji(guild_id.into().0, map)
     }
 
-    /// Creates a [`Guild`] with the data provided.
+    /// Creates a guild with the data provided.
+    ///
+    /// Only a [`PartialGuild`] will be immediately returned, and a full
+    /// [`Guild`] will be received over a [`Shard`].
     ///
     /// **Note**: This endpoint is usually only available for user accounts.
     /// Refer to Discord's information for the endpoint [here][whitelist] for
@@ -281,10 +284,12 @@ impl Context {
     /// ```
     ///
     /// [`Guild`]: ../model/struct.Guild.html
+    /// [`PartialGuild`]: ../model/struct.PartialGuild.html
+    /// [`Shard`]: ../gateway/struct.Shard.html
     /// [US West region]: ../model/enum.Region.html#variant.UsWest
     /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
     pub fn create_guild(&self, name: &str, region: Region, icon: Option<&str>)
-        -> Result<Guild> {
+        -> Result<PartialGuild> {
         let map = ObjectBuilder::new()
             .insert("icon", icon)
             .insert("name", name)
@@ -493,11 +498,13 @@ impl Context {
         http::delete_emoji(guild_id.into().0, emoji_id.into().0)
     }
 
-    /// Deletes a [`Guild`]. You must be the guild owner to be able to delete
-    /// the guild.
+    /// Deletes a guild. You must be the guild owner to be able to delete it.
     ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    pub fn delete_guild<G: Into<GuildId>>(&self, guild_id: G) -> Result<Guild> {
+    /// Only a [`PartialGuild`] will be immediately returned.
+    ///
+    /// [`PartialGuild`]: ../model/struct.PartialGuild.html
+    pub fn delete_guild<G: Into<GuildId>>(&self, guild_id: G)
+        -> Result<PartialGuild> {
         http::delete_guild(guild_id.into().0)
     }
 
@@ -707,7 +714,7 @@ impl Context {
         http::edit_emoji(guild_id.into().0, emoji_id.into().0, map)
     }
 
-    pub fn edit_guild<F, G>(&self, guild_id: G, f: F) -> Result<Guild>
+    pub fn edit_guild<F, G>(&self, guild_id: G, f: F) -> Result<PartialGuild>
         where F: FnOnce(EditGuild) -> EditGuild, G: Into<GuildId> {
         let map = f(EditGuild::default()).0.build();
 
@@ -864,7 +871,8 @@ impl Context {
         http::get_emojis(guild_id.into().0)
     }
 
-    pub fn get_guild<G: Into<GuildId>>(&self, guild_id: G) -> Result<Guild> {
+    pub fn get_guild<G: Into<GuildId>>(&self, guild_id: G)
+        -> Result<PartialGuild> {
         http::get_guild(guild_id.into().0)
     }
 
@@ -1016,7 +1024,8 @@ impl Context {
         http::kick_member(guild_id.into().0, user_id.into().0)
     }
 
-    pub fn leave_guild<G: Into<GuildId>>(&self, guild_id: G) -> Result<Guild> {
+    pub fn leave_guild<G: Into<GuildId>>(&self, guild_id: G)
+        -> Result<PartialGuild> {
         http::leave_guild(guild_id.into().0)
     }
 

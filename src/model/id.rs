@@ -76,7 +76,7 @@ impl From<Emoji> for EmojiId {
 impl GuildId {
     /// Search the cache for the guild.
     #[cfg(feature="methods")]
-    pub fn find(&self) -> Option<LiveGuild> {
+    pub fn find(&self) -> Option<Guild> {
         CACHE.read().unwrap().get_guild(*self).cloned()
     }
 
@@ -85,7 +85,7 @@ impl GuildId {
     /// Note that this will not be a complete guild, as REST does not send
     /// all data with a guild retrieval.
     #[cfg(feature="methods")]
-    pub fn get(&self) -> Result<Guild> {
+    pub fn get(&self) -> Result<PartialGuild> {
         http::get_guild(self.0)
     }
 
@@ -117,8 +117,8 @@ impl GuildId {
     }
 }
 
-impl From<Guild> for GuildId {
-    fn from(guild: Guild) -> GuildId {
+impl From<PartialGuild> for GuildId {
+    fn from(guild: PartialGuild) -> GuildId {
         guild.id
     }
 }
@@ -135,8 +135,8 @@ impl From<InviteGuild> for GuildId {
     }
 }
 
-impl From<LiveGuild> for GuildId {
-    fn from(live_guild: LiveGuild) -> GuildId {
+impl From<Guild> for GuildId {
+    fn from(live_guild: Guild) -> GuildId {
         live_guild.id
     }
 }

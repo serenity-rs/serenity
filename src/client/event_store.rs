@@ -48,11 +48,11 @@ pub struct EventStore {
     pub on_friend_suggestion_delete: Option<Arc<Fn(Context, UserId) + Send + Sync + 'static>>,
     pub on_guild_ban_addition: Option<Arc<Fn(Context, GuildId, User) + Send + Sync + 'static>>,
     pub on_guild_ban_removal: Option<Arc<Fn(Context, GuildId, User) + Send + Sync + 'static>>,
-    pub on_guild_create: Option<Arc<Fn(Context, LiveGuild) + Send + Sync + 'static>>,
+    pub on_guild_create: Option<Arc<Fn(Context, Guild) + Send + Sync + 'static>>,
     #[cfg(feature = "cache")]
-    pub on_guild_delete: Option<Arc<Fn(Context, Guild, Option<LiveGuild>) + Send + Sync + 'static>>,
+    pub on_guild_delete: Option<Arc<Fn(Context, PartialGuild, Option<Guild>) + Send + Sync + 'static>>,
     #[cfg(not(feature = "cache"))]
-    pub on_guild_delete: Option<Arc<Fn(Context, Guild) + Send + Sync + 'static>>,
+    pub on_guild_delete: Option<Arc<Fn(Context, PartialGuild) + Send + Sync + 'static>>,
     pub on_guild_emojis_update: Option<Arc<Fn(Context, GuildId, HashMap<EmojiId, Emoji>) + Send + Sync + 'static>>,
     pub on_guild_integrations_update: Option<Arc<Fn(Context, GuildId) + Send + Sync + 'static>>,
     pub on_guild_member_addition: Option<Arc<Fn(Context, GuildId, Member) + Send + Sync + 'static>>,
@@ -77,9 +77,9 @@ pub struct EventStore {
     pub on_guild_sync: Option<Arc<Fn(Context, GuildSyncEvent) + Send + Sync + 'static>>,
     pub on_guild_unavailable: Option<Arc<Fn(Context, GuildId) + Send + Sync + 'static>>,
     #[cfg(feature = "cache")]
-    pub on_guild_update: Option<Arc<Fn(Context, Option<LiveGuild>, Guild) + Send + Sync + 'static>>,
+    pub on_guild_update: Option<Arc<Fn(Context, Option<Guild>, PartialGuild) + Send + Sync + 'static>>,
     #[cfg(not(feature = "cache"))]
-    pub on_guild_update: Option<Arc<Fn(Context, Guild) + Send + Sync + 'static>>,
+    pub on_guild_update: Option<Arc<Fn(Context, PartialGuild) + Send + Sync + 'static>>,
     pub on_message: Option<Arc<Fn(Context, Message) + Send + Sync + 'static>>,
     pub on_message_ack: Option<Arc<Fn(Context, ChannelId, Option<MessageId>) + Send + Sync + 'static>>,
     pub on_message_delete: Option<Arc<Fn(Context, ChannelId, MessageId) + Send + Sync + 'static>>,

@@ -59,11 +59,11 @@ pub enum Error {
     DeleteMessageDaysAmount(u8),
     /// When there was an error retrieving the gateway URI from the REST API.
     Gateway,
-    /// An indication that a [guild][`LiveGuild`] could not be found by
+    /// An indication that a [guild][`Guild`] could not be found by
     /// [Id][`GuildId`] in the [`Cache`].
     ///
+    /// [`Guild`]: ../model/struct.Guild.html
     /// [`GuildId`]: ../model/struct.GuildId.html
-    /// [`LiveGuild`]: ../model/struct.LiveGuild.html
     /// [`Cache`]: ../ext/cache/struct.Cache.html
     GuildNotFound,
     InvalidOpCode,

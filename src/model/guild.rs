@@ -28,8 +28,8 @@ use ::client::http;
 #[cfg(feature = "cache")]
 use ::client::CACHE;
 
-impl From<Guild> for GuildContainer {
-    fn from(guild: Guild) -> GuildContainer {
+impl From<PartialGuild> for GuildContainer {
+    fn from(guild: PartialGuild) -> GuildContainer {
         GuildContainer::Guild(guild)
     }
 }
@@ -126,7 +126,7 @@ impl GuildInfo {
     }
 }
 
-impl Guild {
+impl PartialGuild {
     /// Finds a role by Id within the guild.
     #[cfg(feature = "methods")]
     pub fn find_role<R: Into<RoleId>>(&self, role_id: R) -> Option<&Role> {
@@ -164,7 +164,7 @@ impl Guild {
     }
 }
 
-impl LiveGuild {
+impl Guild {
     #[cfg(feature = "cache")]
     fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
         let member = match self.get_member(CACHE.read().unwrap().user.id) {
@@ -322,7 +322,7 @@ impl LiveGuild {
     }
 
     #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<LiveGuild> {
+    pub fn decode(value: Value) -> Result<Guild> {
         let mut map = try!(into_map(value));
 
         let id = try!(remove(&mut map, "id").and_then(GuildId::decode));
@@ -340,7 +340,7 @@ impl LiveGuild {
             public_channels
         };
 
-        missing!(map, LiveGuild {
+        missing!(map, Guild {
             afk_channel_id: try!(opt(&mut map, "afk_channel_id", ChannelId::decode)),
             afk_timeout: req!(try!(remove(&mut map, "afk_timeout")).as_u64()),
             channels: public_channels,
@@ -378,7 +378,7 @@ impl LiveGuild {
     ///
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
     #[cfg(feature = "methods")]
-    pub fn delete(&self) -> Result<Guild> {
+    pub fn delete(&self) -> Result<PartialGuild> {
         if self.owner_id != CACHE.read().unwrap().user.id {
             let req = permissions::MANAGE_GUILD;
 
@@ -551,7 +551,7 @@ impl LiveGuild {
 
     /// Leaves the guild.
     #[cfg(feature = "methods")]
-    pub fn leave(&self) -> Result<Guild> {
+    pub fn leave(&self) -> Result<PartialGuild> {
         http::leave_guild(self.id.0)
     }
 
@@ -961,14 +961,14 @@ impl fmt::Display for Member {
     }
 }
 
-impl PossibleGuild<LiveGuild> {
+impl PossibleGuild<Guild> {
     #[doc(hidden)]
     pub fn decode(value: Value) -> Result<Self> {
         let mut value = try!(into_map(value));
         if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
             remove(&mut value, "id").and_then(GuildId::decode).map(PossibleGuild::Offline)
         } else {
-            LiveGuild::decode(Value::Object(value)).map(PossibleGuild::Online)
+            Guild::decode(Value::Object(value)).map(PossibleGuild::Online)
         }
     }
 
@@ -983,14 +983,14 @@ impl PossibleGuild<LiveGuild> {
     }
 }
 
-impl PossibleGuild<Guild> {
+impl PossibleGuild<PartialGuild> {
     #[doc(hidden)]
     pub fn decode(value: Value) -> Result<Self> {
         let mut value = try!(into_map(value));
         if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
             remove(&mut value, "id").and_then(GuildId::decode).map(PossibleGuild::Offline)
         } else {
-            Guild::decode(Value::Object(value)).map(PossibleGuild::Online)
+            PartialGuild::decode(Value::Object(value)).map(PossibleGuild::Online)
         }
     }
 

@@ -1,38 +1,49 @@
 ---
 name: Guild
-description: Static information about a guild
+description: "Live server information"
 fields:
-  - name: id
-    type: GuildId
   - name: afk_channel_id
     optional: true
     type: ChannelId
   - name: afk_timeout
     type: u64
+  - name: channels
+    t: ChannelId, PublicChannel
+    type: hashmap
   - name: default_message_notifications
     type: u64
-  - name: embed_channel_id
-    optional: true
-    type: ChannelId
-  - name: embed_enabled
-    type: bool
   - name: emojis
     custom: decode_emojis
     t: EmojiId, Emoji
     type: hashmap
   - name: features
     array: true
-    custom: Feature::decode_str
     type: Feature
   - name: icon
     optional: true
     type: string
+  - name: id
+    type: GuildId
+  - name: joined_at
+    type: string
+  - name: large
+    type: bool
+  - name: member_count
+    type: u64
+  - name: members
+    custom: decode_members
+    t: UserId, Member
+    type: hashmap
   - name: mfa_level
     type: u64
   - name: name
     type: string
   - name: owner_id
     type: UserId
+  - name: presences
+    custom: decode_emojis
+    t: UserId, Presence
+    type: hashmap
   - name: region
     type: string
   - name: roles
@@ -44,3 +55,8 @@ fields:
     type: string
   - name: verification_level
     type: VerificationLevel
+  - name: voice_states
+    custom: decode_voice_states
+    t: UserId, VoiceState
+    type: hashmap
+decode: false
