@@ -30,8 +30,10 @@ use super::utils;
 
 #[cfg(feature = "methods")]
 use ::utils::builder::{CreateEmbed, CreateInvite, EditChannel};
-#[cfg(feature = "methods")]
-use ::client::{CACHE, http};
+#[cfg(all(feature = "cache", feature = "methods"))]
+use ::client::CACHE;
+#[cfg(all(feature = "methods"))]
+use ::client::http;
 
 impl Attachment {
     /// If this attachment is an image, then a tuple of the width and height
@@ -433,7 +435,7 @@ impl Message {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    #[cfg(feature = "methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn delete(&self) -> Result<()> {
         let req = permissions::MANAGE_MESSAGES;
         let is_author = self.author.id != CACHE.read().unwrap().user.id;
@@ -461,7 +463,7 @@ impl Message {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    #[cfg(feature = "methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn delete_reactions(&self) -> Result<()> {
         let req = permissions::MANAGE_MESSAGES;
 
@@ -487,8 +489,8 @@ impl Message {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidUser`] if the current user is not the
-    /// author.
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidUser`] if the
+    /// current user is not the author.
     ///
     /// Returns a [`ClientError::MessageTooLong`] if the content of the message
     /// is over the above limit, containing the number of unicode code points
@@ -503,9 +505,11 @@ impl Message {
             return Err(Error::Client(ClientError::MessageTooLong(length_over)));
         }
 
-        if self.author.id != CACHE.read().unwrap().user.id {
-            return Err(Error::Client(ClientError::InvalidUser));
-        }
+        feature_cache_enabled! {{
+            if self.author.id != CACHE.read().unwrap().user.id {
+                return Err(Error::Client(ClientError::InvalidUser));
+            }
+        }}
 
         let mut map = ObjectBuilder::new().insert("content", new_content);
 
@@ -714,15 +718,17 @@ impl PrivateChannel {
     ///
     /// # Errors
     ///
-    /// Returns a
+    /// If the `cache` is enabled, then returns a
     /// [`ClientError::InvalidUser`] if the current user is not a bot user.
     ///
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
     #[cfg(feature = "methods")]
     pub fn delete_messages(&self, message_ids: &[MessageId]) -> Result<()> {
-        if !CACHE.read().unwrap().user.bot {
-            return Err(Error::Client(ClientError::InvalidOperationAsUser));
-        }
+        feature_cache_enabled! {{
+            if !CACHE.read().unwrap().user.bot {
+                return Err(Error::Client(ClientError::InvalidOperationAsUser));
+            }
+        }}
 
         let ids: Vec<u64> = message_ids.into_iter()
             .map(|message_id| message_id.0)
@@ -970,38 +976,46 @@ impl Reaction {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
-    /// not have the required [permissions].
+    /// If the `cache` is enabled, then returns a
+    /// [`ClientError::InvalidPermissions`] if the current user does not have
+    /// the required [permissions].
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     /// [permissions]: permissions
     #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<()> {
-        let user = if self.user_id == CACHE.read().unwrap().user.id {
-            None
-        } else {
-            Some(self.user_id.0)
-        };
+        feature_cache! {{
+            let user = if self.user_id == CACHE.read().unwrap().user.id {
+                None
+            } else {
+                Some(self.user_id.0)
+            };
 
-        // If the reaction is one _not_ made by the current user, then ensure
-        // that the current user has permission* to delete the reaction.
-        //
-        // Normally, users can only delete their own reactions.
-        //
-        // * The `Manage Messages` permission.
-        if user.is_some() {
-            let req = permissions::MANAGE_MESSAGES;
+            // If the reaction is one _not_ made by the current user, then ensure
+            // that the current user has permission* to delete the reaction.
+            //
+            // Normally, users can only delete their own reactions.
+            //
+            // * The `Manage Messages` permission.
+            if user.is_some() {
+                let req = permissions::MANAGE_MESSAGES;
 
-            if !utils::user_has_perms(self.channel_id, req).unwrap_or(true) {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                if !utils::user_has_perms(self.channel_id, req).unwrap_or(true) {
+                    return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                }
             }
-        }
 
-        http::delete_reaction(self.channel_id.0,
-                              self.message_id.0,
-                              user,
-                              self.emoji.clone())
+            http::delete_reaction(self.channel_id.0,
+                                  self.message_id.0,
+                                  user,
+                                  self.emoji.clone())
+        } else {
+            http::delete_reaction(self.channel_id.0,
+                                  self.message_id.0,
+                                  Some(self.user_id.0),
+                                  self.emoji.clone())
+        }}
     }
 
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a

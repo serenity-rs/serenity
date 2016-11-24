@@ -1,13 +1,15 @@
 use super::*;
 
+#[cfg(all(feature = "cache", feature = "methods"))]
+use ::client::CACHE;
 #[cfg(feature = "methods")]
-use ::client::{CACHE, http};
+use ::client::http;
 #[cfg(feature = "methods")]
 use ::internal::prelude::*;
 
 impl ChannelId {
     /// Search the cache for the channel with the Id.
-    #[cfg(feature="methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn find(&self) -> Option<Channel> {
         CACHE.read().unwrap().get_channel(*self)
     }
@@ -16,9 +18,11 @@ impl ChannelId {
     /// requested over REST.
     #[cfg(feature="methods")]
     pub fn get(&self) -> Result<Channel> {
-        if let Some(channel) = CACHE.read().unwrap().get_channel(*self) {
-            return Ok(channel.clone());
-        }
+        feature_cache_enabled! {{
+            if let Some(channel) = CACHE.read().unwrap().get_channel(*self) {
+                return Ok(channel.clone());
+            }
+        }}
 
         http::get_channel(self.0)
     }
@@ -75,7 +79,7 @@ impl From<Emoji> for EmojiId {
 
 impl GuildId {
     /// Search the cache for the guild.
-    #[cfg(feature="methods")]
+    #[cfg(all(feature = "cache", feature="methods"))]
     pub fn find(&self) -> Option<Guild> {
         CACHE.read().unwrap().get_guild(*self).cloned()
     }
@@ -161,7 +165,7 @@ impl From<Role> for RoleId {
 
 impl RoleId {
     /// Search the cache for the role.
-    #[cfg(feature="methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn find(&self) -> Option<Role> {
         CACHE.read()
             .unwrap()

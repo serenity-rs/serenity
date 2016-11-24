@@ -45,7 +45,7 @@ version = "0.0.12"
 yaml-rust = "0.3"
 
 [features]
-default = ["extras", "framework", "methods", "cache"]
+default = ["cache", "extras", "framework", "methods"]
 cache = []
 debug = []
 extras = []

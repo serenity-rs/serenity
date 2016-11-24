@@ -109,13 +109,15 @@ impl RichInvite {
     /// [`http::delete_invite`]: ../client/http/fn.delete_invite.html
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     /// [permission]: permissions/index.html
-    #[cfg(feature="methods")]
+    #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<Invite> {
         let req = permissions::MANAGE_GUILD;
 
-        if !try!(utils::user_has_perms(self.channel.id, req)) {
-            return Err(Error::Client(ClientError::InvalidPermissions(req)));
-        }
+        feature_cache_enabled! {{
+            if !try!(utils::user_has_perms(self.channel.id, req)) {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }}
 
         http::delete_invite(&self.code)
     }

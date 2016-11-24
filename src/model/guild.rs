@@ -50,7 +50,7 @@ impl Emoji {
     /// Finds the [`Guild`] that owns the emoji by looking through the Cache.
     ///
     /// [`Guild`]: struct.Guild.html
-    #[cfg(feature = "methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn find_guild_id(&self) -> Option<GuildId> {
         CACHE.read()
             .unwrap()
@@ -67,7 +67,7 @@ impl Emoji {
     /// **Note**: Only user accounts may use this method.
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
-    #[cfg(feature = "methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn delete(&self) -> Result<()> {
         match self.find_guild_id() {
             Some(guild_id) => http::delete_emoji(guild_id.0, self.id.0),
@@ -82,7 +82,7 @@ impl Emoji {
     /// **Note**: Only user accounts may use this method.
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
-    #[cfg(feature = "methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn edit(&mut self, name: &str) -> Result<()> {
         match self.find_guild_id() {
             Some(guild_id) => {
@@ -373,17 +373,19 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidUser`] if the current user is not the
-    /// guild owner.
+    /// If the `cache` is enabled, then returns a [`ClientError::InvalidUser`]
+    /// if the current user is not the guild owner.
     ///
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
     #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<PartialGuild> {
-        if self.owner_id != CACHE.read().unwrap().user.id {
-            let req = permissions::MANAGE_GUILD;
+        feature_cache_enabled! {{
+            if self.owner_id != CACHE.read().unwrap().user.id {
+                let req = permissions::MANAGE_GUILD;
 
-            return Err(Error::Client(ClientError::InvalidPermissions(req)));
-        }
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }}
 
         http::delete_guild(self.id.0)
     }
@@ -768,7 +770,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature = "methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn add_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
         let role_id = role_id.into();
 
@@ -795,7 +797,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature = "methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn add_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         let guild_id = try!(self.find_guild());
         self.roles.extend_from_slice(role_ids);
@@ -818,7 +820,7 @@ impl Member {
     /// **Note**: Requires the [Ban Members] role.
     ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    #[cfg(feature = "methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn ban(&self, delete_message_days: u8) -> Result<()> {
         let guild_id = try!(self.find_guild());
 
@@ -842,7 +844,7 @@ impl Member {
     ///
     /// [`Context::edit_member`]: ../client/struct.Context.html#method.edit_member
     /// [`EditMember`]: ../builder/struct.EditMember.html
-    #[cfg(feature = "methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn edit<F>(&self, f: F) -> Result<()>
         where F: FnOnce(EditMember) -> EditMember {
         let guild_id = try!(self.find_guild());
@@ -854,7 +856,7 @@ impl Member {
     /// Finds the Id of the [`Guild`] that the member is in.
     ///
     /// [`Guild`]: struct.Guild.html
-    #[cfg(feature = "methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn find_guild(&self) -> Result<GuildId> {
         CACHE.read()
             .unwrap()
@@ -881,7 +883,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature = "methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn remove_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
         let role_id = role_id.into();
 
@@ -907,7 +909,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature = "methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn remove_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         let guild_id = try!(self.find_guild());
         self.roles.retain(|r| !role_ids.contains(r));
@@ -1011,7 +1013,7 @@ impl Role {
     /// **Note** Requires the [Manage Roles] permission.
     ///
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature = "methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn delete(&self) -> Result<()> {
         let guild_id = try!(self.find_guild());
 
@@ -1026,7 +1028,7 @@ impl Role {
     /// that contains the role.
     ///
     /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
-    #[cfg(feature = "methods")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn find_guild(&self) -> Result<GuildId> {
         CACHE.read()
             .unwrap()

@@ -61,7 +61,7 @@ impl User {
     #[cfg(feature="methods")]
     pub fn direct_message(&self, content: &str)
         -> Result<Message> {
-        let private_channel_id = {
+        let private_channel_id = feature_cache! {{
             let finding = CACHE.read()
                 .unwrap()
                 .private_channels
@@ -78,7 +78,13 @@ impl User {
 
                 try!(http::create_private_channel(map)).id
             }
-        };
+        } else {
+            let map = ObjectBuilder::new()
+                .insert("recipient_id", self.id.0)
+                .build();
+
+            try!(http::create_private_channel(map)).id
+        }};
 
         let map = ObjectBuilder::new()
             .insert("content", content)
