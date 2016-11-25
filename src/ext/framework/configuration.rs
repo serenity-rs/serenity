@@ -1,5 +1,5 @@
 use std::default::Default;
-use ::client::http;
+use ::client::rest;
 
 pub struct Configuration {
     #[doc(hidden)]
@@ -53,7 +53,7 @@ impl Configuration {
             return self;
         }
 
-        if let Ok(current_user) = http::get_current_user() {
+        if let Ok(current_user) = rest::get_current_user() {
             self.on_mention = Some(vec![
                 format!("<@{}>", current_user.id), // Regular mention
                 format!("<@!{}>", current_user.id), // Nickname mention

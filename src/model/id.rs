@@ -3,7 +3,7 @@ use super::*;
 #[cfg(all(feature = "cache", feature = "methods"))]
 use ::client::CACHE;
 #[cfg(feature = "methods")]
-use ::client::http;
+use ::client::rest;
 #[cfg(feature = "methods")]
 use ::internal::prelude::*;
 
@@ -24,7 +24,7 @@ impl ChannelId {
             }
         }}
 
-        http::get_channel(self.0)
+        rest::get_channel(self.0)
     }
 
     /// Returns a [`Mention`] which will link to the [`Channel`].
@@ -45,7 +45,7 @@ impl ChannelId {
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[cfg(feature="methods")]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        http::get_channel_webhooks(self.0)
+        rest::get_channel_webhooks(self.0)
     }
 }
 
@@ -90,7 +90,7 @@ impl GuildId {
     /// all data with a guild retrieval.
     #[cfg(feature="methods")]
     pub fn get(&self) -> Result<PartialGuild> {
-        http::get_guild(self.0)
+        rest::get_guild(self.0)
     }
 
     /// Mentions the [`Guild`]'s default channel.
@@ -117,7 +117,7 @@ impl GuildId {
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[cfg(feature="methods")]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        http::get_guild_webhooks(self.0)
+        rest::get_guild_webhooks(self.0)
     }
 }
 
@@ -229,6 +229,6 @@ impl WebhookId {
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[cfg(feature="methods")]
     pub fn webhooks(&self) -> Result<Webhook> {
-        http::get_webhook(self.0)
+        rest::get_webhook(self.0)
     }
 }

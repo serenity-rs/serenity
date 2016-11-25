@@ -33,7 +33,7 @@ use ::utils::builder::{CreateEmbed, CreateInvite, EditChannel};
 #[cfg(all(feature = "cache", feature = "methods"))]
 use ::client::CACHE;
 #[cfg(all(feature = "methods"))]
-use ::client::http;
+use ::client::rest;
 
 impl Attachment {
     /// If this attachment is an image, then a tuple of the width and height
@@ -286,7 +286,7 @@ impl Group {
     /// Adds the given user to the group. If the user is already in the group,
     /// then nothing is done.
     ///
-    /// Refer to [`http::add_group_recipient`] for more information.
+    /// Refer to [`rest::add_group_recipient`] for more information.
     ///
     /// **Note**: Groups have a limit of 10 recipients, including the current
     /// user.
@@ -299,13 +299,13 @@ impl Group {
             return Ok(());
         }
 
-        http::add_group_recipient(self.channel_id.0, user.0)
+        rest::add_group_recipient(self.channel_id.0, user.0)
     }
 
     /// Broadcasts that the current user is typing in the group.
     #[cfg(feature = "methods")]
     pub fn broadcast_typing(&self) -> Result<()> {
-        http::broadcast_typing(self.channel_id.0)
+        rest::broadcast_typing(self.channel_id.0)
     }
 
     /// Deletes multiple messages in the group.
@@ -337,7 +337,7 @@ impl Group {
             .insert("messages", ids)
             .build();
 
-        http::delete_messages(self.channel_id.0, map)
+        rest::delete_messages(self.channel_id.0, map)
     }
 
     /// Returns the formatted URI of the group's icon if one exists.
@@ -349,7 +349,7 @@ impl Group {
     /// Leaves the group.
     #[cfg(feature = "methods")]
     pub fn leave(&self) -> Result<Group> {
-        http::leave_group(self.channel_id.0)
+        rest::leave_group(self.channel_id.0)
     }
 
     /// Generates a name for the group.
@@ -378,7 +378,7 @@ impl Group {
     /// Retrieves the list of messages that have been pinned in the group.
     #[cfg(feature = "methods")]
     pub fn pins(&self) -> Result<Vec<Message>> {
-        http::get_pins(self.channel_id.0)
+        rest::get_pins(self.channel_id.0)
     }
 
     /// Removes a recipient from the group. If the recipient is already not in
@@ -394,7 +394,7 @@ impl Group {
             return Ok(());
         }
 
-        http::remove_group_recipient(self.channel_id.0, user.0)
+        rest::remove_group_recipient(self.channel_id.0, user.0)
     }
 
     /// Sends a message to the group with the given content.
@@ -412,7 +412,7 @@ impl Group {
             .insert("tts", false)
             .build();
 
-        http::send_message(self.channel_id.0, map)
+        rest::send_message(self.channel_id.0, map)
     }
 }
 
@@ -448,7 +448,7 @@ impl Message {
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
         }
 
-        http::delete_message(self.channel_id.0, self.id.0)
+        rest::delete_message(self.channel_id.0, self.id.0)
     }
 
     /// Deletes all of the [`Reaction`]s associated with the message.
@@ -471,7 +471,7 @@ impl Message {
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
         }
 
-        http::delete_message_reactions(self.channel_id.0, self.id.0)
+        rest::delete_message_reactions(self.channel_id.0, self.id.0)
     }
 
     /// Edits this message, replacing the original content with new content.
@@ -519,7 +519,7 @@ impl Message {
             map = map.insert("embed", Value::Object(embed));
         }
 
-        match http::edit_message(self.channel_id.0, self.id.0, map.build()) {
+        match rest::edit_message(self.channel_id.0, self.id.0, map.build()) {
             Ok(edited) => {
                 mem::replace(self, edited);
 
@@ -568,7 +568,7 @@ impl Message {
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
         }
 
-        http::pin_message(self.channel_id.0, self.id.0)
+        rest::pin_message(self.channel_id.0, self.id.0)
     }
 
     /// React to the message with a custom [`Emoji`] or unicode character.
@@ -592,7 +592,7 @@ impl Message {
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
         }
 
-        http::create_reaction(self.channel_id.0,
+        rest::create_reaction(self.channel_id.0,
                               self.id.0,
                               reaction_type.into())
     }
@@ -641,7 +641,7 @@ impl Message {
             .insert("tts", false)
             .build();
 
-        http::send_message(self.channel_id.0, map)
+        rest::send_message(self.channel_id.0, map)
     }
 
     /// Unpins the message from its channel.
@@ -664,7 +664,7 @@ impl Message {
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
         }
 
-        http::unpin_message(self.channel_id.0, self.id.0)
+        rest::unpin_message(self.channel_id.0, self.id.0)
     }
 }
 
@@ -692,7 +692,7 @@ impl PrivateChannel {
     /// Broadcasts that the current user is typing to the recipient.
     #[cfg(feature = "methods")]
     pub fn broadcast_typing(&self) -> Result<()> {
-        http::broadcast_typing(self.id.0)
+        rest::broadcast_typing(self.id.0)
     }
 
     #[doc(hidden)]
@@ -738,7 +738,7 @@ impl PrivateChannel {
             .insert("messages", ids)
             .build();
 
-        http::delete_messages(self.id.0, map)
+        rest::delete_messages(self.id.0, map)
     }
 
     /// Deletes the channel. This does not delete the contents of the channel,
@@ -746,14 +746,14 @@ impl PrivateChannel {
     /// be re-opened.
     #[cfg(feature = "methods")]
     pub fn delete(&self) -> Result<Channel> {
-        http::delete_channel(self.id.0)
+        rest::delete_channel(self.id.0)
     }
 
     /// Retrieves the list of messages that have been pinned in the private
     /// channel.
     #[cfg(feature = "methods")]
     pub fn pins(&self) -> Result<Vec<Message>> {
-        http::get_pins(self.id.0)
+        rest::get_pins(self.id.0)
     }
 
     /// Sends a message to the channel with the given content.
@@ -779,7 +779,7 @@ impl PrivateChannel {
             .insert("tts", false)
             .build();
 
-        http::send_message(self.id.0, map)
+        rest::send_message(self.id.0, map)
     }
 }
 
@@ -807,7 +807,7 @@ impl PublicChannel {
     /// [Send Messages]: permissions/constants.SEND_MESSAGES.html
     #[cfg(feature = "methods")]
     pub fn broadcast_typing(&self) -> Result<()> {
-        http::broadcast_typing(self.id.0)
+        rest::broadcast_typing(self.id.0)
     }
 
     #[cfg(feature = "methods")]
@@ -821,7 +821,7 @@ impl PublicChannel {
 
         let map = f(CreateInvite::default()).0.build();
 
-        http::create_invite(self.id.0, map)
+        rest::create_invite(self.id.0, map)
     }
 
     #[doc(hidden)]
@@ -860,7 +860,7 @@ impl PublicChannel {
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
         }
 
-        http::delete_channel(self.id.0)
+        rest::delete_channel(self.id.0)
     }
 
     #[cfg(feature = "methods")]
@@ -879,7 +879,7 @@ impl PublicChannel {
 
         let edited = f(EditChannel(map)).0.build();
 
-        match http::edit_channel(self.id.0, edited) {
+        match rest::edit_channel(self.id.0, edited) {
             Ok(channel) => {
                 mem::replace(self, channel);
 
@@ -907,7 +907,7 @@ impl PublicChannel {
 
     #[cfg(feature = "methods")]
     pub fn pins(&self) -> Result<Vec<Message>> {
-        http::get_pins(self.id.0)
+        rest::get_pins(self.id.0)
     }
 
     /// Sends a message to the channel with the given content.
@@ -946,7 +946,7 @@ impl PublicChannel {
             .insert("tts", false)
             .build();
 
-        http::send_message(self.id.0, map)
+        rest::send_message(self.id.0, map)
     }
 
     /// Retrieves the channel's webhooks.
@@ -956,7 +956,7 @@ impl PublicChannel {
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[cfg(feature = "methods")]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        http::get_channel_webhooks(self.id.0)
+        rest::get_channel_webhooks(self.id.0)
     }
 }
 
@@ -1006,12 +1006,12 @@ impl Reaction {
                 }
             }
 
-            http::delete_reaction(self.channel_id.0,
+            rest::delete_reaction(self.channel_id.0,
                                   self.message_id.0,
                                   user,
                                   self.emoji.clone())
         } else {
-            http::delete_reaction(self.channel_id.0,
+            rest::delete_reaction(self.channel_id.0,
                                   self.message_id.0,
                                   Some(self.user_id.0),
                                   self.emoji.clone())
@@ -1049,7 +1049,7 @@ impl Reaction {
                        -> Result<Vec<User>>
                        where R: Into<ReactionType>,
                              U: Into<UserId> {
-        http::get_reaction_users(self.channel_id.0,
+        rest::get_reaction_users(self.channel_id.0,
                                  self.message_id.0,
                                  reaction_type.into(),
                                  limit.unwrap_or(50),

@@ -8,7 +8,7 @@ use ::model::*;
 /// some data from the event is possible.
 ///
 /// This acts as a cache, to avoid making requests over the REST API through the
-/// [`http`] module where possible. All fields are public, and do not have
+/// [`rest`] module where possible. All fields are public, and do not have
 /// getters, to allow you more flexibility with the stored data. However, this
 /// allows data to be "corrupted", and _may or may not_ cause misfunctions
 /// within the library. Mutate data at your own discretion.
@@ -23,7 +23,7 @@ use ::model::*;
 ///
 /// This allows you to only need to perform the `Context::get_channel` call,
 /// and not need to first search through the cache - and if not found - _then_
-/// perform an HTTP request through the Context or `http` module.
+/// perform an HTTP request through the Context or `rest` module.
 ///
 /// Additionally, note that some information received through events can _not_
 /// be retrieved through the REST API. This is information such as [`Role`]s in
@@ -34,7 +34,7 @@ use ::model::*;
 /// [`Context::get_channel`]: ../../client/struct.Context.html#method.get_channel
 /// [`Guild`]: ../../model/struct.Guild.html
 /// [`Role`]: ../../model/struct.Role.html
-/// [`http`]: ../../client/http/index.html
+/// [`rest`]: ../../client/rest/index.html
 #[derive(Debug, Clone)]
 pub struct Cache {
     /// A map of the currently active calls that the current user knows about,

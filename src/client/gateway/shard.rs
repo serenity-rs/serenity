@@ -86,12 +86,12 @@ impl Shard {
     ///
     /// ```rust,ignore
     /// use serenity::client::gateway::Shard;
-    /// use serenity::client::{LoginType, http};
+    /// use serenity::client::{LoginType, rest};
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_BOT_TOKEN").expect("Token in environment");
     /// // retrieve the gateway response, which contains the URL to connect to
-    /// let gateway = http::get_gateway().expect("Valid gateway response").url;
+    /// let gateway = rest::get_gateway().expect("Valid gateway response").url;
     /// let shard = Shard::new(&gateway, &token, None, LoginType::Bot)
     ///     .expect("Working shard");
     ///

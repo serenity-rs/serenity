@@ -23,7 +23,7 @@ use std::mem;
 #[cfg(feature = "methods")]
 use ::utils::builder::{EditGuild, EditMember, EditRole};
 #[cfg(feature = "methods")]
-use ::client::http;
+use ::client::rest;
 
 #[cfg(feature = "cache")]
 use ::client::CACHE;
@@ -70,7 +70,7 @@ impl Emoji {
     #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn delete(&self) -> Result<()> {
         match self.find_guild_id() {
-            Some(guild_id) => http::delete_emoji(guild_id.0, self.id.0),
+            Some(guild_id) => rest::delete_emoji(guild_id.0, self.id.0),
             None => Err(Error::Client(ClientError::ItemMissing)),
         }
     }
@@ -90,7 +90,7 @@ impl Emoji {
                     .insert("name", name)
                     .build();
 
-                match http::edit_emoji(guild_id.0, self.id.0, map) {
+                match rest::edit_emoji(guild_id.0, self.id.0, map) {
                     Ok(emoji) => {
                         mem::replace(self, emoji);
 
@@ -143,7 +143,7 @@ impl PartialGuild {
     #[cfg(feature = "methods")]
     #[inline]
     pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
-        http::edit_nickname(self.id.0, new_nickname)
+        rest::edit_nickname(self.id.0, new_nickname)
     }
 
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
@@ -160,7 +160,7 @@ impl PartialGuild {
     #[cfg(feature = "methods")]
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        http::get_guild_webhooks(self.id.0)
+        rest::get_guild_webhooks(self.id.0)
     }
 }
 
@@ -224,7 +224,7 @@ impl Guild {
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
         }
 
-        http::ban_user(self.id.0, user.into().0, delete_message_days)
+        rest::ban_user(self.id.0, user.into().0, delete_message_days)
     }
 
     /// Retrieves a list of [`Ban`]s for the guild.
@@ -247,7 +247,7 @@ impl Guild {
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
         }
 
-        http::get_bans(self.id.0)
+        rest::get_bans(self.id.0)
     }
 
     /// Creates a new [`Channel`] in the guild.
@@ -286,7 +286,7 @@ impl Guild {
             .insert("type", kind.name())
             .build();
 
-        http::create_channel(self.id.0, map)
+        rest::create_channel(self.id.0, map)
     }
 
     /// Creates a new [`Role`] in the guild with the data set, if any.
@@ -314,11 +314,11 @@ impl Guild {
         }
 
         let role = {
-            try!(http::create_role(self.id.0))
+            try!(rest::create_role(self.id.0))
         };
         let map = f(EditRole::default()).0.build();
 
-        http::edit_role(self.id.0, role.id.0, map)
+        rest::edit_role(self.id.0, role.id.0, map)
     }
 
     #[doc(hidden)]
@@ -387,7 +387,7 @@ impl Guild {
             }
         }}
 
-        http::delete_guild(self.id.0)
+        rest::delete_guild(self.id.0)
     }
 
     /// Edits the current guild with new data where specified. See the
@@ -415,7 +415,7 @@ impl Guild {
 
         let map = f(EditGuild::default()).0.build();
 
-        match http::edit_guild(self.id.0, map) {
+        match rest::edit_guild(self.id.0, map) {
             Ok(guild) => {
                 self.afk_channel_id = guild.afk_channel_id;
                 self.afk_timeout = guild.afk_timeout;
@@ -458,7 +458,7 @@ impl Guild {
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
         }
 
-        http::edit_nickname(self.id.0, new_nickname)
+        rest::edit_nickname(self.id.0, new_nickname)
     }
 
     /// Attempts to retrieve a [`PublicChannel`] with the given Id.
@@ -488,7 +488,7 @@ impl Guild {
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
         }
 
-        http::get_guild_invites(self.id.0)
+        rest::get_guild_invites(self.id.0)
     }
 
     /// Attempts to retrieve the given user's member instance in the guild.
@@ -554,7 +554,7 @@ impl Guild {
     /// Leaves the guild.
     #[cfg(feature = "methods")]
     pub fn leave(&self) -> Result<PartialGuild> {
-        http::leave_guild(self.id.0)
+        rest::leave_guild(self.id.0)
     }
 
     /// Calculate a [`User`]'s permissions in a given channel in the guild.
@@ -694,7 +694,7 @@ impl Guild {
             .insert("days", days)
             .build();
 
-        http::get_guild_prune_count(self.id.0, map)
+        rest::get_guild_prune_count(self.id.0, map)
     }
 
     /// Starts a prune of [`Member`]s.
@@ -724,7 +724,7 @@ impl Guild {
             .insert("days", days)
             .build();
 
-        http::start_guild_prune(self.id.0, map)
+        rest::start_guild_prune(self.id.0, map)
     }
 
     /// Unbans the given [`User`] from the guild.
@@ -747,7 +747,7 @@ impl Guild {
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
         }
 
-        http::remove_ban(self.id.0, user.into().0)
+        rest::remove_ban(self.id.0, user.into().0)
     }
 
     /// Retrieves the guild's webhooks.
@@ -758,7 +758,7 @@ impl Guild {
     #[cfg(feature = "methods")]
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        http::get_guild_webhooks(self.id.0)
+        rest::get_guild_webhooks(self.id.0)
     }
 }
 
@@ -780,7 +780,7 @@ impl Member {
 
         let guild_id = try!(self.find_guild());
 
-        match http::add_member_role(guild_id.0, self.user.id.0, role_id.0) {
+        match rest::add_member_role(guild_id.0, self.user.id.0, role_id.0) {
             Ok(()) => {
                 self.roles.push(role_id);
 
@@ -804,7 +804,7 @@ impl Member {
 
         let map = EditMember::default().roles(&self.roles).0.build();
 
-        match http::edit_member(guild_id.0, self.user.id.0, map) {
+        match rest::edit_member(guild_id.0, self.user.id.0, map) {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.retain(|r| !role_ids.contains(r));
@@ -824,7 +824,7 @@ impl Member {
     pub fn ban(&self, delete_message_days: u8) -> Result<()> {
         let guild_id = try!(self.find_guild());
 
-        http::ban_user(guild_id.0,
+        rest::ban_user(guild_id.0,
                        self.user.id.0,
                        delete_message_days)
     }
@@ -850,7 +850,7 @@ impl Member {
         let guild_id = try!(self.find_guild());
         let map = f(EditMember::default()).0.build();
 
-        http::edit_member(guild_id.0, self.user.id.0, map)
+        rest::edit_member(guild_id.0, self.user.id.0, map)
     }
 
     /// Finds the Id of the [`Guild`] that the member is in.
@@ -893,7 +893,7 @@ impl Member {
 
         let guild_id = try!(self.find_guild());
 
-        match http::remove_member_role(guild_id.0, self.user.id.0, role_id.0) {
+        match rest::remove_member_role(guild_id.0, self.user.id.0, role_id.0) {
             Ok(()) => {
                 self.roles.retain(|r| r.0 != role_id.0);
 
@@ -916,7 +916,7 @@ impl Member {
 
         let map = EditMember::default().roles(&self.roles).0.build();
 
-        match http::edit_member(guild_id.0, self.user.id.0, map) {
+        match rest::edit_member(guild_id.0, self.user.id.0, map) {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);
@@ -1017,7 +1017,7 @@ impl Role {
     pub fn delete(&self) -> Result<()> {
         let guild_id = try!(self.find_guild());
 
-        http::delete_role(guild_id.0, self.id.0)
+        rest::delete_role(guild_id.0, self.id.0)
     }
 
     /// Searches the cache for the guild that owns the role.

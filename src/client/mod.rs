@@ -1,15 +1,15 @@
 //! The Client contains information about a single bot or user's token, as well
 //! as event handlers. Dispatching events to configured handlers and starting
 //! the shards' connections are handled directly via the client. In addition,
-//! the [`http`] module and [`Cache`] are also automatically handled by the
+//! the [`rest`] module and [`Cache`] are also automatically handled by the
 //! Client module for you.
 //!
 //! A [`Context`] is provided for every handler. The context is an ergonomic
-//! method of accessing the lower-level http functions.
+//! method of accessing the lower-level HTTP functions.
 //!
-//! The `http` module is the lower-level method of interacting with the Discord
+//! The `rest` module is the lower-level method of interacting with the Discord
 //! REST API. Realistically, there should be little reason to use this yourself,
-//! as the Context will do this for you. A possible use case of using the `http`
+//! as the Context will do this for you. A possible use case of using the `rest`
 //! module is if you do not have a Cache, for purposes such as low memory
 //! requirements.
 //!
@@ -18,11 +18,11 @@
 //! [`Client`]: struct.Client.html#examples
 //! [`Context`]: struct.Context.html
 //! [`Cache`]: ../ext/cache/index.html
-//! [`http`]: http/index.html
+//! [`rest`]: rest/index.html
 //! [Client examples]: struct.Client.html#examples
 
-pub mod http;
 pub mod gateway;
+pub mod rest;
 
 mod context;
 mod dispatch;
@@ -180,7 +180,7 @@ impl Client {
             .insert("token", Value::Null)
             .build();
 
-        http::logout(map)
+        rest::logout(map)
     }
 
     /// Sets a framework to be used with the client. All message events will be
@@ -229,7 +229,7 @@ impl Client {
     ///
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start_autosharded(&mut self) -> Result<()> {
-        let res = try!(http::get_bot_gateway());
+        let res = try!(rest::get_bot_gateway());
 
         self.start_connection(Some([0, res.shards as u8 - 1, res.shards as u8]))
     }
@@ -718,7 +718,7 @@ impl Client {
     //
     // Not all shards need to be initialized in this process.
     fn start_connection(&mut self, shard_data: Option<[u8; 3]>) -> Result<()> {
-        let gateway_url = try!(http::get_gateway()).url;
+        let gateway_url = try!(rest::get_gateway()).url;
 
         for i in 0..shard_data.map_or(1, |x| x[1] + 1) {
             let shard = Shard::new(&gateway_url,
@@ -795,7 +795,7 @@ impl Client {
     pub fn boot_shard(&mut self,
                       shard_info: Option<[u8; 2]>)
                       -> Result<(Shard, ReadyEvent, Receiver<WebSocketStream>)> {
-        let gateway_url = try!(http::get_gateway()).url;
+        let gateway_url = try!(rest::get_gateway()).url;
 
         Shard::new(&gateway_url, &self.token, shard_info, self.login_type)
     }
@@ -1164,7 +1164,7 @@ fn handle_shard(shard: Arc<Mutex<Shard>>,
 fn login(token: &str, login_type: LoginType) -> Client {
     let token = token.to_owned();
 
-    http::set_token(&token);
+    rest::set_token(&token);
 
     feature_framework! {{
         Client {

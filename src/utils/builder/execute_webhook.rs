@@ -16,14 +16,14 @@ use std::default::Default;
 /// payload of [`Webhook::execute`]:
 ///
 /// ```rust,no_run
-/// use serenity::client::http;
+/// use serenity::client::rest;
 /// use serenity::model::Embed;
 /// use serenity::utils::Colour;
 ///
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 ///
-/// let webhook = http::get_webhook_with_token(id, token)
+/// let webhook = rest::get_webhook_with_token(id, token)
 ///     .expect("valid webhook");
 ///
 /// let website = Embed::fake(|e| e
@@ -51,7 +51,7 @@ use std::default::Default;
 ///
 /// [`Webhook`]: ../model/struct.Webhook.html
 /// [`Webhook::execute`]: ../../model/struct.Webhook.html#method.execute
-/// [`execute_webhook`]: ../client/http/fn.execute_webhook.html
+/// [`execute_webhook`]: ../client/rest/fn.execute_webhook.html
 pub struct ExecuteWebhook(pub ObjectBuilder);
 
 impl ExecuteWebhook {

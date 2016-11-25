@@ -1,5 +1,5 @@
 use super::{Invite, RichInvite};
-use ::client::http;
+use ::client::rest;
 use ::internal::prelude::*;
 use super::{permissions, utils};
 
@@ -10,7 +10,7 @@ impl Invite {
     /// Accepts the invite, placing the current user in the [`Guild`] that the
     /// invite was for.
     ///
-    /// Refer to [`http::accept_invite`] for more information.
+    /// Refer to [`rest::accept_invite`] for more information.
     ///
     /// **Note**: This will fail if you are already in the guild, or are banned.
     /// A ban is equivilant to an IP ban.
@@ -25,7 +25,7 @@ impl Invite {
     ///
     /// [`ClientError::InvalidOperationAsBot`]: enum.ClientError.html#variant.InvalidOperationAsBot
     /// [`Guild`]: struct.Guild.html
-    /// [`http::accept_invite`]: ../client/http/fn.accept_invite.html
+    /// [`rest::accept_invite`]: ../client/rest/fn.accept_invite.html
     /// [permission]: permissions/index.html
     #[cfg(feature="methods")]
     pub fn accept(&self) -> Result<Invite> {
@@ -35,7 +35,7 @@ impl Invite {
             }
         }}
 
-        http::accept_invite(&self.code)
+        rest::accept_invite(&self.code)
     }
 
     /// Deletes the invite.
@@ -58,7 +58,7 @@ impl Invite {
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
         }
 
-        http::delete_invite(&self.code)
+        rest::delete_invite(&self.code)
     }
 }
 
@@ -66,7 +66,7 @@ impl RichInvite {
     /// Accepts the invite, placing the current user in the [`Guild`] that the
     /// invite was for.
     ///
-    /// Refer to [`http::accept_invite`] for more information.
+    /// Refer to [`rest::accept_invite`] for more information.
     ///
     /// **Note**: This will fail if you are already in the guild, or are banned.
     /// A ban is equivilant to an IP ban.
@@ -80,7 +80,7 @@ impl RichInvite {
     ///
     /// [`ClientError::InvalidOperationAsBot`]: enum.ClientError.html#variant.InvalidOperationAsBot
     /// [`Guild`]: struct.Guild.html
-    /// [`http::accept_invite`]: ../client/http/fn.accept_invite.html
+    /// [`rest::accept_invite`]: ../client/rest/fn.accept_invite.html
     #[cfg(feature="methods")]
     pub fn accept(&self) -> Result<Invite> {
         feature_cache_enabled! {{
@@ -89,12 +89,12 @@ impl RichInvite {
             }
         }}
 
-        http::accept_invite(&self.code)
+        rest::accept_invite(&self.code)
     }
 
     /// Deletes the invite.
     ///
-    /// Refer to [`http::delete_invite`] for more information.
+    /// Refer to [`rest::delete_invite`] for more information.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
@@ -106,7 +106,7 @@ impl RichInvite {
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`Invite::delete`]: struct.Invite.html#method.delete
-    /// [`http::delete_invite`]: ../client/http/fn.delete_invite.html
+    /// [`rest::delete_invite`]: ../client/rest/fn.delete_invite.html
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     /// [permission]: permissions/index.html
     #[cfg(feature = "methods")]
@@ -119,6 +119,6 @@ impl RichInvite {
             }
         }}
 
-        http::delete_invite(&self.code)
+        rest::delete_invite(&self.code)
     }
 }

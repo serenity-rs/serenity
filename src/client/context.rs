@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::io::Read;
 use std::sync::{Arc, Mutex};
 use super::gateway::Shard;
-use super::http;
+use super::rest;
 use super::login_type::LoginType;
 use ::utils::builder::{
     CreateEmbed,
@@ -27,7 +27,7 @@ use super::CACHE;
 /// helps with dealing with the current "context" of the event dispatch,
 /// and providing helper methods where possible. The context also acts as a
 /// general high-level interface over the associated [`Shard`] which
-/// received the event, or the low-level [`http`] module.
+/// received the event, or the low-level [`rest`] module.
 ///
 /// For example, when the [`Client::on_message`] handler is dispatched to, the
 /// context will contain the Id of the [`Channel`] that the message was created
@@ -71,7 +71,7 @@ use super::CACHE;
 /// [`Shard`]: gateway/struct.Shard.html
 /// [`Cache`]: ../ext/cache/struct.Cache.html
 /// [`get_channel`]: #method.get_channel
-/// [`http`]: http/index.html
+/// [`rest`]: rest/index.html
 /// [`say`]: #method.say
 /// [`set_game`]: #method.set_game
 #[derive(Clone)]
@@ -110,7 +110,7 @@ impl Context {
 
     /// Accepts the given invite.
     ///
-    /// Refer to the documentation for [`http::accept_invite`] for restrictions
+    /// Refer to the documentation for [`rest::accept_invite`] for restrictions
     /// on accepting an invite.
     ///
     /// **Note**: Requires that the current user be a user account.
@@ -129,12 +129,12 @@ impl Context {
 
         let code = utils::parse_invite(invite);
 
-        http::accept_invite(code)
+        rest::accept_invite(code)
     }
 
     /// Mark a [`Channel`] as being read up to a certain [`Message`].
     ///
-    /// Refer to the documentation for [`http::ack_message`] for more
+    /// Refer to the documentation for [`rest::ack_message`] for more
     /// information.
     ///
     /// # Errors
@@ -144,20 +144,20 @@ impl Context {
     /// [`Channel`]: ../../model/enum.Channel.html
     /// [`ClientError::InvalidOperationAsBot`]: ../enum.ClientError.html#variant.InvalidOperationAsUser
     /// [`Message`]: ../../model/struct.Message.html
-    /// [`http::ack_message`]: http/fn.ack_message.html
+    /// [`rest::ack_message`]: rest/fn.ack_message.html
     pub fn ack<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
         if self.login_type == LoginType::User {
             return Err(Error::Client(ClientError::InvalidOperationAsUser));
         }
 
-        http::ack_message(channel_id.into().0, message_id.into().0)
+        rest::ack_message(channel_id.into().0, message_id.into().0)
     }
 
     /// Ban a [`User`] from a [`Guild`], removing their messages sent in the
     /// last X number of days.
     ///
-    /// Refer to the documentation for [`http::ban_user`] for more information.
+    /// Refer to the documentation for [`rest::ban_user`] for more information.
     ///
     /// **Note**: Requires that you have the [Ban Members] permission.
     ///
@@ -185,7 +185,7 @@ impl Context {
             return Err(Error::Client(ClientError::DeleteMessageDaysAmount(delete_message_days)));
         }
 
-        http::ban_user(guild_id.into().0, user_id.into().0, delete_message_days)
+        rest::ban_user(guild_id.into().0, user_id.into().0, delete_message_days)
     }
 
     /// Broadcast that you are typing to a channel for the next 5 seconds.
@@ -204,12 +204,12 @@ impl Context {
     /// ```
     pub fn broadcast_typing<C>(&self, channel_id: C) -> Result<()>
         where C: Into<ChannelId> {
-        http::broadcast_typing(channel_id.into().0)
+        rest::broadcast_typing(channel_id.into().0)
     }
 
     /// Creates a [`PublicChannel`] in the given [`Guild`].
     ///
-    /// Refer to [`http::create_channel`] for more information.
+    /// Refer to [`rest::create_channel`] for more information.
     ///
     /// **Note**: Requires the [Manage Channels] permission.
     ///
@@ -225,7 +225,7 @@ impl Context {
     ///
     /// [`Guild`]: ../model/struct.Guild.html
     /// [`PublicChannel`]: ../model/struct.PublicChannel.html
-    /// [`http::create_channel`]: http/fn.create_channel.html
+    /// [`rest::create_channel`]: rest/fn.create_channel.html
     /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
     pub fn create_channel<G>(&self, guild_id: G, name: &str, kind: ChannelType)
         -> Result<Channel> where G: Into<GuildId> {
@@ -234,7 +234,7 @@ impl Context {
             .insert("type", kind.name())
             .build();
 
-        http::create_channel(guild_id.into().0, map)
+        rest::create_channel(guild_id.into().0, map)
     }
 
     /// Creates an emoji in the given guild with a name and base64-encoded
@@ -260,7 +260,7 @@ impl Context {
             .insert("image", image)
             .build();
 
-        http::create_emoji(guild_id.into().0, map)
+        rest::create_emoji(guild_id.into().0, map)
     }
 
     /// Creates a guild with the data provided.
@@ -296,7 +296,7 @@ impl Context {
             .insert("region", region.name())
             .build();
 
-        http::create_guild(map)
+        rest::create_guild(map)
     }
 
     /// Creates an [`Integration`] for a [`Guild`].
@@ -318,7 +318,7 @@ impl Context {
             .insert("type", kind)
             .build();
 
-        http::create_guild_integration(guild_id.into().0, integration_id.0, map)
+        rest::create_guild_integration(guild_id.into().0, integration_id.0, map)
     }
 
     /// Creates an invite for the channel, providing a builder so that fields
@@ -335,7 +335,7 @@ impl Context {
         where C: Into<ChannelId>, F: FnOnce(CreateInvite) -> CreateInvite {
         let map = f(CreateInvite::default()).0.build();
 
-        http::create_invite(channel_id.into().0, map)
+        rest::create_invite(channel_id.into().0, map)
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -420,7 +420,7 @@ impl Context {
             .insert("type", kind)
             .build();
 
-        http::create_permission(channel_id.into().0, id, map)
+        rest::create_permission(channel_id.into().0, id, map)
     }
 
     /// Creates a direct message channel between the [current user] and another
@@ -434,7 +434,7 @@ impl Context {
             .insert("recipient_id", user_id.into().0)
             .build();
 
-        http::create_private_channel(map)
+        rest::create_private_channel(map)
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -457,7 +457,7 @@ impl Context {
                                     where C: Into<ChannelId>,
                                           M: Into<MessageId>,
                                           R: Into<ReactionType> {
-        http::create_reaction(channel_id.into().0,
+        rest::create_reaction(channel_id.into().0,
                               message_id.into().0,
                               reaction_type.into())
     }
@@ -467,10 +467,10 @@ impl Context {
         let id = guild_id.into().0;
 
         // The API only allows creating an empty role.
-        let role = try!(http::create_role(id));
+        let role = try!(rest::create_role(id));
         let map = f(EditRole::default()).0.build();
 
-        http::edit_role(id, role.id.0, map)
+        rest::edit_role(id, role.id.0, map)
     }
 
     /// Deletes a [`Channel`] based on the Id given.
@@ -484,7 +484,7 @@ impl Context {
     /// [Manage Messages]: ../model/permissions/constant.MANAGE_CHANNELS.html
     pub fn delete_channel<C>(&self, channel_id: C) -> Result<Channel>
         where C: Into<ChannelId> {
-        http::delete_channel(channel_id.into().0)
+        rest::delete_channel(channel_id.into().0)
     }
 
     /// Deletes an emoji in a [`Guild`] given its Id.
@@ -495,7 +495,7 @@ impl Context {
     /// [Manage Emojis]: ../model/permissions/constant.MANAGE_EMOJIS.html
     pub fn delete_emoji<E, G>(&self, guild_id: G, emoji_id: E) -> Result<()>
         where E: Into<EmojiId>, G: Into<GuildId> {
-        http::delete_emoji(guild_id.into().0, emoji_id.into().0)
+        rest::delete_emoji(guild_id.into().0, emoji_id.into().0)
     }
 
     /// Deletes a guild. You must be the guild owner to be able to delete it.
@@ -505,12 +505,12 @@ impl Context {
     /// [`PartialGuild`]: ../model/struct.PartialGuild.html
     pub fn delete_guild<G: Into<GuildId>>(&self, guild_id: G)
         -> Result<PartialGuild> {
-        http::delete_guild(guild_id.into().0)
+        rest::delete_guild(guild_id.into().0)
     }
 
     pub fn delete_integration<G, I>(&self, guild_id: G, integration_id: I)
         -> Result<()> where G: Into<GuildId>, I: Into<IntegrationId> {
-        http::delete_guild_integration(guild_id.into().0,
+        rest::delete_guild_integration(guild_id.into().0,
                                        integration_id.into().0)
     }
 
@@ -530,7 +530,7 @@ impl Context {
     pub fn delete_invite(&self, invite: &str) -> Result<Invite> {
         let code = utils::parse_invite(invite);
 
-        http::delete_invite(code)
+        rest::delete_invite(code)
     }
 
     /// Deletes a [`Message`] given its Id.
@@ -554,7 +554,7 @@ impl Context {
     /// [`Message`]: ../model/struct.Message.html
     pub fn delete_message<C, M>(&self, channel_id: C, message_id: M)
         -> Result<()> where C: Into<ChannelId>, M: Into<MessageId> {
-        http::delete_message(channel_id.into().0, message_id.into().0)
+        rest::delete_message(channel_id.into().0, message_id.into().0)
     }
 
     pub fn delete_messages<C>(&self, channel_id: C, message_ids: &[MessageId])
@@ -571,7 +571,7 @@ impl Context {
             .insert("messages", ids)
             .build();
 
-        http::delete_messages(channel_id.into().0, map)
+        rest::delete_messages(channel_id.into().0, map)
     }
 
     pub fn delete_note<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
@@ -579,7 +579,7 @@ impl Context {
             .insert("note", "")
             .build();
 
-        http::edit_note(user_id.into().0, map)
+        rest::edit_note(user_id.into().0, map)
     }
 
     pub fn delete_permission<C>(&self,
@@ -591,7 +591,7 @@ impl Context {
             PermissionOverwriteType::Role(id) => id.0,
         };
 
-        http::delete_permission(channel_id.into().0, id)
+        rest::delete_permission(channel_id.into().0, id)
     }
 
 
@@ -612,7 +612,7 @@ impl Context {
                                     where C: Into<ChannelId>,
                                           M: Into<MessageId>,
                                           R: Into<ReactionType> {
-        http::delete_reaction(channel_id.into().0,
+        rest::delete_reaction(channel_id.into().0,
                               message_id.into().0,
                               user_id.map(|uid| uid.0),
                               reaction_type.into())
@@ -620,7 +620,7 @@ impl Context {
 
     pub fn delete_role<G, R>(&self, guild_id: G, role_id: R) -> Result<()>
         where G: Into<GuildId>, R: Into<RoleId> {
-        http::delete_role(guild_id.into().0, role_id.into().0)
+        rest::delete_role(guild_id.into().0, role_id.into().0)
     }
 
     /// Sends a message to a user through a direct message channel. This is a
@@ -702,7 +702,7 @@ impl Context {
 
         let edited = f(EditChannel(map)).0.build();
 
-        http::edit_channel(channel_id.0, edited)
+        rest::edit_channel(channel_id.0, edited)
     }
 
     pub fn edit_emoji<E, G>(&self, guild_id: G, emoji_id: E, name: &str)
@@ -711,14 +711,14 @@ impl Context {
             .insert("name", name)
             .build();
 
-        http::edit_emoji(guild_id.into().0, emoji_id.into().0, map)
+        rest::edit_emoji(guild_id.into().0, emoji_id.into().0, map)
     }
 
     pub fn edit_guild<F, G>(&self, guild_id: G, f: F) -> Result<PartialGuild>
         where F: FnOnce(EditGuild) -> EditGuild, G: Into<GuildId> {
         let map = f(EditGuild::default()).0.build();
 
-        http::edit_guild(guild_id.into().0, map)
+        rest::edit_guild(guild_id.into().0, map)
     }
 
     pub fn edit_member<F, G, U>(&self, guild_id: G, user_id: U, f: F)
@@ -727,7 +727,7 @@ impl Context {
                             U: Into<UserId> {
         let map = f(EditMember::default()).0.build();
 
-        http::edit_member(guild_id.into().0, user_id.into().0, map)
+        rest::edit_member(guild_id.into().0, user_id.into().0, map)
     }
 
     /// Edits the current user's nickname for the provided [`Guild`] via its Id.
@@ -741,12 +741,12 @@ impl Context {
     #[inline]
     pub fn edit_nickname<G>(&self, guild_id: G, new_nickname: Option<&str>)
         -> Result<()> where G: Into<GuildId> {
-        http::edit_nickname(guild_id.into().0, new_nickname)
+        rest::edit_nickname(guild_id.into().0, new_nickname)
     }
 
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&mut self, f: F)
         -> Result<CurrentUser> {
-        let user = try!(http::get_current_user());
+        let user = try!(rest::get_current_user());
 
         let mut map = ObjectBuilder::new()
             .insert("avatar", user.avatar)
@@ -758,7 +758,7 @@ impl Context {
 
         let edited = f(EditProfile(map)).0.build();
 
-        http::edit_profile(edited)
+        rest::edit_profile(edited)
     }
 
     pub fn edit_role<F, G, R>(&self, guild_id: G, role_id: R, f: F)
@@ -781,11 +781,11 @@ impl Context {
 
             let map = f(EditRole::new(role)).0.build();
 
-            http::edit_role(guild_id.0, role_id.0, map)
+            rest::edit_role(guild_id.0, role_id.0, map)
         } else {
             let map = f(EditRole::default()).0.build();
 
-            http::edit_role(guild_id.0, role_id.0, map)
+            rest::edit_role(guild_id.0, role_id.0, map)
         }}
     }
 
@@ -806,7 +806,7 @@ impl Context {
             map = map.insert("embed", Value::Object(embed));
         }
 
-        http::edit_message(channel_id.into().0, message_id.into().0, map.build())
+        rest::edit_message(channel_id.into().0, message_id.into().0, map.build())
     }
 
     pub fn edit_note<U: Into<UserId>>(&self, user_id: U, note: &str)
@@ -815,16 +815,16 @@ impl Context {
             .insert("note", note)
             .build();
 
-        http::edit_note(user_id.into().0, map)
+        rest::edit_note(user_id.into().0, map)
     }
 
     pub fn get_bans<G: Into<GuildId>>(&self, guild_id: G) -> Result<Vec<Ban>> {
-        http::get_bans(guild_id.into().0)
+        rest::get_bans(guild_id.into().0)
     }
 
     pub fn get_channel_invites<C: Into<ChannelId>>(&self, channel_id: C)
         -> Result<Vec<RichInvite>> {
-        http::get_channel_invites(channel_id.into().0)
+        rest::get_channel_invites(channel_id.into().0)
     }
 
     pub fn get_channel<C>(&self, channel_id: C) -> Result<Channel>
@@ -837,7 +837,7 @@ impl Context {
             }
         }}
 
-        http::get_channel(channel_id.0)
+        rest::get_channel(channel_id.0)
     }
 
     pub fn get_channels<G>(&self, guild_id: G)
@@ -854,7 +854,7 @@ impl Context {
 
         let mut channels = HashMap::new();
 
-        for channel in try!(http::get_channels(guild_id.0)) {
+        for channel in try!(rest::get_channels(guild_id.0)) {
             channels.insert(channel.id, channel);
         }
 
@@ -863,22 +863,22 @@ impl Context {
 
     pub fn get_emoji<E, G>(&self, guild_id: G, emoji_id: E) -> Result<Emoji>
         where E: Into<EmojiId>, G: Into<GuildId> {
-        http::get_emoji(guild_id.into().0, emoji_id.into().0)
+        rest::get_emoji(guild_id.into().0, emoji_id.into().0)
     }
 
     pub fn get_emojis<G: Into<GuildId>>(&self, guild_id: G)
         -> Result<Vec<Emoji>> {
-        http::get_emojis(guild_id.into().0)
+        rest::get_emojis(guild_id.into().0)
     }
 
     pub fn get_guild<G: Into<GuildId>>(&self, guild_id: G)
         -> Result<PartialGuild> {
-        http::get_guild(guild_id.into().0)
+        rest::get_guild(guild_id.into().0)
     }
 
     pub fn get_guild_invites<G>(&self, guild_id: G) -> Result<Vec<RichInvite>>
         where G: Into<GuildId> {
-        http::get_guild_invites(guild_id.into().0)
+        rest::get_guild_invites(guild_id.into().0)
     }
 
     pub fn get_guild_prune_count<G>(&self, guild_id: G, days: u16)
@@ -887,22 +887,22 @@ impl Context {
             .insert("days", days)
             .build();
 
-        http::get_guild_prune_count(guild_id.into().0, map)
+        rest::get_guild_prune_count(guild_id.into().0, map)
     }
 
     pub fn get_guilds(&self) -> Result<Vec<GuildInfo>> {
-        http::get_guilds()
+        rest::get_guilds()
     }
 
     pub fn get_integrations<G: Into<GuildId>>(&self, guild_id: G)
         -> Result<Vec<Integration>> {
-        http::get_guild_integrations(guild_id.into().0)
+        rest::get_guild_integrations(guild_id.into().0)
     }
 
     pub fn get_invite(&self, invite: &str) -> Result<Invite> {
         let code = utils::parse_invite(invite);
 
-        http::get_invite(code)
+        rest::get_invite(code)
     }
 
     pub fn get_member<G, U>(&self, guild_id: G, user_id: U) -> Result<Member>
@@ -918,7 +918,7 @@ impl Context {
             }
         }}
 
-        http::get_member(guild_id.0, user_id.0)
+        rest::get_member(guild_id.0, user_id.0)
     }
 
     /// Retrieves a single [`Message`] from a [`Channel`].
@@ -939,7 +939,7 @@ impl Context {
             return Err(Error::Client(ClientError::InvalidOperationAsUser))
         }
 
-        http::get_message(channel_id.into().0, message_id.into().0)
+        rest::get_message(channel_id.into().0, message_id.into().0)
     }
 
     pub fn get_messages<C, F>(&self, channel_id: C, f: F) -> Result<Vec<Message>>
@@ -967,7 +967,7 @@ impl Context {
             query
         };
 
-        http::get_messages(channel_id.into().0, &query)
+        rest::get_messages(channel_id.into().0, &query)
     }
 
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
@@ -1005,7 +1005,7 @@ impl Context {
                                                 U: Into<UserId> {
         let limit = limit.map(|x| if x > 100 { 100 } else { x }).unwrap_or(50);
 
-        http::get_reaction_users(channel_id.into().0,
+        rest::get_reaction_users(channel_id.into().0,
                                  message_id.into().0,
                                  reaction_type.into(),
                                  limit,
@@ -1021,12 +1021,12 @@ impl Context {
     /// [Kick Members]: ../model/permissions/constant.KICK_MEMBERS.html
     pub fn kick_member<G, U>(&self, guild_id: G, user_id: U) -> Result<()>
         where G: Into<GuildId>, U: Into<UserId> {
-        http::kick_member(guild_id.into().0, user_id.into().0)
+        rest::kick_member(guild_id.into().0, user_id.into().0)
     }
 
     pub fn leave_guild<G: Into<GuildId>>(&self, guild_id: G)
         -> Result<PartialGuild> {
-        http::leave_guild(guild_id.into().0)
+        rest::leave_guild(guild_id.into().0)
     }
 
     pub fn move_member<C, G, U>(&self, guild_id: G, user_id: U, channel_id: C)
@@ -1037,7 +1037,7 @@ impl Context {
             .insert("channel_id", channel_id.into().0)
             .build();
 
-        http::edit_member(guild_id.into().0, user_id.into().0, map)
+        rest::edit_member(guild_id.into().0, user_id.into().0, map)
     }
 
     /// Retrieves the list of [`Message`]s which are pinned to the specified
@@ -1047,12 +1047,12 @@ impl Context {
     /// [`Message`]: ../model/struct.Message.html
     pub fn get_pins<C>(&self, channel_id: C) -> Result<Vec<Message>>
         where C: Into<ChannelId> {
-        http::get_pins(channel_id.into().0)
+        rest::get_pins(channel_id.into().0)
     }
 
     pub fn pin<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
-        http::pin_message(channel_id.into().0, message_id.into().0)
+        rest::pin_message(channel_id.into().0, message_id.into().0)
     }
 
     /// Sends a message with just the given message content in the channel that
@@ -1106,7 +1106,7 @@ impl Context {
             return Err(Error::Client(ClientError::MessageTooLong(length_over)));
         }
 
-        http::send_file(channel_id.into().0, content, file, filename)
+        rest::send_file(channel_id.into().0, content, file, filename)
     }
 
     /// Sends a message to a [`Channel`].
@@ -1228,7 +1228,7 @@ impl Context {
             }
         }
 
-        http::send_message(channel_id.into().0, Value::Object(map))
+        rest::send_message(channel_id.into().0, Value::Object(map))
     }
 
     /// Sets the current user as being [`Online`]. This maintains the current
@@ -1369,12 +1369,12 @@ impl Context {
             .insert("days", days)
             .build();
 
-        http::start_guild_prune(guild_id.into().0, map)
+        rest::start_guild_prune(guild_id.into().0, map)
     }
 
     pub fn start_integration_sync<G, I>(&self, guild_id: G, integration_id: I)
         -> Result<()> where G: Into<GuildId>, I: Into<IntegrationId> {
-        http::start_integration_sync(guild_id.into().0, integration_id.into().0)
+        rest::start_integration_sync(guild_id.into().0, integration_id.into().0)
     }
 
     /// Unbans a [`User`] from a [`Guild`].
@@ -1386,11 +1386,11 @@ impl Context {
     /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
     pub fn unban<G, U>(&self, guild_id: G, user_id: U) -> Result<()>
         where G: Into<GuildId>, U: Into<UserId> {
-        http::remove_ban(guild_id.into().0, user_id.into().0)
+        rest::remove_ban(guild_id.into().0, user_id.into().0)
     }
 
     pub fn unpin<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
-        http::unpin_message(channel_id.into().0, message_id.into().0)
+        rest::unpin_message(channel_id.into().0, message_id.into().0)
     }
 }

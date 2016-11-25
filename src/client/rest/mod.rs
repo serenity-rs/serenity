@@ -85,13 +85,13 @@ pub fn set_token(token: &str) {
 /// Accept an invite given a code from a URL:
 ///
 /// ```rust,no_run
-/// use serenity::client::http;
+/// use serenity::client::rest;
 /// use serenity::utils;
 ///
 /// let url = "https://discord.gg/0cDvIgU2voY8RSYL";
 /// let code = utils::parse_invite(url);
 ///
-/// let _result = http::accept_invite(code);
+/// let _result = rest::accept_invite(code);
 /// ```
 ///
 /// [`Context::accept_invite`]: ../struct.Context.html#method.accept_invite
@@ -252,14 +252,14 @@ pub fn create_emoji(guild_id: u64, map: Value)
 ///
 /// use serde_json::builder::ObjectBuilder;
 /// use serde_json::Value;
-/// use serenity::client::http;
+/// use serenity::client::rest;
 ///
 /// let map = ObjectBuilder::new()
 ///     .insert("name", "test")
 ///     .insert("region", "us-west")
 ///     .build();
 ///
-/// let _result = http::create_guild(map);
+/// let _result = rest::create_guild(map);
 /// ```
 ///
 /// [`Guild`]: ../../model/struct.Guild.html
@@ -382,12 +382,12 @@ pub fn create_role(guild_id: u64) -> Result<Role> {
 /// extern crate serenity;
 ///
 /// use serde_json::builder::ObjectBuilder;
-/// use serenity::client::http;
+/// use serenity::client::rest;
 ///
 /// let channel_id = 81384788765712384;
 /// let map = ObjectBuilder::new().insert("name", "test").build();
 ///
-/// let webhook = http::create_webhook(channel_id, map).expect("err creating");
+/// let webhook = rest::create_webhook(channel_id, map).expect("err creating");
 /// ```
 ///
 /// [`PublicChannel`]: ../../model/struct.PublicChannel.html
@@ -465,13 +465,13 @@ pub fn delete_messages(channel_id: u64, map: Value) -> Result<()> {
 /// # Examples
 ///
 /// ```rust,no_run
-/// use serenity::client::http;
+/// use serenity::client::rest;
 /// use serenity::model::{ChannelId, MessageId};
 ///
 /// let channel_id = ChannelId(7);
 /// let message_id = MessageId(8);
 ///
-/// match http::delete_message_reactions(channel_id.0, message_id.0) {
+/// match rest::delete_message_reactions(channel_id.0, message_id.0) {
 ///     Ok(()) => println!("Reactions deleted"),
 ///     Err(why) => println!("Error deleting reactions: {:?}", why),
 /// }
@@ -531,14 +531,14 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 /// Delete a webhook given its Id:
 ///
 /// ```rust,no_run
-/// use serenity::client::{Client, http};
+/// use serenity::client::{Client, rest};
 /// use std::env;
 ///
 /// // Due to the `delete_webhook` function requiring you to authenticate, you
 /// // must have initialized a client first.
 /// let client = Client::login_user(&env::var("DISCORD_TOKEN").unwrap());
 ///
-/// http::delete_webhook(245037420704169985).expect("err deleting webhook");
+/// rest::delete_webhook(245037420704169985).expect("err deleting webhook");
 /// ```
 ///
 /// [`Webhook`]: ../../model/struct.Webhook.html
@@ -556,12 +556,12 @@ pub fn delete_webhook(webhook_id: u64) -> Result<()> {
 /// Delete a webhook given its Id and unique token:
 ///
 /// ```rust,no_run
-/// use serenity::client::http;
+/// use serenity::client::rest;
 ///
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 ///
-/// http::delete_webhook_with_token(id, token).expect("err deleting webhook");
+/// rest::delete_webhook_with_token(id, token).expect("err deleting webhook");
 ///
 /// [`Webhook`]: ../../model/struct.Webhook.html
 pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
@@ -697,7 +697,7 @@ pub fn edit_role(guild_id: u64, role_id: u64, map: Value)
 /// extern crate serenity;
 ///
 /// use serde_json::builder::ObjectBuilder;
-/// use serenity::client::http;
+/// use serenity::client::rest;
 ///
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
@@ -705,7 +705,7 @@ pub fn edit_role(guild_id: u64, role_id: u64, map: Value)
 ///     .expect("err reading image");
 /// let map = ObjectBuilder::new().insert("avatar", image).build();
 ///
-/// let edited = http::edit_webhook_with_token(id, token, map)
+/// let edited = rest::edit_webhook_with_token(id, token, map)
 ///     .expect("err editing webhook");
 /// ```
 ///
@@ -738,13 +738,13 @@ pub fn edit_webhook(webhook_id: u64, map: Value) -> Result<Webhook> {
 /// extern crate serenity;
 ///
 /// use serde_json::builder::ObjectBuilder;
-/// use serenity::client::http;
+/// use serenity::client::rest;
 ///
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 /// let map = ObjectBuilder::new().insert("name", "new name").build();
 ///
-/// let edited = http::edit_webhook_with_token(id, token, map)
+/// let edited = rest::edit_webhook_with_token(id, token, map)
 ///     .expect("err editing webhook");
 /// ```
 ///
@@ -797,13 +797,13 @@ pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: Value)
 /// extern crate serenity;
 ///
 /// use serde_json::builder::ObjectBuilder;
-/// use serenity::client::http;
+/// use serenity::client::rest;
 ///
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 /// let map = ObjectBuilder::new().insert("content", "test").build();
 ///
-/// let message = match http::execute_webhook(id, token, map) {
+/// let message = match rest::execute_webhook(id, token, map) {
 ///     Ok(message) => message,
 ///     Err(why) => {
 ///         println!("Error executing webhook: {:?}", why);
@@ -871,11 +871,11 @@ pub fn get_channel_invites(channel_id: u64)
 /// Retrieve all of the webhooks owned by a channel:
 ///
 /// ```rust,no_run
-/// use serenity::client::http;
+/// use serenity::client::rest;
 ///
 /// let channel_id = 81384788765712384;
 ///
-/// let webhooks = http::get_channel_webhooks(channel_id)
+/// let webhooks = rest::get_channel_webhooks(channel_id)
 ///     .expect("err getting channel webhooks");
 /// ```
 ///
@@ -1005,11 +1005,11 @@ pub fn get_guild_regions(guild_id: u64) -> Result<Vec<VoiceRegion>> {
 /// Retrieve all of the webhooks owned by a guild:
 ///
 /// ```rust,no_run
-/// use serenity::client::http;
+/// use serenity::client::rest;
 ///
 /// let guild_id = 81384788765712384;
 ///
-/// let webhooks = http::get_guild_webhooks(guild_id)
+/// let webhooks = rest::get_guild_webhooks(guild_id)
 ///     .expect("err getting guild webhooks");
 /// ```
 ///
@@ -1143,10 +1143,10 @@ pub fn get_voice_regions() -> Result<Vec<VoiceRegion>> {
 /// Retrieve a webhook by Id:
 ///
 /// ```rust,no_run
-/// use serenity::client::http;
+/// use serenity::client::rest;
 ///
 /// let id = 245037420704169985;
-/// let webhook = http::get_webhook(id).expect("err getting webhook");
+/// let webhook = rest::get_webhook(id).expect("err getting webhook");
 /// ```
 ///
 /// [`get_webhook_with_token`]: fn.get_webhook_with_token.html
@@ -1165,12 +1165,12 @@ pub fn get_webhook(webhook_id: u64) -> Result<Webhook> {
 /// Retrieve a webhook by Id and its unique token:
 ///
 /// ```rust,no_run
-/// use serenity::client::http;
+/// use serenity::client::rest;
 ///
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 ///
-/// let webhook = http::get_webhook_with_token(id, token)
+/// let webhook = rest::get_webhook_with_token(id, token)
 ///     .expect("err getting webhook");
 /// ```
 pub fn get_webhook_with_token(webhook_id: u64, token: &str) -> Result<Webhook> {

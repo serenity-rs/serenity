@@ -2,19 +2,19 @@ use serde_json::builder::ObjectBuilder;
 use std::mem;
 use super::{Message, Webhook};
 use ::utils::builder::ExecuteWebhook;
-use ::client::http;
+use ::client::rest;
 use ::internal::prelude::*;
 
 impl Webhook {
     /// Deletes the webhook.
     ///
-    /// As this calls the [`http::delete_webhook_with_token`] function,
+    /// As this calls the [`rest::delete_webhook_with_token`] function,
     /// authentication is not required.
     ///
-    /// [`http::delete_webhook_with_token`]: ../client/http/fn.delete_webhook_with_token.html
+    /// [`rest::delete_webhook_with_token`]: ../client/rest/fn.delete_webhook_with_token.html
     #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<()> {
-        http::delete_webhook_with_token(self.id.0, &self.token)
+        rest::delete_webhook_with_token(self.id.0, &self.token)
     }
 
     ///
@@ -23,9 +23,9 @@ impl Webhook {
     /// To nullify the avatar, pass `Some("")`. Otherwise, passing `None` will
     /// not modify the avatar.
     ///
-    /// Refer to [`http::edit_webhook`] for restrictions on editing webhooks.
+    /// Refer to [`rest::edit_webhook`] for restrictions on editing webhooks.
     ///
-    /// As this calls the [`http::edit_webhook_with_token`] function,
+    /// As this calls the [`rest::edit_webhook_with_token`] function,
     /// authentication is not required.
     ///
     /// # Examples
@@ -33,12 +33,12 @@ impl Webhook {
     /// Editing a webhook's name:
     ///
     /// ```rust,no_run
-    /// use serenity::client::http;
+    /// use serenity::client::rest;
     ///
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// let mut webhook = http::get_webhook_with_token(id, token)
+    /// let mut webhook = rest::get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
     /// let _ = webhook.edit(Some("new name"), None).expect("err editing");
@@ -47,12 +47,12 @@ impl Webhook {
     /// Setting a webhook's avatar:
     ///
     /// ```rust,no_run
-    /// use serenity::client::http;
+    /// use serenity::client::rest;
     ///
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// let mut webhook = http::get_webhook_with_token(id, token)
+    /// let mut webhook = rest::get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
     /// let image = serenity::utils::read_image("./webhook_img.png")
@@ -61,8 +61,8 @@ impl Webhook {
     /// let _ = webhook.edit(None, Some(&image)).expect("err editing");
     /// ```
     ///
-    /// [`http::edit_webhook`]: ../client/http/fn.edit_webhook.html
-    /// [`http::edit_webhook_with_token`]: ../client/http/fn.edit_webhook_with_token.html
+    /// [`rest::edit_webhook`]: ../client/rest/fn.edit_webhook.html
+    /// [`rest::edit_webhook_with_token`]: ../client/rest/fn.edit_webhook_with_token.html
     #[cfg(feature="methods")]
     pub fn edit(&mut self, name: Option<&str>, avatar: Option<&str>)
         -> Result<()> {
@@ -86,7 +86,7 @@ impl Webhook {
 
         let map = map.build();
 
-        match http::edit_webhook_with_token(self.id.0, &self.token, map) {
+        match rest::edit_webhook_with_token(self.id.0, &self.token, map) {
             Ok(replacement) => {
                 mem::replace(self, replacement);
 
@@ -106,12 +106,12 @@ impl Webhook {
     /// Execute a webhook with message content of `test`:
     ///
     /// ```rust,no_run
-    /// use serenity::client::http;
+    /// use serenity::client::rest;
     ///
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// let mut webhook = http::get_webhook_with_token(id, token)
+    /// let mut webhook = rest::get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
     /// let _ = webhook.execute(|w| w.content("test")).expect("err executing");
@@ -121,13 +121,13 @@ impl Webhook {
     /// username to `serenity`, and sending an embed:
     ///
     /// ```rust,no_run
-    /// use serenity::client::http;
+    /// use serenity::client::rest;
     /// use serenity::model::Embed;
     ///
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// let mut webhook = http::get_webhook_with_token(id, token)
+    /// let mut webhook = rest::get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
     /// let embed = Embed::fake(|e| e
@@ -148,19 +148,19 @@ impl Webhook {
         where F: FnOnce(ExecuteWebhook) -> ExecuteWebhook {
         let map = f(ExecuteWebhook::default()).0.build();
 
-        http::execute_webhook(self.id.0, &self.token, map)
+        rest::execute_webhook(self.id.0, &self.token, map)
     }
 
     /// Retrieves the latest information about the webhook, editing the
     /// webhook in-place.
     ///
-    /// As this calls the [`http::get_webhook_with_token`] function,
+    /// As this calls the [`rest::get_webhook_with_token`] function,
     /// authentication is not required.
     ///
-    /// [`http::get_webhook_with_token`]: ../client/http/fn.get_webhook_with_token.html
+    /// [`rest::get_webhook_with_token`]: ../client/rest/fn.get_webhook_with_token.html
     #[cfg(feature="methods")]
     pub fn refresh(&mut self) -> Result<()> {
-        match http::get_webhook_with_token(self.id.0, &self.token) {
+        match rest::get_webhook_with_token(self.id.0, &self.token) {
             Ok(replacement) => {
                 mem::replace(self, replacement);
 

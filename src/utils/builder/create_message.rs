@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use std::default::Default;
 use super::CreateEmbed;
 
-/// A builder to specify the contents of an [`http::create_message`] request,
+/// A builder to specify the contents of an [`rest::create_message`] request,
 /// primarily meant for use through [`Context::send_message`].
 ///
 /// There are two situations where different field requirements are present:
@@ -31,7 +31,7 @@ use super::CreateEmbed;
 /// [`Context::send_message`]: ../../client/struct.Context.html#method.send_message
 /// [`content`]: #method.content
 /// [`embed`]: #method.embed
-/// [`http::create_message`]: ../../client/http/fn.create_message.html
+/// [`rest::create_message`]: ../../client/rest/fn.create_message.html
 pub struct CreateMessage(pub BTreeMap<String, Value>);
 
 impl CreateMessage {

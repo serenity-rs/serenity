@@ -20,7 +20,7 @@ use super::Message;
 #[cfg(feature = "methods")]
 use time::Timespec;
 #[cfg(feature = "methods")]
-use ::client::http;
+use ::client::rest;
 
 #[cfg(feature = "cache")]
 use ::client::CACHE;
@@ -76,14 +76,14 @@ impl User {
                     .insert("recipient_id", self.id.0)
                     .build();
 
-                try!(http::create_private_channel(map)).id
+                try!(rest::create_private_channel(map)).id
             }
         } else {
             let map = ObjectBuilder::new()
                 .insert("recipient_id", self.id.0)
                 .build();
 
-            try!(http::create_private_channel(map)).id
+            try!(rest::create_private_channel(map)).id
         }};
 
         let map = ObjectBuilder::new()
@@ -92,7 +92,7 @@ impl User {
             .insert("tts", false)
             .build();
 
-        http::send_message(private_channel_id.0, map)
+        rest::send_message(private_channel_id.0, map)
     }
 
     /// Check if a user has a [`Role`]. This will retrieve the

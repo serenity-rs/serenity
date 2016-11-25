@@ -34,10 +34,10 @@ pub type Result<T> = ::std::result::Result<T, Error>;
 /// [`Result`]: type.Result.html
 #[derive(Debug)]
 pub enum Error {
-    /// An [http] or [client] error.
+    /// A [rest] or [client] error.
     ///
     /// [client]: client/index.html
-    /// [http]: client/http/index.html
+    /// [rest]: client/rest/index.html
     Client(ClientError),
     /// An error with the WebSocket [`Gateway`].
     ///
