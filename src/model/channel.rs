@@ -426,9 +426,6 @@ impl Message {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidUser`] if the current user is not the
-    /// author.
-    ///
     /// Returns a [`ClientError::InvalidPermissions`] if the current user does
     /// not have the required permissions.
     ///
@@ -439,12 +436,9 @@ impl Message {
     pub fn delete(&self) -> Result<()> {
         let req = permissions::MANAGE_MESSAGES;
         let is_author = self.author.id != CACHE.read().unwrap().user.id;
+        let has_perms = try!(utils::user_has_perms(self.channel_id, req));
 
-        if is_author {
-            return Err(Error::Client(ClientError::InvalidUser));
-        }
-
-        if !try!(utils::user_has_perms(self.channel_id, req)) && !is_author {
+        if !is_author && !has_perms {
             return Err(Error::Client(ClientError::InvalidPermissions(req)));
         }
 
