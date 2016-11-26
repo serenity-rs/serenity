@@ -5,16 +5,16 @@ extern crate serenity;
 #[cfg(feature = "voice")]
 use serenity::client::{CACHE, Client, Context};
 #[cfg(feature = "voice")]
-use serenity::model::{Channel, ChannelId, Message};
+use serenity::model::{ChannelId, Message};
 #[cfg(feature = "voice")]
 use std::env;
 
-#[cfg(not(feature = "voice"))]
+#[cfg(any(not(feature = "extras"), not(feature = "voice")))]
 fn main() {
-    panic!("Voice not enabled");
+    panic!("'extras' and 'voice' must be enabled");
 }
 
-#[cfg(feature = "voice")]
+#[cfg(all(feature = "extras", feature = "voice"))]
 fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
@@ -36,17 +36,12 @@ fn main() {
     let _ = client.start();
 }
 
-#[cfg(feature = "voice")]
+#[cfg(all(feature = "extras", feature = "voice"))]
 fn deafen(context: Context, message: Message, _args: Vec<String>) {
-    let guild_id = match CACHE.read().unwrap().get_channel(message.channel_id) {
-        Some(Channel::Guild(channel)) => channel.guild_id,
-        Some(_) => {
-            let _ = message.reply("Groups and DMs not supported");
-
-            return;
-        },
+    let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
+        Some(channel) => channel.guild_id,
         None => {
-            let _ = context.say("Can't find guild");
+            let _ = context.say("Groups and DMs not supported");
 
             return;
         },
@@ -72,7 +67,7 @@ fn deafen(context: Context, message: Message, _args: Vec<String>) {
     }
 }
 
-#[cfg(feature = "voice")]
+#[cfg(all(feature = "extras", feature = "voice"))]
 fn join(context: Context, message: Message, args: Vec<String>) {
     let connect_to = match args.get(0) {
         Some(arg) => match arg.parse::<u64>() {
@@ -90,15 +85,10 @@ fn join(context: Context, message: Message, args: Vec<String>) {
         },
     };
 
-    let guild_id = match CACHE.read().unwrap().get_channel(message.channel_id) {
-        Some(Channel::Guild(channel)) => channel.guild_id,
-        Some(_) => {
-            let _ = context.say("Groups and DMs not supported");
-
-            return;
-        },
+    let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
+        Some(channel) => channel.guild_id,
         None => {
-            let _ = context.say("Can't find guild");
+            let _ = context.say("Groups and DMs not supported");
 
             return;
         },
@@ -112,17 +102,12 @@ fn join(context: Context, message: Message, args: Vec<String>) {
     let _ = context.say(&format!("Joined {}", connect_to.mention()));
 }
 
-#[cfg(feature = "voice")]
+#[cfg(all(feature = "extras", feature = "voice"))]
 fn leave(context: Context, message: Message, _args: Vec<String>) {
-    let guild_id = match CACHE.read().unwrap().get_channel(message.channel_id) {
-        Some(Channel::Guild(channel)) => channel.guild_id,
-        Some(_) => {
-            let _ = context.say("Groups and DMs not supported");
-
-            return;
-        },
+    let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
+        Some(channel) => channel.guild_id,
         None => {
-            let _ = context.say("Can't find guild");
+            let _ = context.say("Groups and DMs not supported");
 
             return;
         },
@@ -142,17 +127,12 @@ fn leave(context: Context, message: Message, _args: Vec<String>) {
     }
 }
 
-#[cfg(feature = "voice")]
+#[cfg(all(feature = "extras", feature = "voice"))]
 fn mute(context: Context, message: Message, _args: Vec<String>) {
-    let guild_id = match CACHE.read().unwrap().get_channel(message.channel_id) {
-        Some(Channel::Guild(channel)) => channel.guild_id,
-        Some(_) => {
-            let _ = message.reply("Groups and DMs not supported");
-
-            return;
-        },
+    let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
+        Some(channel) => channel.guild_id,
         None => {
-            let _ = context.say("Can't find guild");
+            let _ = context.say("Groups and DMs not supported");
 
             return;
         },

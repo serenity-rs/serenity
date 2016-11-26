@@ -132,6 +132,19 @@ impl Cache {
         self.guilds.get(&id.into())
     }
 
+    #[cfg(feature = "extras")]
+    pub fn get_guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<&GuildChannel> {
+        let id = id.into();
+
+        for guild in self.guilds.values() {
+            if let Some(channel) = guild.channels.get(&id) {
+                return Some(channel);
+            }
+        }
+
+        None
+    }
+
     pub fn get_group<C: Into<ChannelId>>(&self, id: C) -> Option<&Group> {
         self.groups.get(&id.into())
     }
