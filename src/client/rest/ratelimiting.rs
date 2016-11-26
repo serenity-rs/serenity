@@ -43,10 +43,9 @@ use hyper::client::{RequestBuilder, Response};
 use hyper::header::Headers;
 use hyper::status::StatusCode;
 use std::collections::HashMap;
-use std::str;
 use std::sync::{Arc, Mutex};
-use std::thread;
 use std::time::Duration;
+use std::{str, thread};
 use time;
 use ::internal::prelude::*;
 
