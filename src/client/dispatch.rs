@@ -257,7 +257,8 @@ fn handle_event(event: Event,
                 feature_cache! {{
                     let before = CACHE.read()
                         .unwrap()
-                        .get_channel(event.channel.id());
+                        .get_channel(event.channel.id())
+                        .map(|x| x.clone_inner());
                     update!(update_with_channel_update, event);
 
                     thread::spawn(move || {

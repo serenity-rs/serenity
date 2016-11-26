@@ -11,7 +11,7 @@ impl ChannelId {
     /// Search the cache for the channel with the Id.
     #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn find(&self) -> Option<Channel> {
-        CACHE.read().unwrap().get_channel(*self)
+        CACHE.read().unwrap().get_channel(*self).map(|x| x.clone_inner())
     }
 
     /// Search the cache for the channel. If it can't be found, the channel is
@@ -20,7 +20,7 @@ impl ChannelId {
     pub fn get(&self) -> Result<Channel> {
         feature_cache_enabled! {{
             if let Some(channel) = CACHE.read().unwrap().get_channel(*self) {
-                return Ok(channel.clone());
+                return Ok(channel.clone_inner());
             }
         }}
 

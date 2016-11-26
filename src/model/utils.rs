@@ -21,6 +21,8 @@ use ::utils::{decode_array, into_array};
 use super::permissions::{self, Permissions};
 #[cfg(all(feature = "cache", feature = "methods"))]
 use ::client::CACHE;
+#[cfg(all(feature = "cache", feature = "methods"))]
+use ::ext::cache::ChannelRef;
 
 #[macro_escape]
 macro_rules! missing {
@@ -284,10 +286,10 @@ pub fn user_has_perms(channel_id: ChannelId,
     };
 
     let guild_id = match channel {
-        Channel::Group(_) | Channel::Private(_) => {
+        ChannelRef::Group(_) | ChannelRef::Private(_) => {
             return Ok(permissions == permissions::MANAGE_MESSAGES);
         },
-        Channel::Guild(channel) => channel.guild_id,
+        ChannelRef::Guild(channel) => channel.guild_id,
     };
 
     let guild = match cache.get_guild(guild_id) {

@@ -833,7 +833,7 @@ impl Context {
 
         feature_cache_enabled! {{
             if let Some(channel) = CACHE.read().unwrap().get_channel(channel_id) {
-                return Ok(channel.clone());
+                return Ok(channel.clone_inner());
             }
         }}
 

@@ -114,13 +114,21 @@ impl Cache {
         self.calls.get(&group_id.into())
     }
 
-    pub fn get_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
+    pub fn get_channel<C: Into<ChannelId>>(&self, id: C) -> Option<ChannelRef> {
         let id = id.into();
+
+        if let Some(private_channel) = self.private_channels.get(&id) {
+            return Some(ChannelRef::Private(private_channel));
+        }
+
+        if let Some(group) = self.groups.get(&id) {
+            return Some(ChannelRef::Group(group));
+        }
 
         for guild in self.guilds.values() {
             for channel in guild.channels.values() {
                 if channel.id == id {
-                    return Some(Channel::Guild(channel.clone()));
+                    return Some(ChannelRef::Guild(channel));
                 }
             }
         }
@@ -849,14 +857,25 @@ fn update_presence(presences: &mut HashMap<UserId, Presence>,
 }
 
 /// A reference to a private channel, guild's channel, or group.
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum ChannelRef<'a> {
     /// A group's channel
     Group(&'a Group),
     /// A guild channel and its guild
-    Guild(&'a Guild, &'a GuildChannel),
+    Guild(&'a GuildChannel),
     /// A private channel
     Private(&'a PrivateChannel),
+}
+
+impl<'a> ChannelRef<'a> {
+    /// Clones the inner value of the variant.
+    pub fn clone_inner(&self) -> Channel {
+        match *self {
+            ChannelRef::Group(group) => Channel::Group(group.clone()),
+            ChannelRef::Guild(channel) => Channel::Guild(channel.clone()),
+            ChannelRef::Private(private) => Channel::Private(private.clone()),
+        }
+    }
 }
 
 fn opt_modify<T: Clone>(dest: &mut T, src: &Option<T>) {
