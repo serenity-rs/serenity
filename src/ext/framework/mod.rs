@@ -11,8 +11,44 @@ use std::thread;
 use ::client::Context;
 use ::model::Message;
 
+/// A macro to generate "named parameters". This is useful to avoid manually
+/// using the "arguments" parameter and manually parsing types.
+///
+/// This is meant for use with the command [`Framework`].
+///
+/// # Examples
+///
+/// Create a regular `ping` command which takes no arguments:
+///
+/// ```rust,ignore
+/// command!(ping(_context, message, _args) {
+///     if let Err(why) = message.reply("Pong!") {
+///         println!("Error sending pong: {:?}", why);
+///     }
+/// });
+/// ```
+///
+/// Create a command named `multiply` which accepts 2 floats and multiplies
+/// them, sending the returned value:
+///
+/// ```rust,ignore
+/// command!(multiply(_context, message, _args, first: f64, second: f64) {
+///     let product = first * second;
+///
+///     if let Err(why) = message.reply(&product.to_string()) {
+///         println!("Error sending product: {:?}", why);
+///     }
+/// });
+/// ```
+///
+/// [`Framework`]: ext/framework/index.html
 #[macro_export]
 macro_rules! command {
+    ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
+        fn $fname($c: Context, $m: Message, $a: Vec<String>) {
+            $b
+        }
+    };
     ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
         fn $fname($c: Context, $m: Message, $a: Vec<String>) {
             let mut i = $a.iter();
@@ -31,7 +67,7 @@ macro_rules! command {
 
             $b
         }
-    }
+    };
 }
 
 /// The type of command being received.

@@ -43,9 +43,9 @@ fn main() {
     let _ = client.start();
 }
 
-fn cat_command(context: Context, _msg: Message, _args: Vec<String>) {
+command!(cat_command(context, _msg, _arg) {
     let _ = context.say(":cat:");
-}
+});
 
 fn dog_command(context: Context, _msg: Message, _args: Vec<String>) {
     let _ = context.say(":dog:");
