@@ -16,15 +16,8 @@ use websocket::ws::sender::Sender as WsSender;
 use ::constants::OpCode;
 use ::internal::prelude::*;
 use ::internal::ws_impl::{ReceiverExt, SenderExt};
-use ::model::{
-    ChannelId,
-    Event,
-    Game,
-    GatewayEvent,
-    GuildId,
-    OnlineStatus,
-    ReadyEvent,
-};
+use ::model::event::{Event, GatewayEvent, ReadyEvent};
+use ::model::{ChannelId, Game, GuildId, OnlineStatus};
 
 #[cfg(feature="voice")]
 use ::ext::voice::Manager as VoiceManager;

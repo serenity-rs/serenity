@@ -17,7 +17,7 @@ use websocket::stream::WebSocketStream;
 use ::constants::{self, OpCode};
 use ::error::{Error, Result};
 use ::internal::ws_impl::{ReceiverExt, SenderExt};
-use ::model::{Event, GatewayEvent, ReadyEvent};
+use ::model::event::{Event, GatewayEvent, ReadyEvent};
 
 #[inline]
 pub fn parse_ready(event: GatewayEvent,

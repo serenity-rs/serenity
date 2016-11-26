@@ -82,7 +82,7 @@ pub struct Framework {
     /// itself.
     ///
     /// [`Client::on_message`]: ../../client/struct.Client.html#method.on_message
-    /// [`Event::MessageCreate`]: ../../model/enum.Event.html#variant.MessageCreate
+    /// [`Event::MessageCreate`]: ../../model/event/enum.Event.html#variant.MessageCreate
     pub initialized: bool,
 }
 

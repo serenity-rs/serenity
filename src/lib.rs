@@ -61,19 +61,19 @@
 //! }
 //! ```
 //!
+//! [`Cache`]: ext/cache/struct.Cache.html
 //! [`Client::login_bot`]: client/struct.Client.html#method.login_bot
 //! [`Client::login_user`]: client/struct.Client.html#method.login_user
 //! [`Client::on_message`]: client/struct.Client.html#method.on_message
-//! [`validate_token`]: client/fn.validate_token.html
 //! [`Connection`]: client/struct.Connection.html
 //! [`Context`]: client/struct.Context.html
-//! [`Event`]: model/enum.Event.html
-//! [`Event::MessageCreate`]: model/enum.Event.html#variant.MessageCreate
-//! [`Cache`]: ext/cache/struct.Cache.html
+//! [`Event`]: model/event/enum.Event.html
+//! [`Event::MessageCreate`]: model/event/enum.Event.html#variant.MessageCreate
+//! [cache docs]: ext/cache/index.html
 //! [client's module-level documentation]: client/index.html
 //! [docs]: https://discordapp.com/developers/docs/intro
 //! [examples]: https://github.com/zeyla/serenity.rs/tree/master/examples
-//! [cache docs]: ext/cache/index.html
+//! [`validate_token`]: client/fn.validate_token.html
 #![allow(doc_markdown, inline_always, unknown_lints)]
 #![warn(dead_code, enum_glob_use, if_not_else)]
 

@@ -1,7 +1,9 @@
-pub mod permissions;
-
 #[macro_use]
 mod utils;
+
+pub mod event;
+pub mod permissions;
+
 
 mod channel;
 mod gateway;

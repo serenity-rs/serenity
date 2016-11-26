@@ -2,6 +2,16 @@ use serde_json::Value;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 use super::context::Context;
+use ::model::event::{
+    ChannelPinsAckEvent,
+    ChannelPinsUpdateEvent,
+    GuildSyncEvent,
+    MessageUpdateEvent,
+    PresenceUpdateEvent,
+    ResumedEvent,
+    TypingStartEvent,
+    VoiceServerUpdateEvent,
+};
 use ::model::*;
 
 // This should use type macros when stable receives the type macro
