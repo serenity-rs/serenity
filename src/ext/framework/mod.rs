@@ -1,3 +1,58 @@
+//! The framework is a customizable method of separating commands, used in
+//! combination with [`Client::with_framework`].
+//!
+//! The framework has a number of configurations, and can have any number of
+//! commands bound to it. The primary purpose of it is to offer the utility of
+//! not needing to manually match message content strings to determine if a
+//! message is a command.
+//!
+//! Additionally, "checks" can be added to commands, to ensure that a certain
+//! condition is met prior to calling a command; this could be a check that the
+//! user who posted a message owns the bot, for example.
+//!
+//! Each command has a given named, and an associated function/closure. For
+//! example, you might have two commands: `"ping"` and `"weather"`. These each
+//! have an associated function that are called if the framework determines
+//! that a message is of that command.
+//!
+//! Assuming a command prefix of `"~"`, then the following would occur with the
+//! two previous commands:
+//!
+//! ```ignore
+//! ~ping // calls the ping command's function
+//! ~pin // does not
+//! ~ ping // _does_ call it _if_ the `allow_whitespace` option is enabled
+//! ~~ping // does not
+//! ```
+//!
+//! # Examples
+//!
+//! Configuring a Client with a framework, which has a prefix of `"~"` and a
+//! ping and about command:
+//!
+//! ```rust,no_run
+//! use serenity::client::{Client, Context};
+//! use serenity::model::Message;
+//! use std::env;
+//!
+//! let mut client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN").unwrap());
+//!
+//! client.with_framework(|f| f
+//!     .configure(|c| c.prefix("~"))
+//!     .on("about", about)
+//!     .on("ping", ping));
+//!
+//! fn about(context: Context, _message: Message, _args: Vec<String>) {
+//!     let _ = context.say("A simple test bot");
+//! }
+//!
+//! fn ping(context: Context, _message: Message, _args: Vec<String>) {
+//!     let _ = context.say("Pong!");
+//! }
+//! ```
+//!
+//! [`Client::with_framework`]: ../../client/struct.Client.html#method.with_framework
+
 mod command;
 mod configuration;
 
@@ -98,6 +153,11 @@ pub enum CommandType {
     Prefix,
 }
 
+/// A utility for easily managing dispatches to commands.
+///
+/// Refer to the [module-level documentation] for more information.
+///
+/// [module-level documentation]: index.html
 #[allow(type_complexity)]
 #[derive(Default)]
 pub struct Framework {
@@ -218,6 +278,16 @@ impl Framework {
         }
     }
 
+    /// Adds a function to be associated with a command, which will be called
+    /// when a command is used in a message.
+    ///
+    /// This requires that a check - if one exists - passes, prior to being
+    /// called.
+    ///
+    /// Refer to the [module-level documentation] for more information and
+    /// usage.
+    ///
+    /// [module-level documentation]: index.html
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
         where F: Fn(Context, Message, Vec<String>) + Send + Sync + 'static,
               S: Into<String> {
@@ -227,6 +297,35 @@ impl Framework {
         self
     }
 
+    /// Adds a "check" to a command, which checks whether or not the command's
+    /// associated function should be called.
+    ///
+    /// # Examples
+    ///
+    /// Ensure that the user who created a message, calling a "ping" command,
+    /// is the owner.
+    ///
+    /// ```rust,no_run
+    /// use serenity::client::{Client, Context};
+    /// use serenity::model::Message;
+    /// use std::env;
+    ///
+    /// let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").unwrap());
+    ///
+    /// client.with_framework(|f| f
+    ///     .configure(|c| c.prefix("~"))
+    ///     .on("ping", ping)
+    ///     .set_check("ping", owner_check));
+    ///
+    /// fn ping(context: Context, _message: Message, _args: Vec<String>) {
+    ///     context.say("Pong!");
+    /// }
+    ///
+    /// fn owner_check(_context: &Context, message: &Message) -> bool {
+    ///     // replace with your user ID
+    ///     message.author.id == 7
+    /// }
+    /// ```
     pub fn set_check<F, S>(mut self, command: S, check: F) -> Self
         where F: Fn(&Context, &Message) -> bool + Send + Sync + 'static,
               S: Into<String> {

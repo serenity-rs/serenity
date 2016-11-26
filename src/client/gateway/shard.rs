@@ -32,6 +32,10 @@ type CurrentPresence = (Option<Game>, OnlineStatus, bool);
 /// Refer to the [module-level documentation][module docs] for information on
 /// effectively using multiple shards, if you need to.
 ///
+/// Note that there are additional methods available if you are manually
+/// managing a shard yourself, although they are hidden from the documentation
+/// since there are few use cases for doing such.
+///
 /// # Stand-alone shards
 ///
 /// You may instantiate a shard yourself - decoupled from the [`Client`] - if
@@ -63,6 +67,8 @@ pub struct Shard {
     shard_info: Option<[u8; 2]>,
     token: String,
     ws_url: String,
+    /// The voice connections that this Shard is responsible for. The Shard will
+    /// update the voice connections' states.
     #[cfg(feature = "voice")]
     pub manager: VoiceManager,
 }
@@ -159,6 +165,13 @@ impl Shard {
         }}, ready, receiver))
     }
 
+    /// Retrieves a copy of the current shard information.
+    ///
+    /// The first element is the _current_ shard - 0-indexed - while the second
+    /// element is the _total number_ of shards -- 1-indexed.
+    ///
+    /// For example, if using 3 shards in total, and if this is shard 1, then it
+    /// can be read as "the second of three shards".
     pub fn shard_info(&self) -> Option<[u8; 2]> {
         self.shard_info
     }
@@ -188,6 +201,9 @@ impl Shard {
     /// converted to [`Invisible`].
     ///
     /// Other presence settings are maintained.
+    ///
+    /// [`Invisible`]: ../../model/enum.OnlineStatus.html#variant.Invisible
+    /// [`Offline`]: ../../model/enum.OnlineStatus.html#variant.Offline
     pub fn set_status(&mut self, online_status: OnlineStatus) {
         self.current_presence.1 = match online_status {
             OnlineStatus::Offline => OnlineStatus::Invisible,
@@ -232,6 +248,17 @@ impl Shard {
         self.update_presence();
     }
 
+    /// Handles an event from the gateway over the receiver, requiring the
+    /// receiver to be passed if a reconnect needs to occur.
+    ///
+    /// The best case scenario is that one of two values is returned:
+    ///
+    /// - `Ok(None)`: a heartbeat, late hello, or session invalidation was
+    ///   received;
+    /// - `Ok(Some((event, None)))`: an op0 dispatch was received, and the
+    ///   shard's voice state will be updated, _if_ the `voice` feature is
+    ///   enabled.
+    #[doc(hidden)]
     pub fn handle_event(&mut self,
                         event: Result<GatewayEvent>,
                         mut receiver: &mut Receiver<WebSocketStream>)
@@ -318,6 +345,9 @@ impl Shard {
         }
     }
 
+    /// Shuts down the receiver by attempting to cleanly close the
+    /// connection.
+    #[doc(hidden)]
     pub fn shutdown(&mut self, receiver: &mut Receiver<WebSocketStream>)
         -> Result<()> {
         let stream = receiver.get_mut().get_mut();
@@ -335,6 +365,9 @@ impl Shard {
         Ok(())
     }
 
+    /// Syncs a number of [`Call`]s, given by their associated channel Ids. This
+    /// will allow the current user to know what calls are currently occurring,
+    /// as otherwise events will not be received.
     pub fn sync_calls(&self, channels: &[ChannelId]) {
         for &channel in channels {
             let msg = ObjectBuilder::new()
@@ -348,6 +381,18 @@ impl Shard {
         }
     }
 
+    /// Requests that one or multiple [`Guild`]s be synced.
+    ///
+    /// This will ask Discord to start sending member chunks for large guilds
+    /// (250 members+). If a guild is over 250 members, then a full member list
+    /// will not be downloaded, and must instead be requested to be sent in
+    /// "chunks" containing members.
+    ///
+    /// Member chunks are sent as the [`Event::GuildMembersChunk`] event. Each
+    /// chunk only contains a partial amount of the total members.
+    ///
+    /// If the `cache` feature is enabled, the cache will automatically be
+    /// updated with member chunks.
     pub fn sync_guilds(&self, guild_ids: &[GuildId]) {
         let msg = ObjectBuilder::new()
             .insert("op", OpCode::SyncGuild.num())
@@ -383,7 +428,8 @@ impl Shard {
         }}
     }
 
-    fn reconnect(&mut self, mut receiver: &mut Receiver<WebSocketStream>) -> Result<(Event, Receiver<WebSocketStream>)> {
+    fn reconnect(&mut self, mut receiver: &mut Receiver<WebSocketStream>)
+        -> Result<(Event, Receiver<WebSocketStream>)> {
         debug!("Reconnecting");
 
         // Take a few attempts at reconnecting; otherwise fall back to

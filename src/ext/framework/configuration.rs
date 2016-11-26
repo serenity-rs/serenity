@@ -1,6 +1,28 @@
 use std::default::Default;
 use ::client::rest;
 
+/// The configuration to use for a [`Framework`] associated with a [`Client`]
+/// instance.
+///
+/// This allows setting configurations like the depth to search for commands,
+/// whether to treat mentions like a command prefix, etc.
+///
+/// # Examples
+///
+/// Responding to mentions and setting a command prefix of `"~"`:
+///
+/// ```rust,no_run
+/// use serenity::Client;
+/// use std::env;
+///
+/// let mut client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN").unwrap());
+///
+/// client.with_framework(|f| f
+///     .configure(|c| c.on_mention(true).prefix("~")));
+/// ```
+///
+/// [`Client`]: ../../client/struct.Client.html
+/// [`Framework`]: struct.Framework.html
 pub struct Configuration {
     #[doc(hidden)]
     pub depth: usize,

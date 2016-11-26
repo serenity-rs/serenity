@@ -3,6 +3,7 @@ use super::{CommandType, Configuration};
 use ::client::Context;
 use ::model::Message;
 
+#[doc(hidden)]
 pub type Command = Fn(Context, Message, Vec<String>) + Send + Sync;
 #[doc(hidden)]
 pub type InternalCommand = Arc<Command>;

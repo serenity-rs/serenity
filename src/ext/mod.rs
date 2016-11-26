@@ -1,5 +1,5 @@
-//! The set of extensions is functionality that is not required for a
-//! [`Client`] and/or [`Connection`] to properly function.
+//! A set of extended functionality that is not required for a [`Client`] and/or
+//! [`Shard`] to properly function.
 //!
 //! These are flagged behind feature-gates and can be enabled and disabled.
 //!
@@ -11,7 +11,7 @@
 //! to be enabled (disabled by default).
 //!
 //! [`Client`]: ../client/struct.Client.html
-//! [`Connection`]: ../client/struct.Connection.html
+//! [`Shard`]: ../client/gateway/struct.Shard.html
 
 #[cfg(feature = "cache")]
 pub mod cache;

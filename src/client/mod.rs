@@ -76,23 +76,36 @@ use ::model::event::{
 
 #[cfg(feature = "cache")]
 lazy_static! {
-    /// The CACHE is a mutable lazily-initialized static binding. It can be
-    /// accessed across any function and in any context.
+    /// A mutable and lazily-initialized static binding. It can be accessed
+    /// across any function and in any context.
     ///
     /// This [`Cache`] instance is updated for every event received, so you do
     /// not need to maintain your own cache.
     ///
     /// See the [cache module documentation] for more details.
     ///
+    /// The Cache itself is wrapped within an `RwLock`, which allows for
+    /// multiple readers or at most one writer at a time across threads. This
+    /// means that you may have multiple commands reading from the Cache
+    /// concurrently.
+    ///
     /// # Examples
     ///
-    /// Retrieve the [current user][`CurrentUser`]'s Id:
+    /// Retrieve the [current user][`CurrentUser`]'s Id, by opening a Read
+    /// guard:
     ///
     /// ```rust,ignore
     /// use serenity::client::CACHE;
     ///
-    /// println!("{}", CACHE.lock().unwrap().user.id);
+    /// println!("{}", CACHE.read().unwrap().user.id);
     /// ```
+    ///
+    /// By `unwrap()`ing, the thread managing an event dispatch will be blocked
+    /// until the guard can be opened.
+    ///
+    /// If you do not want to block the current thread, you may instead use
+    /// `RwLock::try_read`. Refer to `RwLock`'s documentation in the stdlib for
+    /// more information.
     ///
     /// [`CurrentUser`]: ../model/struct.CurrentUser.html
     /// [`Cache`]: ../ext/cache/struct.Cache.html

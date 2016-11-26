@@ -12,7 +12,7 @@ impl EditProfile {
     ///
     /// # Examples
     ///
-    /// A utility method - [`utils::read_message`] - is provided to read an
+    /// A utility method - [`utils::read_image`] - is provided to read an
     /// image from a file and return its contents in base64-encoded form:
     ///
     /// ```rust,ignore

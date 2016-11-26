@@ -112,7 +112,6 @@ impl MessageBuilder {
         self
     }
 
-
     /// Mentions the [`Role`] in the built message.
     ///
     /// This accepts anything that converts _into_ a [`RoleId`]. Refer to

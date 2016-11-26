@@ -1,5 +1,10 @@
 ---
 name: VerificationLevel
+description: >
+  The level to set as criteria prior to a user being able to send messages in a
+  [`Guild`].
+
+    [`Guild`]: struct.Guild.html
 variants:
   - variant: High
     number: 3

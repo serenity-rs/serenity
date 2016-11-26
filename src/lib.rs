@@ -25,10 +25,10 @@
 //! to avoid unnecessary HTTP requests to the Discord API. For more information,
 //! see the [cache's module-level documentation][cache docs].
 //!
-//! Note that - although this documentation will try to be as up-to-date and
-//! accurate as possible - Discord hosts [official documentation][docs]. If you
-//! need to be sure that some information piece is accurate, refer to their
-//! docs.
+//! Note that, although this documentation will try to be as up-to-date and
+//! accurate as possible, Discord hosts [official documentation][docs]. If you
+//! need to be sure that some information piece is sanctioned by Discord, refer
+//! to their own documentation.
 //!
 //! # Dependencies
 //!

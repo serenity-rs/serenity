@@ -1,8 +1,12 @@
 use std::fmt::{self, Display};
 
+/// An error that occurred while attempting to deal with the gateway.
+///
+/// Note that - from a user standpoint - there should be no situation in which
+/// you manually handle these.
 #[derive(Clone, Debug)]
 pub enum Error {
-    /// The connection closed
+    /// The connection unexpectedly (read: non-cleanly) closed.
     Closed(Option<u16>, String),
     /// Expected a Hello during a handshake
     ExpectedHello,
