@@ -1,7 +1,6 @@
 use super::utils::*;
 use super::*;
 use ::internal::prelude::*;
-use ::utils::decode_array;
 
 impl Game {
     #[cfg(feature="methods")]

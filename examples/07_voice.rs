@@ -9,12 +9,12 @@ use serenity::model::{ChannelId, Message};
 #[cfg(feature = "voice")]
 use std::env;
 
-#[cfg(any(not(feature = "extras"), not(feature = "voice")))]
+#[cfg(not(feature = "voice"))]
 fn main() {
     panic!("'extras' and 'voice' must be enabled");
 }
 
-#[cfg(all(feature = "extras", feature = "voice"))]
+#[cfg(feature = "voice")]
 fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
@@ -36,7 +36,7 @@ fn main() {
     let _ = client.start();
 }
 
-#[cfg(all(feature = "extras", feature = "voice"))]
+#[cfg(feature = "voice")]
 fn deafen(context: Context, message: Message, _args: Vec<String>) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
@@ -67,7 +67,7 @@ fn deafen(context: Context, message: Message, _args: Vec<String>) {
     }
 }
 
-#[cfg(all(feature = "extras", feature = "voice"))]
+#[cfg(feature = "voice")]
 fn join(context: Context, message: Message, args: Vec<String>) {
     let connect_to = match args.get(0) {
         Some(arg) => match arg.parse::<u64>() {
@@ -102,7 +102,7 @@ fn join(context: Context, message: Message, args: Vec<String>) {
     let _ = context.say(&format!("Joined {}", connect_to.mention()));
 }
 
-#[cfg(all(feature = "extras", feature = "voice"))]
+#[cfg(feature = "voice")]
 fn leave(context: Context, message: Message, _args: Vec<String>) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
@@ -127,7 +127,7 @@ fn leave(context: Context, message: Message, _args: Vec<String>) {
     }
 }
 
-#[cfg(all(feature = "extras", feature = "voice"))]
+#[cfg(feature = "voice")]
 fn mute(context: Context, message: Message, _args: Vec<String>) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
