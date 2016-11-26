@@ -44,19 +44,21 @@ impl Invite {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
-    /// not have the required [permission].
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have the required [permission].
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     /// [permission]: permissions/index.html
     #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<Invite> {
-        let req = permissions::MANAGE_GUILD;
+        feature_cache_enabled! {{
+            let req = permissions::MANAGE_GUILD;
 
-        if !try!(utils::user_has_perms(self.channel.id, req)) {
-            return Err(Error::Client(ClientError::InvalidPermissions(req)));
-        }
+            if !try!(utils::user_has_perms(self.channel.id, req)) {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }}
 
         rest::delete_invite(&self.code)
     }
@@ -75,8 +77,9 @@ impl RichInvite {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidOperationAsBot`] if the current user is
-    /// a bot user.
+    /// If the `cache` is enabled, returns a
+    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot
+    /// user.
     ///
     /// [`ClientError::InvalidOperationAsBot`]: enum.ClientError.html#variant.InvalidOperationAsBot
     /// [`Guild`]: struct.Guild.html

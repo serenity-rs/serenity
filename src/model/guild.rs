@@ -218,11 +218,13 @@ impl Guild {
             return Err(Error::Client(ClientError::DeleteMessageDaysAmount(delete_message_days)));
         }
 
-        let req = permissions::BAN_MEMBERS;
+        feature_cache_enabled! {{
+            let req = permissions::BAN_MEMBERS;
 
-        if !try!(self.has_perms(req)) {
-            return Err(Error::Client(ClientError::InvalidPermissions(req)));
-        }
+            if !try!(self.has_perms(req)) {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }}
 
         rest::ban_user(self.id.0, user.into().0, delete_message_days)
     }
@@ -233,19 +235,21 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
-    /// not have permission to perform bans.
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to perform bans.
     ///
     /// [`Ban`]: struct.Ban.html
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature = "methods")]
     pub fn bans(&self) -> Result<Vec<Ban>> {
-        let req = permissions::BAN_MEMBERS;
+        feature_cache_enabled! {{
+            let req = permissions::BAN_MEMBERS;
 
-        if !try!(self.has_perms(req)) {
-            return Err(Error::Client(ClientError::InvalidPermissions(req)));
-        }
+            if !try!(self.has_perms(req)) {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }}
 
         rest::get_bans(self.id.0)
     }
@@ -266,8 +270,8 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
-    /// not have permission to perform bans.
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to perform bans.
     ///
     /// [`Channel`]: struct.Channel.html
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
@@ -275,11 +279,13 @@ impl Guild {
     #[cfg(feature = "methods")]
     pub fn create_channel(&mut self, name: &str, kind: ChannelType)
         -> Result<Channel> {
-        let req = permissions::MANAGE_CHANNELS;
+        feature_cache_enabled! {{
+            let req = permissions::MANAGE_CHANNELS;
 
-        if !try!(self.has_perms(req)) {
-            return Err(Error::Client(ClientError::InvalidPermissions(req)));
-        }
+            if !try!(self.has_perms(req)) {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }}
 
         let map = ObjectBuilder::new()
             .insert("name", name)
@@ -297,8 +303,8 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
-    /// not have permission to perform bans.
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to perform bans.
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`Context::create_role`]: ../client/struct.Context.html#method.create_role
@@ -307,11 +313,13 @@ impl Guild {
     #[cfg(feature = "methods")]
     pub fn create_role<F>(&self, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole {
-        let req = permissions::MANAGE_ROLES;
+        feature_cache_enabled! {{
+            let req = permissions::MANAGE_ROLES;
 
-        if !try!(self.has_perms(req)) {
-            return Err(Error::Client(ClientError::InvalidPermissions(req)));
-        }
+            if !try!(self.has_perms(req)) {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }}
 
         let role = {
             try!(rest::create_role(self.id.0))
@@ -398,8 +406,8 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
-    /// not have permission to perform bans.
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to perform bans.
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`Context::edit_guild`]: ../client/struct.Context.html#method.edit_guild
@@ -407,11 +415,13 @@ impl Guild {
     #[cfg(feature = "methods")]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditGuild) -> EditGuild {
-        let req = permissions::MANAGE_GUILD;
+        feature_cache_enabled! {{
+            let req = permissions::MANAGE_GUILD;
 
-        if !try!(self.has_perms(req)) {
-            return Err(Error::Client(ClientError::InvalidPermissions(req)));
-        }
+            if !try!(self.has_perms(req)) {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }}
 
         let map = f(EditGuild::default()).0.build();
 
@@ -445,18 +455,21 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
-    /// not have permission to change their own nickname.
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to change their own
+    /// nickname.
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
     #[cfg(feature = "methods")]
     pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
-        let req = permissions::CHANGE_NICKNAME;
+        feature_cache_enabled! {{
+            let req = permissions::CHANGE_NICKNAME;
 
-        if !try!(self.has_perms(req)) {
-            return Err(Error::Client(ClientError::InvalidPermissions(req)));
-        }
+            if !try!(self.has_perms(req)) {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }}
 
         rest::edit_nickname(self.id.0, new_nickname)
     }
@@ -475,18 +488,20 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
-    /// not have permission to perform bans.
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to perform bans.
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[cfg(feature = "methods")]
     pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
-        let req = permissions::MANAGE_GUILD;
+        feature_cache_enabled! {{
+            let req = permissions::MANAGE_GUILD;
 
-        if !try!(self.has_perms(req)) {
-            return Err(Error::Client(ClientError::InvalidPermissions(req)));
-        }
+            if !try!(self.has_perms(req)) {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }}
 
         rest::get_guild_invites(self.id.0)
     }
@@ -675,8 +690,8 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
-    /// not have permission to perform bans.
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to perform bans.
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`GuildPrune`]: struct.GuildPrune.html
@@ -684,11 +699,13 @@ impl Guild {
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     #[cfg(feature = "methods")]
     pub fn prune_count(&self, days: u16) -> Result<GuildPrune> {
-        let req = permissions::KICK_MEMBERS;
+        feature_cache_enabled! {{
+            let req = permissions::KICK_MEMBERS;
 
-        if !try!(self.has_perms(req)) {
-            return Err(Error::Client(ClientError::InvalidPermissions(req)));
-        }
+            if !try!(self.has_perms(req)) {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }}
 
         let map = ObjectBuilder::new()
             .insert("days", days)
@@ -705,8 +722,8 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
-    /// not have permission to perform bans.
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to perform bans.
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`GuildPrune`]: struct.GuildPrune.html
@@ -714,11 +731,13 @@ impl Guild {
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     #[cfg(feature = "methods")]
     pub fn start_prune(&self, days: u16) -> Result<GuildPrune> {
-        let req = permissions::KICK_MEMBERS;
+        feature_cache_enabled! {{
+            let req = permissions::KICK_MEMBERS;
 
-        if !try!(self.has_perms(req)) {
-            return Err(Error::Client(ClientError::InvalidPermissions(req)));
-        }
+            if !try!(self.has_perms(req)) {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }}
 
         let map = ObjectBuilder::new()
             .insert("days", days)
@@ -733,19 +752,21 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
-    /// not have permission to perform bans.
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to perform bans.
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature = "methods")]
     pub fn unban<U: Into<UserId>>(&self, user: U) -> Result<()> {
-        let req = permissions::BAN_MEMBERS;
+        feature_cache_enabled! {{
+            let req = permissions::BAN_MEMBERS;
 
-        if !try!(self.has_perms(req)) {
-            return Err(Error::Client(ClientError::InvalidPermissions(req)));
-        }
+            if !try!(self.has_perms(req)) {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }}
 
         rest::remove_ban(self.id.0, user.into().0)
     }

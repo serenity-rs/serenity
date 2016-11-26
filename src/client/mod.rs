@@ -67,6 +67,13 @@ use ::ext::framework::Framework;
 #[cfg(feature = "cache")]
 use ::ext::cache::Cache;
 
+#[cfg(not(feature = "cache"))]
+use ::model::event::{
+    CallUpdateEvent,
+    GuildMemberUpdateEvent,
+    UserSettingsUpdateEvent,
+};
+
 #[cfg(feature = "cache")]
 lazy_static! {
     /// The CACHE is a mutable lazily-initialized static binding. It can be

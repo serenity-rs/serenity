@@ -14,6 +14,13 @@ use ::model::event::{
 };
 use ::model::*;
 
+#[cfg(not(feature = "cache"))]
+use ::model::event::{
+    CallUpdateEvent,
+    GuildMemberUpdateEvent,
+    UserSettingsUpdateEvent,
+};
+
 // This should use type macros when stable receives the type macro
 // stabilization patch.
 //
