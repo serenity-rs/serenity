@@ -1,9 +1,6 @@
-use std::collections::{BTreeMap, HashMap};
 use super::utils::*;
 use super::*;
-use ::constants::OpCode;
 use ::internal::prelude::*;
-use ::utils::decode_array;
 
 impl Game {
     #[cfg(feature="methods")]
