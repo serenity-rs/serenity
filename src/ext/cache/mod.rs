@@ -132,7 +132,6 @@ impl Cache {
         self.guilds.get(&id.into())
     }
 
-    #[cfg(feature = "extras")]
     pub fn get_guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<&GuildChannel> {
         let id = id.into();
 

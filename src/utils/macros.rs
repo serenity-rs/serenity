@@ -95,55 +95,6 @@ macro_rules! feature_cache_disabled {
     }
 }
 
-// Enable/disable check for extras
-#[cfg(feature = "extras")]
-macro_rules! feature_extras {
-    ($enabled:block else $disabled:block) => {
-        {
-            feature_extras_enabled! {{
-                $enabled
-            }}
-        }
-    }
-}
-
-#[cfg(not(feature = "extras"))]
-macro_rules! feature_extras {
-    ($enabled:block else $disabled:block) => {
-        {
-            $disabled
-        }
-    };
-}
-
-#[cfg(feature = "extras")]
-macro_rules! feature_extras_enabled {
-    ($enabled:block) => {{
-        {
-            $enabled
-        }
-    }}
-}
-
-#[cfg(not(feature = "extras"))]
-macro_rules! feature_extras_enabled {
-    ($enabled:block) => {{}}
-}
-
-#[cfg(feature = "extras")]
-macro_rules! feature_extras_disabled {
-    ($disabled:block) => {{}}
-}
-
-#[cfg(not(feature = "extras"))]
-macro_rules! feature_extras_disabled {
-    ($disabled:block) => {
-        {
-            $disabled
-        }
-    }
-}
-
 // Enable/disable check for framework
 #[cfg(feature = "framework")]
 macro_rules! feature_framework {

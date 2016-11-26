@@ -8,7 +8,6 @@ pub mod builder;
 
 mod colour;
 
-#[cfg(feature = "extras")]
 mod message_builder;
 
 pub use self::colour::Colour;
@@ -20,7 +19,6 @@ use std::io::Read;
 use std::path::Path;
 use ::internal::prelude::*;
 
-#[cfg(feature = "extras")]
 pub use self::message_builder::MessageBuilder;
 
 macro_rules! cdn_concat {
