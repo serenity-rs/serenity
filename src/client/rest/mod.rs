@@ -192,14 +192,14 @@ pub fn broadcast_typing(channel_id: u64) -> Result<()> {
                          channel_id))
 }
 
-/// Creates a [`PublicChannel`] in the [`Guild`] given its Id.
+/// Creates a [`GuildChannel`] in the [`Guild`] given its Id.
 ///
 /// Refer to the Discord's [docs] for information on what fields this requires.
 ///
 /// **Note**: Requires the [Manage Channels] permission.
 ///
 /// [`Guild`]: ../../model/struct.Guild.html
-/// [`PublicChannel`]: ../../model/struct.PublicChannel.html
+/// [`GuildChannel`]: ../../model/struct.GuildChannel.html
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-channel
 /// [Manage Channels]: ../../model/permissions/constant.MANAGE_CHANNELS.html
 pub fn create_channel(guild_id: u64, map: Value) -> Result<Channel> {
@@ -295,7 +295,7 @@ pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: Value)
                          integration_id))
 }
 
-/// Creates a [`RichInvite`] for the given [channel][`PublicChannel`].
+/// Creates a [`RichInvite`] for the given [channel][`GuildChannel`].
 ///
 /// Refer to Discord's [docs] for field information.
 ///
@@ -303,7 +303,7 @@ pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: Value)
 ///
 /// **Note**: Requires the [Create Invite] permission.
 ///
-/// [`PublicChannel`]: ../../model/struct.PublicChannel.html
+/// [`GuildChannel`]: ../../model/struct.GuildChannel.html
 /// [`RichInvite`]: ../../model/struct.RichInvite.html
 /// [Create Invite]: ../../model/permissions/constant.CREATE_INVITE.html
 /// [docs]: https://discordapp.com/developers/docs/resources/channel#create-channel-invite
@@ -361,7 +361,7 @@ pub fn create_role(guild_id: u64) -> Result<Role> {
     Role::decode(try!(serde_json::from_reader(response)))
 }
 
-/// Creates a webhook for the given [channel][`PublicChannel`]'s Id, passing in
+/// Creates a webhook for the given [channel][`GuildChannel`]'s Id, passing in
 /// the given data.
 ///
 /// This method requires authentication.
@@ -390,7 +390,7 @@ pub fn create_role(guild_id: u64) -> Result<Role> {
 /// let webhook = rest::create_webhook(channel_id, map).expect("err creating");
 /// ```
 ///
-/// [`PublicChannel`]: ../../model/struct.PublicChannel.html
+/// [`GuildChannel`]: ../../model/struct.GuildChannel.html
 pub fn create_webhook(channel_id: u64, map: Value) -> Result<Webhook> {
     let body = try!(serde_json::to_string(&map));
     let response = request!(Route::ChannelsIdWebhooks(channel_id),
@@ -572,14 +572,14 @@ pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
 }
 
 pub fn edit_channel(channel_id: u64, map: Value)
-    -> Result<PublicChannel> {
+    -> Result<GuildChannel> {
     let body = try!(serde_json::to_string(&map));
     let response = request!(Route::ChannelsId(channel_id),
                             patch(body),
                             "/channels/{}",
                             channel_id);
 
-    PublicChannel::decode(try!(serde_json::from_reader(response)))
+    GuildChannel::decode(try!(serde_json::from_reader(response)))
 }
 
 pub fn edit_emoji(guild_id: u64, emoji_id: u64, map: Value)
@@ -862,7 +862,7 @@ pub fn get_channel_invites(channel_id: u64)
                  RichInvite::decode)
 }
 
-/// Retrieves the webhooks for the given [channel][`PublicChannel`]'s Id.
+/// Retrieves the webhooks for the given [channel][`GuildChannel`]'s Id.
 ///
 /// This method requires authentication.
 ///
@@ -879,7 +879,7 @@ pub fn get_channel_invites(channel_id: u64)
 ///     .expect("err getting channel webhooks");
 /// ```
 ///
-/// [`PublicChannel`]: ../../model/struct.PublicChannel.html
+/// [`GuildChannel`]: ../../model/struct.GuildChannel.html
 pub fn get_channel_webhooks(channel_id: u64) -> Result<Vec<Webhook>> {
     let response = request!(Route::ChannelsIdWebhooks(channel_id),
                             get,
@@ -898,14 +898,14 @@ pub fn get_channel(channel_id: u64) -> Result<Channel> {
     Channel::decode(try!(serde_json::from_reader(response)))
 }
 
-pub fn get_channels(guild_id: u64) -> Result<Vec<PublicChannel>> {
+pub fn get_channels(guild_id: u64) -> Result<Vec<GuildChannel>> {
     let response = request!(Route::ChannelsId(guild_id),
                             get,
                             "/guilds/{}/channels",
                             guild_id);
 
     decode_array(try!(serde_json::from_reader(response)),
-                 PublicChannel::decode)
+                 GuildChannel::decode)
 }
 
 pub fn get_current_user() -> Result<CurrentUser> {

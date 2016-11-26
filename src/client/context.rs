@@ -52,7 +52,7 @@ use super::CACHE;
 /// one.
 ///
 /// For example, if you are needing information about a
-/// [channel][`PublicChannel`] within a [guild][`Guild`], then you can
+/// [channel][`GuildChannel`] within a [guild][`Guild`], then you can
 /// use [`get_channel`] to retrieve it. Under most circumstances, the guild and
 /// its channels will be cached within the cache, and `get_channel` will just
 /// pull from the cache. If it does not exist, it will make a request to the
@@ -67,7 +67,7 @@ use super::CACHE;
 /// [`Client::on_message`]: struct.Client.html#method.on_message
 /// [`Guild`]: ../model/struct.Guild.html
 /// [`Message`]: ../model/struct.Message.html
-/// [`PublicChannel`]: ../model/struct.PublicChannel.html
+/// [`GuildChannel`]: ../model/struct.GuildChannel.html
 /// [`Shard`]: gateway/struct.Shard.html
 /// [`Cache`]: ../ext/cache/struct.Cache.html
 /// [`get_channel`]: #method.get_channel
@@ -207,7 +207,7 @@ impl Context {
         rest::broadcast_typing(channel_id.into().0)
     }
 
-    /// Creates a [`PublicChannel`] in the given [`Guild`].
+    /// Creates a [`GuildChannel`] in the given [`Guild`].
     ///
     /// Refer to [`rest::create_channel`] for more information.
     ///
@@ -224,7 +224,7 @@ impl Context {
     /// ```
     ///
     /// [`Guild`]: ../model/struct.Guild.html
-    /// [`PublicChannel`]: ../model/struct.PublicChannel.html
+    /// [`GuildChannel`]: ../model/struct.GuildChannel.html
     /// [`rest::create_channel`]: rest/fn.create_channel.html
     /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
     pub fn create_channel<G>(&self, guild_id: G, name: &str, kind: ChannelType)
@@ -475,12 +475,12 @@ impl Context {
 
     /// Deletes a [`Channel`] based on the Id given.
     ///
-    /// If the channel being deleted is a [`PublicChannel`] (a [`Guild`]'s
+    /// If the channel being deleted is a [`GuildChannel`] (a [`Guild`]'s
     /// channel), then the [Manage Channels] permission is required.
     ///
     /// [`Channel`]: ../model/enum.Channel.html
     /// [`Guild`]: ../model/struct.Guild.html
-    /// [`PublicChannel`]: ../model/struct.PublicChannel.html
+    /// [`GuildChannel`]: ../model/struct.GuildChannel.html
     /// [Manage Messages]: ../model/permissions/constant.MANAGE_CHANNELS.html
     pub fn delete_channel<C>(&self, channel_id: C) -> Result<Channel>
         where C: Into<ChannelId> {
@@ -673,12 +673,12 @@ impl Context {
     }
 
     pub fn edit_channel<C, F>(&self, channel_id: C, f: F)
-        -> Result<PublicChannel> where C: Into<ChannelId>,
+        -> Result<GuildChannel> where C: Into<ChannelId>,
                                        F: FnOnce(EditChannel) -> EditChannel {
         let channel_id = channel_id.into();
 
         let map = match try!(self.get_channel(channel_id)) {
-            Channel::Public(channel) => {
+            Channel::Guild(channel) => {
                 let map = ObjectBuilder::new()
                     .insert("name", channel.name)
                     .insert("position", channel.position);
@@ -841,7 +841,7 @@ impl Context {
     }
 
     pub fn get_channels<G>(&self, guild_id: G)
-        -> Result<HashMap<ChannelId, PublicChannel>> where G: Into<GuildId> {
+        -> Result<HashMap<ChannelId, GuildChannel>> where G: Into<GuildId> {
         let guild_id = guild_id.into();
 
         feature_cache_enabled! {{
@@ -1161,7 +1161,7 @@ impl Context {
     ///     let cache = CACHE.read().unwrap();
     ///     let ch = cache.get_channel(message.channel_id);
     ///     let name = match ch {
-    ///         Some(Channel::Public(ch)) => ch.name.clone(),
+    ///         Some(Channel::Guild(ch)) => ch.name.clone(),
     ///         _ => "Unknown".to_owned(),
     ///     };
     ///

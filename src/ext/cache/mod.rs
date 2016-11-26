@@ -119,7 +119,7 @@ impl Cache {
         for guild in self.guilds.values() {
             for channel in guild.channels.values() {
                 if channel.id == id {
-                    return Some(Channel::Public(channel.clone()));
+                    return Some(Channel::Guild(channel.clone()));
                 }
             }
         }
@@ -326,7 +326,7 @@ impl Cache {
 
                 ch.map(Channel::Private)
             },
-            Channel::Public(ref channel) => {
+            Channel::Guild(ref channel) => {
                 let ch = self.guilds
                     .get_mut(&channel.guild_id)
                     .map(|guild| {
@@ -338,7 +338,7 @@ impl Cache {
                     _ => None,
                 };
 
-                ch.map(Channel::Public)
+                ch.map(Channel::Guild)
             },
         }
     }
@@ -353,13 +353,13 @@ impl Cache {
                 self.private_channels.remove(&channel.id)
                     .map(Channel::Private)
             },
-            Channel::Public(ref channel) => {
+            Channel::Guild(ref channel) => {
                 let ch = self.guilds
                     .get_mut(&channel.guild_id)
                     .map(|guild| guild.channels.remove(&channel.id));
 
                 match ch {
-                    Some(Some(ch)) => Some(Channel::Public(ch)),
+                    Some(Some(ch)) => Some(Channel::Guild(ch)),
                     _ => None,
                 }
             },
@@ -430,16 +430,16 @@ impl Cache {
                     },
                 }
             },
-            Channel::Private(ref channel) => {
-                self.private_channels
-                    .get_mut(&channel.id)
-                    .map(|private| private.clone_from(channel));
-            },
-            Channel::Public(ref channel) => {
+            Channel::Guild(ref channel) => {
                 self.guilds
                     .get_mut(&channel.guild_id)
                     .map(|guild| guild.channels
                         .insert(channel.id, channel.clone()));
+            },
+            Channel::Private(ref channel) => {
+                self.private_channels
+                    .get_mut(&channel.id)
+                    .map(|private| private.clone_from(channel));
             },
         }
     }
@@ -652,7 +652,7 @@ impl Cache {
                 Channel::Private(channel) => {
                     self.private_channels.insert(channel_id, channel);
                 },
-                Channel::Public(_) => {},
+                Channel::Guild(_) => {},
             }
         }
 
@@ -835,15 +835,15 @@ fn update_presence(presences: &mut HashMap<UserId, Presence>,
     }
 }
 
-/// A reference to a private channel, public channel, or group.
+/// A reference to a private channel, guild's channel, or group.
 #[derive(Debug, Clone, Copy)]
 pub enum ChannelRef<'a> {
+    /// A group's channel
+    Group(&'a Group),
+    /// A guild channel and its guild
+    Guild(&'a Guild, &'a GuildChannel),
     /// A private channel
     Private(&'a PrivateChannel),
-    /// A group channel
-    Group(&'a Group),
-    /// A public channel and its guild
-    Public(&'a Guild, &'a PublicChannel),
 }
 
 fn opt_modify<T: Clone>(dest: &mut T, src: &Option<T>) {

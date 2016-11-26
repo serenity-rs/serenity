@@ -143,7 +143,7 @@ pub fn decode_private_channels(value: Value)
         let id = match private_channel {
             Channel::Group(ref group) => group.channel_id,
             Channel::Private(ref channel) => channel.id,
-            Channel::Public(_) => unreachable!("Public private channel decode"),
+            Channel::Guild(_) => unreachable!("Guild private channel decode"),
         };
 
         private_channels.insert(id, private_channel);
@@ -287,7 +287,7 @@ pub fn user_has_perms(channel_id: ChannelId,
         Channel::Group(_) | Channel::Private(_) => {
             return Ok(permissions == permissions::MANAGE_MESSAGES);
         },
-        Channel::Public(channel) => channel.guild_id,
+        Channel::Guild(channel) => channel.guild_id,
     };
 
     let guild = match cache.get_guild(guild_id) {

@@ -169,7 +169,7 @@ bitflags! {
         const ADMINISTRATOR = 1 << 3,
         /// Allows management and editing of guild [channel]s.
         ///
-        /// [channel]: ../struct.PublicChannel.html
+        /// [channel]: ../struct.GuildChannel.html
         const MANAGE_CHANNELS = 1 << 4,
         /// Allows management and editing of the [guild].
         ///

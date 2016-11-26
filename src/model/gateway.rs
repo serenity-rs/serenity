@@ -462,10 +462,10 @@ pub enum Event {
     VoiceStateUpdate(VoiceStateUpdateEvent),
     /// Voice server information is available
     VoiceServerUpdate(VoiceServerUpdateEvent),
-    /// A webhook for a [channel][`PublicChannel`] was updated in a [`Guild`].
+    /// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].
     ///
     /// [`Guild`]: struct.Guild.html
-    /// [`PublicChannel`]: struct.PublicChannel.html
+    /// [`GuildChannel`]: struct.GuildChannel.html
     WebhookUpdate(WebhookUpdateEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),

@@ -1,12 +1,12 @@
 use serde_json::builder::ObjectBuilder;
 use std::default::Default;
 
-/// A builder to edit a [`PublicChannel`] for use via one of a couple methods.
+/// A builder to edit a [`GuildChannel`] for use via one of a couple methods.
 ///
 /// These methods are:
 ///
 /// - [`Context::edit_channel`]
-/// - [`PublicChannel::edit`]
+/// - [`GuildChannel::edit`]
 ///
 /// Defaults are not directly provided by the builder itself.
 ///
@@ -22,8 +22,8 @@ use std::default::Default;
 /// ```
 ///
 /// [`Context::edit_channel`]: ../client/struct.Context.html#method.edit_channel
-/// [`PublicChannel`]: ../model/struct.PublicChannel.html
-/// [`PublicChannel::edit`]: ../model/struct.PublicChannel.html#method.edit
+/// [`GuildChannel`]: ../model/struct.GuildChannel.html
+/// [`GuildChannel::edit`]: ../model/struct.GuildChannel.html#method.edit
 pub struct EditChannel(pub ObjectBuilder);
 
 impl EditChannel {

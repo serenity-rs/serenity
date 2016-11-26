@@ -124,15 +124,15 @@ id! {
 pub enum Channel {
     /// A group. A group comprises of only one channel.
     Group(Group),
-    /// A private channel to another [`User`]. No other users may access the
-    /// channel. For multi-user "private channels", use a group.
-    Private(PrivateChannel),
     /// A [text] or [voice] channel within a [`Guild`].
     ///
     /// [`Guild`]: struct.Guild.html
     /// [text]: enum.ChannelType.html#variant.Text
     /// [voice]: enum.ChannelType.html#variant.Voice
-    Public(PublicChannel),
+    Guild(GuildChannel),
+    /// A private channel to another [`User`]. No other users may access the
+    /// channel. For multi-user "private channels", use a group.
+    Private(PrivateChannel),
 }
 
 /// A container for guilds.

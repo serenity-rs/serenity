@@ -53,8 +53,8 @@ impl From<Channel> for ChannelId {
     fn from(channel: Channel) -> ChannelId {
         match channel {
             Channel::Group(group) => group.channel_id,
+            Channel::Guild(channel) => channel.id,
             Channel::Private(channel) => channel.id,
-            Channel::Public(channel) => channel.id,
         }
     }
 }
@@ -65,8 +65,8 @@ impl From<PrivateChannel> for ChannelId {
     }
 }
 
-impl From<PublicChannel> for ChannelId {
-    fn from(public_channel: PublicChannel) -> ChannelId {
+impl From<GuildChannel> for ChannelId {
+    fn from(public_channel: GuildChannel) -> ChannelId {
         public_channel.id
     }
 }

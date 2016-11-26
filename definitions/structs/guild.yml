@@ -8,7 +8,7 @@ fields:
   - name: afk_timeout
     type: u64
   - name: channels
-    t: ChannelId, PublicChannel
+    t: ChannelId, GuildChannel
     type: hashmap
   - name: default_message_notifications
     type: u64

@@ -53,7 +53,7 @@ impl MessageBuilder {
         self.0
     }
 
-    /// Mentions the [`PublicChannel`] in the built message.
+    /// Mentions the [`GuildChannel`] in the built message.
     ///
     /// This accepts anything that converts _into_ a [`ChannelId`]. Refer to
     /// `ChannelId`'s documentation for more information.
@@ -62,7 +62,7 @@ impl MessageBuilder {
     /// how this is formatted.
     ///
     /// [`ChannelId`]: ../model/struct.ChannelId.html
-    /// [`PublicChannel`]: ../model/struct.PublicChannel.html
+    /// [`GuildChannel`]: ../model/struct.GuildChannel.html
     /// [Display implementation]: ../model/struct.ChannelId.html#method.fmt-1
     pub fn channel<C: Into<ChannelId>>(mut self, channel: C) -> Self {
         self.0.push_str(&format!("{}", channel.into()));

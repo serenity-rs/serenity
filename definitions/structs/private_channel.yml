@@ -1,6 +1,6 @@
 ---
 name: PrivateChannel
-description: Private text channel to another user.
+description: A Direct Message text channel with another user.
 fields:
   - name: id
     type: ChannelId

@@ -11,9 +11,9 @@ fields:
   - name: channel
     description: >
       A representation of the minimal amount of information needed about the
-      [`PublicChannel`] being invited to.
+      [`GuildChannel`] being invited to.
 
-        [`PublicChannel`]: struct.PublicChannel.html
+        [`GuildChannel`]: struct.GuildChannel.html
     type: InviteChannel
   - name: code
     description: The unique code for the invite.

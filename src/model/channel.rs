@@ -195,8 +195,8 @@ impl Channel {
     pub fn decode(value: Value) -> Result<Channel> {
         let map = try!(into_map(value));
         match req!(map.get("type").and_then(|x| x.as_u64())) {
-            0 | 2 => PublicChannel::decode(Value::Object(map))
-                .map(Channel::Public),
+            0 | 2 => GuildChannel::decode(Value::Object(map))
+                .map(Channel::Guild),
             1 => PrivateChannel::decode(Value::Object(map))
                 .map(Channel::Private),
             3 => Group::decode(Value::Object(map))
@@ -218,28 +218,28 @@ impl Channel {
             Channel::Group(ref group) => {
                 let _ = try!(group.leave());
             },
+            Channel::Guild(ref public_channel) => {
+                let _ = try!(public_channel.delete());
+            },
             Channel::Private(ref private_channel) => {
                 let _ = try!(private_channel.delete());
-            },
-            Channel::Public(ref public_channel) => {
-                let _ = try!(public_channel.delete());
             },
         }
 
         Ok(())
     }
 
-    /// Retrieves the Id of the inner [`Group`], [`PublicChannel`], or
+    /// Retrieves the Id of the inner [`Group`], [`GuildChannel`], or
     /// [`PrivateChannel`].
     ///
     /// [`Group`]: struct.Group.html
-    /// [`PublicChannel`]: struct.PublicChannel.html
+    /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     pub fn id(&self) -> ChannelId {
         match *self {
             Channel::Group(ref group) => group.channel_id,
+            Channel::Guild(ref channel) => channel.id,
             Channel::Private(ref channel) => channel.id,
-            Channel::Public(ref channel) => channel.id,
         }
     }
 }
@@ -251,18 +251,18 @@ impl fmt::Display for Channel {
     ///
     /// - [`Group`]s: the generated name retrievable via [`Group::name`];
     /// - [`PrivateChannel`]s: the recipient's name;
-    /// - [`PublicChannel`]s: a string mentioning the channel that users who can
+    /// - [`GuildChannel`]s: a string mentioning the channel that users who can
     /// see the channel can click on.
     ///
     /// [`Group`]: struct.Group.html
     /// [`Group::name`]: struct.Group.html#method.name
-    /// [`PublicChannel`]: struct.PublicChannel.html
+    /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let out = match *self {
             Channel::Group(ref group) => group.name().to_owned(),
+            Channel::Guild(ref channel) => Cow::Owned(format!("{}", channel)),
             Channel::Private(ref channel) => Cow::Owned(channel.recipient.name.clone()),
-            Channel::Public(ref channel) => Cow::Owned(format!("{}", channel)),
         };
 
         fmt::Display::fmt(&out, f)
@@ -784,7 +784,7 @@ impl fmt::Display for PrivateChannel {
     }
 }
 
-impl PublicChannel {
+impl GuildChannel {
     /// Broadcasts to the channel that the current user is typing.
     ///
     /// For bots, this is a good indicator for long-running commands.
@@ -819,18 +819,18 @@ impl PublicChannel {
     }
 
     #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<PublicChannel> {
+    pub fn decode(value: Value) -> Result<GuildChannel> {
         let mut map = try!(into_map(value));
 
         let id = try!(remove(&mut map, "guild_id").and_then(GuildId::decode));
 
-        PublicChannel::decode_guild(Value::Object(map), id)
+        GuildChannel::decode_guild(Value::Object(map), id)
     }
 
     #[doc(hidden)]
-    pub fn decode_guild(value: Value, guild_id: GuildId) -> Result<PublicChannel> {
+    pub fn decode_guild(value: Value, guild_id: GuildId) -> Result<GuildChannel> {
         let mut map = try!(into_map(value));
-        missing!(map, PublicChannel {
+        missing!(map, GuildChannel {
             id: try!(remove(&mut map, "id").and_then(ChannelId::decode)),
             name: try!(remove(&mut map, "name").and_then(into_string)),
             guild_id: guild_id,
@@ -954,7 +954,7 @@ impl PublicChannel {
     }
 }
 
-impl fmt::Display for PublicChannel {
+impl fmt::Display for GuildChannel {
     /// Formas the channel, creating a mention of it.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.mention(), f)

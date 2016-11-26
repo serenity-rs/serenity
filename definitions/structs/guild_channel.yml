@@ -1,6 +1,6 @@
 ---
-name: PublicChannel
-description: Public voice or text channel within a guild
+name: GuildChannel
+description: A guild's voice or text channel.
 fields:
   - name: id
     type: ChannelId

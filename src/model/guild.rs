@@ -331,7 +331,7 @@ impl Guild {
             let mut public_channels = HashMap::new();
 
             let vals = try!(decode_array(try!(remove(&mut map, "channels")),
-                |v| PublicChannel::decode_guild(v, id)));
+                |v| GuildChannel::decode_guild(v, id)));
 
             for public_channel in vals {
                 public_channels.insert(public_channel.id, public_channel);
@@ -461,11 +461,11 @@ impl Guild {
         rest::edit_nickname(self.id.0, new_nickname)
     }
 
-    /// Attempts to retrieve a [`PublicChannel`] with the given Id.
+    /// Attempts to retrieve a [`GuildChannel`] with the given Id.
     ///
-    /// [`PublicChannel`]: struct.PublicChannel.html
+    /// [`GuildChannel`]: struct.GuildChannel.html
     pub fn get_channel<C: Into<ChannelId>>(&self, channel_id: C)
-        -> Option<&PublicChannel> {
+        -> Option<&GuildChannel> {
         self.channels.get(&channel_id.into())
     }
 

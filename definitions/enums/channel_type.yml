@@ -17,16 +17,16 @@ variants:
     name: private
     number: 1
   - variant: Text
-    description: "An indicator that the channel is a text [`PublicChannel`].
+    description: "An indicator that the channel is a text [`GuildChannel`].
 
 
-      [`PublicChannel`]: struct.PublicChannel.html"
+      [`GuildChannel`]: struct.GuildChannel.html"
     name: text
     number: 0
   - variant: Voice
-    description: "An indicator that the channel is a voice [`PublicChannel`].
+    description: "An indicator that the channel is a voice [`GuildChannel`].
 
 
-      [`PublicChannel`]: struct.PublicChannel.html"
+      [`GuildChannel`]: struct.GuildChannel.html"
     name: voice
     number: 2

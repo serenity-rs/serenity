@@ -15,10 +15,10 @@ fields:
     type: string
   - name: channel_id
     description: >
-      The Id of the [channel][`PublicChannel`] that owns the webhook.
+      The Id of the [channel][`GuildChannel`] that owns the webhook.
 
 
-        [`PublicChannel`]: struct.PublicChannel.html
+        [`GuildChannel`]: struct.GuildChannel.html
     type: ChannelId
   - name: guild_id
     description: >
