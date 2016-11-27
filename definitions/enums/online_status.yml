@@ -1,5 +1,6 @@
 ---
 name: OnlineStatus
+description: Status types like online, idle etc.
 variants:
   - variant: DoNotDisturb
     name: dnd

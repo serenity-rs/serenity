@@ -12,6 +12,7 @@ use super::{
 };
 use ::internal::prelude::*;
 
+/// Allows us to mention a thing in our messages.
 pub trait Mentionable {
     fn mention(&self) -> String;
 }

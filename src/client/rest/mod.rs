@@ -318,6 +318,7 @@ pub fn create_invite(channel_id: u64, map: Value)
     RichInvite::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Creates a permission override for a member or a role in a channel.
 pub fn create_permission(channel_id: u64, target_id: u64, map: Value)
     -> Result<()> {
     let body = try!(serde_json::to_string(&map));
@@ -329,6 +330,7 @@ pub fn create_permission(channel_id: u64, target_id: u64, map: Value)
                          target_id))
 }
 
+/// Creates a private channel with a user.
 pub fn create_private_channel(map: Value)
     -> Result<PrivateChannel> {
     let body = try!(serde_json::to_string(&map));
@@ -339,6 +341,7 @@ pub fn create_private_channel(map: Value)
     PrivateChannel::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Reacts to a message.
 pub fn create_reaction(channel_id: u64,
                        message_id: u64,
                        reaction_type: ReactionType)
@@ -351,6 +354,7 @@ pub fn create_reaction(channel_id: u64,
                          reaction_type.as_data()))
 }
 
+/// Creates a role.
 pub fn create_role(guild_id: u64) -> Result<Role> {
     let body = String::from("{}");
     let response = request!(Route::GuildsIdRoles(guild_id),
@@ -401,6 +405,7 @@ pub fn create_webhook(channel_id: u64, map: Value) -> Result<Webhook> {
     Webhook::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Deketes a private channel or a channel in a guild.
 pub fn delete_channel(channel_id: u64) -> Result<Channel> {
     let response = request!(Route::ChannelsId(channel_id),
                             delete,
@@ -410,6 +415,7 @@ pub fn delete_channel(channel_id: u64) -> Result<Channel> {
     Channel::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Removes an emoji from a server.
 pub fn delete_emoji(guild_id: u64, emoji_id: u64) -> Result<()> {
     verify(204, request!(Route::GuildsIdEmojisId(guild_id),
                          delete,
@@ -418,6 +424,7 @@ pub fn delete_emoji(guild_id: u64, emoji_id: u64) -> Result<()> {
                          emoji_id))
 }
 
+/// Removes a guild, only if connected account owns it.
 pub fn delete_guild(guild_id: u64) -> Result<PartialGuild> {
     let response = request!(Route::GuildsId(guild_id),
                             delete,
@@ -427,6 +434,7 @@ pub fn delete_guild(guild_id: u64) -> Result<PartialGuild> {
     PartialGuild::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Remvoes an integration from a guild.
 pub fn delete_guild_integration(guild_id: u64, integration_id: u64)
     -> Result<()> {
     verify(204, request!(Route::GuildsIdIntegrationsId(guild_id),
@@ -436,12 +444,15 @@ pub fn delete_guild_integration(guild_id: u64, integration_id: u64)
                          integration_id))
 }
 
+/// Removes an invite by code.
 pub fn delete_invite(code: &str) -> Result<Invite> {
     let response = request!(Route::InvitesCode, delete, "/invite/{}", code);
 
     Invite::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Removes a message if created by us or we have
+/// specific permissions.
 pub fn delete_message(channel_id: u64, message_id: u64)
     -> Result<()> {
     verify(204, request!(Route::ChannelsIdMessagesId(channel_id),
@@ -451,6 +462,7 @@ pub fn delete_message(channel_id: u64, message_id: u64)
                          message_id))
 }
 
+/// Removes a bunch of messages, only works for bots.
 pub fn delete_messages(channel_id: u64, map: Value) -> Result<()> {
     let body = try!(serde_json::to_string(&map));
 
@@ -460,7 +472,7 @@ pub fn delete_messages(channel_id: u64, map: Value) -> Result<()> {
                          channel_id))
 }
 
-/// Delete all of the [`Reaction`]s associated with a [`Message`].
+/// Removes all of the [`Reaction`]s associated with a [`Message`].
 ///
 /// # Examples
 ///
@@ -488,6 +500,7 @@ pub fn delete_message_reactions(channel_id: u64, message_id: u64)
                          message_id))
 }
 
+/// Removes a permission override from a role or a member in a channel.
 pub fn delete_permission(channel_id: u64, target_id: u64)
     -> Result<()> {
     verify(204, request!(Route::ChannelsIdPermissionsOverwriteId(channel_id),
@@ -497,6 +510,8 @@ pub fn delete_permission(channel_id: u64, target_id: u64)
                          target_id))
 }
 
+/// Removes a reaction from a message if owned by us or
+/// we have specific permissions.
 pub fn delete_reaction(channel_id: u64,
                        message_id: u64,
                        user_id: Option<u64>,
@@ -513,6 +528,7 @@ pub fn delete_reaction(channel_id: u64,
                          user))
 }
 
+/// Removes a role from a server. Can't remove the default everyone role.
 pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
     verify(204, request!(Route::GuildsIdRolesId(guild_id),
                          delete,
@@ -528,7 +544,7 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 ///
 /// # Examples
 ///
-/// Delete a webhook given its Id:
+/// Remove a webhook given its Id:
 ///
 /// ```rust,no_run
 /// use serenity::client::{Client, rest};
@@ -553,7 +569,7 @@ pub fn delete_webhook(webhook_id: u64) -> Result<()> {
 ///
 /// # Examples
 ///
-/// Delete a webhook given its Id and unique token:
+/// Remove a webhook given its Id and unique token:
 ///
 /// ```rust,no_run
 /// use serenity::client::rest;
@@ -571,6 +587,7 @@ pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
         .map_err(Error::Hyper)))
 }
 
+/// Changes channel information.
 pub fn edit_channel(channel_id: u64, map: Value)
     -> Result<GuildChannel> {
     let body = try!(serde_json::to_string(&map));
@@ -582,6 +599,7 @@ pub fn edit_channel(channel_id: u64, map: Value)
     GuildChannel::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Changes emoji information.
 pub fn edit_emoji(guild_id: u64, emoji_id: u64, map: Value)
     -> Result<Emoji> {
     let body = try!(serde_json::to_string(&map));
@@ -594,6 +612,7 @@ pub fn edit_emoji(guild_id: u64, emoji_id: u64, map: Value)
     Emoji::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Changes guild information.
 pub fn edit_guild(guild_id: u64, map: Value) -> Result<PartialGuild> {
     let body = try!(serde_json::to_string(&map));
     let response = request!(Route::GuildsId(guild_id),
@@ -604,6 +623,7 @@ pub fn edit_guild(guild_id: u64, map: Value) -> Result<PartialGuild> {
     PartialGuild::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Does specific actions to a member.
 pub fn edit_member(guild_id: u64, user_id: u64, map: Value)
     -> Result<()> {
     let body = try!(serde_json::to_string(&map));
@@ -615,6 +635,7 @@ pub fn edit_member(guild_id: u64, user_id: u64, map: Value)
                          user_id))
 }
 
+/// Changes message content, only if owned by us.
 pub fn edit_message(channel_id: u64,
                     message_id: u64,
                     map: Value)
@@ -646,6 +667,7 @@ pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>)
     verify(200, response)
 }
 
+/// Changes a profile note.
 pub fn edit_note(user_id: u64, map: Value) -> Result<()> {
     let body = try!(serde_json::to_string(&map));
 
@@ -655,6 +677,7 @@ pub fn edit_note(user_id: u64, map: Value) -> Result<()> {
                          user_id))
 }
 
+/// Edits profile we're connected to.
 pub fn edit_profile(map: Value) -> Result<CurrentUser> {
     let body = try!(serde_json::to_string(&map));
     let response = request!(Route::UsersMe, patch(body), "/users/@me");
@@ -662,6 +685,7 @@ pub fn edit_profile(map: Value) -> Result<CurrentUser> {
     CurrentUser::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Changes a role in a guild.
 pub fn edit_role(guild_id: u64, role_id: u64, map: Value)
     -> Result<Role> {
     let body = try!(serde_json::to_string(&map));
@@ -823,12 +847,14 @@ pub fn execute_webhook(webhook_id: u64, token: &str, map: Value)
     Message::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Get information about an oauth2 application we own, only for user accouts.
 pub fn get_application_info() -> Result<CurrentApplicationInfo> {
     let response = request!(Route::None, get, "/oauth2/applications/@me");
 
     CurrentApplicationInfo::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Get all oauth2 applications we've made, only for user accounts.
 pub fn get_applications() -> Result<Vec<ApplicationInfo>> {
     let response = request!(Route::None, get, "/oauth2/applications");
     let decoded = try!(serde_json::from_reader(response));
@@ -836,6 +862,7 @@ pub fn get_applications() -> Result<Vec<ApplicationInfo>> {
     decode_array(decoded, ApplicationInfo::decode)
 }
 
+/// Get all the users that are banned in specific guild.
 pub fn get_bans(guild_id: u64) -> Result<Vec<Ban>> {
     let response = request!(Route::GuildsIdBans(guild_id),
                             get,
@@ -845,12 +872,14 @@ pub fn get_bans(guild_id: u64) -> Result<Vec<Ban>> {
     decode_array(try!(serde_json::from_reader(response)), Ban::decode)
 }
 
+/// Gets current bot gateway.
 pub fn get_bot_gateway() -> Result<BotGateway> {
     let response = request!(Route::GatewayBot, get, "/gateway/bot");
 
     BotGateway::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Get all invites for a channel.
 pub fn get_channel_invites(channel_id: u64)
     -> Result<Vec<RichInvite>> {
     let response = request!(Route::ChannelsIdInvites(channel_id),
@@ -889,6 +918,7 @@ pub fn get_channel_webhooks(channel_id: u64) -> Result<Vec<Webhook>> {
     decode_array(try!(serde_json::from_reader(response)), Webhook::decode)
 }
 
+/// Gets channel information.
 pub fn get_channel(channel_id: u64) -> Result<Channel> {
     let response = request!(Route::ChannelsId(channel_id),
                             get,
@@ -898,6 +928,7 @@ pub fn get_channel(channel_id: u64) -> Result<Channel> {
     Channel::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Gets all channels in a guild.
 pub fn get_channels(guild_id: u64) -> Result<Vec<GuildChannel>> {
     let response = request!(Route::ChannelsId(guild_id),
                             get,
@@ -908,18 +939,21 @@ pub fn get_channels(guild_id: u64) -> Result<Vec<GuildChannel>> {
                  GuildChannel::decode)
 }
 
+/// Gets information about the user we're connected with.
 pub fn get_current_user() -> Result<CurrentUser> {
     let response = request!(Route::UsersMe, get, "/users/@me");
 
     CurrentUser::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Gets current gateway.
 pub fn get_gateway() -> Result<Gateway> {
     let response = request!(Route::Gateway, get, "/gateway");
 
     Gateway::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Gets information about an emoji.
 pub fn get_emoji(guild_id: u64, emoji_id: u64) -> Result<Emoji> {
     let response = request!(Route::GuildsIdEmojisId(guild_id),
                             get,
@@ -930,6 +964,7 @@ pub fn get_emoji(guild_id: u64, emoji_id: u64) -> Result<Emoji> {
     Emoji::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Gets all emojis in a guild.
 pub fn get_emojis(guild_id: u64) -> Result<Vec<Emoji>> {
     let response = request!(Route::GuildsIdEmojis(guild_id),
                             get,
@@ -939,6 +974,7 @@ pub fn get_emojis(guild_id: u64) -> Result<Vec<Emoji>> {
     decode_array(try!(serde_json::from_reader(response)), Emoji::decode)
 }
 
+/// Gets guild information.
 pub fn get_guild(guild_id: u64) -> Result<PartialGuild> {
     let response = request!(Route::GuildsId(guild_id),
                             get,
@@ -948,6 +984,7 @@ pub fn get_guild(guild_id: u64) -> Result<PartialGuild> {
     PartialGuild::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Gets a guild embed information.
 pub fn get_guild_embed(guild_id: u64) -> Result<GuildEmbed> {
     let response = request!(Route::GuildsIdEmbed(guild_id),
                             get,
@@ -957,6 +994,7 @@ pub fn get_guild_embed(guild_id: u64) -> Result<GuildEmbed> {
     GuildEmbed::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Gets integrations that a guild has.
 pub fn get_guild_integrations(guild_id: u64) -> Result<Vec<Integration>> {
     let response = request!(Route::GuildsIdIntegrations(guild_id),
                             get,
@@ -966,6 +1004,7 @@ pub fn get_guild_integrations(guild_id: u64) -> Result<Vec<Integration>> {
     decode_array(try!(serde_json::from_reader(response)), Integration::decode)
 }
 
+/// Gets all invites to a guild.
 pub fn get_guild_invites(guild_id: u64) -> Result<Vec<RichInvite>> {
     let response = request!(Route::GuildsIdInvites(guild_id),
                             get,
@@ -976,6 +1015,7 @@ pub fn get_guild_invites(guild_id: u64) -> Result<Vec<RichInvite>> {
                  RichInvite::decode)
 }
 
+/// Get the amount of users that can be pruned.
 pub fn get_guild_prune_count(guild_id: u64, map: Value)
     -> Result<GuildPrune> {
     let body = try!(serde_json::to_string(&map));
@@ -987,6 +1027,7 @@ pub fn get_guild_prune_count(guild_id: u64, map: Value)
     GuildPrune::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Gets regions that a guild can use, if a guild is VIP shows more regions :o
 pub fn get_guild_regions(guild_id: u64) -> Result<Vec<VoiceRegion>> {
     let response = request!(Route::GuildsIdRegions(guild_id),
                             get,
@@ -1023,6 +1064,7 @@ pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
     decode_array(try!(serde_json::from_reader(response)), Webhook::decode)
 }
 
+/// Gets all guilds we're connected to.
 pub fn get_guilds() -> Result<Vec<GuildInfo>> {
     let response = request!(Route::UsersMeGuilds,
                             get,
@@ -1031,6 +1073,7 @@ pub fn get_guilds() -> Result<Vec<GuildInfo>> {
     decode_array(try!(serde_json::from_reader(response)), GuildInfo::decode)
 }
 
+/// Gets information about a specific invite.
 pub fn get_invite(code: &str) -> Result<Invite> {
     let invite = ::utils::parse_invite(code);
     let response = request!(Route::InvitesCode, get, "/invite/{}", invite);
@@ -1038,6 +1081,7 @@ pub fn get_invite(code: &str) -> Result<Invite> {
     Invite::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Gets member of a guild.
 pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
     let response = request!(Route::GuildsIdMembersId(guild_id),
                             get,
@@ -1048,6 +1092,7 @@ pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
     Member::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Gets a message by an Id, bots only.
 pub fn get_message(channel_id: u64, message_id: u64)
     -> Result<Message> {
     let response = request!(Route::ChannelsIdMessagesId(channel_id),
@@ -1059,6 +1104,7 @@ pub fn get_message(channel_id: u64, message_id: u64)
     Message::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Gets X messages from a channel.
 pub fn get_messages(channel_id: u64, query: &str)
     -> Result<Vec<Message>> {
     let url = format!(api_concat!("/channels/{}/messages{}"),
@@ -1071,6 +1117,7 @@ pub fn get_messages(channel_id: u64, query: &str)
     decode_array(try!(serde_json::from_reader(response)), Message::decode)
 }
 
+/// Gets all pins of a channel.
 pub fn get_pins(channel_id: u64) -> Result<Vec<Message>> {
     let response = request!(Route::ChannelsIdPins(channel_id),
                             get,
@@ -1080,6 +1127,7 @@ pub fn get_pins(channel_id: u64) -> Result<Vec<Message>> {
     decode_array(try!(serde_json::from_reader(response)), Message::decode)
 }
 
+/// Get user Ids based on their reaction to a message. This endpoint is dumb.
 pub fn get_reaction_users(channel_id: u64,
                           message_id: u64,
                           reaction_type: ReactionType,
@@ -1105,12 +1153,14 @@ pub fn get_reaction_users(channel_id: u64,
     decode_array(try!(serde_json::from_reader(response)), User::decode)
 }
 
+/// Gets a user by Id.
 pub fn get_user(user_id: u64) -> Result<CurrentUser> {
     let response = request!(Route::UsersId, get, "/users/{}", user_id);
 
     CurrentUser::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Gets our connections.
 pub fn get_user_connections() -> Result<Vec<UserConnection>> {
     let response = request!(Route::UsersMeConnections,
                             get,
@@ -1120,6 +1170,7 @@ pub fn get_user_connections() -> Result<Vec<UserConnection>> {
                       UserConnection::decode)
 }
 
+/// Gets our DM channels.
 pub fn get_user_dm_channels() -> Result<Vec<PrivateChannel>> {
     let response = request!(Route::UsersMeChannels, get, "/users/@me/channels");
 
@@ -1127,6 +1178,7 @@ pub fn get_user_dm_channels() -> Result<Vec<PrivateChannel>> {
                       PrivateChannel::decode)
 }
 
+/// Gets all voice regions.
 pub fn get_voice_regions() -> Result<Vec<VoiceRegion>> {
     let response = request!(Route::VoiceRegions, get, "/voice/regions");
 
@@ -1182,6 +1234,7 @@ pub fn get_webhook_with_token(webhook_id: u64, token: &str) -> Result<Webhook> {
     Webhook::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Kicks a member from a guild.
 pub fn kick_member(guild_id: u64, user_id: u64) -> Result<()> {
     verify(204, request!(Route::GuildsIdMembersId(guild_id),
                          delete,
@@ -1190,6 +1243,7 @@ pub fn kick_member(guild_id: u64, user_id: u64) -> Result<()> {
                          user_id))
 }
 
+/// Leaves a group DM.
 pub fn leave_group(guild_id: u64) -> Result<Group> {
     let response = request!(Route::None,
                             delete,
@@ -1199,6 +1253,7 @@ pub fn leave_group(guild_id: u64) -> Result<Group> {
     Group::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Leaves a guild.
 pub fn leave_guild(guild_id: u64) -> Result<PartialGuild> {
     let response = request!(Route::UsersMeGuildsId,
                             delete,
@@ -1208,12 +1263,14 @@ pub fn leave_guild(guild_id: u64) -> Result<PartialGuild> {
     PartialGuild::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Logs out. That's supposed to disable the token but doesn't.
 pub fn logout(map: Value) -> Result<()> {
     let body = try!(serde_json::to_string(&map));
 
     verify(204, request!(Route::None, post(body), "/auth/logout"))
 }
 
+/// Removes a user from group DM.
 pub fn remove_group_recipient(group_id: u64, user_id: u64)
     -> Result<()> {
     verify(204, request!(Route::None,
@@ -1223,6 +1280,7 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64)
                          user_id))
 }
 
+/// Sends a file to a channel.
 pub fn send_file<R: Read>(channel_id: u64,
                           content: &str,
                           mut file: R,
@@ -1246,6 +1304,7 @@ pub fn send_file<R: Read>(channel_id: u64,
     Message::decode(try!(serde_json::from_reader(try!(request.send()))))
 }
 
+/// Sends a message to a channel.
 pub fn send_message(channel_id: u64, map: Value) -> Result<Message> {
     let body = try!(serde_json::to_string(&map));
     let response = request!(Route::ChannelsIdMessages(channel_id),
@@ -1256,6 +1315,7 @@ pub fn send_message(channel_id: u64, map: Value) -> Result<Message> {
     Message::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Pins a message in a channel.
 pub fn pin_message(channel_id: u64, message_id: u64) -> Result<()> {
     verify(204, request!(Route::ChannelsIdPinsMessageId(channel_id),
                          put,
@@ -1264,6 +1324,7 @@ pub fn pin_message(channel_id: u64, message_id: u64) -> Result<()> {
                          message_id))
 }
 
+/// Unbans a user from a guild.
 pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
     verify(204, request!(Route::GuildsIdBansUserId(guild_id),
                          delete,
@@ -1290,6 +1351,7 @@ pub fn remove_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<(
                          role_id))
 }
 
+/// Starts removing some members from a guild based on the last time they've been online.
 pub fn start_guild_prune(guild_id: u64, map: Value)
     -> Result<GuildPrune> {
     let body = try!(serde_json::to_string(&map));
@@ -1301,6 +1363,7 @@ pub fn start_guild_prune(guild_id: u64, map: Value)
     GuildPrune::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Adds an integration to a guild.
 pub fn start_integration_sync(guild_id: u64, integration_id: u64)
     -> Result<()> {
     verify(204, request!(Route::GuildsIdIntegrationsIdSync(guild_id),
@@ -1310,6 +1373,7 @@ pub fn start_integration_sync(guild_id: u64, integration_id: u64)
                          integration_id))
 }
 
+/// Unpins a message from a channel.
 pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
     verify(204, request!(Route::ChannelsIdPinsMessageId(channel_id),
                          delete,
@@ -1318,6 +1382,7 @@ pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
                          message_id))
 }
 
+/// Does a rest request.
 fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
     where F: Fn() -> RequestBuilder<'a> {
     ratelimiting::perform(route, || f()
@@ -1339,6 +1404,7 @@ pub fn retry<'a, F>(f: F) -> HyperResult<HyperResponse>
     }
 }
 
+/// Verifies a request's response.
 fn verify(expected_status_code: u16,
           mut response: HyperResponse)
           -> Result<()> {

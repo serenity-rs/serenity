@@ -1,5 +1,6 @@
 ---
 name: Region
+description: All the regions a server can be in.
 variants:
   - variant: Amsterdam
     name: amsterdam

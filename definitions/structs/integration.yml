@@ -1,5 +1,6 @@
 ---
 name: Integration
+description: Holds various information about integrations.
 fields:
   - name: id
     type: IntegrationId

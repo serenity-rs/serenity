@@ -1,5 +1,8 @@
 ---
 name: MessageType
+description: >
+  Let's us differentiate regular messages and
+  things like Clyde's responses, new pins etc.
 variants:
   - variant: Regular
     number: 0

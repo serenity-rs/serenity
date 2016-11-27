@@ -282,6 +282,7 @@ impl Embed {
     }
 }
 
+/// A group DM.
 impl Group {
     /// Adds the given user to the group. If the user is already in the group,
     /// then nothing is done.
