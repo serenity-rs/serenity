@@ -1,5 +1,6 @@
 ---
 name: Region
+description: The name of a region that a guild's voice server can be located in.
 variants:
   - variant: Amsterdam
     name: amsterdam

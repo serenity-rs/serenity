@@ -1,5 +1,8 @@
 ---
 name: MessageType
+description: >
+  Allows messages to be differentiated between regular ones
+  and system ones like pins and clyde's responses.
 variants:
   - variant: Regular
     number: 0

@@ -1,3 +1,5 @@
+//! All the events this library handles.
+
 use std::collections::{BTreeMap, HashMap};
 use super::utils::*;
 use super::*;

@@ -1,5 +1,6 @@
 ---
 name: OnlineStatus
+description: The representation of a user's status like online, idle, etc.
 variants:
   - variant: DoNotDisturb
     name: dnd

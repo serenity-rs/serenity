@@ -12,6 +12,7 @@ use super::{
 };
 use ::internal::prelude::*;
 
+/// Allows something - such as a channel or role - to be mentioned in a message.
 pub trait Mentionable {
     fn mention(&self) -> String;
 }

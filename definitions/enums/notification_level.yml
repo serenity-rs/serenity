@@ -1,5 +1,8 @@
 ---
 name: NotificationLevel
+description: >
+  Different level of notification levels such as
+  mention-only, all messages, etc.
 variants:
   - variant: All
     number: 0
