@@ -415,7 +415,7 @@ pub fn delete_channel(channel_id: u64) -> Result<Channel> {
     Channel::decode(try!(serde_json::from_reader(response)))
 }
 
-/// Removes an emoji from a server.
+/// Deletes an emoji from a server.
 pub fn delete_emoji(guild_id: u64, emoji_id: u64) -> Result<()> {
     verify(204, request!(Route::GuildsIdEmojisId(guild_id),
                          delete,
@@ -424,7 +424,7 @@ pub fn delete_emoji(guild_id: u64, emoji_id: u64) -> Result<()> {
                          emoji_id))
 }
 
-/// Removes a guild, only if connected account owns it.
+/// Deletes a guild, only if connected account owns it.
 pub fn delete_guild(guild_id: u64) -> Result<PartialGuild> {
     let response = request!(Route::GuildsId(guild_id),
                             delete,
@@ -444,14 +444,14 @@ pub fn delete_guild_integration(guild_id: u64, integration_id: u64)
                          integration_id))
 }
 
-/// Removes an invite by code.
+/// Deletes an invite by code.
 pub fn delete_invite(code: &str) -> Result<Invite> {
     let response = request!(Route::InvitesCode, delete, "/invite/{}", code);
 
     Invite::decode(try!(serde_json::from_reader(response)))
 }
 
-/// Removes a message if created by us or we have
+/// Deletes a message if created by us or we have
 /// specific permissions.
 pub fn delete_message(channel_id: u64, message_id: u64)
     -> Result<()> {
@@ -462,7 +462,7 @@ pub fn delete_message(channel_id: u64, message_id: u64)
                          message_id))
 }
 
-/// Removes a bunch of messages, only works for bots.
+/// Deletes a bunch of messages, only works for bots.
 pub fn delete_messages(channel_id: u64, map: Value) -> Result<()> {
     let body = try!(serde_json::to_string(&map));
 
@@ -472,7 +472,7 @@ pub fn delete_messages(channel_id: u64, map: Value) -> Result<()> {
                          channel_id))
 }
 
-/// Removes all of the [`Reaction`]s associated with a [`Message`].
+/// Deletes all of the [`Reaction`]s associated with a [`Message`].
 ///
 /// # Examples
 ///
@@ -500,7 +500,7 @@ pub fn delete_message_reactions(channel_id: u64, message_id: u64)
                          message_id))
 }
 
-/// Removes a permission override from a role or a member in a channel.
+/// Deletes a permission override from a role or a member in a channel.
 pub fn delete_permission(channel_id: u64, target_id: u64)
     -> Result<()> {
     verify(204, request!(Route::ChannelsIdPermissionsOverwriteId(channel_id),
@@ -510,7 +510,7 @@ pub fn delete_permission(channel_id: u64, target_id: u64)
                          target_id))
 }
 
-/// Removes a reaction from a message if owned by us or
+/// Deletes a reaction from a message if owned by us or
 /// we have specific permissions.
 pub fn delete_reaction(channel_id: u64,
                        message_id: u64,
@@ -528,7 +528,7 @@ pub fn delete_reaction(channel_id: u64,
                          user))
 }
 
-/// Removes a role from a server. Can't remove the default everyone role.
+/// Deletes a role from a server. Can't remove the default everyone role.
 pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
     verify(204, request!(Route::GuildsIdRolesId(guild_id),
                          delete,
@@ -544,7 +544,7 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 ///
 /// # Examples
 ///
-/// Remove a webhook given its Id:
+/// Deletes a webhook given its Id:
 ///
 /// ```rust,no_run
 /// use serenity::client::{Client, rest};
@@ -569,7 +569,7 @@ pub fn delete_webhook(webhook_id: u64) -> Result<()> {
 ///
 /// # Examples
 ///
-/// Remove a webhook given its Id and unique token:
+/// Deletes a webhook given its Id and unique token:
 ///
 /// ```rust,no_run
 /// use serenity::client::rest;
@@ -847,14 +847,18 @@ pub fn execute_webhook(webhook_id: u64, token: &str, map: Value)
     Message::decode(try!(serde_json::from_reader(response)))
 }
 
-/// Get information about an oauth2 application we own, only for user accouts.
+/// Gets information about an oauth2 application we own.
+///
+/// **Note**: Only user accounts may use this endpoint.
 pub fn get_application_info() -> Result<CurrentApplicationInfo> {
     let response = request!(Route::None, get, "/oauth2/applications/@me");
 
     CurrentApplicationInfo::decode(try!(serde_json::from_reader(response)))
 }
 
-/// Get all oauth2 applications we've made, only for user accounts.
+/// Gets all oauth2 applications we've made.
+///
+/// **Note**: Only user accounts may use this endpoint.
 pub fn get_applications() -> Result<Vec<ApplicationInfo>> {
     let response = request!(Route::None, get, "/oauth2/applications");
     let decoded = try!(serde_json::from_reader(response));
@@ -862,7 +866,7 @@ pub fn get_applications() -> Result<Vec<ApplicationInfo>> {
     decode_array(decoded, ApplicationInfo::decode)
 }
 
-/// Get all the users that are banned in specific guild.
+/// Gets all the users that are banned in specific guild.
 pub fn get_bans(guild_id: u64) -> Result<Vec<Ban>> {
     let response = request!(Route::GuildsIdBans(guild_id),
                             get,
@@ -879,7 +883,7 @@ pub fn get_bot_gateway() -> Result<BotGateway> {
     BotGateway::decode(try!(serde_json::from_reader(response)))
 }
 
-/// Get all invites for a channel.
+/// Gets all invites for a channel.
 pub fn get_channel_invites(channel_id: u64)
     -> Result<Vec<RichInvite>> {
     let response = request!(Route::ChannelsIdInvites(channel_id),
@@ -1015,7 +1019,7 @@ pub fn get_guild_invites(guild_id: u64) -> Result<Vec<RichInvite>> {
                  RichInvite::decode)
 }
 
-/// Get the amount of users that can be pruned.
+/// Gets the amount of users that can be pruned.
 pub fn get_guild_prune_count(guild_id: u64, map: Value)
     -> Result<GuildPrune> {
     let body = try!(serde_json::to_string(&map));
@@ -1127,7 +1131,7 @@ pub fn get_pins(channel_id: u64) -> Result<Vec<Message>> {
     decode_array(try!(serde_json::from_reader(response)), Message::decode)
 }
 
-/// Get user Ids based on their reaction to a message. This endpoint is dumb.
+/// Gets user Ids based on their reaction to a message. This endpoint is dumb.
 pub fn get_reaction_users(channel_id: u64,
                           message_id: u64,
                           reaction_type: ReactionType,
@@ -1270,7 +1274,7 @@ pub fn logout(map: Value) -> Result<()> {
     verify(204, request!(Route::None, post(body), "/auth/logout"))
 }
 
-/// Removes a user from group DM.
+/// Deletes a user from group DM.
 pub fn remove_group_recipient(group_id: u64, user_id: u64)
     -> Result<()> {
     verify(204, request!(Route::None,
@@ -1333,7 +1337,7 @@ pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
                          user_id))
 }
 
-/// Removes a single [`Role`] from a [`Member`] in a [`Guild`].
+/// Deletes a single [`Role`] from a [`Member`] in a [`Guild`].
 ///
 /// **Note**: Requires the [Manage Roles] permission and respect of role
 /// hierarchy.
@@ -1382,7 +1386,6 @@ pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
                          message_id))
 }
 
-/// Does a rest request.
 fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
     where F: Fn() -> RequestBuilder<'a> {
     ratelimiting::perform(route, || f()
@@ -1404,7 +1407,6 @@ pub fn retry<'a, F>(f: F) -> HyperResult<HyperResponse>
     }
 }
 
-/// Verifies a request's response.
 fn verify(expected_status_code: u16,
           mut response: HyperResponse)
           -> Result<()> {

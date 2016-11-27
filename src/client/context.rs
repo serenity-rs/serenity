@@ -474,6 +474,8 @@ impl Context {
     ///     .hoist(true)
     ///     .name("role"));
     /// ```
+    ///
+    /// [`Role`]: ../model/struct.Role.html
     pub fn create_role<F, G>(&self, guild_id: G, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole, G: Into<GuildId> {
         let id = guild_id.into().0;
@@ -520,7 +522,7 @@ impl Context {
         rest::delete_guild(guild_id.into().0)
     }
 
-    /// Removes an integration by Id from a server which Id was given.
+    /// Deletes an integration by Id from a server which Id was given.
     pub fn delete_integration<G, I>(&self, guild_id: G, integration_id: I)
         -> Result<()> where G: Into<GuildId>, I: Into<IntegrationId> {
         rest::delete_guild_integration(guild_id.into().0,
@@ -571,9 +573,11 @@ impl Context {
     }
 
     /// Deletes all messages by Ids from the given vector in the given channel.
+    ///
+    /// The minimum amount of messages is 2 and the maximum amount is 100.
+    ///
     /// **Note**: This uses bulk delete endpoint which is not available
     /// for user accounts.
-    /// Minimum amount of messages is 2 and maximum is 100.
     pub fn delete_messages<C>(&self, channel_id: C, message_ids: &[MessageId])
         -> Result<()> where C: Into<ChannelId> {
         if self.login_type == LoginType::User {
@@ -591,7 +595,7 @@ impl Context {
         rest::delete_messages(channel_id.into().0, map)
     }
 
-    /// Removes a profile note from a user.
+    /// Deletes a profile note from a user.
     pub fn delete_note<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
         let map = ObjectBuilder::new()
             .insert("note", "")
@@ -600,7 +604,7 @@ impl Context {
         rest::edit_note(user_id.into().0, map)
     }
 
-    /// Removes all permission overrides in a channel from a member or
+    /// Deletes all permission overrides in a channel from a member or
     /// a role.
     pub fn delete_permission<C>(&self,
                                 channel_id: C,
@@ -638,7 +642,7 @@ impl Context {
                               reaction_type.into())
     }
 
-    /// Removes a role by Id from the given guild.
+    /// Deletes a role by Id from the given guild.
     pub fn delete_role<G, R>(&self, guild_id: G, role_id: R) -> Result<()>
         where G: Into<GuildId>, R: Into<RoleId> {
         rest::delete_role(guild_id.into().0, role_id.into().0)
@@ -694,7 +698,7 @@ impl Context {
     }
 
     /// Allows to configure channel options like position, name, etc.
-    /// You can see available methods in [`EditChannel`] docs.
+    /// You can see available methods in `EditChannel` docs.
     ///
     /// # Examples
     ///
@@ -750,11 +754,11 @@ impl Context {
 
     /// Allows to configure specific guild options like icon, AFK channel, etc.
     ///
-    /// You can see available methods in [`EditGuild`] docs.
+    /// You can see available methods in `EditGuild` docs.
     ///
     /// # Examples
     ///
-    /// Change server's icon using file icon.png:
+    /// Change a server's icon using a file name "icon.png":
     ///
     /// ```rust,ignore
     /// use serenity::utils;
@@ -780,16 +784,17 @@ impl Context {
 
     /// Allows to do specific things with members of a server
     /// like mute, change nickname, etc.
-    /// Full list of methods is available at [`EditMember`] docs.
+    /// Full list of methods is available at `EditMember` docs.
     ///
     /// # Examples
     ///
     /// Mute a member and set their roles to just one role with
-    /// predefined Id.
+    /// the predefined Id.
+    ///
     /// ```rust,ignore
-    /// context.edit_member(guild_id, user_id, |m|
-    ///     m.mute()
-    ///      .roles(&vec![role_id]));
+    /// context.edit_member(guild_id, user_id, |m| m
+    ///     .mute(true)
+    ///     .roles(&vec![role_id]));
     /// ```
     pub fn edit_member<F, G, U>(&self, guild_id: G, user_id: U, f: F)
         -> Result<()> where F: FnOnce(EditMember) -> EditMember,
@@ -819,6 +824,7 @@ impl Context {
     /// # Examples
     ///
     /// Change our username:
+    ///
     /// ```rust,ignore
     /// context.edit_member(|p|
     ///     p.username("meew zero"));
@@ -897,7 +903,7 @@ impl Context {
         rest::edit_message(channel_id.into().0, message_id.into().0, map.build())
     }
 
-    /// Change note of a user profile.
+    /// Changes note of a user profile.
     pub fn edit_note<U: Into<UserId>>(&self, user_id: U, note: &str)
         -> Result<()> {
         let map = ObjectBuilder::new()
@@ -907,18 +913,18 @@ impl Context {
         rest::edit_note(user_id.into().0, map)
     }
 
-    /// Get a vector of bans server has.
+    /// Gets a vector of bans server has.
     pub fn get_bans<G: Into<GuildId>>(&self, guild_id: G) -> Result<Vec<Ban>> {
         rest::get_bans(guild_id.into().0)
     }
 
-    /// Get all [`RichInvite`]s a channel has.
+    /// Gets all invites a channel has.
     pub fn get_channel_invites<C: Into<ChannelId>>(&self, channel_id: C)
         -> Result<Vec<RichInvite>> {
         rest::get_channel_invites(channel_id.into().0)
     }
 
-    /// Get [`Channel`] by the given Id, checking cache first.
+    /// Gets `Channel` by the given Id, checking cache first.
     pub fn get_channel<C>(&self, channel_id: C) -> Result<Channel>
         where C: Into<ChannelId> {
         let channel_id = channel_id.into();
@@ -932,7 +938,7 @@ impl Context {
         rest::get_channel(channel_id.0)
     }
 
-    /// Get all channels of a guild with given Id, checking cache first.
+    /// Gets all channels of a guild with given Id, checking cache first.
     pub fn get_channels<G>(&self, guild_id: G)
         -> Result<HashMap<ChannelId, GuildChannel>> where G: Into<GuildId> {
         let guild_id = guild_id.into();
@@ -954,25 +960,25 @@ impl Context {
         Ok(channels)
     }
 
-    /// Get [`Emoji`] by the given Id from a server.
+    /// Gets [`Emoji`] by the given Id from a server.
     pub fn get_emoji<E, G>(&self, guild_id: G, emoji_id: E) -> Result<Emoji>
         where E: Into<EmojiId>, G: Into<GuildId> {
         rest::get_emoji(guild_id.into().0, emoji_id.into().0)
     }
 
-    /// Get a vector of all [`Emojis`] a server has.
+    /// Gets a vector of all [`Emojis`] a server has.
     pub fn get_emojis<G: Into<GuildId>>(&self, guild_id: G)
         -> Result<Vec<Emoji>> {
         rest::get_emojis(guild_id.into().0)
     }
 
-    /// Get [`PartialGuild`] by the given Id.
+    /// Gets [`PartialGuild`] by the given Id.
     pub fn get_guild<G: Into<GuildId>>(&self, guild_id: G)
         -> Result<PartialGuild> {
         rest::get_guild(guild_id.into().0)
     }
 
-    /// Get all [`RichInvite`]s a guild has.
+    /// Gets all [`RichInvite`]s a guild has.
     pub fn get_guild_invites<G>(&self, guild_id: G) -> Result<Vec<RichInvite>>
         where G: Into<GuildId> {
         rest::get_guild_invites(guild_id.into().0)
@@ -1000,14 +1006,14 @@ impl Context {
         rest::get_guild_integrations(guild_id.into().0)
     }
 
-    /// Get invite code information.
+    /// Gets invite code information.
     pub fn get_invite(&self, invite: &str) -> Result<Invite> {
         let code = utils::parse_invite(invite);
 
         rest::get_invite(code)
     }
 
-    /// Get [`Member`] of a specific server by Id, checking cache first.
+    /// Gets `Member` of a specific server by Id, checking cache first.
     pub fn get_member<G, U>(&self, guild_id: G, user_id: U) -> Result<Member>
         where G: Into<GuildId>, U: Into<UserId> {
         let guild_id = guild_id.into();
@@ -1045,7 +1051,7 @@ impl Context {
         rest::get_message(channel_id.into().0, message_id.into().0)
     }
 
-    /// Get messages from a specific channel.
+    /// Gets messages from a specific channel.
     ///
     /// # Examples
     ///
@@ -1474,10 +1480,12 @@ impl Context {
             .set_presence(game, status, afk)
     }
 
-    /// Remove an undefined amount of members from the given server
+    /// Deletes an undefined amount of members from the given server
     /// based on the amount of days they've been offline for.
     ///
-    /// **Note**: This might trigger some amount of [`GuildMemberRemove`] events.
+    /// **Note**: This will trigger [`GuildMemberRemove`] events
+    ///
+    /// [`GuildMemberRemove`]: ../model/event/enum.Event.html#variant.GuildMemberRemove
     pub fn start_guild_prune<G>(&self, guild_id: G, days: u16)
         -> Result<GuildPrune> where G: Into<GuildId> {
         let map = ObjectBuilder::new()
