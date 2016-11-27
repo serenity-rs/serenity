@@ -1084,7 +1084,11 @@ impl Context {
     /// Sends a file along with optional message contents. The filename _must_
     /// be specified.
     ///
-    /// Pass an empty string to send no message contents.
+    /// Message contents may be passed by using the [`CreateMessage::content`]
+    /// method.
+    ///
+    /// An embed can _not_ be sent when sending a file. If you set one, it will
+    /// be automatically removed.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     ///
@@ -1095,18 +1099,24 @@ impl Context {
     /// of unicode code points over the limit.
     ///
     /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
-    pub fn send_file<C, R>(&self,
-                           channel_id: C,
-                           content: &str,
-                           file: R,
-                           filename: &str)
-                           -> Result<Message> where C: Into<ChannelId>,
-                                                    R: Read {
-        if let Some(length_over) = Message::overflow_length(content) {
-            return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+    /// [`CreateMessage::content`]: ../utils/builder/struct.CreateMessage.html#method.content
+    pub fn send_file<C, F, R>(&self, channel_id: C, file: R, filename: &str, f: F)
+        -> Result<Message> where C: Into<ChannelId>,
+                                 F: FnOnce(CreateMessage) -> CreateMessage,
+                                 R: Read {
+        let mut map = f(CreateMessage::default()).0;
+
+        if let Some(content) = map.get("content") {
+            if let Value::String(ref content) = *content {
+                if let Some(length_over) = Message::overflow_length(content) {
+                    return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+                }
+            }
         }
 
-        rest::send_file(channel_id.into().0, content, file, filename)
+        let _ = map.remove("embed");
+
+        rest::send_file(channel_id.into().0, file, filename, map)
     }
 
     /// Sends a message to a [`Channel`].

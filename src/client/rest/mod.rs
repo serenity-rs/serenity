@@ -39,6 +39,7 @@ use multipart::client::Multipart;
 use self::ratelimiting::Route;
 use serde_json::builder::ObjectBuilder;
 use serde_json;
+use std::collections::BTreeMap;
 use std::default::Default;
 use std::io::{ErrorKind as IoErrorKind, Read};
 use std::sync::{Arc, Mutex};
@@ -1224,9 +1225,9 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64)
 }
 
 pub fn send_file<R: Read>(channel_id: u64,
-                          content: &str,
                           mut file: R,
-                          filename: &str)
+                          filename: &str,
+                          map: BTreeMap<String, Value>)
                           -> Result<Message> {
     let uri = format!(api_concat!("/channels/{}/messages"), channel_id);
     let url = match Url::parse(&uri) {
@@ -1235,13 +1236,25 @@ pub fn send_file<R: Read>(channel_id: u64,
     };
 
     let mut request = try!(Request::new(Method::Post, url));
-    request.headers_mut().set(header::Authorization(TOKEN.lock().unwrap().clone()));
+    request.headers_mut()
+        .set(header::Authorization(TOKEN.lock().unwrap().clone()));
     request.headers_mut()
         .set(header::UserAgent(constants::USER_AGENT.to_owned()));
 
     let mut request = try!(Multipart::from_request(request));
-    try!(request.write_text("content", content));
+
     try!(request.write_stream("file", &mut file, Some(&filename), None));
+
+    for (k, v) in map {
+        let val = match v {
+            Value::I64(v) => v.to_string(),
+            Value::String(v) => v,
+            Value::U64(v) => v.to_string(),
+            _ => continue,
+        };
+
+        try!(request.write_text(&k, val));
+    }
 
     Message::decode(try!(serde_json::from_reader(try!(request.send()))))
 }
