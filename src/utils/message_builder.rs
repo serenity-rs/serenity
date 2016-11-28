@@ -28,6 +28,40 @@ use ::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 /// [`build`]: #method.build
 /// [`emoji`]: #method.emoji
 /// [`user`]: #method.user
+
+fn normalize(text: &str) -> String {
+    // Remove everyone and here mentions
+    // This changes 'at' symbol to a full-width variation
+    let mut new_text = text.replace("@everyone", "＠everyone")
+        .replace("@here", "＠here")
+    // Remove invite links and popular scam websites
+    // mostly to prevent our bot triggering various ads detectors
+        .replace("discord.gg", "discord․gg")
+        .replace("discord.me", "discord․me")
+        .replace("discordlist.net", "discordlist․net")
+        .replace("discordservers.com", "discordlist․net")
+        .replace("discordapp.com/invite", "discordapp․com/invite")
+    // Remove right-to-left override and similar
+        .replace("\u{202E}", " ")  // RTL
+        .replace("\u{200F}", " ")  // RTL Mark
+        .replace("\u{202B}", " ")  // RTL Embedding
+        .replace("\u{200B}", " ")  // Zero-width space
+        .replace("\u{200D}", " ")  // Zero-width joiner
+        .replace("\u{200C}", " "); // Zero-width non-joiner
+
+    // I'm going quite a bit lazy with this, but at least
+    // we don't have to fetch members.
+    if new_text.split("<@").count() > 3 {
+        new_text = new_text.replace("<@!", "<user ")
+            .replace("<@", "<user ");
+    }
+    if new_text.split("<&").count() > 3 {
+        new_text = new_text.replace("<&", "<role ");
+    }
+
+    new_text
+}
+
 pub struct MessageBuilder(pub String);
 
 impl MessageBuilder {
@@ -161,44 +195,11 @@ impl MessageBuilder {
         self
     }
 
-    fn normalize(self, text: &str) -> String {
-        // Remove everyone and here mentions
-        // This changes 'at' symbol to a full-width variation
-        let mut new_text = text.replace("@everyone", "＠everyone")
-            .replace("@here", "＠here")
-        // Remove invite links and popular scam websites
-        // mostly to prevent our bot triggering various ads detectors
-            .replace("discord.gg", "discord․gg")
-            .replace("discord.me", "discord․me")
-            .replace("discordlist.net", "discordlist․net")
-            .replace("discordservers.com", "discordlist․net")
-            .replace("discordapp.com/invite", "discordapp․com/invite")
-        // Remove right-to-left override and similar
-            .replace("\u{202E}", " ")  // RTL
-            .replace("\u{200F}", " ")  // RTL Mark
-            .replace("\u{202B}", " ")  // RTL Embedding
-            .replace("\u{200B}", " ")  // Zero-width space
-            .replace("\u{200D}", " ")  // Zero-width joiner
-            .replace("\u{200C}", " "); // Zero-width non-joiner
-
-        // I'm going quite a bit lazy with this, but at least
-        // we don't have to fetch members.
-        if new_text.split("<@").count() > 3 {
-            new_text = new_text.replace("<@!", "<user ")
-                .replace("<@", "<user ");
-        }
-        if new_text.split("<&").count() > 3 {
-            new_text = new_text.replace("<&", "<role ");
-        }
-
-        new_text
-    }
-
     /// Pushes text to your message, but normalizing content - that means
     /// ensuring that there's no unwanted formatting, mention spam etc.
     pub fn push_safe(mut self, content: &str) -> Self {
         self.0.push_str(
-            &(self.normalize(&content)).replace("*", "\\*")
+            &normalize(&content).replace("*", "\\*")
                 .replace("`", "\\`")
                 .replace("_", "\\_")
         );
@@ -208,7 +209,7 @@ impl MessageBuilder {
 
     /// Pushes a code-block to your message normalizing content.
     pub fn push_codeblock_safe(mut self, ct: &str, language: Option<&str>) -> Self {
-        let content = &(self.normalize(&ct))
+        let content = &normalize(&ct)
             .replace("```", "\u{201B}\u{201B}\u{201B}");
 
         match language {
@@ -228,7 +229,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "`{}`",
-                &(self.normalize(&content)).replace("`", "\u{201B}")
+                &normalize(&content).replace("`", "\u{201B}")
             )
         );
 
@@ -240,7 +241,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "_{}_",
-                &(self.normalize(&content)).replace("_", "＿")
+                &normalize(&content).replace("_", "＿")
             )
         );
 
@@ -252,7 +253,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "**{}**",
-                &(self.normalize(&content)).replace("**", "∗∗")
+                &normalize(&content).replace("**", "∗∗")
             )
         );
 
@@ -264,7 +265,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "__{}__",
-                &(self.normalize(&content)).replace("__", "＿＿")
+                &normalize(&content).replace("__", "＿＿")
             )
         );
 
@@ -276,7 +277,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "~~{}~~",
-                &(self.normalize(&content)).replace("~~", "∼∼")
+                &normalize(&content).replace("~~", "∼∼")
             )
         );
 
