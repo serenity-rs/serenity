@@ -100,12 +100,12 @@ use ::model::Message;
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
-        fn $fname($c: Context, $m: Message, $a: Vec<String>) {
+        fn $fname($c: &Context, $m: &Message, $a: Vec<String>) {
             $b
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
-        fn $fname($c: Context, $m: Message, $a: Vec<String>) {
+        fn $fname($c: &Context, $m: &Message, $a: Vec<String>) {
             let mut i = $a.iter();
 
             $(
@@ -163,6 +163,8 @@ pub enum CommandType {
 pub struct Framework {
     configuration: Configuration,
     commands: HashMap<String, InternalCommand>,
+    before: Option<Arc<Fn(&Context, &Message, &String) + Send + Sync + 'static>>,
+    after: Option<Arc<Fn(&Context, &Message, &String) + Send + Sync + 'static>>,
     checks: HashMap<String, Arc<Fn(&Context, &Message) -> bool + Send + Sync + 'static>>,
     /// Whether the framework has been "initialized".
     ///
@@ -261,15 +263,25 @@ impl Framework {
                         }
                     }
 
+                    let before = self.before.clone();
                     let command = command.clone();
+                    let after = self.after.clone();
 
                     thread::spawn(move || {
+                        if let Some(before) = before {
+                            (before)(&context, &message, &built);
+                        }
+
                         let args = message.content[position + built.len()..]
                             .split_whitespace()
                             .map(|arg| arg.to_owned())
                             .collect::<Vec<String>>();
 
-                        (command)(context, message, args)
+                        (command)(&context, &message, args);
+
+                        if let Some(after) = after {
+                            (after)(&context, &message, &built);
+                        }
                     });
 
                     return;
@@ -289,10 +301,26 @@ impl Framework {
     ///
     /// [module-level documentation]: index.html
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(Context, Message, Vec<String>) + Send + Sync + 'static,
+        where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static,
               S: Into<String> {
         self.commands.insert(command_name.into(), Arc::new(f));
         self.initialized = true;
+
+        self
+    }
+
+    /// This will call given closure before every command's execution
+    pub fn before<F>(mut self, f: F) -> Self
+        where F: Fn(&Context, &Message, &String) + Send + Sync + 'static {
+        self.before = Some(Arc::new(f));
+
+        self
+    }
+
+    /// This will call given closure after every command's execution
+    pub fn after<F>(mut self, f: F) -> Self
+        where F: Fn(&Context, &Message, &String) + Send + Sync + 'static {
+        self.after = Some(Arc::new(f));
 
         self
     }
