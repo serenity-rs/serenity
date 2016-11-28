@@ -198,7 +198,7 @@ impl MessageBuilder {
     /// ensuring that there's no unwanted formatting, mention spam etc.
     pub fn push_safe(mut self, content: &str) -> Self {
         self.0.push_str(
-            self.normalize(&content).replace("*", "\\*")
+            &self.normalize(&content).replace("*", "\\*")
                 .replace("`", "\\`")
                 .replace("_", "\\_")
         );
