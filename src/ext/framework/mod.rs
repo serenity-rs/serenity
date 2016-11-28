@@ -309,6 +309,28 @@ impl Framework {
         self
     }
 
+    /// A wrapper for `on` which accepts vector of commands.
+    ///
+    /// Default formatter `help_formatter` can be found beneath.
+    pub fn help_command<F, S>(mut self, command_name: S, f: F) -> Self
+        where F: Fn(&Context, &Message, Vec<String>, Vec<Command>) + Send + Sync + 'static,
+              S: Into<String> {
+        self.on(command_name, |ctx, msg, args| {
+            (f)(ctx, msg, args, &self.commands)
+        });
+
+        self
+    }
+
+    /// This should only be used for `help_command`
+    pub fn help_formatter(ctx, msg, args, cmds) {
+        let result = format!(
+            "__List of commands:__\n{}",
+            cmds.keys().collect::<Vec<String>>().join(", ")
+        );
+        let _ = ctx.say(&result);
+    }
+
     /// This will call given closure before every command's execution
     pub fn before<F>(mut self, f: F) -> Self
         where F: Fn(&Context, &Message, &String) + Send + Sync + 'static {
