@@ -139,7 +139,7 @@ impl Attachment {
     ///
     /// // Make sure that the directory to store images in exists.
     /// fs::create_dir_all("./attachment_downloads")
-    ///     .expect("err making directory");
+    ///     .expect("Error making directory");
     ///
     /// let token = env::var("DISCORD_TOKEN").expect("token in environment");
     /// let mut client = Client::login_bot(&token);
@@ -820,6 +820,16 @@ impl GuildChannel {
         rest::broadcast_typing(self.id.0)
     }
 
+    /// Creates an invite leading to the given channel.
+    ///
+    /// # Examples
+    ///
+    /// Create an invite that can only be used 5 times:
+    ///
+    /// ```rust,ignore
+    /// let invite = channel.create_invite(|i| i
+    ///     .max_uses(5));
+    /// ```
     #[cfg(feature = "methods")]
     pub fn create_invite<F>(&self, f: F) -> Result<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
@@ -875,6 +885,18 @@ impl GuildChannel {
         rest::delete_channel(self.id.0)
     }
 
+    /// Allows to configure channel options like position, name, etc.
+    /// You can see available methods in `EditChannel` docs.
+    ///
+    /// # Examples
+    ///
+    /// Change a voice channel's name and bitrate:
+    ///
+    /// ```rust,ignore
+    /// channel.edit(|c| c
+    ///     .name("test")
+    ///     .bitrate(71));
+    /// ```
     #[cfg(feature = "methods")]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
@@ -919,6 +941,7 @@ impl GuildChannel {
         self.id.mention()
     }
 
+    /// Gets all channel's pins.
     #[cfg(feature = "methods")]
     pub fn pins(&self) -> Result<Vec<Message>> {
         rest::get_pins(self.id.0)
