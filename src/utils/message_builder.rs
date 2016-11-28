@@ -161,7 +161,7 @@ impl MessageBuilder {
         self
     }
 
-    fn normalize(self, text: &str) -> &str {
+    fn normalize(self, text: &str) -> String {
         // Remove everyone and here mentions
         // This changes 'at' symbol to a full-width variation
         let mut new_text = text.replace("@everyone", "＠everyone")
@@ -191,14 +191,14 @@ impl MessageBuilder {
             new_text = new_text.replace("<&", "<role ");
         }
 
-        &new_text
+        new_text
     }
 
     /// Pushes text to your message, but normalizing content - that means
     /// ensuring that there's no unwanted formatting, mention spam etc.
     pub fn push_safe(mut self, content: &str) -> Self {
         self.0.push_str(
-            &self.normalize(&content).replace("*", "\\*")
+            &(self.normalize(&content)).replace("*", "\\*")
                 .replace("`", "\\`")
                 .replace("_", "\\_")
         );
@@ -208,7 +208,8 @@ impl MessageBuilder {
 
     /// Pushes a code-block to your message normalizing content.
     pub fn push_codeblock_safe(mut self, ct: &str, language: Option<&str>) -> Self {
-        let content = self.normalize(&ct).replace("```", "\u{201B}\u{201B}\u{201B}");
+        let content = &(self.normalize(&ct))
+            .replace("```", "\u{201B}\u{201B}\u{201B}");
 
         match language {
             Some(x) => {
@@ -227,7 +228,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "`{}`",
-                self.normalize(&content).replace("`", "\u{201B}")
+                &(self.normalize(&content)).replace("`", "\u{201B}")
             )
         );
 
@@ -239,7 +240,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "_{}_",
-                self.normalize(&content).replace("_", "＿")
+                &(self.normalize(&content)).replace("_", "＿")
             )
         );
 
@@ -251,7 +252,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "**{}**",
-                self.normalize(&content).replace("**", "∗∗")
+                &(self.normalize(&content)).replace("**", "∗∗")
             )
         );
 
@@ -263,7 +264,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "__{}__",
-                self.normalize(&content).replace("__", "＿＿")
+                &(self.normalize(&content)).replace("__", "＿＿")
             )
         );
 
@@ -275,7 +276,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "~~{}~~",
-                self.normalize(&content).replace("~~", "∼∼")
+                &(self.normalize(&content)).replace("~~", "∼∼")
             )
         );
 
