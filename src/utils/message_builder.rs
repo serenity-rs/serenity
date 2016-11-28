@@ -116,7 +116,7 @@ impl MessageBuilder {
     pub fn push_codeblock(mut self, content: &str, language: Option<&str>) -> Self {
         match language {
             Some(x) => {
-                self.0.push_str(&format!("```{}\n{}\n```", language, content));
+                self.0.push_str(&format!("```{}\n{}\n```", x, content));
             },
             None => {
                 self.0.push_str(&format!("```\n{}\n```", content));
@@ -183,24 +183,24 @@ impl MessageBuilder {
 
         // I'm going quite a bit lazy with this, but at least
         // we don't have to fetch members.
-        if new_text.split("<@").count(0) > 3 {
+        if new_text.split("<@").count() > 3 {
             new_text = new_text.replace("<@!", "<user ")
                 .replace("<@", "<user ");
         }
-        if new_text.split("<&").count(0) > 3 {
+        if new_text.split("<&").count() > 3 {
             new_text = new_text.replace("<&", "<role ");
         }
 
-        new_text
+        &new_text
     }
 
     /// Pushes text to your message, but normalizing content - that means
     /// ensuring that there's no unwanted formatting, mention spam etc.
     pub fn push_safe(mut self, content: &str) -> Self {
         self.0.push_str(
-            normalize(&content).replace("*", "\*")
-                .replace("`", "\`")
-                .replace("_", "\_")
+            self.normalize(&content).replace("*", "\\*")
+                .replace("`", "\\`")
+                .replace("_", "\\_")
         );
 
         self
@@ -208,11 +208,11 @@ impl MessageBuilder {
 
     /// Pushes a code-block to your message normalizing content.
     pub fn push_codeblock_safe(mut self, ct: &str, language: Option<&str>) -> Self {
-        let content = normalize(&ct).replace("```", "\u{201B}\u{201B}\u{201B}");
+        let content = self.normalize(&ct).replace("```", "\u{201B}\u{201B}\u{201B}");
 
         match language {
             Some(x) => {
-                self.0.push_str(&format!("```{}\n{}\n```", language, content));
+                self.0.push_str(&format!("```{}\n{}\n```", x, content));
             },
             None => {
                 self.0.push_str(&format!("```\n{}\n```", content));
@@ -227,7 +227,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "`{}`",
-                normalize(&content).replace("`", "\u{201B}")
+                self.normalize(&content).replace("`", "\u{201B}")
             )
         );
 
@@ -239,7 +239,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "_{}_",
-                normalize(&content).replace("_", "＿")
+                self.normalize(&content).replace("_", "＿")
             )
         );
 
@@ -251,7 +251,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "**{}**",
-                normalize(&content).replace("**", "∗∗")
+                self.normalize(&content).replace("**", "∗∗")
             )
         );
 
@@ -263,7 +263,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "__{}__",
-                normalize(&content).replace("__", "＿＿")
+                self.normalize(&content).replace("__", "＿＿")
             )
         );
 
@@ -275,7 +275,7 @@ impl MessageBuilder {
         self.0.push_str(
             &format!(
                 "~~{}~~",
-                normalize(&content).replace("~~", "∼∼")
+                self.normalize(&content).replace("~~", "∼∼")
             )
         );
 
