@@ -323,7 +323,8 @@ impl Framework {
     }
 
     /// This should only be used for `help_command`
-    pub fn help_formatter(ctx, msg, args, cmds) {
+    pub fn help_formatter(ctx: Context, msg: Message,
+                          args: Vec<String>, cmds: Vec<Command>) -> () {
         let result = format!(
             "__List of commands:__\n{}",
             cmds.keys().collect::<Vec<String>>().join(", ")
