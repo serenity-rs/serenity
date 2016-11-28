@@ -3,6 +3,7 @@ use super::*;
 use ::internal::prelude::*;
 
 impl Game {
+    /// Generates a `Game` struct that appears as '**Playing** <name>' status
     #[cfg(feature="methods")]
     pub fn playing(name: &str) -> Game {
         Game {
@@ -12,6 +13,7 @@ impl Game {
         }
     }
 
+    /// Generates a `Game` struct that appears as '**Streaming** <name>' status
     #[cfg(feature="methods")]
     pub fn streaming(name: &str, url: &str) -> Game {
         Game {
