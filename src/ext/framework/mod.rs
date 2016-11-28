@@ -163,8 +163,8 @@ pub enum CommandType {
 pub struct Framework {
     configuration: Configuration,
     commands: HashMap<String, InternalCommand>,
-    before: Option<Arc<Fn(&Context, &Message, String)>>,
-    after: Option<Arc<Fn(&Context, &Message, String)>>,
+    before: Option<Arc<Fn(&Context, &Message, &str)>>,
+    after: Option<Arc<Fn(&Context, &Message, &str)>>,
     checks: HashMap<String, Arc<Fn(&Context, &Message) -> bool + Send + Sync + 'static>>,
     /// Whether the framework has been "initialized".
     ///
@@ -265,20 +265,20 @@ impl Framework {
 
                     let command = command.clone();
 
+                    let before = self.before.clone();
+                    (before).map(|x| (x)(&context, &message, &built));
+
                     thread::spawn(move || {
                         let args = message.content[position + built.len()..]
                             .split_whitespace()
                             .map(|arg| arg.to_owned())
                             .collect::<Vec<String>>();
 
-                        self.before.clone()
-                            .map(|x| (x)(context, message, args[0]));
-
-                        (command)(context, message, args)
-
-                        self.after.clone()
-                            .map(|x| (x)(context, message, args[0]));
+                        (command)(&context, &message, args)
                     });
+
+                    let after = self.after.clone();
+                    (after).map(|x| (x)(&context, &message, &built));
 
                     return;
                 }
