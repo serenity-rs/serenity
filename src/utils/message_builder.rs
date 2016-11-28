@@ -87,7 +87,7 @@ impl MessageBuilder {
     /// [`GuildChannel`]: ../model/struct.GuildChannel.html
     /// [Display implementation]: ../model/struct.ChannelId.html#method.fmt-1
     pub fn channel<C: Into<ChannelId>>(mut self, channel: C) -> Self {
-        write!(self.0, "{}", channel.into());
+        let _ = write!(self.0, "{}", channel.into());
 
         self
     }
@@ -99,7 +99,7 @@ impl MessageBuilder {
     ///
     /// [Display implementation]: ../model/struct.Emoji.html#method.fmt
     pub fn emoji(mut self, emoji: Emoji) -> Self {
-        write!(self.0, "{}", emoji);
+        let _ = write!(self.0, "{}", emoji);
 
         self
     }
@@ -108,7 +108,7 @@ impl MessageBuilder {
     ///
     /// [`Mentionable`]: ../model/trait.Mentionable.html
     pub fn mention<M: Mentionable>(mut self, item: M) -> Self {
-        write!(self.0, "{}", item.mention());
+        let _ = write!(self.0, "{}", item.mention());
 
         self
     }
@@ -197,7 +197,7 @@ impl MessageBuilder {
     /// Pushes text to your message, but normalizing content - that means
     /// ensuring that there's no unwanted formatting, mention spam etc.
     pub fn push_safe(mut self, content: &str) -> Self {
-        let normalized = normalize(&content)
+        let normalized = normalize(content)
             .replace('*', "\\*")
             .replace('`', "\\`")
             .replace('_', "\\_");
@@ -210,7 +210,7 @@ impl MessageBuilder {
     /// Pushes a code-block to your message normalizing content.
     pub fn push_codeblock_safe(mut self, content: &str, language: Option<&str>)
         -> Self {
-        let mut content = &normalize(&content)
+        let content = &normalize(content)
             .replace("```", "\u{201B}\u{201B}\u{201B}");
 
         self.0.push_str("```");
@@ -283,7 +283,7 @@ impl MessageBuilder {
     /// [`RoleId`]: ../model/struct.RoleId.html
     /// [Display implementation]: ../model/struct.RoleId.html#method.fmt-1
     pub fn role<R: Into<RoleId>>(mut self, role: R) -> Self {
-        write!(self.0, "{}", role.into());
+        let _ = write!(self.0, "{}", role.into());
 
         self
     }
@@ -300,7 +300,7 @@ impl MessageBuilder {
     /// [`UserId`]: ../model/struct.UserId.html
     /// [Display implementation]: ../model/struct.UserId.html#method.fmt-1
     pub fn user<U: Into<UserId>>(mut self, user: U) -> Self {
-        write!(self.0, "{}", user.into());
+        let _ = write!(self.0, "{}", user.into());
 
         self
     }
