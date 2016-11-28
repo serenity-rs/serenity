@@ -148,14 +148,8 @@ pub fn parse_invite(code: &str) -> &str {
 /// ```rust,no_run
 /// use serenity::utils;
 ///
-/// let image = match utils::read_image("./cat.png") {
-///     Ok(image) => image,
-///     Err(why) => {
-///         // properly handle the error
-///
-///         return;
-///     },
-/// };
+/// let image = utils::read_image("./cat.png")
+///     .expect("Failed to read image");
 /// ```
 ///
 /// [`EditProfile::avatar`]: ../builder/struct.EditProfile.html#method.avatar

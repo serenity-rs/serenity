@@ -315,7 +315,7 @@ impl Shard {
                     if let Some(session_id) = self.session_id.clone() {
                         match self.resume(session_id, receiver) {
                             Ok((ev, rec)) => return Ok(Some((ev, Some(rec)))),
-                            Err(why) => debug!("Err resuming: {:?}", why),
+                            Err(why) => debug!("Error resuming: {:?}", why),
                         }
                     }
                 }
@@ -335,7 +335,7 @@ impl Shard {
                 if let Some(session_id) = self.session_id.clone() {
                     match self.resume(session_id, &mut receiver) {
                         Ok((ev, rec)) => return Ok(Some((ev, Some(rec)))),
-                        Err(why) => debug!("Err resuming: {:?}", why),
+                        Err(why) => debug!("Error resuming: {:?}", why),
                     }
                 }
 

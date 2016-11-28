@@ -1,5 +1,5 @@
 use std::default::Default;
-use std::fmt;
+use std::fmt::{self, Write};
 use ::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 
 /// The Message Builder is an ergonomic utility to easily build a message,
@@ -28,6 +28,28 @@ use ::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 /// [`build`]: #method.build
 /// [`emoji`]: #method.emoji
 /// [`user`]: #method.user
+
+fn normalize(text: &str) -> String {
+    // Remove everyone and here mentions
+    // This changes 'at' symbol to a full-width variation
+    text.replace("@everyone", "＠everyone")
+        .replace("@here", "＠here")
+        // Remove invite links and popular scam websites, mostly to prevent the
+        // current user from triggering various ad detectors
+        .replace("discord.gg", "discord․gg")
+        .replace("discord.me", "discord․me")
+        .replace("discordlist.net", "discordlist․net")
+        .replace("discordservers.com", "discordservers․com")
+        .replace("discordapp.com/invite", "discordapp․com/invite")
+        // Remove right-to-left and other similar overrides
+        .replace('\u{202E}', " ") // RTL
+        .replace('\u{200F}', " ") // RTL Mark
+        .replace('\u{202B}', " ") // RTL Embedding
+        .replace('\u{200B}', " ") // Zero-width space
+        .replace('\u{200D}', " ") // Zero-width joiner
+        .replace('\u{200C}', " ") // Zero-width non-joiner
+}
+
 pub struct MessageBuilder(pub String);
 
 impl MessageBuilder {
@@ -65,7 +87,7 @@ impl MessageBuilder {
     /// [`GuildChannel`]: ../model/struct.GuildChannel.html
     /// [Display implementation]: ../model/struct.ChannelId.html#method.fmt-1
     pub fn channel<C: Into<ChannelId>>(mut self, channel: C) -> Self {
-        self.0.push_str(&format!("{}", channel.into()));
+        write!(self.0, "{}", channel.into());
 
         self
     }
@@ -77,7 +99,7 @@ impl MessageBuilder {
     ///
     /// [Display implementation]: ../model/struct.Emoji.html#method.fmt
     pub fn emoji(mut self, emoji: Emoji) -> Self {
-        self.0.push_str(&format!("{}", emoji));
+        write!(self.0, "{}", emoji);
 
         self
     }
@@ -86,7 +108,7 @@ impl MessageBuilder {
     ///
     /// [`Mentionable`]: ../model/trait.Mentionable.html
     pub fn mention<M: Mentionable>(mut self, item: M) -> Self {
-        self.0.push_str(&item.mention());
+        write!(self.0, "{}", item.mention());
 
         self
     }
@@ -112,6 +134,143 @@ impl MessageBuilder {
         self
     }
 
+    /// Pushes a code-block to your message, with optional syntax highlighting.
+    pub fn push_codeblock(mut self, content: &str, language: Option<&str>) -> Self {
+        self.0.push_str("```");
+
+        if let Some(language) = language {
+            self.0.push_str(language);
+        }
+
+        self.0.push('\n');
+        self.0.push_str(content);
+        self.0.push_str("\n```");
+
+        self
+    }
+
+    /// Pushes an inline monospaced text to your message.
+    pub fn push_mono(mut self, content: &str) -> Self {
+        self.0.push('`');
+        self.0.push_str(content);
+        self.0.push('`');
+
+        self
+    }
+
+    /// Pushes an inline italicized text to your message.
+    pub fn push_italic(mut self, content: &str) -> Self {
+        self.0.push('_');
+        self.0.push_str(content);
+        self.0.push('_');
+
+        self
+    }
+
+    /// Pushes an inline bold text to your message.
+    pub fn push_bold(mut self, content: &str) -> Self {
+        self.0.push_str("**");
+        self.0.push_str(content);
+        self.0.push_str("**");
+
+        self
+    }
+
+    /// Pushes an underlined inline text to your message.
+    pub fn push_underline(mut self, content: &str) -> Self {
+        self.0.push_str("__");
+        self.0.push_str(content);
+        self.0.push_str("__");
+
+        self
+    }
+
+    /// Pushes a strikethrough inline text to your message.
+    pub fn push_strike(mut self, content: &str) -> Self {
+        self.0.push_str("~~");
+        self.0.push_str(content);
+        self.0.push_str("~~");
+
+        self
+    }
+
+    /// Pushes text to your message, but normalizing content - that means
+    /// ensuring that there's no unwanted formatting, mention spam etc.
+    pub fn push_safe(mut self, content: &str) -> Self {
+        let normalized = normalize(&content)
+            .replace('*', "\\*")
+            .replace('`', "\\`")
+            .replace('_', "\\_");
+
+        self.0.push_str(&normalized);
+
+        self
+    }
+
+    /// Pushes a code-block to your message normalizing content.
+    pub fn push_codeblock_safe(mut self, content: &str, language: Option<&str>)
+        -> Self {
+        let mut content = &normalize(&content)
+            .replace("```", "\u{201B}\u{201B}\u{201B}");
+
+        self.0.push_str("```");
+
+        if let Some(language) = language {
+            self.0.push_str(language);
+        }
+
+        self.0.push('\n');
+        self.0.push_str(content);
+        self.0.push_str("```");
+
+        self
+    }
+
+    /// Pushes an inline monospaced text to your message normalizing content.
+    pub fn push_mono_safe(mut self, content: &str) -> Self {
+        self.0.push('`');
+        self.0.push_str(&normalize(content).replace("`", "\u{201B}"));
+        self.0.push('`');
+
+        self
+    }
+
+    /// Pushes an inline italicized text to your message normalizing content.
+    pub fn push_italic_safe(mut self, content: &str) -> Self {
+        self.0.push('_');
+        self.0.push_str(&normalize(content).replace('_', "＿"));
+        self.0.push('_');
+
+        self
+    }
+
+    /// Pushes an inline bold text to your message normalizing content.
+    pub fn push_bold_safe(mut self, content: &str) -> Self {
+        self.0.push_str("**");
+        self.0.push_str(&normalize(content).replace("**", "∗∗"));
+        self.0.push_str("**");
+
+        self
+    }
+
+    /// Pushes an underlined inline text to your message normalizing content.
+    pub fn push_underline_safe(mut self, content: &str) -> Self {
+        self.0.push_str("__");
+        self.0.push_str(&normalize(content).replace("__", "＿＿"));
+        self.0.push_str("__");
+
+        self
+    }
+
+    /// Pushes a strikethrough inline text to your message normalizing content.
+    pub fn push_strike_safe(mut self, content: &str) -> Self {
+        self.0.push_str("~~");
+        self.0.push_str(&normalize(content).replace("~~", "∼∼"));
+        self.0.push_str("~~");
+
+        self
+    }
+
     /// Mentions the [`Role`] in the built message.
     ///
     /// This accepts anything that converts _into_ a [`RoleId`]. Refer to
@@ -124,7 +283,7 @@ impl MessageBuilder {
     /// [`RoleId`]: ../model/struct.RoleId.html
     /// [Display implementation]: ../model/struct.RoleId.html#method.fmt-1
     pub fn role<R: Into<RoleId>>(mut self, role: R) -> Self {
-        self.0.push_str(&format!("{}", role.into()));
+        write!(self.0, "{}", role.into());
 
         self
     }
@@ -141,7 +300,7 @@ impl MessageBuilder {
     /// [`UserId`]: ../model/struct.UserId.html
     /// [Display implementation]: ../model/struct.UserId.html#method.fmt-1
     pub fn user<U: Into<UserId>>(mut self, user: U) -> Self {
-        self.0.push_str(&format!("{}", user.into()));
+        write!(self.0, "{}", user.into());
 
         self
     }

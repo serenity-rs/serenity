@@ -403,6 +403,7 @@ impl Context {
     /// [`Role`]: ../model/struct.Role.html
     /// [Attach Files]: ../model/permissions/constant.ATTACH_FILES.html
     /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
+    /// [Manage Webhooks]: ../model/permissions/constant.MANAGE_WEBHOOKS.html
     /// [Send TTS Messages]: ../model/permissions/constant.SEND_TTS_MESSAGES.html
     pub fn create_permission<C>(&self,
                                 channel_id: C,
@@ -495,7 +496,7 @@ impl Context {
     /// [`Channel`]: ../model/enum.Channel.html
     /// [`Guild`]: ../model/struct.Guild.html
     /// [`GuildChannel`]: ../model/struct.GuildChannel.html
-    /// [Manage Messages]: ../model/permissions/constant.MANAGE_CHANNELS.html
+    /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
     pub fn delete_channel<C>(&self, channel_id: C) -> Result<Channel>
         where C: Into<ChannelId> {
         rest::delete_channel(channel_id.into().0)
@@ -522,7 +523,7 @@ impl Context {
         rest::delete_guild(guild_id.into().0)
     }
 
-    /// Deletes an integration by Id from a server which Id was given.
+    /// Deletes an integration by Id from a guild which Id was given.
     pub fn delete_integration<G, I>(&self, guild_id: G, integration_id: I)
         -> Result<()> where G: Into<GuildId>, I: Into<IntegrationId> {
         rest::delete_guild_integration(guild_id.into().0,
@@ -622,7 +623,7 @@ impl Context {
     /// Deletes the given [`Reaction`], but only if the current user is the user
     /// who made the reaction or has permission to.
     ///
-    /// **Note**: Requires the [`Manage Messages`] permission, _if_ the current
+    /// **Note**: Requires the [Manage Messages] permission, _if_ the current
     /// user did not perform the reaction.
     ///
     /// [`Reaction`]: ../model/struct.Reaction.html
@@ -698,7 +699,8 @@ impl Context {
     }
 
     /// Allows to configure channel options like position, name, etc.
-    /// You can see available methods in `EditChannel` docs.
+    ///
+    /// You can see available methods in `EditChannel`s docs.
     ///
     /// # Examples
     ///
@@ -758,19 +760,14 @@ impl Context {
     ///
     /// # Examples
     ///
-    /// Change a server's icon using a file name "icon.png":
+    /// Change a guild's icon using a file name "icon.png":
     ///
     /// ```rust,ignore
     /// use serenity::utils;
     ///
     /// // We are using read_image helper function from utils.
-    /// let base64_icon = match utils::read_image("./icon.png") {
-    ///     Ok(base64_icon) => base64_icon,
-    ///     Err(why) => {
-    ///         println!("Error reading image: {:?}", why);
-    ///         return;
-    ///     },
-    /// };
+    /// let base64_icon = utils::read_image("./icon.png")
+    ///     .expect("Failed to read image");
     ///
     /// context.edit_guild(guild_id, |g|
     ///     g.icon(base64_icon));
@@ -782,14 +779,14 @@ impl Context {
         rest::edit_guild(guild_id.into().0, map)
     }
 
-    /// Allows to do specific things with members of a server
-    /// like mute, change nickname, etc.
-    /// Full list of methods is available at `EditMember` docs.
+    /// Modify the properties of member of a guild, such as muting or nicknaming
+    /// them.
+    ///
+    /// Refer to `EditMember`s documentation for a full list of methods.
     ///
     /// # Examples
     ///
-    /// Mute a member and set their roles to just one role with
-    /// the predefined Id.
+    /// Mute a member and set their roles to just one role with a predefined Id:
     ///
     /// ```rust,ignore
     /// context.edit_member(guild_id, user_id, |m| m
@@ -913,7 +910,7 @@ impl Context {
         rest::edit_note(user_id.into().0, map)
     }
 
-    /// Gets a vector of bans server has.
+    /// Gets a vector of bans guild has.
     pub fn get_bans<G: Into<GuildId>>(&self, guild_id: G) -> Result<Vec<Ban>> {
         rest::get_bans(guild_id.into().0)
     }
@@ -960,13 +957,13 @@ impl Context {
         Ok(channels)
     }
 
-    /// Gets [`Emoji`] by the given Id from a server.
+    /// Gets an `Emoji` by the given Id from a guild.
     pub fn get_emoji<E, G>(&self, guild_id: G, emoji_id: E) -> Result<Emoji>
         where E: Into<EmojiId>, G: Into<GuildId> {
         rest::get_emoji(guild_id.into().0, emoji_id.into().0)
     }
 
-    /// Gets a vector of all [`Emojis`] a server has.
+    /// Gets a vector of all `Emoji` a guild has.
     pub fn get_emojis<G: Into<GuildId>>(&self, guild_id: G)
         -> Result<Vec<Emoji>> {
         rest::get_emojis(guild_id.into().0)
@@ -1013,7 +1010,7 @@ impl Context {
         rest::get_invite(code)
     }
 
-    /// Gets `Member` of a specific server by Id, checking cache first.
+    /// Gets `Member` of a specific guild by Id, checking cache first.
     pub fn get_member<G, U>(&self, guild_id: G, user_id: U) -> Result<Member>
         where G: Into<GuildId>, U: Into<UserId> {
         let guild_id = guild_id.into();
@@ -1490,7 +1487,7 @@ impl Context {
             .set_presence(game, status, afk)
     }
 
-    /// Deletes an undefined amount of members from the given server
+    /// Deletes an undefined amount of members from the given guild
     /// based on the amount of days they've been offline for.
     ///
     /// **Note**: This will trigger [`GuildMemberRemove`] events

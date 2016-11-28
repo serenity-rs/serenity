@@ -13,7 +13,7 @@ pub fn start(target_id: Target, rx: MpscReceiver<Status>) {
     ThreadBuilder::new()
         .name(name)
         .spawn(move || runner(rx))
-        .expect("Err starting voice");
+        .expect("Error starting voice");
 }
 
 fn runner(rx: MpscReceiver<Status>) {
@@ -29,7 +29,7 @@ fn runner(rx: MpscReceiver<Status>) {
                     connection = match Connection::new(info) {
                         Ok(connection) => Some(connection),
                         Err(why) => {
-                            error!("Err connecting via voice: {:?}", why);
+                            error!("Error connecting via voice: {:?}", why);
 
                             None
                         },
@@ -71,7 +71,7 @@ fn runner(rx: MpscReceiver<Status>) {
                 match update {
                     Ok(()) => false,
                     Err(why) => {
-                        error!("Err updating voice connection: {:?}", why);
+                        error!("Error updating voice connection: {:?}", why);
 
                         true
                     },

@@ -20,14 +20,8 @@ impl EditProfile {
     ///
     /// // assuming you are in a context
     ///
-    /// let base64 = match utils::read_image("./my_image.jpg") {
-    ///     Ok(base64) => base64,
-    ///     Err(why) => {
-    ///         println!("Error reading image: {:?}", why);
-    ///
-    ///         return;
-    ///     },
-    /// };
+    /// let base64 = utils::read_image("./my_image.jpg")
+    ///     .expect("Failed to read image");
     ///
     /// let _ = context.edit_profile(|profile| {
     ///     profile.avatar(Some(base64))

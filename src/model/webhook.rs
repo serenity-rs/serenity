@@ -41,7 +41,7 @@ impl Webhook {
     /// let mut webhook = rest::get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
-    /// let _ = webhook.edit(Some("new name"), None).expect("err editing");
+    /// let _ = webhook.edit(Some("new name"), None).expect("Error editing");
     /// ```
     ///
     /// Setting a webhook's avatar:
@@ -56,9 +56,9 @@ impl Webhook {
     ///     .expect("valid webhook");
     ///
     /// let image = serenity::utils::read_image("./webhook_img.png")
-    ///     .expect("err reading image");
+    ///     .expect("Error reading image");
     ///
-    /// let _ = webhook.edit(None, Some(&image)).expect("err editing");
+    /// let _ = webhook.edit(None, Some(&image)).expect("Error editing");
     /// ```
     ///
     /// [`rest::edit_webhook`]: ../client/rest/fn.edit_webhook.html
@@ -114,7 +114,7 @@ impl Webhook {
     /// let mut webhook = rest::get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
-    /// let _ = webhook.execute(|w| w.content("test")).expect("err executing");
+    /// let _ = webhook.execute(|w| w.content("test")).expect("Error executing");
     /// ```
     ///
     /// Execute a webhook with message content of `test`, overriding the
@@ -141,7 +141,7 @@ impl Webhook {
     ///     .content("test")
     ///     .username("serenity")
     ///     .embeds(vec![embed]))
-    ///     .expect("err executing");
+    ///     .expect("Error executing");
     /// ```
     #[cfg(feature="methods")]
     pub fn execute<F>(&self, f: F) -> Result<Message>
