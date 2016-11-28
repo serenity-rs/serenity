@@ -52,7 +52,7 @@ impl EditGuild {
     /// // assuming a `guild` has already been bound
     ///
     /// let base64_icon = utils::read_image("./guild_icon.png")
-    ///     .unwrap("Failed to read image");
+    ///     .expect("Failed to read image");
     ///
     /// let _ = guild.edit(|g| g.icon(base64_icon));
     /// ```

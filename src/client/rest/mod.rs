@@ -484,8 +484,8 @@ pub fn delete_messages(channel_id: u64, map: Value) -> Result<()> {
 /// let channel_id = ChannelId(7);
 /// let message_id = MessageId(8);
 ///
-/// match rest::delete_message_reactions(channel_id.0, message_id.0)
-///     .unwrap("Error deleting reactions");
+/// let _ = rest::delete_message_reactions(channel_id.0, message_id.0)
+///     .expect("Error deleting reactions");
 /// ```
 ///
 /// [`Message`]: ../../model/struct.Message.html
