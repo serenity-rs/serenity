@@ -392,7 +392,7 @@ pub fn create_role(guild_id: u64) -> Result<Role> {
 /// let channel_id = 81384788765712384;
 /// let map = ObjectBuilder::new().insert("name", "test").build();
 ///
-/// let webhook = rest::create_webhook(channel_id, map).expect("err creating");
+/// let webhook = rest::create_webhook(channel_id, map).expect("Error creating");
 /// ```
 ///
 /// [`GuildChannel`]: ../../model/struct.GuildChannel.html
@@ -484,10 +484,8 @@ pub fn delete_messages(channel_id: u64, map: Value) -> Result<()> {
 /// let channel_id = ChannelId(7);
 /// let message_id = MessageId(8);
 ///
-/// match rest::delete_message_reactions(channel_id.0, message_id.0) {
-///     Ok(()) => println!("Reactions deleted"),
-///     Err(why) => println!("Error deleting reactions: {:?}", why),
-/// }
+/// match rest::delete_message_reactions(channel_id.0, message_id.0)
+///     .unwrap("Error deleting reactions");
 /// ```
 ///
 /// [`Message`]: ../../model/struct.Message.html
@@ -555,7 +553,7 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 /// // must have initialized a client first.
 /// let client = Client::login_user(&env::var("DISCORD_TOKEN").unwrap());
 ///
-/// rest::delete_webhook(245037420704169985).expect("err deleting webhook");
+/// rest::delete_webhook(245037420704169985).expect("Error deleting webhook");
 /// ```
 ///
 /// [`Webhook`]: ../../model/struct.Webhook.html
@@ -578,7 +576,7 @@ pub fn delete_webhook(webhook_id: u64) -> Result<()> {
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 ///
-/// rest::delete_webhook_with_token(id, token).expect("err deleting webhook");
+/// rest::delete_webhook_with_token(id, token).expect("Error deleting webhook");
 ///
 /// [`Webhook`]: ../../model/struct.Webhook.html
 pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
@@ -727,11 +725,11 @@ pub fn edit_role(guild_id: u64, role_id: u64, map: Value)
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 /// let image = serenity::utils::read_image("./webhook_img.png")
-///     .expect("err reading image");
+///     .expect("Error reading image");
 /// let map = ObjectBuilder::new().insert("avatar", image).build();
 ///
 /// let edited = rest::edit_webhook_with_token(id, token, map)
-///     .expect("err editing webhook");
+///     .expect("Error editing webhook");
 /// ```
 ///
 /// [`create_webhook`]: fn.create_webhook.html
@@ -770,7 +768,7 @@ pub fn edit_webhook(webhook_id: u64, map: Value) -> Result<Webhook> {
 /// let map = ObjectBuilder::new().insert("name", "new name").build();
 ///
 /// let edited = rest::edit_webhook_with_token(id, token, map)
-///     .expect("err editing webhook");
+///     .expect("Error editing webhook");
 /// ```
 ///
 /// [`edit_webhook`]: fn.edit_webhook.html
@@ -910,7 +908,7 @@ pub fn get_channel_invites(channel_id: u64)
 /// let channel_id = 81384788765712384;
 ///
 /// let webhooks = rest::get_channel_webhooks(channel_id)
-///     .expect("err getting channel webhooks");
+///     .expect("Error getting channel webhooks");
 /// ```
 ///
 /// [`GuildChannel`]: ../../model/struct.GuildChannel.html
@@ -1056,7 +1054,7 @@ pub fn get_guild_regions(guild_id: u64) -> Result<Vec<VoiceRegion>> {
 /// let guild_id = 81384788765712384;
 ///
 /// let webhooks = rest::get_guild_webhooks(guild_id)
-///     .expect("err getting guild webhooks");
+///     .expect("Error getting guild webhooks");
 /// ```
 ///
 /// [`Guild`]: ../../model/struct.Guild.html
@@ -1203,7 +1201,7 @@ pub fn get_voice_regions() -> Result<Vec<VoiceRegion>> {
 /// use serenity::client::rest;
 ///
 /// let id = 245037420704169985;
-/// let webhook = rest::get_webhook(id).expect("err getting webhook");
+/// let webhook = rest::get_webhook(id).expect("Error getting webhook");
 /// ```
 ///
 /// [`get_webhook_with_token`]: fn.get_webhook_with_token.html
@@ -1228,7 +1226,7 @@ pub fn get_webhook(webhook_id: u64) -> Result<Webhook> {
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 ///
 /// let webhook = rest::get_webhook_with_token(id, token)
-///     .expect("err getting webhook");
+///     .expect("Error getting webhook");
 /// ```
 pub fn get_webhook_with_token(webhook_id: u64, token: &str) -> Result<Webhook> {
     let client = HyperClient::new();

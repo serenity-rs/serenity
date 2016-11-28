@@ -117,7 +117,7 @@ pub fn keepalive(interval: u64,
                 },
                 Ok(GatewayStatus::SendMessage(val)) => {
                     if let Err(why) = sender.send_json(&val) {
-                        warn!("Err sending message: {:?}", why);
+                        warn!("Error sending message: {:?}", why);
                     }
                 },
                 Ok(GatewayStatus::Sequence(seq)) => {
@@ -137,7 +137,7 @@ pub fn keepalive(interval: u64,
                 .build();
 
             if let Err(why) = sender.send_json(&map) {
-                warn!("Err sending keepalive: {:?}", why);
+                warn!("Error sending keepalive: {:?}", why);
             }
         }
     }

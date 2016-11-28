@@ -403,6 +403,7 @@ impl Context {
     /// [`Role`]: ../model/struct.Role.html
     /// [Attach Files]: ../model/permissions/constant.ATTACH_FILES.html
     /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
+    /// [Manage Webhooks]: ../model/permissions/constant.MANAGE_WEBHOOKS.html
     /// [Send TTS Messages]: ../model/permissions/constant.SEND_TTS_MESSAGES.html
     pub fn create_permission<C>(&self,
                                 channel_id: C,
@@ -495,7 +496,7 @@ impl Context {
     /// [`Channel`]: ../model/enum.Channel.html
     /// [`Guild`]: ../model/struct.Guild.html
     /// [`GuildChannel`]: ../model/struct.GuildChannel.html
-    /// [Manage Messages]: ../model/permissions/constant.MANAGE_CHANNELS.html
+    /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
     pub fn delete_channel<C>(&self, channel_id: C) -> Result<Channel>
         where C: Into<ChannelId> {
         rest::delete_channel(channel_id.into().0)
@@ -626,7 +627,7 @@ impl Context {
     /// user did not perform the reaction.
     ///
     /// [`Reaction`]: ../model/struct.Reaction.html
-    /// [Manage Messages]: ../model/permissions/constant.MANAGE_MESSAGES.html
+    /// [`Manage Messages`]: ../model/permissions/constant.MANAGE_MESSAGES.html
     pub fn delete_reaction<C, M, R>(&self,
                                     channel_id: C,
                                     message_id: M,
@@ -764,13 +765,9 @@ impl Context {
     /// use serenity::utils;
     ///
     /// // We are using read_image helper function from utils.
-    /// let base64_icon = match utils::read_image("./icon.png") {
-    ///     Ok(base64_icon) => base64_icon,
-    ///     Err(why) => {
-    ///         println!("Error reading image: {:?}", why);
-    ///         return;
-    ///     },
-    /// };
+    /// let base64_icon = utils::read_image("./icon.png")
+    ///     .expect("Failed to read image");
+    /// // Don't use expect when fetching image dynamically.
     ///
     /// context.edit_guild(guild_id, |g|
     ///     g.icon(base64_icon));
@@ -960,13 +957,13 @@ impl Context {
         Ok(channels)
     }
 
-    /// Gets [`Emoji`] by the given Id from a server.
+    /// Gets `Emoji` by the given Id from a server.
     pub fn get_emoji<E, G>(&self, guild_id: G, emoji_id: E) -> Result<Emoji>
         where E: Into<EmojiId>, G: Into<GuildId> {
         rest::get_emoji(guild_id.into().0, emoji_id.into().0)
     }
 
-    /// Gets a vector of all [`Emojis`] a server has.
+    /// Gets a vector of all `Emoji` a server has.
     pub fn get_emojis<G: Into<GuildId>>(&self, guild_id: G)
         -> Result<Vec<Emoji>> {
         rest::get_emojis(guild_id.into().0)

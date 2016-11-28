@@ -325,7 +325,7 @@ impl Cache {
     ///     Some(channel) => channel,
     ///     None => {
     ///         context.say("Could not find guild's channel data")
-    ///             .map_err(|why| println!("Err sending message: {:?}", why));
+    ///             .map_err(|why| println!("Error sending message: {:?}", why));
     ///
     ///         return;
     ///     },
@@ -373,8 +373,8 @@ impl Cache {
     ///     let channel = match cache.get_guild_channel(message.channel_id) {
     ///         Some(channel) => channel,
     ///         None => {
-    ///             if let Err(why) = context.say("Err finding channel data") {
-    ///                 println!("Err sending message: {:?}", why);
+    ///             if let Err(why) = context.say("Error finding channel data") {
+    ///                 println!("Error sending message: {:?}", why);
     ///             }
     ///         },
     ///     };
@@ -382,8 +382,8 @@ impl Cache {
     ///     match cache.get_member(channel.guild_id, message.author.id) {
     ///         Some(member) => member,
     ///         None => {
-    ///             if let Err(why) = context.say("Err finding member data") {
-    ///                 println!("Err sending message: {:?}", why);
+    ///             if let Err(why) = context.say("Error finding member data") {
+    ///                 println!("Error sending message: {:?}", why);
     ///             }
     ///         },
     ///     }
@@ -392,7 +392,7 @@ impl Cache {
     /// let msg = format!("You have {} roles", member.roles.len());
     ///
     /// if let Err(why) = context.say(&msg) {
-    ///     println!("Err sending message: {:?}", why);
+    ///     println!("Error sending message: {:?}", why);
     /// }
     /// ```
     ///

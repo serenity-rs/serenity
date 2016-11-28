@@ -139,7 +139,7 @@ impl Attachment {
     ///
     /// // Make sure that the directory to store images in exists.
     /// fs::create_dir_all("./attachment_downloads")
-    ///     .expect("err making directory");
+    ///     .expect("Error making directory");
     ///
     /// let token = env::var("DISCORD_TOKEN").expect("token in environment");
     /// let mut client = Client::login_bot(&token);

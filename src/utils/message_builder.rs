@@ -112,6 +112,176 @@ impl MessageBuilder {
         self
     }
 
+    /// Pushes a code-block to your message, with optional syntax highlighting.
+    pub fn push_codeblock(mut self, content: &str, language: Option<&str>) -> Self {
+        match language {
+            Some(x) => {
+                self.0.push_str(&format!("```{}\n{}\n```", language, content));
+            },
+            None => {
+                self.0.push_str(&format!("```\n{}\n```", content));
+            }
+        }
+
+        self
+    }
+
+    /// Pushes an inline monospaced text to your message.
+    pub fn push_mono(mut self, content: &str) -> Self {
+        self.0.push_str(&format!("`{}`", content));
+
+        self
+    }
+
+    /// Pushes an inline italicized text to your message.
+    pub fn push_italic(mut self, content: &str) -> Self {
+        self.0.push_str(&format!("_{}_", content));
+
+        self
+    }
+
+    /// Pushes an inline bold text to your message.
+    pub fn push_bold(mut self, content: &str) -> Self {
+        self.0.push_str(&format!("**{}**", content));
+
+        self
+    }
+
+    /// Pushes an underlined inline text to your message.
+    pub fn push_underline(mut self, content: &str) -> Self {
+        self.0.push_str(&format!("__{}__", content));
+
+        self
+    }
+
+    /// Pushes a strikethrough inline text to your message.
+    pub fn push_strike(mut self, content: &str) -> Self {
+        self.0.push_str(&format!("~~{}~~", content));
+
+        self
+    }
+
+    fn normalize(text: &str) -> &str {
+        // Remove everyone and here mentions
+        // This changes 'at' symbol to a full-width variation
+        let mut new_text = text.replace("@everyone", "＠everyone")
+            .replace("@here", "＠here")
+        // Remove invite links and popular scam websites
+        // mostly to prevent our bot triggering various ads detectors
+            .replace("discord.gg", "discord․gg")
+            .replace("discord.me", "discord․me")
+            .replace("discordlist.net", "discordlist․net")
+            .replace("discordservers.com", "discordlist․net")
+            .replace("discordapp.com/invite", "discordapp․com/invite")
+        // Remove right-to-left override and similar
+            .replace("\u{202E}", " ")  // RTL
+            .replace("\u{200F}", " ")  // RTL Mark
+            .replace("\u{202B}", " ")  // RTL Embedding
+            .replace("\u{200B}", " ")  // Zero-width space
+            .replace("\u{200D}", " ")  // Zero-width joiner
+            .replace("\u{200C}", " "); // Zero-width non-joiner
+
+        // I'm going quite a bit lazy with this, but at least
+        // we don't have to fetch members.
+        if new_text.split("<@").count(0) > 3 {
+            new_text = new_text.replace("<@!", "<user ")
+                .replace("<@", "<user ");
+        }
+        if new_text.split("<&").count(0) > 3 {
+            new_text = new_text.replace("<&", "<role ");
+        }
+
+        new_text
+    }
+
+    /// Pushes text to your message, but normalizing content - that means
+    /// ensuring that there's no unwanted formatting, mention spam etc.
+    pub fn push_safe(mut self, content: &str) -> Self {
+        self.0.push_str(
+            normalize(&content).replace("*", "\*")
+                .replace("`", "\`")
+                .replace("_", "\_")
+        );
+
+        self
+    }
+
+    /// Pushes a code-block to your message normalizing content.
+    pub fn push_codeblock_safe(mut self, ct: &str, language: Option<&str>) -> Self {
+        let content = normalize(&ct).replace("```", "\u{201B}\u{201B}\u{201B}");
+
+        match language {
+            Some(x) => {
+                self.0.push_str(&format!("```{}\n{}\n```", language, content));
+            },
+            None => {
+                self.0.push_str(&format!("```\n{}\n```", content));
+            }
+        }
+
+        self
+    }
+
+    /// Pushes an inline monospaced text to your message normalizing content.
+    pub fn push_mono_safe(mut self, content: &str) -> Self {
+        self.0.push_str(
+            &format!(
+                "`{}`",
+                normalize(&content).replace("`", "\u{201B}")
+            )
+        );
+
+        self
+    }
+
+    /// Pushes an inline italicized text to your message normalizing content.
+    pub fn push_italic_safe(mut self, content: &str) -> Self {
+        self.0.push_str(
+            &format!(
+                "_{}_",
+                normalize(&content).replace("_", "＿")
+            )
+        );
+
+        self
+    }
+
+    /// Pushes an inline bold text to your message normalizing content.
+    pub fn push_bold_safe(mut self, content: &str) -> Self {
+        self.0.push_str(
+            &format!(
+                "**{}**",
+                normalize(&content).replace("**", "∗∗")
+            )
+        );
+
+        self
+    }
+
+    /// Pushes an underlined inline text to your message normalizing content.
+    pub fn push_underline_safe(mut self, content: &str) -> Self {
+        self.0.push_str(
+            &format!(
+                "__{}__",
+                normalize(&content).replace("__", "＿＿")
+            )
+        );
+
+        self
+    }
+
+    /// Pushes a strikethrough inline text to your message normalizing content.
+    pub fn push_strike_safe(mut self, content: &str) -> Self {
+        self.0.push_str(
+            &format!(
+                "~~{}~~",
+                normalize(&content).replace("~~", "∼∼")
+            )
+        );
+
+        self
+    }
+
     /// Mentions the [`Role`] in the built message.
     ///
     /// This accepts anything that converts _into_ a [`RoleId`]. Refer to
