@@ -50,6 +50,7 @@ impl ChannelId {
 }
 
 impl From<Channel> for ChannelId {
+    /// Gets the Id of a `Channel`.
     fn from(channel: Channel) -> ChannelId {
         match channel {
             Channel::Group(group) => group.channel_id,
@@ -60,18 +61,21 @@ impl From<Channel> for ChannelId {
 }
 
 impl From<PrivateChannel> for ChannelId {
+    /// Gets the Id of a private channel.
     fn from(private_channel: PrivateChannel) -> ChannelId {
         private_channel.id
     }
 }
 
 impl From<GuildChannel> for ChannelId {
+    /// Gets the Id of a guild channel.
     fn from(public_channel: GuildChannel) -> ChannelId {
         public_channel.id
     }
 }
 
 impl From<Emoji> for EmojiId {
+    /// Gets the Id of an `Emoji`.
     fn from(emoji: Emoji) -> EmojiId {
         emoji.id
     }
@@ -122,42 +126,49 @@ impl GuildId {
 }
 
 impl From<PartialGuild> for GuildId {
+    /// Gets the Id of a partial guild.
     fn from(guild: PartialGuild) -> GuildId {
         guild.id
     }
 }
 
 impl From<GuildInfo> for GuildId {
+    /// Gets the Id of Guild information struct.
     fn from(guild_info: GuildInfo) -> GuildId {
         guild_info.id
     }
 }
 
 impl From<InviteGuild> for GuildId {
+    /// Gets the Id of Invite Guild struct.
     fn from(invite_guild: InviteGuild) -> GuildId {
         invite_guild.id
     }
 }
 
 impl From<Guild> for GuildId {
+    /// Gets the Id of Guild.
     fn from(live_guild: Guild) -> GuildId {
         live_guild.id
     }
 }
 
 impl From<Integration> for IntegrationId {
+    /// Gets the Id of integration.
     fn from(integration: Integration) -> IntegrationId {
         integration.id
     }
 }
 
 impl From<Message> for MessageId {
+    /// Gets the Id of a `Message`.
     fn from(message: Message) -> MessageId {
         message.id
     }
 }
 
 impl From<Role> for RoleId {
+    /// Gets the Id of a `Role`.
     fn from(role: Role) -> RoleId {
         role.id
     }
@@ -192,18 +203,21 @@ impl RoleId {
 }
 
 impl From<CurrentUser> for UserId {
+    /// Gets the Id of a `CurrentUser` struct.
     fn from(current_user: CurrentUser) -> UserId {
         current_user.id
     }
 }
 
 impl From<Member> for UserId {
+    /// Gets the Id of a `Member`.
     fn from(member: Member) -> UserId {
         member.user.id
     }
 }
 
 impl From<User> for UserId {
+    /// Gets the Id of a `User`.
     fn from(user: User) -> UserId {
         user.id
     }
