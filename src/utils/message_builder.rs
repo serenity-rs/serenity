@@ -161,7 +161,7 @@ impl MessageBuilder {
         self
     }
 
-    fn normalize(text: &str) -> &str {
+    fn normalize(self, text: &str) -> &str {
         // Remove everyone and here mentions
         // This changes 'at' symbol to a full-width variation
         let mut new_text = text.replace("@everyone", "＠everyone")
