@@ -37,7 +37,7 @@ fn main() {
 }
 
 #[cfg(feature = "voice")]
-fn deafen(context: Context, message: Message, _args: Vec<String>) {
+fn deafen(context: &Context, message: &Message, _args: Vec<String>) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
         None => {
@@ -68,7 +68,7 @@ fn deafen(context: Context, message: Message, _args: Vec<String>) {
 }
 
 #[cfg(feature = "voice")]
-fn join(context: Context, message: Message, args: Vec<String>) {
+fn join(context: &Context, message: &Message, args: Vec<String>) {
     let connect_to = match args.get(0) {
         Some(arg) => match arg.parse::<u64>() {
             Ok(id) => ChannelId(id),
@@ -103,7 +103,7 @@ fn join(context: Context, message: Message, args: Vec<String>) {
 }
 
 #[cfg(feature = "voice")]
-fn leave(context: Context, message: Message, _args: Vec<String>) {
+fn leave(context: &Context, message: &Message, _args: Vec<String>) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
         None => {
@@ -128,7 +128,7 @@ fn leave(context: Context, message: Message, _args: Vec<String>) {
 }
 
 #[cfg(feature = "voice")]
-fn mute(context: Context, message: Message, _args: Vec<String>) {
+fn mute(context: &Context, message: &Message, _args: Vec<String>) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
         None => {
@@ -159,6 +159,6 @@ fn mute(context: Context, message: Message, _args: Vec<String>) {
 }
 
 #[cfg(feature = "voice")]
-fn ping(context: Context, _message: Message, _args: Vec<String>) {
+fn ping(context: &Context, _message: &Message, _args: Vec<String>) {
     let _ = context.say("Pong!");
 }
