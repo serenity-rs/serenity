@@ -722,12 +722,18 @@ impl Cache {
 
     #[doc(hidden)]
     pub fn update_with_guild_create(&mut self, event: &GuildCreateEvent) {
+        self.unavailable_guilds.retain(|guild_id| *guild_id != event.guild.id);
+
         self.guilds.insert(event.guild.id, event.guild.clone());
     }
 
     #[doc(hidden)]
     pub fn update_with_guild_delete(&mut self, event: &GuildDeleteEvent)
         -> Option<Guild> {
+        if !self.unavailable_guilds.contains(&event.guild.id) {
+            self.unavailable_guilds.push(event.guild.id);
+        }
+
         self.guilds.remove(&event.guild.id)
     }
 
