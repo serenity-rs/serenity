@@ -19,6 +19,7 @@ mod get_messages;
 pub use self::create_embed::{
     CreateEmbed,
     CreateEmbedAuthor,
+    CreateEmbedFooter,
     CreateEmbedField,
     CreateEmbedImage,
     CreateEmbedThumbnail,
