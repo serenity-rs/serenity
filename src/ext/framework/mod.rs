@@ -163,6 +163,8 @@ pub enum CommandType {
 pub struct Framework {
     configuration: Configuration,
     commands: HashMap<String, InternalCommand>,
+    before: Option<Arc<Fn(&Context, &Message, &str)>>,
+    after: Option<Arc<Fn(&Context, &Message, &str)>>,
     checks: HashMap<String, Arc<Fn(&Context, &Message) -> bool + Send + Sync + 'static>>,
     /// Whether the framework has been "initialized".
     ///
@@ -263,14 +265,20 @@ impl Framework {
 
                     let command = command.clone();
 
+                    let before = self.before.clone();
+                    (before).map(|x| (x)(&context, &message, &built));
+
                     thread::spawn(move || {
                         let args = message.content[position + built.len()..]
                             .split_whitespace()
                             .map(|arg| arg.to_owned())
                             .collect::<Vec<String>>();
 
-                        (command)(context, message, args)
+                        (command)(&context, &message, args)
                     });
+
+                    let after = self.after.clone();
+                    (after).map(|x| (x)(&context, &message, &built));
 
                     return;
                 }
@@ -294,6 +302,20 @@ impl Framework {
         self.commands.insert(command_name.into(), Arc::new(f));
         self.initialized = true;
 
+        self
+    }
+
+    /// This will call given closure before every command's execution
+    pub fn before<F>(mut self, f: F) -> Self
+        where F: Fn(Context, Message, String) + Send + Sync + 'static {
+        self.before = Some(Arc::new(f));
+        self
+    }
+
+    /// This will call given closure after every command's execution
+    pub fn after<F>(mut self, f: F) -> Self
+        where F: Fn(Context, Message, String) + Send + Sync + 'static {
+        self.after = Some(Arc::new(f));
         self
     }
 
