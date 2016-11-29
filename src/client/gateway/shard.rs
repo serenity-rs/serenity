@@ -6,7 +6,7 @@ use std::thread::{self, Builder as ThreadBuilder};
 use std::time::Duration as StdDuration;
 use std::mem;
 use super::super::login_type::LoginType;
-use super::super::Client;
+use super::super::{Client, rest};
 use super::{GatewayError, GatewayStatus, prep};
 use websocket::client::{Client as WsClient, Sender, Receiver};
 use websocket::message::Message as WsMessage;
@@ -435,7 +435,9 @@ impl Shard {
         // Take a few attempts at reconnecting; otherwise fall back to
         // re-instantiating the connection.
         for _ in 0..3 {
-            let shard = Shard::new(&self.ws_url,
+            let gateway_url = try!(rest::get_gateway()).url;
+
+            let shard = Shard::new(&gateway_url,
                                    &self.token,
                                    self.shard_info,
                                    self.login_type);
