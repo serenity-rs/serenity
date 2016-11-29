@@ -447,7 +447,7 @@ pub fn delete_guild_integration(guild_id: u64, integration_id: u64)
 
 /// Deletes an invite by code.
 pub fn delete_invite(code: &str) -> Result<Invite> {
-    let response = request!(Route::InvitesCode, delete, "/invite/{}", code);
+    let response = request!(Route::InvitesCode, delete, "/invites/{}", code);
 
     Invite::decode(try!(serde_json::from_reader(response)))
 }
@@ -620,6 +620,19 @@ pub fn edit_guild(guild_id: u64, map: Value) -> Result<PartialGuild> {
                             guild_id);
 
     PartialGuild::decode(try!(serde_json::from_reader(response)))
+}
+
+/// Edits a [`Guild`]'s embed setting.
+///
+/// [`Guild`]: ../../model/struct.Guild.html
+pub fn edit_guild_embed(guild_id: u64, map: Value) -> Result<GuildEmbed> {
+    let body = try!(serde_json::to_string(&map));
+    let response = request!(Route::GuildsIdEmbed(guild_id),
+                            patch(body),
+                            "/guilds/{}/embed",
+                            guild_id);
+
+    GuildEmbed::decode(try!(serde_json::from_reader(response)))
 }
 
 /// Does specific actions to a member.
@@ -1030,7 +1043,10 @@ pub fn get_guild_prune_count(guild_id: u64, map: Value)
     GuildPrune::decode(try!(serde_json::from_reader(response)))
 }
 
-/// Gets regions that a guild can use, if a guild is VIP shows more regions :o
+/// Gets regions that a guild can use. If a guild has [`Feature::VipRegions`]
+/// enabled, then additional VIP-only regions are returned.
+///
+/// [`Feature::VipRegions`]: ../../model/enum.Feature.html#variant.VipRegions
 pub fn get_guild_regions(guild_id: u64) -> Result<Vec<VoiceRegion>> {
     let response = request!(Route::GuildsIdRegions(guild_id),
                             get,
@@ -1038,6 +1054,18 @@ pub fn get_guild_regions(guild_id: u64) -> Result<Vec<VoiceRegion>> {
                             guild_id);
 
     decode_array(try!(serde_json::from_reader(response)), VoiceRegion::decode)
+}
+
+/// Retrieves a list of roles in a [`Guild`].
+///
+/// [`Guild`]: ../../model/struct.Guild.html
+pub fn get_guild_roles(guild_id: u64) -> Result<Vec<Role>> {
+    let response = request!(Route::GuildsIdRoles(guild_id),
+                            get,
+                            "/guilds/{}/roles",
+                            guild_id);
+
+    decode_array(try!(serde_json::from_reader(response)), Role::decode)
 }
 
 /// Retrieves the webhooks for the given [guild][`Guild`]'s Id.
@@ -1079,7 +1107,7 @@ pub fn get_guilds() -> Result<Vec<GuildInfo>> {
 /// Gets information about a specific invite.
 pub fn get_invite(code: &str) -> Result<Invite> {
     let invite = ::utils::parse_invite(code);
-    let response = request!(Route::InvitesCode, get, "/invite/{}", invite);
+    let response = request!(Route::InvitesCode, get, "/invites/{}", invite);
 
     Invite::decode(try!(serde_json::from_reader(response)))
 }
