@@ -75,6 +75,7 @@
 //! [examples]: https://github.com/zeyla/serenity.rs/tree/master/examples
 //! [`validate_token`]: client/fn.validate_token.html
 #![allow(doc_markdown, inline_always, unknown_lints)]
+#![doc(html_logo_url = "https://docs.austinhellyer.me/serenity.rs/docs_header.png")]
 #![warn(dead_code, enum_glob_use, if_not_else)]
 
 #[macro_use]
