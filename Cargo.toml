@@ -51,38 +51,3 @@ debug = []
 framework = []
 methods = []
 voice = ["opus", "sodiumoxide"]
-
-[[bin]]
-doc = false
-name = "example-01"
-path = "./examples/01_basic_ping_bot.rs"
-
-[[bin]]
-doc = false
-name = "example-02"
-path = "./examples/02_transparent_guild_sharding.rs"
-
-[[bin]]
-doc = false
-name = "example-03"
-path = "./examples/03_struct_utilities.rs"
-
-[[bin]]
-doc = false
-name = "example-04"
-path = "./examples/04_message_builder.rs"
-
-[[bin]]
-doc = false
-name = "example-05"
-path = "./examples/05_user_login.rs"
-
-[[bin]]
-doc = false
-name = "example-06"
-path = "./examples/06_command_framework.rs"
-
-[[bin]]
-doc = false
-name = "example-07"
-path = "./examples/07_voice.rs"
