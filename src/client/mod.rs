@@ -819,19 +819,6 @@ impl Client {
             thread::sleep(Duration::from_secs(1));
         }
     }
-
-    // Boot up a new shard. This is used primarily in the scenario of
-    // re-instantiating a shard in the reconnect logic in another [`Shard`].
-    //
-    // [`Shard`]: gateway/struct.Shard.html
-    #[doc(hidden)]
-    pub fn boot_shard(&mut self,
-                      shard_info: Option<[u8; 2]>)
-                      -> Result<(Shard, ReadyEvent, Receiver<WebSocketStream>)> {
-        let gateway_url = try!(rest::get_gateway()).url;
-
-        Shard::new(&gateway_url, &self.token, shard_info, self.login_type)
-    }
 }
 
 #[cfg(feature = "cache")]

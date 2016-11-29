@@ -12,6 +12,8 @@ pub enum Error {
     ExpectedHello,
     /// Expected a Ready or an InvalidateSession
     InvalidHandshake,
+    /// Failed to reconnect after a number of attempts.
+    ReconnectFailure,
 }
 
 impl Display for Error {
@@ -25,6 +27,9 @@ impl Display for Error {
             },
             Error::InvalidHandshake => {
                 f.write_str("Expected Ready or InvalidateSession")
+            },
+            Error::ReconnectFailure => {
+                f.write_str("Failed to Reconnect")
             },
         }
     }

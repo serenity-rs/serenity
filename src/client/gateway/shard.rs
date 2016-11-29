@@ -432,9 +432,8 @@ impl Shard {
         -> Result<(Event, Receiver<WebSocketStream>)> {
         debug!("Reconnecting");
 
-        // Take a few attempts at reconnecting; otherwise fall back to
-        // re-instantiating the connection.
-        for _ in 0..3 {
+        // Take a few attempts at reconnecting.
+        for i in 1u64..11u64 {
             let gateway_url = try!(rest::get_gateway()).url;
 
             let shard = Shard::new(&gateway_url,
@@ -450,29 +449,12 @@ impl Shard {
                 return Ok((Event::Ready(ready), receiver_new));
             }
 
-            thread::sleep(StdDuration::from_secs(1));
+            // Exponentially back off.
+            thread::sleep(StdDuration::from_secs(i.pow(2)));
         }
 
-        // If all else fails: get a new endpoint.
-        //
-        // A bit of complexity here: instantiate a temporary instance of a
-        // Client. This client _does not_ replace the current client(s) that the
-        // user has. This client will then connect to gateway. This new
-        // shard will be used to replace _this_ shard.
-        let (shard, ready, receiver_new) = {
-            let mut client = Client::login_raw(&self.token.clone(),
-                                               self.login_type);
-
-            try!(client.boot_shard(self.shard_info))
-        };
-
-        // Replace this shard with a new one, and shutdown the now-old
-        // shard.
-        try!(mem::replace(self, shard).shutdown(&mut receiver));
-
-        self.session_id = Some(ready.ready.session_id.clone());
-
-        Ok((Event::Ready(ready), receiver_new))
+        // Reconnecting failed; just return an error instead.
+        Err(Error::Gateway(GatewayError::ReconnectFailure))
     }
 
     fn resume(&mut self, session_id: String, receiver: &mut Receiver<WebSocketStream>)
