@@ -1285,7 +1285,7 @@ impl Context {
     ///
     /// let _ = client.start();
     ///
-    /// fn ping(context: Context, message: Message, _arguments: Vec<String>) {
+    /// fn ping(context: &Context, message: &Message, _arguments: Vec<String>) {
     ///     let cache = CACHE.read().unwrap();
     ///     let channel = cache.get_guild_channel(message.channel_id);
     ///

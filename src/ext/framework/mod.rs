@@ -42,11 +42,11 @@
 //!     .on("about", about)
 //!     .on("ping", ping));
 //!
-//! fn about(context: Context, _message: Message, _args: Vec<String>) {
+//! fn about(context: &Context, _message: &Message, _args: Vec<String>) {
 //!     let _ = context.say("A simple test bot");
 //! }
 //!
-//! fn ping(context: Context, _message: Message, _args: Vec<String>) {
+//! fn ping(context: &Context, _message: &Message, _args: Vec<String>) {
 //!     let _ = context.say("Pong!");
 //! }
 //! ```
@@ -345,7 +345,7 @@ impl Framework {
     ///     .on("ping", ping)
     ///     .set_check("ping", owner_check));
     ///
-    /// fn ping(context: Context, _message: Message, _args: Vec<String>) {
+    /// fn ping(context: &Context, _message: &Message, _args: Vec<String>) {
     ///     context.say("Pong!");
     /// }
     ///
