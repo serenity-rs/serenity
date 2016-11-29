@@ -7,6 +7,8 @@ use serde_json::Value;
 use websocket::result::WebSocketError;
 use ::client::gateway::GatewayError;
 use ::client::ClientError;
+#[cfg(feature = "opus")]
+use opus::Error as OpusError;
 #[cfg(feature="voice")]
 use ::ext::voice::VoiceError;
 
@@ -59,36 +61,46 @@ pub enum Error {
     Other(&'static str),
     /// An error from the `url` crate.
     Url(String),
+    /// An error from the `rust-websocket` crate.
+    WebSocket(WebSocketError),
+    /// An error from the `opus` crate.
+    #[cfg(feature = "voice")]
+    Opus(OpusError),
     /// Indicating an error within the [voice module].
     ///
     /// [voice module]: ext/voice/index.html
-    #[cfg(feature="voice")]
+    #[cfg(feature = "voice")]
     Voice(VoiceError),
-    /// An error from the `rust-websocket` crate.
-    WebSocket(WebSocketError),
 }
 
 impl From<IoError> for Error {
-    fn from(err: IoError) -> Error {
-        Error::Io(err)
+    fn from(e: IoError) -> Error {
+        Error::Io(e)
     }
 }
 
 impl From<HyperError> for Error {
-    fn from(err: HyperError) -> Error {
-        Error::Hyper(err)
+    fn from(e: HyperError) -> Error {
+        Error::Hyper(e)
     }
 }
 
 impl From<JsonError> for Error {
-    fn from(err: JsonError) -> Error {
-        Error::Json(err)
+    fn from(e: JsonError) -> Error {
+        Error::Json(e)
+    }
+}
+
+#[cfg(feature = "voice")]
+impl From<OpusError> for Error {
+    fn from(e: OpusError) -> Error {
+        Error::Opus(e)
     }
 }
 
 impl From<WebSocketError> for Error {
-    fn from(err: WebSocketError) -> Error {
-        Error::WebSocket(err)
+    fn from(e: WebSocketError) -> Error {
+        Error::WebSocket(e)
     }
 }
 
@@ -96,9 +108,11 @@ impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Error::Hyper(ref inner) => inner.fmt(f),
+            Error::Io(ref inner) => inner.fmt(f),
             Error::Json(ref inner) => inner.fmt(f),
             Error::WebSocket(ref inner) => inner.fmt(f),
-            Error::Io(ref inner) => inner.fmt(f),
+            #[cfg(feature = "voice")]
+            Error::Opus(ref inner) => inner.fmt(f),
             _ => f.write_str(self.description()),
         }
     }
@@ -115,6 +129,8 @@ impl StdError for Error {
             Error::Json(ref inner) => inner.description(),
             Error::Url(ref inner) => inner,
             Error::WebSocket(ref inner) => inner.description(),
+            #[cfg(feature = "voice")]
+            Error::Opus(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Voice(_) => "Voice error",
         }

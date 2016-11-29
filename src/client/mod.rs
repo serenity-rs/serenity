@@ -54,7 +54,6 @@ use ::model::event::{
     GuildSyncEvent,
     MessageUpdateEvent,
     PresenceUpdateEvent,
-    ReadyEvent,
     ResumedEvent,
     TypingStartEvent,
     VoiceServerUpdateEvent,

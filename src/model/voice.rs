@@ -4,16 +4,7 @@ use ::constants::VoiceOpCode;
 use ::internal::prelude::*;
 use ::utils::decode_array;
 
-#[derive(Clone, Debug)]
-pub struct VoiceHandshake {
-    pub heartbeat_interval: u64,
-    pub ip: Option<String>,
-    pub modes: Vec<String>,
-    pub port: u16,
-    pub ssrc: u32,
-}
-
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct VoiceHeartbeat {
     pub heartbeat_interval: u64,
 }
@@ -21,6 +12,7 @@ pub struct VoiceHeartbeat {
 #[derive(Clone, Debug)]
 pub struct VoiceHello {
     pub heartbeat_interval: u64,
+    pub ip: String,
     pub modes: Vec<String>,
     pub port: u16,
     pub ssrc: u32,
@@ -32,7 +24,7 @@ pub struct VoiceReady {
     pub secret_key: Vec<u8>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct VoiceSpeaking {
     pub speaking: bool,
     pub ssrc: u32,
@@ -41,7 +33,6 @@ pub struct VoiceSpeaking {
 
 #[derive(Clone, Debug)]
 pub enum VoiceEvent {
-    Handshake(VoiceHandshake),
     Heartbeat(VoiceHeartbeat),
     Hello(VoiceHello),
     Ready(VoiceReady),
@@ -56,16 +47,20 @@ impl VoiceEvent {
         let op = req!(try!(remove(&mut value, "op")).as_u64());
         let mut map = try!(remove(&mut value, "d").and_then(into_map));
 
-        match try!(VoiceOpCode::from_num(op).ok_or(Error::Client(ClientError::InvalidOpCode))) {
+        let opcode = try!(VoiceOpCode::from_num(op)
+            .ok_or(Error::Client(ClientError::InvalidOpCode)));
+
+        match opcode {
             VoiceOpCode::Heartbeat => {
                 missing!(map, VoiceEvent::Heartbeat(VoiceHeartbeat {
-                    heartbeat_interval: req!(try!(remove(&mut value, "heartbeat_interval")).as_u64()),
+                    heartbeat_interval: req!(try!(remove(&mut map, "heartbeat_interval")).as_u64()),
                 }))
             },
             VoiceOpCode::Hello => {
                 missing!(map, VoiceEvent::Hello(VoiceHello {
                     heartbeat_interval: req!(try!(remove(&mut map, "heartbeat_interval"))
                         .as_u64()),
+                    ip: try!(remove(&mut map, "ip").and_then(into_string)),
                     modes: try!(decode_array(try!(remove(&mut map, "modes")),
                                              into_string)),
                     port: req!(try!(remove(&mut map, "port"))

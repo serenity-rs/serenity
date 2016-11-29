@@ -4,13 +4,16 @@ mod connection_info;
 mod error;
 mod manager;
 mod handler;
+mod payload;
+mod streamer;
 mod threading;
 
+pub use self::audio::{AudioReceiver, AudioSource};
 pub use self::error::VoiceError;
 pub use self::handler::Handler;
 pub use self::manager::Manager;
+pub use self::streamer::{ffmpeg, ytdl};
 
-use self::audio::{AudioReceiver, AudioSource};
 use self::connection_info::ConnectionInfo;
 use ::model::{ChannelId, GuildId};
 

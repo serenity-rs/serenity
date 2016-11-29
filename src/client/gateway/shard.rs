@@ -6,7 +6,7 @@ use std::thread::{self, Builder as ThreadBuilder};
 use std::time::Duration as StdDuration;
 use std::mem;
 use super::super::login_type::LoginType;
-use super::super::{Client, rest};
+use super::super::rest;
 use super::{GatewayError, GatewayStatus, prep};
 use websocket::client::{Client as WsClient, Sender, Receiver};
 use websocket::message::Message as WsMessage;

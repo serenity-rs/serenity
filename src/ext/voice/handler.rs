@@ -1,5 +1,6 @@
 use serde_json::builder::ObjectBuilder;
-use std::sync::mpsc::{self, Sender};
+use std::sync::mpsc::{self, Sender as MpscSender};
+use super::{AudioReceiver, AudioSource};
 use super::connection_info::ConnectionInfo;
 use super::{Status as VoiceStatus, Target};
 use ::client::gateway::GatewayStatus;
@@ -36,10 +37,10 @@ pub struct Handler {
     guild_id: Option<GuildId>,
     self_deaf: bool,
     self_mute: bool,
-    sender: Sender<VoiceStatus>,
+    sender: MpscSender<VoiceStatus>,
     session_id: Option<String>,
     user_id: u64,
-    ws: Sender<GatewayStatus>,
+    ws: MpscSender<GatewayStatus>,
 }
 
 impl Handler {
@@ -52,7 +53,7 @@ impl Handler {
     ///
     /// [`Manager::join`]: struct.Manager.html#method.join
     #[doc(hidden)]
-    pub fn new(target: Target, ws: Sender<GatewayStatus>, user_id: u64)
+    pub fn new(target: Target, ws: MpscSender<GatewayStatus>, user_id: u64)
         -> Self {
         let (tx, rx) = mpsc::channel();
 
@@ -170,6 +171,17 @@ impl Handler {
         }
     }
 
+    /// Sets a receiver, i.e. a way to receive audio. Most use cases for bots do
+    /// not require this.
+    ///
+    /// The `receiver` argument can be thought of as an "optional Option". You
+    /// can pass in just a boxed receiver, and do not need to specify `Some`.
+    ///
+    /// Pass `None` to drop the current receiver, if one exists.
+    pub fn listen<O: Into<Option<Box<AudioReceiver>>>>(&mut self, receiver: O) {
+        self.send(VoiceStatus::SetReceiver(receiver.into()))
+    }
+
     /// Sets whether the current connection is to be muted.
     ///
     /// If there is no live voice connection, then this only acts as a settings
@@ -180,6 +192,19 @@ impl Handler {
         if self.channel_id.is_some() {
             self.update();
         }
+    }
+
+    /// Plays audio from a source. This can be a source created via
+    /// [`voice::ffmpeg`] or [`voice::ytdl`].
+    ///
+    /// [`voice::ffmpeg`]: fn.ffmpeg.html
+    /// [`voice::ytdl`]: fn.ytdl.html
+    pub fn play(&mut self, source: Box<AudioSource>) {
+        self.send(VoiceStatus::SetSender(Some(source)))
+    }
+
+    pub fn stop(&mut self) {
+        self.send(VoiceStatus::SetSender(None))
     }
 
     /// Switches the current connected voice channel to the given `channel_id`.
@@ -243,8 +268,8 @@ impl Handler {
 
         self.send(VoiceStatus::Connect(ConnectionInfo {
             endpoint: endpoint,
-            server_id: target_id,
             session_id: session_id,
+            target_id: target_id,
             token: token,
         }))
     }
@@ -264,10 +289,8 @@ impl Handler {
     }
 
     fn send(&mut self, status: VoiceStatus) {
-        let send = self.sender.send(status);
-
-        // Reconnect if it errored.
-        if let Err(mpsc::SendError(status)) = send {
+        // Restart thread if it errored.
+        if let Err(mpsc::SendError(status)) = self.sender.send(status) {
             let (tx, rx) = mpsc::channel();
 
             self.sender = tx;
@@ -282,15 +305,14 @@ impl Handler {
     /// You probably shouldn't use this if you're reading the source code.
     #[doc(hidden)]
     pub fn update_server(&mut self, endpoint: &Option<String>, token: &str) {
-        if let Some(ref endpoint) = *endpoint {
-            let endpoint = endpoint.clone();
+        if let Some(endpoint) = endpoint.clone() {
             let token = token.to_owned();
-            let session_id = match self.session_id {
-                Some(ref session_id) => session_id.clone(),
-                None => return,
-            };
 
-            self.connect_with_data(session_id, endpoint, token);
+            if let Some(session_id) = self.session_id.clone() {
+                self.connect_with_data(session_id, endpoint, token);
+            } else {
+                self.endpoint_token = Some((endpoint, token));
+            }
         } else {
             self.leave();
         }
