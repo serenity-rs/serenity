@@ -28,28 +28,6 @@ use ::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 /// [`build`]: #method.build
 /// [`emoji`]: #method.emoji
 /// [`user`]: #method.user
-
-fn normalize(text: &str) -> String {
-    // Remove everyone and here mentions
-    // This changes 'at' symbol to a full-width variation
-    text.replace("@everyone", "＠everyone")
-        .replace("@here", "＠here")
-        // Remove invite links and popular scam websites, mostly to prevent the
-        // current user from triggering various ad detectors
-        .replace("discord.gg", "discord․gg")
-        .replace("discord.me", "discord․me")
-        .replace("discordlist.net", "discordlist․net")
-        .replace("discordservers.com", "discordservers․com")
-        .replace("discordapp.com/invite", "discordapp․com/invite")
-        // Remove right-to-left and other similar overrides
-        .replace('\u{202E}', " ") // RTL
-        .replace('\u{200F}', " ") // RTL Mark
-        .replace('\u{202B}', " ") // RTL Embedding
-        .replace('\u{200B}', " ") // Zero-width space
-        .replace('\u{200D}', " ") // Zero-width joiner
-        .replace('\u{200C}', " ") // Zero-width non-joiner
-}
-
 pub struct MessageBuilder(pub String);
 
 impl MessageBuilder {
@@ -316,4 +294,25 @@ impl Default for MessageBuilder {
     fn default() -> MessageBuilder {
         MessageBuilder(String::default())
     }
+}
+
+fn normalize(text: &str) -> String {
+    // Remove everyone and here mentions
+    // This changes 'at' symbol to a full-width variation
+    text.replace("@everyone", "＠everyone")
+        .replace("@here", "＠here")
+        // Remove invite links and popular scam websites, mostly to prevent the
+        // current user from triggering various ad detectors
+        .replace("discord.gg", "discord․gg")
+        .replace("discord.me", "discord․me")
+        .replace("discordlist.net", "discordlist․net")
+        .replace("discordservers.com", "discordservers․com")
+        .replace("discordapp.com/invite", "discordapp․com/invite")
+        // Remove right-to-left and other similar overrides
+        .replace('\u{202E}', " ") // RTL
+        .replace('\u{200F}', " ") // RTL Mark
+        .replace('\u{202B}', " ") // RTL Embedding
+        .replace('\u{200B}', " ") // Zero-width space
+        .replace('\u{200D}', " ") // Zero-width joiner
+        .replace('\u{200C}', " ") // Zero-width non-joiner
 }
