@@ -1,4 +1,4 @@
-[![ci-badge][]][ci] [![license-badge][]][license] [![docs-badge][]][docs]
+[![ci-badge][]][ci] [![crate-badge][]][crate] [![license-badge][]][license] [![docs-badge][]][docs] [![contribs-badge][]][contribs]
 
 # serenity.rs
 
@@ -75,11 +75,15 @@ fn main() {
 [`State`]: https://serenity.zey.moe/serenity/ext/state/struct.State.html
 [ci]: https://travis-ci.org/zeyla/serenity.rs
 [ci-badge]: https://travis-ci.org/zeyla/serenity.rs.svg?branch=master
+[contribs]: https://img.shields.io/github/contributors/zeyla/serenity.rs.svg
+[contribs-badge]: https://img.shields.io/github/contributors/zeyla/serenity.rs.svg
+[crate]: https://crates.io/crates/serenity
+[crate-badge]: https://img.shields.io/crates/v/serenity.svg?maxAge=2592000
 [client's module-level documentation]: https://serenity.zey.moe/serenity/client/index.html
 [discord docs]: https://discordapp.com/developers/docs/intro
 [docs]: https://serenity.zey.moe/
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
 [examples]: https://github.com/zeyla/serenity.rs/tree/master/examples
 [license]: https://opensource.org/licenses/ISC
-[license-badge]: https://img.shields.io/badge/license-ISC-blue.svg?style=flat-square
+[license-badge]: https://img.shields.io/badge/license-ISC-blue.svg
 [state docs]: https://serenity.zey.moe/serenity/ext/state/index.html
