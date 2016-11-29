@@ -833,11 +833,13 @@ impl GuildChannel {
     #[cfg(feature = "methods")]
     pub fn create_invite<F>(&self, f: F) -> Result<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
-        let req = permissions::CREATE_INVITE;
+        feature_cache_enabled! {{
+            let req = permissions::CREATE_INVITE;
 
-        if !try!(utils::user_has_perms(self.id, req)) {
-            return Err(Error::Client(ClientError::InvalidPermissions(req)));
-        }
+            if !try!(utils::user_has_perms(self.id, req)) {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }}
 
         let map = f(CreateInvite::default()).0.build();
 

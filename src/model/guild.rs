@@ -25,7 +25,7 @@ use ::utils::builder::{EditGuild, EditMember, EditRole};
 #[cfg(feature = "methods")]
 use ::client::rest;
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "methods"))]
 use ::client::CACHE;
 
 impl From<PartialGuild> for GuildContainer {
@@ -165,7 +165,7 @@ impl PartialGuild {
 }
 
 impl Guild {
-    #[cfg(feature = "cache")]
+    #[cfg(all(feature = "cache", feature = "methods"))]
     fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
         let member = match self.get_member(CACHE.read().unwrap().user.id) {
             Some(member) => member,

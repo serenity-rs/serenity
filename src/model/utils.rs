@@ -304,13 +304,6 @@ pub fn user_has_perms(channel_id: ChannelId,
     Ok(permissions.is_empty())
 }
 
-#[doc(hidden)]
-#[cfg(all(not(feature = "cache"), feature = "methods"))]
-pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions)
-    -> Result<bool> {
-    Ok(true)
-}
-
 pub fn warn_field(name: &str, map: BTreeMap<String, Value>) {
     if !map.is_empty() {
         debug!("Unhandled keys: {} has {:?}", name, Value::Object(map))

@@ -55,8 +55,17 @@ fn dog_command(context: &Context, _msg: &Message, _args: Vec<String>) {
     let _ = context.say(":dog:");
 }
 
+// `Message::reply` is only compiled if the `methods` feature flag is enabled.
+#[cfg(feature = "methods")]
 fn ping_command(_context: &Context, message: &Message, _args: Vec<String>) {
     let _ = message.reply("Pong!");
+}
+
+#[cfg(not(feature = "methods"))]
+fn ping_command(context: &Context, message: &Message, _args: Vec<String>) {
+    if let Err(why) = context.say(&format!("{}: Pong!", message.author)) {
+        println!("Error sending message: {:?}", why);
+    }
 }
 
 fn owner_check(_context: &Context, message: &Message) -> bool {
