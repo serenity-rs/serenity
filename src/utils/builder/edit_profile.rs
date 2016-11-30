@@ -2,6 +2,8 @@ use serde_json::builder::ObjectBuilder;
 use serde_json::Value;
 use std::default::Default;
 
+/// A builder to edit the current users settings via ['Context::edit_profile'].
+
 pub struct EditProfile(pub ObjectBuilder);
 
 impl EditProfile {
@@ -32,8 +34,7 @@ impl EditProfile {
     pub fn avatar(self, icon: Option<&str>) -> Self {
         EditProfile(self.0
             .insert("avatar",
-                    icon.map_or_else(|| Value::Null,
-                                     |x| Value::String(x.to_owned()))))
+                    icon.map_or_else(|| Value::Null, |x| Value::String(x.to_owned()))))
     }
 
     /// Modifies the current user's email address.
