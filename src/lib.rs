@@ -29,6 +29,38 @@
 //! need to be sure that some information piece is sanctioned by Discord, refer
 //! to their own documentation.
 //!
+//! # Example Bot
+//!
+//! A basic ping-pong bot looks like:
+//!
+//! ```rust,no-run
+//! extern crate serenity;
+//!
+//! use serenity::client::{Client, Context};
+//! use serenity::model::Message;
+//! use std::env;
+//!
+//! fn main() {
+//!     // Login with a bot token from the environment
+//!     let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").expect("token"));
+//!     client.with_framework(|f| f
+//!         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
+//!         .on("ping", ping));
+//!
+//!     // start listening for events by starting a single shard
+//!     let _ = client.start();
+//! }
+//!
+//! fn ping(_context: Context, message: Message, _args: Vec<String>) {
+//!     let _ = message.reply("Pong!");
+//! }
+//! ```
+//!
+//! ### Full Examples
+//!
+//! Full examples, detailing and explaining usage of the basic functionality of the
+//! library, can be found in the [`examples`] directory.
+//!
 //! # Features
 //!
 //! Features can be enabled or disabled by configuring the library through
@@ -78,35 +110,6 @@
 //! Voice+youtube-dl:
 //!
 //! - youtube-dl (Arch: `community/youtube-dl`)
-//!
-//! # Example Bot
-//!
-//! A basic ping-pong bot looks like:
-//!
-//! ```rust,no_run
-//! extern crate serenity;
-//!
-//! use serenity::Client;
-//! use std::env;
-//!
-//! fn main() {
-//!     // Login with a bot token from the environment
-//!     let mut client = Client::login_bot(&env::var("DISCORD_TOKEN")
-//!         .expect("token"));
-//!     client.with_framework(|f| f
-//!         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
-//!         .on("ping", |_context, message, _arguments| {
-//!             let _ = message.reply("Pong!");
-//!         }));
-//!
-//!     // start listening for events by starting a single shard
-//!     let _ = client.start();
-//! }
-//! ```
-//! ### Full Examples
-//!
-//! Full examples, detailing and explaining usage of the basic functionality of the
-//! library, can be found in the [`examples`] directory.
 //!
 //! [`Cache`]: ext/cache/struct.Cache.html
 //! [`Client::login_bot`]: client/struct.Client.html#method.login_bot
