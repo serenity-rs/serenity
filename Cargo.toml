@@ -2,7 +2,7 @@
 authors = ["Austin Hellyer <hello@austinhellyer.me>"]
 build = "build.rs"
 description = "Ergonomic and high-level Rust library for the Discord API."
-documentation = "http://serenity.zey.moe"
+documentation = "https://serenity.zey.moe"
 homepage = "https://github.com/zeyla/serenity.rs"
 keywords = ["discord", "api"]
 license = "ISC"

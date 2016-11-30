@@ -4,5 +4,5 @@ version = "0.1.0"
 authors = ["my name <my@email.address>"]
 
 [dependencies.serenity]
-git = "https://github.com/zeyla/serenity.rs.git"
 features = ["framework", "methods"]
+version = "0.1"
