@@ -122,7 +122,7 @@ impl Context {
     /// a bot user.
     ///
     /// [`ClientError::InvalidOperationAsBot`]: enum.ClientError.html#variant.InvalidOperationAsBot
-    /// [`Invite::accept`]: ../model/struct.Invite.html#method.accept
+    /// [`rest::accept_invite`]: rest/fn.accept_invite.html
     pub fn accept_invite(&self, invite: &str) -> Result<Invite> {
         if self.login_type == LoginType::Bot {
             return Err(Error::Client(ClientError::InvalidOperationAsBot));
@@ -131,14 +131,15 @@ impl Context {
         rest::accept_invite(utils::parse_invite(invite))
     }
 
-    /// Mark a [`Channel`] as being read up to a certain [`Message`].
+    /// Marks a [`Channel`] as being read up to a certain [`Message`].
     ///
     /// Refer to the documentation for [`rest::ack_message`] for more
     /// information.
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidOperationAsBot`] if this is a bot.
+    /// Returns a [`ClientError::InvalidOperationAsBot`] if the current user is
+    /// a bot user.
     ///
     /// [`Channel`]: ../../model/enum.Channel.html
     /// [`ClientError::InvalidOperationAsBot`]: ../enum.ClientError.html#variant.InvalidOperationAsUser
@@ -153,7 +154,7 @@ impl Context {
         rest::ack_message(channel_id.into().0, message_id.into().0)
     }
 
-    /// Ban a [`User`] from a [`Guild`], removing their messages sent in the
+    /// Bans a [`User`] from a [`Guild`], removing their messages sent in the
     /// last X number of days.
     ///
     /// Refer to the documentation for [`rest::ban_user`] for more information.
@@ -177,6 +178,7 @@ impl Context {
     /// [`ClientError::DeleteMessageDaysAmount`]: enum.ClientError.html#variant.DeleteMessageDaysAmount
     /// [`Guild`]: ../model/struct.Guild.html
     /// [`User`]: ../model/struct.User.html
+    /// [`rest::ban_user`]: rest/fn.ban_user.html
     /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
     pub fn ban<G, U>(&self, guild_id: G, user_id: U, delete_message_days: u8)
         -> Result<()> where G: Into<GuildId>, U: Into<UserId> {
@@ -187,7 +189,7 @@ impl Context {
         rest::ban_user(guild_id.into().0, user_id.into().0, delete_message_days)
     }
 
-    /// Broadcast that you are typing to a channel for the next 5 seconds.
+    /// Broadcasts that you are typing to a channel for the next 5 seconds.
     ///
     /// After 5 seconds, another request must be made to continue broadcasting
     /// that you are typing.
@@ -518,10 +520,12 @@ impl Context {
         rest::delete_emoji(guild_id.into().0, emoji_id.into().0)
     }
 
-    /// Deletes a guild. You must be the guild owner to be able to delete it.
+    /// Deletes a [`Guild`]. The current user must be the guild owner to be able
+    /// to delete it.
     ///
     /// Only a [`PartialGuild`] will be immediately returned.
     ///
+    /// [`Guild`]: ../model/struct.Guild.html
     /// [`PartialGuild`]: ../model/struct.PartialGuild.html
     pub fn delete_guild<G: Into<GuildId>>(&self, guild_id: G)
         -> Result<PartialGuild> {
@@ -623,8 +627,7 @@ impl Context {
     }
 
 
-    /// Deletes the given [`Reaction`], but only if the current user is the user
-    /// who made the reaction or has permission to.
+    /// Deletes the given [`Reaction`].
     ///
     /// **Note**: Requires the [Manage Messages] permission, _if_ the current
     /// user did not perform the reaction.
@@ -701,9 +704,9 @@ impl Context {
         self.send_message(target_id.into(), |m| m.content(content))
     }
 
-    /// Allows to configure channel options like position, name, etc.
+    /// Edits the settings of a [`Channel`], optionally setting new values.
     ///
-    /// You can see available methods in `EditChannel`s docs.
+    /// Refer to `EditChannel`'s documentation for its methods.
     ///
     /// # Examples
     ///
@@ -712,8 +715,10 @@ impl Context {
     /// ```rust,ignore
     /// context.edit_channel(channel_id, |c| c
     ///     .name("test")
-    ///     .bitrate(71));
+    ///     .bitrate(64000));
     /// ```
+    ///
+    /// [`Channel`]: ../model/enum.Channel.html
     pub fn edit_channel<C, F>(&self, channel_id: C, f: F)
         -> Result<GuildChannel> where C: Into<ChannelId>,
                                        F: FnOnce(EditChannel) -> EditChannel {
@@ -747,7 +752,9 @@ impl Context {
         rest::edit_channel(channel_id.0, edited)
     }
 
-    /// Allows to rename specific emoji by Id.
+    /// Edits an [`Emoji`]'s name.
+    ///
+    /// [`Emoji`]: ../model/struct.Emoji.html
     pub fn edit_emoji<E, G>(&self, guild_id: G, emoji_id: E, name: &str)
         -> Result<Emoji> where E: Into<EmojiId>, G: Into<GuildId> {
         let map = ObjectBuilder::new()
@@ -757,9 +764,9 @@ impl Context {
         rest::edit_emoji(guild_id.into().0, emoji_id.into().0, map)
     }
 
-    /// Allows to configure specific guild options like icon, AFK channel, etc.
+    /// Edits the settings of a [`Guild`], optionally setting new values.
     ///
-    /// You can see available methods in `EditGuild` docs.
+    /// Refer to `EditGuild`'s documentation for a full list of methods.
     ///
     /// # Examples
     ///
@@ -775,6 +782,8 @@ impl Context {
     /// context.edit_guild(guild_id, |g|
     ///     g.icon(base64_icon));
     /// ```
+    ///
+    /// [`Guild`]: ../model/struct.Guild.html
     pub fn edit_guild<F, G>(&self, guild_id: G, f: F) -> Result<PartialGuild>
         where F: FnOnce(EditGuild) -> EditGuild, G: Into<GuildId> {
         let map = f(EditGuild::default()).0.build();
@@ -782,10 +791,10 @@ impl Context {
         rest::edit_guild(guild_id.into().0, map)
     }
 
-    /// Modify the properties of member of a guild, such as muting or nicknaming
+    /// Edits the properties of member of a guild, such as muting or nicknaming
     /// them.
     ///
-    /// Refer to `EditMember`s documentation for a full list of methods.
+    /// Refer to `EditMember`'s documentation for a full list of methods.
     ///
     /// # Examples
     ///
@@ -819,7 +828,9 @@ impl Context {
         rest::edit_nickname(guild_id.into().0, new_nickname)
     }
 
-    /// Allows to edit info of a account we're connected to.
+    /// Edits the current user's settings.
+    ///
+    /// Refer to `EditProfile`'s documentation for its methods.
     ///
     /// # Examples
     ///
@@ -846,15 +857,18 @@ impl Context {
         rest::edit_profile(edited)
     }
 
-    /// Allows to edit role options like colour, permissions etc.
+    /// Edits a [`Role`], optionally setting its new fields.
     ///
     /// # Examples
     ///
     /// Make a role hoisted:
+    ///
     /// ```rust,ignore
-    /// context.edit_role(, guild_id, role_id, |r|
-    ///     r.hoist(true));
+    /// context.edit_role(guild_id, role_id, |r| r
+    ///     .hoist(true));
     /// ```
+    ///
+    /// [`Role`]: ../model/struct.Role.html
     pub fn edit_role<F, G, R>(&self, guild_id: G, role_id: R, f: F)
         -> Result<Role> where F: FnOnce(EditRole) -> EditRole,
                               G: Into<GuildId>,
@@ -881,10 +895,13 @@ impl Context {
         rest::edit_role(guild_id.0, role_id.0, map)
     }
 
-    /// Edit a message given its Id and the Id of the channel it belongs to.
+    /// Edits a [`Message`] given its Id and the Id of the channel it belongs
+    /// to.
     ///
     /// Pass an empty string (`""`) to `text` if you are editing a message with
-    /// an embed but no content. Otherwise, `text` must be given.
+    /// an embed or file but no content. Otherwise, `text` must be given.
+    ///
+    /// [`Message`]: ../model/struct.Message.html
     pub fn edit_message<C, F, M>(&self, channel_id: C, message_id: M, text: &str, f: F)
         -> Result<Message> where C: Into<ChannelId>,
                                  F: FnOnce(CreateEmbed) -> CreateEmbed,
@@ -901,7 +918,28 @@ impl Context {
         rest::edit_message(channel_id.into().0, message_id.into().0, map.build())
     }
 
-    /// Changes note of a user profile.
+    /// Edits the note that the current user has set for another user.
+    ///
+    /// Use [`delete_note`] to remove a note.
+    ///
+    /// **Note**: Requires that the current user be a user account.
+    ///
+    /// # Examples
+    ///
+    /// Set a note for a message's author:
+    ///
+    /// ```rust,ignore
+    /// // assuming a `message` has been bound
+    /// let _ = context.edit_note(message.author, "test note");
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::InvalidOperationAsBot`] if the current user is
+    /// a bot user.
+    ///
+    /// [`ClientError::InvalidOperationAsBot`]: enum.ClientError.html#variant.InvalidOperationAsBot
+    /// [`delete_note`]: #method.delete_note
     pub fn edit_note<U: Into<UserId>>(&self, user_id: U, note: &str)
         -> Result<()> {
         let map = ObjectBuilder::new()
@@ -911,18 +949,28 @@ impl Context {
         rest::edit_note(user_id.into().0, map)
     }
 
-    /// Gets a vector of bans guild has.
+    /// Gets a list of the given [`Guild`]'s bans.
+    ///
+    /// Requires the [Ban Members] permission.
+    ///
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
     pub fn get_bans<G: Into<GuildId>>(&self, guild_id: G) -> Result<Vec<Ban>> {
         rest::get_bans(guild_id.into().0)
     }
 
-    /// Gets all invites a channel has.
+    /// Gets all of a [`GuildChannel`]'s invites.
+    ///
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// [`GuildChannel`]: ../model/struct.GuildChannel.html
+    /// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
     pub fn get_channel_invites<C: Into<ChannelId>>(&self, channel_id: C)
         -> Result<Vec<RichInvite>> {
         rest::get_channel_invites(channel_id.into().0)
     }
 
-    /// Gets `Channel` by the given Id, checking cache first.
+    /// Gets a `Channel` by the given Id.
     pub fn get_channel<C>(&self, channel_id: C) -> Result<Channel>
         where C: Into<ChannelId> {
         let channel_id = channel_id.into();
@@ -936,7 +984,7 @@ impl Context {
         rest::get_channel(channel_id.0)
     }
 
-    /// Gets all channels of a guild with given Id, checking cache first.
+    /// Gets all channels of a guild with given Id.
     pub fn get_channels<G>(&self, guild_id: G)
         -> Result<HashMap<ChannelId, GuildChannel>> where G: Into<GuildId> {
         let guild_id = guild_id.into();
@@ -958,32 +1006,41 @@ impl Context {
         Ok(channels)
     }
 
-    /// Gets an `Emoji` by the given Id from a guild.
+    /// Gets an guild's emoji by Id.
     pub fn get_emoji<E, G>(&self, guild_id: G, emoji_id: E) -> Result<Emoji>
         where E: Into<EmojiId>, G: Into<GuildId> {
         rest::get_emoji(guild_id.into().0, emoji_id.into().0)
     }
 
-    /// Gets a vector of all `Emoji` a guild has.
+    /// Gets a list of all emojis a guild has.
     pub fn get_emojis<G: Into<GuildId>>(&self, guild_id: G)
         -> Result<Vec<Emoji>> {
         rest::get_emojis(guild_id.into().0)
     }
 
-    /// Gets [`PartialGuild`] by the given Id.
+    /// Gets a guild by its Id.
+    ///
+    /// Requires that the current user be in the guild.
     pub fn get_guild<G: Into<GuildId>>(&self, guild_id: G)
         -> Result<PartialGuild> {
         rest::get_guild(guild_id.into().0)
     }
 
-    /// Gets all [`RichInvite`]s a guild has.
+    /// Gets all of a guild's invites.
+    ///
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// [`RichInvite`]: ../model/struct.RichInvite.html
+    /// [Manage Guild]: ../model/permissions/struct.MANAGE_GUILD.html
     pub fn get_guild_invites<G>(&self, guild_id: G) -> Result<Vec<RichInvite>>
         where G: Into<GuildId> {
         rest::get_guild_invites(guild_id.into().0)
     }
 
-    /// Gives the amount of members that would be pruned with the
-    /// given days parameter right now.
+    /// Gets the number of [`Member`]s that would be pruned with the given
+    /// number of days.
+    ///
+    /// [`Member`]: ../model/struct.Member.html
     pub fn get_guild_prune_count<G>(&self, guild_id: G, days: u16)
         -> Result<GuildPrune> where G: Into<GuildId> {
         let map = ObjectBuilder::new()
@@ -993,25 +1050,28 @@ impl Context {
         rest::get_guild_prune_count(guild_id.into().0, map)
     }
 
-    /// Gets all guilds we are connected to.
+    /// Gets all guilds that the current user is in.
     pub fn get_guilds(&self) -> Result<Vec<GuildInfo>> {
         rest::get_guilds()
     }
 
-    /// Gets all [`Integration`]s of a guild by the given Id.
+    /// Gets all integrations of a guild via the given Id.
     pub fn get_integrations<G: Into<GuildId>>(&self, guild_id: G)
         -> Result<Vec<Integration>> {
         rest::get_guild_integrations(guild_id.into().0)
     }
 
-    /// Gets invite code information.
+    /// Gets the information about an invite.
     pub fn get_invite(&self, invite: &str) -> Result<Invite> {
         let code = utils::parse_invite(invite);
 
         rest::get_invite(code)
     }
 
-    /// Gets `Member` of a specific guild by Id, checking cache first.
+    /// Gets a user's [`Member`] object for a [`Guild`], given by Id.
+    ///
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`Member`]: ../model/struct.Member.html
     pub fn get_member<G, U>(&self, guild_id: G, user_id: U) -> Result<Member>
         where G: Into<GuildId>, U: Into<UserId> {
         let guild_id = guild_id.into();
@@ -1043,13 +1103,14 @@ impl Context {
                                 after.map(|x| x.into().0))
     }
 
-    /// Retrieves a single [`Message`] from a [`Channel`].
+    /// Gets a single [`Message`] from a [`Channel`].
     ///
     /// Requires the [Read Message History] permission.
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidOperationAsUser`] if this is a user.
+    /// Returns a [`ClientError::InvalidOperationAsUser`] if the current user is
+    /// not a user account.
     ///
     /// [`Channel`]: ../model/struct.Channel.html
     /// [`ClientError::InvalidOperationAsUser`]: ../enum.ClientError.html#variant.InvalidOperationAsUser
@@ -1098,7 +1159,7 @@ impl Context {
         rest::get_messages(channel_id.into().0, &query)
     }
 
-    /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
+    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
     ///
     /// The default `limit` is `50` - specify otherwise to receive a different
@@ -1156,7 +1217,7 @@ impl Context {
         rest::kick_member(guild_id.into().0, user_id.into().0)
     }
 
-    /// Leave a guild by the given Id.
+    /// Leaves a guild by its Id.
     pub fn leave_guild<G: Into<GuildId>>(&self, guild_id: G)
         -> Result<PartialGuild> {
         rest::leave_guild(guild_id.into().0)
@@ -1174,7 +1235,7 @@ impl Context {
         rest::edit_member(guild_id.into().0, user_id.into().0, map)
     }
 
-    /// Retrieves the list of [`Message`]s which are pinned to the specified
+    /// Gets the list of [`Message`]s which are pinned to the specified
     /// [`Channel`].
     ///
     /// [`Channel`]: ../model/enum.Channel.html
@@ -1538,7 +1599,10 @@ impl Context {
     }
 
 
-    /// Unpins a message in the specified channel by the given Id.
+    /// Unpins a [`Message`] in the specified [`Channel`] given each Id.
+    ///
+    /// [`Channel`]: ../model/enum.Channel.html
+    /// [`Message`]: ../model/struct.Message.html
     pub fn unpin<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
         rest::unpin_message(channel_id.into().0, message_id.into().0)

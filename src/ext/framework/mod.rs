@@ -84,7 +84,7 @@ use ::model::Message;
 /// ```
 ///
 /// Create a command named `multiply` which accepts 2 floats and multiplies
-/// them, sending the returned value:
+/// them, sending the product as a reply:
 ///
 /// ```rust,ignore
 /// command!(multiply(_context, message, _args, first: f64, second: f64) {

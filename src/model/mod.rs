@@ -1,3 +1,18 @@
+//! Mappings of objects received from the API, with optional helper methods for
+//! ease of use.
+//!
+//! Models can optionally have additional helper methods compiled, by enabling
+//! the `methods` feature.
+//!
+//! Methods like [`Message::delete`] or [`Webhook::execute`] are provided with
+//! this feature, which can be shorthands for operations that are otherwise in
+//! the [`Context`], or the much lower-level [`rest`] module.
+//!
+//! [`Context`]: ../client/struct.Context.html
+//! [`Message::delete`]: struct.Message.html#method.delete
+//! [`Webhook::execute`]: struct.Webhook.html#method.execute
+//! [`rest`]: ../client/rest/index.html
+
 #[macro_use]
 mod utils;
 
