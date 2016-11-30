@@ -55,7 +55,7 @@ fn main() {
     let _ = client.start();
 }
 
-fn ping(_context: Context, message: Message, _args: Vec<String>) {
+fn ping(_context: &Context, message: &Message, _args: Vec<String>) {
     let _ = message.reply("Pong!");
 }
 ```
