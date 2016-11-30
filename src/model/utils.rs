@@ -25,19 +25,6 @@ use ::client::CACHE;
 use ::ext::cache::ChannelRef;
 
 #[macro_escape]
-macro_rules! missing {
-    (@ $name:expr, $json:ident, $value:expr) => {
-        (Ok($value), warn_field($name, $json)).0
-    };
-    ($json:ident, $ty:ident $(::$ext:ident)* ( $($value:expr),*$(,)* ) ) => {
-        (Ok($ty$(::$ext)* ( $($value),* )), warn_field(stringify!($ty$(::$ext)*), $json)).0
-    };
-    ($json:ident, $ty:ident $(::$ext:ident)* { $($name:ident: $value:expr),*$(,)* } ) => {
-        (Ok($ty$(::$ext)* { $($name: $value),* }), warn_field(stringify!($ty$(::$ext)*), $json)).0
-    };
-}
-
-#[macro_escape]
 macro_rules! req {
     ($opt:expr) => {
         try!($opt.ok_or(Error::Decode(concat!("Type mismatch in model:",
@@ -253,7 +240,7 @@ pub fn opt<T, F: FnOnce(Value) -> Result<T>>(map: &mut BTreeMap<String, Value>, 
     }
 }
 
-pub fn parse_discriminator(value: Value) -> Result<u16> {
+pub fn decode_discriminator(value: Value) -> Result<u16> {
     match value {
         Value::I64(v) => Ok(v as u16),
         Value::U64(v) => Ok(v as u16),
@@ -302,10 +289,4 @@ pub fn user_has_perms(channel_id: ChannelId,
     permissions.remove(perms);
 
     Ok(permissions.is_empty())
-}
-
-pub fn warn_field(name: &str, map: BTreeMap<String, Value>) {
-    if !map.is_empty() {
-        debug!("Unhandled keys: {} has {:?}", name, Value::Object(map))
-    }
 }

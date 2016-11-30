@@ -349,39 +349,3 @@ impl Default for CreateEmbedThumbnail {
         CreateEmbedThumbnail(ObjectBuilder::new())
     }
 }
-
-/// A builder to create a fake [`Embed`] object's video, for use with the
-/// [`CreateEmbed::video`] method.
-///
-/// Requires that you specify a [`url`].
-///
-/// [`Embed`]: ../../model/struct.Embed.html
-/// [`CreateEmbed::video`]: struct.CreateEmbed.html#method.video
-/// [`url`]: #method.url
-pub struct CreateEmbedVideo(pub ObjectBuilder);
-
-impl CreateEmbedVideo {
-    /// Set the height of the video, in pixels.
-    pub fn height(self, height: u64) -> Self {
-        CreateEmbedVideo(self.0.insert("height", height))
-    }
-
-    /// Set the source URL of the video.
-    ///
-    /// _Must_ be specified.
-    pub fn url(self, url: &str) -> Self {
-        CreateEmbedVideo(self.0.insert("url", url))
-    }
-
-    /// Set the width of the video, in pixels.
-    pub fn width(self, width: &str) -> Self {
-        CreateEmbedVideo(self.0.insert("width", width))
-    }
-}
-
-impl Default for CreateEmbedVideo {
-    /// Creates a builder with no default values.
-    fn default() -> CreateEmbedVideo {
-        CreateEmbedVideo(ObjectBuilder::new())
-    }
-}

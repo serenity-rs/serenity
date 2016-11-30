@@ -244,7 +244,7 @@ impl Cache {
     pub fn all_guilds(&self) -> Vec<GuildId> {
         self.guilds
             .values()
-            .map(|s| s.id)
+            .map(|g| g.id)
             .chain(self.unavailable_guilds.iter().cloned())
             .collect()
     }
@@ -259,7 +259,7 @@ impl Cache {
 
                 guild.id
             })
-            .collect::<Vec<_>>()
+            .collect::<Vec<GuildId>>()
     }
 
     /// Retrieves a reference to a [`Call`] from the cache based on the
@@ -324,8 +324,9 @@ impl Cache {
     /// let channel = match cache.get_guild_channel(message.channel_id) {
     ///     Some(channel) => channel,
     ///     None => {
-    ///         context.say("Could not find guild's channel data")
-    ///             .map_err(|why| println!("Error sending message: {:?}", why));
+    ///         if let Err(why) = context.say("Could not find guild's channel data") {
+    ///             println!("Error sending message: {:?}", why);
+    ///         }
     ///
     ///         return;
     ///     },
@@ -406,7 +407,7 @@ impl Cache {
                 guild.members.get(&user_id.into())
             }).and_then(|x| match x {
                 Some(x) => Some(x),
-                _ => None,
+                None => None,
             })
     }
 
@@ -419,130 +420,6 @@ impl Cache {
             guild.roles.get(&role_id.into())
         } else {
             None
-        }
-    }
-
-    /// Update the cache according to the changes described in the given event.
-    #[allow(cyclomatic_complexity)]
-    #[allow(unneeded_field_pattern)]
-    #[doc(hidden)]
-    pub fn update(&mut self, event: &Event) {
-        match *event {
-            Event::CallCreate(ref event) => {
-                self.update_with_call_create(event);
-            },
-            Event::CallDelete(ref event) => {
-                self.update_with_call_delete(event);
-            },
-            Event::CallUpdate(ref event) => {
-                self.update_with_call_update(event, false);
-            },
-            Event::ChannelCreate(ref event) => {
-                self.update_with_channel_create(event);
-            },
-            Event::ChannelDelete(ref event) => {
-                self.update_with_channel_delete(event);
-            },
-            Event::ChannelPinsUpdate(ref event) => {
-                self.update_with_channel_pins_update(event);
-            },
-            Event::ChannelRecipientAdd(ref event) => {
-                self.update_with_channel_recipient_add(event);
-            },
-            Event::ChannelRecipientRemove(ref event) => {
-                self.update_with_channel_recipient_remove(event);
-            },
-            Event::ChannelUpdate(ref event) => {
-                self.update_with_channel_update(event);
-            },
-            Event::GuildCreate(ref event) => {
-                self.update_with_guild_create(event);
-            },
-            Event::GuildDelete(ref event) => {
-                self.update_with_guild_delete(event);
-            },
-            Event::GuildEmojisUpdate(ref event) => {
-                self.update_with_guild_emojis_update(event);
-            },
-            Event::GuildMemberAdd(ref event) => {
-                self.update_with_guild_member_add(event);
-            },
-            Event::GuildMemberRemove(ref event) => {
-                self.update_with_guild_member_remove(event);
-            },
-            Event::GuildMemberUpdate(ref event) => {
-                self.update_with_guild_member_update(event);
-            },
-            Event::GuildMembersChunk(ref event) => {
-                self.update_with_guild_members_chunk(event);
-            },
-            Event::GuildRoleCreate(ref event) => {
-                self.update_with_guild_role_create(event);
-            },
-            Event::GuildRoleDelete(ref event) => {
-                self.update_with_guild_role_delete(event);
-            },
-            Event::GuildRoleUpdate(ref event) => {
-                self.update_with_guild_role_update(event);
-            },
-            Event::GuildSync(ref event) => {
-                self.update_with_guild_sync(event);
-            },
-            Event::GuildUnavailable(ref event) => {
-                self.update_with_guild_unavailable(event);
-            },
-            Event::GuildUpdate(ref event) => {
-                self.update_with_guild_update(event);
-            },
-            Event::PresencesReplace(ref event) => {
-                self.update_with_presences_replace(event);
-            },
-            Event::PresenceUpdate(ref event) => {
-                self.update_with_presence_update(event);
-            },
-            Event::Ready(ref event) => {
-                self.update_with_ready(event);
-            },
-            Event::RelationshipAdd(ref event) => {
-                self.update_with_relationship_add(event);
-            },
-            Event::RelationshipRemove(ref event) => {
-                self.update_with_relationship_remove(event);
-            },
-            Event::UserGuildSettingsUpdate(ref event) => {
-                self.update_with_user_guild_settings_update(event);
-            },
-            Event::UserNoteUpdate(ref event) => {
-                self.update_with_user_note_update(event);
-            },
-            Event::UserSettingsUpdate(ref event) => {
-                self.update_with_user_settings_update(event, false);
-            },
-            Event::UserUpdate(ref event) => {
-                self.update_with_user_update(event);
-            },
-            Event::VoiceStateUpdate(ref event) => {
-                self.update_with_voice_state_update(event);
-            },
-            Event::ChannelPinsAck(_) |
-            Event::FriendSuggestionCreate(_) |
-            Event::FriendSuggestionDelete(_) |
-            Event::GuildBanAdd(_) |
-            Event::GuildBanRemove(_) |
-            Event::GuildIntegrationsUpdate(_) |
-            Event::MessageAck(_) |
-            Event::MessageCreate(_) |
-            Event::MessageDelete(_) |
-            Event::MessageDeleteBulk(_) |
-            Event::MessageUpdate(_) |
-            Event::ReactionAdd(_) |
-            Event::ReactionRemove(_) |
-            Event::ReactionRemoveAll(_) |
-            Event::Resumed(_) |
-            Event::TypingStart(_) |
-            Event::VoiceServerUpdate(_) |
-            Event::WebhookUpdate(_) |
-            Event::Unknown(_) => {},
         }
     }
 
@@ -604,12 +481,10 @@ impl Cache {
                         guild.channels.insert(channel.id, channel.clone())
                     });
 
-                let ch = match ch {
-                    Some(Some(ch)) => Some(ch),
+                match ch {
+                    Some(Some(ch)) => Some(Channel::Guild(ch)),
                     _ => None,
-                };
-
-                ch.map(Channel::Guild)
+                }
             },
         }
     }
@@ -695,7 +570,8 @@ impl Cache {
                         let dest = e.get_mut();
 
                         if group.recipients.is_empty() {
-                            let recipients = mem::replace(&mut dest.recipients, HashMap::new());
+                            let recipients = mem::replace(&mut dest.recipients,
+                                                          HashMap::new());
 
                             dest.clone_from(group);
 
@@ -1075,8 +951,8 @@ impl Cache {
                     let finding = call.voice_states
                         .get_mut(&event.voice_state.user_id);
 
-                    if let Some(grp_state) = finding {
-                        grp_state.clone_from(&event.voice_state);
+                    if let Some(group_state) = finding {
+                        group_state.clone_from(&event.voice_state);
 
                         return;
                     }

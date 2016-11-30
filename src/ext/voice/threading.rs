@@ -66,11 +66,11 @@ fn runner(rx: MpscReceiver<Status>) {
         // another event.
         let error = match connection.as_mut() {
             Some(connection) => {
-                let update = connection.update(&mut sender,
-                                               &mut receiver,
-                                               &mut timer);
+                let cycle = connection.cycle(&mut sender,
+                                             &mut receiver,
+                                             &mut timer);
 
-                match update {
+                match cycle {
                     Ok(()) => false,
                     Err(why) => {
                         error!("[Voice] Error updating connection: {:?}", why);

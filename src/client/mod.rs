@@ -812,8 +812,6 @@ impl Client {
             }
         }
 
-        // How to avoid the problem while still working on other parts of the
-        // library 101
         loop {
             thread::sleep(Duration::from_secs(1));
         }

@@ -21,10 +21,10 @@ use ::model::event::{Event, GatewayEvent, ReadyEvent};
 
 #[inline]
 pub fn parse_ready(event: GatewayEvent,
-               tx: &MpscSender<GatewayStatus>,
-               receiver: &mut Receiver<WebSocketStream>,
-               identification: Value)
-               -> Result<(ReadyEvent, u64)> {
+                   tx: &MpscSender<GatewayStatus>,
+                   receiver: &mut Receiver<WebSocketStream>,
+                   identification: Value)
+                   -> Result<(ReadyEvent, u64)> {
     match event {
         GatewayEvent::Dispatch(seq, Event::Ready(event)) => {
             Ok((event, seq))
@@ -60,7 +60,7 @@ pub fn identify(token: &str, shard_info: Option<[u8; 2]>) -> Value {
             object = identify_compression(object)
                 .insert("large_threshold", 250) // max value
                 .insert_object("properties", |object| object
-                    .insert("$browser", "Feature-full and ergonomic discord rust library")
+                    .insert("$browser", "Ergonomic and high-level Rust library")
                     .insert("$device", "serenity")
                     .insert("$os", env::consts::OS)
                     .insert("$referrer", "")
@@ -70,10 +70,9 @@ pub fn identify(token: &str, shard_info: Option<[u8; 2]>) -> Value {
                 .insert("v", constants::GATEWAY_VERSION);
 
             if let Some(shard_info) = shard_info {
-                object = object
-                    .insert_array("shard", |a| a
-                        .push(shard_info[0])
-                        .push(shard_info[1]));
+                object = object.insert_array("shard", |a| a
+                    .push(shard_info[0])
+                    .push(shard_info[1]));
             }
 
             object
@@ -97,8 +96,8 @@ pub fn build_gateway_url(base: &str) -> Result<RequestUrl> {
 }
 
 pub fn keepalive(interval: u64,
-             mut sender: Sender<WebSocketStream>,
-             channel: MpscReceiver<GatewayStatus>) {
+                 mut sender: Sender<WebSocketStream>,
+                 channel: MpscReceiver<GatewayStatus>) {
     let mut base_interval = Duration::milliseconds(interval as i64);
     let mut next_tick = time::get_time() + base_interval;
 

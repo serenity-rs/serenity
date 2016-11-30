@@ -23,7 +23,6 @@ pub use self::create_embed::{
     CreateEmbedField,
     CreateEmbedImage,
     CreateEmbedThumbnail,
-    CreateEmbedVideo,
 };
 pub use self::create_invite::CreateInvite;
 pub use self::create_message::CreateMessage;

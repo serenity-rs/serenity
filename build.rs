@@ -296,7 +296,7 @@ impl {0} {{
     pub fn decode(value: Value) -> Result<{0}> {{
         let mut map = try!(into_map(value));
 
-        missing!(map, {0} {{", name);
+        Ok({0} {{", name);
 
         let decoding = doc["decode"].as_bool().unwrap_or(true);
 

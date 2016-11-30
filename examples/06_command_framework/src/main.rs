@@ -1,3 +1,13 @@
+//! Requires the 'methods' feature flag be enabled in your project's Cargo.toml.
+//!
+//! This can be activated by specifying the feature in the dependency section:
+//!
+//! ```toml
+//! [dependencies.serenity]
+//! git = "https://github.com/zeyla/serenity.rs.git"
+//! features = ["framework", methods"]
+//! ```
+
 #[macro_use]
 extern crate serenity;
 
@@ -56,16 +66,8 @@ fn dog_command(context: &Context, _msg: &Message, _args: Vec<String>) {
 }
 
 // `Message::reply` is only compiled if the `methods` feature flag is enabled.
-#[cfg(feature = "methods")]
 fn ping_command(_context: &Context, message: &Message, _args: Vec<String>) {
     let _ = message.reply("Pong!");
-}
-
-#[cfg(not(feature = "methods"))]
-fn ping_command(context: &Context, message: &Message, _args: Vec<String>) {
-    if let Err(why) = context.say(&format!("{}: Pong!", message.author)) {
-        println!("Error sending message: {:?}", why);
-    }
 }
 
 fn owner_check(_context: &Context, message: &Message) -> bool {

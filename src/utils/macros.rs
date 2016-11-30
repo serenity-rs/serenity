@@ -19,11 +19,11 @@ macro_rules! request {
     ($route:expr, $method:ident, $url:expr) => {{
         let client = HyperClient::new();
         try!(request($route, || client
-            .$method(api_concat!($url))))
+            .$method(api!($url))))
     }};
 }
 
-macro_rules! cdn_concat {
+macro_rules! cdn {
     ($e:expr) => {
         concat!("https://cdn.discordapp.com", $e)
     }
@@ -37,12 +37,7 @@ macro_rules! api {
     };
 }
 
-macro_rules! api_concat {
-    ($e:expr) => {
-        concat!("https://discordapp.com/api/v6", $e)
-    }
-}
-macro_rules! status_concat {
+macro_rules! status {
     ($e:expr) => {
         concat!("https://status.discordapp.com/api/v2", $e)
     }

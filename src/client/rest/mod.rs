@@ -41,6 +41,7 @@ use serde_json::builder::ObjectBuilder;
 use serde_json;
 use std::collections::BTreeMap;
 use std::default::Default;
+use std::fmt::Write as FmtWrite;
 use std::io::{ErrorKind as IoErrorKind, Read};
 use std::sync::{Arc, Mutex};
 use ::constants;
@@ -1138,7 +1139,7 @@ pub fn get_message(channel_id: u64, message_id: u64)
 /// Gets X messages from a channel.
 pub fn get_messages(channel_id: u64, query: &str)
     -> Result<Vec<Message>> {
-    let url = format!(api_concat!("/channels/{}/messages{}"),
+    let url = format!(api!("/channels/{}/messages{}"),
                       channel_id,
                       query);
     let client = HyperClient::new();
@@ -1172,8 +1173,7 @@ pub fn get_reaction_users(channel_id: u64,
                       limit);
 
     if let Some(user_id) = after {
-        uri.push_str("&after=");
-        uri.push_str(&user_id.to_string());
+        try!(write!(uri, "&after={}", user_id));
     }
 
     let response = request!(Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
@@ -1317,7 +1317,7 @@ pub fn send_file<R: Read>(channel_id: u64,
                           filename: &str,
                           map: BTreeMap<String, Value>)
                           -> Result<Message> {
-    let uri = format!(api_concat!("/channels/{}/messages"), channel_id);
+    let uri = format!(api!("/channels/{}/messages"), channel_id);
     let url = match Url::parse(&uri) {
         Ok(url) => url,
         Err(_why) => return Err(Error::Url(uri)),

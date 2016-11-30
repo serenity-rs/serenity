@@ -1,0 +1,7 @@
+[package]
+name = "01_basic_ping_bot"
+version = "0.1.0"
+authors = ["my name <my@email.address>"]
+
+[dependencies]
+serenity = { git = "https://github.com/zeyla/serenity.rs.git" }

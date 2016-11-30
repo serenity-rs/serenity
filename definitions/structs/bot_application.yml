@@ -15,7 +15,7 @@ fields:
     description: "Whether or not this is a bot."
     type: bool
   - name: discriminator
-    custom: parse_discriminator
+    custom: decode_discriminator
     description: "The discriminator assigned to the user's username. While
       discriminators are not unique, the username#discriminator combination is."
     type: u16

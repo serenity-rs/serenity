@@ -1,9 +1,9 @@
-use std::io::Error as IoError;
-use std::error::Error as StdError;
-use std::fmt::{self, Display};
 use hyper::Error as HyperError;
 use serde_json::Error as JsonError;
 use serde_json::Value;
+use std::io::Error as IoError;
+use std::error::Error as StdError;
+use std::fmt::{self, Display, Error as FormatError};
 use websocket::result::WebSocketError;
 use ::client::gateway::GatewayError;
 use ::client::ClientError;
@@ -47,6 +47,8 @@ pub enum Error {
     Gateway(GatewayError),
     /// An error while decoding a payload.
     Decode(&'static str, Value),
+    /// There was an error with a format.
+    Format(FormatError),
     /// An error from the `hyper` crate.
     Hyper(HyperError),
     /// An `std::io` error.
@@ -71,6 +73,12 @@ pub enum Error {
     /// [voice module]: ext/voice/index.html
     #[cfg(feature = "voice")]
     Voice(VoiceError),
+}
+
+impl From<FormatError> for Error {
+    fn from(e: FormatError) -> Error {
+        Error::Format(e)
+    }
 }
 
 impl From<IoError> for Error {
@@ -122,8 +130,9 @@ impl StdError for Error {
     fn description(&self) -> &str {
         match *self {
             Error::Client(_) => "Client refused a request",
-            Error::Gateway(ref _inner) => "Gateway error",
             Error::Decode(msg, _) | Error::Other(msg) => msg,
+            Error::Format(ref inner) => inner.description(),
+            Error::Gateway(ref _inner) => "Gateway error",
             Error::Hyper(ref inner) => inner.description(),
             Error::Io(ref inner) => inner.description(),
             Error::Json(ref inner) => inner.description(),

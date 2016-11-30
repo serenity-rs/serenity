@@ -10,7 +10,6 @@ use super::utils::{
     into_string,
     opt,
     remove,
-    warn_field
 };
 use super::*;
 use ::internal::prelude::*;
@@ -122,7 +121,7 @@ impl GuildInfo {
     /// Returns the formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
-            format!(cdn_concat!("/icons/{}/{}.jpg"), self.id, icon))
+            format!(cdn!("/icons/{}/{}.jpg"), self.id, icon))
     }
 }
 
@@ -149,7 +148,7 @@ impl PartialGuild {
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
-            format!(cdn_concat!("/icons/{}/{}.jpg"), self.id, icon))
+            format!(cdn!("/icons/{}/{}.jpg"), self.id, icon))
     }
 
     /// Retrieves the guild's webhooks.
@@ -173,7 +172,6 @@ impl Guild {
         };
 
         let perms = self.permissions_for(ChannelId(self.id.0), member.user.id);
-
         permissions.remove(perms);
 
         Ok(permissions.is_empty())
@@ -321,10 +319,8 @@ impl Guild {
             }
         }}
 
-        let role = {
-            try!(rest::create_role(self.id.0))
-        };
-        let map = f(EditRole::default()).0.build();
+        let role = try!(rest::create_role(self.id.0));
+        let map = f(EditRole::new(&role)).0.build();
 
         rest::edit_role(self.id.0, role.id.0, map)
     }
@@ -348,7 +344,7 @@ impl Guild {
             public_channels
         };
 
-        missing!(map, Guild {
+        Ok(Guild {
             afk_channel_id: try!(opt(&mut map, "afk_channel_id", ChannelId::decode)),
             afk_timeout: req!(try!(remove(&mut map, "afk_timeout")).as_u64()),
             channels: public_channels,
@@ -557,7 +553,7 @@ impl Guild {
     /// Returns the formatted URL of the guild's icon, if one exists.
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
-            format!(cdn_concat!("/icons/{}/{}.jpg"), self.id, icon))
+            format!(cdn!("/icons/{}/{}.jpg"), self.id, icon))
     }
 
     /// Checks if the guild is 'large'. A guild is considered large if it has

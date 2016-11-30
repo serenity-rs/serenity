@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use super::{CommandType, Configuration};
+use super::Configuration;
 use ::client::Context;
 use ::model::Message;
 
@@ -8,15 +8,14 @@ pub type Command = Fn(&Context, &Message, Vec<String>) + Send + Sync;
 #[doc(hidden)]
 pub type InternalCommand = Arc<Command>;
 
-pub fn positions(content: &str, conf: &Configuration)
-    -> Option<(Vec<usize>, CommandType)> {
+pub fn positions(content: &str, conf: &Configuration) -> Option<Vec<usize>> {
     if let Some(ref prefix) = conf.prefix {
         // Find out if they were mentioned. If not, determine if the prefix
         // was used. If not, return None.
-        let (mut positions, kind) = if let Some(mention_end) = find_mention_end(content, conf) {
-            (vec![mention_end], CommandType::Mention)
+        let mut positions = if let Some(mention_end) = find_mention_end(content, conf) {
+            vec![mention_end]
         } else if content.starts_with(prefix) {
-            (vec![prefix.len()], CommandType::Prefix)
+            vec![prefix.len()]
         } else {
             return None;
         };
@@ -29,7 +28,7 @@ pub fn positions(content: &str, conf: &Configuration)
             positions.insert(0, pos + 1);
         }
 
-        Some((positions, kind))
+        Some(positions)
     } else if conf.on_mention.is_some() {
         match find_mention_end(content, conf) {
             Some(mention_end) => {
@@ -39,7 +38,7 @@ pub fn positions(content: &str, conf: &Configuration)
                     positions.insert(0, mention_end + 1);
                 }
 
-                Some((positions, CommandType::Mention))
+                Some(positions)
             },
             None => None,
         }

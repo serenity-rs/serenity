@@ -11,7 +11,7 @@ fields:
     default: 'false'
     type: bool
   - name: discriminator
-    custom: parse_discriminator
+    custom: decode_discriminator
     type: u16
   - name: email
     optional: true

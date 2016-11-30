@@ -26,7 +26,7 @@ use websocket::stream::WebSocketStream;
 use ::internal::prelude::*;
 use ::internal::ws_impl::{ReceiverExt, SenderExt};
 use ::internal::Timer;
-use ::model::VoiceEvent;
+use ::model::event::VoiceEvent;
 
 enum ReceiverStatus {
     Udp(Vec<u8>),
@@ -165,11 +165,11 @@ impl Connection {
     }
 
     #[allow(unused_variables)]
-    pub fn update(&mut self,
-                  source: &mut Option<Box<AudioSource>>,
-                  receiver: &mut Option<Box<AudioReceiver>>,
-                  audio_timer: &mut Timer)
-                  -> Result<()> {
+    pub fn cycle(&mut self,
+                 source: &mut Option<Box<AudioSource>>,
+                 receiver: &mut Option<Box<AudioReceiver>>,
+                 audio_timer: &mut Timer)
+                 -> Result<()> {
         let mut buffer = [0i16; 960 * 2];
         let mut packet = [0u8; 512];
         let mut nonce = secretbox::Nonce([0; 24]);
@@ -230,7 +230,7 @@ impl Connection {
             try!(self.sender.send_json(&payload::build_keepalive()));
         }
 
-        // Send the UDP keepalive if it's time
+        // Send UDP keepalive if it's time
         if self.audio_timer.check() {
             let mut bytes = [0; 4];
             try!((&mut bytes[..]).write_u32::<BigEndian>(self.ssrc));
@@ -286,7 +286,7 @@ impl Connection {
 
         nonce.0[..HEADER_LEN].clone_from_slice(&packet[..HEADER_LEN]);
 
-        let extent = packet.len() - 16;
+        let sl_index = packet.len() - 16;
         let buffer_len = if self.encoder_stereo {
             960 * 2
         } else {
@@ -294,7 +294,7 @@ impl Connection {
         };
 
         let len = try!(self.encoder.encode(&buffer[..buffer_len],
-                                           &mut packet[HEADER_LEN..extent]));
+                                           &mut packet[HEADER_LEN..sl_index]));
         let crypted = {
             let slice = &packet[HEADER_LEN..HEADER_LEN + len];
             secretbox::seal(slice, &nonce, &self.key)

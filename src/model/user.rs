@@ -1,5 +1,5 @@
 use std::fmt;
-use super::utils::{into_map, into_string, remove, warn_field};
+use super::utils::{into_map, into_string, remove};
 use super::{
     CurrentUser,
     FriendSourceFlags,
@@ -29,7 +29,7 @@ impl CurrentUser {
     /// Returns the formatted URL of the user's icon, if one exists.
     pub fn avatar_url(&self) -> Option<String> {
         self.avatar.as_ref().map(|av|
-            format!(cdn_concat!("/avatars/{}/{}.jpg"), self.id, av))
+            format!(cdn!("/avatars/{}/{}.jpg"), self.id, av))
     }
 }
 
@@ -37,7 +37,7 @@ impl User {
     /// Returns the formatted URL of the user's icon, if one exists.
     pub fn avatar_url(&self) -> Option<String> {
         self.avatar.as_ref().map(|av|
-            format!(cdn_concat!("/avatars/{}/{}.jpg"), self.id, av))
+            format!(cdn!("/avatars/{}/{}.jpg"), self.id, av))
     }
 
     /// Retrieves the time that this user was created at.
@@ -166,7 +166,7 @@ impl UserSettings {
             return Ok(None);
         }
 
-        missing!(map, UserSettings {
+        Ok(UserSettings {
             convert_emoticons: req!(try!(remove(&mut map, "convert_emoticons")).as_bool()),
             enable_tts_command: req!(try!(remove(&mut map, "enable_tts_command")).as_bool()),
             friend_source_flags: try!(remove(&mut map, "friend_source_flags").and_then(FriendSourceFlags::decode)),

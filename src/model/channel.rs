@@ -6,7 +6,6 @@ use super::utils::{
     into_string,
     opt,
     remove,
-    warn_field,
 };
 use super::*;
 use ::constants;
@@ -343,7 +342,7 @@ impl Group {
     /// Returns the formatted URI of the group's icon if one exists.
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
-            format!(cdn_concat!("/channel-icons/{}/{}.jpg"), self.channel_id, icon))
+            format!(cdn!("/channel-icons/{}/{}.jpg"), self.channel_id, icon))
     }
 
     /// Leaves the group.
@@ -639,8 +638,7 @@ impl Message {
         }}
 
         let mut gen = format!("{}", self.author.mention());
-        gen.push(':');
-        gen.push(' ');
+        gen.push_str(": ");
         gen.push_str(content);
 
         let map = ObjectBuilder::new()
@@ -690,7 +688,7 @@ impl PermissionOverwrite {
             _ => return Err(Error::Decode("Expected valid PermissionOverwrite type", Value::String(kind))),
         };
 
-        missing!(map, PermissionOverwrite {
+        Ok(PermissionOverwrite {
             kind: kind,
             allow: try!(remove(&mut map, "allow").and_then(Permissions::decode)),
             deny: try!(remove(&mut map, "deny").and_then(Permissions::decode)),
@@ -711,7 +709,7 @@ impl PrivateChannel {
         let mut recipients = try!(decode_array(try!(remove(&mut map, "recipients")),
                                   User::decode));
 
-        missing!(map, PrivateChannel {
+        Ok(PrivateChannel {
             id: try!(remove(&mut map, "id").and_then(ChannelId::decode)),
             kind: try!(remove(&mut map, "type").and_then(ChannelType::decode)),
             last_message_id: try!(opt(&mut map, "last_message_id", MessageId::decode)),
@@ -858,7 +856,8 @@ impl GuildChannel {
     #[doc(hidden)]
     pub fn decode_guild(value: Value, guild_id: GuildId) -> Result<GuildChannel> {
         let mut map = try!(into_map(value));
-        missing!(map, GuildChannel {
+
+        Ok(GuildChannel {
             id: try!(remove(&mut map, "id").and_then(ChannelId::decode)),
             name: try!(remove(&mut map, "name").and_then(into_string)),
             guild_id: guild_id,

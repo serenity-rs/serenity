@@ -22,11 +22,9 @@ impl ReceiverExt for Receiver<WebSocketStream> {
         let message: WsMessage = try!(self.recv_message());
 
         if message.opcode == WsType::Close {
-            let representation = String::from_utf8_lossy(&message.payload)
-                .into_owned();
+            let r = String::from_utf8_lossy(&message.payload).into_owned();
 
-            Err(Error::Gateway(GatewayError::Closed(message.cd_status_code,
-                                                    representation)))
+            Err(Error::Gateway(GatewayError::Closed(message.cd_status_code, r)))
         } else if message.opcode == WsType::Binary || message.opcode == WsType::Text {
             let json: Value = if message.opcode == WsType::Binary {
                 try!(serde_json::from_reader(ZlibDecoder::new(&message.payload[..])))
@@ -34,17 +32,20 @@ impl ReceiverExt for Receiver<WebSocketStream> {
                 try!(serde_json::from_reader(&message.payload[..]))
             };
 
-            decode(json).map_err(|err| {
-                warn!("Error decoding: {}",
-                      String::from_utf8_lossy(&message.payload));
+            match decode(json) {
+                Ok(v) => Ok(v),
+                Err(why) => {
+                    let s = String::from_utf8_lossy(&message.payload);
 
-                err
-            })
+                    warn!("Error decoding: {}", s);
+
+                    Err(why)
+                }
+            }
         } else {
-            let representation = String::from_utf8_lossy(&message.payload)
-                .into_owned();
+            let r = String::from_utf8_lossy(&message.payload).into_owned();
 
-            Err(Error::Gateway(GatewayError::Closed(None, representation)))
+            Err(Error::Gateway(GatewayError::Closed(None, r)))
         }
     }
 }

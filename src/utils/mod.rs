@@ -21,60 +21,6 @@ use ::internal::prelude::*;
 
 pub use self::message_builder::MessageBuilder;
 
-macro_rules! cdn_concat {
-    ($e:expr) => {
-        concat!("https://cdn.discordapp.com", $e)
-    }
-}
-macro_rules! api {
-    ($e:expr) => {
-        concat!("https://discordapp.com/api/v6", $e)
-    };
-    ($e:expr, $($rest:tt)*) => {
-        format!(api!($e), $($rest)*)
-    };
-}
-
-macro_rules! api_concat {
-    ($e:expr) => {
-        concat!("https://discordapp.com/api/v6", $e)
-    }
-}
-macro_rules! status_concat {
-    ($e:expr) => {
-        concat!("https://status.discordapp.com/api/v2", $e)
-    }
-}
-
-macro_rules! map_nums {
-    ($item:ident; $($entry:ident $value:expr,)*) => {
-        impl $item {
-            #[allow(dead_code)]
-            pub fn num(&self) -> u64 {
-                match *self {
-                    $($item::$entry => $value,)*
-                }
-            }
-
-            #[allow(dead_code)]
-            pub fn from_num(num: u64) -> Option<Self> {
-                match num {
-                    $($value => Some($item::$entry),)*
-                    _ => None,
-                }
-            }
-
-            #[allow(dead_code)]
-            fn decode(value: Value) -> Result<Self> {
-                value.as_u64().and_then(Self::from_num).ok_or(Error::Decode(
-                    concat!("Expected valid ", stringify!($item)),
-                    value
-                ))
-            }
-        }
-    }
-}
-
 #[doc(hidden)]
 pub fn decode_array<T, F: Fn(Value) -> Result<T>>(value: Value, f: F) -> Result<Vec<T>> {
     into_array(value).and_then(|x| x.into_iter().map(f).collect())

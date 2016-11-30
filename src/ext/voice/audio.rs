@@ -1,5 +1,3 @@
-use ::model::UserId;
-
 pub const HEADER_LEN: usize = 12;
 pub const SAMPLE_RATE: u32 = 48000;
 

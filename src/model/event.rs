@@ -3,7 +3,7 @@
 use std::collections::{BTreeMap, HashMap};
 use super::utils::*;
 use super::*;
-use ::constants::OpCode;
+use ::constants::{OpCode, VoiceOpCode};
 use ::internal::prelude::*;
 use ::utils::decode_array;
 
@@ -489,11 +489,11 @@ impl Event {
                 call: try!(Call::decode(Value::Object(value))),
             }))
         } else if kind == "CALL_DELETE" {
-            missing!(value, Event::CallDelete(CallDeleteEvent {
+            Ok(Event::CallDelete(CallDeleteEvent {
                 channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
             }))
         } else if kind == "CALL_UPDATE" {
-            missing!(value, Event::CallUpdate(CallUpdateEvent {
+            Ok(Event::CallUpdate(CallUpdateEvent {
                 channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
                 message_id: try!(remove(&mut value, "message_id").and_then(MessageId::decode)),
                 region: try!(remove(&mut value, "region").and_then(into_string)),
@@ -508,22 +508,22 @@ impl Event {
                 channel: try!(Channel::decode(Value::Object(value))),
             }))
         } else if kind == "CHANNEL_PINS_ACK" {
-            missing!(value, Event::ChannelPinsAck(ChannelPinsAckEvent {
+            Ok(Event::ChannelPinsAck(ChannelPinsAckEvent {
                 channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
                 timestamp: try!(remove(&mut value, "timestamp").and_then(into_string)),
             }))
         } else if kind == "CHANNEL_PINS_UPDATE" {
-            missing!(value, Event::ChannelPinsUpdate(ChannelPinsUpdateEvent {
+            Ok(Event::ChannelPinsUpdate(ChannelPinsUpdateEvent {
                 channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
                 last_pin_timestamp: try!(opt(&mut value, "last_pin_timestamp", into_string)),
             }))
         } else if kind == "CHANNEL_RECIPIENT_ADD" {
-            missing!(value, Event::ChannelRecipientAdd(ChannelRecipientAddEvent {
+            Ok(Event::ChannelRecipientAdd(ChannelRecipientAddEvent {
                 channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
                 user: try!(remove(&mut value, "user").and_then(User::decode)),
             }))
         } else if kind == "CHANNEL_RECIPIENT_REMOVE" {
-            missing!(value, Event::ChannelRecipientRemove(ChannelRecipientRemoveEvent {
+            Ok(Event::ChannelRecipientRemove(ChannelRecipientRemoveEvent {
                 channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
                 user: try!(remove(&mut value, "user").and_then(User::decode)),
             }))
@@ -532,21 +532,21 @@ impl Event {
                 channel: try!(Channel::decode(Value::Object(value))),
             }))
         } else if kind == "FRIEND_SUGGESTION_CREATE" {
-            missing!(value, Event::FriendSuggestionCreate(FriendSuggestionCreateEvent {
+            Ok(Event::FriendSuggestionCreate(FriendSuggestionCreateEvent {
                 reasons: try!(decode_array(try!(remove(&mut value, "reasons")), SuggestionReason::decode)),
                 suggested_user: try!(remove(&mut value, "suggested_user").and_then(User::decode)),
             }))
         } else if kind == "FRIEND_SUGGESTION_DELETE" {
-            missing!(value, Event::FriendSuggestionDelete(FriendSuggestionDeleteEvent {
+            Ok(Event::FriendSuggestionDelete(FriendSuggestionDeleteEvent {
                 suggested_user_id: try!(remove(&mut value, "suggested_user_id").and_then(UserId::decode)),
             }))
         } else if kind == "GUILD_BAN_ADD" {
-            missing!(value, Event::GuildBanAdd(GuildBanAddEvent {
+            Ok(Event::GuildBanAdd(GuildBanAddEvent {
                 guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
                 user: try!(remove(&mut value, "user").and_then(User::decode)),
             }))
         } else if kind == "GUILD_BAN_REMOVE" {
-            missing!(value, Event::GuildBanRemove(GuildBanRemoveEvent {
+            Ok(Event::GuildBanRemove(GuildBanRemoveEvent {
                 guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
                 user: try!(remove(&mut value, "user").and_then(User::decode)),
             }))
@@ -571,12 +571,12 @@ impl Event {
                 }))
             }
         } else if kind == "GUILD_EMOJIS_UPDATE" {
-            missing!(value, Event::GuildEmojisUpdate(GuildEmojisUpdateEvent {
+            Ok(Event::GuildEmojisUpdate(GuildEmojisUpdateEvent {
                 emojis: try!(remove(&mut value, "emojis").and_then(decode_emojis)),
                 guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
             }))
         } else if kind == "GUILD_INTEGRATIONS_UPDATE" {
-            missing!(value, Event::GuildIntegrationsUpdate(GuildIntegrationsUpdateEvent {
+            Ok(Event::GuildIntegrationsUpdate(GuildIntegrationsUpdateEvent {
                 guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
             }))
         } else if kind == "GUILD_MEMBER_ADD" {
@@ -585,39 +585,39 @@ impl Event {
                 member: try!(Member::decode(Value::Object(value))),
             }))
         } else if kind == "GUILD_MEMBER_REMOVE" {
-            missing!(value, Event::GuildMemberRemove(GuildMemberRemoveEvent {
+            Ok(Event::GuildMemberRemove(GuildMemberRemoveEvent {
                 guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
                 user: try!(remove(&mut value, "user").and_then(User::decode)),
             }))
         } else if kind == "GUILD_MEMBER_UPDATE" {
-            missing!(value, Event::GuildMemberUpdate(GuildMemberUpdateEvent {
+            Ok(Event::GuildMemberUpdate(GuildMemberUpdateEvent {
                 guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
                 nick: try!(opt(&mut value, "nick", into_string)),
                 roles: try!(decode_array(try!(remove(&mut value, "roles")), RoleId::decode)),
                 user: try!(remove(&mut value, "user").and_then(User::decode)),
             }))
         } else if kind == "GUILD_MEMBERS_CHUNK" {
-            missing!(value, Event::GuildMembersChunk(GuildMembersChunkEvent {
+            Ok(Event::GuildMembersChunk(GuildMembersChunkEvent {
                 guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
                 members: try!(remove(&mut value, "members").and_then(decode_members)),
             }))
         } else if kind == "GUILD_ROLE_CREATE" {
-            missing!(value, Event::GuildRoleCreate(GuildRoleCreateEvent {
+            Ok(Event::GuildRoleCreate(GuildRoleCreateEvent {
                 guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
                 role: try!(remove(&mut value, "role").and_then(Role::decode)),
             }))
         } else if kind == "GUILD_ROLE_DELETE" {
-            missing!(value, Event::GuildRoleDelete(GuildRoleDeleteEvent {
+            Ok(Event::GuildRoleDelete(GuildRoleDeleteEvent {
                 guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
                 role_id: try!(remove(&mut value, "role_id").and_then(RoleId::decode)),
             }))
         } else if kind == "GUILD_ROLE_UPDATE" {
-            missing!(value, Event::GuildRoleUpdate(GuildRoleUpdateEvent {
+            Ok(Event::GuildRoleUpdate(GuildRoleUpdateEvent {
                 guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
                 role: try!(remove(&mut value, "role").and_then(Role::decode)),
             }))
         } else if kind == "GUILD_SYNC" {
-            missing!(value, Event::GuildSync(GuildSyncEvent {
+            Ok(Event::GuildSync(GuildSyncEvent {
                 guild_id: try!(remove(&mut value, "id").and_then(GuildId::decode)),
                 large: req!(try!(remove(&mut value, "large")).as_bool()),
                 members: try!(remove(&mut value, "members").and_then(decode_members)),
@@ -628,7 +628,7 @@ impl Event {
                 guild: try!(PartialGuild::decode(Value::Object(value))),
             }))
         } else if kind == "MESSAGE_ACK" {
-            missing!(value, Event::MessageAck(MessageAckEvent {
+            Ok(Event::MessageAck(MessageAckEvent {
                 channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
                 message_id: try!(opt(&mut value, "message_id", MessageId::decode)),
             }))
@@ -637,12 +637,12 @@ impl Event {
                 message: try!(Message::decode(Value::Object(value))),
             }))
         } else if kind == "MESSAGE_DELETE" {
-            missing!(value, Event::MessageDelete(MessageDeleteEvent {
+            Ok(Event::MessageDelete(MessageDeleteEvent {
                 channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
                 message_id: try!(remove(&mut value, "id").and_then(MessageId::decode)),
             }))
         } else if kind == "MESSAGE_DELETE_BULK" {
-            missing!(value, Event::MessageDeleteBulk(MessageDeleteBulkEvent {
+            Ok(Event::MessageDeleteBulk(MessageDeleteBulkEvent {
                 channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
                 ids: try!(decode_array(try!(remove(&mut value, "ids")), MessageId::decode)),
             }))
@@ -650,7 +650,7 @@ impl Event {
             Ok(Event::ReactionAdd(ReactionAddEvent {
                 reaction: try!(Reaction::decode(Value::Object(value)))
             }))
-        } else if kind == "MESSAG_REACTION_REMOVE" {
+        } else if kind == "MESSAGE_REACTION_REMOVE" {
             Ok(Event::ReactionRemove(ReactionRemoveEvent {
                 reaction: try!(Reaction::decode(Value::Object(value)))
             }))
@@ -660,7 +660,7 @@ impl Event {
                 message_id: try!(remove(&mut value, "message_id").and_then(MessageId::decode)),
             }))
         } else if kind == "MESSAGE_UPDATE" {
-            missing!(value, Event::MessageUpdate(MessageUpdateEvent {
+            Ok(Event::MessageUpdate(MessageUpdateEvent {
                 id: try!(remove(&mut value, "id").and_then(MessageId::decode)),
                 channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
                 kind: try!(opt(&mut value, "type", MessageType::decode)),
@@ -691,7 +691,7 @@ impl Event {
                 relationship: try!(Relationship::decode(Value::Object(value))),
             }))
         } else if kind == "RELATIONSHIP_REMOVE" {
-            missing!(value, Event::RelationshipRemove(RelationshipRemoveEvent {
+            Ok(Event::RelationshipRemove(RelationshipRemoveEvent {
                 kind: try!(remove(&mut value, "type").and_then(RelationshipType::decode)),
                 user_id: try!(remove(&mut value, "id").and_then(UserId::decode)),
             }))
@@ -700,12 +700,12 @@ impl Event {
                 ready: try!(Ready::decode(Value::Object(value))),
             }))
         } else if kind == "RESUMED" {
-            missing!(value, Event::Resumed(ResumedEvent {
+            Ok(Event::Resumed(ResumedEvent {
                 heartbeat_interval: req!(try!(remove(&mut value, "heartbeat_interval")).as_u64()),
                 trace: try!(remove(&mut value, "_trace").and_then(|v| decode_array(v, |v| Ok(into_string(v).ok())))),
             }))
         } else if kind == "TYPING_START" {
-            missing!(value, Event::TypingStart(TypingStartEvent {
+            Ok(Event::TypingStart(TypingStartEvent {
                 channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
                 timestamp: req!(try!(remove(&mut value, "timestamp")).as_u64()),
                 user_id: try!(remove(&mut value, "user_id").and_then(UserId::decode)),
@@ -715,12 +715,12 @@ impl Event {
                 settings: try!(UserGuildSettings::decode(Value::Object(value))),
             }))
         } else if kind == "USER_NOTE_UPDATE" {
-            missing!(value, Event::UserNoteUpdate(UserNoteUpdateEvent {
+            Ok(Event::UserNoteUpdate(UserNoteUpdateEvent {
                 note: try!(remove(&mut value, "note").and_then(into_string)),
                 user_id: try!(remove(&mut value, "id").and_then(UserId::decode)),
             }))
         } else if kind == "USER_SETTINGS_UPDATE" {
-            missing!(value, Event::UserSettingsUpdate(UserSettingsUpdateEvent {
+            Ok(Event::UserSettingsUpdate(UserSettingsUpdateEvent {
                 enable_tts_command: remove(&mut value, "enable_tts_command").ok().and_then(|v| v.as_bool()),
                 inline_attachment_media: remove(&mut value, "inline_attachment_media").ok().and_then(|v| v.as_bool()),
                 inline_embed_media: remove(&mut value, "inline_embed_media").ok().and_then(|v| v.as_bool()),
@@ -737,7 +737,7 @@ impl Event {
                 current_user: try!(CurrentUser::decode(Value::Object(value))),
             }))
         } else if kind == "VOICE_SERVER_UPDATE" {
-            missing!(value, Event::VoiceServerUpdate(VoiceServerUpdateEvent {
+            Ok(Event::VoiceServerUpdate(VoiceServerUpdateEvent {
                 guild_id: try!(opt(&mut value, "guild_id", GuildId::decode)),
                 channel_id: try!(opt(&mut value, "channel_id", ChannelId::decode)),
                 endpoint: try!(opt(&mut value, "endpoint", into_string)),
@@ -758,6 +758,93 @@ impl Event {
                 kind: kind,
                 value: value,
             }))
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct VoiceHeartbeat {
+    pub heartbeat_interval: u64,
+}
+
+#[derive(Clone, Debug)]
+pub struct VoiceHello {
+    pub heartbeat_interval: u64,
+    pub ip: String,
+    pub modes: Vec<String>,
+    pub port: u16,
+    pub ssrc: u32,
+}
+
+#[derive(Clone, Debug)]
+pub struct VoiceReady {
+    pub mode: String,
+    pub secret_key: Vec<u8>,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct VoiceSpeaking {
+    pub speaking: bool,
+    pub ssrc: u32,
+    pub user_id: UserId,
+}
+
+#[derive(Clone, Debug)]
+pub enum VoiceEvent {
+    Heartbeat(VoiceHeartbeat),
+    Hello(VoiceHello),
+    Ready(VoiceReady),
+    Speaking(VoiceSpeaking),
+    KeepAlive,
+    Unknown(VoiceOpCode, Value)
+}
+
+impl VoiceEvent {
+    pub fn decode(value: Value) -> Result<VoiceEvent> {
+        let mut value = try!(into_map(value));
+        let op = req!(try!(remove(&mut value, "op")).as_u64());
+        let mut map = try!(remove(&mut value, "d").and_then(into_map));
+
+        let opcode = try!(VoiceOpCode::from_num(op)
+            .ok_or(Error::Client(ClientError::InvalidOpCode)));
+
+        match opcode {
+            VoiceOpCode::Heartbeat => {
+                Ok(VoiceEvent::Heartbeat(VoiceHeartbeat {
+                    heartbeat_interval: req!(try!(remove(&mut map, "heartbeat_interval")).as_u64()),
+                }))
+            },
+            VoiceOpCode::Hello => {
+                Ok(VoiceEvent::Hello(VoiceHello {
+                    heartbeat_interval: req!(try!(remove(&mut map, "heartbeat_interval"))
+                        .as_u64()),
+                    ip: try!(remove(&mut map, "ip").and_then(into_string)),
+                    modes: try!(decode_array(try!(remove(&mut map, "modes")),
+                                             into_string)),
+                    port: req!(try!(remove(&mut map, "port"))
+                        .as_u64()) as u16,
+                    ssrc: req!(try!(remove(&mut map, "ssrc"))
+                        .as_u64()) as u32,
+                }))
+            },
+            VoiceOpCode::KeepAlive => Ok(VoiceEvent::KeepAlive),
+            VoiceOpCode::SessionDescription => {
+                Ok(VoiceEvent::Ready(VoiceReady {
+                    mode: try!(remove(&mut map, "mode")
+                        .and_then(into_string)),
+                    secret_key: try!(decode_array(try!(remove(&mut map, "secret_key")),
+                        |v| Ok(req!(v.as_u64()) as u8)
+                    )),
+                }))
+            },
+            VoiceOpCode::Speaking => {
+                Ok(VoiceEvent::Speaking(VoiceSpeaking {
+                    speaking: req!(try!(remove(&mut map, "speaking")).as_bool()),
+                    ssrc: req!(try!(remove(&mut map, "ssrc")).as_u64()) as u32,
+                    user_id: try!(remove(&mut map, "user_id").and_then(UserId::decode)),
+                }))
+            }
+            other => Ok(VoiceEvent::Unknown(other, Value::Object(map))),
         }
     }
 }

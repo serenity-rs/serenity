@@ -135,9 +135,9 @@ impl Shard {
         // Parse READY
         let event = try!(receiver.recv_json(GatewayEvent::decode));
         let (ready, sequence) = try!(prep::parse_ready(event,
-                                                 &tx,
-                                                 &mut receiver,
-                                                 identification));
+                                                       &tx,
+                                                       &mut receiver,
+                                                       identification));
 
         Ok((feature_voice! {{
             Shard {
@@ -512,8 +512,8 @@ impl Shard {
         let msg = ObjectBuilder::new()
             .insert("op", OpCode::StatusUpdate.num())
             .insert_object("d", move |mut object| {
-                object = object.insert("since", 0)
-                    .insert("afk", afk)
+                object = object.insert("afk", afk)
+                    .insert("since", 0)
                     .insert("status", status.name());
 
                 match game.as_ref() {

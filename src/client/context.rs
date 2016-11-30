@@ -1,5 +1,6 @@
 use serde_json::builder::ObjectBuilder;
 use std::collections::HashMap;
+use std::fmt::Write as FmtWrite;
 use std::io::Read;
 use std::sync::{Arc, Mutex};
 use super::gateway::Shard;
@@ -127,9 +128,7 @@ impl Context {
             return Err(Error::Client(ClientError::InvalidOperationAsBot));
         }
 
-        let code = utils::parse_invite(invite);
-
-        rest::accept_invite(code)
+        rest::accept_invite(utils::parse_invite(invite))
     }
 
     /// Mark a [`Channel`] as being read up to a certain [`Message`].
@@ -481,7 +480,13 @@ impl Context {
         where F: FnOnce(EditRole) -> EditRole, G: Into<GuildId> {
         let id = guild_id.into().0;
 
-        // The API only allows creating an empty role.
+        // The API only allows creating an empty role, which must then be
+        // edited.
+        //
+        // Note to self: [this] issue/proposal may make this not require an
+        // edit.
+        //
+        // [this]: http://github.com/hammerandchisel/discord-api-docs/issues/156
         let role = try!(rest::create_role(id));
         let map = f(EditRole::default()).0.build();
 
@@ -544,9 +549,7 @@ impl Context {
     /// [`Invite::delete`]: ../model/struct.Invite.html#method.delete
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn delete_invite(&self, invite: &str) -> Result<Invite> {
-        let code = utils::parse_invite(invite);
-
-        rest::delete_invite(code)
+        rest::delete_invite(utils::parse_invite(invite))
     }
 
     /// Deletes a [`Message`] given its Id.
@@ -859,7 +862,7 @@ impl Context {
         let guild_id = guild_id.into();
         let role_id = role_id.into();
 
-        feature_cache! {{
+        let map = feature_cache! {{
             let cache = CACHE.read().unwrap();
 
             let role = if let Some(role) = {
@@ -870,14 +873,12 @@ impl Context {
                 return Err(Error::Client(ClientError::RecordNotFound));
             };
 
-            let map = f(EditRole::new(role)).0.build();
-
-            rest::edit_role(guild_id.0, role_id.0, map)
+            f(EditRole::new(role)).0.build()
         } else {
-            let map = f(EditRole::default()).0.build();
+            f(EditRole::default()).0.build()
+        }};
 
-            rest::edit_role(guild_id.0, role_id.0, map)
-        }}
+        rest::edit_role(guild_id.0, role_id.0, map)
     }
 
     /// Edit a message given its Id and the Id of the channel it belongs to.
@@ -1061,22 +1062,19 @@ impl Context {
         where C: Into<ChannelId>, F: FnOnce(GetMessages) -> GetMessages {
         let query = {
             let mut map = f(GetMessages::default()).0;
-            let mut query = format!("?limit={}",
-                                    map.remove("limit").unwrap_or(50));
+            let mut query = String::new();
+            try!(write!(query, "?limit={}", map.remove("limit").unwrap_or(50)));
 
             if let Some(after) = map.remove("after") {
-                query.push_str("&after=");
-                query.push_str(&after.to_string());
+                try!(write!(query, "&after={}", after));
             }
 
             if let Some(around) = map.remove("around") {
-                query.push_str("&around=");
-                query.push_str(&around.to_string());
+                try!(write!(query, "&around={}", around));
             }
 
             if let Some(before) = map.remove("before") {
-                query.push_str("&before=");
-                query.push_str(&before.to_string());
+                try!(write!(query, "&before={}", before));
             }
 
             query
@@ -1118,7 +1116,11 @@ impl Context {
                                                 M: Into<MessageId>,
                                                 R: Into<ReactionType>,
                                                 U: Into<UserId> {
-        let limit = limit.map(|x| if x > 100 { 100 } else { x }).unwrap_or(50);
+        let limit = limit.map(|x| if x > 100 {
+            100
+        } else {
+            x
+        }).unwrap_or(50);
 
         rest::get_reaction_users(channel_id.into().0,
                                  message_id.into().0,

@@ -36,7 +36,7 @@ impl Game {
             return Ok(None);
         }
 
-        missing!(map, Some(Game {
+        Ok(Some(Game {
             name: name,
             kind: try!(opt(&mut map, "type", GameType::decode)).unwrap_or(GameType::Playing),
             url: try!(opt(&mut map, "url", into_string)),
@@ -62,7 +62,7 @@ impl Presence {
             Some(v) => try!(Game::decode(v)),
         };
 
-        missing!(value, Presence {
+        Ok(Presence {
             user_id: user_id,
             status: try!(remove(&mut value, "status").and_then(OnlineStatus::decode_str)),
             last_modified: try!(opt(&mut value, "last_modified", |v| Ok(req!(v.as_u64())))),

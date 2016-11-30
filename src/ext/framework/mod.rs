@@ -125,34 +125,6 @@ macro_rules! command {
     };
 }
 
-/// The type of command being received.
-///
-/// The [`Mention`] variant is emitted if the bot is being commanded via a
-/// mention (`<@USER_ID>` or `<@!USER_ID>`). This can only be emitted if
-/// [`Configuration::on_mention`] is set to `true`.
-///
-/// The [`Prefix`] variant is emitted if a message starts with the prefix set
-/// via [`Configuration::prefix`].
-///
-/// [`Mention`]: #variant.Mention
-/// [`Prefix`]: #variant.Prefix
-// This is public due to being leaked by [`command::positions`], which is used
-// in [`Framework::dispatch`]. It therefore is hidden from the docs, due to
-// having no use to users.
-//
-// [`Framework::dispatch`]: struct.Framework.html#method.dispatch
-// [`command::positions`]: command/fn.positions.html
-#[derive(Clone, Copy, Debug)]
-#[doc(hidden)]
-pub enum CommandType {
-    /// This is emitted if the bot is being commanded via a mention
-    /// (`<@USER_ID>` or `<@!USER_ID>`). This can only be emitted if
-    /// [`Configuration::on_mention`] is set to `true`.
-    Mention,
-    None,
-    Prefix,
-}
-
 /// A utility for easily managing dispatches to commands.
 ///
 /// Refer to the [module-level documentation] for more information.
@@ -214,7 +186,6 @@ impl Framework {
     pub fn configure<F>(mut self, f: F) -> Self
         where F: FnOnce(Configuration) -> Configuration {
         self.configuration = f(self.configuration);
-        self.initialized = true;
 
         self
     }
@@ -224,7 +195,7 @@ impl Framework {
         let res = command::positions(&message.content, &self.configuration);
 
         let positions = match res {
-            Some((positions, _kind)) => positions,
+            Some(positions) => positions,
             None => return,
         };
 
@@ -358,7 +329,6 @@ impl Framework {
         where F: Fn(&Context, &Message) -> bool + Send + Sync + 'static,
               S: Into<String> {
         self.checks.insert(command.into(), Arc::new(check));
-        self.initialized = true;
 
         self
     }

@@ -1,24 +1,20 @@
-// Requires the feature "voice" be enabled.
+//! Requires the "cache", "methods", and "voice" features be enabled in your
+//! Cargo.toml, like so:
+//!
+//! ```toml
+//! [dependencies.serenity]
+//! version = "*"
+//! features = ["cache", "methods", "voice"]
+//! ```
 
 extern crate serenity;
 
-#[cfg(feature = "voice")]
 use serenity::client::{CACHE, Client, Context};
-#[cfg(feature = "voice")]
 use serenity::ext::voice;
-#[cfg(feature = "voice")]
 use serenity::model::{ChannelId, Message};
-#[cfg(feature = "voice")]
 use serenity::Result as SerenityResult;
-#[cfg(feature = "voice")]
 use std::env;
 
-#[cfg(not(feature = "voice"))]
-fn main() {
-    panic!("'extras' and 'voice' must be enabled");
-}
-
-#[cfg(feature = "voice")]
 fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
@@ -45,7 +41,6 @@ fn main() {
     let _ = client.start().map_err(|why| println!("Client ended: {:?}", why));
 }
 
-#[cfg(feature = "voice")]
 fn deafen(context: &Context, message: &Message, _args: Vec<String>) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
@@ -76,7 +71,6 @@ fn deafen(context: &Context, message: &Message, _args: Vec<String>) {
     }
 }
 
-#[cfg(feature = "voice")]
 fn join(context: &Context, message: &Message, args: Vec<String>) {
     let connect_to = match args.get(0) {
         Some(arg) => match arg.parse::<u64>() {
@@ -109,7 +103,6 @@ fn join(context: &Context, message: &Message, args: Vec<String>) {
     check_msg(context.say(&format!("Joined {}", connect_to.mention())));
 }
 
-#[cfg(feature = "voice")]
 fn leave(context: &Context, message: &Message, _args: Vec<String>) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
@@ -132,7 +125,6 @@ fn leave(context: &Context, message: &Message, _args: Vec<String>) {
     }
 }
 
-#[cfg(feature = "voice")]
 fn mute(context: &Context, message: &Message, _args: Vec<String>) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
@@ -163,12 +155,10 @@ fn mute(context: &Context, message: &Message, _args: Vec<String>) {
     }
 }
 
-#[cfg(feature = "voice")]
 fn ping(context: &Context, _message: &Message, _args: Vec<String>) {
     check_msg(context.say("Pong!"));
 }
 
-#[cfg(feature = "voice")]
 fn play(context: &Context, message: &Message, args: Vec<String>) {
     let url = match args.get(0) {
         Some(url) => url,
@@ -214,7 +204,6 @@ fn play(context: &Context, message: &Message, args: Vec<String>) {
     }
 }
 
-#[cfg(feature = "voice")]
 fn undeafen(context: &Context, message: &Message, _args: Vec<String>) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
@@ -234,7 +223,6 @@ fn undeafen(context: &Context, message: &Message, _args: Vec<String>) {
     }
 }
 
-#[cfg(feature = "voice")]
 fn unmute(context: &Context, message: &Message, _args: Vec<String>) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
@@ -255,6 +243,7 @@ fn unmute(context: &Context, message: &Message, _args: Vec<String>) {
 }
 
 /// Checks that a message successfully sent; if not, then logs why to stdout.
+#[cfg(feature = "voice")]
 fn check_msg(result: SerenityResult<Message>) {
     if let Err(why) = result {
         println!("Error sending message: {:?}", why);
