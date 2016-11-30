@@ -5,3 +5,4 @@ authors = ["my name <my@email.address>"]
 
 [dependencies]
 serenity = { git = "https://github.com/zeyla/serenity.rs.git" }
+features = ["cache", "framework", "methods", "voice"]

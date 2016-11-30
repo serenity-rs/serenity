@@ -2,7 +2,7 @@
 //! data from the event is possible.
 //!
 //! This acts as a hot cache, to avoid making requests over the REST API through
-//! the [`http`] module where possible. All fields are public, and do not have
+//! the [`rest`] module where possible. All fields are public, and do not have
 //! getters, to allow you more flexibility with the stored data. However, this
 //! allows data to be "corrupted", and _may or may not_ cause misfunctions
 //! within the library. Mutate data at your own discretion.
@@ -22,7 +22,7 @@
 //! This allows you to save a step, by only needing to perform the
 //! [`Context::get_channel`] call and not need to first search through the cache
 //! - and if not found - _then_ perform an HTTP request through the Context or
-//! [`http`] module.
+//! [`rest`] module.
 //!
 //! Additionally, note that some information received through events can _not_
 //! be retrieved through the REST API. This is information such as [`Role`]s in
@@ -74,7 +74,7 @@
 //! [`Role`]: ../../model/struct.Role.html
 //! [`Shard`]: ../../client/gateway/struct.Shard.html
 //! [`client::CACHE`]: ../../client/struct.CACHE.html
-//! [`http`]: ../../client/http/index.html
+//! [`rest`]: ../../client/rest/index.html
 
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;

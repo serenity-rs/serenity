@@ -29,6 +29,9 @@ fn main() {
 
     client.on_message(|context, message| {
         if message.content == "!ping" {
+            // The current shard needs to be unlocked so it can be read from, as
+            // multiple threads may otherwise attempt to read from or mutate it
+            // concurrently.
             {
                 let shard = context.shard.lock().unwrap();
 
@@ -37,7 +40,9 @@ fn main() {
                 }
             }
 
-            let _ = context.say("Pong!");
+            if let Err(why) = context.say("Pong!") {
+                println!("Error sending message: {:?}", why);
+            }
         }
     });
 
@@ -51,5 +56,7 @@ fn main() {
     //
     // This means if you have 5 shards, your total shard count will be 5, while
     // each shard will be assigned numbers 0 through 4.
-    let _ = client.start_shards(2);
+    if let Err(why) = client.start_shards(2) {
+        println!("Client error: {:?}", why);
+    }
 }

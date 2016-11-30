@@ -21,15 +21,20 @@ fn main() {
                 },
             };
 
+            // The message builder allows for creating a message by mentioning
+            // users dynamically, pushing "safe" versions of content (such as
+            // bolding normalized content), displaying emojis, and more.
             let response = MessageBuilder::new()
                 .push("User ")
-                .mention(message.author)
+                .push_bold_safe(&message.author.name)
                 .push(" used the 'ping' command in the ")
                 .mention(channel)
                 .push(" channel")
                 .build();
 
-            let _ = context.say(&response);
+            if let Err(why) = context.say(&response) {
+                println!("Error sending message: {:?}", why);
+            }
         }
     });
 
@@ -37,5 +42,7 @@ fn main() {
         println!("{} is connected!", ready.user.name);
     });
 
-    let _ = client.start();
+    if let Err(why) = client.start() {
+        println!("Client error: {:?}", why);
+    }
 }

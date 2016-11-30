@@ -4,7 +4,7 @@
 //! ```toml
 //! [dependencies.serenity]
 //! version = "*"
-//! features = ["cache", "methods", "voice"]
+//! features = ["cache", "framework", "methods", "voice"]
 //! ```
 
 extern crate serenity;

@@ -14,10 +14,9 @@
 //! [`Context`], giving information about the event. See the
 //! [client's module-level documentation].
 //!
-//! The [`Connection`] is transparently handled by the library, removing
+//! The [`Shard`] is transparently handled by the library, removing
 //! unnecessary complexity. Sharded connections are automatically handled for
-//! you. See the [Connection's documentation][`Connection`] for more
-//! information.
+//! you. See the [gateway's documentation][gateway docs] for more information.
 //!
 //! A [`Cache`] is also provided for you. This will be updated automatically for
 //! you as data is received from the Discord API via events. When calling a
@@ -30,11 +29,55 @@
 //! need to be sure that some information piece is sanctioned by Discord, refer
 //! to their own documentation.
 //!
+//! # Features
+//!
+//! Features can be enabled or disabled by configuring the library through
+//! Cargo.toml:
+//!
+//! ```toml
+//! [dependencies.serenity]
+//! git = "https://github.com/zeyla/serenity.rs.git"
+//! default-features = false
+//! features = ["pick", "your", "feature", "names", "here"]
+//! ```
+//!
+//! The following is a full list of features:
+//!
+//! - **cache**: The cache will store information about guilds, channels, users,
+//! and other data, to avoid performing REST requests. If you are low on RAM, do
+//! not enable this;
+//! - **framework**: Enables the framework, which is a utility to allow simple
+//! command parsing, before/after command execution, prefix setting, and more;
+//! - **methods**: Enables compilation of extra methods on struct
+//! implementations, such as `Message::delete()`, `Message::reply()`,
+//! `Guild::edit()`, and more. Without this enabled, requests will need to go
+//! through the [`Context`] or [`rest`] module, which are slightly less
+//! efficient from a development standpoint, and do not automatically perform
+//! permission checking;
+//! - **voice**: Enables compilation of voice support, so that voice channels
+//! can be connected to and audio can be sent/received.
+//!
 //! # Dependencies
 //!
 //! Serenity requires the following dependencies:
 //!
 //! - openssl
+//!
+//! ### Voice
+//!
+//! The following dependencies all require the **voice** feature to be enabled
+//! in your Cargo.toml:
+//!
+//! - libsodium (Arch: `community/libsodium`)
+//! - opus (Arch: `extra/opus`)
+//!
+//! Voice+ffmpeg:
+//!
+//! - ffmpeg (Arch: `extra/ffmpeg`)
+//!
+//! Voice+youtube-dl:
+//!
+//! - youtube-dl (Arch: `community/youtube-dl`)
 //!
 //! # Example Bot
 //!
@@ -56,24 +99,31 @@
 //!             let _ = message.reply("Pong!");
 //!         }));
 //!
-//!     // start listening for events by starting a connection
+//!     // start listening for events by starting a single shard
 //!     let _ = client.start();
 //! }
 //! ```
+//! ### Full Examples
+//!
+//! Full examples, detailing and explaining usage of the basic functionality of the
+//! library, can be found in the [`examples`] directory.
 //!
 //! [`Cache`]: ext/cache/struct.Cache.html
 //! [`Client::login_bot`]: client/struct.Client.html#method.login_bot
 //! [`Client::login_user`]: client/struct.Client.html#method.login_user
 //! [`Client::on_message`]: client/struct.Client.html#method.on_message
-//! [`Connection`]: client/struct.Connection.html
 //! [`Context`]: client/struct.Context.html
 //! [`Event`]: model/event/enum.Event.html
 //! [`Event::MessageCreate`]: model/event/enum.Event.html#variant.MessageCreate
+//! [`Shard`]: client/struct.Shard.html
+//! [`examples`]: https://github.com/zeyla/serenity.rs.git/blob/master/examples
+//! [`rest`]: client/rest/index.html
+//! [`validate_token`]: client/fn.validate_token.html
 //! [cache docs]: ext/cache/index.html
 //! [client's module-level documentation]: client/index.html
 //! [docs]: https://discordapp.com/developers/docs/intro
 //! [examples]: https://github.com/zeyla/serenity.rs/tree/master/examples
-//! [`validate_token`]: client/fn.validate_token.html
+//! [gateway docs]: client/gateway/index.html
 #![allow(doc_markdown, inline_always, unknown_lints)]
 #![doc(html_logo_url = "https://docs.austinhellyer.me/serenity.rs/docs_header.png")]
 #![warn(enum_glob_use, if_not_else)]

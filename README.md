@@ -18,27 +18,69 @@ when a [`Event::MessageCreate`] is received. Each handler is given a
 [`Context`], giving information about the event. See the
 [client's module-level documentation].
 
-The [`Connection`] is transparently handled by the library, removing
+The [`Shard`] is transparently handled by the library, removing
 unnecessary complexity. Sharded connections are automatically handled for
-you. See the [Connection's documentation][`Connection`] for more
-information.
+you. See the [gateway's documentation][gateway docs] for more information.
 
-A [`State`] is also provided for you. This will be updated automatically for
+A [`Cache`] is also provided for you. This will be updated automatically for
 you as data is received from the Discord API via events. When calling a
-method on a [`Context`], the state will first be searched for relevant data
+method on a [`Context`], the cache will first be searched for relevant data
 to avoid unnecessary HTTP requests to the Discord API. For more information,
-see the [state's module-level documentation][state docs].
+see the [cache's module-level documentation][cache docs].
 
 Note that - although this documentation will try to be as up-to-date and
 accurate as possible - Discord hosts [official documentation][discord docs]. If
 you need to be sure that some information piece is accurate, refer to their
 docs.
 
+# Features
+
+Features can be enabled or disabled by configuring the library through
+Cargo.toml:
+
+```toml
+[dependencies.serenity]
+git = "https://github.com/zeyla/serenity.rs.git"
+default-features = false
+features = ["pick", "your", "feature", "names", "here"]
+```
+
+The following is a full list of features:
+
+- **cache**: The cache will store information about guilds, channels, users, and
+other data, to avoid performing REST requests. If you are low on RAM, do not
+enable this;
+- **framework**: Enables the framework, which is a utility to allow simple
+command parsing, before/after command execution, prefix setting, and more;
+- **methods**: Enables compilation of extra methods on struct implementations,
+such as `Message::delete()`, `Message::reply()`, `Guild::edit()`, and more.
+Without this enabled, requests will need to go through the [`Context`] or
+[`rest`] module, which are slightly less efficient from a development
+standpoint, and do not automatically perform permission checking;
+- **voice**: Enables compilation of voice support, so that voice channels can be
+connected to and audio can be sent/received.
+
 # Dependencies
 
 Serenity requires the following dependencies:
 
 - openssl
+
+### Voice
+
+The following dependencies all require the **voice** feature to be enabled in
+your Cargo.toml:
+
+- libsodium (Arch: `community/libsodium`)
+- opus (Arch: `extra/opus`)
+
+Voice+ffmpeg:
+
+- ffmpeg (Arch: `extra/ffmpeg`)
+
+Voice+youtube-dl:
+
+- youtube-dl (Arch: `community/youtube-dl`)
 
 # Example Bot
 
@@ -59,20 +101,28 @@ fn main() {
             let _ = message.reply("Pong!");
         }));
 
-    // start listening for events by starting a connection
+    // start listening for events by starting a single shard
     let _ = client.start();
 }
 ```
 
+### Full Examples
+
+Full examples, detailing and explaining usage of the basic functionality of the
+library, can be found in the [`examples`] directory.
+
+[`Cache`]: https://serenity.zey.moe/serenity/ext/cache/struct.Cache.html
 [`Client::login_bot`]: https://serenity.zey.moe/serenity/client/struct.Client.html#method.login_bot
 [`Client::login_user`]: https://serenity.zey.moe/serenity/client/struct.Client.html#method.login_user
 [`Client::on_message`]: https://serenity.zey.moe/serenity/client/struct.Client.html#method.on_message
-[`validate_token`]: https://serenity.zey.moe/serenity/client/fn.validate_token.html
-[`Connection`]: https://serenity.zey.moe/serenity/client/struct.Connection.html
+[`Shard`]: https://serenity.zey.moe/serenity/client/gateway/struct.Shard.html
 [`Context`]: https://serenity.zey.moe/serenity/client/struct.Context.html
 [`Event`]: https://serenity.zey.moe/serenity/model/enum.Event.html
-[`Event::MessageCreate`]: https://serenity.zey.moe/serenity/model/enum.Event.html#MessageCreate.v
-[`State`]: https://serenity.zey.moe/serenity/ext/state/struct.State.html
+[`Event::MessageCreate`]: https://serenity.zey.moe/serenity/model/enum.Event.html#variant.MessageCreate
+[`examples`]: https://github.com/zeyla/serenity.rs/blob/master/examples
+[`rest`]: https://serenity.zey.moe/serenity/client/rest/index.html
+[`validate_token`]: https://serenity.zey.moe/serenity/client/fn.validate_token.html
+[cache docs]: https://serenity.zey.moe/serenity/ext/cache/index.html
 [ci]: https://travis-ci.org/zeyla/serenity.rs
 [ci-badge]: https://travis-ci.org/zeyla/serenity.rs.svg?branch=master
 [contribs]: https://img.shields.io/github/contributors/zeyla/serenity.rs.svg
@@ -84,6 +134,6 @@ fn main() {
 [docs]: https://serenity.zey.moe/
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
 [examples]: https://github.com/zeyla/serenity.rs/tree/master/examples
+[gateway docs]: https://serenity.zey.moe/serenity/client/gateway/index.html
 [license]: https://opensource.org/licenses/ISC
 [license-badge]: https://img.shields.io/badge/license-ISC-blue.svg
-[state docs]: https://serenity.zey.moe/serenity/ext/state/index.html

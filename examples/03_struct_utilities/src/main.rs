@@ -21,7 +21,17 @@ fn main() {
 
     client.on_message(|_context, message| {
         if message.content == "!messageme" {
-            let _ = message.author.dm("Hello!");
+            // If the `methods` feature is enabled, then model structs will
+            // have a lot of useful methods implemented, to avoid using an
+            // often otherwise bulky Context, or even much lower-level `rest`
+            // method.
+            //
+            // In this case, you can direct message a User directly by simply
+            // calling a method on its instance, with the content of the
+            // message.
+            if let Err(why) = message.author.dm("Hello!") {
+                println!("Error when direct messaging user: {:?}", why);
+            }
         }
     });
 
@@ -29,5 +39,7 @@ fn main() {
         println!("{} is connected!", ready.user.name);
     });
 
-    let _ = client.start();
+    if let Err(why) = client.start() {
+        println!("Client error: {:?}", why);
+    }
 }
