@@ -368,7 +368,8 @@ impl Connection {
 
 impl Drop for Connection {
     fn drop(&mut self) {
-        let _ = self.sender.get_mut().shutdown(Shutdown::Both);
+        let _ = self.thread_items.udp_close_sender.send(0);
+        let _ = self.thread_items.ws_close_sender.send(0);
 
         info!("[Voice] Disconnected");
     }

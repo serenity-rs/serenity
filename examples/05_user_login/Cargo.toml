@@ -3,5 +3,5 @@ name = "05_user_login"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 
-[dependencies]
-serenity = { git = "https://github.com/zeyla/serenity.rs.git" }
+[dependencies.serenity]
+git = "https://github.com/zeyla/serenity.rs.git"
