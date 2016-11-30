@@ -860,6 +860,22 @@ pub fn execute_webhook(webhook_id: u64, token: &str, map: Value)
     Message::decode(try!(serde_json::from_reader(response)))
 }
 
+/// Gets the active maintenances from Discord's Status API.
+///
+/// Does not require authentication.
+pub fn get_active_maintenances() -> Result<Vec<Maintenance>> {
+    let client = HyperClient::new();
+    let response = try!(retry(|| client.get(
+        status!("/scheduled-maintenances/active.json"))));
+
+    let mut map: BTreeMap<String, Value> = try!(serde_json::from_reader(response));
+
+    match map.remove("scheduled_maintenances") {
+        Some(v) => decode_array(v, Maintenance::decode),
+        None => Ok(vec![]),
+    }
+}
+
 /// Gets information about an oauth2 application we own.
 ///
 /// **Note**: Only user accounts may use this endpoint.
@@ -1028,8 +1044,21 @@ pub fn get_guild_invites(guild_id: u64) -> Result<Vec<RichInvite>> {
                             "/guilds/{}/invites",
                             guild_id);
 
-    decode_array(try!(serde_json::from_reader(response)),
-                 RichInvite::decode)
+    decode_array(try!(serde_json::from_reader(response)), RichInvite::decode)
+}
+
+/// Gets the members of a guild. Optionally pass a `limit` and the Id of the
+/// user to offset the result by.
+pub fn get_guild_members(guild_id: u64, limit: Option<u64>, after: Option<u64>)
+    -> Result<Vec<Member>> {
+    let response = request!(Route::GuildsIdMembers(guild_id),
+                            get,
+                            "/guilds/{}/members?limit={}&after={}",
+                            guild_id,
+                            limit.unwrap_or(500),
+                            after.unwrap_or(0));
+
+    decode_array(try!(serde_json::from_reader(response)), Member::decode)
 }
 
 /// Gets the amount of users that can be pruned.
@@ -1182,6 +1211,38 @@ pub fn get_reaction_users(channel_id: u64,
                             uri);
 
     decode_array(try!(serde_json::from_reader(response)), User::decode)
+}
+
+/// Gets the current unresolved incidents from Discord's Status API.
+///
+/// Does not require authentication.
+pub fn get_unresolved_incidents() -> Result<Vec<Incident>> {
+    let client = HyperClient::new();
+    let response = try!(retry(|| client.get(
+        status!("/incidents/unresolved.json"))));
+
+    let mut map: BTreeMap<String, Value> = try!(serde_json::from_reader(response));
+
+    match map.remove("incidents") {
+        Some(incidents) => decode_array(incidents, Incident::decode),
+        None => Ok(vec![]),
+    }
+}
+
+/// Gets the upcoming (planned) maintenances from Discord's Status API.
+///
+/// Does not require authentication.
+pub fn get_upcoming_maintenances() -> Result<Vec<Maintenance>> {
+    let client = HyperClient::new();
+    let response = try!(retry(|| client.get(
+        status!("/scheduled-maintenances/upcoming.json"))));
+
+    let mut map: BTreeMap<String, Value> = try!(serde_json::from_reader(response));
+
+    match map.remove("scheduled_maintenances") {
+        Some(v) => decode_array(v, Maintenance::decode),
+        None => Ok(vec![]),
+    }
 }
 
 /// Gets a user by Id.

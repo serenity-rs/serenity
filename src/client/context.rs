@@ -1028,6 +1028,21 @@ impl Context {
         rest::get_member(guild_id.0, user_id.0)
     }
 
+    /// Gets a list of a [`Guild`]'s members.
+    ///
+    /// Optionally pass in the `limit` to limit the number of results. Maximum
+    /// value is 1000. Optionally pass in `after` to offset the results by a
+    /// [`User`]'s Id.
+    ///
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`User`]: ../model/struct.User.html
+    pub fn get_members<G, U>(&self, guild_id: G, limit: Option<u64>, after: Option<U>)
+        -> Result<Vec<Member>> where G: Into<GuildId>, U: Into<UserId> {
+        rest::get_guild_members(guild_id.into().0,
+                                limit,
+                                after.map(|x| x.into().0))
+    }
+
     /// Retrieves a single [`Message`] from a [`Channel`].
     ///
     /// Requires the [Read Message History] permission.

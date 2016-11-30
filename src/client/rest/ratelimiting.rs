@@ -83,6 +83,7 @@ pub enum Route {
     GuildsIdIntegrationsId(u64),
     GuildsIdIntegrationsIdSync(u64),
     GuildsIdInvites(u64),
+    GuildsIdMembers(u64),
     GuildsIdMembersId(u64),
     GuildsIdMembersIdRolesId(u64),
     GuildsIdMembersMeNick(u64),
@@ -107,6 +108,12 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
     where F: Fn() -> RequestBuilder<'a> {
 
     loop {
+        {
+            /// This will block if another thread already has the global
+            /// unlocked already (due to receiving an x-ratelimit-global).
+            let mut _global = GLOBAL.lock().expect("global route lock poisoned");
+        }
+
         // Perform pre-checking here:
         //
         // - get the route's relevant rate
@@ -115,11 +122,6 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
         // - get the global rate;
         // - sleep if there is 0 remaining
         // - then, perform the request
-        {
-            let mut global = GLOBAL.lock().expect("global route lock poisoned");
-            global.pre_hook();
-        }
-
         if route != Route::None {
             if let Some(route) = ROUTES.lock().expect("routes poisoned").get_mut(&route) {
                 route.pre_hook();
@@ -141,7 +143,6 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
         // It _may_ be possible for the limit to be raised at any time,
         // so check if it did from the value of the 'x-ratelimit-limit'
         // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
-
         if route != Route::None {
             let redo = if response.headers.get_raw("x-ratelimit-global").is_some() {
                 let mut global = GLOBAL.lock().expect("global route lock poisoned");
