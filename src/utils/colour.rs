@@ -281,6 +281,8 @@ colour! {
     purple, 0x9B59B6;
     /// Creates a new `Colour`, setting its RGB value to `(231, 76, 60)`.
     red, 0xE74C3C;
+    /// Creates a new `Colour`, setting its RGB value to `(250, 177, 237)`.
+    fabled_pink, 0xFAB1ED
     /// Creates a new `Colour`, setting its RGB value to `(26, 188, 156)`.
     teal, 0x1ABC9C;
 }
