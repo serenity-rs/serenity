@@ -2,8 +2,8 @@ use std::default::Default;
 use ::internal::prelude::*;
 
 macro_rules! colour {
-    ($struct_:ident; $(#[$attr:meta] $name:ident, $val:expr;)*) => {
-        impl $struct_ {
+    ($(#[$attr:meta] $name:ident, $val:expr;)*) => {
+        impl Colour {
             $(
                 #[$attr]
                 pub fn $name() -> Colour {
@@ -237,7 +237,6 @@ impl From<u64> for Colour {
 }
 
 colour! {
-    Colour;
     /// Creates a new `Colour`, setting its RGB value to `(111, 198, 226)`.
     blitz_blue, 0x6FC6E2;
     /// Creates a new `Colour`, setting its RGB value to `(52, 152, 219)`.
