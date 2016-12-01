@@ -240,6 +240,8 @@ colour! {
     Colour;
     /// Creates a new `Colour`, setting its RGB value to `(52, 152, 219)`.
     blue, 0x3498DB;
+    /// Creates a new `Colour`, setting its RGB value to `(114, 137, 218)`.
+    blurple, 0x7289DA;
     /// Creates a new `Colour`, setting its RGB value to `(32, 102, 148)`.
     dark_blue, 0x206694;
     /// Creates a new `Colour`, setting its RGB value to `(31, 139, 76)`.
