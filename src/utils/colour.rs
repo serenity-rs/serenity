@@ -278,8 +278,6 @@ colour! {
     red, 0xE74C3C;
     /// Creates a new `Colour`, setting its RGB value to `(26, 188, 156)`.
     teal, 0x1ABC9C;
-    /// Creates a new `Colour`, setting its RGB value to `(114, 137, 218)`.
-    blurple, 0x7289DA;
 }
 
 impl Default for Colour {
