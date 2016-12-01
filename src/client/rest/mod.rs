@@ -1467,12 +1467,12 @@ pub fn start_guild_prune(guild_id: u64, map: Value)
     GuildPrune::decode(try!(serde_json::from_reader(response)))
 }
 
-/// Adds an integration to a guild.
+/// Starts syncing an integration with a guild.
 pub fn start_integration_sync(guild_id: u64, integration_id: u64)
     -> Result<()> {
     verify(204, request!(Route::GuildsIdIntegrationsIdSync(guild_id),
                          post,
-                         "/guilds/{}/integrations/{}",
+                         "/guilds/{}/integrations/{}/sync",
                          guild_id,
                          integration_id))
 }
