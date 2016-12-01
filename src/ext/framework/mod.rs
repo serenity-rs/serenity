@@ -100,12 +100,12 @@ use ::model::Message;
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
-        fn $fname($c: &Context, $m: &Message, $a: Vec<String>) {
+        pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) {
             $b
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
-        fn $fname($c: &Context, $m: &Message, $a: Vec<String>) {
+        pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) {
             let mut i = $a.iter();
 
             $(
