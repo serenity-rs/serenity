@@ -246,10 +246,10 @@ colour! {
     blurple, 0x7289DA;
     /// Creates a new `Colour`, setting its RGB value to `(32, 102, 148)`.
     dark_blue, 0x206694;
-    /// Creates a new `Colour`, setting its RGB value to `(31, 139, 76)`.
-    dark_green, 0x1F8B4C;
     /// Creates a new `Colour`, setting its RGB value to `(194, 124, 14)`.
     dark_gold, 0xC27C0E;
+    /// Creates a new `Colour`, setting its RGB value to `(31, 139, 76)`.
+    dark_green, 0x1F8B4C;
     /// Creates a new `Colour`, setting its RGB value to `(96, 125, 139)`.
     dark_grey, 0x607D8B;
     /// Creates a new `Colour`, setting its RGB value to `(173, 20, 87)`.
