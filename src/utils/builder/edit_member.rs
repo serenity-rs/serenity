@@ -2,7 +2,8 @@ use serde_json::builder::ObjectBuilder;
 use std::default::Default;
 use ::model::{ChannelId, RoleId};
 
-/// A builder that edits properties of a ['Member'] via ['Context::edit_member'].
+/// A builder that edits properties of a [`Member`] via
+/// [`Context::edit_member`]: ../../client/struct.Context.html
 
 pub struct EditMember(pub ObjectBuilder);
 
@@ -17,15 +18,15 @@ impl EditMember {
         EditMember(self.0.insert("mute", mute))
     }
 
-    /// Changes a members nickname.
+    /// Changes a members nickname. If the string is empty the nickname will be reset.
     pub fn nickname(self, nickname: &str) -> Self {
         EditMember(self.0.insert("nick", nickname))
     }
 
     pub fn roles(self, roles: &[RoleId]) -> Self {
         EditMember(self.0
-            .insert_array("roles", |a| roles.iter().fold(a, |a, id| a.push(id.0))))
-    }
+             .insert_array("roles",
+                           |a| roles.iter().fold(a, |a, id| a.push(id.0))))
 
     /// The Id of the voice channel the member is currently in.
     /// If that member is in a voice channel.
