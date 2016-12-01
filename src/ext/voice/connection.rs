@@ -9,7 +9,7 @@ use opus::{
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
 use std::collections::HashMap;
 use std::io::Write;
-use std::net::{Shutdown, SocketAddr, ToSocketAddrs, UdpSocket};
+use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
 use std::sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender};
 use std::thread::{self, Builder as ThreadBuilder, JoinHandle};
 use std::time::Duration;

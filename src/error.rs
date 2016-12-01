@@ -7,7 +7,7 @@ use std::fmt::{self, Display, Error as FormatError};
 use websocket::result::WebSocketError;
 use ::client::gateway::GatewayError;
 use ::client::ClientError;
-#[cfg(feature = "opus")]
+#[cfg(feature = "voice")]
 use opus::Error as OpusError;
 #[cfg(feature="voice")]
 use ::ext::voice::VoiceError;
