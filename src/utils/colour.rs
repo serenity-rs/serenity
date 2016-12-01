@@ -238,8 +238,8 @@ impl From<u64> for Colour {
 
 colour! {
     Colour;
-    /// Creates a new `Colour`, setting its RGB value to `(51, 181, 229)`.
-    blitz_blue, 0x33b5e5;
+    /// Creates a new `Colour`, setting its RGB value to `(111, 198, 226)`.
+    blitz_blue, 0x6fc6e2;
     /// Creates a new `Colour`, setting its RGB value to `(52, 152, 219)`.
     blue, 0x3498DB;
     /// Creates a new `Colour`, setting its RGB value to `(114, 137, 218)`.
