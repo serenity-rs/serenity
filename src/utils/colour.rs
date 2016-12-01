@@ -262,6 +262,8 @@ colour! {
     darker_grey, 0x546E7A;
     /// Creates a new `Colour`, setting its RGB value to `(241, 196, 15)`.
     gold, 0xF1C40F;
+    /// Creates a new `Colour`, setting its RGB value to `(186, 218, 85)`.
+    kerbal, 0xBADA55;
     /// Creates a new `Colour`, setting its RGB value to `(151, 156, 159)`.
     light_grey, 0x979C9F;
     /// Creates a new `Colour`, setting its RGB value to `(149, 165, 166)`.
