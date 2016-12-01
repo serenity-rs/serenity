@@ -263,6 +263,8 @@ colour! {
     dark_teal, 0x11806A;
     /// Creates a new `Colour`, setting its RGB value to `(84, 110, 122)`.
     darker_grey, 0x546E7A;
+    /// Creates a new `Colour`, setting its RGB value to `(250, 177, 237)`.
+    fabled_pink, 0xFAB1ED
     /// Creates a new `Colour`, setting its RGB value to `(241, 196, 15)`.
     gold, 0xF1C40F;
     /// Creates a new `Colour`, setting its RGB value to `(186, 218, 85)`.
