@@ -2,6 +2,10 @@ use serde_json::builder::ObjectBuilder;
 use serde_json::Value;
 use std::default::Default;
 
+/// A builder to edit the current user's settings, to be used in conjunction
+/// with [`Context::edit_profile`].
+///
+/// [`Context::edit_profile`]: ../../client/struct.Context.html#method.edit_profile
 pub struct EditProfile(pub ObjectBuilder);
 
 impl EditProfile {
