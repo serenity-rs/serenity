@@ -5,11 +5,13 @@ use super::{
     FriendSourceFlags,
     GuildContainer,
     GuildId,
+    GuildInfo,
     Mention,
     RoleId,
     UserSettings,
     User,
 };
+use ::client::rest::GuildPagination;
 use ::internal::prelude::*;
 use ::utils::decode_array;
 
@@ -30,6 +32,11 @@ impl CurrentUser {
     pub fn avatar_url(&self) -> Option<String> {
         self.avatar.as_ref().map(|av|
             format!(cdn!("/avatars/{}/{}.jpg"), self.id, av))
+    }
+
+    /// Gets a list of guilds that the current user is in.
+    pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
+        rest::get_guilds(GuildPagination::After(GuildId(0)), 100)
     }
 }
 

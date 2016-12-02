@@ -1125,11 +1125,38 @@ pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
     decode_array(try!(serde_json::from_reader(response)), Webhook::decode)
 }
 
-/// Gets all guilds we're connected to.
-pub fn get_guilds() -> Result<Vec<GuildInfo>> {
-    let response = request!(Route::UsersMeGuilds,
-                            get,
-                            "/users/@me/guilds");
+/// Gets a paginated list of the current user's guilds.
+///
+/// The `limit` has a maximum value of 100.
+///
+/// [Discord's documentation][docs]
+///
+/// # Examples
+///
+/// Get the first 10 guilds after a certain guild's Id:
+///
+/// ```rust,no_run
+/// use serenity::rest::{GuildPagination, get_guilds};
+///
+/// let guild_id = 81384788765712384;
+///
+/// let guilds = get_guilds(GuildPagination::after(guild_id), 10).unwrap();
+/// ```
+///
+/// [docs]: https://discordapp.com/developers/docs/resources/user#get-current-user-guilds
+pub fn get_guilds(target: GuildPagination, limit: u64) -> Result<Vec<GuildInfo>> {
+    let mut uri = format!("/users/@me/guilds?limit={}", limit);
+
+    match target {
+        GuildPagination::After(id) => {
+            try!(write!(uri, "&after={}", id));
+        },
+        GuildPagination::Before(id) => {
+            try!(write!(uri, "&before={}", id));
+        },
+    }
+
+    let response = request!(Route::UsersMeGuilds, get, "{}", uri);
 
     decode_array(try!(serde_json::from_reader(response)), GuildInfo::decode)
 }
@@ -1533,4 +1560,15 @@ fn verify(expected_status_code: u16,
     debug!("Content: {}", s);
 
     Err(Error::Client(ClientError::UnexpectedStatusCode(response.status)))
+}
+
+/// Representation of the method of a query to send for the [`get_guilds`]
+/// function.
+///
+/// [`get_guilds`]: fn.get_guilds.html
+pub enum GuildPagination {
+    /// The Id to get the guilds after.
+    After(GuildId),
+    /// The Id to get the guilds before.
+    Before(GuildId),
 }

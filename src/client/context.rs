@@ -4,7 +4,7 @@ use std::fmt::Write as FmtWrite;
 use std::io::Read;
 use std::sync::{Arc, Mutex};
 use super::gateway::Shard;
-use super::rest;
+use super::rest::{self, GuildPagination};
 use super::login_type::LoginType;
 use ::utils::builder::{
     CreateEmbed,
@@ -1050,9 +1050,29 @@ impl Context {
         rest::get_guild_prune_count(guild_id.into().0, map)
     }
 
-    /// Gets all guilds that the current user is in.
-    pub fn get_guilds(&self) -> Result<Vec<GuildInfo>> {
-        rest::get_guilds()
+    /// Gets a paginated list of guilds that the current user is in.
+    ///
+    /// The `limit` has a maximum value of 100.
+    ///
+    /// See also: [`CurrentUser::guilds`].
+    ///
+    /// # Examples
+    ///
+    /// Get the first 10 guilds after the current [`Message`]'s guild's Id:
+    ///
+    /// ```rust,ignore
+    /// use serenity::client::rest::GuildPagination;
+    ///
+    /// // assuming you are in a context
+    ///
+    /// let guild_id = message.guild_id.unwrap();
+    /// context.get_guilds(GuildPagination::After(guild_id, 10)).unwrap();
+    /// ```
+    ///
+    /// [`CurrentUser::guilds`]: ../model/struct.CurrentUser.html#method.guilds
+    /// [`Message`]: ../model/struct.Message.html
+    pub fn get_guilds(&self, target: GuildPagination, limit: u8) -> Result<Vec<GuildInfo>> {
+        rest::get_guilds(target, limit as u64)
     }
 
     /// Gets all integrations of a guild via the given Id.
