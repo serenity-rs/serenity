@@ -33,6 +33,8 @@ use ::utils::builder::{CreateEmbed, CreateInvite, EditChannel};
 use ::client::CACHE;
 #[cfg(all(feature = "methods"))]
 use ::client::rest;
+#[cfg(all(feature = "cache", feature = "methods"))]
+use ::ext::cache::ChannelRef;
 
 impl Attachment {
     /// If this attachment is an image, then a tuple of the width and height
@@ -525,6 +527,21 @@ impl Message {
                 Ok(())
             },
             Err(why) => Err(why),
+        }
+    }
+
+    /// Retrieves the Id of the guild that the message was sent in, if sent in
+    /// one.
+    ///
+    /// Returns `None` if the channel data or guild data does not exist in the
+    /// cache.
+    #[cfg(all(feature = "cache", feature = "methods"))]
+    pub fn guild_id(&self) -> Option<GuildId> {
+        let cache = CACHE.read().unwrap();
+
+        match cache.get_channel(self.channel_id) {
+            Some(ChannelRef::Guild(channel)) => Some(channel.guild_id),
+            _ => None,
         }
     }
 
