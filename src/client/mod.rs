@@ -156,7 +156,7 @@ pub struct Client {
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`on_ready`]: #method.on_ready
-    event_store: Arc<Mutex<EventStore>>,
+    event_store: Arc<RwLock<EventStore>>,
     #[cfg(feature="framework")]
     framework: Arc<Mutex<Framework>>,
     login_type: LoginType,
@@ -342,7 +342,7 @@ impl Client {
     /// [`CallCreate`]: ../model/event/enum.Event.html#variant.CallCreate
     pub fn on_call_create<F>(&mut self, handler: F)
         where F: Fn(Context, Call) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_call_create = Some(Arc::new(handler));
     }
@@ -352,7 +352,7 @@ impl Client {
     /// [`ChannelCreate`]: ../model/event/enum.Event.html#variant.ChannelCreate
     pub fn on_channel_create<F>(&mut self, handler: F)
         where F: Fn(Context, Channel) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_channel_create = Some(Arc::new(handler));
     }
@@ -362,7 +362,7 @@ impl Client {
     /// [`ChannelDelete`]: ../model/event/enum.Event.html#variant.ChannelDelete
     pub fn on_channel_delete<F>(&mut self, handler: F)
         where F: Fn(Context, Channel) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_channel_delete = Some(Arc::new(handler));
     }
@@ -372,7 +372,7 @@ impl Client {
     /// [`ChannelPinsAck`]: ../model/event/enum.Event.html#variant.ChannelPinsAck
     pub fn on_channel_pins_ack<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelPinsAckEvent) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_channel_pins_ack = Some(Arc::new(handler));
     }
@@ -382,7 +382,7 @@ impl Client {
     /// [`ChannelPinsUpdate`]: ../model/event/enum.Event.html#variant.ChannelPinsUpdate
     pub fn on_channel_pins_update<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelPinsUpdateEvent) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_channel_pins_update = Some(Arc::new(handler));
     }
@@ -392,7 +392,7 @@ impl Client {
     /// [`FriendSuggestionCreate`]: ../model/event/enum.Event.html#variant.FriendSuggestionCreate
     pub fn on_friend_suggestion_create<F>(&mut self, handler: F)
         where F: Fn(Context, User, Vec<SuggestionReason>) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_friend_suggestion_create = Some(Arc::new(handler));
     }
@@ -402,7 +402,7 @@ impl Client {
     /// [`FriendSuggestionDelete`]: ../model/event/enum.Event.html#variant.FriendSuggestionDelete
     pub fn on_friend_suggestion_delete<F>(&mut self, handler: F)
         where F: Fn(Context, UserId) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_friend_suggestion_delete = Some(Arc::new(handler));
     }
@@ -412,7 +412,7 @@ impl Client {
     /// [`GuildCreate`]: ../model/event/enum.Event.html#variant.GuildCreate
     pub fn on_guild_create<F>(&mut self, handler: F)
         where F: Fn(Context, Guild) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_create = Some(Arc::new(handler));
     }
@@ -424,7 +424,7 @@ impl Client {
     /// [`GuildEmojisUpdate`]: ../model/event/enum.Event.html#variant.GuildEmojisUpdate
     pub fn on_guild_emojis_update<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, HashMap<EmojiId, Emoji>) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_emojis_update = Some(Arc::new(handler));
     }
@@ -434,7 +434,7 @@ impl Client {
     /// [`GuildIntegrationsUpdate`]: ../model/event/enum.Event.html#variant.GuildIntegrationsUpdate
     pub fn on_guild_integrations_update<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_integrations_update = Some(Arc::new(handler));
     }
@@ -444,7 +444,7 @@ impl Client {
     /// [`GuildMemberAdd`]: ../model/event/enum.Event.html#variant.GuildMemberAdd
     pub fn on_guild_member_add<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, Member) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_member_addition = Some(Arc::new(handler));
     }
@@ -454,7 +454,7 @@ impl Client {
     /// [`GuildMembersChunk`]: ../model/event/enum.Event.html#variant.GuildMembersChunk
     pub fn on_guild_members_chunk<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, HashMap<UserId, Member>) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_members_chunk = Some(Arc::new(handler));
     }
@@ -464,7 +464,7 @@ impl Client {
     /// [`GuildRoleCreate`]: ../model/event/enum.Event.html#variant.GuildRoleCreate
     pub fn on_guild_role_create<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, Role) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_role_create = Some(Arc::new(handler));
     }
@@ -474,7 +474,7 @@ impl Client {
     /// [`GuildRoleSync`]: ../model/event/enum.Event.html#variant.GuildRoleSync
     pub fn on_guild_sync<F>(&mut self, handler: F)
         where F: Fn(Context, GuildSyncEvent) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_sync = Some(Arc::new(handler));
     }
@@ -484,7 +484,7 @@ impl Client {
     /// [`GuildUnavailable`]: ../model/event/enum.Event.html#variant.GuildUnavailable
     pub fn on_guild_unavailable<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_unavailable = Some(Arc::new(handler));
     }
@@ -494,7 +494,7 @@ impl Client {
     /// [`GuildBan`]: ../model/event/enum.Event.html#variant.GuildBan
     pub fn on_member_ban<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, User) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_ban_addition = Some(Arc::new(handler));
     }
@@ -504,7 +504,7 @@ impl Client {
     /// [`GuildUnban`]: ../model/event/enum.Event.html#variant.GuildUnban
     pub fn on_member_unban<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, User) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_ban_removal = Some(Arc::new(handler));
     }
@@ -515,7 +515,7 @@ impl Client {
     pub fn on_message<F>(&mut self, handler: F)
         where F: Fn(Context, Message) + Send + Sync + 'static {
 
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_message = Some(Arc::new(handler));
     }
@@ -525,7 +525,7 @@ impl Client {
     /// [`MessageAck`]: ../model/event/enum.Event.html#variant.MessageAck
     pub fn on_message_ack<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelId, Option<MessageId>) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_message_ack = Some(Arc::new(handler));
     }
@@ -535,7 +535,7 @@ impl Client {
     /// [`MessageDelete`]: ../model/event/enum.Event.html#variant.MessageDelete
     pub fn on_message_delete<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelId, MessageId) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_message_delete = Some(Arc::new(handler));
     }
@@ -545,7 +545,7 @@ impl Client {
     /// [`MessageDeleteBulk`]: ../model/event/enum.Event.html#variant.MessageDeleteBulk
     pub fn on_message_delete_bulk<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelId, Vec<MessageId>) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_message_delete_bulk = Some(Arc::new(handler));
     }
@@ -555,7 +555,7 @@ impl Client {
     /// [`MessageUpdate`]: ../model/event/enum.Event.html#variant.MessageUpdate
     pub fn on_message_update<F>(&mut self, handler: F)
         where F: Fn(Context, MessageUpdateEvent) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_message_update = Some(Arc::new(handler));
     }
@@ -565,7 +565,7 @@ impl Client {
     /// [`PresencesReplace`]: ../model/event/enum.Event.html#variant.PresencesReplace
     pub fn on_presence_replace<F>(&mut self, handler: F)
         where F: Fn(Context, Vec<Presence>) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_presence_replace = Some(Arc::new(handler));
     }
@@ -575,7 +575,7 @@ impl Client {
     /// [`PresenceUpdate`]: ../model/event/enum.Event.html#variant.PresenceUpdate
     pub fn on_presence_update<F>(&mut self, handler: F)
         where F: Fn(Context, PresenceUpdateEvent) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_presence_update = Some(Arc::new(handler));
     }
@@ -585,7 +585,7 @@ impl Client {
     /// [`ReactionAdd`]: ../model/event/enum.Event.html#variant.ReactionAdd
     pub fn on_reaction_add<F>(&mut self, handler: F)
         where F: Fn(Context, Reaction) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_reaction_add = Some(Arc::new(handler));
     }
@@ -595,7 +595,7 @@ impl Client {
     /// [`ReactionRemove`]: ../model/event/enum.Event.html#variant.ReactionRemove
     pub fn on_reaction_remove<F>(&mut self, handler: F)
         where F: Fn(Context, Reaction) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_reaction_remove = Some(Arc::new(handler));
     }
@@ -605,7 +605,7 @@ impl Client {
     /// [`ReactionRemoveAll`]: ../model/event/enum.Event.html#variant.ReactionRemoveAll
     pub fn on_reaction_remove_all<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelId, MessageId) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_reaction_remove_all = Some(Arc::new(handler));
     }
@@ -638,7 +638,7 @@ impl Client {
     /// [`Shard`]: gateway/struct.Shard.html
     pub fn on_ready<F>(&mut self, handler: F)
         where F: Fn(Context, Ready) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_ready = Some(Arc::new(handler));
     }
@@ -648,7 +648,7 @@ impl Client {
     /// [`ChannelRecipientAdd`]: ../model/event/enum.Event.html#variant.ChannelRecipientAdd
     pub fn on_recipient_add<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelId, User) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_channel_recipient_addition = Some(Arc::new(handler));
     }
@@ -658,7 +658,7 @@ impl Client {
     /// [`ChannelRecipientRemove`]: ../model/event/enum.Event.html#variant.ChannelRecipientRemove
     pub fn on_recipient_remove<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelId, User) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_channel_recipient_removal = Some(Arc::new(handler));
     }
@@ -668,7 +668,7 @@ impl Client {
     /// [`RelationshipAdd`]: ../model/event/enum.Event.html#variant.RelationshipAdd
     pub fn on_relationship_add<F>(&mut self, handler: F)
         where F: Fn(Context, Relationship) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_relationship_addition = Some(Arc::new(handler));
     }
@@ -678,7 +678,7 @@ impl Client {
     /// [`RelationshipRemove`]: ../model/event/enum.Event.html#variant.RelationshipRemove
     pub fn on_relationship_remove<F>(&mut self, handler: F)
         where F: Fn(Context, UserId, RelationshipType) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_relationship_removal = Some(Arc::new(handler));
     }
@@ -688,7 +688,7 @@ impl Client {
     /// [`Resumed`]: ../model/event/enum.Event.html#variant.Resumed
     pub fn on_resume<F>(&mut self, handler: F)
         where F: Fn(Context, ResumedEvent) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_resume = Some(Arc::new(handler));
     }
@@ -698,7 +698,7 @@ impl Client {
     /// [`TypingStart`]: ../model/event/enum.Event.html#variant.TypingStart
     pub fn on_typing_start<F>(&mut self, handler: F)
         where F: Fn(Context, TypingStartEvent) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_typing_start = Some(Arc::new(handler));
     }
@@ -708,7 +708,7 @@ impl Client {
     /// [`Unknown`]: ../model/event/enum.Event.html#variant.Unknown
     pub fn on_unknown<F>(&mut self, handler: F)
         where F: Fn(Context, String, BTreeMap<String, Value>) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_unknown = Some(Arc::new(handler));
     }
@@ -718,7 +718,7 @@ impl Client {
     /// [`VoiceServerUpdate`]: ../model/event/enum.Event.html#variant.VoiceServerUpdate
     pub fn on_voice_server_update<F>(&mut self, handler: F)
         where F: Fn(Context, VoiceServerUpdateEvent) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_voice_server_update = Some(Arc::new(handler));
     }
@@ -728,7 +728,7 @@ impl Client {
     /// [`VoiceStateUpdate`]: ../model/event/enum.Event.html#variant.VoiceStateUpdate
     pub fn on_voice_state_update<F>(&mut self, handler: F)
         where F: Fn(Context, Option<GuildId>, VoiceState) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_voice_state_update = Some(Arc::new(handler));
     }
@@ -738,7 +738,7 @@ impl Client {
     /// [`WebhookUpdate`]: ../model/event/enum.Event.html#variant.WebhookUpdate
     pub fn on_webhook_update<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, ChannelId) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_webhook_update = Some(Arc::new(handler));
     }
@@ -828,7 +828,7 @@ impl Client {
     /// [`CallDelete`]: ../model/event/enum.Event.html#variant.CallDelete
     pub fn on_call_delete<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelId, Option<Call>) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_call_delete = Some(Arc::new(handler));
     }
@@ -838,7 +838,7 @@ impl Client {
     /// [`CallUpdate`]: ../model/event/enum.Event.html#variant.CallUpdate
     pub fn on_call_update<F>(&mut self, handler: F)
         where F: Fn(Context, Option<Call>, Option<Call>) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_call_update = Some(Arc::new(handler));
     }
@@ -850,7 +850,7 @@ impl Client {
     /// [`ChannelUpdate`]: ../model/event/enum.Event.html#variant.ChannelUpdate
     pub fn on_channel_update<F>(&mut self, handler: F)
         where F: Fn(Context, Option<Channel>, Channel) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_channel_update = Some(Arc::new(handler));
     }
@@ -870,7 +870,7 @@ impl Client {
     /// [`Cache`]: ../ext/cache/struct.Cache.html
     pub fn on_guild_delete<F>(&mut self, handler: F)
         where F: Fn(Context, PartialGuild, Option<Guild>) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_delete = Some(Arc::new(handler));
     }
@@ -883,7 +883,7 @@ impl Client {
     /// [`GuildMemberRemove`]: ../model/event/enum.Event.html#variant.GuildMemberRemove
     pub fn on_guild_member_remove<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, User, Option<Member>) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_member_removal = Some(Arc::new(handler));
     }
@@ -893,7 +893,7 @@ impl Client {
     /// [`GuildMemberUpdate`]: ../model/event/enum.Event.html#variant.GuildMemberUpdate
     pub fn on_guild_member_update<F>(&mut self, handler: F)
         where F: Fn(Context, Option<Member>, Member) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_member_update = Some(Arc::new(handler));
     }
@@ -903,7 +903,7 @@ impl Client {
     /// [`GuildRoleDelete`]: ../model/event/enum.Event.html#variant.GuildRoleDelete
     pub fn on_guild_role_delete<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, RoleId, Option<Role>) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_role_delete = Some(Arc::new(handler));
     }
@@ -917,7 +917,7 @@ impl Client {
     /// [`Cache`]: ../ext/cache/struct.Cache.html
     pub fn on_guild_role_update<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, Option<Role>, Role) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_role_update = Some(Arc::new(handler));
     }
@@ -927,7 +927,7 @@ impl Client {
     /// [`UserGuildSettingsUpdate`]: ../model/event/enum.Event.html#variant.UserGuildSettingsUpdate
     pub fn on_user_guild_settings_update<F>(&mut self, handler: F)
         where F: Fn(Context, Option<UserGuildSettings>, UserGuildSettings) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_user_guild_settings_update = Some(Arc::new(handler));
     }
@@ -937,7 +937,7 @@ impl Client {
     /// [`GuildUpdate`]: ../model/event/enum.Event.html#variant.GuildUpdate
     pub fn on_guild_update<F>(&mut self, handler: F)
         where F: Fn(Context, Option<Guild>, PartialGuild) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_update = Some(Arc::new(handler));
     }
@@ -950,7 +950,7 @@ impl Client {
     /// [`UserNoteUpdate`]: ../model/event/enum.Event.html#variant.UserNoteUpdate
     pub fn on_note_update<F>(&mut self, handler: F)
         where F: Fn(Context, UserId, Option<String>, String) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_note_update = Some(Arc::new(handler));
     }
@@ -962,7 +962,7 @@ impl Client {
     /// [`UserSettingsUpdate`]: ../model/event/enum.Event.html#variant.UserSettingsUpdate
     pub fn on_user_settings_update<F>(&mut self, handler: F)
         where F: Fn(Context, UserSettings, UserSettings) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_user_settings_update = Some(Arc::new(handler));
     }
@@ -974,7 +974,7 @@ impl Client {
     /// [`UserUpdate`]: ../model/event/enum.Event.html#variant.UserUpdate
     pub fn on_user_update<F>(&mut self, handler: F)
         where F: Fn(Context, CurrentUser, CurrentUser) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_user_update = Some(Arc::new(handler));
     }
@@ -987,7 +987,7 @@ impl Client {
     /// [`CallDelete`]: ../model/event/enum.Event.html#variant.CallDelete
     pub fn on_call_delete<F>(&mut self, handler: F)
         where F: Fn(Context, ChannelId) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_call_delete = Some(Arc::new(handler));
     }
@@ -997,7 +997,7 @@ impl Client {
     /// [`CallUpdate`]: ../model/event/enum.Event.html#variant.CallUpdate
     pub fn on_call_update<F>(&mut self, handler: F)
         where F: Fn(Context, CallUpdateEvent) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_call_update = Some(Arc::new(handler));
     }
@@ -1007,7 +1007,7 @@ impl Client {
     /// [`ChannelUpdate`]: ../model/event/enum.Event.html#variant.ChannelUpdate
     pub fn on_channel_update<F>(&mut self, handler: F)
         where F: Fn(Context, Channel) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_channel_update = Some(Arc::new(handler));
     }
@@ -1019,7 +1019,7 @@ impl Client {
     /// [`Cache`]: ../ext/cache/struct.Cache.html
     pub fn on_guild_delete<F>(&mut self, handler: F)
         where F: Fn(Context, PartialGuild) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_delete = Some(Arc::new(handler));
     }
@@ -1032,7 +1032,7 @@ impl Client {
     /// [`GuildMemberRemove`]: ../model/event/enum.Event.html#variant.GuildMemberRemove
     pub fn on_guild_member_remove<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, User) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_member_removal = Some(Arc::new(handler));
     }
@@ -1042,7 +1042,7 @@ impl Client {
     /// [`GuildMemberUpdate`]: ../model/event/enum.Event.html#variant.GuildMemberUpdate
     pub fn on_guild_member_update<F>(&mut self, handler: F)
         where F: Fn(Context, GuildMemberUpdateEvent) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_member_update = Some(Arc::new(handler));
     }
@@ -1052,7 +1052,7 @@ impl Client {
     /// [`GuildRoleDelete`]: ../model/event/enum.Event.html#variant.GuildRoleDelete
     pub fn on_guild_role_delete<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, RoleId) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_role_delete = Some(Arc::new(handler));
     }
@@ -1063,7 +1063,7 @@ impl Client {
     /// [`Cache`]: ../ext/cache/struct.Cache.html
     pub fn on_guild_role_update<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, Role) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_role_update = Some(Arc::new(handler));
     }
@@ -1073,7 +1073,7 @@ impl Client {
     /// [`UserGuildSettingsUpdate`]: ../model/event/enum.Event.html#variant.UserGuildSettingsUpdate
     pub fn on_user_guild_settings_update<F>(&mut self, handler: F)
         where F: Fn(Context, UserGuildSettings) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_user_guild_settings_update = Some(Arc::new(handler));
     }
@@ -1083,7 +1083,7 @@ impl Client {
     /// [`GuildUpdate`]: ../model/event/enum.Event.html#variant.GuildUpdate
     pub fn on_guild_update<F>(&mut self, handler: F)
         where F: Fn(Context, PartialGuild) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_guild_update = Some(Arc::new(handler));
     }
@@ -1096,7 +1096,7 @@ impl Client {
     /// [`UserNoteUpdate`]: ../model/event/enum.Event.html#variant.UserNoteUpdate
     pub fn on_note_update<F>(&mut self, handler: F)
         where F: Fn(Context, UserId, String) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_note_update = Some(Arc::new(handler));
     }
@@ -1106,7 +1106,7 @@ impl Client {
     /// [`UserSettingsUpdate`]: ../model/event/enum.Event.html#variant.UserSettingsUpdate
     pub fn on_user_settings_update<F>(&mut self, handler: F)
         where F: Fn(Context, UserSettingsUpdateEvent) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_user_settings_update = Some(Arc::new(handler));
     }
@@ -1116,7 +1116,7 @@ impl Client {
     /// [`UserUpdate`]: ../model/event/enum.Event.html#variant.UserUpdate
     pub fn on_user_update<F>(&mut self, handler: F)
         where F: Fn(Context, CurrentUser) + Send + Sync + 'static {
-        self.event_store.lock()
+        self.event_store.write()
             .unwrap()
             .on_user_update = Some(Arc::new(handler));
     }
@@ -1126,7 +1126,7 @@ impl Client {
 fn handle_shard(shard: Arc<Mutex<Shard>>,
                 framework: Arc<Mutex<Framework>>,
                 login_type: LoginType,
-                event_store: Arc<Mutex<EventStore>>,
+                event_store: Arc<RwLock<EventStore>>,
                 mut receiver: Receiver<WebSocketStream>) {
     loop {
         let event = receiver.recv_json(GatewayEvent::decode);
@@ -1153,9 +1153,9 @@ fn handle_shard(shard: Arc<Mutex<Shard>>,
 
 #[cfg(not(feature="framework"))]
 fn handle_shard(shard: Arc<Mutex<Shard>>,
-                     login_type: LoginType,
-                     event_store: Arc<Mutex<EventStore>>,
-                     mut receiver: Receiver<WebSocketStream>) {
+                login_type: LoginType,
+                event_store: Arc<RwLock<EventStore>>,
+                mut receiver: Receiver<WebSocketStream>) {
     loop {
         let event = receiver.recv_json(GatewayEvent::decode);
 
@@ -1186,7 +1186,7 @@ fn login(token: &str, login_type: LoginType) -> Client {
     feature_framework! {{
         Client {
             shards: Vec::default(),
-            event_store: Arc::new(Mutex::new(EventStore::default())),
+            event_store: Arc::new(RwLock::new(EventStore::default())),
             framework: Arc::new(Mutex::new(Framework::default())),
             login_type: login_type,
             token: token.to_owned(),
@@ -1194,7 +1194,7 @@ fn login(token: &str, login_type: LoginType) -> Client {
     } else {
         Client {
             shards: Vec::default(),
-            event_store: Arc::new(Mutex::new(EventStore::default())),
+            event_store: Arc::new(RwLock::new(EventStore::default())),
             login_type: login_type,
             token: token.to_owned(),
         }

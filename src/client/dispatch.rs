@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, RwLock};
 use std::thread;
 use super::event_store::EventStore;
 use super::login_type::LoginType;
@@ -15,7 +15,7 @@ use super::CACHE;
 
 macro_rules! handler {
     ($field:ident, $event_store:ident) => {
-        $event_store.lock()
+        $event_store.read()
             .unwrap()
             .$field
             .as_ref()
@@ -47,7 +47,7 @@ pub fn dispatch(event: Event,
                 conn: Arc<Mutex<Shard>>,
                 framework: Arc<Mutex<Framework>>,
                 login_type: LoginType,
-                event_store: Arc<Mutex<EventStore>>) {
+                event_store: Arc<RwLock<EventStore>>) {
     match event {
         Event::MessageCreate(event) => {
             let context = context(Some(event.message.channel_id),
@@ -73,7 +73,7 @@ pub fn dispatch(event: Event,
 pub fn dispatch(event: Event,
                 conn: Arc<Mutex<Shard>>,
                 login_type: LoginType,
-                event_store: Arc<Mutex<EventStore>>) {
+                event_store: Arc<RwLock<EventStore>>) {
     match event {
         Event::MessageCreate(event) => {
             let context = context(Some(event.message.channel_id),
@@ -89,7 +89,7 @@ pub fn dispatch(event: Event,
 
 fn dispatch_message(context: Context,
                     message: Message,
-                    event_store: Arc<Mutex<EventStore>>) {
+                    event_store: Arc<RwLock<EventStore>>) {
     if let Some(ref handler) = handler!(on_message, event_store) {
         let handler = handler.clone();
 
@@ -103,7 +103,7 @@ fn dispatch_message(context: Context,
 fn handle_event(event: Event,
                 conn: Arc<Mutex<Shard>>,
                 login_type: LoginType,
-                event_store: Arc<Mutex<EventStore>>) {
+                event_store: Arc<RwLock<EventStore>>) {
     match event {
         Event::CallCreate(event) => {
             if let Some(ref handler) = handler!(on_call_create, event_store) {
