@@ -33,5 +33,5 @@ fields:
     description: "The role's position in the position list. Roles above another
       are considered higher in the role hierarchy in most situations.
 
-      The @everyone role is always position 0."
-    type: u64
+      The @everyone role is always position -1 or 0."
+    type: i64
