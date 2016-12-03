@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, mem};
 use super::utils::{into_map, into_string, remove};
 use super::{
     CurrentUser,
@@ -13,6 +13,7 @@ use super::{
 };
 use ::client::rest::GuildPagination;
 use ::internal::prelude::*;
+use ::utils::builder::EditProfile;
 use ::utils::decode_array;
 
 #[cfg(feature = "methods")]
@@ -32,6 +33,50 @@ impl CurrentUser {
     pub fn avatar_url(&self) -> Option<String> {
         self.avatar.as_ref().map(|av|
             format!(cdn!("/avatars/{}/{}.jpg"), self.id, av))
+    }
+
+    /// Edits the current user's profile settings.
+    ///
+    /// This mutates the current user in-place.
+    ///
+    /// Refer to `EditProfile`'s documentation for its methods.
+    ///
+    /// # Examples
+    ///
+    /// Change the avatar:
+    ///
+    /// ```rust,no_run
+    /// use serenity::client::CACHE;
+    ///
+    /// let avatar = serenity::utils::read_image("./avatar.png").unwrap();
+    ///
+    /// CACHE.write()
+    ///     .unwrap()
+    ///     .user
+    ///     .edit(|p| p
+    ///         .avatar(Some(&avatar)));
+    /// ```
+    #[cfg(feature = "methods")]
+    pub fn edit<F>(&mut self, f: F) -> Result<()>
+        where F: FnOnce(EditProfile) -> EditProfile {
+        let mut map = ObjectBuilder::new()
+            .insert("avatar", Some(&self.avatar))
+            .insert("username", &self.name);
+
+        if let Some(email) = self.email.as_ref() {
+            map = map.insert("email", email)
+        }
+
+        let edited = f(EditProfile(map)).0.build();
+
+        match rest::edit_profile(edited) {
+            Ok(new) => {
+                mem::replace(self, new);
+
+                Ok(())
+            },
+            Err(why) => Err(why),
+        }
     }
 
     /// Gets a list of guilds that the current user is in.
