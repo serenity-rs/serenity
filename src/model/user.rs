@@ -47,6 +47,11 @@ impl User {
             format!(cdn!("/avatars/{}/{}.jpg"), self.id, av))
     }
 
+    /// Returns the DiscordTag™ of a User
+    pub fn distinct(&self) -> String {
+        format!("{}#{}", &self.name, &self.discriminator)
+    }
+
     /// Retrieves the time that this user was created at.
     #[cfg(feature = "methods")]
     #[inline]
