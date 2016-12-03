@@ -79,6 +79,11 @@ impl CurrentUser {
         }
     }
 
+    /// Returns the DiscordTag(tm) of a User.
+    pub fn distinct(&self) -> String {
+        format!("{}#{}", self.name, self.discriminator)
+    }
+
     /// Gets a list of guilds that the current user is in.
     pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
         rest::get_guilds(GuildPagination::After(GuildId(0)), 100)
