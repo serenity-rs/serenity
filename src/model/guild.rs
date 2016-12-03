@@ -13,7 +13,7 @@ use super::utils::{
 };
 use super::*;
 use ::internal::prelude::*;
-use ::utils::decode_array;
+use ::utils::{Colour, decode_array};
 
 #[cfg(feature = "methods")]
 use serde_json::builder::ObjectBuilder;
@@ -854,14 +854,18 @@ impl Member {
     }
 
     /// Determines the member's colour.
-    pub fn colour(&self) -> Option<::utils::Colour> {
-        let roles = self.roles.clone();
-        for n in &roles {
+    /// If user has no Colour, the default one is returned.
+    pub fn colour(&self) -> Colour {
+        let roles = &mut self.roles.clone();
+        roles.reverse();
+        for n in roles {
             if let Some(r) = n.find() {
-                return Some(r.colour);
+                if r.colour.value != Colour::default().value {
+                    return r.colour;
+                }
             }
         }
-        None
+        Colour::default()
     }
 
     /// Edits the member with the given data. See [`Context::edit_member`] for
