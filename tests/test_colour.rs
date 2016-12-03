@@ -39,7 +39,7 @@ fn get_tuple() {
 
 #[test]
 fn default() {
-    assert_eq!(Colour::default().value, 0x99AAB5);
+    assert_eq!(Colour::default().value, 0);
 }
 
 #[test]
