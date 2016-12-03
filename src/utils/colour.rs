@@ -48,10 +48,23 @@ macro_rules! colour {
 /// assert_eq!(colour.get_tuple(), (17, 128, 106));
 /// ```
 ///
+/// Colours can also be directly compared for equivilance:
+///
+/// ```rust
+/// use serenity::utils::Colour;
+///
+/// let blitz_blue = Colour::blitz_blue();
+/// let fooyoo = Colour::fooyoo();
+/// let fooyoo2 = Colour::fooyoo();
+/// assert!(blitz_blue != fooyoo);
+/// assert_eq!(fooyoo, fooyoo2);
+/// assert!(blitz_blue > fooyoo);
+/// ```
+///
 /// [`Role`]: ../model/struct.Role.html
 /// [`dark_teal`]: #method.dark_teal
 /// [`get_g`]: #method.get_g
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Colour {
     /// The raw inner 32-bit unsigned integer value of this Colour. This is
     /// worked with to generate values such as the red component value.
