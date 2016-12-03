@@ -874,11 +874,15 @@ impl Member {
             None => return default,
         };
 
-        for role_id in self.roles.iter().rev() {
-            if let Some(role) = guild.roles.get(role_id) {
-                if role.colour.value != default.value {
-                    return role.colour;
-                }
+        let mut roles = self.roles
+            .iter()
+            .filter_map(|id| guild.roles.get(id))
+            .collect::<Vec<&Role>>();
+        roles.sort_by(|a, b| b.cmp(a));
+
+        for role in roles {
+            if role.colour.value != default.value {
+                return role.colour;
             }
         }
 
