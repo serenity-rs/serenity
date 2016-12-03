@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::fmt;
 use super::utils::{
@@ -1097,5 +1098,37 @@ impl fmt::Display for Role {
     // This is in the format of: `<@&ROLE_ID>`.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.mention(), f)
+    }
+}
+
+impl Eq for Role {}
+
+impl Ord for Role {
+    fn cmp(&self, other: &Role) -> Ordering {
+        if self.position > other.position {
+            Ordering::Greater
+        } else if self.position == other.position {
+            if self.id > other.id {
+                Ordering::Greater
+            } else if self.id == other.id {
+                Ordering::Equal
+            } else {
+                Ordering::Less
+            }
+        } else {
+            Ordering::Less
+        }
+    }
+}
+
+impl PartialEq for Role {
+    fn eq(&self, other: &Role) -> bool {
+        self.id == other.id
+    }
+}
+
+impl PartialOrd for Role {
+    fn partial_cmp(&self, other: &Role) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
