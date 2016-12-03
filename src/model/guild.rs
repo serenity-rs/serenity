@@ -27,6 +27,8 @@ use ::client::rest;
 
 #[cfg(all(feature = "cache", feature = "methods"))]
 use ::client::CACHE;
+#[cfg(all(feature = "cache", feature = "methods"))]
+use ::utils::Colour;
 
 impl From<PartialGuild> for GuildContainer {
     fn from(guild: PartialGuild) -> GuildContainer {
