@@ -230,7 +230,7 @@ impl Shard {
     ///
     /// context.shard.lock()
     ///     .unwrap()
-    ///     .set_presence(Game::playing("Heroes of the Storm"),
+    ///     .set_presence(Some(Game::playing("Heroes of the Storm")),
     ///                   OnlineStatus::Online,
     ///                   false);
     /// ```
