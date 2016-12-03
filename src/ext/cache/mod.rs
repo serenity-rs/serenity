@@ -188,7 +188,7 @@ pub struct Cache {
 }
 
 impl Cache {
-    /// Calculates the number of [`Member`]s that have not had data received.
+    /// Fetches the number of [`Member`]s that have not had data received.
     ///
     /// The important detail to note here is that this is the number of
     /// _member_s that have not had data downloaded. A single [`User`] may have
@@ -214,7 +214,7 @@ impl Cache {
         total
     }
 
-    /// Calculates a vector of all [`PrivateChannel`] and [`Group`] Ids that are
+    /// Fetches a vector of all [`PrivateChannel`] and [`Group`] Ids that are
     /// stored in the cache.
     ///
     /// # Examples
@@ -232,7 +232,7 @@ impl Cache {
             .collect()
     }
 
-    /// Calculates a vector of all [`Guild`]s' Ids that are stored in the cache.
+    /// Fetches a vector of all [`Guild`]s' Ids that are stored in the cache.
     ///
     /// Note that if you are utilizing multiple [`Shard`]s, then the guilds
     /// retrieved over all shards are included in this count -- not just the

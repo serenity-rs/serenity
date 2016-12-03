@@ -846,14 +846,14 @@ impl Member {
                        delete_message_days)
     }
 
-    /// Calculates the member's display name.
+    /// Determines the member's display name.
     ///
     /// The nickname takes priority over the member's username if it exists.
     pub fn display_name(&self) -> &str {
         self.nick.as_ref().unwrap_or(&self.user.name)
     }
 
-    /// Calculates the member's colour.
+    /// Determines the member's colour.
     pub fn colour(&self) -> Option<::utils::Colour> {
         let roles = self.roles.clone();
         for n in &roles {
