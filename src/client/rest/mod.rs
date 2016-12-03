@@ -1154,11 +1154,12 @@ pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
 /// Get the first 10 guilds after a certain guild's Id:
 ///
 /// ```rust,no_run
-/// use serenity::rest::{GuildPagination, get_guilds};
+/// use serenity::client::rest::{GuildPagination, get_guilds};
+/// use serenity::model::GuildId;
 ///
-/// let guild_id = 81384788765712384;
+/// let guild_id = GuildId(81384788765712384);
 ///
-/// let guilds = get_guilds(GuildPagination::after(guild_id), 10).unwrap();
+/// let guilds = get_guilds(GuildPagination::After(guild_id), 10).unwrap();
 /// ```
 ///
 /// [docs]: https://discordapp.com/developers/docs/resources/user#get-current-user-guilds
