@@ -291,10 +291,10 @@ colour! {
 
 impl Default for Colour {
     /// Creates a default value for a `Colour`, setting the inner value to `0`.
-    /// This is equivilant to setting the RGB value to `(0, 0, 0)`.
+    /// This is equivilant to setting the RGB value to `(153, 170, 181)`.
     fn default() -> Colour {
         Colour {
-            value: 0,
+            value: 0x99AAB5,
         }
     }
 }
