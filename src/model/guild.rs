@@ -14,7 +14,7 @@ use super::utils::{
 };
 use super::*;
 use ::internal::prelude::*;
-use ::utils::decode_array;
+use ::utils::{Colour, decode_array};
 
 #[cfg(feature = "methods")]
 use serde_json::builder::ObjectBuilder;
@@ -847,22 +847,47 @@ impl Member {
                        delete_message_days)
     }
 
-    /// Calculates the member's display name.
+    /// Determines the member's display name.
     ///
     /// The nickname takes priority over the member's username if it exists.
     pub fn display_name(&self) -> &str {
         self.nick.as_ref().unwrap_or(&self.user.name)
     }
 
-    /// Calculates the member's colour.
-    pub fn colour(&self) -> Option<::utils::Colour> {
-        let roles = self.roles.clone();
-        for n in &roles {
-            if let Some(r) = n.find() {
-                return Some(r.colour);
+    /// Determines the member's colour.
+    ///
+    /// If the member has no role with a colour override - or the member's guild
+    /// data does not exist in the cache - then the value of [`Colour::default`]
+    /// is returned.
+    ///
+    /// [`Colour::default`]: ../utils/struct.Colour.html#method.default
+    #[cfg(all(feature = "cache", feature = "methods"))]
+    pub fn colour(&self) -> Colour {
+        let default = Colour::default();
+        let guild_id = match self.find_guild() {
+            Ok(guild_id) => guild_id,
+            Err(_why) => return default,
+        };
+
+        let cache = CACHE.read().unwrap();
+        let guild = match cache.guilds.get(&guild_id) {
+            Some(guild) => guild,
+            None => return default,
+        };
+
+        let mut roles = self.roles
+            .iter()
+            .filter_map(|id| guild.roles.get(id))
+            .collect::<Vec<&Role>>();
+        roles.sort_by(|a, b| b.cmp(a));
+
+        for role in roles {
+            if role.colour.value != default.value {
+                return role.colour;
             }
         }
-        None
+
+        default
     }
 
     /// Edits the member with the given data. See [`Context::edit_member`] for
