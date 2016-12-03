@@ -854,18 +854,35 @@ impl Member {
     }
 
     /// Determines the member's colour.
-    /// If user has no Colour, the default one is returned.
+    ///
+    /// If the member has no role with a colour override - or the member's guild
+    /// data does not exist in the cache - then the value of [`Colour::default`]
+    /// is returned.
+    ///
+    /// [`Colour::default`]: ../utils/struct.Colour.html#method.default
+    #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn colour(&self) -> Colour {
-        let roles = &mut self.roles.clone();
-        roles.reverse();
-        for n in roles {
-            if let Some(r) = n.find() {
-                if r.colour.value != Colour::default().value {
-                    return r.colour;
+        let default = Colour::default();
+        let guild_id = match self.find_guild() {
+            Ok(guild_id) => guild_id,
+            Err(_why) => return default,
+        };
+
+        let cache = CACHE.read().unwrap();
+        let guild = match cache.guilds.get(&guild_id) {
+            Some(guild) => guild,
+            None => return default,
+        };
+
+        for role_id in self.roles.iter().rev() {
+            if let Some(role) = guild.roles.get(role_id) {
+                if role.colour.value != default.value {
+                    return role.colour;
                 }
             }
         }
-        Colour::default()
+
+        default
     }
 
     /// Edits the member with the given data. See [`Context::edit_member`] for
