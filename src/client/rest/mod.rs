@@ -690,12 +690,30 @@ pub fn edit_note(user_id: u64, map: Value) -> Result<()> {
                          user_id))
 }
 
-/// Edits profile we're connected to.
+/// Edits the current user's profile settings.
+///
+/// For bot users, the password is optional.
+///
+/// # User Accounts
+///
+/// If a new token is received due to a password change, then the stored token
+/// internally will be updated.
+///
+/// **Note**: this token change may cause requests made between the actual token
+/// change and when the token is internally changed to be invalid requests, as
+/// the token may be outdated.
+///
 pub fn edit_profile(map: Value) -> Result<CurrentUser> {
     let body = try!(serde_json::to_string(&map));
     let response = request!(Route::UsersMe, patch(body), "/users/@me");
 
-    CurrentUser::decode(try!(serde_json::from_reader(response)))
+    let mut map: BTreeMap<String, Value> = try!(serde_json::from_reader(response));
+
+    if let Some(Value::String(token)) = map.remove("token") {
+        set_token(&token)
+    }
+
+    CurrentUser::decode(Value::Object(map))
 }
 
 /// Changes a role in a guild.

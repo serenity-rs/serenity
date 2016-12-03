@@ -828,7 +828,7 @@ impl Context {
         rest::edit_nickname(guild_id.into().0, new_nickname)
     }
 
-    /// Edits the current user's settings.
+    /// Edits the current user's profile settings.
     ///
     /// Refer to `EditProfile`'s documentation for its methods.
     ///
@@ -840,7 +840,7 @@ impl Context {
     /// context.edit_member(|p|
     ///     p.username("meew zero"));
     /// ```
-    pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&mut self, f: F)
+    pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F)
         -> Result<CurrentUser> {
         let user = try!(rest::get_current_user());
 
