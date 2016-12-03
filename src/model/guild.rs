@@ -853,6 +853,17 @@ impl Member {
         self.nick.as_ref().unwrap_or(&self.user.name)
     }
 
+    /// Calculates the member's colour.
+    pub fn colour(&self) -> Option<::utils::Colour> {
+        let roles = self.roles.clone();
+        for n in &roles {
+            if let Some(r) = n.find() {
+                return Some(r.colour);
+            }
+        }
+        None
+    }
+
     /// Edits the member with the given data. See [`Context::edit_member`] for
     /// more information.
     ///
