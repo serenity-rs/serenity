@@ -1,21 +1,27 @@
 ---
 name: Presence
-description: A member's online status
+description: A set of settings each member of a guild has.
 fields:
   - name: game
+    description: A game's name that is displayed near user's name.
     optional: true
     type: Game
   - name: last_modified
+    description: Date of last presence change.
     optional: true
     type: u64
   - name: nick
+    description: Optional nickname. Can't be longer than 32 characters.
     optional: true
     type: string
   - name: status
+    description: Member's online status.
     type: OnlineStatus
   - name: user_id
+    description: Member's Id. Can be used to calculate account creation date.
     type: UserId
   - name: user
+    description: Attached User struct.
     optional: true
     type: User
 decode: false

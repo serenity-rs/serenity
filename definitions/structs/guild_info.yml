@@ -1,15 +1,20 @@
 ---
 name: GuildInfo
-description: Basic information about a server
+description: Basic information about a guild used for oauth.
 fields:
   - name: id
+    description: Id of the Guild. Can be used to calculate the creation date.
     type: GuildId
   - name: icon
+    description: The guild's icon.
     optional: true
     type: string
   - name: name
+    description: The guild's name.
     type: string
   - name: owner
+    description: True if you're the owner of the guild.
     type: bool
   - name: permissions
+    description: Permissions that you have in the guild.
     type: Permissions

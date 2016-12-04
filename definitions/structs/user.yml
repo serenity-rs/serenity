@@ -1,17 +1,28 @@
 ---
 name: User
-description: Information about a user
+description: Information about a user.
 fields:
   - name: id
+    description: >
+      The unique Id of the user. Can be used to calculate the account's
+      creation date.
     type: UserId
   - name: avatar
+    description: Optional avatar hash.
     optional: true
     type: string
   - name: bot
+    description: Lets you know if the account is a bot or not.
     default: 'false'
     type: bool
   - name: discriminator
+    description: >
+      The account's discriminator. The name + discriminator pair is
+      always unique.
     type: string
   - name: name
+    description: >
+      The account's username. Changing username will trigger a
+      discriminator change if the pair is not unique.
     from: username
     type: string

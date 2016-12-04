@@ -1,33 +1,51 @@
 ---
 name: GuildChannel
-description: A guild's voice or text channel.
+description: >
+  Represents a guild's voice or text channel. Some methods are available
+  only for voice channels and some are only available for text channels.
 fields:
   - name: id
+    description: >
+      Channel's Id. Default channel shares the Id with the guild it is in.
     type: ChannelId
   - name: bitrate
+    description: Bitrate of channel. Only available for voice channels.
     optional: true
     type: u64
   - name: guild_id
+    description: Id of the guild the channel is located in.
     type: GuildId
   - name: kind
+    description: Type of the channel.
     type: ChannelType
   - name: last_message_id
+    description: >
+      The Id of last message sent. It lets client determine
+      if channel has unread messages.
     optional: true
     type: MessageId
   - name: last_pin_timestamp
+    description: Timestamp of the latest pinned message.
     optional: true
     type: string
   - name: name
+    description: >
+      Channel name. Voice and text channels have different
+      limitations for this.
     type: string
   - name: permission_overwrites
+    description: Permission overwrites for members and roles.
     array: true
     type: PermissionOverwrite
   - name: position
+    description: Position of a channel.
     type: i64
   - name: topic
+    description: Text channel topic.
     optional: true
     type: string
   - name: user_limit
+    description: Max amount of members allowed in a voice channel.
     optional: true
     type: u64
 decode: false

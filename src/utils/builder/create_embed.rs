@@ -67,6 +67,8 @@ impl CreateEmbed {
     }
 
     /// Set the description of the embed.
+    ///
+    /// **Note**: This can't be longer than 2048 characters.
     pub fn description(mut self, description: &str) -> Self {
         self.0.insert("description".to_owned(), Value::String(description.to_owned()));
 
@@ -78,6 +80,9 @@ impl CreateEmbed {
     ///
     /// Refer to the documentation for [`CreateEmbedField`] for more
     /// information.
+    ///
+    /// **Note**: Maximum amount of characters you can put is 256 in a field
+    /// name and 1024 in a field value and a field is inline by default.
     ///
     /// [`CreateEmbedField`]: struct.CreateEmbedField.html
     pub fn field<F>(mut self, f: F) -> Self
@@ -229,17 +234,17 @@ impl Default for CreateEmbedAuthor {
 pub struct CreateEmbedField(pub ObjectBuilder);
 
 impl CreateEmbedField {
-    /// Set whether the field is inlined.
+    /// Set whether the field is inlined. Set to true by default.
     pub fn inline(self, inline: bool) -> Self {
         CreateEmbedField(self.0.insert("inline", inline))
     }
 
-    /// Set the field's name.
+    /// Set the field's name. It can't be longer than 256 characters.
     pub fn name(self, name: &str) -> Self {
         CreateEmbedField(self.0.insert("name", name))
     }
 
-    /// Set the field's value.
+    /// Set the field's value. It can't be longer than 1024 characters.
     pub fn value(self, value: &str) -> Self {
         CreateEmbedField(self.0.insert("value", value))
     }

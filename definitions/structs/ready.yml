@@ -1,6 +1,6 @@
 ---
 name: Ready
-description: An active group or private call. These are different from server voice channels.
+description: An active group or private call. These are different from guild voice channels.
 fields:
   - name: analytics_token
     optional: true
