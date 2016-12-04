@@ -1,61 +1,102 @@
 ---
 name: Guild
-description: "Live server information"
+description: >
+  Live information about a Discord server such as channels, emojis, etc.
 fields:
   - name: afk_channel_id
+    description: Id of a voice channel that's considered AFK.
     optional: true
     type: ChannelId
   - name: afk_timeout
+    description: >
+      The amount of seconds a user can not show any activity in a voice
+      channel before being moved to an AFK channel if one exists.
     type: u64
   - name: channels
+    description: >
+      All voice and text channels a server has. This gives all of them
+      regardless of permissions.
     t: ChannelId, GuildChannel
     type: hashmap
   - name: default_message_notifications
+    description: >
+      Lets you know if notifications for all messages are enabled by
+      default in the server.
     type: u64
   - name: emojis
+    description: >
+      All custom emojis of a server. Such are made using the API or
+      Twitch integrations.
     custom: decode_emojis
     t: EmojiId, Emoji
     type: hashmap
   - name: features
+    description: >
+      VIP server features a server has. Can be obtained through
+      [Discord Partnership website](https://discordapp.com/partners).
     array: true
     type: Feature
   - name: icon
+    description: Optional server icon that appears in sidebar.
     optional: true
     type: string
   - name: id
+    description: >
+      Server's Id which is also the Id of the default role and channel.
     type: GuildId
   - name: joined_at
     type: string
   - name: large
+    description: >
+      Set to true if server has a lot of users.
+      It means that server members aren't sent on ready event.
     type: bool
   - name: member_count
+    description: >
+      The amount of members in server.
     type: u64
   - name: members
+    description: >
+      All members of server. Might not available on start-up if the
+      `large` field is `true`.
     custom: decode_members
     t: UserId, Member
     type: hashmap
   - name: mfa_level
+    description: >
+      Lets you you know if server requires 2-factor authentication for
+      administrators.
     type: u64
   - name: name
+    description: The server's name.
     type: string
   - name: owner_id
+    description: Id of the server's owner.
     type: UserId
   - name: presences
+    description: Presence statuses of members.
     custom: decode_emojis
     t: UserId, Presence
     type: hashmap
   - name: region
+    description: Region the server is located in.
     type: string
   - name: roles
+    description: All roles a server has.
     custom: decode_roles
     t: RoleId, Role
     type: hashmap
   - name: splash
+    description: >
+      If InviteSplash feature is enabled, this can point to splash image
+      URL displayed when someone opens invite URL.
     optional: true
     type: string
   - name: verification_level
+    description: Determines the verification level.
     type: VerificationLevel
   - name: voice_states
+    description: Lets you know what voice channels user have joined.
     custom: decode_voice_states
     t: UserId, VoiceState
     type: hashmap

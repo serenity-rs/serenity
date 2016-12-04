@@ -1,12 +1,17 @@
 ---
 name: Emoji
-description: "A custom emoji for a guild."
+description: >
+  Represents a custom guild emoji, which can be created using
+  API, or by a twitch integration. Emojis created using API only
+  work on one server. Maximum amount of Emoji a guild can have
+  is 50.
 fields:
   - name: id
     description: "The Id of the emoji."
     type: EmojiId
   - name: name
-    description: "The name of the emoji."
+    description: "The name of the emoji. It must be at least 2 characters
+      long and can only contain alphanumeric characters and underscores."
     type: string
   - name: managed
     description: "Whether the emoji is managed via an

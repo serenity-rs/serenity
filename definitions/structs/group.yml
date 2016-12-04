@@ -1,25 +1,35 @@
 ---
 name: Group
-description: A group channel, potentially including other users, separate from a server.
+description: >
+  A group channel, potentially including other users, separate from a server.
 fields:
   - name: channel_id
+    description: The Id of the group channel.
     from: id
     type: ChannelId
   - name: icon
+    description: The optional icon of the group channel.
     optional: true
     type: string
   - name: last_message_id
+    description: >
+      The Id of last message sent. It lets client determine
+      if the group channel has unread messages.
     optional: true
     type: MessageId
   - name: last_pin_timestamp
+    description: Timestamp of the latest pinned message.
     optional: true
     type: string
   - name: name
+    description: The name of the group channel.
     optional: true
     type: string
   - name: owner_id
+    description: The Id of the group channel creator.
     type: UserId
   - name: recipients
+    description: Represents members of the group channel.
     custom: decode_users
     t: UserId, User
     type: hashmap

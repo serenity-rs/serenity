@@ -3,13 +3,17 @@ name: ReadState
 description: "Summary of messages since last login"
 fields:
   - name: id
+    description: The channel's Id.
     type: ChannelId
   - name: last_message_id
+    description: The Id of the latest message sent to the channel.
     optional: true
     type: MessageId
   - name: last_pin_timestamp
+    description: The timestmap of the latest pinned message in the channel.
     optional: true
     type: string
   - name: mention_count
+    description: The amount of times you've been mentioned in the channel.
     default: '0'
     type: u64
