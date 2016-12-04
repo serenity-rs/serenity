@@ -3,7 +3,9 @@ use super::*;
 use ::internal::prelude::*;
 
 impl Game {
-    /// Creates a `Game` struct that appears as a `**Playing** <name>` status.
+    /// Creates a `Game` struct that appears as a `Playing <name>` status.
+    ///
+    /// **Note**: Maximum `name` length is 128.
     #[cfg(feature="methods")]
     pub fn playing(name: &str) -> Game {
         Game {
@@ -13,7 +15,9 @@ impl Game {
         }
     }
 
-    /// Creates a `Game` struct that appears as a `**Streaming** <name>` status.
+    /// Creates a `Game` struct that appears as a `Streaming <name>` status.
+    ///
+    /// **Note**: Maximum `name` length is 128.
     #[cfg(feature="methods")]
     pub fn streaming(name: &str, url: &str) -> Game {
         Game {

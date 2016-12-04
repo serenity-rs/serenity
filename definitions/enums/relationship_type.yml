@@ -1,13 +1,19 @@
 ---
 name: RelationshipType
+description: The type of a relationship between two users.
 variants:
   - variant: Blocked
+    description: When one user blocked the other one.
     number: 2
   - variant: Friends
+    description: When users are friends.
     number: 1
   - variant: IncomingRequest
+    description: When an incoming friend request was received.
     number: 3
   - variant: Ignored
+    description: When a friend request was ignored.
     number: 0
   - variant: OutgoingRequest
+    description: When an outgoing friend request was sent.
     number: 4

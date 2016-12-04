@@ -1,11 +1,14 @@
 ---
 name: Relationship
-description: "Information about a relationship that this user has with another user."
+description: Information about a relationship that a user has with another user.
 fields:
   - name: id
+    description: Id of the first relationship participant.
     type: UserId
   - name: kind
+    description: Type of the relationship such as blocked, friends etc.
     from: type
     type: RelationshipType
   - name: user
+    description: User struct of the second relationship participant.
     type: User

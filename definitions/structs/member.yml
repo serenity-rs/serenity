@@ -1,18 +1,24 @@
 ---
 name: Member
-description: Information about a member of a server
+description: Represents information about a member of a guild.
 fields:
   - name: deaf
+    description: True if user isn't allowed to hear in voice channels.
     type: bool
   - name: joined_at
+    description: Timestamp representing the date when the member joined.
     type: string
   - name: mute
+    description: True if user isn't allowed to talk in voice channels.
     type: bool
   - name: nick
+    description: Optional nickname. Can't be longer than 32 characters.
     optional: true
     type: string
   - name: roles
+    description: Ids of roles that were given to the member.
     array: true
     type: RoleId
   - name: user
+    description: Attached User struct.
     type: User

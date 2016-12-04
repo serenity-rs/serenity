@@ -243,6 +243,9 @@ impl Context {
     /// simple method to read an image and encode it into base64, if you are
     /// reading from the filesystem.
     ///
+    /// The name of the emoji must be at least 2 characters long and can only
+    /// contain alphanumeric characters and underscores.
+    ///
     /// **Note**: Requires the [Manage Emojis] permission.
     ///
     /// # Examples
@@ -1526,6 +1529,8 @@ impl Context {
     ///
     /// Use [`reset_presence`] to clear the current game, or [`set_presence`]
     /// for more fine-grained control.
+    ///
+    /// **Note**: Maximum length is 128.
     ///
     /// [`GameType`]: ../model/enum.GameType.html
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online

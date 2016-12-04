@@ -1,14 +1,19 @@
 ---
 name: Game
-description: Information about a game that a user is playing
+description: >
+  Represents a game that a a user is playing, or streaming in the case that a
+  stream link is provided.
 fields:
   - name: kind
+    description: The type of game status.
     default: GameType::Playing
     from: type
     type: GameType
   - name: name
+    description: The name of the game that's being played.
     type: string
   - name: url
+    description: Stream URL if the `kind` is `Streaming`.
     optional: true
     type: string
 decode: false

@@ -193,7 +193,7 @@ impl Guild {
     ///
     /// # Examples
     ///
-    /// Ban a member for 4 days:
+    /// Ban a member and remove all messages they've sent in the last 4 days:
     ///
     /// ```rust,ignore
     /// // assumes a `user` and `guild` have already been bound

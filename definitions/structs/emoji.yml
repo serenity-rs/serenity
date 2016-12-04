@@ -1,12 +1,16 @@
 ---
 name: Emoji
-description: "A custom emoji for a guild."
+description: >
+  Represents a custom guild emoji, which can either be created using the API,
+  or via an integration. Emojis created using the API only work within the guild
+  it was created in.
 fields:
   - name: id
     description: "The Id of the emoji."
     type: EmojiId
   - name: name
-    description: "The name of the emoji."
+    description: "The name of the emoji. It must be at least 2 characters
+      long and can only contain alphanumeric characters and underscores."
     type: string
   - name: managed
     description: "Whether the emoji is managed via an

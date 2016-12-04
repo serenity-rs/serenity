@@ -1,6 +1,19 @@
 ---
 name: Embed
-description: An embed in a message, such as for a URL or an attachment.
+description: >
+  Represents a rich embed which allows using richer markdown,
+  multiple columns and more. This was heavily inspired by
+  [slack's attachments].
+
+
+  You can include an attachment in your own message by a user or a bot,
+  or in a webhook. They can be edited, too.
+
+
+  **Note**: Maximum amount of characters you can put is 256 in a field name,
+  1024 in a field value, and 2048 in a description.
+
+    [slack's attachments]: https://api.slack.com/docs/message-attachments
 fields:
   - name: author
     description: Author information about the embed.
