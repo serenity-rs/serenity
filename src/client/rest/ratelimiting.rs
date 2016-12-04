@@ -109,8 +109,8 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
 
     loop {
         {
-            /// This will block if another thread already has the global
-            /// unlocked already (due to receiving an x-ratelimit-global).
+            // This will block if another thread already has the global
+            // unlocked already (due to receiving an x-ratelimit-global).
             let mut _global = GLOBAL.lock().expect("global route lock poisoned");
         }
 
