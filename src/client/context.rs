@@ -1246,8 +1246,8 @@ impl Context {
     /// Moves a member to a specific voice channel.
     pub fn move_member<C, G, U>(&self, guild_id: G, user_id: U, channel_id: C)
         -> Result<()> where C: Into<ChannelId>,
-                            G: Into<ChannelId>,
-                            U: Into<ChannelId> {
+                            G: Into<GuildId>,
+                            U: Into<UserId> {
         let map = ObjectBuilder::new()
             .insert("channel_id", channel_id.into().0)
             .build();
