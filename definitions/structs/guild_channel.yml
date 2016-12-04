@@ -6,7 +6,7 @@ description: >
 fields:
   - name: id
     description: >
-      Channel's Id. Default channel shares the Id with the server it is in.
+      Channel's Id. Default channel shares the Id with the guild it is in.
     type: ChannelId
   - name: bitrate
     description: Bitrate of channel. Only available for voice channels.

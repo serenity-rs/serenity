@@ -1,6 +1,6 @@
 ---
 name: Presence
-description: A set of settings each member of a server has.
+description: A set of settings each member of a guild has.
 fields:
   - name: game
     description: A game's name that is displayed near user's name.

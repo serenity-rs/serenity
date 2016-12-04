@@ -2,7 +2,7 @@
 name: Game
 description: >
   Represents a game that a a user is playing or
-  streaming, in case a twitch stream link is provided.
+  streaming, in case a stream link is provided.
 fields:
   - name: kind
     description: >
@@ -14,11 +14,11 @@ fields:
     description: >
       The name of the game that's being played.
 
-      **Note**: Maximum length is 64.
+      **Note**: Maximum length is 128.
     type: string
   - name: url
     description: >
-      Twitch stream URL if the `kind` is `Streaming`.
+      Stream URL if the `kind` is `Streaming`.
     optional: true
     type: string
 decode: false

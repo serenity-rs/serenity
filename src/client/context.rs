@@ -243,7 +243,9 @@ impl Context {
     /// simple method to read an image and encode it into base64, if you are
     /// reading from the filesystem.
     ///
-    /// **Note**: Requires the [Manage Emojis] permission.
+    /// **Note**: Requires the [Manage Emojis] permission. The name of the emoji
+    /// must be at least 2 characters long and can only contain alphanumeric
+    /// characters and underscores.
     ///
     /// # Examples
     ///

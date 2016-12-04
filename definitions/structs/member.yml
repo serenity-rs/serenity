@@ -1,6 +1,6 @@
 ---
 name: Member
-description: Represents information about a member of a server.
+description: Represents information about a member of a guild.
 fields:
   - name: deaf
     description: True if user isn't allowed to hear in voice channels.

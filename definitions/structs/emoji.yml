@@ -3,7 +3,7 @@ name: Emoji
 description: >
   Represents a custom guild emoji, which can be created using
   API, or by a twitch integration. Emojis created using API only
-  work on one server. Maximum amount of Emoji a guild can have
+  work on one guild. Maximum amount of Emoji a guild can have
   is 50.
 fields:
   - name: id

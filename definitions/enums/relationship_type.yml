@@ -1,6 +1,6 @@
 ---
 name: RelationshipType
-description: Different kinds of relationships.
+description: The type of a relationship between two users.
 variants:
   - variant: Blocked
     description: When one user blocked the other one.

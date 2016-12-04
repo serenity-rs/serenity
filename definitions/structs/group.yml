@@ -1,7 +1,7 @@
 ---
 name: Group
 description: >
-  A group channel, potentially including other users, separate from a server.
+  A group channel, potentially including other users, separate from a guild.
 fields:
   - name: channel_id
     description: The Id of the group channel.

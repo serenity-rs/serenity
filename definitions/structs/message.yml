@@ -29,8 +29,7 @@ fields:
     type: Embed
   - name: kind
     description: >
-      Lets you differentiate system messages and messages sent by
-      real accounts.
+      Lets you differentiate system messages and regular messages.
     from: type
     type: MessageType
   - name: mention_everyone
@@ -53,7 +52,7 @@ fields:
     description: True if message is pinned.
     type: bool
   - name: reactions
-    description: Array of reactions message received.
+    description: Array of reactions performed on the message.
     array: true
     default: Vec::default()
     type: MessageReaction
