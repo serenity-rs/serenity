@@ -291,6 +291,8 @@ impl Group {
     ///
     /// **Note**: Groups have a limit of 10 recipients, including the current
     /// user.
+    ///
+    /// [`rest::add_group_recipient`]: ../client/rest/fn.add_group_recipient.html
     #[cfg(feature = "methods")]
     pub fn add_recipient<U: Into<UserId>>(&self, user: U) -> Result<()> {
         let user = user.into();
