@@ -68,7 +68,7 @@ v0.1.1 can now be retrieved from the [crates.io listing].
 - `rest::get_guilds` now supports pagination of guilds, as the output is now
   limited to 100
 
-## Backwards Compatibility Breaks
+### Backwards Compatibility Breaks
 
 None
 
