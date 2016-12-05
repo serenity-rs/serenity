@@ -6,6 +6,7 @@ use std::sync::{Arc, Mutex};
 use super::gateway::Shard;
 use super::rest::{self, GuildPagination};
 use super::login_type::LoginType;
+use typemap::ShareMap;
 use ::utils::builder::{
     CreateEmbed,
     CreateInvite,
@@ -82,6 +83,11 @@ pub struct Context {
     ///
     /// [`on_message`]: struct.Client.html#method.on_message
     pub channel_id: Option<ChannelId>,
+    /// A clone of [`Client::data`]. Refer to its documentation for more
+    /// information.
+    ///
+    /// [`Client::data`]: struct.Client.html#method.data
+    pub data: Arc<Mutex<ShareMap>>,
     /// The associated shard which dispatched the event handler.
     ///
     /// Note that if you are sharding, in relevant terms, this is the shard
@@ -101,9 +107,11 @@ impl Context {
     #[doc(hidden)]
     pub fn new(channel_id: Option<ChannelId>,
                shard: Arc<Mutex<Shard>>,
+               data: Arc<Mutex<ShareMap>>,
                login_type: LoginType) -> Context {
         Context {
             channel_id: channel_id,
+            data: data,
             shard: shard,
             login_type: login_type,
         }

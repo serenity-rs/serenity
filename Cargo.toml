@@ -21,6 +21,7 @@ lazy_static = "0.2"
 log = "0.3"
 serde_json = "0.8"
 time = "0.1"
+typemap = "0.3"
 websocket = "0.17"
 
 [dependencies.cookie]

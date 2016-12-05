@@ -42,6 +42,7 @@ use std::collections::{BTreeMap, HashMap};
 use std::sync::{Arc, Mutex, RwLock};
 use std::thread;
 use std::time::Duration;
+use typemap::ShareMap;
 use websocket::client::Receiver;
 use websocket::stream::WebSocketStream;
 use ::internal::prelude::{Error, Result, Value};
@@ -150,6 +151,23 @@ lazy_static! {
 /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
 /// [sharding docs]: gateway/index.html#sharding
 pub struct Client {
+    /// A ShareMap which requires types to be Send + Sync. This is a map that
+    /// can be safely shared across contexts.
+    ///
+    /// The purpose of the data field is to be accessible and persistent across
+    /// contexts; that is, data can be modified by one context, and will persist
+    /// through the future and be accessible through other contexts. This is
+    /// useful for anything that should "live" through the program: counters,
+    /// database connections, custom user caches, etc.
+    ///
+    /// In the meaning of a context, this data can be accessed through
+    /// [`Context::data`].
+    ///
+    /// Refer to [example 06] for an example on using the `data` field.
+    ///
+    /// [`Context::data`]: struct.Context.html#method.data
+    /// [example 06]: https://github.com/zeyla/serenity.rs/tree/master/examples/06_command_framework
+    pub data: Arc<Mutex<ShareMap>>,
     /// A vector of all active shards that have received their [`Event::Ready`]
     /// payload, and have dispatched to [`on_ready`] if an event handler was
     /// configured.
@@ -773,18 +791,21 @@ impl Client {
                                 dispatch(Event::Ready(ready),
                                          shard.clone(),
                                          self.framework.clone(),
+                                         self.data.clone(),
                                          self.login_type,
                                          self.event_store.clone());
                             } else {
                                 dispatch(Event::Ready(ready),
                                          shard.clone(),
+                                         self.data.clone(),
                                          self.login_type,
                                          self.event_store.clone());
                             }}
 
-                            let shard_clone = shard.clone();
+                            let data_clone = self.data.clone();
                             let event_store = self.event_store.clone();
                             let login_type = self.login_type;
+                            let shard_clone = shard.clone();
 
                             feature_framework! {{
                                 let framework = self.framework.clone();
@@ -792,6 +813,7 @@ impl Client {
                                 thread::spawn(move || {
                                     handle_shard(shard_clone,
                                                  framework,
+                                                 data_clone,
                                                  login_type,
                                                  event_store,
                                                  receiver)
@@ -799,6 +821,7 @@ impl Client {
                             } else {
                                 thread::spawn(move || {
                                     handle_shard(shard_clone,
+                                                 data_clone,
                                                  login_type,
                                                  event_store,
                                                  receiver)
@@ -1125,6 +1148,7 @@ impl Client {
 #[cfg(feature="framework")]
 fn handle_shard(shard: Arc<Mutex<Shard>>,
                 framework: Arc<Mutex<Framework>>,
+                data: Arc<Mutex<ShareMap>>,
                 login_type: LoginType,
                 event_store: Arc<RwLock<EventStore>>,
                 mut receiver: Receiver<WebSocketStream>) {
@@ -1146,6 +1170,7 @@ fn handle_shard(shard: Arc<Mutex<Shard>>,
         dispatch(event,
                  shard.clone(),
                  framework.clone(),
+                 data.clone(),
                  login_type,
                  event_store.clone());
     }
@@ -1153,6 +1178,7 @@ fn handle_shard(shard: Arc<Mutex<Shard>>,
 
 #[cfg(not(feature="framework"))]
 fn handle_shard(shard: Arc<Mutex<Shard>>,
+                data: Arc<Mutex<ShareMap>>,
                 login_type: LoginType,
                 event_store: Arc<RwLock<EventStore>>,
                 mut receiver: Receiver<WebSocketStream>) {
@@ -1173,6 +1199,7 @@ fn handle_shard(shard: Arc<Mutex<Shard>>,
 
         dispatch(event,
                  shard.clone(),
+                 data.clone(),
                  login_type,
                  event_store.clone());
     }
@@ -1185,17 +1212,19 @@ fn login(token: &str, login_type: LoginType) -> Client {
 
     feature_framework! {{
         Client {
-            shards: Vec::default(),
+            data: Arc::new(Mutex::new(ShareMap::custom())),
             event_store: Arc::new(RwLock::new(EventStore::default())),
             framework: Arc::new(Mutex::new(Framework::default())),
             login_type: login_type,
+            shards: Vec::default(),
             token: token.to_owned(),
         }
     } else {
         Client {
-            shards: Vec::default(),
+            data: Arc::new(Mutex::new(ShareMap::custom())),
             event_store: Arc::new(RwLock::new(EventStore::default())),
             login_type: login_type,
+            shards: Vec::default(),
             token: token.to_owned(),
         }
     }}

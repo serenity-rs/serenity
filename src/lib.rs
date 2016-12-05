@@ -145,6 +145,7 @@ extern crate hyper;
 extern crate multipart;
 extern crate serde_json;
 extern crate time;
+extern crate typemap;
 extern crate websocket;
 
 #[cfg(feature="voice")]

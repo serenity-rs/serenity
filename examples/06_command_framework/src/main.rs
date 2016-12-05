@@ -10,17 +10,32 @@
 
 #[macro_use]
 extern crate serenity;
+extern crate typemap;
 
 use serenity::client::Context;
 use serenity::Client;
 use serenity::model::Message;
+use std::collections::HashMap;
 use std::env;
+use std::fmt::Write;
+use typemap::Key;
+
+struct CommandCounter;
+
+impl Key for CommandCounter {
+    type Value = HashMap<String, u64>;
+}
 
 fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
     let mut client = Client::login_bot(&token);
+
+    {
+        let mut data = client.data.lock().unwrap();
+        data.insert::<CommandCounter>(HashMap::default());
+    }
 
     client.on_ready(|_context, ready| {
         println!("{} is connected!", ready.user.name);
@@ -51,16 +66,26 @@ fn main() {
         // You can not use this to determine whether a command should be
         // executed. Instead, `set_check` is provided to give you this
         // functionality.
-        .before(|_context, message, command_name| {
+        .before(|context, message, command_name| {
             println!("Got command '{}' by user '{}'",
                      command_name,
                      message.author.name);
+
+            // Increment the number of times this command has been run once. If
+            // the command's name does not exist in the counter, add a default
+            // value of 0.
+            let mut data = context.data.lock().unwrap();
+            let counter = data.get_mut::<CommandCounter>().unwrap();
+            let entry = counter.entry(command_name.clone()).or_insert(0);
+            *entry += 1;
         })
         // Very similar to `before`, except this will be called directly _after_
         // command execution.
         .after(|_context, _message, command_name| {
             println!("Processed command '{}'", command_name)
         })
+        .on("commands", commands)
+        .set_check("commands", owner_check)
         .on("ping", ping_command)
         .set_check("ping", owner_check) // Ensure only the owner can run this
         .on("emoji cat", cat_command)
@@ -84,9 +109,24 @@ fn main() {
 // This may bring more features available for commands in the future. See the
 // "multiply" command below for some of the power that the `command!` macro can
 // bring.
-command!(cat_command(context, _msg, _arg) {
+command!(cat_command(context, _msg, _args) {
     if let Err(why) = context.say(":cat:") {
         println!("Eror sending message: {:?}", why);
+    }
+});
+
+command!(commands(context, _msg, _args) {
+    let mut contents = "Commands used:\n".to_owned();
+
+    let data = context.data.lock().unwrap();
+    let counter = data.get::<CommandCounter>().unwrap();
+
+    for (k, v) in counter {
+        let _ = write!(contents, "- {name}: {amount}\n", name=k, amount=v);
+    }
+
+    if let Err(why) = context.say(&contents) {
+        println!("Error sending message: {:?}", why);
     }
 });
 
