@@ -6,7 +6,6 @@ use super::{
     GuildContainer,
     GuildId,
     GuildInfo,
-    Mention,
     RoleId,
     UserSettings,
     User,
@@ -15,6 +14,7 @@ use ::client::rest::GuildPagination;
 use ::internal::prelude::*;
 use ::utils::builder::EditProfile;
 use ::utils::decode_array;
+use ::model::misc::Mentionable;
 
 #[cfg(feature = "methods")]
 use serde_json::builder::ObjectBuilder;
@@ -196,13 +196,6 @@ impl User {
                 }}
             },
         }
-    }
-
-    /// Return a [`Mention`] which will ping this user.
-    ///
-    /// [`Mention`]: struct.Mention.html
-    pub fn mention(&self) -> Mention {
-        self.id.mention()
     }
 }
 

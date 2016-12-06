@@ -1,4 +1,3 @@
-use std::fmt;
 use super::{
     ChannelId,
     Channel,
@@ -19,73 +18,59 @@ pub trait Mentionable {
 
 impl Mentionable for ChannelId {
     fn mention(&self) -> String {
-        format!("{}", self)
+        format!("<#{}>", self.0)
     }
 }
 
 impl Mentionable for Channel {
     fn mention(&self) -> String {
-        format!("{}", self)
+        match *self {
+            Channel::Guild(ref x) => {
+                format!("<#{}>", x.id.0)
+            },
+            Channel::Private(ref x) => {
+                format!("<#{}>", x.id.0)
+            },
+            Channel::Group(ref x) => {
+                format!("<#{}>", x.channel_id.0)
+            }
+        }
     }
 }
 
 impl Mentionable for Emoji {
     fn mention(&self) -> String {
-        format!("{}", self)
+        format!("<:{}:{}>", self.name, self.id.0)
     }
 }
 
 impl Mentionable for Member {
     fn mention(&self) -> String {
-        format!("{}", self.user)
+        format!("<@{}>", self.user.id.0)
     }
 }
 
 impl Mentionable for RoleId {
     fn mention(&self) -> String {
-        format!("{}", self)
+        format!("<@&{}>", self.0)
     }
 }
 
 impl Mentionable for Role {
     fn mention(&self) -> String {
-        format!("{}", self)
+        format!("<@&{}>", self.id.0)
     }
 }
 
 impl Mentionable for UserId {
     fn mention(&self) -> String {
-        format!("{}", self)
+        format!("<@{}>", self.0)
     }
 }
 
 impl Mentionable for User {
     fn mention(&self) -> String {
-        format!("{}", self)
-    }
-}
-
-/// A mention targeted at a certain model.
-///
-/// A mention can be created by calling `.mention()` on anything that is
-/// mentionable - or an item's Id - and can be formatted into a string using
-/// [`format!`]:
-///
-/// ```rust,ignore
-/// let message = format!("Mentioning {}", user.mention());
-/// ```
-///
-/// If a `String` is required, call `mention.to_string()`.
-pub struct Mention {
-    pub prefix: &'static str,
-    pub id: u64,
-}
-
-impl fmt::Display for Mention {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        try!(f.write_str(self.prefix));
-        try!(fmt::Display::fmt(&self.id, f));
-        fmt::Write::write_char(f, '>')
+        format!("<@{}>", self.id.0)
     }
 }
 

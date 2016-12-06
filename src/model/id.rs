@@ -1,4 +1,5 @@
 use super::*;
+use std::fmt;
 
 #[cfg(all(feature = "cache", feature = "methods"))]
 use ::client::CACHE;
@@ -25,17 +26,6 @@ impl ChannelId {
         }}
 
         rest::get_channel(self.0)
-    }
-
-    /// Returns a [`Mention`] which will link to the [`Channel`].
-    ///
-    /// [`Channel`]: enum.Channel.html
-    /// [`Mention`]: struct.Mention.html
-    pub fn mention(&self) -> Mention {
-        Mention {
-            id: self.0,
-            prefix: "<#",
-        }
     }
 
     /// Retrieves the channel's webhooks.
@@ -95,16 +85,6 @@ impl GuildId {
     #[cfg(feature="methods")]
     pub fn get(&self) -> Result<PartialGuild> {
         rest::get_guild(self.0)
-    }
-
-    /// Mentions the [`Guild`]'s default channel.
-    ///
-    /// [`Guild`]: struct.Guild.html
-    pub fn mention(&self) -> Mention {
-        Mention {
-            id: self.0,
-            prefix: "<#",
-        }
     }
 
     /// Returns this Id as a `ChannelId`, which is useful when needing to use
@@ -190,16 +170,6 @@ impl RoleId {
             })
             .cloned()
     }
-
-    /// Returns a [`Mention`] which will ping members of the role.
-    ///
-    /// [`Mention`]: struct.Mention.html
-    pub fn mention(&self) -> Mention {
-        Mention {
-            id: self.0,
-            prefix: "<@&",
-        }
-    }
 }
 
 impl From<CurrentUser> for UserId {
@@ -223,15 +193,33 @@ impl From<User> for UserId {
     }
 }
 
-impl UserId {
-    /// Returns a [`Mention`] which will ping the user.
-    ///
-    /// [`Mention`]: struct.Mention.html
-    pub fn mention(&self) -> Mention {
-        Mention {
-            id: self.0,
-            prefix: "<@",
-        }
+impl fmt::Display for UserId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Display::fmt(&self.mention(), f)
+    }
+}
+
+impl fmt::Display for RoleId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Display::fmt(&self.mention(), f)
+    }
+}
+
+impl fmt::Display for ChannelId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Display::fmt(&self.mention(), f)
+    }
+}
+
+impl fmt::Display for GuildId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Display::fmt(&self.0, f)
+    }
+}
+
+impl fmt::Display for EmojiId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Display::fmt(&self.0, f)
     }
 }
 

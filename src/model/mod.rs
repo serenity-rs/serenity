@@ -49,7 +49,6 @@ pub use self::webhook::*;
 
 use self::utils::*;
 use std::collections::HashMap;
-use std::fmt;
 use time::Timespec;
 use ::internal::prelude::*;
 use ::utils::{Colour, decode_array};
@@ -87,12 +86,6 @@ macro_rules! id {
                 pub fn created_at(&self) -> Timespec {
                     let offset = (self.0 >> 22) / 1000;
                     Timespec::new(1420070400 + offset as i64, 0)
-                }
-            }
-
-            impl fmt::Display for $name {
-                fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-                    write!(f, "{}", self.0)
                 }
             }
 
