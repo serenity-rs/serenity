@@ -10,7 +10,6 @@ use super::utils::{
 use super::*;
 use ::constants;
 use ::internal::prelude::*;
-use ::model::misc::Mentionable;
 use ::utils::decode_array;
 
 #[cfg(feature = "methods")]
