@@ -1,4 +1,5 @@
 use super::*;
+use std::fmt;
 
 #[cfg(all(feature = "cache", feature = "methods"))]
 use ::client::CACHE;
