@@ -1102,11 +1102,6 @@ impl Role {
             self.permissions.contains(permissions)
         }
     }
-
-    /// Return a `Mention` which will ping members of the role.
-    pub fn mention(&self) -> Mention {
-        self.id.mention()
-    }
 }
 
 impl fmt::Display for Role {

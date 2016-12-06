@@ -90,12 +90,6 @@ macro_rules! id {
                 }
             }
 
-            impl fmt::Display for $name {
-                fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-                    write!(f, "{}", self.0)
-                }
-            }
-
             impl From<u64> for $name {
                 fn from(id_as_u64: u64) -> $name {
                     $name(id_as_u64)

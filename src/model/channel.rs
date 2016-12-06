@@ -10,6 +10,7 @@ use super::utils::{
 use super::*;
 use ::constants;
 use ::internal::prelude::*;
+use ::model::misc::Mentionable;
 use ::utils::decode_array;
 
 #[cfg(feature = "methods")]
@@ -955,13 +956,6 @@ impl GuildChannel {
         CACHE.read().unwrap().get_guild(self.guild_id).cloned()
     }
 
-    /// Return a [`Mention`] which will link to this channel.
-    ///
-    /// [`Mention`]: struct.Mention.html
-    pub fn mention(&self) -> Mention {
-        self.id.mention()
-    }
-
     /// Gets all channel's pins.
     #[cfg(feature = "methods")]
     pub fn pins(&self) -> Result<Vec<Message>> {
@@ -1023,7 +1017,7 @@ impl GuildChannel {
 impl fmt::Display for GuildChannel {
     /// Formas the channel, creating a mention of it.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Display::fmt(&self.mention(), f)
+        fmt::Display::fmt(&self.id.mention(), f)
     }
 }
 
