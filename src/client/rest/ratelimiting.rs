@@ -128,7 +128,7 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
             }
         }
 
-        let response = try!(super::retry(&f));
+        let response = super::retry(&f)?;
 
         // Check if the request got ratelimited by checking for status 429,
         // and if so, sleep for the value of the header 'retry-after' -
@@ -201,21 +201,21 @@ impl RateLimit {
     }
 
     pub fn post_hook(&mut self, response: &Response) -> Result<bool> {
-        if let Some(limit) = try!(get_header(&response.headers, "x-ratelimit-limit")) {
+        if let Some(limit) = get_header(&response.headers, "x-ratelimit-limit")? {
             self.limit = limit;
         }
 
-        if let Some(remaining) = try!(get_header(&response.headers, "x-ratelimit-remaining")) {
+        if let Some(remaining) = get_header(&response.headers, "x-ratelimit-remaining")? {
             self.remaining = remaining;
         }
 
-        if let Some(reset) = try!(get_header(&response.headers, "x-ratelimit-reset")) {
+        if let Some(reset) = get_header(&response.headers, "x-ratelimit-reset")? {
             self.reset = reset;
         }
 
         Ok(if response.status != StatusCode::TooManyRequests {
             false
-        } else if let Some(retry_after) = try!(get_header(&response.headers, "retry-after")) {
+        } else if let Some(retry_after) = get_header(&response.headers, "retry-after")? {
             debug!("Ratelimited: {:?}ms", retry_after);
             thread::sleep(Duration::from_millis(retry_after as u64));
 

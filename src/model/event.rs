@@ -339,27 +339,27 @@ pub enum GatewayEvent {
 
 impl GatewayEvent {
     pub fn decode(value: Value) -> Result<Self> {
-        let mut value = try!(into_map(value));
+        let mut value = into_map(value)?;
 
         let op = req!(value.get("op").and_then(|x| x.as_u64()));
 
-        match try!(OpCode::from_num(op).ok_or(Error::Client(ClientError::InvalidOpCode))) {
+        match OpCode::from_num(op).ok_or(Error::Client(ClientError::InvalidOpCode))? {
             OpCode::Event => Ok(GatewayEvent::Dispatch(
-                req!(try!(remove(&mut value, "s")).as_u64()),
-                try!(Event::decode(
-                    try!(remove(&mut value, "t").and_then(into_string)),
-                    try!(remove(&mut value, "d"))
-                ))
+                req!(remove(&mut value, "s")?.as_u64()),
+                Event::decode(
+                    remove(&mut value, "t").and_then(into_string)?,
+                    remove(&mut value, "d")?
+                )?
             )),
             OpCode::Heartbeat => {
-                Ok(GatewayEvent::Heartbeat(req!(try!(remove(&mut value, "s"))
+                Ok(GatewayEvent::Heartbeat(req!(remove(&mut value, "s")?
                     .as_u64())))
             },
             OpCode::Reconnect => Ok(GatewayEvent::Reconnect),
             OpCode::InvalidSession => Ok(GatewayEvent::InvalidateSession),
             OpCode::Hello => {
-                let mut data = try!(remove(&mut value, "d").and_then(into_map));
-                let interval = req!(try!(remove(&mut data, "heartbeat_interval")).as_u64());
+                let mut data = remove(&mut value, "d").and_then(into_map)?;
+                let interval = req!(remove(&mut data, "heartbeat_interval")?.as_u64());
                 Ok(GatewayEvent::Hello(interval))
             },
             OpCode::HeartbeatAck => Ok(GatewayEvent::HeartbeatAck),
@@ -478,209 +478,209 @@ impl Event {
     fn decode(kind: String, value: Value) -> Result<Event> {
         if kind == "PRESENCES_REPLACE" {
             return Ok(Event::PresencesReplace(PresencesReplaceEvent {
-                presences: try!(decode_array(value, Presence::decode)),
+                presences: decode_array(value, Presence::decode)?,
             }));
         }
 
-        let mut value = try!(into_map(value));
+        let mut value = into_map(value)?;
 
         if kind == "CALL_CREATE" {
             Ok(Event::CallCreate(CallCreateEvent {
-                call: try!(Call::decode(Value::Object(value))),
+                call: Call::decode(Value::Object(value))?,
             }))
         } else if kind == "CALL_DELETE" {
             Ok(Event::CallDelete(CallDeleteEvent {
-                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
+                channel_id: remove(&mut value, "channel_id").and_then(ChannelId::decode)?,
             }))
         } else if kind == "CALL_UPDATE" {
             Ok(Event::CallUpdate(CallUpdateEvent {
-                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
-                message_id: try!(remove(&mut value, "message_id").and_then(MessageId::decode)),
-                region: try!(remove(&mut value, "region").and_then(into_string)),
-                ringing: try!(decode_array(try!(remove(&mut value, "ringing")), UserId::decode)),
+                channel_id: remove(&mut value, "channel_id").and_then(ChannelId::decode)?,
+                message_id: remove(&mut value, "message_id").and_then(MessageId::decode)?,
+                region: remove(&mut value, "region").and_then(into_string)?,
+                ringing: decode_array(remove(&mut value, "ringing")?, UserId::decode)?,
             }))
         } else if kind == "CHANNEL_CREATE" {
             Ok(Event::ChannelCreate(ChannelCreateEvent {
-                channel: try!(Channel::decode(Value::Object(value))),
+                channel: Channel::decode(Value::Object(value))?,
             }))
         } else if kind == "CHANNEL_DELETE" {
             Ok(Event::ChannelDelete(ChannelDeleteEvent {
-                channel: try!(Channel::decode(Value::Object(value))),
+                channel: Channel::decode(Value::Object(value))?,
             }))
         } else if kind == "CHANNEL_PINS_ACK" {
             Ok(Event::ChannelPinsAck(ChannelPinsAckEvent {
-                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
-                timestamp: try!(remove(&mut value, "timestamp").and_then(into_string)),
+                channel_id: remove(&mut value, "channel_id").and_then(ChannelId::decode)?,
+                timestamp: remove(&mut value, "timestamp").and_then(into_string)?,
             }))
         } else if kind == "CHANNEL_PINS_UPDATE" {
             Ok(Event::ChannelPinsUpdate(ChannelPinsUpdateEvent {
-                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
-                last_pin_timestamp: try!(opt(&mut value, "last_pin_timestamp", into_string)),
+                channel_id: remove(&mut value, "channel_id").and_then(ChannelId::decode)?,
+                last_pin_timestamp: opt(&mut value, "last_pin_timestamp", into_string)?,
             }))
         } else if kind == "CHANNEL_RECIPIENT_ADD" {
             Ok(Event::ChannelRecipientAdd(ChannelRecipientAddEvent {
-                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
-                user: try!(remove(&mut value, "user").and_then(User::decode)),
+                channel_id: remove(&mut value, "channel_id").and_then(ChannelId::decode)?,
+                user: remove(&mut value, "user").and_then(User::decode)?,
             }))
         } else if kind == "CHANNEL_RECIPIENT_REMOVE" {
             Ok(Event::ChannelRecipientRemove(ChannelRecipientRemoveEvent {
-                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
-                user: try!(remove(&mut value, "user").and_then(User::decode)),
+                channel_id: remove(&mut value, "channel_id").and_then(ChannelId::decode)?,
+                user: remove(&mut value, "user").and_then(User::decode)?,
             }))
         } else if kind == "CHANNEL_UPDATE" {
             Ok(Event::ChannelUpdate(ChannelUpdateEvent {
-                channel: try!(Channel::decode(Value::Object(value))),
+                channel: Channel::decode(Value::Object(value))?,
             }))
         } else if kind == "FRIEND_SUGGESTION_CREATE" {
             Ok(Event::FriendSuggestionCreate(FriendSuggestionCreateEvent {
-                reasons: try!(decode_array(try!(remove(&mut value, "reasons")), SuggestionReason::decode)),
-                suggested_user: try!(remove(&mut value, "suggested_user").and_then(User::decode)),
+                reasons: decode_array(remove(&mut value, "reasons")?, SuggestionReason::decode)?,
+                suggested_user: remove(&mut value, "suggested_user").and_then(User::decode)?,
             }))
         } else if kind == "FRIEND_SUGGESTION_DELETE" {
             Ok(Event::FriendSuggestionDelete(FriendSuggestionDeleteEvent {
-                suggested_user_id: try!(remove(&mut value, "suggested_user_id").and_then(UserId::decode)),
+                suggested_user_id: remove(&mut value, "suggested_user_id").and_then(UserId::decode)?,
             }))
         } else if kind == "GUILD_BAN_ADD" {
             Ok(Event::GuildBanAdd(GuildBanAddEvent {
-                guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
-                user: try!(remove(&mut value, "user").and_then(User::decode)),
+                guild_id: remove(&mut value, "guild_id").and_then(GuildId::decode)?,
+                user: remove(&mut value, "user").and_then(User::decode)?,
             }))
         } else if kind == "GUILD_BAN_REMOVE" {
             Ok(Event::GuildBanRemove(GuildBanRemoveEvent {
-                guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
-                user: try!(remove(&mut value, "user").and_then(User::decode)),
+                guild_id: remove(&mut value, "guild_id").and_then(GuildId::decode)?,
+                user: remove(&mut value, "user").and_then(User::decode)?,
             }))
         } else if kind == "GUILD_CREATE" {
             if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
                 Ok(Event::GuildUnavailable(GuildUnavailableEvent {
-                    guild_id: try!(remove(&mut value, "id").and_then(GuildId::decode)),
+                    guild_id: remove(&mut value, "id").and_then(GuildId::decode)?,
                 }))
             } else {
                 Ok(Event::GuildCreate(GuildCreateEvent {
-                    guild: try!(Guild::decode(Value::Object(value))),
+                    guild: Guild::decode(Value::Object(value))?,
                 }))
             }
         } else if kind == "GUILD_DELETE" {
             if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
                 Ok(Event::GuildUnavailable(GuildUnavailableEvent {
-                    guild_id: try!(remove(&mut value, "id").and_then(GuildId::decode)),
+                    guild_id: remove(&mut value, "id").and_then(GuildId::decode)?,
                 }))
             } else {
                 Ok(Event::GuildDelete(GuildDeleteEvent {
-                    guild: try!(PartialGuild::decode(Value::Object(value))),
+                    guild: PartialGuild::decode(Value::Object(value))?,
                 }))
             }
         } else if kind == "GUILD_EMOJIS_UPDATE" {
             Ok(Event::GuildEmojisUpdate(GuildEmojisUpdateEvent {
-                emojis: try!(remove(&mut value, "emojis").and_then(decode_emojis)),
-                guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
+                emojis: remove(&mut value, "emojis").and_then(decode_emojis)?,
+                guild_id: remove(&mut value, "guild_id").and_then(GuildId::decode)?,
             }))
         } else if kind == "GUILD_INTEGRATIONS_UPDATE" {
             Ok(Event::GuildIntegrationsUpdate(GuildIntegrationsUpdateEvent {
-                guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
+                guild_id: remove(&mut value, "guild_id").and_then(GuildId::decode)?,
             }))
         } else if kind == "GUILD_MEMBER_ADD" {
             Ok(Event::GuildMemberAdd(GuildMemberAddEvent {
-                guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
-                member: try!(Member::decode(Value::Object(value))),
+                guild_id: remove(&mut value, "guild_id").and_then(GuildId::decode)?,
+                member: Member::decode(Value::Object(value))?,
             }))
         } else if kind == "GUILD_MEMBER_REMOVE" {
             Ok(Event::GuildMemberRemove(GuildMemberRemoveEvent {
-                guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
-                user: try!(remove(&mut value, "user").and_then(User::decode)),
+                guild_id: remove(&mut value, "guild_id").and_then(GuildId::decode)?,
+                user: remove(&mut value, "user").and_then(User::decode)?,
             }))
         } else if kind == "GUILD_MEMBER_UPDATE" {
             Ok(Event::GuildMemberUpdate(GuildMemberUpdateEvent {
-                guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
-                nick: try!(opt(&mut value, "nick", into_string)),
-                roles: try!(decode_array(try!(remove(&mut value, "roles")), RoleId::decode)),
-                user: try!(remove(&mut value, "user").and_then(User::decode)),
+                guild_id: remove(&mut value, "guild_id").and_then(GuildId::decode)?,
+                nick: opt(&mut value, "nick", into_string)?,
+                roles: decode_array(remove(&mut value, "roles")?, RoleId::decode)?,
+                user: remove(&mut value, "user").and_then(User::decode)?,
             }))
         } else if kind == "GUILD_MEMBERS_CHUNK" {
             Ok(Event::GuildMembersChunk(GuildMembersChunkEvent {
-                guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
-                members: try!(remove(&mut value, "members").and_then(decode_members)),
+                guild_id: remove(&mut value, "guild_id").and_then(GuildId::decode)?,
+                members: remove(&mut value, "members").and_then(decode_members)?,
             }))
         } else if kind == "GUILD_ROLE_CREATE" {
             Ok(Event::GuildRoleCreate(GuildRoleCreateEvent {
-                guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
-                role: try!(remove(&mut value, "role").and_then(Role::decode)),
+                guild_id: remove(&mut value, "guild_id").and_then(GuildId::decode)?,
+                role: remove(&mut value, "role").and_then(Role::decode)?,
             }))
         } else if kind == "GUILD_ROLE_DELETE" {
             Ok(Event::GuildRoleDelete(GuildRoleDeleteEvent {
-                guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
-                role_id: try!(remove(&mut value, "role_id").and_then(RoleId::decode)),
+                guild_id: remove(&mut value, "guild_id").and_then(GuildId::decode)?,
+                role_id: remove(&mut value, "role_id").and_then(RoleId::decode)?,
             }))
         } else if kind == "GUILD_ROLE_UPDATE" {
             Ok(Event::GuildRoleUpdate(GuildRoleUpdateEvent {
-                guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
-                role: try!(remove(&mut value, "role").and_then(Role::decode)),
+                guild_id: remove(&mut value, "guild_id").and_then(GuildId::decode)?,
+                role: remove(&mut value, "role").and_then(Role::decode)?,
             }))
         } else if kind == "GUILD_SYNC" {
             Ok(Event::GuildSync(GuildSyncEvent {
-                guild_id: try!(remove(&mut value, "id").and_then(GuildId::decode)),
-                large: req!(try!(remove(&mut value, "large")).as_bool()),
-                members: try!(remove(&mut value, "members").and_then(decode_members)),
-                presences: try!(remove(&mut value, "presences").and_then(decode_presences)),
+                guild_id: remove(&mut value, "id").and_then(GuildId::decode)?,
+                large: req!(remove(&mut value, "large")?.as_bool()),
+                members: remove(&mut value, "members").and_then(decode_members)?,
+                presences: remove(&mut value, "presences").and_then(decode_presences)?,
             }))
         } else if kind == "GUILD_UPDATE" {
             Ok(Event::GuildUpdate(GuildUpdateEvent {
-                guild: try!(PartialGuild::decode(Value::Object(value))),
+                guild: PartialGuild::decode(Value::Object(value))?,
             }))
         } else if kind == "MESSAGE_ACK" {
             Ok(Event::MessageAck(MessageAckEvent {
-                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
-                message_id: try!(opt(&mut value, "message_id", MessageId::decode)),
+                channel_id: remove(&mut value, "channel_id").and_then(ChannelId::decode)?,
+                message_id: opt(&mut value, "message_id", MessageId::decode)?,
             }))
         } else if kind == "MESSAGE_CREATE" {
             Ok(Event::MessageCreate(MessageCreateEvent {
-                message: try!(Message::decode(Value::Object(value))),
+                message: Message::decode(Value::Object(value))?,
             }))
         } else if kind == "MESSAGE_DELETE" {
             Ok(Event::MessageDelete(MessageDeleteEvent {
-                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
-                message_id: try!(remove(&mut value, "id").and_then(MessageId::decode)),
+                channel_id: remove(&mut value, "channel_id").and_then(ChannelId::decode)?,
+                message_id: remove(&mut value, "id").and_then(MessageId::decode)?,
             }))
         } else if kind == "MESSAGE_DELETE_BULK" {
             Ok(Event::MessageDeleteBulk(MessageDeleteBulkEvent {
-                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
-                ids: try!(decode_array(try!(remove(&mut value, "ids")), MessageId::decode)),
+                channel_id: remove(&mut value, "channel_id").and_then(ChannelId::decode)?,
+                ids: decode_array(remove(&mut value, "ids")?, MessageId::decode)?,
             }))
         } else if kind == "MESSAGE_REACTION_ADD" {
             Ok(Event::ReactionAdd(ReactionAddEvent {
-                reaction: try!(Reaction::decode(Value::Object(value)))
+                reaction: Reaction::decode(Value::Object(value))?
             }))
         } else if kind == "MESSAGE_REACTION_REMOVE" {
             Ok(Event::ReactionRemove(ReactionRemoveEvent {
-                reaction: try!(Reaction::decode(Value::Object(value)))
+                reaction: Reaction::decode(Value::Object(value))?
             }))
         } else if kind == "MESSAGE_REACTION_REMOVE_ALL" {
             Ok(Event::ReactionRemoveAll(ReactionRemoveAllEvent {
-                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
-                message_id: try!(remove(&mut value, "message_id").and_then(MessageId::decode)),
+                channel_id: remove(&mut value, "channel_id").and_then(ChannelId::decode)?,
+                message_id: remove(&mut value, "message_id").and_then(MessageId::decode)?,
             }))
         } else if kind == "MESSAGE_UPDATE" {
             Ok(Event::MessageUpdate(MessageUpdateEvent {
-                id: try!(remove(&mut value, "id").and_then(MessageId::decode)),
-                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
-                kind: try!(opt(&mut value, "type", MessageType::decode)),
-                content: try!(opt(&mut value, "content", into_string)),
+                id: remove(&mut value, "id").and_then(MessageId::decode)?,
+                channel_id: remove(&mut value, "channel_id").and_then(ChannelId::decode)?,
+                kind: opt(&mut value, "type", MessageType::decode)?,
+                content: opt(&mut value, "content", into_string)?,
                 nonce: remove(&mut value, "nonce").and_then(into_string).ok(),
                 tts: remove(&mut value, "tts").ok().and_then(|v| v.as_bool()),
                 pinned: remove(&mut value, "pinned").ok().and_then(|v| v.as_bool()),
-                timestamp: try!(opt(&mut value, "timestamp", into_string)),
-                edited_timestamp: try!(opt(&mut value, "edited_timestamp", into_string)),
-                author: try!(opt(&mut value, "author", User::decode)),
+                timestamp: opt(&mut value, "timestamp", into_string)?,
+                edited_timestamp: opt(&mut value, "edited_timestamp", into_string)?,
+                author: opt(&mut value, "author", User::decode)?,
                 mention_everyone: remove(&mut value, "mention_everyone").ok().and_then(|v| v.as_bool()),
-                mentions: try!(opt(&mut value, "mentions", |v| decode_array(v, User::decode))),
-                mention_roles: try!(opt(&mut value, "mention_roles", |v| decode_array(v, RoleId::decode))),
-                attachments: try!(opt(&mut value, "attachments", |v| decode_array(v, Attachment::decode))),
-                embeds: try!(opt(&mut value, "embeds", |v| decode_array(v, Ok))),
+                mentions: opt(&mut value, "mentions", |v| decode_array(v, User::decode))?,
+                mention_roles: opt(&mut value, "mention_roles", |v| decode_array(v, RoleId::decode))?,
+                attachments: opt(&mut value, "attachments", |v| decode_array(v, Attachment::decode))?,
+                embeds: opt(&mut value, "embeds", |v| decode_array(v, Ok))?,
             }))
         } else if kind == "PRESENCE_UPDATE" {
-            let guild_id = try!(opt(&mut value, "guild_id", GuildId::decode));
-            let roles = try!(opt(&mut value, "roles", |v| decode_array(v, RoleId::decode)));
-            let presence = try!(Presence::decode(Value::Object(value)));
+            let guild_id = opt(&mut value, "guild_id", GuildId::decode)?;
+            let roles = opt(&mut value, "roles", |v| decode_array(v, RoleId::decode))?;
+            let presence = Presence::decode(Value::Object(value))?;
             Ok(Event::PresenceUpdate(PresenceUpdateEvent {
                 guild_id: guild_id,
                 presence: presence,
@@ -688,70 +688,70 @@ impl Event {
             }))
         } else if kind == "RELATIONSHIP_ADD" {
             Ok(Event::RelationshipAdd(RelationshipAddEvent {
-                relationship: try!(Relationship::decode(Value::Object(value))),
+                relationship: Relationship::decode(Value::Object(value))?,
             }))
         } else if kind == "RELATIONSHIP_REMOVE" {
             Ok(Event::RelationshipRemove(RelationshipRemoveEvent {
-                kind: try!(remove(&mut value, "type").and_then(RelationshipType::decode)),
-                user_id: try!(remove(&mut value, "id").and_then(UserId::decode)),
+                kind: remove(&mut value, "type").and_then(RelationshipType::decode)?,
+                user_id: remove(&mut value, "id").and_then(UserId::decode)?,
             }))
         } else if kind == "READY" {
             Ok(Event::Ready(ReadyEvent {
-                ready: try!(Ready::decode(Value::Object(value))),
+                ready: Ready::decode(Value::Object(value))?,
             }))
         } else if kind == "RESUMED" {
             Ok(Event::Resumed(ResumedEvent {
-                heartbeat_interval: req!(try!(remove(&mut value, "heartbeat_interval")).as_u64()),
-                trace: try!(remove(&mut value, "_trace").and_then(|v| decode_array(v, |v| Ok(into_string(v).ok())))),
+                heartbeat_interval: req!(remove(&mut value, "heartbeat_interval")?.as_u64()),
+                trace: remove(&mut value, "_trace").and_then(|v| decode_array(v, |v| Ok(into_string(v).ok())))?,
             }))
         } else if kind == "TYPING_START" {
             Ok(Event::TypingStart(TypingStartEvent {
-                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
-                timestamp: req!(try!(remove(&mut value, "timestamp")).as_u64()),
-                user_id: try!(remove(&mut value, "user_id").and_then(UserId::decode)),
+                channel_id: remove(&mut value, "channel_id").and_then(ChannelId::decode)?,
+                timestamp: req!(remove(&mut value, "timestamp")?.as_u64()),
+                user_id: remove(&mut value, "user_id").and_then(UserId::decode)?,
             }))
         } else if kind == "USER_GUILD_SETTINGS_UPDATE" {
             Ok(Event::UserGuildSettingsUpdate(UserGuildSettingsUpdateEvent {
-                settings: try!(UserGuildSettings::decode(Value::Object(value))),
+                settings: UserGuildSettings::decode(Value::Object(value))?,
             }))
         } else if kind == "USER_NOTE_UPDATE" {
             Ok(Event::UserNoteUpdate(UserNoteUpdateEvent {
-                note: try!(remove(&mut value, "note").and_then(into_string)),
-                user_id: try!(remove(&mut value, "id").and_then(UserId::decode)),
+                note: remove(&mut value, "note").and_then(into_string)?,
+                user_id: remove(&mut value, "id").and_then(UserId::decode)?,
             }))
         } else if kind == "USER_SETTINGS_UPDATE" {
             Ok(Event::UserSettingsUpdate(UserSettingsUpdateEvent {
                 enable_tts_command: remove(&mut value, "enable_tts_command").ok().and_then(|v| v.as_bool()),
                 inline_attachment_media: remove(&mut value, "inline_attachment_media").ok().and_then(|v| v.as_bool()),
                 inline_embed_media: remove(&mut value, "inline_embed_media").ok().and_then(|v| v.as_bool()),
-                locale: try!(opt(&mut value, "locale", into_string)),
+                locale: opt(&mut value, "locale", into_string)?,
                 message_display_compact: remove(&mut value, "message_display_compact").ok().and_then(|v| v.as_bool()),
                 render_embeds: remove(&mut value, "render_embeds").ok().and_then(|v| v.as_bool()),
                 show_current_game: remove(&mut value, "show_current_game").ok().and_then(|v| v.as_bool()),
-                theme: try!(opt(&mut value, "theme", into_string)),
+                theme: opt(&mut value, "theme", into_string)?,
                 convert_emoticons: remove(&mut value, "convert_emoticons").ok().and_then(|v| v.as_bool()),
-                friend_source_flags: try!(opt(&mut value, "friend_source_flags", FriendSourceFlags::decode)),
+                friend_source_flags: opt(&mut value, "friend_source_flags", FriendSourceFlags::decode)?,
             }))
         } else if kind == "USER_UPDATE" {
             Ok(Event::UserUpdate(UserUpdateEvent {
-                current_user: try!(CurrentUser::decode(Value::Object(value))),
+                current_user: CurrentUser::decode(Value::Object(value))?,
             }))
         } else if kind == "VOICE_SERVER_UPDATE" {
             Ok(Event::VoiceServerUpdate(VoiceServerUpdateEvent {
-                guild_id: try!(opt(&mut value, "guild_id", GuildId::decode)),
-                channel_id: try!(opt(&mut value, "channel_id", ChannelId::decode)),
-                endpoint: try!(opt(&mut value, "endpoint", into_string)),
-                token: try!(remove(&mut value, "token").and_then(into_string)),
+                guild_id: opt(&mut value, "guild_id", GuildId::decode)?,
+                channel_id: opt(&mut value, "channel_id", ChannelId::decode)?,
+                endpoint: opt(&mut value, "endpoint", into_string)?,
+                token: remove(&mut value, "token").and_then(into_string)?,
             }))
         } else if kind == "VOICE_STATE_UPDATE" {
             Ok(Event::VoiceStateUpdate(VoiceStateUpdateEvent {
-                guild_id: try!(opt(&mut value, "guild_id", GuildId::decode)),
-                voice_state: try!(VoiceState::decode(Value::Object(value))),
+                guild_id: opt(&mut value, "guild_id", GuildId::decode)?,
+                voice_state: VoiceState::decode(Value::Object(value))?,
             }))
         } else if kind == "WEBHOOKS_UPDATE" {
             Ok(Event::WebhookUpdate(WebhookUpdateEvent {
-                channel_id: try!(remove(&mut value, "channel_id").and_then(ChannelId::decode)),
-                guild_id: try!(remove(&mut value, "guild_id").and_then(GuildId::decode)),
+                channel_id: remove(&mut value, "channel_id").and_then(ChannelId::decode)?,
+                guild_id: remove(&mut value, "guild_id").and_then(GuildId::decode)?,
             }))
         } else {
             Ok(Event::Unknown(UnknownEvent {
@@ -801,47 +801,47 @@ pub enum VoiceEvent {
 
 impl VoiceEvent {
     pub fn decode(value: Value) -> Result<VoiceEvent> {
-        let mut value = try!(into_map(value));
-        let op = req!(try!(remove(&mut value, "op")).as_u64());
-        let mut map = try!(remove(&mut value, "d").and_then(into_map));
+        let mut value = into_map(value)?;
+        let op = req!(remove(&mut value, "op")?.as_u64());
+        let mut map = remove(&mut value, "d").and_then(into_map)?;
 
-        let opcode = try!(VoiceOpCode::from_num(op)
-            .ok_or(Error::Client(ClientError::InvalidOpCode)));
+        let opcode = VoiceOpCode::from_num(op)
+            .ok_or(Error::Client(ClientError::InvalidOpCode))?;
 
         match opcode {
             VoiceOpCode::Heartbeat => {
                 Ok(VoiceEvent::Heartbeat(VoiceHeartbeat {
-                    heartbeat_interval: req!(try!(remove(&mut map, "heartbeat_interval")).as_u64()),
+                    heartbeat_interval: req!(remove(&mut map, "heartbeat_interval")?.as_u64()),
                 }))
             },
             VoiceOpCode::Hello => {
                 Ok(VoiceEvent::Hello(VoiceHello {
-                    heartbeat_interval: req!(try!(remove(&mut map, "heartbeat_interval"))
+                    heartbeat_interval: req!(remove(&mut map, "heartbeat_interval")?
                         .as_u64()),
-                    ip: try!(remove(&mut map, "ip").and_then(into_string)),
-                    modes: try!(decode_array(try!(remove(&mut map, "modes")),
-                                             into_string)),
-                    port: req!(try!(remove(&mut map, "port"))
+                    ip: remove(&mut map, "ip").and_then(into_string)?,
+                    modes: decode_array(remove(&mut map, "modes")?,
+                                             into_string)?,
+                    port: req!(remove(&mut map, "port")?
                         .as_u64()) as u16,
-                    ssrc: req!(try!(remove(&mut map, "ssrc"))
+                    ssrc: req!(remove(&mut map, "ssrc")?
                         .as_u64()) as u32,
                 }))
             },
             VoiceOpCode::KeepAlive => Ok(VoiceEvent::KeepAlive),
             VoiceOpCode::SessionDescription => {
                 Ok(VoiceEvent::Ready(VoiceReady {
-                    mode: try!(remove(&mut map, "mode")
-                        .and_then(into_string)),
-                    secret_key: try!(decode_array(try!(remove(&mut map, "secret_key")),
+                    mode: remove(&mut map, "mode")
+                        .and_then(into_string)?,
+                    secret_key: decode_array(remove(&mut map, "secret_key")?,
                         |v| Ok(req!(v.as_u64()) as u8)
-                    )),
+                    )?,
                 }))
             },
             VoiceOpCode::Speaking => {
                 Ok(VoiceEvent::Speaking(VoiceSpeaking {
-                    speaking: req!(try!(remove(&mut map, "speaking")).as_bool()),
-                    ssrc: req!(try!(remove(&mut map, "ssrc")).as_u64()) as u32,
-                    user_id: try!(remove(&mut map, "user_id").and_then(UserId::decode)),
+                    speaking: req!(remove(&mut map, "speaking")?.as_bool()),
+                    ssrc: req!(remove(&mut map, "ssrc")?.as_u64()) as u32,
+                    user_id: remove(&mut map, "user_id").and_then(UserId::decode)?,
                 }))
             }
             other => Ok(VoiceEvent::Unknown(other, Value::Object(map))),

@@ -63,21 +63,19 @@ pub struct Connection {
 
 impl Connection {
     pub fn new(mut info: ConnectionInfo) -> Result<Connection> {
-        let url = try!(generate_url(&mut info.endpoint));
+        let url = generate_url(&mut info.endpoint)?;
 
-        let response = try!(try!(WsClient::connect(url)).send());
-        try!(response.validate());
+        let response = WsClient::connect(url)?.send()?;
+        response.validate()?;
         let (mut sender, mut receiver) = response.begin().split();
 
-        try!(sender.send_json(&payload::build_identify(&info)));
+        sender.send_json(&payload::build_identify(&info))?;
 
         let hello = {
             let hello;
 
             loop {
-                let k = receiver.recv_json(VoiceEvent::decode);
-
-                match try!(k) {
+                match receiver.recv_json(VoiceEvent::decode)? {
                     VoiceEvent::Hello(received_hello) => {
                         hello = received_hello;
 
@@ -100,10 +98,10 @@ impl Connection {
             return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
         }
 
-        let destination = try!(try!((&info.endpoint[..], hello.port)
-            .to_socket_addrs())
+        let destination = (&info.endpoint[..], hello.port)
+            .to_socket_addrs()?
             .next()
-            .ok_or(Error::Voice(VoiceError::HostnameResolve)));
+            .ok_or(Error::Voice(VoiceError::HostnameResolve))?;
 
         // Important to note here: the length of the packet can be of either 4
         // or 70 bytes. If it is 4 bytes, then we need to send a 70-byte packet
@@ -113,37 +111,37 @@ impl Connection {
         //
         // The returned packet will be a null-terminated string of the IP, and
         // the port encoded in LE in the last two bytes of the packet.
-        let udp = try!(UdpSocket::bind("0.0.0.0:0"));
+        let udp = UdpSocket::bind("0.0.0.0:0")?;
 
         {
             let mut bytes = [0; 70];
 
-            try!((&mut bytes[..]).write_u32::<BigEndian>(hello.ssrc));
-            try!(udp.send_to(&bytes, destination));
+            (&mut bytes[..]).write_u32::<BigEndian>(hello.ssrc)?;
+            udp.send_to(&bytes, destination)?;
 
             let mut bytes = [0; 256];
-            let (len, _addr) = try!(udp.recv_from(&mut bytes));
+            let (len, _addr) = udp.recv_from(&mut bytes)?;
 
             // Find the position in the bytes that contains the first byte of 0,
             // indicating the "end of the address".
-            let index = try!(bytes.iter().skip(4).position(|&x| x == 0)
-                .ok_or(Error::Voice(VoiceError::FindingByte)));
+            let index = bytes.iter().skip(4).position(|&x| x == 0)
+                .ok_or(Error::Voice(VoiceError::FindingByte))?;
 
             let pos = 4 + index;
             let addr = String::from_utf8_lossy(&bytes[4..pos]);
             let port_pos = len - 2;
-            let port = try!((&bytes[port_pos..]).read_u16::<LittleEndian>());
+            let port = (&bytes[port_pos..]).read_u16::<LittleEndian>()?;
 
-            try!(sender.send_json(&payload::build_select_protocol(addr, port)));
+            sender.send_json(&payload::build_select_protocol(addr, port))?;
         }
 
-        let key = try!(get_encryption_key(&mut receiver));
+        let key = get_encryption_key(&mut receiver)?;
 
-        let thread_items = try!(start_threads(receiver, &udp));
+        let thread_items = start_threads(receiver, &udp)?;
 
         info!("[Voice] Connected to: {}", info.endpoint);
 
-        let encoder = try!(OpusEncoder::new(SAMPLE_RATE, Channels::Mono, CodingMode::Audio));
+        let encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Mono, CodingMode::Audio)?;
 
         Ok(Connection {
             audio_timer: Timer::new(1000 * 60 * 4),
@@ -179,21 +177,21 @@ impl Connection {
                 match status {
                     ReceiverStatus::Udp(packet) => {
                         let mut handle = &packet[2..];
-                        let seq = try!(handle.read_u16::<BigEndian>());
-                        let timestamp = try!(handle.read_u32::<BigEndian>());
-                        let ssrc = try!(handle.read_u32::<BigEndian>());
+                        let seq = handle.read_u16::<BigEndian>()?;
+                        let timestamp = handle.read_u32::<BigEndian>()?;
+                        let ssrc = handle.read_u32::<BigEndian>()?;
 
                         nonce.0[..HEADER_LEN].clone_from_slice(&packet[..HEADER_LEN]);
 
                         if let Ok(decrypted) = secretbox::open(&packet[HEADER_LEN..], &nonce, &self.key) {
-                            let channels = try!(opus_packet::get_nb_channels(&decrypted));
+                            let channels = opus_packet::get_nb_channels(&decrypted)?;
 
                             let entry = self.decoder_map.entry((ssrc, channels))
                                 .or_insert_with(|| OpusDecoder::new(SAMPLE_RATE,
                                                                     channels)
                                                     .unwrap());
 
-                            let len = try!(entry.decode(&decrypted, &mut buffer, false));
+                            let len = entry.decode(&decrypted, &mut buffer, false)?;
 
                             let is_stereo = channels == Channels::Stereo;
 
@@ -227,20 +225,20 @@ impl Connection {
 
         // Send the voice websocket keepalive if it's time
         if self.keepalive_timer.check() {
-            try!(self.sender.send_json(&payload::build_keepalive()));
+            self.sender.send_json(&payload::build_keepalive())?;
         }
 
         // Send UDP keepalive if it's time
         if self.audio_timer.check() {
             let mut bytes = [0; 4];
-            try!((&mut bytes[..]).write_u32::<BigEndian>(self.ssrc));
-            try!(self.udp.send_to(&bytes, self.destination));
+            (&mut bytes[..]).write_u32::<BigEndian>(self.ssrc)?;
+            self.udp.send_to(&bytes, self.destination)?;
         }
 
-        let len = try!(self.read(source, &mut buffer));
+        let len = self.read(source, &mut buffer)?;
 
         if len == 0 {
-            try!(self.set_speaking(false));
+            self.set_speaking(false)?;
 
             if self.silence_frames > 0 {
                 self.silence_frames -= 1;
@@ -261,11 +259,11 @@ impl Connection {
             }
         }
 
-        try!(self.set_speaking(true));
-        let index = try!(self.prep_packet(&mut packet, buffer, nonce));
+        self.set_speaking(true)?;
+        let index = self.prep_packet(&mut packet, buffer, nonce)?;
 
         audio_timer.await();
-        try!(self.udp.send_to(&packet[..index], self.destination));
+        self.udp.send_to(&packet[..index], self.destination)?;
         self.audio_timer.reset();
 
         Ok(())
@@ -278,10 +276,10 @@ impl Connection {
                    -> Result<usize> {
         {
             let mut cursor = &mut packet[..HEADER_LEN];
-            try!(cursor.write_all(&[0x80, 0x78]));
-            try!(cursor.write_u16::<BigEndian>(self.sequence));
-            try!(cursor.write_u32::<BigEndian>(self.timestamp));
-            try!(cursor.write_u32::<BigEndian>(self.ssrc));
+            cursor.write_all(&[0x80, 0x78])?;
+            cursor.write_u16::<BigEndian>(self.sequence)?;
+            cursor.write_u32::<BigEndian>(self.timestamp)?;
+            cursor.write_u32::<BigEndian>(self.ssrc)?;
         }
 
         nonce.0[..HEADER_LEN].clone_from_slice(&packet[..HEADER_LEN]);
@@ -293,8 +291,8 @@ impl Connection {
             960
         };
 
-        let len = try!(self.encoder.encode(&buffer[..buffer_len],
-                                           &mut packet[HEADER_LEN..sl_index]));
+        let len = self.encoder.encode(&buffer[..buffer_len],
+                                           &mut packet[HEADER_LEN..sl_index])?;
         let crypted = {
             let slice = &packet[HEADER_LEN..HEADER_LEN + len];
             secretbox::seal(slice, &nonce, &self.key)
@@ -324,9 +322,9 @@ impl Connection {
                     } else {
                         Channels::Mono
                     };
-                    self.encoder = try!(OpusEncoder::new(SAMPLE_RATE,
+                    self.encoder = OpusEncoder::new(SAMPLE_RATE,
                                                          channels,
-                                                         CodingMode::Audio));
+                                                         CodingMode::Audio)?;
                     self.encoder_stereo = is_stereo;
                 }
 
@@ -390,7 +388,7 @@ fn generate_url(endpoint: &mut String) -> Result<WebsocketUrl> {
 fn get_encryption_key(receiver: &mut WsReceiver<WebSocketStream>)
     -> Result<Key> {
     loop {
-        match try!(receiver.recv_json(VoiceEvent::decode)) {
+        match receiver.recv_json(VoiceEvent::decode)? {
             VoiceEvent::Ready(ready) => {
                 if ready.mode != CRYPTO_MODE {
                     return Err(Error::Voice(VoiceError::VoiceModeInvalid));
@@ -425,9 +423,9 @@ fn start_threads(mut receiver: WsReceiver<WebSocketStream>, udp: &UdpSocket)
 
     let (tx, rx) = mpsc::channel();
     let tx_clone = tx.clone();
-    let udp_clone = try!(udp.try_clone());
+    let udp_clone = udp.try_clone()?;
 
-    let udp_thread = try!(ThreadBuilder::new()
+    let udp_thread = ThreadBuilder::new()
         .name(format!("{} UDP", thread_name))
         .spawn(move || {
             let _ = udp_clone.set_read_timeout(Some(Duration::from_millis(250)));
@@ -446,9 +444,9 @@ fn start_threads(mut receiver: WsReceiver<WebSocketStream>, udp: &UdpSocket)
                     return;
                 }
             }
-        }));
+        })?;
 
-    let ws_thread = try!(ThreadBuilder::new()
+    let ws_thread = ThreadBuilder::new()
         .name(format!("{} WS", thread_name))
         .spawn(move || {
             loop {
@@ -464,7 +462,7 @@ fn start_threads(mut receiver: WsReceiver<WebSocketStream>, udp: &UdpSocket)
 
                 thread::sleep(Duration::from_millis(25));
             }
-        }));
+        })?;
 
     Ok(ThreadItems {
         rx: rx,

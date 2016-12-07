@@ -102,17 +102,17 @@ impl Shard {
                shard_info: Option<[u8; 2]>,
                login_type: LoginType)
                -> Result<(Shard, ReadyEvent, Receiver<WebSocketStream>)> {
-        let url = try!(prep::build_gateway_url(base_url));
+        let url = prep::build_gateway_url(base_url)?;
 
-        let response = try!(try!(WsClient::connect(url)).send());
-        try!(response.validate());
+        let response = WsClient::connect(url)?.send()?;
+        response.validate()?;
 
         let (mut sender, mut receiver) = response.begin().split();
 
         let identification = prep::identify(token, shard_info);
-        try!(sender.send_json(&identification));
+        sender.send_json(&identification)?;
 
-        let heartbeat_interval = match try!(receiver.recv_json(GatewayEvent::decode)) {
+        let heartbeat_interval = match receiver.recv_json(GatewayEvent::decode)? {
             GatewayEvent::Hello(interval) => interval,
             other => {
                 debug!("Unexpected event during connection start: {:?}", other);
@@ -128,16 +128,16 @@ impl Shard {
                                   info[1] - 1),
             None => "serenity keepalive [unsharded]".to_owned(),
         };
-        try!(ThreadBuilder::new()
+        ThreadBuilder::new()
             .name(thread_name)
-            .spawn(move || prep::keepalive(heartbeat_interval, sender, rx)));
+            .spawn(move || prep::keepalive(heartbeat_interval, sender, rx))?;
 
         // Parse READY
-        let event = try!(receiver.recv_json(GatewayEvent::decode));
-        let (ready, sequence) = try!(prep::parse_ready(event,
+        let event = receiver.recv_json(GatewayEvent::decode)?;
+        let (ready, sequence) = prep::parse_ready(event,
                                                        &tx,
                                                        &mut receiver,
-                                                       identification));
+                                                       identification)?;
 
         Ok((feature_voice! {{
             Shard {
@@ -356,11 +356,11 @@ impl Shard {
             let mut sender = Sender::new(stream.by_ref(), true);
             let message = WsMessage::close_because(1000, "");
 
-            try!(sender.send_message(&message));
+            sender.send_message(&message)?;
         }
 
-        try!(stream.flush());
-        try!(stream.shutdown(Shutdown::Both));
+        stream.flush()?;
+        stream.shutdown(Shutdown::Both)?;
 
         Ok(())
     }
@@ -434,7 +434,7 @@ impl Shard {
 
         // Take a few attempts at reconnecting.
         for i in 1u64..11u64 {
-            let gateway_url = try!(rest::get_gateway()).url;
+            let gateway_url = rest::get_gateway()?.url;
 
             let shard = Shard::new(&gateway_url,
                                    &self.token,
@@ -442,7 +442,7 @@ impl Shard {
                                    self.login_type);
 
             if let Ok((shard, ready, receiver_new)) = shard {
-                try!(mem::replace(self, shard).shutdown(&mut receiver));
+                mem::replace(self, shard).shutdown(&mut receiver)?;
 
                 self.session_id = Some(ready.ready.session_id.clone());
 
@@ -459,27 +459,27 @@ impl Shard {
 
     fn resume(&mut self, session_id: String, receiver: &mut Receiver<WebSocketStream>)
         -> Result<(Event, Receiver<WebSocketStream>)> {
-        try!(receiver.get_mut().get_mut().shutdown(Shutdown::Both));
-        let url = try!(prep::build_gateway_url(&self.ws_url));
+        receiver.get_mut().get_mut().shutdown(Shutdown::Both)?;
+        let url = prep::build_gateway_url(&self.ws_url)?;
 
-        let response = try!(try!(WsClient::connect(url)).send());
-        try!(response.validate());
+        let response = WsClient::connect(url)?.send()?;
+        response.validate()?;
 
         let (mut sender, mut receiver) = response.begin().split();
 
-        try!(sender.send_json(&ObjectBuilder::new()
+        sender.send_json(&ObjectBuilder::new()
             .insert_object("d", |o| o
                 .insert("session_id", session_id)
                 .insert("seq", self.last_sequence)
                 .insert("token", &self.token)
             )
             .insert("op", OpCode::Resume.num())
-            .build()));
+            .build())?;
 
         let first_event;
 
         loop {
-            match try!(receiver.recv_json(GatewayEvent::decode)) {
+            match receiver.recv_json(GatewayEvent::decode)? {
                 GatewayEvent::Dispatch(seq, event) => {
                     if let Event::Ready(ref event) = event {
                         self.session_id = Some(event.ready.session_id.clone());
@@ -491,7 +491,7 @@ impl Shard {
                     break;
                 },
                 GatewayEvent::InvalidateSession => {
-                    try!(sender.send_json(&prep::identify(&self.token, self.shard_info)));
+                    sender.send_json(&prep::identify(&self.token, self.shard_info))?;
                 },
                 other => {
                     debug!("Unexpected event: {:?}", other);

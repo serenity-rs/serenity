@@ -34,7 +34,7 @@ pub fn parse_ready(event: GatewayEvent,
 
             let _ = tx.send(GatewayStatus::SendMessage(identification));
 
-            match try!(receiver.recv_json(GatewayEvent::decode)) {
+            match receiver.recv_json(GatewayEvent::decode)? {
                 GatewayEvent::Dispatch(seq, Event::Ready(event)) => {
                     Ok((event, seq))
                 },

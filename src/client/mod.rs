@@ -279,7 +279,7 @@ impl Client {
     ///
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start_autosharded(&mut self) -> Result<()> {
-        let res = try!(rest::get_bot_gateway());
+        let res = rest::get_bot_gateway()?;
 
         self.start_connection(Some([0, res.shards as u8 - 1, res.shards as u8]))
     }
@@ -768,7 +768,7 @@ impl Client {
     //
     // Not all shards need to be initialized in this process.
     fn start_connection(&mut self, shard_data: Option<[u8; 3]>) -> Result<()> {
-        let gateway_url = try!(rest::get_gateway()).url;
+        let gateway_url = rest::get_gateway()?.url;
 
         for i in 0..shard_data.map_or(1, |x| x[1] + 1) {
             let shard = Shard::new(&gateway_url,

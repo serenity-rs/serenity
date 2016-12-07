@@ -19,7 +19,7 @@ pub trait SenderExt {
 
 impl ReceiverExt for Receiver<WebSocketStream> {
     fn recv_json<F, T>(&mut self, decode: F) -> Result<T> where F: FnOnce(Value) -> Result<T> {
-        let message: WsMessage = try!(self.recv_message());
+        let message: WsMessage = self.recv_message()?;
 
         if message.opcode == WsType::Close {
             let r = String::from_utf8_lossy(&message.payload).into_owned();
@@ -27,9 +27,9 @@ impl ReceiverExt for Receiver<WebSocketStream> {
             Err(Error::Gateway(GatewayError::Closed(message.cd_status_code, r)))
         } else if message.opcode == WsType::Binary || message.opcode == WsType::Text {
             let json: Value = if message.opcode == WsType::Binary {
-                try!(serde_json::from_reader(ZlibDecoder::new(&message.payload[..])))
+                serde_json::from_reader(ZlibDecoder::new(&message.payload[..]))?
             } else {
-                try!(serde_json::from_reader(&message.payload[..]))
+                serde_json::from_reader(&message.payload[..])?
             };
 
             match decode(json) {

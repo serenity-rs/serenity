@@ -112,10 +112,10 @@ impl fmt::Display for Emoji {
     ///
     /// This is in the format of: `<:NAME:EMOJI_ID>`.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        try!(f.write_str("<:"));
-        try!(f.write_str(&self.name));
-        try!(fmt::Write::write_char(f, ':'));
-        try!(fmt::Display::fmt(&self.id, f));
+        f.write_str("<:")?;
+        f.write_str(&self.name)?;
+        fmt::Write::write_char(f, ':')?;
+        fmt::Display::fmt(&self.id, f)?;
         fmt::Write::write_char(f, '>')
     }
 }
@@ -222,7 +222,7 @@ impl Guild {
         feature_cache_enabled! {{
             let req = permissions::BAN_MEMBERS;
 
-            if !try!(self.has_perms(req)) {
+            if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -247,7 +247,7 @@ impl Guild {
         feature_cache_enabled! {{
             let req = permissions::BAN_MEMBERS;
 
-            if !try!(self.has_perms(req)) {
+            if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -283,7 +283,7 @@ impl Guild {
         feature_cache_enabled! {{
             let req = permissions::MANAGE_CHANNELS;
 
-            if !try!(self.has_perms(req)) {
+            if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -317,12 +317,12 @@ impl Guild {
         feature_cache_enabled! {{
             let req = permissions::MANAGE_ROLES;
 
-            if !try!(self.has_perms(req)) {
+            if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
 
-        let role = try!(rest::create_role(self.id.0));
+        let role = rest::create_role(self.id.0)?;
         let map = f(EditRole::new(&role)).0.build();
 
         rest::edit_role(self.id.0, role.id.0, map)
@@ -330,15 +330,15 @@ impl Guild {
 
     #[doc(hidden)]
     pub fn decode(value: Value) -> Result<Guild> {
-        let mut map = try!(into_map(value));
+        let mut map = into_map(value)?;
 
-        let id = try!(remove(&mut map, "id").and_then(GuildId::decode));
+        let id = remove(&mut map, "id").and_then(GuildId::decode)?;
 
         let public_channels = {
             let mut public_channels = HashMap::new();
 
-            let vals = try!(decode_array(try!(remove(&mut map, "channels")),
-                |v| GuildChannel::decode_guild(v, id)));
+            let vals = decode_array(remove(&mut map, "channels")?,
+                |v| GuildChannel::decode_guild(v, id))?;
 
             for public_channel in vals {
                 public_channels.insert(public_channel.id, public_channel);
@@ -348,27 +348,27 @@ impl Guild {
         };
 
         Ok(Guild {
-            afk_channel_id: try!(opt(&mut map, "afk_channel_id", ChannelId::decode)),
-            afk_timeout: req!(try!(remove(&mut map, "afk_timeout")).as_u64()),
+            afk_channel_id: opt(&mut map, "afk_channel_id", ChannelId::decode)?,
+            afk_timeout: req!(remove(&mut map, "afk_timeout")?.as_u64()),
             channels: public_channels,
-            default_message_notifications: req!(try!(remove(&mut map, "default_message_notifications")).as_u64()),
-            emojis: try!(remove(&mut map, "emojis").and_then(decode_emojis)),
-            features: try!(remove(&mut map, "features").and_then(|v| decode_array(v, Feature::decode_str))),
-            icon: try!(opt(&mut map, "icon", into_string)),
+            default_message_notifications: req!(remove(&mut map, "default_message_notifications")?.as_u64()),
+            emojis: remove(&mut map, "emojis").and_then(decode_emojis)?,
+            features: remove(&mut map, "features").and_then(|v| decode_array(v, Feature::decode_str))?,
+            icon: opt(&mut map, "icon", into_string)?,
             id: id,
-            joined_at: try!(remove(&mut map, "joined_at").and_then(into_string)),
-            large: req!(try!(remove(&mut map, "large")).as_bool()),
-            member_count: req!(try!(remove(&mut map, "member_count")).as_u64()),
-            members: try!(remove(&mut map, "members").and_then(decode_members)),
-            mfa_level: req!(try!(remove(&mut map, "mfa_level")).as_u64()),
-            name: try!(remove(&mut map, "name").and_then(into_string)),
-            owner_id: try!(remove(&mut map, "owner_id").and_then(UserId::decode)),
-            presences: try!(remove(&mut map, "presences").and_then(decode_presences)),
-            region: try!(remove(&mut map, "region").and_then(into_string)),
-            roles: try!(remove(&mut map, "roles").and_then(decode_roles)),
-            splash: try!(opt(&mut map, "splash", into_string)),
-            verification_level: try!(remove(&mut map, "verification_level").and_then(VerificationLevel::decode)),
-            voice_states: try!(remove(&mut map, "voice_states").and_then(decode_voice_states)),
+            joined_at: remove(&mut map, "joined_at").and_then(into_string)?,
+            large: req!(remove(&mut map, "large")?.as_bool()),
+            member_count: req!(remove(&mut map, "member_count")?.as_u64()),
+            members: remove(&mut map, "members").and_then(decode_members)?,
+            mfa_level: req!(remove(&mut map, "mfa_level")?.as_u64()),
+            name: remove(&mut map, "name").and_then(into_string)?,
+            owner_id: remove(&mut map, "owner_id").and_then(UserId::decode)?,
+            presences: remove(&mut map, "presences").and_then(decode_presences)?,
+            region: remove(&mut map, "region").and_then(into_string)?,
+            roles: remove(&mut map, "roles").and_then(decode_roles)?,
+            splash: opt(&mut map, "splash", into_string)?,
+            verification_level: remove(&mut map, "verification_level").and_then(VerificationLevel::decode)?,
+            voice_states: remove(&mut map, "voice_states").and_then(decode_voice_states)?,
         })
     }
 
@@ -417,7 +417,7 @@ impl Guild {
         feature_cache_enabled! {{
             let req = permissions::MANAGE_GUILD;
 
-            if !try!(self.has_perms(req)) {
+            if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -465,7 +465,7 @@ impl Guild {
         feature_cache_enabled! {{
             let req = permissions::CHANGE_NICKNAME;
 
-            if !try!(self.has_perms(req)) {
+            if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -497,7 +497,7 @@ impl Guild {
         feature_cache_enabled! {{
             let req = permissions::MANAGE_GUILD;
 
-            if !try!(self.has_perms(req)) {
+            if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -701,7 +701,7 @@ impl Guild {
         feature_cache_enabled! {{
             let req = permissions::KICK_MEMBERS;
 
-            if !try!(self.has_perms(req)) {
+            if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -733,7 +733,7 @@ impl Guild {
         feature_cache_enabled! {{
             let req = permissions::KICK_MEMBERS;
 
-            if !try!(self.has_perms(req)) {
+            if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -762,7 +762,7 @@ impl Guild {
         feature_cache_enabled! {{
             let req = permissions::BAN_MEMBERS;
 
-            if !try!(self.has_perms(req)) {
+            if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -798,7 +798,7 @@ impl Member {
             return Ok(());
         }
 
-        let guild_id = try!(self.find_guild());
+        let guild_id = self.find_guild()?;
 
         match rest::add_member_role(guild_id.0, self.user.id.0, role_id.0) {
             Ok(()) => {
@@ -819,7 +819,7 @@ impl Member {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn add_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
-        let guild_id = try!(self.find_guild());
+        let guild_id = self.find_guild()?;
         self.roles.extend_from_slice(role_ids);
 
         let map = EditMember::default().roles(&self.roles).0.build();
@@ -842,7 +842,7 @@ impl Member {
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn ban(&self, delete_message_days: u8) -> Result<()> {
-        let guild_id = try!(self.find_guild());
+        let guild_id = self.find_guild()?;
 
         rest::ban_user(guild_id.0,
                        self.user.id.0,
@@ -892,7 +892,7 @@ impl Member {
     #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn edit<F>(&self, f: F) -> Result<()>
         where F: FnOnce(EditMember) -> EditMember {
-        let guild_id = try!(self.find_guild());
+        let guild_id = self.find_guild()?;
         let map = f(EditMember::default()).0.build();
 
         rest::edit_member(guild_id.0, self.user.id.0, map)
@@ -936,7 +936,7 @@ impl Member {
             return Ok(());
         }
 
-        let guild_id = try!(self.find_guild());
+        let guild_id = self.find_guild()?;
 
         match rest::remove_member_role(guild_id.0, self.user.id.0, role_id.0) {
             Ok(()) => {
@@ -956,7 +956,7 @@ impl Member {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn remove_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
-        let guild_id = try!(self.find_guild());
+        let guild_id = self.find_guild()?;
         self.roles.retain(|r| !role_ids.contains(r));
 
         let map = EditMember::default().roles(&self.roles).0.build();
@@ -1011,7 +1011,7 @@ impl fmt::Display for Member {
 impl PossibleGuild<Guild> {
     #[doc(hidden)]
     pub fn decode(value: Value) -> Result<Self> {
-        let mut value = try!(into_map(value));
+        let mut value = into_map(value)?;
         if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
             remove(&mut value, "id").and_then(GuildId::decode).map(PossibleGuild::Offline)
         } else {
@@ -1033,7 +1033,7 @@ impl PossibleGuild<Guild> {
 impl PossibleGuild<PartialGuild> {
     #[doc(hidden)]
     pub fn decode(value: Value) -> Result<Self> {
-        let mut value = try!(into_map(value));
+        let mut value = into_map(value)?;
         if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
             remove(&mut value, "id").and_then(GuildId::decode).map(PossibleGuild::Offline)
         } else {
@@ -1060,7 +1060,7 @@ impl Role {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn delete(&self) -> Result<()> {
-        let guild_id = try!(self.find_guild());
+        let guild_id = self.find_guild()?;
 
         rest::delete_role(guild_id.0, self.id.0)
     }

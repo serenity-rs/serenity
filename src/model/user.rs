@@ -133,14 +133,14 @@ impl User {
                     .insert("recipient_id", self.id.0)
                     .build();
 
-                try!(rest::create_private_channel(map)).id
+                rest::create_private_channel(map)?.id
             }
         } else {
             let map = ObjectBuilder::new()
                 .insert("recipient_id", self.id.0)
                 .build();
 
-            try!(rest::create_private_channel(map)).id
+            rest::create_private_channel(map)?.id
         }};
 
         let map = ObjectBuilder::new()
@@ -210,24 +210,24 @@ impl fmt::Display for User {
 impl UserSettings {
     #[doc(hidden)]
     pub fn decode(value: Value) -> Result<Option<UserSettings>> {
-        let mut map = try!(into_map(value));
+        let mut map = into_map(value)?;
 
         if map.is_empty() {
             return Ok(None);
         }
 
         Ok(UserSettings {
-            convert_emoticons: req!(try!(remove(&mut map, "convert_emoticons")).as_bool()),
-            enable_tts_command: req!(try!(remove(&mut map, "enable_tts_command")).as_bool()),
-            friend_source_flags: try!(remove(&mut map, "friend_source_flags").and_then(FriendSourceFlags::decode)),
-            inline_attachment_media: req!(try!(remove(&mut map, "inline_attachment_media")).as_bool()),
-            inline_embed_media: req!(try!(remove(&mut map, "inline_embed_media")).as_bool()),
-            locale: try!(remove(&mut map, "locale").and_then(into_string)),
-            message_display_compact: req!(try!(remove(&mut map, "message_display_compact")).as_bool()),
-            render_embeds: req!(try!(remove(&mut map, "render_embeds")).as_bool()),
-            restricted_guilds: try!(remove(&mut map, "restricted_guilds").and_then(|v| decode_array(v, GuildId::decode))),
-            show_current_game: req!(try!(remove(&mut map, "show_current_game")).as_bool()),
-            theme: try!(remove(&mut map, "theme").and_then(into_string)),
+            convert_emoticons: req!(remove(&mut map, "convert_emoticons")?.as_bool()),
+            enable_tts_command: req!(remove(&mut map, "enable_tts_command")?.as_bool()),
+            friend_source_flags: remove(&mut map, "friend_source_flags").and_then(FriendSourceFlags::decode)?,
+            inline_attachment_media: req!(remove(&mut map, "inline_attachment_media")?.as_bool()),
+            inline_embed_media: req!(remove(&mut map, "inline_embed_media")?.as_bool()),
+            locale: remove(&mut map, "locale").and_then(into_string)?,
+            message_display_compact: req!(remove(&mut map, "message_display_compact")?.as_bool()),
+            render_embeds: req!(remove(&mut map, "render_embeds")?.as_bool()),
+            restricted_guilds: remove(&mut map, "restricted_guilds").and_then(|v| decode_array(v, GuildId::decode))?,
+            show_current_game: req!(remove(&mut map, "show_current_game")?.as_bool()),
+            theme: remove(&mut map, "theme").and_then(into_string)?,
         }).map(Some)
     }
 }

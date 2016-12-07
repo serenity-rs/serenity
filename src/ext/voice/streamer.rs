@@ -60,14 +60,14 @@ pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Box<AudioSource>> {
         "-",
     ];
 
-    let command = try!(Command::new("ffmpeg")
+    let command = Command::new("ffmpeg")
         .arg("-i")
         .arg(path)
         .args(&args)
         .stderr(Stdio::null())
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
-        .spawn());
+        .spawn()?;
 
     Ok(pcm(is_stereo, ChildContainer(command)))
 }
@@ -87,16 +87,16 @@ pub fn ytdl(uri: &str) -> Result<Box<AudioSource>> {
         uri,
     ];
 
-    let out = try!(Command::new("youtube-dl")
+    let out = Command::new("youtube-dl")
         .args(&args)
         .stdin(Stdio::null())
-        .output());
+        .output()?;
 
     if !out.status.success() {
         return Err(Error::Voice(VoiceError::YouTubeDLRun(out)));
     }
 
-    let value = try!(serde_json::from_reader(&out.stdout[..]));
+    let value = serde_json::from_reader(&out.stdout[..])?;
     let mut obj = match value {
         Value::Object(obj) => obj,
         other => return Err(Error::Voice(VoiceError::YouTubeDLProcessing(other))),
@@ -123,18 +123,18 @@ fn is_stereo(path: &OsStr) -> Result<bool> {
         "-i",
     ];
 
-    let out = try!(Command::new("ffprobe")
+    let out = Command::new("ffprobe")
         .args(&args)
         .arg(path)
         .stdin(Stdio::null())
-        .output());
+        .output()?;
 
-    let value: Value = try!(serde_json::from_reader(&out.stdout[..]));
+    let value: Value = serde_json::from_reader(&out.stdout[..])?;
 
-    let streams = try!(value.as_object()
+    let streams = value.as_object()
         .and_then(|m| m.get("streams"))
         .and_then(|v| v.as_array())
-        .ok_or(Error::Voice(VoiceError::Streams)));
+        .ok_or(Error::Voice(VoiceError::Streams))?;
 
     let check = streams.iter()
         .any(|stream| {
