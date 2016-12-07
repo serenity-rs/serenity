@@ -121,9 +121,9 @@ pub fn parse_channel(mention: &str) -> Option<u64> {
         return None;
     }
 
-    if mention.starts_with("<@#") {
+    if mention.starts_with("<#") {
         let len = mention.len() - 1;
-        mention[3..len].parse::<u64>().ok()
+        mention[2..len].parse::<u64>().ok()
     } else {
         None
     }

@@ -1,6 +1,5 @@
 extern crate serenity;
 
-use serenity::model::{UserId, ChannelId, RoleId, EmojiIdentifier};
 use serenity::utils::*;
 
 #[test]
@@ -27,8 +26,8 @@ fn channel_parser() {
 }
 
 #[test]
-fn channel_parser() {
-	let emoji = parse_channel("<:name:12345>").unwrap();
+fn emoji_parser() {
+	let emoji = parse_emoji("<:name:12345>").unwrap();
 	assert_eq!(emoji.name, "name");
 	assert_eq!(emoji.id, 12345);
 }
