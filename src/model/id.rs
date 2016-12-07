@@ -172,6 +172,14 @@ impl RoleId {
     }
 }
 
+impl UserId {
+    /// Search the cache for the channel with the Id.
+    #[cfg(all(feature = "cache", feature = "methods"))]
+    pub fn find(&self) -> Option<User> {
+        CACHE.read().unwrap().get_user(*self).map(|x| x.clone())
+    }
+}
+
 impl From<CurrentUser> for UserId {
     /// Gets the Id of a `CurrentUser` struct.
     fn from(current_user: CurrentUser) -> UserId {

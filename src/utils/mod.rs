@@ -18,6 +18,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 use ::internal::prelude::*;
+use ::model::{EmojiIdentifier, EmojiId};
 
 pub use self::message_builder::MessageBuilder;
 
@@ -80,6 +81,88 @@ pub fn parse_invite(code: &str) -> &str {
         &code[11..]
     } else {
         code
+    }
+}
+
+/// Retreives Id from a username mention.
+pub fn parse_username(mention: &str) -> Option<u64> {
+    if mention.len() < 4 {
+        return None;
+    }
+
+    if mention.starts_with("<@!") {
+        let len = mention.len() - 1;
+        mention[3..len].parse::<u64>().ok()
+    } else if mention.starts_with("<@") {
+        let len = mention.len() - 1;
+        mention[2..len].parse::<u64>().ok()
+    } else {
+        None
+    }
+}
+
+/// Retreives Id from a role mention.
+pub fn parse_role(mention: &str) -> Option<u64> {
+    if mention.len() < 4 {
+        return None;
+    }
+
+    if mention.starts_with("<@&") {
+        let len = mention.len() - 1;
+        mention[3..len].parse::<u64>().ok()
+    } else {
+        None
+    }
+}
+
+/// Retreives Id from a channel mention.
+pub fn parse_channel(mention: &str) -> Option<u64> {
+    if mention.len() < 4 {
+        return None;
+    }
+
+    if mention.starts_with("<#") {
+        let len = mention.len() - 1;
+        mention[2..len].parse::<u64>().ok()
+    } else {
+        None
+    }
+}
+
+/// Retreives name and Id from an emoji mention.
+pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
+    let len = mention.len();
+    if len < 6 || len > 56 {
+        return None;
+    }
+
+    if mention.starts_with("<:") {
+        let mut name = String::default();
+        let mut id = String::default();
+        for (i, x) in mention[2..].chars().enumerate() {
+            if x == ':' {
+                let from = i + 3;
+                for y in mention[from..].chars() {
+                    if y == '>' {
+                        break;
+                    } else {
+                        id.push(y);
+                    }
+                }
+                break;
+            } else {
+                name.push(x);
+            }
+        }
+        match id.parse::<u64>() {
+            Ok(x) => Some(EmojiIdentifier {
+                name: name,
+                id: EmojiId(x)
+            }),
+            _ => None
+        }
+    } else {
+        None
     }
 }
 
