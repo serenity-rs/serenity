@@ -415,7 +415,7 @@ impl Cache {
     /// the first server they are in.
     pub fn get_user<U>(&self, user_id: U) -> Option<&User>
         where U: Into<UserId> + Clone {
-        for (_, v) in &self.guilds {
+        for v in self.guilds.values() {
             match v.members.get(&user_id.clone().into()) {
                 Some(x) => { return Some(&x.user) }
                 None => {}
