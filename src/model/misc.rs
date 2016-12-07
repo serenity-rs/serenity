@@ -7,9 +7,14 @@ use super::{
     Role,
     UserId,
     User,
-    IncidentStatus
+    IncidentStatus,
+    EmojiIdentifier,
+    EmojiId
 };
 use ::internal::prelude::*;
+use std::str::FromStr;
+use std::result::Result as StdResult;
+use ::utils;
 
 /// Allows something - such as a channel or role - to be mentioned in a message.
 pub trait Mentionable {
@@ -71,6 +76,97 @@ impl Mentionable for UserId {
 impl Mentionable for User {
     fn mention(&self) -> String {
         format!("<@{}>", self.id.0)
+    }
+}
+
+#[cfg(feature = "cache")]
+impl FromStr for User {
+    type Err = ();
+    fn from_str(s: &str) -> StdResult<Self, ()> {
+        match utils::parse_username(s) {
+            Some(x) => {
+                match UserId(x as u64).find() {
+                    Some(user) => Ok(user),
+                    _ => Err(())
+                }
+            },
+            _ => Err(())
+        }
+    }
+}
+
+impl FromStr for UserId {
+    type Err = ();
+    fn from_str(s: &str) -> StdResult<Self, ()> {
+        match utils::parse_username(s) {
+            Some(x) => Ok(UserId(x)),
+            _ => Err(())
+        }
+    }
+}
+
+#[cfg(feature = "cache")]
+impl FromStr for Role {
+    type Err = ();
+    fn from_str(s: &str) -> StdResult<Self, ()> {
+        match utils::parse_role(s) {
+            Some(x) => {
+                match RoleId(x).find() {
+                    Some(user) => Ok(user),
+                    _ => Err(())
+                }
+            },
+            _ => Err(())
+        }
+    }
+}
+
+impl FromStr for RoleId {
+    type Err = ();
+    fn from_str(s: &str) -> StdResult<Self, ()> {
+        match utils::parse_role(s) {
+            Some(x) => Ok(RoleId(x)),
+            _ => Err(())
+        }
+    }
+}
+
+impl FromStr for EmojiIdentifier {
+    type Err = ();
+    fn from_str(s: &str) -> StdResult<Self, ()> {
+        match utils::parse_emoji(s) {
+            Some(x) => Ok(EmojiIdentifier {
+                id: EmojiId(x.1),
+                name: x.0
+            }),
+            _ => Err(())
+        }
+    }
+}
+
+impl FromStr for ChannelId {
+    type Err = ();
+    fn from_str(s: &str) -> StdResult<Self, ()> {
+        match utils::parse_channel(s) {
+            Some(x) => Ok(ChannelId(x)),
+            _ => Err(())
+        }
+    }
+}
+
+#[cfg(feature = "cache")]
+impl FromStr for Channel {
+    type Err = ();
+    fn from_str(s: &str) -> StdResult<Self, ()> {
+        match utils::parse_channel(s) {
+            Some(x) => {
+                match ChannelId(x).find() {
+                    Some(channel) => Ok(channel),
+                    _ => Err(())
+                }
+            },
+            _ => Err(())
+        }
     }
 }
 

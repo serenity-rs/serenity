@@ -411,6 +411,19 @@ impl Cache {
             })
     }
 
+    /// Retrieves a reference to a `User` based on appearance in
+    /// the first server they are in.
+    pub fn get_user<U>(&self, user_id: U) -> Option<&User>
+        where U: Into<UserId> + Clone {
+        for (_, v) in &self.guilds {
+            match v.members.get(&user_id.clone().into()) {
+                Some(x) => { return Some(&x.user) }
+                None => {}
+            }
+        }
+        None
+    }
+
     /// Retrieves a reference to a [`Guild`]'s role by their Ids.
     ///
     /// [`Guild`]: ../../model/struct.Guild.html
