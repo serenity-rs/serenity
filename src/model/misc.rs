@@ -97,10 +97,7 @@ impl FromStr for User {
 impl FromStr for UserId {
     type Err = ();
     fn from_str(s: &str) -> StdResult<Self, ()> {
-        match utils::parse_username(s) {
-            Some(x) => Ok(UserId(x)),
-            _ => Err(())
-        }
+        utils::parse_username(s).ok_or_else(|| ()).map(|x| UserId(x))
     }
 }
 
@@ -123,30 +120,21 @@ impl FromStr for Role {
 impl FromStr for RoleId {
     type Err = ();
     fn from_str(s: &str) -> StdResult<Self, ()> {
-        match utils::parse_role(s) {
-            Some(x) => Ok(RoleId(x)),
-            _ => Err(())
-        }
+        utils::parse_role(s).ok_or_else(|| ()).map(|x| RoleId(x))
     }
 }
 
 impl FromStr for EmojiIdentifier {
     type Err = ();
     fn from_str(s: &str) -> StdResult<Self, ()> {
-        match utils::parse_emoji(s) {
-            Some(x) => Ok(x),
-            _ => Err(())
-        }
+        utils::parse_emoji(s).ok_or_else(|| ())
     }
 }
 
 impl FromStr for ChannelId {
     type Err = ();
     fn from_str(s: &str) -> StdResult<Self, ()> {
-        match utils::parse_channel(s) {
-            Some(x) => Ok(ChannelId(x)),
-            _ => Err(())
-        }
+        utils::parse_channel(s).ok_or_else(|| ()).map(|x| ChannelId(x))
     }
 }
 

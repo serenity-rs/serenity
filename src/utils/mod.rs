@@ -89,6 +89,7 @@ pub fn parse_username(mention: &str) -> Option<u64> {
     if mention.len() < 4 {
         return None;
     }
+
     if mention.starts_with("<@!") {
         let len = mention.len() - 1;
         mention[3..len].parse::<u64>().ok()
@@ -105,6 +106,7 @@ pub fn parse_role(mention: &str) -> Option<u64> {
     if mention.len() < 4 {
         return None;
     }
+
     if mention.starts_with("<@&") {
         let len = mention.len() - 1;
         mention[3..len].parse::<u64>().ok()
@@ -118,6 +120,7 @@ pub fn parse_channel(mention: &str) -> Option<u64> {
     if mention.len() < 4 {
         return None;
     }
+
     if mention.starts_with("<@#") {
         let len = mention.len() - 1;
         mention[3..len].parse::<u64>().ok()
@@ -129,9 +132,10 @@ pub fn parse_channel(mention: &str) -> Option<u64> {
 /// Retreives name and Id from an emoji mention.
 pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
     let len = mention.len();
-    if len < 4 || len > 100 {
+    if len < 6 || len > 56 {
         return None;
     }
+
     if mention.starts_with("<:") {
         let mut name = String::default();
         let mut id = String::default();
@@ -144,7 +148,6 @@ pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
                     } else {
                         id.push(y);
                     }
-
                 }
                 break;
             } else {
