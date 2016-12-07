@@ -26,7 +26,6 @@ mod guild;
 mod id;
 mod misc;
 mod user;
-mod voice;
 
 #[cfg(feature = "methods")]
 mod invite;
@@ -40,7 +39,6 @@ pub use self::id::*;
 pub use self::misc::*;
 pub use self::permissions::Permissions;
 pub use self::user::*;
-pub use self::voice::*;
 
 #[cfg(feature = "methods")]
 pub use self::invite::*;

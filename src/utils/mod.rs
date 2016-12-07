@@ -103,7 +103,7 @@ pub fn read_image<P: AsRef<Path>>(path: P) -> Result<String> {
     let path = path.as_ref();
 
     let mut v = Vec::default();
-    let mut f = try!(File::open(path));
+    let mut f = File::open(path)?;
     let _ = f.read_to_end(&mut v);
 
     let b64 = base64::encode(&v);

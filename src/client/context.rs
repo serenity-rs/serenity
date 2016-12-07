@@ -507,7 +507,7 @@ impl Context {
         // edit.
         //
         // [this]: http://github.com/hammerandchisel/discord-api-docs/issues/156
-        let role = try!(rest::create_role(id));
+        let role = rest::create_role(id)?;
         let map = f(EditRole::default()).0.build();
 
         rest::edit_role(id, role.id.0, map)
@@ -775,7 +775,7 @@ impl Context {
                                        F: FnOnce(EditChannel) -> EditChannel {
         let channel_id = channel_id.into();
 
-        let map = match try!(self.get_channel(channel_id)) {
+        let map = match self.get_channel(channel_id)? {
             Channel::Guild(channel) => {
                 let map = ObjectBuilder::new()
                     .insert("name", channel.name)
@@ -906,7 +906,7 @@ impl Context {
     /// ```
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F)
         -> Result<CurrentUser> {
-        let user = try!(rest::get_current_user());
+        let user = rest::get_current_user()?;
 
         let mut map = ObjectBuilder::new()
             .insert("avatar", user.avatar)
@@ -1070,7 +1070,7 @@ impl Context {
 
         let mut channels = HashMap::new();
 
-        for channel in try!(rest::get_channels(guild_id.0)) {
+        for channel in rest::get_channels(guild_id.0)? {
             channels.insert(channel.id, channel);
         }
 
@@ -1250,18 +1250,18 @@ impl Context {
         let query = {
             let mut map = f(GetMessages::default()).0;
             let mut query = String::new();
-            try!(write!(query, "?limit={}", map.remove("limit").unwrap_or(50)));
+            write!(query, "?limit={}", map.remove("limit").unwrap_or(50))?;
 
             if let Some(after) = map.remove("after") {
-                try!(write!(query, "&after={}", after));
+                write!(query, "&after={}", after)?;
             }
 
             if let Some(around) = map.remove("around") {
-                try!(write!(query, "&around={}", around));
+                write!(query, "&around={}", around)?;
             }
 
             if let Some(before) = map.remove("before") {
-                try!(write!(query, "&before={}", before));
+                write!(query, "&before={}", before)?;
             }
 
             query

@@ -117,10 +117,10 @@ impl Attachment {
     #[cfg(feature = "methods")]
     pub fn download(&self) -> Result<Vec<u8>> {
         let hyper = HyperClient::new();
-        let mut response = try!(hyper.get(&self.url).send());
+        let mut response = hyper.get(&self.url).send()?;
 
         let mut bytes = vec![];
-        try!(response.read_to_end(&mut bytes));
+        response.read_to_end(&mut bytes)?;
 
         Ok(bytes)
     }
@@ -181,11 +181,11 @@ impl Attachment {
     /// [`Message`]: struct.Message.html
     #[cfg(feature = "methods")]
     pub fn download_to_directory<P: AsRef<Path>>(&self, path: P) -> Result<PathBuf> {
-        let bytes = try!(self.download());
+        let bytes = self.download()?;
 
         let filepath: PathBuf = path.as_ref().join(&self.filename);
-        let mut file = try!(File::create(&filepath));
-        try!(file.write(&bytes));
+        let mut file = File::create(&filepath)?;
+        file.write(&bytes)?;
 
         Ok(filepath)
     }
@@ -194,7 +194,7 @@ impl Attachment {
 impl Channel {
     #[doc(hidden)]
     pub fn decode(value: Value) -> Result<Channel> {
-        let map = try!(into_map(value));
+        let map = into_map(value)?;
         match req!(map.get("type").and_then(|x| x.as_u64())) {
             0 | 2 => GuildChannel::decode(Value::Object(map))
                 .map(Channel::Guild),
@@ -217,13 +217,13 @@ impl Channel {
     pub fn delete(&self) -> Result<()> {
         match *self {
             Channel::Group(ref group) => {
-                let _ = try!(group.leave());
+                let _ = group.leave()?;
             },
             Channel::Guild(ref public_channel) => {
-                let _ = try!(public_channel.delete());
+                let _ = public_channel.delete()?;
             },
             Channel::Private(ref private_channel) => {
-                let _ = try!(private_channel.delete());
+                let _ = private_channel.delete()?;
             },
         }
 
@@ -441,7 +441,7 @@ impl Message {
         feature_cache_enabled! {{
             let req = permissions::MANAGE_MESSAGES;
             let is_author = self.author.id != CACHE.read().unwrap().user.id;
-            let has_perms = try!(utils::user_has_perms(self.channel_id, req));
+            let has_perms = utils::user_has_perms(self.channel_id, req)?;
 
             if !is_author && !has_perms {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
@@ -469,7 +469,7 @@ impl Message {
         feature_cache_enabled! {{
             let req = permissions::MANAGE_MESSAGES;
 
-            if !try!(utils::user_has_perms(self.channel_id, req)) {
+            if !utils::user_has_perms(self.channel_id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -583,7 +583,7 @@ impl Message {
         feature_cache_enabled! {{
             let req = permissions::MANAGE_MESSAGES;
 
-            if !try!(utils::user_has_perms(self.channel_id, req)) {
+            if !utils::user_has_perms(self.channel_id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -610,7 +610,7 @@ impl Message {
         feature_cache_enabled! {{
             let req = permissions::ADD_REACTIONS;
 
-            if !try!(utils::user_has_perms(self.channel_id, req)) {
+            if !utils::user_has_perms(self.channel_id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -651,7 +651,7 @@ impl Message {
         feature_cache_enabled! {{
             let req = permissions::SEND_MESSAGES;
 
-            if !try!(utils::user_has_perms(self.channel_id, req)) {
+            if !utils::user_has_perms(self.channel_id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -686,7 +686,7 @@ impl Message {
         feature_cache_enabled! {{
             let req = permissions::MANAGE_MESSAGES;
 
-            if !try!(utils::user_has_perms(self.channel_id, req)) {
+            if !utils::user_has_perms(self.channel_id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -698,9 +698,9 @@ impl Message {
 impl PermissionOverwrite {
     #[doc(hidden)]
     pub fn decode(value: Value) -> Result<PermissionOverwrite> {
-        let mut map = try!(into_map(value));
-        let id = try!(remove(&mut map, "id").and_then(decode_id));
-        let kind = try!(remove(&mut map, "type").and_then(into_string));
+        let mut map = into_map(value)?;
+        let id = remove(&mut map, "id").and_then(decode_id)?;
+        let kind = remove(&mut map, "type").and_then(into_string)?;
         let kind = match &*kind {
             "member" => PermissionOverwriteType::Member(UserId(id)),
             "role" => PermissionOverwriteType::Role(RoleId(id)),
@@ -709,8 +709,8 @@ impl PermissionOverwrite {
 
         Ok(PermissionOverwrite {
             kind: kind,
-            allow: try!(remove(&mut map, "allow").and_then(Permissions::decode)),
-            deny: try!(remove(&mut map, "deny").and_then(Permissions::decode)),
+            allow: remove(&mut map, "allow").and_then(Permissions::decode)?,
+            deny: remove(&mut map, "deny").and_then(Permissions::decode)?,
         })
     }
 }
@@ -724,15 +724,15 @@ impl PrivateChannel {
 
     #[doc(hidden)]
     pub fn decode(value: Value) -> Result<PrivateChannel> {
-        let mut map = try!(into_map(value));
-        let mut recipients = try!(decode_array(try!(remove(&mut map, "recipients")),
-                                  User::decode));
+        let mut map = into_map(value)?;
+        let mut recipients = decode_array(remove(&mut map, "recipients")?,
+                                  User::decode)?;
 
         Ok(PrivateChannel {
-            id: try!(remove(&mut map, "id").and_then(ChannelId::decode)),
-            kind: try!(remove(&mut map, "type").and_then(ChannelType::decode)),
-            last_message_id: try!(opt(&mut map, "last_message_id", MessageId::decode)),
-            last_pin_timestamp: try!(opt(&mut map, "last_pin_timestamp", into_string)),
+            id: remove(&mut map, "id").and_then(ChannelId::decode)?,
+            kind: remove(&mut map, "type").and_then(ChannelType::decode)?,
+            last_message_id: opt(&mut map, "last_message_id", MessageId::decode)?,
+            last_pin_timestamp: opt(&mut map, "last_pin_timestamp", into_string)?,
             recipient: recipients.remove(0),
         })
     }
@@ -853,7 +853,7 @@ impl GuildChannel {
         feature_cache_enabled! {{
             let req = permissions::CREATE_INVITE;
 
-            if !try!(utils::user_has_perms(self.id, req)) {
+            if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -865,29 +865,29 @@ impl GuildChannel {
 
     #[doc(hidden)]
     pub fn decode(value: Value) -> Result<GuildChannel> {
-        let mut map = try!(into_map(value));
+        let mut map = into_map(value)?;
 
-        let id = try!(remove(&mut map, "guild_id").and_then(GuildId::decode));
+        let id = remove(&mut map, "guild_id").and_then(GuildId::decode)?;
 
         GuildChannel::decode_guild(Value::Object(map), id)
     }
 
     #[doc(hidden)]
     pub fn decode_guild(value: Value, guild_id: GuildId) -> Result<GuildChannel> {
-        let mut map = try!(into_map(value));
+        let mut map = into_map(value)?;
 
         Ok(GuildChannel {
-            id: try!(remove(&mut map, "id").and_then(ChannelId::decode)),
-            name: try!(remove(&mut map, "name").and_then(into_string)),
+            id: remove(&mut map, "id").and_then(ChannelId::decode)?,
+            name: remove(&mut map, "name").and_then(into_string)?,
             guild_id: guild_id,
-            topic: try!(opt(&mut map, "topic", into_string)),
-            position: req!(try!(remove(&mut map, "position")).as_i64()),
-            kind: try!(remove(&mut map, "type").and_then(ChannelType::decode)),
-            last_message_id: try!(opt(&mut map, "last_message_id", MessageId::decode)),
-            permission_overwrites: try!(decode_array(try!(remove(&mut map, "permission_overwrites")), PermissionOverwrite::decode)),
+            topic: opt(&mut map, "topic", into_string)?,
+            position: req!(remove(&mut map, "position")?.as_i64()),
+            kind: remove(&mut map, "type").and_then(ChannelType::decode)?,
+            last_message_id: opt(&mut map, "last_message_id", MessageId::decode)?,
+            permission_overwrites: decode_array(remove(&mut map, "permission_overwrites")?, PermissionOverwrite::decode)?,
             bitrate: remove(&mut map, "bitrate").ok().and_then(|v| v.as_u64()),
             user_limit: remove(&mut map, "user_limit").ok().and_then(|v| v.as_u64()),
-            last_pin_timestamp: try!(opt(&mut map, "last_pin_timestamp", into_string)),
+            last_pin_timestamp: opt(&mut map, "last_pin_timestamp", into_string)?,
         })
     }
 
@@ -897,7 +897,7 @@ impl GuildChannel {
         let req = permissions::MANAGE_CHANNELS;
 
         feature_cache_enabled! {{
-            if !try!(utils::user_has_perms(self.id, req)) {
+            if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -924,7 +924,7 @@ impl GuildChannel {
         let req = permissions::MANAGE_CHANNELS;
 
         feature_cache_enabled! {{
-            if !try!(utils::user_has_perms(self.id, req)) {
+            if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -988,7 +988,7 @@ impl GuildChannel {
         feature_cache_enabled! {{
             let req = permissions::SEND_MESSAGES;
 
-            if !try!(utils::user_has_perms(self.id, req)) {
+            if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -1151,11 +1151,11 @@ impl ReactionType {
 
     #[doc(hidden)]
     pub fn decode(value: Value) -> Result<Self> {
-        let mut map = try!(into_map(value));
-        let name = try!(remove(&mut map, "name").and_then(into_string));
+        let mut map = into_map(value)?;
+        let name = remove(&mut map, "name").and_then(into_string)?;
 
         // Only custom emoji reactions (`ReactionType::Custom`) have an Id.
-        Ok(match try!(opt(&mut map, "id", EmojiId::decode)) {
+        Ok(match opt(&mut map, "id", EmojiId::decode)? {
             Some(id) => ReactionType::Custom {
                 id: id,
                 name: name,
@@ -1195,11 +1195,11 @@ impl fmt::Display for ReactionType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             ReactionType::Custom { id, ref name } => {
-                try!(f.write_char('<'));
-                try!(f.write_char(':'));
-                try!(f.write_str(&name));
-                try!(f.write_char(':'));
-                try!(fmt::Display::fmt(&id, f));
+                f.write_char('<')?;
+                f.write_char(':')?;
+                f.write_str(&name)?;
+                f.write_char(':')?;
+                fmt::Display::fmt(&id, f)?;
                 f.write_char('>')
             },
             ReactionType::Unicode(ref unicode) => f.write_str(unicode),

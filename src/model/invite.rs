@@ -55,7 +55,7 @@ impl Invite {
         feature_cache_enabled! {{
             let req = permissions::MANAGE_GUILD;
 
-            if !try!(utils::user_has_perms(self.channel.id, req)) {
+            if !utils::user_has_perms(self.channel.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
@@ -117,7 +117,7 @@ impl RichInvite {
         let req = permissions::MANAGE_GUILD;
 
         feature_cache_enabled! {{
-            if !try!(utils::user_has_perms(self.channel.id, req)) {
+            if !utils::user_has_perms(self.channel.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
         }}
