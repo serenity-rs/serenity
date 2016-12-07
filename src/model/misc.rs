@@ -8,8 +8,7 @@ use super::{
     UserId,
     User,
     IncidentStatus,
-    EmojiIdentifier,
-    EmojiId
+    EmojiIdentifier
 };
 use ::internal::prelude::*;
 use std::str::FromStr;
@@ -135,10 +134,7 @@ impl FromStr for EmojiIdentifier {
     type Err = ();
     fn from_str(s: &str) -> StdResult<Self, ()> {
         match utils::parse_emoji(s) {
-            Some(x) => Ok(EmojiIdentifier {
-                id: EmojiId(x.1),
-                name: x.0
-            }),
+            Some(x) => Ok(x),
             _ => Err(())
         }
     }

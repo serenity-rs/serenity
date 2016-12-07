@@ -18,6 +18,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 use ::internal::prelude::*;
+use ::model::{EmojiIdentifier, EmojiId};
 
 pub use self::message_builder::MessageBuilder;
 
@@ -126,7 +127,7 @@ pub fn parse_channel(mention: &str) -> Option<u64> {
 }
 
 /// Retreives name and Id from an emoji mention.
-pub fn parse_emoji(mention: &str) -> Option<(String, u64)> {
+pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
     let len = mention.len();
     if len < 4 || len > 100 {
         return None;
@@ -151,7 +152,10 @@ pub fn parse_emoji(mention: &str) -> Option<(String, u64)> {
             }
         }
         match id.parse::<u64>() {
-            Ok(x) => Some((name, x)),
+            Ok(x) => Some(EmojiIdentifier {
+                name: name,
+                id: EmojiId(x)
+            }),
             _ => None
         }
     } else {
