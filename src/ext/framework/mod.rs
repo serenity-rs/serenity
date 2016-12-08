@@ -53,11 +53,13 @@
 //!
 //! [`Client::with_framework`]: ../../client/struct.Client.html#method.with_framework
 
-mod command;
-mod configuration;
+pub mod command;
+pub mod configuration;
 
 pub use self::command::Command;
+pub use self::command::CommandFnType;
 pub use self::configuration::Configuration;
+use ::utils::builder::CreateCommand;
 
 use self::command::InternalCommand;
 use std::collections::HashMap;
@@ -65,6 +67,7 @@ use std::sync::Arc;
 use std::thread;
 use ::client::Context;
 use ::model::Message;
+use ::utils;
 
 /// A macro to generate "named parameters". This is useful to avoid manually
 /// using the "arguments" parameter and manually parsing types.
@@ -243,12 +246,20 @@ impl Framework {
                             (before)(&context, &message, &built);
                         }
 
-                        let args = message.content[position + built.len()..]
-                            .split_whitespace()
-                            .map(|arg| arg.to_owned())
-                            .collect::<Vec<String>>();
+                        let args = if command.use_quotes {
+                            utils::parse_quotes(&message.content[position + built.len()..])
+                        } else {
+                            message.content[position + built.len()..]
+                                .split_whitespace()
+                                .map(|arg| arg.to_owned())
+                                .collect::<Vec<String>>()
+                        };
 
-                        (command)(&context, &message, args);
+                        match command.exec {
+                            CommandFnType::Basic(ref x) => {
+                                (x)(&context, &message, args);
+                            }
+                        }
 
                         if let Some(after) = after {
                             (after)(&context, &message, &built);
@@ -274,7 +285,35 @@ impl Framework {
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
         where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static,
               S: Into<String> {
-        self.commands.insert(command_name.into(), Arc::new(f));
+        self.commands.insert(command_name.into(), Arc::new(Command {
+            exec: CommandFnType::Basic(Box::new(f)),
+            desc: None,
+            usage: None,
+            use_quotes: false
+        }));
+        self.initialized = true;
+
+        self
+    }
+
+    /// Adds a command using command builder.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,ignore
+    /// framework.command("ping", |c| c
+    ///     .description("Responds with 'pong'.")
+    ///     .exec(|ctx, _, _| {
+    ///         let _ = ctx.say("pong");
+    ///     }));
+    /// ```
+    pub fn command<F, S>(mut self, command_name: S, f: F) -> Self
+        where F: FnOnce(CreateCommand) -> CreateCommand,
+              S: Into<String> {
+
+        let cmd = f(CreateCommand(Command::default())).0;
+        self.commands.insert(command_name.into(), Arc::new(cmd));
+
         self.initialized = true;
 
         self

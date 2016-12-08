@@ -3,8 +3,25 @@ use super::Configuration;
 use ::client::Context;
 use ::model::Message;
 
-#[doc(hidden)]
-pub type Command = Fn(&Context, &Message, Vec<String>) + Send + Sync;
+/// Command function type. In future this will allow us to pass additional
+/// internal information to commands.
+pub enum CommandFnType {
+    Basic(Box<Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static>)
+    // Todo: WithHelp(Fn(&Context, &Message, HashMap<String, Command>, Vec<String>))
+}
+
+/// Command struct used to store commands internally.
+pub struct Command {
+    /// Function called when the command is called.
+    pub exec: CommandFnType,
+    /// Command description, used by other commands.
+    pub desc: Option<String>,
+    /// Command usage schema, used by other commands.
+    pub usage: Option<String>,
+    /// Whether arguments should be parsed using quote parser or not.
+    pub use_quotes: bool
+}
+
 #[doc(hidden)]
 pub type InternalCommand = Arc<Command>;
 
