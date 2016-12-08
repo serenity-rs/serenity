@@ -46,20 +46,20 @@ fields:
     description: The provider information for the embed.
     optional: true
     type: EmbedProvider
-  - name: timestamp
-    description: Timestamp of embed content.
-    optional: true
-    type: string
-  - name: url
-    description: The URL of the embed.
-    optional: true
-    type: string
   - name: thumbnail
     description: The thumbnail provided for the embed.
     optional: true
     type: EmbedThumbnail
+  - name: timestamp
+    description: Timestamp of embed content.
+    optional: true
+    type: string
   - name: title
     description: The title of the embed.
+    optional: true
+    type: string
+  - name: url
+    description: The URL of the embed.
     optional: true
     type: string
   - name: video

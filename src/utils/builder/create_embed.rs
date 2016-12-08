@@ -19,6 +19,7 @@ use serde_json::builder::ObjectBuilder;
 use serde_json::Value;
 use std::collections::BTreeMap;
 use std::default::Default;
+use ::model::Embed;
 use ::utils::Colour;
 
 /// A builder to create a fake [`Embed`] object, for use with the
@@ -189,6 +190,74 @@ impl Default for CreateEmbed {
     }
 }
 
+impl From<Embed> for CreateEmbed {
+    /// Converts the fields of an embed into the values for a new embed builder.
+    ///
+    /// Some values - such as Proxy URLs - are not preserved.
+    fn from(embed: Embed) -> CreateEmbed {
+        let mut b = CreateEmbed::default()
+            .colour(embed.colour);
+
+        if let Some(author) = embed.author {
+            b = b.author(move |mut a| {
+                a = a.name(&author.name);
+
+                if let Some(icon_url) = author.icon_url {
+                    a = a.icon_url(&icon_url);
+                }
+
+                if let Some(url) = author.url {
+                    a = a.url(&url);
+                }
+
+                a
+            });
+        }
+
+        if let Some(description) = embed.description {
+            b = b.description(&description);
+        }
+
+        if let Some(fields) = embed.fields {
+            for field in fields {
+                b = b.field(move |f| f
+                    .inline(field.inline)
+                    .name(&field.name)
+                    .value(&field.value));
+            }
+        }
+
+        if let Some(image) = embed.image {
+            b = b.image(move |i| i
+                .height(image.height)
+                .url(&image.url)
+                .width(image.width));
+        }
+
+        if let Some(timestamp) = embed.timestamp {
+            b = b.timestamp(&timestamp);
+        }
+
+        if let Some(thumbnail) = embed.thumbnail {
+            b = b.thumbnail(move |t| t
+                .height(thumbnail.height)
+                .url(&thumbnail.url)
+                .width(thumbnail.width));
+        }
+
+        if let Some(url) = embed.url {
+            b = b.url(&url);
+        }
+
+        if let Some(title) = embed.title {
+            b = b.title(&title);
+        }
+
+        b
+    }
+}
+
+
 /// A builder to create a fake [`Embed`] object's author, for use with the
 /// [`CreateEmbed::author`] method.
 ///
@@ -308,7 +377,7 @@ impl CreateEmbedImage {
 
     /// Set the display width of the image.
     pub fn width(self, width: u64) -> Self {
-        CreateEmbedImage(self.0.insert("widht", width))
+        CreateEmbedImage(self.0.insert("width", width))
     }
 }
 
