@@ -57,7 +57,7 @@ pub mod command;
 pub mod configuration;
 
 pub use self::command::Command;
-pub use self::command::CommandFnType;
+pub use self::command::CommandType;
 pub use self::configuration::Configuration;
 use ::utils::builder::CreateCommand;
 
@@ -256,7 +256,7 @@ impl Framework {
                         };
 
                         match command.exec {
-                            CommandFnType::Basic(ref x) => {
+                            CommandType::Basic(ref x) => {
                                 (x)(&context, &message, args);
                             }
                         }
@@ -286,7 +286,7 @@ impl Framework {
         where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static,
               S: Into<String> {
         self.commands.insert(command_name.into(), Arc::new(Command {
-            exec: CommandFnType::Basic(Box::new(f)),
+            exec: CommandType::Basic(Box::new(f)),
             desc: None,
             usage: None,
             use_quotes: false

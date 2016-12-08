@@ -5,7 +5,7 @@ use ::model::Message;
 
 /// Command function type. In future this will allow us to pass additional
 /// internal information to commands.
-pub enum CommandFnType {
+pub enum CommandType {
     Basic(Box<Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static>)
     // Todo: WithHelp(Fn(&Context, &Message, HashMap<String, Command>, Vec<String>))
 }
@@ -13,7 +13,7 @@ pub enum CommandFnType {
 /// Command struct used to store commands internally.
 pub struct Command {
     /// Function called when the command is called.
-    pub exec: CommandFnType,
+    pub exec: CommandType,
     /// Command description, used by other commands.
     pub desc: Option<String>,
     /// Command usage schema, used by other commands.

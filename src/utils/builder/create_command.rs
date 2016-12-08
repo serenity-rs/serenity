@@ -3,7 +3,7 @@ use ::client::Context;
 use ::model::Message;
 
 pub use ext::framework::command::Command;
-pub use ext::framework::command::CommandFnType;
+pub use ext::framework::command::CommandType;
 
 pub struct CreateCommand(pub Command);
 
@@ -12,7 +12,7 @@ impl CreateCommand {
     pub fn exec<F>(mut self, func: F) -> Self
         where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static {
         self.0 = Command {
-            exec: CommandFnType::Basic(Box::new(func)),
+            exec: CommandType::Basic(Box::new(func)),
             desc: self.0.desc,
             usage: self.0.usage,
             use_quotes: self.0.use_quotes
@@ -61,7 +61,7 @@ impl CreateCommand {
 impl Default for Command {
     fn default() -> Command {
         Command {
-            exec: CommandFnType::Basic(Box::new(|_, _, _| {})),
+            exec: CommandType::Basic(Box::new(|_, _, _| {})),
             desc: None,
             usage: None,
             use_quotes: true
