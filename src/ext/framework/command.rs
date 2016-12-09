@@ -9,7 +9,11 @@ use std::collections::HashMap;
 pub enum CommandType {
     StringResponse(String),
     Basic(Box<Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static>),
-    WithCommands(Box<Fn(&Context, &Message, HashMap<String, Arc<Command>>, Vec<String>) + Send + Sync + 'static>)
+    WithCommands(
+        Box<Fn(&Context,
+               &Message,
+               HashMap<String, Arc<Command>>,
+               Vec<String>) + Send + Sync + 'static>)
 }
 
 /// Command struct used to store commands internally.
@@ -21,7 +25,7 @@ pub struct Command {
     /// Command usage schema, used by other commands.
     pub usage: Option<String>,
     /// Whether arguments should be parsed using quote parser or not.
-    pub use_quotes: bool
+    pub use_quotes: bool,
 }
 
 #[doc(hidden)]
@@ -40,9 +44,7 @@ pub fn positions(content: &str, conf: &Configuration) -> Option<Vec<usize>> {
         };
 
         if conf.allow_whitespace {
-            let pos = *unsafe {
-                positions.get_unchecked(0)
-            };
+            let pos = *unsafe { positions.get_unchecked(0) };
 
             positions.insert(0, pos + 1);
         }
@@ -58,7 +60,7 @@ pub fn positions(content: &str, conf: &Configuration) -> Option<Vec<usize>> {
                 }
 
                 Some(positions)
-            },
+            }
             None => None,
         }
     } else {
