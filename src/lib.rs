@@ -61,6 +61,23 @@
 //! Full examples, detailing and explaining usage of the basic functionality of the
 //! library, can be found in the [`examples`] directory.
 //!
+//! # Installation
+//!
+//! Add the following to your `Cargo.toml` file:
+//!
+//! ```toml
+//! [dependencies]
+//! serenity = "0.1"
+//! ```
+//!
+//! and to the top of your `main.rs`:
+//!
+//! ```rs
+//! #[macro_use] extern crate serenity;
+//! ```
+//!
+//! Serenity only supports the _latest_ Stable, Beta, and Nightly.
+//!
 //! # Features
 //!
 //! Features can be enabled or disabled by configuring the library through
