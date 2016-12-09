@@ -199,18 +199,20 @@ pub fn read_image<P: AsRef<Path>>(path: P) -> Result<String> {
     Ok(format!("data:image/{};base64,{}", ext, b64))
 }
 
-/// Turns a string into a vector of strings splitting by space, but keeps
-/// spaces inside quotes.
+/// Turns a string into a vector of string arguments, splitting by spaces, but
+/// parsing content within quotes as one individual argument.
 pub fn parse_quotes(s: &str) -> Vec<String> {
-    let mut result: Vec<String> = vec![];
+    let mut args = vec![];
     let mut in_string = false;
     let mut current_str = String::default();
+
     for x in s.chars() {
         if in_string {
             if x == '"' {
-                if current_str != "" {
-                    result.push(current_str.clone());
+                if !current_str.is_empty() {
+                    args.push(current_str);
                 }
+
                 current_str = String::default();
                 in_string = false;
             } else {
@@ -218,14 +220,16 @@ pub fn parse_quotes(s: &str) -> Vec<String> {
             }
         } else {
             if x == ' ' {
-                if current_str != "" {
-                    result.push(current_str.clone());
+                if !current_str.is_empty() {
+                    args.push(current_str.clone());
                 }
+
                 current_str = String::default();
             } else if x == '"' {
-                if current_str != "" {
-                    result.push(current_str.clone());
+                if !current_str.is_empty() {
+                    args.push(current_str.clone());
                 }
+
                 in_string = true;
                 current_str = String::default();
             } else {
@@ -233,8 +237,10 @@ pub fn parse_quotes(s: &str) -> Vec<String> {
             }
         }
     }
-    if current_str != "" {
-        result.push(current_str.clone());
+
+    if !current_str.is_empty() {
+        args.push(current_str);
     }
-    result
+
+    args
 }

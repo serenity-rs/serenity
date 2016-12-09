@@ -1,0 +1,131 @@
+pub use ext::framework::command::{Command, CommandType};
+
+use std::collections::HashMap;
+use std::default::Default;
+use std::sync::Arc;
+use ::client::Context;
+use ::model::Message;
+
+pub struct CreateCommand(pub Command);
+
+impl CreateCommand {
+    /// Adds a "check" to a command, which checks whether or not the command's
+    /// function should be called.
+    ///
+    /// # Examples
+    ///
+    /// Ensure that the user who created a message, calling a "ping" command,
+    /// is the owner.
+    ///
+    /// ```rust,no_run
+    /// use serenity::client::{Client, Context};
+    /// use serenity::model::Message;
+    /// use std::env;
+    ///
+    /// let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").unwrap());
+    ///
+    /// client.with_framework(|f| f
+    ///     .configure(|c| c.prefix("~"))
+    ///     .command("ping", |c| c
+    ///         .check(owner_check)
+    ///         .desc("Replies to a ping with a pong")
+    ///         .exec(ping)));
+    ///
+    /// fn ping(context: &Context, _message: &Message, _args: Vec<String>) {
+    ///     context.say("Pong!");
+    /// }
+    ///
+    /// fn owner_check(_context: &Context, message: &Message) -> bool {
+    ///     // replace with your user ID
+    ///     message.author.id == 7
+    /// }
+    /// ```
+    pub fn check<F>(mut self, check: F) -> Self
+        where F: Fn(&Context, &Message) -> bool + Send + Sync + 'static {
+        self.0.checks.push(Box::new(check));
+
+        self
+    }
+
+    /// Description, used by other commands.
+    pub fn desc(mut self, desc: &str) -> Self {
+        self.0.desc = Some(desc.to_owned());
+
+        self
+    }
+
+    /// A function that can be called when a command is received.
+    ///
+    /// See [`exec_str`] if you _only_ need to return a string on command use.
+    ///
+    /// [`exec_str`]: #method.exec_str
+    pub fn exec<F>(mut self, func: F) -> Self
+        where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static {
+        self.0.exec = CommandType::Basic(Box::new(func));
+
+        self
+    }
+
+    /// Sets a function that's called when a command is called that can access
+    /// the internal HashMap of usages, used specifically for creating a help
+    /// command.
+    pub fn exec_help<F>(mut self, f: F) -> Self
+        where F: Fn(&Context, &Message, HashMap<String, Arc<Command>>, Vec<String>) + Send + Sync + 'static {
+        self.0.exec = CommandType::WithCommands(Box::new(f));
+
+        self
+    }
+
+    /// Sets a string to be sent in the channel of context on command. This can
+    /// be useful for an `about`, `invite`, `ping`, etc. command.
+    ///
+    /// # Examples
+    ///
+    /// Create a command named "ping" that returns "Pong!":
+    ///
+    /// ```rust,ignore
+    /// client.with_framework(|f| f
+    ///     .command("ping", |c| c.exec_str("Pong!")));
+    /// ```
+    pub fn exec_str(mut self, content: &str) -> Self {
+        self.0.exec = CommandType::StringResponse(content.to_owned());
+
+        self
+    }
+
+    /// Command usage schema, used by other commands.
+    pub fn usage(mut self, usage: &str) -> Self {
+        self.0.usage = Some(usage.to_owned());
+
+        self
+    }
+
+    /// Whether or not arguments should be parsed using the quotation parser.
+    ///
+    /// Enabling this will parse `~command "this is arg 1" "this is arg 2"` as
+    /// two arguments: `this is arg 1` and `this is arg 2`.
+    ///
+    /// Disabling this will parse `~command "this is arg 1" "this is arg 2"` as
+    /// eight arguments: `"this`, `is`, `arg`, `1"`, `"this`, `is`, `arg`, `2"`.
+    ///
+    /// Refer to [`utils::parse_quotes`] for information on the parser.
+    ///
+    /// [`utils::parse_quotes`]: ../../utils/fn.parse_quotes.html
+    pub fn use_quotes(mut self, use_quotes: bool) -> Self {
+        self.0.use_quotes = use_quotes;
+
+        self
+    }
+}
+
+impl Default for Command {
+    fn default() -> Command {
+        Command {
+            checks: Vec::default(),
+            exec: CommandType::Basic(Box::new(|_, _, _| {})),
+            desc: None,
+            usage: None,
+            use_quotes: true,
+        }
+    }
+}

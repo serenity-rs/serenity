@@ -53,13 +53,16 @@
 //!
 //! [`Client::with_framework`]: ../../client/struct.Client.html#method.with_framework
 
-pub mod command;
-pub mod configuration;
+mod command;
+mod configuration;
+
+mod create_command;
 
 pub use self::command::Command;
 pub use self::command::CommandType;
 pub use self::configuration::Configuration;
-use ::utils::builder::CreateCommand;
+pub use self::create_command::CreateCommand;
+
 
 use self::command::InternalCommand;
 use std::collections::HashMap;
@@ -289,15 +292,18 @@ impl Framework {
     /// usage.
     ///
     /// [module-level documentation]: index.html
+    #[deprecated(since="0.1.2", note="Use `command` for greater flexibility")]
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
         where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static,
               S: Into<String> {
         self.commands.insert(command_name.into(), Arc::new(Command {
+            checks: Vec::default(),
             exec: CommandType::Basic(Box::new(f)),
             desc: None,
             usage: None,
-            use_quotes: false
+            use_quotes: false,
         }));
+
         self.initialized = true;
 
         self
@@ -326,7 +332,7 @@ impl Framework {
         self
     }
 
-    /// This will call given closure before every command's execution
+    /// Specify the function to be called prior to every command's execution.
     pub fn before<F>(mut self, f: F) -> Self
         where F: Fn(&Context, &Message, &String) + Send + Sync + 'static {
         self.before = Some(Arc::new(f));
@@ -334,7 +340,7 @@ impl Framework {
         self
     }
 
-    /// This will call given closure after every command's execution
+    /// Specify the function to be called after every command's execution.
     pub fn after<F>(mut self, f: F) -> Self
         where F: Fn(&Context, &Message, &String) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
@@ -371,10 +377,15 @@ impl Framework {
     ///     message.author.id == 7
     /// }
     /// ```
+    #[deprecated(since="0.1.2", note="Use the `CreateCommand` builder's `check` instead.")]
     pub fn set_check<F, S>(mut self, command: S, check: F) -> Self
         where F: Fn(&Context, &Message) -> bool + Send + Sync + 'static,
               S: Into<String> {
-        self.checks.insert(command.into(), Arc::new(check));
+        if let Some(command) = self.commands.get_mut(&command.into()) {
+            if let Some(c) = Arc::get_mut(command) {
+                c.checks.push(Box::new(check));
+            }
+        }
 
         self
     }

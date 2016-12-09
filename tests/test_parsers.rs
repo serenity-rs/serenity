@@ -35,5 +35,5 @@ fn emoji_parser() {
 #[test]
 fn quote_parser() {
 	let parsed = parse_quotes("a \"b c\" d\"e f\"  g");
-	assert_eq!(parsed, vec!["a", "b c", "d", "e f", "g"]);
+	assert_eq!(parsed, ["a", "b c", "d", "e f", "g"]);
 }

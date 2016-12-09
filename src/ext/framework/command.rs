@@ -18,6 +18,9 @@ pub enum CommandType {
 
 /// Command struct used to store commands internally.
 pub struct Command {
+    /// A set of checks to be called prior to executing the command. The checks
+    /// will short-circuit on the first check that returns `false`.
+    pub checks: Vec<Box<Fn(&Context, &Message) -> bool + Send + Sync + 'static>>,
     /// Function called when the command is called.
     pub exec: CommandType,
     /// Command description, used by other commands.
