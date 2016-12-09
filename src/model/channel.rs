@@ -656,7 +656,7 @@ impl Message {
             }
         }}
 
-        let mut gen = format!("{}", self.author.mention());
+        let mut gen = self.author.mention();
         gen.push_str(": ");
         gen.push_str(content);
 
@@ -1197,7 +1197,7 @@ impl fmt::Display for ReactionType {
             ReactionType::Custom { id, ref name } => {
                 f.write_char('<')?;
                 f.write_char(':')?;
-                f.write_str(&name)?;
+                f.write_str(name)?;
                 f.write_char(':')?;
                 fmt::Display::fmt(&id, f)?;
                 f.write_char('>')

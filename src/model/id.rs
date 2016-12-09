@@ -176,7 +176,7 @@ impl UserId {
     /// Search the cache for the channel with the Id.
     #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn find(&self) -> Option<User> {
-        CACHE.read().unwrap().get_user(*self).map(|x| x.clone())
+        CACHE.read().unwrap().get_user(*self).cloned()
     }
 }
 

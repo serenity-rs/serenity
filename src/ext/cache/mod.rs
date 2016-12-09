@@ -413,12 +413,12 @@ impl Cache {
 
     /// Retrieves a reference to a `User` based on appearance in
     /// the first server they are in.
-    pub fn get_user<U>(&self, user_id: U) -> Option<&User>
-        where U: Into<UserId> + Clone {
-        for v in self.guilds.values() {
-            match v.members.get(&user_id.clone().into()) {
-                Some(x) => { return Some(&x.user) }
-                None => {}
+    pub fn get_user<U: Into<UserId>>(&self, user_id: U) -> Option<&User> {
+        let user_id = user_id.into();
+
+        for guild in self.guilds.values() {
+            if let Some(member) = guild.members.get(&user_id) {
+                return Some(&member.user);
             }
         }
 

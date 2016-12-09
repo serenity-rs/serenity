@@ -1438,7 +1438,7 @@ pub fn send_file<R: Read>(channel_id: u64,
 
     let mut request = Multipart::from_request(request)?;
 
-    request.write_stream("file", &mut file, Some(&filename), None)?;
+    request.write_stream("file", &mut file, Some(filename), None)?;
 
     for (k, v) in map {
         let val = match v {
