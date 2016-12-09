@@ -2,12 +2,14 @@ use std::sync::Arc;
 use super::Configuration;
 use ::client::Context;
 use ::model::Message;
+use std::collections::HashMap;
 
-/// Command function type. In future this will allow us to pass additional
-/// internal information to commands.
+/// Command function type. Allows to access internal framework things inside
+/// your commands.
 pub enum CommandType {
-    Basic(Box<Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static>)
-    // Todo: WithHelp(Fn(&Context, &Message, HashMap<String, Command>, Vec<String>))
+    StringResponse(String),
+    Basic(Box<Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static>),
+    WithCommands(Box<Fn(&Context, &Message, HashMap<String, Arc<Command>>, Vec<String>) + Send + Sync + 'static>)
 }
 
 /// Command struct used to store commands internally.

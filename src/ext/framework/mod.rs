@@ -240,6 +240,7 @@ impl Framework {
                     let before = self.before.clone();
                     let command = command.clone();
                     let after = self.after.clone();
+                    let commands = self.commands.clone();
 
                     thread::spawn(move || {
                         if let Some(before) = before {
@@ -256,8 +257,14 @@ impl Framework {
                         };
 
                         match command.exec {
+                            CommandType::StringResponse(ref x) => {
+                                let _ = &context.say(x);
+                            },
                             CommandType::Basic(ref x) => {
                                 (x)(&context, &message, args);
+                            },
+                            CommandType::WithCommands(ref x) => {
+                                (x)(&context, &message, commands, args);
                             }
                         }
 

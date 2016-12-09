@@ -1,4 +1,6 @@
 use std::default::Default;
+use std::collections::HashMap;
+use std::sync::Arc;
 use ::client::Context;
 use ::model::Message;
 
@@ -18,6 +20,35 @@ impl CreateCommand {
             use_quotes: self.0.use_quotes
         };
 
+        self
+    }
+
+    /// Closure or function that's called when a command is called that can
+    /// access internal help hashmap.
+    pub fn exec_help<F>(mut self, func: F) -> Self
+        where F: Fn(&Context,
+                    &Message,
+                    HashMap<String, Arc<Command>>,
+                    Vec<String>) + Send + Sync + 'static {
+        self.0 = Command {
+            exec: CommandType::WithCommands(Box::new(func)),
+            desc: self.0.desc,
+            usage: self.0.usage,
+            use_quotes: self.0.use_quotes
+        };
+
+        self
+    }
+
+
+    /// String that's sent when the command is called.
+    pub fn exec_string<F>(mut self, i: String) -> Self {
+        self.0 = Command {
+            exec: CommandType::StringResponse(i),
+            desc: self.0.desc,
+            usage: self.0.usage,
+            use_quotes: self.0.use_quotes
+        };
         self
     }
 
