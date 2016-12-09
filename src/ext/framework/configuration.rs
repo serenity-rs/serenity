@@ -127,13 +127,10 @@ impl Configuration {
         self
     }
 
-
     /// Sets the prefix to respond to. This can either be a single-char or
     /// multi-char string.
     pub fn prefixes(mut self, prefixes: Vec<&str>) -> Self {
-        self.prefixes = prefixes.iter()
-                                .map(|x| { x.to_string() })
-                                .collect::<Vec<String>>();
+        self.prefixes = prefixes.iter().map(|x| x.to_string()).collect();
 
         self
     }

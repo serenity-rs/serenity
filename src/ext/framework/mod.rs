@@ -55,14 +55,11 @@
 
 mod command;
 mod configuration;
-
 mod create_command;
 
-pub use self::command::Command;
-pub use self::command::CommandType;
+pub use self::command::{Command, CommandType};
 pub use self::configuration::Configuration;
 pub use self::create_command::CreateCommand;
-
 
 use self::command::InternalCommand;
 use std::collections::HashMap;

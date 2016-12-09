@@ -9,11 +9,7 @@ use std::collections::HashMap;
 pub enum CommandType {
     StringResponse(String),
     Basic(Box<Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static>),
-    WithCommands(
-        Box<Fn(&Context,
-               &Message,
-               HashMap<String, Arc<Command>>,
-               Vec<String>) + Send + Sync + 'static>)
+    WithCommands(Box<Fn(&Context, &Message, HashMap<String, Arc<Command>>, Vec<String>) + Send + Sync + 'static>)
 }
 
 /// Command struct used to store commands internally.
@@ -81,7 +77,7 @@ pub fn positions(ctx: &Context, content: &str, conf: &Configuration) -> Option<V
                 }
 
                 Some(positions)
-            }
+            },
             None => None,
         }
     } else {
