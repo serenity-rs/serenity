@@ -1,5 +1,6 @@
 use std::default::Default;
 use ::client::rest;
+use ::client::Context;
 
 /// The configuration to use for a [`Framework`] associated with a [`Client`]
 /// instance.
@@ -31,7 +32,9 @@ pub struct Configuration {
     #[doc(hidden)]
     pub allow_whitespace: bool,
     #[doc(hidden)]
-    pub prefix: Option<String>,
+    pub prefixes: Vec<String>,
+    #[doc(hidden)]
+    pub dynamic_prefix: Option<Box<Fn(&Context) -> Option<String> + Send + Sync + 'static>>
 }
 
 impl Configuration {
@@ -119,7 +122,24 @@ impl Configuration {
     /// Sets the prefix to respond to. This can either be a single-char or
     /// multi-char string.
     pub fn prefix<S: Into<String>>(mut self, prefix: S) -> Self {
-        self.prefix = Some(prefix.into());
+        self.prefixes = vec![prefix.into()];
+
+        self
+    }
+
+    /// Sets the prefix to respond to. This can either be a single-char or
+    /// multi-char string.
+    pub fn prefixes(mut self, prefixes: Vec<&str>) -> Self {
+        self.prefixes = prefixes.iter().map(|x| x.to_string()).collect();
+
+        self
+    }
+
+    /// Sets the prefix to respond to. This can either be a single-char or
+    /// multi-char string.
+    pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
+        where F: Fn(&Context) -> Option<String> + Send + Sync + 'static {
+        self.dynamic_prefix = Some(Box::new(dynamic_prefix));
 
         self
     }
@@ -137,7 +157,8 @@ impl Default for Configuration {
             depth: 5,
             on_mention: None,
             allow_whitespace: false,
-            prefix: None,
+            prefixes: vec![],
+            dynamic_prefix: None
         }
     }
 }

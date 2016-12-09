@@ -37,7 +37,7 @@ fn main() {
         data.insert::<CommandCounter>(HashMap::default());
     }
 
-    client.on_ready(|_context, ready| {
+    client.on_ready(|_, ready| {
         println!("{} is connected!", ready.user.name);
     });
 
@@ -81,22 +81,20 @@ fn main() {
         })
         // Very similar to `before`, except this will be called directly _after_
         // command execution.
-        .after(|_context, _message, command_name| {
+        .after(|_, _, command_name| {
             println!("Processed command '{}'", command_name)
         })
-        .on("commands", commands)
-        .set_check("commands", owner_check)
-        .on("ping", ping_command)
-        .set_check("ping", owner_check) // Ensure only the owner can run this
-        .on("emoji cat", cat_command)
-        .on("emoji dog", dog_command)
-        .on("multiply", multiply)
-        .on("some long command", some_long_command)
-        // Commands can be in closure-form as well.
-        //
-        // This is not recommended though, as any closure larger than a couple
-        // lines will look ugly.
-        .on("about", |context, _message, _args| drop(context.say("A test bot"))));
+        .command("about", |c| c.exec_str("A test bot"))
+        .command("commands", |c| c
+            .check(owner_check)
+            .exec(commands))
+        .command("emoji cat", |c| c.exec_str(":cat:"))
+        .command("emoji dog", |c| c.exec_str(":dog:"))
+        .command("multiply", |c| c.exec(multiply))
+        .command("ping", |c| c
+            .check(owner_check)
+            .exec_str("Pong!"))
+        .command("some long command", |c| c.exec(some_long_command)));
 
     if let Err(why) = client.start() {
         println!("Client error: {:?}", why);
@@ -109,12 +107,6 @@ fn main() {
 // This may bring more features available for commands in the future. See the
 // "multiply" command below for some of the power that the `command!` macro can
 // bring.
-command!(cat_command(context, _msg, _args) {
-    if let Err(why) = context.say(":cat:") {
-        println!("Eror sending message: {:?}", why);
-    }
-});
-
 command!(commands(context, _msg, _args) {
     let mut contents = "Commands used:\n".to_owned();
 
@@ -130,29 +122,17 @@ command!(commands(context, _msg, _args) {
     }
 });
 
-fn dog_command(context: &Context, _msg: &Message, _args: Vec<String>) {
-    if let Err(why) = context.say(":dog:") {
-        println!("Error sending message: {:?}", why);
-    }
-}
-
-fn ping_command(_context: &Context, message: &Message, _args: Vec<String>) {
-    if let Err(why) = message.reply("Pong!") {
-        println!("Error sending reply: {:?}", why);
-    }
-}
-
 // A function which acts as a "check", to determine whether to call a command.
 //
 // In this case, this command checks to ensure you are the owner of the message
 // in order for the command to be executed. If the check fails, the command is
 // not called.
-fn owner_check(_context: &Context, message: &Message) -> bool {
+fn owner_check(_: &Context, message: &Message) -> bool {
     // Replace 7 with your ID
     message.author.id == 7
 }
 
-fn some_long_command(context: &Context, _msg: &Message, args: Vec<String>) {
+fn some_long_command(context: &Context, _: &Message, args: Vec<String>) {
     if let Err(why) = context.say(&format!("Arguments: {:?}", args)) {
         println!("Error sending message: {:?}", why);
     }
@@ -178,7 +158,7 @@ fn some_long_command(context: &Context, _msg: &Message, args: Vec<String>) {
 // will be ignored.
 //
 // Argument type overloading is currently not supported.
-command!(multiply(context, _message, args, first: f64, second: f64) {
+command!(multiply(context, _msg, args, first: f64, second: f64) {
     let res = first * second;
 
     if let Err(why) = context.say(&res.to_string()) {

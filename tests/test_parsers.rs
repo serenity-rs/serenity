@@ -31,3 +31,9 @@ fn emoji_parser() {
 	assert_eq!(emoji.name, "name");
 	assert_eq!(emoji.id, 12345);
 }
+
+#[test]
+fn quote_parser() {
+	let parsed = parse_quotes("a \"b c\" d\"e f\"  g");
+	assert_eq!(parsed, ["a", "b c", "d", "e f", "g"]);
+}

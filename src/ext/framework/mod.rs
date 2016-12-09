@@ -39,8 +39,8 @@
 //!
 //! client.with_framework(|f| f
 //!     .configure(|c| c.prefix("~"))
-//!     .on("about", about)
-//!     .on("ping", ping));
+//!     .command("about", |c| c.exec_str("A simple test bot"))
+//!     .command("ping", |c| c.exec(ping)));
 //!
 //! fn about(context: &Context, _message: &Message, _args: Vec<String>) {
 //!     let _ = context.say("A simple test bot");
@@ -55,9 +55,11 @@
 
 mod command;
 mod configuration;
+mod create_command;
 
-pub use self::command::Command;
+pub use self::command::{Command, CommandType};
 pub use self::configuration::Configuration;
+pub use self::create_command::CreateCommand;
 
 use self::command::InternalCommand;
 use std::collections::HashMap;
@@ -65,6 +67,7 @@ use std::sync::Arc;
 use std::thread;
 use ::client::Context;
 use ::model::Message;
+use ::utils;
 
 /// A macro to generate "named parameters". This is useful to avoid manually
 /// using the "arguments" parameter and manually parsing types.
@@ -137,7 +140,6 @@ pub struct Framework {
     commands: HashMap<String, InternalCommand>,
     before: Option<Arc<Fn(&Context, &Message, &String) + Send + Sync + 'static>>,
     after: Option<Arc<Fn(&Context, &Message, &String) + Send + Sync + 'static>>,
-    checks: HashMap<String, Arc<Fn(&Context, &Message) -> bool + Send + Sync + 'static>>,
     /// Whether the framework has been "initialized".
     ///
     /// The framework is initialized once one of the following occurs:
@@ -192,7 +194,7 @@ impl Framework {
 
     #[doc(hidden)]
     pub fn dispatch(&mut self, context: Context, message: Message) {
-        let res = command::positions(&message.content, &self.configuration);
+        let res = command::positions(&context, &message.content, &self.configuration);
 
         let positions = match res {
             Some(positions) => positions,
@@ -206,7 +208,7 @@ impl Framework {
             return;
         }
 
-        for position in positions {
+        'outer: for position in positions {
             let mut built = String::new();
 
             for i in 0..self.configuration.depth {
@@ -228,27 +230,42 @@ impl Framework {
                 });
 
                 if let Some(command) = self.commands.get(&built) {
-                    if let Some(check) = self.checks.get(&built) {
+                    for check in &command.checks {
                         if !(check)(&context, &message) {
-                            continue;
+                            continue 'outer;
                         }
                     }
 
                     let before = self.before.clone();
                     let command = command.clone();
                     let after = self.after.clone();
+                    let commands = self.commands.clone();
 
                     thread::spawn(move || {
                         if let Some(before) = before {
                             (before)(&context, &message, &built);
                         }
 
-                        let args = message.content[position + built.len()..]
-                            .split_whitespace()
-                            .map(|arg| arg.to_owned())
-                            .collect::<Vec<String>>();
+                        let args = if command.use_quotes {
+                            utils::parse_quotes(&message.content[position + built.len()..])
+                        } else {
+                            message.content[position + built.len()..]
+                                .split_whitespace()
+                                .map(|arg| arg.to_owned())
+                                .collect::<Vec<String>>()
+                        };
 
-                        (command)(&context, &message, args);
+                        match command.exec {
+                            CommandType::StringResponse(ref x) => {
+                                let _ = &context.say(x);
+                            },
+                            CommandType::Basic(ref x) => {
+                                (x)(&context, &message, args);
+                            },
+                            CommandType::WithCommands(ref x) => {
+                                (x)(&context, &message, commands, args);
+                            }
+                        }
 
                         if let Some(after) = after {
                             (after)(&context, &message, &built);
@@ -267,20 +284,54 @@ impl Framework {
     /// This requires that a check - if one exists - passes, prior to being
     /// called.
     ///
+    /// Note that once v0.2.0 lands, you will need to use the command builder
+    /// via the [`command`] method to set checks. This command will otherwise
+    /// only be for simple commands.
+    ///
     /// Refer to the [module-level documentation] for more information and
     /// usage.
     ///
+    /// [`command`]: #method.command
     /// [module-level documentation]: index.html
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
         where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static,
               S: Into<String> {
-        self.commands.insert(command_name.into(), Arc::new(f));
+        self.commands.insert(command_name.into(), Arc::new(Command {
+            checks: Vec::default(),
+            exec: CommandType::Basic(Box::new(f)),
+            desc: None,
+            usage: None,
+            use_quotes: false,
+        }));
+
         self.initialized = true;
 
         self
     }
 
-    /// This will call given closure before every command's execution
+    /// Adds a command using command builder.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,ignore
+    /// framework.command("ping", |c| c
+    ///     .description("Responds with 'pong'.")
+    ///     .exec(|ctx, _, _| {
+    ///         let _ = ctx.say("pong");
+    ///     }));
+    /// ```
+    pub fn command<F, S>(mut self, command_name: S, f: F) -> Self
+        where F: FnOnce(CreateCommand) -> CreateCommand,
+              S: Into<String> {
+        let cmd = f(CreateCommand(Command::default())).0;
+        self.commands.insert(command_name.into(), Arc::new(cmd));
+
+        self.initialized = true;
+
+        self
+    }
+
+    /// Specify the function to be called prior to every command's execution.
     pub fn before<F>(mut self, f: F) -> Self
         where F: Fn(&Context, &Message, &String) + Send + Sync + 'static {
         self.before = Some(Arc::new(f));
@@ -288,7 +339,7 @@ impl Framework {
         self
     }
 
-    /// This will call given closure after every command's execution
+    /// Specify the function to be called after every command's execution.
     pub fn after<F>(mut self, f: F) -> Self
         where F: Fn(&Context, &Message, &String) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
@@ -325,10 +376,15 @@ impl Framework {
     ///     message.author.id == 7
     /// }
     /// ```
+    #[deprecated(since="0.1.2", note="Use the `CreateCommand` builder's `check` instead.")]
     pub fn set_check<F, S>(mut self, command: S, check: F) -> Self
         where F: Fn(&Context, &Message) -> bool + Send + Sync + 'static,
               S: Into<String> {
-        self.checks.insert(command.into(), Arc::new(check));
+        if let Some(command) = self.commands.get_mut(&command.into()) {
+            if let Some(c) = Arc::get_mut(command) {
+                c.checks.push(Box::new(check));
+            }
+        }
 
         self
     }
