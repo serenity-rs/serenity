@@ -32,14 +32,14 @@ pub struct Command {
 pub type InternalCommand = Arc<Command>;
 
 pub fn positions(ctx: &Context, content: &str, conf: &Configuration) -> Option<Vec<usize>> {
-    if conf.prefixes.len() > 0 || conf.prefix_fn.is_some() {
+    if conf.prefixes.len() > 0 || conf.dynamic_prefix.is_some() {
         // Find out if they were mentioned. If not, determine if the prefix
         // was used. If not, return None.
         let mut positions: Vec<usize> = vec![];
 
         if let Some(mention_end) = find_mention_end(&content, conf) {
             positions.push(mention_end);
-        } else if let Some(ref func) = conf.prefix_fn {
+        } else if let Some(ref func) = conf.dynamic_prefix {
             if let Some(x) = func(&ctx) {
                 positions.push(x.len());
             } else {

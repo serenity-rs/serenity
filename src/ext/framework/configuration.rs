@@ -34,7 +34,7 @@ pub struct Configuration {
     #[doc(hidden)]
     pub prefixes: Vec<String>,
     #[doc(hidden)]
-    pub prefix_fn: Option<Box<Fn(&Context) -> Option<String> + Send + Sync + 'static>>
+    pub dynamic_prefix: Option<Box<Fn(&Context) -> Option<String> + Send + Sync + 'static>>
 }
 
 impl Configuration {
@@ -140,9 +140,9 @@ impl Configuration {
 
     /// Sets the prefix to respond to. This can either be a single-char or
     /// multi-char string.
-    pub fn prefix_fn<F>(mut self, prefix_fn: F) -> Self
+    pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
         where F: Fn(&Context) -> Option<String> + Send + Sync + 'static {
-        self.prefix_fn = Some(Box::new(prefix_fn));
+        self.dynamic_prefix = Some(Box::new(dynamic_prefix));
 
         self
     }
@@ -161,7 +161,7 @@ impl Default for Configuration {
             on_mention: None,
             allow_whitespace: false,
             prefixes: vec![],
-            prefix_fn: None
+            dynamic_prefix: None
         }
     }
 }
