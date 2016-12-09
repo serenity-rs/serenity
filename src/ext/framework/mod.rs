@@ -195,7 +195,7 @@ impl Framework {
 
     #[doc(hidden)]
     pub fn dispatch(&mut self, context: Context, message: Message) {
-        let res = command::positions(&message.content, &self.configuration);
+        let res = command::positions(&context, &message.content, &self.configuration);
 
         let positions = match res {
             Some(positions) => positions,

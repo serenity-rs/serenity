@@ -31,17 +31,35 @@ pub struct Command {
 #[doc(hidden)]
 pub type InternalCommand = Arc<Command>;
 
-pub fn positions(content: &str, conf: &Configuration) -> Option<Vec<usize>> {
-    if let Some(ref prefix) = conf.prefix {
+pub fn positions(ctx: &Context, content: &str, conf: &Configuration) -> Option<Vec<usize>> {
+    if conf.prefixes.len() > 0 || conf.prefix_fn.is_some() {
         // Find out if they were mentioned. If not, determine if the prefix
         // was used. If not, return None.
-        let mut positions = if let Some(mention_end) = find_mention_end(content, conf) {
-            vec![mention_end]
-        } else if content.starts_with(prefix) {
-            vec![prefix.len()]
+        let mut positions: Vec<usize> = vec![];
+
+        if let Some(mention_end) = find_mention_end(&content, conf) {
+            positions.push(mention_end);
+        } else if let Some(ref func) = conf.prefix_fn {
+            if let Some(x) = func(&ctx) {
+                positions.push(x.len());
+            } else {
+                for n in conf.prefixes.clone() {
+                    if content.starts_with(&n) {
+                        positions.push(n.len());
+                    }
+                }
+            }
         } else {
-            return None;
+            for n in conf.prefixes.clone() {
+                if content.starts_with(&n) {
+                    positions.push(n.len());
+                }
+            }
         };
+
+        if positions.len() == 0 {
+            return None;
+        }
 
         if conf.allow_whitespace {
             let pos = *unsafe { positions.get_unchecked(0) };
