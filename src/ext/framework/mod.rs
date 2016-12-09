@@ -39,8 +39,8 @@
 //!
 //! client.with_framework(|f| f
 //!     .configure(|c| c.prefix("~"))
-//!     .on("about", about)
-//!     .on("ping", ping));
+//!     .command("about", |c| c.exec_str("A simple test bot"))
+//!     .command("ping", |c| c.exec(ping)));
 //!
 //! fn about(context: &Context, _message: &Message, _args: Vec<String>) {
 //!     let _ = context.say("A simple test bot");
@@ -143,7 +143,6 @@ pub struct Framework {
     commands: HashMap<String, InternalCommand>,
     before: Option<Arc<Fn(&Context, &Message, &String) + Send + Sync + 'static>>,
     after: Option<Arc<Fn(&Context, &Message, &String) + Send + Sync + 'static>>,
-    checks: HashMap<String, Arc<Fn(&Context, &Message) -> bool + Send + Sync + 'static>>,
     /// Whether the framework has been "initialized".
     ///
     /// The framework is initialized once one of the following occurs:
@@ -212,7 +211,7 @@ impl Framework {
             return;
         }
 
-        for position in positions {
+        'outer: for position in positions {
             let mut built = String::new();
 
             for i in 0..self.configuration.depth {
@@ -234,9 +233,9 @@ impl Framework {
                 });
 
                 if let Some(command) = self.commands.get(&built) {
-                    if let Some(check) = self.checks.get(&built) {
+                    for check in &command.checks {
                         if !(check)(&context, &message) {
-                            continue;
+                            continue 'outer;
                         }
                     }
 
@@ -288,11 +287,15 @@ impl Framework {
     /// This requires that a check - if one exists - passes, prior to being
     /// called.
     ///
+    /// Note that once v0.2.0 lands, you will need to use the command builder
+    /// via the [`command`] method to set checks. This command will otherwise
+    /// only be for simple commands.
+    ///
     /// Refer to the [module-level documentation] for more information and
     /// usage.
     ///
+    /// [`command`]: #method.command
     /// [module-level documentation]: index.html
-    #[deprecated(since="0.1.2", note="Use `command` for greater flexibility")]
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
         where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static,
               S: Into<String> {
