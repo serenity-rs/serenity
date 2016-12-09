@@ -323,7 +323,6 @@ impl Framework {
     pub fn command<F, S>(mut self, command_name: S, f: F) -> Self
         where F: FnOnce(CreateCommand) -> CreateCommand,
               S: Into<String> {
-
         let cmd = f(CreateCommand(Command::default())).0;
         self.commands.insert(command_name.into(), Arc::new(cmd));
 
