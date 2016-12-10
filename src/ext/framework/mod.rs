@@ -300,20 +300,22 @@ impl Framework {
                             }
                         }
 
-                        if command.required_permissions != Permissions::empty() {
-                            let mut permission_unfulfilled = true;
+                        if !command.required_permissions.is_empty() {
+                            let mut permissions_fulfilled = false;
 
-                            if let Some(x) = message.get_member() {
-                                for role_id in x.roles {
-                                    if let Some(role) = role_id.find() {
-                                        if role.permissions >= command.required_permissions {
-                                            permission_unfulfilled = false;
-                                        }
+                            if let Some(member) = message.get_member() {
+                                let cache = CACHE.read().unwrap();
+
+                                if let Ok(guild_id) = member.find_guild() {
+                                    if let Some(guild) = cache.get_guild(guild_id) {
+                                        let perms = guild.permissions_for(message.channel_id, message.author.id);
+
+                                        permissions_fulfilled = perms.contains(command.required_permissions);
                                     }
                                 }
                             }
 
-                            if permission_unfulfilled {
+                            if !permissions_fulfilled {
                                 return;
                             }
                         }
