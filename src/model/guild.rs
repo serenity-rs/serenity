@@ -18,11 +18,13 @@ use ::utils::decode_array;
 
 #[cfg(feature="methods")]
 use serde_json::builder::ObjectBuilder;
-#[cfg(feature="methods")]
+#[cfg(all(feature="cache", feature = "methods"))]
 use std::mem;
-#[cfg(feature="methods")]
-use ::utils::builder::{EditGuild, EditMember, EditRole};
-#[cfg(feature="methods")]
+#[cfg(feature = "methods")]
+use ::utils::builder::{EditGuild, EditRole};
+#[cfg(all(feature="cache", feature="methods"))]
+use ::utils::builder::EditMember;
+#[cfg(feature = "methods")]
 use ::client::rest;
 
 #[cfg(all(feature="cache", feature="methods"))]
@@ -178,11 +180,6 @@ impl Guild {
         permissions.remove(perms);
 
         Ok(permissions.is_empty())
-    }
-
-    #[cfg(not(feature="cache"))]
-    fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
-        Ok(true)
     }
 
     /// Ban a [`User`] from the guild. All messages by the

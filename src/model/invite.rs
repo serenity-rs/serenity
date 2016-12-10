@@ -1,9 +1,12 @@
 use super::{Invite, RichInvite};
 use ::client::rest;
 use ::internal::prelude::*;
-use super::{permissions, utils};
 
 #[cfg(feature="cache")]
+use super::permissions;
+#[cfg(all(feature="cache", feature="methods"))]
+use super::utils;
+#[cfg(feature = "cache")]
 use ::client::CACHE;
 
 impl Invite {
@@ -114,9 +117,9 @@ impl RichInvite {
     /// [permission]: permissions/index.html
     #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<Invite> {
-        let req = permissions::MANAGE_GUILD;
-
         feature_cache_enabled! {{
+            let req = permissions::MANAGE_GUILD;
+
             if !utils::user_has_perms(self.channel.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }

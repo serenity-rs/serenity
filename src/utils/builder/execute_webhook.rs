@@ -15,7 +15,7 @@ use std::default::Default;
 /// Creating two embeds, and then sending them as part of the delivery
 /// payload of [`Webhook::execute`]:
 ///
-/// ```rust,no_run
+/// ```rust,ignore
 /// use serenity::client::rest;
 /// use serenity::model::Embed;
 /// use serenity::utils::Colour;

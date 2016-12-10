@@ -24,7 +24,7 @@ use std::io::{Read, Write as IoWrite};
 use std::mem;
 #[cfg(feature="methods")]
 use std::path::{Path, PathBuf};
-#[cfg(feature="methods")]
+#[cfg(all(feature="cache", feature="methods"))]
 use super::utils;
 
 #[cfg(feature="methods")]
@@ -925,9 +925,9 @@ impl GuildChannel {
     /// Deletes this channel, returning the channel on a successful deletion.
     #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<Channel> {
-        let req = permissions::MANAGE_CHANNELS;
-
         feature_cache_enabled! {{
+            let req = permissions::MANAGE_CHANNELS;
+
             if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
@@ -952,9 +952,10 @@ impl GuildChannel {
     #[cfg(feature="methods")]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
-        let req = permissions::MANAGE_CHANNELS;
 
         feature_cache_enabled! {{
+            let req = permissions::MANAGE_CHANNELS;
+
             if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }

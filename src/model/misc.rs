@@ -78,7 +78,7 @@ impl Mentionable for User {
     }
 }
 
-#[cfg(feature="cache")]
+#[cfg(all(feature="cache", feature="methods"))]
 impl FromStr for User {
     type Err = ();
     fn from_str(s: &str) -> StdResult<Self, ()> {
@@ -101,7 +101,7 @@ impl FromStr for UserId {
     }
 }
 
-#[cfg(feature="cache")]
+#[cfg(all(feature="cache", feature="methods"))]
 impl FromStr for Role {
     type Err = ();
     fn from_str(s: &str) -> StdResult<Self, ()> {
@@ -138,7 +138,7 @@ impl FromStr for ChannelId {
     }
 }
 
-#[cfg(feature="cache")]
+#[cfg(all(feature="cache", feature="methods"))]
 impl FromStr for Channel {
     type Err = ();
     fn from_str(s: &str) -> StdResult<Self, ()> {

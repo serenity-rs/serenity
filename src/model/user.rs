@@ -1,30 +1,33 @@
-use std::{fmt, mem};
+use std::fmt;
 use super::utils::{into_map, into_string, remove};
 use super::{
     CurrentUser,
     FriendSourceFlags,
     GuildContainer,
     GuildId,
-    GuildInfo,
     RoleId,
     UserSettings,
     User,
     Member
 };
-use ::client::rest::GuildPagination;
 use ::internal::prelude::*;
-use ::utils::builder::EditProfile;
 use ::utils::decode_array;
 use ::model::misc::Mentionable;
 
 #[cfg(feature="methods")]
 use serde_json::builder::ObjectBuilder;
 #[cfg(feature="methods")]
+use std::mem;
+#[cfg(feature = "methods")]
 use super::Message;
 #[cfg(feature="methods")]
 use time::Timespec;
 #[cfg(feature="methods")]
-use ::client::rest;
+use ::client::rest::{self, GuildPagination};
+#[cfg(feature="methods")]
+use super::GuildInfo;
+#[cfg(feature="methods")]
+use ::utils::builder::EditProfile;
 
 #[cfg(feature="cache")]
 use ::client::CACHE;
@@ -46,7 +49,7 @@ impl CurrentUser {
     ///
     /// Change the avatar:
     ///
-    /// ```rust,no_run
+    /// ```rust,ignore
     /// use serenity::client::CACHE;
     ///
     /// let avatar = serenity::utils::read_image("./avatar.png").unwrap();
@@ -80,12 +83,14 @@ impl CurrentUser {
         }
     }
 
-    /// Returns the DiscordTag(tm) of a User.
+    /// Returns the DiscordTag™ of a User.
+    #[cfg(feature="methods")]
     pub fn distinct(&self) -> String {
         format!("{}#{}", self.name, self.discriminator)
     }
 
     /// Gets a list of guilds that the current user is in.
+    #[cfg(feature="methods")]
     pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
         rest::get_guilds(GuildPagination::After(GuildId(0)), 100)
     }
@@ -188,6 +193,8 @@ impl User {
     /// [`GuildId`]: struct.GuildId.html
     /// [`Role`]: struct.Role.html
     /// [`Cache`]: ../ext/cache/struct.Cache.html
+    #[allow(unused_variables)]
+    // no-cache would warn on guild_id.
     pub fn has_role<G, R>(&self, guild: G, role: R) -> bool
         where G: Into<GuildContainer>, R: Into<RoleId> {
         let role_id = role.into();
