@@ -547,6 +547,7 @@ impl Message {
         }
     }
 
+    /// Gets message author as member. Won't work on private messages.
     #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn get_member(&self) -> Option<Member> {
         let cache = CACHE.read().unwrap();
@@ -561,7 +562,7 @@ impl Message {
         None
     }
 
-    /// True if message was sent in direct messages.
+    /// True if message was sent using direct messages.
     #[cfg(all(feature = "cache", feature = "methods"))]
     pub fn is_private(&self) -> bool {
         let cache = CACHE.read().unwrap();
