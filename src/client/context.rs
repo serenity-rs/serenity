@@ -22,7 +22,7 @@ use ::internal::prelude::*;
 use ::model::*;
 use ::utils;
 
-#[cfg(feature = "cache")]
+#[cfg(feature="cache")]
 use super::CACHE;
 
 /// The context is a general utility struct provided on event dispatches, which

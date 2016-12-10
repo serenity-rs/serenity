@@ -61,20 +61,20 @@ use ::model::event::{
 };
 use ::model::*;
 
-#[cfg(feature = "framework")]
+#[cfg(feature="framework")]
 use ::ext::framework::Framework;
 
-#[cfg(feature = "cache")]
+#[cfg(feature="cache")]
 use ::ext::cache::Cache;
 
-#[cfg(not(feature = "cache"))]
+#[cfg(not(feature="cache"))]
 use ::model::event::{
     CallUpdateEvent,
     GuildMemberUpdateEvent,
     UserSettingsUpdateEvent,
 };
 
-#[cfg(feature = "cache")]
+#[cfg(feature="cache")]
 lazy_static! {
     /// A mutable and lazily-initialized static binding. It can be accessed
     /// across any function and in any context.
@@ -841,7 +841,7 @@ impl Client {
     }
 }
 
-#[cfg(feature = "cache")]
+#[cfg(feature="cache")]
 impl Client {
     /// Attaches a handler for when a [`CallDelete`] is received.
     ///
@@ -1003,7 +1003,7 @@ impl Client {
     }
 }
 
-#[cfg(not(feature = "cache"))]
+#[cfg(not(feature="cache"))]
 impl Client {
     /// Attaches a handler for when a [`CallDelete`] is received.
     ///

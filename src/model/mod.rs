@@ -27,9 +27,9 @@ mod id;
 mod misc;
 mod user;
 
-#[cfg(feature = "methods")]
+#[cfg(feature="methods")]
 mod invite;
-#[cfg(feature = "methods")]
+#[cfg(feature="methods")]
 mod webhook;
 
 pub use self::channel::*;
@@ -40,9 +40,9 @@ pub use self::misc::*;
 pub use self::permissions::Permissions;
 pub use self::user::*;
 
-#[cfg(feature = "methods")]
+#[cfg(feature="methods")]
 pub use self::invite::*;
-#[cfg(feature = "methods")]
+#[cfg(feature="methods")]
 pub use self::webhook::*;
 
 use self::utils::*;

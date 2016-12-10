@@ -17,16 +17,16 @@ use ::utils::builder::EditProfile;
 use ::utils::decode_array;
 use ::model::misc::Mentionable;
 
-#[cfg(feature = "methods")]
+#[cfg(feature="methods")]
 use serde_json::builder::ObjectBuilder;
-#[cfg(feature = "methods")]
+#[cfg(feature="methods")]
 use super::Message;
-#[cfg(feature = "methods")]
+#[cfg(feature="methods")]
 use time::Timespec;
-#[cfg(feature = "methods")]
+#[cfg(feature="methods")]
 use ::client::rest;
 
-#[cfg(feature = "cache")]
+#[cfg(feature="cache")]
 use ::client::CACHE;
 
 impl CurrentUser {
@@ -57,7 +57,7 @@ impl CurrentUser {
     ///     .edit(|p| p
     ///         .avatar(Some(&avatar)));
     /// ```
-    #[cfg(feature = "methods")]
+    #[cfg(feature="methods")]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
         let mut map = ObjectBuilder::new()
@@ -109,7 +109,7 @@ impl User {
     }
 
     /// Retrieves the time that this user was created at.
-    #[cfg(feature = "methods")]
+    #[cfg(feature="methods")]
     #[inline]
     pub fn created_at(&self) -> Timespec {
         self.id.created_at()

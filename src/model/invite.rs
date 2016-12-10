@@ -3,7 +3,7 @@ use ::client::rest;
 use ::internal::prelude::*;
 use super::{permissions, utils};
 
-#[cfg(feature = "cache")]
+#[cfg(feature="cache")]
 use ::client::CACHE;
 
 impl Invite {
@@ -112,7 +112,7 @@ impl RichInvite {
     /// [`rest::delete_invite`]: ../client/rest/fn.delete_invite.html
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     /// [permission]: permissions/index.html
-    #[cfg(feature = "methods")]
+    #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<Invite> {
         let req = permissions::MANAGE_GUILD;
 

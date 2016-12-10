@@ -13,9 +13,9 @@
 //! [`Client`]: ../client/struct.Client.html
 //! [`Shard`]: ../client/gateway/struct.Shard.html
 
-#[cfg(feature = "cache")]
+#[cfg(feature="cache")]
 pub mod cache;
-#[cfg(feature = "framework")]
+#[cfg(feature="framework")]
 pub mod framework;
-#[cfg(feature = "voice")]
+#[cfg(feature="voice")]
 pub mod voice;
