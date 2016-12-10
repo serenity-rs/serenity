@@ -228,10 +228,7 @@ impl From<Embed> for CreateEmbed {
         }
 
         if let Some(image) = embed.image {
-            b = b.image(move |i| i
-                .height(image.height)
-                .url(&image.url)
-                .width(image.width));
+            b = b.image(move |i| i.url(&image.url));
         }
 
         if let Some(timestamp) = embed.timestamp {
@@ -239,10 +236,7 @@ impl From<Embed> for CreateEmbed {
         }
 
         if let Some(thumbnail) = embed.thumbnail {
-            b = b.thumbnail(move |t| t
-                .height(thumbnail.height)
-                .url(&thumbnail.url)
-                .width(thumbnail.width));
+            b = b.thumbnail(move |t| t.url(&thumbnail.url));
         }
 
         if let Some(url) = embed.url {
@@ -266,6 +260,7 @@ impl From<Embed> for CreateEmbed {
 /// [`Embed`]: ../../model/struct.Embed.html
 /// [`CreateEmbed::author`]: struct.CreateEmbed.html#method.author
 /// [`name`]: #method.name
+#[derive(Default)]
 pub struct CreateEmbedAuthor(pub ObjectBuilder);
 
 impl CreateEmbedAuthor {
@@ -282,13 +277,6 @@ impl CreateEmbedAuthor {
     /// Set the author's URL.
     pub fn url(self, url: &str) -> Self {
         CreateEmbedAuthor(self.0.insert("url", url))
-    }
-}
-
-impl Default for CreateEmbedAuthor {
-    /// Creates a builder with no default values.
-    fn default() -> CreateEmbedAuthor {
-        CreateEmbedAuthor(ObjectBuilder::new())
     }
 }
 
@@ -334,6 +322,7 @@ impl Default for CreateEmbedField {
 ///
 /// [`Embed`]: ../../model/struct.Embed.html
 /// [`CreateEmbed::footer`]: struct.CreateEmbed.html#method.footer
+#[derive(Default)]
 pub struct CreateEmbedFooter(pub ObjectBuilder);
 
 impl CreateEmbedFooter {
@@ -348,13 +337,6 @@ impl CreateEmbedFooter {
     }
 }
 
-impl Default for CreateEmbedFooter {
-    /// Creates a builder with no default values.
-    fn default() -> CreateEmbedFooter {
-        CreateEmbedFooter(ObjectBuilder::new())
-    }
-}
-
 /// A builder to create a fake [`Embed`] object's image, for use with the
 /// [`CreateEmbed::image`] method.
 ///
@@ -362,10 +344,12 @@ impl Default for CreateEmbedFooter {
 ///
 /// [`Embed`]: ../../model/struct.Embed.html
 /// [`CreateEmbed::image`]: struct.CreateEmbed.html#method.image
+#[derive(Default)]
 pub struct CreateEmbedImage(pub ObjectBuilder);
 
 impl CreateEmbedImage {
     /// Set the display height of the image.
+    #[deprecated(since="0.1.2", note="Discord does not allow specifying this")]
     pub fn height(self, height: u64) -> Self {
         CreateEmbedImage(self.0.insert("height", height))
     }
@@ -376,15 +360,9 @@ impl CreateEmbedImage {
     }
 
     /// Set the display width of the image.
+    #[deprecated(since="0.1.2", note="Discord does not allow specifying this")]
     pub fn width(self, width: u64) -> Self {
         CreateEmbedImage(self.0.insert("width", width))
-    }
-}
-
-impl Default for CreateEmbedImage {
-    /// Creates a builder with no default values.
-    fn default() -> CreateEmbedImage {
-        CreateEmbedImage(ObjectBuilder::new())
     }
 }
 
@@ -396,10 +374,12 @@ impl Default for CreateEmbedImage {
 /// [`Embed`]: ../../model/struct.Embed.html
 /// [`CreateEmbed::thumbnail`]: struct.CreateEmbed.html#method.thumbnail
 /// [`url`]: #method.url
+#[derive(Default)]
 pub struct CreateEmbedThumbnail(pub ObjectBuilder);
 
 impl CreateEmbedThumbnail {
     /// Set the height of the thumbnail, in pixels.
+    #[deprecated(since="0.1.2", note="Discord does not allow specifying this")]
     pub fn height(self, height: u64) -> Self {
         CreateEmbedThumbnail(self.0.insert("height", height))
     }
@@ -412,14 +392,8 @@ impl CreateEmbedThumbnail {
     }
 
     /// Set the width of the thumbnail, in pixels.
+    #[deprecated(since="0.1.2", note="Discord does not allow specifying this")]
     pub fn width(self, width: u64) -> Self {
         CreateEmbedThumbnail(self.0.insert("width", width))
-    }
-}
-
-impl Default for CreateEmbedThumbnail {
-    /// Creates a builder with no default values.
-    fn default() -> CreateEmbedThumbnail {
-        CreateEmbedThumbnail(ObjectBuilder::new())
     }
 }

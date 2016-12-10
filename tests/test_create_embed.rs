@@ -45,10 +45,7 @@ fn from_embed() {
         .description("This is a cat description")
         .title("still a funny cat meme")
         .url("https://i.imgur.com/q9MqLqZ.jpg")
-        .image(|i| i
-            .height(426)
-            .url("https://i.imgur.com/q9MqLqZ.jpg")
-            .width(448));
+        .image(|i| i.url("https://i.imgur.com/q9MqLqZ.jpg"));
 
     let built = Value::Object(builder.0);
 
@@ -65,9 +62,7 @@ fn from_embed() {
                 .insert("name", "c")
                 .insert("value", "z")))
         .insert_object("image", |o| o
-            .insert("height", 426)
-            .insert("url", "https://i.imgur.com/q9MqLqZ.jpg")
-            .insert("width", 448))
+            .insert("url", "https://i.imgur.com/q9MqLqZ.jpg"))
         .insert("title", "still a funny cat meme")
         .insert("type", "rich")
         .insert("url", "https://i.imgur.com/q9MqLqZ.jpg")
