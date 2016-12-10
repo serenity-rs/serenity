@@ -218,23 +218,21 @@ pub fn parse_quotes(s: &str) -> Vec<String> {
             } else {
                 current_str.push(x);
             }
-        } else {
-            if x == ' ' {
-                if !current_str.is_empty() {
-                    args.push(current_str.clone());
-                }
-
-                current_str = String::default();
-            } else if x == '"' {
-                if !current_str.is_empty() {
-                    args.push(current_str.clone());
-                }
-
-                in_string = true;
-                current_str = String::default();
-            } else {
-                current_str.push(x);
+        } else if x == ' ' {
+            if !current_str.is_empty() {
+                args.push(current_str.clone());
             }
+
+            current_str = String::default();
+        } else if x == '"' {
+            if !current_str.is_empty() {
+                args.push(current_str.clone());
+            }
+
+            in_string = true;
+            current_str = String::default();
+        } else {
+            current_str.push(x);
         }
     }
 

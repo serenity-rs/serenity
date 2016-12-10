@@ -4,19 +4,27 @@ use ::client::Context;
 use ::model::Message;
 use std::collections::HashMap;
 
+pub type Check = Fn(&Context, &Message) -> bool + Send + Sync + 'static;
+pub type Exec = Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static;
+pub type Help = Fn(&Context, &Message, HashMap<String, Arc<Command>>, Vec<String>) + Send + Sync + 'static;
+pub type Hook = Fn(&Context, &Message, &String) + Send + Sync + 'static;
+#[doc(hidden)]
+pub type InternalCommand = Arc<Command>;
+pub type PrefixCheck = Fn(&Context) -> Option<String> + Send + Sync + 'static;
+
 /// Command function type. Allows to access internal framework things inside
 /// your commands.
 pub enum CommandType {
     StringResponse(String),
-    Basic(Box<Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static>),
-    WithCommands(Box<Fn(&Context, &Message, HashMap<String, Arc<Command>>, Vec<String>) + Send + Sync + 'static>)
+    Basic(Box<Exec>),
+    WithCommands(Box<Help>),
 }
 
 /// Command struct used to store commands internally.
 pub struct Command {
     /// A set of checks to be called prior to executing the command. The checks
     /// will short-circuit on the first check that returns `false`.
-    pub checks: Vec<Box<Fn(&Context, &Message) -> bool + Send + Sync + 'static>>,
+    pub checks: Vec<Box<Check>>,
     /// Function called when the command is called.
     pub exec: CommandType,
     /// Command description, used by other commands.
@@ -27,19 +35,16 @@ pub struct Command {
     pub use_quotes: bool,
 }
 
-#[doc(hidden)]
-pub type InternalCommand = Arc<Command>;
-
 pub fn positions(ctx: &Context, content: &str, conf: &Configuration) -> Option<Vec<usize>> {
-    if conf.prefixes.len() > 0 || conf.dynamic_prefix.is_some() {
+    if !conf.prefixes.is_empty() || conf.dynamic_prefix.is_some() {
         // Find out if they were mentioned. If not, determine if the prefix
         // was used. If not, return None.
         let mut positions: Vec<usize> = vec![];
 
-        if let Some(mention_end) = find_mention_end(&content, conf) {
+        if let Some(mention_end) = find_mention_end(content, conf) {
             positions.push(mention_end);
         } else if let Some(ref func) = conf.dynamic_prefix {
-            if let Some(x) = func(&ctx) {
+            if let Some(x) = func(ctx) {
                 positions.push(x.len());
             } else {
                 for n in conf.prefixes.clone() {
@@ -56,7 +61,7 @@ pub fn positions(ctx: &Context, content: &str, conf: &Configuration) -> Option<V
             }
         };
 
-        if positions.len() == 0 {
+        if positions.is_empty() {
             return None;
         }
 

@@ -61,7 +61,7 @@ pub use self::command::{Command, CommandType};
 pub use self::configuration::Configuration;
 pub use self::create_command::CreateCommand;
 
-use self::command::InternalCommand;
+use self::command::{Hook, InternalCommand};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::thread;
@@ -138,8 +138,8 @@ macro_rules! command {
 pub struct Framework {
     configuration: Configuration,
     commands: HashMap<String, InternalCommand>,
-    before: Option<Arc<Fn(&Context, &Message, &String) + Send + Sync + 'static>>,
-    after: Option<Arc<Fn(&Context, &Message, &String) + Send + Sync + 'static>>,
+    before: Option<Arc<Hook>>,
+    after: Option<Arc<Hook>>,
     /// Whether the framework has been "initialized".
     ///
     /// The framework is initialized once one of the following occurs:

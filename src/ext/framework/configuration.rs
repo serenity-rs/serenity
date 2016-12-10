@@ -1,4 +1,5 @@
 use std::default::Default;
+use super::command::PrefixCheck;
 use ::client::rest;
 use ::client::Context;
 
@@ -34,7 +35,7 @@ pub struct Configuration {
     #[doc(hidden)]
     pub prefixes: Vec<String>,
     #[doc(hidden)]
-    pub dynamic_prefix: Option<Box<Fn(&Context) -> Option<String> + Send + Sync + 'static>>
+    pub dynamic_prefix: Option<Box<PrefixCheck>>,
 }
 
 impl Configuration {
