@@ -76,8 +76,8 @@ pub fn dispatch(event: Event,
 #[cfg(not(feature="framework"))]
 pub fn dispatch(event: Event,
                 conn: Arc<Mutex<Shard>>,
-                login_type: LoginType,
                 data: Arc<Mutex<ShareMap>>,
+                login_type: LoginType,
                 event_store: Arc<RwLock<EventStore>>) {
     match event {
         Event::MessageCreate(event) => {

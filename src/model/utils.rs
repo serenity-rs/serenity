@@ -17,11 +17,11 @@ use super::{
 use ::internal::prelude::*;
 use ::utils::{decode_array, into_array};
 
-#[cfg(feature = "methods")]
+#[cfg(all(feature="cache", feature="methods"))]
 use super::permissions::{self, Permissions};
-#[cfg(all(feature = "cache", feature = "methods"))]
+#[cfg(all(feature="cache", feature="methods"))]
 use ::client::CACHE;
-#[cfg(all(feature = "cache", feature = "methods"))]
+#[cfg(all(feature="cache", feature="methods"))]
 use ::ext::cache::ChannelRef;
 
 #[macro_escape]
