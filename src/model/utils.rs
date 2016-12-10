@@ -260,7 +260,7 @@ pub fn remove(map: &mut BTreeMap<String, Value>, key: &str) -> Result<Value> {
 }
 
 #[doc(hidden)]
-#[cfg(all(feature = "cache", feature="methods"))]
+#[cfg(all(feature="cache", feature="methods"))]
 pub fn user_has_perms(channel_id: ChannelId,
                       mut permissions: Permissions)
                       -> Result<bool> {

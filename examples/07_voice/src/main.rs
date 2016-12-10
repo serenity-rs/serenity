@@ -243,7 +243,7 @@ fn unmute(context: &Context, message: &Message, _args: Vec<String>) {
 }
 
 /// Checks that a message successfully sent; if not, then logs why to stdout.
-#[cfg(feature = "voice")]
+#[cfg(feature="voice")]
 fn check_msg(result: SerenityResult<Message>) {
     if let Err(why) = result {
         println!("Error sending message: {:?}", why);

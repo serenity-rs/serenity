@@ -115,7 +115,7 @@ impl RichInvite {
     /// [`rest::delete_invite`]: ../client/rest/fn.delete_invite.html
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     /// [permission]: permissions/index.html
-    #[cfg(feature = "methods")]
+    #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<Invite> {
         feature_cache_enabled! {{
             let req = permissions::MANAGE_GUILD;

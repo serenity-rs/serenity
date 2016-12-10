@@ -14,7 +14,7 @@ extern crate typemap;
 
 use serenity::client::Context;
 use serenity::Client;
-use serenity::model::Message;
+use serenity::model::{Message, permissions};
 use std::collections::HashMap;
 use std::env;
 use std::fmt::Write;
@@ -88,7 +88,9 @@ fn main() {
         .command("commands", |c| c
             .check(owner_check)
             .exec(commands))
-        .command("emoji cat", |c| c.exec_str(":cat:"))
+        .command("emoji cat", |c| c
+            .exec_str(":cat:")
+            .required_permissions(permissions::SEND_MESSAGES))
         .command("emoji dog", |c| c.exec_str(":dog:"))
         .command("multiply", |c| c.exec(multiply))
         .command("ping", |c| c

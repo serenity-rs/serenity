@@ -13,22 +13,24 @@ use ::internal::prelude::*;
 use ::utils::decode_array;
 use ::model::misc::Mentionable;
 
-#[cfg(feature = "methods")]
+#[cfg(feature="methods")]
 use serde_json::builder::ObjectBuilder;
 #[cfg(feature="methods")]
 use std::mem;
 #[cfg(feature = "methods")]
 use super::Message;
-#[cfg(feature = "methods")]
+#[cfg(all(feature = "cache", feature = "methods"))]
+use super::Member;
+#[cfg(feature="methods")]
 use time::Timespec;
-#[cfg(feature = "methods")]
+#[cfg(feature="methods")]
 use ::client::rest::{self, GuildPagination};
 #[cfg(feature="methods")]
 use super::GuildInfo;
 #[cfg(feature="methods")]
 use ::utils::builder::EditProfile;
 
-#[cfg(feature = "cache")]
+#[cfg(feature="cache")]
 use ::client::CACHE;
 
 impl CurrentUser {
@@ -59,7 +61,7 @@ impl CurrentUser {
     ///     .edit(|p| p
     ///         .avatar(Some(&avatar)));
     /// ```
-    #[cfg(feature = "methods")]
+    #[cfg(feature="methods")]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
         let mut map = ObjectBuilder::new()
@@ -102,8 +104,17 @@ impl User {
             format!(cdn!("/avatars/{}/{}.jpg"), self.id, av))
     }
 
+    /// Gets user as `Member` of a server.
+    #[cfg(all(feature="cache", feature="methods"))]
+    pub fn member<G>(&self, guild_id: G) -> Option<Member>
+        where G: Into<GuildId> {
+        let cache = CACHE.read().unwrap();
+
+        cache.get_member(guild_id.into(), self.id).cloned()
+    }
+
     /// Retrieves the time that this user was created at.
-    #[cfg(feature = "methods")]
+    #[cfg(feature="methods")]
     #[inline]
     pub fn created_at(&self) -> Timespec {
         self.id.created_at()

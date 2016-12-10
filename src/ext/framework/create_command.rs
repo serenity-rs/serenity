@@ -5,6 +5,7 @@ use std::default::Default;
 use std::sync::Arc;
 use ::client::Context;
 use ::model::Message;
+use ::model::Permissions;
 
 pub struct CreateCommand(pub Command);
 
@@ -50,6 +51,48 @@ impl CreateCommand {
     /// Description, used by other commands.
     pub fn desc(mut self, desc: &str) -> Self {
         self.0.desc = Some(desc.to_owned());
+
+        self
+    }
+
+    /// Whether command should be displayed in help list or not, used by other commands.
+    pub fn help_available(mut self, help_available: bool) -> Self {
+        self.0.help_available = help_available;
+
+        self
+    }
+
+    /// Whether command can be used only privately or not.
+    pub fn dm_only(mut self, dm_only: bool) -> Self {
+        self.0.dm_only = dm_only;
+
+        self
+    }
+
+    /// Whether command can be used only in guilds or not.
+    pub fn guild_only(mut self, guild_only: bool) -> Self {
+        self.0.guild_only = guild_only;
+
+        self
+    }
+
+    /// Minumum amount of arguments that should be passed.
+    pub fn min_args(mut self, min_args: i32) -> Self {
+        self.0.min_args = Some(min_args);
+
+        self
+    }
+
+    /// Maximum amount of arguments that can be passed.
+    pub fn max_args(mut self, max_args: i32) -> Self {
+        self.0.max_args = Some(max_args);
+
+        self
+    }
+
+    /// Maximum amount of arguments that can be passed.
+    pub fn required_permissions(mut self, required_permissions: Permissions) -> Self {
+        self.0.required_permissions = required_permissions;
 
         self
     }
@@ -126,6 +169,12 @@ impl Default for Command {
             desc: None,
             usage: None,
             use_quotes: true,
+            min_args: None,
+            max_args: None,
+            required_permissions: Permissions::empty(),
+            dm_only: false,
+            guild_only: false,
+            help_available: true
         }
     }
 }

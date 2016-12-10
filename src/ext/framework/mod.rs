@@ -58,7 +58,7 @@ mod configuration;
 mod create_command;
 
 pub use self::command::{Command, CommandType};
-pub use self::configuration::Configuration;
+pub use self::configuration::{AccountType, Configuration};
 pub use self::create_command::CreateCommand;
 
 use self::command::{Hook, InternalCommand};
@@ -68,6 +68,8 @@ use std::thread;
 use ::client::Context;
 use ::model::Message;
 use ::utils;
+use ::client::CACHE;
+use ::model::Permissions;
 
 /// A macro to generate "named parameters". This is useful to avoid manually
 /// using the "arguments" parameter and manually parsing types.
@@ -194,6 +196,29 @@ impl Framework {
 
     #[doc(hidden)]
     pub fn dispatch(&mut self, context: Context, message: Message) {
+        match self.configuration.account_type {
+            AccountType::Selfbot => {
+                if message.author.id != CACHE.read().unwrap().user.id {
+                    return;
+                }
+            },
+            AccountType::Bot => {
+                if message.author.bot {
+                    return;
+                }
+            },
+            AccountType::Automatic => {
+                let cache = CACHE.read().unwrap();
+                if cache.user.bot {
+                    if message.author.bot {
+                        return;
+                    }
+                } else if message.author.id != cache.user.id {
+                    return;
+                }
+            },
+            AccountType::Any => {}
+        }
         let res = command::positions(&context, &message.content, &self.configuration);
 
         let positions = match res {
@@ -230,6 +255,14 @@ impl Framework {
                 });
 
                 if let Some(command) = self.commands.get(&built) {
+                    if message.is_private() {
+                        if command.guild_only {
+                            return;
+                        }
+                    } else if command.dm_only {
+                        return;
+                    }
+
                     for check in &command.checks {
                         if !(check)(&context, &message) {
                             continue 'outer;
@@ -254,6 +287,38 @@ impl Framework {
                                 .map(|arg| arg.to_owned())
                                 .collect::<Vec<String>>()
                         };
+
+                        if let Some(x) = command.min_args {
+                            if args.len() < x as usize {
+                                return;
+                            }
+                        }
+
+                        if let Some(x) = command.max_args {
+                            if args.len() > x as usize {
+                                return;
+                            }
+                        }
+
+                        if !command.required_permissions.is_empty() {
+                            let mut permissions_fulfilled = false;
+
+                            if let Some(member) = message.get_member() {
+                                let cache = CACHE.read().unwrap();
+
+                                if let Ok(guild_id) = member.find_guild() {
+                                    if let Some(guild) = cache.get_guild(guild_id) {
+                                        let perms = guild.permissions_for(message.channel_id, message.author.id);
+
+                                        permissions_fulfilled = perms.contains(command.required_permissions);
+                                    }
+                                }
+                            }
+
+                            if !permissions_fulfilled {
+                                return;
+                            }
+                        }
 
                         match command.exec {
                             CommandType::StringResponse(ref x) => {
@@ -302,6 +367,12 @@ impl Framework {
             desc: None,
             usage: None,
             use_quotes: false,
+            dm_only: false,
+            guild_only: false,
+            help_available: true,
+            min_args: None,
+            max_args: None,
+            required_permissions: Permissions::empty()
         }));
 
         self.initialized = true;

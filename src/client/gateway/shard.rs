@@ -69,7 +69,7 @@ pub struct Shard {
     ws_url: String,
     /// The voice connections that this Shard is responsible for. The Shard will
     /// update the voice connections' states.
-    #[cfg(feature = "voice")]
+    #[cfg(feature="voice")]
     pub manager: VoiceManager,
 }
 

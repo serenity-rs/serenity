@@ -1,16 +1,16 @@
 use super::*;
 use std::fmt;
 
-#[cfg(all(feature = "cache", feature = "methods"))]
+#[cfg(all(feature="cache", feature="methods"))]
 use ::client::CACHE;
-#[cfg(feature = "methods")]
+#[cfg(feature="methods")]
 use ::client::rest;
-#[cfg(feature = "methods")]
+#[cfg(feature="methods")]
 use ::internal::prelude::*;
 
 impl ChannelId {
     /// Search the cache for the channel with the Id.
-    #[cfg(all(feature = "cache", feature = "methods"))]
+    #[cfg(all(feature="cache", feature="methods"))]
     pub fn find(&self) -> Option<Channel> {
         CACHE.read().unwrap().get_channel(*self).map(|x| x.clone_inner())
     }
@@ -73,7 +73,7 @@ impl From<Emoji> for EmojiId {
 
 impl GuildId {
     /// Search the cache for the guild.
-    #[cfg(all(feature = "cache", feature="methods"))]
+    #[cfg(all(feature="cache", feature="methods"))]
     pub fn find(&self) -> Option<Guild> {
         CACHE.read().unwrap().get_guild(*self).cloned()
     }
@@ -89,7 +89,7 @@ impl GuildId {
 
     /// Returns this Id as a `ChannelId`, which is useful when needing to use
     /// the guild Id to send a message to the default channel.
-    #[cfg(feature = "methods")]
+    #[cfg(feature="methods")]
     pub fn to_channel(&self) -> ChannelId {
         ChannelId(self.0)
     }
@@ -156,7 +156,7 @@ impl From<Role> for RoleId {
 
 impl RoleId {
     /// Search the cache for the role.
-    #[cfg(all(feature = "cache", feature = "methods"))]
+    #[cfg(all(feature="cache", feature="methods"))]
     pub fn find(&self) -> Option<Role> {
         CACHE.read()
             .unwrap()
@@ -174,7 +174,7 @@ impl RoleId {
 
 impl UserId {
     /// Search the cache for the channel with the Id.
-    #[cfg(all(feature = "cache", feature = "methods"))]
+    #[cfg(all(feature="cache", feature="methods"))]
     pub fn find(&self) -> Option<User> {
         CACHE.read().unwrap().get_user(*self).cloned()
     }

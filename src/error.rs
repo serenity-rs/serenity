@@ -7,7 +7,7 @@ use std::fmt::{self, Display, Error as FormatError};
 use websocket::result::WebSocketError;
 use ::client::gateway::GatewayError;
 use ::client::ClientError;
-#[cfg(feature = "voice")]
+#[cfg(feature="voice")]
 use opus::Error as OpusError;
 #[cfg(feature="voice")]
 use ::ext::voice::VoiceError;
@@ -66,12 +66,12 @@ pub enum Error {
     /// An error from the `rust-websocket` crate.
     WebSocket(WebSocketError),
     /// An error from the `opus` crate.
-    #[cfg(feature = "voice")]
+    #[cfg(feature="voice")]
     Opus(OpusError),
     /// Indicating an error within the [voice module].
     ///
     /// [voice module]: ext/voice/index.html
-    #[cfg(feature = "voice")]
+    #[cfg(feature="voice")]
     Voice(VoiceError),
 }
 
@@ -99,7 +99,7 @@ impl From<JsonError> for Error {
     }
 }
 
-#[cfg(feature = "voice")]
+#[cfg(feature="voice")]
 impl From<OpusError> for Error {
     fn from(e: OpusError) -> Error {
         Error::Opus(e)
@@ -119,7 +119,7 @@ impl Display for Error {
             Error::Io(ref inner) => inner.fmt(f),
             Error::Json(ref inner) => inner.fmt(f),
             Error::WebSocket(ref inner) => inner.fmt(f),
-            #[cfg(feature = "voice")]
+            #[cfg(feature="voice")]
             Error::Opus(ref inner) => inner.fmt(f),
             _ => f.write_str(self.description()),
         }
@@ -138,9 +138,9 @@ impl StdError for Error {
             Error::Json(ref inner) => inner.description(),
             Error::Url(ref inner) => inner,
             Error::WebSocket(ref inner) => inner.description(),
-            #[cfg(feature = "voice")]
+            #[cfg(feature="voice")]
             Error::Opus(ref inner) => inner.description(),
-            #[cfg(feature = "voice")]
+            #[cfg(feature="voice")]
             Error::Voice(_) => "Voice error",
         }
     }

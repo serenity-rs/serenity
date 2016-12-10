@@ -2,6 +2,7 @@ use std::sync::Arc;
 use super::Configuration;
 use ::client::Context;
 use ::model::Message;
+use ::model::Permissions;
 use std::collections::HashMap;
 
 pub type Check = Fn(&Context, &Message) -> bool + Send + Sync + 'static;
@@ -33,6 +34,18 @@ pub struct Command {
     pub usage: Option<String>,
     /// Whether arguments should be parsed using quote parser or not.
     pub use_quotes: bool,
+    /// Minumum amount of arguments that should be passed.
+    pub min_args: Option<i32>,
+    /// Maximum amount of arguments that can be passed.
+    pub max_args: Option<i32>,
+    /// Permissions required to use this command.
+    pub required_permissions: Permissions,
+    /// Whether command should be displayed in help list or not, used by other commands.
+    pub help_available: bool,
+    /// Whether command can be used only privately or not.
+    pub dm_only: bool,
+    /// Whether command can be used only in guilds or not.
+    pub guild_only: bool,
 }
 
 pub fn positions(ctx: &Context, content: &str, conf: &Configuration) -> Option<Vec<usize>> {

@@ -11,7 +11,7 @@ use ::model::{ChannelId, Message};
 #[cfg(feature="framework")]
 use ::ext::framework::Framework;
 
-#[cfg(feature = "cache")]
+#[cfg(feature="cache")]
 use super::CACHE;
 
 macro_rules! handler {

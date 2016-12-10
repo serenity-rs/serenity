@@ -22,7 +22,7 @@ use ::internal::prelude::*;
 use ::model::*;
 use ::utils;
 
-#[cfg(feature = "cache")]
+#[cfg(feature="cache")]
 use super::CACHE;
 
 /// The context is a general utility struct provided on event dispatches, which
@@ -1075,6 +1075,15 @@ impl Context {
         }
 
         Ok(channels)
+    }
+
+    /// Gets information about the current user.
+    ///
+    /// Note this is shorthand for retrieving the current user through the
+    /// cache, and will perform a clone.
+    #[cfg(all(feature = "cache", feature = "methods"))]
+    pub fn get_current_user(&self) -> CurrentUser {
+        CACHE.read().unwrap().user.clone()
     }
 
     /// Gets an [`Guild`]'s emoji by Id.
