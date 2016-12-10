@@ -566,16 +566,10 @@ impl Message {
     /// True if message was sent using direct messages.
     #[cfg(all(feature="cache", feature="methods"))]
     pub fn is_private(&self) -> bool {
-        let cache = CACHE.read().unwrap();
-
-        match cache.get_channel(self.channel_id) {
-            Some(ChannelRef::Group(_)) | Some(ChannelRef::Private(_)) => {
-                return false;
-            },
-            _ => {}
+        match CACHE.read().unwrap().get_channel(self.channel_id) {
+            Some(ChannelRef::Group(_)) | Some(ChannelRef::Private(_)) => true,
+            _ => false,
         }
-
-        true
     }
 
     /// Checks the length of a string to ensure that it is within Discord's
