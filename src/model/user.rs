@@ -9,6 +9,7 @@ use super::{
     RoleId,
     UserSettings,
     User,
+    Member
 };
 use ::client::rest::GuildPagination;
 use ::internal::prelude::*;
@@ -95,6 +96,16 @@ impl User {
     pub fn avatar_url(&self) -> Option<String> {
         self.avatar.as_ref().map(|av|
             format!(cdn!("/avatars/{}/{}.jpg"), self.id, av))
+    }
+
+    /// Gets user as `Member` of a server.
+    #[cfg(feature="methods")]
+    #[cfg(feature="cache")]
+    pub fn member<G>(&self, guild_id: G) -> Option<Member>
+        where G: Into<GuildId> {
+        let cache = CACHE.read().unwrap();
+
+        cache.get_member(guild_id.into(), self.id).map(|x| { x.clone() })
     }
 
     /// Retrieves the time that this user was created at.
