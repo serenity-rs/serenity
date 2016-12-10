@@ -139,11 +139,6 @@ impl Context {
         rest::accept_invite(utils::parse_invite(invite))
     }
 
-    /// Gets information about the user that's currently logged in.
-    pub fn get_current_user(&self) -> CurrentUser {
-        CACHE.read().unwrap().user.clone()
-    }
-
     /// Marks a [`Channel`] as being read up to a certain [`Message`].
     ///
     /// Refer to the documentation for [`rest::ack_message`] for more
@@ -1080,6 +1075,15 @@ impl Context {
         }
 
         Ok(channels)
+    }
+
+    /// Gets information about the current user.
+    ///
+    /// Note this is shorthand for retrieving the current user through the
+    /// cache, and will perform a clone.
+    #[cfg(all(feature = "cache", feature = "methods"))]
+    pub fn get_current_user(&self) -> CurrentUser {
+        CACHE.read().unwrap().user.clone()
     }
 
     /// Gets an [`Guild`]'s emoji by Id.

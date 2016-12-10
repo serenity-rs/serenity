@@ -8,7 +8,6 @@ use super::{
     RoleId,
     UserSettings,
     User,
-    Member
 };
 use ::internal::prelude::*;
 use ::utils::decode_array;
@@ -20,6 +19,8 @@ use serde_json::builder::ObjectBuilder;
 use std::mem;
 #[cfg(feature = "methods")]
 use super::Message;
+#[cfg(all(feature = "cache", feature = "methods"))]
+use super::Member;
 #[cfg(feature="methods")]
 use time::Timespec;
 #[cfg(feature="methods")]
