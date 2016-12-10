@@ -3,6 +3,18 @@ use super::command::PrefixCheck;
 use ::client::rest;
 use ::client::Context;
 
+/// Account type used for configuration.
+pub enum AccountType {
+    /// Connected client will only listen to itself.
+    Selfbot,
+    /// Connected client will ignore all bot accounts.
+    Bot,
+    /// Connected client will listen to everyone.
+    Any,
+    #[doc(hidden)]
+    Automatic
+}
+
 /// The configuration to use for a [`Framework`] associated with a [`Client`]
 /// instance.
 ///
@@ -36,6 +48,8 @@ pub struct Configuration {
     pub prefixes: Vec<String>,
     #[doc(hidden)]
     pub dynamic_prefix: Option<Box<PrefixCheck>>,
+    #[doc(hidden)]
+    pub account_type: AccountType
 }
 
 impl Configuration {
@@ -136,6 +150,13 @@ impl Configuration {
         self
     }
 
+    /// Allows you to change what accounts to ignore.
+    pub fn account_type(mut self, account_type: AccountType) -> Self {
+        self.account_type = account_type;
+
+        self
+    }
+
     /// Sets the prefix to respond to. This can either be a single-char or
     /// multi-char string.
     pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
@@ -159,7 +180,8 @@ impl Default for Configuration {
             on_mention: None,
             allow_whitespace: false,
             prefixes: vec![],
-            dynamic_prefix: None
+            dynamic_prefix: None,
+            account_type: AccountType::Automatic
         }
     }
 }

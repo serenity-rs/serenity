@@ -139,6 +139,11 @@ impl Context {
         rest::accept_invite(utils::parse_invite(invite))
     }
 
+    /// Gets information about the user that's currently logged in.
+    pub fn get_current_user(&self) -> CurrentUser {
+        CACHE.read().unwrap().user.clone()
+    }
+
     /// Marks a [`Channel`] as being read up to a certain [`Message`].
     ///
     /// Refer to the documentation for [`rest::ack_message`] for more

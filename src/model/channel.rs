@@ -547,6 +547,31 @@ impl Message {
         }
     }
 
+    #[cfg(all(feature = "cache", feature = "methods"))]
+    pub fn get_member(&self) -> Option<Member> {
+        let cache = CACHE.read().unwrap();
+
+        if let Some(ChannelRef::Guild(channel)) = cache.get_channel(self.channel_id) {
+            if let Some(guild) = channel.guild_id.find() {
+                if let Some(member) = guild.members.get(&self.author.id) {
+                    return Some(member.clone())
+                }
+            }
+        }
+        None
+    }
+
+    /// True if message was sent in direct messages.
+    #[cfg(all(feature = "cache", feature = "methods"))]
+    pub fn is_private(&self) -> bool {
+        let cache = CACHE.read().unwrap();
+
+        match cache.get_channel(self.channel_id) {
+            Some(_) => false,
+            _ => true,
+        }
+    }
+
     /// Checks the length of a string to ensure that it is within Discord's
     /// maximum message length limit.
     ///
