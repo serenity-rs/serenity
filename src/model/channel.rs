@@ -559,6 +559,7 @@ impl Message {
                 }
             }
         }
+
         None
     }
 
@@ -568,9 +569,13 @@ impl Message {
         let cache = CACHE.read().unwrap();
 
         match cache.get_channel(self.channel_id) {
-            Some(_) => false,
-            _ => true,
+            Some(ChannelRef::Group(_)) | Some(ChannelRef::Private(_)) => {
+                return false;
+            },
+            _ => {}
         }
+
+        true
     }
 
     /// Checks the length of a string to ensure that it is within Discord's

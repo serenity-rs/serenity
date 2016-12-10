@@ -58,8 +58,7 @@ mod configuration;
 mod create_command;
 
 pub use self::command::{Command, CommandType};
-pub use self::configuration::Configuration;
-pub use self::configuration::AccountType;
+pub use self::configuration::{AccountType, Configuration};
 pub use self::create_command::CreateCommand;
 
 use self::command::{Hook, InternalCommand};
@@ -208,18 +207,17 @@ impl Framework {
                     return;
                 }
             },
-            AccountType::Any => {},
             AccountType::Automatic => {
-                if CACHE.read().unwrap().user.bot {
+                let cache = CACHE.read().unwrap();
+                if cache.user.bot {
                     if message.author.bot {
                         return;
                     }
-                } else {
-                    if message.author.id != CACHE.read().unwrap().user.id {
-                        return;
-                    }
+                } else if message.author.id != cache.user.id {
+                    return;
                 }
-            }
+            },
+            AccountType::Any => {}
         }
         let res = command::positions(&context, &message.content, &self.configuration);
 
@@ -259,13 +257,12 @@ impl Framework {
                 if let Some(command) = self.commands.get(&built) {
                     if message.is_private() {
                         if command.guild_only {
-                            return
+                            return;
                         }
-                    } else {
-                        if command.dm_only {
-                            return
-                        }
+                    } else if command.dm_only {
+                        return;
                     }
+
                     for check in &command.checks {
                         if !(check)(&context, &message) {
                             continue 'outer;
@@ -304,20 +301,20 @@ impl Framework {
                         }
 
                         if command.required_permissions != Permissions::empty() {
-                            let mut permissions_not_fulfilled = true;
+                            let mut permission_unfulfilled = true;
 
                             if let Some(x) = message.get_member() {
                                 for role_id in x.roles {
                                     if let Some(role) = role_id.find() {
                                         if role.permissions >= command.required_permissions {
-                                            permissions_not_fulfilled = false;
+                                            permission_unfulfilled = false;
                                         }
                                     }
                                 }
                             }
 
-                            if permissions_not_fulfilled {
-                                return
+                            if permission_unfulfilled {
+                                return;
                             }
                         }
 

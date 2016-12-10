@@ -99,13 +99,12 @@ impl User {
     }
 
     /// Gets user as `Member` of a server.
-    #[cfg(feature="methods")]
-    #[cfg(feature="cache")]
+    #[cfg(all(feature="cache", feature="methods"))]
     pub fn member<G>(&self, guild_id: G) -> Option<Member>
         where G: Into<GuildId> {
         let cache = CACHE.read().unwrap();
 
-        cache.get_member(guild_id.into(), self.id).map(|x| { x.clone() })
+        cache.get_member(guild_id.into(), self.id).cloned()
     }
 
     /// Retrieves the time that this user was created at.
