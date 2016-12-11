@@ -56,10 +56,12 @@
 mod command;
 mod configuration;
 mod create_command;
+mod create_group;
 
 pub use self::command::{Command, CommandType, CommandGroup};
 pub use self::configuration::{AccountType, Configuration};
 pub use self::create_command::CreateCommand;
+pub use self::create_group::CreateGroup;
 
 use self::command::{Hook, InternalCommand};
 use std::collections::HashMap;
@@ -381,19 +383,21 @@ impl Framework {
         }
 
         if let Some(ref mut x) = self.groups.get_mut("Ungrouped") {
-            x.commands.insert(command_name.into(), Command {
-                checks: Vec::default(),
-                exec: CommandType::Basic(Box::new(f)),
-                desc: None,
-                usage: None,
-                use_quotes: false,
-                dm_only: false,
-                guild_only: false,
-                help_available: true,
-                min_args: None,
-                max_args: None,
-                required_permissions: Permissions::empty()
-            });
+            if let Some(ref mut y) = Arc::get_mut(x) {
+                y.commands.insert(command_name.into(), Command {
+                    checks: Vec::default(),
+                    exec: CommandType::Basic(Box::new(f)),
+                    desc: None,
+                    usage: None,
+                    use_quotes: false,
+                    dm_only: false,
+                    guild_only: false,
+                    help_available: true,
+                    min_args: None,
+                    max_args: None,
+                    required_permissions: Permissions::empty()
+                });
+            }
         }
 
         self.initialized = true;
@@ -424,8 +428,23 @@ impl Framework {
         }
 
         if let Some(ref mut x) = self.groups.get_mut("Ungrouped") {
-            x.commands.insert(command_name.into(), cmd);
+            if let Some(ref mut y) = Arc::get_mut(x) {
+                y.commands.insert(command_name.into(), cmd);
+            }
         }
+
+        self.initialized = true;
+
+        self
+    }
+
+    pub fn group<F, S>(mut self, group_name: S, f: F) -> Self
+        where F: FnOnce(CreateGroup) -> CreateGroup,
+              S: Into<String> {
+
+        let group = f(CreateGroup(CommandGroup::default())).0;
+
+        self.groups.insert(group_name.into(), Arc::new(group));
 
         self.initialized = true;
 
