@@ -57,7 +57,7 @@ mod command;
 mod configuration;
 mod create_command;
 
-pub use self::command::{Command, CommandType};
+pub use self::command::{Command, CommandType, CommandGroup};
 pub use self::configuration::{AccountType, Configuration};
 pub use self::create_command::CreateCommand;
 
@@ -140,6 +140,7 @@ macro_rules! command {
 pub struct Framework {
     configuration: Configuration,
     commands: HashMap<String, InternalCommand>,
+    groups: HashMap<String, Arc<CommandGroup>>,
     before: Option<Arc<Hook>>,
     after: Option<Arc<Hook>>,
     /// Whether the framework has been "initialized".
@@ -253,91 +254,102 @@ impl Framework {
                     Some(piece) => piece,
                     None => continue,
                 });
+                for (_, group) in &self.groups {
+                    let to_check = if let Some(ref prefix) = group.prefix {
+                        if built.starts_with(prefix) {
+                            built[prefix.len()..].to_owned()
+                        } else {
+                            continue;
+                        }
+                    } else {
+                        built.clone()
+                    };
 
-                if let Some(command) = self.commands.get(&built) {
-                    if message.is_private() {
-                        if command.guild_only {
+                    if let Some(command) = self.commands.get(&to_check) {
+                        if message.is_private() {
+                            if command.guild_only {
+                                return;
+                            }
+                        } else if command.dm_only {
                             return;
                         }
-                    } else if command.dm_only {
-                        return;
-                    }
 
-                    for check in &command.checks {
-                        if !(check)(&context, &message) {
-                            continue 'outer;
-                        }
-                    }
-
-                    let before = self.before.clone();
-                    let command = command.clone();
-                    let after = self.after.clone();
-                    let commands = self.commands.clone();
-
-                    thread::spawn(move || {
-                        if let Some(before) = before {
-                            (before)(&context, &message, &built);
-                        }
-
-                        let args = if command.use_quotes {
-                            utils::parse_quotes(&message.content[position + built.len()..])
-                        } else {
-                            message.content[position + built.len()..]
-                                .split_whitespace()
-                                .map(|arg| arg.to_owned())
-                                .collect::<Vec<String>>()
-                        };
-
-                        if let Some(x) = command.min_args {
-                            if args.len() < x as usize {
-                                return;
+                        for check in &command.checks {
+                            if !(check)(&context, &message) {
+                                continue 'outer;
                             }
                         }
 
-                        if let Some(x) = command.max_args {
-                            if args.len() > x as usize {
-                                return;
+                        let before = self.before.clone();
+                        let command = command.clone();
+                        let after = self.after.clone();
+                        let groups = self.groups.clone();
+
+                        thread::spawn(move || {
+                            if let Some(before) = before {
+                                (before)(&context, &message, &built);
                             }
-                        }
 
-                        if !command.required_permissions.is_empty() {
-                            let mut permissions_fulfilled = false;
+                            let args = if command.use_quotes {
+                                utils::parse_quotes(&message.content[position + built.len()..])
+                            } else {
+                                message.content[position + built.len()..]
+                                    .split_whitespace()
+                                    .map(|arg| arg.to_owned())
+                                    .collect::<Vec<String>>()
+                            };
 
-                            if let Some(member) = message.get_member() {
-                                let cache = CACHE.read().unwrap();
-
-                                if let Ok(guild_id) = member.find_guild() {
-                                    if let Some(guild) = cache.get_guild(guild_id) {
-                                        let perms = guild.permissions_for(message.channel_id, message.author.id);
-
-                                        permissions_fulfilled = perms.contains(command.required_permissions);
-                                    }
+                            if let Some(x) = command.min_args {
+                                if args.len() < x as usize {
+                                    return;
                                 }
                             }
 
-                            if !permissions_fulfilled {
-                                return;
+                            if let Some(x) = command.max_args {
+                                if args.len() > x as usize {
+                                    return;
+                                }
                             }
-                        }
 
-                        match command.exec {
-                            CommandType::StringResponse(ref x) => {
-                                let _ = &context.say(x);
-                            },
-                            CommandType::Basic(ref x) => {
-                                (x)(&context, &message, args);
-                            },
-                            CommandType::WithCommands(ref x) => {
-                                (x)(&context, &message, commands, args);
+                            if !command.required_permissions.is_empty() {
+                                let mut permissions_fulfilled = false;
+
+                                if let Some(member) = message.get_member() {
+                                    let cache = CACHE.read().unwrap();
+
+                                    if let Ok(guild_id) = member.find_guild() {
+                                        if let Some(guild) = cache.get_guild(guild_id) {
+                                            let perms = guild.permissions_for(message.channel_id, message.author.id);
+
+                                            permissions_fulfilled = perms.contains(command.required_permissions);
+                                        }
+                                    }
+                                }
+
+                                if !permissions_fulfilled {
+                                    return;
+                                }
                             }
-                        }
 
-                        if let Some(after) = after {
-                            (after)(&context, &message, &built);
-                        }
-                    });
+                            match command.exec {
+                                CommandType::StringResponse(ref x) => {
+                                    let _ = &context.say(x);
+                                },
+                                CommandType::Basic(ref x) => {
+                                    (x)(&context, &message, args);
+                                },
+                                CommandType::WithCommands(ref x) => {
+                                    (x)(&context, &message, groups, args);
+                                }
+                            }
 
-                    return;
+                            if let Some(after) = after {
+                                (after)(&context, &message, &built);
+                            }
+                        });
+
+                        return;
+                    }
                 }
             }
         }
@@ -361,19 +373,28 @@ impl Framework {
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
         where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static,
               S: Into<String> {
-        self.commands.insert(command_name.into(), Arc::new(Command {
-            checks: Vec::default(),
-            exec: CommandType::Basic(Box::new(f)),
-            desc: None,
-            usage: None,
-            use_quotes: false,
-            dm_only: false,
-            guild_only: false,
-            help_available: true,
-            min_args: None,
-            max_args: None,
-            required_permissions: Permissions::empty()
-        }));
+        if !self.groups.contains_key("Ungrouped") {
+            self.groups.insert("Ungrouped".to_string(), Arc::new(CommandGroup {
+                prefix: None,
+                commands: HashMap::new()
+            }));
+        }
+
+        if let Some(ref x) = self.groups.get_mut("Ungrouped") {
+            x.commands.insert(command_name.into(), Command {
+                checks: Vec::default(),
+                exec: CommandType::Basic(Box::new(f)),
+                desc: None,
+                usage: None,
+                use_quotes: false,
+                dm_only: false,
+                guild_only: false,
+                help_available: true,
+                min_args: None,
+                max_args: None,
+                required_permissions: Permissions::empty()
+            });
+        }
 
         self.initialized = true;
 
@@ -395,7 +416,16 @@ impl Framework {
         where F: FnOnce(CreateCommand) -> CreateCommand,
               S: Into<String> {
         let cmd = f(CreateCommand(Command::default())).0;
-        self.commands.insert(command_name.into(), Arc::new(cmd));
+        if !self.groups.contains_key("Ungrouped") {
+            self.groups.insert("Ungrouped".to_string(), Arc::new(CommandGroup {
+                prefix: None,
+                commands: HashMap::new()
+            }));
+        }
+
+        if let Some(ref x) = self.groups.get_mut("Ungrouped") {
+            x.commands.insert(command_name.into(), cmd);
+        }
 
         self.initialized = true;
 
@@ -414,48 +444,6 @@ impl Framework {
     pub fn after<F>(mut self, f: F) -> Self
         where F: Fn(&Context, &Message, &String) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
-
-        self
-    }
-
-    /// Adds a "check" to a command, which checks whether or not the command's
-    /// associated function should be called.
-    ///
-    /// # Examples
-    ///
-    /// Ensure that the user who created a message, calling a "ping" command,
-    /// is the owner.
-    ///
-    /// ```rust,no_run
-    /// use serenity::client::{Client, Context};
-    /// use serenity::model::Message;
-    /// use std::env;
-    ///
-    /// let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").unwrap());
-    ///
-    /// client.with_framework(|f| f
-    ///     .configure(|c| c.prefix("~"))
-    ///     .on("ping", ping)
-    ///     .set_check("ping", owner_check));
-    ///
-    /// fn ping(context: &Context, _message: &Message, _args: Vec<String>) {
-    ///     context.say("Pong!");
-    /// }
-    ///
-    /// fn owner_check(_context: &Context, message: &Message) -> bool {
-    ///     // replace with your user ID
-    ///     message.author.id == 7
-    /// }
-    /// ```
-    #[deprecated(since="0.1.2", note="Use the `CreateCommand` builder's `check` instead.")]
-    pub fn set_check<F, S>(mut self, command: S, check: F) -> Self
-        where F: Fn(&Context, &Message) -> bool + Send + Sync + 'static,
-              S: Into<String> {
-        if let Some(command) = self.commands.get_mut(&command.into()) {
-            if let Some(c) = Arc::get_mut(command) {
-                c.checks.push(Box::new(check));
-            }
-        }
 
         self
     }

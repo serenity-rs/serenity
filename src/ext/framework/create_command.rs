@@ -1,4 +1,4 @@
-pub use ext::framework::command::{Command, CommandType};
+pub use ext::framework::command::{Command, CommandType, CommandGroup};
 
 use std::collections::HashMap;
 use std::default::Default;
@@ -113,7 +113,7 @@ impl CreateCommand {
     /// the internal HashMap of usages, used specifically for creating a help
     /// command.
     pub fn exec_help<F>(mut self, f: F) -> Self
-        where F: Fn(&Context, &Message, HashMap<String, Arc<Command>>, Vec<String>) + Send + Sync + 'static {
+        where F: Fn(&Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) + Send + Sync + 'static {
         self.0.exec = CommandType::WithCommands(Box::new(f));
 
         self
