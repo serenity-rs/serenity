@@ -23,7 +23,7 @@ pub enum CommandType {
 
 pub struct CommandGroup {
     pub prefix: Option<String>,
-    pub commands: HashMap<String, Command>
+    pub commands: HashMap<String, InternalCommand>
 }
 
 /// Command struct used to store commands internally.

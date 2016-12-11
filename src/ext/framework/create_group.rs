@@ -6,6 +6,7 @@ use std::default::Default;
 use ::client::Context;
 use ::model::Message;
 use ::model::Permissions;
+use std::sync::Arc;
 
 pub struct CreateGroup(pub CommandGroup);
 
@@ -24,7 +25,7 @@ impl CreateGroup {
 
         let cmd = f(CreateCommand(Command::default())).0;
 
-        self.0.commands.insert(command_name.into(), cmd);
+        self.0.commands.insert(command_name.into(), Arc::new(cmd));
 
         self
     }
@@ -34,7 +35,7 @@ impl CreateGroup {
         where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static,
               S: Into<String> {
 
-        self.0.commands.insert(command_name.into(), Command {
+        self.0.commands.insert(command_name.into(), Arc::new(Command {
             checks: Vec::default(),
             exec: CommandType::Basic(Box::new(f)),
             desc: None,
@@ -46,7 +47,7 @@ impl CreateGroup {
             min_args: None,
             max_args: None,
             required_permissions: Permissions::empty()
-        });
+        }));
 
         self
     }

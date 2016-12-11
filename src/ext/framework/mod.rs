@@ -64,7 +64,7 @@ pub use self::configuration::{AccountType, Configuration};
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
 
-use self::command::{Hook, InternalCommand};
+use self::command::Hook;
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::thread;
@@ -261,16 +261,15 @@ impl Framework {
 
                 for (_, group) in groups {
                     let to_check = if let Some(ref prefix) = group.prefix {
-                        if built.starts_with(prefix) {
-                            built[prefix.len()..].to_owned()
+                        if built.starts_with(prefix) && built.len() > prefix.len() + 1 {
+                            built[(prefix.len() + 1)..].to_owned()
                         } else {
                             continue;
                         }
                     } else {
                         built.clone()
                     };
-
-                    if let Some(command) = group.clone().commands.get(&to_check) {
+                    if let Some(command) = group.commands.get(&to_check) {
                         if message.is_private() {
                             if command.guild_only {
                                 return;
@@ -387,7 +386,7 @@ impl Framework {
 
         if let Some(ref mut x) = self.groups.get_mut("Ungrouped") {
             if let Some(ref mut y) = Arc::get_mut(x) {
-                y.commands.insert(command_name.into(), Command {
+                y.commands.insert(command_name.into(), Arc::new(Command {
                     checks: Vec::default(),
                     exec: CommandType::Basic(Box::new(f)),
                     desc: None,
@@ -399,7 +398,7 @@ impl Framework {
                     min_args: None,
                     max_args: None,
                     required_permissions: Permissions::empty()
-                });
+                }));
             }
         }
 
@@ -432,7 +431,7 @@ impl Framework {
 
         if let Some(ref mut x) = self.groups.get_mut("Ungrouped") {
             if let Some(ref mut y) = Arc::get_mut(x) {
-                y.commands.insert(command_name.into(), cmd);
+                y.commands.insert(command_name.into(), Arc::new(cmd));
             }
         }
 
