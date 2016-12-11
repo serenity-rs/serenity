@@ -54,6 +54,7 @@
 //! [`Client::with_framework`]: ../../client/struct.Client.html#method.with_framework
 
 mod command;
+pub mod help_commands;
 mod configuration;
 mod create_command;
 mod create_group;
@@ -141,7 +142,6 @@ macro_rules! command {
 #[derive(Default)]
 pub struct Framework {
     configuration: Configuration,
-    commands: HashMap<String, InternalCommand>,
     groups: HashMap<String, Arc<CommandGroup>>,
     before: Option<Arc<Hook>>,
     after: Option<Arc<Hook>>,
@@ -256,7 +256,10 @@ impl Framework {
                     Some(piece) => piece,
                     None => continue,
                 });
-                for (_, group) in &self.groups {
+
+                let groups = self.groups.clone();
+
+                for (_, group) in groups {
                     let to_check = if let Some(ref prefix) = group.prefix {
                         if built.starts_with(prefix) {
                             built[prefix.len()..].to_owned()
@@ -267,7 +270,7 @@ impl Framework {
                         built.clone()
                     };
 
-                    if let Some(command) = self.commands.get(&to_check) {
+                    if let Some(command) = group.clone().commands.get(&to_check) {
                         if message.is_private() {
                             if command.guild_only {
                                 return;
