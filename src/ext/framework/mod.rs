@@ -380,7 +380,7 @@ impl Framework {
             }));
         }
 
-        if let Some(ref x) = self.groups.get_mut("Ungrouped") {
+        if let Some(ref mut x) = self.groups.get_mut("Ungrouped") {
             x.commands.insert(command_name.into(), Command {
                 checks: Vec::default(),
                 exec: CommandType::Basic(Box::new(f)),
@@ -423,7 +423,7 @@ impl Framework {
             }));
         }
 
-        if let Some(ref x) = self.groups.get_mut("Ungrouped") {
+        if let Some(ref mut x) = self.groups.get_mut("Ungrouped") {
             x.commands.insert(command_name.into(), cmd);
         }
 
