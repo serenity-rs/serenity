@@ -62,10 +62,7 @@ pub fn identify(token: &str, shard_info: Option<[u8; 2]>) -> Value {
                 .insert_object("properties", |object| object
                     .insert("$browser", "Ergonomic and high-level Rust library")
                     .insert("$device", "serenity")
-                    .insert("$os", env::consts::OS)
-                    .insert("$referrer", "")
-                    .insert("$referring_domain", "")
-                )
+                    .insert("$os", env::consts::OS))
                 .insert("token", token)
                 .insert("v", constants::GATEWAY_VERSION);
 
