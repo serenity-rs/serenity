@@ -47,6 +47,7 @@ impl CreateGroup {
     }
 
     /// Adds a command to group with simplified API.
+    /// You can return a string inside Some if there's an error.
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
         where F: Fn(&Context, &Message, Vec<String>) -> Option<String> + Send + Sync + 'static,
               S: Into<String> {
