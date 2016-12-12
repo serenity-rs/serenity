@@ -1,4 +1,4 @@
-pub use ext::framework::command::{Command, CommandType, CommandGroup};
+pub use super::{Command, CommandType, CommandGroup};
 
 use std::collections::HashMap;
 use std::default::Default;
@@ -51,6 +51,13 @@ impl CreateCommand {
     /// Description, used by other commands.
     pub fn desc(mut self, desc: &str) -> Self {
         self.0.desc = Some(desc.to_owned());
+
+        self
+    }
+
+    /// Adds a ratelimit bucket.
+    pub fn bucket(mut self, bucket: &str) -> Self {
+        self.0.bucket = Some(bucket.to_owned());
 
         self
     }
@@ -170,6 +177,7 @@ impl Default for Command {
             usage: None,
             use_quotes: true,
             min_args: None,
+            bucket: None,
             max_args: None,
             required_permissions: Permissions::empty(),
             dm_only: false,

@@ -33,6 +33,8 @@ pub struct Command {
     pub checks: Vec<Box<Check>>,
     /// Function called when the command is called.
     pub exec: CommandType,
+    /// Ratelimit bucket.
+    pub bucket: Option<String>,
     /// Command description, used by other commands.
     pub desc: Option<String>,
     /// Command usage schema, used by other commands.
@@ -63,6 +65,7 @@ impl Command {
             usage: None,
             use_quotes: false,
             dm_only: false,
+            bucket: None,
             guild_only: false,
             help_available: true,
             min_args: None,

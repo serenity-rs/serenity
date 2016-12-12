@@ -59,11 +59,13 @@ mod command;
 mod configuration;
 mod create_command;
 mod create_group;
+mod buckets;
 
 pub use self::command::{Command, CommandType, CommandGroup};
 pub use self::configuration::{AccountType, Configuration};
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
+pub use self::buckets::{Ratelimit, MemberRatelimit, Bucket};
 
 use self::command::Hook;
 use std::collections::HashMap;
@@ -73,6 +75,7 @@ use ::client::Context;
 use ::model::Message;
 use ::utils;
 use ::client::CACHE;
+use time;
 
 /// A macro to generate "named parameters". This is useful to avoid manually
 /// using the "arguments" parameter and manually parsing types.
@@ -131,24 +134,6 @@ macro_rules! command {
             $b
         }
     };
-}
-
-#[doc(hidden)]
-pub struct Ratelimit {
-    pub delay: i32,
-    pub limit: Option<(i64, i32)>
-}
-
-#[doc(hidden)]
-pub struct MemberRatelimit {
-    pub count: i32,
-    pub last_time: u64
-}
-
-#[doc(hidden)]
-pub struct Bucket {
-    pub ratelimit: Ratelimit,
-    pub limits: HashMap<u64, MemberRatelimit>
 }
 
 /// A utility for easily managing dispatches to commands.
@@ -216,7 +201,7 @@ impl Framework {
         self
     }
 
-    pub fn bucket<S>(mut self, s: S, delay: i32, time_span: i64, limit: i32) -> Self
+    pub fn bucket<S>(mut self, s: S, delay: i64, time_span: i64, limit: i32) -> Self
         where S: Into<String> {
         self.buckets.insert(s.into(), Bucket {
             ratelimit: Ratelimit {
@@ -229,8 +214,7 @@ impl Framework {
         self
     }
 
-
-    pub fn simple_bucket<S>(mut self, s: S, delay: i32) -> Self
+    pub fn simple_bucket<S>(mut self, s: S, delay: i64) -> Self
         where S: Into<String> {
         self.buckets.insert(s.into(), Bucket {
             ratelimit: Ratelimit {
@@ -241,6 +225,45 @@ impl Framework {
         });
 
         self
+    }
+
+    #[allow(dead_code)]
+    fn is_ratelimited(&mut self, bucket_name: String, id: u64) -> i64 {
+        let time = time::now().to_timespec().sec;
+        if self.buckets.contains_key(&bucket_name) {
+            if let Some(ref mut bucket) = self.buckets.get_mut(&bucket_name) {
+                if bucket.limits.contains_key(&id) {
+                    let ratelimit = &bucket.ratelimit;
+                    let member = bucket.limits.get(&id).unwrap();
+                    if let Some((time_span, limit)) = ratelimit.limit {
+                        if (member.count + 1) > limit {
+                            if time < (member.set_time + time_span) {
+                                return 0;
+                            } else if let Some(ref mut member) = bucket.limits.get_mut(&id) {
+                                member.count = 0;
+                                member.set_time = time;
+                            }
+                        }
+                    }
+                    if time < (member.last_time + ratelimit.delay) {
+                        return (member.last_time + ratelimit.delay) - time;
+                    } else {
+                        if let Some(ref mut member) = bucket.limits.get_mut(&id) {
+                            member.count = 0;
+                            member.last_time = time;
+                        }
+                    }
+                } else {
+                    bucket.limits.insert(id, MemberRatelimit {
+                        count: 1,
+                        last_time: time,
+                        set_time: time
+                    });
+                }
+            }
+        }
+
+        0
     }
 
     #[doc(hidden)]
