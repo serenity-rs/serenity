@@ -49,6 +49,20 @@ pub struct Configuration {
     #[doc(hidden)]
     pub dynamic_prefix: Option<Box<PrefixCheck>>,
     #[doc(hidden)]
+    pub rate_limit_message: Option<String>,
+    #[doc(hidden)]
+    pub invalid_permission_message: Option<String>,
+    #[doc(hidden)]
+    pub invalid_check_message: Option<String>,
+    #[doc(hidden)]
+    pub no_dm_message: Option<String>,
+    #[doc(hidden)]
+    pub no_guild_message: Option<String>,
+    #[doc(hidden)]
+    pub too_many_args_message: Option<String>,
+    #[doc(hidden)]
+    pub not_enough_args_message: Option<String>,
+    #[doc(hidden)]
     pub account_type: AccountType
 }
 
@@ -63,6 +77,73 @@ impl Configuration {
     /// triggered, as its "depth" is `2`.
     pub fn depth(mut self, depth: u8) -> Self {
         self.depth = depth as usize;
+
+        self
+    }
+
+    /// Message that's sent when a command is on cooldown.
+    /// See framework documentation to see where is this utilized.
+    ///
+    /// %time% will be replaced with waiting time in seconds.
+    pub fn rate_limit_message<S>(mut self, rate_limit_message: S) -> Self
+        where S: Into<String> {
+        self.rate_limit_message = Some(rate_limit_message.into());
+
+        self
+    }
+
+    /// Message that's sent when a user with wrong permissions calls a command.
+    pub fn invalid_permission_message<S>(mut self, invalid_permission_message: S) -> Self
+        where S: Into<String> {
+        self.invalid_permission_message = Some(invalid_permission_message.into());
+
+        self
+    }
+
+    /// Message that's sent when one of a command's checks doesn't succeed.
+    pub fn invalid_check_message<S>(mut self, invalid_check_message: S) -> Self
+        where S: Into<String> {
+        self.invalid_check_message = Some(invalid_check_message.into());
+
+        self
+    }
+
+    /// Message that's sent when a command isn't available in DM.
+    pub fn no_dm_message<S>(mut self, no_dm_message: S) -> Self
+        where S: Into<String> {
+        self.no_dm_message = Some(no_dm_message.into());
+
+        self
+    }
+
+    /// Message that's sent when a command isn't available in guilds.
+    pub fn no_guild_message<S>(mut self, no_guild_message: S) -> Self
+        where S: Into<String> {
+        self.no_guild_message = Some(no_guild_message.into());
+
+        self
+    }
+
+    /// Message that's sent when user sends too many arguments to a command.
+    ///
+    /// %max% will be replaced with maximum allowed amount of arguments.
+    ///
+    /// %given% will be replced with the given amount of arguments.
+    pub fn too_many_args_message<S>(mut self, too_many_args_message: S) -> Self
+        where S: Into<String> {
+        self.too_many_args_message = Some(too_many_args_message.into());
+
+        self
+    }
+
+    /// Message that's sent when user sends too few arguments to a command.
+    ///
+    /// %min% will be replaced with minimum allowed amount of arguments.
+    ///
+    /// %given% will be replced with the given amount of arguments.
+    pub fn not_enough_args_message<S>(mut self, not_enough_args_message: S) -> Self
+        where S: Into<String> {
+        self.not_enough_args_message = Some(not_enough_args_message.into());
 
         self
     }
@@ -181,6 +262,13 @@ impl Default for Configuration {
             allow_whitespace: false,
             prefixes: vec![],
             dynamic_prefix: None,
+            rate_limit_message: None,
+            invalid_permission_message: None,
+            invalid_check_message: None,
+            no_dm_message: None,
+            no_guild_message: None,
+            too_many_args_message: None,
+            not_enough_args_message: None,
             account_type: AccountType::Automatic
         }
     }

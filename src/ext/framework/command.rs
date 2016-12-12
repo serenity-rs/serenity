@@ -6,9 +6,10 @@ use ::model::Permissions;
 use std::collections::HashMap;
 
 pub type Check = Fn(&Context, &Message) -> bool + Send + Sync + 'static;
-pub type Exec = Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static;
-pub type Help = Fn(&Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) + Send + Sync + 'static;
+pub type Exec = Fn(&Context, &Message, Vec<String>) -> Option<String> + Send + Sync + 'static;
+pub type Help = Fn(&Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) -> Option<String> + Send + Sync + 'static;
 pub type Hook = Fn(&Context, &Message, &String) + Send + Sync + 'static;
+pub type AfterHook = Fn(&Context, &Message, &String, Option<String>) + Send + Sync + 'static;
 #[doc(hidden)]
 pub type InternalCommand = Arc<Command>;
 pub type PrefixCheck = Fn(&Context) -> Option<String> + Send + Sync + 'static;
@@ -57,7 +58,7 @@ pub struct Command {
 
 impl Command {
     pub fn new<F>(f: F) -> Self
-        where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static {
+        where F: Fn(&Context, &Message, Vec<String>) -> Option<String> + Send + Sync + 'static {
         Command {
             checks: Vec::default(),
             exec: CommandType::Basic(Box::new(f)),

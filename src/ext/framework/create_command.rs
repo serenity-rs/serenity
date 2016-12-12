@@ -110,7 +110,7 @@ impl CreateCommand {
     ///
     /// [`exec_str`]: #method.exec_str
     pub fn exec<F>(mut self, func: F) -> Self
-        where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static {
+        where F: Fn(&Context, &Message, Vec<String>) -> Option<String> + Send + Sync + 'static {
         self.0.exec = CommandType::Basic(Box::new(func));
 
         self
@@ -120,7 +120,7 @@ impl CreateCommand {
     /// the internal HashMap of usages, used specifically for creating a help
     /// command.
     pub fn exec_help<F>(mut self, f: F) -> Self
-        where F: Fn(&Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) + Send + Sync + 'static {
+        where F: Fn(&Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) -> Option<String> + Send + Sync + 'static {
         self.0.exec = CommandType::WithCommands(Box::new(f));
 
         self
@@ -172,7 +172,7 @@ impl Default for Command {
     fn default() -> Command {
         Command {
             checks: Vec::default(),
-            exec: CommandType::Basic(Box::new(|_, _, _| {})),
+            exec: CommandType::Basic(Box::new(|_, _, _| None)),
             desc: None,
             usage: None,
             use_quotes: true,

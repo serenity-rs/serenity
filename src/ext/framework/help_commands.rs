@@ -17,7 +17,7 @@ fn error_embed(ctx: &Context, message: &Message, input: &str) {
 pub fn with_embeds(ctx: &Context,
                    message: &Message,
                    groups: HashMap<String, Arc<CommandGroup>>,
-                   args: Vec<String>) {
+                   args: Vec<String>) -> Option<String> {
     if !args.is_empty() {
         let name = args.join(" ");
         for (group_name, group) in groups {
@@ -38,7 +38,7 @@ pub fn with_embeds(ctx: &Context,
             if let Some((command_name, command)) = found {
                 if !command.help_available {
                     error_embed(ctx, message, "**Error**: No help available.");
-                    return;
+                    return None;
                 }
                 let _ = ctx.send_message(message.channel_id, |m| {
                     m.embed(|e| {
@@ -77,16 +77,16 @@ pub fn with_embeds(ctx: &Context,
                         embed
                     })
                 });
-                return;
+                return None;
             }
         }
         let error_msg = format!("**Error**: Command `{}` not found.", name);
         error_embed(ctx, message, &error_msg);
-        return;
+        return None;
     }
     let _ = ctx.send_message(message.channel_id, |m| {
         m.embed(|e| {
-            let mut embed = e.colour(Colour::blurple())
+            let mut embed = e.colour(Colour::rosewater())
                 .description("To get help about individual command, pass its name as an argument \
                               to this command.");
             for (group_name, group) in groups {
@@ -113,12 +113,14 @@ pub fn with_embeds(ctx: &Context,
             embed
         })
     });
+
+    None
 }
 
 pub fn plain(ctx: &Context,
              _: &Message,
              groups: HashMap<String, Arc<CommandGroup>>,
-             args: Vec<String>) {
+             args: Vec<String>) -> Option<String> {
     if !args.is_empty() {
         let name = args.join(" ");
         for (group_name, group) in groups {
@@ -139,14 +141,17 @@ pub fn plain(ctx: &Context,
             if let Some((command_name, command)) = found {
                 if !command.help_available {
                     let _ = ctx.say("**Error**: No help available.");
-                    return;
+                    return None;
                 }
                 let mut result = format!("**{}**\n", command_name);
                 if let Some(ref desc) = command.desc {
-                    let _ = write!(result, "**Description:** {}", desc);
+                    let _ = write!(result, "**Description:** {}\n", desc);
                 }
                 if let Some(ref usage) = command.usage {
-                    let _ = write!(result, "**Usage:** {}", usage);
+                    let _ = write!(result, "**Usage:** {}\n", usage);
+                }
+                if group_name != "Ungrouped" {
+                    let _ = write!(result, "**Group:** {}\n", group_name);
                 }
                 let available = if command.dm_only {
                     "Only in DM"
@@ -155,16 +160,13 @@ pub fn plain(ctx: &Context,
                 } else {
                     "In DM and guilds"
                 };
-                if group_name != "Ungrouped" {
-                    let _ = write!(result, "**Group:** {}", group_name);
-                }
-                let _ = write!(result, "**Available:** {}", available);
+                let _ = write!(result, "**Available:** {}\n", available);
                 let _ = ctx.say(&result);
-                return;
+                return None;
             }
         }
         let _ = ctx.say(&format!("**Error**: Command `{}` not found.", name));
-        return;
+        return None;
     }
     let mut result = "**Commands**\nTo get help about individual command, pass its name as an \
                   argument to this command.\n\n"
@@ -187,4 +189,6 @@ pub fn plain(ctx: &Context,
         let _ = write!(result, "**{}:** {}\n", group_name, desc);
     }
     let _ = ctx.say(&result);
+
+    None
 }

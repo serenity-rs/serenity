@@ -67,7 +67,7 @@ pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
 pub use self::buckets::{Ratelimit, MemberRatelimit, Bucket};
 
-use self::command::Hook;
+use self::command::{AfterHook, Hook};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::thread;
@@ -111,27 +111,31 @@ use time;
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
-        pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) {
+        pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) -> Option<String> {
             $b
+
+            None
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
-        pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) {
+        pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) -> Option<String> {
             let mut i = $a.iter();
 
             $(
                 let $name = match i.next() {
                     Some(v) => match v.parse::<$t>() {
                         Ok(v) => v,
-                        Err(_why) => return,
+                        Err(_why) => return Some(format!("Failed to parse {:?}", stringify!($t))),
                     },
-                    None => return,
+                    None => return Some(format!("Failed to parse {:?}", stringify!($t))),
                 };
             )*
 
             drop(i);
 
             $b
+
+            None
         }
     };
 }
@@ -148,7 +152,7 @@ pub struct Framework {
     groups: HashMap<String, Arc<CommandGroup>>,
     before: Option<Arc<Hook>>,
     buckets: HashMap<String, Bucket>,
-    after: Option<Arc<Hook>>,
+    after: Option<Arc<AfterHook>>,
     /// Whether the framework has been "initialized".
     ///
     /// The framework is initialized once one of the following occurs:
@@ -201,6 +205,8 @@ impl Framework {
         self
     }
 
+    /// Defines a bucket with `delay` between each command, and the `limit` of uses
+    /// per `time_span`.
     pub fn bucket<S>(mut self, s: S, delay: i64, time_span: i64, limit: i32) -> Self
         where S: Into<String> {
         self.buckets.insert(s.into(), Bucket {
@@ -214,6 +220,7 @@ impl Framework {
         self
     }
 
+    /// Defines a bucket just with `delay` between each command.
     pub fn simple_bucket<S>(mut self, s: S, delay: i64) -> Self
         where S: Into<String> {
         self.buckets.insert(s.into(), Bucket {
@@ -227,19 +234,18 @@ impl Framework {
         self
     }
 
-    #[allow(dead_code)]
-    fn is_ratelimited(&mut self, bucket_name: String, id: u64) -> i64 {
+    fn is_ratelimited(&mut self, bucket_name: &str, id: u64) -> i64 {
         let time = time::now().to_timespec().sec;
-        if self.buckets.contains_key(&bucket_name) {
-            if let Some(ref mut bucket) = self.buckets.get_mut(&bucket_name) {
+        if self.buckets.contains_key(bucket_name) {
+            if let Some(ref mut bucket) = self.buckets.get_mut(bucket_name) {
                 if bucket.limits.contains_key(&id) {
                     let ratelimit = &bucket.ratelimit;
-                    let member = bucket.limits.get(&id).unwrap();
+                    let member = bucket.limits.get_mut(&id).unwrap();
                     if let Some((time_span, limit)) = ratelimit.limit {
                         if (member.count + 1) > limit {
                             if time < (member.set_time + time_span) {
-                                return 0;
-                            } else if let Some(ref mut member) = bucket.limits.get_mut(&id) {
+                                return (member.set_time + time_span) - time;
+                            } else {
                                 member.count = 0;
                                 member.set_time = time;
                             }
@@ -248,10 +254,8 @@ impl Framework {
                     if time < (member.last_time + ratelimit.delay) {
                         return (member.last_time + ratelimit.delay) - time;
                     } else {
-                        if let Some(ref mut member) = bucket.limits.get_mut(&id) {
-                            member.count = 0;
-                            member.last_time = time;
-                        }
+                        member.count += 1;
+                        member.last_time = time;
                     }
                 } else {
                     bucket.limits.insert(id, MemberRatelimit {
@@ -339,16 +343,36 @@ impl Framework {
                         built.clone()
                     };
                     if let Some(command) = group.commands.get(&to_check) {
+                        if let Some(ref bucket_name) = command.bucket {
+                            let rate_limit = self.is_ratelimited(bucket_name, message.author.id.0);
+                            if rate_limit > 0 {
+                                if let Some(ref message) = self.configuration.rate_limit_message {
+                                    let _ = context.say(
+                                        &message.replace("%time%", &rate_limit.to_string()));
+                                }
+                                return;
+                            }
+                        }
+
                         if message.is_private() {
                             if command.guild_only {
+                                if let Some(ref message) = self.configuration.no_guild_message {
+                                    let _ = context.say(&message);
+                                }
                                 return;
                             }
                         } else if command.dm_only {
+                            if let Some(ref message) = self.configuration.no_dm_message {
+                                let _ = context.say(&message);
+                            }
                             return;
                         }
 
                         for check in &command.checks {
                             if !(check)(&context, &message) {
+                                if let Some(ref message) = self.configuration.invalid_check_message {
+                                    let _ = context.say(&message);
+                                }
                                 continue 'outer;
                             }
                         }
@@ -358,50 +382,63 @@ impl Framework {
                         let after = self.after.clone();
                         let groups = self.groups.clone();
 
+                        let args = if command.use_quotes {
+                            utils::parse_quotes(&message.content[position + built.len()..])
+                        } else {
+                            message.content[position + built.len()..]
+                                .split_whitespace()
+                                .map(|arg| arg.to_owned())
+                                .collect::<Vec<String>>()
+                        };
+
+                        if let Some(x) = command.min_args {
+                            if args.len() < x as usize {
+                                if let Some(ref message) = self.configuration.not_enough_args_message {
+                                    let _ = context.say(
+                                        &message.replace("%min%", &x.to_string())
+                                                .replace("%given%", &args.len().to_string()));
+                                }
+                                return;
+                            }
+                        }
+
+                        if let Some(x) = command.max_args {
+                            if args.len() > x as usize {
+                                if let Some(ref message) = self.configuration.too_many_args_message {
+                                    let _ = context.say(
+                                        &message.replace("%max%", &x.to_string())
+                                                .replace("%given%", &args.len().to_string()));
+                                }
+                                return;
+                            }
+                        }
+
+                        if !command.required_permissions.is_empty() {
+                            let mut permissions_fulfilled = false;
+
+                            if let Some(member) = message.get_member() {
+                                let cache = CACHE.read().unwrap();
+
+                                if let Ok(guild_id) = member.find_guild() {
+                                    if let Some(guild) = cache.get_guild(guild_id) {
+                                        let perms = guild.permissions_for(message.channel_id, message.author.id);
+
+                                        permissions_fulfilled = perms.contains(command.required_permissions);
+                                    }
+                                }
+                            }
+
+                            if !permissions_fulfilled {
+                                if let Some(ref message) = self.configuration.invalid_permission_message {
+                                    let _ = context.say(&message);
+                                }
+                                return;
+                            }
+                        }
+
                         thread::spawn(move || {
                             if let Some(before) = before {
                                 (before)(&context, &message, &built);
-                            }
-
-                            let args = if command.use_quotes {
-                                utils::parse_quotes(&message.content[position + built.len()..])
-                            } else {
-                                message.content[position + built.len()..]
-                                    .split_whitespace()
-                                    .map(|arg| arg.to_owned())
-                                    .collect::<Vec<String>>()
-                            };
-
-                            if let Some(x) = command.min_args {
-                                if args.len() < x as usize {
-                                    return;
-                                }
-                            }
-
-                            if let Some(x) = command.max_args {
-                                if args.len() > x as usize {
-                                    return;
-                                }
-                            }
-
-                            if !command.required_permissions.is_empty() {
-                                let mut permissions_fulfilled = false;
-
-                                if let Some(member) = message.get_member() {
-                                    let cache = CACHE.read().unwrap();
-
-                                    if let Ok(guild_id) = member.find_guild() {
-                                        if let Some(guild) = cache.get_guild(guild_id) {
-                                            let perms = guild.permissions_for(message.channel_id, message.author.id);
-
-                                            permissions_fulfilled = perms.contains(command.required_permissions);
-                                        }
-                                    }
-                                }
-
-                                if !permissions_fulfilled {
-                                    return;
-                                }
                             }
 
                             match command.exec {
@@ -409,15 +446,19 @@ impl Framework {
                                     let _ = &context.say(x);
                                 },
                                 CommandType::Basic(ref x) => {
-                                    (x)(&context, &message, args);
+                                    let result = (x)(&context, &message, args);
+
+                                    if let Some(after) = after {
+                                        (after)(&context, &message, &built, result);
+                                    }
                                 },
                                 CommandType::WithCommands(ref x) => {
-                                    (x)(&context, &message, groups, args);
-                                }
-                            }
+                                    let result = (x)(&context, &message, groups, args);
 
-                            if let Some(after) = after {
-                                (after)(&context, &message, &built);
+                                    if let Some(after) = after {
+                                        (after)(&context, &message, &built, result);
+                                    }
+                                }
                             }
                         });
 
@@ -444,7 +485,7 @@ impl Framework {
     /// [`command`]: #method.command
     /// [module-level documentation]: index.html
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static,
+        where F: Fn(&Context, &Message, Vec<String>) -> Option<String> + Send + Sync + 'static,
               S: Into<String> {
         if !self.groups.contains_key("Ungrouped") {
             self.groups.insert("Ungrouped".to_string(), Arc::new(CommandGroup::default()));
@@ -513,8 +554,9 @@ impl Framework {
     }
 
     /// Specify the function to be called after every command's execution.
+    /// Fourth argument exists if command returned an error which you can handle.
     pub fn after<F>(mut self, f: F) -> Self
-        where F: Fn(&Context, &Message, &String) + Send + Sync + 'static {
+        where F: Fn(&Context, &Message, &String, Option<String>) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
 
         self

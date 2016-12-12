@@ -48,7 +48,7 @@ impl CreateGroup {
 
     /// Adds a command to group with simplified API.
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static,
+        where F: Fn(&Context, &Message, Vec<String>) -> Option<String> + Send + Sync + 'static,
               S: Into<String> {
         self.0.commands.insert(command_name.into(), Arc::new(Command::new(f)));
 

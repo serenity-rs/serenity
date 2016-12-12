@@ -15,6 +15,7 @@ extern crate typemap;
 use serenity::client::Context;
 use serenity::Client;
 use serenity::model::{Message, permissions};
+use serenity::ext::framework::help_commands;
 use std::collections::HashMap;
 use std::env;
 use std::fmt::Write;
@@ -58,6 +59,7 @@ fn main() {
         .configure(|c| c
             .allow_whitespace(true)
             .on_mention(true)
+            .rate_limit_message("Try this again in `%time%` seconds.")
             .prefix("~"))
         // Set a function to be called prior to each command execution. This
         // provides the context of the command, the message that was received,
@@ -81,19 +83,34 @@ fn main() {
         })
         // Very similar to `before`, except this will be called directly _after_
         // command execution.
-        .after(|_, _, command_name| {
-            println!("Processed command '{}'", command_name)
+        .after(|_, _, command_name, error| {
+            if let Some(why) = error {
+                println!("Command '{}' returned error {:?}", command_name, why);
+            } else {
+                println!("Processed command '{}'", command_name);
+            }
         })
+        // Can't be used more than once per 5 seconds:
+        .simple_bucket("emoji", 5)
+        // Can't be used more than 2 times per 30 seconds, with a 5 second delay:
+        .bucket("complicated", 5, 30, 2)
         .command("about", |c| c.exec_str("A test bot"))
+        .command("help", |c| c.exec_help(help_commands::plain))
         .command("commands", |c| c
-            .check(owner_check)
+            .bucket("complicated") // Make this command use "complicated" bucket.
             .exec(commands))
-        .group("emoji", |g|
+        .group("Emoji", |g| g
+            .prefix("emoji")
             .command("cat", |c| c
+                .desc("Sends an emoji with a cat.")
+                .bucket("emoji") // Make this command use "emoji" bucket.
                 .exec_str(":cat:")
-                 // All only administrators to call this:
+                 // Allow only administrators to call this:
                 .required_permissions(permissions::ADMINISTRATOR))
-            .command("dog", |c| c.exec_str(":dog:")))
+            .command("dog", |c| c
+                .desc("Sends an emoji with a dog.")
+                .bucket("emoji")
+                .exec_str(":dog:")))
         .command("multiply", |c| c.exec(multiply))
         .command("ping", |c| c
             .check(owner_check)
@@ -136,10 +153,12 @@ fn owner_check(_: &Context, message: &Message) -> bool {
     message.author.id == 7
 }
 
-fn some_long_command(context: &Context, _: &Message, args: Vec<String>) {
+fn some_long_command(context: &Context, _: &Message, args: Vec<String>) -> Option<String> {
     if let Err(why) = context.say(&format!("Arguments: {:?}", args)) {
         println!("Error sending message: {:?}", why);
     }
+
+    None
 }
 
 // Using the `command!` macro, commands can be created with a certain type of
