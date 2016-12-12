@@ -133,6 +133,24 @@ macro_rules! command {
     };
 }
 
+#[doc(hidden)]
+pub struct Ratelimit {
+    pub delay: i32,
+    pub limit: Option<(i64, i32)>
+}
+
+#[doc(hidden)]
+pub struct MemberRatelimit {
+    pub count: i32,
+    pub last_time: u64
+}
+
+#[doc(hidden)]
+pub struct Bucket {
+    pub ratelimit: Ratelimit,
+    pub limits: HashMap<u64, MemberRatelimit>
+}
+
 /// A utility for easily managing dispatches to commands.
 ///
 /// Refer to the [module-level documentation] for more information.
@@ -144,6 +162,7 @@ pub struct Framework {
     configuration: Configuration,
     groups: HashMap<String, Arc<CommandGroup>>,
     before: Option<Arc<Hook>>,
+    buckets: HashMap<String, Bucket>,
     after: Option<Arc<Hook>>,
     /// Whether the framework has been "initialized".
     ///
@@ -193,6 +212,33 @@ impl Framework {
     pub fn configure<F>(mut self, f: F) -> Self
         where F: FnOnce(Configuration) -> Configuration {
         self.configuration = f(self.configuration);
+
+        self
+    }
+
+    pub fn bucket<S>(mut self, s: S, delay: i32, time_span: i64, limit: i32) -> Self
+        where S: Into<String> {
+        self.buckets.insert(s.into(), Bucket {
+            ratelimit: Ratelimit {
+                delay: delay,
+                limit: Some((time_span, limit))
+            },
+            limits: HashMap::new()
+        });
+
+        self
+    }
+
+
+    pub fn simple_bucket<S>(mut self, s: S, delay: i32) -> Self
+        where S: Into<String> {
+        self.buckets.insert(s.into(), Bucket {
+            ratelimit: Ratelimit {
+                delay: delay,
+                limit: None
+            },
+            limits: HashMap::new()
+        });
 
         self
     }
