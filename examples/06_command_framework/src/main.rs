@@ -91,7 +91,8 @@ fn main() {
         .group("emoji", |g|
             .command("cat", |c| c
                 .exec_str(":cat:")
-                .required_permissions(permissions::SEND_MESSAGES))
+                 // All only administrators to call this:
+                .required_permissions(permissions::ADMINISTRATOR))
             .command("dog", |c| c.exec_str(":dog:")))
         .command("multiply", |c| c.exec(multiply))
         .command("ping", |c| c

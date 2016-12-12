@@ -53,6 +53,25 @@ pub struct Command {
     pub guild_only: bool,
 }
 
+impl Command {
+    pub fn new<F>(f: F) -> Self
+        where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static {
+        Command {
+            checks: Vec::default(),
+            exec: CommandType::Basic(Box::new(f)),
+            desc: None,
+            usage: None,
+            use_quotes: false,
+            dm_only: false,
+            guild_only: false,
+            help_available: true,
+            min_args: None,
+            max_args: None,
+            required_permissions: Permissions::empty()
+        }
+    }
+}
+
 pub fn positions(ctx: &Context, content: &str, conf: &Configuration) -> Option<Vec<usize>> {
     if !conf.prefixes.is_empty() || conf.dynamic_prefix.is_some() {
         // Find out if they were mentioned. If not, determine if the prefix

@@ -5,13 +5,30 @@ use std::collections::HashMap;
 use std::default::Default;
 use ::client::Context;
 use ::model::Message;
-use ::model::Permissions;
 use std::sync::Arc;
 
 pub struct CreateGroup(pub CommandGroup);
 
+/// Used to create command groups
+///
+/// # Examples
+///
+/// Create group named Information where all commands are prefixed with info,
+/// and add one command named "name". For example, if prefix is "~", we say "~info name"
+/// to call the "name" command.
+///
+/// ```rust,ignore
+/// framework.group("Information", |g| g
+///     .prefix("info")
+///     .command("name", |c| c
+///         .exec_str("meew0")))
+/// ```
 impl CreateGroup {
     /// If prefix is set, it will be required before all command names.
+    /// For example, if bot prefix is "~" and group prefix is "image"
+    /// we'd call a subcommand named "hibiki" by sending "~image hibiki".
+    ///
+    /// **Note**: serenity automatically puts a space after group prefix.
     pub fn prefix(mut self, desc: &str) -> Self {
         self.0.prefix = Some(desc.to_owned());
 
@@ -22,7 +39,6 @@ impl CreateGroup {
     pub fn command<F, S>(mut self, command_name: S, f: F) -> Self
         where F: FnOnce(CreateCommand) -> CreateCommand,
               S: Into<String> {
-
         let cmd = f(CreateCommand(Command::default())).0;
 
         self.0.commands.insert(command_name.into(), Arc::new(cmd));
@@ -34,20 +50,7 @@ impl CreateGroup {
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
         where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static,
               S: Into<String> {
-
-        self.0.commands.insert(command_name.into(), Arc::new(Command {
-            checks: Vec::default(),
-            exec: CommandType::Basic(Box::new(f)),
-            desc: None,
-            usage: None,
-            use_quotes: false,
-            dm_only: false,
-            guild_only: false,
-            help_available: true,
-            min_args: None,
-            max_args: None,
-            required_permissions: Permissions::empty()
-        }));
+        self.0.commands.insert(command_name.into(), Arc::new(Command::new(f)));
 
         self
     }

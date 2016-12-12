@@ -53,8 +53,9 @@
 //!
 //! [`Client::with_framework`]: ../../client/struct.Client.html#method.with_framework
 
-mod command;
 pub mod help_commands;
+
+mod command;
 mod configuration;
 mod create_command;
 mod create_group;
@@ -72,7 +73,6 @@ use ::client::Context;
 use ::model::Message;
 use ::utils;
 use ::client::CACHE;
-use ::model::Permissions;
 
 /// A macro to generate "named parameters". This is useful to avoid manually
 /// using the "arguments" parameter and manually parsing types.
@@ -259,7 +259,7 @@ impl Framework {
 
                 let groups = self.groups.clone();
 
-                for (_, group) in groups {
+                for group in groups.values() {
                     let to_check = if let Some(ref prefix) = group.prefix {
                         if built.starts_with(prefix) && built.len() > prefix.len() + 1 {
                             built[(prefix.len() + 1)..].to_owned()
@@ -378,27 +378,12 @@ impl Framework {
         where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static,
               S: Into<String> {
         if !self.groups.contains_key("Ungrouped") {
-            self.groups.insert("Ungrouped".to_string(), Arc::new(CommandGroup {
-                prefix: None,
-                commands: HashMap::new()
-            }));
+            self.groups.insert("Ungrouped".to_string(), Arc::new(CommandGroup::default()));
         }
 
         if let Some(ref mut x) = self.groups.get_mut("Ungrouped") {
             if let Some(ref mut y) = Arc::get_mut(x) {
-                y.commands.insert(command_name.into(), Arc::new(Command {
-                    checks: Vec::default(),
-                    exec: CommandType::Basic(Box::new(f)),
-                    desc: None,
-                    usage: None,
-                    use_quotes: false,
-                    dm_only: false,
-                    guild_only: false,
-                    help_available: true,
-                    min_args: None,
-                    max_args: None,
-                    required_permissions: Permissions::empty()
-                }));
+                y.commands.insert(command_name.into(), Arc::new(Command::new(f)));
             }
         }
 
@@ -423,10 +408,7 @@ impl Framework {
               S: Into<String> {
         let cmd = f(CreateCommand(Command::default())).0;
         if !self.groups.contains_key("Ungrouped") {
-            self.groups.insert("Ungrouped".to_string(), Arc::new(CommandGroup {
-                prefix: None,
-                commands: HashMap::new()
-            }));
+            self.groups.insert("Ungrouped".to_string(), Arc::new(CommandGroup::default()));
         }
 
         if let Some(ref mut x) = self.groups.get_mut("Ungrouped") {
@@ -465,6 +447,56 @@ impl Framework {
     pub fn after<F>(mut self, f: F) -> Self
         where F: Fn(&Context, &Message, &String) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
+
+        self
+    }
+
+    /// Adds a "check" to a command, which checks whether or not the command's
+    /// associated function should be called.
+    ///
+    /// # Examples
+    ///
+    /// Ensure that the user who created a message, calling a "ping" command,
+    /// is the owner.
+    ///
+    /// ```rust,no_run
+    /// use serenity::client::{Client, Context};
+    /// use serenity::model::Message;
+    /// use std::env;
+    ///
+    /// let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").unwrap());
+    ///
+    /// client.with_framework(|f| f
+    ///     .configure(|c| c.prefix("~"))
+    ///     .on("ping", ping)
+    ///     .set_check("ping", owner_check));
+    ///
+    /// fn ping(context: &Context, _message: &Message, _args: Vec<String>) {
+    ///     context.say("Pong!");
+    /// }
+    ///
+    /// fn owner_check(_context: &Context, message: &Message) -> bool {
+    ///     // replace with your user ID
+    ///     message.author.id == 7
+    /// }
+    /// ```
+    #[deprecated(since="0.1.2", note="Use the `CreateCommand` builder's `check` instead.")]
+    pub fn set_check<F, S>(mut self, command: S, check: F) -> Self
+        where F: Fn(&Context, &Message) -> bool + Send + Sync + 'static,
+              S: Into<String> {
+        if !self.groups.contains_key("Ungrouped") {
+            self.groups.insert("Ungrouped".to_string(), Arc::new(CommandGroup::default()));
+        }
+
+        if let Some(ref mut group) = self.groups.get_mut("Ungrouped") {
+            if let Some(group_mut) = Arc::get_mut(group) {
+                if let Some(ref mut command) = group_mut.commands.get_mut(&command.into()) {
+                    if let Some(c) = Arc::get_mut(command) {
+                        c.checks.push(Box::new(check));
+                    }
+                }
+            }
+        }
 
         self
     }
