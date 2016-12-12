@@ -11,7 +11,7 @@ extern crate serenity;
 
 use serenity::client::{CACHE, Client, Context};
 use serenity::ext::voice;
-use serenity::model::{ChannelId, Message};
+use serenity::model::{ChannelId, Message, Mentionable};
 use serenity::Result as SerenityResult;
 use std::env;
 
@@ -47,7 +47,7 @@ fn deafen(context: &Context, message: &Message, _args: Vec<String>) -> Option<St
         None => {
             check_msg(context.say("Groups and DMs not supported"));
 
-            return;
+            return None;
         },
     };
 
@@ -58,7 +58,7 @@ fn deafen(context: &Context, message: &Message, _args: Vec<String>) -> Option<St
         None => {
             check_msg(message.reply("Not in a voice channel"));
 
-            return;
+            return None;
         },
     };
 
@@ -80,13 +80,13 @@ fn join(context: &Context, message: &Message, args: Vec<String>) -> Option<Strin
             Err(_why) => {
                 check_msg(message.reply("Invalid voice channel ID given"));
 
-                return;
+                return None;
             },
         },
         None => {
             check_msg(message.reply("Requires a voice channel ID be given"));
 
-            return;
+            return None;
         },
     };
 
@@ -95,7 +95,7 @@ fn join(context: &Context, message: &Message, args: Vec<String>) -> Option<Strin
         None => {
             check_msg(context.say("Groups and DMs not supported"));
 
-            return;
+            return None;
         },
     };
 
@@ -113,7 +113,7 @@ fn leave(context: &Context, message: &Message, _args: Vec<String>) -> Option<Str
         None => {
             check_msg(context.say("Groups and DMs not supported"));
 
-            return;
+            return None;
         },
     };
 
@@ -137,7 +137,7 @@ fn mute(context: &Context, message: &Message, _args: Vec<String>) -> Option<Stri
         None => {
             check_msg(context.say("Groups and DMs not supported"));
 
-            return;
+            return None;
         },
     };
 
@@ -148,7 +148,7 @@ fn mute(context: &Context, message: &Message, _args: Vec<String>) -> Option<Stri
         None => {
             check_msg(message.reply("Not in a voice channel"));
 
-            return;
+            return None;
         },
     };
 
@@ -175,14 +175,14 @@ fn play(context: &Context, message: &Message, args: Vec<String>) -> Option<Strin
         None => {
             check_msg(context.say("Must provide a URL to a video or audio"));
 
-            return;
+            return None;
         },
     };
 
     if !url.starts_with("http") {
         check_msg(context.say("Must provide a valid URL"));
 
-        return;
+        return None;
     }
 
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
@@ -190,7 +190,7 @@ fn play(context: &Context, message: &Message, args: Vec<String>) -> Option<Strin
         None => {
             check_msg(context.say("Error finding channel info"));
 
-            return;
+            return None;
         },
     };
 
@@ -202,7 +202,7 @@ fn play(context: &Context, message: &Message, args: Vec<String>) -> Option<Strin
 
                 check_msg(context.say("Error sourcing ffmpeg"));
 
-                return;
+                return None;
             },
         };
 
@@ -222,7 +222,7 @@ fn undeafen(context: &Context, message: &Message, _args: Vec<String>) -> Option<
         None => {
             check_msg(context.say("Error finding channel info"));
 
-            return;
+            return None;
         },
     };
 
@@ -243,7 +243,7 @@ fn unmute(context: &Context, message: &Message, _args: Vec<String>) -> Option<St
         None => {
             check_msg(context.say("Error finding channel info"));
 
-            return;
+            return None;
         },
     };
 
@@ -259,7 +259,6 @@ fn unmute(context: &Context, message: &Message, _args: Vec<String>) -> Option<St
 }
 
 /// Checks that a message successfully sent; if not, then logs why to stdout.
-#[cfg(feature="voice")]
 fn check_msg(result: SerenityResult<Message>) {
     if let Err(why) = result {
         println!("Error sending message: {:?}", why);
