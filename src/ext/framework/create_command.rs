@@ -32,8 +32,10 @@ impl CreateCommand {
     ///         .desc("Replies to a ping with a pong")
     ///         .exec(ping)));
     ///
-    /// fn ping(context: &Context, _message: &Message, _args: Vec<String>) {
-    ///     context.say("Pong!");
+    /// fn ping(context: &Context, _message: &Message, _args: Vec<String>) -> Option<String> {
+    ///     let _ = context.say("Pong!");
+    ///
+    ///     None
     /// }
     ///
     /// fn owner_check(_context: &Context, message: &Message) -> bool {

@@ -42,12 +42,16 @@
 //!     .command("about", |c| c.exec_str("A simple test bot"))
 //!     .command("ping", |c| c.exec(ping)));
 //!
-//! fn about(context: &Context, _message: &Message, _args: Vec<String>) {
+//! fn about(context: &Context, _message: &Message, _args: Vec<String>) -> Option<String> {
 //!     let _ = context.say("A simple test bot");
+//!
+//!     None
 //! }
 //!
-//! fn ping(context: &Context, _message: &Message, _args: Vec<String>) {
+//! fn ping(context: &Context, _message: &Message, _args: Vec<String>) -> Option<String> {
 //!     let _ = context.say("Pong!");
+//!
+//!     None
 //! }
 //! ```
 //!
@@ -582,8 +586,10 @@ impl Framework {
     ///     .on("ping", ping)
     ///     .set_check("ping", owner_check));
     ///
-    /// fn ping(context: &Context, _message: &Message, _args: Vec<String>) {
-    ///     context.say("Pong!");
+    /// fn ping(context: &Context, _message: &Message, _args: Vec<String>) -> Option<String> {
+    ///     let _ = context.say("Pong!");
+    ///
+    ///     None
     /// }
     ///
     /// fn owner_check(_context: &Context, message: &Message) -> bool {
