@@ -69,9 +69,9 @@ pub use self::buckets::{Bucket, MemberRatelimit, Ratelimit};
 
 use self::command::{AfterHook, Hook};
 use std::collections::HashMap;
+use std::default::Default;
 use std::sync::Arc;
 use std::thread;
-use time;
 use ::client::{CACHE, Context};
 use ::model::Message;
 use ::utils;
@@ -248,45 +248,14 @@ impl Framework {
     }
 
     #[allow(map_entry)]
-    fn is_ratelimited(&mut self, bucket_name: &str, id: u64) -> i64 {
-        let time = time::get_time().sec;
-
-        if self.buckets.contains_key(bucket_name) {
-            if let Some(ref mut bucket) = self.buckets.get_mut(bucket_name) {
-                if bucket.limits.contains_key(&id) {
-                    let ratelimit = &bucket.ratelimit;
-                    let member = bucket.limits.get_mut(&id).unwrap();
-
-                    if let Some((time_span, limit)) = ratelimit.limit {
-                        if (member.count + 1) > limit {
-                            if time < (member.set_time + time_span) {
-                                return (member.set_time + time_span) - time;
-                            } else {
-                                member.count = 0;
-                                member.set_time = time;
-                            }
-                        }
-                    }
-
-                    if time < member.last_time + ratelimit.delay {
-                        return (member.last_time + ratelimit.delay) - time;
-                    } else {
-                        member.count += 1;
-                        member.last_time = time;
-                    }
-                } else {
-                    bucket.limits.insert(id, MemberRatelimit {
-                        count: 1,
-                        last_time: time,
-                        set_time: time
-                    });
-                }
-            }
-        }
-
-        0
+    fn ratelimit_time(&mut self, bucket_name: &str, user_id: u64) -> i64 {
+        self.buckets
+            .get_mut(bucket_name)
+            .map(|bucket| bucket.take(user_id))
+            .unwrap_or(0)
     }
 
+    #[allow(cyclomatic_complexity)]
     #[doc(hidden)]
     pub fn dispatch(&mut self, context: Context, message: Message) {
         match self.configuration.account_type {
@@ -363,7 +332,7 @@ impl Framework {
 
                     if let Some(command) = group.commands.get(&to_check) {
                         if let Some(ref bucket_name) = command.bucket {
-                            let rate_limit = self.is_ratelimited(bucket_name, message.author.id.0);
+                            let rate_limit = self.ratelimit_time(bucket_name, message.author.id.0);
 
                             if rate_limit > 0 {
                                 if let Some(ref message) = self.configuration.rate_limit_message {
