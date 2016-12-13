@@ -28,7 +28,7 @@ impl EditProfile {
     ///     .expect("Failed to read image");
     ///
     /// let _ = context.edit_profile(|profile| {
-    ///     profile.avatar(Some(base64))
+    ///     profile.avatar(Some(&base64))
     /// });
     /// ```
     ///
