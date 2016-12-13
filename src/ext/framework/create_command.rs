@@ -107,7 +107,7 @@ impl CreateCommand {
     }
 
     /// A function that can be called when a command is received.
-    /// You can return a string inside Some if there's an error.
+    /// You can return Err(string) if there's an error.
     ///
     /// See [`exec_str`] if you _only_ need to return a string on command use.
     ///
@@ -123,7 +123,7 @@ impl CreateCommand {
     /// the internal HashMap of usages, used specifically for creating a help
     /// command.
     ///
-    /// You can return a string inside Some if there's an error.
+    /// You can return Err(string) if there's an error.
     pub fn exec_help<F>(mut self, f: F) -> Self
         where F: Fn(&Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
         self.0.exec = CommandType::WithCommands(Box::new(f));
