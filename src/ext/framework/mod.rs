@@ -30,7 +30,7 @@
 //! Configuring a Client with a framework, which has a prefix of `"~"` and a
 //! ping and about command:
 //!
-//! ```rust,no_run
+//! ```rust,ignore
 //! use serenity::client::{Client, Context};
 //! use serenity::model::Message;
 //! use std::env;
@@ -584,7 +584,7 @@ impl Framework {
     /// Ensure that the user who created a message, calling a "ping" command,
     /// is the owner.
     ///
-    /// ```rust,no_run
+    /// ```rust,ignore
     /// use serenity::client::{Client, Context};
     /// use serenity::model::Message;
     /// use std::env;
@@ -598,7 +598,7 @@ impl Framework {
     ///
     /// command!(ping(context) {
     ///     let _ = context.say("Pong!");
-    /// })
+    /// });
     ///
     /// fn owner_check(_context: &Context, message: &Message) -> bool {
     ///     // replace with your user ID
