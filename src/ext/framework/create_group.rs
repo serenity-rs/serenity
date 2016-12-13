@@ -1,12 +1,12 @@
 pub use ext::framework::command::{Command, CommandType, CommandGroup};
 pub use ext::framework::create_command::CreateCommand;
 
-use std::collections::HashMap;
 use std::default::Default;
+use std::sync::Arc;
 use ::client::Context;
 use ::model::Message;
-use std::sync::Arc;
 
+#[derive(Default)]
 pub struct CreateGroup(pub CommandGroup);
 
 /// Used to create command groups
@@ -54,14 +54,5 @@ impl CreateGroup {
         self.0.commands.insert(command_name.into(), Arc::new(Command::new(f)));
 
         self
-    }
-}
-
-impl Default for CommandGroup {
-    fn default() -> CommandGroup {
-        CommandGroup {
-            prefix: None,
-            commands: HashMap::new()
-        }
     }
 }

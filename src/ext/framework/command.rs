@@ -22,9 +22,10 @@ pub enum CommandType {
     WithCommands(Box<Help>),
 }
 
+#[derive(Default)]
 pub struct CommandGroup {
     pub prefix: Option<String>,
-    pub commands: HashMap<String, InternalCommand>
+    pub commands: HashMap<String, InternalCommand>,
 }
 
 /// Command struct used to store commands internally.
@@ -71,7 +72,7 @@ impl Command {
             help_available: true,
             min_args: None,
             max_args: None,
-            required_permissions: Permissions::empty()
+            required_permissions: Permissions::empty(),
         }
     }
 }

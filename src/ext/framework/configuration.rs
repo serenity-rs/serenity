@@ -63,7 +63,7 @@ pub struct Configuration {
     #[doc(hidden)]
     pub not_enough_args_message: Option<String>,
     #[doc(hidden)]
-    pub account_type: AccountType
+    pub account_type: AccountType,
 }
 
 impl Configuration {

@@ -65,17 +65,16 @@ pub use self::command::{Command, CommandType, CommandGroup};
 pub use self::configuration::{AccountType, Configuration};
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
-pub use self::buckets::{Ratelimit, MemberRatelimit, Bucket};
+pub use self::buckets::{Bucket, MemberRatelimit, Ratelimit};
 
 use self::command::{AfterHook, Hook};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::thread;
-use ::client::Context;
+use time;
+use ::client::{CACHE, Context};
 use ::model::Message;
 use ::utils;
-use ::client::CACHE;
-use time;
 
 /// A macro to generate "named parameters". This is useful to avoid manually
 /// using the "arguments" parameter and manually parsing types.
@@ -139,7 +138,7 @@ macro_rules! command {
                 let $name = match i.next() {
                     Some(v) => match v.parse::<$t>() {
                         Ok(v) => v,
-                        Err(_why) => return Err(format!("Failed to parse {:?}", stringify!($t))),
+                        Err(_) => return Err(format!("Failed to parse {:?}", stringify!($t))),
                     },
                     None => return Err(format!("Failed to parse {:?}", stringify!($t))),
                 };
@@ -248,13 +247,16 @@ impl Framework {
         self
     }
 
+    #[allow(map_entry)]
     fn is_ratelimited(&mut self, bucket_name: &str, id: u64) -> i64 {
-        let time = time::now().to_timespec().sec;
+        let time = time::get_time().sec;
+
         if self.buckets.contains_key(bucket_name) {
             if let Some(ref mut bucket) = self.buckets.get_mut(bucket_name) {
                 if bucket.limits.contains_key(&id) {
                     let ratelimit = &bucket.ratelimit;
                     let member = bucket.limits.get_mut(&id).unwrap();
+
                     if let Some((time_span, limit)) = ratelimit.limit {
                         if (member.count + 1) > limit {
                             if time < (member.set_time + time_span) {
@@ -265,7 +267,8 @@ impl Framework {
                             }
                         }
                     }
-                    if time < (member.last_time + ratelimit.delay) {
+
+                    if time < member.last_time + ratelimit.delay {
                         return (member.last_time + ratelimit.delay) - time;
                     } else {
                         member.count += 1;
@@ -299,6 +302,7 @@ impl Framework {
             },
             AccountType::Automatic => {
                 let cache = CACHE.read().unwrap();
+
                 if cache.user.bot {
                     if message.author.bot {
                         return;
@@ -356,14 +360,17 @@ impl Framework {
                     } else {
                         built.clone()
                     };
+
                     if let Some(command) = group.commands.get(&to_check) {
                         if let Some(ref bucket_name) = command.bucket {
                             let rate_limit = self.is_ratelimited(bucket_name, message.author.id.0);
+
                             if rate_limit > 0 {
                                 if let Some(ref message) = self.configuration.rate_limit_message {
                                     let _ = context.say(
                                         &message.replace("%time%", &rate_limit.to_string()));
                                 }
+
                                 return;
                             }
                         }
@@ -371,22 +378,25 @@ impl Framework {
                         if message.is_private() {
                             if command.guild_only {
                                 if let Some(ref message) = self.configuration.no_guild_message {
-                                    let _ = context.say(&message);
+                                    let _ = context.say(message);
                                 }
+
                                 return;
                             }
                         } else if command.dm_only {
                             if let Some(ref message) = self.configuration.no_dm_message {
-                                let _ = context.say(&message);
+                                let _ = context.say(message);
                             }
+
                             return;
                         }
 
                         for check in &command.checks {
                             if !(check)(&context, &message) {
                                 if let Some(ref message) = self.configuration.invalid_check_message {
-                                    let _ = context.say(&message);
+                                    let _ = context.say(message);
                                 }
+
                                 continue 'outer;
                             }
                         }
@@ -412,6 +422,7 @@ impl Framework {
                                         &message.replace("%min%", &x.to_string())
                                                 .replace("%given%", &args.len().to_string()));
                                 }
+
                                 return;
                             }
                         }
@@ -423,6 +434,7 @@ impl Framework {
                                         &message.replace("%max%", &x.to_string())
                                                 .replace("%given%", &args.len().to_string()));
                                 }
+
                                 return;
                             }
                         }
@@ -444,8 +456,9 @@ impl Framework {
 
                             if !permissions_fulfilled {
                                 if let Some(ref message) = self.configuration.invalid_permission_message {
-                                    let _ = context.say(&message);
+                                    let _ = context.say(message);
                                 }
+
                                 return;
                             }
                         }
@@ -529,6 +542,7 @@ impl Framework {
         where F: FnOnce(CreateCommand) -> CreateCommand,
               S: Into<String> {
         let cmd = f(CreateCommand(Command::default())).0;
+
         if !self.groups.contains_key("Ungrouped") {
             self.groups.insert("Ungrouped".to_string(), Arc::new(CommandGroup::default()));
         }
@@ -547,11 +561,9 @@ impl Framework {
     pub fn group<F, S>(mut self, group_name: S, f: F) -> Self
         where F: FnOnce(CreateGroup) -> CreateGroup,
               S: Into<String> {
-
         let group = f(CreateGroup(CommandGroup::default())).0;
 
         self.groups.insert(group_name.into(), Arc::new(group));
-
         self.initialized = true;
 
         self
