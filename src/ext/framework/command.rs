@@ -6,9 +6,10 @@ use ::model::Permissions;
 use std::collections::HashMap;
 
 pub type Check = Fn(&Context, &Message) -> bool + Send + Sync + 'static;
-pub type Exec = Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static;
-pub type Help = Fn(&Context, &Message, HashMap<String, Arc<Command>>, Vec<String>) + Send + Sync + 'static;
+pub type Exec = Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static;
+pub type Help = Fn(&Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) -> Result<(), String> + Send + Sync + 'static;
 pub type Hook = Fn(&Context, &Message, &String) + Send + Sync + 'static;
+pub type AfterHook = Fn(&Context, &Message, &String, Result<(), String>) + Send + Sync + 'static;
 #[doc(hidden)]
 pub type InternalCommand = Arc<Command>;
 pub type PrefixCheck = Fn(&Context) -> Option<String> + Send + Sync + 'static;
@@ -21,6 +22,12 @@ pub enum CommandType {
     WithCommands(Box<Help>),
 }
 
+#[derive(Default)]
+pub struct CommandGroup {
+    pub prefix: Option<String>,
+    pub commands: HashMap<String, InternalCommand>,
+}
+
 /// Command struct used to store commands internally.
 pub struct Command {
     /// A set of checks to be called prior to executing the command. The checks
@@ -28,6 +35,8 @@ pub struct Command {
     pub checks: Vec<Box<Check>>,
     /// Function called when the command is called.
     pub exec: CommandType,
+    /// Ratelimit bucket.
+    pub bucket: Option<String>,
     /// Command description, used by other commands.
     pub desc: Option<String>,
     /// Command usage schema, used by other commands.
@@ -46,6 +55,26 @@ pub struct Command {
     pub dm_only: bool,
     /// Whether command can be used only in guilds or not.
     pub guild_only: bool,
+}
+
+impl Command {
+    pub fn new<F>(f: F) -> Self
+        where F: Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
+        Command {
+            checks: Vec::default(),
+            exec: CommandType::Basic(Box::new(f)),
+            desc: None,
+            usage: None,
+            use_quotes: false,
+            dm_only: false,
+            bucket: None,
+            guild_only: false,
+            help_available: true,
+            min_args: None,
+            max_args: None,
+            required_permissions: Permissions::empty(),
+        }
+    }
 }
 
 pub fn positions(ctx: &Context, content: &str, conf: &Configuration) -> Option<Vec<usize>> {

@@ -902,7 +902,7 @@ impl Context {
     /// Change the current user's username:
     ///
     /// ```rust,ignore
-    /// context.edit_member(|p| p.username("meew zero"));
+    /// context.edit_profile(|p| p.username("meew0"));
     /// ```
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F)
         -> Result<CurrentUser> {
@@ -1534,7 +1534,7 @@ impl Context {
     ///
     /// let _ = client.start();
     ///
-    /// fn ping(context: &Context, message: &Message, _arguments: Vec<String>) {
+    /// command!(ping(context, message) {
     ///     let cache = CACHE.read().unwrap();
     ///     let channel = cache.get_guild_channel(message.channel_id);
     ///
@@ -1571,7 +1571,9 @@ impl Context {
     ///
     ///                 f
     ///             })));
-    /// }
+    ///
+    ///     Ok(())
+    /// });
     /// ```
     ///
     /// Note that for most use cases, your embed layout will _not_ be this ugly.

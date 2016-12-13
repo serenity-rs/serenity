@@ -1,4 +1,4 @@
-pub use ext::framework::command::{Command, CommandType};
+pub use super::{Command, CommandType, CommandGroup};
 
 use std::collections::HashMap;
 use std::default::Default;
@@ -32,8 +32,10 @@ impl CreateCommand {
     ///         .desc("Replies to a ping with a pong")
     ///         .exec(ping)));
     ///
-    /// fn ping(context: &Context, _message: &Message, _args: Vec<String>) {
-    ///     context.say("Pong!");
+    /// fn ping(context: &Context, _message: &Message, _args: Vec<String>) -> Result<(), String> {
+    ///     let _ = context.say("Pong!");
+    ///
+    ///     Ok(())
     /// }
     ///
     /// fn owner_check(_context: &Context, message: &Message) -> bool {
@@ -51,6 +53,13 @@ impl CreateCommand {
     /// Description, used by other commands.
     pub fn desc(mut self, desc: &str) -> Self {
         self.0.desc = Some(desc.to_owned());
+
+        self
+    }
+
+    /// Adds a ratelimit bucket.
+    pub fn bucket(mut self, bucket: &str) -> Self {
+        self.0.bucket = Some(bucket.to_owned());
 
         self
     }
@@ -98,12 +107,13 @@ impl CreateCommand {
     }
 
     /// A function that can be called when a command is received.
+    /// You can return Err(string) if there's an error.
     ///
     /// See [`exec_str`] if you _only_ need to return a string on command use.
     ///
     /// [`exec_str`]: #method.exec_str
     pub fn exec<F>(mut self, func: F) -> Self
-        where F: Fn(&Context, &Message, Vec<String>) + Send + Sync + 'static {
+        where F: Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
         self.0.exec = CommandType::Basic(Box::new(func));
 
         self
@@ -112,8 +122,10 @@ impl CreateCommand {
     /// Sets a function that's called when a command is called that can access
     /// the internal HashMap of usages, used specifically for creating a help
     /// command.
+    ///
+    /// You can return Err(string) if there's an error.
     pub fn exec_help<F>(mut self, f: F) -> Self
-        where F: Fn(&Context, &Message, HashMap<String, Arc<Command>>, Vec<String>) + Send + Sync + 'static {
+        where F: Fn(&Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
         self.0.exec = CommandType::WithCommands(Box::new(f));
 
         self
@@ -165,11 +177,12 @@ impl Default for Command {
     fn default() -> Command {
         Command {
             checks: Vec::default(),
-            exec: CommandType::Basic(Box::new(|_, _, _| {})),
+            exec: CommandType::Basic(Box::new(|_, _, _| Ok(()))),
             desc: None,
             usage: None,
             use_quotes: true,
             min_args: None,
+            bucket: None,
             max_args: None,
             required_permissions: Permissions::empty(),
             dm_only: false,
