@@ -7,6 +7,7 @@
 //! features = ["cache", "framework", "methods", "voice"]
 //! ```
 
+#[macro_use]
 extern crate serenity;
 
 use serenity::client::{CACHE, Client, Context};
@@ -41,13 +42,13 @@ fn main() {
     let _ = client.start().map_err(|why| println!("Client ended: {:?}", why));
 }
 
-fn deafen(context: &Context, message: &Message, _args: Vec<String>) -> Option<String> {
+command!(deafen(context, message) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
         None => {
             check_msg(context.say("Groups and DMs not supported"));
 
-            return None;
+            return Ok(());
         },
     };
 
@@ -58,7 +59,7 @@ fn deafen(context: &Context, message: &Message, _args: Vec<String>) -> Option<St
         None => {
             check_msg(message.reply("Not in a voice channel"));
 
-            return None;
+            return Ok(());
         },
     };
 
@@ -69,24 +70,22 @@ fn deafen(context: &Context, message: &Message, _args: Vec<String>) -> Option<St
 
         check_msg(context.say("Deafened"));
     }
+});
 
-    None
-}
-
-fn join(context: &Context, message: &Message, args: Vec<String>) -> Option<String> {
+command!(join(context, message, args) {
     let connect_to = match args.get(0) {
         Some(arg) => match arg.parse::<u64>() {
             Ok(id) => ChannelId(id),
             Err(_why) => {
                 check_msg(message.reply("Invalid voice channel ID given"));
 
-                return None;
+                return Ok(());
             },
         },
         None => {
             check_msg(message.reply("Requires a voice channel ID be given"));
 
-            return None;
+            return Ok(());
         },
     };
 
@@ -95,7 +94,7 @@ fn join(context: &Context, message: &Message, args: Vec<String>) -> Option<Strin
         None => {
             check_msg(context.say("Groups and DMs not supported"));
 
-            return None;
+            return Ok(());
         },
     };
 
@@ -103,17 +102,15 @@ fn join(context: &Context, message: &Message, args: Vec<String>) -> Option<Strin
     shard.manager.join(Some(guild_id), connect_to);
 
     check_msg(context.say(&format!("Joined {}", connect_to.mention())));
+});
 
-    None
-}
-
-fn leave(context: &Context, message: &Message, _args: Vec<String>) -> Option<String> {
+command!(leave(context, message) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
         None => {
             check_msg(context.say("Groups and DMs not supported"));
 
-            return None;
+            return Ok(());
         },
     };
 
@@ -127,17 +124,15 @@ fn leave(context: &Context, message: &Message, _args: Vec<String>) -> Option<Str
     } else {
         check_msg(message.reply("Not in a voice channel"));
     }
+});
 
-    None
-}
-
-fn mute(context: &Context, message: &Message, _args: Vec<String>) -> Option<String> {
+command!(mute(context, message) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
         None => {
             check_msg(context.say("Groups and DMs not supported"));
 
-            return None;
+            return Ok(());
         },
     };
 
@@ -148,7 +143,7 @@ fn mute(context: &Context, message: &Message, _args: Vec<String>) -> Option<Stri
         None => {
             check_msg(message.reply("Not in a voice channel"));
 
-            return None;
+            return Ok(());
         },
     };
 
@@ -159,30 +154,26 @@ fn mute(context: &Context, message: &Message, _args: Vec<String>) -> Option<Stri
 
         check_msg(context.say("Now muted"));
     }
+});
 
-    None
-}
-
-fn ping(context: &Context, _message: &Message, _args: Vec<String>) -> Option<String> {
+command!(ping(context) {
     check_msg(context.say("Pong!"));
+});
 
-    None
-}
-
-fn play(context: &Context, message: &Message, args: Vec<String>) -> Option<String> {
+command!(play(context, message, args) {
     let url = match args.get(0) {
         Some(url) => url,
         None => {
             check_msg(context.say("Must provide a URL to a video or audio"));
 
-            return None;
+            return Ok(());
         },
     };
 
     if !url.starts_with("http") {
         check_msg(context.say("Must provide a valid URL"));
 
-        return None;
+        return Ok(());
     }
 
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
@@ -190,7 +181,7 @@ fn play(context: &Context, message: &Message, args: Vec<String>) -> Option<Strin
         None => {
             check_msg(context.say("Error finding channel info"));
 
-            return None;
+            return Ok(());
         },
     };
 
@@ -202,7 +193,7 @@ fn play(context: &Context, message: &Message, args: Vec<String>) -> Option<Strin
 
                 check_msg(context.say("Error sourcing ffmpeg"));
 
-                return None;
+                return Ok(());
             },
         };
 
@@ -212,17 +203,15 @@ fn play(context: &Context, message: &Message, args: Vec<String>) -> Option<Strin
     } else {
         check_msg(context.say("Not in a voice channel to play in"));
     }
+});
 
-    None
-}
-
-fn undeafen(context: &Context, message: &Message, _args: Vec<String>) -> Option<String> {
+command!(undeafen(context, message) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
         None => {
             check_msg(context.say("Error finding channel info"));
 
-            return None;
+            return Ok(());
         },
     };
 
@@ -233,17 +222,15 @@ fn undeafen(context: &Context, message: &Message, _args: Vec<String>) -> Option<
     } else {
         check_msg(context.say("Not in a voice channel to undeafen in"));
     }
+});
 
-    None
-}
-
-fn unmute(context: &Context, message: &Message, _args: Vec<String>) -> Option<String> {
+command!(unmute(context, message) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
         Some(channel) => channel.guild_id,
         None => {
             check_msg(context.say("Error finding channel info"));
 
-            return None;
+            return Ok(());
         },
     };
 
@@ -254,9 +241,7 @@ fn unmute(context: &Context, message: &Message, _args: Vec<String>) -> Option<St
     } else {
         check_msg(context.say("Not in a voice channel to undeafen in"));
     }
-
-    None
-}
+});
 
 /// Checks that a message successfully sent; if not, then logs why to stdout.
 fn check_msg(result: SerenityResult<Message>) {

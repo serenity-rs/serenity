@@ -153,13 +153,11 @@ fn owner_check(_: &Context, message: &Message) -> bool {
     message.author.id == 7
 }
 
-fn some_long_command(context: &Context, _: &Message, args: Vec<String>) -> Option<String> {
+command!(some_long_command(context, _msg, args) {
     if let Err(why) = context.say(&format!("Arguments: {:?}", args)) {
         println!("Error sending message: {:?}", why);
     }
-
-    None
-}
+});
 
 // Using the `command!` macro, commands can be created with a certain type of
 // "dynamic" type checking. This is a method of requiring that the arguments

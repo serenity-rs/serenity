@@ -51,11 +51,9 @@
 //!     let _ = client.start();
 //! }
 //!
-//! fn ping(_context: &Context, message: &Message, _args: Vec<String>) -> Option<String> {
+//! command!(ping(_context: &Context, message: &Message, _args: Vec<String>) {
 //!     let _ = message.reply("Pong!");
-//!
-//!     None
-//! }
+//! });
 //! ```
 //!
 //! ### Full Examples

@@ -32,10 +32,10 @@ impl CreateCommand {
     ///         .desc("Replies to a ping with a pong")
     ///         .exec(ping)));
     ///
-    /// fn ping(context: &Context, _message: &Message, _args: Vec<String>) -> Option<String> {
+    /// fn ping(context: &Context, _message: &Message, _args: Vec<String>) -> Result<(), String> {
     ///     let _ = context.say("Pong!");
     ///
-    ///     None
+    ///     Ok(())
     /// }
     ///
     /// fn owner_check(_context: &Context, message: &Message) -> bool {
@@ -113,7 +113,7 @@ impl CreateCommand {
     ///
     /// [`exec_str`]: #method.exec_str
     pub fn exec<F>(mut self, func: F) -> Self
-        where F: Fn(&Context, &Message, Vec<String>) -> Option<String> + Send + Sync + 'static {
+        where F: Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
         self.0.exec = CommandType::Basic(Box::new(func));
 
         self
@@ -125,7 +125,7 @@ impl CreateCommand {
     ///
     /// You can return a string inside Some if there's an error.
     pub fn exec_help<F>(mut self, f: F) -> Self
-        where F: Fn(&Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) -> Option<String> + Send + Sync + 'static {
+        where F: Fn(&Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
         self.0.exec = CommandType::WithCommands(Box::new(f));
 
         self
@@ -177,7 +177,7 @@ impl Default for Command {
     fn default() -> Command {
         Command {
             checks: Vec::default(),
-            exec: CommandType::Basic(Box::new(|_, _, _| None)),
+            exec: CommandType::Basic(Box::new(|_, _, _| Ok(()))),
             desc: None,
             usage: None,
             use_quotes: true,

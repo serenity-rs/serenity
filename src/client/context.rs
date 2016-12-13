@@ -1534,7 +1534,7 @@ impl Context {
     ///
     /// let _ = client.start();
     ///
-    /// fn ping(context: &Context, message: &Message, _arguments: Vec<String>) -> Option<String> {
+    /// command!(ping(context, message) {
     ///     let cache = CACHE.read().unwrap();
     ///     let channel = cache.get_guild_channel(message.channel_id);
     ///
@@ -1573,7 +1573,7 @@ impl Context {
     ///             })));
     ///
     ///     None
-    /// }
+    /// });
     /// ```
     ///
     /// Note that for most use cases, your embed layout will _not_ be this ugly.

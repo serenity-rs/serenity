@@ -17,7 +17,7 @@ fn error_embed(ctx: &Context, message: &Message, input: &str) {
 pub fn with_embeds(ctx: &Context,
                    message: &Message,
                    groups: HashMap<String, Arc<CommandGroup>>,
-                   args: Vec<String>) -> Option<String> {
+                   args: Vec<String>) -> Result<(), String> {
     if !args.is_empty() {
         let name = args.join(" ");
         for (group_name, group) in groups {
@@ -38,7 +38,7 @@ pub fn with_embeds(ctx: &Context,
             if let Some((command_name, command)) = found {
                 if !command.help_available {
                     error_embed(ctx, message, "**Error**: No help available.");
-                    return None;
+                    return Ok(());
                 }
                 let _ = ctx.send_message(message.channel_id, |m| {
                     m.embed(|e| {
@@ -77,12 +77,12 @@ pub fn with_embeds(ctx: &Context,
                         embed
                     })
                 });
-                return None;
+                return Ok(());
             }
         }
         let error_msg = format!("**Error**: Command `{}` not found.", name);
         error_embed(ctx, message, &error_msg);
-        return None;
+        return Ok(());
     }
     let _ = ctx.send_message(message.channel_id, |m| {
         m.embed(|e| {
@@ -114,13 +114,13 @@ pub fn with_embeds(ctx: &Context,
         })
     });
 
-    None
+    Ok(())
 }
 
 pub fn plain(ctx: &Context,
              _: &Message,
              groups: HashMap<String, Arc<CommandGroup>>,
-             args: Vec<String>) -> Option<String> {
+             args: Vec<String>) -> Result<(), String> {
     if !args.is_empty() {
         let name = args.join(" ");
         for (group_name, group) in groups {
@@ -141,7 +141,7 @@ pub fn plain(ctx: &Context,
             if let Some((command_name, command)) = found {
                 if !command.help_available {
                     let _ = ctx.say("**Error**: No help available.");
-                    return None;
+                    return Ok(());
                 }
                 let mut result = format!("**{}**\n", command_name);
                 if let Some(ref desc) = command.desc {
@@ -162,11 +162,11 @@ pub fn plain(ctx: &Context,
                 };
                 let _ = write!(result, "**Available:** {}\n", available);
                 let _ = ctx.say(&result);
-                return None;
+                return Ok(());
             }
         }
         let _ = ctx.say(&format!("**Error**: Command `{}` not found.", name));
-        return None;
+        return Ok(());
     }
     let mut result = "**Commands**\nTo get help about individual command, pass its name as an \
                   argument to this command.\n\n"
@@ -190,5 +190,5 @@ pub fn plain(ctx: &Context,
     }
     let _ = ctx.say(&result);
 
-    None
+    Ok(())
 }

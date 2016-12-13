@@ -42,17 +42,13 @@
 //!     .command("about", |c| c.exec_str("A simple test bot"))
 //!     .command("ping", |c| c.exec(ping)));
 //!
-//! fn about(context: &Context, _message: &Message, _args: Vec<String>) -> Option<String> {
+//! command!(about(context) {
 //!     let _ = context.say("A simple test bot");
+//! });
 //!
-//!     None
-//! }
-//!
-//! fn ping(context: &Context, _message: &Message, _args: Vec<String>) -> Option<String> {
+//! command!(ping(context) {
 //!     let _ = context.say("Pong!");
-//!
-//!     None
-//! }
+//! });
 //! ```
 //!
 //! [`Client::with_framework`]: ../../client/struct.Client.html#method.with_framework
@@ -114,24 +110,38 @@ use time;
 /// [`Framework`]: ext/framework/index.html
 #[macro_export]
 macro_rules! command {
-    ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
-        pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) -> Option<String> {
+    ($fname:ident($c:ident) $b:block) => {
+        pub fn $fname($c: &Context, _: &Message, _: Vec<String>) -> Result<(), String> {
             $b
 
-            None
+            Ok(())
+        }
+    };
+    ($fname:ident($c:ident, $m:ident) $b:block) => {
+        pub fn $fname($c: &Context, $m: &Message, _: Vec<String>) -> Result<(), String> {
+            $b
+
+            Ok(())
+        }
+    };
+    ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
+        pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) -> Result<(), String> {
+            $b
+
+            Ok(())
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
-        pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) -> Option<String> {
+        pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) -> Result<(), String> {
             let mut i = $a.iter();
 
             $(
                 let $name = match i.next() {
                     Some(v) => match v.parse::<$t>() {
                         Ok(v) => v,
-                        Err(_why) => return Some(format!("Failed to parse {:?}", stringify!($t))),
+                        Err(_why) => return Err(format!("Failed to parse {:?}", stringify!($t))),
                     },
-                    None => return Some(format!("Failed to parse {:?}", stringify!($t))),
+                    None => return Err(format!("Failed to parse {:?}", stringify!($t))),
                 };
             )*
 
@@ -139,7 +149,7 @@ macro_rules! command {
 
             $b
 
-            None
+            Ok(())
         }
     };
 }
@@ -489,7 +499,7 @@ impl Framework {
     /// [`command`]: #method.command
     /// [module-level documentation]: index.html
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(&Context, &Message, Vec<String>) -> Option<String> + Send + Sync + 'static,
+        where F: Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static,
               S: Into<String> {
         if !self.groups.contains_key("Ungrouped") {
             self.groups.insert("Ungrouped".to_string(), Arc::new(CommandGroup::default()));
@@ -560,7 +570,7 @@ impl Framework {
     /// Specify the function to be called after every command's execution.
     /// Fourth argument exists if command returned an error which you can handle.
     pub fn after<F>(mut self, f: F) -> Self
-        where F: Fn(&Context, &Message, &String, Option<String>) + Send + Sync + 'static {
+        where F: Fn(&Context, &Message, &String, Result<(), String>) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
 
         self
@@ -586,11 +596,9 @@ impl Framework {
     ///     .on("ping", ping)
     ///     .set_check("ping", owner_check));
     ///
-    /// fn ping(context: &Context, _message: &Message, _args: Vec<String>) -> Option<String> {
+    /// command!(ping(context) {
     ///     let _ = context.say("Pong!");
-    ///
-    ///     None
-    /// }
+    /// })
     ///
     /// fn owner_check(_context: &Context, message: &Message) -> bool {
     ///     // replace with your user ID
