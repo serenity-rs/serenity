@@ -455,24 +455,22 @@ impl Framework {
                                 (before)(&context, &message, &built);
                             }
 
-                            match command.exec {
+                            let result = match command.exec {
                                 CommandType::StringResponse(ref x) => {
                                     let _ = &context.say(x);
+
+                                    Ok(())
                                 },
                                 CommandType::Basic(ref x) => {
-                                    let result = (x)(&context, &message, args);
-
-                                    if let Some(after) = after {
-                                        (after)(&context, &message, &built, result);
-                                    }
+                                    (x)(&context, &message, args)
                                 },
                                 CommandType::WithCommands(ref x) => {
-                                    let result = (x)(&context, &message, groups, args);
-
-                                    if let Some(after) = after {
-                                        (after)(&context, &message, &built, result);
-                                    }
+                                    (x)(&context, &message, groups, args)
                                 }
+                            };
+
+                            if let Some(after) = after {
+                                (after)(&context, &message, &built, result);
                             }
                         });
 

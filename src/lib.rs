@@ -51,7 +51,7 @@
 //!     let _ = client.start();
 //! }
 //!
-//! command!(ping(_context: &Context, message: &Message, _args: Vec<String>) {
+//! command!(ping(_context, message) {
 //!     let _ = message.reply("Pong!");
 //! });
 //! ```
