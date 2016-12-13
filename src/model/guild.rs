@@ -106,6 +106,13 @@ impl Emoji {
             None => Err(Error::Client(ClientError::ItemMissing)),
         }
     }
+
+    /// Generates a URL to the emoji's image.
+    #[cfg(feature="methods")]
+    #[inline]
+    pub fn url(&self) -> String {
+        format!(cdn!("/emojis/{}.png"), self.id)
+    }
 }
 
 impl fmt::Display for Emoji {

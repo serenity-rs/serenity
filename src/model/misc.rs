@@ -124,6 +124,15 @@ impl FromStr for RoleId {
     }
 }
 
+impl EmojiIdentifier {
+    /// Generates a URL to the emoji's image.
+    #[cfg(feature="methods")]
+    #[inline]
+    pub fn url(&self) -> String {
+        format!(cdn!("/emojis/{}.png"), self.id)
+    }
+}
+
 impl FromStr for EmojiIdentifier {
     type Err = ();
     fn from_str(s: &str) -> StdResult<Self, ()> {
