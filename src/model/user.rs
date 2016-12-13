@@ -104,7 +104,7 @@ impl User {
             format!(cdn!("/avatars/{}/{}.jpg"), self.id, av))
     }
 
-    /// Gets user as `Member` of a server.
+    /// Gets user as `Member` of a guild.
     #[cfg(all(feature="cache", feature="methods"))]
     pub fn member<G>(&self, guild_id: G) -> Option<Member>
         where G: Into<GuildId> {
