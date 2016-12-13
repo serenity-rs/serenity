@@ -902,7 +902,7 @@ impl Context {
     /// Change the current user's username:
     ///
     /// ```rust,ignore
-    /// context.edit_member(|p| p.username("meew zero"));
+    /// context.edit_profile(|p| p.username("meew0"));
     /// ```
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F)
         -> Result<CurrentUser> {
