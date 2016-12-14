@@ -2,6 +2,23 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.1.3] - 2016-12-14
+
+This is a hotfix for applying a PR and fixing a major bug in the plain help
+command.
+
+### Added
+
+- Blocking individual users and guilds in commands
+- Disabling commands
+- Configuring "owners" of the bot, which command checks won't apply to
+
+### Fixes
+
+- The plain help command now properly sends a message when requesting
+  information about a command
+- Groups are now on their own lines in the plain help command
+
 ## [0.1.2] - 2016-12-14
 
 v0.1.2 focuses on revamping the framework, adding a large amount of
@@ -176,6 +193,7 @@ in Discord's API.
 
 Initial commit.
 
+[0.1.3]: https://github.com/zeyla/serenity.rs/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/zeyla/serenity.rs/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/zeyla/serenity.rs/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/zeyla/serenity.rs/tree/403d65d5e98bdfa9f0c018610000c4a0b0c7d8d5
