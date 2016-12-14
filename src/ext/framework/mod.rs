@@ -334,6 +334,13 @@ impl Framework {
                         let is_owner = self.configuration.owners.contains(&message.author.id);
                         // Most of the checks don't apply to owners.
                         if !is_owner {
+                            if !self.configuration.allow_dm {
+                                if let Some(ref message) = self.configuration.no_dm_message {
+                                    let _ = context.say(message);
+                                }
+
+                                return;
+                            }
                             if let Some(guild_id) = message.guild_id() {
                                 if self.configuration.blocked_guilds.contains(&guild_id) {
                                     if let Some(ref message) = self.configuration.blocked_guild_message {
