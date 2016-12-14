@@ -190,6 +190,8 @@ pub fn plain(ctx: &Context,
                 });
                 result.push_str("\n");
 
+                let _ = ctx.say(&result);
+
                 return Ok(());
             }
         }
