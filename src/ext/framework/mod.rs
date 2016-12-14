@@ -360,7 +360,7 @@ impl Framework {
                                                 let _ = context.say(message);
                                             }
 
-                                            return
+                                            return;
                                         }
                                     }
                                 }
