@@ -84,10 +84,9 @@ fn main() {
         // Very similar to `before`, except this will be called directly _after_
         // command execution.
         .after(|_, _, command_name, error| {
-            if let Some(why) = error {
-                println!("Command '{}' returned error {:?}", command_name, why);
-            } else {
-                println!("Processed command '{}'", command_name);
+            match error {
+                Ok(()) => println!("Processed command '{}'", command_name),
+                Err(why) => println!("Command '{}' returned error {:?}", command_name, why),
             }
         })
         // Can't be used more than once per 5 seconds:

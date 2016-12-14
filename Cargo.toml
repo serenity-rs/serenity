@@ -49,6 +49,6 @@ yaml-rust = "0.3"
 default = ["cache", "framework", "methods"]
 cache = []
 debug = []
-framework = []
+framework = ["cache"]
 methods = []
 voice = ["opus", "sodiumoxide"]
