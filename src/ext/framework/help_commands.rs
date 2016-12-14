@@ -225,6 +225,8 @@ pub fn plain(ctx: &Context,
         if no_commands {
             result.push_str("*[No Commands]*");
         }
+
+        result.push('\n');
     }
 
     let _ = ctx.say(&result);
