@@ -341,6 +341,7 @@ impl Framework {
 
                                 return;
                             }
+
                             if let Some(guild_id) = message.guild_id() {
                                 if self.configuration.blocked_guilds.contains(&guild_id) {
                                     if let Some(ref message) = self.configuration.blocked_guild_message {
