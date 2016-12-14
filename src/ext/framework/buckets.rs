@@ -10,7 +10,7 @@ pub struct Ratelimit {
 
 #[doc(hidden)]
 pub struct MemberRatelimit {
-    pub count: i32,
+    pub tickets: i32,
     pub last_time: i64,
     pub set_time: i64,
 }
@@ -18,7 +18,7 @@ pub struct MemberRatelimit {
 impl Default for MemberRatelimit {
     fn default() -> Self {
         MemberRatelimit {
-            count: 0,
+            tickets: 0,
             last_time: 0,
             set_time: 0,
         }
@@ -28,31 +28,31 @@ impl Default for MemberRatelimit {
 #[doc(hidden)]
 pub struct Bucket {
     pub ratelimit: Ratelimit,
-    pub limits: HashMap<u64, MemberRatelimit>,
+    pub users: HashMap<u64, MemberRatelimit>,
 }
 
 impl Bucket {
     pub fn take(&mut self, user_id: u64) -> i64 {
         let time =- time::get_time().sec;
-        let member = self.limits.entry(user_id)
+        let user = self.users.entry(user_id)
             .or_insert_with(MemberRatelimit::default);
 
         if let Some((timespan, limit)) = self.ratelimit.limit {
-            if (member.count + 1) > limit {
-                if time < (member.set_time + timespan) {
-                    return (member.set_time + timespan) - time;
+            if (user.tickets + 1) > limit {
+                if time < (user.set_time + timespan) {
+                    return (user.set_time + timespan) - time;
                 } else {
-                    member.count = 0;
-                    member.set_time = time;
+                    user.tickets = 0;
+                    user.set_time = time;
                 }
             }
         }
 
-        if time < member.last_time + self.ratelimit.delay {
-            (member.last_time + self.ratelimit.delay) - time
+        if time < user.last_time + self.ratelimit.delay {
+            (user.last_time + self.ratelimit.delay) - time
         } else {
-            member.count += 1;
-            member.last_time = time;
+            user.tickets += 1;
+            user.last_time = time;
 
             0
         }

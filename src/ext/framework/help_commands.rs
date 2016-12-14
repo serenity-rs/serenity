@@ -1,8 +1,7 @@
-pub use super::{Command, CommandGroup};
-
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::fmt::Write;
+use super::{Command, CommandGroup};
 use ::client::Context;
 use ::model::Message;
 use ::utils::Colour;
@@ -41,6 +40,7 @@ pub fn with_embeds(ctx: &Context,
             if let Some((command_name, command)) = found {
                 if !command.help_available {
                     error_embed(ctx, message, "**Error**: No help available.");
+
                     return Ok(());
                 }
 
@@ -96,6 +96,7 @@ pub fn with_embeds(ctx: &Context,
 
         return Ok(());
     }
+
     let _ = ctx.send_message(message.channel_id, |m| {
         m.embed(|mut e| {
             e = e.colour(Colour::rosewater())
@@ -109,8 +110,9 @@ pub fn with_embeds(ctx: &Context,
                     let _ = write!(desc, "Prefix: {}\n", x);
                 }
 
+                desc.push_str("Commands:\n");
+
                 let mut no_commands = true;
-                let _ = write!(desc, "Commands:\n");
 
                 for (n, cmd) in &group.commands {
                     if cmd.help_available {
@@ -143,6 +145,7 @@ pub fn plain(ctx: &Context,
 
         for (group_name, group) in groups {
             let mut found: Option<(&String, &Command)> = None;
+
             if let Some(ref prefix) = group.prefix {
                 for (command_name, command) in &group.commands {
                     if name == format!("{} {}", prefix, command_name) {
@@ -177,16 +180,15 @@ pub fn plain(ctx: &Context,
                     let _ = write!(result, "**Group:** {}\n", group_name);
                 }
 
-                let available = if command.dm_only {
+                result.push_str("**Available:** ");
+                result.push_str(if command.dm_only {
                     "Only in DM"
                 } else if command.guild_only {
                     "Only in guilds"
                 } else {
                     "In DM and guilds"
-                };
-
-                let _ = write!(result, "**Available:** {}\n", available);
-                let _ = ctx.say(&result);
+                });
+                result.push_str("\n");
 
                 return Ok(());
             }
@@ -196,31 +198,31 @@ pub fn plain(ctx: &Context,
 
         return Ok(());
     }
+
     let mut result = "**Commands**\nTo get help about individual command, pass \
                       its name as an argument to this command.\n\n"
         .to_string();
 
     for (group_name, group) in groups {
-        let mut desc = String::new();
+        let _ = write!(result, "**{}:** ", group_name);
 
         if let Some(ref x) = group.prefix {
-            let _ = write!(desc, "(prefix: `{}`): ", x);
+            let _ = write!(result, "(prefix: `{}`): ", x);
         }
 
         let mut no_commands = true;
 
         for (n, cmd) in &group.commands {
             if cmd.help_available {
-                let _ = write!(desc, "`{}` ", n);
+                let _ = write!(result, "`{}` ", n);
+
                 no_commands = false;
             }
         }
 
         if no_commands {
-            let _ = write!(desc, "*[No commands]*");
+            result.push_str("*[No Commands]*");
         }
-
-        let _ = write!(result, "**{}:** {}\n", group_name, desc);
     }
 
     let _ = ctx.say(&result);

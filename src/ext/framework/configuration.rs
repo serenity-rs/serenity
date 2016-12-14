@@ -67,6 +67,44 @@ pub struct Configuration {
 }
 
 impl Configuration {
+    /// Allows you to change what accounts to ignore.
+    pub fn account_type(mut self, account_type: AccountType) -> Self {
+        self.account_type = account_type;
+
+        self
+    }
+
+    /// Whether to allow whitespace being optional between a mention/prefix and
+    /// a command.
+    ///
+    /// **Note**: Defaults to `false`.
+    ///
+    /// # Examples
+    ///
+    /// Setting this to `false` will _only_ allow this scenario to occur:
+    ///
+    /// ```ignore
+    /// <@245571012924538880> about
+    /// !about
+    ///
+    /// // bot processes and executes the "about" command if it exists
+    /// ```
+    ///
+    /// while setting this to `true` will _also_ allow this scenario to occur:
+    ///
+    /// ```ignore
+    /// <@245571012924538880>about
+    /// ! about
+    ///
+    /// // bot processes and executes the "about" command if it exists
+    /// ```
+    pub fn allow_whitespace(mut self, allow_whitespace: bool)
+        -> Self {
+        self.allow_whitespace = allow_whitespace;
+
+        self
+    }
+
     /// The default depth of the message to check for commands. Defaults to 5.
     /// This determines how "far" into a message to check for a valid command.
     ///
@@ -81,57 +119,49 @@ impl Configuration {
         self
     }
 
-    /// Message that's sent when a command is on cooldown.
-    /// See framework documentation to see where is this utilized.
-    ///
-    /// %time% will be replaced with waiting time in seconds.
-    pub fn rate_limit_message<S>(mut self, rate_limit_message: S) -> Self
-        where S: Into<String> {
-        self.rate_limit_message = Some(rate_limit_message.into());
-
-        self
-    }
-
-    /// Message that's sent when a user with wrong permissions calls a command.
-    pub fn invalid_permission_message<S>(mut self, invalid_permission_message: S) -> Self
-        where S: Into<String> {
-        self.invalid_permission_message = Some(invalid_permission_message.into());
+    /// Sets the prefix to respond to. This can either be a single-char or
+    /// multi-char string.
+    pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
+        where F: Fn(&Context) -> Option<String> + Send + Sync + 'static {
+        self.dynamic_prefix = Some(Box::new(dynamic_prefix));
 
         self
     }
 
     /// Message that's sent when one of a command's checks doesn't succeed.
-    pub fn invalid_check_message<S>(mut self, invalid_check_message: S) -> Self
-        where S: Into<String> {
-        self.invalid_check_message = Some(invalid_check_message.into());
+    pub fn invalid_check_message(mut self, content: &str) -> Self {
+        self.invalid_check_message = Some(content.to_owned());
+
+        self
+    }
+
+    /// Message that's sent when a user with wrong permissions calls a command.
+    pub fn invalid_permission_message(mut self, content: &str) -> Self {
+        self.invalid_permission_message = Some(content.to_owned());
+
+        self
+    }
+
+    /// Message that's sent when a command is on cooldown.
+    /// See framework documentation to see where is this utilized.
+    ///
+    /// %time% will be replaced with waiting time in seconds.
+    pub fn rate_limit_message(mut self, content: &str) -> Self {
+        self.rate_limit_message = Some(content.to_owned());
 
         self
     }
 
     /// Message that's sent when a command isn't available in DM.
-    pub fn no_dm_message<S>(mut self, no_dm_message: S) -> Self
-        where S: Into<String> {
-        self.no_dm_message = Some(no_dm_message.into());
+    pub fn no_dm_message(mut self, content: &str) -> Self {
+        self.no_dm_message = Some(content.to_owned());
 
         self
     }
 
     /// Message that's sent when a command isn't available in guilds.
-    pub fn no_guild_message<S>(mut self, no_guild_message: S) -> Self
-        where S: Into<String> {
-        self.no_guild_message = Some(no_guild_message.into());
-
-        self
-    }
-
-    /// Message that's sent when user sends too many arguments to a command.
-    ///
-    /// %max% will be replaced with maximum allowed amount of arguments.
-    ///
-    /// %given% will be replced with the given amount of arguments.
-    pub fn too_many_args_message<S>(mut self, too_many_args_message: S) -> Self
-        where S: Into<String> {
-        self.too_many_args_message = Some(too_many_args_message.into());
+    pub fn no_guild_message(mut self, content: &str) -> Self {
+        self.no_guild_message = Some(content.to_owned());
 
         self
     }
@@ -141,9 +171,8 @@ impl Configuration {
     /// %min% will be replaced with minimum allowed amount of arguments.
     ///
     /// %given% will be replced with the given amount of arguments.
-    pub fn not_enough_args_message<S>(mut self, not_enough_args_message: S) -> Self
-        where S: Into<String> {
-        self.not_enough_args_message = Some(not_enough_args_message.into());
+    pub fn not_enough_args_message(mut self, content: &str) -> Self {
+        self.not_enough_args_message = Some(content.to_owned());
 
         self
     }
@@ -184,41 +213,10 @@ impl Configuration {
         self
     }
 
-    /// Whether to allow whitespace being optional between a mention/prefix and
-    /// a command.
-    ///
-    /// **Note**: Defaults to `false`.
-    ///
-    /// # Examples
-    ///
-    /// Setting this to `false` will _only_ allow this scenario to occur:
-    ///
-    /// ```ignore
-    /// <@245571012924538880> about
-    /// !about
-    ///
-    /// // bot processes and executes the "about" command if it exists
-    /// ```
-    ///
-    /// while setting this to `true` will _also_ allow this scenario to occur:
-    ///
-    /// ```ignore
-    /// <@245571012924538880>about
-    /// ! about
-    ///
-    /// // bot processes and executes the "about" command if it exists
-    /// ```
-    pub fn allow_whitespace(mut self, allow_whitespace: bool)
-        -> Self {
-        self.allow_whitespace = allow_whitespace;
-
-        self
-    }
-
     /// Sets the prefix to respond to. This can either be a single-char or
     /// multi-char string.
-    pub fn prefix<S: Into<String>>(mut self, prefix: S) -> Self {
-        self.prefixes = vec![prefix.into()];
+    pub fn prefix(mut self, prefix: &str) -> Self {
+        self.prefixes = vec![prefix.to_owned()];
 
         self
     }
@@ -231,18 +229,13 @@ impl Configuration {
         self
     }
 
-    /// Allows you to change what accounts to ignore.
-    pub fn account_type(mut self, account_type: AccountType) -> Self {
-        self.account_type = account_type;
-
-        self
-    }
-
-    /// Sets the prefix to respond to. This can either be a single-char or
-    /// multi-char string.
-    pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
-        where F: Fn(&Context) -> Option<String> + Send + Sync + 'static {
-        self.dynamic_prefix = Some(Box::new(dynamic_prefix));
+    /// Message that's sent when user sends too many arguments to a command.
+    ///
+    /// %max% will be replaced with maximum allowed amount of arguments.
+    ///
+    /// %given% will be replced with the given amount of arguments.
+    pub fn too_many_args_message(mut self, content: &str) -> Self {
+        self.too_many_args_message = Some(content.to_owned());
 
         self
     }

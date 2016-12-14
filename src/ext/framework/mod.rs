@@ -61,11 +61,11 @@ mod create_command;
 mod create_group;
 mod buckets;
 
+pub use self::buckets::{Bucket, MemberRatelimit, Ratelimit};
 pub use self::command::{Command, CommandType, CommandGroup};
 pub use self::configuration::{AccountType, Configuration};
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
-pub use self::buckets::{Bucket, MemberRatelimit, Ratelimit};
 
 use self::command::{AfterHook, Hook};
 use std::collections::HashMap;
@@ -225,9 +225,9 @@ impl Framework {
         self.buckets.insert(s.into(), Bucket {
             ratelimit: Ratelimit {
                 delay: delay,
-                limit: Some((time_span, limit))
+                limit: Some((time_span, limit)),
             },
-            limits: HashMap::new()
+            users: HashMap::new(),
         });
 
         self
@@ -239,20 +239,12 @@ impl Framework {
         self.buckets.insert(s.into(), Bucket {
             ratelimit: Ratelimit {
                 delay: delay,
-                limit: None
+                limit: None,
             },
-            limits: HashMap::new()
+            users: HashMap::new(),
         });
 
         self
-    }
-
-    #[allow(map_entry)]
-    fn ratelimit_time(&mut self, bucket_name: &str, user_id: u64) -> i64 {
-        self.buckets
-            .get_mut(bucket_name)
-            .map(|bucket| bucket.take(user_id))
-            .unwrap_or(0)
     }
 
     #[allow(cyclomatic_complexity)]
@@ -264,10 +256,8 @@ impl Framework {
                     return;
                 }
             },
-            AccountType::Bot => {
-                if message.author.bot {
-                    return;
-                }
+            AccountType::Bot => if message.author.bot {
+                return;
             },
             AccountType::Automatic => {
                 let cache = CACHE.read().unwrap();
@@ -481,13 +471,14 @@ impl Framework {
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
         where F: Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static,
               S: Into<String> {
-        if !self.groups.contains_key("Ungrouped") {
-            self.groups.insert("Ungrouped".to_string(), Arc::new(CommandGroup::default()));
-        }
+        {
+            let ungrouped = self.groups.entry("Ungrouped".to_owned())
+                .or_insert_with(|| Arc::new(CommandGroup::default()));
 
-        if let Some(ref mut x) = self.groups.get_mut("Ungrouped") {
-            if let Some(ref mut y) = Arc::get_mut(x) {
-                y.commands.insert(command_name.into(), Arc::new(Command::new(f)));
+            if let Some(ref mut group) = Arc::get_mut(ungrouped) {
+                let name = command_name.into();
+
+                group.commands.insert(name, Arc::new(Command::new(f)));
             }
         }
 
@@ -510,15 +501,15 @@ impl Framework {
     pub fn command<F, S>(mut self, command_name: S, f: F) -> Self
         where F: FnOnce(CreateCommand) -> CreateCommand,
               S: Into<String> {
-        let cmd = f(CreateCommand(Command::default())).0;
+        {
+            let ungrouped = self.groups.entry("Ungrouped".to_owned())
+                .or_insert_with(|| Arc::new(CommandGroup::default()));
 
-        if !self.groups.contains_key("Ungrouped") {
-            self.groups.insert("Ungrouped".to_string(), Arc::new(CommandGroup::default()));
-        }
+            if let Some(ref mut group) = Arc::get_mut(ungrouped) {
+                let cmd = f(CreateCommand(Command::default())).0;
+                let name = command_name.into();
 
-        if let Some(ref mut x) = self.groups.get_mut("Ungrouped") {
-            if let Some(ref mut y) = Arc::get_mut(x) {
-                y.commands.insert(command_name.into(), Arc::new(cmd));
+                group.commands.insert(name, Arc::new(cmd));
             }
         }
 
@@ -588,20 +579,28 @@ impl Framework {
     pub fn set_check<F, S>(mut self, command: S, check: F) -> Self
         where F: Fn(&Context, &Message) -> bool + Send + Sync + 'static,
               S: Into<String> {
-        if !self.groups.contains_key("Ungrouped") {
-            self.groups.insert("Ungrouped".to_string(), Arc::new(CommandGroup::default()));
-        }
+        {
+            let ungrouped = self.groups.entry("Ungrouped".to_owned())
+                .or_insert_with(|| Arc::new(CommandGroup::default()));
 
-        if let Some(ref mut group) = self.groups.get_mut("Ungrouped") {
-            if let Some(group_mut) = Arc::get_mut(group) {
-                if let Some(ref mut command) = group_mut.commands.get_mut(&command.into()) {
-                    if let Some(c) = Arc::get_mut(command) {
-                        c.checks.push(Box::new(check));
+            if let Some(group) = Arc::get_mut(ungrouped) {
+                let name = command.into();
+
+                if let Some(ref mut command) = group.commands.get_mut(&name) {
+                    if let Some(command) = Arc::get_mut(command) {
+                        command.checks.push(Box::new(check));
                     }
                 }
             }
         }
 
         self
+    }
+
+    fn ratelimit_time(&mut self, bucket_name: &str, user_id: u64) -> i64 {
+        self.buckets
+            .get_mut(bucket_name)
+            .map(|bucket| bucket.take(user_id))
+            .unwrap_or(0)
     }
 }

@@ -4,12 +4,18 @@ use std::collections::HashMap;
 use std::default::Default;
 use std::sync::Arc;
 use ::client::Context;
-use ::model::Message;
-use ::model::Permissions;
+use ::model::{Message, Permissions};
 
 pub struct CreateCommand(pub Command);
 
 impl CreateCommand {
+    /// Adds a ratelimit bucket.
+    pub fn bucket(mut self, bucket: &str) -> Self {
+        self.0.bucket = Some(bucket.to_owned());
+
+        self
+    }
+
     /// Adds a "check" to a command, which checks whether or not the command's
     /// function should be called.
     ///
@@ -57,51 +63,9 @@ impl CreateCommand {
         self
     }
 
-    /// Adds a ratelimit bucket.
-    pub fn bucket(mut self, bucket: &str) -> Self {
-        self.0.bucket = Some(bucket.to_owned());
-
-        self
-    }
-
-    /// Whether command should be displayed in help list or not, used by other commands.
-    pub fn help_available(mut self, help_available: bool) -> Self {
-        self.0.help_available = help_available;
-
-        self
-    }
-
     /// Whether command can be used only privately or not.
     pub fn dm_only(mut self, dm_only: bool) -> Self {
         self.0.dm_only = dm_only;
-
-        self
-    }
-
-    /// Whether command can be used only in guilds or not.
-    pub fn guild_only(mut self, guild_only: bool) -> Self {
-        self.0.guild_only = guild_only;
-
-        self
-    }
-
-    /// Minumum amount of arguments that should be passed.
-    pub fn min_args(mut self, min_args: i32) -> Self {
-        self.0.min_args = Some(min_args);
-
-        self
-    }
-
-    /// Maximum amount of arguments that can be passed.
-    pub fn max_args(mut self, max_args: i32) -> Self {
-        self.0.max_args = Some(max_args);
-
-        self
-    }
-
-    /// Maximum amount of arguments that can be passed.
-    pub fn required_permissions(mut self, required_permissions: Permissions) -> Self {
-        self.0.required_permissions = required_permissions;
 
         self
     }
@@ -144,6 +108,41 @@ impl CreateCommand {
     /// ```
     pub fn exec_str(mut self, content: &str) -> Self {
         self.0.exec = CommandType::StringResponse(content.to_owned());
+
+        self
+    }
+
+    /// Whether command can be used only in guilds or not.
+    pub fn guild_only(mut self, guild_only: bool) -> Self {
+        self.0.guild_only = guild_only;
+
+        self
+    }
+
+    /// Whether command should be displayed in help list or not, used by other commands.
+    pub fn help_available(mut self, help_available: bool) -> Self {
+        self.0.help_available = help_available;
+
+        self
+    }
+
+    /// Maximum amount of arguments that can be passed.
+    pub fn max_args(mut self, max_args: i32) -> Self {
+        self.0.max_args = Some(max_args);
+
+        self
+    }
+
+    /// Minumum amount of arguments that should be passed.
+    pub fn min_args(mut self, min_args: i32) -> Self {
+        self.0.min_args = Some(min_args);
+
+        self
+    }
+
+    /// Maximum amount of arguments that can be passed.
+    pub fn required_permissions(mut self, required_permissions: Permissions) -> Self {
+        self.0.required_permissions = required_permissions;
 
         self
     }
