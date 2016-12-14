@@ -1,7 +1,8 @@
+use std::collections::HashSet;
 use std::default::Default;
 use super::command::PrefixCheck;
-use ::client::rest;
-use ::client::Context;
+use ::client::{Context, rest};
+use ::model::{GuildId, UserId};
 
 /// Account type used for configuration.
 pub enum AccountType {
@@ -59,11 +60,27 @@ pub struct Configuration {
     #[doc(hidden)]
     pub no_guild_message: Option<String>,
     #[doc(hidden)]
+    pub blocked_user_message: Option<String>,
+    #[doc(hidden)]
+    pub blocked_guild_message: Option<String>,
+    #[doc(hidden)]
     pub too_many_args_message: Option<String>,
     #[doc(hidden)]
     pub not_enough_args_message: Option<String>,
     #[doc(hidden)]
+    pub command_disabled_message: Option<String>,
+    #[doc(hidden)]
     pub account_type: AccountType,
+    #[doc(hidden)]
+    pub blocked_users: HashSet<UserId>,
+    #[doc(hidden)]
+    pub blocked_guilds: HashSet<GuildId>,
+    #[doc(hidden)]
+    pub owners: HashSet<UserId>,
+    #[doc(hidden)]
+    pub disabled_commands: HashSet<String>,
+    #[doc(hidden)]
+    pub allow_dm: bool,
 }
 
 impl Configuration {
@@ -98,9 +115,23 @@ impl Configuration {
     ///
     /// // bot processes and executes the "about" command if it exists
     /// ```
-    pub fn allow_whitespace(mut self, allow_whitespace: bool)
-        -> Self {
+    pub fn allow_whitespace(mut self, allow_whitespace: bool) -> Self {
         self.allow_whitespace = allow_whitespace;
+
+        self
+    }
+
+    /// HashSet of user Ids whose commands will be ignored.
+    /// Guilds owned by user Ids will also be ignored.
+    pub fn blocked_users(mut self, users: HashSet<UserId>) -> Self {
+        self.blocked_users = users;
+
+        self
+    }
+
+    /// HashSet of guild Ids where commands will be ignored.
+    pub fn blocked_guilds(mut self, guilds: HashSet<GuildId>) -> Self {
+        self.blocked_guilds = guilds;
 
         self
     }
@@ -119,7 +150,14 @@ impl Configuration {
         self
     }
 
-    /// Sets the prefix to respond to. This can either be a single-char or
+    /// HashSet of command names that won't be run.
+    pub fn disabled_commands(mut self, commands: HashSet<String>) -> Self {
+        self.disabled_commands = commands;
+
+        self
+    }
+
+    /// Sets the prefix to respond to. This can either be a single- or
     /// multi-char string.
     pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
         where F: Fn(&Context) -> Option<String> + Send + Sync + 'static {
@@ -131,6 +169,30 @@ impl Configuration {
     /// Message that's sent when one of a command's checks doesn't succeed.
     pub fn invalid_check_message(mut self, content: &str) -> Self {
         self.invalid_check_message = Some(content.to_owned());
+
+        self
+    }
+
+    /// Message that's sent if a command is disabled.
+    ///
+    /// %command% will be replaced with command name.
+    pub fn command_disabled_message(mut self, content: &str) -> Self {
+        self.command_disabled_message = Some(content.to_owned());
+
+        self
+    }
+
+    /// Message that's sent if a blocked user attempts to use a command.
+    pub fn blocked_user_message(mut self, content: &str) -> Self {
+        self.blocked_user_message = Some(content.to_owned());
+
+        self
+    }
+
+    /// Message that's sent if a command issued within a guild owned by a
+    /// blocked user.
+    pub fn blocked_guild_message(mut self, content: &str) -> Self {
+        self.blocked_guild_message = Some(content.to_owned());
 
         self
     }
@@ -213,6 +275,13 @@ impl Configuration {
         self
     }
 
+    /// HashSet of user Ids checks won't apply to.
+    pub fn owners(mut self, user_ids: HashSet<UserId>) -> Self {
+        self.owners = user_ids;
+
+        self
+    }
+
     /// Sets the prefix to respond to. This can either be a single-char or
     /// multi-char string.
     pub fn prefix(mut self, prefix: &str) -> Self {
@@ -221,8 +290,8 @@ impl Configuration {
         self
     }
 
-    /// Sets the prefix to respond to. This can either be a single-char or
-    /// multi-char string.
+    /// Sets the prefixes to respond to. Those can either be single-chararacter or
+    /// multi-chararacter strings.
     pub fn prefixes(mut self, prefixes: Vec<&str>) -> Self {
         self.prefixes = prefixes.iter().map(|x| x.to_string()).collect();
 
@@ -252,17 +321,25 @@ impl Default for Configuration {
         Configuration {
             depth: 5,
             on_mention: None,
+            dynamic_prefix: None,
             allow_whitespace: false,
             prefixes: vec![],
-            dynamic_prefix: None,
-            rate_limit_message: None,
-            invalid_permission_message: None,
-            invalid_check_message: None,
             no_dm_message: None,
             no_guild_message: None,
+            rate_limit_message: None,
+            blocked_user_message: None,
             too_many_args_message: None,
+            invalid_check_message: None,
+            blocked_guild_message: None,
             not_enough_args_message: None,
-            account_type: AccountType::Automatic
+            command_disabled_message: None,
+            invalid_permission_message: None,
+            account_type: AccountType::Automatic,
+            owners: HashSet::default(),
+            blocked_users: HashSet::default(),
+            blocked_guilds: HashSet::default(),
+            disabled_commands: HashSet::default(),
+            allow_dm: true,
         }
     }
 }

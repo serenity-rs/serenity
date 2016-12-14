@@ -140,9 +140,17 @@ impl CreateCommand {
         self
     }
 
-    /// Maximum amount of arguments that can be passed.
-    pub fn required_permissions(mut self, required_permissions: Permissions) -> Self {
-        self.0.required_permissions = required_permissions;
+    /// Whether command can be used only privately or not.
+    pub fn owners_only(mut self, owners_only: bool) -> Self {
+        self.0.owners_only = owners_only;
+
+        self
+    }
+
+    /// The permissions that a user must have in the contextual channel in order
+    /// for the command to be processed.
+    pub fn required_permissions(mut self, permissions: Permissions) -> Self {
+        self.0.required_permissions = permissions;
 
         self
     }
@@ -186,7 +194,8 @@ impl Default for Command {
             required_permissions: Permissions::empty(),
             dm_only: false,
             guild_only: false,
-            help_available: true
+            help_available: true,
+            owners_only: false
         }
     }
 }

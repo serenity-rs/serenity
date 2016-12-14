@@ -80,6 +80,8 @@ fn main() {
             let counter = data.get_mut::<CommandCounter>().unwrap();
             let entry = counter.entry(command_name.clone()).or_insert(0);
             *entry += 1;
+
+            true
         })
         // Very similar to `before`, except this will be called directly _after_
         // command execution.

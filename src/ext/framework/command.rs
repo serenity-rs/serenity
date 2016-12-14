@@ -8,7 +8,7 @@ use std::collections::HashMap;
 pub type Check = Fn(&Context, &Message) -> bool + Send + Sync + 'static;
 pub type Exec = Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static;
 pub type Help = Fn(&Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) -> Result<(), String> + Send + Sync + 'static;
-pub type Hook = Fn(&Context, &Message, &String) + Send + Sync + 'static;
+pub type BeforeHook = Fn(&Context, &Message, &String) -> bool + Send + Sync + 'static;
 pub type AfterHook = Fn(&Context, &Message, &String, Result<(), String>) + Send + Sync + 'static;
 #[doc(hidden)]
 pub type InternalCommand = Arc<Command>;
@@ -55,6 +55,8 @@ pub struct Command {
     pub dm_only: bool,
     /// Whether command can be used only in guilds or not.
     pub guild_only: bool,
+    /// Whether command can only be used by owners or not.
+    pub owners_only: bool,
 }
 
 impl Command {
@@ -73,6 +75,7 @@ impl Command {
             min_args: None,
             max_args: None,
             required_permissions: Permissions::empty(),
+            owners_only: false,
         }
     }
 }
