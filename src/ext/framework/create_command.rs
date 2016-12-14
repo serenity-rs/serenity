@@ -78,6 +78,13 @@ impl CreateCommand {
         self
     }
 
+    /// Whether command can be used only privately or not.
+    pub fn owners_only(mut self, owners_only: bool) -> Self {
+        self.0.owners_only = owners_only;
+
+        self
+    }
+
     /// Whether command can be used only in guilds or not.
     pub fn guild_only(mut self, guild_only: bool) -> Self {
         self.0.guild_only = guild_only;
@@ -187,7 +194,8 @@ impl Default for Command {
             required_permissions: Permissions::empty(),
             dm_only: false,
             guild_only: false,
-            help_available: true
+            help_available: true,
+            owners_only: false
         }
     }
 }

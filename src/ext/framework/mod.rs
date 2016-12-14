@@ -67,7 +67,7 @@ pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
 pub use self::buckets::{Bucket, MemberRatelimit, Ratelimit};
 
-use self::command::{AfterHook, Hook};
+use self::command::{AfterHook, BeforeHook};
 use std::collections::HashMap;
 use std::default::Default;
 use std::sync::Arc;
@@ -163,7 +163,7 @@ macro_rules! command {
 pub struct Framework {
     configuration: Configuration,
     groups: HashMap<String, Arc<CommandGroup>>,
-    before: Option<Arc<Hook>>,
+    before: Option<Arc<BeforeHook>>,
     buckets: HashMap<String, Bucket>,
     after: Option<Arc<AfterHook>>,
     /// Whether the framework has been "initialized".
@@ -331,43 +331,105 @@ impl Framework {
                     };
 
                     if let Some(command) = group.commands.get(&to_check) {
-                        if let Some(ref bucket_name) = command.bucket {
-                            let rate_limit = self.ratelimit_time(bucket_name, message.author.id.0);
-
-                            if rate_limit > 0 {
-                                if let Some(ref message) = self.configuration.rate_limit_message {
-                                    let _ = context.say(
-                                        &message.replace("%time%", &rate_limit.to_string()));
-                                }
-
-                                return;
-                            }
-                        }
-
-                        if message.is_private() {
-                            if command.guild_only {
-                                if let Some(ref message) = self.configuration.no_guild_message {
+                        let is_owner = self.configuration.owners.contains(&message.author.id);
+                        // Most of the checks don't apply to owners.
+                        if !is_owner {
+                            if !self.configuration.allow_dm {
+                                if let Some(ref message) = self.configuration.no_dm_message {
                                     let _ = context.say(message);
                                 }
 
                                 return;
                             }
-                        } else if command.dm_only {
-                            if let Some(ref message) = self.configuration.no_dm_message {
+
+                            if let Some(guild_id) = message.guild_id() {
+                                if self.configuration.blocked_guilds.contains(&guild_id) {
+                                    if let Some(ref message) = self.configuration.blocked_guild_message {
+                                        let _ = context.say(message);
+                                    }
+
+                                    return;
+                                }
+                            }
+
+                            if cfg!(feature = "cache") {
+                                if let Some(guild_id) = message.guild_id() {
+                                    if let Some(guild) = guild_id.find() {
+                                        if self.configuration.blocked_users.contains(&guild.owner_id) {
+                                            if let Some(ref message) = self.configuration.blocked_guild_message {
+                                                let _ = context.say(message);
+                                            }
+
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if self.configuration.blocked_users.contains(&message.author.id) {
+                                if let Some(ref message) = self.configuration.blocked_user_message {
+                                    let _ = context.say(message);
+                                }
+
+                                return;
+                            }
+
+                            if self.configuration.disabled_commands.contains(&to_check) ||
+                               self.configuration.disabled_commands.contains(&built) {
+                                if let Some(ref message) = self.configuration.command_disabled_message {
+                                    let msg = message.replace("%command%", &to_check);
+
+                                    let _ = context.say(&msg);
+                                }
+
+                                return;
+                            }
+
+                            if let Some(ref bucket_name) = command.bucket {
+                                let rate_limit = self.ratelimit_time(bucket_name, message.author.id.0);
+
+                                if rate_limit > 0 {
+                                    if let Some(ref message) = self.configuration.rate_limit_message {
+                                        let msg = message.replace("%time%", &rate_limit.to_string());
+
+                                        let _ = context.say(&msg);
+                                    }
+
+                                    return;
+                                }
+                            }
+
+                            if message.is_private() {
+                                if command.guild_only {
+                                    if let Some(ref message) = self.configuration.no_guild_message {
+                                        let _ = context.say(message);
+                                    }
+
+                                    return;
+                                }
+                            } else if command.dm_only {
+                                if let Some(ref message) = self.configuration.no_dm_message {
+                                    let _ = context.say(message);
+                                }
+
+                                return;
+                            }
+
+                            for check in &command.checks {
+                                if !(check)(&context, &message) {
+                                    if let Some(ref message) = self.configuration.invalid_check_message {
+                                        let _ = context.say(message);
+                                    }
+
+                                    continue 'outer;
+                                }
+                            }
+                        } else if command.owners_only {
+                            if let Some(ref message) = self.configuration.invalid_permission_message {
                                 let _ = context.say(message);
                             }
 
                             return;
-                        }
-
-                        for check in &command.checks {
-                            if !(check)(&context, &message) {
-                                if let Some(ref message) = self.configuration.invalid_check_message {
-                                    let _ = context.say(message);
-                                }
-
-                                continue 'outer;
-                            }
                         }
 
                         let before = self.before.clone();
@@ -387,9 +449,10 @@ impl Framework {
                         if let Some(x) = command.min_args {
                             if args.len() < x as usize {
                                 if let Some(ref message) = self.configuration.not_enough_args_message {
-                                    let _ = context.say(
-                                        &message.replace("%min%", &x.to_string())
-                                                .replace("%given%", &args.len().to_string()));
+                                    let msg = message.replace("%min%", &x.to_string())
+                                        .replace("%given%", &args.len().to_string());
+
+                                    let _ = context.say(&msg);
                                 }
 
                                 return;
@@ -399,16 +462,17 @@ impl Framework {
                         if let Some(x) = command.max_args {
                             if args.len() > x as usize {
                                 if let Some(ref message) = self.configuration.too_many_args_message {
-                                    let _ = context.say(
-                                        &message.replace("%max%", &x.to_string())
-                                                .replace("%given%", &args.len().to_string()));
+                                    let msg = message.replace("%max%", &x.to_string())
+                                        .replace("%given%", &args.len().to_string());
+
+                                    let _ = context.say(&msg);
                                 }
 
                                 return;
                             }
                         }
 
-                        if !command.required_permissions.is_empty() {
+                        if !is_owner && !command.required_permissions.is_empty() {
                             let mut permissions_fulfilled = false;
 
                             if let Some(member) = message.get_member() {
@@ -434,7 +498,9 @@ impl Framework {
 
                         thread::spawn(move || {
                             if let Some(before) = before {
-                                (before)(&context, &message, &built);
+                                if !is_owner && !(before)(&context, &message, &built) {
+                                    return;
+                                }
                             }
 
                             let result = match command.exec {
@@ -539,8 +605,9 @@ impl Framework {
     }
 
     /// Specify the function to be called prior to every command's execution.
+    /// If that function returns true, the command will be executed.
     pub fn before<F>(mut self, f: F) -> Self
-        where F: Fn(&Context, &Message, &String) + Send + Sync + 'static {
+        where F: Fn(&Context, &Message, &String) -> bool + Send + Sync + 'static {
         self.before = Some(Arc::new(f));
 
         self
