@@ -75,7 +75,7 @@ impl Command {
             min_args: None,
             max_args: None,
             required_permissions: Permissions::empty(),
-            owners_only: false
+            owners_only: false,
         }
     }
 }

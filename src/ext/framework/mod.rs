@@ -377,8 +377,9 @@ impl Framework {
                             if self.configuration.disabled_commands.contains(&to_check) ||
                                self.configuration.disabled_commands.contains(&built) {
                                 if let Some(ref message) = self.configuration.command_disabled_message {
-                                    let _ = context.say(
-                                        &message.replace("%command%", &to_check));
+                                    let msg = message.replace("%command%", &to_check);
+
+                                    let _ = context.say(&msg);
                                 }
 
                                 return;
@@ -389,8 +390,9 @@ impl Framework {
 
                                 if rate_limit > 0 {
                                     if let Some(ref message) = self.configuration.rate_limit_message {
-                                        let _ = context.say(
-                                            &message.replace("%time%", &rate_limit.to_string()));
+                                        let msg = message.replace("%time%", &rate_limit.to_string());
+
+                                        let _ = context.say(&msg);
                                     }
 
                                     return;
@@ -447,9 +449,10 @@ impl Framework {
                         if let Some(x) = command.min_args {
                             if args.len() < x as usize {
                                 if let Some(ref message) = self.configuration.not_enough_args_message {
-                                    let _ = context.say(
-                                        &message.replace("%min%", &x.to_string())
-                                                .replace("%given%", &args.len().to_string()));
+                                    let msg = message.replace("%min%", &x.to_string())
+                                        .replace("%given%", &args.len().to_string());
+
+                                    let _ = context.say(&msg);
                                 }
 
                                 return;
@@ -459,9 +462,10 @@ impl Framework {
                         if let Some(x) = command.max_args {
                             if args.len() > x as usize {
                                 if let Some(ref message) = self.configuration.too_many_args_message {
-                                    let _ = context.say(
-                                        &message.replace("%max%", &x.to_string())
-                                                .replace("%given%", &args.len().to_string()));
+                                    let msg = message.replace("%max%", &x.to_string())
+                                        .replace("%given%", &args.len().to_string());
+
+                                    let _ = context.say(&msg);
                                 }
 
                                 return;

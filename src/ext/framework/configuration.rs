@@ -349,7 +349,7 @@ impl Default for Configuration {
             blocked_users: HashSet::default(),
             blocked_guilds: HashSet::default(),
             disabled_commands: HashSet::default(),
-            allow_dm: true
+            allow_dm: true,
         }
     }
 }
