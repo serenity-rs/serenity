@@ -709,8 +709,10 @@ pub fn edit_profile(map: Value) -> Result<CurrentUser> {
 
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
-    if let Some(Value::String(token)) = map.remove("token") {
-        set_token(&token)
+    if !TOKEN.lock().unwrap().starts_with("Bot ") {
+        if let Some(Value::String(token)) = map.remove("token") {
+            set_token(&token);
+        }
     }
 
     CurrentUser::decode(Value::Object(map))
