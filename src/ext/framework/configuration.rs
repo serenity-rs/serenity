@@ -1,7 +1,9 @@
+use std::collections::HashSet;
 use std::default::Default;
 use super::command::PrefixCheck;
 use ::client::rest;
 use ::client::Context;
+use ::model::{GuildId, UserId};
 
 /// Account type used for configuration.
 pub enum AccountType {
@@ -59,11 +61,27 @@ pub struct Configuration {
     #[doc(hidden)]
     pub no_guild_message: Option<String>,
     #[doc(hidden)]
+    pub blocked_user_message: Option<String>,
+    #[doc(hidden)]
+    pub blocked_guild_message: Option<String>,
+    #[doc(hidden)]
     pub too_many_args_message: Option<String>,
     #[doc(hidden)]
     pub not_enough_args_message: Option<String>,
     #[doc(hidden)]
+    pub command_disabled_message: Option<String>,
+    #[doc(hidden)]
     pub account_type: AccountType,
+    #[doc(hidden)]
+    pub blocked_users: HashSet<UserId>,
+    #[doc(hidden)]
+    pub blocked_guilds: HashSet<GuildId>,
+    #[doc(hidden)]
+    pub owners: HashSet<UserId>,
+    #[doc(hidden)]
+    pub disabled_commands: HashSet<String>,
+    #[doc(hidden)]
+    pub allow_dm: bool,
 }
 
 impl Configuration {
@@ -88,6 +106,32 @@ impl Configuration {
     pub fn rate_limit_message<S>(mut self, rate_limit_message: S) -> Self
         where S: Into<String> {
         self.rate_limit_message = Some(rate_limit_message.into());
+
+        self
+    }
+
+    /// Message that's sent if a command is disabled.
+    ///
+    /// %command% will be replaced with command name.
+    pub fn command_disabled_message<S>(mut self, command_disabled_message: S) -> Self
+        where S: Into<String> {
+        self.command_disabled_message = Some(command_disabled_message.into());
+
+        self
+    }
+
+    /// Message that's sent if a blocked user attempts to use a command.
+    pub fn blocked_user_message<S>(mut self, blocked_user_message: S) -> Self
+        where S: Into<String> {
+        self.blocked_user_message = Some(blocked_user_message.into());
+
+        self
+    }
+
+    /// Message that's sent if a command issued within a server owned by a blocked user.
+    pub fn blocked_guild_message<S>(mut self, blocked_guild_message: S) -> Self
+        where S: Into<String> {
+        self.blocked_guild_message = Some(blocked_guild_message.into());
 
         self
     }
@@ -223,10 +267,39 @@ impl Configuration {
         self
     }
 
-    /// Sets the prefix to respond to. This can either be a single-char or
-    /// multi-char string.
+    /// Sets the prefixes to respond to. Those can either be single-chararacter or
+    /// multi-chararacter strings.
     pub fn prefixes(mut self, prefixes: Vec<&str>) -> Self {
         self.prefixes = prefixes.iter().map(|x| x.to_string()).collect();
+
+        self
+    }
+
+    /// HashSet of user Ids whose commands will be ignored.
+    /// Guilds owned by user Ids will also be ignored.
+    pub fn blocked_users(mut self, users: HashSet<UserId>) -> Self {
+        self.blocked_users = users;
+
+        self
+    }
+
+    /// HashSet of guild Ids where commands will be ignored.
+    pub fn blocked_guilds(mut self, guilds: HashSet<GuildId>) -> Self {
+        self.blocked_guilds = guilds;
+
+        self
+    }
+
+    /// HashSet of user Ids checks won't apply to.
+    pub fn owners(mut self, users: HashSet<UserId>) -> Self {
+        self.owners = users;
+
+        self
+    }
+
+    /// HashSet of command names that won't be run.
+    pub fn disabled_commands(mut self, commands: HashSet<String>) -> Self {
+        self.disabled_commands = commands;
 
         self
     }
@@ -259,17 +332,25 @@ impl Default for Configuration {
         Configuration {
             depth: 5,
             on_mention: None,
+            dynamic_prefix: None,
             allow_whitespace: false,
             prefixes: vec![],
-            dynamic_prefix: None,
-            rate_limit_message: None,
-            invalid_permission_message: None,
-            invalid_check_message: None,
             no_dm_message: None,
             no_guild_message: None,
+            rate_limit_message: None,
+            blocked_user_message: None,
             too_many_args_message: None,
+            invalid_check_message: None,
+            blocked_guild_message: None,
             not_enough_args_message: None,
-            account_type: AccountType::Automatic
+            command_disabled_message: None,
+            invalid_permission_message: None,
+            account_type: AccountType::Automatic,
+            owners: HashSet::new(),
+            blocked_users: HashSet::new(),
+            blocked_guilds: HashSet::new(),
+            disabled_commands: HashSet::new(),
+            allow_dm: true
         }
     }
 }
