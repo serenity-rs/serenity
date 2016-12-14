@@ -1,8 +1,7 @@
 use std::collections::HashSet;
 use std::default::Default;
 use super::command::PrefixCheck;
-use ::client::rest;
-use ::client::Context;
+use ::client::{Context, rest};
 use ::model::{GuildId, UserId};
 
 /// Account type used for configuration.
@@ -346,10 +345,10 @@ impl Default for Configuration {
             command_disabled_message: None,
             invalid_permission_message: None,
             account_type: AccountType::Automatic,
-            owners: HashSet::new(),
-            blocked_users: HashSet::new(),
-            blocked_guilds: HashSet::new(),
-            disabled_commands: HashSet::new(),
+            owners: HashSet::default(),
+            blocked_users: HashSet::default(),
+            blocked_guilds: HashSet::default(),
+            disabled_commands: HashSet::default(),
             allow_dm: true
         }
     }
