@@ -37,7 +37,7 @@ impl CurrentUser {
     /// Returns the formatted URL of the user's icon, if one exists.
     pub fn avatar_url(&self) -> Option<String> {
         self.avatar.as_ref().map(|av|
-            format!(cdn!("/avatars/{}/{}.jpg"), self.id, av))
+            format!(cdn!("/avatars/{}/{}.jpg"), self.id.0, av))
     }
 
     /// Edits the current user's profile settings.
@@ -101,7 +101,7 @@ impl User {
     /// Returns the formatted URL of the user's icon, if one exists.
     pub fn avatar_url(&self) -> Option<String> {
         self.avatar.as_ref().map(|av|
-            format!(cdn!("/avatars/{}/{}.jpg"), self.id, av))
+            format!(cdn!("/avatars/{}/{}.jpg"), self.id.0, av))
     }
 
     /// Gets user as `Member` of a guild.
