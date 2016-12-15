@@ -18,28 +18,34 @@ fields:
       representation of the inner value.
     type: Colour
   - name: hoist
-    description: "Whether the role is pinned above lesser roles, causing members
-      in the role to be seen above others."
+    description: >
+      Whether the role is pinned above lesser roles, causing members in the role
+      to be seen above others.
     type: bool
   - name: managed
-    description: "Whether the role is managed by an integration service."
+    description: Whether the role is managed by an integration service.
     type: bool
   - name: mentionable
     default: false
-    description: "Whether the role can be mentioned, similar to mentioning a
-      specific member or @everyone. Only members of the role will be notified if
-      a role is mentioned with this set to true."
+    description: >
+      Whether the role can be mentioned, similar to mentioning a specific member
+      or @everyone. Only members of the role will be notified if a role is
+      mentioned with this set to true.
     type: bool
   - name: name
     description: The name of the role.
     type: string
   - name: permissions
-    description: "A set of permissions that the role has been assigned. See the
-      `permissions` module for more information."
+    description: >
+      A set of permissions that the role has been assigned. See the
+      [`permissions`] module for more information.
+
+        [`permissions`]: permissions/index.html
     type: Permissions
   - name: position
-    description: "The role's position in the position list. Roles above another
-      are considered higher in the role hierarchy in most situations.
+    description: >
+      The role's position in the position list. Roles above another are
+      considered higher in the role hierarchy in most situations.
 
-      The @everyone role is always position -1 or 0."
+      The @everyone role is usually either position `-1` or `0`.
     type: i64

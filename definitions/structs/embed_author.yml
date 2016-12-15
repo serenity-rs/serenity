@@ -3,7 +3,6 @@ name: EmbedAuthor
 description: >
   An author object in an [`Embed`].
 
-
     [`Embed`]: struct.Embed.html
 fields:
   - name: icon_url

@@ -6,26 +6,29 @@ description: >
   it was created in.
 fields:
   - name: id
-    description: "The Id of the emoji."
+    description: The Id of the emoji.
     type: EmojiId
   - name: name
-    description: "The name of the emoji. It must be at least 2 characters
-      long and can only contain alphanumeric characters and underscores."
+    description: >
+      The name of the emoji. It must be at least 2 characters long and can only
+      contain alphanumeric characters and underscores.
     type: string
   - name: managed
-    description: "Whether the emoji is managed via an
-      [integration][`Integration`] service.
+    description: >
+      Whether the emoji is managed via an [`Integration`] service.
 
-      [`Integration`]: struct.Integration.html"
+      [`Integration`]: struct.Integration.html
     type: bool
   - name: require_colons
-    description: "Whether the emoji name needs to be surrounded by colons in
-      order to be used by the client."
+    description: >
+      Whether the emoji name needs to be surrounded by colons in order to be
+      used by the client.
     type: bool
   - name: roles
     array: true
-    description: "A list of [`Role`]s that are allowed to use the emoji. If
-      there are no roles specified, then usage is unrestricted.
+    description: >
+      A list of [`Role`]s that are allowed to use the emoji. If there are no
+      roles specified, then usage is unrestricted.
 
-      [`Role`]: struct.Role.html"
+      [`Role`]: struct.Role.html
     type: RoleId

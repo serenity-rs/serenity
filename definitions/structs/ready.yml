@@ -21,8 +21,9 @@ fields:
   - name: notes
     custom: decode_notes
     default: HashMap::default()
-    description: "The shard info for this session; the shard is used and the
-      total number of shards."
+    description: >
+      The shard info for this session; the shard is used and the total number of
+      shards.
     t: UserId, String
     type: hashmap
   - name: presences
@@ -50,7 +51,7 @@ fields:
     type: '[u8; 2]'
   - name: trace
     array: true
-    description: "The trace of guilds involved in this connection."
+    description: The trace of guilds involved in this connection.
     from: _trace
     optional: true
     type: string

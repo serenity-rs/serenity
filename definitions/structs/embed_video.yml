@@ -3,7 +3,6 @@ name: EmbedVideo
 description: >
   A video information object in an [`Embed`].
 
-
     [`Embed`]: struct.Embed.html
 fields:
   - name: height

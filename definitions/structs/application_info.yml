@@ -1,56 +1,65 @@
 ---
 name: ApplicationInfo
-description: "Information about a user's application. An application does not
-  necessarily have an associated bot user."
+description: >
+  Information about a user's application. An application does not necessarily
+  have an associated bot user.
 fields:
   - name: bot
-    description: "The bot user associated with this application. See
-      [BotApplication](./struct.BotApplication.html) for more information."
+    description: >
+      The bot user associated with this application. See [BotApplication] for
+      more information.
+
+        [BotApplication]: struct.BotApplication.html
     optional: true
     type: BotApplication
   - name: bot_public
     default: true
-    description: "Whether or not the bot is public. If a bot is public, anyone
-      may invite it to their [Guild](./struct.Guild.html). While a bot is
-      private, only the owner may invite it to a guild."
+    description: >
+      Whether or not the bot is public. If a bot is public, anyone may invite it
+      to their [Guild]. While a bot is private, only the owner may add it to a
+      guild.
+
+        [Guild]: struct.Guild.html
     type: bool
   - name: bot_require_code_grant
-    description: "Whether or not the bot requires an OAuth2 code grant."
+    description: Whether or not the bot requires an OAuth2 code grant.
     type: bool
   - name: description
-    description: "A description of the application, assigned by the application
-      owner."
+    description: >
+      A description of the application, assigned by the application owner.
     type: string
   - name: flags
-    description: "A set of bitflags assigned to the application, which represent
-      gated feature flags that have been enabled for the application's bot user.
+    description: >
+      A set of bitflags assigned to the application, which represent gated
+      feature flags that have been enabled for the application's bot user.
 
       If the application does not have a bot user, then bitflags are not
-      present."
+      present.
     optional: true
     type: u64
   - name: icon
-    description: "A hash pointing to the application's icon. This is not
-      necessarily equivilant to the bot user's avatar. If there is no icon
-      assigned, then this is None."
+    description: >
+      A hash pointing to the application's icon. This is not necessarily
+      equivilant to the bot user's avatar. If there is no icon assigned, then
+      this is None.
     optional: true
     type: string
   - name: id
-    description: "The numeric id of the application."
+    description: The numeric id of the application.
     type: UserId
   - name: name
-    description: "The name assigned to the application by the application
-      owner."
+    description: The name assigned to the application by the application owner.
     type: string
   - name: redirect_uris
     array: true
-    description: "A list of redirect URIs assigned to the application."
+    description: A list of redirect URIs assigned to the application.
     type: string
   - name: rpc_origins
     array: true
-    description: "A list of RPC Origins asigned to the application."
+    description: A list of RPC Origins asigned to the application.
     type: string
   - name: secret
-    description: "The given secret to the application. Note that this is not
-      equivilant to an application's bot user's token."
+    description: >
+      The given secret to the application. Note that this is not equivilant to
+      an application's bot user's token.
     type: string

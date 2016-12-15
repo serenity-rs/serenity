@@ -1,6 +1,6 @@
 ---
 name: FriendSourceFlags
-description: "Flags about who may or may not add the current user as a friend."
+description: Flags about who may or may not add the current user as a friend.
 fields:
   - name: all
     default: 'false'

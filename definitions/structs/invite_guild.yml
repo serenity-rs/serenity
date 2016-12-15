@@ -1,6 +1,6 @@
 ---
 name: InviteGuild
-description: "A minimal amount of information about an invite's guild."
+description: A minimal amount of information about an invite's guild.
 fields:
   - name: id
     type: GuildId

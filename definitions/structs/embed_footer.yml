@@ -3,7 +3,6 @@ name: EmbedFooter
 description: >
   Footer information about an [`Embed`].
 
-
     [`Embed`]: struct.Embed.html
 fields:
   - name: icon_url

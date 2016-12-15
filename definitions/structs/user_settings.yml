@@ -1,6 +1,6 @@
 ---
 name: UserSettings
-description: "User settings usually used to influence client behavior"
+description: User settings usually used to influence client behavior.
 fields:
   - name: convert_emoticons
     type: bool

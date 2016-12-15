@@ -1,7 +1,6 @@
 ---
 name: Guild
-description: >
-  Live information about a Discord guild such as channels, emojis, etc.
+description: Information about a Discord guild such as channels, emojis, etc.
 fields:
   - name: afk_channel_id
     description: Id of a voice channel that's considered AFK.
@@ -51,7 +50,9 @@ fields:
   - name: large
     description: >
       Set to true if guild has a lot of users.
-      It means that guild members aren't sent on ready event.
+
+
+      True indicates that offline guild members aren't initially sent.
     type: bool
   - name: member_count
     description: >
@@ -59,15 +60,15 @@ fields:
     type: u64
   - name: members
     description: >
-      All members of guild. Might not available on start-up if the
-      `large` field is `true`.
+      Members of the guild. Members might not all be available on start-up if
+      the `large` field is `true`.
     custom: decode_members
     t: UserId, Member
     type: hashmap
   - name: mfa_level
     description: >
-      Lets you you know if guild requires 2-factor authentication for
-      administrators.
+      Indicator if guild requires 2-factor authentication for roles with certain
+      permissions.
     type: u64
   - name: name
     description: The guild's name.
@@ -92,7 +93,7 @@ fields:
     description: >
       If [InviteSplash] feature is enabled, this can point to splash image
       URL displayed when someone opens invite URL.
-      
+
         [InviteSplash]: enum.Feature.html#variant.InviteSplash
     optional: true
     type: string

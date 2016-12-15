@@ -1,6 +1,6 @@
 ---
 name: VoiceState
-description: "A member's state within a voice channel"
+description: A member's state within a voice channel.
 fields:
   - name: channel_id
     optional: true

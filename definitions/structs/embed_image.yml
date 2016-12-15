@@ -3,7 +3,6 @@ name: EmbedImage
 description: >
   An image object in an [`Embed`].
 
-
     [`Embed`]: struct.Embed.html
 fields:
   - name: height

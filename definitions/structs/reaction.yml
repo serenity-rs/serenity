@@ -3,7 +3,6 @@ name: Reaction
 description: >
   An [`Emoji`] reaction to a [`Message`].
 
-
     [`Emoji`]: struct.Emoji.html
     [`Message`]: struct.Message.html
 fields:

@@ -1,13 +1,12 @@
 ---
 name: Embed
 description: >
-  Represents a rich embed which allows using richer markdown,
-  multiple columns and more. This was heavily inspired by
-  [slack's attachments].
+  Represents a rich embed which allows using richer markdown, multiple fields
+  and more. This was heavily inspired by [slack's attachments].
 
 
   You can include an attachment in your own message by a user or a bot,
-  or in a webhook. They can be edited, too.
+  or in a webhook.
 
 
   **Note**: Maximum amount of characters you can put is 256 in a field name,

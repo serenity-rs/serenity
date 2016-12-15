@@ -9,8 +9,8 @@ fields:
     type: ChannelId
   - name: last_message_id
     description: >
-      The Id of last message sent. It lets client determine
-      if the channel has unread messages.
+      The Id of last message sent. It lets client determine if the channel has
+      unread messages.
     optional: true
     type: MessageId
   - name: last_pin_timestamp

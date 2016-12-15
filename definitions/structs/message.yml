@@ -1,6 +1,8 @@
 ---
 name: Message
-description: "A representation of a message sent over a guild's text channel, a group, or a private channel."
+description: >
+  A representation of a message sent over a guild's text channel, a group, or a
+  private channel.
 fields:
   - name: id
     description: Message Id. Can be used to calculate the message creation date.
@@ -28,8 +30,7 @@ fields:
     array: true
     type: Embed
   - name: kind
-    description: >
-      Lets you differentiate system messages and regular messages.
+    description: Lets you differentiate system messages and regular messages.
     from: type
     type: MessageType
   - name: mention_everyone

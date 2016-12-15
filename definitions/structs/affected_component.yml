@@ -3,6 +3,7 @@ name: AffectedComponent
 description: >
   A component that was affected during a service incident.
 
+
   This is pulled from the Discord status page.
 fields:
   - name: name

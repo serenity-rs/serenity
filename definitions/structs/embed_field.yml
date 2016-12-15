@@ -3,7 +3,6 @@ name: EmbedField
 description: >
   A field object in an [`Embed`].
 
-
     [`Embed`]: struct.Embed.html
 fields:
   - name: inline

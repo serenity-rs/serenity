@@ -3,30 +3,33 @@ name: BotApplication
 description: Information about an application with an application's bot user.
 fields:
   - name: id
-    description: "The Id of the bot user."
+    description: The Id of the bot user.
     type: UserId
   - name: avatar
-    description: "A hash of the avatar, if one is assigned. This can be used to
-      generate a full URL."
+    description: >
+      A hash of the avatar, if one is assigned. This can be used to generate a
+      full URL.
     optional: true
     type: string
   - name: bot
     default: 'false'
-    description: "Whether or not this is a bot."
+    description: Whether or not this is a bot.
     type: bool
   - name: discriminator
     custom: decode_discriminator
-    description: "The discriminator assigned to the user's username. While
-      discriminators are not unique, the username#discriminator combination is."
+    description: >
+      The discriminator assigned to the user's username. While discriminators
+      are not unique, the username#discriminator combination is.
     type: u16
   - name: name
-    description: "The username."
+    description: The username.
     from: username
     type: string
   - name: token
-    description: "The token used to login to the bot user.
+    description: >
+      The token used to login to the bot user.
 
 
       **Note**: Keep this information private, as untrusted users can use it to
-      log into your bot."
+      perform any action on a bot.
     type: string

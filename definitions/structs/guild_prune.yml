@@ -1,6 +1,8 @@
 ---
 name: GuildPrune
-description: Representation of the number of members that would be pruned by a guild prune operation.
+description: >
+  Representation of the number of members that would be pruned by a guild prune
+  operation.
 fields:
   - name: pruned
     type: u64

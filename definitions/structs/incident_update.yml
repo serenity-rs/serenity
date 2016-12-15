@@ -1,6 +1,11 @@
 ---
 name: IncidentUpdate
-description: "An update to an incident from the Discord status page. This will typically state what new information has been discovered about an incident."
+description: >
+  An update to an incident from the Discord status page.
+
+
+  This will typically state what new information has been discovered about an
+  incident.
 fields:
   - name: affected_components
     array: true

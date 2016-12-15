@@ -1,34 +1,34 @@
 ---
 name: Attachment
 description: >
-  A file uploaded with a message. Not to be confused with [embed][`Embed`]s.
+  A file uploaded with a message. Not to be confused with [`Embed`]s.
 
-
-  [`Embed`]: struct.Embed.html
+    [`Embed`]: struct.Embed.html
 fields:
   - name: id
-    description: "The unique ID given to this attachment."
+    description: The unique ID given to this attachment.
     type: string
   - name: filename
-    description: "The filename of the file that was uploaded. This is equivilant
-      to what the uploader had their file named."
+    description: >
+      The filename of the file that was uploaded. This is equivilant to what the
+      uploader had their file named.
     type: string
   - name: height
-    description: "If the attachment is an image, then the height of the image is
-      provided."
+    description: >
+      If the attachment is an image, then the height of the image is provided.
     optional: true
     type: u64
   - name: proxy_url
-    description: "The proxy URL."
+    description: The proxy URL.
     type: string
   - name: size
-    description: "The size of the file in bytes."
+    description: The size of the file in bytes.
     type: u64
   - name: url
-    description: "The URL of the uploaded attachment."
+    description: The URL of the uploaded attachment.
     type: string
   - name: width
-    description: "If the attachment is an image, then the width of the image is
-      provided."
+    description: >
+      If the attachment is an image, then the width of the image is provided.
     optional: true
     type: u64

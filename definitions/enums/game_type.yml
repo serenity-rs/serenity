@@ -1,15 +1,14 @@
 ---
 name: GameType
-description: "The type of activity that is being performed when playing a
-  [`Game`].
+description: >
+  The type of activity that is being performed when playing a [`Game`].
 
-
-  [`Game`]: struct.Game.html"
+    [`Game`]: struct.Game.html
 variants:
   - variant: Playing
-    description: "An indicator that a person is playing a game."
+    description: An indicator that a person is playing a game.
     number: 0
   - variant: Streaming
-    description: "An indicator that a person is streaming something to a
-      service."
+    description: >
+      An indicator that a person is streaming something to a service.
     number: 1

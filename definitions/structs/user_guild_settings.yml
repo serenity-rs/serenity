@@ -1,6 +1,6 @@
 ---
 name: UserGuildSettings
-description: "Settings about a guild in regards to notification configuration"
+description: Settings about a guild in regards to notification configuration
 fields:
   - name: channel_overrides
     array: true

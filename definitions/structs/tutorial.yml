@@ -1,6 +1,6 @@
 ---
 name: Tutorial
-description: "The current user's progress through the Discord tutorial"
+description: The current user's progress through the Discord tutorial.
 fields:
   - name: indicators_confirmed
     array: true

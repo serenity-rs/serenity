@@ -1,26 +1,25 @@
 ---
 name: DefaultAvatar
-description: "An enum that represents a default avatar. The default avatar is
-  calculated via the result of `discriminator % 5`.
-
+description: >
+  An enum that represents a default avatar. The default avatar is calculated via
+  the result of `discriminator % 5`.
 
   The hash of the avatar can be retrieved via calling [`name`] on the enum.
 
-
-  [`name`]: #method.name"
+    [`name`]: #method.name
 variants:
   - variant: Blurple
-    description: "The avatar when the result is 0."
+    description: The avatar when the result is 0.
     name: 6debd47ed13483642cf09e832ed0bc1b
   - variant: Grey
-    description: "The avatar when the result is 1."
+    description: The avatar when the result is 1.
     name: 322c936a8c8be1b803cd94861bdfa868
   - variant: Green
-    description: "The avatar when the result is 2."
+    description: The avatar when the result is 2.
     name: dd4dbc0016779df1378e7812eabaa04d
   - variant: Orange
-    description: "The avatar when the result is 3."
+    description: The avatar when the result is 3.
     name: 0e291f67c9274a1abdddeb3fd919cbaa
   - variant: Red
-    description: "The avatar when the result is 4."
+    description: The avatar when the result is 4.
     name: 1cbd08c76f8af6dddce02c5138971129

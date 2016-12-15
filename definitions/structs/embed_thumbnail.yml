@@ -1,6 +1,6 @@
 ---
 name: EmbedThumbnail
-description: The dimensions and URL of an embed thumbnail
+description: The dimensions and URL of an embed thumbnail.
 fields:
   - name: height
     description: The height of the thumbnail in pixels.

@@ -3,6 +3,7 @@ name: UserConnection
 description: >
   A user's connection.
 
+
   **Note**: This is not in any way related to a WebSocket connection.
 fields:
   - name: id

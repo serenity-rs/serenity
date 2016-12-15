@@ -1,7 +1,8 @@
 ---
 name: Invite
 description: >
-  Information about an invite URL. Can't be accessed if you're banned.
+  Information about an invite URL. Can't be accessed if the current user is
+  banned.
 fields:
   - name: code
     description: The unique code for the invite.

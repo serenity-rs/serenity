@@ -1,10 +1,9 @@
 ---
 name: IncidentStatus
-description: "The type of status update during a
-  [service incident][`Incident`].
+description: >
+  The type of status update during a [service incident][`Incident`].
 
-
-  [`Incident`]: struct.Incident.html"
+    [`Incident`]: struct.Incident.html
 variants:
   - variant: Identified
     name: identified

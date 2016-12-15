@@ -1,6 +1,6 @@
 ---
 name: EmbedProvider
-description: The provider of an embed
+description: The provider of an embed.
 fields:
   - name: name
     description: The name of the provider.

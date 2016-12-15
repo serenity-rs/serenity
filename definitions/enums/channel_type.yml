@@ -1,32 +1,32 @@
 ---
 name: ChannelType
-description: "A representation of a type of channel."
+description: A representation of a type of channel.
 variants:
   - variant: Group
-    description: "An indicator that the channel is the channel of a [`Group`].
+    description: >
+      An indicator that the channel is the channel of a [`Group`].
 
-
-      [`Group`]: struct.Group.html"
+        [`Group`]: struct.Group.html
     name: group
     number: 3
   - variant: Private
-    description: "An indicator that the channel is a [`PrivateChannel`].
+    description: >
+      An indicator that the channel is a [`PrivateChannel`].
 
-
-      [`PrivateChannel`]: struct.PrivateChannel.html"
+        [`PrivateChannel`]: struct.PrivateChannel.html
     name: private
     number: 1
   - variant: Text
-    description: "An indicator that the channel is a text [`GuildChannel`].
+    description: >
+      An indicator that the channel is a text [`GuildChannel`].
 
-
-      [`GuildChannel`]: struct.GuildChannel.html"
+        [`GuildChannel`]: struct.GuildChannel.html
     name: text
     number: 0
   - variant: Voice
-    description: "An indicator that the channel is a voice [`GuildChannel`].
+    description: >
+      An indicator that the channel is a voice [`GuildChannel`].
 
-
-      [`GuildChannel`]: struct.GuildChannel.html"
+        [`GuildChannel`]: struct.GuildChannel.html
     name: voice
     number: 2

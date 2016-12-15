@@ -17,13 +17,11 @@ fields:
     description: >
       The Id of the [channel][`GuildChannel`] that owns the webhook.
 
-
         [`GuildChannel`]: struct.GuildChannel.html
     type: ChannelId
   - name: guild_id
     description: >
       The Id of the [`Guild`] that owns the webhook.
-
 
         [`Guild`]: struct.Guild.html
     optional: true

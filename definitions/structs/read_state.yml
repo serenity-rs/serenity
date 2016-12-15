@@ -1,6 +1,6 @@
 ---
 name: ReadState
-description: "Summary of messages since last login"
+description: Summary of messages since last login.
 fields:
   - name: id
     description: The channel's Id.

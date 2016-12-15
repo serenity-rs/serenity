@@ -1,6 +1,10 @@
 ---
 name: Incident
-description: "An incident retrieved from the Discord status page. This is not necessarily a representation of an ongoing incident."
+description: >
+  An incident retrieved from the Discord status page.
+
+
+  This is not necessarily a representation of an ongoing incident.
 fields:
   - name: created_at
     type: string

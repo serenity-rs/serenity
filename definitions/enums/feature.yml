@@ -19,6 +19,5 @@ variants:
       URL.
     name: VANITY_URL
   - variant: VipRegions
-    description: >
-      The guild has access to VIP voice channel regions.
+    description: The guild has access to VIP voice channel regions.
     name: VIP_REGIONS

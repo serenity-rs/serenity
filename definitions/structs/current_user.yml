@@ -1,6 +1,6 @@
 ---
 name: CurrentUser
-description: Information about the current user
+description: Information about the current user.
 fields:
   - name: id
     type: UserId
