@@ -324,6 +324,14 @@ impl Framework {
                         let is_owner = self.configuration.owners.contains(&message.author.id);
                         // Most of the checks don't apply to owners.
                         if !is_owner {
+                            if command.owners_only {
+                                if let Some(ref message) = self.configuration.invalid_permission_message {
+                                    let _ = context.say(message);
+                                }
+
+                                return;
+                            }
+
                             if !self.configuration.allow_dm {
                                 if let Some(ref message) = self.configuration.no_dm_message {
                                     let _ = context.say(message);
@@ -415,12 +423,6 @@ impl Framework {
                                     continue 'outer;
                                 }
                             }
-                        } else if command.owners_only {
-                            if let Some(ref message) = self.configuration.invalid_permission_message {
-                                let _ = context.say(message);
-                            }
-
-                            return;
                         }
 
                         let before = self.before.clone();
