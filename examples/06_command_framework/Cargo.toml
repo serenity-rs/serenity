@@ -8,4 +8,4 @@ typemap = "0.3"
 
 [dependencies.serenity]
 features = ["framework", "methods"]
-version = "0.1"
+path = "../../"

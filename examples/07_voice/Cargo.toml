@@ -5,4 +5,4 @@ authors = ["my name <my@email.address>"]
 
 [dependencies.serenity]
 features = ["cache", "framework", "methods", "voice"]
-version = "0.1"
+path = "../../"

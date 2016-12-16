@@ -4,4 +4,4 @@ version = "0.1.0"
 authors = ["my name <my@email.address>"]
 
 [dependencies.serenity]
-version = "0.1"
+path = "../../"
