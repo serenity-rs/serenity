@@ -145,7 +145,7 @@
 //! [examples]: https://github.com/zeyla/serenity.rs/tree/master/examples
 //! [gateway docs]: client/gateway/index.html
 #![allow(doc_markdown, inline_always, unknown_lints)]
-#![doc(html_logo_url = "https://docs.austinhellyer.me/serenity.rs/docs_header.png")]
+#![doc(html_logo_url = "https://raw.githubusercontent.com/zeyla/serenity.rs/master/html_logo.jpg")]
 #![warn(enum_glob_use, if_not_else)]
 
 #[macro_use]
