@@ -133,14 +133,21 @@ macro_rules! command {
     ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
         pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) -> Result<(), String> {
             let mut i = $a.iter();
+            let mut arg_counter = 0;
 
             $(
+                arg_counter += 1;
+
                 let $name = match i.next() {
                     Some(v) => match v.parse::<$t>() {
                         Ok(v) => v,
-                        Err(_) => return Err(format!("Failed to parse {:?}", stringify!($t))),
+                        Err(_) => return Err(format!("Failed to parse argument #{} of type {:?}",
+                                                     arg_counter,
+                                                     stringify!($t))),
                     },
-                    None => return Err(format!("Failed to parse {:?}", stringify!($t))),
+                    None => return Err(format!("Failed to parse argument #{} of type {:?}",
+                                               arg_counter,
+                                               stringify!($t))),
                 };
             )*
 
