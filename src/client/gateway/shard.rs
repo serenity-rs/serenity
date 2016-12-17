@@ -149,7 +149,7 @@ impl Shard {
                 session_id: Some(ready.ready.session_id.clone()),
                 shard_info: shard_info,
                 ws_url: base_url.to_owned(),
-                manager: VoiceManager::new(tx, ready.ready.user.id.0),
+                manager: VoiceManager::new(tx, ready.ready.user.id),
             }
         } else {
             Shard {

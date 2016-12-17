@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::sync::mpsc::Sender as MpscSender;
 use super::{Handler, Target};
 use ::client::gateway::GatewayStatus;
-use ::model::{ChannelId, GuildId};
+use ::model::{ChannelId, GuildId, UserId};
 
 /// A manager is a struct responsible for managing [`Handler`]s which belong to
 /// a single [WebSocket connection]. This is a fairly complex key-value store,
@@ -22,13 +22,13 @@ use ::model::{ChannelId, GuildId};
 /// [WebSocket connection]: ../../client/struct.Connection.html
 pub struct Manager {
     handlers: HashMap<Target, Handler>,
-    user_id: u64,
+    user_id: UserId,
     ws: MpscSender<GatewayStatus>,
 }
 
 impl Manager {
     #[doc(hidden)]
-    pub fn new(ws: MpscSender<GatewayStatus>, user_id: u64) -> Manager {
+    pub fn new(ws: MpscSender<GatewayStatus>, user_id: UserId) -> Manager {
         Manager {
             handlers: HashMap::new(),
             user_id: user_id,

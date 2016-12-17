@@ -27,6 +27,7 @@ use ::internal::prelude::*;
 use ::internal::ws_impl::{ReceiverExt, SenderExt};
 use ::internal::Timer;
 use ::model::event::VoiceEvent;
+use ::model::UserId;
 
 enum ReceiverStatus {
     Udp(Vec<u8>),
@@ -59,6 +60,7 @@ pub struct Connection {
     thread_items: ThreadItems,
     timestamp: u32,
     udp: UdpSocket,
+    user_id: UserId,
 }
 
 impl Connection {
@@ -159,6 +161,7 @@ impl Connection {
             ssrc: hello.ssrc,
             thread_items: thread_items,
             timestamp: 0,
+            user_id: info.user_id,
         })
     }
 

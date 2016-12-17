@@ -5,7 +5,7 @@ use super::connection_info::ConnectionInfo;
 use super::{Status as VoiceStatus, Target};
 use ::client::gateway::GatewayStatus;
 use ::constants::VoiceOpCode;
-use ::model::{ChannelId, GuildId, VoiceState};
+use ::model::{ChannelId, GuildId, UserId, VoiceState};
 use super::threading;
 
 /// The handler is responsible for "handling" a single voice connection, acting
@@ -39,7 +39,7 @@ pub struct Handler {
     self_mute: bool,
     sender: MpscSender<VoiceStatus>,
     session_id: Option<String>,
-    user_id: u64,
+    user_id: UserId,
     ws: MpscSender<GatewayStatus>,
 }
 
@@ -53,7 +53,7 @@ impl Handler {
     ///
     /// [`Manager::join`]: struct.Manager.html#method.join
     #[doc(hidden)]
-    pub fn new(target: Target, ws: MpscSender<GatewayStatus>, user_id: u64)
+    pub fn new(target: Target, ws: MpscSender<GatewayStatus>, user_id: UserId)
         -> Self {
         let (tx, rx) = mpsc::channel();
 
@@ -266,11 +266,14 @@ impl Handler {
             return;
         };
 
+        let user_id = self.user_id;
+
         self.send(VoiceStatus::Connect(ConnectionInfo {
             endpoint: endpoint,
             session_id: session_id,
             target_id: target_id,
             token: token,
+            user_id: user_id,
         }))
     }
 
