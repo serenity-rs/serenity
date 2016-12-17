@@ -137,6 +137,15 @@ impl GuildInfo {
     }
 }
 
+impl InviteGuild {
+    /// Returns the formatted URL of the guild's splash image, if one exists.
+    #[cfg(feature="methods")]
+    pub fn splash_url(&self) -> Option<String> {
+        self.icon.as_ref().map(|icon|
+            format!(cdn!("/splashes/{}/{}.jpg"), self.id, icon))
+    }
+}
+
 impl PartialGuild {
     /// Finds a role by Id within the guild.
     #[cfg(feature="methods")]
@@ -161,6 +170,13 @@ impl PartialGuild {
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
             format!(cdn!("/icons/{}/{}.jpg"), self.id, icon))
+    }
+
+    /// Returns the formatted URL of the guild's splash image, if one exists.
+    #[cfg(feature="methods")]
+    pub fn splash_url(&self) -> Option<String> {
+        self.icon.as_ref().map(|icon|
+            format!(cdn!("/splashes/{}/{}.jpg"), self.id, icon))
     }
 
     /// Retrieves the guild's webhooks.
@@ -715,6 +731,13 @@ impl Guild {
             .build();
 
         rest::get_guild_prune_count(self.id.0, map)
+    }
+
+    /// Returns the formatted URL of the guild's splash image, if one exists.
+    #[cfg(feature="methods")]
+    pub fn splash_url(&self) -> Option<String> {
+        self.icon.as_ref().map(|icon|
+            format!(cdn!("/splashes/{}/{}.jpg"), self.id, icon))
     }
 
     /// Starts a prune of [`Member`]s.
