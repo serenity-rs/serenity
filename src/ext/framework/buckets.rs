@@ -33,7 +33,7 @@ pub struct Bucket {
 
 impl Bucket {
     pub fn take(&mut self, user_id: u64) -> i64 {
-        let time =- time::get_time().sec;
+        let time = time::get_time().sec;
         let user = self.users.entry(user_id)
             .or_insert_with(MemberRatelimit::default);
 
