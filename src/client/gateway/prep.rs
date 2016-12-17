@@ -77,14 +77,9 @@ pub fn identify(token: &str, shard_info: Option<[u8; 2]>) -> Value {
         .build()
 }
 
-#[cfg(not(feature="debug"))]
+#[inline(always)]
 pub fn identify_compression(object: ObjectBuilder) -> ObjectBuilder {
-    object.insert("compression", true)
-}
-
-#[cfg(feature="debug")]
-pub fn identify_compression(object: ObjectBuilder) -> ObjectBuilder {
-    object.insert("compression", false)
+    object.insert("compression", !cfg!(feature="debug"))
 }
 
 pub fn build_gateway_url(base: &str) -> Result<RequestUrl> {
