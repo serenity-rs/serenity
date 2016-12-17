@@ -768,6 +768,18 @@ impl Client {
     //
     // Not all shards need to be initialized in this process.
     fn start_connection(&mut self, shard_data: Option<[u8; 3]>) -> Result<()> {
+        // Update the framework's current user if the feature is enabled.
+        //
+        // This also acts as a form of check to ensure the token is correct.
+        #[cfg(feature="framework")]
+        {
+            let user = rest::get_current_user()?;
+
+            self.framework.lock()
+                .unwrap()
+                .update_current_user(user.id, user.bot);
+        }
+
         let gateway_url = rest::get_gateway()?.url;
 
         for i in 0..shard_data.map_or(1, |x| x[1] + 1) {

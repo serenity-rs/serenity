@@ -72,9 +72,12 @@ use std::collections::HashMap;
 use std::default::Default;
 use std::sync::Arc;
 use std::thread;
-use ::client::{CACHE, Context};
-use ::model::Message;
+use ::client::Context;
+use ::model::{Message, UserId};
 use ::utils;
+
+#[cfg(feature="cache")]
+use ::client::CACHE;
 
 /// A macro to generate "named parameters". This is useful to avoid manually
 /// using the "arguments" parameter and manually parsing types.
@@ -189,6 +192,7 @@ pub struct Framework {
     /// [`Client::on_message`]: ../../client/struct.Client.html#method.on_message
     /// [`Event::MessageCreate`]: ../../model/event/enum.Event.html#variant.MessageCreate
     pub initialized: bool,
+    user_info: (u64, bool),
 }
 
 impl Framework {
@@ -259,7 +263,7 @@ impl Framework {
     pub fn dispatch(&mut self, context: Context, message: Message) {
         match self.configuration.account_type {
             AccountType::Selfbot => {
-                if message.author.id != CACHE.read().unwrap().user.id {
+                if message.author.id != self.user_info.0 {
                     return;
                 }
             },
@@ -267,13 +271,11 @@ impl Framework {
                 return;
             },
             AccountType::Automatic => {
-                let cache = CACHE.read().unwrap();
-
-                if cache.user.bot {
+                if self.user_info.1 {
                     if message.author.bot {
                         return;
                     }
-                } else if message.author.id != cache.user.id {
+                } else if message.author.id != self.user_info.0 {
                     return;
                 }
             },
@@ -347,31 +349,6 @@ impl Framework {
                                 return;
                             }
 
-                            if let Some(guild_id) = message.guild_id() {
-                                if self.configuration.blocked_guilds.contains(&guild_id) {
-                                    if let Some(ref message) = self.configuration.blocked_guild_message {
-                                        let _ = context.say(message);
-                                    }
-
-                                    return;
-                                }
-                            }
-
-                            #[cfg(feature="cache")]
-                            {
-                                if let Some(guild_id) = message.guild_id() {
-                                    if let Some(guild) = guild_id.find() {
-                                        if self.configuration.blocked_users.contains(&guild.owner_id) {
-                                            if let Some(ref message) = self.configuration.blocked_guild_message {
-                                                let _ = context.say(message);
-                                            }
-
-                                            return;
-                                        }
-                                    }
-                                }
-                            }
-
                             if self.configuration.blocked_users.contains(&message.author.id) {
                                 if let Some(ref message) = self.configuration.blocked_user_message {
                                     let _ = context.say(message);
@@ -405,20 +382,45 @@ impl Framework {
                                 }
                             }
 
-                            if message.is_private() {
-                                if command.guild_only {
-                                    if let Some(ref message) = self.configuration.no_guild_message {
+                            #[cfg(feature="cache")]
+                            {
+                                if let Some(guild_id) = message.guild_id() {
+                                    if self.configuration.blocked_guilds.contains(&guild_id) {
+                                        if let Some(ref message) = self.configuration.blocked_guild_message {
+                                            let _ = context.say(message);
+                                        }
+
+                                        return;
+                                    }
+                                }
+
+                                if let Some(guild_id) = message.guild_id() {
+                                    if let Some(guild) = guild_id.find() {
+                                        if self.configuration.blocked_users.contains(&guild.owner_id) {
+                                            if let Some(ref message) = self.configuration.blocked_guild_message {
+                                                let _ = context.say(message);
+                                            }
+
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                if message.is_private() {
+                                    if command.guild_only {
+                                        if let Some(ref message) = self.configuration.no_guild_message {
+                                            let _ = context.say(message);
+                                        }
+
+                                        return;
+                                    }
+                                } else if command.dm_only {
+                                    if let Some(ref message) = self.configuration.no_dm_message {
                                         let _ = context.say(message);
                                     }
 
                                     return;
                                 }
-                            } else if command.dm_only {
-                                if let Some(ref message) = self.configuration.no_dm_message {
-                                    let _ = context.say(message);
-                                }
-
-                                return;
                             }
 
                             for check in &command.checks {
@@ -472,27 +474,30 @@ impl Framework {
                             }
                         }
 
-                        if !is_owner && !command.required_permissions.is_empty() {
-                            let mut permissions_fulfilled = false;
+                        #[cfg(feature="cache")]
+                        {
+                            if !is_owner && !command.required_permissions.is_empty() {
+                                let mut permissions_fulfilled = false;
 
-                            if let Some(member) = message.get_member() {
-                                let cache = CACHE.read().unwrap();
+                                if let Some(member) = message.get_member() {
+                                    let cache = CACHE.read().unwrap();
 
-                                if let Ok(guild_id) = member.find_guild() {
-                                    if let Some(guild) = cache.get_guild(guild_id) {
-                                        let perms = guild.permissions_for(message.channel_id, message.author.id);
+                                    if let Ok(guild_id) = member.find_guild() {
+                                        if let Some(guild) = cache.get_guild(guild_id) {
+                                            let perms = guild.permissions_for(message.channel_id, message.author.id);
 
-                                        permissions_fulfilled = perms.contains(command.required_permissions);
+                                            permissions_fulfilled = perms.contains(command.required_permissions);
+                                        }
                                     }
                                 }
-                            }
 
-                            if !permissions_fulfilled {
-                                if let Some(ref message) = self.configuration.invalid_permission_message {
-                                    let _ = context.say(message);
+                                if !permissions_fulfilled {
+                                    if let Some(ref message) = self.configuration.invalid_permission_message {
+                                        let _ = context.say(message);
+                                    }
+
+                                    return;
                                 }
-
-                                return;
                             }
                         }
 
@@ -672,6 +677,11 @@ impl Framework {
         }
 
         self
+    }
+
+    #[doc(hidden)]
+    pub fn update_current_user(&mut self, user_id: UserId, is_bot: bool) {
+        self.user_info = (user_id.0, is_bot);
     }
 
     fn ratelimit_time(&mut self, bucket_name: &str, user_id: u64) -> i64 {
