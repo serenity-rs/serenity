@@ -1,12 +1,71 @@
 extern crate serenity;
 
 use serenity::model::*;
+use serenity::utils::Colour;
 
 #[test]
 fn test_formatters() {
-    assert_eq!(format!("{}", ChannelId(1)), "<#1>");
-    assert_eq!(format!("{}", EmojiId(2)), "2");
-    assert_eq!(format!("{}", GuildId(3)), "3");
-    assert_eq!(format!("{}", RoleId(4)), "<@&4>");
-    assert_eq!(format!("{}", UserId(5)), "<@5>");
+    assert_eq!(ChannelId(1).to_string(), "1");
+    assert_eq!(EmojiId(2).to_string(), "2");
+    assert_eq!(GuildId(3).to_string(), "3");
+    assert_eq!(RoleId(4).to_string(), "4");
+    assert_eq!(UserId(5).to_string(), "5");
+}
+
+#[test]
+fn test_mention() {
+    let channel = Channel::Guild(GuildChannel {
+        bitrate: None,
+        guild_id: GuildId(1),
+        kind: ChannelType::Text,
+        id: ChannelId(4),
+        last_message_id: None,
+        last_pin_timestamp: None,
+        name: "a".to_owned(),
+        permission_overwrites: vec![],
+        position: 1,
+        topic: None,
+        user_limit: None,
+    });
+    let emoji = Emoji {
+        id: EmojiId(5),
+        name: "a".to_owned(),
+        managed: true,
+        require_colons: true,
+        roles: vec![],
+    };
+    let role = Role {
+        id: RoleId(2),
+        colour: Colour::rosewater(),
+        hoist: false,
+        managed: false,
+        mentionable: false,
+        name: "fake role".to_owned(),
+        permissions: Permissions::empty(),
+        position: 1,
+    };
+    let user = User {
+        id: UserId(6),
+        avatar: None,
+        bot: false,
+        discriminator: "4132".to_owned(),
+        name: "fake".to_owned(),
+    };
+    let member = Member {
+        deaf: false,
+        joined_at: "fake".to_owned(),
+        mute: false,
+        nick: None,
+        roles: vec![],
+        user: user.clone(),
+    };
+
+    assert_eq!(ChannelId(1).mention(), "<#1>");
+    assert_eq!(channel.mention(), "<#4>");
+    assert_eq!(emoji.mention(), "<:a:5>");
+    assert_eq!(member.mention(), "<@6>");
+    assert_eq!(role.mention(), "<@&2>");
+    assert_eq!(role.id.mention(), "<@&2>");
+    assert_eq!(user.mention(), "<@6>");
+    assert_eq!(user.id.mention(), "<@6>");
 }

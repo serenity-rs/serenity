@@ -65,7 +65,7 @@ impl MessageBuilder {
     /// [`GuildChannel`]: ../model/struct.GuildChannel.html
     /// [Display implementation]: ../model/struct.ChannelId.html#method.fmt-1
     pub fn channel<C: Into<ChannelId>>(mut self, channel: C) -> Self {
-        let _ = write!(self.0, "{}", channel.into());
+        let _ = write!(self.0, "{}", channel.into().mention());
 
         self
     }
@@ -261,7 +261,7 @@ impl MessageBuilder {
     /// [`RoleId`]: ../model/struct.RoleId.html
     /// [Display implementation]: ../model/struct.RoleId.html#method.fmt-1
     pub fn role<R: Into<RoleId>>(mut self, role: R) -> Self {
-        let _ = write!(self.0, "{}", role.into());
+        let _ = write!(self.0, "{}", role.into().mention());
 
         self
     }
@@ -278,7 +278,7 @@ impl MessageBuilder {
     /// [`UserId`]: ../model/struct.UserId.html
     /// [Display implementation]: ../model/struct.UserId.html#method.fmt-1
     pub fn user<U: Into<UserId>>(mut self, user: U) -> Self {
-        let _ = write!(self.0, "{}", user.into());
+        let _ = write!(self.0, "{}", user.into().mention());
 
         self
     }

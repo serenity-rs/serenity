@@ -203,19 +203,19 @@ impl From<User> for UserId {
 
 impl fmt::Display for UserId {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Display::fmt(&self.mention(), f)
+        fmt::Display::fmt(&self.0, f)
     }
 }
 
 impl fmt::Display for RoleId {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Display::fmt(&self.mention(), f)
+        fmt::Display::fmt(&self.0, f)
     }
 }
 
 impl fmt::Display for ChannelId {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Display::fmt(&self.mention(), f)
+        fmt::Display::fmt(&self.0, f)
     }
 }
 
