@@ -3,9 +3,6 @@ use serde_json::Value;
 use super::connection_info::ConnectionInfo;
 use ::constants::VoiceOpCode;
 
-#[cfg(feature="cache")]
-use ::client::CACHE;
-
 #[inline]
 pub fn build_identify(info: &ConnectionInfo) -> Value {
     ObjectBuilder::new()
