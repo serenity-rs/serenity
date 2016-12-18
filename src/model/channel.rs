@@ -420,12 +420,6 @@ impl Group {
 }
 
 impl Message {
-    /// True only if message was sent using a webhook.
-    #[cfg(feature="methods")]
-    pub fn is_webhook(&self) -> bool {
-        self.webhook_id.is_some()
-    }
-
     /// Deletes the message.
     ///
     /// **Note**: The logged in user must either be the author of the message or
@@ -446,7 +440,7 @@ impl Message {
     pub fn delete(&self) -> Result<()> {
         feature_cache_enabled! {{
             let req = permissions::MANAGE_MESSAGES;
-            let is_author = self.author.id != CACHE.read().unwrap().user.id;
+            let is_author = self.author.id == CACHE.read().unwrap().user.id;
             let has_perms = utils::user_has_perms(self.channel_id, req)?;
 
             if !is_author && !has_perms {
@@ -576,6 +570,12 @@ impl Message {
             Some(ChannelRef::Group(_)) | Some(ChannelRef::Private(_)) => true,
             _ => false,
         }
+    }
+
+    /// True only if message was sent using a webhook.
+    #[cfg(feature="methods")]
+    pub fn is_webhook(&self) -> bool {
+        self.webhook_id.is_some()
     }
 
     /// Checks the length of a string to ensure that it is within Discord's
