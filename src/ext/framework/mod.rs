@@ -341,7 +341,11 @@ impl Framework {
                                 return;
                             }
 
-                            if !self.configuration.allow_dm {
+                            if self.configuration.ignore_webhooks && message.is_webhook() {
+                                return;
+                            }
+
+                            if !self.configuration.allow_dm && message.is_private() {
                                 if let Some(ref message) = self.configuration.no_dm_message {
                                     let _ = context.say(message);
                                 }

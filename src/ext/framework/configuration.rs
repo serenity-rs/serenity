@@ -81,6 +81,8 @@ pub struct Configuration {
     pub disabled_commands: HashSet<String>,
     #[doc(hidden)]
     pub allow_dm: bool,
+    #[doc(hidden)]
+    pub ignore_webhooks: bool,
 }
 
 impl Configuration {
@@ -117,6 +119,21 @@ impl Configuration {
     /// ```
     pub fn allow_whitespace(mut self, allow_whitespace: bool) -> Self {
         self.allow_whitespace = allow_whitespace;
+
+        self
+    }
+
+    /// If set to false, bot will ignore any private messages.
+    pub fn allow_dm(mut self, allow_dm: bool) -> Self {
+        self.allow_dm = allow_dm;
+
+        self
+    }
+
+    /// If set to true, bot will ignore all commands called by webhooks.
+    /// True by default.
+    pub fn ignore_webhooks(mut self, ignore_webhooks: bool) -> Self {
+        self.ignore_webhooks = ignore_webhooks;
 
         self
     }
@@ -340,6 +357,7 @@ impl Default for Configuration {
             blocked_guilds: HashSet::default(),
             disabled_commands: HashSet::default(),
             allow_dm: true,
+            ignore_webhooks: true,
         }
     }
 }
