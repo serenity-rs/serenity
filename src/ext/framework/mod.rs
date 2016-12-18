@@ -503,7 +503,7 @@ impl Framework {
 
                         thread::spawn(move || {
                             if let Some(before) = before {
-                                if !is_owner && !(before)(&context, &message, &built) {
+                                if !(before)(&context, &message, &built) && !is_owner {
                                     return;
                                 }
                             }
