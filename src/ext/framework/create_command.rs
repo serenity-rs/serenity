@@ -187,7 +187,7 @@ impl Default for Command {
             exec: CommandType::Basic(Box::new(|_, _, _| Ok(()))),
             desc: None,
             usage: None,
-            use_quotes: true,
+            use_quotes: false,
             min_args: None,
             bucket: None,
             max_args: None,
