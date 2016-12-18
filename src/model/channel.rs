@@ -420,6 +420,12 @@ impl Group {
 }
 
 impl Message {
+    /// True only if message was sent using a webhook.
+    #[cfg(feature="methods")]
+    pub fn is_webhook(&self) -> bool {
+        self.webhook_id.is_some()
+    }
+
     /// Deletes the message.
     ///
     /// **Note**: The logged in user must either be the author of the message or

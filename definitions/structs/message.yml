@@ -63,3 +63,7 @@ fields:
   - name: tts
     description: True if message was sent with /tts command.
     type: bool
+  - name: webhook_id
+    description: An id of a webhook if message was sent using one.
+    optional: true
+    type: WebhookId
