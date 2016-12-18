@@ -437,6 +437,30 @@ impl Message {
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[cfg(feature="methods")]
+    pub fn is_webhook(&self) -> bool {
+        if let Some(_) = self.webhook_id {
+            return true;
+        }
+        false
+    }
+
+    /// Deletes the message.
+    ///
+    /// **Note**: The logged in user must either be the author of the message or
+    /// have the [Manage Messages] permission.
+    ///
+    /// **Note**: Requires the [Manage Messages] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` feature is enabled, then returns a
+    /// [`ClientError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
+    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<()> {
         feature_cache_enabled! {{
             let req = permissions::MANAGE_MESSAGES;
