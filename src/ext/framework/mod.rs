@@ -284,36 +284,39 @@ impl Framework {
         let res = command::positions(&context, &message.content, &self.configuration);
 
         let positions = match res {
-            Some(positions) => positions,
+            Some(mut positions) => {
+                // First, take out the prefixes that are as long as _or_ longer
+                // than the message, to avoid character boundary violations.
+                positions.retain(|p| *p < message.content.len());
+
+                // Ensure that there is _at least one_ position remaining. There
+                // is no point in continuing if there is not.
+                if positions.is_empty() {
+                    return;
+                }
+
+                positions
+            },
             None => return,
         };
 
-        // Ensure that the message length is at least longer than a prefix
-        // length. There's no point in checking further ahead if there's nothing
-        // _to_ check.
-        if positions.iter().all(|p| message.content.len() <= *p) {
-            return;
-        }
-
         'outer: for position in positions {
             let mut built = String::new();
+            let round = message.content.chars()
+                .skip(position)
+                .collect::<String>();
+            let round = round.trim()
+                .split_whitespace()
+                .collect::<Vec<&str>>();
 
             for i in 0..self.configuration.depth {
                 if i != 0 {
                     built.push(' ');
                 }
 
-                built.push_str(match {
-                    message.content
-                        .split_at(position)
-                        .1
-                        .trim()
-                        .split_whitespace()
-                        .collect::<Vec<&str>>()
-                        .get(i)
-                } {
+                built.push_str(match round.get(i) {
                     Some(piece) => piece,
-                    None => continue,
+                    None => continue 'outer,
                 });
 
                 let groups = self.groups.clone();
