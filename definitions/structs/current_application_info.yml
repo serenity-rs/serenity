@@ -4,8 +4,6 @@ description: Information about the current application and its owner.
 fields:
   - name: description
     type: string
-  - name: flags
-    type: u64
   - name: icon
     optional: true
     type: string

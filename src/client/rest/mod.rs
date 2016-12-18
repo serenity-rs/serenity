@@ -896,13 +896,13 @@ pub fn get_active_maintenances() -> Result<Vec<Maintenance>> {
     }
 }
 
-/// Gets information about an oauth2 application we own.
+/// Gets information about an oauth2 application that the current user owns.
 ///
 /// **Note**: Only user accounts may use this endpoint.
-pub fn get_application_info() -> Result<CurrentApplicationInfo> {
-    let response = request!(Route::None, get, "/oauth2/applications/@me");
+pub fn get_application_info(id: u64) -> Result<ApplicationInfo> {
+    let response = request!(Route::None, get, "/oauth2/applications/{}", id);
 
-    CurrentApplicationInfo::decode(serde_json::from_reader(response)?)
+    ApplicationInfo::decode(serde_json::from_reader(response)?)
 }
 
 /// Gets all oauth2 applications we've made.
@@ -990,6 +990,15 @@ pub fn get_channels(guild_id: u64) -> Result<Vec<GuildChannel>> {
 
     decode_array(serde_json::from_reader(response)?,
                  GuildChannel::decode)
+}
+
+/// Gets information about the current application.
+///
+/// **Note**: Only applications may use this endpoint.
+pub fn get_current_application_info() -> Result<CurrentApplicationInfo> {
+    let response = request!(Route::None, get, "/oauth2/applications/@me");
+
+    CurrentApplicationInfo::decode(serde_json::from_reader(response)?)
 }
 
 /// Gets information about the user we're connected with.
