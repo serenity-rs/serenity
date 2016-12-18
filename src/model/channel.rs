@@ -423,10 +423,7 @@ impl Message {
     /// True only if message was sent using a webhook.
     #[cfg(feature="methods")]
     pub fn is_webhook(&self) -> bool {
-        if let Some(_) = self.webhook_id {
-            return true;
-        }
-        false
+        self.webhook_id.is_some()
     }
 
     /// Deletes the message.
