@@ -1187,16 +1187,23 @@ fn handle_shard(shard: Arc<Mutex<Shard>>,
     loop {
         let event = receiver.recv_json(GatewayEvent::decode);
 
+        // This will only lock when _updating_ the shard, resuming, etc. Most
+        // of the time, this won't be locked (i.e. when receiving an event over
+        // the receiver, separate from the shard itself).
         let event = match shard.lock().unwrap().handle_event(event, &mut receiver) {
-            Ok(Some(x)) => match x {
-                (event, Some(new_receiver)) => {
-                    receiver = new_receiver;
+            Ok(Some((event, Some(new_receiver)))) => {
+                receiver = new_receiver;
 
-                    event
-                },
-                (event, None) => event,
+                event
             },
-            _ => continue,
+            Ok(Some((event, None))) => event,
+            Ok(None) => continue,
+            Err(why) => {
+                // This is potentially causing problems -- let's see.
+                error!("Shard handler received err: {:?}", why);
+
+                continue;
+            },
         };
 
         dispatch(event,
@@ -1209,6 +1216,7 @@ fn handle_shard(shard: Arc<Mutex<Shard>>,
 }
 
 #[cfg(not(feature="framework"))]
+// aaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 fn handle_shard(shard: Arc<Mutex<Shard>>,
                 data: Arc<Mutex<ShareMap>>,
                 login_type: LoginType,
@@ -1218,15 +1226,18 @@ fn handle_shard(shard: Arc<Mutex<Shard>>,
         let event = receiver.recv_json(GatewayEvent::decode);
 
         let event = match shard.lock().unwrap().handle_event(event, &mut receiver) {
-            Ok(Some(x)) => match x {
-                (event, Some(new_receiver)) => {
-                    receiver = new_receiver;
+            Ok(Some((event, Some(new_receiver)))) => {
+                receiver = new_receiver;
 
-                    event
-                },
-                (event, None) => event,
+                event
             },
-            _ => continue,
+            Ok(Some((event, None))) => event,
+            Ok(None) => continue,
+            Err(why) => {
+                error!("Shard handler received err: {:?}", why);
+
+                continue;
+            },
         };
 
         dispatch(event,

@@ -6,7 +6,7 @@ use std::fmt::{self, Display};
 /// you manually handle these.
 #[derive(Clone, Debug)]
 pub enum Error {
-    /// The connection unexpectedly (read: non-cleanly) closed.
+    /// The connection closed, potentially uncleanly.
     Closed(Option<u16>, String),
     /// Expected a Hello during a handshake
     ExpectedHello,

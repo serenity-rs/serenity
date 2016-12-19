@@ -64,7 +64,7 @@ type CurrentPresence = (Option<Game>, OnlineStatus, bool);
 pub struct Shard {
     current_presence: CurrentPresence,
     keepalive_channel: MpscSender<GatewayStatus>,
-    last_sequence: u64,
+    seq: u64,
     login_type: LoginType,
     session_id: Option<String>,
     shard_info: Option<[u64; 2]>,
@@ -118,7 +118,7 @@ impl Shard {
         let heartbeat_interval = match receiver.recv_json(GatewayEvent::decode)? {
             GatewayEvent::Hello(interval) => interval,
             other => {
-                debug!("Unexpected event during connection start: {:?}", other);
+                debug!("Unexpected event during shard start: {:?}", other);
 
                 return Err(Error::Gateway(GatewayError::ExpectedHello));
             },
@@ -138,15 +138,15 @@ impl Shard {
         // Parse READY
         let event = receiver.recv_json(GatewayEvent::decode)?;
         let (ready, sequence) = prep::parse_ready(event,
-                                                       &tx,
-                                                       &mut receiver,
-                                                       identification)?;
+                                                  &tx,
+                                                  &mut receiver,
+                                                  identification)?;
 
         Ok((feature_voice! {{
             Shard {
                 current_presence: (None, OnlineStatus::Online, false),
                 keepalive_channel: tx.clone(),
-                last_sequence: sequence,
+                seq: sequence,
                 login_type: login_type,
                 token: token.to_owned(),
                 session_id: Some(ready.ready.session_id.clone()),
@@ -158,7 +158,7 @@ impl Shard {
             Shard {
                 current_presence: (None, OnlineStatus::Online, false),
                 keepalive_channel: tx.clone(),
-                last_sequence: sequence,
+                seq: sequence,
                 login_type: login_type,
                 token: token.to_owned(),
                 session_id: Some(ready.ready.session_id.clone()),
@@ -267,20 +267,23 @@ impl Shard {
                         mut receiver: &mut Receiver<WebSocketStream>)
                         -> Result<Option<(Event, Option<Receiver<WebSocketStream>>)>> {
         match event {
-            Ok(GatewayEvent::Dispatch(sequence, event)) => {
-                let status = GatewayStatus::Sequence(sequence);
+            Ok(GatewayEvent::Dispatch(seq, event)) => {
+                let status = GatewayStatus::Sequence(seq);
                 let _ = self.keepalive_channel.send(status);
 
                 self.handle_dispatch(&event);
 
                 Ok(Some((event, None)))
             },
-            Ok(GatewayEvent::Heartbeat(sequence)) => {
+            Ok(GatewayEvent::Heartbeat(seq)) => {
+                info!("Received shard heartbeat; seq: {}", seq);
+
                 let map = ObjectBuilder::new()
-                    .insert("d", sequence)
+                    .insert("d", seq)
                     .insert("op", OpCode::Heartbeat.num())
                     .build();
-                let _ = self.keepalive_channel.send(GatewayStatus::SendMessage(map));
+                let status = GatewayStatus::SendMessage(map);
+                let _ = self.keepalive_channel.send(status);
 
                 Ok(None)
             },
@@ -288,17 +291,20 @@ impl Shard {
                 Ok(None)
             },
             Ok(GatewayEvent::Hello(interval)) => {
-                let _ = self.keepalive_channel.send(GatewayStatus::ChangeInterval(interval));
+                if interval > 0 {
+                    let status = GatewayStatus::Interval(interval);
+                    let _ = self.keepalive_channel.send(status);
+                }
 
                 Ok(None)
             },
             Ok(GatewayEvent::InvalidateSession) => {
+                info!("Received session invalidation; re-identifying");
+                self.seq = 0;
                 self.session_id = None;
 
                 let identification = prep::identify(&self.token, self.shard_info);
-
                 let status = GatewayStatus::SendMessage(identification);
-
                 let _ = self.keepalive_channel.send(status);
 
                 Ok(None)
@@ -307,14 +313,39 @@ impl Shard {
                 self.reconnect(receiver).map(|(ev, rec)| Some((ev, Some(rec))))
             },
             Err(Error::Gateway(GatewayError::Closed(num, message))) => {
-                warn!("Closing with {:?}: {:?}", num, message);
+                let clean = num == Some(1000);
 
-                // Attempt to resume if the following was not received:
-                //
-                // - 1000: Close.
-                //
-                // Otherwise, fallback to reconnecting.
-                if num != Some(1000) {
+                {
+                    let kind = if clean { "Cleanly" } else { "Uncleanly" };
+
+                    info!("{} closing with {:?}: {}", kind, num, message);
+                }
+
+                match num {
+                    Some(4001) => warn!("Sent invalid opcode"),
+                    Some(4002) => warn!("Sent invalid message"),
+                    Some(4003) => warn!("Sent no authentication"),
+                    Some(4004) => warn!("Sent invalid authentication"),
+                    Some(4005) => warn!("Already authenticated"),
+                    Some(4007) => {
+                        warn!("Sent invalid seq: {}", self.seq);
+
+                        self.seq = 0;
+                    },
+                    Some(4008) => warn!("Gateway ratelimited"),
+                    Some(4010) => warn!("Sent invalid shard"),
+                    Some(4006) | Some(4009) => {
+                        info!("Invalid session");
+
+                        self.session_id = None;
+                    },
+                    Some(other) if !clean => {
+                        warn!("Unknown unclean close {}: {:?}", other, message);
+                    },
+                    _ => {},
+                }
+
+                if !clean && num != Some(1000) && num != Some(4004) {
                     if let Some(session_id) = self.session_id.clone() {
                         match self.resume(session_id, receiver) {
                             Ok((ev, rec)) => return Ok(Some((ev, Some(rec)))),
@@ -328,7 +359,7 @@ impl Shard {
             Err(Error::WebSocket(WebSocketError::NoDataAvailable)) => Ok(None),
             Err(Error::WebSocket(why)) => {
                 warn!("Websocket error: {:?}", why);
-                info!("Reconnecting");
+                info!("Will attempt to reconnect or resume");
 
                 // Attempt to resume if the following was not received:
                 //
@@ -338,9 +369,11 @@ impl Shard {
                 if let Some(session_id) = self.session_id.clone() {
                     match self.resume(session_id, &mut receiver) {
                         Ok((ev, rec)) => return Ok(Some((ev, Some(rec)))),
-                        Err(why) => debug!("Error resuming: {:?}", why),
+                        Err(why) => info!("Error resuming: {:?}", why),
                     }
                 }
+
+                info!("Reconnecting");
 
                 self.reconnect(receiver).map(|(ev, rec)| Some((ev, Some(rec))))
             },
@@ -351,19 +384,28 @@ impl Shard {
     /// Shuts down the receiver by attempting to cleanly close the
     /// connection.
     #[doc(hidden)]
-    pub fn shutdown(&mut self, receiver: &mut Receiver<WebSocketStream>)
+    pub fn shutdown_clean(receiver: &mut Receiver<WebSocketStream>)
         -> Result<()> {
-        let stream = receiver.get_mut().get_mut();
+        let r = receiver.get_mut().get_mut();
 
         {
-            let mut sender = Sender::new(stream.by_ref(), true);
+            let mut sender = Sender::new(r.by_ref(), true);
             let message = WsMessage::close_because(1000, "");
 
             sender.send_message(&message)?;
         }
 
-        stream.flush()?;
-        stream.shutdown(Shutdown::Both)?;
+        r.flush()?;
+        r.shutdown(Shutdown::Both)?;
+
+        Ok(())
+    }
+
+    pub fn shutdown(receiver: &mut Receiver<WebSocketStream>) -> Result<()> {
+        let r = receiver.get_mut().get_mut();
+
+        r.flush()?;
+        r.shutdown(Shutdown::Both)?;
 
         Ok(())
     }
@@ -407,7 +449,7 @@ impl Shard {
 
     fn handle_dispatch(&mut self, event: &Event) {
         if let Event::Resumed(ref ev) = *event {
-            let status = GatewayStatus::ChangeInterval(ev.heartbeat_interval);
+            let status = GatewayStatus::Interval(ev.heartbeat_interval);
 
             let _ = self.keepalive_channel.send(status);
         }
@@ -434,7 +476,7 @@ impl Shard {
 
     fn reconnect(&mut self, mut receiver: &mut Receiver<WebSocketStream>)
         -> Result<(Event, Receiver<WebSocketStream>)> {
-        debug!("Reconnecting");
+        info!("Attempting to reconnect");
 
         // Take a few attempts at reconnecting.
         for i in 1u64..11u64 {
@@ -446,8 +488,9 @@ impl Shard {
                                    self.login_type);
 
             if let Ok((shard, ready, receiver_new)) = shard {
-                mem::replace(self, shard).shutdown(&mut receiver)?;
+                let _ = Shard::shutdown(&mut receiver);
 
+                mem::replace(self, shard);
                 self.session_id = Some(ready.ready.session_id.clone());
 
                 return Ok((Event::Ready(ready), receiver_new));
@@ -474,26 +517,34 @@ impl Shard {
         sender.send_json(&ObjectBuilder::new()
             .insert_object("d", |o| o
                 .insert("session_id", session_id)
-                .insert("seq", self.last_sequence)
-                .insert("token", &self.token)
-            )
+                .insert("seq", self.seq)
+                .insert("token", &self.token))
             .insert("op", OpCode::Resume.num())
             .build())?;
 
-        let first_event;
+        // Note to self when this gets accepted in a decade:
+        // https://github.com/rust-lang/rfcs/issues/961
+        let ev;
 
         loop {
             match receiver.recv_json(GatewayEvent::decode)? {
                 GatewayEvent::Dispatch(seq, event) => {
-                    if let Event::Ready(ref event) = event {
-                        self.session_id = Some(event.ready.session_id.clone());
+                    match event {
+                        Event::Ready(ref ready) => {
+                            self.session_id = Some(ready.ready.session_id.clone());
+                        },
+                        Event::Resumed { .. } => info!("Resumed"),
+                        ref other => warn!("Unknown resume event: {:?}", other),
                     }
 
-                    self.last_sequence = seq;
-                    first_event = event;
+                    self.seq = seq;
+                    ev = event;
 
                     break;
                 },
+                GatewayEvent::Hello(i) => {
+                    let _ = self.keepalive_channel.send(GatewayStatus::Interval(i));
+                }
                 GatewayEvent::InvalidateSession => {
                     sender.send_json(&prep::identify(&self.token, self.shard_info))?;
                 },
@@ -505,9 +556,9 @@ impl Shard {
             }
         }
 
-        let _ = self.keepalive_channel.send(GatewayStatus::ChangeSender(sender));
+        let _ = self.keepalive_channel.send(GatewayStatus::Sender(sender));
 
-        Ok((first_event, receiver))
+        Ok((ev, receiver))
     }
 
     fn update_presence(&self) {
