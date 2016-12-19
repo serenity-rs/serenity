@@ -19,6 +19,7 @@ use serde_json::builder::ObjectBuilder;
 use serde_json::Value;
 use std::collections::BTreeMap;
 use std::default::Default;
+use time::Tm;
 use ::model::Embed;
 use ::utils::Colour;
 
@@ -160,15 +161,29 @@ impl CreateEmbed {
 
     /// Set the timestamp.
     ///
-    /// **Note:** This timestamp must be in ISO-8601 format. It must also be
+    /// **Note**: This timestamp must be in ISO-8601 format. It must also be
     /// in UTC format.
-    /// 
-    /// # Examples 
-    /// 
-    /// `2017-01-03T23:00:00`
-    /// `2004-06-08T16:04:23`
-    pub fn timestamp(mut self, timestamp: &str) -> Self {
-        self.0.insert("timestamp".to_owned(), Value::String(timestamp.to_owned()));
+    ///
+    /// # Examples
+    ///
+    /// You may pass a direct string:
+    ///
+    /// - `2017-01-03T23:00:00`
+    /// - `2004-06-08T16:04:23`
+    /// - `2004-06-08T16:04:23`
+    ///
+    /// Or a `time::Tm`:
+    ///
+    /// ```rust,no_run
+    /// extern crate time;
+    ///
+    /// let now = time::now();
+    ///
+    /// embed = embed.timestamp(now);
+    /// // ...
+    /// ```
+    pub fn timestamp<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
+        self.0.insert("timestamp".to_owned(), Value::String(timestamp.into().ts));
 
         CreateEmbed(self.0)
     }
@@ -240,7 +255,7 @@ impl From<Embed> for CreateEmbed {
         }
 
         if let Some(timestamp) = embed.timestamp {
-            b = b.timestamp(&timestamp);
+            b = b.timestamp(timestamp);
         }
 
         if let Some(thumbnail) = embed.thumbnail {
@@ -403,5 +418,25 @@ impl CreateEmbedThumbnail {
     #[deprecated(since="0.1.2", note="Discord does not allow specifying this")]
     pub fn width(self, width: u64) -> Self {
         CreateEmbedThumbnail(self.0.insert("width", width))
+    }
+}
+
+pub struct Timestamp {
+    pub ts: String,
+}
+
+impl From<String> for Timestamp {
+    fn from(ts: String) -> Self {
+        Timestamp {
+            ts: ts,
+        }
+    }
+}
+
+impl From<Tm> for Timestamp {
+    fn from(tm: Tm) -> Self {
+        Timestamp {
+            ts: tm.to_utc().rfc3339().to_string(),
+        }
     }
 }

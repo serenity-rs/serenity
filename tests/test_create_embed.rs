@@ -8,7 +8,7 @@ use serenity::utils::builder::CreateEmbed;
 use serenity::utils::Colour;
 
 #[test]
-fn from_embed() {
+fn test_from_embed() {
     let embed = Embed {
         author: None,
         colour: Colour::new(0xFF0011),
