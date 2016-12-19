@@ -159,6 +159,13 @@ impl CreateEmbed {
     }
 
     /// Set the timestamp.
+    ///
+    /// **Note:** This timestamp must be in ISO-8601 format.
+    /// 
+    /// # Examples 
+    /// 
+    /// `2017-01-03T23:00:00Z`
+    /// `2004-06-08T16:04:23-05:00`
     pub fn timestamp(mut self, timestamp: &str) -> Self {
         self.0.insert("timestamp".to_owned(), Value::String(timestamp.to_owned()));
 
