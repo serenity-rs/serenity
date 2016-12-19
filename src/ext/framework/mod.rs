@@ -148,7 +148,7 @@ macro_rules! command {
                                                      arg_counter,
                                                      stringify!($t))),
                     },
-                    None => return Err(format!("Failed to parse argument #{} of type {:?}",
+                    None => return Err(format!("Missing argument #{} of type {:?}",
                                                arg_counter,
                                                stringify!($t))),
                 };
