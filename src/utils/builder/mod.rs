@@ -21,8 +21,6 @@ pub use self::create_embed::{
     CreateEmbedAuthor,
     CreateEmbedFooter,
     CreateEmbedField,
-    CreateEmbedImage,
-    CreateEmbedThumbnail,
 };
 pub use self::create_invite::CreateInvite;
 pub use self::create_message::CreateMessage;

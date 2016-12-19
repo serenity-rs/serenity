@@ -43,9 +43,9 @@ fn test_from_embed() {
     let builder = CreateEmbed::from(embed)
         .colour(0xFF0000)
         .description("This is a cat description")
+        .image("https://i.imgur.com/q9MqLqZ.jpg")
         .title("still a funny cat meme")
-        .url("https://i.imgur.com/q9MqLqZ.jpg")
-        .image(|i| i.url("https://i.imgur.com/q9MqLqZ.jpg"));
+        .url("https://i.imgur.com/q9MqLqZ.jpg");
 
     let built = Value::Object(builder.0);
 

@@ -129,30 +129,22 @@ impl CreateEmbed {
         CreateEmbed(self.0)
     }
 
-    /// Set the image associated with the embed.
-    ///
-    /// Refer to the documentation for [`CreateEmbedImage`] for more
-    /// information.
-    ///
-    /// [`CreateEmbedImage`]: struct.CreateEmbedImage.html
-    pub fn image<F>(mut self, f: F) -> Self
-        where F: FnOnce(CreateEmbedImage) -> CreateEmbedImage {
-        let image = f(CreateEmbedImage::default()).0.build();
+    /// Set the image associated with the embed. This only supports HTTP(S).
+    pub fn image(mut self, url: &str) -> Self {
+        let image = ObjectBuilder::new()
+            .insert("url".to_owned(), url.to_owned())
+            .build();
 
         self.0.insert("image".to_owned(), image);
 
         CreateEmbed(self.0)
     }
 
-    /// Set the thumbnail of the embed.
-    ///
-    /// Refer to the documentation for [`CreateEmbedThumbnail`] for more
-    /// information.
-    ///
-    /// [`CreateEmbedThumbnail`]: struct.CreateEmbedThumbnail.html
-    pub fn thumbnail<F>(mut self, f: F) -> Self
-        where F: FnOnce(CreateEmbedThumbnail) -> CreateEmbedThumbnail {
-        let thumbnail = f(CreateEmbedThumbnail::default()).0.build();
+    /// Set the thumbnail of the embed. This only supports HTTP(S).
+    pub fn thumbnail(mut self, url: &str) -> Self {
+        let thumbnail = ObjectBuilder::new()
+            .insert("url".to_owned(), url.to_owned())
+            .build();
 
         self.0.insert("thumbnail".to_owned(), thumbnail);
 
@@ -174,7 +166,7 @@ impl CreateEmbed {
     ///
     /// Or a `time::Tm`:
     ///
-    /// ```rust,no_run
+    /// ```rust,ignore
     /// extern crate time;
     ///
     /// let now = time::now();
@@ -251,7 +243,7 @@ impl From<Embed> for CreateEmbed {
         }
 
         if let Some(image) = embed.image {
-            b = b.image(move |i| i.url(&image.url));
+            b = b.image(&image.url);
         }
 
         if let Some(timestamp) = embed.timestamp {
@@ -259,7 +251,7 @@ impl From<Embed> for CreateEmbed {
         }
 
         if let Some(thumbnail) = embed.thumbnail {
-            b = b.thumbnail(move |t| t.url(&thumbnail.url));
+            b = b.thumbnail(&thumbnail.url);
         }
 
         if let Some(url) = embed.url {
@@ -357,67 +349,6 @@ impl CreateEmbedFooter {
     /// Set the footer's text.
     pub fn text(self, text: &str) -> Self {
         CreateEmbedFooter(self.0.insert("text", text))
-    }
-}
-
-/// A builder to create a fake [`Embed`] object's image, for use with the
-/// [`CreateEmbed::image`] method.
-///
-/// This does not require any field be set.
-///
-/// [`Embed`]: ../../model/struct.Embed.html
-/// [`CreateEmbed::image`]: struct.CreateEmbed.html#method.image
-#[derive(Default)]
-pub struct CreateEmbedImage(pub ObjectBuilder);
-
-impl CreateEmbedImage {
-    /// Set the display height of the image.
-    #[deprecated(since="0.1.2", note="Discord does not allow specifying this")]
-    pub fn height(self, height: u64) -> Self {
-        CreateEmbedImage(self.0.insert("height", height))
-    }
-
-    /// Set the image's URL. This only supports HTTP(S).
-    pub fn url(self, url: &str) -> Self {
-        CreateEmbedImage(self.0.insert("url", url))
-    }
-
-    /// Set the display width of the image.
-    #[deprecated(since="0.1.2", note="Discord does not allow specifying this")]
-    pub fn width(self, width: u64) -> Self {
-        CreateEmbedImage(self.0.insert("width", width))
-    }
-}
-
-/// A builder to create a fake [`Embed`] object's thumbnail, for use with the
-/// [`CreateEmbed::thumbnail`] method.
-///
-/// Requires that you specify a [`url`].
-///
-/// [`Embed`]: ../../model/struct.Embed.html
-/// [`CreateEmbed::thumbnail`]: struct.CreateEmbed.html#method.thumbnail
-/// [`url`]: #method.url
-#[derive(Default)]
-pub struct CreateEmbedThumbnail(pub ObjectBuilder);
-
-impl CreateEmbedThumbnail {
-    /// Set the height of the thumbnail, in pixels.
-    #[deprecated(since="0.1.2", note="Discord does not allow specifying this")]
-    pub fn height(self, height: u64) -> Self {
-        CreateEmbedThumbnail(self.0.insert("height", height))
-    }
-
-    /// Set the URL of the thumbnail. This only supports HTTP(S).
-    ///
-    /// _Must_ be specified.
-    pub fn url(self, url: &str) -> Self {
-        CreateEmbedThumbnail(self.0.insert("url", url))
-    }
-
-    /// Set the width of the thumbnail, in pixels.
-    #[deprecated(since="0.1.2", note="Discord does not allow specifying this")]
-    pub fn width(self, width: u64) -> Self {
-        CreateEmbedThumbnail(self.0.insert("width", width))
     }
 }
 
