@@ -173,7 +173,7 @@ impl RoleId {
 }
 
 impl UserId {
-    /// Search the cache for the channel with the Id.
+    /// Search the cache for the user with the Id.
     #[cfg(all(feature="cache", feature="methods"))]
     pub fn find(&self) -> Option<User> {
         CACHE.read().unwrap().get_user(*self).cloned()
