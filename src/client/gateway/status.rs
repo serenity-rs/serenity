@@ -4,8 +4,8 @@ use websocket::stream::WebSocketStream;
 
 #[doc(hidden)]
 pub enum Status {
+    Interval(u64),
+    Sender(Sender<WebSocketStream>),
     SendMessage(Value),
     Sequence(u64),
-    ChangeInterval(u64),
-    ChangeSender(Sender<WebSocketStream>),
 }

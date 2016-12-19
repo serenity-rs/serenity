@@ -100,10 +100,10 @@ pub fn keepalive(interval: u64,
 
         loop {
             match channel.try_recv() {
-                Ok(GatewayStatus::ChangeInterval(interval)) => {
+                Ok(GatewayStatus::Interval(interval)) => {
                     base_interval = Duration::milliseconds(interval as i64);
                 },
-                Ok(GatewayStatus::ChangeSender(new_sender)) => {
+                Ok(GatewayStatus::Sender(new_sender)) => {
                     sender = new_sender;
                 },
                 Ok(GatewayStatus::SendMessage(val)) => {
