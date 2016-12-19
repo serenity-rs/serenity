@@ -73,7 +73,8 @@ fn runner(rx: MpscReceiver<Status>) {
                 match cycle {
                     Ok(()) => false,
                     Err(why) => {
-                        error!("[Voice] Error updating connection: {:?}", why);
+                        error!("(╯°□°）╯︵ ┻━┻ Error updating connection: {:?}",
+                               why);
 
                         true
                     },

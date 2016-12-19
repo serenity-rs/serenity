@@ -37,7 +37,7 @@ impl ReceiverExt for Receiver<WebSocketStream> {
                 Err(why) => {
                     let s = String::from_utf8_lossy(&message.payload);
 
-                    warn!("Error decoding: {}", s);
+                    warn!("(╯°□°）╯︵ ┻━┻ Error decoding: {}", s);
 
                     Err(why)
                 }

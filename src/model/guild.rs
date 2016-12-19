@@ -611,7 +611,9 @@ impl Guild {
         let everyone = match self.roles.get(&RoleId(self.id.0)) {
             Some(everyone) => everyone,
             None => {
-                error!("@everyone role ({}) missing in {}", self.id, self.name);
+                error!("(╯°□°）╯︵ ┻━┻ @everyone role ({}) missing in '{}'",
+                       self.id,
+                       self.name);
 
                 return Permissions::empty();
             },
@@ -629,7 +631,10 @@ impl Guild {
             if let Some(role) = self.roles.get(&role) {
                 permissions |= role.permissions;
             } else {
-                warn!("perms: {:?} on {:?} has non-existent role {:?}", member.user.id, self.id, role);
+                warn!("(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
+                      member.user.id,
+                      self.id,
+                      role);
             }
         }
 
@@ -672,7 +677,9 @@ impl Guild {
                 permissions = (permissions & !overwrite.deny) | overwrite.allow;
             }
         } else {
-            warn!("Guild {} does not contain channel {}", self.id, channel_id);
+            warn!("(╯°□°）╯︵ ┻━┻ Guild {} does not contain channel {}",
+                  self.id,
+                  channel_id);
         }
 
         // The default channel is always readable.

@@ -261,7 +261,7 @@ impl Handler {
             channel_id.0
         } else {
             // Theoretically never happens? This needs to be researched more.
-            error!("[Voice] No guild/channel ID when connecting");
+            error!("(╯°□°）╯︵ ┻━┻ No guild/channel ID when connecting");
 
             return;
         };
