@@ -127,11 +127,15 @@ pub fn keepalive(interval: u64,
                 .insert("op", OpCode::Heartbeat.num())
                 .build();
 
+            debug!("Sending heartbeat d: {}", last_sequence);
+
             if let Err(why) = sender.send_json(&map) {
                 warn!("Error sending keepalive: {:?}", why);
             }
         }
     }
+
+    debug!("Closing keepalive");
 
     let _ = sender.get_mut().shutdown(Shutdown::Both);
 }
