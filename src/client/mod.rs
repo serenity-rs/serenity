@@ -536,13 +536,13 @@ impl Client {
     /// ```rust,ignore
     /// use serenity::Client;
     ///
-    /// let mut client = Client::login_bot("my token here");
+    /// let mut client = Client::login_bot("bot token here");
     ///
-    /// client.on_message(|context, message| {
+    /// client.on_message(|_context, message| {
     ///     println!("{}", message.content);
     /// });
     ///
-    /// client.start();
+    /// let _ = client.start();
     /// ```
     ///
     /// [`MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
