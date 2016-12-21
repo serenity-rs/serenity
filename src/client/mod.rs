@@ -529,6 +529,22 @@ impl Client {
 
     /// Attaches a handler for when a [`MessageCreate`] is received.
     ///
+    /// # Examples
+    ///
+    /// Print the contents of every received message:
+    ///
+    /// ```rust,ignore
+    /// use serenity::Client;
+    ///
+    /// let mut client = Client::login_bot("my token here");
+    ///
+    /// client.on_message(|context, message| {
+    ///     println!("{}", message.content);
+    /// });
+    ///
+    /// client.start();
+    /// ```
+    ///
     /// [`MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
     pub fn on_message<F>(&mut self, handler: F)
         where F: Fn(Context, Message) + Send + Sync + 'static {
