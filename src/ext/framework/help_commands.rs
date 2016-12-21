@@ -100,7 +100,7 @@ pub fn with_embeds(ctx: &Context,
     let _ = ctx.send_message(message.channel_id, |m| {
         m.embed(|mut e| {
             e = e.colour(Colour::rosewater())
-                .description("To get help about individual command, pass its \
+                .description("To get help with an individual command, pass its \
                               name as an argument to this command.");
 
             for (group_name, group) in groups {
