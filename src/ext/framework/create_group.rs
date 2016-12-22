@@ -1,4 +1,4 @@
-pub use ext::framework::command::{Command, CommandType, CommandGroup, CommandKind};
+pub use ext::framework::command::{Command, CommandType, CommandGroup, CommandOrAlias};
 pub use ext::framework::create_command::CreateCommand;
 
 use std::default::Default;
@@ -29,7 +29,7 @@ impl CreateGroup {
         where F: FnOnce(CreateCommand) -> CreateCommand {
         let cmd = f(CreateCommand(Command::default())).0;
 
-        self.0.commands.insert(command_name.to_owned(), CommandKind::CommandStruct(Arc::new(cmd)));
+        self.0.commands.insert(command_name.to_owned(), CommandOrAlias::Command(Arc::new(cmd)));
 
         self
     }
@@ -40,7 +40,7 @@ impl CreateGroup {
         where F: Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
         let cmd = Arc::new(Command::new(f));
 
-        self.0.commands.insert(command_name.to_owned(), CommandKind::CommandStruct(cmd));
+        self.0.commands.insert(command_name.to_owned(), CommandOrAlias::Command(cmd));
 
         self
     }

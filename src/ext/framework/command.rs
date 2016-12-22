@@ -15,9 +15,9 @@ pub type InternalCommand = Arc<Command>;
 pub type PrefixCheck = Fn(&Context) -> Option<String> + Send + Sync + 'static;
 
 #[doc(hidden)]
-pub enum CommandKind {
+pub enum CommandOrAlias {
     Alias(String),
-    CommandStruct(InternalCommand)
+    Command(InternalCommand)
 }
 
 /// Command function type. Allows to access internal framework things inside
@@ -31,7 +31,7 @@ pub enum CommandType {
 #[derive(Default)]
 pub struct CommandGroup {
     pub prefix: Option<String>,
-    pub commands: HashMap<String, CommandKind>,
+    pub commands: HashMap<String, CommandOrAlias>,
 }
 
 /// Command struct used to store commands internally.

@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::fmt::Write;
-use super::{Command, CommandGroup, CommandKind};
+use super::{Command, CommandGroup, CommandOrAlias};
+use super::command::InternalCommand;
 use ::client::Context;
 use ::model::Message;
 use ::utils::Colour;
@@ -13,11 +14,11 @@ fn error_embed(ctx: &Context, message: &Message, input: &str) {
             .description(input)));
 }
 
-fn remove_aliases(cmds: &HashMap<String, CommandKind>) -> HashMap<String, &Arc<Command>> {
+fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<String, &InternalCommand> {
     let mut result = HashMap::new();
 
     for (n, v) in cmds {
-        if let &CommandKind::CommandStruct(ref cmd) = v {
+        if let &CommandOrAlias::Command(ref cmd) = v {
             result.insert(n.to_owned(), cmd);
         }
     }
@@ -33,16 +34,16 @@ pub fn with_embeds(ctx: &Context,
         let name = args.join(" ");
 
         for (group_name, group) in groups {
-            let mut found: Option<(&String, &Arc<Command>)> = None;
+            let mut found: Option<(&String, &InternalCommand)> = None;
 
             if let Some(ref prefix) = group.prefix {
                 for (command_name, command) in &group.commands {
-                    if name == format!("{} {}", prefix, command_name) || name == command_name.to_owned() {
-                        match command {
-                            &CommandKind::CommandStruct(ref cmd) => {
-                                found = Some((command_name, &cmd));
+                    if name == format!("{} {}", prefix, command_name) || name == *command_name {
+                        match *command {
+                            CommandOrAlias::Command(ref cmd) => {
+                                found = Some((command_name, cmd));
                             },
-                            &CommandKind::Alias(ref name) => {
+                            CommandOrAlias::Alias(ref name) => {
                                 error_embed(ctx, message, &format!("Did you mean {:?}?", name));
                                 return Ok(());
                             }
@@ -52,11 +53,11 @@ pub fn with_embeds(ctx: &Context,
             } else {
                 for (command_name, command) in &group.commands {
                     if name == command_name[..] {
-                        match command {
-                            &CommandKind::CommandStruct(ref cmd) => {
-                                found = Some((command_name, &cmd));
+                        match *command {
+                            CommandOrAlias::Command(ref cmd) => {
+                                found = Some((command_name, cmd));
                             },
-                            &CommandKind::Alias(ref name) => {
+                            CommandOrAlias::Alias(ref name) => {
                                 error_embed(ctx, message, &format!("Did you mean {:?}?", name));
                                 return Ok(());
                             }
@@ -83,21 +84,21 @@ pub fn with_embeds(ctx: &Context,
                         if let Some(ref usage) = command.usage {
                             embed = embed.field(|f| {
                                 f.name("Usage")
-                                    .value(&format!("`{} {}`", command_name, usage))
+                                 .value(&format!("`{} {}`", command_name, usage))
                             });
                         }
 
                         if let Some(ref example) = command.example {
                             embed = embed.field(|f| {
                                 f.name("Sample usage")
-                                    .value(&format!("`{} {}`", command_name, example))
+                                 .value(&format!("`{} {}`", command_name, example))
                             });
                         }
 
                         if group_name != "Ungrouped" {
                             embed = embed.field(|f| {
                                 f.name("Group")
-                                    .value(&group_name)
+                                 .value(&group_name)
                             });
                         }
 
@@ -111,7 +112,7 @@ pub fn with_embeds(ctx: &Context,
 
                         embed = embed.field(|f| {
                             f.name("Available")
-                                .value(available)
+                             .value(available)
                         });
 
                         embed
@@ -179,12 +180,12 @@ pub fn plain(ctx: &Context,
 
             if let Some(ref prefix) = group.prefix {
                 for (command_name, command) in &group.commands {
-                    if name == format!("{} {}", prefix, command_name) || name == command_name.to_owned()  {
-                        match command {
-                            &CommandKind::CommandStruct(ref cmd) => {
-                                found = Some((command_name, &cmd));
+                    if name == format!("{} {}", prefix, command_name) || name == *command_name  {
+                        match *command {
+                            CommandOrAlias::Command(ref cmd) => {
+                                found = Some((command_name, cmd));
                             },
-                            &CommandKind::Alias(ref name) => {
+                            CommandOrAlias::Alias(ref name) => {
                                 let _ = ctx.say(&format!("Did you mean {:?}?", name));
                                 return Ok(());
                             }
@@ -194,11 +195,11 @@ pub fn plain(ctx: &Context,
             } else {
                 for (command_name, command) in &group.commands {
                     if name == command_name[..] {
-                        match command {
-                            &CommandKind::CommandStruct(ref cmd) => {
-                                found = Some((command_name, &cmd));
+                        match *command {
+                            CommandOrAlias::Command(ref cmd) => {
+                                found = Some((command_name, cmd));
                             },
-                            &CommandKind::Alias(ref name) => {
+                            CommandOrAlias::Alias(ref name) => {
                                 let _ = ctx.say(&format!("Did you mean {:?}?", name));
                                 return Ok(());
                             }

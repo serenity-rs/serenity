@@ -62,7 +62,7 @@ mod create_group;
 mod buckets;
 
 pub use self::buckets::{Bucket, MemberRatelimit, Ratelimit};
-pub use self::command::{Command, CommandType, CommandGroup, CommandKind};
+pub use self::command::{Command, CommandType, CommandGroup, CommandOrAlias};
 pub use self::configuration::{AccountType, Configuration};
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
@@ -259,44 +259,46 @@ impl Framework {
     }
 
     /// Aliases a command, allowing it to be used under a different name.
-    /// Note that default group is called "Ungrouped".
-    pub fn alias<S>(mut self, group: S, to: S, from: S) -> Self
-        where S: Into<String> + Copy {
+    ///
+    /// Note that the default group is named "Ungrouped".
+    pub fn alias<S>(mut self, group: &str, to: &str, from: &str) -> Self {
         {
-            let group = self.groups.entry(group.into())
-            .or_insert_with(|| Arc::new(CommandGroup::default()));
+            let group = self.groups.entry(group.to_owned())
+                .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(group) {
                 if let Some(ref prefix) = group.prefix {
-                    group.commands.insert(format!("{} {}", prefix, from.into()), CommandKind::Alias(format!("{} {}", prefix, to.into())));
+                    group.commands.insert(format!("{} {}", prefix, from.to_owned()), CommandOrAlias::Alias(format!("{} {}", prefix, to.to_owned())));
                 } else {
-                    group.commands.insert(from.into(), CommandKind::Alias(to.into()));
+                    group.commands.insert(from.to_owned(), CommandOrAlias::Alias(to.to_owned()));
                 }
             }
         }
+
         self
     }
 
     /// Shorthand way to add multiple aliases.
-    /// Note that default group is called "Ungrouped".
-    pub fn aliases<S>(mut self, group: S, from: S, to: Vec<&str>) -> Self
-        where S: Into<String> + Copy {
+    ///
+    /// Note that the default group is named "Ungrouped".
+    pub fn aliases<S>(mut self, group: &str, from: &str, to: Vec<&str>) -> Self {
         {
-            let group = self.groups.entry(group.into())
-            .or_insert_with(|| Arc::new(CommandGroup::default()));
+            let group = self.groups.entry(group.to_owned())
+                .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(group) {
                 if let Some(ref prefix) = group.prefix {
                     for n in to {
-                        group.commands.insert(format!("{} {}", prefix, from.into()), CommandKind::Alias(format!("{} {}", prefix, n.to_owned())));
+                        group.commands.insert(format!("{} {}", prefix, from.to_owned()), CommandOrAlias::Alias(format!("{} {}", prefix, n.to_owned())));
                     }
                 } else {
                     for n in to {
-                        group.commands.insert(from.into(), CommandKind::Alias(n.to_owned()));
+                        group.commands.insert(from.to_owned(), CommandOrAlias::Alias(n.to_owned()));
                     }
                 }
             }
         }
+
         self
     }
 
@@ -366,7 +368,7 @@ impl Framework {
                 for group in groups.values() {
                     let command_length = built.len();
 
-                    if let Some(&CommandKind::Alias(ref points_to)) = group.commands.get(&built) {
+                    if let Some(&CommandOrAlias::Alias(ref points_to)) = group.commands.get(&built) {
                         built = points_to.to_owned();
                     }
 
@@ -380,7 +382,7 @@ impl Framework {
                         built.clone()
                     };
 
-                    if let Some(&CommandKind::CommandStruct(ref command)) = group.commands.get(&to_check) {
+                    if let Some(&CommandOrAlias::Command(ref command)) = group.commands.get(&to_check) {
                         let is_owner = self.configuration.owners.contains(&message.author.id);
                         // Most of the checks don't apply to owners.
                         if !is_owner {
@@ -614,7 +616,7 @@ impl Framework {
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
                 let name = command_name.into();
 
-                group.commands.insert(name, CommandKind::CommandStruct(Arc::new(Command::new(f))));
+                group.commands.insert(name, CommandOrAlias::Command(Arc::new(Command::new(f))));
             }
         }
 
@@ -645,7 +647,7 @@ impl Framework {
                 let cmd = f(CreateCommand(Command::default())).0;
                 let name = command_name.into();
 
-                group.commands.insert(name, CommandKind::CommandStruct(Arc::new(cmd)));
+                group.commands.insert(name, CommandOrAlias::Command(Arc::new(cmd)));
             }
         }
 
@@ -723,7 +725,7 @@ impl Framework {
             if let Some(group) = Arc::get_mut(ungrouped) {
                 let name = command.into();
 
-                if let Some(&mut CommandKind::CommandStruct(ref mut command)) = group.commands.get_mut(&name) {
+                if let Some(&mut CommandOrAlias::Command(ref mut command)) = group.commands.get_mut(&name) {
                     if let Some(command) = Arc::get_mut(command) {
                         command.checks.push(Box::new(check));
                     }
