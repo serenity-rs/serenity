@@ -261,7 +261,7 @@ impl Framework {
     /// Aliases a command, allowing it to be used under a different name.
     ///
     /// Note that the default group is named "Ungrouped".
-    pub fn alias<S>(mut self, group: &str, to: &str, from: &str) -> Self {
+    pub fn alias(mut self, group: &str, to: &str, from: &str) -> Self {
         {
             let group = self.groups.entry(group.to_owned())
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
@@ -281,7 +281,7 @@ impl Framework {
     /// Shorthand way to add multiple aliases.
     ///
     /// Note that the default group is named "Ungrouped".
-    pub fn aliases<S>(mut self, group: &str, from: &str, to: Vec<&str>) -> Self {
+    pub fn aliases(mut self, group: &str, from: &str, to: Vec<&str>) -> Self {
         {
             let group = self.groups.entry(group.to_owned())
                 .or_insert_with(|| Arc::new(CommandGroup::default()));

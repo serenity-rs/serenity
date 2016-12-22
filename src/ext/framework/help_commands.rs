@@ -44,7 +44,7 @@ pub fn with_embeds(ctx: &Context,
                                 found = Some((command_name, cmd));
                             },
                             CommandOrAlias::Alias(ref name) => {
-                                error_embed(ctx, message, &format!("Did you mean {:?}?", name));
+                                error_embed(ctx, message, &format!("Did you mean \"{}\"?", name));
                                 return Ok(());
                             }
                         }
@@ -58,7 +58,7 @@ pub fn with_embeds(ctx: &Context,
                                 found = Some((command_name, cmd));
                             },
                             CommandOrAlias::Alias(ref name) => {
-                                error_embed(ctx, message, &format!("Did you mean {:?}?", name));
+                                error_embed(ctx, message, &format!("Did you mean \"{}\"?", name));
                                 return Ok(());
                             }
                         }
@@ -82,24 +82,21 @@ pub fn with_embeds(ctx: &Context,
                         }
 
                         if let Some(ref usage) = command.usage {
-                            embed = embed.field(|f| {
-                                f.name("Usage")
-                                 .value(&format!("`{} {}`", command_name, usage))
-                            });
+                            embed = embed.field(|f| f
+                                .name("Usage")
+                                .value(&format!("`{} {}`", command_name, usage)));
                         }
 
                         if let Some(ref example) = command.example {
-                            embed = embed.field(|f| {
-                                f.name("Sample usage")
-                                 .value(&format!("`{} {}`", command_name, example))
-                            });
+                            embed = embed.field(|f| f
+                                .name("Sample usage")
+                                .value(&format!("`{} {}`", command_name, example)));
                         }
 
                         if group_name != "Ungrouped" {
-                            embed = embed.field(|f| {
-                                f.name("Group")
-                                 .value(&group_name)
-                            });
+                            embed = embed.field(|f| f
+                                .name("Group")
+                                .value(&group_name));
                         }
 
                         let available = if command.dm_only {
@@ -110,10 +107,9 @@ pub fn with_embeds(ctx: &Context,
                             "In DM and guilds"
                         };
 
-                        embed = embed.field(|f| {
-                            f.name("Available")
-                             .value(available)
-                        });
+                        embed = embed.field(|f| f
+                            .name("Available")
+                            .value(available));
 
                         embed
                     })
