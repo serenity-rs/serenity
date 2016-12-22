@@ -1050,115 +1050,71 @@ impl Event {
 
         let mut value = into_map(value)?;
 
-        Ok(if kind == "CALL_CREATE" {
-            Event::CallCreate(CallCreateEvent::decode(value)?)
-        } else if kind == "CALL_DELETE" {
-            Event::CallDelete(CallDeleteEvent::decode(value)?)
-        } else if kind == "CALL_UPDATE" {
-            Event::CallUpdate(CallUpdateEvent::decode(value)?)
-        } else if kind == "CHANNEL_CREATE" {
-            Event::ChannelCreate(ChannelCreateEvent::decode(value)?)
-        } else if kind == "CHANNEL_DELETE" {
-            Event::ChannelDelete(ChannelDeleteEvent::decode(value)?)
-        } else if kind == "CHANNEL_PINS_ACK" {
-            Event::ChannelPinsAck(ChannelPinsAckEvent::decode(value)?)
-        } else if kind == "CHANNEL_PINS_UPDATE" {
-            Event::ChannelPinsUpdate(ChannelPinsUpdateEvent::decode(value)?)
-        } else if kind == "CHANNEL_RECIPIENT_ADD" {
-            Event::ChannelRecipientAdd(ChannelRecipientAddEvent::decode(value)?)
-        } else if kind == "CHANNEL_RECIPIENT_REMOVE" {
-            Event::ChannelRecipientRemove(ChannelRecipientRemoveEvent::decode(value)?)
-        } else if kind == "CHANNEL_UPDATE" {
-            Event::ChannelUpdate(ChannelUpdateEvent::decode(value)?)
-        } else if kind == "FRIEND_SUGGESTION_CREATE" {
-            Event::FriendSuggestionCreate(FriendSuggestionCreateEvent::decode(value)?)
-        } else if kind == "FRIEND_SUGGESTION_DELETE" {
-            Event::FriendSuggestionDelete(FriendSuggestionDeleteEvent::decode(value)?)
-        } else if kind == "GUILD_BAN_ADD" {
-            Event::GuildBanAdd(GuildBanAddEvent::decode(value)?)
-        } else if kind == "GUILD_BAN_REMOVE" {
-            Event::GuildBanRemove(GuildBanRemoveEvent::decode(value)?)
-        } else if kind == "GUILD_CREATE" {
-            if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
-                Event::GuildUnavailable(GuildUnavailableEvent::decode(value)?)
-            } else {
-                Event::GuildCreate(GuildCreateEvent::decode(value)?)
-            }
-        } else if kind == "GUILD_DELETE" {
-            if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
-                Event::GuildUnavailable(GuildUnavailableEvent::decode(value)?)
-            } else {
-                Event::GuildDelete(GuildDeleteEvent::decode(value)?)
-            }
-        } else if kind == "GUILD_EMOJIS_UPDATE" {
-            Event::GuildEmojisUpdate(GuildEmojisUpdateEvent::decode(value)?)
-        } else if kind == "GUILD_INTEGRATIONS_UPDATE" {
-            Event::GuildIntegrationsUpdate(GuildIntegrationsUpdateEvent::decode(value)?)
-        } else if kind == "GUILD_MEMBER_ADD" {
-            Event::GuildMemberAdd(GuildMemberAddEvent::decode(value)?)
-        } else if kind == "GUILD_MEMBER_REMOVE" {
-            Event::GuildMemberRemove(GuildMemberRemoveEvent::decode(value)?)
-        } else if kind == "GUILD_MEMBER_UPDATE" {
-            Event::GuildMemberUpdate(GuildMemberUpdateEvent::decode(value)?)
-        } else if kind == "GUILD_MEMBERS_CHUNK" {
-            Event::GuildMembersChunk(GuildMembersChunkEvent::decode(value)?)
-        } else if kind == "GUILD_ROLE_CREATE" {
-            Event::GuildRoleCreate(GuildRoleCreateEvent::decode(value)?)
-        } else if kind == "GUILD_ROLE_DELETE" {
-            Event::GuildRoleDelete(GuildRoleDeleteEvent::decode(value)?)
-        } else if kind == "GUILD_ROLE_UPDATE" {
-            Event::GuildRoleUpdate(GuildRoleUpdateEvent::decode(value)?)
-        } else if kind == "GUILD_SYNC" {
-            Event::GuildSync(GuildSyncEvent::decode(value)?)
-        } else if kind == "GUILD_UPDATE" {
-            Event::GuildUpdate(GuildUpdateEvent::decode(value)?)
-        } else if kind == "MESSAGE_ACK" {
-            Event::MessageAck(MessageAckEvent::decode(value)?)
-        } else if kind == "MESSAGE_CREATE" {
-            Event::MessageCreate(MessageCreateEvent::decode(value)?)
-        } else if kind == "MESSAGE_DELETE" {
-            Event::MessageDelete(MessageDeleteEvent::decode(value)?)
-        } else if kind == "MESSAGE_DELETE_BULK" {
-            Event::MessageDeleteBulk(MessageDeleteBulkEvent::decode(value)?)
-        } else if kind == "MESSAGE_REACTION_ADD" {
-            Event::ReactionAdd(ReactionAddEvent::decode(value)?)
-        } else if kind == "MESSAGE_REACTION_REMOVE" {
-            Event::ReactionRemove(ReactionRemoveEvent::decode(value)?)
-        } else if kind == "MESSAGE_REACTION_REMOVE_ALL" {
-            Event::ReactionRemoveAll(ReactionRemoveAllEvent::decode(value)?)
-        } else if kind == "MESSAGE_UPDATE" {
-            Event::MessageUpdate(MessageUpdateEvent::decode(value)?)
-        } else if kind == "PRESENCE_UPDATE" {
-            Event::PresenceUpdate(PresenceUpdateEvent::decode(value)?)
-        } else if kind == "RELATIONSHIP_ADD" {
-            Event::RelationshipAdd(RelationshipAddEvent::decode(value)?)
-        } else if kind == "RELATIONSHIP_REMOVE" {
-            Event::RelationshipRemove(RelationshipRemoveEvent::decode(value)?)
-        } else if kind == "READY" {
-            Event::Ready(ReadyEvent::decode(value)?)
-        } else if kind == "RESUMED" {
-            Event::Resumed(ResumedEvent::decode(value)?)
-        } else if kind == "TYPING_START" {
-            Event::TypingStart(TypingStartEvent::decode(value)?)
-        } else if kind == "USER_GUILD_SETTINGS_UPDATE" {
-            Event::UserGuildSettingsUpdate(UserGuildSettingsUpdateEvent::decode(value)?)
-        } else if kind == "USER_NOTE_UPDATE" {
-            Event::UserNoteUpdate(UserNoteUpdateEvent::decode(value)?)
-        } else if kind == "USER_SETTINGS_UPDATE" {
-            Event::UserSettingsUpdate(UserSettingsUpdateEvent::decode(value)?)
-        } else if kind == "USER_UPDATE" {
-            Event::UserUpdate(UserUpdateEvent::decode(value)?)
-        } else if kind == "VOICE_SERVER_UPDATE" {
-            Event::VoiceServerUpdate(VoiceServerUpdateEvent::decode(value)?)
-        } else if kind == "VOICE_STATE_UPDATE" {
-            Event::VoiceStateUpdate(VoiceStateUpdateEvent::decode(value)?)
-        } else if kind == "WEBHOOKS_UPDATE" {
-            Event::WebhookUpdate(WebhookUpdateEvent::decode(value)?)
-        } else {
-            Event::Unknown(UnknownEvent {
+        Ok(match &kind[..] {
+            "CALL_CREATE" => Event::CallCreate(CallCreateEvent::decode(value)?),
+            "CALL_DELETE" => Event::CallDelete(CallDeleteEvent::decode(value)?),
+            "CALL_UPDATE" => Event::CallUpdate(CallUpdateEvent::decode(value)?),
+            "CHANNEL_CREATE" => Event::ChannelCreate(ChannelCreateEvent::decode(value)?),
+            "CHANNEL_DELETE" => Event::ChannelDelete(ChannelDeleteEvent::decode(value)?),
+            "CHANNEL_PINS_ACK" => Event::ChannelPinsAck(ChannelPinsAckEvent::decode(value)?),
+            "CHANNEL_PINS_UPDATE" => Event::ChannelPinsUpdate(ChannelPinsUpdateEvent::decode(value)?),
+            "CHANNEL_RECIPIENT_ADD" => Event::ChannelRecipientAdd(ChannelRecipientAddEvent::decode(value)?),
+            "CHANNEL_RECIPIENT_REMOVE" => Event::ChannelRecipientRemove(ChannelRecipientRemoveEvent::decode(value)?),
+            "CHANNEL_UPDATE" => Event::ChannelUpdate(ChannelUpdateEvent::decode(value)?),
+            "FRIEND_SUGGESTION_CREATE" => Event::FriendSuggestionCreate(FriendSuggestionCreateEvent::decode(value)?),
+            "FRIEND_SUGGESTION_DELETE" => Event::FriendSuggestionDelete(FriendSuggestionDeleteEvent::decode(value)?),
+            "GUILD_BAN_ADD" => Event::GuildBanAdd(GuildBanAddEvent::decode(value)?),
+            "GUILD_BAN_REMOVE" => Event::GuildBanRemove(GuildBanRemoveEvent::decode(value)?),
+            "GUILD_CREATE" => {
+                if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
+                    Event::GuildUnavailable(GuildUnavailableEvent::decode(value)?)
+                } else {
+                    Event::GuildCreate(GuildCreateEvent::decode(value)?)
+                }
+            },
+            "GUILD_DELETE" => {
+                if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
+                    Event::GuildUnavailable(GuildUnavailableEvent::decode(value)?)
+                } else {
+                    Event::GuildDelete(GuildDeleteEvent::decode(value)?)
+                }
+            },
+            "GUILD_EMOJIS_UPDATE" => Event::GuildEmojisUpdate(GuildEmojisUpdateEvent::decode(value)?),
+            "GUILD_INTEGRATIONS_UPDATE" => Event::GuildIntegrationsUpdate(GuildIntegrationsUpdateEvent::decode(value)?),
+            "GUILD_MEMBER_ADD" => Event::GuildMemberAdd(GuildMemberAddEvent::decode(value)?),
+            "GUILD_MEMBER_REMOVE" => Event::GuildMemberRemove(GuildMemberRemoveEvent::decode(value)?),
+            "GUILD_MEMBER_UPDATE" => Event::GuildMemberUpdate(GuildMemberUpdateEvent::decode(value)?),
+            "GUILD_MEMBERS_CHUNK" => Event::GuildMembersChunk(GuildMembersChunkEvent::decode(value)?),
+            "GUILD_ROLE_CREATE" => Event::GuildRoleCreate(GuildRoleCreateEvent::decode(value)?),
+            "GUILD_ROLE_DELETE" => Event::GuildRoleDelete(GuildRoleDeleteEvent::decode(value)?),
+            "GUILD_ROLE_UPDATE" => Event::GuildRoleUpdate(GuildRoleUpdateEvent::decode(value)?),
+            "GUILD_SYNC" => Event::GuildSync(GuildSyncEvent::decode(value)?),
+            "GUILD_UPDATE" => Event::GuildUpdate(GuildUpdateEvent::decode(value)?),
+            "MESSAGE_ACK" => Event::MessageAck(MessageAckEvent::decode(value)?),
+            "MESSAGE_CREATE" => Event::MessageCreate(MessageCreateEvent::decode(value)?),
+            "MESSAGE_DELETE" => Event::MessageDelete(MessageDeleteEvent::decode(value)?),
+            "MESSAGE_DELETE_BULK" => Event::MessageDeleteBulk(MessageDeleteBulkEvent::decode(value)?),
+            "MESSAGE_REACTION_ADD" => Event::ReactionAdd(ReactionAddEvent::decode(value)?),
+            "MESSAGE_REACTION_REMOVE" => Event::ReactionRemove(ReactionRemoveEvent::decode(value)?),
+            "MESSAGE_REACTION_REMOVE_ALL" => Event::ReactionRemoveAll(ReactionRemoveAllEvent::decode(value)?),
+            "MESSAGE_UPDATE" => Event::MessageUpdate(MessageUpdateEvent::decode(value)?),
+            "PRESENCE_UPDATE" => Event::PresenceUpdate(PresenceUpdateEvent::decode(value)?),
+            "RELATIONSHIP_ADD" => Event::RelationshipAdd(RelationshipAddEvent::decode(value)?),
+            "RELATIONSHIP_REMOVE" => Event::RelationshipRemove(RelationshipRemoveEvent::decode(value)?),
+            "READY" => Event::Ready(ReadyEvent::decode(value)?),
+            "RESUMED" => Event::Resumed(ResumedEvent::decode(value)?),
+            "TYPING_START" => Event::TypingStart(TypingStartEvent::decode(value)?),
+            "USER_GUILD_SETTINGS_UPDATE" => Event::UserGuildSettingsUpdate(UserGuildSettingsUpdateEvent::decode(value)?),
+            "USER_NOTE_UPDATE" => Event::UserNoteUpdate(UserNoteUpdateEvent::decode(value)?),
+            "USER_SETTINGS_UPDATE" => Event::UserSettingsUpdate(UserSettingsUpdateEvent::decode(value)?),
+            "USER_UPDATE" => Event::UserUpdate(UserUpdateEvent::decode(value)?),
+            "VOICE_SERVER_UPDATE" => Event::VoiceServerUpdate(VoiceServerUpdateEvent::decode(value)?),
+            "VOICE_STATE_UPDATE" => Event::VoiceStateUpdate(VoiceStateUpdateEvent::decode(value)?),
+            "WEBHOOKS_UPDATE" => Event::WebhookUpdate(WebhookUpdateEvent::decode(value)?),
+            _ => Event::Unknown(UnknownEvent {
                 kind: kind,
                 value: value,
-            })
+            }),
         })
     }
 }
