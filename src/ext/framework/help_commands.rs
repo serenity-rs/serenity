@@ -18,7 +18,7 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<String, &In
     let mut result = HashMap::new();
 
     for (n, v) in cmds {
-        if let &CommandOrAlias::Command(ref cmd) = v {
+        if let CommandOrAlias::Command(ref cmd) = *v {
             result.insert(n.to_owned(), cmd);
         }
     }
