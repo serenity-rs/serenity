@@ -259,6 +259,7 @@ impl Framework {
     }
 
     /// Aliases a command, allowing it to be used under a different name.
+    /// Note that default group is called "Ungrouped".
     pub fn alias<S>(mut self, group: S, to: S, from: S) -> Self
         where S: Into<String> {
         {
@@ -266,13 +267,18 @@ impl Framework {
             .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(group) {
-                group.commands.insert(from.into(), CommandKind::Alias(to.into()));
+                if let Some(ref prefix) = group.prefix {
+                    group.commands.insert(format!("{} {}", prefix, from.into()), CommandKind::Alias(to.into()));
+                } else {
+                    group.commands.insert(from.into(), CommandKind::Alias(to.into()));
+                }
             }
         }
         self
     }
 
     /// Shorthand way to add multiple aliases.
+    /// Note that default group is called "Ungrouped".
     pub fn aliases<S>(mut self, group: S, from: S, to: Vec<&str>) -> Self
         where S: Into<String> + Copy {
         {
@@ -280,8 +286,14 @@ impl Framework {
             .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(group) {
-                for n in to {
-                    group.commands.insert(from.into(), CommandKind::Alias(n.to_owned()));
+                if let Some(ref prefix) = group.prefix {
+                    for n in to {
+                        group.commands.insert(format!("{} {}", prefix, from.into()), CommandKind::Alias(n.to_owned()));
+                    }
+                } else {
+                    for n in to {
+                        group.commands.insert(from.into(), CommandKind::Alias(n.to_owned()));
+                    }
                 }
             }
         }
