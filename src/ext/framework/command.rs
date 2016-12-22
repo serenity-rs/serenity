@@ -75,6 +75,7 @@ impl Command {
             exec: CommandType::Basic(Box::new(f)),
             desc: None,
             usage: None,
+            example: None,
             use_quotes: false,
             dm_only: false,
             bucket: None,
