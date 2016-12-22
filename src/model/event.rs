@@ -1050,116 +1050,116 @@ impl Event {
 
         let mut value = into_map(value)?;
 
-        if kind == "CALL_CREATE" {
-            Ok(Event::CallCreate(CallCreateEvent::decode(value)?))
+        Ok(if kind == "CALL_CREATE" {
+            Event::CallCreate(CallCreateEvent::decode(value)?)
         } else if kind == "CALL_DELETE" {
-            Ok(Event::CallDelete(CallDeleteEvent::decode(value)?))
+            Event::CallDelete(CallDeleteEvent::decode(value)?)
         } else if kind == "CALL_UPDATE" {
-            Ok(Event::CallUpdate(CallUpdateEvent::decode(value)?))
+            Event::CallUpdate(CallUpdateEvent::decode(value)?)
         } else if kind == "CHANNEL_CREATE" {
-            Ok(Event::ChannelCreate(ChannelCreateEvent::decode(value)?))
+            Event::ChannelCreate(ChannelCreateEvent::decode(value)?)
         } else if kind == "CHANNEL_DELETE" {
-            Ok(Event::ChannelDelete(ChannelDeleteEvent::decode(value)?))
+            Event::ChannelDelete(ChannelDeleteEvent::decode(value)?)
         } else if kind == "CHANNEL_PINS_ACK" {
-            Ok(Event::ChannelPinsAck(ChannelPinsAckEvent::decode(value)?))
+            Event::ChannelPinsAck(ChannelPinsAckEvent::decode(value)?)
         } else if kind == "CHANNEL_PINS_UPDATE" {
-            Ok(Event::ChannelPinsUpdate(ChannelPinsUpdateEvent::decode(value)?))
+            Event::ChannelPinsUpdate(ChannelPinsUpdateEvent::decode(value)?)
         } else if kind == "CHANNEL_RECIPIENT_ADD" {
-            Ok(Event::ChannelRecipientAdd(ChannelRecipientAddEvent::decode(value)?))
+            Event::ChannelRecipientAdd(ChannelRecipientAddEvent::decode(value)?)
         } else if kind == "CHANNEL_RECIPIENT_REMOVE" {
-            Ok(Event::ChannelRecipientRemove(ChannelRecipientRemoveEvent::decode(value)?))
+            Event::ChannelRecipientRemove(ChannelRecipientRemoveEvent::decode(value)?)
         } else if kind == "CHANNEL_UPDATE" {
-            Ok(Event::ChannelUpdate(ChannelUpdateEvent::decode(value)?))
+            Event::ChannelUpdate(ChannelUpdateEvent::decode(value)?)
         } else if kind == "FRIEND_SUGGESTION_CREATE" {
-            Ok(Event::FriendSuggestionCreate(FriendSuggestionCreateEvent::decode(value)?))
+            Event::FriendSuggestionCreate(FriendSuggestionCreateEvent::decode(value)?)
         } else if kind == "FRIEND_SUGGESTION_DELETE" {
-            Ok(Event::FriendSuggestionDelete(FriendSuggestionDeleteEvent::decode(value)?))
+            Event::FriendSuggestionDelete(FriendSuggestionDeleteEvent::decode(value)?)
         } else if kind == "GUILD_BAN_ADD" {
-            Ok(Event::GuildBanAdd(GuildBanAddEvent::decode(value)?))
+            Event::GuildBanAdd(GuildBanAddEvent::decode(value)?)
         } else if kind == "GUILD_BAN_REMOVE" {
-            Ok(Event::GuildBanRemove(GuildBanRemoveEvent::decode(value)?))
+            Event::GuildBanRemove(GuildBanRemoveEvent::decode(value)?)
         } else if kind == "GUILD_CREATE" {
-            Ok(if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
+            if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
                 Event::GuildUnavailable(GuildUnavailableEvent::decode(value)?)
             } else {
                 Event::GuildCreate(GuildCreateEvent::decode(value)?)
-            })
+            }
         } else if kind == "GUILD_DELETE" {
-            Ok(if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
+            if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
                 Event::GuildUnavailable(GuildUnavailableEvent::decode(value)?)
             } else {
                 Event::GuildDelete(GuildDeleteEvent::decode(value)?)
-            })
+            }
         } else if kind == "GUILD_EMOJIS_UPDATE" {
-            Ok(Event::GuildEmojisUpdate(GuildEmojisUpdateEvent::decode(value)?))
+            Event::GuildEmojisUpdate(GuildEmojisUpdateEvent::decode(value)?)
         } else if kind == "GUILD_INTEGRATIONS_UPDATE" {
-            Ok(Event::GuildIntegrationsUpdate(GuildIntegrationsUpdateEvent::decode(value)?))
+            Event::GuildIntegrationsUpdate(GuildIntegrationsUpdateEvent::decode(value)?)
         } else if kind == "GUILD_MEMBER_ADD" {
-            Ok(Event::GuildMemberAdd(GuildMemberAddEvent::decode(value)?))
+            Event::GuildMemberAdd(GuildMemberAddEvent::decode(value)?)
         } else if kind == "GUILD_MEMBER_REMOVE" {
-            Ok(Event::GuildMemberRemove(GuildMemberRemoveEvent::decode(value)?))
+            Event::GuildMemberRemove(GuildMemberRemoveEvent::decode(value)?)
         } else if kind == "GUILD_MEMBER_UPDATE" {
-            Ok(Event::GuildMemberUpdate(GuildMemberUpdateEvent::decode(value)?))
+            Event::GuildMemberUpdate(GuildMemberUpdateEvent::decode(value)?)
         } else if kind == "GUILD_MEMBERS_CHUNK" {
-            Ok(Event::GuildMembersChunk(GuildMembersChunkEvent::decode(value)?))
+            Event::GuildMembersChunk(GuildMembersChunkEvent::decode(value)?)
         } else if kind == "GUILD_ROLE_CREATE" {
-            Ok(Event::GuildRoleCreate(GuildRoleCreateEvent::decode(value)?))
+            Event::GuildRoleCreate(GuildRoleCreateEvent::decode(value)?)
         } else if kind == "GUILD_ROLE_DELETE" {
-            Ok(Event::GuildRoleDelete(GuildRoleDeleteEvent::decode(value)?))
+            Event::GuildRoleDelete(GuildRoleDeleteEvent::decode(value)?)
         } else if kind == "GUILD_ROLE_UPDATE" {
-            Ok(Event::GuildRoleUpdate(GuildRoleUpdateEvent::decode(value)?))
+            Event::GuildRoleUpdate(GuildRoleUpdateEvent::decode(value)?)
         } else if kind == "GUILD_SYNC" {
-            Ok(Event::GuildSync(GuildSyncEvent::decode(value)?))
+            Event::GuildSync(GuildSyncEvent::decode(value)?)
         } else if kind == "GUILD_UPDATE" {
-            Ok(Event::GuildUpdate(GuildUpdateEvent::decode(value)?))
+            Event::GuildUpdate(GuildUpdateEvent::decode(value)?)
         } else if kind == "MESSAGE_ACK" {
-            Ok(Event::MessageAck(MessageAckEvent::decode(value)?))
+            Event::MessageAck(MessageAckEvent::decode(value)?)
         } else if kind == "MESSAGE_CREATE" {
-            Ok(Event::MessageCreate(MessageCreateEvent::decode(value)?))
+            Event::MessageCreate(MessageCreateEvent::decode(value)?)
         } else if kind == "MESSAGE_DELETE" {
-            Ok(Event::MessageDelete(MessageDeleteEvent::decode(value)?))
+            Event::MessageDelete(MessageDeleteEvent::decode(value)?)
         } else if kind == "MESSAGE_DELETE_BULK" {
-            Ok(Event::MessageDeleteBulk(MessageDeleteBulkEvent::decode(value)?))
+            Event::MessageDeleteBulk(MessageDeleteBulkEvent::decode(value)?)
         } else if kind == "MESSAGE_REACTION_ADD" {
-            Ok(Event::ReactionAdd(ReactionAddEvent::decode(value)?))
+            Event::ReactionAdd(ReactionAddEvent::decode(value)?)
         } else if kind == "MESSAGE_REACTION_REMOVE" {
-            Ok(Event::ReactionRemove(ReactionRemoveEvent::decode(value)?))
+            Event::ReactionRemove(ReactionRemoveEvent::decode(value)?)
         } else if kind == "MESSAGE_REACTION_REMOVE_ALL" {
-            Ok(Event::ReactionRemoveAll(ReactionRemoveAllEvent::decode(value)?))
+            Event::ReactionRemoveAll(ReactionRemoveAllEvent::decode(value)?)
         } else if kind == "MESSAGE_UPDATE" {
-            Ok(Event::MessageUpdate(MessageUpdateEvent::decode(value)?))
+            Event::MessageUpdate(MessageUpdateEvent::decode(value)?)
         } else if kind == "PRESENCE_UPDATE" {
-            Ok(Event::PresenceUpdate(PresenceUpdateEvent::decode(value)?))
+            Event::PresenceUpdate(PresenceUpdateEvent::decode(value)?)
         } else if kind == "RELATIONSHIP_ADD" {
-            Ok(Event::RelationshipAdd(RelationshipAddEvent::decode(value)?))
+            Event::RelationshipAdd(RelationshipAddEvent::decode(value)?)
         } else if kind == "RELATIONSHIP_REMOVE" {
-            Ok(Event::RelationshipRemove(RelationshipRemoveEvent::decode(value)?))
+            Event::RelationshipRemove(RelationshipRemoveEvent::decode(value)?)
         } else if kind == "READY" {
-            Ok(Event::Ready(ReadyEvent::decode(value)?))
+            Event::Ready(ReadyEvent::decode(value)?)
         } else if kind == "RESUMED" {
-            Ok(Event::Resumed(ResumedEvent::decode(value)?))
+            Event::Resumed(ResumedEvent::decode(value)?)
         } else if kind == "TYPING_START" {
-            Ok(Event::TypingStart(TypingStartEvent::decode(value)?))
+            Event::TypingStart(TypingStartEvent::decode(value)?)
         } else if kind == "USER_GUILD_SETTINGS_UPDATE" {
-            Ok(Event::UserGuildSettingsUpdate(UserGuildSettingsUpdateEvent::decode(value)?))
+            Event::UserGuildSettingsUpdate(UserGuildSettingsUpdateEvent::decode(value)?)
         } else if kind == "USER_NOTE_UPDATE" {
-            Ok(Event::UserNoteUpdate(UserNoteUpdateEvent::decode(value)?))
+            Event::UserNoteUpdate(UserNoteUpdateEvent::decode(value)?)
         } else if kind == "USER_SETTINGS_UPDATE" {
-            Ok(Event::UserSettingsUpdate(UserSettingsUpdateEvent::decode(value)?))
+            Event::UserSettingsUpdate(UserSettingsUpdateEvent::decode(value)?)
         } else if kind == "USER_UPDATE" {
-            Ok(Event::UserUpdate(UserUpdateEvent::decode(value)?))
+            Event::UserUpdate(UserUpdateEvent::decode(value)?)
         } else if kind == "VOICE_SERVER_UPDATE" {
-            Ok(Event::VoiceServerUpdate(VoiceServerUpdateEvent::decode(value)?))
+            Event::VoiceServerUpdate(VoiceServerUpdateEvent::decode(value)?)
         } else if kind == "VOICE_STATE_UPDATE" {
-            Ok(Event::VoiceStateUpdate(VoiceStateUpdateEvent::decode(value)?))
+            Event::VoiceStateUpdate(VoiceStateUpdateEvent::decode(value)?)
         } else if kind == "WEBHOOKS_UPDATE" {
-            Ok(Event::WebhookUpdate(WebhookUpdateEvent::decode(value)?))
+            Event::WebhookUpdate(WebhookUpdateEvent::decode(value)?)
         } else {
-            Ok(Event::Unknown(UnknownEvent {
+            Event::Unknown(UnknownEvent {
                 kind: kind,
                 value: value,
-            }))
-        }
+            })
+        })
     }
 }
 
@@ -1260,13 +1260,13 @@ impl VoiceEvent {
         let opcode = VoiceOpCode::from_num(op)
             .ok_or(Error::Client(ClientError::InvalidOpCode))?;
 
-        match opcode {
-            VoiceOpCode::Heartbeat => Ok(VoiceEvent::Heartbeat(VoiceHeartbeat::decode(map)?)),
-            VoiceOpCode::Hello => Ok(VoiceEvent::Hello(VoiceHello::decode(map)?)),
-            VoiceOpCode::KeepAlive => Ok(VoiceEvent::KeepAlive),
-            VoiceOpCode::SessionDescription => Ok(VoiceEvent::Ready(VoiceSessionDescription::decode(map)?)),
-            VoiceOpCode::Speaking => Ok(VoiceEvent::Speaking(VoiceSpeaking::decode(map)?)),
-            other => Ok(VoiceEvent::Unknown(other, Value::Object(map))),
-        }
+        Ok(match opcode {
+            VoiceOpCode::Heartbeat => VoiceEvent::Heartbeat(VoiceHeartbeat::decode(map)?),
+            VoiceOpCode::Hello => VoiceEvent::Hello(VoiceHello::decode(map)?),
+            VoiceOpCode::KeepAlive => VoiceEvent::KeepAlive,
+            VoiceOpCode::SessionDescription => VoiceEvent::Ready(VoiceSessionDescription::decode(map)?),
+            VoiceOpCode::Speaking => VoiceEvent::Speaking(VoiceSpeaking::decode(map)?),
+            other => VoiceEvent::Unknown(other, Value::Object(map)),
+        })
     }
 }
