@@ -261,14 +261,14 @@ impl Framework {
     /// Aliases a command, allowing it to be used under a different name.
     /// Note that default group is called "Ungrouped".
     pub fn alias<S>(mut self, group: S, to: S, from: S) -> Self
-        where S: Into<String> {
+        where S: Into<String> + Copy {
         {
             let group = self.groups.entry(group.into())
             .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(group) {
                 if let Some(ref prefix) = group.prefix {
-                    group.commands.insert(format!("{} {}", prefix, from.into()), CommandKind::Alias(to.into()));
+                    group.commands.insert(format!("{} {}", prefix, from.into()), CommandKind::Alias(format!("{} {}", prefix, to.into())));
                 } else {
                     group.commands.insert(from.into(), CommandKind::Alias(to.into()));
                 }
@@ -288,7 +288,7 @@ impl Framework {
             if let Some(ref mut group) = Arc::get_mut(group) {
                 if let Some(ref prefix) = group.prefix {
                     for n in to {
-                        group.commands.insert(format!("{} {}", prefix, from.into()), CommandKind::Alias(n.to_owned()));
+                        group.commands.insert(format!("{} {}", prefix, from.into()), CommandKind::Alias(format!("{} {}", prefix, n.to_owned())));
                     }
                 } else {
                     for n in to {
@@ -364,12 +364,14 @@ impl Framework {
                 let groups = self.groups.clone();
 
                 for group in groups.values() {
+                    let command_length = built.len();
+
                     if let Some(&CommandKind::Alias(ref points_to)) = group.commands.get(&built) {
                         built = points_to.to_owned();
                     }
 
                     let to_check = if let Some(ref prefix) = group.prefix {
-                        if built.starts_with(prefix) && built.len() > prefix.len() + 1 {
+                        if built.starts_with(prefix) && command_length > prefix.len() + 1 {
                             built[(prefix.len() + 1)..].to_owned()
                         } else {
                             continue;
@@ -493,9 +495,9 @@ impl Framework {
                         let groups = self.groups.clone();
 
                         let args = if command.use_quotes {
-                            utils::parse_quotes(&message.content[position + built.len()..])
+                            utils::parse_quotes(&message.content[position + command_length..])
                         } else {
-                            message.content[position + built.len()..]
+                            message.content[position + command_length..]
                                 .split_whitespace()
                                 .map(|arg| arg.to_owned())
                                 .collect::<Vec<String>>()

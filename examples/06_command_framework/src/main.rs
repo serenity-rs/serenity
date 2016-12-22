@@ -113,6 +113,8 @@ fn main() {
                 .desc("Sends an emoji with a dog.")
                 .bucket("emoji")
                 .exec_str(":dog:")))
+        .alias("Ungrouped", "multiply", "*")
+        .alias("Emoji", "cat", "kitty")
         .command("multiply", |c| c.exec(multiply))
         .command("ping", |c| c
             .check(owner_check)

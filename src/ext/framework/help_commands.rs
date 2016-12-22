@@ -37,7 +37,7 @@ pub fn with_embeds(ctx: &Context,
 
             if let Some(ref prefix) = group.prefix {
                 for (command_name, command) in &group.commands {
-                    if name == format!("{} {}", prefix, command_name) {
+                    if name == format!("{} {}", prefix, command_name) || name == command_name.to_owned() {
                         match command {
                             &CommandKind::CommandStruct(ref cmd) => {
                                 found = Some((command_name, &cmd));
@@ -77,17 +77,20 @@ pub fn with_embeds(ctx: &Context,
                         let mut embed = e.colour(Colour::rosewater())
                             .title(command_name);
                         if let Some(ref desc) = command.desc {
-                            embed = embed.field(|f| {
-                                f.name("Description")
-                                    .value(desc)
-                                    .inline(false)
-                            });
+                            embed = embed.description(desc);
                         }
 
                         if let Some(ref usage) = command.usage {
                             embed = embed.field(|f| {
                                 f.name("Usage")
-                                    .value(&format!("{} {}", command_name, usage))
+                                    .value(&format!("`{} {}`", command_name, usage))
+                            });
+                        }
+
+                        if let Some(ref example) = command.example {
+                            embed = embed.field(|f| {
+                                f.name("Sample usage")
+                                    .value(&format!("`{} {}`", command_name, example))
                             });
                         }
 
@@ -176,7 +179,7 @@ pub fn plain(ctx: &Context,
 
             if let Some(ref prefix) = group.prefix {
                 for (command_name, command) in &group.commands {
-                    if name == format!("{} {}", prefix, command_name) {
+                    if name == format!("{} {}", prefix, command_name) || name == command_name.to_owned()  {
                         match command {
                             &CommandKind::CommandStruct(ref cmd) => {
                                 found = Some((command_name, &cmd));
@@ -217,7 +220,11 @@ pub fn plain(ctx: &Context,
                 }
 
                 if let Some(ref usage) = command.usage {
-                    let _ = write!(result, "**Usage:** {}\n", usage);
+                    let _ = write!(result, "**Usage:** `{} {}`\n", command_name, usage);
+                }
+
+                if let Some(ref example) = command.example {
+                    let _ = write!(result, "**Sample usage:** `{} {}`\n", command_name, example);
                 }
 
                 if group_name != "Ungrouped" {
@@ -245,8 +252,8 @@ pub fn plain(ctx: &Context,
         return Ok(());
     }
 
-    let mut result = "**Commands**\nTo get help about individual command, pass \
-                      its name as an argument to this command.\n\n"
+    let mut result = "**Commands**\nTo get help with an individual command, pass its \
+                      name as an argument to this command.\n\n"
         .to_string();
 
     for (group_name, group) in groups {

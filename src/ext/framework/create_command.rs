@@ -162,6 +162,13 @@ impl CreateCommand {
         self
     }
 
+    /// Example arguments, used by other commands.
+    pub fn example(mut self, example: &str) -> Self {
+        self.0.example = Some(example.to_owned());
+
+        self
+    }
+
     /// Whether or not arguments should be parsed using the quotation parser.
     ///
     /// Enabling this will parse `~command "this is arg 1" "this is arg 2"` as
@@ -187,6 +194,7 @@ impl Default for Command {
             exec: CommandType::Basic(Box::new(|_, _, _| Ok(()))),
             desc: None,
             usage: None,
+            example: None,
             use_quotes: false,
             min_args: None,
             bucket: None,

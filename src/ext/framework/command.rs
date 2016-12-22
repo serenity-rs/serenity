@@ -45,6 +45,8 @@ pub struct Command {
     pub bucket: Option<String>,
     /// Command description, used by other commands.
     pub desc: Option<String>,
+    /// Example arguments, used by other commands.
+    pub example: Option<String>,
     /// Command usage schema, used by other commands.
     pub usage: Option<String>,
     /// Whether arguments should be parsed using quote parser or not.
