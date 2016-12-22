@@ -14,6 +14,12 @@ pub type AfterHook = Fn(&Context, &Message, &String, Result<(), String>) + Send 
 pub type InternalCommand = Arc<Command>;
 pub type PrefixCheck = Fn(&Context) -> Option<String> + Send + Sync + 'static;
 
+#[doc(hidden)]
+pub enum CommandKind {
+    Alias(String),
+    CommandStruct(InternalCommand)
+}
+
 /// Command function type. Allows to access internal framework things inside
 /// your commands.
 pub enum CommandType {
@@ -25,7 +31,7 @@ pub enum CommandType {
 #[derive(Default)]
 pub struct CommandGroup {
     pub prefix: Option<String>,
-    pub commands: HashMap<String, InternalCommand>,
+    pub commands: HashMap<String, CommandKind>,
 }
 
 /// Command struct used to store commands internally.

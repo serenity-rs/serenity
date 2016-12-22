@@ -62,7 +62,7 @@ mod create_group;
 mod buckets;
 
 pub use self::buckets::{Bucket, MemberRatelimit, Ratelimit};
-pub use self::command::{Command, CommandType, CommandGroup};
+pub use self::command::{Command, CommandType, CommandGroup, CommandKind};
 pub use self::configuration::{AccountType, Configuration};
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
@@ -258,6 +258,36 @@ impl Framework {
         self
     }
 
+    /// Aliases a command, allowing it to be used under a different name.
+    pub fn alias<S>(mut self, group: S, to: S, from: S) -> Self
+        where S: Into<String> {
+        {
+            let group = self.groups.entry(group.into())
+            .or_insert_with(|| Arc::new(CommandGroup::default()));
+
+            if let Some(ref mut group) = Arc::get_mut(group) {
+                group.commands.insert(from.into(), CommandKind::Alias(to.into()));
+            }
+        }
+        self
+    }
+
+    /// Shorthand way to add multiple aliases.
+    pub fn aliases<S>(mut self, group: S, from: S, to: Vec<&str>) -> Self
+        where S: Into<String> + Copy {
+        {
+            let group = self.groups.entry(group.into())
+            .or_insert_with(|| Arc::new(CommandGroup::default()));
+
+            if let Some(ref mut group) = Arc::get_mut(group) {
+                for n in to {
+                    group.commands.insert(from.into(), CommandKind::Alias(n.to_owned()));
+                }
+            }
+        }
+        self
+    }
+
     #[allow(cyclomatic_complexity)]
     #[doc(hidden)]
     pub fn dispatch(&mut self, context: Context, message: Message) {
@@ -322,6 +352,10 @@ impl Framework {
                 let groups = self.groups.clone();
 
                 for group in groups.values() {
+                    if let Some(&CommandKind::Alias(ref points_to)) = group.commands.get(&built) {
+                        built = points_to.to_owned();
+                    }
+
                     let to_check = if let Some(ref prefix) = group.prefix {
                         if built.starts_with(prefix) && built.len() > prefix.len() + 1 {
                             built[(prefix.len() + 1)..].to_owned()
@@ -332,7 +366,7 @@ impl Framework {
                         built.clone()
                     };
 
-                    if let Some(command) = group.commands.get(&to_check) {
+                    if let Some(&CommandKind::CommandStruct(ref command)) = group.commands.get(&to_check) {
                         let is_owner = self.configuration.owners.contains(&message.author.id);
                         // Most of the checks don't apply to owners.
                         if !is_owner {
@@ -566,7 +600,7 @@ impl Framework {
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
                 let name = command_name.into();
 
-                group.commands.insert(name, Arc::new(Command::new(f)));
+                group.commands.insert(name, CommandKind::CommandStruct(Arc::new(Command::new(f))));
             }
         }
 
@@ -597,7 +631,7 @@ impl Framework {
                 let cmd = f(CreateCommand(Command::default())).0;
                 let name = command_name.into();
 
-                group.commands.insert(name, Arc::new(cmd));
+                group.commands.insert(name, CommandKind::CommandStruct(Arc::new(cmd)));
             }
         }
 
@@ -675,7 +709,7 @@ impl Framework {
             if let Some(group) = Arc::get_mut(ungrouped) {
                 let name = command.into();
 
-                if let Some(ref mut command) = group.commands.get_mut(&name) {
+                if let Some(&mut CommandKind::CommandStruct(ref mut command)) = group.commands.get_mut(&name) {
                     if let Some(command) = Arc::get_mut(command) {
                         command.checks.push(Box::new(check));
                     }
