@@ -113,28 +113,28 @@ use ::client::CACHE;
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
-        pub fn $fname($c: &Context, _: &Message, _: Vec<String>) -> Result<(), String> {
+        pub fn $fname($c: &Context, _: &Message, _: Vec<String>) -> std::result::Result<(), String> {
             $b
 
             Ok(())
         }
     };
     ($fname:ident($c:ident, $m:ident) $b:block) => {
-        pub fn $fname($c: &Context, $m: &Message, _: Vec<String>) -> Result<(), String> {
+        pub fn $fname($c: &Context, $m: &Message, _: Vec<String>) -> std::result::Result<(), String> {
             $b
 
             Ok(())
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
-        pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) -> Result<(), String> {
+        pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) -> std::result::Result<(), String> {
             $b
 
             Ok(())
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
-        pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) -> Result<(), String> {
+        pub fn $fname($c: &Context, $m: &Message, $a: Vec<String>) -> std::result::Result<(), String> {
             let mut i = $a.iter();
             let mut arg_counter = 0;
 
