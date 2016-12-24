@@ -10,7 +10,7 @@
 #[macro_use]
 extern crate serenity;
 
-use serenity::client::{CACHE, Client, Context};
+use serenity::client::{CACHE, Client};
 use serenity::ext::voice;
 use serenity::model::{ChannelId, Message, Mentionable};
 use serenity::Result as SerenityResult;
