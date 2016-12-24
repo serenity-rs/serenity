@@ -36,35 +36,25 @@ pub fn with_embeds(ctx: &Context,
         for (group_name, group) in groups {
             let mut found: Option<(&String, &InternalCommand)> = None;
 
-            if let Some(ref prefix) = group.prefix {
-                for (command_name, command) in &group.commands {
-                    if name == format!("{} {}", prefix, command_name) || name == *command_name {
-                        match *command {
-                            CommandOrAlias::Command(ref cmd) => {
-                                found = Some((command_name, cmd));
-                            },
-                            CommandOrAlias::Alias(ref name) => {
-                                error_embed(ctx, message, &format!("Did you mean \"{}\"?", name));
-                                return Ok(());
-                            }
+            for (command_name, command) in &group.commands {
+                let with_prefix = if let Some(ref prefix) = group.prefix {
+                    format!("{} {}", prefix, command_name)
+                } else {
+                    command_name.to_owned()
+                };
+
+                if name == with_prefix || name == *command_name {
+                    match *command {
+                        CommandOrAlias::Command(ref cmd) => {
+                            found = Some((command_name, cmd));
+                        },
+                        CommandOrAlias::Alias(ref name) => {
+                            error_embed(ctx, message, &format!("Did you mean \"{}\"?", name));
+                            return Ok(());
                         }
                     }
                 }
-            } else {
-                for (command_name, command) in &group.commands {
-                    if name == command_name[..] {
-                        match *command {
-                            CommandOrAlias::Command(ref cmd) => {
-                                found = Some((command_name, cmd));
-                            },
-                            CommandOrAlias::Alias(ref name) => {
-                                error_embed(ctx, message, &format!("Did you mean \"{}\"?", name));
-                                return Ok(());
-                            }
-                        }
-                    }
-                }
-            };
+            }
 
             if let Some((command_name, command)) = found {
                 if !command.help_available {
@@ -174,35 +164,25 @@ pub fn plain(ctx: &Context,
         for (group_name, group) in groups {
             let mut found: Option<(&String, &Command)> = None;
 
-            if let Some(ref prefix) = group.prefix {
-                for (command_name, command) in &group.commands {
-                    if name == format!("{} {}", prefix, command_name) || name == *command_name  {
-                        match *command {
-                            CommandOrAlias::Command(ref cmd) => {
-                                found = Some((command_name, cmd));
-                            },
-                            CommandOrAlias::Alias(ref name) => {
-                                let _ = ctx.say(&format!("Did you mean {:?}?", name));
-                                return Ok(());
-                            }
+            for (command_name, command) in &group.commands {
+                let with_prefix = if let Some(ref prefix) = group.prefix {
+                    format!("{} {}", prefix, command_name)
+                } else {
+                    command_name.to_owned()
+                };
+
+                if name == with_prefix || name == *command_name  {
+                    match *command {
+                        CommandOrAlias::Command(ref cmd) => {
+                            found = Some((command_name, cmd));
+                        },
+                        CommandOrAlias::Alias(ref name) => {
+                            let _ = ctx.say(&format!("Did you mean {:?}?", name));
+                            return Ok(());
                         }
                     }
                 }
-            } else {
-                for (command_name, command) in &group.commands {
-                    if name == command_name[..] {
-                        match *command {
-                            CommandOrAlias::Command(ref cmd) => {
-                                found = Some((command_name, cmd));
-                            },
-                            CommandOrAlias::Alias(ref name) => {
-                                let _ = ctx.say(&format!("Did you mean {:?}?", name));
-                                return Ok(());
-                            }
-                        }
-                    }
-                }
-            };
+            }
 
             if let Some((command_name, command)) = found {
                 if !command.help_available {
