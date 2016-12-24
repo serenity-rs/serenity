@@ -16,6 +16,23 @@ impl CreateCommand {
         self
     }
 
+    /// Adds an alias, allowing users to use the command under a different name.
+    pub fn known_as<S>(mut self, name: S) -> Self
+        where S: Into<String> {
+        self.0.exported_aliases.push(name.into());
+
+        self
+    }
+
+    /// Adds multiple aliases.
+    pub fn batch_known_as(mut self, names: Vec<&str>) -> Self {
+        for n in names {
+            self.0.exported_aliases.push(n.to_owned());
+        }
+
+        self
+    }
+
     /// Adds a "check" to a command, which checks whether or not the command's
     /// function should be called.
     ///
@@ -203,7 +220,8 @@ impl Default for Command {
             dm_only: false,
             guild_only: false,
             help_available: true,
-            owners_only: false
+            owners_only: false,
+            exported_aliases: Vec::new()
         }
     }
 }

@@ -29,6 +29,10 @@ impl CreateGroup {
         where F: FnOnce(CreateCommand) -> CreateCommand {
         let cmd = f(CreateCommand(Command::default())).0;
 
+        for n in &cmd.exported_aliases {
+            self.0.exported_aliases.insert(n.to_owned(), command_name.to_string());
+        }
+
         self.0.commands.insert(command_name.to_owned(), CommandOrAlias::Command(Arc::new(cmd)));
 
         self

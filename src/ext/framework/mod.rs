@@ -258,50 +258,6 @@ impl Framework {
         self
     }
 
-    /// Aliases a command, allowing it to be used under a different name.
-    ///
-    /// Note that the default group is named "Ungrouped".
-    pub fn alias(mut self, group: &str, to: &str, from: &str) -> Self {
-        {
-            let group = self.groups.entry(group.to_owned())
-                .or_insert_with(|| Arc::new(CommandGroup::default()));
-
-            if let Some(ref mut group) = Arc::get_mut(group) {
-                if let Some(ref prefix) = group.prefix {
-                    group.commands.insert(format!("{} {}", prefix, from.to_owned()), CommandOrAlias::Alias(format!("{} {}", prefix, to.to_owned())));
-                } else {
-                    group.commands.insert(from.to_owned(), CommandOrAlias::Alias(to.to_owned()));
-                }
-            }
-        }
-
-        self
-    }
-
-    /// Shorthand way to add multiple aliases.
-    ///
-    /// Note that the default group is named "Ungrouped".
-    pub fn aliases(mut self, group: &str, from: &str, to: Vec<&str>) -> Self {
-        {
-            let group = self.groups.entry(group.to_owned())
-                .or_insert_with(|| Arc::new(CommandGroup::default()));
-
-            if let Some(ref mut group) = Arc::get_mut(group) {
-                if let Some(ref prefix) = group.prefix {
-                    for n in to {
-                        group.commands.insert(format!("{} {}", prefix, from.to_owned()), CommandOrAlias::Alias(format!("{} {}", prefix, n.to_owned())));
-                    }
-                } else {
-                    for n in to {
-                        group.commands.insert(from.to_owned(), CommandOrAlias::Alias(n.to_owned()));
-                    }
-                }
-            }
-        }
-
-        self
-    }
-
     #[allow(cyclomatic_complexity)]
     #[doc(hidden)]
     pub fn dispatch(&mut self, context: Context, message: Message) {
@@ -647,6 +603,16 @@ impl Framework {
                 let cmd = f(CreateCommand(Command::default())).0;
                 let name = command_name.into();
 
+                if let Some(ref prefix) = group.prefix {
+                    for v in &cmd.exported_aliases {
+                        group.commands.insert(format!("{} {}", prefix, v.to_owned()), CommandOrAlias::Alias(format!("{} {}", prefix, name)));
+                    }
+                } else {
+                    for v in &cmd.exported_aliases {
+                        group.commands.insert(v.to_owned(), CommandOrAlias::Alias(name.clone()));
+                    }
+                }
+
                 group.commands.insert(name, CommandOrAlias::Command(Arc::new(cmd)));
             }
         }
@@ -659,7 +625,17 @@ impl Framework {
     pub fn group<F, S>(mut self, group_name: S, f: F) -> Self
         where F: FnOnce(CreateGroup) -> CreateGroup,
               S: Into<String> {
-        let group = f(CreateGroup(CommandGroup::default())).0;
+        let mut group = f(CreateGroup(CommandGroup::default())).0;
+
+        if let Some(ref prefix) = group.prefix {
+            for (k, v) in &group.exported_aliases {
+                group.commands.insert(format!("{} {}", prefix, k.to_owned()), CommandOrAlias::Alias(format!("{} {}", prefix, v.to_owned())));
+            }
+        } else {
+            for (k, v) in &group.exported_aliases {
+                group.commands.insert(k.to_owned(), CommandOrAlias::Alias(v.to_owned()));
+            }
+        }
 
         self.groups.insert(group_name.into(), Arc::new(group));
         self.initialized = true;

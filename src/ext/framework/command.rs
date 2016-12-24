@@ -32,6 +32,8 @@ pub enum CommandType {
 pub struct CommandGroup {
     pub prefix: Option<String>,
     pub commands: HashMap<String, CommandOrAlias>,
+    #[doc(hidden)]
+    pub exported_aliases: HashMap<String, String>
 }
 
 /// Command struct used to store commands internally.
@@ -65,6 +67,8 @@ pub struct Command {
     pub guild_only: bool,
     /// Whether command can only be used by owners or not.
     pub owners_only: bool,
+    #[doc(hidden)]
+    pub exported_aliases: Vec<String>
 }
 
 impl Command {
@@ -85,6 +89,7 @@ impl Command {
             max_args: None,
             required_permissions: Permissions::empty(),
             owners_only: false,
+            exported_aliases: Vec::new()
         }
     }
 }

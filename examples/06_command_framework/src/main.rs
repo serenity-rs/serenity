@@ -105,6 +105,7 @@ fn main() {
             .prefix("emoji")
             .command("cat", |c| c
                 .desc("Sends an emoji with a cat.")
+                .batch_known_as(vec!["kitty", "neko"]) // Adds multiple aliases
                 .bucket("emoji") // Make this command use the "emoji" bucket.
                 .exec_str(":cat:")
                  // Allow only administrators to call this:
@@ -113,9 +114,9 @@ fn main() {
                 .desc("Sends an emoji with a dog.")
                 .bucket("emoji")
                 .exec_str(":dog:")))
-        .alias("Ungrouped", "multiply", "*")
-        .alias("Emoji", "cat", "kitty")
-        .command("multiply", |c| c.exec(multiply))
+        .command("multiply", |c| c
+            .known_as("*") // Lets us call ~* instead of ~multiply
+            .exec(multiply))
         .command("ping", |c| c
             .check(owner_check)
             .exec_str("Pong!"))
