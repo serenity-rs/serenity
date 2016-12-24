@@ -36,8 +36,7 @@
 //! ```rust,ignore
 //! extern crate serenity;
 //!
-//! use serenity::client::{Client, Context};
-//! use serenity::model::Message;
+//! use serenity::client::Client;
 //! use std::env;
 //!
 //! fn main() {
