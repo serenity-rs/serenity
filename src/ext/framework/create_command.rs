@@ -19,7 +19,7 @@ impl CreateCommand {
     /// Adds an alias, allowing users to use the command under a different name.
     pub fn known_as<S>(mut self, name: S) -> Self
         where S: Into<String> {
-        self.0.exported_aliases.push(name.into());
+        self.0.aliases.push(name.into());
 
         self
     }
@@ -27,7 +27,7 @@ impl CreateCommand {
     /// Adds multiple aliases.
     pub fn batch_known_as(mut self, names: Vec<&str>) -> Self {
         for n in names {
-            self.0.exported_aliases.push(n.to_owned());
+            self.0.aliases.push(n.to_owned());
         }
 
         self
@@ -221,7 +221,7 @@ impl Default for Command {
             guild_only: false,
             help_available: true,
             owners_only: false,
-            exported_aliases: Vec::new()
+            aliases: Vec::new()
         }
     }
 }

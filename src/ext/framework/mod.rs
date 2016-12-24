@@ -604,11 +604,11 @@ impl Framework {
                 let name = command_name.into();
 
                 if let Some(ref prefix) = group.prefix {
-                    for v in &cmd.exported_aliases {
+                    for v in &cmd.aliases {
                         group.commands.insert(format!("{} {}", prefix, v.to_owned()), CommandOrAlias::Alias(format!("{} {}", prefix, name)));
                     }
                 } else {
-                    for v in &cmd.exported_aliases {
+                    for v in &cmd.aliases {
                         group.commands.insert(v.to_owned(), CommandOrAlias::Alias(name.clone()));
                     }
                 }
@@ -625,17 +625,7 @@ impl Framework {
     pub fn group<F, S>(mut self, group_name: S, f: F) -> Self
         where F: FnOnce(CreateGroup) -> CreateGroup,
               S: Into<String> {
-        let mut group = f(CreateGroup(CommandGroup::default())).0;
-
-        if let Some(ref prefix) = group.prefix {
-            for (k, v) in &group.exported_aliases {
-                group.commands.insert(format!("{} {}", prefix, k.to_owned()), CommandOrAlias::Alias(format!("{} {}", prefix, v.to_owned())));
-            }
-        } else {
-            for (k, v) in &group.exported_aliases {
-                group.commands.insert(k.to_owned(), CommandOrAlias::Alias(v.to_owned()));
-            }
-        }
+        let group = f(CreateGroup(CommandGroup::default())).0;
 
         self.groups.insert(group_name.into(), Arc::new(group));
         self.initialized = true;

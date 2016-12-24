@@ -29,8 +29,12 @@ impl CreateGroup {
         where F: FnOnce(CreateCommand) -> CreateCommand {
         let cmd = f(CreateCommand(Command::default())).0;
 
-        for n in &cmd.exported_aliases {
-            self.0.exported_aliases.insert(n.to_owned(), command_name.to_string());
+        for n in &cmd.aliases {
+            if let Some(ref prefix) = self.0.prefix {
+                self.0.commands.insert(format!("{} {}", prefix, n.to_owned()), CommandOrAlias::Alias(format!("{} {}", prefix, command_name.to_string())));
+            } else {
+                self.0.commands.insert(n.to_owned(), CommandOrAlias::Alias(command_name.to_string()));
+            }
         }
 
         self.0.commands.insert(command_name.to_owned(), CommandOrAlias::Command(Arc::new(cmd)));
@@ -54,6 +58,8 @@ impl CreateGroup {
     /// we'd call a subcommand named "hibiki" by sending "~image hibiki".
     ///
     /// **Note**: serenity automatically puts a space after group prefix.
+    ///
+    /// **Note**: It's suggested to call this first when making a group.
     pub fn prefix(mut self, desc: &str) -> Self {
         self.0.prefix = Some(desc.to_owned());
 
