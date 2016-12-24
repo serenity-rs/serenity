@@ -93,7 +93,7 @@ fn main() {
         })
         // Can't be used more than once per 5 seconds:
         .simple_bucket("emoji", 5)
-        // Can't be used more than 2 times per 30 seconds, with a 5 second delay
+        // Can't be used more than 2 times per 30 seconds, with a 5 second delay:
         .bucket("complicated", 5, 30, 2)
         .command("about", |c| c.exec_str("A test bot"))
         .command("help", |c| c.exec_help(help_commands::plain))
