@@ -48,7 +48,7 @@ fields:
   - name: shard
     custom: decode_shards
     optional: true
-    type: '[u8; 2]'
+    type: '[u64; 2]'
   - name: trace
     array: true
     description: The trace of guilds involved in this connection.
