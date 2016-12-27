@@ -279,7 +279,7 @@ impl Shard {
                 info!("Received shard heartbeat; seq: {}", seq);
 
                 let map = ObjectBuilder::new()
-                    .insert("d", seq)
+                    .insert("d", Value::Null)
                     .insert("op", OpCode::Heartbeat.num())
                     .build();
                 let status = GatewayStatus::SendMessage(map);
