@@ -173,14 +173,14 @@ pub fn decode_roles(value: Value) -> Result<HashMap<RoleId, Role>> {
     Ok(roles)
 }
 
-pub fn decode_shards(value: Value) -> Result<[u8; 2]> {
+pub fn decode_shards(value: Value) -> Result<[u64; 2]> {
     let array = into_array(value)?;
 
     Ok([
         req!(array.get(0)
-            .ok_or(Error::Client(ClientError::InvalidShards))?.as_u64()) as u8,
+            .ok_or(Error::Client(ClientError::InvalidShards))?.as_u64()) as u64,
         req!(array.get(1)
-            .ok_or(Error::Client(ClientError::InvalidShards))?.as_u64()) as u8,
+            .ok_or(Error::Client(ClientError::InvalidShards))?.as_u64()) as u64,
     ])
 }
 

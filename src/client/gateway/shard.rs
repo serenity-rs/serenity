@@ -64,7 +64,7 @@ pub struct Shard {
     last_sequence: u64,
     login_type: LoginType,
     session_id: Option<String>,
-    shard_info: Option<[u8; 2]>,
+    shard_info: Option<[u64; 2]>,
     token: String,
     ws_url: String,
     /// The voice connections that this Shard is responsible for. The Shard will
@@ -99,7 +99,7 @@ impl Shard {
     /// ```
     pub fn new(base_url: &str,
                token: &str,
-               shard_info: Option<[u8; 2]>,
+               shard_info: Option<[u64; 2]>,
                login_type: LoginType)
                -> Result<(Shard, ReadyEvent, Receiver<WebSocketStream>)> {
         let url = prep::build_gateway_url(base_url)?;
@@ -172,7 +172,7 @@ impl Shard {
     ///
     /// For example, if using 3 shards in total, and if this is shard 1, then it
     /// can be read as "the second of three shards".
-    pub fn shard_info(&self) -> Option<[u8; 2]> {
+    pub fn shard_info(&self) -> Option<[u64; 2]> {
         self.shard_info
     }
 

@@ -281,7 +281,10 @@ impl Client {
     pub fn start_autosharded(&mut self) -> Result<()> {
         let res = rest::get_bot_gateway()?;
 
-        self.start_connection(Some([0, res.shards as u8 - 1, res.shards as u8]))
+        let x = res.shards as u64 - 1;
+        let y = res.shards as u64;
+
+        self.start_connection(Some([0, x, y]))
     }
 
     /// Establish a sharded connection and start listening for events.
@@ -297,7 +300,7 @@ impl Client {
     /// on effectively using sharding.
     ///
     /// [gateway docs]: gateway/index.html#sharding
-    pub fn start_shard(&mut self, shard: u8, shards: u8) -> Result<()> {
+    pub fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
         self.start_connection(Some([shard, shard, shards]))
     }
 
@@ -316,7 +319,7 @@ impl Client {
     /// [`start_shard`]: #method.start_shard
     /// [`start_shard_range`]: #method.start_shards
     /// [Gateway docs]: gateway/index.html#sharding
-    pub fn start_shards(&mut self, total_shards: u8) -> Result<()> {
+    pub fn start_shards(&mut self, total_shards: u64) -> Result<()> {
         self.start_connection(Some([0, total_shards - 1, total_shards]))
     }
 
@@ -350,7 +353,7 @@ impl Client {
     /// [`start_shard`]: #method.start_shard
     /// [`start_shards`]: #method.start_shards
     /// [Gateway docs]: gateway/index.html#sharding
-    pub fn start_shard_range(&mut self, range: [u8; 2], total_shards: u8)
+    pub fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64)
         -> Result<()> {
         self.start_connection(Some([range[0], range[1], total_shards]))
     }
@@ -783,7 +786,7 @@ impl Client {
     // 2: total number of shards the bot is sharding for
     //
     // Not all shards need to be initialized in this process.
-    fn start_connection(&mut self, shard_data: Option<[u8; 3]>) -> Result<()> {
+    fn start_connection(&mut self, shard_data: Option<[u64; 3]>) -> Result<()> {
         // Update the framework's current user if the feature is enabled.
         //
         // This also acts as a form of check to ensure the token is correct.

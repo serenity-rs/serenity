@@ -313,7 +313,7 @@ impl {0} {{
             // let name = field["from"].as_str().unwrap_or(name);
 
             let operation = match (kind, optional, array, default, custom, from, t) {
-                ("[u8; 2]", true, false, None, Some(custom), None, None) => {
+                ("[u64; 2]", true, false, None, Some(custom), None, None) => {
                     format!(r#"try!(opt(&mut map, "{}", {}))"#,
                             field_name,
                             custom)

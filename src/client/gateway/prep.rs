@@ -53,7 +53,7 @@ pub fn parse_ready(event: GatewayEvent,
     }
 }
 
-pub fn identify(token: &str, shard_info: Option<[u8; 2]>) -> Value {
+pub fn identify(token: &str, shard_info: Option<[u64; 2]>) -> Value {
     ObjectBuilder::new()
         .insert("op", OpCode::Identify.num())
         .insert_object("d", |mut object| {
