@@ -275,8 +275,23 @@ impl Shard {
 
                 Ok(Some((event, None)))
             },
-            Ok(GatewayEvent::Heartbeat(seq)) => {
-                info!("Received shard heartbeat; seq: {}", seq);
+            Ok(GatewayEvent::Heartbeat(s)) => {
+                info!("Received shard heartbeat");
+
+                // Received seq is off -- attempt to resume.
+                if s > self.seq + 1 {
+                    info!("Received off sequence (them: {}; us: {}); resuming",
+                          s,
+                          self.seq);
+
+                    return if let Some(session_id) = self.session_id.clone() {
+                        self.resume(session_id, receiver)
+                            .map(|(ev, rec)| Some((ev, Some(rec))))
+                    } else {
+                        self.reconnect(receiver)
+                            .map(|(ev, rec)| Some((ev, Some(rec))))
+                    };
+                }
 
                 let map = ObjectBuilder::new()
                     .insert("d", Value::Null)
@@ -296,7 +311,13 @@ impl Shard {
                     let _ = self.keepalive_channel.send(status);
                 }
 
-                Ok(None)
+                if let Some(session_id) = self.session_id.clone() {
+                    self.resume(session_id, receiver)
+                        .map(|(ev, rec)| Some((ev, Some(rec))))
+                } else {
+                    self.reconnect(receiver)
+                        .map(|(ev, rec)| Some((ev, Some(rec))))
+                }
             },
             Ok(GatewayEvent::InvalidateSession) => {
                 info!("Received session invalidation; re-identifying");
