@@ -17,9 +17,8 @@ impl CreateCommand {
     }
 
     /// Adds an alias, allowing users to use the command under a different name.
-    pub fn known_as<S>(mut self, name: S) -> Self
-        where S: Into<String> {
-        self.0.aliases.push(name.into());
+    pub fn known_as(mut self, name: &str) -> Self {
+        self.0.aliases.push(name.to_owned());
 
         self
     }
@@ -83,6 +82,13 @@ impl CreateCommand {
     /// Whether command can be used only privately or not.
     pub fn dm_only(mut self, dm_only: bool) -> Self {
         self.0.dm_only = dm_only;
+
+        self
+    }
+
+    /// Example arguments, used by other commands.
+    pub fn example(mut self, example: &str) -> Self {
+        self.0.example = Some(example.to_owned());
 
         self
     }
@@ -179,13 +185,6 @@ impl CreateCommand {
         self
     }
 
-    /// Example arguments, used by other commands.
-    pub fn example(mut self, example: &str) -> Self {
-        self.0.example = Some(example.to_owned());
-
-        self
-    }
-
     /// Whether or not arguments should be parsed using the quotation parser.
     ///
     /// Enabling this will parse `~command "this is arg 1" "this is arg 2"` as
@@ -207,6 +206,7 @@ impl CreateCommand {
 impl Default for Command {
     fn default() -> Command {
         Command {
+            aliases: Vec::new(),
             checks: Vec::default(),
             exec: CommandType::Basic(Box::new(|_, _, _| Ok(()))),
             desc: None,
@@ -221,7 +221,6 @@ impl Default for Command {
             guild_only: false,
             help_available: true,
             owners_only: false,
-            aliases: Vec::new()
         }
     }
 }

@@ -17,7 +17,7 @@ pub type PrefixCheck = Fn(&Context) -> Option<String> + Send + Sync + 'static;
 #[doc(hidden)]
 pub enum CommandOrAlias {
     Alias(String),
-    Command(InternalCommand)
+    Command(InternalCommand),
 }
 
 /// Command function type. Allows to access internal framework things inside
@@ -31,7 +31,7 @@ pub enum CommandType {
 #[derive(Default)]
 pub struct CommandGroup {
     pub prefix: Option<String>,
-    pub commands: HashMap<String, CommandOrAlias>
+    pub commands: HashMap<String, CommandOrAlias>,
 }
 
 /// Command struct used to store commands internally.
@@ -66,13 +66,14 @@ pub struct Command {
     /// Whether command can only be used by owners or not.
     pub owners_only: bool,
     #[doc(hidden)]
-    pub aliases: Vec<String>
+    pub aliases: Vec<String>,
 }
 
 impl Command {
     pub fn new<F>(f: F) -> Self
         where F: Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
         Command {
+            aliases: Vec::new(),
             checks: Vec::default(),
             exec: CommandType::Basic(Box::new(f)),
             desc: None,
@@ -85,9 +86,8 @@ impl Command {
             help_available: true,
             min_args: None,
             max_args: None,
-            required_permissions: Permissions::empty(),
             owners_only: false,
-            aliases: Vec::new()
+            required_permissions: Permissions::empty(),
         }
     }
 }

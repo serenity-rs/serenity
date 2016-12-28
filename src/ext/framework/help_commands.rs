@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::fmt::Write;
-use super::{Command, CommandGroup, CommandOrAlias};
 use super::command::InternalCommand;
+use super::{Command, CommandGroup, CommandOrAlias};
 use ::client::Context;
 use ::model::Message;
 use ::utils::Colour;
@@ -14,12 +14,12 @@ fn error_embed(ctx: &Context, message: &Message, input: &str) {
             .description(input)));
 }
 
-fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<String, &InternalCommand> {
+fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &InternalCommand> {
     let mut result = HashMap::new();
 
     for (n, v) in cmds {
         if let CommandOrAlias::Command(ref cmd) = *v {
-            result.insert(n.to_owned(), cmd);
+            result.insert(n, cmd);
         }
     }
 
