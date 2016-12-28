@@ -35,9 +35,19 @@ use ::client::CACHE;
 
 impl CurrentUser {
     /// Returns the formatted URL of the user's icon, if one exists.
+    ///
+    /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
     pub fn avatar_url(&self) -> Option<String> {
-        self.avatar.as_ref().map(|av|
-            format!(cdn!("/avatars/{}/{}.jpg"), self.id.0, av))
+        self.avatar.as_ref()
+            .map(|av| {
+                let ext = if av.starts_with("a_") {
+                    "gif"
+                } else {
+                    "webp"
+                };
+
+                format!(cdn!("/avatars/{}/{}.{}?size=1024"), self.id.0, av, ext)
+            })
     }
 
     /// Edits the current user's profile settings.
@@ -99,9 +109,19 @@ impl CurrentUser {
 
 impl User {
     /// Returns the formatted URL of the user's icon, if one exists.
+    ///
+    /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
     pub fn avatar_url(&self) -> Option<String> {
-        self.avatar.as_ref().map(|av|
-            format!(cdn!("/avatars/{}/{}.jpg"), self.id.0, av))
+        self.avatar.as_ref()
+            .map(|av| {
+                let ext = if av.starts_with("a_") {
+                    "gif"
+                } else {
+                    "webp"
+                };
+
+                format!(cdn!("/avatars/{}/{}.{}?size=1024"), self.id.0, av, ext)
+            })
     }
 
     /// Gets user as `Member` of a guild.
