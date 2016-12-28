@@ -1150,18 +1150,10 @@ impl Eq for Role {}
 
 impl Ord for Role {
     fn cmp(&self, other: &Role) -> Ordering {
-        if self.position > other.position {
-            Ordering::Greater
-        } else if self.position == other.position {
-            if self.id > other.id {
-                Ordering::Greater
-            } else if self.id == other.id {
-                Ordering::Equal
-            } else {
-                Ordering::Less
-            }
+        if self.position == other.position {
+            self.id.cmp(&other.id)
         } else {
-            Ordering::Less
+            self.position.cmp(&other.position)
         }
     }
 }
