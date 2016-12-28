@@ -8,6 +8,7 @@ use std::mem;
 use super::super::login_type::LoginType;
 use super::super::rest;
 use super::{GatewayError, GatewayStatus, prep};
+use time;
 use websocket::client::{Client as WsClient, Sender, Receiver};
 use websocket::message::Message as WsMessage;
 use websocket::result::WebSocketError;
@@ -19,6 +20,8 @@ use ::internal::ws_impl::{ReceiverExt, SenderExt};
 use ::model::event::{Event, GatewayEvent, ReadyEvent};
 use ::model::{ChannelId, Game, GuildId, OnlineStatus};
 
+#[cfg(feature="cache")]
+use ::client::CACHE;
 #[cfg(feature="voice")]
 use ::ext::voice::Manager as VoiceManager;
 
@@ -508,12 +511,13 @@ impl Shard {
 
     fn update_presence(&self) {
         let (ref game, status, afk) = self.current_presence;
+        let now = time::get_time().sec as u64;
 
         let msg = ObjectBuilder::new()
             .insert("op", OpCode::StatusUpdate.num())
             .insert_object("d", move |mut object| {
                 object = object.insert("afk", afk)
-                    .insert("since", 0)
+                    .insert("since", now)
                     .insert("status", status.name());
 
                 match game.as_ref() {
@@ -527,5 +531,20 @@ impl Shard {
             .build();
 
         let _ = self.keepalive_channel.send(GatewayStatus::SendMessage(msg));
+
+        #[cfg(feature="cache")]
+        {
+            let mut cache = CACHE.write().unwrap();
+            let current_user_id = cache.user.id;
+
+            for (user_id, presence) in &mut cache.presences {
+                if *user_id != current_user_id {
+                    continue;
+                }
+
+                presence.game = game.clone();
+                presence.last_modified = Some(now);
+            }
+        }
     }
 }
