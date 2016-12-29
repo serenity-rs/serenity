@@ -482,8 +482,6 @@ impl Message {
     /// **Note**: The logged in user must either be the author of the message or
     /// have the [Manage Messages] permission.
     ///
-    /// **Note**: Requires the [Manage Messages] permission.
-    ///
     /// # Errors
     ///
     /// If the `cache` feature is enabled, then returns a

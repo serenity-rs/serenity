@@ -93,7 +93,7 @@ fn main() {
         })
         // Can't be used more than once per 5 seconds:
         .simple_bucket("emoji", 5)
-        // Can't be used more than 2 times per 30 seconds, with a 5 second delay
+        // Can't be used more than 2 times per 30 seconds, with a 5 second delay:
         .bucket("complicated", 5, 30, 2)
         .command("about", |c| c.exec_str("A test bot"))
         .command("help", |c| c.exec_help(help_commands::plain))
@@ -105,6 +105,7 @@ fn main() {
             .prefix("emoji")
             .command("cat", |c| c
                 .desc("Sends an emoji with a cat.")
+                .batch_known_as(vec!["kitty", "neko"]) // Adds multiple aliases
                 .bucket("emoji") // Make this command use the "emoji" bucket.
                 .exec_str(":cat:")
                  // Allow only administrators to call this:
@@ -113,7 +114,9 @@ fn main() {
                 .desc("Sends an emoji with a dog.")
                 .bucket("emoji")
                 .exec_str(":dog:")))
-        .command("multiply", |c| c.exec(multiply))
+        .command("multiply", |c| c
+            .known_as("*") // Lets us call ~* instead of ~multiply
+            .exec(multiply))
         .command("ping", |c| c
             .check(owner_check)
             .exec_str("Pong!"))

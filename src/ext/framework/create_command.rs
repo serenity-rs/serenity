@@ -16,6 +16,22 @@ impl CreateCommand {
         self
     }
 
+    /// Adds an alias, allowing users to use the command under a different name.
+    pub fn known_as(mut self, name: &str) -> Self {
+        self.0.aliases.push(name.to_owned());
+
+        self
+    }
+
+    /// Adds multiple aliases.
+    pub fn batch_known_as(mut self, names: Vec<&str>) -> Self {
+        for n in names {
+            self.0.aliases.push(n.to_owned());
+        }
+
+        self
+    }
+
     /// Adds a "check" to a command, which checks whether or not the command's
     /// function should be called.
     ///
@@ -66,6 +82,13 @@ impl CreateCommand {
     /// Whether command can be used only privately or not.
     pub fn dm_only(mut self, dm_only: bool) -> Self {
         self.0.dm_only = dm_only;
+
+        self
+    }
+
+    /// Example arguments, used by other commands.
+    pub fn example(mut self, example: &str) -> Self {
+        self.0.example = Some(example.to_owned());
 
         self
     }
@@ -183,10 +206,12 @@ impl CreateCommand {
 impl Default for Command {
     fn default() -> Command {
         Command {
+            aliases: Vec::new(),
             checks: Vec::default(),
             exec: CommandType::Basic(Box::new(|_, _, _| Ok(()))),
             desc: None,
             usage: None,
+            example: None,
             use_quotes: false,
             min_args: None,
             bucket: None,
@@ -195,7 +220,7 @@ impl Default for Command {
             dm_only: false,
             guild_only: false,
             help_available: true,
-            owners_only: false
+            owners_only: false,
         }
     }
 }

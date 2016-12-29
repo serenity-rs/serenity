@@ -14,6 +14,12 @@ pub type AfterHook = Fn(&Context, &Message, &String, Result<(), String>) + Send 
 pub type InternalCommand = Arc<Command>;
 pub type PrefixCheck = Fn(&Context) -> Option<String> + Send + Sync + 'static;
 
+#[doc(hidden)]
+pub enum CommandOrAlias {
+    Alias(String),
+    Command(InternalCommand),
+}
+
 /// Command function type. Allows to access internal framework things inside
 /// your commands.
 pub enum CommandType {
@@ -25,7 +31,7 @@ pub enum CommandType {
 #[derive(Default)]
 pub struct CommandGroup {
     pub prefix: Option<String>,
-    pub commands: HashMap<String, InternalCommand>,
+    pub commands: HashMap<String, CommandOrAlias>,
 }
 
 /// Command struct used to store commands internally.
@@ -39,6 +45,8 @@ pub struct Command {
     pub bucket: Option<String>,
     /// Command description, used by other commands.
     pub desc: Option<String>,
+    /// Example arguments, used by other commands.
+    pub example: Option<String>,
     /// Command usage schema, used by other commands.
     pub usage: Option<String>,
     /// Whether arguments should be parsed using quote parser or not.
@@ -57,16 +65,20 @@ pub struct Command {
     pub guild_only: bool,
     /// Whether command can only be used by owners or not.
     pub owners_only: bool,
+    #[doc(hidden)]
+    pub aliases: Vec<String>,
 }
 
 impl Command {
     pub fn new<F>(f: F) -> Self
         where F: Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
         Command {
+            aliases: Vec::new(),
             checks: Vec::default(),
             exec: CommandType::Basic(Box::new(f)),
             desc: None,
             usage: None,
+            example: None,
             use_quotes: false,
             dm_only: false,
             bucket: None,
@@ -74,8 +86,8 @@ impl Command {
             help_available: true,
             min_args: None,
             max_args: None,
-            required_permissions: Permissions::empty(),
             owners_only: false,
+            required_permissions: Permissions::empty(),
         }
     }
 }

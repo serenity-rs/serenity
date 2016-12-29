@@ -1,4 +1,4 @@
-pub use ext::framework::command::{Command, CommandType, CommandGroup};
+pub use ext::framework::command::{Command, CommandType, CommandGroup, CommandOrAlias};
 pub use ext::framework::create_command::CreateCommand;
 
 use std::default::Default;
@@ -29,7 +29,15 @@ impl CreateGroup {
         where F: FnOnce(CreateCommand) -> CreateCommand {
         let cmd = f(CreateCommand(Command::default())).0;
 
-        self.0.commands.insert(command_name.to_owned(), Arc::new(cmd));
+        for n in &cmd.aliases {
+            if let Some(ref prefix) = self.0.prefix {
+                self.0.commands.insert(format!("{} {}", prefix, n.to_owned()), CommandOrAlias::Alias(format!("{} {}", prefix, command_name.to_string())));
+            } else {
+                self.0.commands.insert(n.to_owned(), CommandOrAlias::Alias(command_name.to_string()));
+            }
+        }
+
+        self.0.commands.insert(command_name.to_owned(), CommandOrAlias::Command(Arc::new(cmd)));
 
         self
     }
@@ -40,7 +48,7 @@ impl CreateGroup {
         where F: Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
         let cmd = Arc::new(Command::new(f));
 
-        self.0.commands.insert(command_name.to_owned(), cmd);
+        self.0.commands.insert(command_name.to_owned(), CommandOrAlias::Command(cmd));
 
         self
     }
@@ -50,6 +58,8 @@ impl CreateGroup {
     /// we'd call a subcommand named "hibiki" by sending "~image hibiki".
     ///
     /// **Note**: serenity automatically puts a space after group prefix.
+    ///
+    /// **Note**: It's suggested to call this first when making a group.
     pub fn prefix(mut self, desc: &str) -> Self {
         self.0.prefix = Some(desc.to_owned());
 

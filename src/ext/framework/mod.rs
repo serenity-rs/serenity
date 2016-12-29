@@ -62,7 +62,7 @@ mod create_group;
 mod buckets;
 
 pub use self::buckets::{Bucket, MemberRatelimit, Ratelimit};
-pub use self::command::{Command, CommandType, CommandGroup};
+pub use self::command::{Command, CommandType, CommandGroup, CommandOrAlias};
 pub use self::configuration::{AccountType, Configuration};
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
@@ -113,28 +113,28 @@ use ::client::CACHE;
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
-        pub fn $fname($c: &$crate::client::Context, _: &$crate::model::Message, _: Vec<String>) -> Result<(), String> {
+        pub fn $fname($c: &$crate::client::Context, _: &$crate::model::Message, _: Vec<String>) -> std::result::Result<(), String> {
             $b
 
             Ok(())
         }
     };
     ($fname:ident($c:ident, $m:ident) $b:block) => {
-        pub fn $fname($c: &$crate::client::Context, $m: &$crate::model::Message, _: Vec<String>) -> Result<(), String> {
+        pub fn $fname($c: &$crate::client::Context, $m: &$crate::model::Message, _: Vec<String>) -> std::result::Result<(), String> {
             $b
 
             Ok(())
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
-        pub fn $fname($c: &$crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> Result<(), String> {
+        pub fn $fname($c: &$crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> std::result::Result<(), String> {
             $b
 
             Ok(())
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
-        pub fn $fname($c: &$crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> Result<(), String> {
+        pub fn $fname($c: &$crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> std::result::Result<(), String> {
             let mut i = $a.iter();
             let mut arg_counter = 0;
 
@@ -322,8 +322,14 @@ impl Framework {
                 let groups = self.groups.clone();
 
                 for group in groups.values() {
+                    let command_length = built.len();
+
+                    if let Some(&CommandOrAlias::Alias(ref points_to)) = group.commands.get(&built) {
+                        built = points_to.to_owned();
+                    }
+
                     let to_check = if let Some(ref prefix) = group.prefix {
-                        if built.starts_with(prefix) && built.len() > prefix.len() + 1 {
+                        if built.starts_with(prefix) && command_length > prefix.len() + 1 {
                             built[(prefix.len() + 1)..].to_owned()
                         } else {
                             continue;
@@ -332,7 +338,7 @@ impl Framework {
                         built.clone()
                     };
 
-                    if let Some(command) = group.commands.get(&to_check) {
+                    if let Some(&CommandOrAlias::Command(ref command)) = group.commands.get(&to_check) {
                         let is_owner = self.configuration.owners.contains(&message.author.id);
                         // Most of the checks don't apply to owners.
                         if !is_owner {
@@ -447,9 +453,9 @@ impl Framework {
                         let groups = self.groups.clone();
 
                         let args = if command.use_quotes {
-                            utils::parse_quotes(&message.content[position + built.len()..])
+                            utils::parse_quotes(&message.content[position + command_length..])
                         } else {
-                            message.content[position + built.len()..]
+                            message.content[position + command_length..]
                                 .split_whitespace()
                                 .map(|arg| arg.to_owned())
                                 .collect::<Vec<String>>()
@@ -566,7 +572,7 @@ impl Framework {
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
                 let name = command_name.into();
 
-                group.commands.insert(name, Arc::new(Command::new(f)));
+                group.commands.insert(name, CommandOrAlias::Command(Arc::new(Command::new(f))));
             }
         }
 
@@ -597,7 +603,17 @@ impl Framework {
                 let cmd = f(CreateCommand(Command::default())).0;
                 let name = command_name.into();
 
-                group.commands.insert(name, Arc::new(cmd));
+                if let Some(ref prefix) = group.prefix {
+                    for v in &cmd.aliases {
+                        group.commands.insert(format!("{} {}", prefix, v.to_owned()), CommandOrAlias::Alias(format!("{} {}", prefix, name)));
+                    }
+                } else {
+                    for v in &cmd.aliases {
+                        group.commands.insert(v.to_owned(), CommandOrAlias::Alias(name.clone()));
+                    }
+                }
+
+                group.commands.insert(name, CommandOrAlias::Command(Arc::new(cmd)));
             }
         }
 
@@ -675,7 +691,7 @@ impl Framework {
             if let Some(group) = Arc::get_mut(ungrouped) {
                 let name = command.into();
 
-                if let Some(ref mut command) = group.commands.get_mut(&name) {
+                if let Some(&mut CommandOrAlias::Command(ref mut command)) = group.commands.get_mut(&name) {
                     if let Some(command) = Arc::get_mut(command) {
                         command.checks.push(Box::new(check));
                     }
