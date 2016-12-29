@@ -26,14 +26,20 @@ macro_rules! handler {
 
 macro_rules! update {
     ($method:ident, $event:expr) => {
-        feature_cache_enabled! {{
-            CACHE.write().unwrap().$method(&$event)
-        }}
+        {
+            #[cfg(feature="cache")]
+            {
+                CACHE.write().unwrap().$method(&$event)
+            }
+        }
     };
     ($method:ident, $event:expr, $old:expr) => {
-        feature_cache_enabled! {{
-            CACHE.write().unwrap().$method(&$event, $old)
-        }}
+        {
+            #[cfg(feature="cache")]
+            {
+                CACHE.write().unwrap().$method(&$event, $old)
+            }
+        }
     };
 }
 
@@ -169,9 +175,10 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_cache_enabled! {{
+                #[cfg(feature="cache")]
+                {
                     update!(update_with_call_update, event, false);
-                }}
+                }
             }
         },
         Event::ChannelCreate(event) => {
@@ -355,9 +362,10 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_cache_enabled! {{
+                #[cfg(feature="cache")]
+                {
                     let _full = update!(update_with_guild_delete, event);
-                }}
+                }
             }
         },
         Event::GuildEmojisUpdate(event) => {
@@ -411,9 +419,10 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_cache_enabled! {{
+                #[cfg(feature="cache")]
+                {
                     let _member = update!(update_with_guild_member_remove, event);
-                }}
+                }
             }
         },
         Event::GuildMemberUpdate(event) => {
@@ -486,9 +495,10 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_cache_enabled! {{
+                #[cfg(feature="cache")]
+                {
                     let _role = update!(update_with_guild_role_delete, event);
-                }}
+                }
             }
         },
         Event::GuildRoleUpdate(event) => {
@@ -508,9 +518,10 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_cache_enabled! {{
+                #[cfg(feature="cache")]
+                {
                     let _before = update!(update_with_guild_role_update, event);
-                }}
+                }
             }
         },
         Event::GuildSync(event) => {
@@ -765,9 +776,10 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_cache_enabled! {{
+                #[cfg(feature="cache")]
+                {
                     let _before = update!(update_with_user_guild_settings_update, event);
-                }}
+                }
             }
         },
         Event::UserNoteUpdate(event) => {
@@ -787,9 +799,10 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_cache_enabled! {{
+                #[cfg(feature="cache")]
+                {
                     let _before = update!(update_with_user_note_update, event);
-                }}
+                }
             }
         },
         Event::UserSettingsUpdate(event) => {
@@ -810,9 +823,10 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_cache_enabled! {{
+                #[cfg(feature="cache")]
+                {
                     update!(update_with_user_settings_update, event, false);
-                }}
+                }
             }
         },
         Event::UserUpdate(event) => {
@@ -832,9 +846,10 @@ fn handle_event(event: Event,
                     });
                 }}
             } else {
-                feature_cache_enabled! {{
+                #[cfg(feature="cache")]
+                {
                     let _before = update!(update_with_user_update, event);
-                }}
+                }
             }
         },
         Event::VoiceServerUpdate(event) => {

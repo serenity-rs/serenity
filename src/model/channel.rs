@@ -438,7 +438,8 @@ impl Message {
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<()> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::MANAGE_MESSAGES;
             let is_author = self.author.id == CACHE.read().unwrap().user.id;
             let has_perms = utils::user_has_perms(self.channel_id, req)?;
@@ -446,7 +447,7 @@ impl Message {
             if !is_author && !has_perms {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         rest::delete_message(self.channel_id.0, self.id.0)
     }
@@ -466,13 +467,14 @@ impl Message {
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[cfg(feature="methods")]
     pub fn delete_reactions(&self) -> Result<()> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::MANAGE_MESSAGES;
 
             if !utils::user_has_perms(self.channel_id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         rest::delete_message_reactions(self.channel_id.0, self.id.0)
     }
@@ -508,11 +510,12 @@ impl Message {
             return Err(Error::Client(ClientError::MessageTooLong(length_over)));
         }
 
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             if self.author.id != CACHE.read().unwrap().user.id {
                 return Err(Error::Client(ClientError::InvalidUser));
             }
-        }}
+        }
 
         let mut map = ObjectBuilder::new().insert("content", new_content);
 
@@ -611,13 +614,14 @@ impl Message {
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[cfg(feature="methods")]
     pub fn pin(&self) -> Result<()> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::MANAGE_MESSAGES;
 
             if !utils::user_has_perms(self.channel_id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         rest::pin_message(self.channel_id.0, self.id.0)
     }
@@ -638,13 +642,14 @@ impl Message {
     /// [permissions]: permissions
     #[cfg(feature="methods")]
     pub fn react<R: Into<ReactionType>>(&self, reaction_type: R) -> Result<()> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::ADD_REACTIONS;
 
             if !utils::user_has_perms(self.channel_id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         rest::create_reaction(self.channel_id.0,
                               self.id.0,
@@ -679,13 +684,14 @@ impl Message {
             return Err(Error::Client(ClientError::MessageTooLong(length_over)));
         }
 
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::SEND_MESSAGES;
 
             if !utils::user_has_perms(self.channel_id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         let mut gen = self.author.mention();
         gen.push_str(": ");
@@ -714,13 +720,14 @@ impl Message {
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[cfg(feature="methods")]
     pub fn unpin(&self) -> Result<()> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::MANAGE_MESSAGES;
 
             if !utils::user_has_perms(self.channel_id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         rest::unpin_message(self.channel_id.0, self.id.0)
     }
@@ -782,11 +789,12 @@ impl PrivateChannel {
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
     #[cfg(feature="methods")]
     pub fn delete_messages(&self, message_ids: &[MessageId]) -> Result<()> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             if !CACHE.read().unwrap().user.bot {
                 return Err(Error::Client(ClientError::InvalidOperationAsUser));
             }
-        }}
+        }
 
         let ids: Vec<u64> = message_ids.into_iter()
             .map(|message_id| message_id.0)
@@ -881,13 +889,14 @@ impl GuildChannel {
     #[cfg(feature="methods")]
     pub fn create_invite<F>(&self, f: F) -> Result<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::CREATE_INVITE;
 
             if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         let map = f(CreateInvite::default()).0.build();
 
@@ -925,13 +934,14 @@ impl GuildChannel {
     /// Deletes this channel, returning the channel on a successful deletion.
     #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<Channel> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::MANAGE_CHANNELS;
 
             if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         rest::delete_channel(self.id.0)
     }
@@ -953,13 +963,14 @@ impl GuildChannel {
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
 
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::MANAGE_CHANNELS;
 
             if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         let map = ObjectBuilder::new()
             .insert("name", &self.name)
@@ -1017,13 +1028,14 @@ impl GuildChannel {
             return Err(Error::Client(ClientError::MessageTooLong(length_over)));
         }
 
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::SEND_MESSAGES;
 
             if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         let map = ObjectBuilder::new()
             .insert("content", content)

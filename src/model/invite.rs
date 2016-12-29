@@ -32,11 +32,12 @@ impl Invite {
     /// [permission]: permissions/index.html
     #[cfg(feature="methods")]
     pub fn accept(&self) -> Result<Invite> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             if CACHE.read().unwrap().user.bot {
                 return Err(Error::Client(ClientError::InvalidOperationAsBot));
             }
-        }}
+        }
 
         rest::accept_invite(&self.code)
     }
@@ -55,13 +56,14 @@ impl Invite {
     /// [permission]: permissions/index.html
     #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<Invite> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::MANAGE_GUILD;
 
             if !utils::user_has_perms(self.channel.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         rest::delete_invite(&self.code)
     }
@@ -89,11 +91,12 @@ impl RichInvite {
     /// [`rest::accept_invite`]: ../client/rest/fn.accept_invite.html
     #[cfg(feature="methods")]
     pub fn accept(&self) -> Result<Invite> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             if CACHE.read().unwrap().user.bot {
                 return Err(Error::Client(ClientError::InvalidOperationAsBot));
             }
-        }}
+        }
 
         rest::accept_invite(&self.code)
     }
@@ -117,13 +120,14 @@ impl RichInvite {
     /// [permission]: permissions/index.html
     #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<Invite> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::MANAGE_GUILD;
 
             if !utils::user_has_perms(self.channel.id, req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         rest::delete_invite(&self.code)
     }

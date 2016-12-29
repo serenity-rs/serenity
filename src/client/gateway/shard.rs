@@ -412,7 +412,8 @@ impl Shard {
             let _ = self.keepalive_channel.send(status);
         }
 
-        feature_voice_enabled! {{
+        #[cfg(feature="voice")]
+        {
             if let Event::VoiceStateUpdate(ref update) = *event {
                 if let Some(guild_id) = update.guild_id {
                     if let Some(handler) = self.manager.get(guild_id) {
@@ -428,7 +429,7 @@ impl Shard {
                     }
                 }
             }
-        }}
+        }
     }
 
     fn reconnect(&mut self, mut receiver: &mut Receiver<WebSocketStream>)

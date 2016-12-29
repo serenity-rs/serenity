@@ -239,13 +239,14 @@ impl Guild {
             return Err(Error::Client(ClientError::DeleteMessageDaysAmount(delete_message_days)));
         }
 
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::BAN_MEMBERS;
 
             if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         rest::ban_user(self.id.0, user.into().0, delete_message_days)
     }
@@ -264,13 +265,14 @@ impl Guild {
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature="methods")]
     pub fn bans(&self) -> Result<Vec<Ban>> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::BAN_MEMBERS;
 
             if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         rest::get_bans(self.id.0)
     }
@@ -300,13 +302,14 @@ impl Guild {
     #[cfg(feature="methods")]
     pub fn create_channel(&mut self, name: &str, kind: ChannelType)
         -> Result<Channel> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::MANAGE_CHANNELS;
 
             if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         let map = ObjectBuilder::new()
             .insert("name", name)
@@ -334,13 +337,14 @@ impl Guild {
     #[cfg(feature="methods")]
     pub fn create_role<F>(&self, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::MANAGE_ROLES;
 
             if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         let role = rest::create_role(self.id.0)?;
         let map = f(EditRole::new(&role)).0.build();
@@ -406,13 +410,14 @@ impl Guild {
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
     #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<PartialGuild> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             if self.owner_id != CACHE.read().unwrap().user.id {
                 let req = permissions::MANAGE_GUILD;
 
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         rest::delete_guild(self.id.0)
     }
@@ -434,13 +439,14 @@ impl Guild {
     #[cfg(feature="methods")]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditGuild) -> EditGuild {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::MANAGE_GUILD;
 
             if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         let map = f(EditGuild::default()).0.build();
 
@@ -482,13 +488,14 @@ impl Guild {
     /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
     #[cfg(feature="methods")]
     pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::CHANGE_NICKNAME;
 
             if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         rest::edit_nickname(self.id.0, new_nickname)
     }
@@ -514,13 +521,14 @@ impl Guild {
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[cfg(feature="methods")]
     pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::MANAGE_GUILD;
 
             if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         rest::get_guild_invites(self.id.0)
     }
@@ -725,13 +733,14 @@ impl Guild {
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     #[cfg(feature="methods")]
     pub fn prune_count(&self, days: u16) -> Result<GuildPrune> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::KICK_MEMBERS;
 
             if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         let map = ObjectBuilder::new()
             .insert("days", days)
@@ -764,13 +773,14 @@ impl Guild {
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     #[cfg(feature="methods")]
     pub fn start_prune(&self, days: u16) -> Result<GuildPrune> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::KICK_MEMBERS;
 
             if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         let map = ObjectBuilder::new()
             .insert("days", days)
@@ -793,13 +803,14 @@ impl Guild {
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature="methods")]
     pub fn unban<U: Into<UserId>>(&self, user: U) -> Result<()> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let req = permissions::BAN_MEMBERS;
 
             if !self.has_perms(req)? {
                 return Err(Error::Client(ClientError::InvalidPermissions(req)));
             }
-        }}
+        }
 
         rest::remove_ban(self.id.0, user.into().0)
     }
