@@ -810,11 +810,12 @@ impl Client {
                 Ok((shard, ready, receiver)) => {
                     self.shards.push(Arc::new(Mutex::new(shard)));
 
-                    feature_cache_enabled! {{
+                    #[cfg(feature="cache")]
+                    {
                         CACHE.write()
                             .unwrap()
                             .update_with_ready(&ready);
-                    }}
+                    }
 
                     match self.shards.last() {
                         Some(shard) => {

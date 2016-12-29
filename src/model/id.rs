@@ -19,11 +19,12 @@ impl ChannelId {
     /// requested over REST.
     #[cfg(feature="methods")]
     pub fn get(&self) -> Result<Channel> {
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             if let Some(channel) = CACHE.read().unwrap().get_channel(*self) {
                 return Ok(channel.clone_inner());
             }
-        }}
+        }
 
         rest::get_channel(self.0)
     }

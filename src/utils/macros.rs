@@ -62,34 +62,6 @@ macro_rules! feature_cache {
     }
 }
 
-#[cfg(feature="cache")]
-macro_rules! feature_cache_enabled {
-    ($enabled:block) => {
-        {
-            $enabled
-        }
-    }
-}
-
-#[cfg(not(feature="cache"))]
-macro_rules! feature_cache_enabled {
-    ($enabled:block) => {{}}
-}
-
-#[cfg(feature="cache")]
-macro_rules! feature_cache_disabled {
-    ($disabled:block) => {{}}
-}
-
-#[cfg(not(feature="cache"))]
-macro_rules! feature_cache_disabled {
-    ($disabled:block) => {
-        {
-            $disabled
-        }
-    }
-}
-
 // Enable/disable check for framework
 #[cfg(feature="framework")]
 macro_rules! feature_framework {
@@ -103,34 +75,6 @@ macro_rules! feature_framework {
 #[cfg(not(feature="framework"))]
 macro_rules! feature_framework {
     ($enabled:block else $disabled:block) => {
-        {
-            $disabled
-        }
-    }
-}
-
-#[cfg(feature="framework")]
-macro_rules! feature_framework_enabled {
-    ($enabled:block) => {
-        {
-            $enabled
-        }
-    }
-}
-
-#[cfg(not(feature="framework"))]
-macro_rules! feature_framework_enabled {
-    ($enabled:block) => {{}}
-}
-
-#[cfg(feature="framework")]
-macro_rules! feature_framework_disabled {
-    ($disabled:block) => {{}}
-}
-
-#[cfg(not(feature="framework"))]
-macro_rules! feature_framework_disabled {
-    ($disabled:block) => {
         {
             $disabled
         }
@@ -156,34 +100,6 @@ macro_rules! feature_methods {
     }
 }
 
-#[cfg(feature="methods")]
-macro_rules! feature_methods_enabled {
-    ($enabled:block) => {
-        {
-            $enabled
-        }
-    }
-}
-
-#[cfg(not(feature="methods"))]
-macro_rules! feature_methods_enabled {
-    ($enabled:block) => {{}}
-}
-
-#[cfg(feature="methods")]
-macro_rules! feature_methods_disabled {
-    ($disabled:block) => {{}}
-}
-
-#[cfg(not(feature="methods"))]
-macro_rules! feature_methods_disabled {
-    ($disabled:block) => {
-        {
-            $disabled
-        }
-    }
-}
-
 // Enable/disable check for voice
 #[cfg(feature="voice")]
 macro_rules! feature_voice {
@@ -197,34 +113,6 @@ macro_rules! feature_voice {
 #[cfg(not(feature="voice"))]
 macro_rules! feature_voice {
     ($enabled:block else $disabled:block) => {
-        {
-            $disabled
-        }
-    }
-}
-
-#[cfg(feature="voice")]
-macro_rules! feature_voice_enabled {
-    ($enabled:block) => {
-        {
-            $enabled
-        }
-    }
-}
-
-#[cfg(not(feature="voice"))]
-macro_rules! feature_voice_enabled {
-    ($enabled:block) => {{}}
-}
-
-#[cfg(feature="voice")]
-macro_rules! feature_voice_disabled {
-    ($disabled:block) => {{}}
-}
-
-#[cfg(not(feature="voice"))]
-macro_rules! feature_voice_disabled {
-    ($disabled:block) => {
         {
             $disabled
         }

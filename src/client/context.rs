@@ -1044,11 +1044,12 @@ impl Context {
         where C: Into<ChannelId> {
         let channel_id = channel_id.into();
 
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             if let Some(channel) = CACHE.read().unwrap().get_channel(channel_id) {
                 return Ok(channel.clone_inner());
             }
-        }}
+        }
 
         rest::get_channel(channel_id.0)
     }
@@ -1060,13 +1061,14 @@ impl Context {
         -> Result<HashMap<ChannelId, GuildChannel>> where G: Into<GuildId> {
         let guild_id = guild_id.into();
 
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let cache = CACHE.read().unwrap();
 
             if let Some(guild) = cache.get_guild(guild_id) {
                 return Ok(guild.channels.clone());
             }
-        }}
+        }
 
         let mut channels = HashMap::new();
 
@@ -1193,13 +1195,14 @@ impl Context {
         let guild_id = guild_id.into();
         let user_id = user_id.into();
 
-        feature_cache_enabled! {{
+        #[cfg(feature="cache")]
+        {
             let cache = CACHE.read().unwrap();
 
             if let Some(member) = cache.get_member(guild_id, user_id) {
                 return Ok(member.clone());
             }
-        }}
+        }
 
         rest::get_member(guild_id.0, user_id.0)
     }
