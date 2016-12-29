@@ -105,6 +105,14 @@ impl CurrentUser {
     pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
         rest::get_guilds(GuildPagination::After(GuildId(0)), 100)
     }
+
+    /// Returns a static formatted URL of the user's icon, if one exists.
+    ///
+    /// This will always produce a WEBP image URL.
+    pub fn static_avatar_url(&self) -> Option<String> {
+        self.avatar.as_ref()
+            .map(|av| format!(cdn!("/avatars/{}/{}.webp?size=1024"), self.id.0, av))
+    }
 }
 
 impl User {
@@ -234,6 +242,14 @@ impl User {
                 }}
             },
         }
+    }
+
+    /// Returns a static formatted URL of the user's icon, if one exists.
+    ///
+    /// This will always produce a WEBP image URL.
+    pub fn static_avatar_url(&self) -> Option<String> {
+        self.avatar.as_ref()
+            .map(|av| format!(cdn!("/avatars/{}/{}.webp?size=1024"), self.id.0, av))
     }
 }
 
