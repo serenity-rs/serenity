@@ -554,7 +554,7 @@ impl Shard {
                         Event::Ready(ref ready) => {
                             self.session_id = Some(ready.ready.session_id.clone());
                         },
-                        Event::Resumed { .. } => info!("Resumed"),
+                        Event::Resumed(_) => info!("Resumed"),
                         ref other => warn!("Unknown resume event: {:?}", other),
                     }
 
