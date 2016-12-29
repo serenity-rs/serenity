@@ -261,6 +261,7 @@ impl Shard {
     /// - `Ok(Some((event, None)))`: an op0 dispatch was received, and the
     ///   shard's voice state will be updated, _if_ the `voice` feature is
     ///   enabled.
+    #[allow(cyclomatic_complexity)]
     #[doc(hidden)]
     pub fn handle_event(&mut self,
                         event: Result<GatewayEvent>,
