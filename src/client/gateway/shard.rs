@@ -239,12 +239,11 @@ impl Shard {
     /// ```
     pub fn set_presence(&mut self,
                         game: Option<Game>,
-                        status: OnlineStatus,
+                        mut status: OnlineStatus,
                         afk: bool) {
-        let status = match status {
-            OnlineStatus::Offline => OnlineStatus::Invisible,
-            other => other,
-        };
+        if status == OnlineStatus::Offline {
+            status = OnlineStatus::Invisible;
+        }
 
         self.current_presence = (game, status, afk);
 
