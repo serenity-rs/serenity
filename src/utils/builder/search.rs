@@ -114,25 +114,24 @@ impl SortingOrder {
 /// use serenity::utils::builder::{SortingMode, SortingOrder};
 /// use std::env;
 ///
-/// let client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN").unwrap());
+/// let mut client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN").unwrap());
 ///
 /// client.with_framework(|f| f
 ///     .configure(|c| c.prefix("~").on_mention(true))
 ///     .on("search", search));
 ///
-/// fn search(context: Context, message: Message, args: Vec<String>) {
+/// fn search(context: &Context, message: &Message, args: Vec<String>) -> Result<(), String> {
 ///     let query = args.join(" ");
 ///
 ///     if query.is_empty() {
 ///         let _ = context.say("You must provide a query");
 ///
-///         return;
+///         return Ok(());
 ///     }
 ///
-///     let guild = match message.guild().unwrap();
+///     let guild = message.guild().unwrap();
 ///
-///     let channel_ids = guild.iter()
-///         .channels
+///     let channel_ids = guild.channels
 ///         .values()
 ///         .filter(|c| c.name.starts_with("search-"))
 ///         .map(|c| c.id)
@@ -147,31 +146,37 @@ impl SortingOrder {
 ///         .sort_by(SortingMode::Timestamp)
 ///         .sort_order(SortingOrder::Descending));
 ///
-///     let messages = match search {
+///     let mut messages = match search {
 ///         Ok(messages) => messages,
 ///         Err(why) => {
 ///             println!("Error performing search '{}': {:?}", query, why);
 ///
 ///             let _ = context.say("Error occurred while searching");
 ///
-///             return;
+///             return Ok(());
 ///         },
 ///     };
 ///
 ///     let _ = context.send_message(message.channel_id, |m| m
 ///         .content(&format!("Found {} total results", messages.total))
-///         .embed(|e| {
-///             for (i, messages) in messages.results.iter().enumerate() {
-///                 let mut message = messages[0];
+///         .embed(|mut e| {
+///             for (i, messages) in messages.results.iter_mut().enumerate() {
+///                 let mut message = match messages.get_mut(i) {
+///                     Some(message) => message,
+///                     None => break,
+///                 };
+///
 ///                 message.content.truncate(1000);
 ///
-///                 e.field(|f| f
+///                 e = e.field(|f| f
 ///                     .name(&format!("Result {}", i))
 ///                     .value(&message.content));
 ///              }
 ///
 ///              e
 ///         }));
+///
+///     Ok(())
 /// }
 /// ```
 ///
