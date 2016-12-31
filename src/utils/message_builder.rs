@@ -40,7 +40,7 @@ impl MessageBuilder {
     ///
     /// # Examples
     ///
-    /// This is equivilant to simply retrieving the tuple struct's first value:
+    /// This is equivalent to simply retrieving the tuple struct's first value:
     ///
     /// ```rust
     /// use serenity::utils::MessageBuilder;

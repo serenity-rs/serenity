@@ -144,8 +144,8 @@ pub struct Cache {
     pub guilds: HashMap<GuildId, Guild>,
     /// A map of notes that a user has made for individual users.
     ///
-    /// An empty note is equivilant to having no note, and creating an empty
-    /// note is equivilant to deleting a note.
+    /// An empty note is equivalent to having no note, and creating an empty
+    /// note is equivalent to deleting a note.
     ///
     /// This will always be empty for bot users.
     pub notes: HashMap<UserId, String>,

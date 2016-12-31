@@ -211,9 +211,9 @@ impl Handler {
     ///
     /// This has 3 separate behaviors:
     ///
-    /// - if the given `channel_id` is equivilant to the current connected
+    /// - if the given `channel_id` is equivalent to the current connected
     ///   `channel_id`, then do nothing;
-    /// - if the given `channel_id` is _not_ equivilant to the current connected
+    /// - if the given `channel_id` is _not_ equivalent to the current connected
     ///   `channel_id`, then switch to the given `channel_id`;
     /// - if not currently connected to a voice channel, connect to the given
     /// one.

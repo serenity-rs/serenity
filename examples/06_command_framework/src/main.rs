@@ -42,7 +42,7 @@ fn main() {
         println!("{} is connected!", ready.user.name);
     });
 
-    // Commands are equivilant to:
+    // Commands are equivalent to:
     // "~about"
     // "~emoji cat"
     // "~emoji dog"

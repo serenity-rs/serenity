@@ -19,7 +19,7 @@ macro_rules! colour {
 /// as the API works with an integer value instead of an RGB value.
 ///
 /// Instances can be created by using the struct's associated functions. These
-/// produce presets equivilant to those found in the official client's colour
+/// produce presets equivalent to those found in the official client's colour
 /// picker.
 ///
 /// # Examples
@@ -76,7 +76,7 @@ impl Colour {
     ///
     /// # Examples
     ///
-    /// Create a new Colour, and then ensure that its inner value is equivilant
+    /// Create a new Colour, and then ensure that its inner value is equivalent
     /// to a specific RGB value, retrieved via [`get_tuple`]:
     ///
     /// ```rust
@@ -177,7 +177,7 @@ impl Colour {
 
     /// Returns a tuple of the red, green, and blue components of this Colour.
     ///
-    /// This is equivilant to creating a tuple with the return values of
+    /// This is equivalent to creating a tuple with the return values of
     /// [`get_r`], [`get_g`], and [`get_b`].
     ///
     /// # Examples

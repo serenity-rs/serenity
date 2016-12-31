@@ -40,7 +40,7 @@ fields:
   - name: icon
     description: >
       A hash pointing to the application's icon. This is not necessarily
-      equivilant to the bot user's avatar. If there is no icon assigned, then
+      equivalent to the bot user's avatar. If there is no icon assigned, then
       this is None.
     optional: true
     type: string
@@ -60,6 +60,6 @@ fields:
     type: string
   - name: secret
     description: >
-      The given secret to the application. Note that this is not equivilant to
+      The given secret to the application. Note that this is not equivalent to
       an application's bot user's token.
     type: string

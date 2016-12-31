@@ -272,7 +272,7 @@ impl Client {
     ///
     /// This will retrieve an automatically determined number of shards to use
     /// from the API - determined by Discord - and then open a number of shards
-    /// equivilant to that amount.
+    /// equivalent to that amount.
     ///
     /// Refer to the [Gateway documentation][gateway docs] for more information
     /// on effectively using sharding.

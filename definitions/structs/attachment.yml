@@ -10,7 +10,7 @@ fields:
     type: string
   - name: filename
     description: >
-      The filename of the file that was uploaded. This is equivilant to what the
+      The filename of the file that was uploaded. This is equivalent to what the
       uploader had their file named.
     type: string
   - name: height

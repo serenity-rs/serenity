@@ -8,7 +8,7 @@ fn main() {
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
 
-    // Logging in is essentially equivilant to logging in as a user.
+    // Logging in is essentially equivalent to logging in as a user.
     //
     // The primary difference is that by using `login_user`, the "Bot " string
     // is not prefixed to the token.

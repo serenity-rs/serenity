@@ -1289,7 +1289,7 @@ impl Role {
     /// Checks whether the role has all of the given permissions.
     ///
     /// The 'precise' argument is used to check if the role's permissions are
-    /// precisely equivilant to the given permissions. If you need only check
+    /// precisely equivalent to the given permissions. If you need only check
     /// that the role has at least the given permissions, pass `false`.
     pub fn has_permissions(&self, permissions: Permissions, precise: bool)
         -> bool {

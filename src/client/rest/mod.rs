@@ -74,7 +74,7 @@ pub fn set_token(token: &str) {
 /// event is received.
 ///
 /// **Note**: This will fail if you are already in the guild, or are banned. A
-/// ban is equivilant to an IP ban.
+/// ban is equivalent to an IP ban.
 ///
 /// **Note**: Requires that the current user be a user account. Bots can not
 /// accept invites. Instead, they must be accepted via OAuth2 authorization
@@ -160,7 +160,7 @@ pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> 
 /// Bans a [`User`] from a [`Guild`], removing their messages sent in the last
 /// X number of days.
 ///
-/// Passing a `delete_message_days` of `0` is equivilant to not removing any
+/// Passing a `delete_message_days` of `0` is equivalent to not removing any
 /// messages. Up to `7` days' worth of messages may be deleted.
 ///
 /// **Note**: Requires that you have the [Ban Members] permission.

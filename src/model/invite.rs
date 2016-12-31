@@ -16,7 +16,7 @@ impl Invite {
     /// Refer to [`rest::accept_invite`] for more information.
     ///
     /// **Note**: This will fail if you are already in the guild, or are banned.
-    /// A ban is equivilant to an IP ban.
+    /// A ban is equivalent to an IP ban.
     ///
     /// **Note**: Requires that the current user be a user account.
     ///
@@ -76,7 +76,7 @@ impl RichInvite {
     /// Refer to [`rest::accept_invite`] for more information.
     ///
     /// **Note**: This will fail if you are already in the guild, or are banned.
-    /// A ban is equivilant to an IP ban.
+    /// A ban is equivalent to an IP ban.
     ///
     /// **Note**: Requires that the current user be a user account.
     ///

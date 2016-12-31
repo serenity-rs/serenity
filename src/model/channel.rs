@@ -863,7 +863,7 @@ impl PrivateChannel {
     }
 
     /// Deletes the channel. This does not delete the contents of the channel,
-    /// and is equivilant to closing a private channel on the client, which can
+    /// and is equivalent to closing a private channel on the client, which can
     /// be re-opened.
     #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<Channel> {

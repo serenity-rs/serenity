@@ -14,7 +14,7 @@
 //! `GET /channels/5/messages/8` being rate limited _separately_. However, the
 //! two URIs of `GET /channels/10/messages/11` and
 //! `GET /channels/10/messages/12` will count towards the "same ratelimit", as
-//! the major parameter - `10` is equivilant in both URIs' format.
+//! the major parameter - `10` is equivalent in both URIs' format.
 //!
 //! # Examples
 //!
@@ -30,7 +30,7 @@
 //! `10`, requesting the first URI will return a `remaining` of `9` in the
 //! response. Immediately after - prior to buckets resetting - performing a
 //! request to the _second_ URI will return a `remaining` of `8` in the
-//! response, as the major parameter - `channel_id` - is equivilant for the two
+//! response, as the major parameter - `channel_id` - is equivalent for the two
 //! requests (`10`).
 //!
 //!

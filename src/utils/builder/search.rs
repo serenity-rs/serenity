@@ -19,7 +19,7 @@ pub enum SortingMode {
 }
 
 impl SortingMode {
-    /// Retrieves the name of the sorting mode. This is equivilant to a
+    /// Retrieves the name of the sorting mode. This is equivalent to a
     /// lowercase string version of each variant.
     pub fn name(&self) -> &str {
         match *self {
@@ -60,7 +60,7 @@ pub enum SortingOrder {
 }
 
 impl SortingOrder {
-    /// Retrieves the name of the sorting order. This is equivilant to a
+    /// Retrieves the name of the sorting order. This is equivalent to a
     /// lowercase string version of each variant.
     pub fn name(&self) -> &str {
         match *self {
