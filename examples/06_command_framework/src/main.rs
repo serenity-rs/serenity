@@ -120,7 +120,7 @@ fn main() {
         .command("ping", |c| c
             .check(owner_check)
             .exec_str("Pong!"))
-        .command("some long command", |c| c.exec(some_long_command)));
+        .command("test", |c| c.exec(some_long_command)));
 
     if let Err(why) = client.start() {
         println!("Client error: {:?}", why);

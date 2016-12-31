@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::fmt::Write as FmtWrite;
 use std::io::Read;
 use std::sync::{Arc, Mutex};
+use std::ops::{Shl, ShlAssign};
 use super::gateway::Shard;
 use super::rest::{self, GuildPagination};
 use super::login_type::LoginType;
@@ -94,6 +95,8 @@ pub struct Context {
     /// Note that if you are sharding, in relevant terms, this is the shard
     /// which received the event being dispatched.
     pub shard: Arc<Mutex<Shard>>,
+    /// The queue of messages that are sent after context goes out of scope.
+    pub queue: Vec<String>,
     login_type: LoginType,
 }
 
@@ -115,6 +118,7 @@ impl Context {
             data: data,
             shard: shard,
             login_type: login_type,
+            queue: Vec::new()
         }
     }
 
@@ -1445,6 +1449,15 @@ impl Context {
         }
     }
 
+    /// Adds a string to message queue, which is sent when context goes out of scope.
+    ///
+    /// **Note**: Only works if the `say` method works.
+    pub fn queue(mut self, content: &str) -> Self {
+        self.queue.push(content.to_owned());
+
+        self
+    }
+
     /// Searches a [`Channel`]'s messages by providing query parameters via the
     /// search builder.
     ///
@@ -1878,5 +1891,28 @@ impl Context {
     pub fn unpin<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
         rest::unpin_message(channel_id.into().0, message_id.into().0)
+    }
+}
+
+impl Drop for Context {
+    /// Combines and sends all queued messages.
+    fn drop(&mut self) {
+        if !self.queue.is_empty() {
+            let _ = self.say(&self.queue.join("\n"));
+        }
+    }
+}
+
+impl ShlAssign<&'static str> for Context {
+    fn shl_assign(&mut self, rhs: &str) {
+        let _ = self.say(&rhs);
+    }
+}
+
+impl Shl<&'static str> for Context {
+    type Output = Self;
+
+    fn shl(self, rhs: &str) -> Self {
+        self.queue(&rhs)
     }
 }
