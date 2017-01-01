@@ -3,8 +3,6 @@ use std::collections::HashMap;
 use std::fmt::Write as FmtWrite;
 use std::io::Read;
 use std::sync::{Arc, Mutex};
-#[cfg(feature="extras")]
-use std::ops::ShlAssign;
 use super::gateway::Shard;
 use super::rest::{self, GuildPagination};
 use super::login_type::LoginType;
@@ -24,6 +22,9 @@ use ::utils::builder::{
 use ::internal::prelude::*;
 use ::model::*;
 use ::utils;
+
+#[cfg(feature="extras")]
+use std::ops::ShlAssign;
 
 #[cfg(feature="cache")]
 use super::CACHE;
@@ -119,7 +120,7 @@ impl Context {
             data: data,
             shard: shard,
             login_type: login_type,
-            queue: String::new()
+            queue: String::new(),
         }
     }
 
@@ -1453,10 +1454,13 @@ impl Context {
     /// Adds a string to message queue, which is sent joined by a newline
     /// when context goes out of scope.
     ///
-    /// **Note**: Only works if the `say` method works.
+    /// **Note**: Only works in a context where a channel is present. Refer to
+    /// [`say`] for a list of events where this is applicable.
+    ///
+    /// [`say`]: #method.say
     pub fn queue(&mut self, content: &str) -> &mut Self {
-        let to_push = "\n".to_owned() + content;
-        self.queue.push_str(&to_push);
+        self.queue.push('\n');
+        self.queue.push_str(content);
 
         self
     }
@@ -1908,7 +1912,7 @@ impl Drop for Context {
 
 /// Allows the `<<=` operator to be used to queue messages.
 #[cfg(feature="extras")]
-impl<'a> ShlAssign<&'static str> for &'a mut Context {
+impl<'a> ShlAssign<&'a str> for &'a mut Context {
     fn shl_assign(&mut self, rhs: &str) {
         self.queue(rhs);
     }

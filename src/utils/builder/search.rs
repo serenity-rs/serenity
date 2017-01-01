@@ -129,7 +129,7 @@ impl SortingOrder {
 ///         return Ok(());
 ///     }
 ///
-///     let guild = message.guild_id().unwrap().find().unwrap();
+///     let guild = message.guild().unwrap();
 ///
 ///     let channel_ids = guild
 ///         .channels
