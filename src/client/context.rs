@@ -3,7 +3,8 @@ use std::collections::HashMap;
 use std::fmt::Write as FmtWrite;
 use std::io::Read;
 use std::sync::{Arc, Mutex};
-use std::ops::{Shl, ShlAssign};
+#[cfg(feature="extras")]
+use std::ops::ShlAssign;
 use super::gateway::Shard;
 use super::rest::{self, GuildPagination};
 use super::login_type::LoginType;
@@ -96,7 +97,7 @@ pub struct Context {
     /// which received the event being dispatched.
     pub shard: Arc<Mutex<Shard>>,
     /// The queue of messages that are sent after context goes out of scope.
-    pub queue: Vec<String>,
+    pub queue: String,
     login_type: LoginType,
 }
 
@@ -118,7 +119,7 @@ impl Context {
             data: data,
             shard: shard,
             login_type: login_type,
-            queue: Vec::new()
+            queue: String::new()
         }
     }
 
@@ -907,7 +908,7 @@ impl Context {
     /// Change the current user's username:
     ///
     /// ```rust,ignore
-    /// context.edit_profile(|p| p.username("meew0"));
+    /// context.edit_profile(|p| p.username("Hakase"));
     /// ```
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F)
         -> Result<CurrentUser> {
@@ -1449,11 +1450,13 @@ impl Context {
         }
     }
 
-    /// Adds a string to message queue, which is sent when context goes out of scope.
+    /// Adds a string to message queue, which is sent joined by a newline
+    /// when context goes out of scope.
     ///
     /// **Note**: Only works if the `say` method works.
-    pub fn queue(mut self, content: &str) -> Self {
-        self.queue.push(content.to_owned());
+    pub fn queue(&mut self, content: &str) -> &mut Self {
+        let to_push = "\n".to_owned() + content;
+        self.queue.push_str(&to_push);
 
         self
     }
@@ -1898,21 +1901,15 @@ impl Drop for Context {
     /// Combines and sends all queued messages.
     fn drop(&mut self) {
         if !self.queue.is_empty() {
-            let _ = self.say(&self.queue.join("\n"));
+            let _ = self.say(&self.queue);
         }
     }
 }
 
-impl ShlAssign<&'static str> for Context {
+/// Allows the `<<=` operator to be used to queue messages.
+#[cfg(feature="extras")]
+impl<'a> ShlAssign<&'static str> for &'a mut Context {
     fn shl_assign(&mut self, rhs: &str) {
-        let _ = self.say(&rhs);
-    }
-}
-
-impl Shl<&'static str> for Context {
-    type Output = Self;
-
-    fn shl(self, rhs: &str) -> Self {
-        self.queue(&rhs)
+        self.queue(rhs);
     }
 }

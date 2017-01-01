@@ -113,28 +113,32 @@ use ::client::CACHE;
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
-        pub fn $fname($c: &$crate::client::Context, _: &$crate::model::Message, _: Vec<String>) -> std::result::Result<(), String> {
+        #[allow(unused_mut)]
+        pub fn $fname(mut $c: &mut $crate::client::Context, _: &$crate::model::Message, _: Vec<String>) -> std::result::Result<(), String> {
             $b
 
             Ok(())
         }
     };
     ($fname:ident($c:ident, $m:ident) $b:block) => {
-        pub fn $fname($c: &$crate::client::Context, $m: &$crate::model::Message, _: Vec<String>) -> std::result::Result<(), String> {
+        #[allow(unused_mut)]
+        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, _: Vec<String>) -> std::result::Result<(), String> {
             $b
 
             Ok(())
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
-        pub fn $fname($c: &$crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> std::result::Result<(), String> {
+        #[allow(unused_mut)]
+        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> std::result::Result<(), String> {
             $b
 
             Ok(())
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
-        pub fn $fname($c: &$crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> std::result::Result<(), String> {
+        #[allow(unused_mut)]
+        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> std::result::Result<(), String> {
             let mut i = $a.iter();
             let mut arg_counter = 0;
 
@@ -260,7 +264,7 @@ impl Framework {
 
     #[allow(cyclomatic_complexity)]
     #[doc(hidden)]
-    pub fn dispatch(&mut self, context: Context, message: Message) {
+    pub fn dispatch(&mut self, mut context: Context, message: Message) {
         match self.configuration.account_type {
             AccountType::Selfbot => {
                 if message.author.id != self.user_info.0 {
@@ -281,7 +285,7 @@ impl Framework {
             },
             AccountType::Any => {}
         }
-        let res = command::positions(&context, &message.content, &self.configuration);
+        let res = command::positions(&mut context, &message.content, &self.configuration);
 
         let positions = match res {
             Some(mut positions) => {
@@ -437,7 +441,7 @@ impl Framework {
                             }
 
                             for check in &command.checks {
-                                if !(check)(&context, &message) {
+                                if !(check)(&mut context, &message) {
                                     if let Some(ref message) = self.configuration.invalid_check_message {
                                         let _ = context.say(message);
                                     }
@@ -516,27 +520,27 @@ impl Framework {
 
                         thread::spawn(move || {
                             if let Some(before) = before {
-                                if !(before)(&context, &message, &built) && !is_owner {
+                                if !(before)(&mut context, &message, &built) && !is_owner {
                                     return;
                                 }
                             }
 
                             let result = match command.exec {
                                 CommandType::StringResponse(ref x) => {
-                                    let _ = &context.say(x);
+                                    let _ = &mut context.say(x);
 
                                     Ok(())
                                 },
                                 CommandType::Basic(ref x) => {
-                                    (x)(&context, &message, args)
+                                    (x)(&mut context, &message, args)
                                 },
                                 CommandType::WithCommands(ref x) => {
-                                    (x)(&context, &message, groups, args)
+                                    (x)(&mut context, &message, groups, args)
                                 }
                             };
 
                             if let Some(after) = after {
-                                (after)(&context, &message, &built, result);
+                                (after)(&mut context, &message, &built, result);
                             }
                         });
 
@@ -563,7 +567,7 @@ impl Framework {
     /// [`command`]: #method.command
     /// [module-level documentation]: index.html
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static,
+        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static,
               S: Into<String> {
         {
             let ungrouped = self.groups.entry("Ungrouped".to_owned())
@@ -636,7 +640,7 @@ impl Framework {
     /// Specify the function to be called prior to every command's execution.
     /// If that function returns true, the command will be executed.
     pub fn before<F>(mut self, f: F) -> Self
-        where F: Fn(&Context, &Message, &String) -> bool + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, &String) -> bool + Send + Sync + 'static {
         self.before = Some(Arc::new(f));
 
         self
@@ -645,7 +649,7 @@ impl Framework {
     /// Specify the function to be called after every command's execution.
     /// Fourth argument exists if command returned an error which you can handle.
     pub fn after<F>(mut self, f: F) -> Self
-        where F: Fn(&Context, &Message, &String, Result<(), String>) + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, &String, Result<(), String>) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
 
         self
@@ -675,14 +679,14 @@ impl Framework {
     ///     let _ = context.say("Pong!");
     /// });
     ///
-    /// fn owner_check(_context: &Context, message: &Message) -> bool {
+    /// fn owner_check(_context: &mut Context, message: &Message) -> bool {
     ///     // replace with your user ID
     ///     message.author.id == 7
     /// }
     /// ```
     #[deprecated(since="0.1.2", note="Use the `CreateCommand` builder's `check` instead.")]
     pub fn set_check<F, S>(mut self, command: S, check: F) -> Self
-        where F: Fn(&Context, &Message) -> bool + Send + Sync + 'static,
+        where F: Fn(&mut Context, &Message) -> bool + Send + Sync + 'static,
               S: Into<String> {
         {
             let ungrouped = self.groups.entry("Ungrouped".to_owned())

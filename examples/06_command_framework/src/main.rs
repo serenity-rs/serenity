@@ -81,9 +81,9 @@ fn main() {
             let entry = counter.entry(command_name.clone()).or_insert(0);
             *entry += 1;
 
-            true
+            true // if `before` returns false, command processing doesn't happen.
         })
-        // Very similar to `before`, except this will be called directly _after_
+        // Similar to `before`, except will be called directly _after_
         // command execution.
         .after(|_, _, command_name, error| {
             match error {
@@ -120,7 +120,7 @@ fn main() {
         .command("ping", |c| c
             .check(owner_check)
             .exec_str("Pong!"))
-        .command("test", |c| c.exec(some_long_command)));
+        .command("some long command", |c| c.exec(some_long_command)));
 
     if let Err(why) = client.start() {
         println!("Client error: {:?}", why);
@@ -153,7 +153,7 @@ command!(commands(context, _msg, _args) {
 // In this case, this command checks to ensure you are the owner of the message
 // in order for the command to be executed. If the check fails, the command is
 // not called.
-fn owner_check(_: &Context, message: &Message) -> bool {
+fn owner_check(_: &mut Context, message: &Message) -> bool {
     // Replace 7 with your ID
     message.author.id == 7
 }
