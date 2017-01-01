@@ -1412,13 +1412,6 @@ pub fn leave_guild(guild_id: u64) -> Result<PartialGuild> {
     PartialGuild::decode(serde_json::from_reader(response)?)
 }
 
-/// Logs out. That's supposed to disable the token but doesn't.
-pub fn logout(map: Value) -> Result<()> {
-    let body = serde_json::to_string(&map)?;
-
-    verify(204, request!(Route::None, post(body), "/auth/logout"))
-}
-
 /// Deletes a user from group DM.
 pub fn remove_group_recipient(group_id: u64, user_id: u64)
     -> Result<()> {

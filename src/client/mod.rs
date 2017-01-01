@@ -37,7 +37,6 @@ pub use self::login_type::LoginType;
 use self::dispatch::dispatch;
 use self::event_store::EventStore;
 use self::gateway::Shard;
-use serde_json::builder::ObjectBuilder;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::{Arc, Mutex, RwLock};
 use std::thread;
@@ -213,24 +212,6 @@ impl Client {
     /// [`LoginType::User`]: enum.LoginType.html#variant.User
     pub fn login_user(user_token: &str) -> Client {
         login(&user_token.to_owned(), LoginType::User)
-    }
-
-    /// Logout from the Discord API. This theoretically is supposed to
-    /// invalidate the current token, but currently does not do anything. This
-    /// is an issue on Discord's side.
-    ///
-    /// **Note**: This can only be used by users.
-    pub fn logout(self) -> Result<()> {
-        if self.login_type == LoginType::Bot {
-            return Err(Error::Client(ClientError::InvalidOperationAsBot));
-        }
-
-        let map = ObjectBuilder::new()
-            .insert("provider", Value::Null)
-            .insert("token", Value::Null)
-            .build();
-
-        rest::logout(map)
     }
 
     /// Sets a framework to be used with the client. All message events will be
