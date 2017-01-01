@@ -590,6 +590,20 @@ impl Message {
         }
     }
 
+    /// Retrieves the guild associated with this message.
+    ///
+    /// Returns `None` if the guild data does not exist in the cache, or if the
+    /// message was not sent in a [`GuildChannel`].
+    ///
+    /// [`GuildChannel`]: struct.GuildChannel.html
+    #[cfg(all(feature="cache", feature="methods"))]
+    pub fn guild(&self) -> Option<Guild> {
+        match self.guild_id().map(|x| CACHE.read().unwrap().get_guild(x).cloned()) {
+            Some(Some(guild)) => Some(guild),
+            _ => None,
+        }
+    }
+
     /// Retrieves the Id of the guild that the message was sent in, if sent in
     /// one.
     ///
@@ -597,9 +611,7 @@ impl Message {
     /// cache.
     #[cfg(all(feature="cache", feature="methods"))]
     pub fn guild_id(&self) -> Option<GuildId> {
-        let cache = CACHE.read().unwrap();
-
-        match cache.get_channel(self.channel_id) {
+        match CACHE.read().unwrap().get_channel(self.channel_id) {
             Some(ChannelRef::Guild(channel)) => Some(channel.guild_id),
             _ => None,
         }

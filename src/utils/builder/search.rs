@@ -114,7 +114,7 @@ impl SortingOrder {
 /// use serenity::utils::builder::{SortingMode, SortingOrder};
 /// use std::env;
 ///
-/// let client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN").unwrap());
+/// let mut client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN").unwrap());
 ///
 /// client.with_framework(|f| f
 ///     .configure(|c| c.prefix("~").on_mention(true))
@@ -147,7 +147,7 @@ impl SortingOrder {
 ///         .sort_by(SortingMode::Timestamp)
 ///         .sort_order(SortingOrder::Descending));
 ///
-///     let messages = match search {
+///     let mut messages = match search {
 ///         Ok(messages) => messages,
 ///         Err(why) => {
 ///             println!("Error performing search '{}': {:?}", query, why);
@@ -160,12 +160,16 @@ impl SortingOrder {
 ///
 ///     let _ = context.send_message(message.channel_id, |m| m
 ///         .content(&format!("Found {} total results", messages.total))
-///         .embed(|e| {
-///             for (i, messages) in messages.results.iter().enumerate() {
-///                 let mut message = messages[0];
+///         .embed(|mut e| {
+///             for (i, messages) in messages.results.iter_mut().enumerate() {
+///                 let mut message = match messages.get_mut(i) {
+///                     Some(message) => message,
+///                     None => break,
+///                 };
+///
 ///                 message.content.truncate(1000);
 ///
-///                 e.field(|f| f
+///                 e = e.field(|f| f
 ///                     .name(&format!("Result {}", i))
 ///                     .value(&message.content));
 ///              }

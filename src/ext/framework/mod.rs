@@ -114,7 +114,7 @@ use ::client::CACHE;
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
         #[allow(unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context, _: &$crate::model::Message, _: Vec<String>) -> std::result::Result<(), String> {
+        pub fn $fname(mut $c: &mut $crate::client::Context, _: &$crate::model::Message, _: Vec<String>) -> ::std::result::Result<(), String> {
             $b
 
             Ok(())
@@ -122,7 +122,7 @@ macro_rules! command {
     };
     ($fname:ident($c:ident, $m:ident) $b:block) => {
         #[allow(unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, _: Vec<String>) -> std::result::Result<(), String> {
+        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, _: Vec<String>) -> ::std::result::Result<(), String> {
             $b
 
             Ok(())
@@ -130,7 +130,7 @@ macro_rules! command {
     };
     ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
         #[allow(unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> std::result::Result<(), String> {
+        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> ::std::result::Result<(), String> {
             $b
 
             Ok(())
@@ -138,7 +138,7 @@ macro_rules! command {
     };
     ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
         #[allow(unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> std::result::Result<(), String> {
+        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> ::std::result::Result<(), String> {
             let mut i = $a.iter();
             let mut arg_counter = 0;
 
