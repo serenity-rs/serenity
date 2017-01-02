@@ -107,7 +107,7 @@ impl CreateCommand {
     }
 
     /// Sets a function that's called when a command is called that can access
-    /// the internal HashMap of usages, used specifically for creating a help
+    /// the internal HashMap of commands, used specifically for creating a help
     /// command.
     ///
     /// You can return Err(string) if there's an error.
