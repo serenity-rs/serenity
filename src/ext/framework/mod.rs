@@ -358,12 +358,15 @@ impl Framework {
                                 return;
                             }
 
-                            if !self.configuration.allow_dm && message.is_private() {
-                                if let Some(ref message) = self.configuration.no_dm_message {
-                                    let _ = context.say(message);
-                                }
+                            #[cfg(all(feature="cache", feature="methods"))]
+                            {
+                                if !self.configuration.allow_dm && message.is_private() {
+                                    if let Some(ref message) = self.configuration.no_dm_message {
+                                        let _ = context.say(message);
+                                    }
 
-                                return;
+                                    return;
+                                }
                             }
 
                             if self.configuration.blocked_users.contains(&message.author.id) {
