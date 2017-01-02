@@ -21,7 +21,9 @@ use serde_json::builder::ObjectBuilder;
 #[cfg(all(feature="cache", feature = "methods"))]
 use std::mem;
 #[cfg(all(feature="cache", feature="methods"))]
-use ::utils::builder::{EditGuild, EditMember, EditRole, Search};
+use ::utils::builder::EditMember;
+#[cfg(feature="methods")]
+use ::utils::builder::{EditGuild, EditRole, Search};
 #[cfg(feature = "methods")]
 use ::client::rest;
 
