@@ -545,7 +545,7 @@ impl Message {
     ///
     /// **Note**: You must be the author of the message to be able to do this.
     ///
-    /// **Note**: Messages must be under 2000 unicode code points.
+    /// **Note**: Messages must be at most 2000 unicode code points.
     ///
     /// # Errors
     ///
@@ -961,7 +961,7 @@ impl GuildChannel {
     /// # Errors
     ///
     /// Returns a
-    /// [ClientError::InvalidPermissions] if the current user does not have the
+    /// [`ClientError::InvalidPermissions`] if the current user does not have the
     /// required permissions.
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
@@ -1144,6 +1144,7 @@ impl GuildChannel {
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`Message`]: struct.Message.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[cfg(feature="methods")]
     pub fn send_message(&self, content: &str) -> Result<Message> {
@@ -1191,7 +1192,7 @@ impl Reaction {
     /// Deletes the reaction, but only if the current user is the user who made
     /// the reaction or has permission to.
     ///
-    /// **Note**: Requires the [`Manage Messages`] permission, _if_ the current
+    /// **Note**: Requires the [Manage Messages] permission, _if_ the current
     /// user did not perform the reaction.
     ///
     /// # Errors

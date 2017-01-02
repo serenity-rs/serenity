@@ -6,6 +6,7 @@ fields:
     description: >
       The reason given for this ban.
 
+
       **Note**: Until the Audit Log feature is completed by Discord, then this
       will always be None.
     optional: true
