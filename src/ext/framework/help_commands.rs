@@ -128,8 +128,6 @@ pub fn with_embeds(ctx: &mut Context,
                     let _ = write!(desc, "Prefix: {}\n", x);
                 }
 
-                desc.push_str("Commands:\n");
-
                 let mut no_commands = true;
 
                 for (n, cmd) in remove_aliases(&group.commands) {
