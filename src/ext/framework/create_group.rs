@@ -21,7 +21,7 @@ pub struct CreateGroup(pub CommandGroup);
 /// framework.group("Information", |g| g
 ///     .prefix("info")
 ///     .command("name", |c| c
-///         .exec_str("meew0")))
+///         .exec_str("Hakase")))
 /// ```
 impl CreateGroup {
     /// Adds a command to group.
@@ -45,7 +45,7 @@ impl CreateGroup {
     /// Adds a command to group with simplified API.
     /// You can return Err(string) if there's an error.
     pub fn on<F>(mut self, command_name: &str, f: F) -> Self
-        where F: Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
         let cmd = Arc::new(Command::new(f));
 
         self.0.commands.insert(command_name.to_owned(), CommandOrAlias::Command(cmd));

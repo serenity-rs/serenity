@@ -7,7 +7,7 @@ use ::client::Context;
 use ::model::Message;
 use ::utils::Colour;
 
-fn error_embed(ctx: &Context, message: &Message, input: &str) {
+fn error_embed(ctx: &mut Context, message: &Message, input: &str) {
     let _ = ctx.send_message(message.channel_id, |m| m
         .embed(|e| e
             .colour(Colour::dark_red())
@@ -26,7 +26,7 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
     result
 }
 
-pub fn with_embeds(ctx: &Context,
+pub fn with_embeds(ctx: &mut Context,
                    message: &Message,
                    groups: HashMap<String, Arc<CommandGroup>>,
                    args: Vec<String>) -> Result<(), String> {
@@ -154,7 +154,7 @@ pub fn with_embeds(ctx: &Context,
     Ok(())
 }
 
-pub fn plain(ctx: &Context,
+pub fn plain(ctx: &mut Context,
              _: &Message,
              groups: HashMap<String, Arc<CommandGroup>>,
              args: Vec<String>) -> Result<(), String> {

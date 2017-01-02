@@ -177,7 +177,7 @@ impl Configuration {
     /// Sets the prefix to respond to. This can either be a single- or
     /// multi-char string.
     pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
-        where F: Fn(&Context) -> Option<String> + Send + Sync + 'static {
+        where F: Fn(&mut Context) -> Option<String> + Send + Sync + 'static {
         self.dynamic_prefix = Some(Box::new(dynamic_prefix));
 
         self

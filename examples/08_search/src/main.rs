@@ -13,6 +13,7 @@
 //! This particular example will automatically ensure that only the current user
 //! may search; this acts as a "selfbot".
 
+#[macro_use]
 extern crate serenity;
 
 use serenity::client::{CACHE, Client, Context};
@@ -37,17 +38,17 @@ fn main() {
     }
 }
 
-fn self_check(_context: &Context, message: &Message) -> bool {
+fn self_check(_context: &mut Context, message: &Message) -> bool {
     message.author.id == CACHE.read().unwrap().user.id
 }
 
-fn search(context: &Context, message: &Message, args: Vec<String>) {
+command!(search(context, message, args) {
     let query = args.join(" ");
 
     if query.is_empty() {
         let _ = context.say("You must provide a query");
 
-        return;
+        return Ok(());
     }
 
     let guild_id = match message.guild_id() {
@@ -55,7 +56,7 @@ fn search(context: &Context, message: &Message, args: Vec<String>) {
         None => {
             let _ = context.say("Only supports guilds");
 
-            return;
+            return Ok(());
         },
     };
 
@@ -67,7 +68,7 @@ fn search(context: &Context, message: &Message, args: Vec<String>) {
             None => {
                 let _ = context.say("Guild data not found");
 
-                return;
+                return Ok(());
             },
         };
 
@@ -94,7 +95,7 @@ fn search(context: &Context, message: &Message, args: Vec<String>) {
 
             let _ = context.say("Error occurred while searching");
 
-            return;
+            return Ok(());
         },
     };
 
@@ -112,4 +113,4 @@ fn search(context: &Context, message: &Message, args: Vec<String>) {
 
             e
         }));
-}
+});

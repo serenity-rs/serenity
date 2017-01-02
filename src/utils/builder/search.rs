@@ -108,7 +108,7 @@ impl SortingOrder {
 /// limiting to 2 results, and only searching channels that have a name
 /// prefixed with `"search-"`:
 ///
-/// ```rust,no_run
+/// ```rust,ignore
 /// use serenity::client::{Client, Context};
 /// use serenity::model::Message;
 /// use serenity::utils::builder::{SortingMode, SortingOrder};
@@ -120,7 +120,7 @@ impl SortingOrder {
 ///     .configure(|c| c.prefix("~").on_mention(true))
 ///     .on("search", search));
 ///
-/// fn search(context: &Context, message: &Message, args: Vec<String>) -> Result<(), String> {
+/// command!(search(context, message, args) {
 ///     let query = args.join(" ");
 ///
 ///     if query.is_empty() {
@@ -131,7 +131,8 @@ impl SortingOrder {
 ///
 ///     let guild = message.guild().unwrap();
 ///
-///     let channel_ids = guild.channels
+///     let channel_ids = guild
+///         .channels
 ///         .values()
 ///         .filter(|c| c.name.starts_with("search-"))
 ///         .map(|c| c.id)
@@ -175,9 +176,7 @@ impl SortingOrder {
 ///
 ///              e
 ///         }));
-///
-///     Ok(())
-/// }
+/// });
 /// ```
 ///
 /// [`Channel`]: ../../model/enum.Channel.html

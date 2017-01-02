@@ -54,19 +54,19 @@ impl CreateCommand {
     ///         .desc("Replies to a ping with a pong")
     ///         .exec(ping)));
     ///
-    /// fn ping(context: &Context, _message: &Message, _args: Vec<String>) -> Result<(), String> {
+    /// fn ping(context: &mut Context, _message: &Message, _args: Vec<String>) -> Result<(), String> {
     ///     let _ = context.say("Pong!");
     ///
     ///     Ok(())
     /// }
     ///
-    /// fn owner_check(_context: &Context, message: &Message) -> bool {
+    /// fn owner_check(_context: &mut Context, message: &Message) -> bool {
     ///     // replace with your user ID
     ///     message.author.id == 7
     /// }
     /// ```
     pub fn check<F>(mut self, check: F) -> Self
-        where F: Fn(&Context, &Message) -> bool + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message) -> bool + Send + Sync + 'static {
         self.0.checks.push(Box::new(check));
 
         self
@@ -100,7 +100,7 @@ impl CreateCommand {
     ///
     /// [`exec_str`]: #method.exec_str
     pub fn exec<F>(mut self, func: F) -> Self
-        where F: Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
         self.0.exec = CommandType::Basic(Box::new(func));
 
         self
@@ -112,7 +112,7 @@ impl CreateCommand {
     ///
     /// You can return Err(string) if there's an error.
     pub fn exec_help<F>(mut self, f: F) -> Self
-        where F: Fn(&Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
         self.0.exec = CommandType::WithCommands(Box::new(f));
 
         self

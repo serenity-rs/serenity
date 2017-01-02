@@ -23,6 +23,9 @@ use ::internal::prelude::*;
 use ::model::*;
 use ::utils;
 
+#[cfg(feature="extras")]
+use std::ops::ShlAssign;
+
 #[cfg(feature="cache")]
 use super::CACHE;
 
@@ -94,6 +97,8 @@ pub struct Context {
     /// Note that if you are sharding, in relevant terms, this is the shard
     /// which received the event being dispatched.
     pub shard: Arc<Mutex<Shard>>,
+    /// The queue of messages that are sent after context goes out of scope.
+    pub queue: String,
     login_type: LoginType,
 }
 
@@ -115,6 +120,7 @@ impl Context {
             data: data,
             shard: shard,
             login_type: login_type,
+            queue: String::new(),
         }
     }
 
@@ -903,7 +909,7 @@ impl Context {
     /// Change the current user's username:
     ///
     /// ```rust,ignore
-    /// context.edit_profile(|p| p.username("meew0"));
+    /// context.edit_profile(|p| p.username("Hakase"));
     /// ```
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F)
         -> Result<CurrentUser> {
@@ -1445,6 +1451,20 @@ impl Context {
         }
     }
 
+    /// Adds a string to message queue, which is sent joined by a newline
+    /// when context goes out of scope.
+    ///
+    /// **Note**: Only works in a context where a channel is present. Refer to
+    /// [`say`] for a list of events where this is applicable.
+    ///
+    /// [`say`]: #method.say
+    pub fn queue(&mut self, content: &str) -> &mut Self {
+        self.queue.push('\n');
+        self.queue.push_str(content);
+
+        self
+    }
+
     /// Searches a [`Channel`]'s messages by providing query parameters via the
     /// search builder.
     ///
@@ -1878,5 +1898,22 @@ impl Context {
     pub fn unpin<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
         where C: Into<ChannelId>, M: Into<MessageId> {
         rest::unpin_message(channel_id.into().0, message_id.into().0)
+    }
+}
+
+impl Drop for Context {
+    /// Combines and sends all queued messages.
+    fn drop(&mut self) {
+        if !self.queue.is_empty() {
+            let _ = self.say(&self.queue);
+        }
+    }
+}
+
+/// Allows the `<<=` operator to be used to queue messages.
+#[cfg(feature="extras")]
+impl<'a> ShlAssign<&'a str> for &'a mut Context {
+    fn shl_assign(&mut self, rhs: &str) {
+        self.queue(rhs);
     }
 }

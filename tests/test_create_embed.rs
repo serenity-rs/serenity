@@ -28,30 +28,30 @@ fn test_from_embed() {
         image: Some(EmbedImage {
             height: 213,
             proxy_url: "a".to_owned(),
-            url: "https://i.imgur.com/q9MqLqZ.png".to_owned(),
+            url: "https://i.imgur.com/XfWpfCV.gif".to_owned(),
             width: 224,
         }),
         kind: "rich".to_owned(),
         provider: None,
         thumbnail: None,
         timestamp: None,
-        title: Some("funny cat meme".to_owned()),
-        url: Some("https://i.imgur.com/q9MqLqZ.png".to_owned()),
+        title: Some("hakase".to_owned()),
+        url: Some("https://i.imgur.com/XfWpfCV.gif".to_owned()),
         video: None,
     };
 
     let builder = CreateEmbed::from(embed)
         .colour(0xFF0000)
-        .description("This is a cat description")
-        .image("https://i.imgur.com/q9MqLqZ.jpg")
-        .title("still a funny cat meme")
-        .url("https://i.imgur.com/q9MqLqZ.jpg");
+        .description("This is a hakase description")
+        .image("https://i.imgur.com/XfWpfCV.gif")
+        .title("still a hakase")
+        .url("https://i.imgur.com/XfWpfCV.gif");
 
     let built = Value::Object(builder.0);
 
     let obj = ObjectBuilder::new()
         .insert("color", 0xFF0000)
-        .insert("description", "This is a cat description")
+        .insert("description", "This is a hakase description")
         .insert_array("fields", |a| a
             .push_object(|o| o
                 .insert("inline", false)
@@ -62,10 +62,10 @@ fn test_from_embed() {
                 .insert("name", "c")
                 .insert("value", "z")))
         .insert_object("image", |o| o
-            .insert("url", "https://i.imgur.com/q9MqLqZ.jpg"))
-        .insert("title", "still a funny cat meme")
+            .insert("url", "https://i.imgur.com/XfWpfCV.gif"))
+        .insert("title", "still a hakase")
         .insert("type", "rich")
-        .insert("url", "https://i.imgur.com/q9MqLqZ.jpg")
+        .insert("url", "https://i.imgur.com/XfWpfCV.gif")
         .build();
 
     assert_eq!(built, obj);

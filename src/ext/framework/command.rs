@@ -5,14 +5,14 @@ use ::model::Message;
 use ::model::Permissions;
 use std::collections::HashMap;
 
-pub type Check = Fn(&Context, &Message) -> bool + Send + Sync + 'static;
-pub type Exec = Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static;
-pub type Help = Fn(&Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) -> Result<(), String> + Send + Sync + 'static;
-pub type BeforeHook = Fn(&Context, &Message, &String) -> bool + Send + Sync + 'static;
-pub type AfterHook = Fn(&Context, &Message, &String, Result<(), String>) + Send + Sync + 'static;
+pub type Check = Fn(&mut Context, &Message) -> bool + Send + Sync + 'static;
+pub type Exec = Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static;
+pub type Help = Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) -> Result<(), String> + Send + Sync + 'static;
+pub type BeforeHook = Fn(&mut Context, &Message, &String) -> bool + Send + Sync + 'static;
+pub type AfterHook = Fn(&mut Context, &Message, &String, Result<(), String>) + Send + Sync + 'static;
 #[doc(hidden)]
 pub type InternalCommand = Arc<Command>;
-pub type PrefixCheck = Fn(&Context) -> Option<String> + Send + Sync + 'static;
+pub type PrefixCheck = Fn(&mut Context) -> Option<String> + Send + Sync + 'static;
 
 #[doc(hidden)]
 pub enum CommandOrAlias {
@@ -71,7 +71,7 @@ pub struct Command {
 
 impl Command {
     pub fn new<F>(f: F) -> Self
-        where F: Fn(&Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
         Command {
             aliases: Vec::new(),
             checks: Vec::default(),
@@ -92,7 +92,7 @@ impl Command {
     }
 }
 
-pub fn positions(ctx: &Context, content: &str, conf: &Configuration) -> Option<Vec<usize>> {
+pub fn positions(ctx: &mut Context, content: &str, conf: &Configuration) -> Option<Vec<usize>> {
     if !conf.prefixes.is_empty() || conf.dynamic_prefix.is_some() {
         // Find out if they were mentioned. If not, determine if the prefix
         // was used. If not, return None.
