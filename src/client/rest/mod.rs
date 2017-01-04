@@ -1303,10 +1303,10 @@ pub fn get_upcoming_maintenances() -> Result<Vec<Maintenance>> {
 }
 
 /// Gets a user by Id.
-pub fn get_user(user_id: u64) -> Result<CurrentUser> {
+pub fn get_user(user_id: u64) -> Result<User> {
     let response = request!(Route::UsersId, get, "/users/{}", user_id);
 
-    CurrentUser::decode(serde_json::from_reader(response)?)
+    User::decode(serde_json::from_reader(response)?)
 }
 
 /// Gets our connections.
