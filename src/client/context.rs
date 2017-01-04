@@ -634,9 +634,9 @@ impl Context {
             return Err(Error::Client(ClientError::InvalidOperationAsUser))
         }
 
-        let ids: Vec<u64> = message_ids.into_iter()
+        let ids = message_ids.into_iter()
             .map(|message_id| message_id.0)
-            .collect();
+            .collect::<Vec<u64>>();
 
         let map = ObjectBuilder::new()
             .insert("messages", ids)
@@ -1070,9 +1070,7 @@ impl Context {
 
         #[cfg(feature="cache")]
         {
-            let cache = CACHE.read().unwrap();
-
-            if let Some(guild) = cache.get_guild(guild_id) {
+            if let Some(guild) = CACHE.read().unwrap().get_guild(guild_id) {
                 return Ok(guild.channels.clone());
             }
         }
@@ -1266,25 +1264,20 @@ impl Context {
     /// [Read Message History]: ../model/permission/constant.READ_MESSAGE_HISTORY.html
     pub fn get_messages<C, F>(&self, channel_id: C, f: F) -> Result<Vec<Message>>
         where C: Into<ChannelId>, F: FnOnce(GetMessages) -> GetMessages {
-        let query = {
-            let mut map = f(GetMessages::default()).0;
-            let mut query = String::new();
-            write!(query, "?limit={}", map.remove("limit").unwrap_or(50))?;
+        let mut map = f(GetMessages::default()).0;
+        let mut query = format!("?limit={}", map.remove("limit").unwrap_or(50));
 
-            if let Some(after) = map.remove("after") {
-                write!(query, "&after={}", after)?;
-            }
+        if let Some(after) = map.remove("after") {
+            write!(query, "&after={}", after)?;
+        }
 
-            if let Some(around) = map.remove("around") {
-                write!(query, "&around={}", around)?;
-            }
+        if let Some(around) = map.remove("around") {
+            write!(query, "&around={}", around)?;
+        }
 
-            if let Some(before) = map.remove("before") {
-                write!(query, "&before={}", before)?;
-            }
-
-            query
-        };
+        if let Some(before) = map.remove("before") {
+            write!(query, "&before={}", before)?;
+        }
 
         rest::get_messages(channel_id.into().0, &query)
     }
