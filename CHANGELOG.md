@@ -193,14 +193,14 @@ in Discord's API.
 
 Initial commit.
 
-[0.1.3]: https://github.com/zeyla/serenity.rs/compare/v0.1.2...v0.1.3
-[0.1.2]: https://github.com/zeyla/serenity.rs/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/zeyla/serenity.rs/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/zeyla/serenity.rs/tree/403d65d5e98bdfa9f0c018610000c4a0b0c7d8d5
+[0.1.3]: https://github.com/zeyla/serenity/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/zeyla/serenity/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/zeyla/serenity/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/zeyla/serenity/tree/403d65d5e98bdfa9f0c018610000c4a0b0c7d8d5
 [crates.io listing]: https://crates.io/crates/serenity
 [semver]: http://semver.org
-[v0.1.2:example 06]: https://github.com/zeyla/serenity.rs/tree/5a3665a9951c023e3e6ea688844558b7f8b5fb6e/examples/06_command_framework
-[v0.1.1:example 06]: https://github.com/zeyla/serenity.rs/tree/ccb9d16e5dbe965e5a604e1cb402cd3bc7de0df5/examples/06_command_framework
+[v0.1.2:example 06]: https://github.com/zeyla/serenity/tree/5a3665a9951c023e3e6ea688844558b7f8b5fb6e/examples/06_command_framework
+[v0.1.1:example 06]: https://github.com/zeyla/serenity/tree/ccb9d16e5dbe965e5a604e1cb402cd3bc7de0df5/examples/06_command_framework
 
 [@abalabahaha]: https://github.com/abalabahaha
 [@acdenisSK]: https://github.com/acdenisSK

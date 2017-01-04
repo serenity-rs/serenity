@@ -6,7 +6,7 @@ pub const MESSAGE_CODE_LIMIT: u16 = 2000;
 /// The [UserAgent] sent along with every request.
 ///
 /// [UserAgent]: ../hyper/header/struct.UserAgent.html
-pub const USER_AGENT: &'static str = concat!("DiscordBot (https://github.com/zeyla/serenity.rs, ", env!("CARGO_PKG_VERSION"), ")");
+pub const USER_AGENT: &'static str = concat!("DiscordBot (https://github.com/zeyla/serenity, ", env!("CARGO_PKG_VERSION"), ")");
 
 #[allow(dead_code)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]

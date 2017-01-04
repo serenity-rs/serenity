@@ -7,7 +7,7 @@
 /// Use [`User`] if you are creating a selfbot which responds only to you.
 ///
 /// [`Bot`]: #variant.Bot
-/// [`README`]: https://github.com/zeyla/serenity.rs/blob/master/README.md#Bots
+/// [`README`]: https://github.com/zeyla/serenity/blob/master/README.md#Bots
 /// [`User`]: #variant.User
 /// [applications page]: https://discordapp.com/developers/applications/me
 #[derive(Copy, Clone, Hash, Eq, PartialEq, Debug, Ord, PartialOrd)]

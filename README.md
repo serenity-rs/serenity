@@ -1,6 +1,6 @@
 [![ci-badge][]][ci] [![crate-badge][]][crate] [![license-badge][]][license] [![docs-badge][]][docs] [![contribs-badge][]][contribs] [![dapi-badge][]][dapi]
 
-# serenity.rs
+# serenity
 
 Serenity is an ergonomic and high-level Rust library for the Discord API.
 
@@ -88,7 +88,7 @@ Cargo.toml:
 
 ```toml
 [dependencies.serenity]
-git = "https://github.com/zeyla/serenity.rs.git"
+git = "https://github.com/zeyla/serenity.git"
 default-features = false
 features = ["pick", "your", "feature", "names", "here"]
 ```
@@ -146,14 +146,14 @@ Voice+youtube-dl:
 [`Context`]: https://serenity.zey.moe/serenity/client/struct.Context.html
 [`Event`]: https://serenity.zey.moe/serenity/model/enum.Event.html
 [`Event::MessageCreate`]: https://serenity.zey.moe/serenity/model/enum.Event.html#variant.MessageCreate
-[`examples`]: https://github.com/zeyla/serenity.rs/blob/master/examples
+[`examples`]: https://github.com/zeyla/serenity/blob/master/examples
 [`rest`]: https://serenity.zey.moe/serenity/client/rest/index.html
 [`validate_token`]: https://serenity.zey.moe/serenity/client/fn.validate_token.html
 [cache docs]: https://serenity.zey.moe/serenity/ext/cache/index.html
-[ci]: https://travis-ci.org/zeyla/serenity.rs
-[ci-badge]: https://travis-ci.org/zeyla/serenity.rs.svg?branch=master
-[contribs]: https://img.shields.io/github/contributors/zeyla/serenity.rs.svg
-[contribs-badge]: https://img.shields.io/github/contributors/zeyla/serenity.rs.svg
+[ci]: https://travis-ci.org/zeyla/serenity
+[ci-badge]: https://travis-ci.org/zeyla/serenity.svg?branch=master
+[contribs]: https://img.shields.io/github/contributors/zeyla/serenity.svg
+[contribs-badge]: https://img.shields.io/github/contributors/zeyla/serenity.svg
 [crate]: https://crates.io/crates/serenity
 [crate-badge]: https://img.shields.io/crates/v/serenity.svg?maxAge=2592000
 [client's module-level documentation]: https://serenity.zey.moe/serenity/client/index.html
@@ -162,7 +162,7 @@ Voice+youtube-dl:
 [discord docs]: https://discordapp.com/developers/docs/intro
 [docs]: https://serenity.zey.moe/
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
-[examples]: https://github.com/zeyla/serenity.rs/tree/master/examples
+[examples]: https://github.com/zeyla/serenity/tree/master/examples
 [gateway docs]: https://serenity.zey.moe/serenity/client/gateway/index.html
 [license]: https://opensource.org/licenses/ISC
 [license-badge]: https://img.shields.io/badge/license-ISC-blue.svg

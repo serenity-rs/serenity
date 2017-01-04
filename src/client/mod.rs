@@ -165,7 +165,7 @@ pub struct Client {
     /// Refer to [example 06] for an example on using the `data` field.
     ///
     /// [`Context::data`]: struct.Context.html#method.data
-    /// [example 06]: https://github.com/zeyla/serenity.rs/tree/master/examples/06_command_framework
+    /// [example 06]: https://github.com/zeyla/serenity/tree/master/examples/06_command_framework
     pub data: Arc<Mutex<ShareMap>>,
     /// A vector of all active shards that have received their [`Event::Ready`]
     /// payload, and have dispatched to [`on_ready`] if an event handler was

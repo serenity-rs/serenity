@@ -105,7 +105,7 @@ impl Default for ExecuteWebhook {
     ///
     /// The only default value is [`tts`] being set to `true`. In the event that
     /// there is a bug that Discord defaults `tts` to `true`, at least
-    /// serenity.rs won't be a part of it.
+    /// serenity won't be a part of it.
     ///
     /// [`Webhook`]: ../../model/struct.Webhook.html
     /// [`tts`]: #method.tts

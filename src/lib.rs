@@ -84,7 +84,7 @@
 //!
 //! ```toml
 //! [dependencies.serenity]
-//! git = "https://github.com/zeyla/serenity.rs.git"
+//! git = "https://github.com/zeyla/serenity.git"
 //! default-features = false
 //! features = ["pick", "your", "feature", "names", "here"]
 //! ```
@@ -135,16 +135,16 @@
 //! [`Event`]: model/event/enum.Event.html
 //! [`Event::MessageCreate`]: model/event/enum.Event.html#variant.MessageCreate
 //! [`Shard`]: client/struct.Shard.html
-//! [`examples`]: https://github.com/zeyla/serenity.rs.git/blob/master/examples
+//! [`examples`]: https://github.com/zeyla/serenity.git/blob/master/examples
 //! [`rest`]: client/rest/index.html
 //! [`validate_token`]: client/fn.validate_token.html
 //! [cache docs]: ext/cache/index.html
 //! [client's module-level documentation]: client/index.html
 //! [docs]: https://discordapp.com/developers/docs/intro
-//! [examples]: https://github.com/zeyla/serenity.rs/tree/master/examples
+//! [examples]: https://github.com/zeyla/serenity/tree/master/examples
 //! [gateway docs]: client/gateway/index.html
 #![allow(doc_markdown, inline_always, unknown_lints)]
-#![doc(html_logo_url = "https://docs.austinhellyer.me/serenity.rs/docs_header.png")]
+#![doc(html_logo_url = "https://docs.austinhellyer.me/serenity/docs_header.png")]
 #![warn(enum_glob_use, if_not_else)]
 
 #[macro_use]

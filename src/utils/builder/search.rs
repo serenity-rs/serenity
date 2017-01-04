@@ -187,7 +187,7 @@ impl SortingOrder {
 /// [`limit`]: #method.limit
 /// [`offset`]: #method.offset
 /// [`sort_by`]: #method.sort_by
-/// [example 08]: https://github.com/zeyla/serenity.rs/tree/master/examples/08_search
+/// [example 08]: https://github.com/zeyla/serenity/tree/master/examples/08_search
 pub struct Search<'a>(pub BTreeMap<&'a str, String>);
 
 impl<'a> Search<'a> {
