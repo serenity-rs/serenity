@@ -1316,11 +1316,7 @@ impl Context {
                                                 M: Into<MessageId>,
                                                 R: Into<ReactionType>,
                                                 U: Into<UserId> {
-        let limit = limit.map(|x| if x > 100 {
-            100
-        } else {
-            x
-        }).unwrap_or(50);
+        let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
 
         rest::get_reaction_users(channel_id.into().0,
                                  message_id.into().0,
