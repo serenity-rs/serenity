@@ -1,6 +1,6 @@
 [![ci-badge][]][ci] [![crate-badge][]][crate] [![license-badge][]][license] [![docs-badge][]][docs] [![contribs-badge][]][contribs] [![dapi-badge][]][dapi]
 
-# serenity.rs
+# serenity
 
 Serenity is an ergonomic and high-level Rust library for the Discord API.
 
