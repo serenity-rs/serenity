@@ -1335,6 +1335,28 @@ impl Context {
                                  after.map(|u| u.into().0))
     }
 
+    /// Gets a [`User`] by its Id.
+    ///
+    /// [`User`]: ../model/struct.User.html
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::InvalidOperationAsUser`] if the current user is
+    /// not a bot user.
+    ///
+    /// [`ClientError::InvalidOperationAsUser`]: enum.ClientError.html#variant.InvalidOperationAsUser
+    #[inline]
+    pub fn get_user<U: Into<UserId>>(&self, user_id: U) -> Result<User> {
+        #[cfg(feature="cache")]
+        {
+            if !CACHE.read().unwrap().user.bot {
+                return Err(Error::Client(ClientError::InvalidOperationAsUser));
+            }
+        }
+
+        rest::get_user(user_id.into().0)
+    }
+
     /// Kicks a [`Member`] from the specified [`Guild`] if they are in it.
     ///
     /// Requires the [Kick Members] permission.
