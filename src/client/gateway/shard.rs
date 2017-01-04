@@ -355,6 +355,7 @@ impl Shard {
                     },
                     Some(4008) => warn!("Gateway ratelimited"),
                     Some(4010) => warn!("Sent invalid shard"),
+                    Some(4011) => warn!("Bot requires more shards"),
                     Some(4006) | Some(4009) => {
                         info!("Invalid session");
 
@@ -366,7 +367,7 @@ impl Shard {
                     _ => {},
                 }
 
-                if !clean && num != Some(1000) && num != Some(4004) {
+                if !clean && num != Some(1000) && num != Some(4004) && num != Some(4011) {
                     if let Some(session_id) = self.session_id.clone() {
                         match self.resume(session_id, receiver) {
                             Ok((ev, rec)) => return Ok(Some((ev, Some(rec)))),
