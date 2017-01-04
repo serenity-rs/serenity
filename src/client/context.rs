@@ -1301,12 +1301,6 @@ impl Context {
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
-    /// # Errors
-    ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
-    /// not have the required [permissions].
-    ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`Emoji`]: struct.Emoji.html
     /// [`Message`]: struct.Message.html
     /// [`User`]: struct.User.html
