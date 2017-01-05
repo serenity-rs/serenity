@@ -177,7 +177,7 @@ pub struct Client {
     #[cfg(feature="framework")]
     framework: Arc<Mutex<Framework>>,
     login_type: LoginType,
-    pub shards: Vec<Arc<Mutex<Shard>>>,
+    shards: Vec<Arc<Mutex<Shard>>>,
     token: String,
 }
 
