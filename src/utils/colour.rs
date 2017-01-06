@@ -302,6 +302,8 @@ colour! {
     rosewater, 0xF6DBD8;
     /// Creates a new `Colour`, setting its RGB value to `(26, 188, 156)`.
     teal, 0x1ABC9C;
+    /// Creates a new `Colour`, setting its RGB value to `(117, 150, 255)`.
+    rohrkatze_blue, 0x7596FF;
 }
 
 impl Default for Colour {
