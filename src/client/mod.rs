@@ -846,6 +846,9 @@ impl Client {
                 },
                 Err(why) => return Err(why),
             }
+
+            // Wait 5 seconds between shard boots.
+            thread::sleep(Duration::from_secs(5));
         }
 
         loop {
