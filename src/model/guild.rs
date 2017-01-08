@@ -203,7 +203,7 @@ impl PartialGuild {
     /// [`Search`]: ../utils/builder/struct.Search.html
     /// [`search_channels`]: #method.search_channels
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[cfg(feature = "methods")]
+    #[cfg(feature="methods")]
     pub fn search<F>(&self, f: F) -> Result<SearchResult>
         where F: FnOnce(Search) -> Search {
         #[cfg(feature="cache")]
@@ -241,7 +241,7 @@ impl PartialGuild {
     /// [`Search`]: ../utils/builder/struct.Search.html
     /// [`search`]: #method.search
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[cfg(feature = "methods")]
+    #[cfg(feature="methods")]
     pub fn search_channels<F>(&self, channel_ids: &[ChannelId], f: F)
         -> Result<SearchResult> where F: FnOnce(Search) -> Search {
         #[cfg(feature="cache")]
@@ -857,7 +857,7 @@ impl Guild {
     /// [`Search`]: ../utils/builder/struct.Search.html
     /// [`search_channels`]: #method.search_channels
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[cfg(feature = "methods")]
+    #[cfg(feature="methods")]
     pub fn search<F>(&self, f: F) -> Result<SearchResult>
         where F: FnOnce(Search) -> Search {
         #[cfg(feature="cache")]

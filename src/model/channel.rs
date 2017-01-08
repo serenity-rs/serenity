@@ -260,7 +260,7 @@ impl Channel {
     /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
     /// [`Message`]: struct.Message.html
     /// [`Search`]: ../utils/builder/struct.Search.html
-    #[cfg(feature = "methods")]
+    #[cfg(feature="methods")]
     pub fn search<F>(&self, f: F) -> Result<SearchResult>
         where F: FnOnce(Search) -> Search {
         #[cfg(feature="cache")]
@@ -451,7 +451,7 @@ impl Group {
     /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
     /// [`Message`]: struct.Message.html
     /// [`Search`]: ../utils/builder/struct.Search.html
-    #[cfg(feature = "methods")]
+    #[cfg(feature="methods")]
     pub fn search<F>(&self, f: F) -> Result<SearchResult>
         where F: FnOnce(Search) -> Search {
         rest::search_channel_messages(self.channel_id.0, f(Search::default()).0)
@@ -904,7 +904,7 @@ impl PrivateChannel {
     /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
     /// [`Message`]: struct.Message.html
     /// [`Search`]: ../utils/builder/struct.Search.html
-    #[cfg(feature = "methods")]
+    #[cfg(feature="methods")]
     pub fn search<F>(&self, f: F) -> Result<SearchResult>
         where F: FnOnce(Search) -> Search {
         #[cfg(feature="cache")]
@@ -1114,7 +1114,7 @@ impl GuildChannel {
     /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
     /// [`Message`]: struct.Message.html
     /// [`Search`]: ../utils/builder/struct.Search.html
-    #[cfg(feature = "methods")]
+    #[cfg(feature="methods")]
     pub fn search<F>(&self, f: F) -> Result<SearchResult>
         where F: FnOnce(Search) -> Search {
         #[cfg(feature="cache")]

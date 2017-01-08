@@ -114,7 +114,7 @@ use ::model::event::*;
 /// [`Guild`]: ../../model/struct.Guild.html
 /// [`Role`]: ../../model/struct.Role.html
 /// [`rest`]: ../../client/rest/index.html
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub struct Cache {
     /// A map of the currently active calls that the current user knows about,
     /// where the key is the Id of the [`PrivateChannel`] or [`Group`] hosting

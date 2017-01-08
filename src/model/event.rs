@@ -102,8 +102,8 @@ impl ChannelPinsAckEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(ChannelPinsAckEvent {
-                channel_id: remove(&mut map, "channel_id").and_then(ChannelId::decode)?,
-                timestamp: remove(&mut map, "timestamp").and_then(into_string)?,
+            channel_id: remove(&mut map, "channel_id").and_then(ChannelId::decode)?,
+            timestamp: remove(&mut map, "timestamp").and_then(into_string)?,
         })
     }
 }
@@ -119,8 +119,8 @@ impl ChannelPinsUpdateEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(ChannelPinsUpdateEvent {
-                channel_id: remove(&mut map, "channel_id").and_then(ChannelId::decode)?,
-                last_pin_timestamp: opt(&mut map, "last_pin_timestamp", into_string)?,
+            channel_id: remove(&mut map, "channel_id").and_then(ChannelId::decode)?,
+            last_pin_timestamp: opt(&mut map, "last_pin_timestamp", into_string)?,
         })
     }
 }
@@ -136,8 +136,8 @@ impl ChannelRecipientAddEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(ChannelRecipientAddEvent {
-                channel_id: remove(&mut map, "channel_id").and_then(ChannelId::decode)?,
-                user: remove(&mut map, "user").and_then(User::decode)?,
+            channel_id: remove(&mut map, "channel_id").and_then(ChannelId::decode)?,
+            user: remove(&mut map, "user").and_then(User::decode)?,
         })
     }
 }
@@ -153,8 +153,8 @@ impl ChannelRecipientRemoveEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(ChannelRecipientRemoveEvent {
-                channel_id: remove(&mut map, "channel_id").and_then(ChannelId::decode)?,
-                user: remove(&mut map, "user").and_then(User::decode)?,
+            channel_id: remove(&mut map, "channel_id").and_then(ChannelId::decode)?,
+            user: remove(&mut map, "user").and_then(User::decode)?,
         })
     }
 }
@@ -169,7 +169,7 @@ impl ChannelUpdateEvent {
     #[inline]
     pub fn decode(map: Map) -> Result<Self> {
         Ok(ChannelUpdateEvent {
-                channel: Channel::decode(Value::Object(map))?,
+            channel: Channel::decode(Value::Object(map))?,
         })
     }
 }
@@ -185,8 +185,8 @@ impl FriendSuggestionCreateEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(FriendSuggestionCreateEvent {
-                reasons: decode_array(remove(&mut map, "reasons")?, SuggestionReason::decode)?,
-                suggested_user: remove(&mut map, "suggested_user").and_then(User::decode)?,
+            reasons: decode_array(remove(&mut map, "reasons")?, SuggestionReason::decode)?,
+            suggested_user: remove(&mut map, "suggested_user").and_then(User::decode)?,
         })
     }
 }
@@ -201,7 +201,7 @@ impl FriendSuggestionDeleteEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(FriendSuggestionDeleteEvent {
-                suggested_user_id: remove(&mut map, "suggested_user_id").and_then(UserId::decode)?,
+            suggested_user_id: remove(&mut map, "suggested_user_id").and_then(UserId::decode)?,
         })
     }
 }
@@ -217,8 +217,8 @@ impl GuildBanAddEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(GuildBanAddEvent {
-                guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
-                user: remove(&mut map, "user").and_then(User::decode)?,
+            guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
+            user: remove(&mut map, "user").and_then(User::decode)?,
         })
     }
 }
@@ -234,8 +234,8 @@ impl GuildBanRemoveEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(GuildBanRemoveEvent {
-                guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
-                user: remove(&mut map, "user").and_then(User::decode)?,
+            guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
+            user: remove(&mut map, "user").and_then(User::decode)?,
         })
     }
 }
@@ -281,8 +281,8 @@ impl GuildEmojisUpdateEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(GuildEmojisUpdateEvent {
-                emojis: remove(&mut map, "emojis").and_then(decode_emojis)?,
-                guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
+            emojis: remove(&mut map, "emojis").and_then(decode_emojis)?,
+            guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
         })
     }
 }
@@ -297,7 +297,7 @@ impl GuildIntegrationsUpdateEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(GuildIntegrationsUpdateEvent {
-                guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
+            guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
         })
     }
 }
@@ -313,8 +313,8 @@ impl GuildMemberAddEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(GuildMemberAddEvent {
-                guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
-                member: Member::decode(Value::Object(map))?,
+            guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
+            member: Member::decode(Value::Object(map))?,
         })
     }
 }
@@ -330,8 +330,8 @@ impl GuildMemberRemoveEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(GuildMemberRemoveEvent {
-                guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
-                user: remove(&mut map, "user").and_then(User::decode)?,
+            guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
+            user: remove(&mut map, "user").and_then(User::decode)?,
         })
     }
 }
@@ -349,10 +349,10 @@ impl GuildMemberUpdateEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(GuildMemberUpdateEvent {
-                guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
-                nick: opt(&mut map, "nick", into_string)?,
-                roles: decode_array(remove(&mut map, "roles")?, RoleId::decode)?,
-                user: remove(&mut map, "user").and_then(User::decode)?,
+            guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
+            nick: opt(&mut map, "nick", into_string)?,
+            roles: decode_array(remove(&mut map, "roles")?, RoleId::decode)?,
+            user: remove(&mut map, "user").and_then(User::decode)?,
         })
     }
 }
@@ -368,8 +368,8 @@ impl GuildMembersChunkEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(GuildMembersChunkEvent {
-                guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
-                members: remove(&mut map, "members").and_then(decode_members)?,
+            guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
+            members: remove(&mut map, "members").and_then(decode_members)?,
         })
     }
 }
@@ -385,8 +385,8 @@ impl GuildRoleCreateEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(GuildRoleCreateEvent {
-                guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
-                role: remove(&mut map, "role").and_then(Role::decode)?,
+            guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
+            role: remove(&mut map, "role").and_then(Role::decode)?,
         })
     }
 }
@@ -402,8 +402,8 @@ impl GuildRoleDeleteEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(GuildRoleDeleteEvent {
-                guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
-                role_id: remove(&mut map, "role_id").and_then(RoleId::decode)?,
+            guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
+            role_id: remove(&mut map, "role_id").and_then(RoleId::decode)?,
         })
     }
 }
@@ -419,8 +419,8 @@ impl GuildRoleUpdateEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(GuildRoleUpdateEvent {
-                guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
-                role: remove(&mut map, "role").and_then(Role::decode)?,
+            guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
+            role: remove(&mut map, "role").and_then(Role::decode)?,
         })
     }
 }
@@ -438,10 +438,10 @@ impl GuildSyncEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(GuildSyncEvent {
-                guild_id: remove(&mut map, "id").and_then(GuildId::decode)?,
-                large: req!(remove(&mut map, "large")?.as_bool()),
-                members: remove(&mut map, "members").and_then(decode_members)?,
-                presences: remove(&mut map, "presences").and_then(decode_presences)?,
+            guild_id: remove(&mut map, "id").and_then(GuildId::decode)?,
+            large: req!(remove(&mut map, "large")?.as_bool()),
+            members: remove(&mut map, "members").and_then(decode_members)?,
+            presences: remove(&mut map, "presences").and_then(decode_presences)?,
         })
     }
 }
@@ -471,7 +471,7 @@ impl GuildUpdateEvent {
     #[inline]
     pub fn decode(map: Map) -> Result<Self> {
         Ok(GuildUpdateEvent {
-                guild: PartialGuild::decode(Value::Object(map))?,
+            guild: PartialGuild::decode(Value::Object(map))?,
         })
     }
 }
@@ -488,8 +488,8 @@ impl MessageAckEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(MessageAckEvent {
-                channel_id: remove(&mut map, "channel_id").and_then(ChannelId::decode)?,
-                message_id: opt(&mut map, "message_id", MessageId::decode)?,
+            channel_id: remove(&mut map, "channel_id").and_then(ChannelId::decode)?,
+            message_id: opt(&mut map, "message_id", MessageId::decode)?,
         })
     }
 }
@@ -504,7 +504,7 @@ impl MessageCreateEvent {
     #[inline]
     pub fn decode(map: Map) -> Result<Self> {
         Ok(MessageCreateEvent {
-                message: Message::decode(Value::Object(map))?,
+            message: Message::decode(Value::Object(map))?,
         })
     }
 }
@@ -1185,7 +1185,7 @@ pub struct VoiceSpeaking {
 }
 
 impl VoiceSpeaking {
-    #[doc(hdiden)]
+    #[doc(hidden)]
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(VoiceSpeaking {

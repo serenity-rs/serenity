@@ -222,7 +222,6 @@ impl User {
     /// [`GuildId`]: struct.GuildId.html
     /// [`Role`]: struct.Role.html
     /// [`Cache`]: ../ext/cache/struct.Cache.html
-    #[allow(unused_variables)]
     // no-cache would warn on guild_id.
     pub fn has_role<G, R>(&self, guild: G, role: R) -> bool
         where G: Into<GuildContainer>, R: Into<RoleId> {

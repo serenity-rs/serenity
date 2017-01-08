@@ -29,9 +29,9 @@ use ::ext::cache::ChannelRef;
 macro_rules! req {
     ($opt:expr) => {
         $opt.ok_or(Error::Decode(concat!("Type mismatch in model:",
-                                              line!(),
-                                              ": ",
-                                              stringify!($opt)),
+                                         line!(),
+                                         ": ",
+                                         stringify!($opt)),
                                       Value::Null))?
     }
 }
@@ -100,6 +100,9 @@ pub fn decode_members(value: Value) -> Result<HashMap<UserId, Member>> {
 }
 
 // Clippy's lint is incorrect here and will result in invalid code.
+//
+// Bit more detaul: `result_unwrap_or_default` is not yet stable as of rustc
+// 1.14.
 #[allow(or_fun_call)]
 pub fn decode_notes(value: Value) -> Result<HashMap<UserId, String>> {
     let mut notes = HashMap::new();
@@ -263,7 +266,8 @@ pub fn into_u64(value: Value) -> Result<u64> {
     }
 }
 
-pub fn opt<T, F: FnOnce(Value) -> Result<T>>(map: &mut BTreeMap<String, Value>, key: &str, f: F) -> Result<Option<T>> {
+pub fn opt<F, T>(map: &mut BTreeMap<String, Value>, key: &str, f: F)
+    -> Result<Option<T>> where F: FnOnce(Value) -> Result<T> {
     match map.remove(key) {
         None | Some(Value::Null) => Ok(None),
         Some(val) => f(val).map(Some),
@@ -289,7 +293,6 @@ pub fn remove(map: &mut BTreeMap<String, Value>, key: &str) -> Result<Value> {
     })
 }
 
-#[doc(hidden)]
 #[cfg(all(feature="cache", feature="methods"))]
 pub fn user_has_perms(channel_id: ChannelId,
                       mut permissions: Permissions)

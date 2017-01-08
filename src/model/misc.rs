@@ -81,6 +81,7 @@ impl Mentionable for User {
 #[cfg(all(feature="cache", feature="methods"))]
 impl FromStr for User {
     type Err = ();
+
     fn from_str(s: &str) -> StdResult<Self, ()> {
         match utils::parse_username(s) {
             Some(x) => {
@@ -96,6 +97,7 @@ impl FromStr for User {
 
 impl FromStr for UserId {
     type Err = ();
+
     fn from_str(s: &str) -> StdResult<Self, ()> {
         utils::parse_username(s).ok_or_else(|| ()).map(UserId)
     }
@@ -104,6 +106,7 @@ impl FromStr for UserId {
 #[cfg(all(feature="cache", feature="methods"))]
 impl FromStr for Role {
     type Err = ();
+
     fn from_str(s: &str) -> StdResult<Self, ()> {
         match utils::parse_role(s) {
             Some(x) => {
@@ -119,6 +122,7 @@ impl FromStr for Role {
 
 impl FromStr for RoleId {
     type Err = ();
+
     fn from_str(s: &str) -> StdResult<Self, ()> {
         utils::parse_role(s).ok_or_else(|| ()).map(RoleId)
     }
@@ -135,6 +139,7 @@ impl EmojiIdentifier {
 
 impl FromStr for EmojiIdentifier {
     type Err = ();
+
     fn from_str(s: &str) -> StdResult<Self, ()> {
         utils::parse_emoji(s).ok_or_else(|| ())
     }
@@ -142,6 +147,7 @@ impl FromStr for EmojiIdentifier {
 
 impl FromStr for ChannelId {
     type Err = ();
+
     fn from_str(s: &str) -> StdResult<Self, ()> {
         utils::parse_channel(s).ok_or_else(|| ()).map(ChannelId)
     }
@@ -150,6 +156,7 @@ impl FromStr for ChannelId {
 #[cfg(all(feature="cache", feature="methods"))]
 impl FromStr for Channel {
     type Err = ();
+
     fn from_str(s: &str) -> StdResult<Self, ()> {
         match utils::parse_channel(s) {
             Some(x) => {
