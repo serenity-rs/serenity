@@ -367,7 +367,10 @@ impl Shard {
                     _ => {},
                 }
 
-                if !clean && num != Some(1000) && num != Some(4004) && num != Some(4011) {
+                let resume = num.map(|x| x != 1000 && x != 4004 && self.session_id.is_some())
+                    .unwrap_or(false);
+
+                if resume {
                     if let Some(session_id) = self.session_id.clone() {
                         match self.resume(session_id, receiver) {
                             Ok((ev, rec)) => return Ok(Some((ev, Some(rec)))),
