@@ -355,7 +355,7 @@ impl Shard {
                     },
                     Some(4008) => warn!("Gateway ratelimited"),
                     Some(4010) => warn!("Sent invalid shard"),
-                    Some(4011) => warn!("Bot requires more shards"),
+                    Some(4011) => error!("Bot requires more shards"),
                     Some(4006) | Some(4009) => {
                         info!("Invalid session");
 
@@ -371,13 +371,24 @@ impl Shard {
                     .unwrap_or(false);
 
                 if resume {
+                    info!("Attempting to resume");
+
                     if let Some(session_id) = self.session_id.clone() {
                         match self.resume(session_id, receiver) {
-                            Ok((ev, rec)) => return Ok(Some((ev, Some(rec)))),
-                            Err(why) => debug!("Error resuming: {:?}", why),
+                            Ok((ev, rec)) => {
+                                info!("Resumed");
+
+                                return Ok(Some((ev, Some(rec))));
+                            },
+                            Err(why) => {
+                                warn!("Error resuming: {:?}", why);
+                                info!("Falling back to reconnecting");
+                            },
                         }
                     }
                 }
+
+                info!("Reconnecting");
 
                 self.reconnect(receiver).map(|(ev, rec)| Some((ev, Some(rec))))
             },
@@ -392,9 +403,18 @@ impl Shard {
                 //
                 // Otherwise, fallback to reconnecting.
                 if let Some(session_id) = self.session_id.clone() {
+                    info!("Attempting to resume");
+
                     match self.resume(session_id, &mut receiver) {
-                        Ok((ev, rec)) => return Ok(Some((ev, Some(rec)))),
-                        Err(why) => info!("Error resuming: {:?}", why),
+                        Ok((ev, rec)) => {
+                            info!("Resumed");
+
+                            return Ok(Some((ev, Some(rec))));
+                        },
+                        Err(why) => {
+                            warn!("Error resuming: {:?}", why);
+                            info!("Falling back to reconnecting");
+                        },
                     }
                 }
 
@@ -422,6 +442,8 @@ impl Shard {
 
         r.flush()?;
         r.shutdown(Shutdown::Both)?;
+
+        debug!("Cleanly shutdown shard");
 
         Ok(())
     }
@@ -521,8 +543,12 @@ impl Shard {
                 return Ok((Event::Ready(ready), receiver_new));
             }
 
+            let seconds = i.pow(2);
+
+            debug!("Exponentially backing off for {} seconds", seconds);
+
             // Exponentially back off.
-            thread::sleep(StdDuration::from_secs(i.pow(2)));
+            thread::sleep(StdDuration::from_secs(seconds));
         }
 
         // Reconnecting failed; just return an error instead.
