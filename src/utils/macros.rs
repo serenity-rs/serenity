@@ -26,7 +26,10 @@ macro_rules! request {
 macro_rules! cdn {
     ($e:expr) => {
         concat!("https://cdn.discordapp.com", $e)
-    }
+    };
+    ($e:expr, $($rest:tt)*) => {
+        format!(cdn!($e), $($rest)*)
+    };
 }
 
 macro_rules! base {

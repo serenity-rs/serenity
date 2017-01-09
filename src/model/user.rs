@@ -2,7 +2,6 @@ use std::fmt;
 use super::utils::{into_map, into_string, remove};
 use super::{
     CurrentUser,
-    DefaultAvatar,
     FriendSourceFlags,
     GuildContainer,
     GuildId,
@@ -156,18 +155,7 @@ impl User {
     /// [`Error::Num`]: ../enum.Error.html#variant.Num
     /// [`Error::Other`]: ../enum.Error.html#variant.Other
     pub fn default_avatar_url(&self) -> Result<String> {
-        Ok(base!("/assets/{}.png", match self.discriminator.parse::<u16>()? % 5u16 {
-            0 => DefaultAvatar::Blurple.name().to_owned(),
-            1 => DefaultAvatar::Grey.name().to_owned(),
-            2 => DefaultAvatar::Green.name().to_owned(),
-            3 => DefaultAvatar::Orange.name().to_owned(),
-            4 => DefaultAvatar::Red.name().to_owned(),
-            other => {
-                error!("Reached impossible default avatar match: {}", other);
-
-                return Err(Error::Other("Reached impossible default match"));
-            },
-        }))
+        Ok(cdn!("/embed/avatars/{}.png", self.discriminator.parse::<u16>()? % 5u16).to_owned())
     }
 
     /// Send a direct message to a user. This will create or retrieve the

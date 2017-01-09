@@ -32,13 +32,13 @@ fn default_avatars() {
     let mut user = gen();
 
     user.discriminator = "0".to_owned();
-    assert!(user.default_avatar_url().unwrap().ends_with("1b.png"));
+    assert!(user.default_avatar_url().unwrap().ends_with("0.png"));
     user.discriminator = "1".to_owned();
-    assert!(user.default_avatar_url().unwrap().ends_with("68.png"));
+    assert!(user.default_avatar_url().unwrap().ends_with("1.png"));
     user.discriminator = "2".to_owned();
-    assert!(user.default_avatar_url().unwrap().ends_with("4d.png"));
+    assert!(user.default_avatar_url().unwrap().ends_with("2.png"));
     user.discriminator = "3".to_owned();
-    assert!(user.default_avatar_url().unwrap().ends_with("aa.png"));
+    assert!(user.default_avatar_url().unwrap().ends_with("3.png"));
     user.discriminator = "4".to_owned();
-    assert!(user.default_avatar_url().unwrap().ends_with("29.png"));
+    assert!(user.default_avatar_url().unwrap().ends_with("4.png"));
 }
