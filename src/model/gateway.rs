@@ -3,6 +3,26 @@ use super::*;
 use ::internal::prelude::*;
 
 impl Game {
+    #[doc(hidden)]
+    pub fn decode(value: Value) -> Result<Option<Game>> {
+        let mut map = into_map(value)?;
+
+        let name = match map.remove("name") {
+            Some(Value::Null) | None => return Ok(None),
+            Some(v) => into_string(v)?,
+        };
+
+        if name.trim().is_empty() {
+            return Ok(None);
+        }
+
+        Ok(Some(Game {
+            name: name,
+            kind: opt(&mut map, "type", GameType::decode)?.unwrap_or(GameType::Playing),
+            url: opt(&mut map, "url", into_string)?,
+        }))
+    }
+
     /// Creates a `Game` struct that appears as a `Playing <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
@@ -25,26 +45,6 @@ impl Game {
             name: name.to_owned(),
             url: Some(url.to_owned()),
         }
-    }
-
-    #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<Option<Game>> {
-        let mut map = into_map(value)?;
-
-        let name = match map.remove("name") {
-            Some(Value::Null) | None => return Ok(None),
-            Some(v) => into_string(v)?,
-        };
-
-        if name.trim().is_empty() {
-            return Ok(None);
-        }
-
-        Ok(Some(Game {
-            name: name,
-            kind: opt(&mut map, "type", GameType::decode)?.unwrap_or(GameType::Playing),
-            url: opt(&mut map, "url", into_string)?,
-        }))
     }
 }
 

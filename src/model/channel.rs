@@ -29,11 +29,11 @@ use super::utils;
 
 #[cfg(all(feature="cache", feature="methods"))]
 use ::client::CACHE;
-#[cfg(all(feature="methods"))]
+#[cfg(feature="methods")]
 use ::client::rest;
 #[cfg(all(feature="cache", feature="methods"))]
 use ::ext::cache::ChannelRef;
-#[cfg(feature = "methods")]
+#[cfg(feature="methods")]
 use ::utils::builder::{CreateEmbed, CreateInvite, EditChannel, Search};
 
 impl Attachment {
@@ -590,6 +590,27 @@ impl Message {
         }
     }
 
+    /// Retrieves the message author's member instance.
+    ///
+    /// **Note**: This will always return `None` for messages not sent in a
+    /// [`Guild`].
+    ///
+    /// [`Guild`]: struct.Guild.html
+    #[cfg(all(feature="cache", feature="methods"))]
+    pub fn get_member(&self) -> Option<Member> {
+        let cache = CACHE.read().unwrap();
+
+        if let Some(ChannelRef::Guild(channel)) = cache.get_channel(self.channel_id) {
+            if let Some(guild) = channel.guild_id.find() {
+                if let Some(member) = guild.members.get(&self.author.id) {
+                    return Some(member.clone())
+                }
+            }
+        }
+
+        None
+    }
+
     /// Retrieves the guild associated with this message.
     ///
     /// Returns `None` if the guild data does not exist in the cache, or if the
@@ -615,22 +636,6 @@ impl Message {
             Some(ChannelRef::Guild(channel)) => Some(channel.guild_id),
             _ => None,
         }
-    }
-
-    /// Gets message author as member. Won't work on private messages.
-    #[cfg(all(feature="cache", feature="methods"))]
-    pub fn get_member(&self) -> Option<Member> {
-        let cache = CACHE.read().unwrap();
-
-        if let Some(ChannelRef::Guild(channel)) = cache.get_channel(self.channel_id) {
-            if let Some(guild) = channel.guild_id.find() {
-                if let Some(member) = guild.members.get(&self.author.id) {
-                    return Some(member.clone())
-                }
-            }
-        }
-
-        None
     }
 
     /// True if message was sent using direct messages.
@@ -842,6 +847,14 @@ impl PrivateChannel {
         })
     }
 
+    /// Deletes the channel. This does not delete the contents of the channel,
+    /// and is equivalent to closing a private channel on the client, which can
+    /// be re-opened.
+    #[cfg(feature="methods")]
+    pub fn delete(&self) -> Result<Channel> {
+        rest::delete_channel(self.id.0)
+    }
+
     /// Deletes the given message Ids from the private channel.
     ///
     /// **Note**: You can only delete your own messages.
@@ -872,14 +885,6 @@ impl PrivateChannel {
             .build();
 
         rest::delete_messages(self.id.0, map)
-    }
-
-    /// Deletes the channel. This does not delete the contents of the channel,
-    /// and is equivalent to closing a private channel on the client, which can
-    /// be re-opened.
-    #[cfg(feature="methods")]
-    pub fn delete(&self) -> Result<Channel> {
-        rest::delete_channel(self.id.0)
     }
 
     /// Retrieves the list of messages that have been pinned in the private
@@ -1176,6 +1181,7 @@ impl GuildChannel {
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[cfg(feature="methods")]
+    #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
         rest::get_channel_webhooks(self.id.0)
     }

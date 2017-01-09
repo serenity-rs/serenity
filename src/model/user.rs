@@ -17,9 +17,9 @@ use ::model::misc::Mentionable;
 use serde_json::builder::ObjectBuilder;
 #[cfg(feature="methods")]
 use std::mem;
-#[cfg(feature = "methods")]
+#[cfg(feature="methods")]
 use super::Message;
-#[cfg(all(feature = "cache", feature = "methods"))]
+#[cfg(all(feature="cache", feature="methods"))]
 use super::Member;
 #[cfg(feature="methods")]
 use time::Timespec;
@@ -48,6 +48,12 @@ impl CurrentUser {
 
                 format!(cdn!("/avatars/{}/{}.{}?size=1024"), self.id.0, av, ext)
             })
+    }
+
+    /// Returns the DiscordTag™ of a User.
+    #[cfg(feature="methods")]
+    pub fn distinct(&self) -> String {
+        format!("{}#{}", self.name, self.discriminator)
     }
 
     /// Edits the current user's profile settings.
@@ -94,12 +100,6 @@ impl CurrentUser {
         }
     }
 
-    /// Returns the DiscordTag™ of a User.
-    #[cfg(feature="methods")]
-    pub fn distinct(&self) -> String {
-        format!("{}#{}", self.name, self.discriminator)
-    }
-
     /// Gets a list of guilds that the current user is in.
     #[cfg(feature="methods")]
     pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
@@ -132,28 +132,11 @@ impl User {
             })
     }
 
-    /// Gets user as `Member` of a guild.
-    #[cfg(all(feature="cache", feature="methods"))]
-    pub fn member<G>(&self, guild_id: G) -> Option<Member>
-        where G: Into<GuildId> {
-        let cache = CACHE.read().unwrap();
-
-        cache.get_member(guild_id.into(), self.id).cloned()
-    }
-
     /// Retrieves the time that this user was created at.
     #[cfg(feature="methods")]
     #[inline]
     pub fn created_at(&self) -> Timespec {
         self.id.created_at()
-    }
-
-    /// This is an alias of [direct_message].
-    ///
-    /// [direct_message]: #method.direct_message
-    #[cfg(feature="methods")]
-    pub fn dm(&self, content: &str) -> Result<Message> {
-        self.direct_message(content)
     }
 
     /// Send a direct message to a user. This will create or retrieve the
@@ -194,6 +177,15 @@ impl User {
             .build();
 
         rest::send_message(private_channel_id.0, map)
+    }
+
+    /// This is an alias of [direct_message].
+    ///
+    /// [direct_message]: #method.direct_message
+    #[cfg(feature="methods")]
+    #[inline]
+    pub fn dm(&self, content: &str) -> Result<Message> {
+        self.direct_message(content)
     }
 
     /// Check if a user has a [`Role`]. This will retrieve the
@@ -241,6 +233,15 @@ impl User {
                 }}
             },
         }
+    }
+
+    /// Gets the user's member instance for a guild.
+    #[cfg(all(feature="cache", feature="methods"))]
+    pub fn member<G>(&self, guild_id: G) -> Option<Member>
+        where G: Into<GuildId> {
+        let cache = CACHE.read().unwrap();
+
+        cache.get_member(guild_id.into(), self.id).cloned()
     }
 
     /// Returns a static formatted URL of the user's icon, if one exists.

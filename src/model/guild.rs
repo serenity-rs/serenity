@@ -51,19 +51,6 @@ impl From<u64> for GuildContainer {
 }
 
 impl Emoji {
-    /// Finds the [`Guild`] that owns the emoji by looking through the Cache.
-    ///
-    /// [`Guild`]: struct.Guild.html
-    #[cfg(all(feature="cache", feature="methods"))]
-    pub fn find_guild_id(&self) -> Option<GuildId> {
-        CACHE.read()
-            .unwrap()
-            .guilds
-            .values()
-            .find(|guild| guild.emojis.contains_key(&self.id))
-            .map(|guild| guild.id)
-    }
-
     /// Deletes the emoji.
     ///
     /// **Note**: The [Manage Emojis] permission is required.
@@ -107,6 +94,19 @@ impl Emoji {
         }
     }
 
+    /// Finds the [`Guild`] that owns the emoji by looking through the Cache.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    #[cfg(all(feature="cache", feature="methods"))]
+    pub fn find_guild_id(&self) -> Option<GuildId> {
+        CACHE.read()
+            .unwrap()
+            .guilds
+            .values()
+            .find(|guild| guild.emojis.contains_key(&self.id))
+            .map(|guild| guild.id)
+    }
+
     /// Generates a URL to the emoji's image.
     #[cfg(feature="methods")]
     #[inline]
@@ -147,12 +147,6 @@ impl InviteGuild {
 }
 
 impl PartialGuild {
-    /// Finds a role by Id within the guild.
-    #[cfg(feature="methods")]
-    pub fn find_role<R: Into<RoleId>>(&self, role_id: R) -> Option<&Role> {
-        self.roles.get(&role_id.into())
-    }
-
     /// Edits the current user's nickname for the guild.
     ///
     /// Pass `None` to reset the nickname.
@@ -166,17 +160,16 @@ impl PartialGuild {
         rest::edit_nickname(self.id.0, new_nickname)
     }
 
+    /// Finds a role by Id within the guild.
+    #[cfg(feature="methods")]
+    pub fn find_role<R: Into<RoleId>>(&self, role_id: R) -> Option<&Role> {
+        self.roles.get(&role_id.into())
+    }
+
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
             format!(cdn!("/icons/{}/{}.jpg"), self.id, icon))
-    }
-
-    /// Returns the formatted URL of the guild's splash image, if one exists.
-    #[cfg(feature="methods")]
-    pub fn splash_url(&self) -> Option<String> {
-        self.icon.as_ref().map(|icon|
-            format!(cdn!("/splashes/{}/{}.jpg"), self.id, icon))
     }
 
     /// Performs a search request to the API for the guild's [`Message`]s.
@@ -254,6 +247,13 @@ impl PartialGuild {
         let ids = channel_ids.iter().map(|x| x.0).collect::<Vec<u64>>();
 
         rest::search_guild_messages(self.id.0, &ids, f(Search::default()).0)
+    }
+
+    /// Returns the formatted URL of the guild's splash image, if one exists.
+    #[cfg(feature="methods")]
+    pub fn splash_url(&self) -> Option<String> {
+        self.icon.as_ref().map(|icon|
+            format!(cdn!("/splashes/{}/{}.jpg"), self.id, icon))
     }
 
     /// Retrieves the guild's webhooks.
@@ -826,13 +826,6 @@ impl Guild {
         rest::get_guild_prune_count(self.id.0, map)
     }
 
-    /// Returns the formatted URL of the guild's splash image, if one exists.
-    #[cfg(feature="methods")]
-    pub fn splash_url(&self) -> Option<String> {
-        self.icon.as_ref().map(|icon|
-            format!(cdn!("/splashes/{}/{}.jpg"), self.id, icon))
-    }
-
     /// Performs a search request to the API for the guild's [`Message`]s.
     ///
     /// This will search all of the guild's [`Channel`]s at once, that you have
@@ -908,6 +901,13 @@ impl Guild {
         let ids = channel_ids.iter().map(|x| x.0).collect::<Vec<u64>>();
 
         rest::search_guild_messages(self.id.0, &ids, f(Search::default()).0)
+    }
+
+    /// Returns the formatted URL of the guild's splash image, if one exists.
+    #[cfg(feature="methods")]
+    pub fn splash_url(&self) -> Option<String> {
+        self.icon.as_ref().map(|icon|
+            format!(cdn!("/splashes/{}/{}.jpg"), self.id, icon))
     }
 
     /// Starts a prune of [`Member`]s.
@@ -1048,13 +1048,6 @@ impl Member {
                        delete_message_days)
     }
 
-    /// Calculates the member's display name.
-    ///
-    /// The nickname takes priority over the member's username if it exists.
-    pub fn display_name(&self) -> &str {
-        self.nick.as_ref().unwrap_or(&self.user.name)
-    }
-
     /// Determines the member's colour.
     #[cfg(all(feature="cache", feature="methods"))]
     pub fn colour(&self) -> Option<Colour> {
@@ -1079,6 +1072,12 @@ impl Member {
         roles.iter().find(|r| r.colour.value != default.value).map(|r| r.colour)
     }
 
+    /// Calculates the member's display name.
+    ///
+    /// The nickname takes priority over the member's username if it exists.
+    pub fn display_name(&self) -> &str {
+        self.nick.as_ref().unwrap_or(&self.user.name)
+    }
 
     /// Edits the member with the given data. See [`Context::edit_member`] for
     /// more information.

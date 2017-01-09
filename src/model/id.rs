@@ -91,6 +91,7 @@ impl GuildId {
     /// Returns this Id as a `ChannelId`, which is useful when needing to use
     /// the guild Id to send a message to the default channel.
     #[cfg(feature="methods")]
+    #[inline(always)]
     pub fn to_channel(&self) -> ChannelId {
         ChannelId(self.0)
     }
