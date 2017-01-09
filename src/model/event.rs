@@ -720,7 +720,6 @@ impl RelationshipRemoveEvent {
 
 #[derive(Clone, Debug)]
 pub struct ResumedEvent {
-    pub heartbeat_interval: u64,
     pub trace: Vec<Option<String>>,
 }
 
@@ -729,7 +728,6 @@ impl ResumedEvent {
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
         Ok(ResumedEvent {
-            heartbeat_interval: req!(remove(&mut map, "heartbeat_interval")?.as_u64()),
             trace: remove(&mut map, "_trace").and_then(|v| decode_array(v, |v| Ok(into_string(v).ok())))?,
         })
     }

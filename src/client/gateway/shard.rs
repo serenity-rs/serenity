@@ -494,13 +494,8 @@ impl Shard {
         let _ = self.keepalive_channel.send(GatewayStatus::SendMessage(msg));
     }
 
+    #[allow(unused_variables)]
     fn handle_dispatch(&mut self, event: &Event) {
-        if let Event::Resumed(ref ev) = *event {
-            let status = GatewayStatus::Interval(ev.heartbeat_interval);
-
-            let _ = self.keepalive_channel.send(status);
-        }
-
         #[cfg(feature="voice")]
         {
             if let Event::VoiceStateUpdate(ref update) = *event {
