@@ -1212,7 +1212,7 @@ impl Reaction {
     /// [permissions]: permissions
     #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<()> {
-        feature_cache! {{
+        let user_id = feature_cache! {{
             let user = if self.user_id == CACHE.read().unwrap().user.id {
                 None
             } else {
@@ -1233,16 +1233,15 @@ impl Reaction {
                 }
             }
 
-            rest::delete_reaction(self.channel_id.0,
-                                  self.message_id.0,
-                                  user,
-                                  self.emoji.clone())
+            user
         } else {
-            rest::delete_reaction(self.channel_id.0,
-                                  self.message_id.0,
-                                  Some(self.user_id.0),
-                                  self.emoji.clone())
-        }}
+            Some(self.user_id.0)
+        }};
+
+        rest::delete_reaction(self.channel_id.0,
+                              self.message_id.0,
+                              user_id,
+                              self.emoji.clone())
     }
 
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
