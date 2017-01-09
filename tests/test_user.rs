@@ -26,3 +26,19 @@ fn test_core() {
     user.avatar = None;
     assert!(user.avatar_url().is_none());
 }
+
+#[test]
+fn default_avatars() {
+    let mut user = gen();
+
+    user.discriminator = "0".to_owned();
+    assert!(user.default_avatar_url().unwrap().ends_with("1b.png"));
+    user.discriminator = "1".to_owned();
+    assert!(user.default_avatar_url().unwrap().ends_with("68.png"));
+    user.discriminator = "2".to_owned();
+    assert!(user.default_avatar_url().unwrap().ends_with("4d.png"));
+    user.discriminator = "3".to_owned();
+    assert!(user.default_avatar_url().unwrap().ends_with("aa.png"));
+    user.discriminator = "4".to_owned();
+    assert!(user.default_avatar_url().unwrap().ends_with("29.png"));
+}

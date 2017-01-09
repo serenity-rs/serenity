@@ -4,6 +4,7 @@ use serde_json::Value;
 use std::io::Error as IoError;
 use std::error::Error as StdError;
 use std::fmt::{self, Display, Error as FormatError};
+use std::num::ParseIntError;
 use websocket::result::WebSocketError;
 use ::client::gateway::GatewayError;
 use ::client::ClientError;
@@ -55,6 +56,8 @@ pub enum Error {
     Io(IoError),
     /// An error from the `serde_json` crate.
     Json(JsonError),
+    /// An error occurred while parsing an integer.
+    Num(ParseIntError),
     /// Some other error. This is only used for "Expected value <TYPE>" errors,
     /// when a more detailed error can not be easily provided via the
     /// [`Error::Decode`] variant.
@@ -99,6 +102,12 @@ impl From<JsonError> for Error {
     }
 }
 
+impl From<ParseIntError> for Error {
+    fn from(e: ParseIntError) -> Error {
+        Error::Num(e)
+    }
+}
+
 #[cfg(feature="voice")]
 impl From<OpusError> for Error {
     fn from(e: OpusError) -> Error {
@@ -136,6 +145,7 @@ impl StdError for Error {
             Error::Hyper(ref inner) => inner.description(),
             Error::Io(ref inner) => inner.description(),
             Error::Json(ref inner) => inner.description(),
+            Error::Num(ref inner) => inner.description(),
             Error::Url(ref inner) => inner,
             Error::WebSocket(ref inner) => inner.description(),
             #[cfg(feature="voice")]

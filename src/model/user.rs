@@ -2,6 +2,7 @@ use std::fmt;
 use super::utils::{into_map, into_string, remove};
 use super::{
     CurrentUser,
+    DefaultAvatar,
     FriendSourceFlags,
     GuildContainer,
     GuildId,
@@ -137,6 +138,36 @@ impl User {
     #[inline]
     pub fn created_at(&self) -> Timespec {
         self.id.created_at()
+    }
+
+    /// Returns the formatted URL to the user's default avatar URL.
+    ///
+    /// This will produce a PNG URL.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Num`] if there was an error parsing the
+    /// discriminator. Theoretically this is not possible.
+    ///
+    /// Returns an [`Error::Other`] if the remainder of the calculation
+    /// `discriminator % 5` can not be matched. This is also probably not going
+    /// to occur.
+    ///
+    /// [`Error::Num`]: ../enum.Error.html#variant.Num
+    /// [`Error::Other`]: ../enum.Error.html#variant.Other
+    pub fn default_avatar_url(&self) -> Result<String> {
+        Ok(base!("/assets/{}.png", match self.discriminator.parse::<u16>()? % 5u16 {
+            0 => DefaultAvatar::Blurple.name().to_owned(),
+            1 => DefaultAvatar::Grey.name().to_owned(),
+            2 => DefaultAvatar::Green.name().to_owned(),
+            3 => DefaultAvatar::Orange.name().to_owned(),
+            4 => DefaultAvatar::Red.name().to_owned(),
+            other => {
+                error!("Reached impossible default avatar match: {}", other);
+
+                return Err(Error::Other("Reached impossible default match"));
+            },
+        }))
     }
 
     /// Send a direct message to a user. This will create or retrieve the
