@@ -133,7 +133,7 @@ impl GuildInfo {
     /// Returns the formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
-            format!(cdn!("/icons/{}/{}.jpg"), self.id, icon))
+            format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
     }
 }
 
@@ -142,7 +142,7 @@ impl InviteGuild {
     #[cfg(feature="methods")]
     pub fn splash_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
-            format!(cdn!("/splashes/{}/{}.jpg"), self.id, icon))
+            format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
     }
 }
 
@@ -169,7 +169,7 @@ impl PartialGuild {
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
-            format!(cdn!("/icons/{}/{}.jpg"), self.id, icon))
+            format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
     }
 
     /// Performs a search request to the API for the guild's [`Message`]s.
@@ -253,7 +253,7 @@ impl PartialGuild {
     #[cfg(feature="methods")]
     pub fn splash_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
-            format!(cdn!("/splashes/{}/{}.jpg"), self.id, icon))
+            format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
     }
 
     /// Retrieves the guild's webhooks.
@@ -661,7 +661,7 @@ impl Guild {
     /// Returns the formatted URL of the guild's icon, if one exists.
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
-            format!(cdn!("/icons/{}/{}.jpg"), self.id, icon))
+            format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
     }
 
     /// Checks if the guild is 'large'. A guild is considered large if it has
@@ -907,7 +907,7 @@ impl Guild {
     #[cfg(feature="methods")]
     pub fn splash_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
-            format!(cdn!("/splashes/{}/{}.jpg"), self.id, icon))
+            format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
     }
 
     /// Starts a prune of [`Member`]s.

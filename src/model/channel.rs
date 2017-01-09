@@ -381,7 +381,7 @@ impl Group {
     /// Returns the formatted URI of the group's icon if one exists.
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
-            format!(cdn!("/channel-icons/{}/{}.jpg"), self.channel_id, icon))
+            format!(cdn!("/channel-icons/{}/{}.webp"), self.channel_id, icon))
     }
 
     /// Leaves the group.
