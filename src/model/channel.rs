@@ -629,21 +629,21 @@ impl Message {
     /// names and everyone/here mentions cancelled.
     #[cfg(all(feature="cache", feature="methods"))]
     pub fn content_safe(&self) -> String {
-        let mut result = self.content;
+        let mut result = self.content.clone();
 
         // First replace all user mentions.
-        for u in self.mentions {
-            result = result.replace(u.mention(), u.distinct());
+        for u in &self.mentions {
+            result = result.replace(&u.mention(), &u.distinct());
         }
 
         // Then replace all role mentions.
-        for id in self.mention_roles {
+        for id in &self.mention_roles {
             let mention = id.mention();
 
             if let Some(role) = id.find() {
-                result = result.replace(mention, format!("@{}", role.name));
+                result = result.replace(&mention, &format!("@{}", role.name));
             } else {
-                result = result.replace(mention, "@deleted-role");
+                result = result.replace(&mention, "@deleted-role");
             }
         }
 
