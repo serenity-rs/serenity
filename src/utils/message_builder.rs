@@ -297,22 +297,22 @@ impl Default for MessageBuilder {
 }
 
 fn normalize(text: &str) -> String {
-    // Remove everyone and here mentions
-    // This changes 'at' symbol to a full-width variation
-    text.replace("@everyone", "＠everyone")
-        .replace("@here", "＠here")
-        // Remove invite links and popular scam websites, mostly to prevent the
-        // current user from triggering various ad detectors
-        .replace("discord.gg", "discord․gg")
-        .replace("discord.me", "discord․me")
-        .replace("discordlist.net", "discordlist․net")
-        .replace("discordservers.com", "discordservers․com")
-        .replace("discordapp.com/invite", "discordapp․com/invite")
-        // Remove right-to-left and other similar overrides
-        .replace('\u{202E}', " ") // RTL
+    // Remove invite links and popular scam websites, mostly to prevent the
+    // current user from triggering various ad detectors and prevent embeds.
+    text.replace("discord.gg", "discord\u{2024}gg")
+        .replace("discord.me", "discord\u{2024}me")
+        .replace("discordlist.net", "discordlist\u{2024}net")
+        .replace("discordservers.com", "discordservers\u{2024}com")
+        .replace("discordapp.com/invite", "discordapp\u{2024}com/invite")
+        // Remove right-to-left override and other similar annoying symbols
+        .replace('\u{202E}', " ") // RTL Override
         .replace('\u{200F}', " ") // RTL Mark
         .replace('\u{202B}', " ") // RTL Embedding
         .replace('\u{200B}', " ") // Zero-width space
         .replace('\u{200D}', " ") // Zero-width joiner
         .replace('\u{200C}', " ") // Zero-width non-joiner
+        // Remove everyone and here mentions. Has to be put after ZWS replacement
+        // because it utilises it itself.
+        .replace("@everyone", "@\u{200B}everyone")
+        .replace("@here", "@\u{200B}here")
 }
