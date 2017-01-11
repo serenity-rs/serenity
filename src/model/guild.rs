@@ -1079,6 +1079,12 @@ impl Member {
         self.nick.as_ref().unwrap_or(&self.user.name)
     }
 
+    /// Returns the DiscordTag of a Member, taking possible nickname into account.
+    #[cfg(feature="methods")]
+    pub fn distinct(&self) -> String {
+        format!("{}#{}", self.display_name(), self.discriminator)
+    }
+
     /// Edits the member with the given data. See [`Context::edit_member`] for
     /// more information.
     ///

@@ -625,6 +625,33 @@ impl Message {
         }
     }
 
+    /// Returns message content, but with user and role mentions replaced with
+    /// names and everyone/here mentions cancelled.
+    #[cfg(all(feature="cache", feature="methods"))]
+    pub fn content_safe(&self) -> String {
+        let mut result = self.content;
+
+        // First replace all user mentions.
+        for u in self.mentions {
+            result = result.replace(u.mention(), u.distinct());
+        }
+
+        // Then replace all role mentions.
+        for id in self.mention_roles {
+            let mention = id.mention();
+
+            if let Some(role) = id.find() {
+                result = result.replace(mention, format!("@{}", role.name));
+            } else {
+                result = result.replace(mention, "@deleted-role");
+            }
+        }
+
+        // And finally replace everyone and here mentions.
+        result.replace("@everyone", "@\u{200B}everyone")
+              .replace("@here", "@\u{200B}here")
+    }
+
     /// Retrieves the Id of the guild that the message was sent in, if sent in
     /// one.
     ///

@@ -50,7 +50,7 @@ impl CurrentUser {
             })
     }
 
-    /// Returns the DiscordTag™ of a User.
+    /// Returns the DiscordTag of a User.
     #[cfg(feature="methods")]
     pub fn distinct(&self) -> String {
         format!("{}#{}", self.name, self.discriminator)
@@ -130,6 +130,12 @@ impl User {
 
                 format!(cdn!("/avatars/{}/{}.{}?size=1024"), self.id.0, av, ext)
             })
+    }
+
+    /// Returns the DiscordTag of a User.
+    #[cfg(feature="methods")]
+    pub fn distinct(&self) -> String {
+        format!("{}#{}", self.name, self.discriminator)
     }
 
     /// Retrieves the time that this user was created at.
