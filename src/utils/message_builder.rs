@@ -189,7 +189,7 @@ impl MessageBuilder {
     pub fn push_codeblock_safe(mut self, content: &str, language: Option<&str>)
         -> Self {
         let content = &normalize(content)
-            .replace("```", "\u{201B}\u{201B}\u{201B}");
+            .replace("```", "'''");
 
         self.0.push_str("```");
 
@@ -207,7 +207,7 @@ impl MessageBuilder {
     /// Pushes an inline monospaced text to your message normalizing content.
     pub fn push_mono_safe(mut self, content: &str) -> Self {
         self.0.push('`');
-        self.0.push_str(&normalize(content).replace("`", "\u{201B}"));
+        self.0.push_str(&normalize(content).replace('`', "'"));
         self.0.push('`');
 
         self
@@ -216,7 +216,7 @@ impl MessageBuilder {
     /// Pushes an inline italicized text to your message normalizing content.
     pub fn push_italic_safe(mut self, content: &str) -> Self {
         self.0.push('_');
-        self.0.push_str(&normalize(content).replace('_', "＿"));
+        self.0.push_str(&normalize(content).replace('_', " "));
         self.0.push('_');
 
         self
@@ -225,7 +225,7 @@ impl MessageBuilder {
     /// Pushes an inline bold text to your message normalizing content.
     pub fn push_bold_safe(mut self, content: &str) -> Self {
         self.0.push_str("**");
-        self.0.push_str(&normalize(content).replace("**", "∗∗"));
+        self.0.push_str(&normalize(content).replace("**", "  "));
         self.0.push_str("**");
 
         self
@@ -234,7 +234,7 @@ impl MessageBuilder {
     /// Pushes an underlined inline text to your message normalizing content.
     pub fn push_underline_safe(mut self, content: &str) -> Self {
         self.0.push_str("__");
-        self.0.push_str(&normalize(content).replace("__", "＿＿"));
+        self.0.push_str(&normalize(content).replace("__", "  "));
         self.0.push_str("__");
 
         self
@@ -243,7 +243,7 @@ impl MessageBuilder {
     /// Pushes a strikethrough inline text to your message normalizing content.
     pub fn push_strike_safe(mut self, content: &str) -> Self {
         self.0.push_str("~~");
-        self.0.push_str(&normalize(content).replace("~~", "∼∼"));
+        self.0.push_str(&normalize(content).replace("~~", "  "));
         self.0.push_str("~~");
 
         self
