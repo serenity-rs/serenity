@@ -505,19 +505,7 @@ impl Context {
     /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
     pub fn create_role<F, G>(&self, guild_id: G, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole, G: Into<GuildId> {
-        let id = guild_id.into().0;
-
-        // The API only allows creating an empty role, which must then be
-        // edited.
-        //
-        // Note to self: [this] issue/proposal may make this not require an
-        // edit.
-        //
-        // [this]: http://github.com/hammerandchisel/discord-api-docs/issues/156
-        let role = rest::create_role(id)?;
-        let map = f(EditRole::default()).0.build();
-
-        rest::edit_role(id, role.id.0, map)
+        rest::create_role(guild_id.into().0, f(EditRole::default()).0.build())
     }
 
     /// Deletes a [`Channel`] based on the Id given.

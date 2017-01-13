@@ -357,8 +357,8 @@ pub fn create_reaction(channel_id: u64,
 }
 
 /// Creates a role.
-pub fn create_role(guild_id: u64) -> Result<Role> {
-    let body = String::from("{}");
+pub fn create_role(guild_id: u64, map: Value) -> Result<Role> {
+    let body = serde_json::to_string(&map)?;
     let response = request!(Route::GuildsIdRoles(guild_id),
                             post(body),
                             "/guilds/{}/roles",

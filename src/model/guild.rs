@@ -417,10 +417,7 @@ impl Guild {
             }
         }
 
-        let role = rest::create_role(self.id.0)?;
-        let map = f(EditRole::new(&role)).0.build();
-
-        rest::edit_role(self.id.0, role.id.0, map)
+        rest::create_role(self.id.0, f(EditRole::default()).0.build())
     }
 
     #[doc(hidden)]
