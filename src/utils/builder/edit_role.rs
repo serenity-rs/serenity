@@ -37,7 +37,7 @@ impl EditRole {
     /// Creates a new builder with the values of the given [`Role`].
     pub fn new(role: &Role) -> Self {
         EditRole(ObjectBuilder::new()
-            .insert("color", role.colour.value)
+            .insert("color", role.colour.0)
             .insert("hoist", role.hoist)
             .insert("managed", role.managed)
             .insert("mentionable", role.mentionable)

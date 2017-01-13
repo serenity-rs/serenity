@@ -63,7 +63,7 @@ impl CreateEmbed {
 
     /// Set the colour of the left-hand side of the embed.
     pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
-        self.0.insert("color".to_owned(), Value::U64(colour.into().value as u64));
+        self.0.insert("color".to_owned(), Value::U64(colour.into().0 as u64));
 
         CreateEmbed(self.0)
     }

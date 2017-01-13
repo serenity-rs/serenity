@@ -1069,7 +1069,7 @@ impl Member {
             .collect::<Vec<&Role>>();
         roles.sort_by(|a, b| b.cmp(a));
 
-        roles.iter().find(|r| r.colour.value != default.value).map(|r| r.colour)
+        roles.iter().find(|r| r.colour.0 != default.0).map(|r| r.colour)
     }
 
     /// Calculates the member's display name.

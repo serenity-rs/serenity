@@ -65,11 +65,7 @@ macro_rules! colour {
 /// [`dark_teal`]: #method.dark_teal
 /// [`get_g`]: #method.get_g
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub struct Colour {
-    /// The raw inner 32-bit unsigned integer value of this Colour. This is
-    /// worked with to generate values such as the red component value.
-    pub value: u32,
-}
+pub struct Colour(pub u32);
 
 impl Colour {
     /// Generates a new Colour with the given integer value set.
@@ -88,10 +84,9 @@ impl Colour {
     /// ```
     ///
     /// [`get_tuple`]: #method.get_tuple
+    #[inline]
     pub fn new(value: u32) -> Colour {
-        Colour {
-            value: value,
-        }
+        Colour(value)
     }
 
     /// Generates a new Colour from an RGB value, creating an inner u32
@@ -104,8 +99,8 @@ impl Colour {
     /// ```rust
     /// use serenity::utils::Colour;
     ///
-    /// assert!(Colour::from_rgb(255, 0, 0).value == 0xFF0000);
-    /// assert!(Colour::from_rgb(217, 23, 211).value == 0xD917D3);
+    /// assert!(Colour::from_rgb(255, 0, 0).0 == 0xFF0000);
+    /// assert!(Colour::from_rgb(217, 23, 211).0 == 0xD917D3);
     /// ```
     ///
     /// And you can then retrieve those same RGB values via its methods:
@@ -125,14 +120,14 @@ impl Colour {
         uint = (uint << 8) | (g as u32);
         uint = (uint << 8) | (b as u32);
 
-        Colour::new(uint)
+        Colour(uint)
     }
 
     #[doc(hidden)]
     pub fn decode(value: Value) -> Result<Colour> {
         match value {
-            Value::U64(v) => Ok(Colour::new(v as u32)),
-            Value::I64(v) => Ok(Colour::new(v as u32)),
+            Value::U64(v) => Ok(Colour(v as u32)),
+            Value::I64(v) => Ok(Colour(v as u32)),
             other => Err(Error::Decode("Expected valid colour", other)),
         }
     }
@@ -147,7 +142,7 @@ impl Colour {
     /// assert_eq!(Colour::new(6573123).get_r(), 100);
     /// ```
     pub fn get_r(&self) -> u8 {
-        ((self.value >> 16) & 255) as u8
+        ((self.0 >> 16) & 255) as u8
     }
 
     /// Returns the green RGB component of this Colour.
@@ -160,7 +155,7 @@ impl Colour {
     /// assert_eq!(Colour::new(6573123).get_g(), 76);
     /// ```
     pub fn get_g(&self) -> u8 {
-        ((self.value >> 8) & 255) as u8
+        ((self.0 >> 8) & 255) as u8
     }
 
     /// Returns the blue RGB component of this Colour.
@@ -172,7 +167,7 @@ impl Colour {
     ///
     /// assert_eq!(Colour::new(6573123).get_b(), 67);
     pub fn get_b(&self) -> u8 {
-        (self.value & 255) as u8
+        (self.0 & 255) as u8
     }
 
     /// Returns a tuple of the red, green, and blue components of this Colour.
@@ -211,7 +206,7 @@ impl From<i32> for Colour {
     /// assert_eq!(Colour::from(0xDEA584).get_tuple(), (222, 165, 132));
     /// ```
     fn from(value: i32) -> Colour {
-        Colour::new(value as u32)
+        Colour(value as u32)
     }
 }
 
@@ -228,7 +223,7 @@ impl From<u32> for Colour {
     /// assert_eq!(Colour::from(6573123u32).get_r(), 100);
     /// ```
     fn from(value: u32) -> Colour {
-        Colour::new(value)
+        Colour(value)
     }
 }
 
@@ -245,7 +240,7 @@ impl From<u64> for Colour {
     /// assert_eq!(Colour::from(6573123u64).get_r(), 100);
     /// ```
     fn from(value: u64) -> Colour {
-        Colour::new(value as u32)
+        Colour(value as u32)
     }
 }
 
@@ -309,8 +304,6 @@ colour! {
 impl Default for Colour {
     /// Creates a default value for a `Colour`, setting the inner value to `0`.
     fn default() -> Colour {
-        Colour {
-            value: 0,
-        }
+        Colour(0)
     }
 }
