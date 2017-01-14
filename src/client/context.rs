@@ -627,6 +627,8 @@ impl Context {
     /// **Note**: This uses bulk delete endpoint which is not available
     /// for user accounts.
     ///
+    /// **Note**: Messages that are older than 2 weeks can't be deleted using this method.
+    ///
     /// [Manage Messages]: ../model/permissions/constant.MANAGE_MESSAGES.html
     pub fn delete_messages<C>(&self, channel_id: C, message_ids: &[MessageId])
         -> Result<()> where C: Into<ChannelId> {

@@ -353,6 +353,8 @@ impl Group {
     ///
     /// **Note**: Only 2 to 100 messages may be deleted in a single request.
     ///
+    /// **Note**: Messages that are older than 2 weeks can't be deleted using this method.
+    ///
     /// # Errors
     ///
     /// Returns a
@@ -884,9 +886,11 @@ impl PrivateChannel {
 
     /// Deletes the given message Ids from the private channel.
     ///
-    /// **Note**: You can only delete your own messages.
+    /// **Note** This method is only available to bot users and they can't
+    /// delete their recipient's messages.
     ///
-    /// **Note** This method is only available to bot users.
+    /// **Note**: Messages that are older than 2 weeks can't be deleted using
+    /// this method.
     ///
     /// # Errors
     ///
