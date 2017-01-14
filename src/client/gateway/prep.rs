@@ -2,11 +2,12 @@ use serde_json::builder::ObjectBuilder;
 use serde_json::Value;
 use std::net::Shutdown;
 use std::sync::mpsc::{
-    TryRecvError,
     Receiver as MpscReceiver,
-    Sender as MpscSender
+    Sender as MpscSender,
+    TryRecvError,
 };
-use std::time::Duration as StdDuration;
+use std::sync::{Arc, Mutex};
+use std::time::{Duration as StdDuration, Instant};
 use std::{env, thread};
 use super::super::ClientError;
 use super::{GatewayError, GatewayStatus};
@@ -88,6 +89,7 @@ pub fn build_gateway_url(base: &str) -> Result<RequestUrl> {
 }
 
 pub fn keepalive(interval: u64,
+                 heartbeat_sent: Arc<Mutex<Instant>>,
                  mut sender: Sender<WebSocketStream>,
                  channel: MpscReceiver<GatewayStatus>) {
     let mut base_interval = Duration::milliseconds(interval as i64);
@@ -129,8 +131,13 @@ pub fn keepalive(interval: u64,
 
             trace!("Sending heartbeat d: {}", last_sequence);
 
-            if let Err(why) = sender.send_json(&map) {
-                warn!("Error sending keepalive: {:?}", why);
+            match sender.send_json(&map) {
+                Ok(_) => {
+                    let now = Instant::now();
+
+                    *heartbeat_sent.lock().unwrap() = now;
+                },
+                Err(why) => warn!("Error sending keepalive: {:?}", why),
             }
         }
     }

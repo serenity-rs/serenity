@@ -2,8 +2,9 @@ use serde_json::builder::ObjectBuilder;
 use std::io::Write;
 use std::net::Shutdown;
 use std::sync::mpsc::{self, Sender as MpscSender};
+use std::sync::{Arc, Mutex};
 use std::thread::{self, Builder as ThreadBuilder};
-use std::time::Duration as StdDuration;
+use std::time::{Duration as StdDuration, Instant};
 use std::mem;
 use super::super::login_type::LoginType;
 use super::super::rest;
@@ -63,6 +64,13 @@ type CurrentPresence = (Option<Game>, OnlineStatus, bool);
 /// [module docs]: index.html#sharding
 pub struct Shard {
     current_presence: CurrentPresence,
+    /// A tuple of the last instant that a heartbeat was sent, and the last that
+    /// an acknowledgement was received.
+    ///
+    /// This can be used to calculate [`latency`].
+    ///
+    /// [`latency`]: fn.latency.html
+    heartbeat_instants: (Arc<Mutex<Instant>>, Option<Instant>),
     keepalive_channel: MpscSender<GatewayStatus>,
     seq: u64,
     login_type: LoginType,
@@ -131,9 +139,15 @@ impl Shard {
                                   info[1] - 1),
             None => "serenity keepalive [unsharded]".to_owned(),
         };
+
+        let heartbeat_sent = Arc::new(Mutex::new(Instant::now()));
+        let heartbeat_clone = heartbeat_sent.clone();
+
         ThreadBuilder::new()
             .name(thread_name)
-            .spawn(move || prep::keepalive(heartbeat_interval, sender, rx))?;
+            .spawn(move || {
+                prep::keepalive(heartbeat_interval, heartbeat_clone, sender, rx)
+            })?;
 
         // Parse READY
         let event = receiver.recv_json(GatewayEvent::decode)?;
@@ -145,6 +159,7 @@ impl Shard {
         Ok((feature_voice! {{
             Shard {
                 current_presence: (None, OnlineStatus::Online, false),
+                heartbeat_instants: (heartbeat_sent, None),
                 keepalive_channel: tx.clone(),
                 seq: sequence,
                 login_type: login_type,
@@ -157,6 +172,7 @@ impl Shard {
         } else {
             Shard {
                 current_presence: (None, OnlineStatus::Online, false),
+                heartbeat_instants: (heartbeat_sent, None),
                 keepalive_channel: tx.clone(),
                 seq: sequence,
                 login_type: login_type,
@@ -303,6 +319,8 @@ impl Shard {
                 Ok(None)
             },
             Ok(GatewayEvent::HeartbeatAck) => {
+                self.heartbeat_instants.1 = Some(Instant::now());
+
                 Ok(None)
             },
             Ok(GatewayEvent::Hello(interval)) => {
@@ -424,6 +442,12 @@ impl Shard {
             },
             Err(error) => Err(error),
         }
+    }
+
+    /// Calculates the heartbeat latency (in nanoseconds) between the shard and
+    /// Discord.
+    pub fn latency(&self) -> Option<StdDuration> {
+        self.heartbeat_instants.1.map(|send| send - *self.heartbeat_instants.0.lock().unwrap())
     }
 
     /// Shuts down the receiver by attempting to cleanly close the
