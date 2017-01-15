@@ -12,6 +12,7 @@ use super::{GatewayError, GatewayStatus, prep};
 use time;
 use websocket::client::{Client as WsClient, Sender, Receiver};
 use websocket::message::Message as WsMessage;
+use websocket::result::WebSocketError;
 use websocket::stream::WebSocketStream;
 use websocket::ws::sender::Sender as WsSender;
 use ::constants::OpCode;
@@ -410,6 +411,12 @@ impl Shard {
                 self.reconnect(receiver).map(|(ev, rec)| Some((ev, Some(rec))))
             },
             Err(Error::WebSocket(why)) => {
+                if let WebSocketError::NoDataAvailable = why {
+                    if self.heartbeat_instants.1.is_none() {
+                        return Ok(None);
+                    }
+                }
+
                 warn!("Websocket error: {:?}", why);
                 info!("Will attempt to reconnect or resume");
 
