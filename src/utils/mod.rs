@@ -204,11 +204,14 @@ pub fn read_image<P: AsRef<Path>>(path: P) -> Result<String> {
 pub fn parse_quotes(s: &str) -> Vec<String> {
     let mut args = vec![];
     let mut in_string = false;
+    let mut escaping = false;
     let mut current_str = String::default();
 
     for x in s.chars() {
         if in_string {
-            if x == '"' {
+            if x == '\\' && !escaping {
+                escaping = true;
+            } else if x == '"' && !escaping {
                 if !current_str.is_empty() {
                     args.push(current_str);
                 }
@@ -217,6 +220,7 @@ pub fn parse_quotes(s: &str) -> Vec<String> {
                 in_string = false;
             } else {
                 current_str.push(x);
+                escaping = false;
             }
         } else if x == ' ' {
             if !current_str.is_empty() {
