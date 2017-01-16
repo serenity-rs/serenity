@@ -78,6 +78,8 @@ use ::utils;
 
 #[cfg(feature="cache")]
 use ::client::CACHE;
+#[cfg(feature="cache")]
+use ::ext::cache::ChannelRef;
 
 /// A macro to generate "named parameters". This is useful to avoid manually
 /// using the "arguments" parameter and manually parsing types.
@@ -354,7 +356,7 @@ impl Framework {
                                 return;
                             }
 
-                            if self.configuration.ignore_webhooks && message.is_webhook() {
+                            if self.configuration.ignore_webhooks && message.webhook_id.is_some() {
                                 return;
                             }
 
@@ -404,7 +406,15 @@ impl Framework {
 
                             #[cfg(feature="cache")]
                             {
-                                if let Some(guild_id) = message.guild_id() {
+
+                                let guild_id = {
+                                    match CACHE.read().unwrap().get_channel(message.channel_id) {
+                                        Some(ChannelRef::Guild(channel)) => Some(channel.guild_id),
+                                        _ => None,
+                                    }
+                                };
+
+                                if let Some(guild_id) = guild_id {
                                     if self.configuration.blocked_guilds.contains(&guild_id) {
                                         if let Some(ref message) = self.configuration.blocked_guild_message {
                                             let _ = context.say(message);
@@ -412,9 +422,7 @@ impl Framework {
 
                                         return;
                                     }
-                                }
 
-                                if let Some(guild_id) = message.guild_id() {
                                     if let Some(guild) = guild_id.find() {
                                         if self.configuration.blocked_users.contains(&guild.owner_id) {
                                             if let Some(ref message) = self.configuration.blocked_guild_message {
@@ -499,9 +507,25 @@ impl Framework {
                             if !is_owner && !command.required_permissions.is_empty() {
                                 let mut permissions_fulfilled = false;
 
-                                if let Some(member) = message.get_member() {
-                                    let cache = CACHE.read().unwrap();
+                                let cache = CACHE.read().unwrap();
 
+                                // Really **really** dirty code in the meantime
+                                // before the framework rewrite.
+                                let member = {
+                                    let mut member_found = None;
+
+                                    if let Some(ChannelRef::Guild(channel)) = cache.get_channel(message.channel_id) {
+                                        if let Some(guild) = channel.guild_id.find() {
+                                            if let Some(member) = guild.members.get(&message.author.id) {
+                                                member_found = Some(member.clone());
+                                            }
+                                        }
+                                    }
+
+                                    member_found
+                                };
+
+                                if let Some(member) = member {
                                     if let Ok(guild_id) = member.find_guild() {
                                         if let Some(guild) = cache.get_guild(guild_id) {
                                             let perms = guild.permissions_for(message.channel_id, message.author.id);

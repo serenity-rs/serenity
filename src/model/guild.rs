@@ -160,12 +160,6 @@ impl PartialGuild {
         rest::edit_nickname(self.id.0, new_nickname)
     }
 
-    /// Finds a role by Id within the guild.
-    #[cfg(feature="methods")]
-    pub fn find_role<R: Into<RoleId>>(&self, role_id: R) -> Option<&Role> {
-        self.roles.get(&role_id.into())
-    }
-
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
@@ -271,7 +265,7 @@ impl PartialGuild {
 impl Guild {
     #[cfg(all(feature="cache", feature="methods"))]
     fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
-        let member = match self.get_member(CACHE.read().unwrap().user.id) {
+        let member = match self.members.get(&CACHE.read().unwrap().user.id) {
             Some(member) => member,
             None => return Err(Error::Client(ClientError::ItemMissing)),
         };
@@ -577,14 +571,6 @@ impl Guild {
         rest::edit_nickname(self.id.0, new_nickname)
     }
 
-    /// Attempts to retrieve a [`GuildChannel`] with the given Id.
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    pub fn get_channel<C: Into<ChannelId>>(&self, channel_id: C)
-        -> Option<&GuildChannel> {
-        self.channels.get(&channel_id.into())
-    }
-
     /// Retrieves the active invites for the guild.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
@@ -608,11 +594,6 @@ impl Guild {
         }
 
         rest::get_guild_invites(self.id.0)
-    }
-
-    /// Attempts to retrieve the given user's member instance in the guild.
-    pub fn get_member<U: Into<UserId>>(&self, user_id: U) -> Option<&Member> {
-        self.members.get(&user_id.into())
     }
 
     /// Retrieves the first [`Member`] found that matches the name - with an

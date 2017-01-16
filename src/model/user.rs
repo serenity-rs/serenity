@@ -19,8 +19,6 @@ use serde_json::builder::ObjectBuilder;
 use std::mem;
 #[cfg(feature="methods")]
 use super::Message;
-#[cfg(all(feature="cache", feature="methods"))]
-use super::Member;
 #[cfg(feature="methods")]
 use time::Timespec;
 #[cfg(feature="methods")]
@@ -258,15 +256,6 @@ impl User {
                 }}
             },
         }
-    }
-
-    /// Gets the user's member instance for a guild.
-    #[cfg(all(feature="cache", feature="methods"))]
-    pub fn member<G>(&self, guild_id: G) -> Option<Member>
-        where G: Into<GuildId> {
-        let cache = CACHE.read().unwrap();
-
-        cache.get_member(guild_id.into(), self.id).cloned()
     }
 
     /// Returns a static formatted URL of the user's icon, if one exists.

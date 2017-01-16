@@ -88,14 +88,6 @@ impl GuildId {
         rest::get_guild(self.0)
     }
 
-    /// Returns this Id as a `ChannelId`, which is useful when needing to use
-    /// the guild Id to send a message to the default channel.
-    #[cfg(feature="methods")]
-    #[inline(always)]
-    pub fn to_channel(&self) -> ChannelId {
-        ChannelId(self.0)
-    }
-
     /// Retrieves the guild's webhooks.
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.

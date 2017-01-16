@@ -17,13 +17,9 @@ use hyper::Client as HyperClient;
 #[cfg(feature="methods")]
 use serde_json::builder::ObjectBuilder;
 #[cfg(feature="methods")]
-use std::fs::File;
-#[cfg(feature="methods")]
-use std::io::{Read, Write as IoWrite};
+use std::io::Read;
 #[cfg(feature="methods")]
 use std::mem;
-#[cfg(feature="methods")]
-use std::path::{Path, PathBuf};
 #[cfg(all(feature="cache", feature="methods"))]
 use super::utils;
 
@@ -123,71 +119,6 @@ impl Attachment {
         response.read_to_end(&mut bytes)?;
 
         Ok(bytes)
-    }
-
-    /// Downloads the attachment, saving it to the provided directory path.
-    /// Returns a path to the saved file.
-    ///
-    /// # Examples
-    ///
-    /// Download all of the attachments associated with a [`Message`] to a
-    /// given folder:
-    ///
-    /// ```rust,no_run
-    /// use serenity::Client;
-    /// use std::env;
-    /// use std::fs;
-    ///
-    /// // Make sure that the directory to store images in exists.
-    /// fs::create_dir_all("./attachment_downloads")
-    ///     .expect("Error making directory");
-    ///
-    /// let token = env::var("DISCORD_TOKEN").expect("token in environment");
-    /// let mut client = Client::login_bot(&token);
-    ///
-    /// client.on_message(|context, message| {
-    ///     for attachment in message.attachments {
-    ///         let dir = "./attachment_downloads";
-    ///
-    ///         let _ = match attachment.download_to_directory(dir) {
-    ///             Ok(_saved_filepath) => {
-    ///                 context.say(&format!("Saved {:?}", attachment.filename))
-    ///             },
-    ///             Err(why) => {
-    ///                 println!("Error saving attachment: {:?}", why);
-    ///                 context.say("Error saving attachment")
-    ///             },
-    ///         };
-    ///     }
-    /// });
-    ///
-    /// client.on_ready(|_context, ready| {
-    ///     println!("{} is connected!", ready.user.name);
-    /// });
-    ///
-    /// let _ = client.start();
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Io`] when there is a problem reading the contents of
-    /// the HTTP response, creating the file, or writing to the file.
-    ///
-    /// Returns an [`Error::Hyper`] when there is a problem retrieving the
-    /// attachment.
-    ///
-    /// [`Error::Hyper`]: ../enum.Error.html#variant.Hyper
-    /// [`Error::Io`]: ../enum.Error.html#variant.Io
-    /// [`Message`]: struct.Message.html
-    #[cfg(feature="methods")]
-    pub fn download_to_directory<P: AsRef<Path>>(&self, path: P) -> Result<PathBuf> {
-        let bytes = self.download()?;
-
-        let filepath: PathBuf = path.as_ref().join(&self.filename);
-        let mut file = File::create(&filepath)?;
-        file.write(&bytes)?;
-
-        Ok(filepath)
     }
 }
 
@@ -592,41 +523,6 @@ impl Message {
         }
     }
 
-    /// Retrieves the message author's member instance.
-    ///
-    /// **Note**: This will always return `None` for messages not sent in a
-    /// [`Guild`].
-    ///
-    /// [`Guild`]: struct.Guild.html
-    #[cfg(all(feature="cache", feature="methods"))]
-    pub fn get_member(&self) -> Option<Member> {
-        let cache = CACHE.read().unwrap();
-
-        if let Some(ChannelRef::Guild(channel)) = cache.get_channel(self.channel_id) {
-            if let Some(guild) = channel.guild_id.find() {
-                if let Some(member) = guild.members.get(&self.author.id) {
-                    return Some(member.clone())
-                }
-            }
-        }
-
-        None
-    }
-
-    /// Retrieves the guild associated with this message.
-    ///
-    /// Returns `None` if the guild data does not exist in the cache, or if the
-    /// message was not sent in a [`GuildChannel`].
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    #[cfg(all(feature="cache", feature="methods"))]
-    pub fn guild(&self) -> Option<Guild> {
-        match self.guild_id().map(|x| CACHE.read().unwrap().get_guild(x).cloned()) {
-            Some(Some(guild)) => Some(guild),
-            _ => None,
-        }
-    }
-
     /// Returns message content, but with user and role mentions replaced with
     /// names and everyone/here mentions cancelled.
     #[cfg(all(feature="cache", feature="methods"))]
@@ -654,19 +550,6 @@ impl Message {
               .replace("@here", "@\u{200B}here")
     }
 
-    /// Retrieves the Id of the guild that the message was sent in, if sent in
-    /// one.
-    ///
-    /// Returns `None` if the channel data or guild data does not exist in the
-    /// cache.
-    #[cfg(all(feature="cache", feature="methods"))]
-    pub fn guild_id(&self) -> Option<GuildId> {
-        match CACHE.read().unwrap().get_channel(self.channel_id) {
-            Some(ChannelRef::Guild(channel)) => Some(channel.guild_id),
-            _ => None,
-        }
-    }
-
     /// True if message was sent using direct messages.
     #[cfg(all(feature="cache", feature="methods"))]
     pub fn is_private(&self) -> bool {
@@ -674,12 +557,6 @@ impl Message {
             Some(ChannelRef::Group(_)) | Some(ChannelRef::Private(_)) => true,
             _ => false,
         }
-    }
-
-    /// True only if message was sent using a webhook.
-    #[cfg(feature="methods")]
-    pub fn is_webhook(&self) -> bool {
-        self.webhook_id.is_some()
     }
 
     /// Checks the length of a string to ensure that it is within Discord's
@@ -1088,7 +965,7 @@ impl GuildChannel {
     /// ```rust,ignore
     /// channel.edit(|c| c
     ///     .name("test")
-    ///     .bitrate(71));
+    ///     .bitrate(86400));
     /// ```
     #[cfg(feature="methods")]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
