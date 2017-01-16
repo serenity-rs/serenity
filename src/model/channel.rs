@@ -550,6 +550,19 @@ impl Message {
               .replace("@here", "@\u{200B}here")
     }
 
+    /// Retrieves the Id of the guild that the message was sent in, if sent in
+    /// one.
+    ///
+    /// Returns `None` if the channel data or guild data does not exist in the
+    /// cache.
+    #[cfg(all(feature="cache", feature="methods"))]
+    pub fn guild_id(&self) -> Option<GuildId> {
+        match CACHE.read().unwrap().get_channel(self.channel_id) {
+            Some(ChannelRef::Guild(channel)) => Some(channel.guild_id),
+            _ => None,
+        }
+    }
+
     /// True if message was sent using direct messages.
     #[cfg(all(feature="cache", feature="methods"))]
     pub fn is_private(&self) -> bool {
