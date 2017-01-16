@@ -287,6 +287,8 @@ impl Shard {
                 let status = GatewayStatus::Sequence(seq);
                 let _ = self.keepalive_channel.send(status);
 
+                self.seq = seq;
+
                 self.handle_dispatch(&event);
 
                 Ok(Some((event, None)))
