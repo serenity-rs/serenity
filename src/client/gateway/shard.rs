@@ -453,6 +453,8 @@ impl Shard {
 
     /// Calculates the heartbeat latency (in nanoseconds) between the shard and
     /// Discord.
+    // Shamelessly stolen from brayzure's commit in eris:
+    // <https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6>
     pub fn latency(&self) -> Option<StdDuration> {
         self.heartbeat_instants.1.map(|send| send - *self.heartbeat_instants.0.lock().unwrap())
     }
