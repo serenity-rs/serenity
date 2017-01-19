@@ -1171,6 +1171,8 @@ fn handle_shard(shard: Arc<Mutex<Shard>>,
     loop {
         let event = receiver.recv_json(GatewayEvent::decode);
 
+        trace!("Received event on shard handler: {:?}", event);
+
         // This will only lock when _updating_ the shard, resuming, etc. Most
         // of the time, this won't be locked (i.e. when receiving an event over
         // the receiver, separate from the shard itself).
@@ -1208,6 +1210,8 @@ fn handle_shard(shard: Arc<Mutex<Shard>>,
                 mut receiver: Receiver<WebSocketStream>) {
     loop {
         let event = receiver.recv_json(GatewayEvent::decode);
+
+        trace!("Received event on shard handler: {:?}", event);
 
         let event = match shard.lock().unwrap().handle_event(event, &mut receiver) {
             Ok(Some((event, Some(new_receiver)))) => {
