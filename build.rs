@@ -390,6 +390,11 @@ impl {0} {{
                     format!(r#"try!(remove(&mut map, "{}").and_then(into_string))"#,
                             field_name)
                 },
+                ("string", false, true, Some(def), None, None, None) => {
+                    format!(r#"try!(opt(&mut map, "{}", |v| decode_array(v, into_string))).unwrap_or({})"#,
+                            field_name,
+                            def)
+                },
                 ("string", false, true, None, None, None, None) => {
                     format!(r#"try!(remove(&mut map, "{}").and_then(|v| decode_array(v, into_string)))"#,
                             field_name)

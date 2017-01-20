@@ -15,4 +15,5 @@ fields:
     type: User
   - name: rpc_origins
     array: true
+    default: Vec::default()
     type: string
