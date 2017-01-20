@@ -1,6 +1,5 @@
 use serde_json::builder::ObjectBuilder;
 use serde_json::Value;
-use std::net::Shutdown;
 use std::sync::mpsc::{
     Receiver as MpscReceiver,
     Sender as MpscSender,
@@ -96,6 +95,7 @@ pub fn keepalive(interval: u64,
     let mut next_tick = time::get_time() + base_interval;
 
     let mut last_sequence = 0;
+    let mut last_successful = false;
 
     'outer: loop {
         thread::sleep(StdDuration::from_millis(100));
@@ -137,12 +137,25 @@ pub fn keepalive(interval: u64,
 
                     *heartbeat_sent.lock().unwrap() = now;
                 },
-                Err(why) => warn!("Error sending keepalive: {:?}", why),
+                Err(why) => {
+                    warn!("Error sending keepalive: {:?}", why);
+
+                    if last_successful {
+                        debug!("If next keepalive fails, closing");
+                    } else {
+                        break;
+                    }
+
+                    last_successful = false;
+                },
             }
         }
     }
 
     debug!("Closing keepalive");
 
-    let _ = sender.get_mut().shutdown(Shutdown::Both);
+    match sender.shutdown_all() {
+        Ok(_) => debug!("Successfully shutdown sender/receiver"),
+        Err(why) => warn!("Failed to shutdown sender/receiver: {:?}", why),
+    }
 }

@@ -122,6 +122,7 @@ pub enum Error {
     ///
     /// [`Context::edit_role`]: struct.Context.html#method.edit_role
     RecordNotFound,
+    ShardBootFailure,
     /// When the shard being retrieved from within the Client could not be
     /// found after being inserted into the Client's internal vector of
     /// [`Shard`]s.
