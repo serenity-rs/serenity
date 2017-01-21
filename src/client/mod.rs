@@ -50,6 +50,7 @@ use ::internal::ws_impl::ReceiverExt;
 use ::model::event::{
     ChannelPinsAckEvent,
     ChannelPinsUpdateEvent,
+    Event,
     GatewayEvent,
     GuildSyncEvent,
     MessageUpdateEvent,
@@ -796,13 +797,22 @@ impl Client {
             });
 
             match boot {
-                Ok((shard, _ready, receiver)) => {
+                Ok((shard, ready, receiver)) => {
                     #[cfg(feature="cache")]
                     {
                         CACHE.write()
                             .unwrap()
-                            .update_with_ready(&_ready);
+                            .update_with_ready(&ready);
                     }
+
+                    let shard = Arc::new(Mutex::new(shard));
+
+                    dispatch(Event::Ready(ready),
+                             shard.clone(),
+                             self.framework.clone(),
+                             self.data.clone(),
+                             self.login_type,
+                             self.event_store.clone());
 
                     let monitor_info = feature_framework! {{
                         MonitorInfo {
@@ -812,7 +822,7 @@ impl Client {
                             gateway_url: gateway_url.clone(),
                             login_type: self.login_type,
                             receiver: receiver,
-                            shard: Arc::new(Mutex::new(shard)),
+                            shard: shard,
                             shard_info: shard_info,
                             token: self.token.clone(),
                         }
@@ -823,7 +833,7 @@ impl Client {
                             gateway_url: gateway_url.clone(),
                             login_type: self.login_type,
                             receiver: receiver,
-                            shard: Arc::new(Mutex::new(shard)),
+                            shard: shard,
                             shard_info: shard_info,
                             token: self.token.clone(),
                         }
@@ -1245,16 +1255,23 @@ fn monitor_shard(mut info: MonitorInfo) {
             });
 
             match boot {
-                Ok((new_shard, _ready, new_receiver)) => {
+                Ok((new_shard, ready, new_receiver)) => {
                     #[cfg(feature="cache")]
                     {
-                        CACHE.write().unwrap().update_with_ready(&_ready);
+                        CACHE.write().unwrap().update_with_ready(&ready);
                     }
 
                     *info.shard.lock().unwrap() = new_shard;
                     info.receiver = new_receiver;
 
                     boot_successful = true;
+
+                    dispatch(Event::Ready(ready),
+                             info.shard.clone(),
+                             info.framework.clone(),
+                             info.data.clone(),
+                             info.login_type,
+                             info.event_store.clone());
 
                     break;
                 },
