@@ -807,12 +807,20 @@ impl Client {
 
                     let shard = Arc::new(Mutex::new(shard));
 
-                    dispatch(Event::Ready(ready),
-                             shard.clone(),
-                             self.framework.clone(),
-                             self.data.clone(),
-                             self.login_type,
-                             self.event_store.clone());
+                    feature_framework! {{
+                        dispatch(Event::Ready(ready),
+                                 shard.clone(),
+                                 self.framework.clone(),
+                                 self.data.clone(),
+                                 self.login_type,
+                                 self.event_store.clone());
+                    } else {
+                        dispatch(Event::Ready(ready),
+                                 shard.clone(),
+                                 self.data.clone(),
+                                 self.login_type,
+                                 self.event_store.clone());
+                    }}
 
                     let monitor_info = feature_framework! {{
                         MonitorInfo {
@@ -1266,12 +1274,20 @@ fn monitor_shard(mut info: MonitorInfo) {
 
                     boot_successful = true;
 
-                    dispatch(Event::Ready(ready),
-                             info.shard.clone(),
-                             info.framework.clone(),
-                             info.data.clone(),
-                             info.login_type,
-                             info.event_store.clone());
+                    feature_framework! {{
+                        dispatch(Event::Ready(ready),
+                                 info.shard.clone(),
+                                 info.framework.clone(),
+                                 info.data.clone(),
+                                 info.login_type,
+                                 info.event_store.clone());
+                    } else {
+                        dispatch(Event::Ready(ready),
+                                 info.shard.clone(),
+                                 info.data.clone(),
+                                 info.login_type,
+                                 info.event_store.clone());
+                    }}
 
                     break;
                 },
