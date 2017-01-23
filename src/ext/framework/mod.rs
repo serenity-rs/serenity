@@ -360,7 +360,7 @@ impl Framework {
                                 return;
                             }
 
-                            #[cfg(all(feature="cache", feature="methods"))]
+                            #[cfg(feature="cache")]
                             {
                                 if !self.configuration.allow_dm && message.is_private() {
                                     if let Some(ref message) = self.configuration.no_dm_message {

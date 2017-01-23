@@ -78,7 +78,7 @@ impl Mentionable for User {
     }
 }
 
-#[cfg(all(feature="cache", feature="methods"))]
+#[cfg(feature="cache")]
 impl FromStr for User {
     type Err = ();
 
@@ -103,7 +103,7 @@ impl FromStr for UserId {
     }
 }
 
-#[cfg(all(feature="cache", feature="methods"))]
+#[cfg(feature="cache")]
 impl FromStr for Role {
     type Err = ();
 
@@ -130,7 +130,6 @@ impl FromStr for RoleId {
 
 impl EmojiIdentifier {
     /// Generates a URL to the emoji's image.
-    #[cfg(feature="methods")]
     #[inline]
     pub fn url(&self) -> String {
         format!(cdn!("/emojis/{}.png"), self.id)
@@ -153,7 +152,7 @@ impl FromStr for ChannelId {
     }
 }
 
-#[cfg(all(feature="cache", feature="methods"))]
+#[cfg(feature="cache")]
 impl FromStr for Channel {
     type Err = ();
 

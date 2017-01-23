@@ -94,25 +94,6 @@ macro_rules! feature_framework {
     }
 }
 
-// Enable/disable check for methods
-#[cfg(feature="methods")]
-macro_rules! feature_methods {
-    ($enabled:block else $disabled:block) => {
-        {
-            $enabled
-        }
-    }
-}
-
-#[cfg(not(feature="methods"))]
-macro_rules! feature_methods {
-    ($enabled:block else $disabled:block) => {
-        {
-            $disabled
-        }
-    }
-}
-
 // Enable/disable check for voice
 #[cfg(feature="voice")]
 macro_rules! feature_voice {

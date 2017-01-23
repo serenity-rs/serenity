@@ -1,6 +1,6 @@
 use serde_json::builder::ObjectBuilder;
 use std::mem;
-use super::{Message, Webhook};
+use super::{Message, Webhook, WebhookId};
 use ::utils::builder::ExecuteWebhook;
 use ::client::rest;
 use ::internal::prelude::*;
@@ -12,7 +12,7 @@ impl Webhook {
     /// authentication is not required.
     ///
     /// [`rest::delete_webhook_with_token`]: ../client/rest/fn.delete_webhook_with_token.html
-    #[cfg(feature="methods")]
+    #[inline]
     pub fn delete(&self) -> Result<()> {
         rest::delete_webhook_with_token(self.id.0, &self.token)
     }
@@ -63,7 +63,6 @@ impl Webhook {
     ///
     /// [`rest::edit_webhook`]: ../client/rest/fn.edit_webhook.html
     /// [`rest::edit_webhook_with_token`]: ../client/rest/fn.edit_webhook_with_token.html
-    #[cfg(feature="methods")]
     pub fn edit(&mut self, name: Option<&str>, avatar: Option<&str>)
         -> Result<()> {
         if name.is_none() && avatar.is_none() {
@@ -84,9 +83,7 @@ impl Webhook {
             map = map.insert("name", name);
         }
 
-        let map = map.build();
-
-        match rest::edit_webhook_with_token(self.id.0, &self.token, map) {
+        match rest::edit_webhook_with_token(self.id.0, &self.token, map.build()) {
             Ok(replacement) => {
                 mem::replace(self, replacement);
 
@@ -143,12 +140,9 @@ impl Webhook {
     ///     .embeds(vec![embed]))
     ///     .expect("Error executing");
     /// ```
-    #[cfg(feature="methods")]
-    pub fn execute<F>(&self, f: F) -> Result<Message>
-        where F: FnOnce(ExecuteWebhook) -> ExecuteWebhook {
-        let map = f(ExecuteWebhook::default()).0.build();
-
-        rest::execute_webhook(self.id.0, &self.token, map)
+    #[inline]
+    pub fn execute<F: FnOnce(ExecuteWebhook) -> ExecuteWebhook>(&self, f: F) -> Result<Message> {
+        rest::execute_webhook(self.id.0, &self.token, f(ExecuteWebhook::default()).0.build())
     }
 
     /// Retrieves the latest information about the webhook, editing the
@@ -158,7 +152,6 @@ impl Webhook {
     /// authentication is not required.
     ///
     /// [`rest::get_webhook_with_token`]: ../client/rest/fn.get_webhook_with_token.html
-    #[cfg(feature="methods")]
     pub fn refresh(&mut self) -> Result<()> {
         match rest::get_webhook_with_token(self.id.0, &self.token) {
             Ok(replacement) => {
@@ -168,5 +161,17 @@ impl Webhook {
             },
             Err(why) => Err(why),
         }
+    }
+}
+
+impl WebhookId {
+    /// Retrieves the webhook by the Id.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[inline]
+    pub fn get(&self) -> Result<Webhook> {
+        rest::get_webhook(self.0)
     }
 }

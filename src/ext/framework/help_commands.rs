@@ -7,8 +7,8 @@ use ::client::Context;
 use ::model::Message;
 use ::utils::Colour;
 
-fn error_embed(ctx: &mut Context, message: &Message, input: &str) {
-    let _ = ctx.send_message(message.channel_id, |m| m
+fn error_embed(ctx: &mut Context, input: &str) {
+    let _ = ctx.send_message(|m| m
         .embed(|e| e
             .colour(Colour::dark_red())
             .description(input)));
@@ -27,7 +27,7 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 }
 
 pub fn with_embeds(ctx: &mut Context,
-                   message: &Message,
+                   _: &Message,
                    groups: HashMap<String, Arc<CommandGroup>>,
                    args: Vec<String>) -> Result<(), String> {
     if !args.is_empty() {
@@ -49,7 +49,7 @@ pub fn with_embeds(ctx: &mut Context,
                             found = Some((command_name, cmd));
                         },
                         CommandOrAlias::Alias(ref name) => {
-                            error_embed(ctx, message, &format!("Did you mean \"{}\"?", name));
+                            error_embed(ctx, &format!("Did you mean \"{}\"?", name));
                             return Ok(());
                         }
                     }
@@ -58,12 +58,12 @@ pub fn with_embeds(ctx: &mut Context,
 
             if let Some((command_name, command)) = found {
                 if !command.help_available {
-                    error_embed(ctx, message, "**Error**: No help available.");
+                    error_embed(ctx, "**Error**: No help available.");
 
                     return Ok(());
                 }
 
-                let _ = ctx.send_message(message.channel_id, |m| {
+                let _ = ctx.send_message(|m| {
                     m.embed(|e| {
                         let mut embed = e.colour(Colour::rosewater())
                             .title(command_name);
@@ -110,13 +110,13 @@ pub fn with_embeds(ctx: &mut Context,
         }
 
         let error_msg = format!("**Error**: Command `{}` not found.", name);
-        error_embed(ctx, message, &error_msg);
+        error_embed(ctx, &error_msg);
 
         return Ok(());
     }
 
-    let _ = ctx.send_message(message.channel_id, |m| {
-        m.embed(|mut e| {
+    let _ = ctx.send_message(|m| m
+        .embed(|mut e| {
             e = e.colour(Colour::rosewater())
                 .description("To get help with an individual command, pass its \
                               name as an argument to this command.");
@@ -146,8 +146,7 @@ pub fn with_embeds(ctx: &mut Context,
             }
 
             e
-        })
-    });
+        }));
 
     Ok(())
 }

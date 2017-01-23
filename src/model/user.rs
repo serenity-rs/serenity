@@ -1,32 +1,26 @@
-use std::fmt;
+use serde_json::builder::ObjectBuilder;
+use std::{fmt, mem};
 use super::utils::{into_map, into_string, remove};
 use super::{
     CurrentUser,
     FriendSourceFlags,
     GuildContainer,
     GuildId,
+    GuildInfo,
+    Member,
+    Message,
+    PrivateChannel,
     RoleId,
     UserSettings,
     User,
+    UserId,
 };
-use ::internal::prelude::*;
-use ::utils::decode_array;
-use ::model::misc::Mentionable;
-
-#[cfg(feature="methods")]
-use serde_json::builder::ObjectBuilder;
-#[cfg(feature="methods")]
-use std::mem;
-#[cfg(feature="methods")]
-use super::Message;
-#[cfg(feature="methods")]
 use time::Timespec;
-#[cfg(feature="methods")]
 use ::client::rest::{self, GuildPagination};
-#[cfg(feature="methods")]
-use super::GuildInfo;
-#[cfg(feature="methods")]
+use ::internal::prelude::*;
+use ::model::misc::Mentionable;
 use ::utils::builder::EditProfile;
+use ::utils::decode_array;
 
 #[cfg(feature="cache")]
 use ::client::CACHE;
@@ -49,7 +43,6 @@ impl CurrentUser {
     }
 
     /// Returns the DiscordTag of a User.
-    #[cfg(feature="methods")]
     pub fn distinct(&self) -> String {
         format!("{}#{}", self.name, self.discriminator)
     }
@@ -75,7 +68,6 @@ impl CurrentUser {
     ///     .edit(|p| p
     ///         .avatar(Some(&avatar)));
     /// ```
-    #[cfg(feature="methods")]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
         let mut map = ObjectBuilder::new()
@@ -86,11 +78,9 @@ impl CurrentUser {
             map = map.insert("email", email)
         }
 
-        let edited = f(EditProfile(map)).0.build();
-
-        match rest::edit_profile(edited) {
+        match rest::edit_profile(f(EditProfile(map)).0.build()) {
             Ok(new) => {
-                mem::replace(self, new);
+                let _ = mem::replace(self, new);
 
                 Ok(())
             },
@@ -99,9 +89,9 @@ impl CurrentUser {
     }
 
     /// Gets a list of guilds that the current user is in.
-    #[cfg(feature="methods")]
+    #[inline]
     pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
-        rest::get_guilds(GuildPagination::After(GuildId(0)), 100)
+        rest::get_guilds(GuildPagination::After(GuildId(1)), 100)
     }
 
     /// Returns a static formatted URL of the user's icon, if one exists.
@@ -130,14 +120,22 @@ impl User {
             })
     }
 
+    /// Creates a direct message channel between the [current user] and the
+    /// user. This can also retrieve the channel if one already exists.
+    ///
+    /// [current user]: struct.CurrentUser.html
+    #[inline]
+    pub fn create_dm_channel(&self) -> Result<PrivateChannel> {
+        self.id.create_dm_channel()
+    }
+
     /// Returns the DiscordTag of a User.
-    #[cfg(feature="methods")]
+    #[inline]
     pub fn distinct(&self) -> String {
         format!("{}#{}", self.name, self.discriminator)
     }
 
     /// Retrieves the time that this user was created at.
-    #[cfg(feature="methods")]
     #[inline]
     pub fn created_at(&self) -> Timespec {
         self.id.created_at()
@@ -162,10 +160,26 @@ impl User {
         Ok(cdn!("/embed/avatars/{}.png", self.discriminator.parse::<u16>()? % 5u16).to_owned())
     }
 
-    /// Send a direct message to a user. This will create or retrieve the
-    /// PrivateChannel over REST if one is not already in the cache, and then
-    /// send a message to it.
-    #[cfg(feature="methods")]
+    /// Deletes a profile note from a user.
+    #[inline]
+    pub fn delete_note(&self) -> Result<()> {
+        self.id.delete_note()
+    }
+
+    /// Sends a message to a user through a direct message channel. This is a
+    /// channel that can only be accessed by you and the recipient.
+    ///
+    /// # Examples
+    ///
+    /// Sending a message:
+    ///
+    /// ```rust,ignore
+    /// // assuming you are in a context
+    /// let _ = context.message.author.dm("Hello!");
+    /// ```
+    ///
+    /// [`PrivateChannel`]: struct.PrivateChannel.html
+    /// [`User::dm`]: struct.User.html#method.dm
     pub fn direct_message(&self, content: &str)
         -> Result<Message> {
         let private_channel_id = feature_cache! {{
@@ -205,10 +219,59 @@ impl User {
     /// This is an alias of [direct_message].
     ///
     /// [direct_message]: #method.direct_message
-    #[cfg(feature="methods")]
     #[inline]
     pub fn dm(&self, content: &str) -> Result<Message> {
         self.direct_message(content)
+    }
+
+    /// Edits the note that the current user has set for another user.
+    ///
+    /// Use [`delete_note`] to remove a note.
+    ///
+    /// **Note**: Requires that the current user be a user account.
+    ///
+    /// # Examples
+    ///
+    /// Set a note for a message's author:
+    ///
+    /// ```rust,ignore
+    /// // assuming a `message` has been bound
+    /// let _ = context.edit_note(message.author, "test note");
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot
+    /// user.
+    ///
+    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
+    /// [`delete_note`]: #method.delete_note
+    #[inline]
+    pub fn edit_note(&self, note: &str) -> Result<()> {
+        self.id.edit_note(note)
+    }
+
+    /// Gets a user by its Id over the REST API.
+    ///
+    /// **Note**: The current user must be a bot user.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ClientError::InvalidOperationAsUser`] if the current user is not a bot
+    /// user.
+    ///
+    /// [`ClientError::InvalidOperationAsUser`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
+    pub fn get<U: Into<UserId>>(user_id: U) -> Result<User> {
+        #[cfg(feature="cache")]
+        {
+            if !CACHE.read().unwrap().user.bot {
+                return Err(Error::Client(ClientError::InvalidOperationAsUser));
+            }
+        }
+
+        user_id.into().get()
     }
 
     /// Check if a user has a [`Role`]. This will retrieve the
@@ -244,13 +307,16 @@ impl User {
 
         match guild.into() {
             GuildContainer::Guild(guild) => {
-                guild.roles.get(&role_id).is_some()
+                guild.roles.contains_key(&role_id)
             },
-            GuildContainer::Id(guild_id) => {
+            GuildContainer::Id(_guild_id) => {
                 feature_cache! {{
-                    let cache = CACHE.read().unwrap();
-
-                    cache.get_role(guild_id, role_id).is_some()
+                    CACHE.read()
+                        .unwrap()
+                        .guilds
+                        .get(&_guild_id)
+                        .map(|g| g.roles.contains_key(&role_id))
+                        .unwrap_or(false)
                 } else {
                     true
                 }}
@@ -272,6 +338,82 @@ impl fmt::Display for User {
     // This is in the format of: `<@USER_ID>`
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.id.mention(), f)
+    }
+}
+
+impl UserId {
+    /// Creates a direct message channel between the [current user] and the
+    /// user. This can also retrieve the channel if one already exists.
+    ///
+    /// [current user]: struct.CurrentUser.html
+    pub fn create_dm_channel(&self) -> Result<PrivateChannel> {
+        let map = ObjectBuilder::new().insert("recipient_id", self.0).build();
+
+        rest::create_private_channel(map)
+    }
+
+    /// Deletes a profile note from a user.
+    pub fn delete_note(&self) -> Result<()> {
+        let map = ObjectBuilder::new().insert("note", "").build();
+
+        rest::edit_note(self.0, map)
+    }
+
+    /// Edits the note that the current user has set for another user.
+    ///
+    /// Use [`delete_note`] to remove a note.
+    ///
+    /// Refer to the documentation for [`User::edit_note`] for more information.
+    ///
+    /// **Note**: Requires that the current user be a user account.
+    ///
+    /// [`delete_note`]: #method.delete_note
+    /// [`User::edit_note`]: struct.User.html#method.edit_note
+    pub fn edit_note(&self, note: &str) -> Result<()> {
+        let map = ObjectBuilder::new().insert("note", note).build();
+
+        rest::edit_note(self.0, map)
+    }
+
+    /// Search the cache for the user with the Id.
+    #[cfg(feature="cache")]
+    pub fn find(&self) -> Option<User> {
+        CACHE.read().unwrap().get_user(*self).cloned()
+    }
+
+    /// Gets a user by its Id over the REST API.
+    ///
+    /// **Note**: The current user must be a bot user.
+    #[inline]
+    pub fn get(&self) -> Result<User> {
+        rest::get_user(self.0)
+    }
+}
+
+impl From<CurrentUser> for UserId {
+    /// Gets the Id of a `CurrentUser` struct.
+    fn from(current_user: CurrentUser) -> UserId {
+        current_user.id
+    }
+}
+
+impl From<Member> for UserId {
+    /// Gets the Id of a `Member`.
+    fn from(member: Member) -> UserId {
+        member.user.id
+    }
+}
+
+impl From<User> for UserId {
+    /// Gets the Id of a `User`.
+    fn from(user: User) -> UserId {
+        user.id
+    }
+}
+
+impl fmt::Display for UserId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Display::fmt(&self.0, f)
     }
 }
 

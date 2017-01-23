@@ -18,11 +18,11 @@ use super::{
 use ::internal::prelude::*;
 use ::utils::{decode_array, into_array};
 
-#[cfg(all(feature="cache", feature="methods"))]
+#[cfg(feature="cache")]
 use super::permissions::{self, Permissions};
-#[cfg(all(feature="cache", feature="methods"))]
+#[cfg(feature="cache")]
 use ::client::CACHE;
-#[cfg(all(feature="cache", feature="methods"))]
+#[cfg(feature="cache")]
 use ::ext::cache::ChannelRef;
 
 #[macro_escape]
@@ -293,7 +293,7 @@ pub fn remove(map: &mut BTreeMap<String, Value>, key: &str) -> Result<Value> {
     })
 }
 
-#[cfg(all(feature="cache", feature="methods"))]
+#[cfg(feature="cache")]
 pub fn user_has_perms(channel_id: ChannelId,
                       mut permissions: Permissions)
                       -> Result<bool> {

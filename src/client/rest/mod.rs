@@ -517,7 +517,7 @@ pub fn delete_reaction(channel_id: u64,
                        user_id: Option<u64>,
                        reaction_type: ReactionType)
                        -> Result<()> {
-    let user = user_id.map(|uid| uid.to_string()).unwrap_or("@me".to_string());
+    let user = user_id.map(|uid| uid.to_string()).unwrap_or_else(|| "@me".to_string());
 
     verify(204, request!(Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
                          delete,
@@ -702,7 +702,6 @@ pub fn edit_note(user_id: u64, map: Value) -> Result<()> {
 /// **Note**: this token change may cause requests made between the actual token
 /// change and when the token is internally changed to be invalid requests, as
 /// the token may be outdated.
-///
 pub fn edit_profile(map: Value) -> Result<CurrentUser> {
     let body = serde_json::to_string(&map)?;
     let response = request!(Route::UsersMe, patch(body), "/users/@me");

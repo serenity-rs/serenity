@@ -1,3 +1,4 @@
+use serde_json::builder::ObjectBuilder;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::fmt;
@@ -13,23 +14,17 @@ use super::utils::{
     remove,
 };
 use super::*;
+use ::client::rest;
 use ::internal::prelude::*;
+use ::utils::builder::{EditGuild, EditMember, EditRole, Search};
 use ::utils::decode_array;
 
-#[cfg(feature="methods")]
-use serde_json::builder::ObjectBuilder;
-#[cfg(all(feature="cache", feature = "methods"))]
+#[cfg(feature="cache")]
 use std::mem;
-#[cfg(all(feature="cache", feature="methods"))]
-use ::utils::builder::EditMember;
-#[cfg(feature="methods")]
-use ::utils::builder::{EditGuild, EditRole, Search};
-#[cfg(feature = "methods")]
-use ::client::rest;
 
-#[cfg(all(feature="cache", feature="methods"))]
+#[cfg(feature="cache")]
 use ::client::CACHE;
-#[cfg(all(feature="cache", feature="methods"))]
+#[cfg(feature="cache")]
 use ::utils::Colour;
 
 impl From<PartialGuild> for GuildContainer {
@@ -58,7 +53,7 @@ impl Emoji {
     /// **Note**: Only user accounts may use this method.
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     pub fn delete(&self) -> Result<()> {
         match self.find_guild_id() {
             Some(guild_id) => rest::delete_emoji(guild_id.0, self.id.0),
@@ -73,7 +68,7 @@ impl Emoji {
     /// **Note**: Only user accounts may use this method.
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     pub fn edit(&mut self, name: &str) -> Result<()> {
         match self.find_guild_id() {
             Some(guild_id) => {
@@ -97,7 +92,7 @@ impl Emoji {
     /// Finds the [`Guild`] that owns the emoji by looking through the Cache.
     ///
     /// [`Guild`]: struct.Guild.html
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     pub fn find_guild_id(&self) -> Option<GuildId> {
         CACHE.read()
             .unwrap()
@@ -108,7 +103,6 @@ impl Emoji {
     }
 
     /// Generates a URL to the emoji's image.
-    #[cfg(feature="methods")]
     #[inline]
     pub fn url(&self) -> String {
         format!(cdn!("/emojis/{}.png"), self.id)
@@ -129,6 +123,19 @@ impl fmt::Display for Emoji {
     }
 }
 
+impl fmt::Display for EmojiId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Display::fmt(&self.0, f)
+    }
+}
+
+impl From<Emoji> for EmojiId {
+    /// Gets the Id of an `Emoji`.
+    fn from(emoji: Emoji) -> EmojiId {
+        emoji.id
+    }
+}
+
 impl GuildInfo {
     /// Returns the formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
@@ -139,131 +146,14 @@ impl GuildInfo {
 
 impl InviteGuild {
     /// Returns the formatted URL of the guild's splash image, if one exists.
-    #[cfg(feature="methods")]
     pub fn splash_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
             format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
-    }
-}
-
-impl PartialGuild {
-    /// Edits the current user's nickname for the guild.
-    ///
-    /// Pass `None` to reset the nickname.
-    ///
-    /// **Note**: Requires the [Change Nickname] permission.
-    ///
-    /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
-    #[cfg(feature="methods")]
-    #[inline]
-    pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
-        rest::edit_nickname(self.id.0, new_nickname)
-    }
-
-    /// Returns a formatted URL of the guild's icon, if the guild has an icon.
-    pub fn icon_url(&self) -> Option<String> {
-        self.icon.as_ref().map(|icon|
-            format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
-    }
-
-    /// Performs a search request to the API for the guild's [`Message`]s.
-    ///
-    /// This will search all of the guild's [`Channel`]s at once, that you have
-    /// the [Read Message History] permission to. Use [`search_channels`] to
-    /// specify a list of [channel][`GuildChannel`]s to search, where all other
-    /// channels will be excluded.
-    ///
-    /// Refer to the documentation for the [`Search`] builder for examples and
-    /// more information.
-    ///
-    /// **Note**: Bot users can not search.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
-    ///
-    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
-    /// [`Channel`]: enum.Channel.html
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`Message`]: struct.Message.html
-    /// [`Search`]: ../utils/builder/struct.Search.html
-    /// [`search_channels`]: #method.search_channels
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[cfg(feature="methods")]
-    pub fn search<F>(&self, f: F) -> Result<SearchResult>
-        where F: FnOnce(Search) -> Search {
-        #[cfg(feature="cache")]
-        {
-            if CACHE.read().unwrap().user.bot {
-                return Err(Error::Client(ClientError::InvalidOperationAsBot));
-            }
-        }
-
-        rest::search_guild_messages(self.id.0, &[], f(Search::default()).0)
-    }
-
-    /// Performs a search request to the API for the guild's [`Message`]s in
-    /// given channels.
-    ///
-    /// This will search all of the messages in the guild's provided
-    /// [`Channel`]s by Id that you have the [Read Message History] permission
-    /// to. Use [`search`] to search all of a guild's [channel][`GuildChannel`]s
-    /// at once.
-    ///
-    /// Refer to the documentation for the [`Search`] builder for examples and
-    /// more information.
-    ///
-    /// **Note**: Bot users can not search.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
-    ///
-    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
-    /// [`Channel`]: enum.Channel.html
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`Message`]: struct.Message.html
-    /// [`Search`]: ../utils/builder/struct.Search.html
-    /// [`search`]: #method.search
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[cfg(feature="methods")]
-    pub fn search_channels<F>(&self, channel_ids: &[ChannelId], f: F)
-        -> Result<SearchResult> where F: FnOnce(Search) -> Search {
-        #[cfg(feature="cache")]
-        {
-            if CACHE.read().unwrap().user.bot {
-                return Err(Error::Client(ClientError::InvalidOperationAsBot));
-            }
-        }
-
-        let ids = channel_ids.iter().map(|x| x.0).collect::<Vec<u64>>();
-
-        rest::search_guild_messages(self.id.0, &ids, f(Search::default()).0)
-    }
-
-    /// Returns the formatted URL of the guild's splash image, if one exists.
-    #[cfg(feature="methods")]
-    pub fn splash_url(&self) -> Option<String> {
-        self.icon.as_ref().map(|icon|
-            format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
-    }
-
-    /// Retrieves the guild's webhooks.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
-    #[cfg(feature="methods")]
-    #[inline]
-    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        rest::get_guild_webhooks(self.id.0)
     }
 }
 
 impl Guild {
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
         let member = match self.members.get(&CACHE.read().unwrap().user.id) {
             Some(member) => member,
@@ -277,8 +167,9 @@ impl Guild {
     }
 
     /// Ban a [`User`] from the guild. All messages by the
-    /// user within the last given number of days given will be deleted. This
-    /// may be a range between `0` and `7`.
+    /// user within the last given number of days given will be deleted.
+    ///
+    /// Refer to the documentation for [`Guild::ban`] for more information.
     ///
     /// **Note**: Requires the [Ban Members] permission.
     ///
@@ -301,9 +192,9 @@ impl Guild {
     ///
     /// [`ClientError::DeleteMessageDaysAmount`]: ../client/enum.ClientError.html#variant.DeleteMessageDaysAmount
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`Guild::ban`]: struct.Guild.html#method.ban
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    #[cfg(feature="methods")]
     pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8)
         -> Result<()> {
         if delete_message_days > 7 {
@@ -319,7 +210,7 @@ impl Guild {
             }
         }
 
-        rest::ban_user(self.id.0, user.into().0, delete_message_days)
+        self.id.ban(user.into(), delete_message_days)
     }
 
     /// Retrieves a list of [`Ban`]s for the guild.
@@ -334,7 +225,6 @@ impl Guild {
     /// [`Ban`]: struct.Ban.html
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    #[cfg(feature="methods")]
     pub fn bans(&self) -> Result<Vec<Ban>> {
         #[cfg(feature="cache")]
         {
@@ -345,7 +235,43 @@ impl Guild {
             }
         }
 
-        rest::get_bans(self.id.0)
+        self.id.get_bans()
+    }
+
+    /// Creates a guild with the data provided.
+    ///
+    /// Only a [`PartialGuild`] will be immediately returned, and a full
+    /// [`Guild`] will be received over a [`Shard`].
+    ///
+    /// **Note**: This endpoint is usually only available for user accounts.
+    /// Refer to Discord's information for the endpoint [here][whitelist] for
+    /// more information. If you require this as a bot, re-think what you are
+    /// doing and if it _really_ needs to be doing this.
+    ///
+    /// # Examples
+    ///
+    /// Create a guild called `"test"` in the [US West region] with no icon:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::{Guild, Region};
+    ///
+    /// let _guild = Guild::create_guild("test", Region::UsWest, None);
+    /// ```
+    ///
+    /// [`Guild`]: struct.Guild.html
+    /// [`PartialGuild`]: struct.PartialGuild.html
+    /// [`Shard`]: ../gateway/struct.Shard.html
+    /// [US West region]: enum.Region.html#variant.UsWest
+    /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
+    pub fn create(name: &str, region: Region, icon: Option<&str>)
+        -> Result<PartialGuild> {
+        let map = ObjectBuilder::new()
+            .insert("icon", icon)
+            .insert("name", name)
+            .insert("region", region.name())
+            .build();
+
+        rest::create_guild(map)
     }
 
     /// Creates a new [`Channel`] in the guild.
@@ -370,7 +296,6 @@ impl Guild {
     /// [`Channel`]: struct.Channel.html
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Channels]: permissions/constants.MANAGE_CHANNELS.html
-    #[cfg(feature="methods")]
     pub fn create_channel(&mut self, name: &str, kind: ChannelType)
         -> Result<Channel> {
         #[cfg(feature="cache")]
@@ -382,19 +307,57 @@ impl Guild {
             }
         }
 
-        let map = ObjectBuilder::new()
-            .insert("name", name)
-            .insert("type", kind.name())
-            .build();
-
-        rest::create_channel(self.id.0, map)
+        self.id.create_channel(name, kind)
     }
 
-    /// Creates a new [`Role`] in the guild with the data set, if any.
+    /// Creates an emoji in the guild with a name and base64-encoded image. The
+    /// [`utils::read_image`] function is provided for you as a simple method to
+    /// read an image and encode it into base64, if you are reading from the
+    /// filesystem.
     ///
-    /// See the documentation for [`Context::create_role`] on how to use this.
+    /// The name of the emoji must be at least 2 characters long and can only
+    /// contain alphanumeric characters and underscores.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// # Examples
+    ///
+    /// See the [`EditProfile::avatar`] example for an in-depth example as to
+    /// how to read an image from the filesystem and encode it as base64. Most
+    /// of the example can be applied similarly for this method.
+    ///
+    /// [`EditProfile::avatar`]: ../utils/builder/struct.EditProfile.html#method.avatar
+    /// [`utils::read_image`]: ../utils/fn.read_image.html
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn create_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
+        self.id.create_emoji(name, image)
+    }
+
+    /// Creates an integration for the guild.
+    ///
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[inline]
+    pub fn create_integration<I>(&self, integration_id: I, kind: &str) -> Result<()>
+        where I: Into<IntegrationId> {
+        self.id.create_integration(integration_id, kind)
+    }
+
+    /// Creates a new role in the guild with the data set, if any.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Create a role which can be mentioned, with the name 'test':
+    ///
+    /// ```rust,ignore
+    /// let role = context.create_role(guild_id, |r| r
+    ///     .hoist(true)
+    ///     .name("role"));
+    /// ```
     ///
     /// # Errors
     ///
@@ -405,7 +368,6 @@ impl Guild {
     /// [`Context::create_role`]: ../client/struct.Context.html#method.create_role
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constants.MANAGE_ROLES.html
-    #[cfg(feature="methods")]
     pub fn create_role<F>(&self, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole {
         #[cfg(feature="cache")]
@@ -417,7 +379,7 @@ impl Guild {
             }
         }
 
-        rest::create_role(self.id.0, f(EditRole::default()).0.build())
+        self.id.create_role(f)
     }
 
     #[doc(hidden)]
@@ -464,8 +426,7 @@ impl Guild {
         })
     }
 
-
-    /// Deletes the current guild if the current account is the owner of the
+    /// Deletes the current guild if the current user is the owner of the
     /// guild.
     ///
     /// **Note**: Requires the current user to be the owner of the guild.
@@ -476,7 +437,6 @@ impl Guild {
     /// if the current user is not the guild owner.
     ///
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
-    #[cfg(feature="methods")]
     pub fn delete(&self) -> Result<PartialGuild> {
         #[cfg(feature="cache")]
         {
@@ -487,14 +447,67 @@ impl Guild {
             }
         }
 
-        rest::delete_guild(self.id.0)
+        self.id.delete()
     }
 
-    /// Edits the current guild with new data where specified. See the
-    /// documentation for [`Context::edit_guild`] on how to use this.
+    /// Deletes an [`Emoji`] from the guild.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// [`Emoji`]: struct.Emoji.html
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn delete_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<()> {
+        self.id.delete_emoji(emoji_id)
+    }
+
+    /// Deletes an integration by Id from the guild.
+    ///
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[inline]
+    pub fn delete_integration<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
+        self.id.delete_integration(integration_id)
+    }
+
+    /// Deletes a [`Role`] by Id from the guild.
+    ///
+    /// Also see [`Role::delete`] if you have the `cache` and `methods` features
+    /// enabled.
+    ///
+    /// Requires the [Manage Roles] permission.
+    ///
+    /// [`Role`]: struct.Role.html
+    /// [`Role::delete`]: struct.Role.html#method.delete
+    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[inline]
+    pub fn delete_role<R: Into<RoleId>>(&self, role_id: R) -> Result<()> {
+        self.id.delete_role(role_id)
+    }
+
+    /// Edits the current guild with new data where specified.
+    ///
+    /// Refer to `EditGuild`'s documentation for a full list of methods.
+    ///
+    /// Also see [`Guild::edit`] if you have the `methods` feature enabled.
     ///
     /// **Note**: Requires the current user to have the [Manage Guild]
     /// permission.
+    ///
+    /// # Examples
+    ///
+    /// Change a guild's icon using a file name "icon.png":
+    ///
+    /// ```rust,ignore
+    /// use serenity::utils;
+    ///
+    /// // We are using read_image helper function from utils.
+    /// let base64_icon = utils::read_image("./icon.png")
+    ///     .expect("Failed to read image");
+    ///
+    /// guild.edit(|g| g.icon(base64_icon));
+    /// ```
     ///
     /// # Errors
     ///
@@ -504,7 +517,6 @@ impl Guild {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`Context::edit_guild`]: ../client/struct.Context.html#method.edit_guild
     /// [Manage Guild]: permissions/constants.MANAGE_GUILD.html
-    #[cfg(feature="methods")]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditGuild) -> EditGuild {
         #[cfg(feature="cache")]
@@ -516,9 +528,7 @@ impl Guild {
             }
         }
 
-        let map = f(EditGuild::default()).0.build();
-
-        match rest::edit_guild(self.id.0, map) {
+        match self.id.edit(f) {
             Ok(guild) => {
                 self.afk_channel_id = guild.afk_channel_id;
                 self.afk_timeout = guild.afk_timeout;
@@ -540,6 +550,42 @@ impl Guild {
         }
     }
 
+    /// Edits an [`Emoji`]'s name in the guild.
+    ///
+    /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features
+    /// enabled.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// [`Emoji`]: struct.Emoji.html
+    /// [`Emoji::edit`]: struct.Emoji.html#method.edit
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str) -> Result<Emoji> {
+        self.id.edit_emoji(emoji_id, name)
+    }
+
+    /// Edits the properties of member of the guild, such as muting or
+    /// nicknaming them.
+    ///
+    /// Refer to `EditMember`'s documentation for a full list of methods and
+    /// permission restrictions.
+    ///
+    /// # Examples
+    ///
+    /// Mute a member and set their roles to just one role with a predefined Id:
+    ///
+    /// ```rust,ignore
+    /// guild.edit_member(user_id, |m| m
+    ///     .mute(true)
+    ///     .roles(&vec![role_id]));
+    /// ```
+    #[inline]
+    pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
+        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
+        self.id.edit_member(user_id, f)
+    }
+
     /// Edits the current user's nickname for the guild.
     ///
     /// Pass `None` to reset the nickname.
@@ -554,7 +600,6 @@ impl Guild {
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
-    #[cfg(feature="methods")]
     pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
         #[cfg(feature="cache")]
         {
@@ -565,7 +610,78 @@ impl Guild {
             }
         }
 
-        rest::edit_nickname(self.id.0, new_nickname)
+        self.id.edit_nickname(new_nickname)
+    }
+
+    /// Edits a role, optionally setting its fields.
+    ///
+    /// Requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Make a role hoisted:
+    ///
+    /// ```rust,ignore
+    /// guild.edit_role(RoleId(7), |r| r.hoist(true));
+    /// ```
+    ///
+    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[inline]
+    pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
+        where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
+        self.id.edit_role(role_id, f)
+    }
+
+    /// Gets a partial amount of guild data by its Id.
+    ///
+    /// Requires that the current user be in the guild.
+    #[inline]
+    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> {
+        guild_id.into().get()
+    }
+
+    /// Gets a list of the guild's bans.
+    ///
+    /// Requires the [Ban Members] permission.
+    #[inline]
+    pub fn get_bans(&self) -> Result<Vec<Ban>> {
+        self.id.get_bans()
+    }
+
+    /// Gets all of the guild's channels over the REST API.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    #[inline]
+    pub fn get_channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> {
+        self.id.get_channels()
+    }
+
+    /// Gets an emoji in the guild by Id.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn get_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> {
+        self.id.get_emoji(emoji_id)
+    }
+
+    /// Gets a list of all of the guild's emojis.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn get_emojis(&self) -> Result<Vec<Emoji>> {
+        self.id.get_emojis()
+    }
+
+    /// Gets all integration of the guild.
+    ///
+    /// This performs a request over the REST API.
+    #[inline]
+    pub fn get_integrations(&self) -> Result<Vec<Integration>> {
+        self.id.get_integrations()
     }
 
     /// Retrieves the active invites for the guild.
@@ -579,7 +695,6 @@ impl Guild {
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    #[cfg(feature="methods")]
     pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
         #[cfg(feature="cache")]
         {
@@ -590,7 +705,29 @@ impl Guild {
             }
         }
 
-        rest::get_guild_invites(self.id.0)
+        self.id.get_invites()
+    }
+
+    /// Gets a user's [`Member`] for the guild by Id.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    /// [`Member`]: struct.Member.html
+    #[inline]
+    pub fn get_member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
+        self.id.get_member(user_id)
+    }
+
+    /// Gets a list of the guild's members.
+    ///
+    /// Optionally pass in the `limit` to limit the number of results. Maximum
+    /// value is 1000. Optionally pass in `after` to offset the results by a
+    /// [`User`]'s Id.
+    ///
+    /// [`User`]: struct.User.html
+    #[inline]
+    pub fn get_members<U>(&self, limit: Option<u64>, after: Option<U>)
+        -> Result<Vec<Member>> where U: Into<UserId> {
+        self.id.get_members(limit, after)
     }
 
     /// Retrieves the first [`Member`] found that matches the name - with an
@@ -631,9 +768,38 @@ impl Guild {
                 };
 
                 name_matches && discrim_matches
-            }).or(self.members.iter().find(|&(_member_id, member)| {
+            }).or_else(|| self.members.iter().find(|&(_member_id, member)| {
                 member.nick.as_ref().map_or(false, |nick| nick == name)
             })).map(|(_member_id, member)| member)
+    }
+
+    /// Retrieves the count of the number of [`Member`]s that would be pruned
+    /// with the number of given days.
+    ///
+    /// See the documentation on [`GuildPrune`] for more information.
+    ///
+    /// **Note**: Requires the [Kick Members] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to perform bans.
+    ///
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`GuildPrune`]: struct.GuildPrune.html
+    /// [`Member`]: struct.Member.html
+    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    pub fn get_prune_count(&self, days: u16) -> Result<GuildPrune> {
+        #[cfg(feature="cache")]
+        {
+            let req = permissions::KICK_MEMBERS;
+
+            if !self.has_perms(req)? {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }
+
+        self.id.get_prune_count(days)
     }
 
     /// Returns the formatted URL of the guild's icon, if one exists.
@@ -644,14 +810,37 @@ impl Guild {
 
     /// Checks if the guild is 'large'. A guild is considered large if it has
     /// more than 250 members.
+    #[inline]
     pub fn is_large(&self) -> bool {
         self.members.len() > 250
     }
 
+    /// Kicks a [`Member`] from the guild.
+    ///
+    /// Requires the [Kick Members] permission.
+    ///
+    /// [`Member`]: struct.Member.html
+    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    #[inline]
+    pub fn kick<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
+        self.id.kick(user_id)
+    }
+
     /// Leaves the guild.
-    #[cfg(feature="methods")]
+    #[inline]
     pub fn leave(&self) -> Result<PartialGuild> {
-        rest::leave_guild(self.id.0)
+        self.id.leave()
+    }
+
+    /// Moves a member to a specific voice channel.
+    ///
+    /// Requires the [Move Members] permission.
+    ///
+    /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
+    #[inline]
+    pub fn move_member<C, U>(&self, user_id: U, channel_id: C)
+        -> Result<()> where C: Into<ChannelId>, U: Into<UserId> {
+        self.id.move_member(user_id, channel_id)
     }
 
     /// Calculate a [`User`]'s permissions in a given channel in the guild.
@@ -770,40 +959,6 @@ impl Guild {
         permissions
     }
 
-    /// Retrieves the count of the number of [`Member`]s that would be pruned
-    /// with the number of given days.
-    ///
-    /// See the documentation on [`GuildPrune`] for more information.
-    ///
-    /// **Note**: Requires the [Kick Members] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans.
-    ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
-    /// [`GuildPrune`]: struct.GuildPrune.html
-    /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
-    #[cfg(feature="methods")]
-    pub fn prune_count(&self, days: u16) -> Result<GuildPrune> {
-        #[cfg(feature="cache")]
-        {
-            let req = permissions::KICK_MEMBERS;
-
-            if !self.has_perms(req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
-            }
-        }
-
-        let map = ObjectBuilder::new()
-            .insert("days", days)
-            .build();
-
-        rest::get_guild_prune_count(self.id.0, map)
-    }
-
     /// Performs a search request to the API for the guild's [`Message`]s.
     ///
     /// This will search all of the guild's [`Channel`]s at once, that you have
@@ -828,9 +983,7 @@ impl Guild {
     /// [`Search`]: ../utils/builder/struct.Search.html
     /// [`search_channels`]: #method.search_channels
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[cfg(feature="methods")]
-    pub fn search<F>(&self, f: F) -> Result<SearchResult>
-        where F: FnOnce(Search) -> Search {
+    pub fn search<F: FnOnce(Search) -> Search>(&self, f: F) -> Result<SearchResult> {
         #[cfg(feature="cache")]
         {
             if CACHE.read().unwrap().user.bot {
@@ -866,7 +1019,6 @@ impl Guild {
     /// [`Search`]: ../utils/builder/struct.Search.html
     /// [`search`]: #method.search
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[cfg(feature = "methods")]
     pub fn search_channels<F>(&self, channel_ids: &[ChannelId], f: F)
         -> Result<SearchResult> where F: FnOnce(Search) -> Search {
         #[cfg(feature="cache")]
@@ -876,16 +1028,23 @@ impl Guild {
             }
         }
 
-        let ids = channel_ids.iter().map(|x| x.0).collect::<Vec<u64>>();
-
-        rest::search_guild_messages(self.id.0, &ids, f(Search::default()).0)
+        self.id.search_channels(channel_ids, f)
     }
 
     /// Returns the formatted URL of the guild's splash image, if one exists.
-    #[cfg(feature="methods")]
     pub fn splash_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
             format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
+    }
+
+    /// Starts an integration sync for the given integration Id.
+    ///
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[inline]
+    pub fn start_integration_sync<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
+        self.id.start_integration_sync(integration_id)
     }
 
     /// Starts a prune of [`Member`]s.
@@ -903,7 +1062,6 @@ impl Guild {
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
-    #[cfg(feature="methods")]
     pub fn start_prune(&self, days: u16) -> Result<GuildPrune> {
         #[cfg(feature="cache")]
         {
@@ -914,11 +1072,7 @@ impl Guild {
             }
         }
 
-        let map = ObjectBuilder::new()
-            .insert("days", days)
-            .build();
-
-        rest::start_guild_prune(self.id.0, map)
+        self.id.start_prune(days)
     }
 
     /// Unbans the given [`User`] from the guild.
@@ -933,8 +1087,7 @@ impl Guild {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    #[cfg(feature="methods")]
-    pub fn unban<U: Into<UserId>>(&self, user: U) -> Result<()> {
+    pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
         #[cfg(feature="cache")]
         {
             let req = permissions::BAN_MEMBERS;
@@ -944,7 +1097,7 @@ impl Guild {
             }
         }
 
-        rest::remove_ban(self.id.0, user.into().0)
+        self.id.unban(user_id)
     }
 
     /// Retrieves the guild's webhooks.
@@ -952,10 +1105,537 @@ impl Guild {
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
-    #[cfg(feature="methods")]
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        rest::get_guild_webhooks(self.id.0)
+        self.id.webhooks()
+    }
+}
+
+impl GuildId {
+    /// Ban a [`User`] from the guild. All messages by the
+    /// user within the last given number of days given will be deleted.
+    ///
+    /// Refer to the documentation for [`Guild::ban`] for more information.
+    ///
+    /// **Note**: Requires the [Ban Members] permission.
+    ///
+    /// # Examples
+    ///
+    /// Ban a member and remove all messages they've sent in the last 4 days:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::GuildId;
+    ///
+    /// // assuming a `user` has already been bound
+    /// let _ = GuildId(81384788765712384).ban(user, 4);
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::DeleteMessageDaysAmount`] if the number of
+    /// days' worth of messages to delete is over the maximum.
+    ///
+    /// [`ClientError::DeleteMessageDaysAmount`]: ../client/enum.ClientError.html#variant.DeleteMessageDaysAmount
+    /// [`Guild::ban`]: struct.Guild.html#method.ban
+    /// [`User`]: struct.User.html
+    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8)
+        -> Result<()> {
+        if delete_message_days > 7 {
+            return Err(Error::Client(ClientError::DeleteMessageDaysAmount(delete_message_days)));
+        }
+
+        rest::ban_user(self.0, user.into().0, delete_message_days)
+    }
+
+    /// Creates a [`GuildChannel`] in the the guild.
+    ///
+    /// Refer to [`rest::create_channel`] for more information.
+    ///
+    /// Requires the [Manage Channels] permission.
+    ///
+    /// # Examples
+    ///
+    /// Create a voice channel in a guild with the name `test`:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::{ChannelType, GuildId};
+    ///
+    /// let _channel = GuildId(7).create_channel("test", ChannelType::Voice);
+    /// ```
+    ///
+    /// [`GuildChannel`]: struct.GuildChannel.html
+    /// [`rest::create_channel`]: rest/fn.create_channel.html
+    /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
+    pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<Channel> {
+        let map = ObjectBuilder::new()
+            .insert("name", name)
+            .insert("type", kind.name())
+            .build();
+
+        rest::create_channel(self.0, map)
+    }
+
+    /// Creates an emoji in the guild with a name and base64-encoded image.
+    ///
+    /// Refer to the documentation for [`Guild::create_emoji`] for more
+    /// information.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// # Examples
+    ///
+    /// See the [`EditProfile::avatar`] example for an in-depth example as to
+    /// how to read an image from the filesystem and encode it as base64. Most
+    /// of the example can be applied similarly for this method.
+    ///
+    /// [`EditProfile::avatar`]: ../utils/builder/struct.EditProfile.html#method.avatar
+    /// [`Guild::create_emoji`]: struct.Guild.html#method.create_emoji
+    /// [`utils::read_image`]: ../utils/fn.read_image.html
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    pub fn create_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
+        let map = ObjectBuilder::new()
+            .insert("name", name)
+            .insert("image", image)
+            .build();
+
+        rest::create_emoji(self.0, map)
+    }
+
+    /// Creates an integration for the guild.
+    ///
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    pub fn create_integration<I>(&self, integration_id: I, kind: &str)
+        -> Result<()> where I: Into<IntegrationId> {
+        let integration_id = integration_id.into();
+        let map = ObjectBuilder::new()
+            .insert("id", integration_id.0)
+            .insert("type", kind)
+            .build();
+
+        rest::create_guild_integration(self.0, integration_id.0, map)
+    }
+
+    /// Creates a new role in the guild with the data set, if any.
+    ///
+    /// See the documentation for [`Guild::create_role`] on how to use this.
+    ///
+    /// **Note**: Requires the [Manage Roles] permission.
+    ///
+    /// [`Guild::create_role`]: struct.Guild.html#method.create_role
+    /// [Manage Roles]: permissions/constants.MANAGE_ROLES.html
+    #[inline]
+    pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
+        rest::create_role(self.0, f(EditRole::default()).0.build())
+    }
+
+    /// Deletes the current guild if the current account is the owner of the
+    /// guild.
+    ///
+    /// Refer to [`Guild::delete`] for more information.
+    ///
+    /// **Note**: Requires the current user to be the owner of the guild.
+    ///
+    /// [`Guild::delete`]: struct.Guild.html#method.delete
+    #[inline]
+    pub fn delete(&self) -> Result<PartialGuild> {
+        rest::delete_guild(self.0)
+    }
+
+    /// Deletes an [`Emoji`] from the guild.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// [`Emoji`]: struct.Emoji.html
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn delete_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<()> {
+        rest::delete_emoji(self.0, emoji_id.into().0)
+    }
+
+    /// Deletes an integration by Id from the guild.
+    ///
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[inline]
+    pub fn delete_integration<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
+        rest::delete_guild_integration(self.0, integration_id.into().0)
+    }
+
+    /// Deletes a [`Role`] by Id from the guild.
+    ///
+    /// Also see [`Role::delete`] if you have the `cache` and `methods` features
+    /// enabled.
+    ///
+    /// Requires the [Manage Roles] permission.
+    ///
+    /// [`Role`]: struct.Role.html
+    /// [`Role::delete`]: struct.Role.html#method.delete
+    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[inline]
+    pub fn delete_role<R: Into<RoleId>>(&self, role_id: R) -> Result<()> {
+        rest::delete_role(self.0, role_id.into().0)
+    }
+
+    /// Edits the current guild with new data where specified.
+    ///
+    /// Refer to [`Guild::edit`] for more information.
+    ///
+    /// **Note**: Requires the current user to have the [Manage Guild]
+    /// permission.
+    ///
+    /// [`Guild::edit`]: struct.Guild.html#method.edit
+    /// [Manage Guild]: permissions/constants.MANAGE_GUILD.html
+    #[inline]
+    pub fn edit<F: FnOnce(EditGuild) -> EditGuild>(&mut self, f: F) -> Result<PartialGuild> {
+        rest::edit_guild(self.0, f(EditGuild::default()).0.build())
+    }
+
+    /// Edits an [`Emoji`]'s name in the guild.
+    ///
+    /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features
+    /// enabled.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// [`Emoji`]: struct.Emoji.html
+    /// [`Emoji::edit`]: struct.Emoji.html#method.edit
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str) -> Result<Emoji> {
+        let map = ObjectBuilder::new()
+            .insert("name", name)
+            .build();
+
+        rest::edit_emoji(self.0, emoji_id.into().0, map)
+    }
+
+    /// Edits the properties of member of the guild, such as muting or
+    /// nicknaming them.
+    ///
+    /// Refer to `EditMember`'s documentation for a full list of methods and
+    /// permission restrictions.
+    ///
+    /// # Examples
+    ///
+    /// Mute a member and set their roles to just one role with a predefined Id:
+    ///
+    /// ```rust,ignore
+    /// guild.edit_member(user_id, |m| m
+    ///     .mute(true)
+    ///     .roles(&vec![role_id]));
+    /// ```
+    #[inline]
+    pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
+        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
+        rest::edit_member(self.0, user_id.into().0, f(EditMember::default()).0.build())
+    }
+
+    /// Edits the current user's nickname for the guild.
+    ///
+    /// Pass `None` to reset the nickname.
+    ///
+    /// Requires the [Change Nickname] permission.
+    ///
+    /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
+    #[inline]
+    pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
+        rest::edit_nickname(self.0, new_nickname)
+    }
+
+    /// Edits a [`Role`], optionally setting its new fields.
+    ///
+    /// Requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Make a role hoisted:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::{GuildId, RoleId};
+    ///
+    /// GuildId(7).edit_role(RoleId(8), |r| r.hoist(true));
+    /// ```
+    ///
+    /// [`Role`]: struct.Role.html
+    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[inline]
+    pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
+        where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
+        rest::edit_role(self.0, role_id.into().0, f(EditRole::default()).0.build())
+    }
+
+    /// Search the cache for the guild.
+    #[cfg(feature="cache")]
+    pub fn find(&self) -> Option<Guild> {
+        CACHE.read().unwrap().get_guild(*self).cloned()
+    }
+
+    /// Requests the guild over REST.
+    ///
+    /// Note that this will not be a complete guild, as REST does not send
+    /// all data with a guild retrieval.
+    #[inline]
+    pub fn get(&self) -> Result<PartialGuild> {
+        rest::get_guild(self.0)
+    }
+
+    /// Gets a list of the guild's bans.
+    ///
+    /// Requires the [Ban Members] permission.
+    #[inline]
+    pub fn get_bans(&self) -> Result<Vec<Ban>> {
+        rest::get_bans(self.0)
+    }
+
+    /// Gets all of the guild's channels over the REST API.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    pub fn get_channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> {
+        let mut channels = HashMap::new();
+
+        for channel in rest::get_channels(self.0)? {
+            channels.insert(channel.id, channel);
+        }
+
+        Ok(channels)
+    }
+
+    /// Gets an emoji in the guild by Id.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn get_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> {
+        rest::get_emoji(self.0, emoji_id.into().0)
+    }
+
+    /// Gets a list of all of the guild's emojis.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn get_emojis(&self) -> Result<Vec<Emoji>> {
+        rest::get_emojis(self.0)
+    }
+
+    /// Gets all integration of the guild.
+    ///
+    /// This performs a request over the REST API.
+    #[inline]
+    pub fn get_integrations(&self) -> Result<Vec<Integration>> {
+        rest::get_guild_integrations(self.0)
+    }
+
+    /// Gets all of the guild's invites.
+    ///
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: permissions/struct.MANAGE_GUILD.html
+    #[inline]
+    pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
+        rest::get_guild_invites(self.0)
+    }
+
+    /// Gets a user's [`Member`] for the guild by Id.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    /// [`Member`]: struct.Member.html
+    #[inline]
+    pub fn get_member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
+        rest::get_member(self.0, user_id.into().0)
+    }
+
+    /// Gets a list of the guild's members.
+    ///
+    /// Optionally pass in the `limit` to limit the number of results. Maximum
+    /// value is 1000. Optionally pass in `after` to offset the results by a
+    /// [`User`]'s Id.
+    ///
+    /// [`User`]: struct.User.html
+    #[inline]
+    pub fn get_members<U>(&self, limit: Option<u64>, after: Option<U>)
+        -> Result<Vec<Member>> where U: Into<UserId> {
+        rest::get_guild_members(self.0, limit, after.map(|x| x.into().0))
+    }
+
+    /// Gets the number of [`Member`]s that would be pruned with the given
+    /// number of days.
+    ///
+    /// Requires the [Kick Members] permission.
+    ///
+    /// [`Member`]: struct.Member.html
+    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    pub fn get_prune_count(&self, days: u16) -> Result<GuildPrune> {
+        let map = ObjectBuilder::new()
+            .insert("days", days)
+            .build();
+
+        rest::get_guild_prune_count(self.0, map)
+    }
+
+    /// Kicks a [`Member`] from the guild.
+    ///
+    /// Requires the [Kick Members] permission.
+    ///
+    /// [`Member`]: struct.Member.html
+    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    #[inline]
+    pub fn kick<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
+        rest::kick_member(self.0, user_id.into().0)
+    }
+
+    /// Leaves the guild.
+    #[inline]
+    pub fn leave(&self) -> Result<PartialGuild> {
+        rest::leave_guild(self.0)
+    }
+
+    /// Moves a member to a specific voice channel.
+    ///
+    /// Requires the [Move Members] permission.
+    ///
+    /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
+    pub fn move_member<C, U>(&self, user_id: U, channel_id: C)
+        -> Result<()> where C: Into<ChannelId>, U: Into<UserId> {
+        let map = ObjectBuilder::new()
+            .insert("channel_id", channel_id.into().0)
+            .build();
+
+        rest::edit_member(self.0, user_id.into().0, map)
+    }
+
+    /// Performs a search request to the API for the guild's [`Message`]s.
+    ///
+    /// This will search all of the guild's [`Channel`]s at once, that you have
+    /// the [Read Message History] permission to. Use [`search_channels`] to
+    /// specify a list of [channel][`GuildChannel`]s to search, where all other
+    /// channels will be excluded.
+    ///
+    /// Refer to the documentation for the [`Search`] builder for examples and
+    /// more information.
+    ///
+    /// [`Channel`]: enum.Channel.html
+    /// [`GuildChannel`]: struct.GuildChannel.html
+    /// [`Message`]: struct.Message.html
+    /// [`Search`]: ../utils/builder/struct.Search.html
+    /// [`search_channels`]: #method.search_channels
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    #[inline]
+    pub fn search<F: FnOnce(Search) -> Search>(&self, f: F) -> Result<SearchResult> {
+        rest::search_guild_messages(self.0, &[], f(Search::default()).0)
+    }
+
+    /// Performs a search request to the API for the guild's [`Message`]s in
+    /// given channels.
+    ///
+    /// Refer to [`Guild::search_channels`] for more information.
+    ///
+    /// Refer to the documentation for the [`Search`] builder for examples and
+    /// more information.
+    ///
+    /// **Note**: Bot users can not search.
+    ///
+    /// [`Guild::search_channels`]: struct.Guild.html#method.search_channels
+    /// [`Message`]: struct.Message.html
+    pub fn search_channels<F>(&self, channel_ids: &[ChannelId], f: F)
+        -> Result<SearchResult> where F: FnOnce(Search) -> Search {
+        let ids = channel_ids.iter().map(|x| x.0).collect::<Vec<u64>>();
+
+        rest::search_guild_messages(self.0, &ids, f(Search::default()).0)
+    }
+
+    /// Starts an integration sync for the given integration Id.
+    ///
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[inline]
+    pub fn start_integration_sync<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
+        rest::start_integration_sync(self.0, integration_id.into().0)
+    }
+
+    /// Starts a prune of [`Member`]s.
+    ///
+    /// See the documentation on [`GuildPrune`] for more information.
+    ///
+    /// **Note**: Requires the [Kick Members] permission.
+    ///
+    /// [`GuildPrune`]: struct.GuildPrune.html
+    /// [`Member`]: struct.Member.html
+    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    pub fn start_prune(&self, days: u16) -> Result<GuildPrune> {
+        let map = ObjectBuilder::new()
+            .insert("days", days)
+            .build();
+
+        rest::start_guild_prune(self.0, map)
+    }
+
+    /// Unbans a [`User`] from the guild.
+    ///
+    /// Requires the [Ban Members] permission.
+    ///
+    /// [`User`]: struct.User.html
+    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    #[inline]
+    pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
+        rest::remove_ban(self.0, user_id.into().0)
+    }
+
+    /// Retrieves the guild's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[inline]
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
+        rest::get_guild_webhooks(self.0)
+    }
+}
+
+impl fmt::Display for GuildId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Display::fmt(&self.0, f)
+    }
+}
+
+impl From<PartialGuild> for GuildId {
+    /// Gets the Id of a partial guild.
+    fn from(guild: PartialGuild) -> GuildId {
+        guild.id
+    }
+}
+
+impl From<GuildInfo> for GuildId {
+    /// Gets the Id of Guild information struct.
+    fn from(guild_info: GuildInfo) -> GuildId {
+        guild_info.id
+    }
+}
+
+impl From<InviteGuild> for GuildId {
+    /// Gets the Id of Invite Guild struct.
+    fn from(invite_guild: InviteGuild) -> GuildId {
+        invite_guild.id
+    }
+}
+
+impl From<Guild> for GuildId {
+    /// Gets the Id of Guild.
+    fn from(live_guild: Guild) -> GuildId {
+        live_guild.id
+    }
+}
+
+impl From<Integration> for IntegrationId {
+    /// Gets the Id of integration.
+    fn from(integration: Integration) -> IntegrationId {
+        integration.id
     }
 }
 
@@ -967,7 +1647,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     pub fn add_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
         let role_id = role_id.into();
 
@@ -994,7 +1674,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     pub fn add_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         let guild_id = self.find_guild()?;
         self.roles.extend_from_slice(role_ids);
@@ -1016,23 +1696,25 @@ impl Member {
     ///
     /// **Note**: Requires the [Ban Members] role.
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::GuildNotFound`] if the guild could not be
+    /// found.
+    ///
+    /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
+    ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     pub fn ban(&self, delete_message_days: u8) -> Result<()> {
-        let guild_id = self.find_guild()?;
-
-        rest::ban_user(guild_id.0,
-                       self.user.id.0,
-                       delete_message_days)
+        rest::ban_user(self.find_guild()?.0, self.user.id.0, delete_message_days)
     }
 
     /// Determines the member's colour.
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     pub fn colour(&self) -> Option<Colour> {
-        let default = Colour::default();
         let guild_id = match self.find_guild() {
             Ok(guild_id) => guild_id,
-            Err(_why) => return None,
+            Err(_) => return None,
         };
 
         let cache = CACHE.read().unwrap();
@@ -1047,18 +1729,21 @@ impl Member {
             .collect::<Vec<&Role>>();
         roles.sort_by(|a, b| b.cmp(a));
 
+        let default = Colour::default();
+
         roles.iter().find(|r| r.colour.0 != default.0).map(|r| r.colour)
     }
 
     /// Calculates the member's display name.
     ///
     /// The nickname takes priority over the member's username if it exists.
+    #[inline]
     pub fn display_name(&self) -> &str {
         self.nick.as_ref().unwrap_or(&self.user.name)
     }
 
     /// Returns the DiscordTag of a Member, taking possible nickname into account.
-    #[cfg(feature="methods")]
+    #[inline]
     pub fn distinct(&self) -> String {
         format!("{}#{}", self.display_name(), self.user.discriminator)
     }
@@ -1071,7 +1756,7 @@ impl Member {
     ///
     /// [`Context::edit_member`]: ../client/struct.Context.html#method.edit_member
     /// [`EditMember`]: ../builder/struct.EditMember.html
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     pub fn edit<F>(&self, f: F) -> Result<()>
         where F: FnOnce(EditMember) -> EditMember {
         let guild_id = self.find_guild()?;
@@ -1082,8 +1767,14 @@ impl Member {
 
     /// Finds the Id of the [`Guild`] that the member is in.
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::GuildNotFound`] if the guild could not be
+    /// found.
+    ///
+    /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
     /// [`Guild`]: struct.Guild.html
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     pub fn find_guild(&self) -> Result<GuildId> {
         CACHE.read()
             .unwrap()
@@ -1110,7 +1801,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     pub fn remove_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
         let role_id = role_id.into();
 
@@ -1136,7 +1827,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     pub fn remove_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         let guild_id = self.find_guild()?;
         self.roles.retain(|r| !role_ids.contains(r));
@@ -1158,7 +1849,7 @@ impl Member {
     /// This is shorthand for manually searching through the CACHE.
     ///
     /// If role data can not be found for the member, then `None` is returned.
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     pub fn roles(&self) -> Option<Vec<Role>> {
         CACHE.read().unwrap()
             .guilds
@@ -1171,6 +1862,23 @@ impl Member {
                 .filter(|r| self.roles.contains(&r.id))
                 .cloned()
                 .collect())
+    }
+
+    /// Unbans the [`User`] from the guild.
+    ///
+    /// **Note**: Requires the [Ban Members] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to perform bans.
+    ///
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`User`]: struct.User.html
+    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    #[cfg(feature="cache")]
+    pub fn unban(&self) -> Result<()> {
+        rest::remove_ban(self.find_guild()?.0, self.user.id.0)
     }
 }
 
@@ -1187,6 +1895,489 @@ impl fmt::Display for Member {
     // This is in the format of `<@USER_ID>`.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.user.mention(), f)
+    }
+}
+
+impl PartialGuild {
+    /// Ban a [`User`] from the guild. All messages by the
+    /// user within the last given number of days given will be deleted. This
+    /// may be a range between `0` and `7`.
+    ///
+    /// **Note**: Requires the [Ban Members] permission.
+    ///
+    /// # Examples
+    ///
+    /// Ban a member and remove all messages they've sent in the last 4 days:
+    ///
+    /// ```rust,ignore
+    /// // assumes a `user` and `guild` have already been bound
+    /// let _ = guild.ban(user, 4);
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::DeleteMessageDaysAmount`] if the number of
+    /// days' worth of messages to delete is over the maximum.
+    ///
+    /// [`ClientError::DeleteMessageDaysAmount`]: ../client/enum.ClientError.html#variant.DeleteMessageDaysAmount
+    /// [`User`]: struct.User.html
+    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8)
+        -> Result<()> {
+        if delete_message_days > 7 {
+            return Err(Error::Client(ClientError::DeleteMessageDaysAmount(delete_message_days)));
+        }
+
+        self.id.ban(user.into(), delete_message_days)
+    }
+
+    /// Creates a [`GuildChannel`] in the guild.
+    ///
+    /// Refer to [`rest::create_channel`] for more information.
+    ///
+    /// Requires the [Manage Channels] permission.
+    ///
+    /// # Examples
+    ///
+    /// Create a voice channel in a guild with the name `test`:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::ChannelType;
+    ///
+    /// guild.create_channel("test", ChannelType::Voice);
+    /// ```
+    ///
+    /// [`GuildChannel`]: struct.GuildChannel.html
+    /// [`rest::create_channel`]: rest/fn.create_channel.html
+    /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
+    #[inline]
+    pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<Channel> {
+        self.id.create_channel(name, kind)
+    }
+
+    /// Creates an emoji in the guild with a name and base64-encoded image.
+    ///
+    /// Refer to the documentation for [`Guild::create_emoji`] for more
+    /// information.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// # Examples
+    ///
+    /// See the [`EditProfile::avatar`] example for an in-depth example as to
+    /// how to read an image from the filesystem and encode it as base64. Most
+    /// of the example can be applied similarly for this method.
+    ///
+    /// [`EditProfile::avatar`]: ../utils/builder/struct.EditProfile.html#method.avatar
+    /// [`Guild::create_emoji`]: struct.Guild.html#method.create_emoji
+    /// [`utils::read_image`]: ../utils/fn.read_image.html
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn create_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
+        self.id.create_emoji(name, image)
+    }
+
+    /// Creates an integration for the guild.
+    ///
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[inline]
+    pub fn create_integration<I>(&self, integration_id: I, kind: &str) -> Result<()>
+        where I: Into<IntegrationId> {
+        self.id.create_integration(integration_id, kind)
+    }
+
+    /// Creates a new role in the guild with the data set, if any.
+    ///
+    /// See the documentation for [`Guild::create_role`] on how to use this.
+    ///
+    /// **Note**: Requires the [Manage Roles] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to perform bans.
+    ///
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`Guild::create_role`]: struct.Guild.html#method.create_role
+    /// [Manage Roles]: permissions/constants.MANAGE_ROLES.html
+    #[inline]
+    pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
+        self.id.create_role(f)
+    }
+
+    /// Deletes the current guild if the current user is the owner of the
+    /// guild.
+    ///
+    /// **Note**: Requires the current user to be the owner of the guild.
+    #[inline]
+    pub fn delete(&self) -> Result<PartialGuild> {
+        self.id.delete()
+    }
+
+    /// Deletes an [`Emoji`] from the guild.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// [`Emoji`]: struct.Emoji.html
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn delete_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<()> {
+        self.id.delete_emoji(emoji_id)
+    }
+
+    /// Deletes an integration by Id from the guild.
+    ///
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[inline]
+    pub fn delete_integration<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
+        self.id.delete_integration(integration_id)
+    }
+
+    /// Deletes a [`Role`] by Id from the guild.
+    ///
+    /// Also see [`Role::delete`] if you have the `cache` and `methods` features
+    /// enabled.
+    ///
+    /// Requires the [Manage Roles] permission.
+    ///
+    /// [`Role`]: struct.Role.html
+    /// [`Role::delete`]: struct.Role.html#method.delete
+    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[inline]
+    pub fn delete_role<R: Into<RoleId>>(&self, role_id: R) -> Result<()> {
+        self.id.delete_role(role_id)
+    }
+
+    /// Edits the current guild with new data where specified.
+    ///
+    /// Refer to [`Guild::edit`] for more information.
+    ///
+    /// **Note**: Requires the current user to have the [Manage Guild]
+    /// permission.
+    ///
+    /// [`Context::edit_guild`]: ../client/struct.Context.html#method.edit_guild
+    /// [Manage Guild]: permissions/constants.MANAGE_GUILD.html
+    pub fn edit<F>(&mut self, f: F) -> Result<()>
+        where F: FnOnce(EditGuild) -> EditGuild {
+        match self.id.edit(f) {
+            Ok(guild) => {
+                self.afk_channel_id = guild.afk_channel_id;
+                self.afk_timeout = guild.afk_timeout;
+                self.default_message_notifications = guild.default_message_notifications;
+                self.emojis = guild.emojis;
+                self.features = guild.features;
+                self.icon = guild.icon;
+                self.mfa_level = guild.mfa_level;
+                self.name = guild.name;
+                self.owner_id = guild.owner_id;
+                self.region = guild.region;
+                self.roles = guild.roles;
+                self.splash = guild.splash;
+                self.verification_level = guild.verification_level;
+
+                Ok(())
+            },
+            Err(why) => Err(why),
+        }
+    }
+
+    /// Edits an [`Emoji`]'s name in the guild.
+    ///
+    /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features
+    /// enabled.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// [`Emoji`]: struct.Emoji.html
+    /// [`Emoji::edit`]: struct.Emoji.html#method.edit
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str) -> Result<Emoji> {
+        self.id.edit_emoji(emoji_id, name)
+    }
+
+    /// Edits the properties of member of the guild, such as muting or
+    /// nicknaming them.
+    ///
+    /// Refer to `EditMember`'s documentation for a full list of methods and
+    /// permission restrictions.
+    ///
+    /// # Examples
+    ///
+    /// Mute a member and set their roles to just one role with a predefined Id:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::GuildId;
+    ///
+    /// GuildId(7).edit_member(user_id, |m| m
+    ///     .mute(true)
+    ///     .roles(&vec![role_id]));
+    /// ```
+    #[inline]
+    pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
+        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
+        self.id.edit_member(user_id, f)
+    }
+
+    /// Edits the current user's nickname for the guild.
+    ///
+    /// Pass `None` to reset the nickname.
+    ///
+    /// **Note**: Requires the [Change Nickname] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to change their own
+    /// nickname.
+    ///
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
+    #[inline]
+    pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
+        self.id.edit_nickname(new_nickname)
+    }
+
+    /// Gets a partial amount of guild data by its Id.
+    ///
+    /// Requires that the current user be in the guild.
+    #[inline]
+    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> {
+        guild_id.into().get()
+    }
+
+    /// Gets a list of the guild's bans.
+    ///
+    /// Requires the [Ban Members] permission.
+    #[inline]
+    pub fn get_bans(&self) -> Result<Vec<Ban>> {
+        self.id.get_bans()
+    }
+
+    /// Gets all of the guild's channels over the REST API.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    #[inline]
+    pub fn get_channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> {
+        self.id.get_channels()
+    }
+
+    /// Gets an emoji in the guild by Id.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn get_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> {
+        self.id.get_emoji(emoji_id)
+    }
+
+    /// Gets a list of all of the guild's emojis.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn get_emojis(&self) -> Result<Vec<Emoji>> {
+        self.id.get_emojis()
+    }
+
+    /// Gets all integration of the guild.
+    ///
+    /// This performs a request over the REST API.
+    #[inline]
+    pub fn get_integrations(&self) -> Result<Vec<Integration>> {
+        self.id.get_integrations()
+    }
+
+    /// Gets all of the guild's invites.
+    ///
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: permissions/struct.MANAGE_GUILD.html
+    #[inline]
+    pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
+        self.id.get_invites()
+    }
+
+    /// Gets a user's [`Member`] for the guild by Id.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    /// [`Member`]: struct.Member.html
+    pub fn get_member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
+        self.id.get_member(user_id)
+    }
+
+    /// Gets a list of the guild's members.
+    ///
+    /// Optionally pass in the `limit` to limit the number of results. Maximum
+    /// value is 1000. Optionally pass in `after` to offset the results by a
+    /// [`User`]'s Id.
+    ///
+    /// [`User`]: struct.User.html
+    pub fn get_members<U>(&self, limit: Option<u64>, after: Option<U>)
+        -> Result<Vec<Member>> where U: Into<UserId> {
+        self.id.get_members(limit, after)
+    }
+
+    /// Gets the number of [`Member`]s that would be pruned with the given
+    /// number of days.
+    ///
+    /// Requires the [Kick Members] permission.
+    ///
+    /// [`Member`]: struct.Member.html
+    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    #[inline]
+    pub fn get_prune_count(&self, days: u16) -> Result<GuildPrune> {
+        self.id.get_prune_count(days)
+    }
+
+    /// Kicks a [`Member`] from the guild.
+    ///
+    /// Requires the [Kick Members] permission.
+    ///
+    /// [`Member`]: struct.Member.html
+    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    #[inline]
+    pub fn kick<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
+        self.id.kick(user_id)
+    }
+
+    /// Returns a formatted URL of the guild's icon, if the guild has an icon.
+    pub fn icon_url(&self) -> Option<String> {
+        self.icon.as_ref().map(|icon|
+            format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
+    }
+
+    /// Leaves the guild.
+    #[inline]
+    pub fn leave(&self) -> Result<PartialGuild> {
+        self.id.leave()
+    }
+
+    /// Moves a member to a specific voice channel.
+    ///
+    /// Requires the [Move Members] permission.
+    ///
+    /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
+    #[inline]
+    pub fn move_member<C, U>(&self, user_id: U, channel_id: C)
+        -> Result<()> where C: Into<ChannelId>, U: Into<UserId> {
+        self.id.move_member(user_id, channel_id)
+    }
+
+    /// Performs a search request to the API for the guild's [`Message`]s.
+    ///
+    /// This will search all of the guild's [`Channel`]s at once, that you have
+    /// the [Read Message History] permission to. Use [`search_channels`] to
+    /// specify a list of [channel][`GuildChannel`]s to search, where all other
+    /// channels will be excluded.
+    ///
+    /// Refer to the documentation for the [`Search`] builder for examples and
+    /// more information.
+    ///
+    /// **Note**: Bot users can not search.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
+    ///
+    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
+    /// [`Channel`]: enum.Channel.html
+    /// [`GuildChannel`]: struct.GuildChannel.html
+    /// [`Message`]: struct.Message.html
+    /// [`Search`]: ../utils/builder/struct.Search.html
+    /// [`search_channels`]: #method.search_channels
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    pub fn search<F>(&self, f: F) -> Result<SearchResult>
+        where F: FnOnce(Search) -> Search {
+        #[cfg(feature="cache")]
+        {
+            if CACHE.read().unwrap().user.bot {
+                return Err(Error::Client(ClientError::InvalidOperationAsBot));
+            }
+        }
+
+        self.id.search(f)
+    }
+
+    /// Performs a search request to the API for the guild's [`Message`]s in
+    /// given channels.
+    ///
+    /// This will search all of the messages in the guild's provided
+    /// [`Channel`]s by Id that you have the [Read Message History] permission
+    /// to. Use [`search`] to search all of a guild's [channel][`GuildChannel`]s
+    /// at once.
+    ///
+    /// Refer to the documentation for the [`Search`] builder for examples and
+    /// more information.
+    ///
+    /// **Note**: Bot users can not search.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
+    ///
+    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
+    /// [`Channel`]: enum.Channel.html
+    /// [`GuildChannel`]: struct.GuildChannel.html
+    /// [`Message`]: struct.Message.html
+    /// [`Search`]: ../utils/builder/struct.Search.html
+    /// [`search`]: #method.search
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    pub fn search_channels<F>(&self, channel_ids: &[ChannelId], f: F)
+        -> Result<SearchResult> where F: FnOnce(Search) -> Search {
+        #[cfg(feature="cache")]
+        {
+            if CACHE.read().unwrap().user.bot {
+                return Err(Error::Client(ClientError::InvalidOperationAsBot));
+            }
+        }
+
+        self.id.search_channels(channel_ids, f)
+    }
+
+    /// Returns the formatted URL of the guild's splash image, if one exists.
+    pub fn splash_url(&self) -> Option<String> {
+        self.icon.as_ref().map(|icon|
+            format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
+    }
+
+    /// Starts an integration sync for the given integration Id.
+    ///
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[inline]
+    pub fn start_integration_sync<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
+        self.id.start_integration_sync(integration_id)
+    }
+
+    /// Unbans a [`User`] from the guild.
+    ///
+    /// Requires the [Ban Members] permission.
+    ///
+    /// [`User`]: struct.User.html
+    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    #[inline]
+    pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
+        self.id.unban(user_id)
+    }
+
+    /// Retrieves the guild's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[inline]
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
+        self.id.webhooks()
     }
 }
 
@@ -1240,11 +2431,34 @@ impl Role {
     /// **Note** Requires the [Manage Roles] permission.
     ///
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     pub fn delete(&self) -> Result<()> {
         let guild_id = self.find_guild()?;
 
         rest::delete_role(guild_id.0, self.id.0)
+    }
+
+    /// Edits a [`Role`], optionally setting its new fields.
+    ///
+    /// Requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Make a role hoisted:
+    ///
+    /// ```rust,ignore
+    /// context.edit_role(guild_id, role_id, |r| r
+    ///     .hoist(true));
+    /// ```
+    ///
+    /// [`Role`]: struct.Role.html
+    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[cfg(feature="cache")]
+    pub fn edit_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
+        match self.find_guild() {
+            Ok(guild_id) => guild_id.edit_role(self.id, f),
+            Err(why) => Err(why),
+        }
     }
 
     /// Searches the cache for the guild that owns the role.
@@ -1255,7 +2469,7 @@ impl Role {
     /// that contains the role.
     ///
     /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
-    #[cfg(all(feature="cache", feature="methods"))]
+    #[cfg(feature="cache")]
     pub fn find_guild(&self) -> Result<GuildId> {
         CACHE.read()
             .unwrap()
@@ -1267,6 +2481,7 @@ impl Role {
     }
 
     /// Check that the role has the given permission.
+    #[inline]
     pub fn has_permission(&self, permission: Permissions) -> bool {
         self.permissions.contains(permission)
     }
@@ -1315,5 +2530,36 @@ impl PartialEq for Role {
 impl PartialOrd for Role {
     fn partial_cmp(&self, other: &Role) -> Option<Ordering> {
         Some(self.cmp(other))
+    }
+}
+
+impl RoleId {
+    /// Search the cache for the role.
+    #[cfg(feature="cache")]
+    pub fn find(&self) -> Option<Role> {
+        CACHE.read()
+            .unwrap()
+            .guilds
+            .values()
+            .find(|guild| guild.roles.contains_key(self))
+            .map(|guild| guild.roles.get(self))
+            .and_then(|v| match v {
+                Some(v) => Some(v),
+                None => None,
+            })
+            .cloned()
+    }
+}
+
+impl fmt::Display for RoleId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Display::fmt(&self.0, f)
+    }
+}
+
+impl From<Role> for RoleId {
+    /// Gets the Id of a role.
+    fn from(role: Role) -> RoleId {
+        role.id
     }
 }

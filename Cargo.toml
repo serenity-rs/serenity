@@ -46,10 +46,9 @@ version = "0.0.12"
 yaml-rust = "0.3"
 
 [features]
-default = ["cache", "framework", "methods"]
+default = ["cache", "framework"]
 cache = []
 debug = []
 framework = []
-methods = []
 extras = []
 voice = ["opus", "sodiumoxide"]

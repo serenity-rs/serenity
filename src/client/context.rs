@@ -1,6 +1,4 @@
 use serde_json::builder::ObjectBuilder;
-use std::collections::HashMap;
-use std::fmt::Write as FmtWrite;
 use std::io::Read;
 use std::sync::{Arc, Mutex};
 use super::gateway::Shard;
@@ -9,19 +7,13 @@ use super::login_type::LoginType;
 use typemap::ShareMap;
 use ::utils::builder::{
     CreateEmbed,
-    CreateInvite,
     CreateMessage,
     EditChannel,
-    EditGuild,
-    EditMember,
     EditProfile,
-    EditRole,
-    GetMessages,
     Search,
 };
 use ::internal::prelude::*;
 use ::model::*;
-use ::utils;
 
 #[cfg(feature="extras")]
 use std::ops::ShlAssign;
@@ -90,7 +82,7 @@ pub struct Context {
     /// A clone of [`Client::data`]. Refer to its documentation for more
     /// information.
     ///
-    /// [`Client::data`]: struct.Client.html#method.data
+    /// [`Client::data`]: struct.Client.html#structfield.data
     pub data: Arc<Mutex<ShareMap>>,
     /// The associated shard which dispatched the event handler.
     ///
@@ -124,29 +116,7 @@ impl Context {
         }
     }
 
-    /// Accepts the given invite.
-    ///
-    /// Refer to the documentation for [`rest::accept_invite`] for restrictions
-    /// on accepting an invite.
-    ///
-    /// **Note**: Requires that the current user be a user account.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ClientError::InvalidOperationAsBot`] if the current user is
-    /// a bot user.
-    ///
-    /// [`ClientError::InvalidOperationAsBot`]: enum.ClientError.html#variant.InvalidOperationAsBot
-    /// [`rest::accept_invite`]: rest/fn.accept_invite.html
-    pub fn accept_invite(&self, invite: &str) -> Result<Invite> {
-        if self.login_type == LoginType::Bot {
-            return Err(Error::Client(ClientError::InvalidOperationAsBot));
-        }
-
-        rest::accept_invite(utils::parse_invite(invite))
-    }
-
-    /// Marks a [`Channel`] as being read up to a certain [`Message`].
+    /// Marks the contextual channel as being read up to a certain [`Message`].
     ///
     /// Refer to the documentation for [`rest::ack_message`] for more
     /// information.
@@ -156,52 +126,25 @@ impl Context {
     /// Returns a [`ClientError::InvalidOperationAsBot`] if the current user is
     /// a bot user.
     ///
-    /// [`Channel`]: ../../model/enum.Channel.html
-    /// [`ClientError::InvalidOperationAsBot`]: ../enum.ClientError.html#variant.InvalidOperationAsUser
-    /// [`Message`]: ../../model/struct.Message.html
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
+    ///
+    /// [`Channel`]: ../model/enum.Channel.html
+    /// [`ChannelId`]: ../model/struct.ChannelId.html
+    /// [`ClientError::InvalidOperationAsBot`]: enum.ClientError.html#variant.InvalidOperationAsUser
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
+    /// [`Message`]: ../model/struct.Message.html
     /// [`rest::ack_message`]: rest/fn.ack_message.html
-    pub fn ack<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
-        where C: Into<ChannelId>, M: Into<MessageId> {
+    /// [`say`]: #method.say
+    pub fn ack<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         if self.login_type == LoginType::User {
             return Err(Error::Client(ClientError::InvalidOperationAsUser));
         }
 
-        rest::ack_message(channel_id.into().0, message_id.into().0)
-    }
-
-    /// Bans a [`User`] from a [`Guild`], removing their messages sent in the
-    /// last X number of days.
-    ///
-    /// Refer to the documentation for [`rest::ban_user`] for more information.
-    ///
-    /// Requires the [Ban Members] permission.
-    ///
-    /// # Examples
-    ///
-    /// Ban the user that sent a message for `7` days:
-    ///
-    /// ```rust,ignore
-    /// // assuming you are in a context
-    /// context.ban_user(context.guild_id, context.message.author, 7);
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ClientError::DeleteMessageDaysAmount`] if the number of days
-    /// given is over the maximum allowed.
-    ///
-    /// [`ClientError::DeleteMessageDaysAmount`]: enum.ClientError.html#variant.DeleteMessageDaysAmount
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`User`]: ../model/struct.User.html
-    /// [`rest::ban_user`]: rest/fn.ban_user.html
-    /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
-    pub fn ban<G, U>(&self, guild_id: G, user_id: U, delete_message_days: u8)
-        -> Result<()> where G: Into<GuildId>, U: Into<UserId> {
-        if delete_message_days > 7 {
-            return Err(Error::Client(ClientError::DeleteMessageDaysAmount(delete_message_days)));
+        match self.channel_id {
+            Some(channel_id) => channel_id.ack(message_id),
+            None => Err(Error::Client(ClientError::NoChannelId)),
         }
-
-        rest::ban_user(guild_id.into().0, user_id.into().0, delete_message_days)
     }
 
     /// Broadcasts that you are typing to a channel for the next 5 seconds.
@@ -221,244 +164,55 @@ impl Context {
     /// context.broadcast_typing(context.channel_id);
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::InvalidOperationAsBot`] if the current user is
+    /// a bot user.
+    ///
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
+    ///
+    /// [`ChannelId`]: ../model/struct.ChannelId.html
+    /// [`ClientError::InvalidOperationAsBot`]: enum.ClientError.html#variant.InvalidOperationAsUser
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
+    /// [`say`]: #method.say
     /// [Send Messages]: ../model/permissions/constant.SEND_MESSAGES.html
-    pub fn broadcast_typing<C>(&self, channel_id: C) -> Result<()>
-        where C: Into<ChannelId> {
-        rest::broadcast_typing(channel_id.into().0)
-    }
+    pub fn broadcast_typing(&self) -> Result<()> {
+        if self.login_type == LoginType::User {
+            return Err(Error::Client(ClientError::InvalidOperationAsUser));
+        }
 
-    /// Creates a [`GuildChannel`] in the given [`Guild`].
-    ///
-    /// Refer to [`rest::create_channel`] for more information.
-    ///
-    /// Requires the [Manage Channels] permission.
-    ///
-    /// # Examples
-    ///
-    /// Create a voice channel in a guild with the name `test`:
-    ///
-    /// ```rust,ignore
-    /// use serenity::model::ChannelType;
-    ///
-    /// context.create_channel(context.guild_id, "test", ChannelType::Voice);
-    /// ```
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`GuildChannel`]: ../model/struct.GuildChannel.html
-    /// [`rest::create_channel`]: rest/fn.create_channel.html
-    /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
-    pub fn create_channel<G>(&self, guild_id: G, name: &str, kind: ChannelType)
-        -> Result<Channel> where G: Into<GuildId> {
-        let map = ObjectBuilder::new()
-            .insert("name", name)
-            .insert("type", kind.name())
-            .build();
-
-        rest::create_channel(guild_id.into().0, map)
-    }
-
-    /// Creates an emoji in the given guild with a name and base64-encoded
-    /// image. The [`utils::read_image`] function is provided for you as a
-    /// simple method to read an image and encode it into base64, if you are
-    /// reading from the filesystem.
-    ///
-    /// The name of the emoji must be at least 2 characters long and can only
-    /// contain alphanumeric characters and underscores.
-    ///
-    /// Requires the [Manage Emojis] permission.
-    ///
-    /// # Examples
-    ///
-    /// See the [`EditProfile::avatar`] example for an in-depth example as to
-    /// how to read an image from the filesystem and encode it as base64. Most
-    /// of the example can be applied similarly for this method.
-    ///
-    /// [`EditProfile::avatar`]: ../utils/builder/struct.EditProfile.html#method.avatar
-    /// [`utils::read_image`]: ../utils/fn.read_image.html
-    /// [Manage Emojis]: ../model/permissions/constant.MANAGE_EMOJIS.html
-    pub fn create_emoji<G>(&self, guild_id: G, name: &str, image: &str)
-        -> Result<Emoji> where G: Into<GuildId> {
-        let map = ObjectBuilder::new()
-            .insert("name", name)
-            .insert("image", image)
-            .build();
-
-        rest::create_emoji(guild_id.into().0, map)
-    }
-
-    /// Creates a guild with the data provided.
-    ///
-    /// Only a [`PartialGuild`] will be immediately returned, and a full
-    /// [`Guild`] will be received over a [`Shard`].
-    ///
-    /// **Note**: This endpoint is usually only available for user accounts.
-    /// Refer to Discord's information for the endpoint [here][whitelist] for
-    /// more information. If you require this as a bot, re-think what you are
-    /// doing and if it _really_ needs to be doing this.
-    ///
-    /// # Examples
-    ///
-    /// Create a guild called `"test"` in the [US West region] with no icon:
-    ///
-    /// ```rust,ignore
-    /// use serenity::model::Region;
-    ///
-    /// context.create_guild("test", Region::UsWest, None);
-    /// ```
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`PartialGuild`]: ../model/struct.PartialGuild.html
-    /// [`Shard`]: ../gateway/struct.Shard.html
-    /// [US West region]: ../model/enum.Region.html#variant.UsWest
-    /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
-    pub fn create_guild(&self, name: &str, region: Region, icon: Option<&str>)
-        -> Result<PartialGuild> {
-        let map = ObjectBuilder::new()
-            .insert("icon", icon)
-            .insert("name", name)
-            .insert("region", region.name())
-            .build();
-
-        rest::create_guild(map)
-    }
-
-    /// Creates an [`Integration`] for a [`Guild`].
-    ///
-    /// Requires the [Manage Guild] permission.
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`Integration`]: ../model/struct.Integration.html
-    /// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
-    pub fn create_integration<G, I>(&self,
-                                    guild_id: G,
-                                    integration_id: I,
-                                    kind: &str)
-                                    -> Result<()> where G: Into<GuildId>,
-                                                        I: Into<IntegrationId> {
-        let integration_id = integration_id.into();
-        let map = ObjectBuilder::new()
-            .insert("id", integration_id.0)
-            .insert("type", kind)
-            .build();
-
-        rest::create_guild_integration(guild_id.into().0, integration_id.0, map)
-    }
-
-    /// Creates an invite for the channel, providing a builder so that fields
-    /// may optionally be set.
-    ///
-    /// See the documentation for the [`CreateInvite`] builder for information
-    /// on how to use this and the default values that it provides.
-    ///
-    /// Requires the [Create Invite] permission.
-    ///
-    /// [`CreateInvite`]: ../utils/builder/struct.CreateInvite.html
-    /// [Create Invite]: ../model/permissions/constant.CREATE_INVITE.html
-    pub fn create_invite<C, F>(&self, channel_id: C, f: F) -> Result<RichInvite>
-        where C: Into<ChannelId>, F: FnOnce(CreateInvite) -> CreateInvite {
-        let map = f(CreateInvite::default()).0.build();
-
-        rest::create_invite(channel_id.into().0, map)
+        match self.channel_id {
+            Some(channel_id) => channel_id.broadcast_typing(),
+            None => Err(Error::Client(ClientError::NoChannelId)),
+        }
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
-    /// single [`Member`] or [`Role`] within a [`Channel`].
+    /// single [`Member`] or [`Role`] within the channel.
     ///
-    /// Refer to the documentation for [`PermissionOverwrite`]s for more
-    /// information.
+    /// Refer to the documentation for [`GuildChannel::create_permission`] for
+    /// more information.
     ///
     /// Requires the [Manage Channels] permission.
     ///
-    /// # Examples
+    /// # Errors
     ///
-    /// Creating a permission overwrite for a member by specifying the
-    /// [`PermissionOverwrite::Member`] variant, allowing it the [Send Messages]
-    /// permission, but denying the [Send TTS Messages] and [Attach Files]
-    /// permissions:
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
     ///
-    /// ```rust,ignore
-    /// use serenity::model::{ChannelId, PermissionOverwrite, permissions};
-    ///
-    /// // assuming you are in a context
-    ///
-    /// let channel_id = 7;
-    /// let user_id = 8;
-    ///
-    /// let allow = permissions::SEND_MESSAGES;
-    /// let deny = permissions::SEND_TTS_MESSAGES | permissions::ATTACH_FILES;
-    /// let overwrite = PermissionOverwrite {
-    ///     allow: allow,
-    ///     deny: deny,
-    ///     kind: PermissionOverwriteType::Member(user_id),
-    /// };
-    ///
-    /// let _result = context.create_permission(channel_id, overwrite);
-    /// ```
-    ///
-    /// Creating a permission overwrite for a role by specifying the
-    /// [`PermissionOverwrite::Role`] variant, allowing it the [Manage Webhooks]
-    /// permission, but denying the [Send TTS Messages] and [Attach Files]
-    /// permissions:
-    ///
-    /// ```rust,ignore
-    /// use serenity::model::{ChannelId, PermissionOverwrite, permissions};
-    ///
-    /// // assuming you are in a context
-    ///
-    /// let channel_id = 7;
-    /// let user_id = 8;
-    ///
-    /// let allow = permissions::SEND_MESSAGES;
-    /// let deny = permissions::SEND_TTS_MESSAGES | permissions::ATTACH_FILES;
-    /// let overwrite = PermissionOverwrite {
-    ///     allow: allow,
-    ///     deny: deny,
-    ///     kind: PermissionOverwriteType::Member(user_id),
-    /// };
-    ///
-    /// let _result = context.create_permission(channel_id, overwrite);
-    /// ```
-    ///
-    /// [`Channel`]: ../model/enum.Channel.html
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
+    /// [`GuildChannel::create_permission`]: struct.GuildChannel.html#method.create_permission
     /// [`Member`]: ../model/struct.Member.html
     /// [`PermissionOverwrite`]: ../model/struct.PermissionOverWrite.html
-    /// [`PermissionOverwrite::Member`]: ../model/struct.PermissionOverwrite.html#variant.Member
     /// [`Role`]: ../model/struct.Role.html
-    /// [Attach Files]: ../model/permissions/constant.ATTACH_FILES.html
     /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
-    /// [Manage Webhooks]: ../model/permissions/constant.MANAGE_WEBHOOKS.html
-    /// [Send TTS Messages]: ../model/permissions/constant.SEND_TTS_MESSAGES.html
-    pub fn create_permission<C>(&self,
-                                channel_id: C,
-                                target: PermissionOverwrite)
-                                -> Result<()> where C: Into<ChannelId> {
-        let (id, kind) = match target.kind {
-            PermissionOverwriteType::Member(id) => (id.0, "member"),
-            PermissionOverwriteType::Role(id) => (id.0, "role"),
-        };
-
-        let map = ObjectBuilder::new()
-            .insert("allow", target.allow.bits())
-            .insert("deny", target.deny.bits())
-            .insert("id", id)
-            .insert("type", kind)
-            .build();
-
-        rest::create_permission(channel_id.into().0, id, map)
-    }
-
-    /// Creates a direct message channel between the [current user] and another
-    /// [`User`]. This can also retrieve the channel if one already exists.
-    ///
-    /// [`User`]: ../model/struct.User.html
-    /// [current user]: ../model/struct.CurrentUser.html
-    pub fn create_direct_message_channel<U>(&self, user_id: U)
-        -> Result<PrivateChannel> where U: Into<UserId> {
-        let map = ObjectBuilder::new()
-            .insert("recipient_id", user_id.into().0)
-            .build();
-
-        rest::create_private_channel(map)
+    pub fn create_permission(&self, target: PermissionOverwrite)
+        -> Result<()> {
+        match self.channel_id {
+            Some(channel_id) => channel_id.create_permission(target),
+            None => Err(Error::Client(ClientError::NoChannelId)),
+        }
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -469,118 +223,49 @@ impl Context {
     /// Requires the [Add Reactions] permission, _if_ the current user is the
     /// first user to perform a react with a certain emoji.
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
+    ///
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
     /// [`Emoji`]: ../model/struct.Emoji.html
     /// [`Message`]: ../model/struct.Message.html
     /// [`Message::react`]: ../model/struct.Message.html#method.react
     /// [Add Reactions]: ../model/permissions/constant.ADD_REACTIONS.html
-    pub fn create_reaction<C, M, R>(&self,
-                                    channel_id: C,
-                                    message_id: M,
-                                    reaction_type: R)
-                                    -> Result<()>
-                                    where C: Into<ChannelId>,
-                                          M: Into<MessageId>,
-                                          R: Into<ReactionType> {
-        rest::create_reaction(channel_id.into().0,
-                              message_id.into().0,
-                              reaction_type.into())
+    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R)
+        -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
+        match self.channel_id {
+            Some(channel_id) => channel_id.create_reaction(message_id, reaction_type),
+            None => Err(Error::Client(ClientError::NoChannelId)),
+        }
     }
 
-    /// Creates a [`Role`] in guild with given Id. Second argument is a
-    /// closure, and you can use it to automatically configure role.
-    ///
-    /// Requires the [Manage Roles] permission.
-    ///
-    /// # Examples
-    ///
-    /// Create a role which can be mentioned, with the name 'test':
-    ///
-    /// ```rust,ignore
-    /// let role = context.create_role(guild_id, |r| r
-    ///     .hoist(true)
-    ///     .name("role"));
-    /// ```
-    ///
-    /// [`Role`]: ../model/struct.Role.html
-    /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
-    pub fn create_role<F, G>(&self, guild_id: G, f: F) -> Result<Role>
-        where F: FnOnce(EditRole) -> EditRole, G: Into<GuildId> {
-        rest::create_role(guild_id.into().0, f(EditRole::default()).0.build())
-    }
-
-    /// Deletes a [`Channel`] based on the Id given.
+    /// Deletes the contextual channel.
     ///
     /// If the channel being deleted is a [`GuildChannel`] (a [`Guild`]'s
     /// channel), then the [Manage Channels] permission is required.
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
+    ///
     /// [`Channel`]: ../model/enum.Channel.html
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
     /// [`Guild`]: ../model/struct.Guild.html
     /// [`GuildChannel`]: ../model/struct.GuildChannel.html
     /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
-    pub fn delete_channel<C>(&self, channel_id: C) -> Result<Channel>
-        where C: Into<ChannelId> {
-        rest::delete_channel(channel_id.into().0)
+    pub fn delete_channel(&self) -> Result<Channel> {
+        match self.channel_id {
+            Some(channel_id) => channel_id.delete(),
+            None => Err(Error::Client(ClientError::NoChannelId)),
+        }
     }
 
-    /// Deletes an emoji in a [`Guild`] given its Id.
+    /// Deletes a [`Message`] given its Id from the contextual channel.
     ///
-    /// Requires the [Manage Emojis] permission.
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [Manage Emojis]: ../model/permissions/constant.MANAGE_EMOJIS.html
-    pub fn delete_emoji<E, G>(&self, guild_id: G, emoji_id: E) -> Result<()>
-        where E: Into<EmojiId>, G: Into<GuildId> {
-        rest::delete_emoji(guild_id.into().0, emoji_id.into().0)
-    }
-
-    /// Deletes a [`Guild`]. The current user must be the guild owner to be able
-    /// to delete it.
-    ///
-    /// Only a [`PartialGuild`] will be immediately returned.
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`PartialGuild`]: ../model/struct.PartialGuild.html
-    pub fn delete_guild<G: Into<GuildId>>(&self, guild_id: G)
-        -> Result<PartialGuild> {
-        rest::delete_guild(guild_id.into().0)
-    }
-
-    /// Deletes an integration by Id from a guild which Id was given.
-    ///
-    /// Requires the [Manage Guild] permission.
-    ///
-    /// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
-    pub fn delete_integration<G, I>(&self, guild_id: G, integration_id: I)
-        -> Result<()> where G: Into<GuildId>, I: Into<IntegrationId> {
-        rest::delete_guild_integration(guild_id.into().0,
-                                       integration_id.into().0)
-    }
-
-    /// Deletes the given invite.
-    ///
-    /// Refer to the documentation for [`Invite::delete`] for restrictions on
-    /// deleting an invite.
-    ///
-    /// Requires the [Manage Guild] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
-    /// not have the required [permission].
-    ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
-    /// [`Invite::delete`]: ../model/struct.Invite.html#method.delete
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    pub fn delete_invite(&self, invite: &str) -> Result<Invite> {
-        rest::delete_invite(utils::parse_invite(invite))
-    }
-
-    /// Deletes a [`Message`] given its Id.
-    ///
-    /// Also see [`Message::delete`] if you have the `methods` feature enabled.
-    ///
-    /// Requires the [Manage Messages] permission, if the current user is not
-    /// the author of the message.
+    /// Refer to [`Message::delete`] for more information.
     ///
     /// # Examples
     ///
@@ -591,19 +276,27 @@ impl Context {
     /// use std::env;
     ///
     /// let client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN").unwrap());
-    /// client.on_message(|context, message| {
-    ///     context.delete_message(message);
+    /// client.on_message(|ctx, message| {
+    ///     ctx.delete_message(message);
     /// });
     /// ```
     ///
     /// (in practice, please do not do this)
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
+    ///
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
     /// [`Message`]: ../model/struct.Message.html
     /// [`Message::delete`]: ../model/struct.Message.html#method.delete
     /// [Manage Messages]: ../model/permissions/constant.MANAGE_MESSAGES.html
-    pub fn delete_message<C, M>(&self, channel_id: C, message_id: M)
-        -> Result<()> where C: Into<ChannelId>, M: Into<MessageId> {
-        rest::delete_message(channel_id.into().0, message_id.into().0)
+    pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
+        match self.channel_id {
+            Some(channel_id) => channel_id.delete_message(message_id),
+            None => Err(Error::Client(ClientError::NoChannelId)),
+        }
     }
 
     /// Deletes all messages by Ids from the given vector in the given channel.
@@ -617,137 +310,67 @@ impl Context {
     ///
     /// **Note**: Messages that are older than 2 weeks can't be deleted using this method.
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
+    ///
+    /// Returns a [`ClientError::InvalidOperationAsUser`] if the current user is
+    /// not a bot user.
+    ///
+    /// [`ClientError::InvalidOperationAsUser`]: enum.ClientError.html#variant.InvalidOperationAsUser
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
     /// [Manage Messages]: ../model/permissions/constant.MANAGE_MESSAGES.html
-    pub fn delete_messages<C>(&self, channel_id: C, message_ids: &[MessageId])
-        -> Result<()> where C: Into<ChannelId> {
+    pub fn delete_messages(&self, message_ids: &[MessageId]) -> Result<()> {
         if self.login_type == LoginType::User {
             return Err(Error::Client(ClientError::InvalidOperationAsUser))
         }
 
-        let ids = message_ids.into_iter()
-            .map(|message_id| message_id.0)
-            .collect::<Vec<u64>>();
-
-        let map = ObjectBuilder::new()
-            .insert("messages", ids)
-            .build();
-
-        rest::delete_messages(channel_id.into().0, map)
+        match self.channel_id {
+            Some(channel_id) => channel_id.delete_messages(message_ids),
+            None => Err(Error::Client(ClientError::NoChannelId)),
+        }
     }
 
-    /// Deletes a profile note from a user.
-    pub fn delete_note<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
-        let map = ObjectBuilder::new()
-            .insert("note", "")
-            .build();
-
-        rest::edit_note(user_id.into().0, map)
-    }
-
-    /// Deletes all permission overrides in a channel from a member or
-    /// a role.
+    /// Deletes all permission overrides in the contextual channel from a member
+    /// or role.
     ///
-    /// Requires the [Manage Channel] permission.
+    /// **Note**: Requires the [Manage Channel] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
+    ///
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
     /// [Manage Channel]: ../model/permissions/constant.MANAGE_CHANNELS.html
-    pub fn delete_permission<C>(&self,
-                                channel_id: C,
-                                permission_type: PermissionOverwriteType)
-                                -> Result<()> where C: Into<ChannelId> {
-        let id = match permission_type {
-            PermissionOverwriteType::Member(id) => id.0,
-            PermissionOverwriteType::Role(id) => id.0,
-        };
-
-        rest::delete_permission(channel_id.into().0, id)
+    #[inline]
+    pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
+        match self.channel_id {
+            Some(channel_id) => channel_id.delete_permission(permission_type),
+            None => Err(Error::Client(ClientError::NoChannelId)),
+        }
     }
 
-
-    /// Deletes the given [`Reaction`].
+    /// Deletes the given [`Reaction`] from the contextual channel.
     ///
     /// **Note**: Requires the [Manage Messages] permission, _if_ the current
     /// user did not perform the reaction.
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
+    ///
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
     /// [`Reaction`]: ../model/struct.Reaction.html
     /// [Manage Messages]: ../model/permissions/constant.MANAGE_MESSAGES.html
-    pub fn delete_reaction<C, M, R>(&self,
-                                    channel_id: C,
-                                    message_id: M,
-                                    user_id: Option<UserId>,
-                                    reaction_type: R)
-                                    -> Result<()>
-                                    where C: Into<ChannelId>,
-                                          M: Into<MessageId>,
-                                          R: Into<ReactionType> {
-        rest::delete_reaction(channel_id.into().0,
-                              message_id.into().0,
-                              user_id.map(|uid| uid.0),
-                              reaction_type.into())
-    }
-
-    /// Deletes a [`Role`] by Id from the given [`Guild`].
-    ///
-    /// Also see [`Role::delete`] if you have the `cache` and `methods` features
-    /// enabled.
-    ///
-    /// Requires the [Manage Roles] permission.
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`Role`]: ../model/struct.Role.html
-    /// [`Role::delete`]: ../model/struct.Role.html#method.delete
-    /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
-    pub fn delete_role<G, R>(&self, guild_id: G, role_id: R) -> Result<()>
-        where G: Into<GuildId>, R: Into<RoleId> {
-        rest::delete_role(guild_id.into().0, role_id.into().0)
-    }
-
-    /// Sends a message to a user through a direct message channel. This is a
-    /// channel that can only be accessed by you and the recipient.
-    ///
-    /// # Examples
-    ///
-    /// There are three ways to send a direct message to someone, the first
-    /// being an unrelated, although equally helpful method.
-    ///
-    /// Sending a message via [`User::dm`]:
-    ///
-    /// ```rust,ignore
-    /// // assuming you are in a context
-    /// let _ = context.message.author.dm("Hello!");
-    /// ```
-    ///
-    /// Sending a message to a `PrivateChannel`:
-    ///
-    /// ```rust,ignore
-    /// assuming you are in a context
-    /// let private_channel = context.create_private_channel(context.message.author.id);
-    ///
-    /// let _ = context.direct_message(private_channel, "Test!");
-    /// ```
-    ///
-    /// Sending a message to a `PrivateChannel` given its ID:
-    ///
-    /// ```rust,ignore
-    /// use serenity::Client;
-    /// use std::env;
-    ///
-    /// let mut client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN").unwrap());
-    ///
-    /// client.on_message(|context, message| {
-    ///     if message.content == "!pm-me" {
-    ///         let channel = context.create_private_channel(message.author.id)
-    ///             .unwrap();
-    ///
-    ///         let _ = channel.send_message("test!");
-    ///     }
-    /// });
-    /// ```
-    ///
-    /// [`PrivateChannel`]: ../model/struct.PrivateChannel.html
-    /// [`User::dm`]: ../model/struct.User.html#method.dm
-    pub fn dm<C: Into<ChannelId>>(&self, target_id: C, content: &str)
-        -> Result<Message> {
-        self.send_message(target_id.into(), |m| m.content(content))
+    pub fn delete_reaction<M, R>(&self, message_id: M, user_id: Option<UserId>, reaction_type: R)
+        -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
+        match self.channel_id {
+            Some(channel_id) => channel_id.delete_reaction(message_id, user_id, reaction_type),
+            None => Err(Error::Client(ClientError::NoChannelId)),
+        }
     }
 
     /// Edits the settings of a [`Channel`], optionally setting new values.
@@ -766,128 +389,33 @@ impl Context {
     ///     .bitrate(64000));
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a guild channel.
+    ///
     /// [`Channel`]: ../model/enum.Channel.html
-    pub fn edit_channel<C, F>(&self, channel_id: C, f: F)
-        -> Result<GuildChannel> where C: Into<ChannelId>,
-                                       F: FnOnce(EditChannel) -> EditChannel {
-        let channel_id = channel_id.into();
-
-        let map = match self.get_channel(channel_id)? {
-            Channel::Guild(channel) => {
-                let map = ObjectBuilder::new()
-                    .insert("name", channel.name)
-                    .insert("position", channel.position);
-
-                match channel.kind {
-                    ChannelType::Text => map.insert("topic", channel.topic),
-                    ChannelType::Voice => {
-                        map.insert("bitrate", channel.bitrate)
-                            .insert("user_limit", channel.user_limit)
-                    },
-                    kind => return Err(Error::Client(ClientError::UnexpectedChannelType(kind))),
-                }
-            },
-            Channel::Private(channel) => {
-                return Err(Error::Client(ClientError::UnexpectedChannelType(channel.kind)));
-            },
-            Channel::Group(_group) => {
-                return Err(Error::Client(ClientError::UnexpectedChannelType(ChannelType::Group)));
-            },
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
+    pub fn edit_channel<F>(&self, f: F) -> Result<GuildChannel>
+        where F: FnOnce(EditChannel) -> EditChannel {
+        let channel_id = match self.channel_id {
+            Some(channel_id) => channel_id,
+            None => return Err(Error::Client(ClientError::NoChannelId)),
         };
 
-        let edited = f(EditChannel(map)).0.build();
+        #[cfg(feature="cache")]
+        {
 
-        rest::edit_channel(channel_id.0, edited)
-    }
+            match channel_id.get()? {
+                Channel::Guild(ref c) if c.kind != ChannelType::Text &&
+                                         c.kind != ChannelType::Voice => {
+                    return Err(Error::Client(ClientError::UnexpectedChannelType(c.kind)));
+                },
+                _ => {},
+            }
+        }
 
-    /// Edits an [`Emoji`]'s name.
-    ///
-    /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features
-    /// enabled.
-    ///
-    /// Requires the [Manage Emojis] permission.
-    ///
-    /// [`Emoji`]: ../model/struct.Emoji.html
-    /// [`Emoji::edit`]: ../model/struct.Emoji.html#method.edit
-    /// [Manage Emojis]: ../model/permissions/constant.MANAGE_EMOJIS.html
-    pub fn edit_emoji<E, G>(&self, guild_id: G, emoji_id: E, name: &str)
-        -> Result<Emoji> where E: Into<EmojiId>, G: Into<GuildId> {
-        let map = ObjectBuilder::new()
-            .insert("name", name)
-            .build();
-
-        rest::edit_emoji(guild_id.into().0, emoji_id.into().0, map)
-    }
-
-    /// Edits the settings of a [`Guild`], optionally setting new values.
-    ///
-    /// Refer to `EditGuild`'s documentation for a full list of methods.
-    ///
-    /// Also see [`Guild::edit`] if you have the `methods` feature enabled.
-    ///
-    /// Requires the [Manage Guild] permission.
-    ///
-    /// # Examples
-    ///
-    /// Change a guild's icon using a file name "icon.png":
-    ///
-    /// ```rust,ignore
-    /// use serenity::utils;
-    ///
-    /// // We are using read_image helper function from utils.
-    /// let base64_icon = utils::read_image("./icon.png")
-    ///     .expect("Failed to read image");
-    ///
-    /// context.edit_guild(guild_id, |g|
-    ///     g.icon(base64_icon));
-    /// ```
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`Guild::edit`]: ../model/struct.Guild.html
-    /// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
-    pub fn edit_guild<F, G>(&self, guild_id: G, f: F) -> Result<PartialGuild>
-        where F: FnOnce(EditGuild) -> EditGuild, G: Into<GuildId> {
-        let map = f(EditGuild::default()).0.build();
-
-        rest::edit_guild(guild_id.into().0, map)
-    }
-
-    /// Edits the properties of member of a guild, such as muting or nicknaming
-    /// them.
-    ///
-    /// Refer to `EditMember`'s documentation for a full list of methods and
-    /// permission restrictions.
-    ///
-    /// # Examples
-    ///
-    /// Mute a member and set their roles to just one role with a predefined Id:
-    ///
-    /// ```rust,ignore
-    /// context.edit_member(guild_id, user_id, |m| m
-    ///     .mute(true)
-    ///     .roles(&vec![role_id]));
-    /// ```
-    pub fn edit_member<F, G, U>(&self, guild_id: G, user_id: U, f: F)
-        -> Result<()> where F: FnOnce(EditMember) -> EditMember,
-                            G: Into<GuildId>,
-                            U: Into<UserId> {
-        let map = f(EditMember::default()).0.build();
-
-        rest::edit_member(guild_id.into().0, user_id.into().0, map)
-    }
-
-    /// Edits the current user's nickname for the provided [`Guild`] via its Id.
-    ///
-    /// Pass `None` to reset the nickname.
-    ///
-    /// Requires the [Change Nickname] permission.
-    ///
-    /// [`Guild`]: ../../model/struct.Guild.html
-    /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
-    #[inline]
-    pub fn edit_nickname<G>(&self, guild_id: G, new_nickname: Option<&str>)
-        -> Result<()> where G: Into<GuildId> {
-        rest::edit_nickname(guild_id.into().0, new_nickname)
+        channel_id.edit(f)
     }
 
     /// Edits the current user's profile settings.
@@ -901,243 +429,89 @@ impl Context {
     /// ```rust,ignore
     /// context.edit_profile(|p| p.username("Hakase"));
     /// ```
-    pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F)
-        -> Result<CurrentUser> {
-        let user = rest::get_current_user()?;
+    pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser> {
+        let mut map = ObjectBuilder::new();
 
-        let mut map = ObjectBuilder::new()
-            .insert("avatar", user.avatar)
-            .insert("username", user.name);
+        feature_cache! {{
+            let cache = CACHE.read().unwrap();
 
-        if let Some(email) = user.email.as_ref() {
-            map = map.insert("email", email);
-        }
+            map = map.insert("avatar", &cache.user.avatar)
+                .insert("username", &cache.user.name);
+
+            if let Some(email) = cache.user.email.as_ref() {
+                map = map.insert("email", email);
+            }
+        } else {
+            let user = rest::get_current_user()?;
+
+            map = map.insert("avatar", user.avatar)
+                .insert("username", user.name);
+
+            if let Some(email) = user.email.as_ref() {
+                map = map.insert("email", email);
+            }
+        }}
 
         let edited = f(EditProfile(map)).0.build();
 
         rest::edit_profile(edited)
     }
 
-    /// Edits a [`Role`], optionally setting its new fields.
-    ///
-    /// Requires the [Manage Roles] permission.
-    ///
-    /// # Examples
-    ///
-    /// Make a role hoisted:
-    ///
-    /// ```rust,ignore
-    /// context.edit_role(guild_id, role_id, |r| r
-    ///     .hoist(true));
-    /// ```
-    ///
-    /// [`Role`]: ../model/struct.Role.html
-    /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
-    pub fn edit_role<F, G, R>(&self, guild_id: G, role_id: R, f: F)
-        -> Result<Role> where F: FnOnce(EditRole) -> EditRole,
-                              G: Into<GuildId>,
-                              R: Into<GuildId> {
-        let guild_id = guild_id.into();
-        let role_id = role_id.into();
-
-        let map = feature_cache! {{
-            let cache = CACHE.read().unwrap();
-
-            let role = if let Some(role) = {
-                cache.get_role(guild_id.0, role_id.0)
-            } {
-                role
-            } else {
-                return Err(Error::Client(ClientError::RecordNotFound));
-            };
-
-            f(EditRole::new(role)).0.build()
-        } else {
-            f(EditRole::default()).0.build()
-        }};
-
-        rest::edit_role(guild_id.0, role_id.0, map)
-    }
-
     /// Edits a [`Message`] given its Id and the Id of the channel it belongs
     /// to.
     ///
-    /// Pass an empty string (`""`) to `text` if you are editing a message with
-    /// an embed or file but no content. Otherwise, `text` must be given.
+    /// Refer to [`Channel::edit_message`] for more information.
     ///
     /// **Note**: Requires that the current user be the author of the message.
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
+    ///
+    /// [`Channel::edit_message`]: ../model/enum.Channel.html#method.edit_message
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
     /// [`Message`]: ../model/struct.Message.html
-    pub fn edit_message<C, F, M>(&self, channel_id: C, message_id: M, text: &str, f: F)
-        -> Result<Message> where C: Into<ChannelId>,
-                                 F: FnOnce(CreateEmbed) -> CreateEmbed,
-                                 M: Into<MessageId> {
-        let mut map = ObjectBuilder::new()
-            .insert("content", text);
-
-        let embed = f(CreateEmbed::default()).0;
-
-        if embed.len() > 1 {
-            map = map.insert("embed", Value::Object(embed));
+    pub fn edit_message<F, M>(&self, message_id: M, text: &str, f: F) -> Result<Message>
+        where F: FnOnce(CreateEmbed) -> CreateEmbed, M: Into<MessageId> {
+        match self.channel_id {
+            Some(channel_id) => channel_id.edit_message(message_id, text, f),
+            None => Err(Error::Client(ClientError::NoChannelId)),
         }
-
-        rest::edit_message(channel_id.into().0, message_id.into().0, map.build())
     }
 
-    /// Edits the note that the current user has set for another user.
-    ///
-    /// Use [`delete_note`] to remove a note.
-    ///
-    /// **Note**: Requires that the current user be a user account.
-    ///
-    /// # Examples
-    ///
-    /// Set a note for a message's author:
-    ///
-    /// ```rust,ignore
-    /// // assuming a `message` has been bound
-    /// let _ = context.edit_note(message.author, "test note");
-    /// ```
+    /// Gets a fresh version of the channel over the REST API.
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidOperationAsBot`] if the current user is
-    /// a bot user.
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
     ///
-    /// [`ClientError::InvalidOperationAsBot`]: enum.ClientError.html#variant.InvalidOperationAsBot
-    /// [`delete_note`]: #method.delete_note
-    pub fn edit_note<U: Into<UserId>>(&self, user_id: U, note: &str)
-        -> Result<()> {
-        let map = ObjectBuilder::new()
-            .insert("note", note)
-            .build();
-
-        rest::edit_note(user_id.into().0, map)
-    }
-
-    /// Gets a list of the given [`Guild`]'s bans.
-    ///
-    /// Requires the [Ban Members] permission.
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
-    pub fn get_bans<G: Into<GuildId>>(&self, guild_id: G) -> Result<Vec<Ban>> {
-        rest::get_bans(guild_id.into().0)
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
+    pub fn get_channel(&self) -> Result<Channel> {
+        match self.channel_id {
+            Some(channel_id) => channel_id.get(),
+            None => Err(Error::Client(ClientError::NoChannelId)),
+        }
     }
 
     /// Gets all of a [`GuildChannel`]'s invites.
     ///
     /// Requires the [Manage Guild] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
+    ///
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
     /// [`GuildChannel`]: ../model/struct.GuildChannel.html
     /// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
-    pub fn get_channel_invites<C: Into<ChannelId>>(&self, channel_id: C)
-        -> Result<Vec<RichInvite>> {
-        rest::get_channel_invites(channel_id.into().0)
-    }
-
-    /// Gets a `Channel` by the given Id.
-    pub fn get_channel<C>(&self, channel_id: C) -> Result<Channel>
-        where C: Into<ChannelId> {
-        let channel_id = channel_id.into();
-
-        #[cfg(feature="cache")]
-        {
-            if let Some(channel) = CACHE.read().unwrap().get_channel(channel_id) {
-                return Ok(channel.clone_inner());
-            }
+    pub fn get_channel_invites(&self) -> Result<Vec<RichInvite>> {
+        match self.channel_id {
+            Some(channel_id) => channel_id.get_invites(),
+            None => Err(Error::Client(ClientError::NoChannelId)),
         }
-
-        rest::get_channel(channel_id.0)
-    }
-
-    /// Gets all of a [`Guild`]'s channels with given Id.
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    pub fn get_channels<G>(&self, guild_id: G)
-        -> Result<HashMap<ChannelId, GuildChannel>> where G: Into<GuildId> {
-        let guild_id = guild_id.into();
-
-        #[cfg(feature="cache")]
-        {
-            if let Some(guild) = CACHE.read().unwrap().get_guild(guild_id) {
-                return Ok(guild.channels.clone());
-            }
-        }
-
-        let mut channels = HashMap::new();
-
-        for channel in rest::get_channels(guild_id.0)? {
-            channels.insert(channel.id, channel);
-        }
-
-        Ok(channels)
-    }
-
-    /// Gets information about the current user.
-    ///
-    /// Note this is shorthand for retrieving the current user through the
-    /// cache, and will perform a clone.
-    #[cfg(all(feature = "cache", feature = "methods"))]
-    pub fn get_current_user(&self) -> CurrentUser {
-        CACHE.read().unwrap().user.clone()
-    }
-
-    /// Gets an [`Guild`]'s emoji by Id.
-    ///
-    /// Requires the [Manage Emojis] permission.
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [Manage Emojis]: ../model/permissions/constant.MANAGE_EMOJIS.html
-    pub fn get_emoji<E, G>(&self, guild_id: G, emoji_id: E) -> Result<Emoji>
-        where E: Into<EmojiId>, G: Into<GuildId> {
-        rest::get_emoji(guild_id.into().0, emoji_id.into().0)
-    }
-
-    /// Gets a list of all of a [`Guild`]'s emojis.
-    ///
-    /// Requires the [Manage Emojis] permission.
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [Manage Emojis]: ../model/permissions/constant.MANAGE_EMOJIS.html
-    pub fn get_emojis<G: Into<GuildId>>(&self, guild_id: G)
-        -> Result<Vec<Emoji>> {
-        rest::get_emojis(guild_id.into().0)
-    }
-
-    /// Gets a partial amount of guild data by its Id.
-    ///
-    /// Requires that the current user be in the guild.
-    pub fn get_guild<G: Into<GuildId>>(&self, guild_id: G)
-        -> Result<PartialGuild> {
-        rest::get_guild(guild_id.into().0)
-    }
-
-    /// Gets all of a guild's invites.
-    ///
-    /// Requires the [Manage Guild] permission.
-    ///
-    /// [`RichInvite`]: ../model/struct.RichInvite.html
-    /// [Manage Guild]: ../model/permissions/struct.MANAGE_GUILD.html
-    pub fn get_guild_invites<G>(&self, guild_id: G) -> Result<Vec<RichInvite>>
-        where G: Into<GuildId> {
-        rest::get_guild_invites(guild_id.into().0)
-    }
-
-    /// Gets the number of [`Member`]s that would be pruned with the given
-    /// number of days.
-    ///
-    /// Requires the [Kick Members] permission.
-    ///
-    /// [`Member`]: ../model/struct.Member.html
-    /// [Kick Members]: ../model/permissions/constant.KICK_MEMBERS.html
-    pub fn get_guild_prune_count<G>(&self, guild_id: G, days: u16)
-        -> Result<GuildPrune> where G: Into<GuildId> {
-        let map = ObjectBuilder::new()
-            .insert("days", days)
-            .build();
-
-        rest::get_guild_prune_count(guild_id.into().0, map)
     }
 
     /// Gets a paginated list of guilds that the current user is in.
@@ -1161,63 +535,12 @@ impl Context {
     ///
     /// [`CurrentUser::guilds`]: ../model/struct.CurrentUser.html#method.guilds
     /// [`Message`]: ../model/struct.Message.html
+    #[inline]
     pub fn get_guilds(&self, target: GuildPagination, limit: u8) -> Result<Vec<GuildInfo>> {
         rest::get_guilds(target, limit as u64)
     }
 
-    /// Gets all integrations of a guild via the given Id.
-    pub fn get_integrations<G: Into<GuildId>>(&self, guild_id: G)
-        -> Result<Vec<Integration>> {
-        rest::get_guild_integrations(guild_id.into().0)
-    }
-
-    /// Gets the information about an invite.
-    pub fn get_invite(&self, invite: &str) -> Result<Invite> {
-        let code = utils::parse_invite(invite);
-
-        rest::get_invite(code)
-    }
-
-    /// Gets a user's [`Member`] instance for a [`Guild`], given by Id.
-    ///
-    /// If the `cache` feature is enabled, then the instance will be cloned from
-    /// the cache if it exists.
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`Member`]: ../model/struct.Member.html
-    pub fn get_member<G, U>(&self, guild_id: G, user_id: U) -> Result<Member>
-        where G: Into<GuildId>, U: Into<UserId> {
-        let guild_id = guild_id.into();
-        let user_id = user_id.into();
-
-        #[cfg(feature="cache")]
-        {
-            let cache = CACHE.read().unwrap();
-
-            if let Some(member) = cache.get_member(guild_id, user_id) {
-                return Ok(member.clone());
-            }
-        }
-
-        rest::get_member(guild_id.0, user_id.0)
-    }
-
-    /// Gets a list of a [`Guild`]'s members.
-    ///
-    /// Optionally pass in the `limit` to limit the number of results. Maximum
-    /// value is 1000. Optionally pass in `after` to offset the results by a
-    /// [`User`]'s Id.
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`User`]: ../model/struct.User.html
-    pub fn get_members<G, U>(&self, guild_id: G, limit: Option<u64>, after: Option<U>)
-        -> Result<Vec<Member>> where G: Into<GuildId>, U: Into<UserId> {
-        rest::get_guild_members(guild_id.into().0,
-                                limit,
-                                after.map(|x| x.into().0))
-    }
-
-    /// Gets a single [`Message`] from a [`Channel`].
+    /// Gets a single [`Message`] from the contextual channel.
     ///
     /// Requires the [Read Message History] permission.
     ///
@@ -1226,50 +549,22 @@ impl Context {
     /// Returns a [`ClientError::InvalidOperationAsUser`] if the current user is
     /// not a user account.
     ///
-    /// [`Channel`]: ../model/struct.Channel.html
-    /// [`ClientError::InvalidOperationAsUser`]: ../enum.ClientError.html#variant.InvalidOperationAsUser
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
+    ///
+    /// [`ClientError::InvalidOperationAsUser`]: enum.ClientError.html#variant.InvalidOperationAsUser
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
     /// [`Message`]: ../model/struct.Message.html
     /// [Read Message History]: ../model/permissions/constant.READ_MESSAGE_HISTORY.html
-    pub fn get_message<C, M>(&self, channel_id: C, message_id: M)
-        -> Result<Message> where C: Into<ChannelId>, M: Into<MessageId> {
+    pub fn get_message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         if self.login_type == LoginType::User {
             return Err(Error::Client(ClientError::InvalidOperationAsUser))
         }
 
-        rest::get_message(channel_id.into().0, message_id.into().0)
-    }
-
-    /// Gets messages from a specific channel.
-    ///
-    /// Requires the [Read Message History] permission.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// let role = context.get_messages(channel_id, |g| g
-    ///     .before(20)
-    ///     .after(100)); // Maximum is 100.
-    /// ```
-    ///
-    /// [Read Message History]: ../model/permission/constant.READ_MESSAGE_HISTORY.html
-    pub fn get_messages<C, F>(&self, channel_id: C, f: F) -> Result<Vec<Message>>
-        where C: Into<ChannelId>, F: FnOnce(GetMessages) -> GetMessages {
-        let mut map = f(GetMessages::default()).0;
-        let mut query = format!("?limit={}", map.remove("limit").unwrap_or(50));
-
-        if let Some(after) = map.remove("after") {
-            write!(query, "&after={}", after)?;
+        match self.channel_id {
+            Some(channel_id) => channel_id.get_message(message_id),
+            None => Err(Error::Client(ClientError::NoChannelId)),
         }
-
-        if let Some(around) = map.remove("around") {
-            write!(query, "&around={}", around)?;
-        }
-
-        if let Some(before) = map.remove("before") {
-            write!(query, "&before={}", before)?;
-        }
-
-        rest::get_messages(channel_id.into().0, &query)
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
@@ -1284,86 +579,46 @@ impl Context {
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
+    ///
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
     /// [`Emoji`]: struct.Emoji.html
     /// [`Message`]: struct.Message.html
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    pub fn get_reaction_users<C, M, R, U>(&self,
-                                          channel_id: C,
-                                          message_id: M,
-                                          reaction_type: R,
-                                          limit: Option<u8>,
-                                          after: Option<U>)
-                                          -> Result<Vec<User>>
-                                          where C: Into<ChannelId>,
-                                                M: Into<MessageId>,
-                                                R: Into<ReactionType>,
-                                                U: Into<UserId> {
-        let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
-
-        rest::get_reaction_users(channel_id.into().0,
-                                 message_id.into().0,
-                                 reaction_type.into(),
-                                 limit,
-                                 after.map(|u| u.into().0))
+    pub fn get_reaction_users<M, R, U>(&self,
+                                       message_id: M,
+                                       reaction_type: R,
+                                       limit: Option<u8>,
+                                       after: Option<U>)
+        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
+        match self.channel_id {
+            Some(c) => c.get_reaction_users(message_id, reaction_type, limit, after),
+            None => Err(Error::Client(ClientError::NoChannelId)),
+        }
     }
 
-    /// Gets a [`User`] by its Id.
+    /// Pins a [`Message`] in the specified [`Channel`] by its Id.
     ///
-    /// [`User`]: ../model/struct.User.html
+    /// Requires the [Manage Messages] permission.
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidOperationAsUser`] if the current user is
-    /// not a bot user.
+    /// Returns a [`ClientError::NoChannelId`] if the current context is not
+    /// related to a channel.
     ///
-    /// [`ClientError::InvalidOperationAsUser`]: enum.ClientError.html#variant.InvalidOperationAsUser
-    #[inline]
-    pub fn get_user<U: Into<UserId>>(&self, user_id: U) -> Result<User> {
-        #[cfg(feature="cache")]
-        {
-            if !CACHE.read().unwrap().user.bot {
-                return Err(Error::Client(ClientError::InvalidOperationAsUser));
-            }
+    /// [`Channel`]: ../model/enum.Channel.html
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
+    /// [`Message`]: ../model/struct.Message.html
+    /// [Manage Messages]: ../model/permissions/constant.MANAGE_MESSAGES.html
+    pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
+        match self.channel_id {
+            Some(channel_id) => channel_id.pin(message_id),
+            None => Err(Error::Client(ClientError::NoChannelId)),
         }
-
-        rest::get_user(user_id.into().0)
-    }
-
-    /// Kicks a [`Member`] from the specified [`Guild`] if they are in it.
-    ///
-    /// Requires the [Kick Members] permission.
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`Member`]: ../model/struct.Member.html
-    /// [Kick Members]: ../model/permissions/constant.KICK_MEMBERS.html
-    pub fn kick_member<G, U>(&self, guild_id: G, user_id: U) -> Result<()>
-        where G: Into<GuildId>, U: Into<UserId> {
-        rest::kick_member(guild_id.into().0, user_id.into().0)
-    }
-
-    /// Leaves a [`Guild`] by its Id.
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    pub fn leave_guild<G: Into<GuildId>>(&self, guild_id: G)
-        -> Result<PartialGuild> {
-        rest::leave_guild(guild_id.into().0)
-    }
-
-    /// Moves a member to a specific voice channel.
-    ///
-    /// Requires the [Move Members] permission.
-    ///
-    /// [Move Members]: ../model/permissions/constant.MOVE_MEMBERS.html
-    pub fn move_member<C, G, U>(&self, guild_id: G, user_id: U, channel_id: C)
-        -> Result<()> where C: Into<ChannelId>,
-                            G: Into<GuildId>,
-                            U: Into<UserId> {
-        let map = ObjectBuilder::new()
-            .insert("channel_id", channel_id.into().0)
-            .build();
-
-        rest::edit_member(guild_id.into().0, user_id.into().0, map)
     }
 
     /// Gets the list of [`Message`]s which are pinned to the specified
@@ -1371,22 +626,11 @@ impl Context {
     ///
     /// [`Channel`]: ../model/enum.Channel.html
     /// [`Message`]: ../model/struct.Message.html
-    pub fn get_pins<C>(&self, channel_id: C) -> Result<Vec<Message>>
-        where C: Into<ChannelId> {
-        rest::get_pins(channel_id.into().0)
-    }
-
-    /// Pins a [`Message`] in the specified [`Channel`] by its Id.
-    ///
-    /// Requires the [Manage Messages] permission.
-    ///
-    /// [`Channel`]: ../model/enum.Channel.html
-    /// [`Message`]: ../model/struct.Message.html
-    ///
-    /// [Manage Messages]: ../model/permissions/constant.MANAGE_MESSAGES.html
-    pub fn pin<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
-        where C: Into<ChannelId>, M: Into<MessageId> {
-        rest::pin_message(channel_id.into().0, message_id.into().0)
+    pub fn pins(&self) -> Result<Vec<Message>> {
+        match self.channel_id {
+            Some(channel_id) => channel_id.pins(),
+            None => Err(Error::Client(ClientError::NoChannelId)),
+        }
     }
 
     /// Sends a message with just the given message content in the channel that
@@ -1423,7 +667,7 @@ impl Context {
     ///
     /// [`ChannelId`]: ../../model/struct.ChannelId.html
     /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
-    /// [`ClientError::NoChannelId`]: ../enum.ClientError.html#NoChannelId
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#NoChannelId
     /// [`Event::ChannelCreate`]: ../model/event/enum.Event.html#variant.ChannelCreate
     /// [`Event::ChannelPinsAck`]: ../model/event/enum.Event.html#variant.ChannelPinsAck
     /// [`Event::ChannelPinsUpdate`]: ../model/event/enum.Event.html#variant.ChannelPinsUpdate
@@ -1439,10 +683,9 @@ impl Context {
     /// [`Event::ReactionRemoveAll`]: ../model/event/enum.Event.html#variant.ReactionRemoveAll
     /// [`Message`]: ../model/struct.Message.html
     pub fn say(&self, content: &str) -> Result<Message> {
-        if let Some(channel_id) = self.channel_id {
-            self.send_message(channel_id, |m| m.content(content))
-        } else {
-            Err(Error::Client(ClientError::NoChannelId))
+        match self.channel_id {
+            Some(channel_id) => channel_id.send_message(|m| m.content(content)),
+            None => Err(Error::Client(ClientError::NoChannelId)),
         }
     }
 
@@ -1478,13 +721,17 @@ impl Context {
     /// If the `cache` is enabled, returns a
     /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
     ///
-    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
+    /// [`ClientError::InvalidOperationAsBot`]: enum.ClientError.html#variant.InvalidOperationAsBot
     /// [`Channel`]: ../model/enum.Channel.html
     /// [`Search`]: ../utils/builder/struct.Search.html
-    /// [search channel]: ../../utils/builder/struct.Search.html#searching-a-channel
-    pub fn search_channel<C, F>(&self, channel_id: C, f: F)
-        -> Result<SearchResult> where C: Into<ChannelId>,
-                                      F: FnOnce(Search) -> Search {
+    /// [search channel]: ../utils/builder/struct.Search.html#searching-a-channel
+    pub fn search_channel<F>(&self, f: F) -> Result<SearchResult>
+        where F: FnOnce(Search) -> Search {
+        let channel_id = match self.channel_id {
+            Some(channel_id) => channel_id,
+            None => return Err(Error::Client(ClientError::NoChannelId)),
+        };
+
         #[cfg(feature="cache")]
         {
             if CACHE.read().unwrap().user.bot {
@@ -1492,52 +739,7 @@ impl Context {
             }
         }
 
-        let map = f(Search::default()).0;
-
-        rest::search_channel_messages(channel_id.into().0, map)
-    }
-
-    /// Searches a [`Guild`]'s messages by providing query parameters via the
-    /// search builder, with the ability to narrow down channels to search.
-    ///
-    /// Refer to the documentation for the [`Search`] builder for restrictions
-    /// and default parameters, as well as potentially advanced usage.
-    ///
-    /// **Note**: Bot users can not search.
-    ///
-    /// # Examples
-    ///
-    /// Refer to the [`Search`] builder's documentation for more examples,
-    /// specifically the section on
-    /// [searching a guild's channels][search guild].
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
-    ///
-    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`Search`]: ../utils/builder/struct.Search.html
-    /// [search guild]: ../../utils/builder/struct.Search.html#searching-a-guilds-channels
-    pub fn search_guild<F, G>(&self,
-                              guild_id: G,
-                              channel_ids: Vec<ChannelId>,
-                              f: F)
-                              -> Result<SearchResult>
-                              where F: FnOnce(Search) -> Search,
-                                    G: Into<GuildId> {
-        #[cfg(feature="cache")]
-        {
-            if CACHE.read().unwrap().user.bot {
-                return Err(Error::Client(ClientError::InvalidOperationAsBot));
-            }
-        }
-
-        let map = f(Search::default()).0;
-        let ids = channel_ids.iter().map(|ch| ch.0).collect::<Vec<u64>>();
-
-        rest::search_guild_messages(guild_id.into().0, &ids, map)
+        channel_id.search(f)
     }
 
     /// Sends a file along with optional message contents. The filename _must_
@@ -1564,23 +766,12 @@ impl Context {
     /// [`GuildChannel`]: ../model/struct.GuildChannel.html
     /// [Attach Files]: ../model/permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: ../model/permissions/constant.SEND_MESSAGES.html
-    pub fn send_file<C, F, R>(&self, channel_id: C, file: R, filename: &str, f: F)
-        -> Result<Message> where C: Into<ChannelId>,
-                                 F: FnOnce(CreateMessage) -> CreateMessage,
-                                 R: Read {
-        let mut map = f(CreateMessage::default()).0;
-
-        if let Some(content) = map.get("content") {
-            if let Value::String(ref content) = *content {
-                if let Some(length_over) = Message::overflow_length(content) {
-                    return Err(Error::Client(ClientError::MessageTooLong(length_over)));
-                }
-            }
+    pub fn send_file<F, R>(&self, file: R, filename: &str, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, R: Read {
+        match self.channel_id {
+            Some(channel_id) => channel_id.send_file(file, filename, f),
+            None => Err(Error::Client(ClientError::NoChannelId)),
         }
-
-        let _ = map.remove("embed");
-
-        rest::send_file(channel_id.into().0, file, filename, map)
     }
 
     /// Sends a message to a [`Channel`].
@@ -1692,19 +883,12 @@ impl Context {
     /// [Send Messages]: ../model/permissions/constant.SEND_MESSAGES.html
     /// [author structure]: ../utils/builder/struct.CreateEmbedAuthor.html
     /// [field structure]: ../utils/builder/struct.CreateEmbedField.html
-    pub fn send_message<C, F>(&self, channel_id: C, f: F) -> Result<Message>
-        where C: Into<ChannelId>, F: FnOnce(CreateMessage) -> CreateMessage {
-        let map = f(CreateMessage::default()).0;
-
-        if let Some(content) = map.get(&"content".to_owned()) {
-            if let Value::String(ref content) = *content {
-                if let Some(length_over) = Message::overflow_length(content) {
-                    return Err(Error::Client(ClientError::MessageTooLong(length_over)));
-                }
-            }
+    pub fn send_message<F>(&self, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage {
+        match self.channel_id {
+            Some(channel_id) => channel_id.send_message(f),
+            None => Err(Error::Client(ClientError::NoChannelId)),
         }
-
-        rest::send_message(channel_id.into().0, Value::Object(map))
     }
 
     /// Sets the current user as being [`Online`]. This maintains the current
@@ -1841,58 +1025,18 @@ impl Context {
             .set_presence(game, status, afk)
     }
 
-    /// Deletes an undefined amount of members from the given guild
-    /// based on the amount of days they've been offline for.
-    ///
-    /// **Note**: This will trigger [`GuildMemberRemove`] events.
-    ///
-    /// **Note**: Requires the [Kick Members] permission.
-    ///
-    /// [`GuildMemberRemove`]: ../model/event/enum.Event.html#variant.GuildMemberRemove
-    /// [Kick Members]: ../model/permissions/constant.KICK_MEMBERS.html
-    pub fn start_guild_prune<G>(&self, guild_id: G, days: u16)
-        -> Result<GuildPrune> where G: Into<GuildId> {
-        let map = ObjectBuilder::new()
-            .insert("days", days)
-            .build();
-
-        rest::start_guild_prune(guild_id.into().0, map)
-    }
-
-    /// Starts integration synchronization by the given integration Id.
-    ///
-    /// Requires the [Manage Guild] permission.
-    ///
-    /// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
-    pub fn start_integration_sync<G, I>(&self, guild_id: G, integration_id: I)
-        -> Result<()> where G: Into<GuildId>, I: Into<IntegrationId> {
-        rest::start_integration_sync(guild_id.into().0, integration_id.into().0)
-    }
-
-    /// Unbans a [`User`] from a [`Guild`].
-    ///
-    /// Requires the [Ban Members] permission.
-    ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`User`]: ../model/struct.User.html
-    /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
-    pub fn unban<G, U>(&self, guild_id: G, user_id: U) -> Result<()>
-        where G: Into<GuildId>, U: Into<UserId> {
-        rest::remove_ban(guild_id.into().0, user_id.into().0)
-    }
-
-
-    /// Unpins a [`Message`] in the specified [`Channel`] given each Id.
+    /// Unpins a [`Message`] in the contextual channel given by its Id.
     ///
     /// Requires the [Manage Messages] permission.
     ///
     /// [`Channel`]: ../model/enum.Channel.html
     /// [`Message`]: ../model/struct.Message.html
-    ///
     /// [Manage Messages]: ../model/permissions/constant.MANAGE_MESSAGES.html
-    pub fn unpin<C, M>(&self, channel_id: C, message_id: M) -> Result<()>
-        where C: Into<ChannelId>, M: Into<MessageId> {
-        rest::unpin_message(channel_id.into().0, message_id.into().0)
+    pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
+        match self.channel_id {
+            Some(channel_id) => channel_id.unpin(message_id),
+            None => Err(Error::Client(ClientError::NoChannelId)),
+        }
     }
 }
 

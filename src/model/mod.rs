@@ -23,26 +23,18 @@ pub mod permissions;
 mod channel;
 mod gateway;
 mod guild;
-mod id;
+mod invite;
 mod misc;
 mod user;
-
-#[cfg(feature="methods")]
-mod invite;
-#[cfg(feature="methods")]
 mod webhook;
 
 pub use self::channel::*;
 pub use self::gateway::*;
 pub use self::guild::*;
-pub use self::id::*;
+pub use self::invite::*;
 pub use self::misc::*;
 pub use self::permissions::Permissions;
 pub use self::user::*;
-
-#[cfg(feature="methods")]
-pub use self::invite::*;
-#[cfg(feature="methods")]
 pub use self::webhook::*;
 
 use self::utils::*;
