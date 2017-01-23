@@ -1170,7 +1170,7 @@ impl Client {
     }
 }
 
-pub struct BootInfo {
+struct BootInfo {
     gateway_url: Arc<Mutex<String>>,
     login_type: LoginType,
     shard_info: Option<[u64; 2]>,
@@ -1178,7 +1178,7 @@ pub struct BootInfo {
 }
 
 #[cfg(feature="framework")]
-pub struct MonitorInfo {
+struct MonitorInfo {
     data: Arc<Mutex<ShareMap>>,
     event_store: Arc<RwLock<EventStore>>,
     framework: Arc<Mutex<Framework>>,
@@ -1191,7 +1191,7 @@ pub struct MonitorInfo {
 }
 
 #[cfg(not(feature="framework"))]
-pub struct MonitorInfo {
+struct MonitorInfo {
     data: Arc<Mutex<ShareMap>>,
     event_store: Arc<RwLock<EventStore>>,
     gateway_url: Arc<Mutex<String>>,
