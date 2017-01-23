@@ -1112,6 +1112,12 @@ impl Guild {
 }
 
 impl GuildId {
+    /// Converts the guild Id into the default channel's Id.
+    #[inline]
+    pub fn as_channel_id(&self) -> ChannelId {
+        ChannelId(self.0)
+    }
+
     /// Ban a [`User`] from the guild. All messages by the
     /// user within the last given number of days given will be deleted.
     ///
