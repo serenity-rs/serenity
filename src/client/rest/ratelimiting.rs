@@ -233,9 +233,9 @@ fn get_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
         Some(header) => match str::from_utf8(&header[0]) {
             Ok(v) => match v.parse::<i64>() {
                 Ok(v) => Ok(Some(v)),
-                Err(_why) => Err(Error::Client(ClientError::RateLimitI64)),
+                Err(_) => Err(Error::Client(ClientError::RateLimitI64)),
             },
-            Err(_why) => Err(Error::Client(ClientError::RateLimitUtf8)),
+            Err(_) => Err(Error::Client(ClientError::RateLimitUtf8)),
         },
         None => Ok(None),
     }

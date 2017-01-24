@@ -758,8 +758,8 @@ impl Guild {
         };
 
         self.members
-            .iter()
-            .find(|&(_member_id, member)| {
+            .values()
+            .find(|member| {
                 let name_matches = member.user.name == name;
                 let discrim_matches = match discrim {
                     Some(discrim) => member.user.discriminator == discrim,
@@ -767,9 +767,9 @@ impl Guild {
                 };
 
                 name_matches && discrim_matches
-            }).or_else(|| self.members.iter().find(|&(_member_id, member)| {
+            }).or_else(|| self.members.values().find(|member| {
                 member.nick.as_ref().map_or(false, |nick| nick == name)
-            })).map(|(_member_id, member)| member)
+            }))
     }
 
     /// Retrieves the count of the number of [`Member`]s that would be pruned
@@ -1777,8 +1777,8 @@ impl Member {
             .values()
             .find(|guild| {
                 guild.members
-                    .iter()
-                    .any(|(_member_id, member)| {
+                    .values()
+                    .any(|member| {
                         let joined_at = member.joined_at == self.joined_at;
                         let user_id = member.user.id == self.user.id;
 

@@ -161,13 +161,10 @@ impl Handler {
     /// This does _not_ forget settings, like whether to be self-deafened or
     /// self-muted.
     pub fn leave(&mut self) {
-        match self.channel_id {
-            None => return,
-            Some(_channel_id) => {
-                self.channel_id = None;
+        if let Some(_) = self.channel_id {
+            self.channel_id = None;
 
-                self.update();
-            },
+            self.update();
         }
     }
 
@@ -231,7 +228,7 @@ impl Handler {
                 // If already connected to the given channel, do nothing.
                 return;
             },
-            Some(_current_id) => {
+            Some(_) => {
                 self.channel_id = Some(channel_id);
 
                 self.update();

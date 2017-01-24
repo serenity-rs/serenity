@@ -83,7 +83,7 @@ impl Connection {
 
                         break;
                     },
-                    VoiceEvent::Heartbeat(_heartbeat) => continue,
+                    VoiceEvent::Heartbeat(_) => continue,
                     other => {
                         debug!("[Voice] Expected hello/heartbeat; got: {:?}",
                                other);
@@ -220,7 +220,7 @@ impl Connection {
             }
         } else {
             loop {
-                if let Err(_why) = self.thread_items.rx.try_recv() {
+                if let Err(_) = self.thread_items.rx.try_recv() {
                     break;
                 }
             }
@@ -440,10 +440,10 @@ fn start_threads(mut receiver: WsReceiver<WebSocketStream>, udp: &UdpSocket)
                     let piece = buffer[..len].iter().cloned().collect();
                     let send = tx.send(ReceiverStatus::Udp(piece));
 
-                    if let Err(_why) = send {
+                    if let Err(_) = send {
                         return;
                     }
-                } else if let Ok(_v) = udp_close_reader.try_recv() {
+                } else if let Ok(_) = udp_close_reader.try_recv() {
                     return;
                 }
             }
@@ -454,12 +454,12 @@ fn start_threads(mut receiver: WsReceiver<WebSocketStream>, udp: &UdpSocket)
         .spawn(move || {
             loop {
                 while let Ok(msg) = receiver.recv_json(VoiceEvent::decode) {
-                    if let Err(_why) = tx_clone.send(ReceiverStatus::Websocket(msg)) {
+                    if let Err(_) = tx_clone.send(ReceiverStatus::Websocket(msg)) {
                         return;
                     }
                 }
 
-                if let Ok(_v) = ws_close_reader.try_recv() {
+                if let Ok(_) = ws_close_reader.try_recv() {
                     return;
                 }
 

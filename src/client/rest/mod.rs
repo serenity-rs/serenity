@@ -1470,7 +1470,7 @@ pub fn send_file<R: Read>(channel_id: u64,
     let uri = format!(api!("/channels/{}/messages"), channel_id);
     let url = match Url::parse(&uri) {
         Ok(url) => url,
-        Err(_why) => return Err(Error::Url(uri)),
+        Err(_) => return Err(Error::Url(uri)),
     };
 
     let mut request = Request::new(Method::Post, url)?;

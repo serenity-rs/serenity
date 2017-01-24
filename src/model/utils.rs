@@ -259,7 +259,7 @@ pub fn into_u64(value: Value) -> Result<u64> {
         Value::I64(v) => Ok(v as u64),
         Value::String(v) => match v.parse::<u64>() {
             Ok(v) => Ok(v),
-            Err(_why) => Err(Error::Decode("Expected valid u64", Value::String(v))),
+            Err(_) => Err(Error::Decode("Expected valid u64", Value::String(v))),
         },
         Value::U64(v) => Ok(v),
         value => Err(Error::Decode("Expected u64", value)),
@@ -280,8 +280,8 @@ pub fn decode_discriminator(value: Value) -> Result<u16> {
         Value::U64(v) => Ok(v as u16),
         Value::String(s) => match s.parse::<u16>() {
             Ok(v) => Ok(v),
-            Err(_why) => Err(Error::Decode("Error parsing discriminator as u16",
-                                           Value::String(s))),
+            Err(_) => Err(Error::Decode("Error parsing discriminator as u16",
+                                        Value::String(s))),
         },
         value => Err(Error::Decode("Expected string or u64", value)),
     }
