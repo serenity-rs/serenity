@@ -192,7 +192,7 @@ impl Configuration {
 
     /// Message that's sent if a command is disabled.
     ///
-    /// %command% will be replaced with command name.
+    /// `%command%` will be replaced with command name.
     pub fn command_disabled_message(mut self, content: &str) -> Self {
         self.command_disabled_message = Some(content.to_owned());
 
@@ -224,7 +224,7 @@ impl Configuration {
     /// Message that's sent when a command is on cooldown.
     /// See framework documentation to see where is this utilized.
     ///
-    /// %time% will be replaced with waiting time in seconds.
+    /// `%time%` will be replaced with waiting time in seconds.
     pub fn rate_limit_message(mut self, content: &str) -> Self {
         self.rate_limit_message = Some(content.to_owned());
 
@@ -247,9 +247,9 @@ impl Configuration {
 
     /// Message that's sent when user sends too few arguments to a command.
     ///
-    /// %min% will be replaced with minimum allowed amount of arguments.
+    /// `%min%` will be replaced with minimum allowed amount of arguments.
     ///
-    /// %given% will be replced with the given amount of arguments.
+    /// `%given%` will be replced with the given amount of arguments.
     pub fn not_enough_args_message(mut self, content: &str) -> Self {
         self.not_enough_args_message = Some(content.to_owned());
 
@@ -292,7 +292,7 @@ impl Configuration {
         self
     }
 
-    /// HashSet of user Ids checks won't apply to.
+    /// A `HashSet` of user Ids checks won't apply to.
     pub fn owners(mut self, user_ids: HashSet<UserId>) -> Self {
         self.owners = user_ids;
 
@@ -317,9 +317,9 @@ impl Configuration {
 
     /// Message that's sent when user sends too many arguments to a command.
     ///
-    /// %max% will be replaced with maximum allowed amount of arguments.
+    /// `%max%` will be replaced with maximum allowed amount of arguments.
     ///
-    /// %given% will be replced with the given amount of arguments.
+    /// `%given%` will be replced with the given amount of arguments.
     pub fn too_many_args_message(mut self, content: &str) -> Self {
         self.too_many_args_message = Some(content.to_owned());
 

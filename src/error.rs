@@ -33,7 +33,7 @@ pub type Result<T> = ::std::result::Result<T, Error>;
 /// [`Client`]: #variant.Client
 /// [`ClientError`]: client/enum.ClientError.html
 /// [`Gateway`]: #variant.Gateway
-/// [`GatewayError`]: client/enum.GatewayError.html
+/// [`GatewayError`]: client/gateway/enum.GatewayError.html
 /// [`Result`]: type.Result.html
 #[derive(Debug)]
 pub enum Error {

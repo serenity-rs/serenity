@@ -26,8 +26,8 @@ use std::default::Default;
 /// });
 /// ```
 ///
-/// [`Context::create_invite`]: ../client/struct.Context.html#method.create_invite
-/// [`RichInvite`]: ../model/struct.Invite.html
+/// [`Context::create_invite`]: ../../client/struct.Context.html#method.create_invite
+/// [`RichInvite`]: ../../model/struct.Invite.html
 pub struct CreateInvite(pub ObjectBuilder);
 
 impl CreateInvite {

@@ -132,6 +132,8 @@ pub enum Channel {
     Guild(GuildChannel),
     /// A private channel to another [`User`]. No other users may access the
     /// channel. For multi-user "private channels", use a group.
+    ///
+    /// [`User`]: struct.User.html
     Private(PrivateChannel),
 }
 

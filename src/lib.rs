@@ -79,8 +79,8 @@
 //! [`Context`]: client/struct.Context.html
 //! [`Event`]: model/event/enum.Event.html
 //! [`Event::MessageCreate`]: model/event/enum.Event.html#variant.MessageCreate
-//! [`Shard`]: client/struct.Shard.html
-//! [`examples`]: https://github.com/zeyla/serenity.git/blob/master/examples
+//! [`Shard`]: client/gateway/struct.Shard.html
+//! [`examples`]: https://github.com/zeyla/serenity/blob/master/examples
 //! [cache docs]: ext/cache/index.html
 //! [client's module-level documentation]: client/index.html
 //! [docs]: https://discordapp.com/developers/docs/intro

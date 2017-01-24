@@ -1,5 +1,6 @@
-//! The framework is a customizable method of separating commands, used in
-//! combination with [`Client::with_framework`].
+//! The framework is a customizable method of separating commands.
+//!
+//! This is used in combination with [`Client::with_framework`].
 //!
 //! The framework has a number of configurations, and can have any number of
 //! commands bound to it. The primary purpose of it is to offer the utility of

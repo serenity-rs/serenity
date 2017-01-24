@@ -32,7 +32,7 @@ impl EditProfile {
     /// });
     /// ```
     ///
-    /// [`utils::read_image`]: ../utils/fn.read_image.html
+    /// [`utils::read_image`]: ../fn.read_image.html
     pub fn avatar(self, icon: Option<&str>) -> Self {
         EditProfile(self.0
             .insert("avatar",

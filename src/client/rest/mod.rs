@@ -96,7 +96,9 @@ pub fn set_token(token: &str) {
 /// let _result = rest::accept_invite(code);
 /// ```
 ///
+/// [`Client::on_guild_create`]: ../struct.Client.html#method.on_guild_create
 /// [`Context::accept_invite`]: ../struct.Context.html#method.accept_invite
+/// [`Guild`]: ../../model/struct.Guild.html
 /// [`Invite`]: ../../model/struct.Invite.html
 /// [`utils::parse_invite`]: ../../utils/fn.parse_invite.html
 pub fn accept_invite(code: &str) -> Result<Invite> {
@@ -400,7 +402,7 @@ pub fn create_webhook(channel_id: u64, map: Value) -> Result<Webhook> {
     Webhook::decode(serde_json::from_reader(response)?)
 }
 
-/// Deketes a private channel or a channel in a guild.
+/// Deletes a private channel or a channel in a guild.
 pub fn delete_channel(channel_id: u64) -> Result<Channel> {
     let response = request!(Route::ChannelsId(channel_id),
                             delete,
@@ -634,7 +636,9 @@ pub fn edit_member(guild_id: u64, user_id: u64, map: Value) -> Result<()> {
                          user_id))
 }
 
-/// Changes message content, only if owned by us.
+/// Edits a message by Id.
+///
+/// **Note**: Only the author of a message can modify it.
 pub fn edit_message(channel_id: u64, message_id: u64, map: Value) -> Result<Message> {
     let body = serde_json::to_string(&map)?;
     let response = request!(Route::ChannelsIdMessagesId(channel_id),
@@ -848,6 +852,10 @@ pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: Value) -> Resu
 ///         return;
 ///     },
 /// };
+///
+/// [`Channel`]: ../../model/enum.Channel.html
+/// [`Message`]: ../../model/struct.Message.html
+/// [Discord docs]: https://discordapp.com/developers/docs/resources/webhook#querystring-params
 pub fn execute_webhook(webhook_id: u64, token: &str, map: Value) -> Result<Message> {
     let body = serde_json::to_string(&map)?;
     let client = HyperClient::new();

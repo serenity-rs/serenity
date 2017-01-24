@@ -1,4 +1,4 @@
-//! The gateway module contains the pieces - primarily the [`Shard`] -
+//! The gateway module contains the pieces - primarily the `Shard` -
 //! responsible for maintaing a WebSocket connection with Discord.
 //!
 //! A shard is an interface for the lower-level receiver and sender. It provides
@@ -47,7 +47,6 @@
 //! [`Client::start_shard`]: ../struct.Client.html#method.start_shard
 //! [`Client::start_shard_range`]: ../struct.Client.html#method.start_shard_range
 //! [`Client::start_shards`]: ../struct.Client.html#method.start_shards
-//! [`Shard`]: struct.Shard.html
 //! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 
 mod error;

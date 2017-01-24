@@ -261,7 +261,7 @@ impl Guild {
     ///
     /// [`Guild`]: struct.Guild.html
     /// [`PartialGuild`]: struct.PartialGuild.html
-    /// [`Shard`]: ../gateway/struct.Shard.html
+    /// [`Shard`]: ../client/gateway/struct.Shard.html
     /// [US West region]: enum.Region.html#variant.UsWest
     /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
     pub fn create(name: &str, region: Region, icon: Option<&str>) -> Result<PartialGuild> {
@@ -295,7 +295,7 @@ impl Guild {
     ///
     /// [`Channel`]: struct.Channel.html
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
-    /// [Manage Channels]: permissions/constants.MANAGE_CHANNELS.html
+    /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     pub fn create_channel(&mut self, name: &str, kind: ChannelType) -> Result<Channel> {
         #[cfg(feature="cache")]
         {
@@ -366,7 +366,7 @@ impl Guild {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`Context::create_role`]: ../client/struct.Context.html#method.create_role
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constants.MANAGE_ROLES.html
+    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     pub fn create_role<F>(&self, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole {
         #[cfg(feature="cache")]
@@ -489,8 +489,6 @@ impl Guild {
     ///
     /// Refer to `EditGuild`'s documentation for a full list of methods.
     ///
-    /// Also see [`Guild::edit`] if you have the `methods` feature enabled.
-    ///
     /// **Note**: Requires the current user to have the [Manage Guild]
     /// permission.
     ///
@@ -515,7 +513,7 @@ impl Guild {
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`Context::edit_guild`]: ../client/struct.Context.html#method.edit_guild
-    /// [Manage Guild]: permissions/constants.MANAGE_GUILD.html
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditGuild) -> EditGuild {
         #[cfg(feature="cache")]
@@ -1170,7 +1168,7 @@ impl GuildId {
     /// ```
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`rest::create_channel`]: rest/fn.create_channel.html
+    /// [`rest::create_channel`]: ../client/rest/fn.create_channel.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<Channel> {
         let map = ObjectBuilder::new()
@@ -1230,7 +1228,7 @@ impl GuildId {
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// [`Guild::create_role`]: struct.Guild.html#method.create_role
-    /// [Manage Roles]: permissions/constants.MANAGE_ROLES.html
+    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
     pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
         rest::create_role(self.0, f(EditRole::default()).0.build())
@@ -1293,7 +1291,7 @@ impl GuildId {
     /// permission.
     ///
     /// [`Guild::edit`]: struct.Guild.html#method.edit
-    /// [Manage Guild]: permissions/constants.MANAGE_GUILD.html
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
     pub fn edit<F: FnOnce(EditGuild) -> EditGuild>(&mut self, f: F) -> Result<PartialGuild> {
         rest::edit_guild(self.0, f(EditGuild::default()).0.build())
@@ -1388,6 +1386,8 @@ impl GuildId {
     /// Gets a list of the guild's bans.
     ///
     /// Requires the [Ban Members] permission.
+    ///
+    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[inline]
     pub fn get_bans(&self) -> Result<Vec<Ban>> {
         rest::get_bans(self.0)
@@ -1551,6 +1551,7 @@ impl GuildId {
     ///
     /// [`Guild::search_channels`]: struct.Guild.html#method.search_channels
     /// [`Message`]: struct.Message.html
+    /// [`Search`]: ../utils/builder/struct.Search.html
     pub fn search_channels<F>(&self, channel_ids: &[ChannelId], f: F)
         -> Result<SearchResult> where F: FnOnce(Search) -> Search {
         let ids = channel_ids.iter().map(|x| x.0).collect::<Vec<u64>>();
@@ -1942,7 +1943,7 @@ impl PartialGuild {
     /// ```
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`rest::create_channel`]: rest/fn.create_channel.html
+    /// [`rest::create_channel`]: ../client/rest/fn.create_channel.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
     pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<Channel> {
@@ -1995,7 +1996,7 @@ impl PartialGuild {
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`Guild::create_role`]: struct.Guild.html#method.create_role
-    /// [Manage Roles]: permissions/constants.MANAGE_ROLES.html
+    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
     pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
         self.id.create_role(f)
@@ -2048,13 +2049,11 @@ impl PartialGuild {
 
     /// Edits the current guild with new data where specified.
     ///
-    /// Refer to [`Guild::edit`] for more information.
-    ///
     /// **Note**: Requires the current user to have the [Manage Guild]
     /// permission.
     ///
     /// [`Context::edit_guild`]: ../client/struct.Context.html#method.edit_guild
-    /// [Manage Guild]: permissions/constants.MANAGE_GUILD.html
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditGuild) -> EditGuild {
         match self.id.edit(f) {
@@ -2147,6 +2146,8 @@ impl PartialGuild {
     /// Gets a list of the guild's bans.
     ///
     /// Requires the [Ban Members] permission.
+    ///
+    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[inline]
     pub fn get_bans(&self) -> Result<Vec<Ban>> {
         self.id.get_bans()
@@ -2192,7 +2193,7 @@ impl PartialGuild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/struct.MANAGE_GUILD.html
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
     pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
         self.id.get_invites()

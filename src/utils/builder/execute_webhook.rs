@@ -49,9 +49,9 @@ use std::default::Default;
 ///     .embeds(vec![website, resources]));
 /// ```
 ///
-/// [`Webhook`]: ../model/struct.Webhook.html
+/// [`Webhook`]: ../../model/struct.Webhook.html
 /// [`Webhook::execute`]: ../../model/struct.Webhook.html#method.execute
-/// [`execute_webhook`]: ../client/rest/fn.execute_webhook.html
+/// [`execute_webhook`]: ../../client/rest/fn.execute_webhook.html
 pub struct ExecuteWebhook(pub ObjectBuilder);
 
 impl ExecuteWebhook {

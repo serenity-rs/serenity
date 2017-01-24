@@ -1,7 +1,7 @@
 //! The Client contains information about a single bot or user's token, as well
 //! as event handlers. Dispatching events to configured handlers and starting
 //! the shards' connections are handled directly via the client. In addition,
-//! the [`rest`] module and [`Cache`] are also automatically handled by the
+//! the `rest` module and `Cache` are also automatically handled by the
 //! Client module for you.
 //!
 //! A [`Context`] is provided for every handler. The context is an ergonomic
@@ -17,8 +17,6 @@
 //!
 //! [`Client`]: struct.Client.html#examples
 //! [`Context`]: struct.Context.html
-//! [`Cache`]: ../ext/cache/index.html
-//! [`rest`]: rest/index.html
 //! [Client examples]: struct.Client.html#examples
 
 pub mod gateway;

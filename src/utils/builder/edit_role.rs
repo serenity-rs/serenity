@@ -26,15 +26,17 @@ use ::model::{Permissions, Role, permissions};
 ///     .name("a test role"));
 /// ```
 ///
-/// [`Context::create_role`]: ../client/struct.Context.html#method.create_role
-/// [`Context::edit_role`]: ../client/struct.Context.html#method.edit_role
-/// [`Guild::create_role`]: ../model/struct.Guild.html#method.create_role
-/// [`Role`]: ../model/struct.Role.html
-/// [`Role::edit`]: ../model/struct.Role.html#method.edit
+/// [`Context::create_role`]: ../../client/struct.Context.html#method.create_role
+/// [`Context::edit_role`]: ../../client/struct.Context.html#method.edit_role
+/// [`Guild::create_role`]: ../../model/struct.Guild.html#method.create_role
+/// [`Role`]: ../../model/struct.Role.html
+/// [`Role::edit`]: ../../model/struct.Role.html#method.edit
 pub struct EditRole(pub ObjectBuilder);
 
 impl EditRole {
     /// Creates a new builder with the values of the given [`Role`].
+    ///
+    /// [`Role`]: ../../model/struct.Role.html
     pub fn new(role: &Role) -> Self {
         EditRole(ObjectBuilder::new()
             .insert("color", role.colour.0)
@@ -91,7 +93,7 @@ impl Default for EditRole {
     /// - **permissions**: the [general permissions set]
     /// - **position**: 1
     ///
-    /// [general permissions set]: ../model/permissions/fn.general.html
+    /// [general permissions set]: ../../model/permissions/fn.general.html
     fn default() -> EditRole {
         EditRole(ObjectBuilder::new()
             .insert("color", 10070709)

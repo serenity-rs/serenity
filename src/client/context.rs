@@ -202,9 +202,9 @@ impl Context {
     /// related to a channel.
     ///
     /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
-    /// [`GuildChannel::create_permission`]: struct.GuildChannel.html#method.create_permission
+    /// [`GuildChannel::create_permission`]: ../model/struct.GuildChannel.html#method.create_permission
     /// [`Member`]: ../model/struct.Member.html
-    /// [`PermissionOverwrite`]: ../model/struct.PermissionOverWrite.html
+    /// [`PermissionOverwrite`]: ../model/struct.PermissionOverwrite.html
     /// [`Role`]: ../model/struct.Role.html
     /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
     pub fn create_permission(&self, target: PermissionOverwrite)
@@ -243,8 +243,8 @@ impl Context {
 
     /// Deletes the contextual channel.
     ///
-    /// If the channel being deleted is a [`GuildChannel`] (a [`Guild`]'s
-    /// channel), then the [Manage Channels] permission is required.
+    /// If the channel being deleted is a [`GuildChannel`], then the
+    /// [Manage Channels] permission is required.
     ///
     /// # Errors
     ///
@@ -396,6 +396,7 @@ impl Context {
     ///
     /// [`Channel`]: ../model/enum.Channel.html
     /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
+    /// [Manage Channel]: ../model/permissions/constant.MANAGE_CHANNEL.html
     pub fn edit_channel<F>(&self, f: F) -> Result<GuildChannel>
         where F: FnOnce(EditChannel) -> EditChannel {
         let channel_id = match self.channel_id {
@@ -585,10 +586,10 @@ impl Context {
     /// related to a channel.
     ///
     /// [`ClientError::NoChannelId`]: enum.ClientError.html#variant.NoChannelId
-    /// [`Emoji`]: struct.Emoji.html
-    /// [`Message`]: struct.Message.html
-    /// [`User`]: struct.User.html
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [`Emoji`]: ../model/struct.Emoji.html
+    /// [`Message`]: ../model/struct.Message.html
+    /// [`User`]: ../model/struct.User.html
+    /// [Read Message History]: ../model/permissions/constant.READ_MESSAGE_HISTORY.html
     pub fn get_reaction_users<M, R, U>(&self,
                                        message_id: M,
                                        reaction_type: R,
@@ -665,7 +666,7 @@ impl Context {
     /// directly available; i.e. when not under the context of one of the above
     /// events.
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../model/struct.ChannelId.html
     /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
     /// [`ClientError::NoChannelId`]: enum.ClientError.html#NoChannelId
     /// [`Event::ChannelCreate`]: ../model/event/enum.Event.html#variant.ChannelCreate

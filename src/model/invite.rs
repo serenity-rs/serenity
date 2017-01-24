@@ -57,6 +57,7 @@ impl Invite {
     /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
     /// if the current user does not have the required [permission].
     ///
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [`CreateInvite`]: ../utils/builder/struct.CreateInvite.html
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [Create Invite]: permissions/constant.CREATE_INVITE.html

@@ -23,11 +23,11 @@ variants:
     description: >
       A [Twitch.tv] connection.
 
-        [`Twitch`]: https://twitch.tv
+        [Twitch.tv]: https://twitch.tv
     name: twitch
   - variant: YouTube
     description: >
       A [YouTube Gaming] connection.
 
-        [`YouTube Gaming`]: https://gaming.youtube.com
+        [YouTube Gaming]: https://gaming.youtube.com
     name: youtube

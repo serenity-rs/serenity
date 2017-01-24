@@ -9,8 +9,8 @@ use ::model::{ChannelType, Permissions};
 ///
 /// # Examples
 ///
-/// Matching an [`Error`] with this variant may look something like the
-/// following for the [`Client::ban`] method, which in this example is used to
+/// Matching an [`Error`] with this variant would look something like the
+/// following for the [`GuildId::ban`] method, which in this example is used to
 /// re-ban all members with an odd discriminator:
 ///
 /// ```rust,no_run
@@ -29,7 +29,7 @@ use ::model::{ChannelType, Permissions};
 ///         return;
 ///     }
 ///
-///     match context.ban(guild_id, user, 8) {
+///     match guild_id.ban(user, 8) {
 ///         Ok(()) => {
 ///             // Ban successful.
 ///         },
@@ -45,8 +45,9 @@ use ::model::{ChannelType, Permissions};
 ///
 /// [`Client`]: struct.Client.html
 /// [`Context`]: struct.Context.html
-/// [`Context::ban`]: struct.Context.html#method.ban
+/// [`Error`]: ../enum.Error.html
 /// [`Error::Client`]: ../enum.Error.html#variant.Client
+/// [`GuildId::ban`]: ../model/struct.GuildId.html#method.ban
 #[allow(enum_variant_names)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Error {

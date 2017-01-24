@@ -240,6 +240,8 @@ impl<'a> Search<'a> {
     ///
     /// The default value is `2`. The minimum value is `0`. The maximum value is
     /// `2`.
+    ///
+    /// [`Message`]: ../../model/struct.Message.html
     pub fn context_size(mut self, context_size: u8) -> Self {
         self.0.insert("context_size", context_size.to_string());
 
@@ -327,7 +329,7 @@ impl<'a> Search<'a> {
     /// The minimum value is `0`. The maximum value is `5000`.
     ///
     /// [`Message`]: ../../model/struct.Message.html
-    /// [`limit`]: fn.limit.html
+    /// [`limit`]: #method.limit
     pub fn offset(mut self, offset: u16) -> Self {
         self.0.insert("offset", offset.to_string());
 

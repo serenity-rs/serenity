@@ -1,7 +1,7 @@
-//! A cache of events received over a [`Shard`], where storing at least some
+//! A cache of events received over a `Shard`, where storing at least some
 //! data from the event is possible.
 //!
-//! This acts as a hot cache, to avoid making requests over the REST API through
+//! This acts as a cache, to avoid making requests over the REST API through
 //! the [`rest`] module where possible. All fields are public, and do not have
 //! getters, to allow you more flexibility with the stored data. However, this
 //! allows data to be "corrupted", and _may or may not_ cause misfunctions
@@ -72,7 +72,6 @@
 //! [`Message`]: ../../model/struct.Message.html
 //! [`PublicChannel`]: ../../model/struct.PublicChannel.html
 //! [`Role`]: ../../model/struct.Role.html
-//! [`Shard`]: ../../client/gateway/struct.Shard.html
 //! [`client::CACHE`]: ../../client/struct.CACHE.html
 //! [`rest`]: ../../client/rest/index.html
 

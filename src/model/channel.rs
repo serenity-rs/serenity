@@ -135,7 +135,7 @@ impl Channel {
     /// [`Channel`]: enum.Channel.html
     /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
     /// [`Message`]: struct.Message.html
-    /// [`rest::ack_message`]: rest/fn.ack_message.html
+    /// [`rest::ack_message`]: ../client/rest/fn.ack_message.html
     pub fn ack<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         #[cfg(feature="cache")]
         {
@@ -265,7 +265,7 @@ impl Channel {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]: permission/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn get_message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         self.id().get_message(message_id)
@@ -285,7 +285,7 @@ impl Channel {
     ///     .after(100)); // Maximum is 100.
     /// ```
     ///
-    /// [Read Message History]: permission/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn get_messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
@@ -446,7 +446,7 @@ impl ChannelId {
     ///
     /// [`GuildChannel::create_permission`]: struct.GuildChannel.html#method.create_permission
     /// [`Member`]: struct.Member.html
-    /// [`PermissionOverwrite`]: struct.PermissionOverWrite.html
+    /// [`PermissionOverwrite`]: struct.PermissionOverwrite.html
     /// [`Role`]: struct.Role.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     pub fn create_permission(&self, target: PermissionOverwrite)
@@ -496,8 +496,6 @@ impl ChannelId {
     ///
     /// Requires the [Manage Messages] permission, if the current user is not
     /// the author of the message.
-    ///
-    /// (in practice, please do not do this)
     ///
     /// [`Message`]: struct.Message.html
     /// [`Message::delete`]: struct.Message.html#method.delete
@@ -582,6 +580,7 @@ impl ChannelId {
     ///
     /// [`Channel`]: enum.Channel.html
     /// [`ClientError::NoChannelId`]: ../client/enum.ClientError.html#variant.NoChannelId
+    /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
     pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel> {
         rest::edit_channel(self.0, f(EditChannel::default()).0.build())
@@ -646,7 +645,7 @@ impl ChannelId {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]: permission/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn get_message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         rest::get_message(self.0, message_id.into().0)
@@ -659,7 +658,7 @@ impl ChannelId {
     /// Requires the [Read Message History] permission.
     ///
     /// [`Channel::get_messages`]: enum.Channel.html#method.get_messages
-    /// [Read Message History]: permission/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     pub fn get_messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
         let mut map = f(GetMessages::default()).0;
@@ -714,12 +713,16 @@ impl ChannelId {
     }
 
     /// Pins a [`Message`] to the channel.
+    ///
+    /// [`Message`]: struct.Message.html
     #[inline]
     pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         rest::pin_message(self.0, message_id.into().0)
     }
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
+    ///
+    /// [`Message`]: struct.Message.html
     #[inline]
     pub fn pins(&self) -> Result<Vec<Message>> {
         rest::get_pins(self.0)
@@ -888,7 +891,7 @@ impl Group {
     ///
     /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
     /// [`Message`]: struct.Message.html
-    /// [`rest::ack_message`]: rest/fn.ack_message.html
+    /// [`rest::ack_message`]: ../client/rest/fn.ack_message.html
     pub fn ack<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         #[cfg(feature="cache")]
         {
@@ -991,7 +994,7 @@ impl Group {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]: permission/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn get_message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         self.channel_id.get_message(message_id)
@@ -1001,7 +1004,7 @@ impl Group {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]: permission/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn get_messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
@@ -1110,7 +1113,7 @@ impl Group {
 
     /// Sends a message to the group with the given content.
     ///
-    /// Note that an @everyone mention will not be applied.
+    /// Note that an `@everyone` mention will not be applied.
     ///
     /// **Note**: Requires the [Send Messages] permission.
     ///
@@ -1147,7 +1150,7 @@ impl Message {
     /// [`Channel`]: enum.Channel.html
     /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
     /// [`Message`]: struct.Message.html
-    /// [`rest::ack_message`]: rest/fn.ack_message.html
+    /// [`rest::ack_message`]: ../client/rest/fn.ack_message.html
     pub fn ack<M: Into<MessageId>>(&self) -> Result<()> {
         #[cfg(feature="cache")]
         {
@@ -1562,7 +1565,7 @@ impl PrivateChannel {
     ///
     /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
     /// [`Message`]: struct.Message.html
-    /// [`rest::ack_message`]: rest/fn.ack_message.html
+    /// [`rest::ack_message`]: ../client/rest/fn.ack_message.html
     pub fn ack<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         #[cfg(feature="cache")]
         {
@@ -1666,7 +1669,7 @@ impl PrivateChannel {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]: permission/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn get_message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         self.id.get_message(message_id)
@@ -1679,7 +1682,7 @@ impl PrivateChannel {
     /// Requires the [Read Message History] permission.
     ///
     /// [`Channel::get_messages`]: enum.Channel.html#method.get_messages
-    /// [Read Message History]: permission/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn get_messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
@@ -1709,6 +1712,8 @@ impl PrivateChannel {
     }
 
     /// Pins a [`Message`] to the channel.
+    ///
+    /// [`Message`]: struct.Message.html
     #[inline]
     pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.id.pin(message_id)
@@ -1800,7 +1805,7 @@ impl GuildChannel {
     ///
     /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
     /// [`Message`]: struct.Message.html
-    /// [`rest::ack_message`]: rest/fn.ack_message.html
+    /// [`rest::ack_message`]: ../client/rest/fn.ack_message.html
     pub fn ack<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         #[cfg(feature="cache")]
         {
@@ -1820,12 +1825,11 @@ impl GuildChannel {
     ///
     /// # Errors
     ///
-    /// Returns a
-    /// [`ClientError::InvalidPermissions`] if the current user does not have the
-    /// required permissions.
+    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
+    /// not have the required permissions.
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
-    /// [Send Messages]: permissions/constants.SEND_MESSAGES.html
+    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn broadcast_typing(&self) -> Result<()> {
         self.id.broadcast_typing()
     }
@@ -1916,7 +1920,7 @@ impl GuildChannel {
     ///
     /// [`Channel`]: enum.Channel.html
     /// [`Member`]: struct.Member.html
-    /// [`PermissionOverwrite`]: struct.PermissionOverWrite.html
+    /// [`PermissionOverwrite`]: struct.PermissionOverwrite.html
     /// [`PermissionOverwrite::Member`]: struct.PermissionOverwrite.html#variant.Member
     /// [`Role`]: struct.Role.html
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
@@ -2068,7 +2072,7 @@ impl GuildChannel {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]: permission/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn get_message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         self.id.get_message(message_id)
@@ -2081,7 +2085,7 @@ impl GuildChannel {
     /// Requires the [Read Message History] permission.
     ///
     /// [`Channel::get_messages`]: enum.Channel.html#method.get_messages
-    /// [Read Message History]: permission/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn get_messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {

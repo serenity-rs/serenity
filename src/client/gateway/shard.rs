@@ -57,7 +57,7 @@ type CurrentPresence = (Option<Game>, OnlineStatus, bool);
 ///
 /// See the documentation for [`new`] on how to use this.
 ///
-/// [`Client`]: struct.Client.html
+/// [`Client`]: ../struct.Client.html
 /// [`new`]: #method.new
 /// [`receive`]: #method.receive
 /// [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding

@@ -31,7 +31,7 @@ impl EditChannel {
     ///
     /// This is for [voice] channels only.
     ///
-    /// [voice]: ../model/enum.ChannelType.html#variant.Voice
+    /// [voice]: ../../model/enum.ChannelType.html#variant.Voice
     pub fn bitrate(self, bitrate: u64) -> Self {
         EditChannel(self.0.insert("bitrate", bitrate))
     }
@@ -54,7 +54,7 @@ impl EditChannel {
     ///
     /// This is for [text] channels only.
     ///
-    /// [text]: ../model/enum.ChannelType.html#variant.Text
+    /// [text]: ../../model/enum.ChannelType.html#variant.Text
     pub fn topic(self, topic: &str) -> Self {
         EditChannel(self.0.insert("topic", topic))
     }
@@ -63,7 +63,7 @@ impl EditChannel {
     ///
     /// This is for [voice] channels only.
     ///
-    /// [voice]: ../model/enum.ChannelType.html#variant.Voice
+    /// [voice]: ../../model/enum.ChannelType.html#variant.Voice
     pub fn user_limit(self, user_limit: u64) -> Self {
         EditChannel(self.0.insert("user_limit", user_limit))
     }
