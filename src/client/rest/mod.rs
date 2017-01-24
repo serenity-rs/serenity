@@ -872,7 +872,7 @@ pub fn execute_webhook(webhook_id: u64, token: &str, map: Value)
     let body = serde_json::to_string(&map)?;
     let client = HyperClient::new();
     let response = retry(|| client
-        .patch(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
+        .post(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
         .body(&body))
         .map_err(Error::Hyper)?;
 
