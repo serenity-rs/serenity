@@ -91,8 +91,8 @@ pub fn dispatch(event: Event,
                                   conn,
                                   data,
                                   login_type);
-            dispatch_message(context,
-                             event.message,
+            dispatch_message(&context,
+                             &event.message,
                              event_store);
         },
         other => handle_event(other, conn, data, login_type, event_store),

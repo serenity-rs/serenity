@@ -807,10 +807,10 @@ impl Client {
                                  &self.event_store);
                     } else {
                         dispatch(Event::Ready(ready),
-                                 shard.clone(),
-                                 self.data.clone(),
+                                 &shard,
+                                 &self.data,
                                  self.login_type,
-                                 self.event_store.clone());
+                                 &self.event_store);
                     }}
 
                     let monitor_info = feature_framework! {{
@@ -1343,10 +1343,10 @@ fn handle_shard(info: &mut MonitorInfo) {
                      &info.event_store);
         } else {
             dispatch(event,
-                     info.shard.clone(),
-                     info.data.clone(),
+                     &info.shard,
+                     &info.data,
                      info.login_type,
-                     info.event_store.clone());
+                     &info.event_store);
         }}
     }
 }
