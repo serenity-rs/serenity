@@ -5,7 +5,7 @@
 //! ```toml
 //! [dependencies.serenity]
 //! git = "https://github.com/zeyla/serenity.git"
-//! features = ["framework", "methods"]
+//! features = ["framework"]
 //! ```
 
 #[macro_use]
@@ -38,7 +38,7 @@ fn main() {
         data.insert::<CommandCounter>(HashMap::default());
     }
 
-    client.on_ready(|_, ready| {
+    client.on_ready(|_ctx, ready| {
         println!("{} is connected!", ready.user.name);
     });
 
@@ -133,17 +133,17 @@ fn main() {
 // This may bring more features available for commands in the future. See the
 // "multiply" command below for some of the power that the `command!` macro can
 // bring.
-command!(commands(context, _msg, _args) {
+command!(commands(ctx, _msg, _args) {
     let mut contents = "Commands used:\n".to_owned();
 
-    let data = context.data.lock().unwrap();
+    let data = ctx.data.lock().unwrap();
     let counter = data.get::<CommandCounter>().unwrap();
 
     for (k, v) in counter {
         let _ = write!(contents, "- {name}: {amount}\n", name=k, amount=v);
     }
 
-    if let Err(why) = context.say(&contents) {
+    if let Err(why) = ctx.say(&contents) {
         println!("Error sending message: {:?}", why);
     }
 });
@@ -158,8 +158,8 @@ fn owner_check(_: &mut Context, message: &Message) -> bool {
     message.author.id == 7
 }
 
-command!(some_long_command(context, _msg, args) {
-    if let Err(why) = context.say(&format!("Arguments: {:?}", args)) {
+command!(some_long_command(ctx, _msg, args) {
+    if let Err(why) = ctx.say(&format!("Arguments: {:?}", args)) {
         println!("Error sending message: {:?}", why);
     }
 });
@@ -184,10 +184,10 @@ command!(some_long_command(context, _msg, args) {
 // will be ignored.
 //
 // Argument type overloading is currently not supported.
-command!(multiply(context, _msg, args, first: f64, second: f64) {
+command!(multiply(ctx, _msg, args, first: f64, second: f64) {
     let res = first * second;
 
-    if let Err(why) = context.say(&res.to_string()) {
+    if let Err(why) = ctx.say(&res.to_string()) {
         println!("Err sending product of {} and {}: {:?}", first, second, why);
     }
 });

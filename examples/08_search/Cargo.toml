@@ -4,5 +4,4 @@ version = "0.1.0"
 authors = ["Austin Hellyer <hello@austinhellyer.me>"]
 
 [dependencies]
-#serenity = "0.1"
 serenity = { path = "../../" }

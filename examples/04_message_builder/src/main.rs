@@ -10,9 +10,9 @@ fn main() {
         .expect("Expected a token in the environment");
     let mut client = Client::login_bot(&token);
 
-    client.on_message(|context, message| {
+    client.on_message(|ctx, message| {
         if message.content == "!ping" {
-            let channel = match context.get_channel(message.channel_id) {
+            let channel = match ctx.get_channel() {
                 Ok(channel) => channel,
                 Err(why) => {
                     println!("Error getting channel: {:?}", why);
@@ -32,7 +32,7 @@ fn main() {
                 .push(" channel")
                 .build();
 
-            if let Err(why) = context.say(&response) {
+            if let Err(why) = ctx.say(&response) {
                 println!("Error sending message: {:?}", why);
             }
         }

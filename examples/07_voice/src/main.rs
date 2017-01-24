@@ -4,7 +4,7 @@
 //! ```toml
 //! [dependencies.serenity]
 //! version = "*"
-//! features = ["cache", "framework", "methods", "voice"]
+//! features = ["cache", "framework", "voice"]
 //! ```
 
 #[macro_use]

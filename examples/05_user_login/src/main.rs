@@ -17,7 +17,7 @@ fn main() {
     // disallow you from performing bot-only commands.
     let mut client = Client::login_user(&token);
 
-    client.on_ready(|_context, ready| {
+    client.on_ready(|_ctx, ready| {
         println!("{} is connected!", ready.user.name);
     });
 

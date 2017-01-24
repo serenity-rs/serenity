@@ -4,7 +4,7 @@
 //! ```toml
 //! [dependencies.serenity]
 //! version = "*"
-//! features = ["cache", "framework", "methods"]
+//! features = ["cache", "framework"]
 //! ```
 //!
 //! Note that - due to bot users not being able to search - this example may
@@ -26,8 +26,9 @@ fn main() {
 
     client.with_framework(|f| f
         .configure(|c| c.prefix("~").on_mention(true))
-        .on("search", search)
-        .set_check("search", self_check));
+        .command("search", |c| c
+            .exec(search)
+            .check(self_check)));
 
     client.on_ready(|_context, ready| {
         println!("{} is connected!", ready.user.name);
@@ -76,10 +77,10 @@ command!(search(context, message, args) {
             .values()
             .filter(|c| c.name.starts_with("search-"))
             .map(|c| c.id)
-            .collect()
+            .collect::<Vec<_>>()
     };
 
-    let search = context.search_guild(guild_id, channel_ids, |s| s
+    let search = guild_id.search_channels(&channel_ids, |s| s
         .content(&query)
         .context_size(0)
         .has_attachment(true)
@@ -99,11 +100,11 @@ command!(search(context, message, args) {
         },
     };
 
-    let _ = context.send_message(message.channel_id, move |m| m
+    let _ = context.send_message(|m| m
         .content(&format!("Found {} total results", messages.total))
         .embed(move |mut e| {
             for (i, mut messages) in messages.results.into_iter().enumerate() {
-                let ref mut message = messages[0];
+                let mut message = &mut messages[0];
                 message.content.truncate(1000);
 
                 e = e.field(|f| f

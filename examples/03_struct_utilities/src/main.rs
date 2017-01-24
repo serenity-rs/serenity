@@ -5,7 +5,6 @@
 //! ```toml
 //! [dependencies.serenity]
 //! git = "https://github.com/zeyla/serenity.git"
-//! features = ["methods"]
 //! ```
 
 extern crate serenity;
@@ -19,7 +18,7 @@ fn main() {
         .expect("Expected a token in the environment");
     let mut client = Client::login_bot(&token);
 
-    client.on_message(|_context, message| {
+    client.on_message(|_ctx, message| {
         if message.content == "!messageme" {
             // If the `methods` feature is enabled, then model structs will
             // have a lot of useful methods implemented, to avoid using an
@@ -35,7 +34,7 @@ fn main() {
         }
     });
 
-    client.on_ready(|_context, ready| {
+    client.on_ready(|_ctx, ready| {
         println!("{} is connected!", ready.user.name);
     });
 

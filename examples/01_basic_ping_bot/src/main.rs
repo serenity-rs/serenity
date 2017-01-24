@@ -18,13 +18,13 @@ fn main() {
     //
     // Event handlers are dispatched through multi-threading, and so multiple
     // of a single event can be dispatched simultaneously.
-    client.on_message(|context, message| {
+    client.on_message(|ctx, message| {
         if message.content == "!ping" {
             // Sending a message can fail, due to a network error, an
             // authentication error, or lack of permissions to post in the
             // channel, so log to stdout when some error happens, with a
             // description of it.
-            if let Err(why) = context.say("Pong!") {
+            if let Err(why) = ctx.say("Pong!") {
                 println!("Error sending message: {:?}", why);
             }
         }
@@ -36,7 +36,7 @@ fn main() {
     // relationships, and more.
     //
     // In this case, just print what the current user's username is.
-    client.on_ready(|_context, ready| {
+    client.on_ready(|_ctx, ready| {
         println!("{} is connected!", ready.user.name);
     });
 

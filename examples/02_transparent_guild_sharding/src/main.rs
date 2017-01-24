@@ -27,26 +27,26 @@ fn main() {
         .expect("Expected a token in the environment");
     let mut client = Client::login_bot(&token);
 
-    client.on_message(|context, message| {
+    client.on_message(|ctx, message| {
         if message.content == "!ping" {
             // The current shard needs to be unlocked so it can be read from, as
             // multiple threads may otherwise attempt to read from or mutate it
             // concurrently.
             {
-                let shard = context.shard.lock().unwrap();
+                let shard = ctx.shard.lock().unwrap();
 
                 if let Some(shard_info) = shard.shard_info() {
                     println!("Shard {}", shard_info[0]);
                 }
             }
 
-            if let Err(why) = context.say("Pong!") {
+            if let Err(why) = ctx.say("Pong!") {
                 println!("Error sending message: {:?}", why);
             }
         }
     });
 
-    client.on_ready(|_context, ready| {
+    client.on_ready(|_ctx, ready| {
         println!("{} is connected!", ready.user.name);
     });
 

@@ -3,6 +3,5 @@ name = "03_struct_utilities"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 
-[dependencies.serenity]
-features = ["methods"]
-path = "../../"
+[dependencies]
+serenity = { path = "../../" }
