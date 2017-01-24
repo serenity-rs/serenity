@@ -155,7 +155,7 @@ impl Webhook {
     pub fn refresh(&mut self) -> Result<()> {
         match rest::get_webhook_with_token(self.id.0, &self.token) {
             Ok(replacement) => {
-                mem::replace(self, replacement);
+                let _ = mem::replace(self, replacement);
 
                 Ok(())
             },

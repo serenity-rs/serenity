@@ -210,7 +210,7 @@ impl Guild {
             }
         }
 
-        self.id.ban(user.into(), delete_message_days)
+        self.id.ban(user, delete_message_days)
     }
 
     /// Retrieves a list of [`Ban`]s for the guild.
@@ -263,8 +263,7 @@ impl Guild {
     /// [`Shard`]: ../gateway/struct.Shard.html
     /// [US West region]: enum.Region.html#variant.UsWest
     /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
-    pub fn create(name: &str, region: Region, icon: Option<&str>)
-        -> Result<PartialGuild> {
+    pub fn create(name: &str, region: Region, icon: Option<&str>) -> Result<PartialGuild> {
         let map = ObjectBuilder::new()
             .insert("icon", icon)
             .insert("name", name)
@@ -296,8 +295,7 @@ impl Guild {
     /// [`Channel`]: struct.Channel.html
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Channels]: permissions/constants.MANAGE_CHANNELS.html
-    pub fn create_channel(&mut self, name: &str, kind: ChannelType)
-        -> Result<Channel> {
+    pub fn create_channel(&mut self, name: &str, kind: ChannelType) -> Result<Channel> {
         #[cfg(feature="cache")]
         {
             let req = permissions::MANAGE_CHANNELS;
@@ -838,8 +836,8 @@ impl Guild {
     ///
     /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
     #[inline]
-    pub fn move_member<C, U>(&self, user_id: U, channel_id: C)
-        -> Result<()> where C: Into<ChannelId>, U: Into<UserId> {
+    pub fn move_member<C, U>(&self, user_id: U, channel_id: C) -> Result<()>
+        where C: Into<ChannelId>, U: Into<UserId> {
         self.id.move_member(user_id, channel_id)
     }
 
@@ -991,7 +989,7 @@ impl Guild {
             }
         }
 
-        rest::search_guild_messages(self.id.0, &[], f(Search::default()).0)
+        self.id.search(f)
     }
 
     /// Performs a search request to the API for the guild's [`Message`]s in
@@ -1311,9 +1309,7 @@ impl GuildId {
     /// [`Emoji::edit`]: struct.Emoji.html#method.edit
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str) -> Result<Emoji> {
-        let map = ObjectBuilder::new()
-            .insert("name", name)
-            .build();
+        let map = ObjectBuilder::new().insert("name", name).build();
 
         rest::edit_emoji(self.0, emoji_id.into().0, map)
     }
@@ -1477,9 +1473,7 @@ impl GuildId {
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     pub fn get_prune_count(&self, days: u16) -> Result<GuildPrune> {
-        let map = ObjectBuilder::new()
-            .insert("days", days)
-            .build();
+        let map = ObjectBuilder::new().insert("days", days).build();
 
         rest::get_guild_prune_count(self.0, map)
     }
@@ -1508,9 +1502,7 @@ impl GuildId {
     /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
     pub fn move_member<C, U>(&self, user_id: U, channel_id: C)
         -> Result<()> where C: Into<ChannelId>, U: Into<UserId> {
-        let map = ObjectBuilder::new()
-            .insert("channel_id", channel_id.into().0)
-            .build();
+        let map = ObjectBuilder::new().insert("channel_id", channel_id.into().0).build();
 
         rest::edit_member(self.0, user_id.into().0, map)
     }
@@ -1574,12 +1566,9 @@ impl GuildId {
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    #[inline]
     pub fn start_prune(&self, days: u16) -> Result<GuildPrune> {
-        let map = ObjectBuilder::new()
-            .insert("days", days)
-            .build();
-
-        rest::start_guild_prune(self.0, map)
+        rest::start_guild_prune(self.0, ObjectBuilder::new().insert("days", days).build())
     }
 
     /// Unbans a [`User`] from the guild.
@@ -1763,8 +1752,7 @@ impl Member {
     /// [`Context::edit_member`]: ../client/struct.Context.html#method.edit_member
     /// [`EditMember`]: ../builder/struct.EditMember.html
     #[cfg(feature="cache")]
-    pub fn edit<F>(&self, f: F) -> Result<()>
-        where F: FnOnce(EditMember) -> EditMember {
+    pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F) -> Result<()> {
         let guild_id = self.find_guild()?;
         let map = f(EditMember::default()).0.build();
 
@@ -1928,13 +1916,12 @@ impl PartialGuild {
     /// [`ClientError::DeleteMessageDaysAmount`]: ../client/enum.ClientError.html#variant.DeleteMessageDaysAmount
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8)
-        -> Result<()> {
+    pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8) -> Result<()> {
         if delete_message_days > 7 {
             return Err(Error::Client(ClientError::DeleteMessageDaysAmount(delete_message_days)));
         }
 
-        self.id.ban(user.into(), delete_message_days)
+        self.id.ban(user, delete_message_days)
     }
 
     /// Creates a [`GuildChannel`] in the guild.
@@ -2271,8 +2258,8 @@ impl PartialGuild {
     ///
     /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
     #[inline]
-    pub fn move_member<C, U>(&self, user_id: U, channel_id: C)
-        -> Result<()> where C: Into<ChannelId>, U: Into<UserId> {
+    pub fn move_member<C, U>(&self, user_id: U, channel_id: C) -> Result<()>
+        where C: Into<ChannelId>, U: Into<UserId> {
         self.id.move_member(user_id, channel_id)
     }
 
@@ -2300,8 +2287,7 @@ impl PartialGuild {
     /// [`Search`]: ../utils/builder/struct.Search.html
     /// [`search_channels`]: #method.search_channels
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    pub fn search<F>(&self, f: F) -> Result<SearchResult>
-        where F: FnOnce(Search) -> Search {
+    pub fn search<F: FnOnce(Search) -> Search>(&self, f: F) -> Result<SearchResult> {
         #[cfg(feature="cache")]
         {
             if CACHE.read().unwrap().user.bot {
@@ -2438,10 +2424,9 @@ impl Role {
     ///
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature="cache")]
+    #[inline]
     pub fn delete(&self) -> Result<()> {
-        let guild_id = self.find_guild()?;
-
-        rest::delete_role(guild_id.0, self.id.0)
+        rest::delete_role(self.find_guild()?.0, self.id.0)
     }
 
     /// Edits a [`Role`], optionally setting its new fields.

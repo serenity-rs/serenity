@@ -1128,7 +1128,7 @@ impl Group {
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        self.channel_id.unpin(message_id.into().0)
+        self.channel_id.unpin(message_id)
     }
 }
 
@@ -1571,12 +1571,12 @@ impl PrivateChannel {
             }
         }
 
-        rest::ack_message(self.id.0, message_id.into().0)
+        self.id.ack(message_id)
     }
 
     /// Broadcasts that the current user is typing to the recipient.
     pub fn broadcast_typing(&self) -> Result<()> {
-        rest::broadcast_typing(self.id.0)
+        self.id.broadcast_typing()
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -1764,13 +1764,7 @@ impl PrivateChannel {
             return Err(Error::Client(ClientError::MessageTooLong(length_over)));
         }
 
-        let map = ObjectBuilder::new()
-            .insert("content", content)
-            .insert("nonce", "")
-            .insert("tts", false)
-            .build();
-
-        rest::send_message(self.id.0, map)
+        self.id.send_message(|m| m.content(content))
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.
@@ -1781,7 +1775,7 @@ impl PrivateChannel {
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        self.id.unpin(message_id.into().0)
+        self.id.unpin(message_id)
     }
 }
 
@@ -1833,7 +1827,7 @@ impl GuildChannel {
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Send Messages]: permissions/constants.SEND_MESSAGES.html
     pub fn broadcast_typing(&self) -> Result<()> {
-        rest::broadcast_typing(self.id.0)
+        self.id.broadcast_typing()
     }
 
     /// Creates an invite leading to the given channel.
@@ -2151,8 +2145,7 @@ impl GuildChannel {
     /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
     /// [`Message`]: struct.Message.html
     /// [`Search`]: ../utils/builder/struct.Search.html
-    pub fn search<F>(&self, f: F) -> Result<SearchResult>
-        where F: FnOnce(Search) -> Search {
+    pub fn search<F: FnOnce(Search) -> Search>(&self, f: F) -> Result<SearchResult> {
         #[cfg(feature="cache")]
         {
             if CACHE.read().unwrap().user.bot {
@@ -2160,7 +2153,7 @@ impl GuildChannel {
             }
         }
 
-        rest::search_channel_messages(self.id.0, f(Search::default()).0)
+        self.id.search(f)
     }
 
     /// Sends a message to the channel with the given content.
@@ -2196,13 +2189,7 @@ impl GuildChannel {
             }
         }
 
-        let map = ObjectBuilder::new()
-            .insert("content", content)
-            .insert("nonce", "")
-            .insert("tts", false)
-            .build();
-
-        rest::send_message(self.id.0, map)
+        self.id.send_message(|m| m.content(content))
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.
@@ -2213,7 +2200,7 @@ impl GuildChannel {
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        self.id.unpin(message_id.into().0)
+        self.id.unpin(message_id)
     }
 
     /// Retrieves the channel's webhooks.
@@ -2223,7 +2210,7 @@ impl GuildChannel {
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        rest::get_channel_webhooks(self.id.0)
+        self.id.webhooks()
     }
 }
 

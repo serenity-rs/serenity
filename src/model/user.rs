@@ -43,6 +43,7 @@ impl CurrentUser {
     }
 
     /// Returns the DiscordTag of a User.
+    #[inline]
     pub fn distinct(&self) -> String {
         format!("{}#{}", self.name, self.discriminator)
     }
