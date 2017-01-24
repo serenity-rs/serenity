@@ -15,6 +15,7 @@ use super::utils::{
 };
 use super::*;
 use ::client::rest;
+use ::constants::LARGE_THRESHOLD;
 use ::internal::prelude::*;
 use ::utils::builder::{EditGuild, EditMember, EditRole, Search};
 use ::utils::decode_array;
@@ -820,7 +821,7 @@ impl Guild {
     /// more than 250 members.
     #[inline]
     pub fn is_large(&self) -> bool {
-        self.members.len() > 250
+        self.members.len() > LARGE_THRESHOLD as usize
     }
 
     /// Kicks a [`Member`] from the guild.

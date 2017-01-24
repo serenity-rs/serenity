@@ -1,6 +1,8 @@
 /// The gateway version used by the library. The gateway URI is retrieved via
 /// the REST API.
 pub const GATEWAY_VERSION: u8 = 6;
+/// The large threshold to send on identify.
+pub const LARGE_THRESHOLD: u8 = 250;
 /// The maximum unicode code points allowed within a message by Discord.
 pub const MESSAGE_CODE_LIMIT: u16 = 2000;
 /// The [UserAgent] sent along with every request.

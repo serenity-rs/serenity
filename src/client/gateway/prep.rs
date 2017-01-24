@@ -14,7 +14,7 @@ use time::{self, Duration};
 use websocket::client::request::Url as RequestUrl;
 use websocket::client::{Receiver, Sender};
 use websocket::stream::WebSocketStream;
-use ::constants::{self, OpCode};
+use ::constants::{self, LARGE_THRESHOLD, OpCode};
 use ::error::{Error, Result};
 use ::internal::ws_impl::{ReceiverExt, SenderExt};
 use ::model::event::{Event, GatewayEvent, ReadyEvent};
@@ -58,7 +58,7 @@ pub fn identify(token: &str, shard_info: Option<[u64; 2]>) -> Value {
         .insert("op", OpCode::Identify.num())
         .insert_object("d", |mut object| {
             object = identify_compression(object)
-                .insert("large_threshold", 250) // max value
+                .insert("large_threshold", LARGE_THRESHOLD) // max value
                 .insert_object("properties", |object| object
                     .insert("$browser", "Ergonomic and high-level Rust library")
                     .insert("$device", "serenity")
