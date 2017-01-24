@@ -703,6 +703,16 @@ impl ChannelId {
                                  after.map(|u| u.into().0))
     }
 
+    /// Retrieves the channel's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[inline]
+    pub fn get_webhooks(&self) -> Result<Vec<Webhook>> {
+        rest::get_channel_webhooks(self.0)
+    }
+
     /// Pins a [`Message`] to the channel.
     #[inline]
     pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
@@ -818,16 +828,6 @@ impl ChannelId {
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         rest::unpin_message(self.0, message_id.into().0)
-    }
-
-    /// Retrieves the channel's webhooks.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
-    #[inline]
-    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        rest::get_channel_webhooks(self.0)
     }
 }
 
@@ -2109,6 +2109,16 @@ impl GuildChannel {
         self.id.get_reaction_users(message_id, reaction_type, limit, after)
     }
 
+    /// Retrieves the channel's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[inline]
+    pub fn get_webhooks(&self) -> Result<Vec<Webhook>> {
+        self.id.get_webhooks()
+    }
+
     /// Attempts to find this channel's guild in the Cache.
     ///
     /// **Note**: Right now this performs a clone of the guild. This will be
@@ -2201,16 +2211,6 @@ impl GuildChannel {
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.id.unpin(message_id)
-    }
-
-    /// Retrieves the channel's webhooks.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
-    #[inline]
-    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        self.id.webhooks()
     }
 }
 

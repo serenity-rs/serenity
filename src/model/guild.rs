@@ -800,6 +800,16 @@ impl Guild {
         self.id.get_prune_count(days)
     }
 
+    /// Retrieves the guild's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[inline]
+    pub fn get_webhooks(&self) -> Result<Vec<Webhook>> {
+        self.id.get_webhooks()
+    }
+
     /// Returns the formatted URL of the guild's icon, if one exists.
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
@@ -1096,16 +1106,6 @@ impl Guild {
         }
 
         self.id.unban(user_id)
-    }
-
-    /// Retrieves the guild's webhooks.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
-    #[inline]
-    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        self.id.webhooks()
     }
 }
 
@@ -1478,6 +1478,16 @@ impl GuildId {
         rest::get_guild_prune_count(self.0, map)
     }
 
+    /// Retrieves the guild's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[inline]
+    pub fn get_webhooks(&self) -> Result<Vec<Webhook>> {
+        rest::get_guild_webhooks(self.0)
+    }
+
     /// Kicks a [`Member`] from the guild.
     ///
     /// Requires the [Kick Members] permission.
@@ -1580,16 +1590,6 @@ impl GuildId {
     #[inline]
     pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
         rest::remove_ban(self.0, user_id.into().0)
-    }
-
-    /// Retrieves the guild's webhooks.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
-    #[inline]
-    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        rest::get_guild_webhooks(self.0)
     }
 }
 
@@ -2229,6 +2229,16 @@ impl PartialGuild {
         self.id.get_prune_count(days)
     }
 
+    /// Retrieves the guild's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[inline]
+    pub fn get_webhooks(&self) -> Result<Vec<Webhook>> {
+        self.id.get_webhooks()
+    }
+
     /// Kicks a [`Member`] from the guild.
     ///
     /// Requires the [Kick Members] permission.
@@ -2360,16 +2370,6 @@ impl PartialGuild {
     #[inline]
     pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
         self.id.unban(user_id)
-    }
-
-    /// Retrieves the guild's webhooks.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
-    #[inline]
-    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        self.id.webhooks()
     }
 }
 
