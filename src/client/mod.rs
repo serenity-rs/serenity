@@ -187,22 +187,15 @@ impl Client {
     /// Creates a Client for a bot user.
     ///
     /// Discord has a requirement of prefixing bot tokens with `"Bot "`, which
-    /// this function will automatically do for you.
+    /// this function will automatically do for you if not already included.
     pub fn login_bot(bot_token: &str) -> Client {
-        let token = format!("Bot {}", bot_token);
+        let token = if !bot_token.starts_with("Bot ") {
+            format!("Bot {}", bot_token)
+        } else {
+            bot_token.to_owned()
+        };
 
-        login(&token, LoginType::Bot)
-    }
-
-    /// Create an instance from "raw values". This allows you to manually
-    /// specify whether to login as a [`Bot`] or [`User`], and does not modify
-    /// the token in any way regardless.
-    ///
-    /// [`Bot`]: enum.LoginType.html#variant.Bot
-    /// [`User`]: enum.LoginType.html#variant.User
-    #[doc(hidden)]
-    pub fn login_raw(token: &str, login_type: LoginType) -> Client {
-        login(&token.to_owned(), login_type)
+        login(token, LoginType::Bot)
     }
 
     /// Creates a Client for a user.
@@ -212,7 +205,7 @@ impl Client {
     ///
     /// [`LoginType::User`]: enum.LoginType.html#variant.User
     pub fn login_user(user_token: &str) -> Client {
-        login(&user_token.to_owned(), LoginType::User)
+        login(user_token.to_owned(), LoginType::User)
     }
 
     /// Sets a framework to be used with the client. All message events will be
@@ -1360,9 +1353,7 @@ fn handle_shard(info: &mut MonitorInfo) {
     }
 }
 
-fn login(token: &str, login_type: LoginType) -> Client {
-    let token = token.to_owned();
-
+fn login(token: String, login_type: LoginType) -> Client {
     rest::set_token(&token);
 
     feature_framework! {{
@@ -1371,14 +1362,14 @@ fn login(token: &str, login_type: LoginType) -> Client {
             event_store: Arc::new(RwLock::new(EventStore::default())),
             framework: Arc::new(Mutex::new(Framework::default())),
             login_type: login_type,
-            token: token.to_owned(),
+            token: token,
         }
     } else {
         Client {
             data: Arc::new(Mutex::new(ShareMap::custom())),
             event_store: Arc::new(RwLock::new(EventStore::default())),
             login_type: login_type,
-            token: token.to_owned(),
+            token: token,
         }
     }}
 }
