@@ -802,11 +802,11 @@ impl Client {
 
                     feature_framework! {{
                         dispatch(Event::Ready(ready),
-                                 shard.clone(),
-                                 self.framework.clone(),
-                                 self.data.clone(),
+                                 &shard,
+                                 &self.framework,
+                                 &self.data,
                                  self.login_type,
-                                 self.event_store.clone());
+                                 &self.event_store);
                     } else {
                         dispatch(Event::Ready(ready),
                                  shard.clone(),
@@ -1269,17 +1269,17 @@ fn monitor_shard(mut info: MonitorInfo) {
 
                     feature_framework! {{
                         dispatch(Event::Ready(ready),
-                                 info.shard.clone(),
-                                 info.framework.clone(),
-                                 info.data.clone(),
+                                 &info.shard,
+                                 &info.framework,
+                                 &info.data,
                                  info.login_type,
-                                 info.event_store.clone());
+                                 &info.event_store);
                     } else {
                         dispatch(Event::Ready(ready),
-                                 info.shard.clone(),
-                                 info.data.clone(),
+                                 &info.shard,
+                                 &info.data,
                                  info.login_type,
-                                 info.event_store.clone());
+                                 &info.event_store);
                     }}
 
                     break;
@@ -1338,11 +1338,11 @@ fn handle_shard(info: &mut MonitorInfo) {
 
         feature_framework! {{
             dispatch(event,
-                     info.shard.clone(),
-                     info.framework.clone(),
-                     info.data.clone(),
+                     &info.shard,
+                     &info.framework,
+                     &info.data,
                      info.login_type,
-                     info.event_store.clone());
+                     &info.event_store);
         } else {
             dispatch(event,
                      info.shard.clone(),

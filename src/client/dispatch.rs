@@ -44,35 +44,35 @@ macro_rules! update {
 }
 
 fn context(channel_id: Option<ChannelId>,
-           conn: Arc<Mutex<Shard>>,
-           data: Arc<Mutex<ShareMap>>,
+           conn: &Arc<Mutex<Shard>>,
+           data: &Arc<Mutex<ShareMap>>,
            login_type: LoginType) -> Context {
-    Context::new(channel_id, conn, data, login_type)
+    Context::new(channel_id, conn.clone(), data.clone(), login_type)
 }
 
 #[cfg(feature="framework")]
 pub fn dispatch(event: Event,
-                conn: Arc<Mutex<Shard>>,
-                framework: Arc<Mutex<Framework>>,
-                data: Arc<Mutex<ShareMap>>,
+                conn: &Arc<Mutex<Shard>>,
+                framework: &Arc<Mutex<Framework>>,
+                data: &Arc<Mutex<ShareMap>>,
                 login_type: LoginType,
-                event_store: Arc<RwLock<EventStore>>) {
+                event_store: &Arc<RwLock<EventStore>>) {
     match event {
         Event::MessageCreate(event) => {
             let context = context(Some(event.message.channel_id),
                                   conn,
                                   data,
                                   login_type);
-            let mut framework = framework.lock().expect("framework poisoned");
+            let mut framework = framework.lock().unwrap();
 
             if framework.initialized {
-                dispatch_message(context.clone(),
-                                 event.message.clone(),
+                dispatch_message(&context,
+                                 &event.message,
                                  event_store);
 
                 framework.dispatch(context, event.message);
             } else {
-                dispatch_message(context, event.message, event_store);
+                dispatch_message(&context, &event.message, event_store);
             }
         },
         other => handle_event(other, conn, data, login_type, event_store),
@@ -81,81 +81,71 @@ pub fn dispatch(event: Event,
 
 #[cfg(not(feature="framework"))]
 pub fn dispatch(event: Event,
-                conn: Arc<Mutex<Shard>>,
-                data: Arc<Mutex<ShareMap>>,
+                conn: &Arc<Mutex<Shard>>,
+                data: &Arc<Mutex<ShareMap>>,
                 login_type: LoginType,
-                event_store: Arc<RwLock<EventStore>>) {
+                event_store: &Arc<RwLock<EventStore>>) {
     match event {
         Event::MessageCreate(event) => {
             let context = context(Some(event.message.channel_id),
                                   conn,
                                   data,
                                   login_type);
-            dispatch_message(context.clone(),
-                             event.message.clone(),
+            dispatch_message(context,
+                             event.message,
                              event_store);
         },
         other => handle_event(other, conn, data, login_type, event_store),
     }
 }
 
-fn dispatch_message(context: Context,
-                    message: Message,
-                    event_store: Arc<RwLock<EventStore>>) {
-    if let Some(ref handler) = handler!(on_message, event_store) {
-        let handler = handler.clone();
+fn dispatch_message(context: &Context,
+                    message: &Message,
+                    event_store: &Arc<RwLock<EventStore>>) {
+    if let Some(handler) = handler!(on_message, event_store) {
+        let context = context.clone();
+        let message = message.clone();
 
-        thread::spawn(move || {
-            (handler)(context, message);
-        });
+        thread::spawn(move || (handler)(context, message));
     }
 }
 
 #[allow(cyclomatic_complexity)]
 fn handle_event(event: Event,
-                conn: Arc<Mutex<Shard>>,
-                data: Arc<Mutex<ShareMap>>,
+                conn: &Arc<Mutex<Shard>>,
+                data: &Arc<Mutex<ShareMap>>,
                 login_type: LoginType,
-                event_store: Arc<RwLock<EventStore>>) {
+                event_store: &Arc<RwLock<EventStore>>) {
     match event {
         Event::CallCreate(event) => {
-            if let Some(ref handler) = handler!(on_call_create, event_store) {
+            if let Some(handler) = handler!(on_call_create, event_store) {
                 update!(update_with_call_create, event);
 
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.call);
-                });
+                thread::spawn(move || (handler)(context, event.call));
             } else {
                 update!(update_with_call_create, event);
             }
         },
         Event::CallDelete(event) => {
-            if let Some(ref handler) = handler!(on_call_delete, event_store) {
+            if let Some(handler) = handler!(on_call_delete, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
                 feature_cache! {{
                     let call = update!(update_with_call_delete, event);
 
-                    thread::spawn(move || {
-                        (handler)(context, event.channel_id, call);
-                    });
+                    thread::spawn(move || (handler)(context, event.channel_id, call));
                 } else {
-                    thread::spawn(move || {
-                        (handler)(context, event.channel_id);
-                    });
+                    thread::spawn(move || (handler)(context, event.channel_id));
                 }}
             } else {
                 update!(update_with_call_delete, event);
             }
         },
         Event::CallUpdate(event) => {
-            if let Some(ref handler) = handler!(on_call_update, event_store) {
+            if let Some(handler) = handler!(on_call_update, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
                 feature_cache! {{
                     let before = update!(update_with_call_update, event, true);
@@ -166,13 +156,9 @@ fn handle_event(event: Event,
                         .get(&event.channel_id)
                         .cloned();
 
-                    thread::spawn(move || {
-                        (handler)(context, before, after);
-                    });
+                    thread::spawn(move || (handler)(context, before, after));
                 } else {
-                    thread::spawn(move || {
-                        (handler)(context, event);
-                    });
+                    thread::spawn(move || (handler)(context, event));
                 }}
             } else {
                 #[cfg(feature="cache")]
@@ -182,97 +168,78 @@ fn handle_event(event: Event,
             }
         },
         Event::ChannelCreate(event) => {
-            if let Some(ref handler) = handler!(on_channel_create, event_store) {
+            if let Some(handler) = handler!(on_channel_create, event_store) {
                 update!(update_with_channel_create, event);
                 let context = context(Some(event.channel.id()),
                                       conn,
                                       data,
                                       login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.channel);
-                });
+                thread::spawn(move || (handler)(context, event.channel));
             } else {
                 update!(update_with_channel_create, event);
             }
         },
         Event::ChannelDelete(event) => {
-            if let Some(ref handler) = handler!(on_channel_delete, event_store) {
+            if let Some(handler) = handler!(on_channel_delete, event_store) {
                 update!(update_with_channel_delete, event);
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.channel);
-                });
+                thread::spawn(move || (handler)(context, event.channel));
             } else {
                 update!(update_with_channel_delete, event);
             }
         },
         Event::ChannelPinsAck(event) => {
-            if let Some(ref handler) = handler!(on_channel_pins_ack, event_store) {
+            if let Some(handler) = handler!(on_channel_pins_ack, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
                                       data,
                                       login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event);
-                });
+                thread::spawn(move || (handler)(context, event));
             }
         },
         Event::ChannelPinsUpdate(event) => {
-            if let Some(ref handler) = handler!(on_channel_pins_update, event_store) {
+            if let Some(handler) = handler!(on_channel_pins_update, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
                                       data,
                                       login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event);
-                });
+                thread::spawn(move || (handler)(context, event));
             }
         },
         Event::ChannelRecipientAdd(event) => {
             update!(update_with_channel_recipient_add, event);
 
-            if let Some(ref handler) = handler!(on_channel_recipient_addition, event_store) {
+            if let Some(handler) = handler!(on_channel_recipient_addition, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
                                       data,
                                       login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.channel_id, event.user);
-                });
+                thread::spawn(move || (handler)(context, event.channel_id, event.user));
             }
         },
         Event::ChannelRecipientRemove(event) => {
             update!(update_with_channel_recipient_remove, event);
 
-            if let Some(ref handler) = handler!(on_channel_recipient_removal, event_store) {
+            if let Some(handler) = handler!(on_channel_recipient_removal, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
                                       data,
                                       login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.channel_id, event.user);
-                });
+                thread::spawn(move || (handler)(context, event.channel_id, event.user));
             }
         },
         Event::ChannelUpdate(event) => {
-            if let Some(ref handler) = handler!(on_channel_update, event_store) {
+            if let Some(handler) = handler!(on_channel_update, event_store) {
                 let context = context(Some(event.channel.id()),
                                       conn,
                                       data,
                                       login_type);
-                let handler = handler.clone();
 
                 feature_cache! {{
                     let before = CACHE.read()
@@ -281,174 +248,131 @@ fn handle_event(event: Event,
                         .map(|x| x.clone_inner());
                     update!(update_with_channel_update, event);
 
-                    thread::spawn(move || {
-                        (handler)(context, before, event.channel);
-                    });
+                    thread::spawn(move || (handler)(context, before, event.channel));
                 } else {
-                    thread::spawn(move || {
-                        (handler)(context, event.channel);
-                    });
+                    thread::spawn(move || (handler)(context, event.channel));
                 }}
             } else {
                 update!(update_with_channel_update, event);
             }
         },
         Event::FriendSuggestionCreate(event) => {
-            if let Some(ref handler) = handler!(on_friend_suggestion_create, event_store) {
+            if let Some(handler) = handler!(on_friend_suggestion_create, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.suggested_user, event.reasons);
-                });
+                thread::spawn(move || (handler)(context, event.suggested_user, event.reasons));
             }
         },
         Event::FriendSuggestionDelete(event) => {
-            if let Some(ref handler) = handler!(on_friend_suggestion_delete, event_store) {
+            if let Some(handler) = handler!(on_friend_suggestion_delete, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.suggested_user_id);
-                });
+                thread::spawn(move || (handler)(context, event.suggested_user_id));
             }
         },
         Event::GuildBanAdd(event) => {
-            if let Some(ref handler) = handler!(on_guild_ban_addition, event_store) {
+            if let Some(handler) = handler!(on_guild_ban_addition, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild_id, event.user);
-                });
+                thread::spawn(move || (handler)(context, event.guild_id, event.user));
             }
         },
         Event::GuildBanRemove(event) => {
-            if let Some(ref handler) = handler!(on_guild_ban_removal, event_store) {
+            if let Some(handler) = handler!(on_guild_ban_removal, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild_id, event.user);
-                });
+                thread::spawn(move || (handler)(context, event.guild_id, event.user));
             }
         },
         Event::GuildCreate(event) => {
             update!(update_with_guild_create, event);
 
-            if let Some(ref handler) = handler!(on_guild_create, event_store) {
+            if let Some(handler) = handler!(on_guild_create, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild);
-                });
+                thread::spawn(move || (handler)(context, event.guild));
             }
         },
         Event::GuildDelete(event) => {
-            if let Some(ref handler) = handler!(on_guild_delete, event_store) {
+            if let Some(handler) = handler!(on_guild_delete, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
                 feature_cache! {{
                     let full = update!(update_with_guild_delete, event);
 
-                    thread::spawn(move || {
-                        (handler)(context, event.guild, full);
-                    });
+                    thread::spawn(move || (handler)(context, event.guild, full));
                 } else {
-                    thread::spawn(move || {
-                        (handler)(context, event.guild);
-                    });
+                    thread::spawn(move || (handler)(context, event.guild));
                 }}
             } else {
                 #[cfg(feature="cache")]
                 {
-                    let _full = update!(update_with_guild_delete, event);
+                    let _ = update!(update_with_guild_delete, event);
                 }
             }
         },
         Event::GuildEmojisUpdate(event) => {
             update!(update_with_guild_emojis_update, event);
 
-            if let Some(ref handler) = handler!(on_guild_emojis_update, event_store) {
+            if let Some(handler) = handler!(on_guild_emojis_update, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild_id, event.emojis);
-                });
+                thread::spawn(move || (handler)(context, event.guild_id, event.emojis));
             }
         },
         Event::GuildIntegrationsUpdate(event) => {
-            if let Some(ref handler) = handler!(on_guild_integrations_update, event_store) {
+            if let Some(handler) = handler!(on_guild_integrations_update, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild_id);
-                });
+                thread::spawn(move || (handler)(context, event.guild_id));
             }
         },
         Event::GuildMemberAdd(event) => {
             update!(update_with_guild_member_add, event);
 
-            if let Some(ref handler) = handler!(on_guild_member_addition, event_store) {
+            if let Some(handler) = handler!(on_guild_member_addition, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild_id, event.member);
-                });
+                thread::spawn(move || (handler)(context, event.guild_id, event.member));
             }
         },
         Event::GuildMemberRemove(event) => {
-            if let Some(ref handler) = handler!(on_guild_member_removal, event_store) {
+            if let Some(handler) = handler!(on_guild_member_removal, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
                 feature_cache! {{
                     let member = update!(update_with_guild_member_remove, event);
 
-                    thread::spawn(move || {
-                        (handler)(context, event.guild_id, event.user, member);
-                    });
+                    thread::spawn(move || (handler)(context, event.guild_id, event.user, member));
                 } else {
-                    thread::spawn(move || {
-                        (handler)(context, event.guild_id, event.user);
-                    });
+                    thread::spawn(move || (handler)(context, event.guild_id, event.user));
                 }}
             } else {
                 #[cfg(feature="cache")]
                 {
-                    let _member = update!(update_with_guild_member_remove, event);
+                    let _ = update!(update_with_guild_member_remove, event);
                 }
             }
         },
         Event::GuildMemberUpdate(event) => {
-            if let Some(ref handler) = handler!(on_guild_member_update, event_store) {
+            if let Some(handler) = handler!(on_guild_member_update, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
                 feature_cache! {{
                     let before = update!(update_with_guild_member_update, event);
 
-                    // This is safe, as the update would have created the member
-                    // if it did not exist. Thus, there _should_ be no way that this
-                    // could fail under any circumstance.
+                    // This is safe to unwrap, as the update would have created
+                    // the member if it did not exist. So, there is be _no_ way
+                    // that this could fail under any circumstance.
                     let after = CACHE.read()
                         .unwrap()
                         .get_member(event.guild_id, event.user.id)
                         .unwrap()
                         .clone();
 
-                    thread::spawn(move || {
-                        (handler)(context, before, after);
-                    });
+                    thread::spawn(move || (handler)(context, before, after));
                 } else {
-                    thread::spawn(move || {
-                        (handler)(context, event);
-                    });
+                    thread::spawn(move || (handler)(context, event));
                 }}
             } else {
                 let _ = update!(update_with_guild_member_update, event);
@@ -457,99 +381,76 @@ fn handle_event(event: Event,
         Event::GuildMembersChunk(event) => {
             update!(update_with_guild_members_chunk, event);
 
-            if let Some(ref handler) = handler!(on_guild_members_chunk, event_store) {
+            if let Some(handler) = handler!(on_guild_members_chunk, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild_id, event.members);
-                });
+                thread::spawn(move || (handler)(context, event.guild_id, event.members));
             }
         },
         Event::GuildRoleCreate(event) => {
             update!(update_with_guild_role_create, event);
 
-            if let Some(ref handler) = handler!(on_guild_role_create, event_store) {
+            if let Some(handler) = handler!(on_guild_role_create, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild_id, event.role);
-                });
+                thread::spawn(move || (handler)(context, event.guild_id, event.role));
             }
         },
         Event::GuildRoleDelete(event) => {
-            if let Some(ref handler) = handler!(on_guild_role_delete, event_store) {
+            if let Some(handler) = handler!(on_guild_role_delete, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
                 feature_cache! {{
                     let role = update!(update_with_guild_role_delete, event);
 
-                    thread::spawn(move || {
-                        (handler)(context, event.guild_id, event.role_id, role);
-                    });
+                    thread::spawn(move || (handler)(context, event.guild_id, event.role_id, role));
                 } else {
-                    thread::spawn(move || {
-                        (handler)(context, event.guild_id, event.role_id);
-                    });
+                    thread::spawn(move || (handler)(context, event.guild_id, event.role_id));
                 }}
             } else {
                 #[cfg(feature="cache")]
                 {
-                    let _role = update!(update_with_guild_role_delete, event);
+                    let _ = update!(update_with_guild_role_delete, event);
                 }
             }
         },
         Event::GuildRoleUpdate(event) => {
-            if let Some(ref handler) = handler!(on_guild_role_update, event_store) {
+            if let Some(handler) = handler!(on_guild_role_update, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
                 feature_cache! {{
                     let before = update!(update_with_guild_role_update, event);
 
-                    thread::spawn(move || {
-                        (handler)(context, event.guild_id, before, event.role);
-                    });
+                    thread::spawn(move || (handler)(context, event.guild_id, before, event.role));
                 } else {
-                    thread::spawn(move || {
-                        (handler)(context, event.guild_id, event.role);
-                    });
+                    thread::spawn(move || (handler)(context, event.guild_id, event.role));
                 }}
             } else {
                 #[cfg(feature="cache")]
                 {
-                    let _before = update!(update_with_guild_role_update, event);
+                    let _ = update!(update_with_guild_role_update, event);
                 }
             }
         },
         Event::GuildSync(event) => {
-            if let Some(ref handler) = handler!(on_guild_sync, event_store) {
+            if let Some(handler) = handler!(on_guild_sync, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event);
-                });
+                thread::spawn(move || (handler)(context, event));
             }
         },
         Event::GuildUnavailable(event) => {
             update!(update_with_guild_unavailable, event);
 
-            if let Some(ref handler) = handler!(on_guild_unavailable, event_store) {
+            if let Some(handler) = handler!(on_guild_unavailable, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild_id);
-                });
+                thread::spawn(move || (handler)(context, event.guild_id));
             }
         },
         Event::GuildUpdate(event) => {
-            if let Some(ref handler) = handler!(on_guild_update, event_store) {
+            if let Some(handler) = handler!(on_guild_update, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
                 feature_cache! {{
                     let before = CACHE.read()
@@ -559,70 +460,54 @@ fn handle_event(event: Event,
                         .cloned();
                     update!(update_with_guild_update, event);
 
-                    thread::spawn(move || {
-                        (handler)(context, before, event.guild);
-                    });
+                    thread::spawn(move || (handler)(context, before, event.guild));
                 } else {
-                    thread::spawn(move || {
-                        (handler)(context, event.guild);
-                    });
+                    thread::spawn(move || (handler)(context, event.guild));
                 }}
             } else {
                 update!(update_with_guild_update, event);
             }
         }
         Event::MessageAck(event) => {
-            if let Some(ref handler) = handler!(on_message_ack, event_store) {
+            if let Some(handler) = handler!(on_message_ack, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
                                       data,
                                       login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.channel_id, event.message_id);
-                });
+                thread::spawn(move || (handler)(context, event.channel_id, event.message_id));
             }
         },
         // Already handled by the framework check macro
-        Event::MessageCreate(_event) => {},
+        Event::MessageCreate(_) => {},
         Event::MessageDeleteBulk(event) => {
-            if let Some(ref handler) = handler!(on_message_delete_bulk, event_store) {
+            if let Some(handler) = handler!(on_message_delete_bulk, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
                                       data,
                                       login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.channel_id, event.ids);
-                });
+                thread::spawn(move || (handler)(context, event.channel_id, event.ids));
             }
         },
         Event::MessageDelete(event) => {
-            if let Some(ref handler) = handler!(on_message_delete, event_store) {
+            if let Some(handler) = handler!(on_message_delete, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
                                       data,
                                       login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.channel_id, event.message_id);
-                });
+                thread::spawn(move || (handler)(context, event.channel_id, event.message_id));
             }
         },
         Event::MessageUpdate(event) => {
-            if let Some(ref handler) = handler!(on_message_update, event_store) {
+            if let Some(handler) = handler!(on_message_update, event_store) {
                 let context = context(Some(event.channel_id),
-                                           conn,
-                                           data,
-                                           login_type);
-                let handler = handler.clone();
+                                      conn,
+                                      data,
+                                      login_type);
 
-                thread::spawn(move || {
-                    (handler)(context, event);
-                });
+                thread::spawn(move || (handler)(context, event));
             }
         },
         Event::PresencesReplace(event) => {
@@ -630,11 +515,8 @@ fn handle_event(event: Event,
 
             if let Some(handler) = handler!(on_presence_replace, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.presences);
-                });
+                thread::spawn(move || (handler)(context, event.presences));
             }
         },
         Event::PresenceUpdate(event) => {
@@ -642,62 +524,47 @@ fn handle_event(event: Event,
 
             if let Some(handler) = handler!(on_presence_update, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event);
-                });
+                thread::spawn(move || (handler)(context, event));
             }
         },
         Event::ReactionAdd(event) => {
-            if let Some(ref handler) = handler!(on_reaction_add, event_store) {
+            if let Some(handler) = handler!(on_reaction_add, event_store) {
                 let context = context(Some(event.reaction.channel_id),
                                       conn,
                                       data,
                                       login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.reaction);
-                });
+                thread::spawn(move || (handler)(context, event.reaction));
             }
         },
         Event::ReactionRemove(event) => {
-            if let Some(ref handler) = handler!(on_reaction_remove, event_store) {
+            if let Some(handler) = handler!(on_reaction_remove, event_store) {
                 let context = context(Some(event.reaction.channel_id),
                                       conn,
                                       data,
                                       login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.reaction);
-                });
+                thread::spawn(move || (handler)(context, event.reaction));
             }
         },
         Event::ReactionRemoveAll(event) => {
-            if let Some(ref handler) = handler!(on_reaction_remove_all, event_store) {
+            if let Some(handler) = handler!(on_reaction_remove_all, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
                                       data,
                                       login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.channel_id, event.message_id);
-                });
+                thread::spawn(move || (handler)(context, event.channel_id, event.message_id));
             }
         },
         Event::Ready(event) => {
-            if let Some(ref handler) = handler!(on_ready, event_store) {
+            if let Some(handler) = handler!(on_ready, event_store) {
                 update!(update_with_ready, event);
 
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.ready);
-                });
+                thread::spawn(move || (handler)(context, event.ready));
             } else {
                 update!(update_with_ready, event);
             }
@@ -705,122 +572,96 @@ fn handle_event(event: Event,
         Event::RelationshipAdd(event) => {
             update!(update_with_relationship_add, event);
 
-            if let Some(ref handler) = handler!(on_relationship_addition, event_store) {
+            if let Some(handler) = handler!(on_relationship_addition, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.relationship);
-                });
+                thread::spawn(move || (handler)(context, event.relationship));
             }
         },
         Event::RelationshipRemove(event) => {
             update!(update_with_relationship_remove, event);
 
-            if let Some(ref handler) = handler!(on_relationship_removal, event_store) {
+            if let Some(handler) = handler!(on_relationship_removal, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.user_id, event.kind);
-                });
+                thread::spawn(move || (handler)(context, event.user_id, event.kind));
             }
         },
         Event::Resumed(event) => {
-            if let Some(ref handler) = handler!(on_resume, event_store) {
+            if let Some(handler) = handler!(on_resume, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event);
-                });
+                thread::spawn(move || (handler)(context, event));
             }
         },
         Event::TypingStart(event) => {
-            if let Some(ref handler) = handler!(on_typing_start, event_store) {
+            if let Some(handler) = handler!(on_typing_start, event_store) {
                 let context = context(Some(event.channel_id),
                                       conn,
                                       data,
                                       login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event);
-                });
+                thread::spawn(move || (handler)(context, event));
             }
         },
         Event::Unknown(event) => {
-            if let Some(ref handler) = handler!(on_unknown, event_store) {
+            if let Some(handler) = handler!(on_unknown, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.kind, event.value);
-                });
+                thread::spawn(move || (handler)(context, event.kind, event.value));
             }
         },
         Event::UserGuildSettingsUpdate(event) => {
-            if let Some(ref handler) = handler!(on_user_guild_settings_update, event_store) {
+            if let Some(handler) = handler!(on_user_guild_settings_update, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
                 feature_cache! {{
                     let before = update!(update_with_user_guild_settings_update, event);
 
-                    thread::spawn(move || {
-                        (handler)(context, before, event.settings);
-                    });
+                    thread::spawn(move || (handler)(context, before, event.settings));
                 } else {
-                    thread::spawn(move || {
-                        (handler)(context, event.settings);
-                    });
+                    thread::spawn(move || (handler)(context, event.settings));
                 }}
             } else {
                 #[cfg(feature="cache")]
                 {
-                    let _before = update!(update_with_user_guild_settings_update, event);
+                    let _ = update!(update_with_user_guild_settings_update, event);
                 }
             }
         },
         Event::UserNoteUpdate(event) => {
-            if let Some(ref handler) = handler!(on_note_update, event_store) {
+            if let Some(handler) = handler!(on_note_update, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
                 feature_cache! {{
                     let before = update!(update_with_user_note_update, event);
 
-                    thread::spawn(move || {
-                        (handler)(context, event.user_id, before, event.note);
-                    });
+                    thread::spawn(move || (handler)(context, event.user_id, before, event.note));
                 } else {
-                    thread::spawn(move || {
-                        (handler)(context, event.user_id, event.note);
-                    });
+                    thread::spawn(move || (handler)(context, event.user_id, event.note));
                 }}
             } else {
                 #[cfg(feature="cache")]
                 {
-                    let _before = update!(update_with_user_note_update, event);
+                    let _ = update!(update_with_user_note_update, event);
                 }
             }
         },
         Event::UserSettingsUpdate(event) => {
-            if let Some(ref handler) = handler!(on_user_settings_update, event_store) {
+            if let Some(handler) = handler!(on_user_settings_update, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
                 feature_cache! {{
                     let before = update!(update_with_user_settings_update, event, true);
                     let after = CACHE.read().unwrap().settings.clone();
 
-                    thread::spawn(move || {
-                        (handler)(context, before.unwrap(), after.unwrap());
-                    });
+                    // Unwrap in the spawned thread so that if they don't
+                    // actually exist, then the current thread won't panic.
+                    //
+                    // Yes, this is probably bad.
+                    thread::spawn(move || (handler)(context, before.unwrap(), after.unwrap()));
                 } else {
-                    thread::spawn(move || {
-                        (handler)(context, event);
-                    });
+                    thread::spawn(move || (handler)(context, event));
                 }}
             } else {
                 #[cfg(feature="cache")]
@@ -830,58 +671,44 @@ fn handle_event(event: Event,
             }
         },
         Event::UserUpdate(event) => {
-            if let Some(ref handler) = handler!(on_user_update, event_store) {
+            if let Some(handler) = handler!(on_user_update, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
                 feature_cache! {{
                     let before = update!(update_with_user_update, event);
 
-                    thread::spawn(move || {
-                        (handler)(context, before, event.current_user);
-                    });
+                    thread::spawn(move || (handler)(context, before, event.current_user));
                 } else {
-                    thread::spawn(move || {
-                        (handler)(context, event.current_user);
-                    });
+                    thread::spawn(move || (handler)(context, event.current_user));
                 }}
             } else {
                 #[cfg(feature="cache")]
                 {
-                    let _before = update!(update_with_user_update, event);
+                    let _ = update!(update_with_user_update, event);
                 }
             }
         },
         Event::VoiceServerUpdate(event) => {
-            if let Some(ref handler) = handler!(on_voice_server_update, event_store) {
+            if let Some(handler) = handler!(on_voice_server_update, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event);
-                });
+                thread::spawn(move || (handler)(context, event));
             }
         },
         Event::VoiceStateUpdate(event) => {
             update!(update_with_voice_state_update, event);
 
-            if let Some(ref handler) = handler!(on_voice_state_update, event_store) {
+            if let Some(handler) = handler!(on_voice_state_update, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild_id, event.voice_state);
-                });
+                thread::spawn(move || (handler)(context, event.guild_id, event.voice_state));
             }
         },
         Event::WebhookUpdate(event) => {
-            if let Some(ref handler) = handler!(on_webhook_update, event_store) {
+            if let Some(handler) = handler!(on_webhook_update, event_store) {
                 let context = context(None, conn, data, login_type);
-                let handler = handler.clone();
 
-                thread::spawn(move || {
-                    (handler)(context, event.guild_id, event.channel_id);
-                });
+                thread::spawn(move || (handler)(context, event.guild_id, event.channel_id));
             }
         },
     }
