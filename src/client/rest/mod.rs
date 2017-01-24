@@ -130,8 +130,7 @@ pub fn ack_message(channel_id: u64, message_id: u64) -> Result<()> {
 /// [`Group`]: ../../model/struct.Group.html
 /// [`Group::add_recipient`]: ../../model/struct.Group.html#method.add_recipient
 /// [`User`]: ../../model/struct.User.html
-pub fn add_group_recipient(group_id: u64, user_id: u64)
-    -> Result<()> {
+pub fn add_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
     verify(204, request!(Route::None,
                          put,
                          "/channels/{}/recipients/{}",
@@ -168,8 +167,7 @@ pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> 
 /// [`Guild`]: ../../model/struct.Guild.html
 /// [`User`]: ../../model/struct.User.html
 /// [Ban Members]: ../../model/permissions/constant.BAN_MEMBERS.html
-pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8)
-    -> Result<()> {
+pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8) -> Result<()> {
     verify(204, request!(Route::GuildsIdBansUserId(guild_id),
                          put,
                          "/guilds/{}/bans/{}?delete_message_days={}",
@@ -224,8 +222,7 @@ pub fn create_channel(guild_id: u64, map: Value) -> Result<Channel> {
 /// [`Context::create_emoji`]: ../struct.Context.html#method.create_emoji
 /// [`Guild`]: ../../model/struct.Guild.html
 /// [Manage Emojis]: ../../model/permissions/constant.MANAGE_EMOJIS.html
-pub fn create_emoji(guild_id: u64, map: Value)
-    -> Result<Emoji> {
+pub fn create_emoji(guild_id: u64, map: Value) -> Result<Emoji> {
     let body = serde_json::to_string(&map)?;
     let response = request!(Route::GuildsIdEmojis(guild_id),
                             post(body),
@@ -286,8 +283,7 @@ pub fn create_guild(map: Value) -> Result<PartialGuild> {
 /// [`Integration`]: ../../model/struct.Integration.html
 /// [Manage Guild]: ../../model/permissions/constant.MANAGE_GUILD.html
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-integration
-pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: Value)
-    -> Result<()> {
+pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: Value) -> Result<()> {
     let body = serde_json::to_string(&map)?;
 
     verify(204, request!(Route::GuildsIdIntegrations(guild_id),
@@ -309,8 +305,7 @@ pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: Value)
 /// [`RichInvite`]: ../../model/struct.RichInvite.html
 /// [Create Invite]: ../../model/permissions/constant.CREATE_INVITE.html
 /// [docs]: https://discordapp.com/developers/docs/resources/channel#create-channel-invite
-pub fn create_invite(channel_id: u64, map: Value)
-    -> Result<RichInvite> {
+pub fn create_invite(channel_id: u64, map: Value) -> Result<RichInvite> {
     let body = serde_json::to_string(&map)?;
     let response = request!(Route::ChannelsIdInvites(channel_id),
                             post(body),
@@ -321,8 +316,7 @@ pub fn create_invite(channel_id: u64, map: Value)
 }
 
 /// Creates a permission override for a member or a role in a channel.
-pub fn create_permission(channel_id: u64, target_id: u64, map: Value)
-    -> Result<()> {
+pub fn create_permission(channel_id: u64, target_id: u64, map: Value) -> Result<()> {
     let body = serde_json::to_string(&map)?;
 
     verify(204, request!(Route::ChannelsIdPermissionsOverwriteId(channel_id),
@@ -333,8 +327,7 @@ pub fn create_permission(channel_id: u64, target_id: u64, map: Value)
 }
 
 /// Creates a private channel with a user.
-pub fn create_private_channel(map: Value)
-    -> Result<PrivateChannel> {
+pub fn create_private_channel(map: Value) -> Result<PrivateChannel> {
     let body = serde_json::to_string(&map)?;
     let response = request!(Route::UsersMeChannels,
                             post(body),
@@ -437,8 +430,7 @@ pub fn delete_guild(guild_id: u64) -> Result<PartialGuild> {
 }
 
 /// Remvoes an integration from a guild.
-pub fn delete_guild_integration(guild_id: u64, integration_id: u64)
-    -> Result<()> {
+pub fn delete_guild_integration(guild_id: u64, integration_id: u64) -> Result<()> {
     verify(204, request!(Route::GuildsIdIntegrationsId(guild_id),
                          delete,
                          "/guilds/{}/integrations/{}",
@@ -455,8 +447,7 @@ pub fn delete_invite(code: &str) -> Result<Invite> {
 
 /// Deletes a message if created by us or we have
 /// specific permissions.
-pub fn delete_message(channel_id: u64, message_id: u64)
-    -> Result<()> {
+pub fn delete_message(channel_id: u64, message_id: u64) -> Result<()> {
     verify(204, request!(Route::ChannelsIdMessagesId(channel_id),
                          delete,
                          "/channels/{}/messages/{}",
@@ -491,8 +482,7 @@ pub fn delete_messages(channel_id: u64, map: Value) -> Result<()> {
 ///
 /// [`Message`]: ../../model/struct.Message.html
 /// [`Reaction`]: ../../model/struct.Reaction.html
-pub fn delete_message_reactions(channel_id: u64, message_id: u64)
-    -> Result<()> {
+pub fn delete_message_reactions(channel_id: u64, message_id: u64) -> Result<()> {
     verify(204, request!(Route::ChannelsIdMessagesIdReactions(channel_id),
                          delete,
                          "/channels/{}/messages/{}/reactions",
@@ -501,8 +491,7 @@ pub fn delete_message_reactions(channel_id: u64, message_id: u64)
 }
 
 /// Deletes a permission override from a role or a member in a channel.
-pub fn delete_permission(channel_id: u64, target_id: u64)
-    -> Result<()> {
+pub fn delete_permission(channel_id: u64, target_id: u64) -> Result<()> {
     verify(204, request!(Route::ChannelsIdPermissionsOverwriteId(channel_id),
                          delete,
                          "/channels/{}/permissions/{}",
@@ -588,8 +577,7 @@ pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
 }
 
 /// Changes channel information.
-pub fn edit_channel(channel_id: u64, map: Value)
-    -> Result<GuildChannel> {
+pub fn edit_channel(channel_id: u64, map: Value) -> Result<GuildChannel> {
     let body = serde_json::to_string(&map)?;
     let response = request!(Route::ChannelsId(channel_id),
                             patch(body),
@@ -600,8 +588,7 @@ pub fn edit_channel(channel_id: u64, map: Value)
 }
 
 /// Changes emoji information.
-pub fn edit_emoji(guild_id: u64, emoji_id: u64, map: Value)
-    -> Result<Emoji> {
+pub fn edit_emoji(guild_id: u64, emoji_id: u64, map: Value) -> Result<Emoji> {
     let body = serde_json::to_string(&map)?;
     let response = request!(Route::GuildsIdEmojisId(guild_id),
                             patch(body),
@@ -637,8 +624,7 @@ pub fn edit_guild_embed(guild_id: u64, map: Value) -> Result<GuildEmbed> {
 }
 
 /// Does specific actions to a member.
-pub fn edit_member(guild_id: u64, user_id: u64, map: Value)
-    -> Result<()> {
+pub fn edit_member(guild_id: u64, user_id: u64, map: Value) -> Result<()> {
     let body = serde_json::to_string(&map)?;
 
     verify(204, request!(Route::GuildsIdMembersId(guild_id),
@@ -649,10 +635,7 @@ pub fn edit_member(guild_id: u64, user_id: u64, map: Value)
 }
 
 /// Changes message content, only if owned by us.
-pub fn edit_message(channel_id: u64,
-                    message_id: u64,
-                    map: Value)
-                    -> Result<Message> {
+pub fn edit_message(channel_id: u64, message_id: u64, map: Value) -> Result<Message> {
     let body = serde_json::to_string(&map)?;
     let response = request!(Route::ChannelsIdMessagesId(channel_id),
                             patch(body),
@@ -668,8 +651,7 @@ pub fn edit_message(channel_id: u64,
 /// Pass `None` to reset the nickname.
 ///
 /// [`Guild`]: ../../model/struct.Guild.html
-pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>)
-    -> Result<()> {
+pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
     let map = ObjectBuilder::new().insert("nick", new_nickname).build();
     let body = serde_json::to_string(&map)?;
     let response = request!(Route::GuildsIdMembersMeNick(guild_id),
@@ -805,8 +787,7 @@ pub fn edit_webhook(webhook_id: u64, map: Value) -> Result<Webhook> {
 /// ```
 ///
 /// [`edit_webhook`]: fn.edit_webhook.html
-pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: Value)
-    -> Result<Webhook> {
+pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: Value) -> Result<Webhook> {
     let body = serde_json::to_string(&map)?;
     let client = HyperClient::new();
     let response = retry(|| client
@@ -867,8 +848,7 @@ pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: Value)
 ///         return;
 ///     },
 /// };
-pub fn execute_webhook(webhook_id: u64, token: &str, map: Value)
-    -> Result<Message> {
+pub fn execute_webhook(webhook_id: u64, token: &str, map: Value) -> Result<Message> {
     let body = serde_json::to_string(&map)?;
     let client = HyperClient::new();
     let response = retry(|| client
@@ -932,8 +912,7 @@ pub fn get_bot_gateway() -> Result<BotGateway> {
 }
 
 /// Gets all invites for a channel.
-pub fn get_channel_invites(channel_id: u64)
-    -> Result<Vec<RichInvite>> {
+pub fn get_channel_invites(channel_id: u64) -> Result<Vec<RichInvite>> {
     let response = request!(Route::ChannelsIdInvites(channel_id),
                             get,
                             "/channels/{}/invites",
@@ -1090,8 +1069,7 @@ pub fn get_guild_members(guild_id: u64, limit: Option<u64>, after: Option<u64>)
 }
 
 /// Gets the amount of users that can be pruned.
-pub fn get_guild_prune_count(guild_id: u64, map: Value)
-    -> Result<GuildPrune> {
+pub fn get_guild_prune_count(guild_id: u64, map: Value) -> Result<GuildPrune> {
     let body = serde_json::to_string(&map)?;
     let response = request!(Route::GuildsIdPrune(guild_id),
                             get(body),
@@ -1210,8 +1188,7 @@ pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
 }
 
 /// Gets a message by an Id, bots only.
-pub fn get_message(channel_id: u64, message_id: u64)
-    -> Result<Message> {
+pub fn get_message(channel_id: u64, message_id: u64) -> Result<Message> {
     let response = request!(Route::ChannelsIdMessagesId(channel_id),
                             get,
                             "/channels/{}/messages/{}",
@@ -1310,9 +1287,7 @@ pub fn get_user(user_id: u64) -> Result<User> {
 
 /// Gets our connections.
 pub fn get_user_connections() -> Result<Vec<UserConnection>> {
-    let response = request!(Route::UsersMeConnections,
-                            get,
-                            "/users/@me/connections");
+    let response = request!(Route::UsersMeConnections, get, "/users/@me/connections");
 
     decode_array(serde_json::from_reader(response)?,
                       UserConnection::decode)
@@ -1322,8 +1297,7 @@ pub fn get_user_connections() -> Result<Vec<UserConnection>> {
 pub fn get_user_dm_channels() -> Result<Vec<PrivateChannel>> {
     let response = request!(Route::UsersMeChannels, get, "/users/@me/channels");
 
-    decode_array(serde_json::from_reader(response)?,
-                      PrivateChannel::decode)
+    decode_array(serde_json::from_reader(response)?, PrivateChannel::decode)
 }
 
 /// Gets all voice regions.
@@ -1412,8 +1386,7 @@ pub fn leave_guild(guild_id: u64) -> Result<PartialGuild> {
 }
 
 /// Deletes a user from group DM.
-pub fn remove_group_recipient(group_id: u64, user_id: u64)
-    -> Result<()> {
+pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
     verify(204, request!(Route::None,
                          delete,
                          "/channels/{}/recipients/{}",
@@ -1572,8 +1545,7 @@ pub fn remove_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<(
 }
 
 /// Starts removing some members from a guild based on the last time they've been online.
-pub fn start_guild_prune(guild_id: u64, map: Value)
-    -> Result<GuildPrune> {
+pub fn start_guild_prune(guild_id: u64, map: Value) -> Result<GuildPrune> {
     let body = serde_json::to_string(&map)?;
     let response = request!(Route::GuildsIdPrune(guild_id),
                             post(body),
@@ -1623,9 +1595,7 @@ pub fn retry<'a, F>(f: F) -> HyperResult<HyperResponse>
     }
 }
 
-fn verify(expected_status_code: u16,
-          mut response: HyperResponse)
-          -> Result<()> {
+fn verify(expected_status_code: u16, mut response: HyperResponse) -> Result<()> {
     let expected_status = match expected_status_code {
         200 => StatusCode::Ok,
         204 => StatusCode::NoContent,
