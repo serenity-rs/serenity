@@ -296,7 +296,7 @@ impl Guild {
     /// [`Channel`]: struct.Channel.html
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
-    pub fn create_channel(&mut self, name: &str, kind: ChannelType) -> Result<Channel> {
+    pub fn create_channel(&mut self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
         #[cfg(feature="cache")]
         {
             let req = permissions::MANAGE_CHANNELS;
@@ -1170,7 +1170,7 @@ impl GuildId {
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`rest::create_channel`]: ../client/rest/fn.create_channel.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
-    pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<Channel> {
+    pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
         let map = ObjectBuilder::new()
             .insert("name", name)
             .insert("type", kind.name())
@@ -1946,7 +1946,7 @@ impl PartialGuild {
     /// [`rest::create_channel`]: ../client/rest/fn.create_channel.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
-    pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<Channel> {
+    pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
         self.id.create_channel(name, kind)
     }
 

@@ -204,14 +204,14 @@ pub fn broadcast_typing(channel_id: u64) -> Result<()> {
 /// [`GuildChannel`]: ../../model/struct.GuildChannel.html
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-channel
 /// [Manage Channels]: ../../model/permissions/constant.MANAGE_CHANNELS.html
-pub fn create_channel(guild_id: u64, map: Value) -> Result<Channel> {
+pub fn create_channel(guild_id: u64, map: Value) -> Result<GuildChannel> {
     let body = serde_json::to_string(&map)?;
     let response = request!(Route::GuildsIdChannels(guild_id),
                             post(body),
                             "/guilds/{}/channels",
                             guild_id);
 
-    Channel::decode(serde_json::from_reader(response)?)
+    GuildChannel::decode(serde_json::from_reader(response)?)
 }
 
 /// Creates an emoji in the given [`Guild`] with the given data.
