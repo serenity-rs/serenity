@@ -1242,6 +1242,8 @@ fn boot_shard(info: BootInfo) -> Result<(Shard, ReadyEvent, Receiver<WebSocketSt
 }
 
 fn monitor_shard(mut info: MonitorInfo) {
+    handle_shard(&mut info);
+
     loop {
         let mut boot_successful = false;
 
