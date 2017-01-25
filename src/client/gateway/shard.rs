@@ -518,6 +518,19 @@ impl Shard {
     ///
     /// If the `cache` feature is enabled, the cache will automatically be
     /// updated with member chunks.
+    pub fn chunk_guilds(&self, guild_ids: &[GuildId], limit: Option<u16>, query: Option<&str>) {
+        let msg = ObjectBuilder::new()
+            .insert("op", OpCode::GetGuildMembers.num())
+            .insert_object("d", |obj| obj
+                .insert_array("guild_id", |a| guild_ids.iter().fold(a, |a, s| a.push(s.0)))
+                .insert("limit", limit.unwrap_or(0))
+                .insert("query", query.unwrap_or("")))
+            .build();
+
+        let _ = self.keepalive_channel.send(GatewayStatus::SendMessage(msg));
+    }
+
+    /// Syncs the user's guilds.
     pub fn sync_guilds(&self, guild_ids: &[GuildId]) {
         let msg = ObjectBuilder::new()
             .insert("op", OpCode::SyncGuild.num())
