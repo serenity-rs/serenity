@@ -63,11 +63,7 @@ impl CurrentUser {
     ///
     /// let avatar = serenity::utils::read_image("./avatar.png").unwrap();
     ///
-    /// CACHE.write()
-    ///     .unwrap()
-    ///     .user
-    ///     .edit(|p| p
-    ///         .avatar(Some(&avatar)));
+    /// CACHE.write().unwrap().user.edit(|p| p.avatar(Some(&avatar)));
     /// ```
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
@@ -162,6 +158,18 @@ impl User {
     }
 
     /// Deletes a profile note from a user.
+    ///
+    /// # Examples
+    ///
+    /// Delete a note for a [`Message`]'s author:
+    ///
+    /// ```rust,ignore
+    /// // assuming you are in a context
+    ///
+    /// let _ = message.author.delete_note();
+    /// ```
+    ///
+    /// [`Message`]: struct.Message.html
     #[inline]
     pub fn delete_note(&self) -> Result<()> {
         self.id.delete_note()
@@ -176,7 +184,8 @@ impl User {
     ///
     /// ```rust,ignore
     /// // assuming you are in a context
-    /// let _ = context.message.author.dm("Hello!");
+    ///
+    /// let _ = message.author.direct_message("Hello!");
     /// ```
     ///
     /// [`PrivateChannel`]: struct.PrivateChannel.html
@@ -219,6 +228,16 @@ impl User {
 
     /// This is an alias of [direct_message].
     ///
+    /// # Examples
+    ///
+    /// Sending a message:
+    ///
+    /// ```rust,ignore
+    /// // assuming you are in a context
+    ///
+    /// let _ = message.author.dm("Hello!");
+    /// ```
+    ///
     /// [direct_message]: #method.direct_message
     #[inline]
     pub fn dm(&self, content: &str) -> Result<Message> {
@@ -237,7 +256,8 @@ impl User {
     ///
     /// ```rust,ignore
     /// // assuming a `message` has been bound
-    /// let _ = context.edit_note(message.author, "test note");
+    ///
+    /// let _ = message.author.edit_note("test note");
     /// ```
     ///
     /// # Errors
@@ -275,15 +295,9 @@ impl User {
         user_id.into().get()
     }
 
-    /// Check if a user has a [`Role`]. This will retrieve the
-    /// [`Guild`] from the [`Cache`] if it is available, and then check if that
-    /// guild has the given [`Role`].
-    ///
-    /// If the [`Guild`] is not present, then the guild will be retrieved from
-    /// the API and the cache will be updated with it.
-    ///
-    /// If there are issues with requesting the API, then `false` will be
-    /// returned.
+    /// Check if a user has a [`Role`]. This will retrieve the [`Guild`] from
+    /// the [`Cache`] if it is available, and then check if that guild has the
+    /// given [`Role`].
     ///
     /// Three forms of data may be passed in to the guild parameter: either a
     /// [`Guild`] itself, a [`GuildId`], or a `u64`.
@@ -294,7 +308,7 @@ impl User {
     ///
     /// ```rust,ignore
     /// // Assumes a 'guild' and `role_id` have already been bound
-    /// context.message.author.has_role(guild, role_id);
+    /// let _ = message.author.has_role(guild, role_id);
     /// ```
     ///
     /// [`Guild`]: struct.Guild.html

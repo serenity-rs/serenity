@@ -161,7 +161,7 @@ impl Context {
     ///
     /// ```rust,ignore
     /// // assuming you are in a context
-    /// context.broadcast_typing(context.channel_id);
+    /// let _ = context.broadcast_typing();
     /// ```
     ///
     /// # Errors
@@ -530,7 +530,7 @@ impl Context {
     ///
     /// // assuming you are in a context
     ///
-    /// let guild_id = message.guild_id.unwrap();
+    /// let guild_id = message.guild_id().unwrap();
     /// context.get_guilds(GuildPagination::After(guild_id, 10)).unwrap();
     /// ```
     ///
@@ -790,7 +790,7 @@ impl Context {
     ///
     /// ```rust,ignore
     /// // assuming you are in a context
-    /// let _ = context.send_message(message.channel_id, |f| f.content("test"));
+    /// let _ = context.send_message(|f| f.content("test"));
     /// ```
     ///
     /// Send a message on `!ping` with a very descriptive [`Embed`]. This sends
@@ -829,7 +829,7 @@ impl Context {
     ///     let cache = CACHE.read().unwrap();
     ///     let channel = cache.get_guild_channel(message.channel_id);
     ///
-    ///     let _ = context.send_message(message.channel_id, |m| m
+    ///     let _ = context.send_message(|m| m
     ///         .content("Pong! Here's some info")
     ///         .embed(|e| e
     ///             .colour(Colour::dark_gold())

@@ -209,8 +209,6 @@ impl Channel {
     /// Requires the [Manage Messages] permission, if the current user is not
     /// the author of the message.
     ///
-    /// (in practice, please do not do this)
-    ///
     /// [`Message`]: struct.Message.html
     /// [`Message::delete`]: struct.Message.html#method.delete
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
@@ -278,11 +276,12 @@ impl Channel {
     /// # Examples
     ///
     /// ```rust,ignore
-    /// use serenity::model::ChannelId;
+    /// use serenity::model::MessageId;
     ///
-    /// let messages = channel.get_messages(|g| g
-    ///     .before(20)
-    ///     .after(100)); // Maximum is 100.
+    /// let id = MessageId(81392407232380928);
+    ///
+    /// // Maximum is 100.
+    /// let _messages = channel.get_messages(|g| g.after(id).limit(100));
     /// ```
     ///
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
@@ -1764,6 +1763,7 @@ impl PrivateChannel {
     /// over the limit.
     ///
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`Message`]: struct.Message.html
     pub fn send_message(&self, content: &str) -> Result<Message> {
         if let Some(length_over) = Message::overflow_length(content) {
             return Err(Error::Client(ClientError::MessageTooLong(length_over)));
@@ -1841,8 +1841,7 @@ impl GuildChannel {
     /// Create an invite that can only be used 5 times:
     ///
     /// ```rust,ignore
-    /// let invite = channel.create_invite(|i| i
-    ///     .max_uses(5));
+    /// let invite = channel.create_invite(|i| i.max_uses(5));
     /// ```
     pub fn create_invite<F>(&self, f: F) -> Result<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
@@ -1876,9 +1875,8 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,ignore
+    /// use serenity::client::CACHE;
     /// use serenity::model::{ChannelId, PermissionOverwrite, permissions};
-    ///
-    /// // assuming you are in a context
     ///
     /// let channel_id = 7;
     /// let user_id = 8;
@@ -1891,7 +1889,10 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     ///
-    /// let _result = context.create_permission(channel_id, overwrite);
+    /// let cache = CACHE.read().unwrap();
+    /// let channel = cache.get_guild_channel(channel_id).unwrap();
+    ///
+    /// let _ = channel.create_permission(overwrite);
     /// ```
     ///
     /// Creating a permission overwrite for a role by specifying the
@@ -1900,9 +1901,8 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,ignore
+    /// use serenity::client::CACHE;
     /// use serenity::model::{ChannelId, PermissionOverwrite, permissions};
-    ///
-    /// // assuming you are in a context
     ///
     /// let channel_id = 7;
     /// let user_id = 8;
@@ -1915,13 +1915,17 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     ///
-    /// let _result = context.create_permission(channel_id, overwrite);
+    /// let cache = CACHE.read().unwrap();
+    /// let channel = cache.get_guild_channel(channel_id).unwrap();
+    ///
+    /// let _ = channel.create_permission(overwrite);
     /// ```
     ///
     /// [`Channel`]: enum.Channel.html
     /// [`Member`]: struct.Member.html
     /// [`PermissionOverwrite`]: struct.PermissionOverwrite.html
     /// [`PermissionOverwrite::Member`]: struct.PermissionOverwrite.html#variant.Member
+    /// [`PermissionOverwrite::Role`]: struct.PermissionOverwrite.html#variant.Role
     /// [`Role`]: struct.Role.html
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
@@ -2026,9 +2030,7 @@ impl GuildChannel {
     /// Change a voice channels name and bitrate:
     ///
     /// ```rust,ignore
-    /// channel.edit(|c| c
-    ///     .name("test")
-    ///     .bitrate(86400));
+    /// channel.edit(|c| c.name("test").bitrate(86400));
     /// ```
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {

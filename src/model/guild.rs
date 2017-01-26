@@ -573,9 +573,7 @@ impl Guild {
     /// Mute a member and set their roles to just one role with a predefined Id:
     ///
     /// ```rust,ignore
-    /// guild.edit_member(user_id, |m| m
-    ///     .mute(true)
-    ///     .roles(&vec![role_id]));
+    /// guild.edit_member(user_id, |m| m.mute(true).roles(&vec![role_id]));
     /// ```
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
@@ -1324,9 +1322,7 @@ impl GuildId {
     /// Mute a member and set their roles to just one role with a predefined Id:
     ///
     /// ```rust,ignore
-    /// guild.edit_member(user_id, |m| m
-    ///     .mute(true)
-    ///     .roles(&vec![role_id]));
+    /// guild.edit_member(user_id, |m| m.mute(true).roles(&vec![role_id]));
     /// ```
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
@@ -2106,9 +2102,7 @@ impl PartialGuild {
     /// ```rust,ignore
     /// use serenity::model::GuildId;
     ///
-    /// GuildId(7).edit_member(user_id, |m| m
-    ///     .mute(true)
-    ///     .roles(&vec![role_id]));
+    /// GuildId(7).edit_member(user_id, |m| m.mute(true).roles(&vec![role_id]));
     /// ```
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
@@ -2440,8 +2434,7 @@ impl Role {
     /// Make a role hoisted:
     ///
     /// ```rust,ignore
-    /// context.edit_role(guild_id, role_id, |r| r
-    ///     .hoist(true));
+    /// context.edit_role(guild_id, role_id, |r| r.hoist(true));
     /// ```
     ///
     /// [`Role`]: struct.Role.html
