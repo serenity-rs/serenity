@@ -817,6 +817,7 @@ pub struct UserSettingsUpdateEvent {
     pub theme: Option<String>,
     pub convert_emoticons: Option<bool>,
     pub friend_source_flags: Option<FriendSourceFlags>,
+    pub status: Option<OnlineStatus>,
 }
 
 impl UserSettingsUpdateEvent {
@@ -834,6 +835,7 @@ impl UserSettingsUpdateEvent {
             theme: opt(&mut map, "theme", into_string)?,
             convert_emoticons: remove(&mut map, "convert_emoticons").ok().and_then(|v| v.as_bool()),
             friend_source_flags: opt(&mut map, "friend_source_flags", FriendSourceFlags::decode)?,
+            status: opt(&mut map, "status", OnlineStatus::decode_str)?,
         })
     }
 }

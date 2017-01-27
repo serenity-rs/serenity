@@ -23,6 +23,10 @@ fields:
     type: GuildId
   - name: show_current_game
     type: bool
+  - name: status
+    custom: OnlineStatus::decode_str
+    default: OnlineStatus::Online
+    type: OnlineStatus
   - name: theme
     type: string
 decode: false

@@ -9,6 +9,7 @@ use super::{
     GuildInfo,
     Member,
     Message,
+    OnlineStatus,
     PrivateChannel,
     RoleId,
     UserSettings,
@@ -453,6 +454,7 @@ impl UserSettings {
             restricted_guilds: remove(&mut map, "restricted_guilds").and_then(|v| decode_array(v, GuildId::decode))?,
             show_current_game: req!(remove(&mut map, "show_current_game")?.as_bool()),
             theme: remove(&mut map, "theme").and_then(into_string)?,
+            status: remove(&mut map, "status").and_then(OnlineStatus::decode_str)?,
         }).map(Some)
     }
 }

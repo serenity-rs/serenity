@@ -411,6 +411,12 @@ impl {0} {{
                     format!(r#"try!(opt(&mut map, "{}", |v| decode_array(v, into_string)))"#,
                             field_name)
                 },
+                (_struct_name, false, false, Some(def), Some(custom), None, None) => {
+                    format!(r#"try!(remove(&mut map, "{}").and_then({})).unwrap_or({})"#,
+                            field_name,
+                            custom,
+                            def)
+                },
                 (struct_name, false, false, Some(def), None, Some(from), None) => {
                     format!(r#"try!(opt(&mut map, "{}", {}::decode)).unwrap_or({})"#,
                             from,
