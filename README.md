@@ -2,6 +2,8 @@
 
 # serenity
 
+![serenity logo][logo]
+
 Serenity is an ergonomic and high-level Rust library for the Discord API.
 
 View the [examples] on how to make and structure a bot.
@@ -166,6 +168,7 @@ Voice+youtube-dl:
 [gateway docs]: https://serenity.zey.moe/serenity/client/gateway/index.html
 [license]: https://opensource.org/licenses/ISC
 [license-badge]: https://img.shields.io/badge/license-ISC-blue.svg
+[logo]: https://github.com/zeyla/serenity/tree/master/logo.png
 [rel:discord-rs]: https://github.com/SpaceManiac/discord-rs
 [rel:discord.net]: https://github.com/RogueException/Discord.Net
 [rel:discord.py]: https://github.com/Rapptz/discord.py
