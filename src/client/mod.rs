@@ -37,8 +37,8 @@ use self::event_store::EventStore;
 use self::gateway::Shard;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::{Arc, Mutex, RwLock};
-use std::thread;
 use std::time::Duration;
+use std::{mem, thread};
 use typemap::ShareMap;
 use websocket::client::Receiver;
 use websocket::result::WebSocketError;
@@ -235,7 +235,7 @@ impl Client {
     ///
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start(&mut self) -> Result<()> {
-        self.start_connection(None)
+        self.start_connection(None, rest::get_gateway()?.url)
     }
 
     /// Establish the connection(s) and start listening for events.
@@ -252,12 +252,15 @@ impl Client {
     ///
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start_autosharded(&mut self) -> Result<()> {
-        let res = rest::get_bot_gateway()?;
+        let mut res = rest::get_bot_gateway()?;
 
         let x = res.shards as u64 - 1;
         let y = res.shards as u64;
+        let url = mem::replace(&mut res.url, String::default());
 
-        self.start_connection(Some([0, x, y]))
+        drop(res);
+
+        self.start_connection(Some([0, x, y]), url)
     }
 
     /// Establish a sharded connection and start listening for events.
@@ -274,7 +277,7 @@ impl Client {
     ///
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
-        self.start_connection(Some([shard, shard, shards]))
+        self.start_connection(Some([shard, shard, shards]), rest::get_gateway()?.url)
     }
 
     /// Establish sharded connections and start listening for events.
@@ -293,7 +296,7 @@ impl Client {
     /// [`start_shard_range`]: #method.start_shards
     /// [Gateway docs]: gateway/index.html#sharding
     pub fn start_shards(&mut self, total_shards: u64) -> Result<()> {
-        self.start_connection(Some([0, total_shards - 1, total_shards]))
+        self.start_connection(Some([0, total_shards - 1, total_shards]), rest::get_gateway()?.url)
     }
 
     /// Establish a range of sharded connections and start listening for events.
@@ -326,9 +329,8 @@ impl Client {
     /// [`start_shard`]: #method.start_shard
     /// [`start_shards`]: #method.start_shards
     /// [Gateway docs]: gateway/index.html#sharding
-    pub fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64)
-        -> Result<()> {
-        self.start_connection(Some([range[0], range[1], total_shards]))
+    pub fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64) -> Result<()> {
+        self.start_connection(Some([range[0], range[1], total_shards]), rest::get_gateway()?.url)
     }
 
     /// Attaches a handler for when a [`CallCreate`] is received.
@@ -759,7 +761,7 @@ impl Client {
     // 2: total number of shards the bot is sharding for
     //
     // Not all shards need to be initialized in this process.
-    fn start_connection(&mut self, shard_data: Option<[u64; 3]>) -> Result<()> {
+    fn start_connection(&mut self, shard_data: Option<[u64; 3]>, url: String) -> Result<()> {
         // Update the framework's current user if the feature is enabled.
         //
         // This also acts as a form of check to ensure the token is correct.
@@ -772,7 +774,7 @@ impl Client {
                 .update_current_user(user.id, user.bot);
         }
 
-        let gateway_url = Arc::new(Mutex::new(rest::get_gateway()?.url));
+        let gateway_url = Arc::new(Mutex::new(url));
 
         let shards_index = shard_data.map_or(0, |x| x[0]);
         let shards_total = shard_data.map_or(1, |x| x[1] + 1);
