@@ -66,13 +66,13 @@ pub fn dispatch(event: Event,
             let mut framework = framework.lock().unwrap();
 
             if framework.initialized {
-                dispatch_message(&context,
+                dispatch_message(context.clone(),
                                  event.message.clone(),
                                  event_store);
 
                 framework.dispatch(context, event.message);
             } else {
-                dispatch_message(&context, event.message, event_store);
+                dispatch_message(context, event.message, event_store);
             }
         },
         other => handle_event(other, conn, data, login_type, event_store),
@@ -91,7 +91,7 @@ pub fn dispatch(event: Event,
                                   conn,
                                   data,
                                   login_type);
-            dispatch_message(&context,
+            dispatch_message(context,
                              event.message,
                              event_store);
         },
@@ -99,12 +99,10 @@ pub fn dispatch(event: Event,
     }
 }
 
-fn dispatch_message(context: &Context,
+fn dispatch_message(context: Context,
                     message: Message,
                     event_store: &Arc<RwLock<EventStore>>) {
     if let Some(handler) = handler!(on_message, event_store) {
-        let context = context.clone();
-
         thread::spawn(move || (handler)(context, message));
     }
 }
