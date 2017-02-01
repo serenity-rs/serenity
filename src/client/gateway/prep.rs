@@ -13,6 +13,7 @@ use super::{GatewayError, GatewayStatus};
 use time::{self, Duration};
 use websocket::client::request::Url as RequestUrl;
 use websocket::client::{Receiver, Sender};
+use websocket::result::WebSocketError as WsError;
 use websocket::stream::WebSocketStream;
 use ::constants::{self, LARGE_THRESHOLD, OpCode};
 use ::error::{Error, Result};
@@ -138,7 +139,14 @@ pub fn keepalive(interval: u64,
                     *heartbeat_sent.lock().unwrap() = now;
                 },
                 Err(why) => {
-                    warn!("Error sending keepalive: {:?}", why);
+                    match why {
+                        Error::WebSocket(WsError::IoError(err)) => {
+                            if err.raw_os_error() != Some(32) {
+                                debug!("Err w/ keepalive: {:?}", err);
+                            }
+                        },
+                        other => warn!("Other err w/ keepalive: {:?}", other),
+                    }
 
                     if last_successful {
                         debug!("If next keepalive fails, closing");
@@ -156,6 +164,11 @@ pub fn keepalive(interval: u64,
 
     match sender.shutdown_all() {
         Ok(_) => debug!("Successfully shutdown sender/receiver"),
-        Err(why) => warn!("Failed to shutdown sender/receiver: {:?}", why),
+        Err(why) => {
+            // This can fail if the receiver already shutdown.
+            if why.raw_os_error() != Some(107) {
+                warn!("Failed to shutdown sender/receiver: {:?}", why);
+            }
+        },
     }
 }
