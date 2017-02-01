@@ -680,15 +680,10 @@ impl Shard {
         {
             let mut cache = CACHE.write().unwrap();
             let current_user_id = cache.user.id;
-
-            for (user_id, presence) in &mut cache.presences {
-                if *user_id != current_user_id {
-                    continue;
-                }
-
+            cache.presences.get_mut(&current_user_id).map(|presence| {
                 presence.game = game.clone();
                 presence.last_modified = Some(now);
-            }
+            });
         }
     }
 }
