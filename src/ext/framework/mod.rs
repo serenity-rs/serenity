@@ -140,7 +140,7 @@ macro_rules! command {
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
-        #[allow(unused_mut)]
+        #[allow(unreachable_patterns, unused_mut)]
         pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> ::std::result::Result<(), String> {
             let mut i = $a.iter();
             let mut arg_counter = 0;
