@@ -61,7 +61,7 @@ pub fn identify(token: &str, shard_info: Option<[u64; 2]>) -> Value {
             object = identify_compression(object)
                 .insert("large_threshold", LARGE_THRESHOLD) // max value
                 .insert_object("properties", |object| object
-                    .insert("$browser", "Ergonomic and high-level Rust library")
+                    .insert("$browser", "serenity")
                     .insert("$device", "serenity")
                     .insert("$os", env::consts::OS))
                 .insert("token", token)
