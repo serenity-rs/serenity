@@ -33,11 +33,11 @@
 //! response, as the major parameter - `channel_id` - is equivalent for the two
 //! requests (`10`).
 //!
+//! Major parameters are why some variants (i.e. all of the channel/guild
+//! variants) have an associated u64 as data. This is the Id of the parameter,
+//! differentiating between different ratelimits.
 //!
-//! With the examples out of the way: major parameters are why some variants
-//! (i.e. all of the channel/guild variants) have an associated u64 as data.
-//! This is the Id of the parameter, differentiating between different
-//! ratelimits.
+//! [Taken from]: https://discordapp.com/developers/docs/topics/rate-limits#rate-limits
 
 use hyper::client::{RequestBuilder, Response};
 use hyper::header::Headers;
@@ -50,10 +50,51 @@ use time;
 use ::internal::prelude::*;
 
 lazy_static! {
-    static ref GLOBAL: Arc<Mutex<()>> = Arc::new(Mutex::new(()));
-    static ref ROUTES: Arc<Mutex<HashMap<Route, RateLimit>>> = Arc::new(Mutex::new(HashMap::default()));
+    /// The global mutex is a mutex unlocked and then immediately re-locked
+    /// prior to every request, to abide by Discord's global ratelimit.
+    ///
+    /// The global ratelimit is the total number of requests that may be made
+    /// across the entirity of the API within an amount of time. If this is
+    /// reached, then the global mutex is unlocked for the amount of time
+    /// present in the "Retry-After" header.
+    ///
+    /// While locked, all requests are blocked until each request can acquire
+    /// the lock.
+    ///
+    /// The only reason that you would need to use the global mutex is to
+    /// block requests yourself. This has the side-effect of potentially
+    /// blocking many of your event handlers or framework commands.
+    pub static ref GLOBAL: Arc<Mutex<()>> = Arc::new(Mutex::new(()));
+    /// The routes mutex is a HashMap of each [`Route`] and their respective
+    /// ratelimit information.
+    ///
+    /// See the documentation for [`RateLimit`] for more infomation on how the
+    /// library handles ratelimiting.
+    ///
+    /// # Examples
+    ///
+    /// View the `reset` time of the route for `ChannelsId(7)`:
+    ///
+    /// ```rust,no_run
+    /// use serenity::client::rest::ratelimiting::{ROUTES, Route};
+    ///
+    /// let routes = ROUTES.lock().unwrap();
+    ///
+    /// if let Some(route) = routes.get(&Route::ChannelsId(7)) {
+    ///     println!("Reset time at: {}", route.reset);
+    /// }
+    /// ```
+    ///
+    /// [`RateLimit`]: struct.RateLimit.html
+    /// [`Route`]: enum.Route.html
+    pub static ref ROUTES: Arc<Mutex<HashMap<Route, RateLimit>>> = Arc::new(Mutex::new(HashMap::default()));
 }
 
+/// A representation of all routes registered within the library. These are safe
+/// and memory-efficient representations of each path that functions exist for
+/// in the [`rest`] module.
+///
+/// [`rest`]: ../index.html
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Route {
     ChannelsId(u64),
@@ -106,6 +147,7 @@ pub enum Route {
     None,
 }
 
+#[doc(hidden)]
 pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
     where F: Fn() -> RequestBuilder<'a> {
 
@@ -174,14 +216,33 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
     }
 }
 
+/// A set of data containing information about the ratelimits for a particular
+/// [`Route`], which is stored in the [`ROUTES`] mutex.
+///
+/// See the [Discord docs] on ratelimits for more information.
+///
+/// **Note**: You should _not_ mutate any of the fields, as this can help cause
+/// 429s.
+///
+/// [`ROUTES`]: struct.ROUTES.html
+/// [`Route`]: enum.Route.html
+/// [Discord docs]: https://discordapp.com/developers/docs/topics/rate-limits
 #[derive(Clone, Debug, Default)]
 pub struct RateLimit {
-    limit: i64,
-    remaining: i64,
-    reset: i64,
+    /// The total number of requests that can be made in a period of time.
+    pub limit: i64,
+    /// The number of requests remaining in the period of time.
+    pub remaining: i64,
+    /// When the interval resets and the the [`limit`] resets to the value of
+    /// [`remaining`].
+    ///
+    /// [`limit`]: #structfield.limit
+    /// [`remaining`]: #structfield.remaining
+    pub reset: i64,
 }
 
 impl RateLimit {
+    #[doc(hidden)]
     pub fn pre_hook(&mut self) {
         if self.limit == 0 {
             return;
@@ -210,6 +271,7 @@ impl RateLimit {
         self.remaining -= 1;
     }
 
+    #[doc(hidden)]
     pub fn post_hook(&mut self, response: &Response) -> Result<bool> {
         if let Some(limit) = get_header(&response.headers, "x-ratelimit-limit")? {
             self.limit = limit;
