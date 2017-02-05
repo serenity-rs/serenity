@@ -50,7 +50,7 @@ use time;
 use ::internal::prelude::*;
 
 lazy_static! {
-    static ref GLOBAL: Arc<Mutex<RateLimit>> = Arc::new(Mutex::new(RateLimit::default()));
+    static ref GLOBAL: Arc<Mutex<()>> = Arc::new(Mutex::new(()));
     static ref ROUTES: Arc<Mutex<HashMap<Route, RateLimit>>> = Arc::new(Mutex::new(HashMap::default()));
 }
 
@@ -147,8 +147,16 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
         // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
         if route != Route::None {
             let redo = if response.headers.get_raw("x-ratelimit-global").is_some() {
-                let mut global = GLOBAL.lock().expect("global route lock poisoned");
-                global.post_hook(&response)
+                let _ = GLOBAL.lock().expect("global route lock poisoned");
+
+                Ok(if let Some(retry_after) = get_header(&response.headers, "retry-after")? {
+                    debug!("Ratelimited: {:?}ms", retry_after);
+                    thread::sleep(Duration::from_millis(retry_after as u64));
+
+                    true
+                } else {
+                    false
+                })
             } else {
                 ROUTES.lock()
                     .expect("routes poisoned")

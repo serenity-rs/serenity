@@ -24,7 +24,7 @@
 //! [`Context`]: ../struct.Context.html
 //! [model]: ../../model/index.html
 
-mod ratelimiting;
+pub mod ratelimiting;
 
 use hyper::client::{
     Client as HyperClient,
