@@ -1105,8 +1105,7 @@ impl Group {
     /// [`Message`]: struct.Message.html
     /// [`Search`]: ../utils/builder/struct.Search.html
     #[inline]
-    pub fn search<F>(&self, f: F) -> Result<SearchResult>
-        where F: FnOnce(Search) -> Search {
+    pub fn search<F: FnOnce(Search) -> Search>(&self, f: F) -> Result<SearchResult> {
         self.channel_id.search(f)
     }
 
@@ -1118,8 +1117,8 @@ impl Group {
     ///
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
-    pub fn send_message(&self, content: &str) -> Result<Message> {
-        self.channel_id.send_message(|m| m.content(content))
+    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+        self.channel_id.send_message(f)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.
@@ -1764,12 +1763,9 @@ impl PrivateChannel {
     ///
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
     /// [`Message`]: struct.Message.html
-    pub fn send_message(&self, content: &str) -> Result<Message> {
-        if let Some(length_over) = Message::overflow_length(content) {
-            return Err(Error::Client(ClientError::MessageTooLong(length_over)));
-        }
-
-        self.id.send_message(|m| m.content(content))
+    #[inline]
+    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+        self.id.send_message(f)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.
@@ -2191,11 +2187,7 @@ impl GuildChannel {
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
     /// [`Message`]: struct.Message.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    pub fn send_message(&self, content: &str) -> Result<Message> {
-        if let Some(length_over) = Message::overflow_length(content) {
-            return Err(Error::Client(ClientError::MessageTooLong(length_over)));
-        }
-
+    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
         #[cfg(feature="cache")]
         {
             let req = permissions::SEND_MESSAGES;
@@ -2205,7 +2197,7 @@ impl GuildChannel {
             }
         }
 
-        self.id.send_message(|m| m.content(content))
+        self.id.send_message(f)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.
