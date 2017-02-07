@@ -188,9 +188,9 @@ impl SortingOrder {
 /// [`offset`]: #method.offset
 /// [`sort_by`]: #method.sort_by
 /// [example 08]: https://github.com/zeyla/serenity/tree/master/examples/08_search
-pub struct Search<'a>(pub BTreeMap<&'a str, String>);
+pub struct Search(pub BTreeMap<&'static str, String>);
 
-impl<'a> Search<'a> {
+impl Search {
     /// Sets the list of attachment extensions to search by.
     ///
     /// When providing a vector of extensions, do _not_ include the period (`.`)
@@ -359,7 +359,7 @@ impl<'a> Search<'a> {
     }
 }
 
-impl<'a> Default for Search<'a> {
+impl Default for Search {
     /// Creates a new builder for searching for [`Message`]s. Refer to each
     /// method to learn what minimum and maximum values are available for each
     /// field, as well as restrictions and other useful information.
@@ -379,7 +379,7 @@ impl<'a> Default for Search<'a> {
     /// [`limit`]: #method.limit
     /// [`offset`]: #method.offset
     /// [`sort_by`]: #method.sort_by
-    fn default<'b>() -> Search<'b> {
+    fn default() -> Search {
         Search(BTreeMap::default())
     }
 }
