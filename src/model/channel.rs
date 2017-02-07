@@ -1316,7 +1316,7 @@ impl Message {
     #[inline]
     pub fn get_reaction_users<R, U>(&self, reaction_type: R, limit: Option<u8>, after: Option<U>)
         -> Result<Vec<User>> where R: Into<ReactionType>, U: Into<UserId> {
-        self.id.get_reaction_users(self.channel_id, reaction_type, limit, after)
+        self.channel_id.get_reaction_users(self.id, reaction_type, limit, after)
     }
 
     /// Retrieves the Id of the guild that the message was sent in, if sent in
@@ -1486,39 +1486,6 @@ impl Message {
         }
 
         rest::unpin_message(self.channel_id.0, self.id.0)
-    }
-}
-
-impl MessageId {
-    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
-    /// certain [`Emoji`].
-    ///
-    /// The default `limit` is `50` - specify otherwise to receive a different
-    /// maximum number of users. The maximum that may be retrieve at a time is
-    /// `100`, if a greater number is provided then it is automatically reduced.
-    ///
-    /// The optional `after` attribute is to retrieve the users after a certain
-    /// user. This is useful for pagination.
-    ///
-    /// **Note**: Requires the [Read Message History] permission.
-    ///
-    /// [`Emoji`]: struct.Emoji.html
-    /// [`Message`]: struct.Message.html
-    /// [`User`]: struct.User.html
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    pub fn get_reaction_users<C, R, U>(&self,
-                                       channel_id: C,
-                                       reaction_type: R,
-                                       limit: Option<u8>,
-                                       after: Option<U>)
-        -> Result<Vec<User>> where C: Into<ChannelId>, R: Into<ReactionType>, U: Into<UserId> {
-        let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
-
-        rest::get_reaction_users(channel_id.into().0,
-                                 self.0,
-                                 reaction_type.into(),
-                                 limit,
-                                 after.map(|u| u.into().0))
     }
 }
 
