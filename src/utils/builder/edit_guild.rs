@@ -1,7 +1,7 @@
 use serde_json::builder::ObjectBuilder;
 use serde_json::Value;
 use std::default::Default;
-use ::model::{ChannelId, Region, VerificationLevel};
+use ::model::{ChannelId, Region, UserId, VerificationLevel};
 
 /// A builder to optionally edit certain fields of a [`Guild`]. This is meant
 /// for usage with [`Context::edit_guild`] and [`LiveGuild::edit`].
@@ -70,6 +70,13 @@ impl EditGuild {
     /// **Note**: Must be between (and including) 2-100 chracters.
     pub fn name(self, name: &str) -> Self {
         EditGuild(self.0.insert("name", name))
+    }
+
+    /// Transfers the ownership of the guild to another user by Id.
+    ///
+    /// **Note**: The current user must be the owner of the guild.
+    pub fn owner<U: Into<UserId>>(self, user_id: U) -> Self {
+        EditGuild(self.0.insert("owner_id", user_id.into().0))
     }
 
     /// Set the voice region of the server.
