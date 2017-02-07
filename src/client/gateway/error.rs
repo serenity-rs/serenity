@@ -12,6 +12,8 @@ pub enum Error {
     ExpectedHello,
     /// Expected a Ready or an InvalidateSession
     InvalidHandshake,
+    /// When a session Id was expected (for resuming), but was not present.
+    NoSessionId,
     /// Failed to reconnect after a number of attempts.
     ReconnectFailure,
 }
@@ -22,15 +24,10 @@ impl Display for Error {
             Error::Closed(s, ref v) => {
                 f.write_str(&format!("Connection closed {:?}: {:?}", s, v))
             },
-            Error::ExpectedHello => {
-                f.write_str("Expected Hello during handshake")
-            },
-            Error::InvalidHandshake => {
-                f.write_str("Expected Ready or InvalidateSession")
-            },
-            Error::ReconnectFailure => {
-                f.write_str("Failed to Reconnect")
-            },
+            Error::ExpectedHello => f.write_str("Expected Hello during handshake"),
+            Error::InvalidHandshake => f.write_str("Expected Ready or InvalidateSession"),
+            Error::NoSessionId => f.write_str("No Session Id present"),
+            Error::ReconnectFailure => f.write_str("Failed to Reconnect"),
         }
     }
 }

@@ -1308,12 +1308,20 @@ fn handle_shard(info: &mut MonitorInfo) {
             Err(Error::WebSocket(WebSocketError::NoDataAvailable)) => {
                 debug!("Attempting to shutdown receiver/sender");
 
-                match info.receiver.shutdown_all() {
-                    Ok(_) => debug!("Successfully shutdown receiver/sender"),
-                    Err(why) => warn!("Err shutting down receiver/sender: {:?}", why),
-                }
+                match info.shard.lock().unwrap().resume(&mut info.receiver) {
+                    Ok((_, receiver)) => {
+                        debug!("Successfully resumed shard");
 
-                return;
+                        info.receiver = receiver;
+
+                        continue;
+                    },
+                    Err(why) => {
+                        warn!("Err resuming shard: {:?}", why);
+
+                        return;
+                    },
+                }
             },
             other => other,
         };

@@ -302,12 +302,10 @@ impl Shard {
                           s,
                           self.seq);
 
-                    return if let Some(session_id) = self.session_id.clone() {
-                        self.resume(session_id, receiver)
-                            .map(|(ev, rec)| Some((ev, Some(rec))))
+                    return if self.session_id.is_some() {
+                        self.resume(receiver).map(|(ev, rec)| Some((ev, Some(rec))))
                     } else {
-                        self.reconnect(receiver)
-                            .map(|(ev, rec)| Some((ev, Some(rec))))
+                        self.reconnect(receiver).map(|(ev, rec)| Some((ev, Some(rec))))
                     };
                 }
 
@@ -331,12 +329,10 @@ impl Shard {
                     let _ = self.keepalive_channel.send(status);
                 }
 
-                if let Some(session_id) = self.session_id.clone() {
-                    self.resume(session_id, receiver)
-                        .map(|(ev, rec)| Some((ev, Some(rec))))
+                if self.session_id.is_some() {
+                    self.resume(receiver).map(|(ev, rec)| Some((ev, Some(rec))))
                 } else {
-                    self.reconnect(receiver)
-                        .map(|(ev, rec)| Some((ev, Some(rec))))
+                    self.reconnect(receiver).map(|(ev, rec)| Some((ev, Some(rec))))
                 }
             },
             Ok(GatewayEvent::InvalidateSession) => {
@@ -393,8 +389,8 @@ impl Shard {
                 if resume {
                     info!("Attempting to resume");
 
-                    if let Some(session_id) = self.session_id.clone() {
-                        match self.resume(session_id, receiver) {
+                    if self.session_id.is_some() {
+                        match self.resume(receiver) {
                             Ok((ev, rec)) => {
                                 info!("Resumed");
 
@@ -427,10 +423,10 @@ impl Shard {
                 // - InvalidateSession.
                 //
                 // Otherwise, fallback to reconnecting.
-                if let Some(session_id) = self.session_id.clone() {
+                if self.session_id.is_some() {
                     info!("Attempting to resume");
 
-                    match self.resume(session_id, &mut receiver) {
+                    match self.resume(&mut receiver) {
                         Ok((ev, rec)) => {
                             info!("Resumed");
 
@@ -596,9 +592,15 @@ impl Shard {
         Err(Error::Gateway(GatewayError::ReconnectFailure))
     }
 
-    fn resume(&mut self, session_id: String, receiver: &mut Receiver<WebSocketStream>)
+    #[doc(hidden)]
+    pub fn resume(&mut self, receiver: &mut Receiver<WebSocketStream>)
         -> Result<(Event, Receiver<WebSocketStream>)> {
-        receiver.get_mut().get_mut().shutdown(Shutdown::Both)?;
+        let session_id = match self.session_id.clone() {
+            Some(session_id) => session_id,
+            None => return Err(Error::Gateway(GatewayError::NoSessionId)),
+        };
+
+        let _ = receiver.shutdown_all();
         let url = prep::build_gateway_url(&self.ws_url)?;
 
         let response = WsClient::connect(url)?.send()?;
