@@ -187,10 +187,10 @@ impl Client {
     /// Discord has a requirement of prefixing bot tokens with `"Bot "`, which
     /// this function will automatically do for you if not already included.
     pub fn login_bot(bot_token: &str) -> Client {
-        let token = if !bot_token.starts_with("Bot ") {
-            format!("Bot {}", bot_token)
-        } else {
+        let token = if bot_token.starts_with("Bot ") {
             bot_token.to_owned()
+        } else {
+            format!("Bot {}", bot_token)
         };
 
         login(token, LoginType::Bot)
