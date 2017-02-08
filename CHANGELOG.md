@@ -1,6 +1,86 @@
 # Change Log
+
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
+
+## [0.1.5] - 2017-02-08
+
+This is a release to fix broken nightly builds, due to a change in how rustc
+handles lifetimes, with a few performance optimizations and other fixes.
+
+### Upgrade Path
+
+For `Group::send_message`, `PrivateChannel::send_message`,
+and `GuildChannel::send_message`, instead of passing in only a `&str` of
+content, use a `CreateMessage` builder:
+
+```rust
+// assuming a `channel` is bound
+
+// old signature:
+channel.send_message("hello");
+
+// new signature:
+channel.send_message(|m| m.content("hello"));
+```
+
+Instead of calling `message_id.get_reaction_users` and passing in a `ChannelId`,
+call `channel_id.get_reaction_users` and pass in the `MessageId`. Note that the
+latter already existed.
+
+```rust
+// assuming `channel_id`, `message_id`, and `reaction_type` are bound
+
+// removed method:
+message_id.get_reaction_users(channel_id, reaction_type, Some(10), None);
+
+// alternative method:
+channel_id.get_reaction_users(message_id, reaction_type, Some(10), None);
+```
+
+### Added
+
+- Register the `status` user setting for user accounts (e.g. online, invisible)
+  [c:0b9bf91]
+- Expose and document ratelimiting structures [c:eb09f2d]
+- Add method to `EditGuild` to transfer ownership [c:f00e165]
+
+### Fixed
+
+- Fix potential unreachable pattern warning in `command!` macro [c:97f9bd1]
+- Fix value of 'browser' in shard identify [c:4cf8338]
+- Remove lifetime on Search builder [c:6f33a35]
+
+### Changed
+
+- Standardize methods for creating messages [c:c8c6b83]
+- Remove `MessageId::get_reaction_users` [c:268f356]
+
+### Misc.
+
+- Avoid re-requesting the gateway URL when autosharding (optimization)
+  [c:e891ebe]
+- Avoid cloning on non-framework message create events (opt.) [c:b7cbf75]
+- Avoid cloning the context on event dispatches (opt.) [c:5ee5fef]
+- Optimize presence update for current user in cache (opt.) [c:9392f61]
+- Make `GLOBAL` ratelimit mutex a unit (opt.) [c:55ccaca]
+- Resume when restarting WS sender/receiver [c:04cfaa9]
+
+[c:04cfaa9]: https://github.com/zeyla/serenity/commit/04cfaa9a69dc1638e9cd1904a9b8e94c1a97f832
+[c:0b9bf91]: https://github.com/zeyla/serenity/commit/0b9bf91f62eef85a4eca703902077f4c04b3b6d1
+[c:268f356]: https://github.com/zeyla/serenity/commit/268f356a25f27175a5d72458fff92b0f770d0a5a
+[c:4cf8338]: https://github.com/zeyla/serenity/commit/4cf8338e364b0feefef26ece6649077e87962ff3
+[c:55ccaca]: https://github.com/zeyla/serenity/commit/55ccaca57051b3fbd47cf7fa288014d9c36f6952
+[c:5ee5fef]: https://github.com/zeyla/serenity/commit/5ee5feff615565b6f661ee3598fe19bb98bd6a88
+[c:6f33a35]: https://github.com/zeyla/serenity/commit/6f33a35c4f85a06c45c4ce9e118db203c4951475
+[c:9392f61]: https://github.com/zeyla/serenity/commit/9392f61f8857b6ab2a04781c2d9c92a582a1577b
+[c:97f9bd1]: https://github.com/zeyla/serenity/commit/97f9bd10c16eb24d54a0ab00c52f19eb51a88675
+[c:b7cbf75]: https://github.com/zeyla/serenity/commit/b7cbf75103939b0b7834c808050b19ba4fbc4b17
+[c:c8c6b83]: https://github.com/zeyla/serenity/commit/c8c6b83ca685a3e503c853d4154a17761790954e
+[c:e891ebe]: https://github.com/zeyla/serenity/commit/e891ebeba43eb87c985db4e031b8bf76dcaca67b
+[c:eb09f2d]: https://github.com/zeyla/serenity/commit/eb09f2d3389b135978e0671a0e7e4ed299014f94
+[c:f00e165]: https://github.com/zeyla/serenity/commit/f00e1654e8549ec6582c6f3a8fc4af6aadd56015
+
 
 ## [0.1.4] - 2017-01-26
 
@@ -63,7 +143,7 @@ the `Context` to get stuff done. The `methods` feature flag has been removed.
   [c:096b0f5]
 - Add guild chunking [c:3ca7ad9]
 
-### Fixes
+### Fixed
 
 - `User::avatar_url` no longer mentions the user in the generated URL
   [c:0708ccf]
@@ -193,6 +273,7 @@ the `Context` to get stuff done. The `methods` feature flag has been removed.
 [c:fb07751]: https://github.com/zeyla/serenity/commit/fb07751cfc1efb657cba7005c38ed5ec6b192b4f
 [c:fb4d411]: https://github.com/zeyla/serenity/commit/fb4d411054fa44928b4fa052b19de19fce69d7cf
 
+
 ## [0.1.3] - 2016-12-14
 
 This is a hotfix for applying a PR and fixing a major bug in the plain help
@@ -204,11 +285,12 @@ command.
 - Disabling commands
 - Configuring "owners" of the bot, which command checks won't apply to
 
-### Fixes
+### Fixed
 
 - The plain help command now properly sends a message when requesting
   information about a command
 - Groups are now on their own lines in the plain help command
+
 
 ## [0.1.2] - 2016-12-14
 
@@ -238,8 +320,6 @@ using `CACHE.read().unwrap().user` to avoid a clone.
 
 Implemented `Emoji::url()` and `EmojiIdentifier::url()` to generate URLs for the
 emoji's image.
-
-
 
 The framework has been revamped:
 Structs can now be used as framework command arguments. FromStr is implemented
@@ -288,8 +368,7 @@ Thanks to [@fwrs] for most work of the work on the framework.
 
 See [example 06][v0.1.2:example 06] for examples on most of this.
 
-
-### Fixes
+### Fixed
 
 - MessageBuilder channel/role/user methods now properly mention the given
   item ([@fwrs])
@@ -311,6 +390,7 @@ See [example 06][v0.1.2:example 06] for examples on most of this.
   not do anything and there seems to not be any plans on Discord's side to make
   them do anything. These will be removed in v0.1.3 and the builders themselves
   will be replaced with methods on `CreateEmbed` (BC break)
+
 
 ## [0.1.1] - 2016-12-05
 
@@ -356,7 +436,7 @@ v0.1.1 can now be retrieved from the [crates.io listing].
   commands/contexts, through the use of `Context.data`'s ShareMap. See
   [example 06][v0.1.1:example 06] for an example
 
-### Fixes
+### Fixed
 
 - `rest::start_integration_sync`/`Context::start_integration_sync` now properly
   work ([@abalabahaha])
@@ -384,6 +464,7 @@ in Discord's API.
 
 Initial commit.
 
+[0.1.5]: https://github.com/zeyla/serenity/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/zeyla/serenity/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/zeyla/serenity/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/zeyla/serenity/compare/v0.1.1...v0.1.2
