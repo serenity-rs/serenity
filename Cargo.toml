@@ -12,7 +12,7 @@ repository = "https://github.com/zeyla/serenity.git"
 version = "0.1.4"
 
 [dependencies]
-base64 = "0.2"
+base64 = "0.3"
 bitflags = "0.7"
 byteorder = "0.5"
 flate2 = "0.2"
