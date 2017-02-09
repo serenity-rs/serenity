@@ -2,6 +2,7 @@ extern crate serenity;
 
 use serenity::model::*;
 use serenity::utils::Colour;
+use std::sync::{Arc, RwLock};
 
 #[test]
 fn test_formatters() {
@@ -14,7 +15,7 @@ fn test_formatters() {
 
 #[test]
 fn test_mention() {
-    let channel = Channel::Guild(GuildChannel {
+    let channel = Channel::Guild(Arc::new(RwLock::new(GuildChannel {
         bitrate: None,
         guild_id: GuildId(1),
         kind: ChannelType::Text,
@@ -26,7 +27,7 @@ fn test_mention() {
         position: 1,
         topic: None,
         user_limit: None,
-    });
+    })));
     let emoji = Emoji {
         id: EmojiId(5),
         name: "a".to_owned(),
@@ -57,7 +58,7 @@ fn test_mention() {
         mute: false,
         nick: None,
         roles: vec![],
-        user: user.clone(),
+        user: Arc::new(RwLock::new(user.clone())),
     };
 
     assert_eq!(ChannelId(1).mention(), "<#1>");

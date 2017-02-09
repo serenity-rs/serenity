@@ -1,3 +1,4 @@
+use std::sync::{Arc, RwLock};
 use super::utils::*;
 use super::*;
 use ::internal::prelude::*;
@@ -69,7 +70,7 @@ impl Presence {
             status: remove(&mut value, "status").and_then(OnlineStatus::decode_str)?,
             last_modified: opt(&mut value, "last_modified", |v| Ok(req!(v.as_u64())))?,
             game: game,
-            user: user,
+            user: user.map(RwLock::new).map(Arc::new),
             nick: opt(&mut value, "nick", into_string)?,
         })
     }

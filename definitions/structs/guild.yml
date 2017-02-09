@@ -15,7 +15,7 @@ fields:
     description: >
       All voice and text channels a guild has. This gives all of them
       regardless of permissions.
-    t: ChannelId, GuildChannel
+    t: ChannelId, Arc<RwLock<GuildChannel>>
     type: hashmap
   - name: default_message_notifications
     description: >

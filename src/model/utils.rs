@@ -1,4 +1,5 @@
 use std::collections::{BTreeMap, HashMap};
+use std::sync::{Arc, RwLock};
 use super::{
     Channel,
     ChannelId,
@@ -22,8 +23,6 @@ use ::utils::{decode_array, into_array};
 use super::permissions::{self, Permissions};
 #[cfg(feature="cache")]
 use ::client::CACHE;
-#[cfg(feature="cache")]
-use ::ext::cache::ChannelRef;
 
 #[macro_escape]
 macro_rules! req {
@@ -93,7 +92,9 @@ pub fn decode_members(value: Value) -> Result<HashMap<UserId, Member>> {
     let mut members = HashMap::new();
 
     for member in decode_array(value, Member::decode)? {
-        members.insert(member.user.id, member);
+        let user_id = member.user.read().unwrap().id;
+
+        members.insert(user_id, member);
     }
 
     Ok(members)
@@ -134,8 +135,8 @@ pub fn decode_private_channels(value: Value)
 
     for private_channel in decode_array(value, Channel::decode)? {
         let id = match private_channel {
-            Channel::Group(ref group) => group.channel_id,
-            Channel::Private(ref channel) => channel.id,
+            Channel::Group(ref group) => group.read().unwrap().channel_id,
+            Channel::Private(ref channel) => channel.read().unwrap().id,
             Channel::Guild(_) => unreachable!("Guild private channel decode"),
         };
 
@@ -217,11 +218,11 @@ pub fn decode_shards(value: Value) -> Result<[u64; 2]> {
     ])
 }
 
-pub fn decode_users(value: Value) -> Result<HashMap<UserId, User>> {
+pub fn decode_users(value: Value) -> Result<HashMap<UserId, Arc<RwLock<User>>>> {
     let mut users = HashMap::new();
 
     for user in decode_array(value, User::decode)? {
-        users.insert(user.id, user);
+        users.insert(user.id, Arc::new(RwLock::new(user)));
     }
 
     Ok(users)
@@ -306,10 +307,10 @@ pub fn user_has_perms(channel_id: ChannelId,
     };
 
     let guild_id = match channel {
-        ChannelRef::Group(_) | ChannelRef::Private(_) => {
+        Channel::Group(_) | Channel::Private(_) => {
             return Ok(permissions == permissions::MANAGE_MESSAGES);
         },
-        ChannelRef::Guild(channel) => channel.guild_id,
+        Channel::Guild(channel) => channel.read().unwrap().guild_id,
     };
 
     let guild = match cache.get_guild(guild_id) {
@@ -317,7 +318,7 @@ pub fn user_has_perms(channel_id: ChannelId,
         None => return Err(Error::Client(ClientError::ItemMissing)),
     };
 
-    let perms = guild.permissions_for(channel_id, current_user.id);
+    let perms = guild.read().unwrap().permissions_for(channel_id, current_user.id);
 
     permissions.remove(perms);
 

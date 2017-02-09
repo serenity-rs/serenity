@@ -14,6 +14,9 @@ use ::model::event::{
 };
 use ::model::*;
 
+#[cfg(feature="cache")]
+use std::sync::RwLock;
+
 #[cfg(not(feature="cache"))]
 use ::model::event::{
     CallUpdateEvent,
@@ -44,11 +47,11 @@ use ::model::event::{
 pub struct EventStore {
     pub on_call_create: Option<Arc<Fn(Context, Call) + Send + Sync + 'static>>,
     #[cfg(feature="cache")]
-    pub on_call_delete: Option<Arc<Fn(Context, ChannelId, Option<Call>) + Send + Sync + 'static>>,
+    pub on_call_delete: Option<Arc<Fn(Context, ChannelId, Option<Arc<RwLock<Call>>>) + Send + Sync + 'static>>,
     #[cfg(not(feature="cache"))]
     pub on_call_delete: Option<Arc<Fn(Context, ChannelId) + Send + Sync + 'static>>,
     #[cfg(feature="cache")]
-    pub on_call_update: Option<Arc<Fn(Context, Option<Call>, Option<Call>) + Send + Sync + 'static>>,
+    pub on_call_update: Option<Arc<Fn(Context, Option<Arc<RwLock<Call>>>, Option<Arc<RwLock<Call>>>) + Send + Sync + 'static>>,
     #[cfg(not(feature="cache"))]
     pub on_call_update: Option<Arc<Fn(Context, CallUpdateEvent) + Send + Sync + 'static>>,
     pub on_channel_create: Option<Arc<Fn(Context, Channel) + Send + Sync + 'static>>,
@@ -67,7 +70,7 @@ pub struct EventStore {
     pub on_guild_ban_removal: Option<Arc<Fn(Context, GuildId, User) + Send + Sync + 'static>>,
     pub on_guild_create: Option<Arc<Fn(Context, Guild) + Send + Sync + 'static>>,
     #[cfg(feature="cache")]
-    pub on_guild_delete: Option<Arc<Fn(Context, PartialGuild, Option<Guild>) + Send + Sync + 'static>>,
+    pub on_guild_delete: Option<Arc<Fn(Context, PartialGuild, Option<Arc<RwLock<Guild>>>) + Send + Sync + 'static>>,
     #[cfg(not(feature="cache"))]
     pub on_guild_delete: Option<Arc<Fn(Context, PartialGuild) + Send + Sync + 'static>>,
     pub on_guild_emojis_update: Option<Arc<Fn(Context, GuildId, HashMap<EmojiId, Emoji>) + Send + Sync + 'static>>,
@@ -94,7 +97,7 @@ pub struct EventStore {
     pub on_guild_sync: Option<Arc<Fn(Context, GuildSyncEvent) + Send + Sync + 'static>>,
     pub on_guild_unavailable: Option<Arc<Fn(Context, GuildId) + Send + Sync + 'static>>,
     #[cfg(feature="cache")]
-    pub on_guild_update: Option<Arc<Fn(Context, Option<Guild>, PartialGuild) + Send + Sync + 'static>>,
+    pub on_guild_update: Option<Arc<Fn(Context, Option<Arc<RwLock<Guild>>>, PartialGuild) + Send + Sync + 'static>>,
     #[cfg(not(feature="cache"))]
     pub on_guild_update: Option<Arc<Fn(Context, PartialGuild) + Send + Sync + 'static>>,
     pub on_message: Option<Arc<Fn(Context, Message) + Send + Sync + 'static>>,

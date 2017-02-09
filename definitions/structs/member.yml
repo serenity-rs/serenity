@@ -21,4 +21,4 @@ fields:
     type: RoleId
   - name: user
     description: Attached User struct.
-    type: User
+    type: Arc<RwLock<User>>

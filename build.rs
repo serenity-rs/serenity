@@ -411,6 +411,10 @@ impl {0} {{
                     format!(r#"try!(opt(&mut map, "{}", |v| decode_array(v, into_string)))"#,
                             field_name)
                 },
+                ("Arc<RwLock<User>>", false, false, None, None, None, None) => {
+                    format!(r#"Arc::new(RwLock::new(User::decode(remove(&mut map, "{}")?)?))"#,
+                            field_name)
+                },
                 (_struct_name, false, false, Some(def), Some(custom), None, None) => {
                     format!(r#"try!(remove(&mut map, "{}").and_then({})).unwrap_or({})"#,
                             field_name,

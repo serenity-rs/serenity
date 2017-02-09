@@ -22,5 +22,5 @@ fields:
     type: ChannelType
   - name: recipient
     description: User that receives messages in this channel.
-    type: User
+    type: Arc<RwLock<User>>
 decode: false

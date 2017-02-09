@@ -868,7 +868,7 @@ impl Client {
     ///
     /// [`CallDelete`]: ../model/event/enum.Event.html#variant.CallDelete
     pub fn on_call_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, ChannelId, Option<Call>) + Send + Sync + 'static {
+        where F: Fn(Context, ChannelId, Option<Arc<RwLock<Call>>>) + Send + Sync + 'static {
         self.event_store.write()
             .unwrap()
             .on_call_delete = Some(Arc::new(handler));
@@ -878,7 +878,7 @@ impl Client {
     ///
     /// [`CallUpdate`]: ../model/event/enum.Event.html#variant.CallUpdate
     pub fn on_call_update<F>(&mut self, handler: F)
-        where F: Fn(Context, Option<Call>, Option<Call>) + Send + Sync + 'static {
+        where F: Fn(Context, Option<Arc<RwLock<Call>>>, Option<Arc<RwLock<Call>>>) + Send + Sync + 'static {
         self.event_store.write()
             .unwrap()
             .on_call_update = Some(Arc::new(handler));
@@ -910,7 +910,7 @@ impl Client {
     /// [`Role`]: ../model/struct.Role.html
     /// [`Cache`]: ../ext/cache/struct.Cache.html
     pub fn on_guild_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, PartialGuild, Option<Guild>) + Send + Sync + 'static {
+        where F: Fn(Context, PartialGuild, Option<Arc<RwLock<Guild>>>) + Send + Sync + 'static {
         self.event_store.write()
             .unwrap()
             .on_guild_delete = Some(Arc::new(handler));
@@ -977,7 +977,7 @@ impl Client {
     ///
     /// [`GuildUpdate`]: ../model/event/enum.Event.html#variant.GuildUpdate
     pub fn on_guild_update<F>(&mut self, handler: F)
-        where F: Fn(Context, Option<Guild>, PartialGuild) + Send + Sync + 'static {
+        where F: Fn(Context, Option<Arc<RwLock<Guild>>>, PartialGuild) + Send + Sync + 'static {
         self.event_store.write()
             .unwrap()
             .on_guild_update = Some(Arc::new(handler));

@@ -668,8 +668,7 @@ impl Shard {
 
                 match game.as_ref() {
                     Some(game) => {
-                        object.insert_object("game", move |o| o
-                            .insert("name", &game.name))
+                        object.insert_object("game", move |o| o.insert("name", &game.name))
                     },
                     None => object.insert("game", Value::Null),
                 }
@@ -682,6 +681,7 @@ impl Shard {
         {
             let mut cache = CACHE.write().unwrap();
             let current_user_id = cache.user.id;
+
             cache.presences.get_mut(&current_user_id).map(|presence| {
                 presence.game = game.clone();
                 presence.last_modified = Some(now);

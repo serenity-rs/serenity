@@ -31,5 +31,5 @@ fields:
   - name: recipients
     description: Group channel's members.
     custom: decode_users
-    t: UserId, User
+    t: UserId, Arc<RwLock<User>>
     type: hashmap

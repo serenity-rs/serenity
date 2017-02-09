@@ -39,6 +39,7 @@ pub use self::webhook::*;
 
 use self::utils::*;
 use std::collections::HashMap;
+use std::sync::{Arc, RwLock};
 use time::Timespec;
 use ::internal::prelude::*;
 use ::utils::{Colour, decode_array};
@@ -123,18 +124,18 @@ id! {
 #[derive(Clone, Debug)]
 pub enum Channel {
     /// A group. A group comprises of only one channel.
-    Group(Group),
+    Group(Arc<RwLock<Group>>),
     /// A [text] or [voice] channel within a [`Guild`].
     ///
     /// [`Guild`]: struct.Guild.html
     /// [text]: enum.ChannelType.html#variant.Text
     /// [voice]: enum.ChannelType.html#variant.Voice
-    Guild(GuildChannel),
+    Guild(Arc<RwLock<GuildChannel>>),
     /// A private channel to another [`User`]. No other users may access the
     /// channel. For multi-user "private channels", use a group.
     ///
     /// [`User`]: struct.User.html
-    Private(PrivateChannel),
+    Private(Arc<RwLock<PrivateChannel>>),
 }
 
 /// A container for guilds.

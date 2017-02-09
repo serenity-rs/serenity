@@ -30,13 +30,13 @@ impl Mentionable for Channel {
     fn mention(&self) -> String {
         match *self {
             Channel::Guild(ref x) => {
-                format!("<#{}>", x.id.0)
+                format!("<#{}>", x.read().unwrap().id.0)
             },
             Channel::Private(ref x) => {
-                format!("<#{}>", x.id.0)
+                format!("<#{}>", x.read().unwrap().id.0)
             },
             Channel::Group(ref x) => {
-                format!("<#{}>", x.channel_id.0)
+                format!("<#{}>", x.read().unwrap().channel_id.0)
             }
         }
     }
@@ -50,7 +50,7 @@ impl Mentionable for Emoji {
 
 impl Mentionable for Member {
     fn mention(&self) -> String {
-        format!("<@{}>", self.user.id.0)
+        format!("<@{}>", self.user.read().unwrap().id.0)
     }
 }
 
@@ -86,7 +86,7 @@ impl FromStr for User {
         match utils::parse_username(s) {
             Some(x) => {
                 match UserId(x as u64).find() {
-                    Some(user) => Ok(user),
+                    Some(user) => Ok(user.read().unwrap().clone()),
                     _ => Err(())
                 }
             },

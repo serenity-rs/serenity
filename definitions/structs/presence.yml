@@ -23,5 +23,5 @@ fields:
   - name: user
     description: Attached User struct.
     optional: true
-    type: User
+    type: Arc<RwLock<User>>
 decode: false

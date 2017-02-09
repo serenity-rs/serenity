@@ -4,6 +4,7 @@ use std::borrow::Cow;
 use std::fmt::{self, Write};
 use std::io::Read;
 use std::mem;
+use std::sync::{Arc, RwLock};
 use super::utils::{
     decode_id,
     into_map,
@@ -29,8 +30,6 @@ use ::utils::decode_array;
 use super::utils;
 #[cfg(feature="cache")]
 use ::client::CACHE;
-#[cfg(feature="cache")]
-use ::ext::cache::ChannelRef;
 
 impl Attachment {
     /// If this attachment is an image, then a tuple of the width and height
@@ -170,11 +169,11 @@ impl Channel {
         let map = into_map(value)?;
         match req!(map.get("type").and_then(|x| x.as_u64())) {
             0 | 2 => GuildChannel::decode(Value::Object(map))
-                .map(Channel::Guild),
+                .map(|x| Channel::Guild(Arc::new(RwLock::new(x)))),
             1 => PrivateChannel::decode(Value::Object(map))
-                .map(Channel::Private),
+                .map(|x| Channel::Private(Arc::new(RwLock::new(x)))),
             3 => Group::decode(Value::Object(map))
-                .map(Channel::Group),
+                .map(|x| Channel::Group(Arc::new(RwLock::new(x)))),
             other => Err(Error::Decode("Expected value Channel type",
                                        Value::U64(other))),
         }
@@ -189,13 +188,13 @@ impl Channel {
     pub fn delete(&self) -> Result<()> {
         match *self {
             Channel::Group(ref group) => {
-                let _ = group.leave()?;
+                let _ = group.read().unwrap().leave()?;
             },
             Channel::Guild(ref public_channel) => {
-                let _ = public_channel.delete()?;
+                let _ = public_channel.read().unwrap().delete()?;
             },
             Channel::Private(ref private_channel) => {
-                let _ = private_channel.delete()?;
+                let _ = private_channel.read().unwrap().delete()?;
             },
         }
 
@@ -325,9 +324,9 @@ impl Channel {
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     pub fn id(&self) -> ChannelId {
         match *self {
-            Channel::Group(ref group) => group.channel_id,
-            Channel::Guild(ref channel) => channel.id,
-            Channel::Private(ref channel) => channel.id,
+            Channel::Group(ref group) => group.read().unwrap().channel_id,
+            Channel::Guild(ref channel) => channel.read().unwrap().id,
+            Channel::Private(ref channel) => channel.read().unwrap().id,
         }
     }
 
@@ -386,13 +385,20 @@ impl fmt::Display for Channel {
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let out = match *self {
-            Channel::Group(ref group) => group.name().to_owned(),
-            Channel::Guild(ref channel) => Cow::Owned(format!("{}", channel)),
-            Channel::Private(ref channel) => Cow::Owned(channel.recipient.name.clone()),
-        };
+        match *self {
+            Channel::Group(ref group) => {
+                fmt::Display::fmt(&group.read().unwrap().name(), f)
+            },
+            Channel::Guild(ref ch) => {
+                fmt::Display::fmt(&ch.read().unwrap().id.mention(), f)
+            },
+            Channel::Private(ref ch) => {
+                let channel = ch.read().unwrap();
+                let recipient = channel.recipient.read().unwrap();
 
-        fmt::Display::fmt(&out, f)
+                fmt::Display::fmt(&recipient.name, f)
+            },
+        }
     }
 }
 
@@ -615,7 +621,7 @@ impl ChannelId {
     /// Search the cache for the channel with the Id.
     #[cfg(feature="cache")]
     pub fn find(&self) -> Option<Channel> {
-        CACHE.read().unwrap().get_channel(*self).map(|x| x.clone_inner())
+        CACHE.read().unwrap().get_channel(*self)
     }
 
     /// Search the cache for the channel. If it can't be found, the channel is
@@ -624,7 +630,7 @@ impl ChannelId {
         #[cfg(feature="cache")]
         {
             if let Some(channel) = CACHE.read().unwrap().get_channel(*self) {
-                return Ok(channel.clone_inner());
+                return Ok(channel);
             }
         }
 
@@ -837,9 +843,9 @@ impl From<Channel> for ChannelId {
     /// Gets the Id of a `Channel`.
     fn from(channel: Channel) -> ChannelId {
         match channel {
-            Channel::Group(group) => group.channel_id,
-            Channel::Guild(channel) => channel.id,
-            Channel::Private(channel) => channel.id,
+            Channel::Group(group) => group.read().unwrap().channel_id,
+            Channel::Guild(ch) => ch.read().unwrap().id,
+            Channel::Private(ch) => ch.read().unwrap().id,
         }
     }
 }
@@ -1054,12 +1060,12 @@ impl Group {
             Some(ref name) => Cow::Borrowed(name),
             None => {
                 let mut name = match self.recipients.values().nth(0) {
-                    Some(recipient) => recipient.name.clone(),
+                    Some(recipient) => recipient.read().unwrap().name.clone(),
                     None => return Cow::Borrowed("Empty Group"),
                 };
 
                 for recipient in self.recipients.values().skip(1) {
-                    let _ = write!(name, ", {}", recipient.name);
+                    let _ = write!(name, ", {}", recipient.read().unwrap().name);
                 }
 
                 Cow::Owned(name)
@@ -1327,7 +1333,7 @@ impl Message {
     #[cfg(feature="cache")]
     pub fn guild_id(&self) -> Option<GuildId> {
         match CACHE.read().unwrap().get_channel(self.channel_id) {
-            Some(ChannelRef::Guild(channel)) => Some(channel.guild_id),
+            Some(Channel::Guild(ch)) => Some(ch.read().unwrap().guild_id),
             _ => None,
         }
     }
@@ -1336,7 +1342,7 @@ impl Message {
     #[cfg(feature="cache")]
     pub fn is_private(&self) -> bool {
         match CACHE.read().unwrap().get_channel(self.channel_id) {
-            Some(ChannelRef::Group(_)) | Some(ChannelRef::Private(_)) => true,
+            Some(Channel::Group(_)) | Some(Channel::Private(_)) => true,
             _ => false,
         }
     }
@@ -1568,14 +1574,14 @@ impl PrivateChannel {
     pub fn decode(value: Value) -> Result<PrivateChannel> {
         let mut map = into_map(value)?;
         let mut recipients = decode_array(remove(&mut map, "recipients")?,
-                                  User::decode)?;
+                                                 User::decode)?;
 
         Ok(PrivateChannel {
             id: remove(&mut map, "id").and_then(ChannelId::decode)?,
             kind: remove(&mut map, "type").and_then(ChannelType::decode)?,
             last_message_id: opt(&mut map, "last_message_id", MessageId::decode)?,
             last_pin_timestamp: opt(&mut map, "last_pin_timestamp", into_string)?,
-            recipient: recipients.remove(0),
+            recipient: Arc::new(RwLock::new(recipients.remove(0))),
         })
     }
 
@@ -1750,7 +1756,7 @@ impl PrivateChannel {
 impl fmt::Display for PrivateChannel {
     /// Formats the private channel, displaying the recipient's username.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_str(&self.recipient.name)
+        f.write_str(&self.recipient.read().unwrap().name)
     }
 }
 
@@ -2093,8 +2099,8 @@ impl GuildChannel {
     /// **Note**: Right now this performs a clone of the guild. This will be
     /// optimized in the future.
     #[cfg(feature="cache")]
-    pub fn guild(&self) -> Option<Guild> {
-        CACHE.read().unwrap().get_guild(self.guild_id).cloned()
+    pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> {
+        CACHE.read().unwrap().get_guild(self.guild_id)
     }
 
     /// Pins a [`Message`] to the channel.

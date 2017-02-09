@@ -1,6 +1,8 @@
 use serde_json::builder::ObjectBuilder;
+use std::borrow::Cow;
 use std::cmp::Ordering;
 use std::collections::HashMap;
+use std::sync::{Arc, RwLock};
 use std::fmt;
 use super::utils::{
     decode_emojis,
@@ -95,12 +97,15 @@ impl Emoji {
     /// [`Guild`]: struct.Guild.html
     #[cfg(feature="cache")]
     pub fn find_guild_id(&self) -> Option<GuildId> {
-        CACHE.read()
-            .unwrap()
-            .guilds
-            .values()
-            .find(|guild| guild.emojis.contains_key(&self.id))
-            .map(|guild| guild.id)
+        for guild in CACHE.read().unwrap().guilds.values() {
+            let guild = guild.read().unwrap();
+
+            if guild.emojis.contains_key(&self.id) {
+                return Some(guild.id);
+            }
+        }
+
+        None
     }
 
     /// Generates a URL to the emoji's image.
@@ -161,7 +166,7 @@ impl Guild {
             None => return Err(Error::Client(ClientError::ItemMissing)),
         };
 
-        let perms = self.permissions_for(ChannelId(self.id.0), member.user.id);
+        let perms = self.permissions_for(ChannelId(self.id.0), member.user.read().unwrap().id);
         permissions.remove(perms);
 
         Ok(permissions.is_empty())
@@ -387,23 +392,23 @@ impl Guild {
 
         let id = remove(&mut map, "id").and_then(GuildId::decode)?;
 
-        let public_channels = {
-            let mut public_channels = HashMap::new();
+        let channels = {
+            let mut channels = HashMap::new();
 
             let vals = decode_array(remove(&mut map, "channels")?,
                 |v| GuildChannel::decode_guild(v, id))?;
 
-            for public_channel in vals {
-                public_channels.insert(public_channel.id, public_channel);
+            for channel in vals {
+                channels.insert(channel.id, Arc::new(RwLock::new(channel)));
             }
 
-            public_channels
+            channels
         };
 
         Ok(Guild {
             afk_channel_id: opt(&mut map, "afk_channel_id", ChannelId::decode)?,
             afk_timeout: req!(remove(&mut map, "afk_timeout")?.as_u64()),
-            channels: public_channels,
+            channels: channels,
             default_message_notifications: req!(remove(&mut map, "default_message_notifications")?.as_u64()),
             emojis: remove(&mut map, "emojis").and_then(decode_emojis)?,
             features: remove(&mut map, "features").and_then(|v| decode_array(v, Feature::decode_str))?,
@@ -756,9 +761,9 @@ impl Guild {
         self.members
             .values()
             .find(|member| {
-                let name_matches = member.user.name == name;
+                let name_matches = member.user.read().unwrap().name == name;
                 let discrim_matches = match discrim {
-                    Some(discrim) => member.user.discriminator == discrim,
+                    Some(discrim) => member.user.read().unwrap().discriminator == discrim,
                     None => true,
                 };
 
@@ -889,7 +894,7 @@ impl Guild {
                 permissions |= role.permissions;
             } else {
                 warn!("(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
-                      member.user.id,
+                      member.user.read().unwrap().id,
                       self.id,
                       role);
             }
@@ -901,6 +906,8 @@ impl Guild {
         }
 
         if let Some(channel) = self.channels.get(&channel_id) {
+            let channel = channel.read().unwrap();
+
             // If this is a text channel, then throw out voice permissions.
             if channel.kind == ChannelType::Text {
                 permissions &= !(CONNECT | SPEAK | MUTE_MEMBERS |
@@ -1366,8 +1373,8 @@ impl GuildId {
 
     /// Search the cache for the guild.
     #[cfg(feature="cache")]
-    pub fn find(&self) -> Option<Guild> {
-        CACHE.read().unwrap().get_guild(*self).cloned()
+    pub fn find(&self) -> Option<Arc<RwLock<Guild>>> {
+        CACHE.read().unwrap().get_guild(*self)
     }
 
     /// Requests the guild over REST.
@@ -1650,7 +1657,7 @@ impl Member {
 
         let guild_id = self.find_guild()?;
 
-        match rest::add_member_role(guild_id.0, self.user.id.0, role_id.0) {
+        match rest::add_member_role(guild_id.0, self.user.read().unwrap().id.0, role_id.0) {
             Ok(()) => {
                 self.roles.push(role_id);
 
@@ -1674,7 +1681,7 @@ impl Member {
 
         let map = EditMember::default().roles(&self.roles).0.build();
 
-        match rest::edit_member(guild_id.0, self.user.id.0, map) {
+        match rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, map) {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.retain(|r| !role_ids.contains(r));
@@ -1699,7 +1706,7 @@ impl Member {
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature="cache")]
     pub fn ban(&self, delete_message_days: u8) -> Result<()> {
-        rest::ban_user(self.find_guild()?.0, self.user.id.0, delete_message_days)
+        rest::ban_user(self.find_guild()?.0, self.user.read().unwrap().id.0, delete_message_days)
     }
 
     /// Determines the member's colour.
@@ -1712,13 +1719,13 @@ impl Member {
 
         let cache = CACHE.read().unwrap();
         let guild = match cache.guilds.get(&guild_id) {
-            Some(guild) => guild,
+            Some(guild) => guild.read().unwrap(),
             None => return None,
         };
 
         let mut roles = self.roles
             .iter()
-            .filter_map(|id| guild.roles.get(id))
+            .filter_map(|role_id| guild.roles.get(role_id))
             .collect::<Vec<&Role>>();
         roles.sort_by(|a, b| b.cmp(a));
 
@@ -1731,14 +1738,16 @@ impl Member {
     ///
     /// The nickname takes priority over the member's username if it exists.
     #[inline]
-    pub fn display_name(&self) -> &str {
-        self.nick.as_ref().unwrap_or(&self.user.name)
+    pub fn display_name(&self) -> Cow<String> {
+        self.nick.as_ref()
+            .map(Cow::Borrowed)
+            .unwrap_or_else(|| Cow::Owned(self.user.read().unwrap().name.clone()))
     }
 
     /// Returns the DiscordTag of a Member, taking possible nickname into account.
     #[inline]
     pub fn distinct(&self) -> String {
-        format!("{}#{}", self.display_name(), self.user.discriminator)
+        format!("{}#{}", self.display_name(), self.user.read().unwrap().discriminator)
     }
 
     /// Edits the member with the given data. See [`Context::edit_member`] for
@@ -1754,7 +1763,7 @@ impl Member {
         let guild_id = self.find_guild()?;
         let map = f(EditMember::default()).0.build();
 
-        rest::edit_member(guild_id.0, self.user.id.0, map)
+        rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, map)
     }
 
     /// Finds the Id of the [`Guild`] that the member is in.
@@ -1768,22 +1777,19 @@ impl Member {
     /// [`Guild`]: struct.Guild.html
     #[cfg(feature="cache")]
     pub fn find_guild(&self) -> Result<GuildId> {
-        CACHE.read()
-            .unwrap()
-            .guilds
-            .values()
-            .find(|guild| {
-                guild.members
-                    .values()
-                    .any(|member| {
-                        let joined_at = member.joined_at == self.joined_at;
-                        let user_id = member.user.id == self.user.id;
+        for guild in CACHE.read().unwrap().guilds.values() {
+            let guild = guild.read().unwrap();
 
-                        joined_at && user_id
-                    })
-            })
-            .map(|x| x.id)
-            .ok_or(Error::Client(ClientError::GuildNotFound))
+            let predicate = guild.members
+                .values()
+                .any(|m| m.joined_at == self.joined_at && m.user.read().unwrap().id == self.user.read().unwrap().id);
+
+            if predicate {
+                return Ok(guild.id);
+            }
+        }
+
+        Err(Error::Client(ClientError::GuildNotFound))
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the
@@ -1803,7 +1809,7 @@ impl Member {
 
         let guild_id = self.find_guild()?;
 
-        match rest::remove_member_role(guild_id.0, self.user.id.0, role_id.0) {
+        match rest::remove_member_role(guild_id.0, self.user.read().unwrap().id.0, role_id.0) {
             Ok(()) => {
                 self.roles.retain(|r| r.0 != role_id.0);
 
@@ -1826,7 +1832,7 @@ impl Member {
 
         let map = EditMember::default().roles(&self.roles).0.build();
 
-        match rest::edit_member(guild_id.0, self.user.id.0, map) {
+        match rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, map) {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);
@@ -1846,12 +1852,18 @@ impl Member {
         CACHE.read().unwrap()
             .guilds
             .values()
-            .find(|g| g.members
+            .find(|guild| guild
+                .read()
+                .unwrap()
+                .members
                 .values()
-                .any(|m| m.user.id == self.user.id && m.joined_at == *self.joined_at))
-            .map(|g| g.roles
+                .any(|m| m.user.read().unwrap().id == self.user.read().unwrap().id && m.joined_at == *self.joined_at))
+            .map(|guild| guild
+                .read()
+                .unwrap()
+                .roles
                 .values()
-                .filter(|r| self.roles.contains(&r.id))
+                .filter(|role| self.roles.contains(&role.id))
                 .cloned()
                 .collect())
     }
@@ -1870,7 +1882,7 @@ impl Member {
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature="cache")]
     pub fn unban(&self) -> Result<()> {
-        rest::remove_ban(self.find_guild()?.0, self.user.id.0)
+        rest::remove_ban(self.find_guild()?.0, self.user.read().unwrap().id.0)
     }
 }
 
@@ -1886,7 +1898,7 @@ impl fmt::Display for Member {
     ///
     // This is in the format of `<@USER_ID>`.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Display::fmt(&self.user.mention(), f)
+        fmt::Display::fmt(&self.user.read().unwrap().mention(), f)
     }
 }
 
@@ -2457,13 +2469,15 @@ impl Role {
     /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
     #[cfg(feature="cache")]
     pub fn find_guild(&self) -> Result<GuildId> {
-        CACHE.read()
-            .unwrap()
-            .guilds
-            .values()
-            .find(|guild| guild.roles.contains_key(&RoleId(self.id.0)))
-            .map(|x| x.id)
-            .ok_or(Error::Client(ClientError::GuildNotFound))
+        for guild in CACHE.read().unwrap().guilds.values() {
+            let guild = guild.read().unwrap();
+
+            if guild.roles.contains_key(&RoleId(self.id.0)) {
+                return Ok(guild.id);
+            }
+        }
+
+        Err(Error::Client(ClientError::GuildNotFound))
     }
 
     /// Check that the role has the given permission.
@@ -2523,17 +2537,21 @@ impl RoleId {
     /// Search the cache for the role.
     #[cfg(feature="cache")]
     pub fn find(&self) -> Option<Role> {
-        CACHE.read()
-            .unwrap()
-            .guilds
-            .values()
-            .find(|guild| guild.roles.contains_key(self))
-            .map(|guild| guild.roles.get(self))
-            .and_then(|v| match v {
-                Some(v) => Some(v),
-                None => None,
-            })
-            .cloned()
+        let cache = CACHE.read().unwrap();
+
+        for guild in cache.guilds.values() {
+            let guild = guild.read().unwrap();
+
+            if !guild.roles.contains_key(self) {
+                continue;
+            }
+
+            if let Some(role) = guild.roles.get(self) {
+                return Some(role.clone());
+            }
+        }
+
+        None
     }
 }
 

@@ -407,12 +407,12 @@ impl Context {
         #[cfg(feature="cache")]
         {
 
-            match channel_id.get()? {
-                Channel::Guild(ref c) if c.kind != ChannelType::Text &&
-                                         c.kind != ChannelType::Voice => {
-                    return Err(Error::Client(ClientError::UnexpectedChannelType(c.kind)));
-                },
-                _ => {},
+            if let Channel::Guild(ref channel) = channel_id.get()? {
+                let ch = channel.read().unwrap();
+
+                if ch.kind != ChannelType::Text && ch.kind != ChannelType::Voice {
+                    return Err(Error::Client(ClientError::UnexpectedChannelType(ch.kind)));
+                }
             }
         }
 

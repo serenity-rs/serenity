@@ -25,6 +25,22 @@ macro_rules! handler {
 }
 
 macro_rules! update {
+    ($method:ident, @$event:expr) => {
+        {
+            #[cfg(feature="cache")]
+            {
+                CACHE.write().unwrap().$method(&mut $event)
+            }
+        }
+    };
+    ($method:ident, @$event:expr, $old:expr) => {
+        {
+            #[cfg(feature="cache")]
+            {
+                CACHE.write().unwrap().$method(&mut $event, $old)
+            }
+        }
+    };
     ($method:ident, $event:expr) => {
         {
             #[cfg(feature="cache")]
@@ -107,7 +123,7 @@ fn dispatch_message(context: Context,
     }
 }
 
-#[allow(cyclomatic_complexity)]
+#[allow(cyclomatic_complexity, unused_mut)]
 fn handle_event(event: Event,
                 conn: &Arc<Mutex<Shard>>,
                 data: &Arc<Mutex<ShareMap>>,
@@ -207,8 +223,8 @@ fn handle_event(event: Event,
                 thread::spawn(move || (handler)(context, event));
             }
         },
-        Event::ChannelRecipientAdd(event) => {
-            update!(update_with_channel_recipient_add, event);
+        Event::ChannelRecipientAdd(mut event) => {
+            update!(update_with_channel_recipient_add, @event);
 
             if let Some(handler) = handler!(on_channel_recipient_addition, event_store) {
                 let context = context(Some(event.channel_id),
@@ -241,8 +257,7 @@ fn handle_event(event: Event,
                 feature_cache! {{
                     let before = CACHE.read()
                         .unwrap()
-                        .get_channel(event.channel.id())
-                        .map(|x| x.clone_inner());
+                        .get_channel(event.channel.id());
                     update!(update_with_channel_update, event);
 
                     thread::spawn(move || (handler)(context, before, event.channel));
@@ -324,8 +339,8 @@ fn handle_event(event: Event,
                 thread::spawn(move || (handler)(context, event.guild_id));
             }
         },
-        Event::GuildMemberAdd(event) => {
-            update!(update_with_guild_member_add, event);
+        Event::GuildMemberAdd(mut event) => {
+            update!(update_with_guild_member_add, @event);
 
             if let Some(handler) = handler!(on_guild_member_addition, event_store) {
                 let context = context(None, conn, data, login_type);
@@ -516,8 +531,8 @@ fn handle_event(event: Event,
                 thread::spawn(move || (handler)(context, event.presences));
             }
         },
-        Event::PresenceUpdate(event) => {
-            update!(update_with_presence_update, event);
+        Event::PresenceUpdate(mut event) => {
+            update!(update_with_presence_update, @event);
 
             if let Some(handler) = handler!(on_presence_update, event_store) {
                 let context = context(None, conn, data, login_type);

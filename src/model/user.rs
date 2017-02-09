@@ -24,6 +24,8 @@ use ::utils::builder::EditProfile;
 use ::utils::decode_array;
 
 #[cfg(feature="cache")]
+use std::sync::{Arc, RwLock};
+#[cfg(feature="cache")]
 use ::client::CACHE;
 
 impl CurrentUser {
@@ -87,7 +89,6 @@ impl CurrentUser {
     }
 
     /// Gets a list of guilds that the current user is in.
-    #[inline]
     pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
         rest::get_guilds(GuildPagination::After(GuildId(1)), 100)
     }
@@ -191,15 +192,36 @@ impl User {
     ///
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     /// [`User::dm`]: struct.User.html#method.dm
+    // A tale with Clippy:
+    //
+    // A person named Clippy once asked you to unlock a box and take something
+    // from it, but you never re-locked it, so you'll die and the universe will
+    // implode because the box must remain locked unless you're there, and you
+    // can't just borrow that item from it and take it with you forever.
+    //
+    // Instead what you do is unlock the box, take the item out of it, make a
+    // copy of said item, and then re-lock the box, and take your copy of the
+    // item with you.
+    //
+    // The universe is still fine, and nothing implodes.
+    //
+    // (AKA: Clippy is wrong and so we have to mark as allowing this lint.)
+    #[allow(let_and_return)]
     pub fn direct_message(&self, content: &str)
         -> Result<Message> {
         let private_channel_id = feature_cache! {{
-            let finding = CACHE.read()
-                .unwrap()
-                .private_channels
-                .values()
-                .find(|ch| ch.recipient.id == self.id)
-                .map(|ch| ch.id);
+            let finding = {
+                let cache = CACHE.read().unwrap();
+
+                let finding = cache.private_channels
+                    .values()
+                    .map(|ch| ch.read().unwrap())
+                    .find(|ch| ch.recipient.read().unwrap().id == self.id)
+                    .map(|ch| ch.id)
+                    .clone();
+
+                finding
+            };
 
             if let Some(finding) = finding {
                 finding
@@ -331,7 +353,7 @@ impl User {
                         .unwrap()
                         .guilds
                         .get(&_guild_id)
-                        .map(|g| g.roles.contains_key(&role_id))
+                        .map(|g| g.read().unwrap().roles.contains_key(&role_id))
                         .unwrap_or(false)
                 } else {
                     true
@@ -393,8 +415,8 @@ impl UserId {
 
     /// Search the cache for the user with the Id.
     #[cfg(feature="cache")]
-    pub fn find(&self) -> Option<User> {
-        CACHE.read().unwrap().get_user(*self).cloned()
+    pub fn find(&self) -> Option<Arc<RwLock<User>>> {
+        CACHE.read().unwrap().get_user(*self)
     }
 
     /// Gets a user by its Id over the REST API.
@@ -416,7 +438,7 @@ impl From<CurrentUser> for UserId {
 impl From<Member> for UserId {
     /// Gets the Id of a `Member`.
     fn from(member: Member) -> UserId {
-        member.user.id
+        member.user.read().unwrap().id
     }
 }
 
