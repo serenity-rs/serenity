@@ -37,8 +37,7 @@ impl Manager {
     }
 
     /// Retrieves a mutable handler for the given target, if one exists.
-    pub fn get<T: Into<Target>>(&mut self, target_id: T)
-        -> Option<&mut Handler> {
+    pub fn get<T: Into<Target>>(&mut self, target_id: T) -> Option<&mut Handler> {
         self.handlers.get_mut(&target_id.into())
     }
 
@@ -64,8 +63,7 @@ impl Manager {
     /// [`Handler`]: struct.Handler.html
     /// [`get`]: #method.get
     #[allow(map_entry)]
-    pub fn join(&mut self, guild_id: Option<GuildId>, channel_id: ChannelId)
-        -> &mut Handler {
+    pub fn join(&mut self, guild_id: Option<GuildId>, channel_id: ChannelId) -> &mut Handler {
         if let Some(guild_id) = guild_id {
             let target = Target::Guild(guild_id);
 

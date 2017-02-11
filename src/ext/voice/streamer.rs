@@ -37,6 +37,7 @@ impl<R: Read + Send> AudioSource for PcmSource<R> {
     }
 }
 
+/// Opens an audio file through `ffmpeg` and creates an audio source.
 pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Box<AudioSource>> {
     let path = path.as_ref();
 
@@ -72,11 +73,13 @@ pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Box<AudioSource>> {
     Ok(pcm(is_stereo, ChildContainer(command)))
 }
 
+/// Creates a PCM audio source.
 pub fn pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R)
     -> Box<AudioSource> {
     Box::new(PcmSource(is_stereo, reader))
 }
 
+/// Creates a streamed audio source with `youtube-dl` and `ffmpeg`.
 pub fn ytdl(uri: &str) -> Result<Box<AudioSource>> {
     let args = [
         "-f",
