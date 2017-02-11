@@ -564,7 +564,7 @@ impl Cache {
                     .get_mut(&guild_id)
                     .and_then(|guild| {
                         guild.write().unwrap().channels.insert(channel_id, channel.clone())
-                    })
+                    }).map(Channel::Guild)
             },
             Channel::Private(ref channel) => {
                 let channel = channel.clone();
@@ -608,6 +608,7 @@ impl Cache {
                 self.guilds
                     .get_mut(&guild_id)
                     .and_then(|guild| guild.write().unwrap().channels.remove(&channel_id))
+                    .map(Channel::Guild)
             },
         }
     }
