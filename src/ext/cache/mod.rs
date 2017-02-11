@@ -382,7 +382,8 @@ impl Cache {
     /// [`Guild`]: ../../model/struct.Guild.html
     /// [`get_channel`]: #method.get_channel
     #[inline]
-    pub fn get_guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<GuildChannel>>> {
+    pub fn get_guild_channel<C: Into<ChannelId>>(&self, id: C)
+        -> Option<Arc<RwLock<GuildChannel>>> {
         self.channels.get(&id.into()).cloned()
     }
 
@@ -459,7 +460,8 @@ impl Cache {
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`ChannelId`].
     #[inline]
-    pub fn get_private_channel<C: Into<ChannelId>>(&self, channel_id: C) -> Option<Arc<RwLock<PrivateChannel>>> {
+    pub fn get_private_channel<C: Into<ChannelId>>(&self, channel_id: C)
+        -> Option<Arc<RwLock<PrivateChannel>>> {
         self.private_channels.get(&channel_id.into()).cloned()
     }
 
@@ -471,8 +473,7 @@ impl Cache {
     /// [`Guild`]: ../../model/struct.Guild.html
     /// [`roles`]: ../../model/struct.Guild.html#structfield.roles
     pub fn get_role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
-        where G: Into<GuildId>, R: Into<RoleId>
-    {
+        where G: Into<GuildId>, R: Into<RoleId> {
         self.guilds
             .get(&guild_id.into())
             .and_then(|g| g.read().unwrap().roles.get(&role_id.into()).cloned())
@@ -495,15 +496,16 @@ impl Cache {
         match self.calls.entry(event.call.channel_id) {
             Entry::Vacant(e) => {
                 e.insert(Arc::new(RwLock::new(event.call.clone())));
-            }
+            },
             Entry::Occupied(mut e) => {
                 *e.get_mut() = Arc::new(RwLock::new(event.call.clone()));
-            }
+            },
         }
     }
 
     #[doc(hidden)]
-    pub fn update_with_call_delete(&mut self, event: &CallDeleteEvent) -> Option<Arc<RwLock<Call>>> {
+    pub fn update_with_call_delete(&mut self, event: &CallDeleteEvent)
+        -> Option<Arc<RwLock<Call>>> {
         self.calls.remove(&event.channel_id)
     }
 
@@ -666,7 +668,7 @@ impl Cache {
                 match self.groups.entry(ch_id) {
                     Entry::Vacant(e) => {
                         e.insert(group.clone());
-                    }
+                    },
                     Entry::Occupied(mut e) => {
                         let mut dest = e.get_mut().write().unwrap();
 
@@ -679,7 +681,7 @@ impl Cache {
                         } else {
                             dest.clone_from(&group.read().unwrap());
                         }
-                    }
+                    },
                 }
             },
             Channel::Guild(ref channel) => {
@@ -703,8 +705,8 @@ impl Cache {
                 self.private_channels
                     .get_mut(&channel.read().unwrap().id)
                     .map(|private| private.clone_from(channel));
-            }
-        },
+            },
+        }
     }
 
     #[doc(hidden)]
@@ -725,7 +727,8 @@ impl Cache {
     }
 
     #[doc(hidden)]
-    pub fn update_with_guild_delete(&mut self, event: &GuildDeleteEvent) -> Option<Arc<RwLock<Guild>>> {
+    pub fn update_with_guild_delete(&mut self, event: &GuildDeleteEvent)
+        -> Option<Arc<RwLock<Guild>>> {
         // Remove channel entries for the guild if the guild is found.
         self.guilds.remove(&event.guild.id).map(|guild| {
             for channel_id in guild.read().unwrap().channels.keys() {
@@ -774,7 +777,8 @@ impl Cache {
     }
 
     #[doc(hidden)]
-    pub fn update_with_guild_member_update(&mut self, event: &GuildMemberUpdateEvent) -> Option<Member> {
+    pub fn update_with_guild_member_update(&mut self, event: &GuildMemberUpdateEvent)
+        -> Option<Member> {
         self.update_user_entry(&event.user);
 
         if let Some(guild) = self.guilds.get_mut(&event.guild_id) {
@@ -955,10 +959,10 @@ impl Cache {
             match channel {
                 Channel::Group(group) => {
                     self.groups.insert(channel_id, group);
-                }
+                },
                 Channel::Private(channel) => {
                     self.private_channels.insert(channel_id, channel);
-                }
+                },
                 Channel::Guild(guild) => warn!("Got a guild in DMs: {:?}", guild),
             }
         }
@@ -997,7 +1001,8 @@ impl Cache {
     }
 
     #[doc(hidden)]
-    pub fn update_with_user_guild_settings_update(&mut self, event: &UserGuildSettingsUpdateEvent) -> Option<UserGuildSettings> {
+    pub fn update_with_user_guild_settings_update(&mut self, event: &UserGuildSettingsUpdateEvent)
+        -> Option<UserGuildSettings> {
         self.guild_settings
             .get_mut(&event.settings.guild_id)
             .map(|guild_setting| mem::replace(guild_setting, event.settings.clone()))
@@ -1013,7 +1018,8 @@ impl Cache {
     }
 
     #[doc(hidden)]
-    pub fn update_with_user_settings_update(&mut self, event: &UserSettingsUpdateEvent, old: bool) -> Option<UserSettings> {
+    pub fn update_with_user_settings_update(&mut self, event: &UserSettingsUpdateEvent, old: bool)
+        -> Option<UserSettings> {
         let item = if old { self.settings.clone() } else { None };
 
         self.settings
@@ -1100,7 +1106,7 @@ impl Cache {
         match self.users.entry(user.id) {
             Entry::Vacant(e) => {
                 e.insert(Arc::new(RwLock::new(user.clone())));
-            }
+            },
             Entry::Occupied(mut e) => {
                 e.get_mut().write().unwrap().clone_from(user);
             }
