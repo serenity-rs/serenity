@@ -1020,7 +1020,11 @@ impl Cache {
     #[doc(hidden)]
     pub fn update_with_user_settings_update(&mut self, event: &UserSettingsUpdateEvent, old: bool)
         -> Option<UserSettings> {
-        let item = if old { self.settings.clone() } else { None };
+        let item = if old {
+            self.settings.clone()
+        } else {
+            None
+        };
 
         self.settings
             .as_mut()
