@@ -12,7 +12,7 @@ pub use self::audio::{AudioReceiver, AudioSource};
 pub use self::error::VoiceError;
 pub use self::handler::Handler;
 pub use self::manager::Manager;
-pub use self::streamer::{ffmpeg, ytdl};
+pub use self::streamer::{ffmpeg, pcm, ytdl};
 
 use self::connection_info::ConnectionInfo;
 use ::model::{ChannelId, GuildId};
