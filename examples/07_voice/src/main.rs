@@ -44,7 +44,7 @@ fn main() {
 
 command!(deafen(context, message) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
-        Some(channel) => channel.guild_id,
+        Some(channel) => channel.read().unwrap().guild_id,
         None => {
             check_msg(context.say("Groups and DMs not supported"));
 
@@ -90,7 +90,7 @@ command!(join(context, message, args) {
     };
 
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
-        Some(channel) => channel.guild_id,
+        Some(channel) => channel.read().unwrap().guild_id,
         None => {
             check_msg(context.say("Groups and DMs not supported"));
 
@@ -106,7 +106,7 @@ command!(join(context, message, args) {
 
 command!(leave(context, message) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
-        Some(channel) => channel.guild_id,
+        Some(channel) => channel.read().unwrap().guild_id,
         None => {
             check_msg(context.say("Groups and DMs not supported"));
 
@@ -128,7 +128,7 @@ command!(leave(context, message) {
 
 command!(mute(context, message) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
-        Some(channel) => channel.guild_id,
+        Some(channel) => channel.read().unwrap().guild_id,
         None => {
             check_msg(context.say("Groups and DMs not supported"));
 
@@ -177,7 +177,7 @@ command!(play(context, message, args) {
     }
 
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
-        Some(channel) => channel.guild_id,
+        Some(channel) => channel.read().unwrap().guild_id,
         None => {
             check_msg(context.say("Error finding channel info"));
 
@@ -207,7 +207,7 @@ command!(play(context, message, args) {
 
 command!(undeafen(context, message) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
-        Some(channel) => channel.guild_id,
+        Some(channel) => channel.read().unwrap().guild_id,
         None => {
             check_msg(context.say("Error finding channel info"));
 
@@ -226,7 +226,7 @@ command!(undeafen(context, message) {
 
 command!(unmute(context, message) {
     let guild_id = match CACHE.read().unwrap().get_guild_channel(message.channel_id) {
-        Some(channel) => channel.guild_id,
+        Some(channel) => channel.read().unwrap().guild_id,
         None => {
             check_msg(context.say("Error finding channel info"));
 

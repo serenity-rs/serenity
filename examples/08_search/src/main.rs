@@ -73,11 +73,14 @@ command!(search(context, message, args) {
             },
         };
 
-        guild.channels
+        let channel_ids = guild.read().unwrap()
+            .channels
             .values()
-            .filter(|c| c.name.starts_with("search-"))
-            .map(|c| c.id)
-            .collect::<Vec<_>>()
+            .filter(|c| c.read().unwrap().name.starts_with("search-"))
+            .map(|c| c.read().unwrap().id)
+            .collect::<Vec<_>>();
+
+        channel_ids.clone()
     };
 
     let search = guild_id.search_channels(&channel_ids, |s| s
