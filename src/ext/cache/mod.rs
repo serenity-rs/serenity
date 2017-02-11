@@ -451,12 +451,7 @@ impl Cache {
         where G: Into<GuildId>, U: Into<UserId> {
         self.guilds
             .get(&guild_id.into())
-            .map(|guild| {
-                guild.write().unwrap().members.get(&user_id.into()).cloned()
-            }).and_then(|x| match x {
-                Some(x) => Some(x),
-                None => None,
-            })
+            .and_then(|guild| guild.write().unwrap().members.get(&user_id.into()).cloned())
     }
 
     /// Retrieves a [`PrivateChannel`] from the cache's [`private_channels`]
@@ -479,12 +474,9 @@ impl Cache {
     /// [`roles`]: ../../model/struct.Guild.html#structfield.roles
     pub fn get_role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
         where G: Into<GuildId>, R: Into<RoleId> {
-        self.guilds.get(&guild_id.into())
-            .map(|g| g.read().unwrap().roles.get(&role_id.into()).cloned())
-            .and_then(|x| match x {
-                Some(x) => Some(x),
-                None => None,
-            })
+        self.guilds
+            .get(&guild_id.into())
+            .and_then(|g| g.read().unwrap().roles.get(&role_id.into()).cloned())
     }
 
     /// Retrieves a `User` from the cache's [`users`] map, if it exists.
@@ -569,16 +561,11 @@ impl Cache {
 
                 self.channels.insert(channel_id, channel.clone());
 
-                let ch = self.guilds
+                self.guilds
                     .get_mut(&guild_id)
-                    .map(|guild| {
+                    .and_then(|guild| {
                         guild.write().unwrap().channels.insert(channel_id, channel.clone())
-                    });
-
-                match ch {
-                    Some(Some(ch)) => Some(Channel::Guild(ch)),
-                    _ => None,
-                }
+                    }).map(Channel::Guild)
             },
             Channel::Private(ref channel) => {
                 let channel = channel.clone();
@@ -619,14 +606,10 @@ impl Cache {
 
                 self.channels.remove(&channel_id);
 
-                let ch = self.guilds
+                self.guilds
                     .get_mut(&guild_id)
-                    .map(|guild| guild.write().unwrap().channels.remove(&channel_id));
-
-                match ch {
-                    Some(Some(ch)) => Some(Channel::Guild(ch)),
-                    _ => None,
-                }
+                    .and_then(|guild| guild.write().unwrap().channels.remove(&channel_id))
+                    .map(Channel::Guild)
             },
         }
     }
@@ -692,8 +675,7 @@ impl Cache {
                         let mut dest = e.get_mut().write().unwrap();
 
                         if no_recipients {
-                            let recipients = mem::replace(&mut dest.recipients,
-                                                          HashMap::new());
+                            let recipients = mem::replace(&mut dest.recipients, HashMap::new());
 
                             dest.clone_from(&group.read().unwrap());
 
@@ -719,7 +701,7 @@ impl Cache {
                             .unwrap()
                             .channels
                             .insert(channel_id, channel.clone())
-                        });
+                    });
             },
             Channel::Private(ref channel) => {
                 self.private_channels
@@ -787,19 +769,14 @@ impl Cache {
     #[doc(hidden)]
     pub fn update_with_guild_member_remove(&mut self, event: &GuildMemberRemoveEvent)
         -> Option<Member> {
-        let member = self.guilds
+        self.guilds
             .get_mut(&event.guild_id)
-            .map(|guild| {
+            .and_then(|guild| {
                 let mut guild = guild.write().unwrap();
 
                 guild.member_count -= 1;
                 guild.members.remove(&event.user.id)
-            });
-
-        match member {
-            Some(Some(member)) => Some(member),
-            _ => None,
-        }
+            })
     }
 
     #[doc(hidden)]
@@ -851,50 +828,34 @@ impl Cache {
 
         self.guilds
             .get_mut(&event.guild_id)
-            .map(|guild| {
-                guild.write().unwrap().members.extend(event.members.clone())
-            });
+            .map(|guild| guild.write().unwrap().members.extend(event.members.clone()));
     }
 
     #[doc(hidden)]
     pub fn update_with_guild_role_create(&mut self, event: &GuildRoleCreateEvent) {
         self.guilds
             .get_mut(&event.guild_id)
-            .map(|guild| {
-                guild.write().unwrap().roles.insert(event.role.id, event.role.clone())
-            });
+            .map(|guild| guild.write().unwrap().roles.insert(event.role.id, event.role.clone()));
     }
 
     #[doc(hidden)]
     pub fn update_with_guild_role_delete(&mut self, event: &GuildRoleDeleteEvent) -> Option<Role> {
-        let role = self.guilds
+        self.guilds
             .get_mut(&event.guild_id)
-            .map(|guild| {
-                guild.write().unwrap().roles.remove(&event.role_id)
-            });
-
-        match role {
-            Some(Some(x)) => Some(x),
-            _ => None,
-        }
+            .and_then(|guild| guild.write().unwrap().roles.remove(&event.role_id))
     }
 
     #[doc(hidden)]
     pub fn update_with_guild_role_update(&mut self, event: &GuildRoleUpdateEvent) -> Option<Role> {
-        let item = self.guilds
+        self.guilds
             .get_mut(&event.guild_id)
-            .map(|guild| {
+            .and_then(|guild| {
                 guild.write()
                     .unwrap()
                     .roles
                     .get_mut(&event.role.id)
                     .map(|role| mem::replace(role, event.role.clone()))
-            });
-
-        match item {
-            Some(Some(x)) => Some(x),
-            _ => None,
-        }
+            })
     }
 
     #[doc(hidden)]
@@ -1109,8 +1070,7 @@ impl Cache {
                         }
                     }
 
-                    guild.voice_states.insert(event.voice_state.user_id,
-                                              event.voice_state.clone());
+                    guild.voice_states.insert(event.voice_state.user_id, event.voice_state.clone());
                 } else {
                     // Remove the user from the voice state list
                     guild.voice_states.remove(&event.voice_state.user_id);
