@@ -510,7 +510,8 @@ impl Cache {
     }
 
     #[doc(hidden)]
-    pub fn update_with_call_update(&mut self, event: &CallUpdateEvent, old: bool) -> Option<Arc<RwLock<Call>>> {
+    pub fn update_with_call_update(&mut self, event: &CallUpdateEvent, old: bool)
+        -> Option<Arc<RwLock<Call>>> {
         let item = if old {
             self.calls.get(&event.channel_id).cloned()
         } else {
@@ -766,7 +767,8 @@ impl Cache {
     }
 
     #[doc(hidden)]
-    pub fn update_with_guild_member_remove(&mut self, event: &GuildMemberRemoveEvent) -> Option<Member> {
+    pub fn update_with_guild_member_remove(&mut self, event: &GuildMemberRemoveEvent)
+        -> Option<Member> {
         self.guilds
             .get_mut(&event.guild_id)
             .and_then(|guild| {
