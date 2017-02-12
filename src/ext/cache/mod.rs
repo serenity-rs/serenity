@@ -932,10 +932,10 @@ impl Cache {
                     guild.presences.insert(event.presence.user_id, event.presence.clone());
                 }
             }
-        } else if event.presence.status != OnlineStatus::Offline {
-            self.presences.insert(event.presence.user_id, event.presence.clone());
-        } else {
+        } else if event.presence.status == OnlineStatus::Offline {
             self.presences.remove(&event.presence.user_id);
+        } else {
+            self.presences.insert(event.presence.user_id, event.presence.clone());
         }
     }
 

@@ -895,6 +895,7 @@ impl WebhookUpdateEvent {
     }
 }
 
+#[allow(large_enum_variant)]
 #[derive(Debug, Clone)]
 pub enum GatewayEvent {
     Dispatch(u64, Event),
@@ -937,6 +938,7 @@ impl GatewayEvent {
 }
 
 /// Event received over a websocket connection
+#[allow(large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum Event {
     /// A new group call has been created
