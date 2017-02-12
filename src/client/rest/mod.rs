@@ -33,7 +33,7 @@ use hyper::client::{
     Request,
 };
 use hyper::method::Method;
-use hyper::status::StatusCode;
+use hyper::status::{StatusClass, StatusCode};
 use hyper::{Error as HyperError, Result as HyperResult, Url, header};
 use multipart::client::Multipart;
 use self::ratelimiting::Route;
@@ -1584,9 +1584,15 @@ pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
 
 fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
     where F: Fn() -> RequestBuilder<'a> {
-    ratelimiting::perform(route, || f()
+    let response = ratelimiting::perform(route, || f()
         .header(header::Authorization(TOKEN.lock().unwrap().clone()))
-        .header(header::ContentType::json()))
+        .header(header::ContentType::json()))?;
+
+    if response.status.class() == StatusClass::Success {
+        Ok(response)
+    } else {
+        Err(Error::Client(ClientError::InvalidRequest(response.status)))
+    }
 }
 
 #[doc(hidden)]
@@ -1626,7 +1632,7 @@ fn verify(expected_status_code: u16, mut response: HyperResponse) -> Result<()> 
 
     debug!("Content: {}", s);
 
-    Err(Error::Client(ClientError::UnexpectedStatusCode(response.status)))
+    Err(Error::Client(ClientError::InvalidRequest(response.status)))
 }
 
 /// Representation of the method of a query to send for the [`get_guilds`]

@@ -142,7 +142,7 @@ pub enum Error {
     /// [`Context::edit_channel`]: struct.Context.html#method.edit_channel
     UnexpectedChannelType(ChannelType),
     /// When a status code was unexpectedly received for a request's status.
-    UnexpectedStatusCode(StatusCode),
+    InvalidRequest(StatusCode),
     /// When a status is received, but the verification to ensure the response
     /// is valid does not recognize the status.
     UnknownStatus(u16),
