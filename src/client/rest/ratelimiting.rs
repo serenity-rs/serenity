@@ -46,6 +46,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use std::{str, thread};
+use super::LightMethod;
 use time;
 use ::internal::prelude::*;
 
@@ -101,7 +102,13 @@ pub enum Route {
     ChannelsIdInvites(u64),
     ChannelsIdMessages(u64),
     ChannelsIdMessagesBulkDelete(u64),
-    ChannelsIdMessagesId(u64),
+    // This route is a unique case. The ratelimit for message _deletions_ is
+    // different than the overall route ratelimit.
+    //
+    // Refer to the docs on [Rate Limits] in the yellow warning section.
+    //
+    // [Rate Limits]: https://discordapp.com/developers/docs/topics/rate-limits
+    ChannelsIdMessagesId(LightMethod, u64),
     ChannelsIdMessagesIdAck(u64),
     ChannelsIdMessagesIdReactions(u64),
     ChannelsIdMessagesIdReactionsUserIdType(u64),
@@ -150,7 +157,6 @@ pub enum Route {
 #[doc(hidden)]
 pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
     where F: Fn() -> RequestBuilder<'a> {
-
     loop {
         {
             // This will block if another thread already has the global

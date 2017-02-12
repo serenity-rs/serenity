@@ -49,6 +49,25 @@ use ::internal::prelude::*;
 use ::model::*;
 use ::utils::decode_array;
 
+/// An method used for ratelimiting special routes.
+///
+/// This is needed because `hyper`'s `Method` enum does not derive Copy.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub enum LightMethod {
+    /// Indicates that a route is for "any" method.
+    Any,
+    /// Indicates that a route is for the `DELETE` method only.
+    Delete,
+    /// Indicates that a route is for the `GET` method only.
+    Get,
+    /// Indicates that a route is for the `PATCH` method only.
+    Patch,
+    /// Indicates that a route is for the `POST` method only.
+    Post,
+    /// Indicates that a route is for the `PUT` method only.
+    Put,
+}
+
 lazy_static! {
     static ref TOKEN: Arc<Mutex<String>> = Arc::new(Mutex::new(String::default()));
 }
@@ -450,7 +469,7 @@ pub fn delete_invite(code: &str) -> Result<Invite> {
 /// Deletes a message if created by us or we have
 /// specific permissions.
 pub fn delete_message(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(204, request!(Route::ChannelsIdMessagesId(channel_id),
+    verify(204, request!(Route::ChannelsIdMessagesId(LightMethod::Delete, channel_id),
                          delete,
                          "/channels/{}/messages/{}",
                          channel_id,
@@ -641,7 +660,7 @@ pub fn edit_member(guild_id: u64, user_id: u64, map: Value) -> Result<()> {
 /// **Note**: Only the author of a message can modify it.
 pub fn edit_message(channel_id: u64, message_id: u64, map: Value) -> Result<Message> {
     let body = serde_json::to_string(&map)?;
-    let response = request!(Route::ChannelsIdMessagesId(channel_id),
+    let response = request!(Route::ChannelsIdMessagesId(LightMethod::Any, channel_id),
                             patch(body),
                             "/channels/{}/messages/{}",
                             channel_id,
@@ -1197,7 +1216,7 @@ pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
 
 /// Gets a message by an Id, bots only.
 pub fn get_message(channel_id: u64, message_id: u64) -> Result<Message> {
-    let response = request!(Route::ChannelsIdMessagesId(channel_id),
+    let response = request!(Route::ChannelsIdMessagesId(LightMethod::Any, channel_id),
                             get,
                             "/channels/{}/messages/{}",
                             channel_id,
