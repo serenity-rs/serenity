@@ -26,6 +26,8 @@
 
 pub mod ratelimiting;
 
+pub use hyper::status::{StatusClass, StatusCode};
+
 use hyper::client::{
     Client as HyperClient,
     RequestBuilder,
@@ -33,7 +35,6 @@ use hyper::client::{
     Request,
 };
 use hyper::method::Method;
-use hyper::status::{StatusClass, StatusCode};
 use hyper::{Error as HyperError, Result as HyperResult, Url, header};
 use multipart::client::Multipart;
 use self::ratelimiting::Route;
