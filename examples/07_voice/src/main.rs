@@ -63,7 +63,7 @@ command!(deafen(context, message) {
         },
     };
 
-    if handler.is_deafened() {
+    if handler.self_deaf {
         check_msg(context.say("Already deafened"));
     } else {
         handler.deafen(true);
@@ -147,7 +147,7 @@ command!(mute(context, message) {
         },
     };
 
-    if handler.is_muted() {
+    if handler.self_mute {
         check_msg(context.say("Already muted"));
     } else {
         handler.mute(true);
