@@ -733,6 +733,27 @@ impl ChannelId {
         rest::get_pins(self.0)
     }
 
+    /// Sends a message with just the given message content in the channel that
+    /// a message was received from.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// Returns a [`ClientError::NoChannelId`] when there is no [`ChannelId`]
+    /// directly available; i.e. when not under the context of one of the above
+    /// events.
+    ///
+    /// [`ChannelId`]: ../model/struct.ChannelId.html
+    /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
+    /// [`ClientError::NoChannelId`]: enum.ClientError.html#NoChannelId
+    #[inline]
+    pub fn say(&self, content: &str) -> Result<Message> {
+        self.send_message(|m| m.content(content))
+    }
+
     /// Searches the channel's messages by providing query parameters via the
     /// search builder.
     ///

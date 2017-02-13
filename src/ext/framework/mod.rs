@@ -349,7 +349,7 @@ impl Framework {
                         if !is_owner {
                             if command.owners_only {
                                 if let Some(ref message) = self.configuration.invalid_permission_message {
-                                    let _ = context.say(message);
+                                    let _ = context.channel_id.unwrap().say(message);
                                 }
 
                                 return;
@@ -363,7 +363,7 @@ impl Framework {
                             {
                                 if !self.configuration.allow_dm && message.is_private() {
                                     if let Some(ref message) = self.configuration.no_dm_message {
-                                        let _ = context.say(message);
+                                        let _ = context.channel_id.unwrap().say(message);
                                     }
 
                                     return;
@@ -372,7 +372,7 @@ impl Framework {
 
                             if self.configuration.blocked_users.contains(&message.author.id) {
                                 if let Some(ref message) = self.configuration.blocked_user_message {
-                                    let _ = context.say(message);
+                                    let _ = context.channel_id.unwrap().say(message);
                                 }
 
                                 return;
@@ -383,7 +383,7 @@ impl Framework {
                                 if let Some(ref message) = self.configuration.command_disabled_message {
                                     let msg = message.replace("%command%", &to_check);
 
-                                    let _ = context.say(&msg);
+                                    let _ = context.channel_id.unwrap().say(&msg);
                                 }
 
                                 return;
@@ -396,7 +396,7 @@ impl Framework {
                                     if let Some(ref message) = self.configuration.rate_limit_message {
                                         let msg = message.replace("%time%", &rate_limit.to_string());
 
-                                        let _ = context.say(&msg);
+                                        let _ = context.channel_id.unwrap().say(&msg);
                                     }
 
                                     return;
@@ -416,7 +416,7 @@ impl Framework {
                                 if let Some(guild_id) = guild_id {
                                     if self.configuration.blocked_guilds.contains(&guild_id) {
                                         if let Some(ref message) = self.configuration.blocked_guild_message {
-                                            let _ = context.say(message);
+                                            let _ = context.channel_id.unwrap().say(message);
                                         }
 
                                         return;
@@ -425,7 +425,7 @@ impl Framework {
                                     if let Some(guild) = guild_id.find() {
                                         if self.configuration.blocked_users.contains(&guild.read().unwrap().owner_id) {
                                             if let Some(ref message) = self.configuration.blocked_guild_message {
-                                                let _ = context.say(message);
+                                                let _ = context.channel_id.unwrap().say(message);
                                             }
 
                                             return;
@@ -436,14 +436,14 @@ impl Framework {
                                 if message.is_private() {
                                     if command.guild_only {
                                         if let Some(ref message) = self.configuration.no_guild_message {
-                                            let _ = context.say(message);
+                                            let _ = context.channel_id.unwrap().say(message);
                                         }
 
                                         return;
                                     }
                                 } else if command.dm_only {
                                     if let Some(ref message) = self.configuration.no_dm_message {
-                                        let _ = context.say(message);
+                                        let _ = context.channel_id.unwrap().say(message);
                                     }
 
                                     return;
@@ -453,7 +453,7 @@ impl Framework {
                             for check in &command.checks {
                                 if !(check)(&mut context, &message) {
                                     if let Some(ref message) = self.configuration.invalid_check_message {
-                                        let _ = context.say(message);
+                                        let _ = context.channel_id.unwrap().say(message);
                                     }
 
                                     continue 'outer;
@@ -481,7 +481,7 @@ impl Framework {
                                     let msg = message.replace("%min%", &x.to_string())
                                         .replace("%given%", &args.len().to_string());
 
-                                    let _ = context.say(&msg);
+                                    let _ = context.channel_id.unwrap().say(&msg);
                                 }
 
                                 return;
@@ -494,7 +494,7 @@ impl Framework {
                                     let msg = message.replace("%max%", &x.to_string())
                                         .replace("%given%", &args.len().to_string());
 
-                                    let _ = context.say(&msg);
+                                    let _ = context.channel_id.unwrap().say(&msg);
                                 }
 
                                 return;
@@ -538,7 +538,7 @@ impl Framework {
 
                                 if !permissions_fulfilled {
                                     if let Some(ref message) = self.configuration.invalid_permission_message {
-                                        let _ = context.say(message);
+                                        let _ = context.channel_id.unwrap().say(message);
                                     }
 
                                     return;
@@ -555,7 +555,7 @@ impl Framework {
 
                             let result = match command.exec {
                                 CommandType::StringResponse(ref x) => {
-                                    let _ = &mut context.say(x);
+                                    let _ = &mut context.channel_id.unwrap().say(x);
 
                                     Ok(())
                                 },

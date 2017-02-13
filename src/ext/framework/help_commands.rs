@@ -8,7 +8,9 @@ use ::model::Message;
 use ::utils::Colour;
 
 fn error_embed(ctx: &mut Context, input: &str) {
-    let _ = ctx.send_message(|m| m
+    let _ = ctx.channel_id
+        .unwrap()
+        .send_message(|m| m
         .embed(|e| e
             .colour(Colour::dark_red())
             .description(input)));
@@ -63,7 +65,7 @@ pub fn with_embeds(ctx: &mut Context,
                     return Ok(());
                 }
 
-                let _ = ctx.send_message(|m| {
+                let _ = ctx.channel_id.unwrap().send_message(|m| {
                     m.embed(|e| {
                         let mut embed = e.colour(Colour::rosewater())
                             .title(command_name);
@@ -115,7 +117,7 @@ pub fn with_embeds(ctx: &mut Context,
         return Ok(());
     }
 
-    let _ = ctx.send_message(|m| m
+    let _ = ctx.channel_id.unwrap().send_message(|m| m
         .embed(|mut e| {
             e = e.colour(Colour::rosewater())
                 .description("To get help with an individual command, pass its \
@@ -174,7 +176,7 @@ pub fn plain(ctx: &mut Context,
                             found = Some((command_name, cmd));
                         },
                         CommandOrAlias::Alias(ref name) => {
-                            let _ = ctx.say(&format!("Did you mean {:?}?", name));
+                            let _ = ctx.channel_id.unwrap().say(&format!("Did you mean {:?}?", name));
                             return Ok(());
                         }
                     }
@@ -183,7 +185,7 @@ pub fn plain(ctx: &mut Context,
 
             if let Some((command_name, command)) = found {
                 if !command.help_available {
-                    let _ = ctx.say("**Error**: No help available.");
+                    let _ = ctx.channel_id.unwrap().say("**Error**: No help available.");
                     return Ok(());
                 }
 
@@ -215,13 +217,13 @@ pub fn plain(ctx: &mut Context,
                 });
                 result.push_str("\n");
 
-                let _ = ctx.say(&result);
+                let _ = ctx.channel_id.unwrap().say(&result);
 
                 return Ok(());
             }
         }
 
-        let _ = ctx.say(&format!("**Error**: Command `{}` not found.", name));
+        let _ = ctx.channel_id.unwrap().say(&format!("**Error**: Command `{}` not found.", name));
 
         return Ok(());
     }
@@ -254,7 +256,7 @@ pub fn plain(ctx: &mut Context,
         result.push('\n');
     }
 
-    let _ = ctx.say(&result);
+    let _ = ctx.channel_id.unwrap().say(&result);
 
     Ok(())
 }
