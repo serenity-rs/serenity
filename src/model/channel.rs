@@ -330,6 +330,21 @@ impl Channel {
         }
     }
 
+    /// Sends a message with just the given message content in the channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [`ChannelId`]: ../model/struct.ChannelId.html
+    /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
+    #[inline]
+    pub fn say(&self, content: &str) -> Result<Message> {
+        self.id().say(content)
+    }
+
     /// Performs a search request to the API for the inner channel's
     /// [`Message`]s.
     ///
@@ -733,8 +748,7 @@ impl ChannelId {
         rest::get_pins(self.0)
     }
 
-    /// Sends a message with just the given message content in the channel that
-    /// a message was received from.
+    /// Sends a message with just the given message content in the channel.
     ///
     /// # Errors
     ///
@@ -742,13 +756,8 @@ impl ChannelId {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// Returns a [`ClientError::NoChannelId`] when there is no [`ChannelId`]
-    /// directly available; i.e. when not under the context of one of the above
-    /// events.
-    ///
     /// [`ChannelId`]: ../model/struct.ChannelId.html
     /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
-    /// [`ClientError::NoChannelId`]: enum.ClientError.html#NoChannelId
     #[inline]
     pub fn say(&self, content: &str) -> Result<Message> {
         self.send_message(|m| m.content(content))
@@ -1113,6 +1122,21 @@ impl Group {
         }
 
         rest::remove_group_recipient(self.channel_id.0, user.0)
+    }
+
+    /// Sends a message with just the given message content in the channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [`ChannelId`]: ../model/struct.ChannelId.html
+    /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
+    #[inline]
+    pub fn say(&self, content: &str) -> Result<Message> {
+        self.channel_id.say(content)
     }
 
     /// Performs a search request to the API for the group's channel's
@@ -1718,6 +1742,21 @@ impl PrivateChannel {
         self.id.pins()
     }
 
+    /// Sends a message with just the given message content in the channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [`ChannelId`]: ../model/struct.ChannelId.html
+    /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
+    #[inline]
+    pub fn say(&self, content: &str) -> Result<Message> {
+        self.id.say(content)
+    }
+
     /// Performs a search request to the API for the channel's [`Message`]s.
     ///
     /// Refer to the documentation for the [`Search`] builder for examples and
@@ -2134,6 +2173,21 @@ impl GuildChannel {
     #[inline]
     pub fn pins(&self) -> Result<Vec<Message>> {
         self.id.pins()
+    }
+
+    /// Sends a message with just the given message content in the channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [`ChannelId`]: ../model/struct.ChannelId.html
+    /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
+    #[inline]
+    pub fn say(&self, content: &str) -> Result<Message> {
+        self.id.say(content)
     }
 
     /// Performs a search request for the channel's [`Message`]s.

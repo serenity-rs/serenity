@@ -1,7 +1,7 @@
 use serde_json::builder::ObjectBuilder;
 use std::sync::{Arc, Mutex};
 use super::gateway::Shard;
-use super::rest::{self, GuildPagination};
+use super::rest;
 use super::login_type::LoginType;
 use typemap::ShareMap;
 use ::utils::builder::EditProfile;
