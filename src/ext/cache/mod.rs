@@ -368,7 +368,7 @@ impl Cache {
     /// let channel = match cache.get_guild_channel(message.channel_id) {
     ///     Some(channel) => channel,
     ///     None => {
-    ///         if let Err(why) = context.say("Could not find guild's channel data") {
+    ///         if let Err(why) = message.channel_id.say("Could not find guild's channel data") {
     ///             println!("Error sending message: {:?}", why);
     ///         }
     ///
@@ -414,14 +414,12 @@ impl Cache {
     /// ```rust,ignore
     /// use serenity::client::CACHE;
     ///
-    /// // assuming you are in a context
-    ///
     /// let cache = CACHE.read().unwrap();
     /// let member = {
     ///     let channel = match cache.get_guild_channel(message.channel_id) {
     ///         Some(channel) => channel,
     ///         None => {
-    ///             if let Err(why) = context.say("Error finding channel data") {
+    ///             if let Err(why) = message.channel_id.say("Error finding channel data") {
     ///                 println!("Error sending message: {:?}", why);
     ///             }
     ///         },
@@ -430,7 +428,7 @@ impl Cache {
     ///     match cache.get_member(channel.guild_id, message.author.id) {
     ///         Some(member) => member,
     ///         None => {
-    ///             if let Err(why) = context.say("Error finding member data") {
+    ///             if let Err(why) = message.channel_id.say("Error finding member data") {
     ///                 println!("Error sending message: {:?}", why);
     ///             }
     ///         },
@@ -439,7 +437,7 @@ impl Cache {
     ///
     /// let msg = format!("You have {} roles", member.roles.len());
     ///
-    /// if let Err(why) = context.say(&msg) {
+    /// if let Err(why) = message.channel_id.say(&msg) {
     ///     println!("Error sending message: {:?}", why);
     /// }
     /// ```

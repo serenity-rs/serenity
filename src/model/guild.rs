@@ -358,9 +358,9 @@ impl Guild {
     /// Create a role which can be mentioned, with the name 'test':
     ///
     /// ```rust,ignore
-    /// let role = context.create_role(guild_id, |r| r
-    ///     .hoist(true)
-    ///     .name("role"));
+    /// // assuming a `guild` has been bound
+    ///
+    /// let role = guild.create_role(|r| r.hoist(true).name("role"));
     /// ```
     ///
     /// # Errors
@@ -2446,7 +2446,9 @@ impl Role {
     /// Make a role hoisted:
     ///
     /// ```rust,ignore
-    /// context.edit_role(guild_id, role_id, |r| r.hoist(true));
+    /// // assuming a `guild` and `role_id` have been bound
+    //
+    /// guild.edit_role(role_id, |r| r.hoist(true));
     /// ```
     ///
     /// [`Role`]: struct.Role.html

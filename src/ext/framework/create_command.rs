@@ -54,8 +54,8 @@ impl CreateCommand {
     ///         .desc("Replies to a ping with a pong")
     ///         .exec(ping)));
     ///
-    /// fn ping(context: &mut Context, _message: &Message, _args: Vec<String>) -> Result<(), String> {
-    ///     let _ = context.say("Pong!");
+    /// fn ping(_context: &mut Context, message: &Message, _args: Vec<String>) -> Result<(), String> {
+    ///     let _ = message.channel_id.say("Pong!");
     ///
     ///     Ok(())
     /// }

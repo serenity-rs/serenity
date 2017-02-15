@@ -90,9 +90,9 @@ impl SortingOrder {
 /// ascending order, and limiting to 5 results:
 ///
 /// ```rust,ignore
-/// // assuming you are in a context
+/// // assuming a `channel_id` has been bound
 ///
-/// let res = context.search_channel(message.channel_id, |s| s
+/// let res = channel_id.search(|s| s
 ///     .content("rust")
 ///     .has_embed(false)
 ///     .has_attachment(false)
@@ -124,7 +124,7 @@ impl SortingOrder {
 ///     let query = args.join(" ");
 ///
 ///     if query.is_empty() {
-///         let _ = context.say("You must provide a query");
+///         let _ = message.channel_id.say("You must provide a query");
 ///
 ///         return Ok(());
 ///     }
@@ -138,7 +138,7 @@ impl SortingOrder {
 ///         .map(|c| c.id)
 ///         .collect();
 ///
-///     let search = context.search_guild(guild.id, channel_ids, |s| s
+///     let search = guild.search(guild.id, channel_ids, |s| s
 ///         .content(&query)
 ///         .context_size(0)
 ///         .has_attachment(true)
@@ -152,13 +152,13 @@ impl SortingOrder {
 ///         Err(why) => {
 ///             println!("Error performing search '{}': {:?}", query, why);
 ///
-///             let _ = context.say("Error occurred while searching");
+///             let _ = message.channel_id.say("Error occurred while searching");
 ///
 ///             return Ok(());
 ///         },
 ///     };
 ///
-///     let _ = context.send_message(message.channel_id, |m| m
+///     let _ = message.channel_id.send_message(|m| m
 ///         .content(&format!("Found {} total results", messages.total))
 ///         .embed(|mut e| {
 ///             for (i, messages) in messages.results.iter_mut().enumerate() {

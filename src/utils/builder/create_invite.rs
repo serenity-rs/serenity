@@ -17,9 +17,9 @@ use std::default::Default;
 ///
 /// let mut client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN").unwrap());
 ///
-/// client.on_message(|context, message| {
+/// client.on_message(|_, message| {
 ///     if message.content == "!invite" {
-///         let invite = context.create_invite(message.channel_id, |i| i
+///         let invite = message.channel_id.create_invite(|i| i
 ///             .max_age(3600)
 ///             .max_uses(10));
 ///     }

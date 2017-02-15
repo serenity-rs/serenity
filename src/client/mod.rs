@@ -138,7 +138,7 @@ lazy_static! {
 ///
 /// client.on_message(|context, message| {
 ///     if message.content == "!ping" {
-///         context.say("Pong!");
+///         message.channel_id.say("Pong!");
 ///     }
 /// });
 ///

@@ -58,13 +58,13 @@ impl Attachment {
     /// let token = env::var("DISCORD_TOKEN").expect("token in environment");
     /// let mut client = Client::login_bot(&token);
     ///
-    /// client.on_message(|context, message| {
+    /// client.on_message(|_, message| {
     ///     for attachment in message.attachments {
     ///         let content = match attachment.download() {
     ///             Ok(content) => content,
     ///             Err(why) => {
     ///                 println!("Error downloading attachment: {:?}", why);
-    ///                 let _ = context.say("Error downloading attachment");
+    ///                 let _ = message.channel_id.say("Error downloading attachment");
     ///
     ///                 return;
     ///             },
@@ -74,7 +74,7 @@ impl Attachment {
     ///             Ok(file) => file,
     ///             Err(why) => {
     ///                 println!("Error creating file: {:?}", why);
-    ///                 let _ = context.say("Error creating file");
+    ///                 let _ = message.channel_id.say("Error creating file");
     ///
     ///                 return;
     ///             },
@@ -86,7 +86,7 @@ impl Attachment {
     ///             return;
     ///         }
     ///
-    ///         let _ = context.say(&format!("Saved {:?}", attachment.filename));
+    ///         let _ = message.channel_id.say(&format!("Saved {:?}", attachment.filename));
     ///     }
     /// });
     ///
@@ -588,9 +588,9 @@ impl ChannelId {
     /// Change a voice channel's name and bitrate:
     ///
     /// ```rust,ignore
-    /// context.edit_channel(channel_id, |c| c
-    ///     .name("test")
-    ///     .bitrate(64000));
+    /// // assuming a `channel_id` has been bound
+    ///
+    /// channel_id.edit(|c| c.name("test").bitrate(64000));
     /// ```
     ///
     /// # Errors

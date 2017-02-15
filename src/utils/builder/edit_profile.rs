@@ -22,7 +22,7 @@ impl EditProfile {
     /// ```rust,ignore
     /// use serenity::utils;
     ///
-    /// // assuming you are in a context
+    /// // assuming a `context` has been bound
     ///
     /// let base64 = utils::read_image("./my_image.jpg")
     ///     .expect("Failed to read image");

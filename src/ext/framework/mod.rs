@@ -43,12 +43,12 @@
 //!     .command("about", |c| c.exec_str("A simple test bot"))
 //!     .command("ping", |c| c.exec(ping)));
 //!
-//! command!(about(context) {
-//!     let _ = context.say("A simple test bot");
+//! command!(about(_context, message) {
+//!     let _ = message.channel_id.say("A simple test bot");
 //! });
 //!
-//! command!(ping(context) {
-//!     let _ = context.say("Pong!");
+//! command!(ping(_context, message) {
+//!     let _ = message.channel_id.say("Pong!");
 //! });
 //! ```
 //!
@@ -703,8 +703,8 @@ impl Framework {
     ///     .on("ping", ping)
     ///     .set_check("ping", owner_check));
     ///
-    /// command!(ping(context) {
-    ///     let _ = context.say("Pong!");
+    /// command!(ping(_context, message) {
+    ///     let _ = message.channel_id.say("Pong!");
     /// });
     ///
     /// fn owner_check(_context: &mut Context, message: &Message) -> bool {

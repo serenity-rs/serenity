@@ -19,8 +19,8 @@ use ::model::{Permissions, Role, permissions};
 /// Create a hoisted, mentionable role named "a test role":
 ///
 /// ```rust,ignore
-/// // assuming you are in a `context` and a `guild_id` has been bound
-/// let role = context.create_role(guild_id, |r| r
+/// // assuming a `channel_id` and `guild_id` has been bound
+/// let role = channel_id.create_role(guild_id, |r| r
 ///     .hoist(true)
 ///     .mentionable(true)
 ///     .name("a test role"));

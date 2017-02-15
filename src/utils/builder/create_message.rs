@@ -21,10 +21,9 @@ use super::CreateEmbed;
 /// Sending a message with a content of `"test"` and applying text-to-speech:
 ///
 /// ```rust,ignore
-/// // assuming you are in a context
-/// context.send_message(message.channel_id, |m|
-///     .content("test")
-///     .tts(true));
+/// // assuming a `channel_id` has been bound
+///
+/// channel_id.say(|m| m.content("test").tts(true));
 /// ```
 ///
 /// [`Context::say`]: ../../client/struct.Context.html#method.say
