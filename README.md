@@ -102,11 +102,6 @@ other data, to avoid performing REST requests. If you are low on RAM, do not
 enable this;
 - **framework**: Enables the framework, which is a utility to allow simple
 command parsing, before/after command execution, prefix setting, and more;
-- **methods**: Enables compilation of extra methods on struct implementations,
-such as `Message::delete()`, `Message::reply()`, `Guild::edit()`, and more.
-Without this enabled, requests will need to go through the [`Context`] or
-[`rest`] module, which are slightly less efficient from a development
-standpoint, and do not automatically perform permission checking;
 - **voice**: Enables compilation of voice support, so that voice channels can be
 connected to and audio can be sent/received.
 
