@@ -18,13 +18,13 @@ fn main() {
     //
     // Event handlers are dispatched through multi-threading, and so multiple
     // of a single event can be dispatched simultaneously.
-    client.on_message(|ctx, message| {
-        if message.content == "!ping" {
+    client.on_message(|_ctx, msg| {
+        if msg.content == "!ping" {
             // Sending a message can fail, due to a network error, an
             // authentication error, or lack of permissions to post in the
             // channel, so log to stdout when some error happens, with a
             // description of it.
-            if let Err(why) = ctx.say("Pong!") {
+            if let Err(why) = msg.channel_id.say("Pong!") {
                 println!("Error sending message: {:?}", why);
             }
         }

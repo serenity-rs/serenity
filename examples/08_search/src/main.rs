@@ -30,7 +30,7 @@ fn main() {
             .exec(search)
             .check(self_check)));
 
-    client.on_ready(|_context, ready| {
+    client.on_ready(|_ctx, ready| {
         println!("{} is connected!", ready.user.name);
     });
 
@@ -39,23 +39,23 @@ fn main() {
     }
 }
 
-fn self_check(_context: &mut Context, message: &Message) -> bool {
-    message.author.id == CACHE.read().unwrap().user.id
+fn self_check(_ctx: &mut Context, msg: &Message) -> bool {
+    msg.author.id == CACHE.read().unwrap().user.id
 }
 
-command!(search(context, message, args) {
+command!(search(_ctx, msg, args) {
     let query = args.join(" ");
 
     if query.is_empty() {
-        let _ = context.say("You must provide a query");
+        let _ = msg.channel_id.say("You must provide a query");
 
         return Ok(());
     }
 
-    let guild_id = match message.guild_id() {
+    let guild_id = match msg.guild_id() {
         Some(guild_id) => guild_id,
         None => {
-            let _ = context.say("Only supports guilds");
+            let _ = msg.channel_id.say("Only supports guilds");
 
             return Ok(());
         },
@@ -67,7 +67,7 @@ command!(search(context, message, args) {
         let guild = match cache.get_guild(guild_id) {
             Some(guild) => guild,
             None => {
-                let _ = context.say("Guild data not found");
+                let _ = msg.channel_id.say("Guild data not found");
 
                 return Ok(());
             },
@@ -88,7 +88,7 @@ command!(search(context, message, args) {
         .context_size(0)
         .has_attachment(true)
         .has_embed(true)
-        .max_id(message.id.0 - 1)
+        .max_id(msg.id.0 - 1)
         .sort_by(SortingMode::Timestamp)
         .sort_order(SortingOrder::Descending));
 
@@ -97,22 +97,22 @@ command!(search(context, message, args) {
         Err(why) => {
             println!("Error performing search '{}': {:?}", query, why);
 
-            let _ = context.say("Error occurred while searching");
+            let _ = msg.channel_id.say("Error occurred while searching");
 
             return Ok(());
         },
     };
 
-    let _ = context.send_message(|m| m
+    let _ = msg.channel_id.send_message(|m| m
         .content(&format!("Found {} total results", messages.total))
         .embed(move |mut e| {
             for (i, mut messages) in messages.results.into_iter().enumerate() {
-                let mut message = &mut messages[0];
-                message.content.truncate(1000);
+                let mut msg = &mut messages[0];
+                msg.content.truncate(1000);
 
                 e = e.field(|f| f
                     .name(&format!("Result {}", i))
-                    .value(&message.content));
+                    .value(&msg.content));
             }
 
             e

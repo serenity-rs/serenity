@@ -18,8 +18,8 @@ fn main() {
         .expect("Expected a token in the environment");
     let mut client = Client::login_bot(&token);
 
-    client.on_message(|_ctx, message| {
-        if message.content == "!messageme" {
+    client.on_message(|_ctx, msg| {
+        if msg.content == "!messageme" {
             // If the `methods` feature is enabled, then model structs will
             // have a lot of useful methods implemented, to avoid using an
             // often otherwise bulky Context, or even much lower-level `rest`
@@ -28,7 +28,7 @@ fn main() {
             // In this case, you can direct message a User directly by simply
             // calling a method on its instance, with the content of the
             // message.
-            if let Err(why) = message.author.dm("Hello!") {
+            if let Err(why) = msg.author.dm("Hello!") {
                 println!("Error when direct messaging user: {:?}", why);
             }
         }

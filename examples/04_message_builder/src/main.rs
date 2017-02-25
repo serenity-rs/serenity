@@ -10,9 +10,9 @@ fn main() {
         .expect("Expected a token in the environment");
     let mut client = Client::login_bot(&token);
 
-    client.on_message(|ctx, message| {
-        if message.content == "!ping" {
-            let channel = match ctx.get_channel() {
+    client.on_message(|_ctx, msg| {
+        if msg.content == "!ping" {
+            let channel = match msg.channel_id.get() {
                 Ok(channel) => channel,
                 Err(why) => {
                     println!("Error getting channel: {:?}", why);
@@ -21,18 +21,19 @@ fn main() {
                 },
             };
 
-            // The message builder allows for creating a message by mentioning
-            // users dynamically, pushing "safe" versions of content (such as
-            // bolding normalized content), displaying emojis, and more.
+            // The message builder allows for creating a message by
+            // mentioning users dynamically, pushing "safe" versions of
+            // content (such as bolding normalized content), displaying
+            // emojis, and more.
             let response = MessageBuilder::new()
                 .push("User ")
-                .push_bold_safe(&message.author.name)
+                .push_bold_safe(&msg.author.name)
                 .push(" used the 'ping' command in the ")
                 .mention(channel)
                 .push(" channel")
                 .build();
 
-            if let Err(why) = ctx.say(&response) {
+            if let Err(why) = msg.channel_id.say(&response) {
                 println!("Error sending message: {:?}", why);
             }
         }

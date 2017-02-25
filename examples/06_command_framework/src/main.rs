@@ -68,15 +68,15 @@ fn main() {
         // You can not use this to determine whether a command should be
         // executed. Instead, `set_check` is provided to give you this
         // functionality.
-        .before(|context, message, command_name| {
+        .before(|ctx, msg, command_name| {
             println!("Got command '{}' by user '{}'",
                      command_name,
-                     message.author.name);
+                     msg.author.name);
 
             // Increment the number of times this command has been run once. If
             // the command's name does not exist in the counter, add a default
             // value of 0.
-            let mut data = context.data.lock().unwrap();
+            let mut data = ctx.data.lock().unwrap();
             let counter = data.get_mut::<CommandCounter>().unwrap();
             let entry = counter.entry(command_name.clone()).or_insert(0);
             *entry += 1;
@@ -133,7 +133,7 @@ fn main() {
 // This may bring more features available for commands in the future. See the
 // "multiply" command below for some of the power that the `command!` macro can
 // bring.
-command!(commands(ctx, _msg, _args) {
+command!(commands(ctx, msg, _args) {
     let mut contents = "Commands used:\n".to_owned();
 
     let data = ctx.data.lock().unwrap();
@@ -143,7 +143,7 @@ command!(commands(ctx, _msg, _args) {
         let _ = write!(contents, "- {name}: {amount}\n", name=k, amount=v);
     }
 
-    if let Err(why) = ctx.say(&contents) {
+    if let Err(why) = msg.channel_id.say(&contents) {
         println!("Error sending message: {:?}", why);
     }
 });
@@ -153,13 +153,13 @@ command!(commands(ctx, _msg, _args) {
 // In this case, this command checks to ensure you are the owner of the message
 // in order for the command to be executed. If the check fails, the command is
 // not called.
-fn owner_check(_: &mut Context, message: &Message) -> bool {
+fn owner_check(_: &mut Context, msg: &Message) -> bool {
     // Replace 7 with your ID
-    message.author.id == 7
+    msg.author.id == 7
 }
 
-command!(some_long_command(ctx, _msg, args) {
-    if let Err(why) = ctx.say(&format!("Arguments: {:?}", args)) {
+command!(some_long_command(_ctx, msg, args) {
+    if let Err(why) = msg.channel_id.say(&format!("Arguments: {:?}", args)) {
         println!("Error sending message: {:?}", why);
     }
 });
@@ -184,10 +184,10 @@ command!(some_long_command(ctx, _msg, args) {
 // will be ignored.
 //
 // Argument type overloading is currently not supported.
-command!(multiply(ctx, _msg, args, first: f64, second: f64) {
+command!(multiply(_ctx, msg, args, first: f64, second: f64) {
     let res = first * second;
 
-    if let Err(why) = ctx.say(&res.to_string()) {
+    if let Err(why) = msg.channel_id.say(&res.to_string()) {
         println!("Err sending product of {} and {}: {:?}", first, second, why);
     }
 });

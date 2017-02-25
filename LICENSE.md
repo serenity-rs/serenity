@@ -1,6 +1,6 @@
 ISC License (ISC)
 
-Copyright (c) 2016, Austin Hellyer <hello@austinhellyer.me>
+Copyright (c) 2016, Zeyla Hellyer <zey@zey.moe>
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice

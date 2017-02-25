@@ -27,8 +27,8 @@ fn main() {
         .expect("Expected a token in the environment");
     let mut client = Client::login_bot(&token);
 
-    client.on_message(|ctx, message| {
-        if message.content == "!ping" {
+    client.on_message(|ctx, msg| {
+        if msg.content == "!ping" {
             // The current shard needs to be unlocked so it can be read from, as
             // multiple threads may otherwise attempt to read from or mutate it
             // concurrently.
@@ -40,7 +40,7 @@ fn main() {
                 }
             }
 
-            if let Err(why) = ctx.say("Pong!") {
+            if let Err(why) = msg.channel_id.say("Pong!") {
                 println!("Error sending message: {:?}", why);
             }
         }
