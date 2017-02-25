@@ -373,6 +373,55 @@ impl Channel {
         self.id().search(f)
     }
 
+    /// Sends a file along with optional message contents. The filename _must_
+    /// be specified.
+    ///
+    /// Refer to [`ChannelId::send_file`] for examples and more information.
+    ///
+    /// The [Attach Files] and [Send Messages] permissions are required.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// If the content of the message is over the above limit, then a
+    /// [`ClientError::MessageTooLong`] will be returned, containing the number
+    /// of unicode code points over the limit.
+    ///
+    /// [`ChannelId::send_file`]: struct.ChannelId.html#method.send_file
+    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
+    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    pub fn send_file<F, R>(&self, file: R, filename: &str, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, R: Read {
+        self.id().send_file(file, filename, f)
+    }
+
+    /// Sends a message to the channel.
+    ///
+    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// regarding message restrictions and requirements.
+    ///
+    /// The [Send Messages] permission is required.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [`Channel`]: enum.Channel.html
+    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
+    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[inline]
+    pub fn send_message<F>(&self, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage {
+        self.id().send_message(f)
+    }
+
     /// Unpins a [`Message`] in the channel given by its Id.
     ///
     /// Requires the [Manage Messages] permission.
@@ -791,9 +840,24 @@ impl ChannelId {
     /// An embed can _not_ be sent when sending a file. If you set one, it will
     /// be automatically removed.
     ///
-    /// Requires the [Attach Files] and [Send Messages] permissions are required.
+    /// The [Attach Files] and [Send Messages] permissions are required.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Examples
+    ///
+    /// Send a file with the filename `my_file.jpg`:
+    ///
+    /// ```rust,no_run
+    /// use serenity::model::ChannelId;
+    /// use std::fs::File;
+    ///
+    /// let channel_id = ChannelId(7);
+    /// let filename = "my_file.jpg";
+    /// let file = File::open(filename).unwrap();
+    ///
+    /// let _ = channel_id.send_file(file, filename, |m| m.content("a file"));
+    /// ```
     ///
     /// # Errors
     ///
@@ -828,7 +892,7 @@ impl ChannelId {
     /// Refer to the documentation for [`CreateMessage`] for more information
     /// regarding message restrictions and requirements.
     ///
-    /// Requires the [Send Messages] permission is required.
+    /// Requires the [Send Messages] permission.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     ///
@@ -1160,12 +1224,38 @@ impl Group {
         self.channel_id.search(f)
     }
 
+    /// Sends a file along with optional message contents. The filename _must_
+    /// be specified.
+    ///
+    /// Refer to [`ChannelId::send_file`] for examples and more information.
+    ///
+    /// The [Attach Files] and [Send Messages] permissions are required.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// If the content of the message is over the above limit, then a
+    /// [`ClientError::MessageTooLong`] will be returned, containing the number
+    /// of unicode code points over the limit.
+    ///
+    /// [`ChannelId::send_file`]: struct.ChannelId.html#method.send_file
+    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
+    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    pub fn send_file<F, R>(&self, file: R, filename: &str, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, R: Read {
+        self.channel_id.send_file(file, filename, f)
+    }
+
     /// Sends a message to the group with the given content.
     ///
-    /// Note that an `@everyone` mention will not be applied.
+    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// regarding message restrictions and requirements.
     ///
     /// **Note**: Requires the [Send Messages] permission.
     ///
+    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
     pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
@@ -1784,9 +1874,34 @@ impl PrivateChannel {
         self.id.search(f)
     }
 
+    /// Sends a file along with optional message contents. The filename _must_
+    /// be specified.
+    ///
+    /// Refer to [`ChannelId::send_file`] for examples and more information.
+    ///
+    /// The [Attach Files] and [Send Messages] permissions are required.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// If the content of the message is over the above limit, then a
+    /// [`ClientError::MessageTooLong`] will be returned, containing the number
+    /// of unicode code points over the limit.
+    ///
+    /// [`ChannelId::send_file`]: struct.ChannelId.html#method.send_file
+    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
+    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    pub fn send_file<F, R>(&self, file: R, filename: &str, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, R: Read {
+        self.id.send_file(file, filename, f)
+    }
+
     /// Sends a message to the channel with the given content.
     ///
-    /// **Note**: This will only work when a [`Message`] is received.
+    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// regarding message restrictions and requirements.
     ///
     /// # Errors
     ///
@@ -1795,6 +1910,7 @@ impl PrivateChannel {
     /// over the limit.
     ///
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
     #[inline]
     pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
@@ -2214,6 +2330,30 @@ impl GuildChannel {
         }
 
         self.id.search(f)
+    }
+
+    /// Sends a file along with optional message contents. The filename _must_
+    /// be specified.
+    ///
+    /// Refer to [`ChannelId::send_file`] for examples and more information.
+    ///
+    /// The [Attach Files] and [Send Messages] permissions are required.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// If the content of the message is over the above limit, then a
+    /// [`ClientError::MessageTooLong`] will be returned, containing the number
+    /// of unicode code points over the limit.
+    ///
+    /// [`ChannelId::send_file`]: struct.ChannelId.html#method.send_file
+    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
+    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    pub fn send_file<F, R>(&self, file: R, filename: &str, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, R: Read {
+        self.id.send_file(file, filename, f)
     }
 
     /// Sends a message to the channel with the given content.

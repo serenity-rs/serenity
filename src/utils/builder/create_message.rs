@@ -20,10 +20,17 @@ use super::CreateEmbed;
 ///
 /// Sending a message with a content of `"test"` and applying text-to-speech:
 ///
-/// ```rust,ignore
-/// // assuming a `channel_id` has been bound
+/// ```rust,no_run
+/// use serenity::model::ChannelId;
 ///
-/// channel_id.say(|m| m.content("test").tts(true));
+/// let channel_id = ChannelId(7);
+///
+/// let _ = channel_id.send_message(|m| m
+///     .content("test")
+///     .tts(true)
+///     .embed(|e| e
+///         .title("This is an embed")
+///         .description("With a description")));
 /// ```
 ///
 /// [`Context::say`]: ../../client/struct.Context.html#method.say
