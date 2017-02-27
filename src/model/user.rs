@@ -242,7 +242,6 @@ impl User {
 
         let map = ObjectBuilder::new()
             .insert("content", content)
-            .insert("nonce", "")
             .insert("tts", false)
             .build();
 

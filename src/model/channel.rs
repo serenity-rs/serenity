@@ -1597,7 +1597,6 @@ impl Message {
 
         let map = ObjectBuilder::new()
             .insert("content", gen)
-            .insert("nonce", "")
             .insert("tts", false)
             .build();
 

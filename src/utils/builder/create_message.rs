@@ -60,16 +60,6 @@ impl CreateMessage {
         CreateMessage(self.0)
     }
 
-    /// Set the nonce. This is used for validation of a sent message. You most
-    /// likely don't need to worry about this.
-    ///
-    /// Defaults to empty.
-    pub fn nonce(mut self, nonce: &str) -> Self {
-        self.0.insert("nonce".to_owned(), Value::String(nonce.to_owned()));
-
-        CreateMessage(self.0)
-    }
-
     /// Set whether the message is text-to-speech.
     ///
     /// Think carefully before setting this to `true`.
