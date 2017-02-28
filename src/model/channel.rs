@@ -258,6 +258,31 @@ impl Channel {
         self.id().delete_reaction(message_id, user_id, reaction_type)
     }
 
+    /// Edits a [`Message`] in the channel given its Id.
+    ///
+    /// Message editing preserves all unchanged message data.
+    ///
+    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// regarding message restrictions and requirements.
+    ///
+    /// **Note**: Requires that the current user be the author of the message.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the [`the limit`], containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
+    /// [`Message`]: struct.Message.html
+    /// [`the limit`]: ../utils/builder/struct.CreateMessage.html#method.content
+    #[inline]
+    pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
+        self.id().edit_message(message_id, f)
+    }
+
     /// Gets a message from the channel.
     ///
     /// Requires the [Read Message History] permission.
@@ -657,29 +682,36 @@ impl ChannelId {
 
     /// Edits a [`Message`] in the channel given its Id.
     ///
-    /// Pass an empty string (`""`) to `text` if you are editing a message with
-    /// an embed or file but no content. Otherwise, `text` must be given.
+    /// Message editing preserves all unchanged message data.
+    ///
+    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// regarding message restrictions and requirements.
     ///
     /// **Note**: Requires that the current user be the author of the message.
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::NoChannelId`] if the current context is not
-    /// related to a channel.
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the [`the limit`], containing the number of unicode code points
+    /// over the limit.
     ///
-    /// [`ClientError::NoChannelId`]: ../client/enum.ClientError.html#variant.NoChannelId
+    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
-    pub fn edit_message<F, M>(&self, message_id: M, text: &str, f: F) -> Result<Message>
-        where F: FnOnce(CreateEmbed) -> CreateEmbed, M: Into<MessageId> {
-        let mut map = ObjectBuilder::new().insert("content", text);
+    /// [`the limit`]: ../utils/builder/struct.CreateMessage.html#method.content
+    pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
+        let map = f(CreateMessage::default()).0;
 
-        let embed = f(CreateEmbed::default()).0;
-
-        if embed.len() > 1 {
-            map = map.insert("embed", Value::Object(embed));
+        if let Some(content) = map.get("content") {
+            if let Value::String(ref content) = *content {
+                if let Some(length_over) = Message::overflow_length(content) {
+                    return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+                }
+            }
         }
 
-        rest::edit_message(self.0, message_id.into().0, map.build())
+        rest::edit_message(self.0, message_id.into().0, Value::Object(map))
     }
 
     /// Search the cache for the channel with the Id.
@@ -1089,6 +1121,31 @@ impl Group {
         self.channel_id.delete_reaction(message_id, user_id, reaction_type)
     }
 
+    /// Edits a [`Message`] in the channel given its Id.
+    ///
+    /// Message editing preserves all unchanged message data.
+    ///
+    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// regarding message restrictions and requirements.
+    ///
+    /// **Note**: Requires that the current user be the author of the message.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the [`the limit`], containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
+    /// [`Message`]: struct.Message.html
+    /// [`the limit`]: ../utils/builder/struct.CreateMessage.html#method.content
+    #[inline]
+    pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
+        self.channel_id.edit_message(message_id, f)
+    }
+
     /// Gets a message from the channel.
     ///
     /// Requires the [Read Message History] permission.
@@ -1358,16 +1415,22 @@ impl Message {
 
     /// Edits this message, replacing the original content with new content.
     ///
-    /// If editing a message and not using an embed, just return the embed
-    /// builder directly, via:
+    /// Message editing preserves all unchanged message data.
+    ///
+    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// regarding message restrictions and requirements.
+    ///
+    /// **Note**: Requires that the current user be the author of the message.
+    ///
+    /// # Examples
+    ///
+    /// Edit a message with new content:
     ///
     /// ```rust,ignore
-    /// message.edit("new content", |f| f);
+    /// // assuming a `message` has already been bound
+    ///
+    /// message.edit(|m| m.content("new content"));
     /// ```
-    ///
-    /// **Note**: You must be the author of the message to be able to do this.
-    ///
-    /// **Note**: Messages must be at most 2000 unicode code points.
     ///
     /// # Errors
     ///
@@ -1375,17 +1438,15 @@ impl Message {
     /// current user is not the author.
     ///
     /// Returns a [`ClientError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
+    /// is over [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
     /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    pub fn edit<F>(&mut self, new_content: &str, embed: F) -> Result<()>
-        where F: FnOnce(CreateEmbed) -> CreateEmbed {
-        if let Some(length_over) = Message::overflow_length(new_content) {
-            return Err(Error::Client(ClientError::MessageTooLong(length_over)));
-        }
-
+    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
+    /// [`the limit`]: ../utils/builder/struct.CreateMessage.html#method.content
+    pub fn edit<F>(&mut self, f: F) -> Result<()>
+        where F: FnOnce(CreateMessage) -> CreateMessage {
         #[cfg(feature="cache")]
         {
             if self.author.id != CACHE.read().unwrap().user.id {
@@ -1393,15 +1454,23 @@ impl Message {
             }
         }
 
-        let mut map = ObjectBuilder::new().insert("content", new_content);
+        let mut builder = CreateMessage::default();
 
-        let embed = embed(CreateEmbed::default()).0;
-
-        if embed.len() > 1 {
-            map = map.insert("embed", Value::Object(embed));
+        if !self.content.is_empty() {
+            builder = builder.content(&self.content);
         }
 
-        match rest::edit_message(self.channel_id.0, self.id.0, map.build()) {
+        if let Some(embed) = self.embeds.get(0) {
+            builder = builder.embed(|_| CreateEmbed::from(embed.clone()));
+        }
+
+        if self.tts {
+            builder = builder.tts(true);
+        }
+
+        let map = f(builder).0;
+
+        match rest::edit_message(self.channel_id.0, self.id.0, Value::Object(map)) {
             Ok(edited) => {
                 mem::replace(self, edited);
 
@@ -1768,6 +1837,31 @@ impl PrivateChannel {
     pub fn delete_reaction<M, R>(&self, message_id: M, user_id: Option<UserId>, reaction_type: R)
         -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
         self.id.delete_reaction(message_id, user_id, reaction_type)
+    }
+
+    /// Edits a [`Message`] in the channel given its Id.
+    ///
+    /// Message editing preserves all unchanged message data.
+    ///
+    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// regarding message restrictions and requirements.
+    ///
+    /// **Note**: Requires that the current user be the author of the message.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the [`the limit`], containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
+    /// [`Message`]: struct.Message.html
+    /// [`the limit`]: ../utils/builder/struct.CreateMessage.html#method.content
+    #[inline]
+    pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
+        self.id.edit_message(message_id, f)
     }
 
     /// Gets a message from the channel.
@@ -2205,6 +2299,31 @@ impl GuildChannel {
         }
     }
 
+    /// Edits a [`Message`] in the channel given its Id.
+    ///
+    /// Message editing preserves all unchanged message data.
+    ///
+    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// regarding message restrictions and requirements.
+    ///
+    /// **Note**: Requires that the current user be the author of the message.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// is over the [`the limit`], containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
+    /// [`Message`]: struct.Message.html
+    /// [`the limit`]: ../utils/builder/struct.CreateMessage.html#method.content
+    #[inline]
+    pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
+        self.id.edit_message(message_id, f)
+    }
+
     /// Gets all of the channel's invites.
     ///
     /// Requires the [Manage Channels] permission.
@@ -2400,7 +2519,7 @@ impl GuildChannel {
 }
 
 impl fmt::Display for GuildChannel {
-    /// Formas the channel, creating a mention of it.
+    /// Formats the channel, creating a mention of it.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.id.mention(), f)
     }
