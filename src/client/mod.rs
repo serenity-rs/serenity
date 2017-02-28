@@ -18,6 +18,7 @@
 //! [`Client`]: struct.Client.html#examples
 //! [`Context`]: struct.Context.html
 //! [Client examples]: struct.Client.html#examples
+#![allow(zero_ptr)]
 
 pub mod gateway;
 pub mod rest;

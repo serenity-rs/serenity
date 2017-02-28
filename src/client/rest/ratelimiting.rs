@@ -214,12 +214,10 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
                     .post_hook(&response)
             };
 
-            if redo.unwrap_or(false) {
-                continue;
+            if !redo.unwrap_or(true) {
+                return Ok(response);
             }
         }
-
-        return Ok(response);
     }
 }
 

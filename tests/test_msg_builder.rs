@@ -19,7 +19,7 @@ fn safe_content() {
     let content = MessageBuilder::new()
         .push_safe("@everyone discord.gg/discord-api")
         .build();
-    assert!(content != "@everyone discord.gg/discord-api");
+    assert_ne!(content, "@everyone discord.gg/discord-api");
 }
 
 
@@ -28,7 +28,7 @@ fn no_free_formatting() {
     let content = MessageBuilder::new()
         .push_bold_safe("test**test")
         .build();
-    assert!(content != "**test**test**");
+    assert_ne!(content, "**test**test**");
 }
 
 #[test]
