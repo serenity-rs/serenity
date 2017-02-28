@@ -224,8 +224,8 @@ pub fn broadcast_typing(channel_id: u64) -> Result<()> {
 /// [`GuildChannel`]: ../../model/struct.GuildChannel.html
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-channel
 /// [Manage Channels]: ../../model/permissions/constant.MANAGE_CHANNELS.html
-pub fn create_channel(guild_id: u64, map: Value) -> Result<GuildChannel> {
-    let body = serde_json::to_string(&map)?;
+pub fn create_channel(guild_id: u64, map: &Value) -> Result<GuildChannel> {
+    let body = map.to_string();
     let response = request!(Route::GuildsIdChannels(guild_id),
                             post(body),
                             "/guilds/{}/channels",
@@ -244,8 +244,8 @@ pub fn create_channel(guild_id: u64, map: Value) -> Result<GuildChannel> {
 /// [`Context::create_emoji`]: ../struct.Context.html#method.create_emoji
 /// [`Guild`]: ../../model/struct.Guild.html
 /// [Manage Emojis]: ../../model/permissions/constant.MANAGE_EMOJIS.html
-pub fn create_emoji(guild_id: u64, map: Value) -> Result<Emoji> {
-    let body = serde_json::to_string(&map)?;
+pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
+    let body = map.to_string();
     let response = request!(Route::GuildsIdEmojis(guild_id),
                             post(body),
                             "/guilds/{}/emojis",
@@ -288,8 +288,8 @@ pub fn create_emoji(guild_id: u64, map: Value) -> Result<Emoji> {
 /// [`Shard`]: ../gateway/struct.Shard.html
 /// [US West Region]: ../../model/enum.Region.html#variant.UsWest
 /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
-pub fn create_guild(map: Value) -> Result<PartialGuild> {
-    let body = serde_json::to_string(&map)?;
+pub fn create_guild(map: &Value) -> Result<PartialGuild> {
+    let body = map.to_string();
     let response = request!(Route::Guilds, post(body), "/guilds");
 
     PartialGuild::decode(serde_json::from_reader(response)?)
@@ -305,8 +305,8 @@ pub fn create_guild(map: Value) -> Result<PartialGuild> {
 /// [`Integration`]: ../../model/struct.Integration.html
 /// [Manage Guild]: ../../model/permissions/constant.MANAGE_GUILD.html
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-integration
-pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: Value) -> Result<()> {
-    let body = serde_json::to_string(&map)?;
+pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: &Value) -> Result<()> {
+    let body = map.to_string();
 
     verify(204, request!(Route::GuildsIdIntegrations(guild_id),
                          post(body),
@@ -327,8 +327,8 @@ pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: Value) 
 /// [`RichInvite`]: ../../model/struct.RichInvite.html
 /// [Create Invite]: ../../model/permissions/constant.CREATE_INVITE.html
 /// [docs]: https://discordapp.com/developers/docs/resources/channel#create-channel-invite
-pub fn create_invite(channel_id: u64, map: Value) -> Result<RichInvite> {
-    let body = serde_json::to_string(&map)?;
+pub fn create_invite(channel_id: u64, map: &Value) -> Result<RichInvite> {
+    let body = map.to_string();
     let response = request!(Route::ChannelsIdInvites(channel_id),
                             post(body),
                             "/channels/{}/invites",
@@ -338,8 +338,8 @@ pub fn create_invite(channel_id: u64, map: Value) -> Result<RichInvite> {
 }
 
 /// Creates a permission override for a member or a role in a channel.
-pub fn create_permission(channel_id: u64, target_id: u64, map: Value) -> Result<()> {
-    let body = serde_json::to_string(&map)?;
+pub fn create_permission(channel_id: u64, target_id: u64, map: &Value) -> Result<()> {
+    let body = map.to_string();
 
     verify(204, request!(Route::ChannelsIdPermissionsOverwriteId(channel_id),
                          put(body),
@@ -349,8 +349,8 @@ pub fn create_permission(channel_id: u64, target_id: u64, map: Value) -> Result<
 }
 
 /// Creates a private channel with a user.
-pub fn create_private_channel(map: Value) -> Result<PrivateChannel> {
-    let body = serde_json::to_string(&map)?;
+pub fn create_private_channel(map: &Value) -> Result<PrivateChannel> {
+    let body = map.to_string();
     let response = request!(Route::UsersMeChannels,
                             post(body),
                             "/users/@me/channels");
@@ -361,7 +361,7 @@ pub fn create_private_channel(map: Value) -> Result<PrivateChannel> {
 /// Reacts to a message.
 pub fn create_reaction(channel_id: u64,
                        message_id: u64,
-                       reaction_type: ReactionType)
+                       reaction_type: &ReactionType)
                        -> Result<()> {
     verify(204, request!(Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
                          put,
@@ -372,8 +372,8 @@ pub fn create_reaction(channel_id: u64,
 }
 
 /// Creates a role.
-pub fn create_role(guild_id: u64, map: Value) -> Result<Role> {
-    let body = serde_json::to_string(&map)?;
+pub fn create_role(guild_id: u64, map: &Value) -> Result<Role> {
+    let body = map.to_string();
     let response = request!(Route::GuildsIdRoles(guild_id),
                             post(body),
                             "/guilds/{}/roles",
@@ -412,8 +412,8 @@ pub fn create_role(guild_id: u64, map: Value) -> Result<Role> {
 /// ```
 ///
 /// [`GuildChannel`]: ../../model/struct.GuildChannel.html
-pub fn create_webhook(channel_id: u64, map: Value) -> Result<Webhook> {
-    let body = serde_json::to_string(&map)?;
+pub fn create_webhook(channel_id: u64, map: &Value) -> Result<Webhook> {
+    let body = map.to_string();
     let response = request!(Route::ChannelsIdWebhooks(channel_id),
                             post(body),
                             "/channels/{}/webhooks",
@@ -478,8 +478,8 @@ pub fn delete_message(channel_id: u64, message_id: u64) -> Result<()> {
 }
 
 /// Deletes a bunch of messages, only works for bots.
-pub fn delete_messages(channel_id: u64, map: Value) -> Result<()> {
-    let body = serde_json::to_string(&map)?;
+pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
+    let body = map.to_string();
 
     verify(204, request!(Route::ChannelsIdMessagesBulkDelete(channel_id),
                          post(body),
@@ -526,7 +526,7 @@ pub fn delete_permission(channel_id: u64, target_id: u64) -> Result<()> {
 pub fn delete_reaction(channel_id: u64,
                        message_id: u64,
                        user_id: Option<u64>,
-                       reaction_type: ReactionType)
+                       reaction_type: &ReactionType)
                        -> Result<()> {
     let user = user_id.map(|uid| uid.to_string()).unwrap_or_else(|| "@me".to_string());
 
@@ -599,8 +599,8 @@ pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
 }
 
 /// Changes channel information.
-pub fn edit_channel(channel_id: u64, map: Value) -> Result<GuildChannel> {
-    let body = serde_json::to_string(&map)?;
+pub fn edit_channel(channel_id: u64, map: &Value) -> Result<GuildChannel> {
+    let body = map.to_string();
     let response = request!(Route::ChannelsId(channel_id),
                             patch(body),
                             "/channels/{}",
@@ -610,8 +610,8 @@ pub fn edit_channel(channel_id: u64, map: Value) -> Result<GuildChannel> {
 }
 
 /// Changes emoji information.
-pub fn edit_emoji(guild_id: u64, emoji_id: u64, map: Value) -> Result<Emoji> {
-    let body = serde_json::to_string(&map)?;
+pub fn edit_emoji(guild_id: u64, emoji_id: u64, map: &Value) -> Result<Emoji> {
+    let body = map.to_string();
     let response = request!(Route::GuildsIdEmojisId(guild_id),
                             patch(body),
                             "/guilds/{}/emojis/{}",
@@ -622,8 +622,8 @@ pub fn edit_emoji(guild_id: u64, emoji_id: u64, map: Value) -> Result<Emoji> {
 }
 
 /// Changes guild information.
-pub fn edit_guild(guild_id: u64, map: Value) -> Result<PartialGuild> {
-    let body = serde_json::to_string(&map)?;
+pub fn edit_guild(guild_id: u64, map: &Value) -> Result<PartialGuild> {
+    let body = map.to_string();
     let response = request!(Route::GuildsId(guild_id),
                             patch(body),
                             "/guilds/{}",
@@ -635,8 +635,8 @@ pub fn edit_guild(guild_id: u64, map: Value) -> Result<PartialGuild> {
 /// Edits a [`Guild`]'s embed setting.
 ///
 /// [`Guild`]: ../../model/struct.Guild.html
-pub fn edit_guild_embed(guild_id: u64, map: Value) -> Result<GuildEmbed> {
-    let body = serde_json::to_string(&map)?;
+pub fn edit_guild_embed(guild_id: u64, map: &Value) -> Result<GuildEmbed> {
+    let body = map.to_string();
     let response = request!(Route::GuildsIdEmbed(guild_id),
                             patch(body),
                             "/guilds/{}/embed",
@@ -646,8 +646,8 @@ pub fn edit_guild_embed(guild_id: u64, map: Value) -> Result<GuildEmbed> {
 }
 
 /// Does specific actions to a member.
-pub fn edit_member(guild_id: u64, user_id: u64, map: Value) -> Result<()> {
-    let body = serde_json::to_string(&map)?;
+pub fn edit_member(guild_id: u64, user_id: u64, map: &Value) -> Result<()> {
+    let body = map.to_string();
 
     verify(204, request!(Route::GuildsIdMembersId(guild_id),
                          patch(body),
@@ -659,8 +659,8 @@ pub fn edit_member(guild_id: u64, user_id: u64, map: Value) -> Result<()> {
 /// Edits a message by Id.
 ///
 /// **Note**: Only the author of a message can modify it.
-pub fn edit_message(channel_id: u64, message_id: u64, map: Value) -> Result<Message> {
-    let body = serde_json::to_string(&map)?;
+pub fn edit_message(channel_id: u64, message_id: u64, map: &Value) -> Result<Message> {
+    let body = map.to_string();
     let response = request!(Route::ChannelsIdMessagesId(LightMethod::Any, channel_id),
                             patch(body),
                             "/channels/{}/messages/{}",
@@ -677,7 +677,7 @@ pub fn edit_message(channel_id: u64, message_id: u64, map: Value) -> Result<Mess
 /// [`Guild`]: ../../model/struct.Guild.html
 pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
     let map = ObjectBuilder::new().insert("nick", new_nickname).build();
-    let body = serde_json::to_string(&map)?;
+    let body = map.to_string();
     let response = request!(Route::GuildsIdMembersMeNick(guild_id),
                             patch(body),
                             "/guilds/{}/members/@me/nick",
@@ -687,8 +687,8 @@ pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
 }
 
 /// Changes a profile note.
-pub fn edit_note(user_id: u64, map: Value) -> Result<()> {
-    let body = serde_json::to_string(&map)?;
+pub fn edit_note(user_id: u64, map: &Value) -> Result<()> {
+    let body = map.to_string();
 
     verify(204, request!(Route::None,
                          put(body),
@@ -708,8 +708,8 @@ pub fn edit_note(user_id: u64, map: Value) -> Result<()> {
 /// **Note**: this token change may cause requests made between the actual token
 /// change and when the token is internally changed to be invalid requests, as
 /// the token may be outdated.
-pub fn edit_profile(map: Value) -> Result<CurrentUser> {
-    let body = serde_json::to_string(&map)?;
+pub fn edit_profile(map: &Value) -> Result<CurrentUser> {
+    let body = map.to_string();
     let response = request!(Route::UsersMe, patch(body), "/users/@me");
 
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
@@ -724,9 +724,9 @@ pub fn edit_profile(map: Value) -> Result<CurrentUser> {
 }
 
 /// Changes a role in a guild.
-pub fn edit_role(guild_id: u64, role_id: u64, map: Value)
+pub fn edit_role(guild_id: u64, role_id: u64, map: &Value)
     -> Result<Role> {
-    let body = serde_json::to_string(&map)?;
+    let body = map.to_string();
     let response = request!(Route::GuildsIdRolesId(guild_id),
                             patch(body),
                             "/guilds/{}/roles/{}",
@@ -775,8 +775,8 @@ pub fn edit_role(guild_id: u64, role_id: u64, map: Value)
 /// [`edit_webhook_with_token`]: fn.edit_webhook_with_token.html
 // The tests are ignored, rather than no_run'd, due to rustdoc tests with
 // external crates being incredibly messy and misleading in the end user's view.
-pub fn edit_webhook(webhook_id: u64, map: Value) -> Result<Webhook> {
-    let body = serde_json::to_string(&map)?;
+pub fn edit_webhook(webhook_id: u64, map: &Value) -> Result<Webhook> {
+    let body = map.to_string();
     let response = request!(Route::WebhooksId,
                             patch(body),
                             "/webhooks/{}",
@@ -811,8 +811,8 @@ pub fn edit_webhook(webhook_id: u64, map: Value) -> Result<Webhook> {
 /// ```
 ///
 /// [`edit_webhook`]: fn.edit_webhook.html
-pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: Value) -> Result<Webhook> {
-    let body = serde_json::to_string(&map)?;
+pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &Value) -> Result<Webhook> {
+    let body = map.to_string();
     let client = HyperClient::new();
     let response = retry(|| client
         .patch(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
@@ -876,8 +876,8 @@ pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: Value) -> Resu
 /// [`Channel`]: ../../model/enum.Channel.html
 /// [`Message`]: ../../model/struct.Message.html
 /// [Discord docs]: https://discordapp.com/developers/docs/resources/webhook#querystring-params
-pub fn execute_webhook(webhook_id: u64, token: &str, map: Value) -> Result<Message> {
-    let body = serde_json::to_string(&map)?;
+pub fn execute_webhook(webhook_id: u64, token: &str, map: &Value) -> Result<Message> {
+    let body = map.to_string();
     let client = HyperClient::new();
     let response = retry(|| client
         .post(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
@@ -1097,8 +1097,8 @@ pub fn get_guild_members(guild_id: u64, limit: Option<u64>, after: Option<u64>)
 }
 
 /// Gets the amount of users that can be pruned.
-pub fn get_guild_prune_count(guild_id: u64, map: Value) -> Result<GuildPrune> {
-    let body = serde_json::to_string(&map)?;
+pub fn get_guild_prune_count(guild_id: u64, map: &Value) -> Result<GuildPrune> {
+    let body = map.to_string();
     let response = request!(Route::GuildsIdPrune(guild_id),
                             get(body),
                             "/guilds/{}/prune",
@@ -1179,10 +1179,10 @@ pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
 /// ```
 ///
 /// [docs]: https://discordapp.com/developers/docs/resources/user#get-current-user-guilds
-pub fn get_guilds(target: GuildPagination, limit: u64) -> Result<Vec<GuildInfo>> {
+pub fn get_guilds(target: &GuildPagination, limit: u64) -> Result<Vec<GuildInfo>> {
     let mut uri = format!("/users/@me/guilds?limit={}", limit);
 
-    match target {
+    match *target {
         GuildPagination::After(id) => {
             write!(uri, "&after={}", id)?;
         },
@@ -1234,7 +1234,7 @@ pub fn get_messages(channel_id: u64, query: &str)
                       query);
     let client = HyperClient::new();
     let response = request(Route::ChannelsIdMessages(channel_id),
-                                || client.get(&url))?;
+                           || client.get(&url))?;
 
     decode_array(serde_json::from_reader(response)?, Message::decode)
 }
@@ -1252,7 +1252,7 @@ pub fn get_pins(channel_id: u64) -> Result<Vec<Message>> {
 /// Gets user Ids based on their reaction to a message. This endpoint is dumb.
 pub fn get_reaction_users(channel_id: u64,
                           message_id: u64,
-                          reaction_type: ReactionType,
+                          reaction_type: &ReactionType,
                           limit: u8,
                           after: Option<u64>)
                           -> Result<Vec<User>> {
@@ -1512,22 +1512,15 @@ pub fn send_file<R: Read>(channel_id: u64,
     request.write_stream("file", &mut file, Some(filename), None)?;
 
     for (k, v) in map {
-        let val = match v {
-            Value::I64(v) => v.to_string(),
-            Value::String(v) => v,
-            Value::U64(v) => v.to_string(),
-            _ => continue,
-        };
-
-        request.write_text(&k, val)?;
+        request.write_text(&k, v.to_string())?;
     }
 
     Message::decode(serde_json::from_reader(request.send()?)?)
 }
 
 /// Sends a message to a channel.
-pub fn send_message(channel_id: u64, map: Value) -> Result<Message> {
-    let body = serde_json::to_string(&map)?;
+pub fn send_message(channel_id: u64, map: &Value) -> Result<Message> {
+    let body = map.to_string();
     let response = request!(Route::ChannelsIdMessages(channel_id),
                             post(body),
                             "/channels/{}/messages",
@@ -1573,8 +1566,8 @@ pub fn remove_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<(
 }
 
 /// Starts removing some members from a guild based on the last time they've been online.
-pub fn start_guild_prune(guild_id: u64, map: Value) -> Result<GuildPrune> {
-    let body = serde_json::to_string(&map)?;
+pub fn start_guild_prune(guild_id: u64, map: &Value) -> Result<GuildPrune> {
+    let body = map.to_string();
     let response = request!(Route::GuildsIdPrune(guild_id),
                             post(body),
                             "/guilds/{}/prune",

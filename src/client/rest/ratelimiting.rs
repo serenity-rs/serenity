@@ -38,6 +38,7 @@
 //! differentiating between different ratelimits.
 //!
 //! [Taken from]: https://discordapp.com/developers/docs/topics/rate-limits#rate-limits
+#![allow(zero_ptr)]
 
 use hyper::client::{RequestBuilder, Response};
 use hyper::header::Headers;

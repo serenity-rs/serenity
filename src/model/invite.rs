@@ -75,7 +75,7 @@ impl Invite {
             }
         }
 
-        rest::create_invite(channel_id.0, f(CreateInvite::default()).0.build())
+        rest::create_invite(channel_id.0, &f(CreateInvite::default()).0.build())
     }
 
     /// Deletes the invite.

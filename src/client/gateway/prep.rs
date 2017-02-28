@@ -91,7 +91,7 @@ pub fn build_gateway_url(base: &str) -> Result<RequestUrl> {
 pub fn keepalive(interval: u64,
                  heartbeat_sent: Arc<Mutex<Instant>>,
                  mut sender: Sender<WebSocketStream>,
-                 channel: MpscReceiver<GatewayStatus>) {
+                 channel: &MpscReceiver<GatewayStatus>) {
     let mut base_interval = Duration::milliseconds(interval as i64);
     let mut next_tick = time::get_time() + base_interval;
 

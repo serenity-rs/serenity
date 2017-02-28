@@ -557,7 +557,7 @@ impl ChannelId {
             .insert("type", kind)
             .build();
 
-        rest::create_permission(self.0, id, map)
+        rest::create_permission(self.0, id, &map)
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -575,7 +575,7 @@ impl ChannelId {
     #[inline]
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R)
         -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
-        rest::create_reaction(self.0, message_id.into().0, reaction_type.into())
+        rest::create_reaction(self.0, message_id.into().0, &reaction_type.into())
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
@@ -620,7 +620,7 @@ impl ChannelId {
 
         let map = ObjectBuilder::new().insert("messages", ids).build();
 
-        rest::delete_messages(self.0, map)
+        rest::delete_messages(self.0, &map)
     }
 
     /// Deletes all permission overrides in the channel from a member or role.
@@ -647,7 +647,7 @@ impl ChannelId {
         rest::delete_reaction(self.0,
                               message_id.into().0,
                               user_id.map(|uid| uid.0),
-                              reaction_type.into())
+                              &reaction_type.into())
     }
 
 
@@ -677,7 +677,7 @@ impl ChannelId {
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
     pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel> {
-        rest::edit_channel(self.0, f(EditChannel::default()).0.build())
+        rest::edit_channel(self.0, &f(EditChannel::default()).0.build())
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -711,7 +711,7 @@ impl ChannelId {
             }
         }
 
-        rest::edit_message(self.0, message_id.into().0, Value::Object(map))
+        rest::edit_message(self.0, message_id.into().0, &Value::Object(map))
     }
 
     /// Search the cache for the channel with the Id.
@@ -798,7 +798,7 @@ impl ChannelId {
 
         rest::get_reaction_users(self.0,
                                  message_id.into().0,
-                                 reaction_type.into(),
+                                 &reaction_type.into(),
                                  limit,
                                  after.map(|u| u.into().0))
     }
@@ -950,7 +950,7 @@ impl ChannelId {
             }
         }
 
-        rest::send_message(self.0, Value::Object(map))
+        rest::send_message(self.0, &Value::Object(map))
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.
@@ -1470,7 +1470,7 @@ impl Message {
 
         let map = f(builder).0;
 
-        match rest::edit_message(self.channel_id.0, self.id.0, Value::Object(map)) {
+        match rest::edit_message(self.channel_id.0, self.id.0, &Value::Object(map)) {
             Ok(edited) => {
                 mem::replace(self, edited);
 
@@ -1621,7 +1621,7 @@ impl Message {
 
         rest::create_reaction(self.channel_id.0,
                               self.id.0,
-                              reaction_type.into())
+                              &reaction_type.into())
     }
 
     /// Replies to the user, mentioning them prior to the content in the form
@@ -1669,7 +1669,7 @@ impl Message {
             .insert("tts", false)
             .build();
 
-        rest::send_message(self.channel_id.0, map)
+        rest::send_message(self.channel_id.0, &map)
     }
 
     /// Unpins the message from its channel.
@@ -2094,7 +2094,7 @@ impl GuildChannel {
 
         let map = f(CreateInvite::default()).0.build();
 
-        rest::create_invite(self.id.0, map)
+        rest::create_invite(self.id.0, &map)
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -2289,7 +2289,7 @@ impl GuildChannel {
 
         let edited = f(EditChannel(map)).0.build();
 
-        match rest::edit_channel(self.id.0, edited) {
+        match rest::edit_channel(self.id.0, &edited) {
             Ok(channel) => {
                 mem::replace(self, channel);
 
@@ -2571,7 +2571,7 @@ impl Reaction {
         rest::delete_reaction(self.channel_id.0,
                               self.message_id.0,
                               user_id,
-                              self.emoji.clone())
+                              &self.emoji)
     }
 
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
@@ -2606,7 +2606,7 @@ impl Reaction {
                              U: Into<UserId> {
         rest::get_reaction_users(self.channel_id.0,
                                  self.message_id.0,
-                                 reaction_type.into(),
+                                 &reaction_type.into(),
                                  limit.unwrap_or(50),
                                  after.map(|u| u.into().0))
     }

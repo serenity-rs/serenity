@@ -83,7 +83,7 @@ impl Webhook {
             map = map.insert("name", name);
         }
 
-        match rest::edit_webhook_with_token(self.id.0, &self.token, map.build()) {
+        match rest::edit_webhook_with_token(self.id.0, &self.token, &map.build()) {
             Ok(replacement) => {
                 mem::replace(self, replacement);
 
@@ -142,7 +142,7 @@ impl Webhook {
     /// ```
     #[inline]
     pub fn execute<F: FnOnce(ExecuteWebhook) -> ExecuteWebhook>(&self, f: F) -> Result<Message> {
-        rest::execute_webhook(self.id.0, &self.token, f(ExecuteWebhook::default()).0.build())
+        rest::execute_webhook(self.id.0, &self.token, &f(ExecuteWebhook::default()).0.build())
     }
 
     /// Retrieves the latest information about the webhook, editing the

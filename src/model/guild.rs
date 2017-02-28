@@ -79,7 +79,7 @@ impl Emoji {
                     .insert("name", name)
                     .build();
 
-                match rest::edit_emoji(guild_id.0, self.id.0, map) {
+                match rest::edit_emoji(guild_id.0, self.id.0, &map) {
                     Ok(emoji) => {
                         mem::replace(self, emoji);
 
@@ -276,7 +276,7 @@ impl Guild {
             .insert("region", region.name())
             .build();
 
-        rest::create_guild(map)
+        rest::create_guild(&map)
     }
 
     /// Creates a new [`Channel`] in the guild.
@@ -1181,7 +1181,7 @@ impl GuildId {
             .insert("type", kind.name())
             .build();
 
-        rest::create_channel(self.0, map)
+        rest::create_channel(self.0, &map)
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
@@ -1207,7 +1207,7 @@ impl GuildId {
             .insert("image", image)
             .build();
 
-        rest::create_emoji(self.0, map)
+        rest::create_emoji(self.0, &map)
     }
 
     /// Creates an integration for the guild.
@@ -1223,7 +1223,7 @@ impl GuildId {
             .insert("type", kind)
             .build();
 
-        rest::create_guild_integration(self.0, integration_id.0, map)
+        rest::create_guild_integration(self.0, integration_id.0, &map)
     }
 
     /// Creates a new role in the guild with the data set, if any.
@@ -1236,7 +1236,7 @@ impl GuildId {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
     pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
-        rest::create_role(self.0, f(EditRole::default()).0.build())
+        rest::create_role(self.0, &f(EditRole::default()).0.build())
     }
 
     /// Deletes the current guild if the current account is the owner of the
@@ -1299,7 +1299,7 @@ impl GuildId {
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
     pub fn edit<F: FnOnce(EditGuild) -> EditGuild>(&mut self, f: F) -> Result<PartialGuild> {
-        rest::edit_guild(self.0, f(EditGuild::default()).0.build())
+        rest::edit_guild(self.0, &f(EditGuild::default()).0.build())
     }
 
     /// Edits an [`Emoji`]'s name in the guild.
@@ -1315,7 +1315,7 @@ impl GuildId {
     pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str) -> Result<Emoji> {
         let map = ObjectBuilder::new().insert("name", name).build();
 
-        rest::edit_emoji(self.0, emoji_id.into().0, map)
+        rest::edit_emoji(self.0, emoji_id.into().0, &map)
     }
 
     /// Edits the properties of member of the guild, such as muting or
@@ -1334,7 +1334,7 @@ impl GuildId {
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
         where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
-        rest::edit_member(self.0, user_id.into().0, f(EditMember::default()).0.build())
+        rest::edit_member(self.0, user_id.into().0, &f(EditMember::default()).0.build())
     }
 
     /// Edits the current user's nickname for the guild.
@@ -1368,7 +1368,7 @@ impl GuildId {
     #[inline]
     pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
-        rest::edit_role(self.0, role_id.into().0, f(EditRole::default()).0.build())
+        rest::edit_role(self.0, role_id.into().0, &f(EditRole::default()).0.build())
     }
 
     /// Search the cache for the guild.
@@ -1479,7 +1479,7 @@ impl GuildId {
     pub fn get_prune_count(&self, days: u16) -> Result<GuildPrune> {
         let map = ObjectBuilder::new().insert("days", days).build();
 
-        rest::get_guild_prune_count(self.0, map)
+        rest::get_guild_prune_count(self.0, &map)
     }
 
     /// Retrieves the guild's webhooks.
@@ -1518,7 +1518,7 @@ impl GuildId {
         -> Result<()> where C: Into<ChannelId>, U: Into<UserId> {
         let map = ObjectBuilder::new().insert("channel_id", channel_id.into().0).build();
 
-        rest::edit_member(self.0, user_id.into().0, map)
+        rest::edit_member(self.0, user_id.into().0, &map)
     }
 
     /// Performs a search request to the API for the guild's [`Message`]s.
@@ -1583,7 +1583,7 @@ impl GuildId {
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     #[inline]
     pub fn start_prune(&self, days: u16) -> Result<GuildPrune> {
-        rest::start_guild_prune(self.0, ObjectBuilder::new().insert("days", days).build())
+        rest::start_guild_prune(self.0, &ObjectBuilder::new().insert("days", days).build())
     }
 
     /// Unbans a [`User`] from the guild.
@@ -1681,7 +1681,7 @@ impl Member {
 
         let map = EditMember::default().roles(&self.roles).0.build();
 
-        match rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, map) {
+        match rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map) {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.retain(|r| !role_ids.contains(r));
@@ -1763,7 +1763,7 @@ impl Member {
         let guild_id = self.find_guild()?;
         let map = f(EditMember::default()).0.build();
 
-        rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, map)
+        rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map)
     }
 
     /// Finds the Id of the [`Guild`] that the member is in.
@@ -1832,7 +1832,7 @@ impl Member {
 
         let map = EditMember::default().roles(&self.roles).0.build();
 
-        match rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, map) {
+        match rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map) {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);

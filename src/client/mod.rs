@@ -782,7 +782,7 @@ impl Client {
         for shard_number in shards_index..shards_total {
             let shard_info = shard_data.map(|s| [shard_number, s[2]]);
 
-            let boot = boot_shard(BootInfo {
+            let boot = boot_shard(&BootInfo {
                 gateway_url: gateway_url.clone(),
                 login_type: self.login_type,
                 shard_info: shard_info,
@@ -1195,7 +1195,7 @@ struct MonitorInfo {
     token: String,
 }
 
-fn boot_shard(info: BootInfo) -> Result<(Shard, ReadyEvent, Receiver<WebSocketStream>)> {
+fn boot_shard(info: &BootInfo) -> Result<(Shard, ReadyEvent, Receiver<WebSocketStream>)> {
     // Make ten attempts to boot the shard, exponentially backing off; if it
     // still doesn't boot after that, accept it as a failure.
     //
@@ -1250,7 +1250,7 @@ fn monitor_shard(mut info: MonitorInfo) {
         let mut boot_successful = false;
 
         for _ in 0..3 {
-            let boot = boot_shard(BootInfo {
+            let boot = boot_shard(&BootInfo {
                 gateway_url: info.gateway_url.clone(),
                 login_type: info.login_type,
                 shard_info: info.shard_info,

@@ -106,7 +106,7 @@ impl Context {
 
         let edited = f(EditProfile(map)).0.build();
 
-        rest::edit_profile(edited)
+        rest::edit_profile(&edited)
     }
 
     /// Sets the current user as being [`Online`]. This maintains the current

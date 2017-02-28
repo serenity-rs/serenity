@@ -78,7 +78,7 @@ impl CurrentUser {
             map = map.insert("email", email)
         }
 
-        match rest::edit_profile(f(EditProfile(map)).0.build()) {
+        match rest::edit_profile(&f(EditProfile(map)).0.build()) {
             Ok(new) => {
                 let _ = mem::replace(self, new);
 
@@ -90,7 +90,7 @@ impl CurrentUser {
 
     /// Gets a list of guilds that the current user is in.
     pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
-        rest::get_guilds(GuildPagination::After(GuildId(1)), 100)
+        rest::get_guilds(&GuildPagination::After(GuildId(1)), 100)
     }
 
     /// Returns a static formatted URL of the user's icon, if one exists.
@@ -230,7 +230,7 @@ impl User {
                     .insert("recipient_id", self.id.0)
                     .build();
 
-                rest::create_private_channel(map)?.id
+                rest::create_private_channel(&map)?.id
             }
         } else {
             let map = ObjectBuilder::new()
@@ -245,7 +245,7 @@ impl User {
             .insert("tts", false)
             .build();
 
-        rest::send_message(private_channel_id.0, map)
+        rest::send_message(private_channel_id.0, &map)
     }
 
     /// This is an alias of [direct_message].
@@ -386,14 +386,14 @@ impl UserId {
     pub fn create_dm_channel(&self) -> Result<PrivateChannel> {
         let map = ObjectBuilder::new().insert("recipient_id", self.0).build();
 
-        rest::create_private_channel(map)
+        rest::create_private_channel(&map)
     }
 
     /// Deletes a profile note from a user.
     pub fn delete_note(&self) -> Result<()> {
         let map = ObjectBuilder::new().insert("note", "").build();
 
-        rest::edit_note(self.0, map)
+        rest::edit_note(self.0, &map)
     }
 
     /// Edits the note that the current user has set for another user.
@@ -409,7 +409,7 @@ impl UserId {
     pub fn edit_note(&self, note: &str) -> Result<()> {
         let map = ObjectBuilder::new().insert("note", note).build();
 
-        rest::edit_note(self.0, map)
+        rest::edit_note(self.0, &map)
     }
 
     /// Search the cache for the user with the Id.

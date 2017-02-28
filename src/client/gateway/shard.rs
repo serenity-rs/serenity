@@ -146,7 +146,7 @@ impl Shard {
         ThreadBuilder::new()
             .name(thread_name)
             .spawn(move || {
-                prep::keepalive(heartbeat_interval, heartbeat_clone, sender, rx)
+                prep::keepalive(heartbeat_interval, heartbeat_clone, sender, &rx)
             })?;
 
         // Parse READY
