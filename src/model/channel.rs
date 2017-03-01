@@ -1539,10 +1539,7 @@ impl Message {
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature="cache")]
     pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> {
-        match self.guild_id().map(|guild_id| CACHE.read().unwrap().get_guild(guild_id)) {
-            Some(Some(x)) => Some(x),
-            _ => None,
-        }
+        self.guild_id().and_then(|guild_id| CACHE.read().unwrap().get_guild(guild_id))
     }
 
     /// Retrieves the Id of the guild that the message was sent in, if sent in
