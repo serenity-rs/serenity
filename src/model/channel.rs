@@ -1529,6 +1529,22 @@ impl Message {
         self.channel_id.get_reaction_users(self.id, reaction_type, limit, after)
     }
 
+    /// Returns the associated `Guild` for the message if one is in the cache.
+    ///
+    /// Returns `None` if the guild's Id could not be found via [`guild_id`] or
+    /// if the Guild itself is not cached.
+    ///
+    /// Requires the `cache` feature be enabled.
+    ///
+    /// [`guild_id`]: #method.guild_id
+    #[cfg(feature="cache")]
+    pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> {
+        match self.guild_id().map(|guild_id| CACHE.read().unwrap().get_guild(guild_id)) {
+            Some(Some(x)) => Some(x),
+            _ => None,
+        }
+    }
+
     /// Retrieves the Id of the guild that the message was sent in, if sent in
     /// one.
     ///
