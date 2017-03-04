@@ -1175,7 +1175,7 @@ pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
 ///
 /// let guild_id = GuildId(81384788765712384);
 ///
-/// let guilds = get_guilds(GuildPagination::After(guild_id), 10).unwrap();
+/// let guilds = get_guilds(&GuildPagination::After(guild_id), 10).unwrap();
 /// ```
 ///
 /// [docs]: https://discordapp.com/developers/docs/resources/user#get-current-user-guilds
