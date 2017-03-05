@@ -82,51 +82,6 @@ pub fn set_token(token: &str) {
     TOKEN.lock().unwrap().clone_from(&token.to_owned());
 }
 
-/// Accepts the [`Invite`] given its code, placing the current user in the
-/// [`Guild`] that the invite was for.
-///
-/// Use [`utils::parse_invite`] to retrieve codes from URLs.
-///
-/// Refer to the documentation for [`Context::accept_invite`] for restrictions on
-/// accepting an invite.
-///
-/// This will fire the [`Client::on_guild_create`] handler once the associated
-/// event is received.
-///
-/// **Note**: This will fail if you are already in the guild, or are banned. A
-/// ban is equivalent to an IP ban.
-///
-/// **Note**: Requires that the current user be a user account. Bots can not
-/// accept invites. Instead, they must be accepted via OAuth2 authorization
-/// links. These are in the format of:
-///
-/// `https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID&scope=bot`
-///
-/// # Examples
-///
-/// Accept an invite given a code from a URL:
-///
-/// ```rust,no_run
-/// use serenity::client::rest;
-/// use serenity::utils;
-///
-/// let url = "https://discord.gg/0cDvIgU2voY8RSYL";
-/// let code = utils::parse_invite(url);
-///
-/// let _result = rest::accept_invite(code);
-/// ```
-///
-/// [`Client::on_guild_create`]: ../struct.Client.html#method.on_guild_create
-/// [`Context::accept_invite`]: ../struct.Context.html#method.accept_invite
-/// [`Guild`]: ../../model/struct.Guild.html
-/// [`Invite`]: ../../model/struct.Invite.html
-/// [`utils::parse_invite`]: ../../utils/fn.parse_invite.html
-pub fn accept_invite(code: &str) -> Result<Invite> {
-    let response = request!(Route::InvitesCode, post, "/invites/{}", code);
-
-    Invite::decode(serde_json::from_reader(response)?)
-}
-
 /// Marks a [`Channel`] as being "read" up to a certain [`Message`]. Any
 /// message past the given one will not be marked as read.
 ///

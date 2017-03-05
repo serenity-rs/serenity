@@ -9,41 +9,8 @@ use ::utils;
 use super::permissions;
 #[cfg(feature="cache")]
 use super::utils as model_utils;
-#[cfg(feature="cache")]
-use ::client::CACHE;
 
 impl Invite {
-    /// Accepts the invite, placing the current user in the [`Guild`] that the
-    /// invite was for.
-    ///
-    /// Refer to [`rest::accept_invite`] for more information.
-    ///
-    /// **Note**: This will fail if you are already in the guild, or are banned.
-    /// A ban is equivalent to an IP ban.
-    ///
-    /// **Note**: Requires that the current user be a user account.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` features is enabled, then this returns a
-    /// [`ClientError::InvalidOperationAsBot`] if the current user does not have
-    /// the required [permission].
-    ///
-    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
-    /// [`Guild`]: struct.Guild.html
-    /// [`rest::accept_invite`]: ../client/rest/fn.accept_invite.html
-    /// [permission]: permissions/index.html
-    pub fn accept(&self) -> Result<Invite> {
-        #[cfg(feature="cache")]
-        {
-            if CACHE.read().unwrap().user.bot {
-                return Err(Error::Client(ClientError::InvalidOperationAsBot));
-            }
-        }
-
-        rest::accept_invite(&self.code)
-    }
-
     /// Creates an invite for a [`GuildChannel`], providing a builder so that
     /// fields may optionally be set.
     ///
@@ -110,36 +77,6 @@ impl Invite {
 }
 
 impl RichInvite {
-    /// Accepts the invite, placing the current user in the [`Guild`] that the
-    /// invite was for.
-    ///
-    /// Refer to [`rest::accept_invite`] for more information.
-    ///
-    /// **Note**: This will fail if you are already in the guild, or are banned.
-    /// A ban is equivalent to an IP ban.
-    ///
-    /// **Note**: Requires that the current user be a user account.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot
-    /// user.
-    ///
-    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
-    /// [`Guild`]: struct.Guild.html
-    /// [`rest::accept_invite`]: ../client/rest/fn.accept_invite.html
-    pub fn accept(&self) -> Result<Invite> {
-        #[cfg(feature="cache")]
-        {
-            if CACHE.read().unwrap().user.bot {
-                return Err(Error::Client(ClientError::InvalidOperationAsBot));
-            }
-        }
-
-        rest::accept_invite(&self.code)
-    }
-
     /// Deletes the invite.
     ///
     /// Refer to [`rest::delete_invite`] for more information.
