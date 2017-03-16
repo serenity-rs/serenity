@@ -1,9 +1,9 @@
-//! Requires the "cache", "methods", and "voice" features be enabled in your
-//! Cargo.toml, like so:
+//! Requires the "cache" and "framework" features be enabled in your
+//! `Cargo.toml`, like so:
 //!
 //! ```toml
 //! [dependencies.serenity]
-//! version = "*"
+//! git = "https://github.com/zeyla/serenity.git"
 //! features = ["cache", "framework"]
 //! ```
 //!

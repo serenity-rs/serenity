@@ -1,6 +1,7 @@
-//! Requires the 'methods' feature flag be enabled in your project's Cargo.toml.
+//! Requires the 'framework' feature flag be enabled in your project's
+//! `Cargo.toml`.
 //!
-//! This can be activated by specifying the feature in the dependency section:
+//! This can be enabled by specifying the feature in the dependency section:
 //!
 //! ```toml
 //! [dependencies.serenity]

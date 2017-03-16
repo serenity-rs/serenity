@@ -1,12 +1,3 @@
-//! Requires the 'methods' feature flag be enabled in your project's Cargo.toml.
-//!
-//! This can be activated by specifying the feature in the dependency section:
-//!
-//! ```toml
-//! [dependencies.serenity]
-//! git = "https://github.com/zeyla/serenity.git"
-//! ```
-
 extern crate serenity;
 
 use serenity::Client;
