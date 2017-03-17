@@ -237,7 +237,7 @@ impl User {
                 .insert("recipient_id", self.id.0)
                 .build();
 
-            rest::create_private_channel(map)?.id
+            rest::create_private_channel(&map)?.id
         }};
 
         let map = ObjectBuilder::new()
