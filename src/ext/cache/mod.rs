@@ -361,7 +361,7 @@ impl Cache {
     /// [`Client::on_message`] event dispatch:
     ///
     /// ```rust,ignore
-    /// use serenity::cache::CACHE;
+    /// use serenity::client::CACHE;
     ///
     /// let cache = CACHE.read().unwrap();
     ///
