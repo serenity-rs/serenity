@@ -1467,7 +1467,14 @@ pub fn send_file<R: Read>(channel_id: u64,
     request.write_stream("file", &mut file, Some(filename), None)?;
 
     for (k, v) in map {
-        request.write_text(&k, v.to_string())?;
+        let _ = match v {
+            Value::Bool(false) => request.write_text(&k, "false")?,
+            Value::Bool(true) => request.write_text(&k, "true")?,
+            Value::I64(inner) => request.write_text(&k, inner.to_string())?,
+            Value::U64(inner) => request.write_text(&k, inner.to_string())?,
+            Value::String(inner) => request.write_text(&k, inner)?,
+            _ => continue,
+        };
     }
 
     Message::decode(serde_json::from_reader(request.send()?)?)
