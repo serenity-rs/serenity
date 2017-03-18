@@ -1782,7 +1782,7 @@ impl Member {
 
             let predicate = guild.members
                 .values()
-                .any(|m| m.joined_at == self.joined_at && m.user.read().unwrap().id == self.user.read().unwrap().id);
+                .any(|m| m.user.read().unwrap().id == self.user.read().unwrap().id);
 
             if predicate {
                 return Ok(guild.id);
@@ -1857,7 +1857,7 @@ impl Member {
                 .unwrap()
                 .members
                 .values()
-                .any(|m| m.user.read().unwrap().id == self.user.read().unwrap().id && m.joined_at == *self.joined_at))
+                .any(|m| m.user.read().unwrap().id == self.user.read().unwrap().id))
             .map(|guild| guild
                 .read()
                 .unwrap()
