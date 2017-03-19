@@ -580,7 +580,7 @@ impl Cache {
 
                 channel_writer.recipient = self.users[&user_id].clone();
 
-                let ch = self.private_channels.insert(channel.read().unwrap().id, channel.clone());
+                let ch = self.private_channels.insert(channel_writer.id, channel.clone());
                 ch.map(Channel::Private)
             },
         }
