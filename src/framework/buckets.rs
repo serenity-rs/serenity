@@ -1,31 +1,23 @@
 use std::collections::HashMap;
-use std::default::Default;
 use time;
 
 #[doc(hidden)]
+#[derive(Clone)]
 pub struct Ratelimit {
     pub delay: i64,
     pub limit: Option<(i64, i32)>,
 }
 
 #[doc(hidden)]
+#[derive(Clone, Default)]
 pub struct MemberRatelimit {
     pub last_time: i64,
     pub set_time: i64,
     pub tickets: i32,
 }
 
-impl Default for MemberRatelimit {
-    fn default() -> Self {
-        MemberRatelimit {
-            last_time: 0,
-            set_time: 0,
-            tickets: 0,
-        }
-    }
-}
-
 #[doc(hidden)]
+#[derive(Clone)]
 pub struct Bucket {
     pub ratelimit: Ratelimit,
     pub users: HashMap<u64, MemberRatelimit>,
@@ -53,7 +45,7 @@ impl Bucket {
         } else {
             user.tickets += 1;
             user.last_time = time;
-
+            
             0
         }
     }

@@ -53,7 +53,7 @@ use ::model::event::*;
 use ::model::*;
 
 #[cfg(feature="framework")]
-use ::framework::Framework;
+use ::framework::{Framework, Command};
 
 /// The Client is the way to "login" and be able to start sending authenticated
 /// requests over the REST API, as well as initializing a WebSocket connection
@@ -92,7 +92,7 @@ use ::framework::Framework;
 /// [`on_message`]: #method.on_message
 /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
 /// [sharding docs]: gateway/index.html#sharding
-pub struct Client {
+pub struct Client<T: Command> {
     /// A ShareMap which requires types to be Send + Sync. This is a map that
     /// can be safely shared across contexts.
     ///
@@ -170,12 +170,12 @@ pub struct Client {
     /// [`on_ready`]: #method.on_ready
     event_store: Arc<RwLock<EventStore>>,
     #[cfg(feature="framework")]
-    framework: Arc<Mutex<Framework>>,
+    framework: Arc<Mutex<Framework<T>>>,
     token: String,
 }
 
 #[allow(type_complexity)]
-impl Client {
+impl<T: Command + Send + Sync + 'static + Clone> Client<T> {
     /// Alias of [`login`].
     ///
     /// [`login`]: #method.login
@@ -257,7 +257,7 @@ impl Client {
     /// [framework docs]: ../framework/index.html
     #[cfg(feature="framework")]
     pub fn with_framework<F>(&mut self, f: F)
-        where F: FnOnce(Framework) -> Framework + Send + Sync + 'static {
+        where F: FnOnce(Framework<T>) -> Framework<T> + Send + Sync + 'static {
         self.framework = Arc::new(Mutex::new(f(Framework::default())));
     }
 
@@ -1004,7 +1004,7 @@ impl Client {
 }
 
 #[cfg(feature="cache")]
-impl Client {
+impl<T: Command + Send + Sync + 'static> Client<T> {
     /// Attaches a handler for when a [`ChannelUpdate`] is received.
     ///
     /// Optionally provides the version of the channel before the update.
@@ -1108,7 +1108,7 @@ impl Client {
 }
 
 #[cfg(not(feature="cache"))]
-impl Client {
+impl<T: Command> Client<T> {
     /// Attaches a handler for when a [`ChannelUpdate`] is received.
     ///
     /// [`ChannelUpdate`]: ../model/event/enum.Event.html#variant.ChannelUpdate
@@ -1203,10 +1203,10 @@ struct BootInfo {
 }
 
 #[cfg(feature="framework")]
-struct MonitorInfo {
+struct MonitorInfo<T: Command> {
     data: Arc<Mutex<ShareMap>>,
     event_store: Arc<RwLock<EventStore>>,
-    framework: Arc<Mutex<Framework>>,
+    framework: Arc<Mutex<Framework<T>>>,
     gateway_url: Arc<Mutex<String>>,
     receiver: Receiver<WebSocketStream>,
     shard: Arc<Mutex<Shard>>,
@@ -1215,7 +1215,7 @@ struct MonitorInfo {
 }
 
 #[cfg(not(feature="framework"))]
-struct MonitorInfo {
+struct MonitorInfo<T: Command + Send + Sync + 'static> {
     data: Arc<Mutex<ShareMap>>,
     event_store: Arc<RwLock<EventStore>>,
     gateway_url: Arc<Mutex<String>>,
@@ -1223,6 +1223,8 @@ struct MonitorInfo {
     shard: Arc<Mutex<Shard>>,
     shard_info: Option<[u64; 2]>,
     token: String,
+    // Yes this is a hack.
+    _m: std::marker::PhantomData<T>,
 }
 
 fn boot_shard(info: &BootInfo) -> Result<(Shard, ReadyEvent, Receiver<WebSocketStream>)> {
@@ -1272,7 +1274,7 @@ fn boot_shard(info: &BootInfo) -> Result<(Shard, ReadyEvent, Receiver<WebSocketS
     Err(Error::Client(ClientError::ShardBootFailure))
 }
 
-fn monitor_shard(mut info: MonitorInfo) {
+fn monitor_shard<T: Command + Send + Sync + 'static + Clone>(mut info: MonitorInfo<T>) {
     handle_shard(&mut info);
 
     loop {
@@ -1328,7 +1330,7 @@ fn monitor_shard(mut info: MonitorInfo) {
     error!("Completely failed to reboot shard");
 }
 
-fn handle_shard(info: &mut MonitorInfo) {
+fn handle_shard<T: Command + Send + Sync + 'static + Clone>(info: &mut MonitorInfo<T>) {
     loop {
         let event = match info.receiver.recv_json(GatewayEvent::decode) {
             Err(Error::WebSocket(WebSocketError::NoDataAvailable)) => {
@@ -1387,7 +1389,7 @@ fn handle_shard(info: &mut MonitorInfo) {
     }
 }
 
-fn login(token: String) -> Client {
+fn login<T: Command + Send + Sync + 'static + Clone>(token: String) -> Client<T> {
     http::set_token(&token);
 
     feature_framework! {{

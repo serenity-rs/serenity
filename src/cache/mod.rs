@@ -1058,25 +1058,8 @@ impl Cache {
 impl Default for Cache {
     fn default() -> Cache {
         Cache {
-            channels: HashMap::default(),
-            groups: HashMap::default(),
-            guilds: HashMap::default(),
-            notes: HashMap::default(),
-            presences: HashMap::default(),
-            private_channels: HashMap::default(),
             shard_count: 1,
-            unavailable_guilds: HashSet::default(),
-            user: CurrentUser {
-                avatar: None,
-                bot: false,
-                discriminator: 0,
-                email: None,
-                id: UserId(0),
-                mfa_enabled: false,
-                name: String::default(),
-                verified: false,
-            },
-            users: HashMap::default(),
+            ..Default::default()
         }
     }
 }
