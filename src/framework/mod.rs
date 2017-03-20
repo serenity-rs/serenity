@@ -32,6 +32,10 @@
 //! ping and about command:
 //!
 //! ```rust,ignore
+//! extern crate serenity;
+//! extern crate serenity_attributes;
+//!
+//! use serenity_attributes::command;
 //! use serenity::client::{Client, Context};
 //! use serenity::model::Message;
 //! use std::env;
@@ -40,33 +44,56 @@
 //!
 //! client.with_framework(|f| f
 //!     .configure(|c| c.prefix("~"))
-//!     .command("about", |c| c.exec_str("A simple test bot"))
-//!     .command("ping", |c| c.exec(ping)));
+//!     .register(About)
+//!     .register(Ping));
 //!
-//! command!(about(_context, message) {
-//!     let _ = message.channel_id.say("A simple test bot");
-//! });
-//!
-//! command!(ping(_context, message) {
-//!     let _ = message.channel_id.say("Pong!");
-//! });
+//! #[command]
+//! fn about() -> String {
+//!    "A simple test bot".to_string()
+//! }
+//! 
+//! #[command]
+//! fn ping(msg: &Message) {
+//!     let _ = msg.channel_id.say("Pong!");
+//! }
 //! ```
 //!
-//! [`Client::with_framework`]: ../client/struct.Client.html#method.with_framework
+//! A command with named args:
+//! ```rust,ignore
+//! #[macro_use]
+//! extern crate serenity; 
+//! extern crate serenity_attributes;
+//!
+//! use serenity_attributes::command;
+//! use serenity::client::{Client, Context};
+//! use serenity::model::Message;
+//! use std::env;
+//!
+//! let mut client = Client::login(&env::var("DISCORD_BOT_TOKEN").unwrap());
+//!
+//! client.with_framework(|f| f
+//!     .configure(|c| c.prefix("~"))
+//!     .register(Number));
+//!
+//! #[command]
+//! fn number(msg: &Message, args: Vec<String>) {
+//!    named_args!(args, number:i32;);
+//!    let _ = msg.channel_id.say(&format!("The number you passed: {}", number));
+//! }
+//! ```
+//!  
+//! [`Client::with_framework`]: ../../client/struct.Client.html#method.with_framework
 
 pub mod help_commands;
 
 mod command;
 mod configuration;
-mod create_command;
-mod create_group;
 mod buckets;
 
 pub use self::buckets::{Bucket, MemberRatelimit, Ratelimit};
-pub use self::command::{Command, CommandType, CommandGroup, CommandOrAlias};
+pub use self::command::{Command, CommandGroup};
 pub use self::configuration::Configuration;
-pub use self::create_command::CreateCommand;
-pub use self::create_group::CreateGroup;
+
 
 use self::command::{AfterHook, BeforeHook};
 use std::collections::HashMap;
@@ -82,94 +109,6 @@ use ::utils;
 use ::client::CACHE;
 #[cfg(feature="cache")]
 use ::model::Channel;
-
-/// A macro to generate "named parameters". This is useful to avoid manually
-/// using the "arguments" parameter and manually parsing types.
-///
-/// This is meant for use with the command [`Framework`].
-///
-/// # Examples
-///
-/// Create a regular `ping` command which takes no arguments:
-///
-/// ```rust,ignore
-/// command!(ping(_context, message, _args) {
-///     if let Err(why) = message.reply("Pong!") {
-///         println!("Error sending pong: {:?}", why);
-///     }
-/// });
-/// ```
-///
-/// Create a command named `multiply` which accepts 2 floats and multiplies
-/// them, sending the product as a reply:
-///
-/// ```rust,ignore
-/// command!(multiply(_context, message, _args, first: f64, second: f64) {
-///     let product = first * second;
-///
-///     if let Err(why) = message.reply(&product.to_string()) {
-///         println!("Error sending product: {:?}", why);
-///     }
-/// });
-/// ```
-///
-/// [`Framework`]: framework/index.html
-#[macro_export]
-macro_rules! command {
-    ($fname:ident($c:ident) $b:block) => {
-        #[allow(unreachable_code, unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context, _: &$crate::model::Message, _: Vec<String>) -> ::std::result::Result<(), String> {
-            $b
-
-            Ok(())
-        }
-    };
-    ($fname:ident($c:ident, $m:ident) $b:block) => {
-        #[allow(unreachable_code, unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, _: Vec<String>) -> ::std::result::Result<(), String> {
-            $b
-
-            Ok(())
-        }
-    };
-    ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
-        #[allow(unreachable_code, unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> ::std::result::Result<(), String> {
-            $b
-
-            Ok(())
-        }
-    };
-    ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
-        #[allow(unreachable_code, unreachable_patterns, unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> ::std::result::Result<(), String> {
-            let mut i = $a.iter();
-            let mut arg_counter = 0;
-
-            $(
-                arg_counter += 1;
-
-                let $name = match i.next() {
-                    Some(v) => match v.parse::<$t>() {
-                        Ok(v) => v,
-                        Err(_) => return Err(format!("Failed to parse argument #{} of type {:?}",
-                                                     arg_counter,
-                                                     stringify!($t))),
-                    },
-                    None => return Err(format!("Missing argument #{} of type {:?}",
-                                               arg_counter,
-                                               stringify!($t))),
-                };
-            )*
-
-            drop(i);
-
-            $b
-
-            Ok(())
-        }
-    };
-}
 
 /// A enum representing all possible fail conditions under which a command won't
 /// be executed.
@@ -215,9 +154,10 @@ type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'st
 /// [module-level documentation]: index.html
 #[allow(type_complexity)]
 #[derive(Default)]
-pub struct Framework {
+pub struct Framework<T> {
     configuration: Configuration,
-    groups: HashMap<String, Arc<CommandGroup>>,
+    groups: HashMap<String, Arc<CommandGroup<T>>>,
+    aliases: HashMap<String, String>,
     before: Option<Arc<BeforeHook>>,
     dispatch_error_handler: Option<Arc<DispatchErrorHook>>,
     buckets: HashMap<String, Bucket>,
@@ -241,7 +181,7 @@ pub struct Framework {
     user_info: (u64, bool),
 }
 
-impl Framework {
+impl<T> Framework<T> {
     /// Configures the framework, setting non-default values. All fields are
     /// optional. Refer to [`Configuration::default`] for more information on
     /// the default values.
@@ -272,6 +212,48 @@ impl Framework {
         where F: FnOnce(Configuration) -> Configuration {
         self.configuration = f(self.configuration);
 
+        self
+    }
+
+    /// Registers the provided command to the framework.
+    /// If the `#[group(name)]` attribute was used when creating a command,
+    /// that name'll be used for assigning the command to the group, if not, 
+    /// "Ungrouped"'s used instead.
+    ///
+    /// # Examples
+    /// ```rust,no_run
+    /// extern crate serenity;
+    /// extern crate serenity_attributes;
+    ///
+    /// use serenity::Client;
+    /// use serenity_attributes::command;
+    ///
+    /// #[command]
+    /// #[group(abc, prefix = "abc")]
+    /// fn some_command(msg: &Message) {
+    ///     let _ = msg.channel_id.say("hello");
+    /// }
+    ///  
+    /// let mut client = Client::login(&env::var("DISCORD_TOKEN").unwrap());
+    /// client.with_framework(|f| 
+    ///     f.configure(|c| c.prefix("~"))
+    ///     .register(SomeCommand)); // `~abc some_command` => `hello`
+    pub fn register<T: Command>(mut self, command: T) -> Self {
+        for alias in &command.aliases() {
+            self.aliases.insert(alias.clone(), command.name());
+        }
+
+        if self.groups.contains_key(command.group()) {
+            let dummy_lock = self.groups.get_mut(command.group()).unwrap().lock().unwrap();
+            dummy_lock.insert(command);
+            return self;
+        }
+        let mut command_group = CommandGroup::new();
+        command_group.insert(command);
+        if !command.group_prefix().is_empty() {
+            command_group.set_prefix(command.group_prefix());
+        }
+        self.groups.insert(command.group(), Arc::new(command_group));
         self
     }
 
@@ -364,7 +346,7 @@ impl Framework {
                 }
             }
 
-            if let Some(x) = command.min_args {
+            if let Some(x) = command.min_args() {
                 if args < x as usize {
                     return Some(DispatchError::NotEnoughArguments {
                         min: x,
@@ -373,7 +355,7 @@ impl Framework {
                 }
             }
 
-            if let Some(x) = command.max_args {
+            if let Some(x) = command.max_args() {
                 if args > x as usize {
                     return Some(DispatchError::TooManyArguments {
                         max: x,
@@ -402,16 +384,21 @@ impl Framework {
                 }
             }
 
-            if command.owners_only {
+            if command.owners_only() {
                 Some(DispatchError::OnlyForOwners)
             } else if !self.checks_passed(command, &mut context, message) {
                 Some(DispatchError::CheckFailed)
             } else if self.configuration.blocked_users.contains(&message.author.id) {
                 Some(DispatchError::BlockedUser)
+            } else if (!self.configuration.allow_dm && message.is_private()) ||
+                (message.is_private() && command.guild_only()) {
+                Some(DispatchError::OnlyForGuilds)
             } else if self.configuration.disabled_commands.contains(to_check) {
                 Some(DispatchError::CommandDisabled(to_check.to_owned()))
             } else if self.configuration.disabled_commands.contains(built) {
                 Some(DispatchError::CommandDisabled(built.to_owned()))
+            } else if !message.is_private() && command.dm_only() {
+                Some(DispatchError::OnlyForDM)
             } else {
                 None
             }
@@ -464,8 +451,10 @@ impl Framework {
                 for group in groups.values() {
                     let command_length = built.len();
 
-                    if let Some(&CommandOrAlias::Alias(ref points_to)) = group.commands.get(&built) {
-                        built = points_to.to_owned();
+                    if let Some(ref points_to) = group.commands.get(&built) {
+                        if !points_to.is_empty() {
+                            built = points_to[0].to_owned();
+                        }
                     }
 
                     let to_check = if let Some(ref prefix) = group.prefix {
@@ -478,23 +467,19 @@ impl Framework {
                         built.clone()
                     };
 
-                    if let Some(&CommandOrAlias::Command(ref command)) = group.commands.get(&to_check) {
+                    if let Some(ref command) = group.commands.get(&to_check) {
                         let before = self.before.clone();
                         let command = command.clone();
                         let after = self.after.clone();
                         let groups = self.groups.clone();
 
-                        let args = {
-                            let content = message.content[position..].trim();
-
-                            if command.use_quotes {
-                                utils::parse_quotes(&content[command_length..])
-                            } else {
-                                content[command_length..]
-                                    .split_whitespace()
-                                    .map(|arg| arg.to_owned())
-                                    .collect::<Vec<String>>()
-                            }
+                        let args = if command.use_quotes() {
+                            utils::parse_quotes(&message.content[position + command_length..])
+                        } else {
+                            message.content[position + command_length..]
+                                .split_whitespace()
+                                .map(|arg| arg.to_owned())
+                                .collect::<Vec<String>>()
                         };
 
                         if let Some(error) = self.should_fail(&mut context, &message, &command, args.len(), &to_check, &built) {
@@ -511,19 +496,7 @@ impl Framework {
                                 }
                             }
 
-                            let result = match command.exec {
-                                CommandType::StringResponse(ref x) => {
-                                    let _ = &mut context.channel_id.unwrap().say(x);
-
-                                    Ok(())
-                                },
-                                CommandType::Basic(ref x) => {
-                                    (x)(&mut context, &message, args)
-                                },
-                                CommandType::WithCommands(ref x) => {
-                                    (x)(&mut context, &message, groups, &args)
-                                }
-                            };
+                            let result = command.exec(&mut context, &message, &args);
 
                             if let Some(after) = after {
                                 (after)(&mut context, &message, &built, result);
@@ -537,92 +510,7 @@ impl Framework {
         }
     }
 
-    /// Adds a function to be associated with a command, which will be called
-    /// when a command is used in a message.
-    ///
-    /// This requires that a check - if one exists - passes, prior to being
-    /// called.
-    ///
-    /// Note that once v0.2.0 lands, you will need to use the command builder
-    /// via the [`command`] method to set checks. This command will otherwise
-    /// only be for simple commands.
-    ///
-    /// Refer to the [module-level documentation] for more information and
-    /// usage.
-    ///
-    /// [`command`]: #method.command
-    /// [module-level documentation]: index.html
-    pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static,
-              S: Into<String> {
-        {
-            let ungrouped = self.groups.entry("Ungrouped".to_owned())
-                .or_insert_with(|| Arc::new(CommandGroup::default()));
-
-            if let Some(ref mut group) = Arc::get_mut(ungrouped) {
-                let name = command_name.into();
-
-                group.commands.insert(name, CommandOrAlias::Command(Arc::new(Command::new(f))));
-            }
-        }
-
-        self.initialized = true;
-
-        self
-    }
-
-    /// Adds a command using command builder.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// framework.command("ping", |c| c
-    ///     .description("Responds with 'pong'.")
-    ///     .exec(|ctx, _, _| {
-    ///         let _ = ctx.say("pong");
-    ///     }));
-    /// ```
-    pub fn command<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: FnOnce(CreateCommand) -> CreateCommand,
-              S: Into<String> {
-        {
-            let ungrouped = self.groups.entry("Ungrouped".to_owned())
-                .or_insert_with(|| Arc::new(CommandGroup::default()));
-
-            if let Some(ref mut group) = Arc::get_mut(ungrouped) {
-                let cmd = f(CreateCommand(Command::default())).0;
-                let name = command_name.into();
-
-                if let Some(ref prefix) = group.prefix {
-                    for v in &cmd.aliases {
-                        group.commands.insert(format!("{} {}", prefix, v.to_owned()), CommandOrAlias::Alias(format!("{} {}", prefix, name)));
-                    }
-                } else {
-                    for v in &cmd.aliases {
-                        group.commands.insert(v.to_owned(), CommandOrAlias::Alias(name.clone()));
-                    }
-                }
-
-                group.commands.insert(name, CommandOrAlias::Command(Arc::new(cmd)));
-            }
-        }
-
-        self.initialized = true;
-
-        self
-    }
-
-    pub fn group<F, S>(mut self, group_name: S, f: F) -> Self
-        where F: FnOnce(CreateGroup) -> CreateGroup,
-              S: Into<String> {
-        let group = f(CreateGroup(CommandGroup::default())).0;
-
-        self.groups.insert(group_name.into(), Arc::new(group));
-        self.initialized = true;
-
-        self
-    }
-
+    
     /// Specify the function that's called in case a command wasn't executed for one reason or another.
     ///
     /// DispatchError represents all possible fail conditions.

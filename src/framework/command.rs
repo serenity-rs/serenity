@@ -1,95 +1,100 @@
 use std::sync::Arc;
-use super::Configuration;
+use super::{Configuration, Bucket};
 use ::client::Context;
-use ::model::Message;
-use ::model::Permissions;
+use ::model::{Message, Permissions};
 use std::collections::HashMap;
 
 pub type Check = Fn(&mut Context, &Message) -> bool + Send + Sync + 'static;
-pub type Exec = Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static;
-pub type Help = Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, &[String]) -> Result<(), String> + Send + Sync + 'static;
+pub type PrefixCheck = Fn(&mut Context) -> Option<String> + Send + Sync + 'static;
 pub type BeforeHook = Fn(&mut Context, &Message, &String) -> bool + Send + Sync + 'static;
 pub type AfterHook = Fn(&mut Context, &Message, &String, Result<(), String>) + Send + Sync + 'static;
-#[doc(hidden)]
-pub type InternalCommand = Arc<Command>;
-pub type PrefixCheck = Fn(&mut Context) -> Option<String> + Send + Sync + 'static;
-
-#[doc(hidden)]
-pub enum CommandOrAlias {
-    Alias(String),
-    Command(InternalCommand),
-}
-
-/// Command function type. Allows to access internal framework things inside
-/// your commands.
-pub enum CommandType {
-    StringResponse(String),
-    Basic(Box<Exec>),
-    WithCommands(Box<Help>),
-}
 
 #[derive(Default)]
-pub struct CommandGroup {
-    pub prefix: Option<String>,
-    pub commands: HashMap<String, CommandOrAlias>,
+pub struct CommandGroup<T: Command> {
+    pub commands: HashMap<String, T>,
+    pub prefix: String,
 }
 
-/// Command struct used to store commands internally.
-pub struct Command {
+impl<T: Command> CommandGroup<T> {
+    fn new() -> Self {
+        Self::default()
+    }
+
+    fn insert(&mut self, command: T) {
+        self.commands.insert(command.name(), command);
+    }
+
+    fn set_prefix(&mut self, prefix: String) {
+        self.prefix = prefix;
+    }
+}
+
+/// A utility macro for named args.
+/// Meant to be used with the `serenity_attributes` crate.
+#[macro_export]
+macro_rules! named_args {
+    ($args_name:ident, $($name:ident:$type:ty;)*) => {
+        let mut i = $args_name.iter();
+        let mut arg_counter = 0;
+
+        $(
+            arg_counter += 1;
+
+            let $name = match i.next() {
+                Some(v) => match v.parse::<$type>() {
+                    Ok(v) => v,
+                    Err(_) => return Err(format!("Failed to parse argument #{} of type {:?}",
+                                                     arg_counter,
+                                                     stringify!($t))),
+                    },
+                None => return Err(format!("Missing argument #{} of type {:?}",
+                                               arg_counter,
+                                               stringify!($t))),
+            };
+        )*
+        drop(i);
+    }
+}
+
+/// The trait that defines the whole functionality (or the main part) of the framework.
+pub trait Command {
+    #[doc(hide)]
+    fn name(&self) -> String { "".to_string() }
+    /// The group this commands belongs to.
+    fn group(&self) -> String { "Ungrouped".to_string() }
+    /// The prefix for the group, e.g `~"abc" command_name`.
+    fn group_prefix(&self) -> String { "".to_string() }
     /// A set of checks to be called prior to executing the command. The checks
     /// will short-circuit on the first check that returns `false`.
-    pub checks: Vec<Box<Check>>,
+    fn checks(&self) -> Vec<Box<Check>> { Vec::new() }
     /// Function called when the command is called.
-    pub exec: CommandType,
+    fn exec(&self, _: &mut Context, _: &Message, _: Vec<String>) -> Result<(), String> { Ok(()) }
     /// Ratelimit bucket.
-    pub bucket: Option<String>,
+    fn bucket(&self) -> Option<Bucket> { None }
     /// Command description, used by other commands.
-    pub desc: Option<String>,
+    fn desc(&self) -> Option<String> { None }
     /// Example arguments, used by other commands.
-    pub example: Option<String>,
+    fn example(&self) -> Option<String> { None }
     /// Command usage schema, used by other commands.
-    pub usage: Option<String>,
+    fn usage(&self) -> Option<String> { None }
     /// Whether arguments should be parsed using quote parser or not.
-    pub use_quotes: bool,
+    fn use_quotes(&self) -> bool { false }
     /// Minumum amount of arguments that should be passed.
-    pub min_args: Option<i32>,
+    fn min_args(&self) -> Option<i32> { None }
     /// Maximum amount of arguments that can be passed.
-    pub max_args: Option<i32>,
+    fn max_args(&self) -> Option<i32> { None }
     /// Permissions required to use this command.
-    pub required_permissions: Permissions,
+    fn required_permissions(&self) -> Permissions { Permissions::empty() }
     /// Whether command should be displayed in help list or not, used by other commands.
-    pub help_available: bool,
+    fn help_available(&self) -> bool { true }
     /// Whether command can be used only privately or not.
-    pub dm_only: bool,
+    fn dm_only(&self) -> bool { false }
     /// Whether command can be used only in guilds or not.
-    pub guild_only: bool,
+    fn guild_only(&self) -> bool { false }
     /// Whether command can only be used by owners or not.
-    pub owners_only: bool,
-    #[doc(hidden)]
-    pub aliases: Vec<String>,
-}
-
-impl Command {
-    pub fn new<F>(f: F) -> Self
-        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
-        Command {
-            aliases: Vec::new(),
-            checks: Vec::default(),
-            exec: CommandType::Basic(Box::new(f)),
-            desc: None,
-            usage: None,
-            example: None,
-            use_quotes: false,
-            dm_only: false,
-            bucket: None,
-            guild_only: false,
-            help_available: true,
-            min_args: None,
-            max_args: None,
-            owners_only: false,
-            required_permissions: Permissions::empty(),
-        }
-    }
+    fn owners_only(&self) -> bool { false }
+    /// Other names that can be used to call this command.
+    fn aliases(&self) -> Vec<String> { Vec::new() }
 }
 
 pub fn positions(ctx: &mut Context, content: &str, conf: &Configuration) -> Option<Vec<usize>> {
@@ -132,18 +137,15 @@ pub fn positions(ctx: &mut Context, content: &str, conf: &Configuration) -> Opti
 
         Some(positions)
     } else if conf.on_mention.is_some() {
-        match find_mention_end(content, conf) {
-            Some(mention_end) => {
-                let mut positions = vec![mention_end];
+        find_mention_end(content, conf).map(|mention_end| {
+            let mut positions = vec![mention_end];
 
-                if conf.allow_whitespace {
-                    positions.insert(0, mention_end + 1);
-                }
+            if conf.allow_whitespace {
+                positions.insert(0, mention_end + 1);
+            }
 
-                Some(positions)
-            },
-            None => None,
-        }
+            positions
+        })
     } else {
         None
     }
