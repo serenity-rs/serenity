@@ -1734,6 +1734,15 @@ impl Member {
         roles.iter().find(|r| r.colour.0 != default.0).map(|r| r.colour)
     }
 
+    #[doc(hidden)]
+    pub fn decode_guild(guild_id: GuildId, mut value: Value) -> Result<Member> {
+        if let Some(v) = value.as_object_mut() {
+            v.insert("guild_id".to_owned(), Value::U64(guild_id.0));
+        }
+
+        Self::decode(value)
+    }
+
     /// Calculates the member's display name.
     ///
     /// The nickname takes priority over the member's username if it exists.
@@ -1768,6 +1777,8 @@ impl Member {
 
     /// Finds the Id of the [`Guild`] that the member is in.
     ///
+    /// If some value is present in [`guild_id`], then that value is returned.
+    ///
     /// # Errors
     ///
     /// Returns a [`ClientError::GuildNotFound`] if the guild could not be
@@ -1775,8 +1786,13 @@ impl Member {
     ///
     /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
     /// [`Guild`]: struct.Guild.html
+    /// [`guild_id`]: #structfield.guild_id
     #[cfg(feature="cache")]
     pub fn find_guild(&self) -> Result<GuildId> {
+        if let Some(guild_id) = self.guild_id {
+            return Ok(guild_id);
+        }
+
         for guild in CACHE.read().unwrap().guilds.values() {
             let guild = guild.read().unwrap();
 

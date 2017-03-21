@@ -1,21 +1,6 @@
 use std::collections::{BTreeMap, HashMap};
 use std::sync::{Arc, RwLock};
-use super::{
-    Channel,
-    ChannelId,
-    Emoji,
-    EmojiId,
-    Member,
-    Message,
-    Presence,
-    ReadState,
-    Relationship,
-    Role,
-    RoleId,
-    User,
-    UserId,
-    VoiceState,
-};
+use super::*;
 use ::internal::prelude::*;
 use ::utils::{decode_array, into_array};
 
@@ -92,6 +77,23 @@ pub fn decode_members(value: Value) -> Result<HashMap<UserId, Member>> {
     let mut members = HashMap::new();
 
     for member in decode_array(value, Member::decode)? {
+        let user_id = member.user.read().unwrap().id;
+
+        members.insert(user_id, member);
+    }
+
+    Ok(members)
+}
+
+pub fn decode_guild_members(guild_id: GuildId, value: Value) -> Result<HashMap<UserId, Member>> {
+    let mut members = HashMap::new();
+    let member_vec = into_array(value).map(|x| x
+        .into_iter()
+        .map(|v| Member::decode_guild(guild_id, v))
+        .filter_map(Result::ok)
+        .collect::<Vec<_>>())?;
+
+    for member in member_vec {
         let user_id = member.user.read().unwrap().id;
 
         members.insert(user_id, member);

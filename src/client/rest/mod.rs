@@ -48,7 +48,7 @@ use std::sync::{Arc, Mutex};
 use ::constants::{self, ErrorCode};
 use ::internal::prelude::*;
 use ::model::*;
-use ::utils::decode_array;
+use ::utils::{decode_array, into_array};
 
 /// An method used for ratelimiting special routes.
 ///
@@ -1048,7 +1048,10 @@ pub fn get_guild_members(guild_id: u64, limit: Option<u64>, after: Option<u64>)
                             limit.unwrap_or(500),
                             after.unwrap_or(0));
 
-    decode_array(serde_json::from_reader(response)?, Member::decode)
+    into_array(serde_json::from_reader(response)?)
+        .and_then(|x| x.into_iter()
+            .map(|v| Member::decode_guild(GuildId(guild_id), v))
+            .collect())
 }
 
 /// Gets the amount of users that can be pruned.
@@ -1167,7 +1170,7 @@ pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
                             guild_id,
                             user_id);
 
-    Member::decode(serde_json::from_reader(response)?)
+    Member::decode_guild(GuildId(guild_id), serde_json::from_reader(response)?)
 }
 
 /// Gets a message by an Id, bots only.

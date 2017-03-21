@@ -5,6 +5,10 @@ fields:
   - name: deaf
     description: True if user isn't allowed to hear in voice channels.
     type: bool
+  - name: guild_id
+    description: The Id of the guild that the member is a part of.
+    optional: true
+    type: GuildId
   - name: joined_at
     description: Timestamp representing the date when the member joined.
     type: string

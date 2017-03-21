@@ -312,9 +312,11 @@ impl GuildMemberAddEvent {
     #[doc(hidden)]
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
+        let guild_id = remove(&mut map, "guild_id").and_then(GuildId::decode)?;
+
         Ok(GuildMemberAddEvent {
-            guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
-            member: Member::decode(Value::Object(map))?,
+            guild_id: guild_id,
+            member: Member::decode_guild(guild_id, Value::Object(map))?,
         })
     }
 }
@@ -367,9 +369,11 @@ impl GuildMembersChunkEvent {
     #[doc(hidden)]
     #[inline]
     pub fn decode(mut map: Map) -> Result<Self> {
+        let guild_id = remove(&mut map, "guild_id").and_then(GuildId::decode)?;
+
         Ok(GuildMembersChunkEvent {
-            guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
-            members: remove(&mut map, "members").and_then(decode_members)?,
+            guild_id: guild_id,
+            members: remove(&mut map, "members").and_then(|x| decode_guild_members(guild_id, x))?,
         })
     }
 }
