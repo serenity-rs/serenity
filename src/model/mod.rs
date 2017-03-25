@@ -19,7 +19,6 @@ mod utils;
 pub mod event;
 pub mod permissions;
 
-
 mod channel;
 mod gateway;
 mod guild;
