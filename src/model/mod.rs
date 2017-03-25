@@ -173,9 +173,24 @@ pub enum PossibleGuild<T> {
     Online(T),
 }
 
+/// Denotes the target for a search.
+///
+/// This can be either a [`Guild`] - which can search multiple [`Channel`]s -
+/// or a `Channel`.
+///
+/// [`Channel`]: enum.Channel.html
+/// [`Guild`]: struct.Guild.html
 #[derive(Copy, Clone, Debug)]
 pub enum SearchTarget {
+    /// An indicator that the target for a [`Search`] is a [`Channel`].
+    ///
+    /// [`Channel`]: enum.Channel.html
+    /// [`Search`]: struct.Search.html
     Channel(ChannelId),
+    /// An indicator that the target for a [`Search`] is a [`Guild`].
+    ///
+    /// [`Guild`]: struct.Guild.html
+    /// [`Search`]: struct.Search.html
     Guild(GuildId),
 }
 

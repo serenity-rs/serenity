@@ -57,6 +57,11 @@ pub enum Error {
     /// When attempting to delete a number of days' worth of messages that is
     /// not allowed.
     DeleteMessageDaysAmount(u8),
+    /// When there is an error from Discord for a specific action, such as
+    /// [`ErrorCode::EditByOtherAuthor`]. This is a friendlier representation of
+    /// the numerical error codes Discord provides.
+    ///
+    /// [`ErrorCode::EditByOtherAuthor`]: rest/enum.ErrorCode.html#variant.EditByOtherAuthor
     ErrorCode(ErrorCode),
     /// When there was an error retrieving the gateway URI from the REST API.
     Gateway,
@@ -67,6 +72,7 @@ pub enum Error {
     /// [`GuildId`]: ../model/struct.GuildId.html
     /// [`Cache`]: ../ext/cache/struct.Cache.html
     GuildNotFound,
+    /// An indicator that an unknown opcode was received from the gateway.
     InvalidOpCode,
     /// When attempting to perform an action which is only available to user
     /// accounts.
@@ -123,6 +129,8 @@ pub enum Error {
     ///
     /// [`Context::edit_role`]: struct.Context.html#method.edit_role
     RecordNotFound,
+    /// When a shard has completely failed to reboot after resume and/or
+    /// reconnect attempts.
     ShardBootFailure,
     /// When the shard being retrieved from within the Client could not be
     /// found after being inserted into the Client's internal vector of

@@ -9,8 +9,19 @@ use ::utils::decode_array;
 
 type Map = BTreeMap<String, Value>;
 
+/// Event data for the call creation event.
+///
+/// This is fired when:
+///
+/// - a [`Call`] in a [`Group`] is created
+/// - a [`Call`] in a [`PrivateChannel`] is created
+///
+/// [`Call`]: ../struct.Call.html
+/// [`Group`]: ../struct.Group.html
+/// [`PrivateChannel`]: ../struct.PrivateChannel.html
 #[derive(Clone, Debug)]
 pub struct CallCreateEvent {
+    /// Information about the created call.
     pub call: Call,
 }
 
@@ -24,8 +35,21 @@ impl CallCreateEvent {
     }
 }
 
+/// Event data for the call deletion event.
+///
+/// This is fired when:
+///
+/// - A [`Call`] in a [`Group`] has ended
+/// - A [`Call`] in a [`PrivateChannel`] has ended
+///
+/// [`Call`]: ../struct.Call.html
+/// [`Group`]: ../struct.Group.html
+/// [`PrivateChannel`]: ../struct.PrivateChannel.html
 #[derive(Clone, Debug)]
 pub struct CallDeleteEvent {
+    /// The Id of the [`Channel`] that the call took place in.
+    ///
+    /// [`Channel`]: ../enum.Channel.html
     pub channel_id: ChannelId,
 }
 
@@ -39,11 +63,40 @@ impl CallDeleteEvent {
     }
 }
 
+/// Event data for the call update event.
+///
+/// This is fired when:
+///
+/// - A member of a [`Group`] has been rung
+/// - The voice [`region`] of the [`Call`] has been updated
+///
+/// [`Call`]: ../struct.Call.html
+/// [`Group`]: ../srruct.Group.html
+/// [`region`]: #structfield.region
 #[derive(Clone, Debug)]
 pub struct CallUpdateEvent {
+    /// The Id of the [channel][`Channel`] that the [call][`Call`] is taking
+    /// place in.
+    ///
+    /// [`Call`]: ../struct.Call.html
+    /// [`Channel`]: ../enum.Channel.html
     pub channel_id: ChannelId,
+    /// The Id in the [channel][`Channel`] - mapped by the [`channel_id`] -
+    /// denoting the beginning of the [call][`Call`].
+    ///
+    /// [`Channel`]: ../enum.Channel.html
+    /// [`Call`]: ../struct.Call.html
+    /// [`channel_id`]: #structfield.channel_id
     pub message_id: MessageId,
+    /// The voice region that the [call][`Call`] is hosted in.
+    ///
+    /// [`Call`]: ../struct.Call.html
     pub region: String,
+    /// A list of [user][`User`]s currently being rung who have not declined or
+    /// accepted the [call][`Call`].
+    ///
+    /// [`Call`]: ../struct.Call.html
+    /// [`User`]: ../struct.User.html
     pub ringing: Vec<UserId>,
 }
 
@@ -60,8 +113,21 @@ impl CallUpdateEvent {
     }
 }
 
+/// Event data for the channel creation event.
+///
+/// This is fired when:
+///
+/// - A [`Channel`] is created in a [`Guild`]
+/// - A [`PrivateChannel`] is created
+/// - The current user is added to a [`Group`]
+///
+/// [`Channel`]: ../enum.Channel.html
+/// [`Group`]: ../struct.Group.html
+/// [`Guild`]: ../struct.Guild.html
+/// [`PrivateChannel`]: ../struct.PrivateChannel.html
 #[derive(Clone, Debug)]
 pub struct ChannelCreateEvent {
+    /// The channel that was created.
     pub channel: Channel,
 }
 
@@ -945,27 +1011,90 @@ impl GatewayEvent {
 #[allow(large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum Event {
-    /// A new group call has been created
+    /// A new [`Call`] has been created.
+    ///
+    /// Fires the [`Client::on_call_create`] event.
+    ///
+    /// [`Call`]: ../struct.Call.html
+    /// [`Client::on_call_create`]: ../../client/struct.Client.html#on_call_create
     CallCreate(CallCreateEvent),
-    /// A group call has been deleted (the call ended)
+    /// A [`Call`] has ended.
+    ///
+    /// Fires the [`Client::on_call_delete`] event.
+    ///
+    /// [`Call`]: ../struct.Call.html
+    /// [`Client::on_call_delete`]: ../../client/struct.Client.html#method.on_call_delete
     CallDelete(CallDeleteEvent),
-    /// A group call has been updated
+    /// A [`Call`] was updated.
+    ///
+    /// Fires the [`Client::on_call_update`] event.
+    ///
+    /// [`Call`]: ../struct.Call.html
+    /// [`Client::on_call_update`]: ../../client/struct.Client.html#method.on_call_update
     CallUpdate(CallUpdateEvent),
+    /// A [`Channel`] was created.
+    ///
+    /// Fires the [`Client::on_channel_create`] event.
+    ///
+    /// [`Channel`]: ../enum.Channel.html
+    /// [`Client::on_channel_create`]: ../../client/struct.Client.html#on_channel_create
     ChannelCreate(ChannelCreateEvent),
+    /// A [`Channel`] has been deleted.
+    ///
+    /// Fires the [`Client::on_channel_delete`] event.
+    ///
+    /// [`Channel`]: ../enum.Channel.html
     ChannelDelete(ChannelDeleteEvent),
+    /// The pins for a [`Channel`] have been acked.
+    ///
+    /// Fires the [`Client::on_channel_pins_ack`] event.
+    ///
+    /// [`Channel`]: ../enum.Channel.html
+    /// [`Client::on_channel_pins_ack`]: ../../client/struct.Client.html#on_channel_pins_ack
     ChannelPinsAck(ChannelPinsAckEvent),
+    /// The pins for a [`Channel`] have been updated.
+    ///
+    /// Fires the [`Client::on_channel_pins_update`] event.
+    ///
+    /// [`Channel`]: ../enum.Channel.html
+    /// [`Client::on_channel_pins_update`]: ../../client/struct.Client.html#on_channel_pins_update
     ChannelPinsUpdate(ChannelPinsUpdateEvent),
-    /// A user has been added to a group
+    /// A [`User`] has been added to a [`Group`].
+    ///
+    /// Fires the [`Client::on_recipient_add`] event.
+    ///
+    /// [`Client::on_recipient_add`]: ../../client/struct.Client.html#on_recipient_add
+    /// [`User`]: ../struct.User.html
     ChannelRecipientAdd(ChannelRecipientAddEvent),
-    /// A user has been removed from a group
+    /// A [`User`] has been removed from a [`Group`].
+    ///
+    /// Fires the [`Client::on_recipient_remove`] event.
+    ///
+    /// [`Client::on_recipient_remove`]: ../../client/struct.Client.html#on_recipient_remove
+    /// [`User`]: ../struct.User.html
     ChannelRecipientRemove(ChannelRecipientRemoveEvent),
+    /// A [`Channel`] has been updated.
+    ///
+    /// Fires the [`Client::on_channel_update`] event.
+    ///
+    /// [`Client::on_channel_update`]: ../../client/struct.Client.html#on_channel_update
+    /// [`User`]: ../struct.User.html
     ChannelUpdate(ChannelUpdateEvent),
     /// When a suggestion for a friend is created, due to a connection like
-    /// [`Skype`].
+    /// [Skype][`Connection::Skype`].
+    ///
+    /// Fires the [`on_friend_suggestion_create`] event.
     ///
     /// [`Connection::Skype`]: enum.Connection.html#variant.Skype
+    /// [`on_friend_suggestion_delete`]: ../../client/struct.Client.html#on_friend_suggestion_create
     FriendSuggestionCreate(FriendSuggestionCreateEvent),
-    /// When a suggestion for a friend is removed.
+    /// When a suggestion for a friend is removed, due to a connection like
+    /// [Skype][`Connection::Skype`].
+    ///
+    /// Fires the [`on_friend_suggestion_delete`] event.
+    ///
+    /// [`Connection::Skype`]: enum.Connection.html#variant.Skype
+    /// [`on_friend_suggestion_create`]: ../../client/struct.Client.html#on_friend_suggestion_delete
     FriendSuggestionDelete(FriendSuggestionDeleteEvent),
     GuildBanAdd(GuildBanAddEvent),
     GuildBanRemove(GuildBanRemoveEvent),
@@ -1125,6 +1254,7 @@ impl Event {
     }
 }
 
+#[allow(missing_docs)]
 #[derive(Clone, Copy, Debug)]
 pub struct VoiceHeartbeat {
     pub heartbeat_interval: u64,
@@ -1140,6 +1270,7 @@ impl VoiceHeartbeat {
     }
 }
 
+#[allow(missing_docs)]
 #[derive(Clone, Debug)]
 pub struct VoiceHello {
     pub heartbeat_interval: u64,
@@ -1163,6 +1294,7 @@ impl VoiceHello {
     }
 }
 
+#[allow(missing_docs)]
 #[derive(Clone, Debug)]
 pub struct VoiceSessionDescription {
     pub mode: String,
@@ -1183,6 +1315,7 @@ impl VoiceSessionDescription {
     }
 }
 
+#[allow(missing_docs)]
 #[derive(Clone, Copy, Debug)]
 pub struct VoiceSpeaking {
     pub speaking: bool,
@@ -1202,13 +1335,25 @@ impl VoiceSpeaking {
     }
 }
 
+/// A representation of data received for [`voice`] events.
+///
+/// [`voice`]: ../../ext/voice/index.html
 #[derive(Clone, Debug)]
 pub enum VoiceEvent {
+    /// A voice heartbeat.
     Heartbeat(VoiceHeartbeat),
+    /// A "hello" was received with initial voice data, such as the
+    /// [`heartbeat_interval`].
+    ///
+    /// [`heartbeat_interval`]: struct.VoiceHello.html#structfield.heartbeat_interval
     Hello(VoiceHello),
+    /// A simple keepalive event.
     KeepAlive,
+    /// A voice event describing the current session.
     Ready(VoiceSessionDescription),
+    /// A voice event denoting that someone is speaking.
     Speaking(VoiceSpeaking),
+    /// An unknown voice event not registered.
     Unknown(VoiceOpCode, Value)
 }
 

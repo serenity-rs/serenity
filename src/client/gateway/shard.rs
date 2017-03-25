@@ -477,6 +477,8 @@ impl Shard {
         Ok(())
     }
 
+    /// Uncleanly shuts down the receiver by not sending a close code.
+    #[doc(hidden)]
     pub fn shutdown(receiver: &mut Receiver<WebSocketStream>) -> Result<()> {
         let r = receiver.get_mut().get_mut();
 

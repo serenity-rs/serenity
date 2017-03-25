@@ -1,3 +1,5 @@
+//! A set of macros for easily working with internals.
+
 macro_rules! request {
     ($route:expr, $method:ident($body:expr), $url:expr, $($rest:tt)*) => {{
         let client = HyperClient::new();

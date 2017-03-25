@@ -1,3 +1,25 @@
+//! A collection of default help commands for the framework.
+//!
+//! # Example
+//!
+//! Using the [`with_embeds`] function to have the framework's help message use
+//! embeds:
+//!
+//! ```rs,no_run
+//! use serenity::Client;
+//! use std::env;
+//!
+//! let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").unwrap());
+//! client.with_framework(|f| f
+//!     .command("help", |c| c.exec(help_commands::with_embeds)));
+//! ```
+//!
+//! The same can be accomplished with no embeds by substituting `with_embeds`
+//! with the [`plain`] function.
+//!
+//! [`plain`]: fn.plain.html
+//! [`with_embeds`]: fn.with_embeds.html
+
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::fmt::Write;

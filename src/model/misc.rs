@@ -17,6 +17,8 @@ use ::utils;
 
 /// Allows something - such as a channel or role - to be mentioned in a message.
 pub trait Mentionable {
+    /// Creates a mentionable string, that will be able to notify and/or create
+    /// a link to the item.
     fn mention(&self) -> String;
 }
 

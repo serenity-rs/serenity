@@ -107,6 +107,7 @@ pub enum {} {{", description, name);
 
             if !names.is_empty() {
                 enum_.push_str("
+    #[allow(missing_docs)]
     pub fn name(&self) -> &str {
         match *self {");
 
@@ -127,6 +128,7 @@ pub enum {} {{", description, name);
         }
     }
 
+    #[allow(missing_docs)]
     pub fn from_str(name: &str) -> Option<Self> {
         match name {");
 
@@ -148,6 +150,7 @@ pub enum {} {{", description, name);
         }}
     }}
 
+    #[allow(missing_docs)]
     pub fn decode_str(value: Value) -> Result<Self> {{
         let name = try!(into_string(value));
 
@@ -159,7 +162,7 @@ pub enum {} {{", description, name);
 
             if !numbers.is_empty() {
                 enum_.push_str("
-    #[allow(dead_code)]
+    #[allow(dead_code, missing_docs)]
     pub fn num(&self) -> u64 {
         match *self {");
 
@@ -180,7 +183,7 @@ pub enum {} {{", description, name);
         }
     }
 
-    #[allow(dead_code)]
+    #[allow(dead_code, missing_docs)]
     pub fn from_num(num: u64) -> Option<Self> {
         match num {");
 
