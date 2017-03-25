@@ -4,16 +4,27 @@ use super::command::PrefixCheck;
 use ::client::{Context, rest};
 use ::model::{GuildId, UserId};
 
-/// Account type used for configuration.
+/// The account type used when setting the framework [`Configuration`].
+///
+/// [`Configuration`]: struct.Configuration.html
 pub enum AccountType {
-    /// Connected client will only listen to itself.
+    /// The current user will only react to [`Message`]s sent by itself.
+    ///
+    /// [`Message`]: ../../model/struct.Message.html
     Selfbot,
-    /// Connected client will ignore all bot accounts.
+    /// The current user will only react to [`Message`]s sent by [`User`]s which
+    /// are _not_ [bot][`User::bot`]s.
+    ///
+    /// [`Message`]: ../../model/struct.Message.html
+    /// [`User`]: ../../model/struct.User.html
+    /// [`User::bot`]: ../../model/struct.User.html#structfield.bot
     Bot,
-    /// Connected client will listen to everyone.
+    /// The current user will react to all [`Message`]s.
+    ///
+    /// [`Message`]: ../../model/struct.Message.html
     Any,
     #[doc(hidden)]
-    Automatic
+    Automatic,
 }
 
 /// The configuration to use for a [`Framework`] associated with a [`Client`]
