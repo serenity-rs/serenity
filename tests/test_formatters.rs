@@ -54,6 +54,7 @@ fn test_mention() {
     };
     let member = Member {
         deaf: false,
+        guild_id: Some(GuildId(2)),
         joined_at: "fake".to_owned(),
         mute: false,
         nick: None,

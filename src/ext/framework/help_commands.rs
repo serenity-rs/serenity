@@ -6,12 +6,13 @@
 //! embeds:
 //!
 //! ```rs,no_run
+//! use serenity::ext::framework::help_commands;
 //! use serenity::Client;
 //! use std::env;
 //!
 //! let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").unwrap());
 //! client.with_framework(|f| f
-//!     .command("help", |c| c.exec(help_commands::with_embeds)));
+//!     .command("help", |c| c.exec_help(help_commands::with_embeds)));
 //! ```
 //!
 //! The same can be accomplished with no embeds by substituting `with_embeds`
