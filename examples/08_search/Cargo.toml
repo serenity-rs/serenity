@@ -1,7 +1,0 @@
-[package]
-name = "08_search"
-version = "0.1.0"
-authors = ["my name <my@email.address>"]
-
-[dependencies]
-serenity = { path = "../../" }

@@ -32,4 +32,4 @@ pub use self::edit_profile::EditProfile;
 pub use self::edit_role::EditRole;
 pub use self::execute_webhook::ExecuteWebhook;
 pub use self::get_messages::GetMessages;
-pub use self::search::{Search, SortingMode, SortingOrder};
+pub use self::search::{Search, Has};

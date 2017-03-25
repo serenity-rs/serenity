@@ -1386,15 +1386,12 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 ///
 /// [`Channel`]: ../../model/enum.Channel.html
 /// [`Message`]: ../../model/struct.Message.html
-pub fn search_channel_messages(channel_id: u64, map: BTreeMap<&str, String>)
+pub fn search_channel_messages(channel_id: u64, map: BTreeMap<&str, Value>)
     -> Result<SearchResult> {
     let mut uri = format!("/channels/{}/messages/search?", channel_id);
 
     for (k, v) in map {
-        uri.push('&');
-        uri.push_str(k);
-        uri.push('=');
-        uri.push_str(&v);
+        let _ = write!(uri, "&{}={}", k, v);
     }
 
     let response = request!(Route::ChannelsIdMessagesSearch(channel_id),
@@ -1420,15 +1417,12 @@ pub fn search_channel_messages(channel_id: u64, map: BTreeMap<&str, String>)
 /// [`GuildChannel`]: ../../model/struct.GuildChannel.html
 pub fn search_guild_messages(guild_id: u64,
                              channel_ids: &[u64],
-                             map: BTreeMap<&str, String>)
+                             map: BTreeMap<&str, Value>)
                              -> Result<SearchResult> {
     let mut uri = format!("/guilds/{}/messages/search?", guild_id);
 
     for (k, v) in map {
-        uri.push('&');
-        uri.push_str(k);
-        uri.push('=');
-        uri.push_str(&v);
+        let _ = write!(uri, "&{}={}", k, v);
     }
 
     for channel_id in channel_ids {
