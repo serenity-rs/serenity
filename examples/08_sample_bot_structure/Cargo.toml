@@ -1,0 +1,8 @@
+[package]
+name = "08_sample_bot_structure"
+version = "0.1.0"
+authors = ["my name <my@email.address>"]
+
+[dependencies.serenity]
+features = ["cache", "framework"]
+path = "../../"
