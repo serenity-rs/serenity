@@ -1,37 +1,14 @@
 use serde_json::builder::ObjectBuilder;
 use std::mem;
 use ::constants;
-use ::client::{CACHE, rest};
+use ::client::rest;
 use ::model::*;
 use ::utils::builder::{CreateEmbed, CreateMessage};
 
+#[cfg(feature="cache")]
+use ::client::CACHE;
+
 impl Message {
-    /// Marks the [`Channel`] as being read up to the message.
-    ///
-    /// Refer to the documentation for [`rest::ack_message`] for more
-    /// information.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot
-    /// user.
-    ///
-    /// [`Channel`]: enum.Channel.html
-    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
-    /// [`Message`]: struct.Message.html
-    /// [`rest::ack_message`]: ../client/rest/fn.ack_message.html
-    pub fn ack<M: Into<MessageId>>(&self) -> Result<()> {
-        #[cfg(feature="cache")]
-        {
-            if CACHE.read().unwrap().user.bot {
-                return Err(Error::Client(ClientError::InvalidOperationAsBot));
-            }
-        }
-
-        self.channel_id.ack(self.id)
-    }
-
     /// Deletes the message.
     ///
     /// **Note**: The logged in user must either be the author of the message or

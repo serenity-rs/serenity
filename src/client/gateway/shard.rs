@@ -6,7 +6,6 @@ use std::sync::{Arc, Mutex};
 use std::thread::{self, Builder as ThreadBuilder};
 use std::time::{Duration as StdDuration, Instant};
 use std::mem;
-use super::super::login_type::LoginType;
 use super::super::rest;
 use super::{GatewayError, GatewayStatus, prep};
 use time;
@@ -73,7 +72,6 @@ pub struct Shard {
     heartbeat_instants: (Arc<Mutex<Instant>>, Option<Instant>),
     keepalive_channel: MpscSender<GatewayStatus>,
     seq: u64,
-    login_type: LoginType,
     session_id: Option<String>,
     shard_info: Option<[u64; 2]>,
     token: String,
@@ -96,13 +94,13 @@ impl Shard {
     ///
     /// ```rust,ignore
     /// use serenity::client::gateway::Shard;
-    /// use serenity::client::{LoginType, rest};
+    /// use serenity::client::rest;
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_BOT_TOKEN").expect("Token in environment");
     /// // retrieve the gateway response, which contains the URL to connect to
     /// let gateway = rest::get_gateway().expect("Valid gateway response").url;
-    /// let shard = Shard::new(&gateway, &token, None, LoginType::Bot)
+    /// let shard = Shard::new(&gateway, &token, None)
     ///     .expect("Working shard");
     ///
     /// // at this point, you can create a `loop`, and receive events and match
@@ -110,8 +108,7 @@ impl Shard {
     /// ```
     pub fn new(base_url: &str,
                token: &str,
-               shard_info: Option<[u64; 2]>,
-               login_type: LoginType)
+               shard_info: Option<[u64; 2]>)
                -> Result<(Shard, ReadyEvent, Receiver<WebSocketStream>)> {
         let url = prep::build_gateway_url(base_url)?;
 
@@ -162,7 +159,6 @@ impl Shard {
                 heartbeat_instants: (heartbeat_sent, None),
                 keepalive_channel: tx.clone(),
                 seq: sequence,
-                login_type: login_type,
                 token: token.to_owned(),
                 session_id: Some(ready.ready.session_id.clone()),
                 shard_info: shard_info,
@@ -175,7 +171,6 @@ impl Shard {
                 heartbeat_instants: (heartbeat_sent, None),
                 keepalive_channel: tx.clone(),
                 seq: sequence,
-                login_type: login_type,
                 token: token.to_owned(),
                 session_id: Some(ready.ready.session_id.clone()),
                 shard_info: shard_info,
@@ -528,16 +523,6 @@ impl Shard {
         let _ = self.keepalive_channel.send(GatewayStatus::SendMessage(msg));
     }
 
-    /// Syncs the user's guilds.
-    pub fn sync_guilds(&self, guild_ids: &[GuildId]) {
-        let msg = ObjectBuilder::new()
-            .insert("op", OpCode::SyncGuild.num())
-            .insert_array("d", |a| guild_ids.iter().fold(a, |a, s| a.push(s.0)))
-            .build();
-
-        let _ = self.keepalive_channel.send(GatewayStatus::SendMessage(msg));
-    }
-
     #[allow(unused_variables)]
     fn handle_dispatch(&mut self, event: &Event) {
         #[cfg(feature="voice")]
@@ -570,8 +555,7 @@ impl Shard {
 
             let shard = Shard::new(&gateway_url,
                                    &self.token,
-                                   self.shard_info,
-                                   self.login_type);
+                                   self.shard_info);
 
             if let Ok((shard, ready, receiver_new)) = shard {
                 let _ = Shard::shutdown(&mut receiver);

@@ -159,12 +159,6 @@ pub enum Route {
     ///
     /// [`ChannelId`]: ../../model/struct.ChannelId.html
     ChannelsIdMessagesIdReactionsUserIdType(u64),
-    /// Route for the `/channels/:channel_id/messages/search` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
-    ChannelsIdMessagesSearch(u64),
     /// Route for the `/channels/:channel_id/permissions/:target_id` path.
     ///
     /// The data is the relevant [`ChannelId`].
@@ -292,12 +286,6 @@ pub enum Route {
     ///
     /// [`GuildId`]: struct.GuildId.html
     GuildsIdMembersMeNick(u64),
-    /// Route for the `/guilds/:guild_id/messages/search` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdMessagesSearch(u64),
     /// Route for the `/guilds/:guild_id/prune` path.
     ///
     /// The data is the relevant [`GuildId`].
@@ -336,8 +324,6 @@ pub enum Route {
     UsersMe,
     /// Route for the `/users/@me/channels` path.
     UsersMeChannels,
-    /// Route for the `/users/@me/connections` path.
-    UsersMeConnections,
     /// Route for the `/users/@me/guilds` path.
     UsersMeGuilds,
     /// Route for the `/users/@me/guilds/:guild_id` path.

@@ -15,7 +15,7 @@ use std::default::Default;
 /// use serenity::Client;
 /// use std::env;
 ///
-/// let mut client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN").unwrap());
+/// let mut client = Client::login(&env::var("DISCORD_BOT_TOKEN").unwrap());
 ///
 /// client.on_message(|_, message| {
 ///     if message.content == "!invite" {

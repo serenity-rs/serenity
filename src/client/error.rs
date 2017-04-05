@@ -19,7 +19,7 @@ use ::model::{ChannelType, Permissions};
 /// use std::env;
 ///
 /// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
-/// let mut client = Client::login_bot(&token);
+/// let mut client = Client::login(&token);
 ///
 /// client.on_member_unban(|context, guild_id, user| {
 ///     let discriminator = user.discriminator.parse::<u16>().unwrap();
@@ -74,12 +74,6 @@ pub enum Error {
     GuildNotFound,
     /// An indicator that an unknown opcode was received from the gateway.
     InvalidOpCode,
-    /// When attempting to perform an action which is only available to user
-    /// accounts.
-    InvalidOperationAsBot,
-    /// When attempting to perform an action which is only available to bot
-    /// accounts.
-    InvalidOperationAsUser,
     /// Indicates that you do not have the required permissions to perform an
     /// operation.
     ///

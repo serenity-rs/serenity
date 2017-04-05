@@ -1,9 +1,13 @@
 use std::borrow::Cow;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use ::client::{CACHE, rest};
 use ::internal::prelude::*;
 use ::model::*;
+
+#[cfg(feature="cache")]
+use ::client::{CACHE, rest};
+#[cfg(feature="cache")]
 use ::utils::builder::EditMember;
+#[cfg(feature="cache")]
 use ::utils::Colour;
 
 impl Member {

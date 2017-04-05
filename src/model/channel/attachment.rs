@@ -28,7 +28,7 @@ impl Attachment {
     /// use std::path::Path;
     ///
     /// let token = env::var("DISCORD_TOKEN").expect("token in environment");
-    /// let mut client = Client::login_bot(&token);
+    /// let mut client = Client::login(&token);
     ///
     /// client.on_message(|_, message| {
     ///     for attachment in message.attachments {

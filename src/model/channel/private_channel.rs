@@ -1,35 +1,9 @@
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::io::Read;
-use ::client::CACHE;
 use ::model::*;
-use ::utils::builder::{CreateMessage, GetMessages, Search};
+use ::utils::builder::{CreateMessage, GetMessages};
 
 impl PrivateChannel {
-    /// Marks the channel as being read up to a certain [`Message`].
-    ///
-    /// Refer to the documentation for [`rest::ack_message`] for more
-    /// information.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot
-    /// user.
-    ///
-    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
-    /// [`Message`]: struct.Message.html
-    /// [`rest::ack_message`]: ../client/rest/fn.ack_message.html
-    pub fn ack<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        #[cfg(feature="cache")]
-        {
-            if CACHE.read().unwrap().user.bot {
-                return Err(Error::Client(ClientError::InvalidOperationAsBot));
-            }
-        }
-
-        self.id.ack(message_id)
-    }
-
     /// Broadcasts that the current user is typing to the recipient.
     pub fn broadcast_typing(&self) -> Result<()> {
         self.id.broadcast_typing()
@@ -217,33 +191,6 @@ impl PrivateChannel {
     #[inline]
     pub fn say(&self, content: &str) -> Result<Message> {
         self.id.say(content)
-    }
-
-    /// Performs a search request to the API for the channel's [`Message`]s.
-    ///
-    /// Refer to the documentation for the [`Search`] builder for examples and
-    /// more information.
-    ///
-    /// **Note**: Bot users can not search.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
-    ///
-    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
-    /// [`Message`]: struct.Message.html
-    /// [`Search`]: ../utils/builder/struct.Search.html
-    pub fn search<F>(&self, f: F) -> Result<SearchResult>
-        where F: FnOnce(Search) -> Search {
-        #[cfg(feature="cache")]
-        {
-            if CACHE.read().unwrap().user.bot {
-                return Err(Error::Client(ClientError::InvalidOperationAsBot));
-            }
-        }
-
-        self.id.search(f)
     }
 
     /// Sends a file along with optional message contents. The filename _must_

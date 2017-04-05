@@ -27,11 +27,9 @@ mod context;
 mod dispatch;
 mod error;
 mod event_store;
-mod login_type;
 
 pub use self::context::Context;
 pub use self::error::Error as ClientError;
-pub use self::login_type::LoginType;
 
 use self::dispatch::dispatch;
 use self::event_store::EventStore;
@@ -68,11 +66,7 @@ use ::ext::framework::Framework;
 use ::ext::cache::Cache;
 
 #[cfg(not(feature="cache"))]
-use ::model::event::{
-    CallUpdateEvent,
-    GuildMemberUpdateEvent,
-    UserSettingsUpdateEvent,
-};
+use ::model::event::{CallUpdateEvent, GuildMemberUpdateEvent};
 
 #[cfg(feature="cache")]
 lazy_static! {
@@ -135,7 +129,7 @@ lazy_static! {
 /// ```rust,ignore
 /// use serenity::Client;
 ///
-/// let mut client = Client::login_bot("my token here");
+/// let mut client = Client::login("my token here");
 ///
 /// client.on_message(|context, message| {
 ///     if message.content == "!ping" {
@@ -163,10 +157,10 @@ pub struct Client {
     /// In the meaning of a context, this data can be accessed through
     /// [`Context::data`].
     ///
-    /// Refer to [example 06] for an example on using the `data` field.
+    /// Refer to [example 05] for an example on using the `data` field.
     ///
     /// [`Context::data`]: struct.Context.html#method.data
-    /// [example 06]: https://github.com/zeyla/serenity/tree/master/examples/06_command_framework
+    /// [example 05]: https://github.com/zeyla/serenity/tree/master/examples/05_command_framework
     pub data: Arc<Mutex<ShareMap>>,
     /// A vector of all active shards that have received their [`Event::Ready`]
     /// payload, and have dispatched to [`on_ready`] if an event handler was
@@ -177,34 +171,32 @@ pub struct Client {
     event_store: Arc<RwLock<EventStore>>,
     #[cfg(feature="framework")]
     framework: Arc<Mutex<Framework>>,
-    login_type: LoginType,
     token: String,
 }
 
 #[allow(type_complexity)]
 impl Client {
+    /// Alias of [`login`].
+    ///
+    /// [`login`]: #method.login
+    #[deprecated(since="0.1.5", note="Use `login` instead")]
+    #[inline]
+    pub fn login_bot(token: &str) -> Self {
+        Self::login(token)
+    }
+
     /// Creates a Client for a bot user.
     ///
     /// Discord has a requirement of prefixing bot tokens with `"Bot "`, which
     /// this function will automatically do for you if not already included.
-    pub fn login_bot(bot_token: &str) -> Client {
+    pub fn login(bot_token: &str) -> Self {
         let token = if bot_token.starts_with("Bot ") {
             bot_token.to_owned()
         } else {
             format!("Bot {}", bot_token)
         };
 
-        login(token, LoginType::Bot)
-    }
-
-    /// Creates a Client for a user.
-    ///
-    /// **Note**: Read the notes for [`LoginType::User`] prior to using this, as
-    /// there are restrictions on usage.
-    ///
-    /// [`LoginType::User`]: enum.LoginType.html#variant.User
-    pub fn login_user(user_token: &str) -> Client {
-        login(user_token.to_owned(), LoginType::User)
+        login(token)
     }
 
     /// Sets a framework to be used with the client. All message events will be
@@ -322,7 +314,7 @@ impl Client {
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
-    /// let mut client = Client::login_bot(&token);
+    /// let mut client = Client::login(&token);
     ///
     /// let _ = client.start_shard_range([4, 7], 10);
     /// ```
@@ -382,26 +374,6 @@ impl Client {
         self.event_store.write()
             .unwrap()
             .on_channel_pins_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`FriendSuggestionCreate`] is received.
-    ///
-    /// [`FriendSuggestionCreate`]: ../model/event/enum.Event.html#variant.FriendSuggestionCreate
-    pub fn on_friend_suggestion_create<F>(&mut self, handler: F)
-        where F: Fn(Context, User, Vec<SuggestionReason>) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_friend_suggestion_create = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`FriendSuggestionDelete`] is received.
-    ///
-    /// [`FriendSuggestionDelete`]: ../model/event/enum.Event.html#variant.FriendSuggestionDelete
-    pub fn on_friend_suggestion_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, UserId) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_friend_suggestion_delete = Some(Arc::new(handler));
     }
 
     /// Attaches a handler for when a [`GuildCreate`] is received.
@@ -515,7 +487,7 @@ impl Client {
     /// ```rust,ignore
     /// use serenity::Client;
     ///
-    /// let mut client = Client::login_bot("bot token here");
+    /// let mut client = Client::login("bot token here");
     ///
     /// client.on_message(|_context, message| {
     ///     println!("{}", message.content);
@@ -640,7 +612,7 @@ impl Client {
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
-    /// let mut client = Client::login_bot(&token);
+    /// let mut client = Client::login(&token);
     ///
     /// client.on_ready(|_context, ready| {
     ///     println!("{} is connected", ready.user.name);
@@ -674,26 +646,6 @@ impl Client {
         self.event_store.write()
             .unwrap()
             .on_channel_recipient_removal = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`RelationshipAdd`] is received.
-    ///
-    /// [`RelationshipAdd`]: ../model/event/enum.Event.html#variant.RelationshipAdd
-    pub fn on_relationship_add<F>(&mut self, handler: F)
-        where F: Fn(Context, Relationship) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_relationship_addition = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`RelationshipRemove`] is received.
-    ///
-    /// [`RelationshipRemove`]: ../model/event/enum.Event.html#variant.RelationshipRemove
-    pub fn on_relationship_remove<F>(&mut self, handler: F)
-        where F: Fn(Context, UserId, RelationshipType) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_relationship_removal = Some(Arc::new(handler));
     }
 
     /// Attaches a handler for when a [`Resumed`] is received.
@@ -785,7 +737,6 @@ impl Client {
 
             let boot = boot_shard(&BootInfo {
                 gateway_url: gateway_url.clone(),
-                login_type: self.login_type,
                 shard_info: shard_info,
                 token: self.token.clone(),
             });
@@ -806,13 +757,11 @@ impl Client {
                                  &shard,
                                  &self.framework,
                                  &self.data,
-                                 self.login_type,
                                  &self.event_store);
                     } else {
                         dispatch(Event::Ready(ready),
                                  &shard,
                                  &self.data,
-                                 self.login_type,
                                  &self.event_store);
                     }}
 
@@ -822,7 +771,6 @@ impl Client {
                             event_store: self.event_store.clone(),
                             framework: self.framework.clone(),
                             gateway_url: gateway_url.clone(),
-                            login_type: self.login_type,
                             receiver: receiver,
                             shard: shard,
                             shard_info: shard_info,
@@ -833,7 +781,6 @@ impl Client {
                             data: self.data.clone(),
                             event_store: self.event_store.clone(),
                             gateway_url: gateway_url.clone(),
-                            login_type: self.login_type,
                             receiver: receiver,
                             shard: shard,
                             shard_info: shard_info,
@@ -964,16 +911,6 @@ impl Client {
             .on_guild_role_update = Some(Arc::new(handler));
     }
 
-    /// Attaches a handler for when a [`UserGuildSettingsUpdate`] is received.
-    ///
-    /// [`UserGuildSettingsUpdate`]: ../model/event/enum.Event.html#variant.UserGuildSettingsUpdate
-    pub fn on_user_guild_settings_update<F>(&mut self, handler: F)
-        where F: Fn(Context, Option<UserGuildSettings>, UserGuildSettings) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_user_guild_settings_update = Some(Arc::new(handler));
-    }
-
     /// Attaches a handler for when a [`GuildUpdate`] is received.
     ///
     /// [`GuildUpdate`]: ../model/event/enum.Event.html#variant.GuildUpdate
@@ -982,31 +919,6 @@ impl Client {
         self.event_store.write()
             .unwrap()
             .on_guild_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`UserNoteUpdate`] is received.
-    ///
-    /// Optionally returns the old note for the [`User`], if one existed.
-    ///
-    /// [`User`]: ../model/struct.User.html
-    /// [`UserNoteUpdate`]: ../model/event/enum.Event.html#variant.UserNoteUpdate
-    pub fn on_note_update<F>(&mut self, handler: F)
-        where F: Fn(Context, UserId, Option<String>, String) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_note_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`UserSettingsUpdate`] is received.
-    ///
-    /// The old user settings will be provided as well.
-    ///
-    /// [`UserSettingsUpdate`]: ../model/event/enum.Event.html#variant.UserSettingsUpdate
-    pub fn on_user_settings_update<F>(&mut self, handler: F)
-        where F: Fn(Context, UserSettings, UserSettings) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_user_settings_update = Some(Arc::new(handler));
     }
 
     /// Attaches a handler for when a [`UserUpdate`] is received.
@@ -1110,16 +1022,6 @@ impl Client {
             .on_guild_role_update = Some(Arc::new(handler));
     }
 
-    /// Attaches a handler for when a [`UserGuildSettingsUpdate`] is received.
-    ///
-    /// [`UserGuildSettingsUpdate`]: ../model/event/enum.Event.html#variant.UserGuildSettingsUpdate
-    pub fn on_user_guild_settings_update<F>(&mut self, handler: F)
-        where F: Fn(Context, UserGuildSettings) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_user_guild_settings_update = Some(Arc::new(handler));
-    }
-
     /// Attaches a handler for when a [`GuildUpdate`] is received.
     ///
     /// [`GuildUpdate`]: ../model/event/enum.Event.html#variant.GuildUpdate
@@ -1128,29 +1030,6 @@ impl Client {
         self.event_store.write()
             .unwrap()
             .on_guild_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`UserNoteUpdate`] is received.
-    ///
-    /// Optionally returns the old note for the [`User`], if one existed.
-    ///
-    /// [`User`]: ../model/struct.User.html
-    /// [`UserNoteUpdate`]: ../model/event/enum.Event.html#variant.UserNoteUpdate
-    pub fn on_note_update<F>(&mut self, handler: F)
-        where F: Fn(Context, UserId, String) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_note_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`UserSettingsUpdate`] is received.
-    ///
-    /// [`UserSettingsUpdate`]: ../model/event/enum.Event.html#variant.UserSettingsUpdate
-    pub fn on_user_settings_update<F>(&mut self, handler: F)
-        where F: Fn(Context, UserSettingsUpdateEvent) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_user_settings_update = Some(Arc::new(handler));
     }
 
     /// Attaches a handler for when a [`UserUpdate`] is received.
@@ -1166,7 +1045,6 @@ impl Client {
 
 struct BootInfo {
     gateway_url: Arc<Mutex<String>>,
-    login_type: LoginType,
     shard_info: Option<[u64; 2]>,
     token: String,
 }
@@ -1177,7 +1055,6 @@ struct MonitorInfo {
     event_store: Arc<RwLock<EventStore>>,
     framework: Arc<Mutex<Framework>>,
     gateway_url: Arc<Mutex<String>>,
-    login_type: LoginType,
     receiver: Receiver<WebSocketStream>,
     shard: Arc<Mutex<Shard>>,
     shard_info: Option<[u64; 2]>,
@@ -1189,7 +1066,6 @@ struct MonitorInfo {
     data: Arc<Mutex<ShareMap>>,
     event_store: Arc<RwLock<EventStore>>,
     gateway_url: Arc<Mutex<String>>,
-    login_type: LoginType,
     receiver: Receiver<WebSocketStream>,
     shard: Arc<Mutex<Shard>>,
     shard_info: Option<[u64; 2]>,
@@ -1220,8 +1096,7 @@ fn boot_shard(info: &BootInfo) -> Result<(Shard, ReadyEvent, Receiver<WebSocketS
 
         let attempt = Shard::new(&info.gateway_url.lock().unwrap(),
                                  &info.token,
-                                 info.shard_info,
-                                 info.login_type);
+                                 info.shard_info);
 
         match attempt {
             Ok((shard, ready, receiver)) => {
@@ -1253,7 +1128,6 @@ fn monitor_shard(mut info: MonitorInfo) {
         for _ in 0..3 {
             let boot = boot_shard(&BootInfo {
                 gateway_url: info.gateway_url.clone(),
-                login_type: info.login_type,
                 shard_info: info.shard_info,
                 token: info.token.clone(),
             });
@@ -1275,13 +1149,11 @@ fn monitor_shard(mut info: MonitorInfo) {
                                  &info.shard,
                                  &info.framework,
                                  &info.data,
-                                 info.login_type,
                                  &info.event_store);
                     } else {
                         dispatch(Event::Ready(ready),
                                  &info.shard,
                                  &info.data,
-                                 info.login_type,
                                  &info.event_store);
                     }}
 
@@ -1352,19 +1224,17 @@ fn handle_shard(info: &mut MonitorInfo) {
                      &info.shard,
                      &info.framework,
                      &info.data,
-                     info.login_type,
                      &info.event_store);
         } else {
             dispatch(event,
                      &info.shard,
                      &info.data,
-                     info.login_type,
                      &info.event_store);
         }}
     }
 }
 
-fn login(token: String, login_type: LoginType) -> Client {
+fn login(token: String) -> Client {
     rest::set_token(&token);
 
     feature_framework! {{
@@ -1372,14 +1242,12 @@ fn login(token: String, login_type: LoginType) -> Client {
             data: Arc::new(Mutex::new(ShareMap::custom())),
             event_store: Arc::new(RwLock::new(EventStore::default())),
             framework: Arc::new(Mutex::new(Framework::default())),
-            login_type: login_type,
             token: token,
         }
     } else {
         Client {
             data: Arc::new(Mutex::new(ShareMap::custom())),
             event_store: Arc::new(RwLock::new(EventStore::default())),
-            login_type: login_type,
             token: token,
         }
     }}

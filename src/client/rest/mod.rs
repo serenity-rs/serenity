@@ -45,7 +45,7 @@ use std::default::Default;
 use std::fmt::Write as FmtWrite;
 use std::io::{ErrorKind as IoErrorKind, Read};
 use std::sync::{Arc, Mutex};
-use ::constants::{self, ErrorCode};
+use ::constants;
 use ::internal::prelude::*;
 use ::model::*;
 use ::utils::{decode_array, into_array};
@@ -80,24 +80,6 @@ lazy_static! {
 #[doc(hidden)]
 pub fn set_token(token: &str) {
     TOKEN.lock().unwrap().clone_from(&token.to_owned());
-}
-
-/// Marks a [`Channel`] as being "read" up to a certain [`Message`]. Any
-/// message past the given one will not be marked as read.
-///
-/// Usually you should use this to mark the latest message as being read.
-///
-/// **Note**: Bot users should not use this, as it has no bearing on them
-/// whatsoever.
-///
-/// [`Channel`]: ../../model/enum.Channel.html
-/// [`Message`]: ../../model/struct.Message.html
-pub fn ack_message(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(204, request!(Route::ChannelsIdMessagesIdAck(channel_id),
-                         post,
-                         "/channels/{}/messages/{}/ack",
-                         channel_id,
-                         message_id))
 }
 
 /// Adds a [`User`] as a recipient to a [`Group`].
@@ -214,10 +196,9 @@ pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
 /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`]
 /// will be received over a [`Shard`], if at least one is running.
 ///
-/// **Note**: This endpoint is usually only available for user accounts. Refer
-/// to Discord's documentation for the endpoint [here][whitelist] for more
-/// information. If your bot requires this, re-think what you are doing and
-/// whether it _really_ needs to be doing this.
+/// **Note**: This endpoint is currently limited to 10 active guilds. The
+/// limits are raised for whitelisted [GameBridge] applications. See the
+/// [documentation on this endpoint] for more info.
 ///
 /// # Examples
 ///
@@ -241,7 +222,9 @@ pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
 /// [`Guild`]: ../../model/struct.Guild.html
 /// [`PartialGuild`]: ../../model/struct.PartialGuild.html
 /// [`Shard`]: ../gateway/struct.Shard.html
+/// [GameBridge]: https://discordapp.com/developers/docs/topics/gamebridge
 /// [US West Region]: ../../model/enum.Region.html#variant.UsWest
+/// [documentation on this endpoint]: https://discordapp.com/developers/docs/resources/guild#create-guild
 /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
 pub fn create_guild(map: &Value) -> Result<PartialGuild> {
     let body = map.to_string();
@@ -517,8 +500,8 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 /// use std::env;
 ///
 /// // Due to the `delete_webhook` function requiring you to authenticate, you
-/// // must have initialized a client first.
-/// let client = Client::login_user(&env::var("DISCORD_TOKEN").unwrap());
+/// // must have set the token first.
+/// rest::set_token(&env::var("DISCORD_TOKEN").unwrap());
 ///
 /// rest::delete_webhook(245037420704169985).expect("Error deleting webhook");
 /// ```
@@ -639,16 +622,6 @@ pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
                             guild_id);
 
     verify(200, response)
-}
-
-/// Changes a profile note.
-pub fn edit_note(user_id: u64, map: &Value) -> Result<()> {
-    let body = map.to_string();
-
-    verify(204, request!(Route::None,
-                         put(body),
-                         "/users/@me/notes/{}",
-                         user_id))
 }
 
 /// Edits the current user's profile settings.
@@ -1271,14 +1244,6 @@ pub fn get_user(user_id: u64) -> Result<User> {
     User::decode(serde_json::from_reader(response)?)
 }
 
-/// Gets our connections.
-pub fn get_user_connections() -> Result<Vec<UserConnection>> {
-    let response = request!(Route::UsersMeConnections, get, "/users/@me/connections");
-
-    decode_array(serde_json::from_reader(response)?,
-                      UserConnection::decode)
-}
-
 /// Gets our DM channels.
 pub fn get_user_dm_channels() -> Result<Vec<PrivateChannel>> {
     let response = request!(Route::UsersMeChannels, get, "/users/@me/channels");
@@ -1378,67 +1343,6 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
                          "/channels/{}/recipients/{}",
                          group_id,
                          user_id))
-}
-
-/// Searches a [`Channel`] for [`Message`]s that meet provided requirements.
-///
-/// **Note**: Bot users can not search.
-///
-/// [`Channel`]: ../../model/enum.Channel.html
-/// [`Message`]: ../../model/struct.Message.html
-pub fn search_channel_messages(channel_id: u64, map: BTreeMap<&str, Value>)
-    -> Result<SearchResult> {
-    let mut uri = format!("/channels/{}/messages/search?", channel_id);
-
-    for (k, v) in map {
-        let _ = write!(uri, "&{}={}", k, v);
-    }
-
-    let response = request!(Route::ChannelsIdMessagesSearch(channel_id),
-                            get,
-                            "{}",
-                            uri);
-
-    if response.status == StatusCode::Accepted {
-        return Err(Error::Client(ClientError::ErrorCode(ErrorCode::SearchIndexUnavailable)));
-    }
-
-    let content = try!(serde_json::from_reader(response));
-
-    SearchResult::decode(content)
-}
-
-/// Searches a [`Guild`] - and optionally specific [channel][`GuildChannel`]s
-/// within it - for messages that meet provided requirements.
-///
-/// **Note**: Bot users can not search.
-///
-/// [`Guild`]: ../../model/struct.Guild.html
-/// [`GuildChannel`]: ../../model/struct.GuildChannel.html
-pub fn search_guild_messages(guild_id: u64,
-                             channel_ids: &[u64],
-                             map: BTreeMap<&str, Value>)
-                             -> Result<SearchResult> {
-    let mut uri = format!("/guilds/{}/messages/search?", guild_id);
-
-    for (k, v) in map {
-        let _ = write!(uri, "&{}={}", k, v);
-    }
-
-    for channel_id in channel_ids {
-        write!(uri, "&channel_id={}", channel_id)?;
-    }
-
-    let response = request!(Route::GuildsIdMessagesSearch(guild_id),
-                            get,
-                            "{}",
-                            uri);
-
-    if response.status == StatusCode::Accepted {
-        return Err(Error::Client(ClientError::ErrorCode(ErrorCode::SearchIndexUnavailable)));
-    }
-
-    SearchResult::decode(try!(serde_json::from_reader(response)))
 }
 
 /// Sends a file to a channel.

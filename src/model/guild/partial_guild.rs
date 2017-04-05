@@ -1,6 +1,5 @@
-use ::client::CACHE;
 use ::model::*;
-use ::utils::builder::{EditGuild, EditMember, EditRole, Search};
+use ::utils::builder::{EditGuild, EditMember, EditRole};
 
 impl PartialGuild {
     /// Ban a [`User`] from the guild. All messages by the
@@ -379,78 +378,6 @@ impl PartialGuild {
     pub fn move_member<C, U>(&self, user_id: U, channel_id: C) -> Result<()>
         where C: Into<ChannelId>, U: Into<UserId> {
         self.id.move_member(user_id, channel_id)
-    }
-
-    /// Performs a search request to the API for the guild's [`Message`]s.
-    ///
-    /// This will search all of the guild's [`Channel`]s at once, that you have
-    /// the [Read Message History] permission to. Use [`search_channels`] to
-    /// specify a list of [channel][`GuildChannel`]s to search, where all other
-    /// channels will be excluded.
-    ///
-    /// Refer to the documentation for the [`Search`] builder for examples and
-    /// more information.
-    ///
-    /// **Note**: Bot users can not search.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
-    ///
-    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
-    /// [`Channel`]: enum.Channel.html
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`Message`]: struct.Message.html
-    /// [`Search`]: ../utils/builder/struct.Search.html
-    /// [`search_channels`]: #method.search_channels
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    pub fn search<F: FnOnce(Search) -> Search>(&self, f: F) -> Result<SearchResult> {
-        #[cfg(feature="cache")]
-        {
-            if CACHE.read().unwrap().user.bot {
-                return Err(Error::Client(ClientError::InvalidOperationAsBot));
-            }
-        }
-
-        self.id.search(f)
-    }
-
-    /// Performs a search request to the API for the guild's [`Message`]s in
-    /// given channels.
-    ///
-    /// This will search all of the messages in the guild's provided
-    /// [`Channel`]s by Id that you have the [Read Message History] permission
-    /// to. Use [`search`] to search all of a guild's [channel][`GuildChannel`]s
-    /// at once.
-    ///
-    /// Refer to the documentation for the [`Search`] builder for examples and
-    /// more information.
-    ///
-    /// **Note**: Bot users can not search.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
-    ///
-    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
-    /// [`Channel`]: enum.Channel.html
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`Message`]: struct.Message.html
-    /// [`Search`]: ../utils/builder/struct.Search.html
-    /// [`search`]: #method.search
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    pub fn search_channels<F>(&self, channel_ids: &[ChannelId], f: F)
-        -> Result<SearchResult> where F: FnOnce(Search) -> Search {
-        #[cfg(feature="cache")]
-        {
-            if CACHE.read().unwrap().user.bot {
-                return Err(Error::Client(ClientError::InvalidOperationAsBot));
-            }
-        }
-
-        self.id.search_channels(channel_ids, f)
     }
 
     /// Returns the formatted URL of the guild's splash image, if one exists.

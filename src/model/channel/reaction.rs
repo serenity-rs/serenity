@@ -1,7 +1,10 @@
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
-use ::client::{CACHE, rest};
+use ::client::rest;
 use ::internal::prelude::*;
 use ::model::*;
+
+#[cfg(feature="cache")]
+use ::client::CACHE;
 
 impl Reaction {
     /// Deletes the reaction, but only if the current user is the user who made

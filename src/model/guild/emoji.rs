@@ -1,9 +1,16 @@
-use serde_json::builder::ObjectBuilder;
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
+use ::model::{Emoji, EmojiId};
+
+#[cfg(feature="cache")]
+use serde_json::builder::ObjectBuilder;
+#[cfg(feature="cache")]
 use std::mem;
+#[cfg(feature="cache")]
 use ::client::{CACHE, rest};
-use ::model::{Emoji, EmojiId, GuildId};
+#[cfg(feature="cache")]
 use ::internal::prelude::*;
+#[cfg(feature="cache")]
+use ::model::GuildId;
 
 impl Emoji {
     /// Deletes the emoji.

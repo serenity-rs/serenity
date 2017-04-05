@@ -49,19 +49,6 @@
 //! while needing to hit the REST API as little as possible, then the answer
 //! is "yes".
 //!
-//! # Special cases in the Cache
-//!
-//! Some items in the cache, notably [`Call`]s and [`Group`]s, will "always be
-//! empty". The exception to this rule, is for:
-//!
-//! 1. Bots which used to be userbots prior to the conversion made available by
-//! Discord when the official Bot API was introduced;
-//! 2. For groups and calls:
-//! 2a. Bots that have friends from before the conversion that have not been
-//! removed, as those users can still add the bots to groups;
-//! 2b. Bots that have the "Create Group" endpoint whitelisted specifically for
-//! them.
-//!
 //! [`Call`]: ../../model/struct.Call.html
 //! [`Context`]: ../../client/struct.Context.html
 //! [`Context::get_channel`]: ../../client/struct.Context.html#method.get_channel
@@ -143,10 +130,6 @@ pub struct Cache {
     ///
     /// [special cases]: index.html#special-cases-in-the-cache
     pub groups: HashMap<ChannelId, Arc<RwLock<Group>>>,
-    /// Settings specific to a guild.
-    ///
-    /// This will always be empty for bot users.
-    pub guild_settings: HashMap<Option<GuildId>, UserGuildSettings>,
     /// A map of guilds with full data available. This includes data like
     /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
     ///
@@ -167,14 +150,6 @@ pub struct Cache {
     /// A map of direct message channels that the current user has open with
     /// other users.
     pub private_channels: HashMap<ChannelId, Arc<RwLock<PrivateChannel>>>,
-    /// A map of relationships that the current user has with other users.
-    ///
-    /// For bot users this will always be empty, except for in [special cases].
-    ///
-    /// [special cases]: index.html#special-cases-in-the-cache
-    pub relationships: HashMap<UserId, Relationship>,
-    /// Account-specific settings for a user account.
-    pub settings: Option<UserSettings>,
     /// A list of guilds which are "unavailable". Refer to the documentation for
     /// [`Event::GuildUnavailable`] for more information on when this can occur.
     ///
@@ -969,12 +944,6 @@ impl Cache {
             }
         }
 
-        if let Some(user_guild_settings) = ready.user_guild_settings {
-            for guild in user_guild_settings {
-                self.guild_settings.insert(guild.guild_id, guild);
-            }
-        }
-
         for (user_id, presence) in &mut ready.presences {
             if let Some(ref user) = presence.user {
                 self.update_user_entry(&user.read().unwrap());
@@ -984,66 +953,7 @@ impl Cache {
         }
 
         self.presences.extend(ready.presences);
-        self.relationships.extend(ready.relationships);
-        self.notes.extend(ready.notes);
-        self.settings = ready.user_settings;
         self.user = ready.user;
-    }
-
-    #[doc(hidden)]
-    pub fn update_with_relationship_add(&mut self, event: &RelationshipAddEvent) {
-        self.update_user_entry(&event.relationship.user);
-
-        self.relationships.insert(event.relationship.id, event.relationship.clone());
-    }
-
-    #[doc(hidden)]
-    pub fn update_with_relationship_remove(&mut self, event: &RelationshipRemoveEvent) {
-        self.relationships.remove(&event.user_id);
-    }
-
-    #[doc(hidden)]
-    pub fn update_with_user_guild_settings_update(&mut self, event: &UserGuildSettingsUpdateEvent)
-        -> Option<UserGuildSettings> {
-        self.guild_settings
-            .get_mut(&event.settings.guild_id)
-            .map(|guild_setting| mem::replace(guild_setting, event.settings.clone()))
-    }
-
-    #[doc(hidden)]
-    pub fn update_with_user_note_update(&mut self, event: &UserNoteUpdateEvent) -> Option<String> {
-        if event.note.is_empty() {
-            self.notes.remove(&event.user_id)
-        } else {
-            self.notes.insert(event.user_id, event.note.clone())
-        }
-    }
-
-    #[doc(hidden)]
-    pub fn update_with_user_settings_update(&mut self, event: &UserSettingsUpdateEvent, old: bool)
-        -> Option<UserSettings> {
-        let item = if old {
-            self.settings.clone()
-        } else {
-            None
-        };
-
-        self.settings
-            .as_mut()
-            .map(|settings| {
-                opt_modify(&mut settings.enable_tts_command, &event.enable_tts_command);
-                opt_modify(&mut settings.inline_attachment_media, &event.inline_attachment_media);
-                opt_modify(&mut settings.inline_embed_media, &event.inline_embed_media);
-                opt_modify(&mut settings.locale, &event.locale);
-                opt_modify(&mut settings.message_display_compact, &event.message_display_compact);
-                opt_modify(&mut settings.render_embeds, &event.render_embeds);
-                opt_modify(&mut settings.show_current_game, &event.show_current_game);
-                opt_modify(&mut settings.theme, &event.theme);
-                opt_modify(&mut settings.convert_emoticons, &event.convert_emoticons);
-                opt_modify(&mut settings.friend_source_flags, &event.friend_source_flags);
-            });
-
-        item
     }
 
     #[doc(hidden)]
@@ -1126,13 +1036,10 @@ impl Default for Cache {
             calls: HashMap::default(),
             channels: HashMap::default(),
             groups: HashMap::default(),
-            guild_settings: HashMap::default(),
             guilds: HashMap::default(),
             notes: HashMap::default(),
             presences: HashMap::default(),
             private_channels: HashMap::default(),
-            relationships: HashMap::default(),
-            settings: None,
             unavailable_guilds: HashSet::default(),
             user: CurrentUser {
                 avatar: None,
@@ -1141,17 +1048,10 @@ impl Default for Cache {
                 email: None,
                 id: UserId(0),
                 mfa_enabled: false,
-                mobile: None,
                 name: String::default(),
                 verified: false,
             },
             users: HashMap::default(),
         }
-    }
-}
-
-fn opt_modify<T: Clone>(dest: &mut T, src: &Option<T>) {
-    if let Some(val) = src.as_ref() {
-        dest.clone_from(val);
     }
 }

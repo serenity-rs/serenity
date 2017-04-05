@@ -11,7 +11,7 @@ fn main() {
     // Create a new instance of the Client, logging in as a bot. This will
     // automatically prepend your bot token with "Bot ", which is a requirement
     // by Discord for bot users.
-    let mut client = Client::login_bot(&token);
+    let mut client = Client::login(&token);
 
     // Set a handler for the `on_message` event - so that whenever a new message
     // is received - the closure (or function) passed will be called.
@@ -33,7 +33,7 @@ fn main() {
     // Set a handler to be called on the `on_ready` event. This is called when a
     // shard is booted, and a READY payload is sent by Discord. This payload
     // contains data like the current user's guild Ids, current user data,
-    // relationships, and more.
+    // private channels, and more.
     //
     // In this case, just print what the current user's username is.
     client.on_ready(|_ctx, ready| {

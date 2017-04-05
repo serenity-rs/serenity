@@ -2,7 +2,6 @@ use serde_json::builder::ObjectBuilder;
 use std::sync::{Arc, Mutex};
 use super::gateway::Shard;
 use super::rest;
-use super::login_type::LoginType;
 use typemap::ShareMap;
 use ::utils::builder::EditProfile;
 use ::internal::prelude::*;
@@ -45,7 +44,6 @@ pub struct Context {
     pub shard: Arc<Mutex<Shard>>,
     /// The queue of messages that are sent after context goes out of scope.
     pub queue: String,
-    login_type: LoginType,
 }
 
 impl Context {
@@ -59,13 +57,11 @@ impl Context {
     #[doc(hidden)]
     pub fn new(channel_id: Option<ChannelId>,
                shard: Arc<Mutex<Shard>>,
-               data: Arc<Mutex<ShareMap>>,
-               login_type: LoginType) -> Context {
+               data: Arc<Mutex<ShareMap>>) -> Context {
         Context {
             channel_id: channel_id,
             data: data,
             shard: shard,
-            login_type: login_type,
             queue: String::new(),
         }
     }

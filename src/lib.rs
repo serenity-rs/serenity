@@ -2,8 +2,7 @@
 //!
 //! View the [examples] on how to make and structure a bot.
 //!
-//! Serenity supports both bot and user login via the use of [`Client::login_bot`]
-//! and [`Client::login_user`].
+//! Serenity supports bot user authentication via the use of [`Client::login`].
 //!
 //! Once logged in, you may add handlers to your client to dispatch [`Event`]s,
 //! such as [`Client::on_message`]. This will cause your handler to be called
@@ -38,7 +37,7 @@
 //!
 //! fn main() {
 //!     // Login with a bot token from the environment
-//!     let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").expect("token"));
+//!     let mut client = Client::login(&env::var("DISCORD_TOKEN").expect("token"));
 //!     client.with_framework(|f| f
 //!         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
 //!         .on("ping", ping));
@@ -73,8 +72,7 @@
 //! ```
 //!
 //! [`Cache`]: ext/cache/struct.Cache.html
-//! [`Client::login_bot`]: client/struct.Client.html#method.login_bot
-//! [`Client::login_user`]: client/struct.Client.html#method.login_user
+//! [`Client::login`]: client/struct.Client.html#method.login
 //! [`Client::on_message`]: client/struct.Client.html#method.on_message
 //! [`Context`]: client/struct.Context.html
 //! [`Event`]: model/event/enum.Event.html

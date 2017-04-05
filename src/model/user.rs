@@ -1,18 +1,14 @@
 use serde_json::builder::ObjectBuilder;
 use std::{fmt, mem};
-use super::utils::{into_map, into_string, remove};
 use super::{
     CurrentUser,
-    FriendSourceFlags,
     GuildContainer,
     GuildId,
     GuildInfo,
     Member,
     Message,
-    OnlineStatus,
     PrivateChannel,
     RoleId,
-    UserSettings,
     User,
     UserId,
 };
@@ -21,7 +17,6 @@ use ::client::rest::{self, GuildPagination};
 use ::internal::prelude::*;
 use ::model::misc::Mentionable;
 use ::utils::builder::EditProfile;
-use ::utils::decode_array;
 
 #[cfg(feature="cache")]
 use std::sync::{Arc, RwLock};
@@ -159,24 +154,6 @@ impl User {
         Ok(cdn!("/embed/avatars/{}.png", self.discriminator.parse::<u16>()? % 5u16).to_owned())
     }
 
-    /// Deletes a profile note from a user.
-    ///
-    /// # Examples
-    ///
-    /// Delete a note for a [`Message`]'s author:
-    ///
-    /// ```rust,ignore
-    /// // assuming you are in a context
-    ///
-    /// let _ = message.author.delete_note();
-    /// ```
-    ///
-    /// [`Message`]: struct.Message.html
-    #[inline]
-    pub fn delete_note(&self) -> Result<()> {
-        self.id.delete_note()
-    }
-
     /// Sends a message to a user through a direct message channel. This is a
     /// channel that can only be accessed by you and the recipient.
     ///
@@ -266,35 +243,6 @@ impl User {
         self.direct_message(content)
     }
 
-    /// Edits the note that the current user has set for another user.
-    ///
-    /// Use [`delete_note`] to remove a note.
-    ///
-    /// **Note**: Requires that the current user be a user account.
-    ///
-    /// # Examples
-    ///
-    /// Set a note for a message's author:
-    ///
-    /// ```rust,ignore
-    /// // assuming a `message` has been bound
-    ///
-    /// let _ = message.author.edit_note("test note");
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot
-    /// user.
-    ///
-    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
-    /// [`delete_note`]: #method.delete_note
-    #[inline]
-    pub fn edit_note(&self, note: &str) -> Result<()> {
-        self.id.edit_note(note)
-    }
-
     /// Gets a user by its Id over the REST API.
     ///
     /// **Note**: The current user must be a bot user.
@@ -306,14 +254,8 @@ impl User {
     /// user.
     ///
     /// [`ClientError::InvalidOperationAsUser`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
+    #[inline]
     pub fn get<U: Into<UserId>>(user_id: U) -> Result<User> {
-        #[cfg(feature="cache")]
-        {
-            if !CACHE.read().unwrap().user.bot {
-                return Err(Error::Client(ClientError::InvalidOperationAsUser));
-            }
-        }
-
         user_id.into().get()
     }
 
@@ -389,29 +331,6 @@ impl UserId {
         rest::create_private_channel(&map)
     }
 
-    /// Deletes a profile note from a user.
-    pub fn delete_note(&self) -> Result<()> {
-        let map = ObjectBuilder::new().insert("note", "").build();
-
-        rest::edit_note(self.0, &map)
-    }
-
-    /// Edits the note that the current user has set for another user.
-    ///
-    /// Use [`delete_note`] to remove a note.
-    ///
-    /// Refer to the documentation for [`User::edit_note`] for more information.
-    ///
-    /// **Note**: Requires that the current user be a user account.
-    ///
-    /// [`delete_note`]: #method.delete_note
-    /// [`User::edit_note`]: struct.User.html#method.edit_note
-    pub fn edit_note(&self, note: &str) -> Result<()> {
-        let map = ObjectBuilder::new().insert("note", note).build();
-
-        rest::edit_note(self.0, &map)
-    }
-
     /// Search the cache for the user with the Id.
     #[cfg(feature="cache")]
     pub fn find(&self) -> Option<Arc<RwLock<User>>> {
@@ -451,31 +370,5 @@ impl From<User> for UserId {
 impl fmt::Display for UserId {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.0, f)
-    }
-}
-
-impl UserSettings {
-    #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<Option<UserSettings>> {
-        let mut map = into_map(value)?;
-
-        if map.is_empty() {
-            return Ok(None);
-        }
-
-        Ok(UserSettings {
-            convert_emoticons: req!(remove(&mut map, "convert_emoticons")?.as_bool()),
-            enable_tts_command: req!(remove(&mut map, "enable_tts_command")?.as_bool()),
-            friend_source_flags: remove(&mut map, "friend_source_flags").and_then(FriendSourceFlags::decode)?,
-            inline_attachment_media: req!(remove(&mut map, "inline_attachment_media")?.as_bool()),
-            inline_embed_media: req!(remove(&mut map, "inline_embed_media")?.as_bool()),
-            locale: remove(&mut map, "locale").and_then(into_string)?,
-            message_display_compact: req!(remove(&mut map, "message_display_compact")?.as_bool()),
-            render_embeds: req!(remove(&mut map, "render_embeds")?.as_bool()),
-            restricted_guilds: remove(&mut map, "restricted_guilds").and_then(|v| decode_array(v, GuildId::decode))?,
-            show_current_game: req!(remove(&mut map, "show_current_game")?.as_bool()),
-            theme: remove(&mut map, "theme").and_then(into_string)?,
-            status: remove(&mut map, "status").and_then(OnlineStatus::decode_str)?,
-        }).map(Some)
     }
 }

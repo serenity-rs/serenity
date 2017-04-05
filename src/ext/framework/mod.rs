@@ -36,7 +36,7 @@
 //! use serenity::model::Message;
 //! use std::env;
 //!
-//! let mut client = Client::login_bot(&env::var("DISCORD_BOT_TOKEN").unwrap());
+//! let mut client = Client::login(&env::var("DISCORD_BOT_TOKEN").unwrap());
 //!
 //! client.with_framework(|f| f
 //!     .configure(|c| c.prefix("~"))
@@ -74,11 +74,13 @@ use std::default::Default;
 use std::sync::Arc;
 use std::thread;
 use ::client::Context;
-use ::model::{Channel, Message, UserId};
+use ::model::{Message, UserId};
 use ::utils;
 
 #[cfg(feature="cache")]
 use ::client::CACHE;
+#[cfg(feature="cache")]
+use ::model::Channel;
 
 /// A macro to generate "named parameters". This is useful to avoid manually
 /// using the "arguments" parameter and manually parsing types.
@@ -214,7 +216,7 @@ impl Framework {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").unwrap());
+    /// let mut client = Client::login(&env::var("DISCORD_TOKEN").unwrap());
     /// client.with_framework(|f| f
     ///     .configure(|c| c
     ///         .depth(3)
@@ -696,7 +698,7 @@ impl Framework {
     /// use serenity::model::Message;
     /// use std::env;
     ///
-    /// let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").unwrap());
+    /// let mut client = Client::login(&env::var("DISCORD_TOKEN").unwrap());
     ///
     /// client.with_framework(|f| f
     ///     .configure(|c| c.prefix("~"))

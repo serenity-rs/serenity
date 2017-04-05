@@ -15,7 +15,6 @@ mod edit_profile;
 mod edit_role;
 mod execute_webhook;
 mod get_messages;
-mod search;
 
 pub use self::create_embed::{
     CreateEmbed,
@@ -32,4 +31,3 @@ pub use self::edit_profile::EditProfile;
 pub use self::edit_role::EditRole;
 pub use self::execute_webhook::ExecuteWebhook;
 pub use self::get_messages::GetMessages;
-pub use self::search::{Search, Has};

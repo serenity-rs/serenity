@@ -45,7 +45,7 @@ impl CreateCommand {
     /// use serenity::model::Message;
     /// use std::env;
     ///
-    /// let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").unwrap());
+    /// let mut client = Client::login(&env::var("DISCORD_TOKEN").unwrap());
     ///
     /// client.with_framework(|f| f
     ///     .configure(|c| c.prefix("~"))

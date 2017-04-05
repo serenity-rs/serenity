@@ -18,11 +18,7 @@ use ::model::*;
 use std::sync::RwLock;
 
 #[cfg(not(feature="cache"))]
-use ::model::event::{
-    CallUpdateEvent,
-    GuildMemberUpdateEvent,
-    UserSettingsUpdateEvent,
-};
+use ::model::event::{CallUpdateEvent, GuildMemberUpdateEvent};
 
 // This should use type macros when stable receives the type macro
 // stabilization patch.
@@ -64,8 +60,6 @@ pub struct EventStore {
     pub on_channel_update: Option<Arc<Fn(Context, Option<Channel>, Channel) + Send + Sync + 'static>>,
     #[cfg(not(feature="cache"))]
     pub on_channel_update: Option<Arc<Fn(Context, Channel) + Send + Sync + 'static>>,
-    pub on_friend_suggestion_create: Option<Arc<Fn(Context, User, Vec<SuggestionReason>) + Send + Sync + 'static>>,
-    pub on_friend_suggestion_delete: Option<Arc<Fn(Context, UserId) + Send + Sync + 'static>>,
     pub on_guild_ban_addition: Option<Arc<Fn(Context, GuildId, User) + Send + Sync + 'static>>,
     pub on_guild_ban_removal: Option<Arc<Fn(Context, GuildId, User) + Send + Sync + 'static>>,
     pub on_guild_create: Option<Arc<Fn(Context, Guild) + Send + Sync + 'static>>,
@@ -108,30 +102,16 @@ pub struct EventStore {
     pub on_reaction_remove: Option<Arc<Fn(Context, Reaction) + Send + Sync + 'static>>,
     pub on_reaction_remove_all: Option<Arc<Fn(Context, ChannelId, MessageId) + Send + Sync + 'static>>,
     pub on_message_update: Option<Arc<Fn(Context, MessageUpdateEvent) + Send + Sync + 'static>>,
-    #[cfg(feature="cache")]
-    pub on_note_update: Option<Arc<Fn(Context, UserId, Option<String>, String) + Send + Sync + 'static>>,
-    #[cfg(not(feature="cache"))]
-    pub on_note_update: Option<Arc<Fn(Context, UserId, String) + Send + Sync + 'static>>,
     pub on_presence_replace: Option<Arc<Fn(Context, Vec<Presence>) + Send + Sync + 'static>>,
     pub on_presence_update: Option<Arc<Fn(Context, PresenceUpdateEvent) + Send + Sync + 'static>>,
     pub on_ready: Option<Arc<Fn(Context, Ready) + Send + Sync + 'static>>,
-    pub on_relationship_addition: Option<Arc<Fn(Context, Relationship) + Send + Sync + 'static>>,
-    pub on_relationship_removal: Option<Arc<Fn(Context, UserId, RelationshipType) + Send + Sync + 'static>>,
     pub on_resume: Option<Arc<Fn(Context, ResumedEvent) + Send + Sync + 'static>>,
     pub on_typing_start: Option<Arc<Fn(Context, TypingStartEvent) + Send + Sync + 'static>>,
     pub on_unknown: Option<Arc<Fn(Context, String, BTreeMap<String, Value>) + Send + Sync + 'static>>,
     #[cfg(feature="cache")]
-    pub on_user_guild_settings_update: Option<Arc<Fn(Context, Option<UserGuildSettings>, UserGuildSettings) + Send + Sync + 'static>>,
-    #[cfg(not(feature="cache"))]
-    pub on_user_guild_settings_update: Option<Arc<Fn(Context, UserGuildSettings) + Send + Sync + 'static>>,
-    #[cfg(feature="cache")]
     pub on_user_update: Option<Arc<Fn(Context, CurrentUser, CurrentUser) + Send + Sync + 'static>>,
     #[cfg(not(feature="cache"))]
     pub on_user_update: Option<Arc<Fn(Context, CurrentUser) + Send + Sync + 'static>>,
-    #[cfg(feature="cache")]
-    pub on_user_settings_update: Option<Arc<Fn(Context, UserSettings, UserSettings) + Send + Sync + 'static>>,
-    #[cfg(not(feature="cache"))]
-    pub on_user_settings_update: Option<Arc<Fn(Context, UserSettingsUpdateEvent) + Send + Sync + 'static>>,
     pub on_voice_server_update: Option<Arc<Fn(Context, VoiceServerUpdateEvent) + Send + Sync + 'static>>,
     pub on_voice_state_update: Option<Arc<Fn(Context, Option<GuildId>, VoiceState) + Send + Sync + 'static>>,
     pub on_webhook_update: Option<Arc<Fn(Context, GuildId, ChannelId) + Send + Sync + 'static>>,

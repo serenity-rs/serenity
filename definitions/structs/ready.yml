@@ -4,28 +4,10 @@ description: >
   An active group or private call. These are different from guild voice
   channels.
 fields:
-  - name: analytics_token
-    optional: true
-    type: string
-  - name: experiments
-    custom: decode_experiments
-    optional: true
-    type: Vec<Vec<u64>>
-  - name: friend_suggestion_count
-    optional: true
-    type: u64
   - name: guilds
     array: true
     custom: PossibleGuild::<Guild>::decode
     type: PossibleGuild<Guild>
-  - name: notes
-    custom: decode_notes
-    default: HashMap::default()
-    description: >
-      The shard info for this session; the shard is used and the total number of
-      shards.
-    t: UserId, String
-    type: hashmap
   - name: presences
     custom: decode_presences
     t: UserId, Presence
@@ -33,15 +15,6 @@ fields:
   - name: private_channels
     custom: decode_private_channels
     t: ChannelId, Channel
-    type: hashmap
-  - name: read_state
-    custom: decode_read_states
-    default: HashMap::default()
-    t: ChannelId, ReadState
-    type: hashmap
-  - name: relationships
-    custom: decode_relationships
-    t: UserId, Relationship
     type: hashmap
   - name: session_id
     type: string
@@ -55,19 +28,8 @@ fields:
     from: _trace
     optional: true
     type: string
-  - name: tutorial
-    optional: true
-    type: Tutorial
   - name: user
     type: CurrentUser
-  - name: user_guild_settings
-    array: true
-    optional: true
-    type: UserGuildSettings
-  - name: user_settings
-    custom: UserSettings::decode
-    optional: false
-    type: Option<UserSettings>
   - name: version
     from: v
     type: u64

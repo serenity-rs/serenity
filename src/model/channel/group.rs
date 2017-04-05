@@ -1,36 +1,11 @@
 use std::borrow::Cow;
 use std::fmt::Write as FmtWrite;
 use std::io::Read;
-use ::client::{CACHE, rest};
+use ::client::rest;
 use ::model::*;
-use ::utils::builder::{CreateMessage, GetMessages, Search};
+use ::utils::builder::{CreateMessage, GetMessages};
 
 impl Group {
-    /// Marks the group as being read up to a certain [`Message`].
-    ///
-    /// Refer to the documentation for [`rest::ack_message`] for more
-    /// information.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot
-    /// user.
-    ///
-    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
-    /// [`Message`]: struct.Message.html
-    /// [`rest::ack_message`]: ../client/rest/fn.ack_message.html
-    pub fn ack<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        #[cfg(feature="cache")]
-        {
-            if CACHE.read().unwrap().user.bot {
-                return Err(Error::Client(ClientError::InvalidOperationAsBot));
-            }
-        }
-
-        self.channel_id.ack(message_id)
-    }
-
     /// Adds the given user to the group. If the user is already in the group,
     /// then nothing is done.
     ///
@@ -255,27 +230,6 @@ impl Group {
     #[inline]
     pub fn say(&self, content: &str) -> Result<Message> {
         self.channel_id.say(content)
-    }
-
-    /// Performs a search request to the API for the group's channel's
-    /// [`Message`]s.
-    ///
-    /// Refer to the documentation for the [`Search`] builder for examples and
-    /// more information.
-    ///
-    /// **Note**: Bot users can not search.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidOperationAsBot`] if the current user is a bot.
-    ///
-    /// [`ClientError::InvalidOperationAsBot`]: ../client/enum.ClientError.html#variant.InvalidOperationAsBot
-    /// [`Message`]: struct.Message.html
-    /// [`Search`]: ../utils/builder/struct.Search.html
-    #[inline]
-    pub fn search<F: FnOnce(Search) -> Search>(&self, f: F) -> Result<SearchResult> {
-        self.channel_id.search(f)
     }
 
     /// Sends a file along with optional message contents. The filename _must_

@@ -30,36 +30,6 @@ pub fn decode_emojis(value: Value) -> Result<HashMap<EmojiId, Emoji>> {
     Ok(emojis)
 }
 
-pub fn decode_experiments(value: Value) -> Result<Vec<Vec<u64>>> {
-    let array = match value {
-        Value::Array(v) => v,
-        value => return Err(Error::Decode("Expected experiment array", value)),
-    };
-
-    let mut experiments: Vec<Vec<u64>> = vec![];
-
-    for arr in array {
-        let arr = match arr {
-            Value::Array(v) => v,
-            value => return Err(Error::Decode("Expected experiment's array", value)),
-        };
-
-        let mut items: Vec<u64> = vec![];
-
-        for item in arr {
-            items.push(match item {
-                Value::I64(v) => v as u64,
-                Value::U64(v) => v,
-                value => return Err(Error::Decode("Expected experiment u64", value)),
-            });
-        }
-
-        experiments.push(items);
-    }
-
-    Ok(experiments)
-}
-
 pub fn decode_id(value: Value) -> Result<u64> {
     match value {
         Value::U64(num) => Ok(num),
@@ -102,25 +72,6 @@ pub fn decode_guild_members(guild_id: GuildId, value: Value) -> Result<HashMap<U
     Ok(members)
 }
 
-// Clippy's lint is incorrect here and will result in invalid code.
-//
-// Bit more detaul: `result_unwrap_or_default` is not yet stable as of rustc
-// 1.14.
-#[allow(or_fun_call)]
-pub fn decode_notes(value: Value) -> Result<HashMap<UserId, String>> {
-    let mut notes = HashMap::new();
-
-    for (key, value) in into_map(value).unwrap_or(BTreeMap::default()) {
-        let id = UserId(key.parse::<u64>()
-            .map_err(|_| Error::Decode("Invalid user id in notes",
-                                       Value::String(key)))?);
-
-        notes.insert(id, into_string(value)?);
-    }
-
-    Ok(notes)
-}
-
 pub fn decode_presences(value: Value) -> Result<HashMap<UserId, Presence>> {
     let mut presences = HashMap::new();
 
@@ -148,28 +99,6 @@ pub fn decode_private_channels(value: Value)
     Ok(private_channels)
 }
 
-pub fn decode_read_states(value: Value)
-    -> Result<HashMap<ChannelId, ReadState>> {
-    let mut read_states = HashMap::new();
-
-    for read_state in decode_array(value, ReadState::decode)? {
-        read_states.insert(read_state.id, read_state);
-    }
-
-    Ok(read_states)
-}
-
-pub fn decode_relationships(value: Value)
-    -> Result<HashMap<UserId, Relationship>> {
-    let mut relationships = HashMap::new();
-
-    for relationship in decode_array(value, Relationship::decode)? {
-        relationships.insert(relationship.id, relationship);
-    }
-
-    Ok(relationships)
-}
-
 pub fn decode_roles(value: Value) -> Result<HashMap<RoleId, Role>> {
     let mut roles = HashMap::new();
 
@@ -178,35 +107,6 @@ pub fn decode_roles(value: Value) -> Result<HashMap<RoleId, Role>> {
     }
 
     Ok(roles)
-}
-
-pub fn decode_search_results(value: Value) -> Result<Vec<Vec<Message>>> {
-    let array = match value {
-        Value::Array(v) => v,
-        value => return Err(Error::Decode("Expected message set array", value)),
-    };
-
-    let mut sets: Vec<Vec<Message>> = vec![];
-
-    for arr in array {
-        let arr = match arr {
-            Value::Array(v) => v,
-            value => return Err(Error::Decode("Expected message set array", value)),
-        };
-
-        let mut messages: Vec<Message> = vec![];
-
-        for item in arr {
-            messages.push(match item {
-                Value::Object(v) => try!(Message::decode(Value::Object(v))),
-                value => return Err(Error::Decode("Expected search message", value)),
-            });
-        }
-
-        sets.push(messages);
-    }
-
-    Ok(sets)
 }
 
 pub fn decode_shards(value: Value) -> Result<[u64; 2]> {

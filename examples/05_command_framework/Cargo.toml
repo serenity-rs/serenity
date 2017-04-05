@@ -1,8 +1,11 @@
 [package]
-name = "07_voice"
+name = "05_command_framework"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 
+[dependencies]
+typemap = "0.3"
+
 [dependencies.serenity]
-features = ["cache", "framework", "voice"]
+features = ["framework"]
 path = "../../"

@@ -241,38 +241,6 @@ impl ChannelUpdateEvent {
 }
 
 #[derive(Clone, Debug)]
-pub struct FriendSuggestionCreateEvent {
-    pub reasons: Vec<SuggestionReason>,
-    pub suggested_user: User,
-}
-
-impl FriendSuggestionCreateEvent {
-    #[doc(hidden)]
-    #[inline]
-    pub fn decode(mut map: Map) -> Result<Self> {
-        Ok(FriendSuggestionCreateEvent {
-            reasons: decode_array(remove(&mut map, "reasons")?, SuggestionReason::decode)?,
-            suggested_user: remove(&mut map, "suggested_user").and_then(User::decode)?,
-        })
-    }
-}
-
-#[derive(Clone, Copy, Debug)]
-pub struct FriendSuggestionDeleteEvent {
-    pub suggested_user_id: UserId,
-}
-
-impl FriendSuggestionDeleteEvent {
-    #[doc(hidden)]
-    #[inline]
-    pub fn decode(mut map: Map) -> Result<Self> {
-        Ok(FriendSuggestionDeleteEvent {
-            suggested_user_id: remove(&mut map, "suggested_user_id").and_then(UserId::decode)?,
-        })
-    }
-}
-
-#[derive(Clone, Debug)]
 pub struct GuildBanAddEvent {
     pub guild_id: GuildId,
     pub user: User,
@@ -546,24 +514,6 @@ impl GuildUpdateEvent {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
-pub struct MessageAckEvent {
-    pub channel_id: ChannelId,
-    /// May be `None` if a private channel with no messages has closed.
-    pub message_id: Option<MessageId>,
-}
-
-impl MessageAckEvent {
-    #[doc(hidden)]
-    #[inline]
-    pub fn decode(mut map: Map) -> Result<Self> {
-        Ok(MessageAckEvent {
-            channel_id: remove(&mut map, "channel_id").and_then(ChannelId::decode)?,
-            message_id: opt(&mut map, "message_id", MessageId::decode)?,
-        })
-    }
-}
-
 #[derive(Clone, Debug)]
 pub struct MessageCreateEvent {
     pub message: Message,
@@ -757,38 +707,6 @@ impl ReadyEvent {
 }
 
 #[derive(Clone, Debug)]
-pub struct RelationshipAddEvent {
-    pub relationship: Relationship,
-}
-
-impl RelationshipAddEvent {
-    #[doc(hidden)]
-    #[inline]
-    pub fn decode(map: Map) -> Result<Self> {
-        Ok(RelationshipAddEvent {
-            relationship: Relationship::decode(Value::Object(map))?,
-        })
-    }
-}
-
-#[derive(Clone, Copy, Debug)]
-pub struct RelationshipRemoveEvent {
-    pub kind: RelationshipType,
-    pub user_id: UserId,
-}
-
-impl RelationshipRemoveEvent {
-    #[doc(hidden)]
-    #[inline]
-    pub fn decode(mut map: Map) -> Result<Self> {
-        Ok(RelationshipRemoveEvent {
-            kind: remove(&mut map, "type").and_then(RelationshipType::decode)?,
-            user_id: remove(&mut map, "id").and_then(UserId::decode)?,
-        })
-    }
-}
-
-#[derive(Clone, Debug)]
 pub struct ResumedEvent {
     pub trace: Vec<Option<String>>,
 }
@@ -829,38 +747,6 @@ pub struct UnknownEvent {
 }
 
 #[derive(Clone, Debug)]
-pub struct UserGuildSettingsUpdateEvent {
-    pub settings: UserGuildSettings,
-}
-
-impl UserGuildSettingsUpdateEvent {
-    #[doc(hidden)]
-    #[inline]
-    pub fn decode(map: Map) -> Result<Self> {
-        Ok(UserGuildSettingsUpdateEvent {
-            settings: UserGuildSettings::decode(Value::Object(map))?,
-        })
-    }
-}
-
-#[derive(Clone, Debug)]
-pub struct UserNoteUpdateEvent {
-    pub note: String,
-    pub user_id: UserId,
-}
-
-impl UserNoteUpdateEvent {
-    #[doc(hidden)]
-    #[inline]
-    pub fn decode(mut map: Map) -> Result<Self> {
-        Ok(UserNoteUpdateEvent {
-            note: remove(&mut map, "note").and_then(into_string)?,
-            user_id: remove(&mut map, "id").and_then(UserId::decode)?,
-        })
-    }
-}
-
-#[derive(Clone, Debug)]
 pub struct UserUpdateEvent {
     pub current_user: CurrentUser,
 }
@@ -871,41 +757,6 @@ impl UserUpdateEvent {
     pub fn decode(map: Map) -> Result<Self> {
         Ok(UserUpdateEvent {
             current_user: CurrentUser::decode(Value::Object(map))?,
-        })
-    }
-}
-
-#[derive(Clone, Debug)]
-pub struct UserSettingsUpdateEvent {
-    pub enable_tts_command: Option<bool>,
-    pub inline_attachment_media: Option<bool>,
-    pub inline_embed_media: Option<bool>,
-    pub locale: Option<String>,
-    pub message_display_compact: Option<bool>,
-    pub render_embeds: Option<bool>,
-    pub show_current_game: Option<bool>,
-    pub theme: Option<String>,
-    pub convert_emoticons: Option<bool>,
-    pub friend_source_flags: Option<FriendSourceFlags>,
-    pub status: Option<OnlineStatus>,
-}
-
-impl UserSettingsUpdateEvent {
-    #[doc(hidden)]
-    #[inline]
-    pub fn decode(mut map: Map) -> Result<Self> {
-        Ok(UserSettingsUpdateEvent {
-            enable_tts_command: remove(&mut map, "enable_tts_command").ok().and_then(|v| v.as_bool()),
-            inline_attachment_media: remove(&mut map, "inline_attachment_media").ok().and_then(|v| v.as_bool()),
-            inline_embed_media: remove(&mut map, "inline_embed_media").ok().and_then(|v| v.as_bool()),
-            locale: opt(&mut map, "locale", into_string)?,
-            message_display_compact: remove(&mut map, "message_display_compact").ok().and_then(|v| v.as_bool()),
-            render_embeds: remove(&mut map, "render_embeds").ok().and_then(|v| v.as_bool()),
-            show_current_game: remove(&mut map, "show_current_game").ok().and_then(|v| v.as_bool()),
-            theme: opt(&mut map, "theme", into_string)?,
-            convert_emoticons: remove(&mut map, "convert_emoticons").ok().and_then(|v| v.as_bool()),
-            friend_source_flags: opt(&mut map, "friend_source_flags", FriendSourceFlags::decode)?,
-            status: opt(&mut map, "status", OnlineStatus::decode_str)?,
         })
     }
 }
@@ -1080,22 +931,6 @@ pub enum Event {
     /// [`Client::on_channel_update`]: ../../client/struct.Client.html#on_channel_update
     /// [`User`]: ../struct.User.html
     ChannelUpdate(ChannelUpdateEvent),
-    /// When a suggestion for a friend is created, due to a connection like
-    /// [Skype][`Connection::Skype`].
-    ///
-    /// Fires the [`on_friend_suggestion_create`] event.
-    ///
-    /// [`Connection::Skype`]: enum.Connection.html#variant.Skype
-    /// [`on_friend_suggestion_delete`]: ../../client/struct.Client.html#on_friend_suggestion_create
-    FriendSuggestionCreate(FriendSuggestionCreateEvent),
-    /// When a suggestion for a friend is removed, due to a connection like
-    /// [Skype][`Connection::Skype`].
-    ///
-    /// Fires the [`on_friend_suggestion_delete`] event.
-    ///
-    /// [`Connection::Skype`]: enum.Connection.html#variant.Skype
-    /// [`on_friend_suggestion_create`]: ../../client/struct.Client.html#on_friend_suggestion_delete
-    FriendSuggestionDelete(FriendSuggestionDeleteEvent),
     GuildBanAdd(GuildBanAddEvent),
     GuildBanRemove(GuildBanRemoveEvent),
     GuildCreate(GuildCreateEvent),
@@ -1114,8 +949,6 @@ pub enum Event {
     /// When a guild is unavailable, such as due to a Discord server outage.
     GuildUnavailable(GuildUnavailableEvent),
     GuildUpdate(GuildUpdateEvent),
-    /// Another logged-in device acknowledged this message
-    MessageAck(MessageAckEvent),
     MessageCreate(MessageCreateEvent),
     MessageDelete(MessageDeleteEvent),
     MessageDeleteBulk(MessageDeleteBulkEvent),
@@ -1149,20 +982,12 @@ pub enum Event {
     ///
     /// May also be received at a later time in the event of a reconnect.
     Ready(ReadyEvent),
-    RelationshipAdd(RelationshipAddEvent),
-    RelationshipRemove(RelationshipRemoveEvent),
     /// The connection has successfully resumed after a disconnect.
     Resumed(ResumedEvent),
     /// A user is typing; considered to last 5 seconds
     TypingStart(TypingStartEvent),
-    /// Update to the logged-in user's guild-specific notification settings
-    UserGuildSettingsUpdate(UserGuildSettingsUpdateEvent),
-    /// Update to a note that the logged-in user has set for another user.
-    UserNoteUpdate(UserNoteUpdateEvent),
     /// Update to the logged-in user's information
     UserUpdate(UserUpdateEvent),
-    /// Update to the logged-in user's preferences or client settings
-    UserSettingsUpdate(UserSettingsUpdateEvent),
     /// A member's voice state has changed
     VoiceStateUpdate(VoiceStateUpdateEvent),
     /// Voice server information is available
@@ -1196,8 +1021,6 @@ impl Event {
             "CHANNEL_RECIPIENT_ADD" => Event::ChannelRecipientAdd(ChannelRecipientAddEvent::decode(value)?),
             "CHANNEL_RECIPIENT_REMOVE" => Event::ChannelRecipientRemove(ChannelRecipientRemoveEvent::decode(value)?),
             "CHANNEL_UPDATE" => Event::ChannelUpdate(ChannelUpdateEvent::decode(value)?),
-            "FRIEND_SUGGESTION_CREATE" => Event::FriendSuggestionCreate(FriendSuggestionCreateEvent::decode(value)?),
-            "FRIEND_SUGGESTION_DELETE" => Event::FriendSuggestionDelete(FriendSuggestionDeleteEvent::decode(value)?),
             "GUILD_BAN_ADD" => Event::GuildBanAdd(GuildBanAddEvent::decode(value)?),
             "GUILD_BAN_REMOVE" => Event::GuildBanRemove(GuildBanRemoveEvent::decode(value)?),
             "GUILD_CREATE" => {
@@ -1225,7 +1048,6 @@ impl Event {
             "GUILD_ROLE_UPDATE" => Event::GuildRoleUpdate(GuildRoleUpdateEvent::decode(value)?),
             "GUILD_SYNC" => Event::GuildSync(GuildSyncEvent::decode(value)?),
             "GUILD_UPDATE" => Event::GuildUpdate(GuildUpdateEvent::decode(value)?),
-            "MESSAGE_ACK" => Event::MessageAck(MessageAckEvent::decode(value)?),
             "MESSAGE_CREATE" => Event::MessageCreate(MessageCreateEvent::decode(value)?),
             "MESSAGE_DELETE" => Event::MessageDelete(MessageDeleteEvent::decode(value)?),
             "MESSAGE_DELETE_BULK" => Event::MessageDeleteBulk(MessageDeleteBulkEvent::decode(value)?),
@@ -1234,14 +1056,9 @@ impl Event {
             "MESSAGE_REACTION_REMOVE_ALL" => Event::ReactionRemoveAll(ReactionRemoveAllEvent::decode(value)?),
             "MESSAGE_UPDATE" => Event::MessageUpdate(MessageUpdateEvent::decode(value)?),
             "PRESENCE_UPDATE" => Event::PresenceUpdate(PresenceUpdateEvent::decode(value)?),
-            "RELATIONSHIP_ADD" => Event::RelationshipAdd(RelationshipAddEvent::decode(value)?),
-            "RELATIONSHIP_REMOVE" => Event::RelationshipRemove(RelationshipRemoveEvent::decode(value)?),
             "READY" => Event::Ready(ReadyEvent::decode(value)?),
             "RESUMED" => Event::Resumed(ResumedEvent::decode(value)?),
             "TYPING_START" => Event::TypingStart(TypingStartEvent::decode(value)?),
-            "USER_GUILD_SETTINGS_UPDATE" => Event::UserGuildSettingsUpdate(UserGuildSettingsUpdateEvent::decode(value)?),
-            "USER_NOTE_UPDATE" => Event::UserNoteUpdate(UserNoteUpdateEvent::decode(value)?),
-            "USER_SETTINGS_UPDATE" => Event::UserSettingsUpdate(UserSettingsUpdateEvent::decode(value)?),
             "USER_UPDATE" => Event::UserUpdate(UserUpdateEvent::decode(value)?),
             "VOICE_SERVER_UPDATE" => Event::VoiceServerUpdate(VoiceServerUpdateEvent::decode(value)?),
             "VOICE_STATE_UPDATE" => Event::VoiceStateUpdate(VoiceStateUpdateEvent::decode(value)?),

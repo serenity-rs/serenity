@@ -10,7 +10,7 @@
 //! use serenity::Client;
 //! use std::env;
 //!
-//! let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").unwrap());
+//! let mut client = Client::login(&env::var("DISCORD_TOKEN").unwrap());
 //! client.with_framework(|f| f
 //!     .command("help", |c| c.exec_help(help_commands::with_embeds)));
 //! ```

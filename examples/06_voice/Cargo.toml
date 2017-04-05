@@ -1,11 +1,8 @@
 [package]
-name = "06_command_framework"
+name = "06_voice"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 
-[dependencies]
-typemap = "0.3"
-
 [dependencies.serenity]
-features = ["framework"]
+features = ["cache", "framework", "voice"]
 path = "../../"

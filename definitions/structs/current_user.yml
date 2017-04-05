@@ -18,10 +18,6 @@ fields:
     type: string
   - name: mfa_enabled
     type: bool
-  - name: mobile
-    description: Whether the current user has logged in on mobile before.
-    optional: true
-    type: bool
   - name: name
     from: username
     type: string

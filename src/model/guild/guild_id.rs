@@ -1,9 +1,12 @@
 use serde_json::builder::ObjectBuilder;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use ::client::{CACHE, rest};
+use ::client::rest;
 use ::internal::prelude::*;
 use ::model::*;
-use ::utils::builder::{EditGuild, EditMember, EditRole, Search};
+use ::utils::builder::{EditGuild, EditMember, EditRole};
+
+#[cfg(feature="cache")]
+use ::client::CACHE;
 
 impl GuildId {
     /// Converts the guild Id into the default channel's Id.
@@ -411,47 +414,6 @@ impl GuildId {
         let map = ObjectBuilder::new().insert("channel_id", channel_id.into().0).build();
 
         rest::edit_member(self.0, user_id.into().0, &map)
-    }
-
-    /// Performs a search request to the API for the guild's [`Message`]s.
-    ///
-    /// This will search all of the guild's [`Channel`]s at once, that you have
-    /// the [Read Message History] permission to. Use [`search_channels`] to
-    /// specify a list of [channel][`GuildChannel`]s to search, where all other
-    /// channels will be excluded.
-    ///
-    /// Refer to the documentation for the [`Search`] builder for examples and
-    /// more information.
-    ///
-    /// [`Channel`]: enum.Channel.html
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`Message`]: struct.Message.html
-    /// [`Search`]: ../utils/builder/struct.Search.html
-    /// [`search_channels`]: #method.search_channels
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[inline]
-    pub fn search<F: FnOnce(Search) -> Search>(&self, f: F) -> Result<SearchResult> {
-        rest::search_guild_messages(self.0, &[], f(Search::default()).0)
-    }
-
-    /// Performs a search request to the API for the guild's [`Message`]s in
-    /// given channels.
-    ///
-    /// Refer to [`Guild::search_channels`] for more information.
-    ///
-    /// Refer to the documentation for the [`Search`] builder for examples and
-    /// more information.
-    ///
-    /// **Note**: Bot users can not search.
-    ///
-    /// [`Guild::search_channels`]: struct.Guild.html#method.search_channels
-    /// [`Message`]: struct.Message.html
-    /// [`Search`]: ../utils/builder/struct.Search.html
-    pub fn search_channels<F>(&self, channel_ids: &[ChannelId], f: F)
-        -> Result<SearchResult> where F: FnOnce(Search) -> Search {
-        let ids = channel_ids.iter().map(|x| x.0).collect::<Vec<u64>>();
-
-        rest::search_guild_messages(self.0, &ids, f(Search::default()).0)
     }
 
     /// Starts an integration sync for the given integration Id.

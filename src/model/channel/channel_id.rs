@@ -1,24 +1,14 @@
 use serde_json::builder::ObjectBuilder;
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 use std::io::Read;
-use ::client::{CACHE, rest};
+use ::client::rest;
 use ::model::*;
-use ::utils::builder::{CreateMessage, EditChannel, GetMessages, Search};
+use ::utils::builder::{CreateMessage, EditChannel, GetMessages};
+
+#[cfg(feature="cache")]
+use ::client::CACHE;
 
 impl ChannelId {
-    /// Marks a [`Channel`] as being read up to a certain [`Message`].
-    ///
-    /// Refer to the documentation for [`rest::ack_message`] for more
-    /// information.
-    ///
-    /// [`Channel`]: enum.Channel.html
-    /// [`Message`]: struct.Message.html
-    /// [`rest::ack_message`]: rest/fn.ack_message.html
-    #[inline]
-    pub fn ack<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        rest::ack_message(self.0, message_id.into().0)
-    }
-
     /// Broadcasts that the current user is typing to a channel for the next 5
     /// seconds.
     ///
@@ -356,25 +346,6 @@ impl ChannelId {
     #[inline]
     pub fn say(&self, content: &str) -> Result<Message> {
         self.send_message(|m| m.content(content))
-    }
-
-    /// Searches the channel's messages by providing query parameters via the
-    /// search builder.
-    ///
-    /// Refer to the documentation for the [`Search`] builder for restrictions
-    /// and defaults parameters, as well as potentially advanced usage.
-    ///
-    /// **Note**: Bot users can not search.
-    ///
-    /// # Examples
-    ///
-    /// Refer to the [`Search`] builder's documentation for examples,
-    /// specifically the section on [searching a channel][search channel].
-    ///
-    /// [`Search`]: ../utils/builder/struct.Search.html
-    #[inline]
-    pub fn search<F: FnOnce(Search) -> Search>(&self, f: F) -> Result<SearchResult> {
-        rest::search_channel_messages(self.0, f(Search::default()).0)
     }
 
     /// Sends a file along with optional message contents. The filename _must_
