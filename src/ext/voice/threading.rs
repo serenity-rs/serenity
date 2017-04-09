@@ -10,11 +10,11 @@ pub fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
 
     ThreadBuilder::new()
         .name(name)
-        .spawn(move || runner(rx))
+        .spawn(move || runner(&rx))
         .expect(&format!("[Voice] Error starting guild: {:?}", guild_id));
 }
 
-fn runner(rx: MpscReceiver<Status>) {
+fn runner(rx: &MpscReceiver<Status>) {
     let mut sender = None;
     let mut receiver = None;
     let mut connection = None;

@@ -220,7 +220,7 @@ impl Handler {
     /// [`standalone`]: #method.standalone
     pub fn leave(&mut self) {
         // Only send an update if we were in a voice channel.
-        if let Some(_) = self.channel_id {
+        if self.channel_id.is_some() {
             self.channel_id = None;
 
             self.update();

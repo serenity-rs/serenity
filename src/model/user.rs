@@ -194,8 +194,7 @@ impl User {
                     .values()
                     .map(|ch| ch.read().unwrap())
                     .find(|ch| ch.recipient.read().unwrap().id == self.id)
-                    .map(|ch| ch.id)
-                    .clone();
+                    .map(|ch| ch.id);
 
                 finding
             };

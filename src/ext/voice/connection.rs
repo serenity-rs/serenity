@@ -96,7 +96,7 @@ impl Connection {
             hello
         };
 
-        if !has_valid_mode(hello.modes) {
+        if !has_valid_mode(&hello.modes) {
             return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
         }
 
@@ -220,7 +220,7 @@ impl Connection {
             }
         } else {
             loop {
-                if let Err(_) = self.thread_items.rx.try_recv() {
+                if self.thread_items.rx.try_recv().is_err() {
                     break;
                 }
             }
@@ -411,7 +411,7 @@ fn get_encryption_key(receiver: &mut WsReceiver<WebSocketStream>)
 }
 
 #[inline]
-fn has_valid_mode(modes: Vec<String>) -> bool {
+fn has_valid_mode(modes: &[String]) -> bool {
     modes.iter().any(|s| s == CRYPTO_MODE)
 }
 
@@ -437,13 +437,13 @@ fn start_threads(mut receiver: WsReceiver<WebSocketStream>, udp: &UdpSocket)
 
             loop {
                 if let Ok((len, _)) = udp_clone.recv_from(&mut buffer) {
-                    let piece = buffer[..len].iter().cloned().collect();
+                    let piece = buffer[..len].to_vec();
                     let send = tx.send(ReceiverStatus::Udp(piece));
 
-                    if let Err(_) = send {
+                    if send.is_err() {
                         return;
                     }
-                } else if let Ok(_) = udp_close_reader.try_recv() {
+                } else if udp_close_reader.try_recv().is_ok() {
                     return;
                 }
             }
@@ -454,12 +454,12 @@ fn start_threads(mut receiver: WsReceiver<WebSocketStream>, udp: &UdpSocket)
         .spawn(move || {
             loop {
                 while let Ok(msg) = receiver.recv_json(VoiceEvent::decode) {
-                    if let Err(_) = tx_clone.send(ReceiverStatus::Websocket(msg)) {
+                    if tx_clone.send(ReceiverStatus::Websocket(msg)).is_ok() {
                         return;
                     }
                 }
 
-                if let Ok(_) = ws_close_reader.try_recv() {
+                if ws_close_reader.try_recv().is_ok() {
                     return;
                 }
 

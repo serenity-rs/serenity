@@ -296,7 +296,7 @@ fn handle_event(event: Event,
                     thread::spawn(move || (handler)(context, event));
                 }}
             } else {
-                let _ = update!(update_with_guild_member_update, event);
+                update!(update_with_guild_member_update, event);
             }
         },
         Event::GuildMembersChunk(event) => {
