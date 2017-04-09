@@ -70,8 +70,6 @@ pub enum OpCode {
     InvalidSession,
     Hello,
     HeartbeatAck,
-    SyncGuild,
-    SyncCall,
 }
 
 impl OpCode {
@@ -89,8 +87,6 @@ impl OpCode {
             9 => Some(OpCode::InvalidSession),
             10 => Some(OpCode::Hello),
             11 => Some(OpCode::HeartbeatAck),
-            12 => Some(OpCode::SyncGuild),
-            13 => Some(OpCode::SyncCall),
             _ => None,
         }
     }
@@ -109,8 +105,6 @@ impl OpCode {
             OpCode::InvalidSession => 9,
             OpCode::Hello => 10,
             OpCode::HeartbeatAck => 11,
-            OpCode::SyncGuild => 12,
-            OpCode::SyncCall => 13,
         }
     }
 }

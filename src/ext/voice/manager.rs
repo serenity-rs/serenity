@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::sync::mpsc::Sender as MpscSender;
-use super::{Handler, Target};
+use super::Handler;
 use ::client::gateway::GatewayStatus;
 use ::model::{ChannelId, GuildId, UserId};
 
@@ -21,7 +21,7 @@ use ::model::{ChannelId, GuildId, UserId};
 /// [guild's channel]: ../../model/enum.ChannelType.html#variant.Voice
 /// [WebSocket connection]: ../../client/struct.Connection.html
 pub struct Manager {
-    handlers: HashMap<Target, Handler>,
+    handlers: HashMap<GuildId, Handler>,
     user_id: UserId,
     ws: MpscSender<GatewayStatus>,
 }
@@ -37,8 +37,8 @@ impl Manager {
     }
 
     /// Retrieves a mutable handler for the given target, if one exists.
-    pub fn get<T: Into<Target>>(&mut self, target_id: T) -> Option<&mut Handler> {
-        self.handlers.get_mut(&target_id.into())
+    pub fn get<G: Into<GuildId>>(&mut self, guild_id: G) -> Option<&mut Handler> {
+        self.handlers.get_mut(&guild_id.into())
     }
 
     /// Connects to a target by retrieving its relevant [`Handler`] and
@@ -63,45 +63,33 @@ impl Manager {
     /// [`Handler`]: struct.Handler.html
     /// [`get`]: #method.get
     #[allow(map_entry)]
-    pub fn join(&mut self, guild_id: Option<GuildId>, channel_id: ChannelId) -> &mut Handler {
-        if let Some(guild_id) = guild_id {
-            let target = Target::Guild(guild_id);
+    pub fn join<C, G>(&mut self, guild_id: G, channel_id: C) -> &mut Handler
+        where C: Into<ChannelId>, G: Into<GuildId> {
+        let channel_id = channel_id.into();
+        let guild_id = guild_id.into();
 
-            {
-                let mut found = false;
+        {
+            let mut found = false;
 
-                if let Some(handler) = self.handlers.get_mut(&target) {
-                    handler.switch_to(channel_id);
+            if let Some(handler) = self.handlers.get_mut(&guild_id) {
+                handler.switch_to(channel_id);
 
-                    found = true;
-                }
-
-                if found {
-                    // Actually safe, as the key has already been found above.
-                    return self.handlers.get_mut(&target).unwrap();
-                }
+                found = true;
             }
 
-            let mut handler = Handler::new(target, self.ws.clone(), self.user_id);
-            handler.join(channel_id);
-
-            self.handlers.insert(target, handler);
-
-            // Actually safe, as the key would have been inserted above.
-            self.handlers.get_mut(&target).unwrap()
-        } else {
-            let target = Target::Channel(channel_id);
-
-            if !self.handlers.contains_key(&target) {
-                let mut handler = Handler::new(target, self.ws.clone(), self.user_id);
-                handler.join(channel_id);
-
-                self.handlers.insert(target, handler);
+            if found {
+                // Actually safe, as the key has already been found above.
+                return self.handlers.get_mut(&guild_id).unwrap();
             }
-
-            // Actually safe, as the key would have been inserted above.
-            self.handlers.get_mut(&target).unwrap()
         }
+
+        let mut handler = Handler::new(guild_id, self.ws.clone(), self.user_id);
+        handler.join(channel_id);
+
+        self.handlers.insert(guild_id, handler);
+
+        // Actually safe, as the key would have been inserted above.
+        self.handlers.get_mut(&guild_id).unwrap()
     }
 
     /// Retrieves the [handler][`Handler`] for the given target and leaves the
@@ -115,10 +103,8 @@ impl Manager {
     /// [`Handler`]: struct.Handler.html
     /// [`get`]: #method.get
     /// [`leave`]: struct.Handler.html#method.leave
-    pub fn leave<T: Into<Target>>(&mut self, target_id: T) {
-        let target = target_id.into();
-
-        if let Some(handler) = self.handlers.get_mut(&target) {
+    pub fn leave<G: Into<GuildId>>(&mut self, guild_id: G) {
+        if let Some(handler) = self.handlers.get_mut(&guild_id.into()) {
             handler.leave();
         }
     }
@@ -129,11 +115,11 @@ impl Manager {
     /// The handler is then dropped, removing settings for the target.
     ///
     /// [`Handler`]: struct.Handler.html
-    pub fn remove<T: Into<Target>>(&mut self, target_id: T) {
-        let target = target_id.into();
+    pub fn remove<G: Into<GuildId>>(&mut self, guild_id: G) {
+        let guild_id = guild_id.into();
 
-        self.leave(target);
+        self.leave(guild_id);
 
-        self.handlers.remove(&target);
+        self.handlers.remove(&guild_id);
     }
 }

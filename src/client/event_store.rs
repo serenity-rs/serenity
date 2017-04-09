@@ -2,23 +2,11 @@ use serde_json::Value;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 use super::context::Context;
-use ::model::event::{
-    ChannelPinsAckEvent,
-    ChannelPinsUpdateEvent,
-    GuildSyncEvent,
-    MessageUpdateEvent,
-    PresenceUpdateEvent,
-    ResumedEvent,
-    TypingStartEvent,
-    VoiceServerUpdateEvent,
-};
+use ::model::event::*;
 use ::model::*;
 
 #[cfg(feature="cache")]
 use std::sync::RwLock;
-
-#[cfg(not(feature="cache"))]
-use ::model::event::{CallUpdateEvent, GuildMemberUpdateEvent};
 
 // This should use type macros when stable receives the type macro
 // stabilization patch.
@@ -41,15 +29,6 @@ use ::model::event::{CallUpdateEvent, GuildMemberUpdateEvent};
 #[allow(type_complexity)]
 #[derive(Default)]
 pub struct EventStore {
-    pub on_call_create: Option<Arc<Fn(Context, Call) + Send + Sync + 'static>>,
-    #[cfg(feature="cache")]
-    pub on_call_delete: Option<Arc<Fn(Context, ChannelId, Option<Arc<RwLock<Call>>>) + Send + Sync + 'static>>,
-    #[cfg(not(feature="cache"))]
-    pub on_call_delete: Option<Arc<Fn(Context, ChannelId) + Send + Sync + 'static>>,
-    #[cfg(feature="cache")]
-    pub on_call_update: Option<Arc<Fn(Context, Option<Arc<RwLock<Call>>>, Option<Arc<RwLock<Call>>>) + Send + Sync + 'static>>,
-    #[cfg(not(feature="cache"))]
-    pub on_call_update: Option<Arc<Fn(Context, CallUpdateEvent) + Send + Sync + 'static>>,
     pub on_channel_create: Option<Arc<Fn(Context, Channel) + Send + Sync + 'static>>,
     pub on_channel_delete: Option<Arc<Fn(Context, Channel) + Send + Sync + 'static>>,
     pub on_channel_pins_ack: Option<Arc<Fn(Context, ChannelPinsAckEvent) + Send + Sync + 'static>>,
@@ -88,7 +67,6 @@ pub struct EventStore {
     pub on_guild_role_update: Option<Arc<Fn(Context, GuildId, Option<Role>, Role) + Send + Sync + 'static>>,
     #[cfg(not(feature="cache"))]
     pub on_guild_role_update: Option<Arc<Fn(Context, GuildId, Role) + Send + Sync + 'static>>,
-    pub on_guild_sync: Option<Arc<Fn(Context, GuildSyncEvent) + Send + Sync + 'static>>,
     pub on_guild_unavailable: Option<Arc<Fn(Context, GuildId) + Send + Sync + 'static>>,
     #[cfg(feature="cache")]
     pub on_guild_update: Option<Arc<Fn(Context, Option<Arc<RwLock<Guild>>>, PartialGuild) + Send + Sync + 'static>>,

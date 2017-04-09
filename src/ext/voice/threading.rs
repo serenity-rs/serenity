@@ -1,19 +1,17 @@
 use std::sync::mpsc::{Receiver as MpscReceiver, TryRecvError};
 use std::thread::Builder as ThreadBuilder;
 use super::connection::Connection;
-use super::{Status, Target};
+use super::Status;
 use ::internal::Timer;
+use ::model::GuildId;
 
-pub fn start(target_id: Target, rx: MpscReceiver<Status>) {
-    let name = match target_id {
-        Target::Channel(channel_id) => format!("Serenity Voice (C{})", channel_id),
-        Target::Guild(guild_id) => format!("Serenity Voice (G{})", guild_id),
-    };
+pub fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
+    let name = format!("Serenity Voice (G{})", guild_id);
 
     ThreadBuilder::new()
         .name(name)
         .spawn(move || runner(rx))
-        .expect(&format!("[Voice] Error starting target: {:?}", target_id));
+        .expect(&format!("[Voice] Error starting guild: {:?}", guild_id));
 }
 
 fn runner(rx: MpscReceiver<Status>) {

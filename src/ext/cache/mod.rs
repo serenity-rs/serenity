@@ -49,7 +49,6 @@
 //! while needing to hit the REST API as little as possible, then the answer
 //! is "yes".
 //!
-//! [`Call`]: ../../model/struct.Call.html
 //! [`Context`]: ../../client/struct.Context.html
 //! [`Context::get_channel`]: ../../client/struct.Context.html#method.get_channel
 //! [`Emoji`]: ../../model/struct.Emoji.html
@@ -103,16 +102,6 @@ use ::model::event::*;
 /// [`rest`]: ../../client/rest/index.html
 #[derive(Clone, Debug)]
 pub struct Cache {
-    /// A map of the currently active calls that the current user knows about,
-    /// where the key is the Id of the [`PrivateChannel`] or [`Group`] hosting
-    /// the call.
-    ///
-    /// For bot users this will always be empty, except for in [special cases].
-    ///
-    /// [`Group`]: ../../model/struct.Group.html
-    /// [`PrivateChannel`]: ../../model/struct.PrivateChannel.html
-    /// [special cases]: index.html#special-cases-in-the-cache
-    pub calls: HashMap<ChannelId, Arc<RwLock<Call>>>,
     /// A map of channels in [`Guild`]s that the current user has received data
     /// for.
     ///
@@ -262,16 +251,6 @@ impl Cache {
             .map(|g| g.read().unwrap().id)
             .chain(self.unavailable_guilds.iter().cloned())
             .collect()
-    }
-
-    /// Retrieves a reference to a [`Call`] from the cache based on the
-    /// associated [`Group`]'s channel Id.
-    ///
-    /// [`Call`]: ../../model/struct.Call.html
-    /// [`Group`]: ../../model/struct.Group.html
-    #[inline]
-    pub fn get_call<C: Into<ChannelId>>(&self, group_id: C) -> Option<Arc<RwLock<Call>>> {
-        self.calls.get(&group_id.into()).cloned()
     }
 
     /// Retrieves a [`Channel`] from the cache based on the given Id.
@@ -462,45 +441,6 @@ impl Cache {
     #[inline]
     pub fn get_user<U: Into<UserId>>(&self, user_id: U) -> Option<Arc<RwLock<User>>> {
         self.users.get(&user_id.into()).cloned()
-    }
-
-    #[doc(hidden)]
-    pub fn update_with_call_create(&mut self, event: &CallCreateEvent) {
-        match self.calls.entry(event.call.channel_id) {
-            Entry::Vacant(e) => {
-                e.insert(Arc::new(RwLock::new(event.call.clone())));
-            },
-            Entry::Occupied(mut e) => {
-                *e.get_mut() = Arc::new(RwLock::new(event.call.clone()));
-            },
-        }
-    }
-
-    #[doc(hidden)]
-    pub fn update_with_call_delete(&mut self, event: &CallDeleteEvent)
-        -> Option<Arc<RwLock<Call>>> {
-        self.calls.remove(&event.channel_id)
-    }
-
-    #[doc(hidden)]
-    pub fn update_with_call_update(&mut self, event: &CallUpdateEvent, old: bool)
-        -> Option<Arc<RwLock<Call>>> {
-        let item = if old {
-            self.calls.get(&event.channel_id).cloned()
-        } else {
-            None
-        };
-
-        self.calls
-            .get_mut(&event.channel_id)
-            .map(|call| {
-                let mut call = call.write().unwrap();
-
-                call.region.clone_from(&event.region);
-                call.ringing.clone_from(&event.ringing);
-            });
-
-        item
     }
 
     #[doc(hidden)]
@@ -833,23 +773,6 @@ impl Cache {
     }
 
     #[doc(hidden)]
-    pub fn update_with_guild_sync(&mut self, event: &GuildSyncEvent) {
-        for member in event.members.values() {
-            self.update_user_entry(&member.user.read().unwrap());
-        }
-
-        self.guilds
-            .get_mut(&event.guild_id)
-            .map(|guild| {
-                let mut guild = guild.write().unwrap();
-
-                guild.large = event.large;
-                guild.members.clone_from(&event.members);
-                guild.presences.clone_from(&event.presences);
-            });
-    }
-
-    #[doc(hidden)]
     pub fn update_with_guild_unavailable(&mut self, event: &GuildUnavailableEvent) {
         self.unavailable_guilds.insert(event.guild_id);
         self.guilds.remove(&event.guild_id);
@@ -988,31 +911,6 @@ impl Cache {
 
             return;
         }
-
-        if let Some(channel) = event.voice_state.channel_id {
-            // channel id available, insert voice state
-            if let Some(call) = self.calls.get_mut(&channel) {
-                let mut call = call.write().unwrap();
-
-                {
-                    let finding = call.voice_states
-                        .get_mut(&event.voice_state.user_id);
-
-                    if let Some(group_state) = finding {
-                        group_state.clone_from(&event.voice_state);
-
-                        return;
-                    }
-                }
-
-                call.voice_states.insert(event.voice_state.user_id, event.voice_state.clone());
-            }
-        } else {
-            // delete this user from any group call containing them
-            for call in self.calls.values_mut() {
-                call.write().unwrap().voice_states.remove(&event.voice_state.user_id);
-            }
-        }
     }
 
     // Adds or updates a user entry in the [`users`] map with a received user.
@@ -1033,7 +931,6 @@ impl Cache {
 impl Default for Cache {
     fn default() -> Cache {
         Cache {
-            calls: HashMap::default(),
             channels: HashMap::default(),
             groups: HashMap::default(),
             guilds: HashMap::default(),

@@ -44,19 +44,7 @@ use websocket::result::WebSocketError;
 use websocket::stream::WebSocketStream;
 use ::internal::prelude::{Error, Result, Value};
 use ::internal::ws_impl::ReceiverExt;
-use ::model::event::{
-    ChannelPinsAckEvent,
-    ChannelPinsUpdateEvent,
-    Event,
-    GatewayEvent,
-    GuildSyncEvent,
-    MessageUpdateEvent,
-    PresenceUpdateEvent,
-    ReadyEvent,
-    ResumedEvent,
-    TypingStartEvent,
-    VoiceServerUpdateEvent,
-};
+use ::model::event::*;
 use ::model::*;
 
 #[cfg(feature="framework")]
@@ -64,9 +52,6 @@ use ::ext::framework::Framework;
 
 #[cfg(feature="cache")]
 use ::ext::cache::Cache;
-
-#[cfg(not(feature="cache"))]
-use ::model::event::{CallUpdateEvent, GuildMemberUpdateEvent};
 
 #[cfg(feature="cache")]
 lazy_static! {
@@ -326,16 +311,6 @@ impl Client {
         self.start_connection(Some([range[0], range[1], total_shards]), rest::get_gateway()?.url)
     }
 
-    /// Attaches a handler for when a [`CallCreate`] is received.
-    ///
-    /// [`CallCreate`]: ../model/event/enum.Event.html#variant.CallCreate
-    pub fn on_call_create<F>(&mut self, handler: F)
-        where F: Fn(Context, Call) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_call_create = Some(Arc::new(handler));
-    }
-
     /// Attaches a handler for when a [`ChannelCreate`] is received.
     ///
     /// [`ChannelCreate`]: ../model/event/enum.Event.html#variant.ChannelCreate
@@ -436,16 +411,6 @@ impl Client {
         self.event_store.write()
             .unwrap()
             .on_guild_role_create = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildRoleSync`] is received.
-    ///
-    /// [`GuildRoleSync`]: ../model/event/enum.Event.html#variant.GuildRoleSync
-    pub fn on_guild_sync<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildSyncEvent) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_sync = Some(Arc::new(handler));
     }
 
     /// Attaches a handler for when a [`GuildUnavailable`] is received.
@@ -809,29 +774,6 @@ impl Client {
 
 #[cfg(feature="cache")]
 impl Client {
-    /// Attaches a handler for when a [`CallDelete`] is received.
-    ///
-    /// The `ChannelId` is the Id of the channel hosting the call. Returns the
-    /// call from the cache - optionally - if the call was in it.
-    ///
-    /// [`CallDelete`]: ../model/event/enum.Event.html#variant.CallDelete
-    pub fn on_call_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, ChannelId, Option<Arc<RwLock<Call>>>) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_call_delete = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`CallUpdate`] is received.
-    ///
-    /// [`CallUpdate`]: ../model/event/enum.Event.html#variant.CallUpdate
-    pub fn on_call_update<F>(&mut self, handler: F)
-        where F: Fn(Context, Option<Arc<RwLock<Call>>>, Option<Arc<RwLock<Call>>>) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_call_update = Some(Arc::new(handler));
-    }
-
     /// Attaches a handler for when a [`ChannelUpdate`] is received.
     ///
     /// Optionally provides the version of the channel before the update.
@@ -936,26 +878,6 @@ impl Client {
 
 #[cfg(not(feature="cache"))]
 impl Client {
-    /// Attaches a handler for when a [`CallDelete`] is received.
-    ///
-    /// [`CallDelete`]: ../model/event/enum.Event.html#variant.CallDelete
-    pub fn on_call_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, ChannelId) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_call_delete = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`CallUpdate`] is received.
-    ///
-    /// [`CallUpdate`]: ../model/event/enum.Event.html#variant.CallUpdate
-    pub fn on_call_update<F>(&mut self, handler: F)
-        where F: Fn(Context, CallUpdateEvent) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_call_update = Some(Arc::new(handler));
-    }
-
     /// Attaches a handler for when a [`ChannelUpdate`] is received.
     ///
     /// [`ChannelUpdate`]: ../model/event/enum.Event.html#variant.ChannelUpdate

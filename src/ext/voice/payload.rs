@@ -8,7 +8,7 @@ pub fn build_identify(info: &ConnectionInfo) -> Value {
     ObjectBuilder::new()
         .insert("op", VoiceOpCode::Identify.num())
         .insert_object("d", |o| o
-            .insert("server_id", info.target_id)
+            .insert("server_id", info.guild_id.0)
             .insert("session_id", &info.session_id)
             .insert("token", &info.token)
             .insert("user_id", info.user_id.0))

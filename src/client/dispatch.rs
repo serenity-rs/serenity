@@ -121,56 +121,6 @@ fn handle_event(event: Event,
                 data: &Arc<Mutex<ShareMap>>,
                 event_store: &Arc<RwLock<EventStore>>) {
     match event {
-        Event::CallCreate(event) => {
-            if let Some(handler) = handler!(on_call_create, event_store) {
-                update!(update_with_call_create, event);
-
-                let context = context(None, conn, data);
-
-                thread::spawn(move || (handler)(context, event.call));
-            } else {
-                update!(update_with_call_create, event);
-            }
-        },
-        Event::CallDelete(event) => {
-            if let Some(handler) = handler!(on_call_delete, event_store) {
-                let context = context(None, conn, data);
-
-                feature_cache! {{
-                    let call = update!(update_with_call_delete, event);
-
-                    thread::spawn(move || (handler)(context, event.channel_id, call));
-                } else {
-                    thread::spawn(move || (handler)(context, event.channel_id));
-                }}
-            } else {
-                update!(update_with_call_delete, event);
-            }
-        },
-        Event::CallUpdate(event) => {
-            if let Some(handler) = handler!(on_call_update, event_store) {
-                let context = context(None, conn, data);
-
-                feature_cache! {{
-                    let before = update!(update_with_call_update, event, true);
-                    let after = CACHE
-                        .read()
-                        .unwrap()
-                        .calls
-                        .get(&event.channel_id)
-                        .cloned();
-
-                    thread::spawn(move || (handler)(context, before, after));
-                } else {
-                    thread::spawn(move || (handler)(context, event));
-                }}
-            } else {
-                #[cfg(feature="cache")]
-                {
-                    update!(update_with_call_update, event, false);
-                }
-            }
-        },
         Event::ChannelCreate(event) => {
             if let Some(handler) = handler!(on_channel_create, event_store) {
                 update!(update_with_channel_create, event);
@@ -401,13 +351,6 @@ fn handle_event(event: Event,
                 {
                     let _ = update!(update_with_guild_role_update, event);
                 }
-            }
-        },
-        Event::GuildSync(event) => {
-            if let Some(handler) = handler!(on_guild_sync, event_store) {
-                let context = context(None, conn, data);
-
-                thread::spawn(move || (handler)(context, event));
             }
         },
         Event::GuildUnavailable(event) => {

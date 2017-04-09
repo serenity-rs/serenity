@@ -2,7 +2,7 @@ use serde_json::builder::ObjectBuilder;
 use std::sync::mpsc::{self, Sender as MpscSender};
 use super::{AudioReceiver, AudioSource};
 use super::connection_info::ConnectionInfo;
-use super::{Status as VoiceStatus, Target};
+use super::Status as VoiceStatus;
 use ::client::gateway::GatewayStatus;
 use ::constants::VoiceOpCode;
 use ::model::{ChannelId, GuildId, UserId, VoiceState};
@@ -59,7 +59,7 @@ pub struct Handler {
     ///
     /// [`Call`]: ../../model/struct.Call.html
     /// [`Group`]: ../../model/struct.Group.html
-    pub guild_id: Option<GuildId>,
+    pub guild_id: GuildId,
     /// Whether the current handler is set to deafen voice connections.
     ///
     /// **Note**: This _must not_ be manually mutated. Call [`deafen`] to
@@ -114,8 +114,8 @@ impl Handler {
     /// [`Manager::join`]: struct.Manager.html#method.join
     #[doc(hidden)]
     #[inline]
-    pub fn new(target: Target, ws: MpscSender<GatewayStatus>, user_id: UserId) -> Self {
-        Self::new_raw(target, Some(ws), user_id)
+    pub fn new(guild_id: GuildId, ws: MpscSender<GatewayStatus>, user_id: UserId) -> Self {
+        Self::new_raw(guild_id, Some(ws), user_id)
     }
 
     /// Creates a new, standalone Handler which is not connected to the primary
@@ -128,8 +128,8 @@ impl Handler {
     /// For most use cases you do not want this. Only use it if you are using
     /// the voice component standalone from the rest of the library.
     #[inline]
-    pub fn standalone(target: Target, user_id: UserId) -> Self {
-        Self::new_raw(target, None, user_id)
+    pub fn standalone(guild_id: GuildId, user_id: UserId) -> Self {
+        Self::new_raw(guild_id, None, user_id)
     }
 
     /// Connects to the voice channel if the following are present:
@@ -154,29 +154,19 @@ impl Handler {
             return false;
         }
 
-        let target_id = if let Some(guild_id) = self.guild_id {
-            guild_id.0
-        } else if let Some(channel_id) = self.channel_id {
-            channel_id.0
-        } else {
-            // Theoretically never happens? This needs to be researched more.
-            error!("(╯°□°）╯︵ ┻━┻ No guild/channel ID when connecting");
-
-            return false;
-        };
-
-        // Safe as all of these being present was already checked.
         let endpoint = self.endpoint.clone().unwrap();
+        let guild_id = self.guild_id;
         let session_id = self.session_id.clone().unwrap();
         let token = self.token.clone().unwrap();
         let user_id = self.user_id;
 
+        // Safe as all of these being present was already checked.
         self.send(VoiceStatus::Connect(ConnectionInfo {
-            endpoint: endpoint,
-            session_id: session_id,
-            target_id: target_id,
-            token: token,
-            user_id: user_id,
+            endpoint,
+            guild_id,
+            session_id,
+            token,
+            user_id,
         }));
 
         true
@@ -368,18 +358,13 @@ impl Handler {
         }
     }
 
-    fn new_raw(target: Target, ws: Option<MpscSender<GatewayStatus>>, user_id: UserId) -> Self {
+    fn new_raw(guild_id: GuildId, ws: Option<MpscSender<GatewayStatus>>, user_id: UserId) -> Self {
         let (tx, rx) = mpsc::channel();
 
-        let (channel_id, guild_id) = match target {
-            Target::Channel(channel_id) => (Some(channel_id), None),
-            Target::Guild(guild_id) => (None, Some(guild_id)),
-        };
-
-        threading::start(target, rx);
+        threading::start(guild_id, rx);
 
         Handler {
-            channel_id: channel_id,
+            channel_id: None,
             endpoint: None,
             guild_id: guild_id,
             self_deaf: false,
@@ -401,7 +386,7 @@ impl Handler {
             self.sender = tx;
             self.sender.send(status).unwrap();
 
-            threading::start(Target::Guild(self.guild_id.unwrap()), rx);
+            threading::start(self.guild_id, rx);
 
             self.update();
         }
@@ -428,7 +413,7 @@ impl Handler {
                 .insert("op", VoiceOpCode::SessionDescription.num())
                 .insert_object("d", |o| o
                     .insert("channel_id", self.channel_id.map(|c| c.0))
-                    .insert("guild_id", self.guild_id.map(|g| g.0))
+                    .insert("guild_id", self.guild_id.0)
                     .insert("self_deaf", self.self_deaf)
                     .insert("self_mute", self.self_mute))
                 .build();

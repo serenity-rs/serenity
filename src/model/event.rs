@@ -9,110 +9,6 @@ use ::utils::decode_array;
 
 type Map = BTreeMap<String, Value>;
 
-/// Event data for the call creation event.
-///
-/// This is fired when:
-///
-/// - a [`Call`] in a [`Group`] is created
-/// - a [`Call`] in a [`PrivateChannel`] is created
-///
-/// [`Call`]: ../struct.Call.html
-/// [`Group`]: ../struct.Group.html
-/// [`PrivateChannel`]: ../struct.PrivateChannel.html
-#[derive(Clone, Debug)]
-pub struct CallCreateEvent {
-    /// Information about the created call.
-    pub call: Call,
-}
-
-impl CallCreateEvent {
-    #[doc(hidden)]
-    #[inline]
-    pub fn decode(map: Map) -> Result<Self> {
-        Ok(CallCreateEvent {
-            call: Call::decode(Value::Object(map))?,
-        })
-    }
-}
-
-/// Event data for the call deletion event.
-///
-/// This is fired when:
-///
-/// - A [`Call`] in a [`Group`] has ended
-/// - A [`Call`] in a [`PrivateChannel`] has ended
-///
-/// [`Call`]: ../struct.Call.html
-/// [`Group`]: ../struct.Group.html
-/// [`PrivateChannel`]: ../struct.PrivateChannel.html
-#[derive(Clone, Debug)]
-pub struct CallDeleteEvent {
-    /// The Id of the [`Channel`] that the call took place in.
-    ///
-    /// [`Channel`]: ../enum.Channel.html
-    pub channel_id: ChannelId,
-}
-
-impl CallDeleteEvent {
-    #[doc(hidden)]
-    #[inline]
-    pub fn decode(mut map: Map) -> Result<Self> {
-        Ok(CallDeleteEvent {
-            channel_id: remove(&mut map, "channel_id").and_then(ChannelId::decode)?,
-        })
-    }
-}
-
-/// Event data for the call update event.
-///
-/// This is fired when:
-///
-/// - A member of a [`Group`] has been rung
-/// - The voice [`region`] of the [`Call`] has been updated
-///
-/// [`Call`]: ../struct.Call.html
-/// [`Group`]: ../srruct.Group.html
-/// [`region`]: #structfield.region
-#[derive(Clone, Debug)]
-pub struct CallUpdateEvent {
-    /// The Id of the [channel][`Channel`] that the [call][`Call`] is taking
-    /// place in.
-    ///
-    /// [`Call`]: ../struct.Call.html
-    /// [`Channel`]: ../enum.Channel.html
-    pub channel_id: ChannelId,
-    /// The Id in the [channel][`Channel`] - mapped by the [`channel_id`] -
-    /// denoting the beginning of the [call][`Call`].
-    ///
-    /// [`Channel`]: ../enum.Channel.html
-    /// [`Call`]: ../struct.Call.html
-    /// [`channel_id`]: #structfield.channel_id
-    pub message_id: MessageId,
-    /// The voice region that the [call][`Call`] is hosted in.
-    ///
-    /// [`Call`]: ../struct.Call.html
-    pub region: String,
-    /// A list of [user][`User`]s currently being rung who have not declined or
-    /// accepted the [call][`Call`].
-    ///
-    /// [`Call`]: ../struct.Call.html
-    /// [`User`]: ../struct.User.html
-    pub ringing: Vec<UserId>,
-}
-
-impl CallUpdateEvent {
-    #[doc(hidden)]
-    #[inline]
-    pub fn decode(mut map: Map) -> Result<Self> {
-        Ok(CallUpdateEvent {
-            channel_id: remove(&mut map, "channel_id").and_then(ChannelId::decode)?,
-            message_id: remove(&mut map, "message_id").and_then(MessageId::decode)?,
-            region: remove(&mut map, "region").and_then(into_string)?,
-            ringing: decode_array(remove(&mut map, "ringing")?, UserId::decode)?,
-        })
-    }
-}
-
 /// Event data for the channel creation event.
 ///
 /// This is fired when:
@@ -459,27 +355,6 @@ impl GuildRoleUpdateEvent {
         Ok(GuildRoleUpdateEvent {
             guild_id: remove(&mut map, "guild_id").and_then(GuildId::decode)?,
             role: remove(&mut map, "role").and_then(Role::decode)?,
-        })
-    }
-}
-
-#[derive(Clone, Debug)]
-pub struct GuildSyncEvent {
-    pub guild_id: GuildId,
-    pub large: bool,
-    pub members: HashMap<UserId, Member>,
-    pub presences: HashMap<UserId, Presence>,
-}
-
-impl GuildSyncEvent {
-    #[doc(hidden)]
-    #[inline]
-    pub fn decode(mut map: Map) -> Result<Self> {
-        Ok(GuildSyncEvent {
-            guild_id: remove(&mut map, "id").and_then(GuildId::decode)?,
-            large: req!(remove(&mut map, "large")?.as_bool()),
-            members: remove(&mut map, "members").and_then(decode_members)?,
-            presences: remove(&mut map, "presences").and_then(decode_presences)?,
         })
     }
 }
@@ -862,27 +737,6 @@ impl GatewayEvent {
 #[allow(large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum Event {
-    /// A new [`Call`] has been created.
-    ///
-    /// Fires the [`Client::on_call_create`] event.
-    ///
-    /// [`Call`]: ../struct.Call.html
-    /// [`Client::on_call_create`]: ../../client/struct.Client.html#on_call_create
-    CallCreate(CallCreateEvent),
-    /// A [`Call`] has ended.
-    ///
-    /// Fires the [`Client::on_call_delete`] event.
-    ///
-    /// [`Call`]: ../struct.Call.html
-    /// [`Client::on_call_delete`]: ../../client/struct.Client.html#method.on_call_delete
-    CallDelete(CallDeleteEvent),
-    /// A [`Call`] was updated.
-    ///
-    /// Fires the [`Client::on_call_update`] event.
-    ///
-    /// [`Call`]: ../struct.Call.html
-    /// [`Client::on_call_update`]: ../../client/struct.Client.html#method.on_call_update
-    CallUpdate(CallUpdateEvent),
     /// A [`Channel`] was created.
     ///
     /// Fires the [`Client::on_channel_create`] event.
@@ -945,7 +799,6 @@ pub enum Event {
     GuildRoleCreate(GuildRoleCreateEvent),
     GuildRoleDelete(GuildRoleDeleteEvent),
     GuildRoleUpdate(GuildRoleUpdateEvent),
-    GuildSync(GuildSyncEvent),
     /// When a guild is unavailable, such as due to a Discord server outage.
     GuildUnavailable(GuildUnavailableEvent),
     GuildUpdate(GuildUpdateEvent),
@@ -1011,9 +864,6 @@ impl Event {
         let mut value = into_map(value)?;
 
         Ok(match &kind[..] {
-            "CALL_CREATE" => Event::CallCreate(CallCreateEvent::decode(value)?),
-            "CALL_DELETE" => Event::CallDelete(CallDeleteEvent::decode(value)?),
-            "CALL_UPDATE" => Event::CallUpdate(CallUpdateEvent::decode(value)?),
             "CHANNEL_CREATE" => Event::ChannelCreate(ChannelCreateEvent::decode(value)?),
             "CHANNEL_DELETE" => Event::ChannelDelete(ChannelDeleteEvent::decode(value)?),
             "CHANNEL_PINS_ACK" => Event::ChannelPinsAck(ChannelPinsAckEvent::decode(value)?),
@@ -1046,7 +896,6 @@ impl Event {
             "GUILD_ROLE_CREATE" => Event::GuildRoleCreate(GuildRoleCreateEvent::decode(value)?),
             "GUILD_ROLE_DELETE" => Event::GuildRoleDelete(GuildRoleDeleteEvent::decode(value)?),
             "GUILD_ROLE_UPDATE" => Event::GuildRoleUpdate(GuildRoleUpdateEvent::decode(value)?),
-            "GUILD_SYNC" => Event::GuildSync(GuildSyncEvent::decode(value)?),
             "GUILD_UPDATE" => Event::GuildUpdate(GuildUpdateEvent::decode(value)?),
             "MESSAGE_CREATE" => Event::MessageCreate(MessageCreateEvent::decode(value)?),
             "MESSAGE_DELETE" => Event::MessageDelete(MessageDeleteEvent::decode(value)?),

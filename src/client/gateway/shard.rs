@@ -18,7 +18,7 @@ use ::constants::OpCode;
 use ::internal::prelude::*;
 use ::internal::ws_impl::{ReceiverExt, SenderExt};
 use ::model::event::{Event, GatewayEvent, ReadyEvent};
-use ::model::{ChannelId, Game, GuildId, OnlineStatus};
+use ::model::{Game, GuildId, OnlineStatus};
 
 #[cfg(feature="cache")]
 use ::client::CACHE;
@@ -481,22 +481,6 @@ impl Shard {
         r.shutdown(Shutdown::Both)?;
 
         Ok(())
-    }
-
-    /// Syncs a number of [`Call`]s, given by their associated channel Ids. This
-    /// will allow the current user to know what calls are currently occurring,
-    /// as otherwise events will not be received.
-    pub fn sync_calls(&self, channels: &[ChannelId]) {
-        for &channel in channels {
-            let msg = ObjectBuilder::new()
-                .insert("op", OpCode::SyncCall.num())
-                .insert_object("d", |obj| obj
-                    .insert("channel_id", channel.0)
-                )
-                .build();
-
-            let _ = self.keepalive_channel.send(GatewayStatus::SendMessage(msg));
-        }
     }
 
     /// Requests that one or multiple [`Guild`]s be synced.
