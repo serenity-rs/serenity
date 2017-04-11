@@ -4,6 +4,9 @@
 //! These are not publicly re-exported to the end user, and must stay as a
 //! private module.
 
-pub use serde_json::Value;
+pub type JsonMap = Map<String, Value>;
+
+pub use serde_json::{Map, Number, Value};
+pub use std::result::Result as StdResult;
 pub use ::client::ClientError;
 pub use ::error::{Error, Result};

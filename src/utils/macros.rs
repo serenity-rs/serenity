@@ -114,3 +114,58 @@ macro_rules! feature_voice {
         }
     }
 }
+
+#[macro_export]
+macro_rules! enum_number {
+    (#[$attr_:meta] $name:ident { $(#[$attr:meta] $variant:ident = $value:expr, )* }) => {
+        #[$attr_]
+        #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
+        pub enum $name {
+            $(
+                #[$attr]
+                $variant = $value,
+            )*
+        }
+
+        impl ::serde::Serialize for $name {
+            fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+                where S: ::serde::Serializer
+            {
+                // Serialize the enum as a u64.
+                serializer.serialize_u64(*self as u64)
+            }
+        }
+
+        impl ::serde::Deserialize for $name {
+            fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
+                where D: ::serde::Deserializer
+            {
+                struct Visitor;
+
+                impl ::serde::de::Visitor for Visitor {
+                    type Value = $name;
+
+                    fn expecting(&self, formatter: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+                        formatter.write_str("positive integer")
+                    }
+
+                    fn visit_u64<E>(self, value: u64) -> StdResult<$name, E>
+                        where E: ::serde::de::Error
+                    {
+                        // Rust does not come with a simple way of converting a
+                        // number to an enum, so use a big `match`.
+                        match value {
+                            $( $value => Ok($name::$variant), )*
+                            _ => Err(E::custom(
+                                format!("unknown {} value: {}",
+                                stringify!($name), value))),
+                        }
+                    }
+                }
+
+                // Deserialize the enum from a u64.
+                deserializer.deserialize_u64(Visitor)
+            }
+        }
+    }
+}

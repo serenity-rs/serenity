@@ -1,4 +1,3 @@
-use serde_json::builder::ObjectBuilder;
 use std::sync::mpsc::{self, Sender as MpscSender};
 use super::{AudioReceiver, AudioSource};
 use super::connection_info::ConnectionInfo;
@@ -162,11 +161,11 @@ impl Handler {
 
         // Safe as all of these being present was already checked.
         self.send(VoiceStatus::Connect(ConnectionInfo {
-            endpoint,
-            guild_id,
-            session_id,
-            token,
-            user_id,
+            endpoint: endpoint,
+            guild_id: guild_id,
+            session_id: session_id,
+            token: token,
+            user_id: user_id,
         }));
 
         true
@@ -409,14 +408,15 @@ impl Handler {
     /// [`standalone`]: #method.standalone
     fn update(&self) {
         if let Some(ref ws) = self.ws {
-            let map = ObjectBuilder::new()
-                .insert("op", VoiceOpCode::SessionDescription.num())
-                .insert_object("d", |o| o
-                    .insert("channel_id", self.channel_id.map(|c| c.0))
-                    .insert("guild_id", self.guild_id.0)
-                    .insert("self_deaf", self.self_deaf)
-                    .insert("self_mute", self.self_mute))
-                .build();
+            let map = json!({
+                "op": VoiceOpCode::SessionDescription.num(),
+                "d": {
+                    "channel_id": self.channel_id.map(|c| c.0),
+                    "guild_id": self.guild_id.0,
+                    "self_deaf": self.self_deaf,
+                    "self_mute": self.self_mute,
+                }
+            });
 
             let _ = ws.send(GatewayStatus::SendMessage(map));
         }

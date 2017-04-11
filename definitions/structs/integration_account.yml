@@ -1,8 +1,0 @@
----
-name: IntegrationAccount
-description: Integration Account Object
-fields:
-  - name: id
-    type: string
-  - name: name
-    type: string

@@ -1,5 +1,5 @@
-use serde_json::builder::ObjectBuilder;
 use std::default::Default;
+use ::internal::prelude::*;
 use ::model::{Permissions, Role, permissions};
 
 /// A builer to create or edit a [`Role`] for use via a number of model and
@@ -31,53 +31,67 @@ use ::model::{Permissions, Role, permissions};
 /// [`Guild::create_role`]: ../../model/struct.Guild.html#method.create_role
 /// [`Role`]: ../../model/struct.Role.html
 /// [`Role::edit`]: ../../model/struct.Role.html#method.edit
-pub struct EditRole(pub ObjectBuilder);
+pub struct EditRole(pub JsonMap);
 
 impl EditRole {
     /// Creates a new builder with the values of the given [`Role`].
     ///
     /// [`Role`]: ../../model/struct.Role.html
     pub fn new(role: &Role) -> Self {
-        EditRole(ObjectBuilder::new()
-            .insert("color", role.colour.0)
-            .insert("hoist", role.hoist)
-            .insert("managed", role.managed)
-            .insert("mentionable", role.mentionable)
-            .insert("name", &role.name)
-            .insert("permissions", role.permissions.bits())
-            .insert("position", role.position))
+        let mut map = Map::new();
+        map.insert("color".to_owned(), Value::Number(Number::from(role.colour.0)));
+        map.insert("hoist".to_owned(), Value::Bool(role.hoist));
+        map.insert("managed".to_owned(), Value::Bool(role.managed));
+        map.insert("mentionable".to_owned(), Value::Bool(role.mentionable));
+        map.insert("name".to_owned(), Value::String(role.name.clone()));
+        map.insert("permissions".to_owned(), Value::Number(Number::from(role.permissions.bits())));
+        map.insert("position".to_owned(), Value::Number(Number::from(role.position)));
+
+        EditRole(map)
     }
 
     /// Sets the colour of the role.
-    pub fn colour(self, colour: u64) -> Self {
-        EditRole(self.0.insert("color", colour))
+    pub fn colour(mut self, colour: u64) -> Self {
+        self.0.insert("color".to_owned(), Value::Number(Number::from(colour)));
+
+        self
     }
 
     /// Whether or not to hoist the role above lower-positioned role in the user
     /// list.
-    pub fn hoist(self, hoist: bool) -> Self {
-        EditRole(self.0.insert("hoist", hoist))
+    pub fn hoist(mut self, hoist: bool) -> Self {
+        self.0.insert("hoist".to_owned(), Value::Bool(hoist));
+
+        self
     }
 
     /// Whether or not to make the role mentionable, notifying its users.
-    pub fn mentionable(self, mentionable: bool) -> Self {
-        EditRole(self.0.insert("mentionable", mentionable))
+    pub fn mentionable(mut self, mentionable: bool) -> Self {
+        self.0.insert("mentionable".to_owned(), Value::Bool(mentionable));
+
+        self
     }
 
     /// The name of the role to set.
-    pub fn name(self, name: &str) -> Self {
-        EditRole(self.0.insert("name", name))
+    pub fn name(mut self, name: &str) -> Self {
+        self.0.insert("name".to_owned(), Value::String(name.to_owned()));
+
+        self
     }
 
     /// The set of permissions to assign the role.
-    pub fn permissions(self, permissions: Permissions) -> Self {
-        EditRole(self.0.insert("permissions", permissions.bits()))
+    pub fn permissions(mut self, permissions: Permissions) -> Self {
+        self.0.insert("permissions".to_owned(), Value::Number(Number::from(permissions.bits())));
+
+        self
     }
 
     /// The position to assign the role in the role list. This correlates to the
     /// role's position in the user list.
-    pub fn position(self, position: u8) -> Self {
-        EditRole(self.0.insert("position", position))
+    pub fn position(mut self, position: u8) -> Self {
+        self.0.insert("position".to_owned(), Value::Number(Number::from(position)));
+
+        self
     }
 }
 
@@ -95,12 +109,16 @@ impl Default for EditRole {
     ///
     /// [general permissions set]: ../../model/permissions/fn.general.html
     fn default() -> EditRole {
-        EditRole(ObjectBuilder::new()
-            .insert("color", 10070709)
-            .insert("hoist", false)
-            .insert("mentionable", false)
-            .insert("name", "new role".to_owned())
-            .insert("permissions", permissions::general().bits())
-            .insert("position", 1))
+        let mut map = Map::new();
+        let permissions = Number::from(permissions::general().bits());
+
+        map.insert("color".to_owned(), Value::Number(Number::from(10070709)));
+        map.insert("hoist".to_owned(), Value::Bool(false));
+        map.insert("mentionable".to_owned(), Value::Bool(false));
+        map.insert("name".to_owned(), Value::String("new role".to_owned()));
+        map.insert("permissions".to_owned(), Value::Number(permissions));
+        map.insert("position".to_owned(), Value::Number(Number::from(1)));
+
+        EditRole(map)
     }
 }

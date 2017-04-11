@@ -1,5 +1,5 @@
 use serde_json::Value;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::HashMap;
 use std::sync::Arc;
 use super::context::Context;
 use ::model::event::*;
@@ -85,7 +85,7 @@ pub struct EventStore {
     pub on_ready: Option<Arc<Fn(Context, Ready) + Send + Sync + 'static>>,
     pub on_resume: Option<Arc<Fn(Context, ResumedEvent) + Send + Sync + 'static>>,
     pub on_typing_start: Option<Arc<Fn(Context, TypingStartEvent) + Send + Sync + 'static>>,
-    pub on_unknown: Option<Arc<Fn(Context, String, BTreeMap<String, Value>) + Send + Sync + 'static>>,
+    pub on_unknown: Option<Arc<Fn(Context, String, Value) + Send + Sync + 'static>>,
     #[cfg(feature="cache")]
     pub on_user_update: Option<Arc<Fn(Context, CurrentUser, CurrentUser) + Send + Sync + 'static>>,
     #[cfg(not(feature="cache"))]

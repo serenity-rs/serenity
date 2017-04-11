@@ -1,4 +1,3 @@
-use serde_json::builder::ObjectBuilder;
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 use std::io::Read;
 use ::client::rest;
@@ -54,12 +53,12 @@ impl ChannelId {
             PermissionOverwriteType::Role(id) => (id.0, "role"),
         };
 
-        let map = ObjectBuilder::new()
-            .insert("allow", target.allow.bits())
-            .insert("deny", target.deny.bits())
-            .insert("id", id)
-            .insert("type", kind)
-            .build();
+        let map = json!({
+            "allow": target.allow.bits(),
+            "deny": target.deny.bits(),
+            "id": id,
+            "type": kind,
+        });
 
         rest::create_permission(self.0, id, &map)
     }
@@ -122,7 +121,9 @@ impl ChannelId {
             .map(|message_id| message_id.0)
             .collect::<Vec<u64>>();
 
-        let map = ObjectBuilder::new().insert("messages", ids).build();
+        let map = json!({
+            "messages": ids
+        });
 
         rest::delete_messages(self.0, &map)
     }
@@ -181,7 +182,7 @@ impl ChannelId {
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
     pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel> {
-        rest::edit_channel(self.0, &f(EditChannel::default()).0.build())
+        rest::edit_channel(self.0, &f(EditChannel::default()).0)
     }
 
     /// Edits a [`Message`] in the channel given its Id.

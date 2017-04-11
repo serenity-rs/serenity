@@ -1,7 +1,33 @@
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::io::Read;
+use super::deserialize_single_recipient;
 use ::model::*;
 use ::utils::builder::{CreateMessage, GetMessages};
+
+/// A Direct Message text channel with another user.
+#[derive(Clone, Debug, Deserialize)]
+pub struct PrivateChannel {
+    /// The unique Id of the private channel.
+    ///
+    /// Can be used to calculate the first message's creation date.
+    pub id: ChannelId,
+    /// The Id of the last message sent.
+    pub last_message_id: Option<MessageId>,
+    /// Timestamp of the last time a [`Message`] was pinned.
+    ///
+    /// [`Message`]: struct.Message.html
+    pub last_pin_timestamp: Option<String>,
+    /// Indicator of the type of channel this is.
+    ///
+    /// This should always be [`ChannelType::Private`].
+    ///
+    /// [`ChannelType::Private`]: enum.ChannelType.html#variant.Private
+    #[serde(rename="type")]
+    pub kind: ChannelType,
+    /// The recipient to the private channel.
+    #[serde(deserialize_with="deserialize_single_recipient", rename="recipients")]
+    pub recipient: Arc<RwLock<User>>,
+}
 
 impl PrivateChannel {
     /// Broadcasts that the current user is typing to the recipient.
@@ -24,21 +50,6 @@ impl PrivateChannel {
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R)
         -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
         self.id.create_reaction(message_id, reaction_type)
-    }
-
-    #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<PrivateChannel> {
-        let mut map = into_map(value)?;
-        let mut recipients = decode_array(remove(&mut map, "recipients")?,
-                                                 User::decode)?;
-
-        Ok(PrivateChannel {
-            id: remove(&mut map, "id").and_then(ChannelId::decode)?,
-            kind: remove(&mut map, "type").and_then(ChannelType::decode)?,
-            last_message_id: opt(&mut map, "last_message_id", MessageId::decode)?,
-            last_pin_timestamp: opt(&mut map, "last_pin_timestamp", into_string)?,
-            recipient: Arc::new(RwLock::new(recipients.remove(0))),
-        })
     }
 
     /// Deletes the channel. This does not delete the contents of the channel,

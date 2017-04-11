@@ -1,18 +1,6 @@
-use super::{
-    ChannelId,
-    Channel,
-    Emoji,
-    Member,
-    RoleId,
-    Role,
-    UserId,
-    User,
-    IncidentStatus,
-    EmojiIdentifier
-};
-use ::internal::prelude::*;
-use std::str::FromStr;
 use std::result::Result as StdResult;
+use std::str::FromStr;
+use super::*;
 use ::utils;
 
 /// Allows something - such as a channel or role - to be mentioned in a message.
@@ -130,6 +118,16 @@ impl FromStr for RoleId {
     }
 }
 
+/// A version of an emoji used only when solely the Id and name are known.
+#[derive(Clone, Debug)]
+pub struct EmojiIdentifier {
+    /// The Id of the emoji.
+    pub id: EmojiId,
+    /// The name of the emoji. It must be at least 2 characters long and can
+    /// only contain alphanumeric characters and underscores.
+    pub name: String,
+}
+
 impl EmojiIdentifier {
     /// Generates a URL to the emoji's image.
     #[inline]
@@ -171,9 +169,66 @@ impl FromStr for Channel {
     }
 }
 
-impl IncidentStatus {
-    #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<Self> {
-        Self::decode_str(value)
-    }
+/// A component that was affected during a service incident.
+///
+/// This is pulled from the Discord status page.
+#[derive(Clone, Debug, Deserialize)]
+pub struct AffectedComponent {
+    pub name: String,
+}
+
+/// An incident retrieved from the Discord status page.
+///
+/// This is not necessarily a representation of an ongoing incident.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Incident {
+    pub created_at: String,
+    pub id: String,
+    pub impact: String,
+    pub incident_updates: Vec<IncidentUpdate>,
+    pub monitoring_at: Option<String>,
+    pub name: String,
+    pub page_id: String,
+    pub resolved_at: Option<String>,
+    pub short_link: String,
+    pub status: String,
+    pub updated_at: String,
+}
+
+/// An update to an incident from the Discord status page.
+///
+/// This will typically state what new information has been discovered about an
+/// incident.
+#[derive(Clone, Debug, Deserialize)]
+pub struct IncidentUpdate {
+    pub affected_components: Vec<AffectedComponent>,
+    pub body: String,
+    pub created_at: String,
+    pub display_at: String,
+    pub id: String,
+    pub incident_id: String,
+    pub status: IncidentStatus,
+    pub updated_at: String,
+}
+
+/// The type of status update during a service incident.
+#[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
+#[serde(rename_all="snake_case")]
+pub enum IncidentStatus {
+    Identified,
+    Investigating,
+    Monitoring,
+    Postmortem,
+    Resolved,
+}
+
+/// A Discord status maintenance message. This can be either for active
+/// maintenances or for scheduled maintenances.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Maintenance {
+    pub description: String,
+    pub id: String,
+    pub name: String,
+    pub start: String,
+    pub stop: String,
 }

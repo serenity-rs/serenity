@@ -842,14 +842,15 @@ impl Cache {
 
         for guild in ready.guilds {
             match guild {
-                PossibleGuild::Offline(guild_id) => {
-                    self.unavailable_guilds.insert(guild_id);
-                    self.guilds.remove(&guild_id);
+                GuildStatus::Offline(unavailable) => {
+                    self.guilds.remove(&unavailable.id);
+                    self.unavailable_guilds.insert(unavailable.id);
                 },
-                PossibleGuild::Online(guild) => {
-                    self.channels.extend(guild.channels.clone());
+                GuildStatus::OnlineGuild(guild) => {
+                    self.unavailable_guilds.remove(&guild.id);
                     self.guilds.insert(guild.id, Arc::new(RwLock::new(guild)));
                 },
+                GuildStatus::OnlinePartialGuild(_) => {},
             }
         }
 

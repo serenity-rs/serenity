@@ -1,4 +1,22 @@
-use serde_json::builder::ObjectBuilder;
+mod emoji;
+mod feature;
+mod guild_id;
+mod integration;
+mod member;
+mod partial_guild;
+mod role;
+
+pub use self::emoji::*;
+pub use self::feature::*;
+pub use self::guild_id::*;
+pub use self::integration::*;
+pub use self::member::*;
+pub use self::partial_guild::*;
+pub use self::role::*;
+
+use serde::de::Error as DeError;
+use serde_json;
+use super::utils::*;
 use ::client::rest;
 use ::constants::LARGE_THRESHOLD;
 use ::model::*;
@@ -7,19 +25,98 @@ use ::utils::builder::{EditGuild, EditMember, EditRole};
 #[cfg(feature="cache")]
 use ::client::CACHE;
 
-mod emoji;
-mod guild_id;
-mod integration;
-mod member;
-mod partial_guild;
-mod role;
+/// A representation of a banning of a user.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Ban {
+    /// The reason given for this ban.
+    ///
+    /// **Note**: Until the Audit Log feature is completed by Discord, this will
+    /// always be `None`.
+    pub reason: Option<String>,
+    /// The user that was banned.
+    pub user: User,
+}
 
-pub use self::emoji::*;
-pub use self::guild_id::*;
-pub use self::integration::*;
-pub use self::member::*;
-pub use self::partial_guild::*;
-pub use self::role::*;
+/// Information about a Discord guild, such as channels, emojis, etc.
+#[derive(Clone, Debug)]
+pub struct Guild {
+    /// Id of a voice channel that's considered the AFK channel.
+    pub afk_channel_id: Option<ChannelId>,
+    /// The amount of seconds a user can not show any activity in a voice
+    /// channel before being moved to an AFK channel -- if one exists.
+    pub afk_timeout: u64,
+    /// All voice and text channels contained within a guild.
+    ///
+    /// This contains all channels regardless of permissions (i.e. the ability
+    /// of the bot to read from or connect to them).
+    pub channels: HashMap<ChannelId, Arc<RwLock<GuildChannel>>>,
+    /// Indicator of whether notifications for all messages are enabled by
+    /// default in the guild.
+    pub default_message_notifications: u64,
+    /// All of the guild's custom emojis.
+    pub emojis: HashMap<EmojiId, Emoji>,
+    /// VIP features enabled for the guild. Can be obtained through the
+    /// [Discord Partnership] website.
+    ///
+    /// [Discord Partnership]: https://discordapp.com/partners
+    pub features: Vec<Feature>,
+    /// The hash of the icon used by the guild.
+    ///
+    /// In the client, this appears on the guild list on the left-hand side.
+    pub icon: Option<String>,
+    /// The unique Id identifying the guild.
+    ///
+    /// This is equivilant to the Id of the default role (`@everyone`) and also
+    /// that of the default channel (typically `#general`).
+    pub id: GuildId,
+    /// The date that the current user joined the guild.
+    pub joined_at: String,
+    /// Indicator of whether the guild is considered "large" by Discord.
+    pub large: bool,
+    /// The number of members in the guild.
+    pub member_count: u64,
+    /// Users who are members of the guild.
+    ///
+    /// Members might not all be available when the [`ReadyEvent`] is received
+    /// if the [`member_count`] is greater than the `LARGE_THRESHOLD` set by
+    /// the library.
+    ///
+    /// [`ReadyEvent`]: events/struct.ReadyEvent.html
+    pub members: HashMap<UserId, Member>,
+    /// Indicator of whether the guild requires multi-factor authentication for
+    /// [`Role`]s or [`User`]s with moderation permissions.
+    ///
+    /// [`Role`]: struct.Role.html
+    /// [`User`]: struct.User.html
+    pub mfa_level: u64,
+    /// The name of the guild.
+    pub name: String,
+    /// The Id of the [`User`] who owns the guild.
+    ///
+    /// [`User`]: struct.User.html
+    pub owner_id: UserId,
+    /// A mapping of [`User`]s' Ids to their current presences.
+    ///
+    /// [`User`]: struct.User.html
+    pub presences: HashMap<UserId, Presence>,
+    /// The region that the voice servers that the guild uses are located in.
+    pub region: String,
+    /// A mapping of the guild's roles.
+    pub roles: HashMap<RoleId, Role>,
+    /// An identifying hash of the guild's splash icon.
+    ///
+    /// If the [`InviteSplash`] feature is enabled, this can be used to generate
+    /// a URL to a splash image.
+    ///
+    /// [`InviteSplash`]: enum.Feature.html#variant.InviteSplash
+    pub splash: Option<String>,
+    /// Indicator of the current verification level of the guild.
+    pub verification_level: VerificationLevel,
+    /// A mapping of of [`User`]s to their current voice state.
+    ///
+    /// [`User`]: struct.User.html
+    pub voice_states: HashMap<UserId, VoiceState>,
+}
 
 impl Guild {
     #[cfg(feature="cache")]
@@ -133,11 +230,11 @@ impl Guild {
     /// [US West region]: enum.Region.html#variant.UsWest
     /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
     pub fn create(name: &str, region: Region, icon: Option<&str>) -> Result<PartialGuild> {
-        let map = ObjectBuilder::new()
-            .insert("icon", icon)
-            .insert("name", name)
-            .insert("region", region.name())
-            .build();
+        let map = json!({
+            "icon": icon,
+            "name": name,
+            "region": region.name(),
+        });
 
         rest::create_guild(&map)
     }
@@ -247,50 +344,6 @@ impl Guild {
         }
 
         self.id.create_role(f)
-    }
-
-    #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<Guild> {
-        let mut map = into_map(value)?;
-
-        let id = remove(&mut map, "id").and_then(GuildId::decode)?;
-
-        let channels = {
-            let mut channels = HashMap::new();
-
-            let vals = decode_array(remove(&mut map, "channels")?,
-                |v| GuildChannel::decode_guild(v, id))?;
-
-            for channel in vals {
-                channels.insert(channel.id, Arc::new(RwLock::new(channel)));
-            }
-
-            channels
-        };
-
-        Ok(Guild {
-            afk_channel_id: opt(&mut map, "afk_channel_id", ChannelId::decode)?,
-            afk_timeout: req!(remove(&mut map, "afk_timeout")?.as_u64()),
-            channels: channels,
-            default_message_notifications: req!(remove(&mut map, "default_message_notifications")?.as_u64()),
-            emojis: remove(&mut map, "emojis").and_then(decode_emojis)?,
-            features: remove(&mut map, "features").and_then(|v| decode_array(v, Feature::decode_str))?,
-            icon: opt(&mut map, "icon", into_string)?,
-            id: id,
-            joined_at: remove(&mut map, "joined_at").and_then(into_string)?,
-            large: req!(remove(&mut map, "large")?.as_bool()),
-            member_count: req!(remove(&mut map, "member_count")?.as_u64()),
-            members: remove(&mut map, "members").and_then(decode_members)?,
-            mfa_level: req!(remove(&mut map, "mfa_level")?.as_u64()),
-            name: remove(&mut map, "name").and_then(into_string)?,
-            owner_id: remove(&mut map, "owner_id").and_then(UserId::decode)?,
-            presences: remove(&mut map, "presences").and_then(decode_presences)?,
-            region: remove(&mut map, "region").and_then(into_string)?,
-            roles: remove(&mut map, "roles").and_then(decode_roles)?,
-            splash: opt(&mut map, "splash", into_string)?,
-            verification_level: remove(&mut map, "verification_level").and_then(VerificationLevel::decode)?,
-            voice_states: remove(&mut map, "voice_states").and_then(decode_voice_states)?,
-        })
     }
 
     /// Deletes the current guild if the current user is the owner of the
@@ -904,6 +957,172 @@ impl Guild {
     }
 }
 
+impl Deserialize for Guild {
+    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut map = JsonMap::deserialize(deserializer)?;
+
+        let id = map.get("id")
+            .and_then(|x| x.as_str())
+            .and_then(|x| x.parse::<u64>().ok());
+
+        if let Some(guild_id) = id {
+            if let Some(array) = map.get_mut("channels").and_then(|x| x.as_array_mut()) {
+
+                for value in array {
+                    if let Some(channel) = value.as_object_mut() {
+                        channel.insert("guild_id".to_owned(), Value::Number(Number::from(guild_id)));
+                    }
+                }
+            }
+        }
+
+        let afk_channel_id = match map.remove("afk_channel_id") {
+            Some(v) => serde_json::from_value::<Option<ChannelId>>(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let afk_timeout = map.remove("afk_timeout")
+            .ok_or_else(|| DeError::custom("expected guild afk_timeout"))
+            .and_then(u64::deserialize)
+            .map_err(DeError::custom)?;
+        let channels = map.remove("channels")
+            .ok_or_else(|| DeError::custom("expected guild channels"))
+            .and_then(deserialize_guild_channels)
+            .map_err(DeError::custom)?;
+        let default_message_notifications = map.remove("default_message_notifications")
+            .ok_or_else(|| DeError::custom("expected guild default_message_notifications"))
+            .and_then(u64::deserialize)
+            .map_err(DeError::custom)?;
+        let emojis = map.remove("emojis")
+            .ok_or_else(|| DeError::custom("expected guild emojis"))
+            .and_then(deserialize_emojis)
+            .map_err(DeError::custom)?;
+        let features = map.remove("features")
+            .ok_or_else(|| DeError::custom("expected guild features"))
+            .and_then(serde_json::from_value::<Vec<Feature>>)
+            .map_err(DeError::custom)?;
+        let icon = match map.remove("icon") {
+            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let id = map.remove("id")
+            .ok_or_else(|| DeError::custom("expected guild id"))
+            .and_then(GuildId::deserialize)
+            .map_err(DeError::custom)?;
+        let joined_at = map.remove("joined_at")
+            .ok_or_else(|| DeError::custom("expected guild joined_at"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+        let large = map.remove("large")
+            .ok_or_else(|| DeError::custom("expected guild large"))
+            .and_then(bool::deserialize)
+            .map_err(DeError::custom)?;
+        let member_count = map.remove("member_count")
+            .ok_or_else(|| DeError::custom("expected guild member_count"))
+            .and_then(u64::deserialize)
+            .map_err(DeError::custom)?;
+        let members = map.remove("members")
+            .ok_or_else(|| DeError::custom("expected guild members"))
+            .and_then(deserialize_members)
+            .map_err(DeError::custom)?;
+        let mfa_level = map.remove("mfa_level")
+            .ok_or_else(|| DeError::custom("expected guild mfa_level"))
+            .and_then(u64::deserialize)
+            .map_err(DeError::custom)?;
+        let name = map.remove("name")
+            .ok_or_else(|| DeError::custom("expected guild name"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+        let owner_id = map.remove("owner_id")
+            .ok_or_else(|| DeError::custom("expected guild owner_id"))
+            .and_then(UserId::deserialize)
+            .map_err(DeError::custom)?;
+        let presences = map.remove("presences")
+            .ok_or_else(|| DeError::custom("expected guild presences"))
+            .and_then(deserialize_presences)
+            .map_err(DeError::custom)?;
+        let region = map.remove("region")
+            .ok_or_else(|| DeError::custom("expected guild region"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+        let roles = map.remove("roles")
+            .ok_or_else(|| DeError::custom("expected guild roles"))
+            .and_then(deserialize_roles)
+            .map_err(DeError::custom)?;
+        let splash = match map.remove("splash") {
+            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let verification_level = map.remove("verification_level")
+            .ok_or_else(|| DeError::custom("expected guild verification_level"))
+            .and_then(VerificationLevel::deserialize)
+            .map_err(DeError::custom)?;
+        let voice_states = map.remove("voice_states")
+            .ok_or_else(|| DeError::custom("expected guild voice_states"))
+            .and_then(deserialize_voice_states)
+            .map_err(DeError::custom)?;
+
+        Ok(Self {
+            afk_channel_id: afk_channel_id,
+            afk_timeout: afk_timeout,
+            channels: channels,
+            default_message_notifications: default_message_notifications,
+            emojis: emojis,
+            features: features,
+            icon: icon,
+            id: id,
+            joined_at: joined_at,
+            large: large,
+            member_count: member_count,
+            members: members,
+            mfa_level: mfa_level,
+            name: name,
+            owner_id: owner_id,
+            presences: presences,
+            region: region,
+            roles: roles,
+            splash: splash,
+            verification_level: verification_level,
+            voice_states: voice_states,
+        })
+    }
+}
+
+/// Information relating to a guild's widget embed.
+#[derive(Clone, Debug, Deserialize)]
+pub struct GuildEmbed {
+    /// The Id of the channel to show the embed for.
+    pub channel_id: ChannelId,
+    /// Whether the widget embed is enabled.
+    pub enabled: bool,
+}
+
+/// Representation of the number of members that would be pruned by a guild
+/// prune operation.
+#[derive(Clone, Copy, Debug, Deserialize)]
+pub struct GuildPrune {
+    /// The number of members that would be pruned by the operation.
+    pub pruned: u64,
+}
+
+/// Basic information about a guild.
+#[derive(Clone, Debug, Deserialize)]
+pub struct GuildInfo {
+    /// The unique Id of the guild.
+    ///
+    /// Can be used to calculate creation date.
+    pub id: GuildId,
+    /// The hash of the icon of the guild.
+    ///
+    /// This can be used to generate a URL to the guild's icon image.
+    pub icon: Option<String>,
+    /// The name of the guild.
+    pub name: String,
+    /// Indicator of whether the current user is the owner.
+    pub owner: bool,
+    /// The permissions that the current user has.
+    pub permissions: Permissions,
+}
+
 impl GuildInfo {
     /// Returns the formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
@@ -938,46 +1157,65 @@ impl InviteGuild {
     }
 }
 
-impl PossibleGuild<Guild> {
-    #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<Self> {
-        let mut value = into_map(value)?;
-        if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
-            remove(&mut value, "id").and_then(GuildId::decode).map(PossibleGuild::Offline)
-        } else {
-            Guild::decode(Value::Object(value)).map(PossibleGuild::Online)
-        }
-    }
+/// Data for an unavailable guild.
+#[derive(Clone, Copy, Debug, Deserialize)]
+pub struct GuildUnavailable {
+    /// The Id of the [`Guild`] that is unavailable.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    pub id: GuildId,
+    /// Indicator of whether the guild is unavailable.
+    ///
+    /// This should always be `true`.
+    pub unavailable: bool,
+}
 
+#[allow(large_enum_variant)]
+#[derive(Clone, Debug, Deserialize)]
+#[serde(untagged)]
+pub enum GuildStatus {
+    OnlinePartialGuild(PartialGuild),
+    OnlineGuild(Guild),
+    Offline(GuildUnavailable),
+}
+
+impl GuildStatus {
     /// Retrieves the Id of the inner [`Guild`].
     ///
     /// [`Guild`]: struct.Guild.html
     pub fn id(&self) -> GuildId {
         match *self {
-            PossibleGuild::Offline(guild_id) => guild_id,
-            PossibleGuild::Online(ref live_guild) => live_guild.id,
+            GuildStatus::Offline(offline) => offline.id,
+            GuildStatus::OnlineGuild(ref guild) => guild.id,
+            GuildStatus::OnlinePartialGuild(ref partial_guild) => partial_guild.id,
         }
     }
 }
 
-impl PossibleGuild<PartialGuild> {
-    #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<Self> {
-        let mut value = into_map(value)?;
-        if remove(&mut value, "unavailable").ok().and_then(|v| v.as_bool()).unwrap_or(false) {
-            remove(&mut value, "id").and_then(GuildId::decode).map(PossibleGuild::Offline)
-        } else {
-            PartialGuild::decode(Value::Object(value)).map(PossibleGuild::Online)
-        }
-    }
+enum_number!(
+    #[doc="The level to set as criteria prior to a user being able to send
+    messages in a [`Guild`].
 
-    /// Retrieves the Id of the inner [`Guild`].
-    ///
-    /// [`Guild`]: struct.Guild.html
-    pub fn id(&self) -> GuildId {
+    [`Guild`]: struct.Guild.html"]
+    VerificationLevel {
+        /// Does not require any verification.
+        None = 0,
+        /// Low verification level.
+        Low = 1,
+        /// Medium verification level.
+        Medium = 2,
+        /// High verification level.
+        High = 3,
+    }
+);
+
+impl VerificationLevel {
+    pub fn num(&self) -> u64 {
         match *self {
-            PossibleGuild::Offline(id) => id,
-            PossibleGuild::Online(ref live_guild) => live_guild.id,
+            VerificationLevel::None => 0,
+            VerificationLevel::Low => 1,
+            VerificationLevel::Medium => 2,
+            VerificationLevel::High => 3,
         }
     }
 }

@@ -96,7 +96,8 @@ impl Reaction {
 /// The type of a [`Reaction`] sent.
 ///
 /// [`Reaction`]: struct.Reaction.html
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize)]
+#[serde(untagged)]
 pub enum ReactionType {
     /// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the
     /// guild.
@@ -113,6 +114,7 @@ pub enum ReactionType {
         name: String,
     },
     /// A reaction with a twemoji.
+    #[serde(rename="name")]
     Unicode(String),
 }
 
@@ -130,21 +132,6 @@ impl ReactionType {
             },
             ReactionType::Unicode(ref unicode) => unicode.clone(),
         }
-    }
-
-    #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<Self> {
-        let mut map = into_map(value)?;
-        let name = remove(&mut map, "name").and_then(into_string)?;
-
-        // Only custom emoji reactions (`ReactionType::Custom`) have an Id.
-        Ok(match opt(&mut map, "id", EmojiId::decode)? {
-            Some(id) => ReactionType::Custom {
-                id: id,
-                name: name,
-            },
-            None => ReactionType::Unicode(name),
-        })
     }
 }
 

@@ -1,7 +1,5 @@
-use serde_json::Value;
-use std::collections::BTreeMap;
-use std::default::Default;
 use super::CreateEmbed;
+use ::internal::prelude::*;
 
 /// A builder to specify the contents of an [`rest::send_message`] request,
 /// primarily meant for use through [`Context::send_message`].
@@ -38,7 +36,7 @@ use super::CreateEmbed;
 /// [`content`]: #method.content
 /// [`embed`]: #method.embed
 /// [`rest::send_message`]: ../../client/rest/fn.send_message.html
-pub struct CreateMessage(pub BTreeMap<String, Value>);
+pub struct CreateMessage(pub Map<String, Value>);
 
 impl CreateMessage {
     /// Set the content of the message.
@@ -79,7 +77,7 @@ impl Default for CreateMessage {
     /// [`Message`]: ../../model/struct.Message.html
     /// [`tts`]: #method.tts
     fn default() -> CreateMessage {
-        let mut map = BTreeMap::default();
+        let mut map = Map::default();
         map.insert("tts".to_owned(), Value::Bool(false));
 
         CreateMessage(map)

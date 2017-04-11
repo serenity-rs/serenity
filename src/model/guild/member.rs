@@ -1,14 +1,38 @@
 use std::borrow::Cow;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use ::internal::prelude::*;
+use super::deserialize_sync_user;
 use ::model::*;
 
 #[cfg(feature="cache")]
 use ::client::{CACHE, rest};
 #[cfg(feature="cache")]
+use ::internal::prelude::*;
+#[cfg(feature="cache")]
 use ::utils::builder::EditMember;
 #[cfg(feature="cache")]
 use ::utils::Colour;
+
+/// Information about a member of a guild.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Member {
+    /// Indicator of whether the member can hear in voice channels.
+    pub deaf: bool,
+    /// The unique Id of the guild that the member is a part of.
+    pub guild_id: Option<GuildId>,
+    /// Timestamp representing the date when the member joined.
+    pub joined_at: String,
+    /// Indicator of whether the member can speak in voice channels.
+    pub mute: bool,
+    /// The member's nickname, if present.
+    ///
+    /// Can't be longer than 32 characters.
+    pub nick: Option<String>,
+    /// Vector of Ids of [`Role`]s given to the member.
+    pub roles: Vec<RoleId>,
+    /// Attached User struct.
+    #[serde(deserialize_with="deserialize_sync_user")]
+    pub user: Arc<RwLock<User>>,
+}
 
 impl Member {
     /// Adds a [`Role`] to the member, editing its roles in-place if the request
@@ -50,7 +74,7 @@ impl Member {
         let guild_id = self.find_guild()?;
         self.roles.extend_from_slice(role_ids);
 
-        let map = EditMember::default().roles(&self.roles).0.build();
+        let map = EditMember::default().roles(&self.roles).0;
 
         match rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map) {
             Ok(()) => Ok(()),
@@ -105,15 +129,6 @@ impl Member {
         roles.iter().find(|r| r.colour.0 != default.0).map(|r| r.colour)
     }
 
-    #[doc(hidden)]
-    pub fn decode_guild(guild_id: GuildId, mut value: Value) -> Result<Member> {
-        if let Some(v) = value.as_object_mut() {
-            v.insert("guild_id".to_owned(), Value::U64(guild_id.0));
-        }
-
-        Self::decode(value)
-    }
-
     /// Calculates the member's display name.
     ///
     /// The nickname takes priority over the member's username if it exists.
@@ -141,7 +156,7 @@ impl Member {
     #[cfg(feature="cache")]
     pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F) -> Result<()> {
         let guild_id = self.find_guild()?;
-        let map = f(EditMember::default()).0.build();
+        let map = f(EditMember::default()).0;
 
         rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map)
     }
@@ -210,7 +225,7 @@ impl Member {
         let guild_id = self.find_guild()?;
         self.roles.retain(|r| !role_ids.contains(r));
 
-        let map = EditMember::default().roles(&self.roles).0.build();
+        let map = EditMember::default().roles(&self.roles).0;
 
         match rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map) {
             Ok(()) => Ok(()),

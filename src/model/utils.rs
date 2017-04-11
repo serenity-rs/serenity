@@ -1,52 +1,46 @@
-use std::collections::{BTreeMap, HashMap};
+use serde::de::Error as DeError;
+use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use super::*;
+
+#[cfg(feature="cache")]
 use ::internal::prelude::*;
-use ::utils::{decode_array, into_array};
 
 #[cfg(feature="cache")]
 use super::permissions::{self, Permissions};
 #[cfg(feature="cache")]
 use ::client::CACHE;
 
-#[macro_escape]
-macro_rules! req {
-    ($opt:expr) => {
-        $opt.ok_or(Error::Decode(concat!("Type mismatch in model:",
-                                         line!(),
-                                         ": ",
-                                         stringify!($opt)),
-                                      Value::Null))?
-    }
-}
-
-pub fn decode_emojis(value: Value) -> Result<HashMap<EmojiId, Emoji>> {
+pub fn deserialize_emojis<D: Deserializer>(deserializer: D)
+    -> StdResult<HashMap<EmojiId, Emoji>, D::Error> {
+    let vec: Vec<Emoji> = Deserialize::deserialize(deserializer)?;
     let mut emojis = HashMap::new();
 
-    for emoji in decode_array(value, Emoji::decode)? {
+    for emoji in vec {
         emojis.insert(emoji.id, emoji);
     }
 
     Ok(emojis)
 }
 
-pub fn decode_id(value: Value) -> Result<u64> {
-    match value {
-        Value::U64(num) => Ok(num),
-        Value::I64(num) => Ok(num as u64),
-        Value::String(text) => match text.parse::<u64>() {
-            Ok(num) => Ok(num),
-            Err(_) => Err(Error::Decode("Expected numeric ID",
-                                        Value::String(text)))
-        },
-        value => Err(Error::Decode("Expected numeric ID", value))
+pub fn deserialize_guild_channels<D: Deserializer>(deserializer: D)
+    -> StdResult<HashMap<ChannelId, Arc<RwLock<GuildChannel>>>, D::Error> {
+    let vec: Vec<GuildChannel> = Deserialize::deserialize(deserializer)?;
+    let mut map = HashMap::new();
+
+    for channel in vec {
+        map.insert(channel.id, Arc::new(RwLock::new(channel)));
     }
+
+    Ok(map)
 }
 
-pub fn decode_members(value: Value) -> Result<HashMap<UserId, Member>> {
+pub fn deserialize_members<D: Deserializer>(deserializer: D)
+    -> StdResult<HashMap<UserId, Member>, D::Error> {
+    let vec: Vec<Member> = Deserialize::deserialize(deserializer)?;
     let mut members = HashMap::new();
 
-    for member in decode_array(value, Member::decode)? {
+    for member in vec {
         let user_id = member.user.read().unwrap().id;
 
         members.insert(user_id, member);
@@ -55,38 +49,24 @@ pub fn decode_members(value: Value) -> Result<HashMap<UserId, Member>> {
     Ok(members)
 }
 
-pub fn decode_guild_members(guild_id: GuildId, value: Value) -> Result<HashMap<UserId, Member>> {
-    let mut members = HashMap::new();
-    let member_vec = into_array(value).map(|x| x
-        .into_iter()
-        .map(|v| Member::decode_guild(guild_id, v))
-        .filter_map(Result::ok)
-        .collect::<Vec<_>>())?;
-
-    for member in member_vec {
-        let user_id = member.user.read().unwrap().id;
-
-        members.insert(user_id, member);
-    }
-
-    Ok(members)
-}
-
-pub fn decode_presences(value: Value) -> Result<HashMap<UserId, Presence>> {
+pub fn deserialize_presences<D: Deserializer>(deserializer: D)
+    -> StdResult<HashMap<UserId, Presence>, D::Error> {
+    let vec: Vec<Presence> = Deserialize::deserialize(deserializer)?;
     let mut presences = HashMap::new();
 
-    for presence in decode_array(value, Presence::decode)? {
+    for presence in vec {
         presences.insert(presence.user_id, presence);
     }
 
     Ok(presences)
 }
 
-pub fn decode_private_channels(value: Value)
-    -> Result<HashMap<ChannelId, Channel>> {
+pub fn deserialize_private_channels<D: Deserializer>(deserializer: D)
+    -> StdResult<HashMap<ChannelId, Channel>, D::Error> {
+    let vec: Vec<Channel> = Deserialize::deserialize(deserializer)?;
     let mut private_channels = HashMap::new();
 
-    for private_channel in decode_array(value, Channel::decode)? {
+    for private_channel in vec {
         let id = match private_channel {
             Channel::Group(ref group) => group.read().unwrap().channel_id,
             Channel::Private(ref channel) => channel.read().unwrap().id,
@@ -99,101 +79,52 @@ pub fn decode_private_channels(value: Value)
     Ok(private_channels)
 }
 
-pub fn decode_roles(value: Value) -> Result<HashMap<RoleId, Role>> {
+pub fn deserialize_roles<D: Deserializer>(deserializer: D)
+    -> StdResult<HashMap<RoleId, Role>, D::Error> {
+    let vec: Vec<Role> = Deserialize::deserialize(deserializer)?;
     let mut roles = HashMap::new();
 
-    for role in decode_array(value, Role::decode)? {
+    for role in vec {
         roles.insert(role.id, role);
     }
 
     Ok(roles)
 }
 
-pub fn decode_shards(value: Value) -> Result<[u64; 2]> {
-    let array = into_array(value)?;
+pub fn deserialize_single_recipient<D: Deserializer>(deserializer: D)
+    -> StdResult<Arc<RwLock<User>>, D::Error> {
+    let mut users: Vec<User> = Deserialize::deserialize(deserializer)?;
+    let user = if users.is_empty() {
+        return Err(DeError::custom("Expected a single recipient"));
+    } else {
+        users.remove(0)
+    };
 
-    Ok([
-        req!(array.get(0)
-            .ok_or(Error::Client(ClientError::InvalidShards))?.as_u64()) as u64,
-        req!(array.get(1)
-            .ok_or(Error::Client(ClientError::InvalidShards))?.as_u64()) as u64,
-    ])
+    Ok(Arc::new(RwLock::new(user)))
 }
 
-pub fn decode_users(value: Value) -> Result<HashMap<UserId, Arc<RwLock<User>>>> {
+pub fn deserialize_users<D: Deserializer>(deserializer: D)
+    -> StdResult<HashMap<UserId, Arc<RwLock<User>>>, D::Error> {
+    let vec: Vec<User> = Deserialize::deserialize(deserializer)?;
     let mut users = HashMap::new();
 
-    for user in decode_array(value, User::decode)? {
+    for user in vec {
         users.insert(user.id, Arc::new(RwLock::new(user)));
     }
 
     Ok(users)
 }
 
-pub fn decode_voice_states(value: Value)
-    -> Result<HashMap<UserId, VoiceState>> {
+pub fn deserialize_voice_states<D: Deserializer>(deserializer: D)
+    -> StdResult<HashMap<UserId, VoiceState>, D::Error> {
+    let vec: Vec<VoiceState> = Deserialize::deserialize(deserializer)?;
     let mut voice_states = HashMap::new();
 
-    for voice_state in decode_array(value, VoiceState::decode)? {
+    for voice_state in vec {
         voice_states.insert(voice_state.user_id, voice_state);
     }
 
     Ok(voice_states)
-}
-
-pub fn into_string(value: Value) -> Result<String> {
-    match value {
-        Value::String(s) => Ok(s),
-        Value::U64(v) => Ok(v.to_string()),
-        Value::I64(v) => Ok(v.to_string()),
-        value => Err(Error::Decode("Expected string", value)),
-    }
-}
-
-pub fn into_map(value: Value) -> Result<BTreeMap<String, Value>> {
-    match value {
-        Value::Object(m) => Ok(m),
-        value => Err(Error::Decode("Expected object", value)),
-    }
-}
-
-pub fn into_u64(value: Value) -> Result<u64> {
-    match value {
-        Value::I64(v) => Ok(v as u64),
-        Value::String(v) => match v.parse::<u64>() {
-            Ok(v) => Ok(v),
-            Err(_) => Err(Error::Decode("Expected valid u64", Value::String(v))),
-        },
-        Value::U64(v) => Ok(v),
-        value => Err(Error::Decode("Expected u64", value)),
-    }
-}
-
-pub fn opt<F, T>(map: &mut BTreeMap<String, Value>, key: &str, f: F)
-    -> Result<Option<T>> where F: FnOnce(Value) -> Result<T> {
-    match map.remove(key) {
-        None | Some(Value::Null) => Ok(None),
-        Some(val) => f(val).map(Some),
-    }
-}
-
-pub fn decode_discriminator(value: Value) -> Result<u16> {
-    match value {
-        Value::I64(v) => Ok(v as u16),
-        Value::U64(v) => Ok(v as u16),
-        Value::String(s) => match s.parse::<u16>() {
-            Ok(v) => Ok(v),
-            Err(_) => Err(Error::Decode("Error parsing discriminator as u16",
-                                        Value::String(s))),
-        },
-        value => Err(Error::Decode("Expected string or u64", value)),
-    }
-}
-
-pub fn remove(map: &mut BTreeMap<String, Value>, key: &str) -> Result<Value> {
-    map.remove(key).ok_or_else(|| {
-        Error::Decode("Unexpected absent key", Value::String(key.into()))
-    })
 }
 
 #[cfg(feature="cache")]

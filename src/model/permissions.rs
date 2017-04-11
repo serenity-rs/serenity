@@ -37,7 +37,10 @@
 //! [Manage Roles]: constant.MANAGE_ROLES.html
 //! [Manage Webhooks]: constant.MANAGE_WEBHOOKS.html
 
-use ::internal::prelude::*;
+use serde::de::{Error as DeError, Visitor};
+use serde::{Deserialize, Deserializer};
+use std::fmt::{Formatter, Result as FmtResult};
+use std::result::Result as StdResult;
 
 /// Returns a set of permissions with the original @everyone permissions set
 /// to true.
@@ -145,6 +148,7 @@ pub fn voice() -> Permissions {
 
     CONNECT | SPEAK | USE_VAD
 }
+
 bitflags! {
     /// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
     /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to
@@ -253,11 +257,6 @@ bitflags! {
 }
 
 impl Permissions {
-    #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<Permissions> {
-        Ok(Self::from_bits_truncate(value.as_u64().unwrap()))
-    }
-
     /// Shorthand for checking that the set of permissions contains the
     /// [Add Reactions] permission.
     ///
@@ -480,5 +479,37 @@ impl Permissions {
     /// [Use VAD]: constant.USE_VAD.html
     pub fn use_vad(&self) -> bool {
         self.contains(self::USE_VAD)
+    }
+}
+
+impl Deserialize for Permissions {
+    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+        Ok(Permissions::from_bits_truncate(deserializer.deserialize_u64(U64Visitor)?))
+    }
+}
+
+struct U64Visitor;
+
+impl Visitor for U64Visitor {
+    type Value = u64;
+
+    fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
+        formatter.write_str("an unsigned 64-bit integer")
+    }
+
+    fn visit_i32<E: DeError>(self, value: i32) -> StdResult<u64, E> {
+        Ok(value as u64)
+    }
+
+    fn visit_i64<E: DeError>(self, value: i64) -> StdResult<u64, E> {
+        Ok(value as u64)
+    }
+
+    fn visit_u32<E: DeError>(self, value: u32) -> StdResult<u64, E> {
+        Ok(value as u64)
+    }
+
+    fn visit_u64<E: DeError>(self, value: u64) -> StdResult<u64, E> {
+        Ok(value)
     }
 }

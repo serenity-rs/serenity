@@ -5,6 +5,31 @@ use ::client::rest;
 use ::model::*;
 use ::utils::builder::{CreateMessage, GetMessages};
 
+/// A group channel - potentially including other [`User`]s - separate from a
+/// [`Guild`].
+///
+/// [`Guild`]: struct.Guild.html
+/// [`User`]: struct.User.html
+#[derive(Clone, Debug, Deserialize)]
+pub struct Group {
+    /// The Id of the group channel.
+    #[serde(rename="id")]
+    pub channel_id: ChannelId,
+    /// The optional icon of the group channel.
+    pub icon: Option<String>,
+    /// The Id of the last message sent.
+    pub last_message_id: Option<MessageId>,
+    /// Timestamp of the latest pinned message.
+    pub last_pin_timestamp: Option<String>,
+    /// The name of the group channel.
+    pub name: Option<String>,
+    /// The Id of the group owner.
+    pub owner_id: UserId,
+    /// A map of the group's recipients.
+    #[serde(deserialize_with="deserialize_users")]
+    pub recipients: HashMap<UserId, Arc<RwLock<User>>>,
+}
+
 impl Group {
     /// Adds the given user to the group. If the user is already in the group,
     /// then nothing is done.

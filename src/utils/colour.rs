@@ -1,6 +1,3 @@
-use std::default::Default;
-use ::internal::prelude::*;
-
 macro_rules! colour {
     ($(#[$attr:meta] $name:ident, $val:expr;)*) => {
         impl Colour {
@@ -64,7 +61,7 @@ macro_rules! colour {
 /// [`Role`]: ../model/struct.Role.html
 /// [`dark_teal`]: #method.dark_teal
 /// [`get_g`]: #method.get_g
-#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Colour(pub u32);
 
 impl Colour {
@@ -121,15 +118,6 @@ impl Colour {
         uint = (uint << 8) | (b as u32);
 
         Colour(uint)
-    }
-
-    #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<Colour> {
-        match value {
-            Value::U64(v) => Ok(Colour(v as u32)),
-            Value::I64(v) => Ok(Colour(v as u32)),
-            other => Err(Error::Decode("Expected valid colour", other)),
-        }
     }
 
     /// Returns the red RGB component of this Colour.

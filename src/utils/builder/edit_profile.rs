@@ -1,12 +1,11 @@
-use serde_json::builder::ObjectBuilder;
-use serde_json::Value;
-use std::default::Default;
+use ::internal::prelude::*;
 
 /// A builder to edit the current user's settings, to be used in conjunction
 /// with [`Context::edit_profile`].
 ///
 /// [`Context::edit_profile`]: ../../client/struct.Context.html#method.edit_profile
-pub struct EditProfile(pub ObjectBuilder);
+#[derive(Default)]
+pub struct EditProfile(pub JsonMap);
 
 impl EditProfile {
     /// Sets the avatar of the current user. `None` can be passed to remove an
@@ -33,11 +32,12 @@ impl EditProfile {
     /// ```
     ///
     /// [`utils::read_image`]: ../fn.read_image.html
-    pub fn avatar(self, icon: Option<&str>) -> Self {
-        EditProfile(self.0
-            .insert("avatar",
-                    icon.map_or_else(|| Value::Null,
-                                     |x| Value::String(x.to_owned()))))
+    pub fn avatar(mut self, avatar: Option<&str>) -> Self {
+        let avatar = avatar.map_or(Value::Null, |x| Value::String(x.to_owned()));
+
+        self.0.insert("avatar".to_owned(), avatar);
+
+        self
     }
 
     /// Modifies the current user's email address.
@@ -50,8 +50,10 @@ impl EditProfile {
     /// **Note**: This can only be used by user accounts.
     ///
     /// [provided]: #method.password
-    pub fn email(self, email: &str) -> Self {
-        EditProfile(self.0.insert("email", email))
+    pub fn email(mut self, email: &str) -> Self {
+        self.0.insert("email".to_owned(), Value::String(email.to_owned()));
+
+        self
     }
 
     /// Modifies the current user's password.
@@ -60,8 +62,10 @@ impl EditProfile {
     /// [provided].
     ///
     /// [provided]: #method.password
-    pub fn new_password(self, new_password: &str) -> Self {
-        EditProfile(self.0.insert("new_password", new_password))
+    pub fn new_password(mut self, new_password: &str) -> Self {
+        self.0.insert("new_password".to_owned(), Value::String(new_password.to_owned()));
+
+        self
     }
 
     /// Used for providing the current password as verification when
@@ -69,8 +73,10 @@ impl EditProfile {
     ///
     /// [modifying the password]: #method.new_password
     /// [modifying the associated email address]: #method.email
-    pub fn password(self, password: &str) -> Self {
-        EditProfile(self.0.insert("password", password))
+    pub fn password(mut self, password: &str) -> Self {
+        self.0.insert("password".to_owned(), Value::String(password.to_owned()));
+
+        self
     }
 
     /// Modifies the current user's username.
@@ -79,13 +85,9 @@ impl EditProfile {
     /// and current discriminator, a new unique discriminator will be assigned.
     /// If there are no available discriminators with the requested username,
     /// an error will occur.
-    pub fn username(self, username: &str) -> Self {
-        EditProfile(self.0.insert("username", username))
-    }
-}
+    pub fn username(mut self, username: &str) -> Self {
+        self.0.insert("username".to_owned(), Value::String(username.to_owned()));
 
-impl Default for EditProfile {
-    fn default() -> EditProfile {
-        EditProfile(ObjectBuilder::new())
+        self
     }
 }

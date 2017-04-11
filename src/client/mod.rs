@@ -34,7 +34,7 @@ pub use self::error::Error as ClientError;
 use self::dispatch::dispatch;
 use self::event_store::EventStore;
 use self::gateway::Shard;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::HashMap;
 use std::sync::{Arc, Mutex, RwLock};
 use std::time::Duration;
 use std::{mem, thread};
@@ -42,7 +42,7 @@ use typemap::ShareMap;
 use websocket::client::Receiver;
 use websocket::result::WebSocketError;
 use websocket::stream::WebSocketStream;
-use ::internal::prelude::{Error, Result, Value};
+use ::internal::prelude::*;
 use ::internal::ws_impl::ReceiverExt;
 use ::model::event::*;
 use ::model::*;
@@ -637,7 +637,7 @@ impl Client {
     ///
     /// [`Unknown`]: ../model/event/enum.Event.html#variant.Unknown
     pub fn on_unknown<F>(&mut self, handler: F)
-        where F: Fn(Context, String, BTreeMap<String, Value>) + Send + Sync + 'static {
+        where F: Fn(Context, String, Value) + Send + Sync + 'static {
         self.event_store.write()
             .unwrap()
             .on_unknown = Some(Arc::new(handler));

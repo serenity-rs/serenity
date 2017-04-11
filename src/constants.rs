@@ -1,3 +1,5 @@
+use std::result::Result as StdResult;
+
 /// The gateway version used by the library. The gateway URI is retrieved via
 /// the REST API.
 pub const GATEWAY_VERSION: u8 = 6;
@@ -56,41 +58,37 @@ pub enum ErrorCode {
     UnknownUser,
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum OpCode {
-    Event,
-    Heartbeat,
-    Identify,
-    StatusUpdate,
-    VoiceStateUpdate,
-    VoiceServerPing,
-    Resume,
-    Reconnect,
-    GetGuildMembers,
-    InvalidSession,
-    Hello,
-    HeartbeatAck,
-}
+enum_number!(
+    /// Enum to map gateway opcodes.
+    OpCode {
+        /// Dispatches an event.
+        Event = 0,
+        /// Used for ping checking.
+        Heartbeat = 1,
+        /// Used for client handshake.
+        Identify = 2,
+        /// Used to update the client status.
+        StatusUpdate = 3,
+        /// Used to join/move/leave voice channels.
+        VoiceStateUpdate = 4,
+        /// Used for voice ping checking.
+        VoiceServerPing = 5,
+        /// Used to resume a closed connection.
+        Resume = 6,
+        /// Used to tell clients to reconnect to the gateway.
+        Reconnect = 7,
+        /// Used to request guild members.
+        GetGuildMembers = 8,
+        /// Used to notify clients that they have an invalid session Id.
+        InvalidSession = 9,
+        /// Sent immediately after connection, contains heartbeat + server info.
+        Hello = 10,
+        /// Sent immediately following a client heartbeat that was received.
+        HeartbeatAck = 11,
+    }
+);
 
 impl OpCode {
-    pub fn from_num(num: u64) -> Option<Self> {
-        match num {
-            0 => Some(OpCode::Event),
-            1 => Some(OpCode::Heartbeat),
-            2 => Some(OpCode::Identify),
-            3 => Some(OpCode::StatusUpdate),
-            4 => Some(OpCode::VoiceStateUpdate),
-            5 => Some(OpCode::VoiceServerPing),
-            6 => Some(OpCode::Resume),
-            7 => Some(OpCode::Reconnect),
-            8 => Some(OpCode::GetGuildMembers),
-            9 => Some(OpCode::InvalidSession),
-            10 => Some(OpCode::Hello),
-            11 => Some(OpCode::HeartbeatAck),
-            _ => None,
-        }
-    }
-
     pub fn num(&self) -> u64 {
         match *self {
             OpCode::Event => 0,
@@ -109,31 +107,27 @@ impl OpCode {
     }
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum VoiceOpCode {
-    Identify,
-    Heartbeat,
-    Hello,
-    KeepAlive,
-    SelectProtocol,
-    SessionDescription,
-    Speaking,
-}
+enum_number!(
+    /// Enum to map voice opcodes.
+    VoiceOpCode {
+        /// Used to begin a voice websocket connection.
+        Identify = 0,
+        /// Used to select the voice protocol.
+        SelectProtocol = 1,
+        /// Used to complete the websocket handshake.
+        Hello = 2,
+        /// Used to keep the websocket connection alive.
+        KeepAlive = 3,
+        /// Used to describe the session.
+        SessionDescription = 4,
+        /// Used to indicate which users are speaking.
+        Speaking = 5,
+        /// Used to heartbeat.
+        Heartbeat = 8,
+    }
+);
 
 impl VoiceOpCode {
-    pub fn from_num(num: u64) -> Option<Self> {
-        match num {
-            0 => Some(VoiceOpCode::Identify),
-            1 => Some(VoiceOpCode::SelectProtocol),
-            2 => Some(VoiceOpCode::Hello),
-            3 => Some(VoiceOpCode::KeepAlive),
-            4 => Some(VoiceOpCode::SessionDescription),
-            5 => Some(VoiceOpCode::Speaking),
-            8 => Some(VoiceOpCode::Heartbeat),
-            _ => None,
-        }
-    }
-
     pub fn num(&self) -> u64 {
         match *self {
             VoiceOpCode::Identify => 0,

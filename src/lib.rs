@@ -85,7 +85,7 @@
 //! [examples]: https://github.com/zeyla/serenity/tree/master/examples
 //! [gateway docs]: client/gateway/index.html
 #![allow(doc_markdown, inline_always, unknown_lints)]
-#![doc(html_logo_url="https://docs.austinhellyer.me/serenity/docs_header.png")]
+#![doc(html_logo_url="https://zey.moe/u/serenity$header.png")]
 #![warn(enum_glob_use, if_not_else)]
 
 #[macro_use]
@@ -94,13 +94,17 @@ extern crate bitflags;
 extern crate lazy_static;
 #[macro_use]
 extern crate log;
+#[macro_use]
+extern crate serde_derive;
+#[macro_use]
+extern crate serde_json;
 
 extern crate base64;
 extern crate byteorder;
 extern crate flate2;
 extern crate hyper;
 extern crate multipart;
-extern crate serde_json;
+extern crate serde;
 extern crate time;
 extern crate typemap;
 extern crate websocket;
@@ -118,9 +122,11 @@ pub mod ext;
 pub mod model;
 pub mod prelude;
 
+#[macro_use]
+mod internal;
+
 mod constants;
 mod error;
-mod internal;
 
 pub use client::Client;
 pub use error::{Error, Result};

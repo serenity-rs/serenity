@@ -1,9 +1,41 @@
-use serde_json::builder::ObjectBuilder;
 use std::mem;
-use super::{Message, Webhook, WebhookId};
+use super::*;
 use ::utils::builder::ExecuteWebhook;
 use ::client::rest;
 use ::internal::prelude::*;
+
+/// A representation of a webhook, which is a low-effort way to post messages to
+/// channels. They do not necessarily require a bot user or authentication to
+/// use.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Webhook {
+    /// The unique Id.
+    ///
+    /// Can be used to calculate the creation date of the webhook.
+    pub id: WebhookId,
+    /// The default avatar.
+    ///
+    /// This can be modified via [`ExecuteWebhook::avatar`].
+    ///
+    /// [`ExecuteWebhook::avatar`]: ../utils/builder/struct.ExecuteWebhook.html#method.avatar
+    pub avatar: Option<String>,
+    /// The Id of the channel that owns the webhook.
+    pub channel_id: ChannelId,
+    /// The Id of the guild that owns the webhook.
+    pub guild_id: Option<GuildId>,
+    /// The default name of the webhook.
+    ///
+    /// This can be modified via [`ExecuteWebhook::username`].
+    ///
+    /// [`ExecuteWebhook::username`]: ../utils/builder/struct.ExecuteWebhook.html#method.username
+    pub name: Option<String>,
+    /// The webhook's secure token.
+    pub token: String,
+    /// The user that created the webhook.
+    ///
+    /// **Note**: This is not received when getting a webhook by its token.
+    pub user: Option<User>,
+}
 
 impl Webhook {
     /// Deletes the webhook.
@@ -63,16 +95,15 @@ impl Webhook {
     ///
     /// [`rest::edit_webhook`]: ../client/rest/fn.edit_webhook.html
     /// [`rest::edit_webhook_with_token`]: ../client/rest/fn.edit_webhook_with_token.html
-    pub fn edit(&mut self, name: Option<&str>, avatar: Option<&str>)
-        -> Result<()> {
+    pub fn edit(&mut self, name: Option<&str>, avatar: Option<&str>) -> Result<()> {
         if name.is_none() && avatar.is_none() {
             return Ok(());
         }
 
-        let mut map = ObjectBuilder::new();
+        let mut map = Map::new();
 
         if let Some(avatar) = avatar {
-            map = map.insert("avatar", if avatar.is_empty() {
+            map.insert("avatar".to_owned(), if avatar.is_empty() {
                 Value::Null
             } else {
                 Value::String(avatar.to_owned())
@@ -80,10 +111,10 @@ impl Webhook {
         }
 
         if let Some(name) = name {
-            map = map.insert("name", name);
+            map.insert("name".to_owned(), Value::String(name.to_owned()));
         }
 
-        match rest::edit_webhook_with_token(self.id.0, &self.token, &map.build()) {
+        match rest::edit_webhook_with_token(self.id.0, &self.token, &map) {
             Ok(replacement) => {
                 mem::replace(self, replacement);
 
@@ -142,7 +173,7 @@ impl Webhook {
     /// ```
     #[inline]
     pub fn execute<F: FnOnce(ExecuteWebhook) -> ExecuteWebhook>(&self, f: F) -> Result<Message> {
-        rest::execute_webhook(self.id.0, &self.token, &f(ExecuteWebhook::default()).0.build())
+        rest::execute_webhook(self.id.0, &self.token, &f(ExecuteWebhook::default()).0)
     }
 
     /// Retrieves the latest information about the webhook, editing the

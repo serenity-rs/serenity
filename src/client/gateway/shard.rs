@@ -1,4 +1,3 @@
-use serde_json::builder::ObjectBuilder;
 use std::io::Write;
 use std::net::Shutdown;
 use std::sync::mpsc::{self, Sender as MpscSender};
@@ -304,10 +303,10 @@ impl Shard {
                     };
                 }
 
-                let map = ObjectBuilder::new()
-                    .insert("d", Value::Null)
-                    .insert("op", OpCode::Heartbeat.num())
-                    .build();
+                let map = json!({
+                    "d": Value::Null,
+                    "op": OpCode::Heartbeat.num(),
+                });
                 let status = GatewayStatus::SendMessage(map);
                 let _ = self.keepalive_channel.send(status);
 
@@ -496,13 +495,14 @@ impl Shard {
     /// If the `cache` feature is enabled, the cache will automatically be
     /// updated with member chunks.
     pub fn chunk_guilds(&self, guild_ids: &[GuildId], limit: Option<u16>, query: Option<&str>) {
-        let msg = ObjectBuilder::new()
-            .insert("op", OpCode::GetGuildMembers.num())
-            .insert_object("d", |obj| obj
-                .insert_array("guild_id", |a| guild_ids.iter().fold(a, |a, s| a.push(s.0)))
-                .insert("limit", limit.unwrap_or(0))
-                .insert("query", query.unwrap_or("")))
-            .build();
+        let msg = json!({
+            "op": OpCode::GetGuildMembers.num(),
+            "d": {
+                "guild_id": guild_ids.iter().map(|x| x.0).collect::<Vec<u64>>(),
+                "limit": limit.unwrap_or(0),
+                "query": query.unwrap_or(""),
+            },
+        });
 
         let _ = self.keepalive_channel.send(GatewayStatus::SendMessage(msg));
     }
@@ -578,13 +578,14 @@ impl Shard {
 
         let (mut sender, mut receiver) = response.begin().split();
 
-        sender.send_json(&ObjectBuilder::new()
-            .insert_object("d", |o| o
-                .insert("session_id", session_id)
-                .insert("seq", self.seq)
-                .insert("token", &self.token))
-            .insert("op", OpCode::Resume.num())
-            .build())?;
+        sender.send_json(&json!({
+            "op": OpCode::Resume.num(),
+            "d": {
+                "session_id": session_id,
+                "seq": self.seq,
+                "token": self.token,
+            },
+        }))?;
 
         // Note to self when this gets accepted in a decade:
         // https://github.com/rust-lang/rfcs/issues/961
@@ -629,21 +630,17 @@ impl Shard {
         let (ref game, status, afk) = self.current_presence;
         let now = time::get_time().sec as u64;
 
-        let msg = ObjectBuilder::new()
-            .insert("op", OpCode::StatusUpdate.num())
-            .insert_object("d", move |mut object| {
-                object = object.insert("afk", afk)
-                    .insert("since", now)
-                    .insert("status", status.name());
-
-                match game.as_ref() {
-                    Some(game) => {
-                        object.insert_object("game", move |o| o.insert("name", &game.name))
-                    },
-                    None => object.insert("game", Value::Null),
-                }
-            })
-            .build();
+        let msg = json!({
+            "op": OpCode::StatusUpdate.num(),
+            "d": {
+                "afk": afk,
+                "since": now,
+                "status": status.name(),
+                "game": game.as_ref().map(|x| json!({
+                    "name": x.name,
+                })),
+            },
+        });
 
         let _ = self.keepalive_channel.send(GatewayStatus::SendMessage(msg));
 

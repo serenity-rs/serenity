@@ -1,6 +1,5 @@
 [package]
 authors = ["Zeyla Hellyer <zey@zey.moe>"]
-build = "build.rs"
 description = "A Rust library for the Discord API."
 documentation = "https://serenity.zey.moe"
 homepage = "https://github.com/zeyla/serenity"
@@ -19,7 +18,9 @@ flate2 = "0.2"
 hyper = "0.9"
 lazy_static = "0.2"
 log = "0.3"
-serde_json = "0.8"
+serde = "0.9"
+serde_derive = "0.9"
+serde_json = "0.9"
 time = "0.1"
 typemap = "0.3"
 websocket = "0.17"

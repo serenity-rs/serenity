@@ -15,11 +15,10 @@
 //! [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
 //! [here]: https://discordapp.com/developers/docs/resources/channel#embed-object
 
-use serde_json::builder::ObjectBuilder;
 use serde_json::Value;
-use std::collections::BTreeMap;
 use std::default::Default;
 use time::Tm;
+use ::internal::prelude::*;
 use ::model::Embed;
 use ::utils::Colour;
 
@@ -34,7 +33,7 @@ use ::utils::Colour;
 /// [`Context::send_message`]: ../../client/struct.Context.html#method.send_message
 /// [`Embed`]: ../../model/struct.Embed.html
 /// [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
-pub struct CreateEmbed(pub BTreeMap<String, Value>);
+pub struct CreateEmbed(pub Map<String, Value>);
 
 impl CreateEmbed {
     /// Set the author of the embed.
@@ -45,9 +44,9 @@ impl CreateEmbed {
     /// [`CreateEmbedAuthor`]: struct.CreateEmbedAuthor.html
     pub fn author<F>(mut self, f: F) -> Self
         where F: FnOnce(CreateEmbedAuthor) -> CreateEmbedAuthor {
-        let author = f(CreateEmbedAuthor::default()).0.build();
+        let author = f(CreateEmbedAuthor::default()).0;
 
-        self.0.insert("author".to_owned(), author);
+        self.0.insert("author".to_owned(), Value::Object(author));
 
         CreateEmbed(self.0)
     }
@@ -63,7 +62,7 @@ impl CreateEmbed {
 
     /// Set the colour of the left-hand side of the embed.
     pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
-        self.0.insert("color".to_owned(), Value::U64(colour.into().0 as u64));
+        self.0.insert("color".to_owned(), Value::Number(Number::from(colour.into().0 as u64)));
 
         CreateEmbed(self.0)
     }
@@ -89,7 +88,7 @@ impl CreateEmbed {
     /// [`CreateEmbedField`]: struct.CreateEmbedField.html
     pub fn field<F>(mut self, f: F) -> Self
         where F: FnOnce(CreateEmbedField) -> CreateEmbedField {
-        let field = f(CreateEmbedField::default()).0.build();
+        let field = f(CreateEmbedField::default()).0;
 
         {
             let key = "fields".to_owned();
@@ -106,7 +105,7 @@ impl CreateEmbed {
                     return CreateEmbed(self.0);
                 },
             };
-            arr.push(field);
+            arr.push(Value::Object(field));
 
             self.0.insert("fields".to_owned(), Value::Array(arr));
         }
@@ -122,18 +121,18 @@ impl CreateEmbed {
     /// [`CreateEmbedFooter`]: struct.CreateEmbedFooter.html
     pub fn footer<F>(mut self, f: F) -> Self
         where F: FnOnce(CreateEmbedFooter) -> CreateEmbedFooter {
-        let footer = f(CreateEmbedFooter::default()).0.build();
+        let footer = f(CreateEmbedFooter::default()).0;
 
-        self.0.insert("footer".to_owned(), footer);
+        self.0.insert("footer".to_owned(), Value::Object(footer));
 
         CreateEmbed(self.0)
     }
 
     /// Set the image associated with the embed. This only supports HTTP(S).
     pub fn image(mut self, url: &str) -> Self {
-        let image = ObjectBuilder::new()
-            .insert("url".to_owned(), url.to_owned())
-            .build();
+        let image = json!({
+            "url": url.to_owned()
+        });
 
         self.0.insert("image".to_owned(), image);
 
@@ -142,9 +141,9 @@ impl CreateEmbed {
 
     /// Set the thumbnail of the embed. This only supports HTTP(S).
     pub fn thumbnail(mut self, url: &str) -> Self {
-        let thumbnail = ObjectBuilder::new()
-            .insert("url".to_owned(), url.to_owned())
-            .build();
+        let thumbnail = json!({
+            "url": url.to_owned(),
+        });
 
         self.0.insert("thumbnail".to_owned(), thumbnail);
 
@@ -198,7 +197,7 @@ impl CreateEmbed {
 impl Default for CreateEmbed {
     /// Creates a builder with default values, setting the `type` to `rich`.
     fn default() -> CreateEmbed {
-        let mut map = BTreeMap::new();
+        let mut map = Map::new();
         map.insert("type".to_owned(), Value::String("rich".to_owned()));
 
         CreateEmbed(map)
@@ -233,13 +232,11 @@ impl From<Embed> for CreateEmbed {
             b = b.description(&description);
         }
 
-        if let Some(fields) = embed.fields {
-            for field in fields {
-                b = b.field(move |f| f
-                    .inline(field.inline)
-                    .name(&field.name)
-                    .value(&field.value));
-            }
+        for field in embed.fields {
+            b = b.field(move |f| f
+                .inline(field.inline)
+                .name(&field.name)
+                .value(&field.value));
         }
 
         if let Some(image) = embed.image {
@@ -266,7 +263,6 @@ impl From<Embed> for CreateEmbed {
     }
 }
 
-
 /// A builder to create a fake [`Embed`] object's author, for use with the
 /// [`CreateEmbed::author`] method.
 ///
@@ -276,22 +272,28 @@ impl From<Embed> for CreateEmbed {
 /// [`CreateEmbed::author`]: struct.CreateEmbed.html#method.author
 /// [`name`]: #method.name
 #[derive(Default)]
-pub struct CreateEmbedAuthor(pub ObjectBuilder);
+pub struct CreateEmbedAuthor(pub Map<String, Value>);
 
 impl CreateEmbedAuthor {
     /// Set the URL of the author's icon.
-    pub fn icon_url(self, icon_url: &str) -> Self {
-        CreateEmbedAuthor(self.0.insert("icon_url", icon_url))
+    pub fn icon_url(mut self, icon_url: &str) -> Self {
+        self.0.insert("icon_url".to_owned(), Value::String(icon_url.to_owned()));
+
+        self
     }
 
     /// Set the author's name.
-    pub fn name(self, name: &str) -> Self {
-        CreateEmbedAuthor(self.0.insert("name", name))
+    pub fn name(mut self, name: &str) -> Self {
+        self.0.insert("name".to_owned(), Value::String(name.to_owned()));
+
+        self
     }
 
     /// Set the author's URL.
-    pub fn url(self, url: &str) -> Self {
-        CreateEmbedAuthor(self.0.insert("url", url))
+    pub fn url(mut self, url: &str) -> Self {
+        self.0.insert("url".to_owned(), Value::String(url.to_owned()));
+
+        self
     }
 }
 
@@ -303,22 +305,28 @@ impl CreateEmbedAuthor {
 ///
 /// [`Embed`]: ../../model/struct.Embed.html
 /// [`CreateEmbed::field`]: struct.CreateEmbed.html#method.field
-pub struct CreateEmbedField(pub ObjectBuilder);
+pub struct CreateEmbedField(pub Map<String, Value>);
 
 impl CreateEmbedField {
     /// Set whether the field is inlined. Set to true by default.
-    pub fn inline(self, inline: bool) -> Self {
-        CreateEmbedField(self.0.insert("inline", inline))
+    pub fn inline(mut self, inline: bool) -> Self {
+        self.0.insert("inline".to_owned(), Value::Bool(inline));
+
+        self
     }
 
     /// Set the field's name. It can't be longer than 256 characters.
-    pub fn name(self, name: &str) -> Self {
-        CreateEmbedField(self.0.insert("name", name))
+    pub fn name(mut self, name: &str) -> Self {
+        self.0.insert("name".to_owned(), Value::String(name.to_owned()));
+
+        self
     }
 
     /// Set the field's value. It can't be longer than 1024 characters.
-    pub fn value(self, value: &str) -> Self {
-        CreateEmbedField(self.0.insert("value", value))
+    pub fn value(mut self, value: &str) -> Self {
+        self.0.insert("value".to_owned(), Value::String(value.to_owned()));
+
+        self
     }
 }
 
@@ -326,7 +334,10 @@ impl Default for CreateEmbedField {
     /// Creates a builder with default values, setting the value of `inline` to
     /// `true`.
     fn default() -> CreateEmbedField {
-        CreateEmbedField(ObjectBuilder::new().insert("inline", true))
+        let mut map = Map::new();
+        map.insert("inline".to_owned(), Value::Bool(true));
+
+        CreateEmbedField(map)
     }
 }
 
@@ -338,17 +349,21 @@ impl Default for CreateEmbedField {
 /// [`Embed`]: ../../model/struct.Embed.html
 /// [`CreateEmbed::footer`]: struct.CreateEmbed.html#method.footer
 #[derive(Default)]
-pub struct CreateEmbedFooter(pub ObjectBuilder);
+pub struct CreateEmbedFooter(pub Map<String, Value>);
 
 impl CreateEmbedFooter {
     /// Set the icon URL's value. This only supports HTTP(S).
-    pub fn icon_url(self, icon_url: &str) -> Self {
-        CreateEmbedFooter(self.0.insert("icon_url", icon_url))
+    pub fn icon_url(mut self, icon_url: &str) -> Self {
+        self.0.insert("icon_url".to_owned(), Value::String(icon_url.to_owned()));
+
+        self
     }
 
     /// Set the footer's text.
-    pub fn text(self, text: &str) -> Self {
-        CreateEmbedFooter(self.0.insert("text", text))
+    pub fn text(mut self, text: &str) -> Self {
+        self.0.insert("text".to_owned(), Value::String(text.to_owned()));
+
+        self
     }
 }
 

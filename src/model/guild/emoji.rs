@@ -1,8 +1,6 @@
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
-use ::model::{Emoji, EmojiId};
+use ::model::{EmojiId, RoleId};
 
-#[cfg(feature="cache")]
-use serde_json::builder::ObjectBuilder;
 #[cfg(feature="cache")]
 use std::mem;
 #[cfg(feature="cache")]
@@ -11,6 +9,30 @@ use ::client::{CACHE, rest};
 use ::internal::prelude::*;
 #[cfg(feature="cache")]
 use ::model::GuildId;
+
+/// Represents a custom guild emoji, which can either be created using the API,
+/// or via an integration. Emojis created using the API only work within the
+/// guild it was created in.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Emoji {
+    /// The Id of the emoji.
+    pub id: EmojiId,
+    /// The name of the emoji. It must be at least 2 characters long and can
+    /// only contain alphanumeric characters and underscores.
+    pub name: String,
+    /// Whether the emoji is managed via an [`Integration`] service.
+    ///
+    /// [`Integration`]: struct.Integration.html
+    pub managed: bool,
+    /// Whether the emoji name needs to be surrounded by colons in order to be
+    /// used by the client.
+    pub require_colons: bool,
+    /// A list of [`Role`]s that are allowed to use the emoji. If there are no
+    /// roles specified, then usage is unrestricted.
+    ///
+    /// [`Role`]: struct.Role.html
+    pub roles: Vec<RoleId>,
+}
 
 impl Emoji {
     /// Deletes the emoji.
@@ -39,9 +61,9 @@ impl Emoji {
     pub fn edit(&mut self, name: &str) -> Result<()> {
         match self.find_guild_id() {
             Some(guild_id) => {
-                let map = ObjectBuilder::new()
-                    .insert("name", name)
-                    .build();
+                let map = json!({
+                    "name": name,
+                });
 
                 match rest::edit_emoji(guild_id.0, self.id.0, &map) {
                     Ok(emoji) => {

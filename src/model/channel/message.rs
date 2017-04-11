@@ -1,4 +1,3 @@
-use serde_json::builder::ObjectBuilder;
 use std::mem;
 use ::constants;
 use ::client::rest;
@@ -7,6 +6,63 @@ use ::utils::builder::{CreateEmbed, CreateMessage};
 
 #[cfg(feature="cache")]
 use ::client::CACHE;
+
+/// A representation of a message over a guild's text channel, a group, or a
+/// private channel.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Message {
+    /// The unique Id of the message. Can be used to calculate the creation date
+    /// of the message.
+    pub id: MessageId,
+    /// An array of the files attached to a message.
+    pub attachments: Vec<Attachment>,
+    /// The user that sent the message.
+    pub author: User,
+    /// The Id of the [`Channel`] that the message was sent to.
+    ///
+    /// [`Channel`]: enum.Channel.html
+    pub channel_id: ChannelId,
+    /// The content of the message.
+    pub content: String,
+    /// The timestamp of the last time the message was updated, if it was.
+    pub edited_timestamp: Option<String>,
+    /// Array of embeds sent with the message.
+    pub embeds: Vec<Embed>,
+    /// Whether the message is the "found" message in a search.
+    ///
+    /// Note that this is only relevant in the context of searches, and will
+    /// otherwise always be `false`.
+    #[serde(default)]
+    pub hit: bool,
+    /// Indicator of the type of message this is, i.e. whether it is a regular
+    /// message or a system message.
+    #[serde(rename="type")]
+    pub kind: MessageType,
+    /// Indicator of whether the message mentions everyone.
+    pub mention_everyone: bool,
+    /// Array of [`Role`]s' Ids mentioned in the message.
+    ///
+    /// [`Role`]: struct.Role.html
+    pub mention_roles: Vec<RoleId>,
+    /// Array of users mentioned in the message.
+    pub mentions: Vec<User>,
+    /// Non-repeating number used for ensuring message order.
+    pub nonce: Option<String>,
+    /// Indicator of whether the message is pinned.
+    pub pinned: bool,
+    /// Array of reactions performed on the message.
+    #[serde(default)]
+    pub reactions: Vec<MessageReaction>,
+    /// Initial message creation timestamp, calculated from its Id.
+    pub timestamp: String,
+    /// Indicator of whether the command is to be played back via
+    /// text-to-speech.
+    ///
+    /// In the client, this is done via the `/tts` slash command.
+    pub tts: bool,
+    /// The Id of the webhook that sent this message, if one did.
+    pub webhook_id: Option<WebhookId>,
+}
 
 impl Message {
     /// Deletes the message.
@@ -328,10 +384,10 @@ impl Message {
         gen.push_str(": ");
         gen.push_str(content);
 
-        let map = ObjectBuilder::new()
-            .insert("content", gen)
-            .insert("tts", false)
-            .build();
+        let map = json!({
+            "content": gen,
+            "tts": false,
+        });
 
         rest::send_message(self.channel_id.0, &map)
     }
@@ -367,4 +423,63 @@ impl From<Message> for MessageId {
     fn from(message: Message) -> MessageId {
         message.id
     }
+}
+
+/// A representation of a reaction to a message.
+///
+/// Multiple of the same [reaction type] are sent into one `MessageReaction`,
+/// with an associated [`count`].
+///
+/// [`count`]: #structfield.count
+/// [reaction type]: enum.ReactionType.html
+#[derive(Clone, Debug, Deserialize)]
+pub struct MessageReaction {
+    /// The amount of the type of reaction that have been sent for the
+    /// associated message.
+    pub count: u64,
+    /// Indicator of whether the current user has sent the type of reaction.
+    pub me: bool,
+    /// The type of reaction.
+    #[serde(rename="emoji")]
+    pub reaction_type: ReactionType,
+}
+
+enum_number!(
+    /// Differentiates between regular and different types of system messages.
+    MessageType {
+        /// A regular message.
+        Regular = 0,
+        /// An indicator that a recipient was added by the author.
+        GroupRecipientAddition = 1,
+        /// An indicator that a recipient was removed by the author.
+        GroupRecipientRemoval = 2,
+        /// An indicator that a call was started by the author.
+        GroupCallCreation = 3,
+        /// An indicator that the group name was modified by the author.
+        GroupNameUpdate = 4,
+        /// An indicator that the group icon was modified by the author.
+        GroupIconUpdate = 5,
+        /// An indicator that a message was pinned by the author.
+        PinsAdd = 6,
+    }
+);
+
+/// An emoji reaction to a message.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Reaction {
+    /// The [`Channel`] of the associated [`Message`].
+    ///
+    /// [`Channel`]: enum.Channel.html
+    /// [`Message`]: struct.Message.html
+    pub channel_id: ChannelId,
+    /// The reactive emoji used.
+    pub emoji: ReactionType,
+    /// The Id of the [`Message`] that was reacted to.
+    ///
+    /// [`Message`]: struct.Message.html
+    pub message_id: MessageId,
+    /// The Id of the [`User`] that sent the reaction.
+    ///
+    /// [`User`]: struct.User.html
+    pub user_id: UserId,
 }

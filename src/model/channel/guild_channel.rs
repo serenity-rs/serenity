@@ -1,4 +1,3 @@
-use serde_json::builder::ObjectBuilder;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::io::Read;
 use std::mem;
@@ -9,6 +8,58 @@ use ::utils::builder::{CreateInvite, CreateMessage, EditChannel, GetMessages};
 
 #[cfg(feature="cache")]
 use ::client::CACHE;
+
+/// Represents a guild's text or voice channel. Some methods are available only
+/// for voice channels and some are only available for text channels.
+#[derive(Clone, Debug, Deserialize)]
+pub struct GuildChannel {
+    /// The unique Id of the channel.
+    ///
+    /// The default channel Id shares the Id of the guild and the default role.
+    pub id: ChannelId,
+    /// The bitrate of the channel.
+    ///
+    /// **Note**: This is only available for voice channels.
+    pub bitrate: Option<u64>,
+    /// The Id of the guild the channel is located in.
+    ///
+    /// If this matches with the [`id`], then this is the default text channel.
+    ///
+    /// The original voice channel has an Id equal to the guild's Id,
+    /// incremented by one.
+    pub guild_id: GuildId,
+    /// The type of the channel.
+    #[serde(rename="type")]
+    pub kind: ChannelType,
+    /// The Id of the last message sent in the channel.
+    ///
+    /// **Note**: This is only available for text channels.
+    pub last_message_id: Option<MessageId>,
+    /// The timestamp of the time a pin was most recently made.
+    ///
+    /// **Note**: This is only available for text channels.
+    pub last_pin_timestamp: Option<String>,
+    /// The name of the channel.
+    pub name: String,
+    /// Permission overwrites for [`Member`]s and for [`Role`]s.
+    ///
+    /// [`Member`]: struct.Member.html
+    /// [`Role`]: struct.Role.html
+    pub permission_overwrites: Vec<PermissionOverwrite>,
+    /// The position of the channel.
+    ///
+    /// The default text channel will _almost always_ have a position of `-1` or
+    /// `0`.
+    pub position: i64,
+    /// The topic of the channel.
+    ///
+    /// **Note**: This is only available for text channels.
+    pub topic: Option<String>,
+    /// The maximum number of members allowed in the channel.
+    ///
+    /// **Note**: This is only available for voice channels.
+    pub user_limit: Option<u64>,
+}
 
 impl GuildChannel {
     /// Broadcasts to the channel that the current user is typing.
@@ -48,9 +99,7 @@ impl GuildChannel {
             }
         }
 
-        let map = f(CreateInvite::default()).0.build();
-
-        rest::create_invite(self.id.0, &map)
+        rest::create_invite(self.id.0, &f(CreateInvite::default()).0)
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -128,34 +177,6 @@ impl GuildChannel {
     #[inline]
     pub fn create_permission(&self, target: PermissionOverwrite) -> Result<()> {
         self.id.create_permission(target)
-    }
-
-    #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<GuildChannel> {
-        let mut map = into_map(value)?;
-
-        let id = remove(&mut map, "guild_id").and_then(GuildId::decode)?;
-
-        GuildChannel::decode_guild(Value::Object(map), id)
-    }
-
-    #[doc(hidden)]
-    pub fn decode_guild(value: Value, guild_id: GuildId) -> Result<GuildChannel> {
-        let mut map = into_map(value)?;
-
-        Ok(GuildChannel {
-            id: remove(&mut map, "id").and_then(ChannelId::decode)?,
-            name: remove(&mut map, "name").and_then(into_string)?,
-            guild_id: guild_id,
-            topic: opt(&mut map, "topic", into_string)?,
-            position: req!(remove(&mut map, "position")?.as_i64()),
-            kind: remove(&mut map, "type").and_then(ChannelType::decode)?,
-            last_message_id: opt(&mut map, "last_message_id", MessageId::decode)?,
-            permission_overwrites: decode_array(remove(&mut map, "permission_overwrites")?, PermissionOverwrite::decode)?,
-            bitrate: remove(&mut map, "bitrate").ok().and_then(|v| v.as_u64()),
-            user_limit: remove(&mut map, "user_limit").ok().and_then(|v| v.as_u64()),
-            last_pin_timestamp: opt(&mut map, "last_pin_timestamp", into_string)?,
-        })
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
@@ -238,12 +259,12 @@ impl GuildChannel {
             }
         }
 
-        let map = ObjectBuilder::new()
-            .insert("name", &self.name)
-            .insert("position", self.position)
-            .insert("type", self.kind.name());
+        let mut map = Map::new();
+        map.insert("name".to_owned(), Value::String(self.name.clone()));
+        map.insert("position".to_owned(), Value::Number(Number::from(self.position)));
+        map.insert("type".to_owned(), Value::String(self.kind.name().to_owned()));
 
-        let edited = f(EditChannel(map)).0.build();
+        let edited = f(EditChannel(map)).0;
 
         match rest::edit_channel(self.id.0, &edited) {
             Ok(channel) => {

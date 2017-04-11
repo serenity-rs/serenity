@@ -25,6 +25,7 @@ mod guild;
 mod invite;
 mod misc;
 mod user;
+mod voice;
 mod webhook;
 
 pub use self::channel::*;
@@ -34,6 +35,7 @@ pub use self::invite::*;
 pub use self::misc::*;
 pub use self::permissions::Permissions;
 pub use self::user::*;
+pub use self::voice::*;
 pub use self::webhook::*;
 
 use self::utils::*;
@@ -41,40 +43,23 @@ use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use time::Timespec;
 use ::internal::prelude::*;
-use ::utils::{Colour, decode_array};
+use ::utils::Colour;
 
-// All of the enums and structs are imported here. These are built from the
-// build script located at `./build.rs`.
-//
-// These use definitions located in `./definitions`, to map to structs and
-// enums, each respectively located in their own folder.
-//
-// For structs, this will almost always include their decode method, although
-// some require their own decoding due to many special fields.
-//
-// For enums, this will include the variants, and will automatically generate
-// the number/string decoding methods where appropriate.
-//
-// As only the struct/enum itself and common mappings can be built, this leaves
-// unique methods on each to be implemented here.
-include!(concat!(env!("OUT_DIR"), "/models/built.rs"));
+fn default_true() -> bool { true }
 
 macro_rules! id {
     ($(#[$attr:meta] $name:ident;)*) => {
         $(
             #[$attr]
-            #[derive(Copy, Clone, Debug, Eq, Hash, PartialOrd, Ord)]
+            #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialOrd, Ord, Serialize)]
             #[allow(derive_hash_xor_eq)]
             pub struct $name(pub u64);
 
             impl $name {
-                fn decode(value: Value) -> Result<Self> {
-                    decode_id(value).map($name)
-                }
-
                 /// Retrieves the time that the Id was created at.
                 pub fn created_at(&self) -> Timespec {
                     let offset = (self.0 >> 22) / 1000;
+
                     Timespec::new(1420070400 + offset as i64, 0)
                 }
             }
@@ -119,24 +104,6 @@ id! {
     WebhookId;
 }
 
-/// A container for any channel.
-#[derive(Clone, Debug)]
-pub enum Channel {
-    /// A group. A group comprises of only one channel.
-    Group(Arc<RwLock<Group>>),
-    /// A [text] or [voice] channel within a [`Guild`].
-    ///
-    /// [`Guild`]: struct.Guild.html
-    /// [text]: enum.ChannelType.html#variant.Text
-    /// [voice]: enum.ChannelType.html#variant.Voice
-    Guild(Arc<RwLock<GuildChannel>>),
-    /// A private channel to another [`User`]. No other users may access the
-    /// channel. For multi-user "private channels", use a group.
-    ///
-    /// [`User`]: struct.User.html
-    Private(Arc<RwLock<PrivateChannel>>),
-}
-
 /// A container for guilds.
 ///
 /// This is used to differentiate whether a guild itself can be used or whether
@@ -147,29 +114,6 @@ pub enum GuildContainer {
     Guild(PartialGuild),
     /// A guild's id, which can be used to search the cache for a guild.
     Id(GuildId),
-}
-
-/// The type of edit being made to a Channel's permissions.
-///
-/// This is for use with methods such as `Context::create_permission`.
-///
-/// [`Context::create_permission`]: ../client/
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum PermissionOverwriteType {
-    /// A member which is having its permission overwrites edited.
-    Member(UserId),
-    /// A role which is having its permission overwrites edited.
-    Role(RoleId),
-}
-
-/// A guild which may or may not currently be available.
-#[derive(Clone, Debug)]
-pub enum PossibleGuild<T> {
-    /// An indicator that a guild is currently unavailable for at least one of
-    /// a variety of reasons.
-    Offline(GuildId),
-    /// An indicator that a guild is currently available.
-    Online(T),
 }
 
 /// Denotes the target for a search.
@@ -203,4 +147,146 @@ impl From<GuildId> for SearchTarget {
     fn from(guild_id: GuildId) -> SearchTarget {
         SearchTarget::Guild(guild_id)
     }
+}
+
+/// Information about a user's application. An application does not necessarily
+/// have an associated bot user.
+#[derive(Clone, Debug, Deserialize)]
+pub struct ApplicationInfo {
+    /// The bot user associated with the application. See [`BotApplication`] for
+    /// more information.
+    ///
+    /// [`BotApplication`]: struct.BotApplication.html
+    pub bot: Option<BotApplication>,
+    /// Indicator of whether the bot is public.
+    ///
+    /// If a bot is public, anyone may invite it to their [`Guild`]. While a bot
+    /// is private, only the owner may add it to a guild.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    #[serde(default="default_true")]
+    pub bot_public: bool,
+    /// Indicator of whether the bot requires an OAuth2 code grant.
+    pub bot_require_code_grant: bool,
+    /// A description of the application, assigned by the application owner.
+    pub description: String,
+    /// A set of bitflags assigned to the application, which represent gated
+    /// feature flags that have been enabled for the application.
+    pub flags: Option<u64>,
+    /// A hash pointing to the application's icon.
+    ///
+    /// This is not necessarily equivalent to the bot user's avatar.
+    pub icon: Option<String>,
+    /// The unique numeric Id of the application.
+    pub id: UserId,
+    /// The name assigned to the application by the application owner.
+    pub name: String,
+    /// A list of redirect URIs assigned to the application.
+    pub redirect_uris: Vec<String>,
+    /// A list of RPC Origins assigned to the application.
+    pub rpc_origins: Vec<String>,
+    /// The given secret to the application.
+    ///
+    /// This is not equivalent to the application's bot user's token.
+    pub secret: String,
+}
+
+/// Information about an application with an application's bot user.
+#[derive(Clone, Debug, Deserialize)]
+pub struct BotApplication {
+    /// The unique Id of the bot user.
+    pub id: UserId,
+    /// A hash of the avatar, if one is assigned.
+    ///
+    /// Can be used to generate a full URL to the avatar.
+    pub avatar: Option<String>,
+    /// Indicator of whether it is a bot.
+    #[serde(default)]
+    pub bot: bool,
+    /// The discriminator assigned to the bot user.
+    ///
+    /// While discriminators are not unique, the `username#discriminator` pair
+    /// is.
+    pub discriminator: u16,
+    /// The bot user's username.
+    pub name: String,
+    /// The token used to authenticate as the bot user.
+    ///
+    /// **Note**: Keep this information private, as untrusted sources can use it
+    /// to perform any action with a bot user.
+    pub token: String,
+}
+
+/// Information about the current application and its owner.
+#[derive(Clone, Debug, Deserialize)]
+pub struct CurrentApplicationInfo {
+    pub description: String,
+    pub icon: Option<String>,
+    pub id: UserId,
+    pub name: String,
+    pub owner: User,
+    #[serde(default)]
+    pub rpc_origins: Vec<String>,
+}
+
+/// The name of a region that a voice server can be located in.
+#[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub enum Region {
+    #[serde(rename="amsterdam")]
+    Amsterdam,
+    #[serde(rename="brazil")]
+    Brazil,
+    #[serde(rename="eu-central")]
+    EuCentral,
+    #[serde(rename="eu-west")]
+    EuWest,
+    #[serde(rename="frankfurt")]
+    Frankfurt,
+    #[serde(rename="london")]
+    London,
+    #[serde(rename="sydney")]
+    Sydney,
+    #[serde(rename="us-central")]
+    UsCentral,
+    #[serde(rename="us-east")]
+    UsEast,
+    #[serde(rename="us-south")]
+    UsSouth,
+    #[serde(rename="us-west")]
+    UsWest,
+    #[serde(rename="vip-amsterdam")]
+    VipAmsterdam,
+    #[serde(rename="vip-us-east")]
+    VipUsEast,
+    #[serde(rename="vip-us-west")]
+    VipUsWest,
+}
+
+impl Region {
+    pub fn name(&self) -> &str {
+        match *self {
+            Region::Amsterdam => "amsterdam",
+            Region::Brazil => "brazil",
+            Region::EuCentral => "eu-central",
+            Region::EuWest => "eu-west",
+            Region::Frankfurt => "frankfurt",
+            Region::London => "london",
+            Region::Sydney => "sydney",
+            Region::UsCentral => "us-central",
+            Region::UsEast => "us-east",
+            Region::UsSouth => "us-south",
+            Region::UsWest => "us-west",
+            Region::VipAmsterdam => "vip-amsterdam",
+            Region::VipUsEast => "vip-us-east",
+            Region::VipUsWest => "vip-us-west",
+        }
+    }
+}
+
+use serde::{Deserialize, Deserializer};
+use std::result::Result as StdResult;
+
+fn deserialize_sync_user<D: Deserializer>(deserializer: D)
+    -> StdResult<Arc<RwLock<User>>, D::Error> {
+    Ok(Arc::new(RwLock::new(User::deserialize(deserializer)?)))
 }

@@ -16,10 +16,30 @@ pub use self::message::*;
 pub use self::private_channel::*;
 pub use self::reaction::*;
 
+use serde::de::Error as DeError;
+use serde_json;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::io::Read;
 use ::model::*;
 use ::utils::builder::{CreateMessage, GetMessages};
+
+/// A container for any channel.
+#[derive(Clone, Debug)]
+pub enum Channel {
+    /// A group. A group comprises of only one channel.
+    Group(Arc<RwLock<Group>>),
+    /// A [text] or [voice] channel within a [`Guild`].
+    ///
+    /// [`Guild`]: struct.Guild.html
+    /// [text]: enum.ChannelType.html#variant.Text
+    /// [voice]: enum.ChannelType.html#variant.Voice
+    Guild(Arc<RwLock<GuildChannel>>),
+    /// A private channel to another [`User`]. No other users may access the
+    /// channel. For multi-user "private channels", use a group.
+    ///
+    /// [`User`]: struct.User.html
+    Private(Arc<RwLock<PrivateChannel>>),
+}
 
 impl Channel {
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -38,21 +58,6 @@ impl Channel {
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R)
         -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
         self.id().create_reaction(message_id, reaction_type)
-    }
-
-    #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<Channel> {
-        let map = into_map(value)?;
-        match req!(map.get("type").and_then(|x| x.as_u64())) {
-            0 | 2 => GuildChannel::decode(Value::Object(map))
-                .map(|x| Channel::Guild(Arc::new(RwLock::new(x)))),
-            1 => PrivateChannel::decode(Value::Object(map))
-                .map(|x| Channel::Private(Arc::new(RwLock::new(x)))),
-            3 => Group::decode(Value::Object(map))
-                .map(|x| Channel::Group(Arc::new(RwLock::new(x)))),
-            other => Err(Error::Decode("Expected value Channel type",
-                                       Value::U64(other))),
-        }
     }
 
     /// Deletes the inner channel.
@@ -307,6 +312,30 @@ impl Channel {
     }
 }
 
+impl Deserialize for Channel {
+    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+        let v = JsonMap::deserialize(deserializer)?;
+        let kind = {
+            let kind = v.get("type").ok_or_else(|| DeError::missing_field("type"))?;
+
+            kind.as_u64().unwrap()
+        };
+
+        match kind {
+            0 | 2 => serde_json::from_value::<GuildChannel>(Value::Object(v))
+                .map(|x| Channel::Guild(Arc::new(RwLock::new(x))))
+                .map_err(DeError::custom),
+            1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
+                .map(|x| Channel::Private(Arc::new(RwLock::new(x))))
+                .map_err(DeError::custom),
+            3 => serde_json::from_value::<Group>(Value::Object(v))
+                .map(|x| Channel::Group(Arc::new(RwLock::new(x))))
+                .map_err(DeError::custom),
+            _ => Err(DeError::custom("Unknown channel type")),
+        }
+    }
+}
+
 impl Display for Channel {
     /// Formats the channel into a "mentioned" string.
     ///
@@ -339,22 +368,101 @@ impl Display for Channel {
     }
 }
 
-impl PermissionOverwrite {
-    #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<PermissionOverwrite> {
-        let mut map = into_map(value)?;
-        let id = remove(&mut map, "id").and_then(decode_id)?;
-        let kind = remove(&mut map, "type").and_then(into_string)?;
-        let kind = match &*kind {
-            "member" => PermissionOverwriteType::Member(UserId(id)),
-            "role" => PermissionOverwriteType::Role(RoleId(id)),
-            _ => return Err(Error::Decode("Expected valid PermissionOverwrite type", Value::String(kind))),
+enum_number!(
+    /// A representation of a type of channel.
+    ChannelType {
+        #[doc="An indicator that the channel is a text [`GuildChannel`].
+
+[`GuildChannel`]: struct.GuildChannel.html"]
+        Text = 0,
+        #[doc="An indicator that the channel is a [`PrivateChannel`].
+
+[`PrivateChannel`]: struct.PrivateChannel.html"]
+        Private = 1,
+        #[doc="An indicator that the channel is a voice [`GuildChannel`].
+
+[`GuildChannel`]: struct.GuildChannel.html"]
+        Voice = 2,
+        #[doc="An indicator that the channel is the channel of a [`Group`].
+
+[`Group`]: struct.Group.html"]
+        Group = 3,
+    }
+);
+
+impl ChannelType {
+    pub fn name(&self) -> &str {
+        match *self {
+            ChannelType::Group => "group",
+            ChannelType::Private => "private",
+            ChannelType::Text => "text",
+            ChannelType::Voice => "voice",
+        }
+    }
+}
+
+#[derive(Deserialize)]
+struct PermissionOverwriteData {
+    allow: Permissions,
+    deny: Permissions,
+    id: u64,
+    #[serde(rename="type")]
+    kind: String,
+}
+
+/// A channel-specific permission overwrite for a member or role.
+#[derive(Clone, Debug)]
+pub struct PermissionOverwrite {
+    pub allow: Permissions,
+    pub deny: Permissions,
+    pub kind: PermissionOverwriteType,
+}
+
+impl Deserialize for PermissionOverwrite {
+    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<PermissionOverwrite, D::Error> {
+        let data = PermissionOverwriteData::deserialize(deserializer)?;
+
+        let kind = match &data.kind[..] {
+            "member" => PermissionOverwriteType::Member(UserId(data.id)),
+            "role" => PermissionOverwriteType::Role(RoleId(data.id)),
+            _ => return Err(DeError::custom("Unknown PermissionOverwriteType")),
         };
 
         Ok(PermissionOverwrite {
+            allow: data.allow,
+            deny: data.deny,
             kind: kind,
-            allow: remove(&mut map, "allow").and_then(Permissions::decode)?,
-            deny: remove(&mut map, "deny").and_then(Permissions::decode)?,
         })
     }
+}
+
+/// The type of edit being made to a Channel's permissions.
+///
+/// This is for use with methods such as `Context::create_permission`.
+///
+/// [`Context::create_permission`]: ../client/
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum PermissionOverwriteType {
+    /// A member which is having its permission overwrites edited.
+    Member(UserId),
+    /// A role which is having its permission overwrites edited.
+    Role(RoleId),
+}
+
+/// The results of a search, including the total results and a vector of
+/// messages.
+#[derive(Clone, Debug, Deserialize)]
+pub struct SearchResult {
+    /// An amount of messages returned from the result.
+    ///
+    /// Note that this is a vectof of a vector of messages. Each "set" of
+    /// messages contains the "found" message, as well as optional surrounding
+    /// messages for context.
+    #[serde(rename="messages")]
+    pub results: Vec<Vec<Message>>,
+    /// The number of messages directly related to the search.
+    ///
+    /// This does not count contextual messages.
+    #[serde(rename="total_results")]
+    pub total: u64,
 }

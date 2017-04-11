@@ -1,4 +1,3 @@
-use serde_json::builder::ObjectBuilder;
 use serde_json::Value;
 use std::sync::mpsc::{
     Receiver as MpscReceiver,
@@ -55,32 +54,21 @@ pub fn parse_ready(event: GatewayEvent,
 }
 
 pub fn identify(token: &str, shard_info: Option<[u64; 2]>) -> Value {
-    ObjectBuilder::new()
-        .insert("op", OpCode::Identify.num())
-        .insert_object("d", |mut object| {
-            object = identify_compression(object)
-                .insert("large_threshold", LARGE_THRESHOLD) // max value
-                .insert_object("properties", |object| object
-                    .insert("$browser", "serenity")
-                    .insert("$device", "serenity")
-                    .insert("$os", env::consts::OS))
-                .insert("token", token)
-                .insert("v", constants::GATEWAY_VERSION);
-
-            if let Some(shard_info) = shard_info {
-                object = object.insert_array("shard", |a| a
-                    .push(shard_info[0])
-                    .push(shard_info[1]));
-            }
-
-            object
-        })
-        .build()
-}
-
-#[inline(always)]
-pub fn identify_compression(object: ObjectBuilder) -> ObjectBuilder {
-    object.insert("compression", !cfg!(feature="debug"))
+    json!({
+        "op": OpCode::Identify.num(),
+        "d": {
+            "compression": !cfg!(feature="debug"),
+            "large_threshold": LARGE_THRESHOLD,
+            "shard": shard_info,
+            "token": token,
+            "v": constants::GATEWAY_VERSION,
+            "properties": {
+                "$browser": "serenity",
+                "$device": "serenity",
+                "$os": env::consts::OS,
+            },
+        },
+    })
 }
 
 pub fn build_gateway_url(base: &str) -> Result<RequestUrl> {
@@ -125,10 +113,10 @@ pub fn keepalive(interval: u64,
         if time::get_time() >= next_tick {
             next_tick = next_tick + base_interval;
 
-            let map = ObjectBuilder::new()
-                .insert("d", last_sequence)
-                .insert("op", OpCode::Heartbeat.num())
-                .build();
+            let map = json!({
+                "d": last_sequence,
+                "op": OpCode::Heartbeat.num(),
+            });
 
             trace!("Sending heartbeat d: {}", last_sequence);
 

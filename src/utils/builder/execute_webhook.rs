@@ -1,6 +1,6 @@
-use serde_json::builder::ObjectBuilder;
 use serde_json::Value;
 use std::default::Default;
+use ::internal::prelude::*;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
 ///
@@ -52,12 +52,14 @@ use std::default::Default;
 /// [`Webhook`]: ../../model/struct.Webhook.html
 /// [`Webhook::execute`]: ../../model/struct.Webhook.html#method.execute
 /// [`execute_webhook`]: ../../client/rest/fn.execute_webhook.html
-pub struct ExecuteWebhook(pub ObjectBuilder);
+pub struct ExecuteWebhook(pub JsonMap);
 
 impl ExecuteWebhook {
     /// Override the default avatar of the webhook with an image URL.
-    pub fn avatar_url(self, avatar_url: &str) -> Self {
-        ExecuteWebhook(self.0.insert("avatar_url", avatar_url))
+    pub fn avatar_url(mut self, avatar_url: &str) -> Self {
+        self.0.insert("avatar_url".to_owned(), Value::String(avatar_url.to_owned()));
+
+        self
     }
 
     /// Set the content of the message.
@@ -66,8 +68,10 @@ impl ExecuteWebhook {
     /// omitted.
     ///
     /// [`embeds`]: #method.embeds
-    pub fn content(self, content: &str) -> Self {
-        ExecuteWebhook(self.0.insert("content", content))
+    pub fn content(mut self, content: &str) -> Self {
+        self.0.insert("content".to_owned(), Value::String(content.to_owned()));
+
+        self
     }
 
     /// Set the embeds associated with the message.
@@ -83,20 +87,26 @@ impl ExecuteWebhook {
     /// [`Embed::fake`]: ../../model/struct.Embed.html#method.fake
     /// [`Webhook::execute`]: ../../model/struct.Webhook.html#method.execute
     /// [struct-level documentation]: #examples
-    pub fn embeds(self, embeds: Vec<Value>) -> Self {
-        ExecuteWebhook(self.0.insert("embeds", embeds))
+    pub fn embeds(mut self, embeds: Vec<Value>) -> Self {
+        self.0.insert("embeds".to_owned(), Value::Array(embeds));
+
+        self
     }
 
     /// Whether the message is a text-to-speech message.
     ///
     /// Think carefully before setting this to `true`.
-    pub fn tts(self, tts: bool) -> Self {
-        ExecuteWebhook(self.0.insert("tts", tts))
+    pub fn tts(mut self, tts: bool) -> Self {
+        self.0.insert("tts".to_owned(), Value::Bool(tts));
+
+        self
     }
 
     /// Override the default username of the webhook.
-    pub fn username(self, username: &str) -> Self {
-        ExecuteWebhook(self.0.insert("username", username))
+    pub fn username(mut self, username: &str) -> Self {
+        self.0.insert("username".to_owned(), Value::String(username.to_owned()));
+
+        self
     }
 }
 
@@ -110,6 +120,9 @@ impl Default for ExecuteWebhook {
     /// [`Webhook`]: ../../model/struct.Webhook.html
     /// [`tts`]: #method.tts
     fn default() -> ExecuteWebhook {
-        ExecuteWebhook(ObjectBuilder::new().insert("tts", false))
+        let mut map = Map::new();
+        map.insert("tts".to_owned(), Value::Bool(false));
+
+        ExecuteWebhook(map)
     }
 }

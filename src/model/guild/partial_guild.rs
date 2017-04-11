@@ -1,6 +1,30 @@
 use ::model::*;
 use ::utils::builder::{EditGuild, EditMember, EditRole};
 
+/// Partial information about a [`Guild`]. This does not include information
+/// like member data.
+///
+/// [`Guild`]: struct.Guild.html
+#[derive(Clone, Debug, Deserialize)]
+pub struct PartialGuild {
+    pub id: GuildId,
+    pub afk_channel_id: Option<ChannelId>,
+    pub afk_timeout: u64,
+    pub default_message_notifications: u64,
+    pub embed_channel_id: Option<ChannelId>,
+    pub embed_enabled: bool,
+    pub emojis: HashMap<EmojiId, Emoji>,
+    pub features: Vec<Feature>,
+    pub icon: Option<String>,
+    pub mfa_level: u64,
+    pub name: String,
+    pub owner_id: UserId,
+    pub region: String,
+    pub roles: HashMap<RoleId, Role>,
+    pub splash: Option<String>,
+    pub verification_level: VerificationLevel,
+}
+
 impl PartialGuild {
     /// Ban a [`User`] from the guild. All messages by the
     /// user within the last given number of days given will be deleted. This

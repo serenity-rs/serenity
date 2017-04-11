@@ -38,7 +38,6 @@ use hyper::method::Method;
 use hyper::{Error as HyperError, Result as HyperResult, Url, header};
 use multipart::client::Multipart;
 use self::ratelimiting::Route;
-use serde_json::builder::ObjectBuilder;
 use serde_json;
 use std::collections::BTreeMap;
 use std::default::Default;
@@ -48,7 +47,6 @@ use std::sync::{Arc, Mutex};
 use ::constants;
 use ::internal::prelude::*;
 use ::model::*;
-use ::utils::{decode_array, into_array};
 
 /// An method used for ratelimiting special routes.
 ///
@@ -168,7 +166,7 @@ pub fn create_channel(guild_id: u64, map: &Value) -> Result<GuildChannel> {
                             "/guilds/{}/channels",
                             guild_id);
 
-    GuildChannel::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, GuildChannel>(response).map_err(From::from)
 }
 
 /// Creates an emoji in the given [`Guild`] with the given data.
@@ -188,7 +186,7 @@ pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
                             "/guilds/{}/emojis",
                             guild_id);
 
-    Emoji::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Emoji>(response).map_err(From::from)
 }
 
 /// Creates a guild with the data provided.
@@ -230,7 +228,7 @@ pub fn create_guild(map: &Value) -> Result<PartialGuild> {
     let body = map.to_string();
     let response = request!(Route::Guilds, post(body), "/guilds");
 
-    PartialGuild::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, PartialGuild>(response).map_err(From::from)
 }
 
 /// Creates an [`Integration`] for a [`Guild`].
@@ -265,14 +263,14 @@ pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: &Value)
 /// [`RichInvite`]: ../../model/struct.RichInvite.html
 /// [Create Invite]: ../../model/permissions/constant.CREATE_INVITE.html
 /// [docs]: https://discordapp.com/developers/docs/resources/channel#create-channel-invite
-pub fn create_invite(channel_id: u64, map: &Value) -> Result<RichInvite> {
-    let body = map.to_string();
+pub fn create_invite(channel_id: u64, map: &JsonMap) -> Result<RichInvite> {
+    let body = serde_json::to_string(map)?;
     let response = request!(Route::ChannelsIdInvites(channel_id),
                             post(body),
                             "/channels/{}/invites",
                             channel_id);
 
-    RichInvite::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, RichInvite>(response).map_err(From::from)
 }
 
 /// Creates a permission override for a member or a role in a channel.
@@ -293,7 +291,7 @@ pub fn create_private_channel(map: &Value) -> Result<PrivateChannel> {
                             post(body),
                             "/users/@me/channels");
 
-    PrivateChannel::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, PrivateChannel>(response).map_err(From::from)
 }
 
 /// Reacts to a message.
@@ -310,14 +308,14 @@ pub fn create_reaction(channel_id: u64,
 }
 
 /// Creates a role.
-pub fn create_role(guild_id: u64, map: &Value) -> Result<Role> {
-    let body = map.to_string();
+pub fn create_role(guild_id: u64, map: &JsonMap) -> Result<Role> {
+    let body = serde_json::to_string(map)?;
     let response = request!(Route::GuildsIdRoles(guild_id),
                             post(body),
                             "/guilds/{}/roles",
                             guild_id);
 
-    Role::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Role>(response).map_err(From::from)
 }
 
 /// Creates a webhook for the given [channel][`GuildChannel`]'s Id, passing in
@@ -357,7 +355,7 @@ pub fn create_webhook(channel_id: u64, map: &Value) -> Result<Webhook> {
                             "/channels/{}/webhooks",
                             channel_id);
 
-    Webhook::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Webhook>(response).map_err(From::from)
 }
 
 /// Deletes a private channel or a channel in a guild.
@@ -367,7 +365,7 @@ pub fn delete_channel(channel_id: u64) -> Result<Channel> {
                             "/channels/{}",
                             channel_id);
 
-    Channel::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Channel>(response).map_err(From::from)
 }
 
 /// Deletes an emoji from a server.
@@ -386,7 +384,7 @@ pub fn delete_guild(guild_id: u64) -> Result<PartialGuild> {
                             "/guilds/{}",
                             guild_id);
 
-    PartialGuild::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, PartialGuild>(response).map_err(From::from)
 }
 
 /// Remvoes an integration from a guild.
@@ -402,7 +400,7 @@ pub fn delete_guild_integration(guild_id: u64, integration_id: u64) -> Result<()
 pub fn delete_invite(code: &str) -> Result<Invite> {
     let response = request!(Route::InvitesCode, delete, "/invites/{}", code);
 
-    Invite::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Invite>(response).map_err(From::from)
 }
 
 /// Deletes a message if created by us or we have
@@ -537,14 +535,14 @@ pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
 }
 
 /// Changes channel information.
-pub fn edit_channel(channel_id: u64, map: &Value) -> Result<GuildChannel> {
-    let body = map.to_string();
+pub fn edit_channel(channel_id: u64, map: &JsonMap) -> Result<GuildChannel> {
+    let body = serde_json::to_string(map)?;
     let response = request!(Route::ChannelsId(channel_id),
                             patch(body),
                             "/channels/{}",
                             channel_id);
 
-    GuildChannel::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, GuildChannel>(response).map_err(From::from)
 }
 
 /// Changes emoji information.
@@ -556,18 +554,18 @@ pub fn edit_emoji(guild_id: u64, emoji_id: u64, map: &Value) -> Result<Emoji> {
                             guild_id,
                             emoji_id);
 
-    Emoji::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Emoji>(response).map_err(From::from)
 }
 
 /// Changes guild information.
-pub fn edit_guild(guild_id: u64, map: &Value) -> Result<PartialGuild> {
-    let body = map.to_string();
+pub fn edit_guild(guild_id: u64, map: &JsonMap) -> Result<PartialGuild> {
+    let body = serde_json::to_string(map)?;
     let response = request!(Route::GuildsId(guild_id),
                             patch(body),
                             "/guilds/{}",
                             guild_id);
 
-    PartialGuild::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, PartialGuild>(response).map_err(From::from)
 }
 
 /// Edits a [`Guild`]'s embed setting.
@@ -580,12 +578,12 @@ pub fn edit_guild_embed(guild_id: u64, map: &Value) -> Result<GuildEmbed> {
                             "/guilds/{}/embed",
                             guild_id);
 
-    GuildEmbed::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, GuildEmbed>(response).map_err(From::from)
 }
 
 /// Does specific actions to a member.
-pub fn edit_member(guild_id: u64, user_id: u64, map: &Value) -> Result<()> {
-    let body = map.to_string();
+pub fn edit_member(guild_id: u64, user_id: u64, map: &JsonMap) -> Result<()> {
+    let body = serde_json::to_string(map)?;
 
     verify(204, request!(Route::GuildsIdMembersId(guild_id),
                          patch(body),
@@ -605,7 +603,7 @@ pub fn edit_message(channel_id: u64, message_id: u64, map: &Value) -> Result<Mes
                             channel_id,
                             message_id);
 
-    Message::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Message>(response).map_err(From::from)
 }
 
 /// Edits the current user's nickname for the provided [`Guild`] via its Id.
@@ -614,7 +612,9 @@ pub fn edit_message(channel_id: u64, message_id: u64, map: &Value) -> Result<Mes
 ///
 /// [`Guild`]: ../../model/struct.Guild.html
 pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
-    let map = ObjectBuilder::new().insert("nick", new_nickname).build();
+    let map = json!({
+        "nick": new_nickname
+    });
     let body = map.to_string();
     let response = request!(Route::GuildsIdMembersMeNick(guild_id),
                             patch(body),
@@ -636,32 +636,33 @@ pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
 /// **Note**: this token change may cause requests made between the actual token
 /// change and when the token is internally changed to be invalid requests, as
 /// the token may be outdated.
-pub fn edit_profile(map: &Value) -> Result<CurrentUser> {
-    let body = map.to_string();
+pub fn edit_profile(map: &JsonMap) -> Result<CurrentUser> {
+    let body = serde_json::to_string(map)?;
     let response = request!(Route::UsersMe, patch(body), "/users/@me");
 
-    let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
+    let mut value = serde_json::from_reader::<HyperResponse, Value>(response)?;
 
-    if !TOKEN.lock().unwrap().starts_with("Bot ") {
-        if let Some(Value::String(token)) = map.remove("token") {
-            set_token(&token);
+    if let Some(map) = value.as_object_mut() {
+        if !TOKEN.lock().unwrap().starts_with("Bot ") {
+            if let Some(Value::String(token)) = map.remove("token") {
+                set_token(&token);
+            }
         }
     }
 
-    CurrentUser::decode(Value::Object(map))
+    serde_json::from_value::<CurrentUser>(value).map_err(From::from)
 }
 
 /// Changes a role in a guild.
-pub fn edit_role(guild_id: u64, role_id: u64, map: &Value)
-    -> Result<Role> {
-    let body = map.to_string();
+pub fn edit_role(guild_id: u64, role_id: u64, map: &JsonMap) -> Result<Role> {
+    let body = serde_json::to_string(map)?;
     let response = request!(Route::GuildsIdRolesId(guild_id),
                             patch(body),
                             "/guilds/{}/roles/{}",
                             guild_id,
                             role_id);
 
-    Role::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Role>(response).map_err(From::from)
 }
 
 /// Edits a the webhook with the given data.
@@ -710,7 +711,7 @@ pub fn edit_webhook(webhook_id: u64, map: &Value) -> Result<Webhook> {
                             "/webhooks/{}",
                             webhook_id);
 
-    Webhook::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Webhook>(response).map_err(From::from)
 }
 
 /// Edits the webhook with the given data.
@@ -739,15 +740,15 @@ pub fn edit_webhook(webhook_id: u64, map: &Value) -> Result<Webhook> {
 /// ```
 ///
 /// [`edit_webhook`]: fn.edit_webhook.html
-pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &Value) -> Result<Webhook> {
-    let body = map.to_string();
+pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &JsonMap) -> Result<Webhook> {
+    let body = serde_json::to_string(map)?;
     let client = HyperClient::new();
     let response = retry(|| client
         .patch(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
         .body(&body))
         .map_err(Error::Hyper)?;
 
-    Webhook::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Webhook>(response).map_err(From::from)
 }
 
 /// Executes a webhook, posting a [`Message`] in the webhook's associated
@@ -804,15 +805,15 @@ pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &Value) -> Res
 /// [`Channel`]: ../../model/enum.Channel.html
 /// [`Message`]: ../../model/struct.Message.html
 /// [Discord docs]: https://discordapp.com/developers/docs/resources/webhook#querystring-params
-pub fn execute_webhook(webhook_id: u64, token: &str, map: &Value) -> Result<Message> {
-    let body = map.to_string();
+pub fn execute_webhook(webhook_id: u64, token: &str, map: &JsonMap) -> Result<Message> {
+    let body = serde_json::to_string(map)?;
     let client = HyperClient::new();
     let response = retry(|| client
         .post(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
         .body(&body))
         .map_err(Error::Hyper)?;
 
-    Message::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Message>(response).map_err(From::from)
 }
 
 /// Gets the active maintenances from Discord's Status API.
@@ -826,7 +827,7 @@ pub fn get_active_maintenances() -> Result<Vec<Maintenance>> {
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
     match map.remove("scheduled_maintenances") {
-        Some(v) => decode_array(v, Maintenance::decode),
+        Some(v) => serde_json::from_value::<Vec<Maintenance>>(v).map_err(From::from),
         None => Ok(vec![]),
     }
 }
@@ -837,7 +838,7 @@ pub fn get_active_maintenances() -> Result<Vec<Maintenance>> {
 pub fn get_application_info(id: u64) -> Result<ApplicationInfo> {
     let response = request!(Route::None, get, "/oauth2/applications/{}", id);
 
-    ApplicationInfo::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, ApplicationInfo>(response).map_err(From::from)
 }
 
 /// Gets all oauth2 applications we've made.
@@ -845,9 +846,8 @@ pub fn get_application_info(id: u64) -> Result<ApplicationInfo> {
 /// **Note**: Only user accounts may use this endpoint.
 pub fn get_applications() -> Result<Vec<ApplicationInfo>> {
     let response = request!(Route::None, get, "/oauth2/applications");
-    let decoded = serde_json::from_reader(response)?;
 
-    decode_array(decoded, ApplicationInfo::decode)
+    serde_json::from_reader::<HyperResponse, Vec<ApplicationInfo>>(response).map_err(From::from)
 }
 
 /// Gets all the users that are banned in specific guild.
@@ -857,14 +857,14 @@ pub fn get_bans(guild_id: u64) -> Result<Vec<Ban>> {
                             "/guilds/{}/bans",
                             guild_id);
 
-    decode_array(serde_json::from_reader(response)?, Ban::decode)
+    serde_json::from_reader::<HyperResponse, Vec<Ban>>(response).map_err(From::from)
 }
 
 /// Gets current bot gateway.
 pub fn get_bot_gateway() -> Result<BotGateway> {
     let response = request!(Route::GatewayBot, get, "/gateway/bot");
 
-    BotGateway::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, BotGateway>(response).map_err(From::from)
 }
 
 /// Gets all invites for a channel.
@@ -874,8 +874,7 @@ pub fn get_channel_invites(channel_id: u64) -> Result<Vec<RichInvite>> {
                             "/channels/{}/invites",
                             channel_id);
 
-    decode_array(serde_json::from_reader(response)?,
-                 RichInvite::decode)
+    serde_json::from_reader::<HyperResponse, Vec<RichInvite>>(response).map_err(From::from)
 }
 
 /// Retrieves the webhooks for the given [channel][`GuildChannel`]'s Id.
@@ -902,7 +901,7 @@ pub fn get_channel_webhooks(channel_id: u64) -> Result<Vec<Webhook>> {
                             "/channels/{}/webhooks",
                             channel_id);
 
-    decode_array(serde_json::from_reader(response)?, Webhook::decode)
+    serde_json::from_reader::<HyperResponse, Vec<Webhook>>(response).map_err(From::from)
 }
 
 /// Gets channel information.
@@ -912,7 +911,7 @@ pub fn get_channel(channel_id: u64) -> Result<Channel> {
                             "/channels/{}",
                             channel_id);
 
-    Channel::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Channel>(response).map_err(From::from)
 }
 
 /// Gets all channels in a guild.
@@ -922,8 +921,7 @@ pub fn get_channels(guild_id: u64) -> Result<Vec<GuildChannel>> {
                             "/guilds/{}/channels",
                             guild_id);
 
-    decode_array(serde_json::from_reader(response)?,
-                 GuildChannel::decode)
+    serde_json::from_reader::<HyperResponse, Vec<GuildChannel>>(response).map_err(From::from)
 }
 
 /// Gets information about the current application.
@@ -932,21 +930,21 @@ pub fn get_channels(guild_id: u64) -> Result<Vec<GuildChannel>> {
 pub fn get_current_application_info() -> Result<CurrentApplicationInfo> {
     let response = request!(Route::None, get, "/oauth2/applications/@me");
 
-    CurrentApplicationInfo::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, CurrentApplicationInfo>(response).map_err(From::from)
 }
 
 /// Gets information about the user we're connected with.
 pub fn get_current_user() -> Result<CurrentUser> {
     let response = request!(Route::UsersMe, get, "/users/@me");
 
-    CurrentUser::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, CurrentUser>(response).map_err(From::from)
 }
 
 /// Gets current gateway.
 pub fn get_gateway() -> Result<Gateway> {
     let response = request!(Route::Gateway, get, "/gateway");
 
-    Gateway::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Gateway>(response).map_err(From::from)
 }
 
 /// Gets information about an emoji.
@@ -957,7 +955,7 @@ pub fn get_emoji(guild_id: u64, emoji_id: u64) -> Result<Emoji> {
                             guild_id,
                             emoji_id);
 
-    Emoji::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Emoji>(response).map_err(From::from)
 }
 
 /// Gets all emojis in a guild.
@@ -967,7 +965,7 @@ pub fn get_emojis(guild_id: u64) -> Result<Vec<Emoji>> {
                             "/guilds/{}/emojis",
                             guild_id);
 
-    decode_array(serde_json::from_reader(response)?, Emoji::decode)
+    serde_json::from_reader::<HyperResponse, Vec<Emoji>>(response).map_err(From::from)
 }
 
 /// Gets guild information.
@@ -977,7 +975,7 @@ pub fn get_guild(guild_id: u64) -> Result<PartialGuild> {
                             "/guilds/{}",
                             guild_id);
 
-    PartialGuild::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, PartialGuild>(response).map_err(From::from)
 }
 
 /// Gets a guild embed information.
@@ -987,7 +985,7 @@ pub fn get_guild_embed(guild_id: u64) -> Result<GuildEmbed> {
                             "/guilds/{}/embeds",
                             guild_id);
 
-    GuildEmbed::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, GuildEmbed>(response).map_err(From::from)
 }
 
 /// Gets integrations that a guild has.
@@ -997,7 +995,7 @@ pub fn get_guild_integrations(guild_id: u64) -> Result<Vec<Integration>> {
                             "/guilds/{}/integrations",
                             guild_id);
 
-    decode_array(serde_json::from_reader(response)?, Integration::decode)
+    serde_json::from_reader::<HyperResponse, Vec<Integration>>(response).map_err(From::from)
 }
 
 /// Gets all invites to a guild.
@@ -1007,7 +1005,7 @@ pub fn get_guild_invites(guild_id: u64) -> Result<Vec<RichInvite>> {
                             "/guilds/{}/invites",
                             guild_id);
 
-    decode_array(serde_json::from_reader(response)?, RichInvite::decode)
+    serde_json::from_reader::<HyperResponse, Vec<RichInvite>>(response).map_err(From::from)
 }
 
 /// Gets the members of a guild. Optionally pass a `limit` and the Id of the
@@ -1021,10 +1019,19 @@ pub fn get_guild_members(guild_id: u64, limit: Option<u64>, after: Option<u64>)
                             limit.unwrap_or(500),
                             after.unwrap_or(0));
 
-    into_array(serde_json::from_reader(response)?)
-        .and_then(|x| x.into_iter()
-            .map(|v| Member::decode_guild(GuildId(guild_id), v))
-            .collect())
+    let mut v = serde_json::from_reader::<HyperResponse, Value>(response)?;
+
+    if let Some(values) = v.as_array_mut() {
+        let num = Value::Number(Number::from(guild_id));
+
+        for value in values {
+            if let Some(element) = value.as_object_mut() {
+                element.insert("guild_id".to_owned(), num.clone());
+            }
+        }
+    }
+
+    serde_json::from_value::<Vec<Member>>(v).map_err(From::from)
 }
 
 /// Gets the amount of users that can be pruned.
@@ -1035,7 +1042,7 @@ pub fn get_guild_prune_count(guild_id: u64, map: &Value) -> Result<GuildPrune> {
                             "/guilds/{}/prune",
                             guild_id);
 
-    GuildPrune::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, GuildPrune>(response).map_err(From::from)
 }
 
 /// Gets regions that a guild can use. If a guild has [`Feature::VipRegions`]
@@ -1048,7 +1055,7 @@ pub fn get_guild_regions(guild_id: u64) -> Result<Vec<VoiceRegion>> {
                             "/guilds/{}/regions",
                             guild_id);
 
-    decode_array(serde_json::from_reader(response)?, VoiceRegion::decode)
+    serde_json::from_reader::<HyperResponse, Vec<VoiceRegion>>(response).map_err(From::from)
 }
 
 /// Retrieves a list of roles in a [`Guild`].
@@ -1060,7 +1067,7 @@ pub fn get_guild_roles(guild_id: u64) -> Result<Vec<Role>> {
                             "/guilds/{}/roles",
                             guild_id);
 
-    decode_array(serde_json::from_reader(response)?, Role::decode)
+    serde_json::from_reader::<HyperResponse, Vec<Role>>(response).map_err(From::from)
 }
 
 /// Retrieves the webhooks for the given [guild][`Guild`]'s Id.
@@ -1087,7 +1094,7 @@ pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
                             "/guilds/{}/webhooks",
                             guild_id);
 
-    decode_array(serde_json::from_reader(response)?, Webhook::decode)
+    serde_json::from_reader::<HyperResponse, Vec<Webhook>>(response).map_err(From::from)
 }
 
 /// Gets a paginated list of the current user's guilds.
@@ -1124,7 +1131,7 @@ pub fn get_guilds(target: &GuildPagination, limit: u64) -> Result<Vec<GuildInfo>
 
     let response = request!(Route::UsersMeGuilds, get, "{}", uri);
 
-    decode_array(serde_json::from_reader(response)?, GuildInfo::decode)
+    serde_json::from_reader::<HyperResponse, Vec<GuildInfo>>(response).map_err(From::from)
 }
 
 /// Gets information about a specific invite.
@@ -1132,7 +1139,7 @@ pub fn get_invite(code: &str) -> Result<Invite> {
     let invite = ::utils::parse_invite(code);
     let response = request!(Route::InvitesCode, get, "/invites/{}", invite);
 
-    Invite::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Invite>(response).map_err(From::from)
 }
 
 /// Gets member of a guild.
@@ -1143,7 +1150,13 @@ pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
                             guild_id,
                             user_id);
 
-    Member::decode_guild(GuildId(guild_id), serde_json::from_reader(response)?)
+    let mut v = serde_json::from_reader::<HyperResponse, Value>(response)?;
+
+    if let Some(map) = v.as_object_mut() {
+        map.insert("guild_id".to_owned(), Value::Number(Number::from(guild_id)));
+    }
+
+    serde_json::from_value::<Member>(v).map_err(From::from)
 }
 
 /// Gets a message by an Id, bots only.
@@ -1154,7 +1167,7 @@ pub fn get_message(channel_id: u64, message_id: u64) -> Result<Message> {
                             channel_id,
                             message_id);
 
-    Message::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Message>(response).map_err(From::from)
 }
 
 /// Gets X messages from a channel.
@@ -1167,7 +1180,7 @@ pub fn get_messages(channel_id: u64, query: &str)
     let response = request(Route::ChannelsIdMessages(channel_id),
                            || client.get(&url))?;
 
-    decode_array(serde_json::from_reader(response)?, Message::decode)
+    serde_json::from_reader::<HyperResponse, Vec<Message>>(response).map_err(From::from)
 }
 
 /// Gets all pins of a channel.
@@ -1177,7 +1190,7 @@ pub fn get_pins(channel_id: u64) -> Result<Vec<Message>> {
                             "/channels/{}/pins",
                             channel_id);
 
-    decode_array(serde_json::from_reader(response)?, Message::decode)
+    serde_json::from_reader::<HyperResponse, Vec<Message>>(response).map_err(From::from)
 }
 
 /// Gets user Ids based on their reaction to a message. This endpoint is dumb.
@@ -1202,7 +1215,7 @@ pub fn get_reaction_users(channel_id: u64,
                             "{}",
                             uri);
 
-    decode_array(serde_json::from_reader(response)?, User::decode)
+    serde_json::from_reader::<HyperResponse, Vec<User>>(response).map_err(From::from)
 }
 
 /// Gets the current unresolved incidents from Discord's Status API.
@@ -1216,7 +1229,7 @@ pub fn get_unresolved_incidents() -> Result<Vec<Incident>> {
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
     match map.remove("incidents") {
-        Some(incidents) => decode_array(incidents, Incident::decode),
+        Some(v) => serde_json::from_value::<Vec<Incident>>(v).map_err(From::from),
         None => Ok(vec![]),
     }
 }
@@ -1232,7 +1245,7 @@ pub fn get_upcoming_maintenances() -> Result<Vec<Maintenance>> {
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
     match map.remove("scheduled_maintenances") {
-        Some(v) => decode_array(v, Maintenance::decode),
+        Some(v) => serde_json::from_value::<Vec<Maintenance>>(v).map_err(From::from),
         None => Ok(vec![]),
     }
 }
@@ -1241,21 +1254,21 @@ pub fn get_upcoming_maintenances() -> Result<Vec<Maintenance>> {
 pub fn get_user(user_id: u64) -> Result<User> {
     let response = request!(Route::UsersId, get, "/users/{}", user_id);
 
-    User::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, User>(response).map_err(From::from)
 }
 
 /// Gets our DM channels.
 pub fn get_user_dm_channels() -> Result<Vec<PrivateChannel>> {
     let response = request!(Route::UsersMeChannels, get, "/users/@me/channels");
 
-    decode_array(serde_json::from_reader(response)?, PrivateChannel::decode)
+    serde_json::from_reader::<HyperResponse, Vec<PrivateChannel>>(response).map_err(From::from)
 }
 
 /// Gets all voice regions.
 pub fn get_voice_regions() -> Result<Vec<VoiceRegion>> {
     let response = request!(Route::VoiceRegions, get, "/voice/regions");
 
-    decode_array(serde_json::from_reader(response)?, VoiceRegion::decode)
+    serde_json::from_reader::<HyperResponse, Vec<VoiceRegion>>(response).map_err(From::from)
 }
 
 /// Retrieves a webhook given its Id.
@@ -1278,7 +1291,7 @@ pub fn get_voice_regions() -> Result<Vec<VoiceRegion>> {
 pub fn get_webhook(webhook_id: u64) -> Result<Webhook> {
     let response = request!(Route::WebhooksId, get, "/webhooks/{}", webhook_id);
 
-    Webhook::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Webhook>(response).map_err(From::from)
 }
 
 /// Retrieves a webhook given its Id and unique token.
@@ -1304,7 +1317,7 @@ pub fn get_webhook_with_token(webhook_id: u64, token: &str) -> Result<Webhook> {
         .get(&format!(api!("/webhooks/{}/{}"), webhook_id, token)))
         .map_err(Error::Hyper)?;
 
-    Webhook::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Webhook>(response).map_err(From::from)
 }
 
 /// Kicks a member from a guild.
@@ -1323,7 +1336,7 @@ pub fn leave_group(guild_id: u64) -> Result<Group> {
                             "/channels/{}",
                             guild_id);
 
-    Group::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Group>(response).map_err(From::from)
 }
 
 /// Leaves a guild.
@@ -1333,7 +1346,7 @@ pub fn leave_guild(guild_id: u64) -> Result<PartialGuild> {
                             "/users/@me/guilds/{}",
                             guild_id);
 
-    PartialGuild::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, PartialGuild>(response).map_err(From::from)
 }
 
 /// Deletes a user from group DM.
@@ -1346,11 +1359,8 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 }
 
 /// Sends a file to a channel.
-pub fn send_file<R: Read>(channel_id: u64,
-                          mut file: R,
-                          filename: &str,
-                          map: BTreeMap<String, Value>)
-                          -> Result<Message> {
+pub fn send_file<R: Read>(channel_id: u64, mut file: R, filename: &str, map: JsonMap)
+    -> Result<Message> {
     let uri = format!(api!("/channels/{}/messages"), channel_id);
     let url = match Url::parse(&uri) {
         Ok(url) => url,
@@ -1371,14 +1381,15 @@ pub fn send_file<R: Read>(channel_id: u64,
         let _ = match v {
             Value::Bool(false) => request.write_text(&k, "false")?,
             Value::Bool(true) => request.write_text(&k, "true")?,
-            Value::I64(inner) => request.write_text(&k, inner.to_string())?,
-            Value::U64(inner) => request.write_text(&k, inner.to_string())?,
+            Value::Number(inner) => request.write_text(&k, inner.to_string())?,
             Value::String(inner) => request.write_text(&k, inner)?,
             _ => continue,
         };
     }
 
-    Message::decode(serde_json::from_reader(request.send()?)?)
+    let response = request.send()?;
+
+    serde_json::from_reader::<HyperResponse, Message>(response).map_err(From::from)
 }
 
 /// Sends a message to a channel.
@@ -1389,7 +1400,7 @@ pub fn send_message(channel_id: u64, map: &Value) -> Result<Message> {
                             "/channels/{}/messages",
                             channel_id);
 
-    Message::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, Message>(response).map_err(From::from)
 }
 
 /// Pins a message in a channel.
@@ -1436,12 +1447,11 @@ pub fn start_guild_prune(guild_id: u64, map: &Value) -> Result<GuildPrune> {
                             "/guilds/{}/prune",
                             guild_id);
 
-    GuildPrune::decode(serde_json::from_reader(response)?)
+    serde_json::from_reader::<HyperResponse, GuildPrune>(response).map_err(From::from)
 }
 
 /// Starts syncing an integration with a guild.
-pub fn start_integration_sync(guild_id: u64, integration_id: u64)
-    -> Result<()> {
+pub fn start_integration_sync(guild_id: u64, integration_id: u64) -> Result<()> {
     verify(204, request!(Route::GuildsIdIntegrationsIdSync(guild_id),
                          post,
                          "/guilds/{}/integrations/{}/sync",

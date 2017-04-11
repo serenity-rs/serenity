@@ -1,4 +1,3 @@
-use serde_json::builder::ObjectBuilder;
 use std::sync::{Arc, Mutex};
 use super::gateway::Shard;
 use super::rest;
@@ -78,29 +77,27 @@ impl Context {
     /// context.edit_profile(|p| p.username("Hakase"));
     /// ```
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser> {
-        let mut map = ObjectBuilder::new();
+        let mut map = Map::new();
 
         feature_cache! {{
             let cache = CACHE.read().unwrap();
 
-            map = map.insert("avatar", &cache.user.avatar)
-                .insert("username", &cache.user.name);
+            map.insert("username".to_owned(), Value::String(cache.user.name.clone()));
 
             if let Some(email) = cache.user.email.as_ref() {
-                map = map.insert("email", email);
+                map.insert("email".to_owned(), Value::String(email.clone()));
             }
         } else {
             let user = rest::get_current_user()?;
 
-            map = map.insert("avatar", user.avatar)
-                .insert("username", user.name);
+            map.insert("username".to_owned(), Value::String(user.name.clone()));
 
             if let Some(email) = user.email.as_ref() {
-                map = map.insert("email", email);
+                map.insert("email".to_owned(), Value::String(email.clone()));
             }
         }}
 
-        let edited = f(EditProfile(map)).0.build();
+        let edited = f(EditProfile(map)).0;
 
         rest::edit_profile(&edited)
     }

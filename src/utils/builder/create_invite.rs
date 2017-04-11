@@ -1,6 +1,6 @@
-use serde_json::builder::ObjectBuilder;
 use serde_json::Value;
 use std::default::Default;
+use ::internal::prelude::*;
 
 /// A builder to create a [`RichInvite`] for use via [`Context::create_invite`].
 ///
@@ -28,7 +28,7 @@ use std::default::Default;
 ///
 /// [`Context::create_invite`]: ../../client/struct.Context.html#method.create_invite
 /// [`RichInvite`]: ../../model/struct.Invite.html
-pub struct CreateInvite(pub ObjectBuilder);
+pub struct CreateInvite(pub JsonMap);
 
 impl CreateInvite {
     /// The duration that the invite will be valid for.
@@ -36,8 +36,10 @@ impl CreateInvite {
     /// Set to `0` for an invite which does not expire after an amount of time.
     ///
     /// Defaults to `86400`, or 24 hours.
-    pub fn max_age(self, max_age: u64) -> Self {
-        CreateInvite(self.0.insert("max_age", max_age))
+    pub fn max_age(mut self, max_age: u64) -> Self {
+        self.0.insert("max_age".to_owned(), Value::Number(Number::from(max_age)));
+
+        self
     }
 
     /// The number of uses that the invite will be valid for.
@@ -45,28 +47,37 @@ impl CreateInvite {
     /// Set to `0` for an invite which does not expire after a number of uses.
     ///
     /// Defaults to `0`.
-    pub fn max_uses(self, max_uses: u64) -> Self {
-        CreateInvite(self.0.insert("max_uses", max_uses))
+    pub fn max_uses(mut self, max_uses: u64) -> Self {
+        self.0.insert("max_uses".to_owned(), Value::Number(Number::from(max_uses)));
+
+        self
     }
 
     /// Whether an invite grants a temporary membership.
     ///
     /// Defaults to `false`.
-    pub fn temporary(self, temporary: bool) -> Self {
-        CreateInvite(self.0.insert("temporary", temporary))
+    pub fn temporary(mut self, temporary: bool) -> Self {
+        self.0.insert("temporary".to_owned(), Value::Bool(temporary));
+
+        self
     }
 
     /// Whether or not to try to reuse a similar invite.
     ///
     /// Defaults to `false`.
-    pub fn unique(self, unique: bool) -> Self {
-        CreateInvite(self.0.insert("unique", unique))
+    pub fn unique(mut self, unique: bool) -> Self {
+        self.0.insert("unique".to_owned(), Value::Bool(unique));
+
+        self
     }
 }
 
 impl Default for CreateInvite {
     /// Creates a builder with default values, setting `validate` to `null`.
     fn default() -> CreateInvite {
-        CreateInvite(ObjectBuilder::new().insert("validate", Value::Null))
+        let mut map = Map::new();
+        map.insert("validate".to_owned(), Value::Null);
+
+        CreateInvite(map)
     }
 }

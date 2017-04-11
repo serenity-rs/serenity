@@ -1,17 +1,6 @@
-use serde_json::builder::ObjectBuilder;
+use serde_json;
 use std::{fmt, mem};
-use super::{
-    CurrentUser,
-    GuildContainer,
-    GuildId,
-    GuildInfo,
-    Member,
-    Message,
-    PrivateChannel,
-    RoleId,
-    User,
-    UserId,
-};
+use super::*;
 use time::Timespec;
 use ::client::rest::{self, GuildPagination};
 use ::internal::prelude::*;
@@ -22,6 +11,56 @@ use ::utils::builder::EditProfile;
 use std::sync::{Arc, RwLock};
 #[cfg(feature="cache")]
 use ::client::CACHE;
+
+/// An override for a channel.
+#[derive(Clone, Debug, Deserialize)]
+pub struct ChannelOverride {
+    /// The channel the override is for.
+    pub channel_id: ChannelId,
+    /// The notification level to use for the channel.
+    pub message_notifications: NotificationLevel,
+    /// Indicator of whether the channel is muted.
+    ///
+    /// In the client, this will not show an unread indicator for the channel,
+    /// although it will continue to show when the user is mentioned in it.
+    pub muted: bool,
+}
+
+/// The type of a user connection.
+///
+/// Note that this is related to a [`Connection`], and has nothing to do with
+/// WebSocket connections.
+///
+/// [`Connection`]: struct.Connection.html
+#[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
+pub enum ConnectionType {
+    /// A Battle.net connection.
+    #[serde(rename="battlenet")]
+    BattleNet,
+    /// A Steam connection.
+    #[serde(rename="steam")]
+    Steam,
+    /// A Twitch.tv connection.
+    #[serde(rename="twitch")]
+    TwitchTv,
+    #[serde(rename="youtube")]
+    YouTube,
+}
+
+/// Information about the current user.
+#[derive(Clone, Debug, Deserialize)]
+pub struct CurrentUser {
+    pub id: UserId,
+    pub avatar: Option<String>,
+    #[serde(default)]
+    pub bot: bool,
+    pub discriminator: u16,
+    pub email: Option<String>,
+    pub mfa_enabled: bool,
+    #[serde(rename="username")]
+    pub name: String,
+    pub verified: bool,
+}
 
 impl CurrentUser {
     /// Returns the formatted URL of the user's icon, if one exists.
@@ -65,15 +104,14 @@ impl CurrentUser {
     /// ```
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
-        let mut map = ObjectBuilder::new()
-            .insert("avatar", Some(&self.avatar))
-            .insert("username", &self.name);
+        let mut map = Map::new();
+        map.insert("username".to_owned(), Value::String(self.name.clone()));
 
         if let Some(email) = self.email.as_ref() {
-            map = map.insert("email", email)
+            map.insert("email".to_owned(), Value::String(email.clone()));
         }
 
-        match rest::edit_profile(&f(EditProfile(map)).0.build()) {
+        match rest::edit_profile(&f(EditProfile(map)).0) {
             Ok(new) => {
                 let _ = mem::replace(self, new);
 
@@ -95,6 +133,194 @@ impl CurrentUser {
         self.avatar.as_ref()
             .map(|av| format!(cdn!("/avatars/{}/{}.webp?size=1024"), self.id.0, av))
     }
+}
+
+/// An enum that represents a default avatar.
+///
+/// The default avatar is calculated via the result of `discriminator % 5`.
+///
+/// The has of the avatar can be retrieved via calling [`name`] on the enum.
+///
+/// [`name`]: #method.name
+#[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
+pub enum DefaultAvatar {
+    /// The avatar when the result is `0`.
+    #[serde(rename="6debd47ed13483642cf09e832ed0bc1b")]
+    Blurple,
+    /// The avatar when the result is `1`.
+    #[serde(rename="322c936a8c8be1b803cd94861bdfa868")]
+    Grey,
+    /// The avatar when the result is `2`.
+    #[serde(rename="dd4dbc0016779df1378e7812eabaa04d")]
+    Green,
+    /// The avatar when the result is `3`.
+    #[serde(rename="0e291f67c9274a1abdddeb3fd919cbaa")]
+    Orange,
+    /// The avatar when the result is `4`.
+    #[serde(rename="1cbd08c76f8af6dddce02c5138971129")]
+    Red,
+}
+
+impl DefaultAvatar {
+    /// Retrieves the String hash of the default avatar.
+    pub fn name(&self) -> Result<String> {
+        serde_json::to_string(self).map_err(From::from)
+    }
+}
+
+/// Flags about who may add the current user as a friend.
+#[derive(Clone, Debug, Deserialize)]
+pub struct FriendSourceFlags {
+    #[serde(default)]
+    pub all: bool,
+    #[serde(default)]
+    pub mutual_friends: bool,
+    #[serde(default)]
+    pub mutual_guilds: bool,
+}
+
+enum_number!(
+    /// Identifier for the notification level of a channel.
+    NotificationLevel {
+        /// Receive notifications for everything.
+        All = 0,
+        /// Receive only mentions.
+        Mentions = 1,
+        /// Receive no notifications.
+        Nothing = 2,
+        /// Inherit the notification level from the parent setting.
+        Parent = 3,
+    }
+);
+
+/// The representation of a user's status.
+///
+/// # Examples
+///
+/// - [`DoNotDisturb`];
+/// - [`Invisible`].
+///
+/// [`DoNotDisturb`]: #variant.DoNotDisturb
+/// [`Invisible`]: #variant.Invisible
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub enum OnlineStatus {
+    #[serde(rename="dnd")]
+    DoNotDisturb,
+    #[serde(rename="idle")]
+    Idle,
+    #[serde(rename="invisible")]
+    Invisible,
+    #[serde(rename="offline")]
+    Offline,
+    #[serde(rename="online")]
+    Online,
+}
+
+impl OnlineStatus {
+    pub fn name(&self) -> &str {
+        match *self {
+            OnlineStatus::DoNotDisturb => "dnd",
+            OnlineStatus::Idle => "idle",
+            OnlineStatus::Invisible => "invisible",
+            OnlineStatus::Offline => "offline",
+            OnlineStatus::Online => "online",
+        }
+    }
+}
+
+impl Default for OnlineStatus {
+    fn default() -> OnlineStatus {
+        OnlineStatus::Online
+    }
+}
+
+/// A summary of messages for a channel.
+///
+/// These are received within a [`ReadyEvent`].
+///
+/// [`ReadyEvent`]: event/struct.ReadyEvent.html
+#[derive(Clone, Debug, Deserialize)]
+pub struct ReadState {
+    /// The unique Id of the channel.
+    pub id: ChannelId,
+    /// The Id of the latest message sent to the channel.
+    pub last_message_id: Option<MessageId>,
+    /// The time that a message was most recently pinned to the channel.
+    pub last_pin_timestamp: Option<String>,
+    /// The amount of times that the current user has been mentioned in the
+    /// channel since the last message ACKed.
+    #[serde(default)]
+    pub mention_count: u64,
+}
+
+/// Information about a relationship that a user has with another user.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Relationship {
+    /// Unique Id of the other user.
+    pub id: UserId,
+    /// The type of the relationship, e.g. blocked, friends, etc.
+    #[serde(rename="type")]
+    pub kind: RelationshipType,
+    /// The User instance of the other user.
+    pub user: User,
+}
+
+enum_number!(
+    /// The type of relationship between the current user and another user.
+    RelationshipType {
+        /// The current user has a friend request ignored.
+        Ignored = 0,
+        /// The current user has the other user added as a friend.
+        Friends = 1,
+        /// The current user has the other blocked.
+        Blocked = 2,
+        /// The current user has an incoming friend request from the other user.
+        IncomingRequest = 3,
+        /// The current user has a friend request outgoing.
+        OutgoingRequest = 4,
+    }
+);
+
+/// A reason that a user was suggested to be added as a friend.
+#[derive(Clone, Debug, Deserialize)]
+pub struct SuggestionReason {
+    /// The name of the user on the platform.
+    pub name: String,
+    /// The type of reason.
+    pub kind: u64,
+    /// The platform that the current user and the other user share.
+    pub platform: ConnectionType,
+}
+
+/// The current user's progress through the Discord tutorial.
+///
+/// This is only applicable to selfbots.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Tutorial {
+    pub indicators_confirmed: Vec<String>,
+    pub indicators_suppressed: bool,
+}
+
+/// Information about a user.
+#[derive(Clone, Debug, Deserialize)]
+pub struct User {
+    /// The unique Id of the user. Can be used to calculate the account's
+    /// cration date.
+    pub id: UserId,
+    /// Optional avatar hash.
+    pub avatar: Option<String>,
+    /// Indicator of whether the user is a bot.
+    #[serde(default)]
+    pub bot: bool,
+    /// The account's discriminator to differentiate the user from others with
+    /// the same [`name`]. The name+discriminator pair is always unique.
+    ///
+    /// [`name`]: #structfield.name
+    pub discriminator: String,
+    /// The account's username. Changing username will trigger a discriminator
+    /// change if the username+discriminator pair becomes non-unique.
+    #[serde(rename="username")]
+    pub name: String,
 }
 
 impl User {
@@ -202,24 +428,24 @@ impl User {
             if let Some(finding) = finding {
                 finding
             } else {
-                let map = ObjectBuilder::new()
-                    .insert("recipient_id", self.id.0)
-                    .build();
+                let map = json!({
+                    "recipient_id": self.id.0,
+                });
 
                 rest::create_private_channel(&map)?.id
             }
         } else {
-            let map = ObjectBuilder::new()
-                .insert("recipient_id", self.id.0)
-                .build();
+            let map = json!({
+                "recipient_id": self.id.0,
+            });
 
             rest::create_private_channel(&map)?.id
         }};
 
-        let map = ObjectBuilder::new()
-            .insert("content", content)
-            .insert("tts", false)
-            .build();
+        let map = json!({
+            "content": content,
+            "tts": false,
+        });
 
         rest::send_message(private_channel_id.0, &map)
     }
@@ -319,13 +545,48 @@ impl fmt::Display for User {
     }
 }
 
+/// A user's connection.
+///
+/// **Note**: This is not in any way related to a WebSocket connection.
+#[derive(Clone, Debug, Deserialize)]
+pub struct UserConnection {
+    /// The User's Id through the connection.
+    pub id: String,
+    /// Whether the user automatically syncs friends through the connection.
+    pub friend_sync: bool,
+    /// The relevant integrations.
+    pub integrations: Vec<Integration>,
+    /// The type of connection set.
+    #[serde(rename="type")]
+    pub kind: ConnectionType,
+    /// The user's name through the connection.
+    pub name: String,
+    /// Indicator of whether the connection has been revoked.
+    pub revoked: bool,
+    /// The visibility level.
+    pub visibility: u64,
+}
+
+/// Settings about a guild in regards to notification configuration.
+#[derive(Clone, Debug, Deserialize)]
+pub struct UserGuildSettings {
+    pub channel_overriddes: Vec<ChannelOverride>,
+    pub guild_id: Option<GuildId>,
+    pub message_notifications: NotificationLevel,
+    pub mobile_push: bool,
+    pub muted: bool,
+    pub suppress_everyone: bool,
+}
+
 impl UserId {
     /// Creates a direct message channel between the [current user] and the
     /// user. This can also retrieve the channel if one already exists.
     ///
     /// [current user]: struct.CurrentUser.html
     pub fn create_dm_channel(&self) -> Result<PrivateChannel> {
-        let map = ObjectBuilder::new().insert("recipient_id", self.0).build();
+        let map = json!({
+            "recipient_id": self.0,
+        });
 
         rest::create_private_channel(&map)
     }

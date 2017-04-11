@@ -1,4 +1,3 @@
-use serde_json::builder::ObjectBuilder;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use ::client::rest;
 use ::internal::prelude::*;
@@ -71,10 +70,10 @@ impl GuildId {
     /// [`rest::create_channel`]: ../client/rest/fn.create_channel.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
-        let map = ObjectBuilder::new()
-            .insert("name", name)
-            .insert("type", kind.name())
-            .build();
+        let map = json!({
+            "name": name,
+            "type": kind.name(),
+        });
 
         rest::create_channel(self.0, &map)
     }
@@ -97,10 +96,10 @@ impl GuildId {
     /// [`utils::read_image`]: ../utils/fn.read_image.html
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     pub fn create_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
-        let map = ObjectBuilder::new()
-            .insert("name", name)
-            .insert("image", image)
-            .build();
+        let map = json!({
+            "name": name,
+            "image": image,
+        });
 
         rest::create_emoji(self.0, &map)
     }
@@ -113,10 +112,10 @@ impl GuildId {
     pub fn create_integration<I>(&self, integration_id: I, kind: &str)
         -> Result<()> where I: Into<IntegrationId> {
         let integration_id = integration_id.into();
-        let map = ObjectBuilder::new()
-            .insert("id", integration_id.0)
-            .insert("type", kind)
-            .build();
+        let map = json!({
+            "id": integration_id.0,
+            "type": kind,
+        });
 
         rest::create_guild_integration(self.0, integration_id.0, &map)
     }
@@ -131,7 +130,7 @@ impl GuildId {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
     pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
-        rest::create_role(self.0, &f(EditRole::default()).0.build())
+        rest::create_role(self.0, &f(EditRole::default()).0)
     }
 
     /// Deletes the current guild if the current account is the owner of the
@@ -194,7 +193,7 @@ impl GuildId {
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
     pub fn edit<F: FnOnce(EditGuild) -> EditGuild>(&mut self, f: F) -> Result<PartialGuild> {
-        rest::edit_guild(self.0, &f(EditGuild::default()).0.build())
+        rest::edit_guild(self.0, &f(EditGuild::default()).0)
     }
 
     /// Edits an [`Emoji`]'s name in the guild.
@@ -208,7 +207,9 @@ impl GuildId {
     /// [`Emoji::edit`]: struct.Emoji.html#method.edit
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str) -> Result<Emoji> {
-        let map = ObjectBuilder::new().insert("name", name).build();
+        let map = json!({
+            "name": name,
+        });
 
         rest::edit_emoji(self.0, emoji_id.into().0, &map)
     }
@@ -229,7 +230,7 @@ impl GuildId {
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
         where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
-        rest::edit_member(self.0, user_id.into().0, &f(EditMember::default()).0.build())
+        rest::edit_member(self.0, user_id.into().0, &f(EditMember::default()).0)
     }
 
     /// Edits the current user's nickname for the guild.
@@ -263,7 +264,7 @@ impl GuildId {
     #[inline]
     pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
-        rest::edit_role(self.0, role_id.into().0, &f(EditRole::default()).0.build())
+        rest::edit_role(self.0, role_id.into().0, &f(EditRole::default()).0)
     }
 
     /// Search the cache for the guild.
@@ -372,7 +373,9 @@ impl GuildId {
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     pub fn get_prune_count(&self, days: u16) -> Result<GuildPrune> {
-        let map = ObjectBuilder::new().insert("days", days).build();
+        let map = json!({
+            "days": days,
+        });
 
         rest::get_guild_prune_count(self.0, &map)
     }
@@ -411,7 +414,8 @@ impl GuildId {
     /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
     pub fn move_member<C, U>(&self, user_id: U, channel_id: C)
         -> Result<()> where C: Into<ChannelId>, U: Into<UserId> {
-        let map = ObjectBuilder::new().insert("channel_id", channel_id.into().0).build();
+        let mut map = Map::new();
+        map.insert("channel_id".to_owned(), Value::Number(Number::from(channel_id.into().0)));
 
         rest::edit_member(self.0, user_id.into().0, &map)
     }
@@ -437,7 +441,11 @@ impl GuildId {
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     #[inline]
     pub fn start_prune(&self, days: u16) -> Result<GuildPrune> {
-        rest::start_guild_prune(self.0, &ObjectBuilder::new().insert("days", days).build())
+        let map = json!({
+            "days": days,
+        });
+
+        rest::start_guild_prune(self.0, &map)
     }
 
     /// Unbans a [`User`] from the guild.

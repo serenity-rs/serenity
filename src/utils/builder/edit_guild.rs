@@ -1,6 +1,4 @@
-use serde_json::builder::ObjectBuilder;
-use serde_json::Value;
-use std::default::Default;
+use ::internal::prelude::*;
 use ::model::{ChannelId, Region, UserId, VerificationLevel};
 
 /// A builder to optionally edit certain fields of a [`Guild`]. This is meant
@@ -13,7 +11,8 @@ use ::model::{ChannelId, Region, UserId, VerificationLevel};
 /// [`Guild`]: ../../model/struct.Guild.html
 /// [`LiveGuild::edit`]: ../../model/struct.LiveGuild.html#method.edit
 /// [Manage Guild]: ../../model/permissions/constant.MANAGE_GUILD.html
-pub struct EditGuild(pub ObjectBuilder);
+#[derive(Default)]
+pub struct EditGuild(pub Map<String, Value>);
 
 impl EditGuild {
     /// Set the "AFK voice channel" that users are to move to if they have been
@@ -24,19 +23,23 @@ impl EditGuild {
     /// valid.
     ///
     /// [`afk_timeout`]: #method.afk_timeout
-    pub fn afk_channel<C: Into<ChannelId>>(self, channel: Option<C>) -> Self {
-        EditGuild(self.0.insert("afk_channel_id", match channel {
-            Some(channel) => Value::U64(channel.into().0),
+    pub fn afk_channel<C: Into<ChannelId>>(mut self, channel: Option<C>) -> Self {
+        self.0.insert("afk_channel_id".to_owned(), match channel {
+            Some(channel) => Value::Number(Number::from(channel.into().0)),
             None => Value::Null,
-        }))
+        });
+
+        self
     }
 
     /// Set the amount of time a user is to be moved to the AFK channel -
     /// configured via [`afk_channel`] - after being AFK.
     ///
     /// [`afk_channel`]: #method.afk_channel
-    pub fn afk_timeout(self, timeout: u64) -> Self {
-        EditGuild(self.0.insert("afk_timeout", timeout))
+    pub fn afk_timeout(mut self, timeout: u64) -> Self {
+        self.0.insert("afk_timeout".to_owned(), Value::Number(Number::from(timeout)));
+
+        self
     }
 
     /// Set the icon of the guild. Pass `None` to remove the icon.
@@ -58,25 +61,28 @@ impl EditGuild {
     /// ```
     ///
     /// [`utils::read_image`]: ../../utils/fn.read_image.html
-    pub fn icon(self, icon: Option<&str>) -> Self {
-        EditGuild(self.0
-            .insert("icon",
-                    icon.map_or_else(|| Value::Null,
-                                     |x| Value::String(x.to_owned()))))
+    pub fn icon(mut self, icon: Option<&str>) -> Self {
+        self.0.insert("icon".to_owned(), icon.map_or_else(|| Value::Null, |x| Value::String(x.to_owned())));
+
+        self
     }
 
     /// Set the name of the guild.
     ///
     /// **Note**: Must be between (and including) 2-100 chracters.
-    pub fn name(self, name: &str) -> Self {
-        EditGuild(self.0.insert("name", name))
+    pub fn name(mut self, name: &str) -> Self {
+        self.0.insert("name".to_owned(), Value::String(name.to_owned()));
+
+        self
     }
 
     /// Transfers the ownership of the guild to another user by Id.
     ///
     /// **Note**: The current user must be the owner of the guild.
-    pub fn owner<U: Into<UserId>>(self, user_id: U) -> Self {
-        EditGuild(self.0.insert("owner_id", user_id.into().0))
+    pub fn owner<U: Into<UserId>>(mut self, user_id: U) -> Self {
+        self.0.insert("owner_id".to_owned(), Value::Number(Number::from(user_id.into().0)));
+
+        self
     }
 
     /// Set the voice region of the server.
@@ -96,8 +102,10 @@ impl EditGuild {
     /// ```
     ///
     /// [`Region::UsWest`]: ../../model/enum.Region.html#variant.UsWest
-    pub fn region(self, region: Region) -> Self {
-        EditGuild(self.0.insert("region", region.name()))
+    pub fn region(mut self, region: Region) -> Self {
+        self.0.insert("region".to_owned(), Value::String(region.name().to_owned()));
+
+        self
     }
 
     /// Set the splash image of the guild on the invitation page.
@@ -107,11 +115,12 @@ impl EditGuild {
     ///
     /// [`InviteSplash`]: ../../model/enum.Feature.html#variant.InviteSplash
     /// [`features`]: ../../model/struct.LiveGuild.html#structfield.features
-    pub fn splash(self, splash: Option<&str>) -> Self {
-        EditGuild(self.0
-            .insert("splash",
-                    splash.map_or_else(|| Value::Null,
-                                       |x| Value::String(x.to_owned()))))
+    pub fn splash(mut self, splash: Option<&str>) -> Self {
+        let splash = splash.map_or(Value::Null, |x| Value::String(x.to_owned()));
+
+        self.0.insert("splash".to_owned(), splash);
+
+        self
     }
 
     /// Set the verification level of the guild. This can restrict what a
@@ -145,15 +154,12 @@ impl EditGuild {
     ///
     /// [`VerificationLevel`]: ../../model/enum.VerificationLevel.html
     /// [`VerificationLevel::High`]: ../../model/enum.VerificationLevel.html#variant.High
-    pub fn verification_level<V>(self, verification_level: V) -> Self
+    pub fn verification_level<V>(mut self, verification_level: V) -> Self
         where V: Into<VerificationLevel> {
-        EditGuild(self.0.insert("verification_level",
-                                verification_level.into().num()))
-    }
-}
+        let num = Value::Number(Number::from(verification_level.into().num()));
 
-impl Default for EditGuild {
-    fn default() -> EditGuild {
-        EditGuild(ObjectBuilder::new())
+        self.0.insert("verification_level".to_owned(), num);
+
+        self
     }
 }
