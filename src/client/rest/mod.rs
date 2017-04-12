@@ -525,6 +525,7 @@ pub fn delete_webhook(webhook_id: u64) -> Result<()> {
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 ///
 /// rest::delete_webhook_with_token(id, token).expect("Error deleting webhook");
+/// ```
 ///
 /// [`Webhook`]: ../../model/struct.Webhook.html
 pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
