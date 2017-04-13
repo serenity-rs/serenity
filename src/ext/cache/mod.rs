@@ -139,6 +139,8 @@ pub struct Cache {
     /// A map of direct message channels that the current user has open with
     /// other users.
     pub private_channels: HashMap<ChannelId, Arc<RwLock<PrivateChannel>>>,
+    /// The total number of shards being used by the bot.
+    pub shard_count: u64,
     /// A list of guilds which are "unavailable". Refer to the documentation for
     /// [`Event::GuildUnavailable`] for more information on when this can occur.
     ///
@@ -877,6 +879,7 @@ impl Cache {
         }
 
         self.presences.extend(ready.presences);
+        self.shard_count = ready.shard.map_or(1, |s| s[1]);
         self.user = ready.user;
     }
 
@@ -938,6 +941,7 @@ impl Default for Cache {
             notes: HashMap::default(),
             presences: HashMap::default(),
             private_channels: HashMap::default(),
+            shard_count: 1,
             unavailable_guilds: HashSet::default(),
             user: CurrentUser {
                 avatar: None,

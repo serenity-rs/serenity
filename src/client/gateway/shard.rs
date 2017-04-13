@@ -18,6 +18,7 @@ use ::internal::prelude::*;
 use ::internal::ws_impl::{ReceiverExt, SenderExt};
 use ::model::event::{Event, GatewayEvent, ReadyEvent};
 use ::model::{Game, GuildId, OnlineStatus};
+use ::utils;
 
 #[cfg(feature="cache")]
 use ::client::CACHE;
@@ -482,7 +483,7 @@ impl Shard {
         Ok(())
     }
 
-    /// Requests that one or multiple [`Guild`]s be synced.
+    /// Requests that one or multiple [`Guild`]s be chunked.
     ///
     /// This will ask Discord to start sending member chunks for large guilds
     /// (250 members+). If a guild is over 250 members, then a full member list
@@ -505,6 +506,28 @@ impl Shard {
         });
 
         let _ = self.keepalive_channel.send(GatewayStatus::SendMessage(msg));
+    }
+
+    /// Calculates the number of guilds that the shard is responsible for.
+    ///
+    /// If sharding is not being used (i.e. 1 shard), then the total number of
+    /// guilds in the [`Cache`] will be used.
+    ///
+    /// **Note**: Requires the `cache` feature be enabled.
+    ///
+    /// [`Cache`]: ../../ext/cache/struct.Cache.html
+    #[cfg(feature="cache")]
+    pub fn guilds_handled(&self) -> u16 {
+        let cache = CACHE.read().unwrap();
+
+        if let Some((shard_id, shard_count)) = self.shard_info.map(|s| (s[0], s[1])) {
+            cache.guilds
+                .keys()
+                .filter(|guild_id| utils::shard_id(guild_id.0, shard_count) == shard_id)
+                .count() as u16
+        } else {
+            cache.guilds.len() as u16
+        }
     }
 
     #[allow(unused_variables)]

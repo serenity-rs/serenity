@@ -233,3 +233,21 @@ pub fn parse_quotes(s: &str) -> Vec<String> {
 
     args
 }
+
+/// Calculates the Id of the shard responsible for a guild, given its Id and
+/// total number of shards used.
+///
+/// # Examples
+///
+/// Retrieve the Id of the shard for a guild with Id `81384788765712384`, using
+/// 17 shards:
+///
+/// ```rust
+/// use serenity::utils;
+///
+/// assert_eq!(utils::shard_id(81384788765712384, 17), 7);
+/// ```
+#[inline]
+pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 {
+    (guild_id >> 22) % shard_count
+}

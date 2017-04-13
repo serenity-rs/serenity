@@ -112,6 +112,50 @@ pub struct InviteGuild {
     pub splash_hash: Option<String>,
 }
 
+impl InviteGuild {
+    /// Returns the Id of the shard associated with the guild.
+    ///
+    /// When the cache is enabled this will automatically retrieve the total
+    /// number of shards.
+    ///
+    /// **Note**: When the cache is enabled, this function unlocks the cache to
+    /// retrieve the total number of shards in use. If you already have the
+    /// total, consider using [`utils::shard_id`].
+    ///
+    /// [`utils::shard_id`]: ../utils/fn.shard_id.html
+    #[cfg(feature="cache")]
+    #[inline]
+    pub fn shard_id(&self) -> u64 {
+        self.id.shard_id()
+    }
+
+    /// Returns the Id of the shard associated with the guild.
+    ///
+    /// When the cache is enabled this will automatically retrieve the total
+    /// number of shards.
+    ///
+    /// When the cache is not enabled, the total number of shards being used
+    /// will need to be passed.
+    ///
+    /// # Examples
+    ///
+    /// Retrieve the Id of the shard for a guild with Id `81384788765712384`,
+    /// using 17 shards:
+    ///
+    /// ```rust,ignore
+    /// use serenity::utils;
+    ///
+    /// // assumes a `guild` has already been bound
+    ///
+    /// assert_eq!(guild.shard_id(17), 7);
+    /// ```
+    #[cfg(not(feature="cache"))]
+    #[inline]
+    pub fn shard_id(&self, shard_count: u64) -> u64 {
+        self.id.shard_id(shard_count)
+    }
+}
+
 /// Detailed information about an invite.
 /// This information can only be retrieved by anyone with the [Manage Guild]
 /// permission. Otherwise, a minimal amount of information can be retrieved via
