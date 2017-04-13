@@ -59,7 +59,7 @@ pub fn identify(token: &str, shard_info: Option<[u64; 2]>) -> Value {
         "d": {
             "compression": !cfg!(feature="debug"),
             "large_threshold": LARGE_THRESHOLD,
-            "shard": shard_info,
+            "shard": shard_info.unwrap_or([0, 1]),
             "token": token,
             "v": constants::GATEWAY_VERSION,
             "properties": {
