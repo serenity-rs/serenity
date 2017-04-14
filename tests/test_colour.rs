@@ -18,23 +18,23 @@ fn from_rgb() {
 }
 
 #[test]
-fn get_r() {
-    assert_eq!(Colour::new(0x336123).get_r(), 0x33);
+fn r() {
+    assert_eq!(Colour::new(0x336123).r(), 0x33);
 }
 
 #[test]
-fn get_g() {
-    assert_eq!(Colour::new(0x336123).get_g(), 0x61);
+fn g() {
+    assert_eq!(Colour::new(0x336123).g(), 0x61);
 }
 
 #[test]
-fn get_b() {
-    assert_eq!(Colour::new(0x336123).get_b(), 0x23);
+fn b() {
+    assert_eq!(Colour::new(0x336123).b(), 0x23);
 }
 
 #[test]
-fn get_tuple() {
-    assert_eq!(Colour::new(0x336123).get_tuple(), (0x33, 0x61, 0x23));
+fn tuple() {
+    assert_eq!(Colour::new(0x336123).tuple(), (0x33, 0x61, 0x23));
 }
 
 #[test]

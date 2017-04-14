@@ -50,6 +50,29 @@ impl GuildId {
         rest::ban_user(self.0, user.into().0, delete_message_days)
     }
 
+    /// Gets a list of the guild's bans.
+    ///
+    /// Requires the [Ban Members] permission.
+    ///
+    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    #[inline]
+    pub fn bans(&self) -> Result<Vec<Ban>> {
+        rest::get_bans(self.0)
+    }
+
+    /// Gets all of the guild's channels over the REST API.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    pub fn channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> {
+        let mut channels = HashMap::new();
+
+        for channel in rest::get_channels(self.0)? {
+            channels.insert(channel.id, channel);
+        }
+
+        Ok(channels)
+    }
+
     /// Creates a [`GuildChannel`] in the the guild.
     ///
     /// Refer to [`rest::create_channel`] for more information.
@@ -267,10 +290,30 @@ impl GuildId {
         rest::edit_role(self.0, role_id.into().0, &f(EditRole::default()).0)
     }
 
+    /// Gets an emoji in the guild by Id.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> {
+        rest::get_emoji(self.0, emoji_id.into().0)
+    }
+
+    /// Gets a list of all of the guild's emojis.
+    ///
+    /// Requires the [Manage Emojis] permission.
+    ///
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
+    pub fn emojis(&self) -> Result<Vec<Emoji>> {
+        rest::get_emojis(self.0)
+    }
+
     /// Search the cache for the guild.
     #[cfg(feature="cache")]
     pub fn find(&self) -> Option<Arc<RwLock<Guild>>> {
-        CACHE.read().unwrap().get_guild(*self)
+        CACHE.read().unwrap().guild(*self)
     }
 
     /// Requests the guild over REST.
@@ -282,54 +325,11 @@ impl GuildId {
         rest::get_guild(self.0)
     }
 
-    /// Gets a list of the guild's bans.
-    ///
-    /// Requires the [Ban Members] permission.
-    ///
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    #[inline]
-    pub fn get_bans(&self) -> Result<Vec<Ban>> {
-        rest::get_bans(self.0)
-    }
-
-    /// Gets all of the guild's channels over the REST API.
-    ///
-    /// [`Guild`]: struct.Guild.html
-    pub fn get_channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> {
-        let mut channels = HashMap::new();
-
-        for channel in rest::get_channels(self.0)? {
-            channels.insert(channel.id, channel);
-        }
-
-        Ok(channels)
-    }
-
-    /// Gets an emoji in the guild by Id.
-    ///
-    /// Requires the [Manage Emojis] permission.
-    ///
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
-    #[inline]
-    pub fn get_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> {
-        rest::get_emoji(self.0, emoji_id.into().0)
-    }
-
-    /// Gets a list of all of the guild's emojis.
-    ///
-    /// Requires the [Manage Emojis] permission.
-    ///
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
-    #[inline]
-    pub fn get_emojis(&self) -> Result<Vec<Emoji>> {
-        rest::get_emojis(self.0)
-    }
-
     /// Gets all integration of the guild.
     ///
     /// This performs a request over the REST API.
     #[inline]
-    pub fn get_integrations(&self) -> Result<Vec<Integration>> {
+    pub fn integrations(&self) -> Result<Vec<Integration>> {
         rest::get_guild_integrations(self.0)
     }
 
@@ -339,55 +339,8 @@ impl GuildId {
     ///
     /// [Manage Guild]: permissions/struct.MANAGE_GUILD.html
     #[inline]
-    pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
+    pub fn invites(&self) -> Result<Vec<RichInvite>> {
         rest::get_guild_invites(self.0)
-    }
-
-    /// Gets a user's [`Member`] for the guild by Id.
-    ///
-    /// [`Guild`]: struct.Guild.html
-    /// [`Member`]: struct.Member.html
-    #[inline]
-    pub fn get_member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
-        rest::get_member(self.0, user_id.into().0)
-    }
-
-    /// Gets a list of the guild's members.
-    ///
-    /// Optionally pass in the `limit` to limit the number of results. Maximum
-    /// value is 1000. Optionally pass in `after` to offset the results by a
-    /// [`User`]'s Id.
-    ///
-    /// [`User`]: struct.User.html
-    #[inline]
-    pub fn get_members<U>(&self, limit: Option<u64>, after: Option<U>)
-        -> Result<Vec<Member>> where U: Into<UserId> {
-        rest::get_guild_members(self.0, limit, after.map(|x| x.into().0))
-    }
-
-    /// Gets the number of [`Member`]s that would be pruned with the given
-    /// number of days.
-    ///
-    /// Requires the [Kick Members] permission.
-    ///
-    /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
-    pub fn get_prune_count(&self, days: u16) -> Result<GuildPrune> {
-        let map = json!({
-            "days": days,
-        });
-
-        rest::get_guild_prune_count(self.0, &map)
-    }
-
-    /// Retrieves the guild's webhooks.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
-    #[inline]
-    pub fn get_webhooks(&self) -> Result<Vec<Webhook>> {
-        rest::get_guild_webhooks(self.0)
     }
 
     /// Kicks a [`Member`] from the guild.
@@ -407,6 +360,28 @@ impl GuildId {
         rest::leave_guild(self.0)
     }
 
+    /// Gets a user's [`Member`] for the guild by Id.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    /// [`Member`]: struct.Member.html
+    #[inline]
+    pub fn member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
+        rest::get_member(self.0, user_id.into().0)
+    }
+
+    /// Gets a list of the guild's members.
+    ///
+    /// Optionally pass in the `limit` to limit the number of results. Maximum
+    /// value is 1000. Optionally pass in `after` to offset the results by a
+    /// [`User`]'s Id.
+    ///
+    /// [`User`]: struct.User.html
+    #[inline]
+    pub fn members<U>(&self, limit: Option<u64>, after: Option<U>)
+        -> Result<Vec<Member>> where U: Into<UserId> {
+        rest::get_guild_members(self.0, limit, after.map(|x| x.into().0))
+    }
+
     /// Moves a member to a specific voice channel.
     ///
     /// Requires the [Move Members] permission.
@@ -418,6 +393,21 @@ impl GuildId {
         map.insert("channel_id".to_owned(), Value::Number(Number::from(channel_id.into().0)));
 
         rest::edit_member(self.0, user_id.into().0, &map)
+    }
+
+    /// Gets the number of [`Member`]s that would be pruned with the given
+    /// number of days.
+    ///
+    /// Requires the [Kick Members] permission.
+    ///
+    /// [`Member`]: struct.Member.html
+    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    pub fn prune_count(&self, days: u16) -> Result<GuildPrune> {
+        let map = json!({
+            "days": days,
+        });
+
+        rest::get_guild_prune_count(self.0, &map)
     }
 
     /// Returns the Id of the shard associated with the guild.
@@ -500,6 +490,107 @@ impl GuildId {
     #[inline]
     pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
         rest::remove_ban(self.0, user_id.into().0)
+    }
+
+    /// Retrieves the guild's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[inline]
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
+        rest::get_guild_webhooks(self.0)
+    }
+
+    /// Alias of [`bans`].
+    ///
+    /// [`bans`]: #method.bans
+    #[deprecated(since="0.1.5", note="Use `bans` instead.")]
+    #[inline]
+    pub fn get_bans(&self) -> Result<Vec<Ban>> {
+        self.bans()
+    }
+
+    /// Alias of [`channels`].
+    ///
+    /// [`channels`]: #method.channels
+    #[deprecated(since="0.1.5", note="Use `channels` instead.")]
+    #[inline]
+    pub fn get_channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> {
+        self.channels()
+    }
+
+    /// Alias of [`emoji`].
+    ///
+    /// [`emoji`]: #method.emoji
+    #[deprecated(since="0.1.5", note="Use `emoji` instead.")]
+    #[inline]
+    pub fn get_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> {
+        self.emoji(emoji_id)
+    }
+
+    /// Alias of [`emojis`].
+    ///
+    /// [`emojis`]: #method.emojis
+    #[deprecated(since="0.1.5", note="Use `emojis` instead.")]
+    #[inline]
+    pub fn get_emojis(&self) -> Result<Vec<Emoji>> {
+        self.emojis()
+    }
+
+    /// Alias of [`integrations`].
+    ///
+    /// [`integrations`]: #method.integrations
+    #[deprecated(since="0.1.5", note="Use `integrations` instead.")]
+    #[inline]
+    pub fn get_integrations(&self) -> Result<Vec<Integration>> {
+        self.integrations()
+    }
+
+    /// Alias of [`invites`].
+    ///
+    /// [`invites`]: #method.invites
+    #[deprecated(since="0.1.5", note="Use `invites` instead.")]
+    #[inline]
+    pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
+        self.invites()
+    }
+
+    /// Alias of [`member`].
+    ///
+    /// [`member`]: #method.member
+    #[deprecated(since="0.1.5", note="Use `member` instead.")]
+    #[inline]
+    pub fn get_member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
+        self.member(user_id)
+    }
+
+    /// Alias of [`members`].
+    ///
+    /// [`members`]: #method.members
+    #[deprecated(since="0.1.5", note="Use `members` instead.")]
+    #[inline]
+    pub fn get_members<U>(&self, limit: Option<u64>, after: Option<U>)
+        -> Result<Vec<Member>> where U: Into<UserId> {
+        self.members(limit, after)
+    }
+
+    /// Alias of [`prune_count`].
+    ///
+    /// [`prune_count`]: #method.prune_count
+    #[deprecated(since="0.1.5", note="Use `prune_count` instead.")]
+    #[inline]
+    pub fn get_prune_count(&self, days: u16) -> Result<GuildPrune> {
+        self.prune_count(days)
+    }
+
+    /// Alias of [`webhooks`].
+    ///
+    /// [`webhooks`]: #method.webhooks
+    #[deprecated(since="0.1.5", note="Use `webhooks` instead.")]
+    #[inline]
+    pub fn get_webhooks(&self) -> Result<Vec<Webhook>> {
+        self.webhooks()
     }
 }
 

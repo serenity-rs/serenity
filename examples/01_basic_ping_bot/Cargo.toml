@@ -4,4 +4,6 @@ version = "0.1.0"
 authors = ["my name <my@email.address>"]
 
 [dependencies]
-serenity = { path = "../../" }
+serenity = { path = "../../", default-features = true }
+env_logger = "*"
+log= "*"

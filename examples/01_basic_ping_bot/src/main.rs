@@ -1,9 +1,13 @@
 extern crate serenity;
+#[macro_use] extern crate log;
+extern crate env_logger;
 
 use serenity::Client;
 use std::env;
 
 fn main() {
+    env_logger::init().unwrap();
+
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
@@ -27,6 +31,8 @@ fn main() {
             if let Err(why) = msg.channel_id.say("Pong!") {
                 println!("Error sending message: {:?}", why);
             }
+
+            println!("{:?}", serenity::client::CACHE.read().unwrap().get_guild_channel(244567637332328450));
         }
     });
 

@@ -236,9 +236,9 @@ impl Message {
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn get_reaction_users<R, U>(&self, reaction_type: R, limit: Option<u8>, after: Option<U>)
+    pub fn reaction_users<R, U>(&self, reaction_type: R, limit: Option<u8>, after: Option<U>)
         -> Result<Vec<User>> where R: Into<ReactionType>, U: Into<UserId> {
-        self.channel_id.get_reaction_users(self.id, reaction_type, limit, after)
+        self.channel_id.reaction_users(self.id, reaction_type, limit, after)
     }
 
     /// Returns the associated `Guild` for the message if one is in the cache.
@@ -251,7 +251,7 @@ impl Message {
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature="cache")]
     pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> {
-        self.guild_id().and_then(|guild_id| CACHE.read().unwrap().get_guild(guild_id))
+        self.guild_id().and_then(|guild_id| CACHE.read().unwrap().guild(guild_id))
     }
 
     /// Retrieves the Id of the guild that the message was sent in, if sent in
@@ -261,7 +261,7 @@ impl Message {
     /// cache.
     #[cfg(feature="cache")]
     pub fn guild_id(&self) -> Option<GuildId> {
-        match CACHE.read().unwrap().get_channel(self.channel_id) {
+        match CACHE.read().unwrap().channel(self.channel_id) {
             Some(Channel::Guild(ch)) => Some(ch.read().unwrap().guild_id),
             _ => None,
         }
@@ -270,7 +270,7 @@ impl Message {
     /// True if message was sent using direct messages.
     #[cfg(feature="cache")]
     pub fn is_private(&self) -> bool {
-        match CACHE.read().unwrap().get_channel(self.channel_id) {
+        match CACHE.read().unwrap().channel(self.channel_id) {
             Some(Channel::Group(_)) | Some(Channel::Private(_)) => true,
             _ => false,
         }
@@ -420,6 +420,16 @@ impl Message {
         }
 
         rest::unpin_message(self.channel_id.0, self.id.0)
+    }
+
+    /// Alias of [`reaction_users`].
+    ///
+    /// [`reaction_users`]: #method.reaction_users
+    #[deprecated(since="0.1.5", note="Use `reaction_users` instead.")]
+    #[inline]
+    pub fn get_reaction_users<R, U>(&self, reaction_type: R, limit: Option<u8>, after: Option<U>)
+        -> Result<Vec<User>> where R: Into<ReactionType>, U: Into<UserId> {
+        self.reaction_users(reaction_type, limit, after)
     }
 }
 

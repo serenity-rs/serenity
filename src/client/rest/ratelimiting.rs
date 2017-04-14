@@ -383,7 +383,7 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
             let redo = if response.headers.get_raw("x-ratelimit-global").is_some() {
                 let _ = GLOBAL.lock().expect("global route lock poisoned");
 
-                Ok(if let Some(retry_after) = get_header(&response.headers, "retry-after")? {
+                Ok(if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {
                     debug!("Ratelimited: {:?}ms", retry_after);
                     thread::sleep(Duration::from_millis(retry_after as u64));
 
@@ -463,21 +463,21 @@ impl RateLimit {
 
     #[doc(hidden)]
     pub fn post_hook(&mut self, response: &Response) -> Result<bool> {
-        if let Some(limit) = get_header(&response.headers, "x-ratelimit-limit")? {
+        if let Some(limit) = parse_header(&response.headers, "x-ratelimit-limit")? {
             self.limit = limit;
         }
 
-        if let Some(remaining) = get_header(&response.headers, "x-ratelimit-remaining")? {
+        if let Some(remaining) = parse_header(&response.headers, "x-ratelimit-remaining")? {
             self.remaining = remaining;
         }
 
-        if let Some(reset) = get_header(&response.headers, "x-ratelimit-reset")? {
+        if let Some(reset) = parse_header(&response.headers, "x-ratelimit-reset")? {
             self.reset = reset;
         }
 
         Ok(if response.status != StatusCode::TooManyRequests {
             false
-        } else if let Some(retry_after) = get_header(&response.headers, "retry-after")? {
+        } else if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {
             debug!("Ratelimited: {:?}ms", retry_after);
             thread::sleep(Duration::from_millis(retry_after as u64));
 
@@ -488,7 +488,7 @@ impl RateLimit {
     }
 }
 
-fn get_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
+fn parse_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
     match headers.get_raw(header) {
         Some(header) => match str::from_utf8(&header[0]) {
             Ok(v) => match v.parse::<i64>() {

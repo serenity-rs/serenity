@@ -57,6 +57,24 @@ impl PartialGuild {
         self.id.ban(user, delete_message_days)
     }
 
+    /// Gets a list of the guild's bans.
+    ///
+    /// Requires the [Ban Members] permission.
+    ///
+    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    #[inline]
+    pub fn bans(&self) -> Result<Vec<Ban>> {
+        self.id.bans()
+    }
+
+    /// Gets all of the guild's channels over the REST API.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    #[inline]
+    pub fn channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> {
+        self.id.channels()
+    }
+
     /// Creates a [`GuildChannel`] in the guild.
     ///
     /// Refer to [`rest::create_channel`] for more information.
@@ -264,40 +282,14 @@ impl PartialGuild {
         self.id.edit_nickname(new_nickname)
     }
 
-    /// Gets a partial amount of guild data by its Id.
-    ///
-    /// Requires that the current user be in the guild.
-    #[inline]
-    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> {
-        guild_id.into().get()
-    }
-
-    /// Gets a list of the guild's bans.
-    ///
-    /// Requires the [Ban Members] permission.
-    ///
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    #[inline]
-    pub fn get_bans(&self) -> Result<Vec<Ban>> {
-        self.id.get_bans()
-    }
-
-    /// Gets all of the guild's channels over the REST API.
-    ///
-    /// [`Guild`]: struct.Guild.html
-    #[inline]
-    pub fn get_channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> {
-        self.id.get_channels()
-    }
-
     /// Gets an emoji in the guild by Id.
     ///
     /// Requires the [Manage Emojis] permission.
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     #[inline]
-    pub fn get_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> {
-        self.id.get_emoji(emoji_id)
+    pub fn emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> {
+        self.id.emoji(emoji_id)
     }
 
     /// Gets a list of all of the guild's emojis.
@@ -306,68 +298,16 @@ impl PartialGuild {
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     #[inline]
-    pub fn get_emojis(&self) -> Result<Vec<Emoji>> {
-        self.id.get_emojis()
+    pub fn emojis(&self) -> Result<Vec<Emoji>> {
+        self.id.emojis()
     }
 
-    /// Gets all integration of the guild.
+    /// Gets a partial amount of guild data by its Id.
     ///
-    /// This performs a request over the REST API.
+    /// Requires that the current user be in the guild.
     #[inline]
-    pub fn get_integrations(&self) -> Result<Vec<Integration>> {
-        self.id.get_integrations()
-    }
-
-    /// Gets all of the guild's invites.
-    ///
-    /// Requires the [Manage Guild] permission.
-    ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    #[inline]
-    pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
-        self.id.get_invites()
-    }
-
-    /// Gets a user's [`Member`] for the guild by Id.
-    ///
-    /// [`Guild`]: struct.Guild.html
-    /// [`Member`]: struct.Member.html
-    pub fn get_member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
-        self.id.get_member(user_id)
-    }
-
-    /// Gets a list of the guild's members.
-    ///
-    /// Optionally pass in the `limit` to limit the number of results. Maximum
-    /// value is 1000. Optionally pass in `after` to offset the results by a
-    /// [`User`]'s Id.
-    ///
-    /// [`User`]: struct.User.html
-    pub fn get_members<U>(&self, limit: Option<u64>, after: Option<U>)
-        -> Result<Vec<Member>> where U: Into<UserId> {
-        self.id.get_members(limit, after)
-    }
-
-    /// Gets the number of [`Member`]s that would be pruned with the given
-    /// number of days.
-    ///
-    /// Requires the [Kick Members] permission.
-    ///
-    /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
-    #[inline]
-    pub fn get_prune_count(&self, days: u16) -> Result<GuildPrune> {
-        self.id.get_prune_count(days)
-    }
-
-    /// Retrieves the guild's webhooks.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
-    #[inline]
-    pub fn get_webhooks(&self) -> Result<Vec<Webhook>> {
-        self.id.get_webhooks()
+    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> {
+        guild_id.into().get()
     }
 
     /// Kicks a [`Member`] from the guild.
@@ -387,10 +327,48 @@ impl PartialGuild {
             format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
     }
 
+    /// Gets all integration of the guild.
+    ///
+    /// This performs a request over the REST API.
+    #[inline]
+    pub fn integrations(&self) -> Result<Vec<Integration>> {
+        self.id.integrations()
+    }
+
+    /// Gets all of the guild's invites.
+    ///
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[inline]
+    pub fn invites(&self) -> Result<Vec<RichInvite>> {
+        self.id.invites()
+    }
+
     /// Leaves the guild.
     #[inline]
     pub fn leave(&self) -> Result<PartialGuild> {
         self.id.leave()
+    }
+
+    /// Gets a user's [`Member`] for the guild by Id.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    /// [`Member`]: struct.Member.html
+    pub fn member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
+        self.id.member(user_id)
+    }
+
+    /// Gets a list of the guild's members.
+    ///
+    /// Optionally pass in the `limit` to limit the number of results. Maximum
+    /// value is 1000. Optionally pass in `after` to offset the results by a
+    /// [`User`]'s Id.
+    ///
+    /// [`User`]: struct.User.html
+    pub fn members<U>(&self, limit: Option<u64>, after: Option<U>)
+        -> Result<Vec<Member>> where U: Into<UserId> {
+        self.id.members(limit, after)
     }
 
     /// Moves a member to a specific voice channel.
@@ -402,6 +380,18 @@ impl PartialGuild {
     pub fn move_member<C, U>(&self, user_id: U, channel_id: C) -> Result<()>
         where C: Into<ChannelId>, U: Into<UserId> {
         self.id.move_member(user_id, channel_id)
+    }
+
+    /// Gets the number of [`Member`]s that would be pruned with the given
+    /// number of days.
+    ///
+    /// Requires the [Kick Members] permission.
+    ///
+    /// [`Member`]: struct.Member.html
+    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    #[inline]
+    pub fn prune_count(&self, days: u16) -> Result<GuildPrune> {
+        self.id.prune_count(days)
     }
 
     /// Returns the Id of the shard associated with the guild.
@@ -471,5 +461,106 @@ impl PartialGuild {
     #[inline]
     pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
         self.id.unban(user_id)
+    }
+
+    /// Retrieves the guild's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[inline]
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
+        self.id.webhooks()
+    }
+
+    /// Alias of [`bans`].
+    ///
+    /// [`bans`]: #method.bans
+    #[deprecated(since="0.1.5", note="Use `bans` instead.")]
+    #[inline]
+    pub fn get_bans(&self) -> Result<Vec<Ban>> {
+        self.bans()
+    }
+
+    /// Alias of [`channels`].
+    ///
+    /// [`channels`]: #method.channels
+    #[deprecated(since="0.1.5", note="Use `channels` instead.")]
+    #[inline]
+    pub fn get_channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> {
+        self.channels()
+    }
+
+    /// Alias of [`emoji`].
+    ///
+    /// [`emoji`]: #method.emoji
+    #[deprecated(since="0.1.5", note="Use `emoji` instead.")]
+    #[inline]
+    pub fn get_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> {
+        self.emoji(emoji_id)
+    }
+
+    /// Alias of [`emojis`].
+    ///
+    /// [`emojis`]: #method.emojis
+    #[deprecated(since="0.1.5", note="Use `emojis` instead.")]
+    #[inline]
+    pub fn get_emojis(&self) -> Result<Vec<Emoji>> {
+        self.emojis()
+    }
+
+    /// Alias of [`integrations`].
+    ///
+    /// [`integrations`]: #method.integrations
+    #[deprecated(since="0.1.5", note="Use `integrations` instead.")]
+    #[inline]
+    pub fn get_integrations(&self) -> Result<Vec<Integration>> {
+        self.integrations()
+    }
+
+    /// Alias of [`invites`].
+    ///
+    /// [`invites`]: #method.invites
+    #[deprecated(since="0.1.5", note="Use `invites` instead.")]
+    #[inline]
+    pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
+        self.invites()
+    }
+
+    /// Alias of [`member`].
+    ///
+    /// [`member`]: #method.member
+    #[deprecated(since="0.1.5", note="Use `member` instead.")]
+    #[inline]
+    pub fn get_member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
+        self.member(user_id)
+    }
+
+    /// Alias of [`members`].
+    ///
+    /// [`members`]: #method.members
+    #[deprecated(since="0.1.5", note="Use `members` instead.")]
+    #[inline]
+    pub fn get_members<U>(&self, limit: Option<u64>, after: Option<U>)
+        -> Result<Vec<Member>> where U: Into<UserId> {
+        self.members(limit, after)
+    }
+
+    /// Alias of [`prune_count`].
+    ///
+    /// [`prune_count`]: #method.prune_count
+    #[deprecated(since="0.1.5", note="Use `prune_count` instead.")]
+    #[inline]
+    pub fn get_prune_count(&self, days: u16) -> Result<GuildPrune> {
+        self.prune_count(days)
+    }
+
+    /// Alias of [`webhooks`].
+    ///
+    /// [`webhooks`]: #method.webhooks
+    #[deprecated(since="0.1.5", note="Use `webhooks` instead.")]
+    #[inline]
+    pub fn get_webhooks(&self) -> Result<Vec<Webhook>> {
+        self.webhooks()
     }
 }

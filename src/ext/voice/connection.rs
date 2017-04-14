@@ -137,7 +137,7 @@ impl Connection {
             sender.send_json(&payload::build_select_protocol(addr, port))?;
         }
 
-        let key = get_encryption_key(&mut receiver)?;
+        let key = encryption_key(&mut receiver)?;
 
         let thread_items = start_threads(receiver, &udp)?;
 
@@ -388,7 +388,7 @@ fn generate_url(endpoint: &mut String) -> Result<WebsocketUrl> {
 }
 
 #[inline]
-fn get_encryption_key(receiver: &mut WsReceiver<WebSocketStream>)
+fn encryption_key(receiver: &mut WsReceiver<WebSocketStream>)
     -> Result<Key> {
     loop {
         match receiver.recv_json(VoiceEvent::decode)? {

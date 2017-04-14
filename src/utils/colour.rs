@@ -22,7 +22,7 @@ macro_rules! colour {
 /// # Examples
 ///
 /// Passing in a role's colour, and then retrieving its green component
-/// via [`get_g`]:
+/// via [`g`]:
 ///
 /// ```rust,ignore
 /// use serenity::utils::Colour;
@@ -30,7 +30,7 @@ macro_rules! colour {
 /// // assuming a `role` has already been bound
 ///
 /// let colour = Colour::new(role.colour);
-/// let green = colour.get_g();
+/// let green = colour.g();
 ///
 /// println!("The green component is: {}", green);
 /// ```
@@ -42,7 +42,7 @@ macro_rules! colour {
 ///
 /// let colour = Colour::dark_teal();
 ///
-/// assert_eq!(colour.get_tuple(), (17, 128, 106));
+/// assert_eq!(colour.tuple(), (17, 128, 106));
 /// ```
 ///
 /// Colours can also be directly compared for equivilance:
@@ -60,7 +60,7 @@ macro_rules! colour {
 ///
 /// [`Role`]: ../model/struct.Role.html
 /// [`dark_teal`]: #method.dark_teal
-/// [`get_g`]: #method.get_g
+/// [`g`]: #method.g
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Colour(pub u32);
 
@@ -70,17 +70,17 @@ impl Colour {
     /// # Examples
     ///
     /// Create a new Colour, and then ensure that its inner value is equivalent
-    /// to a specific RGB value, retrieved via [`get_tuple`]:
+    /// to a specific RGB value, retrieved via [`tuple`]:
     ///
     /// ```rust
     /// use serenity::utils::Colour;
     ///
     /// let colour = Colour::new(6573123);
     ///
-    /// assert_eq!(colour.get_tuple(), (100, 76, 67));
+    /// assert_eq!(colour.tuple(), (100, 76, 67));
     /// ```
     ///
-    /// [`get_tuple`]: #method.get_tuple
+    /// [`tuple`]: #method.tuple
     #[inline]
     pub fn new(value: u32) -> Colour {
         Colour(value)
@@ -107,10 +107,10 @@ impl Colour {
     ///
     /// let colour = Colour::from_rgb(217, 45, 215);
     ///
-    /// assert_eq!(colour.get_r(), 217);
-    /// assert_eq!(colour.get_g(), 45);
-    /// assert_eq!(colour.get_b(), 215);
-    /// assert_eq!(colour.get_tuple(), (217, 45, 215));
+    /// assert_eq!(colour.r(), 217);
+    /// assert_eq!(colour.g(), 45);
+    /// assert_eq!(colour.b(), 215);
+    /// assert_eq!(colour.tuple(), (217, 45, 215));
     /// ```
     pub fn from_rgb(r: u8, g: u8, b: u8) -> Colour {
         let mut uint = r as u32;
@@ -127,9 +127,9 @@ impl Colour {
     /// ```rust
     /// use serenity::utils::Colour;
     ///
-    /// assert_eq!(Colour::new(6573123).get_r(), 100);
+    /// assert_eq!(Colour::new(6573123).r(), 100);
     /// ```
-    pub fn get_r(&self) -> u8 {
+    pub fn r(&self) -> u8 {
         ((self.0 >> 16) & 255) as u8
     }
 
@@ -140,9 +140,9 @@ impl Colour {
     /// ```rust
     /// use serenity::utils::Colour;
     ///
-    /// assert_eq!(Colour::new(6573123).get_g(), 76);
+    /// assert_eq!(Colour::new(6573123).g(), 76);
     /// ```
-    pub fn get_g(&self) -> u8 {
+    pub fn g(&self) -> u8 {
         ((self.0 >> 8) & 255) as u8
     }
 
@@ -153,29 +153,65 @@ impl Colour {
     /// ```rust
     /// use serenity::utils::Colour;
     ///
-    /// assert_eq!(Colour::new(6573123).get_b(), 67);
-    pub fn get_b(&self) -> u8 {
+    /// assert_eq!(Colour::new(6573123).b(), 67);
+    pub fn b(&self) -> u8 {
         (self.0 & 255) as u8
     }
 
     /// Returns a tuple of the red, green, and blue components of this Colour.
     ///
     /// This is equivalent to creating a tuple with the return values of
-    /// [`get_r`], [`get_g`], and [`get_b`].
+    /// [`r`], [`g`], and [`b`].
     ///
     /// # Examples
     ///
     /// ```rust
     /// use serenity::utils::Colour;
     ///
-    /// assert_eq!(Colour::new(6573123).get_tuple(), (100, 76, 67));
+    /// assert_eq!(Colour::new(6573123).tuple(), (100, 76, 67));
     /// ```
     ///
-    /// [`get_r`]: #method.get_r
-    /// [`get_g`]: #method.get_g
-    /// [`get_b`]: #method.get_b
+    /// [`r`]: #method.r
+    /// [`g`]: #method.g
+    /// [`b`]: #method.b
+    pub fn tuple(&self) -> (u8, u8, u8) {
+        (self.r(), self.g(), self.b())
+    }
+
+    /// Alias of [`r`].
+    ///
+    /// [`r`]: #method.r
+    #[deprecated(since="0.1.5", note="Use `r` instead.")]
+    #[inline]
+    pub fn get_r(&self) -> u8 {
+        self.r()
+    }
+
+    /// Alias of [`g`].
+    ///
+    /// [`g`]: #method.g
+    #[deprecated(since="0.1.5", note="Use `g` instead.")]
+    #[inline]
+    pub fn get_g(&self) -> u8 {
+        self.g()
+    }
+
+    /// Alias of [`b`].
+    ///
+    /// [`b`]: #method.b
+    #[deprecated(since="0.1.5", note="Use `b` instead.")]
+    #[inline]
+    pub fn get_b(&self) -> u8 {
+        self.b()
+    }
+
+    /// Alias of [`tuple`].
+    ///
+    /// [`tuple`]: #method.tuple
+    #[deprecated(since="0.1.5", note="Use `tuple` instead.")]
+    #[inline]
     pub fn get_tuple(&self) -> (u8, u8, u8) {
-        (self.get_r(), self.get_g(), self.get_b())
+        self.tuple()
     }
 }
 
@@ -191,7 +227,7 @@ impl From<i32> for Colour {
     /// ```rust
     /// use serenity::utils::Colour;
     ///
-    /// assert_eq!(Colour::from(0xDEA584).get_tuple(), (222, 165, 132));
+    /// assert_eq!(Colour::from(0xDEA584).tuple(), (222, 165, 132));
     /// ```
     fn from(value: i32) -> Colour {
         Colour(value as u32)
@@ -208,7 +244,7 @@ impl From<u32> for Colour {
     /// ```rust
     /// use serenity::utils::Colour;
     ///
-    /// assert_eq!(Colour::from(6573123u32).get_r(), 100);
+    /// assert_eq!(Colour::from(6573123u32).r(), 100);
     /// ```
     fn from(value: u32) -> Colour {
         Colour(value)
@@ -225,7 +261,7 @@ impl From<u64> for Colour {
     /// ```rust
     /// use serenity::utils::Colour;
     ///
-    /// assert_eq!(Colour::from(6573123u64).get_r(), 100);
+    /// assert_eq!(Colour::from(6573123u64).r(), 100);
     /// ```
     fn from(value: u64) -> Colour {
         Colour(value as u32)

@@ -276,7 +276,7 @@ impl Cache {
     /// [`get_private_channel`]: #method.get_private_channel
     /// [`groups`]: #structfield.groups
     /// [`private_channels`]: #structfield.private_channels
-    pub fn get_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
+    pub fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
         let id = id.into();
 
         if let Some(channel) = self.channels.get(&id) {
@@ -301,7 +301,7 @@ impl Cache {
     ///
     /// [`GuildId`]: ../../model/struct.GuildId.html
     #[inline]
-    pub fn get_guild<G: Into<GuildId>>(&self, id: G) -> Option<Arc<RwLock<Guild>>> {
+    pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<Arc<RwLock<Guild>>> {
         self.guilds.get(&id.into()).cloned()
     }
 
@@ -338,8 +338,7 @@ impl Cache {
     /// [`Guild`]: ../../model/struct.Guild.html
     /// [`get_channel`]: #method.get_channel
     #[inline]
-    pub fn get_guild_channel<C: Into<ChannelId>>(&self, id: C)
-        -> Option<Arc<RwLock<GuildChannel>>> {
+    pub fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<GuildChannel>>> {
         self.channels.get(&id.into()).cloned()
     }
 
@@ -352,7 +351,7 @@ impl Cache {
     /// [`ChannelId`]: ../../model/struct.ChannelId.html
     /// [`Group`]: ../../model/struct.Group.html
     #[inline]
-    pub fn get_group<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<Group>>> {
+    pub fn group<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<Group>>> {
         self.groups.get(&id.into()).cloned()
     }
 
@@ -401,7 +400,7 @@ impl Cache {
     /// [`Client::on_message`]: ../../client/struct.Client.html#method.on_message
     /// [`Guild`]: ../../model/struct.Guild.html
     /// [`members`]: ../../model/struct.Guild.html#structfield.members
-    pub fn get_member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
+    pub fn member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
         where G: Into<GuildId>, U: Into<UserId> {
         self.guilds
             .get(&guild_id.into())
@@ -414,7 +413,7 @@ impl Cache {
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`ChannelId`].
     #[inline]
-    pub fn get_private_channel<C: Into<ChannelId>>(&self, channel_id: C)
+    pub fn private_channel<C: Into<ChannelId>>(&self, channel_id: C)
         -> Option<Arc<RwLock<PrivateChannel>>> {
         self.private_channels.get(&channel_id.into()).cloned()
     }
@@ -426,7 +425,7 @@ impl Cache {
     ///
     /// [`Guild`]: ../../model/struct.Guild.html
     /// [`roles`]: ../../model/struct.Guild.html#structfield.roles
-    pub fn get_role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
+    pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
         where G: Into<GuildId>, R: Into<RoleId> {
         self.guilds
             .get(&guild_id.into())
@@ -441,8 +440,75 @@ impl Cache {
     /// [`UserId`]: ../../model/struct.UserId.html
     /// [`users`]: #structfield.users
     #[inline]
-    pub fn get_user<U: Into<UserId>>(&self, user_id: U) -> Option<Arc<RwLock<User>>> {
+    pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<Arc<RwLock<User>>> {
         self.users.get(&user_id.into()).cloned()
+    }
+
+    /// Alias of [`channel`].
+    ///
+    /// [`channel`]: #method.channel
+    #[deprecated(since="0.1.5", note="Use `channel` instead.")]
+    #[inline]
+    pub fn get_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
+        self.channel(id)
+    }
+
+    /// Alias of [`guild`].
+    ///
+    /// [`guild`]: #method.guild
+    #[deprecated(since="0.1.5", note="Use `guild` instead.")]
+    #[inline]
+    pub fn get_guild<G: Into<GuildId>>(&self, id: G) -> Option<Arc<RwLock<Guild>>> {
+        self.guild(id)
+    }
+
+    /// Alias of [`guild_channel`].
+    ///
+    /// [`guild_channel`]: #method.guild_channel
+    #[deprecated(since="0.1.5", note="Use `guild_channel` instead.")]
+    #[inline]
+    pub fn get_guild_channel<C: Into<ChannelId>>(&self, id: C)
+        -> Option<Arc<RwLock<GuildChannel>>> {
+        self.guild_channel(id)
+    }
+
+    /// Alias of [`member`].
+    ///
+    /// [`member`]: #method.member
+    #[deprecated(since="0.1.5", note="Use `member` instead.")]
+    #[inline]
+    pub fn get_member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
+        where G: Into<GuildId>, U: Into<UserId> {
+        self.member(guild_id, user_id)
+    }
+
+    /// Alias of [`private_channel`].
+    ///
+    /// [`private_channel`]: #method.private_channel
+    #[deprecated(since="0.1.5", note="Use `private_channel` instead.")]
+    #[inline]
+    pub fn get_private_channel<C: Into<ChannelId>>(&self, id: C)
+        -> Option<Arc<RwLock<PrivateChannel>>> {
+        self.private_channel(id)
+    }
+
+    /// Alias of [`role`].
+    ///
+    /// [`role`]: #method.role
+    #[deprecated(since="0.1.5", note="Use `role` instead.")]
+    #[inline]
+    pub fn get_role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
+        where G: Into<GuildId>, R: Into<RoleId> {
+        self.role(guild_id, role_id)
+    }
+
+    /// Alias of [`user`].
+    ///
+    /// [`user`]: #method.user
+    #[deprecated(since="0.1.5", note="Use `user` instead.")]
+    #[inline]
+    pub fn get_user<U: Into<UserId>>(&self, id: U) -> Option<Arc<RwLock<User>>> {
+        self.user(id)
     }
 
     #[doc(hidden)]

@@ -128,13 +128,11 @@ pub fn deserialize_voice_states<D: Deserializer>(deserializer: D)
 }
 
 #[cfg(feature="cache")]
-pub fn user_has_perms(channel_id: ChannelId,
-                      mut permissions: Permissions)
-                      -> Result<bool> {
+pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Result<bool> {
     let cache = CACHE.read().unwrap();
     let current_user = &cache.user;
 
-    let channel = match cache.get_channel(channel_id) {
+    let channel = match cache.channel(channel_id) {
         Some(channel) => channel,
         None => return Err(Error::Client(ClientError::ItemMissing)),
     };
@@ -146,7 +144,7 @@ pub fn user_has_perms(channel_id: ChannelId,
         Channel::Guild(channel) => channel.read().unwrap().guild_id,
     };
 
-    let guild = match cache.get_guild(guild_id) {
+    let guild = match cache.guild(guild_id) {
         Some(guild) => guild,
         None => return Err(Error::Client(ClientError::ItemMissing)),
     };

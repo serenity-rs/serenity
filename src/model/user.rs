@@ -594,7 +594,7 @@ impl UserId {
     /// Search the cache for the user with the Id.
     #[cfg(feature="cache")]
     pub fn find(&self) -> Option<Arc<RwLock<User>>> {
-        CACHE.read().unwrap().get_user(*self)
+        CACHE.read().unwrap().user(*self)
     }
 
     /// Gets a user by its Id over the REST API.

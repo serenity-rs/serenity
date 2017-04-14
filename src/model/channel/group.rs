@@ -143,49 +143,6 @@ impl Group {
         self.channel_id.edit_message(message_id, f)
     }
 
-    /// Gets a message from the channel.
-    ///
-    /// Requires the [Read Message History] permission.
-    ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[inline]
-    pub fn get_message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        self.channel_id.get_message(message_id)
-    }
-
-    /// Gets messages from the channel.
-    ///
-    /// Requires the [Read Message History] permission.
-    ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[inline]
-    pub fn get_messages<F>(&self, f: F) -> Result<Vec<Message>>
-        where F: FnOnce(GetMessages) -> GetMessages {
-        self.channel_id.get_messages(f)
-    }
-
-    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
-    /// certain [`Emoji`].
-    ///
-    /// Refer to [`Channel::get_reaction_users`] for more information.
-    ///
-    /// **Note**: Requires the [Read Message History] permission.
-    ///
-    /// [`Channel::get_reaction_users`]: enum.Channel.html#variant.get_reaction_users
-    /// [`Emoji`]: struct.Emoji.html
-    /// [`Message`]: struct.Message.html
-    /// [`User`]: struct.User.html
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[inline]
-    pub fn get_reaction_users<M, R, U>(&self,
-                                       message_id: M,
-                                       reaction_type: R,
-                                       limit: Option<u8>,
-                                       after: Option<U>)
-        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.channel_id.get_reaction_users(message_id, reaction_type, limit, after)
-    }
-
     /// Returns the formatted URI of the group's icon if one exists.
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon|
@@ -196,6 +153,27 @@ impl Group {
     #[inline]
     pub fn leave(&self) -> Result<Group> {
         rest::leave_group(self.channel_id.0)
+    }
+
+    /// Gets a message from the channel.
+    ///
+    /// Requires the [Read Message History] permission.
+    ///
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    #[inline]
+    pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
+        self.channel_id.message(message_id)
+    }
+
+    /// Gets messages from the channel.
+    ///
+    /// Requires the [Read Message History] permission.
+    ///
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    #[inline]
+    pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
+        where F: FnOnce(GetMessages) -> GetMessages {
+        self.channel_id.messages(f)
     }
 
     /// Generates a name for the group.
@@ -225,6 +203,28 @@ impl Group {
     #[inline]
     pub fn pins(&self) -> Result<Vec<Message>> {
         self.channel_id.pins()
+    }
+
+    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
+    /// certain [`Emoji`].
+    ///
+    /// Refer to [`Channel::get_reaction_users`] for more information.
+    ///
+    /// **Note**: Requires the [Read Message History] permission.
+    ///
+    /// [`Channel::get_reaction_users`]: enum.Channel.html#variant.get_reaction_users
+    /// [`Emoji`]: struct.Emoji.html
+    /// [`Message`]: struct.Message.html
+    /// [`User`]: struct.User.html
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    #[inline]
+    pub fn reaction_users<M, R, U>(&self,
+                                   message_id: M,
+                                   reaction_type: R,
+                                   limit: Option<u8>,
+                                   after: Option<U>)
+        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
+        self.channel_id.reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Removes a recipient from the group. If the recipient is already not in
@@ -304,5 +304,38 @@ impl Group {
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.channel_id.unpin(message_id)
+    }
+
+    /// Alias of [`message`].
+    ///
+    /// [`message`]: #method.message
+    #[deprecated(since="0.1.5", note="Use `message` instead.")]
+    #[inline]
+    pub fn get_message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
+        self.message(message_id)
+    }
+
+    /// Alias of [`messages`].
+    ///
+    /// [`messages`]: #method.messages
+    #[deprecated(since="0.1.5", note="Use `messages` instead.")]
+    #[inline]
+    pub fn get_messages<F>(&self, f: F) -> Result<Vec<Message>>
+        where F: FnOnce(GetMessages) -> GetMessages {
+        self.messages(f)
+    }
+
+    /// Alias of [`reaction_users`].
+    ///
+    /// [`reaction_users`]: #method.reaction_users
+    #[deprecated(since="0.1.5", note="Use `reaction_users` instead.")]
+    #[inline]
+    pub fn get_reaction_users<M, R, U>(&self,
+                                       message_id: M,
+                                       reaction_type: R,
+                                       limit: Option<u8>,
+                                       after: Option<U>)
+        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
+        self.reaction_users(message_id, reaction_type, limit, after)
     }
 }

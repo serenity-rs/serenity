@@ -201,7 +201,15 @@ impl Guild {
             }
         }
 
-        self.id.get_bans()
+        self.id.bans()
+    }
+
+    /// Gets all of the guild's channels over the REST API.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    #[inline]
+    pub fn channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> {
+        self.id.channels()
     }
 
     /// Creates a guild with the data provided.
@@ -548,38 +556,14 @@ impl Guild {
         self.id.edit_role(role_id, f)
     }
 
-    /// Gets a partial amount of guild data by its Id.
-    ///
-    /// Requires that the current user be in the guild.
-    #[inline]
-    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> {
-        guild_id.into().get()
-    }
-
-    /// Gets a list of the guild's bans.
-    ///
-    /// Requires the [Ban Members] permission.
-    #[inline]
-    pub fn get_bans(&self) -> Result<Vec<Ban>> {
-        self.id.get_bans()
-    }
-
-    /// Gets all of the guild's channels over the REST API.
-    ///
-    /// [`Guild`]: struct.Guild.html
-    #[inline]
-    pub fn get_channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> {
-        self.id.get_channels()
-    }
-
     /// Gets an emoji in the guild by Id.
     ///
     /// Requires the [Manage Emojis] permission.
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     #[inline]
-    pub fn get_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> {
-        self.id.get_emoji(emoji_id)
+    pub fn emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> {
+        self.id.emoji(emoji_id)
     }
 
     /// Gets a list of all of the guild's emojis.
@@ -588,16 +572,30 @@ impl Guild {
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     #[inline]
-    pub fn get_emojis(&self) -> Result<Vec<Emoji>> {
-        self.id.get_emojis()
+    pub fn emojis(&self) -> Result<Vec<Emoji>> {
+        self.id.emojis()
+    }
+
+    /// Gets a partial amount of guild data by its Id.
+    ///
+    /// Requires that the current user be in the guild.
+    #[inline]
+    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> {
+        guild_id.into().get()
+    }
+
+    /// Returns the formatted URL of the guild's icon, if one exists.
+    pub fn icon_url(&self) -> Option<String> {
+        self.icon.as_ref().map(|icon|
+            format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
     }
 
     /// Gets all integration of the guild.
     ///
     /// This performs a request over the REST API.
     #[inline]
-    pub fn get_integrations(&self) -> Result<Vec<Integration>> {
-        self.id.get_integrations()
+    pub fn integrations(&self) -> Result<Vec<Integration>> {
+        self.id.integrations()
     }
 
     /// Retrieves the active invites for the guild.
@@ -611,7 +609,7 @@ impl Guild {
     ///
     /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
+    pub fn invites(&self) -> Result<Vec<RichInvite>> {
         #[cfg(feature="cache")]
         {
             let req = permissions::MANAGE_GUILD;
@@ -621,117 +619,7 @@ impl Guild {
             }
         }
 
-        self.id.get_invites()
-    }
-
-    /// Gets a user's [`Member`] for the guild by Id.
-    ///
-    /// [`Guild`]: struct.Guild.html
-    /// [`Member`]: struct.Member.html
-    #[inline]
-    pub fn get_member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
-        self.id.get_member(user_id)
-    }
-
-    /// Gets a list of the guild's members.
-    ///
-    /// Optionally pass in the `limit` to limit the number of results. Maximum
-    /// value is 1000. Optionally pass in `after` to offset the results by a
-    /// [`User`]'s Id.
-    ///
-    /// [`User`]: struct.User.html
-    #[inline]
-    pub fn get_members<U>(&self, limit: Option<u64>, after: Option<U>)
-        -> Result<Vec<Member>> where U: Into<UserId> {
-        self.id.get_members(limit, after)
-    }
-
-    /// Retrieves the first [`Member`] found that matches the name - with an
-    /// optional discriminator - provided.
-    ///
-    /// Searching with a discriminator given is the most precise form of lookup,
-    /// as no two people can share the same username *and* discriminator.
-    ///
-    /// If a member can not be found by username or username#discriminator,
-    /// then a search will be done for the nickname. When searching by nickname,
-    /// the hash (`#`) and everything after it is included in the search.
-    ///
-    /// The following are valid types of searches:
-    ///
-    /// - **username**: "zey"
-    /// - **username and discriminator**: "zey#5479"
-    /// - **nickname**: "zeyla" or "zeylas#nick"
-    ///
-    /// [`Member`]: struct.Member.html
-    pub fn get_member_named(&self, name: &str) -> Option<&Member> {
-        let hash_pos = name.find('#');
-
-        let (name, discrim) = if let Some(pos) = hash_pos {
-            let split = name.split_at(pos);
-
-            (split.0, Some(split.1))
-        } else {
-            (&name[..], None)
-        };
-
-        self.members
-            .values()
-            .find(|member| {
-                let name_matches = member.user.read().unwrap().name == name;
-                let discrim_matches = match discrim {
-                    Some(discrim) => member.user.read().unwrap().discriminator == discrim,
-                    None => true,
-                };
-
-                name_matches && discrim_matches
-            }).or_else(|| self.members.values().find(|member| {
-                member.nick.as_ref().map_or(false, |nick| nick == name)
-            }))
-    }
-
-    /// Retrieves the count of the number of [`Member`]s that would be pruned
-    /// with the number of given days.
-    ///
-    /// See the documentation on [`GuildPrune`] for more information.
-    ///
-    /// **Note**: Requires the [Kick Members] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans.
-    ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
-    /// [`GuildPrune`]: struct.GuildPrune.html
-    /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
-    pub fn get_prune_count(&self, days: u16) -> Result<GuildPrune> {
-        #[cfg(feature="cache")]
-        {
-            let req = permissions::KICK_MEMBERS;
-
-            if !self.has_perms(req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
-            }
-        }
-
-        self.id.get_prune_count(days)
-    }
-
-    /// Retrieves the guild's webhooks.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
-    #[inline]
-    pub fn get_webhooks(&self) -> Result<Vec<Webhook>> {
-        self.id.get_webhooks()
-    }
-
-    /// Returns the formatted URL of the guild's icon, if one exists.
-    pub fn icon_url(&self) -> Option<String> {
-        self.icon.as_ref().map(|icon|
-            format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
+        self.id.invites()
     }
 
     /// Checks if the guild is 'large'. A guild is considered large if it has
@@ -756,6 +644,71 @@ impl Guild {
     #[inline]
     pub fn leave(&self) -> Result<PartialGuild> {
         self.id.leave()
+    }
+
+    /// Gets a user's [`Member`] for the guild by Id.
+    ///
+    /// [`Guild`]: struct.Guild.html
+    /// [`Member`]: struct.Member.html
+    #[inline]
+    pub fn member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
+        self.id.member(user_id)
+    }
+
+    /// Gets a list of the guild's members.
+    ///
+    /// Optionally pass in the `limit` to limit the number of results. Maximum
+    /// value is 1000. Optionally pass in `after` to offset the results by a
+    /// [`User`]'s Id.
+    ///
+    /// [`User`]: struct.User.html
+    #[inline]
+    pub fn members<U>(&self, limit: Option<u64>, after: Option<U>)
+        -> Result<Vec<Member>> where U: Into<UserId> {
+        self.id.members(limit, after)
+    }
+
+    /// Retrieves the first [`Member`] found that matches the name - with an
+    /// optional discriminator - provided.
+    ///
+    /// Searching with a discriminator given is the most precise form of lookup,
+    /// as no two people can share the same username *and* discriminator.
+    ///
+    /// If a member can not be found by username or username#discriminator,
+    /// then a search will be done for the nickname. When searching by nickname,
+    /// the hash (`#`) and everything after it is included in the search.
+    ///
+    /// The following are valid types of searches:
+    ///
+    /// - **username**: "zey"
+    /// - **username and discriminator**: "zey#5479"
+    /// - **nickname**: "zeyla" or "zeylas#nick"
+    ///
+    /// [`Member`]: struct.Member.html
+    pub fn member_named(&self, name: &str) -> Option<&Member> {
+        let hash_pos = name.find('#');
+
+        let (name, discrim) = if let Some(pos) = hash_pos {
+            let split = name.split_at(pos);
+
+            (split.0, Some(split.1))
+        } else {
+            (&name[..], None)
+        };
+
+        self.members
+            .values()
+            .find(|member| {
+                let name_matches = member.user.read().unwrap().name == name;
+                let discrim_matches = match discrim {
+                    Some(discrim) => member.user.read().unwrap().discriminator == discrim,
+                    None => true,
+                };
+
+                name_matches && discrim_matches
+            }).or_else(|| self.members.values().find(|member| {
+                member.nick.as_ref().map_or(false, |nick| nick == name)
+            }))
     }
 
     /// Moves a member to a specific voice channel.
@@ -887,6 +840,35 @@ impl Guild {
         permissions
     }
 
+    /// Retrieves the count of the number of [`Member`]s that would be pruned
+    /// with the number of given days.
+    ///
+    /// See the documentation on [`GuildPrune`] for more information.
+    ///
+    /// **Note**: Requires the [Kick Members] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to perform bans.
+    ///
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`GuildPrune`]: struct.GuildPrune.html
+    /// [`Member`]: struct.Member.html
+    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    pub fn prune_count(&self, days: u16) -> Result<GuildPrune> {
+        #[cfg(feature="cache")]
+        {
+            let req = permissions::KICK_MEMBERS;
+
+            if !self.has_perms(req)? {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }
+
+        self.id.prune_count(days)
+    }
+
     /// Returns the Id of the shard associated with the guild.
     ///
     /// When the cache is enabled this will automatically retrieve the total
@@ -996,6 +978,116 @@ impl Guild {
         }
 
         self.id.unban(user_id)
+    }
+
+    /// Retrieves the guild's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[inline]
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
+        self.id.webhooks()
+    }
+
+    /// Alias of [`bans`].
+    ///
+    /// [`bans`]: #method.bans
+    #[deprecated(since="0.1.5", note="Use `bans` instead.")]
+    #[inline]
+    pub fn get_bans(&self) -> Result<Vec<Ban>> {
+        self.bans()
+    }
+
+    /// Alias of [`channels`].
+    ///
+    /// [`channels`]: #method.channels
+    #[deprecated(since="0.1.5", note="Use `channels` instead.")]
+    #[inline]
+    pub fn get_channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> {
+        self.channels()
+    }
+
+    /// Alias of [`emoji`].
+    ///
+    /// [`emoji`]: #method.emoji
+    #[deprecated(since="0.1.5", note="Use `emoji` instead.")]
+    #[inline]
+    pub fn get_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> {
+        self.emoji(emoji_id)
+    }
+
+    /// Alias of [`emojis`].
+    ///
+    /// [`emojis`]: #method.emojis
+    #[deprecated(since="0.1.5", note="Use `emojis` instead.")]
+    #[inline]
+    pub fn get_emojis(&self) -> Result<Vec<Emoji>> {
+        self.emojis()
+    }
+
+    /// Alias of [`integrations`].
+    ///
+    /// [`integrations`]: #method.integrations
+    #[deprecated(since="0.1.5", note="Use `integrations` instead.")]
+    #[inline]
+    pub fn get_integrations(&self) -> Result<Vec<Integration>> {
+        self.integrations()
+    }
+
+    /// Alias of [`invites`].
+    ///
+    /// [`invites`]: #method.invites
+    #[deprecated(since="0.1.5", note="Use `invites` instead.")]
+    #[inline]
+    pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
+        self.invites()
+    }
+
+    /// Alias of [`member`].
+    ///
+    /// [`member`]: #method.member
+    #[deprecated(since="0.1.5", note="Use `member` instead.")]
+    #[inline]
+    pub fn get_member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
+        self.member(user_id)
+    }
+
+    /// Alias of [`members`].
+    ///
+    /// [`members`]: #method.members
+    #[deprecated(since="0.1.5", note="Use `members` instead.")]
+    #[inline]
+    pub fn get_members<U>(&self, limit: Option<u64>, after: Option<U>)
+        -> Result<Vec<Member>> where U: Into<UserId> {
+        self.members(limit, after)
+    }
+
+    /// Alias of [`member_named`].
+    ///
+    /// [`member_named`]: #method.member_named
+    #[deprecated(since="0.1.5", note="Use `member_named` instead.")]
+    #[inline]
+    pub fn get_member_named(&self, name: &str) -> Option<&Member> {
+        self.member_named(name)
+    }
+
+    /// Alias of [`prune_count`].
+    ///
+    /// [`prune_count`]: #method.prune_count
+    #[deprecated(since="0.1.5", note="Use `prune_count` instead.")]
+    #[inline]
+    pub fn get_prune_count(&self, days: u16) -> Result<GuildPrune> {
+        self.prune_count(days)
+    }
+
+    /// Alias of [`webhooks`].
+    ///
+    /// [`webhooks`]: #method.webhooks
+    #[deprecated(since="0.1.5", note="Use `webhooks` instead.")]
+    #[inline]
+    pub fn get_webhooks(&self) -> Result<Vec<Webhook>> {
+        self.webhooks()
     }
 }
 

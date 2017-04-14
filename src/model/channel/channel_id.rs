@@ -222,7 +222,7 @@ impl ChannelId {
     /// Search the cache for the channel with the Id.
     #[cfg(feature="cache")]
     pub fn find(&self) -> Option<Channel> {
-        CACHE.read().unwrap().get_channel(*self)
+        CACHE.read().unwrap().channel(*self)
     }
 
     /// Search the cache for the channel. If it can't be found, the channel is
@@ -230,7 +230,7 @@ impl ChannelId {
     pub fn get(&self) -> Result<Channel> {
         #[cfg(feature="cache")]
         {
-            if let Some(channel) = CACHE.read().unwrap().get_channel(*self) {
+            if let Some(channel) = CACHE.read().unwrap().channel(*self) {
                 return Ok(channel);
             }
         }
@@ -243,7 +243,7 @@ impl ChannelId {
     /// Requires the [Manage Channels] permission.
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
-    pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
+    pub fn invites(&self) -> Result<Vec<RichInvite>> {
         rest::get_channel_invites(self.0)
     }
 
@@ -253,7 +253,7 @@ impl ChannelId {
     ///
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn get_message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
+    pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         rest::get_message(self.0, message_id.into().0)
     }
 
@@ -265,7 +265,7 @@ impl ChannelId {
     ///
     /// [`Channel::get_messages`]: enum.Channel.html#method.get_messages
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    pub fn get_messages<F>(&self, f: F) -> Result<Vec<Message>>
+    pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
         let mut map = f(GetMessages::default()).0;
         let mut query = format!("?limit={}", map.remove("limit").unwrap_or(50));
@@ -279,43 +279,6 @@ impl ChannelId {
         }
 
         rest::get_messages(self.0, &query)
-    }
-
-    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
-    /// certain [`Emoji`].
-    ///
-    /// Refer to [`Channel::get_reaction_users`] for more information.
-    ///
-    /// **Note**: Requires the [Read Message History] permission.
-    ///
-    /// [`Channel::get_reaction_users`]: enum.Channel.html#variant.get_reaction_users
-    /// [`Emoji`]: struct.Emoji.html
-    /// [`Message`]: struct.Message.html
-    /// [`User`]: struct.User.html
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    pub fn get_reaction_users<M, R, U>(&self,
-                                       message_id: M,
-                                       reaction_type: R,
-                                       limit: Option<u8>,
-                                       after: Option<U>)
-        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
-
-        rest::get_reaction_users(self.0,
-                                 message_id.into().0,
-                                 &reaction_type.into(),
-                                 limit,
-                                 after.map(|u| u.into().0))
-    }
-
-    /// Retrieves the channel's webhooks.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
-    #[inline]
-    pub fn get_webhooks(&self) -> Result<Vec<Webhook>> {
-        rest::get_channel_webhooks(self.0)
     }
 
     /// Pins a [`Message`] to the channel.
@@ -332,6 +295,33 @@ impl ChannelId {
     #[inline]
     pub fn pins(&self) -> Result<Vec<Message>> {
         rest::get_pins(self.0)
+    }
+
+    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
+    /// certain [`Emoji`].
+    ///
+    /// Refer to [`Channel::get_reaction_users`] for more information.
+    ///
+    /// **Note**: Requires the [Read Message History] permission.
+    ///
+    /// [`Channel::get_reaction_users`]: enum.Channel.html#variant.get_reaction_users
+    /// [`Emoji`]: struct.Emoji.html
+    /// [`Message`]: struct.Message.html
+    /// [`User`]: struct.User.html
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    pub fn reaction_users<M, R, U>(&self,
+                                       message_id: M,
+                                       reaction_type: R,
+                                       limit: Option<u8>,
+                                       after: Option<U>)
+        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
+        let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
+
+        rest::get_reaction_users(self.0,
+                                 message_id.into().0,
+                                 &reaction_type.into(),
+                                 limit,
+                                 after.map(|u| u.into().0))
     }
 
     /// Sends a message with just the given message content in the channel.
@@ -448,6 +438,67 @@ impl ChannelId {
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         rest::unpin_message(self.0, message_id.into().0)
+    }
+
+    /// Retrieves the channel's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    #[inline]
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
+        rest::get_channel_webhooks(self.0)
+    }
+
+    /// Alias of [`invites`].
+    ///
+    /// [`invites`]: #method.invites
+    #[deprecated(since="0.1.5", note="Use `invites` instead.")]
+    #[inline]
+    pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
+        self.invites()
+    }
+
+    /// Alias of [`message`].
+    ///
+    /// [`message`]: #method.message
+    #[deprecated(since="0.1.5", note="Use `message` instead.")]
+    #[inline]
+    pub fn get_message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
+        self.message(message_id)
+    }
+
+    /// Alias of [`messages`].
+    ///
+    /// [`messages`]: #method.messages
+    #[deprecated(since="0.1.5", note="Use `messages` instead.")]
+    #[inline]
+    pub fn get_messages<F>(&self, f: F) -> Result<Vec<Message>>
+        where F: FnOnce(GetMessages) -> GetMessages {
+        self.messages(f)
+    }
+
+    /// Alias of [`reaction_users`].
+    ///
+    /// [`reaction_users`]: #method.reaction_users
+    #[deprecated(since="0.1.5", note="Use `reaction_users` instead.")]
+    #[inline]
+    pub fn get_reaction_users<M, R, U>(&self,
+                                       message_id: M,
+                                       reaction_type: R,
+                                       limit: Option<u8>,
+                                       after: Option<U>)
+        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
+        self.reaction_users(message_id, reaction_type, limit, after)
+    }
+
+    /// Alias of [`webhooks`].
+    ///
+    /// [`webhooks`]: #method.webhooks
+    #[deprecated(since="0.1.5", note="Use `webhooks` instead.")]
+    #[inline]
+    pub fn get_webhooks(&self) -> Result<Vec<Webhook>> {
+        self.webhooks()
     }
 }
 

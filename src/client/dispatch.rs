@@ -178,9 +178,7 @@ fn handle_event(event: Event,
                 let context = context(Some(event.channel.id()), conn, data);
 
                 feature_cache! {{
-                    let before = CACHE.read()
-                        .unwrap()
-                        .get_channel(event.channel.id());
+                    let before = CACHE.read().unwrap().channel(event.channel.id());
                     update!(update_with_channel_update, event);
 
                     thread::spawn(move || (handler)(context, before, event.channel));
@@ -287,7 +285,7 @@ fn handle_event(event: Event,
                     // that this could fail under any circumstance.
                     let after = CACHE.read()
                         .unwrap()
-                        .get_member(event.guild_id, event.user.id)
+                        .member(event.guild_id, event.user.id)
                         .unwrap()
                         .clone();
 

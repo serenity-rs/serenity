@@ -134,8 +134,8 @@ impl PrivateChannel {
     ///
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn get_message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        self.id.get_message(message_id)
+    pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
+        self.id.message(message_id)
     }
 
     /// Gets messages from the channel.
@@ -147,9 +147,9 @@ impl PrivateChannel {
     /// [`Channel::get_messages`]: enum.Channel.html#method.get_messages
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn get_messages<F>(&self, f: F) -> Result<Vec<Message>>
+    pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
-        self.id.get_messages(f)
+        self.id.messages(f)
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
@@ -165,13 +165,13 @@ impl PrivateChannel {
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn get_reaction_users<M, R, U>(&self,
-                                       message_id: M,
-                                       reaction_type: R,
-                                       limit: Option<u8>,
-                                       after: Option<U>)
+    pub fn reaction_users<M, R, U>(&self,
+                                   message_id: M,
+                                   reaction_type: R,
+                                   limit: Option<u8>,
+                                   after: Option<U>)
         -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id.get_reaction_users(message_id, reaction_type, limit, after)
+        self.id.reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Pins a [`Message`] to the channel.
@@ -256,6 +256,39 @@ impl PrivateChannel {
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.id.unpin(message_id)
+    }
+
+    /// Alias of [`message`].
+    ///
+    /// [`message`]: #method.message
+    #[deprecated(since="0.1.5", note="Use `message` instead.")]
+    #[inline]
+    pub fn get_message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
+        self.message(message_id)
+    }
+
+    /// Alias of [`messages`].
+    ///
+    /// [`messages`]: #method.messages
+    #[deprecated(since="0.1.5", note="Use `messages` instead.")]
+    #[inline]
+    pub fn get_messages<F>(&self, f: F) -> Result<Vec<Message>>
+        where F: FnOnce(GetMessages) -> GetMessages {
+        self.messages(f)
+    }
+
+    /// Alias of [`reaction_users`].
+    ///
+    /// [`reaction_users`]: #method.reaction_users
+    #[deprecated(since="0.1.5", note="Use `reaction_users` instead.")]
+    #[inline]
+    pub fn get_reaction_users<M, R, U>(&self,
+                                       message_id: M,
+                                       reaction_type: R,
+                                       limit: Option<u8>,
+                                       after: Option<U>)
+        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
+        self.reaction_users(message_id, reaction_type, limit, after)
     }
 }
 
