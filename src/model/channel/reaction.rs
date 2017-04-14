@@ -150,6 +150,28 @@ impl From<String> for ReactionType {
     }
 }
 
+impl<'a> From<&'a str> for ReactionType {
+    /// Creates a `ReactionType` from a string slice.
+    ///
+    /// # Examples
+    ///
+    /// Creating a `ReactionType` from a `🍎`, modeling a similar API as the
+    /// rest of the library:
+    ///
+    /// ```rust
+    /// use serenity::model::ReactionType;
+    ///
+    /// fn foo<R: Into<ReactionType>>(bar: R) {
+    ///     println!("{:?}", bar.into());
+    /// }
+    ///
+    /// foo("🍎");
+    /// ```
+    fn from(unicode: &str) -> ReactionType {
+        ReactionType::Unicode(unicode.to_owned())
+    }
+}
+
 impl Display for ReactionType {
     /// Formats the reaction type, displaying the associated emoji in a
     /// way that clients can understand.
