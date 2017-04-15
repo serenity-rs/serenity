@@ -40,7 +40,7 @@ docs.
 A basic ping-pong bot looks like:
 
 ```rust,no-run
-extern crate serenity;
+#[macro_use] extern crate serenity;
 
 use serenity::client::Client;
 use std::env;
