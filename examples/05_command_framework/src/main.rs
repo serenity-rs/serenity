@@ -61,7 +61,6 @@ fn main() {
         .configure(|c| c
             .allow_whitespace(true)
             .on_mention(true)
-            .rate_limit_message("Try this again in `%time%` seconds.")
             .prefix("~"))
         // Set a function to be called prior to each command execution. This
         // provides the context of the command, the message that was received,
@@ -99,8 +98,9 @@ fn main() {
         .on_dispatch_error(|_ctx, msg, error| {
             match error {
                 DispatchError::RateLimited(seconds) => {
-                    let _ = msg.channel_id.say(format!("Try this again in {} seconds.", seconds));
+                    let _ = msg.channel_id.say(&format!("Try this again in {} seconds.", seconds));
                 },
+                // Any other error would be silently ignored.
                 _ => {}
             }
         })

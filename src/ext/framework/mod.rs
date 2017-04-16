@@ -64,7 +64,7 @@ mod buckets;
 
 pub use self::buckets::{Bucket, MemberRatelimit, Ratelimit};
 pub use self::command::{Command, CommandType, CommandGroup, CommandOrAlias};
-pub use self::configuration::{AccountType, Configuration};
+pub use self::configuration::Configuration;
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
 
@@ -183,7 +183,7 @@ pub enum DispatchError {
     BlockedGuild,
     /// When the command requester lacks specific required permissions.
     LackOfPermissions(Permissions),
-    /// When the command requester has exceeded a bucket's ratelimit. The attached value is
+    /// When the command requester has exceeded a ratelimit bucket. The attached value is
     /// the time a requester has to wait to run the command again.
     RateLimited(i64),
     /// When the requested command can only be ran privately.
@@ -196,8 +196,8 @@ pub enum DispatchError {
     NotEnoughArguments { min: i32, given: usize },
     /// When there're too many arguments.
     TooManyArguments { max: i32, given: usize },
-    /// When an account type that requested the command is ignored by configuration.
-    IgnoredAccountType,
+    /// When the command was requested by an account of bot type and those are set to be ignored.
+    IgnoredBot,
     /// When the bot ignores webhooks and a command was issued by one.
     WebhookAuthor
 }
@@ -301,17 +301,6 @@ impl Framework {
     }
 
     #[doc(hidden)]
-    fn correct_account_type(&self, message: &Message) -> bool {
-        match self.configuration.account_type {
-            AccountType::Any => true,
-            AccountType::Bot if message.author.bot => false,
-            AccountType::Automatic if self.user_info.1 && message.author.bot => false,
-            _ if message.author.id != self.user_info.0 => false,
-            _ => true
-        }
-    }
-
-    #[doc(hidden)]
     #[cfg(feature="cache")]
     fn is_blocked_guild(&self, message: &Message) -> bool {
         if let Some(Channel::Guild(channel)) = CACHE.read().unwrap().get_channel(message.channel_id) {
@@ -334,11 +323,10 @@ impl Framework {
     }
 
     #[doc(hidden)]
-    fn has_wrong_permissions(&self, command: &Arc<Command>, message: &Message) -> bool {
+    fn has_correct_permissions(&self, command: &Arc<Command>, message: &Message) -> bool {
         if !command.required_permissions.is_empty() {
             if let Some(guild) = message.guild() {
                 let perms = guild.read().unwrap().permissions_for(message.channel_id, message.author.id);
-
                 return perms.contains(command.required_permissions);
             }
         }
@@ -363,8 +351,8 @@ impl Framework {
                    args: usize,
                    to_check: String,
                    built: &String) -> Option<DispatchError> {
-        if !self.correct_account_type(&message) {
-            Some(DispatchError::IgnoredAccountType)
+        if self.configuration.ignore_bots && message.author.bot {
+            Some(DispatchError::IgnoredBot)
         } else if self.configuration.ignore_webhooks && message.webhook_id.is_some() {
             Some(DispatchError::WebhookAuthor)
         } else if !self.configuration.owners.contains(&message.author.id) {
@@ -391,7 +379,7 @@ impl Framework {
                 Some(DispatchError::OnlyForOwners)
             } else if !self.checks_passed(&command, &mut context, &message) {
                 Some(DispatchError::CheckFailed)
-            } else if self.has_wrong_permissions(&command, &message) {
+            } else if !self.has_correct_permissions(&command, &message) {
                 Some(DispatchError::LackOfPermissions(command.required_permissions))
             } else if self.is_blocked_guild(&message) {
                 Some(DispatchError::BlockedGuild)
@@ -639,57 +627,6 @@ impl Framework {
     pub fn after<F>(mut self, f: F) -> Self
         where F: Fn(&mut Context, &Message, &String, Result<(), String>) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
-
-        self
-    }
-
-    /// Adds a "check" to a command, which checks whether or not the command's
-    /// associated function should be called.
-    ///
-    /// # Examples
-    ///
-    /// Ensure that the user who created a message, calling a "ping" command,
-    /// is the owner.
-    ///
-    /// ```rust,ignore
-    /// use serenity::client::{Client, Context};
-    /// use serenity::model::Message;
-    /// use std::env;
-    ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN").unwrap());
-    ///
-    /// client.with_framework(|f| f
-    ///     .configure(|c| c.prefix("~"))
-    ///     .on("ping", ping)
-    ///     .set_check("ping", owner_check));
-    ///
-    /// command!(ping(_context, message) {
-    ///     let _ = message.channel_id.say("Pong!");
-    /// });
-    ///
-    /// fn owner_check(_context: &mut Context, message: &Message) -> bool {
-    ///     // replace with your user ID
-    ///     message.author.id == 7
-    /// }
-    /// ```
-    #[deprecated(since="0.1.2", note="Use the `CreateCommand` builder's `check` instead.")]
-    pub fn set_check<F, S>(mut self, command: S, check: F) -> Self
-        where F: Fn(&mut Context, &Message) -> bool + Send + Sync + 'static,
-              S: Into<String> {
-        {
-            let ungrouped = self.groups.entry("Ungrouped".to_owned())
-                .or_insert_with(|| Arc::new(CommandGroup::default()));
-
-            if let Some(group) = Arc::get_mut(ungrouped) {
-                let name = command.into();
-
-                if let Some(&mut CommandOrAlias::Command(ref mut command)) = group.commands.get_mut(&name) {
-                    if let Some(command) = Arc::get_mut(command) {
-                        command.checks.push(Box::new(check));
-                    }
-                }
-            }
-        }
 
         self
     }

@@ -4,29 +4,6 @@ use super::command::PrefixCheck;
 use ::client::{Context, rest};
 use ::model::{GuildId, UserId};
 
-/// The account type used when setting the framework [`Configuration`].
-///
-/// [`Configuration`]: struct.Configuration.html
-pub enum AccountType {
-    /// The current user will only react to [`Message`]s sent by itself.
-    ///
-    /// [`Message`]: ../../model/struct.Message.html
-    Selfbot,
-    /// The current user will only react to [`Message`]s sent by [`User`]s which
-    /// are _not_ [bot][`User::bot`]s.
-    ///
-    /// [`Message`]: ../../model/struct.Message.html
-    /// [`User`]: ../../model/struct.User.html
-    /// [`User::bot`]: ../../model/struct.User.html#structfield.bot
-    Bot,
-    /// The current user will react to all [`Message`]s.
-    ///
-    /// [`Message`]: ../../model/struct.Message.html
-    Any,
-    #[doc(hidden)]
-    Automatic,
-}
-
 /// The configuration to use for a [`Framework`] associated with a [`Client`]
 /// instance.
 ///
@@ -61,7 +38,7 @@ pub struct Configuration {
     #[doc(hidden)]
     pub dynamic_prefix: Option<Box<PrefixCheck>>,
     #[doc(hidden)]
-    pub account_type: AccountType,
+    pub ignore_bots: bool,
     #[doc(hidden)]
     pub blocked_users: HashSet<UserId>,
     #[doc(hidden)]
@@ -77,9 +54,9 @@ pub struct Configuration {
 }
 
 impl Configuration {
-    /// Allows you to change what accounts to ignore.
-    pub fn account_type(mut self, account_type: AccountType) -> Self {
-        self.account_type = account_type;
+    /// If set to false the bot will also respond to any other bots and itself.
+    pub fn ignore_bots(mut self, ignore_bots: bool) -> Self {
+        self.ignore_bots = ignore_bots;
 
         self
     }
@@ -248,7 +225,7 @@ impl Default for Configuration {
             dynamic_prefix: None,
             allow_whitespace: false,
             prefixes: vec![],
-            account_type: AccountType::Automatic,
+            ignore_bots: true,
             owners: HashSet::default(),
             blocked_users: HashSet::default(),
             blocked_guilds: HashSet::default(),
