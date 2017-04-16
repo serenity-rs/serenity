@@ -174,32 +174,32 @@ macro_rules! command {
 /// A enum representing all possible fail conditions under which a command won't be executed.
 pub enum DispatchError {
     /// When a custom function check has failed.
-    CheckFailed, // v
+    CheckFailed,
     /// When the requested command is disabled in bot configuration.
-    CommandDisabled(String), // v
+    CommandDisabled(String),
     /// When the user is blocked in bot configuration.
-    BlockedUser, // v
+    BlockedUser,
     /// When the guild or its owner is blocked in bot configuration.
-    BlockedGuild, // v
+    BlockedGuild,
     /// When the command requester lacks specific required permissions.
-    LackOfPermissions(Permissions), // v
+    LackOfPermissions(Permissions),
     /// When the command requester has exceeded a bucket's ratelimit. The attached value is
     /// the time a requester has to wait to run the command again.
-    RateLimited(i64), // v
+    RateLimited(i64),
     /// When the requested command can only be ran privately.
-    OnlyForDM, // v
+    OnlyForDM,
     /// When the requested command can only be ran in guilds, or bot doesn't support DMs.
-    OnlyForGuilds, // v
+    OnlyForGuilds,
     /// When the requested command can only be used by bot owners.
-    OnlyForOwners, // v
+    OnlyForOwners,
     /// When there're too fee arguments.
-    NotEnoughArguments { min: i32, given: usize }, // v
+    NotEnoughArguments { min: i32, given: usize },
     /// When there're too many arguments.
-    TooManyArguments { max: i32, given: usize }, // v
+    TooManyArguments { max: i32, given: usize },
     /// When an account type that requested the command is ignored by configuration.
-    IgnoredAccountType, // v
+    IgnoredAccountType,
     /// When the bot ignores webhooks and a command was issued by one.
-    WebhookAuthor // v
+    WebhookAuthor
 }
 
 type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;
