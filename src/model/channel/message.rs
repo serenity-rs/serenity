@@ -195,7 +195,7 @@ impl Message {
 
         // First replace all user mentions.
         for u in &self.mentions {
-            result = result.replace(&u.mention(), &u.distinct());
+            result = result.replace(&u.mention(), &format!("@{}", u.distinct()));
         }
 
         // Then replace all role mentions.
