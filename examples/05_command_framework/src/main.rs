@@ -99,7 +99,7 @@ fn main() {
         .on_dispatch_error(|_ctx, msg, error| {
             match error {
                 DispatchError::RateLimited(seconds) => {
-                    msg.channel_id.say(format!("Try this again in {} seconds.", seconds))
+                    let _ = msg.channel_id.say(format!("Try this again in {} seconds.", seconds));
                 },
                 _ => {}
             }
