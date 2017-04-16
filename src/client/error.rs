@@ -57,6 +57,9 @@ pub enum Error {
     /// When attempting to delete a number of days' worth of messages that is
     /// not allowed.
     DeleteMessageDaysAmount(u8),
+    /// Indicates that the textual content of an embed exceeds the maximum
+    /// length.
+    EmbedTooLarge(u64),
     /// When there is an error from Discord for a specific action, such as
     /// [`ErrorCode::EditByOtherAuthor`]. This is a friendlier representation of
     /// the numerical error codes Discord provides.

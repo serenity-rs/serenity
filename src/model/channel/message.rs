@@ -431,6 +431,71 @@ impl Message {
         -> Result<Vec<User>> where R: Into<ReactionType>, U: Into<UserId> {
         self.reaction_users(reaction_type, limit, after)
     }
+
+    #[doc(hidden)]
+    pub fn check_content_length(map: &JsonMap) -> Result<()> {
+        if let Some(content) = map.get("content") {
+            if let Value::String(ref content) = *content {
+                if let Some(length_over) = Message::overflow_length(content) {
+                    return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    #[doc(hidden)]
+    pub fn check_embed_length(map: &JsonMap) -> Result<()> {
+        let embed = match map.get("embed") {
+            Some(&Value::Object(ref value)) => value,
+            _ => return Ok(()),
+        };
+
+        let mut total: usize = 0;
+
+        if let Some(&Value::Object(ref author)) = embed.get("author") {
+            if let Some(&Value::Object(ref name)) = author.get("name") {
+                total += name.len();
+            }
+        }
+
+        if let Some(&Value::String(ref description)) = embed.get("description") {
+            total += description.len();
+        }
+
+        if let Some(&Value::Array(ref fields)) = embed.get("fields") {
+            for field_as_value in fields {
+                if let Value::Object(ref field) = *field_as_value {
+                    if let Some(&Value::String(ref field_name)) = field.get("name") {
+                        total += field_name.len();
+                    }
+
+                    if let Some(&Value::String(ref field_value)) = field.get("value") {
+                        total += field_value.len();
+                    }
+                }
+            }
+        }
+
+        if let Some(&Value::Object(ref footer)) = embed.get("footer") {
+            if let Some(&Value::String(ref text)) = footer.get("text") {
+                total += text.len();
+            }
+        }
+
+        if let Some(&Value::String(ref title)) = embed.get("title") {
+            total += title.len();
+        }
+
+        if total > constants::EMBED_MAX_LENGTH as usize {
+            Ok(())
+        } else {
+            let overflow = constants::EMBED_MAX_LENGTH as u64 - total as u64;
+
+            Err(Error::Client(ClientError::EmbedTooLarge(overflow)))
+        }
+    }
 }
 
 impl From<Message> for MessageId {

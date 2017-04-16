@@ -1,5 +1,5 @@
-use std::result::Result as StdResult;
-
+/// The maximum length of the textual size of an embed.
+pub const EMBED_MAX_LENGTH: u16 = 4000;
 /// The gateway version used by the library. The gateway URI is retrieved via
 /// the REST API.
 pub const GATEWAY_VERSION: u8 = 6;

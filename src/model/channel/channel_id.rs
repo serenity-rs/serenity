@@ -418,13 +418,8 @@ impl ChannelId {
         where F: FnOnce(CreateMessage) -> CreateMessage {
         let map = f(CreateMessage::default()).0;
 
-        if let Some(content) = map.get(&"content".to_owned()) {
-            if let Value::String(ref content) = *content {
-                if let Some(length_over) = Message::overflow_length(content) {
-                    return Err(Error::Client(ClientError::MessageTooLong(length_over)));
-                }
-            }
-        }
+        Message::check_content_length(&map)?;
+        Message::check_embed_length(&map)?;
 
         rest::send_message(self.0, &Value::Object(map))
     }
