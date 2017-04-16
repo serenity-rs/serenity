@@ -3,6 +3,7 @@
 use serde::de::Error as DeError;
 use serde_json::{self, Error as JsonError};
 use std::collections::HashMap;
+use super::utils::deserialize_emojis;
 use super::*;
 use ::constants::{OpCode, VoiceOpCode};
 use ::internal::prelude::*;
@@ -134,6 +135,7 @@ impl Deserialize for GuildDeleteEvent {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct GuildEmojisUpdateEvent {
+    #[serde(deserialize_with="deserialize_emojis")]
     pub emojis: HashMap<EmojiId, Emoji>,
     pub guild_id: GuildId,
 }

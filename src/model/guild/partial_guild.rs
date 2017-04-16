@@ -1,3 +1,4 @@
+use super::super::utils::{deserialize_emojis, deserialize_roles};
 use ::model::*;
 use ::utils::builder::{EditGuild, EditMember, EditRole};
 
@@ -13,6 +14,7 @@ pub struct PartialGuild {
     pub default_message_notifications: u64,
     pub embed_channel_id: Option<ChannelId>,
     pub embed_enabled: bool,
+    #[serde(deserialize_with="deserialize_emojis")]
     pub emojis: HashMap<EmojiId, Emoji>,
     pub features: Vec<Feature>,
     pub icon: Option<String>,
@@ -20,6 +22,7 @@ pub struct PartialGuild {
     pub name: String,
     pub owner_id: UserId,
     pub region: String,
+    #[serde(deserialize_with="deserialize_roles")]
     pub roles: HashMap<RoleId, Role>,
     pub splash: Option<String>,
     pub verification_level: VerificationLevel,
