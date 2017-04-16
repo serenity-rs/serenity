@@ -61,26 +61,6 @@ pub struct Configuration {
     #[doc(hidden)]
     pub dynamic_prefix: Option<Box<PrefixCheck>>,
     #[doc(hidden)]
-    pub rate_limit_message: Option<String>,
-    #[doc(hidden)]
-    pub invalid_permission_message: Option<String>,
-    #[doc(hidden)]
-    pub invalid_check_message: Option<String>,
-    #[doc(hidden)]
-    pub no_dm_message: Option<String>,
-    #[doc(hidden)]
-    pub no_guild_message: Option<String>,
-    #[doc(hidden)]
-    pub blocked_user_message: Option<String>,
-    #[doc(hidden)]
-    pub blocked_guild_message: Option<String>,
-    #[doc(hidden)]
-    pub too_many_args_message: Option<String>,
-    #[doc(hidden)]
-    pub not_enough_args_message: Option<String>,
-    #[doc(hidden)]
-    pub command_disabled_message: Option<String>,
-    #[doc(hidden)]
     pub account_type: AccountType,
     #[doc(hidden)]
     pub blocked_users: HashSet<UserId>,
@@ -194,79 +174,6 @@ impl Configuration {
         self
     }
 
-    /// Message that's sent when one of a command's checks doesn't succeed.
-    pub fn invalid_check_message(mut self, content: &str) -> Self {
-        self.invalid_check_message = Some(content.to_owned());
-
-        self
-    }
-
-    /// Message that's sent if a command is disabled.
-    ///
-    /// `%command%` will be replaced with command name.
-    pub fn command_disabled_message(mut self, content: &str) -> Self {
-        self.command_disabled_message = Some(content.to_owned());
-
-        self
-    }
-
-    /// Message that's sent if a blocked user attempts to use a command.
-    pub fn blocked_user_message(mut self, content: &str) -> Self {
-        self.blocked_user_message = Some(content.to_owned());
-
-        self
-    }
-
-    /// Message that's sent if a command issued within a guild owned by a
-    /// blocked user.
-    pub fn blocked_guild_message(mut self, content: &str) -> Self {
-        self.blocked_guild_message = Some(content.to_owned());
-
-        self
-    }
-
-    /// Message that's sent when a user with wrong permissions calls a command.
-    pub fn invalid_permission_message(mut self, content: &str) -> Self {
-        self.invalid_permission_message = Some(content.to_owned());
-
-        self
-    }
-
-    /// Message that's sent when a command is on cooldown.
-    /// See framework documentation to see where is this utilized.
-    ///
-    /// `%time%` will be replaced with waiting time in seconds.
-    pub fn rate_limit_message(mut self, content: &str) -> Self {
-        self.rate_limit_message = Some(content.to_owned());
-
-        self
-    }
-
-    /// Message that's sent when a command isn't available in DM.
-    pub fn no_dm_message(mut self, content: &str) -> Self {
-        self.no_dm_message = Some(content.to_owned());
-
-        self
-    }
-
-    /// Message that's sent when a command isn't available in guilds.
-    pub fn no_guild_message(mut self, content: &str) -> Self {
-        self.no_guild_message = Some(content.to_owned());
-
-        self
-    }
-
-    /// Message that's sent when user sends too few arguments to a command.
-    ///
-    /// `%min%` will be replaced with minimum allowed amount of arguments.
-    ///
-    /// `%given%` will be replced with the given amount of arguments.
-    pub fn not_enough_args_message(mut self, content: &str) -> Self {
-        self.not_enough_args_message = Some(content.to_owned());
-
-        self
-    }
-
     /// Whether or not to respond to commands initiated with a mention. Note
     /// that this can be used in conjunction with [`prefix`].
     ///
@@ -325,17 +232,6 @@ impl Configuration {
 
         self
     }
-
-    /// Message that's sent when user sends too many arguments to a command.
-    ///
-    /// `%max%` will be replaced with maximum allowed amount of arguments.
-    ///
-    /// `%given%` will be replced with the given amount of arguments.
-    pub fn too_many_args_message(mut self, content: &str) -> Self {
-        self.too_many_args_message = Some(content.to_owned());
-
-        self
-    }
 }
 
 impl Default for Configuration {
@@ -352,16 +248,6 @@ impl Default for Configuration {
             dynamic_prefix: None,
             allow_whitespace: false,
             prefixes: vec![],
-            no_dm_message: None,
-            no_guild_message: None,
-            rate_limit_message: None,
-            blocked_user_message: None,
-            too_many_args_message: None,
-            invalid_check_message: None,
-            blocked_guild_message: None,
-            not_enough_args_message: None,
-            command_disabled_message: None,
-            invalid_permission_message: None,
             account_type: AccountType::Automatic,
             owners: HashSet::default(),
             blocked_users: HashSet::default(),

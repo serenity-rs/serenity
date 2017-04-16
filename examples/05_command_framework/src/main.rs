@@ -17,6 +17,7 @@ use serenity::client::Context;
 use serenity::Client;
 use serenity::model::{Message, permissions};
 use serenity::ext::framework::help_commands;
+use serenity::ext::framework::DispatchError;
 use std::collections::HashMap;
 use std::env;
 use std::fmt::Write;
@@ -90,6 +91,17 @@ fn main() {
             match error {
                 Ok(()) => println!("Processed command '{}'", command_name),
                 Err(why) => println!("Command '{}' returned error {:?}", command_name, why),
+            }
+        })
+        // Set a function that's called whenever a command's execution didn't happen for one reason
+        // or another. For example, when user has exceeded a rate-limit.. Or command can only be
+        // used by a bot owner.
+        .on_dispatch_error(|_ctx, msg, error| {
+            match error {
+                DispatchError::RateLimited(seconds) => {
+                    msg.channel_id.say(format!("Try this again in {} seconds.", seconds))
+                },
+                _ => {}
             }
         })
         // Can't be used more than once per 5 seconds:
