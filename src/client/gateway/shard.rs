@@ -18,12 +18,13 @@ use ::internal::prelude::*;
 use ::internal::ws_impl::{ReceiverExt, SenderExt};
 use ::model::event::{Event, GatewayEvent, ReadyEvent};
 use ::model::{Game, GuildId, OnlineStatus};
-use ::utils;
 
 #[cfg(feature="cache")]
 use ::client::CACHE;
 #[cfg(feature="voice")]
 use ::ext::voice::Manager as VoiceManager;
+#[cfg(feature="cache")]
+use ::utils;
 
 type CurrentPresence = (Option<Game>, OnlineStatus, bool);
 
