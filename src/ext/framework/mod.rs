@@ -320,11 +320,6 @@ impl Framework {
         false
     }
 
-    #[cfg(not(feature="cache"))]
-    fn is_blocked_guild(_: &Message) -> bool {
-        false
-    }
-
     fn has_correct_permissions(&self, command: &Arc<Command>, message: &Message) -> bool {
         if !command.required_permissions.is_empty() {
             if let Some(guild) = message.guild() {
@@ -385,14 +380,19 @@ impl Framework {
                 }
             }
 
+            #[cfg(feature="cache")]
+            {
+                if self.is_blocked_guild(&message) {
+                    return Some(DispatchError::BlockedGuild);
+                }
+            }
+
             if command.owners_only {
                 Some(DispatchError::OnlyForOwners)
             } else if !self.checks_passed(&command, &mut context, &message) {
                 Some(DispatchError::CheckFailed)
             } else if !self.has_correct_permissions(&command, &message) {
                 Some(DispatchError::LackOfPermissions(command.required_permissions))
-            } else if self.is_blocked_guild(&message) {
-                Some(DispatchError::BlockedGuild)
             } else if self.configuration.blocked_users.contains(&message.author.id) {
                 Some(DispatchError::BlockedUser)
             } else if !self.configuration.allow_dm && message.is_private() {
