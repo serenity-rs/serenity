@@ -331,16 +331,6 @@ impl Client {
             .on_channel_delete = Some(Arc::new(handler));
     }
 
-    /// Attaches a handler for when a [`ChannelPinsAck`] is received.
-    ///
-    /// [`ChannelPinsAck`]: ../model/event/enum.Event.html#variant.ChannelPinsAck
-    pub fn on_channel_pins_ack<F>(&mut self, handler: F)
-        where F: Fn(Context, ChannelPinsAckEvent) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_channel_pins_ack = Some(Arc::new(handler));
-    }
-
     /// Attaches a handler for when a [`ChannelPinsUpdate`] is received.
     ///
     /// [`ChannelPinsUpdate`]: ../model/event/enum.Event.html#variant.ChannelPinsUpdate
@@ -468,16 +458,6 @@ impl Client {
         self.event_store.write()
             .unwrap()
             .on_message = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`MessageAck`] is received.
-    ///
-    /// [`MessageAck`]: ../model/event/enum.Event.html#variant.MessageAck
-    pub fn on_message_ack<F>(&mut self, handler: F)
-        where F: Fn(Context, ChannelId, Option<MessageId>) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_message_ack = Some(Arc::new(handler));
     }
 
     /// Attaches a handler for when a [`MessageDelete`] is received.

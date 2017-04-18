@@ -48,12 +48,6 @@ impl Deserialize for ChannelDeleteEvent {
 }
 
 #[derive(Clone, Debug, Deserialize)]
-pub struct ChannelPinsAckEvent {
-    pub channel_id: ChannelId,
-    pub timestamp: String,
-}
-
-#[derive(Clone, Debug, Deserialize)]
 pub struct ChannelPinsUpdateEvent {
     pub channel_id: ChannelId,
     pub last_pin_timestamp: Option<String>,
@@ -531,13 +525,6 @@ pub enum Event {
     ///
     /// [`Channel`]: ../enum.Channel.html
     ChannelDelete(ChannelDeleteEvent),
-    /// The pins for a [`Channel`] have been acked.
-    ///
-    /// Fires the [`Client::on_channel_pins_ack`] event.
-    ///
-    /// [`Channel`]: ../enum.Channel.html
-    /// [`Client::on_channel_pins_ack`]: ../../client/struct.Client.html#on_channel_pins_ack
-    ChannelPinsAck(ChannelPinsAckEvent),
     /// The pins for a [`Channel`] have been updated.
     ///
     /// Fires the [`Client::on_channel_pins_update`] event.
@@ -641,7 +628,6 @@ impl Event {
         Ok(match &kind[..] {
             "CHANNEL_CREATE" => Event::ChannelCreate(ChannelCreateEvent::deserialize(value)?),
             "CHANNEL_DELETE" => Event::ChannelDelete(ChannelDeleteEvent::deserialize(value)?),
-            "CHANNEL_PINS_ACK" => Event::ChannelPinsAck(ChannelPinsAckEvent::deserialize(value)?),
             "CHANNEL_PINS_UPDATE" => Event::ChannelPinsUpdate(ChannelPinsUpdateEvent::deserialize(value)?),
             "CHANNEL_RECIPIENT_ADD" => Event::ChannelRecipientAdd(ChannelRecipientAddEvent::deserialize(value)?),
             "CHANNEL_RECIPIENT_REMOVE" => Event::ChannelRecipientRemove(ChannelRecipientRemoveEvent::deserialize(value)?),

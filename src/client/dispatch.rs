@@ -141,13 +141,6 @@ fn handle_event(event: Event,
                 update!(update_with_channel_delete, event);
             }
         },
-        Event::ChannelPinsAck(event) => {
-            if let Some(handler) = handler!(on_channel_pins_ack, event_store) {
-                let context = context(Some(event.channel_id), conn, data);
-
-                thread::spawn(move || (handler)(context, event));
-            }
-        },
         Event::ChannelPinsUpdate(event) => {
             if let Some(handler) = handler!(on_channel_pins_update, event_store) {
                 let context = context(Some(event.channel_id), conn, data);

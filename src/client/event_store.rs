@@ -31,7 +31,6 @@ use std::sync::RwLock;
 pub struct EventStore {
     pub on_channel_create: Option<Arc<Fn(Context, Channel) + Send + Sync + 'static>>,
     pub on_channel_delete: Option<Arc<Fn(Context, Channel) + Send + Sync + 'static>>,
-    pub on_channel_pins_ack: Option<Arc<Fn(Context, ChannelPinsAckEvent) + Send + Sync + 'static>>,
     pub on_channel_pins_update: Option<Arc<Fn(Context, ChannelPinsUpdateEvent) + Send + Sync + 'static>>,
     pub on_channel_recipient_addition: Option<Arc<Fn(Context, ChannelId, User) + Send + Sync + 'static>>,
     pub on_channel_recipient_removal: Option<Arc<Fn(Context, ChannelId, User) + Send + Sync + 'static>>,
@@ -73,7 +72,6 @@ pub struct EventStore {
     #[cfg(not(feature="cache"))]
     pub on_guild_update: Option<Arc<Fn(Context, PartialGuild) + Send + Sync + 'static>>,
     pub on_message: Option<Arc<Fn(Context, Message) + Send + Sync + 'static>>,
-    pub on_message_ack: Option<Arc<Fn(Context, ChannelId, Option<MessageId>) + Send + Sync + 'static>>,
     pub on_message_delete: Option<Arc<Fn(Context, ChannelId, MessageId) + Send + Sync + 'static>>,
     pub on_message_delete_bulk: Option<Arc<Fn(Context, ChannelId, Vec<MessageId>) + Send + Sync + 'static>>,
     pub on_reaction_add: Option<Arc<Fn(Context, Reaction) + Send + Sync + 'static>>,
