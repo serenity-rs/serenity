@@ -171,7 +171,8 @@ macro_rules! command {
     };
 }
 
-/// A enum representing all possible fail conditions under which a command won't be executed.
+/// A enum representing all possible fail conditions under which a command won't
+/// be executed.
 pub enum DispatchError {
     /// When a custom function check has failed.
     CheckFailed,
@@ -183,23 +184,26 @@ pub enum DispatchError {
     BlockedGuild,
     /// When the command requester lacks specific required permissions.
     LackOfPermissions(Permissions),
-    /// When the command requester has exceeded a ratelimit bucket. The attached value is
-    /// the time a requester has to wait to run the command again.
+    /// When the command requester has exceeded a ratelimit bucket. The attached
+    /// value is the time a requester has to wait to run the command again.
     RateLimited(i64),
-    /// When the requested command can only be ran privately.
+    /// When the requested command can only be used in a direct message or group
+    /// channel.
     OnlyForDM,
-    /// When the requested command can only be ran in guilds, or bot doesn't support DMs.
+    /// When the requested command can only be ran in guilds, or the bot doesn't
+    /// support DMs.
     OnlyForGuilds,
     /// When the requested command can only be used by bot owners.
     OnlyForOwners,
-    /// When there're too fee arguments.
+    /// When there are too few arguments.
     NotEnoughArguments { min: i32, given: usize },
-    /// When there're too many arguments.
+    /// When there are too many arguments.
     TooManyArguments { max: i32, given: usize },
-    /// When the command was requested by an account of bot type and those are set to be ignored.
+    /// When the command was requested by a bot user when they are set to be
+    /// ignored.
     IgnoredBot,
     /// When the bot ignores webhooks and a command was issued by one.
-    WebhookAuthor
+    WebhookAuthor,
 }
 
 type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;
@@ -286,7 +290,7 @@ impl Framework {
         self
     }
 
-    /// Defines a bucket with just a `delay` between each command.
+    /// Defines a bucket with only a `delay` between each command.
     pub fn simple_bucket<S>(mut self, s: S, delay: i64) -> Self
         where S: Into<String> {
         self.buckets.insert(s.into(), Bucket {
@@ -300,7 +304,6 @@ impl Framework {
         self
     }
 
-    #[doc(hidden)]
     #[cfg(feature="cache")]
     fn is_blocked_guild(&self, message: &Message) -> bool {
         if let Some(Channel::Guild(channel)) = CACHE.read().unwrap().get_channel(message.channel_id) {
@@ -313,50 +316,51 @@ impl Framework {
                 return self.configuration.blocked_users.contains(&guild.read().unwrap().owner_id);
             }
         }
+
         false
     }
 
-    #[doc(hidden)]
     #[cfg(not(feature="cache"))]
     fn is_blocked_guild(_: &Message) -> bool {
         false
     }
 
-    #[doc(hidden)]
     fn has_correct_permissions(&self, command: &Arc<Command>, message: &Message) -> bool {
         if !command.required_permissions.is_empty() {
             if let Some(guild) = message.guild() {
                 let perms = guild.read().unwrap().permissions_for(message.channel_id, message.author.id);
+
                 return perms.contains(command.required_permissions);
             }
         }
+
         true
     }
 
-    #[doc(hidden)]
     fn checks_passed(&self, command: &Arc<Command>, mut context: &mut Context, message: &Message) -> bool {
         for check in &command.checks {
             if !(check)(&mut context, &message) {
                 return false;
             }
         }
+
         true
     }
 
-    #[doc(hidden)]
     fn should_fail(&mut self,
                    mut context: &mut Context,
                    message: &Message,
                    command: &Arc<Command>,
                    args: usize,
-                   to_check: String,
-                   built: &String) -> Option<DispatchError> {
+                   to_check: &str,
+                   built: &str) -> Option<DispatchError> {
         if self.configuration.ignore_bots && message.author.bot {
             Some(DispatchError::IgnoredBot)
         } else if self.configuration.ignore_webhooks && message.webhook_id.is_some() {
             Some(DispatchError::WebhookAuthor)
         } else if !self.configuration.owners.contains(&message.author.id) {
             let ref bucket = command.bucket;
+
             if let Some(rate_limit) = bucket.clone().map(|x| self.ratelimit_time(x.as_str(), message.author.id.0)) {
                 if rate_limit > 0i64 {
                     return Some(DispatchError::RateLimited(rate_limit.clone()));
@@ -365,13 +369,19 @@ impl Framework {
 
             if let Some(x) = command.min_args {
                 if args < x as usize {
-                    return Some(DispatchError::NotEnoughArguments { min: x, given: args });
+                    return Some(DispatchError::NotEnoughArguments {
+                        min: x,
+                        given: args
+                    });
                 }
             }
 
             if let Some(x) = command.max_args {
                 if args > x as usize {
-                    return Some(DispatchError::TooManyArguments { max: x, given: args });
+                    return Some(DispatchError::TooManyArguments {
+                        max: x,
+                        given: args
+                    });
                 }
             }
 
@@ -387,10 +397,10 @@ impl Framework {
                 Some(DispatchError::BlockedUser)
             } else if !self.configuration.allow_dm && message.is_private() {
                 Some(DispatchError::OnlyForGuilds)
-            } else if self.configuration.disabled_commands.contains(&to_check) {
-                Some(DispatchError::CommandDisabled(to_check))
+            } else if self.configuration.disabled_commands.contains(to_check) {
+                Some(DispatchError::CommandDisabled(to_check.to_owned()))
             } else if self.configuration.disabled_commands.contains(built) {
-                Some(DispatchError::CommandDisabled(built.clone()))
+                Some(DispatchError::CommandDisabled(built.to_owned()))
             } else if message.is_private() && command.guild_only {
                 Some(DispatchError::OnlyForGuilds)
             } else if !message.is_private() && command.dm_only {
@@ -478,7 +488,7 @@ impl Framework {
                                 .collect::<Vec<String>>()
                         };
 
-                        if let Some(error) = self.should_fail(&mut context, &message, &command, args.len(), to_check, &built) {
+                        if let Some(error) = self.should_fail(&mut context, &message, &command, args.len(), &to_check, &built) {
                             if let Some(ref handler) = self.dispatch_error_handler {
                                 handler(context, message, error);
                             }
@@ -605,6 +615,7 @@ impl Framework {
     }
 
     /// Specify the function that's called in case a command wasn't executed for one reason or another.
+    ///
     /// DispatchError represents all possible fail conditions.
     pub fn on_dispatch_error<F>(mut self, f: F) -> Self
         where F: Fn(Context, Message, DispatchError) + Send + Sync + 'static {

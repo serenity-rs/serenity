@@ -195,7 +195,12 @@ impl Message {
 
         // First replace all user mentions.
         for u in &self.mentions {
-            result = result.replace(&u.mention(), &format!("@{}", u.distinct()));
+            let mut at_distinct = String::with_capacity(38);
+            at_distinct.push('@');
+            at_distinct.push_str(&u.name);
+            at_distinct.push('#');
+            at_distinct.push_str(&u.discriminator);
+            result = result.replace(&u.mention(), &at_distinct);
         }
 
         // Then replace all role mentions.

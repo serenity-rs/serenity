@@ -54,7 +54,9 @@ pub struct Configuration {
 }
 
 impl Configuration {
-    /// If set to false the bot will also respond to any other bots and itself.
+    /// Whether the bot should respond to other bots.
+    ///
+    /// For example, if this is set to false, then the bot will respond to any other bots including itself.
     pub fn ignore_bots(mut self, ignore_bots: bool) -> Self {
         self.ignore_bots = ignore_bots;
 
