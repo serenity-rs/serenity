@@ -306,7 +306,7 @@ impl Framework {
 
     #[cfg(feature="cache")]
     fn is_blocked_guild(&self, message: &Message) -> bool {
-        if let Some(Channel::Guild(channel)) = CACHE.read().unwrap().get_channel(message.channel_id) {
+        if let Some(Channel::Guild(channel)) = CACHE.read().unwrap().channel(message.channel_id) {
             let guild_id = channel.read().unwrap().guild_id;
             if self.configuration.blocked_guilds.contains(&guild_id) {
                 return true;
@@ -334,7 +334,7 @@ impl Framework {
 
     fn checks_passed(&self, command: &Arc<Command>, mut context: &mut Context, message: &Message) -> bool {
         for check in &command.checks {
-            if !(check)(&mut context, &message) {
+            if !(check)(&mut context, message) {
                 return false;
             }
         }
@@ -342,6 +342,7 @@ impl Framework {
         true
     }
 
+    #[allow(too_many_arguments)]
     fn should_fail(&mut self,
                    mut context: &mut Context,
                    message: &Message,
@@ -353,12 +354,12 @@ impl Framework {
             Some(DispatchError::IgnoredBot)
         } else if self.configuration.ignore_webhooks && message.webhook_id.is_some() {
             Some(DispatchError::WebhookAuthor)
-        } else if !self.configuration.owners.contains(&message.author.id) {
-            let ref bucket = command.bucket;
-
-            if let Some(rate_limit) = bucket.clone().map(|x| self.ratelimit_time(x.as_str(), message.author.id.0)) {
+        } else if self.configuration.owners.contains(&message.author.id) {
+            None
+        } else {
+            if let Some(rate_limit) = command.bucket.clone().map(|x| self.ratelimit_time(x.as_str(), message.author.id.0)) {
                 if rate_limit > 0i64 {
-                    return Some(DispatchError::RateLimited(rate_limit.clone()));
+                    return Some(DispatchError::RateLimited(rate_limit));
                 }
             }
 
@@ -382,34 +383,31 @@ impl Framework {
 
             #[cfg(feature="cache")]
             {
-                if self.is_blocked_guild(&message) {
+                if self.is_blocked_guild(message) {
                     return Some(DispatchError::BlockedGuild);
                 }
             }
 
             if command.owners_only {
                 Some(DispatchError::OnlyForOwners)
-            } else if !self.checks_passed(&command, &mut context, &message) {
+            } else if !self.checks_passed(command, &mut context, message) {
                 Some(DispatchError::CheckFailed)
-            } else if !self.has_correct_permissions(&command, &message) {
+            } else if !self.has_correct_permissions(command, message) {
                 Some(DispatchError::LackOfPermissions(command.required_permissions))
             } else if self.configuration.blocked_users.contains(&message.author.id) {
                 Some(DispatchError::BlockedUser)
-            } else if !self.configuration.allow_dm && message.is_private() {
+            } else if (!self.configuration.allow_dm && message.is_private()) ||
+                (message.is_private() && command.guild_only) {
                 Some(DispatchError::OnlyForGuilds)
             } else if self.configuration.disabled_commands.contains(to_check) {
                 Some(DispatchError::CommandDisabled(to_check.to_owned()))
             } else if self.configuration.disabled_commands.contains(built) {
                 Some(DispatchError::CommandDisabled(built.to_owned()))
-            } else if message.is_private() && command.guild_only {
-                Some(DispatchError::OnlyForGuilds)
             } else if !message.is_private() && command.dm_only {
                 Some(DispatchError::OnlyForDM)
             } else {
                 None
             }
-        } else {
-            None
         }
     }
 
