@@ -16,7 +16,7 @@ extern crate typemap;
 use serenity::client::Context;
 use serenity::Client;
 use serenity::model::{Message, permissions};
-use serenity::ext::framework::help_commands;
+use serenity::ext::framework::{DispatchError, help_commands};
 use std::collections::HashMap;
 use std::env;
 use std::fmt::Write;
@@ -60,7 +60,6 @@ fn main() {
         .configure(|c| c
             .allow_whitespace(true)
             .on_mention(true)
-            .rate_limit_message("Try this again in `%time%` seconds.")
             .prefix("~"))
         // Set a function to be called prior to each command execution. This
         // provides the context of the command, the message that was received,
@@ -90,6 +89,18 @@ fn main() {
             match error {
                 Ok(()) => println!("Processed command '{}'", command_name),
                 Err(why) => println!("Command '{}' returned error {:?}", command_name, why),
+            }
+        })
+        // Set a function that's called whenever a command's execution didn't complete for one
+        // reason or another. For example, when a user has exceeded a rate-limit or a command
+        // can only be performed by the bot owner.
+        .on_dispatch_error(|_ctx, msg, error| {
+            match error {
+                DispatchError::RateLimited(seconds) => {
+                    let _ = msg.channel_id.say(&format!("Try this again in {} seconds.", seconds));
+                },
+                // Any other error would be silently ignored.
+                _ => {},
             }
         })
         // Can't be used more than once per 5 seconds:

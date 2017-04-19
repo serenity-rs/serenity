@@ -64,7 +64,7 @@ mod buckets;
 
 pub use self::buckets::{Bucket, MemberRatelimit, Ratelimit};
 pub use self::command::{Command, CommandType, CommandGroup, CommandOrAlias};
-pub use self::configuration::{AccountType, Configuration};
+pub use self::configuration::Configuration;
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
 
@@ -75,6 +75,7 @@ use std::sync::Arc;
 use std::thread;
 use ::client::Context;
 use ::model::{Message, UserId};
+use ::model::permissions::Permissions;
 use ::utils;
 
 #[cfg(feature="cache")]
@@ -170,6 +171,43 @@ macro_rules! command {
     };
 }
 
+/// A enum representing all possible fail conditions under which a command won't
+/// be executed.
+pub enum DispatchError {
+    /// When a custom function check has failed.
+    CheckFailed,
+    /// When the requested command is disabled in bot configuration.
+    CommandDisabled(String),
+    /// When the user is blocked in bot configuration.
+    BlockedUser,
+    /// When the guild or its owner is blocked in bot configuration.
+    BlockedGuild,
+    /// When the command requester lacks specific required permissions.
+    LackOfPermissions(Permissions),
+    /// When the command requester has exceeded a ratelimit bucket. The attached
+    /// value is the time a requester has to wait to run the command again.
+    RateLimited(i64),
+    /// When the requested command can only be used in a direct message or group
+    /// channel.
+    OnlyForDM,
+    /// When the requested command can only be ran in guilds, or the bot doesn't
+    /// support DMs.
+    OnlyForGuilds,
+    /// When the requested command can only be used by bot owners.
+    OnlyForOwners,
+    /// When there are too few arguments.
+    NotEnoughArguments { min: i32, given: usize },
+    /// When there are too many arguments.
+    TooManyArguments { max: i32, given: usize },
+    /// When the command was requested by a bot user when they are set to be
+    /// ignored.
+    IgnoredBot,
+    /// When the bot ignores webhooks and a command was issued by one.
+    WebhookAuthor,
+}
+
+type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;
+
 /// A utility for easily managing dispatches to commands.
 ///
 /// Refer to the [module-level documentation] for more information.
@@ -181,6 +219,7 @@ pub struct Framework {
     configuration: Configuration,
     groups: HashMap<String, Arc<CommandGroup>>,
     before: Option<Arc<BeforeHook>>,
+    dispatch_error_handler: Option<Arc<DispatchErrorHook>>,
     buckets: HashMap<String, Bucket>,
     after: Option<Arc<AfterHook>>,
     /// Whether the framework has been "initialized".
@@ -251,7 +290,7 @@ impl Framework {
         self
     }
 
-    /// Defines a bucket just with `delay` between each command.
+    /// Defines a bucket with only a `delay` between each command.
     pub fn simple_bucket<S>(mut self, s: S, delay: i64) -> Self
         where S: Into<String> {
         self.buckets.insert(s.into(), Bucket {
@@ -265,29 +304,118 @@ impl Framework {
         self
     }
 
+    #[cfg(feature="cache")]
+    fn is_blocked_guild(&self, message: &Message) -> bool {
+        if let Some(Channel::Guild(channel)) = CACHE.read().unwrap().get_channel(message.channel_id) {
+            let guild_id = channel.read().unwrap().guild_id;
+            if self.configuration.blocked_guilds.contains(&guild_id) {
+                return true;
+            }
+
+            if let Some(guild) = guild_id.find() {
+                return self.configuration.blocked_users.contains(&guild.read().unwrap().owner_id);
+            }
+        }
+
+        false
+    }
+
+    fn has_correct_permissions(&self, command: &Arc<Command>, message: &Message) -> bool {
+        if !command.required_permissions.is_empty() {
+            if let Some(guild) = message.guild() {
+                let perms = guild.read().unwrap().permissions_for(message.channel_id, message.author.id);
+
+                return perms.contains(command.required_permissions);
+            }
+        }
+
+        true
+    }
+
+    fn checks_passed(&self, command: &Arc<Command>, mut context: &mut Context, message: &Message) -> bool {
+        for check in &command.checks {
+            if !(check)(&mut context, &message) {
+                return false;
+            }
+        }
+
+        true
+    }
+
+    fn should_fail(&mut self,
+                   mut context: &mut Context,
+                   message: &Message,
+                   command: &Arc<Command>,
+                   args: usize,
+                   to_check: &str,
+                   built: &str) -> Option<DispatchError> {
+        if self.configuration.ignore_bots && message.author.bot {
+            Some(DispatchError::IgnoredBot)
+        } else if self.configuration.ignore_webhooks && message.webhook_id.is_some() {
+            Some(DispatchError::WebhookAuthor)
+        } else if !self.configuration.owners.contains(&message.author.id) {
+            let ref bucket = command.bucket;
+
+            if let Some(rate_limit) = bucket.clone().map(|x| self.ratelimit_time(x.as_str(), message.author.id.0)) {
+                if rate_limit > 0i64 {
+                    return Some(DispatchError::RateLimited(rate_limit.clone()));
+                }
+            }
+
+            if let Some(x) = command.min_args {
+                if args < x as usize {
+                    return Some(DispatchError::NotEnoughArguments {
+                        min: x,
+                        given: args
+                    });
+                }
+            }
+
+            if let Some(x) = command.max_args {
+                if args > x as usize {
+                    return Some(DispatchError::TooManyArguments {
+                        max: x,
+                        given: args
+                    });
+                }
+            }
+
+            #[cfg(feature="cache")]
+            {
+                if self.is_blocked_guild(&message) {
+                    return Some(DispatchError::BlockedGuild);
+                }
+            }
+
+            if command.owners_only {
+                Some(DispatchError::OnlyForOwners)
+            } else if !self.checks_passed(&command, &mut context, &message) {
+                Some(DispatchError::CheckFailed)
+            } else if !self.has_correct_permissions(&command, &message) {
+                Some(DispatchError::LackOfPermissions(command.required_permissions))
+            } else if self.configuration.blocked_users.contains(&message.author.id) {
+                Some(DispatchError::BlockedUser)
+            } else if !self.configuration.allow_dm && message.is_private() {
+                Some(DispatchError::OnlyForGuilds)
+            } else if self.configuration.disabled_commands.contains(to_check) {
+                Some(DispatchError::CommandDisabled(to_check.to_owned()))
+            } else if self.configuration.disabled_commands.contains(built) {
+                Some(DispatchError::CommandDisabled(built.to_owned()))
+            } else if message.is_private() && command.guild_only {
+                Some(DispatchError::OnlyForGuilds)
+            } else if !message.is_private() && command.dm_only {
+                Some(DispatchError::OnlyForDM)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+
     #[allow(cyclomatic_complexity)]
     #[doc(hidden)]
     pub fn dispatch(&mut self, mut context: Context, message: Message) {
-        match self.configuration.account_type {
-            AccountType::Selfbot => {
-                if message.author.id != self.user_info.0 {
-                    return;
-                }
-            },
-            AccountType::Bot => if message.author.bot {
-                return;
-            },
-            AccountType::Automatic => {
-                if self.user_info.1 {
-                    if message.author.bot {
-                        return;
-                    }
-                } else if message.author.id != self.user_info.0 {
-                    return;
-                }
-            },
-            AccountType::Any => {}
-        }
         let res = command::positions(&mut context, &message.content, &self.configuration);
 
         let positions = match res {
@@ -346,123 +474,6 @@ impl Framework {
                     };
 
                     if let Some(&CommandOrAlias::Command(ref command)) = group.commands.get(&to_check) {
-                        let is_owner = self.configuration.owners.contains(&message.author.id);
-                        // Most of the checks don't apply to owners.
-                        if !is_owner {
-                            if command.owners_only {
-                                if let Some(ref message) = self.configuration.invalid_permission_message {
-                                    let _ = context.channel_id.unwrap().say(message);
-                                }
-
-                                return;
-                            }
-
-                            if self.configuration.ignore_webhooks && message.webhook_id.is_some() {
-                                return;
-                            }
-
-                            #[cfg(feature="cache")]
-                            {
-                                if !self.configuration.allow_dm && message.is_private() {
-                                    if let Some(ref message) = self.configuration.no_dm_message {
-                                        let _ = context.channel_id.unwrap().say(message);
-                                    }
-
-                                    return;
-                                }
-                            }
-
-                            if self.configuration.blocked_users.contains(&message.author.id) {
-                                if let Some(ref message) = self.configuration.blocked_user_message {
-                                    let _ = context.channel_id.unwrap().say(message);
-                                }
-
-                                return;
-                            }
-
-                            if self.configuration.disabled_commands.contains(&to_check) ||
-                               self.configuration.disabled_commands.contains(&built) {
-                                if let Some(ref message) = self.configuration.command_disabled_message {
-                                    let msg = message.replace("%command%", &to_check);
-
-                                    let _ = context.channel_id.unwrap().say(&msg);
-                                }
-
-                                return;
-                            }
-
-                            if let Some(ref bucket_name) = command.bucket {
-                                let rate_limit = self.ratelimit_time(bucket_name, message.author.id.0);
-
-                                if rate_limit > 0 {
-                                    if let Some(ref message) = self.configuration.rate_limit_message {
-                                        let msg = message.replace("%time%", &rate_limit.to_string());
-
-                                        let _ = context.channel_id.unwrap().say(&msg);
-                                    }
-
-                                    return;
-                                }
-                            }
-
-                            #[cfg(feature="cache")]
-                            {
-
-                                let guild_id = {
-                                    match CACHE.read().unwrap().get_channel(message.channel_id) {
-                                        Some(Channel::Guild(channel)) => Some(channel.read().unwrap().guild_id),
-                                        _ => None,
-                                    }
-                                };
-
-                                if let Some(guild_id) = guild_id {
-                                    if self.configuration.blocked_guilds.contains(&guild_id) {
-                                        if let Some(ref message) = self.configuration.blocked_guild_message {
-                                            let _ = context.channel_id.unwrap().say(message);
-                                        }
-
-                                        return;
-                                    }
-
-                                    if let Some(guild) = guild_id.find() {
-                                        if self.configuration.blocked_users.contains(&guild.read().unwrap().owner_id) {
-                                            if let Some(ref message) = self.configuration.blocked_guild_message {
-                                                let _ = context.channel_id.unwrap().say(message);
-                                            }
-
-                                            return;
-                                        }
-                                    }
-                                }
-
-                                if message.is_private() {
-                                    if command.guild_only {
-                                        if let Some(ref message) = self.configuration.no_guild_message {
-                                            let _ = context.channel_id.unwrap().say(message);
-                                        }
-
-                                        return;
-                                    }
-                                } else if command.dm_only {
-                                    if let Some(ref message) = self.configuration.no_dm_message {
-                                        let _ = context.channel_id.unwrap().say(message);
-                                    }
-
-                                    return;
-                                }
-                            }
-
-                            for check in &command.checks {
-                                if !(check)(&mut context, &message) {
-                                    if let Some(ref message) = self.configuration.invalid_check_message {
-                                        let _ = context.channel_id.unwrap().say(message);
-                                    }
-
-                                    continue 'outer;
-                                }
-                            }
-                        }
-
                         let before = self.before.clone();
                         let command = command.clone();
                         let after = self.after.clone();
@@ -477,80 +488,16 @@ impl Framework {
                                 .collect::<Vec<String>>()
                         };
 
-                        if let Some(x) = command.min_args {
-                            if args.len() < x as usize {
-                                if let Some(ref message) = self.configuration.not_enough_args_message {
-                                    let msg = message.replace("%min%", &x.to_string())
-                                        .replace("%given%", &args.len().to_string());
-
-                                    let _ = context.channel_id.unwrap().say(&msg);
-                                }
-
-                                return;
+                        if let Some(error) = self.should_fail(&mut context, &message, &command, args.len(), &to_check, &built) {
+                            if let Some(ref handler) = self.dispatch_error_handler {
+                                handler(context, message, error);
                             }
-                        }
-
-                        if let Some(x) = command.max_args {
-                            if args.len() > x as usize {
-                                if let Some(ref message) = self.configuration.too_many_args_message {
-                                    let msg = message.replace("%max%", &x.to_string())
-                                        .replace("%given%", &args.len().to_string());
-
-                                    let _ = context.channel_id.unwrap().say(&msg);
-                                }
-
-                                return;
-                            }
-                        }
-
-                        #[cfg(feature="cache")]
-                        {
-                            if !is_owner && !command.required_permissions.is_empty() {
-                                let mut permissions_fulfilled = false;
-
-                                let cache = CACHE.read().unwrap();
-
-                                // Really **really** dirty code in the meantime
-                                // before the framework rewrite.
-                                let member = {
-                                    let mut member_found = None;
-
-                                    if let Some(Channel::Guild(channel)) = cache.get_channel(message.channel_id) {
-                                        let guild_id = channel.read().unwrap().guild_id;
-
-                                        if let Some(guild) = guild_id.find() {
-                                            if let Some(member) = guild.read().unwrap().members.get(&message.author.id) {
-                                                member_found = Some(member.clone());
-                                            }
-                                        }
-                                    }
-
-                                    member_found
-                                };
-
-                                if let Some(member) = member {
-                                    if let Ok(guild_id) = member.find_guild() {
-                                        if let Some(guild) = cache.get_guild(guild_id) {
-                                            let perms = guild.read().unwrap().permissions_for(message.channel_id, message.author.id);
-
-                                            permissions_fulfilled = perms.contains(command.required_permissions);
-                                        }
-                                    }
-                                }
-
-                                if !permissions_fulfilled {
-                                    if let Some(ref message) = self.configuration.invalid_permission_message {
-                                        let _ = context.channel_id.unwrap().say(message);
-                                    }
-
-                                    return;
-                                }
-                            }
+                            return;
                         }
 
                         thread::spawn(move || {
                             if let Some(before) = before {
-                                if !(before)(&mut context, &message, &built) && !is_owner {
+                                if !(before)(&mut context, &message, &built) {
                                     return;
                                 }
                             }
@@ -667,6 +614,16 @@ impl Framework {
         self
     }
 
+    /// Specify the function that's called in case a command wasn't executed for one reason or another.
+    ///
+    /// DispatchError represents all possible fail conditions.
+    pub fn on_dispatch_error<F>(mut self, f: F) -> Self
+        where F: Fn(Context, Message, DispatchError) + Send + Sync + 'static {
+        self.dispatch_error_handler = Some(Arc::new(f));
+
+        self
+    }
+
     /// Specify the function to be called prior to every command's execution.
     /// If that function returns true, the command will be executed.
     pub fn before<F>(mut self, f: F) -> Self
@@ -681,57 +638,6 @@ impl Framework {
     pub fn after<F>(mut self, f: F) -> Self
         where F: Fn(&mut Context, &Message, &String, Result<(), String>) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
-
-        self
-    }
-
-    /// Adds a "check" to a command, which checks whether or not the command's
-    /// associated function should be called.
-    ///
-    /// # Examples
-    ///
-    /// Ensure that the user who created a message, calling a "ping" command,
-    /// is the owner.
-    ///
-    /// ```rust,ignore
-    /// use serenity::client::{Client, Context};
-    /// use serenity::model::Message;
-    /// use std::env;
-    ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN").unwrap());
-    ///
-    /// client.with_framework(|f| f
-    ///     .configure(|c| c.prefix("~"))
-    ///     .on("ping", ping)
-    ///     .set_check("ping", owner_check));
-    ///
-    /// command!(ping(_context, message) {
-    ///     let _ = message.channel_id.say("Pong!");
-    /// });
-    ///
-    /// fn owner_check(_context: &mut Context, message: &Message) -> bool {
-    ///     // replace with your user ID
-    ///     message.author.id == 7
-    /// }
-    /// ```
-    #[deprecated(since="0.1.2", note="Use the `CreateCommand` builder's `check` instead.")]
-    pub fn set_check<F, S>(mut self, command: S, check: F) -> Self
-        where F: Fn(&mut Context, &Message) -> bool + Send + Sync + 'static,
-              S: Into<String> {
-        {
-            let ungrouped = self.groups.entry("Ungrouped".to_owned())
-                .or_insert_with(|| Arc::new(CommandGroup::default()));
-
-            if let Some(group) = Arc::get_mut(ungrouped) {
-                let name = command.into();
-
-                if let Some(&mut CommandOrAlias::Command(ref mut command)) = group.commands.get_mut(&name) {
-                    if let Some(command) = Arc::get_mut(command) {
-                        command.checks.push(Box::new(check));
-                    }
-                }
-            }
-        }
 
         self
     }
