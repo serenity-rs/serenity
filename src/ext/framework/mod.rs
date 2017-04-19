@@ -512,7 +512,7 @@ impl Framework {
                                     (x)(&mut context, &message, args)
                                 },
                                 CommandType::WithCommands(ref x) => {
-                                    (x)(&mut context, &message, groups, args)
+                                    (x)(&mut context, &message, groups, &args)
                                 }
                             };
 

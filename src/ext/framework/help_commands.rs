@@ -54,7 +54,7 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 pub fn with_embeds(ctx: &mut Context,
                    _: &Message,
                    groups: HashMap<String, Arc<CommandGroup>>,
-                   args: Vec<String>) -> Result<(), String> {
+                   args: &[String]) -> Result<(), String> {
     if !args.is_empty() {
         let name = args.join(" ");
 
@@ -179,7 +179,7 @@ pub fn with_embeds(ctx: &mut Context,
 pub fn plain(ctx: &mut Context,
              _: &Message,
              groups: HashMap<String, Arc<CommandGroup>>,
-             args: Vec<String>) -> Result<(), String> {
+             args: &[String]) -> Result<(), String> {
     if !args.is_empty() {
         let name = args.join(" ");
 

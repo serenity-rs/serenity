@@ -112,7 +112,7 @@ impl CreateCommand {
     ///
     /// You can return `Err(string)` if there's an error.
     pub fn exec_help<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, &[String]) -> Result<(), String> + Send + Sync + 'static {
         self.0.exec = CommandType::WithCommands(Box::new(f));
 
         self
