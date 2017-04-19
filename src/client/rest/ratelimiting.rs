@@ -402,6 +402,8 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
             if !redo.unwrap_or(true) {
                 return Ok(response);
             }
+        } else {
+            return Ok(response);
         }
     }
 }
