@@ -345,8 +345,8 @@ impl Channel {
     }
 }
 
-impl Deserialize for Channel {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for Channel {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let v = JsonMap::deserialize(deserializer)?;
         let kind = {
             let kind = v.get("type").ok_or_else(|| DeError::missing_field("type"))?;
@@ -451,8 +451,8 @@ pub struct PermissionOverwrite {
     pub kind: PermissionOverwriteType,
 }
 
-impl Deserialize for PermissionOverwrite {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<PermissionOverwrite, D::Error> {
+impl<'de> Deserialize<'de> for PermissionOverwrite {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<PermissionOverwrite, D::Error> {
         let data = PermissionOverwriteData::deserialize(deserializer)?;
 
         let kind = match &data.kind[..] {

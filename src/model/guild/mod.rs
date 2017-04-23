@@ -1091,8 +1091,8 @@ impl Guild {
     }
 }
 
-impl Deserialize for Guild {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for Guild {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
         let id = map.get("id")

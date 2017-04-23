@@ -26,8 +26,8 @@ pub struct ChannelCreateEvent {
     pub channel: Channel,
 }
 
-impl Deserialize for ChannelCreateEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for ChannelCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             channel: Channel::deserialize(deserializer)?,
         })
@@ -39,8 +39,8 @@ pub struct ChannelDeleteEvent {
     pub channel: Channel,
 }
 
-impl Deserialize for ChannelDeleteEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for ChannelDeleteEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             channel: Channel::deserialize(deserializer)?,
         })
@@ -70,8 +70,8 @@ pub struct ChannelUpdateEvent {
     pub channel: Channel,
 }
 
-impl Deserialize for ChannelUpdateEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for ChannelUpdateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             channel: Channel::deserialize(deserializer)?,
         })
@@ -106,8 +106,8 @@ pub struct GuildCreateEvent {
     pub guild: Guild,
 }
 
-impl Deserialize for GuildCreateEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for GuildCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             guild: Guild::deserialize(deserializer)?,
         })
@@ -119,8 +119,8 @@ pub struct GuildDeleteEvent {
     pub guild: PartialGuild,
 }
 
-impl Deserialize for GuildDeleteEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for GuildDeleteEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             guild: PartialGuild::deserialize(deserializer)?,
         })
@@ -145,8 +145,8 @@ pub struct GuildMemberAddEvent {
     pub member: Member,
 }
 
-impl Deserialize for GuildMemberAddEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for GuildMemberAddEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let map = JsonMap::deserialize(deserializer)?;
 
         let guild_id = map.get("guild_id")
@@ -181,8 +181,8 @@ pub struct GuildMembersChunkEvent {
     pub members: HashMap<UserId, Member>,
 }
 
-impl Deserialize for GuildMembersChunkEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
         let guild_id = map.get("guild_id")
@@ -241,8 +241,8 @@ pub struct GuildUpdateEvent {
     pub guild: PartialGuild,
 }
 
-impl Deserialize for GuildUpdateEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for GuildUpdateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             guild: PartialGuild::deserialize(deserializer)?,
         })
@@ -254,8 +254,8 @@ pub struct MessageCreateEvent {
     pub message: Message,
 }
 
-impl Deserialize for MessageCreateEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for MessageCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             message: Message::deserialize(deserializer)?,
         })
@@ -301,8 +301,8 @@ pub struct PresenceUpdateEvent {
     pub roles: Option<Vec<RoleId>>,
 }
 
-impl Deserialize for PresenceUpdateEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for PresenceUpdateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
         let guild_id = match map.remove("guild_id") {
@@ -328,8 +328,8 @@ pub struct PresencesReplaceEvent {
     pub presences: Vec<Presence>,
 }
 
-impl Deserialize for PresencesReplaceEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for PresencesReplaceEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let presences: Vec<Presence> = Deserialize::deserialize(deserializer)?;
 
         Ok(Self {
@@ -343,8 +343,8 @@ pub struct ReactionAddEvent {
     pub reaction: Reaction,
 }
 
-impl Deserialize for ReactionAddEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for ReactionAddEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             reaction: Reaction::deserialize(deserializer)?,
         })
@@ -356,8 +356,8 @@ pub struct ReactionRemoveEvent {
     pub reaction: Reaction,
 }
 
-impl Deserialize for ReactionRemoveEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for ReactionRemoveEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             reaction: Reaction::deserialize(deserializer)?,
         })
@@ -376,8 +376,8 @@ pub struct ReadyEvent {
     pub ready: Ready,
 }
 
-impl Deserialize for ReadyEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for ReadyEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             ready: Ready::deserialize(deserializer)?,
         })
@@ -408,8 +408,8 @@ pub struct UserUpdateEvent {
     pub current_user: CurrentUser,
 }
 
-impl Deserialize for UserUpdateEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for UserUpdateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             current_user: CurrentUser::deserialize(deserializer)?,
         })
@@ -430,8 +430,8 @@ pub struct VoiceStateUpdateEvent {
     pub voice_state: VoiceState,
 }
 
-impl Deserialize for VoiceStateUpdateEvent {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let map = JsonMap::deserialize(deserializer)?;
         let guild_id = match map.get("guild_id") {
             Some(v) => Some(GuildId::deserialize(v.clone()).map_err(DeError::custom)?),

@@ -286,7 +286,7 @@ impl Region {
 use serde::{Deserialize, Deserializer};
 use std::result::Result as StdResult;
 
-fn deserialize_sync_user<D: Deserializer>(deserializer: D)
+fn deserialize_sync_user<'de, D: Deserializer<'de>>(deserializer: D)
     -> StdResult<Arc<RwLock<User>>, D::Error> {
     Ok(Arc::new(RwLock::new(User::deserialize(deserializer)?)))
 }

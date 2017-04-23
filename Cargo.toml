@@ -11,19 +11,22 @@ repository = "https://github.com/zeyla/serenity.git"
 version = "0.1.5"
 
 [dependencies]
-base64 = "0.3"
-bitflags = "0.7"
-byteorder = "0.5"
-flate2 = "0.2"
-hyper = "0.9"
-lazy_static = "0.2"
-log = "0.3"
-serde = "0.9"
-serde_derive = "0.9"
-serde_json = "0.9"
-time = "0.1"
-typemap = "0.3"
-websocket = "0.17"
+base64 = "~0.4"
+bitflags = "~0.8"
+flate2 = "~0.2"
+hyper = "~0.9"
+lazy_static = "~0.2"
+log = "~0.3"
+serde = "^1.0"
+serde_derive = "^1.0"
+serde_json = "^1.0"
+time = "~0.1"
+typemap = "~0.3"
+websocket = "~0.17"
+
+[dependencies.byteorder]
+optional = true
+version = "1.0"
 
 [dependencies.cookie]
 default-features = false
@@ -43,13 +46,10 @@ default-features = false
 optional = true
 version = "0.0.12"
 
-[build-dependencies]
-yaml-rust = "0.3"
-
 [features]
 default = ["cache", "framework"]
 cache = []
 debug = []
 framework = []
 extras = []
-voice = ["opus", "sodiumoxide"]
+voice = ["byteorder", "opus", "sodiumoxide"]

@@ -100,7 +100,6 @@ extern crate serde_derive;
 extern crate serde_json;
 
 extern crate base64;
-extern crate byteorder;
 extern crate flate2;
 extern crate hyper;
 extern crate multipart;
@@ -109,6 +108,8 @@ extern crate time;
 extern crate typemap;
 extern crate websocket;
 
+#[cfg(feature="voice")]
+extern crate byteorder;
 #[cfg(feature="voice")]
 extern crate opus;
 #[cfg(feature="voice")]

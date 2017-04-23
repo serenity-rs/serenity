@@ -11,7 +11,7 @@ use super::permissions::{self, Permissions};
 #[cfg(feature="cache")]
 use ::client::CACHE;
 
-pub fn deserialize_emojis<D: Deserializer>(deserializer: D)
+pub fn deserialize_emojis<'de, D: Deserializer<'de>>(deserializer: D)
     -> StdResult<HashMap<EmojiId, Emoji>, D::Error> {
     let vec: Vec<Emoji> = Deserialize::deserialize(deserializer)?;
     let mut emojis = HashMap::new();
@@ -23,7 +23,7 @@ pub fn deserialize_emojis<D: Deserializer>(deserializer: D)
     Ok(emojis)
 }
 
-pub fn deserialize_guild_channels<D: Deserializer>(deserializer: D)
+pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(deserializer: D)
     -> StdResult<HashMap<ChannelId, Arc<RwLock<GuildChannel>>>, D::Error> {
     let vec: Vec<GuildChannel> = Deserialize::deserialize(deserializer)?;
     let mut map = HashMap::new();
@@ -35,7 +35,7 @@ pub fn deserialize_guild_channels<D: Deserializer>(deserializer: D)
     Ok(map)
 }
 
-pub fn deserialize_members<D: Deserializer>(deserializer: D)
+pub fn deserialize_members<'de, D: Deserializer<'de>>(deserializer: D)
     -> StdResult<HashMap<UserId, Member>, D::Error> {
     let vec: Vec<Member> = Deserialize::deserialize(deserializer)?;
     let mut members = HashMap::new();
@@ -49,7 +49,7 @@ pub fn deserialize_members<D: Deserializer>(deserializer: D)
     Ok(members)
 }
 
-pub fn deserialize_presences<D: Deserializer>(deserializer: D)
+pub fn deserialize_presences<'de, D: Deserializer<'de>>(deserializer: D)
     -> StdResult<HashMap<UserId, Presence>, D::Error> {
     let vec: Vec<Presence> = Deserialize::deserialize(deserializer)?;
     let mut presences = HashMap::new();
@@ -61,7 +61,7 @@ pub fn deserialize_presences<D: Deserializer>(deserializer: D)
     Ok(presences)
 }
 
-pub fn deserialize_private_channels<D: Deserializer>(deserializer: D)
+pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(deserializer: D)
     -> StdResult<HashMap<ChannelId, Channel>, D::Error> {
     let vec: Vec<Channel> = Deserialize::deserialize(deserializer)?;
     let mut private_channels = HashMap::new();
@@ -79,7 +79,7 @@ pub fn deserialize_private_channels<D: Deserializer>(deserializer: D)
     Ok(private_channels)
 }
 
-pub fn deserialize_roles<D: Deserializer>(deserializer: D)
+pub fn deserialize_roles<'de, D: Deserializer<'de>>(deserializer: D)
     -> StdResult<HashMap<RoleId, Role>, D::Error> {
     let vec: Vec<Role> = Deserialize::deserialize(deserializer)?;
     let mut roles = HashMap::new();
@@ -91,7 +91,7 @@ pub fn deserialize_roles<D: Deserializer>(deserializer: D)
     Ok(roles)
 }
 
-pub fn deserialize_single_recipient<D: Deserializer>(deserializer: D)
+pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(deserializer: D)
     -> StdResult<Arc<RwLock<User>>, D::Error> {
     let mut users: Vec<User> = Deserialize::deserialize(deserializer)?;
     let user = if users.is_empty() {
@@ -103,7 +103,7 @@ pub fn deserialize_single_recipient<D: Deserializer>(deserializer: D)
     Ok(Arc::new(RwLock::new(user)))
 }
 
-pub fn deserialize_users<D: Deserializer>(deserializer: D)
+pub fn deserialize_users<'de, D: Deserializer<'de>>(deserializer: D)
     -> StdResult<HashMap<UserId, Arc<RwLock<User>>>, D::Error> {
     let vec: Vec<User> = Deserialize::deserialize(deserializer)?;
     let mut users = HashMap::new();
@@ -115,7 +115,7 @@ pub fn deserialize_users<D: Deserializer>(deserializer: D)
     Ok(users)
 }
 
-pub fn deserialize_voice_states<D: Deserializer>(deserializer: D)
+pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(deserializer: D)
     -> StdResult<HashMap<UserId, VoiceState>, D::Error> {
     let vec: Vec<VoiceState> = Deserialize::deserialize(deserializer)?;
     let mut voice_states = HashMap::new();

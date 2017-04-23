@@ -482,15 +482,15 @@ impl Permissions {
     }
 }
 
-impl Deserialize for Permissions {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for Permissions {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Permissions::from_bits_truncate(deserializer.deserialize_u64(U64Visitor)?))
     }
 }
 
 struct U64Visitor;
 
-impl Visitor for U64Visitor {
+impl<'de> Visitor<'de> for U64Visitor {
     type Value = u64;
 
     fn expecting(&self, formatter: &mut Formatter) -> FmtResult {

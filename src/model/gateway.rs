@@ -58,8 +58,8 @@ impl Game {
     }
 }
 
-impl Deserialize for Game {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Self, D::Error> {
+impl<'de> Deserialize<'de> for Game {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
         let kind = map.remove("type")
             .and_then(|v| GameType::deserialize(v).ok())
@@ -126,8 +126,8 @@ pub struct Presence {
     pub user: Option<Arc<RwLock<User>>>,
 }
 
-impl Deserialize for Presence {
-    fn deserialize<D: Deserializer>(deserializer: D) -> StdResult<Presence, D::Error> {
+impl<'de> Deserialize<'de> for Presence {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Presence, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
         let mut user_map = map.remove("user")
             .ok_or_else(|| DeError::custom("expected presence user"))
