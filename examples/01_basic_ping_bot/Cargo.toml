@@ -5,5 +5,3 @@ authors = ["my name <my@email.address>"]
 
 [dependencies]
 serenity = { path = "../../", default-features = true }
-env_logger = "*"
-log= "*"
