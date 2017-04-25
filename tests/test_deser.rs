@@ -135,6 +135,11 @@ fn message_reaction_remove_all() {
 }
 
 #[test]
+fn ready() {
+    p!(ReadyEvent, "ready_1");
+}
+
+#[test]
 fn typing_start() {
     p!(TypingStartEvent, "typing_start_1");
 }

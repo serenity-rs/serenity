@@ -1,5 +1,6 @@
 use serde_json;
 use std::{fmt, mem};
+use super::utils::deserialize_u16;
 use super::*;
 use time::Timespec;
 use ::client::rest::{self, GuildPagination};
@@ -54,6 +55,7 @@ pub struct CurrentUser {
     pub avatar: Option<String>,
     #[serde(default)]
     pub bot: bool,
+    #[serde(deserialize_with="deserialize_u16")]
     pub discriminator: u16,
     pub email: Option<String>,
     pub mfa_enabled: bool,
