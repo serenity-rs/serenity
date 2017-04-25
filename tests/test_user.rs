@@ -7,7 +7,7 @@ fn gen() -> User {
         id: UserId(210),
         avatar: Some("abc".to_owned()),
         bot: true,
-        discriminator: "1432".to_owned(),
+        discriminator: 1432,
         name: "test".to_owned(),
     }
 }
@@ -31,14 +31,14 @@ fn test_core() {
 fn default_avatars() {
     let mut user = gen();
 
-    user.discriminator = "0".to_owned();
-    assert!(user.default_avatar_url().unwrap().ends_with("0.png"));
-    user.discriminator = "1".to_owned();
-    assert!(user.default_avatar_url().unwrap().ends_with("1.png"));
-    user.discriminator = "2".to_owned();
-    assert!(user.default_avatar_url().unwrap().ends_with("2.png"));
-    user.discriminator = "3".to_owned();
-    assert!(user.default_avatar_url().unwrap().ends_with("3.png"));
-    user.discriminator = "4".to_owned();
-    assert!(user.default_avatar_url().unwrap().ends_with("4.png"));
+    user.discriminator = 0;
+    assert!(user.default_avatar_url().ends_with("0.png"));
+    user.discriminator = 1;
+    assert!(user.default_avatar_url().ends_with("1.png"));
+    user.discriminator = 2;
+    assert!(user.default_avatar_url().ends_with("2.png"));
+    user.discriminator = 3;
+    assert!(user.default_avatar_url().ends_with("3.png"));
+    user.discriminator = 4;
+    assert!(user.default_avatar_url().ends_with("4.png"));
 }

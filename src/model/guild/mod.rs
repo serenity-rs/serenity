@@ -686,12 +686,13 @@ impl Guild {
     ///
     /// [`Member`]: struct.Member.html
     pub fn member_named(&self, name: &str) -> Option<&Member> {
-        let hash_pos = name.find('#');
-
-        let (name, discrim) = if let Some(pos) = hash_pos {
+        let (name, discrim) = if let Some(pos) = name.find('#') {
             let split = name.split_at(pos);
 
-            (split.0, Some(split.1))
+            match split.1.parse::<u16>() {
+                Ok(discrim_int) => (split.0, Some(discrim_int)),
+                Err(_) => (name, None),
+            }
         } else {
             (&name[..], None)
         };

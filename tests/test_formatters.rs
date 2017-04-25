@@ -49,7 +49,7 @@ fn test_mention() {
         id: UserId(6),
         avatar: None,
         bot: false,
-        discriminator: "4132".to_owned(),
+        discriminator: 4132,
         name: "fake".to_owned(),
     };
     let member = Member {

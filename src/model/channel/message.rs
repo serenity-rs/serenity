@@ -1,3 +1,4 @@
+use std::fmt::Write;
 use std::mem;
 use ::constants;
 use ::client::rest;
@@ -199,7 +200,7 @@ impl Message {
             at_distinct.push('@');
             at_distinct.push_str(&u.name);
             at_distinct.push('#');
-            at_distinct.push_str(&u.discriminator);
+            let _ = write!(at_distinct, "{}", u.discriminator);
             result = result.replace(&u.mention(), &at_distinct);
         }
 

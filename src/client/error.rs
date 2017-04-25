@@ -22,10 +22,8 @@ use ::model::{ChannelType, Permissions};
 /// let mut client = Client::login(&token);
 ///
 /// client.on_member_unban(|context, guild_id, user| {
-///     let discriminator = user.discriminator.parse::<u16>().unwrap();
-///
 ///     // If the user has an even discriminator, don't re-ban them.
-///     if discriminator % 2 == 0 {
+///     if user.discriminator % 2 == 0 {
 ///         return;
 ///     }
 ///

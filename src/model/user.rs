@@ -318,7 +318,8 @@ pub struct User {
     /// the same [`name`]. The name+discriminator pair is always unique.
     ///
     /// [`name`]: #structfield.name
-    pub discriminator: String,
+    #[serde(deserialize_with="deserialize_u16")]
+    pub discriminator: u16,
     /// The account's username. Changing username will trigger a discriminator
     /// change if the username+discriminator pair becomes non-unique.
     #[serde(rename="username")]
@@ -366,20 +367,8 @@ impl User {
     /// Returns the formatted URL to the user's default avatar URL.
     ///
     /// This will produce a PNG URL.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Num`] if there was an error parsing the
-    /// discriminator. Theoretically this is not possible.
-    ///
-    /// Returns an [`Error::Other`] if the remainder of the calculation
-    /// `discriminator % 5` can not be matched. This is also probably not going
-    /// to occur.
-    ///
-    /// [`Error::Num`]: ../enum.Error.html#variant.Num
-    /// [`Error::Other`]: ../enum.Error.html#variant.Other
-    pub fn default_avatar_url(&self) -> Result<String> {
-        Ok(cdn!("/embed/avatars/{}.png", self.discriminator.parse::<u16>()? % 5u16).to_owned())
+    pub fn default_avatar_url(&self) -> String {
+        cdn!("/embed/avatars/{}.png", self.discriminator % 5u16).to_owned()
     }
 
     /// Sends a message to a user through a direct message channel. This is a
