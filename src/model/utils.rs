@@ -115,6 +115,11 @@ pub fn deserialize_users<'de, D: Deserializer<'de>>(deserializer: D)
     Ok(users)
 }
 
+pub fn deserialize_u64<'de, D: Deserializer<'de>>(deserializer: D)
+    -> StdResult<u64, D::Error> {
+    deserializer.deserialize_u64(U64Visitor)
+}
+
 pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(deserializer: D)
     -> StdResult<HashMap<UserId, VoiceState>, D::Error> {
     let vec: Vec<VoiceState> = Deserialize::deserialize(deserializer)?;
@@ -154,4 +159,38 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
     permissions.remove(perms);
 
     Ok(permissions.is_empty())
+}
+
+
+pub struct U64Visitor;
+
+impl<'de> Visitor<'de> for U64Visitor {
+    type Value = u64;
+
+    fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
+        formatter.write_str("identifier")
+    }
+
+    fn visit_str<E: DeError>(self, v: &str) -> StdResult<Self::Value, E> {
+        match v.parse::<u64>() {
+            Ok(v) => Ok(v),
+            Err(_) => {
+                let mut s = String::new();
+                s.push_str("Unknown ");
+                s.push_str(stringify!($name));
+                s.push_str(" value: ");
+                s.push_str(v);
+
+                Err(DeError::custom(s))
+            },
+        }
+    }
+
+    fn visit_i64<E: DeError>(self, v: i64) -> StdResult<Self::Value, E> {
+        Ok(v as u64)
+    }
+
+    fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> {
+        Ok(v)
+    }
 }

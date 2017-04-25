@@ -20,6 +20,7 @@ use serde::de::Error as DeError;
 use serde_json;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::io::Read;
+use super::utils::deserialize_u64;
 use ::model::*;
 use ::utils::builder::{CreateMessage, GetMessages};
 
@@ -438,6 +439,7 @@ impl ChannelType {
 struct PermissionOverwriteData {
     allow: Permissions,
     deny: Permissions,
+    #[serde(deserialize_with="deserialize_u64")]
     id: u64,
     #[serde(rename="type")]
     kind: String,

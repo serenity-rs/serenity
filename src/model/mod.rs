@@ -39,7 +39,9 @@ pub use self::voice::*;
 pub use self::webhook::*;
 
 use self::utils::*;
+use serde::de::Visitor;
 use std::collections::HashMap;
+use std::fmt::{Formatter, Result as FmtResult};
 use std::sync::{Arc, RwLock};
 use time::Timespec;
 use ::internal::prelude::*;
@@ -51,7 +53,7 @@ macro_rules! id {
     ($(#[$attr:meta] $name:ident;)*) => {
         $(
             #[$attr]
-            #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialOrd, Ord, Serialize)]
+            #[derive(Copy, Clone, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
             #[allow(derive_hash_xor_eq)]
             pub struct $name(pub u64);
 
@@ -79,6 +81,12 @@ macro_rules! id {
             impl PartialEq<u64> for $name {
                 fn eq(&self, u: &u64) -> bool {
                     self.0 == *u
+                }
+            }
+
+            impl<'de> Deserialize<'de> for $name {
+                fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+                    deserializer.deserialize_u64(U64Visitor).map($name)
                 }
             }
         )*
