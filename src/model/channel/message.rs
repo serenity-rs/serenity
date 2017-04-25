@@ -488,10 +488,10 @@ impl Message {
             total += title.len();
         }
 
-        if total > constants::EMBED_MAX_LENGTH as usize {
+        if total <= constants::EMBED_MAX_LENGTH as usize {
             Ok(())
         } else {
-            let overflow = constants::EMBED_MAX_LENGTH as u64 - total as u64;
+            let overflow = total as u64 - constants::EMBED_MAX_LENGTH as u64;
 
             Err(Error::Client(ClientError::EmbedTooLarge(overflow)))
         }
