@@ -149,6 +149,19 @@ impl Group {
             format!(cdn!("/channel-icons/{}/{}.webp"), self.channel_id, icon))
     }
 
+    /// Determines if the channel is NSFW.
+    ///
+    /// Refer to [`utils::is_nsfw`] for more details.
+    ///
+    /// **Note**: This method is for consistency. This will always return
+    /// `false`, due to groups not being considered NSFW.
+    ///
+    /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
+    #[inline]
+    pub fn is_nsfw(&self) -> bool {
+        false
+    }
+
     /// Leaves the group.
     #[inline]
     pub fn leave(&self) -> Result<Group> {

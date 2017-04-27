@@ -165,6 +165,20 @@ impl Channel {
         self.id().edit_message(message_id, f)
     }
 
+    /// Determines if the channel is NSFW.
+    ///
+    /// Refer to [`utils::is_nsfw`] for more details.
+    ///
+    /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
+    #[inline]
+    pub fn is_nsfw(&self) -> bool {
+        match *self {
+            Channel::Group(_) => false,
+            Channel::Guild(ref channel) => channel.read().unwrap().is_nsfw(),
+            Channel::Private(_) => false,
+        }
+    }
+
     /// Gets a message from the channel.
     ///
     /// Requires the [Read Message History] permission.

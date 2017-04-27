@@ -128,6 +128,19 @@ impl PrivateChannel {
         self.id.edit_message(message_id, f)
     }
 
+    /// Determines if the channel is NSFW.
+    ///
+    /// Refer to [`utils::is_nsfw`] for more details.
+    ///
+    /// **Note**: This method is for consistency. This will always return
+    /// `false`, due to DMs not being considered NSFW.
+    ///
+    /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
+    #[inline]
+    pub fn is_nsfw(&self) -> bool {
+        false
+    }
+
     /// Gets a message from the channel.
     ///
     /// Requires the [Read Message History] permission.

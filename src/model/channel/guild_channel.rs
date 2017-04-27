@@ -5,6 +5,7 @@ use ::client::rest;
 use ::internal::prelude::*;
 use ::model::*;
 use ::utils::builder::{CreateInvite, CreateMessage, EditChannel, GetMessages};
+use ::utils as serenity_utils;
 
 #[cfg(feature="cache")]
 use ::client::CACHE;
@@ -317,6 +318,21 @@ impl GuildChannel {
     #[inline]
     pub fn invites(&self) -> Result<Vec<RichInvite>> {
         self.id.invites()
+    }
+
+    /// Determines if the channel is NSFW.
+    ///
+    /// Refer to [`utils::is_nsfw`] for more details.
+    ///
+    /// Only [text channels][`ChannelType::Text`] are taken into consideration
+    /// as being NSFW. [voice channels][`ChannelType::Voice`] are never NSFW.
+    ///
+    /// [`ChannelType::Text`]: enum.ChannelType.html#variant.Text
+    /// [`ChannelType::Voice`]: enum.ChannelType.html#variant.Voice
+    /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
+    #[inline]
+    pub fn is_nsfw(&self) -> bool {
+        self.kind == ChannelType::Text && serenity_utils::is_nsfw(&self.name)
     }
 
     /// Gets a message from the channel.

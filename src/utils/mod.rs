@@ -22,6 +22,59 @@ use ::model::{EmojiIdentifier, EmojiId};
 
 pub use self::message_builder::MessageBuilder;
 
+/// Determines if a name is NSFW.
+///
+/// This checks that the name is either `"nsfw"` or, for names longer than that,
+/// is prefixed with `"nsfw"`.
+///
+/// **Note**: Whether a channel is NSFW is done client-side, as a field for the
+/// NSFW-ness of a channel is not sent to clients. Discord's requirements for
+/// defining a channel as NSFW can change at any time.
+///
+/// # Examples
+///
+/// Check that a channel named `"nsfw"` is in fact NSFW:
+///
+/// ```rust
+/// use serenity::utils;
+///
+/// assert!(utils::is_nsfw("nsfw"));
+/// ```
+///
+/// Check that a channel named `"cats"` is _not_ NSFW:
+///
+/// ```rust
+/// use serenity::utils;
+///
+/// assert!(!utils::is_nsfw("cats"));
+/// ```
+///
+/// Check that a channel named `"nsfw-stuff"` _is_ NSFW:
+///
+/// ```rust
+/// use serenity::utils;
+///
+/// assert!(utils::is_nsfw("nsfw-stuff"));
+/// ```
+///
+/// Channels prefixed with `"nsfw"` but not the hyphen (`'-'`) are _not_
+/// considered NSFW:
+///
+/// ```rust
+/// use serenity::utils;
+///
+/// assert!(!utils::is_nsfw("nsfwstuff"));
+/// ```
+pub fn is_nsfw(name: &str) -> bool {
+    if name.len() == 4 {
+        &name[..4] == "nsfw"
+    } else if name.len() > 4 {
+        &name[..5] == "nsfw-"
+    } else {
+        false
+    }
+}
+
 /// Retrieves the "code" part of an [invite][`RichInvite`] out of a URL.
 ///
 /// # Examples
