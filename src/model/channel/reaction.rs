@@ -1,3 +1,4 @@
+use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 use ::client::rest;
 use ::internal::prelude::*;
@@ -96,8 +97,7 @@ impl Reaction {
 /// The type of a [`Reaction`] sent.
 ///
 /// [`Reaction`]: struct.Reaction.html
-#[derive(Clone, Debug, Deserialize)]
-#[serde(untagged)]
+#[derive(Clone, Debug)]
 pub enum ReactionType {
     /// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the
     /// guild.
@@ -114,8 +114,91 @@ pub enum ReactionType {
         name: String,
     },
     /// A reaction with a twemoji.
-    #[serde(rename="name")]
     Unicode(String),
+}
+
+impl<'de> Deserialize<'de> for ReactionType {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        enum Field {
+            Id,
+            Name,
+        }
+
+        impl<'de> Deserialize<'de> for Field {
+            fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+                struct FieldVisitor;
+
+                impl<'de> Visitor<'de> for FieldVisitor {
+                    type Value = Field;
+
+                    fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
+                        formatter.write_str("`id` or `name`")
+                    }
+
+                    fn visit_str<E: DeError>(self, value: &str) -> StdResult<Field, E> {
+                        match value {
+                            "id" => Ok(Field::Id),
+                            "name" => Ok(Field::Name),
+                            _ => Err(DeError::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+
+                deserializer.deserialize_identifier(FieldVisitor)
+            }
+        }
+
+        struct ReactionTypeVisitor;
+
+        impl<'de> Visitor<'de> for ReactionTypeVisitor {
+            type Value = ReactionType;
+
+            fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
+                formatter.write_str("enum ReactionType")
+            }
+
+            fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> StdResult<Self::Value, V::Error> {
+                let mut id = None;
+                let mut name = None;
+
+                while let Some(key) = map.next_key()? {
+                    match key {
+                        Field::Id => {
+                            if id.is_some() {
+                                return Err(DeError::duplicate_field("id"));
+                            }
+
+                            if let Ok(emoji_id) = map.next_value::<EmojiId>() {
+                                id = Some(emoji_id)
+                            }
+                        },
+                        Field::Name => {
+                            if name.is_some() {
+                                return Err(DeError::duplicate_field("name"));
+                            }
+
+                            name = Some(map.next_value()?);
+                        },
+                    }
+                }
+
+                let name = name.ok_or_else(|| DeError::missing_field("name"))?;
+
+                Ok(if let Some(id) = id {
+                    ReactionType::Custom {
+                        id: id,
+                        name: name,
+                    }
+                } else {
+                    ReactionType::Unicode(name)
+                })
+            }
+        }
+
+        const FIELDS: &'static [&'static str] = &["id", "name"];
+
+        deserializer.deserialize_map(ReactionTypeVisitor)
+    }
 }
 
 impl ReactionType {
