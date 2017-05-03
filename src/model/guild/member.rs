@@ -89,7 +89,7 @@ impl Member {
     /// Ban the member from its guild, deleting the last X number of
     /// days' worth of messages.
     ///
-    /// **Note**: Requires the [Ban Members] role.
+    /// **Note**: Requires the [Ban Members] permission.
     ///
     /// # Errors
     ///
@@ -194,6 +194,67 @@ impl Member {
         }
 
         Err(Error::Client(ClientError::GuildNotFound))
+    }
+
+    /// Kick the member from the guild.
+    ///
+    /// **Note**: Requires the [Kick Members] permission.
+    ///
+    /// # Examples
+    ///
+    /// Kick a member from its guild:
+    ///
+    /// ```rust,ignore
+    /// // assuming a `member` has already been bound
+    /// match member.kick() {
+    ///     Ok(()) => println!("Successfully kicked member"),
+    ///     Err(Error::Client(ClientError::GuildNotFound)) => {
+    ///         println!("Couldn't determine guild of member");
+    ///     },
+    ///     Err(Error::Client(ClientError::InvalidPermissions(missing_perms))) => {
+    ///         println!("Didn't have permissions; missing: {:?}", missing_perms);
+    ///     },
+    ///     _ => {},
+    /// }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::GuildNotFound`] if the Id of the member's guild
+    /// could not be determined.
+    ///
+    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// if the current user does not have permission to perform the kick.
+    ///
+    /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
+    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    pub fn kick(&self) -> Result<()> {
+        let guild_id;
+
+        #[cfg(feature="cache")]
+        {
+            guild_id = self.find_guild()?;
+            let req = permissions::KICK_MEMBERS;
+
+            let has_perms = CACHE
+                .read()
+                .unwrap()
+                .guilds
+                .get(&guild_id)
+                .map(|guild| guild.read().unwrap().has_perms(req));
+
+            if let Some(Ok(false)) = has_perms {
+                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+            }
+        }
+
+        #[cfg(not(feature="cache"))]
+        {
+            guild_id = self.guild_id.ok_or_else(|| Error::Client(ClientError::GuildNotFound))?;
+        }
+
+        guild_id.kick(self.user.read().unwrap().id)
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the
