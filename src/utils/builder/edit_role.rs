@@ -107,10 +107,10 @@ impl Default for EditRole {
     /// - **permissions**: the [general permissions set]
     /// - **position**: 1
     ///
-    /// [general permissions set]: ../../model/permissions/fn.general.html
+    /// [general permissions set]: ../../model/permissions/constant.PRESET_GENERAL.html
     fn default() -> EditRole {
         let mut map = Map::new();
-        let permissions = Number::from(permissions::general().bits());
+        let permissions = Number::from(permissions::PRESET_GENERAL.bits());
 
         map.insert("color".to_owned(), Value::Number(Number::from(10070709)));
         map.insert("hoist".to_owned(), Value::Bool(false));

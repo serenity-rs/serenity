@@ -5,6 +5,10 @@
 //! used to test if the set of permissions contains a single permission.
 //! This can simplify code and reduce a potential import.
 //!
+//! Additionally, presets equivalent to the official client's `@everyone` role
+//! presets are available. These are [`PRESET_GENERAL`], [`PRESET_TEXT`], and
+//! [`PRESET_VOICE`].
+//!
 //! Permissions follow a heirarchy:
 //!
 //! - An account can grant roles to users that are of a lower position than
@@ -28,6 +32,9 @@
 //! - [Manage Roles]
 //! - [Manage Webhooks]
 //!
+//! [`PRESET_GENERAL`]: constant.PRESET_GENERAL.html
+//! [`PRESET_TEXT`]: constant.PRESET_TEXT.html
+//! [`PRESET_VOICE`]: constant.PRESET_VOICE.html
 //! [Administrator]: constant.ADMINISTRATOR.html
 //! [Ban Members]: constant.BAN_MEMBERS.html
 //! [Kick Members]: constant.KICK_MEMBERS.html
@@ -85,13 +92,9 @@ use std::result::Result as StdResult;
 /// [Speak]: constant.SPEAK.html
 /// [Use External Emojis]: constant.USE_EXTERNAL_EMOJIS.html
 /// [Use VAD]: constant.USE_VAD.html
-pub fn general() -> Permissions {
-    use self::*;
-
-    ADD_REACTIONS | ATTACH_FILES | CHANGE_NICKNAME | CONNECT | CREATE_INVITE |
-    EMBED_LINKS | MENTION_EVERYONE | READ_MESSAGE_HISTORY | READ_MESSAGES |
-    SEND_MESSAGES | SEND_TTS_MESSAGES | SPEAK | USE_VAD | USE_EXTERNAL_EMOJIS
-}
+pub const PRESET_GENERAL: Permissions = Permissions {
+    bits: 0b01111100000000000000000010111111,
+};
 
 /// Returns a set of text-only permissions with the original `@everyone`
 /// permissions set to true.
@@ -122,13 +125,9 @@ pub fn general() -> Permissions {
 /// [Send Messages]: constant.SEND_MESSAGES.html
 /// [Send TTS Messages]: constant.SEND_TTS_MESSAGES.html
 /// [Use External Emojis]: constant.USE_EXTERNAL_EMOJIS.html
-pub fn text() -> Permissions {
-    use self::*;
-
-    ADD_REACTIONS | ATTACH_FILES | CHANGE_NICKNAME | CREATE_INVITE |
-    EMBED_LINKS | MENTION_EVERYONE | READ_MESSAGE_HISTORY | READ_MESSAGES |
-    SEND_MESSAGES | SEND_TTS_MESSAGES | USE_EXTERNAL_EMOJIS
-}
+pub const PRESET_TEXT: Permissions = Permissions {
+    bits: 0b00000000000001111111110001000000,
+};
 
 /// Returns a set of voice-only permissions with the original `@everyone`
 /// permissions set to true.
@@ -143,10 +142,35 @@ pub fn text() -> Permissions {
 /// [Connect]: constant.CONNECT.html
 /// [Speak]: constant.SPEAK.html
 /// [Use VAD]: constant.USE_VAD.html
-pub fn voice() -> Permissions {
-    use self::*;
+pub const PRESET_VOICE: Permissions = Permissions {
+    bits: 0b00000011111100000000000000000000,
+};
 
-    CONNECT | SPEAK | USE_VAD
+/// Alias of [`PRESET_GENERAL`].
+///
+/// [`PRESET_GENERAL`]: const.PRESET_GENERAL.html
+#[deprecated(since="0.1.5", note="Use `permissions::PRESET_GENERAL` instead")]
+#[inline(always)]
+pub fn general() -> Permissions {
+    PRESET_GENERAL
+}
+
+/// Alias of [`PRESET_TEXT`].
+///
+/// [`PRESET_TEXT`]: const.PRESET_TEXT.html
+#[deprecated(since="0.1.5", note="Use `permissions::PRESET_TEXT` instead")]
+#[inline(always)]
+pub fn text() -> Permissions {
+    PRESET_TEXT
+}
+
+/// Alias of [`PRESET_VOICE`].
+///
+/// [`PRESET_VOICE`]: const.PRESET_VOICE.html
+#[deprecated(since="0.1.5", note="Use `permissions::PRESET_VOICE` instead")]
+#[inline(always)]
+pub fn voice() -> Permissions {
+    PRESET_VOICE
 }
 
 bitflags! {
