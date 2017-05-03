@@ -163,15 +163,24 @@ impl Member {
 
     /// Finds the Id of the [`Guild`] that the member is in.
     ///
+    /// Returns the value of [`Member::guild_id`] if present. Otherwise searches
+    /// the [`Cache`] for the Id.
+    ///
     /// # Errors
     ///
     /// Returns a [`ClientError::GuildNotFound`] if the guild could not be
     /// found.
     ///
+    /// [`Cache`]: ../ext/cache/struct.Cache.html
     /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
     /// [`Guild`]: struct.Guild.html
+    /// [`Member::guild_id`]: struct.Member.html#structfield.guild_id
     #[cfg(feature="cache")]
     pub fn find_guild(&self) -> Result<GuildId> {
+        if let Some(guild_id) = self.guild_id {
+            return Ok(guild_id);
+        }
+
         for guild in CACHE.read().unwrap().guilds.values() {
             let guild = guild.read().unwrap();
 
