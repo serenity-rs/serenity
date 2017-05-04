@@ -604,6 +604,13 @@ impl From<CurrentUser> for UserId {
     }
 }
 
+impl<'a> From<&'a CurrentUser> for UserId {
+    /// Gets the Id of a `CurrentUser` struct.
+    fn from(current_user: &CurrentUser) -> UserId {
+        current_user.id
+    }
+}
+
 impl From<Member> for UserId {
     /// Gets the Id of a `Member`.
     fn from(member: Member) -> UserId {
@@ -611,9 +618,23 @@ impl From<Member> for UserId {
     }
 }
 
+impl<'a> From<&'a Member> for UserId {
+    /// Gets the Id of a `Member`.
+    fn from(member: &Member) -> UserId {
+        member.user.read().unwrap().id
+    }
+}
+
 impl From<User> for UserId {
     /// Gets the Id of a `User`.
     fn from(user: User) -> UserId {
+        user.id
+    }
+}
+
+impl<'a> From<&'a User> for UserId {
+    /// Gets the Id of a `User`.
+    fn from(user: &User) -> UserId {
         user.id
     }
 }

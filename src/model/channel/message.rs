@@ -506,6 +506,13 @@ impl From<Message> for MessageId {
     }
 }
 
+impl<'a> From<&'a Message> for MessageId {
+    /// Gets the Id of a `Message`.
+    fn from(message: &Message) -> MessageId {
+        message.id
+    }
+}
+
 /// A representation of a reaction to a message.
 ///
 /// Multiple of the same [reaction type] are sent into one `MessageReaction`,
