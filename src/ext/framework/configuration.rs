@@ -144,8 +144,30 @@ impl Configuration {
         self
     }
 
-    /// Sets the prefix to respond to. This can either be a single- or
-    /// multi-char string.
+    /// Sets the prefix to respond to dynamically based on conditions.
+    ///
+    /// Return `None` to not have a special prefix for the dispatch, and to
+    /// instead use the inherited prefix.
+    ///
+    /// # Examples
+    ///
+    /// If the Id of the channel is divisible by 5, return a prefix of `"!"`,
+    /// otherwise return a prefix of `"~"`.
+    ///
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::login("token");
+    /// client.with_framework(|f| f
+    ///     .command("ping", |c| c.exec_str("Pong!"))
+    ///     .configure(|c| c.dynamic_prefix(|ctx| {
+    ///         Some(if ctx.channel_id.unwrap().0 % 5 == 0 {
+    ///             "!"
+    ///         } else {
+    ///             "~"
+    ///         }.to_owned())
+    ///     })));
+    /// ```
     pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
         where F: Fn(&mut Context) -> Option<String> + Send + Sync + 'static {
         self.dynamic_prefix = Some(Box::new(dynamic_prefix));
