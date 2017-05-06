@@ -1341,13 +1341,8 @@ pub fn leave_group(guild_id: u64) -> Result<Group> {
 }
 
 /// Leaves a guild.
-pub fn leave_guild(guild_id: u64) -> Result<PartialGuild> {
-    let response = request!(Route::UsersMeGuildsId,
-                            delete,
-                            "/users/@me/guilds/{}",
-                            guild_id);
-
-    serde_json::from_reader::<HyperResponse, PartialGuild>(response).map_err(From::from)
+pub fn leave_guild(guild_id: u64) -> Result<()> {
+    verify(204, request!(Route::UsersMeGuildsId, delete, "/users/@me/guilds/{}", guild_id))
 }
 
 /// Deletes a user from group DM.

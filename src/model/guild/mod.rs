@@ -642,7 +642,7 @@ impl Guild {
 
     /// Leaves the guild.
     #[inline]
-    pub fn leave(&self) -> Result<PartialGuild> {
+    pub fn leave(&self) -> Result<()> {
         self.id.leave()
     }
 

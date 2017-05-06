@@ -356,7 +356,7 @@ impl GuildId {
 
     /// Leaves the guild.
     #[inline]
-    pub fn leave(&self) -> Result<PartialGuild> {
+    pub fn leave(&self) -> Result<()> {
         rest::leave_guild(self.0)
     }
 
