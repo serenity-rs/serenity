@@ -7,7 +7,7 @@ use super::*;
 use ::internal::prelude::*;
 
 #[cfg(feature="cache")]
-use super::permissions::{self, Permissions};
+use super::permissions::Permissions;
 #[cfg(feature="cache")]
 use ::client::CACHE;
 
@@ -148,10 +148,14 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
     };
 
     let guild_id = match channel {
-        Channel::Group(_) | Channel::Private(_) => {
-            return Ok(permissions == permissions::MANAGE_MESSAGES);
-        },
         Channel::Guild(channel) => channel.read().unwrap().guild_id,
+        Channel::Group(_) | Channel::Private(_) => {
+            // Every user in these channels has the same permissions.
+            // Unless for pms where a user has another user blocked,
+            // in which case they won't have the "SEND_MESSAGE" perm and vice versa.
+            // But we can't check for this case by any means, so just return `true`.
+            return Ok(true); 
+        },
     };
 
     let guild = match cache.guild(guild_id) {
