@@ -150,10 +150,15 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
     let guild_id = match channel {
         Channel::Guild(channel) => channel.read().unwrap().guild_id,
         Channel::Group(_) | Channel::Private(_) => {
-            // Every user in these channels has the same permissions.
-            // Unless for pms where a user has another user blocked,
-            // in which case they won't have the "SEND_MESSAGE" perm and vice versa.
-            // But we can't check for this case by any means, so just return `true`.
+            // Both users in DMs, and all users in groups, will have the same
+            // permissions.
+            //
+            // The only exception to this is when the current user is blocked by
+            // the recipient in a DM channel, which results in the current user
+            // not being able to send messages.
+            //
+            // Since serenity can't _reasonably_ check and keep track of these,
+            // just assume that all permissions are granted and return `true`.
             return Ok(true); 
         },
     };
