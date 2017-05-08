@@ -7,7 +7,7 @@ use super::*;
 use ::internal::prelude::*;
 
 #[cfg(feature="cache")]
-use super::permissions::{self, Permissions};
+use super::permissions::Permissions;
 #[cfg(feature="cache")]
 use ::client::CACHE;
 
@@ -148,10 +148,19 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
     };
 
     let guild_id = match channel {
-        Channel::Group(_) | Channel::Private(_) => {
-            return Ok(permissions == permissions::MANAGE_MESSAGES);
-        },
         Channel::Guild(channel) => channel.read().unwrap().guild_id,
+        Channel::Group(_) | Channel::Private(_) => {
+            // Both users in DMs, and all users in groups, will have the same
+            // permissions.
+            //
+            // The only exception to this is when the current user is blocked by
+            // the recipient in a DM channel, which results in the current user
+            // not being able to send messages.
+            //
+            // Since serenity can't _reasonably_ check and keep track of these,
+            // just assume that all permissions are granted and return `true`.
+            return Ok(true); 
+        },
     };
 
     let guild = match cache.guild(guild_id) {
