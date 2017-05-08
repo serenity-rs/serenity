@@ -102,7 +102,9 @@ pub fn positions(ctx: &mut Context, content: &str, conf: &Configuration) -> Opti
             positions.push(mention_end);
         } else if let Some(ref func) = conf.dynamic_prefix {
             if let Some(x) = func(ctx) {
-                positions.push(x.len());
+                if content.starts_with(&x) {
+                    positions.push(x.len());
+                }
             } else {
                 for n in conf.prefixes.clone() {
                     if content.starts_with(&n) {
