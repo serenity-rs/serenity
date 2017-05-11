@@ -477,10 +477,13 @@ impl Framework {
                         let after = self.after.clone();
                         let groups = self.groups.clone();
 
+                        let content = message.content[position..].to_owned();
+                        let content = content.trim();
+
                         let args = if command.use_quotes {
-                            utils::parse_quotes(&message.content[position + command_length..])
+                            utils::parse_quotes(&content[command_length..])
                         } else {
-                            message.content[position + command_length..]
+                            content[command_length..]
                                 .split_whitespace()
                                 .map(|arg| arg.to_owned())
                                 .collect::<Vec<String>>()
