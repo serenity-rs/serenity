@@ -97,7 +97,7 @@ impl Reaction {
 /// The type of a [`Reaction`] sent.
 ///
 /// [`Reaction`]: struct.Reaction.html
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub enum ReactionType {
     /// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the
     /// guild.
