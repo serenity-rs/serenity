@@ -477,16 +477,16 @@ impl Framework {
                         let after = self.after.clone();
                         let groups = self.groups.clone();
 
-                        let content = message.content[position..].to_owned();
-                        let content = content.trim();
-
-                        let args = if command.use_quotes {
-                            utils::parse_quotes(&content[command_length..])
-                        } else {
-                            content[command_length..]
-                                .split_whitespace()
-                                .map(|arg| arg.to_owned())
-                                .collect::<Vec<String>>()
+                        let args = {
+                            let content = message.content[position..].trim();
+                            if command.use_quotes {
+                                utils::parse_quotes(&content[command_length..])
+                            } else {
+                                content[command_length..]
+                                    .split_whitespace()
+                                    .map(|arg| arg.to_owned())
+                                    .collect::<Vec<String>>()
+                            }
                         };
 
                         if let Some(error) = self.should_fail(&mut context, &message, &command, args.len(), &to_check, &built) {
