@@ -11,7 +11,7 @@ repository = "https://github.com/zeyla/serenity.git"
 version = "0.1.5"
 
 [dependencies]
-base64 = "~0.4"
+base64 = "~0.5"
 bitflags = "~0.8"
 flate2 = "~0.2"
 hyper = "~0.9"
