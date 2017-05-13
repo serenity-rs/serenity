@@ -479,6 +479,7 @@ impl Framework {
 
                         let args = {
                             let content = message.content[position..].trim();
+
                             if command.use_quotes {
                                 utils::parse_quotes(&content[command_length..])
                             } else {
