@@ -115,7 +115,6 @@ macro_rules! feature_voice {
     }
 }
 
-#[macro_export]
 macro_rules! enum_number {
     (#[$attr_:meta] $name:ident { $(#[$attr:meta] $variant:ident = $value:expr, )* }) => {
         #[$attr_]
