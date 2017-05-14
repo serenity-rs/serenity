@@ -359,6 +359,93 @@ impl GuildChannel {
         self.id.messages(f)
     }
 
+    /// Calculates the permissions of a member.
+    ///
+    /// The Id of the argument must be a [`Member`] of the [`Guild`] that the
+    /// channel is in.
+    ///
+    /// # Examples
+    ///
+    /// Calculate the permissions of a [`User`] who posted a [`Message`] in a
+    /// channel:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::login("");
+    /// #
+    /// use serenity::client::CACHE;
+    ///
+    /// client.on_message(|_, msg| {
+    ///     let channel = match CACHE.read().unwrap().get_guild_channel(msg.channel_id) {
+    ///         Some(channel) => channel,
+    ///         None => return,
+    ///     };
+    ///
+    ///     let permissions = channel.read().unwrap().permissions_for(&msg.author).unwrap();
+    ///
+    ///     println!("The user's permissions: {:?}", permissions);
+    /// });
+    /// ```
+    ///
+    /// Check if the current user has the [Attach Files] and [Send Messages]
+    /// permissions (note: serenity will automatically check this for; this is
+    /// for demonstrative purposes):
+    ///
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::login("");
+    /// #
+    /// use serenity::client::CACHE;
+    /// use serenity::model::permissions;
+    /// use std::fs::File;
+    ///
+    /// client.on_message(|_, msg| {
+    ///     let channel = match CACHE.read().unwrap().get_guild_channel(msg.channel_id) {
+    ///         Some(channel) => channel,
+    ///         None => return,
+    ///     };
+    ///
+    ///     let current_user_id = CACHE.read().unwrap().user.id;
+    ///     let permissions = channel.read().unwrap().permissions_for(current_user_id).unwrap();
+    ///
+    ///     if !permissions.contains(permissions::ATTACH_FILES | permissions::SEND_MESSAGES) {
+    ///         return;
+    ///     }
+    ///
+    ///     let file = match File::open("./cat.png") {
+    ///         Ok(file) => file,
+    ///         Err(why) => {
+    ///             println!("Err opening file: {:?}", why);
+    ///
+    ///             return;
+    ///         },
+    ///     };
+    ///
+    ///     let _ = msg.channel_id.send_file(file, "cat.png", |m| m.content("here's a cat"));
+    /// });
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::GuildNotFound`] if the channel's guild could
+    /// not be found in the [`Cache`].
+    ///
+    /// [`Cache`]: ../ext/cache/struct.Cache.html
+    /// [`ClientError::GuildNotFound`]: ../client/enum.Error.html#variant.GuildNotFound
+    /// [`Guild`]: struct.Guild.html
+    /// [`Member`]: struct.Member.html
+    /// [`Message`]: struct.Message.html
+    /// [`User`]: struct.User.html
+    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
+    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    pub fn permissions_for<U: Into<UserId>>(&self, user_id: U) -> Result<Permissions> {
+        self.guild()
+            .ok_or_else(|| Error::Client(ClientError::GuildNotFound))
+            .map(|g| g.read().unwrap().permissions_for(self.id, user_id))
+    }
+
     /// Pins a [`Message`] to the channel.
     #[inline]
     pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
