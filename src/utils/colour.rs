@@ -297,6 +297,8 @@ colour! {
     darker_grey, 0x546E7A;
     /// Creates a new `Colour`, setting its RGB value to `(250, 177, 237)`.
     fabled_pink, 0xFAB1ED;
+    /// Creates a new `Colour`, setting its RGB value to `(136, 130, 196)`.`
+    faded_purple, 0x8882C4;
     /// Creates a new `Colour`, setting its RGB value to `(17, 202, 128)`.
     fooyoo, 0x11CA80;
     /// Creates a new `Colour`, setting its RGB value to `(241, 196, 15)`.
@@ -310,7 +312,7 @@ colour! {
     /// Creates a new `Colour`, setting its RGB value to `(233, 30, 99)`.
     magenta, 0xE91E63;
     /// Creates a new `Colour`, setting its RGB value to `(230, 131, 151)`.
-    meibi_pink, 0xE68397;
+    meibe_pink, 0xE68397;
     /// Creates a new `Colour`, setting its RGB value to `(230, 126, 34)`.
     orange, 0xE67E22;
     /// Creates a new `Colour`, setting its RGB value to `(155, 89, 182)`.

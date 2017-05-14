@@ -62,7 +62,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serenity = "0.1"
+//! serenity = "0.2"
 //! ```
 //!
 //! and to the top of your `main.rs`:
@@ -85,7 +85,6 @@
 //! [examples]: https://github.com/zeyla/serenity/tree/master/examples
 //! [gateway docs]: client/gateway/index.html
 #![allow(doc_markdown, inline_always, unknown_lints)]
-#![doc(html_logo_url="https://zey.moe/u/serenity$header.png")]
 #![warn(enum_glob_use, if_not_else)]
 
 #[macro_use]

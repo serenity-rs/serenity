@@ -1,10 +1,11 @@
-use std::fmt::Write;
 use std::mem;
 use ::constants;
 use ::client::rest;
 use ::model::*;
 use ::utils::builder::{CreateEmbed, CreateMessage};
 
+#[cfg(feature="cache")]
+use std::fmt::Write;
 #[cfg(feature="cache")]
 use ::client::CACHE;
 

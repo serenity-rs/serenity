@@ -72,7 +72,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-serenity = "0.1"
+serenity = "0.2"
 ```
 
 and to the top of your `main.rs`:

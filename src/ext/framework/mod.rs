@@ -320,6 +320,7 @@ impl Framework {
         false
     }
 
+    #[cfg(feature="cache")]
     fn has_correct_permissions(&self, command: &Arc<Command>, message: &Message) -> bool {
         if !command.required_permissions.is_empty() {
             if let Some(guild) = message.guild() {
@@ -386,25 +387,31 @@ impl Framework {
                 if self.is_blocked_guild(message) {
                     return Some(DispatchError::BlockedGuild);
                 }
+
+                if !self.has_correct_permissions(command, message) {
+                    return Some(DispatchError::LackOfPermissions(command.required_permissions));
+                }
+
+                if (!self.configuration.allow_dm && message.is_private()) ||
+                    (command.guild_only && message.is_private()) {
+                    return Some(DispatchError::OnlyForGuilds);
+                }
+
+                if command.dm_only && !message.is_private() {
+                    return Some(DispatchError::OnlyForDM);
+                }
             }
 
             if command.owners_only {
                 Some(DispatchError::OnlyForOwners)
             } else if !self.checks_passed(command, &mut context, message) {
                 Some(DispatchError::CheckFailed)
-            } else if !self.has_correct_permissions(command, message) {
-                Some(DispatchError::LackOfPermissions(command.required_permissions))
             } else if self.configuration.blocked_users.contains(&message.author.id) {
                 Some(DispatchError::BlockedUser)
-            } else if (!self.configuration.allow_dm && message.is_private()) ||
-                (message.is_private() && command.guild_only) {
-                Some(DispatchError::OnlyForGuilds)
             } else if self.configuration.disabled_commands.contains(to_check) {
                 Some(DispatchError::CommandDisabled(to_check.to_owned()))
             } else if self.configuration.disabled_commands.contains(built) {
                 Some(DispatchError::CommandDisabled(built.to_owned()))
-            } else if !message.is_private() && command.dm_only {
-                Some(DispatchError::OnlyForDM)
             } else {
                 None
             }
