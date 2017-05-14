@@ -3,9 +3,10 @@ use std::thread;
 use super::event_store::EventStore;
 use super::Context;
 use super::gateway::Shard;
+use time;
 use typemap::ShareMap;
 use ::model::event::Event;
-use ::model::{ChannelId, Message};
+use ::model::{ChannelId, Message, MessageType, Mentionable};
 
 #[cfg(feature="framework")]
 use ::ext::framework::Framework;
@@ -64,6 +65,45 @@ fn context(channel_id: Option<ChannelId>,
     Context::new(channel_id, conn.clone(), data.clone())
 }
 
+static JOIN_MESSAGES: &'static [&'static str] = &[
+  "$user just joined the server - glhf!",
+  "$user just joined. Everyone, look busy!",
+  "$user just joined. Can I get a heal?",
+  "$user joined your party.",
+  "$user joined. You must construct additional pylons.",
+  "Ermagherd. $user is here.",
+  "Welcome, $user. Stay awhile and listen.",
+  "Welcome, $user. We were expecting you ( ͡° ͜ʖ ͡°)",
+  "Welcome, $user. We hope you brought pizza.",
+  "Welcome $user. Leave your weapons by the door.",
+  "A wild $user appeared.",
+  "Swoooosh. $user just landed.",
+  "Brace yourselves. $user just joined the server.",
+  "$user just joined. Hide your bananas.",
+  "$user just arrived. Seems OP - please nerf.",
+  "$user just slid into the server.",
+  "A $user has spawned in the server.",
+  "Big $user showed up!",
+  "Where’s $user? In the server!",
+  "$user hopped into the server. Kangaroo!!",
+  "$user just showed up. Hold my beer."
+];
+
+fn improve_content(mut message: Message) -> Message {
+    let new_content = match message.kind {
+        MessageType::PinsAdd => format!("{} pinned a message to this channel. See all the pins.", message.author),
+        MessageType::MemberJoin => if let Ok(x) = time::strptime(&message.timestamp, "%Y-%m-%dT%H:%M:%S") {
+            JOIN_MESSAGES[x.to_timespec().sec as usize % JOIN_MESSAGES.len()].to_string().replace("$user", &message.author.mention())
+        } else {
+            message.content
+        },
+        _ => message.content
+    };
+
+    message.content = new_content;
+    message
+}
+
 #[cfg(feature="framework")]
 pub fn dispatch(event: Event,
                 conn: &Arc<Mutex<Shard>>,
@@ -111,7 +151,7 @@ fn dispatch_message(context: Context,
                     message: Message,
                     event_store: &Arc<RwLock<EventStore>>) {
     if let Some(handler) = handler!(on_message, event_store) {
-        thread::spawn(move || (handler)(context, message));
+        thread::spawn(move || (handler)(context, improve_content(message)));
     }
 }
 

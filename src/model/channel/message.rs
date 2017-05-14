@@ -550,6 +550,8 @@ enum_number!(
         GroupIconUpdate = 5,
         /// An indicator that a message was pinned by the author.
         PinsAdd = 6,
+        /// An indicator that a member joined the server.
+        MemberJoin = 7,
     }
 );
 
