@@ -47,7 +47,7 @@ use std::env;
 
 fn main() {
     // Login with a bot token from the environment
-    let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").expect("token"));
+    let mut client = Client::login(&env::var("DISCORD_TOKEN").expect("token"));
     client.with_framework(|f| f
         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
         .on("ping", ping));
