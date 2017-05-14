@@ -103,6 +103,36 @@ impl Invite {
     pub fn get(code: &str, stats: bool) -> Result<Invite> {
         rest::get_invite(utils::parse_invite(code), stats)
     }
+
+    /// Returns a URL to use for the invite.
+    ///
+    /// # Examples
+    ///
+    /// Retrieve the URL for an invite with the code `WxZumR`:
+    ///
+    /// ```rust
+    /// # use serenity::model::*;
+    /// #
+    /// # let invite = Invite {
+    /// #     code: "WxZumR".to_owned(),
+    /// #     channel: InviteChannel {
+    /// #         id: ChannelId(1),
+    /// #         name: "foo".to_owned(),
+    /// #         kind: ChannelType::Text,
+    /// #     },
+    /// #     guild: InviteGuild {
+    /// #         id: GuildId(2),
+    /// #         icon: None,
+    /// #         name: "bar".to_owned(),
+    /// #         splash_hash: None,
+    /// #     },
+    /// # };
+    /// #
+    /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
+    /// ```
+    pub fn url(&self) -> String {
+        format!("https://discord.gg/{}", self.code)
+    }
 }
 
 /// A inimal information about the channel an invite points to.
@@ -239,5 +269,47 @@ impl RichInvite {
         }
 
         rest::delete_invite(&self.code)
+    }
+
+    /// Returns a URL to use for the invite.
+    ///
+    /// # Examples
+    ///
+    /// Retrieve the URL for an invite with the code `WxZumR`:
+    ///
+    /// ```rust
+    /// # use serenity::model::*;
+    /// #
+    /// # let invite = RichInvite {
+    /// #     code: "WxZumR".to_owned(),
+    /// #     channel: InviteChannel {
+    /// #         id: ChannelId(1),
+    /// #         name: "foo".to_owned(),
+    /// #         kind: ChannelType::Text,
+    /// #     },
+    /// #     created_at: "bar".to_owned(),
+    /// #     guild: InviteGuild {
+    /// #         id: GuildId(2),
+    /// #         icon: None,
+    /// #         name: "baz".to_owned(),
+    /// #         splash_hash: None,
+    /// #     },
+    /// #     inviter: User {
+    /// #         avatar: None,
+    /// #         bot: false,
+    /// #         discriminator: 3,
+    /// #         id: UserId(4),
+    /// #         name: "qux".to_owned(),
+    /// #     },
+    /// #     max_age: 5,
+    /// #     max_uses: 6,
+    /// #     temporary: true,
+    /// #     uses: 7,
+    /// # };
+    /// #
+    /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
+    /// ```
+    pub fn url(&self) -> String {
+        format!("https://discord.gg/{}", self.code)
     }
 }
