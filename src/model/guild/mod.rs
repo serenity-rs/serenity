@@ -794,7 +794,7 @@ impl Guild {
             // Roles
             for overwrite in &channel.permission_overwrites {
                 if let PermissionOverwriteType::Role(role) = overwrite.kind {
-                    if !member.roles.contains(&role) || role.0 == self.id.0 {
+                    if !member.roles.contains(&role) && role.0 != self.id.0 {
                         continue;
                     }
 
