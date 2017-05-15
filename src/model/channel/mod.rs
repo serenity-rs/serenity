@@ -497,21 +497,3 @@ pub enum PermissionOverwriteType {
     /// A role which is having its permission overwrites edited.
     Role(RoleId),
 }
-
-/// The results of a search, including the total results and a vector of
-/// messages.
-#[derive(Clone, Debug, Deserialize)]
-pub struct SearchResult {
-    /// An amount of messages returned from the result.
-    ///
-    /// Note that this is a vectof of a vector of messages. Each "set" of
-    /// messages contains the "found" message, as well as optional surrounding
-    /// messages for context.
-    #[serde(rename="messages")]
-    pub results: Vec<Vec<Message>>,
-    /// The number of messages directly related to the search.
-    ///
-    /// This does not count contextual messages.
-    #[serde(rename="total_results")]
-    pub total: u64,
-}

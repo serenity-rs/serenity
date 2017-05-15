@@ -31,12 +31,6 @@ pub struct Message {
     pub edited_timestamp: Option<String>,
     /// Array of embeds sent with the message.
     pub embeds: Vec<Embed>,
-    /// Whether the message is the "found" message in a search.
-    ///
-    /// Note that this is only relevant in the context of searches, and will
-    /// otherwise always be `false`.
-    #[serde(default)]
-    pub hit: bool,
     /// Indicator of the type of message this is, i.e. whether it is a regular
     /// message or a system message.
     #[serde(rename="type")]

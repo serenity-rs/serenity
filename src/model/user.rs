@@ -13,41 +13,6 @@ use std::sync::{Arc, RwLock};
 #[cfg(feature="cache")]
 use ::client::CACHE;
 
-/// An override for a channel.
-#[derive(Clone, Debug, Deserialize)]
-pub struct ChannelOverride {
-    /// The channel the override is for.
-    pub channel_id: ChannelId,
-    /// The notification level to use for the channel.
-    pub message_notifications: NotificationLevel,
-    /// Indicator of whether the channel is muted.
-    ///
-    /// In the client, this will not show an unread indicator for the channel,
-    /// although it will continue to show when the user is mentioned in it.
-    pub muted: bool,
-}
-
-/// The type of a user connection.
-///
-/// Note that this is related to a [`Connection`], and has nothing to do with
-/// WebSocket connections.
-///
-/// [`Connection`]: struct.Connection.html
-#[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
-pub enum ConnectionType {
-    /// A Battle.net connection.
-    #[serde(rename="battlenet")]
-    BattleNet,
-    /// A Steam connection.
-    #[serde(rename="steam")]
-    Steam,
-    /// A Twitch.tv connection.
-    #[serde(rename="twitch")]
-    TwitchTv,
-    #[serde(rename="youtube")]
-    YouTube,
-}
-
 /// Information about the current user.
 #[derive(Clone, Debug, Deserialize)]
 pub struct CurrentUser {
@@ -170,17 +135,6 @@ impl DefaultAvatar {
     }
 }
 
-/// Flags about who may add the current user as a friend.
-#[derive(Clone, Debug, Deserialize)]
-pub struct FriendSourceFlags {
-    #[serde(default)]
-    pub all: bool,
-    #[serde(default)]
-    pub mutual_friends: bool,
-    #[serde(default)]
-    pub mutual_guilds: bool,
-}
-
 enum_number!(
     /// Identifier for the notification level of a channel.
     NotificationLevel {
@@ -234,73 +188,6 @@ impl Default for OnlineStatus {
     fn default() -> OnlineStatus {
         OnlineStatus::Online
     }
-}
-
-/// A summary of messages for a channel.
-///
-/// These are received within a [`ReadyEvent`].
-///
-/// [`ReadyEvent`]: event/struct.ReadyEvent.html
-#[derive(Clone, Debug, Deserialize)]
-pub struct ReadState {
-    /// The unique Id of the channel.
-    pub id: ChannelId,
-    /// The Id of the latest message sent to the channel.
-    pub last_message_id: Option<MessageId>,
-    /// The time that a message was most recently pinned to the channel.
-    pub last_pin_timestamp: Option<String>,
-    /// The amount of times that the current user has been mentioned in the
-    /// channel since the last message ACKed.
-    #[serde(default)]
-    pub mention_count: u64,
-}
-
-/// Information about a relationship that a user has with another user.
-#[derive(Clone, Debug, Deserialize)]
-pub struct Relationship {
-    /// Unique Id of the other user.
-    pub id: UserId,
-    /// The type of the relationship, e.g. blocked, friends, etc.
-    #[serde(rename="type")]
-    pub kind: RelationshipType,
-    /// The User instance of the other user.
-    pub user: User,
-}
-
-enum_number!(
-    /// The type of relationship between the current user and another user.
-    RelationshipType {
-        /// The current user has a friend request ignored.
-        Ignored = 0,
-        /// The current user has the other user added as a friend.
-        Friends = 1,
-        /// The current user has the other blocked.
-        Blocked = 2,
-        /// The current user has an incoming friend request from the other user.
-        IncomingRequest = 3,
-        /// The current user has a friend request outgoing.
-        OutgoingRequest = 4,
-    }
-);
-
-/// A reason that a user was suggested to be added as a friend.
-#[derive(Clone, Debug, Deserialize)]
-pub struct SuggestionReason {
-    /// The name of the user on the platform.
-    pub name: String,
-    /// The type of reason.
-    pub kind: u64,
-    /// The platform that the current user and the other user share.
-    pub platform: ConnectionType,
-}
-
-/// The current user's progress through the Discord tutorial.
-///
-/// This is only applicable to selfbots.
-#[derive(Clone, Debug, Deserialize)]
-pub struct Tutorial {
-    pub indicators_confirmed: Vec<String>,
-    pub indicators_suppressed: bool,
 }
 
 /// Information about a user.
@@ -534,39 +421,6 @@ impl fmt::Display for User {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.id.mention(), f)
     }
-}
-
-/// A user's connection.
-///
-/// **Note**: This is not in any way related to a WebSocket connection.
-#[derive(Clone, Debug, Deserialize)]
-pub struct UserConnection {
-    /// The User's Id through the connection.
-    pub id: String,
-    /// Whether the user automatically syncs friends through the connection.
-    pub friend_sync: bool,
-    /// The relevant integrations.
-    pub integrations: Vec<Integration>,
-    /// The type of connection set.
-    #[serde(rename="type")]
-    pub kind: ConnectionType,
-    /// The user's name through the connection.
-    pub name: String,
-    /// Indicator of whether the connection has been revoked.
-    pub revoked: bool,
-    /// The visibility level.
-    pub visibility: u64,
-}
-
-/// Settings about a guild in regards to notification configuration.
-#[derive(Clone, Debug, Deserialize)]
-pub struct UserGuildSettings {
-    pub channel_overriddes: Vec<ChannelOverride>,
-    pub guild_id: Option<GuildId>,
-    pub message_notifications: NotificationLevel,
-    pub mobile_push: bool,
-    pub muted: bool,
-    pub suppress_everyone: bool,
 }
 
 impl UserId {

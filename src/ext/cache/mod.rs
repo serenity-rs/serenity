@@ -174,7 +174,6 @@ pub struct Cache {
     /// - [`GuildSync`][`GuildSyncEvent`]
     /// - [`PresenceUpdate`][`PresenceUpdateEvent`]
     /// - [`Ready`][`ReadyEvent`]
-    /// - [`RelationshipAdd`][`RelationshipAddEvent`]
     ///
     /// Note, however, that users are _not_ removed from the map on removal
     /// events such as [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other
@@ -188,7 +187,6 @@ pub struct Cache {
     /// [`GuildSyncEvent`]: ../../model/event/struct.GuildSyncEvent.html
     /// [`PresenceUpdateEvent`]: ../../model/event/struct.PresenceUpdateEvent.html
     /// [`Ready`]: ../../model/event/struct.ReadyEvent.html
-    /// [`RelationshipAdd`][`RelationshipAddEvent`]
     pub users: HashMap<UserId, Arc<RwLock<User>>>,
 }
 

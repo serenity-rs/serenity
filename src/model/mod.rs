@@ -124,39 +124,6 @@ pub enum GuildContainer {
     Id(GuildId),
 }
 
-/// Denotes the target for a search.
-///
-/// This can be either a [`Guild`] - which can search multiple [`Channel`]s -
-/// or a `Channel`.
-///
-/// [`Channel`]: enum.Channel.html
-/// [`Guild`]: struct.Guild.html
-#[derive(Copy, Clone, Debug)]
-pub enum SearchTarget {
-    /// An indicator that the target for a [`Search`] is a [`Channel`].
-    ///
-    /// [`Channel`]: enum.Channel.html
-    /// [`Search`]: struct.Search.html
-    Channel(ChannelId),
-    /// An indicator that the target for a [`Search`] is a [`Guild`].
-    ///
-    /// [`Guild`]: struct.Guild.html
-    /// [`Search`]: struct.Search.html
-    Guild(GuildId),
-}
-
-impl From<ChannelId> for SearchTarget {
-    fn from(channel_id: ChannelId) -> SearchTarget {
-        SearchTarget::Channel(channel_id)
-    }
-}
-
-impl From<GuildId> for SearchTarget {
-    fn from(guild_id: GuildId) -> SearchTarget {
-        SearchTarget::Guild(guild_id)
-    }
-}
-
 /// Information about a user's application. An application does not necessarily
 /// have an associated bot user.
 #[derive(Clone, Debug, Deserialize)]

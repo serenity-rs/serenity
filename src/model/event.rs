@@ -79,17 +79,6 @@ impl<'de> Deserialize<'de> for ChannelUpdateEvent {
 }
 
 #[derive(Clone, Debug, Deserialize)]
-pub struct FriendSuggestionCreateEvent {
-    pub reasons: Vec<SuggestionReason>,
-    pub suggested_user: User,
-}
-
-#[derive(Clone, Copy, Debug, Deserialize)]
-pub struct FriendSuggestionDeleteEvent {
-    pub suggested_user_id: UserId,
-}
-
-#[derive(Clone, Debug, Deserialize)]
 pub struct GuildBanAddEvent {
     pub guild_id: GuildId,
     pub user: User,
