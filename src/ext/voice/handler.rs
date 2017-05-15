@@ -36,6 +36,7 @@ use super::threading;
 ///
 /// [`Manager`]: struct.Manager.html
 /// [WebSocket connection]: ../../client/struct.Connection.html
+#[derive(Clone, Debug)]
 pub struct Handler {
     /// The ChannelId to be connected to, if any.
     ///

@@ -7,7 +7,7 @@ use ::internal::prelude::*;
 /// [`Context::edit_member`]: ../../client/struct.Context.html#method.edit_member
 /// [`Member`]: ../../model/struct.Member.html
 /// [`Member::edit`]: ../../model/struct.Member.html#method.edit
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct EditMember(pub JsonMap);
 
 impl EditMember {

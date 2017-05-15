@@ -28,6 +28,7 @@ use ::internal::prelude::*;
 ///
 /// [`Context::create_invite`]: ../../client/struct.Context.html#method.create_invite
 /// [`RichInvite`]: ../../model/struct.Invite.html
+#[derive(Clone, Debug)]
 pub struct CreateInvite(pub JsonMap);
 
 impl CreateInvite {

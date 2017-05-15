@@ -1,5 +1,4 @@
 use std::collections::BTreeMap;
-use std::default::Default;
 use ::model::MessageId;
 
 /// Builds a request for a request to the API to retrieve messages.
@@ -22,6 +21,7 @@ use ::model::MessageId;
 /// [`Client::get_messages`] for examples.
 ///
 /// [`Client::get_messages`]: ../../client/struct.Client.html#method.get_messages
+#[derive(Clone, Debug, Default)]
 pub struct GetMessages(pub BTreeMap<String, u64>);
 
 impl GetMessages {
@@ -71,12 +71,5 @@ impl GetMessages {
     /// `before` - as it is the default value.
     pub fn most_recent(self) -> Self {
         self
-    }
-}
-
-impl Default for GetMessages {
-    /// Creates a builder with no default values.
-    fn default() -> GetMessages {
-        GetMessages(BTreeMap::default())
     }
 }

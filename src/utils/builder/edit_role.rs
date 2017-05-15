@@ -31,6 +31,7 @@ use ::model::{Permissions, Role, permissions};
 /// [`Guild::create_role`]: ../../model/struct.Guild.html#method.create_role
 /// [`Role`]: ../../model/struct.Role.html
 /// [`Role::edit`]: ../../model/struct.Role.html#method.edit
+#[derive(Clone, Debug)]
 pub struct EditRole(pub JsonMap);
 
 impl EditRole {

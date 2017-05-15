@@ -1223,7 +1223,7 @@ impl<'de> Deserialize<'de> for Guild {
 }
 
 /// Information relating to a guild's widget embed.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize)]
 pub struct GuildEmbed {
     /// The Id of the channel to show the embed for.
     pub channel_id: ChannelId,

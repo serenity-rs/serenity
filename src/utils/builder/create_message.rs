@@ -36,6 +36,7 @@ use ::internal::prelude::*;
 /// [`content`]: #method.content
 /// [`embed`]: #method.embed
 /// [`rest::send_message`]: ../../client/rest/fn.send_message.html
+#[derive(Clone, Debug)]
 pub struct CreateMessage(pub Map<String, Value>);
 
 impl CreateMessage {

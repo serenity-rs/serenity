@@ -11,7 +11,7 @@ use ::model::{ChannelId, Region, UserId, VerificationLevel};
 /// [`Guild`]: ../../model/struct.Guild.html
 /// [`LiveGuild::edit`]: ../../model/struct.LiveGuild.html#method.edit
 /// [Manage Guild]: ../../model/permissions/constant.MANAGE_GUILD.html
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct EditGuild(pub Map<String, Value>);
 
 impl EditGuild {

@@ -62,6 +62,7 @@ type CurrentPresence = (Option<Game>, OnlineStatus, bool);
 /// [`receive`]: #method.receive
 /// [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 /// [module docs]: index.html#sharding
+#[derive(Clone, Debug)]
 pub struct Shard {
     current_presence: CurrentPresence,
     /// A tuple of the last instant that a heartbeat was sent, and the last that

@@ -20,6 +20,7 @@ use ::model::{ChannelId, GuildId, UserId};
 /// [`Handler`]: struct.Handler.html
 /// [guild's channel]: ../../model/enum.ChannelType.html#variant.Voice
 /// [WebSocket connection]: ../../client/struct.Connection.html
+#[derive(Clone, Debug)]
 pub struct Manager {
     handlers: HashMap<GuildId, Handler>,
     user_id: UserId,

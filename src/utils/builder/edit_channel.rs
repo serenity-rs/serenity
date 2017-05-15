@@ -23,7 +23,7 @@ use ::internal::prelude::*;
 /// [`Context::edit_channel`]: ../client/struct.Context.html#method.edit_channel
 /// [`GuildChannel`]: ../model/struct.GuildChannel.html
 /// [`GuildChannel::edit`]: ../model/struct.GuildChannel.html#method.edit
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct EditChannel(pub JsonMap);
 
 impl EditChannel {

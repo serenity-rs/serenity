@@ -52,6 +52,7 @@ use ::internal::prelude::*;
 /// [`Webhook`]: ../../model/struct.Webhook.html
 /// [`Webhook::execute`]: ../../model/struct.Webhook.html#method.execute
 /// [`execute_webhook`]: ../../client/rest/fn.execute_webhook.html
+#[derive(Clone, Debug)]
 pub struct ExecuteWebhook(pub JsonMap);
 
 impl ExecuteWebhook {

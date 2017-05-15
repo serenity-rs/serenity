@@ -4,7 +4,7 @@ use ::internal::prelude::*;
 /// with [`Context::edit_profile`].
 ///
 /// [`Context::edit_profile`]: ../../client/struct.Context.html#method.edit_profile
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct EditProfile(pub JsonMap);
 
 impl EditProfile {

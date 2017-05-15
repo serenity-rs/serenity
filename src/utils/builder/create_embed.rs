@@ -33,6 +33,7 @@ use ::utils::Colour;
 /// [`Context::send_message`]: ../../client/struct.Context.html#method.send_message
 /// [`Embed`]: ../../model/struct.Embed.html
 /// [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
+#[derive(Clone, Debug)]
 pub struct CreateEmbed(pub Map<String, Value>);
 
 impl CreateEmbed {
@@ -271,7 +272,7 @@ impl From<Embed> for CreateEmbed {
 /// [`Embed`]: ../../model/struct.Embed.html
 /// [`CreateEmbed::author`]: struct.CreateEmbed.html#method.author
 /// [`name`]: #method.name
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct CreateEmbedAuthor(pub Map<String, Value>);
 
 impl CreateEmbedAuthor {
@@ -305,6 +306,7 @@ impl CreateEmbedAuthor {
 ///
 /// [`Embed`]: ../../model/struct.Embed.html
 /// [`CreateEmbed::field`]: struct.CreateEmbed.html#method.field
+#[derive(Clone, Debug)]
 pub struct CreateEmbedField(pub Map<String, Value>);
 
 impl CreateEmbedField {
@@ -348,7 +350,7 @@ impl Default for CreateEmbedField {
 ///
 /// [`Embed`]: ../../model/struct.Embed.html
 /// [`CreateEmbed::footer`]: struct.CreateEmbed.html#method.footer
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct CreateEmbedFooter(pub Map<String, Value>);
 
 impl CreateEmbedFooter {
@@ -367,6 +369,7 @@ impl CreateEmbedFooter {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct Timestamp {
     pub ts: String,
 }
