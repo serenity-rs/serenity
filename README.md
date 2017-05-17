@@ -8,8 +8,7 @@ Serenity is a Rust library for the Discord API.
 
 View the [examples] on how to make and structure a bot.
 
-Serenity supports both bot and user login via the use of [`Client::login_bot`]
-and [`Client::login_user`].
+Serenity supports bot login via the use of [`Client::login`].
 
 You may also check your tokens prior to login via the use of
 [`validate_token`].
@@ -47,7 +46,7 @@ use std::env;
 
 fn main() {
     // Login with a bot token from the environment
-    let mut client = Client::login_bot(&env::var("DISCORD_TOKEN").expect("token"));
+    let mut client = Client::login(&env::var("DISCORD_TOKEN").expect("token"));
     client.with_framework(|f| f
         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
         .on("ping", ping));
@@ -136,8 +135,7 @@ Voice+youtube-dl:
 - [discordrb][rel:discordrb] (Ruby)
 
 [`Cache`]: https://serenity.zey.moe/serenity/ext/cache/struct.Cache.html
-[`Client::login_bot`]: https://serenity.zey.moe/serenity/client/struct.Client.html#method.login_bot
-[`Client::login_user`]: https://serenity.zey.moe/serenity/client/struct.Client.html#method.login_user
+[`Client::login`]: https://serenity.zey.moe/serenity/client/struct.Client.html#method.login
 [`Client::on_message`]: https://serenity.zey.moe/serenity/client/struct.Client.html#method.on_message
 [`Shard`]: https://serenity.zey.moe/serenity/client/gateway/struct.Shard.html
 [`Context`]: https://serenity.zey.moe/serenity/client/struct.Context.html
