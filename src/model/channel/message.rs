@@ -1,4 +1,5 @@
 use std::mem;
+use time;
 use ::constants;
 use ::client::rest;
 use ::model::*;
@@ -187,6 +188,21 @@ impl Message {
             },
             Err(why) => Err(why),
         }
+    }
+
+    #[doc(hidden)]
+    pub fn improved_content(mut self) -> Self {
+        self.content = match self.kind {
+            MessageType::PinsAdd => format!("{} pinned a message to this channel. See all the pins.", self.author),
+            MessageType::MemberJoin => if let Ok(x) = time::strptime(&self.timestamp, "%Y-%m-%dT%H:%M:%S") {
+                constants::JOIN_MESSAGES[x.to_timespec().sec as usize % constants::JOIN_MESSAGES.len()].to_string().replace("$user", &self.author.mention())
+            } else {
+                self.content
+            },
+            _ => self.content
+        };
+
+        self
     }
 
     /// Returns message content, but with user and role mentions replaced with
@@ -550,7 +566,7 @@ enum_number!(
         GroupIconUpdate = 5,
         /// An indicator that a message was pinned by the author.
         PinsAdd = 6,
-        /// An indicator that a member joined the server.
+        /// An indicator that a member joined the guild.
         MemberJoin = 7,
     }
 );

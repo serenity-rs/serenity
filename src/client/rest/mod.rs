@@ -1168,7 +1168,7 @@ pub fn get_message(channel_id: u64, message_id: u64) -> Result<Message> {
                             channel_id,
                             message_id);
 
-    serde_json::from_reader::<HyperResponse, Message>(response).map_err(From::from)
+    serde_json::from_reader::<HyperResponse, Message>(response).map_err(From::from).map(Message::improved_content)
 }
 
 /// Gets X messages from a channel.
@@ -1182,6 +1182,7 @@ pub fn get_messages(channel_id: u64, query: &str)
                            || client.get(&url))?;
 
     serde_json::from_reader::<HyperResponse, Vec<Message>>(response).map_err(From::from)
+        .map(|mut x| x.iter_mut().map(|x| x.clone().improved_content()).collect::<Vec<Message>>())
 }
 
 /// Gets all pins of a channel.
