@@ -1136,9 +1136,15 @@ pub fn get_guilds(target: &GuildPagination, limit: u64) -> Result<Vec<GuildInfo>
 }
 
 /// Gets information about a specific invite.
-pub fn get_invite(code: &str) -> Result<Invite> {
+pub fn get_invite(code: &str, stats: bool) -> Result<Invite> {
     let invite = ::utils::parse_invite(code);
-    let response = request!(Route::InvitesCode, get, "/invites/{}", invite);
+    let mut uri = format!("/invites/{}", invite);
+
+    if stats {
+        uri.push_str("?with_counts=true");
+    }
+
+    let response = request!(Route::InvitesCode, get, "{}", uri);
 
     serde_json::from_reader::<HyperResponse, Invite>(response).map_err(From::from)
 }
