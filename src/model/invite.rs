@@ -121,6 +121,8 @@ pub struct InviteGuild {
     pub icon: Option<String>,
     pub name: String,
     pub splash_hash: Option<String>,
+    pub text_channel_count: Option<u64>,
+    pub voice_channel_count: Option<u64>,
 }
 
 impl InviteGuild {
