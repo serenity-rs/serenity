@@ -1182,7 +1182,7 @@ pub fn get_messages(channel_id: u64, query: &str)
                            || client.get(&url))?;
 
     serde_json::from_reader::<HyperResponse, Vec<Message>>(response).map_err(From::from)
-        .map(|mut x| x.iter_mut().map(|x| x.clone().improved_content()).collect::<Vec<Message>>())
+        .map(|x| x.into_iter().map(|x| x.improved_content()).collect::<Vec<Message>>())
 }
 
 /// Gets all pins of a channel.
