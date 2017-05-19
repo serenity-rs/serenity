@@ -14,6 +14,19 @@ use super::utils as model_utils;
 /// Information can not be accessed for guilds the current user is banned from.
 #[derive(Clone, Debug, Deserialize)]
 pub struct Invite {
+    /// The approximate number of [`Member`]s in the related [`Guild`].
+    ///
+    /// [`Guild`]: struct.Guild.html
+    /// [`Member`]: struct.Member.html
+    pub approximate_member_count: Option<u64>,
+    /// The approximate number of [`Member`]s with an active session in the
+    /// related [`Guild`].
+    ///
+    /// An active session is defined as an open, heartbeating WebSocket connection.
+    /// These include [invisible][`OnlineStatus::Invisible`] members.
+    ///
+    /// [`OnlineStatus::Invisible`]: enum.OnlineStatus.html#variant.Invisible
+    pub approximate_presence_count: Option<u64>,
     /// The unique code for the invite.
     pub code: String,
     /// A representation of the minimal amount of information needed about the
@@ -23,8 +36,6 @@ pub struct Invite {
     pub channel: InviteChannel,
     /// a representation of the minimal amount of information needed about the
     /// [`Guild`] being invited to.
-    ///
-    /// [`Guild`]: struct.Guild.html
     pub guild: InviteGuild,
 }
 
@@ -89,8 +100,8 @@ impl Invite {
     }
 
     /// Gets the information about an invite.
-    pub fn get(code: &str) -> Result<Invite> {
-        rest::get_invite(utils::parse_invite(code))
+    pub fn get(code: &str, stats: bool) -> Result<Invite> {
+        rest::get_invite(utils::parse_invite(code), stats)
     }
 }
 
@@ -110,6 +121,8 @@ pub struct InviteGuild {
     pub icon: Option<String>,
     pub name: String,
     pub splash_hash: Option<String>,
+    pub text_channel_count: Option<u64>,
+    pub voice_channel_count: Option<u64>,
 }
 
 impl InviteGuild {
