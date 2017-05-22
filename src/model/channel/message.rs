@@ -191,18 +191,25 @@ impl Message {
     }
 
     #[doc(hidden)]
-    pub fn improved_content(mut self) -> Self {
-        self.content = match self.kind {
-            MessageType::PinsAdd => format!("{} pinned a message to this channel. See all the pins.", self.author),
-            MessageType::MemberJoin => if let Ok(x) = time::strptime(&self.timestamp, "%Y-%m-%dT%H:%M:%S") {
-                constants::JOIN_MESSAGES[x.to_timespec().sec as usize % constants::JOIN_MESSAGES.len()].to_string().replace("$user", &self.author.mention())
-            } else {
-                self.content
+    pub fn improve_content(&mut self) {
+        match self.kind {
+            MessageType::PinsAdd => {
+                self.content = format!("{} pinned a message to this channel. See all the pins.", self.author);
             },
-            _ => self.content
-        };
+            MessageType::MemberJoin => {
+                if let Ok(tm) = time::strptime(&self.timestamp, "%Y-%m-%dT%H:%M:%S") {
+                    let sec = tm.to_timespec().sec as usize;
+                    let chosen = constants::JOIN_MESSAGES[sec % constants::JOIN_MESSAGES.len()];
 
-        self
+                    self.content = if chosen.contains("$user") {
+                        chosen.replace("$user", &self.author.mention())
+                    } else {
+                        chosen.to_owned()
+                    };
+                }
+            },
+            _ => {},
+        }
     }
 
     /// Returns message content, but with user and role mentions replaced with
