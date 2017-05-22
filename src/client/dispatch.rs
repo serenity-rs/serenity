@@ -112,7 +112,7 @@ fn dispatch_message(context: Context,
                     event_store: &Arc<RwLock<EventStore>>) {
     if let Some(handler) = handler!(on_message, event_store) {
         thread::spawn(move || {
-            message.improve_content();
+            message.transform_content();
 
             (handler)(context, message);
         });

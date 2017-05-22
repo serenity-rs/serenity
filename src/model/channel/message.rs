@@ -191,7 +191,7 @@ impl Message {
     }
 
     #[doc(hidden)]
-    pub fn improve_content(&mut self) {
+    pub fn transform_content(&mut self) {
         match self.kind {
             MessageType::PinsAdd => {
                 self.content = format!("{} pinned a message to this channel. See all the pins.", self.author);

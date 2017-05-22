@@ -256,7 +256,7 @@ impl ChannelId {
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         rest::get_message(self.0, message_id.into().0)
             .map(|mut msg| {
-                msg.improve_content();
+                msg.transform_content();
 
                 msg
             })
@@ -287,7 +287,7 @@ impl ChannelId {
             .map(|msgs| msgs
                 .into_iter()
                 .map(|mut msg| {
-                    msg.improve_content();
+                    msg.transform_content();
 
                     msg
                 }).collect::<Vec<Message>>())
