@@ -1,4 +1,5 @@
 use std::mem;
+use time;
 use ::constants;
 use ::client::rest;
 use ::model::*;
@@ -186,6 +187,28 @@ impl Message {
                 Ok(())
             },
             Err(why) => Err(why),
+        }
+    }
+
+    #[doc(hidden)]
+    pub fn transform_content(&mut self) {
+        match self.kind {
+            MessageType::PinsAdd => {
+                self.content = format!("{} pinned a message to this channel. See all the pins.", self.author);
+            },
+            MessageType::MemberJoin => {
+                if let Ok(tm) = time::strptime(&self.timestamp, "%Y-%m-%dT%H:%M:%S") {
+                    let sec = tm.to_timespec().sec as usize;
+                    let chosen = constants::JOIN_MESSAGES[sec % constants::JOIN_MESSAGES.len()];
+
+                    self.content = if chosen.contains("$user") {
+                        chosen.replace("$user", &self.author.mention())
+                    } else {
+                        chosen.to_owned()
+                    };
+                }
+            },
+            _ => {},
         }
     }
 
@@ -550,6 +573,8 @@ enum_number!(
         GroupIconUpdate = 5,
         /// An indicator that a message was pinned by the author.
         PinsAdd = 6,
+        /// An indicator that a member joined the guild.
+        MemberJoin = 7,
     }
 );
 

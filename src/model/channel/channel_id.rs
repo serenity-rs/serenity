@@ -255,6 +255,11 @@ impl ChannelId {
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         rest::get_message(self.0, message_id.into().0)
+            .map(|mut msg| {
+                msg.transform_content();
+
+                msg
+            })
     }
 
     /// Gets messages from the channel.
@@ -279,6 +284,13 @@ impl ChannelId {
         }
 
         rest::get_messages(self.0, &query)
+            .map(|msgs| msgs
+                .into_iter()
+                .map(|mut msg| {
+                    msg.transform_content();
+
+                    msg
+                }).collect::<Vec<Message>>())
     }
 
     /// Pins a [`Message`] to the channel.

@@ -108,10 +108,14 @@ pub fn dispatch(event: Event,
 }
 
 fn dispatch_message(context: Context,
-                    message: Message,
+                    mut message: Message,
                     event_store: &Arc<RwLock<EventStore>>) {
     if let Some(handler) = handler!(on_message, event_store) {
-        thread::spawn(move || (handler)(context, message));
+        thread::spawn(move || {
+            message.transform_content();
+
+            (handler)(context, message);
+        });
     }
 }
 
