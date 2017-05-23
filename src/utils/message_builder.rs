@@ -12,7 +12,18 @@ use ::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 /// Build a message, mentioning a [`user`] and an [`emoji`], and retrieving the
 /// value:
 ///
-/// ```rust,ignore
+/// ```rust,no_run
+/// # use serenity::model::{Emoji, EmojiId, UserId};
+/// #
+/// # let user = UserId(1);
+/// # let emoji = Emoji {
+/// #     id: EmojiId(2),
+/// #     name: "test".to_owned(),
+/// #     managed: false,
+/// #     require_colons: true,
+/// #     roles: vec![],
+/// # };
+/// #
 /// use serenity::utils::MessageBuilder;
 ///
 /// // assuming an `emoji` and `user` have already been bound
@@ -32,7 +43,20 @@ use ::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 pub struct MessageBuilder(pub String);
 
 impl MessageBuilder {
-    /// Creates a new, empty-content builder.
+    /// Creates a new, empty builder.
+    ///
+    /// # Examples
+    ///
+    /// Create a new `MessageBuilder`:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let message = MessageBuilder::new();
+    ///
+    /// // alternatively:
+    /// let message = MessageBuilder::default();
+    /// ```
     pub fn new() -> MessageBuilder {
         MessageBuilder::default()
     }
@@ -40,6 +64,23 @@ impl MessageBuilder {
     /// Pulls the inner value out of the builder.
     ///
     /// # Examples
+    ///
+    /// Create a string mentioning a channel by Id, and then suffixing `"!"`,
+    /// and finally building it to retrieve the inner String:
+    ///
+    /// ```rust
+    /// use serenity::model::ChannelId;
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let channel_id = ChannelId(81384788765712384);
+    ///
+    /// let content = MessageBuilder::new()
+    ///     .channel(channel_id)
+    ///     .push("!")
+    ///     .build();
+    ///
+    /// assert_eq!(content, "<#81384788765712384>!");
+    /// ```
     ///
     /// This is equivalent to simply retrieving the tuple struct's first value:
     ///
@@ -62,6 +103,25 @@ impl MessageBuilder {
     /// Refer to `ChannelId`'s [Display implementation] for more information on
     /// how this is formatted.
     ///
+    /// # Examples
+    ///
+    /// Mentioning a [`Channel`] by Id:
+    ///
+    /// ```rust
+    /// use serenity::model::ChannelId;
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let channel_id = ChannelId(81384788765712384);
+    ///
+    /// let content = MessageBuilder::new()
+    ///     .push("The channel is: ")
+    ///     .channel(channel_id)
+    ///     .build();
+    ///
+    /// assert_eq!(content, "The channel is: <#81384788765712384>");
+    /// ```
+    ///
+    /// [`Channel`]: ../model/enum.Channel.html
     /// [`ChannelId`]: ../model/struct.ChannelId.html
     /// [`GuildChannel`]: ../model/struct.GuildChannel.html
     /// [Display implementation]: ../model/struct.ChannelId.html#method.fmt-1
@@ -75,6 +135,31 @@ impl MessageBuilder {
     ///
     /// Refer to `Emoji`s [Display implementation] for more information on how
     /// this is formatted.
+    ///
+    /// # Examples
+    ///
+    /// Mention an emoji in a message's content:
+    ///
+    /// ```rust
+    /// use serenity::model::{Emoji, EmojiId};
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let emoji = Emoji {
+    ///     id: EmojiId(302516740095606785),
+    ///     managed: true,
+    ///     name: "smugAnimeFace".to_owned(),
+    ///     require_colons: true,
+    ///     roles: vec![],
+    /// };
+    ///
+    /// let message = MessageBuilder::new()
+    ///     .push("foo ")
+    ///     .emoji(emoji)
+    ///     .push(".")
+    ///     .build();
+    ///
+    /// assert_eq!(message, "foo <:smugAnimeFace:302516740095606785>.");
+    /// ```
     ///
     /// [Display implementation]: ../model/struct.Emoji.html#method.fmt
     pub fn emoji(mut self, emoji: Emoji) -> Self {
@@ -113,7 +198,45 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes a code-block to your message, with optional syntax highlighting.
+    /// Pushes a codeblock to the content, with optional syntax highlighting.
+    ///
+    /// # Examples
+    ///
+    /// Pushing a Rust codeblock:
+    ///
+    /// ```rust,ignore
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let code = r#"
+    /// fn main() {
+    ///     println!("Hello, world!");
+    /// }
+    /// "#;
+    ///
+    /// let content = MessageBuilder::new()
+    ///     .push_codeblock(code, Some("rust"))
+    ///     .build();
+    ///
+    /// let expected = r#"```rust
+    /// fn main() {
+    ///     println!("Hello, world!");
+    /// }
+    /// ```"#;
+    ///
+    /// assert_eq!(content, expected);
+    /// ```
+    ///
+    /// Pushing a codeblock without a language:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new()
+    ///     .push_codeblock("hello", None)
+    ///     .build();
+    ///
+    /// assert_eq!(content, "```\nhello\n```");
+    /// ```
     pub fn push_codeblock(mut self, content: &str, language: Option<&str>) -> Self {
         self.0.push_str("```");
 
@@ -128,7 +251,32 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes an inline monospaced text to your message.
+    /// Pushes inlined monospaced text to the content.
+    ///
+    /// # Examples
+    ///
+    /// Display a server configuration value to the user:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let key = "prefix";
+    /// let value = "&";
+    ///
+    /// let content = MessageBuilder::new()
+    ///     .push("The setting ")
+    ///     .push_mono(key)
+    ///     .push(" for this server is ")
+    ///     .push_mono(value)
+    ///     .push(".")
+    ///     .build();
+    ///
+    /// let expected = format!("The setting `{}` for this server is `{}`.",
+    ///                        key,
+    ///                        value);
+    ///
+    /// assert_eq!(content, expected);
+    /// ```
     pub fn push_mono(mut self, content: &str) -> Self {
         self.0.push('`');
         self.0.push_str(content);
@@ -137,7 +285,27 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes an inline italicized text to your message.
+    /// Pushes inlined italicized text to the content.
+    ///
+    /// # Examples
+    ///
+    /// Emphasize information to the user:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new()
+    ///     .push("You don't ")
+    ///     .push_italic("always need")
+    ///     .push(" to italicize ")
+    ///     .push_italic("everything")
+    ///     .push(".")
+    ///     .build();
+    ///
+    /// let expected = "You don't _always need_ to italicize _everything_.";
+    ///
+    /// assert_eq!(content, expected);
+    /// ```
     pub fn push_italic(mut self, content: &str) -> Self {
         self.0.push('_');
         self.0.push_str(content);
@@ -146,7 +314,7 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes an inline bold text to your message.
+    /// Pushes an inline bold text to the content.
     pub fn push_bold(mut self, content: &str) -> Self {
         self.0.push_str("**");
         self.0.push_str(content);
@@ -155,7 +323,7 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes an underlined inline text to your message.
+    /// Pushes an underlined inline text to the content.
     pub fn push_underline(mut self, content: &str) -> Self {
         self.0.push_str("__");
         self.0.push_str(content);
@@ -164,7 +332,7 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes a strikethrough inline text to your message.
+    /// Pushes a strikethrough inline text to the content.
     pub fn push_strike(mut self, content: &str) -> Self {
         self.0.push_str("~~");
         self.0.push_str(content);
@@ -205,7 +373,7 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes an inline monospaced text to your message normalizing content.
+    /// Pushes an inline monospaced text to the content normalizing content.
     pub fn push_mono_safe(mut self, content: &str) -> Self {
         self.0.push('`');
         self.0.push_str(&normalize(content).replace('`', "'"));
@@ -214,7 +382,7 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes an inline italicized text to your message normalizing content.
+    /// Pushes an inline italicized text to the content normalizing content.
     pub fn push_italic_safe(mut self, content: &str) -> Self {
         self.0.push('_');
         self.0.push_str(&normalize(content).replace('_', " "));
@@ -223,7 +391,7 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes an inline bold text to your message normalizing content.
+    /// Pushes an inline bold text to the content normalizing content.
     pub fn push_bold_safe(mut self, content: &str) -> Self {
         self.0.push_str("**");
         self.0.push_str(&normalize(content).replace("**", "  "));
@@ -232,7 +400,7 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes an underlined inline text to your message normalizing content.
+    /// Pushes an underlined inline text to the content normalizing content.
     pub fn push_underline_safe(mut self, content: &str) -> Self {
         self.0.push_str("__");
         self.0.push_str(&normalize(content).replace("__", "  "));
@@ -241,7 +409,7 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes a strikethrough inline text to your message normalizing content.
+    /// Pushes a strikethrough inline text to the content normalizing content.
     pub fn push_strike_safe(mut self, content: &str) -> Self {
         self.0.push_str("~~");
         self.0.push_str(&normalize(content).replace("~~", "  "));
@@ -286,6 +454,20 @@ impl MessageBuilder {
 }
 
 impl fmt::Display for MessageBuilder {
+    /// Formats the message builder into a string.
+    ///
+    /// This is done by simply taking the internal value of the tuple-struct and
+    /// writing it into the formatter.
+    ///
+    /// # Examples
+    ///
+    /// Create a message builder, and format it into a string via the `format!`
+    /// macro:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    ///
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.0, f)
     }

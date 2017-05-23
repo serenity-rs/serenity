@@ -18,7 +18,13 @@ impl EditProfile {
     /// A utility method - [`utils::read_image`] - is provided to read an
     /// image from a file and return its contents in base64-encoded form:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::login("");
+    /// #
+    /// # client.on_message(|context, _| {
+    /// #
     /// use serenity::utils;
     ///
     /// // assuming a `context` has been bound
@@ -29,6 +35,7 @@ impl EditProfile {
     /// let _ = context.edit_profile(|profile| {
     ///     profile.avatar(Some(&base64))
     /// });
+    /// # });
     /// ```
     ///
     /// [`utils::read_image`]: ../fn.read_image.html

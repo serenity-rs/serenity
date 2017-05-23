@@ -24,13 +24,24 @@ macro_rules! colour {
 /// Passing in a role's colour, and then retrieving its green component
 /// via [`g`]:
 ///
-/// ```rust,ignore
+/// ```rust
+/// # use serenity::model::{Role, RoleId, permissions};
 /// use serenity::utils::Colour;
+/// #
+/// # let role = Role {
+/// #     colour: Colour::blurple(),
+/// #     hoist: false,
+/// #     id: RoleId(1),
+/// #     managed: false,
+/// #     mentionable: false,
+/// #     name: "test".to_owned(),
+/// #     permissions: permissions::PRESET_GENERAL,
+/// #     position: 7,
+/// # };
 ///
 /// // assuming a `role` has already been bound
 ///
-/// let colour = Colour::new(role.colour);
-/// let green = colour.g();
+/// let green = role.colour.g();
 ///
 /// println!("The green component is: {}", green);
 /// ```
@@ -45,7 +56,7 @@ macro_rules! colour {
 /// assert_eq!(colour.tuple(), (17, 128, 106));
 /// ```
 ///
-/// Colours can also be directly compared for equivilance:
+/// Colours can also be directly compared for equivalence:
 ///
 /// ```rust
 /// use serenity::utils::Colour;

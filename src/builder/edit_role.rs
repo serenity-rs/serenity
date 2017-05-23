@@ -16,11 +16,15 @@ use ::model::{Permissions, Role, permissions};
 ///
 /// # Examples
 ///
-/// Create a hoisted, mentionable role named "a test role":
+/// Create a hoisted, mentionable role named `"a test role"`:
 ///
-/// ```rust,ignore
+/// ```rust,no_run
+/// # use serenity::model::{ChannelId, GuildId};
+/// # let (channel_id, guild_id) = (ChannelId(1), GuildId(2));
+/// #
 /// // assuming a `channel_id` and `guild_id` has been bound
-/// let role = channel_id.create_role(guild_id, |r| r
+///
+/// let role = guild_id.create_role(|r| r
 ///     .hoist(true)
 ///     .mentionable(true)
 ///     .name("a test role"));

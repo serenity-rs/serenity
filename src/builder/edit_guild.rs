@@ -49,15 +49,25 @@ impl EditGuild {
     /// Using the utility function - [`utils::read_image`] - to read an image
     /// from the cwd and encode it in base64 to send to Discord.
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
+    /// # use serenity::model::GuildId;
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #     let mut guild = GuildId(0).get()?;
     /// use serenity::utils;
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// let base64_icon = utils::read_image("./guild_icon.png")
-    ///     .expect("Failed to read image");
+    /// let base64_icon = utils::read_image("./guild_icon.png")?;
     ///
-    /// let _ = guild.edit(|g| g.icon(base64_icon));
+    /// guild.edit(|g| g.icon(Some(&base64_icon)))?;
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
     /// ```
     ///
     /// [`utils::read_image`]: ../utils/fn.read_image.html
@@ -91,14 +101,23 @@ impl EditGuild {
     ///
     /// Setting the region to [`Region::UsWest`]:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
+    /// # use serenity::model::GuildId;
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #     let mut guild = GuildId(0).get()?;
     /// use serenity::model::Region;
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// if let Err(why) = guild.edit(|g| g.region(Region::UsWest)) {
-    ///     println!("Error editing guild's region: {:?}", why);
-    /// }
+    /// guild.edit(|g| g.region(Region::UsWest))?;
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
     /// ```
     ///
     /// [`Region::UsWest`]: ../model/enum.Region.html#variant.UsWest

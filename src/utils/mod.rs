@@ -74,11 +74,11 @@ pub fn is_nsfw(name: &str) -> bool {
     }
 }
 
-/// Retrieves the "code" part of an [invite][`RichInvite`] out of a URL.
+/// Retrieves the "code" part of an invite out of a URL.
 ///
 /// # Examples
 ///
-/// Three formats of codes are supported:
+/// Three formats of [invite][`RichInvite`] codes are supported:
 ///
 /// 1. Retrieving the code from the URL `"https://discord.gg/0cDvIgU2voY8RSYL"`:
 ///
@@ -123,7 +123,34 @@ pub fn parse_invite(code: &str) -> &str {
     }
 }
 
-/// Retreives Id from a username mention.
+/// Retreives an Id from a user mention.
+///
+/// If the mention is invalid, then `None` is returned.
+///
+/// # Examples
+///
+/// Retrieving an Id from a valid [`User`] mention:
+///
+/// ```rust
+/// use serenity::utils::parse_username;
+///
+/// // regular username mention
+/// assert_eq!(parse_username("<@114941315417899012>"), Some(114941315417899012));
+///
+/// // nickname mention
+/// assert_eq!(parse_username("<@!114941315417899012>"), Some(114941315417899012));
+/// ```
+///
+/// Asserting that an invalid username or nickname mention returns `None`:
+///
+/// ```rust
+/// use serenity::utils::parse_username;
+///
+/// assert!(parse_username("<@1149413154aa17899012").is_none());
+/// assert!(parse_username("<@!11494131541789a90b1c2").is_none());
+/// ```
+///
+/// [`User`]: ../model/struct.User.html
 pub fn parse_username(mention: &str) -> Option<u64> {
     if mention.len() < 4 {
         return None;
@@ -140,13 +167,35 @@ pub fn parse_username(mention: &str) -> Option<u64> {
     }
 }
 
-/// Retreives Id from a role mention.
+/// Retreives an Id from a role mention.
+///
+/// If the mention is invalid, then `None` is returned.
+///
+/// # Examples
+///
+/// Retrieving an Id from a valid [`Role`] mention:
+///
+/// ```rust
+/// use serenity::utils::parse_role;
+///
+/// assert_eq!(parse_role("<@&136107769680887808>"), Some(136107769680887808));
+/// ```
+///
+/// Asserting that an invalid role mention returns `None`:
+///
+/// ```rust
+/// use serenity::utils::parse_role;
+///
+/// assert!(parse_role("<@&136107769680887808").is_none());
+/// ```
+///
+/// [`Role`]: ../model/struct.Role.html
 pub fn parse_role(mention: &str) -> Option<u64> {
     if mention.len() < 4 {
         return None;
     }
 
-    if mention.starts_with("<@&") {
+    if mention.starts_with("<@&") && mention.ends_with('>') {
         let len = mention.len() - 1;
         mention[3..len].parse::<u64>().ok()
     } else {
@@ -154,13 +203,36 @@ pub fn parse_role(mention: &str) -> Option<u64> {
     }
 }
 
-/// Retreives Id from a channel mention.
+/// Retreives an Id from a channel mention.
+///
+/// If the channel mention is invalid, then `None` is returned.
+///
+/// # Examples
+///
+/// Retrieving an Id from a valid [`Channel`] mention:
+///
+/// ```rust
+/// use serenity::utils::parse_channel;
+///
+/// assert_eq!(parse_channel("<#81384788765712384>"), Some(81384788765712384));
+/// ```
+///
+/// Asserting that an invalid channel mention returns `None`:
+///
+/// ```rust
+/// use serenity::utils::parse_channel;
+///
+/// assert!(parse_channel("<#!81384788765712384>").is_none());
+/// assert!(parse_channel("<#81384788765712384").is_none());
+/// ```
+///
+/// [`Channel`]: ../model/enum.Channel.html
 pub fn parse_channel(mention: &str) -> Option<u64> {
     if mention.len() < 4 {
         return None;
     }
 
-    if mention.starts_with("<#") {
+    if mention.starts_with("<#") && mention.ends_with('>') {
         let len = mention.len() - 1;
         mention[2..len].parse::<u64>().ok()
     } else {
@@ -168,19 +240,51 @@ pub fn parse_channel(mention: &str) -> Option<u64> {
     }
 }
 
-/// Retreives name and Id from an emoji mention.
+/// Retreives the name and Id from an emoji mention, in the form of an
+/// `EmojiIdentifier`.
+///
+/// If the emoji usage is invalid, then `None` is returned.
+///
+/// # Examples
+///
+/// Ensure that a valid [`Emoji`] usage is correctly parsed:
+///
+/// ```rust
+/// use serenity::model::{EmojiId, EmojiIdentifier};
+/// use serenity::utils::parse_emoji;
+///
+/// let expected = EmojiIdentifier {
+///     id: EmojiId(302516740095606785),
+///     name: "smugAnimeFace".to_owned(),
+/// };
+///
+/// assert_eq!(parse_emoji("<:smugAnimeFace:302516740095606785>").unwrap(), expected);
+/// ```
+///
+/// Asserting that an invalid emoji usage returns `None`:
+///
+/// ```rust
+/// use serenity::utils::parse_emoji;
+///
+/// assert!(parse_emoji("<:smugAnimeFace:302516740095606785").is_none());
+/// ```
+///
+/// [`Emoji`]: ../model/struct.Emoji.html
 pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
     let len = mention.len();
+
     if len < 6 || len > 56 {
         return None;
     }
 
-    if mention.starts_with("<:") {
+    if mention.starts_with("<:") && mention.ends_with('>') {
         let mut name = String::default();
         let mut id = String::default();
+
         for (i, x) in mention[2..].chars().enumerate() {
             if x == ':' {
                 let from = i + 3;
+
                 for y in mention[from..].chars() {
                     if y == '>' {
                         break;
@@ -188,11 +292,13 @@ pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
                         id.push(y);
                     }
                 }
+
                 break;
             } else {
                 name.push(x);
             }
         }
+
         match id.parse::<u64>() {
             Ok(x) => Some(EmojiIdentifier {
                 name: name,
@@ -216,8 +322,7 @@ pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
 /// ```rust,no_run
 /// use serenity::utils;
 ///
-/// let image = utils::read_image("./cat.png")
-///     .expect("Failed to read image");
+/// let image = utils::read_image("./cat.png").expect("Failed to read image");
 /// ```
 ///
 /// [`EditProfile::avatar`]: ../builder/struct.EditProfile.html#method.avatar
@@ -240,6 +345,33 @@ pub fn read_image<P: AsRef<Path>>(path: P) -> Result<String> {
 
 /// Turns a string into a vector of string arguments, splitting by spaces, but
 /// parsing content within quotes as one individual argument.
+///
+/// # Examples
+///
+/// Parsing two quoted commands:
+///
+/// ```rust
+/// use serenity::utils::parse_quotes;
+///
+/// let command = r#""this is the first" "this is the second""#;
+/// let expected = vec![
+///     "this is the first".to_owned(),
+///     "this is the second".to_owned()
+/// ];
+///
+/// assert_eq!(parse_quotes(command), expected);
+/// ```
+///
+/// ```rust
+/// use serenity::utils::parse_quotes;
+///
+/// let command = r#""this is a quoted command that doesn't have an ending quotation"#;
+/// let expected = vec![
+///     "this is a quoted command that doesn't have an ending quotation".to_owned(),
+/// ];
+///
+/// assert_eq!(parse_quotes(command), expected);
+/// ```
 pub fn parse_quotes(s: &str) -> Vec<String> {
     let mut args = vec![];
     let mut in_string = false;

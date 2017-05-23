@@ -186,7 +186,7 @@ pub struct Cache {
     /// [`GuildMembersChunkEvent`]: ../model/event/struct.GuildMembersChunkEvent.html
     /// [`GuildSyncEvent`]: ../model/event/struct.GuildSyncEvent.html
     /// [`PresenceUpdateEvent`]: ../model/event/struct.PresenceUpdateEvent.html
-    /// [`Ready`]: ../model/event/struct.ReadyEvent.html
+    /// [`ReadyEvent`]: ../model/event/struct.ReadyEvent.html
     pub users: HashMap<UserId, Arc<RwLock<User>>>,
 }
 
@@ -194,13 +194,39 @@ impl Cache {
     /// Fetches the number of [`Member`]s that have not had data received.
     ///
     /// The important detail to note here is that this is the number of
-    /// _member_s that have not had data downloaded. A single [`User`] may have
+    /// _member_s that have not had data received. A single [`User`] may have
     /// multiple associated member objects that have not been received.
     ///
     /// This can be used in combination with [`Shard::chunk_guilds`], and can be
-    /// used to determine how many members have not yet been downloaded.
+    /// used to determine how many members have not yet been received.
+    ///
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::login("");
+    /// #
+    /// use serenity::client::CACHE;
+    /// use std::thread;
+    /// use std::time::Duration;
+    ///
+    /// client.on_ready(|ctx, _| {
+    ///     // Wait some time for guilds to be received.
+    ///     //
+    ///     // You should keep track of this in a better fashion by tracking how
+    ///     // many guilds each `ready` has, and incrementing a counter on
+    ///     // GUILD_CREATEs. Once the number is equal, print the number of
+    ///     // unknown members.
+    ///     //
+    ///     // For demonstrative purposes we're just sleeping the thread for 5
+    ///     // seconds.
+    ///     thread::sleep(Duration::from_secs(5));
+    ///
+    ///     println!("{} unknown members", CACHE.read().unwrap().unknown_members());
+    /// });
+    /// ```
     ///
     /// [`Member`]: ../model/struct.Member.html
+    /// [`Shard::chunk_guilds`]: ../gateway/struct.Shard.html#method.chunk_guilds
     /// [`User`]: ../model/struct.User.html
     pub fn unknown_members(&self) -> u64 {
         let mut total = 0;
@@ -226,6 +252,16 @@ impl Cache {
     /// If there are 6 private channels and 2 groups in the cache, then `8` Ids
     /// will be returned.
     ///
+    /// Printing the count of all private channels and groups:
+    ///
+    /// ```rust,no_run
+    /// use serenity::client::CACHE;
+    ///
+    /// let amount = CACHE.read().unwrap().all_private_channels().len();
+    ///
+    /// println!("There are {} private channels", amount);
+    /// ```
+    ///
     /// [`Group`]: ../model/struct.Group.html
     /// [`PrivateChannel`]: ../model/struct.PrivateChannel.html
     pub fn all_private_channels(&self) -> Vec<ChannelId> {
@@ -241,6 +277,22 @@ impl Cache {
     /// Note that if you are utilizing multiple [`Shard`]s, then the guilds
     /// retrieved over all shards are included in this count -- not just the
     /// current [`Context`]'s shard, if accessing from one.
+    ///
+    /// # Examples
+    ///
+    /// Print all of the Ids of guilds in the Cache:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::login("");
+    /// #
+    /// use serenity::client::CACHE;
+    ///
+    /// client.on_ready(|_, _| {
+    ///     println!("Guilds in the Cache: {:?}", CACHE.read().unwrap().all_guilds());
+    /// });
+    /// ```
     ///
     /// [`Context`]: ../client/struct.Context.html
     /// [`Guild`]: ../model/struct.Guild.html
@@ -314,8 +366,14 @@ impl Cache {
     /// Getting a guild's channel via the Id of the message received through a
     /// [`Client::on_message`] event dispatch:
     ///
-    /// ```rust,ignore
-    /// use serenity::CACHE;
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::login("");
+    /// #
+    /// # client.on_message(|ctx, message| {
+    /// #
+    /// use serenity::client::CACHE;
     ///
     /// let cache = CACHE.read().unwrap();
     ///
@@ -329,6 +387,7 @@ impl Cache {
     ///         return;
     ///     },
     /// };
+    /// # });
     /// ```
     ///
     /// [`ChannelId`]: ../model/struct.ChannelId.html

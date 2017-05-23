@@ -123,7 +123,7 @@ impl FromStr for RoleId {
 }
 
 /// A version of an emoji used only when solely the Id and name are known.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct EmojiIdentifier {
     /// The Id of the emoji.
     pub id: EmojiId,

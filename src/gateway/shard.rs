@@ -188,6 +188,18 @@ impl Shard {
     ///
     /// For example, if using 3 shards in total, and if this is shard 1, then it
     /// can be read as "the second of three shards".
+    ///
+    /// # Examples
+    ///
+    /// Retrieving the shard info for the second shard, out of two shards total:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::gateway::Shard;
+    /// #
+    /// # let (shard, _, _) = Shard::new("", "", Some([1, 2])).unwrap();
+    /// #
+    /// assert_eq!(shard.shard_info(), Some([1, 2]));
+    /// ```
     pub fn shard_info(&self) -> Option<[u64; 2]> {
         self.shard_info
     }
@@ -205,6 +217,20 @@ impl Shard {
     /// Sets the user's current game, if any.
     ///
     /// Other presence settings are maintained.
+    ///
+    /// # Examples
+    ///
+    /// Setting the current game to playing `"Heroes of the Storm"`:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::gateway::Shard;
+    /// #
+    /// # let (mut shard, _, _) = Shard::new("", "", Some([0, 1])).unwrap();
+    /// #
+    /// use serenity::model::Game;
+    ///
+    /// shard.set_game(Some(Game::playing("Heroes of the Storm")));
+    /// ```
     pub fn set_game(&mut self, game: Option<Game>) {
         self.current_presence.0 = game;
 
@@ -213,11 +239,26 @@ impl Shard {
 
     /// Sets the user's current online status.
     ///
-    /// Note that [`Offline`] is not a valid presence, so it is automatically
-    /// converted to [`Invisible`].
+    /// Note that [`Offline`] is not a valid online status, so it is
+    /// automatically converted to [`Invisible`].
     ///
     /// Other presence settings are maintained.
     ///
+    /// # Examples
+    ///
+    /// Setting the current online status for the shard to [`DoNotDisturb`].
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::gateway::Shard;
+    /// #
+    /// # let (mut shard, _, _) = Shard::new("", "", Some([0, 1])).unwrap();
+    /// #
+    /// use serenity::model::OnlineStatus;
+    ///
+    /// shard.set_status(OnlineStatus::DoNotDisturb);
+    /// ```
+    ///
+    /// [`DoNotDisturb`]: ../../model/enum.OnlineStatus.html#variant.DoNotDisturb
     /// [`Invisible`]: ../../model/enum.OnlineStatus.html#variant.Invisible
     /// [`Offline`]: ../../model/enum.OnlineStatus.html#variant.Offline
     pub fn set_status(&mut self, online_status: OnlineStatus) {
@@ -239,16 +280,14 @@ impl Shard {
     /// Set the current user as playing `"Heroes of the Storm"`, being online,
     /// and not being afk:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
+    /// # use serenity::client::gateway::Shard;
+    /// #
+    /// # let (mut shard, _, _) = Shard::new("", "", Some([0, 1])).unwrap();
+    /// #
     /// use serenity::model::{Game, OnlineStatus};
     ///
-    /// // assuming you are in a context
-    ///
-    /// context.shard.lock()
-    ///     .unwrap()
-    ///     .set_presence(Some(Game::playing("Heroes of the Storm")),
-    ///                   OnlineStatus::Online,
-    ///                   false);
+    /// shard.set_presence(Some(Game::playing("Heroes of the Storm")), OnlineStatus::Online, false);
     /// ```
     pub fn set_presence(&mut self,
                         game: Option<Game>,
@@ -444,8 +483,32 @@ impl Shard {
         }
     }
 
-    /// Calculates the heartbeat latency (in nanoseconds) between the shard and
-    /// Discord.
+    /// Calculates the heartbeat latency between the shard and the gateway.
+    ///
+    /// # Examples
+    ///
+    /// When using the [`Client`], output the latency in response to a `"~ping"`
+    /// message handled through [`Client::on_message`].
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::Client;
+    /// #
+    /// # let mut client = Client::login("hello source code viewer <3");
+    /// client.on_message(|ctx, msg| {
+    ///     if msg.content == "~ping" {
+    ///         if let Some(latency) = ctx.shard.lock().unwrap().latency() {
+    ///             let s = format!("{}.{}s", latency.as_secs(), latency.subsec_nanos());
+    ///
+    ///             let _ = msg.channel_id.say(&s);
+    ///         } else {
+    ///             let _ = msg.channel_id.say("N/A");
+    ///         }
+    ///     }
+    /// });
+    /// ```
+    ///
+    /// [`Client`]: ../struct.Client.html
+    /// [`Client::on_message`]: ../struct.Client.html#method.on_message
     // Shamelessly stolen from brayzure's commit in eris:
     // <https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6>
     pub fn latency(&self) -> Option<StdDuration> {
@@ -487,16 +550,52 @@ impl Shard {
 
     /// Requests that one or multiple [`Guild`]s be chunked.
     ///
-    /// This will ask Discord to start sending member chunks for large guilds
-    /// (250 members+). If a guild is over 250 members, then a full member list
-    /// will not be downloaded, and must instead be requested to be sent in
-    /// "chunks" containing members.
+    /// This will ask the gateway to start sending member chunks for large
+    /// guilds (250 members+). If a guild is over 250 members, then a full
+    /// member list will not be downloaded, and must instead be requested to be
+    /// sent in "chunks" containing members.
     ///
     /// Member chunks are sent as the [`Event::GuildMembersChunk`] event. Each
     /// chunk only contains a partial amount of the total members.
     ///
     /// If the `cache` feature is enabled, the cache will automatically be
     /// updated with member chunks.
+    ///
+    /// # Examples
+    ///
+    /// Chunk a single guild by Id, limiting to 2000 [`Member`]s, and not
+    /// specifying a query parameter:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::gateway::Shard;
+    /// #
+    /// # let (shard, _, _) = Shard::new("", "", Some([0, 1])).unwrap();
+    /// #
+    /// use serenity::model::GuildId;
+    ///
+    /// let guild_ids = vec![GuildId(81384788765712384)];
+    ///
+    /// shard.chunk_guilds(&guild_ids, Some(2000), None);
+    /// ```
+    ///
+    /// Chunk a single guild by Id, limiting to 20 members, and specifying a
+    /// query parameter of `"do"`:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::gateway::Shard;
+    /// #
+    /// # let (shard, _, _) = Shard::new("", "", Some([0, 1])).unwrap();
+    /// #
+    /// use serenity::model::GuildId;
+    ///
+    /// let guild_ids = vec![GuildId(81384788765712384)];
+    ///
+    /// shard.chunk_guilds(&guild_ids, Some(20), Some("do"));
+    /// ```
+    ///
+    /// [`Event::GuildMembersChunk`]: ../../model/event/enum.Event.html#variant.GuildMembersChunk
+    /// [`Guild`]: ../../model/struct.Guild.html
+    /// [`Member`]: ../../model/struct.Member.html
     pub fn chunk_guilds(&self, guild_ids: &[GuildId], limit: Option<u16>, query: Option<&str>) {
         let msg = json!({
             "op": OpCode::GetGuildMembers.num(),
@@ -513,11 +612,27 @@ impl Shard {
     /// Calculates the number of guilds that the shard is responsible for.
     ///
     /// If sharding is not being used (i.e. 1 shard), then the total number of
-    /// guilds in the [`Cache`] will be used.
+    /// [`Guild`] in the [`Cache`] will be used.
     ///
     /// **Note**: Requires the `cache` feature be enabled.
     ///
-    /// [`Cache`]: ../cache/struct.Cache.html
+    /// # Examples
+    ///
+    /// Retrieve the number of guilds a shard is responsible for:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::gateway::Shard;
+    /// #
+    /// # let (shard, _, _) = Shard::new("will anyone read this", "", Some([0, 1])).unwrap();
+    /// #
+    /// let info = shard.shard_info();
+    /// let guilds = shard.guilds_handled();
+    ///
+    /// println!("Shard {:?} is responsible for {} guilds", info, guilds);
+    /// ```
+    ///
+    /// [`Cache`]: ../ext/cache/struct.Cache.html
+    /// [`Guild`]: ../model/struct.Guild.html
     #[cfg(feature="cache")]
     pub fn guilds_handled(&self) -> u16 {
         let cache = CACHE.read().unwrap();

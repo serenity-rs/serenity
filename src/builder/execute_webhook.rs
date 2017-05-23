@@ -15,7 +15,7 @@ use ::internal::prelude::*;
 /// Creating two embeds, and then sending them as part of the delivery
 /// payload of [`Webhook::execute`]:
 ///
-/// ```rust,ignore
+/// ```rust,no_run
 /// use serenity::http;
 /// use serenity::model::Embed;
 /// use serenity::utils::Colour;
@@ -57,6 +57,22 @@ pub struct ExecuteWebhook(pub JsonMap);
 
 impl ExecuteWebhook {
     /// Override the default avatar of the webhook with an image URL.
+    ///
+    /// # Examples
+    ///
+    /// Overriding the default avatar:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http;
+    /// #
+    /// # let webhook = http::get_webhook_with_token(0, "").unwrap();
+    /// #
+    /// let avatar_url = "https://i.imgur.com/KTs6whd.jpg";
+    ///
+    /// let _ = webhook.execute(|w| w
+    ///     .avatar_url(avatar_url)
+    ///     .content("Here's a webhook"));
+    /// ```
     pub fn avatar_url(mut self, avatar_url: &str) -> Self {
         self.0.insert("avatar_url".to_owned(), Value::String(avatar_url.to_owned()));
 
@@ -67,6 +83,20 @@ impl ExecuteWebhook {
     ///
     /// Note that when setting at least one embed via [`embeds`], this may be
     /// omitted.
+    ///
+    /// # Examples
+    ///
+    /// Sending a webhook with a content of `"foo"`:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::rest;
+    /// #
+    /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
+    /// #
+    /// if let Err(why) = webhook.execute(|w| w.content("foo")) {
+    ///     println!("Err sending webhook: {:?}", why);
+    /// }
+    /// ```
     ///
     /// [`embeds`]: #method.embeds
     pub fn content(mut self, content: &str) -> Self {
@@ -96,7 +126,19 @@ impl ExecuteWebhook {
 
     /// Whether the message is a text-to-speech message.
     ///
-    /// Think carefully before setting this to `true`.
+    /// # Examples
+    ///
+    /// Sending a webhook with text-to-speech enabled:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::rest;
+    /// #
+    /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
+    /// #
+    /// if let Err(why) = webhook.execute(|w| w.content("hello").tts(true)) {
+    ///     println!("Err sending webhook: {:?}", why);
+    /// }
+    /// ```
     pub fn tts(mut self, tts: bool) -> Self {
         self.0.insert("tts".to_owned(), Value::Bool(tts));
 
@@ -104,6 +146,20 @@ impl ExecuteWebhook {
     }
 
     /// Override the default username of the webhook.
+    ///
+    /// # Examples
+    ///
+    /// Overriuding the username to `"hakase"`:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::rest;
+    /// #
+    /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
+    /// #
+    /// if let Err(why) = webhook.execute(|w| w.content("hello").username("hakase")) {
+    ///     println!("Err sending webhook: {:?}", why);
+    /// }
+    /// ```
     pub fn username(mut self, username: &str) -> Self {
         self.0.insert("username".to_owned(), Value::String(username.to_owned()));
 
@@ -114,9 +170,17 @@ impl ExecuteWebhook {
 impl Default for ExecuteWebhook {
     /// Returns a default set of values for a [`Webhook`] execution.
     ///
-    /// The only default value is [`tts`] being set to `true`. In the event that
-    /// there is a bug that Discord defaults `tts` to `true`, at least
-    /// serenity won't be a part of it.
+    /// The only default value is [`tts`] being set to `false`.
+    ///
+    /// # Examples
+    ///
+    /// Creating an `ExecuteWebhook` builder:
+    ///
+    /// ```rust
+    /// use serenity::utils::builder::ExecuteWebhook;
+    ///
+    /// let executer = ExecuteWebhook::default();
+    /// ```
     ///
     /// [`Webhook`]: ../model/struct.Webhook.html
     /// [`tts`]: #method.tts

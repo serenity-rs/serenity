@@ -18,9 +18,37 @@ use ::model::MessageId;
 /// does not _need_ to be called and defaults to a value of 50.
 ///
 /// This should be used only for retrieving messages; see
-/// [`Client::get_messages`] for examples.
+/// [`GuildChannel::messages`] for examples.
 ///
-/// [`Client::get_messages`]: ../client/struct.Client.html#method.get_messages
+/// # Examples
+///
+/// Creating a `GetMessages` builder to retrieve the first 25 messages after the
+/// message with an Id of `158339864557912064`:
+///
+/// ```rust,no_run
+/// # use std::error::Error;
+/// #
+/// # fn try_main() -> Result<(), Box<Error>> {
+/// use serenity::model::{ChannelId, MessageId};
+/// use serenity::builder::GetMessages;
+///
+/// let retriever = GetMessages::default()
+///     .after(MessageId(158339864557912064))
+///     .limit(25);
+///
+/// // you can then pass it into a function which retrieves messages:
+/// let channel_id = ChannelId(81384788765712384);
+///
+/// let _messages = channel_id.messages(|_| retriever)?;
+/// #     Ok(())
+/// # }
+/// #
+/// # fn main() {
+/// #     try_main().unwrap();
+/// # }
+/// ```
+///
+/// [`GuildChannel::messages`]: ../model/struct.GuildChannel.html#method.messages
 #[derive(Clone, Debug, Default)]
 pub struct GetMessages(pub BTreeMap<String, u64>);
 
