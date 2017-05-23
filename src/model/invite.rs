@@ -121,6 +121,8 @@ impl Invite {
     /// # use serenity::model::*;
     /// #
     /// # let invite = Invite {
+    /// #     approximate_member_count: Some(1812),
+    /// #     approximate_presence_count: Some(717),
     /// #     code: "WxZumR".to_owned(),
     /// #     channel: InviteChannel {
     /// #         id: ChannelId(1),
@@ -132,6 +134,8 @@ impl Invite {
     /// #         icon: None,
     /// #         name: "bar".to_owned(),
     /// #         splash_hash: None,
+    /// #         text_channel_count: Some(7),
+    /// #         voice_channel_count: Some(3),
     /// #     },
     /// # };
     /// #
@@ -302,6 +306,8 @@ impl RichInvite {
     /// #         icon: None,
     /// #         name: "baz".to_owned(),
     /// #         splash_hash: None,
+    /// #         text_channel_count: None,
+    /// #         voice_channel_count: None,
     /// #     },
     /// #     inviter: User {
     /// #         avatar: None,
