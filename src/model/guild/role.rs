@@ -3,11 +3,13 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 use ::model::*;
 
 #[cfg(feature="cache")]
-use ::client::{CACHE, rest};
+use ::CACHE;
 #[cfg(feature="cache")]
 use ::internal::prelude::*;
-#[cfg(feature="cache")]
-use ::utils::builder::EditRole;
+#[cfg(feature="model")]
+use ::http;
+#[cfg(feature="builder")]
+use ::builder::EditRole;
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
@@ -21,8 +23,13 @@ pub struct Role {
     pub id: RoleId,
     /// The colour of the role. This is an ergonomic representation of the inner
     /// value.
+    #[cfg(feature="utils")]
     #[serde(rename="color")]
     pub colour: Colour,
+    /// The colour of the role.
+    #[cfg(not(feature="utils"))]
+    #[serde(rename="color")]
+    pub colour: u32,
     /// Indicator of whether the role is pinned above lesser roles.
     ///
     /// In the client, this causes [`Member`]s in the role to be seen above
@@ -55,6 +62,7 @@ pub struct Role {
     pub position: i64,
 }
 
+#[cfg(feature="model")]
 impl Role {
     /// Deletes the role.
     ///
@@ -64,7 +72,7 @@ impl Role {
     #[cfg(feature="cache")]
     #[inline]
     pub fn delete(&self) -> Result<()> {
-        rest::delete_role(self.find_guild()?.0, self.id.0)
+        http::delete_role(self.find_guild()?.0, self.id.0)
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
@@ -95,10 +103,10 @@ impl Role {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::GuildNotFound`] if a guild is not in the cache
+    /// Returns a [`ModelError::GuildNotFound`] if a guild is not in the cache
     /// that contains the role.
     ///
-    /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
+    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
     #[cfg(feature="cache")]
     pub fn find_guild(&self) -> Result<GuildId> {
         for guild in CACHE.read().unwrap().guilds.values() {
@@ -109,7 +117,7 @@ impl Role {
             }
         }
 
-        Err(Error::Client(ClientError::GuildNotFound))
+        Err(Error::Model(ModelError::GuildNotFound))
     }
 
     /// Check that the role has the given permission.
@@ -165,6 +173,7 @@ impl PartialOrd for Role {
     }
 }
 
+#[cfg(feature="model")]
 impl RoleId {
     /// Search the cache for the role.
     #[cfg(feature="cache")]

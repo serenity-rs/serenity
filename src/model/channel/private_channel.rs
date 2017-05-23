@@ -2,7 +2,9 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::io::Read;
 use super::deserialize_single_recipient;
 use ::model::*;
-use ::utils::builder::{CreateMessage, GetMessages};
+
+#[cfg(feature="model")]
+use ::builder::{CreateMessage, GetMessages};
 
 /// A Direct Message text channel with another user.
 #[derive(Clone, Debug, Deserialize)]
@@ -29,6 +31,7 @@ pub struct PrivateChannel {
     pub recipient: Arc<RwLock<User>>,
 }
 
+#[cfg(feature="model")]
 impl PrivateChannel {
     /// Broadcasts that the current user is typing to the recipient.
     pub fn broadcast_typing(&self) -> Result<()> {
@@ -114,14 +117,14 @@ impl PrivateChannel {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over the [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../utils/builder/struct.CreateMessage.html#method.content
+    /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
@@ -206,12 +209,12 @@ impl PrivateChannel {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
     /// [`ChannelId`]: ../model/struct.ChannelId.html
-    /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
     pub fn say(&self, content: &str) -> Result<Message> {
         self.id.say(content)
@@ -229,11 +232,11 @@ impl PrivateChannel {
     /// # Errors
     ///
     /// If the content of the message is over the above limit, then a
-    /// [`ClientError::MessageTooLong`] will be returned, containing the number
+    /// [`ModelError::MessageTooLong`] will be returned, containing the number
     /// of unicode code points over the limit.
     ///
     /// [`ChannelId::send_file`]: struct.ChannelId.html#method.send_file
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn send_file<F, R>(&self, file: R, filename: &str, f: F) -> Result<Message>
@@ -248,12 +251,12 @@ impl PrivateChannel {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
     #[inline]
     pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {

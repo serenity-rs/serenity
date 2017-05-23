@@ -1,3 +1,4 @@
+#[cfg(feature="model")]
 use hyper::Client as HyperClient;
 use std::io::Read;
 use ::internal::prelude::*;
@@ -24,6 +25,7 @@ pub struct Attachment {
     pub width: Option<u64>,
 }
 
+#[cfg(feature="model")]
 impl Attachment {
     /// If this attachment is an image, then a tuple of the width and height
     /// in pixels is returned.

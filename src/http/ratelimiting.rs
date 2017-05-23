@@ -47,7 +47,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use std::{str, thread};
-use super::LightMethod;
+use super::{HttpError, LightMethod};
 use time;
 use ::internal::prelude::*;
 
@@ -78,7 +78,7 @@ lazy_static! {
     /// View the `reset` time of the route for `ChannelsId(7)`:
     ///
     /// ```rust,no_run
-    /// use serenity::client::rest::ratelimiting::{ROUTES, Route};
+    /// use serenity::http::ratelimiting::{ROUTES, Route};
     ///
     /// let routes = ROUTES.lock().unwrap();
     ///
@@ -94,9 +94,9 @@ lazy_static! {
 
 /// A representation of all routes registered within the library. These are safe
 /// and memory-efficient representations of each path that functions exist for
-/// in the [`rest`] module.
+/// in the [`http`] module.
 ///
-/// [`rest`]: ../index.html
+/// [`http`]: ../index.html
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Route {
     /// Route for the `/channels/:channel_id` path.
@@ -495,9 +495,9 @@ fn parse_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
         Some(header) => match str::from_utf8(&header[0]) {
             Ok(v) => match v.parse::<i64>() {
                 Ok(v) => Ok(Some(v)),
-                Err(_) => Err(Error::Client(ClientError::RateLimitI64)),
+                Err(_) => Err(Error::Http(HttpError::RateLimitI64)),
             },
-            Err(_) => Err(Error::Client(ClientError::RateLimitUtf8)),
+            Err(_) => Err(Error::Http(HttpError::RateLimitUtf8)),
         },
         None => Ok(None),
     }

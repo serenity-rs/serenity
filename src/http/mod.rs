@@ -26,6 +26,9 @@
 
 pub mod ratelimiting;
 
+mod error;
+
+pub use self::error::Error as HttpError;
 pub use hyper::status::{StatusClass, StatusCode};
 
 use hyper::client::{
@@ -207,14 +210,14 @@ pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
 ///
 /// use serde_json::builder::ObjectBuilder;
 /// use serde_json::Value;
-/// use serenity::client::rest;
+/// use serenity::http;
 ///
 /// let map = ObjectBuilder::new()
 ///     .insert("name", "test")
 ///     .insert("region", "us-west")
 ///     .build();
 ///
-/// let _result = rest::create_guild(map);
+/// let _result = http::create_guild(map);
 /// ```
 ///
 /// [`Guild`]: ../../model/struct.Guild.html
@@ -339,12 +342,12 @@ pub fn create_role(guild_id: u64, map: &JsonMap) -> Result<Role> {
 /// extern crate serenity;
 ///
 /// use serde_json::builder::ObjectBuilder;
-/// use serenity::client::rest;
+/// use serenity::http;
 ///
 /// let channel_id = 81384788765712384;
 /// let map = ObjectBuilder::new().insert("name", "test").build();
 ///
-/// let webhook = rest::create_webhook(channel_id, map).expect("Error creating");
+/// let webhook = http::create_webhook(channel_id, map).expect("Error creating");
 /// ```
 ///
 /// [`GuildChannel`]: ../../model/struct.GuildChannel.html
@@ -428,13 +431,13 @@ pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
 /// # Examples
 ///
 /// ```rust,no_run
-/// use serenity::client::rest;
+/// use serenity::http;
 /// use serenity::model::{ChannelId, MessageId};
 ///
 /// let channel_id = ChannelId(7);
 /// let message_id = MessageId(8);
 ///
-/// let _ = rest::delete_message_reactions(channel_id.0, message_id.0)
+/// let _ = http::delete_message_reactions(channel_id.0, message_id.0)
 ///     .expect("Error deleting reactions");
 /// ```
 ///
@@ -494,14 +497,14 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 /// Deletes a webhook given its Id:
 ///
 /// ```rust,no_run
-/// use serenity::client::{Client, rest};
+/// use serenity::{Client, http};
 /// use std::env;
 ///
 /// // Due to the `delete_webhook` function requiring you to authenticate, you
 /// // must have set the token first.
-/// rest::set_token(&env::var("DISCORD_TOKEN").unwrap());
+/// http::set_token(&env::var("DISCORD_TOKEN").unwrap());
 ///
-/// rest::delete_webhook(245037420704169985).expect("Error deleting webhook");
+/// http::delete_webhook(245037420704169985).expect("Error deleting webhook");
 /// ```
 ///
 /// [`Webhook`]: ../../model/struct.Webhook.html
@@ -519,12 +522,12 @@ pub fn delete_webhook(webhook_id: u64) -> Result<()> {
 /// Deletes a webhook given its Id and unique token:
 ///
 /// ```rust,no_run
-/// use serenity::client::rest;
+/// use serenity::http;
 ///
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 ///
-/// rest::delete_webhook_with_token(id, token).expect("Error deleting webhook");
+/// http::delete_webhook_with_token(id, token).expect("Error deleting webhook");
 /// ```
 ///
 /// [`Webhook`]: ../../model/struct.Webhook.html
@@ -689,7 +692,7 @@ pub fn edit_role(guild_id: u64, role_id: u64, map: &JsonMap) -> Result<Role> {
 /// extern crate serenity;
 ///
 /// use serde_json::builder::ObjectBuilder;
-/// use serenity::client::rest;
+/// use serenity::http;
 ///
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
@@ -697,7 +700,7 @@ pub fn edit_role(guild_id: u64, role_id: u64, map: &JsonMap) -> Result<Role> {
 ///     .expect("Error reading image");
 /// let map = ObjectBuilder::new().insert("avatar", image).build();
 ///
-/// let edited = rest::edit_webhook_with_token(id, token, map)
+/// let edited = http::edit_webhook_with_token(id, token, map)
 ///     .expect("Error editing webhook");
 /// ```
 ///
@@ -730,13 +733,13 @@ pub fn edit_webhook(webhook_id: u64, map: &Value) -> Result<Webhook> {
 /// extern crate serenity;
 ///
 /// use serde_json::builder::ObjectBuilder;
-/// use serenity::client::rest;
+/// use serenity::http;
 ///
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 /// let map = ObjectBuilder::new().insert("name", "new name").build();
 ///
-/// let edited = rest::edit_webhook_with_token(id, token, map)
+/// let edited = http::edit_webhook_with_token(id, token, map)
 ///     .expect("Error editing webhook");
 /// ```
 ///
@@ -788,13 +791,13 @@ pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &JsonMap) -> R
 /// extern crate serenity;
 ///
 /// use serde_json::builder::ObjectBuilder;
-/// use serenity::client::rest;
+/// use serenity::http;
 ///
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 /// let map = ObjectBuilder::new().insert("content", "test").build();
 ///
-/// let message = match rest::execute_webhook(id, token, map) {
+/// let message = match http::execute_webhook(id, token, map) {
 ///     Ok(message) => message,
 ///     Err(why) => {
 ///         println!("Error executing webhook: {:?}", why);
@@ -887,11 +890,11 @@ pub fn get_channel_invites(channel_id: u64) -> Result<Vec<RichInvite>> {
 /// Retrieve all of the webhooks owned by a channel:
 ///
 /// ```rust,no_run
-/// use serenity::client::rest;
+/// use serenity::http;
 ///
 /// let channel_id = 81384788765712384;
 ///
-/// let webhooks = rest::get_channel_webhooks(channel_id)
+/// let webhooks = http::get_channel_webhooks(channel_id)
 ///     .expect("Error getting channel webhooks");
 /// ```
 ///
@@ -1080,11 +1083,11 @@ pub fn get_guild_roles(guild_id: u64) -> Result<Vec<Role>> {
 /// Retrieve all of the webhooks owned by a guild:
 ///
 /// ```rust,no_run
-/// use serenity::client::rest;
+/// use serenity::http;
 ///
 /// let guild_id = 81384788765712384;
 ///
-/// let webhooks = rest::get_guild_webhooks(guild_id)
+/// let webhooks = http::get_guild_webhooks(guild_id)
 ///     .expect("Error getting guild webhooks");
 /// ```
 ///
@@ -1109,7 +1112,7 @@ pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
 /// Get the first 10 guilds after a certain guild's Id:
 ///
 /// ```rust,no_run
-/// use serenity::client::rest::{GuildPagination, get_guilds};
+/// use serenity::http::{GuildPagination, get_guilds};
 /// use serenity::model::GuildId;
 ///
 /// let guild_id = GuildId(81384788765712384);
@@ -1137,7 +1140,13 @@ pub fn get_guilds(target: &GuildPagination, limit: u64) -> Result<Vec<GuildInfo>
 
 /// Gets information about a specific invite.
 pub fn get_invite(code: &str, stats: bool) -> Result<Invite> {
-    let invite = ::utils::parse_invite(code);
+    let mut invite = code;
+
+    #[cfg(feature="utils")]
+    {
+        invite = ::utils::parse_invite(invite);
+    }
+
     let mut uri = format!("/invites/{}", invite);
 
     if stats {
@@ -1288,10 +1297,10 @@ pub fn get_voice_regions() -> Result<Vec<VoiceRegion>> {
 /// Retrieve a webhook by Id:
 ///
 /// ```rust,no_run
-/// use serenity::client::rest;
+/// use serenity::http;
 ///
 /// let id = 245037420704169985;
-/// let webhook = rest::get_webhook(id).expect("Error getting webhook");
+/// let webhook = http::get_webhook(id).expect("Error getting webhook");
 /// ```
 ///
 /// [`get_webhook_with_token`]: fn.get_webhook_with_token.html
@@ -1310,12 +1319,12 @@ pub fn get_webhook(webhook_id: u64) -> Result<Webhook> {
 /// Retrieve a webhook by Id and its unique token:
 ///
 /// ```rust,no_run
-/// use serenity::client::rest;
+/// use serenity::http;
 ///
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 ///
-/// let webhook = rest::get_webhook_with_token(id, token)
+/// let webhook = http::get_webhook_with_token(id, token)
 ///     .expect("Error getting webhook");
 /// ```
 pub fn get_webhook_with_token(webhook_id: u64, token: &str) -> Result<Webhook> {
@@ -1479,7 +1488,7 @@ fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
     if response.status.class() == StatusClass::Success {
         Ok(response)
     } else {
-        Err(Error::Client(ClientError::InvalidRequest(response.status)))
+        Err(Error::Http(HttpError::InvalidRequest(response.status)))
     }
 }
 
@@ -1503,9 +1512,9 @@ fn verify(expected_status_code: u16, mut response: HyperResponse) -> Result<()> 
         204 => StatusCode::NoContent,
         401 => StatusCode::Unauthorized,
         _ => {
-            let client_error = ClientError::UnknownStatus(expected_status_code);
+            let client_error = HttpError::UnknownStatus(expected_status_code);
 
-            return Err(Error::Client(client_error));
+            return Err(Error::Http(client_error));
         },
     };
 
@@ -1520,7 +1529,7 @@ fn verify(expected_status_code: u16, mut response: HyperResponse) -> Result<()> 
 
     debug!("Content: {}", s);
 
-    Err(Error::Client(ClientError::InvalidRequest(response.status)))
+    Err(Error::Http(HttpError::InvalidRequest(response.status)))
 }
 
 /// Representation of the method of a query to send for the [`get_guilds`]

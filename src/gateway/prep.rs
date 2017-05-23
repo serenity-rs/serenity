@@ -7,7 +7,6 @@ use std::sync::mpsc::{
 use std::sync::{Arc, Mutex};
 use std::time::{Duration as StdDuration, Instant};
 use std::{env, thread};
-use super::super::ClientError;
 use super::{GatewayError, GatewayStatus};
 use time::{self, Duration};
 use websocket::client::request::Url as RequestUrl;
@@ -57,7 +56,7 @@ pub fn identify(token: &str, shard_info: Option<[u64; 2]>) -> Value {
     json!({
         "op": OpCode::Identify.num(),
         "d": {
-            "compression": !cfg!(feature="debug"),
+            "compression": true,
             "large_threshold": LARGE_THRESHOLD,
             "shard": shard_info.unwrap_or([0, 1]),
             "token": token,
@@ -73,7 +72,7 @@ pub fn identify(token: &str, shard_info: Option<[u64; 2]>) -> Value {
 
 pub fn build_gateway_url(base: &str) -> Result<RequestUrl> {
     RequestUrl::parse(&format!("{}?v={}", base, constants::GATEWAY_VERSION))
-        .map_err(|_| Error::Client(ClientError::Gateway))
+        .map_err(|_| Error::Gateway(GatewayError::BuildingUrl))
 }
 
 pub fn keepalive(interval: u64,

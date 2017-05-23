@@ -9,7 +9,7 @@ use ::internal::prelude::*;
 #[cfg(feature="cache")]
 use super::permissions::Permissions;
 #[cfg(feature="cache")]
-use ::client::CACHE;
+use ::CACHE;
 
 pub fn deserialize_emojis<'de, D: Deserializer<'de>>(deserializer: D)
     -> StdResult<HashMap<EmojiId, Emoji>, D::Error> {
@@ -137,14 +137,14 @@ pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(deserializer: D)
     Ok(voice_states)
 }
 
-#[cfg(feature="cache")]
+#[cfg(all(feature="cache", feature="model"))]
 pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Result<bool> {
     let cache = CACHE.read().unwrap();
     let current_user = &cache.user;
 
     let channel = match cache.channel(channel_id) {
         Some(channel) => channel,
-        None => return Err(Error::Client(ClientError::ItemMissing)),
+        None => return Err(Error::Model(ModelError::ItemMissing)),
     };
 
     let guild_id = match channel {
@@ -159,13 +159,13 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
             //
             // Since serenity can't _reasonably_ check and keep track of these,
             // just assume that all permissions are granted and return `true`.
-            return Ok(true); 
+            return Ok(true);
         },
     };
 
     let guild = match cache.guild(guild_id) {
         Some(guild) => guild,
-        None => return Err(Error::Client(ClientError::ItemMissing)),
+        None => return Err(Error::Model(ModelError::ItemMissing)),
     };
 
     let perms = guild.read().unwrap().permissions_for(channel_id, current_user.id);

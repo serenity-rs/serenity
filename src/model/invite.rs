@@ -1,13 +1,12 @@
 use super::*;
-use ::client::rest;
 use ::internal::prelude::*;
-use ::utils::builder::CreateInvite;
-use ::utils;
 
 #[cfg(feature="cache")]
-use super::permissions;
-#[cfg(feature="cache")]
-use super::utils as model_utils;
+use super::{permissions, utils as model_utils};
+#[cfg(feature="model")]
+use ::http;
+#[cfg(feature="model")]
+use ::builder::CreateInvite;
 
 /// Information about an invite code.
 ///
@@ -39,6 +38,7 @@ pub struct Invite {
     pub guild: InviteGuild,
 }
 
+#[cfg(feature="model")]
 impl Invite {
     /// Creates an invite for a [`GuildChannel`], providing a builder so that
     /// fields may optionally be set.
@@ -50,11 +50,11 @@ impl Invite {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have the required [permission].
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
-    /// [`CreateInvite`]: ../utils/builder/struct.CreateInvite.html
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
+    /// [`CreateInvite`]: ../builder/struct.CreateInvite.html
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [Create Invite]: permissions/constant.CREATE_INVITE.html
     /// [permission]: permissions/index.html
@@ -67,11 +67,11 @@ impl Invite {
             let req = permissions::CREATE_INVITE;
 
             if !model_utils::user_has_perms(channel_id, req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
-        rest::create_invite(channel_id.0, &f(CreateInvite::default()).0)
+        http::create_invite(channel_id.0, &f(CreateInvite::default()).0)
     }
 
     /// Deletes the invite.
@@ -80,10 +80,10 @@ impl Invite {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have the required [permission].
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     /// [permission]: permissions/index.html
     pub fn delete(&self) -> Result<Invite> {
@@ -92,16 +92,23 @@ impl Invite {
             let req = permissions::MANAGE_GUILD;
 
             if !model_utils::user_has_perms(self.channel.id, req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
-        rest::delete_invite(&self.code)
+        http::delete_invite(&self.code)
     }
 
     /// Gets the information about an invite.
     pub fn get(code: &str, stats: bool) -> Result<Invite> {
-        rest::get_invite(utils::parse_invite(code), stats)
+        let mut invite = code;
+
+        #[cfg(feature="utils")]
+        {
+            invite = ::utils::parse_invite(invite);
+        }
+
+        http::get_invite(invite, stats)
     }
 
     /// Returns a URL to use for the invite.
@@ -155,6 +162,7 @@ pub struct InviteGuild {
     pub voice_channel_count: Option<u64>,
 }
 
+#[cfg(feature="model")]
 impl InviteGuild {
     /// Returns the Id of the shard associated with the guild.
     ///
@@ -166,7 +174,7 @@ impl InviteGuild {
     /// total, consider using [`utils::shard_id`].
     ///
     /// [`utils::shard_id`]: ../utils/fn.shard_id.html
-    #[cfg(feature="cache")]
+    #[cfg(all(feature="cache", feature="utils"))]
     #[inline]
     pub fn shard_id(&self) -> u64 {
         self.id.shard_id()
@@ -192,7 +200,7 @@ impl InviteGuild {
     ///
     /// assert_eq!(guild.shard_id(17), 7);
     /// ```
-    #[cfg(not(feature="cache"))]
+    #[cfg(all(feature="utils", not(feature="cache")))]
     #[inline]
     pub fn shard_id(&self, shard_count: u64) -> u64 {
         self.id.shard_id(shard_count)
@@ -240,22 +248,23 @@ pub struct RichInvite {
     pub uses: u64,
 }
 
+#[cfg(feature="model")]
 impl RichInvite {
     /// Deletes the invite.
     ///
-    /// Refer to [`rest::delete_invite`] for more information.
+    /// Refer to [`http::delete_invite`] for more information.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
     /// # Errors
     ///
     /// If the `cache` feature is enabled, then this returns a
-    /// [`ClientError::InvalidPermissions`] if the current user does not have
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required [permission].
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`Invite::delete`]: struct.Invite.html#method.delete
-    /// [`rest::delete_invite`]: ../client/rest/fn.delete_invite.html
+    /// [`http::delete_invite`]: ../http/fn.delete_invite.html
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     /// [permission]: permissions/index.html
     pub fn delete(&self) -> Result<Invite> {
@@ -264,11 +273,11 @@ impl RichInvite {
             let req = permissions::MANAGE_GUILD;
 
             if !model_utils::user_has_perms(self.channel.id, req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
-        rest::delete_invite(&self.code)
+        http::delete_invite(&self.code)
     }
 
     /// Returns a URL to use for the invite.

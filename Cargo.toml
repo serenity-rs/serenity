@@ -14,15 +14,11 @@ version = "0.2.0"
 base64 = "~0.5"
 bitflags = "~0.8"
 flate2 = "~0.2"
-hyper = "~0.9"
-lazy_static = "~0.2"
 log = "~0.3"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
 time = "~0.1"
-typemap = "~0.3"
-websocket = "~0.17"
 
 [dependencies.byteorder]
 optional = true
@@ -32,9 +28,18 @@ version = "1.0"
 default-features = false
 version = "0.2"
 
+[dependencies.hyper]
+optional = true
+version = "~0.9"
+
+[dependencies.lazy_static]
+optional = true
+version = "~0.2"
+
 [dependencies.multipart]
 default-features = false
 features = ["client", "hyper"]
+optional = true
 version = "0.8"
 
 [dependencies.opus]
@@ -46,10 +51,32 @@ default-features = false
 optional = true
 version = "0.0.12"
 
+[dependencies.typemap]
+optional = true
+version = "~0.3"
+
+[dependencies.websocket]
+optional = true
+version = "~0.17"
+
 [features]
-default = ["cache", "framework"]
-cache = []
-debug = []
-framework = []
+default = [
+    "builder",
+    "cache",
+    "client",
+    "framework",
+    "gateway",
+    "model",
+    "http",
+    "utils"
+]
+builder = []
+cache = ["lazy_static"]
+client = ["gateway", "lazy_static", "http", "typemap"]
 extras = []
-voice = ["byteorder", "opus", "sodiumoxide"]
+framework = ["client", "model", "utils"]
+gateway = ["http", "websocket"]
+http = ["hyper", "lazy_static", "multipart"]
+model = ["builder", "http"]
+utils = []
+voice = ["byteorder", "gateway", "opus", "sodiumoxide"]

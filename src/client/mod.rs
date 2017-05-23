@@ -1,15 +1,15 @@
 //! The Client contains information about a single bot or user's token, as well
 //! as event handlers. Dispatching events to configured handlers and starting
 //! the shards' connections are handled directly via the client. In addition,
-//! the `rest` module and `Cache` are also automatically handled by the
+//! the `http` module and `Cache` are also automatically handled by the
 //! Client module for you.
 //!
 //! A [`Context`] is provided for every handler. The context is a method of
 //! accessing the lower-level HTTP functions relevant to the contextual channel.
 //!
-//! The `rest` module is the lower-level method of interacting with the Discord
+//! The `http` module is the lower-level method of interacting with the Discord
 //! REST API. Realistically, there should be little reason to use this yourself,
-//! as the Context will do this for you. A possible use case of using the `rest`
+//! as the Context will do this for you. A possible use case of using the `http`
 //! module is if you do not have a Cache, for purposes such as low memory
 //! requirements.
 //!
@@ -20,9 +20,6 @@
 //! [Client examples]: struct.Client.html#examples
 #![allow(zero_ptr)]
 
-pub mod gateway;
-pub mod rest;
-
 mod context;
 mod dispatch;
 mod error;
@@ -31,66 +28,32 @@ mod event_store;
 pub use self::context::Context;
 pub use self::error::Error as ClientError;
 
+// Note: the following re-exports are here for backwards compatibility
+pub use ::gateway;
+pub use ::http as rest;
+
+#[cfg(feature="cache")]
+pub use ::CACHE;
+
 use self::dispatch::dispatch;
 use self::event_store::EventStore;
-use self::gateway::Shard;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, RwLock};
 use std::time::Duration;
 use std::{mem, thread};
+use super::gateway::Shard;
 use typemap::ShareMap;
 use websocket::client::Receiver;
 use websocket::result::WebSocketError;
 use websocket::stream::WebSocketStream;
+use ::http;
 use ::internal::prelude::*;
 use ::internal::ws_impl::ReceiverExt;
 use ::model::event::*;
 use ::model::*;
 
 #[cfg(feature="framework")]
-use ::ext::framework::Framework;
-
-#[cfg(feature="cache")]
-use ::ext::cache::Cache;
-
-#[cfg(feature="cache")]
-lazy_static! {
-    /// A mutable and lazily-initialized static binding. It can be accessed
-    /// across any function and in any context.
-    ///
-    /// This [`Cache`] instance is updated for every event received, so you do
-    /// not need to maintain your own cache.
-    ///
-    /// See the [cache module documentation] for more details.
-    ///
-    /// The Cache itself is wrapped within an `RwLock`, which allows for
-    /// multiple readers or at most one writer at a time across threads. This
-    /// means that you may have multiple commands reading from the Cache
-    /// concurrently.
-    ///
-    /// # Examples
-    ///
-    /// Retrieve the [current user][`CurrentUser`]'s Id, by opening a Read
-    /// guard:
-    ///
-    /// ```rust,ignore
-    /// use serenity::client::CACHE;
-    ///
-    /// println!("{}", CACHE.read().unwrap().user.id);
-    /// ```
-    ///
-    /// By `unwrap()`ing, the thread managing an event dispatch will be blocked
-    /// until the guard can be opened.
-    ///
-    /// If you do not want to block the current thread, you may instead use
-    /// `RwLock::try_read`. Refer to `RwLock`'s documentation in the stdlib for
-    /// more information.
-    ///
-    /// [`CurrentUser`]: ../model/struct.CurrentUser.html
-    /// [`Cache`]: ../ext/cache/struct.Cache.html
-    /// [cache module documentation]: ../ext/cache/index.html
-    pub static ref CACHE: RwLock<Cache> = RwLock::new(Cache::default());
-}
+use ::framework::Framework;
 
 /// The Client is the way to "login" and be able to start sending authenticated
 /// requests over the REST API, as well as initializing a WebSocket connection
@@ -192,7 +155,7 @@ impl Client {
     /// information on usage.
     ///
     /// [`on_message`]: #method.on_message
-    /// [framework docs]: ../ext/framework/index.html
+    /// [framework docs]: ../framework/index.html
     #[cfg(feature="framework")]
     pub fn with_framework<F>(&mut self, f: F)
         where F: FnOnce(Framework) -> Framework + Send + Sync + 'static {
@@ -213,7 +176,7 @@ impl Client {
     ///
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start(&mut self) -> Result<()> {
-        self.start_connection(None, rest::get_gateway()?.url)
+        self.start_connection(None, http::get_gateway()?.url)
     }
 
     /// Establish the connection(s) and start listening for events.
@@ -230,7 +193,7 @@ impl Client {
     ///
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start_autosharded(&mut self) -> Result<()> {
-        let mut res = rest::get_bot_gateway()?;
+        let mut res = http::get_bot_gateway()?;
 
         let x = res.shards as u64 - 1;
         let y = res.shards as u64;
@@ -255,7 +218,7 @@ impl Client {
     ///
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
-        self.start_connection(Some([shard, shard, shards]), rest::get_gateway()?.url)
+        self.start_connection(Some([shard, shard, shards]), http::get_gateway()?.url)
     }
 
     /// Establish sharded connections and start listening for events.
@@ -274,7 +237,7 @@ impl Client {
     /// [`start_shard_range`]: #method.start_shards
     /// [Gateway docs]: gateway/index.html#sharding
     pub fn start_shards(&mut self, total_shards: u64) -> Result<()> {
-        self.start_connection(Some([0, total_shards - 1, total_shards]), rest::get_gateway()?.url)
+        self.start_connection(Some([0, total_shards - 1, total_shards]), http::get_gateway()?.url)
     }
 
     /// Establish a range of sharded connections and start listening for events.
@@ -308,7 +271,7 @@ impl Client {
     /// [`start_shards`]: #method.start_shards
     /// [Gateway docs]: gateway/index.html#sharding
     pub fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64) -> Result<()> {
-        self.start_connection(Some([range[0], range[1], total_shards]), rest::get_gateway()?.url)
+        self.start_connection(Some([range[0], range[1], total_shards]), http::get_gateway()?.url)
     }
 
     /// Attaches a handler for when a [`ChannelCreate`] is received.
@@ -665,7 +628,7 @@ impl Client {
         // This also acts as a form of check to ensure the token is correct.
         #[cfg(feature="framework")]
         {
-            let user = rest::get_current_user()?;
+            let user = http::get_current_user()?;
 
             self.framework.lock()
                 .unwrap()
@@ -778,7 +741,7 @@ impl Client {
     ///
     /// [`GuildDelete`]: ../model/event/enum.Event.html#variant.GuildDelete
     /// [`Role`]: ../model/struct.Role.html
-    /// [`Cache`]: ../ext/cache/struct.Cache.html
+    /// [`Cache`]: ../cache/struct.Cache.html
     pub fn on_guild_delete<F>(&mut self, handler: F)
         where F: Fn(Context, PartialGuild, Option<Arc<RwLock<Guild>>>) + Send + Sync + 'static {
         self.event_store.write()
@@ -825,7 +788,7 @@ impl Client {
     /// it did not exist in the [`Cache`] before the update.
     ///
     /// [`GuildRoleUpdate`]: ../model/event/enum.Event.html#variant.GuildRoleUpdate
-    /// [`Cache`]: ../ext/cache/struct.Cache.html
+    /// [`Cache`]: ../cache/struct.Cache.html
     pub fn on_guild_role_update<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, Option<Role>, Role) + Send + Sync + 'static {
         self.event_store.write()
@@ -872,7 +835,7 @@ impl Client {
     ///
     /// [`GuildDelete`]: ../model/event/enum.Event.html#variant.GuildDelete
     /// [`Role`]: ../model/struct.Role.html
-    /// [`Cache`]: ../ext/cache/struct.Cache.html
+    /// [`Cache`]: ../cache/struct.Cache.html
     pub fn on_guild_delete<F>(&mut self, handler: F)
         where F: Fn(Context, PartialGuild) + Send + Sync + 'static {
         self.event_store.write()
@@ -916,7 +879,7 @@ impl Client {
     /// Attaches a handler for when a [`GuildRoleUpdate`] is received.
     ///
     /// [`GuildRoleUpdate`]: ../model/event/enum.Event.html#variant.GuildRoleUpdate
-    /// [`Cache`]: ../ext/cache/struct.Cache.html
+    /// [`Cache`]: ../cache/struct.Cache.html
     pub fn on_guild_role_update<F>(&mut self, handler: F)
         where F: Fn(Context, GuildId, Role) + Send + Sync + 'static {
         self.event_store.write()
@@ -985,7 +948,7 @@ fn boot_shard(info: &BootInfo) -> Result<(Shard, ReadyEvent, Receiver<WebSocketS
         //
         // If doing so fails, count this as a boot attempt.
         if attempt_number > 3 {
-            match rest::get_gateway() {
+            match http::get_gateway() {
                 Ok(g) => *info.gateway_url.lock().unwrap() = g.url,
                 Err(why) => {
                     warn!("Failed to retrieve gateway URL: {:?}", why);
@@ -1137,7 +1100,7 @@ fn handle_shard(info: &mut MonitorInfo) {
 }
 
 fn login(token: String) -> Client {
-    rest::set_token(&token);
+    http::set_token(&token);
 
     feature_framework! {{
         Client {

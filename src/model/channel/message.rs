@@ -1,14 +1,17 @@
 use std::mem;
 use time;
 use ::constants;
-use ::client::rest;
 use ::model::*;
-use ::utils::builder::{CreateEmbed, CreateMessage};
+
 
 #[cfg(feature="cache")]
 use std::fmt::Write;
+#[cfg(feature="model")]
+use ::builder::{CreateEmbed, CreateMessage};
 #[cfg(feature="cache")]
-use ::client::CACHE;
+use ::CACHE;
+#[cfg(feature="http")]
+use ::http;
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
@@ -61,6 +64,7 @@ pub struct Message {
     pub webhook_id: Option<WebhookId>,
 }
 
+#[cfg(feature="model")]
 impl Message {
     /// Deletes the message.
     ///
@@ -70,11 +74,11 @@ impl Message {
     /// # Errors
     ///
     /// If the `cache` feature is enabled, then returns a
-    /// [`ClientError::InvalidPermissions`] if the current user does not have
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
-    /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidUser`]: enum.ModelError.html#variant.InvalidUser
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn delete(&self) -> Result<()> {
         #[cfg(feature="cache")]
@@ -84,7 +88,7 @@ impl Message {
             let has_perms = utils::user_has_perms(self.channel_id, req)?;
 
             if !is_author && !has_perms {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
@@ -98,10 +102,10 @@ impl Message {
     /// # Errors
     ///
     /// If the `cache` feature is enabled, then returns a
-    /// [`ClientError::InvalidPermissions`] if the current user does not have
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn delete_reactions(&self) -> Result<()> {
@@ -110,11 +114,11 @@ impl Message {
             let req = permissions::MANAGE_MESSAGES;
 
             if !utils::user_has_perms(self.channel_id, req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
-        rest::delete_message_reactions(self.channel_id.0, self.id.0)
+        http::delete_message_reactions(self.channel_id.0, self.id.0)
     }
 
     /// Edits this message, replacing the original content with new content.
@@ -138,23 +142,23 @@ impl Message {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidUser`] if the
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidUser`] if the
     /// current user is not the author.
     ///
-    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
-    /// [`the limit`]: ../utils/builder/struct.CreateMessage.html#method.content
+    /// [`ModelError::InvalidUser`]: enum.ModelError.html#variant.InvalidUser
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
+    /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(CreateMessage) -> CreateMessage {
         #[cfg(feature="cache")]
         {
             if self.author.id != CACHE.read().unwrap().user.id {
-                return Err(Error::Client(ClientError::InvalidUser));
+                return Err(Error::Model(ModelError::InvalidUser));
             }
         }
 
@@ -174,7 +178,7 @@ impl Message {
 
         let map = f(builder).0;
 
-        match rest::edit_message(self.channel_id.0, self.id.0, &Value::Object(map)) {
+        match http::edit_message(self.channel_id.0, self.id.0, &Value::Object(map)) {
             Ok(edited) => {
                 mem::replace(self, edited);
 
@@ -321,10 +325,10 @@ impl Message {
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidPermissions`] if the current user does not have
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn pin(&self) -> Result<()> {
         #[cfg(feature="cache")]
@@ -332,7 +336,7 @@ impl Message {
             let req = permissions::MANAGE_MESSAGES;
 
             if !utils::user_has_perms(self.channel_id, req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
@@ -346,10 +350,10 @@ impl Message {
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidPermissions`] if the current user does not have
-    /// the required [permissions].
+    /// [`ModelError::InvalidPermissions`] if the current user does not have the
+    /// required [permissions].
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`Emoji`]: struct.Emoji.html
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     /// [permissions]: permissions
@@ -359,11 +363,11 @@ impl Message {
             let req = permissions::ADD_REACTIONS;
 
             if !utils::user_has_perms(self.channel_id, req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
-        rest::create_reaction(self.channel_id.0,
+        http::create_reaction(self.channel_id.0,
                               self.id.0,
                               &reaction_type.into())
     }
@@ -380,19 +384,19 @@ impl Message {
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidPermissions`] if the current user does not have
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn reply(&self, content: &str) -> Result<Message> {
         if let Some(length_over) = Message::overflow_length(content) {
-            return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+            return Err(Error::Model(ModelError::MessageTooLong(length_over)));
         }
 
         #[cfg(feature="cache")]
@@ -400,7 +404,7 @@ impl Message {
             let req = permissions::SEND_MESSAGES;
 
             if !utils::user_has_perms(self.channel_id, req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
@@ -413,7 +417,7 @@ impl Message {
             "tts": false,
         });
 
-        rest::send_message(self.channel_id.0, &map)
+        http::send_message(self.channel_id.0, &map)
     }
 
     /// Unpins the message from its channel.
@@ -423,10 +427,10 @@ impl Message {
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidPermissions`] if the current user does not have
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn unpin(&self) -> Result<()> {
         #[cfg(feature="cache")]
@@ -434,11 +438,11 @@ impl Message {
             let req = permissions::MANAGE_MESSAGES;
 
             if !utils::user_has_perms(self.channel_id, req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
-        rest::unpin_message(self.channel_id.0, self.id.0)
+        http::unpin_message(self.channel_id.0, self.id.0)
     }
 
     /// Alias of [`reaction_users`].
@@ -456,7 +460,7 @@ impl Message {
         if let Some(content) = map.get("content") {
             if let Value::String(ref content) = *content {
                 if let Some(length_over) = Message::overflow_length(content) {
-                    return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+                    return Err(Error::Model(ModelError::MessageTooLong(length_over)));
                 }
             }
         }
@@ -512,7 +516,7 @@ impl Message {
         } else {
             let overflow = total as u64 - constants::EMBED_MAX_LENGTH as u64;
 
-            Err(Error::Client(ClientError::EmbedTooLarge(overflow)))
+            Err(Error::Model(ModelError::EmbedTooLarge(overflow)))
         }
     }
 }

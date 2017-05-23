@@ -20,7 +20,7 @@ use ::model::MessageId;
 /// This should be used only for retrieving messages; see
 /// [`Client::get_messages`] for examples.
 ///
-/// [`Client::get_messages`]: ../../client/struct.Client.html#method.get_messages
+/// [`Client::get_messages`]: ../client/struct.Client.html#method.get_messages
 #[derive(Clone, Debug, Default)]
 pub struct GetMessages(pub BTreeMap<String, u64>);
 

@@ -10,7 +10,7 @@
 //!
 //! Documentation for embeds can be found [here].
 //!
-//! [`Context::send_message`]: ../../client/struct.Context.html#method.send_message
+//! [`Context::send_message`]: ../client/struct.Context.html#method.send_message
 //! [`CreateEmbed`]: struct.CreateEmbed.html
 //! [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
 //! [here]: https://discordapp.com/developers/docs/resources/channel#embed-object
@@ -20,6 +20,8 @@ use std::default::Default;
 use time::Tm;
 use ::internal::prelude::*;
 use ::model::Embed;
+
+#[cfg(feature="utils")]
 use ::utils::Colour;
 
 /// A builder to create a fake [`Embed`] object, for use with the
@@ -30,8 +32,8 @@ use ::utils::Colour;
 /// Refer to the documentation for [`Context::send_message`] for a very in-depth
 /// example on how to use this.
 ///
-/// [`Context::send_message`]: ../../client/struct.Context.html#method.send_message
-/// [`Embed`]: ../../model/struct.Embed.html
+/// [`Context::send_message`]: ../client/struct.Context.html#method.send_message
+/// [`Embed`]: ../model/struct.Embed.html
 /// [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
 #[derive(Clone, Debug)]
 pub struct CreateEmbed(pub Map<String, Value>);
@@ -57,13 +59,35 @@ impl CreateEmbed {
     /// This is an alias of [`colour`].
     ///
     /// [`colour`]: #method.colour
+    #[cfg(feature="utils")]
+    #[inline]
     pub fn color<C: Into<Colour>>(self, colour: C) -> Self {
         self.colour(colour.into())
     }
 
     /// Set the colour of the left-hand side of the embed.
+    #[cfg(feature="utils")]
     pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
         self.0.insert("color".to_owned(), Value::Number(Number::from(colour.into().0 as u64)));
+
+        CreateEmbed(self.0)
+    }
+
+    /// Set the colour of the left-hand side of the embed.
+    ///
+    /// This is an alias of [`colour`].
+    ///
+    /// [`colour`]: #method.colour
+    #[cfg(not(feature="utils"))]
+    #[inline]
+    pub fn color(self, colour: u32) -> Self {
+        self.colour(colour)
+    }
+
+    /// Set the colour of the left-hand side of the embed.
+    #[cfg(not(feature="utils"))]
+    pub fn colour(mut self, colour: u32) -> Self {
+        self.0.insert("color".to_owned(), Value::Number(Number::from(colour)));
 
         CreateEmbed(self.0)
     }
@@ -269,7 +293,7 @@ impl From<Embed> for CreateEmbed {
 ///
 /// Requires that you specify a [`name`].
 ///
-/// [`Embed`]: ../../model/struct.Embed.html
+/// [`Embed`]: ../model/struct.Embed.html
 /// [`CreateEmbed::author`]: struct.CreateEmbed.html#method.author
 /// [`name`]: #method.name
 #[derive(Clone, Debug, Default)]
@@ -304,7 +328,7 @@ impl CreateEmbedAuthor {
 /// This does not require any field be set. `inline` is set to `true` by
 /// default.
 ///
-/// [`Embed`]: ../../model/struct.Embed.html
+/// [`Embed`]: ../model/struct.Embed.html
 /// [`CreateEmbed::field`]: struct.CreateEmbed.html#method.field
 #[derive(Clone, Debug)]
 pub struct CreateEmbedField(pub Map<String, Value>);
@@ -348,7 +372,7 @@ impl Default for CreateEmbedField {
 ///
 /// This does not require any field be set.
 ///
-/// [`Embed`]: ../../model/struct.Embed.html
+/// [`Embed`]: ../model/struct.Embed.html
 /// [`CreateEmbed::footer`]: struct.CreateEmbed.html#method.footer
 #[derive(Clone, Debug, Default)]
 pub struct CreateEmbedFooter(pub Map<String, Value>);

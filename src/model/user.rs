@@ -3,15 +3,17 @@ use std::{fmt, mem};
 use super::utils::deserialize_u16;
 use super::*;
 use time::Timespec;
-use ::client::rest::{self, GuildPagination};
 use ::internal::prelude::*;
 use ::model::misc::Mentionable;
-use ::utils::builder::EditProfile;
 
 #[cfg(feature="cache")]
 use std::sync::{Arc, RwLock};
 #[cfg(feature="cache")]
-use ::client::CACHE;
+use ::CACHE;
+#[cfg(feature="model")]
+use ::http::{self, GuildPagination};
+#[cfg(feature="model")]
+use ::builder::EditProfile;
 
 /// Information about the current user.
 #[derive(Clone, Debug, Deserialize)]
@@ -29,6 +31,7 @@ pub struct CurrentUser {
     pub verified: bool,
 }
 
+#[cfg(feature="model")]
 impl CurrentUser {
     /// Returns the formatted URL of the user's icon, if one exists.
     ///
@@ -63,7 +66,7 @@ impl CurrentUser {
     /// Change the avatar:
     ///
     /// ```rust,ignore
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let avatar = serenity::utils::read_image("./avatar.png").unwrap();
     ///
@@ -78,7 +81,7 @@ impl CurrentUser {
             map.insert("email".to_owned(), Value::String(email.clone()));
         }
 
-        match rest::edit_profile(&f(EditProfile(map)).0) {
+        match http::edit_profile(&f(EditProfile(map)).0) {
             Ok(new) => {
                 let _ = mem::replace(self, new);
 
@@ -90,7 +93,7 @@ impl CurrentUser {
 
     /// Gets a list of guilds that the current user is in.
     pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
-        rest::get_guilds(&GuildPagination::After(GuildId(1)), 100)
+        http::get_guilds(&GuildPagination::After(GuildId(1)), 100)
     }
 
     /// Returns a static formatted URL of the user's icon, if one exists.
@@ -213,6 +216,7 @@ pub struct User {
     pub name: String,
 }
 
+#[cfg(feature="model")]
 impl User {
     /// Returns the formatted URL of the user's icon, if one exists.
     ///
@@ -310,14 +314,14 @@ impl User {
                     "recipient_id": self.id.0,
                 });
 
-                rest::create_private_channel(&map)?.id
+                http::create_private_channel(&map)?.id
             }
         } else {
             let map = json!({
                 "recipient_id": self.id.0,
             });
 
-            rest::create_private_channel(&map)?.id
+            http::create_private_channel(&map)?.id
         }};
 
         let map = json!({
@@ -325,7 +329,7 @@ impl User {
             "tts": false,
         });
 
-        rest::send_message(private_channel_id.0, &map)
+        http::send_message(private_channel_id.0, &map)
     }
 
     /// This is an alias of [direct_message].
@@ -353,10 +357,10 @@ impl User {
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a
-    /// [`ClientError::InvalidOperationAsUser`] if the current user is not a bot
+    /// [`ModelError::InvalidOperationAsUser`] if the current user is not a bot
     /// user.
     ///
-    /// [`ClientError::InvalidOperationAsUser`]: ../client/enum.ClientError.html#variant.InvalidOperationAsUser
+    /// [`ModelError::InvalidOperationAsUser`]: enum.ModelError.html#variant.InvalidOperationAsUser
     #[inline]
     pub fn get<U: Into<UserId>>(user_id: U) -> Result<User> {
         user_id.into().get()
@@ -381,7 +385,7 @@ impl User {
     /// [`Guild`]: struct.Guild.html
     /// [`GuildId`]: struct.GuildId.html
     /// [`Role`]: struct.Role.html
-    /// [`Cache`]: ../ext/cache/struct.Cache.html
+    /// [`Cache`]: ../cache/struct.Cache.html
     // no-cache would warn on guild_id.
     pub fn has_role<G, R>(&self, guild: G, role: R) -> bool
         where G: Into<GuildContainer>, R: Into<RoleId> {
@@ -423,6 +427,7 @@ impl fmt::Display for User {
     }
 }
 
+#[cfg(feature="model")]
 impl UserId {
     /// Creates a direct message channel between the [current user] and the
     /// user. This can also retrieve the channel if one already exists.
@@ -433,7 +438,7 @@ impl UserId {
             "recipient_id": self.0,
         });
 
-        rest::create_private_channel(&map)
+        http::create_private_channel(&map)
     }
 
     /// Search the cache for the user with the Id.
@@ -447,7 +452,7 @@ impl UserId {
     /// **Note**: The current user must be a bot user.
     #[inline]
     pub fn get(&self) -> Result<User> {
-        rest::get_user(self.0)
+        http::get_user(self.0)
     }
 }
 

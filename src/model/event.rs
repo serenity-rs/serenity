@@ -8,6 +8,9 @@ use super::*;
 use ::constants::{OpCode, VoiceOpCode};
 use ::internal::prelude::*;
 
+#[cfg(feature="gateway")]
+use ::gateway::GatewayError;
+
 /// Event data for the channel creation event.
 ///
 /// This is fired when:
@@ -452,6 +455,7 @@ pub enum GatewayEvent {
 }
 
 impl GatewayEvent {
+    #[cfg(feature="gateway")]
     pub fn decode(value: Value) -> Result<Self> {
         let mut map = JsonMap::deserialize(value)?;
 
@@ -492,7 +496,7 @@ impl GatewayEvent {
                 GatewayEvent::Hello(interval)
             },
             OpCode::HeartbeatAck => GatewayEvent::HeartbeatAck,
-            _ => return Err(Error::Client(ClientError::InvalidOpCode)),
+            _ => return Err(Error::Gateway(GatewayError::InvalidOpCode)),
         })
     }
 }
@@ -708,7 +712,7 @@ pub struct VoiceSpeaking {
 
 /// A representation of data received for [`voice`] events.
 ///
-/// [`voice`]: ../../ext/voice/index.html
+/// [`voice`]: ../../voice/index.html
 #[derive(Clone, Debug)]
 pub enum VoiceEvent {
     /// A voice heartbeat.

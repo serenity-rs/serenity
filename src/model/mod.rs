@@ -2,16 +2,16 @@
 //! ease of use.
 //!
 //! Models can optionally have additional helper methods compiled, by enabling
-//! the `methods` feature.
+//! the `model` feature.
 //!
 //! Methods like [`Message::delete`] or [`Webhook::execute`] are provided with
 //! this feature, which can be shorthands for operations that are otherwise in
-//! the [`Context`], or the much lower-level [`rest`] module.
+//! the [`Context`], or the much lower-level [`http`] module.
 //!
 //! [`Context`]: ../client/struct.Context.html
 //! [`Message::delete`]: struct.Message.html#method.delete
 //! [`Webhook::execute`]: struct.Webhook.html#method.execute
-//! [`rest`]: ../client/rest/index.html
+//! [`http`]: ../http/index.html
 
 #[macro_use]
 mod utils;
@@ -20,6 +20,7 @@ pub mod event;
 pub mod permissions;
 
 mod channel;
+mod error;
 mod gateway;
 mod guild;
 mod invite;
@@ -29,6 +30,7 @@ mod voice;
 mod webhook;
 
 pub use self::channel::*;
+pub use self::error::Error as ModelError;
 pub use self::gateway::*;
 pub use self::guild::*;
 pub use self::invite::*;
@@ -45,6 +47,8 @@ use std::fmt::{Formatter, Result as FmtResult};
 use std::sync::{Arc, RwLock};
 use time::Timespec;
 use ::internal::prelude::*;
+
+#[cfg(feature="utils")]
 use ::utils::Colour;
 
 fn default_true() -> bool { true }

@@ -1,3 +1,5 @@
+//! A set of constants used by the library.
+
 /// The maximum length of the textual size of an embed.
 pub const EMBED_MAX_LENGTH: u16 = 4000;
 /// The gateway version used by the library. The gateway URI is retrieved via
@@ -36,53 +38,6 @@ pub static JOIN_MESSAGES: &'static [&'static str] = &[
   "$user hopped into the server. Kangaroo!!",
   "$user just showed up. Hold my beer."
 ];
-
-
-#[allow(dead_code)]
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub enum ErrorCode {
-    BotsCannotUse,
-    CannotSendEmptyMessage,
-    CannotSendMessagesInVoice,
-    CannotSendMessagesToUser,
-    ChannelVerificationTooHigh,
-    EditByOtherAuthor,
-    EmbedDisabled,
-    InvalidAccountType,
-    InvalidAuthToken,
-    InvalidBulkDeleteCount,
-    InvalidDMChannelAction,
-    InvalidOauthState,
-    InvalidPinChannel,
-    MaxFriendsReached,
-    MaxGuildsReached,
-    MaxPinsReached,
-    MaxRolesReached,
-    MissingAccess,
-    MissingPermissions,
-    NoteTooLong,
-    Oauth2ApplicationLacksBot,
-    Oauth2ApplicationLimitReached,
-    OnlyBotsCanUse,
-    ReactionBlocked,
-    SearchIndexUnavailable,
-    TooManyReactions,
-    Unauthorized,
-    UnknownAccount,
-    UnknownApplication,
-    UnknownChannel,
-    UnknownGuild,
-    UnknownEmoji,
-    UnknownIntegration,
-    UnknownInvite,
-    UnknownMember,
-    UnknownMessage,
-    UnknownOverwrite,
-    UnknownProvider,
-    UnknownRole,
-    UnknownToken,
-    UnknownUser,
-}
 
 enum_number!(
     /// Enum to map gateway opcodes.

@@ -4,12 +4,14 @@ use super::deserialize_sync_user;
 use ::model::*;
 
 #[cfg(feature="cache")]
-use ::client::{CACHE, rest};
+use ::CACHE;
 #[cfg(feature="cache")]
 use ::internal::prelude::*;
-#[cfg(feature="cache")]
-use ::utils::builder::EditMember;
-#[cfg(feature="cache")]
+#[cfg(feature="model")]
+use ::http;
+#[cfg(feature="builder")]
+use ::builder::EditMember;
+#[cfg(feature="utils")]
 use ::utils::Colour;
 
 /// Information about a member of a guild.
@@ -34,6 +36,7 @@ pub struct Member {
     pub user: Arc<RwLock<User>>,
 }
 
+#[cfg(feature="model")]
 impl Member {
     /// Adds a [`Role`] to the member, editing its roles in-place if the request
     /// was successful.
@@ -52,7 +55,7 @@ impl Member {
 
         let guild_id = self.find_guild()?;
 
-        match rest::add_member_role(guild_id.0, self.user.read().unwrap().id.0, role_id.0) {
+        match http::add_member_role(guild_id.0, self.user.read().unwrap().id.0, role_id.0) {
             Ok(()) => {
                 self.roles.push(role_id);
 
@@ -76,7 +79,7 @@ impl Member {
 
         let map = EditMember::default().roles(&self.roles).0;
 
-        match rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map) {
+        match http::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map) {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.retain(|r| !role_ids.contains(r));
@@ -93,15 +96,15 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::GuildNotFound`] if the guild could not be
+    /// Returns a [`ModelError::GuildNotFound`] if the guild could not be
     /// found.
     ///
-    /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
+    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
     ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature="cache")]
     pub fn ban(&self, delete_message_days: u8) -> Result<()> {
-        rest::ban_user(self.find_guild()?.0, self.user.read().unwrap().id.0, delete_message_days)
+        http::ban_user(self.find_guild()?.0, self.user.read().unwrap().id.0, delete_message_days)
     }
 
     /// Determines the member's colour.
@@ -158,7 +161,7 @@ impl Member {
         let guild_id = self.find_guild()?;
         let map = f(EditMember::default()).0;
 
-        rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map)
+        http::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map)
     }
 
     /// Finds the Id of the [`Guild`] that the member is in.
@@ -168,11 +171,11 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::GuildNotFound`] if the guild could not be
+    /// Returns a [`ModelError::GuildNotFound`] if the guild could not be
     /// found.
     ///
-    /// [`Cache`]: ../ext/cache/struct.Cache.html
-    /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
+    /// [`Cache`]: ../cache/struct.Cache.html
+    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
     /// [`Guild`]: struct.Guild.html
     /// [`Member::guild_id`]: struct.Member.html#structfield.guild_id
     #[cfg(feature="cache")]
@@ -193,7 +196,7 @@ impl Member {
             }
         }
 
-        Err(Error::Client(ClientError::GuildNotFound))
+        Err(Error::Model(ModelError::GuildNotFound))
     }
 
     /// Kick the member from the guild.
@@ -208,10 +211,10 @@ impl Member {
     /// // assuming a `member` has already been bound
     /// match member.kick() {
     ///     Ok(()) => println!("Successfully kicked member"),
-    ///     Err(Error::Client(ClientError::GuildNotFound)) => {
+    ///     Err(Error::Model(ModelError::GuildNotFound)) => {
     ///         println!("Couldn't determine guild of member");
     ///     },
-    ///     Err(Error::Client(ClientError::InvalidPermissions(missing_perms))) => {
+    ///     Err(Error::Model(ModelError::InvalidPermissions(missing_perms))) => {
     ///         println!("Didn't have permissions; missing: {:?}", missing_perms);
     ///     },
     ///     _ => {},
@@ -220,14 +223,14 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::GuildNotFound`] if the Id of the member's guild
+    /// Returns a [`ModelError::GuildNotFound`] if the Id of the member's guild
     /// could not be determined.
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform the kick.
     ///
-    /// [`ClientError::GuildNotFound`]: ../client/enum.ClientError.html#variant.GuildNotFound
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     pub fn kick(&self) -> Result<()> {
         let guild_id;
@@ -245,13 +248,13 @@ impl Member {
                 .map(|guild| guild.read().unwrap().has_perms(req));
 
             if let Some(Ok(false)) = has_perms {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
         #[cfg(not(feature="cache"))]
         {
-            guild_id = self.guild_id.ok_or_else(|| Error::Client(ClientError::GuildNotFound))?;
+            guild_id = self.guild_id.ok_or_else(|| Error::Model(ModelError::GuildNotFound))?;
         }
 
         guild_id.kick(self.user.read().unwrap().id)
@@ -274,7 +277,7 @@ impl Member {
 
         let guild_id = self.find_guild()?;
 
-        match rest::remove_member_role(guild_id.0, self.user.read().unwrap().id.0, role_id.0) {
+        match http::remove_member_role(guild_id.0, self.user.read().unwrap().id.0, role_id.0) {
             Ok(()) => {
                 self.roles.retain(|r| r.0 != role_id.0);
 
@@ -297,7 +300,7 @@ impl Member {
 
         let map = EditMember::default().roles(&self.roles).0;
 
-        match rest::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map) {
+        match http::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map) {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);
@@ -339,15 +342,15 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature="cache")]
     pub fn unban(&self) -> Result<()> {
-        rest::remove_ban(self.find_guild()?.0, self.user.read().unwrap().id.0)
+        http::remove_ban(self.find_guild()?.0, self.user.read().unwrap().id.0)
     }
 }
 

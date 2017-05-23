@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 use std::sync::mpsc::Sender as MpscSender;
 use super::Handler;
-use ::client::gateway::GatewayStatus;
+use ::gateway::GatewayStatus;
 use ::model::{ChannelId, GuildId, UserId};
 
 /// A manager is a struct responsible for managing [`Handler`]s which belong to
-/// a single [WebSocket connection]. This is a fairly complex key-value store,
+/// a single [`Shard`]. This is a fairly complex key-value store,
 /// with a bit of extra utility for easily joining a "target".
 ///
 /// The "target" used by the Manager is determined based on the `guild_id` and
@@ -19,7 +19,7 @@ use ::model::{ChannelId, GuildId, UserId};
 /// [`Group`]: ../../model/struct.Group.html
 /// [`Handler`]: struct.Handler.html
 /// [guild's channel]: ../../model/enum.ChannelType.html#variant.Voice
-/// [WebSocket connection]: ../../client/struct.Connection.html
+/// [`Shard`]: ../gateway/struct.Shard.html
 #[derive(Clone, Debug)]
 pub struct Manager {
     handlers: HashMap<GuildId, Handler>,

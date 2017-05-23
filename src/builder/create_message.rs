@@ -1,7 +1,7 @@
 use super::CreateEmbed;
 use ::internal::prelude::*;
 
-/// A builder to specify the contents of an [`rest::send_message`] request,
+/// A builder to specify the contents of an [`http::send_message`] request,
 /// primarily meant for use through [`Context::send_message`].
 ///
 /// There are two situations where different field requirements are present:
@@ -31,11 +31,11 @@ use ::internal::prelude::*;
 ///         .description("With a description")));
 /// ```
 ///
-/// [`Context::say`]: ../../client/struct.Context.html#method.say
-/// [`Context::send_message`]: ../../client/struct.Context.html#method.send_message
+/// [`Context::say`]: ../client/struct.Context.html#method.say
+/// [`Context::send_message`]: ../client/struct.Context.html#method.send_message
 /// [`content`]: #method.content
 /// [`embed`]: #method.embed
-/// [`rest::send_message`]: ../../client/rest/fn.send_message.html
+/// [`http::send_message`]: ../http/fn.send_message.html
 #[derive(Clone, Debug)]
 pub struct CreateMessage(pub Map<String, Value>);
 
@@ -75,7 +75,7 @@ impl Default for CreateMessage {
     /// Creates a map for sending a [`Message`], setting [`tts`] to `false` by
     /// default.
     ///
-    /// [`Message`]: ../../model/struct.Message.html
+    /// [`Message`]: ../model/struct.Message.html
     /// [`tts`]: #method.tts
     fn default() -> CreateMessage {
         let mut map = Map::default();
