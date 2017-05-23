@@ -1,18 +1,19 @@
 use std::sync::{Arc, Mutex};
-use super::gateway::Shard;
-use super::rest;
 use typemap::ShareMap;
-use ::utils::builder::EditProfile;
+use ::gateway::Shard;
+use ::http;
 use ::internal::prelude::*;
 use ::model::*;
 
 #[cfg(feature="cache")]
 use super::CACHE;
+#[cfg(feature="builder")]
+use ::builder::EditProfile;
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
 /// The context also acts as a general high-level interface over the associated
-/// [`Shard`] which received the event, or the low-level [`rest`] module.
+/// [`Shard`] which received the event, or the low-level [`http`] module.
 ///
 /// The context contains "shortcuts", like for interacting with the shard.
 /// Methods like [`set_game`] will unlock the shard and perform an update for
@@ -21,8 +22,8 @@ use super::CACHE;
 /// A context will only live for the event it was dispatched for. After the
 /// event handler finished, it is destroyed and will not be re-used.
 ///
-/// [`Shard`]: gateway/struct.Shard.html
-/// [`rest`]: rest/index.html
+/// [`Shard`]: ../gateway/struct.Shard.html
+/// [`http`]: ../http/index.html
 /// [`set_game`]: #method.set_game
 #[derive(Clone)]
 pub struct Context {
@@ -76,6 +77,7 @@ impl Context {
     /// ```rust,ignore
     /// context.edit_profile(|p| p.username("Hakase"));
     /// ```
+    #[cfg(feature="builder")]
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser> {
         let mut map = Map::new();
 
@@ -88,7 +90,7 @@ impl Context {
                 map.insert("email".to_owned(), Value::String(email.clone()));
             }
         } else {
-            let user = rest::get_current_user()?;
+            let user = http::get_current_user()?;
 
             map.insert("username".to_owned(), Value::String(user.name.clone()));
 
@@ -99,7 +101,7 @@ impl Context {
 
         let edited = f(EditProfile(map)).0;
 
-        rest::edit_profile(&edited)
+        http::edit_profile(&edited)
     }
 
     /// Sets the current user as being [`Online`]. This maintains the current

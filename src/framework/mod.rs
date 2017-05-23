@@ -52,7 +52,7 @@
 //! });
 //! ```
 //!
-//! [`Client::with_framework`]: ../../client/struct.Client.html#method.with_framework
+//! [`Client::with_framework`]: ../client/struct.Client.html#method.with_framework
 
 pub mod help_commands;
 
@@ -113,11 +113,11 @@ use ::model::Channel;
 /// });
 /// ```
 ///
-/// [`Framework`]: ext/framework/index.html
+/// [`Framework`]: framework/index.html
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
-        #[allow(unused_mut)]
+        #[allow(unreachable_code, unused_mut)]
         pub fn $fname(mut $c: &mut $crate::client::Context, _: &$crate::model::Message, _: Vec<String>) -> ::std::result::Result<(), String> {
             $b
 
@@ -125,7 +125,7 @@ macro_rules! command {
         }
     };
     ($fname:ident($c:ident, $m:ident) $b:block) => {
-        #[allow(unused_mut)]
+        #[allow(unreachable_code, unused_mut)]
         pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, _: Vec<String>) -> ::std::result::Result<(), String> {
             $b
 
@@ -133,7 +133,7 @@ macro_rules! command {
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
-        #[allow(unused_mut)]
+        #[allow(unreachable_code, unused_mut)]
         pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> ::std::result::Result<(), String> {
             $b
 
@@ -141,7 +141,7 @@ macro_rules! command {
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
-        #[allow(unreachable_patterns, unused_mut)]
+        #[allow(unreachable_code, unreachable_patterns, unused_mut)]
         pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> ::std::result::Result<(), String> {
             let mut i = $a.iter();
             let mut arg_counter = 0;
@@ -235,8 +235,8 @@ pub struct Framework {
     /// framework check if a [`Event::MessageCreate`] should be processed by
     /// itself.
     ///
-    /// [`Client::on_message`]: ../../client/struct.Client.html#method.on_message
-    /// [`Event::MessageCreate`]: ../../model/event/enum.Event.html#variant.MessageCreate
+    /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
+    /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
     pub initialized: bool,
     user_info: (u64, bool),
 }
@@ -263,7 +263,7 @@ impl Framework {
     ///         .prefix("~")));
     /// ```
     ///
-    /// [`Client`]: ../../client/struct.Client.html
+    /// [`Client`]: ../client/struct.Client.html
     /// [`Configuration::default`]: struct.Configuration.html#method.default
     /// [`depth`]: struct.Configuration.html#method.depth
     /// [`prefix`]: struct.Configuration.html#method.prefix

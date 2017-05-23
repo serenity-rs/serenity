@@ -1,9 +1,12 @@
 use std::borrow::Cow;
 use std::fmt::Write as FmtWrite;
 use std::io::Read;
-use ::client::rest;
 use ::model::*;
-use ::utils::builder::{CreateMessage, GetMessages};
+
+#[cfg(feature="model")]
+use ::builder::{CreateMessage, GetMessages};
+#[cfg(feature="model")]
+use ::http;
 
 /// A group channel - potentially including other [`User`]s - separate from a
 /// [`Guild`].
@@ -30,16 +33,17 @@ pub struct Group {
     pub recipients: HashMap<UserId, Arc<RwLock<User>>>,
 }
 
+#[cfg(feature="model")]
 impl Group {
     /// Adds the given user to the group. If the user is already in the group,
     /// then nothing is done.
     ///
-    /// Refer to [`rest::add_group_recipient`] for more information.
+    /// Refer to [`http::add_group_recipient`] for more information.
     ///
     /// **Note**: Groups have a limit of 10 recipients, including the current
     /// user.
     ///
-    /// [`rest::add_group_recipient`]: ../client/rest/fn.add_group_recipient.html
+    /// [`http::add_group_recipient`]: ../http/fn.add_group_recipient.html
     pub fn add_recipient<U: Into<UserId>>(&self, user: U) -> Result<()> {
         let user = user.into();
 
@@ -48,7 +52,7 @@ impl Group {
             return Ok(());
         }
 
-        rest::add_group_recipient(self.channel_id.0, user.0)
+        http::add_group_recipient(self.channel_id.0, user.0)
     }
 
     /// Broadcasts that the current user is typing in the group.
@@ -129,14 +133,14 @@ impl Group {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over the [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../utils/builder/struct.CreateMessage.html#method.content
+    /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
@@ -165,7 +169,7 @@ impl Group {
     /// Leaves the group.
     #[inline]
     pub fn leave(&self) -> Result<Group> {
-        rest::leave_group(self.channel_id.0)
+        http::leave_group(self.channel_id.0)
     }
 
     /// Gets a message from the channel.
@@ -252,19 +256,19 @@ impl Group {
             return Ok(());
         }
 
-        rest::remove_group_recipient(self.channel_id.0, user.0)
+        http::remove_group_recipient(self.channel_id.0, user.0)
     }
 
     /// Sends a message with just the given message content in the channel.
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
     /// [`ChannelId`]: ../model/struct.ChannelId.html
-    /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
     pub fn say(&self, content: &str) -> Result<Message> {
         self.channel_id.say(content)
@@ -282,11 +286,11 @@ impl Group {
     /// # Errors
     ///
     /// If the content of the message is over the above limit, then a
-    /// [`ClientError::MessageTooLong`] will be returned, containing the number
+    /// [`ModelError::MessageTooLong`] will be returned, containing the number
     /// of unicode code points over the limit.
     ///
     /// [`ChannelId::send_file`]: struct.ChannelId.html#method.send_file
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn send_file<F, R>(&self, file: R, filename: &str, f: F) -> Result<Message>
@@ -301,7 +305,7 @@ impl Group {
     ///
     /// **Note**: Requires the [Send Messages] permission.
     ///
-    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
+    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
     pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {

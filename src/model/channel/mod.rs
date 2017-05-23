@@ -22,7 +22,9 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::io::Read;
 use super::utils::deserialize_u64;
 use ::model::*;
-use ::utils::builder::{CreateMessage, GetMessages};
+
+#[cfg(feature="model")]
+use ::builder::{CreateMessage, GetMessages};
 
 /// A container for any channel.
 #[derive(Clone, Debug)]
@@ -42,6 +44,7 @@ pub enum Channel {
     Private(Arc<RwLock<PrivateChannel>>),
 }
 
+#[cfg(feature="model")]
 impl Channel {
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
     ///
@@ -151,14 +154,14 @@ impl Channel {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over the [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../utils/builder/struct.CreateMessage.html#method.content
+    /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
@@ -170,6 +173,7 @@ impl Channel {
     /// Refer to [`utils::is_nsfw`] for more details.
     ///
     /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
+    #[cfg(feature="utils")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
         match *self {
@@ -255,12 +259,12 @@ impl Channel {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ChannelId`]: ../model/struct.ChannelId.html
-    /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
+    /// [`ChannelId`]: struct.ChannelId.html
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
     pub fn say(&self, content: &str) -> Result<Message> {
         self.id().say(content)
@@ -278,11 +282,11 @@ impl Channel {
     /// # Errors
     ///
     /// If the content of the message is over the above limit, then a
-    /// [`ClientError::MessageTooLong`] will be returned, containing the number
+    /// [`ModelError::MessageTooLong`] will be returned, containing the number
     /// of unicode code points over the limit.
     ///
     /// [`ChannelId::send_file`]: struct.ChannelId.html#method.send_file
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn send_file<F, R>(&self, file: R, filename: &str, f: F) -> Result<Message>
@@ -301,13 +305,13 @@ impl Channel {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
     /// [`Channel`]: enum.Channel.html
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
     pub fn send_message<F>(&self, f: F) -> Result<Message>
@@ -384,6 +388,7 @@ impl<'de> Deserialize<'de> for Channel {
     }
 }
 
+#[cfg(feature="model")]
 impl Display for Channel {
     /// Formats the channel into a "mentioned" string.
     ///
@@ -487,31 +492,13 @@ impl<'de> Deserialize<'de> for PermissionOverwrite {
 
 /// The type of edit being made to a Channel's permissions.
 ///
-/// This is for use with methods such as `Context::create_permission`.
+/// This is for use with methods such as `GuildChannel::create_permission`.
 ///
-/// [`Context::create_permission`]: ../client/
+/// [`GuildChannel::create_permission`]: struct.GuildChannel.html#method.create_permission
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum PermissionOverwriteType {
     /// A member which is having its permission overwrites edited.
     Member(UserId),
     /// A role which is having its permission overwrites edited.
     Role(RoleId),
-}
-
-/// The results of a search, including the total results and a vector of
-/// messages.
-#[derive(Clone, Debug, Deserialize)]
-pub struct SearchResult {
-    /// An amount of messages returned from the result.
-    ///
-    /// Note that this is a vectof of a vector of messages. Each "set" of
-    /// messages contains the "found" message, as well as optional surrounding
-    /// messages for context.
-    #[serde(rename="messages")]
-    pub results: Vec<Vec<Message>>,
-    /// The number of messages directly related to the search.
-    ///
-    /// This does not count contextual messages.
-    #[serde(rename="total_results")]
-    pub total: u64,
 }

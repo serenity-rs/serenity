@@ -1,6 +1,8 @@
 use super::super::utils::{deserialize_emojis, deserialize_roles};
 use ::model::*;
-use ::utils::builder::{EditGuild, EditMember, EditRole};
+
+#[cfg(feature="model")]
+use ::builder::{EditGuild, EditMember, EditRole};
 
 /// Partial information about a [`Guild`]. This does not include information
 /// like member data.
@@ -28,6 +30,7 @@ pub struct PartialGuild {
     pub verification_level: VerificationLevel,
 }
 
+#[cfg(feature="model")]
 impl PartialGuild {
     /// Ban a [`User`] from the guild. All messages by the
     /// user within the last given number of days given will be deleted. This
@@ -46,15 +49,15 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::DeleteMessageDaysAmount`] if the number of
+    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
     /// days' worth of messages to delete is over the maximum.
     ///
-    /// [`ClientError::DeleteMessageDaysAmount`]: ../client/enum.ClientError.html#variant.DeleteMessageDaysAmount
+    /// [`ModelError::DeleteMessageDaysAmount`]: enum.ModelError.html#variant.DeleteMessageDaysAmount
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8) -> Result<()> {
         if delete_message_days > 7 {
-            return Err(Error::Client(ClientError::DeleteMessageDaysAmount(delete_message_days)));
+            return Err(Error::Model(ModelError::DeleteMessageDaysAmount(delete_message_days)));
         }
 
         self.id.ban(user, delete_message_days)
@@ -80,7 +83,7 @@ impl PartialGuild {
 
     /// Creates a [`GuildChannel`] in the guild.
     ///
-    /// Refer to [`rest::create_channel`] for more information.
+    /// Refer to [`http::create_channel`] for more information.
     ///
     /// Requires the [Manage Channels] permission.
     ///
@@ -95,7 +98,7 @@ impl PartialGuild {
     /// ```
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`rest::create_channel`]: ../client/rest/fn.create_channel.html
+    /// [`http::create_channel`]: ../http/fn.create_channel.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
     pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
@@ -115,7 +118,7 @@ impl PartialGuild {
     /// how to read an image from the filesystem and encode it as base64. Most
     /// of the example can be applied similarly for this method.
     ///
-    /// [`EditProfile::avatar`]: ../utils/builder/struct.EditProfile.html#method.avatar
+    /// [`EditProfile::avatar`]: ../builder/struct.EditProfile.html#method.avatar
     /// [`Guild::create_emoji`]: struct.Guild.html#method.create_emoji
     /// [`utils::read_image`]: ../utils/fn.read_image.html
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
@@ -143,10 +146,10 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`Guild::create_role`]: struct.Guild.html#method.create_role
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
@@ -274,11 +277,11 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to change their own
     /// nickname.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
     #[inline]
     pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
@@ -407,7 +410,7 @@ impl PartialGuild {
     /// total, consider using [`utils::shard_id`].
     ///
     /// [`utils::shard_id`]: ../utils/fn.shard_id.html
-    #[cfg(feature="cache")]
+    #[cfg(all(feature="cache", feature="utils"))]
     #[inline]
     pub fn shard_id(&self) -> u64 {
         self.id.shard_id()
@@ -433,7 +436,7 @@ impl PartialGuild {
     ///
     /// assert_eq!(guild.shard_id(17), 7);
     /// ```
-    #[cfg(not(feature="cache"))]
+    #[cfg(all(feature="utils", not(feature="cache")))]
     #[inline]
     pub fn shard_id(&self, shard_count: u64) -> u64 {
         self.id.shard_id(shard_count)

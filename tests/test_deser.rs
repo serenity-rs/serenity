@@ -156,3 +156,8 @@ fn voice_state_update() {
 fn webhooks_update() {
     p!(WebhookUpdateEvent, "webhooks_update_1");
 }
+
+#[test]
+fn message_type_7() {
+    p!(MessageCreateEvent, "message_type_7");
+}

@@ -1,3 +1,5 @@
+//! A set of constants used by the library.
+
 /// The maximum length of the textual size of an embed.
 pub const EMBED_MAX_LENGTH: u16 = 4000;
 /// The gateway version used by the library. The gateway URI is retrieved via
@@ -12,51 +14,30 @@ pub const MESSAGE_CODE_LIMIT: u16 = 2000;
 /// [UserAgent]: ../hyper/header/struct.UserAgent.html
 pub const USER_AGENT: &'static str = concat!("DiscordBot (https://github.com/zeyla/serenity, ", env!("CARGO_PKG_VERSION"), ")");
 
-#[allow(dead_code)]
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub enum ErrorCode {
-    BotsCannotUse,
-    CannotSendEmptyMessage,
-    CannotSendMessagesInVoice,
-    CannotSendMessagesToUser,
-    ChannelVerificationTooHigh,
-    EditByOtherAuthor,
-    EmbedDisabled,
-    InvalidAccountType,
-    InvalidAuthToken,
-    InvalidBulkDeleteCount,
-    InvalidDMChannelAction,
-    InvalidOauthState,
-    InvalidPinChannel,
-    MaxFriendsReached,
-    MaxGuildsReached,
-    MaxPinsReached,
-    MaxRolesReached,
-    MissingAccess,
-    MissingPermissions,
-    NoteTooLong,
-    Oauth2ApplicationLacksBot,
-    Oauth2ApplicationLimitReached,
-    OnlyBotsCanUse,
-    ReactionBlocked,
-    SearchIndexUnavailable,
-    TooManyReactions,
-    Unauthorized,
-    UnknownAccount,
-    UnknownApplication,
-    UnknownChannel,
-    UnknownGuild,
-    UnknownEmoji,
-    UnknownIntegration,
-    UnknownInvite,
-    UnknownMember,
-    UnknownMessage,
-    UnknownOverwrite,
-    UnknownProvider,
-    UnknownRole,
-    UnknownToken,
-    UnknownUser,
-}
+/// List of messages Discord shows on member join.
+pub static JOIN_MESSAGES: &'static [&'static str] = &[
+  "$user just joined the server - glhf!",
+  "$user just joined. Everyone, look busy!",
+  "$user just joined. Can I get a heal?",
+  "$user joined your party.",
+  "$user joined. You must construct additional pylons.",
+  "Ermagherd. $user is here.",
+  "Welcome, $user. Stay awhile and listen.",
+  "Welcome, $user. We were expecting you ( ͡° ͜ʖ ͡°)",
+  "Welcome, $user. We hope you brought pizza.",
+  "Welcome $user. Leave your weapons by the door.",
+  "A wild $user appeared.",
+  "Swoooosh. $user just landed.",
+  "Brace yourselves. $user just joined the server.",
+  "$user just joined. Hide your bananas.",
+  "$user just arrived. Seems OP - please nerf.",
+  "$user just slid into the server.",
+  "A $user has spawned in the server.",
+  "Big $user showed up!",
+  "Where’s $user? In the server!",
+  "$user hopped into the server. Kangaroo!!",
+  "$user just showed up. Hold my beer."
+];
 
 enum_number!(
     /// Enum to map gateway opcodes.

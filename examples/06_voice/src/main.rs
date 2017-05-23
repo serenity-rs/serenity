@@ -99,7 +99,7 @@ command!(join(ctx, msg, args) {
     };
 
     let mut shard = ctx.shard.lock().unwrap();
-    shard.manager.join(Some(guild_id), connect_to);
+    shard.manager.join(guild_id, connect_to);
 
     check_msg(msg.channel_id.say(&format!("Joined {}", connect_to.mention())));
 });

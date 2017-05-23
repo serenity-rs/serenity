@@ -14,6 +14,8 @@
 //!
 //! [`serenity::Error`]: ../enum.Error.html
 
-pub use ::client::{Client, ClientError as ClientError};
 pub use ::error::{Error as SerenityError};
 pub use ::model::Mentionable;
+
+#[cfg(feature="client")]
+pub use ::client::{Client, ClientError as ClientError};

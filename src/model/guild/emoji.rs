@@ -1,14 +1,16 @@
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
-use ::model::{EmojiId, RoleId};
+use super::super::{EmojiId, ModelError, RoleId};
 
 #[cfg(feature="cache")]
 use std::mem;
 #[cfg(feature="cache")]
-use ::client::{CACHE, rest};
+use ::CACHE;
 #[cfg(feature="cache")]
 use ::internal::prelude::*;
+#[cfg(feature="model")]
+use ::http;
 #[cfg(feature="cache")]
-use ::model::GuildId;
+use super::super::GuildId;
 
 /// Represents a custom guild emoji, which can either be created using the API,
 /// or via an integration. Emojis created using the API only work within the
@@ -34,6 +36,7 @@ pub struct Emoji {
     pub roles: Vec<RoleId>,
 }
 
+#[cfg(feature="model")]
 impl Emoji {
     /// Deletes the emoji.
     ///
@@ -45,8 +48,8 @@ impl Emoji {
     #[cfg(feature="cache")]
     pub fn delete(&self) -> Result<()> {
         match self.find_guild_id() {
-            Some(guild_id) => rest::delete_emoji(guild_id.0, self.id.0),
-            None => Err(Error::Client(ClientError::ItemMissing)),
+            Some(guild_id) => http::delete_emoji(guild_id.0, self.id.0),
+            None => Err(Error::Model(ModelError::ItemMissing)),
         }
     }
 
@@ -65,7 +68,7 @@ impl Emoji {
                     "name": name,
                 });
 
-                match rest::edit_emoji(guild_id.0, self.id.0, &map) {
+                match http::edit_emoji(guild_id.0, self.id.0, &map) {
                     Ok(emoji) => {
                         mem::replace(self, emoji);
 
@@ -74,7 +77,7 @@ impl Emoji {
                     Err(why) => Err(why),
                 }
             },
-            None => Err(Error::Client(ClientError::ItemMissing)),
+            None => Err(Error::Model(ModelError::ItemMissing)),
         }
     }
 

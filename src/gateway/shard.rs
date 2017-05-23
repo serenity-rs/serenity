@@ -5,7 +5,6 @@ use std::sync::{Arc, Mutex};
 use std::thread::{self, Builder as ThreadBuilder};
 use std::time::{Duration as StdDuration, Instant};
 use std::mem;
-use super::super::rest;
 use super::{GatewayError, GatewayStatus, prep};
 use time;
 use websocket::client::{Client as WsClient, Sender, Receiver};
@@ -14,6 +13,7 @@ use websocket::result::WebSocketError;
 use websocket::stream::WebSocketStream;
 use websocket::ws::sender::Sender as WsSender;
 use ::constants::OpCode;
+use ::http;
 use ::internal::prelude::*;
 use ::internal::ws_impl::{ReceiverExt, SenderExt};
 use ::model::event::{Event, GatewayEvent, ReadyEvent};
@@ -62,6 +62,7 @@ type CurrentPresence = (Option<Game>, OnlineStatus, bool);
 /// [`receive`]: #method.receive
 /// [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 /// [module docs]: index.html#sharding
+#[derive(Clone, Debug)]
 pub struct Shard {
     current_presence: CurrentPresence,
     /// A tuple of the last instant that a heartbeat was sent, and the last that
@@ -94,13 +95,13 @@ impl Shard {
     /// then listening for events:
     ///
     /// ```rust,ignore
-    /// use serenity::client::gateway::Shard;
-    /// use serenity::client::rest;
+    /// use serenity::gateway::Shard;
+    /// use serenity::http;
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_BOT_TOKEN").expect("Token in environment");
     /// // retrieve the gateway response, which contains the URL to connect to
-    /// let gateway = rest::get_gateway().expect("Valid gateway response").url;
+    /// let gateway = http::get_gateway().expect("Valid gateway response").url;
     /// let shard = Shard::new(&gateway, &token, None)
     ///     .expect("Working shard");
     ///
@@ -516,7 +517,7 @@ impl Shard {
     ///
     /// **Note**: Requires the `cache` feature be enabled.
     ///
-    /// [`Cache`]: ../../ext/cache/struct.Cache.html
+    /// [`Cache`]: ../cache/struct.Cache.html
     #[cfg(feature="cache")]
     pub fn guilds_handled(&self) -> u16 {
         let cache = CACHE.read().unwrap();
@@ -559,7 +560,7 @@ impl Shard {
 
         // Take a few attempts at reconnecting.
         for i in 1u64..11u64 {
-            let gateway_url = rest::get_gateway()?.url;
+            let gateway_url = http::get_gateway()?.url;
 
             let shard = Shard::new(&gateway_url,
                                    &self.token,

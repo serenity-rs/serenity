@@ -1,12 +1,14 @@
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
-use ::client::rest;
 use ::internal::prelude::*;
 use ::model::*;
 
 #[cfg(feature="cache")]
-use ::client::CACHE;
+use ::CACHE;
+#[cfg(feature="model")]
+use ::http;
 
+#[cfg(feature="model")]
 impl Reaction {
     /// Deletes the reaction, but only if the current user is the user who made
     /// the reaction or has permission to.
@@ -17,10 +19,10 @@ impl Reaction {
     /// # Errors
     ///
     /// If the `cache` is enabled, then returns a
-    /// [`ClientError::InvalidPermissions`] if the current user does not have
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required [permissions].
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     /// [permissions]: permissions
     pub fn delete(&self) -> Result<()> {
@@ -41,7 +43,7 @@ impl Reaction {
                 let req = permissions::MANAGE_MESSAGES;
 
                 if !utils::user_has_perms(self.channel_id, req).unwrap_or(true) {
-                    return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
 
@@ -50,7 +52,7 @@ impl Reaction {
             Some(self.user_id.0)
         }};
 
-        rest::delete_reaction(self.channel_id.0,
+        http::delete_reaction(self.channel_id.0,
                               self.message_id.0,
                               user_id,
                               &self.emoji)
@@ -70,10 +72,10 @@ impl Reaction {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
+    /// Returns a [`ModelError::InvalidPermissions`] if the current user does
     /// not have the required [permissions].
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`Emoji`]: struct.Emoji.html
     /// [`Message`]: struct.Message.html
     /// [`User`]: struct.User.html
@@ -86,7 +88,7 @@ impl Reaction {
                        -> Result<Vec<User>>
                        where R: Into<ReactionType>,
                              U: Into<UserId> {
-        rest::get_reaction_users(self.channel_id.0,
+        http::get_reaction_users(self.channel_id.0,
                                  self.message_id.0,
                                  &reaction_type.into(),
                                  limit.unwrap_or(50),
@@ -201,6 +203,7 @@ impl<'de> Deserialize<'de> for ReactionType {
     }
 }
 
+#[cfg(any(feature="model", feature="http"))]
 impl ReactionType {
     /// Creates a data-esque display of the type. This is not very useful for
     /// displaying, as the primary client can not render it, but can be useful

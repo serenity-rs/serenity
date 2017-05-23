@@ -2,8 +2,8 @@ use std::sync::mpsc::{self, Sender as MpscSender};
 use super::{AudioReceiver, AudioSource};
 use super::connection_info::ConnectionInfo;
 use super::Status as VoiceStatus;
-use ::client::gateway::GatewayStatus;
 use ::constants::VoiceOpCode;
+use ::gateway::GatewayStatus;
 use ::model::{ChannelId, GuildId, UserId, VoiceState};
 use super::threading;
 
@@ -19,8 +19,7 @@ use super::threading;
 /// # Examples
 ///
 /// Assuming that you already have a `Manager`, most likely retrieved via a
-/// [WebSocket connection], you can join a guild's voice channel and deafen
-/// yourself like so:
+/// [`Shard`], you can join a guild's voice channel and deafen yourself like so:
 ///
 /// ```rust,ignore
 /// // assuming a `manager` has already been bound, hopefully retrieved through
@@ -35,7 +34,8 @@ use super::threading;
 /// ```
 ///
 /// [`Manager`]: struct.Manager.html
-/// [WebSocket connection]: ../../client/struct.Connection.html
+/// [`Shard`]: ../gateway/struct.Shard.html
+#[derive(Clone, Debug)]
 pub struct Handler {
     /// The ChannelId to be connected to, if any.
     ///

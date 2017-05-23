@@ -26,20 +26,31 @@ use ::model::{Permissions, Role, permissions};
 ///     .name("a test role"));
 /// ```
 ///
-/// [`Context::create_role`]: ../../client/struct.Context.html#method.create_role
-/// [`Context::edit_role`]: ../../client/struct.Context.html#method.edit_role
-/// [`Guild::create_role`]: ../../model/struct.Guild.html#method.create_role
-/// [`Role`]: ../../model/struct.Role.html
-/// [`Role::edit`]: ../../model/struct.Role.html#method.edit
+/// [`Context::create_role`]: ../client/struct.Context.html#method.create_role
+/// [`Context::edit_role`]: ../client/struct.Context.html#method.edit_role
+/// [`Guild::create_role`]: ../model/struct.Guild.html#method.create_role
+/// [`Role`]: ../model/struct.Role.html
+/// [`Role::edit`]: ../model/struct.Role.html#method.edit
+#[derive(Clone, Debug)]
 pub struct EditRole(pub JsonMap);
 
 impl EditRole {
     /// Creates a new builder with the values of the given [`Role`].
     ///
-    /// [`Role`]: ../../model/struct.Role.html
+    /// [`Role`]: ../model/struct.Role.html
     pub fn new(role: &Role) -> Self {
         let mut map = Map::new();
-        map.insert("color".to_owned(), Value::Number(Number::from(role.colour.0)));
+
+        #[cfg(feature="utils")]
+        {
+            map.insert("color".to_owned(), Value::Number(Number::from(role.colour.0)));
+        }
+
+        #[cfg(not(feature="utils"))]
+        {
+            map.insert("color".to_owned(), Value::Number(Number::from(role.colour)));
+        }
+
         map.insert("hoist".to_owned(), Value::Bool(role.hoist));
         map.insert("managed".to_owned(), Value::Bool(role.managed));
         map.insert("mentionable".to_owned(), Value::Bool(role.mentionable));
@@ -107,7 +118,7 @@ impl Default for EditRole {
     /// - **permissions**: the [general permissions set]
     /// - **position**: 1
     ///
-    /// [general permissions set]: ../../model/permissions/constant.PRESET_GENERAL.html
+    /// [general permissions set]: ../model/permissions/constant.PRESET_GENERAL.html
     fn default() -> EditRole {
         let mut map = Map::new();
         let permissions = Number::from(permissions::PRESET_GENERAL.bits());

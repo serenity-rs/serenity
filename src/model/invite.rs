@@ -1,19 +1,31 @@
 use super::*;
-use ::client::rest;
 use ::internal::prelude::*;
-use ::utils::builder::CreateInvite;
-use ::utils;
 
 #[cfg(feature="cache")]
-use super::permissions;
-#[cfg(feature="cache")]
-use super::utils as model_utils;
+use super::{permissions, utils as model_utils};
+#[cfg(feature="model")]
+use ::http;
+#[cfg(feature="model")]
+use ::builder::CreateInvite;
 
 /// Information about an invite code.
 ///
 /// Information can not be accessed for guilds the current user is banned from.
 #[derive(Clone, Debug, Deserialize)]
 pub struct Invite {
+    /// The approximate number of [`Member`]s in the related [`Guild`].
+    ///
+    /// [`Guild`]: struct.Guild.html
+    /// [`Member`]: struct.Member.html
+    pub approximate_member_count: Option<u64>,
+    /// The approximate number of [`Member`]s with an active session in the
+    /// related [`Guild`].
+    ///
+    /// An active session is defined as an open, heartbeating WebSocket connection.
+    /// These include [invisible][`OnlineStatus::Invisible`] members.
+    ///
+    /// [`OnlineStatus::Invisible`]: enum.OnlineStatus.html#variant.Invisible
+    pub approximate_presence_count: Option<u64>,
     /// The unique code for the invite.
     pub code: String,
     /// A representation of the minimal amount of information needed about the
@@ -23,11 +35,10 @@ pub struct Invite {
     pub channel: InviteChannel,
     /// a representation of the minimal amount of information needed about the
     /// [`Guild`] being invited to.
-    ///
-    /// [`Guild`]: struct.Guild.html
     pub guild: InviteGuild,
 }
 
+#[cfg(feature="model")]
 impl Invite {
     /// Creates an invite for a [`GuildChannel`], providing a builder so that
     /// fields may optionally be set.
@@ -39,11 +50,11 @@ impl Invite {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have the required [permission].
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
-    /// [`CreateInvite`]: ../utils/builder/struct.CreateInvite.html
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
+    /// [`CreateInvite`]: ../builder/struct.CreateInvite.html
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [Create Invite]: permissions/constant.CREATE_INVITE.html
     /// [permission]: permissions/index.html
@@ -56,11 +67,11 @@ impl Invite {
             let req = permissions::CREATE_INVITE;
 
             if !model_utils::user_has_perms(channel_id, req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
-        rest::create_invite(channel_id.0, &f(CreateInvite::default()).0)
+        http::create_invite(channel_id.0, &f(CreateInvite::default()).0)
     }
 
     /// Deletes the invite.
@@ -69,10 +80,10 @@ impl Invite {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have the required [permission].
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     /// [permission]: permissions/index.html
     pub fn delete(&self) -> Result<Invite> {
@@ -81,16 +92,57 @@ impl Invite {
             let req = permissions::MANAGE_GUILD;
 
             if !model_utils::user_has_perms(self.channel.id, req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
-        rest::delete_invite(&self.code)
+        http::delete_invite(&self.code)
     }
 
     /// Gets the information about an invite.
-    pub fn get(code: &str) -> Result<Invite> {
-        rest::get_invite(utils::parse_invite(code))
+    pub fn get(code: &str, stats: bool) -> Result<Invite> {
+        let mut invite = code;
+
+        #[cfg(feature="utils")]
+        {
+            invite = ::utils::parse_invite(invite);
+        }
+
+        http::get_invite(invite, stats)
+    }
+
+    /// Returns a URL to use for the invite.
+    ///
+    /// # Examples
+    ///
+    /// Retrieve the URL for an invite with the code `WxZumR`:
+    ///
+    /// ```rust
+    /// # use serenity::model::*;
+    /// #
+    /// # let invite = Invite {
+    /// #     approximate_member_count: Some(1812),
+    /// #     approximate_presence_count: Some(717),
+    /// #     code: "WxZumR".to_owned(),
+    /// #     channel: InviteChannel {
+    /// #         id: ChannelId(1),
+    /// #         name: "foo".to_owned(),
+    /// #         kind: ChannelType::Text,
+    /// #     },
+    /// #     guild: InviteGuild {
+    /// #         id: GuildId(2),
+    /// #         icon: None,
+    /// #         name: "bar".to_owned(),
+    /// #         splash_hash: None,
+    /// #         text_channel_count: Some(7),
+    /// #         voice_channel_count: Some(3),
+    /// #     },
+    /// # };
+    /// #
+    /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
+    /// ```
+    pub fn url(&self) -> String {
+        format!("https://discord.gg/{}", self.code)
     }
 }
 
@@ -110,8 +162,11 @@ pub struct InviteGuild {
     pub icon: Option<String>,
     pub name: String,
     pub splash_hash: Option<String>,
+    pub text_channel_count: Option<u64>,
+    pub voice_channel_count: Option<u64>,
 }
 
+#[cfg(feature="model")]
 impl InviteGuild {
     /// Returns the Id of the shard associated with the guild.
     ///
@@ -123,7 +178,7 @@ impl InviteGuild {
     /// total, consider using [`utils::shard_id`].
     ///
     /// [`utils::shard_id`]: ../utils/fn.shard_id.html
-    #[cfg(feature="cache")]
+    #[cfg(all(feature="cache", feature="utils"))]
     #[inline]
     pub fn shard_id(&self) -> u64 {
         self.id.shard_id()
@@ -149,7 +204,7 @@ impl InviteGuild {
     ///
     /// assert_eq!(guild.shard_id(17), 7);
     /// ```
-    #[cfg(not(feature="cache"))]
+    #[cfg(all(feature="utils", not(feature="cache")))]
     #[inline]
     pub fn shard_id(&self, shard_count: u64) -> u64 {
         self.id.shard_id(shard_count)
@@ -197,22 +252,23 @@ pub struct RichInvite {
     pub uses: u64,
 }
 
+#[cfg(feature="model")]
 impl RichInvite {
     /// Deletes the invite.
     ///
-    /// Refer to [`rest::delete_invite`] for more information.
+    /// Refer to [`http::delete_invite`] for more information.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
     /// # Errors
     ///
     /// If the `cache` feature is enabled, then this returns a
-    /// [`ClientError::InvalidPermissions`] if the current user does not have
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required [permission].
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`Invite::delete`]: struct.Invite.html#method.delete
-    /// [`rest::delete_invite`]: ../client/rest/fn.delete_invite.html
+    /// [`http::delete_invite`]: ../http/fn.delete_invite.html
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     /// [permission]: permissions/index.html
     pub fn delete(&self) -> Result<Invite> {
@@ -221,10 +277,54 @@ impl RichInvite {
             let req = permissions::MANAGE_GUILD;
 
             if !model_utils::user_has_perms(self.channel.id, req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
-        rest::delete_invite(&self.code)
+        http::delete_invite(&self.code)
+    }
+
+    /// Returns a URL to use for the invite.
+    ///
+    /// # Examples
+    ///
+    /// Retrieve the URL for an invite with the code `WxZumR`:
+    ///
+    /// ```rust
+    /// # use serenity::model::*;
+    /// #
+    /// # let invite = RichInvite {
+    /// #     code: "WxZumR".to_owned(),
+    /// #     channel: InviteChannel {
+    /// #         id: ChannelId(1),
+    /// #         name: "foo".to_owned(),
+    /// #         kind: ChannelType::Text,
+    /// #     },
+    /// #     created_at: "bar".to_owned(),
+    /// #     guild: InviteGuild {
+    /// #         id: GuildId(2),
+    /// #         icon: None,
+    /// #         name: "baz".to_owned(),
+    /// #         splash_hash: None,
+    /// #         text_channel_count: None,
+    /// #         voice_channel_count: None,
+    /// #     },
+    /// #     inviter: User {
+    /// #         avatar: None,
+    /// #         bot: false,
+    /// #         discriminator: 3,
+    /// #         id: UserId(4),
+    /// #         name: "qux".to_owned(),
+    /// #     },
+    /// #     max_age: 5,
+    /// #     max_uses: 6,
+    /// #     temporary: true,
+    /// #     uses: 7,
+    /// # };
+    /// #
+    /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
+    /// ```
+    pub fn url(&self) -> String {
+        format!("https://discord.gg/{}", self.code)
     }
 }

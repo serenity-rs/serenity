@@ -2,7 +2,7 @@
 //! data from the event is possible.
 //!
 //! This acts as a cache, to avoid making requests over the REST API through
-//! the [`rest`] module where possible. All fields are public, and do not have
+//! the [`http`] module where possible. All fields are public, and do not have
 //! getters, to allow you more flexibility with the stored data. However, this
 //! allows data to be "corrupted", and _may or may not_ cause misfunctions
 //! within the library. Mutate data at your own discretion.
@@ -22,7 +22,7 @@
 //! This allows you to save a step, by only needing to perform the
 //! [`Context::get_channel`] call and not need to first search through the cache
 //! - and if not found - _then_ perform an HTTP request through the Context or
-//! [`rest`] module.
+//! [`http`] module.
 //!
 //! Additionally, note that some information received through events can _not_
 //! be retrieved through the REST API. This is information such as [`Role`]s in
@@ -49,17 +49,17 @@
 //! while needing to hit the REST API as little as possible, then the answer
 //! is "yes".
 //!
-//! [`Context`]: ../../client/struct.Context.html
-//! [`Context::get_channel`]: ../../client/struct.Context.html#method.get_channel
-//! [`Emoji`]: ../../model/struct.Emoji.html
-//! [`Group`]: ../../model/struct.Group.html
-//! [`LiveGuild`]: ../../model/struct.LiveGuild.html
-//! [`LiveGuild::edit`]: ../../model/struct.LiveGuild.html#method.edit
-//! [`Message`]: ../../model/struct.Message.html
-//! [`PublicChannel`]: ../../model/struct.PublicChannel.html
-//! [`Role`]: ../../model/struct.Role.html
-//! [`client::CACHE`]: ../../client/struct.CACHE.html
-//! [`rest`]: ../../client/rest/index.html
+//! [`Context`]: ../client/struct.Context.html
+//! [`Context::get_channel`]: ../client/struct.Context.html#method.get_channel
+//! [`Emoji`]: ../model/struct.Emoji.html
+//! [`Group`]: ../model/struct.Group.html
+//! [`LiveGuild`]: ../model/struct.LiveGuild.html
+//! [`LiveGuild::edit`]: ../model/struct.LiveGuild.html#method.edit
+//! [`Message`]: ../model/struct.Message.html
+//! [`PublicChannel`]: ../model/struct.PublicChannel.html
+//! [`Role`]: ../model/struct.Role.html
+//! [`CACHE`]: ../struct.CACHE.html
+//! [`http`]: ../http/index.html
 
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
@@ -69,11 +69,11 @@ use std::mem;
 use ::model::*;
 use ::model::event::*;
 
-/// A cache of all events received over a [`Connection`], where storing at least
+/// A cache of all events received over a [`Shard`], where storing at least
 /// some data from the event is possible.
 ///
 /// This acts as a cache, to avoid making requests over the REST API through the
-/// [`rest`] module where possible. All fields are public, and do not have
+/// [`http`] module where possible. All fields are public, and do not have
 /// getters, to allow you more flexibility with the stored data. However, this
 /// allows data to be "corrupted", and _may or may not_ cause misfunctions
 /// within the library. Mutate data at your own discretion.
@@ -88,18 +88,18 @@ use ::model::event::*;
 ///
 /// This allows you to only need to perform the `Context::get_channel` call,
 /// and not need to first search through the cache - and if not found - _then_
-/// perform an HTTP request through the Context or `rest` module.
+/// perform an HTTP request through the Context or `http` module.
 ///
 /// Additionally, note that some information received through events can _not_
 /// be retrieved through the REST API. This is information such as [`Role`]s in
 /// [`Guild`]s.
 ///
-/// [`Connection`]: ../../client/struct.Connection.html
-/// [`Context`]: ../../client/struct.Context.html
-/// [`Context::get_channel`]: ../../client/struct.Context.html#method.get_channel
-/// [`Guild`]: ../../model/struct.Guild.html
-/// [`Role`]: ../../model/struct.Role.html
-/// [`rest`]: ../../client/rest/index.html
+/// [`Shard`]: ../gateway/struct.Shard.html
+/// [`Context`]: ../client/struct.Context.html
+/// [`Context::get_channel`]: ../client/struct.Context.html#method.get_channel
+/// [`Guild`]: ../model/struct.Guild.html
+/// [`Role`]: ../model/struct.Role.html
+/// [`http`]: ../http/index.html
 #[derive(Clone, Debug)]
 pub struct Cache {
     /// A map of channels in [`Guild`]s that the current user has received data
@@ -109,9 +109,9 @@ pub struct Cache {
     /// received and processed by the cache, the relevant channels are also
     /// removed from this map.
     ///
-    /// [`Event::GuildDelete`]: ../../model/event/struct.GuildDeleteEvent.html
-    /// [`Event::GuildUnavailable`]: ../../model/event/struct.GuildUnavailableEvent.html
-    /// [`Guild`]: ../../model/struct.Guild.html
+    /// [`Event::GuildDelete`]: ../model/event/struct.GuildDeleteEvent.html
+    /// [`Event::GuildUnavailable`]: ../model/event/struct.GuildUnavailableEvent.html
+    /// [`Guild`]: ../model/struct.Guild.html
     pub channels: HashMap<ChannelId, Arc<RwLock<GuildChannel>>>,
     /// A map of the groups that the current user is in.
     ///
@@ -122,8 +122,8 @@ pub struct Cache {
     /// A map of guilds with full data available. This includes data like
     /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
     ///
-    /// [`Emoji`]: ../../model/struct.Emoji.html
-    /// [`Role`]: ../../model/struct.Role.html
+    /// [`Emoji`]: ../model/struct.Emoji.html
+    /// [`Role`]: ../model/struct.Role.html
     pub guilds: HashMap<GuildId, Arc<RwLock<Guild>>>,
     /// A map of notes that a user has made for individual users.
     ///
@@ -148,8 +148,8 @@ pub struct Cache {
     /// is received. Guilds are "sent in" over time through the receiving of
     /// [`Event::GuildCreate`]s.
     ///
-    /// [`Event::GuildCreate`]: ../../model/enum.Event.html#variant.GuildCreate
-    /// [`Event::GuildUnavailable`]: ../../model/enum.Event.html#variant.GuildUnavailable
+    /// [`Event::GuildCreate`]: ../model/enum.Event.html#variant.GuildCreate
+    /// [`Event::GuildUnavailable`]: ../model/enum.Event.html#variant.GuildUnavailable
     pub unavailable_guilds: HashSet<GuildId>,
     /// The current user "logged in" and for which events are being received
     /// for.
@@ -159,8 +159,8 @@ pub struct Cache {
     ///
     /// Refer to the documentation for [`CurrentUser`] for more information.
     ///
-    /// [`CurrentUser`]: ../../model/struct.CurrentUser.html
-    /// [`User`]: ../../model/struct.User.html
+    /// [`CurrentUser`]: ../model/struct.CurrentUser.html
+    /// [`User`]: ../model/struct.User.html
     pub user: CurrentUser,
     /// A map of users that the current user sees.
     ///
@@ -174,21 +174,19 @@ pub struct Cache {
     /// - [`GuildSync`][`GuildSyncEvent`]
     /// - [`PresenceUpdate`][`PresenceUpdateEvent`]
     /// - [`Ready`][`ReadyEvent`]
-    /// - [`RelationshipAdd`][`RelationshipAddEvent`]
     ///
     /// Note, however, that users are _not_ removed from the map on removal
     /// events such as [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other
     /// structs such as members or recipients may still exist.
     ///
-    /// [`ChannelRecipientAddEvent`]: ../../model/event/struct.ChannelRecipientAddEvent.html
-    /// [`GuildMemberAddEvent`]: ../../model/event/struct.GuildMemberAddEvent.html
-    /// [`GuildMemberRemoveEvent`]: ../../model/event/struct.GuildMemberRemoveEvent.html
-    /// [`GuildMemberUpdateEvent`]: ../../model/event/struct.GuildMemberUpdateEvent.html
-    /// [`GuildMembersChunkEvent`]: ../../model/event/struct.GuildMembersChunkEvent.html
-    /// [`GuildSyncEvent`]: ../../model/event/struct.GuildSyncEvent.html
-    /// [`PresenceUpdateEvent`]: ../../model/event/struct.PresenceUpdateEvent.html
-    /// [`Ready`]: ../../model/event/struct.ReadyEvent.html
-    /// [`RelationshipAdd`][`RelationshipAddEvent`]
+    /// [`ChannelRecipientAddEvent`]: ../model/event/struct.ChannelRecipientAddEvent.html
+    /// [`GuildMemberAddEvent`]: ../model/event/struct.GuildMemberAddEvent.html
+    /// [`GuildMemberRemoveEvent`]: ../model/event/struct.GuildMemberRemoveEvent.html
+    /// [`GuildMemberUpdateEvent`]: ../model/event/struct.GuildMemberUpdateEvent.html
+    /// [`GuildMembersChunkEvent`]: ../model/event/struct.GuildMembersChunkEvent.html
+    /// [`GuildSyncEvent`]: ../model/event/struct.GuildSyncEvent.html
+    /// [`PresenceUpdateEvent`]: ../model/event/struct.PresenceUpdateEvent.html
+    /// [`Ready`]: ../model/event/struct.ReadyEvent.html
     pub users: HashMap<UserId, Arc<RwLock<User>>>,
 }
 
@@ -202,8 +200,8 @@ impl Cache {
     /// This can be used in combination with [`Shard::chunk_guilds`], and can be
     /// used to determine how many members have not yet been downloaded.
     ///
-    /// [`Member`]: ../../model/struct.Member.html
-    /// [`User`]: ../../model/struct.User.html
+    /// [`Member`]: ../model/struct.Member.html
+    /// [`User`]: ../model/struct.User.html
     pub fn unknown_members(&self) -> u64 {
         let mut total = 0;
 
@@ -228,8 +226,8 @@ impl Cache {
     /// If there are 6 private channels and 2 groups in the cache, then `8` Ids
     /// will be returned.
     ///
-    /// [`Group`]: ../../model/struct.Group.html
-    /// [`PrivateChannel`]: ../../model/struct.PrivateChannel.html
+    /// [`Group`]: ../model/struct.Group.html
+    /// [`PrivateChannel`]: ../model/struct.PrivateChannel.html
     pub fn all_private_channels(&self) -> Vec<ChannelId> {
         self.groups
             .keys()
@@ -244,9 +242,9 @@ impl Cache {
     /// retrieved over all shards are included in this count -- not just the
     /// current [`Context`]'s shard, if accessing from one.
     ///
-    /// [`Context`]: ../../client/struct.Context.html
-    /// [`Guild`]: ../../model/struct.Guild.html
-    /// [`Shard`]: ../../client/gateway/struct.Shard.html
+    /// [`Context`]: ../client/struct.Context.html
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`Shard`]: ../gateway/struct.Shard.html
     pub fn all_guilds(&self) -> Vec<GuildId> {
         self.guilds
             .values()
@@ -267,9 +265,9 @@ impl Cache {
     /// - [`PrivateChannel`]: [`get_private_channel`] or [`private_channels`]
     /// - [`Group`]: [`get_group`] or [`groups`]
     ///
-    /// [`Channel`]: ../../model/enum.Channel.html
-    /// [`Group`]: ../../model/struct.Group.html
-    /// [`Guild`]: ../../model/struct.Guild.html
+    /// [`Channel`]: ../model/enum.Channel.html
+    /// [`Group`]: ../model/struct.Group.html
+    /// [`Guild`]: ../model/struct.Guild.html
     /// [`channels`]: #structfield.channels
     /// [`get_group`]: #method.get_group
     /// [`get_guild_channel`]: #method.get_guild_channel
@@ -299,7 +297,7 @@ impl Cache {
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/struct.GuildId.html
+    /// [`GuildId`]: ../model/struct.GuildId.html
     #[inline]
     pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<Arc<RwLock<Guild>>> {
         self.guilds.get(&id.into()).cloned()
@@ -317,7 +315,7 @@ impl Cache {
     /// [`Client::on_message`] event dispatch:
     ///
     /// ```rust,ignore
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let cache = CACHE.read().unwrap();
     ///
@@ -333,9 +331,9 @@ impl Cache {
     /// };
     /// ```
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
-    /// [`Client::on_message`]: ../../client/struct.Client.html#method.on_message
-    /// [`Guild`]: ../../model/struct.Guild.html
+    /// [`ChannelId`]: ../model/struct.ChannelId.html
+    /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
+    /// [`Guild`]: ../model/struct.Guild.html
     /// [`get_channel`]: #method.get_channel
     #[inline]
     pub fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<GuildChannel>>> {
@@ -348,8 +346,8 @@ impl Cache {
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
-    /// [`Group`]: ../../model/struct.Group.html
+    /// [`ChannelId`]: ../model/struct.ChannelId.html
+    /// [`Group`]: ../model/struct.Group.html
     #[inline]
     pub fn group<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<Group>>> {
         self.groups.get(&id.into()).cloned()
@@ -367,7 +365,7 @@ impl Cache {
     /// [`Client::on_message`] context:
     ///
     /// ```rust,ignore
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let cache = CACHE.read().unwrap();
     /// let member = {
@@ -397,9 +395,9 @@ impl Cache {
     /// }
     /// ```
     ///
-    /// [`Client::on_message`]: ../../client/struct.Client.html#method.on_message
-    /// [`Guild`]: ../../model/struct.Guild.html
-    /// [`members`]: ../../model/struct.Guild.html#structfield.members
+    /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`members`]: ../model/struct.Guild.html#structfield.members
     pub fn member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
         where G: Into<GuildId>, U: Into<UserId> {
         self.guilds
@@ -423,8 +421,8 @@ impl Cache {
     /// **Note**: This will clone the entire role. Instead, retrieve the guild
     /// and retrieve from the guild's [`roles`] map to avoid this.
     ///
-    /// [`Guild`]: ../../model/struct.Guild.html
-    /// [`roles`]: ../../model/struct.Guild.html#structfield.roles
+    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`roles`]: ../model/struct.Guild.html#structfield.roles
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
         where G: Into<GuildId>, R: Into<RoleId> {
         self.guilds
@@ -437,7 +435,7 @@ impl Cache {
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`UserId`].
     ///
-    /// [`UserId`]: ../../model/struct.UserId.html
+    /// [`UserId`]: ../model/struct.UserId.html
     /// [`users`]: #structfield.users
     #[inline]
     pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<Arc<RwLock<User>>> {

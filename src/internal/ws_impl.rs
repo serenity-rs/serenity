@@ -5,7 +5,7 @@ use websocket::message::{Message as WsMessage, Type as WsType};
 use websocket::stream::WebSocketStream;
 use websocket::ws::receiver::Receiver as WsReceiver;
 use websocket::ws::sender::Sender as WsSender;
-use ::client::gateway::GatewayError;
+use ::gateway::GatewayError;
 use ::internal::prelude::*;
 
 pub trait ReceiverExt {

@@ -1,0 +1,23 @@
+{
+  "type": 7,
+  "tts": false,
+  "timestamp": "2017-01-01T12:00:00.000000+00:00",
+  "pinned": false,
+  "nonce": null,
+  "mentions": [],
+  "mention_roles": [],
+  "mention_everyone": false,
+  "id": "123132131321321",
+  "embeds": [],
+  "edited_timestamp": null,
+  "content": "",
+  "channel_id": "321",
+  "author": {
+    "username": "aaa",
+    "id": "123",
+    "discriminator": "0123",
+    "bot": true,
+    "avatar": "u9aosdu9anbsduas8"
+  },
+  "attachments": []
+}

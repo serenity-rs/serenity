@@ -23,7 +23,7 @@ use ::internal::prelude::*;
 /// [`Context::edit_channel`]: ../client/struct.Context.html#method.edit_channel
 /// [`GuildChannel`]: ../model/struct.GuildChannel.html
 /// [`GuildChannel::edit`]: ../model/struct.GuildChannel.html#method.edit
-#[derive(Default)]
+#[derive(Clone, Debug, Default)]
 pub struct EditChannel(pub JsonMap);
 
 impl EditChannel {
@@ -31,7 +31,7 @@ impl EditChannel {
     ///
     /// This is for [voice] channels only.
     ///
-    /// [voice]: ../../model/enum.ChannelType.html#variant.Voice
+    /// [voice]: ../model/enum.ChannelType.html#variant.Voice
     pub fn bitrate(mut self, bitrate: u64) -> Self {
         self.0.insert("bitrate".to_owned(), Value::Number(Number::from(bitrate)));
 
@@ -60,7 +60,7 @@ impl EditChannel {
     ///
     /// This is for [text] channels only.
     ///
-    /// [text]: ../../model/enum.ChannelType.html#variant.Text
+    /// [text]: ../model/enum.ChannelType.html#variant.Text
     pub fn topic(mut self, topic: &str) -> Self {
         self.0.insert("topic".to_owned(), Value::String(topic.to_owned()));
 
@@ -71,7 +71,7 @@ impl EditChannel {
     ///
     /// This is for [voice] channels only.
     ///
-    /// [voice]: ../../model/enum.ChannelType.html#variant.Voice
+    /// [voice]: ../model/enum.ChannelType.html#variant.Voice
     pub fn user_limit(mut self, user_limit: u64) -> Self {
         self.0.insert("user_limit".to_owned(), Value::Number(Number::from(user_limit)));
 

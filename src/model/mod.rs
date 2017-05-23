@@ -2,16 +2,16 @@
 //! ease of use.
 //!
 //! Models can optionally have additional helper methods compiled, by enabling
-//! the `methods` feature.
+//! the `model` feature.
 //!
 //! Methods like [`Message::delete`] or [`Webhook::execute`] are provided with
 //! this feature, which can be shorthands for operations that are otherwise in
-//! the [`Context`], or the much lower-level [`rest`] module.
+//! the [`Context`], or the much lower-level [`http`] module.
 //!
 //! [`Context`]: ../client/struct.Context.html
 //! [`Message::delete`]: struct.Message.html#method.delete
 //! [`Webhook::execute`]: struct.Webhook.html#method.execute
-//! [`rest`]: ../client/rest/index.html
+//! [`http`]: ../http/index.html
 
 #[macro_use]
 mod utils;
@@ -20,6 +20,7 @@ pub mod event;
 pub mod permissions;
 
 mod channel;
+mod error;
 mod gateway;
 mod guild;
 mod invite;
@@ -29,6 +30,7 @@ mod voice;
 mod webhook;
 
 pub use self::channel::*;
+pub use self::error::Error as ModelError;
 pub use self::gateway::*;
 pub use self::guild::*;
 pub use self::invite::*;
@@ -45,6 +47,8 @@ use std::fmt::{Formatter, Result as FmtResult};
 use std::sync::{Arc, RwLock};
 use time::Timespec;
 use ::internal::prelude::*;
+
+#[cfg(feature="utils")]
 use ::utils::Colour;
 
 fn default_true() -> bool { true }
@@ -117,44 +121,12 @@ id! {
 /// This is used to differentiate whether a guild itself can be used or whether
 /// a guild needs to be retrieved from the cache.
 #[allow(large_enum_variant)]
+#[derive(Clone, Debug)]
 pub enum GuildContainer {
     /// A guild which can have its contents directly searched.
     Guild(PartialGuild),
     /// A guild's id, which can be used to search the cache for a guild.
     Id(GuildId),
-}
-
-/// Denotes the target for a search.
-///
-/// This can be either a [`Guild`] - which can search multiple [`Channel`]s -
-/// or a `Channel`.
-///
-/// [`Channel`]: enum.Channel.html
-/// [`Guild`]: struct.Guild.html
-#[derive(Copy, Clone, Debug)]
-pub enum SearchTarget {
-    /// An indicator that the target for a [`Search`] is a [`Channel`].
-    ///
-    /// [`Channel`]: enum.Channel.html
-    /// [`Search`]: struct.Search.html
-    Channel(ChannelId),
-    /// An indicator that the target for a [`Search`] is a [`Guild`].
-    ///
-    /// [`Guild`]: struct.Guild.html
-    /// [`Search`]: struct.Search.html
-    Guild(GuildId),
-}
-
-impl From<ChannelId> for SearchTarget {
-    fn from(channel_id: ChannelId) -> SearchTarget {
-        SearchTarget::Channel(channel_id)
-    }
-}
-
-impl From<GuildId> for SearchTarget {
-    fn from(guild_id: GuildId) -> SearchTarget {
-        SearchTarget::Guild(guild_id)
-    }
 }
 
 /// Information about a user's application. An application does not necessarily

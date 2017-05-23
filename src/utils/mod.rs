@@ -1,16 +1,15 @@
 //! A set of utilities to help with common use cases that are not required to
 //! fully use the library.
 
-#[macro_use]
-pub mod macros;
-
-pub mod builder;
-
 mod colour;
 
 mod message_builder;
 
 pub use self::colour::Colour;
+
+// Note: Here for BC purposes.
+#[cfg(feature="builder")]
+pub use super::builder;
 
 use base64;
 use std::ffi::OsStr;

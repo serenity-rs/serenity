@@ -16,14 +16,14 @@ use ::internal::prelude::*;
 /// payload of [`Webhook::execute`]:
 ///
 /// ```rust,ignore
-/// use serenity::client::rest;
+/// use serenity::http;
 /// use serenity::model::Embed;
 /// use serenity::utils::Colour;
 ///
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 ///
-/// let webhook = rest::get_webhook_with_token(id, token)
+/// let webhook = http::get_webhook_with_token(id, token)
 ///     .expect("valid webhook");
 ///
 /// let website = Embed::fake(|e| e
@@ -49,9 +49,10 @@ use ::internal::prelude::*;
 ///     .embeds(vec![website, resources]));
 /// ```
 ///
-/// [`Webhook`]: ../../model/struct.Webhook.html
-/// [`Webhook::execute`]: ../../model/struct.Webhook.html#method.execute
-/// [`execute_webhook`]: ../../client/rest/fn.execute_webhook.html
+/// [`Webhook`]: ../model/struct.Webhook.html
+/// [`Webhook::execute`]: ../model/struct.Webhook.html#method.execute
+/// [`execute_webhook`]: ../http/fn.execute_webhook.html
+#[derive(Clone, Debug)]
 pub struct ExecuteWebhook(pub JsonMap);
 
 impl ExecuteWebhook {
@@ -84,8 +85,8 @@ impl ExecuteWebhook {
     /// Refer to the [struct-level documentation] for an example on how to use
     /// embeds.
     ///
-    /// [`Embed::fake`]: ../../model/struct.Embed.html#method.fake
-    /// [`Webhook::execute`]: ../../model/struct.Webhook.html#method.execute
+    /// [`Embed::fake`]: ../model/struct.Embed.html#method.fake
+    /// [`Webhook::execute`]: ../model/struct.Webhook.html#method.execute
     /// [struct-level documentation]: #examples
     pub fn embeds(mut self, embeds: Vec<Value>) -> Self {
         self.0.insert("embeds".to_owned(), Value::Array(embeds));
@@ -117,7 +118,7 @@ impl Default for ExecuteWebhook {
     /// there is a bug that Discord defaults `tts` to `true`, at least
     /// serenity won't be a part of it.
     ///
-    /// [`Webhook`]: ../../model/struct.Webhook.html
+    /// [`Webhook`]: ../model/struct.Webhook.html
     /// [`tts`]: #method.tts
     fn default() -> ExecuteWebhook {
         let mut map = Map::new();

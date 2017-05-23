@@ -1,6 +1,8 @@
 use std::result::Result as StdResult;
 use std::str::FromStr;
 use super::*;
+
+#[cfg(feature="utils")]
 use ::utils;
 
 /// Allows something - such as a channel or role - to be mentioned in a message.
@@ -68,7 +70,7 @@ impl Mentionable for User {
     }
 }
 
-#[cfg(feature="cache")]
+#[cfg(all(feature="cache", feature="utils"))]
 impl FromStr for User {
     type Err = ();
 
@@ -85,6 +87,7 @@ impl FromStr for User {
     }
 }
 
+#[cfg(all(feature="model", feature="utils"))]
 impl FromStr for UserId {
     type Err = ();
 
@@ -93,7 +96,7 @@ impl FromStr for UserId {
     }
 }
 
-#[cfg(feature="cache")]
+#[cfg(all(feature="cache", feature="utils"))]
 impl FromStr for Role {
     type Err = ();
 
@@ -110,6 +113,7 @@ impl FromStr for Role {
     }
 }
 
+#[cfg(all(feature="model", feature="utils"))]
 impl FromStr for RoleId {
     type Err = ();
 
@@ -128,6 +132,7 @@ pub struct EmojiIdentifier {
     pub name: String,
 }
 
+#[cfg(all(feature="model", feature="utils"))]
 impl EmojiIdentifier {
     /// Generates a URL to the emoji's image.
     #[inline]
@@ -136,6 +141,7 @@ impl EmojiIdentifier {
     }
 }
 
+#[cfg(all(feature="model", feature="utils"))]
 impl FromStr for EmojiIdentifier {
     type Err = ();
 
@@ -144,6 +150,7 @@ impl FromStr for EmojiIdentifier {
     }
 }
 
+#[cfg(all(feature="model", feature="utils"))]
 impl FromStr for ChannelId {
     type Err = ();
 
@@ -152,7 +159,7 @@ impl FromStr for ChannelId {
     }
 }
 
-#[cfg(feature="cache")]
+#[cfg(all(feature="cache", feature="model", feature="utils"))]
 impl FromStr for Channel {
     type Err = ();
 

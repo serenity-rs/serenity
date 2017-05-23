@@ -2,8 +2,8 @@ use std::sync::{Arc, Mutex, RwLock};
 use std::thread;
 use super::event_store::EventStore;
 use super::Context;
-use super::gateway::Shard;
 use typemap::ShareMap;
+use ::gateway::Shard;
 use ::model::event::Event;
 use ::model::{ChannelId, Message};
 
@@ -108,10 +108,14 @@ pub fn dispatch(event: Event,
 }
 
 fn dispatch_message(context: Context,
-                    message: Message,
+                    mut message: Message,
                     event_store: &Arc<RwLock<EventStore>>) {
     if let Some(handler) = handler!(on_message, event_store) {
-        thread::spawn(move || (handler)(context, message));
+        thread::spawn(move || {
+            message.transform_content();
+
+            (handler)(context, message);
+        });
     }
 }
 

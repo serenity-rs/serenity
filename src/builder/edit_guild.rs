@@ -7,11 +7,11 @@ use ::model::{ChannelId, Region, UserId, VerificationLevel};
 /// **Note**: Editing a guild requires that the current user have the
 /// [Manage Guild] permission.
 ///
-/// [`Context::edit_guild`]: ../../client/struct.Context.html
-/// [`Guild`]: ../../model/struct.Guild.html
-/// [`LiveGuild::edit`]: ../../model/struct.LiveGuild.html#method.edit
-/// [Manage Guild]: ../../model/permissions/constant.MANAGE_GUILD.html
-#[derive(Default)]
+/// [`Context::edit_guild`]: ../client/struct.Context.html
+/// [`Guild`]: ../model/struct.Guild.html
+/// [`LiveGuild::edit`]: ../model/struct.LiveGuild.html#method.edit
+/// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
+#[derive(Clone, Debug, Default)]
 pub struct EditGuild(pub Map<String, Value>);
 
 impl EditGuild {
@@ -60,7 +60,7 @@ impl EditGuild {
     /// let _ = guild.edit(|g| g.icon(base64_icon));
     /// ```
     ///
-    /// [`utils::read_image`]: ../../utils/fn.read_image.html
+    /// [`utils::read_image`]: ../utils/fn.read_image.html
     pub fn icon(mut self, icon: Option<&str>) -> Self {
         self.0.insert("icon".to_owned(), icon.map_or_else(|| Value::Null, |x| Value::String(x.to_owned())));
 
@@ -101,7 +101,7 @@ impl EditGuild {
     /// }
     /// ```
     ///
-    /// [`Region::UsWest`]: ../../model/enum.Region.html#variant.UsWest
+    /// [`Region::UsWest`]: ../model/enum.Region.html#variant.UsWest
     pub fn region(mut self, region: Region) -> Self {
         self.0.insert("region".to_owned(), Value::String(region.name().to_owned()));
 
@@ -113,8 +113,8 @@ impl EditGuild {
     /// Requires that the guild have the [`InviteSplash`] feature enabled.
     /// You can check this through a guild's [`features`] list.
     ///
-    /// [`InviteSplash`]: ../../model/enum.Feature.html#variant.InviteSplash
-    /// [`features`]: ../../model/struct.LiveGuild.html#structfield.features
+    /// [`InviteSplash`]: ../model/enum.Feature.html#variant.InviteSplash
+    /// [`features`]: ../model/struct.LiveGuild.html#structfield.features
     pub fn splash(mut self, splash: Option<&str>) -> Self {
         let splash = splash.map_or(Value::Null, |x| Value::String(x.to_owned()));
 
@@ -129,7 +129,6 @@ impl EditGuild {
     /// Refer to the documentation for [`VerificationLevel`] for more
     /// information on each variant.
     ///
-    /// [`VerificationLevel`]: ../../model/enum.VerificationLevel.html
     ///
     /// # Examples
     ///
@@ -152,8 +151,8 @@ impl EditGuild {
     /// }
     /// ```
     ///
-    /// [`VerificationLevel`]: ../../model/enum.VerificationLevel.html
-    /// [`VerificationLevel::High`]: ../../model/enum.VerificationLevel.html#variant.High
+    /// [`VerificationLevel`]: ../model/enum.VerificationLevel.html
+    /// [`VerificationLevel::High`]: ../model/enum.VerificationLevel.html#variant.High
     pub fn verification_level<V>(mut self, verification_level: V) -> Self
         where V: Into<VerificationLevel> {
         let num = Value::Number(Number::from(verification_level.into().num()));

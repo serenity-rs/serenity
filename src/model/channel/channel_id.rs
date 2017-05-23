@@ -1,12 +1,15 @@
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 use std::io::Read;
-use ::client::rest;
 use ::model::*;
-use ::utils::builder::{CreateMessage, EditChannel, GetMessages};
 
+#[cfg(feature="model")]
+use ::builder::{CreateMessage, EditChannel, GetMessages};
 #[cfg(feature="cache")]
-use ::client::CACHE;
+use ::CACHE;
+#[cfg(feature="model")]
+use ::http;
 
+#[cfg(feature="model")]
 impl ChannelId {
     /// Broadcasts that the current user is typing to a channel for the next 5
     /// seconds.
@@ -30,7 +33,7 @@ impl ChannelId {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
     pub fn broadcast_typing(&self) -> Result<()> {
-        rest::broadcast_typing(self.0)
+        http::broadcast_typing(self.0)
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -60,7 +63,7 @@ impl ChannelId {
             "type": kind,
         });
 
-        rest::create_permission(self.0, id, &map)
+        http::create_permission(self.0, id, &map)
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -78,13 +81,13 @@ impl ChannelId {
     #[inline]
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R)
         -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
-        rest::create_reaction(self.0, message_id.into().0, &reaction_type.into())
+        http::create_reaction(self.0, message_id.into().0, &reaction_type.into())
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
     #[inline]
     pub fn delete(&self) -> Result<Channel> {
-        rest::delete_channel(self.0)
+        http::delete_channel(self.0)
     }
 
     /// Deletes a [`Message`] given its Id.
@@ -99,7 +102,7 @@ impl ChannelId {
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
     pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        rest::delete_message(self.0, message_id.into().0)
+        http::delete_message(self.0, message_id.into().0)
     }
 
     /// Deletes all messages by Ids from the given vector in the given channel.
@@ -125,7 +128,7 @@ impl ChannelId {
             "messages": ids
         });
 
-        rest::delete_messages(self.0, &map)
+        http::delete_messages(self.0, &map)
     }
 
     /// Deletes all permission overrides in the channel from a member or role.
@@ -134,7 +137,7 @@ impl ChannelId {
     ///
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
     pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
-        rest::delete_permission(self.0, match permission_type {
+        http::delete_permission(self.0, match permission_type {
             PermissionOverwriteType::Member(id) => id.0,
             PermissionOverwriteType::Role(id) => id.0,
         })
@@ -149,7 +152,7 @@ impl ChannelId {
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn delete_reaction<M, R>(&self, message_id: M, user_id: Option<UserId>, reaction_type: R)
         -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
-        rest::delete_reaction(self.0,
+        http::delete_reaction(self.0,
                               message_id.into().0,
                               user_id.map(|uid| uid.0),
                               &reaction_type.into())
@@ -172,17 +175,11 @@ impl ChannelId {
     /// channel_id.edit(|c| c.name("test").bitrate(64000));
     /// ```
     ///
-    /// # Errors
-    ///
-    /// Returns a [`ClientError::NoChannelId`] if the current context is not
-    /// related to a channel.
-    ///
     /// [`Channel`]: enum.Channel.html
-    /// [`ClientError::NoChannelId`]: ../client/enum.ClientError.html#variant.NoChannelId
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
     pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel> {
-        rest::edit_channel(self.0, &f(EditChannel::default()).0)
+        http::edit_channel(self.0, &f(EditChannel::default()).0)
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -196,14 +193,14 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over the [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../utils/builder/struct.CreateMessage.html#method.content
+    /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
         let map = f(CreateMessage::default()).0;
@@ -211,12 +208,12 @@ impl ChannelId {
         if let Some(content) = map.get("content") {
             if let Value::String(ref content) = *content {
                 if let Some(length_over) = Message::overflow_length(content) {
-                    return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+                    return Err(Error::Model(ModelError::MessageTooLong(length_over)));
                 }
             }
         }
 
-        rest::edit_message(self.0, message_id.into().0, &Value::Object(map))
+        http::edit_message(self.0, message_id.into().0, &Value::Object(map))
     }
 
     /// Search the cache for the channel with the Id.
@@ -235,7 +232,7 @@ impl ChannelId {
             }
         }
 
-        rest::get_channel(self.0)
+        http::get_channel(self.0)
     }
 
     /// Gets all of the channel's invites.
@@ -244,7 +241,7 @@ impl ChannelId {
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
     pub fn invites(&self) -> Result<Vec<RichInvite>> {
-        rest::get_channel_invites(self.0)
+        http::get_channel_invites(self.0)
     }
 
     /// Gets a message from the channel.
@@ -254,7 +251,12 @@ impl ChannelId {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        rest::get_message(self.0, message_id.into().0)
+        http::get_message(self.0, message_id.into().0)
+            .map(|mut msg| {
+                msg.transform_content();
+
+                msg
+            })
     }
 
     /// Gets messages from the channel.
@@ -278,7 +280,14 @@ impl ChannelId {
             write!(query, "&before={}", before)?;
         }
 
-        rest::get_messages(self.0, &query)
+        http::get_messages(self.0, &query)
+            .map(|msgs| msgs
+                .into_iter()
+                .map(|mut msg| {
+                    msg.transform_content();
+
+                    msg
+                }).collect::<Vec<Message>>())
     }
 
     /// Pins a [`Message`] to the channel.
@@ -286,7 +295,7 @@ impl ChannelId {
     /// [`Message`]: struct.Message.html
     #[inline]
     pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        rest::pin_message(self.0, message_id.into().0)
+        http::pin_message(self.0, message_id.into().0)
     }
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
@@ -294,7 +303,7 @@ impl ChannelId {
     /// [`Message`]: struct.Message.html
     #[inline]
     pub fn pins(&self) -> Result<Vec<Message>> {
-        rest::get_pins(self.0)
+        http::get_pins(self.0)
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
@@ -317,7 +326,7 @@ impl ChannelId {
         -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
         let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
 
-        rest::get_reaction_users(self.0,
+        http::get_reaction_users(self.0,
                                  message_id.into().0,
                                  &reaction_type.into(),
                                  limit,
@@ -328,12 +337,12 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ChannelId`]: ../model/struct.ChannelId.html
-    /// [`ClientError::MessageTooLong`]: enum.ClientError.html#variant.MessageTooLong
+    /// [`ChannelId`]: struct.ChannelId.html
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
     pub fn say(&self, content: &str) -> Result<Message> {
         self.send_message(|m| m.content(content))
@@ -370,11 +379,11 @@ impl ChannelId {
     /// # Errors
     ///
     /// If the content of the message is over the above limit, then a
-    /// [`ClientError::MessageTooLong`] will be returned, containing the number
+    /// [`ModelError::MessageTooLong`] will be returned, containing the number
     /// of unicode code points over the limit.
     ///
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    /// [`CreateMessage::content`]: ../utils/builder/struct.CreateMessage.html#method.content
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    /// [`CreateMessage::content`]: ../builder/struct.CreateMessage.html#method.content
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
@@ -385,14 +394,14 @@ impl ChannelId {
         if let Some(content) = map.get("content") {
             if let Value::String(ref content) = *content {
                 if let Some(length_over) = Message::overflow_length(content) {
-                    return Err(Error::Client(ClientError::MessageTooLong(length_over)));
+                    return Err(Error::Model(ModelError::MessageTooLong(length_over)));
                 }
             }
         }
 
         let _ = map.remove("embed");
 
-        rest::send_file(self.0, file, filename, map)
+        http::send_file(self.0, file, filename, map)
     }
 
     /// Sends a message to the channel.
@@ -406,13 +415,13 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::MessageTooLong`] if the content of the message
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
     /// [`Channel`]: enum.Channel.html
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../utils/builder/struct.CreateMessage.html
+    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn send_message<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
@@ -421,7 +430,7 @@ impl ChannelId {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        rest::send_message(self.0, &Value::Object(map))
+        http::send_message(self.0, &Value::Object(map))
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.
@@ -432,7 +441,7 @@ impl ChannelId {
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        rest::unpin_message(self.0, message_id.into().0)
+        http::unpin_message(self.0, message_id.into().0)
     }
 
     /// Retrieves the channel's webhooks.
@@ -442,7 +451,7 @@ impl ChannelId {
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        rest::get_channel_webhooks(self.0)
+        http::get_channel_webhooks(self.0)
     }
 
     /// Alias of [`invites`].

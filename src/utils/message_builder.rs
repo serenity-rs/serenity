@@ -28,6 +28,7 @@ use ::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 /// [`build`]: #method.build
 /// [`emoji`]: #method.emoji
 /// [`user`]: #method.user
+#[derive(Clone, Debug, Default)]
 pub struct MessageBuilder(pub String);
 
 impl MessageBuilder {
@@ -287,12 +288,6 @@ impl MessageBuilder {
 impl fmt::Display for MessageBuilder {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.0, f)
-    }
-}
-
-impl Default for MessageBuilder {
-    fn default() -> MessageBuilder {
-        MessageBuilder(String::default())
     }
 }
 

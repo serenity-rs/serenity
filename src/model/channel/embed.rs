@@ -1,6 +1,10 @@
-use ::utils::builder::CreateEmbed;
-use ::utils::Colour;
 use ::internal::prelude::*;
+
+#[cfg(feature="utils")]
+use ::utils::Colour;
+
+#[cfg(feature="model")]
+use ::builder::CreateEmbed;
 
 /// Represents a rich embed which allows using richer markdown, multiple fields
 /// and more. This was heavily inspired by [slack's attachments].
@@ -17,8 +21,13 @@ pub struct Embed {
     /// Information about the author of the embed.
     pub author: Option<EmbedAuthor>,
     /// The colour code of the embed.
+    #[cfg(feature="utils")]
     #[serde(default, rename="color")]
     pub colour: Colour,
+    /// The colour code of the embed.
+    #[cfg(not(feature="utils"))]
+    #[serde(default, rename="color")]
+    pub colour: u32,
     /// The description of the embed.
     ///
     /// The maximum value for this field is 2048 unicode codepoints.
@@ -53,6 +62,7 @@ pub struct Embed {
     pub video: Option<EmbedVideo>,
 }
 
+#[cfg(feature="model")]
 impl Embed {
     /// Creates a fake Embed, giving back a `serde_json` map.
     ///

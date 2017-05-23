@@ -1,3 +1,4 @@
+use std::error::Error as StdError;
 use std::fmt::{self, Display};
 
 /// An error that occurred while attempting to deal with the gateway.
@@ -6,12 +7,16 @@ use std::fmt::{self, Display};
 /// you manually handle these.
 #[derive(Clone, Debug)]
 pub enum Error {
+    /// There was an error building a URL.
+    BuildingUrl,
     /// The connection closed, potentially uncleanly.
     Closed(Option<u16>, String),
     /// Expected a Hello during a handshake
     ExpectedHello,
     /// Expected a Ready or an InvalidateSession
     InvalidHandshake,
+    /// An indicator that an unknown opcode was received from the gateway.
+    InvalidOpCode,
     /// When a session Id was expected (for resuming), but was not present.
     NoSessionId,
     /// Failed to reconnect after a number of attempts.
@@ -20,14 +25,20 @@ pub enum Error {
 
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.write_str(self.description())
+    }
+}
+
+impl StdError for Error {
+    fn description(&self) -> &str {
         match *self {
-            Error::Closed(s, ref v) => {
-                f.write_str(&format!("Connection closed {:?}: {:?}", s, v))
-            },
-            Error::ExpectedHello => f.write_str("Expected Hello during handshake"),
-            Error::InvalidHandshake => f.write_str("Expected Ready or InvalidateSession"),
-            Error::NoSessionId => f.write_str("No Session Id present"),
-            Error::ReconnectFailure => f.write_str("Failed to Reconnect"),
+            Error::BuildingUrl => "Error building url",
+            Error::Closed(_, _) => "Connection closed",
+            Error::ExpectedHello => "Expected a Hello",
+            Error::InvalidHandshake => "Expected a valid Handshake",
+            Error::InvalidOpCode => "Invalid OpCode",
+            Error::NoSessionId => "No Session Id present when required",
+            Error::ReconnectFailure => "Failed to Reconnect",
         }
     }
 }

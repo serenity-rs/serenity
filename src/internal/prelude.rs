@@ -8,5 +8,7 @@ pub type JsonMap = Map<String, Value>;
 
 pub use serde_json::{Map, Number, Value};
 pub use std::result::Result as StdResult;
-pub use ::client::ClientError;
 pub use ::error::{Error, Result};
+
+#[cfg(feature="client")]
+pub use ::client::ClientError;

@@ -17,13 +17,15 @@ pub use self::role::*;
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::*;
-use ::client::rest;
 use ::constants::LARGE_THRESHOLD;
 use ::model::*;
-use ::utils::builder::{EditGuild, EditMember, EditRole};
 
 #[cfg(feature="cache")]
-use ::client::CACHE;
+use ::CACHE;
+#[cfg(feature="http")]
+use ::http;
+#[cfg(feature="model")]
+use ::builder::{EditGuild, EditMember, EditRole};
 
 /// A representation of a banning of a user.
 #[derive(Clone, Debug, Deserialize)]
@@ -118,12 +120,13 @@ pub struct Guild {
     pub voice_states: HashMap<UserId, VoiceState>,
 }
 
+#[cfg(feature="model")]
 impl Guild {
     #[cfg(feature="cache")]
     fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
         let member = match self.members.get(&CACHE.read().unwrap().user.id) {
             Some(member) => member,
-            None => return Err(Error::Client(ClientError::ItemMissing)),
+            None => return Err(Error::Model(ModelError::ItemMissing)),
         };
 
         let perms = self.permissions_for(ChannelId(self.id.0), member.user.read().unwrap().id);
@@ -150,21 +153,21 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::InvalidPermissions`] if the current user does
+    /// Returns a [`ModelError::InvalidPermissions`] if the current user does
     /// not have permission to perform bans.
     ///
-    /// Returns a [`ClientError::DeleteMessageDaysAmount`] if the number of
+    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
     /// days' worth of messages to delete is over the maximum.
     ///
-    /// [`ClientError::DeleteMessageDaysAmount`]: ../client/enum.ClientError.html#variant.DeleteMessageDaysAmount
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::DeleteMessageDaysAmount`]: enum.ModelError.html#variant.DeleteMessageDaysAmount
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`Guild::ban`]: struct.Guild.html#method.ban
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8)
         -> Result<()> {
         if delete_message_days > 7 {
-            return Err(Error::Client(ClientError::DeleteMessageDaysAmount(delete_message_days)));
+            return Err(Error::Model(ModelError::DeleteMessageDaysAmount(delete_message_days)));
         }
 
         #[cfg(feature="cache")]
@@ -172,7 +175,7 @@ impl Guild {
             let req = permissions::BAN_MEMBERS;
 
             if !self.has_perms(req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
@@ -185,11 +188,11 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
     /// [`Ban`]: struct.Ban.html
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     pub fn bans(&self) -> Result<Vec<Ban>> {
         #[cfg(feature="cache")]
@@ -197,7 +200,7 @@ impl Guild {
             let req = permissions::BAN_MEMBERS;
 
             if !self.has_perms(req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
@@ -234,7 +237,7 @@ impl Guild {
     ///
     /// [`Guild`]: struct.Guild.html
     /// [`PartialGuild`]: struct.PartialGuild.html
-    /// [`Shard`]: ../client/gateway/struct.Shard.html
+    /// [`Shard`]: ../gateway/struct.Shard.html
     /// [US West region]: enum.Region.html#variant.UsWest
     /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
     pub fn create(name: &str, region: Region, icon: Option<&str>) -> Result<PartialGuild> {
@@ -244,7 +247,7 @@ impl Guild {
             "region": region.name(),
         });
 
-        rest::create_guild(&map)
+        http::create_guild(&map)
     }
 
     /// Creates a new [`Channel`] in the guild.
@@ -263,11 +266,11 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
     /// [`Channel`]: struct.Channel.html
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     pub fn create_channel(&mut self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
         #[cfg(feature="cache")]
@@ -275,7 +278,7 @@ impl Guild {
             let req = permissions::MANAGE_CHANNELS;
 
             if !self.has_perms(req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
@@ -298,8 +301,8 @@ impl Guild {
     /// how to read an image from the filesystem and encode it as base64. Most
     /// of the example can be applied similarly for this method.
     ///
-    /// [`EditProfile::avatar`]: ../utils/builder/struct.EditProfile.html#method.avatar
-    /// [`utils::read_image`]: ../utils/fn.read_image.html
+    /// [`EditProfile::avatar`]: ../builder/struct.EditProfile.html#method.avatar
+    /// [`utils::read_image`]: ../fn.read_image.html
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     #[inline]
     pub fn create_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
@@ -333,10 +336,10 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`Context::create_role`]: ../client/struct.Context.html#method.create_role
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
@@ -347,7 +350,7 @@ impl Guild {
             let req = permissions::MANAGE_ROLES;
 
             if !self.has_perms(req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
@@ -361,17 +364,17 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, then returns a [`ClientError::InvalidUser`]
+    /// If the `cache` is enabled, then returns a [`ModelError::InvalidUser`]
     /// if the current user is not the guild owner.
     ///
-    /// [`ClientError::InvalidUser`]: ../client/enum.ClientError.html#variant.InvalidUser
+    /// [`ModelError::InvalidUser`]: enum.ModelError.html#variant.InvalidUser
     pub fn delete(&self) -> Result<PartialGuild> {
         #[cfg(feature="cache")]
         {
             if self.owner_id != CACHE.read().unwrap().user.id {
                 let req = permissions::MANAGE_GUILD;
 
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
@@ -437,10 +440,10 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`Context::edit_guild`]: ../client/struct.Context.html#method.edit_guild
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn edit<F>(&mut self, f: F) -> Result<()>
@@ -450,7 +453,7 @@ impl Guild {
             let req = permissions::MANAGE_GUILD;
 
             if !self.has_perms(req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
@@ -518,11 +521,11 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to change their own
     /// nickname.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
     pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
         #[cfg(feature="cache")]
@@ -530,7 +533,7 @@ impl Guild {
             let req = permissions::CHANGE_NICKNAME;
 
             if !self.has_perms(req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
@@ -604,10 +607,10 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn invites(&self) -> Result<Vec<RichInvite>> {
         #[cfg(feature="cache")]
@@ -615,7 +618,7 @@ impl Guild {
             let req = permissions::MANAGE_GUILD;
 
             if !self.has_perms(req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
@@ -850,10 +853,10 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
@@ -863,7 +866,7 @@ impl Guild {
             let req = permissions::KICK_MEMBERS;
 
             if !self.has_perms(req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
@@ -880,7 +883,7 @@ impl Guild {
     /// total, consider using [`utils::shard_id`].
     ///
     /// [`utils::shard_id`]: ../utils/fn.shard_id.html
-    #[cfg(feature="cache")]
+    #[cfg(all(feature="cache", feature="utils"))]
     #[inline]
     pub fn shard_id(&self) -> u64 {
         self.id.shard_id()
@@ -906,7 +909,7 @@ impl Guild {
     ///
     /// assert_eq!(guild.shard_id(17), 7);
     /// ```
-    #[cfg(not(feature="cache"))]
+    #[cfg(all(feature="utils", not(feature="cache")))]
     #[inline]
     pub fn shard_id(&self, shard_count: u64) -> u64 {
         self.id.shard_id(shard_count)
@@ -936,10 +939,10 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
@@ -949,7 +952,7 @@ impl Guild {
             let req = permissions::KICK_MEMBERS;
 
             if !self.has_perms(req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
@@ -962,10 +965,10 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ClientError::InvalidPermissions`]
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ClientError::InvalidPermissions`]: ../client/enum.ClientError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
@@ -974,7 +977,7 @@ impl Guild {
             let req = permissions::BAN_MEMBERS;
 
             if !self.has_perms(req)? {
-                return Err(Error::Client(ClientError::InvalidPermissions(req)));
+                return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
@@ -1223,7 +1226,7 @@ impl<'de> Deserialize<'de> for Guild {
 }
 
 /// Information relating to a guild's widget embed.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize)]
 pub struct GuildEmbed {
     /// The Id of the channel to show the embed for.
     pub channel_id: ChannelId,
@@ -1258,6 +1261,7 @@ pub struct GuildInfo {
     pub permissions: Permissions,
 }
 
+#[cfg(any(feature="model", feature="utils"))]
 impl GuildInfo {
     /// Returns the formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
@@ -1284,6 +1288,7 @@ impl From<u64> for GuildContainer {
     }
 }
 
+#[cfg(feature="model")]
 impl InviteGuild {
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
@@ -1314,6 +1319,7 @@ pub enum GuildStatus {
     Offline(GuildUnavailable),
 }
 
+#[cfg(feature="model")]
 impl GuildStatus {
     /// Retrieves the Id of the inner [`Guild`].
     ///

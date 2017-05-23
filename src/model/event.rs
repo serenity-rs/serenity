@@ -8,6 +8,9 @@ use super::*;
 use ::constants::{OpCode, VoiceOpCode};
 use ::internal::prelude::*;
 
+#[cfg(feature="gateway")]
+use ::gateway::GatewayError;
+
 /// Event data for the channel creation event.
 ///
 /// This is fired when:
@@ -76,17 +79,6 @@ impl<'de> Deserialize<'de> for ChannelUpdateEvent {
             channel: Channel::deserialize(deserializer)?,
         })
     }
-}
-
-#[derive(Clone, Debug, Deserialize)]
-pub struct FriendSuggestionCreateEvent {
-    pub reasons: Vec<SuggestionReason>,
-    pub suggested_user: User,
-}
-
-#[derive(Clone, Copy, Debug, Deserialize)]
-pub struct FriendSuggestionDeleteEvent {
-    pub suggested_user_id: UserId,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -463,6 +455,7 @@ pub enum GatewayEvent {
 }
 
 impl GatewayEvent {
+    #[cfg(feature="gateway")]
     pub fn decode(value: Value) -> Result<Self> {
         let mut map = JsonMap::deserialize(value)?;
 
@@ -503,7 +496,7 @@ impl GatewayEvent {
                 GatewayEvent::Hello(interval)
             },
             OpCode::HeartbeatAck => GatewayEvent::HeartbeatAck,
-            _ => return Err(Error::Client(ClientError::InvalidOpCode)),
+            _ => return Err(Error::Gateway(GatewayError::InvalidOpCode)),
         })
     }
 }
@@ -719,7 +712,7 @@ pub struct VoiceSpeaking {
 
 /// A representation of data received for [`voice`] events.
 ///
-/// [`voice`]: ../../ext/voice/index.html
+/// [`voice`]: ../../voice/index.html
 #[derive(Clone, Debug)]
 pub enum VoiceEvent {
     /// A voice heartbeat.
