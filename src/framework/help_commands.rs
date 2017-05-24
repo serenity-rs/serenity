@@ -146,7 +146,7 @@ pub fn with_embeds(ctx: &mut Context,
                 .description("To get help with an individual command, pass its \
                               name as an argument to this command.");
 
-            let mut group_names: Vec<_> = groups.keys().collect();
+            let mut group_names = groups.keys().collect::<Vec<_>>();
             group_names.sort();
 
             for group_name in group_names {
@@ -160,11 +160,12 @@ pub fn with_embeds(ctx: &mut Context,
                 let mut no_commands = true;
 
                 let commands = remove_aliases(&group.commands);
-                let mut command_names: Vec<_> = commands.keys().collect();
+                let mut command_names = commands.keys().collect::<Vec<_>>();
                 command_names.sort();
 
                 for name in command_names {
                     let cmd = &commands[name];
+                    
                     if cmd.help_available {
                         let _ = write!(desc, "`{}`\n", name);
 
@@ -264,7 +265,7 @@ pub fn plain(ctx: &mut Context,
                       name as an argument to this command.\n\n"
         .to_string();
 
-    let mut group_names: Vec<_> = groups.keys().collect();
+    let mut group_names = groups.keys().collect::<Vec<_>>();
     group_names.sort();
 
     for group_name in group_names {
@@ -278,11 +279,12 @@ pub fn plain(ctx: &mut Context,
         let mut no_commands = true;
 
         let commands = remove_aliases(&group.commands);
-        let mut command_names: Vec<_> = commands.keys().collect();
+        let mut command_names = commands.keys().collect::<Vec<_>>();
         command_names.sort();
         
         for name in command_names {
             let cmd = &commands[name];
+            
             if cmd.help_available {
                 let _ = write!(result, "`{}` ", name);
 
