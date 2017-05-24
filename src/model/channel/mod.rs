@@ -177,9 +177,8 @@ impl Channel {
     #[inline]
     pub fn is_nsfw(&self) -> bool {
         match *self {
-            Channel::Group(_) => false,
             Channel::Guild(ref channel) => channel.read().unwrap().is_nsfw(),
-            Channel::Private(_) => false,
+            Channel::Group(_) | Channel::Private(_) => false,
         }
     }
 

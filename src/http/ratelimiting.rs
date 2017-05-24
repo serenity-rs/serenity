@@ -379,7 +379,9 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
         // It _may_ be possible for the limit to be raised at any time,
         // so check if it did from the value of the 'x-ratelimit-limit'
         // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
-        if route != Route::None {
+        if route == Route::None {
+            return Ok(response);
+        } else {
             let redo = if response.headers.get_raw("x-ratelimit-global").is_some() {
                 let _ = GLOBAL.lock().expect("global route lock poisoned");
 
@@ -402,8 +404,6 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
             if !redo.unwrap_or(true) {
                 return Ok(response);
             }
-        } else {
-            return Ok(response);
         }
     }
 }
