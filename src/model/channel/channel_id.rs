@@ -425,12 +425,20 @@ impl ChannelId {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn send_message<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
-        let map = f(CreateMessage::default()).0;
+        let CreateMessage(map, reactions) = f(CreateMessage::default());
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http::send_message(self.0, &Value::Object(map))
+        let message = http::send_message(self.0, &Value::Object(map))?;
+            
+        if let Some(reactions) = reactions {
+            for reaction in reactions {
+                self.create_reaction(message.id, reaction)?;
+            }
+        }
+            
+        Ok(message)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.

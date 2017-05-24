@@ -1,4 +1,5 @@
 use super::CreateEmbed;
+use ::model::ReactionType;
 use ::internal::prelude::*;
 
 /// A builder to specify the contents of an [`http::send_message`] request,
@@ -37,7 +38,7 @@ use ::internal::prelude::*;
 /// [`embed`]: #method.embed
 /// [`http::send_message`]: ../http/fn.send_message.html
 #[derive(Clone, Debug)]
-pub struct CreateMessage(pub Map<String, Value>);
+pub struct CreateMessage(pub Map<String, Value>, pub Option<Vec<ReactionType>>);
 
 impl CreateMessage {
     /// Set the content of the message.
@@ -46,7 +47,7 @@ impl CreateMessage {
     pub fn content(mut self, content: &str) -> Self {
         self.0.insert("content".to_owned(), Value::String(content.to_owned()));
 
-        CreateMessage(self.0)
+        CreateMessage(self.0, self.1)
     }
 
     /// Set an embed for the message.
@@ -56,7 +57,7 @@ impl CreateMessage {
 
         self.0.insert("embed".to_owned(), embed);
 
-        CreateMessage(self.0)
+        CreateMessage(self.0, self.1)
     }
 
     /// Set whether the message is text-to-speech.
@@ -67,7 +68,14 @@ impl CreateMessage {
     pub fn tts(mut self, tts: bool) -> Self {
         self.0.insert("tts".to_owned(), Value::Bool(tts));
 
-        CreateMessage(self.0)
+        CreateMessage(self.0, self.1)
+    }
+
+    /// Adds a list of reactions to create after the message's sent.
+    pub fn reactions<R: Into<ReactionType>>(mut self, reactions: Vec<R>) -> Self {
+        self.1 = Some(reactions.into_iter().map(|r| r.into()).collect());
+
+        CreateMessage(self.0, self.1)
     }
 }
 
@@ -81,6 +89,6 @@ impl Default for CreateMessage {
         let mut map = Map::default();
         map.insert("tts".to_owned(), Value::Bool(false));
 
-        CreateMessage(map)
+        CreateMessage(map, None)
     }
 }
