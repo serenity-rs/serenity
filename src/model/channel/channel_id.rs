@@ -431,11 +431,13 @@ impl ChannelId {
         Message::check_embed_length(&map)?;
 
         let message = http::send_message(self.0, &Value::Object(map))?;
+            
         if let Some(reactions) = reactions {
             for reaction in reactions {
                 self.create_reaction(message.id, reaction)?;
             }
         }
+            
         Ok(message)
     }
 
