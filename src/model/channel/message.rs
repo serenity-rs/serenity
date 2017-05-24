@@ -575,23 +575,3 @@ enum_number!(
         MemberJoin = 7,
     }
 );
-
-/// An emoji reaction to a message.
-#[derive(Clone, Debug, Deserialize)]
-pub struct Reaction {
-    /// The [`Channel`] of the associated [`Message`].
-    ///
-    /// [`Channel`]: enum.Channel.html
-    /// [`Message`]: struct.Message.html
-    pub channel_id: ChannelId,
-    /// The reactive emoji used.
-    pub emoji: ReactionType,
-    /// The Id of the [`Message`] that was reacted to.
-    ///
-    /// [`Message`]: struct.Message.html
-    pub message_id: MessageId,
-    /// The Id of the [`User`] that sent the reaction.
-    ///
-    /// [`User`]: struct.User.html
-    pub user_id: UserId,
-}
