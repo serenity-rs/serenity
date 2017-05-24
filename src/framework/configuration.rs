@@ -29,37 +29,35 @@ use ::model::{GuildId, UserId};
 /// [`Framework`]: struct.Framework.html
 pub struct Configuration {
     #[doc(hidden)]
-    pub depth: usize,
-    #[doc(hidden)]
-    pub on_mention: Option<Vec<String>>,
+    pub allow_dm: bool,
     #[doc(hidden)]
     pub allow_whitespace: bool,
     #[doc(hidden)]
-    pub prefixes: Vec<String>,
+    pub blocked_guilds: HashSet<GuildId>,
+    #[doc(hidden)]
+    pub blocked_users: HashSet<UserId>,
+    #[doc(hidden)]
+    pub depth: usize,
+    #[doc(hidden)]
+    pub disabled_commands: HashSet<String>,
     #[doc(hidden)]
     pub dynamic_prefix: Option<Box<PrefixCheck>>,
     #[doc(hidden)]
     pub ignore_bots: bool,
     #[doc(hidden)]
-    pub blocked_users: HashSet<UserId>,
+    pub ignore_webhooks: bool,
     #[doc(hidden)]
-    pub blocked_guilds: HashSet<GuildId>,
+    pub on_mention: Option<Vec<String>>,
     #[doc(hidden)]
     pub owners: HashSet<UserId>,
     #[doc(hidden)]
-    pub disabled_commands: HashSet<String>,
-    #[doc(hidden)]
-    pub allow_dm: bool,
-    #[doc(hidden)]
-    pub ignore_webhooks: bool,
+    pub prefixes: Vec<String>,
 }
 
 impl Configuration {
-    /// Whether the bot should respond to other bots.
-    ///
-    /// For example, if this is set to false, then the bot will respond to any other bots including itself.
-    pub fn ignore_bots(mut self, ignore_bots: bool) -> Self {
-        self.ignore_bots = ignore_bots;
+    /// If set to false, bot will ignore any private messages.
+    pub fn allow_dm(mut self, allow_dm: bool) -> Self {
+        self.allow_dm = allow_dm;
 
         self
     }
@@ -94,17 +92,9 @@ impl Configuration {
         self
     }
 
-    /// If set to false, bot will ignore any private messages.
-    pub fn allow_dm(mut self, allow_dm: bool) -> Self {
-        self.allow_dm = allow_dm;
-
-        self
-    }
-
-    /// If set to true, bot will ignore all commands called by webhooks.
-    /// True by default.
-    pub fn ignore_webhooks(mut self, ignore_webhooks: bool) -> Self {
-        self.ignore_webhooks = ignore_webhooks;
+    /// HashSet of guild Ids where commands will be ignored.
+    pub fn blocked_guilds(mut self, guilds: HashSet<GuildId>) -> Self {
+        self.blocked_guilds = guilds;
 
         self
     }
@@ -113,13 +103,6 @@ impl Configuration {
     /// Guilds owned by user Ids will also be ignored.
     pub fn blocked_users(mut self, users: HashSet<UserId>) -> Self {
         self.blocked_users = users;
-
-        self
-    }
-
-    /// HashSet of guild Ids where commands will be ignored.
-    pub fn blocked_guilds(mut self, guilds: HashSet<GuildId>) -> Self {
-        self.blocked_guilds = guilds;
 
         self
     }
@@ -172,6 +155,23 @@ impl Configuration {
     pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
         where F: Fn(&mut Context) -> Option<String> + Send + Sync + 'static {
         self.dynamic_prefix = Some(Box::new(dynamic_prefix));
+
+        self
+    }
+
+    /// Whether the bot should respond to other bots.
+    ///
+    /// For example, if this is set to false, then the bot will respond to any other bots including itself.
+    pub fn ignore_bots(mut self, ignore_bots: bool) -> Self {
+        self.ignore_bots = ignore_bots;
+
+        self
+    }
+
+    /// If set to true, bot will ignore all commands called by webhooks.
+    /// True by default.
+    pub fn ignore_webhooks(mut self, ignore_webhooks: bool) -> Self {
+        self.ignore_webhooks = ignore_webhooks;
 
         self
     }

@@ -10,17 +10,17 @@ pub struct Ratelimit {
 
 #[doc(hidden)]
 pub struct MemberRatelimit {
-    pub tickets: i32,
     pub last_time: i64,
     pub set_time: i64,
+    pub tickets: i32,
 }
 
 impl Default for MemberRatelimit {
     fn default() -> Self {
         MemberRatelimit {
-            tickets: 0,
             last_time: 0,
             set_time: 0,
+            tickets: 0,
         }
     }
 }

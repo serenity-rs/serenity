@@ -9,25 +9,18 @@ use ::model::{Message, Permissions};
 pub struct CreateCommand(pub Command);
 
 impl CreateCommand {
-    /// Adds a ratelimit bucket.
-    pub fn bucket(mut self, bucket: &str) -> Self {
-        self.0.bucket = Some(bucket.to_owned());
-
-        self
-    }
-
-    /// Adds an alias, allowing users to use the command under a different name.
-    pub fn known_as(mut self, name: &str) -> Self {
-        self.0.aliases.push(name.to_owned());
-
-        self
-    }
-
     /// Adds multiple aliases.
     pub fn batch_known_as(mut self, names: Vec<&str>) -> Self {
         for n in names {
             self.0.aliases.push(n.to_owned());
         }
+
+        self
+    }
+
+    /// Adds a ratelimit bucket.
+    pub fn bucket(mut self, bucket: &str) -> Self {
+        self.0.bucket = Some(bucket.to_owned());
 
         self
     }
@@ -145,6 +138,13 @@ impl CreateCommand {
     /// Whether command should be displayed in help list or not, used by other commands.
     pub fn help_available(mut self, help_available: bool) -> Self {
         self.0.help_available = help_available;
+
+        self
+    }
+
+    /// Adds an alias, allowing users to use the command under a different name.
+    pub fn known_as(mut self, name: &str) -> Self {
+        self.0.aliases.push(name.to_owned());
 
         self
     }
