@@ -217,6 +217,16 @@ impl CreateEmbed {
 
         CreateEmbed(self.0)
     }
+
+    /// Same as calling [`image`] with "attachment://filename.(jpg, png)".
+    /// 
+    /// Note however, you have to be sure you set an attachment (with [`ChannelId::send_file`])
+    /// with the provided filename; Or else this won't work.
+    ///
+    /// [`ChannelId::send_file`]: ../model/struct.ChannelId.html#send_file
+    pub fn attachment(self, filename: &str) -> Self {
+        self.image(&format!("attachment://{}", filename))
+    }
 }
 
 impl Default for CreateEmbed {
