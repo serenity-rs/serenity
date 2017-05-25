@@ -146,7 +146,11 @@ pub fn with_embeds(ctx: &mut Context,
                 .description("To get help with an individual command, pass its \
                               name as an argument to this command.");
 
-            for (group_name, group) in groups {
+            let mut group_names = groups.keys().collect::<Vec<_>>();
+            group_names.sort();
+
+            for group_name in group_names {
+                let group = &groups[group_name];
                 let mut desc = String::new();
 
                 if let Some(ref x) = group.prefix {
@@ -155,9 +159,15 @@ pub fn with_embeds(ctx: &mut Context,
 
                 let mut no_commands = true;
 
-                for (n, cmd) in remove_aliases(&group.commands) {
+                let commands = remove_aliases(&group.commands);
+                let mut command_names = commands.keys().collect::<Vec<_>>();
+                command_names.sort();
+
+                for name in command_names {
+                    let cmd = &commands[name];
+                    
                     if cmd.help_available {
-                        let _ = write!(desc, "`{}`\n", n);
+                        let _ = write!(desc, "`{}`\n", name);
 
                         no_commands = false;
                     }
@@ -255,7 +265,11 @@ pub fn plain(ctx: &mut Context,
                       name as an argument to this command.\n\n"
         .to_string();
 
-    for (group_name, group) in groups {
+    let mut group_names = groups.keys().collect::<Vec<_>>();
+    group_names.sort();
+
+    for group_name in group_names {
+        let group = &groups[group_name];
         let _ = write!(result, "**{}:** ", group_name);
 
         if let Some(ref x) = group.prefix {
@@ -264,9 +278,15 @@ pub fn plain(ctx: &mut Context,
 
         let mut no_commands = true;
 
-        for (n, cmd) in remove_aliases(&group.commands) {
+        let commands = remove_aliases(&group.commands);
+        let mut command_names = commands.keys().collect::<Vec<_>>();
+        command_names.sort();
+        
+        for name in command_names {
+            let cmd = &commands[name];
+            
             if cmd.help_available {
-                let _ = write!(result, "`{}` ", n);
+                let _ = write!(result, "`{}` ", name);
 
                 no_commands = false;
             }
