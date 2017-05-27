@@ -72,33 +72,6 @@ pub enum LightMethod {
     Put,
 }
 
-/// Enum that allows a user to pass a `Path` or a `File` type to `send_files`
-pub enum FileOrPath {
-    /// Indicates that the `FileOrPath` is a `File`
-    File((File, String)),
-    /// Indicates that the `FileOrPath` is a `Path`
-    Path(PathBuf),
-}
-
-impl From<String> for FileOrPath{
-    fn from(s: String) -> FileOrPath {
-        FileOrPath::Path(PathBuf::from(&s))
-    }
-}
-
-impl<'a> From<&'a str> for FileOrPath {
-    fn from(s: &'a str) -> FileOrPath {
-        FileOrPath::Path(PathBuf::from(s))
-    }
-}
-
-impl<'a> From<(File, &'a str)> for FileOrPath {
-    fn from(f: (File, &str)) -> FileOrPath {
-        let (file, filename) = f;
-        FileOrPath::File((file, filename.to_owned()))
-    }
-}
-
 lazy_static! {
     static ref TOKEN: Arc<Mutex<String>> = Arc::new(Mutex::new(String::default()));
 }
@@ -1446,7 +1419,6 @@ pub fn send_file<R: Read>(channel_id: u64, mut file: R, filename: &str, map: Jso
 }
 
 /// Sends file(s) to a channel.
-/// Sends a file to a channel.
 ///
 /// # Errors
 ///
@@ -1455,7 +1427,7 @@ pub fn send_file<R: Read>(channel_id: u64, mut file: R, filename: &str, map: Jso
 /// if the file is too large to send.
 ///
 /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
-pub fn send_files<T: Into<FileOrPath>>(channel_id: u64, files: Vec<T>, map: JsonMap)
+pub fn send_files<T: Into<AttachmentType>>(channel_id: u64, files: Vec<T>, map: JsonMap)
     -> Result<Message> {
     let uri = format!(api!("/channels/{}/messages"), channel_id);
     let url = match Url::parse(&uri) {
@@ -1470,26 +1442,26 @@ pub fn send_files<T: Into<FileOrPath>>(channel_id: u64, files: Vec<T>, map: Json
         .set(header::UserAgent(constants::USER_AGENT.to_owned()));
 
     let mut request = Multipart::from_request(request)?;
-    let mut file_num = String::from("0");
+    let mut file_num = String::from("0".to_owned());
+
     for file in files {
         match file.into() {
-            FileOrPath::File(f) => {
-                let (mut f, filename) = f;
+            AttachmentType::File((mut f, filename)) => {
                 request.write_stream(&file_num, &mut f, Some(&filename), None)?;
             },
-            FileOrPath::Path(p) => {
+            AttachmentType::Path(p) => {
                 request.write_file(&file_num, &p)?;
             }, 
         }
+
         unsafe {
             let vec = file_num.as_mut_vec();
             vec[0] += 1;
         }
-        
     }
 
     for (k, v) in map {
-        let _ = match v {
+        match v {
             Value::Bool(false) => request.write_text(&k, "false")?,
             Value::Bool(true) => request.write_text(&k, "true")?,
             Value::Number(inner) => request.write_text(&k, inner.to_string())?,
@@ -1630,6 +1602,32 @@ fn verify(expected_status_code: u16, mut response: HyperResponse) -> Result<()> 
     debug!("Content: {}", s);
 
     Err(Error::Http(HttpError::InvalidRequest(response.status)))
+}
+
+/// Enum that allows a user to pass a `Path` or a `File` type to `send_files`
+pub enum AttachmentType {
+    /// Indicates that the `AttachmentType` is a `File`
+    File((File, String)),
+    /// Indicates that the `AttachmentType` is a `Path`
+    Path(PathBuf),
+}
+
+impl From<String> for AttachmentType {
+    fn from(s: String) -> AttachmentType {
+        AttachmentType::Path(PathBuf::from(&s))
+    }
+}
+
+impl<'a> From<&'a str> for AttachmentType {
+    fn from(s: &'a str) -> AttachmentType {
+        AttachmentType::Path(PathBuf::from(s))
+    }
+}
+
+impl<'a> From<(File, &'a str)> for AttachmentType {
+    fn from(f: (File, &str)) -> AttachmentType {
+        AttachmentType::File((f.0, f.1.to_owned()))
+    }
 }
 
 /// Representation of the method of a query to send for the [`get_guilds`]

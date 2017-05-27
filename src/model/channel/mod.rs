@@ -26,7 +26,7 @@ use ::model::*;
 #[cfg(feature="model")]
 use ::builder::{CreateMessage, GetMessages};
 #[cfg(feature="model")]
-use ::http::FileOrPath;
+use ::http::AttachmentType;
 
 /// A container for any channel.
 #[derive(Clone, Debug)]
@@ -320,7 +320,8 @@ impl Channel {
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    pub fn send_files<F, T: Into<FileOrPath>>(&self, files: Vec<T>, f: F) -> Result<Message>
+    #[inline]
+    pub fn send_files<F, T: Into<AttachmentType>>(&self, files: Vec<T>, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
         self.id().send_files(files, f)
     }
