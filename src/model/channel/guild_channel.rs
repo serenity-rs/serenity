@@ -210,6 +210,7 @@ impl GuildChannel {
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     /// [Send TTS Messages]: permissions/constant.SEND_TTS_MESSAGES.html
     #[inline]
     pub fn create_permission(&self, target: &PermissionOverwrite) -> Result<()> {
