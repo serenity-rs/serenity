@@ -1370,6 +1370,14 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 }
 
 /// Sends a file to a channel.
+///
+/// # Errors
+///
+/// Returns an
+/// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
+/// if the file is too large to send.
+///
+/// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
 pub fn send_file<R: Read>(channel_id: u64, mut file: R, filename: &str, map: JsonMap)
     -> Result<Message> {
     let uri = format!(api!("/channels/{}/messages"), channel_id);
@@ -1399,6 +1407,10 @@ pub fn send_file<R: Read>(channel_id: u64, mut file: R, filename: &str, map: Jso
     }
 
     let response = request.send()?;
+
+    if response.status.class() != StatusClass::Success {
+        return Err(Error::Http(HttpError::InvalidRequest(response.status)));
+    }
 
     serde_json::from_reader::<HyperResponse, Message>(response).map_err(From::from)
 }
