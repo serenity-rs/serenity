@@ -272,7 +272,7 @@ impl Guild {
     /// [`Channel`]: struct.Channel.html
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
-    pub fn create_channel(&mut self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
+    pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
         #[cfg(feature="cache")]
         {
             let req = permissions::MANAGE_CHANNELS;
