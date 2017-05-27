@@ -103,6 +103,18 @@ impl CurrentUser {
         self.avatar.as_ref()
             .map(|av| format!(cdn!("/avatars/{}/{}.webp?size=1024"), self.id.0, av))
     }
+
+    /// Returns the invite url for the bot with the given permissions.
+    ///
+    /// If the permissions passed are empty, the permissions part will be dropped.
+    pub fn invite_url(&self, permissions: Permissions) -> String {
+        let bits = permissions.bits();
+        if bits == 0 {
+            format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot", self.id)
+        } else {
+            format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot&permissions={}", self.id, bits)
+        }
+    }
 }
 
 /// An enum that represents a default avatar.
