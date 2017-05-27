@@ -45,7 +45,9 @@ use serde_json;
 use std::collections::BTreeMap;
 use std::default::Default;
 use std::fmt::Write as FmtWrite;
+use std::fs::File;
 use std::io::{ErrorKind as IoErrorKind, Read};
+use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use ::constants;
 use ::internal::prelude::*;
@@ -68,6 +70,33 @@ pub enum LightMethod {
     Post,
     /// Indicates that a route is for the `PUT` method only.
     Put,
+}
+
+/// Enum that allows a user to pass a `Path` or a `File` type to `send_files`
+pub enum FileOrPath {
+    /// Indicates that the `FileOrPath` is a `File`
+    File((File, String)),
+    /// Indicates that the `FileOrPath` is a `Path`
+    Path(PathBuf),
+}
+
+impl From<String> for FileOrPath{
+    fn from(s: String) -> FileOrPath {
+        FileOrPath::Path(PathBuf::from(&s))
+    }
+}
+
+impl<'a> From<&'a str> for FileOrPath {
+    fn from(s: &'a str) -> FileOrPath {
+        FileOrPath::Path(PathBuf::from(s))
+    }
+}
+
+impl<'a> From<(File, &'a str)> for FileOrPath {
+    fn from(f: (File, &str)) -> FileOrPath {
+        let (file, filename) = f;
+        FileOrPath::File((file, filename.to_owned()))
+    }
 }
 
 lazy_static! {
@@ -1378,6 +1407,7 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 /// if the file is too large to send.
 ///
 /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
+#[deprecated(since="0.2.0", note="Please use `send_files` instead.")]
 pub fn send_file<R: Read>(channel_id: u64, mut file: R, filename: &str, map: JsonMap)
     -> Result<Message> {
     let uri = format!(api!("/channels/{}/messages"), channel_id);
@@ -1411,6 +1441,64 @@ pub fn send_file<R: Read>(channel_id: u64, mut file: R, filename: &str, map: Jso
     if response.status.class() != StatusClass::Success {
         return Err(Error::Http(HttpError::InvalidRequest(response.status)));
     }
+
+    serde_json::from_reader::<HyperResponse, Message>(response).map_err(From::from)
+}
+
+/// Sends file(s) to a channel.
+/// Sends a file to a channel.
+///
+/// # Errors
+///
+/// Returns an
+/// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
+/// if the file is too large to send.
+///
+/// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
+pub fn send_files<T: Into<FileOrPath>>(channel_id: u64, files: Vec<T>, map: JsonMap)
+    -> Result<Message> {
+    let uri = format!(api!("/channels/{}/messages"), channel_id);
+    let url = match Url::parse(&uri) {
+        Ok(url) => url,
+        Err(_) => return Err(Error::Url(uri)),
+    };
+
+    let mut request = Request::new(Method::Post, url)?;
+    request.headers_mut()
+        .set(header::Authorization(TOKEN.lock().unwrap().clone()));
+    request.headers_mut()
+        .set(header::UserAgent(constants::USER_AGENT.to_owned()));
+
+    let mut request = Multipart::from_request(request)?;
+    let mut file_num = String::from("0");
+    for file in files {
+        match file.into() {
+            FileOrPath::File(f) => {
+                let (mut f, filename) = f;
+                request.write_stream(&file_num, &mut f, Some(&filename), None)?;
+            },
+            FileOrPath::Path(p) => {
+                request.write_file(&file_num, &p)?;
+            }, 
+        }
+        unsafe {
+            let vec = file_num.as_mut_vec();
+            vec[0] += 1;
+        }
+        
+    }
+
+    for (k, v) in map {
+        let _ = match v {
+            Value::Bool(false) => request.write_text(&k, "false")?,
+            Value::Bool(true) => request.write_text(&k, "true")?,
+            Value::Number(inner) => request.write_text(&k, inner.to_string())?,
+            Value::String(inner) => request.write_text(&k, inner)?,
+            _ => continue,
+        };
+    }
+
+    let response = request.send()?;
 
     serde_json::from_reader::<HyperResponse, Message>(response).map_err(From::from)
 }
