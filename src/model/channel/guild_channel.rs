@@ -122,12 +122,20 @@ impl GuildChannel {
     /// permission, but denying the [Send TTS Messages] and [Attach Files]
     /// permissions:
     ///
-    /// ```rust,ignore
-    /// use serenity::model::{ChannelId, PermissionOverwrite, permissions};
+    /// ```rust,no_run
+    /// # use serenity::model::{ChannelId, UserId};
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
+    /// #
+    /// use serenity::model::{
+    ///     ModelError,
+    ///     PermissionOverwrite,
+    ///     PermissionOverwriteType,
+    ///     permissions,
+    /// };
     /// use serenity::CACHE;
-    ///
-    /// let channel_id = 7;
-    /// let user_id = 8;
     ///
     /// let allow = permissions::SEND_MESSAGES;
     /// let deny = permissions::SEND_TTS_MESSAGES | permissions::ATTACH_FILES;
@@ -138,9 +146,17 @@ impl GuildChannel {
     /// };
     ///
     /// let cache = CACHE.read().unwrap();
-    /// let channel = cache.get_guild_channel(channel_id).unwrap();
+    /// let channel = cache
+    ///     .guild_channel(channel_id)
+    ///     .ok_or(ModelError::ItemMissing)?;
     ///
-    /// let _ = channel.create_permission(overwrite);
+    /// channel.read().unwrap().create_permission(&overwrite)?;
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
     /// ```
     ///
     /// Creating a permission overwrite for a role by specifying the
@@ -148,12 +164,20 @@ impl GuildChannel {
     /// permission, but denying the [Send TTS Messages] and [Attach Files]
     /// permissions:
     ///
-    /// ```rust,ignore
-    /// use serenity::model::{ChannelId, PermissionOverwrite, permissions};
+    /// ```rust,no_run
+    /// # use serenity::model::{ChannelId, UserId};
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
+    /// #
+    /// use serenity::model::{
+    ///     ModelError,
+    ///     PermissionOverwrite,
+    ///     PermissionOverwriteType,
+    ///     permissions,
+    /// };
     /// use serenity::CACHE;
-    ///
-    /// let channel_id = 7;
-    /// let user_id = 8;
     ///
     /// let allow = permissions::SEND_MESSAGES;
     /// let deny = permissions::SEND_TTS_MESSAGES | permissions::ATTACH_FILES;
@@ -164,9 +188,17 @@ impl GuildChannel {
     /// };
     ///
     /// let cache = CACHE.read().unwrap();
-    /// let channel = cache.get_guild_channel(channel_id).unwrap();
+    /// let channel = cache
+    ///     .guild_channel(channel_id)
+    ///     .ok_or(ModelError::ItemMissing)?;
     ///
-    /// let _ = channel.create_permission(overwrite);
+    /// channel.read().unwrap().create_permission(&overwrite)?;
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
     /// ```
     ///
     /// [`Channel`]: enum.Channel.html
