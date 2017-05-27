@@ -180,7 +180,7 @@ impl GuildChannel {
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     /// [Send TTS Messages]: permissions/constant.SEND_TTS_MESSAGES.html
     #[inline]
-    pub fn create_permission(&self, target: PermissionOverwrite) -> Result<()> {
+    pub fn create_permission(&self, target: &PermissionOverwrite) -> Result<()> {
         self.id.create_permission(target)
     }
 

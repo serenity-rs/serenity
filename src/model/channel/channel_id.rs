@@ -49,7 +49,7 @@ impl ChannelId {
     /// [`PermissionOverwrite`]: struct.PermissionOverwrite.html
     /// [`Role`]: struct.Role.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
-    pub fn create_permission(&self, target: PermissionOverwrite)
+    pub fn create_permission(&self, target: &PermissionOverwrite)
         -> Result<()> {
         let (id, kind) = match target.kind {
             PermissionOverwriteType::Member(id) => (id.0, "member"),
@@ -431,13 +431,13 @@ impl ChannelId {
         Message::check_embed_length(&map)?;
 
         let message = http::send_message(self.0, &Value::Object(map))?;
-            
+
         if let Some(reactions) = reactions {
             for reaction in reactions {
                 self.create_reaction(message.id, reaction)?;
             }
         }
-            
+
         Ok(message)
     }
 
