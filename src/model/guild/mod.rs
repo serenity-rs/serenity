@@ -1341,12 +1341,14 @@ enum_number!(
     VerificationLevel {
         /// Does not require any verification.
         None = 0,
-        /// Low verification level.
+        /// Must have a verified email on the user's Discord account.
         Low = 1,
-        /// Medium verification level.
+        /// Must also be a registered user on Discord for longer than 5 minutes.
         Medium = 2,
-        /// High verification level.
+        /// Must also be a member of the guild for longer than 10 minutes.
         High = 3,
+        /// Must have a verified phone on the user's Discord account.
+        Higher = 4,
     }
 );
 
@@ -1357,6 +1359,7 @@ impl VerificationLevel {
             VerificationLevel::Low => 1,
             VerificationLevel::Medium => 2,
             VerificationLevel::High => 3,
+            VerificationLevel::Higher => 4,
         }
     }
 }
