@@ -247,7 +247,18 @@ impl Configuration {
     }
 
     /// Sets the prefix to respond to. This can either be a single-char or
-    /// multi-char string.
+    /// multi-char string.    
+    ///
+    /// # Examples
+    ///
+    /// Assign a basic prefix:
+    ///
+    /// ```rust
+    /// use serenity::ext::framework::Framework;
+    ///
+    /// let framework = Framework::default().configure(|c| c
+    ///                    .prefix("!"));
+    /// ```
     pub fn prefix(mut self, prefix: &str) -> Self {
         self.prefixes = vec![prefix.to_owned()];
 
@@ -256,6 +267,17 @@ impl Configuration {
 
     /// Sets the prefixes to respond to. Those can either be single-chararacter or
     /// multi-chararacter strings.
+    ///
+    /// # Examples
+    ///
+    /// Assign a set of prefixes the bot can respond to:
+    ///
+    /// ```rust
+    /// use serenity::ext::framework::Framework;
+    ///
+    /// let framework = Framework::default().configure(|c| c
+    ///                    .prefixes(vec!("!", ">", "+")));
+    /// ```
     pub fn prefixes(mut self, prefixes: Vec<&str>) -> Self {
         self.prefixes = prefixes.iter().map(|x| x.to_string()).collect();
 
