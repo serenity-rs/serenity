@@ -19,7 +19,8 @@ use std::path::Path;
 use ::internal::prelude::*;
 use ::model::{EmojiIdentifier, EmojiId};
 
-pub use self::message_builder::MessageBuilder;
+pub use self::message_builder::{MessageBuilder, Content, ContentModifier};
+pub use self::message_builder::ContentModifier::*;
 
 /// Determines if a name is NSFW.
 ///

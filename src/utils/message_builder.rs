@@ -1,6 +1,8 @@
 use std::default::Default;
 use std::fmt::{self, Write};
 use ::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
+use std::ops::Add;
+use std::convert::{From, Into};
 
 /// The Message Builder is an ergonomic utility to easily build a message,
 /// by adding text and mentioning mentionable structs.
@@ -192,8 +194,9 @@ impl MessageBuilder {
     ///
     /// assert_eq!(message.push("ing").0, "testing");
     /// ```
-    pub fn push(mut self, content: &str) -> Self {
-        self.0.push_str(content);
+    pub fn push<T: Into<Content>>(mut self, content: T) -> Self {
+        let content: Content = content.into();
+        self.0.push_str(&content.to_string());
 
         self
     }
@@ -343,13 +346,14 @@ impl MessageBuilder {
 
     /// Pushes text to your message, but normalizing content - that means
     /// ensuring that there's no unwanted formatting, mention spam etc.
-    pub fn push_safe(mut self, content: &str) -> Self {
-        let normalized = normalize(content)
+    pub fn push_safe<T: Into<Content>>(mut self, content: T) -> Self {
+        let mut content: Content = content.into();
+        content.inner = normalize(&content.inner)
             .replace('*', "\\*")
             .replace('`', "\\`")
             .replace('_', "\\_");
 
-        self.0.push_str(&normalized);
+        self.0.push_str(&content.to_string());
 
         self
     }
@@ -471,6 +475,190 @@ impl fmt::Display for MessageBuilder {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.0, f)
     }
+}
+
+
+/// Content modifier enum
+///
+/// Provides an enum of formatting modifiers for a string, for combination with
+/// string types and Content types.
+///
+/// # Examples
+///
+/// Create a new Content type which describes a bold-italic "text":
+///
+/// ```rust
+/// use serenity::utils::{Bold, Italic, Content};
+/// let content: Content = Bold + Italic + "text";
+/// ```
+pub enum ContentModifier {
+  Italic,
+  Bold,
+  Strikethrough,
+  Code,
+  Underline
+}
+
+/// Describes formatting on string content
+#[derive(Default, Clone)]
+pub struct Content {
+  italic: bool,
+  bold: bool,
+  strikethrough: bool,
+  pub inner: String,
+  code: bool,
+  underline: bool
+}
+
+impl Add<String> for Content {
+  type Output = Content;
+  fn add(self, rhs: String) -> Content {
+    let mut nc = self.clone();
+    nc.inner = nc.inner + &rhs;
+    nc
+  }
+}
+
+impl<'a> Add<&'a str> for Content {
+  type Output = Content;
+  fn add(self, rhs: &str) -> Content {
+    let mut nc = self.clone();
+    nc.inner = nc.inner + rhs;
+    nc
+  }
+}
+
+impl Add<String> for ContentModifier {
+  type Output = Content;
+  fn add(self, rhs: String) -> Content {
+    let mut nc = self.to_content();
+    nc.inner = nc.inner + &rhs;
+    nc
+  }
+}
+
+impl<'a> Add<&'a str> for ContentModifier {
+  type Output = Content;
+  fn add(self, rhs: &str) -> Content {
+    let mut nc = self.to_content();
+    nc.inner = nc.inner + rhs;
+    nc
+  }
+}
+
+impl Add<ContentModifier> for Content {
+  type Output = Content;
+  fn add(self, rhs: ContentModifier) -> Content {
+    let mut nc = self.clone();
+    nc.apply(&rhs);
+    nc
+  }
+}
+
+impl Add<ContentModifier> for ContentModifier {
+  type Output = Content;
+  fn add(self, rhs: ContentModifier) -> Content {
+    let mut nc = self.to_content();
+    nc.apply(&rhs);
+    nc
+  }
+}
+
+impl ContentModifier {
+  fn to_content(&self) -> Content {
+    let mut nc = Content::default();
+    nc.apply(self);
+    nc
+  }
+}
+
+impl Content {
+  pub fn apply(&mut self, modifier: &ContentModifier) {
+    match *modifier {
+      ContentModifier::Italic => {
+        self.italic = true;
+      },
+      ContentModifier::Bold => {
+        self.bold = true;
+      },
+      ContentModifier::Strikethrough => {
+        self.strikethrough = true;
+      },
+      ContentModifier::Code => {
+        self.code = true;
+      },
+      ContentModifier::Underline => {
+        self.underline = true;
+      }
+    }
+  }
+  pub fn to_string(&self) -> String {
+    let mut newstr = String::with_capacity(
+      self.inner.len()
+      + if self.bold {4} else {0}
+      + if self.italic {2} else {0}
+      + if self.strikethrough {4} else {0}
+      + if self.underline {4} else {0}
+      + if self.code {2} else {0}
+    );
+    if self.bold {
+      newstr.push_str("**");
+    }
+    if self.italic {
+      newstr.push_str("*");
+    }
+    if self.strikethrough {
+      newstr.push_str("~~");
+    }
+    if self.underline {
+      newstr.push_str("__");
+    }
+    if self.code {
+      newstr.push_str("`");
+    }
+    newstr.push_str(&self.inner);
+    if self.code {
+      newstr.push_str("`");
+    }
+    if self.underline {
+      newstr.push_str("__");
+    }
+    if self.strikethrough {
+      newstr.push_str("~~");
+    }
+    if self.italic {
+      newstr.push_str("*");
+    }
+    if self.bold {
+      newstr.push_str("**");
+    }
+    newstr
+  }
+}
+
+impl From<String> for Content {
+  fn from(s: String) -> Content {
+    Content {
+      italic: false,
+      bold: false,
+      strikethrough: false,
+      inner: s,
+      code: false,
+      underline: false
+    }
+  }
+}
+
+impl<'a> From<&'a str> for Content {
+  fn from(s: &str) -> Content {
+    Content::from(s.to_owned())
+  }
+}
+
+impl From<ContentModifier> for Content {
+  fn from(cm: ContentModifier) -> Content {
+    cm.to_content()
+  }
 }
 
 fn normalize(text: &str) -> String {
