@@ -213,6 +213,33 @@ impl Configuration {
     }
 
     /// A `HashSet` of user Ids checks won't apply to.
+    ///
+    /// # Examples
+    ///
+    /// Create a HashSet in-place:
+    ///
+    /// ```rust
+    /// use serenity::ext::framework::Framework;
+    /// use serenity::model::UserId;
+    ///
+    /// let framework = Framework::default().configure(|c| c
+    ///                    .owners(vec!(UserId(7), UserId(77)).into_iter().collect()));
+    /// ```
+    ///
+    /// Create a HashSet beforehand:
+    ///
+    /// ```rust
+    /// use serenity::ext::framework::Framework;
+    /// use serenity::model::UserId;
+    /// use std::collections::HashSet;
+    ///
+    /// let mut set = HashSet::new();
+    /// set.insert(UserId(7));
+    /// set.insert(UserId(77));
+    ///
+    /// let framework = Framework::default().configure(|c| c
+    ///                 .owners(set));
+    /// ```
     pub fn owners(mut self, user_ids: HashSet<UserId>) -> Self {
         self.owners = user_ids;
 
