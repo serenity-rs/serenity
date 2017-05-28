@@ -341,6 +341,126 @@ impl MessageBuilder {
         self
     }
 
+    /// Pushes the given text with a newline appended to the content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new().push_line("hello").push("world").build();
+    ///
+    /// assert_eq!(content, "hello\nworld");
+    /// ```
+    pub fn push_line(mut self, content: &str) -> Self {
+        self = self.push(content);
+        self.0.push('\n');
+
+        self
+    }
+
+    /// Pushes inlined monospace text with an added newline to the content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new().push_mono_line("hello").push("world").build();
+    ///
+    /// assert_eq!(content, "`hello`\nworld");
+    /// ```
+    pub fn push_mono_line(mut self, content: &str) -> Self {
+        self = self.push_mono(content);
+        self.0.push('\n');
+
+        self
+    }
+
+    /// Pushes an inlined italicized text with an added newline to the content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new().push_italic_line("hello").push("world").build();
+    ///
+    /// assert_eq!(content, "_hello_\nworld");
+    /// ```
+    pub fn push_italic_line(mut self, content: &str) -> Self {
+        self = self.push_italic(content);
+        self.0.push('\n');
+
+        self
+    }
+
+    /// Pushes an inline bold text with an added newline to the content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new().push_bold_line("hello").push("world").build();
+    ///
+    /// assert_eq!(content, "**hello**\nworld");
+    /// ```
+    pub fn push_bold_line(mut self, content: &str) -> Self {
+        self = self.push_bold(content);
+        self.0.push('\n');
+
+        self
+    }
+
+    /// Pushes an underlined inline text with an added newline to the content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new().push_underline_line("hello").push("world").build();
+    ///
+    /// assert_eq!(content, "__hello__\nworld");
+    /// ```
+    pub fn push_underline_line(mut self, content: &str) -> Self {
+        self = self.push_underline(content);
+        self.0.push('\n');
+
+        self
+    }
+
+    /// Pushes a strikethrough inline text with a newline added to the content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new().push_strike_line("hello").push("world").build();
+    ///
+    /// assert_eq!(content, "~~hello~~\nworld");
+    /// ```
+    pub fn push_strike_line(mut self, content: &str) -> Self {
+        self = self.push_strike(content);
+        self.0.push('\n');
+
+        self
+    }
+
     /// Pushes text to your message, but normalizing content - that means
     /// ensuring that there's no unwanted formatting, mention spam etc.
     pub fn push_safe(mut self, content: &str) -> Self {
@@ -414,6 +534,136 @@ impl MessageBuilder {
         self.0.push_str("~~");
         self.0.push_str(&normalize(content).replace("~~", "  "));
         self.0.push_str("~~");
+
+        self
+    }
+
+    /// Pushes text with a newline appended to the content normalizing content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new().push_line_safe("Hello @everyone").push("How are you?").build();
+    ///
+    /// assert_eq!(content, "Hello @\u{200B}everyone\nHow are you?");
+    /// ```
+    pub fn push_line_safe(mut self, content: &str) -> Self {
+        self = self.push_safe(content);
+        self.0.push('\n');
+
+        self
+    }
+
+    /// Pushes an inline monospaced text with added newline to the content normalizing content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new()
+    ///                 .push_mono_line_safe("`hello @everyone`")
+    ///                 .push("world").build();
+    ///
+    /// assert_eq!(content, "`'hello @\u{200B}everyone'`\nworld");
+    /// ```
+    pub fn push_mono_line_safe(mut self, content: &str) -> Self {
+        self = self.push_mono_safe(content);
+        self.0.push('\n');
+
+        self
+    }
+
+    /// Pushes an inline italicized text with added newline to the content normalizing content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new()
+    ///                 .push_italic_line_safe("@everyone")
+    ///                 .push("Isn't a mention.").build();
+    ///
+    /// assert_eq!(content, "_@\u{200B}everyone_\nIsn't a mention.");
+    /// ```
+    pub fn push_italic_line_safe(mut self, content: &str) -> Self {
+        self = self.push_italic_safe(content);
+        self.0.push('\n');
+
+        self
+    }
+
+    /// Pushes an inline bold text with added newline to the content normalizing content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new()
+    ///                 .push_bold_line_safe("@everyone")
+    ///                 .push("Isn't a mention.").build();
+    ///
+    /// assert_eq!(content, "**@\u{200B}everyone**\nIsn't a mention.");
+    /// ```
+    pub fn push_bold_line_safe(mut self, content: &str) -> Self {
+        self = self.push_bold_safe(content);
+        self.0.push('\n');
+
+        self
+    }
+
+    /// Pushes an underlined inline text with added newline to the content normalizing content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new()
+    ///                 .push_underline_line_safe("@everyone")
+    ///                 .push("Isn't a mention.").build();
+    ///
+    /// assert_eq!(content, "__@\u{200B}everyone__\nIsn't a mention.");
+    /// ```
+    pub fn push_underline_line_safe(mut self, content: &str) -> Self {
+        self = self.push_underline_safe(content);
+        self.0.push('\n');
+
+        self
+    }
+
+    /// Pushes a strikethrough inline text with added newline to the content normalizing content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new()
+    ///                 .push_strike_line_safe("@everyone")
+    ///                 .push("Isn't a mention.").build();
+    ///
+    /// assert_eq!(content, "~~@\u{200B}everyone~~\nIsn't a mention.");
+    /// ```
+    pub fn push_strike_line_safe(mut self, content: &str) -> Self {
+        self = self.push_strike_safe(content);
+        self.0.push('\n');
 
         self
     }
