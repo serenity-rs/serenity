@@ -10,6 +10,8 @@ use ::builder::{CreateInvite, CreateMessage, EditChannel, GetMessages};
 use ::CACHE;
 #[cfg(feature="model")]
 use ::http;
+#[cfg(feature="model")]
+use ::http::AttachmentType;
 #[cfg(all(feature="model", feature="utils"))]
 use ::utils as serenity_utils;
 
@@ -557,9 +559,35 @@ impl GuildChannel {
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[deprecated(since="0.2.0", note="Please use `send_files` instead.")]
+    #[allow(deprecated)]
     pub fn send_file<F, R>(&self, file: R, filename: &str, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, R: Read {
         self.id.send_file(file, filename, f)
+    }
+
+    /// Sends (a) file(s) along with optional message contents.
+    ///
+    /// Refer to [`ChannelId::send_file`] for examples and more information.
+    ///
+    /// The [Attach Files] and [Send Messages] permissions are required.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// If the content of the message is over the above limit, then a
+    /// [`ClientError::MessageTooLong`] will be returned, containing the number
+    /// of unicode code points over the limit.
+    ///
+    /// [`ChannelId::send_file`]: struct.ChannelId.html#method.send_file
+    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
+    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[inline]
+    pub fn send_files<F, T: Into<AttachmentType>>(&self, files: Vec<T>, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage {
+        self.id.send_files(files, f)
     }
 
     /// Sends a message to the channel with the given content.

@@ -8,6 +8,8 @@ use ::builder::{CreateMessage, EditChannel, GetMessages};
 use ::CACHE;
 #[cfg(feature="model")]
 use ::http;
+#[cfg(feature="model")]
+use ::http::AttachmentType;
 
 #[cfg(feature="model")]
 impl ChannelId {
@@ -393,6 +395,8 @@ impl ChannelId {
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[deprecated(since="0.2.0", note="Please use `send_files` instead.")]
+    #[allow(deprecated)]
     pub fn send_file<F, R>(&self, file: R, filename: &str, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, R: Read {
         let mut map = f(CreateMessage::default()).0;
@@ -408,6 +412,82 @@ impl ChannelId {
         let _ = map.remove("embed");
 
         http::send_file(self.0, file, filename, map)
+    }
+
+    /// Sends a file along with optional message contents. The filename _must_
+    /// be specified.
+    ///
+    /// Message contents may be passed by using the [`CreateMessage::content`]
+    /// method.
+    ///
+    /// An embed can _not_ be sent when sending a file. If you set one, it will
+    /// be automatically removed.
+    ///
+    /// The [Attach Files] and [Send Messages] permissions are required.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Examples
+    ///
+    /// Send files with the paths `/path/to/file.jpg` and `/path/to/file2.jpg`:
+    ///
+    /// ```rust,no_run
+    /// use serenity::model::ChannelId;
+    ///
+    /// let channel_id = ChannelId(7);
+    /// 
+    /// let paths = vec!["/path/to/file.jpg", "path/to/file2.jpg"];
+    ///
+    /// let _ = channel_id.send_files(paths, |m| m.content("a file"));
+    /// ```
+    /// 
+    /// Send files using `File`:
+    ///
+    /// ```rust,no_run
+    /// use serenity::model::ChannelId;
+    /// use std::fs::File;
+    ///
+    /// let channel_id = ChannelId(7);
+    ///
+    /// let f1 = File::open("my_file.jpg").unwrap();
+    /// let f2 = File::open("my_file2.jpg").unwrap();
+    ///
+    /// let files = vec![(f1, "my_file.jpg"), (f2, "my_file2.jpg")];
+    ///
+    /// let _ = channel_id.send_files(files, |m| m.content("a file"));
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// If the content of the message is over the above limit, then a
+    /// [`ClientError::MessageTooLong`] will be returned, containing the number
+    /// of unicode code points over the limit.
+    ///
+    /// Returns an
+    /// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
+    /// if the file is too large to send.
+    ///
+    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`HttpError::InvalidRequest`]: ../http/enum.HttpError.html#variant.InvalidRequest
+    /// [`CreateMessage::content`]: ../utils/builder/struct.CreateMessage.html#method.content
+    /// [`GuildChannel`]: struct.GuildChannel.html
+    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
+    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    pub fn send_files<F, T: Into<AttachmentType>>(&self, files: Vec<T>, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage {
+        let mut map = f(CreateMessage::default()).0;
+
+        if let Some(content) = map.get("content") {
+            if let Value::String(ref content) = *content {
+                if let Some(length_over) = Message::overflow_length(content) {
+                    return Err(Error::Model(ModelError::MessageTooLong(length_over)));
+                }
+            }
+        }
+
+        let _ = map.remove("embed");
+
+        http::send_files(self.0, files, map)
     }
 
     /// Sends a message to the channel.
