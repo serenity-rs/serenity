@@ -357,7 +357,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "hello\nworld");
     /// ```
-    pub fn push_line(mut self, content: &str) -> Self {
+    pub fn push_line<T: Into<Content>>(mut self, content: T) -> Self {
         self = self.push(content);
         self.0.push('\n');
 
@@ -555,7 +555,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "Hello @\u{200B}everyone\nHow are you?");
     /// ```
-    pub fn push_line_safe(mut self, content: &str) -> Self {
+    pub fn push_line_safe<T: Into<Content>>(mut self, content: T) -> Self {
         self = self.push_safe(content);
         self.0.push('\n');
 
