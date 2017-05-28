@@ -241,6 +241,33 @@ impl ReactionType {
     }
 }
 
+impl From<char> for ReactionType {
+    /// Creates a `ReactionType` from a `char`.
+    ///
+    /// # Examples
+    ///
+    /// Reacting to a message with an apple:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::model::ChannelId;
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #     let message = ChannelId(0).get_message(0)?;
+    /// #
+    /// message.react('🍎')?;
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    /// ```
+    fn from(ch: char) -> ReactionType {
+        ReactionType::Unicode(ch.to_string())
+    }
+}
+
 impl From<Emoji> for ReactionType {
     fn from(emoji: Emoji) -> ReactionType {
         ReactionType::Custom {
