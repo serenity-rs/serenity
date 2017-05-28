@@ -6,9 +6,6 @@ use std::sync::Arc;
 use ::client::Context;
 use ::model::Message;
 
-#[derive(Default)]
-pub struct CreateGroup(pub CommandGroup);
-
 /// Used to create command groups
 ///
 /// # Examples
@@ -23,6 +20,9 @@ pub struct CreateGroup(pub CommandGroup);
 ///     .command("name", |c| c
 ///         .exec_str("Hakase")))
 /// ```
+#[derive(Default)]
+pub struct CreateGroup(pub CommandGroup);
+
 impl CreateGroup {
     /// Adds a command to group.
     pub fn command<F>(mut self, command_name: &str, f: F) -> Self
