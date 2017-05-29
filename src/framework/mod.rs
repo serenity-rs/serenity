@@ -290,7 +290,7 @@ impl Framework {
     ///         .bucket("basic", 2, 10, 3)  //  3 uses per 10 seconds with 2 second delay
     ///         .command("ping", |c| c
     ///             .bucket("basic")        //  Use bucket defined above
-    ///             .exec_str("pong!"));
+    ///             .exec_str("pong!")));
     /// ```
     pub fn bucket<S>(mut self, s: S, delay: i64, time_span: i64, limit: i32) -> Self
         where S: Into<String> {
@@ -319,7 +319,7 @@ impl Framework {
     ///         .simple_bucket("simple", 2)  //  2 second delay between uses
     ///         .command("ping", |c| c
     ///             .bucket("simple")        //  Use bucket defined above
-    ///             .exec_str("pong!"));
+    ///             .exec_str("pong!")));
     /// ```
     pub fn simple_bucket<S>(mut self, s: S, delay: i64) -> Self
         where S: Into<String> {
