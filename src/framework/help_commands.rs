@@ -25,7 +25,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::fmt::Write;
 use super::command::CommandGroup;
-use super::Command;
+use super::{Command, Framework};
 use ::client::Context;
 use ::model::Message;
 use ::utils::Colour;
@@ -38,35 +38,143 @@ fn error_embed(msg: &Message, input: &str) {
             .description(input)));
 }
 
-pub fn with_embeds(_: &mut Context,
-                   msg: &Message,
-                   groups: HashMap<String, CommandGroup>,
-                   // First key is the alias, second key is the command.
-                   aliases: HashMap<String, String>,
-                   args: Vec<String>) -> Result<(), String> {
+pub fn plain<T: Command>(msg: &Message,
+             framework: &Framework<T>,
+             args: &[String]) -> Result<(), String> {
     if !args.is_empty() {
         let name = args.join(" ");
 
-        for (group_name, group) in groups {
-            let mut found = None::<(&String, &Box<Command>)>;
+        for (ref group_name, ref group) in &framework.groups {
+            let mut found = None::<(&String, &Command)>;
 
-            for (command_name, command) in &group.commands {
+            for (ref command_name, ref command) in &group.commands {
                 let with_prefix = if let Some(ref prefix) = group.prefix {
                     format!("{} {}", prefix, command_name)
                 } else {
                     command_name.to_owned()
                 };
 
-                for (alias, command_name) in &aliases {
-                    if name == with_prefix || name == alias {
-                        error_embed(msg, &format!("Did you mean \"{}\"?", command_name));
+                if name == with_prefix || name == *command_name  {
+                    if let Some(ref name) = framework.aliases.get(name) {
+                        let _ = msg.channel_id.say(&format!("Did you mean {:?}?", name));
                         return Ok(());
+                    } else {
+                        found = Some((command_name, command));
                     }
                 }
             }
 
             if let Some((command_name, command)) = found {
-                command = **command;
+                if !command.help_available() {
+                    let _ = msg.channel_id.say("**Error**: No help available.");
+                    return Ok(());
+                }
+
+                let mut result = format!("**{}**\n", command_name);
+
+                if let Some(ref desc) = command.desc() {
+                    let _ = write!(result, "**Description:** {}\n", desc);
+                }
+
+                if let Some(ref usage) = command.usage() {
+                    let _ = write!(result, "**Usage:** `{} {}`\n", command_name, usage);
+                }
+
+                if let Some(ref example) = command.example() {
+                    let _ = write!(result, "**Sample usage:** `{} {}`\n", command_name, example);
+                }
+
+                if group_name != "Ungrouped" {
+                    let _ = write!(result, "**Group:** {}\n", group_name);
+                }
+
+                result.push_str("**Available:** ");
+                result.push_str(if command.dm_only() {
+                    "Only in DM"
+                } else if command.guild_only() {
+                    "Only in guilds"
+                } else {
+                    "In DM and guilds"
+                });
+                result.push_str("\n");
+
+                let _ = msg.channel_id.say(&result);
+
+                return Ok(());
+            }
+        }
+
+        let _ = msg.channel_id.say(&format!("**Error**: Command `{}` not found.", name));
+
+        return Ok(());
+    }
+
+    let mut result = "**Commands**\nTo get help with an individual command, pass its \
+                      name as an argument to this command.\n\n"
+        .to_string();
+
+    let mut groups = framework.groups.collect::<Vec<_>>();
+    groups.sort();
+
+    for (ref group_name, ref group) in &groups {
+        let _ = write!(result, "**{}:** ", group_name);
+
+        if !group.prefix.is_empty() {
+            let _ = write!(result, "(prefix: `{}`): ", group.prefix);
+        }
+
+        let mut no_commands = true;
+
+        let mut commands = group.commands.collect::<Vec<_>>();
+        commands.sort();
+        
+        for (ref name, ref cmd) in &commands {
+            if cmd.help_available() {
+                let _ = write!(result, "`{}` ", name);
+
+                no_commands = false;
+            }
+
+            if no_commands {
+                result.push_str("*[No Commands]*");
+            }
+
+            result.push('\n');
+        }
+    }
+    
+    let _ = msg.channel_id.say(&result);
+
+    Ok(())
+}
+
+pub fn with_embeds<T: Command>(msg: &Message,
+                   framework: &Framework<T>,
+                   args: Vec<String>) -> Result<(), String> {
+    if !args.is_empty() {
+        let name = args.join(" ");
+
+        for (ref group_name, ref group) in &framework.groups {
+            let mut found = None::<(&String, &Command)>;
+
+            for (ref command_name, ref command) in &group.commands {
+                let with_prefix = if let Some(ref prefix) = group.prefix {
+                    format!("{} {}", prefix, command_name)
+                } else {
+                    command_name.to_owned()
+                };
+
+                if name == with_prefix || name == alias {
+                    if let Some(ref command_name) = framework.aliases.get(name) {
+                        error_embed(msg, &format!("Did you mean \"{}\"?", command_name));
+                        return Ok(());
+                    } else {
+                        found = Some((command_name, command));
+                    }
+                }
+            }
+
+            if let Some((ref command_name, ref command)) = found {
                 if !command.help_available() {
                     error_embed(msg, "**Error**: No help available.");
 
@@ -131,32 +239,26 @@ pub fn with_embeds(_: &mut Context,
                 .description("To get help with an individual command, pass its \
                               name as an argument to this command.");
 
-            let mut group_names = groups.keys().collect::<Vec<_>>();
-            group_names.sort();
+            let mut groups = groups.collect::<Vec<_>>();
+            groups.sort();
 
-            for group_name in group_names {
-                let group = &groups[group_name];
+            for (ref group_name, ref group) in &groups {
                 let mut desc = String::new();
 
-                if let Some(ref x) = group.prefix {
-                    let _ = write!(desc, "Prefix: {}\n", x);
+                if !group.prefix.is_empty() {
+                    let _ = write!(desc, "Prefix: {}\n", group.prefix);
                 }
 
                 let mut no_commands = true;
 
-                let commands = remove_aliases(&group.commands);
-                let mut command_names = commands.keys().collect::<Vec<_>>();
-                command_names.sort();
+                let mut commands = group.commands.collect::<Vec<_>>();
+                commands.sort();
 
-                for name in command_names {
-                    let cmd = &commands[name];
-                    
-                    for (n, cmd) in &group.commands {
-                        if cmd.help_available {
-                            let _ = write!(desc, "`{}`\n", name);
+                for (ref name, ref cmd) in &commands {
+                    if cmd.help_available() {
+                        let _ = write!(desc, "`{}`\n", name);
 
-                            no_commands = false;
-                        }
+                        no_commands = false;
                     }
 
                     if no_commands {
@@ -173,117 +275,3 @@ pub fn with_embeds(_: &mut Context,
     Ok(())
 }
 
-pub fn plain(_: &mut Context,
-             msg: &Message,
-             groups: HashMap<String, CommandGroup>,
-             args: &[String]) -> Result<(), String> {
-    if !args.is_empty() {
-        let name = args.join(" ");
-
-        for (group_name, group) in groups {
-            let mut found = None::<(&String, Box<Command>)>;
-
-            for (command_name, command) in &group.commands {
-                let with_prefix = if let Some(ref prefix) = group.prefix {
-                    format!("{} {}", prefix, command_name)
-                } else {
-                    command_name.to_owned()
-                };
-
-                if name == with_prefix || name == *command_name  {
-                    if let Some(name) = group.aliases.get(name) {
-                        let _ = msg.channel_id.say(&format!("Did you mean {:?}?", name));
-                        return Ok(());
-                    }
-                }
-            }
-
-            if let Some((command_name, command)) = found {
-                if !command.help_available() {
-                    let _ = msg.channel_id.say("**Error**: No help available.");
-                    return Ok(());
-                }
-
-                let mut result = format!("**{}**\n", command_name);
-
-                if let Some(ref desc) = command.desc() {
-                    let _ = write!(result, "**Description:** {}\n", desc);
-                }
-
-                if let Some(ref usage) = command.usage() {
-                    let _ = write!(result, "**Usage:** `{} {}`\n", command_name, usage);
-                }
-
-                if let Some(ref example) = command.example() {
-                    let _ = write!(result, "**Sample usage:** `{} {}`\n", command_name, example);
-                }
-
-                if group_name != "Ungrouped" {
-                    let _ = write!(result, "**Group:** {}\n", group_name);
-                }
-
-                result.push_str("**Available:** ");
-                result.push_str(if command.dm_only() {
-                    "Only in DM"
-                } else if command.guild_only() {
-                    "Only in guilds"
-                } else {
-                    "In DM and guilds"
-                });
-                result.push_str("\n");
-
-                let _ = msg.channel_id.say(&result);
-
-                return Ok(());
-            }
-        }
-
-        let _ = msg.channel_id.say(&format!("**Error**: Command `{}` not found.", name));
-
-        return Ok(());
-    }
-
-    let mut result = "**Commands**\nTo get help with an individual command, pass its \
-                      name as an argument to this command.\n\n"
-        .to_string();
-
-    let mut group_names = groups.keys().collect::<Vec<_>>();
-    group_names.sort();
-
-    for group_name in group_names {
-        let group = &groups[group_name];
-        let _ = write!(result, "**{}:** ", group_name);
-
-        if let Some(ref x) = group.prefix {
-            let _ = write!(result, "(prefix: `{}`): ", x);
-        }
-
-        let mut no_commands = true;
-
-        let commands = remove_aliases(&group.commands);
-        let mut command_names = commands.keys().collect::<Vec<_>>();
-        command_names.sort();
-        
-        for name in command_names {
-            let cmd = &commands[name];
-            
-            for (n, cmd) in &group.commands {
-                if cmd.help_available {
-                    let _ = write!(result, "`{}` ", name);
-
-                    no_commands = false;
-                }
-            }
-
-            if no_commands {
-                result.push_str("*[No Commands]*");
-            }
-
-            result.push('\n');
-        }
-    }
-    
-    let _ = msg.channel_id.say(&result);
-
-    Ok(())
-}

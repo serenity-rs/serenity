@@ -156,8 +156,10 @@ type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'st
 #[derive(Default)]
 pub struct Framework<T> {
     configuration: Configuration,
-    groups: HashMap<String, Arc<CommandGroup<T>>>,
-    aliases: HashMap<String, String>,
+    #[doc(hidden)]
+    pub groups: HashMap<String, Arc<CommandGroup<T>>>,
+    #[doc(hidden)]
+    pub aliases: HashMap<String, String>,
     before: Option<Arc<BeforeHook>>,
     dispatch_error_handler: Option<Arc<DispatchErrorHook>>,
     buckets: HashMap<String, Bucket>,

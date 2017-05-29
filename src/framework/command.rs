@@ -58,7 +58,7 @@ macro_rules! named_args {
 
 /// The trait that defines the whole functionality (or the main part) of the framework.
 pub trait Command {
-    #[doc(hide)]
+    #[doc(hidden)]
     fn name(&self) -> String { "".to_string() }
     /// The group this commands belongs to.
     fn group(&self) -> String { "Ungrouped".to_string() }
