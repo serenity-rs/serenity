@@ -700,6 +700,41 @@ impl Framework {
 
     /// Specify the function to be called prior to every command's execution.
     /// If that function returns true, the command will be executed.
+    ///
+    /// # Examples
+    ///
+    /// Using before to log command usage:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    ///
+    /// client.with_framework(|f| f
+    ///     .before(|ctx, msg, cmd_name| {
+    ///         println!("Running command {}", cmd_name);
+    ///         true
+    ///     }));
+    /// ```
+    ///
+    /// Using before to prevent command usage:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    ///
+    /// client.with_framework(|f| f
+    ///     .before(|ctx, msg, cmd_name| {
+    ///         if let Ok(channel) = msg.channel_id.get() {
+    ///             if !channel.is_nsfw() {
+    ///                 return false;   //  Don't run unless in nsfw channel
+    ///             }
+    ///         }
+    ///
+    ///         println!("Running command {}", cmd_name);
+    ///         true
+    ///     }));
+    /// ```
+    ///
     pub fn before<F>(mut self, f: F) -> Self
         where F: Fn(&mut Context, &Message, &String) -> bool + Send + Sync + 'static {
         self.before = Some(Arc::new(f));
@@ -709,6 +744,23 @@ impl Framework {
 
     /// Specify the function to be called after every command's execution.
     /// Fourth argument exists if command returned an error which you can handle.
+    ///
+    /// # Examples
+    ///
+    /// Using after to log command usage:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    ///
+    /// client.with_framework(|f| f
+    ///     .after(|ctx, msg, cmd_name, error| {
+    ///         //  Print out an error if it happened
+    ///         if let Err(why) = error {
+    ///             println!("Error in {}: {:?}", cmd_name, why);
+    ///         }
+    ///     }));
+    /// ```
     pub fn after<F>(mut self, f: F) -> Self
         where F: Fn(&mut Context, &Message, &String, Result<(), String>) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
