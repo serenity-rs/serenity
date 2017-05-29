@@ -661,6 +661,22 @@ impl Framework {
         self
     }
 
+    /// Adds a group which can organize several related commands.
+    /// Groups are taken into account when using `serenity::framework::help_commands`.
+    ///
+    /// # Examples
+    ///
+    /// Creating a simple group:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    ///
+    /// client.with_framework(|f| f
+    ///     .group("ping-pong", |g| g
+    ///         .command("ping", |c| c.exec_str("pong!"))
+    ///         .command("pong", |c| c.exec_str("ping!"))));
+    /// ```
     pub fn group<F, S>(mut self, group_name: S, f: F) -> Self
         where F: FnOnce(CreateGroup) -> CreateGroup,
               S: Into<String> {
