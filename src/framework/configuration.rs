@@ -122,6 +122,19 @@ impl Configuration {
     }
 
     /// HashSet of command names that won't be run.
+    ///
+    /// # Examples
+    ///
+    /// Ignore a set of commands, assuming they exist:
+    ///
+    /// ```rust
+    /// use serenity::ext::framework::Framework;
+    ///
+    /// let framework = Framework::default()
+    ///                     .command("ping", |c| c.exec_str("pong!"))
+    ///                     .configure(|c| c.disabled_commands(
+    ///                         vec!("ping").into_iter().map(|x| x.to_owned()).collect()));
+    /// ```
     pub fn disabled_commands(mut self, commands: HashSet<String>) -> Self {
         self.disabled_commands = commands;
 
