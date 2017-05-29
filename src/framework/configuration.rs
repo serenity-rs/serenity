@@ -93,6 +93,18 @@ impl Configuration {
     }
 
     /// HashSet of guild Ids where commands will be ignored.
+    ///
+    /// # Examples
+    ///
+    /// Create a HashSet in-place:
+    ///
+    /// ```rust
+    /// use serenity::ext::framework::Framework;
+    /// use serenity::model::GuildId;
+    ///
+    /// let framework = Framework::default().configure(|c| c
+    ///                    .blocked_guilds(vec!(GuildId(7), GuildId(77)).into_iter().collect()));
+    /// ```
     pub fn blocked_guilds(mut self, guilds: HashSet<GuildId>) -> Self {
         self.blocked_guilds = guilds;
 
@@ -101,6 +113,18 @@ impl Configuration {
 
     /// HashSet of user Ids whose commands will be ignored.
     /// Guilds owned by user Ids will also be ignored.
+    ///
+    /// # Examples
+    ///
+    /// Create a HashSet in-place:
+    ///
+    /// ```rust
+    /// use serenity::ext::framework::Framework;
+    /// use serenity::model::UserId;
+    ///
+    /// let framework = Framework::default().configure(|c| c
+    ///                    .blocked_users(vec!(UserId(7), UserId(77)).into_iter().collect()));
+    /// ```
     pub fn blocked_users(mut self, users: HashSet<UserId>) -> Self {
         self.blocked_users = users;
 
