@@ -691,6 +691,29 @@ impl Framework {
     /// Specify the function that's called in case a command wasn't executed for one reason or another.
     ///
     /// DispatchError represents all possible fail conditions.
+    ///
+    /// # Examples
+    ///
+    /// Making a simple argument error responder:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// use serenity::framework::DispatchError::{NotEnoughArguments, TooManyArguments};
+    ///
+    /// client.with_framework(|f| f
+    ///     .on_dispatch_error(|ctx, msg, error| {
+    ///         match error {
+    ///             NotEnoughArguments { min, given } => {
+    ///                 msg.channel_id.say(&format!("Need {} arguments, but only got {}.", min, given));
+    ///             }
+    ///             TooManyArguments { max, given } => {
+    ///                 msg.channel_id.say(&format!("Max arguments allowed is {}, but got {}.", max, given));
+    ///             }
+    ///             _ => println!("Unhandled dispatch error.")
+    ///         }        
+    ///     }));
+    /// ```
     pub fn on_dispatch_error<F>(mut self, f: F) -> Self
         where F: Fn(Context, Message, DispatchError) + Send + Sync + 'static {
         self.dispatch_error_handler = Some(Arc::new(f));
