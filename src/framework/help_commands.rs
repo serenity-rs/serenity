@@ -58,11 +58,12 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 /// Use the command with `exec_help`:
 ///
 /// ```rust
-/// use serenity::ext::framework::Framework;
+/// # use serenity::Client;
+/// # let mut client = Client::login("token");
 /// use serenity::ext::framework::help_commands;
 ///
-/// let framework = Framework::default()
-///                 .command("help", |c| c.exec_help(help_commands::with_embeds));
+/// client.with_framework(|f| f
+///         .command("help", |c| c.exec_help(help_commands::with_embeds)));
 /// ```
 pub fn with_embeds(ctx: &mut Context,
                    _: &Message,
@@ -206,11 +207,12 @@ pub fn with_embeds(ctx: &mut Context,
 /// Use the command with `exec_help`:
 ///
 /// ```rust
-/// use serenity::ext::framework::Framework;
+/// # use serenity::Client;
+/// # let mut client = Client::login("token");
 /// use serenity::ext::framework::help_commands;
 ///
-/// let framework = Framework::default()
-///                 .command("help", |c| c.exec_help(help_commands::plain));
+/// client.with_framework(|f| f
+///         .command("help", |c| c.exec_help(help_commands::plain)));
 /// ```
 pub fn plain(ctx: &mut Context,
              _: &Message,
