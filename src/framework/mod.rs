@@ -277,6 +277,21 @@ impl Framework {
 
     /// Defines a bucket with `delay` between each command, and the `limit` of uses
     /// per `time_span`.
+    ///
+    /// # Examples
+    ///
+    /// Create and use a bucket:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    ///
+    /// client.with_framework(|f| f
+    ///         .bucket("basic", 2, 10, 3)  //  3 uses per 10 seconds with 2 second delay
+    ///         .command("ping", |c| c
+    ///             .bucket("basic")        //  Use bucket defined above
+    ///             .exec_str("pong!"));
+    /// ```
     pub fn bucket<S>(mut self, s: S, delay: i64, time_span: i64, limit: i32) -> Self
         where S: Into<String> {
         self.buckets.insert(s.into(), Bucket {
@@ -291,6 +306,21 @@ impl Framework {
     }
 
     /// Defines a bucket with only a `delay` between each command.
+    ///
+    /// # Examples
+    ///
+    /// Create and use a simple bucket:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    ///
+    /// client.with_framework(|f| f
+    ///         .simple_bucket("simple", 2)  //  2 second delay between uses
+    ///         .command("ping", |c| c
+    ///             .bucket("simple")        //  Use bucket defined above
+    ///             .exec_str("pong!"));
+    /// ```
     pub fn simple_bucket<S>(mut self, s: S, delay: i64) -> Self
         where S: Into<String> {
         self.buckets.insert(s.into(), Bucket {
