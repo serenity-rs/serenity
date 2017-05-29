@@ -63,7 +63,7 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 /// use serenity::ext::framework::help_commands;
 ///
 /// client.with_framework(|f| f
-///         .command("help", |c| c.exec_help(help_commands::with_embeds)));
+///     .command("help", |c| c.exec_help(help_commands::with_embeds)));
 /// ```
 pub fn with_embeds(ctx: &mut Context,
                    _: &Message,
@@ -212,7 +212,7 @@ pub fn with_embeds(ctx: &mut Context,
 /// use serenity::ext::framework::help_commands;
 ///
 /// client.with_framework(|f| f
-///         .command("help", |c| c.exec_help(help_commands::plain)));
+///     .command("help", |c| c.exec_help(help_commands::plain)));
 /// ```
 pub fn plain(ctx: &mut Context,
              _: &Message,

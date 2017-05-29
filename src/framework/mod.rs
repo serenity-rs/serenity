@@ -280,17 +280,18 @@ impl Framework {
     ///
     /// # Examples
     ///
-    /// Create and use a bucket:
+    /// Create and use a bucket that limits a command to 3 uses per 10 seconds with
+    /// a 2 second delay inbetween invocations:
     ///
     /// ```rust
     /// # use serenity::Client;
     /// # let mut client = Client::login("token");
-    ///
+    /// #
     /// client.with_framework(|f| f
-    ///         .bucket("basic", 2, 10, 3)  //  3 uses per 10 seconds with 2 second delay
-    ///         .command("ping", |c| c
-    ///             .bucket("basic")        //  Use bucket defined above
-    ///             .exec_str("pong!")));
+    ///     .bucket("basic", 2, 10, 3)
+    ///     .command("ping", |c| c
+    ///         .bucket("basic")
+    ///         .exec_str("pong!")));
     /// ```
     pub fn bucket<S>(mut self, s: S, delay: i64, time_span: i64, limit: i32) -> Self
         where S: Into<String> {
@@ -309,17 +310,17 @@ impl Framework {
     ///
     /// # Examples
     ///
-    /// Create and use a simple bucket:
+    /// Create and use a simple bucket that has a 2 second delay between invocations:
     ///
     /// ```rust
     /// # use serenity::Client;
     /// # let mut client = Client::login("token");
-    ///
+    /// #
     /// client.with_framework(|f| f
-    ///         .simple_bucket("simple", 2)  //  2 second delay between uses
-    ///         .command("ping", |c| c
-    ///             .bucket("simple")        //  Use bucket defined above
-    ///             .exec_str("pong!")));
+    ///     .simple_bucket("simple", 2)
+    ///     .command("ping", |c| c
+    ///         .bucket("simple")
+    ///         .exec_str("pong!")));
     /// ```
     pub fn simple_bucket<S>(mut self, s: S, delay: i64) -> Self
         where S: Into<String> {
@@ -589,15 +590,14 @@ impl Framework {
     ///
     /// ```rust
     /// # #[macro_use] extern crate serenity;
-    /// # command!(ping(_ctx, msg) {
-    /// #   msg.channel_id.say("pong!");    
-    /// # });
-    ///
+    /// command!(ping(_ctx, msg) {
+    ///     msg.channel_id.say("pong!");    
+    /// });
+    /// #
     /// # fn main() {
     /// # use serenity::Client;
     /// # let mut client = Client::login("token");
-    ///
-    /// //  Assuming a ping command exists
+    /// #
     /// client.with_framework(|f| f.on("ping", ping));
     /// # }
     /// ```
@@ -671,7 +671,7 @@ impl Framework {
     /// ```rust
     /// # use serenity::Client;
     /// # let mut client = Client::login("token");
-    ///
+    /// #
     /// client.with_framework(|f| f
     ///     .group("ping-pong", |g| g
     ///         .command("ping", |c| c.exec_str("pong!"))
@@ -700,7 +700,7 @@ impl Framework {
     /// # use serenity::Client;
     /// # let mut client = Client::login("token");
     /// use serenity::framework::DispatchError::{NotEnoughArguments, TooManyArguments};
-    ///
+    /// 
     /// client.with_framework(|f| f
     ///     .on_dispatch_error(|ctx, msg, error| {
     ///         match error {
@@ -726,12 +726,12 @@ impl Framework {
     ///
     /// # Examples
     ///
-    /// Using before to log command usage:
+    /// Using `before` to log command usage:
     ///
     /// ```rust
     /// # use serenity::Client;
     /// # let mut client = Client::login("token");
-    ///
+    /// #
     /// client.with_framework(|f| f
     ///     .before(|ctx, msg, cmd_name| {
     ///         println!("Running command {}", cmd_name);
@@ -744,12 +744,13 @@ impl Framework {
     /// ```rust
     /// # use serenity::Client;
     /// # let mut client = Client::login("token");
-    ///
+    /// #
     /// client.with_framework(|f| f
     ///     .before(|ctx, msg, cmd_name| {
     ///         if let Ok(channel) = msg.channel_id.get() {
+    ///             //  Don't run unless in nsfw channel
     ///             if !channel.is_nsfw() {
-    ///                 return false;   //  Don't run unless in nsfw channel
+    ///                 return false;
     ///             }
     ///         }
     ///
@@ -770,12 +771,12 @@ impl Framework {
     ///
     /// # Examples
     ///
-    /// Using after to log command usage:
+    /// Using `after` to log command usage:
     ///
     /// ```rust
     /// # use serenity::Client;
     /// # let mut client = Client::login("token");
-    ///
+    /// #
     /// client.with_framework(|f| f
     ///     .after(|ctx, msg, cmd_name, error| {
     ///         //  Print out an error if it happened
