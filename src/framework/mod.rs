@@ -582,6 +582,25 @@ impl Framework {
     ///
     /// [`command`]: #method.command
     /// [module-level documentation]: index.html
+    ///
+    /// # Examples
+    ///
+    /// Create and use a simple command:
+    ///
+    /// ```rust
+    /// # #[macro_use] extern crate serenity;
+    /// # command!(ping(_ctx, msg) {
+    /// #   msg.channel_id.say("pong!");    
+    /// # });
+    ///
+    /// # fn main() {
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    ///
+    /// //  Assuming a ping command exists
+    /// client.with_framework(|f| f.on("ping", ping));
+    /// # }
+    /// ```
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
         where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static,
               S: Into<String> {
