@@ -99,11 +99,12 @@ impl Configuration {
     /// Create a HashSet in-place:
     ///
     /// ```rust
-    /// use serenity::ext::framework::Framework;
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
     /// use serenity::model::GuildId;
     ///
-    /// let framework = Framework::default().configure(|c| c
-    ///                    .blocked_guilds(vec!(GuildId(7), GuildId(77)).into_iter().collect()));
+    /// client.with_framework(|f| f.configure(|c| c
+    ///                        .blocked_guilds(vec!(GuildId(7), GuildId(77)).into_iter().collect())));
     /// ```
     pub fn blocked_guilds(mut self, guilds: HashSet<GuildId>) -> Self {
         self.blocked_guilds = guilds;
@@ -119,11 +120,12 @@ impl Configuration {
     /// Create a HashSet in-place:
     ///
     /// ```rust
-    /// use serenity::ext::framework::Framework;
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
     /// use serenity::model::UserId;
     ///
-    /// let framework = Framework::default().configure(|c| c
-    ///                    .blocked_users(vec!(UserId(7), UserId(77)).into_iter().collect()));
+    /// client.with_framework(|f| f.configure(|c| c
+    ///                    .blocked_users(vec!(UserId(7), UserId(77)).into_iter().collect())));
     /// ```
     pub fn blocked_users(mut self, users: HashSet<UserId>) -> Self {
         self.blocked_users = users;
@@ -152,12 +154,13 @@ impl Configuration {
     /// Ignore a set of commands, assuming they exist:
     ///
     /// ```rust
-    /// use serenity::ext::framework::Framework;
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
     ///
-    /// let framework = Framework::default()
+    /// client.with_framework(|f| f
     ///                     .command("ping", |c| c.exec_str("pong!"))
     ///                     .configure(|c| c.disabled_commands(
-    ///                         vec!("ping").into_iter().map(|x| x.to_owned()).collect()));
+    ///                         vec!("ping").into_iter().map(|x| x.to_owned()).collect())));
     /// ```
     pub fn disabled_commands(mut self, commands: HashSet<String>) -> Self {
         self.disabled_commands = commands;
@@ -256,17 +259,19 @@ impl Configuration {
     /// Create a HashSet in-place:
     ///
     /// ```rust
-    /// use serenity::ext::framework::Framework;
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
     /// use serenity::model::UserId;
     ///
-    /// let framework = Framework::default().configure(|c| c
-    ///                    .owners(vec!(UserId(7), UserId(77)).into_iter().collect()));
+    /// client.with_framework(|f| f.configure(|c| c
+    ///                    .owners(vec!(UserId(7), UserId(77)).into_iter().collect())));
     /// ```
     ///
     /// Create a HashSet beforehand:
     ///
     /// ```rust
-    /// use serenity::ext::framework::Framework;
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
     /// use serenity::model::UserId;
     /// use std::collections::HashSet;
     ///
@@ -274,8 +279,7 @@ impl Configuration {
     /// set.insert(UserId(7));
     /// set.insert(UserId(77));
     ///
-    /// let framework = Framework::default().configure(|c| c
-    ///                 .owners(set));
+    /// client.with_framework(|f| f.configure(|c| c.owners(set)));
     /// ```
     pub fn owners(mut self, user_ids: HashSet<UserId>) -> Self {
         self.owners = user_ids;
@@ -291,10 +295,11 @@ impl Configuration {
     /// Assign a basic prefix:
     ///
     /// ```rust
-    /// use serenity::ext::framework::Framework;
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
     ///
-    /// let framework = Framework::default().configure(|c| c
-    ///                    .prefix("!"));
+    /// client.with_framework(|f| f.configure(|c| c
+    ///                    .prefix("!")));
     /// ```
     pub fn prefix(mut self, prefix: &str) -> Self {
         self.prefixes = vec![prefix.to_owned()];
@@ -310,10 +315,11 @@ impl Configuration {
     /// Assign a set of prefixes the bot can respond to:
     ///
     /// ```rust
-    /// use serenity::ext::framework::Framework;
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
     ///
-    /// let framework = Framework::default().configure(|c| c
-    ///                    .prefixes(vec!("!", ">", "+")));
+    /// client.with_framework(|f| f.configure(|c| c
+    ///                    .prefixes(vec!("!", ">", "+"))));
     /// ```
     pub fn prefixes(mut self, prefixes: Vec<&str>) -> Self {
         self.prefixes = prefixes.iter().map(|x| x.to_string()).collect();
