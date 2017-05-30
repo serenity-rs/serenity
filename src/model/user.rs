@@ -70,12 +70,13 @@ impl CurrentUser {
     ///
     /// # Examples
     ///
+    /// Print out the current user's distinct identifier (i.e., Username#1234):
+    ///
     /// ```rust
     /// # use serenity::client::CACHE;
     /// # CACHE.read().and_then(|cache| {
     /// #   let user = &cache.user;
     /// // Assuming current user has already been assigned to user
-    /// // Prints out something along the lines of Username#1234
     /// println!("Current user's distinct identifier is {}", user.distinct());
     /// #   Ok(())
     /// # });
