@@ -590,6 +590,30 @@ impl Cache {
     ///
     /// [`UserId`]: ../model/struct.UserId.html
     /// [`users`]: #structfield.users
+    ///
+    /// # Examples
+    ///
+    /// Retrieve a user from the cache and print their name:
+    ///
+    /// ```rust
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// use serenity::client::CACHE;
+    /// let cache = CACHE.read()?;
+    ///
+    /// if let Some(lock) = cache.user(7) {
+    ///     if let Ok(user) = lock.read() {
+    ///         println!("User with Id 7 is currently named {}", user.name);
+    ///     }
+    /// }
+    /// #   Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #   try_main().unwrap();        
+    /// # }
+    /// ```
     #[inline]
     pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<Arc<RwLock<User>>> {
         self.users.get(&user_id.into()).cloned()
