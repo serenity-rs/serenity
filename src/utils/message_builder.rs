@@ -1,5 +1,5 @@
 use std::default::Default;
-use std::fmt::{self, Write};
+use std::fmt::{self, Write, Display};
 use std::ops::Add;
 use ::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 
@@ -706,7 +706,7 @@ impl MessageBuilder {
     }
 }
 
-impl fmt::Display for MessageBuilder {
+impl Display for MessageBuilder {
     /// Formats the message builder into a string.
     ///
     /// This is done by simply taking the internal value of the tuple-struct and
@@ -784,6 +784,17 @@ impl<'a> Add<&'a str> for Content {
 
 }
 
+impl<T: ToString> Add<T> for Content {
+    type Output = Content;
+
+    fn add(self, rhs: T) -> Content {
+        let mut nc = self.clone();
+        nc.inner = nc.inner + rhs.to_string();
+
+        nc
+    }
+}
+
 impl Add<String> for ContentModifier {
     type Output = Content;
 
@@ -806,6 +817,17 @@ impl<'a> Add<&'a str> for ContentModifier {
         nc
     }
 
+}
+
+impl<T: ToString> Add<T> for ContentModifier {
+    type Output = Content;
+
+    fn add(self, rhs: T) -> Content {
+        let mut nc = self.to_content();
+        nc.inner = nc.inner + rhs.to_string();
+
+        nc
+    }
 }
 
 impl Add<ContentModifier> for Content {
@@ -865,60 +887,64 @@ impl Content {
         }
     }
 
-    pub fn to_string(&self) -> String {
-        let mut newstr = String::with_capacity(
-            self.inner.len()
-                + if self.bold { 4 } else { 0 }
-                + if self.italic { 2 } else { 0 }
-                + if self.strikethrough { 4 } else { 0 }
-                + if self.underline { 4 } else { 0 }
-                + if self.code { 2 } else { 0 }
-        );
+}
 
-        if self.bold {
-            newstr.push_str("**");
-        }
+impl Display for Content {
 
-        if self.italic {
-            newstr.push('*');
-        }
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+      let mut newstr = String::with_capacity(
+          self.inner.len()
+              + if self.bold { 4 } else { 0 }
+              + if self.italic { 2 } else { 0 }
+              + if self.strikethrough { 4 } else { 0 }
+              + if self.underline { 4 } else { 0 }
+              + if self.code { 2 } else { 0 }
+      );
 
-        if self.strikethrough {
-            newstr.push_str("~~");
-        }
+      if self.bold {
+          newstr.push_str("**");
+      }
 
-        if self.underline {
-            newstr.push_str("__");
-        }
+      if self.italic {
+          newstr.push('*');
+      }
 
-        if self.code {
-            newstr.push('`');
-        }
+      if self.strikethrough {
+          newstr.push_str("~~");
+      }
 
-        newstr.push_str(&self.inner);
+      if self.underline {
+          newstr.push_str("__");
+      }
 
-        if self.code {
-            newstr.push('`');
-        }
+      if self.code {
+          newstr.push('`');
+      }
 
-        if self.underline {
-            newstr.push_str("__");
-        }
+      newstr.push_str(&self.inner);
 
-        if self.strikethrough {
-            newstr.push_str("~~");
-        }
+      if self.code {
+          newstr.push('`');
+      }
 
-        if self.italic {
-            newstr.push('*');
-        }
+      if self.underline {
+          newstr.push_str("__");
+      }
 
-        if self.bold {
-            newstr.push_str("**");
-        }
+      if self.strikethrough {
+          newstr.push_str("~~");
+      }
 
-        newstr
-    }
+      if self.italic {
+          newstr.push('*');
+      }
+
+      if self.bold {
+          newstr.push_str("**");
+      }
+
+      write!(f, "{}", newstr)
+  }
 
 }
 
@@ -949,6 +975,21 @@ impl From<ContentModifier> for Content {
 
     fn from(cm: ContentModifier) -> Content {
         cm.to_content()
+    }
+
+}
+
+impl<T: ToString> From<T> for Content {
+
+    fn from(stringer: T) -> Content {
+        Content {
+            italic: false,
+            bold: false,
+            strikethrough: false,
+            inner: stringer.to_string(),
+            code: false,
+            underline: false
+        }
     }
 
 }
