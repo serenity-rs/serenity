@@ -367,7 +367,7 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
             }))).clone();
 
         let mut lock = bucket.lock().unwrap();
-        lock.pre_hook();
+        lock.pre_hook(&route);
 
         let response = super::retry(&f)?;
 
@@ -391,7 +391,7 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
                 let _ = GLOBAL.lock().expect("global route lock poisoned");
 
                 Ok(if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {
-                    debug!("Ratelimited: {:?}ms", retry_after);
+                    debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
                     thread::sleep(Duration::from_millis(retry_after as u64));
 
                     true
@@ -399,7 +399,7 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
                     false
                 })
             } else {
-                lock.post_hook(&response)
+                lock.post_hook(&response, &route)
             };
 
             if !redo.unwrap_or(true) {
@@ -436,7 +436,7 @@ pub struct RateLimit {
 
 impl RateLimit {
     #[doc(hidden)]
-    pub fn pre_hook(&mut self) {
+    pub fn pre_hook(&mut self, route: &Route) {
         if self.limit == 0 {
             return;
         }
@@ -455,7 +455,7 @@ impl RateLimit {
         if self.remaining == 0 {
             let delay = (diff * 1000) + 500;
 
-            debug!("Pre-emptive ratelimit for {:?}ms", delay);
+            debug!("Pre-emptive ratelimit on route {:?} for {:?}ms", route, delay);
             thread::sleep(Duration::from_millis(delay));
 
             return;
@@ -465,7 +465,7 @@ impl RateLimit {
     }
 
     #[doc(hidden)]
-    pub fn post_hook(&mut self, response: &Response) -> Result<bool> {
+    pub fn post_hook(&mut self, response: &Response, route: &Route) -> Result<bool> {
         if let Some(limit) = parse_header(&response.headers, "x-ratelimit-limit")? {
             self.limit = limit;
         }
@@ -481,7 +481,7 @@ impl RateLimit {
         Ok(if response.status != StatusCode::TooManyRequests {
             false
         } else if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {
-            debug!("Ratelimited: {:?}ms", retry_after);
+            debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
             thread::sleep(Duration::from_millis(retry_after as u64));
 
             true
