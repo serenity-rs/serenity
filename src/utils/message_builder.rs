@@ -839,7 +839,7 @@ impl Content {
         }
     }
 
-    fn to_string(&self) -> String {
+    pub fn to_string(&self) -> String {
         let mut newstr = String::with_capacity(
             self.inner.len()
                 + if self.bold { 4 } else { 0 }
