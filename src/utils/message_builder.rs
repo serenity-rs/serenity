@@ -1,8 +1,7 @@
 use std::default::Default;
 use std::fmt::{self, Write};
-use ::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 use std::ops::Add;
-use std::convert::{From, Into};
+use ::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 
 /// The Message Builder is an ergonomic utility to easily build a message,
 /// by adding text and mentioning mentionable structs.
@@ -728,7 +727,7 @@ impl fmt::Display for MessageBuilder {
 }
 
 
-/// Content modifier enum
+/// Formatting modifiers for MessageBuilder content pushes
 ///
 /// Provides an enum of formatting modifiers for a string, for combination with
 /// string types and Content types.
@@ -737,178 +736,221 @@ impl fmt::Display for MessageBuilder {
 ///
 /// Create a new Content type which describes a bold-italic "text":
 ///
-/// ```rust
-/// use serenity::utils::{Bold, Italic, Content};
+/// ```rust,no_run
+/// use serenity::utils::ContentModifier::{Bold, Italic};
+/// use serenity::utils::Content;
 /// let content: Content = Bold + Italic + "text";
 /// ```
 pub enum ContentModifier {
-  Italic,
-  Bold,
-  Strikethrough,
-  Code,
-  Underline
+    Italic,
+    Bold,
+    Strikethrough,
+    Code,
+    Underline
 }
 
 /// Describes formatting on string content
 #[derive(Default, Clone)]
 pub struct Content {
-  italic: bool,
-  bold: bool,
-  strikethrough: bool,
-  pub inner: String,
-  code: bool,
-  underline: bool
+    pub italic: bool,
+    pub bold: bool,
+    pub strikethrough: bool,
+    pub inner: String,
+    pub code: bool,
+    pub underline: bool
 }
 
 impl Add<String> for Content {
-  type Output = Content;
-  fn add(self, rhs: String) -> Content {
-    let mut nc = self.clone();
-    nc.inner = nc.inner + &rhs;
-    nc
-  }
+    type Output = Content;
+
+    fn add(self, rhs: String) -> Content {
+        let mut nc = self.clone();
+        nc.inner = nc.inner + &rhs;
+
+        nc
+    }
+
 }
 
 impl<'a> Add<&'a str> for Content {
-  type Output = Content;
-  fn add(self, rhs: &str) -> Content {
-    let mut nc = self.clone();
-    nc.inner = nc.inner + rhs;
-    nc
-  }
+    type Output = Content;
+
+    fn add(self, rhs: &str) -> Content {
+        let mut nc = self.clone();
+        nc.inner = nc.inner + rhs;
+
+        nc
+    }
+
 }
 
 impl Add<String> for ContentModifier {
-  type Output = Content;
-  fn add(self, rhs: String) -> Content {
-    let mut nc = self.to_content();
-    nc.inner = nc.inner + &rhs;
-    nc
-  }
+    type Output = Content;
+
+    fn add(self, rhs: String) -> Content {
+        let mut nc = self.to_content();
+        nc.inner = nc.inner + &rhs;
+
+        nc
+    }
+
 }
 
 impl<'a> Add<&'a str> for ContentModifier {
-  type Output = Content;
-  fn add(self, rhs: &str) -> Content {
-    let mut nc = self.to_content();
-    nc.inner = nc.inner + rhs;
-    nc
-  }
+    type Output = Content;
+
+    fn add(self, rhs: &str) -> Content {
+        let mut nc = self.to_content();
+        nc.inner = nc.inner + rhs;
+
+        nc
+    }
+
 }
 
 impl Add<ContentModifier> for Content {
-  type Output = Content;
-  fn add(self, rhs: ContentModifier) -> Content {
-    let mut nc = self.clone();
-    nc.apply(&rhs);
-    nc
-  }
+    type Output = Content;
+
+    fn add(self, rhs: ContentModifier) -> Content {
+        let mut nc = self.clone();
+        nc.apply(&rhs);
+
+        nc
+    }
+
 }
 
 impl Add<ContentModifier> for ContentModifier {
-  type Output = Content;
-  fn add(self, rhs: ContentModifier) -> Content {
-    let mut nc = self.to_content();
-    nc.apply(&rhs);
-    nc
-  }
+    type Output = Content;
+
+    fn add(self, rhs: ContentModifier) -> Content {
+        let mut nc = self.to_content();
+        nc.apply(&rhs);
+
+        nc
+    }
+
 }
 
 impl ContentModifier {
-  fn to_content(&self) -> Content {
-    let mut nc = Content::default();
-    nc.apply(self);
-    nc
-  }
+
+    fn to_content(&self) -> Content {
+      let mut nc = Content::default();
+      nc.apply(self);
+
+      nc
+    }
+
 }
 
 impl Content {
-  pub fn apply(&mut self, modifier: &ContentModifier) {
-    match *modifier {
-      ContentModifier::Italic => {
-        self.italic = true;
-      },
-      ContentModifier::Bold => {
-        self.bold = true;
-      },
-      ContentModifier::Strikethrough => {
-        self.strikethrough = true;
-      },
-      ContentModifier::Code => {
-        self.code = true;
-      },
-      ContentModifier::Underline => {
-        self.underline = true;
-      }
+
+    pub fn apply(&mut self, modifier: &ContentModifier) {
+        match *modifier {
+            ContentModifier::Italic => {
+                self.italic = true;
+            },
+            ContentModifier::Bold => {
+                self.bold = true;
+            },
+            ContentModifier::Strikethrough => {
+                self.strikethrough = true;
+            },
+            ContentModifier::Code => {
+                self.code = true;
+            },
+            ContentModifier::Underline => {
+                self.underline = true;
+            }
+        }
     }
-  }
-  pub fn to_string(&self) -> String {
-    let mut newstr = String::with_capacity(
-      self.inner.len()
-      + if self.bold {4} else {0}
-      + if self.italic {2} else {0}
-      + if self.strikethrough {4} else {0}
-      + if self.underline {4} else {0}
-      + if self.code {2} else {0}
-    );
-    if self.bold {
-      newstr.push_str("**");
+
+    pub fn to_string(&self) -> String {
+        let mut newstr = String::with_capacity(
+            self.inner.len()
+                + if self.bold { 4 } else { 0 }
+                + if self.italic { 2 } else { 0 }
+                + if self.strikethrough { 4 } else { 0 }
+                + if self.underline { 4 } else { 0 }
+                + if self.code { 2 } else { 0 }
+        );
+
+        if self.bold {
+            newstr.push_str("**");
+        }
+
+        if self.italic {
+            newstr.push('*');
+        }
+
+        if self.strikethrough {
+            newstr.push_str("~~");
+        }
+
+        if self.underline {
+            newstr.push_str("__");
+        }
+
+        if self.code {
+            newstr.push('`');
+        }
+
+        newstr.push_str(&self.inner);
+
+        if self.code {
+            newstr.push('`');
+        }
+
+        if self.underline {
+            newstr.push_str("__");
+        }
+
+        if self.strikethrough {
+            newstr.push_str("~~");
+        }
+
+        if self.italic {
+            newstr.push('*');
+        }
+
+        if self.bold {
+            newstr.push_str("**");
+        }
+
+        newstr
     }
-    if self.italic {
-      newstr.push_str("*");
-    }
-    if self.strikethrough {
-      newstr.push_str("~~");
-    }
-    if self.underline {
-      newstr.push_str("__");
-    }
-    if self.code {
-      newstr.push_str("`");
-    }
-    newstr.push_str(&self.inner);
-    if self.code {
-      newstr.push_str("`");
-    }
-    if self.underline {
-      newstr.push_str("__");
-    }
-    if self.strikethrough {
-      newstr.push_str("~~");
-    }
-    if self.italic {
-      newstr.push_str("*");
-    }
-    if self.bold {
-      newstr.push_str("**");
-    }
-    newstr
-  }
+
 }
 
 impl From<String> for Content {
-  fn from(s: String) -> Content {
-    Content {
-      italic: false,
-      bold: false,
-      strikethrough: false,
-      inner: s,
-      code: false,
-      underline: false
+
+    fn from(s: String) -> Content {
+        Content {
+            italic: false,
+            bold: false,
+            strikethrough: false,
+            inner: s,
+            code: false,
+            underline: false
+        }
     }
-  }
+
 }
 
 impl<'a> From<&'a str> for Content {
-  fn from(s: &str) -> Content {
-    Content::from(s.to_owned())
-  }
+
+    fn from(s: &str) -> Content {
+        Content::from(s.to_owned())
+    }
+
 }
 
 impl From<ContentModifier> for Content {
-  fn from(cm: ContentModifier) -> Content {
-    cm.to_content()
-  }
+
+    fn from(cm: ContentModifier) -> Content {
+        cm.to_content()
+    }
+    
 }
 
 fn normalize(text: &str) -> String {
