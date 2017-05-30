@@ -53,7 +53,7 @@ use ::model::event::*;
 use ::model::*;
 
 #[cfg(feature="framework")]
-use ::framework::Framework;
+use ::framework::{Framework, Command};
 
 /// The Client is the way to "login" and be able to start sending authenticated
 /// requests over the REST API, as well as initializing a WebSocket connection
@@ -92,7 +92,7 @@ use ::framework::Framework;
 /// [`on_message`]: #method.on_message
 /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
 /// [sharding docs]: gateway/index.html#sharding
-pub struct Client {
+pub struct Client<T: Command> {
     /// A ShareMap which requires types to be Send + Sync. This is a map that
     /// can be safely shared across contexts.
     ///
@@ -170,12 +170,12 @@ pub struct Client {
     /// [`on_ready`]: #method.on_ready
     event_store: Arc<RwLock<EventStore>>,
     #[cfg(feature="framework")]
-    framework: Arc<Mutex<Framework>>,
+    framework: Arc<Mutex<Framework<T>>>,
     token: String,
 }
 
 #[allow(type_complexity)]
-impl Client {
+impl<T: Command> Client<T> {
     /// Alias of [`login`].
     ///
     /// [`login`]: #method.login
@@ -257,7 +257,7 @@ impl Client {
     /// [framework docs]: ../framework/index.html
     #[cfg(feature="framework")]
     pub fn with_framework<F>(&mut self, f: F)
-        where F: FnOnce(Framework) -> Framework + Send + Sync + 'static {
+        where F: FnOnce(Framework<T>) -> Framework<T> + Send + Sync + 'static {
         self.framework = Arc::new(Mutex::new(f(Framework::default())));
     }
 

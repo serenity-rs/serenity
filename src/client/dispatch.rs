@@ -8,7 +8,7 @@ use ::model::event::Event;
 use ::model::{ChannelId, Message};
 
 #[cfg(feature="framework")]
-use ::ext::framework::Framework;
+use ::ext::framework::{Framework, Command};
 
 #[cfg(feature="cache")]
 use super::CACHE;
@@ -65,9 +65,9 @@ fn context(channel_id: Option<ChannelId>,
 }
 
 #[cfg(feature="framework")]
-pub fn dispatch(event: Event,
+pub fn dispatch<T: Command>(event: Event,
                 conn: &Arc<Mutex<Shard>>,
-                framework: &Arc<Mutex<Framework>>,
+                framework: &Arc<Mutex<Framework<T>>>,
                 data: &Arc<Mutex<ShareMap>>,
                 event_store: &Arc<RwLock<EventStore>>) {
     match event {
