@@ -760,63 +760,15 @@ pub struct Content {
     pub underline: bool
 }
 
-impl Add<String> for Content {
-    type Output = Content;
-
-    fn add(self, rhs: String) -> Content {
-        let mut nc = self.clone();
-        nc.inner = nc.inner + &rhs;
-
-        nc
-    }
-
-}
-
-impl<'a> Add<&'a str> for Content {
-    type Output = Content;
-
-    fn add(self, rhs: &str) -> Content {
-        let mut nc = self.clone();
-        nc.inner = nc.inner + rhs;
-
-        nc
-    }
-
-}
-
 impl<T: ToString> Add<T> for Content {
     type Output = Content;
 
     fn add(self, rhs: T) -> Content {
         let mut nc = self.clone();
-        nc.inner = nc.inner + rhs.to_string();
+        nc.inner = nc.inner + &rhs.to_string();
 
         nc
     }
-}
-
-impl Add<String> for ContentModifier {
-    type Output = Content;
-
-    fn add(self, rhs: String) -> Content {
-        let mut nc = self.to_content();
-        nc.inner = nc.inner + &rhs;
-
-        nc
-    }
-
-}
-
-impl<'a> Add<&'a str> for ContentModifier {
-    type Output = Content;
-
-    fn add(self, rhs: &str) -> Content {
-        let mut nc = self.to_content();
-        nc.inner = nc.inner + rhs;
-
-        nc
-    }
-
 }
 
 impl<T: ToString> Add<T> for ContentModifier {
@@ -824,7 +776,7 @@ impl<T: ToString> Add<T> for ContentModifier {
 
     fn add(self, rhs: T) -> Content {
         let mut nc = self.to_content();
-        nc.inner = nc.inner + rhs.to_string();
+        nc.inner = nc.inner + &rhs.to_string();
 
         nc
     }
@@ -887,86 +839,59 @@ impl Content {
         }
     }
 
-}
+    fn to_string(&self) -> String {
+        let mut newstr = String::with_capacity(
+            self.inner.len()
+                + if self.bold { 4 } else { 0 }
+                + if self.italic { 2 } else { 0 }
+                + if self.strikethrough { 4 } else { 0 }
+                + if self.underline { 4 } else { 0 }
+                + if self.code { 2 } else { 0 }
+        );
 
-impl Display for Content {
-
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-      let mut newstr = String::with_capacity(
-          self.inner.len()
-              + if self.bold { 4 } else { 0 }
-              + if self.italic { 2 } else { 0 }
-              + if self.strikethrough { 4 } else { 0 }
-              + if self.underline { 4 } else { 0 }
-              + if self.code { 2 } else { 0 }
-      );
-
-      if self.bold {
-          newstr.push_str("**");
-      }
-
-      if self.italic {
-          newstr.push('*');
-      }
-
-      if self.strikethrough {
-          newstr.push_str("~~");
-      }
-
-      if self.underline {
-          newstr.push_str("__");
-      }
-
-      if self.code {
-          newstr.push('`');
-      }
-
-      newstr.push_str(&self.inner);
-
-      if self.code {
-          newstr.push('`');
-      }
-
-      if self.underline {
-          newstr.push_str("__");
-      }
-
-      if self.strikethrough {
-          newstr.push_str("~~");
-      }
-
-      if self.italic {
-          newstr.push('*');
-      }
-
-      if self.bold {
-          newstr.push_str("**");
-      }
-
-      write!(f, "{}", newstr)
-  }
-
-}
-
-impl From<String> for Content {
-
-    fn from(s: String) -> Content {
-        Content {
-            italic: false,
-            bold: false,
-            strikethrough: false,
-            inner: s,
-            code: false,
-            underline: false
+        if self.bold {
+            newstr.push_str("**");
         }
-    }
 
-}
+        if self.italic {
+            newstr.push('*');
+        }
 
-impl<'a> From<&'a str> for Content {
+        if self.strikethrough {
+            newstr.push_str("~~");
+        }
 
-    fn from(s: &str) -> Content {
-        Content::from(s.to_owned())
+        if self.underline {
+            newstr.push_str("__");
+        }
+
+        if self.code {
+            newstr.push('`');
+        }
+
+        newstr.push_str(&self.inner);
+
+        if self.code {
+            newstr.push('`');
+        }
+
+        if self.underline {
+            newstr.push_str("__");
+        }
+
+        if self.strikethrough {
+            newstr.push_str("~~");
+        }
+
+        if self.italic {
+            newstr.push('*');
+        }
+
+        if self.bold {
+            newstr.push_str("**");
+        }
+
+        newstr
     }
 
 }
