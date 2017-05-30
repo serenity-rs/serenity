@@ -155,6 +155,36 @@ impl CurrentUser {
     /// Returns the invite url for the bot with the given permissions.
     ///
     /// If the permissions passed are empty, the permissions part will be dropped.
+    ///
+    /// # Examples
+    ///
+    /// Get the invite url with no permissions set:
+    ///
+    /// ```rust
+    /// # use serenity::client::CACHE;
+    /// # CACHE.read().and_then(|cache| {
+    /// #   let user = &cache.user;
+    /// use serenity::model::permissions::Permissions;
+    ///
+    /// // Assuming current user has already been assigned to user
+    /// let url = user.invite_url(Permissions::empty());
+    /// #   Ok(())
+    /// # });
+    /// ```
+    ///
+    /// Get the invite url with some basic permissions set:
+    ///
+    /// ```rust
+    /// # use serenity::client::CACHE;
+    /// # CACHE.read().and_then(|cache| {
+    /// #   let user = &cache.user;
+    /// use serenity::model::permissions::*;
+    ///
+    /// // Assuming current user has already been assigned to user
+    /// let url = user.invite_url(READ_MESSAGES | SEND_MESSAGES | EMBED_LINKS);
+    /// #   Ok(())
+    /// # });
+    /// ```
     pub fn invite_url(&self, permissions: Permissions) -> String {
         let bits = permissions.bits();
         if bits == 0 {
