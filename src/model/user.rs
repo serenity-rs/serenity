@@ -67,6 +67,19 @@ impl CurrentUser {
     }
 
     /// Returns the DiscordTag of a User.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use serenity::client::CACHE;
+    /// # CACHE.read().and_then(|cache| {
+    /// #   let user = &cache.user;
+    /// // Assuming current user has already been assigned to user
+    /// // Prints out something along the lines of Username#1234
+    /// println!("Current user's distinct identifier is {}", user.distinct());
+    /// #   Ok(())
+    /// # });
+    /// ```
     #[inline]
     pub fn distinct(&self) -> String {
         format!("{}#{}", self.name, self.discriminator)
