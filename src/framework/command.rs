@@ -3,28 +3,63 @@ use super::{Configuration, Bucket};
 use ::client::Context;
 use ::model::{Message, Permissions};
 use std::collections::HashMap;
+use std::cmp::{PartialOrd, Ordering};
 
 pub type Check = Fn(&mut Context, &Message) -> bool + Send + Sync + 'static;
 pub type PrefixCheck = Fn(&mut Context) -> Option<String> + Send + Sync + 'static;
 pub type BeforeHook = Fn(&mut Context, &Message, &String) -> bool + Send + Sync + 'static;
 pub type AfterHook = Fn(&mut Context, &Message, &String, Result<(), String>) + Send + Sync + 'static;
 
-#[derive(Default)]
+#[derive(Clone, Debug)]
 pub struct CommandGroup<T: Command> {
-    pub commands: HashMap<String, T>,
+    pub commands: HashMap<String, Arc<T>>,
     pub prefix: String,
 }
 
+impl<T: Command> Default for CommandGroup<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<T: Command> PartialEq for CommandGroup<T> {
+    fn eq(&self, other: &Self) -> bool {
+        let mut bools = vec![];
+        for key in other.commands.keys() {
+            bools.push(self.commands.contains_key(key));
+            bools.push(self.commands.get(key).is_some());
+        }
+        bools.iter().all(|&b| b)
+    }
+}
+
+impl<T: Command> Eq for CommandGroup<T> {}
+
+impl<T: Command> Ord for CommandGroup<T> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.prefix.cmp(&other.prefix)
+    } 
+}
+
+impl<T: Command> PartialOrd for CommandGroup<T> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.prefix.partial_cmp(&other.prefix)
+    } 
+}
+
 impl<T: Command> CommandGroup<T> {
-    fn new() -> Self {
-        Self::default()
+    pub fn new() -> Self {
+        CommandGroup {
+            commands: HashMap::new(),
+            prefix: "".to_owned(),
+        }
     }
 
-    fn insert(&mut self, command: T) {
-        self.commands.insert(command.name(), command);
+    pub fn insert(&mut self, command: T) {
+        self.commands.insert(command.name(), Arc::new(command));
     }
 
-    fn set_prefix(&mut self, prefix: String) {
+    pub fn set_prefix(&mut self, prefix: String) {
         self.prefix = prefix;
     }
 }

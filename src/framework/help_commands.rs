@@ -38,28 +38,28 @@ fn error_embed(msg: &Message, input: &str) {
             .description(input)));
 }
 
-pub fn plain<T: Command>(msg: &Message,
+pub fn plain<T: Command + Ord>(msg: &Message,
              framework: &Framework<T>,
              args: &[String]) -> Result<(), String> {
     if !args.is_empty() {
         let name = args.join(" ");
 
         for (ref group_name, ref group) in &framework.groups {
-            let mut found = None::<(&String, &Command)>;
+            let mut found = None::<(&String, &Arc<T>)>;
 
             for (ref command_name, ref command) in &group.commands {
-                let with_prefix = if let Some(ref prefix) = group.prefix {
-                    format!("{} {}", prefix, command_name)
+                let with_prefix = if !group.prefix.is_empty() {
+                    format!("{} {}", group.prefix, command_name)
                 } else {
-                    command_name.to_owned()
+                    command_name.to_string()
                 };
 
-                if name == with_prefix || name == *command_name  {
-                    if let Some(ref name) = framework.aliases.get(name) {
+                if name == with_prefix || name == **command_name  {
+                    if let Some(ref name) = framework.aliases.get(&name) {
                         let _ = msg.channel_id.say(&format!("Did you mean {:?}?", name));
                         return Ok(());
                     } else {
-                        found = Some((command_name, command));
+                        found = Some((command_name, *command));
                     }
                 }
             }
@@ -84,7 +84,7 @@ pub fn plain<T: Command>(msg: &Message,
                     let _ = write!(result, "**Sample usage:** `{} {}`\n", command_name, example);
                 }
 
-                if group_name != "Ungrouped" {
+                if *group_name != "Ungrouped" {
                     let _ = write!(result, "**Group:** {}\n", group_name);
                 }
 
@@ -113,10 +113,10 @@ pub fn plain<T: Command>(msg: &Message,
                       name as an argument to this command.\n\n"
         .to_string();
 
-    let mut groups = framework.groups.collect::<Vec<_>>();
+    let mut groups = framework.groups.iter().collect::<Vec<_>>();
     groups.sort();
 
-    for (ref group_name, ref group) in &groups {
+    for &(ref group_name, ref group) in &groups {
         let _ = write!(result, "**{}:** ", group_name);
 
         if !group.prefix.is_empty() {
@@ -125,10 +125,10 @@ pub fn plain<T: Command>(msg: &Message,
 
         let mut no_commands = true;
 
-        let mut commands = group.commands.collect::<Vec<_>>();
+        let mut commands = group.commands.iter().collect::<Vec<_>>();
         commands.sort();
         
-        for (ref name, ref cmd) in &commands {
+        for &(ref name, ref cmd) in &commands {
             if cmd.help_available() {
                 let _ = write!(result, "`{}` ", name);
 
@@ -148,28 +148,28 @@ pub fn plain<T: Command>(msg: &Message,
     Ok(())
 }
 
-pub fn with_embeds<T: Command>(msg: &Message,
+pub fn with_embeds<T: Command + Ord>(msg: &Message,
                    framework: &Framework<T>,
                    args: Vec<String>) -> Result<(), String> {
     if !args.is_empty() {
         let name = args.join(" ");
 
         for (ref group_name, ref group) in &framework.groups {
-            let mut found = None::<(&String, &Command)>;
+            let mut found = None::<(&String, &Arc<T>)>;
 
             for (ref command_name, ref command) in &group.commands {
-                let with_prefix = if let Some(ref prefix) = group.prefix {
-                    format!("{} {}", prefix, command_name)
+                let with_prefix = if !group.prefix.is_empty() {
+                    format!("{} {}", group.prefix, command_name)
                 } else {
-                    command_name.to_owned()
+                    command_name.to_string()
                 };
 
-                if name == with_prefix || name == alias {
-                    if let Some(ref command_name) = framework.aliases.get(name) {
+                if name == with_prefix {
+                    if let Some(ref command_name) = framework.aliases.get(&name) {
                         error_embed(msg, &format!("Did you mean \"{}\"?", command_name));
                         return Ok(());
                     } else {
-                        found = Some((command_name, command));
+                        found = Some((command_name, *command));
                     }
                 }
             }
@@ -201,7 +201,7 @@ pub fn with_embeds<T: Command>(msg: &Message,
                                 .value(&format!("`{} {}`", command_name, example)));
                         }
 
-                        if group_name != "Ungrouped" {
+                        if *group_name != "Ungrouped" {
                             embed = embed.field(|f| f
                                 .name("Group")
                                 .value(&group_name));
@@ -239,10 +239,10 @@ pub fn with_embeds<T: Command>(msg: &Message,
                 .description("To get help with an individual command, pass its \
                               name as an argument to this command.");
 
-            let mut groups = groups.collect::<Vec<_>>();
+            let mut groups = framework.groups.iter().collect::<Vec<_>>();
             groups.sort();
 
-            for (ref group_name, ref group) in &groups {
+            for &(ref group_name, ref group) in &groups {
                 let mut desc = String::new();
 
                 if !group.prefix.is_empty() {
@@ -251,10 +251,10 @@ pub fn with_embeds<T: Command>(msg: &Message,
 
                 let mut no_commands = true;
 
-                let mut commands = group.commands.collect::<Vec<_>>();
+                let mut commands = group.commands.iter().collect::<Vec<_>>();
                 commands.sort();
 
-                for (ref name, ref cmd) in &commands {
+                for &(ref name, ref cmd) in &commands {
                     if cmd.help_available() {
                         let _ = write!(desc, "`{}`\n", name);
 

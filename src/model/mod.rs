@@ -88,6 +88,12 @@ macro_rules! id {
                 }
             }
 
+            impl Default for $name {
+                fn default() -> Self {
+                    $name(0)
+                }
+            }
+
             impl<'de> Deserialize<'de> for $name {
                 fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
                     deserializer.deserialize_u64(U64Visitor).map($name)

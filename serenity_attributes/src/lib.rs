@@ -58,6 +58,7 @@ fn impl_command(ast: &syn::Item) -> Tokens {
     
     quote! {
         extern crate serenity as _serenity;
+        #[derive(Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
         struct #command_name;
         impl _serenity::Command for #command_name {
             fn name(&self) -> String { format!("{}", #ast.ident) }

@@ -65,7 +65,7 @@ fn context(channel_id: Option<ChannelId>,
 }
 
 #[cfg(feature="framework")]
-pub fn dispatch<T: Command>(event: Event,
+pub fn dispatch<T: Command + Send + Sync + 'static + Clone>(event: Event,
                 conn: &Arc<Mutex<Shard>>,
                 framework: &Arc<Mutex<Framework<T>>>,
                 data: &Arc<Mutex<ShareMap>>,
