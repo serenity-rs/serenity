@@ -194,7 +194,7 @@ impl MessageBuilder {
     /// assert_eq!(message.push("ing").0, "testing");
     /// ```
     pub fn push<T: Into<Content>>(mut self, content: T) -> Self {
-        let content: Content = content.into();
+        let content = content.into();
         self.0.push_str(&content.to_string());
 
         self
@@ -950,7 +950,7 @@ impl From<ContentModifier> for Content {
     fn from(cm: ContentModifier) -> Content {
         cm.to_content()
     }
-    
+
 }
 
 fn normalize(text: &str) -> String {
