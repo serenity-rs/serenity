@@ -350,6 +350,30 @@ impl Cache {
     /// is indirectly a [`GuildId`].
     ///
     /// [`GuildId`]: ../model/struct.GuildId.html
+    ///
+    /// # Examples
+    ///
+    /// Retrieve a guild from the cache and print its name:
+    ///
+    /// ```rust
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// use serenity::client::CACHE;
+    /// let cache = CACHE.read()?;
+    ///
+    /// if let Some(lock) = cache.guild(7) {
+    ///     if let Ok(guild) = lock.read() {
+    ///         println!("Guild name: {}", guild.name);
+    ///     }
+    /// }
+    /// #   Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #   try_main().unwrap();        
+    /// # }
+    /// ```
     #[inline]
     pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<Arc<RwLock<Guild>>> {
         self.guilds.get(&id.into()).cloned()
