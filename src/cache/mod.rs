@@ -431,6 +431,30 @@ impl Cache {
     ///
     /// [`ChannelId`]: ../model/struct.ChannelId.html
     /// [`Group`]: ../model/struct.Group.html
+    ///
+    /// # Examples
+    ///
+    /// Retrieve a group from the cache and print its owner's id:
+    ///
+    /// ```rust
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// use serenity::client::CACHE;
+    /// let cache = CACHE.read()?;
+    ///
+    /// if let Some(lock) = cache.group(7) {
+    ///     if let Ok(group) = lock.read() {
+    ///         println!("Owner Id: {}", group.owner_id);
+    ///     }
+    /// }
+    /// #   Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #   try_main().unwrap();        
+    /// # }
+    /// ```
     #[inline]
     pub fn group<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<Group>>> {
         self.groups.get(&id.into()).cloned()
