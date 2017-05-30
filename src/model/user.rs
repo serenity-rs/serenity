@@ -16,7 +16,7 @@ use ::http::{self, GuildPagination};
 use ::builder::EditProfile;
 
 /// Information about the current user.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize)]
 pub struct CurrentUser {
     pub id: UserId,
     pub avatar: Option<String>,

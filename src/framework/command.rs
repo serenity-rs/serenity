@@ -3,28 +3,38 @@ use super::{Configuration, Bucket};
 use ::client::Context;
 use ::model::{Message, Permissions};
 use std::collections::HashMap;
+use std::cmp::{PartialOrd, Ordering};
 
 pub type Check = Fn(&mut Context, &Message) -> bool + Send + Sync + 'static;
 pub type PrefixCheck = Fn(&mut Context) -> Option<String> + Send + Sync + 'static;
 pub type BeforeHook = Fn(&mut Context, &Message, &String) -> bool + Send + Sync + 'static;
 pub type AfterHook = Fn(&mut Context, &Message, &String, Result<(), String>) + Send + Sync + 'static;
 
-#[derive(Default)]
+#[derive(Clone, Debug)]
 pub struct CommandGroup<T: Command> {
-    pub commands: HashMap<String, T>,
+    pub commands: HashMap<String, Arc<T>>,
     pub prefix: String,
 }
 
+impl<T: Command> Default for CommandGroup<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T: Command> CommandGroup<T> {
-    fn new() -> Self {
-        Self::default()
+    pub fn new() -> Self {
+        CommandGroup {
+            commands: HashMap::new(),
+            prefix: "".to_owned(),
+        }
     }
 
-    fn insert(&mut self, command: T) {
-        self.commands.insert(command.name(), command);
+    pub fn insert(&mut self, command: T) {
+        self.commands.insert(command.name(), Arc::new(command));
     }
 
-    fn set_prefix(&mut self, prefix: String) {
+    pub fn set_prefix(&mut self, prefix: String) {
         self.prefix = prefix;
     }
 }

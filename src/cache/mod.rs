@@ -1058,17 +1058,7 @@ impl Cache {
 impl Default for Cache {
     fn default() -> Cache {
         Cache {
-            user: CurrentUser {
-                avatar: None,
-                bot: false,
-                discriminator: 0,
-                email: None,
-                id: UserId(0),
-                mfa_enabled: false,
-                name: String::default(),
-                verified: false,
-            },
-            settings: None,
+            shard_count: 1,
             ..Default::default()
         }
     }

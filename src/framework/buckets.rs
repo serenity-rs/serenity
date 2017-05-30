@@ -2,13 +2,14 @@ use std::collections::HashMap;
 use time;
 
 #[doc(hidden)]
+#[derive(Clone)]
 pub struct Ratelimit {
     pub delay: i64,
     pub limit: Option<(i64, i32)>,
 }
 
 #[doc(hidden)]
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct MemberRatelimit {
     pub last_time: i64,
     pub set_time: i64,
@@ -16,6 +17,7 @@ pub struct MemberRatelimit {
 }
 
 #[doc(hidden)]
+#[derive(Clone)]
 pub struct Bucket {
     pub ratelimit: Ratelimit,
     pub users: HashMap<u64, MemberRatelimit>,

@@ -153,8 +153,7 @@ type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'st
 ///
 /// [module-level documentation]: index.html
 #[allow(type_complexity)]
-#[derive(Default)]
-pub struct Framework<T> {
+pub struct Framework<T: Command> {
     configuration: Configuration,
     #[doc(hidden)]
     pub groups: HashMap<String, Arc<CommandGroup<T>>>,
@@ -183,7 +182,16 @@ pub struct Framework<T> {
     user_info: (u64, bool),
 }
 
-impl<T> Framework<T> {
+// This's to get around the `the trait bound `T: std::default::Default` is not satisfied` error.
+impl<T: Command> Default for Framework<T> {
+    fn default() -> Self {
+        Framework {
+            ..Default::default()
+        }
+    }
+}
+
+impl<T: Command + Send + Sync + 'static + Clone> Framework<T> {
     /// Configures the framework, setting non-default values. All fields are
     /// optional. Refer to [`Configuration::default`] for more information on
     /// the default values.
@@ -240,18 +248,19 @@ impl<T> Framework<T> {
     /// client.with_framework(|f| 
     ///     f.configure(|c| c.prefix("~"))
     ///     .register(SomeCommand)); // `~abc some_command` => `hello`
-    pub fn register<T: Command>(mut self, command: T) -> Self {
+    pub fn register(mut self, command: T) -> Self {
         for alias in &command.aliases() {
             self.aliases.insert(alias.clone(), command.name());
         }
 
-        if self.groups.contains_key(command.group()) {
-            let dummy_lock = self.groups.get_mut(command.group()).unwrap().lock().unwrap();
-            dummy_lock.insert(command);
+        if self.groups.contains_key(&command.group()) {
+            if let Some(g) = self.groups.get_mut(&command.group()) {
+                Arc::make_mut(g).insert(command);
+            }
             return self;
         }
         let mut command_group = CommandGroup::new();
-        command_group.insert(command);
+        command_group.insert(command.clone());
         if !command.group_prefix().is_empty() {
             command_group.set_prefix(command.group_prefix());
         }
@@ -305,20 +314,20 @@ impl<T> Framework<T> {
     }
 
     #[cfg(feature="cache")]
-    fn has_correct_permissions(&self, command: &Arc<Command>, message: &Message) -> bool {
-        if !command.required_permissions.is_empty() {
+    fn has_correct_permissions(&self, command: &Arc<T>, message: &Message) -> bool {
+        if !command.required_permissions().is_empty() {
             if let Some(guild) = message.guild() {
                 let perms = guild.read().unwrap().permissions_for(message.channel_id, message.author.id);
 
-                return perms.contains(command.required_permissions);
+                return perms.contains(command.required_permissions());
             }
         }
 
         true
     }
 
-    fn checks_passed(&self, command: &Arc<Command>, mut context: &mut Context, message: &Message) -> bool {
-        for check in &command.checks {
+    fn checks_passed(&self, command: &Arc<T>, mut context: &mut Context, message: &Message) -> bool {
+        for check in &command.checks() {
             if !(check)(&mut context, message) {
                 return false;
             }
@@ -331,7 +340,7 @@ impl<T> Framework<T> {
     fn should_fail(&mut self,
                    mut context: &mut Context,
                    message: &Message,
-                   command: &Arc<Command>,
+                   command: &Arc<T>,
                    args: usize,
                    to_check: &str,
                    built: &str) -> Option<DispatchError> {
@@ -342,7 +351,7 @@ impl<T> Framework<T> {
         } else if self.configuration.owners.contains(&message.author.id) {
             None
         } else {
-            if let Some(rate_limit) = command.bucket.clone().map(|x| self.ratelimit_time(x.as_str(), message.author.id.0)) {
+            if let Some(rate_limit) = command.bucket().clone().map(|mut x| x.take(message.author.id.0)) {
                 if rate_limit > 0i64 {
                     return Some(DispatchError::RateLimited(rate_limit));
                 }
@@ -373,15 +382,15 @@ impl<T> Framework<T> {
                 }
 
                 if !self.has_correct_permissions(command, message) {
-                    return Some(DispatchError::LackOfPermissions(command.required_permissions));
+                    return Some(DispatchError::LackOfPermissions(command.required_permissions()));
                 }
 
                 if (!self.configuration.allow_dm && message.is_private()) ||
-                    (command.guild_only && message.is_private()) {
+                    (command.guild_only() && message.is_private()) {
                     return Some(DispatchError::OnlyForGuilds);
                 }
 
-                if command.dm_only && !message.is_private() {
+                if command.dm_only() && !message.is_private() {
                     return Some(DispatchError::OnlyForDM);
                 }
             }
@@ -453,15 +462,13 @@ impl<T> Framework<T> {
                 for group in groups.values() {
                     let command_length = built.len();
 
-                    if let Some(ref points_to) = group.commands.get(&built) {
-                        if !points_to.is_empty() {
-                            built = points_to[0].to_owned();
-                        }
+                    if let Some(ref points_to) = self.aliases.get(&built) {
+                        built = (*points_to).clone();
                     }
 
-                    let to_check = if let Some(ref prefix) = group.prefix {
-                        if built.starts_with(prefix) && command_length > prefix.len() + 1 {
-                            built[(prefix.len() + 1)..].to_owned()
+                    let to_check = if !group.prefix.is_empty() {
+                        if built.starts_with(&group.prefix) && command_length > group.prefix.len() + 1 {
+                            built[(group.prefix.len() + 1)..].to_owned()
                         } else {
                             continue;
                         }
@@ -484,7 +491,7 @@ impl<T> Framework<T> {
                                 .collect::<Vec<String>>()
                         };
 
-                        if let Some(error) = self.should_fail(&mut context, &message, &command, args.len(), &to_check, &built) {
+                        if let Some(error) = self.should_fail(&mut context, &message, command, args.len(), &to_check, &built) {
                             if let Some(ref handler) = self.dispatch_error_handler {
                                 handler(context, message, error);
                             }
@@ -498,7 +505,7 @@ impl<T> Framework<T> {
                                 }
                             }
 
-                            let result = command.exec(&mut context, &message, &args);
+                            let result = command.exec(&mut context, &message, args);
 
                             if let Some(after) = after {
                                 (after)(&mut context, &message, &built, result);
@@ -544,12 +551,5 @@ impl<T> Framework<T> {
     #[doc(hidden)]
     pub fn update_current_user(&mut self, user_id: UserId, is_bot: bool) {
         self.user_info = (user_id.0, is_bot);
-    }
-
-    fn ratelimit_time(&mut self, bucket_name: &str, user_id: u64) -> i64 {
-        self.buckets
-            .get_mut(bucket_name)
-            .map(|bucket| bucket.take(user_id))
-            .unwrap_or(0)
     }
 }
