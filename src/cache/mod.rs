@@ -554,6 +554,28 @@ impl Cache {
     ///
     /// [`Guild`]: ../model/struct.Guild.html
     /// [`roles`]: ../model/struct.Guild.html#structfield.roles
+    ///
+    /// # Examples
+    ///
+    /// Retrieve a role from the cache and print its name:
+    ///
+    /// ```rust
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// use serenity::client::CACHE;
+    /// let cache = CACHE.read()?;
+    ///
+    /// if let Some(role) = cache.role(7, 77) {
+    ///     println!("Role with Id 77 is called {}", role.name);
+    /// }
+    /// #   Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #   try_main().unwrap();        
+    /// # }
+    /// ```
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
         where G: Into<GuildId>, R: Into<RoleId> {
         self.guilds
