@@ -517,6 +517,30 @@ impl Cache {
     ///
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`ChannelId`].
+    ///
+    /// # Examples
+    ///
+    /// Retrieve a private channel from the cache and send a message:
+    ///
+    /// ```rust
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// use serenity::client::CACHE;
+    /// let cache = CACHE.read()?;
+    ///
+    /// if let Some(lock) = cache.private_channel(7) {
+    ///     if let Ok(channel) = lock.read() {
+    ///         channel.say("Hello there!");
+    ///     }
+    /// }
+    /// #   Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #   try_main().unwrap();        
+    /// # }
+    /// ```
     #[inline]
     pub fn private_channel<C: Into<ChannelId>>(&self, channel_id: C)
         -> Option<Arc<RwLock<PrivateChannel>>> {
