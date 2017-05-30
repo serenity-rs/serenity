@@ -46,7 +46,7 @@ use hyper::status::StatusCode;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use std::{str, thread};
+use std::{i64, str, thread};
 use super::{HttpError, LightMethod};
 use time;
 use ::internal::prelude::*;
@@ -89,7 +89,7 @@ lazy_static! {
     ///
     /// [`RateLimit`]: struct.RateLimit.html
     /// [`Route`]: enum.Route.html
-    pub static ref ROUTES: Arc<Mutex<HashMap<Route, RateLimit>>> = Arc::new(Mutex::new(HashMap::default()));
+    pub static ref ROUTES: Arc<Mutex<HashMap<Route, Arc<Mutex<RateLimit>>>>> = Arc::new(Mutex::new(HashMap::default()));
 }
 
 /// A representation of all routes registered within the library. These are safe
@@ -344,11 +344,9 @@ pub enum Route {
 pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
     where F: Fn() -> RequestBuilder<'a> {
     loop {
-        {
-            // This will block if another thread already has the global
-            // unlocked already (due to receiving an x-ratelimit-global).
-            let mut _global = GLOBAL.lock().expect("global route lock poisoned");
-        }
+        // This will block if another thread already has the global
+        // unlocked already (due to receiving an x-ratelimit-global).
+        let _ = GLOBAL.lock().expect("global route lock poisoned");
 
         // Perform pre-checking here:
         //
@@ -358,11 +356,18 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
         // - get the global rate;
         // - sleep if there is 0 remaining
         // - then, perform the request
-        if route != Route::None {
-            if let Some(route) = ROUTES.lock().expect("routes poisoned").get_mut(&route) {
-                route.pre_hook();
-            }
-        }
+        let bucket = ROUTES
+            .lock()
+            .expect("routes poisoned")
+            .entry(route)
+            .or_insert_with(|| Arc::new(Mutex::new(RateLimit {
+                limit: i64::MAX,
+                remaining: i64::MAX,
+                reset: i64::MAX,
+            }))).clone();
+
+        let mut lock = bucket.lock().unwrap();
+        lock.pre_hook();
 
         let response = super::retry(&f)?;
 
@@ -394,11 +399,7 @@ pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
                     false
                 })
             } else {
-                ROUTES.lock()
-                    .expect("routes poisoned")
-                    .entry(route)
-                    .or_insert_with(RateLimit::default)
-                    .post_hook(&response)
+                lock.post_hook(&response)
             };
 
             if !redo.unwrap_or(true) {
