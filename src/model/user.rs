@@ -36,6 +36,23 @@ impl CurrentUser {
     /// Returns the formatted URL of the user's icon, if one exists.
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
+    ///
+    /// # Examples
+    ///
+    /// Print out the current user's avatar url if one is set:
+    ///
+    /// ```rust
+    /// # use serenity::client::CACHE;
+    /// # CACHE.read().and_then(|cache| {
+    /// #   let user = &cache.user;
+    /// // Assuming current user has already been assigned to user
+    /// match user.avatar_url() {
+    ///     Some(url) => println!("{}'s avatar can be found at {}", user.name, url),
+    ///     None => println!("{} does not have an avatar set.", user.name)    
+    /// }
+    /// #   Ok(())
+    /// # });
+    /// ```
     pub fn avatar_url(&self) -> Option<String> {
         self.avatar.as_ref()
             .map(|av| {
