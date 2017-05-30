@@ -122,6 +122,24 @@ impl CurrentUser {
     }
 
     /// Gets a list of guilds that the current user is in.
+    ///
+    /// # Examples
+    ///
+    /// Print out the names of all guilds the current user is in:
+    ///
+    /// ```rust
+    /// # use serenity::client::CACHE;
+    /// # CACHE.read().and_then(|cache| {
+    /// #   let user = &cache.user;
+    /// // Assuming current user has already been assigned to user
+    /// if let Ok(guilds) = user.guilds() {
+    ///     for (index, guild) in guilds.into_iter().enumerate() {
+    ///         println!("{}: {}", index, guild.name);
+    ///     }
+    /// }
+    /// #   Ok(())
+    /// # });
+    /// ```
     pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
         http::get_guilds(&GuildPagination::After(GuildId(1)), 100)
     }
