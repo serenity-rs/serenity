@@ -147,6 +147,23 @@ impl CurrentUser {
     /// Returns a static formatted URL of the user's icon, if one exists.
     ///
     /// This will always produce a WEBP image URL.
+    ///
+    /// # Examples
+    ///
+    /// Print out the current user's static avatar url if one is set:
+    ///
+    /// ```rust
+    /// # use serenity::client::CACHE;
+    /// # CACHE.read().and_then(|cache| {
+    /// #   let user = &cache.user;
+    /// // Assuming current user has already been assigned to user
+    /// match user.static_avatar_url() {
+    ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
+    ///     None => println!("Could not get static avatar for {}.", user.name)    
+    /// }
+    /// #   Ok(())
+    /// # });
+    /// ```
     pub fn static_avatar_url(&self) -> Option<String> {
         self.avatar.as_ref()
             .map(|av| format!(cdn!("/avatars/{}/{}.webp?size=1024"), self.id.0, av))
