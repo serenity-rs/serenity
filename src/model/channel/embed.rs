@@ -69,6 +69,22 @@ impl Embed {
     /// This should only be useful in conjunction with [`Webhook::execute`].
     ///
     /// [`Webhook::execute`]: struct.Webhook.html
+    ///
+    /// # Examples
+    ///
+    /// Create an embed:
+    ///
+    /// ```rust,no_run
+    /// use serenity::model::Embed;
+    ///
+    /// let embed = Embed::fake(|e| e
+    ///     .title("Embed title")
+    ///     .description("Making a basic embed")
+    ///     .field(|f| f
+    ///         .name("A field")
+    ///         .value("Has some content.")
+    ///         .inline(false)));
+    /// ```
     #[inline]
     pub fn fake<F>(f: F) -> Value where F: FnOnce(CreateEmbed) -> CreateEmbed {
         Value::Object(f(CreateEmbed::default()).0)
