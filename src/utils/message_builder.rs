@@ -746,7 +746,7 @@ pub enum ContentModifier {
     Bold,
     Strikethrough,
     Code,
-    Underline
+    Underline,
 }
 
 /// Describes formatting on string content
@@ -791,7 +791,6 @@ impl Add<ContentModifier> for Content {
 
         nc
     }
-
 }
 
 impl Add<ContentModifier> for ContentModifier {
@@ -803,22 +802,18 @@ impl Add<ContentModifier> for ContentModifier {
 
         nc
     }
-
 }
 
 impl ContentModifier {
-
     fn to_content(&self) -> Content {
       let mut nc = Content::default();
       nc.apply(self);
 
       nc
     }
-
 }
 
 impl Content {
-
     pub fn apply(&mut self, modifier: &ContentModifier) {
         match *modifier {
             ContentModifier::Italic => {
@@ -835,77 +830,72 @@ impl Content {
             },
             ContentModifier::Underline => {
                 self.underline = true;
-            }
+            },
         }
     }
 
     pub fn to_string(&self) -> String {
-        let mut newstr = String::with_capacity(
-            self.inner.len()
-                + if self.bold { 4 } else { 0 }
-                + if self.italic { 2 } else { 0 }
-                + if self.strikethrough { 4 } else { 0 }
-                + if self.underline { 4 } else { 0 }
-                + if self.code { 2 } else { 0 }
-        );
+        let capacity = self.inner.len()
+            + if self.bold { 4 } else { 0 }
+            + if self.italic { 2 } else { 0 }
+            + if self.strikethrough { 4 } else { 0 }
+            + if self.underline { 4 } else { 0 }
+            + if self.code { 2 } else { 0 };
+        let mut new_str = String::with_capacity(capacity);
 
         if self.bold {
-            newstr.push_str("**");
+            new_str.push_str("**");
         }
 
         if self.italic {
-            newstr.push('*');
+            new_str.push('*');
         }
 
         if self.strikethrough {
-            newstr.push_str("~~");
+            new_str.push_str("~~");
         }
 
         if self.underline {
-            newstr.push_str("__");
+            new_str.push_str("__");
         }
 
         if self.code {
-            newstr.push('`');
+            new_str.push('`');
         }
 
-        newstr.push_str(&self.inner);
+        new_str.push_str(&self.inner);
 
         if self.code {
-            newstr.push('`');
+            new_str.push('`');
         }
 
         if self.underline {
-            newstr.push_str("__");
+            new_str.push_str("__");
         }
 
         if self.strikethrough {
-            newstr.push_str("~~");
+            new_str.push_str("~~");
         }
 
         if self.italic {
-            newstr.push('*');
+            new_str.push('*');
         }
 
         if self.bold {
-            newstr.push_str("**");
+            new_str.push_str("**");
         }
 
-        newstr
+        new_str
     }
-
 }
 
 impl From<ContentModifier> for Content {
-
     fn from(cm: ContentModifier) -> Content {
         cm.to_content()
     }
-
 }
 
 impl<T: ToString> From<T> for Content {
-
     fn from(stringer: T) -> Content {
         Content {
             italic: false,
@@ -913,10 +903,9 @@ impl<T: ToString> From<T> for Content {
             strikethrough: false,
             inner: stringer.to_string(),
             code: false,
-            underline: false
+            underline: false,
         }
     }
-
 }
 
 fn normalize(text: &str) -> String {
