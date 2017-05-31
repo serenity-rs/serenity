@@ -294,11 +294,7 @@ impl Context {
     /// [`reset_presence`]: #method.reset_presence
     /// [`set_presence`]: #method.set_presence
     pub fn set_game_name(&self, game_name: &str) {
-        let game = Game {
-            kind: GameType::Playing,
-            name: game_name.to_owned(),
-            url: None,
-        };
+        let game = Game::playing(game_name);
 
         self.shard.lock()
             .unwrap()
