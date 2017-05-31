@@ -151,6 +151,7 @@ pub fn plain<T: Command + Ord>(msg: &Message,
 pub fn with_embeds<T: Command + Ord>(msg: &Message,
                    framework: &Framework<T>,
                    args: Vec<String>) -> Result<(), String> {
+
     if !args.is_empty() {
         let name = args.join(" ");
 
@@ -249,7 +250,7 @@ pub fn with_embeds<T: Command + Ord>(msg: &Message,
                     let _ = write!(desc, "Prefix: {}\n", group.prefix);
                 }
 
-                let mut no_commands = true;
+                let mut has_commands = false;
 
                 let mut commands = group.commands.iter().collect::<Vec<_>>();
                 commands.sort();
@@ -258,13 +259,10 @@ pub fn with_embeds<T: Command + Ord>(msg: &Message,
                     if cmd.help_available() {
                         let _ = write!(desc, "`{}`\n", name);
 
-                        no_commands = false;
+                        has_commands = true;
                     }
 
-                    if no_commands {
-                        let _ = write!(desc, "*[No commands]*");
-                    }
-
+                if has_commands {
                     e = e.field(|f| f.name(&group_name).value(&desc));
                 }
             }
