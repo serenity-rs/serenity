@@ -350,6 +350,29 @@ impl Cache {
     /// is indirectly a [`GuildId`].
     ///
     /// [`GuildId`]: ../model/struct.GuildId.html
+    ///
+    /// # Examples
+    ///
+    /// Retrieve a guild from the cache and print its name:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// use serenity::client::CACHE;
+    ///
+    /// let cache = CACHE.read()?;
+    ///
+    /// if let Some(guild) = cache.guild(7) {
+    ///     println!("Guild name: {}", guild.read().unwrap().name);
+    /// }
+    /// #   Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    /// ```
     #[inline]
     pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<Arc<RwLock<Guild>>> {
         self.guilds.get(&id.into()).cloned()
@@ -407,6 +430,29 @@ impl Cache {
     ///
     /// [`ChannelId`]: ../model/struct.ChannelId.html
     /// [`Group`]: ../model/struct.Group.html
+    ///
+    /// # Examples
+    ///
+    /// Retrieve a group from the cache and print its owner's id:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// use serenity::client::CACHE;
+    ///
+    /// let cache = CACHE.read()?;
+    ///
+    /// if let Some(group) = cache.group(7) {
+    ///     println!("Owner Id: {}", group.read().unwrap().owner_id);
+    /// }
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    /// ```
     #[inline]
     pub fn group<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<Group>>> {
         self.groups.get(&id.into()).cloned()
@@ -469,6 +515,29 @@ impl Cache {
     ///
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`ChannelId`].
+    ///
+    /// # Examples
+    ///
+    /// Retrieve a private channel from the cache and send a message:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// use serenity::client::CACHE;
+    ///
+    /// let cache = CACHE.read()?;
+    ///
+    /// if let Some(channel) = cache.private_channel(7) {
+    ///     channel.read().unwrap().say("Hello there!");
+    /// }
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    /// ```
     #[inline]
     pub fn private_channel<C: Into<ChannelId>>(&self, channel_id: C)
         -> Option<Arc<RwLock<PrivateChannel>>> {
@@ -482,6 +551,29 @@ impl Cache {
     ///
     /// [`Guild`]: ../model/struct.Guild.html
     /// [`roles`]: ../model/struct.Guild.html#structfield.roles
+    ///
+    /// # Examples
+    ///
+    /// Retrieve a role from the cache and print its name:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// use serenity::client::CACHE;
+    ///
+    /// let cache = CACHE.read()?;
+    ///
+    /// if let Some(role) = cache.role(7, 77) {
+    ///     println!("Role with Id 77 is called {}", role.name);
+    /// }
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #   try_main().unwrap();
+    /// # }
+    /// ```
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
         where G: Into<GuildId>, R: Into<RoleId> {
         self.guilds
@@ -496,6 +588,29 @@ impl Cache {
     ///
     /// [`UserId`]: ../model/struct.UserId.html
     /// [`users`]: #structfield.users
+    ///
+    /// # Examples
+    ///
+    /// Retrieve a user from the cache and print their name:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// use serenity::client::CACHE;
+    ///
+    /// let cache = CACHE.read()?;
+    ///
+    /// if let Some(user) = cache.user(7) {
+    ///     println!("User with Id 7 is currently named {}", user.read().unwrap().name);
+    /// }
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    /// ```
     #[inline]
     pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<Arc<RwLock<User>>> {
         self.users.get(&user_id.into()).cloned()
