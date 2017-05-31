@@ -38,6 +38,20 @@ fn error_embed(msg: &Message, input: &str) {
             .description(input)));
 }
 
+/// Posts formatted text displaying each individual command group and its commands.
+///
+/// # Examples
+///
+/// Use the command with `exec_help`:
+///
+/// ```rust
+/// # use serenity::Client;
+/// # let mut client = Client::login("token");
+/// use serenity::ext::framework::help_commands;
+///
+/// client.with_framework(|f| f
+///     .command("help", |c| c.exec_help(help_commands::plain)));
+/// ```
 pub fn plain<T: Command + Ord>(msg: &Message,
              framework: &Framework<T>,
              args: &[String]) -> Result<(), String> {
@@ -142,6 +156,21 @@ pub fn plain<T: Command + Ord>(msg: &Message,
     Ok(())
 }
 
+
+/// Posts an embed showing each individual command group and its commands.
+///
+/// # Examples
+///
+/// Use the command with `exec_help`:
+///
+/// ```rust
+/// # use serenity::Client;
+/// # let mut client = Client::login("token");
+/// use serenity::ext::framework::help_commands;
+///
+/// client.with_framework(|f| f
+///     .command("help", |c| c.exec_help(help_commands::with_embeds)));
+/// ```
 pub fn with_embeds<T: Command + Ord>(msg: &Message,
                    framework: &Framework<T>,
                    args: Vec<String>) -> Result<(), String> {
@@ -262,4 +291,3 @@ pub fn with_embeds<T: Command + Ord>(msg: &Message,
 
     Ok(())
 }
-
