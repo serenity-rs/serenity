@@ -355,23 +355,22 @@ impl Cache {
     ///
     /// Retrieve a guild from the cache and print its name:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// use serenity::client::CACHE;
+    ///
     /// let cache = CACHE.read()?;
     ///
-    /// if let Some(lock) = cache.guild(7) {
-    ///     if let Ok(guild) = lock.read() {
-    ///         println!("Guild name: {}", guild.name);
-    ///     }
+    /// if let Some(guild) = cache.guild(7) {
+    ///     println!("Guild name: {}", guild.read()?.name);
     /// }
     /// #   Ok(())
     /// # }
     /// #
     /// # fn main() {
-    /// #   try_main().unwrap();        
+    /// #     try_main().unwrap();
     /// # }
     /// ```
     #[inline]
@@ -436,23 +435,22 @@ impl Cache {
     ///
     /// Retrieve a group from the cache and print its owner's id:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// use serenity::client::CACHE;
+    ///
     /// let cache = CACHE.read()?;
     ///
     /// if let Some(lock) = cache.group(7) {
-    ///     if let Ok(group) = lock.read() {
-    ///         println!("Owner Id: {}", group.owner_id);
-    ///     }
+    ///     println!("Owner Id: {}", group.read()?.owner_id);
     /// }
-    /// #   Ok(())
+    /// #     Ok(())
     /// # }
     /// #
     /// # fn main() {
-    /// #   try_main().unwrap();        
+    /// #     try_main().unwrap();
     /// # }
     /// ```
     #[inline]
@@ -522,23 +520,22 @@ impl Cache {
     ///
     /// Retrieve a private channel from the cache and send a message:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// use serenity::client::CACHE;
+    ///
     /// let cache = CACHE.read()?;
     ///
-    /// if let Some(lock) = cache.private_channel(7) {
-    ///     if let Ok(channel) = lock.read() {
-    ///         channel.say("Hello there!");
-    ///     }
+    /// if let Some(channel) = cache.private_channel(7) {
+    ///     channel.read()?.say("Hello there!");
     /// }
-    /// #   Ok(())
+    /// #     Ok(())
     /// # }
     /// #
     /// # fn main() {
-    /// #   try_main().unwrap();        
+    /// #     try_main().unwrap();
     /// # }
     /// ```
     #[inline]
@@ -559,17 +556,18 @@ impl Cache {
     ///
     /// Retrieve a role from the cache and print its name:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// use serenity::client::CACHE;
+    ///
     /// let cache = CACHE.read()?;
     ///
     /// if let Some(role) = cache.role(7, 77) {
     ///     println!("Role with Id 77 is called {}", role.name);
     /// }
-    /// #   Ok(())
+    /// #     Ok(())
     /// # }
     /// #
     /// # fn main() {
@@ -595,23 +593,22 @@ impl Cache {
     ///
     /// Retrieve a user from the cache and print their name:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// use serenity::client::CACHE;
+    ///
     /// let cache = CACHE.read()?;
     ///
     /// if let Some(lock) = cache.user(7) {
-    ///     if let Ok(user) = lock.read() {
-    ///         println!("User with Id 7 is currently named {}", user.name);
-    ///     }
+    ///     println!("User with Id 7 is currently named {}", user.read()?.name);
     /// }
-    /// #   Ok(())
+    /// #     Ok(())
     /// # }
     /// #
     /// # fn main() {
-    /// #   try_main().unwrap();        
+    /// #     try_main().unwrap();        
     /// # }
     /// ```
     #[inline]
