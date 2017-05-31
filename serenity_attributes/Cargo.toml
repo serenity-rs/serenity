@@ -1,0 +1,11 @@
+[package]
+name = "serenity_attributes"
+version = "0.1.0"
+authors = ["acdenisSK <acdenissk69@gmail.com>"]
+
+[dependencies]
+syn = { version = "0.11.9", features = ["full"] }
+quote = "0.3.15"
+
+[lib]
+proc-macro = true

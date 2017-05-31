@@ -339,17 +339,10 @@ impl Default for Configuration {
     fn default() -> Configuration {
         Configuration {
             depth: 5,
-            on_mention: None,
-            dynamic_prefix: None,
-            allow_whitespace: false,
-            prefixes: vec![],
             ignore_bots: true,
-            owners: HashSet::default(),
-            blocked_users: HashSet::default(),
-            blocked_guilds: HashSet::default(),
-            disabled_commands: HashSet::default(),
             allow_dm: true,
             ignore_webhooks: true,
+            ..Default::default()
         }
     }
 }
