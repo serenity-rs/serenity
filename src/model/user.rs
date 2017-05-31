@@ -36,6 +36,24 @@ impl CurrentUser {
     /// Returns the formatted URL of the user's icon, if one exists.
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
+    ///
+    /// # Examples
+    ///
+    /// Print out the current user's avatar url if one is set:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::CACHE;
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
+    /// // assuming the cache has been unlocked
+    /// let user = &cache.user;
+    ///
+    /// match user.avatar_url() {
+    ///     Some(url) => println!("{}'s avatar can be found at {}", user.name, url),
+    ///     None => println!("{} does not have an avatar set.", user.name)
+    /// }
+    /// ```
     pub fn avatar_url(&self) -> Option<String> {
         self.avatar.as_ref()
             .map(|av| {
@@ -50,6 +68,19 @@ impl CurrentUser {
     }
 
     /// Returns the DiscordTag of a User.
+    ///
+    /// # Examples
+    ///
+    /// Print out the current user's distinct identifier (i.e., Username#1234):
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::CACHE;
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
+    /// // assuming the cache has been unlocked
+    /// println!("Current user's distinct identifier is {}", cache.user.distinct());
+    /// ```
     #[inline]
     pub fn distinct(&self) -> String {
         format!("{}#{}", self.name, self.discriminator)
@@ -92,6 +123,25 @@ impl CurrentUser {
     }
 
     /// Gets a list of guilds that the current user is in.
+    ///
+    /// # Examples
+    ///
+    /// Print out the names of all guilds the current user is in:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::CACHE;
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
+    /// // assuming the cache has been unlocked
+    /// let user = &cache.user;
+    ///
+    /// if let Ok(guilds) = user.guilds() {
+    ///     for (index, guild) in guilds.into_iter().enumerate() {
+    ///         println!("{}: {}", index, guild.name);
+    ///     }
+    /// }
+    /// ```
     pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
         http::get_guilds(&GuildPagination::After(GuildId(1)), 100)
     }
@@ -99,6 +149,24 @@ impl CurrentUser {
     /// Returns a static formatted URL of the user's icon, if one exists.
     ///
     /// This will always produce a WEBP image URL.
+    ///
+    /// # Examples
+    ///
+    /// Print out the current user's static avatar url if one is set:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::CACHE;
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
+    /// // assuming the cache has been unlocked
+    /// let user = &cache.user;
+    ///
+    /// match user.static_avatar_url() {
+    ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
+    ///     None => println!("Could not get static avatar for {}.", user.name)
+    /// }
+    /// ```
     pub fn static_avatar_url(&self) -> Option<String> {
         self.avatar.as_ref()
             .map(|av| format!(cdn!("/avatars/{}/{}.webp?size=1024"), self.id.0, av))
@@ -107,8 +175,43 @@ impl CurrentUser {
     /// Returns the invite url for the bot with the given permissions.
     ///
     /// If the permissions passed are empty, the permissions part will be dropped.
+    ///
+    /// # Examples
+    ///
+    /// Get the invite url with no permissions set:
+    ///
+    /// ```rust
+    /// # use serenity::client::CACHE;
+    /// #
+    /// # let mut cache = CACHE.write().unwrap();
+    /// # cache.user.id.0 = 249608697955745802;
+    /// #
+    /// use serenity::model::permissions::Permissions;
+    ///
+    /// // assuming the cache has been unlocked
+    /// let url = cache.user.invite_url(Permissions::empty());
+    ///
+    /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize?client_id=249608697955745802&scope=bot");
+    /// ```
+    ///
+    /// Get the invite url with some basic permissions set:
+    ///
+    /// ```rust
+    /// # use serenity::client::CACHE;
+    /// #
+    /// # let mut cache = CACHE.write().unwrap();
+    /// # cache.user.id.0 = 249608697955745802;
+    /// #
+    /// use serenity::model::permissions::*;
+    ///
+    /// // assuming the cache has been unlocked
+    /// let url = cache.user.invite_url(READ_MESSAGES | SEND_MESSAGES | EMBED_LINKS);
+    ///
+    /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize?client_id=249608697955745802&scope=bot&permissions=19456");
+    /// ```
     pub fn invite_url(&self, permissions: Permissions) -> String {
         let bits = permissions.bits();
+
         if bits == 0 {
             format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot", self.id)
         } else {

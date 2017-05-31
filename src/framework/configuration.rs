@@ -93,6 +93,19 @@ impl Configuration {
     }
 
     /// HashSet of guild Ids where commands will be ignored.
+    ///
+    /// # Examples
+    ///
+    /// Create a HashSet in-place:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// use serenity::model::GuildId;
+    ///
+    /// client.with_framework(|f| f.configure(|c| c
+    ///     .blocked_guilds(vec![GuildId(7), GuildId(77)].into_iter().collect())));
+    /// ```
     pub fn blocked_guilds(mut self, guilds: HashSet<GuildId>) -> Self {
         self.blocked_guilds = guilds;
 
@@ -101,6 +114,19 @@ impl Configuration {
 
     /// HashSet of user Ids whose commands will be ignored.
     /// Guilds owned by user Ids will also be ignored.
+    ///
+    /// # Examples
+    ///
+    /// Create a HashSet in-place:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// use serenity::model::UserId;
+    ///
+    /// client.with_framework(|f| f.configure(|c| c
+    ///     .blocked_users(vec![UserId(7), UserId(77)].into_iter().collect())));
+    /// ```
     pub fn blocked_users(mut self, users: HashSet<UserId>) -> Self {
         self.blocked_users = users;
 
@@ -122,6 +148,21 @@ impl Configuration {
     }
 
     /// HashSet of command names that won't be run.
+    ///
+    /// # Examples
+    ///
+    /// Ignore a set of commands, assuming they exist:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    ///
+    /// let disabled = vec!["ping"].into_iter().map(|x| x.to_owned()).collect();
+    ///
+    /// client.with_framework(|f| f
+    ///     .command("ping", |c| c.exec_str("pong!"))
+    ///     .configure(|c| c.disabled_commands(disabled)));
+    /// ```
     pub fn disabled_commands(mut self, commands: HashSet<String>) -> Self {
         self.disabled_commands = commands;
 
@@ -213,22 +254,74 @@ impl Configuration {
     }
 
     /// A `HashSet` of user Ids checks won't apply to.
+    ///
+    /// # Examples
+    ///
+    /// Create a HashSet in-place:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// use serenity::model::UserId;
+    ///
+    /// client.with_framework(|f| f.configure(|c| c
+    ///     .owners(vec![UserId(7), UserId(77)].into_iter().collect())));
+    /// ```
+    ///
+    /// Create a HashSet beforehand:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// use serenity::model::UserId;
+    /// use std::collections::HashSet;
+    ///
+    /// let mut set = HashSet::new();
+    /// set.insert(UserId(7));
+    /// set.insert(UserId(77));
+    ///
+    /// client.with_framework(|f| f.configure(|c| c.owners(set)));
+    /// ```
     pub fn owners(mut self, user_ids: HashSet<UserId>) -> Self {
         self.owners = user_ids;
 
         self
     }
 
-    /// Sets the prefix to respond to. This can either be a single-char or
-    /// multi-char string.
+    /// Sets the prefix to respond to. A prefix can be a string slice of any 
+    /// non-zero length.
+    ///
+    /// # Examples
+    ///
+    /// Assign a basic prefix:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// #
+    /// client.with_framework(|f| f.configure(|c| c
+    ///     .prefix("!")));
+    /// ```
     pub fn prefix(mut self, prefix: &str) -> Self {
         self.prefixes = vec![prefix.to_owned()];
 
         self
     }
 
-    /// Sets the prefixes to respond to. Those can either be single-chararacter or
-    /// multi-chararacter strings.
+    /// Sets the prefixes to respond to. Each can be a string slice of any
+    /// non-zero length.
+    ///
+    /// # Examples
+    ///
+    /// Assign a set of prefixes the bot can respond to:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// #
+    /// client.with_framework(|f| f.configure(|c| c
+    ///     .prefixes(vec!["!", ">", "+"])));
+    /// ```
     pub fn prefixes(mut self, prefixes: Vec<&str>) -> Self {
         self.prefixes = prefixes.iter().map(|x| x.to_string()).collect();
 

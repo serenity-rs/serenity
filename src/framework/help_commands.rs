@@ -38,7 +38,7 @@ fn error_embed(msg: &Message, input: &str) {
             .description(input)));
 }
 
-pub fn plain<T: Command>(msg: &Message,
+pub fn plain<T: Command + Ord>(msg: &Message,
              framework: &Framework<T>,
              args: &[String]) -> Result<(), String> {
     if !args.is_empty() {
@@ -113,6 +113,7 @@ pub fn plain<T: Command>(msg: &Message,
                       name as an argument to this command.\n\n"
         .to_string();
 
+
     for (ref group_name, ref group) in &framework.groups {
         let _ = write!(result, "**{}:** ", group_name);
 
@@ -142,9 +143,10 @@ pub fn plain<T: Command>(msg: &Message,
     Ok(())
 }
 
-pub fn with_embeds<T: Command>(msg: &Message,
+pub fn with_embeds<T: Command + Ord>(msg: &Message,
                    framework: &Framework<T>,
                    args: Vec<String>) -> Result<(), String> {
+
     if !args.is_empty() {
         let name = args.join(" ");
 
@@ -240,19 +242,16 @@ pub fn with_embeds<T: Command>(msg: &Message,
                     let _ = write!(desc, "Prefix: {}\n", group.prefix);
                 }
 
-                let mut no_commands = true;
+                let mut has_commands = false;
 
                 for (ref name, ref cmd) in &group.commands {
                     if cmd.help_available() {
                         let _ = write!(desc, "`{}`\n", name);
 
-                        no_commands = false;
+                        has_commands = true;
                     }
 
-                    if no_commands {
-                        let _ = write!(desc, "*[No commands]*");
-                    }
-
+                if has_commands {
                     e = e.field(|f| f.name(&group_name).value(&desc));
                 }
             }
