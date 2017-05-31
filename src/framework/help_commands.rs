@@ -171,7 +171,7 @@ pub fn with_embeds(ctx: &mut Context,
                     let _ = write!(desc, "Prefix: {}\n", x);
                 }
 
-                let mut no_commands = true;
+                let mut has_commands = false;
 
                 let commands = remove_aliases(&group.commands);
                 let mut command_names = commands.keys().collect::<Vec<_>>();
@@ -183,15 +183,13 @@ pub fn with_embeds(ctx: &mut Context,
                     if cmd.help_available {
                         let _ = write!(desc, "`{}`\n", name);
 
-                        no_commands = false;
+                        has_commands = true;
                     }
                 }
 
-                if no_commands {
-                    let _ = write!(desc, "*[No commands]*");
+                if has_commands {
+                    e = e.field(|f| f.name(&group_name).value(&desc));
                 }
-
-                e = e.field(|f| f.name(&group_name).value(&desc));
             }
 
             e
@@ -298,13 +296,7 @@ pub fn plain(ctx: &mut Context,
 
     for group_name in group_names {
         let group = &groups[group_name];
-        let _ = write!(result, "**{}:** ", group_name);
-
-        if let Some(ref x) = group.prefix {
-            let _ = write!(result, "(prefix: `{}`): ", x);
-        }
-
-        let mut no_commands = true;
+        let mut group_help = String::new();
 
         let commands = remove_aliases(&group.commands);
         let mut command_names = commands.keys().collect::<Vec<_>>();
@@ -314,17 +306,20 @@ pub fn plain(ctx: &mut Context,
             let cmd = &commands[name];
             
             if cmd.help_available {
-                let _ = write!(result, "`{}` ", name);
-
-                no_commands = false;
+                let _ = write!(group_help, "`{}` ", name);
             }
         }
 
-        if no_commands {
-            result.push_str("*[No Commands]*");
-        }
+        if group_help.len() > 0 {
+            let _ = write!(result, "**{}:** ", group_name);
 
-        result.push('\n');
+            if let Some(ref x) = group.prefix {
+                let _ = write!(result, "(prefix: `{}`): ", x);
+            }
+
+            result.push_str(&group_help);
+            result.push('\n');
+        }
     }
 
     let _ = ctx.channel_id.unwrap().say(&result);
