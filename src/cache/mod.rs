@@ -364,7 +364,7 @@ impl Cache {
     /// let cache = CACHE.read()?;
     ///
     /// if let Some(guild) = cache.guild(7) {
-    ///     println!("Guild name: {}", guild.read()?.name);
+    ///     println!("Guild name: {}", guild.read().unwrap().name);
     /// }
     /// #   Ok(())
     /// # }
@@ -443,8 +443,8 @@ impl Cache {
     ///
     /// let cache = CACHE.read()?;
     ///
-    /// if let Some(lock) = cache.group(7) {
-    ///     println!("Owner Id: {}", group.read()?.owner_id);
+    /// if let Some(group) = cache.group(7) {
+    ///     println!("Owner Id: {}", group.read().unwrap().owner_id);
     /// }
     /// #     Ok(())
     /// # }
@@ -529,7 +529,7 @@ impl Cache {
     /// let cache = CACHE.read()?;
     ///
     /// if let Some(channel) = cache.private_channel(7) {
-    ///     channel.read()?.say("Hello there!");
+    ///     channel.read().unwrap().say("Hello there!");
     /// }
     /// #     Ok(())
     /// # }
@@ -571,7 +571,7 @@ impl Cache {
     /// # }
     /// #
     /// # fn main() {
-    /// #   try_main().unwrap();        
+    /// #   try_main().unwrap();
     /// # }
     /// ```
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
@@ -601,14 +601,14 @@ impl Cache {
     ///
     /// let cache = CACHE.read()?;
     ///
-    /// if let Some(lock) = cache.user(7) {
-    ///     println!("User with Id 7 is currently named {}", user.read()?.name);
+    /// if let Some(user) = cache.user(7) {
+    ///     println!("User with Id 7 is currently named {}", user.read().unwrap().name);
     /// }
     /// #     Ok(())
     /// # }
     /// #
     /// # fn main() {
-    /// #     try_main().unwrap();        
+    /// #     try_main().unwrap();
     /// # }
     /// ```
     #[inline]
