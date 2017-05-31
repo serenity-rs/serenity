@@ -1,6 +1,7 @@
 extern crate serenity;
 
 use serenity::utils::MessageBuilder;
+use serenity::utils::ContentModifier::*;
 use serenity::model::Emoji;
 use serenity::model::EmojiId;
 use serenity::model::UserId;
@@ -50,4 +51,29 @@ fn mentions() {
         .build();
     assert_eq!(content_mentions, "<#1><@2><@&3><@4>");
     assert_eq!(content_emoji, "<:Rohrkatze:32>");
+}
+
+#[test]
+fn content() {
+    let content = Bold + Italic + Code + "Fun!";
+
+    assert_eq!(content.to_string(), "***`Fun!`***");
+}
+
+#[test]
+fn message_content() {
+    let message_content = MessageBuilder::new()
+        .push(Bold + Italic + Code + "Fun!")
+        .build();
+
+  assert_eq!(message_content, "***`Fun!`***");
+}
+
+#[test]
+fn message_content_safe() {
+    let message_content = MessageBuilder::new()
+        .push_safe(Bold + Italic + "test**test")
+        .build();
+
+    assert_eq!(message_content, "***test\\*\\*test***");
 }
