@@ -1,9 +1,9 @@
 use ::internal::prelude::*;
 
 /// A builder to edit the current user's settings, to be used in conjunction
-/// with [`Context::edit_profile`].
+/// with [`CurrentUser::edit`].
 ///
-/// [`Context::edit_profile`]: ../client/struct.Context.html#method.edit_profile
+/// [`CurrentUser::edit`]: ../model/struct.CurrentUser.html#method.edit
 #[derive(Clone, Debug, Default)]
 pub struct EditProfile(pub JsonMap);
 

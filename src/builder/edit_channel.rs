@@ -1,11 +1,6 @@
 use ::internal::prelude::*;
 
-/// A builder to edit a [`GuildChannel`] for use via one of a couple methods.
-///
-/// These methods are:
-///
-/// - [`Context::edit_channel`]
-/// - [`GuildChannel::edit`]
+/// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]
 ///
 /// Defaults are not directly provided by the builder itself.
 ///
@@ -20,7 +15,6 @@ use ::internal::prelude::*;
 /// }
 /// ```
 ///
-/// [`Context::edit_channel`]: ../client/struct.Context.html#method.edit_channel
 /// [`GuildChannel`]: ../model/struct.GuildChannel.html
 /// [`GuildChannel::edit`]: ../model/struct.GuildChannel.html#method.edit
 #[derive(Clone, Debug, Default)]

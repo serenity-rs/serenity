@@ -3,7 +3,7 @@ use ::model::ReactionType;
 use ::internal::prelude::*;
 
 /// A builder to specify the contents of an [`http::send_message`] request,
-/// primarily meant for use through [`Context::send_message`].
+/// primarily meant for use through [`ChannelId::send_message`].
 ///
 /// There are two situations where different field requirements are present:
 ///
@@ -12,7 +12,7 @@ use ::internal::prelude::*;
 /// set.
 ///
 /// Note that if you only need to send the content of a message, without
-/// specifying other fields, then [`Context::say`] may be a more preferable
+/// specifying other fields, then [`ChannelId::say`] may be a more preferable
 /// option.
 ///
 /// # Examples
@@ -32,8 +32,8 @@ use ::internal::prelude::*;
 ///         .description("With a description")));
 /// ```
 ///
-/// [`Context::say`]: ../client/struct.Context.html#method.say
-/// [`Context::send_message`]: ../client/struct.Context.html#method.send_message
+/// [`ChannelId::say`]: ../model/struct.ChannelId.html#method.say
+/// [`ChannelId::send_message`]: ../model/struct.ChannelId.html#method.send_message
 /// [`content`]: #method.content
 /// [`embed`]: #method.embed
 /// [`http::send_message`]: ../http/fn.send_message.html

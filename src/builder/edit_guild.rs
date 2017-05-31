@@ -2,14 +2,13 @@ use ::internal::prelude::*;
 use ::model::{ChannelId, Region, UserId, VerificationLevel};
 
 /// A builder to optionally edit certain fields of a [`Guild`]. This is meant
-/// for usage with [`Context::edit_guild`] and [`LiveGuild::edit`].
+/// for usage with [`Guild::edit`].
 ///
 /// **Note**: Editing a guild requires that the current user have the
 /// [Manage Guild] permission.
 ///
-/// [`Context::edit_guild`]: ../client/struct.Context.html
+/// [`Guild::edit`]: ../model/struct.Guild.html#method.edit
 /// [`Guild`]: ../model/struct.Guild.html
-/// [`LiveGuild::edit`]: ../model/struct.LiveGuild.html#method.edit
 /// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
 #[derive(Clone, Debug, Default)]
 pub struct EditGuild(pub Map<String, Value>);

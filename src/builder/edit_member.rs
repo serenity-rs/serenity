@@ -2,9 +2,8 @@ use ::model::{ChannelId, RoleId};
 use ::internal::prelude::*;
 
 /// A builder which edits the properties of a [`Member`], to be used in
-/// conjunction with [`Context::edit_member`] and [`Member::edit`].
+/// conjunction with [`Member::edit`].
 ///
-/// [`Context::edit_member`]: ../client/struct.Context.html#method.edit_member
 /// [`Member`]: ../model/struct.Member.html
 /// [`Member::edit`]: ../model/struct.Member.html#method.edit
 #[derive(Clone, Debug, Default)]

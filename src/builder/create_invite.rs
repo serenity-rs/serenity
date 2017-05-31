@@ -2,7 +2,7 @@ use serde_json::Value;
 use std::default::Default;
 use ::internal::prelude::*;
 
-/// A builder to create a [`RichInvite`] for use via [`Context::create_invite`].
+/// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
 ///
 /// This is a structured and cleaner way of creating an invite, as all
 /// parameters are optional.
@@ -52,7 +52,7 @@ use ::internal::prelude::*;
 /// });
 /// ```
 ///
-/// [`Context::create_invite`]: ../client/struct.Context.html#method.create_invite
+/// [`GuildChannel::create_invite`]: ../model/struct.GuildChannel.html#method.create_invite
 /// [`RichInvite`]: ../model/struct.Invite.html
 #[derive(Clone, Debug)]
 pub struct CreateInvite(pub JsonMap);
