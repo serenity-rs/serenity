@@ -277,6 +277,22 @@ impl Framework {
 
     /// Defines a bucket with `delay` between each command, and the `limit` of uses
     /// per `time_span`.
+    ///
+    /// # Examples
+    ///
+    /// Create and use a bucket that limits a command to 3 uses per 10 seconds with
+    /// a 2 second delay inbetween invocations:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// #
+    /// client.with_framework(|f| f
+    ///     .bucket("basic", 2, 10, 3)
+    ///     .command("ping", |c| c
+    ///         .bucket("basic")
+    ///         .exec_str("pong!")));
+    /// ```
     pub fn bucket<S>(mut self, s: S, delay: i64, time_span: i64, limit: i32) -> Self
         where S: Into<String> {
         self.buckets.insert(s.into(), Bucket {
@@ -291,6 +307,21 @@ impl Framework {
     }
 
     /// Defines a bucket with only a `delay` between each command.
+    ///
+    /// # Examples
+    ///
+    /// Create and use a simple bucket that has a 2 second delay between invocations:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// #
+    /// client.with_framework(|f| f
+    ///     .simple_bucket("simple", 2)
+    ///     .command("ping", |c| c
+    ///         .bucket("simple")
+    ///         .exec_str("pong!")));
+    /// ```
     pub fn simple_bucket<S>(mut self, s: S, delay: i64) -> Self
         where S: Into<String> {
         self.buckets.insert(s.into(), Bucket {
@@ -552,6 +583,24 @@ impl Framework {
     ///
     /// [`command`]: #method.command
     /// [module-level documentation]: index.html
+    ///
+    /// # Examples
+    ///
+    /// Create and use a simple command:
+    ///
+    /// ```rust
+    /// # #[macro_use] extern crate serenity;
+    /// command!(ping(_ctx, msg) {
+    ///     msg.channel_id.say("pong!");    
+    /// });
+    /// #
+    /// # fn main() {
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// #
+    /// client.with_framework(|f| f.on("ping", ping));
+    /// # }
+    /// ```
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
         where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static,
               S: Into<String> {
@@ -612,6 +661,22 @@ impl Framework {
         self
     }
 
+    /// Adds a group which can organize several related commands.
+    /// Groups are taken into account when using `serenity::framework::help_commands`.
+    ///
+    /// # Examples
+    ///
+    /// Creating a simple group:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// #
+    /// client.with_framework(|f| f
+    ///     .group("ping-pong", |g| g
+    ///         .command("ping", |c| c.exec_str("pong!"))
+    ///         .command("pong", |c| c.exec_str("ping!"))));
+    /// ```
     pub fn group<F, S>(mut self, group_name: S, f: F) -> Self
         where F: FnOnce(CreateGroup) -> CreateGroup,
               S: Into<String> {
@@ -626,6 +691,29 @@ impl Framework {
     /// Specify the function that's called in case a command wasn't executed for one reason or another.
     ///
     /// DispatchError represents all possible fail conditions.
+    ///
+    /// # Examples
+    ///
+    /// Making a simple argument error responder:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// use serenity::framework::DispatchError::{NotEnoughArguments, TooManyArguments};
+    /// 
+    /// client.with_framework(|f| f
+    ///     .on_dispatch_error(|ctx, msg, error| {
+    ///         match error {
+    ///             NotEnoughArguments { min, given } => {
+    ///                 msg.channel_id.say(&format!("Need {} arguments, but only got {}.", min, given));
+    ///             }
+    ///             TooManyArguments { max, given } => {
+    ///                 msg.channel_id.say(&format!("Max arguments allowed is {}, but got {}.", max, given));
+    ///             }
+    ///             _ => println!("Unhandled dispatch error.")
+    ///         }        
+    ///     }));
+    /// ```
     pub fn on_dispatch_error<F>(mut self, f: F) -> Self
         where F: Fn(Context, Message, DispatchError) + Send + Sync + 'static {
         self.dispatch_error_handler = Some(Arc::new(f));
@@ -635,6 +723,42 @@ impl Framework {
 
     /// Specify the function to be called prior to every command's execution.
     /// If that function returns true, the command will be executed.
+    ///
+    /// # Examples
+    ///
+    /// Using `before` to log command usage:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// #
+    /// client.with_framework(|f| f
+    ///     .before(|ctx, msg, cmd_name| {
+    ///         println!("Running command {}", cmd_name);
+    ///         true
+    ///     }));
+    /// ```
+    ///
+    /// Using before to prevent command usage:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// #
+    /// client.with_framework(|f| f
+    ///     .before(|ctx, msg, cmd_name| {
+    ///         if let Ok(channel) = msg.channel_id.get() {
+    ///             //  Don't run unless in nsfw channel
+    ///             if !channel.is_nsfw() {
+    ///                 return false;
+    ///             }
+    ///         }
+    ///
+    ///         println!("Running command {}", cmd_name);
+    ///         true
+    ///     }));
+    /// ```
+    ///
     pub fn before<F>(mut self, f: F) -> Self
         where F: Fn(&mut Context, &Message, &String) -> bool + Send + Sync + 'static {
         self.before = Some(Arc::new(f));
@@ -644,6 +768,23 @@ impl Framework {
 
     /// Specify the function to be called after every command's execution.
     /// Fourth argument exists if command returned an error which you can handle.
+    ///
+    /// # Examples
+    ///
+    /// Using `after` to log command usage:
+    ///
+    /// ```rust
+    /// # use serenity::Client;
+    /// # let mut client = Client::login("token");
+    /// #
+    /// client.with_framework(|f| f
+    ///     .after(|ctx, msg, cmd_name, error| {
+    ///         //  Print out an error if it happened
+    ///         if let Err(why) = error {
+    ///             println!("Error in {}: {:?}", cmd_name, why);
+    ///         }
+    ///     }));
+    /// ```
     pub fn after<F>(mut self, f: F) -> Self
         where F: Fn(&mut Context, &Message, &String, Result<(), String>) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));

@@ -51,6 +51,20 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
     result
 }
 
+/// Posts an embed showing each individual command group and its commands.
+///
+/// # Examples
+///
+/// Use the command with `exec_help`:
+///
+/// ```rust
+/// # use serenity::Client;
+/// # let mut client = Client::login("token");
+/// use serenity::ext::framework::help_commands;
+///
+/// client.with_framework(|f| f
+///     .command("help", |c| c.exec_help(help_commands::with_embeds)));
+/// ```
 pub fn with_embeds(ctx: &mut Context,
                    _: &Message,
                    groups: HashMap<String, Arc<CommandGroup>>,
@@ -186,6 +200,20 @@ pub fn with_embeds(ctx: &mut Context,
     Ok(())
 }
 
+/// Posts formatted text displaying each individual command group and its commands.
+///
+/// # Examples
+///
+/// Use the command with `exec_help`:
+///
+/// ```rust
+/// # use serenity::Client;
+/// # let mut client = Client::login("token");
+/// use serenity::ext::framework::help_commands;
+///
+/// client.with_framework(|f| f
+///     .command("help", |c| c.exec_help(help_commands::plain)));
+/// ```
 pub fn plain(ctx: &mut Context,
              _: &Message,
              groups: HashMap<String, Arc<CommandGroup>>,
