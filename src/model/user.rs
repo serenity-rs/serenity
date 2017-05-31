@@ -47,9 +47,11 @@ impl CurrentUser {
     /// # let cache = CACHE.read().unwrap();
     /// #
     /// // assuming the cache has been unlocked
-    /// match cache.user.avatar_url() {
+    /// let user = &cache.user;
+    ///
+    /// match user.avatar_url() {
     ///     Some(url) => println!("{}'s avatar can be found at {}", user.name, url),
-    ///     None => println!("{} does not have an avatar set.", user.name)    
+    ///     None => println!("{} does not have an avatar set.", user.name)
     /// }
     /// ```
     pub fn avatar_url(&self) -> Option<String> {
@@ -132,6 +134,8 @@ impl CurrentUser {
     /// # let cache = CACHE.read().unwrap();
     /// #
     /// // assuming the cache has been unlocked
+    /// let user = &cache.user;
+    ///
     /// if let Ok(guilds) = user.guilds() {
     ///     for (index, guild) in guilds.into_iter().enumerate() {
     ///         println!("{}: {}", index, guild.name);
@@ -156,9 +160,11 @@ impl CurrentUser {
     /// # let cache = CACHE.read().unwrap();
     /// #
     /// // assuming the cache has been unlocked
+    /// let user = &cache.user;
+    ///
     /// match user.static_avatar_url() {
     ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
-    ///     None => println!("Could not get static avatar for {}.", user.name)    
+    ///     None => println!("Could not get static avatar for {}.", user.name)
     /// }
     /// ```
     pub fn static_avatar_url(&self) -> Option<String> {
@@ -177,7 +183,8 @@ impl CurrentUser {
     /// ```rust
     /// # use serenity::client::CACHE;
     /// #
-    /// # let cache = CACHE.read().unwrap();
+    /// # let mut cache = CACHE.write().unwrap();
+    /// # cache.user.id.0 = 249608697955745802;
     /// #
     /// use serenity::model::permissions::Permissions;
     ///
@@ -192,7 +199,8 @@ impl CurrentUser {
     /// ```rust
     /// # use serenity::client::CACHE;
     /// #
-    /// # let cache = CACHE.read().unwrap();
+    /// # let mut cache = CACHE.write().unwrap();
+    /// # cache.user.id.0 = 249608697955745802;
     /// #
     /// use serenity::model::permissions::*;
     ///
