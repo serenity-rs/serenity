@@ -6,6 +6,7 @@ mod colour;
 mod message_builder;
 
 pub use self::colour::Colour;
+pub use self::message_builder::{MessageBuilder, Content, ContentModifier};
 
 // Note: Here for BC purposes.
 #[cfg(feature="builder")]
@@ -18,8 +19,6 @@ use std::io::Read;
 use std::path::Path;
 use ::internal::prelude::*;
 use ::model::{EmojiIdentifier, EmojiId};
-
-pub use self::message_builder::MessageBuilder;
 
 /// Determines if a name is NSFW.
 ///
