@@ -39,6 +39,23 @@ impl Game {
     /// Creates a `Game` struct that appears as a `Playing <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
+    ///
+    /// # Examples
+    ///
+    /// Create a command that sets the current game being played:
+    ///
+    /// ```rust,no_run
+    /// # #[macro_use] extern crate serenity;
+    /// #
+    /// use serenity::model::Game;
+    ///
+    /// command!(game(ctx, _msg, args) {
+    ///     let name = args.join(" ");
+    ///     ctx.set_game(Game::playing(&name)); 
+    /// });
+    /// #
+    /// # fn main() {}
+    /// ```
     pub fn playing(name: &str) -> Game {
         Game {
             kind: GameType::Playing,
@@ -50,6 +67,24 @@ impl Game {
     /// Creates a `Game` struct that appears as a `Streaming <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
+    ///
+    /// # Examples
+    ///
+    /// Create a command that sets the current game and stream:
+    ///
+    /// ```rust,no_run
+    /// # #[macro_use] extern crate serenity;
+    /// #
+    /// use serenity::model::Game;
+    ///
+    /// // Assumes command has min_args set to 2.
+    /// command!(stream(ctx, _msg, args, stream: String) {
+    ///     let name = args[1..].join(" ");
+    ///     ctx.set_game(Game::streaming(&name, &stream)); 
+    /// });
+    /// #
+    /// # fn main() {}
+    /// ```
     pub fn streaming(name: &str, url: &str) -> Game {
         Game {
             kind: GameType::Streaming,
