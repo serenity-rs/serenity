@@ -127,26 +127,32 @@ pub fn plain<T: Command + Ord>(msg: &Message,
                       name as an argument to this command.\n\n"
         .to_string();
 
+    let _ = ctx.channel_id.unwrap().send_message(|m| m
+        .embed(|mut e| {
+            e = e.colour(Colour::rosewater())
+                .description("To get help with an individual command, pass its \
+                              name as an argument to this command.");
+
     for (ref group_name, ref group) in &framework.groups {
-        let _ = write!(result, "**{}:** ", group_name);
-
-        if !group.prefix.is_empty() {
-            let _ = write!(result, "(prefix: `{}`): ", group.prefix);
-        }
-
-        let mut no_commands = true;
+        let mut group_help = "".to_owned();
  
         for (ref name, ref cmd) in &group.commands {
             if cmd.help_available() {
-                let _ = write!(result, "`{}` ", name);
-
-                no_commands = false;
+                let _ = write!(group_help, "`{}` ", name);
             }
 
-            if no_commands {
-                result.push_str("*[No Commands]*");
+            if has_commands {
+                e = e.field(|f| f.name(&group_name).value(&desc));
             }
+        }
 
+        if group_help.len() > 0 {
+            let _ = write!(result, "**{}:**", group_name);
+
+            if !group.prefix.is_empty() {
+                let _ = write!(result, "(prefix: `{}`): ", x);
+            }
+            result.push_str(&group_help);
             result.push('\n');
         }
     }
@@ -269,20 +275,18 @@ pub fn with_embeds<T: Command + Ord>(msg: &Message,
                     let _ = write!(desc, "Prefix: {}\n", group.prefix);
                 }
 
-                let mut no_commands = true;
+                let mut has_commands = false;
 
                 for (ref name, ref cmd) in &group.commands {
                     if cmd.help_available() {
                         let _ = write!(desc, "`{}`\n", name);
 
-                        no_commands = false;
+                        has_commands = true;
                     }
 
-                    if no_commands {
-                        let _ = write!(desc, "*[No commands]*");
+                    if has_commands {
+                        e = e.field(|f| f.name(&group_name).value(&desc));
                     }
-
-                    e = e.field(|f| f.name(&group_name).value(&desc));
                 }
             }
 
