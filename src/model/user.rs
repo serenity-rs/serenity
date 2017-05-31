@@ -41,17 +41,16 @@ impl CurrentUser {
     ///
     /// Print out the current user's avatar url if one is set:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::client::CACHE;
-    /// # CACHE.read().and_then(|cache| {
-    /// #   let user = &cache.user;
-    /// // Assuming current user has already been assigned to user
-    /// match user.avatar_url() {
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
+    /// // assuming the cache has been unlocked
+    /// match cache.user.avatar_url() {
     ///     Some(url) => println!("{}'s avatar can be found at {}", user.name, url),
     ///     None => println!("{} does not have an avatar set.", user.name)    
     /// }
-    /// #   Ok(())
-    /// # });
     /// ```
     pub fn avatar_url(&self) -> Option<String> {
         self.avatar.as_ref()
@@ -72,14 +71,13 @@ impl CurrentUser {
     ///
     /// Print out the current user's distinct identifier (i.e., Username#1234):
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::client::CACHE;
-    /// # CACHE.read().and_then(|cache| {
-    /// #   let user = &cache.user;
-    /// // Assuming current user has already been assigned to user
-    /// println!("Current user's distinct identifier is {}", user.distinct());
-    /// #   Ok(())
-    /// # });
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
+    /// // assuming the cache has been unlocked
+    /// println!("Current user's distinct identifier is {}", cache.user.distinct());
     /// ```
     #[inline]
     pub fn distinct(&self) -> String {
@@ -128,18 +126,17 @@ impl CurrentUser {
     ///
     /// Print out the names of all guilds the current user is in:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::client::CACHE;
-    /// # CACHE.read().and_then(|cache| {
-    /// #   let user = &cache.user;
-    /// // Assuming current user has already been assigned to user
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
+    /// // assuming the cache has been unlocked
     /// if let Ok(guilds) = user.guilds() {
     ///     for (index, guild) in guilds.into_iter().enumerate() {
     ///         println!("{}: {}", index, guild.name);
     ///     }
     /// }
-    /// #   Ok(())
-    /// # });
     /// ```
     pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
         http::get_guilds(&GuildPagination::After(GuildId(1)), 100)
@@ -153,17 +150,16 @@ impl CurrentUser {
     ///
     /// Print out the current user's static avatar url if one is set:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::client::CACHE;
-    /// # CACHE.read().and_then(|cache| {
-    /// #   let user = &cache.user;
-    /// // Assuming current user has already been assigned to user
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
+    /// // assuming the cache has been unlocked
     /// match user.static_avatar_url() {
     ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
     ///     None => println!("Could not get static avatar for {}.", user.name)    
     /// }
-    /// #   Ok(())
-    /// # });
     /// ```
     pub fn static_avatar_url(&self) -> Option<String> {
         self.avatar.as_ref()
@@ -180,31 +176,34 @@ impl CurrentUser {
     ///
     /// ```rust
     /// # use serenity::client::CACHE;
-    /// # CACHE.read().and_then(|cache| {
-    /// #   let user = &cache.user;
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
     /// use serenity::model::permissions::Permissions;
     ///
-    /// // Assuming current user has already been assigned to user
-    /// let url = user.invite_url(Permissions::empty());
-    /// #   Ok(())
-    /// # });
+    /// // assuming the cache has been unlocked
+    /// let url = cache.user.invite_url(Permissions::empty());
+    ///
+    /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize?client_id=249608697955745802&scope=bot");
     /// ```
     ///
     /// Get the invite url with some basic permissions set:
     ///
     /// ```rust
     /// # use serenity::client::CACHE;
-    /// # CACHE.read().and_then(|cache| {
-    /// #   let user = &cache.user;
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
     /// use serenity::model::permissions::*;
     ///
-    /// // Assuming current user has already been assigned to user
-    /// let url = user.invite_url(READ_MESSAGES | SEND_MESSAGES | EMBED_LINKS);
-    /// #   Ok(())
-    /// # });
+    /// // assuming the cache has been unlocked
+    /// let url = cache.user.invite_url(READ_MESSAGES | SEND_MESSAGES | EMBED_LINKS);
+    ///
+    /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize?client_id=249608697955745802&scope=bot&permissions=19456");
     /// ```
     pub fn invite_url(&self, permissions: Permissions) -> String {
         let bits = permissions.bits();
+
         if bits == 0 {
             format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot", self.id)
         } else {
