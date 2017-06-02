@@ -540,6 +540,64 @@ impl User {
         }
     }
 
+    /// Refreshes the information about the user.
+    ///
+    /// Replaces the instance with the data retrieved over the REST API.
+    ///
+    /// # Examples
+    ///
+    /// If maintaing a very long-running bot, you may want to periodically
+    /// refresh information about certain users if the state becomes
+    /// out-of-sync:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::login("");
+    /// #
+    /// use serenity::model::UserId;
+    /// use serenity::CACHE;
+    /// use std::thread;
+    /// use std::time::Duration;
+    ///
+    /// let special_users = vec![UserId(114941315417899012), UserId(87600987040120832)];
+    ///
+    /// client.on_message(|_ctx, _msg| {
+    ///     // normal message handling here
+    /// });
+    ///
+    /// // start a new thread to periodically refresh the special users' data
+    /// // every 12 hours
+    /// let handle = thread::spawn(move || {
+    ///     // 12 hours in seconds
+    ///     let duration = Duration::from_secs(43200);
+    ///
+    ///     loop {
+    ///         thread::sleep(duration);
+    ///
+    ///         let cache = CACHE.read().unwrap();
+    ///
+    ///         for id in &special_users {
+    ///             if let Some(user) = cache.user(*id) {
+    ///                 if let Err(why) = user.write().unwrap().refresh() {
+    ///                     println!("Error refreshing {}: {:?}", id, why);
+    ///                 }
+    ///             }
+    ///         }
+    ///     }
+    /// });
+    ///
+    /// println!("{:?}", client.start());
+    /// ```
+    pub fn refresh(&mut self) -> Result<()> {
+        self.id.get().map(|replacement| {
+            ::std::mem::replace(self, replacement);
+
+            ()
+        })
+    }
+
+
     /// Returns a static formatted URL of the user's icon, if one exists.
     ///
     /// This will always produce a WEBP image URL.
