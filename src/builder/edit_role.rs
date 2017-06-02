@@ -11,7 +11,7 @@ use ::model::{Permissions, Role, permissions};
 /// - [`Guild::edit_role`]
 /// - [`GuildId::create_role`]
 /// - [`GuildId::edit_role`]
-/// - [`Role::edit_role`]
+/// - [`Role::edit`]
 ///
 /// Defaults are provided for each parameter on role creation.
 ///
@@ -37,7 +37,7 @@ use ::model::{Permissions, Role, permissions};
 /// [`GuildId::create_role`]: ../model/struct.GuildId.html#method.create_role
 /// [`GuildId::edit_role`]: ../model/struct.GuildId.html#method.edit_role
 /// [`Role`]: ../model/struct.Role.html
-/// [`Role::edit_role`]: ../model/struct.Role.html#method.edit_role
+/// [`Role::edit`]: ../model/struct.Role.html#method.edit
 #[derive(Clone, Debug)]
 pub struct EditRole(pub JsonMap);
 

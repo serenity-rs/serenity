@@ -83,14 +83,43 @@ impl Role {
     ///
     /// Make a role hoisted:
     ///
-    /// ```rust,ignore
-    /// // assuming a `guild` and `role_id` have been bound
+    /// ```rust,no_run
+    /// # use serenity::model::RoleId;
+    /// # let role = RoleId(7).find().unwrap();
+    /// // assuming a `role` has already been bound
     //
-    /// guild.edit_role(role_id, |r| r.hoist(true));
+    /// role.edit(|r| r.hoist(true));
     /// ```
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[cfg(feature="cache")]
+    pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
+        match self.find_guild() {
+            Ok(guild_id) => guild_id.edit_role(self.id, f),
+            Err(why) => Err(why),
+        }
+    }
+
+    /// Edits a [`Role`], optionally setting its new fields.
+    ///
+    /// Requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Make a role hoisted:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::model::RoleId;
+    /// # let role = RoleId(7).find().unwrap();
+    /// // assuming a `role` has been bound
+    //
+    /// role.edit(|r| r.hoist(true));
+    /// ```
+    ///
+    /// [`Role`]: struct.Role.html
+    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[deprecated(since="0.2.1", note="Please use `edit` instead.")]
     #[cfg(feature="cache")]
     pub fn edit_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
         match self.find_guild() {
