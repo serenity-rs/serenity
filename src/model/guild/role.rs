@@ -93,7 +93,7 @@ impl Role {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature="cache")]
+    #[cfg(all(feature="builder", feature="cache"))]
     pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
         match self.find_guild() {
             Ok(guild_id) => guild_id.edit_role(self.id, f),
@@ -120,7 +120,7 @@ impl Role {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[deprecated(since="0.2.1", note="Please use `edit` instead.")]
-    #[cfg(feature="cache")]
+    #[cfg(all(feature="builder", feature="cache"))]
     pub fn edit_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
         match self.find_guild() {
             Ok(guild_id) => guild_id.edit_role(self.id, f),
