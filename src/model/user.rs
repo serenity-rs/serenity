@@ -665,6 +665,7 @@ impl fmt::Display for UserId {
     }
 }
 
+#[cfg(feature="model")]
 fn tag(name: &str, discriminator: u16) -> String {
     // 32: max length of username
     // 1: `#`
