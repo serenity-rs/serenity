@@ -18,11 +18,13 @@ pub use self::reaction::*;
 
 use serde::de::Error as DeError;
 use serde_json;
-use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::io::Read;
 use super::utils::deserialize_u64;
 use ::model::*;
 
+#[cfg(feature="model")]
+use std::fmt::{Display, Formatter, Result as FmtResult};
+#[cfg(feature="model")]
+use std::io::Read;
 #[cfg(feature="model")]
 use ::builder::{CreateMessage, GetMessages};
 #[cfg(feature="model")]

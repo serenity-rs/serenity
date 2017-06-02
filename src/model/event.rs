@@ -5,9 +5,11 @@ use serde_json::{self, Error as JsonError};
 use std::collections::HashMap;
 use super::utils::deserialize_emojis;
 use super::*;
-use ::constants::{OpCode, VoiceOpCode};
+use ::constants::VoiceOpCode;
 use ::internal::prelude::*;
 
+#[cfg(feature="gateway")]
+use ::constants::OpCode;
 #[cfg(feature="gateway")]
 use ::gateway::GatewayError;
 
@@ -617,6 +619,7 @@ pub enum Event {
 
 impl Event {
     #[allow(cyclomatic_complexity)]
+    #[cfg(feature="gateway")]
     fn decode(kind: String, value: Value) -> Result<Event> {
         Ok(match &kind[..] {
             "CHANNEL_CREATE" => Event::ChannelCreate(ChannelCreateEvent::deserialize(value)?),

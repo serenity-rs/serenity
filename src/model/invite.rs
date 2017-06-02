@@ -1,12 +1,13 @@
 use super::*;
-use ::internal::prelude::*;
 
 #[cfg(feature="cache")]
 use super::{permissions, utils as model_utils};
 #[cfg(feature="model")]
+use ::builder::CreateInvite;
+#[cfg(feature="model")]
 use ::http;
 #[cfg(feature="model")]
-use ::builder::CreateInvite;
+use ::internal::prelude::*;
 
 /// Information about an invite code.
 ///
@@ -100,6 +101,7 @@ impl Invite {
     }
 
     /// Gets the information about an invite.
+    #[allow(unused_mut)]
     pub fn get(code: &str, stats: bool) -> Result<Invite> {
         let mut invite = code;
 

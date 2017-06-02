@@ -4,12 +4,12 @@ use ::model::*;
 
 #[cfg(feature="cache")]
 use ::CACHE;
+#[cfg(all(feature="builder", feature="cache", feature="model"))]
+use ::builder::EditRole;
 #[cfg(feature="cache")]
 use ::internal::prelude::*;
-#[cfg(feature="model")]
+#[cfg(all(feature="cache", feature="model"))]
 use ::http;
-#[cfg(feature="builder")]
-use ::builder::EditRole;
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
@@ -91,7 +91,7 @@ impl Role {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature="cache")]
+    #[cfg(all(feature="builder", feature="cache"))]
     pub fn edit_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
         match self.find_guild() {
             Ok(guild_id) => guild_id.edit_role(self.id, f),

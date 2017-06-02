@@ -1,15 +1,18 @@
 use serde_json;
-use std::{fmt, mem};
+use std::fmt;
 use super::utils::deserialize_u16;
 use super::*;
-use time::Timespec;
 use ::internal::prelude::*;
 use ::model::misc::Mentionable;
 
 #[cfg(feature="model")]
 use std::fmt::Write;
+#[cfg(feature="model")]
+use std::mem;
 #[cfg(feature="cache")]
 use std::sync::{Arc, RwLock};
+#[cfg(feature="model")]
+use time::Timespec;
 #[cfg(feature="cache")]
 use ::CACHE;
 #[cfg(feature="model")]

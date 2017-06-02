@@ -107,6 +107,7 @@ pub fn dispatch(event: Event,
     }
 }
 
+#[allow(unused_mut)]
 fn dispatch_message(context: Context,
                     mut message: Message,
                     event_store: &Arc<RwLock<EventStore>>) {
@@ -122,7 +123,7 @@ fn dispatch_message(context: Context,
     }
 }
 
-#[allow(cyclomatic_complexity, unused_mut)]
+#[allow(cyclomatic_complexity, unused_assignments, unused_mut)]
 fn handle_event(event: Event,
                 conn: &Arc<Mutex<Shard>>,
                 data: &Arc<Mutex<ShareMap>>,
