@@ -6,6 +6,8 @@ use time::Timespec;
 use ::internal::prelude::*;
 use ::model::misc::Mentionable;
 
+#[cfg(feature="model")]
+use std::fmt::Write;
 #[cfg(feature="cache")]
 use std::sync::{Arc, RwLock};
 #[cfg(feature="cache")]
@@ -67,23 +69,13 @@ impl CurrentUser {
             })
     }
 
-    /// Returns the DiscordTag of a User.
+    /// Alias of [`tag`].
     ///
-    /// # Examples
-    ///
-    /// Print out the current user's distinct identifier (i.e., Username#1234):
-    ///
-    /// ```rust,no_run
-    /// # use serenity::client::CACHE;
-    /// #
-    /// # let cache = CACHE.read().unwrap();
-    /// #
-    /// // assuming the cache has been unlocked
-    /// println!("Current user's distinct identifier is {}", cache.user.distinct());
-    /// ```
+    /// [`tag`]: #method.tag
+    #[deprecated(since="0.2.0", note="Use `tag` instead.")]
     #[inline]
     pub fn distinct(&self) -> String {
-        format!("{}#{}", self.name, self.discriminator)
+        self.tag()
     }
 
     /// Edits the current user's profile settings.
@@ -217,6 +209,25 @@ impl CurrentUser {
         } else {
             format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot&permissions={}", self.id, bits)
         }
+    }
+
+    /// Returns the tag of the current user.
+    ///
+    /// # Examples
+    ///
+    /// Print out the current user's distinct identifier (e.g., Username#1234):
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::CACHE;
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
+    /// // assuming the cache has been unlocked
+    /// println!("The current user's distinct identifier is {}", cache.user.tag());
+    /// ```
+    #[inline]
+    pub fn tag(&self) -> String {
+        tag(&self.name, self.discriminator)
     }
 }
 
@@ -358,10 +369,13 @@ impl User {
         self.id.create_dm_channel()
     }
 
-    /// Returns the DiscordTag of a User.
+    /// Alias of [`tag`].
+    ///
+    /// [`tag`]: #method.tag
+    #[deprecated(since="0.2.0", note="Use `tag` instead.")]
     #[inline]
     pub fn distinct(&self) -> String {
-        format!("{}#{}", self.name, self.discriminator)
+        self.tag()
     }
 
     /// Retrieves the time that this user was created at.
@@ -532,6 +546,37 @@ impl User {
         self.avatar.as_ref()
             .map(|av| format!(cdn!("/avatars/{}/{}.webp?size=1024"), self.id.0, av))
     }
+
+    /// Returns the "tag" for the user.
+    ///
+    /// The "tag" is defined as "username#discriminator", such as "zeyla#5479".
+    ///
+    /// # Examples
+    ///
+    /// Make a command to tell the user what their tag is:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::login("");
+    /// #
+    /// use serenity::utils::MessageBuilder;
+    /// use serenity::utils::ContentModifier::Bold;
+    ///
+    /// client.on_message(|_, msg| {
+    ///     if msg.content == "!mytag" {
+    ///         let content = MessageBuilder::new()
+    ///             .push("Your tag is ")
+    ///             .push(Bold + msg.author.tag())
+    ///             .build();
+    ///
+    ///         let _ = msg.channel_id.say(&content);
+    ///     }
+    /// });
+    /// ```
+    pub fn tag(&self) -> String {
+        tag(&self.name, self.discriminator)
+    }
 }
 
 impl fmt::Display for User {
@@ -617,4 +662,16 @@ impl fmt::Display for UserId {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.0, f)
     }
+}
+
+fn tag(name: &str, discriminator: u16) -> String {
+    // 32: max length of username
+    // 1: `#`
+    // 4: max length of discriminator
+    let mut tag = String::with_capacity(37);
+    tag.push_str(name);
+    tag.push('#');
+    let _ = write!(tag, "{}", discriminator);
+
+    tag
 }
