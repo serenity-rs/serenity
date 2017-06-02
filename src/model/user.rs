@@ -490,6 +490,7 @@ impl User {
     /// user.
     ///
     /// [`ModelError::InvalidOperationAsUser`]: enum.ModelError.html#variant.InvalidOperationAsUser
+    #[deprecated(since="0.2.0", note="Don't use this, since it doesn't fit serenity's design.")]
     #[inline]
     pub fn get<U: Into<UserId>>(user_id: U) -> Result<User> {
         user_id.into().get()
