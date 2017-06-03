@@ -1,17 +1,19 @@
-use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::io::Read;
-use std::mem;
-use ::internal::prelude::*;
 use ::model::*;
 
 #[cfg(feature="model")]
-use ::builder::{CreateInvite, CreateMessage, EditChannel, GetMessages};
+use std::fmt::{Display, Formatter, Result as FmtResult};
+#[cfg(feature="model")]
+use std::io::Read;
+#[cfg(feature="model")]
+use std::mem;
 #[cfg(feature="cache")]
 use ::CACHE;
 #[cfg(feature="model")]
-use ::http;
+use ::builder::{CreateInvite, CreateMessage, EditChannel, GetMessages};
 #[cfg(feature="model")]
-use ::http::AttachmentType;
+use ::http::{self, AttachmentType};
+#[cfg(feature="cache")]
+use ::internal::prelude::*;
 #[cfg(all(feature="model", feature="utils"))]
 use ::utils as serenity_utils;
 

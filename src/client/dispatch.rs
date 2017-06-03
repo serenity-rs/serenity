@@ -107,19 +107,23 @@ pub fn dispatch(event: Event,
     }
 }
 
+#[allow(unused_mut)]
 fn dispatch_message(context: Context,
                     mut message: Message,
                     event_store: &Arc<RwLock<EventStore>>) {
     if let Some(handler) = handler!(on_message, event_store) {
         thread::spawn(move || {
-            message.transform_content();
+            #[cfg(feature="model")]
+            {
+                message.transform_content();
+            }
 
             (handler)(context, message);
         });
     }
 }
 
-#[allow(cyclomatic_complexity, unused_mut)]
+#[allow(cyclomatic_complexity, unused_assignments, unused_mut)]
 fn handle_event(event: Event,
                 conn: &Arc<Mutex<Shard>>,
                 data: &Arc<Mutex<ShareMap>>,
@@ -128,7 +132,15 @@ fn handle_event(event: Event,
         Event::ChannelCreate(event) => {
             if let Some(handler) = handler!(on_channel_create, event_store) {
                 update!(update_with_channel_create, event);
-                let context = context(Some(event.channel.id()), conn, data);
+
+                let mut channel_id = None;
+
+                #[cfg(feature="model")]
+                {
+                    channel_id = Some(event.channel.id());
+                }
+
+                let context = context(channel_id, conn, data);
 
                 thread::spawn(move || (handler)(context, event.channel));
             } else {
@@ -172,7 +184,14 @@ fn handle_event(event: Event,
         },
         Event::ChannelUpdate(event) => {
             if let Some(handler) = handler!(on_channel_update, event_store) {
-                let context = context(Some(event.channel.id()), conn, data);
+                let mut channel_id = None;
+
+                #[cfg(feature="model")]
+                {
+                    channel_id = Some(event.channel.id());
+                }
+
+                let context = context(channel_id, conn, data);
 
                 feature_cache! {{
                     let before = CACHE.read().unwrap().channel(event.channel.id());

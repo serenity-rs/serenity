@@ -77,6 +77,7 @@ pub fn build_gateway_url(base: &str) -> Result<RequestUrl> {
 
 pub fn keepalive(interval: u64,
                  heartbeat_sent: Arc<Mutex<Instant>>,
+                 last_ack: Arc<Mutex<bool>>,
                  mut sender: Sender<WebSocketStream>,
                  channel: &MpscReceiver<GatewayStatus>) {
     let mut base_interval = Duration::milliseconds(interval as i64);
@@ -110,6 +111,14 @@ pub fn keepalive(interval: u64,
         }
 
         if time::get_time() >= next_tick {
+            // If the last heartbeat didn't receive an acknowledgement, then
+            // shutdown and auto-reconnect.
+            if !*last_ack.lock().unwrap() {
+                debug!("Last heartbeat not acknowledged; re-connecting");
+
+                break;
+            }
+
             next_tick = next_tick + base_interval;
 
             let map = json!({
@@ -124,6 +133,7 @@ pub fn keepalive(interval: u64,
                     let now = Instant::now();
 
                     *heartbeat_sent.lock().unwrap() = now;
+                    *last_ack.lock().unwrap() = false;
                 },
                 Err(why) => {
                     match why {

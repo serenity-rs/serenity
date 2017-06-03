@@ -1,17 +1,18 @@
-use std::borrow::Cow;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_sync_user;
 use ::model::*;
 
+#[cfg(feature="model")]
+use std::borrow::Cow;
 #[cfg(feature="cache")]
 use ::CACHE;
 #[cfg(feature="cache")]
 use ::internal::prelude::*;
-#[cfg(feature="model")]
+#[cfg(all(feature="cache", feature="model"))]
 use ::http;
-#[cfg(feature="builder")]
+#[cfg(all(feature="builder", feature="cache", feature="model"))]
 use ::builder::EditMember;
-#[cfg(feature="utils")]
+#[cfg(all(feature="cache", feature="model", feature="utils"))]
 use ::utils::Colour;
 
 /// Information about a member of a guild.
@@ -108,7 +109,7 @@ impl Member {
     }
 
     /// Determines the member's colour.
-    #[cfg(feature="cache")]
+    #[cfg(all(feature="cache", feature="utils"))]
     pub fn colour(&self) -> Option<Colour> {
         let guild_id = match self.find_guild() {
             Ok(guild_id) => guild_id,

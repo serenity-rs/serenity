@@ -1,13 +1,14 @@
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use ::internal::prelude::*;
 use ::model::*;
 
-#[cfg(feature="model")]
-use ::builder::{EditGuild, EditMember, EditRole};
 #[cfg(feature="cache")]
 use ::CACHE;
-#[cfg(feature="http")]
+#[cfg(feature="model")]
+use ::builder::{EditGuild, EditMember, EditRole};
+#[cfg(feature="model")]
 use ::http;
+#[cfg(feature="model")]
+use ::internal::prelude::*;
 
 #[cfg(feature="model")]
 impl GuildId {
