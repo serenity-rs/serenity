@@ -1,13 +1,18 @@
 use serde_json;
-use std::{fmt, mem};
+use std::fmt;
 use super::utils::deserialize_u16;
 use super::*;
-use time::Timespec;
 use ::internal::prelude::*;
 use ::model::misc::Mentionable;
 
+#[cfg(feature="model")]
+use std::fmt::Write;
+#[cfg(feature="model")]
+use std::mem;
 #[cfg(feature="cache")]
 use std::sync::{Arc, RwLock};
+#[cfg(feature="model")]
+use time::Timespec;
 #[cfg(feature="cache")]
 use ::CACHE;
 #[cfg(feature="model")]
@@ -67,23 +72,13 @@ impl CurrentUser {
             })
     }
 
-    /// Returns the DiscordTag of a User.
+    /// Alias of [`tag`].
     ///
-    /// # Examples
-    ///
-    /// Print out the current user's distinct identifier (i.e., Username#1234):
-    ///
-    /// ```rust,no_run
-    /// # use serenity::client::CACHE;
-    /// #
-    /// # let cache = CACHE.read().unwrap();
-    /// #
-    /// // assuming the cache has been unlocked
-    /// println!("Current user's distinct identifier is {}", cache.user.distinct());
-    /// ```
+    /// [`tag`]: #method.tag
+    #[deprecated(since="0.2.0", note="Use `tag` instead.")]
     #[inline]
     pub fn distinct(&self) -> String {
-        format!("{}#{}", self.name, self.discriminator)
+        self.tag()
     }
 
     /// Edits the current user's profile settings.
@@ -217,6 +212,25 @@ impl CurrentUser {
         } else {
             format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot&permissions={}", self.id, bits)
         }
+    }
+
+    /// Returns the tag of the current user.
+    ///
+    /// # Examples
+    ///
+    /// Print out the current user's distinct identifier (e.g., Username#1234):
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::CACHE;
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
+    /// // assuming the cache has been unlocked
+    /// println!("The current user's distinct identifier is {}", cache.user.tag());
+    /// ```
+    #[inline]
+    pub fn tag(&self) -> String {
+        tag(&self.name, self.discriminator)
     }
 }
 
@@ -358,10 +372,13 @@ impl User {
         self.id.create_dm_channel()
     }
 
-    /// Returns the DiscordTag of a User.
+    /// Alias of [`tag`].
+    ///
+    /// [`tag`]: #method.tag
+    #[deprecated(since="0.2.0", note="Use `tag` instead.")]
     #[inline]
     pub fn distinct(&self) -> String {
-        format!("{}#{}", self.name, self.discriminator)
+        self.tag()
     }
 
     /// Retrieves the time that this user was created at.
@@ -476,6 +493,7 @@ impl User {
     /// user.
     ///
     /// [`ModelError::InvalidOperationAsUser`]: enum.ModelError.html#variant.InvalidOperationAsUser
+    #[deprecated(since="0.2.0", note="Don't use this, since it doesn't fit serenity's design.")]
     #[inline]
     pub fn get<U: Into<UserId>>(user_id: U) -> Result<User> {
         user_id.into().get()
@@ -525,12 +543,101 @@ impl User {
         }
     }
 
+    /// Refreshes the information about the user.
+    ///
+    /// Replaces the instance with the data retrieved over the REST API.
+    ///
+    /// # Examples
+    ///
+    /// If maintaing a very long-running bot, you may want to periodically
+    /// refresh information about certain users if the state becomes
+    /// out-of-sync:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::login("");
+    /// #
+    /// use serenity::model::UserId;
+    /// use serenity::CACHE;
+    /// use std::thread;
+    /// use std::time::Duration;
+    ///
+    /// let special_users = vec![UserId(114941315417899012), UserId(87600987040120832)];
+    ///
+    /// client.on_message(|_ctx, _msg| {
+    ///     // normal message handling here
+    /// });
+    ///
+    /// // start a new thread to periodically refresh the special users' data
+    /// // every 12 hours
+    /// let handle = thread::spawn(move || {
+    ///     // 12 hours in seconds
+    ///     let duration = Duration::from_secs(43200);
+    ///
+    ///     loop {
+    ///         thread::sleep(duration);
+    ///
+    ///         let cache = CACHE.read().unwrap();
+    ///
+    ///         for id in &special_users {
+    ///             if let Some(user) = cache.user(*id) {
+    ///                 if let Err(why) = user.write().unwrap().refresh() {
+    ///                     println!("Error refreshing {}: {:?}", id, why);
+    ///                 }
+    ///             }
+    ///         }
+    ///     }
+    /// });
+    ///
+    /// println!("{:?}", client.start());
+    /// ```
+    pub fn refresh(&mut self) -> Result<()> {
+        self.id.get().map(|replacement| {
+            ::std::mem::replace(self, replacement);
+
+            ()
+        })
+    }
+
+
     /// Returns a static formatted URL of the user's icon, if one exists.
     ///
     /// This will always produce a WEBP image URL.
     pub fn static_avatar_url(&self) -> Option<String> {
         self.avatar.as_ref()
             .map(|av| format!(cdn!("/avatars/{}/{}.webp?size=1024"), self.id.0, av))
+    }
+
+    /// Returns the "tag" for the user.
+    ///
+    /// The "tag" is defined as "username#discriminator", such as "zeyla#5479".
+    ///
+    /// # Examples
+    ///
+    /// Make a command to tell the user what their tag is:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::login("");
+    /// #
+    /// use serenity::utils::MessageBuilder;
+    /// use serenity::utils::ContentModifier::Bold;
+    ///
+    /// client.on_message(|_, msg| {
+    ///     if msg.content == "!mytag" {
+    ///         let content = MessageBuilder::new()
+    ///             .push("Your tag is ")
+    ///             .push(Bold + msg.author.tag())
+    ///             .build();
+    ///
+    ///         let _ = msg.channel_id.say(&content);
+    ///     }
+    /// });
+    /// ```
+    pub fn tag(&self) -> String {
+        tag(&self.name, self.discriminator)
     }
 }
 
@@ -617,4 +724,17 @@ impl fmt::Display for UserId {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.0, f)
     }
+}
+
+#[cfg(feature="model")]
+fn tag(name: &str, discriminator: u16) -> String {
+    // 32: max length of username
+    // 1: `#`
+    // 4: max length of discriminator
+    let mut tag = String::with_capacity(37);
+    tag.push_str(name);
+    tag.push('#');
+    let _ = write!(tag, "{}", discriminator);
+
+    tag
 }

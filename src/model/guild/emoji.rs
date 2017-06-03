@@ -1,13 +1,15 @@
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
-use super::super::{EmojiId, ModelError, RoleId};
+use super::super::{EmojiId, RoleId};
 
 #[cfg(feature="cache")]
 use std::mem;
+#[cfg(all(feature="cache", feature="model"))]
+use super::super::ModelError;
 #[cfg(feature="cache")]
 use ::CACHE;
 #[cfg(feature="cache")]
 use ::internal::prelude::*;
-#[cfg(feature="model")]
+#[cfg(all(feature="cache", feature="model"))]
 use ::http;
 #[cfg(feature="cache")]
 use super::super::GuildId;

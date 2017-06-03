@@ -1,14 +1,16 @@
 use std::sync::{Arc, Mutex};
 use typemap::ShareMap;
 use ::gateway::Shard;
-use ::http;
-use ::internal::prelude::*;
 use ::model::*;
 
 #[cfg(feature="cache")]
 use super::CACHE;
 #[cfg(feature="builder")]
+use ::internal::prelude::*;
+#[cfg(feature="builder")]
 use ::builder::EditProfile;
+#[cfg(feature="builder")]
+use ::http;
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.

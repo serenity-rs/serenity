@@ -1,16 +1,18 @@
-use std::mem;
-use time;
-use ::constants;
 use ::model::*;
-
 
 #[cfg(feature="cache")]
 use std::fmt::Write;
 #[cfg(feature="model")]
+use std::mem;
+#[cfg(feature="model")]
+use time;
+#[cfg(feature="model")]
 use ::builder::{CreateEmbed, CreateMessage};
+#[cfg(feature="model")]
+use ::constants;
 #[cfg(feature="cache")]
 use ::CACHE;
-#[cfg(feature="http")]
+#[cfg(feature="model")]
 use ::http;
 
 /// A representation of a message over a guild's text channel, a group, or a

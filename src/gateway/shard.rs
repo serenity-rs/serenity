@@ -62,17 +62,24 @@ type CurrentPresence = (Option<Game>, OnlineStatus, bool);
 /// [`receive`]: #method.receive
 /// [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 /// [module docs]: index.html#sharding
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct Shard {
     current_presence: CurrentPresence,
-    /// A tuple of the last instant that a heartbeat was sent, and the last that
-    /// an acknowledgement was received.
+    /// A tuple of:
+    ///
+    /// - the last instant that a heartbeat was sent
+    /// - the last instant that an acknowledgement was received
     ///
     /// This can be used to calculate [`latency`].
     ///
     /// [`latency`]: fn.latency.html
     heartbeat_instants: (Arc<Mutex<Instant>>, Option<Instant>),
     keepalive_channel: MpscSender<GatewayStatus>,
+    /// This is used by the keepalive thread to determine whether the last
+    /// heartbeat was sent without an acknowledgement, and whether to reconnect.
+    // This _must_ be set to `true` in `Shard::handle_event`'s
+    // `Ok(GatewayEvent::HeartbeatAck)` arm.
+    last_heartbeat_acknowledged: Arc<Mutex<bool>>,
     seq: u64,
     session_id: Option<String>,
     shard_info: Option<[u64; 2]>,
@@ -142,10 +149,19 @@ impl Shard {
         let heartbeat_sent = Arc::new(Mutex::new(Instant::now()));
         let heartbeat_clone = heartbeat_sent.clone();
 
+        // Set this to true: when the keepalive thread sends a heartbeat, it
+        // will check if the value is `false`.
+        //
+        // If it is, it will reconnect. This enters the bot into a reconnect
+        // loop. Set this to `true` to give Discord the first heartbeat to
+        // acknowledge first.
+        let last_ack = Arc::new(Mutex::new(true));
+        let last_ack_clone = last_ack.clone();
+
         ThreadBuilder::new()
             .name(thread_name)
             .spawn(move || {
-                prep::keepalive(heartbeat_interval, heartbeat_clone, sender, &rx)
+                prep::keepalive(heartbeat_interval, heartbeat_clone, last_ack_clone, sender, &rx)
             })?;
 
         // Parse READY
@@ -155,10 +171,12 @@ impl Shard {
                                                   &mut receiver,
                                                   identification)?;
 
+
         Ok((feature_voice! {{
             Shard {
                 current_presence: (None, OnlineStatus::Online, false),
                 heartbeat_instants: (heartbeat_sent, None),
+                last_heartbeat_acknowledged: last_ack,
                 keepalive_channel: tx.clone(),
                 seq: sequence,
                 token: token.to_owned(),
@@ -171,6 +189,7 @@ impl Shard {
             Shard {
                 current_presence: (None, OnlineStatus::Online, false),
                 heartbeat_instants: (heartbeat_sent, None),
+                last_heartbeat_acknowledged: last_ack,
                 keepalive_channel: tx.clone(),
                 seq: sequence,
                 token: token.to_owned(),
@@ -356,6 +375,7 @@ impl Shard {
             },
             Ok(GatewayEvent::HeartbeatAck) => {
                 self.heartbeat_instants.1 = Some(Instant::now());
+                *self.last_heartbeat_acknowledged.lock().unwrap() = true;
 
                 Ok(None)
             },

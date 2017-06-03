@@ -83,7 +83,7 @@ lazy_static! {
     /// let routes = ROUTES.lock().unwrap();
     ///
     /// if let Some(route) = routes.get(&Route::ChannelsId(7)) {
-    ///     println!("Reset time at: {}", route.reset);
+    ///     println!("Reset time at: {}", route.lock().unwrap().reset);
     /// }
     /// ```
     ///

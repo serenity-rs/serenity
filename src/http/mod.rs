@@ -1141,6 +1141,7 @@ pub fn get_guilds(target: &GuildPagination, limit: u64) -> Result<Vec<GuildInfo>
 }
 
 /// Gets information about a specific invite.
+#[allow(unused_mut)]
 pub fn get_invite(code: &str, stats: bool) -> Result<Invite> {
     let mut invite = code;
 
@@ -1451,7 +1452,7 @@ pub fn send_files<T: Into<AttachmentType>>(channel_id: u64, files: Vec<T>, map: 
             },
             AttachmentType::Path(p) => {
                 request.write_file(&file_num, &p)?;
-            }, 
+            },
         }
 
         unsafe {

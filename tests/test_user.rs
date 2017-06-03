@@ -25,6 +25,8 @@ fn test_core() {
 
     user.avatar = None;
     assert!(user.avatar_url().is_none());
+
+    assert_eq!(user.tag(), "test#1432");
 }
 
 #[test]

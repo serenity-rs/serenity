@@ -17,15 +17,16 @@ pub use self::role::*;
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::*;
-use ::constants::LARGE_THRESHOLD;
 use ::model::*;
 
 #[cfg(feature="cache")]
 use ::CACHE;
-#[cfg(feature="http")]
+#[cfg(feature="model")]
 use ::http;
 #[cfg(feature="model")]
 use ::builder::{EditGuild, EditMember, EditRole};
+#[cfg(feature="model")]
+use ::constants::LARGE_THRESHOLD;
 
 /// A representation of a banning of a user.
 #[derive(Clone, Debug, Deserialize)]

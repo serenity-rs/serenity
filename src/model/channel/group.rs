@@ -1,14 +1,15 @@
-use std::borrow::Cow;
-use std::fmt::Write as FmtWrite;
-use std::io::Read;
 use ::model::*;
 
 #[cfg(feature="model")]
+use std::borrow::Cow;
+#[cfg(feature="model")]
+use std::fmt::Write as FmtWrite;
+#[cfg(feature="model")]
+use std::io::Read;
+#[cfg(feature="model")]
 use ::builder::{CreateMessage, GetMessages};
 #[cfg(feature="model")]
-use ::http;
-#[cfg(feature="model")]
-use ::http::AttachmentType;
+use ::http::{self, AttachmentType};
 
 /// A group channel - potentially including other [`User`]s - separate from a
 /// [`Guild`].
