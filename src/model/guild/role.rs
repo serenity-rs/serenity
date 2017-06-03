@@ -101,31 +101,13 @@ impl Role {
         }
     }
 
-    /// Edits a [`Role`], optionally setting its new fields.
+    /// Alias of [`edit`]
     ///
-    /// Requires the [Manage Roles] permission.
-    ///
-    /// # Examples
-    ///
-    /// Make a role hoisted:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::RoleId;
-    /// # let role = RoleId(7).find().unwrap();
-    /// // assuming a `role` has been bound
-    //
-    /// role.edit(|r| r.hoist(true));
-    /// ```
-    ///
-    /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [`edit`]: struct.Role.html#method.edit
     #[deprecated(since="0.2.1", note="Please use `edit` instead.")]
     #[cfg(all(feature="builder", feature="cache"))]
     pub fn edit_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
-        match self.find_guild() {
-            Ok(guild_id) => guild_id.edit_role(self.id, f),
-            Err(why) => Err(why),
-        }
+        self.edit(f)
     }
 
     /// Searches the cache for the guild that owns the role.
