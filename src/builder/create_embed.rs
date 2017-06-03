@@ -2,7 +2,7 @@
 //!
 //! This is a set of embed builders for rich embeds.
 //!
-//! These are used in the [`Context::send_message`] and
+//! These are used in the [`ChannelId::send_message`] and
 //! [`ExecuteWebhook::embeds`] methods, both as part of builders.
 //!
 //! The only builder that should be exposed is [`CreateEmbed`]. The rest of
@@ -10,7 +10,7 @@
 //!
 //! Documentation for embeds can be found [here].
 //!
-//! [`Context::send_message`]: ../client/struct.Context.html#method.send_message
+//! [`ChannelId::send_message`]: ../model/struct.ChannelId.html#method.send_message
 //! [`CreateEmbed`]: struct.CreateEmbed.html
 //! [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
 //! [here]: https://discordapp.com/developers/docs/resources/channel#embed-object
@@ -25,14 +25,14 @@ use ::model::Embed;
 use ::utils::Colour;
 
 /// A builder to create a fake [`Embed`] object, for use with the
-/// [`Context::send_message`] and [`ExecuteWebhook::embeds`] methods.
+/// [`ChannelId::send_message`] and [`ExecuteWebhook::embeds`] methods.
 ///
 /// # Examples
 ///
-/// Refer to the documentation for [`Context::send_message`] for a very in-depth
+/// Refer to the documentation for [`ChannelId::send_message`] for a very in-depth
 /// example on how to use this.
 ///
-/// [`Context::send_message`]: ../client/struct.Context.html#method.send_message
+/// [`ChannelId::send_message`]: ../model/struct.ChannelId.html#method.send_message
 /// [`Embed`]: ../model/struct.Embed.html
 /// [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
 #[derive(Clone, Debug)]
