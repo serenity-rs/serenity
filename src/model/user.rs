@@ -59,24 +59,16 @@ impl CurrentUser {
     ///     None => println!("{} does not have an avatar set.", user.name)
     /// }
     /// ```
+    #[inline]
     pub fn avatar_url(&self) -> Option<String> {
-        self.avatar.as_ref()
-            .map(|av| {
-                let ext = if av.starts_with("a_") {
-                    "gif"
-                } else {
-                    "webp"
-                };
-
-                format!(cdn!("/avatars/{}/{}.{}?size=1024"), self.id.0, av, ext)
-            })
+       avatar_url(self.id, self.avatar.as_ref())
     }
 
     /// Returns the formatted URL to the user's default avatar URL.
     ///
     /// This will produce a PNG URL.
     pub fn default_avatar_url(&self) -> String {
-        cdn!("/embed/avatars/{}.png", self.discriminator % 5u16).to_owned()
+        default_avatar_url(self.discriminator)
     }
 
     /// Alias of [`tag`].
@@ -169,9 +161,9 @@ impl CurrentUser {
     ///     None => println!("Could not get static avatar for {}.", user.name)
     /// }
     /// ```
+    #[inline]
     pub fn static_avatar_url(&self) -> Option<String> {
-        self.avatar.as_ref()
-            .map(|av| format!(cdn!("/avatars/{}/{}.webp?size=1024"), self.id.0, av))
+        static_avatar_url(self.id, self.avatar.as_ref())
     }
 
     /// Returns the invite url for the bot with the given permissions.
@@ -357,17 +349,9 @@ impl User {
     /// Returns the formatted URL of the user's icon, if one exists.
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
+    #[inline]
     pub fn avatar_url(&self) -> Option<String> {
-        self.avatar.as_ref()
-            .map(|av| {
-                let ext = if av.starts_with("a_") {
-                    "gif"
-                } else {
-                    "webp"
-                };
-
-                format!(cdn!("/avatars/{}/{}.{}?size=1024"), self.id.0, av, ext)
-            })
+        avatar_url(self.id, self.avatar.as_ref())
     }
 
     /// Creates a direct message channel between the [current user] and the
@@ -397,8 +381,9 @@ impl User {
     /// Returns the formatted URL to the user's default avatar URL.
     ///
     /// This will produce a PNG URL.
+    #[inline]
     pub fn default_avatar_url(&self) -> String {
-        cdn!("/embed/avatars/{}.png", self.discriminator % 5u16).to_owned()
+        default_avatar_url(self.discriminator)
     }
 
     /// Sends a message to a user through a direct message channel. This is a
@@ -611,9 +596,9 @@ impl User {
     /// Returns a static formatted URL of the user's icon, if one exists.
     ///
     /// This will always produce a WEBP image URL.
+    #[inline]
     pub fn static_avatar_url(&self) -> Option<String> {
-        self.avatar.as_ref()
-            .map(|av| format!(cdn!("/avatars/{}/{}.webp?size=1024"), self.id.0, av))
+        static_avatar_url(self.id, self.avatar.as_ref())
     }
 
     /// Returns the "tag" for the user.
@@ -731,6 +716,29 @@ impl fmt::Display for UserId {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.0, f)
     }
+}
+
+#[cfg(feature="model")]
+fn avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
+    hash.map(|hash| {
+        let ext = if hash.starts_with("a_") {
+            "gif"
+        } else {
+            "webp"
+        };
+
+        cdn!("/avatars/{}/{}.{}?size=1024", user_id.0, hash, ext)
+    })
+}
+
+#[cfg(feature="model")]
+fn default_avatar_url(discriminator: u16) -> String {
+    cdn!("/embed/avatars/{}.png", discriminator % 5u16)
+}
+
+#[cfg(feature="model")]
+fn static_avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
+    hash.map(|hash| cdn!("/avatars/{}/{}.webp?size=1024", user_id, hash))
 }
 
 #[cfg(feature="model")]
