@@ -72,6 +72,13 @@ impl CurrentUser {
             })
     }
 
+    /// Returns the formatted URL to the user's default avatar URL.
+    ///
+    /// This will produce a PNG URL.
+    pub fn default_avatar_url(&self) -> String {
+        cdn!("/embed/avatars/{}.png", self.discriminator % 5u16).to_owned()
+    }
+
     /// Alias of [`tag`].
     ///
     /// [`tag`]: #method.tag
