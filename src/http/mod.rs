@@ -47,7 +47,7 @@ use std::default::Default;
 use std::fmt::Write as FmtWrite;
 use std::fs::File;
 use std::io::{ErrorKind as IoErrorKind, Read};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use ::constants;
 use ::internal::prelude::*;
@@ -1447,8 +1447,11 @@ pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap)
 
     for file in files {
         match file.into() {
+            AttachmentType::Bytes((mut bytes, filename)) => {
+                request.write_stream(&file_num, &mut bytes, Some(filename), None)?;
+            },
             AttachmentType::File((mut f, filename)) => {
-                request.write_stream(&file_num, &mut f, Some(&filename), None)?;
+                request.write_stream(&file_num, &mut f, Some(filename), None)?;
             },
             AttachmentType::Path(p) => {
                 request.write_file(&file_num, &p)?;
@@ -1605,14 +1608,20 @@ fn verify(expected_status_code: u16, mut response: HyperResponse) -> Result<()> 
     Err(Error::Http(HttpError::InvalidRequest(response.status)))
 }
 
-use std::path::Path;
-
 /// Enum that allows a user to pass a `Path` or a `File` type to `send_files`
 pub enum AttachmentType<'a> {
+    /// Indicates that the `AttachmentType` is a byte slice with a filename.
+    Bytes((&'a [u8], &'a str)),
     /// Indicates that the `AttachmentType` is a `File`
     File((&'a File, &'a str)),
     /// Indicates that the `AttachmentType` is a `Path`
     Path(&'a Path),
+}
+
+impl<'a> From<(&'a [u8], &'a str)> for AttachmentType<'a> {
+    fn from(params: (&'a [u8], &'a str)) -> AttachmentType {
+        AttachmentType::Bytes(params)
+    }
 }
 
 impl<'a> From<&'a str> for AttachmentType<'a> {
