@@ -323,8 +323,8 @@ impl Channel {
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
-    pub fn send_files<F, T: Into<AttachmentType>>(&self, files: Vec<T>, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
+    pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         self.id().send_files(files, f)
     }
 

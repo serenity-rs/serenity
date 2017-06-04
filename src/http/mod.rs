@@ -1428,8 +1428,8 @@ pub fn send_file<R: Read>(channel_id: u64, mut file: R, filename: &str, map: Jso
 /// if the file is too large to send.
 ///
 /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
-pub fn send_files<T: Into<AttachmentType>>(channel_id: u64, files: Vec<T>, map: JsonMap)
-    -> Result<Message> {
+pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap)
+    -> Result<Message> where T: Into<AttachmentType<'a>> {
     let uri = format!(api!("/channels/{}/messages"), channel_id);
     let url = match Url::parse(&uri) {
         Ok(url) => url,
@@ -1605,29 +1605,31 @@ fn verify(expected_status_code: u16, mut response: HyperResponse) -> Result<()> 
     Err(Error::Http(HttpError::InvalidRequest(response.status)))
 }
 
+use std::path::Path;
+
 /// Enum that allows a user to pass a `Path` or a `File` type to `send_files`
-pub enum AttachmentType {
+pub enum AttachmentType<'a> {
     /// Indicates that the `AttachmentType` is a `File`
-    File((File, String)),
+    File((&'a File, &'a str)),
     /// Indicates that the `AttachmentType` is a `Path`
-    Path(PathBuf),
+    Path(&'a Path),
 }
 
-impl From<String> for AttachmentType {
-    fn from(s: String) -> AttachmentType {
-        AttachmentType::Path(PathBuf::from(&s))
-    }
-}
-
-impl<'a> From<&'a str> for AttachmentType {
+impl<'a> From<&'a str> for AttachmentType<'a> {
     fn from(s: &'a str) -> AttachmentType {
-        AttachmentType::Path(PathBuf::from(s))
+        AttachmentType::Path(Path::new(s))
     }
 }
 
-impl<'a> From<(File, &'a str)> for AttachmentType {
-    fn from(f: (File, &str)) -> AttachmentType {
-        AttachmentType::File((f.0, f.1.to_owned()))
+impl<'a> From<&'a PathBuf> for AttachmentType<'a> {
+    fn from(pathbuf: &'a PathBuf) -> AttachmentType {
+        AttachmentType::Path(pathbuf.as_path())
+    }
+}
+
+impl<'a> From<(&'a File, &'a str)> for AttachmentType<'a> {
+    fn from(f: (&'a File, &'a str)) -> AttachmentType<'a> {
+        AttachmentType::File((f.0, f.1))
     }
 }
 
