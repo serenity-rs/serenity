@@ -68,6 +68,49 @@ pub struct Message {
 
 #[cfg(feature="model")]
 impl Message {
+    /// Retrieves the related channel located in the cache.
+    ///
+    /// Returns `None` if the channel is not in the cache.
+    ///
+    /// # Examples
+    ///
+    /// On command, print the name of the channel that a message took place in:
+    ///
+    /// ```rust,no_run
+    /// # #[macro_use] extern crate serenity;
+    /// #
+    /// # use serenity::Client;
+    /// #
+    /// # fn main() {
+    /// #     let mut client = Client::login("");
+    /// #
+    /// use serenity::model::Channel;
+    ///
+    /// client.with_framework(|f| f
+    ///     .configure(|c| c.prefix("~"))
+    ///     .command("channelname", |c| c.exec(channel_name)));
+    ///
+    /// command!(channel_name(_ctx, msg) {
+    ///     let _ = match msg.channel() {
+    ///         Some(Channel::Group(c)) => msg.reply(&c.read().unwrap().name()),
+    ///         Some(Channel::Guild(c)) => msg.reply(&c.read().unwrap().name),
+    ///         Some(Channel::Private(c)) => {
+    ///             let channel = c.read().unwrap();
+    ///             let user = channel.recipient.read().unwrap();
+    ///
+    ///             msg.reply(&format!("DM with {}", user.name.clone()))
+    ///         },
+    ///         None => msg.reply("Unknown"),
+    ///     };
+    /// });
+    /// # }
+    /// ```
+    #[cfg(feature="cache")]
+    #[inline]
+    pub fn channel(&self) -> Option<Channel> {
+        CACHE.read().unwrap().channel(self.channel_id)
+    }
+
     /// Deletes the message.
     ///
     /// **Note**: The logged in user must either be the author of the message or
