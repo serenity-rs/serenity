@@ -570,7 +570,7 @@ impl GuildChannel {
 
     /// Sends (a) file(s) along with optional message contents.
     ///
-    /// Refer to [`ChannelId::send_file`] for examples and more information.
+    /// Refer to [`ChannelId::send_files`] for examples and more information.
     ///
     /// The [Attach Files] and [Send Messages] permissions are required.
     ///
@@ -582,7 +582,7 @@ impl GuildChannel {
     /// [`ClientError::MessageTooLong`] will be returned, containing the number
     /// of unicode code points over the limit.
     ///
-    /// [`ChannelId::send_file`]: struct.ChannelId.html#method.send_file
+    /// [`ChannelId::send_files`]: struct.ChannelId.html#method.send_files
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
