@@ -140,32 +140,6 @@ impl CurrentUser {
         http::get_guilds(&GuildPagination::After(GuildId(1)), 100)
     }
 
-    /// Returns a static formatted URL of the user's icon, if one exists.
-    ///
-    /// This will always produce a WEBP image URL.
-    ///
-    /// # Examples
-    ///
-    /// Print out the current user's static avatar url if one is set:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::client::CACHE;
-    /// #
-    /// # let cache = CACHE.read().unwrap();
-    /// #
-    /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
-    ///
-    /// match user.static_avatar_url() {
-    ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
-    ///     None => println!("Could not get static avatar for {}.", user.name)
-    /// }
-    /// ```
-    #[inline]
-    pub fn static_avatar_url(&self) -> Option<String> {
-        static_avatar_url(self.id, self.avatar.as_ref())
-    }
-
     /// Returns the invite url for the bot with the given permissions.
     ///
     /// If the permissions passed are empty, the permissions part will be dropped.
@@ -211,6 +185,32 @@ impl CurrentUser {
         } else {
             format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot&permissions={}", self.id, bits)
         }
+    }
+
+    /// Returns a static formatted URL of the user's icon, if one exists.
+    ///
+    /// This will always produce a WEBP image URL.
+    ///
+    /// # Examples
+    ///
+    /// Print out the current user's static avatar url if one is set:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::CACHE;
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
+    /// // assuming the cache has been unlocked
+    /// let user = &cache.user;
+    ///
+    /// match user.static_avatar_url() {
+    ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
+    ///     None => println!("Could not get static avatar for {}.", user.name)
+    /// }
+    /// ```
+    #[inline]
+    pub fn static_avatar_url(&self) -> Option<String> {
+        static_avatar_url(self.id, self.avatar.as_ref())
     }
 
     /// Returns the tag of the current user.
@@ -363,15 +363,6 @@ impl User {
         self.id.create_dm_channel()
     }
 
-    /// Alias of [`tag`].
-    ///
-    /// [`tag`]: #method.tag
-    #[deprecated(since="0.2.0", note="Use `tag` instead.")]
-    #[inline]
-    pub fn distinct(&self) -> String {
-        self.tag()
-    }
-
     /// Retrieves the time that this user was created at.
     #[inline]
     pub fn created_at(&self) -> Timespec {
@@ -454,6 +445,15 @@ impl User {
         });
 
         http::send_message(private_channel_id.0, &map)
+    }
+
+    /// Alias of [`tag`].
+    ///
+    /// [`tag`]: #method.tag
+    #[deprecated(since="0.2.0", note="Use `tag` instead.")]
+    #[inline]
+    pub fn distinct(&self) -> String {
+        self.tag()
     }
 
     /// This is an alias of [direct_message].
