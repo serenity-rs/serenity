@@ -586,7 +586,7 @@ impl User {
     /// ```
     pub fn refresh(&mut self) -> Result<()> {
         self.id.get().map(|replacement| {
-            ::std::mem::replace(self, replacement);
+            mem::replace(self, replacement);
 
             ()
         })
