@@ -116,6 +116,18 @@ impl CurrentUser {
         }
     }
 
+    /// Retrieves the URL to the current user's avatar, falling back to the
+    /// default avatar if needed.
+    ///
+    /// This will call [`avatar_url`] first, and if that returns `None`, it
+    /// then falls back to [`default_avatar_url`].
+    ///
+    /// [`avatar_url`]: #method.avatar_url
+    /// [`default_avatar_url`]: #method.default_avatar_url
+    pub fn face(&self) -> String {
+        self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
+    }
+
     /// Gets a list of guilds that the current user is in.
     ///
     /// # Examples
@@ -472,6 +484,18 @@ impl User {
     #[inline]
     pub fn dm(&self, content: &str) -> Result<Message> {
         self.direct_message(content)
+    }
+
+    /// Retrieves the URL to the user's avatar, falling back to the default
+    /// avatar if needed.
+    ///
+    /// This will call [`avatar_url`] first, and if that returns `None`, it
+    /// then falls back to [`default_avatar_url`].
+    ///
+    /// [`avatar_url`]: #method.avatar_url
+    /// [`default_avatar_url`]: #method.default_avatar_url
+    pub fn face(&self) -> String {
+        self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
     }
 
     /// Gets a user by its Id over the REST API.
