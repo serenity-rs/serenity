@@ -40,6 +40,7 @@
 //! [Taken from]: https://discordapp.com/developers/docs/topics/rate-limits#rate-limits
 #![allow(zero_ptr)]
 
+use chrono::UTC;
 use hyper::client::{RequestBuilder, Response};
 use hyper::header::Headers;
 use hyper::status::StatusCode;
@@ -48,7 +49,6 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use std::{i64, str, thread};
 use super::{HttpError, LightMethod};
-use time;
 use ::internal::prelude::*;
 
 lazy_static! {
@@ -441,7 +441,7 @@ impl RateLimit {
             return;
         }
 
-        let current_time = time::get_time().sec;
+        let current_time = UTC::now().timestamp();
 
         // The reset was in the past, so we're probably good.
         if current_time > self.reset {

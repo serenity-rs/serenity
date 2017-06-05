@@ -960,7 +960,7 @@ impl Cache {
                 guild.members.insert(event.user.id, Member {
                     deaf: false,
                     guild_id: Some(event.guild_id),
-                    joined_at: String::default(),
+                    joined_at: None,
                     mute: false,
                     nick: event.nick.clone(),
                     roles: event.roles.clone(),

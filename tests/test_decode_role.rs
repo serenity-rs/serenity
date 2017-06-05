@@ -142,7 +142,7 @@ fn decode_guild_with_n1_role_position() {
         ],
         "nick": "asdasdadas",
         "mute": false,
-        "joined_at": "fake",
+        "joined_at": "2017-01-29T15:35:17.136000+00:00",
         "deaf": false
       },
       {
@@ -156,7 +156,7 @@ fn decode_guild_with_n1_role_position() {
           "2342432423432"
         ],
         "mute": false,
-        "joined_at": "fake",
+        "joined_at": "2017-01-29T15:35:17.136000+00:00",
         "deaf": false
       },
       {
@@ -171,7 +171,7 @@ fn decode_guild_with_n1_role_position() {
           "34534543543"
         ],
         "mute": false,
-        "joined_at": "fake",
+        "joined_at": "2017-01-29T15:35:17.136000+00:00",
         "deaf": false
       },
       {
@@ -185,7 +185,7 @@ fn decode_guild_with_n1_role_position() {
           "56465464"
         ],
         "mute": false,
-        "joined_at": "fake",
+        "joined_at": "2017-01-29T15:35:17.136000+00:00",
         "deaf": false
       },
       {
@@ -201,7 +201,7 @@ fn decode_guild_with_n1_role_position() {
         ],
         "nick": null,
         "mute": false,
-        "joined_at": "fake",
+        "joined_at": "2017-01-29T15:35:17.136000+00:00",
         "deaf": false
       },
       {
@@ -217,13 +217,13 @@ fn decode_guild_with_n1_role_position() {
         ],
         "nick": null,
         "mute": false,
-        "joined_at": "fake",
+        "joined_at": "2017-01-29T15:35:17.136000+00:00",
         "deaf": false
       }
     ],
     "member_count": 6,
     "large": false,
-    "joined_at": "fake",
+    "joined_at": "2017-01-29T15:35:17.136000+00:00",
     "id": "12321321312321",
     "icon": "fake icon",
     "features": [],

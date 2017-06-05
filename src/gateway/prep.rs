@@ -1,3 +1,4 @@
+use chrono::{Duration, UTC};
 use serde_json::Value;
 use std::sync::mpsc::{
     Receiver as MpscReceiver,
@@ -8,7 +9,6 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration as StdDuration, Instant};
 use std::{env, thread};
 use super::{GatewayError, GatewayStatus};
-use time::{self, Duration};
 use websocket::client::request::Url as RequestUrl;
 use websocket::client::{Receiver, Sender};
 use websocket::result::WebSocketError as WsError;
@@ -81,7 +81,7 @@ pub fn keepalive(interval: u64,
                  mut sender: Sender<WebSocketStream>,
                  channel: &MpscReceiver<GatewayStatus>) {
     let mut base_interval = Duration::milliseconds(interval as i64);
-    let mut next_tick = time::get_time() + base_interval;
+    let mut next_tick = UTC::now() + base_interval;
 
     let mut last_sequence = 0;
     let mut last_successful = false;
@@ -110,7 +110,7 @@ pub fn keepalive(interval: u64,
             }
         }
 
-        if time::get_time() >= next_tick {
+        if UTC::now() >= next_tick {
             // If the last heartbeat didn't receive an acknowledgement, then
             // shutdown and auto-reconnect.
             if !*last_ack.lock().unwrap() {

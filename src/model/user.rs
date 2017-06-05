@@ -6,13 +6,13 @@ use ::internal::prelude::*;
 use ::model::misc::Mentionable;
 
 #[cfg(feature="model")]
+use chrono::NaiveDateTime;
+#[cfg(feature="model")]
 use std::fmt::Write;
 #[cfg(feature="model")]
 use std::mem;
 #[cfg(feature="cache")]
 use std::sync::{Arc, RwLock};
-#[cfg(feature="model")]
-use time::Timespec;
 #[cfg(feature="cache")]
 use ::CACHE;
 #[cfg(feature="model")]
@@ -377,7 +377,7 @@ impl User {
 
     /// Retrieves the time that this user was created at.
     #[inline]
-    pub fn created_at(&self) -> Timespec {
+    pub fn created_at(&self) -> NaiveDateTime {
         self.id.created_at()
     }
 

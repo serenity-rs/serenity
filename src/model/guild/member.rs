@@ -1,3 +1,4 @@
+use chrono::{DateTime, FixedOffset};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_sync_user;
 use ::model::*;
@@ -23,7 +24,7 @@ pub struct Member {
     /// The unique Id of the guild that the member is a part of.
     pub guild_id: Option<GuildId>,
     /// Timestamp representing the date when the member joined.
-    pub joined_at: String,
+    pub joined_at: Option<DateTime<FixedOffset>>,
     /// Indicator of whether the member can speak in voice channels.
     pub mute: bool,
     /// The member's nickname, if present.
@@ -326,7 +327,7 @@ impl Member {
                 .unwrap()
                 .members
                 .values()
-                .any(|m| m.user.read().unwrap().id == self.user.read().unwrap().id && m.joined_at == *self.joined_at))
+                .any(|m| m.user.read().unwrap().id == self.user.read().unwrap().id && m.joined_at == self.joined_at))
             .map(|guild| guild
                 .read()
                 .unwrap()

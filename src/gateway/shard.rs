@@ -1,3 +1,4 @@
+use chrono::UTC;
 use std::io::Write;
 use std::net::Shutdown;
 use std::sync::mpsc::{self, Sender as MpscSender};
@@ -6,7 +7,6 @@ use std::thread::{self, Builder as ThreadBuilder};
 use std::time::{Duration as StdDuration, Instant};
 use std::mem;
 use super::{GatewayError, GatewayStatus, prep};
-use time;
 use websocket::client::{Client as WsClient, Sender, Receiver};
 use websocket::message::Message as WsMessage;
 use websocket::result::WebSocketError;
@@ -788,7 +788,7 @@ impl Shard {
 
     fn update_presence(&self) {
         let (ref game, status, afk) = self.current_presence;
-        let now = time::get_time().sec as u64;
+        let now = UTC::now().timestamp() as u64;
 
         let msg = json!({
             "op": OpCode::StatusUpdate.num(),

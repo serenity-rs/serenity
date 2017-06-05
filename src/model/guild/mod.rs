@@ -14,6 +14,7 @@ pub use self::member::*;
 pub use self::partial_guild::*;
 pub use self::role::*;
 
+use chrono::{DateTime, FixedOffset};
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::*;
@@ -73,7 +74,7 @@ pub struct Guild {
     /// that of the default channel (typically `#general`).
     pub id: GuildId,
     /// The date that the current user joined the guild.
-    pub joined_at: String,
+    pub joined_at: DateTime<FixedOffset>,
     /// Indicator of whether the guild is considered "large" by Discord.
     pub large: bool,
     /// The number of members in the guild.
@@ -1149,7 +1150,7 @@ impl<'de> Deserialize<'de> for Guild {
             .map_err(DeError::custom)?;
         let joined_at = map.remove("joined_at")
             .ok_or_else(|| DeError::custom("expected guild joined_at"))
-            .and_then(String::deserialize)
+            .and_then(DateTime::deserialize)
             .map_err(DeError::custom)?;
         let large = map.remove("large")
             .ok_or_else(|| DeError::custom("expected guild large"))

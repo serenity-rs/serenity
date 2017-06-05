@@ -1,3 +1,4 @@
+use chrono::{DateTime, FixedOffset};
 use super::*;
 
 #[cfg(feature="cache")]
@@ -228,7 +229,7 @@ pub struct RichInvite {
     /// The unique code for the invite.
     pub code: String,
     /// When the invite was created.
-    pub created_at: String,
+    pub created_at: DateTime<FixedOffset>,
     /// A representation of the minimal amount of information needed about the
     /// guild being invited to.
     pub guild: InviteGuild,
@@ -302,7 +303,7 @@ impl RichInvite {
     /// #         name: "foo".to_owned(),
     /// #         kind: ChannelType::Text,
     /// #     },
-    /// #     created_at: "bar".to_owned(),
+    /// #     created_at: "2017-01-29T15:35:17.136000+00:00".parse().unwrap(),
     /// #     guild: InviteGuild {
     /// #         id: GuildId(2),
     /// #         icon: None,

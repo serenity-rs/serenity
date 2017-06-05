@@ -40,12 +40,12 @@ pub use self::user::*;
 pub use self::voice::*;
 pub use self::webhook::*;
 
+use chrono::NaiveDateTime;
 use self::utils::*;
 use serde::de::Visitor;
 use std::collections::HashMap;
 use std::fmt::{Formatter, Result as FmtResult};
 use std::sync::{Arc, RwLock};
-use time::Timespec;
 use ::internal::prelude::*;
 
 #[cfg(feature="utils")]
@@ -63,10 +63,10 @@ macro_rules! id {
 
             impl $name {
                 /// Retrieves the time that the Id was created at.
-                pub fn created_at(&self) -> Timespec {
+                pub fn created_at(&self) -> NaiveDateTime {
                     let offset = (self.0 >> 22) / 1000;
 
-                    Timespec::new(1420070400 + offset as i64, 0)
+                    NaiveDateTime::from_timestamp(1420070400 + offset as i64, 0)
                 }
             }
 

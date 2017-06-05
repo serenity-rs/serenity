@@ -1,11 +1,10 @@
+use chrono::{DateTime, FixedOffset};
 use ::model::*;
 
 #[cfg(feature="cache")]
 use std::fmt::Write;
 #[cfg(feature="model")]
 use std::mem;
-#[cfg(feature="model")]
-use time;
 #[cfg(feature="model")]
 use ::builder::{CreateEmbed, CreateMessage};
 #[cfg(feature="model")]
@@ -33,7 +32,7 @@ pub struct Message {
     /// The content of the message.
     pub content: String,
     /// The timestamp of the last time the message was updated, if it was.
-    pub edited_timestamp: Option<String>,
+    pub edited_timestamp: Option<DateTime<FixedOffset>>,
     /// Array of embeds sent with the message.
     pub embeds: Vec<Embed>,
     /// Indicator of the type of message this is, i.e. whether it is a regular
@@ -56,7 +55,7 @@ pub struct Message {
     #[serde(default)]
     pub reactions: Vec<MessageReaction>,
     /// Initial message creation timestamp, calculated from its Id.
-    pub timestamp: String,
+    pub timestamp: DateTime<FixedOffset>,
     /// Indicator of whether the command is to be played back via
     /// text-to-speech.
     ///
@@ -240,16 +239,14 @@ impl Message {
                 self.content = format!("{} pinned a message to this channel. See all the pins.", self.author);
             },
             MessageType::MemberJoin => {
-                if let Ok(tm) = time::strptime(&self.timestamp, "%Y-%m-%dT%H:%M:%S") {
-                    let sec = tm.to_timespec().sec as usize;
-                    let chosen = constants::JOIN_MESSAGES[sec % constants::JOIN_MESSAGES.len()];
+                let sec = self.timestamp.timestamp() as usize;
+                let chosen = constants::JOIN_MESSAGES[sec % constants::JOIN_MESSAGES.len()];
 
-                    self.content = if chosen.contains("$user") {
-                        chosen.replace("$user", &self.author.mention())
-                    } else {
-                        chosen.to_owned()
-                    };
-                }
+                self.content = if chosen.contains("$user") {
+                    chosen.replace("$user", &self.author.mention())
+                } else {
+                    chosen.to_owned()
+                };
             },
             _ => {},
         }

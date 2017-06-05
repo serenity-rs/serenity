@@ -1,3 +1,4 @@
+use chrono::{DateTime, FixedOffset};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_single_recipient;
 use ::model::*;
@@ -21,7 +22,7 @@ pub struct PrivateChannel {
     /// Timestamp of the last time a [`Message`] was pinned.
     ///
     /// [`Message`]: struct.Message.html
-    pub last_pin_timestamp: Option<String>,
+    pub last_pin_timestamp: Option<DateTime<FixedOffset>>,
     /// Indicator of the type of channel this is.
     ///
     /// This should always be [`ChannelType::Private`].

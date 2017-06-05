@@ -591,7 +591,7 @@ impl Framework {
     /// ```rust
     /// # #[macro_use] extern crate serenity;
     /// command!(ping(_ctx, msg) {
-    ///     msg.channel_id.say("pong!");    
+    ///     msg.channel_id.say("pong!");
     /// });
     /// #
     /// # fn main() {
@@ -700,7 +700,7 @@ impl Framework {
     /// # use serenity::Client;
     /// # let mut client = Client::login("token");
     /// use serenity::framework::DispatchError::{NotEnoughArguments, TooManyArguments};
-    /// 
+    ///
     /// client.with_framework(|f| f
     ///     .on_dispatch_error(|ctx, msg, error| {
     ///         match error {
@@ -711,7 +711,7 @@ impl Framework {
     ///                 msg.channel_id.say(&format!("Max arguments allowed is {}, but got {}.", max, given));
     ///             }
     ///             _ => println!("Unhandled dispatch error.")
-    ///         }        
+    ///         }
     ///     }));
     /// ```
     pub fn on_dispatch_error<F>(mut self, f: F) -> Self

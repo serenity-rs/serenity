@@ -103,9 +103,9 @@ extern crate serde_json;
 extern crate lazy_static;
 
 extern crate base64;
+extern crate chrono;
 extern crate flate2;
 extern crate serde;
-extern crate time;
 
 #[cfg(feature="voice")]
 extern crate byteorder;
