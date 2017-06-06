@@ -394,12 +394,34 @@ impl User {
     ///
     /// # Examples
     ///
-    /// Sending a message:
+    /// When a user sends a message with a content of `"~help"`, DM the author a
+    /// help message, and then react with `'👌'` to verify message sending:
     ///
-    /// ```rust,ignore
-    /// // assuming you are in a context
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::login("");
+    /// #
+    /// use serenity::model::Permissions;
+    /// use serenity::CACHE;
     ///
-    /// let _ = message.author.direct_message(|m| m.content("Hello!"));
+    /// client.on_message(|_, msg| {
+    ///     if msg.content == "~help" {
+    ///         let url = CACHE.read().unwrap().user.invite_url(Permissions::empty());
+    ///         let help = format!("Helpful info here. Invite me with this link: <{}>", url);
+    ///
+    ///         match msg.author.direct_message(|m| m.content(&help)) {
+    ///             Ok(_) => {
+    ///                 let _ = msg.react('👌');
+    ///             },
+    ///             Err(why) => {
+    ///                 println!("Err sending help: {:?}", why);
+    ///
+    ///                 let _ = msg.reply("There was an error DMing you help.");
+    ///             },
+    ///         };
+    ///     }
+    /// });
     /// ```
     ///
     /// [`PrivateChannel`]: struct.PrivateChannel.html
