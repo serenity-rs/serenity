@@ -119,12 +119,7 @@ impl Shard {
                token: &str,
                shard_info: Option<[u64; 2]>)
                -> Result<(Shard, ReadyEvent, Receiver<WebSocketStream>)> {
-        let url = prep::build_gateway_url(base_url)?;
-
-        let response = WsClient::connect(url)?.send()?;
-        response.validate()?;
-
-        let (mut sender, mut receiver) = response.begin().split();
+        let (mut sender, mut receiver) = connect(base_url)?;
 
         let identification = prep::identify(token, shard_info);
         sender.send_json(&identification)?;
@@ -732,12 +727,7 @@ impl Shard {
         };
 
         let _ = receiver.shutdown_all();
-        let url = prep::build_gateway_url(&self.ws_url)?;
-
-        let response = WsClient::connect(url)?.send()?;
-        response.validate()?;
-
-        let (mut sender, mut receiver) = response.begin().split();
+        let (mut sender, mut receiver) = connect(&self.ws_url)?;
 
         sender.send_json(&json!({
             "op": OpCode::Resume.num(),
@@ -816,4 +806,12 @@ impl Shard {
             });
         }
     }
+}
+
+fn connect(base_url: &str) -> Result<(Sender<WebSocketStream>, Receiver<WebSocketStream>)> {
+    let url = prep::build_gateway_url(base_url)?;
+    let response = WsClient::connect(url)?.send()?;
+    response.validate()?;
+
+    Ok(response.begin().split())
 }
