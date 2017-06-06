@@ -13,12 +13,12 @@ use std::fmt::Write;
 use std::mem;
 #[cfg(feature="cache")]
 use std::sync::{Arc, RwLock};
+#[cfg(feature="model")]
+use ::builder::{CreateMessage, EditProfile};
 #[cfg(feature="cache")]
 use ::CACHE;
 #[cfg(feature="model")]
 use ::http::{self, GuildPagination};
-#[cfg(feature="model")]
-use ::builder::EditProfile;
 
 /// Information about the current user.
 #[derive(Clone, Debug, Deserialize)]
@@ -399,7 +399,7 @@ impl User {
     /// ```rust,ignore
     /// // assuming you are in a context
     ///
-    /// let _ = message.author.direct_message("Hello!");
+    /// let _ = message.author.direct_message(|m| m.content("Hello!"));
     /// ```
     ///
     /// [`PrivateChannel`]: struct.PrivateChannel.html
@@ -419,8 +419,9 @@ impl User {
     //
     // (AKA: Clippy is wrong and so we have to mark as allowing this lint.)
     #[allow(let_and_return)]
-    pub fn direct_message(&self, content: &str)
-        -> Result<Message> {
+    #[cfg(feature="builder")]
+    pub fn direct_message<F>(&self, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage {
         let private_channel_id = feature_cache! {{
             let finding = {
                 let cache = CACHE.read().unwrap();
@@ -451,12 +452,7 @@ impl User {
             http::create_private_channel(&map)?.id
         }};
 
-        let map = json!({
-            "content": content,
-            "tts": false,
-        });
-
-        http::send_message(private_channel_id.0, &map)
+        private_channel_id.send_message(f)
     }
 
     /// Alias of [`tag`].
@@ -481,9 +477,10 @@ impl User {
     /// ```
     ///
     /// [direct_message]: #method.direct_message
+    #[cfg(feature="builder")]
     #[inline]
-    pub fn dm(&self, content: &str) -> Result<Message> {
-        self.direct_message(content)
+    pub fn dm<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+        self.direct_message(f)
     }
 
     /// Retrieves the URL to the user's avatar, falling back to the default
