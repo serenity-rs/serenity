@@ -14,7 +14,7 @@ use ::internal::prelude::*;
 /// ```rust,no_run
 /// # use serenity::Client;
 /// #
-/// # let mut client = Client::login("");
+/// # let mut client = Client::new("");
 /// #
 /// use serenity::client::CACHE;
 ///

@@ -415,7 +415,7 @@ impl GuildChannel {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// use serenity::CACHE;
     ///
@@ -438,7 +438,7 @@ impl GuildChannel {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// use serenity::CACHE;
     /// use serenity::model::permissions;

@@ -203,7 +203,7 @@ impl Cache {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// use serenity::client::CACHE;
     /// use std::thread;
@@ -285,7 +285,7 @@ impl Cache {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// use serenity::client::CACHE;
     ///
@@ -392,7 +392,7 @@ impl Cache {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// # client.on_message(|ctx, message| {
     /// #

@@ -195,7 +195,7 @@ impl CreateEmbed {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// client.on_message(|_, msg| {
     ///     if msg.content == "~embed" {
@@ -214,7 +214,7 @@ impl CreateEmbed {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// use serenity::CACHE;
     ///

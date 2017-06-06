@@ -400,7 +400,7 @@ impl User {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// use serenity::model::Permissions;
     /// use serenity::CACHE;
@@ -591,7 +591,7 @@ impl User {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// use serenity::model::UserId;
     /// use serenity::CACHE;
@@ -655,7 +655,7 @@ impl User {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// use serenity::utils::MessageBuilder;
     /// use serenity::utils::ContentModifier::Bold;

@@ -10,7 +10,8 @@
 //! use serenity::Client;
 //! use std::env;
 //!
-//! let mut client = Client::login(&env::var("DISCORD_TOKEN").unwrap());
+//! let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
+//!
 //! client.with_framework(|f| f
 //!     .command("help", |c| c.exec_help(help_commands::with_embeds)));
 //! ```
@@ -59,7 +60,9 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 ///
 /// ```rust
 /// # use serenity::Client;
-/// # let mut client = Client::login("token");
+/// #
+/// # let mut client = Client::new("token");
+/// #
 /// use serenity::ext::framework::help_commands;
 ///
 /// client.with_framework(|f| f
@@ -206,7 +209,9 @@ pub fn with_embeds(ctx: &mut Context,
 ///
 /// ```rust
 /// # use serenity::Client;
-/// # let mut client = Client::login("token");
+/// #
+/// # let mut client = Client::new("token");
+/// #
 /// use serenity::ext::framework::help_commands;
 ///
 /// client.with_framework(|f| f

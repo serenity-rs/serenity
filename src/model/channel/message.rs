@@ -81,7 +81,7 @@ impl Message {
     /// # use serenity::Client;
     /// #
     /// # fn main() {
-    /// #     let mut client = Client::login("");
+    /// #     let mut client = Client::new("");
     /// #
     /// use serenity::model::Channel;
     ///

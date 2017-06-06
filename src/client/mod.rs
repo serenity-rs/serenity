@@ -55,10 +55,10 @@ use ::model::*;
 #[cfg(feature="framework")]
 use ::framework::Framework;
 
-/// The Client is the way to "login" and be able to start sending authenticated
-/// requests over the REST API, as well as initializing a WebSocket connection
-/// through [`Shard`]s. Refer to the
-/// [documentation on using sharding][sharding docs] for more information.
+/// The Client is the way to be able to start sending authenticated requests
+/// over the REST API, as well as initializing a WebSocket connection through
+/// [`Shard`]s. Refer to the [documentation on using sharding][sharding docs]
+/// for more information.
 ///
 /// # Event Handlers
 ///
@@ -77,7 +77,7 @@ use ::framework::Framework;
 /// ```rust,ignore
 /// use serenity::Client;
 ///
-/// let mut client = Client::login("my token here");
+/// let mut client = Client::new("my token here");
 ///
 /// client.on_message(|context, message| {
 ///     if message.content == "!ping" {
@@ -129,7 +129,7 @@ pub struct Client {
     ///     type Value = HashMap<String, u64>;
     /// }
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN").unwrap());
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
     ///
     /// {
     ///     let mut data = client.data.lock().unwrap();
@@ -176,15 +176,6 @@ pub struct Client {
 
 #[allow(type_complexity)]
 impl Client {
-    /// Alias of [`login`].
-    ///
-    /// [`login`]: #method.login
-    #[deprecated(since="0.1.5", note="Use `login` instead")]
-    #[inline]
-    pub fn login_bot(token: &str) -> Self {
-        Self::login(token)
-    }
-
     /// Creates a Client for a bot user.
     ///
     /// Discord has a requirement of prefixing bot tokens with `"Bot "`, which
@@ -202,7 +193,7 @@ impl Client {
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_TOKEN")?;
-    /// let client = Client::login(&token);
+    /// let client = Client::new(&token);
     /// # Ok(())
     /// # }
     /// #
@@ -210,14 +201,32 @@ impl Client {
     /// #    try_main().unwrap();
     /// # }
     /// ```
-    pub fn login(bot_token: &str) -> Self {
-        let token = if bot_token.starts_with("Bot ") {
-            bot_token.to_owned()
+    pub fn new(token: &str) -> Self {
+        let token = if token.starts_with("Bot ") {
+            token.to_owned()
         } else {
-            format!("Bot {}", bot_token)
+            format!("Bot {}", token)
         };
 
-        login(token)
+        init_client(token)
+    }
+
+    /// Alias of [`new`].
+    ///
+    /// [`new`]: #method.new
+    #[deprecated(since="0.1.5", note="Use `new` instead")]
+    #[inline(always)]
+    pub fn login_bot(token: &str) -> Self {
+        Self::new(token)
+    }
+
+    /// Alias for [`new`].
+    ///
+    /// [`new`]: #method.new
+    #[deprecated(since="0.2.1", note="Use `new` instead")]
+    #[inline(always)]
+    pub fn login(token: &str) -> Self {
+        Self::new(token)
     }
 
     /// Sets a framework to be used with the client. All message events will be
@@ -238,7 +247,7 @@ impl Client {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
     /// client.with_framework(|f| f
     ///     .configure(|c| c.prefix("~"))
     ///     .command("ping", |c| c.exec_str("Pong!")));
@@ -284,7 +293,7 @@ impl Client {
     /// use serenity::client::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
     ///
     /// if let Err(why) = client.start() {
     ///     println!("Err with client: {:?}", why);
@@ -325,7 +334,7 @@ impl Client {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
     ///
     /// if let Err(why) = client.start_autosharded() {
     ///     println!("Err with client: {:?}", why);
@@ -374,7 +383,7 @@ impl Client {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
     ///
     /// if let Err(why) = client.start_shard(3, 5) {
     ///     println!("Err with client: {:?}", why);
@@ -397,7 +406,7 @@ impl Client {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
     ///
     /// if let Err(why) = client.start_shard(0, 1) {
     ///     println!("Err with client: {:?}", why);
@@ -440,7 +449,7 @@ impl Client {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
     ///
     /// if let Err(why) = client.start_shards(8) {
     ///     println!("Err with client: {:?}", why);
@@ -482,7 +491,7 @@ impl Client {
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
-    /// let mut client = Client::login(&token);
+    /// let mut client = Client::new(&token);
     ///
     /// let _ = client.start_shard_range([4, 7], 10);
     /// ```
@@ -494,7 +503,7 @@ impl Client {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
     ///
     /// if let Err(why) = client.start_shard_range([4, 7], 10) {
     ///     println!("Err with client: {:?}", why);
@@ -524,7 +533,7 @@ impl Client {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// use serenity::model::Channel;
     ///
     /// client.on_channel_create(|ctx, channel| {
@@ -554,7 +563,7 @@ impl Client {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// use serenity::model::{Channel, ChannelId};
     ///
     /// client.on_channel_delete(|ctx, channel| {
@@ -693,7 +702,7 @@ impl Client {
     /// ```rust,ignore
     /// use serenity::Client;
     ///
-    /// let mut client = Client::login("bot token here");
+    /// let mut client = Client::new("bot token here");
     ///
     /// client.on_message(|_context, message| {
     ///     println!("{}", message.content);
@@ -808,7 +817,7 @@ impl Client {
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
-    /// let mut client = Client::login(&token);
+    /// let mut client = Client::new(&token);
     ///
     /// client.on_ready(|_context, ready| {
     ///     println!("{} is connected", ready.user.name);
@@ -1387,7 +1396,7 @@ fn handle_shard(info: &mut MonitorInfo) {
     }
 }
 
-fn login(token: String) -> Client {
+fn init_client(token: String) -> Client {
     http::set_token(&token);
 
     feature_framework! {{

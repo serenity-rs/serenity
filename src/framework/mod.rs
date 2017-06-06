@@ -36,7 +36,7 @@
 //! use serenity::model::Message;
 //! use std::env;
 //!
-//! let mut client = Client::login(&env::var("DISCORD_BOT_TOKEN").unwrap());
+//! let mut client = Client::new(&env::var("DISCORD_BOT_TOKEN").unwrap());
 //!
 //! client.with_framework(|f| f
 //!     .configure(|c| c.prefix("~"))
@@ -255,7 +255,7 @@ impl Framework {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN").unwrap());
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
     /// client.with_framework(|f| f
     ///     .configure(|c| c
     ///         .depth(3)
@@ -285,7 +285,7 @@ impl Framework {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f
     ///     .bucket("basic", 2, 10, 3)
@@ -314,7 +314,7 @@ impl Framework {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f
     ///     .simple_bucket("simple", 2)
@@ -593,7 +593,7 @@ impl Framework {
     /// #
     /// # fn main() {
     /// #     use serenity::Client;
-    /// #     let mut client = Client::login("token");
+    /// #     let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f.on("ping", ping));
     ///
@@ -671,7 +671,7 @@ impl Framework {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f
     ///     .group("ping-pong", |g| g
@@ -699,7 +699,7 @@ impl Framework {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// use serenity::framework::DispatchError::{NotEnoughArguments, TooManyArguments};
     ///
     /// client.with_framework(|f| f
@@ -735,7 +735,7 @@ impl Framework {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f
     ///     .before(|ctx, msg, cmd_name| {
@@ -748,7 +748,7 @@ impl Framework {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f
     ///     .before(|_, msg, cmd_name| {
@@ -781,7 +781,7 @@ impl Framework {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f
     ///     .after(|ctx, msg, cmd_name, error| {

@@ -11,7 +11,7 @@ fn main() {
     // Create a new instance of the Client, logging in as a bot. This will
     // automatically prepend your bot token with "Bot ", which is a requirement
     // by Discord for bot users.
-    let mut client = Client::login(&token);
+    let mut client = Client::new(&token);
 
     // Set a handler for the `on_message` event - so that whenever a new message
     // is received - the closure (or function) passed will be called.

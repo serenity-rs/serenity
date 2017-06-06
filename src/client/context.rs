@@ -79,7 +79,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// # client.on_message(|ctx, msg| {
     /// #     if msg.content == "!changename" {
@@ -124,7 +124,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// client.on_message(|ctx, msg| {
     ///     if msg.content == "!online" {
     ///         ctx.online();
@@ -147,7 +147,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// client.on_message(|ctx, msg| {
     ///     if msg.content == "!idle" {
     ///         ctx.idle();
@@ -170,7 +170,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// client.on_message(|ctx, msg| {
     ///     if msg.content == "!dnd" {
     ///         ctx.dnd();
@@ -194,7 +194,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// client.on_ready(|ctx, _| {
     ///     ctx.invisible();
     /// });
@@ -218,7 +218,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// client.on_resume(|ctx, _| {
     ///     ctx.reset_presence();
     /// });
@@ -243,7 +243,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// use serenity::model::Game;
     ///
@@ -281,7 +281,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// client.on_ready(|ctx, _| {
     ///     ctx.set_game_name("test");
@@ -316,7 +316,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// # client.on_ready(|ctx, _| {
     /// #
@@ -332,7 +332,7 @@ impl Context {
     /// ```rust,ignore
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// # client.on_ready(|ctx, _| {
     /// #

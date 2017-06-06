@@ -25,7 +25,7 @@ fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
-    let mut client = Client::login(&token);
+    let mut client = Client::new(&token);
 
     client.on_message(|ctx, msg| {
         if msg.content == "!ping" {

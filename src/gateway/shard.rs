@@ -513,7 +513,8 @@ impl Shard {
     /// ```rust,no_run
     /// # use serenity::client::Client;
     /// #
-    /// # let mut client = Client::login("hello source code viewer <3");
+    /// # let mut client = Client::new("hello source code viewer <3");
+    /// #
     /// client.on_message(|ctx, msg| {
     ///     if msg.content == "~ping" {
     ///         if let Some(latency) = ctx.shard.lock().unwrap().latency() {
