@@ -937,6 +937,8 @@ impl Client {
         let shards_index = shard_data.map_or(0, |x| x[0]);
         let shards_total = shard_data.map_or(1, |x| x[1] + 1);
 
+        let mut threads = vec![];
+
         for shard_number in shards_index..shards_total {
             let shard_info = shard_data.map(|s| [shard_number, s[2]]);
 
@@ -993,9 +995,9 @@ impl Client {
                         }
                     }};
 
-                    thread::spawn(move || {
+                    threads.push(thread::spawn(move || {
                         monitor_shard(monitor_info);
-                    });
+                    }));
                 },
                 Err(why) => warn!("Error starting shard {:?}: {:?}", shard_info, why),
             }
@@ -1006,9 +1008,11 @@ impl Client {
             thread::sleep(Duration::from_secs(5));
         }
 
-        loop {
-            thread::sleep(Duration::from_secs(1));
+        for thread in threads {
+            let _ = thread.join();
         }
+
+        Ok(())
     }
 }
 
