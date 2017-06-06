@@ -590,15 +590,16 @@ impl Framework {
     ///
     /// ```rust
     /// # #[macro_use] extern crate serenity;
-    /// command!(ping(_ctx, msg) {
-    ///     msg.channel_id.say("pong!");
-    /// });
     /// #
     /// # fn main() {
-    /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// #     use serenity::Client;
+    /// #     let mut client = Client::login("token");
     /// #
     /// client.with_framework(|f| f.on("ping", ping));
+    ///
+    /// command!(ping(_ctx, msg) {
+    ///     let _ = msg.channel_id.say("pong!");
+    /// });
     /// # }
     /// ```
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
@@ -702,15 +703,19 @@ impl Framework {
     /// use serenity::framework::DispatchError::{NotEnoughArguments, TooManyArguments};
     ///
     /// client.with_framework(|f| f
-    ///     .on_dispatch_error(|ctx, msg, error| {
+    ///     .on_dispatch_error(|_, msg, error| {
     ///         match error {
     ///             NotEnoughArguments { min, given } => {
-    ///                 msg.channel_id.say(&format!("Need {} arguments, but only got {}.", min, given));
-    ///             }
+    ///                 let s = format!("Need {} arguments, but only got {}.", min, given);
+    ///
+    ///                 let _ = msg.channel_id.say(&s);
+    ///             },
     ///             TooManyArguments { max, given } => {
-    ///                 msg.channel_id.say(&format!("Max arguments allowed is {}, but got {}.", max, given));
-    ///             }
-    ///             _ => println!("Unhandled dispatch error.")
+    ///                 let s = format!("Max arguments allowed is {}, but got {}.", max, given);
+    ///
+    ///                 let _ = msg.channel_id.say(&s);
+    ///             },
+    ///             _ => println!("Unhandled dispatch error."),
     ///         }
     ///     }));
     /// ```
@@ -746,7 +751,7 @@ impl Framework {
     /// # let mut client = Client::login("token");
     /// #
     /// client.with_framework(|f| f
-    ///     .before(|ctx, msg, cmd_name| {
+    ///     .before(|_, msg, cmd_name| {
     ///         if let Ok(channel) = msg.channel_id.get() {
     ///             //  Don't run unless in nsfw channel
     ///             if !channel.is_nsfw() {
@@ -755,6 +760,7 @@ impl Framework {
     ///         }
     ///
     ///         println!("Running command {}", cmd_name);
+    ///
     ///         true
     ///     }));
     /// ```

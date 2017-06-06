@@ -89,12 +89,10 @@
 
 #[macro_use]
 extern crate bitflags;
-#[allow(unused_imports)]
 #[macro_use]
 extern crate log;
 #[macro_use]
 extern crate serde_derive;
-#[allow(unused_imports)]
 #[macro_use]
 extern crate serde_json;
 

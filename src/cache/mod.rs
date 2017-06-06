@@ -770,19 +770,19 @@ impl Cache {
     #[doc(hidden)]
     pub fn update_with_channel_pins_update(&mut self, event: &ChannelPinsUpdateEvent) {
         if let Some(channel) = self.channels.get(&event.channel_id) {
-            channel.write().unwrap().last_pin_timestamp = event.last_pin_timestamp.clone();
+            channel.write().unwrap().last_pin_timestamp = event.last_pin_timestamp;
 
             return;
         }
 
         if let Some(channel) = self.private_channels.get_mut(&event.channel_id) {
-            channel.write().unwrap().last_pin_timestamp = event.last_pin_timestamp.clone();
+            channel.write().unwrap().last_pin_timestamp = event.last_pin_timestamp;
 
             return;
         }
 
         if let Some(group) = self.groups.get_mut(&event.channel_id) {
-            group.write().unwrap().last_pin_timestamp = event.last_pin_timestamp.clone();
+            group.write().unwrap().last_pin_timestamp = event.last_pin_timestamp;
 
             return;
         }
