@@ -1,5 +1,6 @@
 use std::error::Error as StdError;
 use std::fmt::{self, Display};
+use websocket::message::CloseData;
 
 /// An error that occurred while attempting to deal with the gateway.
 ///
@@ -10,9 +11,11 @@ pub enum Error {
     /// There was an error building a URL.
     BuildingUrl,
     /// The connection closed, potentially uncleanly.
-    Closed(Option<u16>, String),
+    Closed(Option<CloseData>),
     /// Expected a Hello during a handshake
     ExpectedHello,
+    /// When there was an error sending a heartbeat.
+    HeartbeatFailed,
     /// Expected a Ready or an InvalidateSession
     InvalidHandshake,
     /// An indicator that an unknown opcode was received from the gateway.
@@ -33,8 +36,9 @@ impl StdError for Error {
     fn description(&self) -> &str {
         match *self {
             Error::BuildingUrl => "Error building url",
-            Error::Closed(_, _) => "Connection closed",
+            Error::Closed(_) => "Connection closed",
             Error::ExpectedHello => "Expected a Hello",
+            Error::HeartbeatFailed => "Failed sending a heartbeat",
             Error::InvalidHandshake => "Expected a valid Handshake",
             Error::InvalidOpCode => "Invalid OpCode",
             Error::NoSessionId => "No Session Id present when required",

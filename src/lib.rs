@@ -109,8 +109,12 @@ extern crate serde;
 extern crate byteorder;
 #[cfg(feature="hyper")]
 extern crate hyper;
+#[cfg(feature="hyper-native-tls")]
+extern crate hyper_native_tls;
 #[cfg(feature="http")]
 extern crate multipart;
+#[cfg(feature="native-tls")]
+extern crate native_tls;
 #[cfg(feature="voice")]
 extern crate opus;
 #[cfg(feature="voice")]

@@ -8,6 +8,8 @@ use ::model::ModelError;
 
 #[cfg(feature="hyper")]
 use hyper::Error as HyperError;
+#[cfg(feature="native-tls")]
+use native_tls::Error as TlsError;
 #[cfg(feature="voice")]
 use opus::Error as OpusError;
 #[cfg(feature="websocket")]
@@ -83,6 +85,9 @@ pub enum Error {
     /// An error from the `hyper` crate.
     #[cfg(feature="hyper")]
     Hyper(HyperError),
+    /// An error from the `native-tls` crate.
+    #[cfg(feature="native-tls")]
+    Tls(TlsError),
     /// An error from the `rust-websocket` crate.
     #[cfg(feature="gateway")]
     WebSocket(WebSocketError),
@@ -141,6 +146,13 @@ impl From<OpusError> for Error {
     }
 }
 
+#[cfg(feature="native-tls")]
+impl From<TlsError> for Error {
+    fn from(e: TlsError) -> Error {
+        Error::Tls(e)
+    }
+}
+
 #[cfg(feature="gateway")]
 impl From<WebSocketError> for Error {
     fn from(e: WebSocketError) -> Error {
@@ -184,6 +196,8 @@ impl StdError for Error {
             Error::Hyper(ref inner) => inner.description(),
             #[cfg(feature="voice")]
             Error::Opus(ref inner) => inner.description(),
+            #[cfg(feature="native-tls")]
+            Error::Tls(ref inner) => inner.description(),
             #[cfg(feature="voice")]
             Error::Voice(_) => "Voice error",
             #[cfg(feature="gateway")]

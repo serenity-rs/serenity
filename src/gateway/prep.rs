@@ -1,18 +1,9 @@
-use chrono::{Duration, UTC};
 use serde_json::Value;
-use std::sync::mpsc::{
-    Receiver as MpscReceiver,
-    Sender as MpscSender,
-    TryRecvError,
-};
-use std::sync::{Arc, Mutex};
-use std::time::{Duration as StdDuration, Instant};
-use std::{env, thread};
-use super::{GatewayError, GatewayStatus};
-use websocket::client::request::Url as RequestUrl;
-use websocket::client::{Receiver, Sender};
-use websocket::result::WebSocketError as WsError;
-use websocket::stream::WebSocketStream;
+use std::env;
+use super::GatewayError;
+use websocket::client::Url;
+use websocket::sync::stream::{TcpStream, TlsStream};
+use websocket::sync::Client as WsClient;
 use ::constants::{self, LARGE_THRESHOLD, OpCode};
 use ::error::{Error, Result};
 use ::internal::ws_impl::{ReceiverExt, SenderExt};
@@ -20,9 +11,8 @@ use ::model::event::{Event, GatewayEvent, ReadyEvent};
 
 #[inline]
 pub fn parse_ready(event: GatewayEvent,
-                   tx: &MpscSender<GatewayStatus>,
-                   receiver: &mut Receiver<WebSocketStream>,
-                   identification: Value)
+                   client: &mut WsClient<TlsStream<TcpStream>>,
+                   identification: &Value)
                    -> Result<(ReadyEvent, u64)> {
     match event {
         GatewayEvent::Dispatch(seq, Event::Ready(event)) => {
@@ -31,9 +21,9 @@ pub fn parse_ready(event: GatewayEvent,
         GatewayEvent::InvalidateSession => {
             debug!("Session invalidation");
 
-            let _ = tx.send(GatewayStatus::SendMessage(identification));
+            let _ = client.send_json(identification);
 
-            match receiver.recv_json(GatewayEvent::decode)? {
+            match client.recv_json(GatewayEvent::decode)? {
                 GatewayEvent::Dispatch(seq, Event::Ready(event)) => {
                     Ok((event, seq))
                 },
@@ -70,11 +60,12 @@ pub fn identify(token: &str, shard_info: Option<[u64; 2]>) -> Value {
     })
 }
 
-pub fn build_gateway_url(base: &str) -> Result<RequestUrl> {
-    RequestUrl::parse(&format!("{}?v={}", base, constants::GATEWAY_VERSION))
+pub fn build_gateway_url(base: &str) -> Result<Url> {
+    Url::parse(&format!("{}?v={}", base, constants::GATEWAY_VERSION))
         .map_err(|_| Error::Gateway(GatewayError::BuildingUrl))
 }
 
+/*
 pub fn keepalive(interval: u64,
                  heartbeat_sent: Arc<Mutex<Instant>>,
                  last_ack: Arc<Mutex<bool>>,
@@ -169,3 +160,4 @@ pub fn keepalive(interval: u64,
         },
     }
 }
+*/

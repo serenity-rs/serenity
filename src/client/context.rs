@@ -134,7 +134,8 @@ impl Context {
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     pub fn online(&self) {
-        self.shard.lock().unwrap().set_status(OnlineStatus::Online);
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_status(OnlineStatus::Online);
     }
 
     /// Sets the current user as being [`Idle`]. This maintains the current
@@ -157,7 +158,8 @@ impl Context {
     ///
     /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
     pub fn idle(&self) {
-        self.shard.lock().unwrap().set_status(OnlineStatus::Idle);
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_status(OnlineStatus::Idle);
     }
 
     /// Sets the current user as being [`DoNotDisturb`]. This maintains the
@@ -180,7 +182,8 @@ impl Context {
     ///
     /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
     pub fn dnd(&self) {
-        self.shard.lock().unwrap().set_status(OnlineStatus::DoNotDisturb);
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_status(OnlineStatus::DoNotDisturb);
     }
 
     /// Sets the current user as being [`Invisible`]. This maintains the current
@@ -203,7 +206,8 @@ impl Context {
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`Invisible`]: ../model/enum.OnlineStatus.html#variant.Invisible
     pub fn invisible(&self) {
-        self.shard.lock().unwrap().set_status(OnlineStatus::Invisible);
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_status(OnlineStatus::Invisible);
     }
 
     /// "Resets" the current user's presence, by setting the game to `None` and
@@ -228,9 +232,8 @@ impl Context {
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     /// [`set_presence`]: #method.set_presence
     pub fn reset_presence(&self) {
-        self.shard.lock()
-            .unwrap()
-            .set_presence(None, OnlineStatus::Online, false)
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_presence(None, OnlineStatus::Online, false)
     }
 
     /// Sets the current game, defaulting to an online status of [`Online`].
@@ -260,9 +263,8 @@ impl Context {
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     pub fn set_game(&self, game: Game) {
-        self.shard.lock()
-            .unwrap()
-            .set_presence(Some(game), OnlineStatus::Online, false);
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_presence(Some(game), OnlineStatus::Online, false);
     }
 
     /// Sets the current game, passing in only its name. This will automatically
@@ -302,9 +304,8 @@ impl Context {
             url: None,
         };
 
-        self.shard.lock()
-            .unwrap()
-            .set_presence(Some(game), OnlineStatus::Online, false);
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_presence(Some(game), OnlineStatus::Online, false);
     }
 
     /// Sets the current user's presence, providing all fields to be passed.
@@ -351,8 +352,7 @@ impl Context {
                         game: Option<Game>,
                         status: OnlineStatus,
                         afk: bool) {
-        self.shard.lock()
-            .unwrap()
-            .set_presence(game, status, afk)
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_presence(game, status, afk)
     }
 }

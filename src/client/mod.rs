@@ -35,6 +35,7 @@ pub use ::http as rest;
 #[cfg(feature="cache")]
 pub use ::CACHE;
 
+use chrono::UTC;
 use self::dispatch::dispatch;
 use self::event_store::EventStore;
 use std::collections::HashMap;
@@ -43,9 +44,7 @@ use std::time::Duration;
 use std::{mem, thread};
 use super::gateway::Shard;
 use typemap::ShareMap;
-use websocket::client::Receiver;
 use websocket::result::WebSocketError;
-use websocket::stream::WebSocketStream;
 use ::http;
 use ::internal::prelude::*;
 use ::internal::ws_impl::ReceiverExt;
@@ -982,7 +981,7 @@ impl Client {
             });
 
             match boot {
-                Ok((shard, ready, receiver)) => {
+                Ok((shard, ready)) => {
                     #[cfg(feature="cache")]
                     {
                         CACHE.write()
@@ -1011,7 +1010,6 @@ impl Client {
                             event_store: self.event_store.clone(),
                             framework: self.framework.clone(),
                             gateway_url: gateway_url.clone(),
-                            receiver: receiver,
                             shard: shard,
                             shard_info: shard_info,
                             token: self.token.clone(),
@@ -1021,7 +1019,6 @@ impl Client {
                             data: self.data.clone(),
                             event_store: self.event_store.clone(),
                             gateway_url: gateway_url.clone(),
-                            receiver: receiver,
                             shard: shard,
                             shard_info: shard_info,
                             token: self.token.clone(),
@@ -1254,7 +1251,6 @@ struct MonitorInfo {
     event_store: Arc<RwLock<EventStore>>,
     framework: Arc<Mutex<Framework>>,
     gateway_url: Arc<Mutex<String>>,
-    receiver: Receiver<WebSocketStream>,
     shard: Arc<Mutex<Shard>>,
     shard_info: Option<[u64; 2]>,
     token: String,
@@ -1265,13 +1261,12 @@ struct MonitorInfo {
     data: Arc<Mutex<ShareMap>>,
     event_store: Arc<RwLock<EventStore>>,
     gateway_url: Arc<Mutex<String>>,
-    receiver: Receiver<WebSocketStream>,
     shard: Arc<Mutex<Shard>>,
     shard_info: Option<[u64; 2]>,
     token: String,
 }
 
-fn boot_shard(info: &BootInfo) -> Result<(Shard, ReadyEvent, Receiver<WebSocketStream>)> {
+fn boot_shard(info: &BootInfo) -> Result<(Shard, ReadyEvent)> {
     // Make ten attempts to boot the shard, exponentially backing off; if it
     // still doesn't boot after that, accept it as a failure.
     //
@@ -1298,7 +1293,7 @@ fn boot_shard(info: &BootInfo) -> Result<(Shard, ReadyEvent, Receiver<WebSocketS
                                  info.shard_info);
 
         match attempt {
-            Ok((shard, ready, receiver)) => {
+            Ok((shard, ready)) => {
                 #[cfg(feature="cache")]
                 {
                     CACHE.write()
@@ -1308,7 +1303,7 @@ fn boot_shard(info: &BootInfo) -> Result<(Shard, ReadyEvent, Receiver<WebSocketS
 
                 info!("Successfully booted shard: {:?}", info.shard_info);
 
-                return Ok((shard, ready, receiver));
+                return Ok((shard, ready));
             },
             Err(why) => warn!("Failed to boot shard: {:?}", why),
         }
@@ -1332,14 +1327,13 @@ fn monitor_shard(mut info: MonitorInfo) {
             });
 
             match boot {
-                Ok((new_shard, ready, new_receiver)) => {
+                Ok((new_shard, ready)) => {
                     #[cfg(feature="cache")]
                     {
                         CACHE.write().unwrap().update_with_ready(&ready);
                     }
 
                     *info.shard.lock().unwrap() = new_shard;
-                    info.receiver = new_receiver;
 
                     boot_successful = true;
 
@@ -1375,16 +1369,54 @@ fn monitor_shard(mut info: MonitorInfo) {
 }
 
 fn handle_shard(info: &mut MonitorInfo) {
-    loop {
-        let event = match info.receiver.recv_json(GatewayEvent::decode) {
-            Err(Error::WebSocket(WebSocketError::NoDataAvailable)) => {
-                debug!("Attempting to shutdown receiver/sender");
+    // This is currently all ducktape. Redo this.
+    let mut last_ack_time = UTC::now().timestamp();
+    let mut last_heartbeat_sent = UTC::now().timestamp();
 
-                match info.shard.lock().unwrap().resume(&mut info.receiver) {
-                    Ok((_, receiver)) => {
+    loop {
+        let mut shard = info.shard.lock().unwrap();
+        let in_secs = shard.heartbeat_interval() / 1000;
+
+        if UTC::now().timestamp() - last_heartbeat_sent > in_secs {
+            // If the last heartbeat didn't receive an acknowledgement, then
+            // shutdown and auto-reconnect.
+            if !shard.last_heartbeat_acknowledged() {
+                debug!("Last heartbeat not acknowledged; re-connecting");
+
+                match shard.resume() {
+                    Ok(_) => {
                         debug!("Successfully resumed shard");
 
-                        info.receiver = receiver;
+                        continue;
+                    },
+                    Err(why) => {
+                        warn!("Err resuming shard: {:?}", why);
+
+                        return;
+                    },
+                }
+            }
+
+            let _ = shard.heartbeat();
+            last_heartbeat_sent = UTC::now().timestamp();
+        }
+
+        let event = match shard.client.recv_json(GatewayEvent::decode) {
+            Ok(GatewayEvent::HeartbeatAck) => {
+                last_ack_time = UTC::now().timestamp();
+
+                Ok(GatewayEvent::HeartbeatAck)
+            },
+            Err(Error::WebSocket(WebSocketError::IoError(_))) => {
+                if shard.last_heartbeat_acknowledged() || UTC::now().timestamp() - 90 < last_ack_time {
+                    continue;
+                }
+
+                debug!("Attempting to shutdown receiver/sender");
+
+                match shard.resume() {
+                    Ok(_) => {
+                        debug!("Successfully resumed shard");
 
                         continue;
                     },
@@ -1395,21 +1427,14 @@ fn handle_shard(info: &mut MonitorInfo) {
                     },
                 }
             },
+            Err(Error::WebSocket(WebSocketError::NoDataAvailable)) => continue,
             other => other,
         };
 
         trace!("Received event on shard handler: {:?}", event);
 
-        // This will only lock when _updating_ the shard, resuming, etc. Most
-        // of the time, this won't be locked (i.e. when receiving an event over
-        // the receiver, separate from the shard itself).
-        let event = match info.shard.lock().unwrap().handle_event(event, &mut info.receiver) {
-            Ok(Some((event, Some(new_receiver)))) => {
-                info.receiver = new_receiver;
-
-                event
-            },
-            Ok(Some((event, None))) => event,
+        let event = match shard.handle_event(event) {
+            Ok(Some(event)) => event,
             Ok(None) => continue,
             Err(why) => {
                 error!("Shard handler received err: {:?}", why);
