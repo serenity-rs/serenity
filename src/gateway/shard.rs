@@ -813,5 +813,29 @@ fn connect(base_url: &str) -> Result<(Sender<WebSocketStream>, Receiver<WebSocke
     let response = WsClient::connect(url)?.send()?;
     response.validate()?;
 
-    Ok(response.begin().split())
+    let (mut sender, mut receiver) = response.begin().split();
+
+    let timeout = StdDuration::from_secs(90);
+
+    {
+        let mut ws_stream = receiver.get_mut().get_mut();
+        let stream = match *ws_stream {
+            WebSocketStream::Tcp(ref mut s) => s,
+            WebSocketStream::Ssl(ref mut s) => s.get_mut(),
+        };
+
+        stream.set_read_timeout(Some(timeout))?;
+    }
+
+    {
+        let mut ws_stream = sender.get_mut();
+        let stream = match *ws_stream {
+            WebSocketStream::Tcp(ref mut s) => s,
+            WebSocketStream::Ssl(ref mut s) => s.get_mut(),
+        };
+
+        stream.set_read_timeout(Some(timeout))?;
+    }
+
+    Ok((sender, receiver))
 }
