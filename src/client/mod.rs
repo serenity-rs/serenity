@@ -347,6 +347,12 @@ impl Client {
     /// # }
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    ///
+    /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start_autosharded(&mut self) -> Result<()> {
         let mut res = http::get_bot_gateway()?;
@@ -419,6 +425,12 @@ impl Client {
     /// # }
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    ///
+    /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [`start`]: #method.start
     /// [`start_autosharded`]: #method.start_autosharded
     /// [gateway docs]: gateway/index.html#sharding
@@ -462,6 +474,12 @@ impl Client {
     /// # }
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    ///
+    /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [`start_shard`]: #method.start_shard
     /// [`start_shard_range`]: #method.start_shard_range
     /// [Gateway docs]: gateway/index.html#sharding
@@ -516,6 +534,13 @@ impl Client {
     /// # }
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    ///
+    ///
+    /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [`start_shard`]: #method.start_shard
     /// [`start_shards`]: #method.start_shards
     /// [Gateway docs]: gateway/index.html#sharding
@@ -919,7 +944,15 @@ impl Client {
     // 2: total number of shards the bot is sharding for
     //
     // Not all shards need to be initialized in this process.
-    fn start_connection(&mut self, shard_data: Option<[u64; 3]>, url: String) -> Result<()> {
+    //
+    // # Errors
+    //
+    // Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    // an error.
+    //
+    // [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
+    fn start_connection(&mut self, shard_data: Option<[u64; 3]>, url: String)
+        -> Result<()> {
         // Update the framework's current user if the feature is enabled.
         //
         // This also acts as a form of check to ensure the token is correct.
@@ -1012,7 +1045,7 @@ impl Client {
             let _ = thread.join();
         }
 
-        Ok(())
+        Err(Error::Client(ClientError::Shutdown))
     }
 }
 
