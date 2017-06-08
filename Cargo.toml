@@ -27,10 +27,6 @@ version = "1.0"
 features = ["serde"]
 version = "~0.3"
 
-[dependencies.cookie]
-default-features = false
-version = "0.2"
-
 [dependencies.hyper]
 optional = true
 version = "~0.10"
