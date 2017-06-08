@@ -183,7 +183,7 @@ impl Shard {
     /// ```rust,no_run
     /// # use serenity::client::gateway::Shard;
     /// #
-    /// # let (shard, _, _) = Shard::new("", "", Some([1, 2])).unwrap();
+    /// # let (shard, _) = Shard::new("", "", Some([1, 2])).unwrap();
     /// #
     /// assert_eq!(shard.shard_info(), Some([1, 2]));
     /// ```
@@ -212,7 +212,7 @@ impl Shard {
     /// ```rust,no_run
     /// # use serenity::client::gateway::Shard;
     /// #
-    /// # let (mut shard, _, _) = Shard::new("", "", Some([0, 1])).unwrap();
+    /// # let (mut shard, _) = Shard::new("", "", Some([0, 1])).unwrap();
     /// #
     /// use serenity::model::Game;
     ///
@@ -238,7 +238,7 @@ impl Shard {
     /// ```rust,no_run
     /// # use serenity::client::gateway::Shard;
     /// #
-    /// # let (mut shard, _, _) = Shard::new("", "", Some([0, 1])).unwrap();
+    /// # let (mut shard, _) = Shard::new("", "", Some([0, 1])).unwrap();
     /// #
     /// use serenity::model::OnlineStatus;
     ///
@@ -270,7 +270,7 @@ impl Shard {
     /// ```rust,no_run
     /// # use serenity::client::gateway::Shard;
     /// #
-    /// # let (mut shard, _, _) = Shard::new("", "", Some([0, 1])).unwrap();
+    /// # let (mut shard, _) = Shard::new("", "", Some([0, 1])).unwrap();
     /// #
     /// use serenity::model::{Game, OnlineStatus};
     ///
@@ -567,7 +567,7 @@ impl Shard {
     /// ```rust,no_run
     /// # use serenity::client::gateway::Shard;
     /// #
-    /// # let (shard, _, _) = Shard::new("", "", Some([0, 1])).unwrap();
+    /// # let (mut shard, _) = Shard::new("", "", Some([0, 1])).unwrap();
     /// #
     /// use serenity::model::GuildId;
     ///
@@ -582,7 +582,7 @@ impl Shard {
     /// ```rust,no_run
     /// # use serenity::client::gateway::Shard;
     /// #
-    /// # let (shard, _, _) = Shard::new("", "", Some([0, 1])).unwrap();
+    /// # let (mut shard, _) = Shard::new("", "", Some([0, 1])).unwrap();
     /// #
     /// use serenity::model::GuildId;
     ///
@@ -621,7 +621,7 @@ impl Shard {
     /// ```rust,no_run
     /// # use serenity::client::gateway::Shard;
     /// #
-    /// # let (shard, _, _) = Shard::new("will anyone read this", "", Some([0, 1])).unwrap();
+    /// # let (shard, _) = Shard::new("will anyone read this", "", Some([0, 1])).unwrap();
     /// #
     /// let info = shard.shard_info();
     /// let guilds = shard.guilds_handled();
