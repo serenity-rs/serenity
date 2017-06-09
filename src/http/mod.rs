@@ -38,7 +38,9 @@ use hyper::client::{
     Request,
 };
 use hyper::method::Method;
+use hyper::net::HttpsConnector;
 use hyper::{Error as HyperError, Result as HyperResult, Url, header};
+use hyper_native_tls::NativeTlsClient;
 use multipart::client::Multipart;
 use self::ratelimiting::Route;
 use serde_json;
@@ -1436,7 +1438,9 @@ pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap)
         Err(_) => return Err(Error::Url(uri)),
     };
 
-    let mut request = Request::new(Method::Post, url)?;
+    let tc = NativeTlsClient::new()?;
+    let connector = HttpsConnector::new(tc);
+    let mut request = Request::with_connector(Method::Post, url, &connector)?;
     request.headers_mut()
         .set(header::Authorization(TOKEN.lock().unwrap().clone()));
     request.headers_mut()
