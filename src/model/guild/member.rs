@@ -352,6 +352,38 @@ impl Member {
     pub fn unban(&self) -> Result<()> {
         http::remove_ban(self.find_guild()?.0, self.user.read().unwrap().id.0)
     }
+
+    /// Returns the permissions for the member.
+    ///
+    /// # Examples
+    /// 
+    /// ```rust
+    /// extern crate serenity;
+    /// use serenity::client::Client;
+    ///
+    /// fn main() {
+    ///     let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"));
+    ///     client.on_guild_member_add(|_, guild_id, member| {
+    ///         guild_id.as_channel_id().say(&format!("The newly joined member has the permissions: {}",
+    ///             member.permissions().expect("permissions")
+    ///         ));
+    ///     });
+    ///     
+    ///     let _ = client.start();
+    /// }
+    /// ```
+
+    /// # Errors
+    ///
+    /// Returns a [`ModelError::GuildNotFound`] if the guild the member's in could not be
+    /// found.
+    ///
+    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
+    pub fn permissions(&self) -> Result<Permissions> {
+        let dummy = self.find_guild()?.find().unwrap();
+        let guild = dummy.read().unwrap();
+        Ok(guild.permissions_for(ChannelId(guild.id.0), self.user.read().unwrap().id))
+    }
 }
 
 impl Display for Member {
