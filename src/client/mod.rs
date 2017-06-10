@@ -1374,10 +1374,15 @@ fn handle_shard(info: &mut MonitorInfo) {
     let mut last_heartbeat_sent = UTC::now().timestamp();
 
     loop {
-        let mut shard = info.shard.lock().unwrap();
-        let in_secs = shard.heartbeat_interval() / 1000;
+        let in_secs = {
+            let shard = info.shard.lock().unwrap();
+
+            shard.heartbeat_interval() / 1000
+        };
 
         if UTC::now().timestamp() - last_heartbeat_sent > in_secs {
+            let mut shard = info.shard.lock().unwrap();
+
             // If the last heartbeat didn't receive an acknowledgement, then
             // shutdown and auto-reconnect.
             if !shard.last_heartbeat_acknowledged() {
@@ -1401,46 +1406,57 @@ fn handle_shard(info: &mut MonitorInfo) {
             last_heartbeat_sent = UTC::now().timestamp();
         }
 
-        let event = match shard.client.recv_json(GatewayEvent::decode) {
-            Ok(GatewayEvent::HeartbeatAck) => {
-                last_ack_time = UTC::now().timestamp();
+        #[cfg(feature="voice")]
+        {
+            let mut shard = info.shard.lock().unwrap();
 
-                Ok(GatewayEvent::HeartbeatAck)
-            },
-            Err(Error::WebSocket(WebSocketError::IoError(_))) => {
-                if shard.last_heartbeat_acknowledged() || UTC::now().timestamp() - 90 < last_ack_time {
-                    continue;
-                }
+            shard.cycle_voice_recv();
+        }
 
-                debug!("Attempting to shutdown receiver/sender");
+        let event = {
+            let mut shard = info.shard.lock().unwrap();
 
-                match shard.resume() {
-                    Ok(_) => {
-                        debug!("Successfully resumed shard");
+            let event = match shard.client.recv_json(GatewayEvent::decode) {
+                Ok(GatewayEvent::HeartbeatAck) => {
+                    last_ack_time = UTC::now().timestamp();
 
+                    Ok(GatewayEvent::HeartbeatAck)
+                },
+                Err(Error::WebSocket(WebSocketError::IoError(_))) => {
+                    if shard.last_heartbeat_acknowledged() || UTC::now().timestamp() - 90 < last_ack_time {
                         continue;
-                    },
-                    Err(why) => {
-                        warn!("Err resuming shard: {:?}", why);
+                    }
 
-                        return;
-                    },
-                }
-            },
-            Err(Error::WebSocket(WebSocketError::NoDataAvailable)) => continue,
-            other => other,
-        };
+                    debug!("Attempting to shutdown receiver/sender");
 
-        trace!("Received event on shard handler: {:?}", event);
+                    match shard.resume() {
+                        Ok(_) => {
+                            debug!("Successfully resumed shard");
 
-        let event = match shard.handle_event(event) {
-            Ok(Some(event)) => event,
-            Ok(None) => continue,
-            Err(why) => {
-                error!("Shard handler received err: {:?}", why);
+                            continue;
+                        },
+                        Err(why) => {
+                            warn!("Err resuming shard: {:?}", why);
 
-                continue;
-            },
+                            return;
+                        },
+                    }
+                },
+                Err(Error::WebSocket(WebSocketError::NoDataAvailable)) => continue,
+                other => other,
+            };
+
+            trace!("Received event on shard handler: {:?}", event);
+
+            match shard.handle_event(event) {
+                Ok(Some(event)) => event,
+                Ok(None) => continue,
+                Err(why) => {
+                    error!("Shard handler received err: {:?}", why);
+
+                    continue;
+                },
+            }
         };
 
         feature_framework! {{

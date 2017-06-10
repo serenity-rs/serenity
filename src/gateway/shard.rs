@@ -1,4 +1,5 @@
 use chrono::UTC;
+use serde_json::Value;
 use std::io::Write;
 use std::net::Shutdown;
 use std::thread;
@@ -17,6 +18,8 @@ use ::internal::ws_impl::{ReceiverExt, SenderExt};
 use ::model::event::{Event, GatewayEvent, ReadyEvent};
 use ::model::{Game, GuildId, OnlineStatus};
 
+#[cfg(feature="voice")]
+use std::sync::mpsc::{self, Receiver as MpscReceiver};
 #[cfg(feature="cache")]
 use ::client::CACHE;
 #[cfg(feature="voice")]
@@ -89,6 +92,8 @@ pub struct Shard {
     /// update the voice connections' states.
     #[cfg(feature="voice")]
     pub manager: VoiceManager,
+    #[cfg(feature="voice")]
+    manager_rx: MpscReceiver<Value>,
 }
 
 impl Shard {
@@ -139,6 +144,8 @@ impl Shard {
         let (ready, sequence) = prep::parse_ready(event, &mut client, &identification)?;
 
         Ok((feature_voice! {{
+            let (tx, rx) = mpsc::channel();
+
             Shard {
                 client: client,
                 current_presence: (None, OnlineStatus::Online, false),
@@ -151,6 +158,7 @@ impl Shard {
                 shard_info: shard_info,
                 ws_url: base_url.to_owned(),
                 manager: VoiceManager::new(tx, ready.ready.user.id),
+                manager_rx: rx,
             }
         } else {
             Shard {
@@ -667,6 +675,16 @@ impl Shard {
         }
     }
 
+    #[cfg(feature="voice")]
+    #[doc(hidden)]
+    pub fn cycle_voice_recv(&mut self) {
+        if let Ok(v) = self.manager_rx.try_recv() {
+            if let Err(why) = self.client.send_json(&v) {
+                warn!("Err sending voice msg: {:?}", why);
+            }
+        }
+    }
+
     #[doc(hidden)]
     pub fn heartbeat(&mut self) -> Result<()> {
         let map = json!({
@@ -830,11 +848,10 @@ fn connect(base_url: &str) -> Result<WsClient> {
     let url = prep::build_gateway_url(base_url)?;
     let client = ClientBuilder::from_url(&url).connect_secure(None)?;
 
-    let timeout = StdDuration::from_secs(1);
+    let timeout = StdDuration::from_millis(250);
 
     {
         let stream = client.stream_ref().as_tcp();
-        stream.set_read_timeout(Some(timeout))?;
         stream.set_read_timeout(Some(timeout))?;
     }
 
