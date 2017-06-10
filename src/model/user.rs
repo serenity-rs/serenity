@@ -185,17 +185,21 @@ impl CurrentUser {
     /// use serenity::model::permissions::*;
     ///
     /// // assuming the cache has been unlocked
-    /// let url = cache.user.invite_url(READ_MESSAGES | SEND_MESSAGES | EMBED_LINKS);
+    /// let url = cache.user.invite_url(READ_MESSAGES | SEND_MESSAGES | EMBED_LINKS).unwrap();
     ///
     /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize?client_id=249608697955745802&scope=bot&permissions=19456");
     /// ```
-    pub fn invite_url(&self, permissions: Permissions) -> String {
+    pub fn invite_url(&self, permissions: Permissions) -> Result<String> {
         let bits = permissions.bits();
+        let client_id = match http::get_current_application_info() {
+            Ok(v) => v.id,
+            Err(e) => return Err(e),
+        };
 
         if bits == 0 {
-            format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot", self.id)
+            Ok(format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot", client_id))
         } else {
-            format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot&permissions={}", self.id, bits)
+            Ok(format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot&permissions={}", client_id, bits))
         }
     }
 
