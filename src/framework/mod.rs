@@ -62,8 +62,9 @@ mod create_command;
 mod create_group;
 mod buckets;
 
-pub use self::buckets::{Bucket, MemberRatelimit, Ratelimit};
-pub use self::command::{Command, CommandType, CommandGroup, CommandOrAlias};
+pub(crate) use self::buckets::{Bucket, Ratelimit};
+pub use self::command::{Command, CommandType, CommandGroup};
+pub(crate) use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
@@ -450,8 +451,7 @@ impl Framework {
     }
 
     #[allow(cyclomatic_complexity)]
-    #[doc(hidden)]
-    pub fn dispatch(&mut self, mut context: Context, message: Message) {
+    pub(crate) fn dispatch(&mut self, mut context: Context, message: Message) {
         let res = command::positions(&mut context, &message, &self.configuration);
 
         let positions = match res {
@@ -798,8 +798,7 @@ impl Framework {
         self
     }
 
-    #[doc(hidden)]
-    pub fn update_current_user(&mut self, user_id: UserId, is_bot: bool) {
+    pub(crate) fn update_current_user(&mut self, user_id: UserId, is_bot: bool) {
         self.user_info = (user_id.0, is_bot);
     }
 

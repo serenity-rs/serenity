@@ -79,11 +79,7 @@ lazy_static! {
 }
 
 /// Sets the token to be used across all requests which require authentication.
-///
-/// This is really only for internal use, and if you are reading this as a user,
-/// you should _not_ use this yourself.
-#[doc(hidden)]
-pub fn set_token(token: &str) {
+pub(crate) fn set_token(token: &str) {
     TOKEN.lock().unwrap().clone_from(&token.to_owned());
 }
 
@@ -1572,8 +1568,7 @@ fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
     }
 }
 
-#[doc(hidden)]
-pub fn retry<'a, F>(f: F) -> HyperResult<HyperResponse>
+pub(crate) fn retry<'a, F>(f: F) -> HyperResult<HyperResponse>
     where F: Fn() -> RequestBuilder<'a> {
     let req = || f()
         .header(header::UserAgent(constants::USER_AGENT.to_owned()))

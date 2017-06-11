@@ -1,4 +1,5 @@
-pub use ext::framework::command::{Command, CommandType, CommandGroup, CommandOrAlias};
+pub use ext::framework::command::{Command, CommandType, CommandGroup};
+pub(crate) use ext::framework::command::CommandOrAlias;
 pub use ext::framework::create_command::CreateCommand;
 
 use std::default::Default;

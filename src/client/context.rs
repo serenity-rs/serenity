@@ -43,14 +43,7 @@ pub struct Context {
 
 impl Context {
     /// Create a new Context to be passed to an event handler.
-    ///
-    /// There's no real reason to use this yourself. But the option is there.
-    /// Highly re-consider _not_ using this if you're tempted.
-    ///
-    /// Or don't do what I say. I'm just a comment hidden from the generated
-    /// documentation.
-    #[doc(hidden)]
-    pub fn new(shard: Arc<Mutex<Shard>>, data: Arc<Mutex<ShareMap>>) -> Context {
+    pub(crate) fn new(shard: Arc<Mutex<Shard>>, data: Arc<Mutex<ShareMap>>) -> Context {
         Context {
             data: data,
             shard: shard,

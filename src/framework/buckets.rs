@@ -2,14 +2,12 @@ use chrono::UTC;
 use std::collections::HashMap;
 use std::default::Default;
 
-#[doc(hidden)]
-pub struct Ratelimit {
+pub(crate) struct Ratelimit {
     pub delay: i64,
     pub limit: Option<(i64, i32)>,
 }
 
-#[doc(hidden)]
-pub struct MemberRatelimit {
+pub(crate) struct MemberRatelimit {
     pub last_time: i64,
     pub set_time: i64,
     pub tickets: i32,
@@ -25,8 +23,7 @@ impl Default for MemberRatelimit {
     }
 }
 
-#[doc(hidden)]
-pub struct Bucket {
+pub(crate) struct Bucket {
     pub ratelimit: Ratelimit,
     pub users: HashMap<u64, MemberRatelimit>,
 }

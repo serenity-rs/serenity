@@ -683,8 +683,7 @@ impl Cache {
         self.user(id)
     }
 
-    #[doc(hidden)]
-    pub fn update_with_channel_create(&mut self, event: &ChannelCreateEvent) -> Option<Channel> {
+    pub(crate) fn update_with_channel_create(&mut self, event: &ChannelCreateEvent) -> Option<Channel> {
         match event.channel {
             Channel::Group(ref group) => {
                 let group = group.clone();
@@ -741,8 +740,7 @@ impl Cache {
         }
     }
 
-    #[doc(hidden)]
-    pub fn update_with_channel_delete(&mut self, event: &ChannelDeleteEvent) -> Option<Channel> {
+    pub(crate) fn update_with_channel_delete(&mut self, event: &ChannelDeleteEvent) -> Option<Channel> {
         match event.channel {
             Channel::Group(ref group) => {
                 self.groups.remove(&group.read().unwrap().channel_id).map(Channel::Group)
@@ -767,8 +765,8 @@ impl Cache {
         }
     }
 
-    #[doc(hidden)]
-    pub fn update_with_channel_pins_update(&mut self, event: &ChannelPinsUpdateEvent) {
+    #[allow(dead_code)]
+    pub(crate) fn update_with_channel_pins_update(&mut self, event: &ChannelPinsUpdateEvent) {
         if let Some(channel) = self.channels.get(&event.channel_id) {
             channel.write().unwrap().last_pin_timestamp = event.last_pin_timestamp;
 
@@ -787,9 +785,8 @@ impl Cache {
             return;
         }
     }
-
-    #[doc(hidden)]
-    pub fn update_with_channel_recipient_add(&mut self, event: &mut ChannelRecipientAddEvent) {
+    
+    pub(crate) fn update_with_channel_recipient_add(&mut self, event: &mut ChannelRecipientAddEvent) {
         self.update_user_entry(&event.user);
         let user = self.users[&event.user.id].clone();
 
@@ -803,15 +800,13 @@ impl Cache {
             });
     }
 
-    #[doc(hidden)]
-    pub fn update_with_channel_recipient_remove(&mut self, event: &ChannelRecipientRemoveEvent) {
+    pub(crate) fn update_with_channel_recipient_remove(&mut self, event: &ChannelRecipientRemoveEvent) {
         self.groups
             .get_mut(&event.channel_id)
             .map(|group| group.write().unwrap().recipients.remove(&event.user.id));
     }
 
-    #[doc(hidden)]
-    pub fn update_with_channel_update(&mut self, event: &ChannelUpdateEvent) {
+    pub(crate) fn update_with_channel_update(&mut self, event: &ChannelUpdateEvent) {
         match event.channel {
             Channel::Group(ref group) => {
                 let (ch_id, no_recipients) = {
@@ -864,8 +859,7 @@ impl Cache {
         }
     }
 
-    #[doc(hidden)]
-    pub fn update_with_guild_create(&mut self, event: &GuildCreateEvent) {
+    pub(crate) fn update_with_guild_create(&mut self, event: &GuildCreateEvent) {
         self.unavailable_guilds.remove(&event.guild.id);
 
         let mut guild = event.guild.clone();
@@ -881,8 +875,7 @@ impl Cache {
         self.guilds.insert(event.guild.id, Arc::new(RwLock::new(guild)));
     }
 
-    #[doc(hidden)]
-    pub fn update_with_guild_delete(&mut self, event: &GuildDeleteEvent)
+    pub(crate) fn update_with_guild_delete(&mut self, event: &GuildDeleteEvent)
         -> Option<Arc<RwLock<Guild>>> {
         // Remove channel entries for the guild if the guild is found.
         self.guilds.remove(&event.guild.id).map(|guild| {
@@ -894,15 +887,13 @@ impl Cache {
         })
     }
 
-    #[doc(hidden)]
-    pub fn update_with_guild_emojis_update(&mut self, event: &GuildEmojisUpdateEvent) {
+    pub(crate) fn update_with_guild_emojis_update(&mut self, event: &GuildEmojisUpdateEvent) {
         self.guilds
             .get_mut(&event.guild_id)
             .map(|guild| guild.write().unwrap().emojis.extend(event.emojis.clone()));
     }
 
-    #[doc(hidden)]
-    pub fn update_with_guild_member_add(&mut self, event: &mut GuildMemberAddEvent) {
+    pub(crate) fn update_with_guild_member_add(&mut self, event: &mut GuildMemberAddEvent) {
         let user_id = event.member.user.read().unwrap().id;
         self.update_user_entry(&event.member.user.read().unwrap());
 
@@ -919,8 +910,7 @@ impl Cache {
             });
     }
 
-    #[doc(hidden)]
-    pub fn update_with_guild_member_remove(&mut self, event: &GuildMemberRemoveEvent)
+    pub(crate) fn update_with_guild_member_remove(&mut self, event: &GuildMemberRemoveEvent)
         -> Option<Member> {
         self.guilds
             .get_mut(&event.guild_id)
@@ -932,8 +922,7 @@ impl Cache {
             })
     }
 
-    #[doc(hidden)]
-    pub fn update_with_guild_member_update(&mut self, event: &GuildMemberUpdateEvent)
+    pub(crate) fn update_with_guild_member_update(&mut self, event: &GuildMemberUpdateEvent)
         -> Option<Member> {
         self.update_user_entry(&event.user);
 
@@ -974,8 +963,7 @@ impl Cache {
         }
     }
 
-    #[doc(hidden)]
-    pub fn update_with_guild_members_chunk(&mut self, event: &GuildMembersChunkEvent) {
+    pub(crate) fn update_with_guild_members_chunk(&mut self, event: &GuildMembersChunkEvent) {
         for member in event.members.values() {
             self.update_user_entry(&member.user.read().unwrap());
         }
@@ -985,22 +973,19 @@ impl Cache {
             .map(|guild| guild.write().unwrap().members.extend(event.members.clone()));
     }
 
-    #[doc(hidden)]
-    pub fn update_with_guild_role_create(&mut self, event: &GuildRoleCreateEvent) {
+    pub(crate) fn update_with_guild_role_create(&mut self, event: &GuildRoleCreateEvent) {
         self.guilds
             .get_mut(&event.guild_id)
             .map(|guild| guild.write().unwrap().roles.insert(event.role.id, event.role.clone()));
     }
 
-    #[doc(hidden)]
-    pub fn update_with_guild_role_delete(&mut self, event: &GuildRoleDeleteEvent) -> Option<Role> {
+    pub(crate) fn update_with_guild_role_delete(&mut self, event: &GuildRoleDeleteEvent) -> Option<Role> {
         self.guilds
             .get_mut(&event.guild_id)
             .and_then(|guild| guild.write().unwrap().roles.remove(&event.role_id))
     }
 
-    #[doc(hidden)]
-    pub fn update_with_guild_role_update(&mut self, event: &GuildRoleUpdateEvent) -> Option<Role> {
+    pub(crate) fn update_with_guild_role_update(&mut self, event: &GuildRoleUpdateEvent) -> Option<Role> {
         self.guilds
             .get_mut(&event.guild_id)
             .and_then(|guild| {
@@ -1012,14 +997,12 @@ impl Cache {
             })
     }
 
-    #[doc(hidden)]
-    pub fn update_with_guild_unavailable(&mut self, event: &GuildUnavailableEvent) {
+    pub(crate) fn update_with_guild_unavailable(&mut self, event: &GuildUnavailableEvent) {
         self.unavailable_guilds.insert(event.guild_id);
         self.guilds.remove(&event.guild_id);
     }
 
-    #[doc(hidden)]
-    pub fn update_with_guild_update(&mut self, event: &GuildUpdateEvent) {
+    pub(crate) fn update_with_guild_update(&mut self, event: &GuildUpdateEvent) {
         self.guilds
             .get_mut(&event.guild.id)
             .map(|guild| {
@@ -1036,8 +1019,7 @@ impl Cache {
             });
     }
 
-    #[doc(hidden)]
-    pub fn update_with_presences_replace(&mut self, event: &PresencesReplaceEvent) {
+    pub(crate) fn update_with_presences_replace(&mut self, event: &PresencesReplaceEvent) {
         self.presences.extend({
             let mut p: HashMap<UserId, Presence> = HashMap::default();
 
@@ -1049,8 +1031,7 @@ impl Cache {
         });
     }
 
-    #[doc(hidden)]
-    pub fn update_with_presence_update(&mut self, event: &mut PresenceUpdateEvent) {
+    pub(crate) fn update_with_presence_update(&mut self, event: &mut PresenceUpdateEvent) {
         let user_id = event.presence.user_id;
 
         if let Some(user) = event.presence.user.as_mut() {
@@ -1076,8 +1057,7 @@ impl Cache {
         }
     }
 
-    #[doc(hidden)]
-    pub fn update_with_ready(&mut self, event: &ReadyEvent) {
+    pub(crate) fn update_with_ready(&mut self, event: &ReadyEvent) {
         let mut ready = event.ready.clone();
 
         for guild in ready.guilds {
@@ -1121,13 +1101,11 @@ impl Cache {
         self.user = ready.user;
     }
 
-    #[doc(hidden)]
-    pub fn update_with_user_update(&mut self, event: &UserUpdateEvent) -> CurrentUser {
+    pub(crate) fn update_with_user_update(&mut self, event: &UserUpdateEvent) -> CurrentUser {
         mem::replace(&mut self.user, event.current_user.clone())
     }
 
-    #[doc(hidden)]
-    pub fn update_with_voice_state_update(&mut self, event: &VoiceStateUpdateEvent) {
+    pub(crate) fn update_with_voice_state_update(&mut self, event: &VoiceStateUpdateEvent) {
         if let Some(guild_id) = event.guild_id {
             if let Some(guild) = self.guilds.get_mut(&guild_id) {
                 let mut guild = guild.write().unwrap();
