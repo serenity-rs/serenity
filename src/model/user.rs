@@ -174,7 +174,8 @@ impl CurrentUser {
     ///     Ok(v) => v,
     ///     Err(why) => {
     ///         println!("Error getting invite url: {:?}", why);
-    ///         return ();
+    ///
+    ///         return;
     ///     },
     /// };
     ///
@@ -195,7 +196,8 @@ impl CurrentUser {
     ///     Ok(v) => v,
     ///     Err(why) => {
     ///         println!("Error getting invite url: {:?}", why);
-    ///         return ();
+    ///
+    ///         return;
     ///     },
     /// };
     ///
@@ -208,9 +210,7 @@ impl CurrentUser {
     /// [`HttpError::InvalidRequest(Unauthorized)`][`HttpError::InvalidRequest`]
     /// If the user is not authorized for this end point.
     ///
-    /// May return
-    /// [`Error::Format`]
-    /// while writing url to buffer
+    /// May return [`Error::Format`] while writing url to the buffer.
     ///
     /// [`Error::Format`]: ../enum.Error.html#variant.Format
     /// [`HttpError::InvalidRequest`]: ../http/enum.HttpError.html#variant.InvalidRequest
@@ -443,13 +443,15 @@ impl User {
     ///                     Ok(v) => v,
     ///                     Err(why) => {
     ///                         println!("Error creating invite url: {:?}", why);
-    ///                         return ();
+    ///
+    ///                         return;
     ///                     },
     ///                 }
     ///             },
     ///             Err(why) => {
     ///                 println!("Error reading from CACHE: {:?}", why);
-    ///                 return ();
+    ///
+    ///                 return;
     ///             }
     ///         };
     ///         let help = format!("Helpful info here. Invite me with this link: <{}>", url);
