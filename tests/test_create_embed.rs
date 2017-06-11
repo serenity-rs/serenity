@@ -24,6 +24,7 @@ fn test_from_embed() {
                 value: "z".to_owned(),
             },
         ],
+        footer: None,
         image: Some(EmbedImage {
             height: 213,
             proxy_url: "a".to_owned(),

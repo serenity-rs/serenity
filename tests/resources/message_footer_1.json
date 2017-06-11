@@ -1,0 +1,70 @@
+{
+  "attachments": [],
+  "tts": false,
+  "embeds": [
+    {
+      "description": "Kyon is your ordinary high school freshman who has long given up on his childhood dreams of encountering the fantastic and supernatural…or so he thought. From the very first day of school, his classmate–the beautiful but eccentric Haruhi Suzumiya–makes it very clear that her only desire is to meet aliens, time travelers, and psychics! A chance conversation between the two inspires Haruhi to form the SOS Brigade, a school club created for the sole purpose of getting these supernatural beings together. The initial members consist of the mute bookworm Yuki Nagato, the timid but voluptuous Mikuru Asahina, and the polite and ever-smiling Itsuki Koizumi. By the end of this first volume, Kyon quickly finds out that these seemingly “helpless victims” of Haruhi’s are actually members of secret organizations–both futuristic and alien–keeping watch over Haruhi as she is the pinnacle of some major calamity on the horizon… \n(Source: Yen Press)",
+      "author": {
+        "url": "https://kitsu.io/manga/suzumiya-haruhi-no-yuuutsu-1d17ddde-b0df-4389-9d4a-f06faa4d6427",
+        "name": "Suzumiya Haruhi no Yuuutsu"
+      },
+      "color": 16738048,
+      "fields": [
+        {
+          "inline": true,
+          "name": "Type",
+          "value": "Manga"
+        },
+        {
+          "inline": true,
+          "name": "Volume(s)",
+          "value": "20"
+        },
+        {
+          "inline": true,
+          "name": "Rating",
+          "value": "75.5/100"
+        },
+        {
+          "inline": true,
+          "name": "Chapters",
+          "value": "105"
+        },
+        {
+          "inline": true,
+          "name": "Rank",
+          "value": "758"
+        }
+      ],
+      "footer": {
+        "text": "2005-09-26 - 2013-09-26",
+        "proxy_icon_url": "https://images-ext-1.discordapp.net/external/pfZ4lvyhr9-sWzjU_u1DcTYZ7QutEFR4e1CZoXq2CS8/http/i.imgur.com/taRJXqB.png",
+        "icon_url": "http://i.imgur.com/taRJXqB.png"
+      },
+      "type": "rich",
+      "thumbnail": {
+        "url": "https://media.kitsu.io/manga/poster_images/2899/original.jpg?1434255521",
+        "width": 225,
+        "proxy_url": "https://images-ext-2.discordapp.net/external/PPXC92RHs7u8dxa4EGK3IBBuCLibURqP7-LOzWG_zxo/%3F1434255521/https/media.kitsu.io/manga/poster_images/2899/original.jpg",
+        "height": 315
+      }
+    }
+  ],
+  "timestamp": "2017-06-10T21:09:39.366000+00:00",
+  "mention_everyone": false,
+  "id": "323207107669393420",
+  "pinned": false,
+  "edited_timestamp": null,
+  "author": {
+    "username": "Yuki α",
+    "discriminator": "0097",
+    "bot": true,
+    "id": "134755682170699776",
+    "avatar": "cf3f033038c87cb89aa9eadc37ef9c09"
+  },
+  "mention_roles": [],
+  "content": "",
+  "channel_id": "244567637332328449",
+  "mentions": [],
+  "type": 0
+}
