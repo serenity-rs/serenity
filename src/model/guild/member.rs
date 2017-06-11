@@ -357,7 +357,7 @@ impl Member {
     ///
     /// # Examples
     /// 
-    /// ```rust
+    /// ```rust,no_run
     /// extern crate serenity;
 	/// use std::env;
     /// use serenity::client::Client;
