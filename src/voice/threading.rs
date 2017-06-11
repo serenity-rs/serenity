@@ -5,7 +5,7 @@ use super::Status;
 use ::internal::Timer;
 use ::model::GuildId;
 
-pub fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
+pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
     let name = format!("Serenity Voice (G{})", guild_id);
 
     ThreadBuilder::new()
