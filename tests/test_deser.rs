@@ -111,7 +111,11 @@ fn guild_update() {
 
 #[test]
 fn message_create() {
+    // standard
     p!(MessageCreateEvent, "message_create_1");
+
+    // negative nonce
+    p!(MessageCreateEvent, "message_create_2");
 }
 
 #[test]

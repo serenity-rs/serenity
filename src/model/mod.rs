@@ -53,7 +53,51 @@ use ::utils::Colour;
 
 fn default_true() -> bool { true }
 
-macro_rules! id {
+macro_rules! id_i64 {
+    ($(#[$attr:meta] $name:ident;)*) => {
+        $(
+            #[$attr]
+            #[derive(Copy, Clone, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
+            #[allow(derive_hash_xor_eq)]
+            pub struct $name(pub i64);
+
+            impl $name {
+                /// Retrieves the time that the Id was created at.
+                pub fn created_at(&self) -> NaiveDateTime {
+                    let offset = (self.0 >> 22) / 1000;
+
+                    NaiveDateTime::from_timestamp(1420070400 + offset, 0)
+                }
+            }
+
+            impl From<i64> for $name {
+                fn from(v: i64) -> $name {
+                    $name(v)
+                }
+            }
+
+            impl PartialEq for $name {
+                fn eq(&self, other: &Self) -> bool {
+                    self.0 == other.0
+                }
+            }
+
+            impl PartialEq<i64> for $name {
+                fn eq(&self, u: &i64) -> bool {
+                    self.0 == *u
+                }
+            }
+
+            impl<'de> Deserialize<'de> for $name {
+                fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+                    deserializer.deserialize_i64(I64Visitor).map($name)
+                }
+            }
+        )*
+    };
+}
+
+macro_rules! id_u64 {
     ($(#[$attr:meta] $name:ident;)*) => {
         $(
             #[$attr]
@@ -97,7 +141,7 @@ macro_rules! id {
     }
 }
 
-id! {
+id_u64! {
     /// An identifier for a Channel
     ChannelId;
     /// An identifier for an Emoji
@@ -114,6 +158,11 @@ id! {
     UserId;
     /// An identifier for a [`Webhook`](struct.Webhook.html).
     WebhookId;
+}
+
+id_i64! {
+    /// An identifier for a general-purpose signed snowflake.
+    Snowflake;
 }
 
 /// A container for guilds.

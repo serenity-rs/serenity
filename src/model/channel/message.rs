@@ -48,7 +48,7 @@ pub struct Message {
     /// Array of users mentioned in the message.
     pub mentions: Vec<User>,
     /// Non-repeating number used for ensuring message order.
-    pub nonce: Option<String>,
+    pub nonce: Option<Snowflake>,
     /// Indicator of whether the message is pinned.
     pub pinned: bool,
     /// Array of reactions performed on the message.
