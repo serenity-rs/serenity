@@ -160,7 +160,7 @@ impl CurrentUser {
     ///
     /// Get the invite url with no permissions set:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::client::CACHE;
     /// #
     /// # let mut cache = CACHE.write().unwrap();
@@ -169,14 +169,14 @@ impl CurrentUser {
     /// use serenity::model::permissions::Permissions;
     ///
     /// // assuming the cache has been unlocked
-    /// let url = cache.user.invite_url(Permissions::empty());
+    /// let url = cache.user.invite_url(Permissions::empty()).unwrap();
     ///
     /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize?client_id=249608697955745802&scope=bot");
     /// ```
     ///
     /// Get the invite url with some basic permissions set:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::client::CACHE;
     /// #
     /// # let mut cache = CACHE.write().unwrap();
@@ -411,7 +411,7 @@ impl User {
     ///
     /// client.on_message(|_, msg| {
     ///     if msg.content == "~help" {
-    ///         let url = CACHE.read().unwrap().user.invite_url(Permissions::empty());
+    ///         let url = CACHE.read().unwrap().user.invite_url(Permissions::empty()).unwrap();
     ///         let help = format!("Helpful info here. Invite me with this link: <{}>", url);
     ///
     ///         match msg.author.direct_message(|m| m.content(&help)) {
