@@ -359,6 +359,7 @@ impl Member {
     /// 
     /// ```rust
     /// extern crate serenity;
+	/// use std::env;
     /// use serenity::client::Client;
     ///
     /// fn main() {
@@ -376,7 +377,7 @@ impl Member {
     /// # Errors
     ///
     /// Returns a [`ModelError::GuildNotFound`] if the guild the member's in could not be
-    /// found.
+    /// found in the cache.
     ///
     /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
     pub fn permissions(&self) -> Result<Permissions> {
