@@ -153,7 +153,8 @@ impl CurrentUser {
     }
 
     /// Returns the invite url for the bot with the given permissions.
-    /// This function queries the REST API for the client id.
+    ///
+    /// This queries the REST API for the client id.
     ///
     /// If the permissions passed are empty, the permissions part will be dropped.
     ///
