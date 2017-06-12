@@ -79,7 +79,11 @@ lazy_static! {
 }
 
 /// Sets the token to be used across all requests which require authentication.
-pub(crate) fn set_token(token: &str) {
+///
+/// This is intended for internal use! The only exception are webhooks.
+/// But really, please don't use this.
+#[doc(hidden)]
+pub fn set_token(token: &str) {
     TOKEN.lock().unwrap().clone_from(&token.to_owned());
 }
 
