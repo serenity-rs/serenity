@@ -358,20 +358,8 @@ impl Member {
     /// # Examples
     /// 
     /// ```rust,no_run
-    /// extern crate serenity;
-	/// use std::env;
-    /// use serenity::client::Client;
-    ///
-    /// fn main() {
-    ///     let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"));
-    ///     client.on_guild_member_add(|_, guild_id, member| {
-    ///         guild_id.as_channel_id().say(&format!("The newly joined member has the permissions: {}",
-    ///             member.permissions().expect("permissions")
-    ///         ));
-    ///     });
-    ///     
-    ///     let _ = client.start();
-    /// }
+    /// // assuming there's a `member` variable gotten from anything.
+    /// println!("The permission bits for the member are: {}", member.permissions().expect("permissions").bits);
     /// ```
 
     /// # Errors
