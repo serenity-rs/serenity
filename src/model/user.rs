@@ -222,8 +222,9 @@ impl CurrentUser {
         };
 
         let mut url = format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot", client_id);
+
         if bits != 0 {
-            write!(&mut url, "&permissions={}", bits)?;
+            write!(url, "&permissions={}", bits)?;
         }
 
         Ok(url)
