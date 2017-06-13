@@ -959,7 +959,7 @@ impl Cache {
             if !found {
                 guild.members.insert(event.user.id, Member {
                     deaf: false,
-                    guild_id: Some(event.guild_id),
+                    guild_id: event.guild_id,
                     joined_at: None,
                     mute: false,
                     nick: event.nick.clone(),
