@@ -154,49 +154,80 @@ impl CurrentUser {
 
     /// Returns the invite url for the bot with the given permissions.
     ///
+    /// This queries the REST API for the client id.
+    ///
     /// If the permissions passed are empty, the permissions part will be dropped.
     ///
     /// # Examples
     ///
     /// Get the invite url with no permissions set:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::client::CACHE;
     /// #
     /// # let mut cache = CACHE.write().unwrap();
-    /// # cache.user.id.0 = 249608697955745802;
-    /// #
+    ///
     /// use serenity::model::permissions::Permissions;
     ///
     /// // assuming the cache has been unlocked
-    /// let url = cache.user.invite_url(Permissions::empty());
+    /// let url = match cache.user.invite_url(Permissions::empty()) {
+    ///     Ok(v) => v,
+    ///     Err(why) => {
+    ///         println!("Error getting invite url: {:?}", why);
+    ///
+    ///         return;
+    ///     },
+    /// };
     ///
     /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize?client_id=249608697955745802&scope=bot");
     /// ```
     ///
     /// Get the invite url with some basic permissions set:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::client::CACHE;
     /// #
     /// # let mut cache = CACHE.write().unwrap();
-    /// # cache.user.id.0 = 249608697955745802;
-    /// #
+    ///
     /// use serenity::model::permissions::*;
     ///
     /// // assuming the cache has been unlocked
-    /// let url = cache.user.invite_url(READ_MESSAGES | SEND_MESSAGES | EMBED_LINKS);
+    /// let url = match cache.user.invite_url(READ_MESSAGES | SEND_MESSAGES | EMBED_LINKS) {
+    ///     Ok(v) => v,
+    ///     Err(why) => {
+    ///         println!("Error getting invite url: {:?}", why);
+    ///
+    ///         return;
+    ///     },
+    /// };
     ///
     /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize?client_id=249608697955745802&scope=bot&permissions=19456");
     /// ```
-    pub fn invite_url(&self, permissions: Permissions) -> String {
+    ///
+    /// # Errors
+    ///
+    /// Returns an
+    /// [`HttpError::InvalidRequest(Unauthorized)`][`HttpError::InvalidRequest`]
+    /// If the user is not authorized for this end point.
+    ///
+    /// May return [`Error::Format`] while writing url to the buffer.
+    ///
+    /// [`Error::Format`]: ../enum.Error.html#variant.Format
+    /// [`HttpError::InvalidRequest`]: ../http/enum.HttpError.html#variant.InvalidRequest
+    pub fn invite_url(&self, permissions: Permissions) -> Result<String> {
         let bits = permissions.bits();
+        let client_id = match http::get_current_application_info() {
+            Ok(v) => v.id,
+            Err(e) => return Err(e),
+        };
 
-        if bits == 0 {
-            format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot", self.id)
-        } else {
-            format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot&permissions={}", self.id, bits)
+        let mut url = format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot", client_id);
+
+        if bits != 0 {
+            write!(url, "&permissions={}", bits)?;
         }
+
+        Ok(url)
     }
 
     /// Returns a static formatted URL of the user's icon, if one exists.
@@ -407,7 +438,23 @@ impl User {
     ///
     /// client.on_message(|_, msg| {
     ///     if msg.content == "~help" {
-    ///         let url = CACHE.read().unwrap().user.invite_url(Permissions::empty());
+    ///         let url = match CACHE.read() {
+    ///             Ok(v) => {
+    ///                 match v.user.invite_url(Permissions::empty()) {
+    ///                     Ok(v) => v,
+    ///                     Err(why) => {
+    ///                         println!("Error creating invite url: {:?}", why);
+    ///
+    ///                         return;
+    ///                     },
+    ///                 }
+    ///             },
+    ///             Err(why) => {
+    ///                 println!("Error reading from CACHE: {:?}", why);
+    ///
+    ///                 return;
+    ///             }
+    ///         };
     ///         let help = format!("Helpful info here. Invite me with this link: <{}>", url);
     ///
     ///         match msg.author.direct_message(|m| m.content(&help)) {
