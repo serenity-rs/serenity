@@ -143,6 +143,8 @@ impl Shard {
         let event = client.recv_json(GatewayEvent::decode)?;
         let (ready, sequence) = prep::parse_ready(event, &mut client, &identification)?;
 
+        set_client_timeout(&mut client)?;
+
         Ok((feature_voice! {{
             let (tx, rx) = mpsc::channel();
 
@@ -848,12 +850,14 @@ fn connect(base_url: &str) -> Result<WsClient> {
     let url = prep::build_gateway_url(base_url)?;
     let client = ClientBuilder::from_url(&url).connect_secure(None)?;
 
+    Ok(client)
+}
+
+fn set_client_timeout(client: &mut WsClient) -> Result<()> {
     let timeout = StdDuration::from_millis(250);
 
-    {
-        let stream = client.stream_ref().as_tcp();
-        stream.set_read_timeout(Some(timeout))?;
-    }
+    let stream = client.stream_ref().as_tcp();
+    stream.set_read_timeout(Some(timeout))?;
 
-    Ok(client)
+    Ok(())
 }
