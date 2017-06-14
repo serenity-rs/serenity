@@ -95,7 +95,7 @@ pub fn dispatch(event: Event,
                 event_store: &Arc<RwLock<EventStore>>) {
     match event {
         Event::MessageCreate(event) => {
-            let context = context(Some(event.message.channel_id), conn, data);
+            let context = context(conn, data);
             dispatch_message(context,
                              event.message,
                              event_store);
