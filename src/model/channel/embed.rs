@@ -128,9 +128,9 @@ pub struct EmbedFooter {
     /// The URL of the footer icon.
     ///
     /// This only supports HTTP(S).
-    pub icon_url: String,
+    pub icon_url: Option<String>,
     /// A proxied URL of the footer icon.
-    pub proxy_icon_url: String,
+    pub proxy_icon_url: Option<String>,
     /// The associated text with the footer.
     pub text: String,
 }

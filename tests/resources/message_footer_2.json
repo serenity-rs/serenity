@@ -1,0 +1,33 @@
+{
+  "type": 0,
+  "tts": false,
+  "timestamp": "2017-01-01T01:01:01.100000+00:00",
+  "pinned": false,
+  "nonce": null,
+  "mentions": [],
+  "mention_roles": [],
+  "mention_everyone": false,
+  "id": "300000000000000001",
+  "embeds": [
+    {
+      "type": "rich",
+      "title": "Hangman Game",
+      "footer": {
+        "text": "I O A"
+      },
+      "description": "person_#1234 guessed a letter `A`!\n` ◯ O A ◯ A`\n. ┌─────┐\r\n.┃...............┋\r\n.┃...............┋\r\n.┃.............😲\r\n.┃  \r\n.┃ \r\n/-\\",
+      "color": 7458112
+    }
+  ],
+  "edited_timestamp": null,
+  "content": "",
+  "channel_id": "300000000000000000",
+  "author": {
+    "username": "Nadeko",
+    "id": "116275390695079945",
+    "discriminator": "6685",
+    "bot": true,
+    "avatar": "b21045e778ef21c96d175400e779f0fb"
+  },
+  "attachments": []
+}
