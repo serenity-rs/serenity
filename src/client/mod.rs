@@ -1392,6 +1392,9 @@ fn handle_shard(info: &mut MonitorInfo) {
                     Ok(_) => {
                         debug!("Successfully resumed shard");
 
+                        last_ack_time = UTC::now().timestamp();
+                        last_heartbeat_sent = UTC::now().timestamp();
+
                         continue;
                     },
                     Err(why) => {
@@ -1432,6 +1435,9 @@ fn handle_shard(info: &mut MonitorInfo) {
                     match shard.resume() {
                         Ok(_) => {
                             debug!("Successfully resumed shard");
+
+                            last_ack_time = UTC::now().timestamp();
+                            last_heartbeat_sent = UTC::now().timestamp();
 
                             continue;
                         },
