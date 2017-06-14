@@ -523,8 +523,7 @@ impl Shard {
 
     /// Shuts down the receiver by attempting to cleanly close the
     /// connection.
-    #[allow(dead_code)]
-    pub(crate) fn shutdown_clean(client: &mut WsClient) -> Result<()> {
+    pub fn shutdown_clean(client: &mut WsClient) -> Result<()> {
         {
             let message = OwnedMessage::Close(Some(CloseData {
                 status_code: 1000,
@@ -545,7 +544,7 @@ impl Shard {
     }
 
     /// Uncleanly shuts down the receiver by not sending a close code.
-    pub(crate) fn shutdown(&mut self) -> Result<()> {
+    pub fn shutdown(&mut self) -> Result<()> {
         let mut stream = self.client.stream_ref().as_tcp();
 
         stream.flush()?;

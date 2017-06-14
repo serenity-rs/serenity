@@ -28,18 +28,30 @@ use ::model::{GuildId, Message, UserId};
 /// [`Client`]: ../../client/struct.Client.html
 /// [`Framework`]: struct.Framework.html
 pub struct Configuration {
-    pub(crate) allow_dm: bool,
-    pub(crate) allow_whitespace: bool,
-    pub(crate) blocked_guilds: HashSet<GuildId>,
-    pub(crate) blocked_users: HashSet<UserId>,
-    pub(crate) depth: usize,
-    pub(crate) disabled_commands: HashSet<String>,
-    pub(crate) dynamic_prefix: Option<Box<PrefixCheck>>,
-    pub(crate) ignore_bots: bool,
-    pub(crate) ignore_webhooks: bool,
-    pub(crate) on_mention: Option<Vec<String>>,
-    pub(crate) owners: HashSet<UserId>,
-    pub(crate) prefixes: Vec<String>,
+    #[doc(hidden)]
+    pub allow_dm: bool,
+    #[doc(hidden)]
+    pub allow_whitespace: bool,
+    #[doc(hidden)]
+    pub blocked_guilds: HashSet<GuildId>,
+    #[doc(hidden)]
+    pub blocked_users: HashSet<UserId>,
+    #[doc(hidden)]
+    pub depth: usize,
+    #[doc(hidden)]
+    pub disabled_commands: HashSet<String>,
+    #[doc(hidden)]
+    pub dynamic_prefix: Option<Box<PrefixCheck>>,
+    #[doc(hidden)]
+    pub ignore_bots: bool,
+    #[doc(hidden)]
+    pub ignore_webhooks: bool,
+    #[doc(hidden)]
+    pub on_mention: Option<Vec<String>>,
+    #[doc(hidden)]
+    pub owners: HashSet<UserId>,
+    #[doc(hidden)]
+    pub prefixes: Vec<String>,
 }
 
 impl Configuration {
