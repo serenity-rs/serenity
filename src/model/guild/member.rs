@@ -218,6 +218,33 @@ impl Member {
         self.guild_id.kick(self.user.read().unwrap().id)
     }
 
+    /// Returns the permissions for the member.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,ignore
+    /// // assuming there's a `member` variable gotten from anything.
+    /// println!("The permission bits for the member are: {}", member.permissions().expect("permissions").bits);
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ModelError::GuildNotFound`] if the guild the member's in could not be
+    /// found in the cache.
+    ///
+    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
+    #[cfg(feature="cache")]
+    pub fn permissions(&self) -> Result<Permissions> {
+        let guild = match self.guild_id.find() {
+            Some(guild) => guild,
+            None => return Err(From::from(ModelError::GuildNotFound)),  
+        };
+
+        let guild = guild.read().unwrap();
+
+        Ok(guild.permissions_for(ChannelId(guild.id.0), self.user.read().unwrap().id))
+    }
+
     /// Removes a [`Role`] from the member, editing its roles in-place if the
     /// request was successful.
     ///
@@ -306,33 +333,6 @@ impl Member {
     #[cfg(feature="cache")]
     pub fn unban(&self) -> Result<()> {
         http::remove_ban(self.guild_id.0, self.user.read().unwrap().id.0)
-    }
-
-    /// Returns the permissions for the member.
-    ///
-    /// # Examples
-    /// 
-    /// ```rust,ignore
-    /// // assuming there's a `member` variable gotten from anything.
-    /// println!("The permission bits for the member are: {}", member.permissions().expect("permissions").bits);
-    /// ```
-
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::GuildNotFound`] if the guild the member's in could not be
-    /// found in the cache.
-    ///
-    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
-    #[cfg(feature="cache")]
-    pub fn permissions(&self) -> Result<Permissions> {
-        let guild = match self.guild_id.find() {
-            Some(guild) => guild,
-            None => return Err(From::from(ModelError::GuildNotFound)),  
-        };
-
-        let guild = guild.read().unwrap();
-
-        Ok(guild.permissions_for(ChannelId(guild.id.0), self.user.read().unwrap().id))
     }
 }
 
