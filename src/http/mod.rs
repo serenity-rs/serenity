@@ -1212,8 +1212,8 @@ pub fn get_messages(channel_id: u64, query: &str)
                       channel_id,
                       query);
 
-                      let tc = NativeTlsClient::new()?;
-                      let connector = HttpsConnector::new(tc);
+    let tc = NativeTlsClient::new()?;
+    let connector = HttpsConnector::new(tc);
     let client = HyperClient::with_connector(connector);
 
     let response = request(Route::ChannelsIdMessages(channel_id),
@@ -1422,6 +1422,7 @@ pub fn send_file<R: Read>(channel_id: u64, mut file: R, filename: &str, map: Jso
     let tc = NativeTlsClient::new()?;
     let connector = HttpsConnector::new(tc);
     let mut request = Request::with_connector(Method::Post, url, &connector)?;
+    
     request.headers_mut()
         .set(header::Authorization(TOKEN.lock().unwrap().clone()));
     request.headers_mut()
