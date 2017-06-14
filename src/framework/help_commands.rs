@@ -28,12 +28,11 @@ use std::fmt::Write;
 use super::command::InternalCommand;
 use super::{Command, CommandGroup, CommandOrAlias};
 use ::client::Context;
-use ::model::Message;
+use ::model::{ChannelId, Message};
 use ::utils::Colour;
 
-fn error_embed(ctx: &mut Context, input: &str) {
-    let _ = ctx.channel_id
-        .unwrap()
+fn error_embed(channel_id: &ChannelId, input: &str) {
+    let _ = channel_id
         .send_message(|m| m
         .embed(|e| e
             .colour(Colour::dark_red())
@@ -68,8 +67,8 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 /// client.with_framework(|f| f
 ///     .command("help", |c| c.exec_help(help_commands::with_embeds)));
 /// ```
-pub fn with_embeds(ctx: &mut Context,
-                   _: &Message,
+pub fn with_embeds(_: &mut Context,
+                   msg: &Message,
                    groups: HashMap<String, Arc<CommandGroup>>,
                    args: &[String]) -> Result<(), String> {
     if !args.is_empty() {
@@ -91,7 +90,8 @@ pub fn with_embeds(ctx: &mut Context,
                             found = Some((command_name, cmd));
                         },
                         CommandOrAlias::Alias(ref name) => {
-                            error_embed(ctx, &format!("Did you mean \"{}\"?", name));
+                            error_embed(&msg.channel_id, &format!("Did you mean \"{}\"?", name));
+
                             return Ok(());
                         }
                     }
@@ -100,12 +100,12 @@ pub fn with_embeds(ctx: &mut Context,
 
             if let Some((command_name, command)) = found {
                 if !command.help_available {
-                    error_embed(ctx, "**Error**: No help available.");
+                    error_embed(&msg.channel_id, "**Error**: No help available.");
 
                     return Ok(());
                 }
 
-                let _ = ctx.channel_id.unwrap().send_message(|m| {
+                let _ = msg.channel_id.send_message(|m| {
                     m.embed(|e| {
                         let mut embed = e.colour(Colour::rosewater())
                             .title(command_name);
@@ -152,12 +152,12 @@ pub fn with_embeds(ctx: &mut Context,
         }
 
         let error_msg = format!("**Error**: Command `{}` not found.", name);
-        error_embed(ctx, &error_msg);
+        error_embed(&msg.channel_id, &error_msg);
 
         return Ok(());
     }
 
-    let _ = ctx.channel_id.unwrap().send_message(|m| m
+    let _ = msg.channel_id.send_message(|m| m
         .embed(|mut e| {
             e = e.colour(Colour::rosewater())
                 .description("To get help with an individual command, pass its \
@@ -217,8 +217,8 @@ pub fn with_embeds(ctx: &mut Context,
 /// client.with_framework(|f| f
 ///     .command("help", |c| c.exec_help(help_commands::plain)));
 /// ```
-pub fn plain(ctx: &mut Context,
-             _: &Message,
+pub fn plain(_: &mut Context,
+             msg: &Message,
              groups: HashMap<String, Arc<CommandGroup>>,
              args: &[String]) -> Result<(), String> {
     if !args.is_empty() {
@@ -240,7 +240,7 @@ pub fn plain(ctx: &mut Context,
                             found = Some((command_name, cmd));
                         },
                         CommandOrAlias::Alias(ref name) => {
-                            let _ = ctx.channel_id.unwrap().say(&format!("Did you mean {:?}?", name));
+                            let _ = msg.channel_id.say(&format!("Did you mean {:?}?", name));
                             return Ok(());
                         }
                     }
@@ -249,7 +249,7 @@ pub fn plain(ctx: &mut Context,
 
             if let Some((command_name, command)) = found {
                 if !command.help_available {
-                    let _ = ctx.channel_id.unwrap().say("**Error**: No help available.");
+                    let _ = msg.channel_id.say("**Error**: No help available.");
                     return Ok(());
                 }
 
@@ -281,13 +281,13 @@ pub fn plain(ctx: &mut Context,
                 });
                 result.push_str("\n");
 
-                let _ = ctx.channel_id.unwrap().say(&result);
+                let _ = msg.channel_id.say(&result);
 
                 return Ok(());
             }
         }
 
-        let _ = ctx.channel_id.unwrap().say(&format!("**Error**: Command `{}` not found.", name));
+        let _ = msg.channel_id.say(&format!("**Error**: Command `{}` not found.", name));
 
         return Ok(());
     }
@@ -327,7 +327,7 @@ pub fn plain(ctx: &mut Context,
         }
     }
 
-    let _ = ctx.channel_id.unwrap().say(&result);
+    let _ = msg.channel_id.say(&result);
 
     Ok(())
 }

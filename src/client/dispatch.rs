@@ -5,7 +5,7 @@ use super::Context;
 use typemap::ShareMap;
 use ::gateway::Shard;
 use ::model::event::Event;
-use ::model::{ChannelId, Message};
+use ::model::Message;
 
 #[cfg(feature="framework")]
 use ::ext::framework::Framework;
@@ -58,10 +58,9 @@ macro_rules! update {
     };
 }
 
-fn context(channel_id: Option<ChannelId>,
-           conn: &Arc<Mutex<Shard>>,
+fn context(conn: &Arc<Mutex<Shard>>,
            data: &Arc<Mutex<ShareMap>>) -> Context {
-    Context::new(channel_id, conn.clone(), data.clone())
+    Context::new(conn.clone(), data.clone())
 }
 
 #[cfg(feature="framework")]
@@ -72,9 +71,7 @@ pub fn dispatch(event: Event,
                 event_store: &Arc<RwLock<EventStore>>) {
     match event {
         Event::MessageCreate(event) => {
-            let context = context(Some(event.message.channel_id),
-                                  conn,
-                                  data);
+            let context = context(conn, data);
             let mut framework = framework.lock().unwrap();
 
             if framework.initialized {
@@ -133,14 +130,7 @@ fn handle_event(event: Event,
             if let Some(handler) = handler!(on_channel_create, event_store) {
                 update!(update_with_channel_create, event);
 
-                let mut channel_id = None;
-
-                #[cfg(feature="model")]
-                {
-                    channel_id = Some(event.channel.id());
-                }
-
-                let context = context(channel_id, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.channel));
             } else {
@@ -150,7 +140,7 @@ fn handle_event(event: Event,
         Event::ChannelDelete(event) => {
             if let Some(handler) = handler!(on_channel_delete, event_store) {
                 update!(update_with_channel_delete, event);
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.channel));
             } else {
@@ -159,7 +149,7 @@ fn handle_event(event: Event,
         },
         Event::ChannelPinsUpdate(event) => {
             if let Some(handler) = handler!(on_channel_pins_update, event_store) {
-                let context = context(Some(event.channel_id), conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event));
             }
@@ -168,7 +158,7 @@ fn handle_event(event: Event,
             update!(update_with_channel_recipient_add, @event);
 
             if let Some(handler) = handler!(on_channel_recipient_addition, event_store) {
-                let context = context(Some(event.channel_id), conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.channel_id, event.user));
             }
@@ -177,21 +167,14 @@ fn handle_event(event: Event,
             update!(update_with_channel_recipient_remove, event);
 
             if let Some(handler) = handler!(on_channel_recipient_removal, event_store) {
-                let context = context(Some(event.channel_id), conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.channel_id, event.user));
             }
         },
         Event::ChannelUpdate(event) => {
             if let Some(handler) = handler!(on_channel_update, event_store) {
-                let mut channel_id = None;
-
-                #[cfg(feature="model")]
-                {
-                    channel_id = Some(event.channel.id());
-                }
-
-                let context = context(channel_id, conn, data);
+                let context = context(conn, data);
 
                 feature_cache! {{
                     let before = CACHE.read().unwrap().channel(event.channel.id());
@@ -207,14 +190,14 @@ fn handle_event(event: Event,
         },
         Event::GuildBanAdd(event) => {
             if let Some(handler) = handler!(on_guild_ban_addition, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.guild_id, event.user));
             }
         },
         Event::GuildBanRemove(event) => {
             if let Some(handler) = handler!(on_guild_ban_removal, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.guild_id, event.user));
             }
@@ -223,14 +206,14 @@ fn handle_event(event: Event,
             update!(update_with_guild_create, event);
 
             if let Some(handler) = handler!(on_guild_create, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.guild));
             }
         },
         Event::GuildDelete(event) => {
             if let Some(handler) = handler!(on_guild_delete, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 feature_cache! {{
                     let full = update!(update_with_guild_delete, event);
@@ -250,14 +233,14 @@ fn handle_event(event: Event,
             update!(update_with_guild_emojis_update, event);
 
             if let Some(handler) = handler!(on_guild_emojis_update, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.guild_id, event.emojis));
             }
         },
         Event::GuildIntegrationsUpdate(event) => {
             if let Some(handler) = handler!(on_guild_integrations_update, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.guild_id));
             }
@@ -266,14 +249,14 @@ fn handle_event(event: Event,
             update!(update_with_guild_member_add, @event);
 
             if let Some(handler) = handler!(on_guild_member_addition, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.guild_id, event.member));
             }
         },
         Event::GuildMemberRemove(event) => {
             if let Some(handler) = handler!(on_guild_member_removal, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 feature_cache! {{
                     let member = update!(update_with_guild_member_remove, event);
@@ -291,7 +274,7 @@ fn handle_event(event: Event,
         },
         Event::GuildMemberUpdate(event) => {
             if let Some(handler) = handler!(on_guild_member_update, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 feature_cache! {{
                     let before = update!(update_with_guild_member_update, event);
@@ -317,7 +300,7 @@ fn handle_event(event: Event,
             update!(update_with_guild_members_chunk, event);
 
             if let Some(handler) = handler!(on_guild_members_chunk, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.guild_id, event.members));
             }
@@ -326,14 +309,14 @@ fn handle_event(event: Event,
             update!(update_with_guild_role_create, event);
 
             if let Some(handler) = handler!(on_guild_role_create, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.guild_id, event.role));
             }
         },
         Event::GuildRoleDelete(event) => {
             if let Some(handler) = handler!(on_guild_role_delete, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 feature_cache! {{
                     let role = update!(update_with_guild_role_delete, event);
@@ -351,7 +334,7 @@ fn handle_event(event: Event,
         },
         Event::GuildRoleUpdate(event) => {
             if let Some(handler) = handler!(on_guild_role_update, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 feature_cache! {{
                     let before = update!(update_with_guild_role_update, event);
@@ -371,14 +354,14 @@ fn handle_event(event: Event,
             update!(update_with_guild_unavailable, event);
 
             if let Some(handler) = handler!(on_guild_unavailable, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.guild_id));
             }
         },
         Event::GuildUpdate(event) => {
             if let Some(handler) = handler!(on_guild_update, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 feature_cache! {{
                     let before = CACHE.read()
@@ -400,21 +383,21 @@ fn handle_event(event: Event,
         Event::MessageCreate(_) => {},
         Event::MessageDeleteBulk(event) => {
             if let Some(handler) = handler!(on_message_delete_bulk, event_store) {
-                let context = context(Some(event.channel_id), conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.channel_id, event.ids));
             }
         },
         Event::MessageDelete(event) => {
             if let Some(handler) = handler!(on_message_delete, event_store) {
-                let context = context(Some(event.channel_id), conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.channel_id, event.message_id));
             }
         },
         Event::MessageUpdate(event) => {
             if let Some(handler) = handler!(on_message_update, event_store) {
-                let context = context(Some(event.channel_id), conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event));
             }
@@ -423,7 +406,7 @@ fn handle_event(event: Event,
             update!(update_with_presences_replace, event);
 
             if let Some(handler) = handler!(on_presence_replace, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.presences));
             }
@@ -432,28 +415,28 @@ fn handle_event(event: Event,
             update!(update_with_presence_update, @event);
 
             if let Some(handler) = handler!(on_presence_update, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event));
             }
         },
         Event::ReactionAdd(event) => {
             if let Some(handler) = handler!(on_reaction_add, event_store) {
-                let context = context(Some(event.reaction.channel_id), conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.reaction));
             }
         },
         Event::ReactionRemove(event) => {
             if let Some(handler) = handler!(on_reaction_remove, event_store) {
-                let context = context(Some(event.reaction.channel_id), conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.reaction));
             }
         },
         Event::ReactionRemoveAll(event) => {
             if let Some(handler) = handler!(on_reaction_remove_all, event_store) {
-                let context = context(Some(event.channel_id), conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.channel_id, event.message_id));
             }
@@ -462,7 +445,7 @@ fn handle_event(event: Event,
             if let Some(handler) = handler!(on_ready, event_store) {
                 update!(update_with_ready, event);
 
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.ready));
             } else {
@@ -471,28 +454,28 @@ fn handle_event(event: Event,
         },
         Event::Resumed(event) => {
             if let Some(handler) = handler!(on_resume, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event));
             }
         },
         Event::TypingStart(event) => {
             if let Some(handler) = handler!(on_typing_start, event_store) {
-                let context = context(Some(event.channel_id), conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event));
             }
         },
         Event::Unknown(event) => {
             if let Some(handler) = handler!(on_unknown, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.kind, event.value));
             }
         },
         Event::UserUpdate(event) => {
             if let Some(handler) = handler!(on_user_update, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 feature_cache! {{
                     let before = update!(update_with_user_update, event);
@@ -510,7 +493,7 @@ fn handle_event(event: Event,
         },
         Event::VoiceServerUpdate(event) => {
             if let Some(handler) = handler!(on_voice_server_update, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event));
             }
@@ -519,14 +502,14 @@ fn handle_event(event: Event,
             update!(update_with_voice_state_update, event);
 
             if let Some(handler) = handler!(on_voice_state_update, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.guild_id, event.voice_state));
             }
         },
         Event::WebhookUpdate(event) => {
             if let Some(handler) = handler!(on_webhook_update, event_store) {
-                let context = context(None, conn, data);
+                let context = context(conn, data);
 
                 thread::spawn(move || (handler)(context, event.guild_id, event.channel_id));
             }

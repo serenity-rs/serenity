@@ -544,7 +544,7 @@ impl Framework {
 
                             let result = match command.exec {
                                 CommandType::StringResponse(ref x) => {
-                                    let _ = &mut context.channel_id.unwrap().say(x);
+                                    let _ = message.channel_id.say(x);
 
                                     Ok(())
                                 },

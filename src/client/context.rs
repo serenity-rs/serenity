@@ -29,11 +29,6 @@ use ::http;
 /// [`set_game`]: #method.set_game
 #[derive(Clone)]
 pub struct Context {
-    /// The Id of the relevant channel, if there is one. This is present on the
-    /// [`on_message`] handler, for example.
-    ///
-    /// [`on_message`]: struct.Client.html#method.on_message
-    pub channel_id: Option<ChannelId>,
     /// A clone of [`Client::data`]. Refer to its documentation for more
     /// information.
     ///
@@ -44,8 +39,6 @@ pub struct Context {
     /// Note that if you are sharding, in relevant terms, this is the shard
     /// which received the event being dispatched.
     pub shard: Arc<Mutex<Shard>>,
-    /// The queue of messages that are sent after context goes out of scope.
-    pub queue: String,
 }
 
 impl Context {
@@ -57,14 +50,10 @@ impl Context {
     /// Or don't do what I say. I'm just a comment hidden from the generated
     /// documentation.
     #[doc(hidden)]
-    pub fn new(channel_id: Option<ChannelId>,
-               shard: Arc<Mutex<Shard>>,
-               data: Arc<Mutex<ShareMap>>) -> Context {
+    pub fn new(shard: Arc<Mutex<Shard>>, data: Arc<Mutex<ShareMap>>) -> Context {
         Context {
-            channel_id: channel_id,
             data: data,
             shard: shard,
-            queue: String::new(),
         }
     }
 
