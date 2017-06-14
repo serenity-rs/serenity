@@ -1107,10 +1107,17 @@ impl<'de> Deserialize<'de> for Guild {
 
         if let Some(guild_id) = id {
             if let Some(array) = map.get_mut("channels").and_then(|x| x.as_array_mut()) {
-
                 for value in array {
                     if let Some(channel) = value.as_object_mut() {
                         channel.insert("guild_id".to_owned(), Value::Number(Number::from(guild_id)));
+                    }
+                }
+            }
+
+            if let Some(array) = map.get_mut("members").and_then(|x| x.as_array_mut()) {
+                for value in array {
+                    if let Some(member) = value.as_object_mut() {
+                        member.insert("guild_id".to_owned(), Value::Number(Number::from(guild_id)));
                     }
                 }
             }

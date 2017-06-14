@@ -22,7 +22,7 @@ pub struct Member {
     /// Indicator of whether the member can hear in voice channels.
     pub deaf: bool,
     /// The unique Id of the guild that the member is a part of.
-    pub guild_id: Option<GuildId>,
+    pub guild_id: GuildId,
     /// Timestamp representing the date when the member joined.
     pub joined_at: Option<DateTime<FixedOffset>>,
     /// Indicator of whether the member can speak in voice channels.
@@ -55,9 +55,7 @@ impl Member {
             return Ok(());
         }
 
-        let guild_id = self.find_guild()?;
-
-        match http::add_member_role(guild_id.0, self.user.read().unwrap().id.0, role_id.0) {
+        match http::add_member_role(self.guild_id.0, self.user.read().unwrap().id.0, role_id.0) {
             Ok(()) => {
                 self.roles.push(role_id);
 
@@ -76,12 +74,11 @@ impl Member {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature="cache")]
     pub fn add_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
-        let guild_id = self.find_guild()?;
         self.roles.extend_from_slice(role_ids);
 
         let map = EditMember::default().roles(&self.roles).0;
 
-        match http::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map) {
+        match http::edit_member(self.guild_id.0, self.user.read().unwrap().id.0, &map) {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.retain(|r| !role_ids.contains(r));
@@ -106,19 +103,14 @@ impl Member {
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature="cache")]
     pub fn ban(&self, delete_message_days: u8) -> Result<()> {
-        http::ban_user(self.find_guild()?.0, self.user.read().unwrap().id.0, delete_message_days)
+        http::ban_user(self.guild_id.0, self.user.read().unwrap().id.0, delete_message_days)
     }
 
     /// Determines the member's colour.
     #[cfg(all(feature="cache", feature="utils"))]
     pub fn colour(&self) -> Option<Colour> {
-        let guild_id = match self.find_guild() {
-            Ok(guild_id) => guild_id,
-            Err(_) => return None,
-        };
-
         let cache = CACHE.read().unwrap();
-        let guild = match cache.guilds.get(&guild_id) {
+        let guild = match cache.guilds.get(&self.guild_id) {
             Some(guild) => guild.read().unwrap(),
             None => return None,
         };
@@ -160,45 +152,17 @@ impl Member {
     /// [`EditMember`]: ../builder/struct.EditMember.html
     #[cfg(feature="cache")]
     pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F) -> Result<()> {
-        let guild_id = self.find_guild()?;
         let map = f(EditMember::default()).0;
 
-        http::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map)
+        http::edit_member(self.guild_id.0, self.user.read().unwrap().id.0, &map)
     }
 
-    /// Finds the Id of the [`Guild`] that the member is in.
+    /// Returns the value of [`guild_id`].
     ///
-    /// Returns the value of [`Member::guild_id`] if present. Otherwise searches
-    /// the [`Cache`] for the Id.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::GuildNotFound`] if the guild could not be
-    /// found.
-    ///
-    /// [`Cache`]: ../cache/struct.Cache.html
-    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
-    /// [`Guild`]: struct.Guild.html
-    /// [`Member::guild_id`]: struct.Member.html#structfield.guild_id
-    #[cfg(feature="cache")]
+    /// [`guild_id`]: #structfield.guild_id
+    #[deprecated(since="0.2.1", note="Use the `guild_id` structfield instead.")]
     pub fn find_guild(&self) -> Result<GuildId> {
-        if let Some(guild_id) = self.guild_id {
-            return Ok(guild_id);
-        }
-
-        for guild in CACHE.read().unwrap().guilds.values() {
-            let guild = guild.read().unwrap();
-
-            let predicate = guild.members
-                .values()
-                .any(|m| m.joined_at == self.joined_at && m.user.read().unwrap().id == self.user.read().unwrap().id);
-
-            if predicate {
-                return Ok(guild.id);
-            }
-        }
-
-        Err(Error::Model(ModelError::GuildNotFound))
+        return Ok(self.guild_id);
     }
 
     /// Kick the member from the guild.
@@ -235,18 +199,15 @@ impl Member {
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     pub fn kick(&self) -> Result<()> {
-        let guild_id;
-
         #[cfg(feature="cache")]
         {
-            guild_id = self.find_guild()?;
             let req = permissions::KICK_MEMBERS;
 
             let has_perms = CACHE
                 .read()
                 .unwrap()
                 .guilds
-                .get(&guild_id)
+                .get(&self.guild_id)
                 .map(|guild| guild.read().unwrap().has_perms(req));
 
             if let Some(Ok(false)) = has_perms {
@@ -254,12 +215,7 @@ impl Member {
             }
         }
 
-        #[cfg(not(feature="cache"))]
-        {
-            guild_id = self.guild_id.ok_or_else(|| Error::Model(ModelError::GuildNotFound))?;
-        }
-
-        guild_id.kick(self.user.read().unwrap().id)
+        self.guild_id.kick(self.user.read().unwrap().id)
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the
@@ -277,9 +233,7 @@ impl Member {
             return Ok(());
         }
 
-        let guild_id = self.find_guild()?;
-
-        match http::remove_member_role(guild_id.0, self.user.read().unwrap().id.0, role_id.0) {
+        match http::remove_member_role(self.guild_id.0, self.user.read().unwrap().id.0, role_id.0) {
             Ok(()) => {
                 self.roles.retain(|r| r.0 != role_id.0);
 
@@ -297,12 +251,11 @@ impl Member {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature="cache")]
     pub fn remove_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
-        let guild_id = self.find_guild()?;
         self.roles.retain(|r| !role_ids.contains(r));
 
         let map = EditMember::default().roles(&self.roles).0;
 
-        match http::edit_member(guild_id.0, self.user.read().unwrap().id.0, &map) {
+        match http::edit_member(self.guild_id.0, self.user.read().unwrap().id.0, &map) {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);
@@ -352,7 +305,7 @@ impl Member {
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature="cache")]
     pub fn unban(&self) -> Result<()> {
-        http::remove_ban(self.find_guild()?.0, self.user.read().unwrap().id.0)
+        http::remove_ban(self.guild_id.0, self.user.read().unwrap().id.0)
     }
 
     /// Returns the permissions for the member.
