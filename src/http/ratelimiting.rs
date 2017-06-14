@@ -340,8 +340,7 @@ pub enum Route {
     None,
 }
 
-#[doc(hidden)]
-pub fn perform<'a, F>(route: Route, f: F) -> Result<Response>
+pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
     where F: Fn() -> RequestBuilder<'a> {
     loop {
         // This will block if another thread already has the global
@@ -435,8 +434,7 @@ pub struct RateLimit {
 }
 
 impl RateLimit {
-    #[doc(hidden)]
-    pub fn pre_hook(&mut self, route: &Route) {
+    pub(crate) fn pre_hook(&mut self, route: &Route) {
         if self.limit == 0 {
             return;
         }
@@ -464,8 +462,7 @@ impl RateLimit {
         self.remaining -= 1;
     }
 
-    #[doc(hidden)]
-    pub fn post_hook(&mut self, response: &Response, route: &Route) -> Result<bool> {
+    pub(crate) fn post_hook(&mut self, response: &Response, route: &Route) -> Result<bool> {
         if let Some(limit) = parse_header(&response.headers, "x-ratelimit-limit")? {
             self.limit = limit;
         }

@@ -2,7 +2,9 @@
 
 use chrono::{DateTime, FixedOffset};
 use serde::de::Error as DeError;
-use serde_json::{self, Error as JsonError};
+use serde_json;
+#[cfg(feature="voice")] 
+use serde_json::Error as JsonError;
 use std::collections::HashMap;
 use super::utils::deserialize_emojis;
 use super::*;
@@ -737,8 +739,8 @@ pub enum VoiceEvent {
 }
 
 impl VoiceEvent {
-    #[doc(hidden)]
-    pub fn decode(value: Value) -> Result<VoiceEvent> {
+    #[cfg(feature="voice")]
+    pub(crate) fn decode(value: Value) -> Result<VoiceEvent> {
         let mut map = JsonMap::deserialize(value)?;
 
         let op = match map.remove("op") {

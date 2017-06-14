@@ -20,9 +20,9 @@ use self::connection_info::ConnectionInfo;
 
 const CRYPTO_MODE: &'static str = "xsalsa20_poly1305";
 
-#[doc(hidden)]
-pub enum Status {
+pub(crate) enum Status {
     Connect(ConnectionInfo),
+    #[allow(dead_code)]
     Disconnect,
     SetReceiver(Option<Box<AudioReceiver>>),
     SetSender(Option<Box<AudioSource>>),

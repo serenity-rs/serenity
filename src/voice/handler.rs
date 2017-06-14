@@ -104,16 +104,8 @@ pub struct Handler {
 
 impl Handler {
     /// Creates a new Handler.
-    ///
-    /// **Note**: You should never call this yourself, and should instead use
-    /// [`Manager::join`].
-    ///
-    /// Like, really. Really do not use this. Please.
-    ///
-    /// [`Manager::join`]: struct.Manager.html#method.join
-    #[doc(hidden)]
     #[inline]
-    pub fn new(guild_id: GuildId, ws: MpscSender<Value>, user_id: UserId) -> Self {
+    pub(crate) fn new(guild_id: GuildId, ws: MpscSender<Value>, user_id: UserId) -> Self {
         Self::new_raw(guild_id, Some(ws), user_id)
     }
 

@@ -9,12 +9,10 @@ pub type Exec = Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + 
 pub type Help = Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, &[String]) -> Result<(), String> + Send + Sync + 'static;
 pub type BeforeHook = Fn(&mut Context, &Message, &String) -> bool + Send + Sync + 'static;
 pub type AfterHook = Fn(&mut Context, &Message, &String, Result<(), String>) + Send + Sync + 'static;
-#[doc(hidden)]
-pub type InternalCommand = Arc<Command>;
+pub(crate) type InternalCommand = Arc<Command>;
 pub type PrefixCheck = Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
 
-#[doc(hidden)]
-pub enum CommandOrAlias {
+pub(crate) enum CommandOrAlias {
     Alias(String),
     Command(InternalCommand),
 }
@@ -30,7 +28,7 @@ pub enum CommandType {
 #[derive(Default)]
 pub struct CommandGroup {
     pub prefix: Option<String>,
-    pub commands: HashMap<String, CommandOrAlias>,
+    pub(crate) commands: HashMap<String, CommandOrAlias>,
 }
 
 /// Command struct used to store commands internally.
@@ -64,8 +62,7 @@ pub struct Command {
     pub guild_only: bool,
     /// Whether command can only be used by owners or not.
     pub owners_only: bool,
-    #[doc(hidden)]
-    pub aliases: Vec<String>,
+    pub(crate) aliases: Vec<String>,
 }
 
 impl Command {

@@ -232,8 +232,7 @@ impl Message {
         }
     }
 
-    #[doc(hidden)]
-    pub fn transform_content(&mut self) {
+    pub(crate) fn transform_content(&mut self) {
         match self.kind {
             MessageType::PinsAdd => {
                 self.content = format!("{} pinned a message to this channel. See all the pins.", self.author);
@@ -497,8 +496,7 @@ impl Message {
         self.reaction_users(reaction_type, limit, after)
     }
 
-    #[doc(hidden)]
-    pub fn check_content_length(map: &JsonMap) -> Result<()> {
+    pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {
         if let Some(content) = map.get("content") {
             if let Value::String(ref content) = *content {
                 if let Some(length_over) = Message::overflow_length(content) {
@@ -510,8 +508,7 @@ impl Message {
         Ok(())
     }
 
-    #[doc(hidden)]
-    pub fn check_embed_length(map: &JsonMap) -> Result<()> {
+    pub(crate) fn check_embed_length(map: &JsonMap) -> Result<()> {
         let embed = match map.get("embed") {
             Some(&Value::Object(ref value)) => value,
             _ => return Ok(()),

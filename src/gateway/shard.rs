@@ -310,8 +310,7 @@ impl Shard {
     ///   shard's voice state will be updated, _if_ the `voice` feature is
     ///   enabled.
     #[allow(cyclomatic_complexity)]
-    #[doc(hidden)]
-    pub fn handle_event(&mut self, event: Result<GatewayEvent>) -> Result<Option<Event>> {
+    pub(crate) fn handle_event(&mut self, event: Result<GatewayEvent>) -> Result<Option<Event>> {
         match event {
             Ok(GatewayEvent::Dispatch(seq, event)) => {
                 self.seq = seq;
@@ -524,7 +523,6 @@ impl Shard {
 
     /// Shuts down the receiver by attempting to cleanly close the
     /// connection.
-    #[doc(hidden)]
     pub fn shutdown_clean(client: &mut WsClient) -> Result<()> {
         {
             let message = OwnedMessage::Close(Some(CloseData {
@@ -546,7 +544,6 @@ impl Shard {
     }
 
     /// Uncleanly shuts down the receiver by not sending a close code.
-    #[doc(hidden)]
     pub fn shutdown(&mut self) -> Result<()> {
         let mut stream = self.client.stream_ref().as_tcp();
 
@@ -678,8 +675,7 @@ impl Shard {
     }
 
     #[cfg(feature="voice")]
-    #[doc(hidden)]
-    pub fn cycle_voice_recv(&mut self) {
+    pub(crate) fn cycle_voice_recv(&mut self) {
         if let Ok(v) = self.manager_rx.try_recv() {
             if let Err(why) = self.client.send_json(&v) {
                 warn!("Err sending voice msg: {:?}", why);
@@ -687,8 +683,7 @@ impl Shard {
         }
     }
 
-    #[doc(hidden)]
-    pub fn heartbeat(&mut self) -> Result<()> {
+    pub(crate) fn heartbeat(&mut self) -> Result<()> {
         let map = json!({
             "d": self.seq,
             "op": OpCode::Heartbeat.num(),
@@ -718,13 +713,11 @@ impl Shard {
         }
     }
 
-    #[doc(hidden)]
-    pub fn heartbeat_interval(&self) -> i64 {
+    pub(crate) fn heartbeat_interval(&self) -> i64 {
         self.heartbeat_interval as i64
     }
 
-    #[doc(hidden)]
-    pub fn last_heartbeat_acknowledged(&self) -> bool {
+    pub(crate) fn last_heartbeat_acknowledged(&self) -> bool {
         self.last_heartbeat_acknowledged
     }
 
@@ -760,8 +753,7 @@ impl Shard {
         Err(Error::Gateway(GatewayError::ReconnectFailure))
     }
 
-    #[doc(hidden)]
-    pub fn resume(&mut self) -> Result<Event> {
+    pub(crate) fn resume(&mut self) -> Result<Event> {
         let session_id = match self.session_id.clone() {
             Some(session_id) => session_id,
             None => return Err(Error::Gateway(GatewayError::NoSessionId)),

@@ -28,8 +28,7 @@ pub struct Manager {
 }
 
 impl Manager {
-    #[doc(hidden)]
-    pub fn new(ws: MpscSender<Value>, user_id: UserId) -> Manager {
+    pub(crate) fn new(ws: MpscSender<Value>, user_id: UserId) -> Manager {
         Manager {
             handlers: HashMap::new(),
             user_id: user_id,
