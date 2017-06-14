@@ -35,6 +35,7 @@ pub use ::http as rest;
 #[cfg(feature="cache")]
 pub use ::CACHE;
 
+use chrono::UTC;
 use self::dispatch::dispatch;
 use self::event_store::EventStore;
 use std::collections::HashMap;
@@ -43,9 +44,7 @@ use std::time::Duration;
 use std::{mem, thread};
 use super::gateway::Shard;
 use typemap::ShareMap;
-use websocket::client::Receiver;
 use websocket::result::WebSocketError;
-use websocket::stream::WebSocketStream;
 use ::http;
 use ::internal::prelude::*;
 use ::internal::ws_impl::ReceiverExt;
@@ -55,10 +54,10 @@ use ::model::*;
 #[cfg(feature="framework")]
 use ::framework::Framework;
 
-/// The Client is the way to "login" and be able to start sending authenticated
-/// requests over the REST API, as well as initializing a WebSocket connection
-/// through [`Shard`]s. Refer to the
-/// [documentation on using sharding][sharding docs] for more information.
+/// The Client is the way to be able to start sending authenticated requests
+/// over the REST API, as well as initializing a WebSocket connection through
+/// [`Shard`]s. Refer to the [documentation on using sharding][sharding docs]
+/// for more information.
 ///
 /// # Event Handlers
 ///
@@ -77,7 +76,7 @@ use ::framework::Framework;
 /// ```rust,ignore
 /// use serenity::Client;
 ///
-/// let mut client = Client::login("my token here");
+/// let mut client = Client::new("my token here");
 ///
 /// client.on_message(|context, message| {
 ///     if message.content == "!ping" {
@@ -129,7 +128,7 @@ pub struct Client {
     ///     type Value = HashMap<String, u64>;
     /// }
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN").unwrap());
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
     ///
     /// {
     ///     let mut data = client.data.lock().unwrap();
@@ -176,15 +175,6 @@ pub struct Client {
 
 #[allow(type_complexity)]
 impl Client {
-    /// Alias of [`login`].
-    ///
-    /// [`login`]: #method.login
-    #[deprecated(since="0.1.5", note="Use `login` instead")]
-    #[inline]
-    pub fn login_bot(token: &str) -> Self {
-        Self::login(token)
-    }
-
     /// Creates a Client for a bot user.
     ///
     /// Discord has a requirement of prefixing bot tokens with `"Bot "`, which
@@ -202,7 +192,7 @@ impl Client {
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_TOKEN")?;
-    /// let client = Client::login(&token);
+    /// let client = Client::new(&token);
     /// # Ok(())
     /// # }
     /// #
@@ -210,14 +200,32 @@ impl Client {
     /// #    try_main().unwrap();
     /// # }
     /// ```
-    pub fn login(bot_token: &str) -> Self {
-        let token = if bot_token.starts_with("Bot ") {
-            bot_token.to_owned()
+    pub fn new(token: &str) -> Self {
+        let token = if token.starts_with("Bot ") {
+            token.to_owned()
         } else {
-            format!("Bot {}", bot_token)
+            format!("Bot {}", token)
         };
 
-        login(token)
+        init_client(token)
+    }
+
+    /// Alias of [`new`].
+    ///
+    /// [`new`]: #method.new
+    #[deprecated(since="0.1.5", note="Use `new` instead")]
+    #[inline(always)]
+    pub fn login_bot(token: &str) -> Self {
+        Self::new(token)
+    }
+
+    /// Alias for [`new`].
+    ///
+    /// [`new`]: #method.new
+    #[deprecated(since="0.2.1", note="Use `new` instead")]
+    #[inline(always)]
+    pub fn login(token: &str) -> Self {
+        Self::new(token)
     }
 
     /// Sets a framework to be used with the client. All message events will be
@@ -238,7 +246,7 @@ impl Client {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
     /// client.with_framework(|f| f
     ///     .configure(|c| c.prefix("~"))
     ///     .command("ping", |c| c.exec_str("Pong!")));
@@ -284,7 +292,7 @@ impl Client {
     /// use serenity::client::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
     ///
     /// if let Err(why) = client.start() {
     ///     println!("Err with client: {:?}", why);
@@ -325,7 +333,7 @@ impl Client {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
     ///
     /// if let Err(why) = client.start_autosharded() {
     ///     println!("Err with client: {:?}", why);
@@ -338,6 +346,12 @@ impl Client {
     /// # }
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    ///
+    /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start_autosharded(&mut self) -> Result<()> {
         let mut res = http::get_bot_gateway()?;
@@ -374,7 +388,7 @@ impl Client {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
     ///
     /// if let Err(why) = client.start_shard(3, 5) {
     ///     println!("Err with client: {:?}", why);
@@ -397,7 +411,7 @@ impl Client {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
     ///
     /// if let Err(why) = client.start_shard(0, 1) {
     ///     println!("Err with client: {:?}", why);
@@ -410,6 +424,12 @@ impl Client {
     /// # }
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    ///
+    /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [`start`]: #method.start
     /// [`start_autosharded`]: #method.start_autosharded
     /// [gateway docs]: gateway/index.html#sharding
@@ -440,7 +460,7 @@ impl Client {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
     ///
     /// if let Err(why) = client.start_shards(8) {
     ///     println!("Err with client: {:?}", why);
@@ -453,6 +473,12 @@ impl Client {
     /// # }
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    ///
+    /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [`start_shard`]: #method.start_shard
     /// [`start_shard_range`]: #method.start_shard_range
     /// [Gateway docs]: gateway/index.html#sharding
@@ -482,7 +508,7 @@ impl Client {
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
-    /// let mut client = Client::login(&token);
+    /// let mut client = Client::new(&token);
     ///
     /// let _ = client.start_shard_range([4, 7], 10);
     /// ```
@@ -494,7 +520,7 @@ impl Client {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
     ///
     /// if let Err(why) = client.start_shard_range([4, 7], 10) {
     ///     println!("Err with client: {:?}", why);
@@ -507,6 +533,13 @@ impl Client {
     /// # }
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    ///
+    ///
+    /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [`start_shard`]: #method.start_shard
     /// [`start_shards`]: #method.start_shards
     /// [Gateway docs]: gateway/index.html#sharding
@@ -524,7 +557,7 @@ impl Client {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// use serenity::model::Channel;
     ///
     /// client.on_channel_create(|ctx, channel| {
@@ -554,7 +587,7 @@ impl Client {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// use serenity::model::{Channel, ChannelId};
     ///
     /// client.on_channel_delete(|ctx, channel| {
@@ -693,7 +726,7 @@ impl Client {
     /// ```rust,ignore
     /// use serenity::Client;
     ///
-    /// let mut client = Client::login("bot token here");
+    /// let mut client = Client::new("bot token here");
     ///
     /// client.on_message(|_context, message| {
     ///     println!("{}", message.content);
@@ -808,7 +841,7 @@ impl Client {
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
-    /// let mut client = Client::login(&token);
+    /// let mut client = Client::new(&token);
     ///
     /// client.on_ready(|_context, ready| {
     ///     println!("{} is connected", ready.user.name);
@@ -910,7 +943,15 @@ impl Client {
     // 2: total number of shards the bot is sharding for
     //
     // Not all shards need to be initialized in this process.
-    fn start_connection(&mut self, shard_data: Option<[u64; 3]>, url: String) -> Result<()> {
+    //
+    // # Errors
+    //
+    // Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    // an error.
+    //
+    // [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
+    fn start_connection(&mut self, shard_data: Option<[u64; 3]>, url: String)
+        -> Result<()> {
         // Update the framework's current user if the feature is enabled.
         //
         // This also acts as a form of check to ensure the token is correct.
@@ -928,6 +969,8 @@ impl Client {
         let shards_index = shard_data.map_or(0, |x| x[0]);
         let shards_total = shard_data.map_or(1, |x| x[1] + 1);
 
+        let mut threads = vec![];
+
         for shard_number in shards_index..shards_total {
             let shard_info = shard_data.map(|s| [shard_number, s[2]]);
 
@@ -938,7 +981,7 @@ impl Client {
             });
 
             match boot {
-                Ok((shard, ready, receiver)) => {
+                Ok((shard, ready)) => {
                     #[cfg(feature="cache")]
                     {
                         CACHE.write()
@@ -967,7 +1010,6 @@ impl Client {
                             event_store: self.event_store.clone(),
                             framework: self.framework.clone(),
                             gateway_url: gateway_url.clone(),
-                            receiver: receiver,
                             shard: shard,
                             shard_info: shard_info,
                             token: self.token.clone(),
@@ -977,16 +1019,15 @@ impl Client {
                             data: self.data.clone(),
                             event_store: self.event_store.clone(),
                             gateway_url: gateway_url.clone(),
-                            receiver: receiver,
                             shard: shard,
                             shard_info: shard_info,
                             token: self.token.clone(),
                         }
                     }};
 
-                    thread::spawn(move || {
+                    threads.push(thread::spawn(move || {
                         monitor_shard(monitor_info);
-                    });
+                    }));
                 },
                 Err(why) => warn!("Error starting shard {:?}: {:?}", shard_info, why),
             }
@@ -997,9 +1038,11 @@ impl Client {
             thread::sleep(Duration::from_secs(5));
         }
 
-        loop {
-            thread::sleep(Duration::from_secs(1));
+        for thread in threads {
+            let _ = thread.join();
         }
+
+        Err(Error::Client(ClientError::Shutdown))
     }
 }
 
@@ -1208,7 +1251,6 @@ struct MonitorInfo {
     event_store: Arc<RwLock<EventStore>>,
     framework: Arc<Mutex<Framework>>,
     gateway_url: Arc<Mutex<String>>,
-    receiver: Receiver<WebSocketStream>,
     shard: Arc<Mutex<Shard>>,
     shard_info: Option<[u64; 2]>,
     token: String,
@@ -1219,13 +1261,12 @@ struct MonitorInfo {
     data: Arc<Mutex<ShareMap>>,
     event_store: Arc<RwLock<EventStore>>,
     gateway_url: Arc<Mutex<String>>,
-    receiver: Receiver<WebSocketStream>,
     shard: Arc<Mutex<Shard>>,
     shard_info: Option<[u64; 2]>,
     token: String,
 }
 
-fn boot_shard(info: &BootInfo) -> Result<(Shard, ReadyEvent, Receiver<WebSocketStream>)> {
+fn boot_shard(info: &BootInfo) -> Result<(Shard, ReadyEvent)> {
     // Make ten attempts to boot the shard, exponentially backing off; if it
     // still doesn't boot after that, accept it as a failure.
     //
@@ -1252,7 +1293,7 @@ fn boot_shard(info: &BootInfo) -> Result<(Shard, ReadyEvent, Receiver<WebSocketS
                                  info.shard_info);
 
         match attempt {
-            Ok((shard, ready, receiver)) => {
+            Ok((shard, ready)) => {
                 #[cfg(feature="cache")]
                 {
                     CACHE.write()
@@ -1262,7 +1303,7 @@ fn boot_shard(info: &BootInfo) -> Result<(Shard, ReadyEvent, Receiver<WebSocketS
 
                 info!("Successfully booted shard: {:?}", info.shard_info);
 
-                return Ok((shard, ready, receiver));
+                return Ok((shard, ready));
             },
             Err(why) => warn!("Failed to boot shard: {:?}", why),
         }
@@ -1286,14 +1327,13 @@ fn monitor_shard(mut info: MonitorInfo) {
             });
 
             match boot {
-                Ok((new_shard, ready, new_receiver)) => {
+                Ok((new_shard, ready)) => {
                     #[cfg(feature="cache")]
                     {
                         CACHE.write().unwrap().update_with_ready(&ready);
                     }
 
                     *info.shard.lock().unwrap() = new_shard;
-                    info.receiver = new_receiver;
 
                     boot_successful = true;
 
@@ -1329,16 +1369,28 @@ fn monitor_shard(mut info: MonitorInfo) {
 }
 
 fn handle_shard(info: &mut MonitorInfo) {
+    // This is currently all ducktape. Redo this.
+    let mut last_ack_time = UTC::now().timestamp();
+    let mut last_heartbeat_sent = UTC::now().timestamp();
+
     loop {
-        let event = match info.receiver.recv_json(GatewayEvent::decode) {
-            Err(Error::WebSocket(WebSocketError::NoDataAvailable)) => {
-                debug!("Attempting to shutdown receiver/sender");
+        let in_secs = {
+            let shard = info.shard.lock().unwrap();
 
-                match info.shard.lock().unwrap().resume(&mut info.receiver) {
-                    Ok((_, receiver)) => {
+            shard.heartbeat_interval() / 1000
+        };
+
+        if UTC::now().timestamp() - last_heartbeat_sent > in_secs {
+            let mut shard = info.shard.lock().unwrap();
+
+            // If the last heartbeat didn't receive an acknowledgement, then
+            // shutdown and auto-reconnect.
+            if !shard.last_heartbeat_acknowledged() {
+                debug!("Last heartbeat not acknowledged; re-connecting");
+
+                match shard.resume() {
+                    Ok(_) => {
                         debug!("Successfully resumed shard");
-
-                        info.receiver = receiver;
 
                         continue;
                     },
@@ -1348,28 +1400,63 @@ fn handle_shard(info: &mut MonitorInfo) {
                         return;
                     },
                 }
-            },
-            other => other,
-        };
+            }
 
-        trace!("Received event on shard handler: {:?}", event);
+            let _ = shard.heartbeat();
+            last_heartbeat_sent = UTC::now().timestamp();
+        }
 
-        // This will only lock when _updating_ the shard, resuming, etc. Most
-        // of the time, this won't be locked (i.e. when receiving an event over
-        // the receiver, separate from the shard itself).
-        let event = match info.shard.lock().unwrap().handle_event(event, &mut info.receiver) {
-            Ok(Some((event, Some(new_receiver)))) => {
-                info.receiver = new_receiver;
+        #[cfg(feature="voice")]
+        {
+            let mut shard = info.shard.lock().unwrap();
 
-                event
-            },
-            Ok(Some((event, None))) => event,
-            Ok(None) => continue,
-            Err(why) => {
-                error!("Shard handler received err: {:?}", why);
+            shard.cycle_voice_recv();
+        }
 
-                continue;
-            },
+        let event = {
+            let mut shard = info.shard.lock().unwrap();
+
+            let event = match shard.client.recv_json(GatewayEvent::decode) {
+                Ok(GatewayEvent::HeartbeatAck) => {
+                    last_ack_time = UTC::now().timestamp();
+
+                    Ok(GatewayEvent::HeartbeatAck)
+                },
+                Err(Error::WebSocket(WebSocketError::IoError(_))) => {
+                    if shard.last_heartbeat_acknowledged() || UTC::now().timestamp() - 90 < last_ack_time {
+                        continue;
+                    }
+
+                    debug!("Attempting to shutdown receiver/sender");
+
+                    match shard.resume() {
+                        Ok(_) => {
+                            debug!("Successfully resumed shard");
+
+                            continue;
+                        },
+                        Err(why) => {
+                            warn!("Err resuming shard: {:?}", why);
+
+                            return;
+                        },
+                    }
+                },
+                Err(Error::WebSocket(WebSocketError::NoDataAvailable)) => continue,
+                other => other,
+            };
+
+            trace!("Received event on shard handler: {:?}", event);
+
+            match shard.handle_event(event) {
+                Ok(Some(event)) => event,
+                Ok(None) => continue,
+                Err(why) => {
+                    error!("Shard handler received err: {:?}", why);
+
+                    continue;
+                },
+            }
         };
 
         feature_framework! {{
@@ -1387,7 +1474,7 @@ fn handle_shard(info: &mut MonitorInfo) {
     }
 }
 
-fn login(token: String) -> Client {
+fn init_client(token: String) -> Client {
     http::set_token(&token);
 
     feature_framework! {{

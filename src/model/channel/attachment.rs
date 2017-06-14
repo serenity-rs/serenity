@@ -1,6 +1,8 @@
 #[cfg(feature="model")]
 use hyper::Client as HyperClient;
+#[cfg(feature="model")]
 use std::io::Read;
+#[cfg(feature="model")]
 use ::internal::prelude::*;
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
@@ -51,7 +53,7 @@ impl Attachment {
     /// use std::path::Path;
     ///
     /// let token = env::var("DISCORD_TOKEN").expect("token in environment");
-    /// let mut client = Client::login(&token);
+    /// let mut client = Client::new(&token);
     ///
     /// client.on_message(|_, message| {
     ///     for attachment in message.attachments {

@@ -2,7 +2,7 @@
 //!
 //! This is a set of embed builders for rich embeds.
 //!
-//! These are used in the [`Context::send_message`] and
+//! These are used in the [`ChannelId::send_message`] and
 //! [`ExecuteWebhook::embeds`] methods, both as part of builders.
 //!
 //! The only builder that should be exposed is [`CreateEmbed`]. The rest of
@@ -10,14 +10,15 @@
 //!
 //! Documentation for embeds can be found [here].
 //!
-//! [`Context::send_message`]: ../client/struct.Context.html#method.send_message
+//! [`ChannelId::send_message`]: ../model/struct.ChannelId.html#method.send_message
 //! [`CreateEmbed`]: struct.CreateEmbed.html
 //! [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
 //! [here]: https://discordapp.com/developers/docs/resources/channel#embed-object
 
+use chrono::{DateTime, TimeZone};
 use serde_json::Value;
 use std::default::Default;
-use time::Tm;
+use std::fmt::Display;
 use ::internal::prelude::*;
 use ::model::Embed;
 
@@ -25,14 +26,14 @@ use ::model::Embed;
 use ::utils::Colour;
 
 /// A builder to create a fake [`Embed`] object, for use with the
-/// [`Context::send_message`] and [`ExecuteWebhook::embeds`] methods.
+/// [`ChannelId::send_message`] and [`ExecuteWebhook::embeds`] methods.
 ///
 /// # Examples
 ///
-/// Refer to the documentation for [`Context::send_message`] for a very in-depth
+/// Refer to the documentation for [`ChannelId::send_message`] for a very in-depth
 /// example on how to use this.
 ///
-/// [`Context::send_message`]: ../client/struct.Context.html#method.send_message
+/// [`ChannelId::send_message`]: ../model/struct.ChannelId.html#method.send_message
 /// [`Embed`]: ../model/struct.Embed.html
 /// [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
 #[derive(Clone, Debug)]
@@ -177,26 +178,75 @@ impl CreateEmbed {
 
     /// Set the timestamp.
     ///
-    /// **Note**: This timestamp must be in ISO-8601 format. It must also be
-    /// in UTC format.
-    ///
-    /// # Examples
-    ///
     /// You may pass a direct string:
     ///
     /// - `2017-01-03T23:00:00`
     /// - `2004-06-08T16:04:23`
     /// - `2004-06-08T16:04:23`
     ///
-    /// Or a `time::Tm`:
+    /// This timestamp must be in ISO-8601 format. It must also be in UTC format.
     ///
-    /// ```rust,ignore
-    /// extern crate time;
+    /// You can also pass anything that implements `chrono::TimeZone`.
     ///
-    /// let now = time::now();
+    /// # Examples
     ///
-    /// embed = embed.timestamp(now);
-    /// // ...
+    /// Passing a string timestamp:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::new("");
+    /// #
+    /// client.on_message(|_, msg| {
+    ///     if msg.content == "~embed" {
+    ///         let _ = msg.channel_id.send_message(|m| m
+    ///             .embed(|e| e
+    ///                 .title("hello")
+    ///                 .timestamp("2004-06-08T16:04:23")));
+    ///     }
+    /// });
+    /// ```
+    ///
+    /// Creating a join-log:
+    ///
+    /// Note: this example isn't efficient and is for demonstrative purposes.
+    ///
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::new("");
+    /// #
+    /// use serenity::CACHE;
+    ///
+    /// client.on_guild_member_add(|_, guild_id, member| {
+    ///     let cache = CACHE.read().unwrap();
+    ///
+    ///     if let Some(guild) = cache.guild(guild_id) {
+    ///         let guild = guild.read().unwrap();
+    ///
+    ///         let channel_search = guild
+    ///             .channels
+    ///             .values()
+    ///             .find(|c| c.read().unwrap().name == "join-log");
+    ///
+    ///         if let Some(channel) = channel_search {
+    ///             let user = member.user.read().unwrap();
+    ///
+    ///             let _ = channel.read().unwrap().send_message(|m| m
+    ///                 .embed(|e| {
+    ///                     let mut e = e
+    ///                         .author(|a| a.icon_url(&user.face()).name(&user.name))
+    ///                         .title("Member Join");
+    ///
+    ///                     if let Some(ref joined_at) = member.joined_at {
+    ///                         e = e.timestamp(joined_at);
+    ///                     }
+    ///
+    ///                     e
+    ///                 }));
+    ///         }
+    ///     }
+    /// });
     /// ```
     pub fn timestamp<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
         self.0.insert("timestamp".to_owned(), Value::String(timestamp.into().ts));
@@ -406,10 +456,18 @@ impl From<String> for Timestamp {
     }
 }
 
-impl From<Tm> for Timestamp {
-    fn from(tm: Tm) -> Self {
+impl<'a> From<&'a str> for Timestamp {
+    fn from(ts: &'a str) -> Self {
         Timestamp {
-            ts: tm.to_utc().rfc3339().to_string(),
+            ts: ts.to_owned(),
+        }
+    }
+}
+
+impl<'a, Tz: TimeZone> From<&'a DateTime<Tz>> for Timestamp where Tz::Offset: Display {
+    fn from(dt: &'a DateTime<Tz>) -> Self {
+        Timestamp {
+            ts: dt.to_rfc3339(),
         }
     }
 }

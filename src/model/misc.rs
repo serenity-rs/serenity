@@ -1,8 +1,10 @@
-use std::result::Result as StdResult;
-use std::str::FromStr;
 use super::*;
 
-#[cfg(feature="utils")]
+#[cfg(all(feature="model", feature="utils"))]
+use std::result::Result as StdResult;
+#[cfg(all(feature="model", feature="utils"))]
+use std::str::FromStr;
+#[cfg(any(all(feature="cache", feature="utils"), all(feature="model", feature="utils")))]
 use ::utils;
 
 /// Allows something - such as a channel or role - to be mentioned in a message.

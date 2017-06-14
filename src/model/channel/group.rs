@@ -1,14 +1,16 @@
-use std::borrow::Cow;
-use std::fmt::Write as FmtWrite;
-use std::io::Read;
+use chrono::{DateTime, FixedOffset};
 use ::model::*;
 
 #[cfg(feature="model")]
+use std::borrow::Cow;
+#[cfg(feature="model")]
+use std::fmt::Write as FmtWrite;
+#[cfg(feature="model")]
+use std::io::Read;
+#[cfg(feature="model")]
 use ::builder::{CreateMessage, GetMessages};
 #[cfg(feature="model")]
-use ::http;
-#[cfg(feature="model")]
-use ::http::AttachmentType;
+use ::http::{self, AttachmentType};
 
 /// A group channel - potentially including other [`User`]s - separate from a
 /// [`Guild`].
@@ -25,7 +27,7 @@ pub struct Group {
     /// The Id of the last message sent.
     pub last_message_id: Option<MessageId>,
     /// Timestamp of the latest pinned message.
-    pub last_pin_timestamp: Option<String>,
+    pub last_pin_timestamp: Option<DateTime<FixedOffset>>,
     /// The name of the group channel.
     pub name: Option<String>,
     /// The Id of the group owner.
@@ -309,7 +311,7 @@ impl Group {
 
     /// Sends (a) file(s) along with optional message contents.
     ///
-    /// Refer to [`ChannelId::send_file`] for examples and more information.
+    /// Refer to [`ChannelId::send_files`] for examples and more information.
     ///
     /// The [Attach Files] and [Send Messages] permissions are required.
     ///
@@ -321,13 +323,13 @@ impl Group {
     /// [`ClientError::MessageTooLong`] will be returned, containing the number
     /// of unicode code points over the limit.
     ///
-    /// [`ChannelId::send_file`]: struct.ChannelId.html#method.send_file
+    /// [`ChannelId::send_files`]: struct.ChannelId.html#method.send_files
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
-    pub fn send_files<F, T: Into<AttachmentType>>(&self, files: Vec<T>, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
+    pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         self.channel_id.send_files(files, f)
     }
 

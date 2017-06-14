@@ -1,13 +1,16 @@
 //! All the events this library handles.
 
+use chrono::{DateTime, FixedOffset};
 use serde::de::Error as DeError;
 use serde_json::{self, Error as JsonError};
 use std::collections::HashMap;
 use super::utils::deserialize_emojis;
 use super::*;
-use ::constants::{OpCode, VoiceOpCode};
+use ::constants::VoiceOpCode;
 use ::internal::prelude::*;
 
+#[cfg(feature="gateway")]
+use ::constants::OpCode;
 #[cfg(feature="gateway")]
 use ::gateway::GatewayError;
 
@@ -53,7 +56,7 @@ impl<'de> Deserialize<'de> for ChannelDeleteEvent {
 #[derive(Clone, Debug, Deserialize)]
 pub struct ChannelPinsUpdateEvent {
     pub channel_id: ChannelId,
-    pub last_pin_timestamp: Option<String>,
+    pub last_pin_timestamp: Option<DateTime<FixedOffset>>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -276,8 +279,8 @@ pub struct MessageUpdateEvent {
     pub nonce: Option<String>,
     pub tts: Option<bool>,
     pub pinned: Option<bool>,
-    pub timestamp: Option<String>,
-    pub edited_timestamp: Option<String>,
+    pub timestamp: Option<DateTime<FixedOffset>>,
+    pub edited_timestamp: Option<DateTime<FixedOffset>>,
     pub author: Option<User>,
     pub mention_everyone: Option<bool>,
     pub mentions: Option<Vec<User>>,
@@ -617,6 +620,7 @@ pub enum Event {
 
 impl Event {
     #[allow(cyclomatic_complexity)]
+    #[cfg(feature="gateway")]
     fn decode(kind: String, value: Value) -> Result<Event> {
         Ok(match &kind[..] {
             "CHANNEL_CREATE" => Event::ChannelCreate(ChannelCreateEvent::deserialize(value)?),

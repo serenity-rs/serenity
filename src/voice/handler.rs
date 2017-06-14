@@ -1,9 +1,9 @@
+use serde_json::Value;
 use std::sync::mpsc::{self, Sender as MpscSender};
 use super::{AudioReceiver, AudioSource};
 use super::connection_info::ConnectionInfo;
 use super::Status as VoiceStatus;
 use ::constants::VoiceOpCode;
-use ::gateway::GatewayStatus;
 use ::model::{ChannelId, GuildId, UserId, VoiceState};
 use super::threading;
 
@@ -99,7 +99,7 @@ pub struct Handler {
     ///
     /// When set via [`standalone`][`Handler::standalone`], it will not be
     /// present.
-    ws: Option<MpscSender<GatewayStatus>>,
+    ws: Option<MpscSender<Value>>,
 }
 
 impl Handler {
@@ -113,7 +113,7 @@ impl Handler {
     /// [`Manager::join`]: struct.Manager.html#method.join
     #[doc(hidden)]
     #[inline]
-    pub fn new(guild_id: GuildId, ws: MpscSender<GatewayStatus>, user_id: UserId) -> Self {
+    pub fn new(guild_id: GuildId, ws: MpscSender<Value>, user_id: UserId) -> Self {
         Self::new_raw(guild_id, Some(ws), user_id)
     }
 
@@ -357,7 +357,7 @@ impl Handler {
         }
     }
 
-    fn new_raw(guild_id: GuildId, ws: Option<MpscSender<GatewayStatus>>, user_id: UserId) -> Self {
+    fn new_raw(guild_id: GuildId, ws: Option<MpscSender<Value>>, user_id: UserId) -> Self {
         let (tx, rx) = mpsc::channel();
 
         threading::start(guild_id, rx);
@@ -418,7 +418,7 @@ impl Handler {
                 }
             });
 
-            let _ = ws.send(GatewayStatus::SendMessage(map));
+            let _ = ws.send(map);
         }
     }
 }

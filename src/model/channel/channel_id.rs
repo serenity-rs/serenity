@@ -1,15 +1,16 @@
-use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
-use std::io::Read;
+use std::fmt::{Display, Formatter, Result as FmtResult};
 use ::model::*;
 
+#[cfg(feature="model")]
+use std::fmt::Write as FmtWrite;
+#[cfg(feature="model")]
+use std::io::Read;
 #[cfg(feature="model")]
 use ::builder::{CreateMessage, EditChannel, GetMessages};
 #[cfg(feature="cache")]
 use ::CACHE;
 #[cfg(feature="model")]
-use ::http;
-#[cfg(feature="model")]
-use ::http::AttachmentType;
+use ::http::{self, AttachmentType};
 
 #[cfg(feature="model")]
 impl ChannelId {
@@ -435,12 +436,12 @@ impl ChannelId {
     /// use serenity::model::ChannelId;
     ///
     /// let channel_id = ChannelId(7);
-    /// 
+    ///
     /// let paths = vec!["/path/to/file.jpg", "path/to/file2.jpg"];
     ///
     /// let _ = channel_id.send_files(paths, |m| m.content("a file"));
     /// ```
-    /// 
+    ///
     /// Send files using `File`:
     ///
     /// ```rust,no_run
@@ -452,7 +453,7 @@ impl ChannelId {
     /// let f1 = File::open("my_file.jpg").unwrap();
     /// let f2 = File::open("my_file2.jpg").unwrap();
     ///
-    /// let files = vec![(f1, "my_file.jpg"), (f2, "my_file2.jpg")];
+    /// let files = vec![(&f1, "my_file.jpg"), (&f2, "my_file2.jpg")];
     ///
     /// let _ = channel_id.send_files(files, |m| m.content("a file"));
     /// ```
@@ -473,8 +474,8 @@ impl ChannelId {
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    pub fn send_files<F, T: Into<AttachmentType>>(&self, files: Vec<T>, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
+    pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         let mut map = f(CreateMessage::default()).0;
 
         if let Some(content) = map.get("content") {

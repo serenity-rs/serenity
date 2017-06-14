@@ -1,8 +1,10 @@
+use chrono::{DateTime, FixedOffset};
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::io::Read;
 use super::deserialize_single_recipient;
 use ::model::*;
 
+#[cfg(feature="model")]
+use std::io::Read;
 #[cfg(feature="model")]
 use ::builder::{CreateMessage, GetMessages};
 #[cfg(feature="model")]
@@ -20,7 +22,7 @@ pub struct PrivateChannel {
     /// Timestamp of the last time a [`Message`] was pinned.
     ///
     /// [`Message`]: struct.Message.html
-    pub last_pin_timestamp: Option<String>,
+    pub last_pin_timestamp: Option<DateTime<FixedOffset>>,
     /// Indicator of the type of channel this is.
     ///
     /// This should always be [`ChannelType::Private`].
@@ -255,7 +257,7 @@ impl PrivateChannel {
 
     /// Sends (a) file(s) along with optional message contents.
     ///
-    /// Refer to [`ChannelId::send_file`] for examples and more information.
+    /// Refer to [`ChannelId::send_files`] for examples and more information.
     ///
     /// The [Attach Files] and [Send Messages] permissions are required.
     ///
@@ -267,13 +269,13 @@ impl PrivateChannel {
     /// [`ClientError::MessageTooLong`] will be returned, containing the number
     /// of unicode code points over the limit.
     ///
-    /// [`ChannelId::send_file`]: struct.ChannelId.html#method.send_file
+    /// [`ChannelId::send_files`]: struct.ChannelId.html#method.send_files
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
-    pub fn send_files<F, T: Into<AttachmentType>>(&self, files: Vec<T>, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
+    pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         self.id.send_files(files, f)
     }
 

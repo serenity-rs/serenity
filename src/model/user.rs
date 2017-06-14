@@ -1,19 +1,24 @@
 use serde_json;
-use std::{fmt, mem};
+use std::fmt;
 use super::utils::deserialize_u16;
 use super::*;
-use time::Timespec;
 use ::internal::prelude::*;
 use ::model::misc::Mentionable;
 
+#[cfg(feature="model")]
+use chrono::NaiveDateTime;
+#[cfg(feature="model")]
+use std::fmt::Write;
+#[cfg(feature="model")]
+use std::mem;
 #[cfg(feature="cache")]
 use std::sync::{Arc, RwLock};
+#[cfg(feature="model")]
+use ::builder::{CreateMessage, EditProfile};
 #[cfg(feature="cache")]
 use ::CACHE;
 #[cfg(feature="model")]
 use ::http::{self, GuildPagination};
-#[cfg(feature="model")]
-use ::builder::EditProfile;
 
 /// Information about the current user.
 #[derive(Clone, Debug, Deserialize)]
@@ -54,36 +59,25 @@ impl CurrentUser {
     ///     None => println!("{} does not have an avatar set.", user.name)
     /// }
     /// ```
+    #[inline]
     pub fn avatar_url(&self) -> Option<String> {
-        self.avatar.as_ref()
-            .map(|av| {
-                let ext = if av.starts_with("a_") {
-                    "gif"
-                } else {
-                    "webp"
-                };
-
-                format!(cdn!("/avatars/{}/{}.{}?size=1024"), self.id.0, av, ext)
-            })
+       avatar_url(self.id, self.avatar.as_ref())
     }
 
-    /// Returns the DiscordTag of a User.
+    /// Returns the formatted URL to the user's default avatar URL.
     ///
-    /// # Examples
+    /// This will produce a PNG URL.
+    pub fn default_avatar_url(&self) -> String {
+        default_avatar_url(self.discriminator)
+    }
+
+    /// Alias of [`tag`].
     ///
-    /// Print out the current user's distinct identifier (i.e., Username#1234):
-    ///
-    /// ```rust,no_run
-    /// # use serenity::client::CACHE;
-    /// #
-    /// # let cache = CACHE.read().unwrap();
-    /// #
-    /// // assuming the cache has been unlocked
-    /// println!("Current user's distinct identifier is {}", cache.user.distinct());
-    /// ```
+    /// [`tag`]: #method.tag
+    #[deprecated(since="0.2.0", note="Use `tag` instead.")]
     #[inline]
     pub fn distinct(&self) -> String {
-        format!("{}#{}", self.name, self.discriminator)
+        self.tag()
     }
 
     /// Edits the current user's profile settings.
@@ -122,6 +116,18 @@ impl CurrentUser {
         }
     }
 
+    /// Retrieves the URL to the current user's avatar, falling back to the
+    /// default avatar if needed.
+    ///
+    /// This will call [`avatar_url`] first, and if that returns `None`, it
+    /// then falls back to [`default_avatar_url`].
+    ///
+    /// [`avatar_url`]: #method.avatar_url
+    /// [`default_avatar_url`]: #method.default_avatar_url
+    pub fn face(&self) -> String {
+        self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
+    }
+
     /// Gets a list of guilds that the current user is in.
     ///
     /// # Examples
@@ -144,32 +150,6 @@ impl CurrentUser {
     /// ```
     pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
         http::get_guilds(&GuildPagination::After(GuildId(1)), 100)
-    }
-
-    /// Returns a static formatted URL of the user's icon, if one exists.
-    ///
-    /// This will always produce a WEBP image URL.
-    ///
-    /// # Examples
-    ///
-    /// Print out the current user's static avatar url if one is set:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::client::CACHE;
-    /// #
-    /// # let cache = CACHE.read().unwrap();
-    /// #
-    /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
-    ///
-    /// match user.static_avatar_url() {
-    ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
-    ///     None => println!("Could not get static avatar for {}.", user.name)
-    /// }
-    /// ```
-    pub fn static_avatar_url(&self) -> Option<String> {
-        self.avatar.as_ref()
-            .map(|av| format!(cdn!("/avatars/{}/{}.webp?size=1024"), self.id.0, av))
     }
 
     /// Returns the invite url for the bot with the given permissions.
@@ -217,6 +197,51 @@ impl CurrentUser {
         } else {
             format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot&permissions={}", self.id, bits)
         }
+    }
+
+    /// Returns a static formatted URL of the user's icon, if one exists.
+    ///
+    /// This will always produce a WEBP image URL.
+    ///
+    /// # Examples
+    ///
+    /// Print out the current user's static avatar url if one is set:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::CACHE;
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
+    /// // assuming the cache has been unlocked
+    /// let user = &cache.user;
+    ///
+    /// match user.static_avatar_url() {
+    ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
+    ///     None => println!("Could not get static avatar for {}.", user.name)
+    /// }
+    /// ```
+    #[inline]
+    pub fn static_avatar_url(&self) -> Option<String> {
+        static_avatar_url(self.id, self.avatar.as_ref())
+    }
+
+    /// Returns the tag of the current user.
+    ///
+    /// # Examples
+    ///
+    /// Print out the current user's distinct identifier (e.g., Username#1234):
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::CACHE;
+    /// #
+    /// # let cache = CACHE.read().unwrap();
+    /// #
+    /// // assuming the cache has been unlocked
+    /// println!("The current user's distinct identifier is {}", cache.user.tag());
+    /// ```
+    #[inline]
+    pub fn tag(&self) -> String {
+        tag(&self.name, self.discriminator)
     }
 }
 
@@ -336,17 +361,9 @@ impl User {
     /// Returns the formatted URL of the user's icon, if one exists.
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
+    #[inline]
     pub fn avatar_url(&self) -> Option<String> {
-        self.avatar.as_ref()
-            .map(|av| {
-                let ext = if av.starts_with("a_") {
-                    "gif"
-                } else {
-                    "webp"
-                };
-
-                format!(cdn!("/avatars/{}/{}.{}?size=1024"), self.id.0, av, ext)
-            })
+        avatar_url(self.id, self.avatar.as_ref())
     }
 
     /// Creates a direct message channel between the [current user] and the
@@ -358,23 +375,18 @@ impl User {
         self.id.create_dm_channel()
     }
 
-    /// Returns the DiscordTag of a User.
-    #[inline]
-    pub fn distinct(&self) -> String {
-        format!("{}#{}", self.name, self.discriminator)
-    }
-
     /// Retrieves the time that this user was created at.
     #[inline]
-    pub fn created_at(&self) -> Timespec {
+    pub fn created_at(&self) -> NaiveDateTime {
         self.id.created_at()
     }
 
     /// Returns the formatted URL to the user's default avatar URL.
     ///
     /// This will produce a PNG URL.
+    #[inline]
     pub fn default_avatar_url(&self) -> String {
-        cdn!("/embed/avatars/{}.png", self.discriminator % 5u16).to_owned()
+        default_avatar_url(self.discriminator)
     }
 
     /// Sends a message to a user through a direct message channel. This is a
@@ -382,12 +394,34 @@ impl User {
     ///
     /// # Examples
     ///
-    /// Sending a message:
+    /// When a user sends a message with a content of `"~help"`, DM the author a
+    /// help message, and then react with `'👌'` to verify message sending:
     ///
-    /// ```rust,ignore
-    /// // assuming you are in a context
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::new("");
+    /// #
+    /// use serenity::model::Permissions;
+    /// use serenity::CACHE;
     ///
-    /// let _ = message.author.direct_message("Hello!");
+    /// client.on_message(|_, msg| {
+    ///     if msg.content == "~help" {
+    ///         let url = CACHE.read().unwrap().user.invite_url(Permissions::empty());
+    ///         let help = format!("Helpful info here. Invite me with this link: <{}>", url);
+    ///
+    ///         match msg.author.direct_message(|m| m.content(&help)) {
+    ///             Ok(_) => {
+    ///                 let _ = msg.react('👌');
+    ///             },
+    ///             Err(why) => {
+    ///                 println!("Err sending help: {:?}", why);
+    ///
+    ///                 let _ = msg.reply("There was an error DMing you help.");
+    ///             },
+    ///         };
+    ///     }
+    /// });
     /// ```
     ///
     /// [`PrivateChannel`]: struct.PrivateChannel.html
@@ -407,8 +441,9 @@ impl User {
     //
     // (AKA: Clippy is wrong and so we have to mark as allowing this lint.)
     #[allow(let_and_return)]
-    pub fn direct_message(&self, content: &str)
-        -> Result<Message> {
+    #[cfg(feature="builder")]
+    pub fn direct_message<F>(&self, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage {
         let private_channel_id = feature_cache! {{
             let finding = {
                 let cache = CACHE.read().unwrap();
@@ -439,12 +474,16 @@ impl User {
             http::create_private_channel(&map)?.id
         }};
 
-        let map = json!({
-            "content": content,
-            "tts": false,
-        });
+        private_channel_id.send_message(f)
+    }
 
-        http::send_message(private_channel_id.0, &map)
+    /// Alias of [`tag`].
+    ///
+    /// [`tag`]: #method.tag
+    #[deprecated(since="0.2.0", note="Use `tag` instead.")]
+    #[inline]
+    pub fn distinct(&self) -> String {
+        self.tag()
     }
 
     /// This is an alias of [direct_message].
@@ -460,9 +499,22 @@ impl User {
     /// ```
     ///
     /// [direct_message]: #method.direct_message
+    #[cfg(feature="builder")]
     #[inline]
-    pub fn dm(&self, content: &str) -> Result<Message> {
-        self.direct_message(content)
+    pub fn dm<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+        self.direct_message(f)
+    }
+
+    /// Retrieves the URL to the user's avatar, falling back to the default
+    /// avatar if needed.
+    ///
+    /// This will call [`avatar_url`] first, and if that returns `None`, it
+    /// then falls back to [`default_avatar_url`].
+    ///
+    /// [`avatar_url`]: #method.avatar_url
+    /// [`default_avatar_url`]: #method.default_avatar_url
+    pub fn face(&self) -> String {
+        self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
     }
 
     /// Gets a user by its Id over the REST API.
@@ -476,6 +528,7 @@ impl User {
     /// user.
     ///
     /// [`ModelError::InvalidOperationAsUser`]: enum.ModelError.html#variant.InvalidOperationAsUser
+    #[deprecated(since="0.2.0", note="Don't use this, since it doesn't fit serenity's design.")]
     #[inline]
     pub fn get<U: Into<UserId>>(user_id: U) -> Result<User> {
         user_id.into().get()
@@ -525,12 +578,101 @@ impl User {
         }
     }
 
+    /// Refreshes the information about the user.
+    ///
+    /// Replaces the instance with the data retrieved over the REST API.
+    ///
+    /// # Examples
+    ///
+    /// If maintaing a very long-running bot, you may want to periodically
+    /// refresh information about certain users if the state becomes
+    /// out-of-sync:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::new("");
+    /// #
+    /// use serenity::model::UserId;
+    /// use serenity::CACHE;
+    /// use std::thread;
+    /// use std::time::Duration;
+    ///
+    /// let special_users = vec![UserId(114941315417899012), UserId(87600987040120832)];
+    ///
+    /// client.on_message(|_ctx, _msg| {
+    ///     // normal message handling here
+    /// });
+    ///
+    /// // start a new thread to periodically refresh the special users' data
+    /// // every 12 hours
+    /// let handle = thread::spawn(move || {
+    ///     // 12 hours in seconds
+    ///     let duration = Duration::from_secs(43200);
+    ///
+    ///     loop {
+    ///         thread::sleep(duration);
+    ///
+    ///         let cache = CACHE.read().unwrap();
+    ///
+    ///         for id in &special_users {
+    ///             if let Some(user) = cache.user(*id) {
+    ///                 if let Err(why) = user.write().unwrap().refresh() {
+    ///                     println!("Error refreshing {}: {:?}", id, why);
+    ///                 }
+    ///             }
+    ///         }
+    ///     }
+    /// });
+    ///
+    /// println!("{:?}", client.start());
+    /// ```
+    pub fn refresh(&mut self) -> Result<()> {
+        self.id.get().map(|replacement| {
+            mem::replace(self, replacement);
+
+            ()
+        })
+    }
+
+
     /// Returns a static formatted URL of the user's icon, if one exists.
     ///
     /// This will always produce a WEBP image URL.
+    #[inline]
     pub fn static_avatar_url(&self) -> Option<String> {
-        self.avatar.as_ref()
-            .map(|av| format!(cdn!("/avatars/{}/{}.webp?size=1024"), self.id.0, av))
+        static_avatar_url(self.id, self.avatar.as_ref())
+    }
+
+    /// Returns the "tag" for the user.
+    ///
+    /// The "tag" is defined as "username#discriminator", such as "zeyla#5479".
+    ///
+    /// # Examples
+    ///
+    /// Make a command to tell the user what their tag is:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::new("");
+    /// #
+    /// use serenity::utils::MessageBuilder;
+    /// use serenity::utils::ContentModifier::Bold;
+    ///
+    /// client.on_message(|_, msg| {
+    ///     if msg.content == "!mytag" {
+    ///         let content = MessageBuilder::new()
+    ///             .push("Your tag is ")
+    ///             .push(Bold + msg.author.tag())
+    ///             .build();
+    ///
+    ///         let _ = msg.channel_id.say(&content);
+    ///     }
+    /// });
+    /// ```
+    pub fn tag(&self) -> String {
+        tag(&self.name, self.discriminator)
     }
 }
 
@@ -617,4 +759,40 @@ impl fmt::Display for UserId {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&self.0, f)
     }
+}
+
+#[cfg(feature="model")]
+fn avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
+    hash.map(|hash| {
+        let ext = if hash.starts_with("a_") {
+            "gif"
+        } else {
+            "webp"
+        };
+
+        cdn!("/avatars/{}/{}.{}?size=1024", user_id.0, hash, ext)
+    })
+}
+
+#[cfg(feature="model")]
+fn default_avatar_url(discriminator: u16) -> String {
+    cdn!("/embed/avatars/{}.png", discriminator % 5u16)
+}
+
+#[cfg(feature="model")]
+fn static_avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
+    hash.map(|hash| cdn!("/avatars/{}/{}.webp?size=1024", user_id, hash))
+}
+
+#[cfg(feature="model")]
+fn tag(name: &str, discriminator: u16) -> String {
+    // 32: max length of username
+    // 1: `#`
+    // 4: max length of discriminator
+    let mut tag = String::with_capacity(37);
+    tag.push_str(name);
+    tag.push('#');
+    let _ = write!(tag, "{}", discriminator);
+
+    tag
 }

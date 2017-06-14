@@ -1,14 +1,16 @@
 use std::sync::{Arc, Mutex};
 use typemap::ShareMap;
 use ::gateway::Shard;
-use ::http;
-use ::internal::prelude::*;
 use ::model::*;
 
 #[cfg(feature="cache")]
 use super::CACHE;
 #[cfg(feature="builder")]
+use ::internal::prelude::*;
+#[cfg(feature="builder")]
 use ::builder::EditProfile;
+#[cfg(feature="builder")]
+use ::http;
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
@@ -77,7 +79,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// # client.on_message(|ctx, msg| {
     /// #     if msg.content == "!changename" {
@@ -122,7 +124,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// client.on_message(|ctx, msg| {
     ///     if msg.content == "!online" {
     ///         ctx.online();
@@ -132,7 +134,8 @@ impl Context {
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     pub fn online(&self) {
-        self.shard.lock().unwrap().set_status(OnlineStatus::Online);
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_status(OnlineStatus::Online);
     }
 
     /// Sets the current user as being [`Idle`]. This maintains the current
@@ -145,7 +148,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// client.on_message(|ctx, msg| {
     ///     if msg.content == "!idle" {
     ///         ctx.idle();
@@ -155,7 +158,8 @@ impl Context {
     ///
     /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
     pub fn idle(&self) {
-        self.shard.lock().unwrap().set_status(OnlineStatus::Idle);
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_status(OnlineStatus::Idle);
     }
 
     /// Sets the current user as being [`DoNotDisturb`]. This maintains the
@@ -168,7 +172,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// client.on_message(|ctx, msg| {
     ///     if msg.content == "!dnd" {
     ///         ctx.dnd();
@@ -178,7 +182,8 @@ impl Context {
     ///
     /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
     pub fn dnd(&self) {
-        self.shard.lock().unwrap().set_status(OnlineStatus::DoNotDisturb);
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_status(OnlineStatus::DoNotDisturb);
     }
 
     /// Sets the current user as being [`Invisible`]. This maintains the current
@@ -192,7 +197,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// client.on_ready(|ctx, _| {
     ///     ctx.invisible();
     /// });
@@ -201,7 +206,8 @@ impl Context {
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`Invisible`]: ../model/enum.OnlineStatus.html#variant.Invisible
     pub fn invisible(&self) {
-        self.shard.lock().unwrap().set_status(OnlineStatus::Invisible);
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_status(OnlineStatus::Invisible);
     }
 
     /// "Resets" the current user's presence, by setting the game to `None` and
@@ -216,7 +222,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// client.on_resume(|ctx, _| {
     ///     ctx.reset_presence();
     /// });
@@ -226,9 +232,8 @@ impl Context {
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     /// [`set_presence`]: #method.set_presence
     pub fn reset_presence(&self) {
-        self.shard.lock()
-            .unwrap()
-            .set_presence(None, OnlineStatus::Online, false)
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_presence(None, OnlineStatus::Online, false)
     }
 
     /// Sets the current game, defaulting to an online status of [`Online`].
@@ -241,7 +246,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// use serenity::model::Game;
     ///
@@ -258,9 +263,8 @@ impl Context {
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     pub fn set_game(&self, game: Game) {
-        self.shard.lock()
-            .unwrap()
-            .set_presence(Some(game), OnlineStatus::Online, false);
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_presence(Some(game), OnlineStatus::Online, false);
     }
 
     /// Sets the current game, passing in only its name. This will automatically
@@ -279,7 +283,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// client.on_ready(|ctx, _| {
     ///     ctx.set_game_name("test");
@@ -300,9 +304,8 @@ impl Context {
             url: None,
         };
 
-        self.shard.lock()
-            .unwrap()
-            .set_presence(Some(game), OnlineStatus::Online, false);
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_presence(Some(game), OnlineStatus::Online, false);
     }
 
     /// Sets the current user's presence, providing all fields to be passed.
@@ -314,7 +317,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// # client.on_ready(|ctx, _| {
     /// #
@@ -330,7 +333,7 @@ impl Context {
     /// ```rust,ignore
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("");
+    /// # let mut client = Client::new("");
     /// #
     /// # client.on_ready(|ctx, _| {
     /// #
@@ -349,8 +352,7 @@ impl Context {
                         game: Option<Game>,
                         status: OnlineStatus,
                         afk: bool) {
-        self.shard.lock()
-            .unwrap()
-            .set_presence(game, status, afk)
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_presence(game, status, afk)
     }
 }

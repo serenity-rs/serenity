@@ -1,7 +1,7 @@
+use serde_json::Value;
 use std::collections::HashMap;
 use std::sync::mpsc::Sender as MpscSender;
 use super::Handler;
-use ::gateway::GatewayStatus;
 use ::model::{ChannelId, GuildId, UserId};
 
 /// A manager is a struct responsible for managing [`Handler`]s which belong to
@@ -24,12 +24,12 @@ use ::model::{ChannelId, GuildId, UserId};
 pub struct Manager {
     handlers: HashMap<GuildId, Handler>,
     user_id: UserId,
-    ws: MpscSender<GatewayStatus>,
+    ws: MpscSender<Value>,
 }
 
 impl Manager {
     #[doc(hidden)]
-    pub fn new(ws: MpscSender<GatewayStatus>, user_id: UserId) -> Manager {
+    pub fn new(ws: MpscSender<Value>, user_id: UserId) -> Manager {
         Manager {
             handlers: HashMap::new(),
             user_id: user_id,

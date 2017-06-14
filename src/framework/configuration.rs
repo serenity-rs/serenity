@@ -19,7 +19,7 @@ use ::model::{GuildId, UserId};
 /// use serenity::Client;
 /// use std::env;
 ///
-/// let mut client = Client::login(&env::var("DISCORD_BOT_TOKEN").unwrap());
+/// let mut client = Client::new(&env::var("DISCORD_BOT_TOKEN").unwrap());
 ///
 /// client.with_framework(|f| f
 ///     .configure(|c| c.on_mention(true).prefix("~")));
@@ -100,7 +100,7 @@ impl Configuration {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// use serenity::model::GuildId;
     ///
     /// client.with_framework(|f| f.configure(|c| c
@@ -121,7 +121,7 @@ impl Configuration {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// use serenity::model::UserId;
     ///
     /// client.with_framework(|f| f.configure(|c| c
@@ -155,7 +155,7 @@ impl Configuration {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     ///
     /// let disabled = vec!["ping"].into_iter().map(|x| x.to_owned()).collect();
     ///
@@ -182,7 +182,7 @@ impl Configuration {
     /// ```rust,no_run
     /// # use serenity::Client;
     /// #
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// client.with_framework(|f| f
     ///     .command("ping", |c| c.exec_str("Pong!"))
     ///     .configure(|c| c.dynamic_prefix(|ctx| {
@@ -261,7 +261,7 @@ impl Configuration {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// use serenity::model::UserId;
     ///
     /// client.with_framework(|f| f.configure(|c| c
@@ -272,7 +272,7 @@ impl Configuration {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// use serenity::model::UserId;
     /// use std::collections::HashSet;
     ///
@@ -288,7 +288,7 @@ impl Configuration {
         self
     }
 
-    /// Sets the prefix to respond to. A prefix can be a string slice of any 
+    /// Sets the prefix to respond to. A prefix can be a string slice of any
     /// non-zero length.
     ///
     /// # Examples
@@ -297,7 +297,7 @@ impl Configuration {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f.configure(|c| c
     ///     .prefix("!")));
@@ -317,7 +317,7 @@ impl Configuration {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f.configure(|c| c
     ///     .prefixes(vec!["!", ">", "+"])));

@@ -21,6 +21,9 @@ pub enum Error {
     /// When a shard has completely failed to reboot after resume and/or
     /// reconnect attempts.
     ShardBootFailure,
+    /// When all shards that the client is responsible for have shutdown with an
+    /// error.
+    Shutdown,
 }
 
 impl Display for Error {
@@ -34,6 +37,7 @@ impl StdError for Error {
         match *self {
             Error::InvalidToken => "The provided token was invalid",
             Error::ShardBootFailure => "Failed to (re-)boot a shard",
+            Error::Shutdown => "The clients shards shutdown",
         }
     }
 }

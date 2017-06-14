@@ -52,8 +52,6 @@
 mod error;
 mod prep;
 mod shard;
-mod status;
 
 pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
-pub use self::status::Status as GatewayStatus;

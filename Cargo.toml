@@ -18,19 +18,22 @@ log = "~0.3"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
-time = "~0.1"
 
 [dependencies.byteorder]
 optional = true
 version = "1.0"
 
-[dependencies.cookie]
-default-features = false
-version = "0.2"
+[dependencies.chrono]
+features = ["serde"]
+version = "~0.3"
 
 [dependencies.hyper]
 optional = true
-version = "~0.9"
+version = "~0.10"
+
+[dependencies.hyper-native-tls]
+optional = true
+version = "0.2.2"
 
 [dependencies.lazy_static]
 optional = true
@@ -40,7 +43,11 @@ version = "~0.2"
 default-features = false
 features = ["client", "hyper"]
 optional = true
-version = "0.8"
+version = "0.12"
+
+[dependencies.native-tls]
+optional = true
+version = "0.1"
 
 [dependencies.opus]
 optional = true
@@ -56,8 +63,10 @@ optional = true
 version = "~0.3"
 
 [dependencies.websocket]
+default-features = false
+features = ["sync-ssl"]
 optional = true
-version = "~0.17"
+version = "~0.20"
 
 [features]
 default = [
@@ -76,7 +85,7 @@ client = ["gateway", "lazy_static", "http", "typemap"]
 extras = []
 framework = ["client", "model", "utils"]
 gateway = ["http", "websocket"]
-http = ["hyper", "lazy_static", "multipart"]
+http = ["hyper", "hyper-native-tls", "lazy_static", "multipart", "native-tls"]
 model = ["builder", "http"]
 utils = []
 voice = ["byteorder", "gateway", "opus", "sodiumoxide"]

@@ -38,7 +38,9 @@ use hyper::client::{
     Request,
 };
 use hyper::method::Method;
+use hyper::net::HttpsConnector;
 use hyper::{Error as HyperError, Result as HyperResult, Url, header};
+use hyper_native_tls::NativeTlsClient;
 use multipart::client::Multipart;
 use self::ratelimiting::Route;
 use serde_json;
@@ -47,7 +49,7 @@ use std::default::Default;
 use std::fmt::Write as FmtWrite;
 use std::fs::File;
 use std::io::{ErrorKind as IoErrorKind, Read};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use ::constants;
 use ::internal::prelude::*;
@@ -1141,6 +1143,7 @@ pub fn get_guilds(target: &GuildPagination, limit: u64) -> Result<Vec<GuildInfo>
 }
 
 /// Gets information about a specific invite.
+#[allow(unused_mut)]
 pub fn get_invite(code: &str, stats: bool) -> Result<Invite> {
     let mut invite = code;
 
@@ -1427,15 +1430,17 @@ pub fn send_file<R: Read>(channel_id: u64, mut file: R, filename: &str, map: Jso
 /// if the file is too large to send.
 ///
 /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
-pub fn send_files<T: Into<AttachmentType>>(channel_id: u64, files: Vec<T>, map: JsonMap)
-    -> Result<Message> {
+pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap)
+    -> Result<Message> where T: Into<AttachmentType<'a>> {
     let uri = format!(api!("/channels/{}/messages"), channel_id);
     let url = match Url::parse(&uri) {
         Ok(url) => url,
         Err(_) => return Err(Error::Url(uri)),
     };
 
-    let mut request = Request::new(Method::Post, url)?;
+    let tc = NativeTlsClient::new()?;
+    let connector = HttpsConnector::new(tc);
+    let mut request = Request::with_connector(Method::Post, url, &connector)?;
     request.headers_mut()
         .set(header::Authorization(TOKEN.lock().unwrap().clone()));
     request.headers_mut()
@@ -1446,12 +1451,15 @@ pub fn send_files<T: Into<AttachmentType>>(channel_id: u64, files: Vec<T>, map: 
 
     for file in files {
         match file.into() {
+            AttachmentType::Bytes((mut bytes, filename)) => {
+                request.write_stream(&file_num, &mut bytes, Some(filename), None)?;
+            },
             AttachmentType::File((mut f, filename)) => {
-                request.write_stream(&file_num, &mut f, Some(&filename), None)?;
+                request.write_stream(&file_num, &mut f, Some(filename), None)?;
             },
             AttachmentType::Path(p) => {
                 request.write_file(&file_num, &p)?;
-            }, 
+            },
         }
 
         unsafe {
@@ -1605,28 +1613,36 @@ fn verify(expected_status_code: u16, mut response: HyperResponse) -> Result<()> 
 }
 
 /// Enum that allows a user to pass a `Path` or a `File` type to `send_files`
-pub enum AttachmentType {
+pub enum AttachmentType<'a> {
+    /// Indicates that the `AttachmentType` is a byte slice with a filename.
+    Bytes((&'a [u8], &'a str)),
     /// Indicates that the `AttachmentType` is a `File`
-    File((File, String)),
+    File((&'a File, &'a str)),
     /// Indicates that the `AttachmentType` is a `Path`
-    Path(PathBuf),
+    Path(&'a Path),
 }
 
-impl From<String> for AttachmentType {
-    fn from(s: String) -> AttachmentType {
-        AttachmentType::Path(PathBuf::from(&s))
+impl<'a> From<(&'a [u8], &'a str)> for AttachmentType<'a> {
+    fn from(params: (&'a [u8], &'a str)) -> AttachmentType {
+        AttachmentType::Bytes(params)
     }
 }
 
-impl<'a> From<&'a str> for AttachmentType {
+impl<'a> From<&'a str> for AttachmentType<'a> {
     fn from(s: &'a str) -> AttachmentType {
-        AttachmentType::Path(PathBuf::from(s))
+        AttachmentType::Path(Path::new(s))
     }
 }
 
-impl<'a> From<(File, &'a str)> for AttachmentType {
-    fn from(f: (File, &str)) -> AttachmentType {
-        AttachmentType::File((f.0, f.1.to_owned()))
+impl<'a> From<&'a PathBuf> for AttachmentType<'a> {
+    fn from(pathbuf: &'a PathBuf) -> AttachmentType {
+        AttachmentType::Path(pathbuf.as_path())
+    }
+}
+
+impl<'a> From<(&'a File, &'a str)> for AttachmentType<'a> {
+    fn from(f: (&'a File, &'a str)) -> AttachmentType<'a> {
+        AttachmentType::File((f.0, f.1))
     }
 }
 

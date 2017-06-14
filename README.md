@@ -8,7 +8,7 @@ Serenity is a Rust library for the Discord API.
 
 View the [examples] on how to make and structure a bot.
 
-Serenity supports bot login via the use of [`Client::login`].
+Serenity supports bot login via the use of [`Client::new`].
 
 You may also check your tokens prior to login via the use of
 [`validate_token`].
@@ -46,7 +46,7 @@ use std::env;
 
 fn main() {
     // Login with a bot token from the environment
-    let mut client = Client::login(&env::var("DISCORD_TOKEN").expect("token"));
+    let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"));
     client.with_framework(|f| f
         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
         .on("ping", ping));
@@ -134,31 +134,31 @@ Voice+youtube-dl:
 - [discord.py][rel:discord.py] (Python)
 - [discordrb][rel:discordrb] (Ruby)
 
-[`Cache`]: https://serenity.zey.moe/serenity/ext/cache/struct.Cache.html
-[`Client::login`]: https://serenity.zey.moe/serenity/client/struct.Client.html#method.login
-[`Client::on_message`]: https://serenity.zey.moe/serenity/client/struct.Client.html#method.on_message
-[`Shard`]: https://serenity.zey.moe/serenity/client/gateway/struct.Shard.html
-[`Context`]: https://serenity.zey.moe/serenity/client/struct.Context.html
-[`Event`]: https://serenity.zey.moe/serenity/model/enum.Event.html
-[`Event::MessageCreate`]: https://serenity.zey.moe/serenity/model/enum.Event.html#variant.MessageCreate
+[`Cache`]: https://serenity.zey.moe/master/target/doc/serenity/ext/cache/struct.Cache.html
+[`Client::new`]: https://serenity.zey.moe/master/target/doc/serenity/client/struct.Client.html#method.new
+[`Client::on_message`]: https://serenity.zey.moe/master/target/doc/serenity/client/struct.Client.html#method.on_message
+[`Shard`]: https://serenity.zey.moe/master/target/doc/serenity/client/gateway/struct.Shard.html
+[`Context`]: https://serenity.zey.moe/master/target/doc/serenity/client/struct.Context.html
+[`Event`]: https://serenity.zey.moe/master/target/doc/serenity/model/event/enum.Event.html
+[`Event::MessageCreate`]: https://serenity.zey.moe/master/target/doc/serenity/model/event/enum.Event.html#variant.MessageCreate
 [`examples`]: https://github.com/zeyla/serenity/blob/master/examples
-[`rest`]: https://serenity.zey.moe/serenity/client/rest/index.html
-[`validate_token`]: https://serenity.zey.moe/serenity/client/fn.validate_token.html
-[cache docs]: https://serenity.zey.moe/serenity/ext/cache/index.html
+[`rest`]: https://serenity.zey.moe/master/target/doc/serenity/client/rest/index.html
+[`validate_token`]: https://serenity.zey.moe/master/target/doc/serenity/client/fn.validate_token.html
+[cache docs]: https://serenity.zey.moe/master/target/doc/serenity/ext/cache/index.html
 [ci]: https://travis-ci.org/zeyla/serenity
 [ci-badge]: https://travis-ci.org/zeyla/serenity.svg?branch=master
 [contribs]: https://img.shields.io/github/contributors/zeyla/serenity.svg
 [contribs-badge]: https://img.shields.io/github/contributors/zeyla/serenity.svg
 [crate]: https://crates.io/crates/serenity
 [crate-badge]: https://img.shields.io/crates/v/serenity.svg?maxAge=2592000
-[client's module-level documentation]: https://serenity.zey.moe/serenity/client/index.html
+[client's module-level documentation]: https://serenity.zey.moe/master/target/doc/serenity/client/index.html
 [dapi]: https://discord.gg/PgQYQcc
 [dapi-badge]: https://discordapp.com/api/guilds/81384788765712384/widget.png
 [discord docs]: https://discordapp.com/developers/docs/intro
 [docs]: https://serenity.zey.moe/
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
 [examples]: https://github.com/zeyla/serenity/tree/master/examples
-[gateway docs]: https://serenity.zey.moe/serenity/client/gateway/index.html
+[gateway docs]: https://serenity.zey.moe/master/target/doc/serenity/client/gateway/index.html
 [license]: https://opensource.org/licenses/ISC
 [license-badge]: https://img.shields.io/badge/license-ISC-blue.svg
 [logo]: https://raw.githubusercontent.com/zeyla/serenity/master/logo.png

@@ -4,12 +4,12 @@ use ::model::*;
 
 #[cfg(feature="cache")]
 use ::CACHE;
+#[cfg(all(feature="builder", feature="cache", feature="model"))]
+use ::builder::EditRole;
 #[cfg(feature="cache")]
 use ::internal::prelude::*;
-#[cfg(feature="model")]
+#[cfg(all(feature="cache", feature="model"))]
 use ::http;
-#[cfg(feature="builder")]
-use ::builder::EditRole;
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
@@ -83,20 +83,31 @@ impl Role {
     ///
     /// Make a role hoisted:
     ///
-    /// ```rust,ignore
-    /// // assuming a `guild` and `role_id` have been bound
+    /// ```rust,no_run
+    /// # use serenity::model::RoleId;
+    /// # let role = RoleId(7).find().unwrap();
+    /// // assuming a `role` has already been bound
     //
-    /// guild.edit_role(role_id, |r| r.hoist(true));
+    /// role.edit(|r| r.hoist(true));
     /// ```
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature="cache")]
-    pub fn edit_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
+    #[cfg(all(feature="builder", feature="cache"))]
+    pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
         match self.find_guild() {
             Ok(guild_id) => guild_id.edit_role(self.id, f),
             Err(why) => Err(why),
         }
+    }
+
+    /// Alias of [`edit`]
+    ///
+    /// [`edit`]: struct.Role.html#method.edit
+    #[deprecated(since="0.2.1", note="Please use `edit` instead.")]
+    #[cfg(all(feature="builder", feature="cache"))]
+    pub fn edit_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
+        self.edit(f)
     }
 
     /// Searches the cache for the guild that owns the role.

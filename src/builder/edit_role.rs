@@ -2,14 +2,15 @@ use std::default::Default;
 use ::internal::prelude::*;
 use ::model::{Permissions, Role, permissions};
 
-/// A builer to create or edit a [`Role`] for use via a number of model and
-/// context methods.
+/// A builer to create or edit a [`Role`] for use via a number of model methods.
 ///
 /// These are:
 ///
-/// - [`Context::create_role`]
-/// - [`Context::edit_role`]
+/// - [`PartialGuild::create_role`]
 /// - [`Guild::create_role`]
+/// - [`Guild::edit_role`]
+/// - [`GuildId::create_role`]
+/// - [`GuildId::edit_role`]
 /// - [`Role::edit`]
 ///
 /// Defaults are provided for each parameter on role creation.
@@ -30,9 +31,11 @@ use ::model::{Permissions, Role, permissions};
 ///     .name("a test role"));
 /// ```
 ///
-/// [`Context::create_role`]: ../client/struct.Context.html#method.create_role
-/// [`Context::edit_role`]: ../client/struct.Context.html#method.edit_role
+/// [`PartialGuild::create_role`]: ../model/struct.PartialGuild.html#method.create_role
 /// [`Guild::create_role`]: ../model/struct.Guild.html#method.create_role
+/// [`Guild::edit_role`]: ../model/struct.Guild.html#method.edit_role
+/// [`GuildId::create_role`]: ../model/struct.GuildId.html#method.create_role
+/// [`GuildId::edit_role`]: ../model/struct.GuildId.html#method.edit_role
 /// [`Role`]: ../model/struct.Role.html
 /// [`Role::edit`]: ../model/struct.Role.html#method.edit
 #[derive(Clone, Debug)]

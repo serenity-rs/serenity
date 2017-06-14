@@ -18,7 +18,7 @@ use super::Permissions;
 /// use std::env;
 ///
 /// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
-/// let mut client = Client::login(&token);
+/// let mut client = Client::new(&token);
 ///
 /// client.on_member_unban(|context, guild_id, user| {
 ///     // If the user has an even discriminator, don't re-ban them.

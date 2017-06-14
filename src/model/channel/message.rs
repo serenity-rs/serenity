@@ -1,16 +1,17 @@
-use std::mem;
-use time;
-use ::constants;
+use chrono::{DateTime, FixedOffset};
 use ::model::*;
-
 
 #[cfg(feature="cache")]
 use std::fmt::Write;
 #[cfg(feature="model")]
+use std::mem;
+#[cfg(feature="model")]
 use ::builder::{CreateEmbed, CreateMessage};
+#[cfg(feature="model")]
+use ::constants;
 #[cfg(feature="cache")]
 use ::CACHE;
-#[cfg(feature="http")]
+#[cfg(feature="model")]
 use ::http;
 
 /// A representation of a message over a guild's text channel, a group, or a
@@ -31,7 +32,7 @@ pub struct Message {
     /// The content of the message.
     pub content: String,
     /// The timestamp of the last time the message was updated, if it was.
-    pub edited_timestamp: Option<String>,
+    pub edited_timestamp: Option<DateTime<FixedOffset>>,
     /// Array of embeds sent with the message.
     pub embeds: Vec<Embed>,
     /// Indicator of the type of message this is, i.e. whether it is a regular
@@ -47,14 +48,14 @@ pub struct Message {
     /// Array of users mentioned in the message.
     pub mentions: Vec<User>,
     /// Non-repeating number used for ensuring message order.
-    pub nonce: Option<String>,
+    pub nonce: Option<Snowflake>,
     /// Indicator of whether the message is pinned.
     pub pinned: bool,
     /// Array of reactions performed on the message.
     #[serde(default)]
     pub reactions: Vec<MessageReaction>,
     /// Initial message creation timestamp, calculated from its Id.
-    pub timestamp: String,
+    pub timestamp: DateTime<FixedOffset>,
     /// Indicator of whether the command is to be played back via
     /// text-to-speech.
     ///
@@ -66,6 +67,49 @@ pub struct Message {
 
 #[cfg(feature="model")]
 impl Message {
+    /// Retrieves the related channel located in the cache.
+    ///
+    /// Returns `None` if the channel is not in the cache.
+    ///
+    /// # Examples
+    ///
+    /// On command, print the name of the channel that a message took place in:
+    ///
+    /// ```rust,no_run
+    /// # #[macro_use] extern crate serenity;
+    /// #
+    /// # use serenity::Client;
+    /// #
+    /// # fn main() {
+    /// #     let mut client = Client::new("");
+    /// #
+    /// use serenity::model::Channel;
+    ///
+    /// client.with_framework(|f| f
+    ///     .configure(|c| c.prefix("~"))
+    ///     .command("channelname", |c| c.exec(channel_name)));
+    ///
+    /// command!(channel_name(_ctx, msg) {
+    ///     let _ = match msg.channel() {
+    ///         Some(Channel::Group(c)) => msg.reply(&c.read().unwrap().name()),
+    ///         Some(Channel::Guild(c)) => msg.reply(&c.read().unwrap().name),
+    ///         Some(Channel::Private(c)) => {
+    ///             let channel = c.read().unwrap();
+    ///             let user = channel.recipient.read().unwrap();
+    ///
+    ///             msg.reply(&format!("DM with {}", user.name.clone()))
+    ///         },
+    ///         None => msg.reply("Unknown"),
+    ///     };
+    /// });
+    /// # }
+    /// ```
+    #[cfg(feature="cache")]
+    #[inline]
+    pub fn channel(&self) -> Option<Channel> {
+        CACHE.read().unwrap().channel(self.channel_id)
+    }
+
     /// Deletes the message.
     ///
     /// **Note**: The logged in user must either be the author of the message or
@@ -195,16 +239,14 @@ impl Message {
                 self.content = format!("{} pinned a message to this channel. See all the pins.", self.author);
             },
             MessageType::MemberJoin => {
-                if let Ok(tm) = time::strptime(&self.timestamp, "%Y-%m-%dT%H:%M:%S") {
-                    let sec = tm.to_timespec().sec as usize;
-                    let chosen = constants::JOIN_MESSAGES[sec % constants::JOIN_MESSAGES.len()];
+                let sec = self.timestamp.timestamp() as usize;
+                let chosen = constants::JOIN_MESSAGES[sec % constants::JOIN_MESSAGES.len()];
 
-                    self.content = if chosen.contains("$user") {
-                        chosen.replace("$user", &self.author.mention())
-                    } else {
-                        chosen.to_owned()
-                    };
-                }
+                self.content = if chosen.contains("$user") {
+                    chosen.replace("$user", &self.author.mention())
+                } else {
+                    chosen.to_owned()
+                };
             },
             _ => {},
         }

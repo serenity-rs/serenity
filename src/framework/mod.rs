@@ -36,7 +36,7 @@
 //! use serenity::model::Message;
 //! use std::env;
 //!
-//! let mut client = Client::login(&env::var("DISCORD_BOT_TOKEN").unwrap());
+//! let mut client = Client::new(&env::var("DISCORD_BOT_TOKEN").unwrap());
 //!
 //! client.with_framework(|f| f
 //!     .configure(|c| c.prefix("~"))
@@ -255,7 +255,7 @@ impl Framework {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::login(&env::var("DISCORD_TOKEN").unwrap());
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
     /// client.with_framework(|f| f
     ///     .configure(|c| c
     ///         .depth(3)
@@ -285,7 +285,7 @@ impl Framework {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f
     ///     .bucket("basic", 2, 10, 3)
@@ -314,7 +314,7 @@ impl Framework {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f
     ///     .simple_bucket("simple", 2)
@@ -590,15 +590,16 @@ impl Framework {
     ///
     /// ```rust
     /// # #[macro_use] extern crate serenity;
-    /// command!(ping(_ctx, msg) {
-    ///     msg.channel_id.say("pong!");    
-    /// });
     /// #
     /// # fn main() {
-    /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// #     use serenity::Client;
+    /// #     let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f.on("ping", ping));
+    ///
+    /// command!(ping(_ctx, msg) {
+    ///     let _ = msg.channel_id.say("pong!");
+    /// });
     /// # }
     /// ```
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
@@ -670,7 +671,7 @@ impl Framework {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f
     ///     .group("ping-pong", |g| g
@@ -698,20 +699,24 @@ impl Framework {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// use serenity::framework::DispatchError::{NotEnoughArguments, TooManyArguments};
-    /// 
+    ///
     /// client.with_framework(|f| f
-    ///     .on_dispatch_error(|ctx, msg, error| {
+    ///     .on_dispatch_error(|_, msg, error| {
     ///         match error {
     ///             NotEnoughArguments { min, given } => {
-    ///                 msg.channel_id.say(&format!("Need {} arguments, but only got {}.", min, given));
-    ///             }
+    ///                 let s = format!("Need {} arguments, but only got {}.", min, given);
+    ///
+    ///                 let _ = msg.channel_id.say(&s);
+    ///             },
     ///             TooManyArguments { max, given } => {
-    ///                 msg.channel_id.say(&format!("Max arguments allowed is {}, but got {}.", max, given));
-    ///             }
-    ///             _ => println!("Unhandled dispatch error.")
-    ///         }        
+    ///                 let s = format!("Max arguments allowed is {}, but got {}.", max, given);
+    ///
+    ///                 let _ = msg.channel_id.say(&s);
+    ///             },
+    ///             _ => println!("Unhandled dispatch error."),
+    ///         }
     ///     }));
     /// ```
     pub fn on_dispatch_error<F>(mut self, f: F) -> Self
@@ -730,7 +735,7 @@ impl Framework {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f
     ///     .before(|ctx, msg, cmd_name| {
@@ -743,10 +748,10 @@ impl Framework {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f
-    ///     .before(|ctx, msg, cmd_name| {
+    ///     .before(|_, msg, cmd_name| {
     ///         if let Ok(channel) = msg.channel_id.get() {
     ///             //  Don't run unless in nsfw channel
     ///             if !channel.is_nsfw() {
@@ -755,6 +760,7 @@ impl Framework {
     ///         }
     ///
     ///         println!("Running command {}", cmd_name);
+    ///
     ///         true
     ///     }));
     /// ```
@@ -775,7 +781,7 @@ impl Framework {
     ///
     /// ```rust
     /// # use serenity::Client;
-    /// # let mut client = Client::login("token");
+    /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f
     ///     .after(|ctx, msg, cmd_name, error| {

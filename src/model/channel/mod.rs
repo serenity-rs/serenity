@@ -18,11 +18,13 @@ pub use self::reaction::*;
 
 use serde::de::Error as DeError;
 use serde_json;
-use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::io::Read;
 use super::utils::deserialize_u64;
 use ::model::*;
 
+#[cfg(feature="model")]
+use std::fmt::{Display, Formatter, Result as FmtResult};
+#[cfg(feature="model")]
+use std::io::Read;
 #[cfg(feature="model")]
 use ::builder::{CreateMessage, GetMessages};
 #[cfg(feature="model")]
@@ -304,7 +306,7 @@ impl Channel {
 
     /// Sends (a) file(s) along with optional message contents.
     ///
-    /// Refer to [`ChannelId::send_file`] for examples and more information.
+    /// Refer to [`ChannelId::send_files`] for examples and more information.
     ///
     /// The [Attach Files] and [Send Messages] permissions are required.
     ///
@@ -316,13 +318,13 @@ impl Channel {
     /// [`ClientError::MessageTooLong`] will be returned, containing the number
     /// of unicode code points over the limit.
     ///
-    /// [`ChannelId::send_file`]: struct.ChannelId.html#method.send_file
+    /// [`ChannelId::send_files`]: struct.ChannelId.html#method.send_files
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
-    pub fn send_files<F, T: Into<AttachmentType>>(&self, files: Vec<T>, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
+    pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         self.id().send_files(files, f)
     }
 

@@ -1,13 +1,15 @@
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
-use super::super::{EmojiId, ModelError, RoleId};
+use super::super::{EmojiId, RoleId};
 
 #[cfg(feature="cache")]
 use std::mem;
+#[cfg(all(feature="cache", feature="model"))]
+use super::super::ModelError;
 #[cfg(feature="cache")]
 use ::CACHE;
 #[cfg(feature="cache")]
 use ::internal::prelude::*;
-#[cfg(feature="model")]
+#[cfg(all(feature="cache", feature="model"))]
 use ::http;
 #[cfg(feature="cache")]
 use super::super::GuildId;
@@ -45,6 +47,28 @@ impl Emoji {
     /// **Note**: Only user accounts may use this method.
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    ///
+    /// # Examples
+    ///
+    /// Delete a given emoji:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::model::{Emoji, EmojiId};
+    /// #
+    /// # let mut emoji = Emoji {
+    /// #     id: EmojiId(7),
+    /// #     name: String::from("blobface"),
+    /// #     managed: false,
+    /// #     require_colons: false,
+    /// #     roles: vec![],
+    /// # };
+    /// #
+    /// // assuming emoji has been set already
+    /// match emoji.delete() {
+    ///     Ok(()) => println!("Emoji deleted."),
+    ///     Err(_) => println!("Could not delete emoji.")
+    /// }
+    /// ```
     #[cfg(feature="cache")]
     pub fn delete(&self) -> Result<()> {
         match self.find_guild_id() {
@@ -60,6 +84,26 @@ impl Emoji {
     /// **Note**: Only user accounts may use this method.
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    ///
+    /// # Examples
+    ///
+    /// Change the name of an emoji:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::model::{Emoji, EmojiId};
+    /// #
+    /// # let mut emoji = Emoji {
+    /// #     id: EmojiId(7),
+    /// #     name: String::from("blobface"),
+    /// #     managed: false,
+    /// #     require_colons: false,
+    /// #     roles: vec![],
+    /// # };
+    /// #
+    /// // assuming emoji has been set already
+    /// let _ = emoji.edit("blobuwu");
+    /// assert_eq!(emoji.name, "blobuwu");
+    /// ```
     #[cfg(feature="cache")]
     pub fn edit(&mut self, name: &str) -> Result<()> {
         match self.find_guild_id() {
@@ -84,6 +128,27 @@ impl Emoji {
     /// Finds the [`Guild`] that owns the emoji by looking through the Cache.
     ///
     /// [`Guild`]: struct.Guild.html
+    ///
+    /// # Examples
+    ///
+    /// Print the guild id that owns this emoji:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::model::{Emoji, EmojiId};
+    /// #
+    /// # let mut emoji = Emoji {
+    /// #     id: EmojiId(7),
+    /// #     name: String::from("blobface"),
+    /// #     managed: false,
+    /// #     require_colons: false,
+    /// #     roles: vec![],
+    /// # };
+    /// #
+    /// // assuming emoji has been set already
+    /// if let Some(guild_id) = emoji.find_guild_id() {
+    ///     println!("{} is owned by {}", emoji.name, guild_id);
+    /// }
+    /// ```
     #[cfg(feature="cache")]
     pub fn find_guild_id(&self) -> Option<GuildId> {
         for guild in CACHE.read().unwrap().guilds.values() {
@@ -98,6 +163,25 @@ impl Emoji {
     }
 
     /// Generates a URL to the emoji's image.
+    ///
+    /// # Examples
+    ///
+    /// Print the direct link to the given emoji:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::model::{Emoji, EmojiId};
+    /// #
+    /// # let mut emoji = Emoji {
+    /// #     id: EmojiId(7),
+    /// #     name: String::from("blobface"),
+    /// #     managed: false,
+    /// #     require_colons: false,
+    /// #     roles: vec![],
+    /// # };
+    /// #
+    /// // assuming emoji has been set already
+    /// println!("Direct link to emoji image: {}", emoji.url());
+    /// ```
     #[inline]
     pub fn url(&self) -> String {
         format!(cdn!("/emojis/{}.png"), self.id)

@@ -10,7 +10,8 @@
 //! use serenity::Client;
 //! use std::env;
 //!
-//! let mut client = Client::login(&env::var("DISCORD_TOKEN").unwrap());
+//! let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
+//!
 //! client.with_framework(|f| f
 //!     .command("help", |c| c.exec_help(help_commands::with_embeds)));
 //! ```
@@ -59,7 +60,9 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 ///
 /// ```rust
 /// # use serenity::Client;
-/// # let mut client = Client::login("token");
+/// #
+/// # let mut client = Client::new("token");
+/// #
 /// use serenity::ext::framework::help_commands;
 ///
 /// client.with_framework(|f| f
@@ -179,7 +182,7 @@ pub fn with_embeds(ctx: &mut Context,
 
                 for name in command_names {
                     let cmd = &commands[name];
-                    
+
                     if cmd.help_available {
                         let _ = write!(desc, "`{}`\n", name);
 
@@ -188,7 +191,7 @@ pub fn with_embeds(ctx: &mut Context,
                 }
 
                 if has_commands {
-                    e = e.field(|f| f.name(&group_name).value(&desc));
+                    e = e.field(|f| f.name(group_name).value(&desc));
                 }
             }
 
@@ -206,7 +209,9 @@ pub fn with_embeds(ctx: &mut Context,
 ///
 /// ```rust
 /// # use serenity::Client;
-/// # let mut client = Client::login("token");
+/// #
+/// # let mut client = Client::new("token");
+/// #
 /// use serenity::ext::framework::help_commands;
 ///
 /// client.with_framework(|f| f
@@ -301,16 +306,16 @@ pub fn plain(ctx: &mut Context,
         let commands = remove_aliases(&group.commands);
         let mut command_names = commands.keys().collect::<Vec<_>>();
         command_names.sort();
-        
+
         for name in command_names {
             let cmd = &commands[name];
-            
+
             if cmd.help_available {
                 let _ = write!(group_help, "`{}` ", name);
             }
         }
 
-        if group_help.len() > 0 {
+        if !group_help.is_empty() {
             let _ = write!(result, "**{}:** ", group_name);
 
             if let Some(ref x) = group.prefix {
