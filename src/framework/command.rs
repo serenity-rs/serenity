@@ -1,8 +1,7 @@
 use std::sync::Arc;
 use super::Configuration;
 use ::client::Context;
-use ::model::Message;
-use ::model::Permissions;
+use ::model::{Message, Permissions};
 use std::collections::HashMap;
 
 pub type Check = Fn(&mut Context, &Message) -> bool + Send + Sync + 'static;
@@ -12,7 +11,7 @@ pub type BeforeHook = Fn(&mut Context, &Message, &String) -> bool + Send + Sync 
 pub type AfterHook = Fn(&mut Context, &Message, &String, Result<(), String>) + Send + Sync + 'static;
 #[doc(hidden)]
 pub type InternalCommand = Arc<Command>;
-pub type PrefixCheck = Fn(&mut Context) -> Option<String> + Send + Sync + 'static;
+pub type PrefixCheck = Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
 
 #[doc(hidden)]
 pub enum CommandOrAlias {
@@ -92,29 +91,29 @@ impl Command {
     }
 }
 
-pub fn positions(ctx: &mut Context, content: &str, conf: &Configuration) -> Option<Vec<usize>> {
+pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Option<Vec<usize>> {
     if !conf.prefixes.is_empty() || conf.dynamic_prefix.is_some() {
         // Find out if they were mentioned. If not, determine if the prefix
         // was used. If not, return None.
         let mut positions: Vec<usize> = vec![];
 
-        if let Some(mention_end) = find_mention_end(content, conf) {
+        if let Some(mention_end) = find_mention_end(&msg.content, conf) {
             positions.push(mention_end);
         } else if let Some(ref func) = conf.dynamic_prefix {
-            if let Some(x) = func(ctx) {
-                if content.starts_with(&x) {
+            if let Some(x) = func(ctx, msg) {
+                if msg.content.starts_with(&x) {
                     positions.push(x.len());
                 }
             } else {
                 for n in conf.prefixes.clone() {
-                    if content.starts_with(&n) {
+                    if msg.content.starts_with(&n) {
                         positions.push(n.len());
                     }
                 }
             }
         } else {
             for n in conf.prefixes.clone() {
-                if content.starts_with(&n) {
+                if msg.content.starts_with(&n) {
                     positions.push(n.len());
                 }
             }
@@ -132,7 +131,7 @@ pub fn positions(ctx: &mut Context, content: &str, conf: &Configuration) -> Opti
 
         Some(positions)
     } else if conf.on_mention.is_some() {
-        match find_mention_end(content, conf) {
+        match find_mention_end(&msg.content, conf) {
             Some(mention_end) => {
                 let mut positions = vec![mention_end];
 

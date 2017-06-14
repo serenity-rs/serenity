@@ -452,7 +452,7 @@ impl Framework {
     #[allow(cyclomatic_complexity)]
     #[doc(hidden)]
     pub fn dispatch(&mut self, mut context: Context, message: Message) {
-        let res = command::positions(&mut context, &message.content, &self.configuration);
+        let res = command::positions(&mut context, &message, &self.configuration);
 
         let positions = match res {
             Some(mut positions) => {

@@ -3,7 +3,7 @@ use std::default::Default;
 use super::command::PrefixCheck;
 use ::client::Context;
 use ::http;
-use ::model::{GuildId, UserId};
+use ::model::{GuildId, Message, UserId};
 
 /// The configuration to use for a [`Framework`] associated with a [`Client`]
 /// instance.
@@ -185,8 +185,8 @@ impl Configuration {
     /// # let mut client = Client::new("token");
     /// client.with_framework(|f| f
     ///     .command("ping", |c| c.exec_str("Pong!"))
-    ///     .configure(|c| c.dynamic_prefix(|ctx| {
-    ///         Some(if ctx.channel_id.unwrap().0 % 5 == 0 {
+    ///     .configure(|c| c.dynamic_prefix(|_, msg| {
+    ///         Some(if msg.channel_id.0 % 5 == 0 {
     ///             "!"
     ///         } else {
     ///             "~"
@@ -194,7 +194,7 @@ impl Configuration {
     ///     })));
     /// ```
     pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
-        where F: Fn(&mut Context) -> Option<String> + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static {
         self.dynamic_prefix = Some(Box::new(dynamic_prefix));
 
         self
