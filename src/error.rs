@@ -139,6 +139,12 @@ impl From<ParseIntError> for Error {
     }
 }
 
+impl From<ModelError> for Error {
+    fn from(e: ModelError) -> Error {
+        Error::Model(e)
+    }
+}
+
 #[cfg(feature="voice")]
 impl From<OpusError> for Error {
     fn from(e: OpusError) -> Error {

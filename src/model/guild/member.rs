@@ -323,9 +323,15 @@ impl Member {
     /// found in the cache.
     ///
     /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
+    #[cfg(feature="cache")]
     pub fn permissions(&self) -> Result<Permissions> {
-        let dummy = self.find_guild()?.find().unwrap();
-        let guild = dummy.read().unwrap();
+        let guild = match self.guild_id.find() {
+            Some(guild) => guild,
+            None => return Err(From::from(ModelError::GuildNotFound)),  
+        };
+
+        let guild = guild.read().unwrap();
+
         Ok(guild.permissions_for(ChannelId(guild.id.0), self.user.read().unwrap().id))
     }
 }
