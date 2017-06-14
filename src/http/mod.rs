@@ -536,9 +536,7 @@ pub fn delete_webhook(webhook_id: u64) -> Result<()> {
 ///
 /// [`Webhook`]: ../model/struct.Webhook.html
 pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
-    let tc = NativeTlsClient::new()?;
-    let connector = HttpsConnector::new(tc);
-    let client = HyperClient::with_connector(connector);
+    let client = request_client!();
 
     verify(204, retry(|| client
         .delete(&format!(api!("/webhooks/{}/{}"), webhook_id, token)))
@@ -753,10 +751,7 @@ pub fn edit_webhook(webhook_id: u64, map: &Value) -> Result<Webhook> {
 /// [`edit_webhook`]: fn.edit_webhook.html
 pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &JsonMap) -> Result<Webhook> {
     let body = serde_json::to_string(map)?;
-
-    let tc = NativeTlsClient::new()?;
-    let connector = HttpsConnector::new(tc);
-    let client = HyperClient::with_connector(connector);
+    let client = request_client!();
 
     let response = retry(|| client
         .patch(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
@@ -822,10 +817,7 @@ pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &JsonMap) -> R
 /// [Discord docs]: https://discordapp.com/developers/docs/resources/webhook#querystring-params
 pub fn execute_webhook(webhook_id: u64, token: &str, map: &JsonMap) -> Result<Message> {
     let body = serde_json::to_string(map)?;
-
-    let tc = NativeTlsClient::new()?;
-    let connector = HttpsConnector::new(tc);
-    let client = HyperClient::with_connector(connector);
+    let client = request_client!();
 
     let response = retry(|| client
         .post(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
@@ -839,9 +831,7 @@ pub fn execute_webhook(webhook_id: u64, token: &str, map: &JsonMap) -> Result<Me
 ///
 /// Does not require authentication.
 pub fn get_active_maintenances() -> Result<Vec<Maintenance>> {
-    let tc = NativeTlsClient::new()?;
-    let connector = HttpsConnector::new(tc);
-    let client = HyperClient::with_connector(connector);
+    let client = request_client!();
 
     let response = retry(|| client.get(
         status!("/scheduled-maintenances/active.json")))?;
@@ -1211,10 +1201,7 @@ pub fn get_messages(channel_id: u64, query: &str)
     let url = format!(api!("/channels/{}/messages{}"),
                       channel_id,
                       query);
-
-    let tc = NativeTlsClient::new()?;
-    let connector = HttpsConnector::new(tc);
-    let client = HyperClient::with_connector(connector);
+    let client = request_client!();
 
     let response = request(Route::ChannelsIdMessages(channel_id),
                            || client.get(&url))?;
@@ -1261,9 +1248,7 @@ pub fn get_reaction_users(channel_id: u64,
 ///
 /// Does not require authentication.
 pub fn get_unresolved_incidents() -> Result<Vec<Incident>> {
-    let tc = NativeTlsClient::new()?;
-    let connector = HttpsConnector::new(tc);
-    let client = HyperClient::with_connector(connector);
+    let client = request_client!();
 
     let response = retry(|| client.get(
         status!("/incidents/unresolved.json")))?;
@@ -1280,9 +1265,7 @@ pub fn get_unresolved_incidents() -> Result<Vec<Incident>> {
 ///
 /// Does not require authentication.
 pub fn get_upcoming_maintenances() -> Result<Vec<Maintenance>> {
-    let tc = NativeTlsClient::new()?;
-    let connector = HttpsConnector::new(tc);
-    let client = HyperClient::with_connector(connector);
+    let client = request_client!();
 
     let response = retry(|| client.get(
         status!("/scheduled-maintenances/upcoming.json")))?;
@@ -1357,9 +1340,7 @@ pub fn get_webhook(webhook_id: u64) -> Result<Webhook> {
 ///     .expect("Error getting webhook");
 /// ```
 pub fn get_webhook_with_token(webhook_id: u64, token: &str) -> Result<Webhook> {
-    let tc = NativeTlsClient::new()?;
-    let connector = HttpsConnector::new(tc);
-    let client = HyperClient::with_connector(connector);
+    let client = request_client!();
 
     let response = retry(|| client
         .get(&format!(api!("/webhooks/{}/{}"), webhook_id, token)))
@@ -1422,7 +1403,7 @@ pub fn send_file<R: Read>(channel_id: u64, mut file: R, filename: &str, map: Jso
     let tc = NativeTlsClient::new()?;
     let connector = HttpsConnector::new(tc);
     let mut request = Request::with_connector(Method::Post, url, &connector)?;
-    
+
     request.headers_mut()
         .set(header::Authorization(TOKEN.lock().unwrap().clone()));
     request.headers_mut()
