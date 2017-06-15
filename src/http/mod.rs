@@ -1394,42 +1394,10 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 #[deprecated(since="0.2.0", note="Please use `send_files` instead.")]
 pub fn send_file<R: Read>(channel_id: u64, mut file: R, filename: &str, map: JsonMap)
     -> Result<Message> {
-    let uri = format!(api!("/channels/{}/messages"), channel_id);
-    let url = match Url::parse(&uri) {
-        Ok(url) => url,
-        Err(_) => return Err(Error::Url(uri)),
-    };
+    let mut bytes = vec![];
+    file.read_to_end(&mut bytes)?;
 
-    let tc = NativeTlsClient::new()?;
-    let connector = HttpsConnector::new(tc);
-    let mut request = Request::with_connector(Method::Post, url, &connector)?;
-
-    request.headers_mut()
-        .set(header::Authorization(TOKEN.lock().unwrap().clone()));
-    request.headers_mut()
-        .set(header::UserAgent(constants::USER_AGENT.to_owned()));
-
-    let mut request = Multipart::from_request(request)?;
-
-    request.write_stream("file", &mut file, Some(filename), None)?;
-
-    for (k, v) in map {
-        let _ = match v {
-            Value::Bool(false) => request.write_text(&k, "false")?,
-            Value::Bool(true) => request.write_text(&k, "true")?,
-            Value::Number(inner) => request.write_text(&k, inner.to_string())?,
-            Value::String(inner) => request.write_text(&k, inner)?,
-            _ => continue,
-        };
-    }
-
-    let response = request.send()?;
-
-    if response.status.class() != StatusClass::Success {
-        return Err(Error::Http(HttpError::InvalidRequest(response.status)));
-    }
-
-    serde_json::from_reader::<HyperResponse, Message>(response).map_err(From::from)
+    send_files(channel_id, vec![AttachmentType::Bytes((&bytes, filename))], map)
 }
 
 /// Sends file(s) to a channel.
@@ -1490,6 +1458,10 @@ pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap)
     }
 
     let response = request.send()?;
+
+    if response.status.class() != StatusClass::Success {
+        return Err(Error::Http(HttpError::InvalidRequest(response.status)));
+    }
 
     serde_json::from_reader::<HyperResponse, Message>(response).map_err(From::from)
 }
