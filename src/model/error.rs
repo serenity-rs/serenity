@@ -43,6 +43,7 @@ use super::Permissions;
 /// [`Error`]: ../enum.Error.html
 /// [`Error::Model`]: ../enum.Error.html#variant.Model
 /// [`GuildId::ban`]: struct.GuildId.html#method.ban
+/// [`model`]: ./index.html
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Error {
     /// When attempting to delete below or above the minimum and maximum allowed
