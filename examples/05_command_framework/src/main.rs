@@ -95,12 +95,8 @@ fn main() {
         // reason or another. For example, when a user has exceeded a rate-limit or a command
         // can only be performed by the bot owner.
         .on_dispatch_error(|_ctx, msg, error| {
-            match error {
-                DispatchError::RateLimited(seconds) => {
-                    let _ = msg.channel_id.say(&format!("Try this again in {} seconds.", seconds));
-                },
-                // Any other error would be silently ignored.
-                _ => {},
+            if let DispatchError::RateLimited(seconds) = error {
+                let _ = msg.channel_id.say(&format!("Try this again in {} seconds.", seconds));
             }
         })
         // Can't be used more than once per 5 seconds:
