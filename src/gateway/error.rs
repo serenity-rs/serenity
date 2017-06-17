@@ -1,5 +1,5 @@
 use std::error::Error as StdError;
-use std::fmt::{self, Display};
+use std::fmt::{Display, Formatter, Result as FmtResult};
 use websocket::message::CloseData;
 
 /// An error that occurred while attempting to deal with the gateway.
@@ -16,33 +16,59 @@ pub enum Error {
     ExpectedHello,
     /// When there was an error sending a heartbeat.
     HeartbeatFailed,
+    /// When invalid authentication (a bad token) was sent in the IDENTIFY.
+    InvalidAuthentication,
     /// Expected a Ready or an InvalidateSession
     InvalidHandshake,
     /// An indicator that an unknown opcode was received from the gateway.
     InvalidOpCode,
+    /// When invalid sharding data was sent in the IDENTIFY.
+    ///
+    /// # Examples
+    ///
+    /// Sending a shard ID of 5 when sharding with 3 total is considered
+    /// invalid.
+    InvalidShardData,
+    /// When no authentication was sent in the IDENTIFY.
+    NoAuthentication,
     /// When a session Id was expected (for resuming), but was not present.
     NoSessionId,
+    /// When a shard would have too many guilds assigned to it.
+    ///
+    /// # Examples
+    ///
+    /// When sharding 5500 guilds on 2 shards, at least one of the shards will
+    /// have over the maximum number of allowed guilds per shard.
+    ///
+    /// This limit is currently 2500 guilds per shard.
+    OverloadedShard,
     /// Failed to reconnect after a number of attempts.
     ReconnectFailure,
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
         f.write_str(self.description())
     }
 }
 
 impl StdError for Error {
     fn description(&self) -> &str {
+        use self::Error::*;
+
         match *self {
-            Error::BuildingUrl => "Error building url",
-            Error::Closed(_) => "Connection closed",
-            Error::ExpectedHello => "Expected a Hello",
-            Error::HeartbeatFailed => "Failed sending a heartbeat",
-            Error::InvalidHandshake => "Expected a valid Handshake",
-            Error::InvalidOpCode => "Invalid OpCode",
-            Error::NoSessionId => "No Session Id present when required",
-            Error::ReconnectFailure => "Failed to Reconnect",
+            BuildingUrl => "Error building url",
+            Closed(_) => "Connection closed",
+            ExpectedHello => "Expected a Hello",
+            HeartbeatFailed => "Failed sending a heartbeat",
+            InvalidAuthentication => "Sent invalid authentication",
+            InvalidHandshake => "Expected a valid Handshake",
+            InvalidOpCode => "Invalid OpCode",
+            InvalidShardData => "Sent invalid shard data",
+            NoAuthentication => "Sent no authentication",
+            NoSessionId => "No Session Id present when required",
+            OverloadedShard => "Shard has too many guilds",
+            ReconnectFailure => "Failed to Reconnect",
         }
     }
 }
