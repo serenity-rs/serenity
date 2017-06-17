@@ -118,6 +118,7 @@ impl Channel {
     /// this method.
     ///
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    #[deprecated(since="0.2.0", note="Use the inner channel's `delete_messages` method instead.")]
     #[inline]
     pub fn delete_messages(&self, message_ids: &[MessageId]) -> Result<()> {
         self.id().delete_messages(message_ids)
@@ -129,6 +130,7 @@ impl Channel {
     /// **Note**: Requires the [Manage Channel] permission.
     ///
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
+    #[deprecated(since="0.2.0", note="Use the inner channel's `delete_permission` method instead.")]
     #[inline]
     pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
         self.id().delete_permission(permission_type)
