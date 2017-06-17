@@ -178,11 +178,11 @@ bitflags! {
     /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to
     /// [`GuildChannel`]s.
     ///
-    /// [`Guild`]: struct.Guild.html
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`PermissionOverwrite`]: struct.PermissionOverwrite.html
-    /// [`Role`]: struct.Role.html
-    /// [`User`]: struct.User.html
+    /// [`Guild`]: ../struct.Guild.html
+    /// [`GuildChannel`]: ../struct.GuildChannel.html
+    /// [`PermissionOverwrite`]: ../struct.PermissionOverwrite.html
+    /// [`Role`]: ../struct.Role.html
+    /// [`User`]: ../struct.User.html
     pub flags Permissions: u64 {
         /// Allows for the creation of [`RichInvite`]s.
         ///
