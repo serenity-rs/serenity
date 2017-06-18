@@ -5,7 +5,7 @@ use super::Context;
 use typemap::ShareMap;
 use ::gateway::Shard;
 use ::model::event::Event;
-use ::model::Message;
+use ::model::{Message, GuildId};
 
 #[cfg(feature="framework")]
 use ::ext::framework::Framework;
@@ -204,6 +204,23 @@ fn handle_event(event: Event,
         },
         Event::GuildCreate(event) => {
             update!(update_with_guild_create, event);
+
+            #[cfg(feature="cache")]
+            {
+                let cache = CACHE.read().unwrap();
+
+                if cache.unavailable_guilds.len() == 0 {
+                    let guild_amount = cache.guilds.iter()
+                        .map(|(&id, _)| id)
+                        .collect::<Vec<GuildId>>();
+
+                    if let Some(handler) = handler!(on_cached, event_store) {
+                        let context = context(conn, data);
+
+                        thread::spawn(move || (handler)(context, guild_amount));
+                    } 
+                }
+            }
 
             if let Some(handler) = handler!(on_guild_create, event_store) {
                 let context = context(conn, data);

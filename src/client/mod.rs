@@ -576,6 +576,32 @@ impl Client {
             .on_channel_create = Some(Arc::new(handler));
     }
 
+    /// Attaches a handle for when all the [`GuildCreate`]s are received;
+    /// providing all the guilds' id.
+    ///
+    /// notes: This requires the cache feature. And that this'll fire when
+    /// all the guilds from all the shards have been cached.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::Client;
+    /// #
+    /// # let client = Client::new("");
+    ///
+    /// client.on_cached(|_, guilds| {
+    ///    println!("All the guilds have been cached; and those are: {:?}". guilds); 
+    /// });
+    /// ```
+    ///
+    /// [`GuildCreate`]: ../model/event/enum.Event.html#variant.GuildCreate
+    #[cfg(feature="cache")]
+    pub fn on_cached<F>(&mut self, handle: F) 
+        where F: Fn(Context, Vec<GuildId>) + Send + Sync + 'static {
+        self.event_store.write()
+            .unwrap()
+            .on_cached = Some(Arc::new(handle));
+    }
     /// Attaches a handler for when a [`ChannelDelete`] is received.
     ///
     /// # Examples
