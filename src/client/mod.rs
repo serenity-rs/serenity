@@ -590,7 +590,7 @@ impl Client {
     /// # let client = Client::new("");
     ///
     /// client.on_cached(|_, guilds| {
-    ///    println!("All the guilds have been cached; and those are: {:?}". guilds); 
+    ///    println!("All the guilds have been cached; and those are: {:?}", guilds); 
     /// });
     /// ```
     ///
