@@ -587,7 +587,7 @@ impl Client {
     /// ```rust,no_run
     /// # use serenity::client::Client;
     /// #
-    /// # let client = Client::new("");
+    /// # let mut client = Client::new("");
     ///
     /// client.on_cached(|_, guilds| {
     ///    println!("All the guilds have been cached; and those are: {:?}", guilds); 
