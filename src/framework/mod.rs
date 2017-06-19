@@ -75,7 +75,7 @@ use std::default::Default;
 use std::sync::Arc;
 use std::thread;
 use ::client::Context;
-use ::model::{Message, UserId};
+use ::model::{Message, MessageId, UserId, ReactionType};
 use ::model::permissions::Permissions;
 use ::utils;
 
@@ -209,6 +209,16 @@ pub enum DispatchError {
 
 type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;
 
+pub(crate) type ActionFn = Fn(Context, MessageId) + Send + Sync + 'static;
+
+/// Defines wheter this action should be called when
+/// a reaction's added, or removed.
+#[derive(Eq, Hash, PartialEq)]
+pub enum ReactionAction {
+    Add(ReactionType),
+    Remove(ReactionType),
+}
+
 /// A utility for easily managing dispatches to commands.
 ///
 /// Refer to the [module-level documentation] for more information.
@@ -222,6 +232,7 @@ pub struct Framework {
     before: Option<Arc<BeforeHook>>,
     dispatch_error_handler: Option<Arc<DispatchErrorHook>>,
     buckets: HashMap<String, Bucket>,
+    pub(crate) reaction_actions: HashMap<ReactionAction, Arc<ActionFn>>,
     after: Option<Arc<AfterHook>>,
     /// Whether the framework has been "initialized".
     ///
@@ -332,6 +343,29 @@ impl Framework {
             },
             users: HashMap::new(),
         });
+
+        self
+    }
+
+    /// Defines a "reaction action", that will be called if a reaction was
+    /// added; or deleted in a message.
+    ///
+    /// # Examples
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// use serenity::model::channel::ReactionType;
+    /// use serenity::framework::ReactionAction;
+    /// # let mut client = Client::new("token");
+    /// #
+    /// client.with_framework(|f| f
+    ///     .action(ReactionAction::Add(ReactionType::Unicode("❤")), |_, msg_id| {
+    ///         let _ = msg_id.find().unwrap().channel_id.say("love you too");
+    ///     })
+    /// );
+    /// ```
+    pub fn action<F>(mut self, action: ReactionAction, f: F) -> Self
+        where F: Fn(Context, MessageId) + Send + Sync + 'static {
+        self.reaction_actions.insert(action, Arc::new(f));
 
         self
     }
