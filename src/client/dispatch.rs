@@ -104,7 +104,7 @@ pub fn dispatch(event: Event,
                     });
                 
                 if let Some((_, f)) = res {
-                    f(context, event.reaction.message_id);
+                    f(context, event.reaction.message_id, event.reaction.channel_id);
                 }
             } else {
                 dispatch_reaction_add(context, event.reaction, event_store);
@@ -130,7 +130,7 @@ pub fn dispatch(event: Event,
                     });
                 
                 if let Some((_, f)) = res {
-                    f(context, event.reaction.message_id);
+                    f(context, event.reaction.message_id, event.reaction.channel_id);
                 }
             } else {
                 dispatch_reaction_remove(context, event.reaction, event_store);

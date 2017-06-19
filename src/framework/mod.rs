@@ -75,7 +75,7 @@ use std::default::Default;
 use std::sync::Arc;
 use std::thread;
 use ::client::Context;
-use ::model::{Message, MessageId, UserId, ReactionType};
+use ::model::{Message, MessageId, UserId, ChannelId, ReactionType};
 use ::model::permissions::Permissions;
 use ::utils;
 
@@ -209,7 +209,7 @@ pub enum DispatchError {
 
 type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;
 
-pub(crate) type ActionFn = Fn(Context, MessageId) + Send + Sync + 'static;
+pub(crate) type ActionFn = Fn(Context, MessageId, ChannelId) + Send + Sync + 'static;
 
 /// Defines wheter this action should be called when
 /// a reaction's added, or removed.
@@ -353,18 +353,18 @@ impl Framework {
     /// # Examples
     /// ```rust,no_run
     /// # use serenity::Client;
-    /// use serenity::model::channel::ReactionType;
+    /// use serenity::model::ReactionType;
     /// use serenity::framework::ReactionAction;
     /// # let mut client = Client::new("token");
     /// #
     /// client.with_framework(|f| f
-    ///     .action(ReactionAction::Add(ReactionType::Unicode("❤")), |_, msg_id| {
-    ///         let _ = msg_id.find().unwrap().channel_id.say("love you too");
+    ///     .action(ReactionAction::Add(ReactionType::Unicode("❤".to_string())), |_, _, channel_id| {
+    ///         let _ = channel_id.say("love you too");
     ///     })
     /// );
     /// ```
     pub fn action<F>(mut self, action: ReactionAction, f: F) -> Self
-        where F: Fn(Context, MessageId) + Send + Sync + 'static {
+        where F: Fn(Context, MessageId, ChannelId) + Send + Sync + 'static {
         self.reaction_actions.insert(action, Arc::new(f));
 
         self
