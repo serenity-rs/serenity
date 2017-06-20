@@ -44,7 +44,7 @@ use ::internal::prelude::*;
 ///         .name("Rust by Example")
 ///         .value("A collection of Rust examples on topics, useable in-browser")));
 ///
-/// let _ = webhook.execute(|w| w
+/// let _ = webhook.execute(false, |w| w
 ///     .content("Here's some information on Rust:")
 ///     .embeds(vec![website, resources]));
 /// ```
@@ -69,7 +69,7 @@ impl ExecuteWebhook {
     /// #
     /// let avatar_url = "https://i.imgur.com/KTs6whd.jpg";
     ///
-    /// let _ = webhook.execute(|w| w
+    /// let _ = webhook.execute(false, |w| w
     ///     .avatar_url(avatar_url)
     ///     .content("Here's a webhook"));
     /// ```
@@ -93,7 +93,7 @@ impl ExecuteWebhook {
     /// #
     /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
     /// #
-    /// if let Err(why) = webhook.execute(|w| w.content("foo")) {
+    /// if let Err(why) = webhook.execute(false, |w| w.content("foo")) {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
     /// ```
@@ -135,7 +135,7 @@ impl ExecuteWebhook {
     /// #
     /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
     /// #
-    /// if let Err(why) = webhook.execute(|w| w.content("hello").tts(true)) {
+    /// if let Err(why) = webhook.execute(false, |w| w.content("hello").tts(true)) {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
     /// ```
@@ -156,7 +156,7 @@ impl ExecuteWebhook {
     /// #
     /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
     /// #
-    /// if let Err(why) = webhook.execute(|w| w.content("hello").username("hakase")) {
+    /// if let Err(why) = webhook.execute(false, |w| w.content("hello").username("hakase")) {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
     /// ```
