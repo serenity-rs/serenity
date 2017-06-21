@@ -1,9 +1,9 @@
-use chrono::{DateTime, Duration, UTC};
+use chrono::{DateTime, Duration, Utc};
 use std::thread;
 use std::time::Duration as StdDuration;
 
 pub struct Timer {
-    due: DateTime<UTC>,
+    due: DateTime<Utc>,
     duration: Duration,
 }
 
@@ -12,7 +12,7 @@ impl Timer {
         let duration = Duration::milliseconds(duration_in_ms as i64);
 
         Timer {
-            due: UTC::now() + duration,
+            due: Utc::now() + duration,
             duration: duration,
         }
     }
@@ -20,7 +20,7 @@ impl Timer {
     pub fn await(&mut self) {
         let due_time = (self.due.timestamp() * 1000) + self.due.timestamp_subsec_millis() as i64;
         let now_time = {
-            let now = UTC::now();
+            let now = Utc::now();
 
             (now.timestamp() * 1000) + now.timestamp_subsec_millis() as i64
         };
@@ -37,7 +37,7 @@ impl Timer {
     }
 
     pub fn check(&mut self) -> bool {
-        if UTC::now() >= self.due {
+        if Utc::now() >= self.due {
             self.due = self.due + self.duration;
 
             true
@@ -47,6 +47,6 @@ impl Timer {
     }
 
     pub fn reset(&mut self) {
-        self.due = UTC::now() + self.duration;
+        self.due = Utc::now() + self.duration;
     }
 }

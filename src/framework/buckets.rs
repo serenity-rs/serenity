@@ -1,4 +1,4 @@
-use chrono::UTC;
+use chrono::Utc;
 use std::collections::HashMap;
 use std::default::Default;
 
@@ -30,7 +30,7 @@ pub(crate) struct Bucket {
 
 impl Bucket {
     pub fn take(&mut self, user_id: u64) -> i64 {
-        let time = UTC::now().timestamp();
+        let time = Utc::now().timestamp();
         let user = self.users.entry(user_id)
             .or_insert_with(MemberRatelimit::default);
 

@@ -40,7 +40,7 @@
 //! [Taken from]: https://discordapp.com/developers/docs/topics/rate-limits#rate-limits
 #![allow(zero_ptr)]
 
-use chrono::UTC;
+use chrono::Utc;
 use hyper::client::{RequestBuilder, Response};
 use hyper::header::Headers;
 use hyper::status::StatusCode;
@@ -439,7 +439,7 @@ impl RateLimit {
             return;
         }
 
-        let current_time = UTC::now().timestamp();
+        let current_time = Utc::now().timestamp();
 
         // The reset was in the past, so we're probably good.
         if current_time > self.reset {

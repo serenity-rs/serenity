@@ -1,4 +1,4 @@
-use chrono::UTC;
+use chrono::Utc;
 use serde_json::Value;
 use std::env::consts;
 use std::io::Write;
@@ -887,7 +887,7 @@ impl Shard {
 
     fn update_presence(&mut self) {
         let (ref game, status, afk) = self.current_presence;
-        let now = UTC::now().timestamp() as u64;
+        let now = Utc::now().timestamp() as u64;
 
         let msg = json!({
             "op": OpCode::StatusUpdate.num(),
