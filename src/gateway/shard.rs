@@ -12,7 +12,7 @@ use websocket::stream::sync::AsTcpStream;
 use websocket::sync::client::{Client, ClientBuilder};
 use websocket::sync::stream::{TcpStream, TlsStream};
 use websocket::WebSocketError;
-use ::constants::{self, OpCode};
+use ::constants::{self, OpCode, close_codes};
 use ::internal::prelude::*;
 use ::internal::ws_impl::SenderExt;
 use ::model::event::{Event, GatewayEvent};
@@ -442,36 +442,36 @@ impl Shard {
                 }
 
                 match num {
-                    Some(4001) => warn!("Sent invalid opcode"),
-                    Some(4002) => warn!("Sent invalid message"),
-                    Some(4003) => {
+                    Some(close_codes::UNKNOWN_OPCODE) => warn!("Sent invalid opcode"),
+                    Some(close_codes::DECODE_ERROR) => warn!("Sent invalid message"),
+                    Some(close_codes::NOT_AUTHENTICATED) => {
                         warn!("Sent no authentication");
 
                         return Err(Error::Gateway(GatewayError::NoAuthentication));
                     },
-                    Some(4004) => {
+                    Some(close_codes::AUTHENTICATION_FAILED) => {
                         warn!("Sent invalid authentication");
 
                         return Err(Error::Gateway(GatewayError::InvalidAuthentication));
                     },
-                    Some(4005) => warn!("Already authenticated"),
-                    Some(4007) => {
+                    Some(close_codes::ALREADY_AUTHENTICATED) => warn!("Already authenticated"),
+                    Some(close_codes::INVALID_SEQUENCE) => {
                         warn!("[Shard {:?}] Sent invalid seq: {}", self.shard_info, self.seq);
 
                         self.seq = 0;
                     },
-                    Some(4008) => warn!("Gateway ratelimited"),
-                    Some(4010) => {
+                    Some(close_codes::RATE_LIMITED) => warn!("Gateway ratelimited"),
+                    Some(close_codes::INVALID_SHARD) => {
                         warn!("Sent invalid shard data");
 
                         return Err(Error::Gateway(GatewayError::InvalidShardData));
                     },
-                    Some(4011) => {
+                    Some(close_codes::SHARDING_REQUIRED) => {
                         error!("Shard has too many guilds");
 
                         return Err(Error::Gateway(GatewayError::OverloadedShard));
                     },
-                    Some(4006) | Some(4009) => {
+                    Some(4006) | Some(close_codes::SESSION_TIMEOUT) => {
                         info!("[Shard {:?}] Invalid session", self.shard_info);
 
                         self.session_id = None;
@@ -485,8 +485,8 @@ impl Shard {
                     _ => {},
                 }
 
-                let resume = num.map(|num| {
-                    num != 1000 && num != 4004 && self.session_id.is_some()
+                let resume = num.map(|x| {
+                    x != 1000 && x != close_codes::AUTHENTICATION_FAILED && self.session_id.is_some()
                 }).unwrap_or(false);
 
                 if resume {
