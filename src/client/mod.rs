@@ -1328,7 +1328,11 @@ fn handle_shard(info: &mut MonitorInfo) {
         {
             let mut shard = info.shard.lock().unwrap();
 
-            shard.check_heartbeat();
+            if let Err(why) = shard.check_heartbeat() {
+                error!("Failed to heartbeat and reconnect: {:?}", why);
+
+                return;
+            }
         }
 
         #[cfg(feature="voice")]

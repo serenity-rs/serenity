@@ -746,10 +746,10 @@ impl Shard {
         }
     }
 
-    pub(crate) fn check_heartbeat(&mut self) {
+    pub(crate) fn check_heartbeat(&mut self) -> Result<()> {
         let heartbeat_interval = match self.heartbeat_interval {
             Some(heartbeat_interval) => heartbeat_interval,
-            None => return,
+            None => return Ok(()),
         };
 
         let wait = StdDuration::from_secs(heartbeat_interval / 1000);
@@ -758,7 +758,7 @@ impl Shard {
         // then don't perform a keepalive or attempt to reconnect.
         if let Some(last_sent) = self.heartbeat_instants.0 {
             if last_sent.elapsed() <= wait {
-                return;
+                return Ok(());
             }
         }
 
@@ -773,15 +773,19 @@ impl Shard {
                       why);
             }
 
-            return;
+            return Ok(());
         }
 
         // Otherwise, we're good to heartbeat.
         if let Err(why) = self.heartbeat() {
             warn!("[Shard {:?}] Err heartbeating: {:?}", self.shard_info, why);
-        }
 
-        self.heartbeat_instants.0 = Some(Instant::now());
+            self.reconnect()
+        } else {
+            self.heartbeat_instants.0 = Some(Instant::now());
+
+            Ok(())
+        }
     }
 
     pub(crate) fn autoreconnect(&mut self) -> Result<()> {
