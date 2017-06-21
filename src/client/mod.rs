@@ -1251,7 +1251,7 @@ fn boot_shard(info: &BootInfo) -> Result<Shard> {
     //
     // After three attempts, start re-retrieving the gateway URL. Before that,
     // use the cached one.
-    for attempt_number in 1..11u64 {
+    for attempt_number in 1..3u64 {
         // If we've tried over 3 times so far, get a new gateway URL.
         //
         // If doing so fails, count this as a boot attempt.

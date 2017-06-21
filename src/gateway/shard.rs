@@ -767,13 +767,13 @@ impl Shard {
         if !self.last_heartbeat_acknowledged {
             debug!("[Shard {:?}] Last heartbeat not acknowledged; re-connecting", self.shard_info);
 
-            if let Err(why) = self.autoreconnect() {
+            return self.reconnect().map_err(|why| {
                 warn!("[Shard {:?}] Err auto-reconnecting from heartbeat check: {:?}",
                       self.shard_info,
                       why);
-            }
 
-            return Ok(());
+                why
+            })
         }
 
         // Otherwise, we're good to heartbeat.
@@ -884,6 +884,7 @@ impl Shard {
 
     fn reset(&mut self) {
         self.heartbeat_instants = (Some(Instant::now()), None);
+        self.heartbeat_interval = None;
         self.last_heartbeat_acknowledged = true;
         self.stage = ConnectionStage::Disconnected;
         self.seq = 0;
@@ -930,10 +931,9 @@ fn connect(base_url: &str) -> Result<WsClient> {
 }
 
 fn set_client_timeout(client: &mut WsClient) -> Result<()> {
-    let timeout = StdDuration::from_millis(250);
-
     let stream = client.stream_ref().as_tcp();
-    stream.set_read_timeout(Some(timeout))?;
+    stream.set_read_timeout(Some(StdDuration::from_millis(100)))?;
+    stream.set_write_timeout(Some(StdDuration::from_secs(5)))?;
 
     Ok(())
 }
