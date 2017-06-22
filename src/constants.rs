@@ -1,7 +1,7 @@
 //! A set of constants used by the library.
 
 /// The maximum length of the textual size of an embed.
-pub const EMBED_MAX_LENGTH: u16 = 4000;
+pub const EMBED_MAX_LENGTH: u16 = 6000;
 /// The gateway version used by the library. The gateway URI is retrieved via
 /// the REST API.
 pub const GATEWAY_VERSION: u8 = 6;
