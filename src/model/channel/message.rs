@@ -1,4 +1,5 @@
 use chrono::{DateTime, FixedOffset};
+use serde_json::Value;
 use ::model::*;
 
 #[cfg(feature="cache")]
@@ -48,7 +49,8 @@ pub struct Message {
     /// Array of users mentioned in the message.
     pub mentions: Vec<User>,
     /// Non-repeating number used for ensuring message order.
-    pub nonce: Option<Snowflake>,
+    #[serde(default)]
+    pub nonce: Value,
     /// Indicator of whether the message is pinned.
     pub pinned: bool,
     /// Array of reactions performed on the message.
