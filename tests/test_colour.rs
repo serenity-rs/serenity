@@ -1,3 +1,5 @@
+#![cfg(feature="utils")]
+
 extern crate serenity;
 
 use serenity::utils::Colour;

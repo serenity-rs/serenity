@@ -1,8 +1,6 @@
 extern crate serenity;
 
 use serenity::model::*;
-use serenity::utils::Colour;
-use std::sync::{Arc, RwLock};
 
 #[test]
 fn test_formatters() {
@@ -13,8 +11,12 @@ fn test_formatters() {
     assert_eq!(UserId(5).to_string(), "5");
 }
 
+#[cfg(feature="utils")]
 #[test]
 fn test_mention() {
+    use serenity::utils::Colour;
+    use std::sync::{Arc, RwLock};
+
     let channel = Channel::Guild(Arc::new(RwLock::new(GuildChannel {
         bitrate: None,
         guild_id: GuildId(1),
