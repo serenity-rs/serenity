@@ -1242,7 +1242,7 @@ struct MonitorInfo {
     gateway_url: Arc<Mutex<String>>,
     shard: Arc<Mutex<Shard>>,
     shard_info: [u64; 2],
-    token: String,
+    token: Arc<Mutex<String>>,
 }
 
 fn boot_shard(info: &BootInfo) -> Result<Shard> {
