@@ -370,6 +370,29 @@ impl Framework {
         self
     }
 
+    /// Remove the action from any further usage by the framework.
+    ///
+    /// # Examples
+    /// ```rust,no_run
+    /// # use serenity::Client;
+    /// use serenity::model::ReactionType;
+    /// use serenity::framework::ReactionAction;
+    /// # let mut client = Client::new("token");
+    /// #
+    /// let action = ReactionAction::Add(ReactionType::Unicode("❤".to_string()));
+    /// client.with_framework(|f| f
+    ///     .action(action, |_, _, channel_id| {
+    ///         let _ = channel_id.say("love you too");
+    ///     })
+    ///     .remove_action(action)
+    /// );
+    /// ```
+    pub fn remove_action(mut self, action: ReactionAction) -> Self {
+        self.reaction_actions.remove(&action);
+
+        self
+    }
+
     #[cfg(feature="cache")]
     fn is_blocked_guild(&self, message: &Message) -> bool {
         if let Some(Channel::Guild(channel)) = CACHE.read().unwrap().channel(message.channel_id) {
