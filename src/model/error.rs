@@ -14,6 +14,9 @@ use super::Permissions;
 ///
 /// ```rust,no_run
 /// # #[cfg(feature="client")]
+/// # use std::error::Error;
+/// #
+/// # #[cfg(feature="client")]
 /// # fn try_main() -> Result<(), Box<Error>> {
 /// use serenity::{Client, Error};
 /// use serenity::model::ModelError;
