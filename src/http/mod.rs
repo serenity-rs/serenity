@@ -37,7 +37,9 @@ use hyper::client::{
     Response as HyperResponse,
     Request,
 };
+use hyper::header::ContentType;
 use hyper::method::Method;
+use hyper::mime::{Mime, SubLevel, TopLevel};
 use hyper::net::HttpsConnector;
 use hyper::{Error as HyperError, Result as HyperResult, Url, header};
 use hyper_native_tls::NativeTlsClient;
@@ -803,28 +805,41 @@ pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &JsonMap) -> R
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 /// let map = ObjectBuilder::new().insert("content", "test").build();
 ///
-/// let message = match http::execute_webhook(id, token, map) {
-///     Ok(message) => message,
+/// let message = match http::execute_webhook(id, token, true, map) {
+///     Ok(Some(message)) => message,
+///     Ok(None) => {
+///         println!("Expected a webhook message");
+///
+///         return;
+///     },
 ///     Err(why) => {
 ///         println!("Error executing webhook: {:?}", why);
 ///
 ///         return;
 ///     },
 /// };
+/// ```
 ///
 /// [`Channel`]: ../model/enum.Channel.html
 /// [`Message`]: ../model/struct.Message.html
 /// [Discord docs]: https://discordapp.com/developers/docs/resources/webhook#querystring-params
-pub fn execute_webhook(webhook_id: u64, token: &str, map: &JsonMap) -> Result<Message> {
+pub fn execute_webhook(webhook_id: u64, token: &str, wait: bool, map: &JsonMap)
+    -> Result<Option<Message>> {
     let body = serde_json::to_string(map)?;
+
     let client = request_client!();
 
     let response = retry(|| client
-        .post(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
-        .body(&body))
+        .post(&format!(api!("/webhooks/{}/{}?wait={}"), webhook_id, token, wait))
+        .body(&body)
+        .header(ContentType(Mime(TopLevel::Application, SubLevel::Json, vec![]))))
         .map_err(Error::Hyper)?;
 
-    serde_json::from_reader::<HyperResponse, Message>(response).map_err(From::from)
+    if response.status == StatusCode::NoContent {
+        return Ok(None);
+    }
+
+    serde_json::from_reader::<HyperResponse, Message>(response).map(Some).map_err(From::from)
 }
 
 /// Gets the active maintenances from Discord's Status API.

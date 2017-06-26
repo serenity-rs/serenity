@@ -148,7 +148,7 @@ impl Webhook {
     /// let mut webhook = http::get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
-    /// let _ = webhook.execute(|w| w.content("test")).expect("Error executing");
+    /// let _ = webhook.execute(false, |w| w.content("test")).expect("Error executing");
     /// ```
     ///
     /// Execute a webhook with message content of `test`, overriding the
@@ -171,15 +171,16 @@ impl Webhook {
     ///                   thread safety.")
     ///     .url("https://rust-lang.org"));
     ///
-    /// let _ = webhook.execute(|w| w
+    /// let _ = webhook.execute(false, |w| w
     ///     .content("test")
     ///     .username("serenity")
     ///     .embeds(vec![embed]))
     ///     .expect("Error executing");
     /// ```
     #[inline]
-    pub fn execute<F: FnOnce(ExecuteWebhook) -> ExecuteWebhook>(&self, f: F) -> Result<Message> {
-        http::execute_webhook(self.id.0, &self.token, &f(ExecuteWebhook::default()).0)
+    pub fn execute<F: FnOnce(ExecuteWebhook) -> ExecuteWebhook>(&self, wait: bool, f: F)
+        -> Result<Option<Message>> {
+        http::execute_webhook(self.id.0, &self.token, wait, &f(ExecuteWebhook::default()).0)
     }
 
     /// Retrieves the latest information about the webhook, editing the

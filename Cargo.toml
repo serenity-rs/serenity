@@ -11,8 +11,8 @@ repository = "https://github.com/zeyla/serenity.git"
 version = "0.2.0"
 
 [dependencies]
-base64 = "~0.5"
-bitflags = "~0.8"
+base64 = "~0.6"
+bitflags = "~0.9"
 flate2 = "~0.2"
 log = "~0.3"
 serde = "^1.0"
@@ -25,7 +25,7 @@ version = "1.0"
 
 [dependencies.chrono]
 features = ["serde"]
-version = "~0.3"
+version = "~0.4"
 
 [dependencies.hyper]
 optional = true
@@ -41,9 +41,9 @@ version = "~0.2"
 
 [dependencies.multipart]
 default-features = false
-features = ["client", "hyper"]
+features = ["client", "hyper", "safemem"]
 optional = true
-version = "0.12"
+version = "0.13"
 
 [dependencies.native-tls]
 optional = true

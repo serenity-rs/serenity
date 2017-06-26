@@ -1,7 +1,7 @@
 //! A set of constants used by the library.
 
 /// The maximum length of the textual size of an embed.
-pub const EMBED_MAX_LENGTH: u16 = 4000;
+pub const EMBED_MAX_LENGTH: u16 = 6000;
 /// The gateway version used by the library. The gateway URI is retrieved via
 /// the REST API.
 pub const GATEWAY_VERSION: u8 = 6;
@@ -120,4 +120,51 @@ impl VoiceOpCode {
             VoiceOpCode::Heartbeat => 8,
         }
     }
+}
+
+pub mod close_codes {
+    /// Unknown error; try reconnecting?
+    ///
+    /// Can reconnect.
+    pub const UNKNOWN_ERROR: u16 = 4000;
+    /// Invalid Gateway OP Code.
+    ///
+    /// Can resume.
+    pub const UNKNOWN_OPCODE: u16 = 4001;
+    /// An invalid payload was sent.
+    ///
+    /// Can resume.
+    pub const DECODE_ERROR: u16 = 4002;
+    /// A payload was sent prior to identifying.
+    ///
+    /// Cannot reconnect.
+    pub const NOT_AUTHENTICATED: u16 = 4003;
+    /// The account token sent with the identify payload was incorrect.
+    ///
+    /// Cannot reconnect.
+    pub const AUTHENTICATION_FAILED: u16 = 4004;
+    /// More than one identify payload was sent.
+    ///
+    /// Can reconnect.
+    pub const ALREADY_AUTHENTICATED: u16 = 4005;
+    /// The sequence sent when resuming the session was invalid.
+    ///
+    /// Can reconnect.
+    pub const INVALID_SEQUENCE: u16 = 4007;
+    /// Payloads were being sent too quickly.
+    ///
+    /// Can resume.
+    pub const RATE_LIMITED: u16 = 4008;
+    /// A session timed out.
+    ///
+    /// Can reconnect.
+    pub const SESSION_TIMEOUT: u16 = 4009;
+    /// An invalid shard when identifying was sent.
+    ///
+    /// Cannot reconnect.
+    pub const INVALID_SHARD: u16 = 4010;
+    /// The session would have handled too many guilds.
+    ///
+    /// Cannot reconnect.
+    pub const SHARDING_REQUIRED: u16 = 4011;
 }

@@ -1,4 +1,4 @@
-use chrono::UTC;
+use chrono::Utc;
 use serde_json::Value;
 use std::env::consts;
 use std::io::Write;
@@ -12,7 +12,7 @@ use websocket::stream::sync::AsTcpStream;
 use websocket::sync::client::{Client, ClientBuilder};
 use websocket::sync::stream::{TcpStream, TlsStream};
 use websocket::WebSocketError;
-use ::constants::{self, OpCode};
+use ::constants::{self, OpCode, close_codes};
 use ::internal::prelude::*;
 use ::internal::ws_impl::SenderExt;
 use ::model::event::{Event, GatewayEvent};
@@ -442,36 +442,36 @@ impl Shard {
                 }
 
                 match num {
-                    Some(4001) => warn!("Sent invalid opcode"),
-                    Some(4002) => warn!("Sent invalid message"),
-                    Some(4003) => {
+                    Some(close_codes::UNKNOWN_OPCODE) => warn!("Sent invalid opcode"),
+                    Some(close_codes::DECODE_ERROR) => warn!("Sent invalid message"),
+                    Some(close_codes::NOT_AUTHENTICATED) => {
                         warn!("Sent no authentication");
 
                         return Err(Error::Gateway(GatewayError::NoAuthentication));
                     },
-                    Some(4004) => {
+                    Some(close_codes::AUTHENTICATION_FAILED) => {
                         warn!("Sent invalid authentication");
 
                         return Err(Error::Gateway(GatewayError::InvalidAuthentication));
                     },
-                    Some(4005) => warn!("Already authenticated"),
-                    Some(4007) => {
+                    Some(close_codes::ALREADY_AUTHENTICATED) => warn!("Already authenticated"),
+                    Some(close_codes::INVALID_SEQUENCE) => {
                         warn!("[Shard {:?}] Sent invalid seq: {}", self.shard_info, self.seq);
 
                         self.seq = 0;
                     },
-                    Some(4008) => warn!("Gateway ratelimited"),
-                    Some(4010) => {
+                    Some(close_codes::RATE_LIMITED) => warn!("Gateway ratelimited"),
+                    Some(close_codes::INVALID_SHARD) => {
                         warn!("Sent invalid shard data");
 
                         return Err(Error::Gateway(GatewayError::InvalidShardData));
                     },
-                    Some(4011) => {
+                    Some(close_codes::SHARDING_REQUIRED) => {
                         error!("Shard has too many guilds");
 
                         return Err(Error::Gateway(GatewayError::OverloadedShard));
                     },
-                    Some(4006) | Some(4009) => {
+                    Some(4006) | Some(close_codes::SESSION_TIMEOUT) => {
                         info!("[Shard {:?}] Invalid session", self.shard_info);
 
                         self.session_id = None;
@@ -485,8 +485,8 @@ impl Shard {
                     _ => {},
                 }
 
-                let resume = num.map(|num| {
-                    num != 1000 && num != 4004 && self.session_id.is_some()
+                let resume = num.map(|x| {
+                    x != 1000 && x != close_codes::AUTHENTICATION_FAILED && self.session_id.is_some()
                 }).unwrap_or(false);
 
                 if resume {
@@ -746,10 +746,10 @@ impl Shard {
         }
     }
 
-    pub(crate) fn check_heartbeat(&mut self) {
+    pub(crate) fn check_heartbeat(&mut self) -> Result<()> {
         let heartbeat_interval = match self.heartbeat_interval {
             Some(heartbeat_interval) => heartbeat_interval,
-            None => return,
+            None => return Ok(()),
         };
 
         let wait = StdDuration::from_secs(heartbeat_interval / 1000);
@@ -758,7 +758,7 @@ impl Shard {
         // then don't perform a keepalive or attempt to reconnect.
         if let Some(last_sent) = self.heartbeat_instants.0 {
             if last_sent.elapsed() <= wait {
-                return;
+                return Ok(());
             }
         }
 
@@ -767,21 +767,25 @@ impl Shard {
         if !self.last_heartbeat_acknowledged {
             debug!("[Shard {:?}] Last heartbeat not acknowledged; re-connecting", self.shard_info);
 
-            if let Err(why) = self.autoreconnect() {
+            return self.reconnect().map_err(|why| {
                 warn!("[Shard {:?}] Err auto-reconnecting from heartbeat check: {:?}",
                       self.shard_info,
                       why);
-            }
 
-            return;
+                why
+            })
         }
 
         // Otherwise, we're good to heartbeat.
         if let Err(why) = self.heartbeat() {
             warn!("[Shard {:?}] Err heartbeating: {:?}", self.shard_info, why);
-        }
 
-        self.heartbeat_instants.0 = Some(Instant::now());
+            self.reconnect()
+        } else {
+            self.heartbeat_instants.0 = Some(Instant::now());
+
+            Ok(())
+        }
     }
 
     pub(crate) fn autoreconnect(&mut self) -> Result<()> {
@@ -880,6 +884,7 @@ impl Shard {
 
     fn reset(&mut self) {
         self.heartbeat_instants = (Some(Instant::now()), None);
+        self.heartbeat_interval = None;
         self.last_heartbeat_acknowledged = true;
         self.stage = ConnectionStage::Disconnected;
         self.seq = 0;
@@ -887,7 +892,7 @@ impl Shard {
 
     fn update_presence(&mut self) {
         let (ref game, status, afk) = self.current_presence;
-        let now = UTC::now().timestamp() as u64;
+        let now = Utc::now().timestamp() as u64;
 
         let msg = json!({
             "op": OpCode::StatusUpdate.num(),
@@ -926,10 +931,9 @@ fn connect(base_url: &str) -> Result<WsClient> {
 }
 
 fn set_client_timeout(client: &mut WsClient) -> Result<()> {
-    let timeout = StdDuration::from_millis(250);
-
     let stream = client.stream_ref().as_tcp();
-    stream.set_read_timeout(Some(timeout))?;
+    stream.set_read_timeout(Some(StdDuration::from_millis(100)))?;
+    stream.set_write_timeout(Some(StdDuration::from_secs(5)))?;
 
     Ok(())
 }

@@ -240,34 +240,3 @@ impl<'de> Visitor<'de> for U64Visitor {
         Ok(v)
     }
 }
-
-pub struct I64Visitor;
-
-impl<'de> Visitor<'de> for I64Visitor {
-    type Value = i64;
-
-    fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
-        formatter.write_str("identifier")
-    }
-
-    fn visit_str<E: DeError>(self, v: &str) -> StdResult<Self::Value, E> {
-        match v.parse::<i64>() {
-            Ok(v) => Ok(v),
-            Err(_) => {
-                let mut s = String::new();
-                s.push_str("Unknown i64 value: ");
-                s.push_str(v);
-
-                Err(DeError::custom(s))
-            },
-        }
-    }
-
-    fn visit_i64<E: DeError>(self, v: i64) -> StdResult<Self::Value, E> {
-        Ok(v)
-    }
-
-    fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> {
-        Ok(v as i64)
-    }
-}
