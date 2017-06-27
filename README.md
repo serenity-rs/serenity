@@ -1,4 +1,4 @@
-[![ci-badge][]][ci] [![crate-badge][]][crate] [![license-badge][]][license] [![docs-badge][]][docs] [![contribs-badge][]][contribs] [![dapi-badge][]][dapi]
+[![ci-badge][]][ci] [![docs-badge][]][docs]
 
 # serenity
 
@@ -126,44 +126,23 @@ Voice+youtube-dl:
 
 - youtube-dl (Arch: `community/youtube-dl`)
 
-# Related Projects
-
-- [discord-rs][rel:discord-rs] (Rust)
-- [eris][rel:eris] (JavaScript)
-- [Discord.Net][rel:discord.net] (.NET)
-- [discord.py][rel:discord.py] (Python)
-- [discordrb][rel:discordrb] (Ruby)
-
 [`Cache`]: https://serenity.zey.moe/master/target/doc/serenity/ext/cache/struct.Cache.html
 [`Client::new`]: https://serenity.zey.moe/master/target/doc/serenity/client/struct.Client.html#method.new
 [`Client::on_message`]: https://serenity.zey.moe/master/target/doc/serenity/client/struct.Client.html#method.on_message
-[`Shard`]: https://serenity.zey.moe/master/target/doc/serenity/client/gateway/struct.Shard.html
 [`Context`]: https://serenity.zey.moe/master/target/doc/serenity/client/struct.Context.html
 [`Event`]: https://serenity.zey.moe/master/target/doc/serenity/model/event/enum.Event.html
 [`Event::MessageCreate`]: https://serenity.zey.moe/master/target/doc/serenity/model/event/enum.Event.html#variant.MessageCreate
+[`Shard`]: https://serenity.zey.moe/master/target/doc/serenity/client/gateway/struct.Shard.html
 [`examples`]: https://github.com/zeyla/serenity/blob/master/examples
 [`rest`]: https://serenity.zey.moe/master/target/doc/serenity/client/rest/index.html
 [`validate_token`]: https://serenity.zey.moe/master/target/doc/serenity/client/fn.validate_token.html
 [cache docs]: https://serenity.zey.moe/master/target/doc/serenity/ext/cache/index.html
 [ci]: https://travis-ci.org/zeyla/serenity
 [ci-badge]: https://travis-ci.org/zeyla/serenity.svg?branch=master
-[contribs]: https://img.shields.io/github/contributors/zeyla/serenity.svg
-[contribs-badge]: https://img.shields.io/github/contributors/zeyla/serenity.svg
-[crate]: https://crates.io/crates/serenity
-[crate-badge]: https://img.shields.io/crates/v/serenity.svg?maxAge=2592000
 [client's module-level documentation]: https://serenity.zey.moe/master/target/doc/serenity/client/index.html
-[dapi]: https://discord.gg/PgQYQcc
-[dapi-badge]: https://discordapp.com/api/guilds/81384788765712384/widget.png
 [discord docs]: https://discordapp.com/developers/docs/intro
 [docs]: https://serenity.zey.moe/
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
 [examples]: https://github.com/zeyla/serenity/tree/master/examples
 [gateway docs]: https://serenity.zey.moe/master/target/doc/serenity/client/gateway/index.html
-[license]: https://opensource.org/licenses/ISC
-[license-badge]: https://img.shields.io/badge/license-ISC-blue.svg
 [logo]: https://raw.githubusercontent.com/zeyla/serenity/master/logo.png
-[rel:discord-rs]: https://github.com/SpaceManiac/discord-rs
-[rel:discord.net]: https://github.com/RogueException/Discord.Net
-[rel:discord.py]: https://github.com/Rapptz/discord.py
-[rel:discordrb]: https://github.com/meew0/discordrb
-[rel:eris]: https://github.com/abalabahaha/eris
