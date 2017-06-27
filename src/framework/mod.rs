@@ -213,7 +213,7 @@ pub(crate) type ActionFn = Fn(Context, MessageId, ChannelId) + Send + Sync + 'st
 
 /// Defines wheter this action should be called when
 /// a reaction's added, or removed.
-#[derive(Eq, Hash, PartialEq)]
+#[derive(Clone, Eq, Hash, PartialEq)]
 pub enum ReactionAction {
     Add(ReactionType),
     Remove(ReactionType),
@@ -381,7 +381,7 @@ impl Framework {
     /// #
     /// let action = ReactionAction::Add(ReactionType::Unicode("❤".to_string()));
     /// client.with_framework(|f| f
-    ///     .action(action, |_, _, channel_id| {
+    ///     .action(action.clone(), |_, _, channel_id| {
     ///         let _ = channel_id.say("love you too");
     ///     })
     ///     .remove_action(action)
