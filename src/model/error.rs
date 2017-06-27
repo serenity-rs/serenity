@@ -101,6 +101,9 @@ pub enum Error {
     ///
     /// [`Message`]: ../model/struct.Message.html
     MessageTooLong(u64),
+    /// Indicates that the current user is attempting to Direct Message another
+    /// bot user, which is disallowed by the API.
+    MessagingBot,
 }
 
 impl Display for Error {
