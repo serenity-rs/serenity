@@ -96,11 +96,21 @@ features = ["pick", "your", "feature", "names", "here"]
 
 The following is a full list of features:
 
+- **builder**: The builders used in conjunction with models' methods.
 - **cache**: The cache will store information about guilds, channels, users, and
 other data, to avoid performing REST requests. If you are low on RAM, do not
 enable this;
+- **client**: A manager for shards and event handlers, abstracting work away
+handling shard events and updating the cache, if enabled.
 - **framework**: Enables the framework, which is a utility to allow simple
 command parsing, before/after command execution, prefix setting, and more;
+- **gateway**: A Shard, used as a higher-level interface for communicating with
+the Discord gateway over a WebSocket client.
+- **http**: Functions providing a wrapper over Discord's REST API at a low
+enough level that optional parameters can be provided at will via a JsonMap.
+- **model**: Method implementations for models, acting as helper methods over
+the HTTP functions.
+- **utils**: Utility functions for common use cases by users.
 - **voice**: Enables compilation of voice support, so that voice channels can be
 connected to and audio can be sent/received.
 
