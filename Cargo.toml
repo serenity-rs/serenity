@@ -1,7 +1,7 @@
 [package]
 authors = ["alex <acdenissk69@gmail.com", "Zeyla Hellyer <zey@zey.moe>"]
 description = "A Rust library for the Discord API."
-documentation = "https://serenity.zey.moe"
+documentation = "https://docs.rs/serenity"
 homepage = "https://github.com/zeyla/serenity"
 keywords = ["discord", "api"]
 license = "ISC"

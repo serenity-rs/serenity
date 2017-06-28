@@ -136,23 +136,23 @@ Voice+youtube-dl:
 
 - youtube-dl (Arch: `community/youtube-dl`)
 
-[`Cache`]: https://serenity.zey.moe/master/target/doc/serenity/ext/cache/struct.Cache.html
-[`Client::new`]: https://serenity.zey.moe/master/target/doc/serenity/client/struct.Client.html#method.new
-[`Client::on_message`]: https://serenity.zey.moe/master/target/doc/serenity/client/struct.Client.html#method.on_message
-[`Context`]: https://serenity.zey.moe/master/target/doc/serenity/client/struct.Context.html
-[`Event`]: https://serenity.zey.moe/master/target/doc/serenity/model/event/enum.Event.html
-[`Event::MessageCreate`]: https://serenity.zey.moe/master/target/doc/serenity/model/event/enum.Event.html#variant.MessageCreate
-[`Shard`]: https://serenity.zey.moe/master/target/doc/serenity/client/gateway/struct.Shard.html
+[`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
+[`Client::new`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.new
+[`Client::on_message`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.on_message
+[`Context`]: https://docs.rs/serenity/*/serenity/client/struct.Context.html
+[`Event`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html
+[`Event::MessageCreate`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html#variant.MessageCreatef
+[`Shard`]: https://docs.rs/serenity/*/serenity/gateway/struct.Shard.html
 [`examples`]: https://github.com/zeyla/serenity/blob/master/examples
-[`rest`]: https://serenity.zey.moe/master/target/doc/serenity/client/rest/index.html
-[`validate_token`]: https://serenity.zey.moe/master/target/doc/serenity/client/fn.validate_token.html
-[cache docs]: https://serenity.zey.moe/master/target/doc/serenity/ext/cache/index.html
+[`rest`]: https://docs.rs/serenity/*/serenity/client/rest/index.html
+[`validate_token`]: https://docs.rs/serenity/*/serenity/client/fn.validate_token.html
+[cache docs]: https://docs.rs/serenity/*/serenity/cache/index.html
 [ci]: https://travis-ci.org/zeyla/serenity
 [ci-badge]: https://travis-ci.org/zeyla/serenity.svg?branch=master
-[client's module-level documentation]: https://serenity.zey.moe/master/target/doc/serenity/client/index.html
+[client's module-level documentation]: https://docs.rs/serenity/*/serenity/client/index.html
 [discord docs]: https://discordapp.com/developers/docs/intro
 [docs]: https://serenity.zey.moe/
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
 [examples]: https://github.com/zeyla/serenity/tree/master/examples
-[gateway docs]: https://serenity.zey.moe/master/target/doc/serenity/client/gateway/index.html
+[gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
 [logo]: https://raw.githubusercontent.com/zeyla/serenity/master/logo.png
