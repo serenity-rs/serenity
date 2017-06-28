@@ -162,7 +162,7 @@ impl Member {
     /// [`guild_id`]: #structfield.guild_id
     #[deprecated(since="0.2.1", note="Use the `guild_id` structfield instead.")]
     pub fn find_guild(&self) -> Result<GuildId> {
-        return Ok(self.guild_id);
+        Ok(self.guild_id)
     }
 
     /// Kick the member from the guild.
