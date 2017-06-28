@@ -6,11 +6,11 @@ use super::Context;
 use typemap::ShareMap;
 use ::gateway::Shard;
 use ::model::event::Event;
-use ::model::{Message, GuildId};
-use chrono::{UTC, Timelike};
+use ::model::{Message, Reaction, GuildId};
+use chrono::{Utc, Timelike};
 
 #[cfg(feature="framework")]
-use ::ext::framework::Framework;
+use ::ext::framework::{Framework, ReactionAction};
 
 #[cfg(feature="cache")]
 use super::CACHE;
@@ -61,7 +61,7 @@ macro_rules! update {
 }
 
 macro_rules! now {
-    () => (UTC::now().time().second() * 1000)
+    () => (Utc::now().time().second() * 1000)
 }
 
 fn context(conn: &Arc<Mutex<Shard>>,
@@ -90,6 +90,58 @@ pub fn dispatch(event: Event,
                 dispatch_message(context, event.message, event_store);
             }
         },
+        Event::ReactionAdd(event) => {
+            let context = context(conn, data);
+            let framework = framework.lock().unwrap();
+
+            if framework.initialized {
+                dispatch_reaction_add(context.clone(),
+                                      event.reaction.clone(),
+                                      event_store);
+                
+                let res = framework.reaction_actions
+                    .iter()
+                    .find(|&(ra, ..)| {
+                        if let ReactionAction::Add(ref kind) = *ra {
+                            *kind == event.reaction.emoji 
+                        } else {
+                            false
+                        }
+                    });
+                
+                if let Some((_, f)) = res {
+                    f(context, event.reaction.message_id, event.reaction.channel_id);
+                }
+            } else {
+                dispatch_reaction_add(context, event.reaction, event_store);
+            }
+        },
+        Event::ReactionRemove(event) => {
+            let context = context(conn, data);
+            let framework = framework.lock().unwrap();
+
+            if framework.initialized {
+                dispatch_reaction_remove(context.clone(),
+                                         event.reaction.clone(),
+                                         event_store);
+                
+                let res = framework.reaction_actions
+                    .iter()
+                    .find(|&(ra, _)| {
+                        if let ReactionAction::Remove(ref kind) = *ra {
+                            *kind == event.reaction.emoji 
+                        } else {
+                            false
+                        }
+                    });
+                
+                if let Some((_, f)) = res {
+                    f(context, event.reaction.message_id, event.reaction.channel_id);
+                }
+            } else {
+                dispatch_reaction_remove(context, event.reaction, event_store);
+            }
+        },
         other => handle_event(other, conn, data, event_store),
     }
 }
@@ -105,6 +157,14 @@ pub fn dispatch(event: Event,
             dispatch_message(context,
                              event.message,
                              event_store);
+        },
+        Event::ReactionAdd(event) => {
+            let context = context(conn, data);
+            dispatch_reaction_add(context, event.reaction);
+        },
+        Event::ReactionRemove(event) => {
+            let context = context(conn, data);
+            dispatch_reaction_remove(context, event.reaction);
         },
         other => handle_event(other, conn, data, event_store),
     }
@@ -122,6 +182,26 @@ fn dispatch_message(context: Context,
             }
 
             (handler)(context, message);
+        });
+    }
+}
+
+fn dispatch_reaction_add(context: Context,
+                         reaction: Reaction,
+                         event_store: &Arc<RwLock<EventStore>>) {
+    if let Some(handler) = handler!(on_reaction_add, event_store) {
+        thread::spawn(move || {
+            (handler)(context, reaction);
+        });
+    }
+}
+
+fn dispatch_reaction_remove(context: Context,
+                         reaction: Reaction,
+                         event_store: &Arc<RwLock<EventStore>>) {
+    if let Some(handler) = handler!(on_reaction_remove, event_store) {
+        thread::spawn(move || {
+            (handler)(context, reaction);
         });
     }
 }
@@ -457,20 +537,11 @@ fn handle_event(event: Event,
                 thread::spawn(move || (handler)(context, event));
             }
         },
-        Event::ReactionAdd(event) => {
-            if let Some(handler) = handler!(on_reaction_add, event_store) {
-                let context = context(conn, data);
 
-                thread::spawn(move || (handler)(context, event.reaction));
-            }
-        },
-        Event::ReactionRemove(event) => {
-            if let Some(handler) = handler!(on_reaction_remove, event_store) {
-                let context = context(conn, data);
+        // Already handled by the framework check macro
+        Event::ReactionAdd(_) => {},
+        Event::ReactionRemove(_) => {},
 
-                thread::spawn(move || (handler)(context, event.reaction));
-            }
-        },
         Event::ReactionRemoveAll(event) => {
             if let Some(handler) = handler!(on_reaction_remove_all, event_store) {
                 let context = context(conn, data);
