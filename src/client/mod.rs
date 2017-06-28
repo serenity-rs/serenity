@@ -22,10 +22,11 @@
 mod context;
 mod dispatch;
 mod error;
-mod event_store;
+mod event_handler;
 
 pub use self::context::Context;
 pub use self::error::Error as ClientError;
+pub use self::event_handler::EventHandler;
 
 // Note: the following re-exports are here for backwards compatibility
 pub use ::gateway;
@@ -35,9 +36,7 @@ pub use ::http as rest;
 pub use ::CACHE;
 
 use self::dispatch::dispatch;
-use self::event_store::EventStore;
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex, RwLock};
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use std::{mem, thread};
 use super::gateway::Shard;
@@ -47,7 +46,6 @@ use ::http;
 use ::internal::prelude::*;
 use ::internal::ws_impl::ReceiverExt;
 use ::model::event::*;
-use ::model::*;
 
 #[cfg(feature="framework")]
 use ::framework::Framework;
@@ -89,7 +87,7 @@ use ::framework::Framework;
 /// [`on_message`]: #method.on_message
 /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
 /// [sharding docs]: gateway/index.html#sharding
-pub struct Client {
+pub struct Client<H: EventHandler + Send + Sync + 'static> {
     /// A ShareMap which requires types to be Send + Sync. This is a map that
     /// can be safely shared across contexts.
     ///
@@ -165,14 +163,13 @@ pub struct Client {
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`on_ready`]: #method.on_ready
-    event_store: Arc<RwLock<EventStore>>,
+    event_handler: Arc<H>,
     #[cfg(feature="framework")]
     framework: Arc<Mutex<Framework>>,
     token: Arc<Mutex<String>>,
 }
 
-#[allow(type_complexity)]
-impl Client {
+impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// Creates a Client for a bot user.
     ///
     /// Discord has a requirement of prefixing bot tokens with `"Bot "`, which
@@ -198,14 +195,14 @@ impl Client {
     /// #    try_main().unwrap();
     /// # }
     /// ```
-    pub fn new(token: &str) -> Self {
+    pub fn new(token: &str, handler: H) -> Self {
         let token = if token.starts_with("Bot ") {
             token.to_owned()
         } else {
             format!("Bot {}", token)
         };
 
-        init_client(token)
+        init_client(token, handler)
     }
 
     /// Alias of [`new`].
@@ -213,8 +210,8 @@ impl Client {
     /// [`new`]: #method.new
     #[deprecated(since="0.1.5", note="Use `new` instead")]
     #[inline(always)]
-    pub fn login_bot(token: &str) -> Self {
-        Self::new(token)
+    pub fn login_bot(token: &str, handler: H) -> Self {
+        Self::new(token, handler)
     }
 
     /// Alias for [`new`].
@@ -222,8 +219,8 @@ impl Client {
     /// [`new`]: #method.new
     #[deprecated(since="0.2.1", note="Use `new` instead")]
     #[inline(always)]
-    pub fn login(token: &str) -> Self {
-        Self::new(token)
+    pub fn login(token: &str, handler: H) -> Self {
+        Self::new(token, handler)
     }
 
     /// Sets a framework to be used with the client. All message events will be
@@ -545,422 +542,6 @@ impl Client {
         self.start_connection([range[0], range[1], total_shards], http::get_gateway()?.url)
     }
 
-    /// Attaches a handler for when a [`ChannelCreate`] is received.
-    ///
-    /// # Examples
-    ///
-    /// If the channel is a guild channel, send `"first"` to the channel when
-    /// one is created:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::Client;
-    /// #
-    /// # let mut client = Client::new("");
-    /// use serenity::model::Channel;
-    ///
-    /// client.on_channel_create(|ctx, channel| {
-    ///     if let Channel::Guild(ch) = channel {
-    ///         if let Err(why) = ch.read().unwrap().say("first") {
-    ///             println!("Err sending first message: {:?}", why);
-    ///         }
-    ///     }
-    /// });
-    /// ```
-    ///
-    /// [`ChannelCreate`]: ../model/event/enum.Event.html#variant.ChannelCreate
-    pub fn on_channel_create<F>(&mut self, handler: F)
-        where F: Fn(Context, Channel) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_channel_create = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handle for when all the [`GuildCreate`]s are received;
-    /// providing all the guilds' id.
-    ///
-    /// notes: This requires the cache feature. And that this'll fire when
-    /// all the guilds from all the shards have been cached.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,no_run
-    /// # use serenity::client::Client;
-    /// #
-    /// # let mut client = Client::new("");
-    ///
-    /// client.on_cached(|_, guilds| {
-    ///    println!("All the guilds have been cached; and those are: {:?}", guilds); 
-    /// });
-    /// ```
-    ///
-    /// [`GuildCreate`]: ../model/event/enum.Event.html#variant.GuildCreate
-    #[cfg(feature="cache")]
-    pub fn on_cached<F>(&mut self, handle: F) 
-        where F: Fn(Context, Vec<GuildId>) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_cached = Some(Arc::new(handle));
-    }
-    /// Attaches a handler for when a [`ChannelDelete`] is received.
-    ///
-    /// # Examples
-    ///
-    /// If the channel is a guild channel, send the name of the channel to the
-    /// guild's default channel.
-    ///
-    /// ```rust,no_run
-    /// # use serenity::Client;
-    /// #
-    /// # let mut client = Client::new("");
-    /// use serenity::model::{Channel, ChannelId};
-    ///
-    /// client.on_channel_delete(|ctx, channel| {
-    ///     if let Channel::Guild(channel) = channel {
-    ///         let (content, default_channel_id) = {
-    ///             let reader = channel.read().unwrap();
-    ///             let content = format!("A channel named '{}' was deleted.", reader.name);
-    ///             let id = ChannelId(reader.guild_id.0);
-    ///
-    ///             (content, id)
-    ///         };
-    ///
-    ///         if let Err(why) = default_channel_id.say(&content) {
-    ///             println!("Err sending message to default channel: {:?}", why);
-    ///         }
-    ///     }
-    /// });
-    /// ```
-    ///
-    /// [`ChannelDelete`]: ../model/event/enum.Event.html#variant.ChannelDelete
-    pub fn on_channel_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, Channel) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_channel_delete = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`ChannelPinsUpdate`] is received.
-    ///
-    /// [`ChannelPinsUpdate`]: ../model/event/enum.Event.html#variant.ChannelPinsUpdate
-    pub fn on_channel_pins_update<F>(&mut self, handler: F)
-        where F: Fn(Context, ChannelPinsUpdateEvent) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_channel_pins_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildCreate`] is received.
-    ///
-    /// [`GuildCreate`]: ../model/event/enum.Event.html#variant.GuildCreate
-    pub fn on_guild_create<F>(&mut self, handler: F)
-        where F: Fn(Context, Guild) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_create = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildEmojisUpdate`] is received.
-    ///
-    /// The `HashMap` of emojis is the new full list of emojis.
-    ///
-    /// [`GuildEmojisUpdate`]: ../model/event/enum.Event.html#variant.GuildEmojisUpdate
-    pub fn on_guild_emojis_update<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, HashMap<EmojiId, Emoji>) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_emojis_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildIntegrationsUpdate`] is received.
-    ///
-    /// [`GuildIntegrationsUpdate`]: ../model/event/enum.Event.html#variant.GuildIntegrationsUpdate
-    pub fn on_guild_integrations_update<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_integrations_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildMemberAdd`] is received.
-    ///
-    /// [`GuildMemberAdd`]: ../model/event/enum.Event.html#variant.GuildMemberAdd
-    pub fn on_guild_member_add<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, Member) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_member_addition = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildMembersChunk`] is received.
-    ///
-    /// [`GuildMembersChunk`]: ../model/event/enum.Event.html#variant.GuildMembersChunk
-    pub fn on_guild_members_chunk<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, HashMap<UserId, Member>) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_members_chunk = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildRoleCreate`] is received.
-    ///
-    /// [`GuildRoleCreate`]: ../model/event/enum.Event.html#variant.GuildRoleCreate
-    pub fn on_guild_role_create<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, Role) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_role_create = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildUnavailable`] is received.
-    ///
-    /// [`GuildUnavailable`]: ../model/event/enum.Event.html#variant.GuildUnavailable
-    pub fn on_guild_unavailable<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_unavailable = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildBan`] is received.
-    ///
-    /// [`GuildBan`]: ../model/event/enum.Event.html#variant.GuildBan
-    pub fn on_member_ban<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, User) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_ban_addition = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildUnban`] is received.
-    ///
-    /// [`GuildUnban`]: ../model/event/enum.Event.html#variant.GuildUnban
-    pub fn on_member_unban<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, User) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_ban_removal = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`MessageCreate`] is received.
-    ///
-    /// # Examples
-    ///
-    /// Print the contents of every received message:
-    ///
-    /// ```rust,ignore
-    /// use serenity::Client;
-    ///
-    /// let mut client = Client::new("bot token here");
-    ///
-    /// client.on_message(|_context, message| {
-    ///     println!("{}", message.content);
-    /// });
-    ///
-    /// let _ = client.start();
-    /// ```
-    ///
-    /// [`MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
-    pub fn on_message<F>(&mut self, handler: F)
-        where F: Fn(Context, Message) + Send + Sync + 'static {
-
-        self.event_store.write()
-            .unwrap()
-            .on_message = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`MessageDelete`] is received.
-    ///
-    /// [`MessageDelete`]: ../model/event/enum.Event.html#variant.MessageDelete
-    pub fn on_message_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, ChannelId, MessageId) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_message_delete = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`MessageDeleteBulk`] is received.
-    ///
-    /// [`MessageDeleteBulk`]: ../model/event/enum.Event.html#variant.MessageDeleteBulk
-    pub fn on_message_delete_bulk<F>(&mut self, handler: F)
-        where F: Fn(Context, ChannelId, Vec<MessageId>) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_message_delete_bulk = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`MessageUpdate`] is received.
-    ///
-    /// [`MessageUpdate`]: ../model/event/enum.Event.html#variant.MessageUpdate
-    pub fn on_message_update<F>(&mut self, handler: F)
-        where F: Fn(Context, MessageUpdateEvent) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_message_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`PresencesReplace`] is received.
-    ///
-    /// [`PresencesReplace`]: ../model/event/enum.Event.html#variant.PresencesReplace
-    pub fn on_presence_replace<F>(&mut self, handler: F)
-        where F: Fn(Context, Vec<Presence>) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_presence_replace = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`PresenceUpdate`] is received.
-    ///
-    /// [`PresenceUpdate`]: ../model/event/enum.Event.html#variant.PresenceUpdate
-    pub fn on_presence_update<F>(&mut self, handler: F)
-        where F: Fn(Context, PresenceUpdateEvent) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_presence_update = Some(Arc::new(handler));
-    }
-
-    /// Attached a handler for when a [`ReactionAdd`] is received.
-    ///
-    /// [`ReactionAdd`]: ../model/event/enum.Event.html#variant.ReactionAdd
-    pub fn on_reaction_add<F>(&mut self, handler: F)
-        where F: Fn(Context, Reaction) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_reaction_add = Some(Arc::new(handler));
-    }
-
-    /// Attached a handler for when a [`ReactionRemove`] is received.
-    ///
-    /// [`ReactionRemove`]: ../model/event/enum.Event.html#variant.ReactionRemove
-    pub fn on_reaction_remove<F>(&mut self, handler: F)
-        where F: Fn(Context, Reaction) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_reaction_remove = Some(Arc::new(handler));
-    }
-
-    /// Attached a handler for when a [`ReactionRemoveAll`] is received.
-    ///
-    /// [`ReactionRemoveAll`]: ../model/event/enum.Event.html#variant.ReactionRemoveAll
-    pub fn on_reaction_remove_all<F>(&mut self, handler: F)
-        where F: Fn(Context, ChannelId, MessageId) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_reaction_remove_all = Some(Arc::new(handler));
-    }
-
-    /// Register an event to be called whenever a Ready event is received.
-    ///
-    /// Registering a handler for the ready event is good for noting when your
-    /// bot has established a connection to the gateway through a [`Shard`].
-    ///
-    /// **Note**: The Ready event is not guarenteed to be the first event you
-    /// will receive by Discord. Do not actively rely on it.
-    ///
-    /// # Examples
-    ///
-    /// Print the [current user][`CurrentUser`]'s name on ready:
-    ///
-    /// ```rust,no_run
-    /// use serenity::Client;
-    /// use std::env;
-    ///
-    /// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
-    /// let mut client = Client::new(&token);
-    ///
-    /// client.on_ready(|_context, ready| {
-    ///     println!("{} is connected", ready.user.name);
-    /// });
-    /// ```
-    ///
-    /// [`CurrentUser`]: ../model/struct.CurrentUser.html
-    /// [`Shard`]: gateway/struct.Shard.html
-    pub fn on_ready<F>(&mut self, handler: F)
-        where F: Fn(Context, Ready) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_ready = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`ChannelRecipientAdd`] is received.
-    ///
-    /// [`ChannelRecipientAdd`]: ../model/event/enum.Event.html#variant.ChannelRecipientAdd
-    pub fn on_recipient_add<F>(&mut self, handler: F)
-        where F: Fn(Context, ChannelId, User) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_channel_recipient_addition = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`ChannelRecipientRemove`] is received.
-    ///
-    /// [`ChannelRecipientRemove`]: ../model/event/enum.Event.html#variant.ChannelRecipientRemove
-    pub fn on_recipient_remove<F>(&mut self, handler: F)
-        where F: Fn(Context, ChannelId, User) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_channel_recipient_removal = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`Resumed`] is received.
-    ///
-    /// [`Resumed`]: ../model/event/enum.Event.html#variant.Resumed
-    pub fn on_resume<F>(&mut self, handler: F)
-        where F: Fn(Context, ResumedEvent) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_resume = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`TypingStart`] is received.
-    ///
-    /// [`TypingStart`]: ../model/event/enum.Event.html#variant.TypingStart
-    pub fn on_typing_start<F>(&mut self, handler: F)
-        where F: Fn(Context, TypingStartEvent) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_typing_start = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when an [`Unknown`] is received.
-    ///
-    /// [`Unknown`]: ../model/event/enum.Event.html#variant.Unknown
-    pub fn on_unknown<F>(&mut self, handler: F)
-        where F: Fn(Context, String, Value) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_unknown = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`VoiceServerUpdate`] is received.
-    ///
-    /// [`VoiceServerUpdate`]: ../model/event/enum.Event.html#variant.VoiceServerUpdate
-    pub fn on_voice_server_update<F>(&mut self, handler: F)
-        where F: Fn(Context, VoiceServerUpdateEvent) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_voice_server_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`VoiceStateUpdate`] is received.
-    ///
-    /// [`VoiceStateUpdate`]: ../model/event/enum.Event.html#variant.VoiceStateUpdate
-    pub fn on_voice_state_update<F>(&mut self, handler: F)
-        where F: Fn(Context, Option<GuildId>, VoiceState) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_voice_state_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`WebhookUpdate`] is received.
-    ///
-    /// [`WebhookUpdate`]: ../model/event/enum.Event.html#variant.WebhookUpdate
-    pub fn on_webhook_update<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, ChannelId) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_webhook_update = Some(Arc::new(handler));
-    }
-
     // Shard data layout is:
     // 0: first shard number to initialize
     // 1: shard number to initialize up to and including
@@ -1011,7 +592,7 @@ impl Client {
                     let monitor_info = feature_framework! {{
                         MonitorInfo {
                             data: self.data.clone(),
-                            event_store: self.event_store.clone(),
+                            event_handler: self.event_handler.clone(),
                             framework: self.framework.clone(),
                             gateway_url: gateway_url.clone(),
                             shard: shard,
@@ -1021,7 +602,7 @@ impl Client {
                     } else {
                         MonitorInfo {
                             data: self.data.clone(),
-                            event_store: self.event_store.clone(),
+                            event_handler: self.event_handler.clone(),
                             gateway_url: gateway_url.clone(),
                             shard: shard,
                             shard_info: shard_info,
@@ -1050,199 +631,6 @@ impl Client {
     }
 }
 
-#[cfg(feature="cache")]
-impl Client {
-    /// Attaches a handler for when a [`ChannelUpdate`] is received.
-    ///
-    /// Optionally provides the version of the channel before the update.
-    ///
-    /// [`ChannelUpdate`]: ../model/event/enum.Event.html#variant.ChannelUpdate
-    pub fn on_channel_update<F>(&mut self, handler: F)
-        where F: Fn(Context, Option<Channel>, Channel) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_channel_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildDelete`] is received.
-    ///
-    /// Returns a partial guild as well as - optionally - the full guild, with
-    /// data like [`Role`]s. This can be `None` in the event that it was not in
-    /// the [`Cache`].
-    ///
-    /// **Note**: The relevant guild is _removed_ from the Cache when this event
-    /// is received. If you need to keep it, you can either re-insert it
-    /// yourself back into the Cache or manage it in another way.
-    ///
-    /// [`GuildDelete`]: ../model/event/enum.Event.html#variant.GuildDelete
-    /// [`Role`]: ../model/struct.Role.html
-    /// [`Cache`]: ../cache/struct.Cache.html
-    pub fn on_guild_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, PartialGuild, Option<Arc<RwLock<Guild>>>) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_delete = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildMemberRemove`] is received.
-    ///
-    /// Returns the user's associated `Member` object, _if_ it existed in the
-    /// cache.
-    ///
-    /// [`GuildMemberRemove`]: ../model/event/enum.Event.html#variant.GuildMemberRemove
-    pub fn on_guild_member_remove<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, User, Option<Member>) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_member_removal = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildMemberUpdate`] is received.
-    ///
-    /// [`GuildMemberUpdate`]: ../model/event/enum.Event.html#variant.GuildMemberUpdate
-    pub fn on_guild_member_update<F>(&mut self, handler: F)
-        where F: Fn(Context, Option<Member>, Member) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_member_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildRoleDelete`] is received.
-    ///
-    /// [`GuildRoleDelete`]: ../model/event/enum.Event.html#variant.GuildRoleDelete
-    pub fn on_guild_role_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, RoleId, Option<Role>) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_role_delete = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildRoleUpdate`] is received.
-    ///
-    /// The optional `Role` is the role prior to updating. This can be `None` if
-    /// it did not exist in the [`Cache`] before the update.
-    ///
-    /// [`GuildRoleUpdate`]: ../model/event/enum.Event.html#variant.GuildRoleUpdate
-    /// [`Cache`]: ../cache/struct.Cache.html
-    pub fn on_guild_role_update<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, Option<Role>, Role) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_role_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildUpdate`] is received.
-    ///
-    /// [`GuildUpdate`]: ../model/event/enum.Event.html#variant.GuildUpdate
-    pub fn on_guild_update<F>(&mut self, handler: F)
-        where F: Fn(Context, Option<Arc<RwLock<Guild>>>, PartialGuild) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`UserUpdate`] is received.
-    ///
-    /// The old current user will be provided as well.
-    ///
-    /// [`UserUpdate`]: ../model/event/enum.Event.html#variant.UserUpdate
-    pub fn on_user_update<F>(&mut self, handler: F)
-        where F: Fn(Context, CurrentUser, CurrentUser) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_user_update = Some(Arc::new(handler));
-    }
-}
-
-#[cfg(not(feature="cache"))]
-impl Client {
-    /// Attaches a handler for when a [`ChannelUpdate`] is received.
-    ///
-    /// [`ChannelUpdate`]: ../model/event/enum.Event.html#variant.ChannelUpdate
-    pub fn on_channel_update<F>(&mut self, handler: F)
-        where F: Fn(Context, Channel) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_channel_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildDelete`] is received.
-    ///
-    /// [`GuildDelete`]: ../model/event/enum.Event.html#variant.GuildDelete
-    /// [`Role`]: ../model/struct.Role.html
-    /// [`Cache`]: ../cache/struct.Cache.html
-    pub fn on_guild_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, PartialGuild) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_delete = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildMemberRemove`] is received.
-    ///
-    /// Returns the user's associated `Member` object, _if_ it existed in the
-    /// cache.
-    ///
-    /// [`GuildMemberRemove`]: ../model/event/enum.Event.html#variant.GuildMemberRemove
-    pub fn on_guild_member_remove<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, User) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_member_removal = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildMemberUpdate`] is received.
-    ///
-    /// [`GuildMemberUpdate`]: ../model/event/enum.Event.html#variant.GuildMemberUpdate
-    pub fn on_guild_member_update<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildMemberUpdateEvent) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_member_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildRoleDelete`] is received.
-    ///
-    /// [`GuildRoleDelete`]: ../model/event/enum.Event.html#variant.GuildRoleDelete
-    pub fn on_guild_role_delete<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, RoleId) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_role_delete = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildRoleUpdate`] is received.
-    ///
-    /// [`GuildRoleUpdate`]: ../model/event/enum.Event.html#variant.GuildRoleUpdate
-    /// [`Cache`]: ../cache/struct.Cache.html
-    pub fn on_guild_role_update<F>(&mut self, handler: F)
-        where F: Fn(Context, GuildId, Role) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_role_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`GuildUpdate`] is received.
-    ///
-    /// [`GuildUpdate`]: ../model/event/enum.Event.html#variant.GuildUpdate
-    pub fn on_guild_update<F>(&mut self, handler: F)
-        where F: Fn(Context, PartialGuild) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_guild_update = Some(Arc::new(handler));
-    }
-
-    /// Attaches a handler for when a [`UserUpdate`] is received.
-    ///
-    /// [`UserUpdate`]: ../model/event/enum.Event.html#variant.UserUpdate
-    pub fn on_user_update<F>(&mut self, handler: F)
-        where F: Fn(Context, CurrentUser) + Send + Sync + 'static {
-        self.event_store.write()
-            .unwrap()
-            .on_user_update = Some(Arc::new(handler));
-    }
-}
-
 struct BootInfo {
     gateway_url: Arc<Mutex<String>>,
     shard_info: [u64; 2],
@@ -1250,9 +638,9 @@ struct BootInfo {
 }
 
 #[cfg(feature="framework")]
-struct MonitorInfo {
+struct MonitorInfo<H: EventHandler + Send + Sync + 'static> {
     data: Arc<Mutex<ShareMap>>,
-    event_store: Arc<RwLock<EventStore>>,
+    event_handler: Arc<H>,
     framework: Arc<Mutex<Framework>>,
     gateway_url: Arc<Mutex<String>>,
     shard: Arc<Mutex<Shard>>,
@@ -1261,9 +649,9 @@ struct MonitorInfo {
 }
 
 #[cfg(not(feature="framework"))]
-struct MonitorInfo {
+struct MonitorInfo<H: EventHandler + Send + Sync + 'static> {
     data: Arc<Mutex<ShareMap>>,
-    event_store: Arc<RwLock<EventStore>>,
+    event_handler: Arc<H>,
     gateway_url: Arc<Mutex<String>>,
     shard: Arc<Mutex<Shard>>,
     shard_info: [u64; 2],
@@ -1310,7 +698,7 @@ fn boot_shard(info: &BootInfo) -> Result<Shard> {
     Err(Error::Client(ClientError::ShardBootFailure))
 }
 
-fn monitor_shard(mut info: MonitorInfo) {
+fn monitor_shard<H: EventHandler + Send + Sync + 'static>(mut info: MonitorInfo<H>) {
     handle_shard(&mut info);
 
     loop {
@@ -1347,7 +735,7 @@ fn monitor_shard(mut info: MonitorInfo) {
     error!("Completely failed to reboot shard");
 }
 
-fn handle_shard(info: &mut MonitorInfo) {
+fn handle_shard<H: EventHandler + Send + Sync + 'static>(info: &mut MonitorInfo<H>) {
     // This is currently all ducktape. Redo this.
     loop {
         {
@@ -1420,31 +808,31 @@ fn handle_shard(info: &mut MonitorInfo) {
                      &info.shard,
                      &info.framework,
                      &info.data,
-                     &info.event_store);
+                     &info.event_handler);
         } else {
             dispatch(event,
                      &info.shard,
                      &info.data,
-                     &info.event_store);
+                     &info.event_handler);
         }}
     }
 }
 
-fn init_client(token: String) -> Client {
+fn init_client<H: EventHandler + Send + Sync + 'static>(token: String, handler: H) -> Client<H> {
     http::set_token(&token);
     let locked = Arc::new(Mutex::new(token));
 
     feature_framework! {{
         Client {
             data: Arc::new(Mutex::new(ShareMap::custom())),
-            event_store: Arc::new(RwLock::new(EventStore::default())),
+            event_handler: Arc::new(handler),
             framework: Arc::new(Mutex::new(Framework::default())),
             token: locked,
         }
     } else {
         Client {
             data: Arc::new(Mutex::new(ShareMap::custom())),
-            event_store: Arc::new(RwLock::new(EventStore::default())),
+            event_handler: Arc::new(handler),
             token: locked,
         }
     }}
