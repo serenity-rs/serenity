@@ -1,3 +1,5 @@
+#![cfg(feature="utils")]
+
 extern crate serenity;
 
 use serenity::utils::MessageBuilder;
@@ -14,7 +16,6 @@ fn code_blocks() {
     assert_eq!(content, "```rb\ntest\n```");
 }
 
-
 #[test]
 fn safe_content() {
     let content = MessageBuilder::new()
@@ -22,7 +23,6 @@ fn safe_content() {
         .build();
     assert_ne!(content, "@everyone discord.gg/discord-api");
 }
-
 
 #[test]
 fn no_free_formatting() {

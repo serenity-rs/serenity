@@ -11,23 +11,6 @@
 //! [`client::CACHE`]. This is the instance that is updated by the library,
 //! meaning you should _not_ need to maintain updating it yourself in any case.
 //!
-//! # Use by the Context
-//!
-//! The [`Context`] will automatically attempt to pull from the cache for you.
-//! For example, the [`Context::get_channel`] method will attempt to find the
-//! channel in the cache. If it can not find it, it will perform a request
-//! through the REST API, and then insert a clone of the channel - if found -
-//! into the Cache, giving you the original.
-//!
-//! This allows you to save a step, by only needing to perform the
-//! [`Context::get_channel`] call and not need to first search through the cache
-//! - and if not found - _then_ perform an HTTP request through the Context or
-//! [`http`] module.
-//!
-//! Additionally, note that some information received through events can _not_
-//! be retrieved through the REST API. This is information such as [`Role`]s in
-//! [`LiveGuild`]s.
-//!
 //! # Use by Models
 //!
 //! Most models of Discord objects, such as the [`Message`], [`PublicChannel`],
@@ -49,8 +32,6 @@
 //! while needing to hit the REST API as little as possible, then the answer
 //! is "yes".
 //!
-//! [`Context`]: ../client/struct.Context.html
-//! [`Context::get_channel`]: ../client/struct.Context.html#method.get_channel
 //! [`Emoji`]: ../model/struct.Emoji.html
 //! [`Group`]: ../model/struct.Group.html
 //! [`LiveGuild`]: ../model/struct.LiveGuild.html
@@ -78,27 +59,8 @@ use ::model::event::*;
 /// allows data to be "corrupted", and _may or may not_ cause misfunctions
 /// within the library. Mutate data at your own discretion.
 ///
-/// # Use by the Context
-///
-/// The [`Context`] will automatically attempt to pull from the cache for you.
-/// For example, the [`Context::get_channel`] method will attempt to find the
-/// channel in the cache. If it can not find it, it will perform a request
-/// through the REST API, and then insert a clone of the channel - if found -
-/// into the Cache.
-///
-/// This allows you to only need to perform the `Context::get_channel` call,
-/// and not need to first search through the cache - and if not found - _then_
-/// perform an HTTP request through the Context or `http` module.
-///
-/// Additionally, note that some information received through events can _not_
-/// be retrieved through the REST API. This is information such as [`Role`]s in
-/// [`Guild`]s.
 ///
 /// [`Shard`]: ../gateway/struct.Shard.html
-/// [`Context`]: ../client/struct.Context.html
-/// [`Context::get_channel`]: ../client/struct.Context.html#method.get_channel
-/// [`Guild`]: ../model/struct.Guild.html
-/// [`Role`]: ../model/struct.Role.html
 /// [`http`]: ../http/index.html
 #[derive(Clone, Debug)]
 pub struct Cache {
@@ -313,17 +275,17 @@ impl Cache {
     /// If you know what type of channel you're looking for, you should instead
     /// manually retrieve from one of the respective maps or methods:
     ///
-    /// - [`GuildChannel`]: [`get_guild_channel`] or [`channels`]
-    /// - [`PrivateChannel`]: [`get_private_channel`] or [`private_channels`]
-    /// - [`Group`]: [`get_group`] or [`groups`]
+    /// - [`GuildChannel`]: [`guild_channel`] or [`channels`]
+    /// - [`PrivateChannel`]: [`private_channel`] or [`private_channels`]
+    /// - [`Group`]: [`group`] or [`groups`]
     ///
     /// [`Channel`]: ../model/enum.Channel.html
     /// [`Group`]: ../model/struct.Group.html
     /// [`Guild`]: ../model/struct.Guild.html
     /// [`channels`]: #structfield.channels
-    /// [`get_group`]: #method.get_group
-    /// [`get_guild_channel`]: #method.get_guild_channel
-    /// [`get_private_channel`]: #method.get_private_channel
+    /// [`group`]: #method.group
+    /// [`guild_channel`]: #method.guild_channel
+    /// [`private_channel`]: #method.private_channel
     /// [`groups`]: #structfield.groups
     /// [`private_channels`]: #structfield.private_channels
     pub fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
@@ -378,7 +340,7 @@ impl Cache {
         self.guilds.get(&id.into()).cloned()
     }
 
-    /// Retrieves a reference to a [`Guild`]'s channel. Unlike [`get_channel`],
+    /// Retrieves a reference to a [`Guild`]'s channel. Unlike [`channel`],
     /// this will only search guilds for the given channel.
     ///
     /// The only advantage of this method is that you can pass in anything that
@@ -400,7 +362,7 @@ impl Cache {
     ///
     /// let cache = CACHE.read().unwrap();
     ///
-    /// let channel = match cache.get_guild_channel(message.channel_id) {
+    /// let channel = match cache.guild_channel(message.channel_id) {
     ///     Some(channel) => channel,
     ///     None => {
     ///         if let Err(why) = message.channel_id.say("Could not find guild's channel data") {
@@ -416,7 +378,7 @@ impl Cache {
     /// [`ChannelId`]: ../model/struct.ChannelId.html
     /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
     /// [`Guild`]: ../model/struct.Guild.html
-    /// [`get_channel`]: #method.get_channel
+    /// [`channel`]: #method.channel
     #[inline]
     pub fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<GuildChannel>>> {
         self.channels.get(&id.into()).cloned()
@@ -474,7 +436,7 @@ impl Cache {
     ///
     /// let cache = CACHE.read().unwrap();
     /// let member = {
-    ///     let channel = match cache.get_guild_channel(message.channel_id) {
+    ///     let channel = match cache.guild_channel(message.channel_id) {
     ///         Some(channel) => channel,
     ///         None => {
     ///             if let Err(why) = message.channel_id.say("Error finding channel data") {
@@ -483,7 +445,7 @@ impl Cache {
     ///         },
     ///     };
     ///
-    ///     match cache.get_member(channel.guild_id, message.author.id) {
+    ///     match cache.member(channel.guild_id, message.author.id) {
     ///         Some(member) => member,
     ///         None => {
     ///             if let Err(why) = message.channel_id.say("Error finding member data") {

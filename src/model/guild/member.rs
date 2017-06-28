@@ -142,13 +142,13 @@ impl Member {
         format!("{}#{}", self.display_name(), self.user.read().unwrap().discriminator)
     }
 
-    /// Edits the member with the given data. See [`Context::edit_member`] for
+    /// Edits the member with the given data. See [`Guild::edit_member`] for
     /// more information.
     ///
     /// See [`EditMember`] for the permission(s) required for separate builder
     /// methods, as well as usage of this.
     ///
-    /// [`Context::edit_member`]: ../client/struct.Context.html#method.edit_member
+    /// [`Guild::edit_member`]: ../model/struct.Guild.html#method.edit_member
     /// [`EditMember`]: ../builder/struct.EditMember.html
     #[cfg(feature="cache")]
     pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F) -> Result<()> {
@@ -162,7 +162,7 @@ impl Member {
     /// [`guild_id`]: #structfield.guild_id
     #[deprecated(since="0.2.1", note="Use the `guild_id` structfield instead.")]
     pub fn find_guild(&self) -> Result<GuildId> {
-        return Ok(self.guild_id);
+        Ok(self.guild_id)
     }
 
     /// Kick the member from the guild.

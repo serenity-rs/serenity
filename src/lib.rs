@@ -62,7 +62,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serenity = "0.2"
+//! serenity = "0.3"
 //! ```
 //!
 //! and to the top of your `main.rs`:
@@ -89,12 +89,10 @@
 
 #[macro_use]
 extern crate bitflags;
-#[allow(unused_imports)]
 #[macro_use]
 extern crate log;
 #[macro_use]
 extern crate serde_derive;
-#[allow(unused_imports)]
 #[macro_use]
 extern crate serde_json;
 

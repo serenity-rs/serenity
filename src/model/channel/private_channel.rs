@@ -160,11 +160,11 @@ impl PrivateChannel {
 
     /// Gets messages from the channel.
     ///
-    /// Refer to [`Channel::get_messages`] for more information.
+    /// Refer to [`Channel::messages`] for more information.
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [`Channel::get_messages`]: enum.Channel.html#method.get_messages
+    /// [`Channel::messages`]: enum.Channel.html#method.messages
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
@@ -175,11 +175,11 @@ impl PrivateChannel {
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
     ///
-    /// Refer to [`Channel::get_reaction_users`] for more information.
+    /// Refer to [`Channel::reaction_users`] for more information.
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
-    /// [`Channel::get_reaction_users`]: enum.Channel.html#variant.get_reaction_users
+    /// [`Channel::reaction_users`]: enum.Channel.html#method.reaction_users
     /// [`Emoji`]: struct.Emoji.html
     /// [`Message`]: struct.Message.html
     /// [`User`]: struct.User.html

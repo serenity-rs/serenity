@@ -64,7 +64,7 @@ mod buckets;
 
 pub(crate) use self::buckets::{Bucket, Ratelimit};
 pub use self::command::{Command, CommandType, CommandGroup};
-pub(crate) use self::command::CommandOrAlias;
+pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;

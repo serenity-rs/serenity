@@ -3,15 +3,6 @@
 //!
 //! Models can optionally have additional helper methods compiled, by enabling
 //! the `model` feature.
-//!
-//! Methods like [`Message::delete`] or [`Webhook::execute`] are provided with
-//! this feature, which can be shorthands for operations that are otherwise in
-//! the [`Context`], or the much lower-level [`http`] module.
-//!
-//! [`Context`]: ../client/struct.Context.html
-//! [`Message::delete`]: struct.Message.html#method.delete
-//! [`Webhook::execute`]: struct.Webhook.html#method.execute
-//! [`http`]: ../http/index.html
 
 #[macro_use]
 mod utils;

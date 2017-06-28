@@ -471,6 +471,12 @@ impl User {
     /// });
     /// ```
     ///
+    /// # Examples
+    ///
+    /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
+    /// is a bot user.
+    ///
+    /// [`ModelError::MessagingBot`]: enum.ModelError.html#variant.MessagingBot
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     /// [`User::dm`]: struct.User.html#method.dm
     // A tale with Clippy:
@@ -491,6 +497,10 @@ impl User {
     #[cfg(feature="builder")]
     pub fn direct_message<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
+        if self.bot {
+            return Err(Error::Model(ModelError::MessagingBot));
+        }
+
         let private_channel_id = feature_cache! {{
             let finding = {
                 let cache = CACHE.read().unwrap();
@@ -545,6 +555,12 @@ impl User {
     /// let _ = message.author.dm("Hello!");
     /// ```
     ///
+    /// # Examples
+    ///
+    /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
+    /// is a bot user.
+    ///
+    /// [`ModelError::MessagingBot`]: enum.ModelError.html#variant.MessagingBot
     /// [direct_message]: #method.direct_message
     #[cfg(feature="builder")]
     #[inline]

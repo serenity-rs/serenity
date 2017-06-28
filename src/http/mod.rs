@@ -16,12 +16,11 @@
 //!
 //! If a request spuriously fails, it will be retried once.
 //!
-//! Note that you may want to perform requests through a [`Context`] or through
-//! [model]s' instance methods where possible, as they each offer different
+//! Note that you may want to perform requests through a [model]s'
+//! instance methods where possible, as they each offer different
 //! levels of a high-level interface to the HTTP module.
 //!
 //! [`Client`]: ../struct.Client.html
-//! [`Context`]: ../struct.Context.html
 //! [model]: ../model/index.html
 
 pub mod ratelimiting;

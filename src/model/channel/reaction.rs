@@ -241,6 +241,7 @@ impl ReactionType {
     }
 }
 
+#[cfg(feature="model")]
 impl From<char> for ReactionType {
     /// Creates a `ReactionType` from a `char`.
     ///

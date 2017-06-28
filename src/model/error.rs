@@ -13,11 +13,16 @@ use super::Permissions;
 /// re-ban all members with an odd discriminator:
 ///
 /// ```rust,no_run
+/// # #[cfg(feature="client")]
+/// # use std::error::Error;
+/// #
+/// # #[cfg(feature="client")]
+/// # fn try_main() -> Result<(), Box<Error>> {
 /// use serenity::{Client, Error};
 /// use serenity::model::ModelError;
 /// use std::env;
 ///
-/// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
+/// let token = env::var("DISCORD_BOT_TOKEN")?;
 /// let mut client = Client::new(&token);
 ///
 /// client.on_member_unban(|context, guild_id, user| {
@@ -38,6 +43,16 @@ use super::Permissions;
 ///         },
 ///     }
 /// });
+/// #     Ok(())
+/// # }
+/// #
+/// # #[cfg(feature="client")]
+/// # fn main() {
+/// #     try_main().unwrap();
+/// # }
+/// #
+/// # #[cfg(not(feature="client"))]
+/// # fn main() { }
 /// ```
 ///
 /// [`Error`]: ../enum.Error.html
@@ -86,6 +101,9 @@ pub enum Error {
     ///
     /// [`Message`]: ../model/struct.Message.html
     MessageTooLong(u64),
+    /// Indicates that the current user is attempting to Direct Message another
+    /// bot user, which is disallowed by the API.
+    MessagingBot,
 }
 
 impl Display for Error {
@@ -105,6 +123,7 @@ impl StdError for Error {
             Error::InvalidUser => "The current user can not perform the action",
             Error::ItemMissing => "The required item is missing from the cache",
             Error::MessageTooLong(_) => "Message too large",
+            Error::MessagingBot => "Attempted to message another bot user",
         }
     }
 }

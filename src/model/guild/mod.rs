@@ -342,7 +342,6 @@ impl Guild {
     /// if the current user does not have permission to perform bans.
     ///
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`Context::create_role`]: ../client/struct.Context.html#method.create_role
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     pub fn create_role<F>(&self, f: F) -> Result<Role>
@@ -446,7 +445,6 @@ impl Guild {
     /// if the current user does not have permission to perform bans.
     ///
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`Context::edit_guild`]: ../client/struct.Context.html#method.edit_guild
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditGuild) -> EditGuild {

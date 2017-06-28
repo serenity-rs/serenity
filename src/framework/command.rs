@@ -12,7 +12,7 @@ pub type AfterHook = Fn(&mut Context, &Message, &String, Result<(), String>) + S
 pub(crate) type InternalCommand = Arc<Command>;
 pub type PrefixCheck = Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
 
-pub(crate) enum CommandOrAlias {
+pub enum CommandOrAlias {
     Alias(String),
     Command(InternalCommand),
 }
@@ -28,7 +28,7 @@ pub enum CommandType {
 #[derive(Default)]
 pub struct CommandGroup {
     pub prefix: Option<String>,
-    pub(crate) commands: HashMap<String, CommandOrAlias>,
+    pub commands: HashMap<String, CommandOrAlias>,
 }
 
 /// Command struct used to store commands internally.
