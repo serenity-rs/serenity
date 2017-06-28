@@ -1,5 +1,5 @@
 [package]
-authors = ["Zeyla Hellyer <zey@zey.moe>"]
+authors = ["alex <acdenissk69@gmail.com", "Zeyla Hellyer <zey@zey.moe>"]
 description = "A Rust library for the Discord API."
 documentation = "https://serenity.zey.moe"
 homepage = "https://github.com/zeyla/serenity"
