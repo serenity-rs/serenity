@@ -29,6 +29,7 @@ use std::sync::RwLock;
 #[allow(type_complexity)]
 #[derive(Default)]
 pub struct EventStore {
+    pub on_cached: Option<Arc<Fn(Context, Vec<GuildId>) + Send + Sync + 'static>>, 
     pub on_channel_create: Option<Arc<Fn(Context, Channel) + Send + Sync + 'static>>,
     pub on_channel_delete: Option<Arc<Fn(Context, Channel) + Send + Sync + 'static>>,
     pub on_channel_pins_update: Option<Arc<Fn(Context, ChannelPinsUpdateEvent) + Send + Sync + 'static>>,

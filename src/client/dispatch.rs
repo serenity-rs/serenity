@@ -1,11 +1,13 @@
 use std::sync::{Arc, Mutex, RwLock};
 use std::thread;
+use std::time;
 use super::event_store::EventStore;
 use super::Context;
 use typemap::ShareMap;
 use ::gateway::Shard;
 use ::model::event::Event;
-use ::model::Message;
+use ::model::{Message, GuildId};
+use chrono::{UTC, Timelike};
 
 #[cfg(feature="framework")]
 use ::ext::framework::Framework;
@@ -56,6 +58,10 @@ macro_rules! update {
             }
         }
     };
+}
+
+macro_rules! now {
+    () => (UTC::now().time().second() * 1000)
 }
 
 fn context(conn: &Arc<Mutex<Shard>>,
@@ -125,6 +131,18 @@ fn handle_event(event: Event,
                 conn: &Arc<Mutex<Shard>>,
                 data: &Arc<Mutex<ShareMap>>,
                 event_store: &Arc<RwLock<EventStore>>) {
+    let mut last_guild_create_time = now!();  
+
+    let wait_for_guilds = move || -> ::Result<()> {
+        let unavailable_guilds = CACHE.read().unwrap().unavailable_guilds.len();
+
+        while unavailable_guilds != 0 && (now!() - last_guild_create_time < 2000) {
+            thread::sleep(time::Duration::from_millis(500));
+        }
+
+        Ok(())
+    };
+
     match event {
         Event::ChannelCreate(event) => {
             if let Some(handler) = handler!(on_channel_create, event_store) {
@@ -204,6 +222,25 @@ fn handle_event(event: Event,
         },
         Event::GuildCreate(event) => {
             update!(update_with_guild_create, event);
+
+            last_guild_create_time = now!();
+
+            #[cfg(feature="cache")]
+            {
+                let cache = CACHE.read().unwrap();
+
+                if cache.unavailable_guilds.len() == 0 {
+                    if let Some(handler) = handler!(on_cached, event_store) {
+                        let context = context(conn, data);
+
+                        let guild_amount = cache.guilds.iter()
+                            .map(|(&id, _)| id)
+                            .collect::<Vec<GuildId>>();
+
+                        thread::spawn(move || (handler)(context, guild_amount));
+                    } 
+                }
+            }
 
             if let Some(handler) = handler!(on_guild_create, event_store) {
                 let context = context(conn, data);
@@ -442,15 +479,19 @@ fn handle_event(event: Event,
             }
         },
         Event::Ready(event) => {
-            if let Some(handler) = handler!(on_ready, event_store) {
-                update!(update_with_ready, event);
+            update!(update_with_ready, event);
 
-                let context = context(conn, data);
+            last_guild_create_time = now!();
 
-                thread::spawn(move || (handler)(context, event.ready));
-            } else {
-                update!(update_with_ready, event);
-            }
+            let _ = wait_for_guilds()
+            .map(|_| {
+                if let Some(handler) = handler!(on_ready, event_store) {
+
+                    let context = context(conn, data);
+
+                    thread::spawn(move || (handler)(context, event.ready));
+                }
+            });
         },
         Event::Resumed(event) => {
             if let Some(handler) = handler!(on_resume, event_store) {
