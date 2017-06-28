@@ -7,7 +7,7 @@ use typemap::ShareMap;
 use ::gateway::Shard;
 use ::model::event::Event;
 use ::model::{Message, Reaction, GuildId};
-use chrono::{UTC, Timelike};
+use chrono::{Utc, Timelike};
 
 #[cfg(feature="framework")]
 use ::ext::framework::{Framework, ReactionAction};
@@ -61,7 +61,7 @@ macro_rules! update {
 }
 
 macro_rules! now {
-    () => (UTC::now().time().second() * 1000)
+    () => (Utc::now().time().second() * 1000)
 }
 
 fn context(conn: &Arc<Mutex<Shard>>,
