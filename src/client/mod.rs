@@ -145,9 +145,9 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     ///
     /// impl EventHandler for Handler {
     ///     fn on_message(&self, ctx: Context, _: Message) { reg!(ctx "MessageCreate") }
-    ///     fn on_message_delete(&self, ctx: Context, _: Message) { reg!(ctx "MessageDelete") }
-    ///     fn on_message_delete_bulk(&self, ctx: Context, _: Vec<Message>) { reg!(ctx "MessageDeleteBulk") }
-    ///     fn on_message_update(&self, ctx: Context, _: Message) { reg!(ctx "MessageUpdate") }
+    ///     fn on_message_delete(&self, ctx: Context, _: ChannelId, _: MessageId) { reg!(ctx "MessageDelete") }
+    ///     fn on_message_delete_bulk(&self, ctx: Context, _: ChannelId, _: Vec<MessageId>) { reg!(ctx "MessageDeleteBulk") }
+    ///     fn on_message_update(&self, ctx: Context, _: ChannelId, _: MessageId) { reg!(ctx "MessageUpdate") }
     /// }
     ///
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
