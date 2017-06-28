@@ -14,7 +14,7 @@ You may also check your tokens prior to login via the use of
 [`validate_token`].
 
 Once logged in, you may add handlers to your client to dispatch [`Event`]s,
-such as [`Client::on_message`]. This will cause your handler to be called
+by implementing the handlers in a trait, such as [`EventHandler::on_message`]. This will cause your handler to be called
 when a [`Event::MessageCreate`] is received. Each handler is given a
 [`Context`], giving information about the event. See the
 [client's module-level documentation].
@@ -138,7 +138,7 @@ Voice+youtube-dl:
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
 [`Client::new`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.new
-[`Client::on_message`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.on_message
+[`EventHandler::on_message`]: https://docs.rs/serenity/*/serenity/client/struct.EventHandler.html#method.on_message
 [`Context`]: https://docs.rs/serenity/*/serenity/client/struct.Context.html
 [`Event`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html
 [`Event::MessageCreate`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html#variant.MessageCreatef

@@ -18,7 +18,7 @@ pub use ::error::{Error as SerenityError};
 pub use ::model::Mentionable;
 
 #[cfg(feature="client")]
-pub use ::client::{Client, ClientError as ClientError};
+pub use ::client::{Client, ClientError as ClientError, EventHandler};
 #[cfg(feature="gateway")]
 pub use ::gateway::GatewayError;
 #[cfg(feature="http")]

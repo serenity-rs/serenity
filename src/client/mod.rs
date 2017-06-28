@@ -58,7 +58,7 @@ use ::framework::Framework;
 /// # Event Handlers
 ///
 /// Event handlers can be configured. For example, the event handler
-/// [`on_message`] will be dispatched to whenever a [`Event::MessageCreate`] is
+/// [`EventHandler::on_message`] will be dispatched to whenever a [`Event::MessageCreate`] is
 /// received over the connection.
 ///
 /// Note that you do not need to manually handle events, as they are handled
@@ -70,15 +70,20 @@ use ::framework::Framework;
 /// receive, acting as a "ping-pong" bot is simple:
 ///
 /// ```rust,ignore
-/// use serenity::Client;
+/// use serenity::prelude::*;
+/// use serenity::model::*;
 ///
-/// let mut client = Client::new("my token here");
+/// struct Handler;
 ///
-/// client.on_message(|context, message| {
-///     if message.content == "!ping" {
-///         message.channel_id.say("Pong!");
+/// impl EventHandler for Handler {
+///     fn on_message(&self, _: Context, msg: Message) {
+///         if msg.content == "!ping" {
+///             let _ = msg.channel_id.say("Pong!");
+///         }
 ///     }
-/// });
+/// }
+/// 
+/// let mut client = Client::new("my token here", Handler);
 ///
 /// client.start();
 /// ```
@@ -113,7 +118,8 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     /// extern crate serenity;
     /// extern crate typemap;
     ///
-    /// use serenity::Client;
+    /// use serenity::prelude::*;
+    /// use serenity::model::*;
     /// use std::collections::HashMap;
     /// use std::env;
     /// use typemap::Key;
@@ -122,13 +128,6 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     ///
     /// impl Key for MessageEventCounter {
     ///     type Value = HashMap<String, u64>;
-    /// }
-    ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
-    ///
-    /// {
-    ///     let mut data = client.data.lock().unwrap();
-    ///     data.insert::<MessageEventCounter>(HashMap::default());
     /// }
     ///
     /// macro_rules! reg {
@@ -142,10 +141,23 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     ///     };
     /// }
     ///
-    /// client.on_message(|ctx, _| reg!(ctx "MessageCreate"));
-    /// client.on_message_delete(|ctx, _| reg!(ctx "MessageDelete"));
-    /// client.on_message_delete_bulk(|ctx, _| reg!(ctx "MessageDeleteBulk"));
-    /// client.on_message_update(|ctx, _| reg!(ctx "MessageUpdate"));
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, ctx: Context, _: Message) { reg!(ctx "MessageCreate") }
+    ///     fn on_message_delete(&self, ctx: Context, _: Message) { reg!(ctx "MessageDelete") }
+    ///     fn on_message_delete_bulk(&self, ctx: Context, _: Vec<Message>) { reg!(ctx "MessageDeleteBulk") }
+    ///     fn on_message_update(&self, ctx: Context, _: Message) { reg!(ctx "MessageUpdate") }
+    /// }
+    ///
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
+    ///
+    /// {
+    ///     let mut data = client.data.lock().unwrap();
+    ///     data.insert::<MessageEventCounter>(HashMap::default());
+    /// }
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// Refer to [example 05] for an example on using the `data` field.
