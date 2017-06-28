@@ -207,7 +207,6 @@ impl PartialGuild {
     /// **Note**: Requires the current user to have the [Manage Guild]
     /// permission.
     ///
-    /// [`Context::edit_guild`]: ../client/struct.Context.html#method.edit_guild
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditGuild) -> EditGuild {

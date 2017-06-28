@@ -4,8 +4,7 @@
 //! the `http` module and `Cache` are also automatically handled by the
 //! Client module for you.
 //!
-//! A [`Context`] is provided for every handler. The context is a method of
-//! accessing the lower-level HTTP functions relevant to the contextual channel.
+//! A [`Context`] is provided for every handler.
 //!
 //! The `http` module is the lower-level method of interacting with the Discord
 //! REST API. Realistically, there should be little reason to use this yourself,

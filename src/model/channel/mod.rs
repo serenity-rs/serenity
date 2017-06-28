@@ -210,7 +210,7 @@ impl Channel {
     /// let id = MessageId(81392407232380928);
     ///
     /// // Maximum is 100.
-    /// let _messages = channel.get_messages(|g| g.after(id).limit(100));
+    /// let _messages = channel.messages(|g| g.after(id).limit(100));
     /// ```
     ///
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html

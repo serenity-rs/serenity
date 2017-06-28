@@ -142,13 +142,13 @@ impl Member {
         format!("{}#{}", self.display_name(), self.user.read().unwrap().discriminator)
     }
 
-    /// Edits the member with the given data. See [`Context::edit_member`] for
+    /// Edits the member with the given data. See [`Guild::edit_member`] for
     /// more information.
     ///
     /// See [`EditMember`] for the permission(s) required for separate builder
     /// methods, as well as usage of this.
     ///
-    /// [`Context::edit_member`]: ../client/struct.Context.html#method.edit_member
+    /// [`Guild::edit_member`]: ../model/struct.Guild.html#method.edit_member
     /// [`EditMember`]: ../builder/struct.EditMember.html
     #[cfg(feature="cache")]
     pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F) -> Result<()> {

@@ -229,11 +229,11 @@ impl Group {
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
     ///
-    /// Refer to [`Channel::get_reaction_users`] for more information.
+    /// Refer to [`Channel::reaction_users`] for more information.
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
-    /// [`Channel::get_reaction_users`]: enum.Channel.html#variant.get_reaction_users
+    /// [`Channel::reaction_users`]: enum.Channel.html#method.reaction_users
     /// [`Emoji`]: struct.Emoji.html
     /// [`Message`]: struct.Message.html
     /// [`User`]: struct.User.html

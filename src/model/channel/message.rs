@@ -22,7 +22,7 @@ pub struct Message {
     /// The unique Id of the message. Can be used to calculate the creation date
     /// of the message.
     pub id: MessageId,
-    /// An array of the files attached to a message.
+    /// An vector of the files attached to a message.
     pub attachments: Vec<Attachment>,
     /// The user that sent the message.
     pub author: User,
