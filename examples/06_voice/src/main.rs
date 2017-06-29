@@ -10,11 +10,20 @@
 #[macro_use]
 extern crate serenity;
 
-use serenity::client::{CACHE, Client};
-use serenity::ext::voice;
-use serenity::model::{ChannelId, Message, Mentionable};
+use serenity::prelude::*;
+use serenity::client::CACHE;
+use serenity::voice;
+use serenity::model::*;
 use serenity::Result as SerenityResult;
 use std::env;
+
+struct Handler;
+
+impl EventHandler for Handler {
+    fn on_ready(&self, _: Context, ready: Ready) {
+        println!("{} is connected!", ready.user.name);
+    }
+}
 
 fn main() {
     // Configure the client with your Discord bot token in the environment.
