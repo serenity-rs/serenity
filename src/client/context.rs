@@ -337,4 +337,15 @@ impl Context {
         let mut shard = self.shard.lock().unwrap();
         shard.set_presence(game, status, afk)
     }
+
+    /// Disconnects the shard from the websocket, essentially "quiting" it.
+    /// Note however that this will only exit the one which the `Context` was given.
+    /// If it's just one shard that's on, then serenity will stop any further actions
+    /// until [`Client::start`] and vice versa are called again.
+    ///
+    /// [`Client::start`]: ./struct.Client.html#method.start
+    pub fn quit(&self) -> Result<()> {
+        let mut shard = self.shard.lock().unwrap();
+        shard.shutdown_clean()
+    }
 }
