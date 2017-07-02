@@ -151,7 +151,7 @@ Voice+youtube-dl:
 [ci-badge]: https://travis-ci.org/zeyla/serenity.svg?branch=master
 [client's module-level documentation]: https://docs.rs/serenity/*/serenity/client/index.html
 [discord docs]: https://discordapp.com/developers/docs/intro
-[docs]: https://serenity.zey.moe/
+[docs]: https://docs.rs/serenity
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
 [examples]: https://github.com/zeyla/serenity/tree/master/examples
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
