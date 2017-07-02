@@ -34,11 +34,14 @@ impl CreateCommand {
     /// is the owner.
     ///
     /// ```rust,no_run
+    /// # use serenity::prelude::EventHandler;
+    /// # struct Handler;
+    /// # impl EventHandler for Handler {}
     /// use serenity::client::{Client, Context};
     /// use serenity::model::Message;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
     ///
     /// client.with_framework(|f| f
     ///     .configure(|c| c.prefix("~"))

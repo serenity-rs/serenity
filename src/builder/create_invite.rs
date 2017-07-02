@@ -12,44 +12,47 @@ use ::internal::prelude::*;
 /// Create an invite with a max age of 3600 seconds and 10 max uses:
 ///
 /// ```rust,no_run
-/// # use serenity::Client;
-/// #
-/// # let mut client = Client::new("");
-/// #
-/// use serenity::client::CACHE;
+/// # use serenity::prelude::*;
+/// # use serenity::model::*;
+/// 
+/// struct Handler;
+/// 
+/// impl EventHandler for Handler {
+///     fn on_message(&self, _: Context, msg: Message) {
+///         use serenity::client::CACHE;
+///         if msg.content == "!createinvite" {
+///             let channel = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
+///                 Some(channel) => channel,
+///                 None => {
+///                     let _ = msg.channel_id.say("Error creating invite");
 ///
-/// client.on_message(|_, msg| {
-///     if msg.content == "!createinvite" {
-///         let channel = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
-///             Some(channel) => channel,
-///             None => {
-///                 let _ = msg.channel_id.say("Error creating invite");
+///                     return;
+///                 },
+///             };
 ///
-///                 return;
-///             },
-///         };
+///             let reader = channel.read().unwrap();
 ///
-///         let reader = channel.read().unwrap();
+///             let invite = match reader.create_invite(|i| i.max_age(3600).max_uses(10)) {
+///                 Ok(invite) => invite,
+///                 Err(why) => {
+///                     println!("Err creating invite: {:?}", why);
 ///
-///         let invite = match reader.create_invite(|i| i.max_age(3600).max_uses(10)) {
-///             Ok(invite) => invite,
-///             Err(why) => {
-///                 println!("Err creating invite: {:?}", why);
+///                     if let Err(why) = msg.channel_id.say("Error creating invite") {
+///                         println!("Err sending err msg: {:?}", why);
+///                     }
 ///
-///                 if let Err(why) = msg.channel_id.say("Error creating invite") {
-///                     println!("Err sending err msg: {:?}", why);
-///                 }
+///                     return;
+///                 },
+///             };
 ///
-///                 return;
-///             },
-///         };
+///             drop(reader);
 ///
-///         drop(reader);
-///
-///         let content = format!("Here's your invite: {}", invite.url());
-///         let _ = msg.channel_id.say(&content);
-///     }
-/// });
+///             let content = format!("Here's your invite: {}", invite.url());
+///             let _ = msg.channel_id.say(&content);
+///         } 
+///     }   
+/// }
+/// let mut client = Client::new("token", Handler); client.start().unwrap();
 /// ```
 ///
 /// [`GuildChannel::create_invite`]: ../model/struct.GuildChannel.html#method.create_invite

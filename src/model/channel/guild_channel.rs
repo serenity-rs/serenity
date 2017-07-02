@@ -413,22 +413,25 @@ impl GuildChannel {
     /// channel:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
-    /// #
-    /// # let mut client = Client::new("");
-    /// #
+    /// use serenity::prelude::*;
+    /// use serenity::model::*;
+    /// struct Handler;
+    /// 
     /// use serenity::CACHE;
+    /// 
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///         let channel = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
+    ///             Some(channel) => channel,
+    ///             None => return,
+    ///         };
     ///
-    /// client.on_message(|_, msg| {
-    ///     let channel = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
-    ///         Some(channel) => channel,
-    ///         None => return,
-    ///     };
+    ///         let permissions = channel.read().unwrap().permissions_for(&msg.author).unwrap();
     ///
-    ///     let permissions = channel.read().unwrap().permissions_for(&msg.author).unwrap();
-    ///
-    ///     println!("The user's permissions: {:?}", permissions);
-    /// });
+    ///         println!("The user's permissions: {:?}", permissions);
+    ///     }
+    /// }
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// Check if the current user has the [Attach Files] and [Send Messages]
@@ -436,38 +439,42 @@ impl GuildChannel {
     /// for demonstrative purposes):
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
-    /// #
-    /// # let mut client = Client::new("");
-    /// #
+    /// use serenity::prelude::*;
+    /// use serenity::model::*;
     /// use serenity::CACHE;
     /// use serenity::model::permissions;
     /// use std::fs::File;
     ///
-    /// client.on_message(|_, msg| {
-    ///     let channel = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
-    ///         Some(channel) => channel,
-    ///         None => return,
-    ///     };
+    /// struct Handler;
     ///
-    ///     let current_user_id = CACHE.read().unwrap().user.id;
-    ///     let permissions = channel.read().unwrap().permissions_for(current_user_id).unwrap();
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///         let channel = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
+    ///             Some(channel) => channel,
+    ///             None => return,
+    ///         };
     ///
-    ///     if !permissions.contains(permissions::ATTACH_FILES | permissions::SEND_MESSAGES) {
-    ///         return;
-    ///     }
+    ///         let current_user_id = CACHE.read().unwrap().user.id;
+    ///         let permissions = channel.read().unwrap().permissions_for(current_user_id).unwrap();
     ///
-    ///     let file = match File::open("./cat.png") {
-    ///         Ok(file) => file,
-    ///         Err(why) => {
-    ///             println!("Err opening file: {:?}", why);
-    ///
+    ///         if !permissions.contains(permissions::ATTACH_FILES | permissions::SEND_MESSAGES) {
     ///             return;
-    ///         },
-    ///     };
+    ///         }
     ///
-    ///     let _ = msg.channel_id.send_file(file, "cat.png", |m| m.content("here's a cat"));
-    /// });
+    ///         let file = match File::open("./cat.png") {
+    ///             Ok(file) => file,
+    ///             Err(why) => {
+    ///                 println!("Err opening file: {:?}", why);
+    ///
+    ///                 return;
+    ///             },
+    ///         };
+    ///
+    ///         let _ = msg.channel_id.send_file(file, "cat.png", |m| m.content("here's a cat"));
+    ///     }        
+    /// }
+    ///
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// # Errors

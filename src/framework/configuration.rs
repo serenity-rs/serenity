@@ -16,10 +16,14 @@ use ::model::{GuildId, Message, UserId};
 /// Responding to mentions and setting a command prefix of `"~"`:
 ///
 /// ```rust,no_run
+/// # use serenity::prelude::EventHandler;
+/// struct Handler;
+/// 
+/// impl EventHandler for Handler {}
 /// use serenity::Client;
 /// use std::env;
 ///
-/// let mut client = Client::new(&env::var("DISCORD_BOT_TOKEN").unwrap());
+/// let mut client = Client::new(&env::var("DISCORD_BOT_TOKEN").unwrap(), Handler);
 ///
 /// client.with_framework(|f| f
 ///     .configure(|c| c.on_mention(true).prefix("~")));
@@ -99,8 +103,11 @@ impl Configuration {
     /// Create a HashSet in-place:
     ///
     /// ```rust
-    /// # use serenity::Client;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// use serenity::model::GuildId;
     ///
     /// client.with_framework(|f| f.configure(|c| c
@@ -120,8 +127,11 @@ impl Configuration {
     /// Create a HashSet in-place:
     ///
     /// ```rust
-    /// # use serenity::Client;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// use serenity::model::UserId;
     ///
     /// client.with_framework(|f| f.configure(|c| c
@@ -154,8 +164,11 @@ impl Configuration {
     /// Ignore a set of commands, assuming they exist:
     ///
     /// ```rust
-    /// # use serenity::Client;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     ///
     /// let disabled = vec!["ping"].into_iter().map(|x| x.to_owned()).collect();
     ///
@@ -180,9 +193,11 @@ impl Configuration {
     /// otherwise return a prefix of `"~"`.
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
     /// #
-    /// # let mut client = Client::new("token");
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// client.with_framework(|f| f
     ///     .command("ping", |c| c.exec_str("Pong!"))
     ///     .configure(|c| c.dynamic_prefix(|_, msg| {
@@ -261,8 +276,11 @@ impl Configuration {
     /// Create a HashSet in-place:
     ///
     /// ```rust
-    /// # use serenity::Client;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// use serenity::model::UserId;
     ///
     /// client.with_framework(|f| f.configure(|c| c
@@ -272,8 +290,11 @@ impl Configuration {
     /// Create a HashSet beforehand:
     ///
     /// ```rust
-    /// # use serenity::Client;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// use serenity::model::UserId;
     /// use std::collections::HashSet;
     ///
@@ -297,8 +318,11 @@ impl Configuration {
     /// Assign a basic prefix:
     ///
     /// ```rust
-    /// # use serenity::Client;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// #
     /// client.with_framework(|f| f.configure(|c| c
     ///     .prefix("!")));
@@ -317,8 +341,11 @@ impl Configuration {
     /// Assign a set of prefixes the bot can respond to:
     ///
     /// ```rust
-    /// # use serenity::Client;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// #
     /// client.with_framework(|f| f.configure(|c| c
     ///     .prefixes(vec!["!", ">", "+"])));

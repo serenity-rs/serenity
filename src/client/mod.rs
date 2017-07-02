@@ -192,6 +192,10 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// Create a Client, using a token from an environment variable:
     ///
     /// ```rust,no_run
+    /// # use serenity::prelude::EventHandler;
+    /// struct Handler; 
+    ///
+    /// impl EventHandler for Handler {}
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -199,7 +203,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_TOKEN")?;
-    /// let client = Client::new(&token);
+    /// let client = Client::new(&token, Handler);
     /// # Ok(())
     /// # }
     /// #
@@ -247,13 +251,17 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// Create a simple framework that responds to a `~ping` command:
     ///
     /// ```rust,no_run
+    /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
     /// #
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
     /// client.with_framework(|f| f
     ///     .configure(|c| c.prefix("~"))
     ///     .command("ping", |c| c.exec_str("Pong!")));
@@ -293,13 +301,17 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// Starting a Client with only 1 shard, out of 1 total:
     ///
     /// ```rust,no_run
+    /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
     /// #
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// use serenity::client::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
     ///
     /// if let Err(why) = client.start() {
     ///     println!("Err with client: {:?}", why);
@@ -334,13 +346,17 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// Start as many shards as needed using autosharding:
     ///
     /// ```rust,no_run
+     /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
     /// #
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::Client;
+    /// use serenity::client::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
     ///
     /// if let Err(why) = client.start_autosharded() {
     ///     println!("Err with client: {:?}", why);
@@ -389,13 +405,17 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// Start shard 3 of 5:
     ///
     /// ```rust,no_run
+     /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
     /// #
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::Client;
+    /// use serenity::client::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
     ///
     /// if let Err(why) = client.start_shard(3, 5) {
     ///     println!("Err with client: {:?}", why);
@@ -412,13 +432,17 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// [`start_autosharded`]):
     ///
     /// ```rust,no_run
+     /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
     /// #
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::Client;
+    /// use serenity::client::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
     ///
     /// if let Err(why) = client.start_shard(0, 1) {
     ///     println!("Err with client: {:?}", why);
@@ -461,13 +485,17 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// Start all of 8 shards:
     ///
     /// ```rust,no_run
+     /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
     /// #
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::Client;
+    /// use serenity::client::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
     ///
     /// if let Err(why) = client.start_shards(8) {
     ///     println!("Err with client: {:?}", why);
@@ -511,23 +539,31 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// For a bot using a total of 10 shards, initialize shards 4 through 7:
     ///
     /// ```rust,ignore
+    /// # use serenity::prelude::EventHandler;
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
     /// use serenity::Client;
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
-    /// let mut client = Client::new(&token);
+    /// let mut client = Client::new(&token, Handler);
     ///
     /// let _ = client.start_shard_range([4, 7], 10);
     /// ```
     ///
     /// ```rust,no_run
+     /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
     /// #
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::Client;
+    /// use serenity::client::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
     ///
     /// if let Err(why) = client.start_shard_range([4, 7], 10) {
     ///     println!("Err with client: {:?}", why);

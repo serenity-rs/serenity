@@ -19,23 +19,26 @@ impl EditProfile {
     /// image from a file and return its contents in base64-encoded form:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
-    /// # let mut client = Client::new("");
-    /// #
-    /// # client.on_message(|context, _| {
-    /// #
-    /// use serenity::utils;
+    /// # struct Handler;
+    /// # impl EventHandler for Handler {
+    ///    # fn on_message(&self, context: Context, _: Message) {
+    ///         use serenity::utils;
     ///
-    /// // assuming a `context` has been bound
+    ///         // assuming a `context` has been bound
     ///
-    /// let base64 = utils::read_image("./my_image.jpg")
-    ///     .expect("Failed to read image");
+    ///         let base64 = utils::read_image("./my_image.jpg")
+    ///         .expect("Failed to read image");
     ///
-    /// let _ = context.edit_profile(|profile| {
-    ///     profile.avatar(Some(&base64))
-    /// });
-    /// # });
+    ///         let _ = context.edit_profile(|profile| {
+    ///             profile.avatar(Some(&base64))
+    ///         });
+    ///    # }
+    /// }
+
+    /// # let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// [`utils::read_image`]: ../fn.read_image.html

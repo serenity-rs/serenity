@@ -45,8 +45,8 @@ impl Context {
     /// Create a new Context to be passed to an event handler.
     pub(crate) fn new(shard: Arc<Mutex<Shard>>, data: Arc<Mutex<ShareMap>>) -> Context {
         Context {
-            data: data,
-            shard: shard,
+            data,
+            shard,
         }
     }
 
@@ -59,15 +59,19 @@ impl Context {
     /// Change the current user's username:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
-    /// # let mut client = Client::new("");
-    /// #
-    /// # client.on_message(|ctx, msg| {
-    /// #     if msg.content == "!changename" {
-    /// ctx.edit_profile(|p| p.username("Hakase"));
-    /// #     }
-    /// # });
+    /// struct Handler;
+    /// 
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, ctx: Context, msg: Message) {
+    ///         if msg.content == "!changename" {
+    ///             ctx.edit_profile(|e| e.username("Edward Elric"));
+    ///         }
+    ///     }   
+    /// }
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     #[cfg(feature="builder")]
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser> {
@@ -104,14 +108,19 @@ impl Context {
     /// Set the current user to being online on the shard:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
-    /// # let mut client = Client::new("");
-    /// client.on_message(|ctx, msg| {
-    ///     if msg.content == "!online" {
-    ///         ctx.online();
-    ///     }
-    /// });
+    /// struct Handler;
+    /// 
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, ctx: Context, msg: Message) {
+    ///         if msg.content == "!online" {
+    ///             ctx.online();
+    ///         }
+    ///     }   
+    /// }
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
@@ -128,14 +137,19 @@ impl Context {
     /// Set the current user to being idle on the shard:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
-    /// # let mut client = Client::new("");
-    /// client.on_message(|ctx, msg| {
-    ///     if msg.content == "!idle" {
-    ///         ctx.idle();
-    ///     }
-    /// });
+    /// struct Handler;
+    /// 
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, ctx: Context, msg: Message) {
+    ///         if msg.content == "!idle" {
+    ///             ctx.idle();
+    ///         }
+    ///     }   
+    /// }
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
@@ -152,14 +166,19 @@ impl Context {
     /// Set the current user to being Do Not Disturb on the shard:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
-    /// # let mut client = Client::new("");
-    /// client.on_message(|ctx, msg| {
-    ///     if msg.content == "!dnd" {
-    ///         ctx.dnd();
-    ///     }
-    /// });
+    /// struct Handler;
+    /// 
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, ctx: Context, msg: Message) {
+    ///         if msg.content == "!dnd" {
+    ///             ctx.dnd();
+    ///         }
+    ///     }   
+    /// }
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
@@ -177,12 +196,18 @@ impl Context {
     /// [`Event::Ready`] is received:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
-    /// # let mut client = Client::new("");
-    /// client.on_ready(|ctx, _| {
-    ///     ctx.invisible();
-    /// });
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {
+    ///     fn on_ready(&self, ctx: Context, _: Ready) {
+    ///         ctx.invisible();
+    ///     }   
+    /// }
+    ///
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
@@ -202,12 +227,18 @@ impl Context {
     /// Reset the presence when an [`Event::Resumed`] is received:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
-    /// #
-    /// # let mut client = Client::new("");
-    /// client.on_resume(|ctx, _| {
-    ///     ctx.reset_presence();
-    /// });
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::event::ResumedEvent;
+    /// # 
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {
+    ///     fn on_resume(&self, ctx: Context, _: ResumedEvent) {
+    ///         ctx.reset_presence();
+    ///     }   
+    /// }
+    ///
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// [`Event::Resumed`]: ../model/event/enum.Event.html#variant.Resumed
@@ -226,21 +257,25 @@ impl Context {
     /// playing:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
-    /// #
-    /// # let mut client = Client::new("");
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
     /// use serenity::model::Game;
     ///
-    /// client.on_message(|ctx, msg| {
-    ///     let args = msg.content.splitn(2, ' ').collect::<Vec<&str>>();
+    /// struct Handler;
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, ctx: Context, msg: Message) {
+    ///         let args = msg.content.splitn(2, ' ').collect::<Vec<&str>>();
     ///
-    ///     if args.len() < 2 || *unsafe { args.get_unchecked(0) } != "~setgame" {
-    ///         return;
-    ///     }
+    ///         if args.len() < 2 || *unsafe { args.get_unchecked(0) } != "~setgame" {
+    ///             return;
+    ///         }
     ///
-    ///     ctx.set_game(Game::playing(*unsafe { args.get_unchecked(1) }));
-    /// });
+    ///         ctx.set_game(Game::playing(*unsafe { args.get_unchecked(1) }));
+    ///     }      
+    /// }
+    ///
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
@@ -263,13 +298,18 @@ impl Context {
     /// When an [`Event::Ready`] is received, set the game name to `"test"`:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
-    /// # let mut client = Client::new("");
-    /// #
-    /// client.on_ready(|ctx, _| {
-    ///     ctx.set_game_name("test");
-    /// });
+    /// struct Handler;
+    /// 
+    /// impl EventHandler for Handler {
+    ///     fn on_ready(&self, ctx: Context, _: Ready) {
+    ///         ctx.set_game_name("test");
+    ///     }   
+    /// }
+    ///
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
@@ -297,35 +337,41 @@ impl Context {
     /// Setting the current user as having no game and being [`Idle`]:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
-    /// # let mut client = Client::new("");
-    /// #
-    /// # client.on_ready(|ctx, _| {
-    /// #
-    /// use serenity::model::OnlineStatus;
+    /// struct Handler;
+    /// 
+    /// impl EventHandler for Handler {
+    ///     fn on_ready(&self, ctx: Context, _: Ready) {
+    ///         use serenity::model::OnlineStatus;
     ///
-    /// ctx.set_presence(None, OnlineStatus::Idle, false);
-    /// # });
+    ///         ctx.set_presence(None, OnlineStatus::Idle, false);
+    ///     }   
+    /// }
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// Setting the current user as playing `"Heroes of the Storm"`, while being
     /// [`DoNotDisturb`]:
     ///
     /// ```rust,ignore
-    /// # use serenity::Client;
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
-    /// # let mut client = Client::new("");
-    /// #
-    /// # client.on_ready(|ctx, _| {
-    /// #
-    /// use serenity::model::{Game, OnlineStatus};
+    /// struct Handler;
+    /// 
+    /// impl EventHandler for Handler {
+    ///     fn on_ready(&self, context: Context, _: Ready) {
+    ///         use serenity::model::{Game, OnlineStatus};
     ///
-    /// let game = Game::playing("Heroes of the Storm");
-    /// let status = OnlineStatus::DoNotDisturb;
+    ///         let game = Game::playing("Heroes of the Storm");
+    ///         let status = OnlineStatus::DoNotDisturb;
     ///
-    /// context.set_presence(Some(game), status, false);
-    /// # });
+    ///         context.set_presence(Some(game), status, false);
+    ///     }   
+    /// }
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb

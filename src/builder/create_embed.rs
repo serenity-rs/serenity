@@ -193,18 +193,22 @@ impl CreateEmbed {
     /// Passing a string timestamp:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
-    /// #
-    /// # let mut client = Client::new("");
-    /// #
-    /// client.on_message(|_, msg| {
-    ///     if msg.content == "~embed" {
-    ///         let _ = msg.channel_id.send_message(|m| m
-    ///             .embed(|e| e
-    ///                 .title("hello")
-    ///                 .timestamp("2004-06-08T16:04:23")));
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
+    /// # 
+    /// struct Handler;
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///         if msg.content == "~embed" {
+    ///             let _ = msg.channel_id.send_message(|m| m
+    ///              .embed(|e| e
+    ///                     .title("hello")
+    ///                     .timestamp("2004-06-08T16:04:23")));
+    ///         }
     ///     }
-    /// });
+    /// }
+    ///
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// Creating a join-log:
@@ -212,41 +216,44 @@ impl CreateEmbed {
     /// Note: this example isn't efficient and is for demonstrative purposes.
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
-    /// # let mut client = Client::new("");
-    /// #
-    /// use serenity::CACHE;
+    /// struct Handler;
+    /// impl EventHandler for Handler {
+    ///     fn on_guild_member_addition(&self, _: Context, guild_id: GuildId, member: Member) {
+    ///         use serenity::client::CACHE;
+    ///         let cache = CACHE.read().unwrap();
     ///
-    /// client.on_guild_member_add(|_, guild_id, member| {
-    ///     let cache = CACHE.read().unwrap();
+    ///         if let Some(guild) = cache.guild(guild_id) {
+    ///             let guild = guild.read().unwrap();
     ///
-    ///     if let Some(guild) = cache.guild(guild_id) {
-    ///         let guild = guild.read().unwrap();
+    ///             let channel_search = guild
+    ///                 .channels
+    ///                 .values()
+    ///                 .find(|c| c.read().unwrap().name == "join-log");
     ///
-    ///         let channel_search = guild
-    ///             .channels
-    ///             .values()
-    ///             .find(|c| c.read().unwrap().name == "join-log");
+    ///             if let Some(channel) = channel_search {
+    ///                 let user = member.user.read().unwrap();
     ///
-    ///         if let Some(channel) = channel_search {
-    ///             let user = member.user.read().unwrap();
+    ///                 let _ = channel.read().unwrap().send_message(|m| m
+    ///                     .embed(|e| {
+    ///                         let mut e = e
+    ///                             .author(|a| a.icon_url(&user.face()).name(&user.name))
+    ///                             .title("Member Join");
     ///
-    ///             let _ = channel.read().unwrap().send_message(|m| m
-    ///                 .embed(|e| {
-    ///                     let mut e = e
-    ///                         .author(|a| a.icon_url(&user.face()).name(&user.name))
-    ///                         .title("Member Join");
+    ///                         if let Some(ref joined_at) = member.joined_at {
+    ///                             e = e.timestamp(joined_at);
+    ///                         }
     ///
-    ///                     if let Some(ref joined_at) = member.joined_at {
-    ///                         e = e.timestamp(joined_at);
-    ///                     }
-    ///
-    ///                     e
-    ///                 }));
+    ///                         e
+    ///                     }));
+    ///             }
     ///         }
     ///     }
-    /// });
+    /// }
+    ///
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     pub fn timestamp<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
         self.0.insert("timestamp".to_owned(), Value::String(timestamp.into().ts));

@@ -67,6 +67,7 @@ impl CurrentUser {
     /// Returns the formatted URL to the user's default avatar URL.
     ///
     /// This will produce a PNG URL.
+    #[inline]
     pub fn default_avatar_url(&self) -> String {
         default_avatar_url(self.discriminator)
     }
@@ -429,46 +430,51 @@ impl User {
     /// help message, and then react with `'👌'` to verify message sending:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
-    /// #
-    /// # let mut client = Client::new("");
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
     /// use serenity::model::Permissions;
     /// use serenity::CACHE;
     ///
-    /// client.on_message(|_, msg| {
-    ///     if msg.content == "~help" {
-    ///         let url = match CACHE.read() {
-    ///             Ok(v) => {
-    ///                 match v.user.invite_url(Permissions::empty()) {
-    ///                     Ok(v) => v,
-    ///                     Err(why) => {
-    ///                         println!("Error creating invite url: {:?}", why);
+    /// struct Handler;
     ///
-    ///                         return;
-    ///                     },
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///         if msg.content == "~help" {
+    ///             let url = match CACHE.read() {
+    ///                 Ok(v) => {
+    ///                     match v.user.invite_url(Permissions::empty()) {
+    ///                         Ok(v) => v,
+    ///                         Err(why) => {
+    ///                             println!("Error creating invite url: {:?}", why);
+    ///
+    ///                             return;
+    ///                         },
+    ///                     }
+    ///                 },
+    ///                 Err(why) => {
+    ///                     println!("Error reading from CACHE: {:?}", why);
+    ///
+    ///                     return;
     ///                 }
-    ///             },
-    ///             Err(why) => {
-    ///                 println!("Error reading from CACHE: {:?}", why);
+    ///             };
+    ///             let help = format!("Helpful info here. Invite me with this link: <{}>", url);
     ///
-    ///                 return;
-    ///             }
-    ///         };
-    ///         let help = format!("Helpful info here. Invite me with this link: <{}>", url);
+    ///             match msg.author.direct_message(|m| m.content(&help)) {
+    ///                 Ok(_) => {
+    ///                     let _ = msg.react('👌');
+    ///                 },
+    ///                 Err(why) => {
+    ///                     println!("Err sending help: {:?}", why);
     ///
-    ///         match msg.author.direct_message(|m| m.content(&help)) {
-    ///             Ok(_) => {
-    ///                 let _ = msg.react('👌');
-    ///             },
-    ///             Err(why) => {
-    ///                 println!("Err sending help: {:?}", why);
+    ///                     let _ = msg.reply("There was an error DMing you help.");
+    ///                 },
+    ///             };
+    ///         }
+    ///     }   
+    /// }
     ///
-    ///                 let _ = msg.reply("There was an error DMing you help.");
-    ///             },
-    ///         };
-    ///     }
-    /// });
+    /// let mut client = Client::new("token", Handler);
     /// ```
     ///
     /// # Examples
@@ -652,9 +658,17 @@ impl User {
     /// out-of-sync:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
-    /// # let mut client = Client::new("");
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, _: Context, _: Message) {
+    ///         // normal message handling here
+    ///     }   
+    /// }
+    /// let mut client = Client::new("token", Handler);
     /// #
     /// use serenity::model::UserId;
     /// use serenity::CACHE;
@@ -662,10 +676,6 @@ impl User {
     /// use std::time::Duration;
     ///
     /// let special_users = vec![UserId(114941315417899012), UserId(87600987040120832)];
-    ///
-    /// client.on_message(|_ctx, _msg| {
-    ///     // normal message handling here
-    /// });
     ///
     /// // start a new thread to periodically refresh the special users' data
     /// // every 12 hours
@@ -716,24 +726,29 @@ impl User {
     /// Make a command to tell the user what their tag is:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
-    /// #
-    /// # let mut client = Client::new("");
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
     /// use serenity::utils::MessageBuilder;
     /// use serenity::utils::ContentModifier::Bold;
     ///
-    /// client.on_message(|_, msg| {
-    ///     if msg.content == "!mytag" {
-    ///         let content = MessageBuilder::new()
-    ///             .push("Your tag is ")
-    ///             .push(Bold + msg.author.tag())
-    ///             .build();
+    /// struct Handler;
     ///
-    ///         let _ = msg.channel_id.say(&content);
-    ///     }
-    /// });
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///         if msg.content == "!mytag" {
+    ///             let content = MessageBuilder::new()
+    ///                 .push("Your tag is ")
+    ///                 .push(Bold + msg.author.tag())
+    ///                 .build();
+    ///
+    ///             let _ = msg.channel_id.say(&content);
+    ///         } 
+    ///     }   
+    /// }
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
+    #[inline]
     pub fn tag(&self) -> String {
         tag(&self.name, self.discriminator)
     }

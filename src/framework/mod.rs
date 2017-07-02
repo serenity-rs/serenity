@@ -243,11 +243,11 @@ pub struct Framework {
     /// - a command check has been set.
     ///
     /// This is used internally to determine whether or not - in addition to
-    /// dispatching to the [`Client::on_message`] handler - to have the
+    /// dispatching to the [`EventHandler::on_message`] handler - to have the
     /// framework check if a [`Event::MessageCreate`] should be processed by
     /// itself.
     ///
-    /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
+    /// [`EventHandler::on_message`]: ../client/event_handler/trait.EventHandler.html#method.on_message
     /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
     pub initialized: bool,
     user_info: (u64, bool),
@@ -264,10 +264,13 @@ impl Framework {
     /// [allowing whitespace], and setting the [`prefix`] to `"~"`:
     ///
     /// ```rust,no_run
+    /// # use serenity::prelude::EventHandler;
+    /// # struct Handler;
+    /// # impl EventHandler for Handler {}
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
     /// client.with_framework(|f| f
     ///     .configure(|c| c
     ///         .depth(3)
@@ -296,8 +299,11 @@ impl Framework {
     /// a 2 second delay inbetween invocations:
     ///
     /// ```rust
-    /// # use serenity::Client;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// #
     /// client.with_framework(|f| f
     ///     .bucket("basic", 2, 10, 3)
@@ -325,8 +331,11 @@ impl Framework {
     /// Create and use a simple bucket that has a 2 second delay between invocations:
     ///
     /// ```rust
-    /// # use serenity::Client;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// #
     /// client.with_framework(|f| f
     ///     .simple_bucket("simple", 2)
@@ -352,10 +361,13 @@ impl Framework {
     ///
     /// # Examples
     /// ```rust,no_run
-    /// # use serenity::Client;
     /// use serenity::model::ReactionType;
     /// use serenity::framework::ReactionAction;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// #
     /// client.with_framework(|f| f
     ///     .action(ReactionAction::Add(ReactionType::Unicode("❤".to_string())), |_, _, channel_id| {
@@ -374,10 +386,13 @@ impl Framework {
     ///
     /// # Examples
     /// ```rust,no_run
-    /// # use serenity::Client;
     /// use serenity::model::ReactionType;
     /// use serenity::framework::ReactionAction;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// #
     /// let action = ReactionAction::Add(ReactionType::Unicode("❤".to_string()));
     /// client.with_framework(|f| f
@@ -649,8 +664,11 @@ impl Framework {
     /// # #[macro_use] extern crate serenity;
     /// #
     /// # fn main() {
-    /// #     use serenity::Client;
-    /// #     let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// #
     /// client.with_framework(|f| f.on("ping", ping));
     ///
@@ -727,8 +745,11 @@ impl Framework {
     /// Creating a simple group:
     ///
     /// ```rust
-    /// # use serenity::Client;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// #
     /// client.with_framework(|f| f
     ///     .group("ping-pong", |g| g
@@ -755,8 +776,11 @@ impl Framework {
     /// Making a simple argument error responder:
     ///
     /// ```rust
-    /// # use serenity::Client;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// use serenity::framework::DispatchError::{NotEnoughArguments, TooManyArguments};
     ///
     /// client.with_framework(|f| f
@@ -791,8 +815,11 @@ impl Framework {
     /// Using `before` to log command usage:
     ///
     /// ```rust
-    /// # use serenity::Client;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// #
     /// client.with_framework(|f| f
     ///     .before(|ctx, msg, cmd_name| {
@@ -804,8 +831,11 @@ impl Framework {
     /// Using before to prevent command usage:
     ///
     /// ```rust
-    /// # use serenity::Client;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// #
     /// client.with_framework(|f| f
     ///     .before(|_, msg, cmd_name| {
@@ -837,8 +867,11 @@ impl Framework {
     /// Using `after` to log command usage:
     ///
     /// ```rust
-    /// # use serenity::Client;
-    /// # let mut client = Client::new("token");
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
     /// #
     /// client.with_framework(|f| f
     ///     .after(|ctx, msg, cmd_name, error| {

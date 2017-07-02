@@ -58,9 +58,11 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 /// Use the command with `exec_help`:
 ///
 /// ```rust
-/// # use serenity::Client;
+/// # use serenity::prelude::*;
+/// # struct Handler;
 /// #
-/// # let mut client = Client::new("token");
+/// # impl EventHandler for Handler {}
+/// # let mut client = Client::new("token", Handler);
 /// #
 /// use serenity::ext::framework::help_commands;
 ///
@@ -208,9 +210,11 @@ pub fn with_embeds(_: &mut Context,
 /// Use the command with `exec_help`:
 ///
 /// ```rust
-/// # use serenity::Client;
+/// # use serenity::prelude::*;
+/// # struct Handler;
 /// #
-/// # let mut client = Client::new("token");
+/// # impl EventHandler for Handler {}
+/// # let mut client = Client::new("token", Handler);
 /// #
 /// use serenity::ext::framework::help_commands;
 ///

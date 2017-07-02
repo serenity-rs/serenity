@@ -519,25 +519,28 @@ impl Shard {
     /// message handled through [`Client::on_message`].
     ///
     /// ```rust,no_run
-    /// # use serenity::client::Client;
-    /// #
-    /// # let mut client = Client::new("hello source code viewer <3");
-    /// #
-    /// client.on_message(|ctx, msg| {
-    ///     if msg.content == "~ping" {
-    ///         if let Some(latency) = ctx.shard.lock().unwrap().latency() {
-    ///             let s = format!("{}.{}s", latency.as_secs(), latency.subsec_nanos());
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
+    /// struct Handler; 
     ///
-    ///             let _ = msg.channel_id.say(&s);
-    ///         } else {
-    ///             let _ = msg.channel_id.say("N/A");
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, ctx: Context, msg: Message) {
+    ///         if msg.content == "~ping" {
+    ///             if let Some(latency) = ctx.shard.lock().unwrap().latency() {
+    ///                 let s = format!("{}.{}s", latency.as_secs(), latency.subsec_nanos());
+    ///
+    ///                 let _ = msg.channel_id.say(&s);
+    ///             } else {
+    ///                 let _ = msg.channel_id.say("N/A");
+    ///             }
     ///         }
     ///     }
-    /// });
+    /// }
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// [`Client`]: ../struct.Client.html
-    /// [`Client::on_message`]: ../struct.Client.html#method.on_message
+    /// [`EventHandler::on_message`]: ../event_handler/trait.EventHandler.html#method.on_message
     // Shamelessly stolen from brayzure's commit in eris:
     // <https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6>
     pub fn latency(&self) -> Option<StdDuration> {

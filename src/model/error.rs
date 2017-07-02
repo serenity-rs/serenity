@@ -18,31 +18,36 @@ use super::Permissions;
 /// #
 /// # #[cfg(feature="client")]
 /// # fn try_main() -> Result<(), Box<Error>> {
-/// use serenity::{Client, Error};
+/// use serenity::prelude::*;
+/// use serenity::model::*;
+/// use serenity::Error;
 /// use serenity::model::ModelError;
 /// use std::env;
 ///
+/// struct Handler;
+///
+/// impl EventHandler for Handler {
+///     fn on_guild_ban_removal(&self, context: Context, guild_id: GuildId, user: User) {
+///         // If the user has an even discriminator, don't re-ban them.
+///         if user.discriminator % 2 == 0 {
+///             return;
+///         }
+///
+///      match guild_id.ban(user, 8) {
+///             Ok(()) => {
+///                 // Ban successful.
+///             },
+///             Err(Error::Model(ModelError::DeleteMessageDaysAmount(amount))) => {
+///                 println!("Failed deleting {} days' worth of messages", amount);
+///             },
+///             Err(why) => {
+///                 println!("Unexpected error: {:?}", why);
+///             },
+///         }
+///     }   
+/// }
 /// let token = env::var("DISCORD_BOT_TOKEN")?;
-/// let mut client = Client::new(&token);
-///
-/// client.on_member_unban(|context, guild_id, user| {
-///     // If the user has an even discriminator, don't re-ban them.
-///     if user.discriminator % 2 == 0 {
-///         return;
-///     }
-///
-///     match guild_id.ban(user, 8) {
-///         Ok(()) => {
-///             // Ban successful.
-///         },
-///         Err(Error::Model(ModelError::DeleteMessageDaysAmount(amount))) => {
-///             println!("Failed deleting {} days' worth of messages", amount);
-///         },
-///         Err(why) => {
-///             println!("Unexpected error: {:?}", why);
-///         },
-///     }
-/// });
+/// let mut client = Client::new(&token, Handler); client.start()?;
 /// #     Ok(())
 /// # }
 /// #

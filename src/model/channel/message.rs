@@ -80,10 +80,12 @@ impl Message {
     /// ```rust,no_run
     /// # #[macro_use] extern crate serenity;
     /// #
-    /// # use serenity::Client;
-    /// #
     /// # fn main() {
-    /// #     let mut client = Client::new("");
+    /// #   use serenity::prelude::*;
+    /// #   struct Handler;
+    /// #
+    /// #   impl EventHandler for Handler {}
+    /// #   let mut client = Client::new("token", Handler);
     /// #
     /// use serenity::model::Channel;
     ///

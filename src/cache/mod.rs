@@ -163,28 +163,33 @@ impl Cache {
     /// used to determine how many members have not yet been received.
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
-    /// #
-    /// # let mut client = Client::new("");
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
     /// use serenity::client::CACHE;
     /// use std::thread;
     /// use std::time::Duration;
+    /// 
+    /// struct Handler;
+    /// 
+    /// impl EventHandler for Handler {
+    ///     fn on_ready(&self, ctx: Context, _: Ready) {
+    ///          // Wait some time for guilds to be received.
+    ///         //
+    ///         // You should keep track of this in a better fashion by tracking how
+    ///         // many guilds each `ready` has, and incrementing a counter on
+    ///         // GUILD_CREATEs. Once the number is equal, print the number of
+    ///         // unknown members.
+    ///         //
+    ///         // For demonstrative purposes we're just sleeping the thread for 5
+    ///         // seconds.
+    ///         thread::sleep(Duration::from_secs(5));
     ///
-    /// client.on_ready(|ctx, _| {
-    ///     // Wait some time for guilds to be received.
-    ///     //
-    ///     // You should keep track of this in a better fashion by tracking how
-    ///     // many guilds each `ready` has, and incrementing a counter on
-    ///     // GUILD_CREATEs. Once the number is equal, print the number of
-    ///     // unknown members.
-    ///     //
-    ///     // For demonstrative purposes we're just sleeping the thread for 5
-    ///     // seconds.
-    ///     thread::sleep(Duration::from_secs(5));
+    ///         println!("{} unknown members", CACHE.read().unwrap().unknown_members());
+    ///     }   
+    /// }
     ///
-    ///     println!("{} unknown members", CACHE.read().unwrap().unknown_members());
-    /// });
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// [`Member`]: ../model/struct.Member.html
@@ -245,15 +250,18 @@ impl Cache {
     /// Print all of the Ids of guilds in the Cache:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
-    /// #
-    /// # let mut client = Client::new("");
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
     /// use serenity::client::CACHE;
     ///
-    /// client.on_ready(|_, _| {
-    ///     println!("Guilds in the Cache: {:?}", CACHE.read().unwrap().all_guilds());
-    /// });
+    /// struct Handler;
+    /// impl EventHandler for Handler {
+    ///     fn on_ready(&self, _: Context, _: Ready) {
+    ///         println!("Guilds in the Cache: {:?}", CACHE.read().unwrap().all_guilds());
+    ///     }    
+    /// }
+    /// let mut client = Client::new("token", Handler);
     /// ```
     ///
     /// [`Context`]: ../client/struct.Context.html
@@ -352,27 +360,31 @@ impl Cache {
     /// [`Client::on_message`] event dispatch:
     ///
     /// ```rust,no_run
-    /// # use serenity::Client;
-    /// #
-    /// # let mut client = Client::new("");
-    /// #
-    /// # client.on_message(|ctx, message| {
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
     /// #
     /// use serenity::client::CACHE;
     ///
-    /// let cache = CACHE.read().unwrap();
+    /// struct Handler;
+    /// 
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, ctx: Context, message: Message) {
+    ///         let cache = CACHE.read().unwrap();
     ///
-    /// let channel = match cache.guild_channel(message.channel_id) {
-    ///     Some(channel) => channel,
-    ///     None => {
-    ///         if let Err(why) = message.channel_id.say("Could not find guild's channel data") {
-    ///             println!("Error sending message: {:?}", why);
-    ///         }
+    ///         let channel = match cache.guild_channel(message.channel_id) {
+    ///             Some(channel) => channel,
+    ///             None => {
+    ///                 if let Err(why) = message.channel_id.say("Could not find guild's channel data") {
+    ///                     println!("Error sending message: {:?}", why);
+    ///                 }
     ///
-    ///         return;
-    ///     },
-    /// };
-    /// # });
+    ///                 return;
+    ///             },
+    ///         };
+    ///     }    
+    /// }
+    ///
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     ///
     /// [`ChannelId`]: ../model/struct.ChannelId.html

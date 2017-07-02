@@ -46,52 +46,55 @@ impl Attachment {
     /// Download all of the attachments associated with a [`Message`]:
     ///
     /// ```rust,no_run
-    /// use serenity::Client;
+    /// use serenity::prelude::*;
+    /// use serenity::model::*;
     /// use std::env;
     /// use std::fs::File;
     /// use std::io::Write;
     /// use std::path::Path;
     ///
-    /// let token = env::var("DISCORD_TOKEN").expect("token in environment");
-    /// let mut client = Client::new(&token);
+    /// struct Handler;
     ///
-    /// client.on_message(|_, message| {
-    ///     for attachment in message.attachments {
-    ///         let content = match attachment.download() {
-    ///             Ok(content) => content,
-    ///             Err(why) => {
-    ///                 println!("Error downloading attachment: {:?}", why);
-    ///                 let _ = message.channel_id.say("Error downloading attachment");
+    ///
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, _: Context, message: Message) {
+    ///         for attachment in message.attachments {
+    ///             let content = match attachment.download() {
+    ///                 Ok(content) => content,
+    ///                 Err(why) => {
+    ///                     println!("Error downloading attachment: {:?}", why);
+    ///                     let _ = message.channel_id.say("Error downloading attachment");
+    ///
+    ///                     return;
+    ///                 },
+    ///             };
+    ///
+    ///             let mut file = match File::create(&attachment.filename) {
+    ///                 Ok(file) => file,
+    ///                 Err(why) => {
+    ///                     println!("Error creating file: {:?}", why);
+    ///                     let _ = message.channel_id.say("Error creating file");
+    ///
+    ///                     return;
+    ///                 },
+    ///             };
+    ///
+    ///             if let Err(why) = file.write(&content) {
+    ///                 println!("Error writing to file: {:?}", why);
     ///
     ///                 return;
-    ///             },
-    ///         };
+    ///             }
     ///
-    ///         let mut file = match File::create(&attachment.filename) {
-    ///             Ok(file) => file,
-    ///             Err(why) => {
-    ///                 println!("Error creating file: {:?}", why);
-    ///                 let _ = message.channel_id.say("Error creating file");
-    ///
-    ///                 return;
-    ///             },
-    ///         };
-    ///
-    ///         if let Err(why) = file.write(&content) {
-    ///             println!("Error writing to file: {:?}", why);
-    ///
-    ///             return;
+    ///             let _ = message.channel_id.say(&format!("Saved {:?}", attachment.filename));
     ///         }
-    ///
-    ///         let _ = message.channel_id.say(&format!("Saved {:?}", attachment.filename));
     ///     }
-    /// });
     ///
-    /// client.on_ready(|_context, ready| {
-    ///     println!("{} is connected!", ready.user.name);
-    /// });
-    ///
-    /// let _ = client.start();
+    ///     fn on_ready(&self, _: Context, ready: Ready) {
+    ///         println!("{} is connected!", ready.user.name);   
+    ///     }
+    /// }
+    /// let token = env::var("DISCORD_TOKEN").expect("token in environment");
+    /// let mut client = Client::new(&token, Handler); client.start().unwrap();
     /// ```
     ///
     /// # Errors
