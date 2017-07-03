@@ -59,6 +59,36 @@ fn context(conn: &Arc<Mutex<Shard>>,
     Context::new(conn.clone(), data.clone())
 }
 
+// Heck you macro hygiene.
+macro_rules! impl_reaction_events {
+    (($event:ident, $conn:ident, $data:ident, $event_handler:ident, $framework:ident), $type_of_action:ident, $dispatch_name:ident) => {
+        let context = context($conn, $data);
+        let framework = $framework.lock().unwrap();
+
+        if framework.initialized {
+            $dispatch_name(context.clone(),
+                           $event.reaction.clone(),
+                           $event_handler);
+                
+            let res = framework.reaction_actions
+                .iter()
+                .find(|&(ra, _)| {
+                    if let ReactionAction::$type_of_action(ref kind) = *ra {
+                        *kind == $event.reaction.emoji 
+                    } else {
+                        false
+                    }
+                });
+                
+            if let Some((_, f)) = res {
+                f(context, $event.reaction.message_id, $event.reaction.channel_id);
+            }
+        } else {
+            $dispatch_name(context, $event.reaction, $event_handler);
+        }
+    }
+}
+
 #[cfg(feature="framework")]
 pub fn dispatch<H: EventHandler + Send + Sync + 'static>(event: Event,
                 conn: &Arc<Mutex<Shard>>,
@@ -81,56 +111,10 @@ pub fn dispatch<H: EventHandler + Send + Sync + 'static>(event: Event,
             }
         },
         Event::ReactionAdd(event) => {
-            let context = context(conn, data);
-            let framework = framework.lock().unwrap();
-
-            if framework.initialized {
-                dispatch_reaction_add(context.clone(),
-                                      event.reaction.clone(),
-                                      event_handler);
-                
-                let res = framework.reaction_actions
-                    .iter()
-                    .find(|&(ra, _)| {
-                        if let ReactionAction::Add(ref kind) = *ra {
-                            *kind == event.reaction.emoji 
-                        } else {
-                            false
-                        }
-                    });
-                
-                if let Some((_, f)) = res {
-                    f(context, event.reaction.message_id, event.reaction.channel_id);
-                }
-            } else {
-                dispatch_reaction_add(context, event.reaction, event_handler);
-            }
+            impl_reaction_events!((event, conn, data, event_handler, framework), Add, dispatch_reaction_add);
         },
         Event::ReactionRemove(event) => {
-            let context = context(conn, data);
-            let framework = framework.lock().unwrap();
-
-            if framework.initialized {
-                dispatch_reaction_remove(context.clone(),
-                                         event.reaction.clone(),
-                                         event_handler);
-                
-                let res = framework.reaction_actions
-                    .iter()
-                    .find(|&(ra, _)| {
-                        if let ReactionAction::Remove(ref kind) = *ra {
-                            *kind == event.reaction.emoji 
-                        } else {
-                            false
-                        }
-                    });
-                
-                if let Some((_, f)) = res {
-                    f(context, event.reaction.message_id, event.reaction.channel_id);
-                }
-            } else {
-                dispatch_reaction_remove(context, event.reaction, event_handler);
-            }
+            impl_reaction_events!((event, conn, data, event_handler, framework), Remove, dispatch_reaction_remove);
         },
         other => handle_event(other, conn, data, event_handler),
     }
