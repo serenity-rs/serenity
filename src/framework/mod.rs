@@ -437,16 +437,6 @@ impl Framework {
         true
     }
 
-    fn checks_passed(&self, command: &Arc<Command>, mut context: &mut Context, message: &Message) -> bool {
-        for check in &command.checks {
-            if !(check)(&mut context, message) {
-                return false;
-            }
-        }
-
-        true
-    }
-
     #[allow(too_many_arguments)]
     fn should_fail(&mut self,
                    mut context: &mut Context,
@@ -508,7 +498,7 @@ impl Framework {
 
             if command.owners_only {
                 Some(DispatchError::OnlyForOwners)
-            } else if !self.checks_passed(command, &mut context, message) {
+            } else if !command.checks.iter().all(|check| (check)(&mut context, message)) {
                 Some(DispatchError::CheckFailed)
             } else if self.configuration.blocked_users.contains(&message.author.id) {
                 Some(DispatchError::BlockedUser)
