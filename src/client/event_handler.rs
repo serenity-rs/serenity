@@ -8,7 +8,6 @@ use ::model::*;
 #[cfg(feature="cache")]
 use std::sync::RwLock;
 
-#[allow(type_complexity)]
 pub trait EventHandler {
     #[cfg(feature="cache")]
     fn on_cached(&self, _: Context, _: Vec<GuildId>) {}
@@ -23,6 +22,9 @@ pub trait EventHandler {
     fn on_channel_update(&self, _: Context, _: Channel) {}
     fn on_guild_ban_addition(&self, _: Context, _: GuildId, _: User) {}
     fn on_guild_ban_removal(&self, _: Context, _: GuildId, _: User) {}
+    #[cfg(feature="cache")]
+    fn on_guild_create(&self, _: Context, _: Guild, _: bool) {}
+    #[cfg(not(feature="cache"))]
     fn on_guild_create(&self, _: Context, _: Guild) {}
     #[cfg(feature="cache")]
     fn on_guild_delete(&self, _: Context, _: PartialGuild, _: Option<Arc<RwLock<Guild>>>) {}

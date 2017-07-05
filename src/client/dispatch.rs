@@ -261,6 +261,13 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(event: Event,
             thread::spawn(move || h.on_guild_ban_removal(context, event.guild_id, event.user));
         },
         Event::GuildCreate(event) => {
+            #[cfg(feature="cache")]
+            let _is_new = {
+                let cache = CACHE.read().unwrap();
+
+                !cache.unavailable_guilds.contains(&event.guild.id)
+            };
+
             update!(update_with_guild_create, event);
 
             #[cfg(feature="cache")]
@@ -285,7 +292,11 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(event: Event,
             let context = context(conn, data);
 
             let h = event_handler.clone();
-            thread::spawn(move || h.on_guild_create(context, event.guild));
+            feature_cache! {{
+                thread::spawn(move || h.on_guild_create(context, event.guild, _is_new));
+            } else {
+                thread::spawn(move || h.on_guild_create(context, event.guild));
+            }}
         },
         Event::GuildDelete(event) => {
             let _full = update!(update_with_guild_delete, event);
