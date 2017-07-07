@@ -5,14 +5,14 @@ use super::context::Context;
 use ::model::event::*;
 use ::model::*;
 
-#[cfg(feature="cache")]
 use std::sync::RwLock;
 
 pub trait EventHandler {
     #[cfg(feature="cache")]
     fn on_cached(&self, _: Context, _: Vec<GuildId>) {}
-    fn on_channel_create(&self, _: Context, _: Channel) {}
-    fn on_channel_delete(&self, _: Context, _: Channel) {}
+    fn on_channel_create(&self, _: Context, _: Arc<RwLock<GuildChannel>>) {}
+    fn on_private_channel_create(&self, _: Context, _: Arc<RwLock<PrivateChannel>>) {}
+    fn on_channel_delete(&self, _: Context, _: Arc<RwLock<GuildChannel>>) {}
     fn on_channel_pins_update(&self, _: Context, _: ChannelPinsUpdateEvent) {}
     fn on_channel_recipient_addition(&self, _: Context, _: ChannelId, _: User) {}
     fn on_channel_recipient_removal(&self, _: Context, _: ChannelId, _: User) {}

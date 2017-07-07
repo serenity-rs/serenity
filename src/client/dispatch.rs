@@ -6,7 +6,7 @@ use super::Context;
 use typemap::ShareMap;
 use ::gateway::Shard;
 use ::model::event::Event;
-use ::model::{Message, Reaction, GuildId};
+use ::model::{Message, Reaction, GuildId, Channel};
 use chrono::{Utc, Timelike};
 
 #[cfg(feature="framework")]
@@ -202,16 +202,32 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(event: Event,
 
             let context = context(conn, data);
 
+            // This different channel_create dispacthing is only due to the fact that
+            // each time the bot receives a dm, this event is also fired.
+            // So in short, only exists to reduce unnecessary clutter.
             let h = event_handler.clone();
-            thread::spawn(move || h.on_channel_create(context, event.channel));
+            match event.channel {
+                Channel::Private(channel) => {
+                    thread::spawn(move || h.on_private_channel_create(context, channel));
+                },
+                Channel::Group(_) => {},
+                Channel::Guild(channel) => {
+                    thread::spawn(move || h.on_channel_create(context, channel));
+                },
+            }
         },
         Event::ChannelDelete(event) => {
             update!(update_with_channel_delete, event);
 
             let context = context(conn, data);
 
-            let h = event_handler.clone();
-            thread::spawn(move || h.on_channel_delete(context, event.channel));
+            match event.channel {
+                Channel::Private(_) | Channel::Group(_) => {}
+                Channel::Guild(channel) => {
+                    let h = event_handler.clone();
+                    thread::spawn(move || h.on_channel_delete(context, channel));
+                },
+            }
         },
         Event::ChannelPinsUpdate(event) => {
             let context = context(conn, data);

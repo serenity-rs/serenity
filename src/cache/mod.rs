@@ -714,29 +714,24 @@ impl Cache {
         }
     }
 
-    pub(crate) fn update_with_channel_delete(&mut self, event: &ChannelDeleteEvent) -> Option<Channel> {
-        match event.channel {
-            Channel::Group(ref group) => {
-                self.groups.remove(&group.read().unwrap().channel_id).map(Channel::Group)
-            },
-            Channel::Private(ref channel) => {
-                self.private_channels.remove(&channel.read().unwrap().id).map(Channel::Private)
-            },
-            Channel::Guild(ref channel) => {
-                let (channel_id, guild_id) = {
-                    let channel = channel.read().unwrap();
+    pub(crate) fn update_with_channel_delete(&mut self, event: &ChannelDeleteEvent) {
+        // We ignore these two due to the fact that the delete event for dms/groups will _not_ fire anymore.
+        let channel = match event.channel {
+            Channel::Guild(ref channel) => channel,
+            Channel::Private(_) | Channel::Group(_) => panic!("Unexpected group/dm channel in the delete event!"),
+        };
 
-                    (channel.id, channel.guild_id)
-                };
+        let (channel_id, guild_id) = {
+            let channel = channel.read().unwrap();
 
-                self.channels.remove(&channel_id);
+            (channel.id, channel.guild_id)
+        };
 
-                self.guilds
-                    .get_mut(&guild_id)
-                    .and_then(|guild| guild.write().unwrap().channels.remove(&channel_id))
-                    .map(Channel::Guild)
-            },
-        }
+        self.channels.remove(&channel_id);
+
+        self.guilds
+            .get_mut(&guild_id)
+            .and_then(|guild| guild.write().unwrap().channels.remove(&channel_id));
     }
 
     #[allow(dead_code)]
@@ -1048,19 +1043,8 @@ impl Cache {
             }
         }
 
-        // The private channels sent in the READY contains both the actual
-        // private channels and the groups.
-        for (channel_id, channel) in ready.private_channels {
-            match channel {
-                Channel::Group(group) => {
-                    self.groups.insert(channel_id, group);
-                },
-                Channel::Private(channel) => {
-                    self.private_channels.insert(channel_id, channel);
-                },
-                Channel::Guild(guild) => warn!("Got a guild in DMs: {:?}", guild),
-            }
-        }
+        // `ready.private_channels` will always be empty, and possibly be removed in the future.
+        // So don't handle it at all.
 
         for (user_id, presence) in &mut ready.presences {
             if let Some(ref user) = presence.user {
@@ -1126,11 +1110,11 @@ impl Default for Cache {
     fn default() -> Cache {
         Cache {
             channels: HashMap::default(),
-            groups: HashMap::default(),
+            groups: HashMap::with_capacity(128),
             guilds: HashMap::default(),
             notes: HashMap::default(),
             presences: HashMap::default(),
-            private_channels: HashMap::default(),
+            private_channels: HashMap::with_capacity(128),
             shard_count: 1,
             unavailable_guilds: HashSet::default(),
             user: CurrentUser {
