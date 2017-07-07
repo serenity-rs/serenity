@@ -132,13 +132,14 @@ pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> 
 /// [`Guild`]: ../model/struct.Guild.html
 /// [`User`]: ../model/struct.User.html
 /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
-pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8) -> Result<()> {
+pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
     verify(204, request!(Route::GuildsIdBansUserId(guild_id),
                          put,
-                         "/guilds/{}/bans/{}?delete_message_days={}",
+                         "/guilds/{}/bans/{}?delete_message_days={}&reason={}",
                          guild_id,
                          user_id,
-                         delete_message_days))
+                         delete_message_days,
+                         reason))
 }
 
 /// Broadcasts that the current user is typing in the given [`Channel`].

@@ -16,6 +16,36 @@ use ::builder::EditMember;
 #[cfg(all(feature="cache", feature="model", feature="utils"))]
 use ::utils::Colour;
 
+pub enum BanOptions {
+    DeleteMessageDays(u8),
+    DMDReason(u8, String),
+    Reason(String),
+}
+
+impl From<u8> for BanOptions {
+    fn from(dmd: u8) -> Self {
+        BanOptions::DeleteMessageDays(dmd)
+    }
+}
+
+impl<'a> From<&'a str> for BanOptions {
+    fn from(reason: &'a str) -> Self {
+        BanOptions::Reason(reason.to_string())
+    }
+}
+
+impl From<String> for BanOptions {
+    fn from(reason: String) -> Self {
+        BanOptions::Reason(reason)
+    }
+}
+
+impl<'a> From<(u8, &'a str)> for BanOptions {
+    fn from(dmdreason: (u8, &'a str)) -> Self {
+        BanOptions::DMDReason(dmdreason.0, dmdreason.1.to_string())
+    }
+}
+
 /// Information about a member of a guild.
 #[derive(Clone, Debug, Deserialize)]
 pub struct Member {
@@ -102,8 +132,20 @@ impl Member {
     ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature="cache")]
-    pub fn ban(&self, delete_message_days: u8) -> Result<()> {
-        http::ban_user(self.guild_id.0, self.user.read().unwrap().id.0, delete_message_days)
+    pub fn ban<BO: Into<BanOptions>>(&self, ban_options: BO) -> Result<()> {
+        use self::BanOptions::*;
+
+        match ban_options.into() {
+            DeleteMessageDays(dmd) => {
+                http::ban_user(self.guild_id.0, self.user.read().unwrap().id.0, dmd, "")
+            },
+            DMDReason(dmd, reason) => {
+                http::ban_user(self.guild_id.0, self.user.read().unwrap().id.0, dmd, &*reason)
+            },
+            Reason(reason) => {
+                http::ban_user(self.guild_id.0, self.user.read().unwrap().id.0, 0, &*reason)
+            },
+        }
     }
 
     /// Determines the member's colour.
