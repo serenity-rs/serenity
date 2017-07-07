@@ -718,7 +718,7 @@ impl Cache {
         // We ignore these two due to the fact that the delete event for dms/groups will _not_ fire anymore.
         let channel = match event.channel {
             Channel::Guild(ref channel) => channel,
-            Channel::Private(_) | Channel::Group(_) => panic!("Unexpected group/dm channel in the delete event!"),
+            Channel::Private(_) | Channel::Group(_) => unreachable!(),
         };
 
         let (channel_id, guild_id) = {
