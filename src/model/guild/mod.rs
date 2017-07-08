@@ -33,9 +33,6 @@ use ::constants::LARGE_THRESHOLD;
 #[derive(Clone, Debug, Deserialize)]
 pub struct Ban {
     /// The reason given for this ban.
-    ///
-    /// **Note**: Until the Audit Log feature is completed by Discord, this will
-    /// always be `None`.
     pub reason: Option<String>,
     /// The user that was banned.
     pub user: User,
