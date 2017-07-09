@@ -668,6 +668,24 @@ impl Guild {
         self.id.members(limit, after)
     }
 
+    /// Gets a list of all the online members in this guild.
+    pub fn online_members(&self) -> Vec<&Member> {
+        let mut members = vec![];
+
+        for (&id, ref member) in &self.members {
+            match self.presences.get(&id) {
+                Some(ref presence) => {
+                    if OnlineStatus::Online == presence.status {
+                        members.push(*member);
+                    }
+                },
+                None => continue,
+            }
+        }
+
+        members
+    }
+
     /// Retrieves the first [`Member`] found that matches the name - with an
     /// optional discriminator - provided.
     ///
