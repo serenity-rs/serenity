@@ -292,7 +292,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(event: Event,
 
                 let cache = CACHE.read().unwrap();
 
-                if cache.unavailable_guilds.len() == 0 {
+                if cache.unavailable_guilds.is_empty() {
                     let h = event_handler.clone();
 
                     let context = context(conn, data);

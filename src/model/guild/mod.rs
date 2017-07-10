@@ -672,11 +672,11 @@ impl Guild {
     pub fn online_members(&self) -> Vec<&Member> {
         let mut members = vec![];
 
-        for (&id, ref member) in &self.members {
+        for (&id, member) in &self.members {
             match self.presences.get(&id) {
-                Some(ref presence) => {
+                Some(presence) => {
                     if OnlineStatus::Online == presence.status {
-                        members.push(*member);
+                        members.push(member);
                     }
                 },
                 None => continue,
