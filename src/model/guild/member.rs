@@ -146,7 +146,13 @@ impl Member {
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature="cache")]
     pub fn ban<BO: BanOptions>(&self, ban_options: BO) -> Result<()> {
-        http::ban_user(self.guild_id.0, self.user.read().unwrap().id.0, ban_options.dmd(), &*ban_options.reason())
+        let reason = ban_options.reason();
+        
+        if reason.len() > 512 {
+            return Err(Error::ExceededLimit);
+        }
+
+        http::ban_user(self.guild_id.0, self.user.read().unwrap().id.0, ban_options.dmd(), &*reason)
     }
 
     /// Determines the member's colour.

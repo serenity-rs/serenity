@@ -53,7 +53,13 @@ impl GuildId {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
         }
 
-        http::ban_user(self.0, user.into().0, dmd, &*ban_options.reason())
+        let reason = ban_options.reason();
+
+        if reason.len() > 512 {
+            return Err(Error::ExceededLimit);
+        }
+
+        http::ban_user(self.0, user.into().0, dmd, &*reason)
     }
 
     /// Gets a list of the guild's bans.

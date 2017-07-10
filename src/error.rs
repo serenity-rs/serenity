@@ -61,6 +61,10 @@ pub enum Error {
     Model(ModelError),
     /// An error occurred while parsing an integer.
     Num(ParseIntError),
+    /// Input exceeded a limit.
+    ///
+    /// *This only exists for the `GuildId::ban` and `Member::ban` functions. For their cases, it's the "reason".*
+    ExceededLimit,
     /// Some other error. This is only used for "Expected value <TYPE>" errors,
     /// when a more detailed error can not be easily provided via the
     /// [`Error::Decode`] variant.
@@ -186,6 +190,7 @@ impl StdError for Error {
     fn description(&self) -> &str {
         match *self {
             Error::Decode(msg, _) | Error::Other(msg) => msg,
+            Error::ExceededLimit => "Input exceeded a limit",
             Error::Format(ref inner) => inner.description(),
             Error::Io(ref inner) => inner.description(),
             Error::Json(ref inner) => inner.description(),
