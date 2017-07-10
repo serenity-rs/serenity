@@ -668,14 +668,14 @@ impl Guild {
         self.id.members(limit, after)
     }
 
-    /// Gets a list of all the online members in this guild.
-    pub fn online_members(&self) -> Vec<&Member> {
+    /// Gets a list of all the members (satisfying the status provided to the function) in this guild.
+    pub fn members_with_status(&self, status: OnlineStatus) -> Vec<&Member> {
         let mut members = vec![];
 
         for (&id, member) in &self.members {
             match self.presences.get(&id) {
                 Some(presence) => {
-                    if OnlineStatus::Online == presence.status {
+                    if status == presence.status {
                         members.push(member);
                     }
                 },
