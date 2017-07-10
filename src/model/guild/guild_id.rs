@@ -46,30 +46,14 @@ impl GuildId {
     /// [`Guild::ban`]: struct.Guild.html#method.ban
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    pub fn ban<U: Into<UserId>, BO: Into<BanOptions>>(&self, user: U, ban_options: BO)
+    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, ban_options: BO)
         -> Result<()> {
-        
-        use self::BanOptions::*;
-
-        match ban_options.into() {
-            DeleteMessageDays(dmd) => {
-                if dmd > 7 {
-                    return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
-                }
-
-                http::ban_user(self.0, user.into().0, dmd, "")
-            },
-            DMDReason(dmd, reason) => {
-                if dmd > 7 {
-                    return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
-                }
-
-                http::ban_user(self.0, user.into().0, dmd, &*reason)
-            },
-            Reason(reason) => {
-                http::ban_user(self.0, user.into().0, 0, &*reason)
-            },
+        let dmd = ban_options.dmd();
+        if dmd > 7 {
+            return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
         }
+
+        http::ban_user(self.0, user.into().0, dmd, &*ban_options.reason())
     }
 
     /// Gets a list of the guild's bans.
