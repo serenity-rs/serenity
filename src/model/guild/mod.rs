@@ -30,7 +30,7 @@ use ::builder::{EditGuild, EditMember, EditRole};
 use ::constants::LARGE_THRESHOLD;
 
 /// A representation of a banning of a user.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash)]
 pub struct Ban {
     /// The reason given for this ban.
     pub reason: Option<String>,

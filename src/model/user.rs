@@ -366,7 +366,7 @@ impl Default for OnlineStatus {
 }
 
 /// Information about a user.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash)]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's
     /// cration date.
