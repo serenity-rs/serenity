@@ -490,16 +490,6 @@ impl Message {
         http::unpin_message(self.channel_id.0, self.id.0)
     }
 
-    /// Alias of [`reaction_users`].
-    ///
-    /// [`reaction_users`]: #method.reaction_users
-    #[deprecated(since="0.1.5", note="Use `reaction_users` instead.")]
-    #[inline]
-    pub fn get_reaction_users<R, U>(&self, reaction_type: R, limit: Option<u8>, after: Option<U>)
-        -> Result<Vec<User>> where R: Into<ReactionType>, U: Into<UserId> {
-        self.reaction_users(reaction_type, limit, after)
-    }
-
     pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {
         if let Some(content) = map.get("content") {
             if let Value::String(ref content) = *content {

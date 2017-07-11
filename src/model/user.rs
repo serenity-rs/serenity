@@ -72,15 +72,6 @@ impl CurrentUser {
         default_avatar_url(self.discriminator)
     }
 
-    /// Alias of [`tag`].
-    ///
-    /// [`tag`]: #method.tag
-    #[deprecated(since="0.2.0", note="Use `tag` instead.")]
-    #[inline]
-    pub fn distinct(&self) -> String {
-        self.tag()
-    }
-
     /// Edits the current user's profile settings.
     ///
     /// This mutates the current user in-place.
@@ -540,15 +531,6 @@ impl User {
         private_channel_id.send_message(f)
     }
 
-    /// Alias of [`tag`].
-    ///
-    /// [`tag`]: #method.tag
-    #[deprecated(since="0.2.0", note="Use `tag` instead.")]
-    #[inline]
-    pub fn distinct(&self) -> String {
-        self.tag()
-    }
-
     /// This is an alias of [direct_message].
     ///
     /// # Examples
@@ -584,23 +566,6 @@ impl User {
     /// [`default_avatar_url`]: #method.default_avatar_url
     pub fn face(&self) -> String {
         self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
-    }
-
-    /// Gets a user by its Id over the REST API.
-    ///
-    /// **Note**: The current user must be a bot user.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a
-    /// [`ModelError::InvalidOperationAsUser`] if the current user is not a bot
-    /// user.
-    ///
-    /// [`ModelError::InvalidOperationAsUser`]: enum.ModelError.html#variant.InvalidOperationAsUser
-    #[deprecated(since="0.2.0", note="Don't use this, since it doesn't fit serenity's design.")]
-    #[inline]
-    pub fn get<U: Into<UserId>>(user_id: U) -> Result<User> {
-        user_id.into().get()
     }
 
     /// Check if a user has a [`Role`]. This will retrieve the [`Guild`] from

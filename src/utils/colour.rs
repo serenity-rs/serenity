@@ -188,42 +188,6 @@ impl Colour {
     pub fn tuple(&self) -> (u8, u8, u8) {
         (self.r(), self.g(), self.b())
     }
-
-    /// Alias of [`r`].
-    ///
-    /// [`r`]: #method.r
-    #[deprecated(since="0.1.5", note="Use `r` instead.")]
-    #[inline]
-    pub fn get_r(&self) -> u8 {
-        self.r()
-    }
-
-    /// Alias of [`g`].
-    ///
-    /// [`g`]: #method.g
-    #[deprecated(since="0.1.5", note="Use `g` instead.")]
-    #[inline]
-    pub fn get_g(&self) -> u8 {
-        self.g()
-    }
-
-    /// Alias of [`b`].
-    ///
-    /// [`b`]: #method.b
-    #[deprecated(since="0.1.5", note="Use `b` instead.")]
-    #[inline]
-    pub fn get_b(&self) -> u8 {
-        self.b()
-    }
-
-    /// Alias of [`tuple`].
-    ///
-    /// [`tuple`]: #method.tuple
-    #[deprecated(since="0.1.5", note="Use `tuple` instead.")]
-    #[inline]
-    pub fn get_tuple(&self) -> (u8, u8, u8) {
-        self.tuple()
-    }
 }
 
 impl From<i32> for Colour {

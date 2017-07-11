@@ -206,14 +206,6 @@ impl Member {
         http::edit_member(self.guild_id.0, self.user.read().unwrap().id.0, &map)
     }
 
-    /// Returns the value of [`guild_id`].
-    ///
-    /// [`guild_id`]: #structfield.guild_id
-    #[deprecated(since="0.2.1", note="Use the `guild_id` structfield instead.")]
-    pub fn find_guild(&self) -> Result<GuildId> {
-        Ok(self.guild_id)
-    }
-
     /// Kick the member from the guild.
     ///
     /// **Note**: Requires the [Kick Members] permission.

@@ -278,37 +278,6 @@ impl Group {
         self.channel_id.say(content)
     }
 
-    /// Sends a file along with optional message contents. The filename _must_
-    /// be specified.
-    ///
-    /// Refer to [`ChannelId::send_file`] for examples and more information.
-    ///
-    /// The [Attach Files] and [Send Messages] permissions are required.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns an
-    /// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
-    /// if the file is too large to send.
-    ///
-    /// If the content of the message is over the above limit, then a
-    /// [`ModelError::MessageTooLong`] will be returned, containing the number
-    /// of unicode code points over the limit.
-    ///
-    /// [`ChannelId::send_file`]: struct.ChannelId.html#method.send_file
-    /// [`HttpError::InvalidRequest`]: ../http/enum.HttpError.html#variant.InvalidRequest
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    #[deprecated(since="0.2.0", note="Please use `send_files` instead.")]
-    #[allow(deprecated)]
-    pub fn send_file<F, R>(&self, file: R, filename: &str, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, R: Read {
-        self.channel_id.send_file(file, filename, f)
-    }
-
     /// Sends (a) file(s) along with optional message contents.
     ///
     /// Refer to [`ChannelId::send_files`] for examples and more information.
@@ -356,38 +325,5 @@ impl Group {
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.channel_id.unpin(message_id)
-    }
-
-    /// Alias of [`message`].
-    ///
-    /// [`message`]: #method.message
-    #[deprecated(since="0.1.5", note="Use `message` instead.")]
-    #[inline]
-    pub fn get_message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        self.message(message_id)
-    }
-
-    /// Alias of [`messages`].
-    ///
-    /// [`messages`]: #method.messages
-    #[deprecated(since="0.1.5", note="Use `messages` instead.")]
-    #[inline]
-    pub fn get_messages<F>(&self, f: F) -> Result<Vec<Message>>
-        where F: FnOnce(GetMessages) -> GetMessages {
-        self.messages(f)
-    }
-
-    /// Alias of [`reaction_users`].
-    ///
-    /// [`reaction_users`]: #method.reaction_users
-    #[deprecated(since="0.1.5", note="Use `reaction_users` instead.")]
-    #[inline]
-    pub fn get_reaction_users<M, R, U>(&self,
-                                       message_id: M,
-                                       reaction_type: R,
-                                       limit: Option<u8>,
-                                       after: Option<U>)
-        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.reaction_users(message_id, reaction_type, limit, after)
     }
 }

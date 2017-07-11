@@ -366,70 +366,6 @@ impl ChannelId {
     ///
     /// # Examples
     ///
-    /// Send a file with the filename `my_file.jpg`:
-    ///
-    /// ```rust,no_run
-    /// use serenity::model::ChannelId;
-    /// use std::fs::File;
-    ///
-    /// let channel_id = ChannelId(7);
-    /// let filename = "my_file.jpg";
-    /// let file = File::open(filename).unwrap();
-    ///
-    /// let _ = channel_id.send_file(file, filename, |m| m.content("a file"));
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// If the content of the message is over the above limit, then a
-    /// [`ModelError::MessageTooLong`] will be returned, containing the number
-    /// of unicode code points over the limit.
-    ///
-    /// Returns an
-    /// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
-    /// if the file is too large to send.
-    ///
-    ///
-    /// [`HttpError::InvalidRequest`]: ../http/enum.HttpError.html#variant.InvalidRequest
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`CreateMessage::content`]: ../builder/struct.CreateMessage.html#method.content
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    #[deprecated(since="0.2.0", note="Please use `send_files` instead.")]
-    #[allow(deprecated)]
-    pub fn send_file<F, R>(&self, file: R, filename: &str, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, R: Read {
-        let mut map = f(CreateMessage::default()).0;
-
-        if let Some(content) = map.get("content") {
-            if let Value::String(ref content) = *content {
-                if let Some(length_over) = Message::overflow_length(content) {
-                    return Err(Error::Model(ModelError::MessageTooLong(length_over)));
-                }
-            }
-        }
-
-        let _ = map.remove("embed");
-
-        http::send_file(self.0, file, filename, map)
-    }
-
-    /// Sends a file along with optional message contents. The filename _must_
-    /// be specified.
-    ///
-    /// Message contents may be passed by using the [`CreateMessage::content`]
-    /// method.
-    ///
-    /// An embed can _not_ be sent when sending a file. If you set one, it will
-    /// be automatically removed.
-    ///
-    /// The [Attach Files] and [Send Messages] permissions are required.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Examples
-    ///
     /// Send files with the paths `/path/to/file.jpg` and `/path/to/file2.jpg`:
     ///
     /// ```rust,no_run
@@ -547,57 +483,6 @@ impl ChannelId {
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> {
         http::get_channel_webhooks(self.0)
-    }
-
-    /// Alias of [`invites`].
-    ///
-    /// [`invites`]: #method.invites
-    #[deprecated(since="0.1.5", note="Use `invites` instead.")]
-    #[inline]
-    pub fn get_invites(&self) -> Result<Vec<RichInvite>> {
-        self.invites()
-    }
-
-    /// Alias of [`message`].
-    ///
-    /// [`message`]: #method.message
-    #[deprecated(since="0.1.5", note="Use `message` instead.")]
-    #[inline]
-    pub fn get_message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        self.message(message_id)
-    }
-
-    /// Alias of [`messages`].
-    ///
-    /// [`messages`]: #method.messages
-    #[deprecated(since="0.1.5", note="Use `messages` instead.")]
-    #[inline]
-    pub fn get_messages<F>(&self, f: F) -> Result<Vec<Message>>
-        where F: FnOnce(GetMessages) -> GetMessages {
-        self.messages(f)
-    }
-
-    /// Alias of [`reaction_users`].
-    ///
-    /// [`reaction_users`]: #method.reaction_users
-    #[deprecated(since="0.1.5", note="Use `reaction_users` instead.")]
-    #[inline]
-    pub fn get_reaction_users<M, R, U>(&self,
-                                       message_id: M,
-                                       reaction_type: R,
-                                       limit: Option<u8>,
-                                       after: Option<U>)
-        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.reaction_users(message_id, reaction_type, limit, after)
-    }
-
-    /// Alias of [`webhooks`].
-    ///
-    /// [`webhooks`]: #method.webhooks
-    #[deprecated(since="0.1.5", note="Use `webhooks` instead.")]
-    #[inline]
-    pub fn get_webhooks(&self) -> Result<Vec<Webhook>> {
-        self.webhooks()
     }
 }
 

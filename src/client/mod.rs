@@ -221,24 +221,6 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
         init_client(token, handler)
     }
 
-    /// Alias of [`new`].
-    ///
-    /// [`new`]: #method.new
-    #[deprecated(since="0.1.5", note="Use `new` instead")]
-    #[inline(always)]
-    pub fn login_bot(token: &str, handler: H) -> Self {
-        Self::new(token, handler)
-    }
-
-    /// Alias for [`new`].
-    ///
-    /// [`new`]: #method.new
-    #[deprecated(since="0.2.1", note="Use `new` instead")]
-    #[inline(always)]
-    pub fn login(token: &str, handler: H) -> Self {
-        Self::new(token, handler)
-    }
-
     /// Sets a framework to be used with the client. All message events will be
     /// passed through the framework _after_ being passed to the [`on_message`]
     /// event handler.

@@ -146,33 +146,6 @@ pub const PRESET_VOICE: Permissions = Permissions {
     bits: 0b00000011111100000000000000000000,
 };
 
-/// Alias of [`PRESET_GENERAL`].
-///
-/// [`PRESET_GENERAL`]: const.PRESET_GENERAL.html
-#[deprecated(since="0.1.5", note="Use `permissions::PRESET_GENERAL` instead")]
-#[inline(always)]
-pub fn general() -> Permissions {
-    PRESET_GENERAL
-}
-
-/// Alias of [`PRESET_TEXT`].
-///
-/// [`PRESET_TEXT`]: const.PRESET_TEXT.html
-#[deprecated(since="0.1.5", note="Use `permissions::PRESET_TEXT` instead")]
-#[inline(always)]
-pub fn text() -> Permissions {
-    PRESET_TEXT
-}
-
-/// Alias of [`PRESET_VOICE`].
-///
-/// [`PRESET_VOICE`]: const.PRESET_VOICE.html
-#[deprecated(since="0.1.5", note="Use `permissions::PRESET_VOICE` instead")]
-#[inline(always)]
-pub fn voice() -> Permissions {
-    PRESET_VOICE
-}
-
 bitflags! {
     /// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
     /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to

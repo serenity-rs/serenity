@@ -101,15 +101,6 @@ impl Role {
         }
     }
 
-    /// Alias of [`edit`]
-    ///
-    /// [`edit`]: struct.Role.html#method.edit
-    #[deprecated(since="0.2.1", note="Please use `edit` instead.")]
-    #[cfg(all(feature="builder", feature="cache"))]
-    pub fn edit_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
-        self.edit(f)
-    }
-
     /// Searches the cache for the guild that owns the role.
     ///
     /// # Errors

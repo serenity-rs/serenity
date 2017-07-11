@@ -1397,24 +1397,6 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
                          user_id))
 }
 
-/// Sends a file to a channel.
-///
-/// # Errors
-///
-/// Returns an
-/// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
-/// if the file is too large to send.
-///
-/// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
-#[deprecated(since="0.2.0", note="Please use `send_files` instead.")]
-pub fn send_file<R: Read>(channel_id: u64, mut file: R, filename: &str, map: JsonMap)
-    -> Result<Message> {
-    let mut bytes = vec![];
-    file.read_to_end(&mut bytes)?;
-
-    send_files(channel_id, vec![AttachmentType::Bytes((&bytes, filename))], map)
-}
-
 /// Sends file(s) to a channel.
 ///
 /// # Errors

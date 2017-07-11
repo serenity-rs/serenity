@@ -545,37 +545,6 @@ impl GuildChannel {
         self.id.say(content)
     }
 
-    /// Sends a file along with optional message contents. The filename _must_
-    /// be specified.
-    ///
-    /// Refer to [`ChannelId::send_file`] for examples and more information.
-    ///
-    /// The [Attach Files] and [Send Messages] permissions are required.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns an
-    /// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
-    /// if the file is too large to send.
-    ///
-    /// If the content of the message is over the above limit, then a
-    /// [`ModelError::MessageTooLong`] will be returned, containing the number
-    /// of unicode code points over the limit.
-    ///
-    /// [`ChannelId::send_file`]: struct.ChannelId.html#method.send_file
-    /// [`HttpError::InvalidRequest`]: ../http/enum.HttpError.html#variant.InvalidRequest
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    #[deprecated(since="0.2.0", note="Please use `send_files` instead.")]
-    #[allow(deprecated)]
-    pub fn send_file<F, R>(&self, file: R, filename: &str, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, R: Read {
-        self.id.send_file(file, filename, f)
-    }
-
     /// Sends (a) file(s) along with optional message contents.
     ///
     /// Refer to [`ChannelId::send_files`] for examples and more information.
