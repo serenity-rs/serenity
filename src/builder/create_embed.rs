@@ -139,6 +139,26 @@ impl CreateEmbed {
         CreateEmbed(self.0)
     }
 
+    /// Adds multiple fields at once.
+    pub fn fields(mut self, fields: Vec<CreateEmbedField>) -> Self {
+        let fields = fields.into_iter().map(|m| Value::Object(m.0)).collect::<Vec<Value>>();
+        
+         {
+            let key = "fields".to_owned();
+
+            let entry = self.0.remove(&key).unwrap_or_else(|| Value::Array(vec![]));
+            let mut arr = match entry {
+                Value::Array(inner) => inner,
+                _ => return CreateEmbed(self.0),
+            };
+            arr.extend(fields);
+
+            self.0.insert("fields".to_owned(), Value::Array(arr));
+        }
+
+        CreateEmbed(self.0)
+    }
+
     /// Set the footer of the embed.
     ///
     /// Refer to the documentation for [`CreateEmbedFooter`] for more
