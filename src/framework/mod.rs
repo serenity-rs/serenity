@@ -498,7 +498,7 @@ impl Framework {
 
             if command.owners_only {
                 Some(DispatchError::OnlyForOwners)
-            } else if !command.checks.iter().all(|check| (check)(&mut context, message)) {
+            } else if !command.checks.iter().all(|check| (check)(&mut context, message, command)) {
                 Some(DispatchError::CheckFailed)
             } else if self.configuration.blocked_users.contains(&message.author.id) {
                 Some(DispatchError::BlockedUser)

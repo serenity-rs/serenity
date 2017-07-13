@@ -62,7 +62,7 @@ impl CreateCommand {
     /// }
     /// ```
     pub fn check<F>(mut self, check: F) -> Self
-        where F: Fn(&mut Context, &Message) -> bool + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, &Arc<Command>) -> bool + Send + Sync + 'static {
         self.0.checks.push(Box::new(check));
 
         self
