@@ -24,8 +24,6 @@ use ::model::*;
 #[cfg(feature="model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
 #[cfg(feature="model")]
-use std::io::Read;
-#[cfg(feature="model")]
 use ::builder::{CreateMessage, GetMessages};
 #[cfg(feature="model")]
 use ::http::AttachmentType;

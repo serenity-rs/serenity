@@ -18,7 +18,7 @@ use ::utils::Colour;
 
 pub trait BanOptions {
     fn dmd(&self) -> u8 { 0 }
-    fn reason(&self) -> String { "".to_string() }
+    fn reason(&self) -> &str { "" }
 }
 
 impl BanOptions for u8 {
@@ -28,14 +28,14 @@ impl BanOptions for u8 {
 }
 
 impl BanOptions for str {
-    fn reason(&self) -> String {
-        self.to_string()
+    fn reason(&self) -> &str {
+        self
     }
 }
 
 impl BanOptions for String {
-    fn reason(&self) -> String {
-        self.clone()
+    fn reason(&self) -> &str {
+        &self
     }
 }
 
@@ -44,8 +44,8 @@ impl<'a> BanOptions for (u8, &'a str) {
         self.0
     }
 
-    fn reason(&self) -> String {
-        self.1.to_string()
+    fn reason(&self) -> &str {
+        self.1
     }
 }
 
@@ -54,8 +54,8 @@ impl BanOptions for (u8, String) {
         self.0
     }
 
-    fn reason(&self) -> String {
-        self.1.clone()
+    fn reason(&self) -> &str {
+        &self.1
     }
 }
 

@@ -4,8 +4,6 @@ use ::model::*;
 #[cfg(feature="model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
 #[cfg(feature="model")]
-use std::io::Read;
-#[cfg(feature="model")]
 use std::mem;
 #[cfg(feature="cache")]
 use ::CACHE;

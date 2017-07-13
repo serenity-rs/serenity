@@ -4,8 +4,6 @@ use super::deserialize_single_recipient;
 use ::model::*;
 
 #[cfg(feature="model")]
-use std::io::Read;
-#[cfg(feature="model")]
 use ::builder::{CreateMessage, GetMessages};
 #[cfg(feature="model")]
 use ::http::AttachmentType;

@@ -6,8 +6,6 @@ use std::borrow::Cow;
 #[cfg(feature="model")]
 use std::fmt::Write as FmtWrite;
 #[cfg(feature="model")]
-use std::io::Read;
-#[cfg(feature="model")]
 use ::builder::{CreateMessage, GetMessages};
 #[cfg(feature="model")]
 use ::http::{self, AttachmentType};
