@@ -2,6 +2,8 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 use ::model::*;
 
 #[cfg(feature="model")]
+use std::borrow::Cow;
+#[cfg(feature="model")]
 use std::fmt::Write as FmtWrite;
 #[cfg(feature="model")]
 use ::builder::{CreateMessage, EditChannel, GetMessages};
@@ -289,6 +291,27 @@ impl ChannelId {
 
                     msg
                 }).collect::<Vec<Message>>())
+    }
+
+    /// Returns the name of whatever channel this id holds.
+    #[cfg(feature="model")]
+    pub fn name(&self) -> Option<String> {
+        use self::Channel::*;
+
+        Some(match match self.find() { Some(c) => c, None => return None, } {
+            Guild(channel) => {
+                channel.read().unwrap().name().to_string()
+            },
+            Group(channel) => {
+                match channel.read().unwrap().name() {
+                    Cow::Borrowed(name) => name.to_string(),
+                    Cow::Owned(name) => name,
+                }
+            },
+            Private(channel) => {
+                channel.read().unwrap().name()
+            }
+        })
     }
 
     /// Pins a [`Message`] to the channel.

@@ -170,6 +170,11 @@ impl PrivateChannel {
         self.id.messages(f)
     }
 
+    /// Returns "DM with $username$".
+    pub fn name(&self) -> String {
+        format!("DM with {}", self.recipient.read().unwrap().tag())
+    }
+
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
     ///

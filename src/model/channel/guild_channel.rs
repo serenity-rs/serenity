@@ -400,6 +400,11 @@ impl GuildChannel {
         self.id.messages(f)
     }
 
+    /// Returns the name of the guild channel. 
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
     /// Calculates the permissions of a member.
     ///
     /// The Id of the argument must be a [`Member`] of the [`Guild`] that the
