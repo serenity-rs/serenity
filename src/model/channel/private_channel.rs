@@ -170,7 +170,7 @@ impl PrivateChannel {
         self.id.messages(f)
     }
 
-    /// Returns "DM with $username$".
+    /// Returns "DM with $username#discriminator".
     pub fn name(&self) -> String {
         format!("DM with {}", self.recipient.read().unwrap().tag())
     }
