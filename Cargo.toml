@@ -27,6 +27,10 @@ version = "1.0"
 features = ["serde"]
 version = "~0.4"
 
+[dependencies.futures]
+optional = true
+version = "0.1"
+
 [dependencies.hyper]
 optional = true
 version = "~0.10"
@@ -51,12 +55,19 @@ version = "0.1"
 
 [dependencies.opus]
 optional = true
-version = "0.1"
+version = "0.2"
+
+[dependencies.parking_lot]
+version = "0.4"
 
 [dependencies.sodiumoxide]
 default-features = false
 optional = true
 version = "0.0.12"
+
+[dependencies.tokio-core]
+optional = true
+version = "0.1"
 
 [dependencies.typemap]
 optional = true
@@ -84,7 +95,7 @@ cache = ["lazy_static"]
 client = ["gateway", "lazy_static", "http", "typemap"]
 extras = []
 framework = ["client", "model", "utils"]
-gateway = ["http", "websocket"]
+gateway = ["http", "websocket", "tokio-core", "futures"]
 http = ["hyper", "hyper-native-tls", "lazy_static", "multipart", "native-tls"]
 model = ["builder", "http"]
 utils = []

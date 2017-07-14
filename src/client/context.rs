@@ -1,7 +1,8 @@
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use typemap::ShareMap;
 use ::gateway::Shard;
 use ::model::*;
+use parking_lot::Mutex;
 
 #[cfg(feature="cache")]
 use super::CACHE;
@@ -125,7 +126,7 @@ impl Context {
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     pub fn online(&self) {
-        let mut shard = self.shard.lock().unwrap();
+        let mut shard = self.shard.lock();
         shard.set_status(OnlineStatus::Online);
     }
 
@@ -154,7 +155,7 @@ impl Context {
     ///
     /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
     pub fn idle(&self) {
-        let mut shard = self.shard.lock().unwrap();
+        let mut shard = self.shard.lock();
         shard.set_status(OnlineStatus::Idle);
     }
 
@@ -183,7 +184,7 @@ impl Context {
     ///
     /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
     pub fn dnd(&self) {
-        let mut shard = self.shard.lock().unwrap();
+        let mut shard = self.shard.lock();
         shard.set_status(OnlineStatus::DoNotDisturb);
     }
 
@@ -213,7 +214,7 @@ impl Context {
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`Invisible`]: ../model/enum.OnlineStatus.html#variant.Invisible
     pub fn invisible(&self) {
-        let mut shard = self.shard.lock().unwrap();
+        let mut shard = self.shard.lock();
         shard.set_status(OnlineStatus::Invisible);
     }
 
@@ -245,7 +246,7 @@ impl Context {
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     /// [`set_presence`]: #method.set_presence
     pub fn reset_presence(&self) {
-        let mut shard = self.shard.lock().unwrap();
+        let mut shard = self.shard.lock();
         shard.set_presence(None, OnlineStatus::Online, false)
     }
 
@@ -280,7 +281,7 @@ impl Context {
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     pub fn set_game(&self, game: Game) {
-        let mut shard = self.shard.lock().unwrap();
+        let mut shard = self.shard.lock();
         shard.set_presence(Some(game), OnlineStatus::Online, false);
     }
 
@@ -326,7 +327,7 @@ impl Context {
             url: None,
         };
 
-        let mut shard = self.shard.lock().unwrap();
+        let mut shard = self.shard.lock();
         shard.set_presence(Some(game), OnlineStatus::Online, false);
     }
 
@@ -380,7 +381,7 @@ impl Context {
                         game: Option<Game>,
                         status: OnlineStatus,
                         afk: bool) {
-        let mut shard = self.shard.lock().unwrap();
+        let mut shard = self.shard.lock();
         shard.set_presence(game, status, afk)
     }
 
@@ -391,7 +392,7 @@ impl Context {
     ///
     /// [`Client::start`]: ./struct.Client.html#method.start
     pub fn quit(&self) -> Result<()> {
-        let mut shard = self.shard.lock().unwrap();
+        let mut shard = self.shard.lock();
         shard.shutdown_clean()
     }
 }

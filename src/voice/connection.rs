@@ -1,7 +1,7 @@
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
 use opus::{
     Channels,
-    CodingMode,
+    Application as CodingMode,
     Decoder as OpusDecoder,
     Encoder as OpusEncoder,
     packet as opus_packet,
