@@ -254,7 +254,7 @@ impl From<char> for ReactionType {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let message = ChannelId(0).get_message(0)?;
+    /// #     let message = ChannelId(0).message(0)?;
     /// #
     /// message.react('🍎')?;
     /// #     Ok(())

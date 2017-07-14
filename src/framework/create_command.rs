@@ -38,8 +38,10 @@ impl CreateCommand {
     /// # struct Handler;
     /// # impl EventHandler for Handler {}
     /// use serenity::client::{Client, Context};
+    /// use serenity::framework::Command;
     /// use serenity::model::Message;
     /// use std::env;
+    /// use std::sync::Arc;
     ///
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
     ///
@@ -56,7 +58,7 @@ impl CreateCommand {
     ///     Ok(())
     /// }
     ///
-    /// fn owner_check(_context: &mut Context, message: &Message) -> bool {
+    /// fn owner_check(_context: &mut Context, message: &Message, _: &Arc<Command>) -> bool {
     ///     // replace with your user ID
     ///     message.author.id == 7
     /// }
