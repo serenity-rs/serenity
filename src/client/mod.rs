@@ -36,7 +36,9 @@ pub use ::http as rest;
 pub use ::CACHE;
 
 use self::dispatch::dispatch;
-use std::sync::{Arc, Mutex};
+use std::sync::{self, Arc};
+use parking_lot::Mutex;
+use tokio_core::reactor::Core;
 use std::time::Duration;
 use std::{mem, thread};
 use super::gateway::Shard;
@@ -133,7 +135,7 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     /// macro_rules! reg {
     ///     ($ctx:ident $name:expr) => {
     ///         {
-    ///             let mut data = $ctx.data.lock().unwrap();
+    ///             let mut data = $ctx.data.lock();
     ///             let counter = data.get_mut::<MessageEventCounter>().unwrap();
     ///             let entry = counter.entry($name).or_insert(0);
     ///             *entry += 1;
@@ -153,7 +155,7 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
     ///
     /// {
-    ///     let mut data = client.data.lock().unwrap();
+    ///     let mut data = client.data.lock();
     ///     data.insert::<MessageEventCounter>(HashMap::default());
     /// }
     ///
@@ -177,8 +179,8 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     /// [`on_ready`]: #method.on_ready
     event_handler: Arc<H>,
     #[cfg(feature="framework")]
-    framework: Arc<Mutex<Framework>>,
-    token: Arc<Mutex<String>>,
+    framework: Arc<sync::Mutex<Framework>>,
+    token: Arc<sync::Mutex<String>>,
 }
 
 impl<H: EventHandler + Send + Sync + 'static> Client<H> {
@@ -263,7 +265,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     #[cfg(feature="framework")]
     pub fn with_framework<F>(&mut self, f: F)
         where F: FnOnce(Framework) -> Framework + Send + Sync + 'static {
-        self.framework = Arc::new(Mutex::new(f(Framework::default())));
+        self.framework = Arc::new(sync::Mutex::new(f(Framework::default())));
     }
 
     /// Establish the connection and start listening for events.
@@ -599,7 +601,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
                 .update_current_user(user.id, user.bot);
         }
 
-        let gateway_url = Arc::new(Mutex::new(url));
+        let gateway_url = Arc::new(sync::Mutex::new(url));
 
         let shards_index = shard_data[0];
         let shards_total = shard_data[1] + 1;
@@ -662,30 +664,30 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
 }
 
 struct BootInfo {
-    gateway_url: Arc<Mutex<String>>,
+    gateway_url: Arc<sync::Mutex<String>>,
     shard_info: [u64; 2],
-    token: Arc<Mutex<String>>,
+    token: Arc<sync::Mutex<String>>,
 }
 
 #[cfg(feature="framework")]
 struct MonitorInfo<H: EventHandler + Send + Sync + 'static> {
     data: Arc<Mutex<ShareMap>>,
     event_handler: Arc<H>,
-    framework: Arc<Mutex<Framework>>,
-    gateway_url: Arc<Mutex<String>>,
+    framework: Arc<sync::Mutex<Framework>>,
+    gateway_url: Arc<sync::Mutex<String>>,
     shard: Arc<Mutex<Shard>>,
     shard_info: [u64; 2],
-    token: Arc<Mutex<String>>,
+    token: Arc<sync::Mutex<String>>,
 }
 
 #[cfg(not(feature="framework"))]
 struct MonitorInfo<H: EventHandler + Send + Sync + 'static> {
     data: Arc<Mutex<ShareMap>>,
     event_handler: Arc<H>,
-    gateway_url: Arc<Mutex<String>>,
+    gateway_url: Arc<sync::Mutex<String>>,
     shard: Arc<Mutex<Shard>>,
     shard_info: [u64; 2],
-    token: Arc<Mutex<String>>,
+    token: Arc<sync::Mutex<String>>,
 }
 
 fn boot_shard(info: &BootInfo) -> Result<Shard> {
@@ -743,7 +745,7 @@ fn monitor_shard<H: EventHandler + Send + Sync + 'static>(mut info: MonitorInfo<
 
             match boot {
                 Ok(new_shard) => {
-                    *info.shard.lock().unwrap() = new_shard;
+                    *info.shard.lock() = new_shard;
 
                     boot_successful = true;
 
@@ -767,9 +769,11 @@ fn monitor_shard<H: EventHandler + Send + Sync + 'static>(mut info: MonitorInfo<
 
 fn handle_shard<H: EventHandler + Send + Sync + 'static>(info: &mut MonitorInfo<H>) {
     // This is currently all ducktape. Redo this.
+    let mut core = Core::new().unwrap();
+    let handle = core.handle();
     loop {
         {
-            let mut shard = info.shard.lock().unwrap();
+            let mut shard = info.shard.lock();
 
             if let Err(why) = shard.check_heartbeat() {
                 error!("Failed to heartbeat and reconnect: {:?}", why);
@@ -780,13 +784,13 @@ fn handle_shard<H: EventHandler + Send + Sync + 'static>(info: &mut MonitorInfo<
 
         #[cfg(feature="voice")]
         {
-            let mut shard = info.shard.lock().unwrap();
+            let mut shard = info.shard.lock();
 
             shard.cycle_voice_recv();
         }
 
         let event = {
-            let mut shard = info.shard.lock().unwrap();
+            let mut shard = info.shard.lock();
 
             let event = match shard.client.recv_json(GatewayEvent::decode) {
                 Err(Error::WebSocket(WebSocketError::IoError(_))) => {
@@ -838,25 +842,29 @@ fn handle_shard<H: EventHandler + Send + Sync + 'static>(info: &mut MonitorInfo<
                      &info.shard,
                      &info.framework,
                      &info.data,
-                     &info.event_handler);
+                     &info.event_handler,
+                     &handle);
         } else {
             dispatch(event,
                      &info.shard,
                      &info.data,
-                     &info.event_handler);
+                     &info.event_handler,
+                     &handle);
         }}
+
+        core.turn(None);
     }
 }
 
 fn init_client<H: EventHandler + Send + Sync + 'static>(token: String, handler: H) -> Client<H> {
     http::set_token(&token);
-    let locked = Arc::new(Mutex::new(token));
+    let locked = Arc::new(sync::Mutex::new(token));
 
     feature_framework! {{
         Client {
             data: Arc::new(Mutex::new(ShareMap::custom())),
             event_handler: Arc::new(handler),
-            framework: Arc::new(Mutex::new(Framework::default())),
+            framework: Arc::new(sync::Mutex::new(Framework::default())),
             token: locked,
         }
     } else {

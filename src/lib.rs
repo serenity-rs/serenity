@@ -104,9 +104,12 @@ extern crate base64;
 extern crate chrono;
 extern crate flate2;
 extern crate serde;
+extern crate parking_lot;
 
 #[cfg(feature="voice")]
 extern crate byteorder;
+#[cfg(feature="futures")]
+extern crate futures;
 #[cfg(feature="hyper")]
 extern crate hyper;
 #[cfg(feature="hyper-native-tls")]
@@ -119,6 +122,8 @@ extern crate native_tls;
 extern crate opus;
 #[cfg(feature="voice")]
 extern crate sodiumoxide;
+#[cfg(feature="tokio-core")]
+extern crate tokio_core;
 #[cfg(feature="client")]
 extern crate typemap;
 #[cfg(feature="gateway")]

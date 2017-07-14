@@ -73,11 +73,11 @@ use self::command::{AfterHook, BeforeHook};
 use std::collections::HashMap;
 use std::default::Default;
 use std::sync::Arc;
-use std::thread;
 use ::client::Context;
 use ::model::{Message, MessageId, UserId, ChannelId, ReactionType};
 use ::model::permissions::Permissions;
 use ::utils;
+use tokio_core::reactor::Handle;
 
 #[cfg(feature="cache")]
 use ::client::CACHE;
@@ -513,7 +513,7 @@ impl Framework {
     }
 
     #[allow(cyclomatic_complexity)]
-    pub(crate) fn dispatch(&mut self, mut context: Context, message: Message) {
+    pub(crate) fn dispatch(&mut self, mut context: Context, message: Message, tokio_handle: &Handle) {
         let res = command::positions(&mut context, &message, &self.configuration);
 
         let positions = match res {
@@ -597,10 +597,10 @@ impl Framework {
                             return;
                         }
 
-                        thread::spawn(move || {
+                        tokio_handle.spawn_fn(move || {
                             if let Some(before) = before {
                                 if !(before)(&mut context, &message, &built) {
-                                    return;
+                                    return Ok(());
                                 }
                             }
 
@@ -621,6 +621,8 @@ impl Framework {
                             if let Some(after) = after {
                                 (after)(&mut context, &message, &built, result);
                             }
+
+                            Ok(())
                         });
 
                         return;
