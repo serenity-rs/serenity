@@ -93,7 +93,7 @@ macro_rules! impl_reaction_events {
 }
 
 #[cfg(feature="framework")]
-pub fn dispatch<H: EventHandler + Send + Sync + 'static>(event: Event,
+pub fn dispatch<H: EventHandler + 'static>(event: Event,
                 conn: &Arc<Mutex<Shard>>,
                 framework: &Arc<sync::Mutex<Framework>>,
                 data: &Arc<Mutex<ShareMap>>,
@@ -126,7 +126,7 @@ pub fn dispatch<H: EventHandler + Send + Sync + 'static>(event: Event,
 }
 
 #[cfg(not(feature="framework"))]
-pub fn dispatch<H: EventHandler + Send + Sync + 'static>(event: Event,
+pub fn dispatch<H: EventHandler + 'static>(event: Event,
                 conn: &Arc<Mutex<Shard>>,
                 data: &Arc<Mutex<ShareMap>>,
                 event_handler: &Arc<H>,
@@ -152,7 +152,7 @@ pub fn dispatch<H: EventHandler + Send + Sync + 'static>(event: Event,
 }
 
 #[allow(unused_mut)]
-fn dispatch_message<H: EventHandler + Send + Sync + 'static>(context: Context,
+fn dispatch_message<H: EventHandler + 'static>(context: Context,
                     mut message: Message,
                     event_handler: &Arc<H>,
                     tokio_handle: &Handle) {
@@ -169,7 +169,7 @@ fn dispatch_message<H: EventHandler + Send + Sync + 'static>(context: Context,
     });
 }
 
-fn dispatch_reaction_add<H: EventHandler + Send + Sync + 'static>(context: Context,
+fn dispatch_reaction_add<H: EventHandler + 'static>(context: Context,
                          reaction: Reaction,
                          event_handler: &Arc<H>,
                          tokio_handle: &Handle) {
@@ -180,7 +180,7 @@ fn dispatch_reaction_add<H: EventHandler + Send + Sync + 'static>(context: Conte
     });
 }
 
-fn dispatch_reaction_remove<H: EventHandler + Send + Sync + 'static>(context: Context,
+fn dispatch_reaction_remove<H: EventHandler + 'static>(context: Context,
                          reaction: Reaction,
                          event_handler: &Arc<H>,
                          tokio_handle: &Handle) {
@@ -192,7 +192,7 @@ fn dispatch_reaction_remove<H: EventHandler + Send + Sync + 'static>(context: Co
 }
 
 #[allow(cyclomatic_complexity, unused_assignments, unused_mut)]
-fn handle_event<H: EventHandler + Send + Sync + 'static>(event: Event,
+fn handle_event<H: EventHandler + 'static>(event: Event,
                 conn: &Arc<Mutex<Shard>>,
                 data: &Arc<Mutex<ShareMap>>,
                 event_handler: &Arc<H>,
