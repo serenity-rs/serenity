@@ -37,6 +37,7 @@ pub use ::CACHE;
 
 use self::dispatch::dispatch;
 use std::sync::{self, Arc};
+use std::sync::atomic::{AtomicBool, ATOMIC_BOOL_INIT, Ordering};
 use parking_lot::Mutex;
 use tokio_core::reactor::Core;
 use std::time::Duration;
@@ -51,6 +52,8 @@ use ::model::event::*;
 
 #[cfg(feature="framework")]
 use ::framework::Framework;
+
+static HANDLE_STILL: AtomicBool = ATOMIC_BOOL_INIT;
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
@@ -220,7 +223,23 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
             format!("Bot {}", token)
         };
 
-        init_client(token, handler)
+        http::set_token(&token);
+        let locked = Arc::new(sync::Mutex::new(token));
+
+        feature_framework! {{
+            Client {
+                data: Arc::new(Mutex::new(ShareMap::custom())),
+                event_handler: Arc::new(handler),
+                framework: Arc::new(sync::Mutex::new(Framework::default())),
+                token: locked,
+            }
+        } else {
+            Client {
+                data: Arc::new(Mutex::new(ShareMap::custom())),
+                event_handler: Arc::new(handler),
+                token: locked,
+            }
+        }}
     }
 
     /// Sets a framework to be used with the client. All message events will be
@@ -574,6 +593,11 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
         self.start_connection([range[0], range[1], total_shards], http::get_gateway()?.url)
     }
 
+    /// Closes all of the shards that are running.
+    pub fn close(&self) {
+        HANDLE_STILL.store(false, Ordering::Relaxed);
+    }
+
     // Shard data layout is:
     // 0: first shard number to initialize
     // 1: shard number to initialize up to and including
@@ -589,6 +613,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     // [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     fn start_connection(&mut self, shard_data: [u64; 3], url: String)
         -> Result<()> {
+        HANDLE_STILL.store(true, Ordering::Relaxed);
         // Update the framework's current user if the feature is enabled.
         //
         // This also acts as a form of check to ensure the token is correct.
@@ -660,6 +685,13 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
         }
 
         Err(Error::Client(ClientError::Shutdown))
+    }
+}
+
+
+impl<H: EventHandler + Send + Sync + 'static> Drop for Client<H> {
+    fn drop(&mut self) {
+        self.close();
     }
 }
 
@@ -771,7 +803,9 @@ fn handle_shard<H: EventHandler + Send + Sync + 'static>(info: &mut MonitorInfo<
     // This is currently all ducktape. Redo this.
     let mut core = Core::new().unwrap();
     let handle = core.handle();
-    loop {
+
+    let handle_still = HANDLE_STILL.load(Ordering::Relaxed);
+    while handle_still {
         {
             let mut shard = info.shard.lock();
 
@@ -854,26 +888,6 @@ fn handle_shard<H: EventHandler + Send + Sync + 'static>(info: &mut MonitorInfo<
 
         core.turn(None);
     }
-}
-
-fn init_client<H: EventHandler + Send + Sync + 'static>(token: String, handler: H) -> Client<H> {
-    http::set_token(&token);
-    let locked = Arc::new(sync::Mutex::new(token));
-
-    feature_framework! {{
-        Client {
-            data: Arc::new(Mutex::new(ShareMap::custom())),
-            event_handler: Arc::new(handler),
-            framework: Arc::new(sync::Mutex::new(Framework::default())),
-            token: locked,
-        }
-    } else {
-        Client {
-            data: Arc::new(Mutex::new(ShareMap::custom())),
-            event_handler: Arc::new(handler),
-            token: locked,
-        }
-    }}
 }
 
 /// Validates that a token is likely in a valid format.
