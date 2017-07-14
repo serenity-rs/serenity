@@ -473,7 +473,7 @@ impl GuildChannel {
     ///             },
     ///         };
     ///
-    ///         let _ = msg.channel_id.send_files((&file, "cat.png"), |m| m.content("here's a cat"));
+    ///         let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m| m.content("here's a cat"));
     ///     }        
     /// }
     ///
