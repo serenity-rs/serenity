@@ -54,7 +54,7 @@ use ::model::event::*;
 #[cfg(feature="framework")]
 use ::framework::Framework;
 
-pub static HANDLE_STILL: AtomicBool = ATOMIC_BOOL_INIT;
+static HANDLE_STILL: AtomicBool = ATOMIC_BOOL_INIT;
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
@@ -98,6 +98,7 @@ pub static HANDLE_STILL: AtomicBool = ATOMIC_BOOL_INIT;
 /// [`on_message`]: #method.on_message
 /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
 /// [sharding docs]: gateway/index.html#sharding
+#[derive(Clone)]
 pub struct Client<H: EventHandler + 'static> {
     /// A ShareMap which requires types to be Send + Sync. This is a map that
     /// can be safely shared across contexts.
