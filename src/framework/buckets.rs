@@ -1,31 +1,26 @@
 use chrono::Utc;
 use std::collections::HashMap;
 use std::default::Default;
+use client::Context;
+use model::{GuildId, ChannelId, UserId};
 
 pub(crate) struct Ratelimit {
     pub delay: i64,
     pub limit: Option<(i64, i32)>,
 }
 
+#[derive(Default)]
 pub(crate) struct MemberRatelimit {
     pub last_time: i64,
     pub set_time: i64,
     pub tickets: i32,
 }
 
-impl Default for MemberRatelimit {
-    fn default() -> Self {
-        MemberRatelimit {
-            last_time: 0,
-            set_time: 0,
-            tickets: 0,
-        }
-    }
-}
-
 pub(crate) struct Bucket {
     pub ratelimit: Ratelimit,
     pub users: HashMap<u64, MemberRatelimit>,
+    #[cfg(feature="cache")]
+    pub check: Option<Box<Fn(&mut Context, GuildId, ChannelId, UserId) -> bool + 'static>>,
 }
 
 impl Bucket {
