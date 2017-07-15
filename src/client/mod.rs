@@ -54,7 +54,7 @@ use ::model::event::*;
 #[cfg(feature="framework")]
 use ::framework::Framework;
 
-static HANDLE_STILL: AtomicBool = ATOMIC_BOOL_INIT;
+pub static HANDLE_STILL: AtomicBool = ATOMIC_BOOL_INIT;
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
