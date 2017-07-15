@@ -56,6 +56,15 @@ use ::framework::Framework;
 
 static HANDLE_STILL: AtomicBool = ATOMIC_BOOL_INIT;
 
+#[derive(Clone)]
+pub struct CloseHandle;
+
+impl CloseHandle {
+    pub fn close(self) {
+        HANDLE_STILL.store(false, Ordering::Relaxed);
+    }
+}
+
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
 /// [`Shard`]s. Refer to the [documentation on using sharding][sharding docs]
@@ -595,9 +604,9 @@ impl<H: EventHandler + 'static> Client<H> {
         self.start_connection([range[0], range[1], total_shards], http::get_gateway()?.url)
     }
 
-    /// Closes all of the shards that are running.
-    pub fn close(&self) {
-        HANDLE_STILL.store(false, Ordering::Relaxed);
+    /// Returns a thread-safe handle for closing shards.
+    pub fn close_handle(&self) -> CloseHandle {
+        CloseHandle
     }
 
     // Shard data layout is:
@@ -696,7 +705,7 @@ impl<H: EventHandler + 'static> Client<H> {
 
 impl<H: EventHandler + 'static> Drop for Client<H> {
     fn drop(&mut self) {
-        self.close();
+        self.close_handle().close();
     }
 }
 
