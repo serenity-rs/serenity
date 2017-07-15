@@ -400,7 +400,7 @@ impl GuildChannel {
         self.id.messages(f)
     }
 
-    /// Returns the name of the guild channel. 
+    /// Returns the name of the guild channel.
     pub fn name(&self) -> &str {
         &self.name
     }
@@ -419,9 +419,9 @@ impl GuildChannel {
     /// use serenity::prelude::*;
     /// use serenity::model::*;
     /// struct Handler;
-    /// 
+    ///
     /// use serenity::CACHE;
-    /// 
+    ///
     /// impl EventHandler for Handler {
     ///     fn on_message(&self, _: Context, msg: Message) {
     ///         let channel = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
@@ -473,8 +473,8 @@ impl GuildChannel {
     ///             },
     ///         };
     ///
-    ///         let _ = msg.channel_id.send_files((&file, "cat.png"), |m| m.content("here's a cat"));
-    ///     }        
+    ///         let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m| m.content("here's a cat"));
+    ///     }
     /// }
     ///
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
