@@ -56,7 +56,7 @@ use ::framework::Framework;
 
 static HANDLE_STILL: AtomicBool = ATOMIC_BOOL_INIT;
 
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct CloseHandle;
 
 impl CloseHandle {
