@@ -779,7 +779,9 @@ fn boot_shard(info: &BootInfo) -> Result<Shard> {
 fn monitor_shard<H: EventHandler + 'static>(mut info: MonitorInfo<H>, handle: Handle) {
     handle_shard(&mut info, &handle);
 
-    loop {
+    let mut handle_still = HANDLE_STILL.load(Ordering::Relaxed);
+
+    while handle_still {
         let mut boot_successful = false;
 
         for _ in 0..3 {
@@ -807,10 +809,21 @@ fn monitor_shard<H: EventHandler + 'static>(mut info: MonitorInfo<H>, handle: Ha
             break;
         }
 
-        // The shard died: redo the cycle.
+        // The shard died: redo the cycle, unless client close was requested.
+        handle_still = HANDLE_STILL.load(Ordering::Relaxed);
     }
 
-    error!("Completely failed to reboot shard");
+    if handle_still {
+        error!("Completely failed to reboot shard");
+    } else {
+        info!("Client close was requested. Shutting down.");
+
+        let mut shard = info.shard.lock();
+
+        if let Err(e) = shard.shutdown_clean() {
+            error!("Error shutting down shard {:?}: {:?}", shard.shard_info(), e);
+        }
+    }
 }
 
 fn handle_shard<H: EventHandler + 'static>(info: &mut MonitorInfo<H>, handle: &Handle) {
