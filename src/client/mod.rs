@@ -815,8 +815,7 @@ fn monitor_shard<H: EventHandler + 'static>(mut info: MonitorInfo<H>, handle: Ha
 
 fn handle_shard<H: EventHandler + 'static>(info: &mut MonitorInfo<H>, handle: &Handle) {
     // This is currently all ducktape. Redo this.
-    let handle_still = HANDLE_STILL.load(Ordering::Relaxed);
-    while handle_still {
+    while HANDLE_STILL.load(Ordering::Relaxed) {
         {
             let mut shard = info.shard.lock();
 
