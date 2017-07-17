@@ -39,7 +39,7 @@ use self::dispatch::dispatch;
 use std::sync::{self, Arc};
 use std::sync::atomic::{AtomicBool, ATOMIC_BOOL_INIT, Ordering};
 use parking_lot::Mutex;
-use tokio_core::reactor::{Core, Handle};
+use tokio_core::reactor::Core;
 use futures;
 use std::time::Duration;
 use std::mem;
@@ -681,9 +681,8 @@ impl<H: EventHandler + 'static> Client<H> {
                         }
                     }};
 
-                    let handle = core.handle();
                     futures.push(futures::future::lazy(move || {
-                        monitor_shard(monitor_info, handle);
+                        monitor_shard(monitor_info);
                         futures::future::ok::<(), ()>(())
                     }));
                 },
@@ -776,8 +775,8 @@ fn boot_shard(info: &BootInfo) -> Result<Shard> {
     Err(Error::Client(ClientError::ShardBootFailure))
 }
 
-fn monitor_shard<H: EventHandler + 'static>(mut info: MonitorInfo<H>, handle: Handle) {
-    handle_shard(&mut info, &handle);
+fn monitor_shard<H: EventHandler + 'static>(mut info: MonitorInfo<H>) {
+    handle_shard(&mut info);
 
     let mut handle_still = HANDLE_STILL.load(Ordering::Relaxed);
 
@@ -804,7 +803,7 @@ fn monitor_shard<H: EventHandler + 'static>(mut info: MonitorInfo<H>, handle: Ha
         }
 
         if boot_successful {
-            handle_shard(&mut info, &handle);
+            handle_shard(&mut info);
         } else {
             break;
         }
@@ -826,7 +825,10 @@ fn monitor_shard<H: EventHandler + 'static>(mut info: MonitorInfo<H>, handle: Ha
     }
 }
 
-fn handle_shard<H: EventHandler + 'static>(info: &mut MonitorInfo<H>, handle: &Handle) {
+fn handle_shard<H: EventHandler + 'static>(info: &mut MonitorInfo<H>) {
+    let mut core = Core::new().unwrap();
+    let handle = core.handle();
+    
     // This is currently all ducktape. Redo this.
     while HANDLE_STILL.load(Ordering::Relaxed) {
         {
@@ -908,6 +910,8 @@ fn handle_shard<H: EventHandler + 'static>(info: &mut MonitorInfo<H>, handle: &H
                      &info.event_handler,
                      &handle);
         }}
+
+        core.turn(None);
     }
 }
 
