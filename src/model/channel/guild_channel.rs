@@ -66,6 +66,19 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available for voice channels.
     pub user_limit: Option<u64>,
+    /// Used to tell if the channel is not safe for work.
+    /// Note however, it's recommended to use [`is_nsfw`] as it's gonna be more accurate.
+    ///
+    /// [`is_nsfw`]: struct.GuildChannel.html#method.is_nsfw  
+
+    // This field can or can not be present sometimes, but if it isn't
+    // default to `false`.
+    #[serde(default = "nsfw_false")]
+    pub nsfw: bool,
+}
+
+fn nsfw_false() -> bool {
+    false
 }
 
 #[cfg(feature="model")]
@@ -373,7 +386,7 @@ impl GuildChannel {
     #[cfg(feature="utils")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
-        self.kind == ChannelType::Text && serenity_utils::is_nsfw(&self.name)
+        self.nsfw || self.name == "nsfw" || self.kind == ChannelType::Text && serenity_utils::is_nsfw(&self.name)
     }
 
     /// Gets a message from the channel.
