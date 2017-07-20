@@ -72,6 +72,12 @@ impl GuildId {
         http::get_bans(self.0)
     }
 
+    /// Gets a list of the guild's audit log entries
+    #[inline]
+    pub fn audit_logs(&self) -> Result<AuditLogs> {
+        http::get_audit_logs(self.0)
+    }
+
     /// Gets all of the guild's channels over the REST API.
     ///
     /// [`Guild`]: struct.Guild.html

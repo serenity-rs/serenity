@@ -887,6 +887,16 @@ pub fn get_bans(guild_id: u64) -> Result<Vec<Ban>> {
     serde_json::from_reader::<HyperResponse, Vec<Ban>>(response).map_err(From::from)
 }
 
+/// Gets all audit logs in a specific guild.
+pub fn get_audit_logs(guild_id: u64) -> Result<AuditLogs> {
+    let response = request!(Route::GuildsIdAuditLogs(guild_id),
+                            get,
+                            "/guilds/{}/audit-logs",
+                            guild_id);
+
+    serde_json::from_reader::<HyperResponse, AuditLogs>(response).map_err(From::from)
+}
+
 /// Gets current bot gateway.
 pub fn get_bot_gateway() -> Result<BotGateway> {
     let response = request!(Route::GatewayBot, get, "/gateway/bot");

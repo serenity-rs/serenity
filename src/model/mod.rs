@@ -105,6 +105,8 @@ id_u64! {
     UserId;
     /// An identifier for a [`Webhook`](struct.Webhook.html).
     WebhookId;
+    /// An identifier for an audit log entry.
+    AuditLogEntryId;
 }
 
 /// A container for guilds.

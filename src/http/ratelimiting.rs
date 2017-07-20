@@ -207,6 +207,11 @@ pub enum Route {
     ///
     /// [`GuildId`]: struct.GuildId.html
     GuildsIdBans(u64),
+    /// Route for the `/guilds/:guild_id/audit-logs` path.
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: struct.GuildId.html
+    GuildsIdAuditLogs(u64),
     /// Route for the `/guilds/:guild_id/bans/:user_id` path.
     ///
     /// The data is the relevant [`GuildId`].

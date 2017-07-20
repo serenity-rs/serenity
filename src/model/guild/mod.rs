@@ -5,6 +5,7 @@ mod integration;
 mod member;
 mod partial_guild;
 mod role;
+mod audit_log;
 
 pub use self::emoji::*;
 pub use self::feature::*;
@@ -13,6 +14,7 @@ pub use self::integration::*;
 pub use self::member::*;
 pub use self::partial_guild::*;
 pub use self::role::*;
+pub use self::audit_log::*;
 
 use chrono::{DateTime, FixedOffset};
 use serde::de::Error as DeError;
@@ -204,6 +206,14 @@ impl Guild {
         }
 
         self.id.bans()
+    }
+
+    /// Retrieves a list of [`AuditLogs`] for the guild.
+    ///
+    /// [`AuditLogs`]: audit_log/struct.AuditLogs.html
+    #[inline]
+    pub fn audit_logs(&self) -> Result<AuditLogs> {
+        self.id.audit_logs()
     }
 
     /// Gets all of the guild's channels over the REST API.
