@@ -204,23 +204,17 @@ impl<'de> Deserialize<'de> for AuditLogs {
             }
 
             fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> Result<AuditLogs, V::Error> {
-                let mut audit_log_entries = None;
-
-                while let Some(key) = map.next_key()? {
-                    match key {
-                        Field::AuditLogEntries => {
-                            if audit_log_entries.is_some() {
-                                return Err(de::Error::duplicate_field("audit_log_entries"));
+                let audit_log_entries = loop {
+                    if let Some(key) = map.next_key()? {
+                        match key {
+                            Field::AuditLogEntries => {
+                                break map.next_value::<Vec<AuditLogEntry>>()?;
                             }
-
-                            audit_log_entries = Some(map.next_value()?);
                         }
                     }
-                }
+                };
 
-                let entries: Vec<AuditLogEntry> = audit_log_entries.ok_or_else(|| de::Error::missing_field("audit_log_entries"))?;
-
-                Ok(AuditLogs { entries: entries.into_iter().map(|entry| (entry.id, entry)).collect() })
+                Ok(AuditLogs { entries: audit_log_entries.into_iter().map(|entry| (entry.id, entry)).collect() })
             }
         }
 

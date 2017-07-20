@@ -71,27 +71,19 @@ impl Connection {
 
         client.send_json(&payload::build_identify(&info))?;
 
-        let hello = {
-            let hello;
+        let hello = loop {
+            match client.recv_json(VoiceEvent::decode)? {
+                VoiceEvent::Hello(received_hello) => {
+                    break received_hello;
+                },
+                VoiceEvent::Heartbeat(_) => continue,
+                other => {
+                    debug!("[Voice] Expected hello/heartbeat; got: {:?}",
+                            other);
 
-            loop {
-                match client.recv_json(VoiceEvent::decode)? {
-                    VoiceEvent::Hello(received_hello) => {
-                        hello = received_hello;
-
-                        break;
-                    },
-                    VoiceEvent::Heartbeat(_) => continue,
-                    other => {
-                        debug!("[Voice] Expected hello/heartbeat; got: {:?}",
-                               other);
-
-                        return Err(Error::Voice(VoiceError::ExpectedHandshake));
-                    },
-                }
+                    return Err(Error::Voice(VoiceError::ExpectedHandshake));
+                },
             }
-
-            hello
         };
 
         if !has_valid_mode(&hello.modes) {
