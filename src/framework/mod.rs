@@ -207,9 +207,9 @@ pub enum DispatchError {
     WebhookAuthor,
 }
 
-type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;
+type DispatchErrorHook = Fn(Context, Message, DispatchError) + 'static;
 
-pub(crate) type ActionFn = Fn(Context, MessageId, ChannelId) + Send + Sync + 'static;
+pub(crate) type ActionFn = Fn(Context, MessageId, ChannelId) + 'static;
 
 /// Defines wheter this action should be called when
 /// a reaction's added, or removed.
@@ -894,7 +894,7 @@ impl Framework {
     ///     }));
     /// ```
     pub fn on_dispatch_error<F>(mut self, f: F) -> Self
-        where F: Fn(Context, Message, DispatchError) + Send + Sync + 'static {
+        where F: Fn(Context, Message, DispatchError) + 'static {
         self.dispatch_error_handler = Some(Arc::new(f));
 
         self
@@ -946,7 +946,7 @@ impl Framework {
     /// ```
     ///
     pub fn before<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, &String) -> bool + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, &String) -> bool + 'static {
         self.before = Some(Arc::new(f));
 
         self
@@ -975,7 +975,7 @@ impl Framework {
     ///     }));
     /// ```
     pub fn after<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, &String, Result<(), String>) + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, &String, Result<(), String>) + 'static {
         self.after = Some(Arc::new(f));
 
         self
@@ -983,13 +983,5 @@ impl Framework {
 
     pub(crate) fn update_current_user(&mut self, user_id: UserId, is_bot: bool) {
         self.user_info = (user_id.0, is_bot);
-    }
-
-    #[allow(dead_code)]
-    fn ratelimit_time(&mut self, bucket_name: &str, user_id: u64) -> i64 {
-        self.buckets
-            .get_mut(bucket_name)
-            .map(|bucket| bucket.take(user_id))
-            .unwrap_or(0)
     }
 }
