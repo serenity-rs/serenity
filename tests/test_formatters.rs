@@ -29,6 +29,7 @@ fn test_mention() {
         position: 1,
         topic: None,
         user_limit: None,
+        nsfw: false,
     })));
     let emoji = Emoji {
         id: EmojiId(5),

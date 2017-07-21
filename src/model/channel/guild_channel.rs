@@ -386,7 +386,7 @@ impl GuildChannel {
     #[cfg(feature="utils")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
-        self.nsfw || self.name == "nsfw" || self.kind == ChannelType::Text && serenity_utils::is_nsfw(&self.name)
+        self.kind == ChannelType::Text && (self.nsfw || serenity_utils::is_nsfw(&self.name))
     }
 
     /// Gets a message from the channel.
