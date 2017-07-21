@@ -313,24 +313,14 @@ impl Framework {
     /// ```
     pub fn bucket<S>(mut self, s: S, delay: i64, time_span: i64, limit: i32) -> Self
         where S: Into<String> {
-        feature_cache! {{
-            self.buckets.insert(s.into(), Bucket {
-                ratelimit: Ratelimit {
-                    delay: delay,
-                    limit: Some((time_span, limit)),
-                },
-                users: HashMap::new(),
-                check: None,
-            });
-        } else {
-           self.buckets.insert(s.into(), Bucket {
-                ratelimit: Ratelimit {
-                    delay: delay,
-                    limit: Some((time_span, limit)),
-                },
-                users: HashMap::new(),
-            }); 
-        }}
+        self.buckets.insert(s.into(), Bucket {
+            ratelimit: Ratelimit {
+                delay: delay,
+                limit: Some((time_span, limit)),
+            },
+            users: HashMap::new(),
+            check: None,
+        });
 
         self
     }
@@ -361,7 +351,47 @@ impl Framework {
     /// [`bucket`]: #method.bucket
     #[cfg(feature="cache")]
     pub fn complex_bucket<S, Check>(mut self, s: S, delay: i64, time_span: i64, limit: i32, check: Check) -> Self 
-        where Check: Fn(&mut Context, GuildId, ChannelId, UserId) -> bool + 'static, 
+        where Check: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + 'static, 
+              S: Into<String> { 
+        self.buckets.insert(s.into(), Bucket {
+            ratelimit: Ratelimit {
+                delay,
+                limit: Some((time_span, limit)),
+            },
+            users: HashMap::new(),
+            check: Some(Box::new(check)),
+        });
+        
+        self
+    }
+
+    /// Same as [`bucket`] but with a check added.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
+    /// #
+    /// client.with_framework(|f| f
+    ///     .complex_bucket("basic", 2, 10, 3, |_, channel_id, user_id| {
+    ///         // check if the channel's id where the command(s) was called is `456`
+    ///         // and if the user who called the command(s) is `789`
+    ///         // otherwise don't apply the bucket at all.
+    ///         channel_id == 456 && user_id == 789
+    ///     })
+    ///     .command("ping", |c| c
+    ///         .bucket("basic")
+    ///         .exec_str("pong!")));
+    /// ```
+    ///
+    /// [`bucket`]: #method.bucket
+    #[cfg(not(feature="cache"))]
+    pub fn complex_bucket<S, Check>(mut self, s: S, delay: i64, time_span: i64, limit: i32, check: Check) -> Self 
+        where Check: Fn(&mut Context, ChannelId, UserId) -> bool + 'static, 
               S: Into<String> { 
         self.buckets.insert(s.into(), Bucket {
             ratelimit: Ratelimit {
@@ -396,24 +426,14 @@ impl Framework {
     /// ```
     pub fn simple_bucket<S>(mut self, s: S, delay: i64) -> Self
         where S: Into<String> {
-        feature_cache! {{
-            self.buckets.insert(s.into(), Bucket {
-                ratelimit: Ratelimit {
-                    delay: delay,
-                    limit: None,
-                },
-                users: HashMap::new(),
-                check: None,
-            });
-        } else {
-            self.buckets.insert(s.into(), Bucket {
-                ratelimit: Ratelimit {
-                    delay: delay,
-                    limit: None,
-                },
-                users: HashMap::new(),
-            });
-        }}
+        self.buckets.insert(s.into(), Bucket {
+            ratelimit: Ratelimit {
+                delay: delay,
+                limit: None,
+            },
+            users: HashMap::new(),
+            check: None,
+        });
 
         self
     }
@@ -514,37 +534,30 @@ impl Framework {
         } else if self.configuration.owners.contains(&message.author.id) {
             None
         } else {
-            feature_cache! {{
-                if let Some(ref bucket) = command.bucket {
-                    if let Some(ref mut bucket) = self.buckets.get_mut(bucket) {
-                        let rate_limit = bucket.take(message.author.id.0);
-                        match bucket.check {
-                            Some(ref check) => {
-                                if let Some(guild_id) = message.guild_id() {
-                                    if (check)(context, guild_id, message.channel_id, message.author.id) {
-                                        if rate_limit > 0i64 {
-                                            return Some(DispatchError::RateLimited(rate_limit));
-                                        }
-                                    } else {
-                                        return None;
-                                    }
-                                }
-                            },
-                            None => {
+            if let Some(ref bucket) = command.bucket {
+                if let Some(ref mut bucket) = self.buckets.get_mut(bucket) {
+                    let rate_limit = bucket.take(message.author.id.0);
+                    match bucket.check {
+                        Some(ref check) => {
+                            if feature_cache! {{ 
+                                let guild_id = message.guild_id();
+                                (check)(context, guild_id, message.channel_id, message.author.id) 
+                            } else {
+                                (check)(context, message.channel_id, message.author.id)
+                            }} {
                                 if rate_limit > 0i64 {
                                     return Some(DispatchError::RateLimited(rate_limit));
                                 }
-                            },
-                        }
+                            }
+                        },
+                        None => {
+                            if rate_limit > 0i64 {
+                                return Some(DispatchError::RateLimited(rate_limit));
+                            }
+                        },
                     }
                 }
-            } else {
-                if let Some(rate_limit) = command.bucket.clone().map(|x| self.ratelimit_time(x.as_str(), message.author.id.0)) {
-                    if rate_limit > 0i64 {
-                        return Some(DispatchError::RateLimited(rate_limit));
-                    }
-                }
-            }}
+            }
 
             if let Some(x) = command.min_args {
                 if args < x as usize {

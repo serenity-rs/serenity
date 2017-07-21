@@ -20,7 +20,9 @@ pub(crate) struct Bucket {
     pub ratelimit: Ratelimit,
     pub users: HashMap<u64, MemberRatelimit>,
     #[cfg(feature="cache")]
-    pub check: Option<Box<Fn(&mut Context, GuildId, ChannelId, UserId) -> bool + 'static>>,
+    pub check: Option<Box<Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + 'static>>,
+    #[cfg(not(feature="cache"))]
+    pub checK: Option<Box<Fn(&mut Context, ChannelId, UserId) -> bool + 'static>>,
 }
 
 impl Bucket {
