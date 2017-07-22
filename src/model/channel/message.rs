@@ -88,8 +88,9 @@ impl Message {
     /// #   let mut client = Client::new("token", Handler);
     /// #
     /// use serenity::model::Channel;
+    /// use serenity::framework::BuiltinFramework;
     ///
-    /// client.with_framework(|f| f
+    /// client.with_framework(BuiltinFramework::new()
     ///     .configure(|c| c.prefix("~"))
     ///     .command("channelname", |c| c.exec(channel_name)));
     ///

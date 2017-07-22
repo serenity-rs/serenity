@@ -7,12 +7,12 @@ use super::Context;
 use typemap::ShareMap;
 use ::gateway::Shard;
 use ::model::event::Event;
-use ::model::{Message, Reaction, GuildId, Channel};
+use ::model::{Message, GuildId, Channel};
 use chrono::{Utc, Timelike};
 use tokio_core::reactor::Handle;
 
 #[cfg(feature="framework")]
-use ::ext::framework::{Framework, ReactionAction};
+use ::ext::framework::Framework;
 
 #[cfg(feature="cache")]
 use super::CACHE;
@@ -61,65 +61,36 @@ fn context(conn: &Arc<Mutex<Shard>>,
     Context::new(conn.clone(), data.clone())
 }
 
-// Heck you macro hygiene.
-macro_rules! impl_reaction_events {
-    (($event:ident, $conn:ident, $data:ident, $event_handler:ident, $framework:ident, $handle:ident), $type_of_action:ident, $dispatch_name:ident) => {
-        let context = context($conn, $data);
-        let framework = $framework.lock().unwrap();
-
-        if framework.initialized {
-            $dispatch_name(context.clone(),
-                           $event.reaction.clone(),
-                           $event_handler,
-                           $handle);
-                
-            let res = framework.reaction_actions
-                .iter()
-                .find(|&(ra, _)| {
-                    if let ReactionAction::$type_of_action(ref kind) = *ra {
-                        *kind == $event.reaction.emoji 
-                    } else {
-                        false
-                    }
-                });
-                
-            if let Some((_, f)) = res {
-                f(context, $event.reaction.message_id, $event.reaction.channel_id);
-            }
-        } else {
-            $dispatch_name(context, $event.reaction, $event_handler, $handle);
-        }
-    }
-}
-
 #[cfg(feature="framework")]
 pub fn dispatch<H: EventHandler + 'static>(event: Event,
                 conn: &Arc<Mutex<Shard>>,
-                framework: &Arc<sync::Mutex<Framework>>,
+                framework: &Arc<sync::Mutex<Option<Box<Framework>>>>,
                 data: &Arc<Mutex<ShareMap>>,
                 event_handler: &Arc<H>,
                 tokio_handle: &Handle) {
     match event {
         Event::MessageCreate(event) => {
             let context = context(conn, data);
-            let mut framework = framework.lock().unwrap();
+            if let Some(ref mut framework) = *framework.lock().unwrap() {
+                if framework.initialized() {
+                    dispatch_message(context.clone(),
+                                     event.message.clone(),
+                                     event_handler,
+                                     tokio_handle);
 
-            if framework.initialized {
+                    framework.dispatch(context, event.message, tokio_handle);
+                } else {
+                    dispatch_message(context.clone(),
+                                     event.message.clone(),
+                                     event_handler,
+                                     tokio_handle);
+                }
+            } else {
                 dispatch_message(context.clone(),
                                  event.message.clone(),
                                  event_handler,
                                  tokio_handle);
-
-                framework.dispatch(context, event.message, tokio_handle);
-            } else {
-                dispatch_message(context, event.message, event_handler, tokio_handle);
             }
-        },
-        Event::ReactionAdd(event) => {
-            impl_reaction_events!((event, conn, data, event_handler, framework, tokio_handle), Add, dispatch_reaction_add);
-        },
-        Event::ReactionRemove(event) => {
-            impl_reaction_events!((event, conn, data, event_handler, framework, tokio_handle), Remove, dispatch_reaction_remove);
         },
         other => handle_event(other, conn, data, event_handler, tokio_handle),
     }
@@ -139,14 +110,6 @@ pub fn dispatch<H: EventHandler + 'static>(event: Event,
                              event_handler,
                              tokio_handle);
         },
-        Event::ReactionAdd(event) => {
-            let context = context(conn, data);
-            dispatch_reaction_add(context, event.reaction, tokio_handle);
-        },
-        Event::ReactionRemove(event) => {
-            let context = context(conn, data);
-            dispatch_reaction_remove(context, event.reaction, tokio_handle);
-        },
         other => handle_event(other, conn, data, event_handler, tokio_handle),
     }
 }
@@ -165,28 +128,6 @@ fn dispatch_message<H: EventHandler + 'static>(context: Context,
 
         h.on_message(context, message);
 
-        Ok(())
-    });
-}
-
-fn dispatch_reaction_add<H: EventHandler + 'static>(context: Context,
-                         reaction: Reaction,
-                         event_handler: &Arc<H>,
-                         tokio_handle: &Handle) {
-    let h = event_handler.clone();
-    tokio_handle.spawn_fn(move || {
-        h.on_reaction_add(context, reaction);
-        Ok(())
-    });
-}
-
-fn dispatch_reaction_remove<H: EventHandler + 'static>(context: Context,
-                         reaction: Reaction,
-                         event_handler: &Arc<H>,
-                         tokio_handle: &Handle) {
-    let h = event_handler.clone();
-    tokio_handle.spawn_fn(move || {
-        h.on_reaction_remove(context, reaction);
         Ok(())
     });
 }
@@ -603,8 +544,22 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
         },
 
         // Already handled by the framework check macro
-        Event::ReactionAdd(_) => {},
-        Event::ReactionRemove(_) => {},
+        Event::ReactionAdd(event) => {
+            let h = event_handler.clone();
+            let context = context(conn, data);
+            tokio_handle.spawn_fn(move || {
+                h.on_reaction_add(context, event.reaction);
+                Ok(())
+            });   
+        },
+        Event::ReactionRemove(event) => {
+            let h = event_handler.clone();
+            let context = context(conn, data);
+            tokio_handle.spawn_fn(move || {
+                h.on_reaction_remove(context, event.reaction);
+                Ok(())
+            });
+        },
         Event::ReactionRemoveAll(event) => {
             let context = context(conn, data);
 

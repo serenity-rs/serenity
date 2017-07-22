@@ -51,7 +51,7 @@ use ::internal::prelude::*;
 use ::internal::ws_impl::ReceiverExt;
 use ::model::event::*;
 
-#[cfg(feature="framework")]
+#[cfg(any(feature="framework", feature="builtin_framework"))]
 use ::framework::Framework;
 
 static HANDLE_STILL: AtomicBool = ATOMIC_BOOL_INIT;
@@ -193,7 +193,7 @@ pub struct Client<H: EventHandler + 'static> {
     /// [`on_ready`]: #method.on_ready
     event_handler: Arc<H>,
     #[cfg(feature="framework")]
-    framework: Arc<sync::Mutex<Framework>>,
+    framework: Arc<sync::Mutex<Option<Box<Framework>>>>,
     token: Arc<sync::Mutex<String>>,
 }
 
@@ -241,7 +241,7 @@ impl<H: EventHandler + 'static> Client<H> {
             Client {
                 data: Arc::new(Mutex::new(ShareMap::custom())),
                 event_handler: Arc::new(handler),
-                framework: Arc::new(sync::Mutex::new(Framework::default())),
+                framework: Arc::new(sync::Mutex::new(None)),
                 token: locked,
             }
         } else {
@@ -268,6 +268,8 @@ impl<H: EventHandler + 'static> Client<H> {
     /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
     /// #
+    /// use serenity::framework::BuiltinFramework;
+    ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {}
@@ -276,7 +278,7 @@ impl<H: EventHandler + 'static> Client<H> {
     /// use std::env;
     ///
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
-    /// client.with_framework(|f| f
+    /// client.with_framework(BuiltinFramework::new()
     ///     .configure(|c| c.prefix("~"))
     ///     .command("ping", |c| c.exec_str("Pong!")));
     /// # Ok(())
@@ -286,16 +288,69 @@ impl<H: EventHandler + 'static> Client<H> {
     /// #     try_main().unwrap();
     /// # }
     /// ```
+    /// 
+    /// Using your own framework:
     ///
+    /// ```rust,ignore
+    /// # use serenity::prelude::EventHandler;
+    /// # use std::error::Error;
+    /// #
+    /// use serenity::framework::Framework;
+    /// use serenity::client::Context;
+    /// use serenity::model::*;
+    /// use tokio_core::reactor::Handle;
+    /// use std::collections::HashMap;
+    ///
+    ///
+    /// struct MyFramework {
+    ///     commands: HashMap<String, Box<Fn(Message, Vec<String>)>>,   
+    /// } 
+    ///
+    /// impl Framework for MyFramework {
+    ///     fn dispatch(&mut self, _: Context, msg: Message, tokio_handle: &Handle) {
+    ///         let args = msg.content.split_whitespace();
+    ///         let command = match args.next() {
+    ///             Some(command) => {
+    ///                 if !command.starts_with('*') { return; }
+    ///                 command
+    ///             },
+    ///             None => return,  
+    ///         };
+    ///         
+    ///         let command = match self.commands.get(&command) {
+    ///             Some(command) => command, None => return,
+    ///         };
+    ///         
+    ///         tokio_handle.spawn_fn(move || { (command)(msg, args); Ok() });
+    ///     }   
+    /// }
+    ///
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
+    ///
+    ///
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// use serenity::Client;
+    /// use std::env;
+    ///
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
+    /// client.with_framework(MyFramework { commands: { let mut map = HashMap::new(); map.insert("ping".to_string(), Box::new(|msg, _| msg.channel_id.say("pong!"))); map }});
+    /// # Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    /// ```
     /// Refer to the documentation for the `framework` module for more in-depth
     /// information.
     ///
     /// [`on_message`]: #method.on_message
     /// [framework docs]: ../framework/index.html
     #[cfg(feature="framework")]
-    pub fn with_framework<F>(&mut self, f: F)
-        where F: FnOnce(Framework) -> Framework + Send + Sync + 'static {
-        self.framework = Arc::new(sync::Mutex::new(f(Framework::default())));
+    pub fn with_framework<F: Framework + 'static>(&mut self, f: F) {
+        self.framework = Arc::new(sync::Mutex::new(Some(Box::new(f))));
     }
 
     /// Establish the connection and start listening for events.
@@ -631,13 +686,13 @@ impl<H: EventHandler + 'static> Client<H> {
         // Update the framework's current user if the feature is enabled.
         //
         // This also acts as a form of check to ensure the token is correct.
-        #[cfg(feature="framework")]
+        #[cfg(all(feature="builtin_framework", feature="framework"))]
         {
             let user = http::get_current_user()?;
 
-            self.framework.lock()
-                .unwrap()
-                .update_current_user(user.id, user.bot);
+            if let Some(ref mut framework) = *self.framework.lock().unwrap() {
+                framework.update_current_user(user.id, user.bot);
+            }
         }
 
         let gateway_url = Arc::new(sync::Mutex::new(url));
@@ -678,6 +733,7 @@ impl<H: EventHandler + 'static> Client<H> {
                             shard: shard,
                             shard_info: shard_info,
                             token: self.token.clone(),
+                            _pd: std::marker::PhantomData,
                         }
                     }};
 
@@ -718,7 +774,7 @@ struct BootInfo {
 struct MonitorInfo<H: EventHandler + 'static> {
     data: Arc<Mutex<ShareMap>>,
     event_handler: Arc<H>,
-    framework: Arc<sync::Mutex<Framework>>,
+    framework: Arc<sync::Mutex<Option<Box<Framework>>>>,
     gateway_url: Arc<sync::Mutex<String>>,
     shard: Arc<Mutex<Shard>>,
     shard_info: [u64; 2],

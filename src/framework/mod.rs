@@ -74,7 +74,7 @@ use std::collections::HashMap;
 use std::default::Default;
 use std::sync::Arc;
 use ::client::Context;
-use ::model::{Message, MessageId, UserId, GuildId, ChannelId, ReactionType};
+use ::model::{Message, UserId, GuildId, ChannelId};
 use ::model::permissions::Permissions;
 use ::utils;
 use tokio_core::reactor::Handle;
@@ -83,6 +83,20 @@ use tokio_core::reactor::Handle;
 use ::client::CACHE;
 #[cfg(feature="cache")]
 use ::model::Channel;
+
+/// This trait allows for serenity to either use its builtin framework, or yours.
+///
+/// When implementing, be sure to use `tokio_handle.spawn_fn(|| ...; Ok())` when dispatching commands.
+/// 
+/// Note that you may see some other methods in here as well, but they're meant to be internal only for the builtin framework.
+pub trait Framework {
+    fn dispatch(&mut self, Context, Message, &Handle);
+
+    #[cfg(feature="builtin_framework")]
+    fn update_current_user(&mut self, UserId, bool) {}
+    #[cfg(feature="builtin_framework")]
+    fn initialized(&self) -> bool { false }
+}
 
 /// A macro to generate "named parameters". This is useful to avoid manually
 /// using the "arguments" parameter and manually parsing types.
@@ -209,16 +223,6 @@ pub enum DispatchError {
 
 type DispatchErrorHook = Fn(Context, Message, DispatchError) + 'static;
 
-pub(crate) type ActionFn = Fn(Context, MessageId, ChannelId) + 'static;
-
-/// Defines wheter this action should be called when
-/// a reaction's added, or removed.
-#[derive(Clone, Eq, Hash, PartialEq)]
-pub enum ReactionAction {
-    Add(ReactionType),
-    Remove(ReactionType),
-}
-
 /// A utility for easily managing dispatches to commands.
 ///
 /// Refer to the [module-level documentation] for more information.
@@ -226,13 +230,12 @@ pub enum ReactionAction {
 /// [module-level documentation]: index.html
 #[allow(type_complexity)]
 #[derive(Default)]
-pub struct Framework {
+pub struct BuiltinFramework {
     configuration: Configuration,
     groups: HashMap<String, Arc<CommandGroup>>,
     before: Option<Arc<BeforeHook>>,
     dispatch_error_handler: Option<Arc<DispatchErrorHook>>,
     buckets: HashMap<String, Bucket>,
-    pub(crate) reaction_actions: HashMap<ReactionAction, Arc<ActionFn>>,
     after: Option<Arc<AfterHook>>,
     /// Whether the framework has been "initialized".
     ///
@@ -253,7 +256,11 @@ pub struct Framework {
     user_info: (u64, bool),
 }
 
-impl Framework {
+impl BuiltinFramework {
+    pub fn new() -> Self {
+        BuiltinFramework::default()
+    }
+
     /// Configures the framework, setting non-default values. All fields are
     /// optional. Refer to [`Configuration::default`] for more information on
     /// the default values.
@@ -268,10 +275,11 @@ impl Framework {
     /// # struct Handler;
     /// # impl EventHandler for Handler {}
     /// use serenity::Client;
+    /// use serenity::framework::BuiltinFramework;
     /// use std::env;
     ///
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
-    /// client.with_framework(|f| f
+    /// client.with_framework(BuiltinFramework::new()
     ///     .configure(|c| c
     ///         .depth(3)
     ///         .allow_whitespace(true)
@@ -305,7 +313,9 @@ impl Framework {
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler);
     /// #
-    /// client.with_framework(|f| f
+    /// use serenity::framework::BuiltinFramework;
+    ///
+    /// client.with_framework(BuiltinFramework::new()
     ///     .bucket("basic", 2, 10, 3)
     ///     .command("ping", |c| c
     ///         .bucket("basic")
@@ -336,12 +346,14 @@ impl Framework {
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler);
     /// #
-    /// client.with_framework(|f| f
+    /// use serenity::framework::BuiltinFramework;
+    ///
+    /// client.with_framework(BuiltinFramework::new()
     ///     .complex_bucket("basic", 2, 10, 3, |_, guild_id, channel_id, user_id| {
     ///         // check if the guild is `123` and the channel where the command(s) was called: `456`
     ///         // and if the user who called the command(s) is `789`
     ///         // otherwise don't apply the bucket at all.
-    ///         guild_id == 123 && channel_id == 456 && user_id == 789
+    ///         guild_id.is_some() && guild_id.unwrap() == 123 && channel_id == 456 && user_id == 789
     ///     })
     ///     .command("ping", |c| c
     ///         .bucket("basic")
@@ -376,7 +388,9 @@ impl Framework {
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler);
     /// #
-    /// client.with_framework(|f| f
+    /// use serenity::framework::BuiltinFramework;
+    ///
+    /// client.with_framework(BuiltinFramework::new()
     ///     .complex_bucket("basic", 2, 10, 3, |_, channel_id, user_id| {
     ///         // check if the channel's id where the command(s) was called is `456`
     ///         // and if the user who called the command(s) is `789`
@@ -418,7 +432,9 @@ impl Framework {
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler);
     /// #
-    /// client.with_framework(|f| f
+    /// use serenity::framework::BuiltinFramework;
+    ///
+    /// client.with_framework(BuiltinFramework::new()
     ///     .simple_bucket("simple", 2)
     ///     .command("ping", |c| c
     ///         .bucket("simple")
@@ -434,58 +450,6 @@ impl Framework {
             users: HashMap::new(),
             check: None,
         });
-
-        self
-    }
-
-    /// Defines a "reaction action", that will be called if a reaction was
-    /// added; or deleted in a message.
-    ///
-    /// # Examples
-    /// ```rust,no_run
-    /// use serenity::model::ReactionType;
-    /// use serenity::framework::ReactionAction;
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
-    /// #
-    /// client.with_framework(|f| f
-    ///     .action(ReactionAction::Add(ReactionType::Unicode("❤".to_string())), |_, _, channel_id| {
-    ///         let _ = channel_id.say("love you too");
-    ///     })
-    /// );
-    /// ```
-    pub fn action<F>(mut self, action: ReactionAction, f: F) -> Self
-        where F: Fn(Context, MessageId, ChannelId) + Send + Sync + 'static {
-        self.reaction_actions.insert(action, Arc::new(f));
-
-        self
-    }
-
-    /// Remove the action from any further usage by the framework.
-    ///
-    /// # Examples
-    /// ```rust,no_run
-    /// use serenity::model::ReactionType;
-    /// use serenity::framework::ReactionAction;
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
-    /// #
-    /// let action = ReactionAction::Add(ReactionType::Unicode("❤".to_string()));
-    /// client.with_framework(|f| f
-    ///     .action(action.clone(), |_, _, channel_id| {
-    ///         let _ = channel_id.say("love you too");
-    ///     })
-    ///     .remove_action(action)
-    /// );
-    /// ```
-    pub fn remove_action(mut self, action: ReactionAction) -> Self {
-        self.reaction_actions.remove(&action);
 
         self
     }
@@ -613,8 +577,268 @@ impl Framework {
         }
     }
 
-    #[allow(cyclomatic_complexity)]
-    pub(crate) fn dispatch(&mut self, mut context: Context, message: Message, tokio_handle: &Handle) {
+    /// Adds a function to be associated with a command, which will be called
+    /// when a command is used in a message.
+    ///
+    /// This requires that a check - if one exists - passes, prior to being
+    /// called.
+    ///
+    /// Note that once v0.2.0 lands, you will need to use the command builder
+    /// via the [`command`] method to set checks. This command will otherwise
+    /// only be for simple commands.
+    ///
+    /// Refer to the [module-level documentation] for more information and
+    /// usage.
+    ///
+    /// [`command`]: #method.command
+    /// [module-level documentation]: index.html
+    ///
+    /// # Examples
+    ///
+    /// Create and use a simple command:
+    ///
+    /// ```rust
+    /// # #[macro_use] extern crate serenity;
+    /// #
+    /// # fn main() {
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
+    /// #
+    /// use serenity::framework::BuiltinFramework;
+    ///
+    /// client.with_framework(BuiltinFramework::new().on("ping", ping));
+    ///
+    /// command!(ping(_ctx, msg) {
+    ///     let _ = msg.channel_id.say("pong!");
+    /// });
+    /// # }
+    /// ```
+    pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
+        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + 'static,
+              S: Into<String> {
+        {
+            let ungrouped = self.groups.entry("Ungrouped".to_owned())
+                .or_insert_with(|| Arc::new(CommandGroup::default()));
+
+            if let Some(ref mut group) = Arc::get_mut(ungrouped) {
+                let name = command_name.into();
+
+                group.commands.insert(name, CommandOrAlias::Command(Arc::new(Command::new(f))));
+            }
+        }
+
+        self.initialized = true;
+
+        self
+    }
+
+    /// Adds a command using command builder.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,ignore
+    /// framework.command("ping", |c| c
+    ///     .description("Responds with 'pong'.")
+    ///     .exec(|ctx, _, _| {
+    ///         let _ = ctx.say("pong");
+    ///     }));
+    /// ```
+    pub fn command<F, S>(mut self, command_name: S, f: F) -> Self
+        where F: FnOnce(CreateCommand) -> CreateCommand,
+              S: Into<String> {
+        {
+            let ungrouped = self.groups.entry("Ungrouped".to_owned())
+                .or_insert_with(|| Arc::new(CommandGroup::default()));
+
+            if let Some(ref mut group) = Arc::get_mut(ungrouped) {
+                let cmd = f(CreateCommand(Command::default())).0;
+                let name = command_name.into();
+
+                if let Some(ref prefix) = group.prefix {
+                    for v in &cmd.aliases {
+                        group.commands.insert(format!("{} {}", prefix, v.to_owned()), CommandOrAlias::Alias(format!("{} {}", prefix, name)));
+                    }
+                } else {
+                    for v in &cmd.aliases {
+                        group.commands.insert(v.to_owned(), CommandOrAlias::Alias(name.clone()));
+                    }
+                }
+
+                group.commands.insert(name, CommandOrAlias::Command(Arc::new(cmd)));
+            }
+        }
+
+        self.initialized = true;
+
+        self
+    }
+
+    /// Adds a group which can organize several related commands.
+    /// Groups are taken into account when using `serenity::framework::help_commands`.
+    ///
+    /// # Examples
+    ///
+    /// Creating a simple group:
+    ///
+    /// ```rust
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
+    /// #
+    /// use serenity::framework::BuiltinFramework;
+    ///
+    /// client.with_framework(BuiltinFramework::new()
+    ///     .group("ping-pong", |g| g
+    ///         .command("ping", |c| c.exec_str("pong!"))
+    ///         .command("pong", |c| c.exec_str("ping!"))));
+    /// ```
+    pub fn group<F, S>(mut self, group_name: S, f: F) -> Self
+        where F: FnOnce(CreateGroup) -> CreateGroup,
+              S: Into<String> {
+        let group = f(CreateGroup(CommandGroup::default())).0;
+
+        self.groups.insert(group_name.into(), Arc::new(group));
+        self.initialized = true;
+
+        self
+    }
+
+    /// Specify the function that's called in case a command wasn't executed for one reason or another.
+    ///
+    /// DispatchError represents all possible fail conditions.
+    ///
+    /// # Examples
+    ///
+    /// Making a simple argument error responder:
+    ///
+    /// ```rust
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
+    /// use serenity::framework::DispatchError::{NotEnoughArguments, TooManyArguments};
+    /// use serenity::framework::BuiltinFramework;
+    ///
+    /// client.with_framework(BuiltinFramework::new()
+    ///     .on_dispatch_error(|_, msg, error| {
+    ///         match error {
+    ///             NotEnoughArguments { min, given } => {
+    ///                 let s = format!("Need {} arguments, but only got {}.", min, given);
+    ///
+    ///                 let _ = msg.channel_id.say(&s);
+    ///             },
+    ///             TooManyArguments { max, given } => {
+    ///                 let s = format!("Max arguments allowed is {}, but got {}.", max, given);
+    ///
+    ///                 let _ = msg.channel_id.say(&s);
+    ///             },
+    ///             _ => println!("Unhandled dispatch error."),
+    ///         }
+    ///     }));
+    /// ```
+    pub fn on_dispatch_error<F>(mut self, f: F) -> Self
+        where F: Fn(Context, Message, DispatchError) + 'static {
+        self.dispatch_error_handler = Some(Arc::new(f));
+
+        self
+    }
+
+    /// Specify the function to be called prior to every command's execution.
+    /// If that function returns true, the command will be executed.
+    ///
+    /// # Examples
+    ///
+    /// Using `before` to log command usage:
+    ///
+    /// ```rust
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
+    /// #
+    /// use serenity::framework::BuiltinFramework;
+    ///
+    /// client.with_framework(BuiltinFramework::new()
+    ///     .before(|ctx, msg, cmd_name| {
+    ///         println!("Running command {}", cmd_name);
+    ///         true
+    ///     }));
+    /// ```
+    ///
+    /// Using before to prevent command usage:
+    ///
+    /// ```rust
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
+    /// #
+    /// use serenity::framework::BuiltinFramework;
+    ///
+    /// client.with_framework(BuiltinFramework::new()
+    ///     .before(|_, msg, cmd_name| {
+    ///         if let Ok(channel) = msg.channel_id.get() {
+    ///             //  Don't run unless in nsfw channel
+    ///             if !channel.is_nsfw() {
+    ///                 return false;
+    ///             }
+    ///         }
+    ///
+    ///         println!("Running command {}", cmd_name);
+    ///
+    ///         true
+    ///     }));
+    /// ```
+    ///
+    pub fn before<F>(mut self, f: F) -> Self
+        where F: Fn(&mut Context, &Message, &String) -> bool + 'static {
+        self.before = Some(Arc::new(f));
+
+        self
+    }
+
+    /// Specify the function to be called after every command's execution.
+    /// Fourth argument exists if command returned an error which you can handle.
+    ///
+    /// # Examples
+    ///
+    /// Using `after` to log command usage:
+    ///
+    /// ```rust
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
+    /// #
+    /// use serenity::framework::BuiltinFramework;
+    ///
+    /// client.with_framework(BuiltinFramework::new()
+    ///     .after(|ctx, msg, cmd_name, error| {
+    ///         //  Print out an error if it happened
+    ///         if let Err(why) = error {
+    ///             println!("Error in {}: {:?}", cmd_name, why);
+    ///         }
+    ///     }));
+    /// ```
+    pub fn after<F>(mut self, f: F) -> Self
+        where F: Fn(&mut Context, &Message, &String, Result<(), String>) + 'static {
+        self.after = Some(Arc::new(f));
+
+        self
+    }
+}
+
+impl Framework for BuiltinFramework {
+    fn dispatch(&mut self, mut context: Context, message: Message, tokio_handle: &Handle) {
         let res = command::positions(&mut context, &message, &self.configuration);
 
         let positions = match res {
@@ -733,255 +957,13 @@ impl Framework {
         }
     }
 
-    /// Adds a function to be associated with a command, which will be called
-    /// when a command is used in a message.
-    ///
-    /// This requires that a check - if one exists - passes, prior to being
-    /// called.
-    ///
-    /// Note that once v0.2.0 lands, you will need to use the command builder
-    /// via the [`command`] method to set checks. This command will otherwise
-    /// only be for simple commands.
-    ///
-    /// Refer to the [module-level documentation] for more information and
-    /// usage.
-    ///
-    /// [`command`]: #method.command
-    /// [module-level documentation]: index.html
-    ///
-    /// # Examples
-    ///
-    /// Create and use a simple command:
-    ///
-    /// ```rust
-    /// # #[macro_use] extern crate serenity;
-    /// #
-    /// # fn main() {
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
-    /// #
-    /// client.with_framework(|f| f.on("ping", ping));
-    ///
-    /// command!(ping(_ctx, msg) {
-    ///     let _ = msg.channel_id.say("pong!");
-    /// });
-    /// # }
-    /// ```
-    pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static,
-              S: Into<String> {
-        {
-            let ungrouped = self.groups.entry("Ungrouped".to_owned())
-                .or_insert_with(|| Arc::new(CommandGroup::default()));
-
-            if let Some(ref mut group) = Arc::get_mut(ungrouped) {
-                let name = command_name.into();
-
-                group.commands.insert(name, CommandOrAlias::Command(Arc::new(Command::new(f))));
-            }
-        }
-
-        self.initialized = true;
-
-        self
-    }
-
-    /// Adds a command using command builder.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// framework.command("ping", |c| c
-    ///     .description("Responds with 'pong'.")
-    ///     .exec(|ctx, _, _| {
-    ///         let _ = ctx.say("pong");
-    ///     }));
-    /// ```
-    pub fn command<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: FnOnce(CreateCommand) -> CreateCommand,
-              S: Into<String> {
-        {
-            let ungrouped = self.groups.entry("Ungrouped".to_owned())
-                .or_insert_with(|| Arc::new(CommandGroup::default()));
-
-            if let Some(ref mut group) = Arc::get_mut(ungrouped) {
-                let cmd = f(CreateCommand(Command::default())).0;
-                let name = command_name.into();
-
-                if let Some(ref prefix) = group.prefix {
-                    for v in &cmd.aliases {
-                        group.commands.insert(format!("{} {}", prefix, v.to_owned()), CommandOrAlias::Alias(format!("{} {}", prefix, name)));
-                    }
-                } else {
-                    for v in &cmd.aliases {
-                        group.commands.insert(v.to_owned(), CommandOrAlias::Alias(name.clone()));
-                    }
-                }
-
-                group.commands.insert(name, CommandOrAlias::Command(Arc::new(cmd)));
-            }
-        }
-
-        self.initialized = true;
-
-        self
-    }
-
-    /// Adds a group which can organize several related commands.
-    /// Groups are taken into account when using `serenity::framework::help_commands`.
-    ///
-    /// # Examples
-    ///
-    /// Creating a simple group:
-    ///
-    /// ```rust
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
-    /// #
-    /// client.with_framework(|f| f
-    ///     .group("ping-pong", |g| g
-    ///         .command("ping", |c| c.exec_str("pong!"))
-    ///         .command("pong", |c| c.exec_str("ping!"))));
-    /// ```
-    pub fn group<F, S>(mut self, group_name: S, f: F) -> Self
-        where F: FnOnce(CreateGroup) -> CreateGroup,
-              S: Into<String> {
-        let group = f(CreateGroup(CommandGroup::default())).0;
-
-        self.groups.insert(group_name.into(), Arc::new(group));
-        self.initialized = true;
-
-        self
-    }
-
-    /// Specify the function that's called in case a command wasn't executed for one reason or another.
-    ///
-    /// DispatchError represents all possible fail conditions.
-    ///
-    /// # Examples
-    ///
-    /// Making a simple argument error responder:
-    ///
-    /// ```rust
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
-    /// use serenity::framework::DispatchError::{NotEnoughArguments, TooManyArguments};
-    ///
-    /// client.with_framework(|f| f
-    ///     .on_dispatch_error(|_, msg, error| {
-    ///         match error {
-    ///             NotEnoughArguments { min, given } => {
-    ///                 let s = format!("Need {} arguments, but only got {}.", min, given);
-    ///
-    ///                 let _ = msg.channel_id.say(&s);
-    ///             },
-    ///             TooManyArguments { max, given } => {
-    ///                 let s = format!("Max arguments allowed is {}, but got {}.", max, given);
-    ///
-    ///                 let _ = msg.channel_id.say(&s);
-    ///             },
-    ///             _ => println!("Unhandled dispatch error."),
-    ///         }
-    ///     }));
-    /// ```
-    pub fn on_dispatch_error<F>(mut self, f: F) -> Self
-        where F: Fn(Context, Message, DispatchError) + 'static {
-        self.dispatch_error_handler = Some(Arc::new(f));
-
-        self
-    }
-
-    /// Specify the function to be called prior to every command's execution.
-    /// If that function returns true, the command will be executed.
-    ///
-    /// # Examples
-    ///
-    /// Using `before` to log command usage:
-    ///
-    /// ```rust
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
-    /// #
-    /// client.with_framework(|f| f
-    ///     .before(|ctx, msg, cmd_name| {
-    ///         println!("Running command {}", cmd_name);
-    ///         true
-    ///     }));
-    /// ```
-    ///
-    /// Using before to prevent command usage:
-    ///
-    /// ```rust
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
-    /// #
-    /// client.with_framework(|f| f
-    ///     .before(|_, msg, cmd_name| {
-    ///         if let Ok(channel) = msg.channel_id.get() {
-    ///             //  Don't run unless in nsfw channel
-    ///             if !channel.is_nsfw() {
-    ///                 return false;
-    ///             }
-    ///         }
-    ///
-    ///         println!("Running command {}", cmd_name);
-    ///
-    ///         true
-    ///     }));
-    /// ```
-    ///
-    pub fn before<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, &String) -> bool + 'static {
-        self.before = Some(Arc::new(f));
-
-        self
-    }
-
-    /// Specify the function to be called after every command's execution.
-    /// Fourth argument exists if command returned an error which you can handle.
-    ///
-    /// # Examples
-    ///
-    /// Using `after` to log command usage:
-    ///
-    /// ```rust
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
-    /// #
-    /// client.with_framework(|f| f
-    ///     .after(|ctx, msg, cmd_name, error| {
-    ///         //  Print out an error if it happened
-    ///         if let Err(why) = error {
-    ///             println!("Error in {}: {:?}", cmd_name, why);
-    ///         }
-    ///     }));
-    /// ```
-    pub fn after<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, &String, Result<(), String>) + 'static {
-        self.after = Some(Arc::new(f));
-
-        self
-    }
-
-    pub(crate) fn update_current_user(&mut self, user_id: UserId, is_bot: bool) {
+    #[cfg(feature="builtin_framework")]
+    fn update_current_user(&mut self, user_id: UserId, is_bot: bool) {
         self.user_info = (user_id.0, is_bot);
+    }
+
+    #[cfg(feature="builtin_framework")]
+    fn initialized(&self) -> bool {
+        self.initialized
     }
 }
