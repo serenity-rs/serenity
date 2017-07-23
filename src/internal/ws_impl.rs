@@ -17,36 +17,40 @@ pub trait SenderExt {
 
 impl ReceiverExt for WsClient<TlsStream<TcpStream>> {
     fn recv_json<F, T>(&mut self, decode: F) -> Result<T> where F: FnOnce(Value) -> Result<T> {
-        match self.recv_message()? {
+		let message = self.recv_message()?;
+		
+		if let OwnedMessage::Ping(ref x) = message {
+			self.send_message(&OwnedMessage::Pong(x.clone())).map_err(Error::from)?;
+		}
+		
+        let res = match message {
             OwnedMessage::Binary(bytes) => {
                 let value = serde_json::from_reader(ZlibDecoder::new(&bytes[..]))?;
 
-                decode(value).map_err(|why| {
+                Some(decode(value).map_err(|why| {
                     let s = String::from_utf8_lossy(&bytes);
 
                     warn!("(╯°□°）╯︵ ┻━┻ Error decoding: {}", s);
 
                     why
-                })
+                }))
             },
             OwnedMessage::Close(data) => {
-                Err(Error::Gateway(GatewayError::Closed(data)))
+                Some(Err(Error::Gateway(GatewayError::Closed(data))))
             },
             OwnedMessage::Text(payload) => {
                 let value = serde_json::from_str(&payload)?;
 
-                decode(value).map_err(|why| {
+                Some(decode(value).map_err(|why| {
                     warn!("(╯°□°）╯︵ ┻━┻ Error decoding: {}", payload);
 
                     why
-                })
+                }))
             },
-            OwnedMessage::Ping(x) | OwnedMessage::Pong(x) => {
-                warn!("Unexpectly got ping/pong: {:?}", x);
-
-                Err(Error::Gateway(GatewayError::Closed(None)))
-            },
-        }
+            OwnedMessage::Ping(..) | OwnedMessage::Pong(..) => None,
+        };
+		
+		res.unwrap()
     }
 }
 
