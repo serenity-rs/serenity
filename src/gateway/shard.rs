@@ -495,6 +495,7 @@ impl Shard {
                     self.reconnect().and(Ok(None))
                 }
             },
+			Err(Error::WebSocket(WebSocketError::ProtocolError(..))) => Ok(None),
             Err(Error::WebSocket(why)) => {
                 if let WebSocketError::NoDataAvailable = why {
                     if self.heartbeat_instants.1.is_none() {
