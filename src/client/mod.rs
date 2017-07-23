@@ -733,7 +733,6 @@ impl<H: EventHandler + 'static> Client<H> {
                             shard: shard,
                             shard_info: shard_info,
                             token: self.token.clone(),
-                            _pd: std::marker::PhantomData,
                         }
                     }};
 
