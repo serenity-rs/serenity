@@ -295,9 +295,7 @@ pub fn create_permission(channel_id: u64, target_id: u64, map: &Value) -> Result
 
 /// Creates a private channel with a user.
 pub fn create_private_channel(map: &Value) -> Result<PrivateChannel> {
-    info!("{:?}", map);
     let body = map.to_string();
-    info!("{}", body);
     let response = request!(Route::UsersMeChannels,
                             post(body),
                             "/users/@me/channels");
