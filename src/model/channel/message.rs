@@ -118,7 +118,7 @@ impl Message {
     /// A util function for determining whether this message was sent by someone else, or the bot.
     #[cfg(all(feature="cache", feature="utils"))]
     pub fn is_own(&self) -> bool {
-        self.author.id == CACHE.read().unwrap().id
+        self.author.id == CACHE.read().unwrap().user.id
     }
 
     /// Deletes the message.
