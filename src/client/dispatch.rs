@@ -61,6 +61,16 @@ fn context(conn: &Arc<Mutex<Shard>>,
     Context::new(conn.clone(), data.clone())
 }
 
+#[cfg(feature="builtin-framework")]
+macro_rules! helper {
+	($enabled:block else $disabled:block) => { $enabled }
+}
+
+#[cfg(not(feature="builtin-framework"))]
+macro_rules! helper {
+	($enabled:block else $disabled:block) => { $disabled }
+}
+
 #[cfg(feature="framework")]
 pub fn dispatch<H: EventHandler + 'static>(event: Event,
                 conn: &Arc<Mutex<Shard>>,
@@ -71,25 +81,19 @@ pub fn dispatch<H: EventHandler + 'static>(event: Event,
     match event {
         Event::MessageCreate(event) => {
             let context = context(conn, data);
+			dispatch_message(context.clone(),
+							 event.message.clone(),
+							 event_handler,
+							 tokio_handle);
+							 
             if let Some(ref mut framework) = *framework.lock().unwrap() {
-                if framework.initialized() {
-                    dispatch_message(context.clone(),
-                                     event.message.clone(),
-                                     event_handler,
-                                     tokio_handle);
-
-                    framework.dispatch(context, event.message, tokio_handle);
-                } else {
-                    dispatch_message(context.clone(),
-                                     event.message.clone(),
-                                     event_handler,
-                                     tokio_handle);
-                }
-            } else {
-                dispatch_message(context.clone(),
-                                 event.message.clone(),
-                                 event_handler,
-                                 tokio_handle);
+				helper! {{
+					if framework.initialized() {
+						framework.dispatch(context, event.message, tokio_handle);
+					}
+				} else {
+					framework.dispatch(context, event.message, tokio_handle);
+				}}
             }
         },
         other => handle_event(other, conn, data, event_handler, tokio_handle),
