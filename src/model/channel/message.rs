@@ -115,6 +115,12 @@ impl Message {
         CACHE.read().unwrap().channel(self.channel_id)
     }
 
+    /// A util function for determining whether this message was sent by someone else, or the bot.
+    #[cfg(all(feature="cache", feature="utils"))]
+    pub fn is_current_user(&self) -> bool {
+        self.author.id == CACHE.read().unwrap().id
+    }
+
     /// Deletes the message.
     ///
     /// **Note**: The logged in user must either be the author of the message or
