@@ -17,12 +17,12 @@ pub trait SenderExt {
 
 impl ReceiverExt for WsClient<TlsStream<TcpStream>> {
     fn recv_json<F, T>(&mut self, decode: F) -> Result<T> where F: FnOnce(Value) -> Result<T> {
-		let message = self.recv_message()?;
-		
-		if let OwnedMessage::Ping(ref x) = message {
-			self.send_message(&OwnedMessage::Pong(x.clone())).map_err(Error::from)?;
-		}
-		
+        let message = self.recv_message()?;
+
+        if let OwnedMessage::Ping(ref x) = message {
+            self.send_message(&OwnedMessage::Pong(x.clone())).map_err(Error::from)?;
+        }
+
         let res = match message {
             OwnedMessage::Binary(bytes) => {
                 let value = serde_json::from_reader(ZlibDecoder::new(&bytes[..]))?;
@@ -49,8 +49,8 @@ impl ReceiverExt for WsClient<TlsStream<TcpStream>> {
             },
             OwnedMessage::Ping(..) | OwnedMessage::Pong(..) => None,
         };
-		
-		res.unwrap()
+
+        res.unwrap()
     }
 }
 

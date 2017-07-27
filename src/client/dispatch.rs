@@ -63,12 +63,12 @@ fn context(conn: &Arc<Mutex<Shard>>,
 
 #[cfg(feature="builtin_framework")]
 macro_rules! helper {
-	($enabled:block else $disabled:block) => { $enabled }
+    ($enabled:block else $disabled:block) => { $enabled }
 }
 
 #[cfg(not(feature="builtin_framework"))]
 macro_rules! helper {
-	($enabled:block else $disabled:block) => { $disabled }
+    ($enabled:block else $disabled:block) => { $disabled }
 }
 
 #[cfg(feature="framework")]
@@ -81,19 +81,19 @@ pub fn dispatch<H: EventHandler + 'static>(event: Event,
     match event {
         Event::MessageCreate(event) => {
             let context = context(conn, data);
-			dispatch_message(context.clone(),
-							 event.message.clone(),
-							 event_handler,
-							 tokio_handle);
-							 
+            dispatch_message(context.clone(),
+                             event.message.clone(),
+                             event_handler,
+                             tokio_handle);
+
             if let Some(ref mut framework) = *framework.lock().unwrap() {
-				helper! {{
-					if framework.initialized() {
-						framework.dispatch(context, event.message, tokio_handle);
-					}
-				} else {
-					framework.dispatch(context, event.message, tokio_handle);
-				}}
+                helper! {{
+                    if framework.initialized() {
+                        framework.dispatch(context, event.message, tokio_handle);
+                    }
+                } else {
+                    framework.dispatch(context, event.message, tokio_handle);
+                }}
             }
         },
         other => handle_event(other, conn, data, event_handler, tokio_handle),
@@ -290,7 +290,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                     let guild_amount = cache.guilds.iter()
                             .map(|(&id, _)| id)
                             .collect::<Vec<GuildId>>();
-                    
+
                     tokio_handle.spawn_fn(move || {
                         h.on_cached(context, guild_amount);
                         Ok(())
@@ -483,7 +483,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                     .guilds
                     .get(&event.guild.id)
                     .cloned();
-        
+
                 tokio_handle.spawn_fn(move || {
                     h.on_guild_update(context, before, event.guild);
                     Ok(())
@@ -554,7 +554,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
             tokio_handle.spawn_fn(move || {
                 h.on_reaction_add(context, event.reaction);
                 Ok(())
-            });   
+            });
         },
         Event::ReactionRemove(event) => {
             let h = event_handler.clone();
@@ -596,7 +596,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                 tokio_handle.spawn_fn(move || {
                     h.on_ready(context, event.ready);
                     Ok(())
-                }); 
+                });
             }}
         },
         Event::Resumed(event) => {
