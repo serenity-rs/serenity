@@ -37,10 +37,10 @@ use serde::de::Visitor;
 use std::collections::HashMap;
 use std::fmt::{Formatter, Result as FmtResult};
 use std::sync::{Arc, RwLock};
-use ::internal::prelude::*;
+use internal::prelude::*;
 
-#[cfg(feature="utils")]
-use ::utils::Colour;
+#[cfg(feature = "utils")]
+use utils::Colour;
 
 fn default_true() -> bool { true }
 
@@ -137,7 +137,7 @@ pub struct ApplicationInfo {
     /// is private, only the owner may add it to a guild.
     ///
     /// [`Guild`]: struct.Guild.html
-    #[serde(default="default_true")]
+    #[serde(default = "default_true")]
     pub bot_public: bool,
     /// Indicator of whether the bot requires an OAuth2 code grant.
     pub bot_require_code_grant: bool,
@@ -205,33 +205,33 @@ pub struct CurrentApplicationInfo {
 /// The name of a region that a voice server can be located in.
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub enum Region {
-    #[serde(rename="amsterdam")]
+    #[serde(rename = "amsterdam")]
     Amsterdam,
-    #[serde(rename="brazil")]
+    #[serde(rename = "brazil")]
     Brazil,
-    #[serde(rename="eu-central")]
+    #[serde(rename = "eu-central")]
     EuCentral,
-    #[serde(rename="eu-west")]
+    #[serde(rename = "eu-west")]
     EuWest,
-    #[serde(rename="frankfurt")]
+    #[serde(rename = "frankfurt")]
     Frankfurt,
-    #[serde(rename="london")]
+    #[serde(rename = "london")]
     London,
-    #[serde(rename="sydney")]
+    #[serde(rename = "sydney")]
     Sydney,
-    #[serde(rename="us-central")]
+    #[serde(rename = "us-central")]
     UsCentral,
-    #[serde(rename="us-east")]
+    #[serde(rename = "us-east")]
     UsEast,
-    #[serde(rename="us-south")]
+    #[serde(rename = "us-south")]
     UsSouth,
-    #[serde(rename="us-west")]
+    #[serde(rename = "us-west")]
     UsWest,
-    #[serde(rename="vip-amsterdam")]
+    #[serde(rename = "vip-amsterdam")]
     VipAmsterdam,
-    #[serde(rename="vip-us-east")]
+    #[serde(rename = "vip-us-east")]
     VipUsEast,
-    #[serde(rename="vip-us-west")]
+    #[serde(rename = "vip-us-west")]
     VipUsWest,
 }
 
@@ -260,6 +260,6 @@ use serde::{Deserialize, Deserializer};
 use std::result::Result as StdResult;
 
 fn deserialize_sync_user<'de, D: Deserializer<'de>>(deserializer: D)
-    -> StdResult<Arc<RwLock<User>>, D::Error> {
+                                                    -> StdResult<Arc<RwLock<User>>, D::Error> {
     Ok(Arc::new(RwLock::new(User::deserialize(deserializer)?)))
 }

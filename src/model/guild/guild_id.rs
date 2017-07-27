@@ -1,23 +1,21 @@
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use ::model::*;
-use ::model::guild::BanOptions;
+use model::*;
+use model::guild::BanOptions;
 
-#[cfg(feature="cache")]
-use ::CACHE;
-#[cfg(feature="model")]
-use ::builder::{EditGuild, EditMember, EditRole};
-#[cfg(feature="model")]
-use ::http;
-#[cfg(feature="model")]
-use ::internal::prelude::*;
+#[cfg(feature = "cache")]
+use CACHE;
+#[cfg(feature = "model")]
+use builder::{EditGuild, EditMember, EditRole};
+#[cfg(feature = "model")]
+use http;
+#[cfg(feature = "model")]
+use internal::prelude::*;
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl GuildId {
     /// Converts the guild Id into the default channel's Id.
     #[inline]
-    pub fn as_channel_id(&self) -> ChannelId {
-        ChannelId(self.0)
-    }
+    pub fn as_channel_id(&self) -> ChannelId { ChannelId(self.0) }
 
     /// Ban a [`User`] from the guild. All messages by the
     /// user within the last given number of days given will be deleted.
@@ -42,12 +40,12 @@ impl GuildId {
     /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
     /// days' worth of messages to delete is over the maximum.
     ///
-    /// [`ModelError::DeleteMessageDaysAmount`]: enum.ModelError.html#variant.DeleteMessageDaysAmount
+    /// [`ModelError::DeleteMessageDaysAmount`]:
+    /// enum.ModelError.html#variant.DeleteMessageDaysAmount
     /// [`Guild::ban`]: struct.Guild.html#method.ban
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, ban_options: BO)
-        -> Result<()> {
+    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, ban_options: BO) -> Result<()> {
         let dmd = ban_options.dmd();
         if dmd > 7 {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
@@ -68,15 +66,11 @@ impl GuildId {
     ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[inline]
-    pub fn bans(&self) -> Result<Vec<Ban>> {
-        http::get_bans(self.0)
-    }
+    pub fn bans(&self) -> Result<Vec<Ban>> { http::get_bans(self.0) }
 
     /// Gets a list of the guild's audit log entries
     #[inline]
-    pub fn audit_logs(&self) -> Result<AuditLogs> {
-        http::get_audit_logs(self.0)
-    }
+    pub fn audit_logs(&self) -> Result<AuditLogs> { http::get_audit_logs(self.0) }
 
     /// Gets all of the guild's channels over the REST API.
     ///
@@ -150,8 +144,9 @@ impl GuildId {
     /// Requires the [Manage Guild] permission.
     ///
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    pub fn create_integration<I>(&self, integration_id: I, kind: &str)
-        -> Result<()> where I: Into<IntegrationId> {
+    pub fn create_integration<I>(&self, integration_id: I, kind: &str) -> Result<()>
+    where
+        I: Into<IntegrationId>, {
         let integration_id = integration_id.into();
         let map = json!({
             "id": integration_id.0,
@@ -183,9 +178,7 @@ impl GuildId {
     ///
     /// [`Guild::delete`]: struct.Guild.html#method.delete
     #[inline]
-    pub fn delete(&self) -> Result<PartialGuild> {
-        http::delete_guild(self.0)
-    }
+    pub fn delete(&self) -> Result<PartialGuild> { http::delete_guild(self.0) }
 
     /// Deletes an [`Emoji`] from the guild.
     ///
@@ -270,7 +263,9 @@ impl GuildId {
     /// ```
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
-        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
+    where
+        F: FnOnce(EditMember) -> EditMember,
+        U: Into<UserId>, {
         http::edit_member(self.0, user_id.into().0, &f(EditMember::default()).0)
     }
 
@@ -304,7 +299,9 @@ impl GuildId {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
     pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
-        where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
+    where
+        F: FnOnce(EditRole) -> EditRole,
+        R: Into<RoleId>, {
         http::edit_role(self.0, role_id.into().0, &f(EditRole::default()).0)
     }
 
@@ -324,32 +321,24 @@ impl GuildId {
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     #[inline]
-    pub fn emojis(&self) -> Result<Vec<Emoji>> {
-        http::get_emojis(self.0)
-    }
+    pub fn emojis(&self) -> Result<Vec<Emoji>> { http::get_emojis(self.0) }
 
     /// Search the cache for the guild.
-    #[cfg(feature="cache")]
-    pub fn find(&self) -> Option<Arc<RwLock<Guild>>> {
-        CACHE.read().unwrap().guild(*self)
-    }
+    #[cfg(feature = "cache")]
+    pub fn find(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().unwrap().guild(*self) }
 
     /// Requests the guild over REST.
     ///
     /// Note that this will not be a complete guild, as REST does not send
     /// all data with a guild retrieval.
     #[inline]
-    pub fn get(&self) -> Result<PartialGuild> {
-        http::get_guild(self.0)
-    }
+    pub fn get(&self) -> Result<PartialGuild> { http::get_guild(self.0) }
 
     /// Gets all integration of the guild.
     ///
     /// This performs a request over the REST API.
     #[inline]
-    pub fn integrations(&self) -> Result<Vec<Integration>> {
-        http::get_guild_integrations(self.0)
-    }
+    pub fn integrations(&self) -> Result<Vec<Integration>> { http::get_guild_integrations(self.0) }
 
     /// Gets all of the guild's invites.
     ///
@@ -357,9 +346,7 @@ impl GuildId {
     ///
     /// [Manage Guild]: permissions/struct.MANAGE_GUILD.html
     #[inline]
-    pub fn invites(&self) -> Result<Vec<RichInvite>> {
-        http::get_guild_invites(self.0)
-    }
+    pub fn invites(&self) -> Result<Vec<RichInvite>> { http::get_guild_invites(self.0) }
 
     /// Kicks a [`Member`] from the guild.
     ///
@@ -374,9 +361,7 @@ impl GuildId {
 
     /// Leaves the guild.
     #[inline]
-    pub fn leave(&self) -> Result<()> {
-        http::leave_guild(self.0)
-    }
+    pub fn leave(&self) -> Result<()> { http::leave_guild(self.0) }
 
     /// Gets a user's [`Member`] for the guild by Id.
     ///
@@ -395,8 +380,9 @@ impl GuildId {
     ///
     /// [`User`]: struct.User.html
     #[inline]
-    pub fn members<U>(&self, limit: Option<u64>, after: Option<U>)
-        -> Result<Vec<Member>> where U: Into<UserId> {
+    pub fn members<U>(&self, limit: Option<u64>, after: Option<U>) -> Result<Vec<Member>>
+    where
+        U: Into<UserId>, {
         http::get_guild_members(self.0, limit, after.map(|x| x.into().0))
     }
 
@@ -405,10 +391,13 @@ impl GuildId {
     /// Requires the [Move Members] permission.
     ///
     /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
-    pub fn move_member<C, U>(&self, user_id: U, channel_id: C)
-        -> Result<()> where C: Into<ChannelId>, U: Into<UserId> {
+    pub fn move_member<C, U>(&self, user_id: U, channel_id: C) -> Result<()>
+    where
+        C: Into<ChannelId>,
+        U: Into<UserId>, {
         let mut map = Map::new();
-        map.insert("channel_id".to_owned(), Value::Number(Number::from(channel_id.into().0)));
+        map.insert("channel_id".to_owned(),
+                   Value::Number(Number::from(channel_id.into().0)));
 
         http::edit_member(self.0, user_id.into().0, &map)
     }
@@ -438,11 +427,9 @@ impl GuildId {
     /// total, consider using [`utils::shard_id`].
     ///
     /// [`utils::shard_id`]: ../utils/fn.shard_id.html
-    #[cfg(all(feature="cache", feature="utils"))]
+    #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self) -> u64 {
-        ::utils::shard_id(self.0, CACHE.read().unwrap().shard_count)
-    }
+    pub fn shard_id(&self) -> u64 { ::utils::shard_id(self.0, CACHE.read().unwrap().shard_count) }
 
     /// Returns the Id of the shard associated with the guild.
     ///
@@ -465,11 +452,9 @@ impl GuildId {
     ///
     /// assert_eq!(guild_id.shard_id(17), 7);
     /// ```
-    #[cfg(all(feature="utils", not(feature="cache")))]
+    #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
-    pub fn shard_id(&self, shard_count: u64) -> u64 {
-        ::utils::shard_id(self.0, shard_count)
-    }
+    pub fn shard_id(&self, shard_count: u64) -> u64 { ::utils::shard_id(self.0, shard_count) }
 
     /// Starts an integration sync for the given integration Id.
     ///
@@ -516,69 +501,49 @@ impl GuildId {
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[inline]
-    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        http::get_guild_webhooks(self.0)
-    }
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> { http::get_guild_webhooks(self.0) }
 }
 
 impl Display for GuildId {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        Display::fmt(&self.0, f)
-    }
+    fn fmt(&self, f: &mut Formatter) -> FmtResult { Display::fmt(&self.0, f) }
 }
 
 impl From<PartialGuild> for GuildId {
     /// Gets the Id of a partial guild.
-    fn from(guild: PartialGuild) -> GuildId {
-        guild.id
-    }
+    fn from(guild: PartialGuild) -> GuildId { guild.id }
 }
 
 impl<'a> From<&'a PartialGuild> for GuildId {
     /// Gets the Id of a partial guild.
-    fn from(guild: &PartialGuild) -> GuildId {
-        guild.id
-    }
+    fn from(guild: &PartialGuild) -> GuildId { guild.id }
 }
 
 impl From<GuildInfo> for GuildId {
     /// Gets the Id of Guild information struct.
-    fn from(guild_info: GuildInfo) -> GuildId {
-        guild_info.id
-    }
+    fn from(guild_info: GuildInfo) -> GuildId { guild_info.id }
 }
 
 impl<'a> From<&'a GuildInfo> for GuildId {
     /// Gets the Id of Guild information struct.
-    fn from(guild_info: &GuildInfo) -> GuildId {
-        guild_info.id
-    }
+    fn from(guild_info: &GuildInfo) -> GuildId { guild_info.id }
 }
 
 impl From<InviteGuild> for GuildId {
     /// Gets the Id of Invite Guild struct.
-    fn from(invite_guild: InviteGuild) -> GuildId {
-        invite_guild.id
-    }
+    fn from(invite_guild: InviteGuild) -> GuildId { invite_guild.id }
 }
 
 impl<'a> From<&'a InviteGuild> for GuildId {
     /// Gets the Id of Invite Guild struct.
-    fn from(invite_guild: &InviteGuild) -> GuildId {
-        invite_guild.id
-    }
+    fn from(invite_guild: &InviteGuild) -> GuildId { invite_guild.id }
 }
 
 impl From<Guild> for GuildId {
     /// Gets the Id of Guild.
-    fn from(live_guild: Guild) -> GuildId {
-        live_guild.id
-    }
+    fn from(live_guild: Guild) -> GuildId { live_guild.id }
 }
 
 impl<'a> From<&'a Guild> for GuildId {
     /// Gets the Id of Guild.
-    fn from(live_guild: &Guild) -> GuildId {
-        live_guild.id
-    }
+    fn from(live_guild: &Guild) -> GuildId { live_guild.id }
 }

@@ -1,15 +1,15 @@
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use ::model::*;
+use model::*;
 
-#[cfg(feature="cache")]
-use ::CACHE;
-#[cfg(all(feature="builder", feature="cache", feature="model"))]
-use ::builder::EditRole;
-#[cfg(feature="cache")]
-use ::internal::prelude::*;
-#[cfg(all(feature="cache", feature="model"))]
-use ::http;
+#[cfg(feature = "cache")]
+use CACHE;
+#[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
+use builder::EditRole;
+#[cfg(feature = "cache")]
+use internal::prelude::*;
+#[cfg(all(feature = "cache", feature = "model"))]
+use http;
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
@@ -23,12 +23,12 @@ pub struct Role {
     pub id: RoleId,
     /// The colour of the role. This is an ergonomic representation of the inner
     /// value.
-    #[cfg(feature="utils")]
-    #[serde(rename="color")]
+    #[cfg(feature = "utils")]
+    #[serde(rename = "color")]
     pub colour: Colour,
     /// The colour of the role.
-    #[cfg(not(feature="utils"))]
-    #[serde(rename="color")]
+    #[cfg(not(feature = "utils"))]
+    #[serde(rename = "color")]
     pub colour: u32,
     /// Indicator of whether the role is pinned above lesser roles.
     ///
@@ -62,18 +62,16 @@ pub struct Role {
     pub position: i64,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl Role {
     /// Deletes the role.
     ///
     /// **Note** Requires the [Manage Roles] permission.
     ///
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     #[inline]
-    pub fn delete(&self) -> Result<()> {
-        http::delete_role(self.find_guild()?.0, self.id.0)
-    }
+    pub fn delete(&self) -> Result<()> { http::delete_role(self.find_guild()?.0, self.id.0) }
 
     /// Edits a [`Role`], optionally setting its new fields.
     ///
@@ -93,9 +91,10 @@ impl Role {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(all(feature="builder", feature="cache"))]
+    #[cfg(all(feature = "builder", feature = "cache"))]
     pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
-        self.find_guild().and_then(|guild_id| guild_id.edit_role(self.id, f))
+        self.find_guild()
+            .and_then(|guild_id| guild_id.edit_role(self.id, f))
     }
 
     /// Searches the cache for the guild that owns the role.
@@ -106,7 +105,7 @@ impl Role {
     /// that contains the role.
     ///
     /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn find_guild(&self) -> Result<GuildId> {
         for guild in CACHE.read().unwrap().guilds.values() {
             let guild = guild.read().unwrap();
@@ -130,8 +129,7 @@ impl Role {
     /// The 'precise' argument is used to check if the role's permissions are
     /// precisely equivalent to the given permissions. If you need only check
     /// that the role has at least the given permissions, pass `false`.
-    pub fn has_permissions(&self, permissions: Permissions, precise: bool)
-        -> bool {
+    pub fn has_permissions(&self, permissions: Permissions, precise: bool) -> bool {
         if precise {
             self.permissions == permissions
         } else {
@@ -143,9 +141,7 @@ impl Role {
 impl Display for Role {
     /// Format a mention for the role, pinging its members.
     // This is in the format of: `<@&ROLE_ID>`.
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        Display::fmt(&self.mention(), f)
-    }
+    fn fmt(&self, f: &mut Formatter) -> FmtResult { Display::fmt(&self.mention(), f) }
 }
 
 impl Eq for Role {}
@@ -161,21 +157,17 @@ impl Ord for Role {
 }
 
 impl PartialEq for Role {
-    fn eq(&self, other: &Role) -> bool {
-        self.id == other.id
-    }
+    fn eq(&self, other: &Role) -> bool { self.id == other.id }
 }
 
 impl PartialOrd for Role {
-    fn partial_cmp(&self, other: &Role) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
+    fn partial_cmp(&self, other: &Role) -> Option<Ordering> { Some(self.cmp(other)) }
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl RoleId {
     /// Search the cache for the role.
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn find(&self) -> Option<Role> {
         let cache = CACHE.read().unwrap();
 
@@ -196,21 +188,15 @@ impl RoleId {
 }
 
 impl Display for RoleId {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        Display::fmt(&self.0, f)
-    }
+    fn fmt(&self, f: &mut Formatter) -> FmtResult { Display::fmt(&self.0, f) }
 }
 
 impl From<Role> for RoleId {
     /// Gets the Id of a role.
-    fn from(role: Role) -> RoleId {
-        role.id
-    }
+    fn from(role: Role) -> RoleId { role.id }
 }
 
 impl<'a> From<&'a Role> for RoleId {
     /// Gets the Id of a role.
-    fn from(role: &Role) -> RoleId {
-        role.id
-    }
+    fn from(role: &Role) -> RoleId { role.id }
 }

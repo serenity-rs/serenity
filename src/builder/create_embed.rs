@@ -19,11 +19,11 @@ use chrono::{DateTime, TimeZone};
 use serde_json::Value;
 use std::default::Default;
 use std::fmt::Display;
-use ::internal::prelude::*;
-use ::model::Embed;
+use internal::prelude::*;
+use model::Embed;
 
-#[cfg(feature="utils")]
-use ::utils::Colour;
+#[cfg(feature = "utils")]
+use utils::Colour;
 
 /// A builder to create a fake [`Embed`] object, for use with the
 /// [`ChannelId::send_message`] and [`ExecuteWebhook::embeds`] methods.
@@ -47,7 +47,8 @@ impl CreateEmbed {
     ///
     /// [`CreateEmbedAuthor`]: struct.CreateEmbedAuthor.html
     pub fn author<F>(mut self, f: F) -> Self
-        where F: FnOnce(CreateEmbedAuthor) -> CreateEmbedAuthor {
+    where
+        F: FnOnce(CreateEmbedAuthor) -> CreateEmbedAuthor, {
         let author = f(CreateEmbedAuthor::default()).0;
 
         self.0.insert("author".to_owned(), Value::Object(author));
@@ -60,16 +61,15 @@ impl CreateEmbed {
     /// This is an alias of [`colour`].
     ///
     /// [`colour`]: #method.colour
-    #[cfg(feature="utils")]
+    #[cfg(feature = "utils")]
     #[inline]
-    pub fn color<C: Into<Colour>>(self, colour: C) -> Self {
-        self.colour(colour.into())
-    }
+    pub fn color<C: Into<Colour>>(self, colour: C) -> Self { self.colour(colour.into()) }
 
     /// Set the colour of the left-hand side of the embed.
-    #[cfg(feature="utils")]
+    #[cfg(feature = "utils")]
     pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
-        self.0.insert("color".to_owned(), Value::Number(Number::from(colour.into().0 as u64)));
+        self.0.insert("color".to_owned(),
+                      Value::Number(Number::from(colour.into().0 as u64)));
 
         CreateEmbed(self.0)
     }
@@ -79,16 +79,15 @@ impl CreateEmbed {
     /// This is an alias of [`colour`].
     ///
     /// [`colour`]: #method.colour
-    #[cfg(not(feature="utils"))]
+    #[cfg(not(feature = "utils"))]
     #[inline]
-    pub fn color(self, colour: u32) -> Self {
-        self.colour(colour)
-    }
+    pub fn color(self, colour: u32) -> Self { self.colour(colour) }
 
     /// Set the colour of the left-hand side of the embed.
-    #[cfg(not(feature="utils"))]
+    #[cfg(not(feature = "utils"))]
     pub fn colour(mut self, colour: u32) -> Self {
-        self.0.insert("color".to_owned(), Value::Number(Number::from(colour)));
+        self.0
+            .insert("color".to_owned(), Value::Number(Number::from(colour)));
 
         CreateEmbed(self.0)
     }
@@ -97,7 +96,8 @@ impl CreateEmbed {
     ///
     /// **Note**: This can't be longer than 2048 characters.
     pub fn description(mut self, description: &str) -> Self {
-        self.0.insert("description".to_owned(), Value::String(description.to_owned()));
+        self.0.insert("description".to_owned(),
+                      Value::String(description.to_owned()));
 
         CreateEmbed(self.0)
     }
@@ -113,7 +113,8 @@ impl CreateEmbed {
     ///
     /// [`CreateEmbedField`]: struct.CreateEmbedField.html
     pub fn field<F>(mut self, f: F) -> Self
-        where F: FnOnce(CreateEmbedField) -> CreateEmbedField {
+    where
+        F: FnOnce(CreateEmbedField) -> CreateEmbedField, {
         let field = f(CreateEmbedField::default()).0;
 
         {
@@ -141,9 +142,12 @@ impl CreateEmbed {
 
     /// Adds multiple fields at once.
     pub fn fields(mut self, fields: Vec<CreateEmbedField>) -> Self {
-        let fields = fields.into_iter().map(|m| Value::Object(m.0)).collect::<Vec<Value>>();
-        
-         {
+        let fields = fields
+            .into_iter()
+            .map(|m| Value::Object(m.0))
+            .collect::<Vec<Value>>();
+
+        {
             let key = "fields".to_owned();
 
             let entry = self.0.remove(&key).unwrap_or_else(|| Value::Array(vec![]));
@@ -166,7 +170,8 @@ impl CreateEmbed {
     ///
     /// [`CreateEmbedFooter`]: struct.CreateEmbedFooter.html
     pub fn footer<F>(mut self, f: F) -> Self
-        where F: FnOnce(CreateEmbedFooter) -> CreateEmbedFooter {
+    where
+        F: FnOnce(CreateEmbedFooter) -> CreateEmbedFooter, {
         let footer = f(CreateEmbedFooter::default()).0;
 
         self.0.insert("footer".to_owned(), Value::Object(footer));
@@ -215,7 +220,7 @@ impl CreateEmbed {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::*;
-    /// # 
+    /// #
     /// struct Handler;
     /// impl EventHandler for Handler {
     ///     fn on_message(&self, _: Context, msg: Message) {
@@ -276,27 +281,30 @@ impl CreateEmbed {
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     pub fn timestamp<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
-        self.0.insert("timestamp".to_owned(), Value::String(timestamp.into().ts));
+        self.0
+            .insert("timestamp".to_owned(), Value::String(timestamp.into().ts));
 
         CreateEmbed(self.0)
     }
 
     /// Set the title of the embed.
     pub fn title(mut self, title: &str) -> Self {
-        self.0.insert("title".to_owned(), Value::String(title.to_owned()));
+        self.0
+            .insert("title".to_owned(), Value::String(title.to_owned()));
 
         CreateEmbed(self.0)
     }
 
     /// Set the URL to direct to when clicking on the title.
     pub fn url(mut self, url: &str) -> Self {
-        self.0.insert("url".to_owned(), Value::String(url.to_owned()));
+        self.0
+            .insert("url".to_owned(), Value::String(url.to_owned()));
 
         CreateEmbed(self.0)
     }
 
     /// Same as calling [`image`] with "attachment://filename.(jpg, png)".
-    /// 
+    ///
     /// Note however, you have to be sure you set an attachment (with [`ChannelId::send_files`])
     /// with the provided filename. Or else this won't work.
     ///
@@ -321,8 +329,7 @@ impl From<Embed> for CreateEmbed {
     ///
     /// Some values - such as Proxy URLs - are not preserved.
     fn from(embed: Embed) -> CreateEmbed {
-        let mut b = CreateEmbed::default()
-            .colour(embed.colour);
+        let mut b = CreateEmbed::default().colour(embed.colour);
 
         if let Some(author) = embed.author {
             b = b.author(move |mut a| {
@@ -345,10 +352,7 @@ impl From<Embed> for CreateEmbed {
         }
 
         for field in embed.fields {
-            b = b.field(move |f| f
-                .inline(field.inline)
-                .name(&field.name)
-                .value(&field.value));
+            b = b.field(move |f| f.inline(field.inline).name(&field.name).value(&field.value));
         }
 
         if let Some(image) = embed.image {
@@ -389,21 +393,24 @@ pub struct CreateEmbedAuthor(pub Map<String, Value>);
 impl CreateEmbedAuthor {
     /// Set the URL of the author's icon.
     pub fn icon_url(mut self, icon_url: &str) -> Self {
-        self.0.insert("icon_url".to_owned(), Value::String(icon_url.to_owned()));
+        self.0
+            .insert("icon_url".to_owned(), Value::String(icon_url.to_owned()));
 
         self
     }
 
     /// Set the author's name.
     pub fn name(mut self, name: &str) -> Self {
-        self.0.insert("name".to_owned(), Value::String(name.to_owned()));
+        self.0
+            .insert("name".to_owned(), Value::String(name.to_owned()));
 
         self
     }
 
     /// Set the author's URL.
     pub fn url(mut self, url: &str) -> Self {
-        self.0.insert("url".to_owned(), Value::String(url.to_owned()));
+        self.0
+            .insert("url".to_owned(), Value::String(url.to_owned()));
 
         self
     }
@@ -430,14 +437,16 @@ impl CreateEmbedField {
 
     /// Set the field's name. It can't be longer than 256 characters.
     pub fn name(mut self, name: &str) -> Self {
-        self.0.insert("name".to_owned(), Value::String(name.to_owned()));
+        self.0
+            .insert("name".to_owned(), Value::String(name.to_owned()));
 
         self
     }
 
     /// Set the field's value. It can't be longer than 1024 characters.
     pub fn value(mut self, value: &str) -> Self {
-        self.0.insert("value".to_owned(), Value::String(value.to_owned()));
+        self.0
+            .insert("value".to_owned(), Value::String(value.to_owned()));
 
         self
     }
@@ -467,14 +476,16 @@ pub struct CreateEmbedFooter(pub Map<String, Value>);
 impl CreateEmbedFooter {
     /// Set the icon URL's value. This only supports HTTP(S).
     pub fn icon_url(mut self, icon_url: &str) -> Self {
-        self.0.insert("icon_url".to_owned(), Value::String(icon_url.to_owned()));
+        self.0
+            .insert("icon_url".to_owned(), Value::String(icon_url.to_owned()));
 
         self
     }
 
     /// Set the footer's text.
     pub fn text(mut self, text: &str) -> Self {
-        self.0.insert("text".to_owned(), Value::String(text.to_owned()));
+        self.0
+            .insert("text".to_owned(), Value::String(text.to_owned()));
 
         self
     }
@@ -501,7 +512,9 @@ impl<'a> From<&'a str> for Timestamp {
     }
 }
 
-impl<'a, Tz: TimeZone> From<&'a DateTime<Tz>> for Timestamp where Tz::Offset: Display {
+impl<'a, Tz: TimeZone> From<&'a DateTime<Tz>> for Timestamp
+where
+    Tz::Offset: Display, {
     fn from(dt: &'a DateTime<Tz>) -> Self {
         Timestamp {
             ts: dt.to_rfc3339(),

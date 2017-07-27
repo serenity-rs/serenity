@@ -6,7 +6,7 @@ pub struct Integration {
     pub id: IntegrationId,
     pub account: IntegrationAccount,
     pub enabled: bool,
-    #[serde(rename="expire_behaviour")]
+    #[serde(rename = "expire_behaviour")]
     pub expire_behaviour: u64,
     pub expire_grace_period: u64,
     pub kind: String,
@@ -19,9 +19,7 @@ pub struct Integration {
 
 impl From<Integration> for IntegrationId {
     /// Gets the Id of integration.
-    fn from(integration: Integration) -> IntegrationId {
-        integration.id
-    }
+    fn from(integration: Integration) -> IntegrationId { integration.id }
 }
 
 /// Integration account object.

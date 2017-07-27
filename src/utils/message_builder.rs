@@ -1,7 +1,7 @@
 use std::default::Default;
-use std::fmt::{self, Write, Display};
+use std::fmt::{self, Display, Write};
 use std::ops::Add;
-use ::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
+use model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 
 /// The Message Builder is an ergonomic utility to easily build a message,
 /// by adding text and mentioning mentionable structs.
@@ -58,9 +58,7 @@ impl MessageBuilder {
     /// // alternatively:
     /// let message = MessageBuilder::default();
     /// ```
-    pub fn new() -> MessageBuilder {
-        MessageBuilder::default()
-    }
+    pub fn new() -> MessageBuilder { MessageBuilder::default() }
 
     /// Pulls the inner value out of the builder.
     ///
@@ -92,9 +90,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "test");
     /// ```
-    pub fn build(self) -> String {
-        self.0
-    }
+    pub fn build(self) -> String { self.0 }
 
     /// Mentions the [`GuildChannel`] in the built message.
     ///
@@ -478,10 +474,8 @@ impl MessageBuilder {
     }
 
     /// Pushes a code-block to your message normalizing content.
-    pub fn push_codeblock_safe(mut self, content: &str, language: Option<&str>)
-        -> Self {
-        let content = &normalize(content)
-            .replace("```", "'''");
+    pub fn push_codeblock_safe(mut self, content: &str, language: Option<&str>) -> Self {
+        let content = &normalize(content).replace("```", "'''");
 
         self.0.push_str("```");
 
@@ -550,7 +544,8 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new().push_line_safe("Hello @everyone").push("How are you?").build();
+    /// let content = MessageBuilder::new().push_line_safe("Hello @everyone").push("How are
+    /// you?").build();
     ///
     /// assert_eq!(content, "Hello @\u{200B}everyone\nHow are you?");
     /// ```
@@ -649,7 +644,8 @@ impl MessageBuilder {
         self
     }
 
-    /// Pushes a strikethrough inline text with added newline to the content normalizing content.
+    /// Pushes a strikethrough inline text with added newline to the content normalizing
+    /// content.
     ///
     /// # Examples
     ///
@@ -721,9 +717,7 @@ impl Display for MessageBuilder {
     /// use serenity::utils::MessageBuilder;
     ///
     ///
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Display::fmt(&self.0, f)
-    }
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { fmt::Display::fmt(&self.0, f) }
 }
 
 
@@ -757,7 +751,7 @@ pub struct Content {
     pub strikethrough: bool,
     pub inner: String,
     pub code: bool,
-    pub underline: bool
+    pub underline: bool,
 }
 
 impl<T: ToString> Add<T> for Content {
@@ -806,10 +800,10 @@ impl Add<ContentModifier> for ContentModifier {
 
 impl ContentModifier {
     fn to_content(&self) -> Content {
-      let mut nc = Content::default();
-      nc.apply(self);
+        let mut nc = Content::default();
+        nc.apply(self);
 
-      nc
+        nc
     }
 }
 
@@ -835,12 +829,10 @@ impl Content {
     }
 
     pub fn to_string(&self) -> String {
-        let capacity = self.inner.len()
-            + if self.bold { 4 } else { 0 }
-            + if self.italic { 2 } else { 0 }
-            + if self.strikethrough { 4 } else { 0 }
-            + if self.underline { 4 } else { 0 }
-            + if self.code { 2 } else { 0 };
+        let capacity =
+            self.inner.len() + if self.bold { 4 } else { 0 } + if self.italic { 2 } else { 0 } +
+            if self.strikethrough { 4 } else { 0 } +
+            if self.underline { 4 } else { 0 } + if self.code { 2 } else { 0 };
         let mut new_str = String::with_capacity(capacity);
 
         if self.bold {
@@ -890,9 +882,7 @@ impl Content {
 }
 
 impl From<ContentModifier> for Content {
-    fn from(cm: ContentModifier) -> Content {
-        cm.to_content()
-    }
+    fn from(cm: ContentModifier) -> Content { cm.to_content() }
 }
 
 impl<T: ToString> From<T> for Content {

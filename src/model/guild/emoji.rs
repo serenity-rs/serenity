@@ -1,17 +1,17 @@
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 use super::super::{EmojiId, RoleId};
 
-#[cfg(feature="cache")]
+#[cfg(feature = "cache")]
 use std::mem;
-#[cfg(all(feature="cache", feature="model"))]
+#[cfg(all(feature = "cache", feature = "model"))]
 use super::super::ModelError;
-#[cfg(feature="cache")]
-use ::CACHE;
-#[cfg(feature="cache")]
-use ::internal::prelude::*;
-#[cfg(all(feature="cache", feature="model"))]
-use ::http;
-#[cfg(feature="cache")]
+#[cfg(feature = "cache")]
+use CACHE;
+#[cfg(feature = "cache")]
+use internal::prelude::*;
+#[cfg(all(feature = "cache", feature = "model"))]
+use http;
+#[cfg(feature = "cache")]
 use super::super::GuildId;
 
 /// Represents a custom guild emoji, which can either be created using the API,
@@ -38,7 +38,7 @@ pub struct Emoji {
     pub roles: Vec<RoleId>,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl Emoji {
     /// Deletes the emoji.
     ///
@@ -69,7 +69,7 @@ impl Emoji {
     ///     Err(_) => println!("Could not delete emoji.")
     /// }
     /// ```
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn delete(&self) -> Result<()> {
         match self.find_guild_id() {
             Some(guild_id) => http::delete_emoji(guild_id.0, self.id.0),
@@ -104,7 +104,7 @@ impl Emoji {
     /// let _ = emoji.edit("blobuwu");
     /// assert_eq!(emoji.name, "blobuwu");
     /// ```
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn edit(&mut self, name: &str) -> Result<()> {
         match self.find_guild_id() {
             Some(guild_id) => {
@@ -149,7 +149,7 @@ impl Emoji {
     ///     println!("{} is owned by {}", emoji.name, guild_id);
     /// }
     /// ```
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn find_guild_id(&self) -> Option<GuildId> {
         for guild in CACHE.read().unwrap().guilds.values() {
             let guild = guild.read().unwrap();
@@ -183,9 +183,7 @@ impl Emoji {
     /// println!("Direct link to emoji image: {}", emoji.url());
     /// ```
     #[inline]
-    pub fn url(&self) -> String {
-        format!(cdn!("/emojis/{}.png"), self.id)
-    }
+    pub fn url(&self) -> String { format!(cdn!("/emojis/{}.png"), self.id) }
 }
 
 impl Display for Emoji {
@@ -203,21 +201,15 @@ impl Display for Emoji {
 }
 
 impl Display for EmojiId {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        Display::fmt(&self.0, f)
-    }
+    fn fmt(&self, f: &mut Formatter) -> FmtResult { Display::fmt(&self.0, f) }
 }
 
 impl From<Emoji> for EmojiId {
     /// Gets the Id of an `Emoji`.
-    fn from(emoji: Emoji) -> EmojiId {
-        emoji.id
-    }
+    fn from(emoji: Emoji) -> EmojiId { emoji.id }
 }
 
 impl<'a> From<&'a Emoji> for EmojiId {
     /// Gets the Id of an `Emoji`.
-    fn from(emoji: &Emoji) -> EmojiId {
-        emoji.id
-    }
+    fn from(emoji: &Emoji) -> EmojiId { emoji.id }
 }

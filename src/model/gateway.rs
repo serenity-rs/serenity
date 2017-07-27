@@ -34,7 +34,7 @@ pub struct Game {
     pub url: Option<String>,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl Game {
     /// Creates a `Game` struct that appears as a `Playing <name>` status.
     ///
@@ -51,7 +51,7 @@ impl Game {
     ///
     /// command!(game(ctx, _msg, args) {
     ///     let name = args.join(" ");
-    ///     ctx.set_game(Game::playing(&name)); 
+    ///     ctx.set_game(Game::playing(&name));
     /// });
     /// #
     /// # fn main() {}
@@ -80,7 +80,7 @@ impl Game {
     /// // Assumes command has min_args set to 2.
     /// command!(stream(ctx, _msg, args, stream: String) {
     ///     let name = args[1..].join(" ");
-    ///     ctx.set_game(Game::streaming(&name, &stream)); 
+    ///     ctx.set_game(Game::streaming(&name, &stream));
     /// });
     /// #
     /// # fn main() {}
@@ -103,13 +103,14 @@ impl<'de> Deserialize<'de> for Game {
         let name = map.remove("name")
             .and_then(|v| String::deserialize(v).ok())
             .unwrap_or_else(String::new);
-        let url = map.remove("url").and_then(|v| serde_json::from_value::<String>(v).ok());
+        let url = map.remove("url")
+            .and_then(|v| serde_json::from_value::<String>(v).ok());
 
         Ok(Game {
-            kind: kind,
-            name: name,
-            url: url
-        })
+               kind: kind,
+               name: name,
+               url: url,
+           })
     }
 }
 
@@ -124,9 +125,7 @@ enum_number!(
 );
 
 impl Default for GameType {
-    fn default() -> Self {
-        GameType::Playing
-    }
+    fn default() -> Self { GameType::Playing }
 }
 
 /// A representation of the data retrieved from the gateway endpoint.
@@ -171,11 +170,13 @@ impl<'de> Deserialize<'de> for Presence {
             .map_err(DeError::custom)?;
 
         let (user_id, user) = if user_map.len() > 1 {
-            let user = User::deserialize(Value::Object(user_map)).map_err(DeError::custom)?;
+            let user = User::deserialize(Value::Object(user_map))
+                .map_err(DeError::custom)?;
 
             (user.id, Some(Arc::new(RwLock::new(user))))
         } else {
-            let user_id = user_map.remove("id")
+            let user_id = user_map
+                .remove("id")
                 .ok_or_else(|| DeError::custom("Missing presence user id"))
                 .and_then(|x| UserId::deserialize(x.clone()))
                 .map_err(DeError::custom)?;
@@ -184,7 +185,10 @@ impl<'de> Deserialize<'de> for Presence {
         };
 
         let game = match map.remove("game") {
-            Some(v) => serde_json::from_value::<Option<Game>>(v).map_err(DeError::custom)?,
+            Some(v) => {
+                serde_json::from_value::<Option<Game>>(v)
+                    .map_err(DeError::custom)?
+            },
             None => None,
         };
         let last_modified = match map.remove("last_modified") {
@@ -192,7 +196,10 @@ impl<'de> Deserialize<'de> for Presence {
             None => None,
         };
         let nick = match map.remove("nick") {
-            Some(v) => serde_json::from_value::<Option<String>>(v).map_err(DeError::custom)?,
+            Some(v) => {
+                serde_json::from_value::<Option<String>>(v)
+                    .map_err(DeError::custom)?
+            },
             None => None,
         };
         let status = map.remove("status")
@@ -201,13 +208,13 @@ impl<'de> Deserialize<'de> for Presence {
             .map_err(DeError::custom)?;
 
         Ok(Presence {
-            game: game,
-            last_modified: last_modified,
-            nick: nick,
-            status: status,
-            user: user,
-            user_id: user_id,
-        })
+               game: game,
+               last_modified: last_modified,
+               nick: nick,
+               status: status,
+               user: user,
+               user_id: user_id,
+           })
     }
 }
 
@@ -215,15 +222,15 @@ impl<'de> Deserialize<'de> for Presence {
 #[derive(Clone, Debug, Deserialize)]
 pub struct Ready {
     pub guilds: Vec<GuildStatus>,
-    #[serde(deserialize_with="deserialize_presences")]
+    #[serde(deserialize_with = "deserialize_presences")]
     pub presences: HashMap<UserId, Presence>,
-    #[serde(deserialize_with="deserialize_private_channels")]
+    #[serde(deserialize_with = "deserialize_private_channels")]
     pub private_channels: HashMap<ChannelId, Channel>,
     pub session_id: String,
     pub shard: Option<[u64; 2]>,
-    #[serde(default, rename="_trace")]
+    #[serde(default, rename = "_trace")]
     pub trace: Vec<String>,
     pub user: CurrentUser,
-    #[serde(rename="v")]
+    #[serde(rename = "v")]
     pub version: u64,
 }

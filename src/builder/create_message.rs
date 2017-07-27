@@ -1,6 +1,6 @@
 use super::CreateEmbed;
-use ::model::ReactionType;
-use ::internal::prelude::*;
+use model::ReactionType;
+use internal::prelude::*;
 
 /// A builder to specify the contents of an [`http::send_message`] request,
 /// primarily meant for use through [`ChannelId::send_message`].
@@ -45,14 +45,16 @@ impl CreateMessage {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     pub fn content(mut self, content: &str) -> Self {
-        self.0.insert("content".to_owned(), Value::String(content.to_owned()));
+        self.0
+            .insert("content".to_owned(), Value::String(content.to_owned()));
 
         CreateMessage(self.0, self.1)
     }
 
     /// Set an embed for the message.
     pub fn embed<F>(mut self, f: F) -> Self
-        where F: FnOnce(CreateEmbed) -> CreateEmbed {
+    where
+        F: FnOnce(CreateEmbed) -> CreateEmbed, {
         let embed = Value::Object(f(CreateEmbed::default()).0);
 
         self.0.insert("embed".to_owned(), embed);

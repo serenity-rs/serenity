@@ -1,9 +1,9 @@
 use std::collections::HashSet;
 use std::default::Default;
 use super::command::PrefixCheck;
-use ::client::Context;
-use ::http;
-use ::model::{GuildId, Message, UserId};
+use client::Context;
+use http;
+use model::{GuildId, Message, UserId};
 
 /// The configuration to use for a [`Framework`] associated with a [`Client`]
 /// instance.
@@ -18,7 +18,7 @@ use ::model::{GuildId, Message, UserId};
 /// ```rust,no_run
 /// # use serenity::prelude::EventHandler;
 /// struct Handler;
-/// 
+///
 /// impl EventHandler for Handler {}
 /// use serenity::Client;
 /// use std::env;
@@ -215,7 +215,8 @@ impl Configuration {
     ///     })));
     /// ```
     pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
-        where F: Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static {
+    where
+        F: Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static, {
         self.dynamic_prefix = Some(Box::new(dynamic_prefix));
 
         self
@@ -267,7 +268,7 @@ impl Configuration {
 
         if let Ok(current_user) = http::get_current_user() {
             self.on_mention = Some(vec![
-                format!("<@{}>", current_user.id), // Regular mention
+                format!("<@{}>", current_user.id),  // Regular mention
                 format!("<@!{}>", current_user.id), // Nickname mention
             ]);
         }

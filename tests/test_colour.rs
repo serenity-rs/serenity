@@ -1,4 +1,4 @@
-#![cfg(feature="utils")]
+#![cfg(feature = "utils")]
 
 extern crate serenity;
 

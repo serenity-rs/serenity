@@ -1,12 +1,12 @@
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
-use ::internal::prelude::*;
-use ::model::*;
+use internal::prelude::*;
+use model::*;
 
-#[cfg(feature="cache")]
-use ::CACHE;
-#[cfg(feature="model")]
-use ::http;
+#[cfg(feature = "cache")]
+use CACHE;
+#[cfg(feature = "model")]
+use http;
 
 /// An emoji reaction to a message.
 #[derive(Clone, Debug, Deserialize)]
@@ -28,7 +28,7 @@ pub struct Reaction {
     pub user_id: UserId,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl Reaction {
     /// Deletes the reaction, but only if the current user is the user who made
     /// the reaction or has permission to.
@@ -72,10 +72,7 @@ impl Reaction {
             Some(self.user_id.0)
         }};
 
-        http::delete_reaction(self.channel_id.0,
-                              self.message_id.0,
-                              user_id,
-                              &self.emoji)
+        http::delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
     }
 
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
@@ -106,8 +103,9 @@ impl Reaction {
                        limit: Option<u8>,
                        after: Option<U>)
                        -> Result<Vec<User>>
-                       where R: Into<ReactionType>,
-                             U: Into<UserId> {
+    where
+        R: Into<ReactionType>,
+        U: Into<UserId>, {
         http::get_reaction_users(self.channel_id.0,
                                  self.message_id.0,
                                  &reaction_type.into(),
@@ -207,13 +205,13 @@ impl<'de> Deserialize<'de> for ReactionType {
                 let name = name.ok_or_else(|| DeError::missing_field("name"))?;
 
                 Ok(if let Some(id) = id {
-                    ReactionType::Custom {
-                        id: id,
-                        name: name,
-                    }
-                } else {
-                    ReactionType::Unicode(name)
-                })
+                       ReactionType::Custom {
+                           id: id,
+                           name: name,
+                       }
+                   } else {
+                       ReactionType::Unicode(name)
+                   })
             }
         }
 
@@ -223,7 +221,7 @@ impl<'de> Deserialize<'de> for ReactionType {
     }
 }
 
-#[cfg(any(feature="model", feature="http"))]
+#[cfg(any(feature = "model", feature = "http"))]
 impl ReactionType {
     /// Creates a data-esque display of the type. This is not very useful for
     /// displaying, as the primary client can not render it, but can be useful
@@ -233,15 +231,16 @@ impl ReactionType {
     /// likely little use for it.
     pub fn as_data(&self) -> String {
         match *self {
-            ReactionType::Custom { id, ref name } => {
-                format!("{}:{}", name, id)
-            },
+            ReactionType::Custom {
+                id,
+                ref name,
+            } => format!("{}:{}", name, id),
             ReactionType::Unicode(ref unicode) => unicode.clone(),
         }
     }
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl From<char> for ReactionType {
     /// Creates a `ReactionType` from a `char`.
     ///
@@ -264,9 +263,7 @@ impl From<char> for ReactionType {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    fn from(ch: char) -> ReactionType {
-        ReactionType::Unicode(ch.to_string())
-    }
+    fn from(ch: char) -> ReactionType { ReactionType::Unicode(ch.to_string()) }
 }
 
 impl From<Emoji> for ReactionType {
@@ -279,9 +276,7 @@ impl From<Emoji> for ReactionType {
 }
 
 impl From<String> for ReactionType {
-    fn from(unicode: String) -> ReactionType {
-        ReactionType::Unicode(unicode)
-    }
+    fn from(unicode: String) -> ReactionType { ReactionType::Unicode(unicode) }
 }
 
 impl<'a> From<&'a str> for ReactionType {
@@ -301,9 +296,7 @@ impl<'a> From<&'a str> for ReactionType {
     ///
     /// foo("🍎");
     /// ```
-    fn from(unicode: &str) -> ReactionType {
-        ReactionType::Unicode(unicode.to_owned())
-    }
+    fn from(unicode: &str) -> ReactionType { ReactionType::Unicode(unicode.to_owned()) }
 }
 
 impl Display for ReactionType {
@@ -320,7 +313,10 @@ impl Display for ReactionType {
     /// [`ReactionType::Unicode`]: enum.ReactionType.html#variant.Unicode
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         match *self {
-            ReactionType::Custom { id, ref name } => {
+            ReactionType::Custom {
+                id,
+                ref name,
+            } => {
                 f.write_char('<')?;
                 f.write_char(':')?;
                 f.write_str(name)?;

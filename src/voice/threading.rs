@@ -2,8 +2,8 @@ use std::sync::mpsc::{Receiver as MpscReceiver, TryRecvError};
 use std::thread::Builder as ThreadBuilder;
 use super::connection::Connection;
 use super::Status;
-use ::internal::Timer;
-use ::model::GuildId;
+use internal::Timer;
+use model::GuildId;
 
 pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
     let name = format!("Serenity Voice (G{})", guild_id);
@@ -25,9 +25,7 @@ fn runner(rx: &MpscReceiver<Status>) {
             match rx.try_recv() {
                 Ok(Status::Connect(info)) => {
                     connection = match Connection::new(info) {
-                        Ok(connection) => {
-                            Some(connection)
-                        },
+                        Ok(connection) => Some(connection),
                         Err(why) => {
                             warn!("[Voice] Error connecting: {:?}", why);
 
@@ -64,9 +62,7 @@ fn runner(rx: &MpscReceiver<Status>) {
         // another event.
         let error = match connection.as_mut() {
             Some(connection) => {
-                let cycle = connection.cycle(&mut sender,
-                                             &mut receiver,
-                                             &mut timer);
+                let cycle = connection.cycle(&mut sender, &mut receiver, &mut timer);
 
                 match cycle {
                     Ok(()) => false,

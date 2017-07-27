@@ -3,8 +3,8 @@ use std::sync::mpsc::{self, Sender as MpscSender};
 use super::{AudioReceiver, AudioSource};
 use super::connection_info::ConnectionInfo;
 use super::Status as VoiceStatus;
-use ::constants::VoiceOpCode;
-use ::model::{ChannelId, GuildId, UserId, VoiceState};
+use constants::VoiceOpCode;
+use model::{ChannelId, GuildId, UserId, VoiceState};
 use super::threading;
 
 /// The handler is responsible for "handling" a single voice connection, acting
@@ -153,12 +153,12 @@ impl Handler {
 
         // Safe as all of these being present was already checked.
         self.send(VoiceStatus::Connect(ConnectionInfo {
-            endpoint: endpoint,
-            guild_id: guild_id,
-            session_id: session_id,
-            token: token,
-            user_id: user_id,
-        }));
+                                           endpoint: endpoint,
+                                           guild_id: guild_id,
+                                           session_id: session_id,
+                                           token: token,
+                                           user_id: user_id,
+                                       }));
 
         true
     }
@@ -256,9 +256,7 @@ impl Handler {
     }
 
     /// Stops playing audio from a source, if one is set.
-    pub fn stop(&mut self) {
-        self.send(VoiceStatus::SetSender(None))
-    }
+    pub fn stop(&mut self) { self.send(VoiceStatus::SetSender(None)) }
 
     /// Switches the current connected voice channel to the given `channel_id`.
     ///
@@ -418,7 +416,5 @@ impl Handler {
 impl Drop for Handler {
     /// Leaves the current connected voice channel, if connected to one, and
     /// forgets all configurations relevant to this Handler.
-    fn drop(&mut self) {
-        self.leave();
-    }
+    fn drop(&mut self) { self.leave(); }
 }

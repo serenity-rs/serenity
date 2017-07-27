@@ -2,7 +2,7 @@ use chrono::Utc;
 use std::collections::HashMap;
 use std::default::Default;
 use client::Context;
-use model::{GuildId, ChannelId, UserId};
+use model::{ChannelId, GuildId, UserId};
 
 pub(crate) struct Ratelimit {
     pub delay: i64,
@@ -19,16 +19,18 @@ pub(crate) struct MemberRatelimit {
 pub(crate) struct Bucket {
     pub ratelimit: Ratelimit,
     pub users: HashMap<u64, MemberRatelimit>,
-    #[cfg(feature="cache")]
-    pub check: Option<Box<Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + 'static>>,
-    #[cfg(not(feature="cache"))]
+    #[cfg(feature = "cache")]
+    pub check:
+        Option<Box<Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + 'static>>,
+    #[cfg(not(feature = "cache"))]
     pub checK: Option<Box<Fn(&mut Context, ChannelId, UserId) -> bool + 'static>>,
 }
 
 impl Bucket {
     pub fn take(&mut self, user_id: u64) -> i64 {
         let time = Utc::now().timestamp();
-        let user = self.users.entry(user_id)
+        let user = self.users
+            .entry(user_id)
             .or_insert_with(MemberRatelimit::default);
 
         if let Some((timespan, limit)) = self.ratelimit.limit {

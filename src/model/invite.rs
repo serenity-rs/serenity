@@ -1,14 +1,14 @@
 use chrono::{DateTime, FixedOffset};
 use super::*;
 
-#[cfg(feature="cache")]
+#[cfg(feature = "cache")]
 use super::{permissions, utils as model_utils};
-#[cfg(feature="model")]
-use ::builder::CreateInvite;
-#[cfg(feature="model")]
-use ::http;
-#[cfg(feature="model")]
-use ::internal::prelude::*;
+#[cfg(feature = "model")]
+use builder::CreateInvite;
+#[cfg(feature = "model")]
+use http;
+#[cfg(feature = "model")]
+use internal::prelude::*;
 
 /// Information about an invite code.
 ///
@@ -40,7 +40,7 @@ pub struct Invite {
     pub guild: InviteGuild,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl Invite {
     /// Creates an invite for a [`GuildChannel`], providing a builder so that
     /// fields may optionally be set.
@@ -61,10 +61,12 @@ impl Invite {
     /// [Create Invite]: permissions/constant.CREATE_INVITE.html
     /// [permission]: permissions/index.html
     pub fn create<C, F>(channel_id: C, f: F) -> Result<RichInvite>
-        where C: Into<ChannelId>, F: FnOnce(CreateInvite) -> CreateInvite {
+    where
+        C: Into<ChannelId>,
+        F: FnOnce(CreateInvite) -> CreateInvite, {
         let channel_id = channel_id.into();
 
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             let req = permissions::CREATE_INVITE;
 
@@ -89,7 +91,7 @@ impl Invite {
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     /// [permission]: permissions/index.html
     pub fn delete(&self) -> Result<Invite> {
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             let req = permissions::MANAGE_GUILD;
 
@@ -106,7 +108,7 @@ impl Invite {
     pub fn get(code: &str, stats: bool) -> Result<Invite> {
         let mut invite = code;
 
-        #[cfg(feature="utils")]
+        #[cfg(feature = "utils")]
         {
             invite = ::utils::parse_invite(invite);
         }
@@ -144,9 +146,7 @@ impl Invite {
     /// #
     /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
     /// ```
-    pub fn url(&self) -> String {
-        format!("https://discord.gg/{}", self.code)
-    }
+    pub fn url(&self) -> String { format!("https://discord.gg/{}", self.code) }
 }
 
 /// A inimal information about the channel an invite points to.
@@ -154,7 +154,7 @@ impl Invite {
 pub struct InviteChannel {
     pub id: ChannelId,
     pub name: String,
-    #[serde(rename="type")]
+    #[serde(rename = "type")]
     pub kind: ChannelType,
 }
 
@@ -169,7 +169,7 @@ pub struct InviteGuild {
     pub voice_channel_count: Option<u64>,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl InviteGuild {
     /// Returns the Id of the shard associated with the guild.
     ///
@@ -181,11 +181,9 @@ impl InviteGuild {
     /// total, consider using [`utils::shard_id`].
     ///
     /// [`utils::shard_id`]: ../utils/fn.shard_id.html
-    #[cfg(all(feature="cache", feature="utils"))]
+    #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self) -> u64 {
-        self.id.shard_id()
-    }
+    pub fn shard_id(&self) -> u64 { self.id.shard_id() }
 
     /// Returns the Id of the shard associated with the guild.
     ///
@@ -207,11 +205,9 @@ impl InviteGuild {
     ///
     /// assert_eq!(guild.shard_id(17), 7);
     /// ```
-    #[cfg(all(feature="utils", not(feature="cache")))]
+    #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
-    pub fn shard_id(&self, shard_count: u64) -> u64 {
-        self.id.shard_id(shard_count)
-    }
+    pub fn shard_id(&self, shard_count: u64) -> u64 { self.id.shard_id(shard_count) }
 }
 
 /// Detailed information about an invite.
@@ -255,7 +251,7 @@ pub struct RichInvite {
     pub uses: u64,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl RichInvite {
     /// Deletes the invite.
     ///
@@ -275,7 +271,7 @@ impl RichInvite {
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     /// [permission]: permissions/index.html
     pub fn delete(&self) -> Result<Invite> {
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             let req = permissions::MANAGE_GUILD;
 
@@ -327,7 +323,5 @@ impl RichInvite {
     /// #
     /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
     /// ```
-    pub fn url(&self) -> String {
-        format!("https://discord.gg/{}", self.code)
-    }
+    pub fn url(&self) -> String { format!("https://discord.gg/{}", self.code) }
 }

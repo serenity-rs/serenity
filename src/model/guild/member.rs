@@ -1,20 +1,20 @@
 use chrono::{DateTime, FixedOffset};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_sync_user;
-use ::model::*;
+use model::*;
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use std::borrow::Cow;
-#[cfg(feature="cache")]
-use ::CACHE;
-#[cfg(feature="cache")]
-use ::internal::prelude::*;
-#[cfg(all(feature="cache", feature="model"))]
-use ::http;
-#[cfg(all(feature="builder", feature="cache", feature="model"))]
-use ::builder::EditMember;
-#[cfg(all(feature="cache", feature="model", feature="utils"))]
-use ::utils::Colour;
+#[cfg(feature = "cache")]
+use CACHE;
+#[cfg(feature = "cache")]
+use internal::prelude::*;
+#[cfg(all(feature = "cache", feature = "model"))]
+use http;
+#[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
+use builder::EditMember;
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use utils::Colour;
 
 pub trait BanOptions {
     fn dmd(&self) -> u8 { 0 }
@@ -22,41 +22,27 @@ pub trait BanOptions {
 }
 
 impl BanOptions for u8 {
-    fn dmd(&self) -> u8 {
-        *self
-    }
+    fn dmd(&self) -> u8 { *self }
 }
 
 impl BanOptions for str {
-    fn reason(&self) -> &str {
-        self
-    }
+    fn reason(&self) -> &str { self }
 }
 
 impl BanOptions for String {
-    fn reason(&self) -> &str {
-        &self
-    }
+    fn reason(&self) -> &str { &self }
 }
 
 impl<'a> BanOptions for (u8, &'a str) {
-    fn dmd(&self) -> u8 {
-        self.0
-    }
+    fn dmd(&self) -> u8 { self.0 }
 
-    fn reason(&self) -> &str {
-        self.1
-    }
+    fn reason(&self) -> &str { self.1 }
 }
 
 impl BanOptions for (u8, String) {
-    fn dmd(&self) -> u8 {
-        self.0
-    }
+    fn dmd(&self) -> u8 { self.0 }
 
-    fn reason(&self) -> &str {
-        &self.1
-    }
+    fn reason(&self) -> &str { &self.1 }
 }
 
 /// Information about a member of a guild.
@@ -77,11 +63,11 @@ pub struct Member {
     /// Vector of Ids of [`Role`]s given to the member.
     pub roles: Vec<RoleId>,
     /// Attached User struct.
-    #[serde(deserialize_with="deserialize_sync_user")]
+    #[serde(deserialize_with = "deserialize_sync_user")]
     pub user: Arc<RwLock<User>>,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl Member {
     /// Adds a [`Role`] to the member, editing its roles in-place if the request
     /// was successful.
@@ -90,7 +76,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn add_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
         let role_id = role_id.into();
 
@@ -115,7 +101,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn add_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         self.roles.extend_from_slice(role_ids);
 
@@ -127,7 +113,7 @@ impl Member {
                 self.roles.retain(|r| !role_ids.contains(r));
 
                 Err(why)
-            }
+            },
         }
     }
 
@@ -144,19 +130,22 @@ impl Member {
     /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
     ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn ban<BO: BanOptions>(&self, ban_options: BO) -> Result<()> {
         let reason = ban_options.reason();
-        
+
         if reason.len() > 512 {
             return Err(Error::ExceededLimit);
         }
 
-        http::ban_user(self.guild_id.0, self.user.read().unwrap().id.0, ban_options.dmd(), &*reason)
+        http::ban_user(self.guild_id.0,
+                       self.user.read().unwrap().id.0,
+                       ban_options.dmd(),
+                       &*reason)
     }
 
     /// Determines the member's colour.
-    #[cfg(all(feature="cache", feature="utils"))]
+    #[cfg(all(feature = "cache", feature = "utils"))]
     pub fn colour(&self) -> Option<Colour> {
         let cache = CACHE.read().unwrap();
         let guild = match cache.guilds.get(&self.guild_id) {
@@ -172,7 +161,10 @@ impl Member {
 
         let default = Colour::default();
 
-        roles.iter().find(|r| r.colour.0 != default.0).map(|r| r.colour)
+        roles
+            .iter()
+            .find(|r| r.colour.0 != default.0)
+            .map(|r| r.colour)
     }
 
     /// Calculates the member's display name.
@@ -180,7 +172,8 @@ impl Member {
     /// The nickname takes priority over the member's username if it exists.
     #[inline]
     pub fn display_name(&self) -> Cow<String> {
-        self.nick.as_ref()
+        self.nick
+            .as_ref()
             .map(Cow::Borrowed)
             .unwrap_or_else(|| Cow::Owned(self.user.read().unwrap().name.clone()))
     }
@@ -188,7 +181,9 @@ impl Member {
     /// Returns the DiscordTag of a Member, taking possible nickname into account.
     #[inline]
     pub fn distinct(&self) -> String {
-        format!("{}#{}", self.display_name(), self.user.read().unwrap().discriminator)
+        format!("{}#{}",
+                self.display_name(),
+                self.user.read().unwrap().discriminator)
     }
 
     /// Edits the member with the given data. See [`Guild::edit_member`] for
@@ -199,7 +194,7 @@ impl Member {
     ///
     /// [`Guild::edit_member`]: ../model/struct.Guild.html#method.edit_member
     /// [`EditMember`]: ../builder/struct.EditMember.html
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F) -> Result<()> {
         let map = f(EditMember::default()).0;
 
@@ -240,7 +235,7 @@ impl Member {
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     pub fn kick(&self) -> Result<()> {
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             let req = permissions::KICK_MEMBERS;
 
@@ -265,7 +260,8 @@ impl Member {
     ///
     /// ```rust,ignore
     /// // assuming there's a `member` variable gotten from anything.
-    /// println!("The permission bits for the member are: {}", member.permissions().expect("permissions").bits);
+    /// println!("The permission bits for the member are: {}",
+    /// member.permissions().expect("permissions").bits);
     /// ```
     ///
     /// # Errors
@@ -274,7 +270,7 @@ impl Member {
     /// found in the cache.
     ///
     /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn permissions(&self) -> Result<Permissions> {
         let guild = match self.guild_id.find() {
             Some(guild) => guild,
@@ -293,7 +289,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn remove_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
         let role_id = role_id.into();
 
@@ -317,7 +313,7 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn remove_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         self.roles.retain(|r| !role_ids.contains(r));
 
@@ -338,25 +334,29 @@ impl Member {
     /// This is shorthand for manually searching through the CACHE.
     ///
     /// If role data can not be found for the member, then `None` is returned.
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn roles(&self) -> Option<Vec<Role>> {
-        CACHE.read().unwrap()
+        CACHE
+            .read()
+            .unwrap()
             .guilds
             .values()
-            .find(|guild| guild
-                .read()
-                .unwrap()
-                .members
-                .values()
-                .any(|m| m.user.read().unwrap().id == self.user.read().unwrap().id && m.joined_at == self.joined_at))
-            .map(|guild| guild
-                .read()
-                .unwrap()
-                .roles
-                .values()
-                .filter(|role| self.roles.contains(&role.id))
-                .cloned()
-                .collect())
+            .find(|guild| {
+                guild.read().unwrap().members.values().any(|m| {
+                    m.user.read().unwrap().id == self.user.read().unwrap().id &&
+                    m.joined_at == self.joined_at
+                })
+            })
+            .map(|guild| {
+                guild
+                    .read()
+                    .unwrap()
+                    .roles
+                    .values()
+                    .filter(|role| self.roles.contains(&role.id))
+                    .cloned()
+                    .collect()
+            })
     }
 
     /// Unbans the [`User`] from the guild.
@@ -371,7 +371,7 @@ impl Member {
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn unban(&self) -> Result<()> {
         http::remove_ban(self.guild_id.0, self.user.read().unwrap().id.0)
     }

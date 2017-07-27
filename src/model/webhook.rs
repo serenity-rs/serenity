@@ -1,13 +1,13 @@
 use super::*;
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use std::mem;
-#[cfg(feature="model")]
-use ::builder::ExecuteWebhook;
-#[cfg(feature="model")]
-use ::internal::prelude::*;
-#[cfg(feature="model")]
-use ::http;
+#[cfg(feature = "model")]
+use builder::ExecuteWebhook;
+#[cfg(feature = "model")]
+use internal::prelude::*;
+#[cfg(feature = "model")]
+use http;
 
 /// A representation of a webhook, which is a low-effort way to post messages to
 /// channels. They do not necessarily require a bot user or authentication to
@@ -42,7 +42,7 @@ pub struct Webhook {
     pub user: Option<User>,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl Webhook {
     /// Deletes the webhook.
     ///
@@ -51,9 +51,7 @@ impl Webhook {
     ///
     /// [`http::delete_webhook_with_token`]: ../http/fn.delete_webhook_with_token.html
     #[inline]
-    pub fn delete(&self) -> Result<()> {
-        http::delete_webhook_with_token(self.id.0, &self.token)
-    }
+    pub fn delete(&self) -> Result<()> { http::delete_webhook_with_token(self.id.0, &self.token) }
 
     ///
     /// Edits the webhook in-place. All fields are optional.
@@ -109,11 +107,12 @@ impl Webhook {
         let mut map = Map::new();
 
         if let Some(avatar) = avatar {
-            map.insert("avatar".to_owned(), if avatar.is_empty() {
-                Value::Null
-            } else {
-                Value::String(avatar.to_owned())
-            });
+            map.insert("avatar".to_owned(),
+                       if avatar.is_empty() {
+                           Value::Null
+                       } else {
+                           Value::String(avatar.to_owned())
+                       });
         }
 
         if let Some(name) = name {
@@ -178,9 +177,14 @@ impl Webhook {
     ///     .expect("Error executing");
     /// ```
     #[inline]
-    pub fn execute<F: FnOnce(ExecuteWebhook) -> ExecuteWebhook>(&self, wait: bool, f: F)
-        -> Result<Option<Message>> {
-        http::execute_webhook(self.id.0, &self.token, wait, &f(ExecuteWebhook::default()).0)
+    pub fn execute<F: FnOnce(ExecuteWebhook) -> ExecuteWebhook>(&self,
+                                                                wait: bool,
+                                                                f: F)
+                                                                -> Result<Option<Message>> {
+        http::execute_webhook(self.id.0,
+                              &self.token,
+                              wait,
+                              &f(ExecuteWebhook::default()).0)
     }
 
     /// Retrieves the latest information about the webhook, editing the
@@ -202,7 +206,7 @@ impl Webhook {
     }
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl WebhookId {
     /// Retrieves the webhook by the Id.
     ///
@@ -210,7 +214,5 @@ impl WebhookId {
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[inline]
-    pub fn get(&self) -> Result<Webhook> {
-        http::get_webhook(self.0)
-    }
+    pub fn get(&self) -> Result<Webhook> { http::get_webhook(self.0) }
 }

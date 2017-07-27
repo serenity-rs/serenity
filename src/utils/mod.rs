@@ -6,10 +6,10 @@ mod colour;
 mod message_builder;
 
 pub use self::colour::Colour;
-pub use self::message_builder::{MessageBuilder, Content, ContentModifier};
+pub use self::message_builder::{Content, ContentModifier, MessageBuilder};
 
 // Note: Here for BC purposes.
-#[cfg(feature="builder")]
+#[cfg(feature = "builder")]
 pub use super::builder;
 
 use base64;
@@ -17,8 +17,8 @@ use std::ffi::OsStr;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
-use ::internal::prelude::*;
-use ::model::{EmojiIdentifier, EmojiId};
+use internal::prelude::*;
+use model::{EmojiId, EmojiIdentifier};
 
 /// Determines if a name is NSFW.
 ///
@@ -299,11 +299,13 @@ pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
         }
 
         match id.parse::<u64>() {
-            Ok(x) => Some(EmojiIdentifier {
-                name: name,
-                id: EmojiId(x)
-            }),
-            _ => None
+            Ok(x) => {
+                Some(EmojiIdentifier {
+                         name: name,
+                         id: EmojiId(x),
+                     })
+            },
+            _ => None,
         }
     } else {
         None
@@ -431,6 +433,4 @@ pub fn parse_quotes(s: &str) -> Vec<String> {
 /// assert_eq!(utils::shard_id(81384788765712384, 17), 7);
 /// ```
 #[inline]
-pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 {
-    (guild_id >> 22) % shard_count
-}
+pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % shard_count }

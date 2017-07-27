@@ -1,14 +1,14 @@
 use chrono::{DateTime, FixedOffset};
-use ::model::*;
+use model::*;
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use std::borrow::Cow;
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use std::fmt::Write as FmtWrite;
-#[cfg(feature="model")]
-use ::builder::{CreateMessage, GetMessages};
-#[cfg(feature="model")]
-use ::http::{self, AttachmentType};
+#[cfg(feature = "model")]
+use builder::{CreateMessage, GetMessages};
+#[cfg(feature = "model")]
+use http::{self, AttachmentType};
 
 /// A group channel - potentially including other [`User`]s - separate from a
 /// [`Guild`].
@@ -18,7 +18,7 @@ use ::http::{self, AttachmentType};
 #[derive(Clone, Debug, Deserialize)]
 pub struct Group {
     /// The Id of the group channel.
-    #[serde(rename="id")]
+    #[serde(rename = "id")]
     pub channel_id: ChannelId,
     /// The optional icon of the group channel.
     pub icon: Option<String>,
@@ -31,11 +31,11 @@ pub struct Group {
     /// The Id of the group owner.
     pub owner_id: UserId,
     /// A map of the group's recipients.
-    #[serde(deserialize_with="deserialize_users")]
+    #[serde(deserialize_with = "deserialize_users")]
     pub recipients: HashMap<UserId, Arc<RwLock<User>>>,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl Group {
     /// Adds the given user to the group. If the user is already in the group,
     /// then nothing is done.
@@ -59,9 +59,7 @@ impl Group {
 
     /// Broadcasts that the current user is typing in the group.
     #[inline]
-    pub fn broadcast_typing(&self) -> Result<()> {
-        self.channel_id.broadcast_typing()
-    }
+    pub fn broadcast_typing(&self) -> Result<()> { self.channel_id.broadcast_typing() }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
     ///
@@ -76,8 +74,10 @@ impl Group {
     /// [`Message::react`]: struct.Message.html#method.react
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     #[inline]
-    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R)
-        -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
+    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
+    where
+        M: Into<MessageId>,
+        R: Into<ReactionType>, {
         self.channel_id.create_reaction(message_id, reaction_type)
     }
 
@@ -119,9 +119,16 @@ impl Group {
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn delete_reaction<M, R>(&self, message_id: M, user_id: Option<UserId>, reaction_type: R)
-        -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
-        self.channel_id.delete_reaction(message_id, user_id, reaction_type)
+    pub fn delete_reaction<M, R>(&self,
+                                 message_id: M,
+                                 user_id: Option<UserId>,
+                                 reaction_type: R)
+                                 -> Result<()>
+    where
+        M: Into<MessageId>,
+        R: Into<ReactionType>, {
+        self.channel_id
+            .delete_reaction(message_id, user_id, reaction_type)
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -145,14 +152,17 @@ impl Group {
     /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
+    where
+        F: FnOnce(CreateMessage) -> CreateMessage,
+        M: Into<MessageId>, {
         self.channel_id.edit_message(message_id, f)
     }
 
     /// Returns the formatted URI of the group's icon if one exists.
     pub fn icon_url(&self) -> Option<String> {
-        self.icon.as_ref().map(|icon|
-            format!(cdn!("/channel-icons/{}/{}.webp"), self.channel_id, icon))
+        self.icon
+            .as_ref()
+            .map(|icon| format!(cdn!("/channel-icons/{}/{}.webp"), self.channel_id, icon))
     }
 
     /// Determines if the channel is NSFW.
@@ -164,15 +174,11 @@ impl Group {
     ///
     /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
     #[inline]
-    pub fn is_nsfw(&self) -> bool {
-        false
-    }
+    pub fn is_nsfw(&self) -> bool { false }
 
     /// Leaves the group.
     #[inline]
-    pub fn leave(&self) -> Result<Group> {
-        http::leave_group(self.channel_id.0)
-    }
+    pub fn leave(&self) -> Result<Group> { http::leave_group(self.channel_id.0) }
 
     /// Gets a message from the channel.
     ///
@@ -191,7 +197,8 @@ impl Group {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-        where F: FnOnce(GetMessages) -> GetMessages {
+    where
+        F: FnOnce(GetMessages) -> GetMessages, {
         self.channel_id.messages(f)
     }
 
@@ -214,15 +221,13 @@ impl Group {
                 }
 
                 Cow::Owned(name)
-            }
+            },
         }
     }
 
     /// Retrieves the list of messages that have been pinned in the group.
     #[inline]
-    pub fn pins(&self) -> Result<Vec<Message>> {
-        self.channel_id.pins()
-    }
+    pub fn pins(&self) -> Result<Vec<Message>> { self.channel_id.pins() }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
@@ -242,8 +247,13 @@ impl Group {
                                    reaction_type: R,
                                    limit: Option<u8>,
                                    after: Option<U>)
-        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.channel_id.reaction_users(message_id, reaction_type, limit, after)
+                                   -> Result<Vec<User>>
+    where
+        M: Into<MessageId>,
+        R: Into<ReactionType>,
+        U: Into<UserId>, {
+        self.channel_id
+            .reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Removes a recipient from the group. If the recipient is already not in
@@ -272,9 +282,7 @@ impl Group {
     /// [`ChannelId`]: ../model/struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
-    pub fn say(&self, content: &str) -> Result<Message> {
-        self.channel_id.say(content)
-    }
+    pub fn say(&self, content: &str) -> Result<Message> { self.channel_id.say(content) }
 
     /// Sends (a) file(s) along with optional message contents.
     ///
@@ -296,7 +304,9 @@ impl Group {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
     pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
+    where
+        F: FnOnce(CreateMessage) -> CreateMessage,
+        T: Into<AttachmentType<'a>>, {
         self.channel_id.send_files(files, f)
     }
 

@@ -30,17 +30,12 @@ mod error;
 pub use self::error::Error as HttpError;
 pub use hyper::status::{StatusClass, StatusCode};
 
-use hyper::client::{
-    Client as HyperClient,
-    RequestBuilder,
-    Response as HyperResponse,
-    Request,
-};
+use hyper::client::{Client as HyperClient, Request, RequestBuilder, Response as HyperResponse};
 use hyper::header::ContentType;
 use hyper::method::Method;
 use hyper::mime::{Mime, SubLevel, TopLevel};
 use hyper::net::HttpsConnector;
-use hyper::{Error as HyperError, Result as HyperResult, Url, header};
+use hyper::{header, Error as HyperError, Result as HyperResult, Url};
 use hyper_native_tls::NativeTlsClient;
 use multipart::client::Multipart;
 use self::ratelimiting::Route;
@@ -52,9 +47,9 @@ use std::fs::File;
 use std::io::{ErrorKind as IoErrorKind, Read};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
-use ::constants;
-use ::internal::prelude::*;
-use ::model::*;
+use constants;
+use internal::prelude::*;
+use model::*;
 
 /// An method used for ratelimiting special routes.
 ///
@@ -84,9 +79,7 @@ lazy_static! {
 /// This is intended for internal use! The only exception are webhooks.
 /// But really, please don't use this.
 #[doc(hidden)]
-pub fn set_token(token: &str) {
-    TOKEN.lock().unwrap().clone_from(&token.to_owned());
-}
+pub fn set_token(token: &str) { TOKEN.lock().unwrap().clone_from(&token.to_owned()); }
 
 /// Adds a [`User`] as a recipient to a [`Group`].
 ///
@@ -96,11 +89,12 @@ pub fn set_token(token: &str) {
 /// [`Group::add_recipient`]: ../model/struct.Group.html#method.add_recipient
 /// [`User`]: ../model/struct.User.html
 pub fn add_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
-    verify(204, request!(Route::None,
-                         put,
-                         "/channels/{}/recipients/{}",
-                         group_id,
-                         user_id))
+    verify(204,
+           request!(Route::None,
+                    put,
+                    "/channels/{}/recipients/{}",
+                    group_id,
+                    user_id))
 }
 
 /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
@@ -113,12 +107,13 @@ pub fn add_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 /// [`Role`]: ../model/struct.Role.html
 /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
 pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
-    verify(204, request!(Route::GuildsIdMembersIdRolesId(guild_id),
-                         put,
-                         "/guilds/{}/members/{}/roles/{}",
-                         guild_id,
-                         user_id,
-                         role_id))
+    verify(204,
+           request!(Route::GuildsIdMembersIdRolesId(guild_id),
+                    put,
+                    "/guilds/{}/members/{}/roles/{}",
+                    guild_id,
+                    user_id,
+                    role_id))
 }
 
 /// Bans a [`User`] from a [`Guild`], removing their messages sent in the last
@@ -133,13 +128,14 @@ pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> 
 /// [`User`]: ../model/struct.User.html
 /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
 pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
-    verify(204, request!(Route::GuildsIdBansUserId(guild_id),
-                         put,
-                         "/guilds/{}/bans/{}?delete_message_days={}&reason={}",
-                         guild_id,
-                         user_id,
-                         delete_message_days,
-                         reason))
+    verify(204,
+           request!(Route::GuildsIdBansUserId(guild_id),
+                    put,
+                    "/guilds/{}/bans/{}?delete_message_days={}&reason={}",
+                    guild_id,
+                    user_id,
+                    delete_message_days,
+                    reason))
 }
 
 /// Broadcasts that the current user is typing in the given [`Channel`].
@@ -152,10 +148,11 @@ pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &s
 ///
 /// [`Channel`]: ../model/enum.Channel.html
 pub fn broadcast_typing(channel_id: u64) -> Result<()> {
-    verify(204, request!(Route::ChannelsIdTyping(channel_id),
-                         post,
-                         "/channels/{}/typing",
-                         channel_id))
+    verify(204,
+           request!(Route::ChannelsIdTyping(channel_id),
+                    post,
+                    "/channels/{}/typing",
+                    channel_id))
 }
 
 /// Creates a [`GuildChannel`] in the [`Guild`] given its Id.
@@ -231,7 +228,8 @@ pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
 /// [`Shard`]: ../gateway/struct.Shard.html
 /// [GameBridge]: https://discordapp.com/developers/docs/topics/gamebridge
 /// [US West Region]: ../model/enum.Region.html#variant.UsWest
-/// [documentation on this endpoint]: https://discordapp.com/developers/docs/resources/guild#create-guild
+/// [documentation on this endpoint]:
+/// https://discordapp.com/developers/docs/resources/guild#create-guild
 /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
 pub fn create_guild(map: &Value) -> Result<PartialGuild> {
     let body = map.to_string();
@@ -253,11 +251,12 @@ pub fn create_guild(map: &Value) -> Result<PartialGuild> {
 pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: &Value) -> Result<()> {
     let body = map.to_string();
 
-    verify(204, request!(Route::GuildsIdIntegrations(guild_id),
-                         post(body),
-                         "/guilds/{}/integrations/{}",
-                         guild_id,
-                         integration_id))
+    verify(204,
+           request!(Route::GuildsIdIntegrations(guild_id),
+                    post(body),
+                    "/guilds/{}/integrations/{}",
+                    guild_id,
+                    integration_id))
 }
 
 /// Creates a [`RichInvite`] for the given [channel][`GuildChannel`].
@@ -286,19 +285,18 @@ pub fn create_invite(channel_id: u64, map: &JsonMap) -> Result<RichInvite> {
 pub fn create_permission(channel_id: u64, target_id: u64, map: &Value) -> Result<()> {
     let body = map.to_string();
 
-    verify(204, request!(Route::ChannelsIdPermissionsOverwriteId(channel_id),
-                         put(body),
-                         "/channels/{}/permissions/{}",
-                         channel_id,
-                         target_id))
+    verify(204,
+           request!(Route::ChannelsIdPermissionsOverwriteId(channel_id),
+                    put(body),
+                    "/channels/{}/permissions/{}",
+                    channel_id,
+                    target_id))
 }
 
 /// Creates a private channel with a user.
 pub fn create_private_channel(map: &Value) -> Result<PrivateChannel> {
     let body = map.to_string();
-    let response = request!(Route::UsersMeChannels,
-                            post(body),
-                            "/users/@me/channels");
+    let response = request!(Route::UsersMeChannels, post(body), "/users/@me/channels");
 
     serde_json::from_reader::<HyperResponse, PrivateChannel>(response).map_err(From::from)
 }
@@ -308,12 +306,13 @@ pub fn create_reaction(channel_id: u64,
                        message_id: u64,
                        reaction_type: &ReactionType)
                        -> Result<()> {
-    verify(204, request!(Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
-                         put,
-                         "/channels/{}/messages/{}/reactions/{}/@me",
-                         channel_id,
-                         message_id,
-                         reaction_type.as_data()))
+    verify(204,
+           request!(Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
+                    put,
+                    "/channels/{}/messages/{}/reactions/{}/@me",
+                    channel_id,
+                    message_id,
+                    reaction_type.as_data()))
 }
 
 /// Creates a role.
@@ -379,30 +378,29 @@ pub fn delete_channel(channel_id: u64) -> Result<Channel> {
 
 /// Deletes an emoji from a server.
 pub fn delete_emoji(guild_id: u64, emoji_id: u64) -> Result<()> {
-    verify(204, request!(Route::GuildsIdEmojisId(guild_id),
-                         delete,
-                         "/guilds/{}/emojis/{}",
-                         guild_id,
-                         emoji_id))
+    verify(204,
+           request!(Route::GuildsIdEmojisId(guild_id),
+                    delete,
+                    "/guilds/{}/emojis/{}",
+                    guild_id,
+                    emoji_id))
 }
 
 /// Deletes a guild, only if connected account owns it.
 pub fn delete_guild(guild_id: u64) -> Result<PartialGuild> {
-    let response = request!(Route::GuildsId(guild_id),
-                            delete,
-                            "/guilds/{}",
-                            guild_id);
+    let response = request!(Route::GuildsId(guild_id), delete, "/guilds/{}", guild_id);
 
     serde_json::from_reader::<HyperResponse, PartialGuild>(response).map_err(From::from)
 }
 
 /// Remvoes an integration from a guild.
 pub fn delete_guild_integration(guild_id: u64, integration_id: u64) -> Result<()> {
-    verify(204, request!(Route::GuildsIdIntegrationsId(guild_id),
-                         delete,
-                         "/guilds/{}/integrations/{}",
-                         guild_id,
-                         integration_id))
+    verify(204,
+           request!(Route::GuildsIdIntegrationsId(guild_id),
+                    delete,
+                    "/guilds/{}/integrations/{}",
+                    guild_id,
+                    integration_id))
 }
 
 /// Deletes an invite by code.
@@ -415,21 +413,23 @@ pub fn delete_invite(code: &str) -> Result<Invite> {
 /// Deletes a message if created by us or we have
 /// specific permissions.
 pub fn delete_message(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(204, request!(Route::ChannelsIdMessagesId(LightMethod::Delete, channel_id),
-                         delete,
-                         "/channels/{}/messages/{}",
-                         channel_id,
-                         message_id))
+    verify(204,
+           request!(Route::ChannelsIdMessagesId(LightMethod::Delete, channel_id),
+                    delete,
+                    "/channels/{}/messages/{}",
+                    channel_id,
+                    message_id))
 }
 
 /// Deletes a bunch of messages, only works for bots.
 pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
     let body = map.to_string();
 
-    verify(204, request!(Route::ChannelsIdMessagesBulkDelete(channel_id),
-                         post(body),
-                         "/channels/{}/messages/bulk_delete",
-                         channel_id))
+    verify(204,
+           request!(Route::ChannelsIdMessagesBulkDelete(channel_id),
+                    post(body),
+                    "/channels/{}/messages/bulk_delete",
+                    channel_id))
 }
 
 /// Deletes all of the [`Reaction`]s associated with a [`Message`].
@@ -450,20 +450,22 @@ pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
 /// [`Message`]: ../model/struct.Message.html
 /// [`Reaction`]: ../model/struct.Reaction.html
 pub fn delete_message_reactions(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(204, request!(Route::ChannelsIdMessagesIdReactions(channel_id),
-                         delete,
-                         "/channels/{}/messages/{}/reactions",
-                         channel_id,
-                         message_id))
+    verify(204,
+           request!(Route::ChannelsIdMessagesIdReactions(channel_id),
+                    delete,
+                    "/channels/{}/messages/{}/reactions",
+                    channel_id,
+                    message_id))
 }
 
 /// Deletes a permission override from a role or a member in a channel.
 pub fn delete_permission(channel_id: u64, target_id: u64) -> Result<()> {
-    verify(204, request!(Route::ChannelsIdPermissionsOverwriteId(channel_id),
-                         delete,
-                         "/channels/{}/permissions/{}",
-                         channel_id,
-                         target_id))
+    verify(204,
+           request!(Route::ChannelsIdPermissionsOverwriteId(channel_id),
+                    delete,
+                    "/channels/{}/permissions/{}",
+                    channel_id,
+                    target_id))
 }
 
 /// Deletes a reaction from a message if owned by us or
@@ -473,24 +475,28 @@ pub fn delete_reaction(channel_id: u64,
                        user_id: Option<u64>,
                        reaction_type: &ReactionType)
                        -> Result<()> {
-    let user = user_id.map(|uid| uid.to_string()).unwrap_or_else(|| "@me".to_string());
+    let user = user_id
+        .map(|uid| uid.to_string())
+        .unwrap_or_else(|| "@me".to_string());
 
-    verify(204, request!(Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
-                         delete,
-                         "/channels/{}/messages/{}/reactions/{}/{}",
-                         channel_id,
-                         message_id,
-                         reaction_type.as_data(),
-                         user))
+    verify(204,
+           request!(Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
+                    delete,
+                    "/channels/{}/messages/{}/reactions/{}/{}",
+                    channel_id,
+                    message_id,
+                    reaction_type.as_data(),
+                    user))
 }
 
 /// Deletes a role from a server. Can't remove the default everyone role.
 pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
-    verify(204, request!(Route::GuildsIdRolesId(guild_id),
-                         delete,
-                         "/guilds/{}/roles/{}",
-                         guild_id,
-                         role_id))
+    verify(204,
+           request!(Route::GuildsIdRolesId(guild_id),
+                    delete,
+                    "/guilds/{}/roles/{}",
+                    guild_id,
+                    role_id))
 }
 
 /// Deletes a [`Webhook`] given its Id.
@@ -516,7 +522,8 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 /// [`Webhook`]: ../model/struct.Webhook.html
 /// [`delete_webhook_with_token`]: fn.delete_webhook_with_token.html
 pub fn delete_webhook(webhook_id: u64) -> Result<()> {
-    verify(204, request!(Route::WebhooksId, delete, "/webhooks/{}", webhook_id))
+    verify(204,
+           request!(Route::WebhooksId, delete, "/webhooks/{}", webhook_id))
 }
 
 /// Deletes a [`Webhook`] given its Id and unique token.
@@ -540,9 +547,9 @@ pub fn delete_webhook(webhook_id: u64) -> Result<()> {
 pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
     let client = request_client!();
 
-    verify(204, retry(|| client
-        .delete(&format!(api!("/webhooks/{}/{}"), webhook_id, token)))
-        .map_err(Error::Hyper)?)
+    verify(204,
+           retry(|| client.delete(&format!(api!("/webhooks/{}/{}"), webhook_id, token)))
+               .map_err(Error::Hyper)?)
 }
 
 /// Changes channel information.
@@ -596,11 +603,12 @@ pub fn edit_guild_embed(guild_id: u64, map: &Value) -> Result<GuildEmbed> {
 pub fn edit_member(guild_id: u64, user_id: u64, map: &JsonMap) -> Result<()> {
     let body = serde_json::to_string(map)?;
 
-    verify(204, request!(Route::GuildsIdMembersId(guild_id),
-                         patch(body),
-                         "/guilds/{}/members/{}",
-                         guild_id,
-                         user_id))
+    verify(204,
+           request!(Route::GuildsIdMembersId(guild_id),
+                    patch(body),
+                    "/guilds/{}/members/{}",
+                    guild_id,
+                    user_id))
 }
 
 /// Edits a message by Id.
@@ -623,9 +631,7 @@ pub fn edit_message(channel_id: u64, message_id: u64, map: &Value) -> Result<Mes
 ///
 /// [`Guild`]: ../model/struct.Guild.html
 pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
-    let map = json!({
-        "nick": new_nickname
-    });
+    let map = json!({ "nick": new_nickname });
     let body = map.to_string();
     let response = request!(Route::GuildsIdMembersMeNick(guild_id),
                             patch(body),
@@ -717,10 +723,7 @@ pub fn edit_role(guild_id: u64, role_id: u64, map: &JsonMap) -> Result<Role> {
 // external crates being incredibly messy and misleading in the end user's view.
 pub fn edit_webhook(webhook_id: u64, map: &Value) -> Result<Webhook> {
     let body = map.to_string();
-    let response = request!(Route::WebhooksId,
-                            patch(body),
-                            "/webhooks/{}",
-                            webhook_id);
+    let response = request!(Route::WebhooksId, patch(body), "/webhooks/{}", webhook_id);
 
     serde_json::from_reader::<HyperResponse, Webhook>(response).map_err(From::from)
 }
@@ -755,10 +758,11 @@ pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &JsonMap) -> R
     let body = serde_json::to_string(map)?;
     let client = request_client!();
 
-    let response = retry(|| client
-        .patch(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
-        .body(&body))
-        .map_err(Error::Hyper)?;
+    let response = retry(|| {
+        client
+            .patch(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
+            .body(&body)
+    }).map_err(Error::Hyper)?;
 
     serde_json::from_reader::<HyperResponse, Webhook>(response).map_err(From::from)
 }
@@ -823,23 +827,29 @@ pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &JsonMap) -> R
 /// [`Channel`]: ../model/enum.Channel.html
 /// [`Message`]: ../model/struct.Message.html
 /// [Discord docs]: https://discordapp.com/developers/docs/resources/webhook#querystring-params
-pub fn execute_webhook(webhook_id: u64, token: &str, wait: bool, map: &JsonMap)
-    -> Result<Option<Message>> {
+pub fn execute_webhook(webhook_id: u64,
+                       token: &str,
+                       wait: bool,
+                       map: &JsonMap)
+                       -> Result<Option<Message>> {
     let body = serde_json::to_string(map)?;
 
     let client = request_client!();
 
-    let response = retry(|| client
-        .post(&format!(api!("/webhooks/{}/{}?wait={}"), webhook_id, token, wait))
-        .body(&body)
-        .header(ContentType(Mime(TopLevel::Application, SubLevel::Json, vec![]))))
-        .map_err(Error::Hyper)?;
+    let response = retry(|| {
+        client
+            .post(&format!(api!("/webhooks/{}/{}?wait={}"), webhook_id, token, wait))
+            .body(&body)
+            .header(ContentType(Mime(TopLevel::Application, SubLevel::Json, vec![])))
+    }).map_err(Error::Hyper)?;
 
     if response.status == StatusCode::NoContent {
         return Ok(None);
     }
 
-    serde_json::from_reader::<HyperResponse, Message>(response).map(Some).map_err(From::from)
+    serde_json::from_reader::<HyperResponse, Message>(response)
+        .map(Some)
+        .map_err(From::from)
 }
 
 /// Gets the active maintenances from Discord's Status API.
@@ -848,8 +858,7 @@ pub fn execute_webhook(webhook_id: u64, token: &str, wait: bool, map: &JsonMap)
 pub fn get_active_maintenances() -> Result<Vec<Maintenance>> {
     let client = request_client!();
 
-    let response = retry(|| client.get(
-        status!("/scheduled-maintenances/active.json")))?;
+    let response = retry(|| client.get(status!("/scheduled-maintenances/active.json")))?;
 
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
@@ -1007,10 +1016,7 @@ pub fn get_emojis(guild_id: u64) -> Result<Vec<Emoji>> {
 
 /// Gets guild information.
 pub fn get_guild(guild_id: u64) -> Result<PartialGuild> {
-    let response = request!(Route::GuildsId(guild_id),
-                            get,
-                            "/guilds/{}",
-                            guild_id);
+    let response = request!(Route::GuildsId(guild_id), get, "/guilds/{}", guild_id);
 
     serde_json::from_reader::<HyperResponse, PartialGuild>(response).map_err(From::from)
 }
@@ -1047,8 +1053,10 @@ pub fn get_guild_invites(guild_id: u64) -> Result<Vec<RichInvite>> {
 
 /// Gets the members of a guild. Optionally pass a `limit` and the Id of the
 /// user to offset the result by.
-pub fn get_guild_members(guild_id: u64, limit: Option<u64>, after: Option<u64>)
-    -> Result<Vec<Member>> {
+pub fn get_guild_members(guild_id: u64,
+                         limit: Option<u64>,
+                         after: Option<u64>)
+                         -> Result<Vec<Member>> {
     let response = request!(Route::GuildsIdMembers(guild_id),
                             get,
                             "/guilds/{}/members?limit={}&after={}",
@@ -1176,7 +1184,7 @@ pub fn get_guilds(target: &GuildPagination, limit: u64) -> Result<Vec<GuildInfo>
 pub fn get_invite(code: &str, stats: bool) -> Result<Invite> {
     let mut invite = code;
 
-    #[cfg(feature="utils")]
+    #[cfg(feature = "utils")]
     {
         invite = ::utils::parse_invite(invite);
     }
@@ -1221,15 +1229,11 @@ pub fn get_message(channel_id: u64, message_id: u64) -> Result<Message> {
 }
 
 /// Gets X messages from a channel.
-pub fn get_messages(channel_id: u64, query: &str)
-    -> Result<Vec<Message>> {
-    let url = format!(api!("/channels/{}/messages{}"),
-                      channel_id,
-                      query);
+pub fn get_messages(channel_id: u64, query: &str) -> Result<Vec<Message>> {
+    let url = format!(api!("/channels/{}/messages{}"), channel_id, query);
     let client = request_client!();
 
-    let response = request(Route::ChannelsIdMessages(channel_id),
-                           || client.get(&url))?;
+    let response = request(Route::ChannelsIdMessages(channel_id), || client.get(&url))?;
 
     serde_json::from_reader::<HyperResponse, Vec<Message>>(response).map_err(From::from)
 }
@@ -1252,10 +1256,10 @@ pub fn get_reaction_users(channel_id: u64,
                           after: Option<u64>)
                           -> Result<Vec<User>> {
     let mut uri = format!("/channels/{}/messages/{}/reactions/{}?limit={}",
-                      channel_id,
-                      message_id,
-                      reaction_type.as_data(),
-                      limit);
+                          channel_id,
+                          message_id,
+                          reaction_type.as_data(),
+                          limit);
 
     if let Some(user_id) = after {
         write!(uri, "&after={}", user_id)?;
@@ -1275,8 +1279,7 @@ pub fn get_reaction_users(channel_id: u64,
 pub fn get_unresolved_incidents() -> Result<Vec<Incident>> {
     let client = request_client!();
 
-    let response = retry(|| client.get(
-        status!("/incidents/unresolved.json")))?;
+    let response = retry(|| client.get(status!("/incidents/unresolved.json")))?;
 
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
@@ -1292,8 +1295,7 @@ pub fn get_unresolved_incidents() -> Result<Vec<Incident>> {
 pub fn get_upcoming_maintenances() -> Result<Vec<Maintenance>> {
     let client = request_client!();
 
-    let response = retry(|| client.get(
-        status!("/scheduled-maintenances/upcoming.json")))?;
+    let response = retry(|| client.get(status!("/scheduled-maintenances/upcoming.json")))?;
 
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
@@ -1367,8 +1369,7 @@ pub fn get_webhook(webhook_id: u64) -> Result<Webhook> {
 pub fn get_webhook_with_token(webhook_id: u64, token: &str) -> Result<Webhook> {
     let client = request_client!();
 
-    let response = retry(|| client
-        .get(&format!(api!("/webhooks/{}/{}"), webhook_id, token)))
+    let response = retry(|| client.get(&format!(api!("/webhooks/{}/{}"), webhook_id, token)))
         .map_err(Error::Hyper)?;
 
     serde_json::from_reader::<HyperResponse, Webhook>(response).map_err(From::from)
@@ -1376,35 +1377,38 @@ pub fn get_webhook_with_token(webhook_id: u64, token: &str) -> Result<Webhook> {
 
 /// Kicks a member from a guild.
 pub fn kick_member(guild_id: u64, user_id: u64) -> Result<()> {
-    verify(204, request!(Route::GuildsIdMembersId(guild_id),
-                         delete,
-                         "/guilds/{}/members/{}",
-                         guild_id,
-                         user_id))
+    verify(204,
+           request!(Route::GuildsIdMembersId(guild_id),
+                    delete,
+                    "/guilds/{}/members/{}",
+                    guild_id,
+                    user_id))
 }
 
 /// Leaves a group DM.
 pub fn leave_group(guild_id: u64) -> Result<Group> {
-    let response = request!(Route::None,
-                            delete,
-                            "/channels/{}",
-                            guild_id);
+    let response = request!(Route::None, delete, "/channels/{}", guild_id);
 
     serde_json::from_reader::<HyperResponse, Group>(response).map_err(From::from)
 }
 
 /// Leaves a guild.
 pub fn leave_guild(guild_id: u64) -> Result<()> {
-    verify(204, request!(Route::UsersMeGuildsId, delete, "/users/@me/guilds/{}", guild_id))
+    verify(204,
+           request!(Route::UsersMeGuildsId,
+                    delete,
+                    "/users/@me/guilds/{}",
+                    guild_id))
 }
 
 /// Deletes a user from group DM.
 pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
-    verify(204, request!(Route::None,
-                         delete,
-                         "/channels/{}/recipients/{}",
-                         group_id,
-                         user_id))
+    verify(204,
+           request!(Route::None,
+                    delete,
+                    "/channels/{}/recipients/{}",
+                    group_id,
+                    user_id))
 }
 
 /// Sends file(s) to a channel.
@@ -1416,8 +1420,9 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 /// if the file is too large to send.
 ///
 /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
-pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap)
-    -> Result<Message> where T: Into<AttachmentType<'a>> {
+pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap) -> Result<Message>
+where
+    T: Into<AttachmentType<'a>>, {
     let uri = format!(api!("/channels/{}/messages"), channel_id);
     let url = match Url::parse(&uri) {
         Ok(url) => url,
@@ -1427,9 +1432,11 @@ pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap)
     let tc = NativeTlsClient::new()?;
     let connector = HttpsConnector::new(tc);
     let mut request = Request::with_connector(Method::Post, url, &connector)?;
-    request.headers_mut()
+    request
+        .headers_mut()
         .set(header::Authorization(TOKEN.lock().unwrap().clone()));
-    request.headers_mut()
+    request
+        .headers_mut()
         .set(header::UserAgent(constants::USER_AGENT.to_owned()));
 
     let mut request = Multipart::from_request(request)?;
@@ -1438,10 +1445,12 @@ pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap)
     for file in files {
         match file.into() {
             AttachmentType::Bytes((mut bytes, filename)) => {
-                request.write_stream(&file_num, &mut bytes, Some(filename), None)?;
+                request
+                    .write_stream(&file_num, &mut bytes, Some(filename), None)?;
             },
             AttachmentType::File((mut f, filename)) => {
-                request.write_stream(&file_num, &mut f, Some(filename), None)?;
+                request
+                    .write_stream(&file_num, &mut f, Some(filename), None)?;
             },
             AttachmentType::Path(p) => {
                 request.write_file(&file_num, &p)?;
@@ -1486,20 +1495,22 @@ pub fn send_message(channel_id: u64, map: &Value) -> Result<Message> {
 
 /// Pins a message in a channel.
 pub fn pin_message(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(204, request!(Route::ChannelsIdPinsMessageId(channel_id),
-                         put,
-                         "/channels/{}/pins/{}",
-                         channel_id,
-                         message_id))
+    verify(204,
+           request!(Route::ChannelsIdPinsMessageId(channel_id),
+                    put,
+                    "/channels/{}/pins/{}",
+                    channel_id,
+                    message_id))
 }
 
 /// Unbans a user from a guild.
 pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
-    verify(204, request!(Route::GuildsIdBansUserId(guild_id),
-                         delete,
-                         "/guilds/{}/bans/{}",
-                         guild_id,
-                         user_id))
+    verify(204,
+           request!(Route::GuildsIdBansUserId(guild_id),
+                    delete,
+                    "/guilds/{}/bans/{}",
+                    guild_id,
+                    user_id))
 }
 
 /// Deletes a single [`Role`] from a [`Member`] in a [`Guild`].
@@ -1512,12 +1523,13 @@ pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
 /// [`Role`]: ../model/struct.Role.html
 /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
 pub fn remove_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
-    verify(204, request!(Route::GuildsIdMembersIdRolesId(guild_id),
-                         delete,
-                         "/guilds/{}/members/{}/roles/{}",
-                         guild_id,
-                         user_id,
-                         role_id))
+    verify(204,
+           request!(Route::GuildsIdMembersIdRolesId(guild_id),
+                    delete,
+                    "/guilds/{}/members/{}/roles/{}",
+                    guild_id,
+                    user_id,
+                    role_id))
 }
 
 /// Starts removing some members from a guild based on the last time they've been online.
@@ -1533,27 +1545,32 @@ pub fn start_guild_prune(guild_id: u64, map: &Value) -> Result<GuildPrune> {
 
 /// Starts syncing an integration with a guild.
 pub fn start_integration_sync(guild_id: u64, integration_id: u64) -> Result<()> {
-    verify(204, request!(Route::GuildsIdIntegrationsIdSync(guild_id),
-                         post,
-                         "/guilds/{}/integrations/{}/sync",
-                         guild_id,
-                         integration_id))
+    verify(204,
+           request!(Route::GuildsIdIntegrationsIdSync(guild_id),
+                    post,
+                    "/guilds/{}/integrations/{}/sync",
+                    guild_id,
+                    integration_id))
 }
 
 /// Unpins a message from a channel.
 pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(204, request!(Route::ChannelsIdPinsMessageId(channel_id),
-                         delete,
-                         "/channels/{}/pins/{}",
-                         channel_id,
-                         message_id))
+    verify(204,
+           request!(Route::ChannelsIdPinsMessageId(channel_id),
+                    delete,
+                    "/channels/{}/pins/{}",
+                    channel_id,
+                    message_id))
 }
 
 fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
-    where F: Fn() -> RequestBuilder<'a> {
-    let response = ratelimiting::perform(route, || f()
-        .header(header::Authorization(TOKEN.lock().unwrap().clone()))
-        .header(header::ContentType::json()))?;
+where
+    F: Fn() -> RequestBuilder<'a>, {
+    let response = ratelimiting::perform(route, || {
+        f()
+            .header(header::Authorization(TOKEN.lock().unwrap().clone()))
+            .header(header::ContentType::json())
+    })?;
 
     if response.status.class() == StatusClass::Success {
         Ok(response)
@@ -1563,14 +1580,16 @@ fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
 }
 
 pub(crate) fn retry<'a, F>(f: F) -> HyperResult<HyperResponse>
-    where F: Fn() -> RequestBuilder<'a> {
-    let req = || f()
-        .header(header::UserAgent(constants::USER_AGENT.to_owned()))
-        .send();
+where
+    F: Fn() -> RequestBuilder<'a>, {
+    let req = || {
+        f()
+            .header(header::UserAgent(constants::USER_AGENT.to_owned()))
+            .send()
+    };
 
     match req() {
-        Err(HyperError::Io(ref io))
-            if io.kind() == IoErrorKind::ConnectionAborted => req(),
+        Err(HyperError::Io(ref io)) if io.kind() == IoErrorKind::ConnectionAborted => req(),
         other => other,
     }
 }
@@ -1612,27 +1631,19 @@ pub enum AttachmentType<'a> {
 }
 
 impl<'a> From<(&'a [u8], &'a str)> for AttachmentType<'a> {
-    fn from(params: (&'a [u8], &'a str)) -> AttachmentType {
-        AttachmentType::Bytes(params)
-    }
+    fn from(params: (&'a [u8], &'a str)) -> AttachmentType { AttachmentType::Bytes(params) }
 }
 
 impl<'a> From<&'a str> for AttachmentType<'a> {
-    fn from(s: &'a str) -> AttachmentType {
-        AttachmentType::Path(Path::new(s))
-    }
+    fn from(s: &'a str) -> AttachmentType { AttachmentType::Path(Path::new(s)) }
 }
 
 impl<'a> From<&'a PathBuf> for AttachmentType<'a> {
-    fn from(pathbuf: &'a PathBuf) -> AttachmentType {
-        AttachmentType::Path(pathbuf.as_path())
-    }
+    fn from(pathbuf: &'a PathBuf) -> AttachmentType { AttachmentType::Path(pathbuf.as_path()) }
 }
 
 impl<'a> From<(&'a File, &'a str)> for AttachmentType<'a> {
-    fn from(f: (&'a File, &'a str)) -> AttachmentType<'a> {
-        AttachmentType::File((f.0, f.1))
-    }
+    fn from(f: (&'a File, &'a str)) -> AttachmentType<'a> { AttachmentType::File((f.0, f.1)) }
 }
 
 /// Representation of the method of a query to send for the [`get_guilds`]

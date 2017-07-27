@@ -1,5 +1,5 @@
 use std::collections::BTreeMap;
-use ::model::MessageId;
+use model::MessageId;
 
 /// Builds a request for a request to the API to retrieve messages.
 ///
@@ -85,11 +85,8 @@ impl GetMessages {
     /// limitation. If an amount larger than 100 is supplied, it will be
     /// reduced.
     pub fn limit(mut self, limit: u64) -> Self {
-        self.0.insert("limit".to_owned(), if limit > 100 {
-            100
-        } else {
-            limit
-        });
+        self.0
+            .insert("limit".to_owned(), if limit > 100 { 100 } else { limit });
 
         self
     }
@@ -97,7 +94,5 @@ impl GetMessages {
     /// This is a function that is here for completeness. You do not need to
     /// call this - except to clear previous calls to `after`, `around`, and
     /// `before` - as it is the default value.
-    pub fn most_recent(self) -> Self {
-        self
-    }
+    pub fn most_recent(self) -> Self { self }
 }

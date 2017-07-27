@@ -1,4 +1,4 @@
-#![cfg(feature="utils")]
+#![cfg(feature = "utils")]
 
 extern crate serenity;
 
@@ -26,9 +26,7 @@ fn safe_content() {
 
 #[test]
 fn no_free_formatting() {
-    let content = MessageBuilder::new()
-        .push_bold_safe("test**test")
-        .build();
+    let content = MessageBuilder::new().push_bold_safe("test**test").build();
     assert_ne!(content, "**test**test**");
 }
 
@@ -36,12 +34,12 @@ fn no_free_formatting() {
 fn mentions() {
     let content_emoji = MessageBuilder::new()
         .emoji(Emoji {
-            id: EmojiId(32),
-            name: "Rohrkatze".to_string(),
-            managed: false,
-            require_colons: true,
-            roles: vec![]
-        })
+                   id: EmojiId(32),
+                   name: "Rohrkatze".to_string(),
+                   managed: false,
+                   require_colons: true,
+                   roles: vec![],
+               })
         .build();
     let content_mentions = MessageBuilder::new()
         .channel(1)
@@ -66,7 +64,7 @@ fn message_content() {
         .push(Bold + Italic + Code + "Fun!")
         .build();
 
-  assert_eq!(message_content, "***`Fun!`***");
+    assert_eq!(message_content, "***`Fun!`***");
 }
 
 #[test]

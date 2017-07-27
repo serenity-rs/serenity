@@ -66,7 +66,7 @@ macro_rules! status {
 }
 
 // Enable/disable check for cache
-#[cfg(feature="cache")]
+#[cfg(feature = "cache")]
 macro_rules! feature_cache {
     ($enabled:block else $disabled:block) => {
         {
@@ -75,7 +75,7 @@ macro_rules! feature_cache {
     }
 }
 
-#[cfg(not(feature="cache"))]
+#[cfg(not(feature = "cache"))]
 macro_rules! feature_cache {
     ($enabled:block else $disabled:block) => {
         {
@@ -85,7 +85,7 @@ macro_rules! feature_cache {
 }
 
 // Enable/disable check for framework
-#[cfg(feature="framework")]
+#[cfg(feature = "framework")]
 macro_rules! feature_framework {
     ($enabled:block else $disabled:block) => {
         {
@@ -94,7 +94,7 @@ macro_rules! feature_framework {
     }
 }
 
-#[cfg(not(feature="framework"))]
+#[cfg(not(feature = "framework"))]
 macro_rules! feature_framework {
     ($enabled:block else $disabled:block) => {
         {
@@ -104,7 +104,7 @@ macro_rules! feature_framework {
 }
 
 // Enable/disable check for voice
-#[cfg(feature="voice")]
+#[cfg(feature = "voice")]
 macro_rules! feature_voice {
     ($enabled:block else $disabled:block) => {
         {
@@ -113,7 +113,7 @@ macro_rules! feature_voice {
     }
 }
 
-#[cfg(not(feature="voice"))]
+#[cfg(not(feature = "voice"))]
 macro_rules! feature_voice {
     ($enabled:block else $disabled:block) => {
         {

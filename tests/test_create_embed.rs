@@ -1,6 +1,7 @@
-#![cfg(feature="utils")]
+#![cfg(feature = "utils")]
 
-#[macro_use] extern crate serde_json;
+#[macro_use]
+extern crate serde_json;
 extern crate serenity;
 
 use serde_json::Value;
@@ -28,11 +29,11 @@ fn test_from_embed() {
         ],
         footer: None,
         image: Some(EmbedImage {
-            height: 213,
-            proxy_url: "a".to_owned(),
-            url: "https://i.imgur.com/XfWpfCV.gif".to_owned(),
-            width: 224,
-        }),
+                        height: 213,
+                        proxy_url: "a".to_owned(),
+                        url: "https://i.imgur.com/XfWpfCV.gif".to_owned(),
+                        width: 224,
+                    }),
         kind: "rich".to_owned(),
         provider: None,
         thumbnail: None,

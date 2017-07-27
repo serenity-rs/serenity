@@ -14,16 +14,16 @@
 //!
 //! [`serenity::Error`]: ../enum.Error.html
 
-pub use ::error::{Error as SerenityError};
-pub use ::model::Mentionable;
+pub use error::Error as SerenityError;
+pub use model::Mentionable;
 
-#[cfg(feature="client")]
-pub use ::client::{Context, Client, ClientError as ClientError, EventHandler};
-#[cfg(feature="gateway")]
-pub use ::gateway::GatewayError;
-#[cfg(feature="http")]
-pub use ::http::HttpError;
-#[cfg(feature="model")]
-pub use ::model::ModelError;
-#[cfg(feature="voice")]
-pub use ::voice::VoiceError;
+#[cfg(feature = "client")]
+pub use client::{Client, ClientError as ClientError, Context, EventHandler};
+#[cfg(feature = "gateway")]
+pub use gateway::GatewayError;
+#[cfg(feature = "http")]
+pub use http::HttpError;
+#[cfg(feature = "model")]
+pub use model::ModelError;
+#[cfg(feature = "voice")]
+pub use voice::VoiceError;

@@ -1,10 +1,10 @@
-pub use super::{Command, CommandType, CommandGroup};
+pub use super::{Command, CommandGroup, CommandType};
 
 use std::collections::HashMap;
 use std::default::Default;
 use std::sync::Arc;
-use ::client::Context;
-use ::model::{Message, Permissions};
+use client::Context;
+use model::{Message, Permissions};
 
 pub struct CreateCommand(pub Command);
 
@@ -52,7 +52,8 @@ impl CreateCommand {
     ///         .desc("Replies to a ping with a pong")
     ///         .exec(ping)));
     ///
-    /// fn ping(_context: &mut Context, message: &Message, _args: Vec<String>) -> Result<(), String> {
+    /// fn ping(_context: &mut Context, message: &Message, _args: Vec<String>) -> Result<(),
+    /// String> {
     ///     let _ = message.channel_id.say("Pong!");
     ///
     ///     Ok(())
@@ -64,7 +65,8 @@ impl CreateCommand {
     /// }
     /// ```
     pub fn check<F>(mut self, check: F) -> Self
-        where F: Fn(&mut Context, &Message, &Arc<Command>) -> bool + Send + Sync + 'static {
+    where
+        F: Fn(&mut Context, &Message, &Arc<Command>) -> bool + Send + Sync + 'static, {
         self.0.checks.push(Box::new(check));
 
         self
@@ -98,7 +100,8 @@ impl CreateCommand {
     ///
     /// [`exec_str`]: #method.exec_str
     pub fn exec<F>(mut self, func: F) -> Self
-        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static {
+    where
+        F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static, {
         self.0.exec = CommandType::Basic(Box::new(func));
 
         self
@@ -110,7 +113,12 @@ impl CreateCommand {
     ///
     /// You can return `Err(string)` if there's an error.
     pub fn exec_help<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, &[String]) -> Result<(), String> + Send + Sync + 'static {
+    where
+        F: Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, &[String])
+           -> Result<(), String>
+            + Send
+            + Sync
+            + 'static, {
         self.0.exec = CommandType::WithCommands(Box::new(f));
 
         self

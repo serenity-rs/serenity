@@ -2,23 +2,23 @@ use serde_json;
 use std::fmt;
 use super::utils::deserialize_u16;
 use super::*;
-use ::internal::prelude::*;
-use ::model::misc::Mentionable;
+use internal::prelude::*;
+use model::misc::Mentionable;
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use chrono::NaiveDateTime;
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use std::fmt::Write;
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use std::mem;
-#[cfg(feature="cache")]
+#[cfg(feature = "cache")]
 use std::sync::{Arc, RwLock};
-#[cfg(feature="model")]
-use ::builder::{CreateMessage, EditProfile};
-#[cfg(feature="cache")]
-use ::CACHE;
-#[cfg(feature="model")]
-use ::http::{self, GuildPagination};
+#[cfg(feature = "model")]
+use builder::{CreateMessage, EditProfile};
+#[cfg(feature = "cache")]
+use CACHE;
+#[cfg(feature = "model")]
+use http::{self, GuildPagination};
 
 /// Information about the current user.
 #[derive(Clone, Debug, Deserialize)]
@@ -27,16 +27,16 @@ pub struct CurrentUser {
     pub avatar: Option<String>,
     #[serde(default)]
     pub bot: bool,
-    #[serde(deserialize_with="deserialize_u16")]
+    #[serde(deserialize_with = "deserialize_u16")]
     pub discriminator: u16,
     pub email: Option<String>,
     pub mfa_enabled: bool,
-    #[serde(rename="username")]
+    #[serde(rename = "username")]
     pub name: String,
     pub verified: bool,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl CurrentUser {
     /// Returns the formatted URL of the user's icon, if one exists.
     ///
@@ -60,17 +60,13 @@ impl CurrentUser {
     /// }
     /// ```
     #[inline]
-    pub fn avatar_url(&self) -> Option<String> {
-       avatar_url(self.id, self.avatar.as_ref())
-    }
+    pub fn avatar_url(&self) -> Option<String> { avatar_url(self.id, self.avatar.as_ref()) }
 
     /// Returns the formatted URL to the user's default avatar URL.
     ///
     /// This will produce a PNG URL.
     #[inline]
-    pub fn default_avatar_url(&self) -> String {
-        default_avatar_url(self.discriminator)
-    }
+    pub fn default_avatar_url(&self) -> String { default_avatar_url(self.discriminator) }
 
     /// Edits the current user's profile settings.
     ///
@@ -90,7 +86,8 @@ impl CurrentUser {
     /// CACHE.write().unwrap().user.edit(|p| p.avatar(Some(&avatar)));
     /// ```
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(EditProfile) -> EditProfile {
+    where
+        F: FnOnce(EditProfile) -> EditProfile, {
         let mut map = Map::new();
         map.insert("username".to_owned(), Value::String(self.name.clone()));
 
@@ -117,7 +114,8 @@ impl CurrentUser {
     /// [`avatar_url`]: #method.avatar_url
     /// [`default_avatar_url`]: #method.default_avatar_url
     pub fn face(&self) -> String {
-        self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
+        self.avatar_url()
+            .unwrap_or_else(|| self.default_avatar_url())
     }
 
     /// Gets a list of guilds that the current user is in.
@@ -193,7 +191,9 @@ impl CurrentUser {
     ///     },
     /// };
     ///
-    /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize?client_id=249608697955745802&scope=bot&permissions=19456");
+    /// assert_eq!(url,
+    /// "https://discordapp.
+    /// com/api/oauth2/authorize?client_id=249608697955745802&scope=bot&permissions=19456");
     /// ```
     ///
     /// # Errors
@@ -213,7 +213,8 @@ impl CurrentUser {
             Err(e) => return Err(e),
         };
 
-        let mut url = format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot", client_id);
+        let mut url = format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot",
+                              client_id);
 
         if bits != 0 {
             write!(url, "&permissions={}", bits)?;
@@ -263,9 +264,7 @@ impl CurrentUser {
     /// println!("The current user's distinct identifier is {}", cache.user.tag());
     /// ```
     #[inline]
-    pub fn tag(&self) -> String {
-        tag(&self.name, self.discriminator)
-    }
+    pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }
 }
 
 /// An enum that represents a default avatar.
@@ -278,27 +277,25 @@ impl CurrentUser {
 #[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
 pub enum DefaultAvatar {
     /// The avatar when the result is `0`.
-    #[serde(rename="6debd47ed13483642cf09e832ed0bc1b")]
+    #[serde(rename = "6debd47ed13483642cf09e832ed0bc1b")]
     Blurple,
     /// The avatar when the result is `1`.
-    #[serde(rename="322c936a8c8be1b803cd94861bdfa868")]
+    #[serde(rename = "322c936a8c8be1b803cd94861bdfa868")]
     Grey,
     /// The avatar when the result is `2`.
-    #[serde(rename="dd4dbc0016779df1378e7812eabaa04d")]
+    #[serde(rename = "dd4dbc0016779df1378e7812eabaa04d")]
     Green,
     /// The avatar when the result is `3`.
-    #[serde(rename="0e291f67c9274a1abdddeb3fd919cbaa")]
+    #[serde(rename = "0e291f67c9274a1abdddeb3fd919cbaa")]
     Orange,
     /// The avatar when the result is `4`.
-    #[serde(rename="1cbd08c76f8af6dddce02c5138971129")]
+    #[serde(rename = "1cbd08c76f8af6dddce02c5138971129")]
     Red,
 }
 
 impl DefaultAvatar {
     /// Retrieves the String hash of the default avatar.
-    pub fn name(&self) -> Result<String> {
-        serde_json::to_string(self).map_err(From::from)
-    }
+    pub fn name(&self) -> Result<String> { serde_json::to_string(self).map_err(From::from) }
 }
 
 enum_number!(
@@ -326,15 +323,15 @@ enum_number!(
 /// [`Invisible`]: #variant.Invisible
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub enum OnlineStatus {
-    #[serde(rename="dnd")]
+    #[serde(rename = "dnd")]
     DoNotDisturb,
-    #[serde(rename="idle")]
+    #[serde(rename = "idle")]
     Idle,
-    #[serde(rename="invisible")]
+    #[serde(rename = "invisible")]
     Invisible,
-    #[serde(rename="offline")]
+    #[serde(rename = "offline")]
     Offline,
-    #[serde(rename="online")]
+    #[serde(rename = "online")]
     Online,
 }
 
@@ -351,9 +348,7 @@ impl OnlineStatus {
 }
 
 impl Default for OnlineStatus {
-    fn default() -> OnlineStatus {
-        OnlineStatus::Online
-    }
+    fn default() -> OnlineStatus { OnlineStatus::Online }
 }
 
 /// Information about a user.
@@ -371,46 +366,38 @@ pub struct User {
     /// the same [`name`]. The name+discriminator pair is always unique.
     ///
     /// [`name`]: #structfield.name
-    #[serde(deserialize_with="deserialize_u16")]
+    #[serde(deserialize_with = "deserialize_u16")]
     pub discriminator: u16,
     /// The account's username. Changing username will trigger a discriminator
     /// change if the username+discriminator pair becomes non-unique.
-    #[serde(rename="username")]
+    #[serde(rename = "username")]
     pub name: String,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl User {
     /// Returns the formatted URL of the user's icon, if one exists.
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
     #[inline]
-    pub fn avatar_url(&self) -> Option<String> {
-        avatar_url(self.id, self.avatar.as_ref())
-    }
+    pub fn avatar_url(&self) -> Option<String> { avatar_url(self.id, self.avatar.as_ref()) }
 
     /// Creates a direct message channel between the [current user] and the
     /// user. This can also retrieve the channel if one already exists.
     ///
     /// [current user]: struct.CurrentUser.html
     #[inline]
-    pub fn create_dm_channel(&self) -> Result<PrivateChannel> {
-        self.id.create_dm_channel()
-    }
+    pub fn create_dm_channel(&self) -> Result<PrivateChannel> { self.id.create_dm_channel() }
 
     /// Retrieves the time that this user was created at.
     #[inline]
-    pub fn created_at(&self) -> NaiveDateTime {
-        self.id.created_at()
-    }
+    pub fn created_at(&self) -> NaiveDateTime { self.id.created_at() }
 
     /// Returns the formatted URL to the user's default avatar URL.
     ///
     /// This will produce a PNG URL.
     #[inline]
-    pub fn default_avatar_url(&self) -> String {
-        default_avatar_url(self.discriminator)
-    }
+    pub fn default_avatar_url(&self) -> String { default_avatar_url(self.discriminator) }
 
     /// Sends a message to a user through a direct message channel. This is a
     /// channel that can only be accessed by you and the recipient.
@@ -449,7 +436,8 @@ impl User {
     ///                     return;
     ///                 }
     ///             };
-    ///             let help = format!("Helpful info here. Invite me with this link: <{}>", url);
+    /// let help = format!("Helpful info here. Invite me with this link: <{}>",
+    /// url);
     ///
     ///             match msg.author.direct_message(|m| m.content(&help)) {
     ///                 Ok(_) => {
@@ -462,7 +450,7 @@ impl User {
     ///                 },
     ///             };
     ///         }
-    ///     }   
+    ///     }
     /// }
     ///
     /// let mut client = Client::new("token", Handler);
@@ -491,9 +479,10 @@ impl User {
     //
     // (AKA: Clippy is wrong and so we have to mark as allowing this lint.)
     #[allow(let_and_return)]
-    #[cfg(feature="builder")]
+    #[cfg(feature = "builder")]
     pub fn direct_message<F>(&self, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
+    where
+        F: FnOnce(CreateMessage) -> CreateMessage, {
         if self.bot {
             return Err(Error::Model(ModelError::MessagingBot));
         }
@@ -550,7 +539,7 @@ impl User {
     ///
     /// [`ModelError::MessagingBot`]: enum.ModelError.html#variant.MessagingBot
     /// [direct_message]: #method.direct_message
-    #[cfg(feature="builder")]
+    #[cfg(feature = "builder")]
     #[inline]
     pub fn dm<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
         self.direct_message(f)
@@ -565,7 +554,8 @@ impl User {
     /// [`avatar_url`]: #method.avatar_url
     /// [`default_avatar_url`]: #method.default_avatar_url
     pub fn face(&self) -> String {
-        self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
+        self.avatar_url()
+            .unwrap_or_else(|| self.default_avatar_url())
     }
 
     /// Check if a user has a [`Role`]. This will retrieve the [`Guild`] from
@@ -590,13 +580,13 @@ impl User {
     /// [`Cache`]: ../cache/struct.Cache.html
     // no-cache would warn on guild_id.
     pub fn has_role<G, R>(&self, guild: G, role: R) -> bool
-        where G: Into<GuildContainer>, R: Into<RoleId> {
+    where
+        G: Into<GuildContainer>,
+        R: Into<RoleId>, {
         let role_id = role.into();
 
         match guild.into() {
-            GuildContainer::Guild(guild) => {
-                guild.roles.contains_key(&role_id)
-            },
+            GuildContainer::Guild(guild) => guild.roles.contains_key(&role_id),
             GuildContainer::Id(_guild_id) => {
                 feature_cache! {{
                     CACHE.read()
@@ -631,7 +621,7 @@ impl User {
     /// impl EventHandler for Handler {
     ///     fn on_message(&self, _: Context, _: Message) {
     ///         // normal message handling here
-    ///     }   
+    ///     }
     /// }
     /// let mut client = Client::new("token", Handler);
     /// #
@@ -708,15 +698,13 @@ impl User {
     ///                 .build();
     ///
     ///             let _ = msg.channel_id.say(&content);
-    ///         } 
-    ///     }   
+    ///         }
+    ///     }
     /// }
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     #[inline]
-    pub fn tag(&self) -> String {
-        tag(&self.name, self.discriminator)
-    }
+    pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }
 }
 
 impl fmt::Display for User {
@@ -727,7 +715,7 @@ impl fmt::Display for User {
     }
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl UserId {
     /// Creates a direct message channel between the [current user] and the
     /// user. This can also retrieve the channel if one already exists.
@@ -742,69 +730,51 @@ impl UserId {
     }
 
     /// Search the cache for the user with the Id.
-    #[cfg(feature="cache")]
-    pub fn find(&self) -> Option<Arc<RwLock<User>>> {
-        CACHE.read().unwrap().user(*self)
-    }
+    #[cfg(feature = "cache")]
+    pub fn find(&self) -> Option<Arc<RwLock<User>>> { CACHE.read().unwrap().user(*self) }
 
     /// Gets a user by its Id over the REST API.
     ///
     /// **Note**: The current user must be a bot user.
     #[inline]
-    pub fn get(&self) -> Result<User> {
-        http::get_user(self.0)
-    }
+    pub fn get(&self) -> Result<User> { http::get_user(self.0) }
 }
 
 impl From<CurrentUser> for UserId {
     /// Gets the Id of a `CurrentUser` struct.
-    fn from(current_user: CurrentUser) -> UserId {
-        current_user.id
-    }
+    fn from(current_user: CurrentUser) -> UserId { current_user.id }
 }
 
 impl<'a> From<&'a CurrentUser> for UserId {
     /// Gets the Id of a `CurrentUser` struct.
-    fn from(current_user: &CurrentUser) -> UserId {
-        current_user.id
-    }
+    fn from(current_user: &CurrentUser) -> UserId { current_user.id }
 }
 
 impl From<Member> for UserId {
     /// Gets the Id of a `Member`.
-    fn from(member: Member) -> UserId {
-        member.user.read().unwrap().id
-    }
+    fn from(member: Member) -> UserId { member.user.read().unwrap().id }
 }
 
 impl<'a> From<&'a Member> for UserId {
     /// Gets the Id of a `Member`.
-    fn from(member: &Member) -> UserId {
-        member.user.read().unwrap().id
-    }
+    fn from(member: &Member) -> UserId { member.user.read().unwrap().id }
 }
 
 impl From<User> for UserId {
     /// Gets the Id of a `User`.
-    fn from(user: User) -> UserId {
-        user.id
-    }
+    fn from(user: User) -> UserId { user.id }
 }
 
 impl<'a> From<&'a User> for UserId {
     /// Gets the Id of a `User`.
-    fn from(user: &User) -> UserId {
-        user.id
-    }
+    fn from(user: &User) -> UserId { user.id }
 }
 
 impl fmt::Display for UserId {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Display::fmt(&self.0, f)
-    }
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { fmt::Display::fmt(&self.0, f) }
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 fn avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
     hash.map(|hash| {
         let ext = if hash.starts_with("a_") {
@@ -817,17 +787,17 @@ fn avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
     })
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 fn default_avatar_url(discriminator: u16) -> String {
     cdn!("/embed/avatars/{}.png", discriminator % 5u16)
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 fn static_avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
     hash.map(|hash| cdn!("/avatars/{}/{}.webp?size=1024", user_id, hash))
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 fn tag(name: &str, discriminator: u16) -> String {
     // 32: max length of username
     // 1: `#`

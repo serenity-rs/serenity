@@ -1,11 +1,11 @@
 use super::*;
 
-#[cfg(all(feature="model", feature="utils"))]
+#[cfg(all(feature = "model", feature = "utils"))]
 use std::result::Result as StdResult;
-#[cfg(all(feature="model", feature="utils"))]
+#[cfg(all(feature = "model", feature = "utils"))]
 use std::str::FromStr;
-#[cfg(any(all(feature="cache", feature="utils"), all(feature="model", feature="utils")))]
-use ::utils;
+#[cfg(any(all(feature = "cache", feature = "utils"), all(feature = "model", feature = "utils")))]
+use utils;
 
 /// Allows something - such as a channel or role - to be mentioned in a message.
 pub trait Mentionable {
@@ -15,64 +15,44 @@ pub trait Mentionable {
 }
 
 impl Mentionable for ChannelId {
-    fn mention(&self) -> String {
-        format!("<#{}>", self.0)
-    }
+    fn mention(&self) -> String { format!("<#{}>", self.0) }
 }
 
 impl Mentionable for Channel {
     fn mention(&self) -> String {
         match *self {
-            Channel::Guild(ref x) => {
-                format!("<#{}>", x.read().unwrap().id.0)
-            },
-            Channel::Private(ref x) => {
-                format!("<#{}>", x.read().unwrap().id.0)
-            },
-            Channel::Group(ref x) => {
-                format!("<#{}>", x.read().unwrap().channel_id.0)
-            }
+            Channel::Guild(ref x) => format!("<#{}>", x.read().unwrap().id.0),
+            Channel::Private(ref x) => format!("<#{}>", x.read().unwrap().id.0),
+            Channel::Group(ref x) => format!("<#{}>", x.read().unwrap().channel_id.0),
         }
     }
 }
 
 impl Mentionable for Emoji {
-    fn mention(&self) -> String {
-        format!("<:{}:{}>", self.name, self.id.0)
-    }
+    fn mention(&self) -> String { format!("<:{}:{}>", self.name, self.id.0) }
 }
 
 impl Mentionable for Member {
-    fn mention(&self) -> String {
-        format!("<@{}>", self.user.read().unwrap().id.0)
-    }
+    fn mention(&self) -> String { format!("<@{}>", self.user.read().unwrap().id.0) }
 }
 
 impl Mentionable for RoleId {
-    fn mention(&self) -> String {
-        format!("<@&{}>", self.0)
-    }
+    fn mention(&self) -> String { format!("<@&{}>", self.0) }
 }
 
 impl Mentionable for Role {
-    fn mention(&self) -> String {
-        format!("<@&{}>", self.id.0)
-    }
+    fn mention(&self) -> String { format!("<@&{}>", self.id.0) }
 }
 
 impl Mentionable for UserId {
-    fn mention(&self) -> String {
-        format!("<@{}>", self.0)
-    }
+    fn mention(&self) -> String { format!("<@{}>", self.0) }
 }
 
 impl Mentionable for User {
-    fn mention(&self) -> String {
-        format!("<@{}>", self.id.0)
-    }
+    fn mention(&self) -> String { format!("<@{}>", self.id.0) }
 }
 
-#[cfg(all(feature="cache", feature="utils"))]
+#[cfg(all(feature = "cache", feature = "utils"))]
 impl FromStr for User {
     type Err = ();
 
@@ -81,15 +61,15 @@ impl FromStr for User {
             Some(x) => {
                 match UserId(x as u64).find() {
                     Some(user) => Ok(user.read().unwrap().clone()),
-                    _ => Err(())
+                    _ => Err(()),
                 }
             },
-            _ => Err(())
+            _ => Err(()),
         }
     }
 }
 
-#[cfg(all(feature="model", feature="utils"))]
+#[cfg(all(feature = "model", feature = "utils"))]
 impl FromStr for UserId {
     type Err = ();
 
@@ -98,7 +78,7 @@ impl FromStr for UserId {
     }
 }
 
-#[cfg(all(feature="cache", feature="utils"))]
+#[cfg(all(feature = "cache", feature = "utils"))]
 impl FromStr for Role {
     type Err = ();
 
@@ -107,15 +87,15 @@ impl FromStr for Role {
             Some(x) => {
                 match RoleId(x).find() {
                     Some(user) => Ok(user),
-                    _ => Err(())
+                    _ => Err(()),
                 }
             },
-            _ => Err(())
+            _ => Err(()),
         }
     }
 }
 
-#[cfg(all(feature="model", feature="utils"))]
+#[cfg(all(feature = "model", feature = "utils"))]
 impl FromStr for RoleId {
     type Err = ();
 
@@ -134,25 +114,21 @@ pub struct EmojiIdentifier {
     pub name: String,
 }
 
-#[cfg(all(feature="model", feature="utils"))]
+#[cfg(all(feature = "model", feature = "utils"))]
 impl EmojiIdentifier {
     /// Generates a URL to the emoji's image.
     #[inline]
-    pub fn url(&self) -> String {
-        format!(cdn!("/emojis/{}.png"), self.id)
-    }
+    pub fn url(&self) -> String { format!(cdn!("/emojis/{}.png"), self.id) }
 }
 
-#[cfg(all(feature="model", feature="utils"))]
+#[cfg(all(feature = "model", feature = "utils"))]
 impl FromStr for EmojiIdentifier {
     type Err = ();
 
-    fn from_str(s: &str) -> StdResult<Self, ()> {
-        utils::parse_emoji(s).ok_or_else(|| ())
-    }
+    fn from_str(s: &str) -> StdResult<Self, ()> { utils::parse_emoji(s).ok_or_else(|| ()) }
 }
 
-#[cfg(all(feature="model", feature="utils"))]
+#[cfg(all(feature = "model", feature = "utils"))]
 impl FromStr for ChannelId {
     type Err = ();
 
@@ -161,7 +137,7 @@ impl FromStr for ChannelId {
     }
 }
 
-#[cfg(all(feature="cache", feature="model", feature="utils"))]
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 impl FromStr for Channel {
     type Err = ();
 
@@ -170,10 +146,10 @@ impl FromStr for Channel {
             Some(x) => {
                 match ChannelId(x).find() {
                     Some(channel) => Ok(channel),
-                    _ => Err(())
+                    _ => Err(()),
                 }
             },
-            _ => Err(())
+            _ => Err(()),
         }
     }
 }
@@ -222,7 +198,7 @@ pub struct IncidentUpdate {
 
 /// The type of status update during a service incident.
 #[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
-#[serde(rename_all="snake_case")]
+#[serde(rename_all = "snake_case")]
 pub enum IncidentStatus {
     Identified,
     Investigating,

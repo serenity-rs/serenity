@@ -1,6 +1,6 @@
 use serde_json::Value;
 use std::default::Default;
-use ::internal::prelude::*;
+use internal::prelude::*;
 
 /// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
 ///
@@ -14,9 +14,9 @@ use ::internal::prelude::*;
 /// ```rust,no_run
 /// # use serenity::prelude::*;
 /// # use serenity::model::*;
-/// 
+///
 /// struct Handler;
-/// 
+///
 /// impl EventHandler for Handler {
 ///     fn on_message(&self, _: Context, msg: Message) {
 ///         use serenity::client::CACHE;
@@ -49,8 +49,8 @@ use ::internal::prelude::*;
 ///
 ///             let content = format!("Here's your invite: {}", invite.url());
 ///             let _ = msg.channel_id.say(&content);
-///         } 
-///     }   
+///         }
+///     }
 /// }
 /// let mut client = Client::new("token", Handler); client.start().unwrap();
 /// ```
@@ -89,7 +89,8 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn max_age(mut self, max_age: u64) -> Self {
-        self.0.insert("max_age".to_owned(), Value::Number(Number::from(max_age)));
+        self.0
+            .insert("max_age".to_owned(), Value::Number(Number::from(max_age)));
 
         self
     }
@@ -122,7 +123,8 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn max_uses(mut self, max_uses: u64) -> Self {
-        self.0.insert("max_uses".to_owned(), Value::Number(Number::from(max_uses)));
+        self.0
+            .insert("max_uses".to_owned(), Value::Number(Number::from(max_uses)));
 
         self
     }
@@ -153,7 +155,8 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn temporary(mut self, temporary: bool) -> Self {
-        self.0.insert("temporary".to_owned(), Value::Bool(temporary));
+        self.0
+            .insert("temporary".to_owned(), Value::Bool(temporary));
 
         self
     }

@@ -47,9 +47,9 @@ use hyper::status::StatusCode;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use std::{i64, str, thread};
+use std::{str, thread, i64};
 use super::{HttpError, LightMethod};
-use ::internal::prelude::*;
+use internal::prelude::*;
 
 lazy_static! {
     /// The global mutex is a mutex unlocked and then immediately re-locked
@@ -346,7 +346,8 @@ pub enum Route {
 }
 
 pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
-    where F: Fn() -> RequestBuilder<'a> {
+where
+    F: Fn() -> RequestBuilder<'a>, {
     loop {
         // This will block if another thread already has the global
         // unlocked already (due to receiving an x-ratelimit-global).
@@ -364,11 +365,14 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
             .lock()
             .expect("routes poisoned")
             .entry(route)
-            .or_insert_with(|| Arc::new(Mutex::new(RateLimit {
-                limit: i64::MAX,
-                remaining: i64::MAX,
-                reset: i64::MAX,
-            }))).clone();
+            .or_insert_with(|| {
+                Arc::new(Mutex::new(RateLimit {
+                                        limit: i64::MAX,
+                                        remaining: i64::MAX,
+                                        reset: i64::MAX,
+                                    }))
+            })
+            .clone();
 
         let mut lock = bucket.lock().unwrap();
         lock.pre_hook(&route);
@@ -395,13 +399,13 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
                 let _ = GLOBAL.lock().expect("global route lock poisoned");
 
                 Ok(if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {
-                    debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-                    thread::sleep(Duration::from_millis(retry_after as u64));
+                       debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
+                       thread::sleep(Duration::from_millis(retry_after as u64));
 
-                    true
-                } else {
-                    false
-                })
+                       true
+                   } else {
+                       false
+                   })
             } else {
                 lock.post_hook(&response, &route)
             };
@@ -458,7 +462,9 @@ impl RateLimit {
         if self.remaining == 0 {
             let delay = (diff * 1000) + 500;
 
-            debug!("Pre-emptive ratelimit on route {:?} for {:?}ms", route, delay);
+            debug!("Pre-emptive ratelimit on route {:?} for {:?}ms",
+                   route,
+                   delay);
             thread::sleep(Duration::from_millis(delay));
 
             return;
@@ -481,26 +487,30 @@ impl RateLimit {
         }
 
         Ok(if response.status != StatusCode::TooManyRequests {
-            false
-        } else if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {
-            debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-            thread::sleep(Duration::from_millis(retry_after as u64));
+               false
+           } else if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {
+               debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
+               thread::sleep(Duration::from_millis(retry_after as u64));
 
-            true
-        } else {
-            false
-        })
+               true
+           } else {
+               false
+           })
     }
 }
 
 fn parse_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
     match headers.get_raw(header) {
-        Some(header) => match str::from_utf8(&header[0]) {
-            Ok(v) => match v.parse::<i64>() {
-                Ok(v) => Ok(Some(v)),
-                Err(_) => Err(Error::Http(HttpError::RateLimitI64)),
-            },
-            Err(_) => Err(Error::Http(HttpError::RateLimitUtf8)),
+        Some(header) => {
+            match str::from_utf8(&header[0]) {
+                Ok(v) => {
+                    match v.parse::<i64>() {
+                        Ok(v) => Ok(Some(v)),
+                        Err(_) => Err(Error::Http(HttpError::RateLimitI64)),
+                    }
+                },
+                Err(_) => Err(Error::Http(HttpError::RateLimitUtf8)),
+            }
         },
         None => Ok(None),
     }

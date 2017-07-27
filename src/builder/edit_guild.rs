@@ -1,5 +1,5 @@
-use ::internal::prelude::*;
-use ::model::{ChannelId, Region, UserId, VerificationLevel};
+use internal::prelude::*;
+use model::{ChannelId, Region, UserId, VerificationLevel};
 
 /// A builder to optionally edit certain fields of a [`Guild`]. This is meant
 /// for usage with [`Guild::edit`].
@@ -36,7 +36,8 @@ impl EditGuild {
     ///
     /// [`afk_channel`]: #method.afk_channel
     pub fn afk_timeout(mut self, timeout: u64) -> Self {
-        self.0.insert("afk_timeout".to_owned(), Value::Number(Number::from(timeout)));
+        self.0.insert("afk_timeout".to_owned(),
+                      Value::Number(Number::from(timeout)));
 
         self
     }
@@ -71,7 +72,8 @@ impl EditGuild {
     ///
     /// [`utils::read_image`]: ../utils/fn.read_image.html
     pub fn icon(mut self, icon: Option<&str>) -> Self {
-        self.0.insert("icon".to_owned(), icon.map_or_else(|| Value::Null, |x| Value::String(x.to_owned())));
+        self.0.insert("icon".to_owned(),
+                      icon.map_or_else(|| Value::Null, |x| Value::String(x.to_owned())));
 
         self
     }
@@ -80,7 +82,8 @@ impl EditGuild {
     ///
     /// **Note**: Must be between (and including) 2-100 chracters.
     pub fn name(mut self, name: &str) -> Self {
-        self.0.insert("name".to_owned(), Value::String(name.to_owned()));
+        self.0
+            .insert("name".to_owned(), Value::String(name.to_owned()));
 
         self
     }
@@ -89,7 +92,8 @@ impl EditGuild {
     ///
     /// **Note**: The current user must be the owner of the guild.
     pub fn owner<U: Into<UserId>>(mut self, user_id: U) -> Self {
-        self.0.insert("owner_id".to_owned(), Value::Number(Number::from(user_id.into().0)));
+        self.0.insert("owner_id".to_owned(),
+                      Value::Number(Number::from(user_id.into().0)));
 
         self
     }
@@ -121,7 +125,8 @@ impl EditGuild {
     ///
     /// [`Region::UsWest`]: ../model/enum.Region.html#variant.UsWest
     pub fn region(mut self, region: Region) -> Self {
-        self.0.insert("region".to_owned(), Value::String(region.name().to_owned()));
+        self.0
+            .insert("region".to_owned(), Value::String(region.name().to_owned()));
 
         self
     }
@@ -172,7 +177,8 @@ impl EditGuild {
     /// [`VerificationLevel`]: ../model/enum.VerificationLevel.html
     /// [`VerificationLevel::High`]: ../model/enum.VerificationLevel.html#variant.High
     pub fn verification_level<V>(mut self, verification_level: V) -> Self
-        where V: Into<VerificationLevel> {
+    where
+        V: Into<VerificationLevel>, {
         let num = Value::Number(Number::from(verification_level.into().num()));
 
         self.0.insert("verification_level".to_owned(), num);

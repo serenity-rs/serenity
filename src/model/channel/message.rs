@@ -1,19 +1,19 @@
 use chrono::{DateTime, FixedOffset};
 use serde_json::Value;
-use ::model::*;
+use model::*;
 
-#[cfg(feature="cache")]
+#[cfg(feature = "cache")]
 use std::fmt::Write;
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use std::mem;
-#[cfg(feature="model")]
-use ::builder::{CreateEmbed, CreateMessage};
-#[cfg(feature="model")]
-use ::constants;
-#[cfg(feature="cache")]
-use ::CACHE;
-#[cfg(feature="model")]
-use ::http;
+#[cfg(feature = "model")]
+use builder::{CreateEmbed, CreateMessage};
+#[cfg(feature = "model")]
+use constants;
+#[cfg(feature = "cache")]
+use CACHE;
+#[cfg(feature = "model")]
+use http;
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
@@ -38,7 +38,7 @@ pub struct Message {
     pub embeds: Vec<Embed>,
     /// Indicator of the type of message this is, i.e. whether it is a regular
     /// message or a system message.
-    #[serde(rename="type")]
+    #[serde(rename = "type")]
     pub kind: MessageType,
     /// Indicator of whether the message mentions everyone.
     pub mention_everyone: bool,
@@ -67,7 +67,7 @@ pub struct Message {
     pub webhook_id: Option<WebhookId>,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl Message {
     /// Retrieves the related channel located in the cache.
     ///
@@ -109,17 +109,14 @@ impl Message {
     /// });
     /// # }
     /// ```
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     #[inline]
-    pub fn channel(&self) -> Option<Channel> {
-        CACHE.read().unwrap().channel(self.channel_id)
-    }
+    pub fn channel(&self) -> Option<Channel> { CACHE.read().unwrap().channel(self.channel_id) }
 
-    /// A util function for determining whether this message was sent by someone else, or the bot.
-    #[cfg(all(feature="cache", feature="utils"))]
-    pub fn is_own(&self) -> bool {
-        self.author.id == CACHE.read().unwrap().user.id
-    }
+    /// A util function for determining whether this message was sent by someone else, or the
+    /// bot.
+    #[cfg(all(feature = "cache", feature = "utils"))]
+    pub fn is_own(&self) -> bool { self.author.id == CACHE.read().unwrap().user.id }
 
     /// Deletes the message.
     ///
@@ -136,7 +133,7 @@ impl Message {
     /// [`ModelError::InvalidUser`]: enum.ModelError.html#variant.InvalidUser
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn delete(&self) -> Result<()> {
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             let req = permissions::MANAGE_MESSAGES;
             let is_author = self.author.id == CACHE.read().unwrap().user.id;
@@ -164,7 +161,7 @@ impl Message {
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn delete_reactions(&self) -> Result<()> {
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             let req = permissions::MANAGE_MESSAGES;
 
@@ -209,8 +206,9 @@ impl Message {
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
-        #[cfg(feature="cache")]
+    where
+        F: FnOnce(CreateMessage) -> CreateMessage, {
+        #[cfg(feature = "cache")]
         {
             if self.author.id != CACHE.read().unwrap().user.id {
                 return Err(Error::Model(ModelError::InvalidUser));
@@ -246,7 +244,8 @@ impl Message {
     pub(crate) fn transform_content(&mut self) {
         match self.kind {
             MessageType::PinsAdd => {
-                self.content = format!("{} pinned a message to this channel. See all the pins.", self.author);
+                self.content = format!("{} pinned a message to this channel. See all the pins.",
+                                       self.author);
             },
             MessageType::MemberJoin => {
                 let sec = self.timestamp.timestamp() as usize;
@@ -264,7 +263,7 @@ impl Message {
 
     /// Returns message content, but with user and role mentions replaced with
     /// names and everyone/here mentions cancelled.
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn content_safe(&self) -> String {
         let mut result = self.content.clone();
 
@@ -290,8 +289,9 @@ impl Message {
         }
 
         // And finally replace everyone and here mentions.
-        result.replace("@everyone", "@\u{200B}everyone")
-              .replace("@here", "@\u{200B}here")
+        result
+            .replace("@everyone", "@\u{200B}everyone")
+            .replace("@here", "@\u{200B}here")
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
@@ -311,9 +311,16 @@ impl Message {
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn reaction_users<R, U>(&self, reaction_type: R, limit: Option<u8>, after: Option<U>)
-        -> Result<Vec<User>> where R: Into<ReactionType>, U: Into<UserId> {
-        self.channel_id.reaction_users(self.id, reaction_type, limit, after)
+    pub fn reaction_users<R, U>(&self,
+                                reaction_type: R,
+                                limit: Option<u8>,
+                                after: Option<U>)
+                                -> Result<Vec<User>>
+    where
+        R: Into<ReactionType>,
+        U: Into<UserId>, {
+        self.channel_id
+            .reaction_users(self.id, reaction_type, limit, after)
     }
 
     /// Returns the associated `Guild` for the message if one is in the cache.
@@ -324,9 +331,10 @@ impl Message {
     /// Requires the `cache` feature be enabled.
     ///
     /// [`guild_id`]: #method.guild_id
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> {
-        self.guild_id().and_then(|guild_id| CACHE.read().unwrap().guild(guild_id))
+        self.guild_id()
+            .and_then(|guild_id| CACHE.read().unwrap().guild(guild_id))
     }
 
     /// Retrieves the Id of the guild that the message was sent in, if sent in
@@ -334,7 +342,7 @@ impl Message {
     ///
     /// Returns `None` if the channel data or guild data does not exist in the
     /// cache.
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn guild_id(&self) -> Option<GuildId> {
         match CACHE.read().unwrap().channel(self.channel_id) {
             Some(Channel::Guild(ch)) => Some(ch.read().unwrap().guild_id),
@@ -343,7 +351,7 @@ impl Message {
     }
 
     /// True if message was sent using direct messages.
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn is_private(&self) -> bool {
         match CACHE.read().unwrap().channel(self.channel_id) {
             Some(Channel::Group(_)) | Some(Channel::Private(_)) => true,
@@ -383,7 +391,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn pin(&self) -> Result<()> {
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             let req = permissions::MANAGE_MESSAGES;
 
@@ -410,7 +418,7 @@ impl Message {
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     /// [permissions]: permissions
     pub fn react<R: Into<ReactionType>>(&self, reaction_type: R) -> Result<()> {
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             let req = permissions::ADD_REACTIONS;
 
@@ -419,9 +427,7 @@ impl Message {
             }
         }
 
-        http::create_reaction(self.channel_id.0,
-                              self.id.0,
-                              &reaction_type.into())
+        http::create_reaction(self.channel_id.0, self.id.0, &reaction_type.into())
     }
 
     /// Replies to the user, mentioning them prior to the content in the form
@@ -451,7 +457,7 @@ impl Message {
             return Err(Error::Model(ModelError::MessageTooLong(length_over)));
         }
 
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             let req = permissions::SEND_MESSAGES;
 
@@ -485,7 +491,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn unpin(&self) -> Result<()> {
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             let req = permissions::MANAGE_MESSAGES;
 
@@ -563,16 +569,12 @@ impl Message {
 
 impl From<Message> for MessageId {
     /// Gets the Id of a `Message`.
-    fn from(message: Message) -> MessageId {
-        message.id
-    }
+    fn from(message: Message) -> MessageId { message.id }
 }
 
 impl<'a> From<&'a Message> for MessageId {
     /// Gets the Id of a `Message`.
-    fn from(message: &Message) -> MessageId {
-        message.id
-    }
+    fn from(message: &Message) -> MessageId { message.id }
 }
 
 /// A representation of a reaction to a message.
@@ -590,7 +592,7 @@ pub struct MessageReaction {
     /// Indicator of whether the current user has sent the type of reaction.
     pub me: bool,
     /// The type of reaction.
-    #[serde(rename="emoji")]
+    #[serde(rename = "emoji")]
     pub reaction_type: ReactionType,
 }
 

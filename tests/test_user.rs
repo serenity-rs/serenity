@@ -1,6 +1,6 @@
 extern crate serenity;
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 mod model {
     use serenity::model::{User, UserId};
 
@@ -18,12 +18,20 @@ mod model {
     fn test_core() {
         let mut user = gen();
 
-        assert!(user.avatar_url().unwrap().ends_with("/avatars/210/abc.webp?size=1024"));
-        assert!(user.static_avatar_url().unwrap().ends_with("/avatars/210/abc.webp?size=1024"));
+        assert!(user.avatar_url()
+                    .unwrap()
+                    .ends_with("/avatars/210/abc.webp?size=1024"));
+        assert!(user.static_avatar_url()
+                    .unwrap()
+                    .ends_with("/avatars/210/abc.webp?size=1024"));
 
         user.avatar = Some("a_aaa".to_owned());
-        assert!(user.avatar_url().unwrap().ends_with("/avatars/210/a_aaa.gif?size=1024"));
-        assert!(user.static_avatar_url().unwrap().ends_with("/avatars/210/a_aaa.webp?size=1024"));
+        assert!(user.avatar_url()
+                    .unwrap()
+                    .ends_with("/avatars/210/a_aaa.gif?size=1024"));
+        assert!(user.static_avatar_url()
+                    .unwrap()
+                    .ends_with("/avatars/210/a_aaa.webp?size=1024"));
 
         user.avatar = None;
         assert!(user.avatar_url().is_none());
