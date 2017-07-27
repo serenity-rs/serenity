@@ -61,9 +61,7 @@ impl Invite {
     /// [Create Invite]: permissions/constant.CREATE_INVITE.html
     /// [permission]: permissions/index.html
     pub fn create<C, F>(channel_id: C, f: F) -> Result<RichInvite>
-    where
-        C: Into<ChannelId>,
-        F: FnOnce(CreateInvite) -> CreateInvite, {
+        where C: Into<ChannelId>, F: FnOnce(CreateInvite) -> CreateInvite {
         let channel_id = channel_id.into();
 
         #[cfg(feature = "cache")]

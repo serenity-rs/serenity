@@ -64,9 +64,7 @@ impl Manager {
     /// [`get`]: #method.get
     #[allow(map_entry)]
     pub fn join<C, G>(&mut self, guild_id: G, channel_id: C) -> &mut Handler
-    where
-        C: Into<ChannelId>,
-        G: Into<GuildId>, {
+        where C: Into<ChannelId>, G: Into<GuildId> {
         let channel_id = channel_id.into();
         let guild_id = guild_id.into();
 

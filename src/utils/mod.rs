@@ -299,12 +299,10 @@ pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
         }
 
         match id.parse::<u64>() {
-            Ok(x) => {
-                Some(EmojiIdentifier {
-                         name: name,
-                         id: EmojiId(x),
-                     })
-            },
+            Ok(x) => Some(EmojiIdentifier {
+                name: name,
+                id: EmojiId(x),
+            }),
             _ => None,
         }
     } else {

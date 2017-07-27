@@ -101,11 +101,9 @@ pub fn ytdl(uri: &str) -> Result<Box<AudioSource>> {
     };
 
     let uri = match obj.remove("url") {
-        Some(v) => {
-            match v {
-                Value::String(uri) => uri,
-                other => return Err(Error::Voice(VoiceError::YouTubeDLUrl(other))),
-            }
+        Some(v) => match v {
+            Value::String(uri) => uri,
+            other => return Err(Error::Voice(VoiceError::YouTubeDLUrl(other))),
         },
         None => return Err(Error::Voice(VoiceError::YouTubeDLUrl(Value::Object(obj)))),
     };

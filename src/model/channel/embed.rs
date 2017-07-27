@@ -88,8 +88,7 @@ impl Embed {
     /// ```
     #[inline]
     pub fn fake<F>(f: F) -> Value
-    where
-        F: FnOnce(CreateEmbed) -> CreateEmbed, {
+        where F: FnOnce(CreateEmbed) -> CreateEmbed {
         Value::Object(f(CreateEmbed::default()).0)
     }
 }

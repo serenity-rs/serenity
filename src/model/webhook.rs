@@ -107,12 +107,14 @@ impl Webhook {
         let mut map = Map::new();
 
         if let Some(avatar) = avatar {
-            map.insert("avatar".to_owned(),
-                       if avatar.is_empty() {
-                           Value::Null
-                       } else {
-                           Value::String(avatar.to_owned())
-                       });
+            map.insert(
+                "avatar".to_owned(),
+                if avatar.is_empty() {
+                    Value::Null
+                } else {
+                    Value::String(avatar.to_owned())
+                },
+            );
         }
 
         if let Some(name) = name {
@@ -181,10 +183,12 @@ impl Webhook {
                                                                 wait: bool,
                                                                 f: F)
                                                                 -> Result<Option<Message>> {
-        http::execute_webhook(self.id.0,
-                              &self.token,
-                              wait,
-                              &f(ExecuteWebhook::default()).0)
+        http::execute_webhook(
+            self.id.0,
+            &self.token,
+            wait,
+            &f(ExecuteWebhook::default()).0,
+        )
     }
 
     /// Retrieves the latest information about the webhook, editing the

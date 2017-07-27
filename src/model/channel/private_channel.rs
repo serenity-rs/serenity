@@ -51,9 +51,7 @@ impl PrivateChannel {
     /// [`Message::react`]: struct.Message.html#method.react
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
-    where
-        M: Into<MessageId>,
-        R: Into<ReactionType>, {
+        where M: Into<MessageId>, R: Into<ReactionType> {
         self.id.create_reaction(message_id, reaction_type)
     }
 
@@ -106,9 +104,7 @@ impl PrivateChannel {
                                  user_id: Option<UserId>,
                                  reaction_type: R)
                                  -> Result<()>
-    where
-        M: Into<MessageId>,
-        R: Into<ReactionType>, {
+        where M: Into<MessageId>, R: Into<ReactionType> {
         self.id.delete_reaction(message_id, user_id, reaction_type)
     }
 
@@ -133,9 +129,7 @@ impl PrivateChannel {
     /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-    where
-        F: FnOnce(CreateMessage) -> CreateMessage,
-        M: Into<MessageId>, {
+        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
         self.id.edit_message(message_id, f)
     }
 
@@ -170,8 +164,7 @@ impl PrivateChannel {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-    where
-        F: FnOnce(GetMessages) -> GetMessages, {
+        where F: FnOnce(GetMessages) -> GetMessages {
         self.id.messages(f)
     }
 
@@ -197,10 +190,7 @@ impl PrivateChannel {
                                    limit: Option<u8>,
                                    after: Option<U>)
                                    -> Result<Vec<User>>
-    where
-        M: Into<MessageId>,
-        R: Into<ReactionType>,
-        U: Into<UserId>, {
+        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
         self.id
             .reaction_users(message_id, reaction_type, limit, after)
     }
@@ -249,9 +239,7 @@ impl PrivateChannel {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
     pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
-    where
-        F: FnOnce(CreateMessage) -> CreateMessage,
-        T: Into<AttachmentType<'a>>, {
+        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         self.id.send_files(files, f)
     }
 

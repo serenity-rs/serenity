@@ -91,22 +91,22 @@ fn deserialize_target<'de, D: Deserializer<'de>>(de: D) -> Result<Target, D::Err
 
         fn visit_i32<E: de::Error>(self, value: i32) -> Result<Target, E> {
             Ok(if value < 10 {
-                   Target::Guild
-               } else if value < 20 {
-                   Target::Channel
-               } else if value < 30 {
-                   Target::User
-               } else if value < 40 {
-                   Target::Role
-               } else if value < 50 {
-                   Target::Invite
-               } else if value < 60 {
-                   Target::Webhook
-               } else if value < 70 {
-                   Target::Emoji
-               } else {
-                   return Err(E::custom(format!("Unexpected target number: {}", value)));
-               })
+                Target::Guild
+            } else if value < 20 {
+                Target::Channel
+            } else if value < 30 {
+                Target::User
+            } else if value < 40 {
+                Target::Role
+            } else if value < 50 {
+                Target::Invite
+            } else if value < 60 {
+                Target::Webhook
+            } else if value < 70 {
+                Target::Emoji
+            } else {
+                return Err(E::custom(format!("Unexpected target number: {}", value)));
+            })
         }
     }
 
@@ -126,58 +126,58 @@ fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Err
         fn visit_i32<E: de::Error>(self, value: i32) -> Result<Action, E> {
             // todo: improve this
             Ok(if value == 1 {
-                   Action::GuildUpdate
-               } else if value == 10 {
-                   Action::ChannelCreate
-               } else if value == 11 {
-                   Action::ChannelUpdate
-               } else if value == 12 {
-                   Action::ChannelDelete
-               } else if value == 13 {
-                   Action::ChannelOverwriteCreate
-               } else if value == 14 {
-                   Action::ChannelOverwriteUpdate
-               } else if value == 15 {
-                   Action::ChannelOverwriteDelete
-               } else if value == 20 {
-                   Action::MemberKick
-               } else if value == 21 {
-                   Action::MemberPrune
-               } else if value == 22 {
-                   Action::MemberBanAdd
-               } else if value == 23 {
-                   Action::MemberBanRemove
-               } else if value == 24 {
-                   Action::MemberUpdate
-               } else if value == 25 {
-                   Action::MemberRoleUpdate
-               } else if value == 30 {
-                   Action::RoleCreate
-               } else if value == 31 {
-                   Action::RoleUpdate
-               } else if value == 32 {
-                   Action::RoleDelete
-               } else if value == 40 {
-                   Action::InviteCreate
-               } else if value == 41 {
-                   Action::InviteUpdate
-               } else if value == 42 {
-                   Action::InviteDelete
-               } else if value == 50 {
-                   Action::WebhookCreate
-               } else if value == 51 {
-                   Action::WebhookUpdate
-               } else if value == 52 {
-                   Action::WebhookDelete
-               } else if value == 60 {
-                   Action::EmojiCreate
-               } else if value == 61 {
-                   Action::EmojiUpdate
-               } else if value == 62 {
-                   Action::EmojiDelete
-               } else {
-                   return Err(E::custom(format!("Unexpected action number: {}", value)));
-               })
+                Action::GuildUpdate
+            } else if value == 10 {
+                Action::ChannelCreate
+            } else if value == 11 {
+                Action::ChannelUpdate
+            } else if value == 12 {
+                Action::ChannelDelete
+            } else if value == 13 {
+                Action::ChannelOverwriteCreate
+            } else if value == 14 {
+                Action::ChannelOverwriteUpdate
+            } else if value == 15 {
+                Action::ChannelOverwriteDelete
+            } else if value == 20 {
+                Action::MemberKick
+            } else if value == 21 {
+                Action::MemberPrune
+            } else if value == 22 {
+                Action::MemberBanAdd
+            } else if value == 23 {
+                Action::MemberBanRemove
+            } else if value == 24 {
+                Action::MemberUpdate
+            } else if value == 25 {
+                Action::MemberRoleUpdate
+            } else if value == 30 {
+                Action::RoleCreate
+            } else if value == 31 {
+                Action::RoleUpdate
+            } else if value == 32 {
+                Action::RoleDelete
+            } else if value == 40 {
+                Action::InviteCreate
+            } else if value == 41 {
+                Action::InviteUpdate
+            } else if value == 42 {
+                Action::InviteDelete
+            } else if value == 50 {
+                Action::WebhookCreate
+            } else if value == 51 {
+                Action::WebhookUpdate
+            } else if value == 52 {
+                Action::WebhookDelete
+            } else if value == 60 {
+                Action::EmojiCreate
+            } else if value == 61 {
+                Action::EmojiUpdate
+            } else if value == 62 {
+                Action::EmojiDelete
+            } else {
+                return Err(E::custom(format!("Unexpected action number: {}", value)));
+            })
         }
     }
 
@@ -214,11 +214,11 @@ impl<'de> Deserialize<'de> for AuditLogs {
                 };
 
                 Ok(AuditLogs {
-                       entries: audit_log_entries
-                           .into_iter()
-                           .map(|entry| (entry.id, entry))
-                           .collect(),
-                   })
+                    entries: audit_log_entries
+                        .into_iter()
+                        .map(|entry| (entry.id, entry))
+                        .collect(),
+                })
             }
         }
 

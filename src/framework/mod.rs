@@ -277,8 +277,7 @@ impl BuiltinFramework {
     /// [`prefix`]: struct.Configuration.html#method.prefix
     /// [allowing whitespace]: struct.Configuration.html#method.allow_whitespace
     pub fn configure<F>(mut self, f: F) -> Self
-    where
-        F: FnOnce(Configuration) -> Configuration, {
+        where F: FnOnce(Configuration) -> Configuration {
         self.configuration = f(self.configuration);
 
         self
@@ -308,17 +307,18 @@ impl BuiltinFramework {
     ///         .exec_str("pong!")));
     /// ```
     pub fn bucket<S>(mut self, s: S, delay: i64, time_span: i64, limit: i32) -> Self
-    where
-        S: Into<String>, {
-        self.buckets.insert(s.into(),
-                            Bucket {
-                                ratelimit: Ratelimit {
-                                    delay: delay,
-                                    limit: Some((time_span, limit)),
-                                },
-                                users: HashMap::new(),
-                                check: None,
-                            });
+        where S: Into<String> {
+        self.buckets.insert(
+            s.into(),
+            Bucket {
+                ratelimit: Ratelimit {
+                    delay: delay,
+                    limit: Some((time_span, limit)),
+                },
+                users: HashMap::new(),
+                check: None,
+            },
+        );
 
         self
     }
@@ -359,18 +359,19 @@ impl BuiltinFramework {
                                     limit: i32,
                                     check: Check)
                                     -> Self
-    where
-        Check: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + 'static,
-        S: Into<String>, {
-        self.buckets.insert(s.into(),
-                            Bucket {
-                                ratelimit: Ratelimit {
-                                    delay,
-                                    limit: Some((time_span, limit)),
-                                },
-                                users: HashMap::new(),
-                                check: Some(Box::new(check)),
-                            });
+        where Check: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + 'static,
+              S: Into<String> {
+        self.buckets.insert(
+            s.into(),
+            Bucket {
+                ratelimit: Ratelimit {
+                    delay,
+                    limit: Some((time_span, limit)),
+                },
+                users: HashMap::new(),
+                check: Some(Box::new(check)),
+            },
+        );
 
         self
     }
@@ -409,18 +410,18 @@ impl BuiltinFramework {
                                     limit: i32,
                                     check: Check)
                                     -> Self
-    where
-        Check: Fn(&mut Context, ChannelId, UserId) -> bool + 'static,
-        S: Into<String>, {
-        self.buckets.insert(s.into(),
-                            Bucket {
-                                ratelimit: Ratelimit {
-                                    delay,
-                                    limit: Some((time_span, limit)),
-                                },
-                                users: HashMap::new(),
-                                check: Some(Box::new(check)),
-                            });
+        where Check: Fn(&mut Context, ChannelId, UserId) -> bool + 'static, S: Into<String> {
+        self.buckets.insert(
+            s.into(),
+            Bucket {
+                ratelimit: Ratelimit {
+                    delay,
+                    limit: Some((time_span, limit)),
+                },
+                users: HashMap::new(),
+                check: Some(Box::new(check)),
+            },
+        );
 
         self
     }
@@ -447,17 +448,18 @@ impl BuiltinFramework {
     ///         .exec_str("pong!")));
     /// ```
     pub fn simple_bucket<S>(mut self, s: S, delay: i64) -> Self
-    where
-        S: Into<String>, {
-        self.buckets.insert(s.into(),
-                            Bucket {
-                                ratelimit: Ratelimit {
-                                    delay: delay,
-                                    limit: None,
-                                },
-                                users: HashMap::new(),
-                                check: None,
-                            });
+        where S: Into<String> {
+        self.buckets.insert(
+            s.into(),
+            Bucket {
+                ratelimit: Ratelimit {
+                    delay: delay,
+                    limit: None,
+                },
+                users: HashMap::new(),
+                check: None,
+            },
+        );
 
         self
     }
@@ -516,22 +518,18 @@ impl BuiltinFramework {
                 if let Some(ref mut bucket) = self.buckets.get_mut(bucket) {
                     let rate_limit = bucket.take(message.author.id.0);
                     match bucket.check {
-                        Some(ref check) => {
-                            if feature_cache! {{ 
+                        Some(ref check) => if feature_cache! {{ 
                                 let guild_id = message.guild_id();
                                 (check)(context, guild_id, message.channel_id, message.author.id) 
                             } else {
                                 (check)(context, message.channel_id, message.author.id)
                             }} {
-                                if rate_limit > 0i64 {
-                                    return Some(DispatchError::RateLimited(rate_limit));
-                                }
-                            }
-                        },
-                        None => {
                             if rate_limit > 0i64 {
                                 return Some(DispatchError::RateLimited(rate_limit));
                             }
+                        },
+                        None => if rate_limit > 0i64 {
+                            return Some(DispatchError::RateLimited(rate_limit));
                         },
                     }
                 }
@@ -540,18 +538,18 @@ impl BuiltinFramework {
             if let Some(x) = command.min_args {
                 if args < x as usize {
                     return Some(DispatchError::NotEnoughArguments {
-                                    min: x,
-                                    given: args,
-                                });
+                        min: x,
+                        given: args,
+                    });
                 }
             }
 
             if let Some(x) = command.max_args {
                 if args > x as usize {
                     return Some(DispatchError::TooManyArguments {
-                                    max: x,
-                                    given: args,
-                                });
+                        max: x,
+                        given: args,
+                    });
                 }
             }
 
@@ -562,7 +560,9 @@ impl BuiltinFramework {
                 }
 
                 if !self.has_correct_permissions(command, message) {
-                    return Some(DispatchError::LackOfPermissions(command.required_permissions));
+                    return Some(DispatchError::LackOfPermissions(
+                        command.required_permissions,
+                    ));
                 }
 
                 if (!self.configuration.allow_dm && message.is_private()) ||
@@ -636,9 +636,8 @@ impl BuiltinFramework {
     /// # }
     /// ```
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-    where
-        F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + 'static,
-        S: Into<String>, {
+        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + 'static,
+              S: Into<String> {
         {
             let ungrouped = self.groups
                 .entry("Ungrouped".to_owned())
@@ -670,9 +669,7 @@ impl BuiltinFramework {
     ///     }));
     /// ```
     pub fn command<F, S>(mut self, command_name: S, f: F) -> Self
-    where
-        F: FnOnce(CreateCommand) -> CreateCommand,
-        S: Into<String>, {
+        where F: FnOnce(CreateCommand) -> CreateCommand, S: Into<String> {
         {
             let ungrouped = self.groups
                 .entry("Ungrouped".to_owned())
@@ -684,10 +681,10 @@ impl BuiltinFramework {
 
                 if let Some(ref prefix) = group.prefix {
                     for v in &cmd.aliases {
-                        group
-                            .commands
-                            .insert(format!("{} {}", prefix, v.to_owned()),
-                                    CommandOrAlias::Alias(format!("{} {}", prefix, name)));
+                        group.commands.insert(
+                            format!("{} {}", prefix, v.to_owned()),
+                            CommandOrAlias::Alias(format!("{} {}", prefix, name)),
+                        );
                     }
                 } else {
                     for v in &cmd.aliases {
@@ -730,9 +727,7 @@ impl BuiltinFramework {
     ///         .command("pong", |c| c.exec_str("ping!"))));
     /// ```
     pub fn group<F, S>(mut self, group_name: S, f: F) -> Self
-    where
-        F: FnOnce(CreateGroup) -> CreateGroup,
-        S: Into<String>, {
+        where F: FnOnce(CreateGroup) -> CreateGroup, S: Into<String> {
         let group = f(CreateGroup(CommandGroup::default())).0;
 
         self.groups.insert(group_name.into(), Arc::new(group));
@@ -777,8 +772,7 @@ impl BuiltinFramework {
     ///     }));
     /// ```
     pub fn on_dispatch_error<F>(mut self, f: F) -> Self
-    where
-        F: Fn(Context, Message, DispatchError) + 'static, {
+        where F: Fn(Context, Message, DispatchError) + 'static {
         self.dispatch_error_handler = Some(Arc::new(f));
 
         self
@@ -834,8 +828,7 @@ impl BuiltinFramework {
     /// ```
     ///
     pub fn before<F>(mut self, f: F) -> Self
-    where
-        F: Fn(&mut Context, &Message, &String) -> bool + 'static, {
+        where F: Fn(&mut Context, &Message, &String) -> bool + 'static {
         self.before = Some(Arc::new(f));
 
         self
@@ -866,8 +859,7 @@ impl BuiltinFramework {
     ///     }));
     /// ```
     pub fn after<F>(mut self, f: F) -> Self
-    where
-        F: Fn(&mut Context, &Message, &String, Result<(), String>) + 'static, {
+        where F: Fn(&mut Context, &Message, &String, Result<(), String>) + 'static {
         self.after = Some(Arc::new(f));
 
         self
@@ -906,9 +898,9 @@ impl ::Framework for BuiltinFramework {
                 }
 
                 built.push_str(match round.get(i) {
-                                   Some(piece) => piece,
-                                   None => continue 'outer,
-                               });
+                    Some(piece) => piece,
+                    None => continue 'outer,
+                });
 
                 let groups = self.groups.clone();
 
@@ -950,12 +942,14 @@ impl ::Framework for BuiltinFramework {
                             }
                         };
 
-                        if let Some(error) = self.should_fail(&mut context,
-                                                              &message,
-                                                              &command,
-                                                              args.len(),
-                                                              &to_check,
-                                                              &built) {
+                        if let Some(error) = self.should_fail(
+                            &mut context,
+                            &message,
+                            &command,
+                            args.len(),
+                            &to_check,
+                            &built,
+                        ) {
                             if let Some(ref handler) = self.dispatch_error_handler {
                                 handler(context, message, error);
                             }

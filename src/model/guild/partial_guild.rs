@@ -58,7 +58,9 @@ impl PartialGuild {
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8) -> Result<()> {
         if delete_message_days > 7 {
-            return Err(Error::Model(ModelError::DeleteMessageDaysAmount(delete_message_days)));
+            return Err(Error::Model(
+                ModelError::DeleteMessageDaysAmount(delete_message_days),
+            ));
         }
 
         self.id.ban(user, delete_message_days)
@@ -131,8 +133,7 @@ impl PartialGuild {
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
     pub fn create_integration<I>(&self, integration_id: I, kind: &str) -> Result<()>
-    where
-        I: Into<IntegrationId>, {
+        where I: Into<IntegrationId> {
         self.id.create_integration(integration_id, kind)
     }
 
@@ -205,8 +206,7 @@ impl PartialGuild {
     ///
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-    where
-        F: FnOnce(EditGuild) -> EditGuild, {
+        where F: FnOnce(EditGuild) -> EditGuild {
         match self.id.edit(f) {
             Ok(guild) => {
                 self.afk_channel_id = guild.afk_channel_id;
@@ -261,9 +261,7 @@ impl PartialGuild {
     /// ```
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
-    where
-        F: FnOnce(EditMember) -> EditMember,
-        U: Into<UserId>, {
+        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
         self.id.edit_member(user_id, f)
     }
 
@@ -356,8 +354,7 @@ impl PartialGuild {
     ///
     /// [`User`]: struct.User.html
     pub fn members<U>(&self, limit: Option<u64>, after: Option<U>) -> Result<Vec<Member>>
-    where
-        U: Into<UserId>, {
+        where U: Into<UserId> {
         self.id.members(limit, after)
     }
 
@@ -368,9 +365,7 @@ impl PartialGuild {
     /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
     #[inline]
     pub fn move_member<C, U>(&self, user_id: U, channel_id: C) -> Result<()>
-    where
-        C: Into<ChannelId>,
-        U: Into<UserId>, {
+        where C: Into<ChannelId>, U: Into<UserId> {
         self.id.move_member(user_id, channel_id)
     }
 

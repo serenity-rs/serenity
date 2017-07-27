@@ -153,12 +153,12 @@ impl Handler {
 
         // Safe as all of these being present was already checked.
         self.send(VoiceStatus::Connect(ConnectionInfo {
-                                           endpoint: endpoint,
-                                           guild_id: guild_id,
-                                           session_id: session_id,
-                                           token: token,
-                                           user_id: user_id,
-                                       }));
+            endpoint: endpoint,
+            guild_id: guild_id,
+            session_id: session_id,
+            token: token,
+            user_id: user_id,
+        }));
 
         true
     }

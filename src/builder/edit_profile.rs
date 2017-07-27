@@ -74,8 +74,10 @@ impl EditProfile {
     ///
     /// [provided]: #method.password
     pub fn new_password(mut self, new_password: &str) -> Self {
-        self.0.insert("new_password".to_owned(),
-                      Value::String(new_password.to_owned()));
+        self.0.insert(
+            "new_password".to_owned(),
+            Value::String(new_password.to_owned()),
+        );
 
         self
     }

@@ -206,8 +206,7 @@ impl Message {
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-    where
-        F: FnOnce(CreateMessage) -> CreateMessage, {
+        where F: FnOnce(CreateMessage) -> CreateMessage {
         #[cfg(feature = "cache")]
         {
             if self.author.id != CACHE.read().unwrap().user.id {
@@ -244,8 +243,10 @@ impl Message {
     pub(crate) fn transform_content(&mut self) {
         match self.kind {
             MessageType::PinsAdd => {
-                self.content = format!("{} pinned a message to this channel. See all the pins.",
-                                       self.author);
+                self.content = format!(
+                    "{} pinned a message to this channel. See all the pins.",
+                    self.author
+                );
             },
             MessageType::MemberJoin => {
                 let sec = self.timestamp.timestamp() as usize;
@@ -316,9 +317,7 @@ impl Message {
                                 limit: Option<u8>,
                                 after: Option<U>)
                                 -> Result<Vec<User>>
-    where
-        R: Into<ReactionType>,
-        U: Into<UserId>, {
+        where R: Into<ReactionType>, U: Into<UserId> {
         self.channel_id
             .reaction_users(self.id, reaction_type, limit, after)
     }

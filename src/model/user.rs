@@ -86,8 +86,7 @@ impl CurrentUser {
     /// CACHE.write().unwrap().user.edit(|p| p.avatar(Some(&avatar)));
     /// ```
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-    where
-        F: FnOnce(EditProfile) -> EditProfile, {
+        where F: FnOnce(EditProfile) -> EditProfile {
         let mut map = Map::new();
         map.insert("username".to_owned(), Value::String(self.name.clone()));
 
@@ -213,8 +212,10 @@ impl CurrentUser {
             Err(e) => return Err(e),
         };
 
-        let mut url = format!("https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot",
-                              client_id);
+        let mut url = format!(
+            "https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot",
+            client_id
+        );
 
         if bits != 0 {
             write!(url, "&permissions={}", bits)?;
@@ -481,8 +482,7 @@ impl User {
     #[allow(let_and_return)]
     #[cfg(feature = "builder")]
     pub fn direct_message<F>(&self, f: F) -> Result<Message>
-    where
-        F: FnOnce(CreateMessage) -> CreateMessage, {
+        where F: FnOnce(CreateMessage) -> CreateMessage {
         if self.bot {
             return Err(Error::Model(ModelError::MessagingBot));
         }
@@ -580,9 +580,7 @@ impl User {
     /// [`Cache`]: ../cache/struct.Cache.html
     // no-cache would warn on guild_id.
     pub fn has_role<G, R>(&self, guild: G, role: R) -> bool
-    where
-        G: Into<GuildContainer>,
-        R: Into<RoleId>, {
+        where G: Into<GuildContainer>, R: Into<RoleId> {
         let role_id = role.into();
 
         match guild.into() {

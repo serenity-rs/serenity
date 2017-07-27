@@ -103,14 +103,14 @@ impl Reaction {
                        limit: Option<u8>,
                        after: Option<U>)
                        -> Result<Vec<User>>
-    where
-        R: Into<ReactionType>,
-        U: Into<UserId>, {
-        http::get_reaction_users(self.channel_id.0,
-                                 self.message_id.0,
-                                 &reaction_type.into(),
-                                 limit.unwrap_or(50),
-                                 after.map(|u| u.into().0))
+        where R: Into<ReactionType>, U: Into<UserId> {
+        http::get_reaction_users(
+            self.channel_id.0,
+            self.message_id.0,
+            &reaction_type.into(),
+            limit.unwrap_or(50),
+            after.map(|u| u.into().0),
+        )
     }
 }
 
@@ -205,13 +205,13 @@ impl<'de> Deserialize<'de> for ReactionType {
                 let name = name.ok_or_else(|| DeError::missing_field("name"))?;
 
                 Ok(if let Some(id) = id {
-                       ReactionType::Custom {
-                           id: id,
-                           name: name,
-                       }
-                   } else {
-                       ReactionType::Unicode(name)
-                   })
+                    ReactionType::Custom {
+                        id: id,
+                        name: name,
+                    }
+                } else {
+                    ReactionType::Unicode(name)
+                })
             }
         }
 

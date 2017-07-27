@@ -42,12 +42,12 @@ mod utils {
             last_pin_timestamp: None,
             kind: ChannelType::Private,
             recipient: Arc::new(RwLock::new(User {
-                                                id: UserId(2),
-                                                avatar: None,
-                                                bot: false,
-                                                discriminator: 1,
-                                                name: "ab".to_owned(),
-                                            })),
+                id: UserId(2),
+                avatar: None,
+                bot: false,
+                discriminator: 1,
+                name: "ab".to_owned(),
+            })),
         }
     }
 

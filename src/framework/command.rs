@@ -69,8 +69,7 @@ pub struct Command {
 
 impl Command {
     pub fn new<F>(f: F) -> Self
-    where
-        F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + 'static, {
+        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + 'static {
         Command {
             aliases: Vec::new(),
             checks: Vec::default(),

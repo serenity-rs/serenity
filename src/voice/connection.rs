@@ -145,23 +145,23 @@ impl Connection {
         let encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Mono, CodingMode::Audio)?;
 
         Ok(Connection {
-               audio_timer: Timer::new(1000 * 60 * 4),
-               client: mutexed_client,
-               decoder_map: HashMap::new(),
-               destination: destination,
-               encoder: encoder,
-               encoder_stereo: false,
-               key: key,
-               keepalive_timer: Timer::new(hello.heartbeat_interval),
-               udp: udp,
-               sequence: 0,
-               silence_frames: 0,
-               speaking: false,
-               ssrc: hello.ssrc,
-               thread_items: thread_items,
-               timestamp: 0,
-               user_id: info.user_id,
-           })
+            audio_timer: Timer::new(1000 * 60 * 4),
+            client: mutexed_client,
+            decoder_map: HashMap::new(),
+            destination: destination,
+            encoder: encoder,
+            encoder_stereo: false,
+            key: key,
+            keepalive_timer: Timer::new(hello.heartbeat_interval),
+            udp: udp,
+            sequence: 0,
+            silence_frames: 0,
+            speaking: false,
+            ssrc: hello.ssrc,
+            thread_items: thread_items,
+            timestamp: 0,
+            user_id: info.user_id,
+        })
     }
 
     #[allow(unused_variables)]
@@ -183,7 +183,8 @@ impl Connection {
                         let timestamp = handle.read_u32::<BigEndian>()?;
                         let ssrc = handle.read_u32::<BigEndian>()?;
 
-                        nonce.0[..HEADER_LEN].clone_from_slice(&packet[..HEADER_LEN]);
+                        nonce.0[..HEADER_LEN]
+                            .clone_from_slice(&packet[..HEADER_LEN]);
 
                         if let Ok(decrypted) =
                             secretbox::open(&packet[HEADER_LEN..], &nonce, &self.key) {
@@ -200,7 +201,8 @@ impl Connection {
 
                             let b = if is_stereo { len * 2 } else { len };
 
-                            receiver.voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b]);
+                            receiver
+                                .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b]);
                         }
                     },
                     ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
@@ -282,7 +284,8 @@ impl Connection {
             cursor.write_u32::<BigEndian>(self.ssrc)?;
         }
 
-        nonce.0[..HEADER_LEN].clone_from_slice(&packet[..HEADER_LEN]);
+        nonce.0[..HEADER_LEN]
+            .clone_from_slice(&packet[..HEADER_LEN]);
 
         let sl_index = packet.len() - 16;
         let buffer_len = if self.encoder_stereo { 960 * 2 } else { 960 };
@@ -386,12 +389,15 @@ fn encryption_key(client: &mut Client) -> Result<Key> {
                     return Err(Error::Voice(VoiceError::VoiceModeInvalid));
                 }
 
-                return Key::from_slice(&ready.secret_key).ok_or(Error::Voice(VoiceError::KeyGen));
+                return Key::from_slice(&ready.secret_key)
+                    .ok_or(Error::Voice(VoiceError::KeyGen));
             },
             VoiceEvent::Unknown(op, value) => {
-                debug!("[Voice] Expected ready for key; got: op{}/v{:?}",
-                       op.num(),
-                       value);
+                debug!(
+                    "[Voice] Expected ready for key; got: op{}/v{:?}",
+                    op.num(),
+                    value
+                );
             },
             _ => {},
         }
@@ -437,24 +443,24 @@ fn start_threads(client: Arc<Mutex<Client>>, udp: &UdpSocket) -> Result<ThreadIt
     let ws_thread = ThreadBuilder::new()
         .name(format!("{} WS", thread_name))
         .spawn(move || loop {
-                   while let Ok(msg) = client.lock().unwrap().recv_json(VoiceEvent::decode) {
-                       if tx_clone.send(ReceiverStatus::Websocket(msg)).is_ok() {
-                           return;
-                       }
-                   }
+            while let Ok(msg) = client.lock().unwrap().recv_json(VoiceEvent::decode) {
+                if tx_clone.send(ReceiverStatus::Websocket(msg)).is_ok() {
+                    return;
+                }
+            }
 
-                   if ws_close_reader.try_recv().is_ok() {
-                       return;
-                   }
+            if ws_close_reader.try_recv().is_ok() {
+                return;
+            }
 
-                   thread::sleep(Duration::from_millis(25));
-               })?;
+            thread::sleep(Duration::from_millis(25));
+        })?;
 
     Ok(ThreadItems {
-           rx: rx,
-           udp_close_sender: udp_close_sender,
-           udp_thread: udp_thread,
-           ws_close_sender: ws_close_sender,
-           ws_thread: ws_thread,
-       })
+        rx: rx,
+        udp_close_sender: udp_close_sender,
+        udp_thread: udp_thread,
+        ws_close_sender: ws_close_sender,
+        ws_thread: ws_thread,
+    })
 }

@@ -53,8 +53,7 @@ impl CreateMessage {
 
     /// Set an embed for the message.
     pub fn embed<F>(mut self, f: F) -> Self
-    where
-        F: FnOnce(CreateEmbed) -> CreateEmbed, {
+        where F: FnOnce(CreateEmbed) -> CreateEmbed {
         let embed = Value::Object(f(CreateEmbed::default()).0);
 
         self.0.insert("embed".to_owned(), embed);

@@ -67,8 +67,10 @@ impl EditMember {
     ///
     /// [Move Members]: ../model/permissions/constant.MOVE_MEMBERS.html
     pub fn voice_channel<C: Into<ChannelId>>(mut self, channel_id: C) -> Self {
-        self.0.insert("channel_id".to_owned(),
-                      Value::Number(Number::from(channel_id.into().0)));
+        self.0.insert(
+            "channel_id".to_owned(),
+            Value::Number(Number::from(channel_id.into().0)),
+        );
 
         self
     }

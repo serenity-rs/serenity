@@ -479,12 +479,10 @@ impl Cache {
     /// [`Guild`]: ../model/struct.Guild.html
     /// [`members`]: ../model/struct.Guild.html#structfield.members
     pub fn member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
-    where
-        G: Into<GuildId>,
-        U: Into<UserId>, {
-        self.guilds
-            .get(&guild_id.into())
-            .and_then(|guild| guild.write().unwrap().members.get(&user_id.into()).cloned())
+        where G: Into<GuildId>, U: Into<UserId> {
+        self.guilds.get(&guild_id.into()).and_then(|guild| {
+            guild.write().unwrap().members.get(&user_id.into()).cloned()
+        })
     }
 
     /// Retrieves a [`PrivateChannel`] from the cache's [`private_channels`]
@@ -553,9 +551,7 @@ impl Cache {
     /// # }
     /// ```
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
-    where
-        G: Into<GuildId>,
-        R: Into<RoleId>, {
+        where G: Into<GuildId>, R: Into<RoleId> {
         self.guilds
             .get(&guild_id.into())
             .and_then(|g| g.read().unwrap().roles.get(&role_id.into()).cloned())
@@ -719,9 +715,9 @@ impl Cache {
 
     pub(crate) fn update_with_channel_recipient_remove(&mut self,
                                                        event: &ChannelRecipientRemoveEvent) {
-        self.groups
-            .get_mut(&event.channel_id)
-            .map(|group| group.write().unwrap().recipients.remove(&event.user.id));
+        self.groups.get_mut(&event.channel_id).map(|group| {
+            group.write().unwrap().recipients.remove(&event.user.id)
+        });
     }
 
     pub(crate) fn update_with_channel_update(&mut self, event: &ChannelUpdateEvent) {
@@ -807,9 +803,9 @@ impl Cache {
     }
 
     pub(crate) fn update_with_guild_emojis_update(&mut self, event: &GuildEmojisUpdateEvent) {
-        self.guilds
-            .get_mut(&event.guild_id)
-            .map(|guild| guild.write().unwrap().emojis.extend(event.emojis.clone()));
+        self.guilds.get_mut(&event.guild_id).map(|guild| {
+            guild.write().unwrap().emojis.extend(event.emojis.clone())
+        });
     }
 
     pub(crate) fn update_with_guild_member_add(&mut self, event: &mut GuildMemberAddEvent) {
@@ -863,16 +859,18 @@ impl Cache {
             };
 
             if !found {
-                guild.members.insert(event.user.id,
-                                     Member {
-                                         deaf: false,
-                                         guild_id: event.guild_id,
-                                         joined_at: None,
-                                         mute: false,
-                                         nick: event.nick.clone(),
-                                         roles: event.roles.clone(),
-                                         user: Arc::new(RwLock::new(event.user.clone())),
-                                     });
+                guild.members.insert(
+                    event.user.id,
+                    Member {
+                        deaf: false,
+                        guild_id: event.guild_id,
+                        joined_at: None,
+                        mute: false,
+                        nick: event.nick.clone(),
+                        roles: event.roles.clone(),
+                        user: Arc::new(RwLock::new(event.user.clone())),
+                    },
+                );
             }
 
             item
@@ -886,9 +884,9 @@ impl Cache {
             self.update_user_entry(&member.user.read().unwrap());
         }
 
-        self.guilds
-            .get_mut(&event.guild_id)
-            .map(|guild| guild.write().unwrap().members.extend(event.members.clone()));
+        self.guilds.get_mut(&event.guild_id).map(|guild| {
+            guild.write().unwrap().members.extend(event.members.clone())
+        });
     }
 
     pub(crate) fn update_with_guild_role_create(&mut self, event: &GuildRoleCreateEvent) {
@@ -944,14 +942,14 @@ impl Cache {
 
     pub(crate) fn update_with_presences_replace(&mut self, event: &PresencesReplaceEvent) {
         self.presences.extend({
-                                  let mut p: HashMap<UserId, Presence> = HashMap::default();
+            let mut p: HashMap<UserId, Presence> = HashMap::default();
 
-                                  for presence in &event.presences {
-                                      p.insert(presence.user_id, presence.clone());
-                                  }
+            for presence in &event.presences {
+                p.insert(presence.user_id, presence.clone());
+            }
 
-                                  p
-                              });
+            p
+        });
     }
 
     pub(crate) fn update_with_presence_update(&mut self, event: &mut PresenceUpdateEvent) {

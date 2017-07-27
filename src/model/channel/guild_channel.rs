@@ -105,8 +105,7 @@ impl GuildChannel {
     /// let invite = channel.create_invite(|i| i.max_uses(5));
     /// ```
     pub fn create_invite<F>(&self, f: F) -> Result<RichInvite>
-    where
-        F: FnOnce(CreateInvite) -> CreateInvite, {
+        where F: FnOnce(CreateInvite) -> CreateInvite {
         #[cfg(feature = "cache")]
         {
             let req = permissions::CREATE_INVITE;
@@ -286,9 +285,7 @@ impl GuildChannel {
                                  user_id: Option<UserId>,
                                  reaction_type: R)
                                  -> Result<()>
-    where
-        M: Into<MessageId>,
-        R: Into<ReactionType>, {
+        where M: Into<MessageId>, R: Into<ReactionType> {
         self.id.delete_reaction(message_id, user_id, reaction_type)
     }
 
@@ -304,8 +301,7 @@ impl GuildChannel {
     /// channel.edit(|c| c.name("test").bitrate(86400));
     /// ```
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-    where
-        F: FnOnce(EditChannel) -> EditChannel, {
+        where F: FnOnce(EditChannel) -> EditChannel {
 
         #[cfg(feature = "cache")]
         {
@@ -318,10 +314,14 @@ impl GuildChannel {
 
         let mut map = Map::new();
         map.insert("name".to_owned(), Value::String(self.name.clone()));
-        map.insert("position".to_owned(),
-                   Value::Number(Number::from(self.position)));
-        map.insert("type".to_owned(),
-                   Value::String(self.kind.name().to_owned()));
+        map.insert(
+            "position".to_owned(),
+            Value::Number(Number::from(self.position)),
+        );
+        map.insert(
+            "type".to_owned(),
+            Value::String(self.kind.name().to_owned()),
+        );
 
         let edited = f(EditChannel(map)).0;
 
@@ -356,9 +356,7 @@ impl GuildChannel {
     /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-    where
-        F: FnOnce(CreateMessage) -> CreateMessage,
-        M: Into<MessageId>, {
+        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
         self.id.edit_message(message_id, f)
     }
 
@@ -412,8 +410,7 @@ impl GuildChannel {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-    where
-        F: FnOnce(GetMessages) -> GetMessages, {
+        where F: FnOnce(GetMessages) -> GetMessages {
         self.id.messages(f)
     }
 
@@ -544,10 +541,7 @@ impl GuildChannel {
                                    limit: Option<u8>,
                                    after: Option<U>)
                                    -> Result<Vec<User>>
-    where
-        M: Into<MessageId>,
-        R: Into<ReactionType>,
-        U: Into<UserId>, {
+        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
         self.id
             .reaction_users(message_id, reaction_type, limit, after)
     }
@@ -585,9 +579,7 @@ impl GuildChannel {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
     pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
-    where
-        F: FnOnce(CreateMessage) -> CreateMessage,
-        T: Into<AttachmentType<'a>>, {
+        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         self.id.send_files(files, f)
     }
 

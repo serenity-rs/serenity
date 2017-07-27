@@ -50,8 +50,10 @@ impl EditRole {
 
         #[cfg(feature = "utils")]
         {
-            map.insert("color".to_owned(),
-                       Value::Number(Number::from(role.colour.0)));
+            map.insert(
+                "color".to_owned(),
+                Value::Number(Number::from(role.colour.0)),
+            );
         }
 
         #[cfg(not(feature = "utils"))]
@@ -63,10 +65,14 @@ impl EditRole {
         map.insert("managed".to_owned(), Value::Bool(role.managed));
         map.insert("mentionable".to_owned(), Value::Bool(role.mentionable));
         map.insert("name".to_owned(), Value::String(role.name.clone()));
-        map.insert("permissions".to_owned(),
-                   Value::Number(Number::from(role.permissions.bits())));
-        map.insert("position".to_owned(),
-                   Value::Number(Number::from(role.position)));
+        map.insert(
+            "permissions".to_owned(),
+            Value::Number(Number::from(role.permissions.bits())),
+        );
+        map.insert(
+            "position".to_owned(),
+            Value::Number(Number::from(role.position)),
+        );
 
         EditRole(map)
     }
@@ -105,8 +111,10 @@ impl EditRole {
 
     /// The set of permissions to assign the role.
     pub fn permissions(mut self, permissions: Permissions) -> Self {
-        self.0.insert("permissions".to_owned(),
-                      Value::Number(Number::from(permissions.bits())));
+        self.0.insert(
+            "permissions".to_owned(),
+            Value::Number(Number::from(permissions.bits())),
+        );
 
         self
     }

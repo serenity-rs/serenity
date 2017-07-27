@@ -75,9 +75,7 @@ impl Group {
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     #[inline]
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
-    where
-        M: Into<MessageId>,
-        R: Into<ReactionType>, {
+        where M: Into<MessageId>, R: Into<ReactionType> {
         self.channel_id.create_reaction(message_id, reaction_type)
     }
 
@@ -124,9 +122,7 @@ impl Group {
                                  user_id: Option<UserId>,
                                  reaction_type: R)
                                  -> Result<()>
-    where
-        M: Into<MessageId>,
-        R: Into<ReactionType>, {
+        where M: Into<MessageId>, R: Into<ReactionType> {
         self.channel_id
             .delete_reaction(message_id, user_id, reaction_type)
     }
@@ -152,17 +148,15 @@ impl Group {
     /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-    where
-        F: FnOnce(CreateMessage) -> CreateMessage,
-        M: Into<MessageId>, {
+        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
         self.channel_id.edit_message(message_id, f)
     }
 
     /// Returns the formatted URI of the group's icon if one exists.
     pub fn icon_url(&self) -> Option<String> {
-        self.icon
-            .as_ref()
-            .map(|icon| format!(cdn!("/channel-icons/{}/{}.webp"), self.channel_id, icon))
+        self.icon.as_ref().map(|icon| {
+            format!(cdn!("/channel-icons/{}/{}.webp"), self.channel_id, icon)
+        })
     }
 
     /// Determines if the channel is NSFW.
@@ -197,8 +191,7 @@ impl Group {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-    where
-        F: FnOnce(GetMessages) -> GetMessages, {
+        where F: FnOnce(GetMessages) -> GetMessages {
         self.channel_id.messages(f)
     }
 
@@ -248,10 +241,7 @@ impl Group {
                                    limit: Option<u8>,
                                    after: Option<U>)
                                    -> Result<Vec<User>>
-    where
-        M: Into<MessageId>,
-        R: Into<ReactionType>,
-        U: Into<UserId>, {
+        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
         self.channel_id
             .reaction_users(message_id, reaction_type, limit, after)
     }
@@ -304,9 +294,7 @@ impl Group {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
     pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
-    where
-        F: FnOnce(CreateMessage) -> CreateMessage,
-        T: Into<AttachmentType<'a>>, {
+        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         self.channel_id.send_files(files, f)
     }
 

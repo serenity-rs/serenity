@@ -215,8 +215,7 @@ impl Configuration {
     ///     })));
     /// ```
     pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
-    where
-        F: Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static, {
+        where F: Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static {
         self.dynamic_prefix = Some(Box::new(dynamic_prefix));
 
         self

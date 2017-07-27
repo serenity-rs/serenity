@@ -62,9 +62,7 @@ impl Channel {
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     #[inline]
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
-    where
-        M: Into<MessageId>,
-        R: Into<ReactionType>, {
+        where M: Into<MessageId>, R: Into<ReactionType> {
         self.id().create_reaction(message_id, reaction_type)
     }
 
@@ -118,9 +116,7 @@ impl Channel {
                                  user_id: Option<UserId>,
                                  reaction_type: R)
                                  -> Result<()>
-    where
-        M: Into<MessageId>,
-        R: Into<ReactionType>, {
+        where M: Into<MessageId>, R: Into<ReactionType> {
         self.id()
             .delete_reaction(message_id, user_id, reaction_type)
     }
@@ -146,9 +142,7 @@ impl Channel {
     /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-    where
-        F: FnOnce(CreateMessage) -> CreateMessage,
-        M: Into<MessageId>, {
+        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
         self.id().edit_message(message_id, f)
     }
 
@@ -194,8 +188,7 @@ impl Channel {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-    where
-        F: FnOnce(GetMessages) -> GetMessages, {
+        where F: FnOnce(GetMessages) -> GetMessages {
         self.id().messages(f)
     }
 
@@ -222,10 +215,7 @@ impl Channel {
                                    limit: Option<u8>,
                                    after: Option<U>)
                                    -> Result<Vec<User>>
-    where
-        M: Into<MessageId>,
-        R: Into<ReactionType>,
-        U: Into<UserId>, {
+        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
         self.id()
             .reaction_users(message_id, reaction_type, limit, after)
     }
@@ -277,9 +267,7 @@ impl Channel {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
     pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
-    where
-        F: FnOnce(CreateMessage) -> CreateMessage,
-        T: Into<AttachmentType<'a>>, {
+        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         self.id().send_files(files, f)
     }
 
@@ -304,8 +292,7 @@ impl Channel {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
     pub fn send_message<F>(&self, f: F) -> Result<Message>
-    where
-        F: FnOnce(CreateMessage) -> CreateMessage, {
+        where F: FnOnce(CreateMessage) -> CreateMessage {
         self.id().send_message(f)
     }
 
@@ -331,21 +318,15 @@ impl<'de> Deserialize<'de> for Channel {
         };
 
         match kind {
-            0 | 2 => {
-                serde_json::from_value::<GuildChannel>(Value::Object(v))
-                    .map(|x| Channel::Guild(Arc::new(RwLock::new(x))))
-                    .map_err(DeError::custom)
-            },
-            1 => {
-                serde_json::from_value::<PrivateChannel>(Value::Object(v))
-                    .map(|x| Channel::Private(Arc::new(RwLock::new(x))))
-                    .map_err(DeError::custom)
-            },
-            3 => {
-                serde_json::from_value::<Group>(Value::Object(v))
-                    .map(|x| Channel::Group(Arc::new(RwLock::new(x))))
-                    .map_err(DeError::custom)
-            },
+            0 | 2 => serde_json::from_value::<GuildChannel>(Value::Object(v))
+                .map(|x| Channel::Guild(Arc::new(RwLock::new(x))))
+                .map_err(DeError::custom),
+            1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
+                .map(|x| Channel::Private(Arc::new(RwLock::new(x))))
+                .map_err(DeError::custom),
+            3 => serde_json::from_value::<Group>(Value::Object(v))
+                .map(|x| Channel::Group(Arc::new(RwLock::new(x))))
+                .map_err(DeError::custom),
             _ => Err(DeError::custom("Unknown channel type")),
         }
     }
@@ -443,10 +424,10 @@ impl<'de> Deserialize<'de> for PermissionOverwrite {
         };
 
         Ok(PermissionOverwrite {
-               allow: data.allow,
-               deny: data.deny,
-               kind: kind,
-           })
+            allow: data.allow,
+            deny: data.deny,
+            kind: kind,
+        })
     }
 }
 

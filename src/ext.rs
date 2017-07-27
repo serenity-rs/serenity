@@ -15,7 +15,7 @@
 
 #[cfg(feature = "cache")]
 pub use super::cache;
-#[cfg(feature = "framework")]
+#[cfg(feature = "buitin_framework")]
 pub use super::framework;
 #[cfg(feature = "voice")]
 pub use super::voice;

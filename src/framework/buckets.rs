@@ -4,6 +4,12 @@ use std::default::Default;
 use client::Context;
 use model::{ChannelId, GuildId, UserId};
 
+#[cfg(feature = "cache")]
+type Check = Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + 'static;
+
+#[cfg(not(feature = "cache"))]
+type Check = Fn(&mut Context, ChannelId, UserId) -> bool + 'static;
+
 pub(crate) struct Ratelimit {
     pub delay: i64,
     pub limit: Option<(i64, i32)>,
@@ -19,11 +25,7 @@ pub(crate) struct MemberRatelimit {
 pub(crate) struct Bucket {
     pub ratelimit: Ratelimit,
     pub users: HashMap<u64, MemberRatelimit>,
-    #[cfg(feature = "cache")]
-    pub check:
-        Option<Box<Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + 'static>>,
-    #[cfg(not(feature = "cache"))]
-    pub checK: Option<Box<Fn(&mut Context, ChannelId, UserId) -> bool + 'static>>,
+    pub check: Option<Box<Check>>,
 }
 
 impl Bucket {

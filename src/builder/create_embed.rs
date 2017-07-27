@@ -47,8 +47,7 @@ impl CreateEmbed {
     ///
     /// [`CreateEmbedAuthor`]: struct.CreateEmbedAuthor.html
     pub fn author<F>(mut self, f: F) -> Self
-    where
-        F: FnOnce(CreateEmbedAuthor) -> CreateEmbedAuthor, {
+        where F: FnOnce(CreateEmbedAuthor) -> CreateEmbedAuthor {
         let author = f(CreateEmbedAuthor::default()).0;
 
         self.0.insert("author".to_owned(), Value::Object(author));
@@ -68,8 +67,10 @@ impl CreateEmbed {
     /// Set the colour of the left-hand side of the embed.
     #[cfg(feature = "utils")]
     pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
-        self.0.insert("color".to_owned(),
-                      Value::Number(Number::from(colour.into().0 as u64)));
+        self.0.insert(
+            "color".to_owned(),
+            Value::Number(Number::from(colour.into().0 as u64)),
+        );
 
         CreateEmbed(self.0)
     }
@@ -96,8 +97,10 @@ impl CreateEmbed {
     ///
     /// **Note**: This can't be longer than 2048 characters.
     pub fn description(mut self, description: &str) -> Self {
-        self.0.insert("description".to_owned(),
-                      Value::String(description.to_owned()));
+        self.0.insert(
+            "description".to_owned(),
+            Value::String(description.to_owned()),
+        );
 
         CreateEmbed(self.0)
     }
@@ -113,8 +116,7 @@ impl CreateEmbed {
     ///
     /// [`CreateEmbedField`]: struct.CreateEmbedField.html
     pub fn field<F>(mut self, f: F) -> Self
-    where
-        F: FnOnce(CreateEmbedField) -> CreateEmbedField, {
+        where F: FnOnce(CreateEmbedField) -> CreateEmbedField {
         let field = f(CreateEmbedField::default()).0;
 
         {
@@ -170,8 +172,7 @@ impl CreateEmbed {
     ///
     /// [`CreateEmbedFooter`]: struct.CreateEmbedFooter.html
     pub fn footer<F>(mut self, f: F) -> Self
-    where
-        F: FnOnce(CreateEmbedFooter) -> CreateEmbedFooter, {
+        where F: FnOnce(CreateEmbedFooter) -> CreateEmbedFooter {
         let footer = f(CreateEmbedFooter::default()).0;
 
         self.0.insert("footer".to_owned(), Value::Object(footer));
@@ -352,7 +353,9 @@ impl From<Embed> for CreateEmbed {
         }
 
         for field in embed.fields {
-            b = b.field(move |f| f.inline(field.inline).name(&field.name).value(&field.value));
+            b = b.field(move |f| {
+                f.inline(field.inline).name(&field.name).value(&field.value)
+            });
         }
 
         if let Some(image) = embed.image {
@@ -513,8 +516,7 @@ impl<'a> From<&'a str> for Timestamp {
 }
 
 impl<'a, Tz: TimeZone> From<&'a DateTime<Tz>> for Timestamp
-where
-    Tz::Offset: Display, {
+    where Tz::Offset: Display {
     fn from(dt: &'a DateTime<Tz>) -> Self {
         Timestamp {
             ts: dt.to_rfc3339(),

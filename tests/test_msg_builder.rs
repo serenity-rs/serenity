@@ -34,12 +34,12 @@ fn no_free_formatting() {
 fn mentions() {
     let content_emoji = MessageBuilder::new()
         .emoji(Emoji {
-                   id: EmojiId(32),
-                   name: "Rohrkatze".to_string(),
-                   managed: false,
-                   require_colons: true,
-                   roles: vec![],
-               })
+            id: EmojiId(32),
+            name: "Rohrkatze".to_string(),
+            managed: false,
+            require_colons: true,
+            roles: vec![],
+        })
         .build();
     let content_mentions = MessageBuilder::new()
         .channel(1)

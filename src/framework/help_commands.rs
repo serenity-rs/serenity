@@ -33,8 +33,9 @@ use model::{ChannelId, Message};
 use utils::Colour;
 
 fn error_embed(channel_id: &ChannelId, input: &str) {
-    let _ =
-        channel_id.send_message(|m| m.embed(|e| e.colour(Colour::dark_red()).description(input)));
+    let _ = channel_id.send_message(|m| {
+        m.embed(|e| e.colour(Colour::dark_red()).description(input))
+    });
 }
 
 fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &InternalCommand> {
@@ -158,9 +159,10 @@ pub fn with_embeds(_: &mut Context,
 
     let _ = msg.channel_id.send_message(|m| {
         m.embed(|mut e| {
-            e = e.colour(Colour::rosewater())
-                .description("To get help with an individual command, pass its \
-                              name as an argument to this command.");
+            e = e.colour(Colour::rosewater()).description(
+                "To get help with an individual command, pass its \
+                 name as an argument to this command.",
+            );
 
             let mut group_names = groups.keys().collect::<Vec<_>>();
             group_names.sort();
@@ -275,14 +277,16 @@ pub fn plain(_: &mut Context,
                     let _ = write!(result, "**Group:** {}\n", group_name);
                 }
 
+                let only = if command.dm_only {
+                    "Only in DM"
+                } else if command.guild_only {
+                    "Only in guilds"
+                } else {
+                    "In DM and guilds"
+                };
+
                 result.push_str("**Available:** ");
-                result.push_str(if command.dm_only {
-                                    "Only in DM"
-                                } else if command.guild_only {
-                                    "Only in guilds"
-                                } else {
-                                    "In DM and guilds"
-                                });
+                result.push_str(only);
                 result.push_str("\n");
 
                 let _ = msg.channel_id.say(&result);

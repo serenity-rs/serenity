@@ -107,10 +107,10 @@ impl<'de> Deserialize<'de> for Game {
             .and_then(|v| serde_json::from_value::<String>(v).ok());
 
         Ok(Game {
-               kind: kind,
-               name: name,
-               url: url,
-           })
+            kind: kind,
+            name: name,
+            url: url,
+        })
     }
 }
 
@@ -185,10 +185,8 @@ impl<'de> Deserialize<'de> for Presence {
         };
 
         let game = match map.remove("game") {
-            Some(v) => {
-                serde_json::from_value::<Option<Game>>(v)
-                    .map_err(DeError::custom)?
-            },
+            Some(v) => serde_json::from_value::<Option<Game>>(v)
+                .map_err(DeError::custom)?,
             None => None,
         };
         let last_modified = match map.remove("last_modified") {
@@ -196,10 +194,8 @@ impl<'de> Deserialize<'de> for Presence {
             None => None,
         };
         let nick = match map.remove("nick") {
-            Some(v) => {
-                serde_json::from_value::<Option<String>>(v)
-                    .map_err(DeError::custom)?
-            },
+            Some(v) => serde_json::from_value::<Option<String>>(v)
+                .map_err(DeError::custom)?,
             None => None,
         };
         let status = map.remove("status")
@@ -208,13 +204,13 @@ impl<'de> Deserialize<'de> for Presence {
             .map_err(DeError::custom)?;
 
         Ok(Presence {
-               game: game,
-               last_modified: last_modified,
-               nick: nick,
-               status: status,
-               user: user,
-               user_id: user_id,
-           })
+            game: game,
+            last_modified: last_modified,
+            nick: nick,
+            status: status,
+            user: user,
+            user_id: user_id,
+        })
     }
 }
 

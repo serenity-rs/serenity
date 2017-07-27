@@ -362,18 +362,22 @@ impl Shard {
 
                 // Received seq is off -- attempt to resume.
                 if s > self.seq + 1 {
-                    info!("[Shard {:?}] Received off sequence (them: {}; us: {}); resuming",
-                          self.shard_info,
-                          s,
-                          self.seq);
+                    info!(
+                        "[Shard {:?}] Received off sequence (them: {}; us: {}); resuming",
+                        self.shard_info,
+                        s,
+                        self.seq
+                    );
 
                     if self.stage == ConnectionStage::Handshake {
                         self.stage = ConnectionStage::Identifying;
 
                         self.identify()?;
                     } else {
-                        warn!("[Shard {:?}] Heartbeat during non-Handshake; auto-reconnecting",
-                              self.shard_info);
+                        warn!(
+                            "[Shard {:?}] Heartbeat during non-Handshake; auto-reconnecting",
+                            self.shard_info
+                        );
 
                         return self.autoreconnect().and(Ok(None));
                     }
@@ -548,10 +552,12 @@ impl Shard {
     /// connection.
     pub fn shutdown_clean(&mut self) -> Result<()> {
         {
-            let message = OwnedMessage::Close(Some(CloseData {
-                                                       status_code: 1000,
-                                                       reason: String::new(),
-                                                   }));
+            let data = CloseData {
+                status_code: 1000,
+                reason: String::new(),
+            };
+
+            let message = OwnedMessage::Close(Some(data));
 
             self.client.send_message(&message)?;
         }
@@ -680,7 +686,9 @@ impl Shard {
         cache
             .guilds
             .keys()
-            .filter(|guild_id| utils::shard_id(guild_id.0, shard_count) == shard_id)
+            .filter(|guild_id| {
+                utils::shard_id(guild_id.0, shard_count) == shard_id
+            })
             .count() as u16
     }
 
@@ -729,10 +737,9 @@ impl Shard {
             },
             Err(why) => {
                 match why {
-                    Error::WebSocket(WebSocketError::IoError(err)) => {
-                        if err.raw_os_error() != Some(32) {
-                            debug!("[Shard {:?}] Err w/ heartbeating: {:?}", self.shard_info, err);
-                        }
+                    Error::WebSocket(WebSocketError::IoError(err)) => if err.raw_os_error() !=
+                                                                         Some(32) {
+                        debug!("[Shard {:?}] Err w/ heartbeating: {:?}", self.shard_info, err);
                     },
                     other => {
                         warn!("[Shard {:?}] Other err w/ keepalive: {:?}", self.shard_info, other);

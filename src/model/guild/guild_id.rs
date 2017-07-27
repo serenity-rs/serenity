@@ -145,8 +145,7 @@ impl GuildId {
     ///
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn create_integration<I>(&self, integration_id: I, kind: &str) -> Result<()>
-    where
-        I: Into<IntegrationId>, {
+        where I: Into<IntegrationId> {
         let integration_id = integration_id.into();
         let map = json!({
             "id": integration_id.0,
@@ -263,9 +262,7 @@ impl GuildId {
     /// ```
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
-    where
-        F: FnOnce(EditMember) -> EditMember,
-        U: Into<UserId>, {
+        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
         http::edit_member(self.0, user_id.into().0, &f(EditMember::default()).0)
     }
 
@@ -299,9 +296,7 @@ impl GuildId {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
     pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
-    where
-        F: FnOnce(EditRole) -> EditRole,
-        R: Into<RoleId>, {
+        where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
         http::edit_role(self.0, role_id.into().0, &f(EditRole::default()).0)
     }
 
@@ -381,8 +376,7 @@ impl GuildId {
     /// [`User`]: struct.User.html
     #[inline]
     pub fn members<U>(&self, limit: Option<u64>, after: Option<U>) -> Result<Vec<Member>>
-    where
-        U: Into<UserId>, {
+        where U: Into<UserId> {
         http::get_guild_members(self.0, limit, after.map(|x| x.into().0))
     }
 
@@ -392,12 +386,12 @@ impl GuildId {
     ///
     /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
     pub fn move_member<C, U>(&self, user_id: U, channel_id: C) -> Result<()>
-    where
-        C: Into<ChannelId>,
-        U: Into<UserId>, {
+        where C: Into<ChannelId>, U: Into<UserId> {
         let mut map = Map::new();
-        map.insert("channel_id".to_owned(),
-                   Value::Number(Number::from(channel_id.into().0)));
+        map.insert(
+            "channel_id".to_owned(),
+            Value::Number(Number::from(channel_id.into().0)),
+        );
 
         http::edit_member(self.0, user_id.into().0, &map)
     }

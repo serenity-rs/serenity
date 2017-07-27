@@ -80,10 +80,12 @@ pub fn dispatch<H: EventHandler + 'static>(event: Event,
     match event {
         Event::MessageCreate(event) => {
             let context = context(conn, data);
-            dispatch_message(context.clone(),
-                             event.message.clone(),
-                             event_handler,
-                             tokio_handle);
+            dispatch_message(
+                context.clone(),
+                event.message.clone(),
+                event_handler,
+                tokio_handle,
+            );
 
             if let Some(ref mut framework) = *framework.lock().unwrap() {
                 helper! {{

@@ -65,8 +65,7 @@ impl CreateCommand {
     /// }
     /// ```
     pub fn check<F>(mut self, check: F) -> Self
-    where
-        F: Fn(&mut Context, &Message, &Arc<Command>) -> bool + Send + Sync + 'static, {
+        where F: Fn(&mut Context, &Message, &Arc<Command>) -> bool + Send + Sync + 'static {
         self.0.checks.push(Box::new(check));
 
         self
@@ -100,8 +99,10 @@ impl CreateCommand {
     ///
     /// [`exec_str`]: #method.exec_str
     pub fn exec<F>(mut self, func: F) -> Self
-    where
-        F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + Send + Sync + 'static, {
+        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String>
+                     + Send
+                     + Sync
+                     + 'static {
         self.0.exec = CommandType::Basic(Box::new(func));
 
         self
@@ -113,12 +114,9 @@ impl CreateCommand {
     ///
     /// You can return `Err(string)` if there's an error.
     pub fn exec_help<F>(mut self, f: F) -> Self
-    where
-        F: Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, &[String])
-           -> Result<(), String>
-            + Send
-            + Sync
-            + 'static, {
+        where F: Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, &[String])
+                    -> Result<(), String>
+                     + 'static {
         self.0.exec = CommandType::WithCommands(Box::new(f));
 
         self

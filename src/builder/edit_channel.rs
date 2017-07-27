@@ -71,8 +71,10 @@ impl EditChannel {
     ///
     /// [voice]: ../model/enum.ChannelType.html#variant.Voice
     pub fn user_limit(mut self, user_limit: u64) -> Self {
-        self.0.insert("user_limit".to_owned(),
-                      Value::Number(Number::from(user_limit)));
+        self.0.insert(
+            "user_limit".to_owned(),
+            Value::Number(Number::from(user_limit)),
+        );
 
         self
     }

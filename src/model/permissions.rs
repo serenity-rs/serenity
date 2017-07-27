@@ -426,7 +426,9 @@ impl Permissions {
 
 impl<'de> Deserialize<'de> for Permissions {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Permissions::from_bits_truncate(deserializer.deserialize_u64(U64Visitor)?))
+        Ok(Permissions::from_bits_truncate(
+            deserializer.deserialize_u64(U64Visitor)?,
+        ))
     }
 }
 

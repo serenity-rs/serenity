@@ -80,9 +80,7 @@ impl ChannelId {
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     #[inline]
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
-    where
-        M: Into<MessageId>,
-        R: Into<ReactionType>, {
+        where M: Into<MessageId>, R: Into<ReactionType> {
         http::create_reaction(self.0, message_id.into().0, &reaction_type.into())
     }
 
@@ -138,10 +136,13 @@ impl ChannelId {
     ///
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
     pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
-        http::delete_permission(self.0, match permission_type {
-            PermissionOverwriteType::Member(id) => id.0,
-            PermissionOverwriteType::Role(id) => id.0,
-        })
+        http::delete_permission(
+            self.0,
+            match permission_type {
+                PermissionOverwriteType::Member(id) => id.0,
+                PermissionOverwriteType::Role(id) => id.0,
+            },
+        )
     }
 
     /// Deletes the given [`Reaction`] from the channel.
@@ -156,13 +157,13 @@ impl ChannelId {
                                  user_id: Option<UserId>,
                                  reaction_type: R)
                                  -> Result<()>
-    where
-        M: Into<MessageId>,
-        R: Into<ReactionType>, {
-        http::delete_reaction(self.0,
-                              message_id.into().0,
-                              user_id.map(|uid| uid.0),
-                              &reaction_type.into())
+        where M: Into<MessageId>, R: Into<ReactionType> {
+        http::delete_reaction(
+            self.0,
+            message_id.into().0,
+            user_id.map(|uid| uid.0),
+            &reaction_type.into(),
+        )
     }
 
 
@@ -209,9 +210,7 @@ impl ChannelId {
     /// [`Message`]: struct.Message.html
     /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-    where
-        F: FnOnce(CreateMessage) -> CreateMessage,
-        M: Into<MessageId>, {
+        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
         let map = f(CreateMessage::default()).0;
 
         if let Some(content) = map.get("content") {
@@ -256,11 +255,13 @@ impl ChannelId {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        http::get_message(self.0, message_id.into().0).map(|mut msg| {
-            msg.transform_content();
+        http::get_message(self.0, message_id.into().0).map(
+            |mut msg| {
+                msg.transform_content();
 
-            msg
-        })
+                msg
+            },
+        )
     }
 
     /// Gets messages from the channel.
@@ -272,8 +273,7 @@ impl ChannelId {
     /// [`Channel::messages`]: enum.Channel.html#method.messages
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-    where
-        F: FnOnce(GetMessages) -> GetMessages, {
+        where F: FnOnce(GetMessages) -> GetMessages {
         let mut map = f(GetMessages::default()).0;
         let mut query = format!("?limit={}", map.remove("limit").unwrap_or(50));
 
@@ -302,18 +302,16 @@ impl ChannelId {
         use self::Channel::*;
 
         Some(match match self.find() {
-                       Some(c) => c,
-                       None => return None,
-                   } {
-                 Guild(channel) => channel.read().unwrap().name().to_string(),
-                 Group(channel) => {
-                     match channel.read().unwrap().name() {
-                         Cow::Borrowed(name) => name.to_string(),
-                         Cow::Owned(name) => name,
-                     }
-                 },
-                 Private(channel) => channel.read().unwrap().name(),
-             })
+                  Some(c) => c,
+                  None => return None,
+              } {
+            Guild(channel) => channel.read().unwrap().name().to_string(),
+            Group(channel) => match channel.read().unwrap().name() {
+                Cow::Borrowed(name) => name.to_string(),
+                Cow::Owned(name) => name,
+            },
+            Private(channel) => channel.read().unwrap().name(),
+        })
     }
 
     /// Pins a [`Message`] to the channel.
@@ -348,17 +346,16 @@ impl ChannelId {
                                    limit: Option<u8>,
                                    after: Option<U>)
                                    -> Result<Vec<User>>
-    where
-        M: Into<MessageId>,
-        R: Into<ReactionType>,
-        U: Into<UserId>, {
+        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
         let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
 
-        http::get_reaction_users(self.0,
-                                 message_id.into().0,
-                                 &reaction_type.into(),
-                                 limit,
-                                 after.map(|u| u.into().0))
+        http::get_reaction_users(
+            self.0,
+            message_id.into().0,
+            &reaction_type.into(),
+            limit,
+            after.map(|u| u.into().0),
+        )
     }
 
     /// Sends a message with just the given message content in the channel.
@@ -436,9 +433,7 @@ impl ChannelId {
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
-    where
-        F: FnOnce(CreateMessage) -> CreateMessage,
-        T: Into<AttachmentType<'a>>, {
+        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         let mut map = f(CreateMessage::default()).0;
 
         if let Some(content) = map.get("content") {
@@ -474,8 +469,7 @@ impl ChannelId {
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn send_message<F>(&self, f: F) -> Result<Message>
-    where
-        F: FnOnce(CreateMessage) -> CreateMessage, {
+        where F: FnOnce(CreateMessage) -> CreateMessage {
         let CreateMessage(map, reactions) = f(CreateMessage::default());
 
         Message::check_content_length(&map)?;

@@ -23,10 +23,13 @@ impl EditGuild {
     ///
     /// [`afk_timeout`]: #method.afk_timeout
     pub fn afk_channel<C: Into<ChannelId>>(mut self, channel: Option<C>) -> Self {
-        self.0.insert("afk_channel_id".to_owned(), match channel {
-            Some(channel) => Value::Number(Number::from(channel.into().0)),
-            None => Value::Null,
-        });
+        self.0.insert(
+            "afk_channel_id".to_owned(),
+            match channel {
+                Some(channel) => Value::Number(Number::from(channel.into().0)),
+                None => Value::Null,
+            },
+        );
 
         self
     }
@@ -36,8 +39,10 @@ impl EditGuild {
     ///
     /// [`afk_channel`]: #method.afk_channel
     pub fn afk_timeout(mut self, timeout: u64) -> Self {
-        self.0.insert("afk_timeout".to_owned(),
-                      Value::Number(Number::from(timeout)));
+        self.0.insert(
+            "afk_timeout".to_owned(),
+            Value::Number(Number::from(timeout)),
+        );
 
         self
     }
@@ -72,8 +77,10 @@ impl EditGuild {
     ///
     /// [`utils::read_image`]: ../utils/fn.read_image.html
     pub fn icon(mut self, icon: Option<&str>) -> Self {
-        self.0.insert("icon".to_owned(),
-                      icon.map_or_else(|| Value::Null, |x| Value::String(x.to_owned())));
+        self.0.insert(
+            "icon".to_owned(),
+            icon.map_or_else(|| Value::Null, |x| Value::String(x.to_owned())),
+        );
 
         self
     }
@@ -92,8 +99,10 @@ impl EditGuild {
     ///
     /// **Note**: The current user must be the owner of the guild.
     pub fn owner<U: Into<UserId>>(mut self, user_id: U) -> Self {
-        self.0.insert("owner_id".to_owned(),
-                      Value::Number(Number::from(user_id.into().0)));
+        self.0.insert(
+            "owner_id".to_owned(),
+            Value::Number(Number::from(user_id.into().0)),
+        );
 
         self
     }
@@ -177,8 +186,7 @@ impl EditGuild {
     /// [`VerificationLevel`]: ../model/enum.VerificationLevel.html
     /// [`VerificationLevel::High`]: ../model/enum.VerificationLevel.html#variant.High
     pub fn verification_level<V>(mut self, verification_level: V) -> Self
-    where
-        V: Into<VerificationLevel>, {
+        where V: Into<VerificationLevel> {
         let num = Value::Number(Number::from(verification_level.into().num()));
 
         self.0.insert("verification_level".to_owned(), num);

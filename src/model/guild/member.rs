@@ -138,10 +138,12 @@ impl Member {
             return Err(Error::ExceededLimit);
         }
 
-        http::ban_user(self.guild_id.0,
-                       self.user.read().unwrap().id.0,
-                       ban_options.dmd(),
-                       &*reason)
+        http::ban_user(
+            self.guild_id.0,
+            self.user.read().unwrap().id.0,
+            ban_options.dmd(),
+            &*reason,
+        )
     }
 
     /// Determines the member's colour.
@@ -181,9 +183,11 @@ impl Member {
     /// Returns the DiscordTag of a Member, taking possible nickname into account.
     #[inline]
     pub fn distinct(&self) -> String {
-        format!("{}#{}",
-                self.display_name(),
-                self.user.read().unwrap().discriminator)
+        format!(
+            "{}#{}",
+            self.display_name(),
+            self.user.read().unwrap().discriminator
+        )
     }
 
     /// Edits the member with the given data. See [`Guild::edit_member`] for
@@ -279,7 +283,10 @@ impl Member {
 
         let guild = guild.read().unwrap();
 
-        Ok(guild.permissions_for(ChannelId(guild.id.0), self.user.read().unwrap().id))
+        Ok(
+            guild
+                .permissions_for(ChannelId(guild.id.0), self.user.read().unwrap().id),
+        )
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the

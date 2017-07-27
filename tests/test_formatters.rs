@@ -18,19 +18,19 @@ fn test_mention() {
     use std::sync::{Arc, RwLock};
 
     let channel = Channel::Guild(Arc::new(RwLock::new(GuildChannel {
-                                                          bitrate: None,
-                                                          guild_id: GuildId(1),
-                                                          kind: ChannelType::Text,
-                                                          id: ChannelId(4),
-                                                          last_message_id: None,
-                                                          last_pin_timestamp: None,
-                                                          name: "a".to_owned(),
-                                                          permission_overwrites: vec![],
-                                                          position: 1,
-                                                          topic: None,
-                                                          user_limit: None,
-                                                          nsfw: false,
-                                                      })));
+        bitrate: None,
+        guild_id: GuildId(1),
+        kind: ChannelType::Text,
+        id: ChannelId(4),
+        last_message_id: None,
+        last_pin_timestamp: None,
+        name: "a".to_owned(),
+        permission_overwrites: vec![],
+        position: 1,
+        topic: None,
+        user_limit: None,
+        nsfw: false,
+    })));
     let emoji = Emoji {
         id: EmojiId(5),
         name: "a".to_owned(),

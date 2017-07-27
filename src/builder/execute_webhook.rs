@@ -74,8 +74,10 @@ impl ExecuteWebhook {
     ///     .content("Here's a webhook"));
     /// ```
     pub fn avatar_url(mut self, avatar_url: &str) -> Self {
-        self.0.insert("avatar_url".to_owned(),
-                      Value::String(avatar_url.to_owned()));
+        self.0.insert(
+            "avatar_url".to_owned(),
+            Value::String(avatar_url.to_owned()),
+        );
 
         self
     }

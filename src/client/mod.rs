@@ -337,10 +337,10 @@ impl<H: EventHandler + 'static> Client<H> {
     /// use std::env;
     ///
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
-    /// client.with_framework(MyFramework { commands: { 
-    ///     let mut map = HashMap::new(); 
-    ///     map.insert("ping".to_string(), Box::new(|msg, _| msg.channel_id.say("pong!"))); 
-    ///     map 
+    /// client.with_framework(MyFramework { commands: {
+    ///     let mut map = HashMap::new();
+    ///     map.insert("ping".to_string(), Box::new(|msg, _| msg.channel_id.say("pong!")));
+    ///     map
     /// }});
     /// # Ok(())
     /// # }
@@ -593,8 +593,10 @@ impl<H: EventHandler + 'static> Client<H> {
     /// [`start_shard_range`]: #method.start_shard_range
     /// [Gateway docs]: gateway/index.html#sharding
     pub fn start_shards(&mut self, total_shards: u64) -> Result<()> {
-        self.start_connection([0, total_shards - 1, total_shards],
-                              http::get_gateway()?.url)
+        self.start_connection(
+            [0, total_shards - 1, total_shards],
+            http::get_gateway()?.url,
+        )
     }
 
     /// Establish a range of sharded connections and start listening for events.
@@ -709,11 +711,13 @@ impl<H: EventHandler + 'static> Client<H> {
         for shard_number in shards_index..shards_total {
             let shard_info = [shard_number, shard_data[2]];
 
-            let boot = boot_shard(&BootInfo {
-                                      gateway_url: gateway_url.clone(),
-                                      shard_info: shard_info,
-                                      token: self.token.clone(),
-                                  });
+            let boot_info = BootInfo {
+                gateway_url: gateway_url.clone(),
+                shard_info: shard_info,
+                token: self.token.clone(),
+            };
+
+            let boot = boot_shard(&boot_info);
 
             match boot {
                 Ok(shard) => {
@@ -814,9 +818,11 @@ fn boot_shard(info: &BootInfo) -> Result<Shard> {
             }
         }
 
-        let attempt = Shard::new(info.gateway_url.clone(),
-                                 info.token.clone(),
-                                 info.shard_info);
+        let attempt = Shard::new(
+            info.gateway_url.clone(),
+            info.token.clone(),
+            info.shard_info,
+        );
 
         match attempt {
             Ok(shard) => {
@@ -842,10 +848,10 @@ fn monitor_shard<H: EventHandler + 'static>(mut info: MonitorInfo<H>) {
 
         for _ in 0..3 {
             let boot = boot_shard(&BootInfo {
-                                      gateway_url: info.gateway_url.clone(),
-                                      shard_info: info.shard_info,
-                                      token: info.token.clone(),
-                                  });
+                gateway_url: info.gateway_url.clone(),
+                shard_info: info.shard_info,
+                token: info.token.clone(),
+            });
 
             match boot {
                 Ok(new_shard) => {
@@ -877,9 +883,11 @@ fn monitor_shard<H: EventHandler + 'static>(mut info: MonitorInfo<H>) {
         let mut shard = info.shard.lock();
 
         if let Err(e) = shard.shutdown_clean() {
-            error!("Error shutting down shard {:?}: {:?}",
-                   shard.shard_info(),
-                   e);
+            error!(
+                "Error shutting down shard {:?}: {:?}",
+                shard.shard_info(),
+                e
+            );
         }
     }
 }

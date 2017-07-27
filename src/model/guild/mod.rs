@@ -168,7 +168,9 @@ impl Guild {
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8) -> Result<()> {
         if delete_message_days > 7 {
-            return Err(Error::Model(ModelError::DeleteMessageDaysAmount(delete_message_days)));
+            return Err(Error::Model(
+                ModelError::DeleteMessageDaysAmount(delete_message_days),
+            ));
         }
 
         #[cfg(feature = "cache")]
@@ -321,8 +323,7 @@ impl Guild {
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
     pub fn create_integration<I>(&self, integration_id: I, kind: &str) -> Result<()>
-    where
-        I: Into<IntegrationId>, {
+        where I: Into<IntegrationId> {
         self.id.create_integration(integration_id, kind)
     }
 
@@ -349,8 +350,7 @@ impl Guild {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     pub fn create_role<F>(&self, f: F) -> Result<Role>
-    where
-        F: FnOnce(EditRole) -> EditRole, {
+        where F: FnOnce(EditRole) -> EditRole {
         #[cfg(feature = "cache")]
         {
             let req = permissions::MANAGE_ROLES;
@@ -452,8 +452,7 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-    where
-        F: FnOnce(EditGuild) -> EditGuild, {
+        where F: FnOnce(EditGuild) -> EditGuild {
         #[cfg(feature = "cache")]
         {
             let req = permissions::MANAGE_GUILD;
@@ -515,9 +514,7 @@ impl Guild {
     /// ```
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
-    where
-        F: FnOnce(EditMember) -> EditMember,
-        U: Into<UserId>, {
+        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
         self.id.edit_member(user_id, f)
     }
 
@@ -563,9 +560,7 @@ impl Guild {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
     pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
-    where
-        F: FnOnce(EditRole) -> EditRole,
-        R: Into<RoleId>, {
+        where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
         self.id.edit_role(role_id, f)
     }
 
@@ -662,8 +657,7 @@ impl Guild {
     /// [`User`]: struct.User.html
     #[inline]
     pub fn members<U>(&self, limit: Option<u64>, after: Option<U>) -> Result<Vec<Member>>
-    where
-        U: Into<UserId>, {
+        where U: Into<UserId> {
         self.id.members(limit, after)
     }
 
@@ -674,10 +668,8 @@ impl Guild {
 
         for (&id, member) in &self.members {
             match self.presences.get(&id) {
-                Some(presence) => {
-                    if status == presence.status {
-                        members.push(member);
-                    }
+                Some(presence) => if status == presence.status {
+                    members.push(member);
                 },
                 None => continue,
             }
@@ -727,9 +719,9 @@ impl Guild {
                 name_matches && discrim_matches
             })
             .or_else(|| {
-                self.members
-                    .values()
-                    .find(|member| member.nick.as_ref().map_or(false, |nick| nick == name))
+                self.members.values().find(|member| {
+                    member.nick.as_ref().map_or(false, |nick| nick == name)
+                })
             })
     }
 
@@ -740,9 +732,7 @@ impl Guild {
     /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
     #[inline]
     pub fn move_member<C, U>(&self, user_id: U, channel_id: C) -> Result<()>
-    where
-        C: Into<ChannelId>,
-        U: Into<UserId>, {
+        where C: Into<ChannelId>, U: Into<UserId> {
         self.id.move_member(user_id, channel_id)
     }
 
@@ -750,9 +740,7 @@ impl Guild {
     ///
     /// [`User`]: struct.User.html
     pub fn permissions_for<C, U>(&self, channel_id: C, user_id: U) -> Permissions
-    where
-        C: Into<ChannelId>,
-        U: Into<UserId>, {
+        where C: Into<ChannelId>, U: Into<UserId> {
         use super::permissions::*;
 
         let user_id = user_id.into();
@@ -1030,17 +1018,16 @@ impl<'de> Deserialize<'de> for Guild {
             if let Some(array) = map.get_mut("members").and_then(|x| x.as_array_mut()) {
                 for value in array {
                     if let Some(member) = value.as_object_mut() {
-                        member.insert("guild_id".to_owned(), Value::Number(Number::from(guild_id)));
+                        member
+                            .insert("guild_id".to_owned(), Value::Number(Number::from(guild_id)));
                     }
                 }
             }
         }
 
         let afk_channel_id = match map.remove("afk_channel_id") {
-            Some(v) => {
-                serde_json::from_value::<Option<ChannelId>>(v)
-                    .map_err(DeError::custom)?
-            },
+            Some(v) => serde_json::from_value::<Option<ChannelId>>(v)
+                .map_err(DeError::custom)?,
             None => None,
         };
         let afk_timeout = map.remove("afk_timeout")
@@ -1052,7 +1039,9 @@ impl<'de> Deserialize<'de> for Guild {
             .and_then(deserialize_guild_channels)
             .map_err(DeError::custom)?;
         let default_message_notifications = map.remove("default_message_notifications")
-            .ok_or_else(|| DeError::custom("expected guild default_message_notifications"))
+            .ok_or_else(|| {
+                DeError::custom("expected guild default_message_notifications")
+            })
             .and_then(u64::deserialize)
             .map_err(DeError::custom)?;
         let emojis = map.remove("emojis")
@@ -1125,28 +1114,28 @@ impl<'de> Deserialize<'de> for Guild {
             .map_err(DeError::custom)?;
 
         Ok(Self {
-               afk_channel_id: afk_channel_id,
-               afk_timeout: afk_timeout,
-               channels: channels,
-               default_message_notifications: default_message_notifications,
-               emojis: emojis,
-               features: features,
-               icon: icon,
-               id: id,
-               joined_at: joined_at,
-               large: large,
-               member_count: member_count,
-               members: members,
-               mfa_level: mfa_level,
-               name: name,
-               owner_id: owner_id,
-               presences: presences,
-               region: region,
-               roles: roles,
-               splash: splash,
-               verification_level: verification_level,
-               voice_states: voice_states,
-           })
+            afk_channel_id: afk_channel_id,
+            afk_timeout: afk_timeout,
+            channels: channels,
+            default_message_notifications: default_message_notifications,
+            emojis: emojis,
+            features: features,
+            icon: icon,
+            id: id,
+            joined_at: joined_at,
+            large: large,
+            member_count: member_count,
+            members: members,
+            mfa_level: mfa_level,
+            name: name,
+            owner_id: owner_id,
+            presences: presences,
+            region: region,
+            roles: roles,
+            splash: splash,
+            verification_level: verification_level,
+            voice_states: voice_states,
+        })
     }
 }
 
