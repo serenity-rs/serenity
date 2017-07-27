@@ -12,7 +12,7 @@ use chrono::{Utc, Timelike};
 use tokio_core::reactor::Handle;
 
 #[cfg(feature="framework")]
-use ::ext::framework::Framework;
+use ::Framework;
 
 #[cfg(feature="cache")]
 use super::CACHE;
@@ -61,12 +61,12 @@ fn context(conn: &Arc<Mutex<Shard>>,
     Context::new(conn.clone(), data.clone())
 }
 
-#[cfg(feature="builtin-framework")]
+#[cfg(feature="builtin_framework")]
 macro_rules! helper {
 	($enabled:block else $disabled:block) => { $enabled }
 }
 
-#[cfg(not(feature="builtin-framework"))]
+#[cfg(not(feature="builtin_framework"))]
 macro_rules! helper {
 	($enabled:block else $disabled:block) => { $disabled }
 }

@@ -51,8 +51,8 @@ use ::internal::prelude::*;
 use ::internal::ws_impl::ReceiverExt;
 use ::model::event::*;
 
-#[cfg(any(feature="framework", feature="builtin_framework"))]
-use ::framework::Framework;
+#[cfg(feature="framework")]
+use ::Framework;
 
 static HANDLE_STILL: AtomicBool = ATOMIC_BOOL_INIT;
 
@@ -295,7 +295,7 @@ impl<H: EventHandler + 'static> Client<H> {
     /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
     /// #
-    /// use serenity::framework::Framework;
+    /// use serenity::Framework;
     /// use serenity::client::Context;
     /// use serenity::model::*;
     /// use tokio_core::reactor::Handle;

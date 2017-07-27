@@ -142,9 +142,9 @@ pub mod builder;
 pub mod cache;
 #[cfg(feature="client")]
 pub mod client;
-#[cfg(any(feature="cache", feature="framework", feature="voice"))]
+#[cfg(any(feature="cache", feature="builtin_framework", feature="voice"))]
 pub mod ext;
-#[cfg(feature="framework")]
+#[cfg(feature="builtin_framework")]
 pub mod framework;
 #[cfg(feature="gateway")]
 pub mod gateway;
@@ -166,6 +166,10 @@ pub use client::Client;
 use cache::Cache;
 #[cfg(feature="cache")]
 use std::sync::RwLock;
+
+use model::{Message, UserId};
+use client::Context;
+use tokio_core::reactor::Handle; 
 
 #[cfg(feature="cache")]
 lazy_static! {
@@ -204,4 +208,19 @@ lazy_static! {
     /// [`Cache`]: cache/struct.Cache.html
     /// [cache module documentation]: cache/index.html
     pub static ref CACHE: RwLock<Cache> = RwLock::new(Cache::default());
+}
+
+/// This trait allows for serenity to either use its builtin framework, or yours.
+///
+/// When implementing, be sure to use `tokio_handle.spawn_fn(|| ...; Ok())` when dispatching commands.
+/// 
+/// Note that you may see some other methods in here as well, but they're meant to be internal only for the builtin framework.
+#[cfg(feature="framework")]
+pub trait Framework {
+    fn dispatch(&mut self, Context, Message, &Handle);
+
+    #[cfg(feature="builtin_framework")]
+    fn update_current_user(&mut self, UserId, bool) {}
+    #[cfg(feature="builtin_framework")]
+    fn initialized(&self) -> bool { false }
 }
