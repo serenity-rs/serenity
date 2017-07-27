@@ -347,9 +347,12 @@ impl Shard {
 
                         self.stage = ConnectionStage::Connected;
                     },
-                    ref _other => #[cfg(feature = "voice")]
-                    {
-                        self.voice_dispatch(_other);
+                    #[cfg_attr(rustfmt, rustfmt_skip)]
+                    ref _other => {
+                        #[cfg(feature = "voice")]
+                        {
+                            self.voice_dispatch(_other);
+                        }
                     },
                 }
 
