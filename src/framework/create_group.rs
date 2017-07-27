@@ -1,6 +1,6 @@
-pub use ext::framework::command::{Command, CommandGroup, CommandType};
-pub(crate) use ext::framework::command::CommandOrAlias;
-pub use ext::framework::create_command::CreateCommand;
+pub use super::command::{Command, CommandGroup, CommandType};
+pub(crate) use super::command::CommandOrAlias;
+pub use super::create_command::CreateCommand;
 
 use std::default::Default;
 use std::sync::Arc;
