@@ -757,11 +757,10 @@ pub struct Content {
 impl<T: ToString> Add<T> for Content {
     type Output = Content;
 
-    fn add(self, rhs: T) -> Content {
-        let mut nc = self.clone();
-        nc.inner = nc.inner + &rhs.to_string();
+    fn add(mut self, rhs: T) -> Content {
+        self.inner = self.inner + &rhs.to_string();
 
-        nc
+        self
     }
 }
 
@@ -779,11 +778,10 @@ impl<T: ToString> Add<T> for ContentModifier {
 impl Add<ContentModifier> for Content {
     type Output = Content;
 
-    fn add(self, rhs: ContentModifier) -> Content {
-        let mut nc = self.clone();
-        nc.apply(&rhs);
+    fn add(mut self, rhs: ContentModifier) -> Content {
+        self.apply(&rhs);
 
-        nc
+        self
     }
 }
 

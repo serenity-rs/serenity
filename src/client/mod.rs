@@ -803,12 +803,13 @@ fn boot_shard(info: &BootInfo) -> Result<Shard> {
     // After three attempts, start re-retrieving the gateway URL. Before that,
     // use the cached one.
     for attempt_number in 1..3u64 {
+        let BootInfo { ref gateway_url, ref token, shard_info } = *info;
         // If we've tried over 3 times so far, get a new gateway URL.
         //
         // If doing so fails, count this as a boot attempt.
         if attempt_number > 3 {
             match http::get_gateway() {
-                Ok(g) => *info.gateway_url.lock().unwrap() = g.url,
+                Ok(g) => *gateway_url.lock().unwrap() = g.url,
                 Err(why) => {
                     warn!("Failed to retrieve gateway URL: {:?}", why);
 
@@ -819,14 +820,14 @@ fn boot_shard(info: &BootInfo) -> Result<Shard> {
         }
 
         let attempt = Shard::new(
-            info.gateway_url.clone(),
-            info.token.clone(),
-            info.shard_info,
+            gateway_url.clone(),
+            token.clone(),
+            shard_info,
         );
 
         match attempt {
             Ok(shard) => {
-                info!("Successfully booted shard: {:?}", info.shard_info);
+                info!("Successfully booted shard: {:?}", shard_info);
 
                 return Ok(shard);
             },

@@ -682,7 +682,7 @@ impl BuiltinFramework {
                 if let Some(ref prefix) = group.prefix {
                     for v in &cmd.aliases {
                         group.commands.insert(
-                            format!("{} {}", prefix, v.to_owned()),
+                            format!("{} {}", prefix, v),
                             CommandOrAlias::Alias(format!("{} {}", prefix, name)),
                         );
                     }

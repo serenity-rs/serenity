@@ -104,15 +104,15 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
                     positions.push(x.len());
                 }
             } else {
-                for n in conf.prefixes.clone() {
-                    if msg.content.starts_with(&n) {
+                for n in &conf.prefixes {
+                    if msg.content.starts_with(n) {
                         positions.push(n.len());
                     }
                 }
             }
         } else {
-            for n in conf.prefixes.clone() {
-                if msg.content.starts_with(&n) {
+            for n in &conf.prefixes {
+                if msg.content.starts_with(n) {
                     positions.push(n.len());
                 }
             }

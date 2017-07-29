@@ -1658,7 +1658,7 @@ pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap) -> Result
         .set(header::UserAgent(constants::USER_AGENT.to_owned()));
 
     let mut request = Multipart::from_request(request)?;
-    let mut file_num = String::from("0".to_owned());
+    let mut file_num = "0".to_owned();
 
     for file in files {
         match file.into() {
