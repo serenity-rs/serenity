@@ -31,7 +31,7 @@ impl FromNum for Target {
             50 => Invite,
             60 => Webhook,
             70 => Emoji,
-            unex => return Err(format!("Unexpected target number: {}", unex)),
+            _ => return Err(format!("Unexpected target number: {}", num)),
         })
     }
 }
@@ -80,7 +80,7 @@ impl FromNum for ActionChannel {
             10 => Create, 
             11 => Update, 
             12 => Delete,
-            unex => return Err(format!("Unexpected action channel num: {}", unex)),
+            _ => return Err(format!("Unexpected action channel num: {}", num)),
         })
     }
 }
@@ -100,7 +100,7 @@ impl FromNum for ActionChannelOverwrite {
             13 => Create, 
             14 => Update, 
             15 => Delete,
-            unex => return Err(format!("Unexpected action channel overwrite num: {}", unex)),
+            _ => return Err(format!("Unexpected action channel overwrite num: {}", num)),
         })
     }
 }
@@ -126,7 +126,7 @@ impl FromNum for ActionMember {
             23 => BanRemove, 
             24 => Update,
             25 => RoleUpdate,
-            unex => return Err(format!("Unexpected action member num: {}", unex)),
+            _ => return Err(format!("Unexpected action member num: {}", num)),
         })
     }
 }
@@ -146,7 +146,7 @@ impl FromNum for ActionRole {
             30 => Create, 
             31 => Update, 
             32 => Delete,
-            unex => return Err(format!("Unexpected action role num: {}", unex)),
+            _ => return Err(format!("Unexpected action role num: {}", num)),
         })
     }
 }
@@ -166,7 +166,7 @@ impl FromNum for ActionInvite {
             40 => Create, 
             41 => Update, 
             42 => Delete,
-            unex => return Err(format!("Unexpected action invite num: {}", unex)),
+            _ => return Err(format!("Unexpected action invite num: {}", num)),
         })
     }
 }
@@ -186,7 +186,7 @@ impl FromNum for ActionWebhook {
             50 => Create, 
             51 => Update, 
             52 => Delete,
-            unex => return Err(format!("Unexpected action webhook num: {}", unex)),
+            _ => return Err(format!("Unexpected action webhook num: {}", num)),
         })
     }
 }
@@ -206,7 +206,7 @@ impl FromNum for ActionEmoji {
             60 => Create, 
             61 => Update, 
             62 => Delete,
-            unex => return Err(format!("Unexpected action emoji num: {}", unex)),
+            _ => return Err(format!("Unexpected action emoji num: {}", num)),
         })
     }
 }
