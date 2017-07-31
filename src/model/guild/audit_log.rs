@@ -3,7 +3,12 @@ use serde::de::{self, Deserialize, Deserializer, MapAccess, Visitor};
 use std::fmt;
 use std::collections::HashMap;
 
+trait FromNum {
+    fn from_num(num: i32) -> Result<Self, String> where Self: Sized;
+}
+
 /// Determines to what entity an action was used on.
+#[derive(Debug)]
 pub enum Target {
     Guild,
     Channel,
@@ -14,36 +19,199 @@ pub enum Target {
     Emoji,
 }
 
-/// Determines what the action was done on a target.
-pub enum Action {
-    GuildUpdate,
-    ChannelCreate,
-    ChannelUpdate,
-    ChannelDelete,
-    ChannelOverwriteCreate,
-    ChannelOverwriteUpdate,
-    ChannelOverwriteDelete,
-    MemberKick,
-    MemberPrune,
-    MemberBanAdd,
-    MemberBanRemove,
-    MemberUpdate,
-    MemberRoleUpdate,
-    RoleCreate,
-    RoleUpdate,
-    RoleDelete,
-    InviteCreate,
-    InviteUpdate,
-    InviteDelete,
-    WebhookCreate,
-    WebhookUpdate,
-    WebhookDelete,
-    EmojiCreate,
-    EmojiUpdate,
-    EmojiDelete,
+impl FromNum for Target {
+    fn from_num(num: i32) -> Result<Self, String> {
+        use self::Target::*;
+
+        Ok(match num {
+            10 => Guild,
+            20 => Channel,
+            30 => User,
+            40 => Role,
+            50 => Invite,
+            60 => Webhook,
+            70 => Emoji,
+            unex => return Err(format!("Unexpected target number: {}", unex)),
+        })
+    }
 }
 
-#[derive(Deserialize)]
+/// Determines the action that was done on a target.
+#[derive(Debug)]
+pub enum Action {
+    GuildUpdate,
+    Channel(ActionChannel),
+    ChannelOverwrite(ActionChannelOverwrite),
+    Member(ActionMember),
+    Role(ActionRole),
+    Invite(ActionInvite),
+    Webhook(ActionWebhook),
+    Emoji(ActionEmoji),
+}
+
+impl FromNum for Action {
+    fn from_num(num: i32) -> Result<Self, String> {
+        Ok(match num {
+            1 => Action::GuildUpdate,
+            num if num >= 10 && num <= 13 => Action::Channel(ActionChannel::from_num(num)?),
+            num if num >= 13 && num <= 15 => Action::ChannelOverwrite(ActionChannelOverwrite::from_num(num)?),
+            num if num >= 20 && num <= 25 => Action::Member(ActionMember::from_num(num)?),
+            num if num >= 30 && num <= 32 => Action::Role(ActionRole::from_num(num)?),
+            num if num >= 40 && num <= 42 => Action::Invite(ActionInvite::from_num(num)?),
+            num if num >= 50 && num <= 52 => Action::Webhook(ActionWebhook::from_num(num)?),
+            num if num >= 60 && num <= 62 => Action::Emoji(ActionEmoji::from_num(num)?),
+            _ => return Err(format!("Unexpected action number: {}", num)),
+        })
+    } 
+}
+
+#[derive(Debug)]
+pub enum ActionChannel {
+    Create,
+    Update,
+    Delete,
+}
+
+impl FromNum for ActionChannel {
+    fn from_num(num: i32) -> Result<Self, String> {
+        use self::ActionChannel::*;
+
+        Ok(match num {
+            10 => Create, 
+            11 => Update, 
+            12 => Delete,
+            unex => return Err(format!("Unexpected action channel num: {}", unex)),
+        })
+    }
+}
+
+#[derive(Debug)]
+pub enum ActionChannelOverwrite {
+    Create,
+    Update,
+    Delete,
+}
+
+impl FromNum for ActionChannelOverwrite {
+    fn from_num(num: i32) -> Result<Self, String> {
+        use self::ActionChannelOverwrite::*;
+
+        Ok(match num {
+            13 => Create, 
+            14 => Update, 
+            15 => Delete,
+            unex => return Err(format!("Unexpected action channel overwrite num: {}", unex)),
+        })
+    }
+}
+
+#[derive(Debug)]
+pub enum ActionMember {
+    Kick,
+    Prune,
+    BanAdd,
+    BanRemove,
+    Update,
+    RoleUpdate
+}
+
+impl FromNum for ActionMember {
+    fn from_num(num: i32) -> Result<Self, String> {
+        use self::ActionMember::*;
+
+        Ok(match num {
+            20 => Kick,
+            21 => Prune,
+            22 => BanAdd, 
+            23 => BanRemove, 
+            24 => Update,
+            25 => RoleUpdate,
+            unex => return Err(format!("Unexpected action member num: {}", unex)),
+        })
+    }
+}
+
+#[derive(Debug)]
+pub enum ActionRole {
+    Create,
+    Update,
+    Delete,
+}
+
+impl FromNum for ActionRole {
+    fn from_num(num: i32) -> Result<Self, String> {
+        use self::ActionRole::*;
+
+        Ok(match num {
+            30 => Create, 
+            31 => Update, 
+            32 => Delete,
+            unex => return Err(format!("Unexpected action role num: {}", unex)),
+        })
+    }
+}
+
+#[derive(Debug)]
+pub enum ActionInvite {
+    Create,
+    Update,
+    Delete,
+}
+
+impl FromNum for ActionInvite {
+    fn from_num(num: i32) -> Result<Self, String> {
+        use self::ActionInvite::*;
+
+        Ok(match num {
+            40 => Create, 
+            41 => Update, 
+            42 => Delete,
+            unex => return Err(format!("Unexpected action invite num: {}", unex)),
+        })
+    }
+}
+
+#[derive(Debug)]
+pub enum ActionWebhook {
+    Create,
+    Update,
+    Delete,
+}
+
+impl FromNum for ActionWebhook {
+    fn from_num(num: i32) -> Result<Self, String> {
+        use self::ActionWebhook::*;
+
+        Ok(match num {
+            50 => Create, 
+            51 => Update, 
+            52 => Delete,
+            unex => return Err(format!("Unexpected action webhook num: {}", unex)),
+        })
+    }
+}
+
+#[derive(Debug)]
+pub enum ActionEmoji {
+    Create,
+    Delete,
+    Update,
+}
+
+impl FromNum for ActionEmoji {
+    fn from_num(num: i32) -> Result<Self, String> {
+        use self::ActionEmoji::*;
+
+        Ok(match num {
+            60 => Create, 
+            61 => Update, 
+            62 => Delete,
+            unex => return Err(format!("Unexpected action emoji num: {}", unex)),
+        })
+    }
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Change {
     #[serde(rename = "key")]
     pub name: String,
@@ -53,11 +221,12 @@ pub struct Change {
     pub new: String,
 }
 
+#[derive(Debug)]
 pub struct AuditLogs {
     pub entries: HashMap<AuditLogEntryId, AuditLogEntry>,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct AuditLogEntry {
     /// Determines to what entity an [`action`] was used on.
     ///
@@ -90,23 +259,7 @@ fn deserialize_target<'de, D: Deserializer<'de>>(de: D) -> Result<Target, D::Err
         }
 
         fn visit_i32<E: de::Error>(self, value: i32) -> Result<Target, E> {
-            Ok(if value < 10 {
-                Target::Guild
-            } else if value < 20 {
-                Target::Channel
-            } else if value < 30 {
-                Target::User
-            } else if value < 40 {
-                Target::Role
-            } else if value < 50 {
-                Target::Invite
-            } else if value < 60 {
-                Target::Webhook
-            } else if value < 70 {
-                Target::Emoji
-            } else {
-                return Err(E::custom(format!("Unexpected target number: {}", value)));
-            })
+            Target::from_num(value).map_err(|e| E::custom(e))
         }
     }
 
@@ -124,60 +277,7 @@ fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Err
         }
 
         fn visit_i32<E: de::Error>(self, value: i32) -> Result<Action, E> {
-            // todo: improve this
-            Ok(if value == 1 {
-                Action::GuildUpdate
-            } else if value == 10 {
-                Action::ChannelCreate
-            } else if value == 11 {
-                Action::ChannelUpdate
-            } else if value == 12 {
-                Action::ChannelDelete
-            } else if value == 13 {
-                Action::ChannelOverwriteCreate
-            } else if value == 14 {
-                Action::ChannelOverwriteUpdate
-            } else if value == 15 {
-                Action::ChannelOverwriteDelete
-            } else if value == 20 {
-                Action::MemberKick
-            } else if value == 21 {
-                Action::MemberPrune
-            } else if value == 22 {
-                Action::MemberBanAdd
-            } else if value == 23 {
-                Action::MemberBanRemove
-            } else if value == 24 {
-                Action::MemberUpdate
-            } else if value == 25 {
-                Action::MemberRoleUpdate
-            } else if value == 30 {
-                Action::RoleCreate
-            } else if value == 31 {
-                Action::RoleUpdate
-            } else if value == 32 {
-                Action::RoleDelete
-            } else if value == 40 {
-                Action::InviteCreate
-            } else if value == 41 {
-                Action::InviteUpdate
-            } else if value == 42 {
-                Action::InviteDelete
-            } else if value == 50 {
-                Action::WebhookCreate
-            } else if value == 51 {
-                Action::WebhookUpdate
-            } else if value == 52 {
-                Action::WebhookDelete
-            } else if value == 60 {
-                Action::EmojiCreate
-            } else if value == 61 {
-                Action::EmojiUpdate
-            } else if value == 62 {
-                Action::EmojiDelete
-            } else {
-                return Err(E::custom(format!("Unexpected action number: {}", value)));
-            })
+            Action::from_num(value).map_err(|e| E::custom(e))
         }
     }
 
