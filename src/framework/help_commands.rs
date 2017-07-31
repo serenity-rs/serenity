@@ -6,7 +6,7 @@
 //! embeds:
 //!
 //! ```rs,no_run
-//! use serenity::ext::framework::help_commands;
+//! use serenity::framework::help_commands;
 //! use serenity::Client;
 //! use std::env;
 //!
@@ -63,7 +63,7 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 /// # impl EventHandler for Handler {}
 /// # let mut client = Client::new("token", Handler);
 /// #
-/// use serenity::ext::framework::help_commands;
+/// use serenity::framework::help_commands;
 /// use serenity::framework::BuiltinFramework;
 ///
 /// client.with_framework(BuiltinFramework::new()
@@ -216,7 +216,7 @@ pub fn with_embeds(_: &mut Context,
 /// # impl EventHandler for Handler {}
 /// # let mut client = Client::new("token", Handler);
 /// #
-/// use serenity::ext::framework::help_commands;
+/// use serenity::framework::help_commands;
 /// use serenity::framework::BuiltinFramework;
 ///
 /// client.with_framework(BuiltinFramework::new()
