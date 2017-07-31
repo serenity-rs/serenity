@@ -339,11 +339,11 @@ impl BuiltinFramework {
     /// client.with_framework(BuiltinFramework::new()
     ///     .complex_bucket("basic", 2, 10, 3, |_, guild_id, channel_id, user_id| {
     /// // check if the guild is `123` and the channel where the command(s) was called:
-    /// `456`
+    /// // `456`
     ///         // and if the user who called the command(s) is `789`
     ///         // otherwise don't apply the bucket at all.
-    /// guild_id.is_some() && guild_id.unwrap() == 123 && channel_id == 456 && user_id
-    /// == 789
+    /// guild_id.is_some() && guild_id.unwrap() == 123 && channel_id == 456
+    /// && user_id == 789
     ///     })
     ///     .command("ping", |c| c
     ///         .bucket("basic")

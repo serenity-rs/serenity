@@ -544,8 +544,9 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new().push_line_safe("Hello @everyone").push("How are
-    /// you?").build();
+    /// let content = MessageBuilder::new().push_line_safe("Hello @everyone")
+    ///                                    .push("How are you?")
+    ///                                    .build();
     ///
     /// assert_eq!(content, "Hello @\u{200B}everyone\nHow are you?");
     /// ```
