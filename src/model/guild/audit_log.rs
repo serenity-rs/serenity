@@ -304,12 +304,8 @@ impl<'de> Deserialize<'de> for AuditLogs {
 
             fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> Result<AuditLogs, V::Error> {
                 let audit_log_entries = loop {
-                    if let Some(key) = map.next_key()? {
-                        match key {
-                            Field::AuditLogEntries => {
-                                break map.next_value::<Vec<AuditLogEntry>>()?;
-                            },
-                        }
+                    if let Some(Field::AuditLogEntries) = map.next_key()? {
+                        break map.next_value::<Vec<AuditLogEntry>>()?;
                     }
                 };
 

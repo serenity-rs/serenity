@@ -142,8 +142,6 @@ pub mod builder;
 pub mod cache;
 #[cfg(feature = "client")]
 pub mod client;
-#[cfg(any(feature = "cache", feature = "builtin_framework", feature = "voice"))]
-pub mod ext;
 #[cfg(feature = "builtin_framework")]
 pub mod framework;
 #[cfg(feature = "gateway")]
