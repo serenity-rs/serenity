@@ -44,7 +44,7 @@ impl ReceiverExt for WsClient<TlsStream<TcpStream>> {
             OwnedMessage::Ping(x) => {
                 self.send_message(&OwnedMessage::Pong(x))
                     .map_err(Error::from)?;
-                
+
                 None
             },
             OwnedMessage::Pong(_) => None,

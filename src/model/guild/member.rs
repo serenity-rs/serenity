@@ -30,7 +30,7 @@ impl BanOptions for str {
 }
 
 impl BanOptions for String {
-    fn reason(&self) -> &str { &self }
+    fn reason(&self) -> &str { self }
 }
 
 impl<'a> BanOptions for (u8, &'a str) {

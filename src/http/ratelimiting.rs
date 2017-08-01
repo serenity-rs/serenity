@@ -370,7 +370,8 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
                     remaining: i64::MAX,
                     reset: i64::MAX,
                 }))
-            }).clone();
+            })
+            .clone();
 
         let mut lock = bucket.lock().unwrap();
         lock.pre_hook(&route);

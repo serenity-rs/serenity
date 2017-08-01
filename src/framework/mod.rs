@@ -214,7 +214,6 @@ type DispatchErrorHook = Fn(Context, Message, DispatchError) + 'static;
 /// Refer to the [module-level documentation] for more information.
 ///
 /// [module-level documentation]: index.html
-#[allow(type_complexity)]
 #[derive(Default)]
 pub struct BuiltinFramework {
     configuration: Configuration,
@@ -518,13 +517,15 @@ impl BuiltinFramework {
                 if let Some(ref mut bucket) = self.buckets.get_mut(bucket) {
                     let rate_limit = bucket.take(message.author.id.0);
                     match bucket.check {
-                        Some(ref check) => if feature_cache! {{ 
+                        Some(ref check) => {
+                            let apply = feature_cache! {{ 
                                 let guild_id = message.guild_id();
                                 (check)(context, guild_id, message.channel_id, message.author.id) 
                             } else {
                                 (check)(context, message.channel_id, message.author.id)
-                            }} {
-                            if rate_limit > 0i64 {
+                            }};
+
+                            if apply && rate_limit > 0i64 {
                                 return Some(DispatchError::RateLimited(rate_limit));
                             }
                         },

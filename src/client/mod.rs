@@ -803,7 +803,11 @@ fn boot_shard(info: &BootInfo) -> Result<Shard> {
     // After three attempts, start re-retrieving the gateway URL. Before that,
     // use the cached one.
     for attempt_number in 1..3u64 {
-        let BootInfo { ref gateway_url, ref token, shard_info } = *info;
+        let BootInfo {
+            ref gateway_url,
+            ref token,
+            shard_info,
+        } = *info;
         // If we've tried over 3 times so far, get a new gateway URL.
         //
         // If doing so fails, count this as a boot attempt.
@@ -819,11 +823,7 @@ fn boot_shard(info: &BootInfo) -> Result<Shard> {
             }
         }
 
-        let attempt = Shard::new(
-            gateway_url.clone(),
-            token.clone(),
-            shard_info,
-        );
+        let attempt = Shard::new(gateway_url.clone(), token.clone(), shard_info);
 
         match attempt {
             Ok(shard) => {

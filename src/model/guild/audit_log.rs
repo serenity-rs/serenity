@@ -54,7 +54,9 @@ impl FromNum for Action {
         Ok(match num {
             1 => Action::GuildUpdate,
             num if num >= 10 && num <= 13 => Action::Channel(ActionChannel::from_num(num)?),
-            num if num >= 13 && num <= 15 => Action::ChannelOverwrite(ActionChannelOverwrite::from_num(num)?),
+            num if num >= 13 && num <= 15 => {
+                Action::ChannelOverwrite(ActionChannelOverwrite::from_num(num)?)
+            },
             num if num >= 20 && num <= 25 => Action::Member(ActionMember::from_num(num)?),
             num if num >= 30 && num <= 32 => Action::Role(ActionRole::from_num(num)?),
             num if num >= 40 && num <= 42 => Action::Invite(ActionInvite::from_num(num)?),
@@ -62,7 +64,7 @@ impl FromNum for Action {
             num if num >= 60 && num <= 62 => Action::Emoji(ActionEmoji::from_num(num)?),
             _ => return Err(format!("Unexpected action number: {}", num)),
         })
-    } 
+    }
 }
 
 #[derive(Debug)]
@@ -112,7 +114,7 @@ pub enum ActionMember {
     BanAdd,
     BanRemove,
     Update,
-    RoleUpdate
+    RoleUpdate,
 }
 
 impl FromNum for ActionMember {
@@ -259,7 +261,7 @@ fn deserialize_target<'de, D: Deserializer<'de>>(de: D) -> Result<Target, D::Err
         }
 
         fn visit_i32<E: de::Error>(self, value: i32) -> Result<Target, E> {
-            Target::from_num(value).map_err(|e| E::custom(e))
+            Target::from_num(value).map_err(E::custom)
         }
     }
 
@@ -277,7 +279,7 @@ fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Err
         }
 
         fn visit_i32<E: de::Error>(self, value: i32) -> Result<Action, E> {
-            Action::from_num(value).map_err(|e| E::custom(e))
+            Action::from_num(value).map_err(E::custom)
         }
     }
 
@@ -290,7 +292,7 @@ impl<'de> Deserialize<'de> for AuditLogs {
         #[serde(field_identifier)]
         enum Field {
             #[serde(rename = "audit_log_entries")]
-            AuditLogEntries,
+            Entries,
         }
 
         struct EntriesVisitor;
@@ -304,7 +306,7 @@ impl<'de> Deserialize<'de> for AuditLogs {
 
             fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> Result<AuditLogs, V::Error> {
                 let audit_log_entries = loop {
-                    if let Some(Field::AuditLogEntries) = map.next_key()? {
+                    if let Some(Field::Entries) = map.next_key()? {
                         break map.next_value::<Vec<AuditLogEntry>>()?;
                     }
                 };
