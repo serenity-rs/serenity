@@ -23,7 +23,7 @@ use std::sync::mpsc::{self, Receiver as MpscReceiver};
 #[cfg(feature = "cache")]
 use client::CACHE;
 #[cfg(feature = "voice")]
-use ext::voice::Manager as VoiceManager;
+use voice::Manager as VoiceManager;
 #[cfg(feature = "voice")]
 use http;
 #[cfg(feature = "cache")]
