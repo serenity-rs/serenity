@@ -227,6 +227,11 @@ impl From<u64> for Colour {
     fn from(value: u64) -> Colour { Colour(value as u32) }
 }
 
+impl From<(u8, u8, u8)> for Colour {
+    /// Constructs a Colour from rgb.
+    fn from((r, g,b): (u8, u8, u8)) -> Self { Colour::from_rgb(r, g, b) }
+}
+
 colour! {
     /// Creates a new `Colour`, setting its RGB value to `(111, 198, 226)`.
     blitz_blue, 0x6FC6E2;
