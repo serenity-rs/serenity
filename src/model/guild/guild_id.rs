@@ -54,7 +54,7 @@ impl GuildId {
         let reason = ban_options.reason();
 
         if reason.len() > 512 {
-            return Err(Error::ExceededLimit);
+            return Err(Error::ExceededLimit(reason.to_string(), 512));
         }
 
         http::ban_user(self.0, user.into().0, dmd, &*reason)

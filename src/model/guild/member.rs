@@ -132,16 +132,21 @@ impl Member {
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature = "cache")]
     pub fn ban<BO: BanOptions>(&self, ban_options: BO) -> Result<()> {
+        let dmd = ban_options.dmd();
+        if dmd > 7 {
+            return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
+        }
+
         let reason = ban_options.reason();
 
         if reason.len() > 512 {
-            return Err(Error::ExceededLimit);
+            return Err(Error::ExceededLimit(reason.to_string(), 512));
         }
 
         http::ban_user(
             self.guild_id.0,
             self.user.read().unwrap().id.0,
-            ban_options.dmd(),
+            dmd,
             &*reason,
         )
     }
