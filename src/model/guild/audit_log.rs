@@ -53,15 +53,13 @@ impl FromNum for Action {
     fn from_num(num: i32) -> Result<Self, String> {
         Ok(match num {
             1 => Action::GuildUpdate,
-            num if num >= 10 && num <= 13 => Action::Channel(ActionChannel::from_num(num)?),
-            num if num >= 13 && num <= 15 => {
-                Action::ChannelOverwrite(ActionChannelOverwrite::from_num(num)?)
-            },
-            num if num >= 20 && num <= 25 => Action::Member(ActionMember::from_num(num)?),
-            num if num >= 30 && num <= 32 => Action::Role(ActionRole::from_num(num)?),
-            num if num >= 40 && num <= 42 => Action::Invite(ActionInvite::from_num(num)?),
-            num if num >= 50 && num <= 52 => Action::Webhook(ActionWebhook::from_num(num)?),
-            num if num >= 60 && num <= 62 => Action::Emoji(ActionEmoji::from_num(num)?),
+            10...13 => Action::Channel(ActionChannel::from_num(num)?),
+            13...15 => Action::ChannelOverwrite(ActionChannelOverwrite::from_num(num)?),
+            20...25 => Action::Member(ActionMember::from_num(num)?),
+            30...32 => Action::Role(ActionRole::from_num(num)?),
+            40...42 => Action::Invite(ActionInvite::from_num(num)?),
+            50...52 => Action::Webhook(ActionWebhook::from_num(num)?),
+            60...62 => Action::Emoji(ActionEmoji::from_num(num)?),
             _ => return Err(format!("Unexpected action number: {}", num)),
         })
     }
