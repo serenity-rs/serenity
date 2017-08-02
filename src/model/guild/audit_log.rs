@@ -2,38 +2,19 @@ use super::super::{AuditLogEntryId, UserId};
 use serde::de::{self, Deserialize, Deserializer, MapAccess, Visitor};
 use std::fmt;
 use std::collections::HashMap;
-
-trait FromNum {
-    fn from_num(num: i32) -> Result<Self, String> where Self: Sized;
-}
+use std::mem::transmute;
 
 /// Determines to what entity an action was used on.
 #[derive(Debug)]
+#[repr(i32)]
 pub enum Target {
-    Guild,
-    Channel,
-    User,
-    Role,
-    Invite,
-    Webhook,
-    Emoji,
-}
-
-impl FromNum for Target {
-    fn from_num(num: i32) -> Result<Self, String> {
-        use self::Target::*;
-
-        Ok(match num {
-            10 => Guild,
-            20 => Channel,
-            30 => User,
-            40 => Role,
-            50 => Invite,
-            60 => Webhook,
-            70 => Emoji,
-            _ => return Err(format!("Unexpected target number: {}", num)),
-        })
-    }
+    Guild = 10,
+    Channel = 20,
+    User = 30,
+    Role = 40,
+    Invite = 50,
+    Webhook = 60,
+    Emoji = 70,
 }
 
 /// Determines the action that was done on a target.
@@ -49,166 +30,63 @@ pub enum Action {
     Emoji(ActionEmoji),
 }
 
-impl FromNum for Action {
-    fn from_num(num: i32) -> Result<Self, String> {
-        Ok(match num {
-            1 => Action::GuildUpdate,
-            10...13 => Action::Channel(ActionChannel::from_num(num)?),
-            13...15 => Action::ChannelOverwrite(ActionChannelOverwrite::from_num(num)?),
-            20...25 => Action::Member(ActionMember::from_num(num)?),
-            30...32 => Action::Role(ActionRole::from_num(num)?),
-            40...42 => Action::Invite(ActionInvite::from_num(num)?),
-            50...52 => Action::Webhook(ActionWebhook::from_num(num)?),
-            60...62 => Action::Emoji(ActionEmoji::from_num(num)?),
-            _ => return Err(format!("Unexpected action number: {}", num)),
-        })
-    }
-}
-
 #[derive(Debug)]
+#[repr(i32)]
 pub enum ActionChannel {
-    Create,
-    Update,
-    Delete,
-}
-
-impl FromNum for ActionChannel {
-    fn from_num(num: i32) -> Result<Self, String> {
-        use self::ActionChannel::*;
-
-        Ok(match num {
-            10 => Create, 
-            11 => Update, 
-            12 => Delete,
-            _ => return Err(format!("Unexpected action channel num: {}", num)),
-        })
-    }
+    Create = 10,
+    Update = 11,
+    Delete = 12,
 }
 
 #[derive(Debug)]
+#[repr(i32)]
 pub enum ActionChannelOverwrite {
-    Create,
-    Update,
-    Delete,
-}
-
-impl FromNum for ActionChannelOverwrite {
-    fn from_num(num: i32) -> Result<Self, String> {
-        use self::ActionChannelOverwrite::*;
-
-        Ok(match num {
-            13 => Create, 
-            14 => Update, 
-            15 => Delete,
-            _ => return Err(format!("Unexpected action channel overwrite num: {}", num)),
-        })
-    }
+    Create = 13,
+    Update = 14,
+    Delete = 15,
 }
 
 #[derive(Debug)]
+#[repr(i32)]
 pub enum ActionMember {
-    Kick,
-    Prune,
-    BanAdd,
-    BanRemove,
-    Update,
-    RoleUpdate,
-}
-
-impl FromNum for ActionMember {
-    fn from_num(num: i32) -> Result<Self, String> {
-        use self::ActionMember::*;
-
-        Ok(match num {
-            20 => Kick,
-            21 => Prune,
-            22 => BanAdd, 
-            23 => BanRemove, 
-            24 => Update,
-            25 => RoleUpdate,
-            _ => return Err(format!("Unexpected action member num: {}", num)),
-        })
-    }
+    Kick = 20,
+    Prune = 21,
+    BanAdd = 22,
+    BanRemove = 23,
+    Update = 24, 
+    RoleUpdate = 25,
 }
 
 #[derive(Debug)]
+#[repr(i32)]
 pub enum ActionRole {
-    Create,
-    Update,
-    Delete,
-}
-
-impl FromNum for ActionRole {
-    fn from_num(num: i32) -> Result<Self, String> {
-        use self::ActionRole::*;
-
-        Ok(match num {
-            30 => Create, 
-            31 => Update, 
-            32 => Delete,
-            _ => return Err(format!("Unexpected action role num: {}", num)),
-        })
-    }
+    Create = 30,
+    Update = 31,
+    Delete = 32,
 }
 
 #[derive(Debug)]
+#[repr(i32)]
 pub enum ActionInvite {
-    Create,
-    Update,
-    Delete,
-}
-
-impl FromNum for ActionInvite {
-    fn from_num(num: i32) -> Result<Self, String> {
-        use self::ActionInvite::*;
-
-        Ok(match num {
-            40 => Create, 
-            41 => Update, 
-            42 => Delete,
-            _ => return Err(format!("Unexpected action invite num: {}", num)),
-        })
-    }
+    Create = 40,
+    Update = 41,
+    Delete = 42,
 }
 
 #[derive(Debug)]
+#[repr(i32)]
 pub enum ActionWebhook {
-    Create,
-    Update,
-    Delete,
-}
-
-impl FromNum for ActionWebhook {
-    fn from_num(num: i32) -> Result<Self, String> {
-        use self::ActionWebhook::*;
-
-        Ok(match num {
-            50 => Create, 
-            51 => Update, 
-            52 => Delete,
-            _ => return Err(format!("Unexpected action webhook num: {}", num)),
-        })
-    }
+    Create = 50,
+    Update = 51,
+    Delete = 52,
 }
 
 #[derive(Debug)]
+#[repr(i32)]
 pub enum ActionEmoji {
-    Create,
-    Delete,
-    Update,
-}
-
-impl FromNum for ActionEmoji {
-    fn from_num(num: i32) -> Result<Self, String> {
-        use self::ActionEmoji::*;
-
-        Ok(match num {
-            60 => Create, 
-            61 => Update, 
-            62 => Delete,
-            _ => return Err(format!("Unexpected action emoji num: {}", num)),
-        })
-    }
+    Create = 60,
+    Delete = 61,
+    Update = 62,
 }
 
 #[derive(Debug, Deserialize)]
@@ -259,7 +137,10 @@ fn deserialize_target<'de, D: Deserializer<'de>>(de: D) -> Result<Target, D::Err
         }
 
         fn visit_i32<E: de::Error>(self, value: i32) -> Result<Target, E> {
-            Target::from_num(value).map_err(E::custom)
+            Ok(match value {
+                10...70 => unsafe { transmute(value) },
+                _ => return Err(E::custom(format!("unexpected target number: {}", value))),
+            })
         }
     }
 
@@ -277,7 +158,17 @@ fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Err
         }
 
         fn visit_i32<E: de::Error>(self, value: i32) -> Result<Action, E> {
-            Action::from_num(value).map_err(E::custom)
+            Ok(match value {
+                1 => Action::GuildUpdate,
+                10...13 => Action::Channel(unsafe { transmute(value) }),
+                13...15 => Action::ChannelOverwrite(unsafe { transmute(value) }),
+                20...25 => Action::Member(unsafe { transmute(value) }),
+                30...32 => Action::Role(unsafe { transmute(value) }),
+                40...42 => Action::Invite(unsafe { transmute(value) }),
+                50...52 => Action::Webhook(unsafe { transmute(value) }),
+                60...62 => Action::Emoji(unsafe { transmute(value) }),
+                _ => return Err(E::custom(format!("Unexpected action number: {}", value))),
+            })
         }
     }
 
