@@ -269,8 +269,8 @@ impl Cache {
     /// [`Shard`]: ../gateway/struct.Shard.html
     pub fn all_guilds(&self) -> Vec<GuildId> {
         self.guilds
-            .values()
-            .map(|g| g.read().unwrap().id)
+            .keys()
+            .cloned()
             .chain(self.unavailable_guilds.iter().cloned())
             .collect()
     }
