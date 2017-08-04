@@ -236,7 +236,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "```\nhello\n```");
     /// ```
-    pub fn push_codeblock<D: fmt::Display>(mut self, content: D, language: Option<D>) -> Self {
+    pub fn push_codeblock<D: fmt::Display, L: fmt::Display>(mut self, content: D, language: Option<L>) -> Self {
         self.0.push_str("```");
 
         if let Some(language) = language {
@@ -504,7 +504,7 @@ impl MessageBuilder {
     }
 
     /// Pushes a code-block to your message normalizing content.
-    pub fn push_codeblock_safe<D: fmt::Display>(mut self, content: D, language: Option<D>) -> Self {
+    pub fn push_codeblock_safe<D: fmt::Display, L: fmt::Display>(mut self, content: D, language: Option<L>) -> Self {
         self.0.push_str("```");
 
         if let Some(language) = language {
