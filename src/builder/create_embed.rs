@@ -18,7 +18,7 @@
 use chrono::{DateTime, TimeZone};
 use serde_json::Value;
 use std::default::Default;
-use std::fmt::Display;
+use std::fmt::{Write, Display};
 use internal::prelude::*;
 use model::Embed;
 
@@ -96,10 +96,12 @@ impl CreateEmbed {
     /// Set the description of the embed.
     ///
     /// **Note**: This can't be longer than 2048 characters.
-    pub fn description(mut self, description: &str) -> Self {
+    pub fn description<D: Display>(mut self, description: D) -> Self {
+        let mut s = "".to_owned();
+        let _ = writeln!(&mut s, "{}", description);
         self.0.insert(
             "description".to_owned(),
-            Value::String(description.to_owned()),
+            Value::String(s),
         );
 
         CreateEmbed(self.0)
@@ -289,9 +291,11 @@ impl CreateEmbed {
     }
 
     /// Set the title of the embed.
-    pub fn title(mut self, title: &str) -> Self {
+    pub fn title<D: Display>(mut self, title: D) -> Self {
+        let mut s = "".to_owned();
+        let _ = writeln!(&mut s, "{}", title);
         self.0
-            .insert("title".to_owned(), Value::String(title.to_owned()));
+            .insert("title".to_owned(), Value::String(s));
 
         CreateEmbed(self.0)
     }
@@ -439,17 +443,23 @@ impl CreateEmbedField {
     }
 
     /// Set the field's name. It can't be longer than 256 characters.
-    pub fn name(mut self, name: &str) -> Self {
+    pub fn name<D: Display>(mut self, name: D) -> Self {
+        let mut s = "".to_owned();
+        let _ = writeln!(&mut s, "{}", name);
+
         self.0
-            .insert("name".to_owned(), Value::String(name.to_owned()));
+            .insert("name".to_owned(), Value::String(s));
 
         self
     }
 
     /// Set the field's value. It can't be longer than 1024 characters.
-    pub fn value(mut self, value: &str) -> Self {
+    pub fn value<D: Display>(mut self, value: D) -> Self {
+        let mut s = "".to_owned();
+        let _ = writeln!(&mut s, "{}", value);
+
         self.0
-            .insert("value".to_owned(), Value::String(value.to_owned()));
+            .insert("value".to_owned(), Value::String(s));
 
         self
     }
@@ -486,9 +496,12 @@ impl CreateEmbedFooter {
     }
 
     /// Set the footer's text.
-    pub fn text(mut self, text: &str) -> Self {
+    pub fn text<D: Display>(mut self, text: D) -> Self {
+        let mut s = "".to_owned();
+        let _ = writeln!(&mut s, "{}", text);
+
         self.0
-            .insert("text".to_owned(), Value::String(text.to_owned()));
+            .insert("text".to_owned(), Value::String(s));
 
         self
     }
