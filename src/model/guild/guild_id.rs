@@ -15,6 +15,7 @@ use internal::prelude::*;
 impl GuildId {
     /// Converts the guild Id into the default channel's Id.
     #[inline]
+    #[deprecated(note = "The concept of default channels is no more, use `Guild::default_channel{_guaranteed}` to simulate the concept.")]
     pub fn as_channel_id(&self) -> ChannelId { ChannelId(self.0) }
 
     /// Ban a [`User`] from the guild. All messages by the

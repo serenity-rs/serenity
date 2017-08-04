@@ -124,13 +124,54 @@ pub struct Guild {
 #[cfg(feature = "model")]
 impl Guild {
     #[cfg(feature = "cache")]
+    /// Returns the "default" channel of the guild.
+    /// (This returns the first channel that can be read by the bot, if there isn't one, returns `None`)
+    pub fn default_channel(&self) -> Option<GuildChannel> {
+        let uid = CACHE.read().unwrap().user.id;
+        
+        for (cid, channel) in &self.channels {
+            if {
+                let perms = self.permissions_for(*cid, uid);
+                perms.read_messages()
+            } {
+                return Some(channel.read().unwrap().clone());
+            }
+        }
+
+        None
+    }
+
+    /// Returns the guaranteed "default" channel of the guild.
+    /// (This returns the first channel that can be read by everyone, if there isn't one, returns `None`)
+    /// Note however that this is very costy if used in a server with lots of channels, members, or both.
+    pub fn default_channel_guaranteed(&self) -> Option<GuildChannel> {
+        for (cid, channel) in &self.channels {
+            for memid in self.members.keys() {
+                if {
+                    let perms = self.permissions_for(*cid, *memid);
+                    perms.read_messages()
+                } {
+                    return Some(channel.read().unwrap().clone());
+                }
+            }
+        }
+
+        None
+    }
+
+    #[cfg(feature = "cache")]
     fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
         let member = match self.members.get(&CACHE.read().unwrap().user.id) {
             Some(member) => member,
             None => return Err(Error::Model(ModelError::ItemMissing)),
         };
 
-        let perms = self.permissions_for(ChannelId(self.id.0), member.user.read().unwrap().id);
+        let default_channel = match self.default_channel() {
+            Some(dc) => dc,
+            None => return Err(Error::Model(ModelError::ItemMissing)),
+        };
+
+        let perms = self.permissions_for(default_channel.id, member.user.read().unwrap().id);
         permissions.remove(perms);
 
         Ok(permissions.is_empty())
