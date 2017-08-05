@@ -5,6 +5,7 @@ rust:
   - nightly
 os:
   - linux
+  - osx
 cache:
   directories:
     - $TRAVIS_BUILD_DIR/target
@@ -18,7 +19,7 @@ before_script:
   - ./autogen.sh
   - ./configure && make
   - sudo make install
-  - sudo ldconfig
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo ldconfig; fi
   - cd ..
 script:
   - cargo test --all-features
