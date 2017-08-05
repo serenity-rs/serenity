@@ -1,6 +1,6 @@
 use serde_json::Value;
 use super::connection_info::ConnectionInfo;
-use ::constants::VoiceOpCode;
+use constants::VoiceOpCode;
 
 #[inline]
 pub fn build_identify(info: &ConnectionInfo) -> Value {

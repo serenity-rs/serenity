@@ -1,9 +1,9 @@
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use hyper::Client as HyperClient;
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use std::io::Read;
-#[cfg(feature="model")]
-use ::internal::prelude::*;
+#[cfg(feature = "model")]
+use internal::prelude::*;
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///
@@ -27,7 +27,7 @@ pub struct Attachment {
     pub width: Option<u64>,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl Attachment {
     /// If this attachment is an image, then a tuple of the width and height
     /// in pixels is returned.
@@ -90,7 +90,7 @@ impl Attachment {
     ///     }
     ///
     ///     fn on_ready(&self, _: Context, ready: Ready) {
-    ///         println!("{} is connected!", ready.user.name);   
+    ///         println!("{} is connected!", ready.user.name);
     ///     }
     /// }
     /// let token = env::var("DISCORD_TOKEN").expect("token in environment");

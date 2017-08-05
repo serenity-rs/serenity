@@ -93,9 +93,7 @@ impl Colour {
     ///
     /// [`tuple`]: #method.tuple
     #[inline]
-    pub fn new(value: u32) -> Colour {
-        Colour(value)
-    }
+    pub fn new(value: u32) -> Colour { Colour(value) }
 
     /// Generates a new Colour from an RGB value, creating an inner u32
     /// representation.
@@ -140,9 +138,7 @@ impl Colour {
     ///
     /// assert_eq!(Colour::new(6573123).r(), 100);
     /// ```
-    pub fn r(&self) -> u8 {
-        ((self.0 >> 16) & 255) as u8
-    }
+    pub fn r(&self) -> u8 { ((self.0 >> 16) & 255) as u8 }
 
     /// Returns the green RGB component of this Colour.
     ///
@@ -153,9 +149,7 @@ impl Colour {
     ///
     /// assert_eq!(Colour::new(6573123).g(), 76);
     /// ```
-    pub fn g(&self) -> u8 {
-        ((self.0 >> 8) & 255) as u8
-    }
+    pub fn g(&self) -> u8 { ((self.0 >> 8) & 255) as u8 }
 
     /// Returns the blue RGB component of this Colour.
     ///
@@ -165,9 +159,7 @@ impl Colour {
     /// use serenity::utils::Colour;
     ///
     /// assert_eq!(Colour::new(6573123).b(), 67);
-    pub fn b(&self) -> u8 {
-        (self.0 & 255) as u8
-    }
+    pub fn b(&self) -> u8 { (self.0 & 255) as u8 }
 
     /// Returns a tuple of the red, green, and blue components of this Colour.
     ///
@@ -185,9 +177,7 @@ impl Colour {
     /// [`r`]: #method.r
     /// [`g`]: #method.g
     /// [`b`]: #method.b
-    pub fn tuple(&self) -> (u8, u8, u8) {
-        (self.r(), self.g(), self.b())
-    }
+    pub fn tuple(&self) -> (u8, u8, u8) { (self.r(), self.g(), self.b()) }
 }
 
 impl From<i32> for Colour {
@@ -204,9 +194,7 @@ impl From<i32> for Colour {
     ///
     /// assert_eq!(Colour::from(0xDEA584).tuple(), (222, 165, 132));
     /// ```
-    fn from(value: i32) -> Colour {
-        Colour(value as u32)
-    }
+    fn from(value: i32) -> Colour { Colour(value as u32) }
 }
 
 impl From<u32> for Colour {
@@ -221,9 +209,7 @@ impl From<u32> for Colour {
     ///
     /// assert_eq!(Colour::from(6573123u32).r(), 100);
     /// ```
-    fn from(value: u32) -> Colour {
-        Colour(value)
-    }
+    fn from(value: u32) -> Colour { Colour(value) }
 }
 
 impl From<u64> for Colour {
@@ -238,9 +224,12 @@ impl From<u64> for Colour {
     ///
     /// assert_eq!(Colour::from(6573123u64).r(), 100);
     /// ```
-    fn from(value: u64) -> Colour {
-        Colour(value as u32)
-    }
+    fn from(value: u64) -> Colour { Colour(value as u32) }
+}
+
+impl From<(u8, u8, u8)> for Colour {
+    /// Constructs a Colour from rgb.
+    fn from((r, g,b): (u8, u8, u8)) -> Self { Colour::from_rgb(r, g, b) }
 }
 
 colour! {
@@ -304,7 +293,5 @@ colour! {
 
 impl Default for Colour {
     /// Creates a default value for a `Colour`, setting the inner value to `0`.
-    fn default() -> Colour {
-        Colour(0)
-    }
+    fn default() -> Colour { Colour(0) }
 }

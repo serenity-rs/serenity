@@ -46,7 +46,5 @@ impl Timer {
         }
     }
 
-    pub fn reset(&mut self) {
-        self.due = Utc::now() + self.duration;
-    }
+    pub fn reset(&mut self) { self.due = Utc::now() + self.duration; }
 }

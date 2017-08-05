@@ -1,5 +1,5 @@
-use ::model::{ChannelId, RoleId};
-use ::internal::prelude::*;
+use model::{ChannelId, RoleId};
+use internal::prelude::*;
 
 /// A builder which edits the properties of a [`Member`], to be used in
 /// conjunction with [`Member::edit`].
@@ -39,7 +39,8 @@ impl EditMember {
     ///
     /// [Manage Nicknames]: ../model/permissions/constant.MANAGE_NICKNAMES.html
     pub fn nickname(mut self, nickname: &str) -> Self {
-        self.0.insert("nick".to_owned(), Value::String(nickname.to_owned()));
+        self.0
+            .insert("nick".to_owned(), Value::String(nickname.to_owned()));
 
         self
     }
@@ -50,7 +51,10 @@ impl EditMember {
     ///
     /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
     pub fn roles(mut self, roles: &[RoleId]) -> Self {
-        let role_ids = roles.iter().map(|x| Value::Number(Number::from(x.0))).collect();
+        let role_ids = roles
+            .iter()
+            .map(|x| Value::Number(Number::from(x.0)))
+            .collect();
 
         self.0.insert("roles".to_owned(), Value::Array(role_ids));
 
@@ -63,7 +67,10 @@ impl EditMember {
     ///
     /// [Move Members]: ../model/permissions/constant.MOVE_MEMBERS.html
     pub fn voice_channel<C: Into<ChannelId>>(mut self, channel_id: C) -> Self {
-        self.0.insert("channel_id".to_owned(), Value::Number(Number::from(channel_id.into().0)));
+        self.0.insert(
+            "channel_id".to_owned(),
+            Value::Number(Number::from(channel_id.into().0)),
+        );
 
         self
     }

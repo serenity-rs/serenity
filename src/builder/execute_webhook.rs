@@ -1,6 +1,6 @@
 use serde_json::Value;
 use std::default::Default;
-use ::internal::prelude::*;
+use internal::prelude::*;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
 ///
@@ -74,7 +74,10 @@ impl ExecuteWebhook {
     ///     .content("Here's a webhook"));
     /// ```
     pub fn avatar_url(mut self, avatar_url: &str) -> Self {
-        self.0.insert("avatar_url".to_owned(), Value::String(avatar_url.to_owned()));
+        self.0.insert(
+            "avatar_url".to_owned(),
+            Value::String(avatar_url.to_owned()),
+        );
 
         self
     }
@@ -100,7 +103,8 @@ impl ExecuteWebhook {
     ///
     /// [`embeds`]: #method.embeds
     pub fn content(mut self, content: &str) -> Self {
-        self.0.insert("content".to_owned(), Value::String(content.to_owned()));
+        self.0
+            .insert("content".to_owned(), Value::String(content.to_owned()));
 
         self
     }
@@ -161,7 +165,8 @@ impl ExecuteWebhook {
     /// }
     /// ```
     pub fn username(mut self, username: &str) -> Self {
-        self.0.insert("username".to_owned(), Value::String(username.to_owned()));
+        self.0
+            .insert("username".to_owned(), Value::String(username.to_owned()));
 
         self
     }

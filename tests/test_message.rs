@@ -20,7 +20,10 @@ macro_rules! p {
 fn test_footer_deser() {
     let mut message = p!(Message, "message_footer_1");
 
-    assert_eq!(message.embeds.remove(0).footer.unwrap().text, "2005-09-26 - 2013-09-26");
+    assert_eq!(
+        message.embeds.remove(0).footer.unwrap().text,
+        "2005-09-26 - 2013-09-26"
+    );
 
     p!(Message, "message_footer_2");
 }

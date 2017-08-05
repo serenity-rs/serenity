@@ -1,6 +1,6 @@
 extern crate serenity;
 
-#[cfg(feature="utils")]
+#[cfg(feature = "utils")]
 mod utils {
     use serenity::model::*;
     use std::collections::HashMap;
@@ -31,6 +31,7 @@ mod utils {
             position: 0,
             topic: None,
             user_limit: None,
+            nsfw: false,
         }
     }
 
@@ -68,6 +69,9 @@ mod utils {
         channel.kind = ChannelType::Text;
 
         channel.name = "nsf".to_owned();
+        channel.nsfw = true;
+        assert!(channel.is_nsfw());
+        channel.nsfw = false;
         assert!(!channel.is_nsfw());
 
         let channel = Channel::Guild(Arc::new(RwLock::new(channel)));

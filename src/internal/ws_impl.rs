@@ -3,12 +3,11 @@ use serde_json;
 use websocket::message::OwnedMessage;
 use websocket::sync::stream::{TcpStream, TlsStream};
 use websocket::sync::Client as WsClient;
-use ::gateway::GatewayError;
-use ::internal::prelude::*;
+use gateway::GatewayError;
+use internal::prelude::*;
 
 pub trait ReceiverExt {
-    fn recv_json<F, T>(&mut self, decode: F) -> Result<T>
-        where F: FnOnce(Value) -> Result<T>;
+    fn recv_json<F, T>(&mut self, decode: F) -> Result<T> where F: Fn(Value) -> Result<T>;
 }
 
 pub trait SenderExt {
@@ -16,36 +15,46 @@ pub trait SenderExt {
 }
 
 impl ReceiverExt for WsClient<TlsStream<TcpStream>> {
-    fn recv_json<F, T>(&mut self, decode: F) -> Result<T> where F: FnOnce(Value) -> Result<T> {
-        match self.recv_message()? {
+    fn recv_json<F, T>(&mut self, decode: F) -> Result<T>
+        where F: Fn(Value) -> Result<T> {
+        let message = self.recv_message()?;
+
+        let res = match message {
             OwnedMessage::Binary(bytes) => {
                 let value = serde_json::from_reader(ZlibDecoder::new(&bytes[..]))?;
 
-                decode(value).map_err(|why| {
+                Some(decode(value).map_err(|why| {
                     let s = String::from_utf8_lossy(&bytes);
 
                     warn!("(╯°□°）╯︵ ┻━┻ Error decoding: {}", s);
 
                     why
-                })
+                }))
             },
-            OwnedMessage::Close(data) => {
-                Err(Error::Gateway(GatewayError::Closed(data)))
-            },
+            OwnedMessage::Close(data) => Some(Err(Error::Gateway(GatewayError::Closed(data)))),
             OwnedMessage::Text(payload) => {
                 let value = serde_json::from_str(&payload)?;
 
-                decode(value).map_err(|why| {
+                Some(decode(value).map_err(|why| {
                     warn!("(╯°□°）╯︵ ┻━┻ Error decoding: {}", payload);
 
                     why
-                })
+                }))
             },
-            OwnedMessage::Ping(x) | OwnedMessage::Pong(x) => {
-                warn!("Unexpectly got ping/pong: {:?}", x);
+            OwnedMessage::Ping(x) => {
+                self.send_message(&OwnedMessage::Pong(x))
+                    .map_err(Error::from)?;
 
-                Err(Error::Gateway(GatewayError::Closed(None)))
+                None
             },
+            OwnedMessage::Pong(_) => None,
+        };
+
+        // As to ignore the `None`s returned from `Ping` and `Pong`.
+        // Since they're essentially useless to us anyway.
+        match res {
+            Some(data) => data,
+            None => self.recv_json(decode),
         }
     }
 }

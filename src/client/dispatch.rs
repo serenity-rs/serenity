@@ -5,16 +5,16 @@ use std::time;
 use super::event_handler::EventHandler;
 use super::Context;
 use typemap::ShareMap;
-use ::gateway::Shard;
-use ::model::event::Event;
-use ::model::{Message, Reaction, GuildId, Channel};
-use chrono::{Utc, Timelike};
+use gateway::Shard;
+use model::event::Event;
+use model::{Channel, GuildId, Message};
+use chrono::{Timelike, Utc};
 use tokio_core::reactor::Handle;
 
-#[cfg(feature="framework")]
-use ::ext::framework::{Framework, ReactionAction};
+#[cfg(feature = "framework")]
+use Framework;
 
-#[cfg(feature="cache")]
+#[cfg(feature = "cache")]
 use super::CACHE;
 
 macro_rules! update {
@@ -56,109 +56,74 @@ macro_rules! now {
     () => (Utc::now().time().second() * 1000)
 }
 
-fn context(conn: &Arc<Mutex<Shard>>,
-           data: &Arc<Mutex<ShareMap>>) -> Context {
+fn context(conn: &Arc<Mutex<Shard>>, data: &Arc<Mutex<ShareMap>>) -> Context {
     Context::new(conn.clone(), data.clone())
 }
 
-// Heck you macro hygiene.
-macro_rules! impl_reaction_events {
-    (($event:ident, $conn:ident, $data:ident, $event_handler:ident, $framework:ident, $handle:ident), $type_of_action:ident, $dispatch_name:ident) => {
-        let context = context($conn, $data);
-        let framework = $framework.lock().unwrap();
-
-        if framework.initialized {
-            $dispatch_name(context.clone(),
-                           $event.reaction.clone(),
-                           $event_handler,
-                           $handle);
-                
-            let res = framework.reaction_actions
-                .iter()
-                .find(|&(ra, _)| {
-                    if let ReactionAction::$type_of_action(ref kind) = *ra {
-                        *kind == $event.reaction.emoji 
-                    } else {
-                        false
-                    }
-                });
-                
-            if let Some((_, f)) = res {
-                f(context, $event.reaction.message_id, $event.reaction.channel_id);
-            }
-        } else {
-            $dispatch_name(context, $event.reaction, $event_handler, $handle);
-        }
-    }
+#[cfg(feature = "builtin_framework")]
+macro_rules! helper {
+    ($enabled:block else $disabled:block) => { $enabled }
 }
 
-#[cfg(feature="framework")]
-pub fn dispatch<H: EventHandler + Send + Sync + 'static>(event: Event,
-                conn: &Arc<Mutex<Shard>>,
-                framework: &Arc<sync::Mutex<Framework>>,
-                data: &Arc<Mutex<ShareMap>>,
-                event_handler: &Arc<H>,
-                tokio_handle: &Handle) {
+#[cfg(not(feature = "builtin_framework"))]
+macro_rules! helper {
+    ($enabled:block else $disabled:block) => { $disabled }
+}
+
+#[cfg(feature = "framework")]
+pub fn dispatch<H: EventHandler + 'static>(event: Event,
+                                           conn: &Arc<Mutex<Shard>>,
+                                           framework: &Arc<sync::Mutex<Option<Box<Framework>>>>,
+                                           data: &Arc<Mutex<ShareMap>>,
+                                           event_handler: &Arc<H>,
+                                           tokio_handle: &Handle) {
     match event {
         Event::MessageCreate(event) => {
             let context = context(conn, data);
-            let mut framework = framework.lock().unwrap();
+            dispatch_message(
+                context.clone(),
+                event.message.clone(),
+                event_handler,
+                tokio_handle,
+            );
 
-            if framework.initialized {
-                dispatch_message(context.clone(),
-                                 event.message.clone(),
-                                 event_handler,
-                                 tokio_handle);
-
-                framework.dispatch(context, event.message, tokio_handle);
-            } else {
-                dispatch_message(context, event.message, event_handler, tokio_handle);
+            if let Some(ref mut framework) = *framework.lock().unwrap() {
+                helper! {{
+					if framework.initialized() {
+						framework.dispatch(context, event.message, tokio_handle);
+					}
+				} else {
+					framework.dispatch(context, event.message, tokio_handle);
+				}}
             }
-        },
-        Event::ReactionAdd(event) => {
-            impl_reaction_events!((event, conn, data, event_handler, framework, tokio_handle), Add, dispatch_reaction_add);
-        },
-        Event::ReactionRemove(event) => {
-            impl_reaction_events!((event, conn, data, event_handler, framework, tokio_handle), Remove, dispatch_reaction_remove);
         },
         other => handle_event(other, conn, data, event_handler, tokio_handle),
     }
 }
 
-#[cfg(not(feature="framework"))]
-pub fn dispatch<H: EventHandler + Send + Sync + 'static>(event: Event,
-                conn: &Arc<Mutex<Shard>>,
-                data: &Arc<Mutex<ShareMap>>,
-                event_handler: &Arc<H>,
-                tokio_handle: &Handle) {
+#[cfg(not(feature = "framework"))]
+pub fn dispatch<H: EventHandler + 'static>(event: Event,
+                                           conn: &Arc<Mutex<Shard>>,
+                                           data: &Arc<Mutex<ShareMap>>,
+                                           event_handler: &Arc<H>,
+                                           tokio_handle: &Handle) {
     match event {
         Event::MessageCreate(event) => {
             let context = context(conn, data);
-            dispatch_message(context,
-                             event.message,
-                             event_handler,
-                             tokio_handle);
-        },
-        Event::ReactionAdd(event) => {
-            let context = context(conn, data);
-            dispatch_reaction_add(context, event.reaction, tokio_handle);
-        },
-        Event::ReactionRemove(event) => {
-            let context = context(conn, data);
-            dispatch_reaction_remove(context, event.reaction, tokio_handle);
+            dispatch_message(context, event.message, event_handler, tokio_handle);
         },
         other => handle_event(other, conn, data, event_handler, tokio_handle),
     }
 }
 
 #[allow(unused_mut)]
-fn dispatch_message<H: EventHandler + Send + Sync + 'static>(context: Context,
-                    mut message: Message,
-                    event_handler: &Arc<H>,
-                    tokio_handle: &Handle) {
+fn dispatch_message<H: EventHandler + 'static>(context: Context,
+                                               mut message: Message,
+                                               event_handler: &Arc<H>,
+                                               tokio_handle: &Handle) {
     let h = event_handler.clone();
     tokio_handle.spawn_fn(move || {
-        #[cfg(feature="model")]
+        #[cfg(feature = "model")]
         {
             message.transform_content();
         }
@@ -169,34 +134,12 @@ fn dispatch_message<H: EventHandler + Send + Sync + 'static>(context: Context,
     });
 }
 
-fn dispatch_reaction_add<H: EventHandler + Send + Sync + 'static>(context: Context,
-                         reaction: Reaction,
-                         event_handler: &Arc<H>,
-                         tokio_handle: &Handle) {
-    let h = event_handler.clone();
-    tokio_handle.spawn_fn(move || {
-        h.on_reaction_add(context, reaction);
-        Ok(())
-    });
-}
-
-fn dispatch_reaction_remove<H: EventHandler + Send + Sync + 'static>(context: Context,
-                         reaction: Reaction,
-                         event_handler: &Arc<H>,
-                         tokio_handle: &Handle) {
-    let h = event_handler.clone();
-    tokio_handle.spawn_fn(move || {
-        h.on_reaction_remove(context, reaction);
-        Ok(())
-    });
-}
-
 #[allow(cyclomatic_complexity, unused_assignments, unused_mut)]
-fn handle_event<H: EventHandler + Send + Sync + 'static>(event: Event,
-                conn: &Arc<Mutex<Shard>>,
-                data: &Arc<Mutex<ShareMap>>,
-                event_handler: &Arc<H>,
-                tokio_handle: &Handle) {
+fn handle_event<H: EventHandler + 'static>(event: Event,
+                                           conn: &Arc<Mutex<Shard>>,
+                                           data: &Arc<Mutex<ShareMap>>,
+                                           event_handler: &Arc<H>,
+                                           tokio_handle: &Handle) {
     #[cfg(feature="cache")]
     let mut last_guild_create_time = now!();
 
@@ -243,7 +186,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(event: Event,
             let context = context(conn, data);
 
             match event.channel {
-                Channel::Private(_) | Channel::Group(_) => {}
+                Channel::Private(_) | Channel::Group(_) => {},
                 Channel::Guild(channel) => {
                     let h = event_handler.clone();
                     tokio_handle.spawn_fn(move || {
@@ -331,7 +274,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(event: Event,
 
             update!(update_with_guild_create, event);
 
-            #[cfg(feature="cache")]
+            #[cfg(feature = "cache")]
             {
                 last_guild_create_time = now!();
 
@@ -342,10 +285,12 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(event: Event,
 
                     let context = context(conn, data);
 
-                    let guild_amount = cache.guilds.iter()
-                            .map(|(&id, _)| id)
-                            .collect::<Vec<GuildId>>();
-                    
+                    let guild_amount = cache
+                        .guilds
+                        .iter()
+                        .map(|(&id, _)| id)
+                        .collect::<Vec<GuildId>>();
+
                     tokio_handle.spawn_fn(move || {
                         h.on_cached(context, guild_amount);
                         Ok(())
@@ -538,7 +483,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(event: Event,
                     .guilds
                     .get(&event.guild.id)
                     .cloned();
-        
+
                 tokio_handle.spawn_fn(move || {
                     h.on_guild_update(context, before, event.guild);
                     Ok(())
@@ -601,10 +546,22 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(event: Event,
                 Ok(())
             });
         },
-
-        // Already handled by the framework check macro
-        Event::ReactionAdd(_) => {},
-        Event::ReactionRemove(_) => {},
+        Event::ReactionAdd(event) => {
+            let h = event_handler.clone();
+            let context = context(conn, data);
+            tokio_handle.spawn_fn(move || {
+                h.on_reaction_add(context, event.reaction);
+                Ok(())
+            });
+        },
+        Event::ReactionRemove(event) => {
+            let h = event_handler.clone();
+            let context = context(conn, data);
+            tokio_handle.spawn_fn(move || {
+                h.on_reaction_remove(context, event.reaction);
+                Ok(())
+            });
+        },
         Event::ReactionRemoveAll(event) => {
             let context = context(conn, data);
 
@@ -637,7 +594,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(event: Event,
                 tokio_handle.spawn_fn(move || {
                     h.on_ready(context, event.ready);
                     Ok(())
-                }); 
+                });
             }}
         },
         Event::Resumed(event) => {

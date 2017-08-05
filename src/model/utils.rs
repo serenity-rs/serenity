@@ -3,15 +3,16 @@ use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use super::*;
 
-#[cfg(feature="cache")]
-use ::internal::prelude::*;
+#[cfg(feature = "cache")]
+use internal::prelude::*;
 
-#[cfg(feature="cache")]
+#[cfg(feature = "cache")]
 use super::permissions::Permissions;
-#[cfg(feature="cache")]
-use ::CACHE;
+#[cfg(feature = "cache")]
+use CACHE;
 
-pub fn deserialize_emojis<'de, D: Deserializer<'de>>(deserializer: D)
+pub fn deserialize_emojis<'de, D: Deserializer<'de>>(
+    deserializer: D)
     -> StdResult<HashMap<EmojiId, Emoji>, D::Error> {
     let vec: Vec<Emoji> = Deserialize::deserialize(deserializer)?;
     let mut emojis = HashMap::new();
@@ -23,7 +24,8 @@ pub fn deserialize_emojis<'de, D: Deserializer<'de>>(deserializer: D)
     Ok(emojis)
 }
 
-pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(deserializer: D)
+pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
+    deserializer: D)
     -> StdResult<HashMap<ChannelId, Arc<RwLock<GuildChannel>>>, D::Error> {
     let vec: Vec<GuildChannel> = Deserialize::deserialize(deserializer)?;
     let mut map = HashMap::new();
@@ -35,7 +37,8 @@ pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(deserializer: D)
     Ok(map)
 }
 
-pub fn deserialize_members<'de, D: Deserializer<'de>>(deserializer: D)
+pub fn deserialize_members<'de, D: Deserializer<'de>>(
+    deserializer: D)
     -> StdResult<HashMap<UserId, Member>, D::Error> {
     let vec: Vec<Member> = Deserialize::deserialize(deserializer)?;
     let mut members = HashMap::new();
@@ -49,7 +52,8 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(deserializer: D)
     Ok(members)
 }
 
-pub fn deserialize_presences<'de, D: Deserializer<'de>>(deserializer: D)
+pub fn deserialize_presences<'de, D: Deserializer<'de>>(
+    deserializer: D)
     -> StdResult<HashMap<UserId, Presence>, D::Error> {
     let vec: Vec<Presence> = Deserialize::deserialize(deserializer)?;
     let mut presences = HashMap::new();
@@ -61,7 +65,8 @@ pub fn deserialize_presences<'de, D: Deserializer<'de>>(deserializer: D)
     Ok(presences)
 }
 
-pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(deserializer: D)
+pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
+    deserializer: D)
     -> StdResult<HashMap<ChannelId, Channel>, D::Error> {
     let vec: Vec<Channel> = Deserialize::deserialize(deserializer)?;
     let mut private_channels = HashMap::new();
@@ -79,7 +84,8 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(deserializer: D)
     Ok(private_channels)
 }
 
-pub fn deserialize_roles<'de, D: Deserializer<'de>>(deserializer: D)
+pub fn deserialize_roles<'de, D: Deserializer<'de>>(
+    deserializer: D)
     -> StdResult<HashMap<RoleId, Role>, D::Error> {
     let vec: Vec<Role> = Deserialize::deserialize(deserializer)?;
     let mut roles = HashMap::new();
@@ -91,7 +97,8 @@ pub fn deserialize_roles<'de, D: Deserializer<'de>>(deserializer: D)
     Ok(roles)
 }
 
-pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(deserializer: D)
+pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
+    deserializer: D)
     -> StdResult<Arc<RwLock<User>>, D::Error> {
     let mut users: Vec<User> = Deserialize::deserialize(deserializer)?;
     let user = if users.is_empty() {
@@ -103,7 +110,8 @@ pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(deserializer: D)
     Ok(Arc::new(RwLock::new(user)))
 }
 
-pub fn deserialize_users<'de, D: Deserializer<'de>>(deserializer: D)
+pub fn deserialize_users<'de, D: Deserializer<'de>>(
+    deserializer: D)
     -> StdResult<HashMap<UserId, Arc<RwLock<User>>>, D::Error> {
     let vec: Vec<User> = Deserialize::deserialize(deserializer)?;
     let mut users = HashMap::new();
@@ -115,17 +123,16 @@ pub fn deserialize_users<'de, D: Deserializer<'de>>(deserializer: D)
     Ok(users)
 }
 
-pub fn deserialize_u16<'de, D: Deserializer<'de>>(deserializer: D)
-    -> StdResult<u16, D::Error> {
+pub fn deserialize_u16<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u16, D::Error> {
     deserializer.deserialize_u16(U16Visitor)
 }
 
-pub fn deserialize_u64<'de, D: Deserializer<'de>>(deserializer: D)
-    -> StdResult<u64, D::Error> {
+pub fn deserialize_u64<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u64, D::Error> {
     deserializer.deserialize_u64(U64Visitor)
 }
 
-pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(deserializer: D)
+pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
+    deserializer: D)
     -> StdResult<HashMap<UserId, VoiceState>, D::Error> {
     let vec: Vec<VoiceState> = Deserialize::deserialize(deserializer)?;
     let mut voice_states = HashMap::new();
@@ -137,7 +144,7 @@ pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(deserializer: D)
     Ok(voice_states)
 }
 
-#[cfg(all(feature="cache", feature="model"))]
+#[cfg(all(feature = "cache", feature = "model"))]
 pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Result<bool> {
     let cache = CACHE.read().unwrap();
     let current_user = &cache.user;
@@ -168,7 +175,10 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
         None => return Err(Error::Model(ModelError::ItemMissing)),
     };
 
-    let perms = guild.read().unwrap().permissions_for(channel_id, current_user.id);
+    let perms = guild
+        .read()
+        .unwrap()
+        .permissions_for(channel_id, current_user.id);
 
     permissions.remove(perms);
 
@@ -199,13 +209,9 @@ impl<'de> Visitor<'de> for U16Visitor {
         }
     }
 
-    fn visit_i64<E: DeError>(self, v: i64) -> StdResult<Self::Value, E> {
-        Ok(v as u16)
-    }
+    fn visit_i64<E: DeError>(self, v: i64) -> StdResult<Self::Value, E> { Ok(v as u16) }
 
-    fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> {
-        Ok(v as u16)
-    }
+    fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> { Ok(v as u16) }
 }
 
 pub struct U64Visitor;
@@ -232,11 +238,7 @@ impl<'de> Visitor<'de> for U64Visitor {
         }
     }
 
-    fn visit_i64<E: DeError>(self, v: i64) -> StdResult<Self::Value, E> {
-        Ok(v as u64)
-    }
+    fn visit_i64<E: DeError>(self, v: i64) -> StdResult<Self::Value, E> { Ok(v as u64) }
 
-    fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> {
-        Ok(v)
-    }
+    fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> { Ok(v) }
 }

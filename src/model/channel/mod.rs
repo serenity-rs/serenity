@@ -19,14 +19,14 @@ pub use self::reaction::*;
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::deserialize_u64;
-use ::model::*;
+use model::*;
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
-#[cfg(feature="model")]
-use ::builder::{CreateMessage, GetMessages};
-#[cfg(feature="model")]
-use ::http::AttachmentType;
+#[cfg(feature = "model")]
+use builder::{CreateMessage, GetMessages};
+#[cfg(feature = "model")]
+use http::AttachmentType;
 
 /// A container for any channel.
 #[derive(Clone, Debug)]
@@ -46,7 +46,7 @@ pub enum Channel {
     Private(Arc<RwLock<PrivateChannel>>),
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl Channel {
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
     ///
@@ -61,8 +61,8 @@ impl Channel {
     /// [`Message::react`]: struct.Message.html#method.react
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     #[inline]
-    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R)
-        -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
+    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
+        where M: Into<MessageId>, R: Into<ReactionType> {
         self.id().create_reaction(message_id, reaction_type)
     }
 
@@ -111,9 +111,14 @@ impl Channel {
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn delete_reaction<M, R>(&self, message_id: M, user_id: Option<UserId>, reaction_type: R)
-        -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
-        self.id().delete_reaction(message_id, user_id, reaction_type)
+    pub fn delete_reaction<M, R>(&self,
+                                 message_id: M,
+                                 user_id: Option<UserId>,
+                                 reaction_type: R)
+                                 -> Result<()>
+        where M: Into<MessageId>, R: Into<ReactionType> {
+        self.id()
+            .delete_reaction(message_id, user_id, reaction_type)
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -146,7 +151,7 @@ impl Channel {
     /// Refer to [`utils::is_nsfw`] for more details.
     ///
     /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
-    #[cfg(feature="utils")]
+    #[cfg(feature = "utils")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
         match *self {
@@ -209,8 +214,10 @@ impl Channel {
                                    reaction_type: R,
                                    limit: Option<u8>,
                                    after: Option<U>)
-        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id().reaction_users(message_id, reaction_type, limit, after)
+                                   -> Result<Vec<User>>
+        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
+        self.id()
+            .reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Retrieves the Id of the inner [`Group`], [`GuildChannel`], or
@@ -238,9 +245,7 @@ impl Channel {
     /// [`ChannelId`]: struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
-    pub fn say(&self, content: &str) -> Result<Message> {
-        self.id().say(content)
-    }
+    pub fn say(&self, content: &str) -> Result<Message> { self.id().say(content) }
 
     /// Sends (a) file(s) along with optional message contents.
     ///
@@ -327,7 +332,7 @@ impl<'de> Deserialize<'de> for Channel {
     }
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl Display for Channel {
     /// Formats the channel into a "mentioned" string.
     ///
@@ -344,12 +349,8 @@ impl Display for Channel {
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         match *self {
-            Channel::Group(ref group) => {
-                Display::fmt(&group.read().unwrap().name(), f)
-            },
-            Channel::Guild(ref ch) => {
-                Display::fmt(&ch.read().unwrap().id.mention(), f)
-            },
+            Channel::Group(ref group) => Display::fmt(&group.read().unwrap().name(), f),
+            Channel::Guild(ref ch) => Display::fmt(&ch.read().unwrap().id.mention(), f),
             Channel::Private(ref ch) => {
                 let channel = ch.read().unwrap();
                 let recipient = channel.recipient.read().unwrap();
@@ -397,9 +398,9 @@ impl ChannelType {
 struct PermissionOverwriteData {
     allow: Permissions,
     deny: Permissions,
-    #[serde(deserialize_with="deserialize_u64")]
+    #[serde(deserialize_with = "deserialize_u64")]
     id: u64,
-    #[serde(rename="type")]
+    #[serde(rename = "type")]
     kind: String,
 }
 
@@ -412,7 +413,8 @@ pub struct PermissionOverwrite {
 }
 
 impl<'de> Deserialize<'de> for PermissionOverwrite {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<PermissionOverwrite, D::Error> {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D)
+                                         -> StdResult<PermissionOverwrite, D::Error> {
         let data = PermissionOverwriteData::deserialize(deserializer)?;
 
         let kind = match &data.kind[..] {

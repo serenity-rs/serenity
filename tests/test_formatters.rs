@@ -11,7 +11,7 @@ fn test_formatters() {
     assert_eq!(UserId(5).to_string(), "5");
 }
 
-#[cfg(feature="utils")]
+#[cfg(feature = "utils")]
 #[test]
 fn test_mention() {
     use serenity::utils::Colour;
@@ -29,6 +29,7 @@ fn test_mention() {
         position: 1,
         topic: None,
         user_limit: None,
+        nsfw: false,
     })));
     let emoji = Emoji {
         id: EmojiId(5),

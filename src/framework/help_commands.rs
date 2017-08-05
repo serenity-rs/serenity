@@ -6,13 +6,14 @@
 //! embeds:
 //!
 //! ```rs,no_run
-//! use serenity::ext::framework::help_commands;
+//! use serenity::framework::help_commands;
 //! use serenity::Client;
 //! use std::env;
 //!
 //! let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
+//! use serenity::framework::BuiltinFramework;
 //!
-//! client.with_framework(|f| f
+//! client.with_framework(BuiltinFramework::new()
 //!     .command("help", |c| c.exec_help(help_commands::with_embeds)));
 //! ```
 //!
@@ -27,16 +28,14 @@ use std::sync::Arc;
 use std::fmt::Write;
 use super::command::InternalCommand;
 use super::{Command, CommandGroup, CommandOrAlias};
-use ::client::Context;
-use ::model::{ChannelId, Message};
-use ::utils::Colour;
+use client::Context;
+use model::{ChannelId, Message};
+use utils::Colour;
 
 fn error_embed(channel_id: &ChannelId, input: &str) {
-    let _ = channel_id
-        .send_message(|m| m
-        .embed(|e| e
-            .colour(Colour::dark_red())
-            .description(input)));
+    let _ = channel_id.send_message(|m| {
+        m.embed(|e| e.colour(Colour::dark_red()).description(input))
+    });
 }
 
 fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &InternalCommand> {
@@ -64,15 +63,17 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 /// # impl EventHandler for Handler {}
 /// # let mut client = Client::new("token", Handler);
 /// #
-/// use serenity::ext::framework::help_commands;
+/// use serenity::framework::help_commands;
+/// use serenity::framework::BuiltinFramework;
 ///
-/// client.with_framework(|f| f
+/// client.with_framework(BuiltinFramework::new()
 ///     .command("help", |c| c.exec_help(help_commands::with_embeds)));
 /// ```
 pub fn with_embeds(_: &mut Context,
                    msg: &Message,
                    groups: HashMap<String, Arc<CommandGroup>>,
-                   args: &[String]) -> Result<(), String> {
+                   args: &[String])
+                   -> Result<(), String> {
     if !args.is_empty() {
         let name = args.join(" ");
 
@@ -95,7 +96,7 @@ pub fn with_embeds(_: &mut Context,
                             error_embed(&msg.channel_id, &format!("Did you mean \"{}\"?", name));
 
                             return Ok(());
-                        }
+                        },
                     }
                 }
             }
@@ -109,28 +110,27 @@ pub fn with_embeds(_: &mut Context,
 
                 let _ = msg.channel_id.send_message(|m| {
                     m.embed(|e| {
-                        let mut embed = e.colour(Colour::rosewater())
-                            .title(command_name);
+                        let mut embed = e.colour(Colour::rosewater()).title(command_name);
                         if let Some(ref desc) = command.desc {
                             embed = embed.description(desc);
                         }
 
                         if let Some(ref usage) = command.usage {
-                            embed = embed.field(|f| f
-                                .name("Usage")
-                                .value(&format!("`{} {}`", command_name, usage)));
+                            embed = embed.field(|f| {
+                                f.name("Usage")
+                                    .value(&format!("`{} {}`", command_name, usage))
+                            });
                         }
 
                         if let Some(ref example) = command.example {
-                            embed = embed.field(|f| f
-                                .name("Sample usage")
-                                .value(&format!("`{} {}`", command_name, example)));
+                            embed = embed.field(|f| {
+                                f.name("Sample usage")
+                                    .value(&format!("`{} {}`", command_name, example))
+                            });
                         }
 
                         if group_name != "Ungrouped" {
-                            embed = embed.field(|f| f
-                                .name("Group")
-                                .value(&group_name));
+                            embed = embed.field(|f| f.name("Group").value(&group_name));
                         }
 
                         let available = if command.dm_only {
@@ -141,9 +141,7 @@ pub fn with_embeds(_: &mut Context,
                             "In DM and guilds"
                         };
 
-                        embed = embed.field(|f| f
-                            .name("Available")
-                            .value(available));
+                        embed = embed.field(|f| f.name("Available").value(available));
 
                         embed
                     })
@@ -159,11 +157,12 @@ pub fn with_embeds(_: &mut Context,
         return Ok(());
     }
 
-    let _ = msg.channel_id.send_message(|m| m
-        .embed(|mut e| {
-            e = e.colour(Colour::rosewater())
-                .description("To get help with an individual command, pass its \
-                              name as an argument to this command.");
+    let _ = msg.channel_id.send_message(|m| {
+        m.embed(|mut e| {
+            e = e.colour(Colour::rosewater()).description(
+                "To get help with an individual command, pass its \
+                 name as an argument to this command.",
+            );
 
             let mut group_names = groups.keys().collect::<Vec<_>>();
             group_names.sort();
@@ -198,7 +197,8 @@ pub fn with_embeds(_: &mut Context,
             }
 
             e
-        }));
+        })
+    });
 
     Ok(())
 }
@@ -216,15 +216,17 @@ pub fn with_embeds(_: &mut Context,
 /// # impl EventHandler for Handler {}
 /// # let mut client = Client::new("token", Handler);
 /// #
-/// use serenity::ext::framework::help_commands;
+/// use serenity::framework::help_commands;
+/// use serenity::framework::BuiltinFramework;
 ///
-/// client.with_framework(|f| f
+/// client.with_framework(BuiltinFramework::new()
 ///     .command("help", |c| c.exec_help(help_commands::plain)));
 /// ```
 pub fn plain(_: &mut Context,
              msg: &Message,
              groups: HashMap<String, Arc<CommandGroup>>,
-             args: &[String]) -> Result<(), String> {
+             args: &[String])
+             -> Result<(), String> {
     if !args.is_empty() {
         let name = args.join(" ");
 
@@ -238,7 +240,7 @@ pub fn plain(_: &mut Context,
                     command_name.to_owned()
                 };
 
-                if name == with_prefix || name == *command_name  {
+                if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
                             found = Some((command_name, cmd));
@@ -246,7 +248,7 @@ pub fn plain(_: &mut Context,
                         CommandOrAlias::Alias(ref name) => {
                             let _ = msg.channel_id.say(&format!("Did you mean {:?}?", name));
                             return Ok(());
-                        }
+                        },
                     }
                 }
             }
@@ -275,14 +277,16 @@ pub fn plain(_: &mut Context,
                     let _ = write!(result, "**Group:** {}\n", group_name);
                 }
 
-                result.push_str("**Available:** ");
-                result.push_str(if command.dm_only {
+                let only = if command.dm_only {
                     "Only in DM"
                 } else if command.guild_only {
                     "Only in guilds"
                 } else {
                     "In DM and guilds"
-                });
+                };
+
+                result.push_str("**Available:** ");
+                result.push_str(only);
                 result.push_str("\n");
 
                 let _ = msg.channel_id.say(&result);
@@ -291,7 +295,8 @@ pub fn plain(_: &mut Context,
             }
         }
 
-        let _ = msg.channel_id.say(&format!("**Error**: Command `{}` not found.", name));
+        let _ = msg.channel_id
+            .say(&format!("**Error**: Command `{}` not found.", name));
 
         return Ok(());
     }

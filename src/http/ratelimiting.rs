@@ -47,9 +47,9 @@ use hyper::status::StatusCode;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use std::{i64, str, thread};
+use std::{str, thread, i64};
 use super::{HttpError, LightMethod};
-use ::internal::prelude::*;
+use internal::prelude::*;
 
 lazy_static! {
     /// The global mutex is a mutex unlocked and then immediately re-locked
@@ -207,6 +207,11 @@ pub enum Route {
     ///
     /// [`GuildId`]: struct.GuildId.html
     GuildsIdBans(u64),
+    /// Route for the `/guilds/:guild_id/audit-logs` path.
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: struct.GuildId.html
+    GuildsIdAuditLogs(u64),
     /// Route for the `/guilds/:guild_id/bans/:user_id` path.
     ///
     /// The data is the relevant [`GuildId`].
@@ -359,11 +364,14 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
             .lock()
             .expect("routes poisoned")
             .entry(route)
-            .or_insert_with(|| Arc::new(Mutex::new(RateLimit {
-                limit: i64::MAX,
-                remaining: i64::MAX,
-                reset: i64::MAX,
-            }))).clone();
+            .or_insert_with(|| {
+                Arc::new(Mutex::new(RateLimit {
+                    limit: i64::MAX,
+                    remaining: i64::MAX,
+                    reset: i64::MAX,
+                }))
+            })
+            .clone();
 
         let mut lock = bucket.lock().unwrap();
         lock.pre_hook(&route);
@@ -389,7 +397,8 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
             let redo = if response.headers.get_raw("x-ratelimit-global").is_some() {
                 let _ = GLOBAL.lock().expect("global route lock poisoned");
 
-                Ok(if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {
+                Ok(if let Some(retry_after) =
+                    parse_header(&response.headers, "retry-after")? {
                     debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
                     thread::sleep(Duration::from_millis(retry_after as u64));
 
@@ -453,7 +462,11 @@ impl RateLimit {
         if self.remaining == 0 {
             let delay = (diff * 1000) + 500;
 
-            debug!("Pre-emptive ratelimit on route {:?} for {:?}ms", route, delay);
+            debug!(
+                "Pre-emptive ratelimit on route {:?} for {:?}ms",
+                route,
+                delay
+            );
             thread::sleep(Duration::from_millis(delay));
 
             return;

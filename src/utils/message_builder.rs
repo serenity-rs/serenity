@@ -1,7 +1,7 @@
 use std::default::Default;
-use std::fmt::{self, Write, Display};
+use std::fmt::{self, Display, Write};
 use std::ops::Add;
-use ::model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
+use model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 
 /// The Message Builder is an ergonomic utility to easily build a message,
 /// by adding text and mentioning mentionable structs.
@@ -58,9 +58,7 @@ impl MessageBuilder {
     /// // alternatively:
     /// let message = MessageBuilder::default();
     /// ```
-    pub fn new() -> MessageBuilder {
-        MessageBuilder::default()
-    }
+    pub fn new() -> MessageBuilder { MessageBuilder::default() }
 
     /// Pulls the inner value out of the builder.
     ///
@@ -92,9 +90,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "test");
     /// ```
-    pub fn build(self) -> String {
-        self.0
-    }
+    pub fn build(self) -> String { self.0 }
 
     /// Mentions the [`GuildChannel`] in the built message.
     ///
@@ -193,9 +189,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(message.push("ing").0, "testing");
     /// ```
-    pub fn push<T: Into<Content>>(mut self, content: T) -> Self {
-        let content = content.into();
-        self.0.push_str(&content.to_string());
+    pub fn push<D: fmt::Display>(mut self, content: D) -> Self {
+        let _ = write!(self.0, "{}", content);
 
         self
     }
@@ -239,15 +234,15 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "```\nhello\n```");
     /// ```
-    pub fn push_codeblock(mut self, content: &str, language: Option<&str>) -> Self {
+    pub fn push_codeblock<D: fmt::Display, L: fmt::Display>(mut self, content: D, language: Option<L>) -> Self {
         self.0.push_str("```");
 
         if let Some(language) = language {
-            self.0.push_str(language);
+            let _ = write!(self.0, "{}", language);
         }
 
         self.0.push('\n');
-        self.0.push_str(content);
+        let _ = write!(self.0, "{}", content);
         self.0.push_str("\n```");
 
         self
@@ -279,9 +274,9 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, expected);
     /// ```
-    pub fn push_mono(mut self, content: &str) -> Self {
+    pub fn push_mono<D: fmt::Display>(mut self, content: D) -> Self {
         self.0.push('`');
-        self.0.push_str(content);
+        let _ = write!(self.0, "{}", content);
         self.0.push('`');
 
         self
@@ -308,36 +303,36 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, expected);
     /// ```
-    pub fn push_italic(mut self, content: &str) -> Self {
+    pub fn push_italic<D: fmt::Display>(mut self, content: D) -> Self {
         self.0.push('_');
-        self.0.push_str(content);
+        let _ = write!(self.0, "{}", content);
         self.0.push('_');
 
         self
     }
 
     /// Pushes an inline bold text to the content.
-    pub fn push_bold(mut self, content: &str) -> Self {
+    pub fn push_bold<D: fmt::Display>(mut self, content: D) -> Self {
         self.0.push_str("**");
-        self.0.push_str(content);
+        let _ = write!(self.0, "{}", content);
         self.0.push_str("**");
 
         self
     }
 
     /// Pushes an underlined inline text to the content.
-    pub fn push_underline(mut self, content: &str) -> Self {
+    pub fn push_underline<D: fmt::Display>(mut self, content: D) -> Self {
         self.0.push_str("__");
-        self.0.push_str(content);
+        let _ = write!(self.0, "{}", content);
         self.0.push_str("__");
 
         self
     }
 
     /// Pushes a strikethrough inline text to the content.
-    pub fn push_strike(mut self, content: &str) -> Self {
+    pub fn push_strike<D: fmt::Display>(mut self, content: D) -> Self {
         self.0.push_str("~~");
-        self.0.push_str(content);
+        let _ = write!(self.0, "{}", content);
         self.0.push_str("~~");
 
         self
@@ -356,7 +351,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "hello\nworld");
     /// ```
-    pub fn push_line<T: Into<Content>>(mut self, content: T) -> Self {
+    pub fn push_line<D: fmt::Display>(mut self, content: D) -> Self {
         self = self.push(content);
         self.0.push('\n');
 
@@ -376,7 +371,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "`hello`\nworld");
     /// ```
-    pub fn push_mono_line(mut self, content: &str) -> Self {
+    pub fn push_mono_line<D: fmt::Display>(mut self, content: D) -> Self {
         self = self.push_mono(content);
         self.0.push('\n');
 
@@ -396,7 +391,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "_hello_\nworld");
     /// ```
-    pub fn push_italic_line(mut self, content: &str) -> Self {
+    pub fn push_italic_line<D: fmt::Display>(mut self, content: D) -> Self {
         self = self.push_italic(content);
         self.0.push('\n');
 
@@ -416,7 +411,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "**hello**\nworld");
     /// ```
-    pub fn push_bold_line(mut self, content: &str) -> Self {
+    pub fn push_bold_line<D: fmt::Display>(mut self, content: D) -> Self {
         self = self.push_bold(content);
         self.0.push('\n');
 
@@ -436,7 +431,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "__hello__\nworld");
     /// ```
-    pub fn push_underline_line(mut self, content: &str) -> Self {
+    pub fn push_underline_line<D: fmt::Display>(mut self, content: D) -> Self {
         self = self.push_underline(content);
         self.0.push('\n');
 
@@ -456,7 +451,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "~~hello~~\nworld");
     /// ```
-    pub fn push_strike_line(mut self, content: &str) -> Self {
+    pub fn push_strike_line<D: fmt::Display>(mut self, content: D) -> Self {
         self = self.push_strike(content);
         self.0.push('\n');
 
@@ -465,77 +460,99 @@ impl MessageBuilder {
 
     /// Pushes text to your message, but normalizing content - that means
     /// ensuring that there's no unwanted formatting, mention spam etc.
-    pub fn push_safe<T: Into<Content>>(mut self, content: T) -> Self {
-        let mut content: Content = content.into();
-        content.inner = normalize(&content.inner)
-            .replace('*', "\\*")
-            .replace('`', "\\`")
-            .replace('_', "\\_");
+    pub fn push_safe<D: fmt::Display>(mut self, content: D) -> Self {
+        {
+            let mut s = format!("{}", content);
+            s  = normalize(&s)
+                .replace('*', "\\=*")
+                .replace('`', "\\`")
+                .replace('_', "\\_");
 
-        self.0.push_str(&content.to_string());
+            self.0.push_str(&s);
+        }
 
         self
     }
 
     /// Pushes a code-block to your message normalizing content.
-    pub fn push_codeblock_safe(mut self, content: &str, language: Option<&str>)
-        -> Self {
-        let content = &normalize(content)
-            .replace("```", "'''");
-
+    pub fn push_codeblock_safe<D: fmt::Display, L: fmt::Display>(mut self, content: D, language: Option<L>) -> Self {
         self.0.push_str("```");
 
         if let Some(language) = language {
-            self.0.push_str(language);
+            let _ = write!(self.0, "{}", language);
         }
 
         self.0.push('\n');
-        self.0.push_str(content);
+        {
+            let mut s = format!("{}", content);
+            s = normalize(&s).replace("```", "'''");
+            self.0.push_str(&s);
+        }
         self.0.push_str("```");
 
         self
     }
 
     /// Pushes an inline monospaced text to the content normalizing content.
-    pub fn push_mono_safe(mut self, content: &str) -> Self {
+    pub fn push_mono_safe<D: fmt::Display>(mut self, content: D) -> Self {
         self.0.push('`');
-        self.0.push_str(&normalize(content).replace('`', "'"));
+        {
+            let mut s = format!("{}", content);
+            s = normalize(&s).replace('`', "'"); 
+            self.0.push_str(&s);
+        }
         self.0.push('`');
 
         self
     }
 
     /// Pushes an inline italicized text to the content normalizing content.
-    pub fn push_italic_safe(mut self, content: &str) -> Self {
+    pub fn push_italic_safe<D: fmt::Display>(mut self, content: D) -> Self {
         self.0.push('_');
-        self.0.push_str(&normalize(content).replace('_', " "));
+        {
+            let mut s = format!("{}", content);
+            s = normalize(&s).replace('_', " "); 
+            self.0.push_str(&s);
+        }
         self.0.push('_');
 
         self
     }
 
     /// Pushes an inline bold text to the content normalizing content.
-    pub fn push_bold_safe(mut self, content: &str) -> Self {
+    pub fn push_bold_safe<D: fmt::Display>(mut self, content: D) -> Self {
         self.0.push_str("**");
-        self.0.push_str(&normalize(content).replace("**", "  "));
+        {
+            let mut s = format!("{}", content);
+            s = normalize(&s).replace("**", " "); 
+            self.0.push_str(&s);
+        }
         self.0.push_str("**");
 
         self
     }
 
     /// Pushes an underlined inline text to the content normalizing content.
-    pub fn push_underline_safe(mut self, content: &str) -> Self {
+    pub fn push_underline_safe<D: fmt::Display>(mut self, content: D) -> Self {
         self.0.push_str("__");
-        self.0.push_str(&normalize(content).replace("__", "  "));
+        {
+            let mut s = format!("{}", content);
+            s = normalize(&s).replace("__", " "); 
+            self.0.push_str(&s);
+        }
         self.0.push_str("__");
 
         self
     }
 
     /// Pushes a strikethrough inline text to the content normalizing content.
-    pub fn push_strike_safe(mut self, content: &str) -> Self {
+    pub fn push_strike_safe<D: fmt::Display>(mut self, content: D) -> Self {
         self.0.push_str("~~");
-        self.0.push_str(&normalize(content).replace("~~", "  "));
+        {
+            let mut s = format!("{}", content);
+            s = normalize(&s).replace("~~", " "); 
+            self.0.push_str(&s);
+        }
         self.0.push_str("~~");
 
         self
@@ -550,11 +567,13 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new().push_line_safe("Hello @everyone").push("How are you?").build();
+    /// let content = MessageBuilder::new().push_line_safe("Hello @everyone")
+    ///                                    .push("How are you?")
+    ///                                    .build();
     ///
     /// assert_eq!(content, "Hello @\u{200B}everyone\nHow are you?");
     /// ```
-    pub fn push_line_safe<T: Into<Content>>(mut self, content: T) -> Self {
+    pub fn push_line_safe<D: fmt::Display>(mut self, content: D) -> Self {
         self = self.push_safe(content);
         self.0.push('\n');
 
@@ -576,7 +595,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "`'hello @\u{200B}everyone'`\nworld");
     /// ```
-    pub fn push_mono_line_safe(mut self, content: &str) -> Self {
+    pub fn push_mono_line_safe<D: fmt::Display>(mut self, content: D) -> Self {
         self = self.push_mono_safe(content);
         self.0.push('\n');
 
@@ -598,7 +617,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "_@\u{200B}everyone_\nIsn't a mention.");
     /// ```
-    pub fn push_italic_line_safe(mut self, content: &str) -> Self {
+    pub fn push_italic_line_safe<D: fmt::Display>(mut self, content: D) -> Self {
         self = self.push_italic_safe(content);
         self.0.push('\n');
 
@@ -620,7 +639,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "**@\u{200B}everyone**\nIsn't a mention.");
     /// ```
-    pub fn push_bold_line_safe(mut self, content: &str) -> Self {
+    pub fn push_bold_line_safe<D: fmt::Display>(mut self, content: D) -> Self {
         self = self.push_bold_safe(content);
         self.0.push('\n');
 
@@ -642,14 +661,15 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "__@\u{200B}everyone__\nIsn't a mention.");
     /// ```
-    pub fn push_underline_line_safe(mut self, content: &str) -> Self {
+    pub fn push_underline_line_safe<D: fmt::Display>(mut self, content: D) -> Self {
         self = self.push_underline_safe(content);
         self.0.push('\n');
 
         self
     }
 
-    /// Pushes a strikethrough inline text with added newline to the content normalizing content.
+    /// Pushes a strikethrough inline text with added newline to the content normalizing
+    /// content.
     ///
     /// # Examples
     ///
@@ -664,7 +684,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "~~@\u{200B}everyone~~\nIsn't a mention.");
     /// ```
-    pub fn push_strike_line_safe(mut self, content: &str) -> Self {
+    pub fn push_strike_line_safe<D: fmt::Display>(mut self, content: D) -> Self {
         self = self.push_strike_safe(content);
         self.0.push('\n');
 
@@ -721,9 +741,7 @@ impl Display for MessageBuilder {
     /// use serenity::utils::MessageBuilder;
     ///
     ///
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Display::fmt(&self.0, f)
-    }
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { fmt::Display::fmt(&self.0, f) }
 }
 
 
@@ -757,17 +775,22 @@ pub struct Content {
     pub strikethrough: bool,
     pub inner: String,
     pub code: bool,
-    pub underline: bool
+    pub underline: bool,
+}
+
+impl fmt::Display for Content {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.to_string())
+    }
 }
 
 impl<T: ToString> Add<T> for Content {
     type Output = Content;
 
-    fn add(self, rhs: T) -> Content {
-        let mut nc = self.clone();
-        nc.inner = nc.inner + &rhs.to_string();
+    fn add(mut self, rhs: T) -> Content {
+        self.inner = self.inner + &rhs.to_string();
 
-        nc
+        self
     }
 }
 
@@ -785,11 +808,10 @@ impl<T: ToString> Add<T> for ContentModifier {
 impl Add<ContentModifier> for Content {
     type Output = Content;
 
-    fn add(self, rhs: ContentModifier) -> Content {
-        let mut nc = self.clone();
-        nc.apply(&rhs);
+    fn add(mut self, rhs: ContentModifier) -> Content {
+        self.apply(&rhs);
 
-        nc
+        self
     }
 }
 
@@ -806,10 +828,10 @@ impl Add<ContentModifier> for ContentModifier {
 
 impl ContentModifier {
     fn to_content(&self) -> Content {
-      let mut nc = Content::default();
-      nc.apply(self);
+        let mut nc = Content::default();
+        nc.apply(self);
 
-      nc
+        nc
     }
 }
 
@@ -835,12 +857,10 @@ impl Content {
     }
 
     pub fn to_string(&self) -> String {
-        let capacity = self.inner.len()
-            + if self.bold { 4 } else { 0 }
-            + if self.italic { 2 } else { 0 }
-            + if self.strikethrough { 4 } else { 0 }
-            + if self.underline { 4 } else { 0 }
-            + if self.code { 2 } else { 0 };
+        let capacity =
+            self.inner.len() + if self.bold { 4 } else { 0 } + if self.italic { 2 } else { 0 } +
+            if self.strikethrough { 4 } else { 0 } +
+            if self.underline { 4 } else { 0 } + if self.code { 2 } else { 0 };
         let mut new_str = String::with_capacity(capacity);
 
         if self.bold {
@@ -890,13 +910,11 @@ impl Content {
 }
 
 impl From<ContentModifier> for Content {
-    fn from(cm: ContentModifier) -> Content {
-        cm.to_content()
-    }
+    fn from(cm: ContentModifier) -> Content { cm.to_content() }
 }
 
-impl<T: ToString> From<T> for Content {
-    fn from(stringer: T) -> Content {
+impl Content {
+    pub fn from<T: ToString>(stringer: T) -> Content {
         Content {
             italic: false,
             bold: false,

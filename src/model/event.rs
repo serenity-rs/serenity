@@ -3,18 +3,18 @@
 use chrono::{DateTime, FixedOffset};
 use serde::de::Error as DeError;
 use serde_json;
-#[cfg(feature="voice")] 
+#[cfg(feature = "voice")]
 use serde_json::Error as JsonError;
 use std::collections::HashMap;
 use super::utils::deserialize_emojis;
 use super::*;
-use ::constants::VoiceOpCode;
-use ::internal::prelude::*;
+use constants::VoiceOpCode;
+use internal::prelude::*;
 
-#[cfg(feature="gateway")]
-use ::constants::OpCode;
-#[cfg(feature="gateway")]
-use ::gateway::GatewayError;
+#[cfg(feature = "gateway")]
+use constants::OpCode;
+#[cfg(feature = "gateway")]
+use gateway::GatewayError;
 
 /// Event data for the channel creation event.
 ///
@@ -126,7 +126,7 @@ impl<'de> Deserialize<'de> for GuildDeleteEvent {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct GuildEmojisUpdateEvent {
-    #[serde(deserialize_with="deserialize_emojis")]
+    #[serde(deserialize_with = "deserialize_emojis")]
     pub emojis: HashMap<EmojiId, Emoji>,
     pub guild_id: GuildId,
 }
@@ -153,7 +153,8 @@ impl<'de> Deserialize<'de> for GuildMemberAddEvent {
 
         Ok(GuildMemberAddEvent {
             guild_id: guild_id,
-            member: Member::deserialize(Value::Object(map)).map_err(DeError::custom)?,
+            member: Member::deserialize(Value::Object(map))
+                .map_err(DeError::custom)?,
         })
     }
 }
@@ -187,7 +188,8 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
             .and_then(|v| GuildId::deserialize(v.clone()))
             .map_err(DeError::custom)?;
 
-        let mut members = map.remove("members").ok_or_else(|| DeError::custom("missing member chunk members"))?;
+        let mut members = map.remove("members")
+            .ok_or_else(|| DeError::custom("missing member chunk members"))?;
 
         if let Some(members) = members.as_array_mut() {
             let num = Value::Number(Number::from(guild_id.0));
@@ -199,8 +201,8 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
             }
         }
 
-        let members: HashMap<UserId, Member> = Deserialize::deserialize(members)
-            .map_err(DeError::custom)?;
+        let members: HashMap<UserId, Member> =
+            Deserialize::deserialize(members).map_err(DeError::custom)?;
 
         Ok(GuildMembersChunkEvent {
             guild_id: guild_id,
@@ -229,7 +231,7 @@ pub struct GuildRoleUpdateEvent {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct GuildUnavailableEvent {
-    #[serde(rename="id")]
+    #[serde(rename = "id")]
     pub guild_id: GuildId,
 }
 
@@ -268,7 +270,7 @@ pub struct MessageDeleteBulkEvent {
 #[derive(Clone, Copy, Debug, Deserialize)]
 pub struct MessageDeleteEvent {
     pub channel_id: ChannelId,
-    #[serde(rename="id")]
+    #[serde(rename = "id")]
     pub message_id: MessageId,
 }
 
@@ -303,14 +305,17 @@ impl<'de> Deserialize<'de> for PresenceUpdateEvent {
         let mut map = JsonMap::deserialize(deserializer)?;
 
         let guild_id = match map.remove("guild_id") {
-            Some(v) => serde_json::from_value::<Option<GuildId>>(v).map_err(DeError::custom)?,
+            Some(v) => serde_json::from_value::<Option<GuildId>>(v)
+                .map_err(DeError::custom)?,
             None => None,
         };
         let roles = match map.remove("roles") {
-            Some(v) => serde_json::from_value::<Option<Vec<RoleId>>>(v).map_err(DeError::custom)?,
+            Some(v) => serde_json::from_value::<Option<Vec<RoleId>>>(v)
+                .map_err(DeError::custom)?,
             None => None,
         };
-        let presence = Presence::deserialize(Value::Object(map)).map_err(DeError::custom)?;
+        let presence = Presence::deserialize(Value::Object(map))
+            .map_err(DeError::custom)?;
 
         Ok(Self {
             guild_id: guild_id,
@@ -383,7 +388,7 @@ impl<'de> Deserialize<'de> for ReadyEvent {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct ResumedEvent {
-    #[serde(rename="_trace")]
+    #[serde(rename = "_trace")]
     pub trace: Vec<Option<String>>,
 }
 
@@ -437,7 +442,8 @@ impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
 
         Ok(VoiceStateUpdateEvent {
             guild_id: guild_id,
-            voice_state: VoiceState::deserialize(Value::Object(map)).map_err(DeError::custom)?,
+            voice_state: VoiceState::deserialize(Value::Object(map))
+                .map_err(DeError::custom)?,
         })
     }
 }
@@ -460,7 +466,7 @@ pub enum GatewayEvent {
 }
 
 impl GatewayEvent {
-    #[cfg(feature="gateway")]
+    #[cfg(feature = "gateway")]
     pub fn decode(value: Value) -> Result<Self> {
         let mut map = JsonMap::deserialize(value)?;
 
@@ -477,7 +483,9 @@ impl GatewayEvent {
                     .ok_or_else(|| DeError::custom("expected gateway event type"))
                     .and_then(String::deserialize)?;
                 let d = map.remove("d")
-                    .ok_or_else(|| Error::Decode("expected gateway event d", Value::Object(map)))?;
+                    .ok_or_else(|| {
+                        Error::Decode("expected gateway event d", Value::Object(map))
+                    })?;
 
                 GatewayEvent::Dispatch(s, Event::decode(t, d)?)
             },
@@ -528,7 +536,8 @@ pub enum Event {
     /// Fires the [`Client::on_channel_pins_update`] event.
     ///
     /// [`Channel`]: ../enum.Channel.html
-    /// [`Client::on_channel_pins_update`]: ../../client/struct.Client.html#on_channel_pins_update
+    /// [`Client::on_channel_pins_update`]:
+    /// ../../client/struct.Client.html#on_channel_pins_update
     ChannelPinsUpdate(ChannelPinsUpdateEvent),
     /// A [`User`] has been added to a [`Group`].
     ///
@@ -587,7 +596,8 @@ pub enum Event {
     ///
     /// Fires the [`on_message_reaction_remove`] event handler.
     ///
-    /// [`on_message_reaction_remove`]: ../client/struct.Client.html#method.on_message_reaction_remove
+    /// [`on_message_reaction_remove`]:
+    /// ../client/struct.Client.html#method.on_message_reaction_remove
     ReactionRemove(ReactionRemoveEvent),
     /// A request was issued to remove all [`Reaction`]s from a [`Message`].
     ///
@@ -622,21 +632,29 @@ pub enum Event {
 
 impl Event {
     #[allow(cyclomatic_complexity)]
-    #[cfg(feature="gateway")]
+    #[cfg(feature = "gateway")]
     fn decode(kind: String, value: Value) -> Result<Event> {
         Ok(match &kind[..] {
             "CHANNEL_CREATE" => Event::ChannelCreate(ChannelCreateEvent::deserialize(value)?),
             "CHANNEL_DELETE" => Event::ChannelDelete(ChannelDeleteEvent::deserialize(value)?),
-            "CHANNEL_PINS_UPDATE" => Event::ChannelPinsUpdate(ChannelPinsUpdateEvent::deserialize(value)?),
-            "CHANNEL_RECIPIENT_ADD" => Event::ChannelRecipientAdd(ChannelRecipientAddEvent::deserialize(value)?),
-            "CHANNEL_RECIPIENT_REMOVE" => Event::ChannelRecipientRemove(ChannelRecipientRemoveEvent::deserialize(value)?),
+            "CHANNEL_PINS_UPDATE" => {
+                Event::ChannelPinsUpdate(ChannelPinsUpdateEvent::deserialize(value)?)
+            },
+            "CHANNEL_RECIPIENT_ADD" => {
+                Event::ChannelRecipientAdd(ChannelRecipientAddEvent::deserialize(value)?)
+            },
+            "CHANNEL_RECIPIENT_REMOVE" => {
+                Event::ChannelRecipientRemove(ChannelRecipientRemoveEvent::deserialize(value)?)
+            },
             "CHANNEL_UPDATE" => Event::ChannelUpdate(ChannelUpdateEvent::deserialize(value)?),
             "GUILD_BAN_ADD" => Event::GuildBanAdd(GuildBanAddEvent::deserialize(value)?),
             "GUILD_BAN_REMOVE" => Event::GuildBanRemove(GuildBanRemoveEvent::deserialize(value)?),
             "GUILD_CREATE" => {
                 let mut map = JsonMap::deserialize(value)?;
 
-                if map.remove("unavailable").and_then(|v| v.as_bool()).unwrap_or(false) {
+                if map.remove("unavailable")
+                       .and_then(|v| v.as_bool())
+                       .unwrap_or(false) {
                     Event::GuildUnavailable(GuildUnavailableEvent::deserialize(Value::Object(map))?)
                 } else {
                     Event::GuildCreate(GuildCreateEvent::deserialize(Value::Object(map))?)
@@ -645,37 +663,67 @@ impl Event {
             "GUILD_DELETE" => {
                 let mut map = JsonMap::deserialize(value)?;
 
-                if map.remove("unavailable").and_then(|v| v.as_bool()).unwrap_or(false) {
+                if map.remove("unavailable")
+                       .and_then(|v| v.as_bool())
+                       .unwrap_or(false) {
                     Event::GuildUnavailable(GuildUnavailableEvent::deserialize(Value::Object(map))?)
                 } else {
                     Event::GuildDelete(GuildDeleteEvent::deserialize(Value::Object(map))?)
                 }
             },
-            "GUILD_EMOJIS_UPDATE" => Event::GuildEmojisUpdate(GuildEmojisUpdateEvent::deserialize(value)?),
-            "GUILD_INTEGRATIONS_UPDATE" => Event::GuildIntegrationsUpdate(GuildIntegrationsUpdateEvent::deserialize(value)?),
+            "GUILD_EMOJIS_UPDATE" => {
+                Event::GuildEmojisUpdate(GuildEmojisUpdateEvent::deserialize(value)?)
+            },
+            "GUILD_INTEGRATIONS_UPDATE" => {
+                Event::GuildIntegrationsUpdate(GuildIntegrationsUpdateEvent::deserialize(value)?)
+            },
             "GUILD_MEMBER_ADD" => Event::GuildMemberAdd(GuildMemberAddEvent::deserialize(value)?),
-            "GUILD_MEMBER_REMOVE" => Event::GuildMemberRemove(GuildMemberRemoveEvent::deserialize(value)?),
-            "GUILD_MEMBER_UPDATE" => Event::GuildMemberUpdate(GuildMemberUpdateEvent::deserialize(value)?),
-            "GUILD_MEMBERS_CHUNK" => Event::GuildMembersChunk(GuildMembersChunkEvent::deserialize(value)?),
-            "GUILD_ROLE_CREATE" => Event::GuildRoleCreate(GuildRoleCreateEvent::deserialize(value)?),
-            "GUILD_ROLE_DELETE" => Event::GuildRoleDelete(GuildRoleDeleteEvent::deserialize(value)?),
-            "GUILD_ROLE_UPDATE" => Event::GuildRoleUpdate(GuildRoleUpdateEvent::deserialize(value)?),
+            "GUILD_MEMBER_REMOVE" => {
+                Event::GuildMemberRemove(GuildMemberRemoveEvent::deserialize(value)?)
+            },
+            "GUILD_MEMBER_UPDATE" => {
+                Event::GuildMemberUpdate(GuildMemberUpdateEvent::deserialize(value)?)
+            },
+            "GUILD_MEMBERS_CHUNK" => {
+                Event::GuildMembersChunk(GuildMembersChunkEvent::deserialize(value)?)
+            },
+            "GUILD_ROLE_CREATE" => {
+                Event::GuildRoleCreate(GuildRoleCreateEvent::deserialize(value)?)
+            },
+            "GUILD_ROLE_DELETE" => {
+                Event::GuildRoleDelete(GuildRoleDeleteEvent::deserialize(value)?)
+            },
+            "GUILD_ROLE_UPDATE" => {
+                Event::GuildRoleUpdate(GuildRoleUpdateEvent::deserialize(value)?)
+            },
             "GUILD_UPDATE" => Event::GuildUpdate(GuildUpdateEvent::deserialize(value)?),
             "MESSAGE_CREATE" => Event::MessageCreate(MessageCreateEvent::deserialize(value)?),
             "MESSAGE_DELETE" => Event::MessageDelete(MessageDeleteEvent::deserialize(value)?),
-            "MESSAGE_DELETE_BULK" => Event::MessageDeleteBulk(MessageDeleteBulkEvent::deserialize(value)?),
+            "MESSAGE_DELETE_BULK" => {
+                Event::MessageDeleteBulk(MessageDeleteBulkEvent::deserialize(value)?)
+            },
             "MESSAGE_REACTION_ADD" => Event::ReactionAdd(ReactionAddEvent::deserialize(value)?),
-            "MESSAGE_REACTION_REMOVE" => Event::ReactionRemove(ReactionRemoveEvent::deserialize(value)?),
-            "MESSAGE_REACTION_REMOVE_ALL" => Event::ReactionRemoveAll(ReactionRemoveAllEvent::deserialize(value)?),
+            "MESSAGE_REACTION_REMOVE" => {
+                Event::ReactionRemove(ReactionRemoveEvent::deserialize(value)?)
+            },
+            "MESSAGE_REACTION_REMOVE_ALL" => {
+                Event::ReactionRemoveAll(ReactionRemoveAllEvent::deserialize(value)?)
+            },
             "MESSAGE_UPDATE" => Event::MessageUpdate(MessageUpdateEvent::deserialize(value)?),
             "PRESENCE_UPDATE" => Event::PresenceUpdate(PresenceUpdateEvent::deserialize(value)?),
-            "PRESENCES_REPLACE" => Event::PresencesReplace(PresencesReplaceEvent::deserialize(value)?),
+            "PRESENCES_REPLACE" => {
+                Event::PresencesReplace(PresencesReplaceEvent::deserialize(value)?)
+            },
             "READY" => Event::Ready(ReadyEvent::deserialize(value)?),
             "RESUMED" => Event::Resumed(ResumedEvent::deserialize(value)?),
             "TYPING_START" => Event::TypingStart(TypingStartEvent::deserialize(value)?),
             "USER_UPDATE" => Event::UserUpdate(UserUpdateEvent::deserialize(value)?),
-            "VOICE_SERVER_UPDATE" => Event::VoiceServerUpdate(VoiceServerUpdateEvent::deserialize(value)?),
-            "VOICE_STATE_UPDATE" => Event::VoiceStateUpdate(VoiceStateUpdateEvent::deserialize(value)?),
+            "VOICE_SERVER_UPDATE" => {
+                Event::VoiceServerUpdate(VoiceServerUpdateEvent::deserialize(value)?)
+            },
+            "VOICE_STATE_UPDATE" => {
+                Event::VoiceStateUpdate(VoiceStateUpdateEvent::deserialize(value)?)
+            },
             "WEBHOOKS_UPDATE" => Event::WebhookUpdate(WebhookUpdateEvent::deserialize(value)?),
             _ => Event::Unknown(UnknownEvent {
                 kind: kind,
@@ -735,22 +783,31 @@ pub enum VoiceEvent {
     /// A voice event denoting that someone is speaking.
     Speaking(VoiceSpeaking),
     /// An unknown voice event not registered.
-    Unknown(VoiceOpCode, Value)
+    Unknown(VoiceOpCode, Value),
 }
 
 impl VoiceEvent {
-    #[cfg(feature="voice")]
+    #[cfg(feature = "voice")]
     pub(crate) fn decode(value: Value) -> Result<VoiceEvent> {
         let mut map = JsonMap::deserialize(value)?;
 
         let op = match map.remove("op") {
-            Some(v) => VoiceOpCode::deserialize(v).map_err(JsonError::from).map_err(Error::from)?,
+            Some(v) => VoiceOpCode::deserialize(v)
+                .map_err(JsonError::from)
+                .map_err(Error::from)?,
             None => return Err(Error::Decode("expected voice event op", Value::Object(map))),
         };
 
         let d = match map.remove("d") {
-            Some(v) => JsonMap::deserialize(v).map_err(JsonError::from).map_err(Error::from)?,
-            None => return Err(Error::Decode("expected voice gateway d", Value::Object(map))),
+            Some(v) => JsonMap::deserialize(v)
+                .map_err(JsonError::from)
+                .map_err(Error::from)?,
+            None => {
+                return Err(Error::Decode(
+                    "expected voice gateway d",
+                    Value::Object(map),
+                ))
+            },
         };
         let v = Value::Object(d);
 
@@ -758,7 +815,9 @@ impl VoiceEvent {
             VoiceOpCode::Heartbeat => VoiceEvent::Heartbeat(VoiceHeartbeat::deserialize(v)?),
             VoiceOpCode::Hello => VoiceEvent::Hello(VoiceHello::deserialize(v)?),
             VoiceOpCode::KeepAlive => VoiceEvent::KeepAlive,
-            VoiceOpCode::SessionDescription => VoiceEvent::Ready(VoiceSessionDescription::deserialize(v)?),
+            VoiceOpCode::SessionDescription => {
+                VoiceEvent::Ready(VoiceSessionDescription::deserialize(v)?)
+            },
             VoiceOpCode::Speaking => VoiceEvent::Speaking(VoiceSpeaking::deserialize(v)?),
             other => VoiceEvent::Unknown(other, v),
         })

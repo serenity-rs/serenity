@@ -1,18 +1,18 @@
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use ::model::*;
+use model::*;
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use std::borrow::Cow;
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use std::fmt::Write as FmtWrite;
-#[cfg(feature="model")]
-use ::builder::{CreateMessage, EditChannel, GetMessages};
-#[cfg(feature="cache")]
-use ::CACHE;
-#[cfg(feature="model")]
-use ::http::{self, AttachmentType};
+#[cfg(feature = "model")]
+use builder::{CreateMessage, EditChannel, GetMessages};
+#[cfg(feature = "cache")]
+use CACHE;
+#[cfg(feature = "model")]
+use http::{self, AttachmentType};
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl ChannelId {
     /// Broadcasts that the current user is typing to a channel for the next 5
     /// seconds.
@@ -35,9 +35,7 @@ impl ChannelId {
     ///
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
-    pub fn broadcast_typing(&self) -> Result<()> {
-        http::broadcast_typing(self.0)
-    }
+    pub fn broadcast_typing(&self) -> Result<()> { http::broadcast_typing(self.0) }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
     /// single [`Member`] or [`Role`] within the channel.
@@ -52,8 +50,7 @@ impl ChannelId {
     /// [`PermissionOverwrite`]: struct.PermissionOverwrite.html
     /// [`Role`]: struct.Role.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
-    pub fn create_permission(&self, target: &PermissionOverwrite)
-        -> Result<()> {
+    pub fn create_permission(&self, target: &PermissionOverwrite) -> Result<()> {
         let (id, kind) = match target.kind {
             PermissionOverwriteType::Member(id) => (id.0, "member"),
             PermissionOverwriteType::Role(id) => (id.0, "role"),
@@ -82,16 +79,14 @@ impl ChannelId {
     /// [`Message::react`]: struct.Message.html#method.react
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     #[inline]
-    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R)
-        -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
+    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
+        where M: Into<MessageId>, R: Into<ReactionType> {
         http::create_reaction(self.0, message_id.into().0, &reaction_type.into())
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
     #[inline]
-    pub fn delete(&self) -> Result<Channel> {
-        http::delete_channel(self.0)
-    }
+    pub fn delete(&self) -> Result<Channel> { http::delete_channel(self.0) }
 
     /// Deletes a [`Message`] given its Id.
     ///
@@ -123,7 +118,8 @@ impl ChannelId {
     /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn delete_messages(&self, message_ids: &[MessageId]) -> Result<()> {
-        let ids = message_ids.into_iter()
+        let ids = message_ids
+            .into_iter()
             .map(|message_id| message_id.0)
             .collect::<Vec<u64>>();
 
@@ -140,10 +136,13 @@ impl ChannelId {
     ///
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
     pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
-        http::delete_permission(self.0, match permission_type {
-            PermissionOverwriteType::Member(id) => id.0,
-            PermissionOverwriteType::Role(id) => id.0,
-        })
+        http::delete_permission(
+            self.0,
+            match permission_type {
+                PermissionOverwriteType::Member(id) => id.0,
+                PermissionOverwriteType::Role(id) => id.0,
+            },
+        )
     }
 
     /// Deletes the given [`Reaction`] from the channel.
@@ -153,12 +152,18 @@ impl ChannelId {
     ///
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    pub fn delete_reaction<M, R>(&self, message_id: M, user_id: Option<UserId>, reaction_type: R)
-        -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
-        http::delete_reaction(self.0,
-                              message_id.into().0,
-                              user_id.map(|uid| uid.0),
-                              &reaction_type.into())
+    pub fn delete_reaction<M, R>(&self,
+                                 message_id: M,
+                                 user_id: Option<UserId>,
+                                 reaction_type: R)
+                                 -> Result<()>
+        where M: Into<MessageId>, R: Into<ReactionType> {
+        http::delete_reaction(
+            self.0,
+            message_id.into().0,
+            user_id.map(|uid| uid.0),
+            &reaction_type.into(),
+        )
     }
 
 
@@ -220,15 +225,13 @@ impl ChannelId {
     }
 
     /// Search the cache for the channel with the Id.
-    #[cfg(feature="cache")]
-    pub fn find(&self) -> Option<Channel> {
-        CACHE.read().unwrap().channel(*self)
-    }
+    #[cfg(feature = "cache")]
+    pub fn find(&self) -> Option<Channel> { CACHE.read().unwrap().channel(*self) }
 
     /// Search the cache for the channel. If it can't be found, the channel is
     /// requested over REST.
     pub fn get(&self) -> Result<Channel> {
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             if let Some(channel) = CACHE.read().unwrap().channel(*self) {
                 return Ok(channel);
@@ -243,9 +246,7 @@ impl ChannelId {
     /// Requires the [Manage Channels] permission.
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
-    pub fn invites(&self) -> Result<Vec<RichInvite>> {
-        http::get_channel_invites(self.0)
-    }
+    pub fn invites(&self) -> Result<Vec<RichInvite>> { http::get_channel_invites(self.0) }
 
     /// Gets a message from the channel.
     ///
@@ -254,12 +255,13 @@ impl ChannelId {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        http::get_message(self.0, message_id.into().0)
-            .map(|mut msg| {
+        http::get_message(self.0, message_id.into().0).map(
+            |mut msg| {
                 msg.transform_content();
 
                 msg
-            })
+            },
+        )
     }
 
     /// Gets messages from the channel.
@@ -283,34 +285,32 @@ impl ChannelId {
             write!(query, "&before={}", before)?;
         }
 
-        http::get_messages(self.0, &query)
-            .map(|msgs| msgs
-                .into_iter()
+        http::get_messages(self.0, &query).map(|msgs| {
+            msgs.into_iter()
                 .map(|mut msg| {
                     msg.transform_content();
 
                     msg
-                }).collect::<Vec<Message>>())
+                })
+                .collect::<Vec<Message>>()
+        })
     }
 
     /// Returns the name of whatever channel this id holds.
-    #[cfg(feature="model")]
+    #[cfg(feature = "model")]
     pub fn name(&self) -> Option<String> {
         use self::Channel::*;
 
-        Some(match match self.find() { Some(c) => c, None => return None, } {
-            Guild(channel) => {
-                channel.read().unwrap().name().to_string()
+        Some(match match self.find() {
+                  Some(c) => c,
+                  None => return None,
+              } {
+            Guild(channel) => channel.read().unwrap().name().to_string(),
+            Group(channel) => match channel.read().unwrap().name() {
+                Cow::Borrowed(name) => name.to_string(),
+                Cow::Owned(name) => name,
             },
-            Group(channel) => {
-                match channel.read().unwrap().name() {
-                    Cow::Borrowed(name) => name.to_string(),
-                    Cow::Owned(name) => name,
-                }
-            },
-            Private(channel) => {
-                channel.read().unwrap().name()
-            }
+            Private(channel) => channel.read().unwrap().name(),
         })
     }
 
@@ -326,9 +326,7 @@ impl ChannelId {
     ///
     /// [`Message`]: struct.Message.html
     #[inline]
-    pub fn pins(&self) -> Result<Vec<Message>> {
-        http::get_pins(self.0)
-    }
+    pub fn pins(&self) -> Result<Vec<Message>> { http::get_pins(self.0) }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
@@ -343,18 +341,21 @@ impl ChannelId {
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     pub fn reaction_users<M, R, U>(&self,
-                                       message_id: M,
-                                       reaction_type: R,
-                                       limit: Option<u8>,
-                                       after: Option<U>)
-        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
+                                   message_id: M,
+                                   reaction_type: R,
+                                   limit: Option<u8>,
+                                   after: Option<U>)
+                                   -> Result<Vec<User>>
+        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
         let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
 
-        http::get_reaction_users(self.0,
-                                 message_id.into().0,
-                                 &reaction_type.into(),
-                                 limit,
-                                 after.map(|u| u.into().0))
+        http::get_reaction_users(
+            self.0,
+            message_id.into().0,
+            &reaction_type.into(),
+            limit,
+            after.map(|u| u.into().0),
+        )
     }
 
     /// Sends a message with just the given message content in the channel.
@@ -368,7 +369,7 @@ impl ChannelId {
     /// [`ChannelId`]: struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
-    pub fn say(&self, content: &str) -> Result<Message> {
+    pub fn say<D: ::std::fmt::Display>(&self, content: D) -> Result<Message> {
         self.send_message(|m| m.content(content))
     }
 
@@ -502,9 +503,7 @@ impl ChannelId {
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[inline]
-    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        http::get_channel_webhooks(self.0)
-    }
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> { http::get_channel_webhooks(self.0) }
 }
 
 impl From<Channel> for ChannelId {
@@ -531,33 +530,23 @@ impl<'a> From<&'a Channel> for ChannelId {
 
 impl From<PrivateChannel> for ChannelId {
     /// Gets the Id of a private channel.
-    fn from(private_channel: PrivateChannel) -> ChannelId {
-        private_channel.id
-    }
+    fn from(private_channel: PrivateChannel) -> ChannelId { private_channel.id }
 }
 
 impl<'a> From<&'a PrivateChannel> for ChannelId {
     /// Gets the Id of a private channel.
-    fn from(private_channel: &PrivateChannel) -> ChannelId {
-        private_channel.id
-    }
+    fn from(private_channel: &PrivateChannel) -> ChannelId { private_channel.id }
 }
 
 impl From<GuildChannel> for ChannelId {
     /// Gets the Id of a guild channel.
-    fn from(public_channel: GuildChannel) -> ChannelId {
-        public_channel.id
-    }
+    fn from(public_channel: GuildChannel) -> ChannelId { public_channel.id }
 }
 impl<'a> From<&'a GuildChannel> for ChannelId {
     /// Gets the Id of a guild channel.
-    fn from(public_channel: &GuildChannel) -> ChannelId {
-        public_channel.id
-    }
+    fn from(public_channel: &GuildChannel) -> ChannelId { public_channel.id }
 }
 
 impl Display for ChannelId {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        Display::fmt(&self.0, f)
-    }
+    fn fmt(&self, f: &mut Formatter) -> FmtResult { Display::fmt(&self.0, f) }
 }

@@ -96,7 +96,7 @@ extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
 
-#[cfg(feature="lazy_static")]
+#[cfg(feature = "lazy_static")]
 #[macro_use]
 extern crate lazy_static;
 
@@ -106,27 +106,27 @@ extern crate flate2;
 extern crate serde;
 extern crate parking_lot;
 
-#[cfg(feature="voice")]
+#[cfg(feature = "voice")]
 extern crate byteorder;
-#[cfg(feature="futures")]
+#[cfg(feature = "futures")]
 extern crate futures;
-#[cfg(feature="hyper")]
+#[cfg(feature = "hyper")]
 extern crate hyper;
-#[cfg(feature="hyper-native-tls")]
+#[cfg(feature = "hyper-native-tls")]
 extern crate hyper_native_tls;
-#[cfg(feature="http")]
+#[cfg(feature = "http")]
 extern crate multipart;
-#[cfg(feature="native-tls")]
+#[cfg(feature = "native-tls")]
 extern crate native_tls;
-#[cfg(feature="voice")]
+#[cfg(feature = "voice")]
 extern crate opus;
-#[cfg(feature="voice")]
+#[cfg(feature = "voice")]
 extern crate sodiumoxide;
-#[cfg(feature="tokio-core")]
+#[cfg(feature = "tokio-core")]
 extern crate tokio_core;
-#[cfg(feature="client")]
+#[cfg(feature = "client")]
 extern crate typemap;
-#[cfg(feature="gateway")]
+#[cfg(feature = "gateway")]
 extern crate websocket;
 
 #[macro_use]
@@ -136,38 +136,40 @@ pub mod constants;
 pub mod model;
 pub mod prelude;
 
-#[cfg(feature="builder")]
+#[cfg(feature = "builder")]
 pub mod builder;
-#[cfg(feature="cache")]
+#[cfg(feature = "cache")]
 pub mod cache;
-#[cfg(feature="client")]
+#[cfg(feature = "client")]
 pub mod client;
-#[cfg(any(feature="cache", feature="framework", feature="voice"))]
-pub mod ext;
-#[cfg(feature="framework")]
+#[cfg(feature = "builtin_framework")]
 pub mod framework;
-#[cfg(feature="gateway")]
+#[cfg(feature = "gateway")]
 pub mod gateway;
-#[cfg(feature="http")]
+#[cfg(feature = "http")]
 pub mod http;
-#[cfg(feature="utils")]
+#[cfg(feature = "utils")]
 pub mod utils;
-#[cfg(feature="voice")]
+#[cfg(feature = "voice")]
 pub mod voice;
 
 mod error;
 
 pub use error::{Error, Result};
 
-#[cfg(feature="client")]
+#[cfg(feature = "client")]
 pub use client::Client;
 
-#[cfg(feature="cache")]
+#[cfg(feature = "cache")]
 use cache::Cache;
-#[cfg(feature="cache")]
+#[cfg(feature = "cache")]
 use std::sync::RwLock;
 
-#[cfg(feature="cache")]
+use model::{Message, UserId};
+use client::Context;
+use tokio_core::reactor::Handle;
+
+#[cfg(feature = "cache")]
 lazy_static! {
     /// A mutable and lazily-initialized static binding. It can be accessed
     /// across any function and in any context.
@@ -204,4 +206,21 @@ lazy_static! {
     /// [`Cache`]: cache/struct.Cache.html
     /// [cache module documentation]: cache/index.html
     pub static ref CACHE: RwLock<Cache> = RwLock::new(Cache::default());
+}
+
+/// This trait allows for serenity to either use its builtin framework, or yours.
+///
+/// When implementing, be sure to use `tokio_handle.spawn_fn(|| ...; Ok())` when dispatching
+/// commands.
+///
+/// Note that you may see some other methods in here as well, but they're meant to be internal only
+/// for the builtin framework.
+#[cfg(feature = "framework")]
+pub trait Framework {
+    fn dispatch(&mut self, Context, Message, &Handle);
+
+    #[cfg(feature = "builtin_framework")]
+    fn update_current_user(&mut self, UserId, bool) {}
+    #[cfg(feature = "builtin_framework")]
+    fn initialized(&self) -> bool { false }
 }

@@ -1,8 +1,8 @@
 use super::super::utils::{deserialize_emojis, deserialize_roles};
-use ::model::*;
+use model::*;
 
-#[cfg(feature="model")]
-use ::builder::{EditGuild, EditMember, EditRole};
+#[cfg(feature = "model")]
+use builder::{EditGuild, EditMember, EditRole};
 
 /// Partial information about a [`Guild`]. This does not include information
 /// like member data.
@@ -16,7 +16,7 @@ pub struct PartialGuild {
     pub default_message_notifications: u64,
     pub embed_channel_id: Option<ChannelId>,
     pub embed_enabled: bool,
-    #[serde(deserialize_with="deserialize_emojis")]
+    #[serde(deserialize_with = "deserialize_emojis")]
     pub emojis: HashMap<EmojiId, Emoji>,
     pub features: Vec<Feature>,
     pub icon: Option<String>,
@@ -24,13 +24,13 @@ pub struct PartialGuild {
     pub name: String,
     pub owner_id: UserId,
     pub region: String,
-    #[serde(deserialize_with="deserialize_roles")]
+    #[serde(deserialize_with = "deserialize_roles")]
     pub roles: HashMap<RoleId, Role>,
     pub splash: Option<String>,
     pub verification_level: VerificationLevel,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl PartialGuild {
     /// Ban a [`User`] from the guild. All messages by the
     /// user within the last given number of days given will be deleted. This
@@ -52,12 +52,15 @@ impl PartialGuild {
     /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
     /// days' worth of messages to delete is over the maximum.
     ///
-    /// [`ModelError::DeleteMessageDaysAmount`]: enum.ModelError.html#variant.DeleteMessageDaysAmount
+    /// [`ModelError::DeleteMessageDaysAmount`]:
+    /// enum.ModelError.html#variant.DeleteMessageDaysAmount
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8) -> Result<()> {
         if delete_message_days > 7 {
-            return Err(Error::Model(ModelError::DeleteMessageDaysAmount(delete_message_days)));
+            return Err(Error::Model(
+                ModelError::DeleteMessageDaysAmount(delete_message_days),
+            ));
         }
 
         self.id.ban(user, delete_message_days)
@@ -69,17 +72,13 @@ impl PartialGuild {
     ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[inline]
-    pub fn bans(&self) -> Result<Vec<Ban>> {
-        self.id.bans()
-    }
+    pub fn bans(&self) -> Result<Vec<Ban>> { self.id.bans() }
 
     /// Gets all of the guild's channels over the REST API.
     ///
     /// [`Guild`]: struct.Guild.html
     #[inline]
-    pub fn channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> {
-        self.id.channels()
-    }
+    pub fn channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> { self.id.channels() }
 
     /// Creates a [`GuildChannel`] in the guild.
     ///
@@ -162,9 +161,7 @@ impl PartialGuild {
     ///
     /// **Note**: Requires the current user to be the owner of the guild.
     #[inline]
-    pub fn delete(&self) -> Result<PartialGuild> {
-        self.id.delete()
-    }
+    pub fn delete(&self) -> Result<PartialGuild> { self.id.delete() }
 
     /// Deletes an [`Emoji`] from the guild.
     ///
@@ -293,9 +290,7 @@ impl PartialGuild {
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     #[inline]
-    pub fn emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> {
-        self.id.emoji(emoji_id)
-    }
+    pub fn emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> { self.id.emoji(emoji_id) }
 
     /// Gets a list of all of the guild's emojis.
     ///
@@ -303,17 +298,13 @@ impl PartialGuild {
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     #[inline]
-    pub fn emojis(&self) -> Result<Vec<Emoji>> {
-        self.id.emojis()
-    }
+    pub fn emojis(&self) -> Result<Vec<Emoji>> { self.id.emojis() }
 
     /// Gets a partial amount of guild data by its Id.
     ///
     /// Requires that the current user be in the guild.
     #[inline]
-    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> {
-        guild_id.into().get()
-    }
+    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> { guild_id.into().get() }
 
     /// Kicks a [`Member`] from the guild.
     ///
@@ -322,23 +313,20 @@ impl PartialGuild {
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     #[inline]
-    pub fn kick<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
-        self.id.kick(user_id)
-    }
+    pub fn kick<U: Into<UserId>>(&self, user_id: U) -> Result<()> { self.id.kick(user_id) }
 
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
-        self.icon.as_ref().map(|icon|
-            format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
+        self.icon
+            .as_ref()
+            .map(|icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
     }
 
     /// Gets all integration of the guild.
     ///
     /// This performs a request over the REST API.
     #[inline]
-    pub fn integrations(&self) -> Result<Vec<Integration>> {
-        self.id.integrations()
-    }
+    pub fn integrations(&self) -> Result<Vec<Integration>> { self.id.integrations() }
 
     /// Gets all of the guild's invites.
     ///
@@ -346,23 +334,17 @@ impl PartialGuild {
     ///
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
-    pub fn invites(&self) -> Result<Vec<RichInvite>> {
-        self.id.invites()
-    }
+    pub fn invites(&self) -> Result<Vec<RichInvite>> { self.id.invites() }
 
     /// Leaves the guild.
     #[inline]
-    pub fn leave(&self) -> Result<()> {
-        self.id.leave()
-    }
+    pub fn leave(&self) -> Result<()> { self.id.leave() }
 
     /// Gets a user's [`Member`] for the guild by Id.
     ///
     /// [`Guild`]: struct.Guild.html
     /// [`Member`]: struct.Member.html
-    pub fn member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
-        self.id.member(user_id)
-    }
+    pub fn member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> { self.id.member(user_id) }
 
     /// Gets a list of the guild's members.
     ///
@@ -371,8 +353,8 @@ impl PartialGuild {
     /// [`User`]'s Id.
     ///
     /// [`User`]: struct.User.html
-    pub fn members<U>(&self, limit: Option<u64>, after: Option<U>)
-        -> Result<Vec<Member>> where U: Into<UserId> {
+    pub fn members<U>(&self, limit: Option<u64>, after: Option<U>) -> Result<Vec<Member>>
+        where U: Into<UserId> {
         self.id.members(limit, after)
     }
 
@@ -395,9 +377,7 @@ impl PartialGuild {
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     #[inline]
-    pub fn prune_count(&self, days: u16) -> Result<GuildPrune> {
-        self.id.prune_count(days)
-    }
+    pub fn prune_count(&self, days: u16) -> Result<GuildPrune> { self.id.prune_count(days) }
 
     /// Returns the Id of the shard associated with the guild.
     ///
@@ -409,11 +389,9 @@ impl PartialGuild {
     /// total, consider using [`utils::shard_id`].
     ///
     /// [`utils::shard_id`]: ../utils/fn.shard_id.html
-    #[cfg(all(feature="cache", feature="utils"))]
+    #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self) -> u64 {
-        self.id.shard_id()
-    }
+    pub fn shard_id(&self) -> u64 { self.id.shard_id() }
 
     /// Returns the Id of the shard associated with the guild.
     ///
@@ -435,16 +413,15 @@ impl PartialGuild {
     ///
     /// assert_eq!(guild.shard_id(17), 7);
     /// ```
-    #[cfg(all(feature="utils", not(feature="cache")))]
+    #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
-    pub fn shard_id(&self, shard_count: u64) -> u64 {
-        self.id.shard_id(shard_count)
-    }
+    pub fn shard_id(&self, shard_count: u64) -> u64 { self.id.shard_id(shard_count) }
 
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
-        self.icon.as_ref().map(|icon|
-            format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
+        self.icon
+            .as_ref()
+            .map(|icon| format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
     }
 
     /// Starts an integration sync for the given integration Id.
@@ -464,9 +441,7 @@ impl PartialGuild {
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[inline]
-    pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
-        self.id.unban(user_id)
-    }
+    pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> { self.id.unban(user_id) }
 
     /// Retrieves the guild's webhooks.
     ///
@@ -474,7 +449,5 @@ impl PartialGuild {
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[inline]
-    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        self.id.webhooks()
-    }
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> { self.id.webhooks() }
 }

@@ -44,7 +44,7 @@ use super::Permissions;
 ///                 println!("Unexpected error: {:?}", why);
 ///             },
 ///         }
-///     }   
+///     }
 /// }
 /// let token = env::var("DISCORD_BOT_TOKEN")?;
 /// let mut client = Client::new(&token, Handler); client.start()?;
@@ -112,9 +112,7 @@ pub enum Error {
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        f.write_str(self.description())
-    }
+    fn fmt(&self, f: &mut Formatter) -> FmtResult { f.write_str(self.description()) }
 }
 
 impl StdError for Error {

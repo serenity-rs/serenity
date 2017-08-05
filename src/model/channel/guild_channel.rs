@@ -1,20 +1,20 @@
 use chrono::{DateTime, FixedOffset};
-use ::model::*;
+use model::*;
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 use std::mem;
-#[cfg(feature="cache")]
-use ::CACHE;
-#[cfg(feature="model")]
-use ::builder::{CreateInvite, CreateMessage, EditChannel, GetMessages};
-#[cfg(feature="model")]
-use ::http::{self, AttachmentType};
-#[cfg(feature="cache")]
-use ::internal::prelude::*;
-#[cfg(all(feature="model", feature="utils"))]
-use ::utils as serenity_utils;
+#[cfg(feature = "cache")]
+use CACHE;
+#[cfg(feature = "model")]
+use builder::{CreateInvite, CreateMessage, EditChannel, GetMessages};
+#[cfg(feature = "model")]
+use http::{self, AttachmentType};
+#[cfg(feature = "cache")]
+use internal::prelude::*;
+#[cfg(all(feature = "model", feature = "utils"))]
+use utils as serenity_utils;
 
 /// Represents a guild's text or voice channel. Some methods are available only
 /// for voice channels and some are only available for text channels.
@@ -36,7 +36,7 @@ pub struct GuildChannel {
     /// incremented by one.
     pub guild_id: GuildId,
     /// The type of the channel.
-    #[serde(rename="type")]
+    #[serde(rename = "type")]
     pub kind: ChannelType,
     /// The Id of the last message sent in the channel.
     ///
@@ -66,9 +66,19 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available for voice channels.
     pub user_limit: Option<u64>,
+    /// Used to tell if the channel is not safe for work.
+    /// Note however, it's recommended to use [`is_nsfw`] as it's gonna be more accurate.
+    ///
+    /// [`is_nsfw`]: struct.GuildChannel.html#method.is_nsfw
+    // This field can or can not be present sometimes, but if it isn't
+    // default to `false`.
+    #[serde(default = "nsfw_false")]
+    pub nsfw: bool,
 }
 
-#[cfg(feature="model")]
+fn nsfw_false() -> bool { false }
+
+#[cfg(feature = "model")]
 impl GuildChannel {
     /// Broadcasts to the channel that the current user is typing.
     ///
@@ -83,9 +93,7 @@ impl GuildChannel {
     ///
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    pub fn broadcast_typing(&self) -> Result<()> {
-        self.id.broadcast_typing()
-    }
+    pub fn broadcast_typing(&self) -> Result<()> { self.id.broadcast_typing() }
 
     /// Creates an invite leading to the given channel.
     ///
@@ -98,7 +106,7 @@ impl GuildChannel {
     /// ```
     pub fn create_invite<F>(&self, f: F) -> Result<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             let req = permissions::CREATE_INVITE;
 
@@ -222,7 +230,7 @@ impl GuildChannel {
 
     /// Deletes this channel, returning the channel on a successful deletion.
     pub fn delete(&self) -> Result<Channel> {
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             let req = permissions::MANAGE_CHANNELS;
 
@@ -272,8 +280,12 @@ impl GuildChannel {
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn delete_reaction<M, R>(&self, message_id: M, user_id: Option<UserId>, reaction_type: R)
-        -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
+    pub fn delete_reaction<M, R>(&self,
+                                 message_id: M,
+                                 user_id: Option<UserId>,
+                                 reaction_type: R)
+                                 -> Result<()>
+        where M: Into<MessageId>, R: Into<ReactionType> {
         self.id.delete_reaction(message_id, user_id, reaction_type)
     }
 
@@ -291,7 +303,7 @@ impl GuildChannel {
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
 
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             let req = permissions::MANAGE_CHANNELS;
 
@@ -302,8 +314,14 @@ impl GuildChannel {
 
         let mut map = Map::new();
         map.insert("name".to_owned(), Value::String(self.name.clone()));
-        map.insert("position".to_owned(), Value::Number(Number::from(self.position)));
-        map.insert("type".to_owned(), Value::String(self.kind.name().to_owned()));
+        map.insert(
+            "position".to_owned(),
+            Value::Number(Number::from(self.position)),
+        );
+        map.insert(
+            "type".to_owned(),
+            Value::String(self.kind.name().to_owned()),
+        );
 
         let edited = f(EditChannel(map)).0;
 
@@ -346,19 +364,15 @@ impl GuildChannel {
     ///
     /// **Note**: Right now this performs a clone of the guild. This will be
     /// optimized in the future.
-    #[cfg(feature="cache")]
-    pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> {
-        CACHE.read().unwrap().guild(self.guild_id)
-    }
+    #[cfg(feature = "cache")]
+    pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().unwrap().guild(self.guild_id) }
 
     /// Gets all of the channel's invites.
     ///
     /// Requires the [Manage Channels] permission.
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
-    pub fn invites(&self) -> Result<Vec<RichInvite>> {
-        self.id.invites()
-    }
+    pub fn invites(&self) -> Result<Vec<RichInvite>> { self.id.invites() }
 
     /// Determines if the channel is NSFW.
     ///
@@ -370,10 +384,10 @@ impl GuildChannel {
     /// [`ChannelType::Text`]: enum.ChannelType.html#variant.Text
     /// [`ChannelType::Voice`]: enum.ChannelType.html#variant.Voice
     /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
-    #[cfg(feature="utils")]
+    #[cfg(feature = "utils")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
-        self.kind == ChannelType::Text && serenity_utils::is_nsfw(&self.name)
+        self.kind == ChannelType::Text && (self.nsfw || serenity_utils::is_nsfw(&self.name))
     }
 
     /// Gets a message from the channel.
@@ -400,10 +414,8 @@ impl GuildChannel {
         self.id.messages(f)
     }
 
-    /// Returns the name of the guild channel. 
-    pub fn name(&self) -> &str {
-        &self.name
-    }
+    /// Returns the name of the guild channel.
+    pub fn name(&self) -> &str { &self.name }
 
     /// Calculates the permissions of a member.
     ///
@@ -419,9 +431,9 @@ impl GuildChannel {
     /// use serenity::prelude::*;
     /// use serenity::model::*;
     /// struct Handler;
-    /// 
+    ///
     /// use serenity::CACHE;
-    /// 
+    ///
     /// impl EventHandler for Handler {
     ///     fn on_message(&self, _: Context, msg: Message) {
     ///         let channel = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
@@ -458,9 +470,11 @@ impl GuildChannel {
     ///         };
     ///
     ///         let current_user_id = CACHE.read().unwrap().user.id;
-    ///         let permissions = channel.read().unwrap().permissions_for(current_user_id).unwrap();
+    /// let permissions =
+    /// channel.read().unwrap().permissions_for(current_user_id).unwrap();
     ///
-    ///         if !permissions.contains(permissions::ATTACH_FILES | permissions::SEND_MESSAGES) {
+    /// if !permissions.contains(permissions::ATTACH_FILES |
+    /// permissions::SEND_MESSAGES) {
     ///             return;
     ///         }
     ///
@@ -473,8 +487,9 @@ impl GuildChannel {
     ///             },
     ///         };
     ///
-    ///         let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m| m.content("here's a cat"));
-    ///     }        
+    /// let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m|
+    /// m.content("here's a cat"));
+    ///     }
     /// }
     ///
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
@@ -493,7 +508,7 @@ impl GuildChannel {
     /// [`User`]: struct.User.html
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     pub fn permissions_for<U: Into<UserId>>(&self, user_id: U) -> Result<Permissions> {
         self.guild()
             .ok_or_else(|| Error::Model(ModelError::GuildNotFound))
@@ -502,15 +517,11 @@ impl GuildChannel {
 
     /// Pins a [`Message`] to the channel.
     #[inline]
-    pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        self.id.pin(message_id)
-    }
+    pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> { self.id.pin(message_id) }
 
     /// Gets all channel's pins.
     #[inline]
-    pub fn pins(&self) -> Result<Vec<Message>> {
-        self.id.pins()
-    }
+    pub fn pins(&self) -> Result<Vec<Message>> { self.id.pins() }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
@@ -529,8 +540,10 @@ impl GuildChannel {
                                    reaction_type: R,
                                    limit: Option<u8>,
                                    after: Option<U>)
-        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id.reaction_users(message_id, reaction_type, limit, after)
+                                   -> Result<Vec<User>>
+        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
+        self.id
+            .reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Sends a message with just the given message content in the channel.
@@ -544,9 +557,7 @@ impl GuildChannel {
     /// [`ChannelId`]: struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
-    pub fn say(&self, content: &str) -> Result<Message> {
-        self.id.say(content)
-    }
+    pub fn say(&self, content: &str) -> Result<Message> { self.id.say(content) }
 
     /// Sends (a) file(s) along with optional message contents.
     ///
@@ -592,7 +603,7 @@ impl GuildChannel {
     /// [`Message`]: struct.Message.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
-        #[cfg(feature="cache")]
+        #[cfg(feature = "cache")]
         {
             let req = permissions::SEND_MESSAGES;
 
@@ -621,15 +632,11 @@ impl GuildChannel {
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[inline]
-    pub fn webhooks(&self) -> Result<Vec<Webhook>> {
-        self.id.webhooks()
-    }
+    pub fn webhooks(&self) -> Result<Vec<Webhook>> { self.id.webhooks() }
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl Display for GuildChannel {
     /// Formats the channel, creating a mention of it.
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        Display::fmt(&self.id.mention(), f)
-    }
+    fn fmt(&self, f: &mut Formatter) -> FmtResult { Display::fmt(&self.id.mention(), f) }
 }

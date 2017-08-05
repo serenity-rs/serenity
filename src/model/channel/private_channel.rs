@@ -1,12 +1,12 @@
 use chrono::{DateTime, FixedOffset};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_single_recipient;
-use ::model::*;
+use model::*;
 
-#[cfg(feature="model")]
-use ::builder::{CreateMessage, GetMessages};
-#[cfg(feature="model")]
-use ::http::AttachmentType;
+#[cfg(feature = "model")]
+use builder::{CreateMessage, GetMessages};
+#[cfg(feature = "model")]
+use http::AttachmentType;
 
 /// A Direct Message text channel with another user.
 #[derive(Clone, Debug, Deserialize)]
@@ -26,19 +26,17 @@ pub struct PrivateChannel {
     /// This should always be [`ChannelType::Private`].
     ///
     /// [`ChannelType::Private`]: enum.ChannelType.html#variant.Private
-    #[serde(rename="type")]
+    #[serde(rename = "type")]
     pub kind: ChannelType,
     /// The recipient to the private channel.
-    #[serde(deserialize_with="deserialize_single_recipient", rename="recipients")]
+    #[serde(deserialize_with = "deserialize_single_recipient", rename = "recipients")]
     pub recipient: Arc<RwLock<User>>,
 }
 
-#[cfg(feature="model")]
+#[cfg(feature = "model")]
 impl PrivateChannel {
     /// Broadcasts that the current user is typing to the recipient.
-    pub fn broadcast_typing(&self) -> Result<()> {
-        self.id.broadcast_typing()
-    }
+    pub fn broadcast_typing(&self) -> Result<()> { self.id.broadcast_typing() }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
     ///
@@ -52,8 +50,8 @@ impl PrivateChannel {
     /// [`Message`]: struct.Message.html
     /// [`Message::react`]: struct.Message.html#method.react
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
-    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R)
-        -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
+    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
+        where M: Into<MessageId>, R: Into<ReactionType> {
         self.id.create_reaction(message_id, reaction_type)
     }
 
@@ -61,9 +59,7 @@ impl PrivateChannel {
     /// and is equivalent to closing a private channel on the client, which can
     /// be re-opened.
     #[inline]
-    pub fn delete(&self) -> Result<Channel> {
-        self.id.delete()
-    }
+    pub fn delete(&self) -> Result<Channel> { self.id.delete() }
 
     /// Deletes all messages by Ids from the given vector in the channel.
     ///
@@ -103,8 +99,12 @@ impl PrivateChannel {
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn delete_reaction<M, R>(&self, message_id: M, user_id: Option<UserId>, reaction_type: R)
-        -> Result<()> where M: Into<MessageId>, R: Into<ReactionType> {
+    pub fn delete_reaction<M, R>(&self,
+                                 message_id: M,
+                                 user_id: Option<UserId>,
+                                 reaction_type: R)
+                                 -> Result<()>
+        where M: Into<MessageId>, R: Into<ReactionType> {
         self.id.delete_reaction(message_id, user_id, reaction_type)
     }
 
@@ -142,9 +142,7 @@ impl PrivateChannel {
     ///
     /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
     #[inline]
-    pub fn is_nsfw(&self) -> bool {
-        false
-    }
+    pub fn is_nsfw(&self) -> bool { false }
 
     /// Gets a message from the channel.
     ///
@@ -171,9 +169,7 @@ impl PrivateChannel {
     }
 
     /// Returns "DM with $username#discriminator".
-    pub fn name(&self) -> String {
-        format!("DM with {}", self.recipient.read().unwrap().tag())
-    }
+    pub fn name(&self) -> String { format!("DM with {}", self.recipient.read().unwrap().tag()) }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
@@ -193,24 +189,22 @@ impl PrivateChannel {
                                    reaction_type: R,
                                    limit: Option<u8>,
                                    after: Option<U>)
-        -> Result<Vec<User>> where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id.reaction_users(message_id, reaction_type, limit, after)
+                                   -> Result<Vec<User>>
+        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
+        self.id
+            .reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Pins a [`Message`] to the channel.
     ///
     /// [`Message`]: struct.Message.html
     #[inline]
-    pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        self.id.pin(message_id)
-    }
+    pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> { self.id.pin(message_id) }
 
     /// Retrieves the list of messages that have been pinned in the private
     /// channel.
     #[inline]
-    pub fn pins(&self) -> Result<Vec<Message>> {
-        self.id.pins()
-    }
+    pub fn pins(&self) -> Result<Vec<Message>> { self.id.pins() }
 
     /// Sends a message with just the given message content in the channel.
     ///
@@ -223,9 +217,7 @@ impl PrivateChannel {
     /// [`ChannelId`]: ../model/struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
-    pub fn say(&self, content: &str) -> Result<Message> {
-        self.id.say(content)
-    }
+    pub fn say(&self, content: &str) -> Result<Message> { self.id.say(content) }
 
     /// Sends (a) file(s) along with optional message contents.
     ///

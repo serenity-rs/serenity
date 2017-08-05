@@ -1,6 +1,7 @@
-#![cfg(feature="utils")]
+#![cfg(feature = "utils")]
 
-#[macro_use] extern crate serde_json;
+#[macro_use]
+extern crate serde_json;
 extern crate serenity;
 
 use serde_json::Value;
