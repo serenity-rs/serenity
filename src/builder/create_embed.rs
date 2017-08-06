@@ -18,7 +18,7 @@
 use chrono::{DateTime, TimeZone};
 use serde_json::Value;
 use std::default::Default;
-use std::fmt::{Write, Display};
+use std::fmt::Display;
 use internal::prelude::*;
 use model::Embed;
 
