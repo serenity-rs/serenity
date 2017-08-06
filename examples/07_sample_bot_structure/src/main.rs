@@ -14,13 +14,16 @@ extern crate serenity;
 
 mod commands;
 
-use serenity::Client;
+use serenity::prelude::*;
+use serenity::framework::BuiltinFramework;
 use std::env;
 
-fn main() {
-    let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
+struct Handler; impl EventHandler for Handler {}
 
-    client.with_framework(|f| f
+fn main() {
+    let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
+
+    client.with_framework(BuiltinFramework::new()
         .configure(|c| c.prefix("~"))
         .command("ping", |c| c.exec(commands::meta::ping))
         .command("latency", |c| c.exec(commands::meta::latency))

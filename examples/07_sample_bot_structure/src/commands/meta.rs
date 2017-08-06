@@ -6,7 +6,7 @@ command!(latency(ctx, msg) {
             format!("{}.{}s", s.as_secs(), s.subsec_nanos())
         });
 
-    let _ = msg.channel_id.say(&latency);
+    let _ = msg.channel_id.say(latency);
 });
 
 command!(ping(_ctx, msg) {

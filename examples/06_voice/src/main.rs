@@ -29,7 +29,7 @@ fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
-    let mut client = Client::new(&token);
+    let mut client = Client::new(&token, Handler);
 
     client.with_framework(|f| f
         .configure(|c| c
@@ -43,11 +43,7 @@ fn main() {
         .on("ping", ping)
         .on("undeafen", undeafen)
         .on("unmute", unmute));
-
-    client.on_ready(|_context, ready| {
-        println!("{} is connected!", ready.user.name);
-    });
-
+        
     let _ = client.start().map_err(|why| println!("Client ended: {:?}", why));
 }
 

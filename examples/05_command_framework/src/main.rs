@@ -13,10 +13,9 @@
 extern crate serenity;
 extern crate typemap;
 
-use serenity::client::Context;
-use serenity::Client;
-use serenity::model::{Message, permissions};
-use serenity::ext::framework::{DispatchError, help_commands};
+use serenity::prelude::*;
+use serenity::model::*;
+use serenity::framework::{BuiltinFramework, DispatchError, help_commands};
 use std::collections::HashMap;
 use std::env;
 use std::fmt::Write;
@@ -28,20 +27,24 @@ impl Key for CommandCounter {
     type Value = HashMap<String, u64>;
 }
 
+struct Handler;
+
+impl EventHandler for Handler {
+    fn on_ready(&self, _: Context, ready: Ready) {
+        println!("{} is connected!", ready.user.name);
+    }
+}
+
 fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
-    let mut client = Client::new(&token);
+    let mut client = Client::new(&token, Handler);
 
     {
         let mut data = client.data.lock().unwrap();
         data.insert::<CommandCounter>(HashMap::default());
     }
-
-    client.on_ready(|_ctx, ready| {
-        println!("{} is connected!", ready.user.name);
-    });
 
     // Commands are equivalent to:
     // "~about"
@@ -50,13 +53,14 @@ fn main() {
     // "~multiply"
     // "~ping"
     // "~some long command"
-    client.with_framework(|f| f
+    client.with_framework(
         // Configures the client, allowing for options to mutate how the
         // framework functions.
         //
         // Refer to the documentation for
         // `serenity::ext::framework::Configuration` for all available
         // configurations.
+        BuiltinFramework::new()
         .configure(|c| c
             .allow_whitespace(true)
             .on_mention(true)
