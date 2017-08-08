@@ -234,11 +234,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "```\nhello\n```");
     /// ```
-    pub fn push_codeblock<D: I, L: I>(mut self, content: D, language: Option<L>) -> Self {
+    pub fn push_codeblock<D: I>(mut self, content: D, language: Option<&str>) -> Self {
         self.0.push_str("```");
 
         if let Some(language) = language {
-            self.0.push_str(&language.into().to_string());
+            self.0.push_str(language);
         }
 
         self.0.push('\n');
@@ -475,11 +475,11 @@ impl MessageBuilder {
     }
 
     /// Pushes a code-block to your message normalizing content.
-    pub fn push_codeblock_safe<D: I, L: I>(mut self, content: D, language: Option<L>) -> Self {
+    pub fn push_codeblock_safe<D: I>(mut self, content: D, language: Option<&str>) -> Self {
         self.0.push_str("```");
 
         if let Some(language) = language {
-            self.0.push_str(&language.into().to_string());
+            self.0.push_str(language);
         }
 
         {
@@ -497,7 +497,7 @@ impl MessageBuilder {
         self.0.push('`');
         {
             let mut c = content.into();
-            c.inner = normalize(&c.inner).replace('`', " "); 
+            c.inner = normalize(&c.inner).replace('`', "'"); 
             self.0.push_str(&c.to_string());
         }
         self.0.push('`');
