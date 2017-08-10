@@ -16,21 +16,15 @@ use Framework;
 
 #[cfg(feature = "cache")]
 use super::CACHE;
+#[cfg(feature = "cache")]
+use super::super::CacheEventsImpl;
 
 macro_rules! update {
     ($method:ident, @$event:expr) => {
         {
             #[cfg(feature="cache")]
             {
-                CACHE.write().unwrap().$method(&mut $event)
-            }
-        }
-    };
-    ($method:ident, @$event:expr, $old:expr) => {
-        {
-            #[cfg(feature="cache")]
-            {
-                CACHE.write().unwrap().$method(&mut $event, $old)
+                CacheEventsImpl::$method(&mut *CACHE.write().unwrap(), &mut $event)
             }
         }
     };
@@ -38,15 +32,7 @@ macro_rules! update {
         {
             #[cfg(feature="cache")]
             {
-                CACHE.write().unwrap().$method(&$event)
-            }
-        }
-    };
-    ($method:ident, $event:expr, $old:expr) => {
-        {
-            #[cfg(feature="cache")]
-            {
-                CACHE.write().unwrap().$method(&$event, $old)
+                CacheEventsImpl::$method(&mut *CACHE.write().unwrap(), &$event)
             }
         }
     };
