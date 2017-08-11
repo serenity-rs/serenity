@@ -41,7 +41,7 @@
 //! [`Role`]: ../model/struct.Role.html
 //! [`CACHE`]: ../struct.CACHE.html
 //! [`http`]: ../http/index.html
-
+use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
 use std::default::Default;
 use std::sync::{Arc, RwLock};
@@ -591,6 +591,17 @@ impl Cache {
     #[inline]
     pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<Arc<RwLock<User>>> {
         self.users.get(&user_id.into()).cloned()
+    }
+
+    fn update_user_entry(&mut self, user: &User) {
+        match self.users.entry(user.id) {
+            Entry::Vacant(e) => {
+                e.insert(Arc::new(RwLock::new(user.clone())));
+            },
+            Entry::Occupied(mut e) => {
+                e.get_mut().write().unwrap().clone_from(user);
+            },
+        }
     }
 }
 

@@ -66,8 +66,6 @@ pub(crate) trait CacheEventsImpl {
     fn update_with_user_update(&mut self, event: &UserUpdateEvent) -> CurrentUser;
 
     fn update_with_voice_state_update(&mut self, event: &VoiceStateUpdateEvent);
-
-    fn update_user_entry(&mut self, user: &User);
 }
 
 impl CacheEventsImpl for super::Cache {
@@ -524,17 +522,6 @@ impl CacheEventsImpl for super::Cache {
             }
 
             return;
-        }
-    }
-
-    fn update_user_entry(&mut self, user: &User) {
-        match self.users.entry(user.id) {
-            Entry::Vacant(e) => {
-                e.insert(Arc::new(RwLock::new(user.clone())));
-            },
-            Entry::Occupied(mut e) => {
-                e.get_mut().write().unwrap().clone_from(user);
-            },
         }
     }
 } 
