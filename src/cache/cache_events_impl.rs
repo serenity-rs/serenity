@@ -113,6 +113,10 @@ impl CacheEventsImpl for super::Cache {
                     .map(Channel::Guild)
             },
             Channel::Private(ref channel) => {
+                if let Some(ref channel) = self.private_channels.get(&channel.read().unwrap().id) {
+                    return Some(Channel::Private((*channel).clone()));
+                }
+
                 let channel = channel.clone();
 
                 let mut channel_writer = channel.write().unwrap();
