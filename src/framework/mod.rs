@@ -937,7 +937,7 @@ impl ::Framework for BuiltinFramework {
                                 utils::parse_quotes(&content[command_length..])
                             } else {
                                 content[command_length..]
-                                    .split_whitespace()
+                                    .split(&self.configuration.delimeter)
                                     .map(|arg| arg.to_owned())
                                     .collect::<Vec<String>>()
                             }

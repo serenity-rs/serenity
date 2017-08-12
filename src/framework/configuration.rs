@@ -57,6 +57,8 @@ pub struct Configuration {
     pub owners: HashSet<UserId>,
     #[doc(hidden)]
     pub prefixes: Vec<String>,
+    #[doc(hidden)]
+    pub delimeter: String,
 }
 
 impl Configuration {
@@ -367,6 +369,30 @@ impl Configuration {
 
         self
     }
+
+    /// Sets a delimeter to be used when splitting the content after a command.
+    ///
+    /// # Examples
+    ///
+    /// Have the args be seperated by a comma and a space:
+    ///
+    /// ```rust
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
+    /// #
+    /// use serenity::framework::BuiltinFramework;
+    ///
+    /// client.with_framework(BuiltinFramework::new().configure(|c| c
+    ///     .delimeter(", ")));
+    /// ```
+    pub fn delimeter(mut self, delimeter: &str) -> Self {
+        self.delimeter = delimeter.to_string();
+
+        self
+    }
 }
 
 impl Default for Configuration {
@@ -376,6 +402,7 @@ impl Default for Configuration {
     /// - **depth** to `5`
     /// - **on_mention** to `false` (basically)
     /// - **prefix** to `None`
+    /// - **delimeter** to " "
     fn default() -> Configuration {
         Configuration {
             depth: 5,
@@ -390,6 +417,7 @@ impl Default for Configuration {
             disabled_commands: HashSet::default(),
             allow_dm: true,
             ignore_webhooks: true,
+            delimeter: " ".to_string(),
         }
     }
 }
