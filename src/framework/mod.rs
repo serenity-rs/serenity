@@ -936,8 +936,13 @@ impl ::Framework for BuiltinFramework {
                             if command.use_quotes {
                                 utils::parse_quotes(&content[command_length..])
                             } else {
+                                let delimeter = {
+                                    let delimeter = self.configuration.delimeters.iter().find(|d| content[command_length..].contains(d.as_str()));
+                                    delimeter.map(|s| s.as_str()).unwrap_or(" ")
+                                };
+
                                 content[command_length..]
-                                    .split(&self.configuration.delimeter)
+                                    .split(delimeter)
                                     .map(|arg| arg.to_owned())
                                     .collect::<Vec<String>>()
                             }

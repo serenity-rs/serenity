@@ -58,7 +58,7 @@ pub struct Configuration {
     #[doc(hidden)]
     pub prefixes: Vec<String>,
     #[doc(hidden)]
-    pub delimeter: String,
+    pub delimeters: Vec<String>,
 }
 
 impl Configuration {
@@ -389,7 +389,31 @@ impl Configuration {
     ///     .delimeter(", ")));
     /// ```
     pub fn delimeter(mut self, delimeter: &str) -> Self {
-        self.delimeter = delimeter.to_string();
+        self.delimeters.push(delimeter.to_string());
+
+        self
+    }
+
+    /// Sets multiple delimeters to be used when splitting the content after a command.
+    ///
+    /// # Examples
+    ///
+    /// Have the args be seperated by a comma and a space; and a regular space:
+    ///
+    /// ```rust
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler);
+    /// #
+    /// use serenity::framework::BuiltinFramework;
+    ///
+    /// client.with_framework(BuiltinFramework::new().configure(|c| c
+    ///     .delimeters(vec![", ", " "])));
+    /// ```
+    pub fn delimeters(mut self, delimeters: Vec<&str>) -> Self {
+        self.delimeters.extend(delimeters.into_iter().map(|s| s.to_string()));
 
         self
     }
@@ -402,7 +426,7 @@ impl Default for Configuration {
     /// - **depth** to `5`
     /// - **on_mention** to `false` (basically)
     /// - **prefix** to `None`
-    /// - **delimeter** to " "
+    /// - **delimeters** to vec![" "]
     fn default() -> Configuration {
         Configuration {
             depth: 5,
@@ -417,7 +441,7 @@ impl Default for Configuration {
             disabled_commands: HashSet::default(),
             allow_dm: true,
             ignore_webhooks: true,
-            delimeter: " ".to_string(),
+            delimeters: vec![" ".to_string()],
         }
     }
 }
