@@ -58,7 +58,7 @@ pub struct Configuration {
     #[doc(hidden)]
     pub prefixes: Vec<String>,
     #[doc(hidden)]
-    pub delimeters: Vec<String>,
+    pub delimiters: Vec<String>,
 }
 
 impl Configuration {
@@ -370,7 +370,7 @@ impl Configuration {
         self
     }
 
-    /// Sets a delimeter to be used when splitting the content after a command.
+    /// Sets a delimiter to be used when splitting the content after a command.
     ///
     /// # Examples
     ///
@@ -386,15 +386,16 @@ impl Configuration {
     /// use serenity::framework::BuiltinFramework;
     ///
     /// client.with_framework(BuiltinFramework::new().configure(|c| c
-    ///     .delimeter(", ")));
+    ///     .delimiter(", ")));
     /// ```
-    pub fn delimeter(mut self, delimeter: &str) -> Self {
-        self.delimeters.push(delimeter.to_string());
+    pub fn delimiter(mut self, delimiter: &str) -> Self {
+        self.delimiters.push(delimiter.to_string());
 
         self
     }
 
-    /// Sets multiple delimeters to be used when splitting the content after a command.
+    /// Sets multiple delimiters to be used when splitting the content after a command.
+    /// Additionally cleans the default delimiter from the vector.
     ///
     /// # Examples
     ///
@@ -410,10 +411,11 @@ impl Configuration {
     /// use serenity::framework::BuiltinFramework;
     ///
     /// client.with_framework(BuiltinFramework::new().configure(|c| c
-    ///     .delimeters(vec![", ", " "])));
+    ///     .delimiters(vec![", ", " "])));
     /// ```
-    pub fn delimeters(mut self, delimeters: Vec<&str>) -> Self {
-        self.delimeters.extend(delimeters.into_iter().map(|s| s.to_string()));
+    pub fn delimiters(mut self, delimiters: Vec<&str>) -> Self {
+        self.delimiters.clear();
+        self.delimiters.extend(delimiters.into_iter().map(|s| s.to_string()));
 
         self
     }
@@ -426,7 +428,7 @@ impl Default for Configuration {
     /// - **depth** to `5`
     /// - **on_mention** to `false` (basically)
     /// - **prefix** to `None`
-    /// - **delimeters** to vec![" "]
+    /// - **delimiters** to vec![" "]
     fn default() -> Configuration {
         Configuration {
             depth: 5,
@@ -441,7 +443,7 @@ impl Default for Configuration {
             disabled_commands: HashSet::default(),
             allow_dm: true,
             ignore_webhooks: true,
-            delimeters: vec![" ".to_string()],
+            delimiters: vec![" ".to_string()],
         }
     }
 }
