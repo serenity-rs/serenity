@@ -941,18 +941,14 @@ impl ::Framework for BuiltinFramework {
                                 utils::parse_quotes(&content[command_length..])
                             } else {
                                 let delimiters = &self.configuration.delimiters;
-                                let regular_expression = delimiters.iter().
-                                    map(|delimiter| escape(delimiter)).join("|");
+                                let regular_expression = delimiters.iter()
+                                    .map(|delimiter| escape(delimiter)).join("|");
 
                                 let regex = Regex::new(&regular_expression).unwrap();
 
-                                let mut result: Vec<String> = vec![];
-                                for part in regex.split(content) {
-                                    if !part.is_empty() {
-                                        result.push(part.to_string());
-                                    }
-                                }
-                                result
+                                regex.split(content)
+                                    .filter_map(|p| if !p.is_empty() { Some(p.to_string()) } else { None })
+                                    .collect::<Vec<_>>()
                             }
                         };
 
