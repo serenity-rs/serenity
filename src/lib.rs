@@ -128,6 +128,9 @@ extern crate tokio_core;
 extern crate typemap;
 #[cfg(feature = "gateway")]
 extern crate websocket;
+#[cfg(feature = "framework")]
+extern crate regex;
+extern crate itertools;
 
 #[macro_use]
 mod internal;

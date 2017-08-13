@@ -78,6 +78,9 @@ use model::{ChannelId, GuildId, Message, UserId};
 use model::permissions::Permissions;
 use utils;
 use tokio_core::reactor::Handle;
+use itertools::Itertools;
+use regex::Regex;
+use regex::escape;
 
 #[cfg(feature = "cache")]
 use client::CACHE;
@@ -518,9 +521,9 @@ impl BuiltinFramework {
                     let rate_limit = bucket.take(message.author.id.0);
                     match bucket.check {
                         Some(ref check) => {
-                            let apply = feature_cache! {{ 
+                            let apply = feature_cache! {{
                                 let guild_id = message.guild_id();
-                                (check)(context, guild_id, message.channel_id, message.author.id) 
+                                (check)(context, guild_id, message.channel_id, message.author.id)
                             } else {
                                 (check)(context, message.channel_id, message.author.id)
                             }};
@@ -567,7 +570,7 @@ impl BuiltinFramework {
                 }
 
                 if (!self.configuration.allow_dm && message.is_private()) ||
-                   (command.guild_only && message.is_private()) {
+                    (command.guild_only && message.is_private()) {
                     return Some(DispatchError::OnlyForGuilds);
                 }
 
@@ -579,13 +582,13 @@ impl BuiltinFramework {
             if command.owners_only {
                 Some(DispatchError::OnlyForOwners)
             } else if !command
-                   .checks
-                   .iter()
-                   .all(|check| (check)(&mut context, message, command)) {
+                .checks
+                .iter()
+                .all(|check| (check)(&mut context, message, command)) {
                 Some(DispatchError::CheckFailed)
             } else if self.configuration
-                   .blocked_users
-                   .contains(&message.author.id) {
+                .blocked_users
+                .contains(&message.author.id) {
                 Some(DispatchError::BlockedUser)
             } else if self.configuration.disabled_commands.contains(to_check) {
                 Some(DispatchError::CommandDisabled(to_check.to_owned()))
@@ -909,7 +912,7 @@ impl ::Framework for BuiltinFramework {
                     let command_length = built.len();
 
                     if let Some(&CommandOrAlias::Alias(ref points_to)) =
-                        group.commands.get(&built) {
+                    group.commands.get(&built) {
                         built = points_to.to_owned();
                     }
 
@@ -924,7 +927,7 @@ impl ::Framework for BuiltinFramework {
                     };
 
                     if let Some(&CommandOrAlias::Command(ref command)) =
-                        group.commands.get(&to_check) {
+                    group.commands.get(&to_check) {
                         let before = self.before.clone();
                         let command = command.clone();
                         let after = self.after.clone();
@@ -937,16 +940,19 @@ impl ::Framework for BuiltinFramework {
                             if command.use_quotes {
                                 utils::parse_quotes(&content[command_length..])
                             } else {
-                                let delimeter = self.configuration.delimeters
-                                    .iter()
-                                    .find(|d| content.contains(d.as_str()))
-                                    .map(|s| s.as_str())
-                                    .unwrap_or(" ");
+                                let delimiters = &self.configuration.delimiters;
+                                let regular_expression = delimiters.iter().
+                                    map(|delimiter| escape(delimiter)).join("|");
 
-                                content
-                                    .split(delimeter)
-                                    .map(|arg| arg.to_owned())
-                                    .collect::<Vec<String>>()
+                                let regex = Regex::new(&regular_expression).unwrap();
+
+                                let mut result: Vec<String> = vec![];
+                                for part in regex.split(content) {
+                                    if !part.is_empty() {
+                                        result.push(part.to_string());
+                                    }
+                                }
+                                result
                             }
                         };
 
