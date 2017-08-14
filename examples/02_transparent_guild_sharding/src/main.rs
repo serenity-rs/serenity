@@ -31,7 +31,7 @@ impl EventHandler for Handler {
             // multiple threads may otherwise attempt to read from or mutate it
             // concurrently.
             {
-                let shard = ctx.shard.lock().unwrap();
+                let shard = ctx.shard.lock();
 
                 if let Some(shard_info) = shard.shard_info() {
                     println!("Shard {}", shard_info[0]);

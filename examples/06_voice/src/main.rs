@@ -57,7 +57,7 @@ command!(deafen(ctx, msg) {
         },
     };
 
-    let mut shard = ctx.shard.lock().unwrap();
+    let mut shard = ctx.shard.lock();
 
     let handler = match shard.manager.get(guild_id) {
         Some(handler) => handler,
@@ -103,7 +103,7 @@ command!(join(ctx, msg, args) {
         },
     };
 
-    let mut shard = ctx.shard.lock().unwrap();
+    let mut shard = ctx.shard.lock();
     shard.manager.join(guild_id, connect_to);
 
     check_msg(msg.channel_id.say(&format!("Joined {}", connect_to.mention())));
@@ -119,7 +119,7 @@ command!(leave(ctx, msg) {
         },
     };
 
-    let mut shard = ctx.shard.lock().unwrap();
+    let mut shard = ctx.shard.lock();
     let has_handler = shard.manager.get(guild_id).is_some();
 
     if has_handler {
@@ -141,7 +141,7 @@ command!(mute(ctx, msg) {
         },
     };
 
-    let mut shard = ctx.shard.lock().unwrap();
+    let mut shard = ctx.shard.lock();
 
     let handler = match shard.manager.get(guild_id) {
         Some(handler) => handler,

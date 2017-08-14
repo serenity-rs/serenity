@@ -42,7 +42,7 @@ fn main() {
     let mut client = Client::new(&token, Handler);
 
     {
-        let mut data = client.data.lock().unwrap();
+        let mut data = client.data.lock();
         data.insert::<CommandCounter>(HashMap::default());
     }
 
@@ -80,7 +80,7 @@ fn main() {
             // Increment the number of times this command has been run once. If
             // the command's name does not exist in the counter, add a default
             // value of 0.
-            let mut data = ctx.data.lock().unwrap();
+            let mut data = ctx.data.lock();
             let counter = data.get_mut::<CommandCounter>().unwrap();
             let entry = counter.entry(command_name.clone()).or_insert(0);
             *entry += 1;
@@ -148,7 +148,7 @@ fn main() {
 command!(commands(ctx, msg, _args) {
     let mut contents = "Commands used:\n".to_owned();
 
-    let data = ctx.data.lock().unwrap();
+    let data = ctx.data.lock();
     let counter = data.get::<CommandCounter>().unwrap();
 
     for (k, v) in counter {
