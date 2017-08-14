@@ -130,33 +130,25 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
 
         Some(positions)
     } else if conf.on_mention.is_some() {
-        match find_mention_end(&msg.content, conf) {
-            Some(mention_end) => {
-                let mut positions = vec![mention_end];
+        find_mention_end(&msg.content, conf).map(|mention_end| {
+            let mut positions = vec![mention_end];
 
-                if conf.allow_whitespace {
-                    positions.insert(0, mention_end + 1);
-                }
+            if conf.allow_whitespace {
+                positions.insert(0, mention_end + 1);
+            }
 
-                Some(positions)
-            },
-            None => None,
-        }
+            positions
+        })
     } else {
         None
     }
 }
 
 fn find_mention_end(content: &str, conf: &Configuration) -> Option<usize> {
-    if let Some(ref mentions) = conf.on_mention {
-        for mention in mentions {
-            if !content.starts_with(&mention[..]) {
-                continue;
-            }
-
-            return Some(mention.len());
-        }
-    }
-
-    None
+    conf.on_mention.as_ref().and_then(|mentions| {
+        mentions
+            .iter()
+            .find(|mention| content.starts_with(&mention[..]))
+            .map(|m| m.len())
+    })
 }

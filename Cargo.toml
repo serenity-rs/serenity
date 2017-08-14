@@ -42,11 +42,11 @@ version = "0.2.2"
 
 [dependencies.regex]
 optional = true
-regex = "0.2"
+version = "0.2"
 
 [dependencies.itertools]
 optional = true
-itertools = "0.6.1"
+version = "0.6.1"
 
 [dependencies.lazy_static]
 optional = true
