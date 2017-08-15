@@ -72,11 +72,9 @@ pub struct GuildChannel {
     /// [`is_nsfw`]: struct.GuildChannel.html#method.is_nsfw
     // This field can or can not be present sometimes, but if it isn't
     // default to `false`.
-    #[serde(default = "nsfw_false")]
+    #[serde(default)]
     pub nsfw: bool,
 }
-
-fn nsfw_false() -> bool { false }
 
 #[cfg(feature = "model")]
 impl GuildChannel {
