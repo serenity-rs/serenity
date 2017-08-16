@@ -57,13 +57,13 @@ impl CreateCommand {
     ///     Ok(())
     /// }
     ///
-    /// fn owner_check(_context: &mut Context, message: &Message, _: &Arc<Command>) -> bool {
+    /// fn owner_check(_context: &mut Context, message: &Message, _: &[String], _: &Arc<Command>) -> bool {
     ///     // replace with your user ID
     ///     message.author.id == 7
     /// }
     /// ```
     pub fn check<F>(mut self, check: F) -> Self
-        where F: Fn(&mut Context, &Message, &Arc<Command>) -> bool + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, &[String], &Arc<Command>) -> bool + Send + Sync + 'static {
         self.0.checks.push(Box::new(check));
 
         self

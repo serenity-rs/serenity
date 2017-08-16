@@ -505,7 +505,7 @@ impl BuiltinFramework {
                    mut context: &mut Context,
                    message: &Message,
                    command: &Arc<Command>,
-                   args: usize,
+                   args: &[String],
                    to_check: &str,
                    built: &str)
                    -> Option<DispatchError> {
@@ -539,20 +539,22 @@ impl BuiltinFramework {
                 }
             }
 
+            let arg_len = args.len();
+
             if let Some(x) = command.min_args {
-                if args < x as usize {
+                if arg_len < x as usize {
                     return Some(DispatchError::NotEnoughArguments {
                         min: x,
-                        given: args,
+                        given: arg_len,
                     });
                 }
             }
 
             if let Some(x) = command.max_args {
-                if args > x as usize {
+                if arg_len > x as usize {
                     return Some(DispatchError::TooManyArguments {
                         max: x,
-                        given: args,
+                        given: arg_len,
                     });
                 }
             }
@@ -584,7 +586,7 @@ impl BuiltinFramework {
             } else if !command
                 .checks
                 .iter()
-                .all(|check| (check)(&mut context, message, command)) {
+                .all(|check| (check)(&mut context, message, args, command)) {
                 Some(DispatchError::CheckFailed)
             } else if self.configuration
                 .blocked_users
@@ -956,7 +958,7 @@ impl ::Framework for BuiltinFramework {
                             &mut context,
                             &message,
                             &command,
-                            args.len(),
+                            &args,
                             &to_check,
                             &built,
                         ) {
