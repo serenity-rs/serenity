@@ -608,7 +608,7 @@ impl BuiltinFramework {
     /// This requires that a check - if one exists - passes, prior to being
     /// called.
     ///
-    /// Note that once v0.2.0 lands, you will need to use the command builder
+    /// Prior to v0.2.0, you will need to use the command builder
     /// via the [`command`] method to set checks. This command will otherwise
     /// only be for simple commands.
     ///
