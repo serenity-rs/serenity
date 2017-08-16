@@ -11,9 +11,7 @@ pub struct CreateCommand(pub Command);
 impl CreateCommand {
     /// Adds multiple aliases.
     pub fn batch_known_as(mut self, names: Vec<&str>) -> Self {
-        for n in names {
-            self.0.aliases.push(n.to_owned());
-        }
+        self.0.aliases.extend(names.into_iter().map(|n| n.to_owned()));
 
         self
     }
