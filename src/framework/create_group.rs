@@ -55,7 +55,7 @@ impl CreateGroup {
     /// Adds a command to group with simplified API.
     /// You can return Err(string) if there's an error.
     pub fn on<F>(mut self, command_name: &str, f: F) -> Self
-        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String>
+        where F: Fn(&mut Context, &Message, Vec<String>, String) -> Result<(), String>
                      + Send
                      + Sync
                      + 'static {

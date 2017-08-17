@@ -122,7 +122,7 @@ use model::Channel;
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
         #[allow(unreachable_code, unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context, _: &$crate::model::Message, _: Vec<String>) -> ::std::result::Result<(), String> {
+        pub fn $fname(mut $c: &mut $crate::client::Context, _: &$crate::model::Message, _: Vec<String>, _: String) -> ::std::result::Result<(), String> {
             $b
 
             Ok(())
@@ -130,7 +130,7 @@ macro_rules! command {
     };
     ($fname:ident($c:ident, $m:ident) $b:block) => {
         #[allow(unreachable_code, unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, _: Vec<String>) -> ::std::result::Result<(), String> {
+        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, _: Vec<String>, _: String) -> ::std::result::Result<(), String> {
             $b
 
             Ok(())
@@ -138,7 +138,15 @@ macro_rules! command {
     };
     ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
         #[allow(unreachable_code, unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> ::std::result::Result<(), String> {
+        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>, _: String) -> ::std::result::Result<(), String> {
+            $b
+
+            Ok(())
+        }
+    };
+    ($fname:ident($c:ident, $m:ident, @$a:ident) $b:block) => {
+        #[allow(unreachable_code, unused_mut)]
+        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, _: Vec<String>, $a: String) -> ::std::result::Result<(), String> {
             $b
 
             Ok(())
@@ -146,7 +154,7 @@ macro_rules! command {
     };
     ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
         #[allow(unreachable_code, unreachable_patterns, unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>) -> ::std::result::Result<(), String> {
+        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>, _: String) -> ::std::result::Result<(), String> {
             let mut i = $a.iter();
             let mut arg_counter = 0;
 
@@ -642,7 +650,7 @@ impl BuiltinFramework {
     /// # }
     /// ```
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + 'static,
+        where F: Fn(&mut Context, &Message, Vec<String>, String) -> Result<(), String> + 'static,
               S: Into<String> {
         {
             let ungrouped = self.groups
@@ -935,12 +943,12 @@ impl ::Framework for BuiltinFramework {
                         let after = self.after.clone();
                         let groups = self.groups.clone();
 
-                        let args = {
+                        let (args, content) = {
                             let mut content = message.content[position..].trim();
                             content = content[command_length..].trim();
 
                             if command.use_quotes {
-                                utils::parse_quotes(content)
+                                (utils::parse_quotes(content), content.to_string())
                             } else {
                                 let delimiters = &self.configuration.delimiters;
                                 let regular_expression = delimiters.iter()
@@ -948,9 +956,9 @@ impl ::Framework for BuiltinFramework {
 
                                 let regex = Regex::new(&regular_expression).unwrap();
 
-                                regex.split(content)
+                                (regex.split(content)
                                     .filter_map(|p| if !p.is_empty() { Some(p.to_string()) } else { None })
-                                    .collect::<Vec<_>>()
+                                    .collect::<Vec<_>>(), content.to_string())
                             }
                         };
 
@@ -981,7 +989,7 @@ impl ::Framework for BuiltinFramework {
 
                                     Ok(())
                                 },
-                                CommandType::Basic(ref x) => (x)(&mut context, &message, args),
+                                CommandType::Basic(ref x) => (x)(&mut context, &message, args, content),
                                 CommandType::WithCommands(ref x) => {
                                     (x)(&mut context, &message, groups, &args)
                                 },

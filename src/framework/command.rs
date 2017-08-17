@@ -5,7 +5,7 @@ use model::{Message, Permissions};
 use std::collections::HashMap;
 
 pub type Check = Fn(&mut Context, &Message, &[String], &Arc<Command>) -> bool + 'static;
-pub type Exec = Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + 'static;
+pub type Exec = Fn(&mut Context, &Message, Vec<String>, String) -> Result<(), String> + 'static;
 pub type Help = Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, &[String])
                    -> Result<(), String>
                     + 'static;
@@ -69,7 +69,7 @@ pub struct Command {
 
 impl Command {
     pub fn new<F>(f: F) -> Self
-        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String> + 'static {
+        where F: Fn(&mut Context, &Message, Vec<String>, String) -> Result<(), String> + 'static {
         Command {
             aliases: Vec::new(),
             checks: Vec::default(),

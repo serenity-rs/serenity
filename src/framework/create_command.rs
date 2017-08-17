@@ -97,7 +97,7 @@ impl CreateCommand {
     ///
     /// [`exec_str`]: #method.exec_str
     pub fn exec<F>(mut self, func: F) -> Self
-        where F: Fn(&mut Context, &Message, Vec<String>) -> Result<(), String>
+        where F: Fn(&mut Context, &Message, Vec<String>, String) -> Result<(), String>
                      + Send
                      + Sync
                      + 'static {
@@ -217,7 +217,7 @@ impl Default for Command {
         Command {
             aliases: Vec::new(),
             checks: Vec::default(),
-            exec: CommandType::Basic(Box::new(|_, _, _| Ok(()))),
+            exec: CommandType::Basic(Box::new(|_, _, _, _| Ok(()))),
             desc: None,
             usage: None,
             example: None,
