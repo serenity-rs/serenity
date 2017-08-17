@@ -152,6 +152,14 @@ macro_rules! command {
             Ok(())
         }
     };
+    ($fname:ident($c:ident, $m:ident, $a:ident, @$f:ident) $b:block) => {
+        #[allow(unreachable_code, unused_mut)]
+        pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>, $f: String) -> ::std::result::Result<(), String> {
+            $b
+
+            Ok(())
+        }
+    };
     ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
         #[allow(unreachable_code, unreachable_patterns, unused_mut)]
         pub fn $fname(mut $c: &mut $crate::client::Context, $m: &$crate::model::Message, $a: Vec<String>, _: String) -> ::std::result::Result<(), String> {
