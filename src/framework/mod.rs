@@ -940,7 +940,7 @@ impl ::Framework for BuiltinFramework {
                             content = content[command_length..].trim();
 
                             if command.use_quotes {
-                                utils::parse_quotes(&content[command_length..])
+                                utils::parse_quotes(content)
                             } else {
                                 let delimiters = &self.configuration.delimiters;
                                 let regular_expression = delimiters.iter()
