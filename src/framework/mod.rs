@@ -179,7 +179,7 @@ macro_rules! command {
 /// be executed.
 pub enum DispatchError {
     /// When a custom function check has failed.
-    CheckFailed,
+    CheckFailed(Arc<Command>),
     /// When the requested command is disabled in bot configuration.
     CommandDisabled(String),
     /// When the user is blocked in bot configuration.
@@ -587,7 +587,7 @@ impl BuiltinFramework {
                 .checks
                 .iter()
                 .all(|check| (check)(&mut context, message, args, command)) {
-                Some(DispatchError::CheckFailed)
+                Some(DispatchError::CheckFailed(command.to_owned()))
             } else if self.configuration
                 .blocked_users
                 .contains(&message.author.id) {
