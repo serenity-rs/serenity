@@ -1,17 +1,16 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use typemap::ShareMap;
-use gateway::Shard;
-use model::*;
-use parking_lot::Mutex;
+use ::gateway::Shard;
+use ::model::*;
 
-#[cfg(feature = "cache")]
+#[cfg(feature="cache")]
 use super::CACHE;
-#[cfg(feature = "builder")]
-use internal::prelude::*;
-#[cfg(feature = "builder")]
-use builder::EditProfile;
-#[cfg(feature = "builder")]
-use http;
+#[cfg(feature="builder")]
+use ::internal::prelude::*;
+#[cfg(feature="builder")]
+use ::builder::EditProfile;
+#[cfg(feature="builder")]
+use ::http;
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
@@ -46,8 +45,8 @@ impl Context {
     /// Create a new Context to be passed to an event handler.
     pub(crate) fn new(shard: Arc<Mutex<Shard>>, data: Arc<Mutex<ShareMap>>) -> Context {
         Context {
-            data,
-            shard,
+            data: data,
+            shard: shard,
         }
     }
 
@@ -60,21 +59,17 @@ impl Context {
     /// Change the current user's username:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::Client;
     /// #
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {
-    ///     fn on_message(&self, ctx: Context, msg: Message) {
-    ///         if msg.content == "!changename" {
-    ///             ctx.edit_profile(|e| e.username("Edward Elric"));
-    ///         }
-    ///     }
-    /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// # let mut client = Client::new("");
+    /// #
+    /// # client.on_message(|ctx, msg| {
+    /// #     if msg.content == "!changename" {
+    /// ctx.edit_profile(|p| p.username("Hakase"));
+    /// #     }
+    /// # });
     /// ```
-    #[cfg(feature = "builder")]
+    #[cfg(feature="builder")]
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser> {
         let mut map = Map::new();
 
@@ -109,24 +104,19 @@ impl Context {
     /// Set the current user to being online on the shard:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::Client;
     /// #
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {
-    ///     fn on_message(&self, ctx: Context, msg: Message) {
-    ///         if msg.content == "!online" {
-    ///             ctx.online();
-    ///         }
+    /// # let mut client = Client::new("");
+    /// client.on_message(|ctx, msg| {
+    ///     if msg.content == "!online" {
+    ///         ctx.online();
     ///     }
-    /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// });
     /// ```
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     pub fn online(&self) {
-        let mut shard = self.shard.lock();
+        let mut shard = self.shard.lock().unwrap();
         shard.set_status(OnlineStatus::Online);
     }
 
@@ -138,24 +128,19 @@ impl Context {
     /// Set the current user to being idle on the shard:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::Client;
     /// #
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {
-    ///     fn on_message(&self, ctx: Context, msg: Message) {
-    ///         if msg.content == "!idle" {
-    ///             ctx.idle();
-    ///         }
+    /// # let mut client = Client::new("");
+    /// client.on_message(|ctx, msg| {
+    ///     if msg.content == "!idle" {
+    ///         ctx.idle();
     ///     }
-    /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// });
     /// ```
     ///
     /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
     pub fn idle(&self) {
-        let mut shard = self.shard.lock();
+        let mut shard = self.shard.lock().unwrap();
         shard.set_status(OnlineStatus::Idle);
     }
 
@@ -167,24 +152,19 @@ impl Context {
     /// Set the current user to being Do Not Disturb on the shard:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::Client;
     /// #
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {
-    ///     fn on_message(&self, ctx: Context, msg: Message) {
-    ///         if msg.content == "!dnd" {
-    ///             ctx.dnd();
-    ///         }
+    /// # let mut client = Client::new("");
+    /// client.on_message(|ctx, msg| {
+    ///     if msg.content == "!dnd" {
+    ///         ctx.dnd();
     ///     }
-    /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// });
     /// ```
     ///
     /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
     pub fn dnd(&self) {
-        let mut shard = self.shard.lock();
+        let mut shard = self.shard.lock().unwrap();
         shard.set_status(OnlineStatus::DoNotDisturb);
     }
 
@@ -197,24 +177,18 @@ impl Context {
     /// [`Event::Ready`] is received:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::Client;
     /// #
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {
-    ///     fn on_ready(&self, ctx: Context, _: Ready) {
-    ///         ctx.invisible();
-    ///     }
-    /// }
-    ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// # let mut client = Client::new("");
+    /// client.on_ready(|ctx, _| {
+    ///     ctx.invisible();
+    /// });
     /// ```
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`Invisible`]: ../model/enum.OnlineStatus.html#variant.Invisible
     pub fn invisible(&self) {
-        let mut shard = self.shard.lock();
+        let mut shard = self.shard.lock().unwrap();
         shard.set_status(OnlineStatus::Invisible);
     }
 
@@ -228,26 +202,20 @@ impl Context {
     /// Reset the presence when an [`Event::Resumed`] is received:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::event::ResumedEvent;
+    /// # use serenity::Client;
     /// #
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {
-    ///     fn on_resume(&self, ctx: Context, _: ResumedEvent) {
-    ///         ctx.reset_presence();
-    ///     }
-    /// }
-    ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// # let mut client = Client::new("");
+    /// client.on_resume(|ctx, _| {
+    ///     ctx.reset_presence();
+    /// });
     /// ```
     ///
     /// [`Event::Resumed`]: ../model/event/enum.Event.html#variant.Resumed
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     /// [`set_presence`]: #method.set_presence
     pub fn reset_presence(&self) {
-        let mut shard = self.shard.lock();
-        shard.set_presence(None, OnlineStatus::Online, false)
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_presence(None, OnlineStatus::Online, false, false, None)
     }
 
     /// Sets the current game, defaulting to an online status of [`Online`].
@@ -258,31 +226,27 @@ impl Context {
     /// playing:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::Client;
+    /// #
+    /// # let mut client = Client::new("");
     /// #
     /// use serenity::model::Game;
     ///
-    /// struct Handler;
-    /// impl EventHandler for Handler {
-    ///     fn on_message(&self, ctx: Context, msg: Message) {
-    ///         let args = msg.content.splitn(2, ' ').collect::<Vec<&str>>();
+    /// client.on_message(|ctx, msg| {
+    ///     let args = msg.content.splitn(2, ' ').collect::<Vec<&str>>();
     ///
-    ///         if args.len() < 2 || *unsafe { args.get_unchecked(0) } != "~setgame" {
-    ///             return;
-    ///         }
-    ///
-    ///         ctx.set_game(Game::playing(*unsafe { args.get_unchecked(1) }));
+    ///     if args.len() < 2 || *unsafe { args.get_unchecked(0) } != "~setgame" {
+    ///         return;
     ///     }
-    /// }
     ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    ///     ctx.set_game(Game::playing(*unsafe { args.get_unchecked(1) }));
+    /// });
     /// ```
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
-    pub fn set_game(&self, game: Game) {
-        let mut shard = self.shard.lock();
-        shard.set_presence(Some(game), OnlineStatus::Online, false);
+    pub fn set_game(&self, game: Game, streaming: bool, url: Option<&str>) {
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_presence(Some(game), OnlineStatus::Online, false, streaming, url);
     }
 
     /// Sets the current game, passing in only its name. This will automatically
@@ -299,18 +263,13 @@ impl Context {
     /// When an [`Event::Ready`] is received, set the game name to `"test"`:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::Client;
     /// #
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {
-    ///     fn on_ready(&self, ctx: Context, _: Ready) {
-    ///         ctx.set_game_name("test");
-    ///     }
-    /// }
-    ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// # let mut client = Client::new("");
+    /// #
+    /// client.on_ready(|ctx, _| {
+    ///     ctx.set_game_name("test");
+    /// });
     /// ```
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
@@ -320,15 +279,15 @@ impl Context {
     /// [`Playing`]: ../model/enum.GameType.html#variant.Playing
     /// [`reset_presence`]: #method.reset_presence
     /// [`set_presence`]: #method.set_presence
-    pub fn set_game_name(&self, game_name: &str) {
+    pub fn set_game_name(&self, game_name: &str, streaming: bool, url: Option<&str>) {
         let game = Game {
             kind: GameType::Playing,
             name: game_name.to_owned(),
             url: None,
         };
 
-        let mut shard = self.shard.lock();
-        shard.set_presence(Some(game), OnlineStatus::Online, false);
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_presence(Some(game), OnlineStatus::Online, false, streaming, url);
     }
 
     /// Sets the current user's presence, providing all fields to be passed.
@@ -338,58 +297,44 @@ impl Context {
     /// Setting the current user as having no game and being [`Idle`]:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::Client;
     /// #
-    /// struct Handler;
+    /// # let mut client = Client::new("");
+    /// #
+    /// # client.on_ready(|ctx, _| {
+    /// #
+    /// use serenity::model::OnlineStatus;
     ///
-    /// impl EventHandler for Handler {
-    ///     fn on_ready(&self, ctx: Context, _: Ready) {
-    ///         use serenity::model::OnlineStatus;
-    ///
-    ///         ctx.set_presence(None, OnlineStatus::Idle, false);
-    ///     }
-    /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// ctx.set_presence(None, OnlineStatus::Idle, false);
+    /// # });
     /// ```
     ///
     /// Setting the current user as playing `"Heroes of the Storm"`, while being
     /// [`DoNotDisturb`]:
     ///
     /// ```rust,ignore
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::Client;
     /// #
-    /// struct Handler;
+    /// # let mut client = Client::new("");
+    /// #
+    /// # client.on_ready(|ctx, _| {
+    /// #
+    /// use serenity::model::{Game, OnlineStatus};
     ///
-    /// impl EventHandler for Handler {
-    ///     fn on_ready(&self, context: Context, _: Ready) {
-    ///         use serenity::model::{Game, OnlineStatus};
+    /// let game = Game::playing("Heroes of the Storm");
+    /// let status = OnlineStatus::DoNotDisturb;
     ///
-    ///         let game = Game::playing("Heroes of the Storm");
-    ///         let status = OnlineStatus::DoNotDisturb;
-    ///
-    ///         context.set_presence(Some(game), status, false);
-    ///     }
-    /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// context.set_presence(Some(game), status, false);
+    /// # });
     /// ```
     ///
     /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
     /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
-    pub fn set_presence(&self, game: Option<Game>, status: OnlineStatus, afk: bool) {
-        let mut shard = self.shard.lock();
-        shard.set_presence(game, status, afk)
-    }
-
-    /// Disconnects the shard from the websocket, essentially "quiting" it.
-    /// Note however that this will only exit the one which the `Context` was given.
-    /// If it's just one shard that's on, then serenity will stop any further actions
-    /// until [`Client::start`] and vice versa are called again.
-    ///
-    /// [`Client::start`]: ./struct.Client.html#method.start
-    pub fn quit(&self) -> Result<()> {
-        let mut shard = self.shard.lock();
-        shard.shutdown_clean()
+    pub fn set_presence(&self,
+                        game: Option<Game>,
+                        status: OnlineStatus,
+                        afk: bool, streaming: bool, url: Option<&str>) {
+        let mut shard = self.shard.lock().unwrap();
+        shard.set_presence(game, status, afk, streaming, url)
     }
 }
