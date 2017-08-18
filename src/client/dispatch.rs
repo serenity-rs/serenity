@@ -12,7 +12,7 @@ use chrono::{Timelike, Utc};
 use tokio_core::reactor::Handle;
 
 #[cfg(feature = "framework")]
-use Framework;
+use framework::Framework;
 
 #[cfg(feature = "cache")]
 use super::CACHE;

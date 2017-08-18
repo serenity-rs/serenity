@@ -888,7 +888,7 @@ impl BuiltinFramework {
     }
 }
 
-impl ::Framework for BuiltinFramework {
+impl Framework for BuiltinFramework {
     fn dispatch(&mut self, mut context: Context, message: Message, tokio_handle: &Handle) {
         let res = command::positions(&mut context, &message, &self.configuration);
 
@@ -1024,4 +1024,21 @@ impl ::Framework for BuiltinFramework {
 
     #[cfg(feature = "builtin_framework")]
     fn initialized(&self) -> bool { self.initialized }
+}
+
+/// This trait allows for serenity to either use its builtin framework, or yours.
+///
+/// When implementing, be sure to use `tokio_handle.spawn_fn(|| ...; Ok())` when dispatching
+/// commands.
+///
+/// Note that you may see some other methods in here as well, but they're meant to be internal only
+/// for the builtin framework.
+#[cfg(feature = "framework")]
+pub trait Framework {
+    fn dispatch(&mut self, Context, Message, &Handle);
+
+    #[cfg(feature = "builtin_framework")]
+    fn update_current_user(&mut self, UserId, bool) {}
+    #[cfg(feature = "builtin_framework")]
+    fn initialized(&self) -> bool { false }
 }

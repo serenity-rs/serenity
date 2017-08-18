@@ -37,7 +37,7 @@ pub use CACHE;
 
 use self::dispatch::dispatch;
 use std::sync::{self, Arc};
-use std::sync::atomic::{AtomicBool, Ordering, ATOMIC_BOOL_INIT};
+use std::sync::atomic::{ATOMIC_BOOL_INIT, AtomicBool, Ordering};
 use parking_lot::Mutex;
 use tokio_core::reactor::Core;
 use futures;
@@ -52,7 +52,7 @@ use internal::ws_impl::ReceiverExt;
 use model::event::*;
 
 #[cfg(feature = "framework")]
-use Framework;
+use framework::Framework;
 
 static HANDLE_STILL: AtomicBool = ATOMIC_BOOL_INIT;
 
