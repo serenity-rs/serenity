@@ -21,5 +21,9 @@ before_script:
   - sudo make install
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo ldconfig; fi
   - cd ..
+  - export PATH="$PATH:$HOME/.cargo/bin"
+  - which rustfmt || cargo install rustfmt
 script:
+  - cargo fmt -- --write-mode=diff
+  - cargo build --all-features
   - cargo test --all-features
