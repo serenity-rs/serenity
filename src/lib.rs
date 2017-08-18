@@ -85,7 +85,7 @@
 //! [examples]: https://github.com/zeyla/serenity/tree/master/examples
 //! [gateway docs]: gateway/index.html
 #![allow(doc_markdown, inline_always, unknown_lints)]
-#![warn(enum_glob_use)]
+#![warn(enum_glob_use, if_not_else)]
 
 #[macro_use]
 extern crate bitflags;
