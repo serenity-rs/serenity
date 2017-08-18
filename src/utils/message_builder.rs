@@ -463,7 +463,7 @@ impl MessageBuilder {
     pub fn push_safe<C: I>(mut self, content: C) -> Self {
         {
             let mut c = content.into();
-            c.inner  = normalize(&c.inner)
+            c.inner = normalize(&c.inner)
                 .replace('*', "\\*")
                 .replace('`', "\\`")
                 .replace('_', "\\_");
@@ -484,7 +484,7 @@ impl MessageBuilder {
 
         {
             let mut c = content.into();
-            c.inner = normalize(&c.inner).replace("```", " "); 
+            c.inner = normalize(&c.inner).replace("```", " ");
             self.0.push_str(&c.to_string());
         }
         self.0.push_str("```");
@@ -497,7 +497,7 @@ impl MessageBuilder {
         self.0.push('`');
         {
             let mut c = content.into();
-            c.inner = normalize(&c.inner).replace('`', "'"); 
+            c.inner = normalize(&c.inner).replace('`', "'");
             self.0.push_str(&c.to_string());
         }
         self.0.push('`');
@@ -510,7 +510,7 @@ impl MessageBuilder {
         self.0.push('_');
         {
             let mut c = content.into();
-            c.inner = normalize(&c.inner).replace('_', " "); 
+            c.inner = normalize(&c.inner).replace('_', " ");
             self.0.push_str(&c.to_string());
         }
         self.0.push('_');
@@ -523,7 +523,7 @@ impl MessageBuilder {
         self.0.push_str("**");
         {
             let mut c = content.into();
-            c.inner = normalize(&c.inner).replace("**", " "); 
+            c.inner = normalize(&c.inner).replace("**", " ");
             self.0.push_str(&c.to_string());
         }
         self.0.push_str("**");
@@ -536,7 +536,7 @@ impl MessageBuilder {
         self.0.push_str("__");
         {
             let mut c = content.into();
-            c.inner = normalize(&c.inner).replace("__", " "); 
+            c.inner = normalize(&c.inner).replace("__", " ");
             self.0.push_str(&c.to_string());
         }
         self.0.push_str("__");
@@ -549,7 +549,7 @@ impl MessageBuilder {
         self.0.push_str("~~");
         {
             let mut c = content.into();
-            c.inner = normalize(&c.inner).replace("~~", " "); 
+            c.inner = normalize(&c.inner).replace("~~", " ");
             self.0.push_str(&c.to_string());
         }
         self.0.push_str("~~");
@@ -906,14 +906,15 @@ impl From<ContentModifier> for Content {
     fn from(cm: ContentModifier) -> Content { cm.to_content() }
 }
 
-/// This trait only exists as way to bypass the shouting of the compiler. Specifically "conflicting implementations in core" and alike.
+/// This trait only exists as way to bypass the shouting of the compiler. Specifically "conflicting
+/// implementations in core" and alike.
 /// However is not meant to be used outside, nor implemented.
 pub trait I {
     fn into(self) -> Content;
 }
 
 impl<T: fmt::Display> I for T {
-     fn into(self) -> Content {
+    fn into(self) -> Content {
         Content {
             italic: false,
             bold: false,
@@ -926,15 +927,11 @@ impl<T: fmt::Display> I for T {
 }
 
 impl I for ContentModifier {
-    fn into(self) -> Content {
-        self.to_content()
-    }
+    fn into(self) -> Content { self.to_content() }
 }
 
 impl I for Content {
-    fn into(self) -> Content {
-        self
-    }
+    fn into(self) -> Content { self }
 }
 
 fn normalize(text: &str) -> String {

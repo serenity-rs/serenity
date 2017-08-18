@@ -11,7 +11,9 @@ pub struct CreateCommand(pub Command);
 impl CreateCommand {
     /// Adds multiple aliases.
     pub fn batch_known_as(mut self, names: Vec<&str>) -> Self {
-        self.0.aliases.extend(names.into_iter().map(|n| n.to_owned()));
+        self.0.aliases.extend(
+            names.into_iter().map(|n| n.to_owned()),
+        );
 
         self
     }
@@ -50,20 +52,25 @@ impl CreateCommand {
     ///         .desc("Replies to a ping with a pong")
     ///         .exec(ping)));
     ///
-    /// fn ping(_context: &mut Context, message: &Message, _args: Vec<String>, _original_msg: String) -> Result<(),
+    /// fn ping(_context: &mut Context, message: &Message, _args: Vec<String>, _original_msg:
+    /// String) -> Result<(),
     /// String> {
     ///     let _ = message.channel_id.say("Pong!");
     ///
     ///     Ok(())
     /// }
     ///
-    /// fn owner_check(_context: &mut Context, message: &Message, _: &[String], _: &Arc<Command>) -> bool {
+    /// fn owner_check(_context: &mut Context, message: &Message, _: &[String], _:
+    /// &Arc<Command>) -> bool {
     ///     // replace with your user ID
     ///     message.author.id == 7
     /// }
     /// ```
     pub fn check<F>(mut self, check: F) -> Self
-        where F: Fn(&mut Context, &Message, &[String], &Arc<Command>) -> bool + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, &[String], &Arc<Command>) -> bool
+                     + Send
+                     + Sync
+                     + 'static {
         self.0.checks.push(Box::new(check));
 
         self
@@ -112,7 +119,10 @@ impl CreateCommand {
     ///
     /// You can return `Err(string)` if there's an error.
     pub fn exec_help<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, &[String])
+        where F: Fn(&mut Context,
+                    &Message,
+                    HashMap<String, Arc<CommandGroup>>,
+                    &[String])
                     -> Result<(), String>
                      + 'static {
         self.0.exec = CommandType::WithCommands(Box::new(f));

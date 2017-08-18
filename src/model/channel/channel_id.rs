@@ -306,9 +306,11 @@ impl ChannelId {
                   None => return None,
               } {
             Guild(channel) => channel.read().unwrap().name().to_string(),
-            Group(channel) => match channel.read().unwrap().name() {
-                Cow::Borrowed(name) => name.to_string(),
-                Cow::Owned(name) => name,
+            Group(channel) => {
+                match channel.read().unwrap().name() {
+                    Cow::Borrowed(name) => name.to_string(),
+                    Cow::Owned(name) => name,
+                }
             },
             Private(channel) => channel.read().unwrap().name(),
         })

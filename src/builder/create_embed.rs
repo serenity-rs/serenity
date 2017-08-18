@@ -87,8 +87,10 @@ impl CreateEmbed {
     /// Set the colour of the left-hand side of the embed.
     #[cfg(not(feature = "utils"))]
     pub fn colour(mut self, colour: u32) -> Self {
-        self.0
-            .insert("color".to_owned(), Value::Number(Number::from(colour)));
+        self.0.insert(
+            "color".to_owned(),
+            Value::Number(Number::from(colour)),
+        );
 
         CreateEmbed(self.0)
     }
@@ -282,24 +284,30 @@ impl CreateEmbed {
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     pub fn timestamp<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
-        self.0
-            .insert("timestamp".to_owned(), Value::String(timestamp.into().ts));
+        self.0.insert(
+            "timestamp".to_owned(),
+            Value::String(timestamp.into().ts),
+        );
 
         CreateEmbed(self.0)
     }
 
     /// Set the title of the embed.
     pub fn title<D: Display>(mut self, title: D) -> Self {
-        self.0
-            .insert("title".to_owned(), Value::String(format!("{}", title)));
+        self.0.insert(
+            "title".to_owned(),
+            Value::String(format!("{}", title)),
+        );
 
         CreateEmbed(self.0)
     }
 
     /// Set the URL to direct to when clicking on the title.
     pub fn url(mut self, url: &str) -> Self {
-        self.0
-            .insert("url".to_owned(), Value::String(url.to_owned()));
+        self.0.insert(
+            "url".to_owned(),
+            Value::String(url.to_owned()),
+        );
 
         CreateEmbed(self.0)
     }
@@ -319,7 +327,10 @@ impl Default for CreateEmbed {
     /// Creates a builder with default values, setting the `type` to `rich`.
     fn default() -> CreateEmbed {
         let mut map = Map::new();
-        map.insert("type".to_owned(), Value::String("rich".to_owned()));
+        map.insert(
+            "type".to_owned(),
+            Value::String("rich".to_owned()),
+        );
 
         CreateEmbed(map)
     }
@@ -396,24 +407,30 @@ pub struct CreateEmbedAuthor(pub Map<String, Value>);
 impl CreateEmbedAuthor {
     /// Set the URL of the author's icon.
     pub fn icon_url(mut self, icon_url: &str) -> Self {
-        self.0
-            .insert("icon_url".to_owned(), Value::String(icon_url.to_owned()));
+        self.0.insert(
+            "icon_url".to_owned(),
+            Value::String(icon_url.to_owned()),
+        );
 
         self
     }
 
     /// Set the author's name.
     pub fn name(mut self, name: &str) -> Self {
-        self.0
-            .insert("name".to_owned(), Value::String(name.to_owned()));
+        self.0.insert(
+            "name".to_owned(),
+            Value::String(name.to_owned()),
+        );
 
         self
     }
 
     /// Set the author's URL.
     pub fn url(mut self, url: &str) -> Self {
-        self.0
-            .insert("url".to_owned(), Value::String(url.to_owned()));
+        self.0.insert(
+            "url".to_owned(),
+            Value::String(url.to_owned()),
+        );
 
         self
     }
@@ -440,16 +457,20 @@ impl CreateEmbedField {
 
     /// Set the field's name. It can't be longer than 256 characters.
     pub fn name<D: Display>(mut self, name: D) -> Self {
-        self.0
-            .insert("name".to_owned(), Value::String(format!("{}", name)));
+        self.0.insert(
+            "name".to_owned(),
+            Value::String(format!("{}", name)),
+        );
 
         self
     }
 
     /// Set the field's value. It can't be longer than 1024 characters.
     pub fn value<D: Display>(mut self, value: D) -> Self {
-        self.0
-            .insert("value".to_owned(), Value::String(format!("{}", value)));
+        self.0.insert(
+            "value".to_owned(),
+            Value::String(format!("{}", value)),
+        );
 
         self
     }
@@ -479,16 +500,20 @@ pub struct CreateEmbedFooter(pub Map<String, Value>);
 impl CreateEmbedFooter {
     /// Set the icon URL's value. This only supports HTTP(S).
     pub fn icon_url(mut self, icon_url: &str) -> Self {
-        self.0
-            .insert("icon_url".to_owned(), Value::String(icon_url.to_owned()));
+        self.0.insert(
+            "icon_url".to_owned(),
+            Value::String(icon_url.to_owned()),
+        );
 
         self
     }
 
     /// Set the footer's text.
     pub fn text<D: Display>(mut self, text: D) -> Self {
-        self.0
-            .insert("text".to_owned(), Value::String(format!("{}", text)));
+        self.0.insert(
+            "text".to_owned(),
+            Value::String(format!("{}", text)),
+        );
 
         self
     }

@@ -540,7 +540,10 @@ impl<H: EventHandler + 'static> Client<H> {
     /// [`start_autosharded`]: #method.start_autosharded
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
-        self.start_connection([shard, shard, shards], http::get_gateway()?.url)
+        self.start_connection(
+            [shard, shard, shards],
+            http::get_gateway()?.url,
+        )
     }
 
     /// Establish sharded connections and start listening for events.
@@ -665,7 +668,10 @@ impl<H: EventHandler + 'static> Client<H> {
     /// [`start_shards`]: #method.start_shards
     /// [Gateway docs]: gateway/index.html#sharding
     pub fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64) -> Result<()> {
-        self.start_connection([range[0], range[1], total_shards], http::get_gateway()?.url)
+        self.start_connection(
+            [range[0], range[1], total_shards],
+            http::get_gateway()?.url,
+        )
     }
 
     /// Returns a thread-safe handle for closing shards.
@@ -723,7 +729,8 @@ impl<H: EventHandler + 'static> Client<H> {
                 Ok(shard) => {
                     let shard = Arc::new(Mutex::new(shard));
 
-                    let monitor_info = feature_framework! {{
+                    let monitor_info =
+                        feature_framework! {{
                         MonitorInfo {
                             data: self.data.clone(),
                             event_handler: self.event_handler.clone(),

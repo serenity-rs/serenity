@@ -125,10 +125,11 @@ pub struct Guild {
 impl Guild {
     #[cfg(feature = "cache")]
     /// Returns the "default" channel of the guild.
-    /// (This returns the first channel that can be read by the bot, if there isn't one, returns `None`)
+    /// (This returns the first channel that can be read by the bot, if there isn't one,
+    /// returns `None`)
     pub fn default_channel(&self) -> Option<GuildChannel> {
         let uid = CACHE.read().unwrap().user.id;
-        
+
         for (cid, channel) in &self.channels {
             if self.permissions_for(*cid, uid).read_messages() {
                 return Some(channel.read().unwrap().clone());
@@ -139,14 +140,16 @@ impl Guild {
     }
 
     /// Returns the guaranteed "default" channel of the guild.
-    /// (This returns the first channel that can be read by everyone, if there isn't one, returns `None`)
-    /// Note however that this is very costy if used in a server with lots of channels, members, or both.
+    /// (This returns the first channel that can be read by everyone, if there isn't one,
+    /// returns `None`)
+    /// Note however that this is very costy if used in a server with lots of channels,
+    /// members, or both.
     pub fn default_channel_guaranteed(&self) -> Option<GuildChannel> {
         for (cid, channel) in &self.channels {
             for memid in self.members.keys() {
                 if self.permissions_for(*cid, *memid).read_messages() {
-                return Some(channel.read().unwrap().clone());
-            }
+                    return Some(channel.read().unwrap().clone());
+                }
             }
         }
 
@@ -165,7 +168,10 @@ impl Guild {
             None => return Err(Error::Model(ModelError::ItemMissing)),
         };
 
-        let perms = self.permissions_for(default_channel.id, member.user.read().unwrap().id);
+        let perms = self.permissions_for(
+            default_channel.id,
+            member.user.read().unwrap().id,
+        );
         permissions.remove(perms);
 
         Ok(permissions.is_empty())
@@ -623,9 +629,9 @@ impl Guild {
 
     /// Returns the formatted URL of the guild's icon, if one exists.
     pub fn icon_url(&self) -> Option<String> {
-        self.icon
-            .as_ref()
-            .map(|icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
+        self.icon.as_ref().map(
+            |icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon),
+        )
     }
 
     /// Gets all integration of the guild.
@@ -703,8 +709,10 @@ impl Guild {
 
         for (&id, member) in &self.members {
             match self.presences.get(&id) {
-                Some(presence) => if status == presence.status {
-                    members.push(member);
+                Some(presence) => {
+                    if status == presence.status {
+                        members.push(member);
+                    }
                 },
                 None => continue,
             }
@@ -828,8 +836,8 @@ impl Guild {
 
             // If this is a text channel, then throw out voice permissions.
             if channel.kind == ChannelType::Text {
-                permissions &=
-                    !(CONNECT | SPEAK | MUTE_MEMBERS | DEAFEN_MEMBERS | MOVE_MEMBERS | USE_VAD);
+                permissions &= !(CONNECT | SPEAK | MUTE_MEMBERS | DEAFEN_MEMBERS | MOVE_MEMBERS |
+                                 USE_VAD);
             }
 
             // Apply the permission overwrites for the channel for each of the
@@ -955,9 +963,9 @@ impl Guild {
 
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
-        self.icon
-            .as_ref()
-            .map(|icon| format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
+        self.icon.as_ref().map(
+            |icon| format!(cdn!("/splashes/{}/{}.webp"), self.id, icon),
+        )
     }
 
     /// Starts an integration sync for the given integration Id.
@@ -1036,16 +1044,18 @@ impl<'de> Deserialize<'de> for Guild {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let id = map.get("id")
-            .and_then(|x| x.as_str())
-            .and_then(|x| x.parse::<u64>().ok());
+        let id = map.get("id").and_then(|x| x.as_str()).and_then(|x| {
+            x.parse::<u64>().ok()
+        });
 
         if let Some(guild_id) = id {
             if let Some(array) = map.get_mut("channels").and_then(|x| x.as_array_mut()) {
                 for value in array {
                     if let Some(channel) = value.as_object_mut() {
-                        channel
-                            .insert("guild_id".to_owned(), Value::Number(Number::from(guild_id)));
+                        channel.insert(
+                            "guild_id".to_owned(),
+                            Value::Number(Number::from(guild_id)),
+                        );
                     }
                 }
             }
@@ -1053,16 +1063,21 @@ impl<'de> Deserialize<'de> for Guild {
             if let Some(array) = map.get_mut("members").and_then(|x| x.as_array_mut()) {
                 for value in array {
                     if let Some(member) = value.as_object_mut() {
-                        member
-                            .insert("guild_id".to_owned(), Value::Number(Number::from(guild_id)));
+                        member.insert(
+                            "guild_id".to_owned(),
+                            Value::Number(Number::from(guild_id)),
+                        );
                     }
                 }
             }
         }
 
         let afk_channel_id = match map.remove("afk_channel_id") {
-            Some(v) => serde_json::from_value::<Option<ChannelId>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => {
+                serde_json::from_value::<Option<ChannelId>>(v).map_err(
+                    DeError::custom,
+                )?
+            },
             None => None,
         };
         let afk_timeout = map.remove("afk_timeout")
@@ -1214,9 +1229,9 @@ pub struct GuildInfo {
 impl GuildInfo {
     /// Returns the formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
-        self.icon
-            .as_ref()
-            .map(|icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
+        self.icon.as_ref().map(
+            |icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon),
+        )
     }
 }
 
@@ -1236,9 +1251,9 @@ impl From<u64> for GuildContainer {
 impl InviteGuild {
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
-        self.icon
-            .as_ref()
-            .map(|icon| format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
+        self.icon.as_ref().map(
+            |icon| format!(cdn!("/splashes/{}/{}.webp"), self.id, icon),
+        )
     }
 }
 

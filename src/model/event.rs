@@ -153,8 +153,9 @@ impl<'de> Deserialize<'de> for GuildMemberAddEvent {
 
         Ok(GuildMemberAddEvent {
             guild_id: guild_id,
-            member: Member::deserialize(Value::Object(map))
-                .map_err(DeError::custom)?,
+            member: Member::deserialize(Value::Object(map)).map_err(
+                DeError::custom,
+            )?,
         })
     }
 }
@@ -188,8 +189,9 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
             .and_then(|v| GuildId::deserialize(v.clone()))
             .map_err(DeError::custom)?;
 
-        let mut members = map.remove("members")
-            .ok_or_else(|| DeError::custom("missing member chunk members"))?;
+        let mut members = map.remove("members").ok_or_else(|| {
+            DeError::custom("missing member chunk members")
+        })?;
 
         if let Some(members) = members.as_array_mut() {
             let num = Value::Number(Number::from(guild_id.0));
@@ -305,17 +307,24 @@ impl<'de> Deserialize<'de> for PresenceUpdateEvent {
         let mut map = JsonMap::deserialize(deserializer)?;
 
         let guild_id = match map.remove("guild_id") {
-            Some(v) => serde_json::from_value::<Option<GuildId>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => {
+                serde_json::from_value::<Option<GuildId>>(v).map_err(
+                    DeError::custom,
+                )?
+            },
             None => None,
         };
         let roles = match map.remove("roles") {
-            Some(v) => serde_json::from_value::<Option<Vec<RoleId>>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => {
+                serde_json::from_value::<Option<Vec<RoleId>>>(v).map_err(
+                    DeError::custom,
+                )?
+            },
             None => None,
         };
-        let presence = Presence::deserialize(Value::Object(map))
-            .map_err(DeError::custom)?;
+        let presence = Presence::deserialize(Value::Object(map)).map_err(
+            DeError::custom,
+        )?;
 
         Ok(Self {
             guild_id: guild_id,
@@ -442,8 +451,9 @@ impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
 
         Ok(VoiceStateUpdateEvent {
             guild_id: guild_id,
-            voice_state: VoiceState::deserialize(Value::Object(map))
-                .map_err(DeError::custom)?,
+            voice_state: VoiceState::deserialize(Value::Object(map)).map_err(
+                DeError::custom,
+            )?,
         })
     }
 }
@@ -482,10 +492,9 @@ impl GatewayEvent {
                 let t = map.remove("t")
                     .ok_or_else(|| DeError::custom("expected gateway event type"))
                     .and_then(String::deserialize)?;
-                let d = map.remove("d")
-                    .ok_or_else(|| {
-                        Error::Decode("expected gateway event d", Value::Object(map))
-                    })?;
+                let d = map.remove("d").ok_or_else(|| {
+                    Error::Decode("expected gateway event d", Value::Object(map))
+                })?;
 
                 GatewayEvent::Dispatch(s, Event::decode(t, d)?)
             },
@@ -792,16 +801,20 @@ impl VoiceEvent {
         let mut map = JsonMap::deserialize(value)?;
 
         let op = match map.remove("op") {
-            Some(v) => VoiceOpCode::deserialize(v)
-                .map_err(JsonError::from)
-                .map_err(Error::from)?,
+            Some(v) => {
+                VoiceOpCode::deserialize(v)
+                    .map_err(JsonError::from)
+                    .map_err(Error::from)?
+            },
             None => return Err(Error::Decode("expected voice event op", Value::Object(map))),
         };
 
         let d = match map.remove("d") {
-            Some(v) => JsonMap::deserialize(v)
-                .map_err(JsonError::from)
-                .map_err(Error::from)?,
+            Some(v) => {
+                JsonMap::deserialize(v).map_err(JsonError::from).map_err(
+                    Error::from,
+                )?
+            },
             None => {
                 return Err(Error::Decode(
                     "expected voice gateway d",

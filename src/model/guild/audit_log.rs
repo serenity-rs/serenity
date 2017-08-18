@@ -53,7 +53,7 @@ pub enum ActionMember {
     Prune = 21,
     BanAdd = 22,
     BanRemove = 23,
-    Update = 24, 
+    Update = 24,
     RoleUpdate = 25,
 }
 

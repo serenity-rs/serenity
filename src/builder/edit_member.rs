@@ -39,8 +39,10 @@ impl EditMember {
     ///
     /// [Manage Nicknames]: ../model/permissions/constant.MANAGE_NICKNAMES.html
     pub fn nickname(mut self, nickname: &str) -> Self {
-        self.0
-            .insert("nick".to_owned(), Value::String(nickname.to_owned()));
+        self.0.insert(
+            "nick".to_owned(),
+            Value::String(nickname.to_owned()),
+        );
 
         self
     }

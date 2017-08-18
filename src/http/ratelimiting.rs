@@ -47,7 +47,7 @@ use hyper::status::StatusCode;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use std::{str, thread, i64};
+use std::{i64, str, thread};
 use super::{HttpError, LightMethod};
 use internal::prelude::*;
 
@@ -503,12 +503,16 @@ impl RateLimit {
 
 fn parse_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
     match headers.get_raw(header) {
-        Some(header) => match str::from_utf8(&header[0]) {
-            Ok(v) => match v.parse::<i64>() {
-                Ok(v) => Ok(Some(v)),
-                Err(_) => Err(Error::Http(HttpError::RateLimitI64)),
-            },
-            Err(_) => Err(Error::Http(HttpError::RateLimitUtf8)),
+        Some(header) => {
+            match str::from_utf8(&header[0]) {
+                Ok(v) => {
+                    match v.parse::<i64>() {
+                        Ok(v) => Ok(Some(v)),
+                        Err(_) => Err(Error::Http(HttpError::RateLimitI64)),
+                    }
+                },
+                Err(_) => Err(Error::Http(HttpError::RateLimitUtf8)),
+            }
         },
         None => Ok(None),
     }

@@ -117,8 +117,11 @@ impl Channel {
                                  reaction_type: R)
                                  -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
-        self.id()
-            .delete_reaction(message_id, user_id, reaction_type)
+        self.id().delete_reaction(
+            message_id,
+            user_id,
+            reaction_type,
+        )
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -156,7 +159,8 @@ impl Channel {
     pub fn is_nsfw(&self) -> bool {
         match *self {
             Channel::Guild(ref channel) => channel.read().unwrap().is_nsfw(),
-            Channel::Group(_) | Channel::Private(_) => false,
+            Channel::Group(_) |
+            Channel::Private(_) => false,
         }
     }
 
@@ -216,8 +220,12 @@ impl Channel {
                                    after: Option<U>)
                                    -> Result<Vec<User>>
         where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id()
-            .reaction_users(message_id, reaction_type, limit, after)
+        self.id().reaction_users(
+            message_id,
+            reaction_type,
+            limit,
+            after,
+        )
     }
 
     /// Retrieves the Id of the inner [`Group`], [`GuildChannel`], or
@@ -318,15 +326,21 @@ impl<'de> Deserialize<'de> for Channel {
         };
 
         match kind {
-            0 | 2 => serde_json::from_value::<GuildChannel>(Value::Object(v))
-                .map(|x| Channel::Guild(Arc::new(RwLock::new(x))))
-                .map_err(DeError::custom),
-            1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
-                .map(|x| Channel::Private(Arc::new(RwLock::new(x))))
-                .map_err(DeError::custom),
-            3 => serde_json::from_value::<Group>(Value::Object(v))
-                .map(|x| Channel::Group(Arc::new(RwLock::new(x))))
-                .map_err(DeError::custom),
+            0 | 2 => {
+                serde_json::from_value::<GuildChannel>(Value::Object(v))
+                    .map(|x| Channel::Guild(Arc::new(RwLock::new(x))))
+                    .map_err(DeError::custom)
+            },
+            1 => {
+                serde_json::from_value::<PrivateChannel>(Value::Object(v))
+                    .map(|x| Channel::Private(Arc::new(RwLock::new(x))))
+                    .map_err(DeError::custom)
+            },
+            3 => {
+                serde_json::from_value::<Group>(Value::Object(v))
+                    .map(|x| Channel::Group(Arc::new(RwLock::new(x))))
+                    .map_err(DeError::custom)
+            },
             _ => Err(DeError::custom("Unknown channel type")),
         }
     }

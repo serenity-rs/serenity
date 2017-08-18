@@ -191,8 +191,12 @@ impl PrivateChannel {
                                    after: Option<U>)
                                    -> Result<Vec<User>>
         where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id
-            .reaction_users(message_id, reaction_type, limit, after)
+        self.id.reaction_users(
+            message_id,
+            reaction_type,
+            limit,
+            after,
+        )
     }
 
     /// Pins a [`Message`] to the channel.

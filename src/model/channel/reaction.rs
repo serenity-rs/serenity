@@ -46,7 +46,8 @@ impl Reaction {
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     /// [permissions]: permissions
     pub fn delete(&self) -> Result<()> {
-        let user_id = feature_cache! {{
+        let user_id =
+            feature_cache! {{
             let user = if self.user_id == CACHE.read().unwrap().user.id {
                 None
             } else {

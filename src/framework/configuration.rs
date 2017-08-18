@@ -269,8 +269,8 @@ impl Configuration {
 
         if let Ok(current_user) = http::get_current_user() {
             self.on_mention = Some(vec![
-                format!("<@{}>", current_user.id),  // Regular mention
-                format!("<@!{}>", current_user.id), // Nickname mention
+                format!("<@{}>", current_user.id), // Regular mention
+                format!("<@!{}>", current_user.id) /* Nickname mention */,
             ]);
         }
 
@@ -415,7 +415,9 @@ impl Configuration {
     /// ```
     pub fn delimiters(mut self, delimiters: Vec<&str>) -> Self {
         self.delimiters.clear();
-        self.delimiters.extend(delimiters.into_iter().map(|s| s.to_string()));
+        self.delimiters.extend(
+            delimiters.into_iter().map(|s| s.to_string()),
+        );
 
         self
     }

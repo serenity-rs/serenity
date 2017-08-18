@@ -491,9 +491,12 @@ impl BuiltinFramework {
             }
 
             if let Some(guild) = guild_id.find() {
-                return self.configuration
-                    .blocked_users
-                    .contains(&guild.read().unwrap().owner_id);
+                return self.configuration.blocked_users.contains(
+                    &guild
+                        .read()
+                        .unwrap()
+                        .owner_id,
+                );
             }
         }
 
@@ -504,10 +507,10 @@ impl BuiltinFramework {
     fn has_correct_permissions(&self, command: &Arc<Command>, message: &Message) -> bool {
         if !command.required_permissions.is_empty() {
             if let Some(guild) = message.guild() {
-                let perms = guild
-                    .read()
-                    .unwrap()
-                    .permissions_for(message.channel_id, message.author.id);
+                let perms = guild.read().unwrap().permissions_for(
+                    message.channel_id,
+                    message.author.id,
+                );
 
                 return perms.contains(command.required_permissions);
             }
@@ -537,7 +540,8 @@ impl BuiltinFramework {
                     let rate_limit = bucket.take(message.author.id.0);
                     match bucket.check {
                         Some(ref check) => {
-                            let apply = feature_cache! {{
+                            let apply =
+                                feature_cache! {{
                                 let guild_id = message.guild_id();
                                 (check)(context, guild_id, message.channel_id, message.author.id)
                             } else {
@@ -548,8 +552,10 @@ impl BuiltinFramework {
                                 return Some(DispatchError::RateLimited(rate_limit));
                             }
                         },
-                        None => if rate_limit > 0i64 {
-                            return Some(DispatchError::RateLimited(rate_limit));
+                        None => {
+                            if rate_limit > 0i64 {
+                                return Some(DispatchError::RateLimited(rate_limit));
+                            }
                         },
                     }
                 }
@@ -588,7 +594,7 @@ impl BuiltinFramework {
                 }
 
                 if (!self.configuration.allow_dm && message.is_private()) ||
-                    (command.guild_only && message.is_private()) {
+                   (command.guild_only && message.is_private()) {
                     return Some(DispatchError::OnlyForGuilds);
                 }
 
@@ -599,14 +605,13 @@ impl BuiltinFramework {
 
             if command.owners_only {
                 Some(DispatchError::OnlyForOwners)
-            } else if !command
-                .checks
-                .iter()
-                .all(|check| (check)(&mut context, message, args, command)) {
+            } else if !command.checks.iter().all(|check| {
+                (check)(&mut context, message, args, command)
+            }) {
                 Some(DispatchError::CheckFailed(command.to_owned()))
-            } else if self.configuration
-                .blocked_users
-                .contains(&message.author.id) {
+            } else if self.configuration.blocked_users.contains(
+                &message.author.id,
+            ) {
                 Some(DispatchError::BlockedUser)
             } else if self.configuration.disabled_commands.contains(to_check) {
                 Some(DispatchError::CommandDisabled(to_check.to_owned()))
@@ -661,16 +666,21 @@ impl BuiltinFramework {
         where F: Fn(&mut Context, &Message, Vec<String>, String) -> Result<(), String> + 'static,
               S: Into<String> {
         {
-            let ungrouped = self.groups
-                .entry("Ungrouped".to_owned())
-                .or_insert_with(|| Arc::new(CommandGroup::default()));
+            let ungrouped = self.groups.entry("Ungrouped".to_owned()).or_insert_with(
+                || {
+                    Arc::new(CommandGroup::default())
+                },
+            );
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
                 let name = command_name.into();
 
-                group
-                    .commands
-                    .insert(name, CommandOrAlias::Command(Arc::new(Command::new(f))));
+                group.commands.insert(
+                    name,
+                    CommandOrAlias::Command(
+                        Arc::new(Command::new(f)),
+                    ),
+                );
             }
         }
 
@@ -693,9 +703,11 @@ impl BuiltinFramework {
     pub fn command<F, S>(mut self, command_name: S, f: F) -> Self
         where F: FnOnce(CreateCommand) -> CreateCommand, S: Into<String> {
         {
-            let ungrouped = self.groups
-                .entry("Ungrouped".to_owned())
-                .or_insert_with(|| Arc::new(CommandGroup::default()));
+            let ungrouped = self.groups.entry("Ungrouped".to_owned()).or_insert_with(
+                || {
+                    Arc::new(CommandGroup::default())
+                },
+            );
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
                 let cmd = f(CreateCommand(Command::default())).0;
@@ -710,15 +722,17 @@ impl BuiltinFramework {
                     }
                 } else {
                     for v in &cmd.aliases {
-                        group
-                            .commands
-                            .insert(v.to_owned(), CommandOrAlias::Alias(name.clone()));
+                        group.commands.insert(
+                            v.to_owned(),
+                            CommandOrAlias::Alias(name.clone()),
+                        );
                     }
                 }
 
-                group
-                    .commands
-                    .insert(name, CommandOrAlias::Command(Arc::new(cmd)));
+                group.commands.insert(
+                    name,
+                    CommandOrAlias::Command(Arc::new(cmd)),
+                );
             }
         }
 
@@ -930,7 +944,7 @@ impl Framework for BuiltinFramework {
                     let command_length = built.len();
 
                     if let Some(&CommandOrAlias::Alias(ref points_to)) =
-                    group.commands.get(&built) {
+                        group.commands.get(&built) {
                         built = points_to.to_owned();
                     }
 
@@ -945,7 +959,7 @@ impl Framework for BuiltinFramework {
                     };
 
                     if let Some(&CommandOrAlias::Command(ref command)) =
-                    group.commands.get(&to_check) {
+                        group.commands.get(&to_check) {
                         let before = self.before.clone();
                         let command = command.clone();
                         let after = self.after.clone();
@@ -959,14 +973,24 @@ impl Framework for BuiltinFramework {
                                 (utils::parse_quotes(content), content.to_string())
                             } else {
                                 let delimiters = &self.configuration.delimiters;
-                                let regular_expression = delimiters.iter()
-                                    .map(|delimiter| escape(delimiter)).join("|");
+                                let regular_expression = delimiters
+                                    .iter()
+                                    .map(|delimiter| escape(delimiter))
+                                    .join("|");
 
                                 let regex = Regex::new(&regular_expression).unwrap();
 
-                                (regex.split(content)
-                                    .filter_map(|p| if !p.is_empty() { Some(p.to_string()) } else { None })
-                                    .collect::<Vec<_>>(), content.to_string())
+                                (
+                                    regex
+                                        .split(content)
+                                        .filter_map(|p| if !p.is_empty() {
+                                            Some(p.to_string())
+                                        } else {
+                                            None
+                                        })
+                                        .collect::<Vec<_>>(),
+                                    content.to_string(),
+                                )
                             }
                         };
 
@@ -997,7 +1021,9 @@ impl Framework for BuiltinFramework {
 
                                     Ok(())
                                 },
-                                CommandType::Basic(ref x) => (x)(&mut context, &message, args, content),
+                                CommandType::Basic(ref x) => {
+                                    (x)(&mut context, &message, args, content)
+                                },
                                 CommandType::WithCommands(ref x) => {
                                     (x)(&mut context, &message, groups, &args)
                                 },

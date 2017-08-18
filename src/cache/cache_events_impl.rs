@@ -7,51 +7,39 @@ use model::*;
 use model::event::*;
 
 pub(crate) trait CacheEventsImpl {
-    fn update_with_channel_create(&mut self,
-                                  event: &ChannelCreateEvent)
-                                        -> Option<Channel>;
+    fn update_with_channel_create(&mut self, event: &ChannelCreateEvent) -> Option<Channel>;
 
     fn update_with_channel_delete(&mut self, event: &ChannelDeleteEvent);
 
     fn update_with_channel_pins_update(&mut self, event: &ChannelPinsUpdateEvent);
 
-    fn update_with_channel_recipient_add(&mut self,
-                                                    event: &mut ChannelRecipientAddEvent);
+    fn update_with_channel_recipient_add(&mut self, event: &mut ChannelRecipientAddEvent);
 
-    fn update_with_channel_recipient_remove(&mut self,
-                                                       event: &ChannelRecipientRemoveEvent);
+    fn update_with_channel_recipient_remove(&mut self, event: &ChannelRecipientRemoveEvent);
 
     fn update_with_channel_update(&mut self, event: &ChannelUpdateEvent);
 
     fn update_with_guild_create(&mut self, event: &GuildCreateEvent);
 
-    fn update_with_guild_delete(&mut self,
-                                           event: &GuildDeleteEvent)
-                                           -> Option<Arc<RwLock<Guild>>>;
+    fn update_with_guild_delete(&mut self, event: &GuildDeleteEvent) -> Option<Arc<RwLock<Guild>>>;
 
     fn update_with_guild_emojis_update(&mut self, event: &GuildEmojisUpdateEvent);
 
     fn update_with_guild_member_add(&mut self, event: &mut GuildMemberAddEvent);
 
-    fn update_with_guild_member_remove(&mut self,
-                                                  event: &GuildMemberRemoveEvent)
-                                                  -> Option<Member>;
+    fn update_with_guild_member_remove(&mut self, event: &GuildMemberRemoveEvent)
+                                       -> Option<Member>;
 
-    fn update_with_guild_member_update(&mut self,
-                                                  event: &GuildMemberUpdateEvent)
-                                                  -> Option<Member>;
+    fn update_with_guild_member_update(&mut self, event: &GuildMemberUpdateEvent)
+                                       -> Option<Member>;
 
     fn update_with_guild_members_chunk(&mut self, event: &GuildMembersChunkEvent);
 
     fn update_with_guild_role_create(&mut self, event: &GuildRoleCreateEvent);
 
-    fn update_with_guild_role_delete(&mut self,
-                                                event: &GuildRoleDeleteEvent)
-                                                -> Option<Role>;
+    fn update_with_guild_role_delete(&mut self, event: &GuildRoleDeleteEvent) -> Option<Role>;
 
-    fn update_with_guild_role_update(&mut self,
-                                                event: &GuildRoleUpdateEvent)
-                                                -> Option<Role>;
+    fn update_with_guild_role_update(&mut self, event: &GuildRoleUpdateEvent) -> Option<Role>;
 
     fn update_with_guild_unavailable(&mut self, event: &GuildUnavailableEvent);
 
@@ -69,9 +57,7 @@ pub(crate) trait CacheEventsImpl {
 }
 
 impl CacheEventsImpl for super::Cache {
-    fn update_with_channel_create(&mut self,
-                                  event: &ChannelCreateEvent)
-                                        -> Option<Channel> {
+    fn update_with_channel_create(&mut self, event: &ChannelCreateEvent) -> Option<Channel> {
         match event.channel {
             Channel::Group(ref group) => {
                 let group = group.clone();
@@ -104,11 +90,10 @@ impl CacheEventsImpl for super::Cache {
                 self.guilds
                     .get_mut(&guild_id)
                     .and_then(|guild| {
-                        guild
-                            .write()
-                            .unwrap()
-                            .channels
-                            .insert(channel_id, channel.clone())
+                        guild.write().unwrap().channels.insert(
+                            channel_id,
+                            channel.clone(),
+                        )
                     })
                     .map(Channel::Guild)
             },
@@ -131,8 +116,10 @@ impl CacheEventsImpl for super::Cache {
 
                 channel_writer.recipient = self.users[&user_id].clone();
 
-                let ch = self.private_channels
-                    .insert(channel_writer.id, channel.clone());
+                let ch = self.private_channels.insert(
+                    channel_writer.id,
+                    channel.clone(),
+                );
                 ch.map(Channel::Private)
             },
         }
@@ -141,9 +128,11 @@ impl CacheEventsImpl for super::Cache {
     fn update_with_channel_delete(&mut self, event: &ChannelDeleteEvent) {
         let channel = match event.channel {
             Channel::Guild(ref channel) => channel,
-            // We ignore these two due to the fact that the delete event for dms/groups will _not_ fire
+            // We ignore these two due to the fact that the delete event for dms/groups
+            // will _not_ fire
             // anymore.
-            Channel::Private(_) | Channel::Group(_) => unreachable!(),
+            Channel::Private(_) |
+            Channel::Group(_) => unreachable!(),
         };
 
         let (channel_id, guild_id) = {
@@ -154,9 +143,9 @@ impl CacheEventsImpl for super::Cache {
 
         self.channels.remove(&channel_id);
 
-        self.guilds
-            .get_mut(&guild_id)
-            .and_then(|guild| guild.write().unwrap().channels.remove(&channel_id));
+        self.guilds.get_mut(&guild_id).and_then(|guild| {
+            guild.write().unwrap().channels.remove(&channel_id)
+        });
     }
 
     #[allow(dead_code)]
@@ -180,22 +169,19 @@ impl CacheEventsImpl for super::Cache {
         }
     }
 
-    fn update_with_channel_recipient_add(&mut self,
-                                                    event: &mut ChannelRecipientAddEvent) {
+    fn update_with_channel_recipient_add(&mut self, event: &mut ChannelRecipientAddEvent) {
         self.update_user_entry(&event.user);
         let user = self.users[&event.user.id].clone();
 
         self.groups.get_mut(&event.channel_id).map(|group| {
-            group
-                .write()
-                .unwrap()
-                .recipients
-                .insert(event.user.id, user);
+            group.write().unwrap().recipients.insert(
+                event.user.id,
+                user,
+            );
         });
     }
 
-    fn update_with_channel_recipient_remove(&mut self,
-                                                       event: &ChannelRecipientRemoveEvent) {
+    fn update_with_channel_recipient_remove(&mut self, event: &ChannelRecipientRemoveEvent) {
         self.groups.get_mut(&event.channel_id).map(|group| {
             group.write().unwrap().recipients.remove(&event.user.id)
         });
@@ -238,11 +224,10 @@ impl CacheEventsImpl for super::Cache {
 
                 self.channels.insert(channel_id, channel.clone());
                 self.guilds.get_mut(&guild_id).map(|guild| {
-                    guild
-                        .write()
-                        .unwrap()
-                        .channels
-                        .insert(channel_id, channel.clone())
+                    guild.write().unwrap().channels.insert(
+                        channel_id,
+                        channel.clone(),
+                    )
                 });
             },
             Channel::Private(ref channel) => {
@@ -266,13 +251,13 @@ impl CacheEventsImpl for super::Cache {
         }
 
         self.channels.extend(guild.channels.clone());
-        self.guilds
-            .insert(event.guild.id, Arc::new(RwLock::new(guild)));
+        self.guilds.insert(
+            event.guild.id,
+            Arc::new(RwLock::new(guild)),
+        );
     }
 
-    fn update_with_guild_delete(&mut self,
-                                           event: &GuildDeleteEvent)
-                                           -> Option<Arc<RwLock<Guild>>> {
+    fn update_with_guild_delete(&mut self, event: &GuildDeleteEvent) -> Option<Arc<RwLock<Guild>>> {
         // Remove channel entries for the guild if the guild is found.
         self.guilds.remove(&event.guild.id).map(|guild| {
             for channel_id in guild.read().unwrap().channels.keys() {
@@ -305,8 +290,8 @@ impl CacheEventsImpl for super::Cache {
     }
 
     fn update_with_guild_member_remove(&mut self,
-                                                  event: &GuildMemberRemoveEvent)
-                                                  -> Option<Member> {
+                                       event: &GuildMemberRemoveEvent)
+                                       -> Option<Member> {
         self.guilds.get_mut(&event.guild_id).and_then(|guild| {
             let mut guild = guild.write().unwrap();
 
@@ -316,8 +301,8 @@ impl CacheEventsImpl for super::Cache {
     }
 
     fn update_with_guild_member_update(&mut self,
-                                                  event: &GuildMemberUpdateEvent)
-                                                  -> Option<Member> {
+                                       event: &GuildMemberUpdateEvent)
+                                       -> Option<Member> {
         self.update_user_entry(&event.user);
 
         if let Some(guild) = self.guilds.get_mut(&event.guild_id) {
@@ -372,32 +357,24 @@ impl CacheEventsImpl for super::Cache {
 
     fn update_with_guild_role_create(&mut self, event: &GuildRoleCreateEvent) {
         self.guilds.get_mut(&event.guild_id).map(|guild| {
-            guild
-                .write()
-                .unwrap()
-                .roles
-                .insert(event.role.id, event.role.clone())
+            guild.write().unwrap().roles.insert(
+                event.role.id,
+                event.role.clone(),
+            )
         });
     }
 
-    fn update_with_guild_role_delete(&mut self,
-                                                event: &GuildRoleDeleteEvent)
-                                                -> Option<Role> {
-        self.guilds
-            .get_mut(&event.guild_id)
-            .and_then(|guild| guild.write().unwrap().roles.remove(&event.role_id))
+    fn update_with_guild_role_delete(&mut self, event: &GuildRoleDeleteEvent) -> Option<Role> {
+        self.guilds.get_mut(&event.guild_id).and_then(|guild| {
+            guild.write().unwrap().roles.remove(&event.role_id)
+        })
     }
 
-    fn update_with_guild_role_update(&mut self,
-                                                event: &GuildRoleUpdateEvent)
-                                                -> Option<Role> {
+    fn update_with_guild_role_update(&mut self, event: &GuildRoleUpdateEvent) -> Option<Role> {
         self.guilds.get_mut(&event.guild_id).and_then(|guild| {
-            guild
-                .write()
-                .unwrap()
-                .roles
-                .get_mut(&event.role.id)
-                .map(|role| mem::replace(role, event.role.clone()))
+            guild.write().unwrap().roles.get_mut(&event.role.id).map(
+                |role| mem::replace(role, event.role.clone()),
+            )
         })
     }
 
@@ -449,16 +426,19 @@ impl CacheEventsImpl for super::Cache {
                 if event.presence.status == OnlineStatus::Offline {
                     guild.presences.remove(&event.presence.user_id);
                 } else {
-                    guild
-                        .presences
-                        .insert(event.presence.user_id, event.presence.clone());
+                    guild.presences.insert(
+                        event.presence.user_id,
+                        event.presence.clone(),
+                    );
                 }
             }
         } else if event.presence.status == OnlineStatus::Offline {
             self.presences.remove(&event.presence.user_id);
         } else {
-            self.presences
-                .insert(event.presence.user_id, event.presence.clone());
+            self.presences.insert(
+                event.presence.user_id,
+                event.presence.clone(),
+            );
         }
     }
 
@@ -516,9 +496,10 @@ impl CacheEventsImpl for super::Cache {
                         }
                     }
 
-                    guild
-                        .voice_states
-                        .insert(event.voice_state.user_id, event.voice_state.clone());
+                    guild.voice_states.insert(
+                        event.voice_state.user_id,
+                        event.voice_state.clone(),
+                    );
                 } else {
                     // Remove the user from the voice state list
                     guild.voice_states.remove(&event.voice_state.user_id);
@@ -528,4 +509,4 @@ impl CacheEventsImpl for super::Cache {
             return;
         }
     }
-} 
+}

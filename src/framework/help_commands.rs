@@ -117,15 +117,19 @@ pub fn with_embeds(_: &mut Context,
 
                         if let Some(ref usage) = command.usage {
                             embed = embed.field(|f| {
-                                f.name("Usage")
-                                    .value(&format!("`{} {}`", command_name, usage))
+                                f.name("Usage").value(
+                                    &format!("`{} {}`", command_name, usage),
+                                )
                             });
                         }
 
                         if let Some(ref example) = command.example {
                             embed = embed.field(|f| {
-                                f.name("Sample usage")
-                                    .value(&format!("`{} {}`", command_name, example))
+                                f.name("Sample usage").value(&format!(
+                                    "`{} {}`",
+                                    command_name,
+                                    example
+                                ))
                             });
                         }
 
@@ -295,8 +299,10 @@ pub fn plain(_: &mut Context,
             }
         }
 
-        let _ = msg.channel_id
-            .say(&format!("**Error**: Command `{}` not found.", name));
+        let _ = msg.channel_id.say(&format!(
+            "**Error**: Command `{}` not found.",
+            name
+        ));
 
         return Ok(());
     }

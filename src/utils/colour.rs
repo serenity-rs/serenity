@@ -229,7 +229,7 @@ impl From<u64> for Colour {
 
 impl From<(u8, u8, u8)> for Colour {
     /// Constructs a Colour from rgb.
-    fn from((r, g,b): (u8, u8, u8)) -> Self { Colour::from_rgb(r, g, b) }
+    fn from((r, g, b): (u8, u8, u8)) -> Self { Colour::from_rgb(r, g, b) }
 }
 
 colour! {
