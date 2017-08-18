@@ -12,22 +12,22 @@ use websocket::stream::sync::AsTcpStream;
 use websocket::sync::client::{Client, ClientBuilder};
 use websocket::sync::stream::{TcpStream, TlsStream};
 use websocket::WebSocketError;
-use constants::{self, close_codes, OpCode};
-use internal::prelude::*;
-use internal::ws_impl::SenderExt;
-use model::event::{Event, GatewayEvent};
-use model::{Game, GuildId, OnlineStatus};
+use ::constants::{self, OpCode, close_codes};
+use ::internal::prelude::*;
+use ::internal::ws_impl::SenderExt;
+use ::model::event::{Event, GatewayEvent};
+use ::model::{Game, GuildId, OnlineStatus};
 
-#[cfg(feature = "voice")]
+#[cfg(feature="voice")]
 use std::sync::mpsc::{self, Receiver as MpscReceiver};
-#[cfg(feature = "cache")]
-use client::CACHE;
-#[cfg(feature = "voice")]
-use voice::Manager as VoiceManager;
-#[cfg(feature = "voice")]
-use http;
-#[cfg(feature = "cache")]
-use utils;
+#[cfg(feature="cache")]
+use ::client::CACHE;
+#[cfg(feature="voice")]
+use ::ext::voice::Manager as VoiceManager;
+#[cfg(feature="voice")]
+use ::http;
+#[cfg(feature="cache")]
+use ::utils;
 
 pub type WsClient = Client<TlsStream<TcpStream>>;
 
@@ -93,9 +93,9 @@ pub struct Shard {
     ws_url: Arc<Mutex<String>>,
     /// The voice connections that this Shard is responsible for. The Shard will
     /// update the voice connections' states.
-    #[cfg(feature = "voice")]
+    #[cfg(feature="voice")]
     pub manager: VoiceManager,
-    #[cfg(feature = "voice")]
+    #[cfg(feature="voice")]
     manager_rx: MpscReceiver<Value>,
 }
 
@@ -200,7 +200,9 @@ impl Shard {
     /// #
     /// assert_eq!(shard.shard_info(), [1, 2]);
     /// ```
-    pub fn shard_info(&self) -> [u64; 2] { self.shard_info }
+    pub fn shard_info(&self) -> [u64; 2] {
+        self.shard_info
+    }
 
     /// Sets whether the current user is afk. This helps Discord determine where
     /// to send notifications.
@@ -209,7 +211,7 @@ impl Shard {
     pub fn set_afk(&mut self, afk: bool) {
         self.current_presence.2 = afk;
 
-        self.update_presence();
+        self.update_presence(false, None);
     }
 
     /// Sets the user's current game, if any.
@@ -232,10 +234,10 @@ impl Shard {
     ///
     /// shard.set_game(Some(Game::playing("Heroes of the Storm")));
     /// ```
-    pub fn set_game(&mut self, game: Option<Game>) {
+    pub fn set_game(&mut self, game: Option<Game>, streaming: bool, url: Option<&str>) {
         self.current_presence.0 = game;
 
-        self.update_presence();
+        self.update_presence(streaming, url);
     }
 
     /// Sets the user's current online status.
@@ -271,7 +273,7 @@ impl Shard {
             other => other,
         };
 
-        self.update_presence();
+        self.update_presence(false, None);
     }
 
     /// Sets the user's full presence information.
@@ -294,17 +296,19 @@ impl Shard {
     /// #
     /// use serenity::model::{Game, OnlineStatus};
     ///
-    /// shard.set_presence(Some(Game::playing("Heroes of the Storm")), OnlineStatus::Online,
-    /// false);
+    /// shard.set_presence(Some(Game::playing("Heroes of the Storm")), OnlineStatus::Online, false);
     /// ```
-    pub fn set_presence(&mut self, game: Option<Game>, mut status: OnlineStatus, afk: bool) {
+    pub fn set_presence(&mut self,
+                        game: Option<Game>,
+                        mut status: OnlineStatus,
+                        afk: bool, streaming: bool, url: Option<&str>) {
         if status == OnlineStatus::Offline {
             status = OnlineStatus::Invisible;
         }
 
         self.current_presence = (game, status, afk);
 
-        self.update_presence();
+        self.update_presence(streaming, url);
     }
 
     /// Handles an event from the gateway over the receiver, requiring the
@@ -347,9 +351,8 @@ impl Shard {
 
                         self.stage = ConnectionStage::Connected;
                     },
-                    #[cfg_attr(rustfmt, rustfmt_skip)]
                     ref _other => {
-                        #[cfg(feature = "voice")]
+                        #[cfg(feature="voice")]
                         {
                             self.voice_dispatch(_other);
                         }
@@ -365,22 +368,18 @@ impl Shard {
 
                 // Received seq is off -- attempt to resume.
                 if s > self.seq + 1 {
-                    info!(
-                        "[Shard {:?}] Received off sequence (them: {}; us: {}); resuming",
-                        self.shard_info,
-                        s,
-                        self.seq
-                    );
+                    info!("[Shard {:?}] Received off sequence (them: {}; us: {}); resuming",
+                          self.shard_info,
+                          s,
+                          self.seq);
 
                     if self.stage == ConnectionStage::Handshake {
                         self.stage = ConnectionStage::Identifying;
 
                         self.identify()?;
                     } else {
-                        warn!(
-                            "[Shard {:?}] Heartbeat during non-Handshake; auto-reconnecting",
-                            self.shard_info
-                        );
+                        warn!("[Shard {:?}] Heartbeat during non-Handshake; auto-reconnecting",
+                              self.shard_info);
 
                         return self.autoreconnect().and(Ok(None));
                     }
@@ -424,7 +423,9 @@ impl Shard {
 
                 Ok(None)
             },
-            Ok(GatewayEvent::Reconnect) => self.reconnect().and(Ok(None)),
+            Ok(GatewayEvent::Reconnect) => {
+                self.reconnect().and(Ok(None))
+            },
             Err(Error::Gateway(GatewayError::Closed(data))) => {
                 let num = data.as_ref().map(|d| d.status_code);
                 let reason = data.map(|d| d.reason);
@@ -485,8 +486,7 @@ impl Shard {
                 }
 
                 let resume = num.map(|x| {
-                    x != 1000 && x != close_codes::AUTHENTICATION_FAILED &&
-                    self.session_id.is_some()
+                    x != 1000 && x != close_codes::AUTHENTICATION_FAILED && self.session_id.is_some()
                 }).unwrap_or(false);
 
                 if resume {
@@ -519,28 +519,25 @@ impl Shard {
     /// message handled through [`Client::on_message`].
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
-    /// struct Handler;
+    /// # use serenity::client::Client;
+    /// #
+    /// # let mut client = Client::new("hello source code viewer <3");
+    /// #
+    /// client.on_message(|ctx, msg| {
+    ///     if msg.content == "~ping" {
+    ///         if let Some(latency) = ctx.shard.lock().unwrap().latency() {
+    ///             let s = format!("{}.{}s", latency.as_secs(), latency.subsec_nanos());
     ///
-    /// impl EventHandler for Handler {
-    ///     fn on_message(&self, ctx: Context, msg: Message) {
-    ///         if msg.content == "~ping" {
-    ///             if let Some(latency) = ctx.shard.lock().latency() {
-    ///                 let s = format!("{}.{}s", latency.as_secs(), latency.subsec_nanos());
-    ///
-    ///                 let _ = msg.channel_id.say(&s);
-    ///             } else {
-    ///                 let _ = msg.channel_id.say("N/A");
-    ///             }
+    ///             let _ = msg.channel_id.say(&s);
+    ///         } else {
+    ///             let _ = msg.channel_id.say("N/A");
     ///         }
     ///     }
-    /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// });
     /// ```
     ///
     /// [`Client`]: ../struct.Client.html
-    /// [`EventHandler::on_message`]: ../event_handler/trait.EventHandler.html#method.on_message
+    /// [`Client::on_message`]: ../struct.Client.html#method.on_message
     // Shamelessly stolen from brayzure's commit in eris:
     // <https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6>
     pub fn latency(&self) -> Option<StdDuration> {
@@ -555,12 +552,10 @@ impl Shard {
     /// connection.
     pub fn shutdown_clean(&mut self) -> Result<()> {
         {
-            let data = CloseData {
+            let message = OwnedMessage::Close(Some(CloseData {
                 status_code: 1000,
                 reason: String::new(),
-            };
-
-            let message = OwnedMessage::Close(Some(data));
+            }));
 
             self.client.send_message(&message)?;
         }
@@ -636,8 +631,7 @@ impl Shard {
     /// shard.chunk_guilds(&guild_ids, Some(20), Some("do"));
     /// ```
     ///
-    /// [`Event::GuildMembersChunk`]:
-    /// ../../model/event/enum.Event.html#variant.GuildMembersChunk
+    /// [`Event::GuildMembersChunk`]: ../../model/event/enum.Event.html#variant.GuildMembersChunk
     /// [`Guild`]: ../../model/struct.Guild.html
     /// [`Member`]: ../../model/struct.Member.html
     pub fn chunk_guilds(&mut self, guild_ids: &[GuildId], limit: Option<u16>, query: Option<&str>) {
@@ -680,22 +674,19 @@ impl Shard {
     ///
     /// [`Cache`]: ../ext/cache/struct.Cache.html
     /// [`Guild`]: ../model/struct.Guild.html
-    #[cfg(feature = "cache")]
+    #[cfg(feature="cache")]
     pub fn guilds_handled(&self) -> u16 {
         let cache = CACHE.read().unwrap();
 
         let (shard_id, shard_count) = (self.shard_info[0], self.shard_info[1]);
 
-        cache
-            .guilds
+        cache.guilds
             .keys()
-            .filter(|guild_id| {
-                utils::shard_id(guild_id.0, shard_count) == shard_id
-            })
+            .filter(|guild_id| utils::shard_id(guild_id.0, shard_count) == shard_id)
             .count() as u16
     }
 
-    #[cfg(feature = "voice")]
+    #[cfg(feature="voice")]
     fn voice_dispatch(&mut self, event: &Event) {
         if let Event::VoiceStateUpdate(ref update) = *event {
             if let Some(guild_id) = update.guild_id {
@@ -714,7 +705,7 @@ impl Shard {
         }
     }
 
-    #[cfg(feature = "voice")]
+    #[cfg(feature="voice")]
     pub(crate) fn cycle_voice_recv(&mut self) {
         if let Ok(v) = self.manager_rx.try_recv() {
             if let Err(why) = self.client.send_json(&v) {
@@ -740,9 +731,10 @@ impl Shard {
             },
             Err(why) => {
                 match why {
-                    Error::WebSocket(WebSocketError::IoError(err)) => if err.raw_os_error() !=
-                                                                         Some(32) {
-                        debug!("[Shard {:?}] Err w/ heartbeating: {:?}", self.shard_info, err);
+                    Error::WebSocket(WebSocketError::IoError(err)) => {
+                        if err.raw_os_error() != Some(32) {
+                            debug!("[Shard {:?}] Err w/ heartbeating: {:?}", self.shard_info, err);
+                        }
                     },
                     other => {
                         warn!("[Shard {:?}] Other err w/ keepalive: {:?}", self.shard_info, other);
@@ -781,7 +773,7 @@ impl Shard {
                       why);
 
                 why
-            });
+            })
         }
 
         // Otherwise, we're good to heartbeat.
@@ -814,11 +806,15 @@ impl Shard {
 
     /// Retrieves the `heartbeat_interval`.
     #[inline]
-    pub(crate) fn heartbeat_interval(&self) -> Option<u64> { self.heartbeat_interval }
+    pub(crate) fn heartbeat_interval(&self) -> Option<u64> {
+        self.heartbeat_interval
+    }
 
     /// Retrieves the value of when the last heartbeat ack was received.
     #[inline]
-    pub(crate) fn last_heartbeat_ack(&self) -> Option<Instant> { self.heartbeat_instants.1 }
+    pub(crate) fn last_heartbeat_ack(&self) -> Option<Instant> {
+        self.heartbeat_instants.1
+    }
 
     fn reconnect(&mut self) -> Result<()> {
         info!("[Shard {:?}] Attempting to reconnect", self.shard_info);
@@ -894,11 +890,12 @@ impl Shard {
         self.seq = 0;
     }
 
-    fn update_presence(&mut self) {
+    fn update_presence(&mut self, streaming: bool, url: Option<&str>) {
         let (ref game, status, afk) = self.current_presence;
         let now = Utc::now().timestamp() as u64;
-
-        let msg = json!({
+		let msg = match streaming {
+			false => {
+			json!({
             "op": OpCode::StatusUpdate.num(),
             "d": {
                 "afk": afk,
@@ -906,15 +903,34 @@ impl Shard {
                 "status": status.name(),
                 "game": game.as_ref().map(|x| json!({
                     "name": x.name,
+					"type": 0
                 })),
             },
-        });
+        })
+			},
+			true => {
+			json!({
+            "op": OpCode::StatusUpdate.num(),
+            "d": {
+                "afk": afk,
+                "since": now,
+                "status": status.name(),
+                "game": game.as_ref().map(|x| json!({
+                    "name": x.name,
+					"type": 1,
+					"url": url.unwrap()
+                })),
+            },
+        })
+			},
+		};
+
 
         if let Err(why) = self.client.send_json(&msg) {
             warn!("[Shard {:?}] Err sending presence update: {:?}", self.shard_info, why);
         }
 
-        #[cfg(feature = "cache")]
+        #[cfg(feature="cache")]
         {
             let mut cache = CACHE.write().unwrap();
             let current_user_id = cache.user.id;
@@ -936,8 +952,7 @@ fn connect(base_url: &str) -> Result<WsClient> {
 
 fn set_client_timeout(client: &mut WsClient) -> Result<()> {
     let stream = client.stream_ref().as_tcp();
-    stream
-        .set_read_timeout(Some(StdDuration::from_millis(100)))?;
+    stream.set_read_timeout(Some(StdDuration::from_millis(100)))?;
     stream.set_write_timeout(Some(StdDuration::from_secs(5)))?;
 
     Ok(())
