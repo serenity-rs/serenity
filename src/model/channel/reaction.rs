@@ -194,9 +194,7 @@ impl<'de> Deserialize<'de> for ReactionType {
             }
         }
 
-        const FIELDS: &'static [&'static str] = &["id", "name"];
-
-        deserializer.deserialize_struct("ReactionType", FIELDS, ReactionTypeVisitor)
+        deserializer.deserialize_map(ReactionTypeVisitor)
     }
 }
 
