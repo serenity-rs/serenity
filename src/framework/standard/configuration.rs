@@ -22,11 +22,11 @@ use model::{GuildId, Message, UserId};
 /// impl EventHandler for Handler {}
 /// use serenity::Client;
 /// use std::env;
-/// use serenity::framework::BuiltinFramework;
+/// use serenity::framework::StandardFramework;
 ///
 /// let mut client = Client::new(&env::var("DISCORD_BOT_TOKEN").unwrap(), Handler);
 ///
-/// client.with_framework(BuiltinFramework::new()
+/// client.with_framework(StandardFramework::new()
 ///     .configure(|c| c.on_mention(true).prefix("~")));
 /// ```
 ///
@@ -112,9 +112,9 @@ impl Configuration {
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler);
     /// use serenity::model::GuildId;
-    /// use serenity::framework::BuiltinFramework;
+    /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(BuiltinFramework::new().configure(|c| c
+    /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .blocked_guilds(vec![GuildId(7), GuildId(77)].into_iter().collect())));
     /// ```
     pub fn blocked_guilds(mut self, guilds: HashSet<GuildId>) -> Self {
@@ -137,9 +137,9 @@ impl Configuration {
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler);
     /// use serenity::model::UserId;
-    /// use serenity::framework::BuiltinFramework;
+    /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(BuiltinFramework::new().configure(|c| c
+    /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .blocked_users(vec![UserId(7), UserId(77)].into_iter().collect())));
     /// ```
     pub fn blocked_users(mut self, users: HashSet<UserId>) -> Self {
@@ -174,11 +174,11 @@ impl Configuration {
     /// #
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler);
-    /// use serenity::framework::BuiltinFramework;
+    /// use serenity::framework::StandardFramework;
     ///
     /// let disabled = vec!["ping"].into_iter().map(|x| x.to_owned()).collect();
     ///
-    /// client.with_framework(BuiltinFramework::new()
+    /// client.with_framework(StandardFramework::new()
     ///     .command("ping", |c| c.exec_str("pong!"))
     ///     .configure(|c| c.disabled_commands(disabled)));
     /// ```
@@ -204,9 +204,9 @@ impl Configuration {
     /// #
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler);
-    /// use serenity::framework::BuiltinFramework;
+    /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(BuiltinFramework::new()
+    /// client.with_framework(StandardFramework::new()
     ///     .command("ping", |c| c.exec_str("Pong!"))
     ///     .configure(|c| c.dynamic_prefix(|_, msg| {
     ///         Some(if msg.channel_id.0 % 5 == 0 {
@@ -290,9 +290,9 @@ impl Configuration {
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler);
     /// use serenity::model::UserId;
-    /// use serenity::framework::BuiltinFramework;
+    /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(BuiltinFramework::new().configure(|c| c
+    /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .owners(vec![UserId(7), UserId(77)].into_iter().collect())));
     /// ```
     ///
@@ -306,13 +306,13 @@ impl Configuration {
     /// # let mut client = Client::new("token", Handler);
     /// use serenity::model::UserId;
     /// use std::collections::HashSet;
-    /// use serenity::framework::BuiltinFramework;
+    /// use serenity::framework::StandardFramework;
     ///
     /// let mut set = HashSet::new();
     /// set.insert(UserId(7));
     /// set.insert(UserId(77));
     ///
-    /// client.with_framework(BuiltinFramework::new().configure(|c| c.owners(set)));
+    /// client.with_framework(StandardFramework::new().configure(|c| c.owners(set)));
     /// ```
     pub fn owners(mut self, user_ids: HashSet<UserId>) -> Self {
         self.owners = user_ids;
@@ -334,9 +334,9 @@ impl Configuration {
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler);
     /// #
-    /// use serenity::framework::BuiltinFramework;
+    /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(BuiltinFramework::new().configure(|c| c
+    /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .prefix("!")));
     /// ```
     pub fn prefix(mut self, prefix: &str) -> Self {
@@ -359,9 +359,9 @@ impl Configuration {
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler);
     /// #
-    /// use serenity::framework::BuiltinFramework;
+    /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(BuiltinFramework::new().configure(|c| c
+    /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .prefixes(vec!["!", ">", "+"])));
     /// ```
     pub fn prefixes(mut self, prefixes: Vec<&str>) -> Self {
@@ -383,9 +383,9 @@ impl Configuration {
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler);
     /// #
-    /// use serenity::framework::BuiltinFramework;
+    /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(BuiltinFramework::new().configure(|c| c
+    /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .delimiter(", ")));
     /// ```
     pub fn delimiter(mut self, delimiter: &str) -> Self {
@@ -408,9 +408,9 @@ impl Configuration {
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler);
     /// #
-    /// use serenity::framework::BuiltinFramework;
+    /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(BuiltinFramework::new().configure(|c| c
+    /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .delimiters(vec![", ", " "])));
     /// ```
     pub fn delimiters(mut self, delimiters: Vec<&str>) -> Self {

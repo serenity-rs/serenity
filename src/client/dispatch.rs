@@ -46,12 +46,12 @@ fn context(conn: &Arc<Mutex<Shard>>, data: &Arc<Mutex<ShareMap>>) -> Context {
     Context::new(conn.clone(), data.clone())
 }
 
-#[cfg(feature = "builtin_framework")]
+#[cfg(feature = "standard_framework")]
 macro_rules! helper {
     ($enabled:block else $disabled:block) => { $enabled }
 }
 
-#[cfg(not(feature = "builtin_framework"))]
+#[cfg(not(feature = "standard_framework"))]
 macro_rules! helper {
     ($enabled:block else $disabled:block) => { $disabled }
 }

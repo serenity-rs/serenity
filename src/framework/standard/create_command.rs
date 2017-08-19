@@ -38,14 +38,14 @@ impl CreateCommand {
     /// # struct Handler;
     /// # impl EventHandler for Handler {}
     /// use serenity::client::{Client, Context};
-    /// use serenity::framework::{Command, BuiltinFramework};
+    /// use serenity::framework::standard::{Command, StandardFramework};
     /// use serenity::model::Message;
     /// use std::env;
     /// use std::sync::Arc;
     ///
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
     ///
-    /// client.with_framework(BuiltinFramework::new()
+    /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
     ///     .command("ping", |c| c
     ///         .check(owner_check)

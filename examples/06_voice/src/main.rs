@@ -10,10 +10,11 @@
 #[macro_use]
 extern crate serenity;
 
-use serenity::prelude::*;
 use serenity::client::CACHE;
-use serenity::voice;
+use serenity::framework::StandardFramework;
 use serenity::model::*;
+use serenity::prelude::*;
+use serenity::voice;
 use serenity::Result as SerenityResult;
 use std::env;
 
@@ -31,7 +32,7 @@ fn main() {
         .expect("Expected a token in the environment");
     let mut client = Client::new(&token, Handler);
 
-    client.with_framework(|f| f
+    client.with_framework(StandardFramework::new()
         .configure(|c| c
             .prefix("~")
             .on_mention(true))
@@ -43,7 +44,7 @@ fn main() {
         .on("ping", ping)
         .on("undeafen", undeafen)
         .on("unmute", unmute));
-        
+
     let _ = client.start().map_err(|why| println!("Client ended: {:?}", why));
 }
 

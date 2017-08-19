@@ -15,10 +15,11 @@ extern crate typemap;
 
 use serenity::prelude::*;
 use serenity::model::*;
-use serenity::framework::{BuiltinFramework, DispatchError, help_commands};
+use serenity::framework::standard::{Command, DispatchError, StandardFramework, help_commands};
 use std::collections::HashMap;
 use std::env;
 use std::fmt::Write;
+use std::sync::Arc;
 use typemap::Key;
 
 struct CommandCounter;
@@ -60,7 +61,7 @@ fn main() {
         // Refer to the documentation for
         // `serenity::ext::framework::Configuration` for all available
         // configurations.
-        BuiltinFramework::new()
+        StandardFramework::new()
         .configure(|c| c
             .allow_whitespace(true)
             .on_mention(true)
@@ -82,7 +83,7 @@ fn main() {
             // value of 0.
             let mut data = ctx.data.lock();
             let counter = data.get_mut::<CommandCounter>().unwrap();
-            let entry = counter.entry(command_name.clone()).or_insert(0);
+            let entry = counter.entry(command_name.to_owned()).or_insert(0);
             *entry += 1;
 
             true // if `before` returns false, command processing doesn't happen.
@@ -165,7 +166,7 @@ command!(commands(ctx, msg, _args) {
 // In this case, this command checks to ensure you are the owner of the message
 // in order for the command to be executed. If the check fails, the command is
 // not called.
-fn owner_check(_: &mut Context, msg: &Message) -> bool {
+fn owner_check(_: &mut Context, msg: &Message, _: &[String], _: &Arc<Command>) -> bool {
     // Replace 7 with your ID
     msg.author.id == 7
 }

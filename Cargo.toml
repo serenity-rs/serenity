@@ -91,10 +91,10 @@ default = [
     "cache",
     "client",
     "framework",
-    "builtin_framework",
     "gateway",
     "model",
     "http",
+    "standard_framework",
     "utils"
 ]
 builder = []
@@ -102,9 +102,9 @@ cache = ["lazy_static"]
 client = ["gateway", "lazy_static", "http", "typemap"]
 extras = []
 framework = ["client", "model", "utils", "regex", "itertools"]
-builtin_framework = ["framework"]
 gateway = ["http", "websocket", "tokio-core", "futures"]
 http = ["hyper", "hyper-native-tls", "lazy_static", "multipart", "native-tls"]
 model = ["builder", "http"]
+standard_framework = ["framework"]
 utils = []
 voice = ["byteorder", "gateway", "opus", "sodiumoxide"]

@@ -15,7 +15,7 @@ extern crate serenity;
 mod commands;
 
 use serenity::prelude::*;
-use serenity::framework::BuiltinFramework;
+use serenity::framework::StandardFramework;
 use std::env;
 
 struct Handler; impl EventHandler for Handler {}
@@ -23,7 +23,7 @@ struct Handler; impl EventHandler for Handler {}
 fn main() {
     let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
 
-    client.with_framework(BuiltinFramework::new()
+    client.with_framework(StandardFramework::new()
         .configure(|c| c.prefix("~"))
         .command("ping", |c| c.exec(commands::meta::ping))
         .command("latency", |c| c.exec(commands::meta::latency))

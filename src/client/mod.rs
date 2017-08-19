@@ -270,7 +270,7 @@ impl<H: EventHandler + 'static> Client<H> {
     /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
     /// #
-    /// use serenity::framework::BuiltinFramework;
+    /// use serenity::framework::StandardFramework;
     ///
     /// struct Handler;
     ///
@@ -280,7 +280,7 @@ impl<H: EventHandler + 'static> Client<H> {
     /// use std::env;
     ///
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
-    /// client.with_framework(BuiltinFramework::new()
+    /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
     ///     .command("ping", |c| c.exec_str("Pong!")));
     /// # Ok(())
@@ -698,7 +698,7 @@ impl<H: EventHandler + 'static> Client<H> {
         // Update the framework's current user if the feature is enabled.
         //
         // This also acts as a form of check to ensure the token is correct.
-        #[cfg(all(feature = "builtin_framework", feature = "framework"))]
+        #[cfg(all(feature = "standard_framework", feature = "framework"))]
         {
             let user = http::get_current_user()?;
 
