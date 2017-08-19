@@ -280,7 +280,7 @@ impl Member {
     pub fn permissions(&self) -> Result<Permissions> {
         let guild = match self.guild_id.find() {
             Some(guild) => guild,
-            None => return Err(From::from(ModelError::GuildNotFound)),  
+            None => return Err(From::from(ModelError::GuildNotFound)),
         };
 
         let guild = guild.read().unwrap();

@@ -89,7 +89,9 @@ lazy_static! {
     ///
     /// [`RateLimit`]: struct.RateLimit.html
     /// [`Route`]: enum.Route.html
-    pub static ref ROUTES: Arc<Mutex<HashMap<Route, Arc<Mutex<RateLimit>>>>> = Arc::new(Mutex::new(HashMap::default()));
+    pub static ref ROUTES: Arc<Mutex<HashMap<Route, Arc<Mutex<RateLimit>>>>> = {
+        Arc::new(Mutex::new(HashMap::default()))
+    };
 }
 
 /// A representation of all routes registered within the library. These are safe

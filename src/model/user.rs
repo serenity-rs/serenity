@@ -172,7 +172,8 @@ impl CurrentUser {
     ///     },
     /// };
     ///
-    /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize?client_id=249608697955745802&scope=bot");
+    /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize? \
+    ///                  client_id=249608697955745802&scope=bot");
     /// ```
     ///
     /// Get the invite url with some basic permissions set:
