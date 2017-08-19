@@ -84,7 +84,7 @@
 //! [docs]: https://discordapp.com/developers/docs/intro
 //! [examples]: https://github.com/zeyla/serenity/tree/master/examples
 //! [gateway docs]: gateway/index.html
-#![doc(html_root_url = "https://docs.rs/serenity/0.3.0")]
+#![doc(html_root_url = "https://docs.rs/serenity/*")]
 #![allow(doc_markdown, inline_always, unknown_lints)]
 #![warn(enum_glob_use, if_not_else)]
 
