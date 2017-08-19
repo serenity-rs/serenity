@@ -850,7 +850,7 @@ impl BuiltinFramework {
     /// ```
     ///
     pub fn before<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, &String) -> bool + 'static {
+        where F: Fn(&mut Context, &Message, &str) -> bool + 'static {
         self.before = Some(Arc::new(f));
 
         self
@@ -881,7 +881,7 @@ impl BuiltinFramework {
     ///     }));
     /// ```
     pub fn after<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, &String, Result<(), String>) + 'static {
+        where F: Fn(&mut Context, &Message, &str, Result<(), String>) + 'static {
         self.after = Some(Arc::new(f));
 
         self

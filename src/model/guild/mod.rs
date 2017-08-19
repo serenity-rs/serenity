@@ -130,10 +130,7 @@ impl Guild {
         let uid = CACHE.read().unwrap().user.id;
         
         for (cid, channel) in &self.channels {
-            if {
-                let perms = self.permissions_for(*cid, uid);
-                perms.read_messages()
-            } {
+            if self.permissions_for(*cid, uid).read_messages() {
                 return Some(channel.read().unwrap().clone());
             }
         }
@@ -147,12 +144,9 @@ impl Guild {
     pub fn default_channel_guaranteed(&self) -> Option<GuildChannel> {
         for (cid, channel) in &self.channels {
             for memid in self.members.keys() {
-                if {
-                    let perms = self.permissions_for(*cid, *memid);
-                    perms.read_messages()
-                } {
-                    return Some(channel.read().unwrap().clone());
-                }
+                if self.permissions_for(*cid, *memid).read_messages() {
+                return Some(channel.read().unwrap().clone());
+            }
             }
         }
 

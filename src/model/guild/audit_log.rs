@@ -160,7 +160,7 @@ fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Err
         fn visit_i32<E: de::Error>(self, value: i32) -> Result<Action, E> {
             Ok(match value {
                 1 => Action::GuildUpdate,
-                10...13 => Action::Channel(unsafe { transmute(value) }),
+                10...12 => Action::Channel(unsafe { transmute(value) }),
                 13...15 => Action::ChannelOverwrite(unsafe { transmute(value) }),
                 20...25 => Action::Member(unsafe { transmute(value) }),
                 30...32 => Action::Role(unsafe { transmute(value) }),

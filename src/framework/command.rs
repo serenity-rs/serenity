@@ -9,8 +9,8 @@ pub type Exec = Fn(&mut Context, &Message, Vec<String>, String) -> Result<(), St
 pub type Help = Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, &[String])
                    -> Result<(), String>
                     + 'static;
-pub type BeforeHook = Fn(&mut Context, &Message, &String) -> bool + 'static;
-pub type AfterHook = Fn(&mut Context, &Message, &String, Result<(), String>) + 'static;
+pub type BeforeHook = Fn(&mut Context, &Message, &str) -> bool + 'static;
+pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), String>) + 'static;
 pub(crate) type InternalCommand = Arc<Command>;
 pub type PrefixCheck = Fn(&mut Context, &Message) -> Option<String> + 'static;
 
