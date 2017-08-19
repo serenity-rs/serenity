@@ -1,3 +1,4 @@
+#![allow(unreadable_literal)]
 #![cfg(feature = "utils")]
 
 #[macro_use]

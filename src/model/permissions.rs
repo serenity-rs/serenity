@@ -93,7 +93,7 @@ use std::result::Result as StdResult;
 /// [Use External Emojis]: constant.USE_EXTERNAL_EMOJIS.html
 /// [Use VAD]: constant.USE_VAD.html
 pub const PRESET_GENERAL: Permissions = Permissions {
-    bits: 0b01111100000000000000000010111111,
+    bits: 0b0111_1100_0000_0000_0000_0000_1011_1111,
 };
 
 /// Returns a set of text-only permissions with the original `@everyone`
@@ -126,7 +126,7 @@ pub const PRESET_GENERAL: Permissions = Permissions {
 /// [Send TTS Messages]: constant.SEND_TTS_MESSAGES.html
 /// [Use External Emojis]: constant.USE_EXTERNAL_EMOJIS.html
 pub const PRESET_TEXT: Permissions = Permissions {
-    bits: 0b00000000000001111111110001000000,
+    bits: 0b0000_0000_0000_0111_1111_1100_0100_0000,
 };
 
 /// Returns a set of voice-only permissions with the original `@everyone`
@@ -143,7 +143,7 @@ pub const PRESET_TEXT: Permissions = Permissions {
 /// [Speak]: constant.SPEAK.html
 /// [Use VAD]: constant.USE_VAD.html
 pub const PRESET_VOICE: Permissions = Permissions {
-    bits: 0b00000011111100000000000000000000,
+    bits: 0b0000_0011_1111_0000_0000_0000_0000_0000,
 };
 
 bitflags! {
@@ -160,27 +160,27 @@ bitflags! {
         /// Allows for the creation of [`RichInvite`]s.
         ///
         /// [`RichInvite`]: ../struct.RichInvite.html
-        const CREATE_INVITE = 0b00000000000000000000000000000001;
+        const CREATE_INVITE = 0b0000_0000_0000_0000_0000_0000_0000_0001;
         /// Allows for the kicking of guild [member]s.
         ///
         /// [member]: ../struct.Member.html
-        const KICK_MEMBERS = 0b00000000000000000000000000000010;
+        const KICK_MEMBERS = 0b0000_0000_0000_0000_0000_0000_0000_0010;
         /// Allows the banning of guild [member]s.
         ///
         /// [member]: ../struct.Member.html
-        const BAN_MEMBERS = 0b00000000000000000000000000000100;
+        const BAN_MEMBERS = 0b0000_0000_0000_0000_0000_0000_0000_0100;
         /// Allows all permissions, bypassing channel [permission overwrite]s.
         ///
         /// [permission overwrite]: ../struct.PermissionOverwrite.html
-        const ADMINISTRATOR = 0b00000000000000000000000000001000;
+        const ADMINISTRATOR = 0b0000_0000_0000_0000_0000_0000_0000_1000;
         /// Allows management and editing of guild [channel]s.
         ///
         /// [channel]: ../struct.GuildChannel.html
-        const MANAGE_CHANNELS = 0b00000000000000000000000000010000;
+        const MANAGE_CHANNELS = 0b0000_0000_0000_0000_0000_0000_0001_0000;
         /// Allows management and editing of the [guild].
         ///
         /// [guild]: ../struct.Guild.html
-        const MANAGE_GUILD = 0b00000000000000000000000000100000;
+        const MANAGE_GUILD = 0b0000_0000_0000_0000_0000_0000_0010_0000;
         /// [`Member`]s with this permission can add new [`Reaction`]s to a
         /// [`Message`]. Members can still react using reactions already added
         /// to messages without this permission.
@@ -188,68 +188,68 @@ bitflags! {
         /// [`Member`]: ../struct.Member.html
         /// [`Message`]: ../struct.Message.html
         /// [`Reaction`]: ../struct.Reaction.html
-        const ADD_REACTIONS = 0b00000000000000000000000001000000;
+        const ADD_REACTIONS = 0b0000_0000_0000_0000_0000_0000_0100_0000;
         /// Allows reading messages in a guild channel. If a user does not have
         /// this permission, then they will not be able to see the channel.
-        const READ_MESSAGES = 0b00000000000000000000010000000000;
+        const READ_MESSAGES = 0b0000_0000_0000_0000_0000_0100_0000_0000;
         /// Allows sending messages in a guild channel.
-        const SEND_MESSAGES = 0b00000000000000000000100000000000;
+        const SEND_MESSAGES = 0b0000_0000_0000_0000_0000_1000_0000_0000;
         /// Allows the sending of text-to-speech messages in a channel.
-        const SEND_TTS_MESSAGES = 0b00000000000000000001000000000000;
+        const SEND_TTS_MESSAGES = 0b0000_0000_0000_0000_0001_0000_0000_0000;
         /// Allows the deleting of other messages in a guild channel.
         ///
         /// **Note**: This does not allow the editing of other messages.
-        const MANAGE_MESSAGES = 0b00000000000000000010000000000000;
+        const MANAGE_MESSAGES = 0b0000_0000_0000_0000_0010_0000_0000_0000;
         /// Allows links from this user - or users of this role - to be
         /// embedded, with potential data such as a thumbnail, description, and
         /// page name.
-        const EMBED_LINKS = 0b00000000000000000100000000000000;
+        const EMBED_LINKS = 0b0000_0000_0000_0000_0100_0000_0000_0000;
         /// Allows uploading of files.
-        const ATTACH_FILES = 0b00000000000000001000000000000000;
+        const ATTACH_FILES = 0b0000_0000_0000_0000_1000_0000_0000_0000;
         /// Allows the reading of a channel's message history.
-        const READ_MESSAGE_HISTORY = 0b00000000000000010000000000000000;
+        const READ_MESSAGE_HISTORY = 0b0000_0000_0000_0001_0000_0000_0000_0000;
         /// Allows the usage of the `@everyone` mention, which will notify all
         /// users in a channel. The `@here` mention will also be available, and
         /// can be used to mention all non-offline users.
         ///
         /// **Note**: You probably want this to be disabled for most roles and
         /// users.
-        const MENTION_EVERYONE = 0b00000000000000100000000000000000;
+        const MENTION_EVERYONE = 0b0000_0000_0000_0010_0000_0000_0000_0000;
         /// Allows the usage of custom emojis from other guilds.
         ///
         /// This does not dictate whether custom emojis in this guild can be
         /// used in other guilds.
-        const USE_EXTERNAL_EMOJIS = 0b00000000000001000000000000000000;
+        const USE_EXTERNAL_EMOJIS = 0b0000_0000_0000_0100_0000_0000_0000_0000;
         /// Allows the joining of a voice channel.
-        const CONNECT = 0b00000000000100000000000000000000;
+        const CONNECT = 0b0000_0000_0001_0000_0000_0000_0000_0000;
         /// Allows the user to speak in a voice channel.
-        const SPEAK = 0b00000000001000000000000000000000;
+        const SPEAK = 0b0000_0000_0010_0000_0000_0000_0000_0000;
         /// Allows the muting of members in a voice channel.
-        const MUTE_MEMBERS = 0b00000000010000000000000000000000;
+        const MUTE_MEMBERS = 0b0000_0000_0100_0000_0000_0000_0000_0000;
         /// Allows the deafening of members in a voice channel.
-        const DEAFEN_MEMBERS = 0b00000000100000000000000000000000;
+        const DEAFEN_MEMBERS = 0b0000_0000_1000_0000_0000_0000_0000_0000;
         /// Allows the moving of members from one voice channel to another.
-        const MOVE_MEMBERS = 0b00000001000000000000000000000000;
+        const MOVE_MEMBERS = 0b0000_0001_0000_0000_0000_0000_0000_0000;
         /// Allows the usage of voice-activity-detection in a [voice] channel.
         ///
         /// If this is disabled, then [`Member`]s must use push-to-talk.
         ///
         /// [`Member`]: ../struct.Member.html
         /// [voice]: ../enum.ChannelType.html#variant.Voice
-        const USE_VAD = 0b00000010000000000000000000000000;
+        const USE_VAD = 0b0000_0010_0000_0000_0000_0000_0000_0000;
         /// Allows members to change their own nickname in the guild.
-        const CHANGE_NICKNAME = 0b00000100000000000000000000000000;
+        const CHANGE_NICKNAME = 0b0000_0100_0000_0000_0000_0000_0000_0000;
         /// Allows members to change other members' nicknames.
-        const MANAGE_NICKNAMES = 0b00001000000000000000000000000000;
+        const MANAGE_NICKNAMES = 0b0000_1000_0000_0000_0000_0000_0000_0000;
         /// Allows management and editing of roles below their own.
-        const MANAGE_ROLES = 0b00010000000000000000000000000000;
+        const MANAGE_ROLES = 0b0001_0000_0000_0000_0000_0000_0000_0000;
         /// Allows management of webhooks.
-        const MANAGE_WEBHOOKS = 0b00100000000000000000000000000000;
+        const MANAGE_WEBHOOKS = 0b0010_0000_0000_0000_0000_0000_0000_0000;
         /// Allows management of emojis created without the use of an
         /// [`Integration`].
         ///
         /// [`Integration`]: ../struct.Integration.html
-        const MANAGE_EMOJIS = 0b01000000000000000000000000000000;
+        const MANAGE_EMOJIS = 0b0100_0000_0000_0000_0000_0000_0000_0000;
     }
 }
 

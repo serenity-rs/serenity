@@ -165,7 +165,7 @@ impl Default for EditRole {
 
         map.insert(
             "color".to_owned(),
-            Value::Number(Number::from(10070709)),
+            Value::Number(Number::from(10_070_709)),
         );
         map.insert("hoist".to_owned(), Value::Bool(false));
         map.insert("mentionable".to_owned(), Value::Bool(false));

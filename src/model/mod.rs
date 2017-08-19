@@ -57,7 +57,7 @@ macro_rules! id_u64 {
                 pub fn created_at(&self) -> NaiveDateTime {
                     let offset = (self.0 >> 22) / 1000;
 
-                    NaiveDateTime::from_timestamp(1420070400 + offset as i64, 0)
+                    NaiveDateTime::from_timestamp(1_420_070_400 + offset as i64, 0)
                 }
             }
 

@@ -605,10 +605,6 @@ impl BuiltinFramework {
 
             if command.owners_only {
                 Some(DispatchError::OnlyForOwners)
-            } else if !command.checks.iter().all(|check| {
-                (check)(&mut context, message, args, command)
-            }) {
-                Some(DispatchError::CheckFailed(command.to_owned()))
             } else if self.configuration.blocked_users.contains(
                 &message.author.id,
             ) {
@@ -618,7 +614,15 @@ impl BuiltinFramework {
             } else if self.configuration.disabled_commands.contains(built) {
                 Some(DispatchError::CommandDisabled(built.to_owned()))
             } else {
-                None
+                let all_passed = command.checks.iter().all(|check| {
+                    check(&mut context, message, args, command)
+                });
+
+                if all_passed {
+                    None
+                } else {
+                    Some(DispatchError::CheckFailed(command.to_owned()))
+                }
             }
         }
     }
@@ -983,10 +987,10 @@ impl Framework for BuiltinFramework {
                                 (
                                     regex
                                         .split(content)
-                                        .filter_map(|p| if !p.is_empty() {
-                                            Some(p.to_string())
-                                        } else {
+                                        .filter_map(|p| if p.is_empty() {
                                             None
+                                        } else {
+                                            Some(p.to_string())
                                         })
                                         .collect::<Vec<_>>(),
                                     content.to_string(),

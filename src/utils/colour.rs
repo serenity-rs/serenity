@@ -1,3 +1,6 @@
+// Disable this lint to avoid it wanting to change `0xABCDEF` to `0xAB_CDEF`.
+#![allow(unreadable_literal)]
+
 macro_rules! colour {
     ($(#[$attr:meta] $name:ident, $val:expr;)*) => {
         impl Colour {
