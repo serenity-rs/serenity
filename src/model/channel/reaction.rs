@@ -132,7 +132,7 @@ pub enum ReactionType {
         id: EmojiId,
         /// The name of the custom emoji. This is primarily used for decoration
         /// and distinguishing the emoji client-side.
-        name: String,
+        name: Option<String>,
     },
     /// A reaction with a twemoji.
     Unicode(String),
@@ -140,33 +140,11 @@ pub enum ReactionType {
 
 impl<'de> Deserialize<'de> for ReactionType {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        #[derive(Deserialize)]
+        #[serde(field_identifier)]
         enum Field {
             Id,
             Name,
-        }
-
-        impl<'de> Deserialize<'de> for Field {
-            fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-                struct FieldVisitor;
-
-                impl<'de> Visitor<'de> for FieldVisitor {
-                    type Value = Field;
-
-                    fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
-                        formatter.write_str("`id` or `name`")
-                    }
-
-                    fn visit_str<E: DeError>(self, value: &str) -> StdResult<Field, E> {
-                        match value {
-                            "id" => Ok(Field::Id),
-                            "name" => Ok(Field::Name),
-                            _ => Err(DeError::unknown_field(value, FIELDS)),
-                        }
-                    }
-                }
-
-                deserializer.deserialize_identifier(FieldVisitor)
-            }
         }
 
         struct ReactionTypeVisitor;
@@ -211,14 +189,14 @@ impl<'de> Deserialize<'de> for ReactionType {
                         name: name,
                     }
                 } else {
-                    ReactionType::Unicode(name)
+                    ReactionType::Unicode(name.unwrap())
                 })
             }
         }
 
         const FIELDS: &'static [&'static str] = &["id", "name"];
 
-        deserializer.deserialize_map(ReactionTypeVisitor)
+        deserializer.deserialize_struct("ReactionType", FIELDS, ReactionTypeVisitor)
     }
 }
 
@@ -235,7 +213,7 @@ impl ReactionType {
             ReactionType::Custom {
                 id,
                 ref name,
-            } => format!("{}:{}", name, id),
+            } => format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id),
             ReactionType::Unicode(ref unicode) => unicode.clone(),
         }
     }
@@ -271,7 +249,7 @@ impl From<Emoji> for ReactionType {
     fn from(emoji: Emoji) -> ReactionType {
         ReactionType::Custom {
             id: emoji.id,
-            name: emoji.name,
+            name: Some(emoji.name),
         }
     }
 }
@@ -320,7 +298,7 @@ impl Display for ReactionType {
             } => {
                 f.write_char('<')?;
                 f.write_char(':')?;
-                f.write_str(name)?;
+                f.write_str(name.as_ref().map_or("", |s| s.as_str()))?;
                 f.write_char(':')?;
                 Display::fmt(&id, f)?;
                 f.write_char('>')
