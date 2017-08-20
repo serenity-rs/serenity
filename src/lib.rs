@@ -106,8 +106,9 @@ extern crate chrono;
 extern crate flate2;
 extern crate serde;
 extern crate parking_lot;
-extern crate vec_shift;
 
+#[cfg(feature="framework")]
+extern crate vec_shift;
 #[cfg(feature = "voice")]
 extern crate byteorder;
 #[cfg(feature = "futures")]
