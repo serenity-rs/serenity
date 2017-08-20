@@ -6,6 +6,7 @@ mod configuration;
 mod create_command;
 mod create_group;
 mod buckets;
+mod args;
 
 pub(crate) use self::buckets::{Bucket, Ratelimit};
 pub use self::command::{Command, CommandGroup, CommandType};
@@ -13,6 +14,7 @@ pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
+pub use self::args::{Args, Error as ArgError};
 
 use self::command::{AfterHook, BeforeHook};
 use std::collections::HashMap;
@@ -22,11 +24,7 @@ use client::Context;
 use super::Framework;
 use model::{ChannelId, GuildId, Message, UserId};
 use model::permissions::Permissions;
-use utils;
 use tokio_core::reactor::Handle;
-use itertools::Itertools;
-use regex::Regex;
-use regex::escape;
 
 #[cfg(feature = "cache")]
 use client::CACHE;
@@ -54,7 +52,9 @@ use model::Channel;
 /// them, sending the product as a reply:
 ///
 /// ```rust,ignore
-/// command!(multiply(_context, message, _args, first: f64, second: f64) {
+/// command!(multiply(_context, message, args) {
+///     let first = args.single::<i32>().unwrap();
+///     let second = args.single::<i32>().unwrap();
 ///     let product = first * second;
 ///
 ///     if let Err(why) = message.reply(&product.to_string()) {
@@ -70,8 +70,7 @@ macro_rules! command {
         #[allow(unreachable_code, unused_mut)]
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       _: &$crate::model::Message,
-                      _: Vec<String>,
-                      _: String)
+                      _: Args)
                       -> ::std::result::Result<(), String> {
             $b
 
@@ -82,8 +81,7 @@ macro_rules! command {
         #[allow(unreachable_code, unused_mut)]
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::Message,
-                      _: Vec<String>,
-                      _: String)
+                      _: Args)
                       -> ::std::result::Result<(), String> {
             $b
 
@@ -94,66 +92,8 @@ macro_rules! command {
         #[allow(unreachable_code, unused_mut)]
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::Message,
-                      $a: Vec<String>,
-                      _: String)
+                      $a: Args)
                       -> ::std::result::Result<(), String> {
-            $b
-
-            Ok(())
-        }
-    };
-    ($fname:ident($c:ident, $m:ident, @$a:ident) $b:block) => {
-        #[allow(unreachable_code, unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context,
-                      $m: &$crate::model::Message,
-                      _: Vec<String>,
-                      $a: String)
-                      -> ::std::result::Result<(), String> {
-            $b
-
-            Ok(())
-        }
-    };
-    ($fname:ident($c:ident, $m:ident, $a:ident, @$f:ident) $b:block) => {
-        #[allow(unreachable_code, unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context,
-                      $m: &$crate::model::Message,
-                      $a: Vec<String>,
-                      $f: String)
-                      -> ::std::result::Result<(), String> {
-            $b
-
-            Ok(())
-        }
-    };
-    ($fname:ident($c:ident, $m:ident, $a:ident, $($name:ident: $t:ty),*) $b:block) => {
-        #[allow(unreachable_code, unreachable_patterns, unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context,
-                      $m: &$crate::model::Message,
-                      $a: Vec<String>,
-                      _: String)
-                      -> ::std::result::Result<(), String> {
-            let mut i = $a.iter();
-            let mut arg_counter = 0;
-
-            $(
-                arg_counter += 1;
-
-                let $name = match i.next() {
-                    Some(v) => match v.parse::<$t>() {
-                        Ok(v) => v,
-                        Err(_) => return Err(format!("Failed to parse argument #{} of type {:?}",
-                                                     arg_counter,
-                                                     stringify!($t))),
-                    },
-                    None => return Err(format!("Missing argument #{} of type {:?}",
-                                               arg_counter,
-                                               stringify!($t))),
-                };
-            )*
-
-            drop(i);
-
             $b
 
             Ok(())
@@ -494,7 +434,7 @@ impl StandardFramework {
                    mut context: &mut Context,
                    message: &Message,
                    command: &Arc<Command>,
-                   args: &[String],
+                   args: &mut Args,
                    to_check: &str,
                    built: &str)
                    -> Option<DispatchError> {
@@ -637,7 +577,7 @@ impl StandardFramework {
     /// # }
     /// ```
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(&mut Context, &Message, Vec<String>, String) -> Result<(), String> + 'static,
+        where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + 'static,
               S: Into<String> {
         {
             let ungrouped = self.groups.entry("Ungrouped".to_owned()).or_insert_with(
@@ -940,40 +880,23 @@ impl Framework for StandardFramework {
                         let after = self.after.clone();
                         let groups = self.groups.clone();
 
-                        let (args, content) = {
+                        let mut args = {
                             let mut content = message.content[position..].trim();
-                            content = content[command_length..].trim();
-
-                            if command.use_quotes {
-                                (utils::parse_quotes(content), content.to_string())
-                            } else {
-                                let delimiters = &self.configuration.delimiters;
-                                let regular_expression = delimiters
-                                    .iter()
-                                    .map(|delimiter| escape(delimiter))
-                                    .join("|");
-
-                                let regex = Regex::new(&regular_expression).unwrap();
-
-                                (
-                                    regex
-                                        .split(content)
-                                        .filter_map(|p| if p.is_empty() {
-                                            None
-                                        } else {
-                                            Some(p.to_string())
-                                        })
-                                        .collect::<Vec<_>>(),
-                                    content.to_string(),
-                                )
-                            }
+                            content = content[command_length..].trim(); 
+                        
+                            let delimiter = self.configuration.delimiters
+                                .iter()
+                                .find(|&d| content.contains(d))
+                                .map_or(" ", |s| s.as_str());
+                                
+                            Args::new(&content, delimiter)
                         };
 
                         if let Some(error) = self.should_fail(
                             &mut context,
                             &message,
                             &command,
-                            &args,
+                            &mut args,
                             &to_check,
                             &built,
                         ) {
@@ -997,10 +920,10 @@ impl Framework for StandardFramework {
                                     Ok(())
                                 },
                                 CommandType::Basic(ref x) => {
-                                    (x)(&mut context, &message, args, content)
+                                    (x)(&mut context, &message, args)
                                 },
                                 CommandType::WithCommands(ref x) => {
-                                    (x)(&mut context, &message, groups, &args)
+                                    (x)(&mut context, &message, groups, args)
                                 },
                             };
 

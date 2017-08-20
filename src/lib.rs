@@ -106,6 +106,7 @@ extern crate chrono;
 extern crate flate2;
 extern crate serde;
 extern crate parking_lot;
+extern crate vec_shift;
 
 #[cfg(feature = "voice")]
 extern crate byteorder;
@@ -129,10 +130,6 @@ extern crate tokio_core;
 extern crate typemap;
 #[cfg(feature = "gateway")]
 extern crate websocket;
-#[cfg(feature = "framework")]
-extern crate regex;
-#[cfg(feature = "framework")]
-extern crate itertools;
 
 #[macro_use]
 mod internal;

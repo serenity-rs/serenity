@@ -1,6 +1,7 @@
 pub use super::command::{Command, CommandGroup, CommandType};
 pub(crate) use super::command::CommandOrAlias;
 pub use super::create_command::CreateCommand;
+pub use super::Args;
 
 use std::default::Default;
 use std::sync::Arc;
@@ -57,7 +58,7 @@ impl CreateGroup {
     /// Adds a command to group with simplified API.
     /// You can return Err(string) if there's an error.
     pub fn on<F>(mut self, command_name: &str, f: F) -> Self
-        where F: Fn(&mut Context, &Message, Vec<String>, String) -> Result<(), String>
+        where F: Fn(&mut Context, &Message, Args) -> Result<(), String>
                      + Send
                      + Sync
                      + 'static {

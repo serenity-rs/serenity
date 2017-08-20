@@ -20,6 +20,10 @@ serde_derive = "^1.0"
 serde_json = "^1.0"
 parking_lot = "0.4"
 
+[dependencies.vec_shift]
+optional = true
+version = "0.1.0"
+
 [dependencies.byteorder]
 optional = true
 version = "1.0"
@@ -39,14 +43,6 @@ version = "~0.10"
 [dependencies.hyper-native-tls]
 optional = true
 version = "0.2.2"
-
-[dependencies.regex]
-optional = true
-version = "0.2"
-
-[dependencies.itertools]
-optional = true
-version = "0.6.1"
 
 [dependencies.lazy_static]
 optional = true
@@ -101,7 +97,7 @@ builder = []
 cache = ["lazy_static"]
 client = ["gateway", "lazy_static", "http", "typemap"]
 extras = []
-framework = ["client", "model", "utils", "regex", "itertools"]
+framework = ["client", "model", "utils", "vec_shift"]
 gateway = ["http", "websocket", "tokio-core", "futures"]
 http = ["hyper", "hyper-native-tls", "lazy_static", "multipart", "native-tls"]
 model = ["builder", "http"]

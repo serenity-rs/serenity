@@ -1,15 +1,15 @@
 use std::sync::Arc;
-use super::Configuration;
+use super::{Configuration, Args};
 use client::Context;
 use model::{Message, Permissions};
 use std::collections::HashMap;
 
-pub type Check = Fn(&mut Context, &Message, &[String], &Arc<Command>) -> bool + 'static;
-pub type Exec = Fn(&mut Context, &Message, Vec<String>, String) -> Result<(), String> + 'static;
+pub type Check = Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool + 'static;
+pub type Exec = Fn(&mut Context, &Message, Args) -> Result<(), String> + 'static;
 pub type Help = Fn(&mut Context,
                    &Message,
                    HashMap<String, Arc<CommandGroup>>,
-                   &[String])
+                   Args)
                    -> Result<(), String>
                     + 'static;
 pub type BeforeHook = Fn(&mut Context, &Message, &str) -> bool + 'static;
@@ -51,8 +51,6 @@ pub struct Command {
     pub example: Option<String>,
     /// Command usage schema, used by other commands.
     pub usage: Option<String>,
-    /// Whether arguments should be parsed using quote parser or not.
-    pub use_quotes: bool,
     /// Minumum amount of arguments that should be passed.
     pub min_args: Option<i32>,
     /// Maximum amount of arguments that can be passed.
@@ -72,7 +70,7 @@ pub struct Command {
 
 impl Command {
     pub fn new<F>(f: F) -> Self
-        where F: Fn(&mut Context, &Message, Vec<String>, String) -> Result<(), String> + 'static {
+        where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + 'static {
         Command {
             aliases: Vec::new(),
             checks: Vec::default(),
@@ -80,7 +78,6 @@ impl Command {
             desc: None,
             usage: None,
             example: None,
-            use_quotes: false,
             dm_only: false,
             bucket: None,
             guild_only: false,

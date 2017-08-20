@@ -1,4 +1,4 @@
-pub use super::{Command, CommandGroup, CommandType};
+pub use super::{Args, Command, CommandGroup, CommandType};
 
 use std::collections::HashMap;
 use std::default::Default;
@@ -52,22 +52,21 @@ impl CreateCommand {
     ///         .desc("Replies to a ping with a pong")
     ///         .exec(ping)));
     ///
-    /// fn ping(_context: &mut Context, message: &Message, _args: Vec<String>, _original_msg:
-    /// String) -> Result<(),
+    /// fn ping(_context: &mut Context, message: &Message, _args: Args) -> Result<(),
     /// String> {
     ///     let _ = message.channel_id.say("Pong!");
     ///
     ///     Ok(())
     /// }
     ///
-    /// fn owner_check(_context: &mut Context, message: &Message, _: &[String], _:
+    /// fn owner_check(_context: &mut Context, message: &Message, _: &mut Args, _:
     /// &Arc<Command>) -> bool {
     ///     // replace with your user ID
     ///     message.author.id == 7
     /// }
     /// ```
     pub fn check<F>(mut self, check: F) -> Self
-        where F: Fn(&mut Context, &Message, &[String], &Arc<Command>) -> bool
+        where F: Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool
                      + Send
                      + Sync
                      + 'static {
@@ -104,7 +103,7 @@ impl CreateCommand {
     ///
     /// [`exec_str`]: #method.exec_str
     pub fn exec<F>(mut self, func: F) -> Self
-        where F: Fn(&mut Context, &Message, Vec<String>, String) -> Result<(), String>
+        where F: Fn(&mut Context, &Message, Args) -> Result<(), String>
                      + Send
                      + Sync
                      + 'static {
@@ -122,7 +121,7 @@ impl CreateCommand {
         where F: Fn(&mut Context,
                     &Message,
                     HashMap<String, Arc<CommandGroup>>,
-                    &[String])
+                    Args)
                     -> Result<(), String>
                      + 'static {
         self.0.exec = CommandType::WithCommands(Box::new(f));
@@ -203,23 +202,6 @@ impl CreateCommand {
 
         self
     }
-
-    /// Whether or not arguments should be parsed using the quotation parser.
-    ///
-    /// Enabling this will parse `~command "this is arg 1" "this is arg 2"` as
-    /// two arguments: `this is arg 1` and `this is arg 2`.
-    ///
-    /// Disabling this will parse `~command "this is arg 1" "this is arg 2"` as
-    /// eight arguments: `"this`, `is`, `arg`, `1"`, `"this`, `is`, `arg`, `2"`.
-    ///
-    /// Refer to [`utils::parse_quotes`] for information on the parser.
-    ///
-    /// [`utils::parse_quotes`]: ../../utils/fn.parse_quotes.html
-    pub fn use_quotes(mut self, use_quotes: bool) -> Self {
-        self.0.use_quotes = use_quotes;
-
-        self
-    }
 }
 
 impl Default for Command {
@@ -227,11 +209,10 @@ impl Default for Command {
         Command {
             aliases: Vec::new(),
             checks: Vec::default(),
-            exec: CommandType::Basic(Box::new(|_, _, _, _| Ok(()))),
+            exec: CommandType::Basic(Box::new(|_, _, _| Ok(()))),
             desc: None,
             usage: None,
             example: None,
-            use_quotes: false,
             min_args: None,
             bucket: None,
             max_args: None,

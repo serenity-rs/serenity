@@ -27,7 +27,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::fmt::Write;
 use super::command::InternalCommand;
-use super::{Command, CommandGroup, CommandOrAlias};
+use super::{Args, Command, CommandGroup, CommandOrAlias};
 use client::Context;
 use model::{ChannelId, Message};
 use utils::Colour;
@@ -71,10 +71,10 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 pub fn with_embeds(_: &mut Context,
                    msg: &Message,
                    groups: HashMap<String, Arc<CommandGroup>>,
-                   args: &[String])
+                   args: Args)
                    -> Result<(), String> {
     if !args.is_empty() {
-        let name = args.join(" ");
+        let name = args.full();
 
         for (group_name, group) in groups {
             let mut found: Option<(&String, &InternalCommand)> = None;
@@ -227,10 +227,10 @@ pub fn with_embeds(_: &mut Context,
 pub fn plain(_: &mut Context,
              msg: &Message,
              groups: HashMap<String, Arc<CommandGroup>>,
-             args: &[String])
+             args: Args)
              -> Result<(), String> {
     if !args.is_empty() {
-        let name = args.join(" ");
+        let name = args.full();
 
         for (group_name, group) in groups {
             let mut found: Option<(&String, &Command)> = None;
