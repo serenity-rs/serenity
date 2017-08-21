@@ -141,7 +141,7 @@ pub enum ReactionType {
 impl<'de> Deserialize<'de> for ReactionType {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         #[derive(Deserialize)]
-        #[serde(field_identifier)]
+        #[serde(field_identifier, rename_all = "snake_case")]
         enum Field {
             Id,
             Name,
