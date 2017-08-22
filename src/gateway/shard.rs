@@ -909,6 +909,8 @@ impl Shard {
                 "status": status.name(),
                 "game": game.as_ref().map(|x| json!({
                     "name": x.name,
+                    "type": x.kind,
+                    "url": x.url,
                 })),
             },
         });
