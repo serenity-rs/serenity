@@ -82,6 +82,7 @@ impl Message {
     /// #
     /// # fn main() {
     /// #   use serenity::prelude::*;
+    /// #   use serenity::framework::standard::Args;
     /// #   struct Handler;
     /// #
     /// #   impl EventHandler for Handler {}

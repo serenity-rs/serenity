@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use super::{Configuration, Args};
+use super::{Args, Configuration};
 use client::Context;
 use model::{Message, Permissions};
 use std::collections::HashMap;

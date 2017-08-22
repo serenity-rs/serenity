@@ -107,7 +107,7 @@ extern crate flate2;
 extern crate serde;
 extern crate parking_lot;
 
-#[cfg(feature="framework")]
+#[cfg(feature = "framework")]
 extern crate vec_shift;
 #[cfg(feature = "voice")]
 extern crate byteorder;

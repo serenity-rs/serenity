@@ -58,10 +58,7 @@ impl CreateGroup {
     /// Adds a command to group with simplified API.
     /// You can return Err(string) if there's an error.
     pub fn on<F>(mut self, command_name: &str, f: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), String>
-                     + Send
-                     + Sync
-                     + 'static {
+        where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + Send + Sync + 'static {
         let cmd = Arc::new(Command::new(f));
 
         self.0.commands.insert(
