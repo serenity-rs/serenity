@@ -47,6 +47,7 @@ impl Game {
     /// ```rust,no_run
     /// # #[macro_use] extern crate serenity;
     /// #
+    /// use serenity::framework::standard::Args;
     /// use serenity::model::Game;
     ///
     /// command!(game(ctx, _msg, args) {
@@ -75,12 +76,14 @@ impl Game {
     /// ```rust,no_run
     /// # #[macro_use] extern crate serenity;
     /// #
+    /// use serenity::framework::standard::Args;
     /// use serenity::model::Game;
     ///
     /// // Assumes command has min_args set to 2.
-    /// command!(stream(ctx, _msg, args, stream: String) {
-    ///     let name = args[1..].join(" ");
-    ///     ctx.set_game(Game::streaming(&name, &stream));
+    /// command!(stream(ctx, _msg, args) {
+    ///     # let stream_url = String::from("");
+    ///     let name = args.full();
+    ///     ctx.set_game(Game::streaming(&name, &stream_url));
     /// });
     /// #
     /// # fn main() {}

@@ -38,7 +38,7 @@ impl CreateCommand {
     /// # struct Handler;
     /// # impl EventHandler for Handler {}
     /// use serenity::client::{Client, Context};
-    /// use serenity::framework::standard::{Command, StandardFramework};
+    /// use serenity::framework::standard::{Args, Command, StandardFramework};
     /// use serenity::model::Message;
     /// use std::env;
     /// use std::sync::Arc;
