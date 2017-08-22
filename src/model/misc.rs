@@ -2,8 +2,12 @@ use super::*;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::result::Result as StdResult;
+#[cfg(all(feature = "cache", feature = "utils"))]
+use std::error::Error as StdError;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::str::FromStr;
+#[cfg(all(feature = "model", feature = "utils"))]
+use std::fmt;
 #[cfg(any(all(feature = "cache", feature = "utils"), all(feature = "model", feature = "utils")))]
 use utils;
 
@@ -53,54 +57,151 @@ impl Mentionable for User {
 }
 
 #[cfg(all(feature = "cache", feature = "utils"))]
-impl FromStr for User {
-    type Err = ();
+#[derive(Debug)]
+pub enum UserParseError {
+    NotPresentInCache,
+    InvalidUsername
+}
 
-    fn from_str(s: &str) -> StdResult<Self, ()> {
+
+impl fmt::Display for UserParseError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.description())
+    }
+}
+
+#[cfg(all(feature = "cache", feature = "utils"))]
+impl StdError for UserParseError {
+    fn description(&self) -> &str {
+        use self::UserParseError::*;
+        
+        match *self {
+            NotPresentInCache => "not present in cache",
+            InvalidUsername => "invalid username"
+        }
+    }
+}
+
+#[cfg(all(feature = "cache", feature = "utils"))]
+impl FromStr for User {
+    type Err = UserParseError;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match utils::parse_username(s) {
             Some(x) => {
                 match UserId(x as u64).find() {
                     Some(user) => Ok(user.read().unwrap().clone()),
-                    _ => Err(()),
+                    _ => Err(UserParseError::NotPresentInCache),
                 }
             },
-            _ => Err(()),
+            _ => Err(UserParseError::InvalidUsername),
+        }
+    }
+}
+
+#[cfg(all(feature = "cache", feature = "utils"))]
+#[derive(Debug)]
+pub enum UserIdParseError {
+    NotPresentInCache,
+}
+
+impl fmt::Display for UserIdParseError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.description())
+    }
+}
+
+#[cfg(all(feature = "cache", feature = "utils"))]
+impl StdError for UserIdParseError {
+    fn description(&self) -> &str {
+        use self::UserIdParseError::*;
+        
+        match *self {
+            NotPresentInCache => "not present in cache",
         }
     }
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
 impl FromStr for UserId {
-    type Err = ();
+    type Err = UserIdParseError;
 
-    fn from_str(s: &str) -> StdResult<Self, ()> {
-        utils::parse_username(s).ok_or_else(|| ()).map(UserId)
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        utils::parse_username(s).ok_or_else(|| UserIdParseError::NotPresentInCache).map(UserId)
+    }
+}
+
+#[cfg(all(feature = "cache", feature = "utils"))]
+#[derive(Debug)]
+pub enum RoleParseError {
+    NotPresentInCache,
+    InvalidRole,
+}
+
+impl fmt::Display for RoleParseError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.description())
+    }
+}
+
+#[cfg(all(feature = "cache", feature = "utils"))]
+impl StdError for RoleParseError {
+    fn description(&self) -> &str {
+        use self::RoleParseError::*;
+        
+        match *self {
+            NotPresentInCache => "not present in cache",
+            InvalidRole => "invalid role"
+        }
     }
 }
 
 #[cfg(all(feature = "cache", feature = "utils"))]
 impl FromStr for Role {
-    type Err = ();
+    type Err = RoleParseError;
 
-    fn from_str(s: &str) -> StdResult<Self, ()> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match utils::parse_role(s) {
             Some(x) => {
                 match RoleId(x).find() {
                     Some(user) => Ok(user),
-                    _ => Err(()),
+                    _ => Err(RoleParseError::NotPresentInCache),
                 }
             },
-            _ => Err(()),
+            _ => Err(RoleParseError::InvalidRole),
+        }
+    }
+}
+
+#[cfg(all(feature = "cache", feature = "utils"))]
+#[derive(Debug)]
+pub enum RoleIdParseError {
+    NotPresentInCache,
+}
+
+impl fmt::Display for RoleIdParseError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.description())
+    }
+}
+
+#[cfg(all(feature = "cache", feature = "utils"))]
+impl StdError for RoleIdParseError {
+    fn description(&self) -> &str {
+        use self::RoleIdParseError::*;
+        
+        match *self {
+            NotPresentInCache => "not present in cache",
         }
     }
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
 impl FromStr for RoleId {
-    type Err = ();
+    type Err = RoleIdParseError;
 
-    fn from_str(s: &str) -> StdResult<Self, ()> {
-        utils::parse_role(s).ok_or_else(|| ()).map(RoleId)
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        utils::parse_role(s).ok_or_else(|| RoleIdParseError::NotPresentInCache).map(RoleId)
     }
 }
 

@@ -92,7 +92,7 @@ macro_rules! command {
         #[allow(unreachable_code, unused_mut)]
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::Message,
-                      $a: Args)
+                      mut $a: Args)
                       -> ::std::result::Result<(), String> {
             $b
 
