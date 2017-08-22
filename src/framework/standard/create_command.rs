@@ -103,10 +103,7 @@ impl CreateCommand {
     ///
     /// [`exec_str`]: #method.exec_str
     pub fn exec<F>(mut self, func: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), String>
-                     + Send
-                     + Sync
-                     + 'static {
+        where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + Send + Sync + 'static {
         self.0.exec = CommandType::Basic(Box::new(func));
 
         self

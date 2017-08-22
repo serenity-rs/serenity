@@ -54,7 +54,7 @@
 //!
 //! [`Client::with_framework`]: ../client/struct.Client.html#method.with_framework
 
-#[cfg(feature="standard_framework")]
+#[cfg(feature = "standard_framework")]
 pub mod standard;
 
 #[cfg(feature = "standard_framework")]
@@ -64,7 +64,7 @@ use client::Context;
 use model::Message;
 use tokio_core::reactor::Handle;
 
-#[cfg(feature="standard_framework")]
+#[cfg(feature = "standard_framework")]
 use model::UserId;
 
 /// This trait allows for serenity to either use its builtin framework, or yours.
