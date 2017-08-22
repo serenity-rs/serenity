@@ -742,7 +742,7 @@ impl UserId {
     ///
     /// **Note**: The current user must be a bot user.
     #[inline]
-    pub fn get(&self) -> Result<User> { 
+    pub fn get(&self) -> Result<User> {
         #[cfg(feature = "cache")]
         {
             if let Some(user) = CACHE.read().unwrap().user(*self) {
@@ -750,7 +750,7 @@ impl UserId {
             }
         }
 
-        http::get_user(self.0) 
+        http::get_user(self.0)
     }
 }
 
