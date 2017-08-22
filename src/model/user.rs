@@ -742,7 +742,16 @@ impl UserId {
     ///
     /// **Note**: The current user must be a bot user.
     #[inline]
-    pub fn get(&self) -> Result<User> { http::get_user(self.0) }
+    pub fn get(&self) -> Result<User> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(user) = CACHE.read().unwrap().user(*self) {
+                return Ok(user.read().unwrap().clone());
+            }
+        }
+
+        http::get_user(self.0)
+    }
 }
 
 impl From<CurrentUser> for UserId {

@@ -28,7 +28,7 @@ impl Args {
         } else {
             message.split(delimiter).map(|s| s.to_string()).collect()
         };
-        
+
         Args {
             delimiter: delimiter.to_string(),
             delimiter_split: split,
