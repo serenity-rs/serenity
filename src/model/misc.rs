@@ -64,6 +64,7 @@ pub enum UserParseError {
 }
 
 
+#[cfg(all(feature = "model", feature = "utils"))]
 impl fmt::Display for UserParseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.description())
@@ -105,6 +106,7 @@ pub enum UserIdParseError {
     NotPresentInCache,
 }
 
+#[cfg(all(feature = "model", feature = "utils"))]
 impl fmt::Display for UserIdParseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.description())
@@ -138,6 +140,7 @@ pub enum RoleParseError {
     InvalidRole,
 }
 
+#[cfg(all(feature = "model", feature = "utils"))]
 impl fmt::Display for RoleParseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.description())
@@ -179,6 +182,7 @@ pub enum RoleIdParseError {
     NotPresentInCache,
 }
 
+#[cfg(all(feature = "model", feature = "utils"))]
 impl fmt::Display for RoleIdParseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.description())
