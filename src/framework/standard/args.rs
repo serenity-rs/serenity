@@ -23,9 +23,15 @@ pub struct Args {
 
 impl Args {
     pub fn new(message: &str, delimiter: &str) -> Self {
+        let split = if message.trim().is_empty() {
+            Vec::new()
+        } else {
+            message.split(delimiter).map(|s| s.to_string()).collect()
+        };
+        
         Args {
             delimiter: delimiter.to_string(),
-            delimiter_split: message.split(delimiter).map(|s| s.to_string()).collect(),
+            delimiter_split: split,
         }
     }
 
