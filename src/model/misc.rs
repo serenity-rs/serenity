@@ -61,7 +61,6 @@ impl Mentionable for User {
 #[cfg(all(feature = "cache", feature = "utils"))]
 #[derive(Debug)]
 pub enum UserParseError {
-    NotPresentInCache,
     InvalidUsername,
     Rest(Box<std::error::Error>),
 }
@@ -78,7 +77,6 @@ impl StdError for UserParseError {
         use self::UserParseError::*;
 
         match *self {
-            NotPresentInCache => "not present in cache",
             InvalidUsername => "invalid username",
             Rest(_) => "could not fetch",
         }
