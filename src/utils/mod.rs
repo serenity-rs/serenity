@@ -20,7 +20,7 @@ use std::path::Path;
 use internal::prelude::*;
 use model::{EmojiId, EmojiIdentifier};
 use cache::Cache;
-use ::CACHE;
+use CACHE;
 
 /// Determines if a name is NSFW.
 ///
@@ -445,11 +445,12 @@ pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % sha
 ///
 /// ```rust,ignore
 /// use serenity::utils;
-/// 
+///
 /// // assuming that the id is `1234`:
 /// assert_eq!(1234, utils::with_cache(|cache| cache.user.id));
 /// ```
-pub fn with_cache<T, F>(f: F) -> T where F: Fn(&Cache) -> T {
+pub fn with_cache<T, F>(f: F) -> T
+    where F: Fn(&Cache) -> T {
     let cache = CACHE.read().unwrap();
     f(&cache)
 }
@@ -462,13 +463,14 @@ pub fn with_cache<T, F>(f: F) -> T where F: Fn(&Cache) -> T {
 ///
 /// ```rust,ignore
 /// use serenity::utils;
-/// 
+///
 /// // assuming that the id is `1234`:
 /// assert_eq!(1234, utils::with_cache_mut(|cache| { cache.shard_count = 8; cache.user.id }));
 /// ```
 ///
 /// [`with_cache`]: #fn.with_cache
-pub fn with_cache_mut<T, F>(mut f: F) -> T where F: FnMut(&mut Cache) -> T {
+pub fn with_cache_mut<T, F>(mut f: F) -> T
+    where F: FnMut(&mut Cache) -> T {
     let mut cache = CACHE.write().unwrap();
     f(&mut cache)
 }
