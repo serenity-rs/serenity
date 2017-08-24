@@ -482,7 +482,7 @@ impl Cache {
     pub fn member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
         where G: Into<GuildId>, U: Into<UserId> {
         self.guilds.get(&guild_id.into()).and_then(|guild| {
-            guild.write().unwrap().members.get(&user_id.into()).cloned()
+            guild.read().unwrap().members.get(&user_id.into()).cloned()
         })
     }
 
@@ -517,7 +517,7 @@ impl Cache {
     #[inline]
     pub fn private_channel<C: Into<ChannelId>>(&self,
                                                channel_id: C)
-                                               -> Option<Arc<RwLock<PrivateChannel>>> {
+-> Option<Arc<RwLock<PrivateChannel>>>{
         self.private_channels.get(&channel_id.into()).cloned()
     }
 
@@ -553,9 +553,9 @@ impl Cache {
     /// ```
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
         where G: Into<GuildId>, R: Into<RoleId> {
-        self.guilds.get(&guild_id.into()).and_then(|g| {
-            g.read().unwrap().roles.get(&role_id.into()).cloned()
-        })
+        self.guilds
+            .get(&guild_id.into())
+            .and_then(|g| g.read().unwrap().roles.get(&role_id.into()).cloned())
     }
 
     /// Retrieves a `User` from the cache's [`users`] map, if it exists.

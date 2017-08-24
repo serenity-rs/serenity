@@ -7,7 +7,8 @@ use gateway::GatewayError;
 use internal::prelude::*;
 
 pub trait ReceiverExt {
-    fn recv_json<F, T>(&mut self, decode: F) -> Result<T> where F: Fn(Value) -> Result<T>;
+    fn recv_json<F, T>(&mut self, decode: F) -> Result<T>
+        where F: Fn(Value) -> Result<T>;
 }
 
 pub trait SenderExt {
@@ -42,9 +43,8 @@ impl ReceiverExt for WsClient<TlsStream<TcpStream>> {
                 }))
             },
             OwnedMessage::Ping(x) => {
-                self.send_message(&OwnedMessage::Pong(x)).map_err(
-                    Error::from,
-                )?;
+                self.send_message(&OwnedMessage::Pong(x))
+                    .map_err(Error::from)?;
 
                 None
             },

@@ -33,32 +33,19 @@ use model::{GuildId, Message, UserId};
 /// [`Client`]: ../../client/struct.Client.html
 /// [`Framework`]: struct.Framework.html
 pub struct Configuration {
-    #[doc(hidden)]
-    pub allow_dm: bool,
-    #[doc(hidden)]
-    pub allow_whitespace: bool,
-    #[doc(hidden)]
-    pub blocked_guilds: HashSet<GuildId>,
-    #[doc(hidden)]
-    pub blocked_users: HashSet<UserId>,
-    #[doc(hidden)]
-    pub depth: usize,
-    #[doc(hidden)]
-    pub disabled_commands: HashSet<String>,
-    #[doc(hidden)]
-    pub dynamic_prefix: Option<Box<PrefixCheck>>,
-    #[doc(hidden)]
-    pub ignore_bots: bool,
-    #[doc(hidden)]
-    pub ignore_webhooks: bool,
-    #[doc(hidden)]
-    pub on_mention: Option<Vec<String>>,
-    #[doc(hidden)]
-    pub owners: HashSet<UserId>,
-    #[doc(hidden)]
-    pub prefixes: Vec<String>,
-    #[doc(hidden)]
-    pub delimiters: Vec<String>,
+    #[doc(hidden)] pub allow_dm: bool,
+    #[doc(hidden)] pub allow_whitespace: bool,
+    #[doc(hidden)] pub blocked_guilds: HashSet<GuildId>,
+    #[doc(hidden)] pub blocked_users: HashSet<UserId>,
+    #[doc(hidden)] pub depth: usize,
+    #[doc(hidden)] pub disabled_commands: HashSet<String>,
+    #[doc(hidden)] pub dynamic_prefix: Option<Box<PrefixCheck>>,
+    #[doc(hidden)] pub ignore_bots: bool,
+    #[doc(hidden)] pub ignore_webhooks: bool,
+    #[doc(hidden)] pub on_mention: Option<Vec<String>>,
+    #[doc(hidden)] pub owners: HashSet<UserId>,
+    #[doc(hidden)] pub prefixes: Vec<String>,
+    #[doc(hidden)] pub delimiters: Vec<String>,
 }
 
 impl Configuration {
@@ -269,8 +256,8 @@ impl Configuration {
 
         if let Ok(current_user) = http::get_current_user() {
             self.on_mention = Some(vec![
-                format!("<@{}>", current_user.id), // Regular mention
-                format!("<@!{}>", current_user.id) /* Nickname mention */,
+                format!("<@{}>", current_user.id),  // Regular mention
+                format!("<@!{}>", current_user.id), // Nickname mention
             ]);
         }
 
@@ -415,9 +402,8 @@ impl Configuration {
     /// ```
     pub fn delimiters(mut self, delimiters: Vec<&str>) -> Self {
         self.delimiters.clear();
-        self.delimiters.extend(
-            delimiters.into_iter().map(|s| s.to_string()),
-        );
+        self.delimiters
+            .extend(delimiters.into_iter().map(|s| s.to_string()));
 
         self
     }

@@ -1,5 +1,6 @@
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use model::*;
+use internal::RwLockExt;
 
 #[cfg(feature = "model")]
 use std::borrow::Cow;
@@ -99,7 +100,7 @@ impl ChannelId {
     /// [`Message::delete`]: struct.Message.html#method.delete
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
+pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()>{
         http::delete_message(self.0, message_id.into().0)
     }
 
@@ -186,7 +187,7 @@ impl ChannelId {
     /// [`Channel`]: enum.Channel.html
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
-    pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel> {
+pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel>{
         http::edit_channel(self.0, &f(EditChannel::default()).0)
     }
 
@@ -255,13 +256,12 @@ impl ChannelId {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        http::get_message(self.0, message_id.into().0).map(
-            |mut msg| {
+        http::get_message(self.0, message_id.into().0)
+            .map(|mut msg| {
                 msg.transform_content();
 
                 msg
-            },
-        )
+            })
     }
 
     /// Gets messages from the channel.
@@ -306,11 +306,9 @@ impl ChannelId {
                   None => return None,
               } {
             Guild(channel) => channel.read().unwrap().name().to_string(),
-            Group(channel) => {
-                match channel.read().unwrap().name() {
-                    Cow::Borrowed(name) => name.to_string(),
-                    Cow::Owned(name) => name,
-                }
+            Group(channel) => match channel.read().unwrap().name() {
+                Cow::Borrowed(name) => name.to_string(),
+                Cow::Owned(name) => name,
             },
             Private(channel) => channel.read().unwrap().name(),
         })
@@ -512,9 +510,9 @@ impl From<Channel> for ChannelId {
     /// Gets the Id of a `Channel`.
     fn from(channel: Channel) -> ChannelId {
         match channel {
-            Channel::Group(group) => group.read().unwrap().channel_id,
-            Channel::Guild(ch) => ch.read().unwrap().id,
-            Channel::Private(ch) => ch.read().unwrap().id,
+            Channel::Group(group) => group.with(|g| g.channel_id),
+            Channel::Guild(ch) => ch.with(|c| c.id),
+            Channel::Private(ch) => ch.with(|c| c.id),
         }
     }
 }
@@ -523,9 +521,9 @@ impl<'a> From<&'a Channel> for ChannelId {
     /// Gets the Id of a `Channel`.
     fn from(channel: &Channel) -> ChannelId {
         match *channel {
-            Channel::Group(ref group) => group.read().unwrap().channel_id,
-            Channel::Guild(ref ch) => ch.read().unwrap().id,
-            Channel::Private(ref ch) => ch.read().unwrap().id,
+            Channel::Group(ref group) => group.with(|g| g.channel_id),
+            Channel::Guild(ref ch) => ch.with(|c| c.id),
+            Channel::Private(ref ch) => ch.with(|c| c.id),
         }
     }
 }

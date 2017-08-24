@@ -300,7 +300,6 @@ impl GuildChannel {
     /// ```
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
-
         #[cfg(feature = "cache")]
         {
             let req = permissions::MANAGE_CHANNELS;
@@ -311,10 +310,7 @@ impl GuildChannel {
         }
 
         let mut map = Map::new();
-        map.insert(
-            "name".to_owned(),
-            Value::String(self.name.clone()),
-        );
+        map.insert("name".to_owned(), Value::String(self.name.clone()));
         map.insert(
             "position".to_owned(),
             Value::Number(Number::from(self.position)),
@@ -543,12 +539,8 @@ impl GuildChannel {
                                    after: Option<U>)
                                    -> Result<Vec<User>>
         where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id.reaction_users(
-            message_id,
-            reaction_type,
-            limit,
-            after,
-        )
+        self.id
+            .reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Sends a message with just the given message content in the channel.
@@ -607,7 +599,7 @@ impl GuildChannel {
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     /// [`Message`]: struct.Message.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message>{
         #[cfg(feature = "cache")]
         {
             let req = permissions::SEND_MESSAGES;

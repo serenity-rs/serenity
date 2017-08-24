@@ -1,4 +1,5 @@
 use super::*;
+use internal::RwLockExt;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::result::Result as StdResult;
@@ -27,9 +28,9 @@ impl Mentionable for ChannelId {
 impl Mentionable for Channel {
     fn mention(&self) -> String {
         match *self {
-            Channel::Guild(ref x) => format!("<#{}>", x.read().unwrap().id.0),
-            Channel::Private(ref x) => format!("<#{}>", x.read().unwrap().id.0),
-            Channel::Group(ref x) => format!("<#{}>", x.read().unwrap().channel_id.0),
+            Channel::Guild(ref x) => format!("<#{}>", x.with(|x| x.id.0)),
+            Channel::Private(ref x) => format!("<#{}>", x.with(|x| x.id.0)),
+            Channel::Group(ref x) => format!("<#{}>", x.with(|x| x.channel_id.0)),
         }
     }
 }
@@ -39,7 +40,7 @@ impl Mentionable for Emoji {
 }
 
 impl Mentionable for Member {
-    fn mention(&self) -> String { format!("<@{}>", self.user.read().unwrap().id.0) }
+    fn mention(&self) -> String { format!("<@{}>", self.user.with(|u| u.id.0)) }
 }
 
 impl Mentionable for RoleId {
@@ -89,11 +90,9 @@ impl FromStr for User {
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match utils::parse_username(s) {
-            Some(x) => {
-                UserId(x as u64).get().map_err(
-                    |e| UserParseError::Rest(Box::new(e)),
-                )
-            },
+            Some(x) => UserId(x as u64)
+                .get()
+                .map_err(|e| UserParseError::Rest(Box::new(e))),
             _ => Err(UserParseError::InvalidUsername),
         }
     }
@@ -162,11 +161,9 @@ impl FromStr for Role {
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match utils::parse_role(s) {
-            Some(x) => {
-                match RoleId(x).find() {
-                    Some(user) => Ok(user),
-                    _ => Err(RoleParseError::NotPresentInCache),
-                }
+            Some(x) => match RoleId(x).find() {
+                Some(user) => Ok(user),
+                _ => Err(RoleParseError::NotPresentInCache),
             },
             _ => Err(RoleParseError::InvalidRole),
         }
@@ -245,11 +242,9 @@ impl FromStr for Channel {
 
     fn from_str(s: &str) -> StdResult<Self, ()> {
         match utils::parse_channel(s) {
-            Some(x) => {
-                match ChannelId(x).find() {
-                    Some(channel) => Ok(channel),
-                    _ => Err(()),
-                }
+            Some(x) => match ChannelId(x).find() {
+                Some(channel) => Ok(channel),
+                _ => Err(()),
             },
             _ => Err(()),
         }

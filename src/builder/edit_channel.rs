@@ -27,10 +27,8 @@ impl EditChannel {
     ///
     /// [voice]: ../model/enum.ChannelType.html#variant.Voice
     pub fn bitrate(mut self, bitrate: u64) -> Self {
-        self.0.insert(
-            "bitrate".to_owned(),
-            Value::Number(Number::from(bitrate)),
-        );
+        self.0
+            .insert("bitrate".to_owned(), Value::Number(Number::from(bitrate)));
 
         self
     }
@@ -39,20 +37,16 @@ impl EditChannel {
     ///
     /// Must be between 2 and 100 characters long.
     pub fn name(mut self, name: &str) -> Self {
-        self.0.insert(
-            "name".to_owned(),
-            Value::String(name.to_owned()),
-        );
+        self.0
+            .insert("name".to_owned(), Value::String(name.to_owned()));
 
         self
     }
 
     /// The position of the channel in the channel list.
     pub fn position(mut self, position: u64) -> Self {
-        self.0.insert(
-            "position".to_owned(),
-            Value::Number(Number::from(position)),
-        );
+        self.0
+            .insert("position".to_owned(), Value::Number(Number::from(position)));
 
         self
     }
@@ -65,10 +59,8 @@ impl EditChannel {
     ///
     /// [text]: ../model/enum.ChannelType.html#variant.Text
     pub fn topic(mut self, topic: &str) -> Self {
-        self.0.insert(
-            "topic".to_owned(),
-            Value::String(topic.to_owned()),
-        );
+        self.0
+            .insert("topic".to_owned(), Value::String(topic.to_owned()));
 
         self
     }

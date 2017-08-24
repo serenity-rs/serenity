@@ -35,9 +35,7 @@ impl CreateGroup {
             if let Some(ref prefix) = self.0.prefix {
                 self.0.commands.insert(
                     format!("{} {}", prefix, n.to_owned()),
-                    CommandOrAlias::Alias(
-                        format!("{} {}", prefix, command_name.to_string()),
-                    ),
+                    CommandOrAlias::Alias(format!("{} {}", prefix, command_name.to_string())),
                 );
             } else {
                 self.0.commands.insert(
@@ -61,10 +59,9 @@ impl CreateGroup {
         where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + Send + Sync + 'static {
         let cmd = Arc::new(Command::new(f));
 
-        self.0.commands.insert(
-            command_name.to_owned(),
-            CommandOrAlias::Command(cmd),
-        );
+        self.0
+            .commands
+            .insert(command_name.to_owned(), CommandOrAlias::Command(cmd));
 
         self
     }

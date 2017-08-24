@@ -123,11 +123,11 @@ pub fn deserialize_users<'de, D: Deserializer<'de>>(
     Ok(users)
 }
 
-pub fn deserialize_u16<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u16, D::Error> {
+pub fn deserialize_u16<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u16, D::Error>{
     deserializer.deserialize_u16(U16Visitor)
 }
 
-pub fn deserialize_u64<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u64, D::Error> {
+pub fn deserialize_u64<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u64, D::Error>{
     deserializer.deserialize_u64(U64Visitor)
 }
 
@@ -156,8 +156,7 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
 
     let guild_id = match channel {
         Channel::Guild(channel) => channel.read().unwrap().guild_id,
-        Channel::Group(_) |
-        Channel::Private(_) => {
+        Channel::Group(_) | Channel::Private(_) => {
             // Both users in DMs, and all users in groups, will have the same
             // permissions.
             //
@@ -176,10 +175,10 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
         None => return Err(Error::Model(ModelError::ItemMissing)),
     };
 
-    let perms = guild.read().unwrap().permissions_for(
-        channel_id,
-        current_user.id,
-    );
+    let perms = guild
+        .read()
+        .unwrap()
+        .permissions_for(channel_id, current_user.id);
 
     permissions.remove(perms);
 

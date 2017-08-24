@@ -6,10 +6,7 @@ use std::collections::HashMap;
 
 pub type Check = Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool + 'static;
 pub type Exec = Fn(&mut Context, &Message, Args) -> Result<(), String> + 'static;
-pub type Help = Fn(&mut Context,
-                   &Message,
-                   HashMap<String, Arc<CommandGroup>>,
-                   Args)
+pub type Help = Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
                    -> Result<(), String>
                     + 'static;
 pub type BeforeHook = Fn(&mut Context, &Message, &str) -> bool + 'static;

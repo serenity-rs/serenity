@@ -12,7 +12,7 @@ use websocket::stream::sync::AsTcpStream;
 use websocket::sync::client::{Client, ClientBuilder};
 use websocket::sync::stream::{TcpStream, TlsStream};
 use websocket::WebSocketError;
-use constants::{self, OpCode, close_codes};
+use constants::{self, close_codes, OpCode};
 use internal::prelude::*;
 use internal::ws_impl::SenderExt;
 use model::event::{Event, GatewayEvent};
@@ -95,8 +95,7 @@ pub struct Shard {
     /// update the voice connections' states.
     #[cfg(feature = "voice")]
     pub manager: VoiceManager,
-    #[cfg(feature = "voice")]
-    manager_rx: MpscReceiver<Value>,
+    #[cfg(feature = "voice")] manager_rx: MpscReceiver<Value>,
 }
 
 impl Shard {
@@ -137,42 +136,41 @@ impl Shard {
         let stage = ConnectionStage::Handshake;
         let session_id = None;
 
-        let mut shard =
-            feature_voice! {{
-            let (tx, rx) = mpsc::channel();
-
-            let user = http::get_current_user()?;
-
-            Shard {
-                client,
-                current_presence,
-                heartbeat_instants,
-                heartbeat_interval,
-                last_heartbeat_acknowledged,
-                seq,
-                stage,
-                token,
-                session_id,
-                shard_info,
-                ws_url,
-                manager: VoiceManager::new(tx, user.id),
-                manager_rx: rx,
-            }
-        } else {
-            Shard {
-                client,
-                current_presence,
-                heartbeat_instants,
-                heartbeat_interval,
-                last_heartbeat_acknowledged,
-                seq,
-                stage,
-                token,
-                session_id,
-                shard_info,
-                ws_url,
-            }
-        }};
+        let mut shard = feature_voice! {{
+                                            let (tx, rx) = mpsc::channel();
+        
+                                            let user = http::get_current_user()?;
+        
+                                            Shard {
+                                                client,
+                                                current_presence,
+                                                heartbeat_instants,
+                                                heartbeat_interval,
+                                                last_heartbeat_acknowledged,
+                                                seq,
+                                                stage,
+                                                token,
+                                                session_id,
+                                                shard_info,
+                                                ws_url,
+                                                manager: VoiceManager::new(tx, user.id),
+                                                manager_rx: rx,
+                                            }
+                                        } else {
+                                            Shard {
+                                                client,
+                                                current_presence,
+                                                heartbeat_instants,
+                                                heartbeat_interval,
+                                                last_heartbeat_acknowledged,
+                                                seq,
+                                                stage,
+                                                token,
+                                                session_id,
+                                                shard_info,
+                                                ws_url,
+                                            }
+                                        }};
 
         shard.identify()?;
 
@@ -416,7 +414,7 @@ impl Shard {
             },
             Ok(GatewayEvent::InvalidateSession) => {
                 info!("[Shard {:?}] Received session invalidation; re-identifying",
-                      self.shard_info);
+                self.shard_info);
 
                 self.seq = 0;
                 self.session_id = None;
@@ -435,10 +433,10 @@ impl Shard {
                     let kind = if clean { "Cleanly" } else { "Uncleanly" };
 
                     info!("[Shard {:?}] {} closing with {:?}: {:?}",
-                          self.shard_info,
-                          kind,
-                          num,
-                          reason);
+                    self.shard_info,
+                    kind,
+                    num,
+                    reason);
                 }
 
                 match num {
@@ -471,17 +469,16 @@ impl Shard {
 
                         return Err(Error::Gateway(GatewayError::OverloadedShard));
                     },
-                    Some(4006) |
-                    Some(close_codes::SESSION_TIMEOUT) => {
+                    Some(4006) | Some(close_codes::SESSION_TIMEOUT) => {
                         info!("[Shard {:?}] Invalid session", self.shard_info);
 
                         self.session_id = None;
                     },
                     Some(other) if !clean => {
                         warn!("[Shard {:?}] Unknown unclean close {}: {:?}",
-                              self.shard_info,
-                              other,
-                              reason);
+                        self.shard_info,
+                        other,
+                        reason);
                     },
                     _ => {},
                 }
@@ -742,10 +739,9 @@ impl Shard {
             },
             Err(why) => {
                 match why {
-                    Error::WebSocket(WebSocketError::IoError(err)) => {
-                        if err.raw_os_error() != Some(32) {
-                            debug!("[Shard {:?}] Err w/ heartbeating: {:?}", self.shard_info, err);
-                        }
+                    Error::WebSocket(WebSocketError::IoError(err)) => if err.raw_os_error() !=
+                                                                         Some(32) {
+                        debug!("[Shard {:?}] Err w/ heartbeating: {:?}", self.shard_info, err);
                     },
                     other => {
                         warn!("[Shard {:?}] Other err w/ keepalive: {:?}", self.shard_info, other);
@@ -780,8 +776,8 @@ impl Shard {
 
             return self.reconnect().map_err(|why| {
                 warn!("[Shard {:?}] Err auto-reconnecting from heartbeat check: {:?}",
-                      self.shard_info,
-                      why);
+                self.shard_info,
+                why);
 
                 why
             });

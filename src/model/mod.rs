@@ -198,41 +198,26 @@ pub struct CurrentApplicationInfo {
     pub id: UserId,
     pub name: String,
     pub owner: User,
-    #[serde(default)]
-    pub rpc_origins: Vec<String>,
+    #[serde(default)] pub rpc_origins: Vec<String>,
 }
 
 /// The name of a region that a voice server can be located in.
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub enum Region {
-    #[serde(rename = "amsterdam")]
-    Amsterdam,
-    #[serde(rename = "brazil")]
-    Brazil,
-    #[serde(rename = "eu-central")]
-    EuCentral,
-    #[serde(rename = "eu-west")]
-    EuWest,
-    #[serde(rename = "frankfurt")]
-    Frankfurt,
-    #[serde(rename = "london")]
-    London,
-    #[serde(rename = "sydney")]
-    Sydney,
-    #[serde(rename = "us-central")]
-    UsCentral,
-    #[serde(rename = "us-east")]
-    UsEast,
-    #[serde(rename = "us-south")]
-    UsSouth,
-    #[serde(rename = "us-west")]
-    UsWest,
-    #[serde(rename = "vip-amsterdam")]
-    VipAmsterdam,
-    #[serde(rename = "vip-us-east")]
-    VipUsEast,
-    #[serde(rename = "vip-us-west")]
-    VipUsWest,
+    #[serde(rename = "amsterdam")] Amsterdam,
+    #[serde(rename = "brazil")] Brazil,
+    #[serde(rename = "eu-central")] EuCentral,
+    #[serde(rename = "eu-west")] EuWest,
+    #[serde(rename = "frankfurt")] Frankfurt,
+    #[serde(rename = "london")] London,
+    #[serde(rename = "sydney")] Sydney,
+    #[serde(rename = "us-central")] UsCentral,
+    #[serde(rename = "us-east")] UsEast,
+    #[serde(rename = "us-south")] UsSouth,
+    #[serde(rename = "us-west")] UsWest,
+    #[serde(rename = "vip-amsterdam")] VipAmsterdam,
+    #[serde(rename = "vip-us-east")] VipUsEast,
+    #[serde(rename = "vip-us-west")] VipUsWest,
 }
 
 impl Region {
@@ -260,6 +245,6 @@ use serde::{Deserialize, Deserializer};
 use std::result::Result as StdResult;
 
 fn deserialize_sync_user<'de, D: Deserializer<'de>>(deserializer: D)
-                                                    -> StdResult<Arc<RwLock<User>>, D::Error> {
+-> StdResult<Arc<RwLock<User>>, D::Error>{
     Ok(Arc::new(RwLock::new(User::deserialize(deserializer)?)))
 }

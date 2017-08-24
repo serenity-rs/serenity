@@ -1,5 +1,6 @@
 use chrono::{DateTime, FixedOffset};
 use model::*;
+use internal::RwLockExt;
 
 #[cfg(feature = "model")]
 use std::borrow::Cow;
@@ -123,11 +124,8 @@ impl Group {
                                  reaction_type: R)
                                  -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
-        self.channel_id.delete_reaction(
-            message_id,
-            user_id,
-            reaction_type,
-        )
+        self.channel_id
+            .delete_reaction(message_id, user_id, reaction_type)
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -208,12 +206,12 @@ impl Group {
             Some(ref name) => Cow::Borrowed(name),
             None => {
                 let mut name = match self.recipients.values().nth(0) {
-                    Some(recipient) => recipient.read().unwrap().name.clone(),
+                    Some(recipient) => recipient.with(|c| c.name.clone()),
                     None => return Cow::Borrowed("Empty Group"),
                 };
 
                 for recipient in self.recipients.values().skip(1) {
-                    let _ = write!(name, ", {}", recipient.read().unwrap().name);
+                    let _ = write!(name, ", {}", recipient.with(|r| r.name.clone()));
                 }
 
                 Cow::Owned(name)
@@ -245,12 +243,8 @@ impl Group {
                                    after: Option<U>)
                                    -> Result<Vec<User>>
         where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.channel_id.reaction_users(
-            message_id,
-            reaction_type,
-            limit,
-            after,
-        )
+        self.channel_id
+            .reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Removes a recipient from the group. If the recipient is already not in
@@ -315,7 +309,7 @@ impl Group {
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
-    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message>{
         self.channel_id.send_message(f)
     }
 

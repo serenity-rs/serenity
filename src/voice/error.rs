@@ -7,20 +7,14 @@ use std::process::Output;
 pub enum VoiceError {
     /// An indicator that an endpoint URL was invalid.
     EndpointUrl,
-    #[doc(hidden)]
-    ExpectedHandshake,
-    #[doc(hidden)]
-    FindingByte,
-    #[doc(hidden)]
-    HostnameResolve,
-    #[doc(hidden)]
-    KeyGen,
+    #[doc(hidden)] ExpectedHandshake,
+    #[doc(hidden)] FindingByte,
+    #[doc(hidden)] HostnameResolve,
+    #[doc(hidden)] KeyGen,
     /// An error occurred while checking if a path is stereo.
     Streams,
-    #[doc(hidden)]
-    VoiceModeInvalid,
-    #[doc(hidden)]
-    VoiceModeUnavailable,
+    #[doc(hidden)] VoiceModeInvalid,
+    #[doc(hidden)] VoiceModeUnavailable,
     /// An error occurred while running `youtube-dl`.
     YouTubeDLRun(Output),
     /// An error occurred while processing the JSON output from `youtube-dl`.

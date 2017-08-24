@@ -2,6 +2,7 @@ use chrono::{DateTime, FixedOffset};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_single_recipient;
 use model::*;
+use internal::RwLockExt;
 
 #[cfg(feature = "model")]
 use builder::{CreateMessage, GetMessages};
@@ -169,7 +170,7 @@ impl PrivateChannel {
     }
 
     /// Returns "DM with $username#discriminator".
-    pub fn name(&self) -> String { format!("DM with {}", self.recipient.read().unwrap().tag()) }
+    pub fn name(&self) -> String { format!("DM with {}", self.recipient.with(|r| r.tag())) }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
@@ -191,12 +192,8 @@ impl PrivateChannel {
                                    after: Option<U>)
                                    -> Result<Vec<User>>
         where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id.reaction_users(
-            message_id,
-            reaction_type,
-            limit,
-            after,
-        )
+        self.id
+            .reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Pins a [`Message`] to the channel.
@@ -262,7 +259,7 @@ impl PrivateChannel {
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
     #[inline]
-    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message>{
         self.id.send_message(f)
     }
 

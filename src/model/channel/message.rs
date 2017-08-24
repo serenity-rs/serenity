@@ -291,10 +291,9 @@ impl Message {
         }
 
         // And finally replace everyone and here mentions.
-        result.replace("@everyone", "@\u{200B}everyone").replace(
-            "@here",
-            "@\u{200B}here",
-        )
+        result
+            .replace("@everyone", "@\u{200B}everyone")
+            .replace("@here", "@\u{200B}here")
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
@@ -320,12 +319,8 @@ impl Message {
                                 after: Option<U>)
                                 -> Result<Vec<User>>
         where R: Into<ReactionType>, U: Into<UserId> {
-        self.channel_id.reaction_users(
-            self.id,
-            reaction_type,
-            limit,
-            after,
-        )
+        self.channel_id
+            .reaction_users(self.id, reaction_type, limit, after)
     }
 
     /// Returns the associated `Guild` for the message if one is in the cache.
@@ -338,9 +333,8 @@ impl Message {
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature = "cache")]
     pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> {
-        self.guild_id().and_then(|guild_id| {
-            CACHE.read().unwrap().guild(guild_id)
-        })
+        self.guild_id()
+            .and_then(|guild_id| CACHE.read().unwrap().guild(guild_id))
     }
 
     /// Retrieves the Id of the guild that the message was sent in, if sent in
@@ -360,8 +354,7 @@ impl Message {
     #[cfg(feature = "cache")]
     pub fn is_private(&self) -> bool {
         match CACHE.read().unwrap().channel(self.channel_id) {
-            Some(Channel::Group(_)) |
-            Some(Channel::Private(_)) => true,
+            Some(Channel::Group(_)) | Some(Channel::Private(_)) => true,
             _ => false,
         }
     }
@@ -378,7 +371,11 @@ impl Message {
         let count = content.chars().count() as i64;
         let diff = count - (constants::MESSAGE_CODE_LIMIT as i64);
 
-        if diff > 0 { Some(diff as u64) } else { None }
+        if diff > 0 {
+            Some(diff as u64)
+        } else {
+            None
+        }
     }
 
     /// Pins this message to its channel.

@@ -91,12 +91,9 @@ pub enum ActionEmoji {
 
 #[derive(Debug, Deserialize)]
 pub struct Change {
-    #[serde(rename = "key")]
-    pub name: String,
-    #[serde(rename = "old_value")]
-    pub old: String,
-    #[serde(rename = "new_value")]
-    pub new: String,
+    #[serde(rename = "key")] pub name: String,
+    #[serde(rename = "old_value")] pub old: String,
+    #[serde(rename = "new_value")] pub new: String,
 }
 
 #[derive(Debug)]
@@ -126,7 +123,7 @@ pub struct AuditLogEntry {
     pub id: AuditLogEntryId,
 }
 
-fn deserialize_target<'de, D: Deserializer<'de>>(de: D) -> Result<Target, D::Error> {
+fn deserialize_target<'de, D: Deserializer<'de>>(de: D) -> Result<Target, D::Error>{
     struct TargetVisitor;
 
     impl<'de> Visitor<'de> for TargetVisitor {
@@ -147,7 +144,7 @@ fn deserialize_target<'de, D: Deserializer<'de>>(de: D) -> Result<Target, D::Err
     de.deserialize_i32(TargetVisitor)
 }
 
-fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Error> {
+fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Error>{
     struct ActionVisitor;
 
     impl<'de> Visitor<'de> for ActionVisitor {
@@ -180,8 +177,7 @@ impl<'de> Deserialize<'de> for AuditLogs {
         #[derive(Deserialize)]
         #[serde(field_identifier)]
         enum Field {
-            #[serde(rename = "audit_log_entries")]
-            Entries,
+            #[serde(rename = "audit_log_entries")] Entries,
         }
 
         struct EntriesVisitor;

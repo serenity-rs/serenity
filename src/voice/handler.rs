@@ -225,7 +225,7 @@ impl Handler {
     /// can pass in just a boxed receiver, and do not need to specify `Some`.
     ///
     /// Pass `None` to drop the current receiver, if one exists.
-    pub fn listen<O: Into<Option<Box<AudioReceiver>>>>(&mut self, receiver: O) {
+pub fn listen<O: Into<Option<Box<AudioReceiver>>>>(&mut self, receiver: O){
         self.send(VoiceStatus::SetReceiver(receiver.into()))
     }
 

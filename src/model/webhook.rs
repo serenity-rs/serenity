@@ -118,10 +118,7 @@ impl Webhook {
         }
 
         if let Some(name) = name {
-            map.insert(
-                "name".to_owned(),
-                Value::String(name.to_owned()),
-            );
+            map.insert("name".to_owned(), Value::String(name.to_owned()));
         }
 
         match http::edit_webhook_with_token(self.id.0, &self.token, &map) {
@@ -185,7 +182,7 @@ impl Webhook {
     pub fn execute<F: FnOnce(ExecuteWebhook) -> ExecuteWebhook>(&self,
                                                                 wait: bool,
                                                                 f: F)
-                                                                -> Result<Option<Message>> {
+-> Result<Option<Message>>{
         http::execute_webhook(
             self.id.0,
             &self.token,
