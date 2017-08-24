@@ -8,6 +8,8 @@ use std::error::Error as StdError;
 use std::str::FromStr;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::fmt;
+#[cfg(all(feature = "cache", feature = "utils"))]
+use std;
 #[cfg(any(all(feature = "cache", feature = "utils"), all(feature = "model", feature = "utils")))]
 use utils;
 
@@ -59,8 +61,8 @@ impl Mentionable for User {
 #[cfg(all(feature = "cache", feature = "utils"))]
 #[derive(Debug)]
 pub enum UserParseError {
-    NotPresentInCache,
     InvalidUsername,
+    Rest(Box<std::error::Error>),
 }
 
 
@@ -75,8 +77,8 @@ impl StdError for UserParseError {
         use self::UserParseError::*;
 
         match *self {
-            NotPresentInCache => "not present in cache",
             InvalidUsername => "invalid username",
+            Rest(_) => "could not fetch",
         }
     }
 }
@@ -88,10 +90,9 @@ impl FromStr for User {
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match utils::parse_username(s) {
             Some(x) => {
-                match UserId(x as u64).find() {
-                    Some(user) => Ok(user.read().unwrap().clone()),
-                    _ => Err(UserParseError::NotPresentInCache),
-                }
+                UserId(x as u64).get().map_err(
+                    |e| UserParseError::Rest(Box::new(e)),
+                )
             },
             _ => Err(UserParseError::InvalidUsername),
         }
