@@ -11,9 +11,9 @@ pub struct CreateCommand(pub Command);
 impl CreateCommand {
     /// Adds multiple aliases.
     pub fn batch_known_as(mut self, names: Vec<&str>) -> Self {
-        self.0
-            .aliases
-            .extend(names.into_iter().map(|n| n.to_owned()));
+        self.0.aliases.extend(
+            names.into_iter().map(|n| n.to_owned()),
+        );
 
         self
     }
@@ -115,7 +115,10 @@ impl CreateCommand {
     ///
     /// You can return `Err(string)` if there's an error.
     pub fn exec_help<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
+        where F: Fn(&mut Context,
+                    &Message,
+                    HashMap<String, Arc<CommandGroup>>,
+                    Args)
                     -> Result<(), String>
                      + 'static {
         self.0.exec = CommandType::WithCommands(Box::new(f));

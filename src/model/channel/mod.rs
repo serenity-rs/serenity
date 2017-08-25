@@ -100,7 +100,7 @@ impl Channel {
     /// [`Message::delete`]: struct.Message.html#method.delete
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()>{
+    pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.id().delete_message(message_id)
     }
 
@@ -118,8 +118,11 @@ pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()>{
                                  reaction_type: R)
                                  -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
-        self.id()
-            .delete_reaction(message_id, user_id, reaction_type)
+        self.id().delete_reaction(
+            message_id,
+            user_id,
+            reaction_type,
+        )
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -157,7 +160,8 @@ pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()>{
     pub fn is_nsfw(&self) -> bool {
         match *self {
             Channel::Guild(ref channel) => channel.with(|c| c.is_nsfw()),
-            Channel::Group(_) | Channel::Private(_) => false,
+            Channel::Group(_) |
+            Channel::Private(_) => false,
         }
     }
 
@@ -217,8 +221,12 @@ pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()>{
                                    after: Option<U>)
                                    -> Result<Vec<User>>
         where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id()
-            .reaction_users(message_id, reaction_type, limit, after)
+        self.id().reaction_users(
+            message_id,
+            reaction_type,
+            limit,
+            after,
+        )
     }
 
     /// Retrieves the Id of the inner [`Group`], [`GuildChannel`], or
@@ -319,15 +327,21 @@ impl<'de> Deserialize<'de> for Channel {
         };
 
         match kind {
-            0 | 2 => serde_json::from_value::<GuildChannel>(Value::Object(v))
-                .map(|x| Channel::Guild(Arc::new(RwLock::new(x))))
-                .map_err(DeError::custom),
-            1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
-                .map(|x| Channel::Private(Arc::new(RwLock::new(x))))
-                .map_err(DeError::custom),
-            3 => serde_json::from_value::<Group>(Value::Object(v))
-                .map(|x| Channel::Group(Arc::new(RwLock::new(x))))
-                .map_err(DeError::custom),
+            0 | 2 => {
+                serde_json::from_value::<GuildChannel>(Value::Object(v))
+                    .map(|x| Channel::Guild(Arc::new(RwLock::new(x))))
+                    .map_err(DeError::custom)
+            },
+            1 => {
+                serde_json::from_value::<PrivateChannel>(Value::Object(v))
+                    .map(|x| Channel::Private(Arc::new(RwLock::new(x))))
+                    .map_err(DeError::custom)
+            },
+            3 => {
+                serde_json::from_value::<Group>(Value::Object(v))
+                    .map(|x| Channel::Group(Arc::new(RwLock::new(x))))
+                    .map_err(DeError::custom)
+            },
             _ => Err(DeError::custom("Unknown channel type")),
         }
     }
@@ -399,8 +413,10 @@ impl ChannelType {
 struct PermissionOverwriteData {
     allow: Permissions,
     deny: Permissions,
-    #[serde(deserialize_with = "deserialize_u64")] id: u64,
-    #[serde(rename = "type")] kind: String,
+    #[serde(deserialize_with = "deserialize_u64")]
+    id: u64,
+    #[serde(rename = "type")]
+    kind: String,
 }
 
 /// A channel-specific permission overwrite for a member or role.

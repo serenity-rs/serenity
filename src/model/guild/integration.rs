@@ -6,7 +6,8 @@ pub struct Integration {
     pub id: IntegrationId,
     pub account: IntegrationAccount,
     pub enabled: bool,
-    #[serde(rename = "expire_behaviour")] pub expire_behaviour: u64,
+    #[serde(rename = "expire_behaviour")]
+    pub expire_behaviour: u64,
     pub expire_grace_period: u64,
     pub kind: String,
     pub name: String,

@@ -171,7 +171,8 @@ impl Display for Error {
 impl StdError for Error {
     fn description(&self) -> &str {
         match *self {
-            Error::Decode(msg, _) | Error::Other(msg) => msg,
+            Error::Decode(msg, _) |
+            Error::Other(msg) => msg,
             Error::ExceededLimit(..) => "Input exceeded a limit",
             Error::Format(ref inner) => inner.description(),
             Error::Io(ref inner) => inner.description(),

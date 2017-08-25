@@ -402,9 +402,9 @@ impl StandardFramework {
             }
 
             if let Some(guild) = guild_id.find() {
-                return self.configuration
-                    .blocked_users
-                    .contains(&guild.with(|g| g.owner_id));
+                return self.configuration.blocked_users.contains(
+                    &guild.with(|g| g.owner_id),
+                );
             }
         }
 
@@ -415,8 +415,9 @@ impl StandardFramework {
     fn has_correct_permissions(&self, command: &Arc<Command>, message: &Message) -> bool {
         if !command.required_permissions.is_empty() {
             if let Some(guild) = message.guild() {
-                let perms = guild
-                    .with(|g| g.permissions_for(message.channel_id, message.author.id));
+                let perms = guild.with(|g| {
+                    g.permissions_for(message.channel_id, message.author.id)
+                });
 
                 return perms.contains(command.required_permissions);
             }
@@ -446,7 +447,8 @@ impl StandardFramework {
                     let rate_limit = bucket.take(message.author.id.0);
                     match bucket.check {
                         Some(ref check) => {
-                            let apply = feature_cache! {{
+                            let apply =
+                                feature_cache! {{
                                 let guild_id = message.guild_id();
                                 (check)(context, guild_id, message.channel_id, message.author.id)
                             } else {
@@ -457,8 +459,10 @@ impl StandardFramework {
                                 return Some(DispatchError::RateLimited(rate_limit));
                             }
                         },
-                        None => if rate_limit > 0i64 {
-                            return Some(DispatchError::RateLimited(rate_limit));
+                        None => {
+                            if rate_limit > 0i64 {
+                                return Some(DispatchError::RateLimited(rate_limit));
+                            }
                         },
                     }
                 }
@@ -508,19 +512,18 @@ impl StandardFramework {
 
             if command.owners_only {
                 Some(DispatchError::OnlyForOwners)
-            } else if self.configuration
-                   .blocked_users
-                   .contains(&message.author.id) {
+            } else if self.configuration.blocked_users.contains(
+                &message.author.id,
+            ) {
                 Some(DispatchError::BlockedUser)
             } else if self.configuration.disabled_commands.contains(to_check) {
                 Some(DispatchError::CommandDisabled(to_check.to_owned()))
             } else if self.configuration.disabled_commands.contains(built) {
                 Some(DispatchError::CommandDisabled(built.to_owned()))
             } else {
-                let all_passed = command
-                    .checks
-                    .iter()
-                    .all(|check| check(&mut context, message, args, command));
+                let all_passed = command.checks.iter().all(|check| {
+                    check(&mut context, message, args, command)
+                });
 
                 if all_passed {
                     None
@@ -574,16 +577,21 @@ impl StandardFramework {
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
         where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + 'static, S: Into<String> {
         {
-            let ungrouped = self.groups
-                .entry("Ungrouped".to_owned())
-                .or_insert_with(|| Arc::new(CommandGroup::default()));
+            let ungrouped = self.groups.entry("Ungrouped".to_owned()).or_insert_with(
+                || {
+                    Arc::new(CommandGroup::default())
+                },
+            );
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
                 let name = command_name.into();
 
-                group
-                    .commands
-                    .insert(name, CommandOrAlias::Command(Arc::new(Command::new(f))));
+                group.commands.insert(
+                    name,
+                    CommandOrAlias::Command(
+                        Arc::new(Command::new(f)),
+                    ),
+                );
             }
         }
 
@@ -606,9 +614,11 @@ impl StandardFramework {
     pub fn command<F, S>(mut self, command_name: S, f: F) -> Self
         where F: FnOnce(CreateCommand) -> CreateCommand, S: Into<String> {
         {
-            let ungrouped = self.groups
-                .entry("Ungrouped".to_owned())
-                .or_insert_with(|| Arc::new(CommandGroup::default()));
+            let ungrouped = self.groups.entry("Ungrouped".to_owned()).or_insert_with(
+                || {
+                    Arc::new(CommandGroup::default())
+                },
+            );
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
                 let cmd = f(CreateCommand(Command::default())).0;
@@ -623,15 +633,17 @@ impl StandardFramework {
                     }
                 } else {
                     for v in &cmd.aliases {
-                        group
-                            .commands
-                            .insert(v.to_owned(), CommandOrAlias::Alias(name.clone()));
+                        group.commands.insert(
+                            v.to_owned(),
+                            CommandOrAlias::Alias(name.clone()),
+                        );
                     }
                 }
 
-                group
-                    .commands
-                    .insert(name, CommandOrAlias::Command(Arc::new(cmd)));
+                group.commands.insert(
+                    name,
+                    CommandOrAlias::Command(Arc::new(cmd)),
+                );
             }
         }
 
@@ -844,7 +856,8 @@ impl Framework for StandardFramework {
                 for group in groups.values() {
                     let command_length = built.len();
 
-                    if let Some(&CommandOrAlias::Alias(ref points_to)) = group.commands.get(&built) {
+                    if let Some(&CommandOrAlias::Alias(ref points_to)) =
+                        group.commands.get(&built) {
                         built = points_to.to_owned();
                     }
 

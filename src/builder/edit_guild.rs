@@ -22,7 +22,7 @@ impl EditGuild {
     /// valid.
     ///
     /// [`afk_timeout`]: #method.afk_timeout
-pub fn afk_channel<C: Into<ChannelId>>(mut self, channel: Option<C>) -> Self{
+    pub fn afk_channel<C: Into<ChannelId>>(mut self, channel: Option<C>) -> Self {
         self.0.insert(
             "afk_channel_id".to_owned(),
             match channel {
@@ -79,7 +79,10 @@ pub fn afk_channel<C: Into<ChannelId>>(mut self, channel: Option<C>) -> Self{
     pub fn icon(mut self, icon: Option<&str>) -> Self {
         self.0.insert(
             "icon".to_owned(),
-            icon.map_or_else(|| Value::Null, |x| Value::String(x.to_owned())),
+            icon.map_or_else(
+                || Value::Null,
+                |x| Value::String(x.to_owned()),
+            ),
         );
 
         self
@@ -89,8 +92,10 @@ pub fn afk_channel<C: Into<ChannelId>>(mut self, channel: Option<C>) -> Self{
     ///
     /// **Note**: Must be between (and including) 2-100 chracters.
     pub fn name(mut self, name: &str) -> Self {
-        self.0
-            .insert("name".to_owned(), Value::String(name.to_owned()));
+        self.0.insert(
+            "name".to_owned(),
+            Value::String(name.to_owned()),
+        );
 
         self
     }
@@ -134,8 +139,10 @@ pub fn afk_channel<C: Into<ChannelId>>(mut self, channel: Option<C>) -> Self{
     ///
     /// [`Region::UsWest`]: ../model/enum.Region.html#variant.UsWest
     pub fn region(mut self, region: Region) -> Self {
-        self.0
-            .insert("region".to_owned(), Value::String(region.name().to_owned()));
+        self.0.insert(
+            "region".to_owned(),
+            Value::String(region.name().to_owned()),
+        );
 
         self
     }

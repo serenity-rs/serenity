@@ -106,8 +106,9 @@ impl<'de> Deserialize<'de> for Game {
         let name = map.remove("name")
             .and_then(|v| String::deserialize(v).ok())
             .unwrap_or_else(String::new);
-        let url = map.remove("url")
-            .and_then(|v| serde_json::from_value::<String>(v).ok());
+        let url = map.remove("url").and_then(|v| {
+            serde_json::from_value::<String>(v).ok()
+        });
 
         Ok(Game {
             kind: kind,
@@ -173,8 +174,9 @@ impl<'de> Deserialize<'de> for Presence {
             .map_err(DeError::custom)?;
 
         let (user_id, user) = if user_map.len() > 1 {
-            let user = User::deserialize(Value::Object(user_map))
-                .map_err(DeError::custom)?;
+            let user = User::deserialize(Value::Object(user_map)).map_err(
+                DeError::custom,
+            )?;
 
             (user.id, Some(Arc::new(RwLock::new(user))))
         } else {
@@ -188,8 +190,11 @@ impl<'de> Deserialize<'de> for Presence {
         };
 
         let game = match map.remove("game") {
-            Some(v) => serde_json::from_value::<Option<Game>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => {
+                serde_json::from_value::<Option<Game>>(v).map_err(
+                    DeError::custom,
+                )?
+            },
             None => None,
         };
         let last_modified = match map.remove("last_modified") {
@@ -197,8 +202,11 @@ impl<'de> Deserialize<'de> for Presence {
             None => None,
         };
         let nick = match map.remove("nick") {
-            Some(v) => serde_json::from_value::<Option<String>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => {
+                serde_json::from_value::<Option<String>>(v).map_err(
+                    DeError::custom,
+                )?
+            },
             None => None,
         };
         let status = map.remove("status")
@@ -221,13 +229,15 @@ impl<'de> Deserialize<'de> for Presence {
 #[derive(Clone, Debug, Deserialize)]
 pub struct Ready {
     pub guilds: Vec<GuildStatus>,
-    #[serde(deserialize_with = "deserialize_presences")] pub presences: HashMap<UserId, Presence>,
+    #[serde(deserialize_with = "deserialize_presences")]
+    pub presences: HashMap<UserId, Presence>,
     #[serde(deserialize_with = "deserialize_private_channels")]
-    pub private_channels:
-        HashMap<ChannelId, Channel>,
+    pub private_channels: HashMap<ChannelId, Channel>,
     pub session_id: String,
     pub shard: Option<[u64; 2]>,
-    #[serde(default, rename = "_trace")] pub trace: Vec<String>,
+    #[serde(default, rename = "_trace")]
+    pub trace: Vec<String>,
     pub user: CurrentUser,
-    #[serde(rename = "v")] pub version: u64,
+    #[serde(rename = "v")]
+    pub version: u64,
 }
