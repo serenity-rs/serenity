@@ -1,5 +1,6 @@
-use serde_json::Value;
+use serde_json::{self, Value};
 use std::process::Output;
+use std;
 
 /// An error returned from the voice module.
 // Errors which are not visible to the end user are hidden.
@@ -31,4 +32,13 @@ pub enum VoiceError {
     ///
     /// The JSON output is given.
     YouTubeDLUrl(Value),
+}
+
+/// An error returned from the dca method.
+#[derive(Debug)]
+pub enum DcaError {
+    IoError(std::io::Error),
+    InvalidHeader,
+    InvalidMetadata(serde_json::Error),
+    InvalidSize(i32),
 }

@@ -3,6 +3,7 @@
 mod audio;
 mod connection;
 mod connection_info;
+mod dca;
 mod error;
 mod manager;
 mod handler;
@@ -12,6 +13,8 @@ mod threading;
 
 pub use self::audio::{AudioReceiver, AudioSource};
 pub use self::error::VoiceError;
+pub use self::dca::DcaMetadata;
+pub use self::error::{DcaError, VoiceError};
 pub use self::handler::Handler;
 pub use self::manager::Manager;
 pub use self::streamer::{ffmpeg, pcm, ytdl};
