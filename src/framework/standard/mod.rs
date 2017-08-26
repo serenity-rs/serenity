@@ -71,7 +71,7 @@ macro_rules! command {
         #[allow(unreachable_code, unused_mut)]
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       _: &$crate::model::Message,
-                      _: Args)
+                      _: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), String> {
             $b
 
@@ -82,7 +82,7 @@ macro_rules! command {
         #[allow(unreachable_code, unused_mut)]
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::Message,
-                      _: Args)
+                      _: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), String> {
             $b
 
@@ -93,7 +93,7 @@ macro_rules! command {
         #[allow(unreachable_code, unused_mut)]
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::Message,
-                      mut $a: Args)
+                      mut $a: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), String> {
             $b
 
