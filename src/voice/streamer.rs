@@ -48,12 +48,17 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
     fn read_opus_frame(&mut self) -> Option<Vec<u8>> {
         match self.reader.read_i16::<LittleEndian>() {
             Ok(size) => {
-                let mut frame = Vec::with_capacity(size as usize + 2);
-                frame.write_i16::<LittleEndian>(size);
-                match self.reader.read_exact(&mut frame[2..]) {
-                    Ok(_) => Some(frame),
-                    _ => None,
+                let mut frame = Vec::with_capacity(size as usize);
+                
+                {
+                    let reader = self.reader.by_ref();
+
+                    if let Err(_) = reader.take(size as u64).read_to_end(&mut frame) {
+                        return None;
+                    }
                 }
+
+                Some(frame)
             },
             Err(ref e) => {
                 return if e.kind() == IoErrorKind::UnexpectedEof {
