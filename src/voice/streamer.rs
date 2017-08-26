@@ -49,7 +49,7 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
         match self.reader.read_i16::<LittleEndian>() {
             Ok(size) => {
                 let mut frame = Vec::with_capacity(size as usize);
-                
+
                 {
                     let reader = self.reader.by_ref();
 
@@ -132,10 +132,14 @@ pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Box<AudioSource>, DcaError> {
 
     {
         let json_reader = reader.by_ref();
-        json_reader.take(size as u64).read_to_end(&mut raw_json).map_err(DcaError::IoError)?;
+        json_reader
+            .take(size as u64)
+            .read_to_end(&mut raw_json)
+            .map_err(DcaError::IoError)?;
     }
 
-    let metadata = serde_json::from_slice::<DcaMetadata>(raw_json.as_slice()).map_err(DcaError::InvalidMetadata)?;
+    let metadata = serde_json::from_slice::<DcaMetadata>(raw_json.as_slice())
+        .map_err(DcaError::InvalidMetadata)?;
 
     Ok(opus(metadata.is_stereo(), reader))
 }
@@ -145,7 +149,7 @@ pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSo
     Box::new(InputSource {
         stereo: is_stereo,
         reader: reader,
-        kind: AudioType::Opus
+        kind: AudioType::Opus,
     })
 }
 
@@ -154,7 +158,7 @@ pub fn pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSou
     Box::new(InputSource {
         stereo: is_stereo,
         reader: reader,
-        kind: AudioType::Pcm
+        kind: AudioType::Pcm,
     })
 }
 

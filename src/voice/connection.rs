@@ -262,7 +262,7 @@ impl Connection {
                             Some(frame) => {
                                 opus_frame = frame;
                                 opus_frame.len()
-                            }
+                            },
                             None => 0,
                         }
                     },
@@ -273,10 +273,10 @@ impl Connection {
                             Some(len) => len,
                             None => 0,
                         }
-                    }
+                    },
                 }
-            }
-            None => 0
+            },
+            None => 0,
         };
 
         if len == 0 {
@@ -340,7 +340,9 @@ impl Connection {
             )?
         } else {
             let len = opus_frame.len();
-            packet[HEADER_LEN..HEADER_LEN + len].clone_from_slice(opus_frame);
+            packet[HEADER_LEN..HEADER_LEN + len].clone_from_slice(
+                opus_frame,
+            );
             len
         };
 
