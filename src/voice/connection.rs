@@ -315,7 +315,7 @@ impl Connection {
     fn prep_packet(&mut self,
                    packet: &mut [u8; 512],
                    buffer: [i16; 1920],
-                   opus_frame: &Vec<u8>,
+                   opus_frame: &[u8],
                    mut nonce: Nonce)
                    -> Result<usize> {
         {
@@ -340,7 +340,7 @@ impl Connection {
             )?
         } else {
             let len = opus_frame.len();
-            packet[HEADER_LEN..HEADER_LEN + len].clone_from_slice(&opus_frame);
+            packet[HEADER_LEN..HEADER_LEN + len].clone_from_slice(opus_frame);
             len
         };
 

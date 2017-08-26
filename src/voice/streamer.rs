@@ -1,4 +1,4 @@
-use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{LittleEndian, ReadBytesExt};
 use serde_json;
 use std::ffi::OsStr;
 use std::io::{BufReader, ErrorKind as IoErrorKind, Read, Result as IoResult};
@@ -53,7 +53,7 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
                 {
                     let reader = self.reader.by_ref();
 
-                    if let Err(_) = reader.take(size as u64).read_to_end(&mut frame) {
+                    if reader.take(size as u64).read_to_end(&mut frame).is_err() {
                         return None;
                     }
                 }
@@ -61,7 +61,7 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
                 Some(frame)
             },
             Err(ref e) => {
-                return if e.kind() == IoErrorKind::UnexpectedEof {
+                if e.kind() == IoErrorKind::UnexpectedEof {
                     Some(Vec::new())
                 } else {
                     None
