@@ -103,8 +103,10 @@ impl ExecuteWebhook {
     ///
     /// [`embeds`]: #method.embeds
     pub fn content(mut self, content: &str) -> Self {
-        self.0
-            .insert("content".to_owned(), Value::String(content.to_owned()));
+        self.0.insert(
+            "content".to_owned(),
+            Value::String(content.to_owned()),
+        );
 
         self
     }
@@ -165,8 +167,10 @@ impl ExecuteWebhook {
     /// }
     /// ```
     pub fn username(mut self, username: &str) -> Self {
-        self.0
-            .insert("username".to_owned(), Value::String(username.to_owned()));
+        self.0.insert(
+            "username".to_owned(),
+            Value::String(username.to_owned()),
+        );
 
         self
     }

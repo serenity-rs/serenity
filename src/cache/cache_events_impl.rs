@@ -85,8 +85,9 @@ impl CacheEventsImpl for super::Cache {
                 self.guilds
                     .get_mut(&guild_id)
                     .and_then(|guild| {
-                        guild
-                            .with_mut(|guild| guild.channels.insert(channel_id, channel.clone()))
+                        guild.with_mut(|guild| {
+                            guild.channels.insert(channel_id, channel.clone())
+                        })
                     })
                     .map(Channel::Guild)
             },
@@ -120,56 +121,59 @@ impl CacheEventsImpl for super::Cache {
             // We ignore these two due to the fact that the delete event for dms/groups
             // will _not_ fire
             // anymore.
-            Channel::Private(_) | Channel::Group(_) => unreachable!(),
+            Channel::Private(_) |
+            Channel::Group(_) => unreachable!(),
         };
 
         let (guild_id, channel_id) = channel.with(|channel| (channel.guild_id, channel.id));
 
         self.channels.remove(&channel_id);
 
-        self.guilds
-            .get_mut(&guild_id)
-            .and_then(|guild| guild.with_mut(|g| g.channels.remove(&channel_id)));
+        self.guilds.get_mut(&guild_id).and_then(|guild| {
+            guild.with_mut(|g| g.channels.remove(&channel_id))
+        });
     }
 
     #[allow(dead_code)]
-fn update_with_channel_pins_update(&mut self, event: &ChannelPinsUpdateEvent){
+    fn update_with_channel_pins_update(&mut self, event: &ChannelPinsUpdateEvent) {
         if let Some(channel) = self.channels.get(&event.channel_id) {
-            channel
-                .with_mut(|c| { c.last_pin_timestamp = event.last_pin_timestamp; });
+            channel.with_mut(|c| {
+                c.last_pin_timestamp = event.last_pin_timestamp;
+            });
 
             return;
         }
 
         if let Some(channel) = self.private_channels.get_mut(&event.channel_id) {
-            channel
-                .with_mut(|c| { c.last_pin_timestamp = event.last_pin_timestamp; });
+            channel.with_mut(|c| {
+                c.last_pin_timestamp = event.last_pin_timestamp;
+            });
 
             return;
         }
 
         if let Some(group) = self.groups.get_mut(&event.channel_id) {
-            group
-                .with_mut(|c| { c.last_pin_timestamp = event.last_pin_timestamp; });
+            group.with_mut(|c| {
+                c.last_pin_timestamp = event.last_pin_timestamp;
+            });
 
             return;
         }
     }
 
-fn update_with_channel_recipient_add(&mut self, event: &mut ChannelRecipientAddEvent){
+    fn update_with_channel_recipient_add(&mut self, event: &mut ChannelRecipientAddEvent) {
         self.update_user_entry(&event.user);
         let user = self.users[&event.user.id].clone();
 
         self.groups.get_mut(&event.channel_id).map(|group| {
-            group
-                .write()
-                .unwrap()
-                .recipients
-                .insert(event.user.id, user);
+            group.write().unwrap().recipients.insert(
+                event.user.id,
+                user,
+            );
         });
     }
 
-fn update_with_channel_recipient_remove(&mut self, event: &ChannelRecipientRemoveEvent){
+    fn update_with_channel_recipient_remove(&mut self, event: &ChannelRecipientRemoveEvent) {
         self.groups.get_mut(&event.channel_id).map(|group| {
             group.with_mut(|g| g.recipients.remove(&event.user.id))
         });
@@ -205,8 +209,9 @@ fn update_with_channel_recipient_remove(&mut self, event: &ChannelRecipientRemov
 
                 self.channels.insert(channel_id, channel.clone());
                 self.guilds.get_mut(&guild_id).map(|guild| {
-                    guild
-                        .with_mut(|g| g.channels.insert(channel_id, channel.clone()))
+                    guild.with_mut(
+                        |g| g.channels.insert(channel_id, channel.clone()),
+                    )
                 });
             },
             Channel::Private(ref channel) => {
@@ -230,8 +235,10 @@ fn update_with_channel_recipient_remove(&mut self, event: &ChannelRecipientRemov
         }
 
         self.channels.extend(guild.channels.clone());
-        self.guilds
-            .insert(event.guild.id, Arc::new(RwLock::new(guild)));
+        self.guilds.insert(
+            event.guild.id,
+            Arc::new(RwLock::new(guild)),
+        );
     }
 
     fn update_with_guild_delete(&mut self, event: &GuildDeleteEvent) -> Option<Arc<RwLock<Guild>>> {
@@ -245,13 +252,13 @@ fn update_with_channel_recipient_remove(&mut self, event: &ChannelRecipientRemov
         })
     }
 
-fn update_with_guild_emojis_update(&mut self, event: &GuildEmojisUpdateEvent){
+    fn update_with_guild_emojis_update(&mut self, event: &GuildEmojisUpdateEvent) {
         self.guilds.get_mut(&event.guild_id).map(|guild| {
             guild.with_mut(|g| g.emojis.extend(event.emojis.clone()))
         });
     }
 
-fn update_with_guild_member_add(&mut self, event: &mut GuildMemberAddEvent){
+    fn update_with_guild_member_add(&mut self, event: &mut GuildMemberAddEvent) {
         let user_id = event.member.user.with(|u| u.id);
         self.update_user_entry(&event.member.user.read().unwrap());
 
@@ -268,7 +275,7 @@ fn update_with_guild_member_add(&mut self, event: &mut GuildMemberAddEvent){
 
     fn update_with_guild_member_remove(&mut self,
                                        event: &GuildMemberRemoveEvent)
--> Option<Member>{
+                                       -> Option<Member> {
         self.guilds.get_mut(&event.guild_id).and_then(|guild| {
             guild.with_mut(|guild| {
                 guild.member_count -= 1;
@@ -279,7 +286,7 @@ fn update_with_guild_member_add(&mut self, event: &mut GuildMemberAddEvent){
 
     fn update_with_guild_member_update(&mut self,
                                        event: &GuildMemberUpdateEvent)
--> Option<Member>{
+                                       -> Option<Member> {
         self.update_user_entry(&event.user);
 
         if let Some(guild) = self.guilds.get_mut(&event.guild_id) {
@@ -322,7 +329,7 @@ fn update_with_guild_member_add(&mut self, event: &mut GuildMemberAddEvent){
         }
     }
 
-fn update_with_guild_members_chunk(&mut self, event: &GuildMembersChunkEvent){
+    fn update_with_guild_members_chunk(&mut self, event: &GuildMembersChunkEvent) {
         for member in event.members.values() {
             self.update_user_entry(&member.user.read().unwrap());
         }
@@ -332,33 +339,32 @@ fn update_with_guild_members_chunk(&mut self, event: &GuildMembersChunkEvent){
         });
     }
 
-fn update_with_guild_role_create(&mut self, event: &GuildRoleCreateEvent){
+    fn update_with_guild_role_create(&mut self, event: &GuildRoleCreateEvent) {
         self.guilds.get_mut(&event.guild_id).map(|guild| {
-            guild
-                .write()
-                .unwrap()
-                .roles
-                .insert(event.role.id, event.role.clone())
+            guild.write().unwrap().roles.insert(
+                event.role.id,
+                event.role.clone(),
+            )
         });
     }
 
-fn update_with_guild_role_delete(&mut self, event: &GuildRoleDeleteEvent) -> Option<Role>{
-        self.guilds
-            .get_mut(&event.guild_id)
-            .and_then(|guild| guild.with_mut(|g| g.roles.remove(&event.role_id)))
+    fn update_with_guild_role_delete(&mut self, event: &GuildRoleDeleteEvent) -> Option<Role> {
+        self.guilds.get_mut(&event.guild_id).and_then(|guild| {
+            guild.with_mut(|g| g.roles.remove(&event.role_id))
+        })
     }
 
-fn update_with_guild_role_update(&mut self, event: &GuildRoleUpdateEvent) -> Option<Role>{
+    fn update_with_guild_role_update(&mut self, event: &GuildRoleUpdateEvent) -> Option<Role> {
         self.guilds.get_mut(&event.guild_id).and_then(|guild| {
             guild.with_mut(|g| {
-                g.roles
-                    .get_mut(&event.role.id)
-                    .map(|role| mem::replace(role, event.role.clone()))
+                g.roles.get_mut(&event.role.id).map(|role| {
+                    mem::replace(role, event.role.clone())
+                })
             })
         })
     }
 
-fn update_with_guild_unavailable(&mut self, event: &GuildUnavailableEvent){
+    fn update_with_guild_unavailable(&mut self, event: &GuildUnavailableEvent) {
         self.unavailable_guilds.insert(event.guild_id);
         self.guilds.remove(&event.guild_id);
     }
@@ -378,7 +384,7 @@ fn update_with_guild_unavailable(&mut self, event: &GuildUnavailableEvent){
         });
     }
 
-fn update_with_presences_replace(&mut self, event: &PresencesReplaceEvent){
+    fn update_with_presences_replace(&mut self, event: &PresencesReplaceEvent) {
         self.presences.extend({
             let mut p: HashMap<UserId, Presence> = HashMap::default();
 
@@ -406,16 +412,19 @@ fn update_with_presences_replace(&mut self, event: &PresencesReplaceEvent){
                 if event.presence.status == OnlineStatus::Offline {
                     guild.presences.remove(&event.presence.user_id);
                 } else {
-                    guild
-                        .presences
-                        .insert(event.presence.user_id, event.presence.clone());
+                    guild.presences.insert(
+                        event.presence.user_id,
+                        event.presence.clone(),
+                    );
                 }
             }
         } else if event.presence.status == OnlineStatus::Offline {
             self.presences.remove(&event.presence.user_id);
         } else {
-            self.presences
-                .insert(event.presence.user_id, event.presence.clone());
+            self.presences.insert(
+                event.presence.user_id,
+                event.presence.clone(),
+            );
         }
     }
 
@@ -456,7 +465,7 @@ fn update_with_presences_replace(&mut self, event: &PresencesReplaceEvent){
         mem::replace(&mut self.user, event.current_user.clone())
     }
 
-fn update_with_voice_state_update(&mut self, event: &VoiceStateUpdateEvent){
+    fn update_with_voice_state_update(&mut self, event: &VoiceStateUpdateEvent) {
         if let Some(guild_id) = event.guild_id {
             if let Some(guild) = self.guilds.get_mut(&guild_id) {
                 let mut guild = guild.write().unwrap();
@@ -473,9 +482,10 @@ fn update_with_voice_state_update(&mut self, event: &VoiceStateUpdateEvent){
                         }
                     }
 
-                    guild
-                        .voice_states
-                        .insert(event.voice_state.user_id, event.voice_state.clone());
+                    guild.voice_states.insert(
+                        event.voice_state.user_id,
+                        event.voice_state.clone(),
+                    );
                 } else {
                     // Remove the user from the voice state list
                     guild.voice_states.remove(&event.voice_state.user_id);

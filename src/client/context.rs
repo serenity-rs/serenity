@@ -75,7 +75,7 @@ impl Context {
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     #[cfg(feature = "builder")]
-pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser>{
+    pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser> {
         let mut map = Map::new();
 
         feature_cache! {{

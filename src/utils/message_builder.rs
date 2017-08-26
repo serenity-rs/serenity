@@ -852,11 +852,8 @@ impl Content {
     pub fn to_string(&self) -> String {
         let capacity =
             self.inner.len() + if self.bold { 4 } else { 0 } + if self.italic { 2 } else { 0 } +
-            if self.strikethrough { 4 } else { 0 } + if self.underline {
-                4
-            } else {
-                0
-            } + if self.code { 2 } else { 0 };
+            if self.strikethrough { 4 } else { 0 } +
+            if self.underline { 4 } else { 0 } + if self.code { 2 } else { 0 };
         let mut new_str = String::with_capacity(capacity);
 
         if self.bold {

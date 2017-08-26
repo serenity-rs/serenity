@@ -12,7 +12,7 @@ use websocket::stream::sync::AsTcpStream;
 use websocket::sync::client::{Client, ClientBuilder};
 use websocket::sync::stream::{TcpStream, TlsStream};
 use websocket::WebSocketError;
-use constants::{self, close_codes, OpCode};
+use constants::{self, OpCode, close_codes};
 use internal::prelude::*;
 use internal::ws_impl::SenderExt;
 use model::event::{Event, GatewayEvent};
@@ -95,7 +95,8 @@ pub struct Shard {
     /// update the voice connections' states.
     #[cfg(feature = "voice")]
     pub manager: VoiceManager,
-    #[cfg(feature = "voice")] manager_rx: MpscReceiver<Value>,
+    #[cfg(feature = "voice")]
+    manager_rx: MpscReceiver<Value>,
 }
 
 impl Shard {
@@ -136,7 +137,8 @@ impl Shard {
         let stage = ConnectionStage::Handshake;
         let session_id = None;
 
-        let mut shard = feature_voice! {{
+        let mut shard =
+            feature_voice! {{
                                             let (tx, rx) = mpsc::channel();
         
                                             let user = http::get_current_user()?;
@@ -469,7 +471,8 @@ impl Shard {
 
                         return Err(Error::Gateway(GatewayError::OverloadedShard));
                     },
-                    Some(4006) | Some(close_codes::SESSION_TIMEOUT) => {
+                    Some(4006) |
+                    Some(close_codes::SESSION_TIMEOUT) => {
                         info!("[Shard {:?}] Invalid session", self.shard_info);
 
                         self.session_id = None;
@@ -739,9 +742,10 @@ impl Shard {
             },
             Err(why) => {
                 match why {
-                    Error::WebSocket(WebSocketError::IoError(err)) => if err.raw_os_error() !=
-                                                                         Some(32) {
-                        debug!("[Shard {:?}] Err w/ heartbeating: {:?}", self.shard_info, err);
+                    Error::WebSocket(WebSocketError::IoError(err)) => {
+                        if err.raw_os_error() != Some(32) {
+                            debug!("[Shard {:?}] Err w/ heartbeating: {:?}", self.shard_info, err);
+                        }
                     },
                     other => {
                         warn!("[Shard {:?}] Other err w/ keepalive: {:?}", self.shard_info, other);

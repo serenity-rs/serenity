@@ -46,8 +46,10 @@ impl CreateMessage {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     pub fn content<D: Display>(mut self, content: D) -> Self {
-        self.0
-            .insert("content".to_owned(), Value::String(format!("{}", content)));
+        self.0.insert(
+            "content".to_owned(),
+            Value::String(format!("{}", content)),
+        );
 
         CreateMessage(self.0, self.1)
     }
@@ -74,7 +76,7 @@ impl CreateMessage {
     }
 
     /// Adds a list of reactions to create after the message's sent.
-pub fn reactions<R: Into<ReactionType>>(mut self, reactions: Vec<R>) -> Self{
+    pub fn reactions<R: Into<ReactionType>>(mut self, reactions: Vec<R>) -> Self {
         self.1 = Some(reactions.into_iter().map(|r| r.into()).collect());
 
         CreateMessage(self.0, self.1)

@@ -35,7 +35,7 @@ use hyper::header::ContentType;
 use hyper::method::Method;
 use hyper::mime::{Mime, SubLevel, TopLevel};
 use hyper::net::HttpsConnector;
-use hyper::{header, Error as HyperError, Result as HyperResult, Url};
+use hyper::{Error as HyperError, Result as HyperResult, Url, header};
 use hyper_native_tls::NativeTlsClient;
 use multipart::client::Multipart;
 use self::ratelimiting::Route;
@@ -549,9 +549,9 @@ pub fn delete_reaction(channel_id: u64,
                        user_id: Option<u64>,
                        reaction_type: &ReactionType)
                        -> Result<()> {
-    let user = user_id
-        .map(|uid| uid.to_string())
-        .unwrap_or_else(|| "@me".to_string());
+    let user = user_id.map(|uid| uid.to_string()).unwrap_or_else(
+        || "@me".to_string(),
+    );
 
     verify(
         204,
@@ -634,8 +634,9 @@ pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
     verify(
         204,
         retry(|| {
-            client
-                .delete(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
+            client.delete(
+                &format!(api!("/webhooks/{}/{}"), webhook_id, token),
+            )
         }).map_err(Error::Hyper)?,
     )
 }
@@ -738,7 +739,9 @@ pub fn edit_message(channel_id: u64, message_id: u64, map: &Value) -> Result<Mes
 ///
 /// [`Guild`]: ../model/struct.Guild.html
 pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
-    let map = json!({ "nick": new_nickname });
+    let map = json!({
+        "nick": new_nickname
+    });
     let body = map.to_string();
     let response = request!(
         Route::GuildsIdMembersMeNick(guild_id),
@@ -776,8 +779,9 @@ pub fn edit_profile(map: &JsonMap) -> Result<CurrentUser> {
         }
     }
 
-    serde_json::from_value::<CurrentUser>(value)
-        .map_err(From::from)
+    serde_json::from_value::<CurrentUser>(value).map_err(
+        From::from,
+    )
 }
 
 /// Changes a role in a guild.
@@ -987,8 +991,11 @@ pub fn get_active_maintenances() -> Result<Vec<Maintenance>> {
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
     match map.remove("scheduled_maintenances") {
-        Some(v) => serde_json::from_value::<Vec<Maintenance>>(v)
-            .map_err(From::from),
+        Some(v) => {
+            serde_json::from_value::<Vec<Maintenance>>(v).map_err(
+                From::from,
+            )
+        },
         None => Ok(vec![]),
     }
 }
@@ -1394,7 +1401,10 @@ pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
     let mut v = serde_json::from_reader::<HyperResponse, Value>(response)?;
 
     if let Some(map) = v.as_object_mut() {
-        map.insert("guild_id".to_owned(), Value::Number(Number::from(guild_id)));
+        map.insert(
+            "guild_id".to_owned(),
+            Value::Number(Number::from(guild_id)),
+        );
     }
 
     serde_json::from_value::<Member>(v).map_err(From::from)
@@ -1479,8 +1489,11 @@ pub fn get_unresolved_incidents() -> Result<Vec<Incident>> {
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
     match map.remove("incidents") {
-        Some(v) => serde_json::from_value::<Vec<Incident>>(v)
-            .map_err(From::from),
+        Some(v) => {
+            serde_json::from_value::<Vec<Incident>>(v).map_err(
+                From::from,
+            )
+        },
         None => Ok(vec![]),
     }
 }
@@ -1498,8 +1511,11 @@ pub fn get_upcoming_maintenances() -> Result<Vec<Maintenance>> {
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
     match map.remove("scheduled_maintenances") {
-        Some(v) => serde_json::from_value::<Vec<Maintenance>>(v)
-            .map_err(From::from),
+        Some(v) => {
+            serde_json::from_value::<Vec<Maintenance>>(v).map_err(
+                From::from,
+            )
+        },
         None => Ok(vec![]),
     }
 }
@@ -1573,8 +1589,9 @@ pub fn get_webhook_with_token(webhook_id: u64, token: &str) -> Result<Webhook> {
     let client = request_client!();
 
     let response = retry(|| {
-        client
-            .get(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
+        client.get(
+            &format!(api!("/webhooks/{}/{}"), webhook_id, token),
+        )
     }).map_err(Error::Hyper)?;
 
     serde_json::from_reader::<HyperResponse, Webhook>(response)
@@ -1650,12 +1667,12 @@ pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap) -> Result
     let tc = NativeTlsClient::new()?;
     let connector = HttpsConnector::new(tc);
     let mut request = Request::with_connector(Method::Post, url, &connector)?;
-    request
-        .headers_mut()
-        .set(header::Authorization(TOKEN.lock().unwrap().clone()));
-    request
-        .headers_mut()
-        .set(header::UserAgent(constants::USER_AGENT.to_owned()));
+    request.headers_mut().set(header::Authorization(
+        TOKEN.lock().unwrap().clone(),
+    ));
+    request.headers_mut().set(header::UserAgent(
+        constants::USER_AGENT.to_owned(),
+    ));
 
     let mut request = Multipart::from_request(request)?;
     let mut file_num = "0".to_owned();
@@ -1663,12 +1680,20 @@ pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap) -> Result
     for file in files {
         match file.into() {
             AttachmentType::Bytes((mut bytes, filename)) => {
-                request
-                    .write_stream(&file_num, &mut bytes, Some(filename), None)?;
+                request.write_stream(
+                    &file_num,
+                    &mut bytes,
+                    Some(filename),
+                    None,
+                )?;
             },
             AttachmentType::File((mut f, filename)) => {
-                request
-                    .write_stream(&file_num, &mut f, Some(filename), None)?;
+                request.write_stream(
+                    &file_num,
+                    &mut f,
+                    Some(filename),
+                    None,
+                )?;
             },
             AttachmentType::Path(p) => {
                 request.write_file(&file_num, &p)?;
@@ -1811,7 +1836,8 @@ pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
 fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
     where F: Fn() -> RequestBuilder<'a> {
     let response = ratelimiting::perform(route, || {
-        f().header(header::Authorization(TOKEN.lock().unwrap().clone()))
+        f()
+            .header(header::Authorization(TOKEN.lock().unwrap().clone()))
             .header(header::ContentType::json())
     })?;
 
@@ -1825,7 +1851,8 @@ fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
 pub(crate) fn retry<'a, F>(f: F) -> HyperResult<HyperResponse>
     where F: Fn() -> RequestBuilder<'a> {
     let req = || {
-        f().header(header::UserAgent(constants::USER_AGENT.to_owned()))
+        f()
+            .header(header::UserAgent(constants::USER_AGENT.to_owned()))
             .send()
     };
 

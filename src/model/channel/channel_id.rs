@@ -100,7 +100,7 @@ impl ChannelId {
     /// [`Message::delete`]: struct.Message.html#method.delete
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()>{
+    pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         http::delete_message(self.0, message_id.into().0)
     }
 
@@ -187,7 +187,7 @@ pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()>{
     /// [`Channel`]: enum.Channel.html
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
-pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel>{
+    pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel> {
         http::edit_channel(self.0, &f(EditChannel::default()).0)
     }
 
@@ -256,12 +256,13 @@ pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildC
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        http::get_message(self.0, message_id.into().0)
-            .map(|mut msg| {
+        http::get_message(self.0, message_id.into().0).map(
+            |mut msg| {
                 msg.transform_content();
 
                 msg
-            })
+            },
+        )
     }
 
     /// Gets messages from the channel.
@@ -306,9 +307,11 @@ pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildC
                   None => return None,
               } {
             Guild(channel) => channel.read().unwrap().name().to_string(),
-            Group(channel) => match channel.read().unwrap().name() {
-                Cow::Borrowed(name) => name.to_string(),
-                Cow::Owned(name) => name,
+            Group(channel) => {
+                match channel.read().unwrap().name() {
+                    Cow::Borrowed(name) => name.to_string(),
+                    Cow::Owned(name) => name,
+                }
             },
             Private(channel) => channel.read().unwrap().name(),
         })

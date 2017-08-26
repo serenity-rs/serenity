@@ -48,7 +48,7 @@ impl GuildId {
     /// [`Guild::ban`]: struct.Guild.html#method.ban
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, ban_options: BO) -> Result<()>{
+    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, ban_options: BO) -> Result<()> {
         let dmd = ban_options.dmd();
         if dmd > 7 {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
@@ -167,7 +167,7 @@ pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, ban_options: BO) -> 
     /// [`Guild::create_role`]: struct.Guild.html#method.create_role
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
-pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role>{
+    pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
         http::create_role(self.0, &f(EditRole::default()).0)
     }
 
@@ -199,7 +199,7 @@ pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role>
     ///
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
-pub fn delete_integration<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()>{
+    pub fn delete_integration<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
         http::delete_guild_integration(self.0, integration_id.into().0)
     }
 
@@ -228,7 +228,7 @@ pub fn delete_integration<I: Into<IntegrationId>>(&self, integration_id: I) -> R
     /// [`Guild::edit`]: struct.Guild.html#method.edit
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
-pub fn edit<F: FnOnce(EditGuild) -> EditGuild>(&mut self, f: F) -> Result<PartialGuild>{
+    pub fn edit<F: FnOnce(EditGuild) -> EditGuild>(&mut self, f: F) -> Result<PartialGuild> {
         http::edit_guild(self.0, &f(EditGuild::default()).0)
     }
 
@@ -459,7 +459,7 @@ pub fn edit<F: FnOnce(EditGuild) -> EditGuild>(&mut self, f: F) -> Result<Partia
     ///
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
-pub fn start_integration_sync<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()>{
+    pub fn start_integration_sync<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
         http::start_integration_sync(self.0, integration_id.into().0)
     }
 

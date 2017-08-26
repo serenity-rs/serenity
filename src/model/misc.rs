@@ -90,9 +90,11 @@ impl FromStr for User {
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match utils::parse_username(s) {
-            Some(x) => UserId(x as u64)
-                .get()
-                .map_err(|e| UserParseError::Rest(Box::new(e))),
+            Some(x) => {
+                UserId(x as u64).get().map_err(
+                    |e| UserParseError::Rest(Box::new(e)),
+                )
+            },
             _ => Err(UserParseError::InvalidUsername),
         }
     }
@@ -161,9 +163,11 @@ impl FromStr for Role {
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match utils::parse_role(s) {
-            Some(x) => match RoleId(x).find() {
-                Some(user) => Ok(user),
-                _ => Err(RoleParseError::NotPresentInCache),
+            Some(x) => {
+                match RoleId(x).find() {
+                    Some(user) => Ok(user),
+                    _ => Err(RoleParseError::NotPresentInCache),
+                }
             },
             _ => Err(RoleParseError::InvalidRole),
         }
@@ -242,9 +246,11 @@ impl FromStr for Channel {
 
     fn from_str(s: &str) -> StdResult<Self, ()> {
         match utils::parse_channel(s) {
-            Some(x) => match ChannelId(x).find() {
-                Some(channel) => Ok(channel),
-                _ => Err(()),
+            Some(x) => {
+                match ChannelId(x).find() {
+                    Some(channel) => Ok(channel),
+                    _ => Err(()),
+                }
             },
             _ => Err(()),
         }

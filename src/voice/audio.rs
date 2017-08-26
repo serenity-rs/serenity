@@ -5,7 +5,11 @@ pub const SAMPLE_RATE: u32 = 48000;
 pub trait AudioSource: Send {
     fn is_stereo(&mut self) -> bool;
 
-    fn read_frame(&mut self, buffer: &mut [i16]) -> Option<usize>;
+    fn get_type(&self) -> AudioType;
+
+    fn read_pcm_frame(&mut self, buffer: &mut [i16]) -> Option<usize>;
+
+    fn read_opus_frame(&mut self) -> Option<Vec<u8>>;
 }
 
 /// A receiver for incoming audio.
@@ -18,4 +22,10 @@ pub trait AudioReceiver: Send {
                     timestamp: u32,
                     stereo: bool,
                     data: &[i16]);
+}
+
+#[derive(Clone)]
+pub enum AudioType {
+    Opus,
+    Pcm,
 }

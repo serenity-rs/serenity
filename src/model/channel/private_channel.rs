@@ -192,8 +192,12 @@ impl PrivateChannel {
                                    after: Option<U>)
                                    -> Result<Vec<User>>
         where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id
-            .reaction_users(message_id, reaction_type, limit, after)
+        self.id.reaction_users(
+            message_id,
+            reaction_type,
+            limit,
+            after,
+        )
     }
 
     /// Pins a [`Message`] to the channel.
@@ -259,7 +263,7 @@ impl PrivateChannel {
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
     #[inline]
-pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message>{
+    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
         self.id.send_message(f)
     }
 
