@@ -9,7 +9,7 @@ use std::sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender};
 use std::sync::{Arc, Mutex};
 use std::thread::{self, Builder as ThreadBuilder, JoinHandle};
 use std::time::Duration;
-use super::audio::{AudioReceiver, AudioSource, HEADER_LEN, SAMPLE_RATE};
+use super::audio::{AudioReceiver, AudioSource, AudioType, HEADER_LEN, SAMPLE_RATE};
 use super::connection_info::ConnectionInfo;
 use super::{CRYPTO_MODE, VoiceError, payload};
 use websocket::client::Url as WebsocketUrl;
@@ -239,7 +239,45 @@ impl Connection {
             self.udp.send_to(&bytes, self.destination)?;
         }
 
-        let len = self.read(source, &mut buffer)?;
+
+        let mut opus_frame = Vec::new();
+
+        let len = match source.as_mut() {
+            Some(stream) => {
+                let is_stereo = stream.is_stereo();
+
+                if is_stereo != self.encoder_stereo {
+                    let channels = if is_stereo {
+                        Channels::Stereo
+                    } else {
+                        Channels::Mono
+                    };
+                    self.encoder = OpusEncoder::new(SAMPLE_RATE, channels, CodingMode::Audio)?;
+                    self.encoder_stereo = is_stereo;
+                }
+
+                match stream.get_type() {
+                    AudioType::Opus => {
+                        match stream.read_opus_frame() {
+                            Some(frame) => {
+                                opus_frame = frame;
+                                opus_frame.len()
+                            }
+                            None => 0,
+                        }
+                    },
+                    AudioType::Pcm => {
+                        let buffer_len = if is_stereo { 960 * 2 } else { 960 };
+
+                        match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
+                            Some(len) => len,
+                            None => 0,
+                        }
+                    }
+                }
+            }
+            None => 0
+        };
 
         if len == 0 {
             self.set_speaking(false)?;
@@ -265,7 +303,7 @@ impl Connection {
 
         self.set_speaking(true)?;
 
-        let index = self.prep_packet(&mut packet, buffer, nonce)?;
+        let index = self.prep_packet(&mut packet, buffer, &opus_frame, nonce)?;
         audio_timer.await();
 
         self.udp.send_to(&packet[..index], self.destination)?;
@@ -277,6 +315,7 @@ impl Connection {
     fn prep_packet(&mut self,
                    packet: &mut [u8; 512],
                    buffer: [i16; 1920],
+                   opus_frame: &Vec<u8>,
                    mut nonce: Nonce)
                    -> Result<usize> {
         {
@@ -294,10 +333,17 @@ impl Connection {
         let sl_index = packet.len() - 16;
         let buffer_len = if self.encoder_stereo { 960 * 2 } else { 960 };
 
-        let len = self.encoder.encode(
-            &buffer[..buffer_len],
-            &mut packet[HEADER_LEN..sl_index],
-        )?;
+        let len = if opus_frame.is_empty() {
+            self.encoder.encode(
+                &buffer[..buffer_len],
+                &mut packet[HEADER_LEN..sl_index],
+            )?
+        } else {
+            let len = opus_frame.len();
+            packet[HEADER_LEN..HEADER_LEN + len].clone_from_slice(&opus_frame);
+            len
+        };
+
         let crypted = {
             let slice = &packet[HEADER_LEN..HEADER_LEN + len];
             secretbox::seal(slice, &nonce, &self.key)
@@ -309,47 +355,6 @@ impl Connection {
         self.timestamp = self.timestamp.wrapping_add(960);
 
         Ok(HEADER_LEN + crypted.len())
-    }
-
-    fn read(&mut self,
-            source: &mut Option<Box<AudioSource>>,
-            buffer: &mut [i16; 1920])
-            -> Result<usize> {
-        let mut clear = false;
-
-        let len = match source.as_mut() {
-            Some(source) => {
-                let is_stereo = source.is_stereo();
-
-                if is_stereo != self.encoder_stereo {
-                    let channels = if is_stereo {
-                        Channels::Stereo
-                    } else {
-                        Channels::Mono
-                    };
-                    self.encoder = OpusEncoder::new(SAMPLE_RATE, channels, CodingMode::Audio)?;
-                    self.encoder_stereo = is_stereo;
-                }
-
-                let buffer_len = if is_stereo { 960 * 2 } else { 960 };
-
-                match source.read_frame(&mut buffer[..buffer_len]) {
-                    Some(len) => len,
-                    None => {
-                        clear = true;
-
-                        0
-                    },
-                }
-            },
-            None => 0,
-        };
-
-        if clear {
-            *source = None;
-        }
-
-        Ok(len)
     }
 
     fn set_speaking(&mut self, speaking: bool) -> Result<()> {
