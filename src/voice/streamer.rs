@@ -126,7 +126,11 @@ pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Box<AudioSource>, DcaError> {
     info!("Size: {}", size);
 
     let mut raw_json = Vec::with_capacity(size as usize);
-    reader.read_exact(raw_json.as_mut_slice()).map_err(DcaError::IoError)?;
+
+    {
+        let json_reader = reader.by_ref();
+        json_reader.take(size as u64).read_to_end(&mut raw_json).map_err(DcaError::IoError)?;
+    }
 
     info!("Raw JSON: {:?}", raw_json);
 
