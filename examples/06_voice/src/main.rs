@@ -191,7 +191,7 @@ command!(play(ctx, msg, args) {
         },
     };
 
-    if let Some(handler) = ctx.shard.lock().unwrap().manager.get(guild_id) {
+    if let Some(handler) = ctx.shard.lock().manager.get(guild_id) {
         let source = match voice::ytdl(url) {
             Ok(source) => source,
             Err(why) => {
@@ -221,7 +221,7 @@ command!(undeafen(ctx, msg) {
         },
     };
 
-    if let Some(handler) = ctx.shard.lock().unwrap().manager.get(guild_id) {
+    if let Some(handler) = ctx.shard.lock().manager.get(guild_id) {
         handler.deafen(false);
 
         check_msg(msg.channel_id.say("Undeafened"));
@@ -240,7 +240,7 @@ command!(unmute(ctx, msg) {
         },
     };
 
-    if let Some(handler) = ctx.shard.lock().unwrap().manager.get(guild_id) {
+    if let Some(handler) = ctx.shard.lock().manager.get(guild_id) {
         handler.mute(false);
 
         check_msg(msg.channel_id.say("Unmuted"));

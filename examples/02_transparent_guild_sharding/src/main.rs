@@ -25,17 +25,15 @@ use std::env;
 struct Handler;
 
 impl EventHandler for Handler {
-    fn on_message(&self, _: Context, msg: Message) {
+    fn on_message(&self, ctx: Context, msg: Message) {
        if msg.content == "!ping" {
             // The current shard needs to be unlocked so it can be read from, as
             // multiple threads may otherwise attempt to read from or mutate it
             // concurrently.
             {
                 let shard = ctx.shard.lock();
-
-                if let Some(shard_info) = shard.shard_info() {
-                    println!("Shard {}", shard_info[0]);
-                }
+                let shard_info = shard.shard_info();
+                println!("Shard {}", shard_info[0]);
             }
 
             if let Err(why) = msg.channel_id.say("Pong!") {

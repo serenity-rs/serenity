@@ -15,7 +15,7 @@ extern crate typemap;
 
 use serenity::prelude::*;
 use serenity::model::*;
-use serenity::framework::standard::{Command, DispatchError, StandardFramework, help_commands};
+use serenity::framework::standard::{Args, Command, DispatchError, StandardFramework, help_commands};
 use std::collections::HashMap;
 use std::env;
 use std::fmt::Write;
@@ -166,7 +166,7 @@ command!(commands(ctx, msg, _args) {
 // In this case, this command checks to ensure you are the owner of the message
 // in order for the command to be executed. If the check fails, the command is
 // not called.
-fn owner_check(_: &mut Context, msg: &Message, _: &[String], _: &Arc<Command>) -> bool {
+fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &Arc<Command>) -> bool {
     // Replace 7 with your ID
     msg.author.id == 7
 }
@@ -197,7 +197,10 @@ command!(some_long_command(_ctx, msg, args) {
 // will be ignored.
 //
 // Argument type overloading is currently not supported.
-command!(multiply(_ctx, msg, args, first: f64, second: f64) {
+command!(multiply(_ctx, msg, args) {
+    let first = args.single::<f64>().unwrap();
+    let second = args.single::<f64>().unwrap();
+
     let res = first * second;
 
     if let Err(why) = msg.channel_id.say(&res.to_string()) {
