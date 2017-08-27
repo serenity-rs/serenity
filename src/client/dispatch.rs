@@ -386,26 +386,28 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
             let context = context(conn, data);
 
             let h = event_handler.clone();
-            feature_cache! {{
-                                                                // This is safe to unwrap, as the update would have created
-                                                                // the member if it did not exist. So, there is be _no_ way
-                                                                // that this could fail under any circumstance.
-                                                                let after = CACHE.read()
-                                                                    .unwrap()
-                                                                    .member(event.guild_id, event.user.id)
-                                                                    .unwrap()
-                                                                    .clone();
-            
-                                                                tokio_handle.spawn_fn(move || {
-                                                                    h.on_guild_member_update(context, _before, after);
-                                                                    Ok(())
-                                                                });
-                                                            } else {
-                                                                tokio_handle.spawn_fn(move || {
-                                                                    h.on_guild_member_update(context, event);
-                                                                    Ok(())
-                                                                });
-                                                            }}
+            feature_cache! {
+                {
+                    // This is safe to unwrap, as the update would have created
+                    // the member if it did not exist. So, there is be _no_ way
+                    // that this could fail under any circumstance.
+                    let after = CACHE.read()
+                        .unwrap()
+                        .member(event.guild_id, event.user.id)
+                        .unwrap()
+                        .clone();
+
+                    tokio_handle.spawn_fn(move || {
+                        h.on_guild_member_update(context, _before, after);
+                        Ok(())
+                    });
+                } else {
+                    tokio_handle.spawn_fn(move || {
+                        h.on_guild_member_update(context, event);
+                        Ok(())
+                    });
+                }
+            }
         },
         Event::GuildMembersChunk(event) => {
             update!(update_with_guild_members_chunk, event);
@@ -484,23 +486,25 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
             let context = context(conn, data);
 
             let h = event_handler.clone();
-            feature_cache! {{
-                                                                let before = CACHE.read()
-                                                                    .unwrap()
-                                                                    .guilds
-                                                                    .get(&event.guild.id)
-                                                                    .cloned();
-            
-                                                                tokio_handle.spawn_fn(move || {
-                                                                    h.on_guild_update(context, before, event.guild);
-                                                                    Ok(())
-                                                                });
-                                                            } else {
-                                                                tokio_handle.spawn_fn(move || {
-                                                                    h.on_guild_update(context, event.guild);
-                                                                    Ok(())
-                                                                });
-                                                            }}
+            feature_cache! {
+                {
+                    let before = CACHE.read()
+                        .unwrap()
+                        .guilds
+                        .get(&event.guild.id)
+                        .cloned();
+
+                    tokio_handle.spawn_fn(move || {
+                        h.on_guild_update(context, before, event.guild);
+                        Ok(())
+                    });
+                } else {
+                    tokio_handle.spawn_fn(move || {
+                        h.on_guild_update(context, event.guild);
+                        Ok(())
+                    });
+                }
+            }
         },
         // Already handled by the framework check macro
         Event::MessageCreate(_) => {},
@@ -593,28 +597,30 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
         Event::Ready(event) => {
             update!(update_with_ready, event);
 
-            feature_cache!{{
-                                                                last_guild_create_time = now!();
-            
-                                                                let _ = wait_for_guilds()
-                                                                .map(|_| {
-                                                                    let context = context(conn, data);
-            
-                                                                    let h = event_handler.clone();
-                                                                    tokio_handle.spawn_fn(move || {
-                                                                        h.on_ready(context, event.ready);
-                                                                        Ok(())
-                                                                    });
-                                                                });
-                                                            } else {
-                                                               let context = context(conn, data);
-            
-                                                                let h = event_handler.clone();
-                                                                tokio_handle.spawn_fn(move || {
-                                                                    h.on_ready(context, event.ready);
-                                                                    Ok(())
-                                                                });
-                                                            }}
+            feature_cache!{
+                {
+                    last_guild_create_time = now!();
+
+                    let _ = wait_for_guilds()
+                    .map(|_| {
+                        let context = context(conn, data);
+
+                        let h = event_handler.clone();
+                        tokio_handle.spawn_fn(move || {
+                            h.on_ready(context, event.ready);
+                            Ok(())
+                        });
+                    });
+                } else {
+                    let context = context(conn, data);
+
+                    let h = event_handler.clone();
+                    tokio_handle.spawn_fn(move || {
+                        h.on_ready(context, event.ready);
+                        Ok(())
+                    });
+                }
+            }
         },
         Event::Resumed(event) => {
             let context = context(conn, data);

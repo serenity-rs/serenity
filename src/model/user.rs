@@ -492,35 +492,38 @@ impl User {
             return Err(Error::Model(ModelError::MessagingBot));
         }
 
-        let private_channel_id = feature_cache! {{
-                                            let finding = {
-                                                let cache = CACHE.read().unwrap();
-        
-                                                let finding = cache.private_channels
-                                                    .values()
-                                                    .map(|ch| ch.read().unwrap())
-                                                    .find(|ch| ch.recipient.read().unwrap().id == self.id)
-                                                    .map(|ch| ch.id);
-        
-                                                finding
-                                            };
-        
-                                            if let Some(finding) = finding {
-                                                finding
-                                            } else {
-                                                let map = json!({
-                                                    "recipient_id": self.id.0,
-                                                });
-        
-                                                http::create_private_channel(&map)?.id
-                                            }
-                                        } else {
-                                            let map = json!({
-                                                "recipient_id": self.id.0,
-                                            });
-        
-                                            http::create_private_channel(&map)?.id
-                                        }};
+        let private_channel_id =
+            feature_cache! {
+            {
+                let finding = {
+                    let cache = CACHE.read().unwrap();
+
+                    let finding = cache.private_channels
+                        .values()
+                        .map(|ch| ch.read().unwrap())
+                        .find(|ch| ch.recipient.read().unwrap().id == self.id)
+                        .map(|ch| ch.id);
+
+                    finding
+                };
+
+                if let Some(finding) = finding {
+                    finding
+                } else {
+                    let map = json!({
+                        "recipient_id": self.id.0,
+                    });
+
+                    http::create_private_channel(&map)?.id
+                }
+            } else {
+                let map = json!({
+                    "recipient_id": self.id.0,
+                });
+
+                http::create_private_channel(&map)?.id
+            }
+        };
 
         private_channel_id.send_message(f)
     }
