@@ -48,6 +48,11 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
     fn read_opus_frame(&mut self) -> Option<Vec<u8>> {
         match self.reader.read_i16::<LittleEndian>() {
             Ok(size) => {
+                if size <= 0 {
+                    warn!("Invalid opus frame size: {}", size);
+                    return None;
+                }
+
                 let mut frame = Vec::with_capacity(size as usize);
 
                 {
