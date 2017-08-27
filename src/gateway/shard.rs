@@ -138,41 +138,43 @@ impl Shard {
         let session_id = None;
 
         let mut shard =
-            feature_voice! {{
-                                            let (tx, rx) = mpsc::channel();
-        
-                                            let user = http::get_current_user()?;
-        
-                                            Shard {
-                                                client,
-                                                current_presence,
-                                                heartbeat_instants,
-                                                heartbeat_interval,
-                                                last_heartbeat_acknowledged,
-                                                seq,
-                                                stage,
-                                                token,
-                                                session_id,
-                                                shard_info,
-                                                ws_url,
-                                                manager: VoiceManager::new(tx, user.id),
-                                                manager_rx: rx,
-                                            }
-                                        } else {
-                                            Shard {
-                                                client,
-                                                current_presence,
-                                                heartbeat_instants,
-                                                heartbeat_interval,
-                                                last_heartbeat_acknowledged,
-                                                seq,
-                                                stage,
-                                                token,
-                                                session_id,
-                                                shard_info,
-                                                ws_url,
-                                            }
-                                        }};
+            feature_voice! {
+                {
+                    let (tx, rx) = mpsc::channel();
+
+                    let user = http::get_current_user()?;
+
+                    Shard {
+                        client,
+                        current_presence,
+                        heartbeat_instants,
+                        heartbeat_interval,
+                        last_heartbeat_acknowledged,
+                        seq,
+                        stage,
+                        token,
+                        session_id,
+                        shard_info,
+                        ws_url,
+                        manager: VoiceManager::new(tx, user.id),
+                        manager_rx: rx,
+                    }
+                } else {
+                    Shard {
+                        client,
+                        current_presence,
+                        heartbeat_instants,
+                        heartbeat_interval,
+                        last_heartbeat_acknowledged,
+                        seq,
+                        stage,
+                        token,
+                        session_id,
+                        shard_info,
+                        ws_url,
+                    }
+                }
+            };
 
         shard.identify()?;
 
