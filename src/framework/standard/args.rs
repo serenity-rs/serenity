@@ -52,7 +52,7 @@ impl Args {
     /// Like [`single`], but doesn't remove the element.
     ///
     /// [`single`]: #method.single
-    pub fn single_n<T: FromStr>(&mut self) -> Result<T>
+    pub fn single_n<T: FromStr>(&self) -> Result<T>
         where T::Err: StdError + 'static {
         if self.delimiter_split.is_empty() {
             return Err(Error::Eos);
@@ -98,7 +98,7 @@ impl Args {
     /// Like [`single_quoted`], but doesn't remove the element.
     ///
     /// [`single_quoted`]: #method.single_quoted
-    pub fn single_quoted_n<T: FromStr>(&mut self) -> Result<T>
+    pub fn single_quoted_n<T: FromStr>(&self) -> Result<T>
         where T::Err: StdError + 'static {
         parse_quotes(&self.delimiter_split.get(0).ok_or(Error::Eos)?)
             .remove(0)
