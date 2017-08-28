@@ -450,4 +450,16 @@ impl PartialGuild {
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> { self.id.webhooks() }
+
+    /// Obtain a reference to a role by its name.
+    ///
+    /// **Note**: If two or more roles have the same name, obtained reference will be one of them.
+    pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
+        for (_, role) in &self.roles {
+            if role_name == role.name {
+                return Some(&role);
+            }
+        }
+        None
+    }
 }
