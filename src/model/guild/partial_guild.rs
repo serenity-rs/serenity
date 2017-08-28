@@ -468,13 +468,13 @@ impl PartialGuild {
     ///
     /// impl EventHandler for Handler {
     ///     fn on_message(&self, _: Context, msg: Message) {
-    ///         match message.guild_id().unwrap().get().unwrap().role_by_name("roll_name") {
-    ///             Some(role) => println!("Obtained role's reference: {:?}", role),
-    ///             None => return,
-    ///         };
+    ///         if let Some(role) = message.guild_id().unwrap().get.unwrap().role_by_name("role_name"){
+    ///             Some(role) => println!("Obtained role's reference: {:?}", role);
+    ///         }
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler); 
+    /// client.start().unwrap();
     /// ```
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
         self.roles.values().find(|role| role_name == role.name)
