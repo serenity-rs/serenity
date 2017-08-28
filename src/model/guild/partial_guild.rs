@@ -453,7 +453,8 @@ impl PartialGuild {
 
     /// Obtain a reference to a role by its name.
     ///
-    /// **Note**: If two or more roles have the same name, obtained reference will be one of them.
+    /// **Note**: If two or more roles have the same name, obtained reference will be one of
+    /// them.
     ///
     /// # Examples
     ///
@@ -468,12 +469,12 @@ impl PartialGuild {
     ///
     /// impl EventHandler for Handler {
     ///     fn on_message(&self, _: Context, msg: Message) {
-    ///         if let Some(role) = message.guild_id().unwrap().get.unwrap().role_by_name("role_name"){
-    ///             Some(role) => println!("Obtained role's reference: {:?}", role);
+    /// if let Some(role) = msg.guild_id().unwrap().get().unwrap().role_by_name("role_name") {
+    ///             println!("Obtained role's reference: {:?}", role);
     ///         }
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler); 
+    /// let mut client = Client::new("token", Handler);
     /// client.start().unwrap();
     /// ```
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {

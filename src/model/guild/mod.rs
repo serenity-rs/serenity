@@ -1039,10 +1039,10 @@ impl Guild {
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> { self.id.webhooks() }
 
-
     /// Obtain a reference to a role by its name.
     ///
-    /// **Note**: If two or more roles have the same name, obtained reference will be one of them.
+    /// **Note**: If two or more roles have the same name, obtained reference will be one of
+    /// them.
     ///
     /// # Examples
     ///
@@ -1058,12 +1058,13 @@ impl Guild {
     /// impl EventHandler for Handler {
     /// fn on_message(&self, _: Context, msg: Message) {
     ///    if let Some(arc) = msg.guild_id().unwrap().find() {
-    ///        if let Some(role) = arc.read().unwrap().role_by_name("role_name") {
-    ///            println!("{:?}", role);
-    ///        }
-    ///    }
+    ///         if let Some(role) = arc.read().unwrap().role_by_name("role_name") {
+    ///             println!("{:?}", role);
+    ///             }
+    ///         }
+    ///     }
     /// }
-    /// let mut client = Client::new("token", Handler); 
+    /// let mut client = Client::new("token", Handler);
     /// client.start().unwrap();
     /// ```
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
