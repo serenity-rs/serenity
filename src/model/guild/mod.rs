@@ -1069,7 +1069,6 @@ impl Guild {
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
         self.roles.values().find(|role| role_name == role.name)
     }
-
 }
 
 impl<'de> Deserialize<'de> for Guild {
