@@ -454,6 +454,28 @@ impl PartialGuild {
     /// Obtain a reference to a role by its name.
     ///
     /// **Note**: If two or more roles have the same name, obtained reference will be one of them.
+    ///
+    /// # Examples
+    ///
+    /// Obtain a reference to a [`Role`] by its name.
+    ///
+    /// ```rust,no_run
+    /// use serenity::prelude::*;
+    /// use serenity::model::*;
+    /// struct Handler;
+    ///
+    /// use serenity::CACHE;
+    ///
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///         match message.guild_id().unwrap().get().unwrap().role_by_name("roll_name") {
+    ///             Some(role) => println!("Obtained role's reference: {:?}", role),
+    ///             None => return,
+    ///         };
+    ///     }
+    /// }
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// ```
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
         self.roles.values().find(|role| role_name == role.name)
     }
