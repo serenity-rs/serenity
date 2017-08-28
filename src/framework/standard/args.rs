@@ -136,6 +136,46 @@ impl Args {
 
     /// This method is just `internal_vector.join(delimiter)`
     pub fn full(&self) -> String { self.delimiter_split.join(&self.delimiter) }
+
+    /// Returns the first argument that can be converted and removes it from the list.
+    pub fn find<T: FromStr>(&mut self) -> Result<T>
+        where T::Err: StdError + 'static {
+        if self.delimiter_split.is_empty() {
+            return Err(Error::Eos);
+        }
+
+        match self.delimiter_split.iter().position(
+            |e| e.parse::<T>().is_ok(),
+        ) {
+            Some(index) => {
+                let value = self.delimiter_split
+                    .get(index)
+                    .ok_or(Error::Eos)?
+                    .parse::<T>()
+                    .map_err(|e| Error::Parse(Box::new(e)));
+
+                self.delimiter_split.remove(index);
+
+                value
+            },
+            _ => Err(Error::Eos),
+        }
+    }
+
+    /// Returns the first argument that can be converted and does not remove it from the list.
+    pub fn find_n<T: FromStr>(&self) -> Result<T>
+        where T::Err: StdError + 'static {
+        if self.delimiter_split.is_empty() {
+            return Err(Error::Eos);
+        }
+
+        self.delimiter_split
+            .iter()
+            .find(|e| e.parse::<T>().is_ok())
+            .ok_or(Error::Eos)?
+            .parse::<T>()
+            .map_err(|e| Error::Parse(Box::new(e)))
+    }
 }
 
 impl ::std::ops::Deref for Args {
