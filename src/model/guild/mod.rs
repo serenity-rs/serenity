@@ -1038,6 +1038,41 @@ impl Guild {
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> { self.id.webhooks() }
+
+    /// Obtain a reference to a role by its name.
+    ///
+    /// **Note**: If two or more roles have the same name, obtained reference will be one of
+    /// them.
+    ///
+    /// # Examples
+    ///
+    /// Obtain a reference to a [`Role`] by its name.
+    ///
+    /// ```rust,no_run
+    /// use serenity::model::*;
+    /// use serenity::prelude::*;
+    ///
+    /// struct Handler;
+    ///
+    /// use serenity::CACHE;
+    ///
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///         if let Some(arc) = msg.guild_id().unwrap().find() {
+    ///             if let Some(role) = arc.read().unwrap().role_by_name("role_name") {
+    ///                 println!("{:?}", role);
+    ///             }
+    ///         }
+    ///     }
+    /// }
+    ///
+    /// let mut client = Client::new("token", Handler);
+    ///
+    /// client.start().unwrap();
+    /// ```
+    pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
+        self.roles.values().find(|role| role_name == role.name)
+    }
 }
 
 impl<'de> Deserialize<'de> for Guild {
