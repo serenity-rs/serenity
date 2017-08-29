@@ -470,7 +470,8 @@ impl PartialGuild {
     ///
     /// impl EventHandler for Handler {
     ///     fn on_message(&self, _: Context, msg: Message) {
-    ///         if let Some(role) = msg.guild_id().unwrap().get().unwrap().role_by_name("role_name") {
+    ///         if let Some(role) =
+    ///            msg.guild_id().unwrap().get().unwrap().role_by_name("role_name") {
     ///             println!("Obtained role's reference: {:?}", role);
     ///         }
     ///     }
