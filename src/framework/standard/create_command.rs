@@ -178,6 +178,14 @@ impl CreateCommand {
         self
     }
 
+    /// Exact number of arguments that should be passed.
+    pub fn num_args(mut self, num_args: i32) -> Self {
+        self.0.min_args = Some(num_args);
+        self.0.max_args = Some(num_args);
+
+        self
+    }
+
     /// Whether command can be used only privately or not.
     pub fn owners_only(mut self, owners_only: bool) -> Self {
         self.0.owners_only = owners_only;
