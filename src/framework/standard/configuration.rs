@@ -59,6 +59,8 @@ pub struct Configuration {
     pub prefixes: Vec<String>,
     #[doc(hidden)]
     pub delimiters: Vec<String>,
+    #[doc(hidden)]
+    pub case_insensitive: bool,
 }
 
 impl Configuration {
@@ -421,6 +423,14 @@ impl Configuration {
 
         self
     }
+
+    /// Whether the framework shouldn't care about the user's input if it's: `~command`, `~Command`, `~COMMAND`.
+    /// Setting this to `true` will result in *all* command names to be case insensitive.
+    pub fn case_insensitivity(mut self, cs: bool) -> Self {
+        self.case_insensitive = cs;
+
+        self
+    }
 }
 
 impl Default for Configuration {
@@ -431,6 +441,7 @@ impl Default for Configuration {
     /// - **on_mention** to `false` (basically)
     /// - **prefix** to `None`
     /// - **delimiters** to vec![" "]
+    /// - **case_insensitive** to `false`
     fn default() -> Configuration {
         Configuration {
             depth: 5,
@@ -445,6 +456,7 @@ impl Default for Configuration {
             disabled_commands: HashSet::default(),
             allow_dm: true,
             ignore_webhooks: true,
+            case_insensitive: false,
             delimiters: vec![" ".to_string()],
         }
     }

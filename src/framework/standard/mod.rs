@@ -861,7 +861,7 @@ impl Framework for StandardFramework {
                         built = points_to.to_owned();
                     }
 
-                    let to_check = if let Some(ref prefix) = group.prefix {
+                    let mut to_check = if let Some(ref prefix) = group.prefix {
                         if built.starts_with(prefix) && command_length > prefix.len() + 1 {
                             built[(prefix.len() + 1)..].to_owned()
                         } else {
@@ -869,6 +869,12 @@ impl Framework for StandardFramework {
                         }
                     } else {
                         built.clone()
+                    };
+
+                    to_check = if self.configuration.case_insensitive {
+                        to_check.to_lowercase()
+                    } else {
+                        to_check
                     };
 
                     if let Some(&CommandOrAlias::Command(ref command)) =
