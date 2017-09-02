@@ -424,7 +424,8 @@ impl Configuration {
         self
     }
 
-    /// Whether the framework shouldn't care about the user's input if it's: `~command`, `~Command`, `~COMMAND`.
+    /// Whether the framework shouldn't care about the user's input if it's: `~command`,
+    /// `~Command`, `~COMMAND`.
     /// Setting this to `true` will result in *all* command names to be case insensitive.
     pub fn case_insensitivity(mut self, cs: bool) -> Self {
         self.case_insensitive = cs;
