@@ -303,24 +303,6 @@ impl GuildId {
         http::edit_role(self.0, role_id.into().0, &f(EditRole::default()).0)
     }
 
-    /// Gets an emoji in the guild by Id.
-    ///
-    /// Requires the [Manage Emojis] permission.
-    ///
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
-    #[inline]
-    pub fn emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> {
-        http::get_emoji(self.0, emoji_id.into().0)
-    }
-
-    /// Gets a list of all of the guild's emojis.
-    ///
-    /// Requires the [Manage Emojis] permission.
-    ///
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
-    #[inline]
-    pub fn emojis(&self) -> Result<Vec<Emoji>> { http::get_emojis(self.0) }
-
     /// Search the cache for the guild.
     #[cfg(feature = "cache")]
     pub fn find(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().unwrap().guild(*self) }

@@ -284,22 +284,6 @@ impl PartialGuild {
         self.id.edit_nickname(new_nickname)
     }
 
-    /// Gets an emoji in the guild by Id.
-    ///
-    /// Requires the [Manage Emojis] permission.
-    ///
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
-    #[inline]
-    pub fn emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<Emoji> { self.id.emoji(emoji_id) }
-
-    /// Gets a list of all of the guild's emojis.
-    ///
-    /// Requires the [Manage Emojis] permission.
-    ///
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
-    #[inline]
-    pub fn emojis(&self) -> Result<Vec<Emoji>> { self.id.emojis() }
-
     /// Gets a partial amount of guild data by its Id.
     ///
     /// Requires that the current user be in the guild.

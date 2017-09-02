@@ -1000,26 +1000,6 @@ pub fn get_active_maintenances() -> Result<Vec<Maintenance>> {
     }
 }
 
-/// Gets information about an oauth2 application that the current user owns.
-///
-/// **Note**: Only user accounts may use this endpoint.
-pub fn get_application_info(id: u64) -> Result<ApplicationInfo> {
-    let response = request!(Route::None, get, "/oauth2/applications/{}", id);
-
-    serde_json::from_reader::<HyperResponse, ApplicationInfo>(response)
-        .map_err(From::from)
-}
-
-/// Gets all oauth2 applications we've made.
-///
-/// **Note**: Only user accounts may use this endpoint.
-pub fn get_applications() -> Result<Vec<ApplicationInfo>> {
-    let response = request!(Route::None, get, "/oauth2/applications");
-
-    serde_json::from_reader::<HyperResponse, Vec<ApplicationInfo>>(response)
-        .map_err(From::from)
-}
-
 /// Gets all the users that are banned in specific guild.
 pub fn get_bans(guild_id: u64) -> Result<Vec<Ban>> {
     let response = request!(
@@ -1146,33 +1126,6 @@ pub fn get_gateway() -> Result<Gateway> {
     let response = request!(Route::Gateway, get, "/gateway");
 
     serde_json::from_reader::<HyperResponse, Gateway>(response)
-        .map_err(From::from)
-}
-
-/// Gets information about an emoji.
-pub fn get_emoji(guild_id: u64, emoji_id: u64) -> Result<Emoji> {
-    let response = request!(
-        Route::GuildsIdEmojisId(guild_id),
-        get,
-        "/guilds/{}/emojis/{}",
-        guild_id,
-        emoji_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Emoji>(response)
-        .map_err(From::from)
-}
-
-/// Gets all emojis in a guild.
-pub fn get_emojis(guild_id: u64) -> Result<Vec<Emoji>> {
-    let response = request!(
-        Route::GuildsIdEmojis(guild_id),
-        get,
-        "/guilds/{}/emojis",
-        guild_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Vec<Emoji>>(response)
         .map_err(From::from)
 }
 
