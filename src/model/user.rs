@@ -212,10 +212,7 @@ impl CurrentUser {
     /// [`HttpError::InvalidRequest`]: ../http/enum.HttpError.html#variant.InvalidRequest
     pub fn invite_url(&self, permissions: Permissions) -> Result<String> {
         let bits = permissions.bits();
-        let client_id = match http::get_current_application_info() {
-            Ok(v) => v.id,
-            Err(e) => return Err(e),
-        };
+        let client_id = http::get_current_application_info().map(|v| v.id)?;
 
         let mut url = format!(
             "https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot",
