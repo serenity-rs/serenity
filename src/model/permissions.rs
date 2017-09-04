@@ -93,7 +93,7 @@ use std::result::Result as StdResult;
 /// [Use External Emojis]: constant.USE_EXTERNAL_EMOJIS.html
 /// [Use VAD]: constant.USE_VAD.html
 pub const PRESET_GENERAL: Permissions = Permissions {
-    bits: 0b0111_1100_0000_0000_0000_0000_1011_1111,
+    bits: 0b0000_0110_0011_0111_1101_1100_0100_0001,
 };
 
 /// Returns a set of text-only permissions with the original `@everyone`
