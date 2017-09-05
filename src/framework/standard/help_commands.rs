@@ -52,10 +52,10 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 
 fn right_roles(cmd: &Command, guild: &Guild, member: &Member) -> bool {
     if cmd.allowed_roles.len() > 0 {
-        return cmd.allowed_roles
+        cmd.allowed_roles
             .iter()
             .flat_map(|r| guild.role_by_name(&r))
-            .any(|g| member.roles.contains(&g.id));
+            .any(|g| member.roles.contains(&g.id))
     } else {
         true
     }
