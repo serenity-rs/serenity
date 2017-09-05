@@ -207,6 +207,13 @@ impl CreateCommand {
 
         self
     }
+
+    /// Sets roles that are allowed to use the command.
+    pub fn allowed_roles(mut self, allowed_roles: Vec<&str>) -> Self {
+        self.0.allowed_roles = allowed_roles.iter().map(|x| x.to_string()).collect();
+
+        self
+    }
 }
 
 impl Default for Command {
@@ -226,6 +233,7 @@ impl Default for Command {
             guild_only: false,
             help_available: true,
             owners_only: false,
+            allowed_roles: Vec::new(),
         }
     }
 }
