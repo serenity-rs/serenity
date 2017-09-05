@@ -56,8 +56,9 @@ fn right_roles(cmd: &Command, guild: &Guild, member: &Member) -> bool {
             .iter()
             .flat_map(|r| guild.role_by_name(&r))
             .any(|g| member.roles.contains(&g.id));
+    } else {
+        true
     }
-    true
 }
 
 /// Posts an embed showing each individual command group and its commands.
@@ -289,7 +290,6 @@ pub fn plain(_: &mut Context,
                                     }
                                 }
                             }
-                            println!("found");
                             found = Some((command_name, cmd));
                         },
                         CommandOrAlias::Alias(ref name) => {
