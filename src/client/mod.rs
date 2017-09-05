@@ -41,6 +41,7 @@ use std::sync::atomic::{ATOMIC_BOOL_INIT, AtomicBool, Ordering};
 use parking_lot::Mutex;
 use tokio_core::reactor::Core;
 use futures;
+use std::collections::HashMap;
 use std::time::Duration;
 use std::mem;
 use super::gateway::Shard;
@@ -196,6 +197,57 @@ pub struct Client<H: EventHandler + 'static> {
     event_handler: Arc<H>,
     #[cfg(feature = "framework")]
     framework: Arc<sync::Mutex<Option<Box<Framework>>>>,
+    /// A HashMap of all shards instantiated by the Client.
+    ///
+    /// The key is the shard ID and the value is the shard itself.
+    ///
+    /// # Examples
+    ///
+    /// If you call [`client.start_shard(3, 5)`][`Client::start_shard`], this
+    /// HashMap will only ever contain a single key of `3`, as that's the only
+    /// Shard the client is responsible for.
+    ///
+    /// If you call [`client.start_shards(10)`][`Client::start_shards`], this
+    /// HashMap will contain keys 0 through 9, one for each shard handled by the
+    /// client.
+    ///
+    /// Printing the number of shards currently instantiated by the client every
+    /// 5 seconds:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::{Client, EventHandler};
+    /// # use std::error::Error;
+    /// # use std::time::Duration;
+    /// # use std::{env, thread};
+    ///
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    ///
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler { }
+    ///
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
+    ///
+    /// let shards = client.shards.clone();
+    ///
+    /// thread::spawn(move || {
+    ///     loop {
+    ///         println!("Shard count instantiated: {}", shards.lock().len());
+    ///
+    ///         thread::sleep(Duration::from_millis(5000));
+    ///     }
+    /// });
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    /// ```
+    ///
+    /// [`Client::start_shard`]: #method.start_shard
+    /// [`Client::start_shards`]: #method.start_shards
+    pub shards: Arc<Mutex<HashMap<u64, Arc<Mutex<Shard>>>>>,
     token: Arc<sync::Mutex<String>>,
 }
 
@@ -244,12 +296,14 @@ impl<H: EventHandler + 'static> Client<H> {
                 data: Arc::new(Mutex::new(ShareMap::custom())),
                 event_handler: Arc::new(handler),
                 framework: Arc::new(sync::Mutex::new(None)),
+                shards: Arc::new(Mutex::new(HashMap::new())),
                 token: locked,
             }
         } else {
             Client {
                 data: Arc::new(Mutex::new(ShareMap::custom())),
                 event_handler: Arc::new(handler),
+                shards: Arc::new(Mutex::new(HashMap::new())),
                 token: locked,
             }
         }}
@@ -728,6 +782,8 @@ impl<H: EventHandler + 'static> Client<H> {
             match boot {
                 Ok(shard) => {
                     let shard = Arc::new(Mutex::new(shard));
+
+                    self.shards.lock().insert(shard_number, shard.clone());
 
                     let monitor_info =
                         feature_framework! {{
