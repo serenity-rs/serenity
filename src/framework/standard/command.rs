@@ -57,6 +57,8 @@ pub struct Command {
     pub max_args: Option<i32>,
     /// Permissions required to use this command.
     pub required_permissions: Permissions,
+    /// Roles allowed to use this command.
+    pub allowed_roles: Vec<String>,
     /// Whether command should be displayed in help list or not, used by other commands.
     pub help_available: bool,
     /// Whether command can be used only privately or not.
@@ -86,6 +88,7 @@ impl Command {
             max_args: None,
             owners_only: false,
             required_permissions: Permissions::empty(),
+            allowed_roles: Vec::new(),
         }
     }
 }

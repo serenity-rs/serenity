@@ -126,6 +126,8 @@ pub enum DispatchError {
     OnlyForGuilds,
     /// When the requested command can only be used by bot owners.
     OnlyForOwners,
+    /// When the requested command requires one role.
+    LackingRole,
     /// When there are too few arguments.
     NotEnoughArguments { min: i32, given: usize },
     /// When there are too many arguments.
@@ -521,6 +523,22 @@ impl StandardFramework {
             } else if self.configuration.disabled_commands.contains(built) {
                 Some(DispatchError::CommandDisabled(built.to_owned()))
             } else {
+                if command.allowed_roles.len() > 0 {
+                    if let Some(guild) = message.guild() {
+                        let guild = guild.read().unwrap();
+                        if let Some(member) = guild.members.get(&message.author.id) {
+                            let right_role = command
+                                .allowed_roles
+                                .iter()
+                                .flat_map(|r| guild.role_by_name(&r))
+                                .any(|g| member.roles.contains(&g.id));
+                            if !right_role {
+                                return Some(DispatchError::LackingRole);
+                            }
+                        }
+                    }
+                }
+
                 let all_passed = command.checks.iter().all(|check| {
                     check(&mut context, message, args, command)
                 });

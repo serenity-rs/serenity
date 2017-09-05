@@ -29,7 +29,7 @@ use std::fmt::Write;
 use super::command::InternalCommand;
 use super::{Args, Command, CommandGroup, CommandOrAlias};
 use client::Context;
-use model::{ChannelId, Message};
+use model::{ChannelId, Guild, Member, Message};
 use utils::Colour;
 
 fn error_embed(channel_id: &ChannelId, input: &str) {
@@ -48,6 +48,16 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
     }
 
     result
+}
+
+fn right_roles(cmd: &Command, guild: &Guild, member: &Member) -> bool {
+    if cmd.allowed_roles.len() > 0 {
+        return cmd.allowed_roles
+            .iter()
+            .flat_map(|r| guild.role_by_name(&r))
+            .any(|g| member.roles.contains(&g.id));
+    }
+    true
 }
 
 /// Posts an embed showing each individual command group and its commands.
@@ -89,6 +99,19 @@ pub fn with_embeds(_: &mut Context,
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
+                            if cmd.allowed_roles.len() > 0 {
+                                if let Some(guild) = msg.guild() {
+                                    let guild = guild.read().unwrap();
+                                    if let Some(member) = guild.members.get(&msg.author.id) {
+                                        if let Ok(permissions) = member.permissions() {
+                                            if !permissions.administrator() &&
+                                               !right_roles(&cmd, &guild, &member) {
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             found = Some((command_name, cmd));
                         },
                         CommandOrAlias::Alias(ref name) => {
@@ -188,17 +211,25 @@ pub fn with_embeds(_: &mut Context,
                     let cmd = &commands[name];
 
                     if cmd.help_available {
-                        let _ = write!(desc, "`{}`\n", name);
-
-                        has_commands = true;
+                        if let Some(guild) = msg.guild() {
+                            let guild = guild.read().unwrap();
+                            if let Some(member) = guild.members.get(&msg.author.id) {
+                                if let Ok(permissions) = member.permissions() {
+                                    if cmd.help_available &&
+                                       (right_roles(&cmd, &guild, &member) ||
+                                        permissions.administrator()) {
+                                        let _ = write!(desc, "`{}`\n", name);
+                                        has_commands = true;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-
                 if has_commands {
                     e = e.field(|f| f.name(group_name).value(&desc));
                 }
             }
-
             e
         })
     });
@@ -245,6 +276,20 @@ pub fn plain(_: &mut Context,
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
+                            if cmd.allowed_roles.len() > 0 {
+                                if let Some(guild) = msg.guild() {
+                                    let guild = guild.read().unwrap();
+                                    if let Some(member) = guild.members.get(&msg.author.id) {
+                                        if let Ok(permissions) = member.permissions() {
+                                            if !permissions.administrator() &&
+                                               !right_roles(&cmd, &guild, &member) {
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            println!("found");
                             found = Some((command_name, cmd));
                         },
                         CommandOrAlias::Alias(ref name) => {
@@ -322,9 +367,16 @@ pub fn plain(_: &mut Context,
 
         for name in command_names {
             let cmd = &commands[name];
-
-            if cmd.help_available {
-                let _ = write!(group_help, "`{}` ", name);
+            if let Some(guild) = msg.guild() {
+                let guild = guild.read().unwrap();
+                if let Some(member) = guild.members.get(&msg.author.id) {
+                    if let Ok(permissions) = member.permissions() {
+                        if cmd.help_available &&
+                           (permissions.administrator() || right_roles(&cmd, &guild, &member)) {
+                            let _ = write!(group_help, "`{}` ", name);
+                        }
+                    }
+                }
             }
         }
 
