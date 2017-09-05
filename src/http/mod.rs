@@ -492,7 +492,7 @@ pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
         request!(
             Route::ChannelsIdMessagesBulkDelete(channel_id),
             post(body),
-            "/channels/{}/messages/bulk_delete",
+            "/channels/{}/messages/bulk-delete",
             channel_id
         ),
     )
