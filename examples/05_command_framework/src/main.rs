@@ -38,8 +38,9 @@ impl EventHandler for Handler {
 
 fn main() {
     // Configure the client with your Discord bot token in the environment.
-    let token = env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment");
+    let token = env::var("DISCORD_TOKEN").expect(
+        "Expected a token in the environment",
+    );
     let mut client = Client::new(&token, Handler);
 
     {
@@ -65,7 +66,17 @@ fn main() {
         .configure(|c| c
             .allow_whitespace(true)
             .on_mention(true)
-            .prefix("~"))
+            .prefix("~")
+            // You can set multiple delimiters via delimiters()
+            // or just one via delimiter(",")
+            // If you set multiple delimiters, the order you list them
+            // decides their priority (from first to last).
+            //
+            // In this case, if "," would be first, a message would never
+            // be delimited at ", ", forcing you to trim your arguments if you
+            // want to avoid whitespaces at the start of each.
+            .delimiters(vec![", ", ","]))
+
         // Set a function to be called prior to each command execution. This
         // provides the context of the command, the message that was received,
         // and the full name of the command that will be called.
@@ -133,7 +144,12 @@ fn main() {
         .command("ping", |c| c
             .check(owner_check)
             .exec_str("Pong!"))
-        .command("some long command", |c| c.exec(some_long_command)));
+        .command("role", |c| c
+            .exec(about_role)
+            // Limits the usage of this command to roles named:
+            .allowed_roles(vec!["mods", "ultimate neko"]))
+        .command("some long command", |c| c.exec(some_long_command)),
+    );
 
     if let Err(why) = client.start() {
         println!("Client error: {:?}", why);
@@ -173,6 +189,27 @@ fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &Arc<Command>) -
 
 command!(some_long_command(_ctx, msg, args) {
     if let Err(why) = msg.channel_id.say(&format!("Arguments: {:?}", args)) {
+        println!("Error sending message: {:?}", why);
+    }
+});
+
+command!(about_role(_ctx, msg, args) {
+    let potential_role_name = args.full();
+
+    if let Some(guild) = msg.guild() {
+        // `role_by_name()` allows us to attempt attaining a reference to a role
+        // via its name.
+        if let Some(role) = guild.read().unwrap().role_by_name(&potential_role_name) {
+            if let Err(why) = msg.channel_id.say(&format!("Role-ID: {}", role.id)) {
+                println!("Error sending message: {:?}", why);
+            }
+
+            return Ok(());
+        }
+    }
+
+    if let Err(why) = msg.channel_id.say(
+                      &format!("Could not find role named: {:?}", potential_role_name)) {
         println!("Error sending message: {:?}", why);
     }
 });
