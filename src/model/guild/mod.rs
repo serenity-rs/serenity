@@ -207,13 +207,7 @@ impl Guild {
     /// [`Guild::ban`]: struct.Guild.html#method.ban
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8) -> Result<()> {
-        if delete_message_days > 7 {
-            return Err(Error::Model(
-                ModelError::DeleteMessageDaysAmount(delete_message_days),
-            ));
-        }
-
+    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: BO) -> Result<()> {        
         #[cfg(feature = "cache")]
         {
             let req = permissions::BAN_MEMBERS;
@@ -223,7 +217,7 @@ impl Guild {
             }
         }
 
-        self.id.ban(user, delete_message_days)
+        self.id.ban(user, options)
     }
 
     /// Retrieves a list of [`Ban`]s for the guild.

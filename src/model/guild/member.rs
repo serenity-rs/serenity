@@ -274,8 +274,11 @@ impl Member {
     ///
     /// Returns a [`ModelError::GuildNotFound`] if the guild the member's in could not be
     /// found in the cache.
+    /// 
+    /// And/or returns [`ModelError::ItemMissing`] if the "default channel" of the guild is not found.
     ///
     /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
+    /// [`ModelError::ItemMissing`]: enum.ModelError.html#variant.ItemMissing
     #[cfg(feature = "cache")]
     pub fn permissions(&self) -> Result<Permissions> {
         let guild = match self.guild_id.find() {
@@ -285,8 +288,13 @@ impl Member {
 
         let guild = guild.read().unwrap();
 
+        let default_channel = match guild.default_channel() {
+            Some(dc) => dc,
+            None => return Err(From::from(ModelError::ItemMissing)),
+        };
+        
         Ok(guild.permissions_for(
-            ChannelId(guild.id.0),
+            default_channel.id,
             self.user.read().unwrap().id,
         ))
     }
