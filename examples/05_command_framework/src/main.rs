@@ -197,7 +197,6 @@ command!(about_role(_ctx, msg, args) {
     let potential_role_name = args.full();
 
     if let Some(guild) = msg.guild() {
-
         // `role_by_name()` allows us to attempt attaining a reference to a role
         // via its name.
         if let Some(role) = guild.read().unwrap().role_by_name(&potential_role_name) {
