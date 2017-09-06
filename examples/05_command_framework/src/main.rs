@@ -144,10 +144,10 @@ fn main() {
         .command("ping", |c| c
             .check(owner_check)
             .exec_str("Pong!"))
-        .command("role", |c| {
-            (c.exec(about_role)
+        .command("role", |c| c
+            .exec(about_role)
             // Limits the usage of this command to roles named:
-            .allowed_roles(vec!["mods", "ultimate neko"]))})
+            .allowed_roles(vec!["mods", "ultimate neko"]))
         .command("some long command", |c| c.exec(some_long_command)),
     );
 
@@ -195,16 +195,20 @@ command!(some_long_command(_ctx, msg, args) {
 
 command!(about_role(_ctx, msg, args) {
     let potential_role_name = args.full();
+
     if let Some(guild) = msg.guild() {
+
         // `role_by_name()` allows us to attempt attaining a reference to a role
         // via its name.
         if let Some(role) = guild.read().unwrap().role_by_name(&potential_role_name) {
             if let Err(why) = msg.channel_id.say(&format!("Role-ID: {}", role.id)) {
                 println!("Error sending message: {:?}", why);
             }
+
             return Ok(());
         }
     }
+    
     if let Err(why) = msg.channel_id.say(
                       &format!("Could not find role named: {:?}", potential_role_name)) {
         println!("Error sending message: {:?}", why);
