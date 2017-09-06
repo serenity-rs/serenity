@@ -208,7 +208,7 @@ command!(about_role(_ctx, msg, args) {
             return Ok(());
         }
     }
-    
+
     if let Err(why) = msg.channel_id.say(
                       &format!("Could not find role named: {:?}", potential_role_name)) {
         println!("Error sending message: {:?}", why);
