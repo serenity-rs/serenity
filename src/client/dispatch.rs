@@ -133,7 +133,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
     let wait_for_guilds = move || -> ::Result<()> {
         let unavailable_guilds = CACHE.read().unwrap().unavailable_guilds.len();
 
-        while unavailable_guilds != 0 && (now!() - last_guild_create_time < 2000) {
+        while unavailable_guilds != 0 && (now!() < last_guild_create_time + 2000) {
             thread::sleep(time::Duration::from_millis(500));
         }
 
