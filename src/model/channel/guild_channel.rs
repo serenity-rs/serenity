@@ -25,7 +25,8 @@ pub struct GuildChannel {
     /// The default channel Id shares the Id of the guild and the default role.
     pub id: ChannelId,
     /// Whether this guild channel belongs in a category.
-    pub parent_id: Option<ChannelId>,
+    #[serde(rename = "parent_id")]
+    pub category_id: Option<ChannelId>,
     /// The bitrate of the channel.
     ///
     /// **Note**: This is only available for voice channels.

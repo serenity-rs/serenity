@@ -11,7 +11,8 @@ pub struct ChannelCategory {
     /// Id of this category.
     pub id: ChannelId,
     /// If this category belongs to another category.
-    pub parent_id: Option<ChannelId>,
+    #[serde(rename = "parent_id")]
+    pub category_id: Option<ChannelId>,
     /// The position of this category.
     pub position: i64,
     /// Indicator of the type of channel this is.
@@ -103,9 +104,9 @@ impl ChannelCategory {
         let edited = f(EditChannel(map)).0;
 
         http::edit_channel(self.id.0, &edited).map(|channel| {
-            let GuildChannel { id, parent_id, permission_overwrites, nsfw, name, position, kind, .. } = channel;
+            let GuildChannel { id, category_id, permission_overwrites, nsfw, name, position, kind, .. } = channel;
 
-            *self = ChannelCategory { id, parent_id, permission_overwrites, nsfw, name, position, kind };
+            *self = ChannelCategory { id, category_id, permission_overwrites, nsfw, name, position, kind };
             ()
         })
     }
