@@ -112,6 +112,9 @@ impl CacheEventsImpl for super::Cache {
                 let ch = self.private_channels.insert(id, channel.clone());
                 ch.map(Channel::Private)
             },
+            Channel::Category(ref category) => {
+                self.categories.insert(category.read().unwrap().id, category.clone()).map(Channel::Category)
+            },
         }
     }
 
@@ -123,6 +126,8 @@ impl CacheEventsImpl for super::Cache {
             // anymore.
             Channel::Private(_) |
             Channel::Group(_) => unreachable!(),
+            // TODO: Fix this later.
+            Channel::Category(_) => unreachable!(),
         };
 
         let (guild_id, channel_id) = channel.with(|channel| (channel.guild_id, channel.id));
@@ -218,6 +223,11 @@ impl CacheEventsImpl for super::Cache {
                 self.private_channels
                     .get_mut(&channel.read().unwrap().id)
                     .map(|private| private.clone_from(channel));
+            },
+            Channel::Category(ref category) => {
+                self.categories
+                    .get_mut(&category.read().unwrap().id)
+                    .map(|c| c.clone_from(category));
             },
         }
     }

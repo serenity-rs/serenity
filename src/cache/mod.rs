@@ -76,6 +76,8 @@ pub struct Cache {
     /// [`Event::GuildUnavailable`]: ../model/event/struct.GuildUnavailableEvent.html
     /// [`Guild`]: ../model/struct.Guild.html
     pub channels: HashMap<ChannelId, Arc<RwLock<GuildChannel>>>,
+    /// A map of channel categories.
+    pub categories: HashMap<ChannelId, Arc<RwLock<ChannelCategory>>>,
     /// A map of the groups that the current user is in.
     ///
     /// For bot users this will always be empty, except for in [special cases].
@@ -593,6 +595,11 @@ impl Cache {
         self.users.get(&user_id.into()).cloned()
     }
 
+    #[inline]
+    pub fn categories<C: Into<ChannelId>>(&self, channel_id: C) -> Option<Arc<RwLock<ChannelCategory>>> {
+        self.categories.get(&channel_id.into()).cloned()
+    }
+
     fn update_user_entry(&mut self, user: &User) {
         match self.users.entry(user.id) {
             Entry::Vacant(e) => {
@@ -609,6 +616,7 @@ impl Default for Cache {
     fn default() -> Cache {
         Cache {
             channels: HashMap::default(),
+            categories: HashMap::default(),
             groups: HashMap::with_capacity(128),
             guilds: HashMap::default(),
             notes: HashMap::default(),

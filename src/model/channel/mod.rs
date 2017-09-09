@@ -6,6 +6,7 @@ mod guild_channel;
 mod message;
 mod private_channel;
 mod reaction;
+mod channel_category;
 
 pub use self::attachment::*;
 pub use self::channel_id::*;
@@ -15,6 +16,7 @@ pub use self::guild_channel::*;
 pub use self::message::*;
 pub use self::private_channel::*;
 pub use self::reaction::*;
+pub use self::channel_category::*;
 
 use serde::de::Error as DeError;
 use serde_json;
@@ -45,6 +47,10 @@ pub enum Channel {
     ///
     /// [`User`]: struct.User.html
     Private(Arc<RwLock<PrivateChannel>>),
+    /// A category of [`GuildChannel`]s
+    ///
+    /// [`GuildChannel`]: struct.GuildChannel.html
+    Category(Arc<RwLock<ChannelCategory>>),
 }
 
 #[cfg(feature = "model")]
@@ -83,6 +89,9 @@ impl Channel {
             },
             Channel::Private(ref private_channel) => {
                 let _ = private_channel.read().unwrap().delete()?;
+            },
+            Channel::Category(ref category) => {
+                let _ = category.read().unwrap().delete()?;
             },
         }
 
@@ -160,6 +169,7 @@ impl Channel {
     pub fn is_nsfw(&self) -> bool {
         match *self {
             Channel::Guild(ref channel) => channel.with(|c| c.is_nsfw()),
+            Channel::Category(ref category) => category.with(|c| c.is_nsfw()),
             Channel::Group(_) |
             Channel::Private(_) => false,
         }
@@ -240,6 +250,7 @@ impl Channel {
             Channel::Group(ref group) => group.with(|g| g.channel_id),
             Channel::Guild(ref ch) => ch.with(|c| c.id),
             Channel::Private(ref ch) => ch.with(|c| c.id),
+            Channel::Category(ref category) => category.with(|c| c.id),
         }
     }
 
@@ -342,6 +353,11 @@ impl<'de> Deserialize<'de> for Channel {
                     .map(|x| Channel::Group(Arc::new(RwLock::new(x))))
                     .map_err(DeError::custom)
             },
+            4 => {
+                serde_json::from_value::<ChannelCategory>(Value::Object(v))
+                    .map(|x| Channel::Category(Arc::new(RwLock::new(x))))
+                    .map_err(DeError::custom)
+            },
             _ => Err(DeError::custom("Unknown channel type")),
         }
     }
@@ -372,6 +388,7 @@ impl Display for Channel {
 
                 Display::fmt(&recipient.name, f)
             },
+            Channel::Category(ref category) => Display::fmt(&category.read().unwrap().name, f),
         }
     }
 }
@@ -395,6 +412,10 @@ enum_number!(
 
 [`Group`]: struct.Group.html"]
         Group = 3,
+        #[doc="An indicator that the channel is the channel of a [`ChannelCategory`].
+
+[`ChannelCategory`]: struct.ChannelCategory.html"]
+        Category = 4,
     }
 );
 
@@ -405,6 +426,7 @@ impl ChannelType {
             ChannelType::Private => "private",
             ChannelType::Text => "text",
             ChannelType::Voice => "voice",
+            ChannelType::Category => "category",
         }
     }
 }

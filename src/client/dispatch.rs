@@ -164,6 +164,12 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                         Ok(())
                     });
                 },
+                Channel::Category(channel) => {
+                    tokio_handle.spawn_fn(move || {
+                        h.on_category_create(context, channel);
+                        Ok(())
+                    });
+                },
             }
         },
         Event::ChannelDelete(event) => {
@@ -178,6 +184,13 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                     let h = event_handler.clone();
                     tokio_handle.spawn_fn(move || {
                         h.on_channel_delete(context, channel);
+                        Ok(())
+                    });
+                },
+                Channel::Category(channel) => {
+                    let h = event_handler.clone();
+                    tokio_handle.spawn_fn(move || {
+                        h.on_category_delete(context, channel);
                         Ok(())
                     });
                 },

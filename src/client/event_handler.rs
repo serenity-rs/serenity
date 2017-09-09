@@ -11,6 +11,8 @@ pub trait EventHandler {
     #[cfg(feature = "cache")]
     fn on_cached(&self, _: Context, _: Vec<GuildId>) {}
     fn on_channel_create(&self, _: Context, _: Arc<RwLock<GuildChannel>>) {}
+    fn on_category_create(&self, _: Context, _: Arc<RwLock<ChannelCategory>>) {}
+    fn on_category_delete(&self, _: Context, _: Arc<RwLock<ChannelCategory>>) {}
     fn on_private_channel_create(&self, _: Context, _: Arc<RwLock<PrivateChannel>>) {}
     fn on_channel_delete(&self, _: Context, _: Arc<RwLock<GuildChannel>>) {}
     fn on_channel_pins_update(&self, _: Context, _: ChannelPinsUpdateEvent) {}

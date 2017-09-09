@@ -302,6 +302,7 @@ impl ChannelId {
     pub fn name(&self) -> Option<String> {
         use self::Channel::*;
 
+        // TODO: Replace this second match with `?`.
         Some(match match self.find() {
                   Some(c) => c,
                   None => return None,
@@ -313,6 +314,7 @@ impl ChannelId {
                     Cow::Owned(name) => name,
                 }
             },
+            Category(category) => category.read().unwrap().name().to_string(),
             Private(channel) => channel.read().unwrap().name(),
         })
     }
@@ -516,6 +518,7 @@ impl From<Channel> for ChannelId {
             Channel::Group(group) => group.with(|g| g.channel_id),
             Channel::Guild(ch) => ch.with(|c| c.id),
             Channel::Private(ch) => ch.with(|c| c.id),
+            Channel::Category(ch) => ch.with(|c| c.id),
         }
     }
 }
@@ -527,6 +530,7 @@ impl<'a> From<&'a Channel> for ChannelId {
             Channel::Group(ref group) => group.with(|g| g.channel_id),
             Channel::Guild(ref ch) => ch.with(|c| c.id),
             Channel::Private(ref ch) => ch.with(|c| c.id),
+            Channel::Category(ref ch) => ch.with(|c| c.id),
         }
     }
 }

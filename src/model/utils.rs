@@ -76,6 +76,7 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
             Channel::Group(ref group) => group.read().unwrap().channel_id,
             Channel::Private(ref channel) => channel.read().unwrap().id,
             Channel::Guild(_) => unreachable!("Guild private channel decode"),
+            Channel::Category(_) => unreachable!("Channel category private channel decode"),
         };
 
         private_channels.insert(id, private_channel);
@@ -157,8 +158,9 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
     let guild_id = match channel {
         Channel::Guild(channel) => channel.read().unwrap().guild_id,
         Channel::Group(_) |
-        Channel::Private(_) => {
-            // Both users in DMs, and all users in groups, will have the same
+        Channel::Private(_) |
+        Channel::Category(_) => {
+            // Both users in DMs, and all users in groups and maybe all channels in categories will have the same
             // permissions.
             //
             // The only exception to this is when the current user is blocked by
