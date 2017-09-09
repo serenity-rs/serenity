@@ -20,6 +20,7 @@ pub struct ChannelCategory {
     /// This should always be [`ChannelType::Category`].
     ///
     /// [`ChannelType::Category`]: enum.ChannelType.html#variant.Category
+    #[serde(rename = "type")]
     pub kind: ChannelType,
     /// The name of the category.
     pub name: String,
