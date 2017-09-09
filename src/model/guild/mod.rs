@@ -207,7 +207,7 @@ impl Guild {
     /// [`Guild::ban`]: struct.Guild.html#method.ban
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: BO) -> Result<()> {        
+    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: BO) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = permissions::BAN_MEMBERS;

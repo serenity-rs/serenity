@@ -19,6 +19,7 @@ fn test_mention() {
 
     let channel = Channel::Guild(Arc::new(RwLock::new(GuildChannel {
         bitrate: None,
+        category_id: None,
         guild_id: GuildId(1),
         kind: ChannelType::Text,
         id: ChannelId(4),

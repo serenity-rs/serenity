@@ -113,7 +113,9 @@ impl CacheEventsImpl for super::Cache {
                 ch.map(Channel::Private)
             },
             Channel::Category(ref category) => {
-                self.categories.insert(category.read().unwrap().id, category.clone()).map(Channel::Category)
+                self.categories
+                    .insert(category.read().unwrap().id, category.clone())
+                    .map(Channel::Category)
             },
         }
     }
@@ -225,9 +227,11 @@ impl CacheEventsImpl for super::Cache {
                     .map(|private| private.clone_from(channel));
             },
             Channel::Category(ref category) => {
-                self.categories
-                    .get_mut(&category.read().unwrap().id)
-                    .map(|c| c.clone_from(category));
+                self.categories.get_mut(&category.read().unwrap().id).map(
+                    |c| {
+                        c.clone_from(category)
+                    },
+                );
             },
         }
     }

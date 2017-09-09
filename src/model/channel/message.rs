@@ -97,6 +97,7 @@ impl Message {
     ///
     /// command!(channel_name(_ctx, msg) {
     ///     let _ = match msg.channel() {
+    ///         Some(Channel::Category(c)) => msg.reply(&c.read().unwrap().name),
     ///         Some(Channel::Group(c)) => msg.reply(&c.read().unwrap().name()),
     ///         Some(Channel::Guild(c)) => msg.reply(&c.read().unwrap().name),
     ///         Some(Channel::Private(c)) => {

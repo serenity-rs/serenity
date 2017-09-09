@@ -274,8 +274,9 @@ impl Member {
     ///
     /// Returns a [`ModelError::GuildNotFound`] if the guild the member's in could not be
     /// found in the cache.
-    /// 
-    /// And/or returns [`ModelError::ItemMissing`] if the "default channel" of the guild is not found.
+    ///
+    /// And/or returns [`ModelError::ItemMissing`] if the "default channel" of the guild is not
+    /// found.
     ///
     /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
     /// [`ModelError::ItemMissing`]: enum.ModelError.html#variant.ItemMissing
@@ -292,7 +293,7 @@ impl Member {
             Some(dc) => dc,
             None => return Err(From::from(ModelError::ItemMissing)),
         };
-        
+
         Ok(guild.permissions_for(
             default_channel.id,
             self.user.read().unwrap().id,

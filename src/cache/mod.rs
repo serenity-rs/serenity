@@ -596,7 +596,9 @@ impl Cache {
     }
 
     #[inline]
-    pub fn categories<C: Into<ChannelId>>(&self, channel_id: C) -> Option<Arc<RwLock<ChannelCategory>>> {
+    pub fn categories<C: Into<ChannelId>>(&self,
+                                          channel_id: C)
+                                          -> Option<Arc<RwLock<ChannelCategory>>> {
         self.categories.get(&channel_id.into()).cloned()
     }
 

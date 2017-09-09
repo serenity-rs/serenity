@@ -104,9 +104,26 @@ impl ChannelCategory {
         let edited = f(EditChannel(map)).0;
 
         http::edit_channel(self.id.0, &edited).map(|channel| {
-            let GuildChannel { id, category_id, permission_overwrites, nsfw, name, position, kind, .. } = channel;
+            let GuildChannel {
+                id,
+                category_id,
+                permission_overwrites,
+                nsfw,
+                name,
+                position,
+                kind,
+                ..
+            } = channel;
 
-            *self = ChannelCategory { id, category_id, permission_overwrites, nsfw, name, position, kind };
+            *self = ChannelCategory {
+                id,
+                category_id,
+                permission_overwrites,
+                nsfw,
+                name,
+                position,
+                kind,
+            };
             ()
         })
     }

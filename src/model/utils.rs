@@ -160,7 +160,8 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
         Channel::Group(_) |
         Channel::Private(_) |
         Channel::Category(_) => {
-            // Both users in DMs, and all users in groups and maybe all channels in categories will have the same
+            // Both users in DMs, and all users in groups and maybe all channels in categories will
+            // have the same
             // permissions.
             //
             // The only exception to this is when the current user is blocked by
