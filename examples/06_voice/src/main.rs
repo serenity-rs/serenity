@@ -4,7 +4,7 @@
 //! ```toml
 //! [dependencies.serenity]
 //! git = "https://github.com/zeyla/serenity.git"
-//! features = ["cache", "framework", "voice"]
+//! features = ["cache", "framework", "standard_framework", "voice"]
 //! ```
 
 #[macro_use]

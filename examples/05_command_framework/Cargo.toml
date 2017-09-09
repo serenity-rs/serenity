@@ -7,5 +7,5 @@ authors = ["my name <my@email.address>"]
 typemap = "0.3"
 
 [dependencies.serenity]
-features = ["framework"]
+features = ["framework", "standard_framework"]
 path = "../../"

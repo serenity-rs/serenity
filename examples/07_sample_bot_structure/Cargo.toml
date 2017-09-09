@@ -4,5 +4,5 @@ version = "0.1.0"
 authors = ["my name <my@email.address>"]
 
 [dependencies.serenity]
-features = ["cache", "framework"]
+features = ["cache", "framework", "standard_framework"]
 path = "../../"
