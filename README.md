@@ -110,6 +110,7 @@ the Discord gateway over a WebSocket client.
 enough level that optional parameters can be provided at will via a JsonMap.
 - **model**: Method implementations for models, acting as helper methods over
 the HTTP functions.
+- **standard_framework**: A standard, default implementation of the Framework
 - **utils**: Utility functions for common use cases by users.
 - **voice**: Enables compilation of voice support, so that voice channels can be
 connected to and audio can be sent/received.
