@@ -51,7 +51,7 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 }
 
 fn right_roles(cmd: &Command, guild: &Guild, member: &Member) -> bool {
-    if cmd.allowed_roles.len() > 0 {
+    if !cmd.allowed_roles.is_empty() {
         cmd.allowed_roles
             .iter()
             .flat_map(|r| guild.role_by_name(&r))

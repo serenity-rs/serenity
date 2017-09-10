@@ -523,17 +523,21 @@ impl StandardFramework {
             } else if self.configuration.disabled_commands.contains(built) {
                 Some(DispatchError::CommandDisabled(built.to_owned()))
             } else {
-                if command.allowed_roles.len() > 0 {
+                if !command.allowed_roles.is_empty() {
                     if let Some(guild) = message.guild() {
                         let guild = guild.read().unwrap();
                         if let Some(member) = guild.members.get(&message.author.id) {
-                            let right_role = command
-                                .allowed_roles
-                                .iter()
-                                .flat_map(|r| guild.role_by_name(&r))
-                                .any(|g| member.roles.contains(&g.id));
-                            if !right_role {
-                                return Some(DispatchError::LackingRole);
+                            if let Ok(permissions) = member.permissions() {
+                                if !permissions.administrator() {
+                                    let right_role = command
+                                        .allowed_roles
+                                        .iter()
+                                        .flat_map(|r| guild.role_by_name(&r))
+                                        .any(|g| member.roles.contains(&g.id));
+                                    if !right_role {
+                                        return Some(DispatchError::LackingRole);
+                                    }
+                                }
                             }
                         }
                     }
