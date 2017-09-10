@@ -121,24 +121,26 @@ impl CacheEventsImpl for super::Cache {
     }
 
     fn update_with_channel_delete(&mut self, event: &ChannelDeleteEvent) {
-        let channel = match event.channel {
-            Channel::Guild(ref channel) => channel,
+        match event.channel {
+            Channel::Guild(ref channel) => {
+                let (guild_id, channel_id) = channel.with(|channel| (channel.guild_id, channel.id));
+
+                self.channels.remove(&channel_id);
+
+                self.guilds.get_mut(&guild_id).and_then(|guild| {
+                    guild.with_mut(|g| g.channels.remove(&channel_id))
+                });
+            },
+            Channel::Category(ref category) => {
+                let channel_id = category.with(|cat| cat.id);
+
+                self.categories.remove(&channel_id);
+            },
             // We ignore these two due to the fact that the delete event for dms/groups
-            // will _not_ fire
-            // anymore.
+            // will _not_ fire anymore.
             Channel::Private(_) |
             Channel::Group(_) => unreachable!(),
-            // TODO: Fix this later.
-            Channel::Category(_) => unreachable!(),
         };
-
-        let (guild_id, channel_id) = channel.with(|channel| (channel.guild_id, channel.id));
-
-        self.channels.remove(&channel_id);
-
-        self.guilds.get_mut(&guild_id).and_then(|guild| {
-            guild.with_mut(|g| g.channels.remove(&channel_id))
-        });
     }
 
     #[allow(dead_code)]
