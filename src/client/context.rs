@@ -47,7 +47,10 @@ pub struct Context {
 
 impl Context {
     /// Create a new Context to be passed to an event handler.
-    pub(crate) fn new(shard: Arc<Mutex<Shard>>, data: Arc<Mutex<ShareMap>>, handle: Handle) -> Context {
+    pub(crate) fn new(shard: Arc<Mutex<Shard>>,
+                      data: Arc<Mutex<ShareMap>>,
+                      handle: Handle)
+                      -> Context {
         Context {
             data,
             shard,

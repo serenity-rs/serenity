@@ -30,10 +30,17 @@ pub enum CommandType {
     WithCommands(Box<Help>),
 }
 
-#[derive(Default)]
 pub struct CommandGroup {
     pub prefix: Option<String>,
     pub commands: HashMap<String, CommandOrAlias>,
+    /// Some fields taken from Command
+    pub bucket: Option<String>,
+    pub required_permissions: Permissions,
+    pub allowed_roles: Vec<String>,
+    pub help_available: bool,
+    pub dm_only: bool,
+    pub guild_only: bool,
+    pub owners_only: bool,
 }
 
 /// Command struct used to store commands internally.
