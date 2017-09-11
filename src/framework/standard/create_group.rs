@@ -6,7 +6,8 @@ pub use super::Args;
 use std::default::Default;
 use std::sync::Arc;
 use client::Context;
-use model::Message;
+use model::{Message, Permissions};
+use std::collections::HashMap;
 
 /// Used to create command groups
 ///
@@ -26,10 +27,25 @@ use model::Message;
 pub struct CreateGroup(pub CommandGroup);
 
 impl CreateGroup {
+    fn build_command(&self) -> CreateCommand {
+        let mut cmd = CreateCommand(Command::default())
+            .required_permissions(self.0.required_permissions)
+            .dm_only(self.0.dm_only)
+            .guild_only(self.0.guild_only)
+            .help_available(self.0.help_available)
+            .owners_only(self.0.owners_only);
+
+        if let Some(ref bucket) = self.0.bucket {
+            cmd = cmd.bucket(&bucket);
+        }
+        cmd.0.allowed_roles = self.0.allowed_roles.clone();
+        cmd
+    }
+
     /// Adds a command to group.
     pub fn command<F>(mut self, command_name: &str, f: F) -> Self
         where F: FnOnce(CreateCommand) -> CreateCommand {
-        let cmd = f(CreateCommand(Command::default())).0;
+        let cmd = f(self.build_command()).0;
 
         for n in &cmd.aliases {
             if let Some(ref prefix) = self.0.prefix {
@@ -80,5 +96,71 @@ impl CreateGroup {
         self.0.prefix = Some(desc.to_owned());
 
         self
+    }
+
+    /// Adds a ratelimit bucket.
+    pub fn bucket(mut self, bucket: &str) -> Self {
+        self.0.bucket = Some(bucket.to_owned());
+
+        self
+    }
+
+    /// Whether command can be used only privately or not.
+    pub fn dm_only(mut self, dm_only: bool) -> Self {
+        self.0.dm_only = dm_only;
+
+        self
+    }
+
+    /// Whether command can be used only in guilds or not.
+    pub fn guild_only(mut self, guild_only: bool) -> Self {
+        self.0.guild_only = guild_only;
+
+        self
+    }
+
+    /// Whether command should be displayed in help list or not, used by other commands.
+    pub fn help_available(mut self, help_available: bool) -> Self {
+        self.0.help_available = help_available;
+
+        self
+    }
+
+    /// Whether command can be used only privately or not.
+    pub fn owners_only(mut self, owners_only: bool) -> Self {
+        self.0.owners_only = owners_only;
+
+        self
+    }
+
+    /// The permissions that a user must have in the contextual channel in order
+    /// for the command to be processed.
+    pub fn required_permissions(mut self, permissions: Permissions) -> Self {
+        self.0.required_permissions = permissions;
+
+        self
+    }
+
+    /// Sets roles that are allowed to use the command.
+    pub fn allowed_roles(mut self, allowed_roles: Vec<&str>) -> Self {
+        self.0.allowed_roles = allowed_roles.iter().map(|x| x.to_string()).collect();
+
+        self
+    }
+}
+
+impl Default for CommandGroup {
+    fn default() -> CommandGroup {
+        CommandGroup {
+            prefix: None,
+            commands: HashMap::new(),
+            bucket: None,
+            required_permissions: Permissions::empty(),
+            dm_only: false,
+            guild_only: false,
+            help_available: true,
+            owners_only: false,
+            allowed_roles: Vec::new(),
+        }
     }
 }
