@@ -167,8 +167,6 @@ pub use client::Client;
 #[cfg(feature = "cache")]
 use cache::Cache;
 #[cfg(feature = "cache")]
-pub(crate) use cache::CacheEventsImpl;
-#[cfg(feature = "cache")]
 use std::sync::RwLock;
 
 #[cfg(feature = "cache")]

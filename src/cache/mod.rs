@@ -47,9 +47,9 @@ use std::default::Default;
 use std::sync::{Arc, RwLock};
 use model::*;
 
-mod cache_events_impl;
+mod cache_update;
 
-pub(crate) use self::cache_events_impl::*;
+pub(crate) use self::cache_update::*;
 
 /// A cache of all events received over a [`Shard`], where storing at least
 /// some data from the event is possible.
@@ -602,7 +602,11 @@ impl Cache {
         self.categories.get(&channel_id.into()).cloned()
     }
 
-    fn update_user_entry(&mut self, user: &User) {
+    pub(crate) fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
+        e.update(self)
+    } 
+
+    pub(crate) fn update_user_entry(&mut self, user: &User) {
         match self.users.entry(user.id) {
             Entry::Vacant(e) => {
                 e.insert(Arc::new(RwLock::new(user.clone())));
