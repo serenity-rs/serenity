@@ -234,11 +234,10 @@ impl Cache {
     ///
     /// [`Group`]: ../model/struct.Group.html
     /// [`PrivateChannel`]: ../model/struct.PrivateChannel.html
-    pub fn all_private_channels(&self) -> Vec<ChannelId> {
+    pub fn all_private_channels(&self) -> Vec<&ChannelId> {
         self.groups
             .keys()
             .chain(self.private_channels.keys())
-            .cloned()
             .collect()
     }
 
@@ -270,11 +269,10 @@ impl Cache {
     /// [`Context`]: ../client/struct.Context.html
     /// [`Guild`]: ../model/struct.Guild.html
     /// [`Shard`]: ../gateway/struct.Shard.html
-    pub fn all_guilds(&self) -> Vec<GuildId> {
+    pub fn all_guilds(&self) -> Vec<&GuildId> {
         self.guilds
             .keys()
             .chain(self.unavailable_guilds.iter())
-            .cloned()
             .collect()
     }
 
@@ -604,7 +602,7 @@ impl Cache {
 
     pub(crate) fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
         e.update(self)
-    } 
+    }
 
     pub(crate) fn update_user_entry(&mut self, user: &User) {
         match self.users.entry(user.id) {
