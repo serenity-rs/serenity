@@ -237,8 +237,8 @@ impl Cache {
     pub fn all_private_channels(&self) -> Vec<ChannelId> {
         self.groups
             .keys()
+            .chain(self.private_channels.keys())
             .cloned()
-            .chain(self.private_channels.keys().cloned())
             .collect()
     }
 
@@ -273,8 +273,8 @@ impl Cache {
     pub fn all_guilds(&self) -> Vec<GuildId> {
         self.guilds
             .keys()
+            .chain(self.unavailable_guilds.iter())
             .cloned()
-            .chain(self.unavailable_guilds.iter().cloned())
             .collect()
     }
 
