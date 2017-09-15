@@ -47,9 +47,9 @@ use std::default::Default;
 use std::sync::{Arc, RwLock};
 use model::*;
 
-mod cache_events_impl;
+mod cache_update;
 
-pub(crate) use self::cache_events_impl::*;
+pub(crate) use self::cache_update::*;
 
 /// A cache of all events received over a [`Shard`], where storing at least
 /// some data from the event is possible.
@@ -234,11 +234,10 @@ impl Cache {
     ///
     /// [`Group`]: ../model/struct.Group.html
     /// [`PrivateChannel`]: ../model/struct.PrivateChannel.html
-    pub fn all_private_channels(&self) -> Vec<ChannelId> {
+    pub fn all_private_channels(&self) -> Vec<&ChannelId> {
         self.groups
             .keys()
-            .cloned()
-            .chain(self.private_channels.keys().cloned())
+            .chain(self.private_channels.keys())
             .collect()
     }
 
@@ -270,11 +269,10 @@ impl Cache {
     /// [`Context`]: ../client/struct.Context.html
     /// [`Guild`]: ../model/struct.Guild.html
     /// [`Shard`]: ../gateway/struct.Shard.html
-    pub fn all_guilds(&self) -> Vec<GuildId> {
+    pub fn all_guilds(&self) -> Vec<&GuildId> {
         self.guilds
             .keys()
-            .cloned()
-            .chain(self.unavailable_guilds.iter().cloned())
+            .chain(self.unavailable_guilds.iter())
             .collect()
     }
 
@@ -602,7 +600,11 @@ impl Cache {
         self.categories.get(&channel_id.into()).cloned()
     }
 
-    fn update_user_entry(&mut self, user: &User) {
+    pub(crate) fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
+        e.update(self)
+    }
+
+    pub(crate) fn update_user_entry(&mut self, user: &User) {
         match self.users.entry(user.id) {
             Entry::Vacant(e) => {
                 e.insert(Arc::new(RwLock::new(user.clone())));
