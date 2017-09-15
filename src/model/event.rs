@@ -78,7 +78,8 @@ impl CacheUpdate for ChannelCreateEvent {
 
                 cache.channels.insert(channel_id, channel.clone());
 
-                cache.guilds
+                cache
+                    .guilds
                     .get_mut(&guild_id)
                     .and_then(|guild| {
                         guild.with_mut(|guild| {
@@ -109,7 +110,8 @@ impl CacheUpdate for ChannelCreateEvent {
                 ch.map(Channel::Private)
             },
             Channel::Category(ref category) => {
-                cache.categories
+                cache
+                    .categories
                     .insert(category.read().unwrap().id, category.clone())
                     .map(Channel::Category)
             },
@@ -188,13 +190,13 @@ impl CacheUpdate for ChannelPinsUpdateEvent {
         }
 
         if let Some(group) = cache.groups.get_mut(&self.channel_id) {
-            group.with_mut(|c| {
-                c.last_pin_timestamp = self.last_pin_timestamp;
-            });
+            group.with_mut(
+                |c| { c.last_pin_timestamp = self.last_pin_timestamp; },
+            );
 
             return None;
         }
-        
+
         None
     }
 }
@@ -215,10 +217,7 @@ impl CacheUpdate for ChannelRecipientAddEvent {
         let user = cache.users[&self.user.id].clone();
 
         cache.groups.get_mut(&self.channel_id).map(|group| {
-            group.write().unwrap().recipients.insert(
-                self.user.id,
-                user,
-            );
+            group.write().unwrap().recipients.insert(self.user.id, user);
         });
 
         None
@@ -292,7 +291,8 @@ impl CacheUpdate for ChannelUpdateEvent {
                 });
             },
             Channel::Private(ref channel) => {
-                cache.private_channels
+                cache
+                    .private_channels
                     .get_mut(&channel.read().unwrap().id)
                     .map(|private| private.clone_from(channel));
             },
