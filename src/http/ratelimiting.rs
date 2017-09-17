@@ -504,18 +504,11 @@ impl RateLimit {
 }
 
 fn parse_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
-    match headers.get_raw(header) {
-        Some(header) => {
-            match str::from_utf8(&header[0]) {
-                Ok(v) => {
-                    match v.parse::<i64>() {
-                        Ok(v) => Ok(Some(v)),
-                        Err(_) => Err(Error::Http(HttpError::RateLimitI64)),
-                    }
-                },
-                Err(_) => Err(Error::Http(HttpError::RateLimitUtf8)),
-            }
-        },
-        None => Ok(None),
-    }
+    headers.get_raw(header).map_or(Ok(None), |header| {
+        str::from_utf8(&header[0])
+            .map_err(|_| Error::Http(HttpError::RateLimitUtf8))
+            .and_then(|v| {
+                v.parse::<i64>().map(|v| Some(v)).map_err(|_| Error::Http(HttpError::RateLimitI64))
+            })
+    })
 }
