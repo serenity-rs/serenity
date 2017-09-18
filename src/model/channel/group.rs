@@ -1,15 +1,16 @@
 use chrono::{DateTime, FixedOffset};
 use model::*;
-use internal::RwLockExt;
 
-#[cfg(feature = "model")]
-use std::borrow::Cow;
-#[cfg(feature = "model")]
-use std::fmt::Write as FmtWrite;
 #[cfg(feature = "model")]
 use builder::{CreateMessage, GetMessages};
 #[cfg(feature = "model")]
 use http::{self, AttachmentType};
+#[cfg(feature="model")]
+use internal::RwLockExt;
+#[cfg(feature = "model")]
+use std::borrow::Cow;
+#[cfg(feature = "model")]
+use std::fmt::Write as FmtWrite;
 
 /// A group channel - potentially including other [`User`]s - separate from a
 /// [`Guild`].

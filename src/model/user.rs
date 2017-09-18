@@ -11,11 +11,11 @@ use chrono::NaiveDateTime;
 use std::fmt::Write;
 #[cfg(feature = "model")]
 use std::mem;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::{Arc, RwLock};
 #[cfg(feature = "model")]
 use builder::{CreateMessage, EditProfile};
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
 use http::{self, GuildPagination};

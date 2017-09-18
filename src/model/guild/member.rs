@@ -5,9 +5,9 @@ use model::*;
 
 #[cfg(feature = "model")]
 use std::borrow::Cow;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use http;

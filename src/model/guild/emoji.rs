@@ -1,17 +1,17 @@
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 use super::super::{EmojiId, RoleId};
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::super::ModelError;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use http;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use super::super::GuildId;
 
 /// Represents a custom guild emoji, which can either be created using the API,

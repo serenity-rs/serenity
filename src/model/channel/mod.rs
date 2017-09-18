@@ -18,11 +18,11 @@ pub use self::private_channel::*;
 pub use self::reaction::*;
 pub use self::channel_category::*;
 
+use internal::RwLockExt;
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::deserialize_u64;
 use model::*;
-use internal::RwLockExt;
 
 #[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -53,7 +53,6 @@ pub enum Channel {
     Category(Arc<RwLock<ChannelCategory>>),
 }
 
-#[cfg(feature = "model")]
 impl Channel {
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
     ///
@@ -67,6 +66,7 @@ impl Channel {
     /// [`Message`]: struct.Message.html
     /// [`Message::react`]: struct.Message.html#method.react
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
@@ -79,6 +79,7 @@ impl Channel {
     /// closest functionality is leaving it.
     ///
     /// [`Group`]: struct.Group.html
+    #[cfg(feature = "model")]
     pub fn delete(&self) -> Result<()> {
         match *self {
             Channel::Group(ref group) => {
@@ -108,6 +109,7 @@ impl Channel {
     /// [`Message`]: struct.Message.html
     /// [`Message::delete`]: struct.Message.html#method.delete
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.id().delete_message(message_id)
@@ -120,6 +122,7 @@ impl Channel {
     ///
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn delete_reaction<M, R>(&self,
                                  message_id: M,
@@ -153,6 +156,7 @@ impl Channel {
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
     /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
+    #[cfg(feature = "model")]
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
@@ -164,14 +168,13 @@ impl Channel {
     /// Refer to [`utils::is_nsfw`] for more details.
     ///
     /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
-    #[cfg(feature = "utils")]
+    #[cfg(all(feature = "model", feature = "utils"))]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
         match *self {
             Channel::Guild(ref channel) => channel.with(|c| c.is_nsfw()),
             Channel::Category(ref category) => category.with(|c| c.is_nsfw()),
-            Channel::Group(_) |
-            Channel::Private(_) => false,
+            Channel::Group(_) | Channel::Private(_) => false,
         }
     }
 
@@ -180,6 +183,7 @@ impl Channel {
     /// Requires the [Read Message History] permission.
     ///
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         self.id().message(message_id)
@@ -201,6 +205,7 @@ impl Channel {
     /// ```
     ///
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
@@ -223,6 +228,7 @@ impl Channel {
     /// [`Message`]: struct.Message.html
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn reaction_users<M, R, U>(&self,
                                    message_id: M,
@@ -264,6 +270,7 @@ impl Channel {
     ///
     /// [`ChannelId`]: struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    #[cfg(feature = "model")]
     #[inline]
     pub fn say(&self, content: &str) -> Result<Message> { self.id().say(content) }
 
@@ -285,6 +292,7 @@ impl Channel {
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
@@ -310,6 +318,7 @@ impl Channel {
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn send_message<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
@@ -322,6 +331,7 @@ impl Channel {
     ///
     /// [`Message`]: struct.Message.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.id().unpin(message_id)

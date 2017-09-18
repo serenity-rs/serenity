@@ -11,14 +11,15 @@ repository = "https://github.com/zeyla/serenity.git"
 version = "0.3.0"
 
 [dependencies]
-base64 = "~0.6"
 bitflags = "~0.9"
-flate2 = "~0.2"
 log = "~0.3"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
-parking_lot = "0.4"
+
+[dependencies.base64]
+optional = true
+version = "~0.6"
 
 [dependencies.byteorder]
 optional = true
@@ -27,6 +28,10 @@ version = "1.0"
 [dependencies.chrono]
 features = ["serde"]
 version = "~0.4"
+
+[dependencies.flate2]
+optional = true
+version = "~0.2"
 
 [dependencies.futures]
 optional = true
@@ -57,6 +62,10 @@ version = "0.1"
 [dependencies.opus]
 optional = true
 version = "0.2"
+
+[dependencies.parking_lot]
+optional = true
+version = "0.4"
 
 [dependencies.sodiumoxide]
 default-features = false
@@ -95,12 +104,20 @@ default = [
 ]
 builder = []
 cache = ["lazy_static"]
-client = ["gateway", "lazy_static", "http", "typemap"]
+client = [
+    "futures",
+    "gateway",
+    "http",
+    "lazy_static",
+    "parking_lot",
+    "tokio-core",
+    "typemap",
+]
 extras = []
-framework = ["client", "model", "utils", "vec_shift"]
-gateway = ["http", "websocket", "tokio-core", "futures"]
+framework = ["client", "model", "utils"]
+gateway = ["flate2", "http", "websocket", "utils"]
 http = ["hyper", "hyper-native-tls", "lazy_static", "multipart", "native-tls"]
 model = ["builder", "http"]
-standard_framework = ["framework"]
-utils = []
+standard_framework = ["framework", "vec_shift"]
+utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "sodiumoxide"]

@@ -1,6 +1,10 @@
 use model::*;
+
+#[cfg(all(feature = "builder", feature = "model"))]
 use builder::EditChannel;
+#[cfg(all(feature = "builder", feature = "model"))]
 use http;
+#[cfg(all(feature = "model", feature = "utils"))]
 use utils as serenity_utils;
 
 /// A category of [`GuildChannel`]s.
@@ -77,7 +81,7 @@ impl ChannelCategory {
     /// ```rust,ignore
     /// category.edit(|c| c.name("test").bitrate(86400));
     /// ```
-    #[cfg(feature = "model")]
+    #[cfg(all(feature = "builder", feature = "model"))]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
         #[cfg(feature = "cache")]

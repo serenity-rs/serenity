@@ -19,7 +19,10 @@ use std::io::Read;
 use std::path::Path;
 use internal::prelude::*;
 use model::{EmojiId, EmojiIdentifier};
+
+#[cfg(feature = "cache")]
 use cache::Cache;
+#[cfg(feature = "cache")]
 use CACHE;
 
 /// Determines if a name is NSFW.
@@ -449,6 +452,7 @@ pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % sha
 /// // assuming that the id is `1234`:
 /// assert_eq!(1234, utils::with_cache(|cache| cache.user.id));
 /// ```
+#[cfg(feature = "cache")]
 pub fn with_cache<T, F>(f: F) -> T
     where F: Fn(&Cache) -> T {
     let cache = CACHE.read().unwrap();
@@ -469,6 +473,7 @@ pub fn with_cache<T, F>(f: F) -> T
 /// ```
 ///
 /// [`with_cache`]: #fn.with_cache
+#[cfg(feature = "cache")]
 pub fn with_cache_mut<T, F>(mut f: F) -> T
     where F: FnMut(&mut Cache) -> T {
     let mut cache = CACHE.write().unwrap();

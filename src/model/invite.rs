@@ -1,7 +1,7 @@
 use chrono::{DateTime, FixedOffset};
 use super::*;
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use super::{permissions, utils as model_utils};
 #[cfg(feature = "model")]
 use builder::CreateInvite;

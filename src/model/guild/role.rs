@@ -2,11 +2,11 @@ use std::cmp::Ordering;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use model::*;
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
 use builder::EditRole;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use http;

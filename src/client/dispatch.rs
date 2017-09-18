@@ -1,18 +1,23 @@
-use std::sync::{self, Arc};
+use std::sync::Arc;
 use parking_lot::Mutex;
-use std::thread;
-use std::time;
 use super::event_handler::EventHandler;
 use super::Context;
 use typemap::ShareMap;
 use gateway::Shard;
 use model::event::Event;
-use model::{Channel, GuildId, Message};
-use chrono::{Timelike, Utc};
+use model::{Channel, Message};
 use tokio_core::reactor::Handle;
 
+#[cfg(feature = "cache")]
+use chrono::{Timelike, Utc};
 #[cfg(feature = "framework")]
 use framework::Framework;
+#[cfg(feature = "cache")]
+use model::GuildId;
+#[cfg(feature = "cache")]
+use std::{thread, time};
+#[cfg(feature = "framework")]
+use std::sync;
 
 #[cfg(feature = "cache")]
 use super::CACHE;
@@ -28,22 +33,13 @@ macro_rules! update {
     };
 }
 
+#[cfg(feature = "cache")]
 macro_rules! now {
     () => (Utc::now().time().second() * 1000)
 }
 
 fn context(conn: &Arc<Mutex<Shard>>, data: &Arc<Mutex<ShareMap>>, handle: &Handle) -> Context {
     Context::new(conn.clone(), data.clone(), handle.clone())
-}
-
-#[cfg(feature = "standard_framework")]
-macro_rules! helper {
-    ($enabled:block else $disabled:block) => { $enabled }
-}
-
-#[cfg(not(feature = "standard_framework"))]
-macro_rules! helper {
-    ($enabled:block else $disabled:block) => { $disabled }
 }
 
 #[cfg(feature = "framework")]
@@ -64,13 +60,7 @@ pub fn dispatch<H: EventHandler + 'static>(event: Event,
             );
 
             if let Some(ref mut framework) = *framework.lock().unwrap() {
-                helper! {{
-                if framework.initialized() {
                 framework.dispatch(context, event.message, tokio_handle);
-                }
-                } else {
-                framework.dispatch(context, event.message, tokio_handle);
-                }}
             }
         },
         other => handle_event(other, conn, data, event_handler, tokio_handle),
@@ -116,10 +106,10 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                                            data: &Arc<Mutex<ShareMap>>,
                                            event_handler: &Arc<H>,
                                            tokio_handle: &Handle) {
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     let mut last_guild_create_time = now!();
 
-    #[cfg(feature="cache")]
+    #[cfg(feature = "cache")]
     let wait_for_guilds = move || -> ::Result<()> {
         let unavailable_guilds = CACHE.read().unwrap().unavailable_guilds.len();
 

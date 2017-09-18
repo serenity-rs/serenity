@@ -22,7 +22,7 @@ use serde_json;
 use super::utils::*;
 use model::*;
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
 use http;

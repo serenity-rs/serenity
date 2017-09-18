@@ -600,6 +600,7 @@ impl Cache {
         self.categories.get(&channel_id.into()).cloned()
     }
 
+    #[cfg(feature = "client")]
     pub(crate) fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
         e.update(self)
     }

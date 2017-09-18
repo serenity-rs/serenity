@@ -89,12 +89,15 @@
 #![allow(doc_markdown, inline_always)]
 #![warn(enum_glob_use, if_not_else)]
 
+#[allow(unused_imports)]
 #[macro_use]
 extern crate bitflags;
+#[allow(unused_imports)]
 #[macro_use]
 extern crate log;
 #[macro_use]
 extern crate serde_derive;
+#[allow(unused_imports)]
 #[macro_use]
 extern crate serde_json;
 
@@ -102,14 +105,15 @@ extern crate serde_json;
 #[macro_use]
 extern crate lazy_static;
 
-extern crate base64;
 extern crate chrono;
-extern crate flate2;
-extern crate parking_lot;
 extern crate serde;
 
+#[cfg(feature = "utils")]
+extern crate base64;
 #[cfg(feature = "voice")]
 extern crate byteorder;
+#[cfg(feature = "gateway")]
+extern crate flate2;
 #[cfg(feature = "futures")]
 extern crate futures;
 #[cfg(feature = "hyper")]
@@ -122,13 +126,15 @@ extern crate multipart;
 extern crate native_tls;
 #[cfg(feature = "voice")]
 extern crate opus;
+#[cfg(feature = "client")]
+extern crate parking_lot;
 #[cfg(feature = "voice")]
 extern crate sodiumoxide;
 #[cfg(feature = "tokio-core")]
 extern crate tokio_core;
 #[cfg(feature = "client")]
 extern crate typemap;
-#[cfg(feature = "framework")]
+#[cfg(feature = "standard_framework")]
 extern crate vec_shift;
 #[cfg(feature = "gateway")]
 extern crate websocket;

@@ -6,9 +6,9 @@ use super::*;
 #[cfg(feature = "cache")]
 use internal::prelude::*;
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use super::permissions::Permissions;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 
 pub fn deserialize_emojis<'de, D: Deserializer<'de>>(

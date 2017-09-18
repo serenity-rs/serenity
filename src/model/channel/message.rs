@@ -2,7 +2,7 @@ use chrono::{DateTime, FixedOffset};
 use serde_json::Value;
 use model::*;
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 #[cfg(feature = "model")]
 use std::mem;
@@ -10,7 +10,7 @@ use std::mem;
 use builder::{CreateEmbed, CreateMessage};
 #[cfg(feature = "model")]
 use constants;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
 use http;

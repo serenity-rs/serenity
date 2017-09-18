@@ -1,3 +1,4 @@
+use Result;
 use std::sync::Arc;
 use typemap::ShareMap;
 use gateway::Shard;
@@ -5,7 +6,7 @@ use model::*;
 use parking_lot::Mutex;
 use tokio_core::reactor::Handle;
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "builder", feature = "cache"))]
 use super::CACHE;
 #[cfg(feature = "builder")]
 use internal::prelude::*;
