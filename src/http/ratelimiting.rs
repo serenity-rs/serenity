@@ -508,7 +508,9 @@ fn parse_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
         str::from_utf8(&header[0])
             .map_err(|_| Error::Http(HttpError::RateLimitUtf8))
             .and_then(|v| {
-                v.parse::<i64>().map(|v| Some(v)).map_err(|_| Error::Http(HttpError::RateLimitI64))
+                v.parse::<i64>().map(|v| Some(v)).map_err(|_| {
+                    Error::Http(HttpError::RateLimitI64)
+                })
             })
     })
 }
