@@ -33,6 +33,7 @@ pub struct ChannelCategory {
     pub permission_overwrites: Vec<PermissionOverwrite>,
 }
 
+#[cfg(feature = "model")]
 impl ChannelCategory {
     /// Adds a permission overwrite to the category's channels.
     #[inline]
