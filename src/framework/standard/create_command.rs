@@ -117,8 +117,8 @@ impl CreateCommand {
     pub fn exec_help<F>(mut self, f: F) -> Self
         where F: Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
                     -> Result<(), String>
-                    + Send
-                    + Sync
+                     + Send
+                     + Sync
                      + 'static {
         self.0.exec = CommandType::WithCommands(Box::new(f));
 

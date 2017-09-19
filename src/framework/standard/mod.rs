@@ -290,7 +290,10 @@ impl StandardFramework {
                                     limit: i32,
                                     check: Check)
                                     -> Self
-        where Check: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static,
+        where Check: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool
+                         + Send
+                         + Sync
+                         + 'static,
               S: Into<String> {
         self.buckets.insert(
             s.into(),
@@ -341,7 +344,8 @@ impl StandardFramework {
                                     limit: i32,
                                     check: Check)
                                     -> Self
-        where Check: Fn(&mut Context, ChannelId, UserId) -> bool + Send + Sync + 'static, S: Into<String> {
+        where Check: Fn(&mut Context, ChannelId, UserId) -> bool + Send + Sync + 'static,
+              S: Into<String> {
         self.buckets.insert(
             s.into(),
             Bucket {
@@ -594,7 +598,8 @@ impl StandardFramework {
     /// # }
     /// ```
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + Send + Sync + 'static, S: Into<String> {
+        where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + Send + Sync + 'static,
+              S: Into<String> {
         {
             let ungrouped = self.groups
                 .entry("Ungrouped".to_owned())

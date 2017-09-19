@@ -4,11 +4,16 @@ use client::Context;
 use model::{Message, Permissions};
 use std::collections::HashMap;
 
-pub type Check = Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool + Send + Sync + 'static;
+pub type Check = Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool
+                     + Send
+                     + Sync
+                     + 'static;
 pub type Exec = Fn(&mut Context, &Message, Args) -> Result<(), String> + Send + Sync + 'static;
 pub type Help = Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
                    -> Result<(), String>
-                    + Send + Sync + 'static;
+                    + Send
+                    + Sync
+                    + 'static;
 pub type BeforeHook = Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static;
 pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), String>) + Send + Sync + 'static;
 pub(crate) type InternalCommand = Arc<Command>;
