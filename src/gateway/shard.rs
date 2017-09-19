@@ -12,7 +12,7 @@ use websocket::stream::sync::AsTcpStream;
 use websocket::sync::client::{Client, ClientBuilder};
 use websocket::sync::stream::{TcpStream, TlsStream};
 use websocket::WebSocketError;
-use constants::{self, OpCode, close_codes};
+use constants::{self, close_codes, OpCode};
 use internal::prelude::*;
 use internal::ws_impl::SenderExt;
 use model::event::{Event, GatewayEvent};
@@ -95,8 +95,7 @@ pub struct Shard {
     /// update the voice connections' states.
     #[cfg(feature = "voice")]
     pub manager: VoiceManager,
-    #[cfg(feature = "voice")]
-    manager_rx: MpscReceiver<Value>,
+    #[cfg(feature = "voice")] manager_rx: MpscReceiver<Value>,
 }
 
 impl Shard {
@@ -137,44 +136,43 @@ impl Shard {
         let stage = ConnectionStage::Handshake;
         let session_id = None;
 
-        let mut shard =
-            feature_voice! {
-                {
-                    let (tx, rx) = mpsc::channel();
+        let mut shard = feature_voice! {
+            {
+                let (tx, rx) = mpsc::channel();
 
-                    let user = http::get_current_user()?;
+                let user = http::get_current_user()?;
 
-                    Shard {
-                        client,
-                        current_presence,
-                        heartbeat_instants,
-                        heartbeat_interval,
-                        last_heartbeat_acknowledged,
-                        seq,
-                        stage,
-                        token,
-                        session_id,
-                        shard_info,
-                        ws_url,
-                        manager: VoiceManager::new(tx, user.id),
-                        manager_rx: rx,
-                    }
-                } else {
-                    Shard {
-                        client,
-                        current_presence,
-                        heartbeat_instants,
-                        heartbeat_interval,
-                        last_heartbeat_acknowledged,
-                        seq,
-                        stage,
-                        token,
-                        session_id,
-                        shard_info,
-                        ws_url,
-                    }
+                Shard {
+                    client,
+                    current_presence,
+                    heartbeat_instants,
+                    heartbeat_interval,
+                    last_heartbeat_acknowledged,
+                    seq,
+                    stage,
+                    token,
+                    session_id,
+                    shard_info,
+                    ws_url,
+                    manager: VoiceManager::new(tx, user.id),
+                    manager_rx: rx,
                 }
-            };
+            } else {
+                Shard {
+                    client,
+                    current_presence,
+                    heartbeat_instants,
+                    heartbeat_interval,
+                    last_heartbeat_acknowledged,
+                    seq,
+                    stage,
+                    token,
+                    session_id,
+                    shard_info,
+                    ws_url,
+                }
+            }
+        };
 
         shard.identify()?;
 
@@ -417,8 +415,10 @@ impl Shard {
                 }
             },
             Ok(GatewayEvent::InvalidateSession) => {
-                info!("[Shard {:?}] Received session invalidation; re-identifying",
-                self.shard_info);
+                info!(
+                    "[Shard {:?}] Received session invalidation; re-identifying",
+                    self.shard_info
+                );
 
                 self.seq = 0;
                 self.session_id = None;
@@ -436,11 +436,13 @@ impl Shard {
                 {
                     let kind = if clean { "Cleanly" } else { "Uncleanly" };
 
-                    info!("[Shard {:?}] {} closing with {:?}: {:?}",
-                    self.shard_info,
-                    kind,
-                    num,
-                    reason);
+                    info!(
+                        "[Shard {:?}] {} closing with {:?}: {:?}",
+                        self.shard_info,
+                        kind,
+                        num,
+                        reason
+                    );
                 }
 
                 match num {
@@ -458,7 +460,11 @@ impl Shard {
                     },
                     Some(close_codes::ALREADY_AUTHENTICATED) => warn!("Already authenticated"),
                     Some(close_codes::INVALID_SEQUENCE) => {
-                        warn!("[Shard {:?}] Sent invalid seq: {}", self.shard_info, self.seq);
+                        warn!(
+                            "[Shard {:?}] Sent invalid seq: {}",
+                            self.shard_info,
+                            self.seq
+                        );
 
                         self.seq = 0;
                     },
@@ -473,17 +479,18 @@ impl Shard {
 
                         return Err(Error::Gateway(GatewayError::OverloadedShard));
                     },
-                    Some(4006) |
-                    Some(close_codes::SESSION_TIMEOUT) => {
+                    Some(4006) | Some(close_codes::SESSION_TIMEOUT) => {
                         info!("[Shard {:?}] Invalid session", self.shard_info);
 
                         self.session_id = None;
                     },
                     Some(other) if !clean => {
-                        warn!("[Shard {:?}] Unknown unclean close {}: {:?}",
-                        self.shard_info,
-                        other,
-                        reason);
+                        warn!(
+                            "[Shard {:?}] Unknown unclean close {}: {:?}",
+                            self.shard_info,
+                            other,
+                            reason
+                        );
                     },
                     _ => {},
                 }
@@ -507,7 +514,10 @@ impl Shard {
                 }
 
                 warn!("[Shard {:?}] Websocket error: {:?}", self.shard_info, why);
-                info!("[Shard {:?}] Will attempt to auto-reconnect", self.shard_info);
+                info!(
+                    "[Shard {:?}] Will attempt to auto-reconnect",
+                    self.shard_info
+                );
 
                 self.autoreconnect().and(Ok(None))
             },
@@ -722,7 +732,11 @@ impl Shard {
     pub(crate) fn cycle_voice_recv(&mut self) {
         if let Ok(v) = self.manager_rx.try_recv() {
             if let Err(why) = self.client.send_json(&v) {
-                warn!("[Shard {:?}] Err sending voice msg: {:?}", self.shard_info, why);
+                warn!(
+                    "[Shard {:?}] Err sending voice msg: {:?}",
+                    self.shard_info,
+                    why
+                );
             }
         }
     }
@@ -733,7 +747,11 @@ impl Shard {
             "op": OpCode::Heartbeat.num(),
         });
 
-        trace!("[Shard {:?}] Sending heartbeat d: {}", self.shard_info, self.seq);
+        trace!(
+            "[Shard {:?}] Sending heartbeat d: {}",
+            self.shard_info,
+            self.seq
+        );
 
         match self.client.send_json(&map) {
             Ok(_) => {
@@ -744,13 +762,20 @@ impl Shard {
             },
             Err(why) => {
                 match why {
-                    Error::WebSocket(WebSocketError::IoError(err)) => {
-                        if err.raw_os_error() != Some(32) {
-                            debug!("[Shard {:?}] Err w/ heartbeating: {:?}", self.shard_info, err);
-                        }
+                    Error::WebSocket(WebSocketError::IoError(err)) => if err.raw_os_error() !=
+                                                                         Some(32) {
+                        debug!(
+                            "[Shard {:?}] Err w/ heartbeating: {:?}",
+                            self.shard_info,
+                            err
+                        );
                     },
                     other => {
-                        warn!("[Shard {:?}] Other err w/ keepalive: {:?}", self.shard_info, other);
+                        warn!(
+                            "[Shard {:?}] Other err w/ keepalive: {:?}",
+                            self.shard_info,
+                            other
+                        );
                     },
                 }
 
@@ -778,12 +803,17 @@ impl Shard {
         // If the last heartbeat didn't receive an acknowledgement, then
         // auto-reconnect.
         if !self.last_heartbeat_acknowledged {
-            debug!("[Shard {:?}] Last heartbeat not acknowledged; re-connecting", self.shard_info);
+            debug!(
+                "[Shard {:?}] Last heartbeat not acknowledged; re-connecting",
+                self.shard_info
+            );
 
             return self.reconnect().map_err(|why| {
-                warn!("[Shard {:?}] Err auto-reconnecting from heartbeat check: {:?}",
-                self.shard_info,
-                why);
+                warn!(
+                    "[Shard {:?}] Err auto-reconnecting from heartbeat check: {:?}",
+                    self.shard_info,
+                    why
+                );
 
                 why
             });
@@ -807,11 +837,17 @@ impl Shard {
         }
 
         if self.session_id.is_some() {
-            debug!("[Shard {:?}] Autoreconnector choosing to resume", self.shard_info);
+            debug!(
+                "[Shard {:?}] Autoreconnector choosing to resume",
+                self.shard_info
+            );
 
             self.resume()
         } else {
-            debug!("[Shard {:?}] Autoreconnector choosing to reconnect", self.shard_info);
+            debug!(
+                "[Shard {:?}] Autoreconnector choosing to reconnect",
+                self.shard_info
+            );
 
             self.reconnect()
         }
@@ -918,7 +954,11 @@ impl Shard {
         });
 
         if let Err(why) = self.client.send_json(&msg) {
-            warn!("[Shard {:?}] Err sending presence update: {:?}", self.shard_info, why);
+            warn!(
+                "[Shard {:?}] Err sending presence update: {:?}",
+                self.shard_info,
+                why
+            );
         }
 
         #[cfg(feature = "cache")]

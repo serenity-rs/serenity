@@ -313,10 +313,7 @@ impl GuildChannel {
         }
 
         let mut map = Map::new();
-        map.insert(
-            "name".to_owned(),
-            Value::String(self.name.clone()),
-        );
+        map.insert("name".to_owned(), Value::String(self.name.clone()));
         map.insert(
             "position".to_owned(),
             Value::Number(Number::from(self.position)),
@@ -545,12 +542,8 @@ impl GuildChannel {
                                    after: Option<U>)
                                    -> Result<Vec<User>>
         where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id.reaction_users(
-            message_id,
-            reaction_type,
-            limit,
-            after,
-        )
+        self.id
+            .reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Sends a message with just the given message content in the channel.

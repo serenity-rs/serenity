@@ -157,9 +157,7 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
 
     let guild_id = match channel {
         Channel::Guild(channel) => channel.read().unwrap().guild_id,
-        Channel::Group(_) |
-        Channel::Private(_) |
-        Channel::Category(_) => {
+        Channel::Group(_) | Channel::Private(_) | Channel::Category(_) => {
             // Both users in DMs, and all users in groups and maybe all channels in categories will
             // have the same
             // permissions.
@@ -179,10 +177,10 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
         None => return Err(Error::Model(ModelError::ItemMissing)),
     };
 
-    let perms = guild.read().unwrap().permissions_for(
-        channel_id,
-        current_user.id,
-    );
+    let perms = guild
+        .read()
+        .unwrap()
+        .permissions_for(channel_id, current_user.id);
 
     permissions.remove(perms);
 

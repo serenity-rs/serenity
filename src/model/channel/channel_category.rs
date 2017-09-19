@@ -94,10 +94,7 @@ impl ChannelCategory {
         }
 
         let mut map = Map::new();
-        map.insert(
-            "name".to_owned(),
-            Value::String(self.name.clone()),
-        );
+        map.insert("name".to_owned(), Value::String(self.name.clone()));
         map.insert(
             "position".to_owned(),
             Value::Number(Number::from(self.position)),

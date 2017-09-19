@@ -24,8 +24,7 @@ const CRYPTO_MODE: &'static str = "xsalsa20_poly1305";
 
 pub(crate) enum Status {
     Connect(ConnectionInfo),
-    #[allow(dead_code)]
-    Disconnect,
+    #[allow(dead_code)] Disconnect,
     SetReceiver(Option<Box<AudioReceiver>>),
     SetSender(Option<Box<AudioSource>>),
 }

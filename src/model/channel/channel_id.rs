@@ -124,9 +124,7 @@ impl ChannelId {
             .map(|message_id| message_id.0)
             .collect::<Vec<u64>>();
 
-        let map = json!({
-            "messages": ids
-        });
+        let map = json!({ "messages": ids });
 
         http::delete_messages(self.0, &map)
     }
@@ -256,13 +254,12 @@ impl ChannelId {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        http::get_message(self.0, message_id.into().0).map(
-            |mut msg| {
+        http::get_message(self.0, message_id.into().0)
+            .map(|mut msg| {
                 msg.transform_content();
 
                 msg
-            },
-        )
+            })
     }
 
     /// Gets messages from the channel.

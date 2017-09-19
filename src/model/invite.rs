@@ -152,8 +152,7 @@ impl Invite {
 pub struct InviteChannel {
     pub id: ChannelId,
     pub name: String,
-    #[serde(rename = "type")]
-    pub kind: ChannelType,
+    #[serde(rename = "type")] pub kind: ChannelType,
 }
 
 /// A minimal amount of information about the guild an invite points to.

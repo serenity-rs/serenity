@@ -144,9 +144,10 @@ impl Args {
             return Err(Error::Eos);
         }
 
-        match self.delimiter_split.iter().position(
-            |e| e.parse::<T>().is_ok(),
-        ) {
+        match self.delimiter_split
+                  .iter()
+                  .position(|e| e.parse::<T>().is_ok())
+        {
             Some(index) => {
                 let value = self.delimiter_split
                     .get(index)

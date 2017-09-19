@@ -242,11 +242,9 @@ impl FromStr for Channel {
 
     fn from_str(s: &str) -> StdResult<Self, ()> {
         match utils::parse_channel(s) {
-            Some(x) => {
-                match ChannelId(x).find() {
-                    Some(channel) => Ok(channel),
-                    _ => Err(()),
-                }
+            Some(x) => match ChannelId(x).find() {
+                Some(channel) => Ok(channel),
+                _ => Err(()),
             },
             _ => Err(()),
         }

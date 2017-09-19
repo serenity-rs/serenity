@@ -37,7 +37,7 @@ pub use CACHE;
 
 use self::dispatch::dispatch;
 use std::sync::{self, Arc};
-use std::sync::atomic::{ATOMIC_BOOL_INIT, AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, Ordering, ATOMIC_BOOL_INIT};
 use parking_lot::Mutex;
 use tokio_core::reactor::Core;
 use futures;
@@ -195,8 +195,7 @@ pub struct Client<H: EventHandler + 'static> {
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`on_ready`]: #method.on_ready
     event_handler: Arc<H>,
-    #[cfg(feature = "framework")]
-    framework: Arc<sync::Mutex<Option<Box<Framework>>>>,
+    #[cfg(feature = "framework")] framework: Arc<sync::Mutex<Option<Box<Framework>>>>,
     /// A HashMap of all shards instantiated by the Client.
     ///
     /// The key is the shard ID and the value is the shard itself.
@@ -594,10 +593,7 @@ impl<H: EventHandler + 'static> Client<H> {
     /// [`start_autosharded`]: #method.start_autosharded
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
-        self.start_connection(
-            [shard, shard, shards],
-            http::get_gateway()?.url,
-        )
+        self.start_connection([shard, shard, shards], http::get_gateway()?.url)
     }
 
     /// Establish sharded connections and start listening for events.
@@ -722,10 +718,7 @@ impl<H: EventHandler + 'static> Client<H> {
     /// [`start_shards`]: #method.start_shards
     /// [Gateway docs]: gateway/index.html#sharding
     pub fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64) -> Result<()> {
-        self.start_connection(
-            [range[0], range[1], total_shards],
-            http::get_gateway()?.url,
-        )
+        self.start_connection([range[0], range[1], total_shards], http::get_gateway()?.url)
     }
 
     /// Returns a thread-safe handle for closing shards.
@@ -785,8 +778,7 @@ impl<H: EventHandler + 'static> Client<H> {
 
                     self.shards.lock().insert(shard_number, shard.clone());
 
-                    let monitor_info =
-                        feature_framework! {{
+                    let monitor_info = feature_framework! {{
                         MonitorInfo {
                             data: self.data.clone(),
                             event_handler: self.event_handler.clone(),

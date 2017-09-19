@@ -16,16 +16,14 @@ pub struct PartialGuild {
     pub default_message_notifications: u64,
     pub embed_channel_id: Option<ChannelId>,
     pub embed_enabled: bool,
-    #[serde(deserialize_with = "deserialize_emojis")]
-    pub emojis: HashMap<EmojiId, Emoji>,
+    #[serde(deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
     pub features: Vec<Feature>,
     pub icon: Option<String>,
     pub mfa_level: u64,
     pub name: String,
     pub owner_id: UserId,
     pub region: String,
-    #[serde(deserialize_with = "deserialize_roles")]
-    pub roles: HashMap<RoleId, Role>,
+    #[serde(deserialize_with = "deserialize_roles")] pub roles: HashMap<RoleId, Role>,
     pub splash: Option<String>,
     pub verification_level: VerificationLevel,
 }
@@ -301,9 +299,9 @@ impl PartialGuild {
 
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
-        self.icon.as_ref().map(|icon| {
-            format!(cdn!("/icons/{}/{}.webp"), self.id, icon)
-        })
+        self.icon
+            .as_ref()
+            .map(|icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
     }
 
     /// Gets all integration of the guild.
@@ -403,9 +401,9 @@ impl PartialGuild {
 
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
-        self.icon.as_ref().map(|icon| {
-            format!(cdn!("/splashes/{}/{}.webp"), self.id, icon)
-        })
+        self.icon
+            .as_ref()
+            .map(|icon| format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
     }
 
     /// Starts an integration sync for the given integration Id.
