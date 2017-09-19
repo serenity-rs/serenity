@@ -45,7 +45,7 @@ fn context(conn: &Arc<Mutex<Shard>>, data: &Arc<Mutex<ShareMap>>, handle: &Handl
 #[cfg(feature = "framework")]
 pub fn dispatch<H: EventHandler + 'static>(event: Event,
                                            conn: &Arc<Mutex<Shard>>,
-                                           framework: &Arc<sync::Mutex<Option<Box<Framework>>>>,
+                                           framework: &Arc<sync::Mutex<Option<Box<Framework + Send>>>>,
                                            data: &Arc<Mutex<ShareMap>>,
                                            event_handler: &Arc<H>,
                                            tokio_handle: &Handle) {

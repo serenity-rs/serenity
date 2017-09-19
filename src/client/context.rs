@@ -400,6 +400,7 @@ impl Context {
     /// [`Client::start`]: ./struct.Client.html#method.start
     pub fn quit(&self) -> Result<()> {
         let mut shard = self.shard.lock();
+
         shard.shutdown_clean()
     }
 }
