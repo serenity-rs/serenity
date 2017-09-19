@@ -4,15 +4,15 @@ use client::Context;
 use model::{Message, Permissions};
 use std::collections::HashMap;
 
-pub type Check = Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool + 'static;
-pub type Exec = Fn(&mut Context, &Message, Args) -> Result<(), String> + 'static;
+pub type Check = Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool + Send + Sync + 'static;
+pub type Exec = Fn(&mut Context, &Message, Args) -> Result<(), String> + Send + Sync + 'static;
 pub type Help = Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
                    -> Result<(), String>
-                    + 'static;
-pub type BeforeHook = Fn(&mut Context, &Message, &str) -> bool + 'static;
-pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), String>) + 'static;
+                    + Send + Sync + 'static;
+pub type BeforeHook = Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static;
+pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), String>) + Send + Sync + 'static;
 pub(crate) type InternalCommand = Arc<Command>;
-pub type PrefixCheck = Fn(&mut Context, &Message) -> Option<String> + 'static;
+pub type PrefixCheck = Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
 
 pub enum CommandOrAlias {
     Alias(String),
@@ -76,7 +76,7 @@ pub struct Command {
 
 impl Command {
     pub fn new<F>(f: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + 'static {
+        where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + Send + Sync + 'static {
         Command {
             aliases: Vec::new(),
             checks: Vec::default(),

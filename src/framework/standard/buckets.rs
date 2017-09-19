@@ -5,7 +5,7 @@ use client::Context;
 use model::{ChannelId, GuildId, UserId};
 
 #[cfg(feature = "cache")]
-type Check = Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + 'static;
+type Check = Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static;
 
 #[cfg(not(feature = "cache"))]
 type Check = Fn(&mut Context, ChannelId, UserId) -> bool + 'static;

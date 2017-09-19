@@ -139,7 +139,7 @@ pub enum DispatchError {
     WebhookAuthor,
 }
 
-type DispatchErrorHook = Fn(Context, Message, DispatchError) + 'static;
+type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;
 
 /// A utility for easily managing dispatches to commands.
 ///
@@ -290,7 +290,7 @@ impl StandardFramework {
                                     limit: i32,
                                     check: Check)
                                     -> Self
-        where Check: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + 'static,
+        where Check: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static,
               S: Into<String> {
         self.buckets.insert(
             s.into(),
@@ -341,7 +341,7 @@ impl StandardFramework {
                                     limit: i32,
                                     check: Check)
                                     -> Self
-        where Check: Fn(&mut Context, ChannelId, UserId) -> bool + 'static, S: Into<String> {
+        where Check: Fn(&mut Context, ChannelId, UserId) -> bool + Send + Sync + 'static, S: Into<String> {
         self.buckets.insert(
             s.into(),
             Bucket {
@@ -594,7 +594,7 @@ impl StandardFramework {
     /// # }
     /// ```
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + 'static, S: Into<String> {
+        where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + Send + Sync + 'static, S: Into<String> {
         {
             let ungrouped = self.groups
                 .entry("Ungrouped".to_owned())
@@ -731,7 +731,7 @@ impl StandardFramework {
     ///     }));
     /// ```
     pub fn on_dispatch_error<F>(mut self, f: F) -> Self
-        where F: Fn(Context, Message, DispatchError) + 'static {
+        where F: Fn(Context, Message, DispatchError) + Send + Sync + 'static {
         self.dispatch_error_handler = Some(Arc::new(f));
 
         self
@@ -787,7 +787,7 @@ impl StandardFramework {
     /// ```
     ///
     pub fn before<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, &str) -> bool + 'static {
+        where F: Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static {
         self.before = Some(Arc::new(f));
 
         self
@@ -818,7 +818,7 @@ impl StandardFramework {
     ///     }));
     /// ```
     pub fn after<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, &str, Result<(), String>) + 'static {
+        where F: Fn(&mut Context, &Message, &str, Result<(), String>) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
 
         self
