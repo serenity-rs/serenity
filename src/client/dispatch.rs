@@ -128,7 +128,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
 
             let context = context(conn, data, tokio_handle);
 
-            // This different channel_create dispacthing is only due to the fact that
+            // This different channel_create dispatching is only due to the fact that
             // each time the bot receives a dm, this event is also fired.
             // So in short, only exists to reduce unnecessary clutter.
             let h = event_handler.clone();
