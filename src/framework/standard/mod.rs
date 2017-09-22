@@ -24,7 +24,6 @@ use client::Context;
 use super::Framework;
 use model::{ChannelId, GuildId, Message, UserId};
 use model::permissions::Permissions;
-use tokio_core::reactor::Handle;
 use internal::RwLockExt;
 
 #[cfg(feature = "cache")]
@@ -831,7 +830,7 @@ impl StandardFramework {
 }
 
 impl Framework for StandardFramework {
-    fn dispatch(&mut self, mut context: Context, message: Message, tokio_handle: &Handle) {
+    fn dispatch(&mut self, mut context: Context, message: Message) {
         let res = command::positions(&mut context, &message, &self.configuration);
 
         let positions = match res {
@@ -927,31 +926,27 @@ impl Framework for StandardFramework {
                             return;
                         }
 
-                        tokio_handle.spawn_fn(move || {
-                            if let Some(before) = before {
-                                if !(before)(&mut context, &message, &built) {
-                                    return Ok(());
-                                }
+                        if let Some(before) = before {
+                            if !(before)(&mut context, &message, &built) {
+                                return;
                             }
+                        }
 
-                            let result = match command.exec {
-                                CommandType::StringResponse(ref x) => {
-                                    let _ = message.channel_id.say(x);
+                        let result = match command.exec {
+                            CommandType::StringResponse(ref x) => {
+                                let _ = message.channel_id.say(x);
 
-                                    Ok(())
-                                },
-                                CommandType::Basic(ref x) => (x)(&mut context, &message, args),
-                                CommandType::WithCommands(ref x) => {
-                                    (x)(&mut context, &message, groups, args)
-                                },
-                            };
+                                Ok(())
+                            },
+                            CommandType::Basic(ref x) => (x)(&mut context, &message, args),
+                            CommandType::WithCommands(ref x) => {
+                                (x)(&mut context, &message, groups, args)
+                            },
+                        };
 
-                            if let Some(after) = after {
-                                (after)(&mut context, &message, &built, result);
-                            }
-
-                            Ok(())
-                        });
+                        if let Some(after) = after {
+                            (after)(&mut context, &message, &built, result);
+                        }
 
                         return;
                     }

@@ -39,8 +39,6 @@ use self::dispatch::dispatch;
 use std::sync::{self, Arc};
 use std::sync::atomic::{AtomicBool, Ordering, ATOMIC_BOOL_INIT};
 use parking_lot::Mutex;
-use tokio_core::reactor::Core;
-use futures;
 use std::collections::HashMap;
 use std::time::Duration;
 use std::{mem, thread};
@@ -798,13 +796,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
                     }};
 
                     threads.push(thread::spawn(move || {
-                        let mut core = Core::new().unwrap();
-
-                        core.run(futures::future::lazy(move || {
-                            monitor_shard(monitor_info);
-
-                            futures::future::ok::<(), ()>(())
-                        })).unwrap();
+                        monitor_shard(monitor_info);
                     }));
                 },
                 Err(why) => warn!("Error starting shard {:?}: {:?}", shard_info, why),
@@ -954,8 +946,6 @@ fn monitor_shard<H: EventHandler + Send + Sync + 'static>(mut info: MonitorInfo<
 }
 
 fn handle_shard<H: EventHandler + Send + Sync + 'static>(info: &mut MonitorInfo<H>) {
-    let mut core = Core::new().unwrap();
-    let handle = core.handle();
 
     // This is currently all ducktape. Redo this.
     while HANDLE_STILL.load(Ordering::Relaxed) {
@@ -1029,17 +1019,13 @@ fn handle_shard<H: EventHandler + Send + Sync + 'static>(info: &mut MonitorInfo<
                      &info.shard,
                      &info.framework,
                      &info.data,
-                     &info.event_handler,
-                     &handle);
+                     &info.event_handler);
         } else {
             dispatch(event,
                      &info.shard,
                      &info.data,
-                     &info.event_handler,
-                     &handle);
+                     &info.event_handler);
         }}
-
-        core.turn(None);
     }
 }
 

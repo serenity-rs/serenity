@@ -33,10 +33,6 @@ version = "~0.4"
 optional = true
 version = "~0.2"
 
-[dependencies.futures]
-optional = true
-version = "0.1"
-
 [dependencies.hyper]
 optional = true
 version = "~0.10"
@@ -72,10 +68,6 @@ default-features = false
 optional = true
 version = "0.0.12"
 
-[dependencies.tokio-core]
-optional = true
-version = "0.1"
-
 [dependencies.typemap]
 optional = true
 version = "~0.3"
@@ -105,12 +97,10 @@ default = [
 builder = []
 cache = ["lazy_static"]
 client = [
-    "futures",
     "gateway",
     "http",
     "lazy_static",
     "parking_lot",
-    "tokio-core",
     "typemap",
 ]
 extras = []
