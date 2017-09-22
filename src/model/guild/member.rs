@@ -246,7 +246,7 @@ impl Member {
     pub fn kick(&self) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::KICK_MEMBERS;
+            let req = Permissions::KICK_MEMBERS;
 
             let has_perms = CACHE
                 .read()

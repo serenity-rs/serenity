@@ -61,7 +61,7 @@ impl Reaction {
                 //
                 // * The `Manage Messages` permission.
                 if user.is_some() {
-                    let req = permissions::MANAGE_MESSAGES;
+                    let req = Permissions::MANAGE_MESSAGES;
 
                     if !utils::user_has_perms(self.channel_id, req).unwrap_or(true) {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));

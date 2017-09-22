@@ -259,169 +259,169 @@ impl Permissions {
     /// [Add Reactions] permission.
     ///
     /// [Add Reactions]: constant.ADD_REACTIONS.html
-    pub fn add_reactions(&self) -> bool { self.contains(self::ADD_REACTIONS) }
+    pub fn add_reactions(&self) -> bool { self.contains(Self::ADD_REACTIONS) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Administrator] permission.
     ///
     /// [Administrator]: constant.ADMINISTRATOR.html
-    pub fn administrator(&self) -> bool { self.contains(self::ADMINISTRATOR) }
+    pub fn administrator(&self) -> bool { self.contains(Self::ADMINISTRATOR) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Attach Files] permission.
     ///
     /// [Attach Files]: constant.ATTACH_FILES.html
-    pub fn attach_files(&self) -> bool { self.contains(self::ATTACH_FILES) }
+    pub fn attach_files(&self) -> bool { self.contains(Self::ATTACH_FILES) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Ban Members] permission.
     ///
     /// [Ban Members]: constant.BAN_MEMBERS.html
-    pub fn ban_members(&self) -> bool { self.contains(self::BAN_MEMBERS) }
+    pub fn ban_members(&self) -> bool { self.contains(Self::BAN_MEMBERS) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Change Nickname] permission.
     ///
     /// [Change Nickname]: constant.CHANGE_NICKNAME.html
-    pub fn change_nickname(&self) -> bool { self.contains(self::CHANGE_NICKNAME) }
+    pub fn change_nickname(&self) -> bool { self.contains(Self::CHANGE_NICKNAME) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Connect] permission.
     ///
     /// [Connect]: constant.CONNECT.html
-    pub fn connect(&self) -> bool { self.contains(self::CONNECT) }
+    pub fn connect(&self) -> bool { self.contains(Self::CONNECT) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Create Invite] permission.
     ///
     /// [Create Invite]: constant.CREATE_INVITE.html
-    pub fn create_invite(&self) -> bool { self.contains(self::CREATE_INVITE) }
+    pub fn create_invite(&self) -> bool { self.contains(Self::CREATE_INVITE) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Deafen Members] permission.
     ///
     /// [Deafen Members]: constant.DEAFEN_MEMBERS.html
-    pub fn deafen_members(&self) -> bool { self.contains(self::DEAFEN_MEMBERS) }
+    pub fn deafen_members(&self) -> bool { self.contains(Self::DEAFEN_MEMBERS) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Embed Links] permission.
     ///
     /// [Embed Links]: constant.EMBED_LINKS.html
-    pub fn embed_links(&self) -> bool { self.contains(self::EMBED_LINKS) }
+    pub fn embed_links(&self) -> bool { self.contains(Self::EMBED_LINKS) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Use External Emojis] permission.
     ///
     /// [Use External Emojis]: constant.USE_EXTERNAL_EMOJIS.html
-    pub fn external_emojis(&self) -> bool { self.contains(self::USE_EXTERNAL_EMOJIS) }
+    pub fn external_emojis(&self) -> bool { self.contains(Self::USE_EXTERNAL_EMOJIS) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Kick Members] permission.
     ///
     /// [Kick Members]: constant.KICK_MEMBERS.html
-    pub fn kick_members(&self) -> bool { self.contains(self::KICK_MEMBERS) }
+    pub fn kick_members(&self) -> bool { self.contains(Self::KICK_MEMBERS) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Channels] permission.
     ///
     /// [Manage Channels]: constant.MANAGE_CHANNELS.html
-    pub fn manage_channels(&self) -> bool { self.contains(self::MANAGE_CHANNELS) }
+    pub fn manage_channels(&self) -> bool { self.contains(Self::MANAGE_CHANNELS) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Emojis] permission.
     ///
     /// [Manage Emojis]: constant.MANAGE_EMOJIS.html
-    pub fn manage_emojis(&self) -> bool { self.contains(self::MANAGE_EMOJIS) }
+    pub fn manage_emojis(&self) -> bool { self.contains(Self::MANAGE_EMOJIS) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Guild] permission.
     ///
     /// [Manage Guild]: constant.MANAGE_GUILD.html
-    pub fn manage_guild(&self) -> bool { self.contains(self::MANAGE_GUILD) }
+    pub fn manage_guild(&self) -> bool { self.contains(Self::MANAGE_GUILD) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Messages] permission.
     ///
     /// [Manage Messages]: constant.MANAGE_MESSAGES.html
-    pub fn manage_messages(&self) -> bool { self.contains(self::MANAGE_MESSAGES) }
+    pub fn manage_messages(&self) -> bool { self.contains(Self::MANAGE_MESSAGES) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Nicknames] permission.
     ///
     /// [Manage Nicknames]: constant.MANAGE_NICKNAMES.html
-    pub fn manage_nicknames(&self) -> bool { self.contains(self::MANAGE_NICKNAMES) }
+    pub fn manage_nicknames(&self) -> bool { self.contains(Self::MANAGE_NICKNAMES) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Roles] permission.
     ///
     /// [Manage Roles]: constant.MANAGE_ROLES.html
-    pub fn manage_roles(&self) -> bool { self.contains(self::MANAGE_ROLES) }
+    pub fn manage_roles(&self) -> bool { self.contains(Self::MANAGE_ROLES) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Webhooks] permission.
     ///
     /// [Manage Webhooks]: constant.MANAGE_WEBHOOKS.html
-    pub fn manage_webhooks(&self) -> bool { self.contains(self::MANAGE_WEBHOOKS) }
+    pub fn manage_webhooks(&self) -> bool { self.contains(Self::MANAGE_WEBHOOKS) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Mention Everyone] permission.
     ///
     /// [Mention Everyone]: constant.MENTION_EVERYONE.html
-    pub fn mention_everyone(&self) -> bool { self.contains(self::MENTION_EVERYONE) }
+    pub fn mention_everyone(&self) -> bool { self.contains(Self::MENTION_EVERYONE) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Move Members] permission.
     ///
     /// [Move Members]: constant.MOVE_MEMBERS.html
-    pub fn move_members(&self) -> bool { self.contains(self::MOVE_MEMBERS) }
+    pub fn move_members(&self) -> bool { self.contains(Self::MOVE_MEMBERS) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Mute Members] permission.
     ///
     /// [Mute Members]: constant.MUTE_MEMBERS.html
-    pub fn mute_members(&self) -> bool { self.contains(self::MUTE_MEMBERS) }
+    pub fn mute_members(&self) -> bool { self.contains(Self::MUTE_MEMBERS) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Read Message History] permission.
     ///
     /// [Read Message History]: constant.READ_MESSAGE_HISTORY.html
-    pub fn read_message_history(&self) -> bool { self.contains(self::READ_MESSAGE_HISTORY) }
+    pub fn read_message_history(&self) -> bool { self.contains(Self::READ_MESSAGE_HISTORY) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Read Messages] permission.
     ///
     /// [Read Messages]: constant.READ_MESSAGES.html
-    pub fn read_messages(&self) -> bool { self.contains(self::READ_MESSAGES) }
+    pub fn read_messages(&self) -> bool { self.contains(Self::READ_MESSAGES) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Send Messages] permission.
     ///
     /// [Send Messages]: constant.SEND_MESSAGES.html
-    pub fn send_messages(&self) -> bool { self.contains(self::SEND_MESSAGES) }
+    pub fn send_messages(&self) -> bool { self.contains(Self::SEND_MESSAGES) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Send TTS Messages] permission.
     ///
     /// [Send TTS Messages]: constant.SEND_TTS_MESSAGES.html
-    pub fn send_tts_messages(&self) -> bool { self.contains(self::SEND_TTS_MESSAGES) }
+    pub fn send_tts_messages(&self) -> bool { self.contains(Self::SEND_TTS_MESSAGES) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Speak] permission.
     ///
     /// [Speak]: constant.SPEAK.html
-    pub fn speak(&self) -> bool { self.contains(self::SPEAK) }
+    pub fn speak(&self) -> bool { self.contains(Self::SPEAK) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Use External Emojis] permission.
     ///
     /// [Use External Emojis]: constant.USE_EXTERNAL_EMOJIS.html
-    pub fn use_external_emojis(&self) -> bool { self.contains(self::USE_EXTERNAL_EMOJIS) }
+    pub fn use_external_emojis(&self) -> bool { self.contains(Self::USE_EXTERNAL_EMOJIS) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Use VAD] permission.
     ///
     /// [Use VAD]: constant.USE_VAD.html
-    pub fn use_vad(&self) -> bool { self.contains(self::USE_VAD) }
+    pub fn use_vad(&self) -> bool { self.contains(Self::USE_VAD) }
 }
 
 impl<'de> Deserialize<'de> for Permissions {

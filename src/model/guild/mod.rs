@@ -207,7 +207,7 @@ impl Guild {
     pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: BO) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::BAN_MEMBERS;
+            let req = Permissions::BAN_MEMBERS;
 
             if !self.has_perms(req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -232,7 +232,7 @@ impl Guild {
     pub fn bans(&self) -> Result<Vec<Ban>> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::BAN_MEMBERS;
+            let req = Permissions::BAN_MEMBERS;
 
             if !self.has_perms(req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -314,7 +314,7 @@ impl Guild {
     pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::MANAGE_CHANNELS;
+            let req = Permissions::MANAGE_CHANNELS;
 
             if !self.has_perms(req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -385,7 +385,7 @@ impl Guild {
         where F: FnOnce(EditRole) -> EditRole {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::MANAGE_ROLES;
+            let req = Permissions::MANAGE_ROLES;
 
             if !self.has_perms(req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -410,7 +410,7 @@ impl Guild {
         #[cfg(feature = "cache")]
         {
             if self.owner_id != CACHE.read().unwrap().user.id {
-                let req = permissions::MANAGE_GUILD;
+                let req = Permissions::MANAGE_GUILD;
 
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
@@ -487,7 +487,7 @@ impl Guild {
         where F: FnOnce(EditGuild) -> EditGuild {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::MANAGE_GUILD;
+            let req = Permissions::MANAGE_GUILD;
 
             if !self.has_perms(req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -567,7 +567,7 @@ impl Guild {
     pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::CHANGE_NICKNAME;
+            let req = Permissions::CHANGE_NICKNAME;
 
             if !self.has_perms(req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -629,7 +629,7 @@ impl Guild {
     pub fn invites(&self) -> Result<Vec<RichInvite>> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::MANAGE_GUILD;
+            let req = Permissions::MANAGE_GUILD;
 
             if !self.has_perms(req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -757,8 +757,6 @@ impl Guild {
     /// [`User`]: struct.User.html
     pub fn permissions_for<C, U>(&self, channel_id: C, user_id: U) -> Permissions
         where C: Into<ChannelId>, U: Into<UserId> {
-        use super::permissions::*;
-
         let user_id = user_id.into();
 
         // The owner has all permissions in all cases.
@@ -804,7 +802,7 @@ impl Guild {
         }
 
         // Administrators have all permissions in any channel.
-        if permissions.contains(ADMINISTRATOR) {
+        if permissions.contains(Permissions::ADMINISTRATOR) {
             return Permissions::all();
         }
 
@@ -813,8 +811,12 @@ impl Guild {
 
             // If this is a text channel, then throw out voice permissions.
             if channel.kind == ChannelType::Text {
-                permissions &=
-                    !(CONNECT | SPEAK | MUTE_MEMBERS | DEAFEN_MEMBERS | MOVE_MEMBERS | USE_VAD);
+                permissions &= !(Permissions::CONNECT
+                    | Permissions::SPEAK
+                    | Permissions::MUTE_MEMBERS
+                    | Permissions::DEAFEN_MEMBERS
+                    | Permissions::MOVE_MEMBERS
+                    | Permissions::USE_VAD);
             }
 
             // Apply the permission overwrites for the channel for each of the
@@ -853,21 +855,28 @@ impl Guild {
 
         // The default channel is always readable.
         if channel_id.0 == self.id.0 {
-            permissions |= READ_MESSAGES;
+            permissions |= Permissions::READ_MESSAGES;
         }
 
         // No SEND_MESSAGES => no message-sending-related actions
         // If the member does not have the `SEND_MESSAGES` permission, then
         // throw out message-able permissions.
-        if !permissions.contains(SEND_MESSAGES) {
-            permissions &= !(SEND_TTS_MESSAGES | MENTION_EVERYONE | EMBED_LINKS | ATTACH_FILES);
+        if !permissions.contains(Permissions::SEND_MESSAGES) {
+            permissions &= !(Permissions::SEND_TTS_MESSAGES
+                | Permissions::MENTION_EVERYONE
+                | Permissions::EMBED_LINKS
+                | Permissions::ATTACH_FILES);
         }
 
         // If the member does not have the `READ_MESSAGES` permission, then
         // throw out actionable permissions.
-        if !permissions.contains(READ_MESSAGES) {
-            permissions &= KICK_MEMBERS | BAN_MEMBERS | ADMINISTRATOR | MANAGE_GUILD |
-                           CHANGE_NICKNAME | MANAGE_NICKNAMES;
+        if !permissions.contains(Permissions::READ_MESSAGES) {
+            permissions &= Permissions::KICK_MEMBERS
+                | Permissions::BAN_MEMBERS
+                | Permissions::ADMINISTRATOR
+                | Permissions::MANAGE_GUILD
+                | Permissions::CHANGE_NICKNAME
+                | Permissions::MANAGE_NICKNAMES;
         }
 
         permissions
@@ -892,7 +901,7 @@ impl Guild {
     pub fn prune_count(&self, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::KICK_MEMBERS;
+            let req = Permissions::KICK_MEMBERS;
 
             if !self.has_perms(req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -975,7 +984,7 @@ impl Guild {
     pub fn start_prune(&self, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::KICK_MEMBERS;
+            let req = Permissions::KICK_MEMBERS;
 
             if !self.has_perms(req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -1000,7 +1009,7 @@ impl Guild {
     pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::BAN_MEMBERS;
+            let req = Permissions::BAN_MEMBERS;
 
             if !self.has_perms(req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));

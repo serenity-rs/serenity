@@ -176,10 +176,10 @@ impl CurrentUser {
     /// #
     /// # let mut cache = CACHE.write().unwrap();
     ///
-    /// use serenity::model::permissions::*;
+    /// use serenity::model::Permissions;
     ///
     /// // assuming the cache has been unlocked
-    /// let url = match cache.user.invite_url(READ_MESSAGES | SEND_MESSAGES | EMBED_LINKS) {
+    /// let url = match cache.user.invite_url(Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS) {
     ///     Ok(v) => v,
     ///     Err(why) => {
     ///         println!("Error getting invite url: {:?}", why);

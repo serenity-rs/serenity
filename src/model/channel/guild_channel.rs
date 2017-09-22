@@ -109,7 +109,7 @@ impl GuildChannel {
         where F: FnOnce(CreateInvite) -> CreateInvite {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::CREATE_INVITE;
+            let req = Permissions::CREATE_INVITE;
 
             if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -135,7 +135,7 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{ChannelId, UserId};
+    /// # use serenity::model::{ChannelId, Permissions, UserId};
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -149,8 +149,8 @@ impl GuildChannel {
     /// };
     /// use serenity::CACHE;
     ///
-    /// let allow = permissions::SEND_MESSAGES;
-    /// let deny = permissions::SEND_TTS_MESSAGES | permissions::ATTACH_FILES;
+    /// let allow = Permissions::SEND_MESSAGES;
+    /// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;
     /// let overwrite = PermissionOverwrite {
     ///     allow: allow,
     ///     deny: deny,
@@ -177,7 +177,7 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{ChannelId, UserId};
+    /// # use serenity::model::{ChannelId, Permissions, UserId};
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -191,8 +191,8 @@ impl GuildChannel {
     /// };
     /// use serenity::CACHE;
     ///
-    /// let allow = permissions::SEND_MESSAGES;
-    /// let deny = permissions::SEND_TTS_MESSAGES | permissions::ATTACH_FILES;
+    /// let allow = Permissions::SEND_MESSAGES;
+    /// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;
     /// let overwrite = PermissionOverwrite {
     ///     allow: allow,
     ///     deny: deny,
@@ -233,7 +233,7 @@ impl GuildChannel {
     pub fn delete(&self) -> Result<Channel> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::MANAGE_CHANNELS;
+            let req = Permissions::MANAGE_CHANNELS;
 
             if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -305,7 +305,7 @@ impl GuildChannel {
         where F: FnOnce(EditChannel) -> EditChannel {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::MANAGE_CHANNELS;
+            let req = Permissions::MANAGE_CHANNELS;
 
             if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -473,8 +473,8 @@ impl GuildChannel {
     /// let permissions =
     /// channel.read().unwrap().permissions_for(current_user_id).unwrap();
     ///
-    /// if !permissions.contains(permissions::ATTACH_FILES |
-    /// permissions::SEND_MESSAGES) {
+    /// if !permissions.contains(Permissions::ATTACH_FILES |
+    /// Permissions::SEND_MESSAGES) {
     ///             return;
     ///         }
     ///
@@ -605,7 +605,7 @@ impl GuildChannel {
     pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::SEND_MESSAGES;
+            let req = Permissions::SEND_MESSAGES;
 
             if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));

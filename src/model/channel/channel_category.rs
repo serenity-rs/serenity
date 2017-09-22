@@ -60,7 +60,7 @@ impl ChannelCategory {
     pub fn delete(&self) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::MANAGE_CHANNELS;
+            let req = Permissions::MANAGE_CHANNELS;
 
             if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -86,7 +86,7 @@ impl ChannelCategory {
         where F: FnOnce(EditChannel) -> EditChannel {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::MANAGE_CHANNELS;
+            let req = Permissions::MANAGE_CHANNELS;
 
             if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
