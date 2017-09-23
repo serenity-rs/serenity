@@ -76,9 +76,28 @@ lazy_static! {
 
 /// Sets the token to be used across all requests which require authentication.
 ///
-/// This is intended for internal use! The only exception are webhooks.
-/// But really, please don't use this.
-#[doc(hidden)]
+/// If you are using the client module, you don't need to use this. If you're
+/// using serenity solely for HTTP, you need to use this.
+///
+/// # Examples
+///
+/// Setting the token from an environment variable:
+///
+/// ```rust,no_run
+/// # use std::error::Error;
+/// #
+/// # fn try_main() -> Result<(), Box<Error>> {
+/// #
+/// use serenity::http;
+/// use std::env;
+///
+/// http::set_token(&env::var("DISCORD_TOKEN")?);
+/// #     Ok(())
+/// # }
+/// #
+/// # fn main() {
+/// #     try_main().unwrap();
+/// # }
 pub fn set_token(token: &str) { TOKEN.lock().unwrap().clone_from(&token.to_owned()); }
 
 /// Adds a [`User`] as a recipient to a [`Group`].
