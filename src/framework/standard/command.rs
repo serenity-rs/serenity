@@ -3,25 +3,61 @@ use super::{Args, Configuration};
 use client::Context;
 use model::{Message, Permissions};
 use std::collections::HashMap;
+use std::error::Error as StdError;
+use std::fmt;
 
 pub type Check = Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool
                      + Send
                      + Sync
                      + 'static;
-pub type Exec = Fn(&mut Context, &Message, Args) -> Result<(), String> + Send + Sync + 'static;
+pub type Exec = Fn(&mut Context, &Message, Args) -> Result<(), Error> + Send + Sync + 'static;
 pub type Help = Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
-                   -> Result<(), String>
+                   -> Result<(), Error>
                     + Send
                     + Sync
                     + 'static;
 pub type BeforeHook = Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static;
-pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), String>) + Send + Sync + 'static;
+pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), Error>) + Send + Sync + 'static;
 pub(crate) type InternalCommand = Arc<Command>;
 pub type PrefixCheck = Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
 
 pub enum CommandOrAlias {
     Alias(String),
     Command(InternalCommand),
+}
+
+/// An error from a command.
+#[derive(Clone, Debug)]
+pub struct Error(String);
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Display::fmt(&self.0, f)
+    }
+}
+
+impl<E: StdError> From<E> for Error {
+    fn from(e: E) -> Self {
+        Error(format!("{}", e))
+    }
+}
+
+impl From<Custom> for Error {
+    fn from(Custom(e): Custom) -> Self {
+        Error(e)
+    }
+}
+
+/// A custom "variant" of [`Error`]
+/// 
+/// [`Error`]: #struct.Error.html
+#[derive(Clone, Debug)]
+pub struct Custom(String);
+
+impl From<String> for Custom {
+    fn from(e: String) -> Custom {
+        Custom(e)
+    }
 }
 
 /// Command function type. Allows to access internal framework things inside
@@ -81,22 +117,31 @@ pub struct Command {
 
 impl Command {
     pub fn new<F>(f: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, Args) -> Result<(), Error> + Send + Sync + 'static {
+        Command {
+            exec: CommandType::Basic(Box::new(f)),
+            ..Command::default()
+        }
+    }
+}
+
+impl Default for Command {
+    fn default() -> Command {
         Command {
             aliases: Vec::new(),
             checks: Vec::default(),
-            exec: CommandType::Basic(Box::new(f)),
+            exec: CommandType::Basic(Box::new(|_, _, _| Ok(()))),
             desc: None,
             usage: None,
             example: None,
-            dm_only: false,
+            min_args: None,
             bucket: None,
+            max_args: None,
+            required_permissions: Permissions::empty(),
+            dm_only: false,
             guild_only: false,
             help_available: true,
-            min_args: None,
-            max_args: None,
             owners_only: false,
-            required_permissions: Permissions::empty(),
             allowed_roles: Vec::new(),
         }
     }

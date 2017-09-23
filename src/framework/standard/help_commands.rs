@@ -27,7 +27,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::fmt::Write;
 use super::command::InternalCommand;
-use super::{Args, Command, CommandGroup, CommandOrAlias};
+use super::{Args, Command, CommandGroup, CommandOrAlias, CommandError};
 use client::Context;
 use model::{ChannelId, Guild, Member, Message};
 use utils::Colour;
@@ -83,7 +83,7 @@ pub fn with_embeds(_: &mut Context,
                    msg: &Message,
                    groups: HashMap<String, Arc<CommandGroup>>,
                    args: Args)
-                   -> Result<(), String> {
+                   -> Result<(), CommandError> {
     if !args.is_empty() {
         let name = args.full();
 
@@ -256,7 +256,7 @@ pub fn plain(_: &mut Context,
              msg: &Message,
              groups: HashMap<String, Arc<CommandGroup>>,
              args: Args)
-             -> Result<(), String> {
+             -> Result<(), CommandError> {
     if !args.is_empty() {
         let name = args.full();
 

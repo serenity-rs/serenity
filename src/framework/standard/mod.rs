@@ -9,7 +9,7 @@ mod buckets;
 mod args;
 
 pub(crate) use self::buckets::{Bucket, Ratelimit};
-pub use self::command::{Command, CommandGroup, CommandType};
+pub use self::command::{Command, CommandGroup, CommandType, Error as CommandError};
 pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
 pub use self::create_command::CreateCommand;
@@ -71,7 +71,7 @@ macro_rules! command {
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       _: &$crate::model::Message,
                       _: $crate::framework::standard::Args)
-                      -> ::std::result::Result<(), String> {
+                      -> ::std::result::Result<(), CommandError> {
             $b
 
             Ok(())
@@ -82,7 +82,7 @@ macro_rules! command {
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::Message,
                       _: $crate::framework::standard::Args)
-                      -> ::std::result::Result<(), String> {
+                      -> ::std::result::Result<(), CommandError> {
             $b
 
             Ok(())
@@ -93,7 +93,7 @@ macro_rules! command {
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::Message,
                       mut $a: $crate::framework::standard::Args)
-                      -> ::std::result::Result<(), String> {
+                      -> ::std::result::Result<(), CommandError> {
             $b
 
             Ok(())
@@ -597,7 +597,7 @@ impl StandardFramework {
     /// # }
     /// ```
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + Send + Sync + 'static,
+        where F: Fn(&mut Context, &Message, Args) -> Result<(), CommandError> + Send + Sync + 'static,
               S: Into<String> {
         {
             let ungrouped = self.groups
@@ -822,7 +822,7 @@ impl StandardFramework {
     ///     }));
     /// ```
     pub fn after<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, &str, Result<(), String>) + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, &str, Result<(), CommandError>) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
 
         self
