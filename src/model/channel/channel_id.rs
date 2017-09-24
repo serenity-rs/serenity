@@ -1,4 +1,3 @@
-use std::fmt::{Display, Formatter, Result as FmtResult};
 use model::*;
 use internal::RwLockExt;
 
@@ -555,8 +554,4 @@ impl From<GuildChannel> for ChannelId {
 impl<'a> From<&'a GuildChannel> for ChannelId {
     /// Gets the Id of a guild channel.
     fn from(public_channel: &GuildChannel) -> ChannelId { public_channel.id }
-}
-
-impl Display for ChannelId {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult { Display::fmt(&self.0, f) }
 }

@@ -769,10 +769,6 @@ impl<'a> From<&'a User> for UserId {
     fn from(user: &User) -> UserId { user.id }
 }
 
-impl fmt::Display for UserId {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { fmt::Display::fmt(&self.0, f) }
-}
-
 #[cfg(feature = "model")]
 fn avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
     hash.map(|hash| {

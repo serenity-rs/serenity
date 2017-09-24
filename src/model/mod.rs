@@ -35,7 +35,7 @@ use chrono::NaiveDateTime;
 use self::utils::*;
 use serde::de::Visitor;
 use std::collections::HashMap;
-use std::fmt::{Formatter, Result as FmtResult};
+use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::sync::{Arc, RwLock};
 use internal::prelude::*;
 
@@ -76,6 +76,12 @@ macro_rules! id_u64 {
             impl PartialEq<u64> for $name {
                 fn eq(&self, u: &u64) -> bool {
                     self.0 == *u
+                }
+            }
+
+            impl Display for $name {
+                fn fmt(&self, f: &mut Formatter) -> FmtResult {
+                    Display::fmt(&self.0, f)
                 }
             }
 

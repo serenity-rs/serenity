@@ -200,10 +200,6 @@ impl Display for Emoji {
     }
 }
 
-impl Display for EmojiId {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult { Display::fmt(&self.0, f) }
-}
-
 impl From<Emoji> for EmojiId {
     /// Gets the Id of an `Emoji`.
     fn from(emoji: Emoji) -> EmojiId { emoji.id }

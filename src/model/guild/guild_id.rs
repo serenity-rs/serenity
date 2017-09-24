@@ -1,4 +1,3 @@
-use std::fmt::{Display, Formatter, Result as FmtResult};
 use model::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -482,10 +481,6 @@ impl GuildId {
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> { http::get_guild_webhooks(self.0) }
-}
-
-impl Display for GuildId {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult { Display::fmt(&self.0, f) }
 }
 
 impl From<PartialGuild> for GuildId {

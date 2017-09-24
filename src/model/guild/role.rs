@@ -1,5 +1,4 @@
 use std::cmp::Ordering;
-use std::fmt::{Display, Formatter, Result as FmtResult};
 use model::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -185,10 +184,6 @@ impl RoleId {
 
         None
     }
-}
-
-impl Display for RoleId {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult { Display::fmt(&self.0, f) }
 }
 
 impl From<Role> for RoleId {
