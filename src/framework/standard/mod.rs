@@ -71,7 +71,7 @@ macro_rules! command {
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       _: &$crate::model::Message,
                       _: $crate::framework::standard::Args)
-                      -> ::std::result::Result<(), CommandError> {
+                      -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
             $b
 
             Ok(())
@@ -82,7 +82,7 @@ macro_rules! command {
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::Message,
                       _: $crate::framework::standard::Args)
-                      -> ::std::result::Result<(), CommandError> {
+                      -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
             $b
 
             Ok(())
@@ -93,7 +93,7 @@ macro_rules! command {
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::Message,
                       mut $a: $crate::framework::standard::Args)
-                      -> ::std::result::Result<(), CommandError> {
+                      -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
             $b
 
             Ok(())
