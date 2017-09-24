@@ -19,6 +19,7 @@ type LockedShard = Parked<Shard>;
 pub enum ShardManagerMessage {
     Restart(ShardId),
     Shutdown(ShardId),
+    #[allow(dead_code)]
     ShutdownAll,
 }
 

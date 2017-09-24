@@ -73,10 +73,10 @@ impl Connection {
 
         let hello = loop {
             match client.recv_json(VoiceEvent::decode)? {
-                VoiceEvent::Hello(received_hello) => {
+                Some(VoiceEvent::Hello(received_hello)) => {
                     break received_hello;
                 },
-                VoiceEvent::Heartbeat(_) => continue,
+                Some(VoiceEvent::Heartbeat(_)) => continue,
                 other => {
                     debug!("[Voice] Expected hello/heartbeat; got: {:?}", other);
 
@@ -388,7 +388,7 @@ fn generate_url(endpoint: &mut String) -> Result<WebsocketUrl> {
 fn encryption_key(client: &mut Client) -> Result<Key> {
     loop {
         match client.recv_json(VoiceEvent::decode)? {
-            VoiceEvent::Ready(ready) => {
+            Some(VoiceEvent::Ready(ready)) => {
                 if ready.mode != CRYPTO_MODE {
                     return Err(Error::Voice(VoiceError::VoiceModeInvalid));
                 }
@@ -396,7 +396,7 @@ fn encryption_key(client: &mut Client) -> Result<Key> {
                 return Key::from_slice(&ready.secret_key)
                     .ok_or(Error::Voice(VoiceError::KeyGen));
             },
-            VoiceEvent::Unknown(op, value) => {
+            Some(VoiceEvent::Unknown(op, value)) => {
                 debug!(
                     "[Voice] Expected ready for key; got: op{}/v{:?}",
                     op.num(),
@@ -447,7 +447,7 @@ fn start_threads(client: Arc<Mutex<Client>>, udp: &UdpSocket) -> Result<ThreadIt
     let ws_thread = ThreadBuilder::new()
         .name(format!("{} WS", thread_name))
         .spawn(move || loop {
-            while let Ok(msg) = client.lock().unwrap().recv_json(VoiceEvent::decode) {
+            while let Ok(Some(msg)) = client.lock().unwrap().recv_json(VoiceEvent::decode) {
                 if tx_clone.send(ReceiverStatus::Websocket(msg)).is_ok() {
                     return;
                 }

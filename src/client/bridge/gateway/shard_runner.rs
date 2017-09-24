@@ -12,10 +12,6 @@ use websocket::WebSocketError;
 #[cfg(feature = "framework")]
 use framework::Framework;
 
-enum EventRetrieval {
-    Some()
-}
-
 pub struct ShardRunner<H: EventHandler + 'static> {
     data: Arc<ParkingLotMutex<ShareMap>>,
     event_handler: Arc<H>,
