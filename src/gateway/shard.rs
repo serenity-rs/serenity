@@ -336,6 +336,10 @@ impl Shard {
     pub(crate) fn handle_event(&mut self, event: Result<GatewayEvent>) -> Result<Option<Event>> {
         match event {
             Ok(GatewayEvent::Dispatch(seq, event)) => {
+                if seq > self.seq + 1 {
+                    warn!("[Shard {:?}] Heartbeat off; them: {}, us: {}", self.shard_info, seq, self.seq);
+                }
+
                 match event {
                     Event::Ready(ref ready) => {
                         self.session_id = Some(ready.ready.session_id.clone());
@@ -398,6 +402,8 @@ impl Shard {
             Ok(GatewayEvent::HeartbeatAck) => {
                 self.heartbeat_instants.1 = Some(Instant::now());
                 self.last_heartbeat_acknowledged = true;
+
+                trace!("[Shard {}] Received heartbeat ack", self.shard_info[0]);
 
                 Ok(None)
             },
@@ -758,12 +764,13 @@ impl Shard {
                 self.heartbeat_instants.0 = Some(Instant::now());
                 self.last_heartbeat_acknowledged = false;
 
+                trace!("[{:02}] successfully heartbeated", self.shard_info[0]);
+
                 Ok(())
             },
             Err(why) => {
                 match why {
-                    Error::WebSocket(WebSocketError::IoError(err)) => if err.raw_os_error() !=
-                                                                         Some(32) {
+                    Error::WebSocket(WebSocketError::IoError(err)) => if err.raw_os_error() != Some(32) {
                         debug!(
                             "[Shard {:?}] Err w/ heartbeating: {:?}",
                             self.shard_info,
@@ -820,11 +827,14 @@ impl Shard {
         }
 
         // Otherwise, we're good to heartbeat.
+        trace!("[{:02}] heartbeating", self.shard_info[0]);
+
         if let Err(why) = self.heartbeat() {
             warn!("[Shard {:?}] Err heartbeating: {:?}", self.shard_info, why);
 
             self.reconnect()
         } else {
+            trace!("[{:02}] heartbeated", self.shard_info[0]);
             self.heartbeat_instants.0 = Some(Instant::now());
 
             Ok(())
@@ -923,6 +933,8 @@ impl Shard {
                 },
             },
         });
+
+        self.heartbeat_instants.0 = Some(Instant::now());
 
         self.client.send_json(&identification)
     }

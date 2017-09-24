@@ -8,7 +8,7 @@ license = "ISC"
 name = "serenity"
 readme = "README.md"
 repository = "https://github.com/zeyla/serenity.git"
-version = "0.3.0"
+version = "0.4.0"
 
 [dependencies]
 bitflags = "^1.0"
@@ -77,10 +77,12 @@ optional = true
 version = "0.1.0"
 
 [dependencies.websocket]
+branch = "opcode-fix"
 default-features = false
 features = ["sync-ssl"]
+git = "https://github.com/serenity-rs/rust-websocket"
 optional = true
-version = "~0.20"
+#version = "~0.20"
 
 [features]
 default = [
