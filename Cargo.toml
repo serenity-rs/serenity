@@ -76,13 +76,11 @@ version = "~0.3"
 optional = true
 version = "0.1.0"
 
-[dependencies.websocket]
-branch = "opcode-fix"
+[dependencies.evzht9h3nznqzwl]
 default-features = false
 features = ["sync-ssl"]
-git = "https://github.com/serenity-rs/rust-websocket"
 optional = true
-#version = "~0.20"
+version = "0.0.1"
 
 [features]
 default = [
@@ -113,3 +111,4 @@ model = ["builder", "http"]
 standard_framework = ["framework", "vec_shift"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "sodiumoxide"]
+websocket = ["evzht9h3nznqzwl"]

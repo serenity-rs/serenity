@@ -133,7 +133,7 @@ extern crate typemap;
 #[cfg(feature = "standard_framework")]
 extern crate vec_shift;
 #[cfg(feature = "gateway")]
-extern crate websocket;
+extern crate evzht9h3nznqzwl as websocket;
 
 #[macro_use]
 mod internal;
