@@ -3,7 +3,6 @@ use super::{Args, Configuration};
 use client::Context;
 use model::{Message, Permissions};
 use std::collections::HashMap;
-use std::error::Error as StdError;
 use std::fmt;
 
 pub type Check = Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool
@@ -30,33 +29,9 @@ pub enum CommandOrAlias {
 #[derive(Clone, Debug)]
 pub struct Error(String);
 
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Display::fmt(&self.0, f)
-    }
-}
-
-impl<E: StdError> From<E> for Error {
-    fn from(e: E) -> Self {
-        Error(format!("{}", e))
-    }
-}
-
-impl From<Custom> for Error {
-    fn from(Custom(e): Custom) -> Self {
-        Error(e)
-    }
-}
-
-/// A custom "variant" of [`Error`]
-/// 
-/// [`Error`]: #struct.Error.html
-#[derive(Clone, Debug)]
-pub struct Custom(String);
-
-impl From<String> for Custom {
-    fn from(e: String) -> Custom {
-        Custom(e)
+impl<D: fmt::Display> From<D> for Error {
+    fn from(d: D) -> Self {
+        Error(format!("{}", d))
     }
 }
 
