@@ -62,7 +62,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serenity = "0.3"
+//! serenity = "0.4"
 //! ```
 //!
 //! and to the top of your `main.rs`:
