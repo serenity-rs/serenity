@@ -106,7 +106,7 @@ impl Attachment {
     /// [`Error::Io`]: ../enum.Error.html#variant.Io
     /// [`Message`]: struct.Message.html
     pub fn download(&self) -> Result<Vec<u8>> {
-        let hyper = request_client!();
+        let hyper = HyperClient::new();
         let mut response = hyper.get(&self.url).send()?;
 
         let mut bytes = vec![];
