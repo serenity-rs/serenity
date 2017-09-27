@@ -19,7 +19,8 @@
 //! [Client examples]: struct.Client.html#examples
 #![allow(zero_ptr)]
 
-mod bridge;
+pub mod bridge;
+
 mod context;
 mod dispatch;
 mod error;
@@ -36,14 +37,13 @@ pub use http as rest;
 #[cfg(feature = "cache")]
 pub use CACHE;
 
-use self::bridge::gateway::ShardManager;
+use self::bridge::gateway::{ShardId, ShardManager, ShardRunnerInfo};
 use self::dispatch::dispatch;
 use std::sync::{self, Arc};
 use std::sync::atomic::{AtomicBool, Ordering, ATOMIC_BOOL_INIT};
 use parking_lot::Mutex;
 use std::collections::HashMap;
 use std::mem;
-use super::gateway::Shard;
 use typemap::ShareMap;
 use http;
 use internal::prelude::*;
@@ -223,11 +223,12 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     ///
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
     ///
-    /// let shards = client.shards.clone();
+    /// let shard_runners = client.shard_runners.clone();
     ///
     /// thread::spawn(move || {
     ///     loop {
-    ///         println!("Shard count instantiated: {}", shards.lock().len());
+    ///         println!("Shard count instantiated: {}",
+    ///                  shard_runners.lock().len());
     ///
     ///         thread::sleep(Duration::from_millis(5000));
     ///     }
@@ -242,7 +243,7 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     ///
     /// [`Client::start_shard`]: #method.start_shard
     /// [`Client::start_shards`]: #method.start_shards
-    pub shards: Arc<Mutex<HashMap<u64, Arc<Mutex<Shard>>>>>,
+    pub shard_runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
     token: Arc<sync::Mutex<String>>,
 }
 
@@ -291,14 +292,14 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
                 data: Arc::new(Mutex::new(ShareMap::custom())),
                 event_handler: Arc::new(handler),
                 framework: Arc::new(sync::Mutex::new(None)),
-                shards: Arc::new(Mutex::new(HashMap::new())),
+                shard_runners: Arc::new(Mutex::new(HashMap::new())),
                 token: locked,
             }
         } else {
             Client {
                 data: Arc::new(Mutex::new(ShareMap::custom())),
                 event_handler: Arc::new(handler),
-                shards: Arc::new(Mutex::new(HashMap::new())),
+                shard_runners: Arc::new(Mutex::new(HashMap::new())),
                 token: locked,
             }
         }}
@@ -761,6 +762,8 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
             #[cfg(feature = "framework")]
             self.framework.clone(),
         );
+
+        self.shard_runners = manager.runners.clone();
 
         if let Err(why) = manager.initialize() {
             error!("Failed to boot a shard: {:?}", why);

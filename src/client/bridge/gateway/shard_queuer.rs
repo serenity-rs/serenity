@@ -107,6 +107,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
 
         let runner_info = ShardRunnerInfo {
             runner_tx: runner.runner_tx(),
+            shard: locked,
         };
 
         thread::spawn(move || {

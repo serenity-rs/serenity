@@ -18,7 +18,7 @@ use typemap::ShareMap;
 use framework::Framework;
 
 pub struct ShardManager {
-    runners: Arc<ParkingLotMutex<HashMap<ShardId, ShardRunnerInfo>>>,
+    pub runners: Arc<ParkingLotMutex<HashMap<ShardId, ShardRunnerInfo>>>,
     /// The index of the first shard to initialize, 0-indexed.
     shard_index: u64,
     /// The number of shards to initialize.
