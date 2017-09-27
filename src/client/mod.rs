@@ -758,6 +758,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
             self.token.clone(),
             self.data.clone(),
             self.event_handler.clone(),
+            #[cfg(feature = "framework")]
             self.framework.clone(),
         );
 
