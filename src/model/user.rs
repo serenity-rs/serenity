@@ -800,7 +800,7 @@ fn tag(name: &str, discriminator: u16) -> String {
     let mut tag = String::with_capacity(37);
     tag.push_str(name);
     tag.push('#');
-    let _ = write!(tag, "{}", discriminator);
+    let _ = write!(tag, "{:04}", discriminator);
 
     tag
 }
