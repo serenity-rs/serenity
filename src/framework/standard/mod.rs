@@ -596,20 +596,18 @@ impl StandardFramework {
     /// });
     /// # }
     /// ```
-    pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), CommandError> + Send + Sync + 'static,
-              S: Into<String> {
+    pub fn on(mut self, name: &str, 
+            f: fn(&mut Context, &Message, Args) 
+            -> Result<(), CommandError>) -> Self {
         {
             let ungrouped = self.groups
                 .entry("Ungrouped".to_owned())
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
-                let name = command_name.into();
-
                 group
                     .commands
-                    .insert(name, CommandOrAlias::Command(Arc::new(Command::new(f))));
+                    .insert(name.to_string(), CommandOrAlias::Command(Arc::new(Command::new(f))));
             }
         }
 

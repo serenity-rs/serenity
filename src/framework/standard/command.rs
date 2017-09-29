@@ -9,12 +9,9 @@ pub type Check = Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool
                      + Send
                      + Sync
                      + 'static;
-pub type Exec = Fn(&mut Context, &Message, Args) -> Result<(), Error> + Send + Sync + 'static;
-pub type Help = Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
-                   -> Result<(), Error>
-                    + Send
-                    + Sync
-                    + 'static;
+pub type Exec = fn(&mut Context, &Message, Args) -> Result<(), Error>;
+pub type Help = fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
+                   -> Result<(), Error>;
 pub type BeforeHook = Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static;
 pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), Error>) + Send + Sync + 'static;
 pub(crate) type InternalCommand = Arc<Command>;
@@ -39,8 +36,8 @@ impl<D: fmt::Display> From<D> for Error {
 /// your commands.
 pub enum CommandType {
     StringResponse(String),
-    Basic(Box<Exec>),
-    WithCommands(Box<Help>),
+    Basic(Exec),
+    WithCommands(Help),
 }
 
 pub struct CommandGroup {
@@ -91,10 +88,9 @@ pub struct Command {
 }
 
 impl Command {
-    pub fn new<F>(f: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), Error> + Send + Sync + 'static {
+    pub fn new(f: fn(&mut Context, &Message, Args) -> Result<(), Error>) -> Self {
         Command {
-            exec: CommandType::Basic(Box::new(f)),
+            exec: CommandType::Basic(f),
             ..Command::default()
         }
     }
@@ -105,7 +101,7 @@ impl Default for Command {
         Command {
             aliases: Vec::new(),
             checks: Vec::default(),
-            exec: CommandType::Basic(Box::new(|_, _, _| Ok(()))),
+            exec: CommandType::Basic(|_, _, _| Ok(())),
             desc: None,
             usage: None,
             example: None,
