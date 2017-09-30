@@ -956,6 +956,4 @@ impl Framework for StandardFramework {
     fn update_current_user(&mut self, user_id: UserId, is_bot: bool) {
         self.user_info = (user_id.0, is_bot);
     }
-
-    fn initialized(&self) -> bool { self.initialized }
 }
