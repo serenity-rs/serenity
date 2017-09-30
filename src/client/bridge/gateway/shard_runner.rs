@@ -23,6 +23,7 @@ pub struct ShardRunner<H: EventHandler + 'static> {
     runner_rx: Receiver<ShardManagerMessage>,
     runner_tx: Sender<ShardManagerMessage>,
     shard: LockedShard,
+    shard_info: [u64; 2],
 }
 
 impl<H: EventHandler + 'static> ShardRunner<H> {
@@ -33,6 +34,7 @@ impl<H: EventHandler + 'static> ShardRunner<H> {
                data: Arc<ParkingLotMutex<ShareMap>>,
                event_handler: Arc<H>) -> Self {
         let (tx, rx) = mpsc::channel();
+        let shard_info = shard.lock().shard_info();
 
         Self {
             runner_rx: rx,
@@ -42,6 +44,7 @@ impl<H: EventHandler + 'static> ShardRunner<H> {
             framework,
             manager_tx,
             shard,
+            shard_info,
         }
     }
 
@@ -51,6 +54,7 @@ impl<H: EventHandler + 'static> ShardRunner<H> {
                data: Arc<ParkingLotMutex<ShareMap>>,
                event_handler: Arc<H>) -> Self {
         let (tx, rx) = mpsc::channel();
+        let shard_info = shard.lock().shard_info();
 
         Self {
             runner_rx: rx,
@@ -59,10 +63,13 @@ impl<H: EventHandler + 'static> ShardRunner<H> {
             event_handler,
             manager_tx,
             shard,
+            shard_info,
         }
     }
 
     pub fn run(&mut self) -> Result<()> {
+        debug!("[ShardRunner {:?}] Running", self.shard_info);
+
         loop {
             {
                 let mut shard = self.shard.lock();
@@ -146,15 +153,24 @@ impl<H: EventHandler + 'static> ShardRunner<H> {
                         break;
                     }
 
-                    debug!("Attempting to auto-reconnect");
+                    debug!("[ShardRunner {:?}] Attempting to auto-reconnect",
+                           self.shard_info);
 
                     if let Err(why) = shard.autoreconnect() {
-                        error!("Failed to auto-reconnect: {:?}", why);
+                        error!(
+                            "[ShardRunner {:?}] Failed to auto-reconnect: {:?}",
+                            self.shard_info,
+                            why,
+                        );
                     }
 
                     break;
                 },
-                Err(Error::WebSocket(WebSocketError::NoDataAvailable)) => break,
+                Err(Error::WebSocket(WebSocketError::NoDataAvailable)) => {
+                    // This is hit when the websocket client dies this will be
+                    // hit every iteration.
+                    break;
+                },
                 other => other,
             };
 
