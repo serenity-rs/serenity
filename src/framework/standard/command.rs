@@ -24,7 +24,7 @@ pub enum CommandOrAlias {
 
 /// An error from a command.
 #[derive(Clone, Debug)]
-pub struct Error(String);
+pub struct Error(pub String);
 
 impl<D: fmt::Display> From<D> for Error {
     fn from(d: D) -> Self {
