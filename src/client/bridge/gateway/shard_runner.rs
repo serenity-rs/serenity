@@ -99,7 +99,7 @@ impl<H: EventHandler + 'static> ShardRunner<H> {
                 }
             }
 
-            let (event, successful) = self.recv_events();
+            let (event, successful) = self.recv_event();
 
             if let Some(event) = event {
                 dispatch(
@@ -124,7 +124,7 @@ impl<H: EventHandler + 'static> ShardRunner<H> {
 
     /// Returns a received event, as well as whether reading the potentially
     /// present event was successful.
-    fn recv_events(&mut self) -> (Option<Event>, bool) {
+    fn recv_event(&mut self) -> (Option<Event>, bool) {
         let mut shard = self.shard.lock();
 
         let gw_event = match shard.client.recv_json(GatewayEvent::decode) {
