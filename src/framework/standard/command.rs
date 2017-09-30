@@ -26,6 +26,7 @@ pub enum CommandOrAlias {
 #[derive(Clone, Debug)]
 pub struct Error(pub String);
 
+// TODO: Have seperate `From<(&)String>` and `From<&str>` impls via specialization
 impl<D: fmt::Display> From<D> for Error {
     fn from(d: D) -> Self {
         Error(format!("{}", d))
