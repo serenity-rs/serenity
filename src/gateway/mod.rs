@@ -60,7 +60,7 @@ pub use self::shard::Shard;
 /// This can be useful for knowing which shards are currently "down"/"up".
 ///
 /// [`Shard`]: struct.Shard.html
-#[derive(Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 pub enum ConnectionStage {
     /// Indicator that the [`Shard`] is normally connected and is not in, e.g.,
     /// a resume phase.
@@ -83,5 +83,56 @@ pub enum ConnectionStage {
     Handshake,
     /// Indicator that the [`Shard`] has sent an IDENTIFY packet and is awaiting
     /// a READY packet.
+    ///
+    /// [`Shard`]: struct.Shard.html
     Identifying,
+    /// Indicator that the [`Shard`] has sent a RESUME packet and is awaiting a
+    /// RESUMED packet.
+    ///
+    /// [`Shard`]: struct.Shard.html
+    Resuming,
+}
+
+impl ConnectionStage {
+    /// Whether the stage is a form of connecting.
+    ///
+    /// This will return `true` on:
+    ///
+    /// - [`Connecting`][`ConnectionStage::Connecting`]
+    /// - [`Handshake`][`ConnectionStage::Handshake`]
+    /// - [`Identifying`][`ConnectionStage::Identifying`]
+    /// - [`Resuming`][`ConnectionStage::Resuming`]
+    ///
+    /// All other variants will return `false`.
+    ///
+    /// # Examples
+    ///
+    /// Assert that [`ConnectionStage::Identifying`] is a connecting stage:
+    ///
+    /// ```rust
+    /// use serenity::gateway::ConnectionStage;
+    ///
+    /// assert!(ConnectionStage::Identifying.is_connecting());
+    /// ```
+    ///
+    /// Assert that [`ConnectionStage::Connected`] is _not_ a connecting stage:
+    ///
+    /// ```rust
+    /// use serenity::gateway::ConnectionStage;
+    ///
+    /// assert!(!ConnectionStage::Connected.is_connecting());
+    /// ```
+    ///
+    /// [`ConnectionStage::Connecting`]: #variant.Connecting
+    /// [`ConnectionStage::Handshake`]: #variant.Handshake
+    /// [`ConnectionStage::Identifying`]: #variant.Identifying
+    /// [`ConnectionStage::Resuming`]: #variant.Resuming
+    pub fn is_connecting(&self) -> bool {
+        use self::ConnectionStage::*;
+
+        *self == Connecting
+            || *self == Handshake
+            || *self == Identifying
+            || *self == Resuming
+    }
 }
