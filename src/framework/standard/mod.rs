@@ -53,8 +53,8 @@ use model::Channel;
 ///
 /// ```rust,ignore
 /// command!(multiply(_context, message, args) {
-///     let first = args.single::<i32>().unwrap();
-///     let second = args.single::<i32>().unwrap();
+///     let first = args.single::<f64>().unwrap();
+///     let second = args.single::<f64>().unwrap();
 ///     let product = first * second;
 ///
 ///     if let Err(why) = message.reply(&product.to_string()) {
