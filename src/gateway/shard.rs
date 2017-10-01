@@ -306,7 +306,7 @@ impl Shard {
 
     /// Returns the current connection stage of the shard.
     pub fn stage(&self) -> ConnectionStage {
-        self.stage.clone()
+        self.stage
     }
 
     /// Handles an event from the gateway over the receiver, requiring the
