@@ -60,7 +60,7 @@ pub use self::shard::Shard;
 /// This can be useful for knowing which shards are currently "down"/"up".
 ///
 /// [`Shard`]: struct.Shard.html
-#[derive(Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 pub enum ConnectionStage {
     /// Indicator that the [`Shard`] is normally connected and is not in, e.g.,
     /// a resume phase.
@@ -130,9 +130,9 @@ impl ConnectionStage {
     pub fn is_connecting(&self) -> bool {
         use self::ConnectionStage::*;
 
-        *self == Connecting
-            || *self == Handshake
-            || *self == Identifying
-            || *self == Resuming
+        match *self {
+            Connecting | Handshake | Identifying | Resuming => true,
+            _ => false,
+        }
     }
 }
