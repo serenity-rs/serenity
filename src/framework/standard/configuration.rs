@@ -164,7 +164,7 @@ impl Configuration {
     /// # let mut client = Client::new("token", Handler);
     /// use serenity::framework::StandardFramework;
     ///
-    /// let disabled = vec!["ping"].into_iter().map(|x| x.to_owned()).collect();
+    /// let disabled = vec!["ping"].into_iter().map(|x| x.to_string()).collect();
     ///
     /// client.with_framework(StandardFramework::new()
     ///     .command("ping", |c| c.exec_str("pong!"))
@@ -201,7 +201,7 @@ impl Configuration {
     ///             "!"
     ///         } else {
     ///             "~"
-    ///         }.to_owned())
+    ///         }.to_string())
     ///     })));
     /// ```
     pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
@@ -328,7 +328,7 @@ impl Configuration {
     ///     .prefix("!")));
     /// ```
     pub fn prefix(mut self, prefix: &str) -> Self {
-        self.prefixes = vec![prefix.to_owned()];
+        self.prefixes = vec![prefix.to_string()];
 
         self
     }

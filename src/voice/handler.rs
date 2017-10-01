@@ -306,7 +306,7 @@ impl Handler {
     /// [`connect`]: #method.connect
     /// [`standalone`]: #method.standalone
     pub fn update_server(&mut self, endpoint: &Option<String>, token: &str) {
-        self.token = Some(token.to_owned());
+        self.token = Some(token.to_string());
 
         if let Some(endpoint) = endpoint.clone() {
             self.endpoint = Some(endpoint);

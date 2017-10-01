@@ -60,7 +60,7 @@ impl Game {
     pub fn playing(name: &str) -> Game {
         Game {
             kind: GameType::Playing,
-            name: name.to_owned(),
+            name: name.to_string(),
             url: None,
         }
     }
@@ -91,8 +91,8 @@ impl Game {
     pub fn streaming(name: &str, url: &str) -> Game {
         Game {
             kind: GameType::Streaming,
-            name: name.to_owned(),
-            url: Some(url.to_owned()),
+            name: name.to_string(),
+            url: Some(url.to_string()),
         }
     }
 }

@@ -374,7 +374,7 @@ impl GuildId {
         where C: Into<ChannelId>, U: Into<UserId> {
         let mut map = Map::new();
         map.insert(
-            "channel_id".to_owned(),
+            "channel_id".to_string(),
             Value::Number(Number::from(channel_id.into().0)),
         );
 

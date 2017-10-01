@@ -98,7 +98,7 @@ lazy_static! {
 /// # fn main() {
 /// #     try_main().unwrap();
 /// # }
-pub fn set_token(token: &str) { TOKEN.lock().unwrap().clone_from(&token.to_owned()); }
+pub fn set_token(token: &str) { TOKEN.lock().unwrap().clone_from(&token.to_string()); }
 
 /// Adds a [`User`] as a recipient to a [`Group`].
 ///
@@ -1210,7 +1210,7 @@ pub fn get_guild_members(guild_id: u64,
 
         for value in values {
             if let Some(element) = value.as_object_mut() {
-                element.insert("guild_id".to_owned(), num.clone());
+                element.insert("guild_id".to_string(), num.clone());
             }
         }
     }
@@ -1366,7 +1366,7 @@ pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
     let mut v = serde_json::from_reader::<HyperResponse, Value>(response)?;
 
     if let Some(map) = v.as_object_mut() {
-        map.insert("guild_id".to_owned(), Value::Number(Number::from(guild_id)));
+        map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
     }
 
     serde_json::from_value::<Member>(v).map_err(From::from)
@@ -1627,10 +1627,10 @@ pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap) -> Result
         .set(header::Authorization(TOKEN.lock().unwrap().clone()));
     request
         .headers_mut()
-        .set(header::UserAgent(constants::USER_AGENT.to_owned()));
+        .set(header::UserAgent(constants::USER_AGENT.to_string()));
 
     let mut request = Multipart::from_request(request)?;
-    let mut file_num = "0".to_owned();
+    let mut file_num = "0".to_string();
 
     for file in files {
         match file.into() {
@@ -1797,7 +1797,7 @@ fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
 pub(crate) fn retry<'a, F>(f: F) -> HyperResult<HyperResponse>
     where F: Fn() -> RequestBuilder<'a> {
     let req = || {
-        f().header(header::UserAgent(constants::USER_AGENT.to_owned()))
+        f().header(header::UserAgent(constants::USER_AGENT.to_string()))
             .send()
     };
 

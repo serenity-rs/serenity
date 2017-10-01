@@ -274,7 +274,7 @@ impl<'a> From<&'a str> for ReactionType {
     ///
     /// foo("🍎");
     /// ```
-    fn from(unicode: &str) -> ReactionType { ReactionType::Unicode(unicode.to_owned()) }
+    fn from(unicode: &str) -> ReactionType { ReactionType::Unicode(unicode.to_string()) }
 }
 
 impl Display for ReactionType {

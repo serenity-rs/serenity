@@ -7,10 +7,10 @@ mod model {
     fn gen() -> User {
         User {
             id: UserId(210),
-            avatar: Some("abc".to_owned()),
+            avatar: Some("abc".to_string()),
             bot: true,
             discriminator: 1432,
-            name: "test".to_owned(),
+            name: "test".to_string(),
         }
     }
 
@@ -29,7 +29,7 @@ mod model {
                 .ends_with("/avatars/210/abc.webp?size=1024",)
         );
 
-        user.avatar = Some("a_aaa".to_owned());
+        user.avatar = Some("a_aaa".to_string());
         assert!(
             user.avatar_url()
                 .unwrap()

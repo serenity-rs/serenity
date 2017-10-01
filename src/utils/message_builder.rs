@@ -19,7 +19,7 @@ use model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 /// # let user = UserId(1);
 /// # let emoji = Emoji {
 /// #     id: EmojiId(2),
-/// #     name: "test".to_owned(),
+/// #     name: "test".to_string(),
 /// #     managed: false,
 /// #     require_colons: true,
 /// #     roles: vec![],
@@ -144,7 +144,7 @@ impl MessageBuilder {
     /// let emoji = Emoji {
     ///     id: EmojiId(302516740095606785),
     ///     managed: true,
-    ///     name: "smugAnimeFace".to_owned(),
+    ///     name: "smugAnimeFace".to_string(),
     ///     require_colons: true,
     ///     roles: vec![],
     /// };

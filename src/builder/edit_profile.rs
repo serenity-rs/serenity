@@ -43,9 +43,9 @@ impl EditProfile {
     ///
     /// [`utils::read_image`]: ../fn.read_image.html
     pub fn avatar(mut self, avatar: Option<&str>) -> Self {
-        let avatar = avatar.map_or(Value::Null, |x| Value::String(x.to_owned()));
+        let avatar = avatar.map_or(Value::Null, |x| Value::String(x.to_string()));
 
-        self.0.insert("avatar".to_owned(), avatar);
+        self.0.insert("avatar".to_string(), avatar);
 
         self
     }
@@ -62,7 +62,7 @@ impl EditProfile {
     /// [provided]: #method.password
     pub fn email(mut self, email: &str) -> Self {
         self.0
-            .insert("email".to_owned(), Value::String(email.to_owned()));
+            .insert("email".to_string(), Value::String(email.to_string()));
 
         self
     }
@@ -75,8 +75,8 @@ impl EditProfile {
     /// [provided]: #method.password
     pub fn new_password(mut self, new_password: &str) -> Self {
         self.0.insert(
-            "new_password".to_owned(),
-            Value::String(new_password.to_owned()),
+            "new_password".to_string(),
+            Value::String(new_password.to_string()),
         );
 
         self
@@ -89,7 +89,7 @@ impl EditProfile {
     /// [modifying the associated email address]: #method.email
     pub fn password(mut self, password: &str) -> Self {
         self.0
-            .insert("password".to_owned(), Value::String(password.to_owned()));
+            .insert("password".to_string(), Value::String(password.to_string()));
 
         self
     }
@@ -102,7 +102,7 @@ impl EditProfile {
     /// an error will occur.
     pub fn username(mut self, username: &str) -> Self {
         self.0
-            .insert("username".to_owned(), Value::String(username.to_owned()));
+            .insert("username".to_string(), Value::String(username.to_string()));
 
         self
     }

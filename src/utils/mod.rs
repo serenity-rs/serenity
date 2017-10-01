@@ -259,7 +259,7 @@ pub fn parse_channel(mention: &str) -> Option<u64> {
 ///
 /// let expected = EmojiIdentifier {
 ///     id: EmojiId(302516740095606785),
-///     name: "smugAnimeFace".to_owned(),
+///     name: "smugAnimeFace".to_string(),
 /// };
 ///
 /// assert_eq!(parse_emoji("<:smugAnimeFace:302516740095606785>").unwrap(), expected);
@@ -359,8 +359,8 @@ pub fn read_image<P: AsRef<Path>>(path: P) -> Result<String> {
 ///
 /// let command = r#""this is the first" "this is the second""#;
 /// let expected = vec![
-///     "this is the first".to_owned(),
-///     "this is the second".to_owned()
+///     "this is the first".to_string(),
+///     "this is the second".to_string()
 /// ];
 ///
 /// assert_eq!(parse_quotes(command), expected);
@@ -371,7 +371,7 @@ pub fn read_image<P: AsRef<Path>>(path: P) -> Result<String> {
 ///
 /// let command = r#""this is a quoted command that doesn't have an ending quotation"#;
 /// let expected = vec![
-///     "this is a quoted command that doesn't have an ending quotation".to_owned(),
+///     "this is a quoted command that doesn't have an ending quotation".to_string(),
 /// ];
 ///
 /// assert_eq!(parse_quotes(command), expected);

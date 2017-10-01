@@ -25,7 +25,7 @@ fn test_mention() {
         id: ChannelId(4),
         last_message_id: None,
         last_pin_timestamp: None,
-        name: "a".to_owned(),
+        name: "a".to_string(),
         permission_overwrites: vec![],
         position: 1,
         topic: None,
@@ -34,7 +34,7 @@ fn test_mention() {
     })));
     let emoji = Emoji {
         id: EmojiId(5),
-        name: "a".to_owned(),
+        name: "a".to_string(),
         managed: true,
         require_colons: true,
         roles: vec![],
@@ -45,7 +45,7 @@ fn test_mention() {
         hoist: false,
         managed: false,
         mentionable: false,
-        name: "fake role".to_owned(),
+        name: "fake role".to_string(),
         permissions: Permissions::empty(),
         position: 1,
     };
@@ -54,7 +54,7 @@ fn test_mention() {
         avatar: None,
         bot: false,
         discriminator: 4132,
-        name: "fake".to_owned(),
+        name: "fake".to_string(),
     };
     let member = Member {
         deaf: false,

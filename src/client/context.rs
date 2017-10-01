@@ -85,18 +85,18 @@ impl Context {
             {
                 let cache = CACHE.read().unwrap();
 
-                map.insert("username".to_owned(), Value::String(cache.user.name.clone()));
+                map.insert("username".to_string(), Value::String(cache.user.name.clone()));
 
                 if let Some(email) = cache.user.email.as_ref() {
-                    map.insert("email".to_owned(), Value::String(email.clone()));
+                    map.insert("email".to_string(), Value::String(email.clone()));
                 }
             } else {
                 let user = http::get_current_user()?;
 
-                map.insert("username".to_owned(), Value::String(user.name.clone()));
+                map.insert("username".to_string(), Value::String(user.name.clone()));
 
                 if let Some(email) = user.email.as_ref() {
-                    map.insert("email".to_owned(), Value::String(email.clone()));
+                    map.insert("email".to_string(), Value::String(email.clone()));
                 }
             }
         }
@@ -328,7 +328,7 @@ impl Context {
     pub fn set_game_name(&self, game_name: &str) {
         let game = Game {
             kind: GameType::Playing,
-            name: game_name.to_owned(),
+            name: game_name.to_string(),
             url: None,
         };
 

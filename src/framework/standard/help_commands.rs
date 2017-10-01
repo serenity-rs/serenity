@@ -94,7 +94,7 @@ pub fn with_embeds(_: &mut Context,
                 let with_prefix = if let Some(ref prefix) = group.prefix {
                     format!("{} {}", prefix, command_name)
                 } else {
-                    command_name.to_owned()
+                    command_name.to_string()
                 };
 
                 if name == with_prefix || name == *command_name {
@@ -267,7 +267,7 @@ pub fn plain(_: &mut Context,
                 let with_prefix = if let Some(ref prefix) = group.prefix {
                     format!("{} {}", prefix, command_name)
                 } else {
-                    command_name.to_owned()
+                    command_name.to_string()
                 };
 
                 if name == with_prefix || name == *command_name {
