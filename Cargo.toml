@@ -68,6 +68,10 @@ default-features = false
 optional = true
 version = "0.0.14"
 
+[dependencies.threadpool]
+optional = true
+version = "~1.7"
+
 [dependencies.typemap]
 optional = true
 version = "~0.3"
@@ -101,6 +105,7 @@ client = [
     "http",
     "lazy_static",
     "parking_lot",
+    "threadpool",
     "typemap",
 ]
 extras = []
