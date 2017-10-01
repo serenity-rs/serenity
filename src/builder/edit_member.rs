@@ -16,7 +16,7 @@ impl EditMember {
     ///
     /// [Deafen Members]: ../model/permissions/constant.DEAFEN_MEMBERS.html
     pub fn deafen(mut self, deafen: bool) -> Self {
-        self.0.insert("deaf".to_owned(), Value::Bool(deafen));
+        self.0.insert("deaf".to_string(), Value::Bool(deafen));
 
         self
     }
@@ -27,7 +27,7 @@ impl EditMember {
     ///
     /// [Mute Members]: ../model/permissions/constant.MUTE_MEMBERS.html
     pub fn mute(mut self, mute: bool) -> Self {
-        self.0.insert("mute".to_owned(), Value::Bool(mute));
+        self.0.insert("mute".to_string(), Value::Bool(mute));
 
         self
     }
@@ -40,7 +40,7 @@ impl EditMember {
     /// [Manage Nicknames]: ../model/permissions/constant.MANAGE_NICKNAMES.html
     pub fn nickname(mut self, nickname: &str) -> Self {
         self.0
-            .insert("nick".to_owned(), Value::String(nickname.to_owned()));
+            .insert("nick".to_string(), Value::String(nickname.to_string()));
 
         self
     }
@@ -56,7 +56,7 @@ impl EditMember {
             .map(|x| Value::Number(Number::from(x.0)))
             .collect();
 
-        self.0.insert("roles".to_owned(), Value::Array(role_ids));
+        self.0.insert("roles".to_string(), Value::Array(role_ids));
 
         self
     }
@@ -68,7 +68,7 @@ impl EditMember {
     /// [Move Members]: ../model/permissions/constant.MOVE_MEMBERS.html
     pub fn voice_channel<C: Into<ChannelId>>(mut self, channel_id: C) -> Self {
         self.0.insert(
-            "channel_id".to_owned(),
+            "channel_id".to_string(),
             Value::Number(Number::from(channel_id.into().0)),
         );
 

@@ -37,7 +37,7 @@ macro_rules! colour {
 /// #     id: RoleId(1),
 /// #     managed: false,
 /// #     mentionable: false,
-/// #     name: "test".to_owned(),
+/// #     name: "test".to_string(),
 /// #     permissions: permissions::PRESET_GENERAL,
 /// #     position: 7,
 /// # };

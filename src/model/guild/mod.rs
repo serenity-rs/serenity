@@ -1076,7 +1076,7 @@ impl<'de> Deserialize<'de> for Guild {
                 for value in array {
                     if let Some(channel) = value.as_object_mut() {
                         channel
-                            .insert("guild_id".to_owned(), Value::Number(Number::from(guild_id)));
+                            .insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
                     }
                 }
             }
@@ -1085,7 +1085,7 @@ impl<'de> Deserialize<'de> for Guild {
                 for value in array {
                     if let Some(member) = value.as_object_mut() {
                         member
-                            .insert("guild_id".to_owned(), Value::Number(Number::from(guild_id)));
+                            .insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
                     }
                 }
             }

@@ -279,7 +279,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// ```
     pub fn new(token: &str, handler: H) -> Self {
         let token = if token.starts_with("Bot ") {
-            token.to_owned()
+            token.to_string()
         } else {
             format!("Bot {}", token)
         };

@@ -51,26 +51,26 @@ impl EditRole {
         #[cfg(feature = "utils")]
         {
             map.insert(
-                "color".to_owned(),
+                "color".to_string(),
                 Value::Number(Number::from(role.colour.0)),
             );
         }
 
         #[cfg(not(feature = "utils"))]
         {
-            map.insert("color".to_owned(), Value::Number(Number::from(role.colour)));
+            map.insert("color".to_string(), Value::Number(Number::from(role.colour)));
         }
 
-        map.insert("hoist".to_owned(), Value::Bool(role.hoist));
-        map.insert("managed".to_owned(), Value::Bool(role.managed));
-        map.insert("mentionable".to_owned(), Value::Bool(role.mentionable));
-        map.insert("name".to_owned(), Value::String(role.name.clone()));
+        map.insert("hoist".to_string(), Value::Bool(role.hoist));
+        map.insert("managed".to_string(), Value::Bool(role.managed));
+        map.insert("mentionable".to_string(), Value::Bool(role.mentionable));
+        map.insert("name".to_string(), Value::String(role.name.clone()));
         map.insert(
-            "permissions".to_owned(),
+            "permissions".to_string(),
             Value::Number(Number::from(role.permissions.bits())),
         );
         map.insert(
-            "position".to_owned(),
+            "position".to_string(),
             Value::Number(Number::from(role.position)),
         );
 
@@ -80,7 +80,7 @@ impl EditRole {
     /// Sets the colour of the role.
     pub fn colour(mut self, colour: u64) -> Self {
         self.0
-            .insert("color".to_owned(), Value::Number(Number::from(colour)));
+            .insert("color".to_string(), Value::Number(Number::from(colour)));
 
         self
     }
@@ -88,7 +88,7 @@ impl EditRole {
     /// Whether or not to hoist the role above lower-positioned role in the user
     /// list.
     pub fn hoist(mut self, hoist: bool) -> Self {
-        self.0.insert("hoist".to_owned(), Value::Bool(hoist));
+        self.0.insert("hoist".to_string(), Value::Bool(hoist));
 
         self
     }
@@ -96,7 +96,7 @@ impl EditRole {
     /// Whether or not to make the role mentionable, notifying its users.
     pub fn mentionable(mut self, mentionable: bool) -> Self {
         self.0
-            .insert("mentionable".to_owned(), Value::Bool(mentionable));
+            .insert("mentionable".to_string(), Value::Bool(mentionable));
 
         self
     }
@@ -104,7 +104,7 @@ impl EditRole {
     /// The name of the role to set.
     pub fn name(mut self, name: &str) -> Self {
         self.0
-            .insert("name".to_owned(), Value::String(name.to_owned()));
+            .insert("name".to_string(), Value::String(name.to_string()));
 
         self
     }
@@ -112,7 +112,7 @@ impl EditRole {
     /// The set of permissions to assign the role.
     pub fn permissions(mut self, permissions: Permissions) -> Self {
         self.0.insert(
-            "permissions".to_owned(),
+            "permissions".to_string(),
             Value::Number(Number::from(permissions.bits())),
         );
 
@@ -123,7 +123,7 @@ impl EditRole {
     /// role's position in the user list.
     pub fn position(mut self, position: u8) -> Self {
         self.0
-            .insert("position".to_owned(), Value::Number(Number::from(position)));
+            .insert("position".to_string(), Value::Number(Number::from(position)));
 
         self
     }
@@ -146,12 +146,12 @@ impl Default for EditRole {
         let mut map = Map::new();
         let permissions = Number::from(permissions::PRESET_GENERAL.bits());
 
-        map.insert("color".to_owned(), Value::Number(Number::from(10_070_709)));
-        map.insert("hoist".to_owned(), Value::Bool(false));
-        map.insert("mentionable".to_owned(), Value::Bool(false));
-        map.insert("name".to_owned(), Value::String("new role".to_owned()));
-        map.insert("permissions".to_owned(), Value::Number(permissions));
-        map.insert("position".to_owned(), Value::Number(Number::from(1)));
+        map.insert("color".to_string(), Value::Number(Number::from(10_070_709)));
+        map.insert("hoist".to_string(), Value::Bool(false));
+        map.insert("mentionable".to_string(), Value::Bool(false));
+        map.insert("name".to_string(), Value::String("new role".to_string()));
+        map.insert("permissions".to_string(), Value::Number(permissions));
+        map.insert("position".to_string(), Value::Number(Number::from(1)));
 
         EditRole(map)
     }

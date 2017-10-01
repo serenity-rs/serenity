@@ -12,14 +12,14 @@ impl CreateCommand {
     pub fn batch_known_as(mut self, names: Vec<&str>) -> Self {
         self.0
             .aliases
-            .extend(names.into_iter().map(|n| n.to_owned()));
+            .extend(names.into_iter().map(|n| n.to_string()));
 
         self
     }
 
     /// Adds a ratelimit bucket.
     pub fn bucket(mut self, bucket: &str) -> Self {
-        self.0.bucket = Some(bucket.to_owned());
+        self.0.bucket = Some(bucket.to_string());
 
         self
     }
@@ -81,7 +81,7 @@ impl CreateCommand {
 
     /// Description, used by other commands.
     pub fn desc(mut self, desc: &str) -> Self {
-        self.0.desc = Some(desc.to_owned());
+        self.0.desc = Some(desc.to_string());
 
         self
     }
@@ -95,7 +95,7 @@ impl CreateCommand {
 
     /// Example arguments, used by other commands.
     pub fn example(mut self, example: &str) -> Self {
-        self.0.example = Some(example.to_owned());
+        self.0.example = Some(example.to_string());
 
         self
     }
@@ -141,7 +141,7 @@ impl CreateCommand {
     ///     .command("ping", |c| c.exec_str("Pong!")));
     /// ```
     pub fn exec_str(mut self, content: &str) -> Self {
-        self.0.exec = CommandType::StringResponse(content.to_owned());
+        self.0.exec = CommandType::StringResponse(content.to_string());
 
         self
     }
@@ -162,7 +162,7 @@ impl CreateCommand {
 
     /// Adds an alias, allowing users to use the command under a different name.
     pub fn known_as(mut self, name: &str) -> Self {
-        self.0.aliases.push(name.to_owned());
+        self.0.aliases.push(name.to_string());
 
         self
     }
@@ -206,7 +206,7 @@ impl CreateCommand {
 
     /// Command usage schema, used by other commands.
     pub fn usage(mut self, usage: &str) -> Self {
-        self.0.usage = Some(usage.to_owned());
+        self.0.usage = Some(usage.to_string());
 
         self
     }

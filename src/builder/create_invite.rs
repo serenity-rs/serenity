@@ -90,7 +90,7 @@ impl CreateInvite {
     /// ```
     pub fn max_age(mut self, max_age: u64) -> Self {
         self.0
-            .insert("max_age".to_owned(), Value::Number(Number::from(max_age)));
+            .insert("max_age".to_string(), Value::Number(Number::from(max_age)));
 
         self
     }
@@ -124,7 +124,7 @@ impl CreateInvite {
     /// ```
     pub fn max_uses(mut self, max_uses: u64) -> Self {
         self.0
-            .insert("max_uses".to_owned(), Value::Number(Number::from(max_uses)));
+            .insert("max_uses".to_string(), Value::Number(Number::from(max_uses)));
 
         self
     }
@@ -156,7 +156,7 @@ impl CreateInvite {
     /// ```
     pub fn temporary(mut self, temporary: bool) -> Self {
         self.0
-            .insert("temporary".to_owned(), Value::Bool(temporary));
+            .insert("temporary".to_string(), Value::Bool(temporary));
 
         self
     }
@@ -187,7 +187,7 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn unique(mut self, unique: bool) -> Self {
-        self.0.insert("unique".to_owned(), Value::Bool(unique));
+        self.0.insert("unique".to_string(), Value::Bool(unique));
 
         self
     }
@@ -207,7 +207,7 @@ impl Default for CreateInvite {
     /// ```
     fn default() -> CreateInvite {
         let mut map = Map::new();
-        map.insert("validate".to_owned(), Value::Null);
+        map.insert("validate".to_string(), Value::Null);
 
         CreateInvite(map)
     }

@@ -50,7 +50,7 @@ impl CreateEmbed {
         where F: FnOnce(CreateEmbedAuthor) -> CreateEmbedAuthor {
         let author = f(CreateEmbedAuthor::default()).0;
 
-        self.0.insert("author".to_owned(), Value::Object(author));
+        self.0.insert("author".to_string(), Value::Object(author));
 
         CreateEmbed(self.0)
     }
@@ -68,7 +68,7 @@ impl CreateEmbed {
     #[cfg(feature = "utils")]
     pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
         self.0.insert(
-            "color".to_owned(),
+            "color".to_string(),
             Value::Number(Number::from(colour.into().0 as u64)),
         );
 
@@ -88,7 +88,7 @@ impl CreateEmbed {
     #[cfg(not(feature = "utils"))]
     pub fn colour(mut self, colour: u32) -> Self {
         self.0
-            .insert("color".to_owned(), Value::Number(Number::from(colour)));
+            .insert("color".to_string(), Value::Number(Number::from(colour)));
 
         CreateEmbed(self.0)
     }
@@ -98,7 +98,7 @@ impl CreateEmbed {
     /// **Note**: This can't be longer than 2048 characters.
     pub fn description<D: Display>(mut self, description: D) -> Self {
         self.0.insert(
-            "description".to_owned(),
+            "description".to_string(),
             Value::String(format!("{}", description)),
         );
 
@@ -120,7 +120,7 @@ impl CreateEmbed {
         let field = f(CreateEmbedField::default()).0;
 
         {
-            let key = "fields".to_owned();
+            let key = "fields".to_string();
 
             let entry = self.0.remove(&key).unwrap_or_else(|| Value::Array(vec![]));
             let mut arr = match entry {
@@ -136,7 +136,7 @@ impl CreateEmbed {
             };
             arr.push(Value::Object(field));
 
-            self.0.insert("fields".to_owned(), Value::Array(arr));
+            self.0.insert("fields".to_string(), Value::Array(arr));
         }
 
         CreateEmbed(self.0)
@@ -150,7 +150,7 @@ impl CreateEmbed {
             .collect::<Vec<Value>>();
 
         {
-            let key = "fields".to_owned();
+            let key = "fields".to_string();
 
             let entry = self.0.remove(&key).unwrap_or_else(|| Value::Array(vec![]));
             let mut arr = match entry {
@@ -159,7 +159,7 @@ impl CreateEmbed {
             };
             arr.extend(fields);
 
-            self.0.insert("fields".to_owned(), Value::Array(arr));
+            self.0.insert("fields".to_string(), Value::Array(arr));
         }
 
         CreateEmbed(self.0)
@@ -175,7 +175,7 @@ impl CreateEmbed {
         where F: FnOnce(CreateEmbedFooter) -> CreateEmbedFooter {
         let footer = f(CreateEmbedFooter::default()).0;
 
-        self.0.insert("footer".to_owned(), Value::Object(footer));
+        self.0.insert("footer".to_string(), Value::Object(footer));
 
         CreateEmbed(self.0)
     }
@@ -183,10 +183,10 @@ impl CreateEmbed {
     /// Set the image associated with the embed. This only supports HTTP(S).
     pub fn image(mut self, url: &str) -> Self {
         let image = json!({
-            "url": url.to_owned()
+            "url": url.to_string()
         });
 
-        self.0.insert("image".to_owned(), image);
+        self.0.insert("image".to_string(), image);
 
         CreateEmbed(self.0)
     }
@@ -194,10 +194,10 @@ impl CreateEmbed {
     /// Set the thumbnail of the embed. This only supports HTTP(S).
     pub fn thumbnail(mut self, url: &str) -> Self {
         let thumbnail = json!({
-            "url": url.to_owned(),
+            "url": url.to_string(),
         });
 
-        self.0.insert("thumbnail".to_owned(), thumbnail);
+        self.0.insert("thumbnail".to_string(), thumbnail);
 
         CreateEmbed(self.0)
     }
@@ -283,7 +283,7 @@ impl CreateEmbed {
     /// ```
     pub fn timestamp<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
         self.0
-            .insert("timestamp".to_owned(), Value::String(timestamp.into().ts));
+            .insert("timestamp".to_string(), Value::String(timestamp.into().ts));
 
         CreateEmbed(self.0)
     }
@@ -291,7 +291,7 @@ impl CreateEmbed {
     /// Set the title of the embed.
     pub fn title<D: Display>(mut self, title: D) -> Self {
         self.0
-            .insert("title".to_owned(), Value::String(format!("{}", title)));
+            .insert("title".to_string(), Value::String(format!("{}", title)));
 
         CreateEmbed(self.0)
     }
@@ -299,7 +299,7 @@ impl CreateEmbed {
     /// Set the URL to direct to when clicking on the title.
     pub fn url(mut self, url: &str) -> Self {
         self.0
-            .insert("url".to_owned(), Value::String(url.to_owned()));
+            .insert("url".to_string(), Value::String(url.to_string()));
 
         CreateEmbed(self.0)
     }
@@ -319,7 +319,7 @@ impl Default for CreateEmbed {
     /// Creates a builder with default values, setting the `type` to `rich`.
     fn default() -> CreateEmbed {
         let mut map = Map::new();
-        map.insert("type".to_owned(), Value::String("rich".to_owned()));
+        map.insert("type".to_string(), Value::String("rich".to_string()));
 
         CreateEmbed(map)
     }
@@ -397,7 +397,7 @@ impl CreateEmbedAuthor {
     /// Set the URL of the author's icon.
     pub fn icon_url(mut self, icon_url: &str) -> Self {
         self.0
-            .insert("icon_url".to_owned(), Value::String(icon_url.to_owned()));
+            .insert("icon_url".to_string(), Value::String(icon_url.to_string()));
 
         self
     }
@@ -405,7 +405,7 @@ impl CreateEmbedAuthor {
     /// Set the author's name.
     pub fn name(mut self, name: &str) -> Self {
         self.0
-            .insert("name".to_owned(), Value::String(name.to_owned()));
+            .insert("name".to_string(), Value::String(name.to_string()));
 
         self
     }
@@ -413,7 +413,7 @@ impl CreateEmbedAuthor {
     /// Set the author's URL.
     pub fn url(mut self, url: &str) -> Self {
         self.0
-            .insert("url".to_owned(), Value::String(url.to_owned()));
+            .insert("url".to_string(), Value::String(url.to_string()));
 
         self
     }
@@ -433,7 +433,7 @@ pub struct CreateEmbedField(pub Map<String, Value>);
 impl CreateEmbedField {
     /// Set whether the field is inlined. Set to true by default.
     pub fn inline(mut self, inline: bool) -> Self {
-        self.0.insert("inline".to_owned(), Value::Bool(inline));
+        self.0.insert("inline".to_string(), Value::Bool(inline));
 
         self
     }
@@ -441,7 +441,7 @@ impl CreateEmbedField {
     /// Set the field's name. It can't be longer than 256 characters.
     pub fn name<D: Display>(mut self, name: D) -> Self {
         self.0
-            .insert("name".to_owned(), Value::String(format!("{}", name)));
+            .insert("name".to_string(), Value::String(format!("{}", name)));
 
         self
     }
@@ -449,7 +449,7 @@ impl CreateEmbedField {
     /// Set the field's value. It can't be longer than 1024 characters.
     pub fn value<D: Display>(mut self, value: D) -> Self {
         self.0
-            .insert("value".to_owned(), Value::String(format!("{}", value)));
+            .insert("value".to_string(), Value::String(format!("{}", value)));
 
         self
     }
@@ -460,7 +460,7 @@ impl Default for CreateEmbedField {
     /// `true`.
     fn default() -> CreateEmbedField {
         let mut map = Map::new();
-        map.insert("inline".to_owned(), Value::Bool(true));
+        map.insert("inline".to_string(), Value::Bool(true));
 
         CreateEmbedField(map)
     }
@@ -480,7 +480,7 @@ impl CreateEmbedFooter {
     /// Set the icon URL's value. This only supports HTTP(S).
     pub fn icon_url(mut self, icon_url: &str) -> Self {
         self.0
-            .insert("icon_url".to_owned(), Value::String(icon_url.to_owned()));
+            .insert("icon_url".to_string(), Value::String(icon_url.to_string()));
 
         self
     }
@@ -488,7 +488,7 @@ impl CreateEmbedFooter {
     /// Set the footer's text.
     pub fn text<D: Display>(mut self, text: D) -> Self {
         self.0
-            .insert("text".to_owned(), Value::String(format!("{}", text)));
+            .insert("text".to_string(), Value::String(format!("{}", text)));
 
         self
     }
@@ -510,7 +510,7 @@ impl From<String> for Timestamp {
 impl<'a> From<&'a str> for Timestamp {
     fn from(ts: &'a str) -> Self {
         Timestamp {
-            ts: ts.to_owned(),
+            ts: ts.to_string(),
         }
     }
 }

@@ -191,7 +191,7 @@ impl Shard {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_owned()));
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
     /// # let shard = Shard::new(mutex.clone(), mutex, [1, 2]).unwrap();
     /// #
@@ -221,7 +221,7 @@ impl Shard {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_owned()));
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
     /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
@@ -250,7 +250,7 @@ impl Shard {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_owned()));
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
     /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
@@ -285,7 +285,7 @@ impl Shard {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_owned()));
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
     /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
@@ -638,7 +638,7 @@ impl Shard {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_owned()));
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
     /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
@@ -656,7 +656,7 @@ impl Shard {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_owned()));
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
     /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
@@ -701,7 +701,7 @@ impl Shard {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
-    /// # let mutex = Arc::new(Mutex::new("will anyone read this".to_owned()));
+    /// # let mutex = Arc::new(Mutex::new("will anyone read this".to_string()));
     /// #
     /// # let shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #

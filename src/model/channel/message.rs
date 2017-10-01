@@ -257,7 +257,7 @@ impl Message {
                 self.content = if chosen.contains("$user") {
                     chosen.replace("$user", &self.author.mention())
                 } else {
-                    chosen.to_owned()
+                    chosen.to_string()
                 };
             },
             _ => {},

@@ -85,10 +85,10 @@ impl CurrentUser {
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
         let mut map = Map::new();
-        map.insert("username".to_owned(), Value::String(self.name.clone()));
+        map.insert("username".to_string(), Value::String(self.name.clone()));
 
         if let Some(email) = self.email.as_ref() {
-            map.insert("email".to_owned(), Value::String(email.clone()));
+            map.insert("email".to_string(), Value::String(email.clone()));
         }
 
         match http::edit_profile(&f(EditProfile(map)).0) {

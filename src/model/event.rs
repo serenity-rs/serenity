@@ -578,7 +578,7 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
 
             for member in members {
                 if let Some(map) = member.as_object_mut() {
-                    map.insert("guild_id".to_owned(), num.clone());
+                    map.insert("guild_id".to_string(), num.clone());
                 }
             }
         }

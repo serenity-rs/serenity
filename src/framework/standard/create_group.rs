@@ -50,19 +50,19 @@ impl CreateGroup {
         for n in &cmd.aliases {
             if let Some(ref prefix) = self.0.prefix {
                 self.0.commands.insert(
-                    format!("{} {}", prefix, n.to_owned()),
+                    format!("{} {}", prefix, n.to_string()),
                     CommandOrAlias::Alias(format!("{} {}", prefix, command_name.to_string())),
                 );
             } else {
                 self.0.commands.insert(
-                    n.to_owned(),
+                    n.to_string(),
                     CommandOrAlias::Alias(command_name.to_string()),
                 );
             }
         }
 
         self.0.commands.insert(
-            command_name.to_owned(),
+            command_name.to_string(),
             CommandOrAlias::Command(Arc::new(cmd)),
         );
 
@@ -77,7 +77,7 @@ impl CreateGroup {
 
         self.0
             .commands
-            .insert(command_name.to_owned(), CommandOrAlias::Command(cmd));
+            .insert(command_name.to_string(), CommandOrAlias::Command(cmd));
 
         self
     }
@@ -90,14 +90,14 @@ impl CreateGroup {
     ///
     /// **Note**: It's suggested to call this first when making a group.
     pub fn prefix(mut self, desc: &str) -> Self {
-        self.0.prefix = Some(desc.to_owned());
+        self.0.prefix = Some(desc.to_string());
 
         self
     }
 
     /// Adds a ratelimit bucket.
     pub fn bucket(mut self, bucket: &str) -> Self {
-        self.0.bucket = Some(bucket.to_owned());
+        self.0.bucket = Some(bucket.to_string());
 
         self
     }

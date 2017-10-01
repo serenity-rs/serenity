@@ -518,9 +518,9 @@ impl StandardFramework {
                    .contains(&message.author.id) {
                 Some(DispatchError::BlockedUser)
             } else if self.configuration.disabled_commands.contains(to_check) {
-                Some(DispatchError::CommandDisabled(to_check.to_owned()))
+                Some(DispatchError::CommandDisabled(to_check.to_string()))
             } else if self.configuration.disabled_commands.contains(built) {
-                Some(DispatchError::CommandDisabled(built.to_owned()))
+                Some(DispatchError::CommandDisabled(built.to_string()))
             } else {
                 if !command.allowed_roles.is_empty() {
                     if let Some(guild) = message.guild() {
@@ -550,7 +550,7 @@ impl StandardFramework {
                 if all_passed {
                     None
                 } else {
-                    Some(DispatchError::CheckFailed(command.to_owned()))
+                    Some(DispatchError::CheckFailed(command.clone()))
                 }
             }
         }
@@ -601,7 +601,7 @@ impl StandardFramework {
               S: Into<String> {
         {
             let ungrouped = self.groups
-                .entry("Ungrouped".to_owned())
+                .entry("Ungrouped".to_string())
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
@@ -633,7 +633,7 @@ impl StandardFramework {
         where F: FnOnce(CreateCommand) -> CreateCommand, S: Into<String> {
         {
             let ungrouped = self.groups
-                .entry("Ungrouped".to_owned())
+                .entry("Ungrouped".to_string())
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
@@ -651,7 +651,7 @@ impl StandardFramework {
                     for v in &cmd.aliases {
                         group
                             .commands
-                            .insert(v.to_owned(), CommandOrAlias::Alias(name.clone()));
+                            .insert(v.to_string(), CommandOrAlias::Alias(name.clone()));
                     }
                 }
 
@@ -873,12 +873,12 @@ impl Framework for StandardFramework {
                     let cmd = group.commands.get(&built);
 
                     if let Some(&CommandOrAlias::Alias(ref points_to)) = cmd {
-                        built = points_to.to_owned();
+                        built = points_to.to_string();
                     }
 
                     let mut to_check = if let Some(ref prefix) = group.prefix {
                         if built.starts_with(prefix) && command_length > prefix.len() + 1 {
-                            built[(prefix.len() + 1)..].to_owned()
+                            built[(prefix.len() + 1)..].to_string()
                         } else {
                             continue;
                         }

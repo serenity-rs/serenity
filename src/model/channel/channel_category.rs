@@ -94,14 +94,14 @@ impl ChannelCategory {
         }
 
         let mut map = Map::new();
-        map.insert("name".to_owned(), Value::String(self.name.clone()));
+        map.insert("name".to_string(), Value::String(self.name.clone()));
         map.insert(
-            "position".to_owned(),
+            "position".to_string(),
             Value::Number(Number::from(self.position)),
         );
         map.insert(
-            "type".to_owned(),
-            Value::String(self.kind.name().to_owned()),
+            "type".to_string(),
+            Value::String(self.kind.name().to_string()),
         );
 
         let edited = f(EditChannel(map)).0;

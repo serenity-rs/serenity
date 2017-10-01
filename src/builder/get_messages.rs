@@ -56,7 +56,7 @@ impl GetMessages {
     /// Indicates to retrieve the messages after a specific message, given by
     /// its Id.
     pub fn after<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("after".to_owned(), message_id.into().0);
+        self.0.insert("after".to_string(), message_id.into().0);
 
         self
     }
@@ -64,7 +64,7 @@ impl GetMessages {
     /// Indicates to retrieve the messages _around_ a specific message in either
     /// direction (before+after) the given message.
     pub fn around<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("around".to_owned(), message_id.into().0);
+        self.0.insert("around".to_string(), message_id.into().0);
 
         self
     }
@@ -72,7 +72,7 @@ impl GetMessages {
     /// Indicates to retrieve the messages before a specific message, given by
     /// its Id.
     pub fn before<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("before".to_owned(), message_id.into().0);
+        self.0.insert("before".to_string(), message_id.into().0);
 
         self
     }
@@ -86,7 +86,7 @@ impl GetMessages {
     /// reduced.
     pub fn limit(mut self, limit: u64) -> Self {
         self.0
-            .insert("limit".to_owned(), if limit > 100 { 100 } else { limit });
+            .insert("limit".to_string(), if limit > 100 { 100 } else { limit });
 
         self
     }
