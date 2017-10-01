@@ -129,6 +129,8 @@ extern crate opus;
 extern crate parking_lot;
 #[cfg(feature = "voice")]
 extern crate sodiumoxide;
+#[cfg(feature = "threadpool")]
+extern crate threadpool;
 #[cfg(feature = "client")]
 extern crate typemap;
 #[cfg(feature = "standard_framework")]

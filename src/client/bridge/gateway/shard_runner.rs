@@ -6,6 +6,7 @@ use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::Arc;
 use super::super::super::{EventHandler, dispatch};
 use super::{LockedShard, ShardId, ShardManagerMessage};
+use threadpool::ThreadPool;
 use typemap::ShareMap;
 use websocket::WebSocketError;
 
@@ -14,7 +15,7 @@ use framework::Framework;
 #[cfg(feature = "framework")]
 use std::sync::Mutex;
 
-pub struct ShardRunner<H: EventHandler + 'static> {
+pub struct ShardRunner<H: EventHandler + Send + Sync + 'static> {
     data: Arc<ParkingLotMutex<ShareMap>>,
     event_handler: Arc<H>,
     #[cfg(feature = "framework")]
@@ -24,9 +25,10 @@ pub struct ShardRunner<H: EventHandler + 'static> {
     runner_tx: Sender<ShardManagerMessage>,
     shard: LockedShard,
     shard_info: [u64; 2],
+    threadpool: ThreadPool,
 }
 
-impl<H: EventHandler + 'static> ShardRunner<H> {
+impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
     #[cfg(feature = "framework")]
     pub fn new(shard: LockedShard,
                manager_tx: Sender<ShardManagerMessage>,
@@ -35,6 +37,8 @@ impl<H: EventHandler + 'static> ShardRunner<H> {
                event_handler: Arc<H>) -> Self {
         let (tx, rx) = mpsc::channel();
         let shard_info = shard.lock().shard_info();
+
+        let name = format!("threadpool {:?}", shard_info);
 
         Self {
             runner_rx: rx,
@@ -45,6 +49,7 @@ impl<H: EventHandler + 'static> ShardRunner<H> {
             manager_tx,
             shard,
             shard_info,
+            threadpool: ThreadPool::with_name(name, 15),
         }
     }
 
@@ -56,6 +61,8 @@ impl<H: EventHandler + 'static> ShardRunner<H> {
         let (tx, rx) = mpsc::channel();
         let shard_info = shard.lock().shard_info();
 
+        let name = format!("threadpool {:?}", shard_info);
+
         Self {
             runner_rx: rx,
             runner_tx: tx,
@@ -64,6 +71,7 @@ impl<H: EventHandler + 'static> ShardRunner<H> {
             manager_tx,
             shard,
             shard_info,
+            threadpool: ThreadPool::with_name(name, 15),
         }
     }
 
@@ -102,14 +110,32 @@ impl<H: EventHandler + 'static> ShardRunner<H> {
             let (event, successful) = self.recv_event();
 
             if let Some(event) = event {
-                dispatch(
-                    event,
-                    &self.shard,
-                    #[cfg(feature = "framework")]
-                    &self.framework,
-                    &self.data,
-                    &self.event_handler,
-                );
+                let data = self.data.clone();
+                let event_handler = self.event_handler.clone();
+                let shard = self.shard.clone();
+
+                feature_framework! {{
+                    let framework = self.framework.clone();
+
+                    self.threadpool.execute(|| {
+                        dispatch(
+                            event,
+                            shard,
+                            framework,
+                            data,
+                            event_handler,
+                        );
+                    });
+                } else {
+                    self.threadpool.execute(|| {
+                        dispatch(
+                            event,
+                            shard,
+                            data,
+                            event_handler,
+                        );
+                    });
+                }}
             }
 
             if !successful && !self.shard.lock().stage().is_connecting() {
