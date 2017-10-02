@@ -62,14 +62,20 @@ impl CreateEmbed {
     /// [`colour`]: #method.colour
     #[cfg(feature = "utils")]
     #[inline]
-    pub fn color<C: Into<Colour>>(self, colour: C) -> Self { self.colour(colour.into()) }
+    pub fn color<C: Into<Colour>>(self, colour: C) -> Self { self.colour(colour) }
 
+    
     /// Set the colour of the left-hand side of the embed.
     #[cfg(feature = "utils")]
     pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
+        self._colour(colour.into())
+    }
+
+    #[cfg(feature = "utils")]
+    fn _colour(mut self, colour: Colour) -> Self {
         self.0.insert(
             "color".to_string(),
-            Value::Number(Number::from(colour.into().0 as u64)),
+            Value::Number(Number::from(colour.0 as u64)),
         );
 
         CreateEmbed(self.0)
@@ -282,8 +288,12 @@ impl CreateEmbed {
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
     /// ```
     pub fn timestamp<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
+        self._timestamp(timestamp.into())
+    }
+
+    fn _timestamp(mut self, timestamp: Timestamp) -> Self {
         self.0
-            .insert("timestamp".to_string(), Value::String(timestamp.into().ts));
+            .insert("timestamp".to_string(), Value::String(timestamp.ts));
 
         CreateEmbed(self.0)
     }

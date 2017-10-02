@@ -66,10 +66,14 @@ impl EditMember {
     /// Requires the [Move Members] permission.
     ///
     /// [Move Members]: ../model/permissions/constant.MOVE_MEMBERS.html
-    pub fn voice_channel<C: Into<ChannelId>>(mut self, channel_id: C) -> Self {
+    pub fn voice_channel<C: Into<ChannelId>>(self, channel_id: C) -> Self {
+        self._voice_channel(channel_id.into())
+    }
+
+    fn _voice_channel(mut self, channel_id: ChannelId) -> Self {
         self.0.insert(
             "channel_id".to_string(),
-            Value::Number(Number::from(channel_id.into().0)),
+            Value::Number(Number::from(channel_id.0)),
         );
 
         self

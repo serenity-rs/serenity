@@ -202,6 +202,10 @@ impl Guild {
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: BO) -> Result<()> {
+        self._ban(user.into(), options)
+    }
+
+    fn _ban<BO: BanOptions>(&self, user: UserId, options: BO) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::BAN_MEMBERS;
@@ -597,7 +601,9 @@ impl Guild {
     ///
     /// Requires that the current user be in the guild.
     #[inline]
-    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> { guild_id.into().get() }
+    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> { Self::_get(guild_id.into()) }
+
+    fn _get(guild_id: GuildId) -> Result<PartialGuild> { guild_id.get() }
 
     /// Returns the formatted URL of the guild's icon, if one exists.
     pub fn icon_url(&self) -> Option<String> {
@@ -754,14 +760,14 @@ impl Guild {
     /// [`User`]: struct.User.html
     pub fn permissions_for<C, U>(&self, channel_id: C, user_id: U) -> Permissions
         where C: Into<ChannelId>, U: Into<UserId> {
-        let user_id = user_id.into();
+        self._permissions_for(channel_id.into(), user_id.into())
+    }
 
+    fn _permissions_for(&self, ChannelId(cid): ChannelId, UserId(uid): UserId) -> Permissions {
         // The owner has all permissions in all cases.
-        if user_id == self.owner_id {
+        if self.owner_id == uid {
             return Permissions::all();
         }
-
-        let channel_id = channel_id.into();
 
         // Start by retrieving the @everyone role's permissions.
         let everyone = match self.roles.get(&RoleId(self.id.0)) {
@@ -780,7 +786,7 @@ impl Guild {
         // Create a base set of permissions, starting with `@everyone`s.
         let mut permissions = everyone.permissions;
 
-        let member = match self.members.get(&user_id) {
+        let member = match self.members.get(&UserId(uid)) {
             Some(member) => member,
             None => return everyone.permissions,
         };
@@ -803,7 +809,7 @@ impl Guild {
             return Permissions::all();
         }
 
-        if let Some(channel) = self.channels.get(&channel_id) {
+        if let Some(channel) = self.channels.get(&ChannelId(cid)) {
             let channel = channel.read().unwrap();
 
             // If this is a text channel, then throw out voice permissions.
@@ -836,7 +842,7 @@ impl Guild {
 
             // Member
             for overwrite in &channel.permission_overwrites {
-                if PermissionOverwriteType::Member(user_id) != overwrite.kind {
+                if PermissionOverwriteType::Member(UserId(uid)) != overwrite.kind {
                     continue;
                 }
 
@@ -846,12 +852,12 @@ impl Guild {
             warn!(
                 "(╯°□°）╯︵ ┻━┻ Guild {} does not contain channel {}",
                 self.id,
-                channel_id
+                cid
             );
         }
 
         // The default channel is always readable.
-        if channel_id.0 == self.id.0 {
+        if cid == self.id.0 {
             permissions |= Permissions::READ_MESSAGES;
         }
 
@@ -1004,6 +1010,10 @@ impl Guild {
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
+        self._unban(user_id.into())
+    }
+
+    fn _unban(&self, user_id: UserId) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::BAN_MEMBERS;

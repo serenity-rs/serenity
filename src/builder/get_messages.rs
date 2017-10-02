@@ -55,24 +55,36 @@ pub struct GetMessages(pub BTreeMap<String, u64>);
 impl GetMessages {
     /// Indicates to retrieve the messages after a specific message, given by
     /// its Id.
-    pub fn after<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("after".to_string(), message_id.into().0);
+    pub fn after<M: Into<MessageId>>(self, message_id: M) -> Self {
+        self._after(message_id.into())
+    }
+
+    fn _after(mut self, MessageId(id): MessageId) -> Self {
+        self.0.insert("after".to_string(), id);
 
         self
     }
 
     /// Indicates to retrieve the messages _around_ a specific message in either
     /// direction (before+after) the given message.
-    pub fn around<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("around".to_string(), message_id.into().0);
+    pub fn around<M: Into<MessageId>>(self, message_id: M) -> Self {
+        self._around(message_id.into())
+    }
+
+    fn _around(mut self, MessageId(id): MessageId) -> Self {
+        self.0.insert("around".to_string(), id);
 
         self
     }
 
     /// Indicates to retrieve the messages before a specific message, given by
     /// its Id.
-    pub fn before<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("before".to_string(), message_id.into().0);
+    pub fn before<M: Into<MessageId>>(self, message_id: M) -> Self {
+        self._before(message_id.into())
+    }
+
+    fn _before(mut self, MessageId(id): MessageId) -> Self {
+        self.0.insert("before".to_string(), id);
 
         self
     }
