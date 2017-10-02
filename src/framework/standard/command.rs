@@ -9,6 +9,7 @@ pub type Check = Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool
                      + Send
                      + Sync
                      + 'static;
+                     
 pub type Exec = Fn(&mut Context, &Message, Args) -> Result<(), Error> + Send + Sync + 'static;
 pub type Help = Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
                    -> Result<(), Error>
@@ -20,6 +21,7 @@ pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), Error>) + Send 
 pub(crate) type InternalCommand = Arc<Command>;
 pub type PrefixCheck = Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
 
+#[derive(Debug)]
 pub enum CommandOrAlias {
     Alias(String),
     Command(InternalCommand),
@@ -43,6 +45,7 @@ pub enum CommandType {
     WithCommands(Box<Help>),
 }
 
+#[derive(Debug)]
 pub struct CommandGroup {
     pub prefix: Option<String>,
     pub commands: HashMap<String, CommandOrAlias>,
@@ -88,6 +91,13 @@ pub struct Command {
     /// Whether command can only be used by owners or not.
     pub owners_only: bool,
     pub(crate) aliases: Vec<String>,
+}
+
+impl fmt::Debug for Command {
+    // add checks somehow?
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Point {{ bucket: {:?}, desc: {:?}, example: {:?}, usage: {:?}, min_args: {:?}, max_args: {:?}, required_permissions: {:?}, allowed_roles: {:?}, help_available: {:?}, dm_only: {:?}, guild_only: {:?}, owners_only: {:?}}}", self.bucket, self.desc, self.example, self.usage, self.min_args, self.max_args, self.required_permissions, self.allowed_roles, self.help_available, self.dm_only, self.guild_only, self.owners_only)
+    }
 }
 
 impl Command {

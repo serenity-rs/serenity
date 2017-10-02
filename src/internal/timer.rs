@@ -2,6 +2,7 @@ use chrono::{DateTime, Duration, Utc};
 use std::thread;
 use std::time::Duration as StdDuration;
 
+#[derive(Debug)]
 pub struct Timer {
     due: DateTime<Utc>,
     duration: Duration,
