@@ -106,9 +106,8 @@ impl CreateCommand {
     /// See [`exec_str`] if you _only_ need to return a string on command use.
     ///
     /// [`exec_str`]: #method.exec_str
-    pub fn exec<F>(mut self, func: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), CommandError> + Send + Sync + 'static {
-        self.0.exec = CommandType::Basic(Box::new(func));
+    pub fn exec(mut self, func: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> Self {
+        self.0.exec = CommandType::Basic(func);
 
         self
     }
@@ -117,14 +116,11 @@ impl CreateCommand {
     /// the internal HashMap of commands, used specifically for creating a help
     /// command.
     ///
-    /// You can return `Err(Custom(string))` if there's an error.
-    pub fn exec_help<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
-                    -> Result<(), CommandError>
-                     + Send
-                     + Sync
-                     + 'static {
-        self.0.exec = CommandType::WithCommands(Box::new(f));
+    /// You can return `Err(From::from(string))` if there's an error.
+    pub fn exec_help(mut self, f: 
+                    fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
+                    -> Result<(), CommandError>) -> Self {
+        self.0.exec = CommandType::WithCommands(f);
 
         self
     }

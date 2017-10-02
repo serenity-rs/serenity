@@ -18,8 +18,7 @@ use typemap::ShareMap;
 use framework::Framework;
 
 pub struct ShardManager {
-    #[cfg(feature = "framework")]
-    runners: Arc<ParkingLotMutex<HashMap<ShardId, ShardRunnerInfo>>>,
+    pub runners: Arc<ParkingLotMutex<HashMap<ShardId, ShardRunnerInfo>>>,
     /// The index of the first shard to initialize, 0-indexed.
     shard_index: u64,
     /// The number of shards to initialize.
@@ -47,31 +46,57 @@ impl ShardManager {
 
         let runners = Arc::new(ParkingLotMutex::new(HashMap::new()));
 
-        let mut shard_queuer = feature_framework! {{
-            ShardQueuer {
-                data: data.clone(),
-                event_handler: event_handler.clone(),
-                framework: framework.clone(),
-                last_start: None,
-                manager_tx: thread_tx.clone(),
-                runners: runners.clone(),
-                rx: shard_queue_rx,
-                token: token.clone(),
-                ws_url: ws_url.clone(),
-            }
-        } else {
-            ShardQueuer {
-                data: data.clone(),
-                event_handler: event_handler.clone(),
-                last_start: None,
-                manager_tx: thread_tx.clone(),
-                runners: runners.clone(),
-                rx: shard_queue_rx,
-                rx: shard_queue_rx,
-                token: token.clone(),
-                ws_url: ws_url.clone(),
-            }
-        }};
+        let mut shard_queuer = ShardQueuer {
+            data: data.clone(),
+            event_handler: event_handler.clone(),
+            framework: framework.clone(),
+            last_start: None,
+            manager_tx: thread_tx.clone(),
+            runners: runners.clone(),
+            rx: shard_queue_rx,
+            token: token.clone(),
+            ws_url: ws_url.clone(),
+        };
+
+        thread::spawn(move || {
+            shard_queuer.run();
+        });
+
+        Self {
+            shard_queuer: shard_queue_tx,
+            thread_rx: thread_rx,
+            runners,
+            shard_index,
+            shard_init,
+            shard_total,
+        }
+    }
+
+    #[cfg(not(feature = "framework"))]
+    pub fn new<H>(
+        shard_index: u64,
+        shard_init: u64,
+        shard_total: u64,
+        ws_url: Arc<Mutex<String>>,
+        token: Arc<Mutex<String>>,
+        data: Arc<ParkingLotMutex<ShareMap>>,
+        event_handler: Arc<H>,
+    ) -> Self where H: EventHandler + Send + Sync + 'static {
+        let (thread_tx, thread_rx) = mpsc::channel();
+        let (shard_queue_tx, shard_queue_rx) = mpsc::channel();
+
+        let runners = Arc::new(ParkingLotMutex::new(HashMap::new()));
+
+        let mut shard_queuer = ShardQueuer {
+            data: data.clone(),
+            event_handler: event_handler.clone(),
+            last_start: None,
+            manager_tx: thread_tx.clone(),
+            runners: runners.clone(),
+            rx: shard_queue_rx,
+            token: token.clone(),
+            ws_url: ws_url.clone(),
+        };
 
         thread::spawn(move || {
             shard_queuer.run();

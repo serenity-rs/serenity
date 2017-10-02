@@ -70,14 +70,14 @@ impl CreateGroup {
     }
 
     /// Adds a command to group with simplified API.
-    /// You can return Err(string) if there's an error.
-    pub fn on<F>(mut self, command_name: &str, f: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), CommandError> + Send + Sync + 'static {
+    /// You can return Err(From::from(string)) if there's an error.
+    pub fn on(mut self, name: &str, 
+            f: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> Self {
         let cmd = Arc::new(Command::new(f));
 
         self.0
             .commands
-            .insert(command_name.to_owned(), CommandOrAlias::Command(cmd));
+            .insert(name.to_string(), CommandOrAlias::Command(cmd));
 
         self
     }

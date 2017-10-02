@@ -1,4 +1,3 @@
-use framework::Framework;
 use gateway::Shard;
 use internal::prelude::*;
 use parking_lot::Mutex as ParkingLotMutex;
@@ -16,6 +15,9 @@ use super::{
     ShardRunnerInfo,
 };
 use typemap::ShareMap;
+
+#[cfg(feature = "framework")]
+use framework::Framework;
 
 /// The shard queuer is a simple loop that runs indefinitely to manage the
 /// startup of shards.
@@ -105,6 +107,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
 
         let runner_info = ShardRunnerInfo {
             runner_tx: runner.runner_tx(),
+            shard: locked,
         };
 
         thread::spawn(move || {

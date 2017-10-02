@@ -3,7 +3,7 @@ use internal::ws_impl::ReceiverExt;
 use model::event::{Event, GatewayEvent};
 use parking_lot::Mutex as ParkingLotMutex;
 use std::sync::mpsc::{self, Receiver, Sender};
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use super::super::super::{EventHandler, dispatch};
 use super::{LockedShard, ShardId, ShardManagerMessage};
 use typemap::ShareMap;
@@ -11,6 +11,8 @@ use websocket::WebSocketError;
 
 #[cfg(feature = "framework")]
 use framework::Framework;
+#[cfg(feature = "framework")]
+use std::sync::Mutex;
 
 pub struct ShardRunner<H: EventHandler + 'static> {
     data: Arc<ParkingLotMutex<ShareMap>>,
@@ -24,6 +26,7 @@ pub struct ShardRunner<H: EventHandler + 'static> {
 }
 
 impl<H: EventHandler + 'static> ShardRunner<H> {
+    #[cfg(feature = "framework")]
     pub fn new(shard: LockedShard,
                manager_tx: Sender<ShardManagerMessage>,
                framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
@@ -37,6 +40,23 @@ impl<H: EventHandler + 'static> ShardRunner<H> {
             data,
             event_handler,
             framework,
+            manager_tx,
+            shard,
+        }
+    }
+
+    #[cfg(not(feature = "framework"))]
+    pub fn new(shard: LockedShard,
+               manager_tx: Sender<ShardManagerMessage>,
+               data: Arc<ParkingLotMutex<ShareMap>>,
+               event_handler: Arc<H>) -> Self {
+        let (tx, rx) = mpsc::channel();
+
+        Self {
+            runner_rx: rx,
+            runner_tx: tx,
+            data,
+            event_handler,
             manager_tx,
             shard,
         }
@@ -86,10 +106,9 @@ impl<H: EventHandler + 'static> ShardRunner<H> {
                             &self.event_handler);
                 } else {
                     dispatch(event,
-                            &info.shard,
-                            &info.data,
-                            &info.event_handler,
-                            &handle);
+                            &self.shard,
+                            &self.data,
+                            &self.event_handler);
                 }}
             }
         }
