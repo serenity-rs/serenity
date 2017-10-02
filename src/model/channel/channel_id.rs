@@ -81,7 +81,11 @@ impl ChannelId {
     #[inline]
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
-        http::create_reaction(self.0, message_id.into().0, &reaction_type.into())
+        self._create_reaction(message_id.into(), reaction_type.into())
+    }
+
+    fn _create_reaction(&self, MessageId(id): MessageId, reaction_type: ReactionType) -> Result<()> {
+        http::create_reaction(self.0, id, &reaction_type)
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
@@ -100,7 +104,11 @@ impl ChannelId {
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
     pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        http::delete_message(self.0, message_id.into().0)
+        self._delete_message(message_id.into())
+    }
+
+    fn _delete_message(&self, MessageId(id): MessageId) -> Result<()> {
+        http::delete_message(self.0, id)
     }
 
     /// Deletes all messages by Ids from the given vector in the given channel.
@@ -156,11 +164,18 @@ impl ChannelId {
                                  reaction_type: R)
                                  -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
+        self._delete_reaction(message_id.into(), user_id, reaction_type.into())
+    }
+
+    fn _delete_reaction(&self,
+                        MessageId(id): MessageId,
+                        user_id: Option<UserId>,
+                        reaction_type: ReactionType) -> Result<()> {
         http::delete_reaction(
             self.0,
-            message_id.into().0,
+            id,
             user_id.map(|uid| uid.0),
-            &reaction_type.into(),
+            &reaction_type,
         )
     }
 
@@ -209,6 +224,11 @@ impl ChannelId {
     /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
+        self._edit_message(message_id.into(), f)
+    }
+
+    fn _edit_message<F>(&self, MessageId(id): MessageId, f: F) -> Result<Message>
+        where F: FnOnce(CreateMessage) -> CreateMessage {
         let map = f(CreateMessage::default()).0;
 
         if let Some(content) = map.get("content") {
@@ -219,7 +239,7 @@ impl ChannelId {
             }
         }
 
-        http::edit_message(self.0, message_id.into().0, &Value::Object(map))
+        http::edit_message(self.0, id, &Value::Object(map))
     }
 
     /// Search the cache for the channel with the Id.
@@ -253,7 +273,11 @@ impl ChannelId {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        http::get_message(self.0, message_id.into().0)
+        self._message(message_id.into())
+    }
+
+    fn _message(&self, MessageId(id): MessageId) -> Result<Message> {
+        http::get_message(self.0, id)
             .map(|mut msg| {
                 msg.transform_content();
 
@@ -326,7 +350,11 @@ impl ChannelId {
     /// [`Message`]: struct.Message.html
     #[inline]
     pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        http::pin_message(self.0, message_id.into().0)
+        self._pin(message_id.into())
+    }
+
+    fn _pin(&self, MessageId(id): MessageId) -> Result<()> {
+        http::pin_message(self.0, id)
     }
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
@@ -354,14 +382,23 @@ impl ChannelId {
                                    after: Option<U>)
                                    -> Result<Vec<User>>
         where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
+        self._reaction_users(message_id.into(), reaction_type.into(), limit, after.map(|u| u.into()))
+    }
+
+    fn _reaction_users(&self,
+                       MessageId(id): MessageId,
+                       reaction_type: ReactionType,
+                       limit: Option<u8>,
+                       after: Option<UserId>)
+                       -> Result<Vec<User>> {
         let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
 
         http::get_reaction_users(
             self.0,
-            message_id.into().0,
-            &reaction_type.into(),
+            id,
+            &reaction_type,
             limit,
-            after.map(|u| u.into().0),
+            after.map(|u| u.0),
         )
     }
 
@@ -502,6 +539,10 @@ impl ChannelId {
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         http::unpin_message(self.0, message_id.into().0)
+    }
+
+    fn _unpin(&self, MessageId(id): MessageId) -> Result<()> {
+        http::unpin_message(self.0, id)
     }
 
     /// Retrieves the channel's webhooks.

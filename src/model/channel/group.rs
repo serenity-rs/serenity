@@ -49,8 +49,10 @@ impl Group {
     ///
     /// [`http::add_group_recipient`]: ../http/fn.add_group_recipient.html
     pub fn add_recipient<U: Into<UserId>>(&self, user: U) -> Result<()> {
-        let user = user.into();
+        self._add_recipient(user.into())
+    }
 
+    fn _add_recipient(&self, user: UserId) -> Result<()> {
         // If the group already contains the recipient, do nothing.
         if self.recipients.contains_key(&user) {
             return Ok(());
@@ -253,8 +255,10 @@ impl Group {
     ///
     /// **Note**: This is only available to the group owner.
     pub fn remove_recipient<U: Into<UserId>>(&self, user: U) -> Result<()> {
-        let user = user.into();
+        self._remove_recipient(user.into())
+    }
 
+    fn _remove_recipient(&self, user: UserId) -> Result<()> {
         // If the group does not contain the recipient already, do nothing.
         if !self.recipients.contains_key(&user) {
             return Ok(());

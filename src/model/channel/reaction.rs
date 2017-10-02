@@ -106,12 +106,20 @@ impl Reaction {
                        after: Option<U>)
                        -> Result<Vec<User>>
         where R: Into<ReactionType>, U: Into<UserId> {
+        self._users(reaction_type.into(), limit, after.map(|u| u.into()))
+    }
+
+    fn _users(&self,
+              reaction_type: ReactionType,
+              limit: Option<u8>,
+              after: Option<UserId>)
+              -> Result<Vec<User>> {
         http::get_reaction_users(
             self.channel_id.0,
             self.message_id.0,
-            &reaction_type.into(),
+            &reaction_type,
             limit.unwrap_or(50),
-            after.map(|u| u.into().0),
+            after.map(|u| u.0),
         )
     }
 }
