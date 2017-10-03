@@ -94,9 +94,21 @@ pub struct Command {
 }
 
 impl fmt::Debug for Command {
-    // add checks somehow?
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Point {{ bucket: {:?}, desc: {:?}, example: {:?}, usage: {:?}, min_args: {:?}, max_args: {:?}, required_permissions: {:?}, allowed_roles: {:?}, help_available: {:?}, dm_only: {:?}, guild_only: {:?}, owners_only: {:?}}}", self.bucket, self.desc, self.example, self.usage, self.min_args, self.max_args, self.required_permissions, self.allowed_roles, self.help_available, self.dm_only, self.guild_only, self.owners_only)
+    // TODO: add Command::checks somehow?
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        fmt.debug_struct("Command")
+            .field("bucket", &self.bucket)
+            .field("desc", &self.desc)
+            .field("example", &self.example)
+            .field("usage", &self.usage)
+            .field("min_args", &self.min_args)
+            .field("required_permissions", &self.required_permissions)
+            .field("allowed_roles", &self.allowed_roles)
+            .field("help_available", &self.help_available)
+            .field("dm_only", &self.dm_only)
+            .field("guild_only", &self.guild_only)
+            .field("owners_only", &self.owners_only)
+            .finish()
     }
 }
 
