@@ -573,19 +573,17 @@ impl User {
     // no-cache would warn on guild_id.
     pub fn has_role<G, R>(&self, guild: G, role: R) -> bool
         where G: Into<GuildContainer>, R: Into<RoleId> {
-        self._has_role(guild.into(), role.into())
-    }
+        let role_id = role.into();
 
-    fn _has_role(&self, guild: GuildContainer, role: RoleId) -> bool {
-        match guild {
-            GuildContainer::Guild(guild) => guild.roles.contains_key(&role),
+        match guild.into() {
+            GuildContainer::Guild(guild) => guild.roles.contains_key(&role_id),
             GuildContainer::Id(_guild_id) => {
                 feature_cache! {{
                     CACHE.read()
                         .unwrap()
                         .guilds
                         .get(&_guild_id)
-                        .map(|g| g.read().unwrap().roles.contains_key(&role))
+                        .map(|g| g.read().unwrap().roles.contains_key(&role_id))
                         .unwrap_or(false)
                 } else {
                     true

@@ -1613,10 +1613,6 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
 pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap) -> Result<Message>
     where T: Into<AttachmentType<'a>> {
-    _send_files(channel_id, files.into_iter().map(|a| a.into()).collect(), map)
-}
-
-fn _send_files<'a>(channel_id: u64, files: Vec<AttachmentType<'a>>, map: JsonMap) -> Result<Message> {
     let uri = format!(api!("/channels/{}/messages"), channel_id);
     let url = match Url::parse(&uri) {
         Ok(url) => url,
@@ -1637,7 +1633,7 @@ fn _send_files<'a>(channel_id: u64, files: Vec<AttachmentType<'a>>, map: JsonMap
     let mut file_num = "0".to_string();
 
     for file in files {
-        match file {
+        match file.into() {
             AttachmentType::Bytes((mut bytes, filename)) => {
                 request
                     .write_stream(&file_num, &mut bytes, Some(filename), None)?;

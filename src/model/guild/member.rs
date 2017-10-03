@@ -78,18 +78,15 @@ impl Member {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature = "cache")]
     pub fn add_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
-        self._add_role(role_id.into())
-    }
+        let role_id = role_id.into();
 
-    #[cfg(feature = "cache")]
-    fn _add_role(&mut self, id: RoleId) -> Result<()> {
-        if self.roles.contains(&id) {
+        if self.roles.contains(&role_id) {
             return Ok(());
         }
 
-        match http::add_member_role(self.guild_id.0, self.user.read().unwrap().id.0, id.0) {
+        match http::add_member_role(self.guild_id.0, self.user.read().unwrap().id.0, role_id.0) {
             Ok(()) => {
-                self.roles.push(id);
+                self.roles.push(role_id);
 
                 Ok(())
             },
@@ -315,18 +312,15 @@ impl Member {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature = "cache")]
     pub fn remove_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
-        self._remove_role(role_id.into())
-    }
+        let role_id = role_id.into();
 
-    #[cfg(feature = "cache")]
-    fn _remove_role(&mut self, id: RoleId) -> Result<()> {
-        if !self.roles.contains(&id) {
+        if !self.roles.contains(&role_id) {
             return Ok(());
         }
 
-        match http::remove_member_role(self.guild_id.0, self.user.read().unwrap().id.0, id.0) {
+        match http::remove_member_role(self.guild_id.0, self.user.read().unwrap().id.0, role_id.0) {
             Ok(()) => {
-                self.roles.retain(|r| r.0 != id.0);
+                self.roles.retain(|r| r.0 != role_id.0);
 
                 Ok(())
             },

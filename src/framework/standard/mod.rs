@@ -236,9 +236,10 @@ impl StandardFramework {
     ///         .bucket("basic")
     ///         .exec_str("pong!")));
     /// ```
-    pub fn bucket(mut self, s: &str, delay: i64, time_span: i64, limit: i32) -> Self {
+    pub fn bucket<S>(mut self, s: S, delay: i64, time_span: i64, limit: i32) -> Self
+        where S: Into<String> {
         self.buckets.insert(
-            s.to_string(),
+            s.into(),
             Bucket {
                 ratelimit: Ratelimit {
                     delay: delay,
@@ -281,8 +282,8 @@ impl StandardFramework {
     ///
     /// [`bucket`]: #method.bucket
     #[cfg(feature = "cache")]
-    pub fn complex_bucket<Check>(mut self,
-                                    s: &str,
+    pub fn complex_bucket<S, Check>(mut self,
+                                    s: S,
                                     delay: i64,
                                     time_span: i64,
                                     limit: i32,
@@ -291,9 +292,10 @@ impl StandardFramework {
         where Check: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool
                          + Send
                          + Sync
-                         + 'static {
+                         + 'static,
+              S: Into<String> {
         self.buckets.insert(
-            s.to_string(),
+            s.into(),
             Bucket {
                 ratelimit: Ratelimit {
                     delay,
@@ -334,16 +336,17 @@ impl StandardFramework {
     ///
     /// [`bucket`]: #method.bucket
     #[cfg(not(feature = "cache"))]
-    pub fn complex_bucket<Check>(mut self,
-                                    s: &str,
+    pub fn complex_bucket<S, Check>(mut self,
+                                    s: S,
                                     delay: i64,
                                     time_span: i64,
                                     limit: i32,
                                     check: Check)
                                     -> Self
-        where Check: Fn(&mut Context, ChannelId, UserId) -> bool + Send + Sync + 'static {
+        where Check: Fn(&mut Context, ChannelId, UserId) -> bool + Send + Sync + 'static,
+              S: Into<String> {
         self.buckets.insert(
-            s.to_string(),
+            s.into(),
             Bucket {
                 ratelimit: Ratelimit {
                     delay,
@@ -378,9 +381,10 @@ impl StandardFramework {
     ///         .bucket("simple")
     ///         .exec_str("pong!")));
     /// ```
-    pub fn simple_bucket(mut self, s: &str, delay: i64) -> Self {
+    pub fn simple_bucket<S>(mut self, s: S, delay: i64) -> Self
+        where S: Into<String> {
         self.buckets.insert(
-            s.to_string(),
+            s.into(),
             Bucket {
                 ratelimit: Ratelimit {
                     delay: delay,
@@ -592,17 +596,20 @@ impl StandardFramework {
     /// });
     /// # }
     /// ```
-    pub fn on<F>(mut self, command_name: &str, f: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), CommandError> + Send + Sync + 'static {
+    pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
+        where F: Fn(&mut Context, &Message, Args) -> Result<(), CommandError> + Send + Sync + 'static,
+              S: Into<String> {
         {
             let ungrouped = self.groups
                 .entry("Ungrouped".to_string())
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
+                let name = command_name.into();
+
                 group
                     .commands
-                    .insert(command_name.to_string(), CommandOrAlias::Command(Arc::new(Command::new(f))));
+                    .insert(name, CommandOrAlias::Command(Arc::new(Command::new(f))));
             }
         }
 
@@ -622,8 +629,8 @@ impl StandardFramework {
     ///         let _ = ctx.say("pong");
     ///     }));
     /// ```
-    pub fn command<F>(mut self, command_name: &str, f: F) -> Self
-        where F: FnOnce(CreateCommand) -> CreateCommand {
+    pub fn command<F, S>(mut self, command_name: S, f: F) -> Self
+        where F: FnOnce(CreateCommand) -> CreateCommand, S: Into<String> {
         {
             let ungrouped = self.groups
                 .entry("Ungrouped".to_string())
@@ -631,7 +638,7 @@ impl StandardFramework {
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
                 let cmd = f(CreateCommand(Command::default())).0;
-                let name = command_name.to_string();
+                let name = command_name.into();
 
                 if let Some(ref prefix) = group.prefix {
                     for v in &cmd.aliases {
@@ -681,8 +688,8 @@ impl StandardFramework {
     ///         .command("ping", |c| c.exec_str("pong!"))
     ///         .command("pong", |c| c.exec_str("ping!"))));
     /// ```
-    pub fn group<F>(mut self, group_name: &str, f: F) -> Self
-        where F: FnOnce(CreateGroup) -> CreateGroup {
+    pub fn group<F, S>(mut self, group_name: S, f: F) -> Self
+        where F: FnOnce(CreateGroup) -> CreateGroup, S: Into<String> {
         let group = f(CreateGroup(CommandGroup::default())).0;
 
         self.groups.insert(group_name.into(), Arc::new(group));

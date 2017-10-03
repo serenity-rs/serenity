@@ -62,11 +62,8 @@ impl Invite {
     /// [permission]: permissions/index.html
     pub fn create<C, F>(channel_id: C, f: F) -> Result<RichInvite>
         where C: Into<ChannelId>, F: FnOnce(CreateInvite) -> CreateInvite {
-        Self::_create(channel_id.into(), f)
-    }
+        let channel_id = channel_id.into();
 
-    fn _create<F>(channel_id: ChannelId, f: F) -> Result<RichInvite>
-        where F: FnOnce(CreateInvite) -> CreateInvite {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::CREATE_INVITE;
