@@ -9,7 +9,7 @@ use std::sync::RwLock;
 
 pub trait EventHandler {
     #[cfg(feature = "cache")]
-    fn on_cached<It: IntoIterator<Item=GuildId>>(&self, _: Context, _: It) {}
+    fn on_cached(&self, _: Context, _: Vec<GuildId>) {}
     fn on_channel_create(&self, _: Context, _: Arc<RwLock<GuildChannel>>) {}
     fn on_category_create(&self, _: Context, _: Arc<RwLock<ChannelCategory>>) {}
     fn on_category_delete(&self, _: Context, _: Arc<RwLock<ChannelCategory>>) {}
@@ -60,12 +60,12 @@ pub trait EventHandler {
     fn on_guild_update(&self, _: Context, _: PartialGuild) {}
     fn on_message(&self, _: Context, _: Message) {}
     fn on_message_delete(&self, _: Context, _: ChannelId, _: MessageId) {}
-    fn on_message_delete_bulk<It: IntoIterator<Item=MessageId>>(&self, _: Context, _: ChannelId, _: It) {}
+    fn on_message_delete_bulk(&self, _: Context, _: ChannelId, _: Vec<MessageId>) {}
     fn on_reaction_add(&self, _: Context, _: Reaction) {}
     fn on_reaction_remove(&self, _: Context, _: Reaction) {}
     fn on_reaction_remove_all(&self, _: Context, _: ChannelId, _: MessageId) {}
     fn on_message_update(&self, _: Context, _: MessageUpdateEvent) {}
-    fn on_presence_replace<It: IntoIterator<Item=Presence>>(&self, _: Context, _: It) {}
+    fn on_presence_replace(&self, _: Context, _: Vec<Presence>) {}
     fn on_presence_update(&self, _: Context, _: PresenceUpdateEvent) {}
     fn on_ready(&self, _: Context, _: Ready) {}
     fn on_resume(&self, _: Context, _: ResumedEvent) {}
