@@ -2,7 +2,6 @@ pub use super::{Args, Command, CommandGroup, CommandType, CommandError};
 
 use std::collections::HashMap;
 use std::sync::Arc;
-use std::string::ToString;
 use client::Context;
 use model::{Message, Permissions};
 

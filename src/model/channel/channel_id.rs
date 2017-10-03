@@ -439,7 +439,7 @@ impl ChannelId {
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    pub fn send_files<'a, F, T, It: ::std::iter::IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
+    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         let mut map = f(CreateMessage::default()).0;
 

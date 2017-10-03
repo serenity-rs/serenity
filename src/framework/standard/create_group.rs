@@ -8,7 +8,6 @@ use std::sync::Arc;
 use client::Context;
 use model::{Message, Permissions};
 use std::collections::HashMap;
-use std::string::ToString;
 
 /// Used to create command groups
 ///

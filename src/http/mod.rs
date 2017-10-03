@@ -1611,7 +1611,7 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 /// if the file is too large to send.
 ///
 /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
-pub fn send_files<'a, T, It: ::std::iter::IntoIterator<Item=T>>(channel_id: u64, files: It, map: JsonMap) -> Result<Message>
+pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, map: JsonMap) -> Result<Message>
     where T: Into<AttachmentType<'a>> {
     let uri = format!(api!("/channels/{}/messages"), channel_id);
     let url = match Url::parse(&uri) {
