@@ -419,10 +419,6 @@ impl Message {
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     /// [permissions]: permissions
     pub fn react<R: Into<ReactionType>>(&self, reaction_type: R) -> Result<()> {
-        self._react(reaction_type.into())
-    }
-
-    fn _react(&self, reaction_type: ReactionType) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::ADD_REACTIONS;
@@ -432,7 +428,7 @@ impl Message {
             }
         }
 
-        http::create_reaction(self.channel_id.0, self.id.0, &reaction_type)
+        http::create_reaction(self.channel_id.0, self.id.0, &reaction_type.into())
     }
 
     /// Replies to the user, mentioning them prior to the content in the form

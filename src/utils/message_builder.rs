@@ -122,12 +122,8 @@ impl MessageBuilder {
     /// [`ChannelId`]: ../model/struct.ChannelId.html
     /// [`GuildChannel`]: ../model/struct.GuildChannel.html
     /// [Display implementation]: ../model/struct.ChannelId.html#method.fmt-1
-    pub fn channel<C: Into<ChannelId>>(self, channel: C) -> Self {
-        self._channel(channel.into())
-    }
-
-    fn _channel(mut self, channel: ChannelId) -> Self {
-        let _ = write!(self.0, "{}", channel.mention());
+    pub fn channel<C: Into<ChannelId>>(mut self, channel: C) -> Self {
+        let _ = write!(self.0, "{}", channel.into().mention());
 
         self
     }
@@ -705,12 +701,8 @@ impl MessageBuilder {
     /// [`Role`]: ../model/struct.Role.html
     /// [`RoleId`]: ../model/struct.RoleId.html
     /// [Display implementation]: ../model/struct.RoleId.html#method.fmt-1
-    pub fn role<R: Into<RoleId>>(self, role: R) -> Self {
-        self._role(role.into())
-    }
-
-    fn _role(mut self, role: RoleId) -> Self {
-        let _ = write!(self.0, "{}", role.mention());
+    pub fn role<R: Into<RoleId>>(mut self, role: R) -> Self {
+        let _ = write!(self.0, "{}", role.into().mention());
 
         self
     }
@@ -726,12 +718,8 @@ impl MessageBuilder {
     /// [`User`]: ../model/struct.User.html
     /// [`UserId`]: ../model/struct.UserId.html
     /// [Display implementation]: ../model/struct.UserId.html#method.fmt-1
-    pub fn user<U: Into<UserId>>(self, user: U) -> Self {
-        self._user(user.into())
-    }
-
-    fn _user(mut self, user: UserId) -> Self {
-        let _ = write!(self.0, "{}", user.mention());
+    pub fn user<U: Into<UserId>>(mut self, user: U) -> Self {
+        let _ = write!(self.0, "{}", user.into().mention());
 
         self
     }

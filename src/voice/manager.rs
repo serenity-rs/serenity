@@ -38,11 +38,7 @@ impl Manager {
 
     /// Retrieves a mutable handler for the given target, if one exists.
     pub fn get<G: Into<GuildId>>(&mut self, guild_id: G) -> Option<&mut Handler> {
-        self._get(guild_id.into())
-    }
-
-    fn _get(&mut self, guild_id: GuildId) -> Option<&mut Handler> {
-        self.handlers.get_mut(&guild_id)
+        self.handlers.get_mut(&guild_id.into())
     }
 
     /// Connects to a target by retrieving its relevant [`Handler`] and
@@ -69,10 +65,9 @@ impl Manager {
     #[allow(map_entry)]
     pub fn join<C, G>(&mut self, guild_id: G, channel_id: C) -> &mut Handler
         where C: Into<ChannelId>, G: Into<GuildId> {
-        self._join(guild_id.into(), channel_id.into())
-    }
+        let channel_id = channel_id.into();
+        let guild_id = guild_id.into();
 
-    fn _join(&mut self, guild_id: GuildId, channel_id: ChannelId) -> &mut Handler {
         {
             let mut found = false;
 
@@ -109,11 +104,7 @@ impl Manager {
     /// [`get`]: #method.get
     /// [`leave`]: struct.Handler.html#method.leave
     pub fn leave<G: Into<GuildId>>(&mut self, guild_id: G) {
-        self._leave(guild_id.into())
-    }
-
-    fn _leave(&mut self, guild_id: GuildId) {
-        if let Some(handler) = self.handlers.get_mut(&guild_id) {
+        if let Some(handler) = self.handlers.get_mut(&guild_id.into()) {
             handler.leave();
         }
     }

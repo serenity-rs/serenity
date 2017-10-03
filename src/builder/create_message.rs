@@ -75,11 +75,7 @@ impl CreateMessage {
 
     /// Adds a list of reactions to create after the message's sent.
     pub fn reactions<R: Into<ReactionType>>(mut self, reactions: Vec<R>) -> Self {
-        self._reactions(reactions.into_iter().map(|r| r.into()).collect())
-    }
-
-    fn _reactions(mut self, reactions: Vec<ReactionType>) -> Self {
-        self.1 = Some(reactions);
+        self.1 = Some(reactions.into_iter().map(|r| r.into()).collect());
 
         CreateMessage(self.0, self.1)
     }
