@@ -4,6 +4,7 @@ use super::command::PrefixCheck;
 use client::Context;
 use http;
 use model::{GuildId, Message, UserId};
+use std::string::ToString;
 
 /// The configuration to use for a [`Framework`] associated with a [`Client`]
 /// instance.
@@ -352,8 +353,8 @@ impl Configuration {
     /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .prefixes(vec!["!", ">", "+"])));
     /// ```
-    pub fn prefixes(mut self, prefixes: Vec<&str>) -> Self {
-        self.prefixes = prefixes.iter().map(|x| x.to_string()).collect();
+    pub fn prefixes<T: ToString, It: IntoIterator<Item=T>>(mut self, prefixes: It) -> Self {
+        self.prefixes = prefixes.into_iter().map(|x| x.to_string()).collect();
 
         self
     }
@@ -401,7 +402,7 @@ impl Configuration {
     /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .delimiters(vec![", ", " "])));
     /// ```
-    pub fn delimiters(mut self, delimiters: Vec<&str>) -> Self {
+    pub fn delimiters<T: ::std::string::ToString, It: ::std::iter::IntoIterator<Item=T>>(mut self, delimiters: It) -> Self {
         self.delimiters.clear();
         self.delimiters
             .extend(delimiters.into_iter().map(|s| s.to_string()));

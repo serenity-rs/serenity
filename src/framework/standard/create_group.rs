@@ -8,6 +8,7 @@ use std::sync::Arc;
 use client::Context;
 use model::{Message, Permissions};
 use std::collections::HashMap;
+use std::string::ToString;
 
 /// Used to create command groups
 ///
@@ -139,8 +140,8 @@ impl CreateGroup {
     }
 
     /// Sets roles that are allowed to use the command.
-    pub fn allowed_roles(mut self, allowed_roles: Vec<&str>) -> Self {
-        self.0.allowed_roles = allowed_roles.iter().map(|x| x.to_string()).collect();
+    pub fn allowed_roles<T: ToString, It: IntoIterator<Item=T>>(mut self, allowed_roles: It) -> Self {
+        self.0.allowed_roles = allowed_roles.into_iter().map(|x| x.to_string()).collect();
 
         self
     }

@@ -295,7 +295,7 @@ impl Group {
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
-    pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
+    pub fn send_files<'a, F, T, It: ::std::iter::IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         self.channel_id.send_files(files, f)
     }

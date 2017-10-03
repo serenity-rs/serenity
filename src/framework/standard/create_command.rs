@@ -2,6 +2,7 @@ pub use super::{Args, Command, CommandGroup, CommandType, CommandError};
 
 use std::collections::HashMap;
 use std::sync::Arc;
+use std::string::ToString;
 use client::Context;
 use model::{Message, Permissions};
 
@@ -9,10 +10,10 @@ pub struct CreateCommand(pub Command);
 
 impl CreateCommand {
     /// Adds multiple aliases.
-    pub fn batch_known_as(mut self, names: Vec<&str>) -> Self {
+    pub fn batch_known_as<T: ToString, It: IntoIterator<Item=T>>(mut self, names: It) -> Self {
         self.0
             .aliases
-            .extend(names.into_iter().map(|n| n.to_owned()));
+            .extend(names.into_iter().map(|n| n.to_string()));
 
         self
     }
@@ -212,8 +213,8 @@ impl CreateCommand {
     }
 
     /// Sets roles that are allowed to use the command.
-    pub fn allowed_roles(mut self, allowed_roles: Vec<&str>) -> Self {
-        self.0.allowed_roles = allowed_roles.iter().map(|x| x.to_string()).collect();
+    pub fn allowed_roles<T: ToString, It: IntoIterator<Item=T>>(mut self, allowed_roles: It) -> Self {
+        self.0.allowed_roles = allowed_roles.into_iter().map(|x| x.to_string()).collect();
 
         self
     }
