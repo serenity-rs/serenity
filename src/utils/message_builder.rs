@@ -909,10 +909,22 @@ impl From<ContentModifier> for Content {
     fn from(cm: ContentModifier) -> Content { cm.to_content() }
 }
 
+mod private {
+    use super::{Content, ContentModifier};
+    use std::fmt;
+    
+    pub trait A {}
+    
+    impl A for ContentModifier {}
+    impl A for Content {}
+    impl<T: fmt::Display> A for T {}
+}
+
+    
 /// This trait only exists as way to bypass the shouting of the compiler. Specifically "conflicting
 /// implementations in core" and alike.
-/// However is not meant to be used outside, nor implemented.
-pub trait I {
+/// However is not meant to be used outside.
+pub trait I: self::private::A {
     fn into(self) -> Content;
 }
 
@@ -928,7 +940,7 @@ impl<T: fmt::Display> I for T {
         }
     }
 }
-
+    
 impl I for ContentModifier {
     fn into(self) -> Content { self.to_content() }
 }
