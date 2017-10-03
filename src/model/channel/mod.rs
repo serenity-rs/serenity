@@ -92,7 +92,7 @@ impl Channel {
                 let _ = private_channel.read().unwrap().delete()?;
             },
             Channel::Category(ref category) => {
-                let _ = category.read().unwrap().delete()?;
+                category.read().unwrap().delete()?;
             },
         }
 

@@ -96,7 +96,7 @@ impl CacheUpdate for ChannelCreateEvent {
 
                 let id = channel.with_mut(|writer| {
                     let user_id = writer.recipient.with_mut(|user| {
-                        cache.update_user_entry(&user);
+                        cache.update_user_entry(user);
 
                         user.id
                     });
