@@ -143,7 +143,7 @@ impl CreateEmbed {
     }
 
     /// Adds multiple fields at once.
-    pub fn fields(mut self, fields: Vec<CreateEmbedField>) -> Self {
+    pub fn fields<It: IntoIterator<Item=CreateEmbedField>>(mut self, fields: It) -> Self {
         let fields = fields
             .into_iter()
             .map(|m| Value::Object(m.0))
