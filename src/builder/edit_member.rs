@@ -50,9 +50,9 @@ impl EditMember {
     /// Requires the [Manage Roles] permission to modify.
     ///
     /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
-    pub fn roles(mut self, roles: &[RoleId]) -> Self {
+    pub fn roles<'a, It: IntoIterator<Item=&'a RoleId>>(mut self, roles: It) -> Self {
         let role_ids = roles
-            .iter()
+            .into_iter()
             .map(|x| Value::Number(Number::from(x.0)))
             .collect();
 

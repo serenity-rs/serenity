@@ -409,7 +409,7 @@ fn encryption_key(client: &mut Client) -> Result<Key> {
 }
 
 #[inline]
-fn has_valid_mode(modes: &[String]) -> bool { modes.iter().any(|s| s == CRYPTO_MODE) }
+fn has_valid_mode<It: IntoIterator<Item=String>> (modes: It) -> bool { modes.into_iter().any(|s| s == CRYPTO_MODE) }
 
 #[inline]
 fn start_threads(client: Arc<Mutex<Client>>, udp: &UdpSocket) -> Result<ThreadItems> {
