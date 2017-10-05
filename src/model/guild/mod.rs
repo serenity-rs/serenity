@@ -168,7 +168,7 @@ impl Guild {
             None => return Err(Error::Model(ModelError::ItemMissing)),
         };
 
-        let perms = self.permissions_for(default_channel.id, member.user.read().unwrap().id);
+        let perms = self.permissions_for(default_channel.read().unwrap().id, member.user.read().unwrap().id);
         permissions.remove(perms);
 
         Ok(permissions.is_empty())
