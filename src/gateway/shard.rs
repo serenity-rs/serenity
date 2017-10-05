@@ -671,13 +671,14 @@ impl Shard {
     /// ../../model/event/enum.Event.html#variant.GuildMembersChunk
     /// [`Guild`]: ../../model/struct.Guild.html
     /// [`Member`]: ../../model/struct.Member.html
-    pub fn chunk_guilds(&mut self, guild_ids: &[GuildId], limit: Option<u16>, query: Option<&str>) {
+    pub fn chunk_guilds<'a, It>(&mut self, guild_ids: It, limit: Option<u16>, query: Option<&str>)
+        where It: IntoIterator<Item=&'a GuildId>{
         debug!("[Shard {:?}] Requesting member chunks", self.shard_info);
 
         let msg = json!({
             "op": OpCode::GetGuildMembers.num(),
             "d": {
-                "guild_id": guild_ids.iter().map(|x| x.0).collect::<Vec<u64>>(),
+                "guild_id": guild_ids.into_iter().map(|x| x.0).collect::<Vec<u64>>(),
                 "limit": limit.unwrap_or(0),
                 "query": query.unwrap_or(""),
             },

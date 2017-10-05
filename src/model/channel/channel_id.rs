@@ -117,7 +117,7 @@ impl ChannelId {
     ///
     /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    pub fn delete_messages(&self, message_ids: &[MessageId]) -> Result<()> {
+    pub fn delete_messages<'a, It: IntoIterator<Item=&'a MessageId>>(&self, message_ids: It) -> Result<()> {
         let ids = message_ids
             .into_iter()
             .map(|message_id| message_id.0)
