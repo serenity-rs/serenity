@@ -127,12 +127,12 @@ impl Guild {
     /// Returns the "default" channel of the guild.
     /// (This returns the first channel that can be read by the bot, if there isn't one,
     /// returns `None`)
-    pub fn default_channel(&self) -> Option<GuildChannel> {
+    pub fn default_channel(&self) -> Option<Arc<RwLock<GuildChannel>>> {
         let uid = CACHE.read().unwrap().user.id;
 
         for (cid, channel) in &self.channels {
             if self.permissions_for(*cid, uid).read_messages() {
-                return Some(channel.read().unwrap().clone());
+                return Some(channel.clone());
             }
         }
 
@@ -144,11 +144,11 @@ impl Guild {
     /// returns `None`)
     /// Note however that this is very costy if used in a server with lots of channels,
     /// members, or both.
-    pub fn default_channel_guaranteed(&self) -> Option<GuildChannel> {
+    pub fn default_channel_guaranteed(&self) -> Option<Arc<RwLock<GuildChannel>>> {
         for (cid, channel) in &self.channels {
             for memid in self.members.keys() {
                 if self.permissions_for(*cid, *memid).read_messages() {
-                    return Some(channel.read().unwrap().clone());
+                    return Some(channel.clone());
                 }
             }
         }
