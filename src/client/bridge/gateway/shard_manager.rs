@@ -127,12 +127,7 @@ impl ShardManager {
     }
 
     pub fn run(&mut self) {
-        loop {
-            let value = match self.thread_rx.recv() {
-                Ok(value) => value,
-                Err(_) => break,
-            };
-
+        while let Ok(value) = self.thread_rx.recv() {
             match value {
                 ShardManagerMessage::Restart(shard_id) => self.restart(shard_id),
                 ShardManagerMessage::Shutdown(shard_id) => self.shutdown(shard_id),

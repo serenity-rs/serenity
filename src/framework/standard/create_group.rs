@@ -36,7 +36,7 @@ impl CreateGroup {
             .owners_only(self.0.owners_only);
 
         if let Some(ref bucket) = self.0.bucket {
-            cmd = cmd.bucket(&bucket);
+            cmd = cmd.bucket(bucket);
         }
         cmd.0.allowed_roles = self.0.allowed_roles.clone();
         cmd

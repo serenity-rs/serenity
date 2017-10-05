@@ -140,7 +140,7 @@ impl Args {
     /// [`single_quoted`]: #method.single_quoted
     pub fn single_quoted_n<T: FromStr>(&self) -> Result<T, T::Err>
         where T::Err: StdError {
-        Ok(parse_quotes(&self.delimiter_split.get(0).ok_or(Error::Eos)?)
+        Ok(parse_quotes(self.delimiter_split.get(0).ok_or(Error::Eos)?)
             .remove(0)
             .parse::<T>()?)
     }
@@ -156,7 +156,7 @@ impl Args {
 
         parse_quotes(&self.delimiter_split.join(&self.delimiter))
             .into_iter()
-            .map(|s| s.parse::<T>().map_err(|e| Error::Parse(e)))
+            .map(|s| s.parse::<T>().map_err(Error::Parse))
             .collect()
     }
 
@@ -169,7 +169,7 @@ impl Args {
 
         self.delimiter_split
             .into_iter()
-            .map(|s| s.parse::<T>().map_err(|e| Error::Parse(e)))
+            .map(|s| s.parse::<T>().map_err(Error::Parse))
             .collect()
     }
 

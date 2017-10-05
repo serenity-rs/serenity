@@ -51,13 +51,13 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 }
 
 fn right_roles(cmd: &Command, guild: &Guild, member: &Member) -> bool {
-    if !cmd.allowed_roles.is_empty() {
+    if cmd.allowed_roles.is_empty() {
+        true
+    } else {
         cmd.allowed_roles
             .iter()
-            .flat_map(|r| guild.role_by_name(&r))
+            .flat_map(|r| guild.role_by_name(r))
             .any(|g| member.roles.contains(&g.id))
-    } else {
-        true
     }
 }
 
@@ -100,13 +100,13 @@ pub fn with_embeds(_: &mut Context,
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
-                            if cmd.allowed_roles.len() > 0 {
+                            if !cmd.allowed_roles.is_empty() {
                                 if let Some(guild) = msg.guild() {
                                     let guild = guild.read().unwrap();
                                     if let Some(member) = guild.members.get(&msg.author.id) {
                                         if let Ok(permissions) = member.permissions() {
                                             if !permissions.administrator() &&
-                                               !right_roles(&cmd, &guild, &member) {
+                                               !right_roles(cmd, &guild, member) {
                                                 break;
                                             }
                                         }
@@ -213,7 +213,7 @@ pub fn with_embeds(_: &mut Context,
                             if let Some(member) = guild.members.get(&msg.author.id) {
                                 if let Ok(permissions) = member.permissions() {
                                     if cmd.help_available &&
-                                       (right_roles(&cmd, &guild, &member) ||
+                                       (right_roles(cmd, &guild, member) ||
                                         permissions.administrator()) {
                                         let _ = write!(desc, "`{}`\n", name);
                                         has_commands = true;
@@ -273,13 +273,13 @@ pub fn plain(_: &mut Context,
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
-                            if cmd.allowed_roles.len() > 0 {
+                            if !cmd.allowed_roles.is_empty() {
                                 if let Some(guild) = msg.guild() {
                                     let guild = guild.read().unwrap();
                                     if let Some(member) = guild.members.get(&msg.author.id) {
                                         if let Ok(permissions) = member.permissions() {
                                             if !permissions.administrator() &&
-                                               !right_roles(&cmd, &guild, &member) {
+                                               !right_roles(cmd, &guild, member) {
                                                 break;
                                             }
                                         }
@@ -366,7 +366,7 @@ pub fn plain(_: &mut Context,
                 if let Some(member) = guild.members.get(&msg.author.id) {
                     if let Ok(permissions) = member.permissions() {
                         if cmd.help_available &&
-                           (permissions.administrator() || right_roles(&cmd, &guild, &member)) {
+                           (permissions.administrator() || right_roles(cmd, &guild, member)) {
                             let _ = write!(group_help, "`{}` ", name);
                         }
                     }

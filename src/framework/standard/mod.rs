@@ -531,7 +531,7 @@ impl StandardFramework {
                                     let right_role = command
                                         .allowed_roles
                                         .iter()
-                                        .flat_map(|r| guild.role_by_name(&r))
+                                        .flat_map(|r| guild.role_by_name(r))
                                         .any(|g| member.roles.contains(&g.id));
                                     if !right_role {
                                         return Some(DispatchError::LackingRole);
