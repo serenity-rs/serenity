@@ -117,10 +117,10 @@ impl ChannelId {
     ///
     /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    pub fn delete_messages<'a, It: IntoIterator<Item=&'a MessageId>>(&self, message_ids: It) -> Result<()> {
+    pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, message_ids: It) -> Result<()> {
         let ids = message_ids
             .into_iter()
-            .map(|message_id| message_id.0)
+            .map(|message_id| message_id.as_ref().0)
             .collect::<Vec<u64>>();
 
         let map = json!({ "messages": ids });
