@@ -61,7 +61,7 @@ macro_rules! id_u64 {
                 }
             }
 
-            // This is a hack so that functions can accept `IntoIterator<Item=IdType>`, or `IntoIterator<Item=&IdType>`
+            // This is a hack so that functions can accept `IntoIterator<Item=IdType>`, and or `IntoIterator<Item=&IdType>`
             impl AsRef<$name> for $name {
                 fn as_ref(&self) -> &Self {
                     self
