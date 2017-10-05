@@ -297,9 +297,11 @@ impl Member {
             None => return Err(From::from(ModelError::ItemMissing)),
         };
 
+        let default_channel_reader = default_channel.read().unwrap();
+
         Ok(
             guild
-                .permissions_for(default_channel.id, self.user.read().unwrap().id),
+                .permissions_for(default_channel_reader.id, self.user.read().unwrap().id),
         )
     }
 
