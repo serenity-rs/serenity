@@ -23,7 +23,7 @@ pub struct Attachment {
     pub size: u64,
     /// The URL of the uploaded attachment.
     pub url: String,
-    /// If the attachment is an image, then the widfth of the image is provided.
+    /// If the attachment is an image, then the width of the image is provided.
     pub width: Option<u64>,
 }
 
