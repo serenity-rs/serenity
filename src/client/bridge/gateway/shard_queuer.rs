@@ -40,14 +40,7 @@ pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static> {
 
 impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
     pub fn run(&mut self) {
-        loop {
-            let msg = match self.rx.recv() {
-                Ok(msg) => msg,
-                Err(_) => {
-                    break;
-                }
-            };
-
+        while let Ok(msg) = self.rx.recv() {
             match msg {
                 ShardQueuerMessage::Shutdown => break,
                 ShardQueuerMessage::Start(shard_id, shard_total) => {

@@ -531,7 +531,7 @@ impl StandardFramework {
                                     let right_role = command
                                         .allowed_roles
                                         .iter()
-                                        .flat_map(|r| guild.role_by_name(&r))
+                                        .flat_map(|r| guild.role_by_name(r))
                                         .any(|g| member.roles.contains(&g.id));
                                     if !right_role {
                                         return Some(DispatchError::LackingRole);
@@ -909,7 +909,7 @@ impl Framework for StandardFramework {
                                 .find(|&d| content.contains(d))
                                 .map_or(" ", |s| s.as_str());
 
-                            Args::new(&content, delimiter)
+                            Args::new(content, delimiter)
                         };
 
                         if let Some(error) = self.should_fail(
