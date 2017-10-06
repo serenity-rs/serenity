@@ -65,12 +65,10 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
 
                 Some(frame)
             },
-            Err(ref e) => {
-                if e.kind() == IoErrorKind::UnexpectedEof {
-                    Some(Vec::new())
-                } else {
-                    None
-                }
+            Err(ref e) => if e.kind() == IoErrorKind::UnexpectedEof {
+                Some(Vec::new())
+            } else {
+                None
             },
         }
     }
@@ -194,11 +192,9 @@ pub fn ytdl(uri: &str) -> Result<Box<AudioSource>> {
     };
 
     let uri = match obj.remove("url") {
-        Some(v) => {
-            match v {
-                Value::String(uri) => uri,
-                other => return Err(Error::Voice(VoiceError::YouTubeDLUrl(other))),
-            }
+        Some(v) => match v {
+            Value::String(uri) => uri,
+            other => return Err(Error::Voice(VoiceError::YouTubeDLUrl(other))),
         },
         None => return Err(Error::Voice(VoiceError::YouTubeDLUrl(Value::Object(obj)))),
     };
@@ -224,9 +220,9 @@ fn is_stereo(path: &OsStr) -> Result<bool> {
         .ok_or(Error::Voice(VoiceError::Streams))?;
 
     let check = streams.iter().any(|stream| {
-        let channels = stream.as_object().and_then(|m| {
-            m.get("channels").and_then(|v| v.as_i64())
-        });
+        let channels = stream
+            .as_object()
+            .and_then(|m| m.get("channels").and_then(|v| v.as_i64()));
 
         channels == Some(2)
     });

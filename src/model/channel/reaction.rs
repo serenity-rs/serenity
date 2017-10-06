@@ -3,7 +3,7 @@ use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 use internal::prelude::*;
 use model::*;
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
 use http;
@@ -46,8 +46,7 @@ impl Reaction {
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     /// [permissions]: permissions
     pub fn delete(&self) -> Result<()> {
-        let user_id =
-            feature_cache! {
+        let user_id = feature_cache! {
             {
                 let user = if self.user_id == CACHE.read().unwrap().user.id {
                     None
@@ -62,7 +61,7 @@ impl Reaction {
                 //
                 // * The `Manage Messages` permission.
                 if user.is_some() {
-                    let req = permissions::MANAGE_MESSAGES;
+                    let req = Permissions::MANAGE_MESSAGES;
 
                     if !utils::user_has_perms(self.channel_id, req).unwrap_or(true) {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));

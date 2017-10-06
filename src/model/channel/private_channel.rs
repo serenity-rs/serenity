@@ -2,12 +2,13 @@ use chrono::{DateTime, FixedOffset};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_single_recipient;
 use model::*;
-use internal::RwLockExt;
 
 #[cfg(feature = "model")]
 use builder::{CreateMessage, GetMessages};
 #[cfg(feature = "model")]
 use http::AttachmentType;
+#[cfg(feature = "model")]
+use internal::RwLockExt;
 
 /// A Direct Message text channel with another user.
 #[derive(Clone, Debug, Deserialize)]
@@ -192,12 +193,8 @@ impl PrivateChannel {
                                    after: Option<U>)
                                    -> Result<Vec<User>>
         where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id.reaction_users(
-            message_id,
-            reaction_type,
-            limit,
-            after,
-        )
+        self.id
+            .reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Pins a [`Message`] to the channel.

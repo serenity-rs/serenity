@@ -9,7 +9,7 @@ mod buckets;
 mod args;
 
 pub(crate) use self::buckets::{Bucket, Ratelimit};
-pub use self::command::{Command, CommandGroup, CommandType};
+pub use self::command::{Command, CommandGroup, CommandType, Error as CommandError};
 pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
 pub use self::create_command::CreateCommand;
@@ -24,7 +24,6 @@ use client::Context;
 use super::Framework;
 use model::{ChannelId, GuildId, Message, UserId};
 use model::permissions::Permissions;
-use tokio_core::reactor::Handle;
 use internal::RwLockExt;
 
 #[cfg(feature = "cache")]
@@ -72,7 +71,7 @@ macro_rules! command {
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       _: &$crate::model::Message,
                       _: $crate::framework::standard::Args)
-                      -> ::std::result::Result<(), String> {
+                      -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
             $b
 
             Ok(())
@@ -83,7 +82,7 @@ macro_rules! command {
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::Message,
                       _: $crate::framework::standard::Args)
-                      -> ::std::result::Result<(), String> {
+                      -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
             $b
 
             Ok(())
@@ -94,7 +93,7 @@ macro_rules! command {
         pub fn $fname(mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::Message,
                       mut $a: $crate::framework::standard::Args)
-                      -> ::std::result::Result<(), String> {
+                      -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
             $b
 
             Ok(())
@@ -139,7 +138,7 @@ pub enum DispatchError {
     WebhookAuthor,
 }
 
-type DispatchErrorHook = Fn(Context, Message, DispatchError) + 'static;
+type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;
 
 /// A utility for easily managing dispatches to commands.
 ///
@@ -290,7 +289,10 @@ impl StandardFramework {
                                     limit: i32,
                                     check: Check)
                                     -> Self
-        where Check: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + 'static,
+        where Check: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool
+                         + Send
+                         + Sync
+                         + 'static,
               S: Into<String> {
         self.buckets.insert(
             s.into(),
@@ -341,7 +343,8 @@ impl StandardFramework {
                                     limit: i32,
                                     check: Check)
                                     -> Self
-        where Check: Fn(&mut Context, ChannelId, UserId) -> bool + 'static, S: Into<String> {
+        where Check: Fn(&mut Context, ChannelId, UserId) -> bool + Send + Sync + 'static,
+              S: Into<String> {
         self.buckets.insert(
             s.into(),
             Bucket {
@@ -404,9 +407,9 @@ impl StandardFramework {
             }
 
             if let Some(guild) = guild_id.find() {
-                return self.configuration.blocked_users.contains(
-                    &guild.with(|g| g.owner_id),
-                );
+                return self.configuration
+                    .blocked_users
+                    .contains(&guild.with(|g| g.owner_id));
             }
         }
 
@@ -417,9 +420,8 @@ impl StandardFramework {
     fn has_correct_permissions(&self, command: &Arc<Command>, message: &Message) -> bool {
         if !command.required_permissions.is_empty() {
             if let Some(guild) = message.guild() {
-                let perms = guild.with(|g| {
-                    g.permissions_for(message.channel_id, message.author.id)
-                });
+                let perms = guild
+                    .with(|g| g.permissions_for(message.channel_id, message.author.id));
 
                 return perms.contains(command.required_permissions);
             }
@@ -449,8 +451,7 @@ impl StandardFramework {
                     let rate_limit = bucket.take(message.author.id.0);
                     match bucket.check {
                         Some(ref check) => {
-                            let apply =
-                                feature_cache! {{
+                            let apply = feature_cache! {{
                                 let guild_id = message.guild_id();
                                 (check)(context, guild_id, message.channel_id, message.author.id)
                             } else {
@@ -461,10 +462,8 @@ impl StandardFramework {
                                 return Some(DispatchError::RateLimited(rate_limit));
                             }
                         },
-                        None => {
-                            if rate_limit > 0i64 {
-                                return Some(DispatchError::RateLimited(rate_limit));
-                            }
+                        None => if rate_limit > 0i64 {
+                            return Some(DispatchError::RateLimited(rate_limit));
                         },
                     }
                 }
@@ -514,9 +513,9 @@ impl StandardFramework {
 
             if command.owners_only {
                 Some(DispatchError::OnlyForOwners)
-            } else if self.configuration.blocked_users.contains(
-                &message.author.id,
-            ) {
+            } else if self.configuration
+                   .blocked_users
+                   .contains(&message.author.id) {
                 Some(DispatchError::BlockedUser)
             } else if self.configuration.disabled_commands.contains(to_check) {
                 Some(DispatchError::CommandDisabled(to_check.to_owned()))
@@ -543,9 +542,10 @@ impl StandardFramework {
                     }
                 }
 
-                let all_passed = command.checks.iter().all(|check| {
-                    check(&mut context, message, args, command)
-                });
+                let all_passed = command
+                    .checks
+                    .iter()
+                    .all(|check| check(&mut context, message, args, command));
 
                 if all_passed {
                     None
@@ -597,23 +597,19 @@ impl StandardFramework {
     /// # }
     /// ```
     pub fn on<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + 'static, S: Into<String> {
+        where F: Fn(&mut Context, &Message, Args) -> Result<(), CommandError> + Send + Sync + 'static,
+              S: Into<String> {
         {
-            let ungrouped = self.groups.entry("Ungrouped".to_owned()).or_insert_with(
-                || {
-                    Arc::new(CommandGroup::default())
-                },
-            );
+            let ungrouped = self.groups
+                .entry("Ungrouped".to_owned())
+                .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
                 let name = command_name.into();
 
-                group.commands.insert(
-                    name,
-                    CommandOrAlias::Command(
-                        Arc::new(Command::new(f)),
-                    ),
-                );
+                group
+                    .commands
+                    .insert(name, CommandOrAlias::Command(Arc::new(Command::new(f))));
             }
         }
 
@@ -636,11 +632,9 @@ impl StandardFramework {
     pub fn command<F, S>(mut self, command_name: S, f: F) -> Self
         where F: FnOnce(CreateCommand) -> CreateCommand, S: Into<String> {
         {
-            let ungrouped = self.groups.entry("Ungrouped".to_owned()).or_insert_with(
-                || {
-                    Arc::new(CommandGroup::default())
-                },
-            );
+            let ungrouped = self.groups
+                .entry("Ungrouped".to_owned())
+                .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
                 let cmd = f(CreateCommand(Command::default())).0;
@@ -655,17 +649,15 @@ impl StandardFramework {
                     }
                 } else {
                     for v in &cmd.aliases {
-                        group.commands.insert(
-                            v.to_owned(),
-                            CommandOrAlias::Alias(name.clone()),
-                        );
+                        group
+                            .commands
+                            .insert(v.to_owned(), CommandOrAlias::Alias(name.clone()));
                     }
                 }
 
-                group.commands.insert(
-                    name,
-                    CommandOrAlias::Command(Arc::new(cmd)),
-                );
+                group
+                    .commands
+                    .insert(name, CommandOrAlias::Command(Arc::new(cmd)));
             }
         }
 
@@ -743,7 +735,7 @@ impl StandardFramework {
     ///     }));
     /// ```
     pub fn on_dispatch_error<F>(mut self, f: F) -> Self
-        where F: Fn(Context, Message, DispatchError) + 'static {
+        where F: Fn(Context, Message, DispatchError) + Send + Sync + 'static {
         self.dispatch_error_handler = Some(Arc::new(f));
 
         self
@@ -799,7 +791,7 @@ impl StandardFramework {
     /// ```
     ///
     pub fn before<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, &str) -> bool + 'static {
+        where F: Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static {
         self.before = Some(Arc::new(f));
 
         self
@@ -830,7 +822,7 @@ impl StandardFramework {
     ///     }));
     /// ```
     pub fn after<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, &str, Result<(), String>) + 'static {
+        where F: Fn(&mut Context, &Message, &str, Result<(), CommandError>) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
 
         self
@@ -838,7 +830,7 @@ impl StandardFramework {
 }
 
 impl Framework for StandardFramework {
-    fn dispatch(&mut self, mut context: Context, message: Message, tokio_handle: &Handle) {
+    fn dispatch(&mut self, mut context: Context, message: Message) {
         let res = command::positions(&mut context, &message, &self.configuration);
 
         let positions = match res {
@@ -878,8 +870,9 @@ impl Framework for StandardFramework {
                 for group in groups.values() {
                     let command_length = built.len();
 
-                    if let Some(&CommandOrAlias::Alias(ref points_to)) =
-                        group.commands.get(&built) {
+                    let cmd = group.commands.get(&built);
+
+                    if let Some(&CommandOrAlias::Alias(ref points_to)) = cmd {
                         built = points_to.to_owned();
                     }
 
@@ -933,31 +926,27 @@ impl Framework for StandardFramework {
                             return;
                         }
 
-                        tokio_handle.spawn_fn(move || {
-                            if let Some(before) = before {
-                                if !(before)(&mut context, &message, &built) {
-                                    return Ok(());
-                                }
+                        if let Some(before) = before {
+                            if !(before)(&mut context, &message, &built) {
+                                return;
                             }
+                        }
 
-                            let result = match command.exec {
-                                CommandType::StringResponse(ref x) => {
-                                    let _ = message.channel_id.say(x);
+                        let result = match command.exec {
+                            CommandType::StringResponse(ref x) => {
+                                let _ = message.channel_id.say(x);
 
-                                    Ok(())
-                                },
-                                CommandType::Basic(ref x) => (x)(&mut context, &message, args),
-                                CommandType::WithCommands(ref x) => {
-                                    (x)(&mut context, &message, groups, args)
-                                },
-                            };
+                                Ok(())
+                            },
+                            CommandType::Basic(ref x) => (x)(&mut context, &message, args),
+                            CommandType::WithCommands(ref x) => {
+                                (x)(&mut context, &message, groups, args)
+                            },
+                        };
 
-                            if let Some(after) = after {
-                                (after)(&mut context, &message, &built, result);
-                            }
-
-                            Ok(())
-                        });
+                        if let Some(after) = after {
+                            (after)(&mut context, &message, &built, result);
+                        }
 
                         return;
                     }

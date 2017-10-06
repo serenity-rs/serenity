@@ -1,7 +1,6 @@
-pub use super::{Args, Command, CommandGroup, CommandType};
+pub use super::{Args, Command, CommandGroup, CommandType, CommandError};
 
 use std::collections::HashMap;
-use std::default::Default;
 use std::sync::Arc;
 use client::Context;
 use model::{Message, Permissions};
@@ -11,9 +10,9 @@ pub struct CreateCommand(pub Command);
 impl CreateCommand {
     /// Adds multiple aliases.
     pub fn batch_known_as(mut self, names: Vec<&str>) -> Self {
-        self.0.aliases.extend(
-            names.into_iter().map(|n| n.to_owned()),
-        );
+        self.0
+            .aliases
+            .extend(names.into_iter().map(|n| n.to_owned()));
 
         self
     }
@@ -38,7 +37,12 @@ impl CreateCommand {
     /// # struct Handler;
     /// # impl EventHandler for Handler {}
     /// use serenity::client::{Client, Context};
-    /// use serenity::framework::standard::{Args, Command, StandardFramework};
+    /// use serenity::framework::standard::{
+    ///     Args,
+    ///     Command,
+    ///     CommandError,
+    ///     StandardFramework,
+    /// };
     /// use serenity::model::Message;
     /// use std::env;
     /// use std::sync::Arc;
@@ -53,8 +57,8 @@ impl CreateCommand {
     ///         .exec(ping)));
     ///
     /// fn ping(_context: &mut Context, message: &Message, _args: Args) -> Result<(),
-    /// String> {
-    ///     let _ = message.channel_id.say("Pong!");
+    /// CommandError> {
+    ///     message.channel_id.say("Pong!")?;
     ///
     ///     Ok(())
     /// }
@@ -103,7 +107,7 @@ impl CreateCommand {
     ///
     /// [`exec_str`]: #method.exec_str
     pub fn exec<F>(mut self, func: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), String> + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, Args) -> Result<(), CommandError> + Send + Sync + 'static {
         self.0.exec = CommandType::Basic(Box::new(func));
 
         self
@@ -113,13 +117,12 @@ impl CreateCommand {
     /// the internal HashMap of commands, used specifically for creating a help
     /// command.
     ///
-    /// You can return `Err(string)` if there's an error.
+    /// You can return `Err(Custom(string))` if there's an error.
     pub fn exec_help<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context,
-                    &Message,
-                    HashMap<String, Arc<CommandGroup>>,
-                    Args)
-                    -> Result<(), String>
+        where F: Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
+                    -> Result<(), CommandError>
+                     + Send
+                     + Sync
                      + 'static {
         self.0.exec = CommandType::WithCommands(Box::new(f));
 
@@ -216,24 +219,3 @@ impl CreateCommand {
     }
 }
 
-impl Default for Command {
-    fn default() -> Command {
-        Command {
-            aliases: Vec::new(),
-            checks: Vec::default(),
-            exec: CommandType::Basic(Box::new(|_, _, _| Ok(()))),
-            desc: None,
-            usage: None,
-            example: None,
-            min_args: None,
-            bucket: None,
-            max_args: None,
-            required_permissions: Permissions::empty(),
-            dm_only: false,
-            guild_only: false,
-            help_available: true,
-            owners_only: false,
-            allowed_roles: Vec::new(),
-        }
-    }
-}

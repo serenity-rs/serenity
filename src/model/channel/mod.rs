@@ -18,11 +18,11 @@ pub use self::private_channel::*;
 pub use self::reaction::*;
 pub use self::channel_category::*;
 
+use internal::RwLockExt;
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::deserialize_u64;
 use model::*;
-use internal::RwLockExt;
 
 #[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -53,7 +53,6 @@ pub enum Channel {
     Category(Arc<RwLock<ChannelCategory>>),
 }
 
-#[cfg(feature = "model")]
 impl Channel {
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
     ///
@@ -67,6 +66,7 @@ impl Channel {
     /// [`Message`]: struct.Message.html
     /// [`Message::react`]: struct.Message.html#method.react
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
@@ -79,6 +79,7 @@ impl Channel {
     /// closest functionality is leaving it.
     ///
     /// [`Group`]: struct.Group.html
+    #[cfg(feature = "model")]
     pub fn delete(&self) -> Result<()> {
         match *self {
             Channel::Group(ref group) => {
@@ -108,6 +109,7 @@ impl Channel {
     /// [`Message`]: struct.Message.html
     /// [`Message::delete`]: struct.Message.html#method.delete
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.id().delete_message(message_id)
@@ -120,6 +122,7 @@ impl Channel {
     ///
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn delete_reaction<M, R>(&self,
                                  message_id: M,
@@ -127,11 +130,8 @@ impl Channel {
                                  reaction_type: R)
                                  -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
-        self.id().delete_reaction(
-            message_id,
-            user_id,
-            reaction_type,
-        )
+        self.id()
+            .delete_reaction(message_id, user_id, reaction_type)
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -153,6 +153,7 @@ impl Channel {
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
     /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
+    #[cfg(feature = "model")]
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
@@ -164,14 +165,13 @@ impl Channel {
     /// Refer to [`utils::is_nsfw`] for more details.
     ///
     /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
-    #[cfg(feature = "utils")]
+    #[cfg(all(feature = "model", feature = "utils"))]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
         match *self {
             Channel::Guild(ref channel) => channel.with(|c| c.is_nsfw()),
             Channel::Category(ref category) => category.with(|c| c.is_nsfw()),
-            Channel::Group(_) |
-            Channel::Private(_) => false,
+            Channel::Group(_) | Channel::Private(_) => false,
         }
     }
 
@@ -180,6 +180,7 @@ impl Channel {
     /// Requires the [Read Message History] permission.
     ///
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         self.id().message(message_id)
@@ -201,6 +202,7 @@ impl Channel {
     /// ```
     ///
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
@@ -223,6 +225,7 @@ impl Channel {
     /// [`Message`]: struct.Message.html
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn reaction_users<M, R, U>(&self,
                                    message_id: M,
@@ -231,12 +234,8 @@ impl Channel {
                                    after: Option<U>)
                                    -> Result<Vec<User>>
         where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id().reaction_users(
-            message_id,
-            reaction_type,
-            limit,
-            after,
-        )
+        self.id()
+            .reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Retrieves the Id of the inner [`Group`], [`GuildChannel`], or
@@ -264,6 +263,7 @@ impl Channel {
     ///
     /// [`ChannelId`]: struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    #[cfg(feature = "model")]
     #[inline]
     pub fn say(&self, content: &str) -> Result<Message> { self.id().say(content) }
 
@@ -285,6 +285,7 @@ impl Channel {
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
@@ -310,6 +311,7 @@ impl Channel {
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn send_message<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
@@ -322,6 +324,7 @@ impl Channel {
     ///
     /// [`Message`]: struct.Message.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    #[cfg(feature = "model")]
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.id().unpin(message_id)
@@ -338,26 +341,18 @@ impl<'de> Deserialize<'de> for Channel {
         };
 
         match kind {
-            0 | 2 => {
-                serde_json::from_value::<GuildChannel>(Value::Object(v))
-                    .map(|x| Channel::Guild(Arc::new(RwLock::new(x))))
-                    .map_err(DeError::custom)
-            },
-            1 => {
-                serde_json::from_value::<PrivateChannel>(Value::Object(v))
-                    .map(|x| Channel::Private(Arc::new(RwLock::new(x))))
-                    .map_err(DeError::custom)
-            },
-            3 => {
-                serde_json::from_value::<Group>(Value::Object(v))
-                    .map(|x| Channel::Group(Arc::new(RwLock::new(x))))
-                    .map_err(DeError::custom)
-            },
-            4 => {
-                serde_json::from_value::<ChannelCategory>(Value::Object(v))
-                    .map(|x| Channel::Category(Arc::new(RwLock::new(x))))
-                    .map_err(DeError::custom)
-            },
+            0 | 2 => serde_json::from_value::<GuildChannel>(Value::Object(v))
+                .map(|x| Channel::Guild(Arc::new(RwLock::new(x))))
+                .map_err(DeError::custom),
+            1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
+                .map(|x| Channel::Private(Arc::new(RwLock::new(x))))
+                .map_err(DeError::custom),
+            3 => serde_json::from_value::<Group>(Value::Object(v))
+                .map(|x| Channel::Group(Arc::new(RwLock::new(x))))
+                .map_err(DeError::custom),
+            4 => serde_json::from_value::<ChannelCategory>(Value::Object(v))
+                .map(|x| Channel::Category(Arc::new(RwLock::new(x))))
+                .map_err(DeError::custom),
             _ => Err(DeError::custom("Unknown channel type")),
         }
     }
@@ -435,10 +430,8 @@ impl ChannelType {
 struct PermissionOverwriteData {
     allow: Permissions,
     deny: Permissions,
-    #[serde(deserialize_with = "deserialize_u64")]
-    id: u64,
-    #[serde(rename = "type")]
-    kind: String,
+    #[serde(deserialize_with = "deserialize_u64")] id: u64,
+    #[serde(rename = "type")] kind: String,
 }
 
 /// A channel-specific permission overwrite for a member or role.

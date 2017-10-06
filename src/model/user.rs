@@ -11,11 +11,11 @@ use chrono::NaiveDateTime;
 use std::fmt::Write;
 #[cfg(feature = "model")]
 use std::mem;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::{Arc, RwLock};
 #[cfg(feature = "model")]
 use builder::{CreateMessage, EditProfile};
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
 use http::{self, GuildPagination};
@@ -25,14 +25,11 @@ use http::{self, GuildPagination};
 pub struct CurrentUser {
     pub id: UserId,
     pub avatar: Option<String>,
-    #[serde(default)]
-    pub bot: bool,
-    #[serde(deserialize_with = "deserialize_u16")]
-    pub discriminator: u16,
+    #[serde(default)] pub bot: bool,
+    #[serde(deserialize_with = "deserialize_u16")] pub discriminator: u16,
     pub email: Option<String>,
     pub mfa_enabled: bool,
-    #[serde(rename = "username")]
-    pub name: String,
+    #[serde(rename = "username")] pub name: String,
     pub verified: bool,
 }
 
@@ -88,10 +85,7 @@ impl CurrentUser {
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
         let mut map = Map::new();
-        map.insert(
-            "username".to_owned(),
-            Value::String(self.name.clone()),
-        );
+        map.insert("username".to_owned(), Value::String(self.name.clone()));
 
         if let Some(email) = self.email.as_ref() {
             map.insert("email".to_owned(), Value::String(email.clone()));
@@ -116,9 +110,8 @@ impl CurrentUser {
     /// [`avatar_url`]: #method.avatar_url
     /// [`default_avatar_url`]: #method.default_avatar_url
     pub fn face(&self) -> String {
-        self.avatar_url().unwrap_or_else(
-            || self.default_avatar_url(),
-        )
+        self.avatar_url()
+            .unwrap_or_else(|| self.default_avatar_url())
     }
 
     /// Gets a list of guilds that the current user is in.
@@ -183,10 +176,10 @@ impl CurrentUser {
     /// #
     /// # let mut cache = CACHE.write().unwrap();
     ///
-    /// use serenity::model::permissions::*;
+    /// use serenity::model::Permissions;
     ///
     /// // assuming the cache has been unlocked
-    /// let url = match cache.user.invite_url(READ_MESSAGES | SEND_MESSAGES | EMBED_LINKS) {
+    /// let url = match cache.user.invite_url(Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS) {
     ///     Ok(v) => v,
     ///     Err(why) => {
     ///         println!("Error getting invite url: {:?}", why);
@@ -326,16 +319,11 @@ enum_number!(
 /// [`Invisible`]: #variant.Invisible
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub enum OnlineStatus {
-    #[serde(rename = "dnd")]
-    DoNotDisturb,
-    #[serde(rename = "idle")]
-    Idle,
-    #[serde(rename = "invisible")]
-    Invisible,
-    #[serde(rename = "offline")]
-    Offline,
-    #[serde(rename = "online")]
-    Online,
+    #[serde(rename = "dnd")] DoNotDisturb,
+    #[serde(rename = "idle")] Idle,
+    #[serde(rename = "invisible")] Invisible,
+    #[serde(rename = "offline")] Offline,
+    #[serde(rename = "online")] Online,
 }
 
 impl OnlineStatus {
@@ -489,8 +477,7 @@ impl User {
             return Err(Error::Model(ModelError::MessagingBot));
         }
 
-        let private_channel_id =
-            feature_cache! {
+        let private_channel_id = feature_cache! {
             {
                 let finding = {
                     let cache = CACHE.read().unwrap();
@@ -559,9 +546,8 @@ impl User {
     /// [`avatar_url`]: #method.avatar_url
     /// [`default_avatar_url`]: #method.default_avatar_url
     pub fn face(&self) -> String {
-        self.avatar_url().unwrap_or_else(
-            || self.default_avatar_url(),
-        )
+        self.avatar_url()
+            .unwrap_or_else(|| self.default_avatar_url())
     }
 
     /// Check if a user has a [`Role`]. This will retrieve the [`Guild`] from
@@ -783,10 +769,6 @@ impl<'a> From<&'a User> for UserId {
     fn from(user: &User) -> UserId { user.id }
 }
 
-impl fmt::Display for UserId {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { fmt::Display::fmt(&self.0, f) }
-}
-
 #[cfg(feature = "model")]
 fn avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
     hash.map(|hash| {
@@ -807,9 +789,7 @@ fn default_avatar_url(discriminator: u16) -> String {
 
 #[cfg(feature = "model")]
 fn static_avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
-    hash.map(
-        |hash| cdn!("/avatars/{}/{}.webp?size=1024", user_id, hash),
-    )
+    hash.map(|hash| cdn!("/avatars/{}/{}.webp?size=1024", user_id, hash))
 }
 
 #[cfg(feature = "model")]

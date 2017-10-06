@@ -1,4 +1,3 @@
-use std::fmt::{Display, Formatter, Result as FmtResult};
 use model::*;
 use internal::RwLockExt;
 
@@ -8,7 +7,7 @@ use std::borrow::Cow;
 use std::fmt::Write as FmtWrite;
 #[cfg(feature = "model")]
 use builder::{CreateMessage, EditChannel, GetMessages};
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
 use http::{self, AttachmentType};
@@ -124,9 +123,7 @@ impl ChannelId {
             .map(|message_id| message_id.0)
             .collect::<Vec<u64>>();
 
-        let map = json!({
-            "messages": ids
-        });
+        let map = json!({ "messages": ids });
 
         http::delete_messages(self.0, &map)
     }
@@ -256,13 +253,12 @@ impl ChannelId {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        http::get_message(self.0, message_id.into().0).map(
-            |mut msg| {
+        http::get_message(self.0, message_id.into().0)
+            .map(|mut msg| {
                 msg.transform_content();
 
                 msg
-            },
-        )
+            })
     }
 
     /// Gets messages from the channel.
@@ -302,17 +298,23 @@ impl ChannelId {
     pub fn name(&self) -> Option<String> {
         use self::Channel::*;
 
-        // TODO: Replace this second match with `?`.
-        Some(match match self.find() {
-                  Some(c) => c,
-                  None => return None,
-              } {
+        let finding = feature_cache! {{
+            Some(self.find())
+        } else {
+            None
+        }};
+
+        let channel = if let Some(Some(c)) = finding {
+            c
+        } else {
+            return None;
+        };
+
+        Some(match channel {
             Guild(channel) => channel.read().unwrap().name().to_string(),
-            Group(channel) => {
-                match channel.read().unwrap().name() {
-                    Cow::Borrowed(name) => name.to_string(),
-                    Cow::Owned(name) => name,
-                }
+            Group(channel) => match channel.read().unwrap().name() {
+                Cow::Borrowed(name) => name.to_string(),
+                Cow::Owned(name) => name,
             },
             Category(category) => category.read().unwrap().name().to_string(),
             Private(channel) => channel.read().unwrap().name(),
@@ -552,8 +554,4 @@ impl From<GuildChannel> for ChannelId {
 impl<'a> From<&'a GuildChannel> for ChannelId {
     /// Gets the Id of a guild channel.
     fn from(public_channel: &GuildChannel) -> ChannelId { public_channel.id }
-}
-
-impl Display for ChannelId {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult { Display::fmt(&self.0, f) }
 }

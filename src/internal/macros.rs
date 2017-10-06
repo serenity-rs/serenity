@@ -1,5 +1,6 @@
 //! A set of macros for easily working with internals.
 
+#[cfg(feature = "http")]
 macro_rules! request {
     ($route:expr, $method:ident($body:expr), $url:expr, $($rest:tt)*) => {{
         let client = request_client!();
@@ -29,6 +30,7 @@ macro_rules! request {
     }};
 }
 
+#[cfg(feature = "http")]
 macro_rules! request_client {
     () => {{
         use hyper::net::HttpsConnector;
@@ -41,6 +43,7 @@ macro_rules! request_client {
     }}
 }
 
+#[cfg(any(feature = "model", feature = "utils"))]
 macro_rules! cdn {
     ($e:expr) => {
         concat!("https://cdn.discordapp.com", $e)
@@ -50,6 +53,7 @@ macro_rules! cdn {
     };
 }
 
+#[cfg(feature = "http")]
 macro_rules! api {
     ($e:expr) => {
         concat!("https://discordapp.com/api/v6", $e)
@@ -59,6 +63,7 @@ macro_rules! api {
     };
 }
 
+#[cfg(feature = "http")]
 macro_rules! status {
     ($e:expr) => {
         concat!("https://status.discordapp.com/api/v2", $e)
@@ -66,7 +71,7 @@ macro_rules! status {
 }
 
 // Enable/disable check for cache
-#[cfg(feature = "cache")]
+#[cfg(any(all(feature = "cache", any(feature = "client", feature = "model"))))]
 macro_rules! feature_cache {
     ($enabled:block else $disabled:block) => {
         {
@@ -75,7 +80,7 @@ macro_rules! feature_cache {
     }
 }
 
-#[cfg(not(feature = "cache"))]
+#[cfg(any(all(not(feature = "cache"), any(feature = "client", feature = "model"))))]
 macro_rules! feature_cache {
     ($enabled:block else $disabled:block) => {
         {
@@ -85,7 +90,7 @@ macro_rules! feature_cache {
 }
 
 // Enable/disable check for framework
-#[cfg(feature = "framework")]
+#[cfg(all(feature = "client", feature = "framework"))]
 macro_rules! feature_framework {
     ($enabled:block else $disabled:block) => {
         {
@@ -94,7 +99,7 @@ macro_rules! feature_framework {
     }
 }
 
-#[cfg(not(feature = "framework"))]
+#[cfg(all(feature = "client", not(feature = "framework")))]
 macro_rules! feature_framework {
     ($enabled:block else $disabled:block) => {
         {
@@ -104,7 +109,7 @@ macro_rules! feature_framework {
 }
 
 // Enable/disable check for voice
-#[cfg(feature = "voice")]
+#[cfg(all(feature = "gateway", feature = "voice"))]
 macro_rules! feature_voice {
     ($enabled:block else $disabled:block) => {
         {
@@ -113,7 +118,7 @@ macro_rules! feature_voice {
     }
 }
 
-#[cfg(not(feature = "voice"))]
+#[cfg(all(feature = "gateway", not(feature = "voice")))]
 macro_rules! feature_voice {
     ($enabled:block else $disabled:block) => {
         {

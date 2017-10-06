@@ -27,7 +27,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::fmt::Write;
 use super::command::InternalCommand;
-use super::{Args, Command, CommandGroup, CommandOrAlias};
+use super::{Args, Command, CommandGroup, CommandOrAlias, CommandError};
 use client::Context;
 use model::{ChannelId, Guild, Member, Message};
 use utils::Colour;
@@ -83,7 +83,7 @@ pub fn with_embeds(_: &mut Context,
                    msg: &Message,
                    groups: HashMap<String, Arc<CommandGroup>>,
                    args: Args)
-                   -> Result<(), String> {
+                   -> Result<(), CommandError> {
     if !args.is_empty() {
         let name = args.full();
 
@@ -140,19 +140,15 @@ pub fn with_embeds(_: &mut Context,
 
                         if let Some(ref usage) = command.usage {
                             embed = embed.field(|f| {
-                                f.name("Usage").value(
-                                    &format!("`{} {}`", command_name, usage),
-                                )
+                                f.name("Usage")
+                                    .value(&format!("`{} {}`", command_name, usage))
                             });
                         }
 
                         if let Some(ref example) = command.example {
                             embed = embed.field(|f| {
-                                f.name("Sample usage").value(&format!(
-                                    "`{} {}`",
-                                    command_name,
-                                    example
-                                ))
+                                f.name("Sample usage")
+                                    .value(&format!("`{} {}`", command_name, example))
                             });
                         }
 
@@ -260,7 +256,7 @@ pub fn plain(_: &mut Context,
              msg: &Message,
              groups: HashMap<String, Arc<CommandGroup>>,
              args: Args)
-             -> Result<(), String> {
+             -> Result<(), CommandError> {
     if !args.is_empty() {
         let name = args.full();
 
@@ -342,10 +338,8 @@ pub fn plain(_: &mut Context,
             }
         }
 
-        let _ = msg.channel_id.say(&format!(
-            "**Error**: Command `{}` not found.",
-            name
-        ));
+        let _ = msg.channel_id
+            .say(&format!("**Error**: Command `{}` not found.", name));
 
         return Ok(());
     }

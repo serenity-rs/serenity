@@ -1,8 +1,8 @@
 use chrono::{DateTime, FixedOffset};
 use super::*;
 
-#[cfg(feature = "cache")]
-use super::{permissions, utils as model_utils};
+#[cfg(all(feature = "cache", feature = "model"))]
+use super::{Permissions, utils as model_utils};
 #[cfg(feature = "model")]
 use builder::CreateInvite;
 #[cfg(feature = "model")]
@@ -66,7 +66,7 @@ impl Invite {
 
         #[cfg(feature = "cache")]
         {
-            let req = permissions::CREATE_INVITE;
+            let req = Permissions::CREATE_INVITE;
 
             if !model_utils::user_has_perms(channel_id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -91,7 +91,7 @@ impl Invite {
     pub fn delete(&self) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::MANAGE_GUILD;
+            let req = Permissions::MANAGE_GUILD;
 
             if !model_utils::user_has_perms(self.channel.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -152,8 +152,7 @@ impl Invite {
 pub struct InviteChannel {
     pub id: ChannelId,
     pub name: String,
-    #[serde(rename = "type")]
-    pub kind: ChannelType,
+    #[serde(rename = "type")] pub kind: ChannelType,
 }
 
 /// A minimal amount of information about the guild an invite points to.
@@ -271,7 +270,7 @@ impl RichInvite {
     pub fn delete(&self) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::MANAGE_GUILD;
+            let req = Permissions::MANAGE_GUILD;
 
             if !model_utils::user_has_perms(self.channel.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));

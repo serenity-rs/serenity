@@ -1,6 +1,10 @@
 use model::*;
+
+#[cfg(all(feature = "builder", feature = "model"))]
 use builder::EditChannel;
+#[cfg(all(feature = "builder", feature = "model"))]
 use http;
+#[cfg(all(feature = "model", feature = "utils"))]
 use utils as serenity_utils;
 
 /// A category of [`GuildChannel`]s.
@@ -33,6 +37,7 @@ pub struct ChannelCategory {
     pub permission_overwrites: Vec<PermissionOverwrite>,
 }
 
+#[cfg(feature = "model")]
 impl ChannelCategory {
     /// Adds a permission overwrite to the category's channels.
     #[inline]
@@ -55,7 +60,7 @@ impl ChannelCategory {
     pub fn delete(&self) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::MANAGE_CHANNELS;
+            let req = Permissions::MANAGE_CHANNELS;
 
             if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -76,12 +81,12 @@ impl ChannelCategory {
     /// ```rust,ignore
     /// category.edit(|c| c.name("test").bitrate(86400));
     /// ```
-    #[cfg(feature = "model")]
+    #[cfg(all(feature = "builder", feature = "model"))]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::MANAGE_CHANNELS;
+            let req = Permissions::MANAGE_CHANNELS;
 
             if !utils::user_has_perms(self.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -89,10 +94,7 @@ impl ChannelCategory {
         }
 
         let mut map = Map::new();
-        map.insert(
-            "name".to_owned(),
-            Value::String(self.name.clone()),
-        );
+        map.insert("name".to_owned(), Value::String(self.name.clone()));
         map.insert(
             "position".to_owned(),
             Value::Number(Number::from(self.position)),

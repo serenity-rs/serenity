@@ -62,7 +62,6 @@ pub use self::standard::StandardFramework;
 
 use client::Context;
 use model::Message;
-use tokio_core::reactor::Handle;
 
 #[cfg(feature = "standard_framework")]
 use model::UserId;
@@ -75,7 +74,7 @@ use model::UserId;
 /// Note that you may see some other methods in here as well, but they're meant to be internal only
 /// for the builtin framework.
 pub trait Framework {
-    fn dispatch(&mut self, Context, Message, &Handle);
+    fn dispatch(&mut self, Context, Message);
 
     #[cfg(feature = "standard_framework")]
     fn update_current_user(&mut self, UserId, bool) {}

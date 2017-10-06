@@ -553,9 +553,9 @@ impl Cache {
     /// ```
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
         where G: Into<GuildId>, R: Into<RoleId> {
-        self.guilds.get(&guild_id.into()).and_then(|g| {
-            g.read().unwrap().roles.get(&role_id.into()).cloned()
-        })
+        self.guilds
+            .get(&guild_id.into())
+            .and_then(|g| g.read().unwrap().roles.get(&role_id.into()).cloned())
     }
 
     /// Retrieves a `User` from the cache's [`users`] map, if it exists.
@@ -600,6 +600,7 @@ impl Cache {
         self.categories.get(&channel_id.into()).cloned()
     }
 
+    #[cfg(feature = "client")]
     pub(crate) fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
         e.update(self)
     }

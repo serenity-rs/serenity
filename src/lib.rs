@@ -33,12 +33,13 @@
 //! #[macro_use] extern crate serenity;
 //!
 //! use serenity::client::Client;
+//! use serenity::framework::standard::StandardFramework;
 //! use std::env;
 //!
 //! fn main() {
 //!     // Login with a bot token from the environment
 //!     let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"));
-//!     client.with_framework(|f| f
+//!     client.with_framework(StandardFramework::new()
 //!         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
 //!         .on("ping", ping));
 //!
@@ -62,7 +63,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serenity = "0.3"
+//! serenity = "0.4"
 //! ```
 //!
 //! and to the top of your `main.rs`:
@@ -89,12 +90,15 @@
 #![allow(doc_markdown, inline_always)]
 #![warn(enum_glob_use, if_not_else)]
 
+#[allow(unused_imports)]
 #[macro_use]
 extern crate bitflags;
+#[allow(unused_imports)]
 #[macro_use]
 extern crate log;
 #[macro_use]
 extern crate serde_derive;
+#[allow(unused_imports)]
 #[macro_use]
 extern crate serde_json;
 
@@ -102,16 +106,15 @@ extern crate serde_json;
 #[macro_use]
 extern crate lazy_static;
 
-extern crate base64;
 extern crate chrono;
-extern crate flate2;
-extern crate parking_lot;
 extern crate serde;
 
+#[cfg(feature = "utils")]
+extern crate base64;
 #[cfg(feature = "voice")]
 extern crate byteorder;
-#[cfg(feature = "futures")]
-extern crate futures;
+#[cfg(feature = "gateway")]
+extern crate flate2;
 #[cfg(feature = "hyper")]
 extern crate hyper;
 #[cfg(feature = "hyper-native-tls")]
@@ -122,16 +125,16 @@ extern crate multipart;
 extern crate native_tls;
 #[cfg(feature = "voice")]
 extern crate opus;
+#[cfg(feature = "client")]
+extern crate parking_lot;
 #[cfg(feature = "voice")]
 extern crate sodiumoxide;
-#[cfg(feature = "tokio-core")]
-extern crate tokio_core;
 #[cfg(feature = "client")]
 extern crate typemap;
-#[cfg(feature = "framework")]
+#[cfg(feature = "standard_framework")]
 extern crate vec_shift;
 #[cfg(feature = "gateway")]
-extern crate websocket;
+extern crate evzht9h3nznqzwl as websocket;
 
 #[macro_use]
 mod internal;

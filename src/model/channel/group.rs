@@ -1,15 +1,16 @@
 use chrono::{DateTime, FixedOffset};
 use model::*;
-use internal::RwLockExt;
 
-#[cfg(feature = "model")]
-use std::borrow::Cow;
-#[cfg(feature = "model")]
-use std::fmt::Write as FmtWrite;
 #[cfg(feature = "model")]
 use builder::{CreateMessage, GetMessages};
 #[cfg(feature = "model")]
 use http::{self, AttachmentType};
+#[cfg(feature = "model")]
+use internal::RwLockExt;
+#[cfg(feature = "model")]
+use std::borrow::Cow;
+#[cfg(feature = "model")]
+use std::fmt::Write as FmtWrite;
 
 /// A group channel - potentially including other [`User`]s - separate from a
 /// [`Guild`].
@@ -124,11 +125,8 @@ impl Group {
                                  reaction_type: R)
                                  -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
-        self.channel_id.delete_reaction(
-            message_id,
-            user_id,
-            reaction_type,
-        )
+        self.channel_id
+            .delete_reaction(message_id, user_id, reaction_type)
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -246,12 +244,8 @@ impl Group {
                                    after: Option<U>)
                                    -> Result<Vec<User>>
         where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.channel_id.reaction_users(
-            message_id,
-            reaction_type,
-            limit,
-            after,
-        )
+        self.channel_id
+            .reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Removes a recipient from the group. If the recipient is already not in

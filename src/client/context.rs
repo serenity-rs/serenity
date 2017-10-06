@@ -1,11 +1,11 @@
+use Result;
 use std::sync::Arc;
 use typemap::ShareMap;
 use gateway::Shard;
 use model::*;
 use parking_lot::Mutex;
-use tokio_core::reactor::Handle;
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "builder", feature = "cache"))]
 use super::CACHE;
 #[cfg(feature = "builder")]
 use internal::prelude::*;
@@ -41,20 +41,16 @@ pub struct Context {
     /// Note that if you are sharding, in relevant terms, this is the shard
     /// which received the event being dispatched.
     pub shard: Arc<Mutex<Shard>>,
-    /// A tokio handle for spawning efficient tasks inside commands and events.
-    pub handle: Handle,
 }
 
 impl Context {
     /// Create a new Context to be passed to an event handler.
     pub(crate) fn new(shard: Arc<Mutex<Shard>>,
-                      data: Arc<Mutex<ShareMap>>,
-                      handle: Handle)
+                      data: Arc<Mutex<ShareMap>>)
                       -> Context {
         Context {
             data,
             shard,
-            handle,
         }
     }
 
@@ -399,6 +395,7 @@ impl Context {
     /// [`Client::start`]: ./struct.Client.html#method.start
     pub fn quit(&self) -> Result<()> {
         let mut shard = self.shard.lock();
+
         shard.shutdown_clean()
     }
 }

@@ -82,9 +82,8 @@ impl CacheUpdate for ChannelCreateEvent {
                     .guilds
                     .get_mut(&guild_id)
                     .and_then(|guild| {
-                        guild.with_mut(|guild| {
-                            guild.channels.insert(channel_id, channel.clone())
-                        })
+                        guild
+                            .with_mut(|guild| guild.channels.insert(channel_id, channel.clone()))
                     })
                     .map(Channel::Guild)
             },
@@ -109,12 +108,10 @@ impl CacheUpdate for ChannelCreateEvent {
                 let ch = cache.private_channels.insert(id, channel.clone());
                 ch.map(Channel::Private)
             },
-            Channel::Category(ref category) => {
-                cache
-                    .categories
-                    .insert(category.read().unwrap().id, category.clone())
-                    .map(Channel::Category)
-            },
+            Channel::Category(ref category) => cache
+                .categories
+                .insert(category.read().unwrap().id, category.clone())
+                .map(Channel::Category),
         }
     }
 }
@@ -135,9 +132,10 @@ impl CacheUpdate for ChannelDeleteEvent {
 
                 cache.channels.remove(&channel_id);
 
-                cache.guilds.get_mut(&guild_id).and_then(|guild| {
-                    guild.with_mut(|g| g.channels.remove(&channel_id))
-                });
+                cache
+                    .guilds
+                    .get_mut(&guild_id)
+                    .and_then(|guild| guild.with_mut(|g| g.channels.remove(&channel_id)));
             },
             Channel::Category(ref category) => {
                 let channel_id = category.with(|cat| cat.id);
@@ -146,8 +144,7 @@ impl CacheUpdate for ChannelDeleteEvent {
             },
             // We ignore these two due to the fact that the delete event for dms/groups
             // will _not_ fire anymore.
-            Channel::Private(_) |
-            Channel::Group(_) => unreachable!(),
+            Channel::Private(_) | Channel::Group(_) => unreachable!(),
         };
 
         None
@@ -190,9 +187,9 @@ impl CacheUpdate for ChannelPinsUpdateEvent {
         }
 
         if let Some(group) = cache.groups.get_mut(&self.channel_id) {
-            group.with_mut(
-                |c| { c.last_pin_timestamp = self.last_pin_timestamp; },
-            );
+            group.with_mut(|c| {
+                c.last_pin_timestamp = self.last_pin_timestamp;
+            });
 
             return None;
         }
@@ -285,9 +282,8 @@ impl CacheUpdate for ChannelUpdateEvent {
 
                 cache.channels.insert(channel_id, channel.clone());
                 cache.guilds.get_mut(&guild_id).map(|guild| {
-                    guild.with_mut(
-                        |g| g.channels.insert(channel_id, channel.clone()),
-                    )
+                    guild
+                        .with_mut(|g| g.channels.insert(channel_id, channel.clone()))
                 });
             },
             Channel::Private(ref channel) => {
@@ -297,11 +293,10 @@ impl CacheUpdate for ChannelUpdateEvent {
                     .map(|private| private.clone_from(channel));
             },
             Channel::Category(ref category) => {
-                cache.categories.get_mut(&category.read().unwrap().id).map(
-                    |c| {
-                        c.clone_from(category)
-                    },
-                );
+                cache
+                    .categories
+                    .get_mut(&category.read().unwrap().id)
+                    .map(|c| c.clone_from(category));
             },
         }
 
@@ -352,10 +347,9 @@ impl CacheUpdate for GuildCreateEvent {
         }
 
         cache.channels.extend(guild.channels.clone());
-        cache.guilds.insert(
-            self.guild.id,
-            Arc::new(RwLock::new(guild)),
-        );
+        cache
+            .guilds
+            .insert(self.guild.id, Arc::new(RwLock::new(guild)));
 
         None
     }
@@ -400,8 +394,7 @@ impl<'de> Deserialize<'de> for GuildDeleteEvent {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct GuildEmojisUpdateEvent {
-    #[serde(deserialize_with = "deserialize_emojis")]
-    pub emojis: HashMap<EmojiId, Emoji>,
+    #[serde(deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
     pub guild_id: GuildId,
 }
 
@@ -463,9 +456,8 @@ impl<'de> Deserialize<'de> for GuildMemberAddEvent {
 
         Ok(GuildMemberAddEvent {
             guild_id: guild_id,
-            member: Member::deserialize(Value::Object(map)).map_err(
-                DeError::custom,
-            )?,
+            member: Member::deserialize(Value::Object(map))
+                .map_err(DeError::custom)?,
         })
     }
 }
@@ -578,9 +570,8 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
             .and_then(|v| GuildId::deserialize(v.clone()))
             .map_err(DeError::custom)?;
 
-        let mut members = map.remove("members").ok_or_else(|| {
-            DeError::custom("missing member chunk members")
-        })?;
+        let mut members = map.remove("members")
+            .ok_or_else(|| DeError::custom("missing member chunk members"))?;
 
         if let Some(members) = members.as_array_mut() {
             let num = Value::Number(Number::from(guild_id.0));
@@ -614,10 +605,11 @@ impl CacheUpdate for GuildRoleCreateEvent {
 
     fn update(&mut self, cache: &mut Cache) -> Option<()> {
         cache.guilds.get_mut(&self.guild_id).map(|guild| {
-            guild.write().unwrap().roles.insert(
-                self.role.id,
-                self.role.clone(),
-            )
+            guild
+                .write()
+                .unwrap()
+                .roles
+                .insert(self.role.id, self.role.clone())
         });
 
         None
@@ -635,9 +627,10 @@ impl CacheUpdate for GuildRoleDeleteEvent {
     type Output = Role;
 
     fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
-        cache.guilds.get_mut(&self.guild_id).and_then(|guild| {
-            guild.with_mut(|g| g.roles.remove(&self.role_id))
-        })
+        cache
+            .guilds
+            .get_mut(&self.guild_id)
+            .and_then(|guild| guild.with_mut(|g| g.roles.remove(&self.role_id)))
     }
 }
 
@@ -654,9 +647,9 @@ impl CacheUpdate for GuildRoleUpdateEvent {
     fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
         cache.guilds.get_mut(&self.guild_id).and_then(|guild| {
             guild.with_mut(|g| {
-                g.roles.get_mut(&self.role.id).map(|role| {
-                    mem::replace(role, self.role.clone())
-                })
+                g.roles
+                    .get_mut(&self.role.id)
+                    .map(|role| mem::replace(role, self.role.clone()))
             })
         })
     }
@@ -664,8 +657,7 @@ impl CacheUpdate for GuildRoleUpdateEvent {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct GuildUnavailableEvent {
-    #[serde(rename = "id")]
-    pub guild_id: GuildId,
+    #[serde(rename = "id")] pub guild_id: GuildId,
 }
 
 #[cfg(feature = "cache")]
@@ -737,8 +729,7 @@ pub struct MessageDeleteBulkEvent {
 #[derive(Clone, Copy, Debug, Deserialize)]
 pub struct MessageDeleteEvent {
     pub channel_id: ChannelId,
-    #[serde(rename = "id")]
-    pub message_id: MessageId,
+    #[serde(rename = "id")] pub message_id: MessageId,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -787,19 +778,17 @@ impl CacheUpdate for PresenceUpdateEvent {
                 if self.presence.status == OnlineStatus::Offline {
                     guild.presences.remove(&self.presence.user_id);
                 } else {
-                    guild.presences.insert(
-                        self.presence.user_id,
-                        self.presence.clone(),
-                    );
+                    guild
+                        .presences
+                        .insert(self.presence.user_id, self.presence.clone());
                 }
             }
         } else if self.presence.status == OnlineStatus::Offline {
             cache.presences.remove(&self.presence.user_id);
         } else {
-            cache.presences.insert(
-                self.presence.user_id,
-                self.presence.clone(),
-            );
+            cache
+                .presences
+                .insert(self.presence.user_id, self.presence.clone());
         }
 
         None
@@ -811,24 +800,17 @@ impl<'de> Deserialize<'de> for PresenceUpdateEvent {
         let mut map = JsonMap::deserialize(deserializer)?;
 
         let guild_id = match map.remove("guild_id") {
-            Some(v) => {
-                serde_json::from_value::<Option<GuildId>>(v).map_err(
-                    DeError::custom,
-                )?
-            },
+            Some(v) => serde_json::from_value::<Option<GuildId>>(v)
+                .map_err(DeError::custom)?,
             None => None,
         };
         let roles = match map.remove("roles") {
-            Some(v) => {
-                serde_json::from_value::<Option<Vec<RoleId>>>(v).map_err(
-                    DeError::custom,
-                )?
-            },
+            Some(v) => serde_json::from_value::<Option<Vec<RoleId>>>(v)
+                .map_err(DeError::custom)?,
             None => None,
         };
-        let presence = Presence::deserialize(Value::Object(map)).map_err(
-            DeError::custom,
-        )?;
+        let presence = Presence::deserialize(Value::Object(map))
+            .map_err(DeError::custom)?;
 
         Ok(Self {
             guild_id: guild_id,
@@ -960,8 +942,7 @@ impl<'de> Deserialize<'de> for ReadyEvent {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct ResumedEvent {
-    #[serde(rename = "_trace")]
-    pub trace: Vec<Option<String>>,
+    #[serde(rename = "_trace")] pub trace: Vec<Option<String>>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -1035,10 +1016,9 @@ impl CacheUpdate for VoiceStateUpdateEvent {
                         }
                     }
 
-                    guild.voice_states.insert(
-                        self.voice_state.user_id,
-                        self.voice_state.clone(),
-                    );
+                    guild
+                        .voice_states
+                        .insert(self.voice_state.user_id, self.voice_state.clone());
                 } else {
                     // Remove the user from the voice state list
                     guild.voice_states.remove(&self.voice_state.user_id);
@@ -1062,9 +1042,8 @@ impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
 
         Ok(VoiceStateUpdateEvent {
             guild_id: guild_id,
-            voice_state: VoiceState::deserialize(Value::Object(map)).map_err(
-                DeError::custom,
-            )?,
+            voice_state: VoiceState::deserialize(Value::Object(map))
+                .map_err(DeError::custom)?,
         })
     }
 }
@@ -1412,20 +1391,16 @@ impl VoiceEvent {
         let mut map = JsonMap::deserialize(value)?;
 
         let op = match map.remove("op") {
-            Some(v) => {
-                VoiceOpCode::deserialize(v)
-                    .map_err(JsonError::from)
-                    .map_err(Error::from)?
-            },
+            Some(v) => VoiceOpCode::deserialize(v)
+                .map_err(JsonError::from)
+                .map_err(Error::from)?,
             None => return Err(Error::Decode("expected voice event op", Value::Object(map))),
         };
 
         let d = match map.remove("d") {
-            Some(v) => {
-                JsonMap::deserialize(v).map_err(JsonError::from).map_err(
-                    Error::from,
-                )?
-            },
+            Some(v) => JsonMap::deserialize(v)
+                .map_err(JsonError::from)
+                .map_err(Error::from)?,
             None => {
                 return Err(Error::Decode(
                     "expected voice gateway d",

@@ -89,10 +89,8 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn max_age(mut self, max_age: u64) -> Self {
-        self.0.insert(
-            "max_age".to_owned(),
-            Value::Number(Number::from(max_age)),
-        );
+        self.0
+            .insert("max_age".to_owned(), Value::Number(Number::from(max_age)));
 
         self
     }
@@ -125,10 +123,8 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn max_uses(mut self, max_uses: u64) -> Self {
-        self.0.insert(
-            "max_uses".to_owned(),
-            Value::Number(Number::from(max_uses)),
-        );
+        self.0
+            .insert("max_uses".to_owned(), Value::Number(Number::from(max_uses)));
 
         self
     }
@@ -159,10 +155,8 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn temporary(mut self, temporary: bool) -> Self {
-        self.0.insert(
-            "temporary".to_owned(),
-            Value::Bool(temporary),
-        );
+        self.0
+            .insert("temporary".to_owned(), Value::Bool(temporary));
 
         self
     }

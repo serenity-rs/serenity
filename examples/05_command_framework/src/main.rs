@@ -133,7 +133,7 @@ fn main() {
                 .bucket("emoji") // Make this command use the "emoji" bucket.
                 .exec_str(":cat:")
                  // Allow only administrators to call this:
-                .required_permissions(permissions::ADMINISTRATOR))
+                .required_permissions(Permissions::ADMINISTRATOR))
             .command("dog", |c| c
                 .desc("Sends an emoji with a dog.")
                 .bucket("emoji")

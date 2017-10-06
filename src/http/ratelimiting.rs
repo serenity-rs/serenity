@@ -47,7 +47,7 @@ use hyper::status::StatusCode;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use std::{i64, str, thread};
+use std::{str, thread, i64};
 use super::{HttpError, LightMethod};
 use internal::prelude::*;
 
@@ -399,15 +399,16 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
             let redo = if response.headers.get_raw("x-ratelimit-global").is_some() {
                 let _ = GLOBAL.lock().expect("global route lock poisoned");
 
-                Ok(if let Some(retry_after) =
-                    parse_header(&response.headers, "retry-after")? {
-                    debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-                    thread::sleep(Duration::from_millis(retry_after as u64));
+                Ok(
+                    if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {
+                        debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
+                        thread::sleep(Duration::from_millis(retry_after as u64));
 
-                    true
-                } else {
-                    false
-                })
+                        true
+                    } else {
+                        false
+                    },
+                )
             } else {
                 lock.post_hook(&response, &route)
             };
@@ -504,18 +505,13 @@ impl RateLimit {
 }
 
 fn parse_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
-    match headers.get_raw(header) {
-        Some(header) => {
-            match str::from_utf8(&header[0]) {
-                Ok(v) => {
-                    match v.parse::<i64>() {
-                        Ok(v) => Ok(Some(v)),
-                        Err(_) => Err(Error::Http(HttpError::RateLimitI64)),
-                    }
-                },
-                Err(_) => Err(Error::Http(HttpError::RateLimitUtf8)),
-            }
-        },
-        None => Ok(None),
-    }
+    headers.get_raw(header).map_or(Ok(None), |header| {
+        str::from_utf8(&header[0])
+            .map_err(|_| Error::Http(HttpError::RateLimitUtf8))
+            .and_then(|v| {
+                v.parse::<i64>()
+                    .map(|v| Some(v))
+                    .map_err(|_| Error::Http(HttpError::RateLimitI64))
+            })
+    })
 }

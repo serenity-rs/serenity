@@ -1,6 +1,11 @@
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
-use opus::{Application as CodingMode, Channels, Decoder as OpusDecoder, Encoder as OpusEncoder,
-           packet as opus_packet};
+use opus::{
+    packet as opus_packet,
+    Application as CodingMode,
+    Channels,
+    Decoder as OpusDecoder,
+    Encoder as OpusEncoder,
+};
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
 use std::collections::HashMap;
 use std::io::Write;
@@ -11,7 +16,7 @@ use std::thread::{self, Builder as ThreadBuilder, JoinHandle};
 use std::time::Duration;
 use super::audio::{AudioReceiver, AudioSource, AudioType, HEADER_LEN, SAMPLE_RATE};
 use super::connection_info::ConnectionInfo;
-use super::{CRYPTO_MODE, VoiceError, payload};
+use super::{payload, VoiceError, CRYPTO_MODE};
 use websocket::client::Url as WebsocketUrl;
 use websocket::sync::client::ClientBuilder;
 use websocket::sync::stream::{AsTcpStream, TcpStream, TlsStream};
@@ -68,10 +73,10 @@ impl Connection {
 
         let hello = loop {
             match client.recv_json(VoiceEvent::decode)? {
-                VoiceEvent::Hello(received_hello) => {
+                Some(VoiceEvent::Hello(received_hello)) => {
                     break received_hello;
                 },
-                VoiceEvent::Heartbeat(_) => continue,
+                Some(VoiceEvent::Heartbeat(_)) => continue,
                 other => {
                     debug!("[Voice] Expected hello/heartbeat; got: {:?}", other);
 
@@ -110,27 +115,27 @@ impl Connection {
 
             // Find the position in the bytes that contains the first byte of 0,
             // indicating the "end of the address".
-            let index = bytes.iter().skip(4).position(|&x| x == 0).ok_or(
-                Error::Voice(
-                    VoiceError::FindingByte,
-                ),
-            )?;
+            let index = bytes
+                .iter()
+                .skip(4)
+                .position(|&x| x == 0)
+                .ok_or(Error::Voice(VoiceError::FindingByte))?;
 
             let pos = 4 + index;
             let addr = String::from_utf8_lossy(&bytes[4..pos]);
             let port_pos = len - 2;
             let port = (&bytes[port_pos..]).read_u16::<LittleEndian>()?;
 
-            client.send_json(
-                &payload::build_select_protocol(addr, port),
-            )?;
+            client
+                .send_json(&payload::build_select_protocol(addr, port))?;
         }
 
         let key = encryption_key(&mut client)?;
 
-        let _ = client.stream_ref().as_tcp().set_read_timeout(
-            Some(Duration::from_millis(25)),
-        );
+        let _ = client
+            .stream_ref()
+            .as_tcp()
+            .set_read_timeout(Some(Duration::from_millis(25)));
 
         let mutexed_client = Arc::new(Mutex::new(client));
         let thread_items = start_threads(mutexed_client.clone(), &udp)?;
@@ -178,21 +183,17 @@ impl Connection {
                         let timestamp = handle.read_u32::<BigEndian>()?;
                         let ssrc = handle.read_u32::<BigEndian>()?;
 
-                        nonce.0[..HEADER_LEN].clone_from_slice(
-                            &packet[..HEADER_LEN],
-                        );
+                        nonce.0[..HEADER_LEN]
+                            .clone_from_slice(&packet[..HEADER_LEN]);
 
-                        if let Ok(decrypted) = secretbox::open(
-                            &packet[HEADER_LEN..],
-                            &nonce,
-                            &self.key,
-                        ) {
+                        if let Ok(decrypted) =
+                            secretbox::open(&packet[HEADER_LEN..], &nonce, &self.key) {
                             let channels = opus_packet::get_nb_channels(&decrypted)?;
 
                             let entry =
-                                self.decoder_map.entry((ssrc, channels)).or_insert_with(|| {
-                                    OpusDecoder::new(SAMPLE_RATE, channels).unwrap()
-                                });
+                                self.decoder_map.entry((ssrc, channels)).or_insert_with(
+                                    || OpusDecoder::new(SAMPLE_RATE, channels).unwrap(),
+                                );
 
                             let len = entry.decode(&decrypted, &mut buffer, false)?;
 
@@ -200,13 +201,8 @@ impl Connection {
 
                             let b = if is_stereo { len * 2 } else { len };
 
-                            receiver.voice_packet(
-                                ssrc,
-                                seq,
-                                timestamp,
-                                is_stereo,
-                                &buffer[..b],
-                            );
+                            receiver
+                                .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b]);
                         }
                     },
                     ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
@@ -227,9 +223,10 @@ impl Connection {
 
         // Send the voice websocket keepalive if it's time
         if self.keepalive_timer.check() {
-            self.client.lock().unwrap().send_json(
-                &payload::build_keepalive(),
-            )?;
+            self.client
+                .lock()
+                .unwrap()
+                .send_json(&payload::build_keepalive())?;
         }
 
         // Send UDP keepalive if it's time
@@ -257,14 +254,12 @@ impl Connection {
                 }
 
                 match stream.get_type() {
-                    AudioType::Opus => {
-                        match stream.read_opus_frame() {
-                            Some(frame) => {
-                                opus_frame = frame;
-                                opus_frame.len()
-                            },
-                            None => 0,
-                        }
+                    AudioType::Opus => match stream.read_opus_frame() {
+                        Some(frame) => {
+                            opus_frame = frame;
+                            opus_frame.len()
+                        },
+                        None => 0,
                     },
                     AudioType::Pcm => {
                         let buffer_len = if is_stereo { 960 * 2 } else { 960 };
@@ -326,23 +321,19 @@ impl Connection {
             cursor.write_u32::<BigEndian>(self.ssrc)?;
         }
 
-        nonce.0[..HEADER_LEN].clone_from_slice(
-            &packet[..HEADER_LEN],
-        );
+        nonce.0[..HEADER_LEN]
+            .clone_from_slice(&packet[..HEADER_LEN]);
 
         let sl_index = packet.len() - 16;
         let buffer_len = if self.encoder_stereo { 960 * 2 } else { 960 };
 
         let len = if opus_frame.is_empty() {
-            self.encoder.encode(
-                &buffer[..buffer_len],
-                &mut packet[HEADER_LEN..sl_index],
-            )?
+            self.encoder
+                .encode(&buffer[..buffer_len], &mut packet[HEADER_LEN..sl_index])?
         } else {
             let len = opus_frame.len();
-            packet[HEADER_LEN..HEADER_LEN + len].clone_from_slice(
-                opus_frame,
-            );
+            packet[HEADER_LEN..HEADER_LEN + len]
+                .clone_from_slice(opus_frame);
             len
         };
 
@@ -366,11 +357,10 @@ impl Connection {
 
         self.speaking = speaking;
 
-        self.client.lock().unwrap().send_json(
-            &payload::build_speaking(
-                speaking,
-            ),
-        )
+        self.client
+            .lock()
+            .unwrap()
+            .send_json(&payload::build_speaking(speaking))
     }
 }
 
@@ -390,25 +380,23 @@ fn generate_url(endpoint: &mut String) -> Result<WebsocketUrl> {
         endpoint.truncate(len - 3);
     }
 
-    WebsocketUrl::parse(&format!("wss://{}", endpoint)).or(Err(
-        Error::Voice(VoiceError::EndpointUrl),
-    ))
+    WebsocketUrl::parse(&format!("wss://{}", endpoint))
+        .or(Err(Error::Voice(VoiceError::EndpointUrl)))
 }
 
 #[inline]
 fn encryption_key(client: &mut Client) -> Result<Key> {
     loop {
         match client.recv_json(VoiceEvent::decode)? {
-            VoiceEvent::Ready(ready) => {
+            Some(VoiceEvent::Ready(ready)) => {
                 if ready.mode != CRYPTO_MODE {
                     return Err(Error::Voice(VoiceError::VoiceModeInvalid));
                 }
 
-                return Key::from_slice(&ready.secret_key).ok_or(Error::Voice(
-                    VoiceError::KeyGen,
-                ));
+                return Key::from_slice(&ready.secret_key)
+                    .ok_or(Error::Voice(VoiceError::KeyGen));
             },
-            VoiceEvent::Unknown(op, value) => {
+            Some(VoiceEvent::Unknown(op, value)) => {
                 debug!(
                     "[Voice] Expected ready for key; got: op{}/v{:?}",
                     op.num(),
@@ -459,7 +447,7 @@ fn start_threads(client: Arc<Mutex<Client>>, udp: &UdpSocket) -> Result<ThreadIt
     let ws_thread = ThreadBuilder::new()
         .name(format!("{} WS", thread_name))
         .spawn(move || loop {
-            while let Ok(msg) = client.lock().unwrap().recv_json(VoiceEvent::decode) {
+            while let Ok(Some(msg)) = client.lock().unwrap().recv_json(VoiceEvent::decode) {
                 if tx_clone.send(ReceiverStatus::Websocket(msg)).is_ok() {
                     return;
                 }

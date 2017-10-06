@@ -1,8 +1,6 @@
-use std::fmt::{Display, Formatter, Result as FmtResult};
 use model::*;
-use model::guild::BanOptions;
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
 use builder::{EditGuild, EditMember, EditRole};
@@ -10,6 +8,8 @@ use builder::{EditGuild, EditMember, EditRole};
 use http;
 #[cfg(feature = "model")]
 use internal::prelude::*;
+#[cfg(feature = "model")]
+use model::guild::BanOptions;
 
 #[cfg(feature = "model")]
 impl GuildId {
@@ -481,10 +481,6 @@ impl GuildId {
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> { http::get_guild_webhooks(self.0) }
-}
-
-impl Display for GuildId {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult { Display::fmt(&self.0, f) }
 }
 
 impl From<PartialGuild> for GuildId {

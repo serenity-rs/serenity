@@ -91,12 +91,9 @@ pub enum ActionEmoji {
 
 #[derive(Debug, Deserialize)]
 pub struct Change {
-    #[serde(rename = "key")]
-    pub name: String,
-    #[serde(rename = "old_value")]
-    pub old: String,
-    #[serde(rename = "new_value")]
-    pub new: String,
+    #[serde(rename = "key")] pub name: String,
+    #[serde(rename = "old_value")] pub old: String,
+    #[serde(rename = "new_value")] pub new: String,
 }
 
 #[derive(Debug)]
@@ -180,8 +177,7 @@ impl<'de> Deserialize<'de> for AuditLogs {
         #[derive(Deserialize)]
         #[serde(field_identifier)]
         enum Field {
-            #[serde(rename = "audit_log_entries")]
-            Entries,
+            #[serde(rename = "audit_log_entries")] Entries,
         }
 
         struct EntriesVisitor;

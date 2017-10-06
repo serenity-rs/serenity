@@ -5,7 +5,7 @@ use client::Context;
 use model::{ChannelId, GuildId, UserId};
 
 #[cfg(feature = "cache")]
-type Check = Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + 'static;
+type Check = Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static;
 
 #[cfg(not(feature = "cache"))]
 type Check = Fn(&mut Context, ChannelId, UserId) -> bool + 'static;
@@ -31,9 +31,9 @@ pub(crate) struct Bucket {
 impl Bucket {
     pub fn take(&mut self, user_id: u64) -> i64 {
         let time = Utc::now().timestamp();
-        let user = self.users.entry(user_id).or_insert_with(
-            MemberRatelimit::default,
-        );
+        let user = self.users
+            .entry(user_id)
+            .or_insert_with(MemberRatelimit::default);
 
         if let Some((timespan, limit)) = self.ratelimit.limit {
             if (user.tickets + 1) > limit {

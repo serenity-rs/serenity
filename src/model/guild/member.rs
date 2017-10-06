@@ -5,9 +5,9 @@ use model::*;
 
 #[cfg(feature = "model")]
 use std::borrow::Cow;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use http;
@@ -168,9 +168,10 @@ impl Member {
 
         let default = Colour::default();
 
-        roles.iter().find(|r| r.colour.0 != default.0).map(
-            |r| r.colour,
-        )
+        roles
+            .iter()
+            .find(|r| r.colour.0 != default.0)
+            .map(|r| r.colour)
     }
 
     /// Calculates the member's display name.
@@ -178,9 +179,10 @@ impl Member {
     /// The nickname takes priority over the member's username if it exists.
     #[inline]
     pub fn display_name(&self) -> Cow<String> {
-        self.nick.as_ref().map(Cow::Borrowed).unwrap_or_else(|| {
-            Cow::Owned(self.user.read().unwrap().name.clone())
-        })
+        self.nick
+            .as_ref()
+            .map(Cow::Borrowed)
+            .unwrap_or_else(|| Cow::Owned(self.user.read().unwrap().name.clone()))
     }
 
     /// Returns the DiscordTag of a Member, taking possible nickname into account.
@@ -244,13 +246,14 @@ impl Member {
     pub fn kick(&self) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = permissions::KICK_MEMBERS;
+            let req = Permissions::KICK_MEMBERS;
 
-            let has_perms = CACHE.read().unwrap().guilds.get(&self.guild_id).map(
-                |guild| {
-                    guild.read().unwrap().has_perms(req)
-                },
-            );
+            let has_perms = CACHE
+                .read()
+                .unwrap()
+                .guilds
+                .get(&self.guild_id)
+                .map(|guild| guild.read().unwrap().has_perms(req));
 
             if let Some(Ok(false)) = has_perms {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -294,10 +297,10 @@ impl Member {
             None => return Err(From::from(ModelError::ItemMissing)),
         };
 
-        Ok(guild.permissions_for(
-            default_channel.id,
-            self.user.read().unwrap().id,
-        ))
+        Ok(
+            guild
+                .permissions_for(default_channel.id, self.user.read().unwrap().id),
+        )
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the

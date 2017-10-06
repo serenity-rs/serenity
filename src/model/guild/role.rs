@@ -1,12 +1,11 @@
 use std::cmp::Ordering;
-use std::fmt::{Display, Formatter, Result as FmtResult};
 use model::*;
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
 use builder::EditRole;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use http;
@@ -93,9 +92,8 @@ impl Role {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(all(feature = "builder", feature = "cache"))]
     pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
-        self.find_guild().and_then(
-            |guild_id| guild_id.edit_role(self.id, f),
-        )
+        self.find_guild()
+            .and_then(|guild_id| guild_id.edit_role(self.id, f))
     }
 
     /// Searches the cache for the guild that owns the role.
@@ -186,10 +184,6 @@ impl RoleId {
 
         None
     }
-}
-
-impl Display for RoleId {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult { Display::fmt(&self.0, f) }
 }
 
 impl From<Role> for RoleId {

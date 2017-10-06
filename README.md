@@ -38,16 +38,17 @@ docs.
 
 A basic ping-pong bot looks like:
 
-```rust,no-run
+```rust,ignore
 #[macro_use] extern crate serenity;
 
 use serenity::client::Client;
+use serenity::framework::standard::StandardFramework;
 use std::env;
 
 fn main() {
     // Login with a bot token from the environment
     let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"));
-    client.with_framework(|f| f
+    client.with_framework(StandardFramework::new()
         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
         .on("ping", ping));
 
@@ -71,7 +72,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-serenity = "0.3"
+serenity = "0.4"
 ```
 
 and to the top of your `main.rs`:
