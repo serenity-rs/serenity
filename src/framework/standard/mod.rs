@@ -416,20 +416,6 @@ impl StandardFramework {
         false
     }
 
-    #[cfg(feature = "cache")]
-    fn has_correct_permissions(&self, command: &Arc<Command>, message: &Message) -> bool {
-        if !command.required_permissions.is_empty() {
-            if let Some(guild) = message.guild() {
-                let perms = guild
-                    .with(|g| g.permissions_for(message.channel_id, message.author.id));
-
-                return perms.contains(command.required_permissions);
-            }
-        }
-
-        true
-    }
-
     #[allow(too_many_arguments)]
     fn should_fail(&mut self,
                    mut context: &mut Context,
@@ -495,7 +481,7 @@ impl StandardFramework {
                     return Some(DispatchError::BlockedGuild);
                 }
 
-                if !self.has_correct_permissions(command, message) {
+                if !has_correct_permissions(command, message) {
                     return Some(DispatchError::LackOfPermissions(
                         command.required_permissions,
                     ));
@@ -950,4 +936,18 @@ impl Framework for StandardFramework {
     fn update_current_user(&mut self, user_id: UserId, is_bot: bool) {
         self.user_info = (user_id.0, is_bot);
     }
+}
+
+#[cfg(feature = "cache")]
+pub(crate) fn has_correct_permissions(command: &Arc<Command>, message: &Message) -> bool {
+    if !command.required_permissions.is_empty() {
+        if let Some(guild) = message.guild() {
+            let perms = guild
+                .with(|g| g.permissions_for(message.channel_id, message.author.id));
+
+            return perms.contains(command.required_permissions);
+        }
+    }
+
+    true
 }
