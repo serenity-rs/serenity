@@ -18,7 +18,7 @@ impl<E: StdError> From<E> for Error<E> {
     fn from(e: E) -> Self {
         Error::Parse(e)
     }
-} 
+}
 
 impl<E: StdError> StdError for Error<E> {
     fn description(&self) -> &str {
