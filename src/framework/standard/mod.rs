@@ -901,13 +901,7 @@ impl Framework for StandardFramework {
                             let mut content = message.content[position..].trim();
                             content = content[command_length..].trim();
 
-                            let delimiter = self.configuration
-                                .delimiters
-                                .iter()
-                                .find(|&d| content.contains(d))
-                                .map_or(" ", |s| s.as_str());
-
-                            Args::new(&content, delimiter)
+                            Args::new(&content, self.configuration.delimiters.clone())
                         };
 
                         if let Some(error) = self.should_fail(

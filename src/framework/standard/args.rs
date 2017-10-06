@@ -60,7 +60,12 @@ pub struct Args {
 }
 
 impl Args {
-    pub fn new(message: &str, delimiter: &str) -> Self {
+    pub fn new(message: &str, possible_delimiters: Vec<String>) -> Self {
+        let delimiter = possible_delimiters
+            .iter()
+            .find(|&d| message.contains(d))
+            .map_or(possible_delimiters[0].as_str(), |s| s.as_str());
+
         let split = if message.trim().is_empty() {
             Vec::new()
         } else {
