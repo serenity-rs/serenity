@@ -745,18 +745,58 @@ impl Guild {
     ///
     /// If the prefix is "zey", following results are possible:
     /// - "zey", "zeyla", "zey mei"
-    /// But the following are not because case-sensitivity:
+    /// If 'case_sensitive' is false, the following are not found:
     /// - "Zey", "ZEYla", "zeY mei"
     /// 
     /// [`Member`]: struct.Member.html
-    pub fn members_starting_with(&self, prefix: &str) -> Vec<&Member> {
+    pub fn members_starting_with(&self, prefix: &str, case_sensitive: bool) -> Vec<&Member> {
         self.members
             .values()
             .filter(|member|
-                member.user.read().unwrap().name.starts_with(prefix)
+
+                if case_sensitive {
+                    member.user.read().unwrap().name.starts_with(prefix)
+                } else {
+                    starts_with_case_insensitive(&member.user.read().unwrap().name, &prefix)
+                }
+                
                 || member.nick.as_ref()
                     .map_or(false, |nick|
-                        nick.starts_with(prefix))).collect()
+
+                    if case_sensitive {
+                        nick.starts_with(prefix)
+                    } else {
+                        starts_with_case_insensitive(&nick, &prefix)
+                    })).collect()
+    }
+
+    /// Retrieves all [`Member`] containing a given `String`.
+    ///
+    /// If the substring is "yla", following results are possible:
+    /// - "zeyla", "meiyla", "yladenisyla"
+    /// If 'case_sensitive' is false, the following are not found:
+    /// - "zeYLa", "meiyLa", "LYAdenislyA"
+    /// 
+    /// [`Member`]: struct.Member.html
+    pub fn members_containing(&self, substring: &str, case_sensitive: bool) -> Vec<&Member> {
+        self.members
+            .values()
+            .filter(|member|
+
+                if case_sensitive {
+                    member.user.read().unwrap().name.contains(substring)
+                } else {
+                    contains_case_insensitive(&member.user.read().unwrap().name, &substring)
+                }
+                
+                || member.nick.as_ref()
+                    .map_or(false, |nick|
+
+                    if case_sensitive {
+                        nick.starts_with(substring)
+                    } else {
+                        contains_case_insensitive(&nick, &substring)
+                    })).collect()
     }
 
     /// Moves a member to a specific voice channel.
@@ -789,7 +829,7 @@ impl Guild {
             Some(everyone) => everyone,
             None => {
                 error!(
-                    "(╯°□°）╯︵ ┻━┻ @everyone role ({}) missing in '{}'",
+                    "(?°?°)?? ??? @everyone role ({}) missing in '{}'",
                     self.id,
                     self.name
                 );
@@ -811,7 +851,7 @@ impl Guild {
                 permissions |= role.permissions;
             } else {
                 warn!(
-                    "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
+                    "(?°?°)?? ??? {} on {} has non-existent role {:?}",
                     member.user.read().unwrap().id,
                     self.id,
                     role
@@ -865,7 +905,7 @@ impl Guild {
             }
         } else {
             warn!(
-                "(╯°□°）╯︵ ┻━┻ Guild {} does not contain channel {}",
+                "(?°?°)?? ??? Guild {} does not contain channel {}",
                 self.id,
                 channel_id
             );
@@ -1223,6 +1263,16 @@ impl<'de> Deserialize<'de> for Guild {
     }
 }
 
+/// Checks if a `&str` contains another `&str`.
+fn contains_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
+    to_look_at.to_lowercase().contains(to_find)
+}
+
+/// Checks if a `&str` starts with another `&str`.
+fn starts_with_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
+    to_look_at.to_lowercase().starts_with(to_find)
+}
+
 /// Information relating to a guild's widget embed.
 #[derive(Clone, Copy, Debug, Deserialize)]
 pub struct GuildEmbed {
@@ -1330,7 +1380,7 @@ impl GuildStatus {
 enum_number!(
     #[doc="The level to set as criteria prior to a user being able to send
     messages in a [`Guild`].
-
+    
     [`Guild`]: struct.Guild.html"]
     VerificationLevel {
         /// Does not require any verification.
