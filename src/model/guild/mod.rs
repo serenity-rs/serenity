@@ -123,13 +123,10 @@ pub struct Guild {
 
 #[cfg(feature = "model")]
 impl Guild {
-    #[cfg(feature = "cache")]
-    /// Returns the "default" channel of the guild.
-    /// (This returns the first channel that can be read by the bot, if there isn't one,
+    /// Returns the "default" channel of the guild for the passed user id.
+    /// (This returns the first channel that can be read by the user, if there isn't one,
     /// returns `None`)
-    pub fn default_channel(&self) -> Option<Arc<RwLock<GuildChannel>>> {
-        let uid = CACHE.read().unwrap().user.id;
-
+    pub fn default_channel(&self, uid: UserId) -> Option<Arc<RwLock<GuildChannel>>> {
         for (cid, channel) in &self.channels {
             if self.permissions_for(*cid, uid).read_messages() {
                 return Some(channel.clone());
@@ -163,7 +160,7 @@ impl Guild {
             None => return Err(Error::Model(ModelError::ItemMissing)),
         };
 
-        let default_channel = match self.default_channel() {
+        let default_channel = match self.default_channel(member.user.read().unwrap().id) {
             Some(dc) => dc,
             None => return Err(Error::Model(ModelError::ItemMissing)),
         };

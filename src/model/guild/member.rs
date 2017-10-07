@@ -174,6 +174,26 @@ impl Member {
             .map(|r| r.colour)
     }
 
+    /// Returns the "default channel" of the guild for the member.
+    /// (This returns the first channel that can be read by the member, if there isn't
+    /// one returns `None`)
+    pub fn default_channel(&self) -> Option<Arc<RwLock<GuildChannel>>> {
+        let guild = match self.guild_id.find() {
+            Some(guild) => guild,
+            None => return None,
+        };
+
+        let reader = guild.read().unwrap();
+
+        for (cid, channel) in &reader.channels {
+            if reader.permissions_for(*cid, self.user.read().unwrap().id).read_messages() {
+                return Some(channel.clone());
+            }
+        }
+
+        None
+    }
+
     /// Calculates the member's display name.
     ///
     /// The nickname takes priority over the member's username if it exists.
@@ -292,7 +312,7 @@ impl Member {
 
         let guild = guild.read().unwrap();
 
-        let default_channel = match guild.default_channel() {
+        let default_channel = match guild.default_channel(self.user.read().unwrap().id) {
             Some(dc) => dc,
             None => return Err(From::from(ModelError::ItemMissing)),
         };
