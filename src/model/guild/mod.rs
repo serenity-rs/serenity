@@ -742,18 +742,58 @@ impl Guild {
     ///
     /// If the prefix is "zey", following results are possible:
     /// - "zey", "zeyla", "zey mei"
-    /// But the following are not because case-sensitivity:
+    /// If 'case_sensitive' is false, the following are not found:
     /// - "Zey", "ZEYla", "zeY mei"
     /// 
     /// [`Member`]: struct.Member.html
-    pub fn members_starting_with(&self, prefix: &str) -> Vec<&Member> {
+    pub fn members_starting_with(&self, prefix: &str, case_sensitive: bool) -> Vec<&Member> {
         self.members
             .values()
             .filter(|member|
-                member.user.read().unwrap().name.starts_with(prefix)
+
+                if case_sensitive {
+                    member.user.read().unwrap().name.starts_with(prefix)
+                } else {
+                    starts_with_case_insensitive(&member.user.read().unwrap().name, &prefix)
+                }
+                
                 || member.nick.as_ref()
                     .map_or(false, |nick|
-                        nick.starts_with(prefix))).collect()
+
+                    if case_sensitive {
+                        nick.starts_with(prefix)
+                    } else {
+                        starts_with_case_insensitive(&nick, &prefix)
+                    })).collect()
+    }
+
+    /// Retrieves all [`Member`] containing a given `String`.
+    ///
+    /// If the substring is "yla", following results are possible:
+    /// - "zeyla", "meiyla", "yladenisyla"
+    /// If 'case_sensitive' is false, the following are not found:
+    /// - "zeYLa", "meiyLa", "LYAdenislyA"
+    /// 
+    /// [`Member`]: struct.Member.html
+    pub fn members_containing(&self, substring: &str, case_sensitive: bool) -> Vec<&Member> {
+        self.members
+            .values()
+            .filter(|member|
+
+                if case_sensitive {
+                    member.user.read().unwrap().name.contains(substring)
+                } else {
+                    contains_case_insensitive(&member.user.read().unwrap().name, &substring)
+                }
+                
+                || member.nick.as_ref()
+                    .map_or(false, |nick|
+
+                    if case_sensitive {
+                        nick.starts_with(substring)
+                    } else {
+                        contains_case_insensitive(&nick, &substring)
+                    })).collect()
     }
 
     /// Moves a member to a specific voice channel.
@@ -1218,6 +1258,16 @@ impl<'de> Deserialize<'de> for Guild {
             voice_states: voice_states,
         })
     }
+}
+
+/// Checks if a `&str` contains another `&str`.
+fn contains_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
+    to_look_at.to_lowercase().contains(to_find)
+}
+
+/// Checks if a `&str` starts with another `&str`.
+fn starts_with_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
+    to_look_at.to_lowercase().starts_with(to_find)
 }
 
 /// Information relating to a guild's widget embed.
