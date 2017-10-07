@@ -738,6 +738,24 @@ impl Guild {
             })
     }
 
+    /// Retrieves all [`Member`] that start with a given `String`.
+    ///
+    /// If the prefix is "zey", following results are possible:
+    /// - "zey", "zeyla", "zey mei"
+    /// But the following are not because case-sensitivity:
+    /// - "Zey", "ZEYla", "zeY mei"
+    /// 
+    /// [`Member`]: struct.Member.html
+    pub fn members_starting_with(&self, prefix: &str) -> Vec<&Member> {
+        self.members
+            .values()
+            .filter(|member|
+                member.user.read().unwrap().name.starts_with(prefix)
+                || member.nick.as_ref()
+                    .map_or(false, |nick|
+                        nick.starts_with(prefix))).collect()
+    }
+
     /// Moves a member to a specific voice channel.
     ///
     /// Requires the [Move Members] permission.

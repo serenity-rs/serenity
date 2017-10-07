@@ -31,6 +31,7 @@ use super::{Args, Command, CommandGroup, CommandOrAlias, CommandError};
 use client::Context;
 use model::{ChannelId, Guild, Member, Message};
 use utils::Colour;
+use framework::standard::{has_correct_roles, has_correct_permissions};
 
 fn error_embed(channel_id: &ChannelId, input: &str) {
     let _ = channel_id.send_message(|m| {
@@ -50,14 +51,13 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
     result
 }
 
-fn right_roles(cmd: &Command, guild: &Guild, member: &Member) -> bool {
+/// Checks whether a user is member of required roles 
+/// and given the required permissions.
+fn has_all_requirements(cmd: &Command, guild: &Guild, member: &Member, msg: &Message) -> bool {
     if cmd.allowed_roles.is_empty() {
-        true
+        has_correct_permissions(cmd, msg)
     } else {
-        cmd.allowed_roles
-            .iter()
-            .flat_map(|r| guild.role_by_name(r))
-            .any(|g| member.roles.contains(&g.id))
+        has_correct_roles(cmd, guild, member) && has_correct_permissions(cmd, msg)
     }
 }
 
@@ -106,7 +106,7 @@ pub fn with_embeds(_: &mut Context,
                                     if let Some(member) = guild.members.get(&msg.author.id) {
                                         if let Ok(permissions) = member.permissions() {
                                             if !permissions.administrator() &&
-                                               !right_roles(cmd, &guild, member) {
+                                               !has_all_requirements(cmd, &guild, member, &msg) {
                                                 break;
                                             }
                                         }
@@ -213,7 +213,7 @@ pub fn with_embeds(_: &mut Context,
                             if let Some(member) = guild.members.get(&msg.author.id) {
                                 if let Ok(permissions) = member.permissions() {
                                     if cmd.help_available &&
-                                       (right_roles(cmd, &guild, member) ||
+                                       (has_all_requirements(cmd, &guild, member, &msg) ||
                                         permissions.administrator()) {
                                         let _ = write!(desc, "`{}`\n", name);
                                         has_commands = true;
@@ -279,7 +279,7 @@ pub fn plain(_: &mut Context,
                                     if let Some(member) = guild.members.get(&msg.author.id) {
                                         if let Ok(permissions) = member.permissions() {
                                             if !permissions.administrator() &&
-                                               !right_roles(cmd, &guild, member) {
+                                               !has_all_requirements(cmd, &guild, member, &msg) {
                                                 break;
                                             }
                                         }
@@ -366,7 +366,7 @@ pub fn plain(_: &mut Context,
                 if let Some(member) = guild.members.get(&msg.author.id) {
                     if let Ok(permissions) = member.permissions() {
                         if cmd.help_available &&
-                           (permissions.administrator() || right_roles(cmd, &guild, member)) {
+                           (permissions.administrator() || has_all_requirements(cmd, &guild, member, &msg)) {
                             let _ = write!(group_help, "`{}` ", name);
                         }
                     }

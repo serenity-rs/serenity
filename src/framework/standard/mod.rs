@@ -22,7 +22,7 @@ use std::default::Default;
 use std::sync::Arc;
 use client::Context;
 use super::Framework;
-use model::{ChannelId, GuildId, Message, UserId};
+use model::{ChannelId, GuildId, Guild, Member, Message, UserId};
 use model::permissions::Permissions;
 use internal::RwLockExt;
 
@@ -514,12 +514,7 @@ impl StandardFramework {
                         if let Some(member) = guild.members.get(&message.author.id) {
                             if let Ok(permissions) = member.permissions() {
                                 if !permissions.administrator() {
-                                    let right_role = command
-                                        .allowed_roles
-                                        .iter()
-                                        .flat_map(|r| guild.role_by_name(r))
-                                        .any(|g| member.roles.contains(&g.id));
-                                    if !right_role {
+                                    if !has_correct_roles(&command, &guild, &member) {
                                         return Some(DispatchError::LackingRole);
                                     }
                                 }
@@ -939,7 +934,7 @@ impl Framework for StandardFramework {
 }
 
 #[cfg(feature = "cache")]
-pub(crate) fn has_correct_permissions(command: &Arc<Command>, message: &Message) -> bool {
+pub(crate) fn has_correct_permissions(command: &Command, message: &Message) -> bool {
     if !command.required_permissions.is_empty() {
         if let Some(guild) = message.guild() {
             let perms = guild
@@ -950,4 +945,12 @@ pub(crate) fn has_correct_permissions(command: &Arc<Command>, message: &Message)
     }
 
     true
+}
+
+#[cfg(feature = "cache")]
+pub(crate) fn has_correct_roles(cmd: &Command, guild: &Guild, member: &Member) -> bool {
+    cmd.allowed_roles
+            .iter()
+            .flat_map(|r| guild.role_by_name(r))
+            .any(|g| member.roles.contains(&g.id))
 }
