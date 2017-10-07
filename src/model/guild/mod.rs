@@ -749,7 +749,7 @@ impl Guild {
     /// - "Zey", "ZEYla", "zeY mei"
     /// 
     /// [`Member`]: struct.Member.html
-    pub fn members_starting_with(&self, prefix: &str, case_sensitive: bool) -> Vec<&Member> {
+    pub fn members_starting_with(&self, prefix: &str) -> Vec<&Member> {
         self.members
             .values()
             .filter(|member|
