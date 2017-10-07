@@ -410,7 +410,7 @@ fn encryption_key(client: &mut Client) -> Result<Key> {
 
 #[inline]
 fn has_valid_mode<T, It> (modes: It) -> bool
-where T: PartialEq<str>,
+where T: for<'a> PartialEq<&'a str>,
       It : IntoIterator<Item=T>
 {
     modes.into_iter().any(|s| s == CRYPTO_MODE)
