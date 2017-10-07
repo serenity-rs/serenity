@@ -829,7 +829,7 @@ impl Guild {
             Some(everyone) => everyone,
             None => {
                 error!(
-                    "(?°?°)?? ??? @everyone role ({}) missing in '{}'",
+                    "(╯°□°）╯︵ ┻━┻ @everyone role ({}) missing in '{}'",
                     self.id,
                     self.name
                 );
@@ -851,7 +851,7 @@ impl Guild {
                 permissions |= role.permissions;
             } else {
                 warn!(
-                    "(?°?°)?? ??? {} on {} has non-existent role {:?}",
+                    "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
                     member.user.read().unwrap().id,
                     self.id,
                     role
@@ -905,7 +905,7 @@ impl Guild {
             }
         } else {
             warn!(
-                "(?°?°)?? ??? Guild {} does not contain channel {}",
+                "(╯°□°）╯︵ ┻━┻ Guild {} does not contain channel {}",
                 self.id,
                 channel_id
             );
@@ -1380,7 +1380,7 @@ impl GuildStatus {
 enum_number!(
     #[doc="The level to set as criteria prior to a user being able to send
     messages in a [`Guild`].
-    
+
     [`Guild`]: struct.Guild.html"]
     VerificationLevel {
         /// Does not require any verification.
