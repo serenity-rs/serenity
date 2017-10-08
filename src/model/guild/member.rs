@@ -29,6 +29,10 @@ impl BanOptions for str {
     fn reason(&self) -> &str { self }
 }
 
+impl<'a> BanOptions for &'a str {
+    fn reason(&self) -> &str { self }
+}
+
 impl BanOptions for String {
     fn reason(&self) -> &str { self }
 }
