@@ -21,7 +21,7 @@ use CACHE;
 use http::{self, GuildPagination};
 
 /// Information about the current user.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Default, Debug, Deserialize)]
 pub struct CurrentUser {
     pub id: UserId,
     pub avatar: Option<String>,

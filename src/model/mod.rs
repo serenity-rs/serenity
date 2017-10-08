@@ -48,7 +48,7 @@ macro_rules! id_u64 {
     ($(#[$attr:meta] $name:ident;)*) => {
         $(
             #[$attr]
-            #[derive(Copy, Clone, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
+            #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
             #[allow(derive_hash_xor_eq)]
             pub struct $name(pub u64);
 
