@@ -629,16 +629,7 @@ impl Default for Cache {
             private_channels: HashMap::with_capacity(128),
             shard_count: 1,
             unavailable_guilds: HashSet::default(),
-            user: CurrentUser {
-                avatar: None,
-                bot: false,
-                discriminator: 0,
-                email: None,
-                id: UserId(0),
-                mfa_enabled: false,
-                name: String::default(),
-                verified: false,
-            },
+            user: CurrentUser::default(),
             users: HashMap::default(),
         }
     }
