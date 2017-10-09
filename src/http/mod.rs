@@ -625,7 +625,12 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 pub fn delete_webhook(webhook_id: u64) -> Result<()> {
     verify(
         204,
-        request!(Route::WebhooksId, delete, "/webhooks/{}", webhook_id),
+        request!(
+            Route::WebhooksId(webhook_id),
+            delete,
+            "/webhooks/{}",
+            webhook_id,
+        ),
     )
 }
 
@@ -855,7 +860,12 @@ pub fn edit_role(guild_id: u64, role_id: u64, map: &JsonMap) -> Result<Role> {
 // external crates being incredibly messy and misleading in the end user's view.
 pub fn edit_webhook(webhook_id: u64, map: &Value) -> Result<Webhook> {
     let body = map.to_string();
-    let response = request!(Route::WebhooksId, patch(body), "/webhooks/{}", webhook_id);
+    let response = request!(
+        Route::WebhooksId(webhook_id),
+        patch(body),
+        "/webhooks/{}",
+        webhook_id,
+    );
 
     serde_json::from_reader::<HyperResponse, Webhook>(response)
         .map_err(From::from)
@@ -1518,7 +1528,12 @@ pub fn get_voice_regions() -> Result<Vec<VoiceRegion>> {
 ///
 /// [`get_webhook_with_token`]: fn.get_webhook_with_token.html
 pub fn get_webhook(webhook_id: u64) -> Result<Webhook> {
-    let response = request!(Route::WebhooksId, get, "/webhooks/{}", webhook_id);
+    let response = request!(
+        Route::WebhooksId(webhook_id),
+        get,
+        "/webhooks/{}",
+        webhook_id,
+    );
 
     serde_json::from_reader::<HyperResponse, Webhook>(response)
         .map_err(From::from)

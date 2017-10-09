@@ -338,7 +338,7 @@ pub enum Route {
     /// Route for the `/voice/regions` path.
     VoiceRegions,
     /// Route for the `/webhooks/:webhook_id` path.
-    WebhooksId,
+    WebhooksId(u64),
     /// Route where no ratelimit headers are in place (i.e. user account-only
     /// routes).
     ///
