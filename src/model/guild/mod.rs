@@ -783,28 +783,28 @@ impl Guild {
                     let name_a = match a.nick {
                         Some(ref nick) => {
                             if contains_case_insensitive(&a.user.read().unwrap().name[..], &prefix) {
-                                a.user.read().unwrap().name.to_owned()
+                                a.user.read().unwrap().name.clone()
                             } else {
-                                nick.to_owned()
+                                nick.clone()
                             }
                         },
-                        None => a.user.read().unwrap().name.to_owned(),
+                        None => a.user.read().unwrap().name.clone(),
                     };
 
                     let name_b = match b.nick {
                         Some(ref nick) => {
                             if contains_case_insensitive(&b.user.read().unwrap().name[..], &prefix) {
-                                b.user.read().unwrap().name.to_owned()
+                                b.user.read().unwrap().name.clone()
                             } else {
-                                nick.to_owned()
+                                nick.clone()
                             }
                         },
-                        None => b.user.read().unwrap().name.to_owned(),
+                        None => b.user.read().unwrap().name.clone(),
                     };
 
                     closest_to_origin(&prefix, &name_a[..], &name_b[..])
                 });
-            return members;
+            members
         } else {
             members
         }
@@ -859,28 +859,28 @@ impl Guild {
                     let name_a = match a.nick {
                         Some(ref nick) => {
                             if contains_case_insensitive(&a.user.read().unwrap().name[..], &substring) {
-                                a.user.read().unwrap().name.to_owned()
+                                a.user.read().unwrap().name.clone()
                             } else {
-                                nick.to_owned()
+                                nick.clone()
                             }
                         },
-                        None => a.user.read().unwrap().name.to_owned(),
+                        None => a.user.read().unwrap().name.clone(),
                     };
 
                     let name_b = match b.nick {
                         Some(ref nick) => {
                             if contains_case_insensitive(&b.user.read().unwrap().name[..], &substring) {
-                                b.user.read().unwrap().name.to_owned()
+                                b.user.read().unwrap().name.clone()
                             } else {
-                                nick.to_owned()
+                                nick.clone()
                             }
                         },
-                        None => b.user.read().unwrap().name.to_owned(),
+                        None => b.user.read().unwrap().name.clone(),
                     };
 
                     closest_to_origin(&substring, &name_a[..], &name_b[..])
                 });
-            return members;
+            members
         } else {
             members
         }
@@ -920,7 +920,7 @@ impl Guild {
                     let name_b = &b.user.read().unwrap().name;
                     closest_to_origin(&substring, &name_a[..], &name_b[..])
                 });
-            return members;
+            members
         } else {
             members
         }
@@ -964,21 +964,21 @@ impl Guild {
                 .sort_by(|a, b| {
                     let name_a = match a.nick {
                         Some(ref nick) => {
-                            nick.to_owned()
+                            nick.clone()
                         },
-                        None => a.user.read().unwrap().name.to_owned(),
+                        None => a.user.read().unwrap().name.clone(),
                     };
 
                     let name_b = match b.nick {
                         Some(ref nick) => {
-                                nick.to_owned()
+                                nick.clone()
                             },
-                        None => b.user.read().unwrap().name.to_owned(),
+                        None => b.user.read().unwrap().name.clone(),
                     };
 
                     closest_to_origin(&substring, &name_a[..], &name_b[..])
                 });
-            return members;
+            members
         } else {
             members
         }
