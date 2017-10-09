@@ -44,6 +44,7 @@ use std::sync::atomic::{AtomicBool, Ordering, ATOMIC_BOOL_INIT};
 use parking_lot::Mutex;
 use std::collections::HashMap;
 use std::mem;
+use threadpool::ThreadPool;
 use typemap::ShareMap;
 use http;
 use internal::prelude::*;
@@ -244,6 +245,11 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     /// [`Client::start_shard`]: #method.start_shard
     /// [`Client::start_shards`]: #method.start_shards
     pub shard_runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
+    /// The threadpool shared by all shards.
+    ///
+    /// Defaults to 5 threads, which should suffice small bots. Consider
+    /// increasing this number as your bot grows.
+    pub threadpool: ThreadPool,
     token: Arc<sync::Mutex<String>>,
 }
 
@@ -287,12 +293,16 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
         http::set_token(&token);
         let locked = Arc::new(sync::Mutex::new(token));
 
+        let name = "serenity client".to_owned();
+        let threadpool = ThreadPool::with_name(name, 5);
+
         feature_framework! {{
             Client {
                 data: Arc::new(Mutex::new(ShareMap::custom())),
                 event_handler: Arc::new(handler),
                 framework: Arc::new(sync::Mutex::new(None)),
                 shard_runners: Arc::new(Mutex::new(HashMap::new())),
+                threadpool,
                 token: locked,
             }
         } else {
@@ -300,6 +310,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
                 data: Arc::new(Mutex::new(ShareMap::custom())),
                 event_handler: Arc::new(handler),
                 shard_runners: Arc::new(Mutex::new(HashMap::new())),
+                threadpool,
                 token: locked,
             }
         }}
@@ -761,6 +772,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
             self.event_handler.clone(),
             #[cfg(feature = "framework")]
             self.framework.clone(),
+            self.threadpool.clone(),
         );
 
         self.shard_runners = manager.runners.clone();

@@ -12,6 +12,7 @@ use super::{
     ShardQueuerMessage,
     ShardRunnerInfo,
 };
+use threadpool::ThreadPool;
 use typemap::ShareMap;
 
 #[cfg(feature = "framework")]
@@ -40,6 +41,7 @@ impl ShardManager {
         data: Arc<ParkingLotMutex<ShareMap>>,
         event_handler: Arc<H>,
         framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
+        threadpool: ThreadPool,
     ) -> Self where H: EventHandler + Send + Sync + 'static {
         let (thread_tx, thread_rx) = mpsc::channel();
         let (shard_queue_tx, shard_queue_rx) = mpsc::channel();
@@ -56,6 +58,7 @@ impl ShardManager {
             rx: shard_queue_rx,
             token: token.clone(),
             ws_url: ws_url.clone(),
+            threadpool,
         };
 
         thread::spawn(move || {
@@ -81,6 +84,7 @@ impl ShardManager {
         token: Arc<Mutex<String>>,
         data: Arc<ParkingLotMutex<ShareMap>>,
         event_handler: Arc<H>,
+        threadpool: ThreadPool,
     ) -> Self where H: EventHandler + Send + Sync + 'static {
         let (thread_tx, thread_rx) = mpsc::channel();
         let (shard_queue_tx, shard_queue_rx) = mpsc::channel();
@@ -96,6 +100,7 @@ impl ShardManager {
             rx: shard_queue_rx,
             token: token.clone(),
             ws_url: ws_url.clone(),
+            threadpool,
         };
 
         thread::spawn(move || {

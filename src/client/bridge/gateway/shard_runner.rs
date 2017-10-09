@@ -30,15 +30,16 @@ pub struct ShardRunner<H: EventHandler + Send + Sync + 'static> {
 
 impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
     #[cfg(feature = "framework")]
-    pub fn new(shard: LockedShard,
-               manager_tx: Sender<ShardManagerMessage>,
-               framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
-               data: Arc<ParkingLotMutex<ShareMap>>,
-               event_handler: Arc<H>) -> Self {
+    pub fn new(
+        shard: LockedShard,
+        manager_tx: Sender<ShardManagerMessage>,
+        framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
+        data: Arc<ParkingLotMutex<ShareMap>>,
+        event_handler: Arc<H>,
+        threadpool: ThreadPool,
+    ) -> Self {
         let (tx, rx) = mpsc::channel();
         let shard_info = shard.lock().shard_info();
-
-        let name = format!("threadpool {:?}", shard_info);
 
         Self {
             runner_rx: rx,
@@ -49,19 +50,20 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             manager_tx,
             shard,
             shard_info,
-            threadpool: ThreadPool::with_name(name, 15),
+            threadpool,
         }
     }
 
     #[cfg(not(feature = "framework"))]
-    pub fn new(shard: LockedShard,
-               manager_tx: Sender<ShardManagerMessage>,
-               data: Arc<ParkingLotMutex<ShareMap>>,
-               event_handler: Arc<H>) -> Self {
+    pub fn new(
+        shard: LockedShard,
+        manager_tx: Sender<ShardManagerMessage>,
+        data: Arc<ParkingLotMutex<ShareMap>>,
+        event_handler: Arc<H>,
+        threadpool: ThreadPool,
+    ) -> Self {
         let (tx, rx) = mpsc::channel();
         let shard_info = shard.lock().shard_info();
-
-        let name = format!("threadpool {:?}", shard_info);
 
         Self {
             runner_rx: rx,
@@ -71,7 +73,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             manager_tx,
             shard,
             shard_info,
-            threadpool: ThreadPool::with_name(name, 15),
+            threadpool,
         }
     }
 
