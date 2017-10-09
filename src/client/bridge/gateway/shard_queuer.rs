@@ -14,6 +14,7 @@ use super::{
     ShardRunner,
     ShardRunnerInfo,
 };
+use threadpool::ThreadPool;
 use typemap::ShareMap;
 
 #[cfg(feature = "framework")]
@@ -34,6 +35,7 @@ pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static> {
     pub manager_tx: Sender<ShardManagerMessage>,
     pub runners: Arc<ParkingLotMutex<HashMap<ShardId, ShardRunnerInfo>>>,
     pub rx: Receiver<ShardQueuerMessage>,
+    pub threadpool: ThreadPool,
     pub token: Arc<Mutex<String>>,
     pub ws_url: Arc<Mutex<String>>,
 }
@@ -88,6 +90,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
                 self.framework.clone(),
                 self.data.clone(),
                 self.event_handler.clone(),
+                self.threadpool.clone(),
             )
         } else {
             ShardRunner::new(
@@ -95,6 +98,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
                 self.manager_tx.clone(),
                 self.data.clone(),
                 self.event_handler.clone(),
+                self.threadpool.clone(),
             )
         }};
 
