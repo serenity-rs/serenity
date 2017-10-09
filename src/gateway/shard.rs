@@ -354,6 +354,8 @@ impl Shard {
                         info!("[Shard {:?}] Resumed", self.shard_info);
 
                         self.stage = ConnectionStage::Connected;
+                        self.last_heartbeat_acknowledged = true;
+                        self.heartbeat_instants = (Some(Instant::now()), None);
                     },
                     #[cfg_attr(rustfmt, rustfmt_skip)]
                     ref _other => {
