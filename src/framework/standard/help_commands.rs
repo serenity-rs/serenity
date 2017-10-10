@@ -53,7 +53,7 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 
 /// Checks whether a user is member of required roles 
 /// and given the required permissions.
-fn has_all_requirements(cmd: &Command, guild: &Guild, member: &Member, msg: &Message) -> bool {
+pub fn has_all_requirements(cmd: &Command, guild: &Guild, member: &Member, msg: &Message) -> bool {
     if cmd.allowed_roles.is_empty() {
         has_correct_permissions(cmd, msg)
     } else {

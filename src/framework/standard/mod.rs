@@ -942,7 +942,7 @@ impl Framework for StandardFramework {
 }
 
 #[cfg(feature = "cache")]
-pub(crate) fn has_correct_permissions(command: &Command, message: &Message) -> bool {
+pub fn has_correct_permissions(command: &Command, message: &Message) -> bool {
     if !command.required_permissions.is_empty() {
         if let Some(guild) = message.guild() {
             let perms = guild
@@ -956,7 +956,7 @@ pub(crate) fn has_correct_permissions(command: &Command, message: &Message) -> b
 }
 
 #[cfg(feature = "cache")]
-pub(crate) fn has_correct_roles(cmd: &Command, guild: &Guild, member: &Member) -> bool {
+pub fn has_correct_roles(cmd: &Command, guild: &Guild, member: &Member) -> bool {
     cmd.allowed_roles
             .iter()
             .flat_map(|r| guild.role_by_name(r))
