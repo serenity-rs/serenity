@@ -53,6 +53,10 @@ impl<E: StdError> fmt::Display for Error<E> {
 
 type Result<T, E> = ::std::result::Result<T, Error<E>>;
 
+/// A utility struct for handling arguments of a command.
+///
+/// General functionality is done via removing an item, parsing it, then returning it; this however
+/// can be mitigated with the `*_n` methods, which just parse and return.
 #[derive(Clone, Debug)]
 pub struct Args {
     delimiter: String,
