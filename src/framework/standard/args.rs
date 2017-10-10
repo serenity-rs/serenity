@@ -160,16 +160,14 @@ impl Args {
     }
 
     /// Empty outs the internal vector while parsing (if necessary) and returning them
-    pub fn list<T: FromStr>(self) -> Result<Vec<T>, T::Err>
+    pub fn list<T: FromStr>(mut self) -> Result<Vec<T>, T::Err>
         where T::Err: StdError {
-        if self.delimiter_split.is_empty() {
-            return Err(Error::Eos);
-        }
-
-        self.delimiter_split
-            .into_iter()
-            .map(|s| s.parse::<T>().map_err(Error::Parse))
-            .collect()
+        Iter::<T>::new(&mut self).collect()
+    }
+    
+    /// Provides an iterator of items: (`T: FromStr`) `Result<T, T::Err>`. 
+    pub fn iter<T: FromStr>(&mut self) -> Iter<T> where T::Err: StdError  {
+        Iter::new(self)
     }
 
     /// This method is just `internal_vector.join(delimiter)`
@@ -219,4 +217,30 @@ impl ::std::ops::Deref for Args {
     type Target = [String];
 
     fn deref(&self) -> &Self::Target { &self.delimiter_split }
+}
+
+use std::marker::PhantomData;
+
+/// Provides `list`'s functionality, but as an iterator.
+pub struct Iter<'a, T: FromStr> where T::Err: StdError {
+    args: &'a mut Args,
+    _marker: PhantomData<T>,
+}
+
+impl<'a, T: FromStr> Iter<'a, T> where T::Err: StdError {
+    fn new(args: &'a mut Args) -> Self {
+        Iter { args, _marker: PhantomData }
+    }
+}
+
+impl<'a, T: FromStr> Iterator for Iter<'a, T> where T::Err: StdError  {
+    type Item = Result<T, T::Err>;
+    
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.args.is_empty() {
+            None
+        } else {
+            Some(self.args.single::<T>())
+        }
+    }
 }
