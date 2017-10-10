@@ -1060,7 +1060,8 @@ pub enum GatewayEvent {
     Dispatch(u64, Event),
     Heartbeat(u64),
     Reconnect,
-    InvalidateSession,
+    /// Whether the session can be resumed.
+    InvalidateSession(bool),
     Hello(u64),
     HeartbeatAck,
 }
@@ -1096,7 +1097,15 @@ impl GatewayEvent {
                 GatewayEvent::Heartbeat(s)
             },
             OpCode::Reconnect => GatewayEvent::Reconnect,
-            OpCode::InvalidSession => GatewayEvent::InvalidateSession,
+            OpCode::InvalidSession => {
+                let resumable = map.remove("d")
+                    .ok_or_else(|| {
+                        DeError::custom("expected gateway invalid session d")
+                    })
+                    .and_then(bool::deserialize)?;
+
+                GatewayEvent::InvalidateSession(resumable)
+            },
             OpCode::Hello => {
                 let mut d = map.remove("d")
                     .ok_or_else(|| DeError::custom("expected gateway hello d"))

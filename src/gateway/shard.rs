@@ -434,16 +434,17 @@ impl Shard {
                     self.autoreconnect().and(Ok(None))
                 }
             },
-            Ok(GatewayEvent::InvalidateSession) => {
+            Ok(GatewayEvent::InvalidateSession(resumable)) => {
                 info!(
-                    "[Shard {:?}] Received session invalidation; re-identifying",
-                    self.shard_info
+                    "[Shard {:?}] Received session invalidation",
+                    self.shard_info,
                 );
 
-                self.seq = 0;
-                self.session_id = None;
-
-                self.identify().and(Ok(None))
+                if resumable {
+                    self.resume().and(Ok(None))
+                } else {
+                    self.identify().and(Ok(None))
+                }
             },
             Ok(GatewayEvent::Reconnect) => self.reconnect().and(Ok(None)),
             Err(Error::Gateway(GatewayError::Closed(data))) => {
@@ -981,6 +982,7 @@ impl Shard {
         self.heartbeat_instants = (Some(Instant::now()), None);
         self.heartbeat_interval = None;
         self.last_heartbeat_acknowledged = true;
+        self.session_id = None;
         self.stage = ConnectionStage::Disconnected;
         self.seq = 0;
     }
