@@ -125,9 +125,9 @@ impl Colour {
     /// assert_eq!(colour.tuple(), (217, 45, 215));
     /// ```
     pub fn from_rgb(r: u8, g: u8, b: u8) -> Colour {
-        let mut uint = r as u32;
-        uint = (uint << 8) | (g as u32);
-        uint = (uint << 8) | (b as u32);
+        let mut uint = u32::from(r);
+        uint = (uint << 8) | (u32::from(g));
+        uint = (uint << 8) | (u32::from(b));
 
         Colour(uint)
     }

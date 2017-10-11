@@ -80,16 +80,20 @@ impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
 
     fn start(&mut self, shard_id: ShardId, shard_total: ShardId) -> Result<()> {
         let shard_info = [shard_id.0, shard_total.0];
-        let shard = Shard::new(self.ws_url.clone(), self.token.clone(), shard_info)?;
+        let shard = Shard::new(
+            Arc::clone(&self.ws_url),
+            Arc::clone(&self.token),
+            shard_info,
+        )?;
         let locked = Arc::new(ParkingLotMutex::new(shard));
 
         let mut runner = feature_framework! {{
             ShardRunner::new(
-                locked.clone(),
+                Arc::clone(&locked),
                 self.manager_tx.clone(),
-                self.framework.clone(),
-                self.data.clone(),
-                self.event_handler.clone(),
+                Arc::clone(&self.framework),
+                Arc::clone(&self.data),
+                Arc::clone(&self.event_handler),
                 self.threadpool.clone(),
             )
         } else {

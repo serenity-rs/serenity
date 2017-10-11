@@ -417,6 +417,7 @@ impl StandardFramework {
     }
 
     #[allow(too_many_arguments)]
+    #[cfg_attr(feature = "cargo-clippy", allow(cyclomatic_complexity))]
     fn should_fail(&mut self,
                    mut context: &mut Context,
                    message: &Message,
@@ -511,12 +512,12 @@ impl StandardFramework {
                 if !command.allowed_roles.is_empty() {
                     if let Some(guild) = message.guild() {
                         let guild = guild.read().unwrap();
+
                         if let Some(member) = guild.members.get(&message.author.id) {
                             if let Ok(permissions) = member.permissions() {
-                                if !permissions.administrator() {
-                                    if !has_correct_roles(&command, &guild, &member) {
-                                        return Some(DispatchError::LackingRole);
-                                    }
+                                if !permissions.administrator()
+                                    && !has_correct_roles(command, &guild, member) {
+                                    return Some(DispatchError::LackingRole);
                                 }
                             }
                         }
@@ -531,7 +532,7 @@ impl StandardFramework {
                 if all_passed {
                     None
                 } else {
-                    Some(DispatchError::CheckFailed(command.clone()))
+                    Some(DispatchError::CheckFailed(Arc::clone(command)))
                 }
             }
         }
@@ -876,7 +877,7 @@ impl Framework for StandardFramework {
                     if let Some(&CommandOrAlias::Command(ref command)) =
                         group.commands.get(&to_check) {
                         let before = self.before.clone();
-                        let command = command.clone();
+                        let command = Arc::clone(command);
                         let after = self.after.clone();
                         let groups = self.groups.clone();
 

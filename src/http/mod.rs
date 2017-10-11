@@ -1632,7 +1632,7 @@ pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, m
     let mut request = Multipart::from_request(request)?;
     let mut file_num = "0".to_string();
 
-    for file in files.into_iter() {
+    for file in files {
         match file.into() {
             AttachmentType::Bytes((mut bytes, filename)) => {
                 request

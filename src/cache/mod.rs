@@ -301,15 +301,15 @@ impl Cache {
         let id = id.into();
 
         if let Some(channel) = self.channels.get(&id) {
-            return Some(Channel::Guild(channel.clone()));
+            return Some(Channel::Guild(Arc::clone(channel)));
         }
 
         if let Some(private_channel) = self.private_channels.get(&id) {
-            return Some(Channel::Private(private_channel.clone()));
+            return Some(Channel::Private(Arc::clone(private_channel)));
         }
 
         if let Some(group) = self.groups.get(&id) {
-            return Some(Channel::Group(group.clone()));
+            return Some(Channel::Group(Arc::clone(group)));
         }
 
         None

@@ -755,7 +755,7 @@ impl Guild {
     /// - "zeya", "zeyaa", "zeyla", "zeyzey", "zeyzeyzey"
     /// It would be sorted:
     /// - "zeya", "zeyaa", "zeyla", "zeyzey", "zeyzeyzey"
-    /// 
+    ///
     /// [`Member`]: struct.Member.html
     pub fn members_starting_with(&self, prefix: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
         let mut members: Vec<&Member> = self.members
@@ -765,24 +765,24 @@ impl Guild {
                 if case_sensitive {
                     member.user.read().unwrap().name.starts_with(prefix)
                 } else {
-                    starts_with_case_insensitive(&member.user.read().unwrap().name, &prefix)
+                    starts_with_case_insensitive(&member.user.read().unwrap().name, prefix)
                 }
-                
+
                 || member.nick.as_ref()
                     .map_or(false, |nick|
 
                     if case_sensitive {
                         nick.starts_with(prefix)
                     } else {
-                        starts_with_case_insensitive(&nick, &prefix)
+                        starts_with_case_insensitive(nick, prefix)
                     })).collect();
 
         if sorted {
-            members 
+            members
                 .sort_by(|a, b| {
                     let name_a = match a.nick {
                         Some(ref nick) => {
-                            if contains_case_insensitive(&a.user.read().unwrap().name[..], &prefix) {
+                            if contains_case_insensitive(&a.user.read().unwrap().name[..], prefix) {
                                 a.user.read().unwrap().name.clone()
                             } else {
                                 nick.clone()
@@ -793,7 +793,7 @@ impl Guild {
 
                     let name_b = match b.nick {
                         Some(ref nick) => {
-                            if contains_case_insensitive(&b.user.read().unwrap().name[..], &prefix) {
+                            if contains_case_insensitive(&b.user.read().unwrap().name[..], prefix) {
                                 b.user.read().unwrap().name.clone()
                             } else {
                                 nick.clone()
@@ -802,7 +802,7 @@ impl Guild {
                         None => b.user.read().unwrap().name.clone(),
                     };
 
-                    closest_to_origin(&prefix, &name_a[..], &name_b[..])
+                    closest_to_origin(prefix, &name_a[..], &name_b[..])
                 });
             members
         } else {
@@ -810,7 +810,7 @@ impl Guild {
         }
     }
 
-    /// Retrieves all [`Member`] containing a given `String` as 
+    /// Retrieves all [`Member`] containing a given `String` as
     /// either username or nick, with a priority on username.
     ///
     /// If the substring is "yla", following results are possible:
@@ -827,10 +827,10 @@ impl Guild {
     /// It would be sorted:
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
-    /// **Note**: Due to two fields of a `Member` being candidates for 
+    /// **Note**: Due to two fields of a `Member` being candidates for
     /// the searched field, setting `sorted` to `true` will result in an overhead,
     /// as both fields have to be considered again for sorting.
-    /// 
+    ///
     /// [`Member`]: struct.Member.html
     pub fn members_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
         let mut members: Vec<&Member> = self.members
@@ -840,25 +840,25 @@ impl Guild {
                 if case_sensitive {
                     member.user.read().unwrap().name.contains(substring)
                 } else {
-                    contains_case_insensitive(&member.user.read().unwrap().name, &substring)
+                    contains_case_insensitive(&member.user.read().unwrap().name, substring)
                 }
-                
+
                 || member.nick.as_ref()
                     .map_or(false, |nick| {
 
                         if case_sensitive {
                             nick.contains(substring)
                         } else {
-                            contains_case_insensitive(&nick, &substring)
+                            contains_case_insensitive(nick, substring)
                         }
                     })).collect();
 
         if sorted {
-            members 
+            members
                 .sort_by(|a, b| {
                     let name_a = match a.nick {
                         Some(ref nick) => {
-                            if contains_case_insensitive(&a.user.read().unwrap().name[..], &substring) {
+                            if contains_case_insensitive(&a.user.read().unwrap().name[..], substring) {
                                 a.user.read().unwrap().name.clone()
                             } else {
                                 nick.clone()
@@ -869,7 +869,7 @@ impl Guild {
 
                     let name_b = match b.nick {
                         Some(ref nick) => {
-                            if contains_case_insensitive(&b.user.read().unwrap().name[..], &substring) {
+                            if contains_case_insensitive(&b.user.read().unwrap().name[..], substring) {
                                 b.user.read().unwrap().name.clone()
                             } else {
                                 nick.clone()
@@ -878,7 +878,7 @@ impl Guild {
                         None => b.user.read().unwrap().name.clone(),
                     };
 
-                    closest_to_origin(&substring, &name_a[..], &name_b[..])
+                    closest_to_origin(substring, &name_a[..], &name_b[..])
                 });
             members
         } else {
@@ -886,7 +886,7 @@ impl Guild {
         }
     }
 
-    /// Retrieves all [`Member`] containing a given `String` in 
+    /// Retrieves all [`Member`] containing a given `String` in
     /// their username.
     ///
     /// If the substring is "yla", following results are possible:
@@ -909,16 +909,16 @@ impl Guild {
                 if case_sensitive {
                     member.user.read().unwrap().name.contains(substring)
                 } else {
-                    contains_case_insensitive(&member.user.read().unwrap().name, &substring)
+                    contains_case_insensitive(&member.user.read().unwrap().name, substring)
                 }
             }).collect();
 
         if sorted {
-            members 
+            members
                 .sort_by(|a, b| {
                     let name_a = &a.user.read().unwrap().name;
                     let name_b = &b.user.read().unwrap().name;
-                    closest_to_origin(&substring, &name_a[..], &name_b[..])
+                    closest_to_origin(substring, &name_a[..], &name_b[..])
                 });
             members
         } else {
@@ -926,7 +926,7 @@ impl Guild {
         }
     }
 
-    /// Retrieves all [`Member`] containing a given `String` in 
+    /// Retrieves all [`Member`] containing a given `String` in
     /// their nick.
     ///
     /// If the substring is "yla", following results are possible:
@@ -955,12 +955,12 @@ impl Guild {
                         if case_sensitive {
                             nick.contains(substring)
                         } else {
-                            contains_case_insensitive(&nick, &substring)
+                            contains_case_insensitive(nick, substring)
                         }
                     })).collect();
 
         if sorted {
-            members 
+            members
                 .sort_by(|a, b| {
                     let name_a = match a.nick {
                         Some(ref nick) => {
@@ -976,7 +976,7 @@ impl Guild {
                         None => b.user.read().unwrap().name.clone(),
                     };
 
-                    closest_to_origin(&substring, &name_a[..], &name_b[..])
+                    closest_to_origin(substring, &name_a[..], &name_b[..])
                 });
             members
         } else {
@@ -1470,12 +1470,12 @@ fn closest_to_origin(origin: &str, word_a: &str, word_b: &str) -> std::cmp::Orde
         Some(value) => value + word_a.len(),
         None => return std::cmp::Ordering::Greater,
     };
-    
+
     let value_b = match word_b.find(origin) {
         Some(value) => value + word_b.len(),
         None => return std::cmp::Ordering::Less,
     };
-    
+
     value_a.cmp(&value_b)
 }
 

@@ -206,7 +206,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                 let cache = CACHE.read().unwrap();
 
                 if cache.unavailable_guilds.is_empty() {
-                    let context = context(conn.clone(), data.clone());
+                    let context = context(Arc::clone(&conn), Arc::clone(&data));
 
                     let guild_amount = cache
                         .guilds
