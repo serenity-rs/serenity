@@ -1,7 +1,7 @@
 use internal::prelude::*;
 use internal::ws_impl::ReceiverExt;
 use model::event::{Event, GatewayEvent};
-use parking_lot::Mutex as ParkingLotMutex;
+use parking_lot::Mutex;
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::Arc;
 use super::super::super::{EventHandler, dispatch};
@@ -12,11 +12,9 @@ use websocket::WebSocketError;
 
 #[cfg(feature = "framework")]
 use framework::Framework;
-#[cfg(feature = "framework")]
-use std::sync::Mutex;
 
 pub struct ShardRunner<H: EventHandler + Send + Sync + 'static> {
-    data: Arc<ParkingLotMutex<ShareMap>>,
+    data: Arc<Mutex<ShareMap>>,
     event_handler: Arc<H>,
     #[cfg(feature = "framework")]
     framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
@@ -34,7 +32,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
         shard: LockedShard,
         manager_tx: Sender<ShardManagerMessage>,
         framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
-        data: Arc<ParkingLotMutex<ShareMap>>,
+        data: Arc<Mutex<ShareMap>>,
         event_handler: Arc<H>,
         threadpool: ThreadPool,
     ) -> Self {
@@ -58,7 +56,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
     pub fn new(
         shard: LockedShard,
         manager_tx: Sender<ShardManagerMessage>,
-        data: Arc<ParkingLotMutex<ShareMap>>,
+        data: Arc<Mutex<ShareMap>>,
         event_handler: Arc<H>,
         threadpool: ThreadPool,
     ) -> Self {

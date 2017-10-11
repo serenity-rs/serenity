@@ -1,6 +1,7 @@
+use parking_lot::RwLock;
 use serde::de::Error as DeError;
 use serde_json;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 use super::utils::*;
 use super::*;
 

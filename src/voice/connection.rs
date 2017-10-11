@@ -1,4 +1,5 @@
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
+use parking_lot::Mutex;
 use opus::{
     packet as opus_packet,
     Application as CodingMode,
@@ -11,7 +12,7 @@ use std::collections::HashMap;
 use std::io::Write;
 use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
 use std::sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender};
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::thread::{self, Builder as ThreadBuilder, JoinHandle};
 use std::time::Duration;
 use super::audio::{AudioReceiver, AudioSource, AudioType, HEADER_LEN, SAMPLE_RATE};
@@ -223,10 +224,7 @@ impl Connection {
 
         // Send the voice websocket keepalive if it's time
         if self.keepalive_timer.check() {
-            self.client
-                .lock()
-                .unwrap()
-                .send_json(&payload::build_keepalive())?;
+            self.client.lock().send_json(&payload::build_keepalive())?;
         }
 
         // Send UDP keepalive if it's time
@@ -357,10 +355,7 @@ impl Connection {
 
         self.speaking = speaking;
 
-        self.client
-            .lock()
-            .unwrap()
-            .send_json(&payload::build_speaking(speaking))
+        self.client.lock().send_json(&payload::build_speaking(speaking))
     }
 }
 
@@ -452,7 +447,7 @@ fn start_threads(client: Arc<Mutex<Client>>, udp: &UdpSocket) -> Result<ThreadIt
     let ws_thread = ThreadBuilder::new()
         .name(format!("{} WS", thread_name))
         .spawn(move || loop {
-            while let Ok(Some(msg)) = client.lock().unwrap().recv_json(VoiceEvent::decode) {
+            while let Ok(Some(msg)) = client.lock().recv_json(VoiceEvent::decode) {
                 if tx_clone.send(ReceiverStatus::Websocket(msg)).is_ok() {
                     return;
                 }

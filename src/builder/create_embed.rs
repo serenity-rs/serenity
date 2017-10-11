@@ -249,20 +249,20 @@ impl CreateEmbed {
     /// impl EventHandler for Handler {
     ///     fn on_guild_member_addition(&self, _: Context, guild_id: GuildId, member: Member) {
     ///         use serenity::client::CACHE;
-    ///         let cache = CACHE.read().unwrap();
+    ///         let cache = CACHE.read();
     ///
     ///         if let Some(guild) = cache.guild(guild_id) {
-    ///             let guild = guild.read().unwrap();
+    ///             let guild = guild.read();
     ///
     ///             let channel_search = guild
     ///                 .channels
     ///                 .values()
-    ///                 .find(|c| c.read().unwrap().name == "join-log");
+    ///                 .find(|c| c.read().name == "join-log");
     ///
     ///             if let Some(channel) = channel_search {
-    ///                 let user = member.user.read().unwrap();
+    ///                 let user = member.user.read();
     ///
-    ///                 let _ = channel.read().unwrap().send_message(|m| m
+    ///                 let _ = channel.read().send_message(|m| m
     ///                     .embed(|e| {
     ///                         let mut e = e
     ///                             .author(|a| a.icon_url(&user.face()).name(&user.name))

@@ -51,7 +51,7 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
     result
 }
 
-/// Checks whether a user is member of required roles 
+/// Checks whether a user is member of required roles
 /// and given the required permissions.
 fn has_all_requirements(cmd: &Command, guild: &Guild, member: &Member, msg: &Message) -> bool {
     if cmd.allowed_roles.is_empty() {
@@ -102,7 +102,8 @@ pub fn with_embeds(_: &mut Context,
                         CommandOrAlias::Command(ref cmd) => {
                             if !cmd.allowed_roles.is_empty() {
                                 if let Some(guild) = msg.guild() {
-                                    let guild = guild.read().unwrap();
+                                    let guild = guild.read();
+
                                     if let Some(member) = guild.members.get(&msg.author.id) {
                                         if let Ok(permissions) = member.permissions() {
                                             if !permissions.administrator() &&
@@ -209,7 +210,8 @@ pub fn with_embeds(_: &mut Context,
 
                     if cmd.help_available {
                         if let Some(guild) = msg.guild() {
-                            let guild = guild.read().unwrap();
+                            let guild = guild.read();
+
                             if let Some(member) = guild.members.get(&msg.author.id) {
                                 if let Ok(permissions) = member.permissions() {
                                     if cmd.help_available &&
@@ -275,7 +277,8 @@ pub fn plain(_: &mut Context,
                         CommandOrAlias::Command(ref cmd) => {
                             if !cmd.allowed_roles.is_empty() {
                                 if let Some(guild) = msg.guild() {
-                                    let guild = guild.read().unwrap();
+                                    let guild = guild.read();
+
                                     if let Some(member) = guild.members.get(&msg.author.id) {
                                         if let Ok(permissions) = member.permissions() {
                                             if !permissions.administrator() &&
@@ -362,7 +365,8 @@ pub fn plain(_: &mut Context,
         for name in command_names {
             let cmd = &commands[name];
             if let Some(guild) = msg.guild() {
-                let guild = guild.read().unwrap();
+                let guild = guild.read();
+
                 if let Some(member) = guild.members.get(&msg.author.id) {
                     if let Ok(permissions) = member.permissions() {
                         if cmd.help_available &&

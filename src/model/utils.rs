@@ -1,6 +1,7 @@
+use parking_lot::RwLock;
 use serde::de::Error as DeError;
 use std::collections::HashMap;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 use super::*;
 
 #[cfg(feature = "cache")]
@@ -44,7 +45,7 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
     let mut members = HashMap::new();
 
     for member in vec {
-        let user_id = member.user.read().unwrap().id;
+        let user_id = member.user.read().id;
 
         members.insert(user_id, member);
     }
@@ -73,8 +74,8 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
 
     for private_channel in vec {
         let id = match private_channel {
-            Channel::Group(ref group) => group.read().unwrap().channel_id,
-            Channel::Private(ref channel) => channel.read().unwrap().id,
+            Channel::Group(ref group) => group.read().channel_id,
+            Channel::Private(ref channel) => channel.read().id,
             Channel::Guild(_) => unreachable!("Guild private channel decode"),
             Channel::Category(_) => unreachable!("Channel category private channel decode"),
         };
@@ -147,7 +148,7 @@ pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
 
 #[cfg(all(feature = "cache", feature = "model"))]
 pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Result<bool> {
-    let cache = CACHE.read().unwrap();
+    let cache = CACHE.read();
     let current_user = &cache.user;
 
     let channel = match cache.channel(channel_id) {
@@ -156,7 +157,7 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
     };
 
     let guild_id = match channel {
-        Channel::Guild(channel) => channel.read().unwrap().guild_id,
+        Channel::Guild(channel) => channel.read().guild_id,
         Channel::Group(_) | Channel::Private(_) | Channel::Category(_) => {
             // Both users in DMs, and all users in groups and maybe all channels in categories will
             // have the same
@@ -177,10 +178,7 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
         None => return Err(Error::Model(ModelError::ItemMissing)),
     };
 
-    let perms = guild
-        .read()
-        .unwrap()
-        .permissions_for(channel_id, current_user.id);
+    let perms = guild.read().permissions_for(channel_id, current_user.id);
 
     permissions.remove(perms);
 

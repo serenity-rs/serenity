@@ -1,11 +1,10 @@
+use parking_lot::RwLock;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::sync::Arc;
 use super::context::Context;
 use model::event::*;
 use model::*;
-
-use std::sync::RwLock;
 
 pub trait EventHandler {
     #[cfg(feature = "cache")]

@@ -1,8 +1,8 @@
 use internal::prelude::*;
-use parking_lot::Mutex as ParkingLotMutex;
+use parking_lot::Mutex;
 use std::collections::HashMap;
 use std::sync::mpsc::{self, Receiver, Sender};
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::thread;
 use super::super::super::EventHandler;
 use super::{
@@ -19,7 +19,7 @@ use typemap::ShareMap;
 use framework::Framework;
 
 pub struct ShardManager {
-    pub runners: Arc<ParkingLotMutex<HashMap<ShardId, ShardRunnerInfo>>>,
+    pub runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
     /// The index of the first shard to initialize, 0-indexed.
     shard_index: u64,
     /// The number of shards to initialize.
@@ -38,7 +38,7 @@ impl ShardManager {
         shard_total: u64,
         ws_url: Arc<Mutex<String>>,
         token: Arc<Mutex<String>>,
-        data: Arc<ParkingLotMutex<ShareMap>>,
+        data: Arc<Mutex<ShareMap>>,
         event_handler: Arc<H>,
         framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
         threadpool: ThreadPool,
@@ -46,7 +46,7 @@ impl ShardManager {
         let (thread_tx, thread_rx) = mpsc::channel();
         let (shard_queue_tx, shard_queue_rx) = mpsc::channel();
 
-        let runners = Arc::new(ParkingLotMutex::new(HashMap::new()));
+        let runners = Arc::new(Mutex::new(HashMap::new()));
 
         let mut shard_queuer = ShardQueuer {
             data: data.clone(),
@@ -82,14 +82,14 @@ impl ShardManager {
         shard_total: u64,
         ws_url: Arc<Mutex<String>>,
         token: Arc<Mutex<String>>,
-        data: Arc<ParkingLotMutex<ShareMap>>,
+        data: Arc<Mutex<ShareMap>>,
         event_handler: Arc<H>,
         threadpool: ThreadPool,
     ) -> Self where H: EventHandler + Send + Sync + 'static {
         let (thread_tx, thread_rx) = mpsc::channel();
         let (shard_queue_tx, shard_queue_rx) = mpsc::channel();
 
-        let runners = Arc::new(ParkingLotMutex::new(HashMap::new()));
+        let runners = Arc::new(Mutex::new(HashMap::new()));
 
         let mut shard_queuer = ShardQueuer {
             data: data.clone(),

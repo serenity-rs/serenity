@@ -199,7 +199,7 @@ command!(about_role(_ctx, msg, args) {
     if let Some(guild) = msg.guild() {
         // `role_by_name()` allows us to attempt attaining a reference to a role
         // via its name.
-        if let Some(role) = guild.read().unwrap().role_by_name(&potential_role_name) {
+        if let Some(role) = guild.read().role_by_name(&potential_role_name) {
             if let Err(why) = msg.channel_id.say(&format!("Role-ID: {}", role.id)) {
                 println!("Error sending message: {:?}", why);
             }

@@ -44,8 +44,9 @@ use chrono::Utc;
 use hyper::client::{RequestBuilder, Response};
 use hyper::header::Headers;
 use hyper::status::StatusCode;
+use parking_lot::Mutex;
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::time::Duration;
 use std::{str, thread, i64};
 use super::{HttpError, LightMethod};
@@ -80,10 +81,8 @@ lazy_static! {
     /// ```rust,no_run
     /// use serenity::http::ratelimiting::{ROUTES, Route};
     ///
-    /// let routes = ROUTES.lock().unwrap();
-    ///
-    /// if let Some(route) = routes.get(&Route::ChannelsId(7)) {
-    ///     println!("Reset time at: {}", route.lock().unwrap().reset);
+    /// if let Some(route) = ROUTES.lock().get(&Route::ChannelsId(7)) {
+    ///     println!("Reset time at: {}", route.lock().reset);
     /// }
     /// ```
     ///
@@ -352,7 +351,7 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
     loop {
         // This will block if another thread already has the global
         // unlocked already (due to receiving an x-ratelimit-global).
-        let _ = GLOBAL.lock().expect("global route lock poisoned");
+        let _ = GLOBAL.lock();
 
         // Perform pre-checking here:
         //
@@ -364,7 +363,6 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
         // - then, perform the request
         let bucket = ROUTES
             .lock()
-            .expect("routes poisoned")
             .entry(route)
             .or_insert_with(|| {
                 Arc::new(Mutex::new(RateLimit {
@@ -375,7 +373,7 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
             })
             .clone();
 
-        let mut lock = bucket.lock().unwrap();
+        let mut lock = bucket.lock();
         lock.pre_hook(&route);
 
         let response = super::retry(&f)?;
@@ -397,7 +395,7 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
             return Ok(response);
         } else {
             let redo = if response.headers.get_raw("x-ratelimit-global").is_some() {
-                let _ = GLOBAL.lock().expect("global route lock poisoned");
+                let _ = GLOBAL.lock();
 
                 Ok(
                     if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {

@@ -400,7 +400,7 @@ impl StandardFramework {
 
     #[cfg(feature = "cache")]
     fn is_blocked_guild(&self, message: &Message) -> bool {
-        if let Some(Channel::Guild(channel)) = CACHE.read().unwrap().channel(message.channel_id) {
+        if let Some(Channel::Guild(channel)) = CACHE.read().channel(message.channel_id) {
             let guild_id = channel.with(|g| g.guild_id);
             if self.configuration.blocked_guilds.contains(&guild_id) {
                 return true;
@@ -510,7 +510,8 @@ impl StandardFramework {
             } else {
                 if !command.allowed_roles.is_empty() {
                     if let Some(guild) = message.guild() {
-                        let guild = guild.read().unwrap();
+                        let guild = guild.read();
+
                         if let Some(member) = guild.members.get(&message.author.id) {
                             if let Ok(permissions) = member.permissions() {
                                 if !permissions.administrator() {

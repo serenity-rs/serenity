@@ -107,6 +107,7 @@ extern crate serde_json;
 extern crate lazy_static;
 
 extern crate chrono;
+extern crate parking_lot;
 extern crate serde;
 
 #[cfg(feature = "utils")]
@@ -125,8 +126,6 @@ extern crate multipart;
 extern crate native_tls;
 #[cfg(feature = "voice")]
 extern crate opus;
-#[cfg(feature = "client")]
-extern crate parking_lot;
 #[cfg(feature = "voice")]
 extern crate sodiumoxide;
 #[cfg(feature = "threadpool")]
@@ -172,7 +171,7 @@ pub use client::Client;
 #[cfg(feature = "cache")]
 use cache::Cache;
 #[cfg(feature = "cache")]
-use std::sync::RwLock;
+use parking_lot::RwLock;
 
 #[cfg(feature = "cache")]
 lazy_static! {
@@ -197,15 +196,8 @@ lazy_static! {
     /// ```rust,ignore
     /// use serenity::CACHE;
     ///
-    /// println!("{}", CACHE.read().unwrap().user.id);
+    /// println!("{}", CACHE.read().user.id);
     /// ```
-    ///
-    /// By `unwrap()`ing, the thread managing an event dispatch will be blocked
-    /// until the guard can be opened.
-    ///
-    /// If you do not want to block the current thread, you may instead use
-    /// `RwLock::try_read`. Refer to `RwLock`'s documentation in the stdlib for
-    /// more information.
     ///
     /// [`CurrentUser`]: model/struct.CurrentUser.html
     /// [`Cache`]: cache/struct.Cache.html

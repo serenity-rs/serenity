@@ -224,14 +224,14 @@ impl ChannelId {
 
     /// Search the cache for the channel with the Id.
     #[cfg(feature = "cache")]
-    pub fn find(&self) -> Option<Channel> { CACHE.read().unwrap().channel(*self) }
+    pub fn find(&self) -> Option<Channel> { CACHE.read().channel(*self) }
 
     /// Search the cache for the channel. If it can't be found, the channel is
     /// requested over REST.
     pub fn get(&self) -> Result<Channel> {
         #[cfg(feature = "cache")]
         {
-            if let Some(channel) = CACHE.read().unwrap().channel(*self) {
+            if let Some(channel) = CACHE.read().channel(*self) {
                 return Ok(channel);
             }
         }
@@ -311,13 +311,13 @@ impl ChannelId {
         };
 
         Some(match channel {
-            Guild(channel) => channel.read().unwrap().name().to_string(),
-            Group(channel) => match channel.read().unwrap().name() {
+            Guild(channel) => channel.read().name().to_string(),
+            Group(channel) => match channel.read().name() {
                 Cow::Borrowed(name) => name.to_string(),
                 Cow::Owned(name) => name,
             },
-            Category(category) => category.read().unwrap().name().to_string(),
-            Private(channel) => channel.read().unwrap().name(),
+            Category(category) => category.read().name().to_string(),
+            Private(channel) => channel.read().name(),
         })
     }
 

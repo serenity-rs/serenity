@@ -157,12 +157,12 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     ///
-    /// let cache = CACHE.read().unwrap();
+    /// let cache = CACHE.read();
     /// let channel = cache
     ///     .guild_channel(channel_id)
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.read().unwrap().create_permission(&overwrite)?;
+    /// channel.read().create_permission(&overwrite)?;
     /// #     Ok(())
     /// # }
     /// #
@@ -199,12 +199,12 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     ///
-    /// let cache = CACHE.read().unwrap();
+    /// let cache = CACHE.read();
     /// let channel = cache
     ///     .guild_channel(channel_id)
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.read().unwrap().create_permission(&overwrite)?;
+    /// channel.read().create_permission(&overwrite)?;
     /// #     Ok(())
     /// # }
     /// #
@@ -365,7 +365,7 @@ impl GuildChannel {
     /// **Note**: Right now this performs a clone of the guild. This will be
     /// optimized in the future.
     #[cfg(feature = "cache")]
-    pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().unwrap().guild(self.guild_id) }
+    pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().guild(self.guild_id) }
 
     /// Gets all of the channel's invites.
     ///
@@ -436,12 +436,12 @@ impl GuildChannel {
     ///
     /// impl EventHandler for Handler {
     ///     fn on_message(&self, _: Context, msg: Message) {
-    ///         let channel = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
+    ///         let channel = match CACHE.read().guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
-    ///         let permissions = channel.read().unwrap().permissions_for(&msg.author).unwrap();
+    ///         let permissions = channel.read().permissions_for(&msg.author).unwrap();
     ///
     ///         println!("The user's permissions: {:?}", permissions);
     ///     }
@@ -464,14 +464,14 @@ impl GuildChannel {
     ///
     /// impl EventHandler for Handler {
     ///     fn on_message(&self, _: Context, msg: Message) {
-    ///         let channel = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
+    ///         let channel = match CACHE.read().guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
-    ///         let current_user_id = CACHE.read().unwrap().user.id;
+    ///         let current_user_id = CACHE.read().user.id;
     /// let permissions =
-    /// channel.read().unwrap().permissions_for(current_user_id).unwrap();
+    /// channel.read().permissions_for(current_user_id).unwrap();
     ///
     /// if !permissions.contains(Permissions::ATTACH_FILES |
     /// Permissions::SEND_MESSAGES) {
@@ -512,7 +512,7 @@ impl GuildChannel {
     pub fn permissions_for<U: Into<UserId>>(&self, user_id: U) -> Result<Permissions> {
         self.guild()
             .ok_or_else(|| Error::Model(ModelError::GuildNotFound))
-            .map(|g| g.read().unwrap().permissions_for(self.id, user_id))
+            .map(|g| g.read().permissions_for(self.id, user_id))
     }
 
     /// Pins a [`Message`] to the channel.

@@ -83,7 +83,7 @@ impl Context {
 
         feature_cache! {
             {
-                let cache = CACHE.read().unwrap();
+                let cache = CACHE.read();
 
                 map.insert("username".to_string(), Value::String(cache.user.name.clone()));
 

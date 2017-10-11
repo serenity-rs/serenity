@@ -1,9 +1,10 @@
 use chrono::Utc;
+use parking_lot::Mutex;
 use serde_json::Value;
 use std::env::consts;
 use std::io::Write;
 use std::net::Shutdown;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
 use super::{ConnectionStage, GatewayError};
 use websocket::client::Url;
@@ -108,25 +109,39 @@ impl Shard {
     /// Instantiating a new Shard manually for a bot with no shards, and
     /// then listening for events:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
+    /// extern crate parking_lot;
+    /// extern crate serenity;
+    /// #
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #
+    /// use parking_lot::Mutex;
     /// use serenity::gateway::Shard;
     /// use serenity::http;
     /// use std::env;
+    /// use std::sync::Arc;
     ///
-    /// let token = env::var("DISCORD_BOT_TOKEN").expect("Token in environment");
+    /// let token = Arc::new(Mutex::new(env::var("DISCORD_BOT_TOKEN")?));
     /// // retrieve the gateway response, which contains the URL to connect to
-    /// let gateway = http::get_gateway().expect("Valid gateway response").url;
-    /// let shard = Shard::new(&gateway, &token, None)
-    ///     .expect("Working shard");
+    /// let gateway = Arc::new(Mutex::new(http::get_gateway()?.url));
+    /// let shard = Shard::new(gateway, token, [0, 1])?;
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
     /// ```
     pub fn new(ws_url: Arc<Mutex<String>>,
                token: Arc<Mutex<String>>,
                shard_info: [u64; 2])
                -> Result<Shard> {
-        let client = connect(&*ws_url.lock().unwrap())?;
+        let client = connect(&*ws_url.lock())?;
 
         let current_presence = (None, OnlineStatus::Online, false);
         let heartbeat_instants = (None, None);
@@ -188,14 +203,26 @@ impl Shard {
     /// Retrieving the shard info for the second shard, out of two shards total:
     ///
     /// ```rust,no_run
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
+    /// #
+    /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
-    /// # use std::sync::{Arc, Mutex};
+    /// # use std::error::Error;
+    /// # use std::sync::Arc;
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_string()));
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let shard = Shard::new(mutex.clone(), mutex, [1, 2]).unwrap();
+    /// #     let shard = Shard::new(mutex.clone(), mutex, [1, 2]).unwrap();
     /// #
     /// assert_eq!(shard.shard_info(), [1, 2]);
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
     /// ```
     pub fn shard_info(&self) -> [u64; 2] { self.shard_info }
 
@@ -218,16 +245,28 @@ impl Shard {
     /// Setting the current game to playing `"Heroes of the Storm"`:
     ///
     /// ```rust,no_run
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
+    /// #
+    /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
-    /// # use std::sync::{Arc, Mutex};
+    /// # use std::error::Error;
+    /// # use std::sync::Arc;
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_string()));
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
+    /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
     /// use serenity::model::Game;
     ///
     /// shard.set_game(Some(Game::playing("Heroes of the Storm")));
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
     /// ```
     pub fn set_game(&mut self, game: Option<Game>) {
         self.current_presence.0 = game;
@@ -247,16 +286,28 @@ impl Shard {
     /// Setting the current online status for the shard to [`DoNotDisturb`].
     ///
     /// ```rust,no_run
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
+    /// #
+    /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
-    /// # use std::sync::{Arc, Mutex};
+    /// # use std::error::Error;
+    /// # use std::sync::Arc;
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_string()));
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
+    /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
     /// use serenity::model::OnlineStatus;
     ///
     /// shard.set_status(OnlineStatus::DoNotDisturb);
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
     /// ```
     ///
     /// [`DoNotDisturb`]: ../../model/enum.OnlineStatus.html#variant.DoNotDisturb
@@ -282,17 +333,29 @@ impl Shard {
     /// and not being afk:
     ///
     /// ```rust,no_run
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
+    /// #
+    /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
-    /// # use std::sync::{Arc, Mutex};
+    /// # use std::error::Error;
+    /// # use std::sync::Arc;
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_string()));
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
+    /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
     /// use serenity::model::{Game, OnlineStatus};
     ///
     /// shard.set_presence(Some(Game::playing("Heroes of the Storm")), OnlineStatus::Online,
     /// false);
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
     /// ```
     pub fn set_presence(&mut self, game: Option<Game>, mut status: OnlineStatus, afk: bool) {
         if status == OnlineStatus::Offline {
@@ -638,36 +701,60 @@ impl Shard {
     /// specifying a query parameter:
     ///
     /// ```rust,no_run
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
+    /// #
+    /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
-    /// # use std::sync::{Arc, Mutex};
+    /// # use std::error::Error;
+    /// # use std::sync::Arc;
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_string()));
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
+    /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1])?;
     /// #
     /// use serenity::model::GuildId;
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
     /// shard.chunk_guilds(&guild_ids, Some(2000), None);
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
     /// ```
     ///
     /// Chunk a single guild by Id, limiting to 20 members, and specifying a
     /// query parameter of `"do"`:
     ///
     /// ```rust,no_run
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
+    /// #
+    /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
-    /// # use std::sync::{Arc, Mutex};
+    /// # use std::error::Error;
+    /// # use std::sync::Arc;
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_string()));
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
+    /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1])?;
     /// #
     /// use serenity::model::GuildId;
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
     /// shard.chunk_guilds(&guild_ids, Some(20), Some("do"));
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
     /// ```
     ///
     /// [`Event::GuildMembersChunk`]:
@@ -702,24 +789,36 @@ impl Shard {
     /// Retrieve the number of guilds a shard is responsible for:
     ///
     /// ```rust,no_run
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
+    /// #
+    /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
-    /// # use std::sync::{Arc, Mutex};
+    /// # use std::error::Error;
+    /// # use std::sync::Arc;
     /// #
-    /// # let mutex = Arc::new(Mutex::new("will anyone read this".to_string()));
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #     let mutex = Arc::new(Mutex::new("will anyone read this".to_string()));
     /// #
-    /// # let shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
+    /// #     let shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
     /// let info = shard.shard_info();
     /// let guilds = shard.guilds_handled();
     ///
     /// println!("Shard {:?} is responsible for {} guilds", info, guilds);
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
     /// ```
     ///
     /// [`Cache`]: ../ext/cache/struct.Cache.html
     /// [`Guild`]: ../model/struct.Guild.html
     #[cfg(feature = "cache")]
     pub fn guilds_handled(&self) -> u16 {
-        let cache = CACHE.read().unwrap();
+        let cache = CACHE.read();
 
         let (shard_id, shard_count) = (self.shard_info[0], self.shard_info[1]);
 
@@ -926,7 +1025,7 @@ impl Shard {
             "d": {
                 "session_id": session_id,
                 "seq": self.seq,
-                "token": &*self.token.lock().unwrap(),
+                "token": &*self.token.lock(),
             },
         }))
     }
@@ -947,7 +1046,7 @@ impl Shard {
         // This is used to accurately assess whether the state of the shard is
         // accurate when a Hello is received.
         self.stage = ConnectionStage::Connecting;
-        self.client = connect(&self.ws_url.lock().unwrap())?;
+        self.client = connect(&self.ws_url.lock())?;
         self.stage = ConnectionStage::Handshake;
 
         Ok(())
@@ -960,7 +1059,7 @@ impl Shard {
                 "compression": true,
                 "large_threshold": constants::LARGE_THRESHOLD,
                 "shard": self.shard_info,
-                "token": &*self.token.lock().unwrap(),
+                "token": &*self.token.lock(),
                 "v": constants::GATEWAY_VERSION,
                 "properties": {
                     "$browser": "serenity",
@@ -1015,7 +1114,7 @@ impl Shard {
 
         #[cfg(feature = "cache")]
         {
-            let mut cache = CACHE.write().unwrap();
+            let mut cache = CACHE.write();
             let current_user_id = cache.user.id;
 
             cache.presences.get_mut(&current_user_id).map(|presence| {

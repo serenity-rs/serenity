@@ -279,6 +279,6 @@ impl PrivateChannel {
 impl Display for PrivateChannel {
     /// Formats the private channel, displaying the recipient's username.
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        f.write_str(&self.recipient.read().unwrap().name)
+        f.write_str(&self.recipient.read().name)
     }
 }

@@ -39,7 +39,7 @@ pub use CACHE;
 
 use self::bridge::gateway::{ShardId, ShardManager, ShardRunnerInfo};
 use self::dispatch::dispatch;
-use std::sync::{self, Arc};
+use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering, ATOMIC_BOOL_INIT};
 use parking_lot::Mutex;
 use std::collections::HashMap;
@@ -192,7 +192,7 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`on_ready`]: #method.on_ready
     event_handler: Arc<H>,
-    #[cfg(feature = "framework")] framework: Arc<sync::Mutex<Option<Box<Framework + Send>>>>,
+    #[cfg(feature = "framework")] framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
     /// A HashMap of all shards instantiated by the Client.
     ///
     /// The key is the shard ID and the value is the shard itself.
@@ -250,7 +250,7 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     /// Defaults to 5 threads, which should suffice small bots. Consider
     /// increasing this number as your bot grows.
     pub threadpool: ThreadPool,
-    token: Arc<sync::Mutex<String>>,
+    token: Arc<Mutex<String>>,
 }
 
 impl<H: EventHandler + Send + Sync + 'static> Client<H> {
@@ -291,7 +291,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
         };
 
         http::set_token(&token);
-        let locked = Arc::new(sync::Mutex::new(token));
+        let locked = Arc::new(Mutex::new(token));
 
         let name = "serenity client".to_owned();
         let threadpool = ThreadPool::with_name(name, 5);
@@ -300,7 +300,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
             Client {
                 data: Arc::new(Mutex::new(ShareMap::custom())),
                 event_handler: Arc::new(handler),
-                framework: Arc::new(sync::Mutex::new(None)),
+                framework: Arc::new(Mutex::new(None)),
                 shard_runners: Arc::new(Mutex::new(HashMap::new())),
                 threadpool,
                 token: locked,
@@ -417,7 +417,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// [framework docs]: ../framework/index.html
     #[cfg(feature = "framework")]
     pub fn with_framework<F: Framework + Send + 'static>(&mut self, f: F) {
-        self.framework = Arc::new(sync::Mutex::new(Some(Box::new(f))));
+        self.framework = Arc::new(Mutex::new(Some(Box::new(f))));
     }
 
     /// Establish the connection and start listening for events.
@@ -755,12 +755,12 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
         {
             let user = http::get_current_user()?;
 
-            if let Some(ref mut framework) = *self.framework.lock().unwrap() {
+            if let Some(ref mut framework) = *self.framework.lock() {
                 framework.update_current_user(user.id, user.bot);
             }
         }
 
-        let gateway_url = Arc::new(sync::Mutex::new(url));
+        let gateway_url = Arc::new(Mutex::new(url));
 
         let mut manager = ShardManager::new(
             shard_data[0],

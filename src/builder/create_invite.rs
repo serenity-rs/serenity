@@ -21,7 +21,7 @@ use internal::prelude::*;
 ///     fn on_message(&self, _: Context, msg: Message) {
 ///         use serenity::client::CACHE;
 ///         if msg.content == "!createinvite" {
-///             let channel = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
+///             let channel = match CACHE.read().guild_channel(msg.channel_id) {
 ///                 Some(channel) => channel,
 ///                 None => {
 ///                     let _ = msg.channel_id.say("Error creating invite");
@@ -30,7 +30,7 @@ use internal::prelude::*;
 ///                 },
 ///             };
 ///
-///             let reader = channel.read().unwrap();
+///             let reader = channel.read();
 ///
 ///             let invite = match reader.create_invite(|i| i.max_age(3600).max_uses(10)) {
 ///                 Ok(invite) => invite,
@@ -77,8 +77,8 @@ impl CreateInvite {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let channel = CACHE.read().unwrap().guild_channel(81384788765712384).unwrap();
-    /// #     let channel = channel.read().unwrap();
+    /// #     let channel = CACHE.read().guild_channel(81384788765712384).unwrap();
+    /// #     let channel = channel.read();
     /// #
     /// let invite = channel.create_invite(|i| i.max_age(3600))?;
     /// #     Ok(())
@@ -111,8 +111,8 @@ impl CreateInvite {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let channel = CACHE.read().unwrap().guild_channel(81384788765712384).unwrap();
-    /// #     let channel = channel.read().unwrap();
+    /// #     let channel = CACHE.read().guild_channel(81384788765712384).unwrap();
+    /// #     let channel = channel.read();
     /// #
     /// let invite = channel.create_invite(|i| i.max_uses(5))?;
     /// #     Ok(())
@@ -143,8 +143,8 @@ impl CreateInvite {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let channel = CACHE.read().unwrap().guild_channel(81384788765712384).unwrap();
-    /// #     let channel = channel.read().unwrap();
+    /// #     let channel = CACHE.read().guild_channel(81384788765712384).unwrap();
+    /// #     let channel = channel.read();
     /// #
     /// let invite = channel.create_invite(|i| i.temporary(true))?;
     /// #     Ok(())
@@ -175,8 +175,8 @@ impl CreateInvite {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let channel = CACHE.read().unwrap().guild_channel(81384788765712384).unwrap();
-    /// #     let channel = channel.read().unwrap();
+    /// #     let channel = CACHE.read().guild_channel(81384788765712384).unwrap();
+    /// #     let channel = channel.read();
     /// #
     /// let invite = channel.create_invite(|i| i.unique(true))?;
     /// #     Ok(())

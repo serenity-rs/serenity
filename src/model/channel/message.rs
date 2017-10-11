@@ -97,12 +97,12 @@ impl Message {
     ///
     /// command!(channel_name(_ctx, msg) {
     ///     let _ = match msg.channel() {
-    ///         Some(Channel::Category(c)) => msg.reply(&c.read().unwrap().name),
-    ///         Some(Channel::Group(c)) => msg.reply(&c.read().unwrap().name()),
-    ///         Some(Channel::Guild(c)) => msg.reply(&c.read().unwrap().name),
+    ///         Some(Channel::Category(c)) => msg.reply(&c.read().name),
+    ///         Some(Channel::Group(c)) => msg.reply(&c.read().name()),
+    ///         Some(Channel::Guild(c)) => msg.reply(&c.read().name),
     ///         Some(Channel::Private(c)) => {
-    ///             let channel = c.read().unwrap();
-    ///             let user = channel.recipient.read().unwrap();
+    ///             let channel = c.read();
+    ///             let user = channel.recipient.read();
     ///
     ///             msg.reply(&format!("DM with {}", user.name.clone()))
     ///         },
@@ -113,12 +113,12 @@ impl Message {
     /// ```
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn channel(&self) -> Option<Channel> { CACHE.read().unwrap().channel(self.channel_id) }
+    pub fn channel(&self) -> Option<Channel> { CACHE.read().channel(self.channel_id) }
 
     /// A util function for determining whether this message was sent by someone else, or the
     /// bot.
     #[cfg(all(feature = "cache", feature = "utils"))]
-    pub fn is_own(&self) -> bool { self.author.id == CACHE.read().unwrap().user.id }
+    pub fn is_own(&self) -> bool { self.author.id == CACHE.read().user.id }
 
     /// Deletes the message.
     ///
@@ -138,7 +138,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_MESSAGES;
-            let is_author = self.author.id == CACHE.read().unwrap().user.id;
+            let is_author = self.author.id == CACHE.read().user.id;
             let has_perms = utils::user_has_perms(self.channel_id, req)?;
 
             if !is_author && !has_perms {
@@ -211,7 +211,7 @@ impl Message {
         where F: FnOnce(CreateMessage) -> CreateMessage {
         #[cfg(feature = "cache")]
         {
-            if self.author.id != CACHE.read().unwrap().user.id {
+            if self.author.id != CACHE.read().user.id {
                 return Err(Error::Model(ModelError::InvalidUser));
             }
         }
@@ -335,7 +335,7 @@ impl Message {
     #[cfg(feature = "cache")]
     pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> {
         self.guild_id()
-            .and_then(|guild_id| CACHE.read().unwrap().guild(guild_id))
+            .and_then(|guild_id| CACHE.read().guild(guild_id))
     }
 
     /// Retrieves the Id of the guild that the message was sent in, if sent in
@@ -345,8 +345,8 @@ impl Message {
     /// cache.
     #[cfg(feature = "cache")]
     pub fn guild_id(&self) -> Option<GuildId> {
-        match CACHE.read().unwrap().channel(self.channel_id) {
-            Some(Channel::Guild(ch)) => Some(ch.read().unwrap().guild_id),
+        match CACHE.read().channel(self.channel_id) {
+            Some(Channel::Guild(ch)) => Some(ch.read().guild_id),
             _ => None,
         }
     }
@@ -354,7 +354,7 @@ impl Message {
     /// True if message was sent using direct messages.
     #[cfg(feature = "cache")]
     pub fn is_private(&self) -> bool {
-        match CACHE.read().unwrap().channel(self.channel_id) {
+        match CACHE.read().channel(self.channel_id) {
             Some(Channel::Group(_)) | Some(Channel::Private(_)) => true,
             _ => false,
         }

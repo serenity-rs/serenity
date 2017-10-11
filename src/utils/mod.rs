@@ -455,7 +455,7 @@ pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % sha
 #[cfg(feature = "cache")]
 pub fn with_cache<T, F>(f: F) -> T
     where F: Fn(&Cache) -> T {
-    let cache = CACHE.read().unwrap();
+    let cache = CACHE.read();
     f(&cache)
 }
 
@@ -476,6 +476,6 @@ pub fn with_cache<T, F>(f: F) -> T
 #[cfg(feature = "cache")]
 pub fn with_cache_mut<T, F>(mut f: F) -> T
     where F: FnMut(&mut Cache) -> T {
-    let mut cache = CACHE.write().unwrap();
+    let mut cache = CACHE.write();
     f(&mut cache)
 }

@@ -48,7 +48,7 @@ impl Reaction {
     pub fn delete(&self) -> Result<()> {
         let user_id = feature_cache! {
             {
-                let user = if self.user_id == CACHE.read().unwrap().user.id {
+                let user = if self.user_id == CACHE.read().user.id {
                     None
                 } else {
                     Some(self.user_id.0)

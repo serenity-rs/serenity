@@ -106,8 +106,8 @@ impl Role {
     /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
     #[cfg(feature = "cache")]
     pub fn find_guild(&self) -> Result<GuildId> {
-        for guild in CACHE.read().unwrap().guilds.values() {
-            let guild = guild.read().unwrap();
+        for guild in CACHE.read().guilds.values() {
+            let guild = guild.read();
 
             if guild.roles.contains_key(&RoleId(self.id.0)) {
                 return Ok(guild.id);
@@ -168,10 +168,10 @@ impl RoleId {
     /// Search the cache for the role.
     #[cfg(feature = "cache")]
     pub fn find(&self) -> Option<Role> {
-        let cache = CACHE.read().unwrap();
+        let cache = CACHE.read();
 
         for guild in cache.guilds.values() {
-            let guild = guild.read().unwrap();
+            let guild = guild.read();
 
             if !guild.roles.contains_key(self) {
                 continue;

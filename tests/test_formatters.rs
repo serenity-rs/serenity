@@ -1,3 +1,4 @@
+extern crate parking_lot;
 extern crate serenity;
 
 use serenity::model::*;
@@ -14,8 +15,9 @@ fn test_formatters() {
 #[cfg(feature = "utils")]
 #[test]
 fn test_mention() {
+    use parking_lot::RwLock;
     use serenity::utils::Colour;
-    use std::sync::{Arc, RwLock};
+    use std::sync::Arc;
 
     let channel = Channel::Guild(Arc::new(RwLock::new(GuildChannel {
         bitrate: None,

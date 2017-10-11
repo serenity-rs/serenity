@@ -1,9 +1,9 @@
 use gateway::Shard;
 use internal::prelude::*;
-use parking_lot::Mutex as ParkingLotMutex;
+use parking_lot::Mutex;
 use std::collections::HashMap;
 use std::sync::mpsc::{Receiver, Sender};
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
 use super::super::super::EventHandler;
@@ -27,13 +27,13 @@ use framework::Framework;
 /// blocking nature of the loop itself as well as a 5 second thread sleep
 /// between shard starts.
 pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static> {
-    pub data: Arc<ParkingLotMutex<ShareMap>>,
+    pub data: Arc<Mutex<ShareMap>>,
     pub event_handler: Arc<H>,
     #[cfg(feature = "framework")]
     pub framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
     pub last_start: Option<Instant>,
     pub manager_tx: Sender<ShardManagerMessage>,
-    pub runners: Arc<ParkingLotMutex<HashMap<ShardId, ShardRunnerInfo>>>,
+    pub runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
     pub rx: Receiver<ShardQueuerMessage>,
     pub threadpool: ThreadPool,
     pub token: Arc<Mutex<String>>,
@@ -81,7 +81,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
     fn start(&mut self, shard_id: ShardId, shard_total: ShardId) -> Result<()> {
         let shard_info = [shard_id.0, shard_total.0];
         let shard = Shard::new(self.ws_url.clone(), self.token.clone(), shard_info)?;
-        let locked = Arc::new(ParkingLotMutex::new(shard));
+        let locked = Arc::new(Mutex::new(shard));
 
         let mut runner = feature_framework! {{
             ShardRunner::new(

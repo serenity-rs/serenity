@@ -305,7 +305,7 @@ impl GuildId {
 
     /// Search the cache for the guild.
     #[cfg(feature = "cache")]
-    pub fn find(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().unwrap().guild(*self) }
+    pub fn find(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().guild(*self) }
 
     /// Requests the guild over REST.
     ///
@@ -408,7 +408,7 @@ impl GuildId {
     /// [`utils::shard_id`]: ../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self) -> u64 { ::utils::shard_id(self.0, CACHE.read().unwrap().shard_count) }
+    pub fn shard_id(&self) -> u64 { ::utils::shard_id(self.0, CACHE.read().shard_count) }
 
     /// Returns the Id of the shard associated with the guild.
     ///

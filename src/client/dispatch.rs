@@ -15,8 +15,6 @@ use framework::Framework;
 use model::GuildId;
 #[cfg(feature = "cache")]
 use std::{thread, time};
-#[cfg(feature = "framework")]
-use std::sync;
 
 #[cfg(feature = "cache")]
 use super::CACHE;
@@ -26,7 +24,7 @@ macro_rules! update {
         {
             #[cfg(feature="cache")]
             {
-                CACHE.write().unwrap().update(&mut $event)
+                CACHE.write().update(&mut $event)
             }
         }
     };
@@ -44,7 +42,7 @@ fn context(conn: Arc<Mutex<Shard>>, data: Arc<Mutex<ShareMap>>) -> Context {
 #[cfg(feature = "framework")]
 pub fn dispatch<H: EventHandler + 'static>(event: Event,
                                            conn: Arc<Mutex<Shard>>,
-                                           framework: Arc<sync::Mutex<Option<Box<Framework + Send>>>>,
+                                           framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
                                            data: Arc<Mutex<ShareMap>>,
                                            event_handler: Arc<H>) {
     match event {
@@ -56,7 +54,7 @@ pub fn dispatch<H: EventHandler + 'static>(event: Event,
                 event_handler,
             );
 
-            if let Some(ref mut framework) = *framework.lock().unwrap() {
+            if let Some(ref mut framework) = *framework.lock() {
                 framework.dispatch(context, event.message);
             }
         },
@@ -102,7 +100,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
 
     #[cfg(feature = "cache")]
     let wait_for_guilds = move || -> ::Result<()> {
-        let unavailable_guilds = CACHE.read().unwrap().unavailable_guilds.len();
+        let unavailable_guilds = CACHE.read().unavailable_guilds.len();
 
         while unavailable_guilds != 0 && (now!() < last_guild_create_time + 2000) {
             thread::sleep(time::Duration::from_millis(500));
@@ -173,7 +171,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
             let context = context(conn, data);
 
             feature_cache! {{
-                let before = CACHE.read().unwrap().channel(event.channel.id());
+                let before = CACHE.read().channel(event.channel.id());
                 event_handler.on_channel_update(context, before, event.channel);
             } else {
                 event_handler.on_channel_update(context, event.channel);
@@ -192,7 +190,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
         Event::GuildCreate(mut event) => {
             #[cfg(feature = "cache")]
             let _is_new = {
-                let cache = CACHE.read().unwrap();
+                let cache = CACHE.read();
 
                 !cache.unavailable_guilds.contains(&event.guild.id)
             };
@@ -203,7 +201,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
             {
                 last_guild_create_time = now!();
 
-                let cache = CACHE.read().unwrap();
+                let cache = CACHE.read();
 
                 if cache.unavailable_guilds.is_empty() {
                     let context = context(conn.clone(), data.clone());
@@ -274,7 +272,6 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                 // the member if it did not exist. So, there is be _no_ way
                 // that this could fail under any circumstance.
                 let after = CACHE.read()
-                    .unwrap()
                     .member(event.guild_id, event.user.id)
                     .unwrap()
                     .clone();
@@ -332,7 +329,6 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
 
             feature_cache! {{
                 let before = CACHE.read()
-                    .unwrap()
                     .guilds
                     .get(&event.guild.id)
                     .cloned();

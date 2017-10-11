@@ -155,17 +155,17 @@ impl Guild {
 
     #[cfg(feature = "cache")]
     fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
-        let member = match self.members.get(&CACHE.read().unwrap().user.id) {
+        let member = match self.members.get(&CACHE.read().user.id) {
             Some(member) => member,
             None => return Err(Error::Model(ModelError::ItemMissing)),
         };
 
-        let default_channel = match self.default_channel(member.user.read().unwrap().id) {
+        let default_channel = match self.default_channel(member.user.read().id) {
             Some(dc) => dc,
             None => return Err(Error::Model(ModelError::ItemMissing)),
         };
 
-        let perms = self.permissions_for(default_channel.read().unwrap().id, member.user.read().unwrap().id);
+        let perms = self.permissions_for(default_channel.read().id, member.user.read().id);
         permissions.remove(perms);
 
         Ok(permissions.is_empty())
@@ -406,7 +406,7 @@ impl Guild {
     pub fn delete(&self) -> Result<PartialGuild> {
         #[cfg(feature = "cache")]
         {
-            if self.owner_id != CACHE.read().unwrap().user.id {
+            if self.owner_id != CACHE.read().user.id {
                 let req = Permissions::MANAGE_GUILD;
 
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -723,9 +723,9 @@ impl Guild {
         self.members
             .values()
             .find(|member| {
-                let name_matches = member.user.read().unwrap().name == name;
+                let name_matches = member.user.read().name == name;
                 let discrim_matches = match discrim {
-                    Some(discrim) => member.user.read().unwrap().discriminator == discrim,
+                    Some(discrim) => member.user.read().discriminator == discrim,
                     None => true,
                 };
 
@@ -744,7 +744,7 @@ impl Guild {
     /// - "zey", "zeyla", "zey mei"
     /// If 'case_sensitive' is false, the following are not found:
     /// - "Zey", "ZEYla", "zeY mei"
-    /// 
+    ///
     /// [`Member`]: struct.Member.html
     pub fn members_starting_with(&self, prefix: &str, case_sensitive: bool) -> Vec<&Member> {
         self.members
@@ -752,11 +752,11 @@ impl Guild {
             .filter(|member|
 
                 if case_sensitive {
-                    member.user.read().unwrap().name.starts_with(prefix)
+                    member.user.read().name.starts_with(prefix)
                 } else {
-                    starts_with_case_insensitive(&member.user.read().unwrap().name, &prefix)
+                    starts_with_case_insensitive(&member.user.read().name, &prefix)
                 }
-                
+
                 || member.nick.as_ref()
                     .map_or(false, |nick|
 
@@ -773,7 +773,7 @@ impl Guild {
     /// - "zeyla", "meiyla", "yladenisyla"
     /// If 'case_sensitive' is false, the following are not found:
     /// - "zeYLa", "meiyLa", "LYAdenislyA"
-    /// 
+    ///
     /// [`Member`]: struct.Member.html
     pub fn members_containing(&self, substring: &str, case_sensitive: bool) -> Vec<&Member> {
         self.members
@@ -781,11 +781,11 @@ impl Guild {
             .filter(|member|
 
                 if case_sensitive {
-                    member.user.read().unwrap().name.contains(substring)
+                    member.user.read().name.contains(substring)
                 } else {
-                    contains_case_insensitive(&member.user.read().unwrap().name, &substring)
+                    contains_case_insensitive(&member.user.read().name, &substring)
                 }
-                
+
                 || member.nick.as_ref()
                     .map_or(false, |nick|
 
@@ -849,7 +849,7 @@ impl Guild {
             } else {
                 warn!(
                     "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
-                    member.user.read().unwrap().id,
+                    member.user.read().id,
                     self.id,
                     role
                 );
@@ -862,7 +862,7 @@ impl Guild {
         }
 
         if let Some(channel) = self.channels.get(&channel_id) {
-            let channel = channel.read().unwrap();
+            let channel = channel.read();
 
             // If this is a text channel, then throw out voice permissions.
             if channel.kind == ChannelType::Text {
@@ -1102,7 +1102,7 @@ impl Guild {
     /// impl EventHandler for Handler {
     ///     fn on_message(&self, _: Context, msg: Message) {
     ///         if let Some(arc) = msg.guild_id().unwrap().find() {
-    ///             if let Some(role) = arc.read().unwrap().role_by_name("role_name") {
+    ///             if let Some(role) = arc.read().role_by_name("role_name") {
     ///                 println!("{:?}", role);
     ///             }
     ///         }

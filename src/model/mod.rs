@@ -32,11 +32,12 @@ pub use self::voice::*;
 pub use self::webhook::*;
 
 use chrono::NaiveDateTime;
+use parking_lot::RwLock;
 use self::utils::*;
 use serde::de::Visitor;
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 use internal::prelude::*;
 
 #[cfg(feature = "utils")]
@@ -67,7 +68,7 @@ macro_rules! id_u64 {
                     self
                 }
             }
-            
+
             impl From<u64> for $name {
                 fn from(id_as_u64: u64) -> $name {
                     $name(id_as_u64)
