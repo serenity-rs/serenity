@@ -365,7 +365,8 @@ impl Member {
             .guild_id
             .find()
             .map(|g| g
-                .read().unwrap()
+                .read()
+                .unwrap()
                 .roles
                 .values()
                 .filter(|role| self.roles.contains(&role.id))
