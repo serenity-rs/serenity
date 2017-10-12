@@ -18,7 +18,7 @@ impl<E: StdError> From<E> for Error<E> {
     fn from(e: E) -> Self {
         Error::Parse(e)
     }
-} 
+}
 
 impl<E: StdError> StdError for Error<E> {
     fn description(&self) -> &str {
@@ -115,10 +115,7 @@ impl Args {
         let mut vec = Vec::with_capacity(i as usize);
 
         for _ in 0..i {
-            vec.push(match self.delimiter_split.shift() {
-                Some(x) => x,
-                None => return None,
-            });
+            vec.push(try_opt!(self.delimiter_split.shift()));
         }
 
         Some(vec)
@@ -164,8 +161,8 @@ impl Args {
         where T::Err: StdError {
         Iter::<T>::new(&mut self).collect()
     }
-    
-    /// Provides an iterator of items: (`T: FromStr`) `Result<T, T::Err>`. 
+
+    /// Provides an iterator of items: (`T: FromStr`) `Result<T, T::Err>`.
     pub fn iter<T: FromStr>(&mut self) -> Iter<T> where T::Err: StdError  {
         Iter::new(self)
     }
@@ -235,7 +232,7 @@ impl<'a, T: FromStr> Iter<'a, T> where T::Err: StdError {
 
 impl<'a, T: FromStr> Iterator for Iter<'a, T> where T::Err: StdError  {
     type Item = Result<T, T::Err>;
-    
+
     fn next(&mut self) -> Option<Self::Item> {
         if self.args.is_empty() {
             None
