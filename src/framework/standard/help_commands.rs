@@ -119,10 +119,10 @@ pub fn with_embeds(_: &mut Context,
                             }                 
                         },
                         CommandOrAlias::Alias(ref name) => {
-                            let actual_command = &group.commands.get(name).unwrap();
+                            let actual_command = group.commands.get(name).unwrap();
 
                             match *actual_command {
-                                &CommandOrAlias::Command(ref cmd) => {
+                                CommandOrAlias::Command(ref cmd) => {
                                     if has_all_requirements(&cmd, &msg) {
                                         found = Some((name, cmd));
                                     }
@@ -131,7 +131,7 @@ pub fn with_embeds(_: &mut Context,
                                     }
                                 },
 
-                                &CommandOrAlias::Alias(ref name) => {
+                                CommandOrAlias::Alias(ref name) => {
                                     let _ = msg.channel_id.say(&format!("Did you mean {:?}?", name));
                                     return Ok(());
                                 },
@@ -297,10 +297,10 @@ pub fn plain(_: &mut Context,
                             }
                         },
                         CommandOrAlias::Alias(ref name) => {
-                            let actual_command = &group.commands.get(name).unwrap();
+                            let actual_command = group.commands.get(name).unwrap();
 
                             match *actual_command {
-                                &CommandOrAlias::Command(ref cmd) => {
+                                CommandOrAlias::Command(ref cmd) => {
                                     if has_all_requirements(&cmd, &msg) {
                                         found = Some((name, cmd));
                                     }
@@ -309,7 +309,7 @@ pub fn plain(_: &mut Context,
                                     }
                                 },
 
-                                &CommandOrAlias::Alias(ref name) => {
+                                CommandOrAlias::Alias(ref name) => {
                                     let _ = msg.channel_id.say(&format!("Did you mean {:?}?", name));
                                     return Ok(());
                                 },
