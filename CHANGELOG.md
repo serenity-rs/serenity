@@ -3,6 +3,66 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.4.1] - 2017-10-14
+
+This release contains bugfixes and some newly added or newly exposed
+functionality.
+
+Thanks to the following for their contributions this release:
+
+- [@acdenisSK]
+- [@ftriquet]
+- [@hsiW]
+- [@Lakelezz]
+- [@lolzballs]
+- [@Roughsketch]
+- [@zeyla]
+
+### Added
+
+- [general] Replace Vec parameters by `IntoIterator` ([@ftriquet])[c:55167c3]
+- [general] Replace slice parameters by `IntoIterator` ([@ftriquet]) [c:022e35d]
+- [model] Add `Guild::members_starting_with` ([@Lakelezz]) [c:b3aa441]
+- [model] Add `Guild::members_containing` ([@Lakelezz]) [c:1b167b5]
+- [model] `impl<'a> BanOptions for &'a str` ([@acdenisSK]) [c:cf40386]
+- [model] Derive `Default` on `CurrentUser` and IDs ([@acdenisSK]) [c:09a8a44]
+- [client] Add a configurable, shard-shared threadpool ([@zeyla]) [c:d7621aa],
+  [c:8109619]
+- [model] Add `Guild::members_username_containing, members_nick_containing`
+  ([@Lakelezz]) [c:002ce3a]
+- [framework] Add an iterator for `Args` ([@acdenisSK]) [c:0ed1972]
+- [framework] Make `has_all_requirements` public ([@Lakelezz]) [c:08d390c]
+- [framework] Make default help messages list help for aliases ([@Lakelezz])
+  [c:0d1c0f1]
+
+### Fixed
+
+- [model] Use `request_client!` for attachment downloading ([@lolzballs])
+  [c:71f709d]
+- [client] Fix client no-framework compilation ([@zeyla]) [c:1d4ecb2]
+- [client] Fix client shards not filling ([@zeyla]) [c:86d8bdd]
+- [model] Fix `User::tag` and `CurrentUser::tag` discrim output ([@zeyla])
+  [c:6b9dcf5]
+- [framework] Modify `initialized` method purpose ([@acdenisSK]) [c:05f158f]
+- [framework] Make command Error string public ([@acdenisSK]) [c:917dd30]
+- [client, gateway] Improve shard logic ([@acdenisSK], [@zeyla]) [c:683691f],
+  [c:7befcd5]
+- [gateway] Reset shard heartbeat state on resume ([@zeyla]) [c:c98cae4]
+- [general] Fix font-height and soften the logo ([@Lakelezz]) [c:3b2c246]
+
+### Misc.
+
+- [client, gateway] Improve shard and shard runner logging ([@zeyla])
+  [c:21e194b]
+- `to_owned` -> `to_string` ([@acdenisSK]) [c:1bf4d9c]
+- [general] Fix most clippy warnings ([@Roughsketch]) [c:7945094]
+- [framework] Add some docs to `Args` ([@acdenisSK]) [c:8572943]
+- [examples] Add `env_logger` bot example [c:0df77b9]
+- [general] Fix clippy lints ([@zeyla]) [c:483b069]
+- [model] Optimize `Member::roles` ([@hsiW]) [c:8565fa2]
+- [general] Internally use a `try_opt!` macro ([@hsiW]) [c:9b0c053]
+- [general] Feature-flag extern crates behind their name ([@zeyla]) [c:11b85ca]
+
 ## [0.4.0] - 2017-09-25
 
 This release contains a lot of added functionality, minor-scale rewrites,
@@ -1367,6 +1427,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.4.1]: https://github.com/zeyla/serenity/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/zeyla/serenity/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/zeyla/serenity/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/zeyla/serenity/compare/v0.1.5...v0.2.0
@@ -1394,6 +1455,7 @@ Initial commit.
 [@emoticon]: https://github.com/emoticon
 [@Flat]: https://github.com/Flat
 [@foxbot]: https://github.com/foxbot
+[@ftriquet]: https://github.com/ftriquet
 [@fwrs]: https://github.com/fwrs
 [@GetRektByMe]: https://github.com/GetRektByMe
 [@hsiW]: https://github.com/hsiW
@@ -1402,12 +1464,45 @@ Initial commit.
 [@indiv0]: https://github.com/indiv0
 [@joek13]: https://github.com/joek13
 [@Lakelezz]: https://github.com/Lakelezz
+[@lolzballs]: https://github.com/lolzballs
 [@khazhyk]: https://github.com/khazhyk
 [@Roughsketch]: https://github.com/Roughsketch
 [@sschroe]: https://github.com/sschroe
 [@SunDwarf]: https://github.com/SunDwarf
 [@xentec]: https://github.com/xentec
 [@zeyla]: https://github.com/zeyla
+
+[c:002ce3a]: https://github.com/zeyla/serenity/commit/002ce3aa272fa51b84e820f12db39cb87a461a83
+[c:022e35d]: https://github.com/zeyla/serenity/commit/022e35d5b12322bd77bbe74a1a3b2ad319977390
+[c:05f158f]: https://github.com/zeyla/serenity/commit/05f158fc89f2adc82e31cf4b93706dc7d25e11d8
+[c:08d390c]: https://github.com/zeyla/serenity/commit/08d390c19f187986fd2856fe5cbb9035a0877e0f
+[c:09a8a44]: https://github.com/zeyla/serenity/commit/09a8a444f5bcefaee8b83dc129a3cea2de8792f9
+[c:0d1c0f1]: https://github.com/zeyla/serenity/commit/0d1c0f1356fd3a891232498c2230d0bb4d2ed4ff
+[c:0df77b9]: https://github.com/zeyla/serenity/commit/0df77b933ff5e98725252116069afad2dec9f89b
+[c:0ed1972]: https://github.com/zeyla/serenity/commit/0ed19727debf28a8aa0818b44713090e97dd6eee
+[c:11b85ca]: https://github.com/zeyla/serenity/commit/11b85ca6799b9984481119851f983d8e3c84cdc0
+[c:1b167b5]: https://github.com/zeyla/serenity/commit/1b167b5496ce816cbcacb0e4f6e63399dffaa25c
+[c:1bf4d9c]: https://github.com/zeyla/serenity/commit/1bf4d9cb9823dca8c4bb77147c66eac2d53f609f
+[c:1d4ecb2]: https://github.com/zeyla/serenity/commit/1d4ecb2f13258d286378c44d59c2ee4b1c68349d
+[c:21e194b]: https://github.com/zeyla/serenity/commit/21e194bffc37f396f007d390170f5b60e22f5d02
+[c:3b2c246]: https://github.com/zeyla/serenity/commit/3b2c2462cb34b5ae5190ebc4a9e04968dc8d5335
+[c:483b069]: https://github.com/zeyla/serenity/commit/483b069cc0c821ec673ac475b168809e3a41525a
+[c:55167c3]: https://github.com/zeyla/serenity/commit/55167c300598536a852b3596fcf1c420aeb96c3a
+[c:683691f]: https://github.com/zeyla/serenity/commit/683691f762bbf58e3abf3bc67381e18112f5c8ad
+[c:6b9dcf5]: https://github.com/zeyla/serenity/commit/6b9dcf5272458499c1caef544cb82d5a8624258b
+[c:71f709d]: https://github.com/zeyla/serenity/commit/71f709d0aceedb6d3091d0c28c9535e281270f71
+[c:7945094]: https://github.com/zeyla/serenity/commit/794509421f21bee528e582a7b109d6a99284510a
+[c:7befcd5]: https://github.com/zeyla/serenity/commit/7befcd5caa9ccdf44d90ecc12014c335b1bd2be7
+[c:8109619]: https://github.com/zeyla/serenity/commit/8109619184867fc843a1e73d18d37726a34f7fbf
+[c:8565fa2]: https://github.com/zeyla/serenity/commit/8565fa2cb356cf8cbccfeb09828c9d136ad3d614
+[c:8572943]: https://github.com/zeyla/serenity/commit/857294358d5f3029850dc79c174b831c0b0c161c
+[c:86d8bdd]: https://github.com/zeyla/serenity/commit/86d8bddff3e3242186d0c2607b34771e5422ba5b
+[c:917dd30]: https://github.com/zeyla/serenity/commit/917dd3071dc8a145b9c379cb3a8a84731c690340
+[c:9b0c053]: https://github.com/zeyla/serenity/commit/9b0c053725e04c60eb7ddcfeb847be4189b3dbf6
+[c:b3aa441]: https://github.com/zeyla/serenity/commit/b3aa441c2d61ba324396deaf70f2c5818fd3f528
+[c:c98cae4]: https://github.com/zeyla/serenity/commit/c98cae4e838147eaa077bbc68ffebf8834ff7b6b
+[c:cf40386]: https://github.com/zeyla/serenity/commit/cf403867400110f446720fc20fad6781cf8c6b13
+[c:d7621aa]: https://github.com/zeyla/serenity/commit/d7621aa4dfb2a3dea22e7848eb97e2b4cc1ade14
 
 [c:005437f]: https://github.com/zeyla/serenity/commit/005437f56869e846ff677b6516605def0c4de7bc
 [c:0186754]: https://github.com/zeyla/serenity/commit/01867549709ef73ee09ed442e1d5ea938fd7f74d
