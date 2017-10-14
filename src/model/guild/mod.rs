@@ -1,5 +1,4 @@
 mod emoji;
-mod feature;
 mod guild_id;
 mod integration;
 mod member;
@@ -8,7 +7,6 @@ mod role;
 mod audit_log;
 
 pub use self::emoji::*;
-pub use self::feature::*;
 pub use self::guild_id::*;
 pub use self::integration::*;
 pub use self::member::*;
@@ -62,8 +60,15 @@ pub struct Guild {
     /// VIP features enabled for the guild. Can be obtained through the
     /// [Discord Partnership] website.
     ///
+    /// The following is a list of known features:
+    ///
+    /// - `INVITE_SPLASH`
+    /// - `VANITY_URL`
+    /// - `VERIFIED`
+    /// - `VIP_REGIONS`
+    ///
     /// [Discord Partnership]: https://discordapp.com/partners
-    pub features: Vec<Feature>,
+    pub features: Vec<String>,
     /// The hash of the icon used by the guild.
     ///
     /// In the client, this appears on the guild list on the left-hand side.
@@ -1351,7 +1356,7 @@ impl<'de> Deserialize<'de> for Guild {
             .map_err(DeError::custom)?;
         let features = map.remove("features")
             .ok_or_else(|| DeError::custom("expected guild features"))
-            .and_then(serde_json::from_value::<Vec<Feature>>)
+            .and_then(serde_json::from_value::<Vec<String>>)
             .map_err(DeError::custom)?;
         let icon = match map.remove("icon") {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,

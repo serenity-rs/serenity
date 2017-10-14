@@ -165,3 +165,11 @@ fn webhooks_update() {
 fn message_type_7() {
     p!(MessageCreateEvent, "message_type_7");
 }
+
+// Ensure string features are properly deserialized.
+//
+// Change made due to a new feature being added and not being in the enum.
+#[test]
+fn guild_features_deser() {
+    p!(GuildCreateEvent, "guild_create_features");
+}

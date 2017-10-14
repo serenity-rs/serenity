@@ -17,7 +17,12 @@ pub struct PartialGuild {
     pub embed_channel_id: Option<ChannelId>,
     pub embed_enabled: bool,
     #[serde(deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
-    pub features: Vec<Feature>,
+    /// Features enabled for the guild.
+    ///
+    /// Refer to [`Guild::features`] for more information.
+    ///
+    /// [`Guild::features`]: struct.Guild.html#structfield.features
+    pub features: Vec<String>,
     pub icon: Option<String>,
     pub mfa_level: u64,
     pub name: String,
