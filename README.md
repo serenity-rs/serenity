@@ -174,4 +174,4 @@ Voice+youtube-dl:
 [library:discord.js]: https://github.com/hydrabolt/discord.js
 [library:discord.py]: https://github.com/Rapptz/discord.py
 [library:discord-rs]: https://github.com/SpaceManiac/discord-rs
-[logo]: https://raw.githubusercontent.com/zeyla/serenity/master/logo.png
+[logo]: https://zey.moe/assets/serenity_logo.png
