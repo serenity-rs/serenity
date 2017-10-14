@@ -32,6 +32,7 @@ pub struct ShardManager {
 
 impl ShardManager {
     #[cfg(feature = "framework")]
+    #[cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))]
     pub fn new<H>(
         shard_index: u64,
         shard_init: u64,
@@ -49,15 +50,15 @@ impl ShardManager {
         let runners = Arc::new(Mutex::new(HashMap::new()));
 
         let mut shard_queuer = ShardQueuer {
-            data: data.clone(),
-            event_handler: event_handler.clone(),
-            framework: framework.clone(),
+            data: Arc::clone(&data),
+            event_handler: Arc::clone(&event_handler),
+            framework: Arc::clone(&framework),
             last_start: None,
             manager_tx: thread_tx.clone(),
-            runners: runners.clone(),
+            runners: Arc::clone(&runners),
             rx: shard_queue_rx,
-            token: token.clone(),
-            ws_url: ws_url.clone(),
+            token: Arc::clone(&token),
+            ws_url: Arc::clone(&ws_url),
             threadpool,
         };
 

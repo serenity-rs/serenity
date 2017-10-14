@@ -417,6 +417,7 @@ impl StandardFramework {
     }
 
     #[allow(too_many_arguments)]
+    #[cfg_attr(feature = "cargo-clippy", allow(cyclomatic_complexity))]
     fn should_fail(&mut self,
                    mut context: &mut Context,
                    message: &Message,
@@ -514,10 +515,9 @@ impl StandardFramework {
 
                         if let Some(member) = guild.members.get(&message.author.id) {
                             if let Ok(permissions) = member.permissions() {
-                                if !permissions.administrator() {
-                                    if !has_correct_roles(&command, &guild, &member) {
-                                        return Some(DispatchError::LackingRole);
-                                    }
+                                if !permissions.administrator()
+                                    && !has_correct_roles(command, &guild, member) {
+                                    return Some(DispatchError::LackingRole);
                                 }
                             }
                         }
@@ -532,7 +532,7 @@ impl StandardFramework {
                 if all_passed {
                     None
                 } else {
-                    Some(DispatchError::CheckFailed(command.clone()))
+                    Some(DispatchError::CheckFailed(Arc::clone(command)))
                 }
             }
         }
@@ -875,7 +875,7 @@ impl Framework for StandardFramework {
                     if let Some(&CommandOrAlias::Command(ref command)) =
                         group.commands.get(&to_check) {
                         let before = self.before.clone();
-                        let command = command.clone();
+                        let command = Arc::clone(command);
                         let after = self.after.clone();
                         let groups = self.groups.clone();
 
@@ -935,7 +935,7 @@ impl Framework for StandardFramework {
 }
 
 #[cfg(feature = "cache")]
-pub(crate) fn has_correct_permissions(command: &Command, message: &Message) -> bool {
+pub fn has_correct_permissions(command: &Command, message: &Message) -> bool {
     if !command.required_permissions.is_empty() {
         if let Some(guild) = message.guild() {
             let perms = guild
@@ -949,7 +949,7 @@ pub(crate) fn has_correct_permissions(command: &Command, message: &Message) -> b
 }
 
 #[cfg(feature = "cache")]
-pub(crate) fn has_correct_roles(cmd: &Command, guild: &Guild, member: &Member) -> bool {
+pub fn has_correct_roles(cmd: &Command, guild: &Guild, member: &Member) -> bool {
     cmd.allowed_roles
             .iter()
             .flat_map(|r| guild.role_by_name(r))

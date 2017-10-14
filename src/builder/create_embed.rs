@@ -69,7 +69,7 @@ impl CreateEmbed {
     pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
         self.0.insert(
             "color".to_string(),
-            Value::Number(Number::from(colour.into().0 as u64)),
+            Value::Number(Number::from(u64::from(colour.into().0))),
         );
 
         CreateEmbed(self.0)

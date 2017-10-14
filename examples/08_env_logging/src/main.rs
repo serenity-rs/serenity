@@ -1,0 +1,45 @@
+#[macro_use] extern crate log;
+
+extern crate env_logger;
+extern crate serenity;
+
+use serenity::prelude::*;
+use serenity::model::event::ResumedEvent;
+use serenity::model::Ready;
+use std::env;
+
+struct Handler;
+
+impl EventHandler for Handler {
+    fn on_ready(&self, _: Context, ready: Ready) {
+        // Log at the INFO level. This is a macro from the `log` crate.
+        info!("{} is connected!", ready.user.name);
+    }
+
+    fn on_resume(&self, _: Context, resume: ResumedEvent) {
+        // Log at the DEBUG level.
+        //
+        // In this example, this will not show up in the logs because DEBUG is
+        // below INFO, which is the set debug level.
+        debug!("Resumed; trace: {:?}", resume.trace);
+    }
+}
+
+fn main() {
+    // Call env_logger's initialize function, which configures `log` via
+    // environment variables.
+    //
+    // For example, you can say to log all levels INFO and up via setting the
+    // environment variable `RUST_LOG` to `INFO`.
+    env_logger::init().expect("Unable to init env_logger");
+
+    // Configure the client with your Discord bot token in the environment.
+    let token = env::var("DISCORD_TOKEN")
+        .expect("Expected a token in the environment");
+
+    let mut client = Client::new(&token, Handler);
+
+    if let Err(why) = client.start() {
+        error!("Client error: {:?}", why);
+    }
+}

@@ -57,13 +57,13 @@ impl CacheUpdate for ChannelCreateEvent {
     fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
         match self.channel {
             Channel::Group(ref group) => {
-                let group = group.clone();
+                let group = Arc::clone(group);
 
                 let channel_id = group.with_mut(|writer| {
                     for (recipient_id, recipient) in &mut writer.recipients {
                         cache.update_user_entry(&recipient.read());
 
-                        *recipient = cache.users[recipient_id].clone();
+                        *recipient = Arc::clone(&cache.users[recipient_id]);
                     }
 
                     writer.channel_id
@@ -76,23 +76,23 @@ impl CacheUpdate for ChannelCreateEvent {
             Channel::Guild(ref channel) => {
                 let (guild_id, channel_id) = channel.with(|channel| (channel.guild_id, channel.id));
 
-                cache.channels.insert(channel_id, channel.clone());
+                cache.channels.insert(channel_id, Arc::clone(channel));
 
                 cache
                     .guilds
                     .get_mut(&guild_id)
                     .and_then(|guild| {
                         guild
-                            .with_mut(|guild| guild.channels.insert(channel_id, channel.clone()))
+                            .with_mut(|guild| guild.channels.insert(channel_id, Arc::clone(channel)))
                     })
                     .map(Channel::Guild)
             },
             Channel::Private(ref channel) => {
                 if let Some(channel) = cache.private_channels.get(&channel.with(|c| c.id)) {
-                    return Some(Channel::Private((*channel).clone()));
+                    return Some(Channel::Private(Arc::clone(&(*channel))));
                 }
 
-                let channel = channel.clone();
+                let channel = Arc::clone(channel);
 
                 let id = channel.with_mut(|writer| {
                     let user_id = writer.recipient.with_mut(|user| {
@@ -101,16 +101,16 @@ impl CacheUpdate for ChannelCreateEvent {
                         user.id
                     });
 
-                    writer.recipient = cache.users[&user_id].clone();
+                    writer.recipient = Arc::clone(&cache.users[&user_id]);
                     writer.id
                 });
 
-                let ch = cache.private_channels.insert(id, channel.clone());
+                let ch = cache.private_channels.insert(id, Arc::clone(&channel));
                 ch.map(Channel::Private)
             },
             Channel::Category(ref category) => cache
                 .categories
-                .insert(category.read().id, category.clone())
+                .insert(category.read().id, Arc::clone(category))
                 .map(Channel::Category),
         }
     }
@@ -211,7 +211,7 @@ impl CacheUpdate for ChannelRecipientAddEvent {
 
     fn update(&mut self, cache: &mut Cache) -> Option<()> {
         cache.update_user_entry(&self.user);
-        let user = cache.users[&self.user.id].clone();
+        let user = Arc::clone(&cache.users[&self.user.id]);
 
         cache.groups.get_mut(&self.channel_id).map(|group| {
             group.write().recipients.insert(self.user.id, user);
@@ -260,7 +260,7 @@ impl CacheUpdate for ChannelUpdateEvent {
 
                 match cache.groups.entry(ch_id) {
                     Entry::Vacant(e) => {
-                        e.insert(group.clone());
+                        e.insert(Arc::clone(group));
                     },
                     Entry::Occupied(mut e) => {
                         let mut dest = e.get_mut().write();
@@ -280,10 +280,10 @@ impl CacheUpdate for ChannelUpdateEvent {
             Channel::Guild(ref channel) => {
                 let (guild_id, channel_id) = channel.with(|channel| (channel.guild_id, channel.id));
 
-                cache.channels.insert(channel_id, channel.clone());
+                cache.channels.insert(channel_id, Arc::clone(channel));
                 cache.guilds.get_mut(&guild_id).map(|guild| {
                     guild
-                        .with_mut(|g| g.channels.insert(channel_id, channel.clone()))
+                        .with_mut(|g| g.channels.insert(channel_id, Arc::clone(channel)))
                 });
             },
             Channel::Private(ref channel) => {
@@ -341,9 +341,9 @@ impl CacheUpdate for GuildCreateEvent {
 
         for (user_id, member) in &mut guild.members {
             cache.update_user_entry(&member.user.read());
-            let user = cache.users[user_id].clone();
+            let user = Arc::clone(&cache.users[user_id]);
 
-            member.user = user.clone();
+            member.user = Arc::clone(&user);
         }
 
         cache.channels.extend(guild.channels.clone());
@@ -431,7 +431,7 @@ impl CacheUpdate for GuildMemberAddEvent {
         cache.update_user_entry(&self.member.user.read());
 
         // Always safe due to being inserted above.
-        self.member.user = cache.users[&user_id].clone();
+        self.member.user = Arc::clone(&cache.users[&user_id]);
 
         cache.guilds.get_mut(&self.guild_id).map(|guild| {
             guild.with_mut(|guild| {
@@ -766,7 +766,7 @@ impl CacheUpdate for PresenceUpdateEvent {
 
         if let Some(user) = self.presence.user.as_mut() {
             cache.update_user_entry(&user.read());
-            *user = cache.users[&user_id].clone();
+            *user = Arc::clone(&cache.users[&user_id]);
         }
 
         if let Some(guild_id) = self.guild_id {

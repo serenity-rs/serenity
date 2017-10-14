@@ -29,7 +29,7 @@ use std::fmt::Write;
 use super::command::InternalCommand;
 use super::{Args, Command, CommandGroup, CommandOrAlias, CommandError};
 use client::Context;
-use model::{ChannelId, Guild, Member, Message};
+use model::{ChannelId, Message};
 use utils::Colour;
 use framework::standard::{has_correct_roles, has_correct_permissions};
 
@@ -51,14 +51,25 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
     result
 }
 
-/// Checks whether a user is member of required roles
+/// Checks whether a user is member of required roles 
 /// and given the required permissions.
-fn has_all_requirements(cmd: &Command, guild: &Guild, member: &Member, msg: &Message) -> bool {
-    if cmd.allowed_roles.is_empty() {
-        has_correct_permissions(cmd, msg)
-    } else {
-        has_correct_roles(cmd, guild, member) && has_correct_permissions(cmd, msg)
+pub fn has_all_requirements(cmd: &Command, msg: &Message) -> bool {
+    if let Some(guild) = msg.guild() {
+        let guild = guild.read();
+
+        if let Some(member) = guild.members.get(&msg.author.id) {
+
+            if let Ok(permissions) = member.permissions() {
+
+                if cmd.allowed_roles.is_empty() {
+                    return permissions.administrator() || has_correct_permissions(&cmd, &msg);
+                } else {
+                    return permissions.administrator() || (has_correct_roles(&cmd, &guild, &member) && has_correct_permissions(cmd, msg));
+                }
+            }
+        }
     }
+    false
 }
 
 /// Posts an embed showing each individual command group and its commands.
@@ -100,26 +111,31 @@ pub fn with_embeds(_: &mut Context,
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
-                            if !cmd.allowed_roles.is_empty() {
-                                if let Some(guild) = msg.guild() {
-                                    let guild = guild.read();
-
-                                    if let Some(member) = guild.members.get(&msg.author.id) {
-                                        if let Ok(permissions) = member.permissions() {
-                                            if !permissions.administrator() &&
-                                               !has_all_requirements(cmd, &guild, member, &msg) {
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
+                            if has_all_requirements(&cmd, &msg) {
+                                found = Some((command_name, cmd));
                             }
-                            found = Some((command_name, cmd));
+                            else {
+                                break;
+                            }                 
                         },
                         CommandOrAlias::Alias(ref name) => {
-                            error_embed(&msg.channel_id, &format!("Did you mean \"{}\"?", name));
+                            let actual_command = group.commands.get(name).unwrap();
 
-                            return Ok(());
+                            match *actual_command {
+                                CommandOrAlias::Command(ref cmd) => {
+                                    if has_all_requirements(&cmd, &msg) {
+                                        found = Some((name, cmd));
+                                    }
+                                    else {
+                                        break;
+                                    }
+                                },
+
+                                CommandOrAlias::Alias(ref name) => {
+                                    let _ = msg.channel_id.say(&format!("Did you mean {:?}?", name));
+                                    return Ok(());
+                                },
+                            }
                         },
                     }
                 }
@@ -135,6 +151,7 @@ pub fn with_embeds(_: &mut Context,
                 let _ = msg.channel_id.send_message(|m| {
                     m.embed(|e| {
                         let mut embed = e.colour(Colour::rosewater()).title(command_name);
+
                         if let Some(ref desc) = command.desc {
                             embed = embed.description(desc);
                         }
@@ -155,6 +172,11 @@ pub fn with_embeds(_: &mut Context,
 
                         if group_name != "Ungrouped" {
                             embed = embed.field(|f| f.name("Group").value(&group_name));
+                        }
+
+                        if !command.aliases.is_empty() {
+                            let aliases = command.aliases.join(", ");
+                            embed = embed.field(|f| f.name("Aliases").value(&aliases));
                         }
 
                         let available = if command.dm_only {
@@ -209,22 +231,14 @@ pub fn with_embeds(_: &mut Context,
                     let cmd = &commands[name];
 
                     if cmd.help_available {
-                        if let Some(guild) = msg.guild() {
-                            let guild = guild.read();
 
-                            if let Some(member) = guild.members.get(&msg.author.id) {
-                                if let Ok(permissions) = member.permissions() {
-                                    if cmd.help_available &&
-                                       (has_all_requirements(cmd, &guild, member, &msg) ||
-                                        permissions.administrator()) {
-                                        let _ = write!(desc, "`{}`\n", name);
-                                        has_commands = true;
-                                    }
-                                }
-                            }
+                        if cmd.help_available && has_all_requirements(&cmd, &msg) {
+                            let _ = write!(desc, "`{}`\n", name);
+                            has_commands = true;
                         }
                     }
                 }
+
                 if has_commands {
                     e = e.field(|f| f.name(group_name).value(&desc));
                 }
@@ -275,25 +289,31 @@ pub fn plain(_: &mut Context,
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
-                            if !cmd.allowed_roles.is_empty() {
-                                if let Some(guild) = msg.guild() {
-                                    let guild = guild.read();
-
-                                    if let Some(member) = guild.members.get(&msg.author.id) {
-                                        if let Ok(permissions) = member.permissions() {
-                                            if !permissions.administrator() &&
-                                               !has_all_requirements(cmd, &guild, member, &msg) {
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
+                            if has_all_requirements(&cmd, &msg) {
+                                found = Some((command_name, cmd));
                             }
-                            found = Some((command_name, cmd));
+                            else {
+                                break;
+                            }
                         },
                         CommandOrAlias::Alias(ref name) => {
-                            let _ = msg.channel_id.say(&format!("Did you mean {:?}?", name));
-                            return Ok(());
+                            let actual_command = group.commands.get(name).unwrap();
+
+                            match *actual_command {
+                                CommandOrAlias::Command(ref cmd) => {
+                                    if has_all_requirements(&cmd, &msg) {
+                                        found = Some((name, cmd));
+                                    }
+                                    else {
+                                        break;
+                                    }
+                                },
+
+                                CommandOrAlias::Alias(ref name) => {
+                                    let _ = msg.channel_id.say(&format!("Did you mean {:?}?", name));
+                                    return Ok(());
+                                },
+                            }
                         },
                     }
                 }
@@ -306,6 +326,11 @@ pub fn plain(_: &mut Context,
                 }
 
                 let mut result = format!("**{}**\n", command_name);
+
+                if !command.aliases.is_empty() {
+                    let aliases = command.aliases.join("`, `");
+                    let _ = write!(result, "**Aliases:** `{}`\n", aliases);
+                }
 
                 if let Some(ref desc) = command.desc {
                     let _ = write!(result, "**Description:** {}\n", desc);
@@ -364,17 +389,9 @@ pub fn plain(_: &mut Context,
 
         for name in command_names {
             let cmd = &commands[name];
-            if let Some(guild) = msg.guild() {
-                let guild = guild.read();
 
-                if let Some(member) = guild.members.get(&msg.author.id) {
-                    if let Ok(permissions) = member.permissions() {
-                        if cmd.help_available &&
-                           (permissions.administrator() || has_all_requirements(cmd, &guild, member, &msg)) {
-                            let _ = write!(group_help, "`{}` ", name);
-                        }
-                    }
-                }
+            if cmd.help_available && has_all_requirements(&cmd, &msg) {
+                let _ = write!(group_help, "`{}` ", name);
             }
         }
 

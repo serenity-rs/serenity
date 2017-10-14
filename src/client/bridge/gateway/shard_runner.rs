@@ -110,12 +110,12 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             let (event, successful) = self.recv_event();
 
             if let Some(event) = event {
-                let data = self.data.clone();
-                let event_handler = self.event_handler.clone();
-                let shard = self.shard.clone();
+                let data = Arc::clone(&self.data);
+                let event_handler = Arc::clone(&self.event_handler);
+                let shard = Arc::clone(&self.shard);
 
                 feature_framework! {{
-                    let framework = self.framework.clone();
+                    let framework = Arc::clone(&self.framework);
 
                     self.threadpool.execute(|| {
                         dispatch(

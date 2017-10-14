@@ -139,7 +139,7 @@ impl Connection {
             .set_read_timeout(Some(Duration::from_millis(25)));
 
         let mutexed_client = Arc::new(Mutex::new(client));
-        let thread_items = start_threads(mutexed_client.clone(), &udp)?;
+        let thread_items = start_threads(Arc::clone(&mutexed_client), &udp)?;
 
         info!("[Voice] Connected to: {}", info.endpoint);
 

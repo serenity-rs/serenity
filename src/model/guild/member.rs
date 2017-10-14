@@ -159,10 +159,7 @@ impl Member {
     #[cfg(all(feature = "cache", feature = "utils"))]
     pub fn colour(&self) -> Option<Colour> {
         let cache = CACHE.read();
-        let guild = match cache.guilds.get(&self.guild_id) {
-            Some(guild) => guild.read(),
-            None => return None,
-        };
+        let guild = try_opt!(cache.guilds.get(&self.guild_id)).read();
 
         let mut roles = self.roles
             .iter()
@@ -382,25 +379,16 @@ impl Member {
     /// If role data can not be found for the member, then `None` is returned.
     #[cfg(feature = "cache")]
     pub fn roles(&self) -> Option<Vec<Role>> {
-        CACHE
-            .read()
-            .guilds
-            .values()
-            .find(|guild| {
-                guild.read().members.values().any(|m| {
-                    m.user.read().id == self.user.read().id &&
-                    m.joined_at == self.joined_at
-                })
-            })
-            .map(|guild| {
-                guild
-                    .read()
-                    .roles
-                    .values()
-                    .filter(|role| self.roles.contains(&role.id))
-                    .cloned()
-                    .collect()
-            })
+        self
+            .guild_id
+            .find()
+            .map(|g| g
+                .read()
+                .roles
+                .values()
+                .filter(|role| self.roles.contains(&role.id))
+                .cloned()
+                .collect())
     }
 
     /// Unbans the [`User`] from the guild.

@@ -21,6 +21,7 @@ use serde::de::Error as DeError;
 use serde_json;
 use super::utils::*;
 use model::*;
+use std;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
@@ -740,21 +741,23 @@ impl Guild {
 
     /// Retrieves all [`Member`] that start with a given `String`.
     ///
-    /// If the prefix is "zey", following results are possible:
-    /// - "zey", "zeyla", "zey mei"
-    /// If 'case_sensitive' is false, the following are not found:
-    /// - "Zey", "ZEYla", "zeY mei"
+    /// `sorted` decides whether the best early match of the `prefix`
+    /// should be the criteria to sort the result.
+    /// For the `prefix` "zey" and the unsorted result:
+    /// - "zeya", "zeyaa", "zeyla", "zeyzey", "zeyzeyzey"
+    /// It would be sorted:
+    /// - "zeya", "zeyaa", "zeyla", "zeyzey", "zeyzeyzey"
     ///
     /// [`Member`]: struct.Member.html
-    pub fn members_starting_with(&self, prefix: &str, case_sensitive: bool) -> Vec<&Member> {
-        self.members
+    pub fn members_starting_with(&self, prefix: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
+        let mut members: Vec<&Member> = self.members
             .values()
             .filter(|member|
 
                 if case_sensitive {
                     member.user.read().name.starts_with(prefix)
                 } else {
-                    starts_with_case_insensitive(&member.user.read().name, &prefix)
+                    starts_with_case_insensitive(&member.user.read().name, prefix)
                 }
 
                 || member.nick.as_ref()
@@ -763,37 +766,214 @@ impl Guild {
                     if case_sensitive {
                         nick.starts_with(prefix)
                     } else {
-                        starts_with_case_insensitive(&nick, &prefix)
-                    })).collect()
+                        starts_with_case_insensitive(nick, prefix)
+                    })).collect();
+
+        if sorted {
+            members
+                .sort_by(|a, b| {
+                    let name_a = match a.nick {
+                        Some(ref nick) => {
+                            if contains_case_insensitive(&a.user.read().name[..], prefix) {
+                                a.user.read().name.clone()
+                            } else {
+                                nick.clone()
+                            }
+                        },
+                        None => a.user.read().name.clone(),
+                    };
+
+                    let name_b = match b.nick {
+                        Some(ref nick) => {
+                            if contains_case_insensitive(&b.user.read().name[..], prefix) {
+                                b.user.read().name.clone()
+                            } else {
+                                nick.clone()
+                            }
+                        },
+                        None => b.user.read().name.clone(),
+                    };
+
+                    closest_to_origin(prefix, &name_a[..], &name_b[..])
+                });
+            members
+        } else {
+            members
+        }
     }
 
-    /// Retrieves all [`Member`] containing a given `String`.
+    /// Retrieves all [`Member`] containing a given `String` as
+    /// either username or nick, with a priority on username.
     ///
     /// If the substring is "yla", following results are possible:
     /// - "zeyla", "meiyla", "yladenisyla"
     /// If 'case_sensitive' is false, the following are not found:
     /// - "zeYLa", "meiyLa", "LYAdenislyA"
     ///
+    /// `sorted` decides whether the best early match of the search-term
+    /// should be the criteria to sort the result.
+    /// It will look at the account name first, if that does not fit the
+    /// search-criteria `substring`, the display-name will be considered.
+    /// For the `substring` "zey" and the unsorted result:
+    /// - "azey", "zey", "zeyla", "zeylaa", "zeyzeyzey"
+    /// It would be sorted:
+    /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
+    ///
+    /// **Note**: Due to two fields of a `Member` being candidates for
+    /// the searched field, setting `sorted` to `true` will result in an overhead,
+    /// as both fields have to be considered again for sorting.
+    ///
     /// [`Member`]: struct.Member.html
-    pub fn members_containing(&self, substring: &str, case_sensitive: bool) -> Vec<&Member> {
-        self.members
+    pub fn members_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
+        let mut members: Vec<&Member> = self.members
             .values()
             .filter(|member|
 
                 if case_sensitive {
                     member.user.read().name.contains(substring)
                 } else {
-                    contains_case_insensitive(&member.user.read().name, &substring)
+                    contains_case_insensitive(&member.user.read().name, substring)
                 }
 
                 || member.nick.as_ref()
-                    .map_or(false, |nick|
+                    .map_or(false, |nick| {
 
-                    if case_sensitive {
-                        nick.starts_with(substring)
-                    } else {
-                        contains_case_insensitive(&nick, &substring)
-                    })).collect()
+                        if case_sensitive {
+                            nick.contains(substring)
+                        } else {
+                            contains_case_insensitive(nick, substring)
+                        }
+                    })).collect();
+
+        if sorted {
+            members
+                .sort_by(|a, b| {
+                    let name_a = match a.nick {
+                        Some(ref nick) => {
+                            if contains_case_insensitive(&a.user.read().name[..], substring) {
+                                a.user.read().name.clone()
+                            } else {
+                                nick.clone()
+                            }
+                        },
+                        None => a.user.read().name.clone(),
+                    };
+
+                    let name_b = match b.nick {
+                        Some(ref nick) => {
+                            if contains_case_insensitive(&b.user.read().name[..], substring) {
+                                b.user.read().name.clone()
+                            } else {
+                                nick.clone()
+                            }
+                        },
+                        None => b.user.read().name.clone(),
+                    };
+
+                    closest_to_origin(substring, &name_a[..], &name_b[..])
+                });
+            members
+        } else {
+            members
+        }
+    }
+
+    /// Retrieves all [`Member`] containing a given `String` in
+    /// their username.
+    ///
+    /// If the substring is "yla", following results are possible:
+    /// - "zeyla", "meiyla", "yladenisyla"
+    /// If 'case_sensitive' is false, the following are not found:
+    /// - "zeYLa", "meiyLa", "LYAdenislyA"
+    ///
+    /// `sort` decides whether the best early match of the search-term
+    /// should be the criteria to sort the result.
+    /// For the `substring` "zey" and the unsorted result:
+    /// - "azey", "zey", "zeyla", "zeylaa", "zeyzeyzey"
+    /// It would be sorted:
+    /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
+    ///
+    /// [`Member`]: struct.Member.html
+    pub fn members_username_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
+        let mut members: Vec<&Member> = self.members
+            .values()
+            .filter(|member| {
+                if case_sensitive {
+                    member.user.read().name.contains(substring)
+                } else {
+                    contains_case_insensitive(&member.user.read().name, substring)
+                }
+            }).collect();
+
+        if sorted {
+            members
+                .sort_by(|a, b| {
+                    let name_a = &a.user.read().name;
+                    let name_b = &b.user.read().name;
+                    closest_to_origin(substring, &name_a[..], &name_b[..])
+                });
+            members
+        } else {
+            members
+        }
+    }
+
+    /// Retrieves all [`Member`] containing a given `String` in
+    /// their nick.
+    ///
+    /// If the substring is "yla", following results are possible:
+    /// - "zeyla", "meiyla", "yladenisyla"
+    /// If 'case_sensitive' is false, the following are not found:
+    /// - "zeYLa", "meiyLa", "LYAdenislyA"
+    ///
+    /// `sort` decides whether the best early match of the search-term
+    /// should be the criteria to sort the result.
+    /// For the `substring` "zey" and the unsorted result:
+    /// - "azey", "zey", "zeyla", "zeylaa", "zeyzeyzey"
+    /// It would be sorted:
+    /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
+    ///
+    /// **Note**: Instead of panicing, when sorting does not find
+    /// a nick, the username will be used (this should never happen).
+    ///
+    /// [`Member`]: struct.Member.html
+    pub fn members_nick_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
+        let mut members: Vec<&Member> = self.members
+            .values()
+            .filter(|member|
+                member.nick.as_ref()
+                    .map_or(false, |nick| {
+
+                        if case_sensitive {
+                            nick.contains(substring)
+                        } else {
+                            contains_case_insensitive(nick, substring)
+                        }
+                    })).collect();
+
+        if sorted {
+            members
+                .sort_by(|a, b| {
+                    let name_a = match a.nick {
+                        Some(ref nick) => {
+                            nick.clone()
+                        },
+                        None => a.user.read().name.clone(),
+                    };
+
+                    let name_b = match b.nick {
+                        Some(ref nick) => {
+                                nick.clone()
+                            },
+                        None => b.user.read().name.clone(),
+                    };
+
+                    closest_to_origin(substring, &name_a[..], &name_b[..])
+                });
+            members
+        } else {
+            members
+        }
     }
 
     /// Moves a member to a specific voice channel.
@@ -1268,6 +1448,27 @@ fn contains_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
 /// Checks if a `&str` starts with another `&str`.
 fn starts_with_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
     to_look_at.to_lowercase().starts_with(to_find)
+}
+
+/// Takes a `&str` as `origin` and tests if either
+/// `word_a` or `word_b` is closer.
+///
+/// **Note**: Normally `word_a` and `word_b` are
+/// expected to contain `origin` as substring.
+/// If not, using `closest_to_origin` would sort these
+/// the end.
+fn closest_to_origin(origin: &str, word_a: &str, word_b: &str) -> std::cmp::Ordering {
+    let value_a = match word_a.find(origin) {
+        Some(value) => value + word_a.len(),
+        None => return std::cmp::Ordering::Greater,
+    };
+
+    let value_b = match word_b.find(origin) {
+        Some(value) => value + word_b.len(),
+        None => return std::cmp::Ordering::Less,
+    };
+
+    value_a.cmp(&value_b)
 }
 
 /// Information relating to a guild's widget embed.

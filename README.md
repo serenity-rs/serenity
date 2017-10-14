@@ -138,6 +138,16 @@ Voice+youtube-dl:
 
 - youtube-dl (Arch: `community/youtube-dl`)
 
+# Related Projects
+
+- [Discord.net][library:Discord.net]
+- [JDA][library:JDA]
+- [disco][library:disco]
+- [discordrb][library:discordrb]
+- [discord.js][library:discord.js]
+- [discord.py][library:discord.py]
+- [discord-rs][library:discord-rs]
+
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
 [`Client::new`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.new
 [`EventHandler::on_message`]: https://docs.rs/serenity/*/serenity/client/struct.EventHandler.html#method.on_message
@@ -157,4 +167,11 @@ Voice+youtube-dl:
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
 [examples]: https://github.com/zeyla/serenity/tree/master/examples
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
+[library:Discord.net]: https://github.com/RogueException/Discord.Net
+[library:JDA]: https://github.com/DV8FromTheWorld/JDA
+[library:disco]: https://github.com/b1naryth1ef/disco
+[library:discordrb]: https://github.com/meew0/discordrb
+[library:discord.js]: https://github.com/hydrabolt/discord.js
+[library:discord.py]: https://github.com/Rapptz/discord.py
+[library:discord-rs]: https://github.com/SpaceManiac/discord-rs
 [logo]: https://raw.githubusercontent.com/zeyla/serenity/master/logo.png

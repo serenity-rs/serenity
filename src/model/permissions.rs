@@ -445,7 +445,7 @@ impl<'de> Visitor<'de> for U64Visitor {
 
     fn visit_i64<E: DeError>(self, value: i64) -> StdResult<u64, E> { Ok(value as u64) }
 
-    fn visit_u32<E: DeError>(self, value: u32) -> StdResult<u64, E> { Ok(value as u64) }
+    fn visit_u32<E: DeError>(self, value: u32) -> StdResult<u64, E> { Ok(u64::from(value)) }
 
     fn visit_u64<E: DeError>(self, value: u64) -> StdResult<u64, E> { Ok(value) }
 }

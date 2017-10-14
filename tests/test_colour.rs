@@ -1,4 +1,4 @@
-#![allow(unreadable_literal)]
+#![cfg_attr(feature = "cargo-clippy", allow(unreadable_literal))]
 #![cfg(feature = "utils")]
 
 extern crate serenity;

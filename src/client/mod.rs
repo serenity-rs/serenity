@@ -766,16 +766,16 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
             shard_data[0],
             shard_data[1] - shard_data[0] + 1,
             shard_data[2],
-            gateway_url.clone(),
-            self.token.clone(),
-            self.data.clone(),
-            self.event_handler.clone(),
+            Arc::clone(&gateway_url),
+            Arc::clone(&self.token),
+            Arc::clone(&self.data),
+            Arc::clone(&self.event_handler),
             #[cfg(feature = "framework")]
-            self.framework.clone(),
+            Arc::clone(&self.framework),
             self.threadpool.clone(),
         );
 
-        self.shard_runners = manager.runners.clone();
+        self.shard_runners = Arc::clone(&manager.runners);
 
         if let Err(why) = manager.initialize() {
             error!("Failed to boot a shard: {:?}", why);

@@ -90,15 +90,12 @@
 #![allow(doc_markdown, inline_always)]
 #![warn(enum_glob_use, if_not_else)]
 
-#[allow(unused_imports)]
 #[macro_use]
 extern crate bitflags;
-#[allow(unused_imports)]
 #[macro_use]
 extern crate log;
 #[macro_use]
 extern crate serde_derive;
-#[allow(unused_imports)]
 #[macro_use]
 extern crate serde_json;
 
@@ -107,34 +104,35 @@ extern crate serde_json;
 extern crate lazy_static;
 
 extern crate chrono;
-extern crate parking_lot;
 extern crate serde;
 
-#[cfg(feature = "utils")]
+#[cfg(feature = "base64")]
 extern crate base64;
-#[cfg(feature = "voice")]
+#[cfg(feature = "byteorder")]
 extern crate byteorder;
-#[cfg(feature = "gateway")]
+#[cfg(feature = "flate2")]
 extern crate flate2;
 #[cfg(feature = "hyper")]
 extern crate hyper;
 #[cfg(feature = "hyper-native-tls")]
 extern crate hyper_native_tls;
-#[cfg(feature = "http")]
+#[cfg(feature = "multipart")]
 extern crate multipart;
 #[cfg(feature = "native-tls")]
 extern crate native_tls;
-#[cfg(feature = "voice")]
+#[cfg(feature = "opus")]
 extern crate opus;
-#[cfg(feature = "voice")]
+#[cfg(feature = "parking_lot")]
+extern crate parking_lot;
+#[cfg(feature = "sodiumoxide")]
 extern crate sodiumoxide;
 #[cfg(feature = "threadpool")]
 extern crate threadpool;
-#[cfg(feature = "client")]
+#[cfg(feature = "typemap")]
 extern crate typemap;
-#[cfg(feature = "standard_framework")]
+#[cfg(feature = "vec_shift")]
 extern crate vec_shift;
-#[cfg(feature = "gateway")]
+#[cfg(feature = "evzht9h3nznqzwl")]
 extern crate evzht9h3nznqzwl as websocket;
 
 #[macro_use]

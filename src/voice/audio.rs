@@ -1,5 +1,5 @@
 pub const HEADER_LEN: usize = 12;
-pub const SAMPLE_RATE: u32 = 48000;
+pub const SAMPLE_RATE: u32 = 48_000;
 
 /// A readable audio source.
 pub trait AudioSource: Send {

@@ -361,7 +361,7 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
         // - get the global rate;
         // - sleep if there is 0 remaining
         // - then, perform the request
-        let bucket = ROUTES
+        let bucket = Arc::clone(ROUTES
             .lock()
             .entry(route)
             .or_insert_with(|| {
@@ -370,8 +370,7 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
                     remaining: i64::MAX,
                     reset: i64::MAX,
                 }))
-            })
-            .clone();
+            }));
 
         let mut lock = bucket.lock();
         lock.pre_hook(&route);
