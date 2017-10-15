@@ -89,8 +89,8 @@ lazy_static! {
     ///
     /// [`RateLimit`]: struct.RateLimit.html
     /// [`Route`]: enum.Route.html
-    pub static ref ROUTES: Arc<Mutex<HashMap<Route, Arc<Mutex<RateLimit>>>>> = {
-        Arc::new(Mutex::new(HashMap::default()))
+    pub static ref RATELIMITER: Arc<Mutex<RateLimiter>> = {
+        Arc::new(Mutex::new(RateLimiter::default()))
     };
 }
 
@@ -347,73 +347,79 @@ pub enum Route {
     None,
 }
 
-pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
-    where F: Fn() -> RequestBuilder<'a> {
-    loop {
-        // This will block if another thread already has the global
-        // unlocked already (due to receiving an x-ratelimit-global).
-        let _ = GLOBAL.lock().expect("global route lock poisoned");
+#[derive(Debug, Default)]
+pub struct RateLimiter {
+    routes: HashMap<Route, Arc<Mutex<RateLimit>>>,
+    time_offset: i64,
+}
 
-        // Perform pre-checking here:
-        //
-        // - get the route's relevant rate
-        // - sleep if that route's already rate-limited until the end of the
-        //   'reset' time;
-        // - get the global rate;
-        // - sleep if there is 0 remaining
-        // - then, perform the request
-        let bucket = Arc::clone(ROUTES
-            .lock()
-            .expect("routes poisoned")
-            .entry(route)
-            .or_insert_with(|| {
-                Arc::new(Mutex::new(RateLimit {
-                    limit: i64::MAX,
-                    remaining: i64::MAX,
-                    reset: i64::MAX,
-                }))
-            }));
+impl RateLimiter {
+    pub(crate) fn perform<'a, F>(&mut self, route: Route, f: F) -> Result<Response>
+        where F: Fn() -> RequestBuilder<'a> {
+        loop {
+            // This will block if another thread already has the global
+            // unlocked already (due to receiving an x-ratelimit-global).
+            let _ = GLOBAL.lock().expect("global route lock poisoned");
 
-        let mut lock = bucket.lock().unwrap();
-        lock.pre_hook(&route);
+            // Perform pre-checking here:
+            //
+            // - get the route's relevant rate
+            // - sleep if that route's already rate-limited until the end of the
+            //   'reset' time;
+            // - get the global rate;
+            // - sleep if there is 0 remaining
+            // - then, perform the request
+            let bucket = Arc::clone(self.routes
+                .entry(route)
+                .or_insert_with(|| {
+                    Arc::new(Mutex::new(RateLimit {
+                        limit: i64::MAX,
+                        remaining: i64::MAX,
+                        reset: i64::MAX,
+                    }))
+                }));
 
-        let response = super::retry(&f)?;
+            let mut lock = bucket.lock().unwrap();
+            lock.pre_hook(&route);
 
-        // Check if the request got ratelimited by checking for status 429,
-        // and if so, sleep for the value of the header 'retry-after' -
-        // which is in milliseconds - and then `continue` to try again
-        //
-        // If it didn't ratelimit, subtract one from the RateLimit's
-        // 'remaining'
-        //
-        // Update the 'reset' with the value of the 'x-ratelimit-reset'
-        // header
-        //
-        // It _may_ be possible for the limit to be raised at any time,
-        // so check if it did from the value of the 'x-ratelimit-limit'
-        // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
-        if route == Route::None {
-            return Ok(response);
-        } else {
-            let redo = if response.headers.get_raw("x-ratelimit-global").is_some() {
-                let _ = GLOBAL.lock().expect("global route lock poisoned");
+            let response = super::retry(&f)?;
 
-                Ok(
-                    if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {
-                        debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-                        thread::sleep(Duration::from_millis(retry_after as u64));
-
-                        true
-                    } else {
-                        false
-                    },
-                )
-            } else {
-                lock.post_hook(&response, &route)
-            };
-
-            if !redo.unwrap_or(true) {
+            // Check if the request got ratelimited by checking for status 429,
+            // and if so, sleep for the value of the header 'retry-after' -
+            // which is in milliseconds - and then `continue` to try again
+            //
+            // If it didn't ratelimit, subtract one from the RateLimit's
+            // 'remaining'
+            //
+            // Update the 'reset' with the value of the 'x-ratelimit-reset'
+            // header
+            //
+            // It _may_ be possible for the limit to be raised at any time,
+            // so check if it did from the value of the 'x-ratelimit-limit'
+            // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
+            if route == Route::None {
                 return Ok(response);
+            } else {
+                let redo = if response.headers.get_raw("x-ratelimit-global").is_some() {
+                    let _ = GLOBAL.lock().expect("global route lock poisoned");
+
+                    Ok(
+                        if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {
+                            debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
+                            thread::sleep(Duration::from_millis(retry_after as u64));
+
+                            true
+                        } else {
+                            false
+                        },
+                    )
+                } else {
+                    lock.post_hook(&response, &route)
+                };
+
+                if !redo.unwrap_or(true) {
+                    return Ok(response);
+                }
             }
         }
     }

@@ -1782,7 +1782,7 @@ pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
 
 fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
     where F: Fn() -> RequestBuilder<'a> {
-    let response = ratelimiting::perform(route, || {
+    let response = ratelimiting::RateLimiter::perform(route, || {
         f().header(header::Authorization(TOKEN.lock().unwrap().clone()))
             .header(header::ContentType::json())
     })?;
