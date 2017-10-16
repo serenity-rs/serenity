@@ -38,7 +38,7 @@ use hyper::net::HttpsConnector;
 use hyper::{header, Error as HyperError, Result as HyperResult, Url};
 use hyper_native_tls::NativeTlsClient;
 use multipart::client::Multipart;
-use self::ratelimiting::Route;
+use self::ratelimiting::{RATELIMITER, Route};
 use serde_json;
 use std::collections::BTreeMap;
 use std::default::Default;
@@ -1782,7 +1782,7 @@ pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
 
 fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
     where F: Fn() -> RequestBuilder<'a> {
-    let response = ratelimiting::RateLimiter::perform(route, || {
+    let response = RATELIMITER.lock().unwrap().perform(route, || {
         f().header(header::Authorization(TOKEN.lock().unwrap().clone()))
             .header(header::ContentType::json())
     })?;

@@ -40,7 +40,7 @@
 //! [Taken from]: https://discordapp.com/developers/docs/topics/rate-limits#rate-limits
 #![allow(zero_ptr)]
 
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use hyper::client::{RequestBuilder, Response};
 use hyper::header::Headers;
 use hyper::status::StatusCode;
@@ -350,7 +350,7 @@ pub enum Route {
 #[derive(Debug, Default)]
 pub struct RateLimiter {
     routes: HashMap<Route, Arc<Mutex<RateLimit>>>,
-    time_offset: i64,
+    offset: Option<i64>,
 }
 
 impl RateLimiter {
@@ -383,6 +383,10 @@ impl RateLimiter {
             lock.pre_hook(&route);
 
             let response = super::retry(&f)?;
+
+            if self.offset.is_none() {
+                self.offset = offset(&response.headers);
+            }
 
             // Check if the request got ratelimited by checking for status 429,
             // and if so, sleep for the value of the header 'retry-after' -
@@ -456,7 +460,13 @@ impl RateLimit {
             return;
         }
 
-        let current_time = Utc::now().timestamp();
+        let time_offset = match RATELIMITER.lock().unwrap().offset {
+            Some(offset) => offset,
+            None => 0,
+        };
+
+        let now = i64::from(Utc::now().timestamp_subsec_millis());
+        let current_time = now + time_offset;
 
         // The reset was in the past, so we're probably good.
         if current_time > self.reset {
@@ -507,6 +517,19 @@ impl RateLimit {
             false
         })
     }
+}
+
+fn offset(headers: &Headers) -> Option<i64> {
+    headers.get_raw("date").map_or(None, |header| {
+        let now = Utc::now().timestamp_subsec_millis();
+        let offset = DateTime::parse_from_str(&str::from_utf8(&header[0]).unwrap(), "%a, %d %b %Y %T %Z")
+                        .unwrap()
+                        .timestamp_subsec_millis();
+
+        let diff = offset - now;
+
+        Some(i64::from(diff))
+    })
 }
 
 fn parse_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
