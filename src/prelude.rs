@@ -16,6 +16,7 @@
 
 pub use error::Error as SerenityError;
 pub use model::Mentionable;
+pub use parking_lot::{Mutex, RwLock};
 
 #[cfg(feature = "client")]
 pub use client::{Client, ClientError as ClientError, Context, EventHandler};
