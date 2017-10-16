@@ -67,28 +67,8 @@ lazy_static! {
     /// block requests yourself. This has the side-effect of potentially
     /// blocking many of your event handlers or framework commands.
     pub static ref GLOBAL: Arc<Mutex<()>> = Arc::new(Mutex::new(()));
-    /// The routes mutex is a HashMap of each [`Route`] and their respective
-    /// ratelimit information.
-    ///
-    /// See the documentation for [`RateLimit`] for more infomation on how the
-    /// library handles ratelimiting.
-    ///
-    /// # Examples
-    ///
-    /// View the `reset` time of the route for `ChannelsId(7)`:
-    ///
-    /// ```rust,no_run
-    /// use serenity::http::ratelimiting::{ROUTES, Route};
-    ///
-    /// let routes = ROUTES.lock().unwrap();
-    ///
-    /// if let Some(route) = routes.get(&Route::ChannelsId(7)) {
-    ///     println!("Reset time at: {}", route.lock().unwrap().reset);
-    /// }
-    /// ```
-    ///
-    /// [`RateLimit`]: struct.RateLimit.html
-    /// [`Route`]: enum.Route.html
+    /// The ratelimiter mutex is used for storing information relevant to the
+    /// interal ratelimiter such as the routes hashmap and the offset.
     pub static ref RATELIMITER: Arc<Mutex<RateLimiter>> = {
         Arc::new(Mutex::new(RateLimiter::default()))
     };
@@ -349,8 +329,55 @@ pub enum Route {
 
 #[derive(Debug, Default)]
 pub struct RateLimiter {
-    routes: HashMap<Route, Arc<Mutex<RateLimit>>>,
-    offset: Option<i64>,
+    /// A HashMap of each [`Route`] and their respective ratelimit information.
+    ///
+    /// See the documentation for [`RateLimit`] for more infomation on how the
+    /// library handles ratelimiting.
+    ///
+    /// # Examples
+    ///
+    /// View the `reset` time of the route for `ChannelsId(7)`:
+    ///
+    /// ```rust,no_run
+    /// use serenity::http::ratelimiting::{RATELIMITER, Route};
+    ///
+    /// let routes = RATELIMITER.lock().unwrap().routes;
+    ///
+    /// if let Some(route) = routes.get(&Route::ChannelsId(7)) {
+    ///     println!("Reset time at: {}", route.lock().unwrap().reset);
+    /// }
+    /// ```
+    ///
+    /// [`RateLimit`]: struct.RateLimit.html
+    /// [`Route`]: enum.Route.html
+    pub routes: HashMap<Route, Arc<Mutex<RateLimit>>>,
+    /// The time offset(in seconds) between the client and discords servers.
+    pub offset: Option<i64>,
+}
+
+/// A set of data containing information about the ratelimits for a particular
+/// [`Route`], which is stored in the [`ROUTES`] mutex.
+///
+/// See the [Discord docs] on ratelimits for more information.
+///
+/// **Note**: You should _not_ mutate any of the fields, as this can help cause
+/// 429s.
+///
+/// [`ROUTES`]: struct.ROUTES.html
+/// [`Route`]: enum.Route.html
+/// [Discord docs]: https://discordapp.com/developers/docs/topics/rate-limits
+#[derive(Clone, Debug, Default)]
+pub struct RateLimit {
+    /// The total number of requests that can be made in a period of time.
+    pub limit: i64,
+    /// The number of requests remaining in the period of time.
+    pub remaining: i64,
+    /// When the interval resets and the the [`limit`] resets to the value of
+    /// [`remaining`].
+    ///
+    /// [`limit`]: #structfield.limit
+    /// [`remaining`]: #structfield.remaining
+    pub reset: i64,
 }
 
 impl RateLimiter {
@@ -380,7 +407,7 @@ impl RateLimiter {
                 }));
 
             let mut lock = bucket.lock().unwrap();
-            lock.pre_hook(&route);
+            self.pre_hook(&mut lock, &route);
 
             let response = super::retry(&f)?;
 
@@ -418,7 +445,7 @@ impl RateLimiter {
                         },
                     )
                 } else {
-                    lock.post_hook(&response, &route)
+                    self.post_hook(&response, &mut lock, &route)
                 };
 
                 if !redo.unwrap_or(true) {
@@ -427,57 +454,32 @@ impl RateLimiter {
             }
         }
     }
-}
 
-/// A set of data containing information about the ratelimits for a particular
-/// [`Route`], which is stored in the [`ROUTES`] mutex.
-///
-/// See the [Discord docs] on ratelimits for more information.
-///
-/// **Note**: You should _not_ mutate any of the fields, as this can help cause
-/// 429s.
-///
-/// [`ROUTES`]: struct.ROUTES.html
-/// [`Route`]: enum.Route.html
-/// [Discord docs]: https://discordapp.com/developers/docs/topics/rate-limits
-#[derive(Clone, Debug, Default)]
-pub struct RateLimit {
-    /// The total number of requests that can be made in a period of time.
-    pub limit: i64,
-    /// The number of requests remaining in the period of time.
-    pub remaining: i64,
-    /// When the interval resets and the the [`limit`] resets to the value of
-    /// [`remaining`].
-    ///
-    /// [`limit`]: #structfield.limit
-    /// [`remaining`]: #structfield.remaining
-    pub reset: i64,
-}
-
-impl RateLimit {
-    pub(crate) fn pre_hook(&mut self, route: &Route) {
-        if self.limit == 0 {
+    pub(crate) fn pre_hook(&mut self, ratelimit: &mut RateLimit, route: &Route) {
+        if ratelimit.limit == 0 {
             return;
         }
 
-        let time_offset = match RATELIMITER.lock().unwrap().offset {
+        let time_offset = match self.offset {
             Some(offset) => offset,
             None => 0,
         };
 
-        let now = i64::from(Utc::now().timestamp_subsec_millis());
+        let now = Utc::now().timestamp();
         let current_time = now + time_offset;
 
         // The reset was in the past, so we're probably good.
-        if current_time > self.reset {
-            self.remaining = self.limit;
+        if current_time > ratelimit.reset {
+            ratelimit.remaining = ratelimit.limit;
 
             return;
         }
 
-        let diff = (self.reset - current_time) as u64;
+        let diff = (ratelimit.reset.saturating_sub(current_time)) as u64;
 
-        if self.remaining == 0 {
+        println!("{:?}", diff);
+
+        if ratelimit.remaining == 0 {
             let delay = (diff * 1000) + 500;
 
             debug!(
@@ -490,20 +492,21 @@ impl RateLimit {
             return;
         }
 
-        self.remaining -= 1;
+        ratelimit.remaining -= 1;
     }
 
-    pub(crate) fn post_hook(&mut self, response: &Response, route: &Route) -> Result<bool> {
+    pub(crate) fn post_hook(&mut self, response: &Response, ratelimit: &mut RateLimit, route: &Route)
+        -> Result<bool> {
         if let Some(limit) = parse_header(&response.headers, "x-ratelimit-limit")? {
-            self.limit = limit;
+            ratelimit.limit = limit;
         }
 
         if let Some(remaining) = parse_header(&response.headers, "x-ratelimit-remaining")? {
-            self.remaining = remaining;
+            ratelimit.remaining = remaining;
         }
 
         if let Some(reset) = parse_header(&response.headers, "x-ratelimit-reset")? {
-            self.reset = reset;
+            ratelimit.reset = reset;
         }
 
         Ok(if response.status != StatusCode::TooManyRequests {
@@ -521,14 +524,22 @@ impl RateLimit {
 
 fn offset(headers: &Headers) -> Option<i64> {
     headers.get_raw("date").map_or(None, |header| {
-        let now = Utc::now().timestamp_subsec_millis();
-        let offset = DateTime::parse_from_str(&str::from_utf8(&header[0]).unwrap(), "%a, %d %b %Y %T %Z")
+        let date_str = str::replace(str::from_utf8(&header[0]).unwrap(), "GMT", "+0000");
+
+        println!("{}", date_str);
+
+        let now = Utc::now().timestamp();
+        let offset = DateTime::parse_from_str(&date_str, "%a, %d %b %Y %T %z")
                         .unwrap()
-                        .timestamp_subsec_millis();
+                        .timestamp();
 
         let diff = offset - now;
 
-        Some(i64::from(diff))
+        if diff > 1 {
+            info!("System time is off by {}s.", diff)
+        }
+
+        Some(diff)
     })
 }
 
