@@ -341,7 +341,7 @@ pub struct RateLimiter {
     /// ```rust,no_run
     /// use serenity::http::ratelimiting::{RATELIMITER, Route};
     ///
-    /// let routes = RATELIMITER.lock().unwrap().routes;
+    /// let routes = &RATELIMITER.lock().unwrap().routes;
     ///
     /// if let Some(route) = routes.get(&Route::ChannelsId(7)) {
     ///     println!("Reset time at: {}", route.lock().unwrap().reset);
