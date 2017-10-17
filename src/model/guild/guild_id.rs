@@ -303,6 +303,26 @@ impl GuildId {
         http::edit_role(self.0, role_id.into().0, &f(EditRole::default()).0)
     }
 
+    /// Edits the order of [`Role`]s
+    /// Requires the [Mange Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Change the order of a role:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::{GuildId, RoleId};
+    /// GuildId(7).edit_role_position(RoleId(8), 2);
+    /// ```
+    ///
+    /// [`Role`]: struct.Role.html
+    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[inline]
+    pub fn edit_role_position(&self, role_id: u64, position: u64) -> Result<Vec<Role>> {
+        http::edit_role_position(self.0, role_id, position)
+    }
+
+
     /// Search the cache for the guild.
     #[cfg(feature = "cache")]
     pub fn find(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().unwrap().guild(*self) }
