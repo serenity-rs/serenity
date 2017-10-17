@@ -104,6 +104,7 @@ extern crate serde_json;
 extern crate lazy_static;
 
 extern crate chrono;
+extern crate parking_lot;
 extern crate serde;
 
 #[cfg(feature = "base64")]
@@ -122,8 +123,6 @@ extern crate multipart;
 extern crate native_tls;
 #[cfg(feature = "opus")]
 extern crate opus;
-#[cfg(feature = "parking_lot")]
-extern crate parking_lot;
 #[cfg(feature = "sodiumoxide")]
 extern crate sodiumoxide;
 #[cfg(feature = "threadpool")]

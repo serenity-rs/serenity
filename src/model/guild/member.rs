@@ -178,6 +178,7 @@ impl Member {
     /// Returns the "default channel" of the guild for the member.
     /// (This returns the first channel that can be read by the member, if there isn't
     /// one returns `None`)
+    #[cfg(feature = "cache")]
     pub fn default_channel(&self) -> Option<Arc<RwLock<GuildChannel>>> {
         let guild = match self.guild_id.find() {
             Some(guild) => guild,

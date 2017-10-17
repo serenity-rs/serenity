@@ -19,7 +19,6 @@ use serde::de::Error as DeError;
 use serde_json;
 use super::utils::*;
 use model::*;
-use std;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
@@ -29,6 +28,8 @@ use http;
 use builder::{EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
 use constants::LARGE_THRESHOLD;
+#[cfg(feature = "model")]
+use std;
 
 /// A representation of a banning of a user.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash)]
@@ -1446,11 +1447,13 @@ impl<'de> Deserialize<'de> for Guild {
 }
 
 /// Checks if a `&str` contains another `&str`.
+#[cfg(feature = "model")]
 fn contains_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
     to_look_at.to_lowercase().contains(to_find)
 }
 
 /// Checks if a `&str` starts with another `&str`.
+#[cfg(feature = "model")]
 fn starts_with_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
     to_look_at.to_lowercase().starts_with(to_find)
 }
@@ -1462,6 +1465,7 @@ fn starts_with_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
 /// expected to contain `origin` as substring.
 /// If not, using `closest_to_origin` would sort these
 /// the end.
+#[cfg(feature = "model")]
 fn closest_to_origin(origin: &str, word_a: &str, word_b: &str) -> std::cmp::Ordering {
     let value_a = match word_a.find(origin) {
         Some(value) => value + word_a.len(),
