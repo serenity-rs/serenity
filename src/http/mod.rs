@@ -38,6 +38,7 @@ use hyper::net::HttpsConnector;
 use hyper::{header, Error as HyperError, Result as HyperResult, Url};
 use hyper_native_tls::NativeTlsClient;
 use multipart::client::Multipart;
+use parking_lot::Mutex;
 use self::ratelimiting::{RATELIMITER, Route};
 use serde_json;
 use std::collections::BTreeMap;
@@ -46,7 +47,7 @@ use std::fmt::Write as FmtWrite;
 use std::fs::File;
 use std::io::{ErrorKind as IoErrorKind, Read};
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use constants;
 use internal::prelude::*;
 use model::*;
@@ -98,7 +99,7 @@ lazy_static! {
 /// # fn main() {
 /// #     try_main().unwrap();
 /// # }
-pub fn set_token(token: &str) { TOKEN.lock().unwrap().clone_from(&token.to_string()); }
+pub fn set_token(token: &str) { TOKEN.lock().clone_from(&token.to_string()); }
 
 /// Adds a [`User`] as a recipient to a [`Group`].
 ///
@@ -788,7 +789,7 @@ pub fn edit_profile(map: &JsonMap) -> Result<CurrentUser> {
     let mut value = serde_json::from_reader::<HyperResponse, Value>(response)?;
 
     if let Some(map) = value.as_object_mut() {
-        if !TOKEN.lock().unwrap().starts_with("Bot ") {
+        if !TOKEN.lock().starts_with("Bot ") {
             if let Some(Value::String(token)) = map.remove("token") {
                 set_token(&token);
             }
@@ -1624,7 +1625,7 @@ pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, m
     let mut request = Request::with_connector(Method::Post, url, &connector)?;
     request
         .headers_mut()
-        .set(header::Authorization(TOKEN.lock().unwrap().clone()));
+        .set(header::Authorization(TOKEN.lock().clone()));
     request
         .headers_mut()
         .set(header::UserAgent(constants::USER_AGENT.to_string()));
@@ -1783,7 +1784,7 @@ pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
 fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
     where F: Fn() -> RequestBuilder<'a> {
     let response = RATELIMITER.lock().unwrap().perform(route, || {
-        f().header(header::Authorization(TOKEN.lock().unwrap().clone()))
+        f().header(header::Authorization(TOKEN.lock().clone()))
             .header(header::ContentType::json())
     })?;
 
