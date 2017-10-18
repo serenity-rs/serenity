@@ -110,7 +110,7 @@ impl GuildId {
     pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
         let map = json!({
             "name": name,
-            "type": kind.name(),
+            "type": kind as u8,
         });
 
         http::create_channel(self.0, &map)
