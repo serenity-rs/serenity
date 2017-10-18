@@ -128,14 +128,6 @@ impl Shard {
                -> Result<Shard> {
         let client = connect(&*ws_url.lock().unwrap())?;
 
-        let current_presence = (None, OnlineStatus::Online, false);
-        let heartbeat_instants = (None, None);
-        let heartbeat_interval = None;
-        let last_heartbeat_acknowledged = true;
-        let seq = 0;
-        let stage = ConnectionStage::Handshake;
-        let session_id = None;
-
         Ok(feature_voice! {
             {
                 let (tx, rx) = mpsc::channel();
@@ -144,32 +136,20 @@ impl Shard {
 
                 Shard {
                     client,
-                    current_presence,
-                    heartbeat_instants,
-                    heartbeat_interval,
-                    last_heartbeat_acknowledged,
-                    seq,
-                    stage,
                     token,
-                    session_id,
                     shard_info,
                     ws_url,
                     manager: VoiceManager::new(tx, user.id),
                     manager_rx: rx,
+                    .. Default::default()
                 }
             } else {
                 Shard {
                     client,
-                    current_presence,
-                    heartbeat_instants,
-                    heartbeat_interval,
-                    last_heartbeat_acknowledged,
-                    seq,
-                    stage,
                     token,
-                    session_id,
                     shard_info,
                     ws_url,
+                    .. Default::default()
                 }
             }
         })
@@ -1042,4 +1022,31 @@ fn set_client_timeout(client: &mut WsClient) -> Result<()> {
 fn build_gateway_url(base: &str) -> Result<Url> {
     Url::parse(&format!("{}?v={}", base, constants::GATEWAY_VERSION))
         .map_err(|_| Error::Gateway(GatewayError::BuildingUrl))
+}
+
+impl Default for Shard {
+    fn default() -> Self {
+        #[cfg(feature = "voice")]
+        let (tx, rx) = mpsc::channel();
+        #[cfg(feature = "voice")]
+        let user = http::get_current_user().unwrap();
+
+        Shard {
+            client: connect(&String::new()).unwrap(),
+            current_presence: (None, OnlineStatus::Online, false),
+            heartbeat_instants: (None, None),
+            heartbeat_interval: None,
+            last_heartbeat_acknowledged: true,
+            seq: 0,
+            stage: ConnectionStage::Handshake,
+            token: Arc::new(Mutex::new(String::new())),
+            session_id: None,
+            shard_info: [0; 2],
+            ws_url: Arc::new(Mutex::new(String::new())),
+            #[cfg(feature = "voice")]
+            manager: VoiceManager::new(tx, user.id),
+            #[cfg(feature = "voice")]
+            manager_rx: rx,
+        }
+    }
 }
