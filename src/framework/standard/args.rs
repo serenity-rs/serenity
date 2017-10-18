@@ -111,7 +111,7 @@ impl Args {
     /// let args = Args::new("42 69", " ");
     /// 
     /// assert_eq!(args.single_n::<i32>().unwrap(), 42);
-    /// assert!(args == ["42", "69"]);
+    /// assert_eq!(args, ["42", "69"]);
     /// ```
     /// 
     /// [`single`]: #method.single
@@ -301,7 +301,7 @@ impl Args {
     /// let args = Args::new("c47 69", " ");
     /// 
     /// assert_eq!(args.find_n::<i32>().unwrap(), 69);
-    /// assert!(args == ["c47", "69"]);
+    /// assert_eq!(args, ["c47", "69"]);
     /// ```
     pub fn find_n<T: FromStr>(&self) -> Result<T, T::Err>
         where T::Err: StdError {
