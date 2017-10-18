@@ -1,6 +1,8 @@
 use super::CreateEmbed;
 use model::ReactionType;
 use internal::prelude::*;
+use utils;
+use std::collections::HashMap;
 use std::fmt::Display;
 
 /// A builder to specify the contents of an [`http::send_message`] request,
@@ -39,15 +41,14 @@ use std::fmt::Display;
 /// [`embed`]: #method.embed
 /// [`http::send_message`]: ../http/fn.send_message.html
 #[derive(Clone, Debug)]
-pub struct CreateMessage(pub Map<String, Value>, pub Option<Vec<ReactionType>>);
+pub struct CreateMessage(pub HashMap<&'static str, Value>, pub Option<Vec<ReactionType>>);
 
 impl CreateMessage {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     pub fn content<D: Display>(mut self, content: D) -> Self {
-        self.0
-            .insert("content".to_string(), Value::String(format!("{}", content)));
+        self.0.insert("content", Value::String(format!("{}", content)));
 
         CreateMessage(self.0, self.1)
     }
@@ -55,9 +56,10 @@ impl CreateMessage {
     /// Set an embed for the message.
     pub fn embed<F>(mut self, f: F) -> Self
         where F: FnOnce(CreateEmbed) -> CreateEmbed {
-        let embed = Value::Object(f(CreateEmbed::default()).0);
+        let map = utils::hashmap_to_json_map(f(CreateEmbed::default()).0);
+        let embed = Value::Object(map);
 
-        self.0.insert("embed".to_string(), embed);
+        self.0.insert("embed", embed);
 
         CreateMessage(self.0, self.1)
     }
@@ -68,7 +70,7 @@ impl CreateMessage {
     ///
     /// Defaults to `false`.
     pub fn tts(mut self, tts: bool) -> Self {
-        self.0.insert("tts".to_string(), Value::Bool(tts));
+        self.0.insert("tts", Value::Bool(tts));
 
         CreateMessage(self.0, self.1)
     }
@@ -88,8 +90,8 @@ impl Default for CreateMessage {
     /// [`Message`]: ../model/struct.Message.html
     /// [`tts`]: #method.tts
     fn default() -> CreateMessage {
-        let mut map = Map::default();
-        map.insert("tts".to_string(), Value::Bool(false));
+        let mut map = HashMap::default();
+        map.insert("tts", Value::Bool(false));
 
         CreateMessage(map, None)
     }

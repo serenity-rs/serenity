@@ -6,15 +6,13 @@ use model::*;
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 #[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
-#[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
-#[cfg(all(feature = "cache", feature = "model"))]
-use http;
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
 use builder::EditMember;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use utils::Colour;
+#[cfg(all(feature = "cache", feature = "model"))]
+use {CACHE, http, utils};
 
 pub trait BanOptions {
     fn dmd(&self) -> u8 { 0 }
@@ -109,7 +107,8 @@ impl Member {
     pub fn add_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         self.roles.extend_from_slice(role_ids);
 
-        let map = EditMember::default().roles(&self.roles).0;
+        let builder = EditMember::default().roles(&self.roles);
+        let map = utils::hashmap_to_json_map(builder.0);
 
         match http::edit_member(self.guild_id.0, self.user.read().id.0, &map) {
             Ok(()) => Ok(()),
@@ -227,7 +226,7 @@ impl Member {
     /// [`EditMember`]: ../builder/struct.EditMember.html
     #[cfg(feature = "cache")]
     pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F) -> Result<()> {
-        let map = f(EditMember::default()).0;
+        let map = utils::hashmap_to_json_map(f(EditMember::default()).0);
 
         http::edit_member(self.guild_id.0, self.user.read().id.0, &map)
     }
@@ -361,7 +360,8 @@ impl Member {
     pub fn remove_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         self.roles.retain(|r| !role_ids.contains(r));
 
-        let map = EditMember::default().roles(&self.roles).0;
+        let builder = EditMember::default().roles(&self.roles);
+        let map = utils::hashmap_to_json_map(builder.0);
 
         match http::edit_member(self.guild_id.0, self.user.read().id.0, &map) {
             Ok(()) => Ok(()),

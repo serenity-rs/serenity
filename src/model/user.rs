@@ -21,6 +21,8 @@ use builder::{CreateMessage, EditProfile};
 use CACHE;
 #[cfg(feature = "model")]
 use http::{self, GuildPagination};
+#[cfg(feature = "model")]
+use utils;
 
 /// Information about the current user.
 #[derive(Clone, Default, Debug, Deserialize)]
@@ -86,14 +88,16 @@ impl CurrentUser {
     /// ```
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
-        let mut map = Map::new();
-        map.insert("username".to_string(), Value::String(self.name.clone()));
+        let mut map = HashMap::new();
+        map.insert("username", Value::String(self.name.clone()));
 
         if let Some(email) = self.email.as_ref() {
-            map.insert("email".to_string(), Value::String(email.clone()));
+            map.insert("email", Value::String(email.clone()));
         }
 
-        match http::edit_profile(&f(EditProfile(map)).0) {
+        let map = utils::hashmap_to_json_map(f(EditProfile(map)).0);
+
+        match http::edit_profile(&map) {
             Ok(new) => {
                 let _ = mem::replace(self, new);
 

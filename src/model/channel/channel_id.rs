@@ -11,6 +11,8 @@ use builder::{CreateMessage, EditChannel, GetMessages};
 use CACHE;
 #[cfg(feature = "model")]
 use http::{self, AttachmentType};
+#[cfg(feature = "model")]
+use utils;
 
 #[cfg(feature = "model")]
 impl ChannelId {
@@ -185,7 +187,9 @@ impl ChannelId {
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
     pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel> {
-        http::edit_channel(self.0, &f(EditChannel::default()).0)
+        let map = utils::hashmap_to_json_map(f(EditChannel::default()).0);
+
+        http::edit_channel(self.0, &map)
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -209,15 +213,17 @@ impl ChannelId {
     /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
-        let map = f(CreateMessage::default()).0;
+        let msg = f(CreateMessage::default());
 
-        if let Some(content) = map.get("content") {
+        if let Some(content) = msg.0.get("content") {
             if let Value::String(ref content) = *content {
                 if let Some(length_over) = Message::overflow_length(content) {
                     return Err(Error::Model(ModelError::MessageTooLong(length_over)));
                 }
             }
         }
+
+        let map = utils::hashmap_to_json_map(msg.0);
 
         http::edit_message(self.0, message_id.into().0, &Value::Object(map))
     }
@@ -441,9 +447,9 @@ impl ChannelId {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
-        let mut map = f(CreateMessage::default()).0;
+        let mut msg = f(CreateMessage::default());
 
-        if let Some(content) = map.get("content") {
+        if let Some(content) = msg.0.get("content") {
             if let Value::String(ref content) = *content {
                 if let Some(length_over) = Message::overflow_length(content) {
                     return Err(Error::Model(ModelError::MessageTooLong(length_over)));
@@ -451,7 +457,8 @@ impl ChannelId {
             }
         }
 
-        let _ = map.remove("embed");
+        let _ = msg.0.remove("embed");
+        let map = utils::hashmap_to_json_map(msg.0);
 
         http::send_files(self.0, files, map)
     }
@@ -477,14 +484,15 @@ impl ChannelId {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     pub fn send_message<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
-        let CreateMessage(map, reactions) = f(CreateMessage::default());
+        let msg = f(CreateMessage::default());
+        let map = utils::hashmap_to_json_map(msg.0);
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
         let message = http::send_message(self.0, &Value::Object(map))?;
 
-        if let Some(reactions) = reactions {
+        if let Some(reactions) = msg.1 {
             for reaction in reactions {
                 self.create_reaction(message.id, reaction)?;
             }

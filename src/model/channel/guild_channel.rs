@@ -116,7 +116,9 @@ impl GuildChannel {
             }
         }
 
-        http::create_invite(self.id.0, &f(CreateInvite::default()).0)
+        let map = serenity_utils::hashmap_to_json_map(f(CreateInvite::default()).0);
+
+        http::create_invite(self.id.0, &map)
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -312,18 +314,12 @@ impl GuildChannel {
             }
         }
 
-        let mut map = Map::new();
-        map.insert("name".to_string(), Value::String(self.name.clone()));
-        map.insert(
-            "position".to_string(),
-            Value::Number(Number::from(self.position)),
-        );
-        map.insert(
-            "type".to_string(),
-            Value::String(self.kind.name().to_string()),
-        );
+        let mut map = HashMap::new();
+        map.insert("name", Value::String(self.name.clone()));
+        map.insert("position", Value::Number(Number::from(self.position)));
+        map.insert("type", Value::String(self.kind.name().to_string()));
 
-        let edited = f(EditChannel(map)).0;
+        let edited = serenity_utils::hashmap_to_json_map(f(EditChannel(map)).0);
 
         match http::edit_channel(self.id.0, &edited) {
             Ok(channel) => {

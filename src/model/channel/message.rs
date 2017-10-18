@@ -14,6 +14,8 @@ use constants;
 use CACHE;
 #[cfg(feature = "model")]
 use http;
+#[cfg(feature = "model")]
+use utils as serenity_utils;
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
@@ -230,7 +232,7 @@ impl Message {
             builder = builder.tts(true);
         }
 
-        let map = f(builder).0;
+        let map = serenity_utils::hashmap_to_json_map(f(builder).0);
 
         match http::edit_message(self.channel_id.0, self.id.0, &Value::Object(map)) {
             Ok(edited) => {

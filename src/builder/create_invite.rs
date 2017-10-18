@@ -1,4 +1,5 @@
 use serde_json::Value;
+use std::collections::HashMap;
 use std::default::Default;
 use internal::prelude::*;
 
@@ -58,7 +59,7 @@ use internal::prelude::*;
 /// [`GuildChannel::create_invite`]: ../model/struct.GuildChannel.html#method.create_invite
 /// [`RichInvite`]: ../model/struct.Invite.html
 #[derive(Clone, Debug)]
-pub struct CreateInvite(pub JsonMap);
+pub struct CreateInvite(pub HashMap<&'static str, Value>);
 
 impl CreateInvite {
     /// The duration that the invite will be valid for.
@@ -89,8 +90,7 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn max_age(mut self, max_age: u64) -> Self {
-        self.0
-            .insert("max_age".to_string(), Value::Number(Number::from(max_age)));
+        self.0.insert("max_age", Value::Number(Number::from(max_age)));
 
         self
     }
@@ -123,8 +123,7 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn max_uses(mut self, max_uses: u64) -> Self {
-        self.0
-            .insert("max_uses".to_string(), Value::Number(Number::from(max_uses)));
+        self.0.insert("max_uses", Value::Number(Number::from(max_uses)));
 
         self
     }
@@ -155,8 +154,7 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn temporary(mut self, temporary: bool) -> Self {
-        self.0
-            .insert("temporary".to_string(), Value::Bool(temporary));
+        self.0.insert("temporary", Value::Bool(temporary));
 
         self
     }
@@ -187,7 +185,7 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn unique(mut self, unique: bool) -> Self {
-        self.0.insert("unique".to_string(), Value::Bool(unique));
+        self.0.insert("unique", Value::Bool(unique));
 
         self
     }
@@ -206,8 +204,8 @@ impl Default for CreateInvite {
     /// let invite_builder = CreateInvite::default();
     /// ```
     fn default() -> CreateInvite {
-        let mut map = Map::new();
-        map.insert("validate".to_string(), Value::Null);
+        let mut map = HashMap::new();
+        map.insert("validate", Value::Null);
 
         CreateInvite(map)
     }

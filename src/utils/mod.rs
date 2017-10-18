@@ -13,17 +13,31 @@ pub use self::message_builder::{Content, ContentModifier, MessageBuilder};
 pub use super::builder;
 
 use base64;
-use std::ffi::OsStr;
-use std::fs::File;
-use std::io::Read;
-use std::path::Path;
 use internal::prelude::*;
 use model::{EmojiId, EmojiIdentifier};
+use std::collections::HashMap;
+use std::ffi::OsStr;
+use std::fs::File;
+use std::hash::Hash;
+use std::io::Read;
+use std::path::Path;
 
 #[cfg(feature = "cache")]
 use cache::Cache;
 #[cfg(feature = "cache")]
 use CACHE;
+
+/// Converts a HashMap into a final `serde_json::Map` representation.
+pub fn hashmap_to_json_map<T>(map: HashMap<T, Value>) -> Map<String, Value>
+    where T: Eq + Hash + ToString {
+    let mut json_map = Map::new();
+
+    for (key, value) in map.into_iter() {
+        json_map.insert(key.to_string(), value);
+    }
+
+    json_map
+}
 
 /// Determines if a name is NSFW.
 ///

@@ -12,7 +12,9 @@ use internal::prelude::*;
 #[cfg(feature = "builder")]
 use builder::EditProfile;
 #[cfg(feature = "builder")]
-use http;
+use {http, utils};
+#[cfg(feature = "builder")]
+use std::collections::HashMap;
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
@@ -79,29 +81,29 @@ impl Context {
     /// ```
     #[cfg(feature = "builder")]
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser> {
-        let mut map = Map::new();
+        let mut map = HashMap::new();
 
         feature_cache! {
             {
                 let cache = CACHE.read();
 
-                map.insert("username".to_string(), Value::String(cache.user.name.clone()));
+                map.insert("username", Value::String(cache.user.name.clone()));
 
                 if let Some(email) = cache.user.email.as_ref() {
-                    map.insert("email".to_string(), Value::String(email.clone()));
+                    map.insert("email", Value::String(email.clone()));
                 }
             } else {
                 let user = http::get_current_user()?;
 
-                map.insert("username".to_string(), Value::String(user.name.clone()));
+                map.insert("username", Value::String(user.name.clone()));
 
                 if let Some(email) = user.email.as_ref() {
-                    map.insert("email".to_string(), Value::String(email.clone()));
+                    map.insert("email", Value::String(email.clone()));
                 }
             }
         }
 
-        let edited = f(EditProfile(map)).0;
+        let edited = utils::hashmap_to_json_map(f(EditProfile(map)).0);
 
         http::edit_profile(&edited)
     }

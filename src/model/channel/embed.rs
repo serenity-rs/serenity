@@ -4,6 +4,8 @@ use utils::Colour;
 use internal::prelude::*;
 #[cfg(feature = "model")]
 use builder::CreateEmbed;
+#[cfg(feature = "model")]
+use utils;
 
 /// Represents a rich embed which allows using richer markdown, multiple fields
 /// and more. This was heavily inspired by [slack's attachments].
@@ -89,7 +91,9 @@ impl Embed {
     #[inline]
     pub fn fake<F>(f: F) -> Value
         where F: FnOnce(CreateEmbed) -> CreateEmbed {
-        Value::Object(f(CreateEmbed::default()).0)
+        let map = utils::hashmap_to_json_map(f(CreateEmbed::default()).0);
+
+        Value::Object(map)
     }
 }
 

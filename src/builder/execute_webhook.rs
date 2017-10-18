@@ -1,6 +1,6 @@
 use serde_json::Value;
+use std::collections::HashMap;
 use std::default::Default;
-use internal::prelude::*;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
 ///
@@ -53,7 +53,7 @@ use internal::prelude::*;
 /// [`Webhook::execute`]: ../model/struct.Webhook.html#method.execute
 /// [`execute_webhook`]: ../http/fn.execute_webhook.html
 #[derive(Clone, Debug)]
-pub struct ExecuteWebhook(pub JsonMap);
+pub struct ExecuteWebhook(pub HashMap<&'static str, Value>);
 
 impl ExecuteWebhook {
     /// Override the default avatar of the webhook with an image URL.
@@ -74,10 +74,7 @@ impl ExecuteWebhook {
     ///     .content("Here's a webhook"));
     /// ```
     pub fn avatar_url(mut self, avatar_url: &str) -> Self {
-        self.0.insert(
-            "avatar_url".to_string(),
-            Value::String(avatar_url.to_string()),
-        );
+        self.0.insert("avatar_url", Value::String(avatar_url.to_string()));
 
         self
     }
@@ -103,8 +100,7 @@ impl ExecuteWebhook {
     ///
     /// [`embeds`]: #method.embeds
     pub fn content(mut self, content: &str) -> Self {
-        self.0
-            .insert("content".to_string(), Value::String(content.to_string()));
+        self.0.insert("content", Value::String(content.to_string()));
 
         self
     }
@@ -123,7 +119,7 @@ impl ExecuteWebhook {
     /// [`Webhook::execute`]: ../model/struct.Webhook.html#method.execute
     /// [struct-level documentation]: #examples
     pub fn embeds(mut self, embeds: Vec<Value>) -> Self {
-        self.0.insert("embeds".to_string(), Value::Array(embeds));
+        self.0.insert("embeds", Value::Array(embeds));
 
         self
     }
@@ -144,7 +140,7 @@ impl ExecuteWebhook {
     /// }
     /// ```
     pub fn tts(mut self, tts: bool) -> Self {
-        self.0.insert("tts".to_string(), Value::Bool(tts));
+        self.0.insert("tts", Value::Bool(tts));
 
         self
     }
@@ -165,8 +161,7 @@ impl ExecuteWebhook {
     /// }
     /// ```
     pub fn username(mut self, username: &str) -> Self {
-        self.0
-            .insert("username".to_string(), Value::String(username.to_string()));
+        self.0.insert("username", Value::String(username.to_string()));
 
         self
     }
@@ -190,8 +185,8 @@ impl Default for ExecuteWebhook {
     /// [`Webhook`]: ../model/struct.Webhook.html
     /// [`tts`]: #method.tts
     fn default() -> ExecuteWebhook {
-        let mut map = Map::new();
-        map.insert("tts".to_string(), Value::Bool(false));
+        let mut map = HashMap::new();
+        map.insert("tts", Value::Bool(false));
 
         ExecuteWebhook(map)
     }

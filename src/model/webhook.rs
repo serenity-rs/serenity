@@ -7,7 +7,7 @@ use builder::ExecuteWebhook;
 #[cfg(feature = "model")]
 use internal::prelude::*;
 #[cfg(feature = "model")]
-use http;
+use {http, utils};
 
 /// A representation of a webhook, which is a low-effort way to post messages to
 /// channels. They do not necessarily require a bot user or authentication to
@@ -183,12 +183,9 @@ impl Webhook {
                                                                 wait: bool,
                                                                 f: F)
                                                                 -> Result<Option<Message>> {
-        http::execute_webhook(
-            self.id.0,
-            &self.token,
-            wait,
-            &f(ExecuteWebhook::default()).0,
-        )
+        let map = utils::hashmap_to_json_map(f(ExecuteWebhook::default()).0);
+
+        http::execute_webhook(self.id.0, &self.token, wait, &map)
     }
 
     /// Retrieves the latest information about the webhook, editing the
