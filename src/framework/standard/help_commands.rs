@@ -93,7 +93,7 @@ pub fn has_all_requirements(cmd: &Command, msg: &Message) -> bool {
 pub fn with_embeds(_: &mut Context,
                    msg: &Message,
                    groups: HashMap<String, Arc<CommandGroup>>,
-                   args: &Args)
+                   args: Args)
                    -> Result<(), CommandError> {
     if !args.is_empty() {
         let name = args.full();
@@ -268,7 +268,7 @@ pub fn with_embeds(_: &mut Context,
 pub fn plain(_: &mut Context,
              msg: &Message,
              groups: HashMap<String, Arc<CommandGroup>>,
-             args: &Args)
+             args: Args)
              -> Result<(), CommandError> {
     if !args.is_empty() {
         let name = args.full();
