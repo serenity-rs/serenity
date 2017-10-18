@@ -51,7 +51,7 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
     result
 }
 
-/// Checks whether a user is member of required roles 
+/// Checks whether a user is member of required roles
 /// and given the required permissions.
 pub fn has_all_requirements(cmd: &Command, msg: &Message) -> bool {
     if let Some(guild) = msg.guild() {
@@ -116,7 +116,7 @@ pub fn with_embeds(_: &mut Context,
                             }
                             else {
                                 break;
-                            }                 
+                            }
                         },
                         CommandOrAlias::Alias(ref name) => {
                             let actual_command = group.commands.get(name).unwrap();
@@ -157,26 +157,25 @@ pub fn with_embeds(_: &mut Context,
                         }
 
                         if let Some(ref usage) = command.usage {
-                            embed = embed.field(|f| {
-                                f.name("Usage")
-                                    .value(&format!("`{} {}`", command_name, usage))
-                            });
+                            let value = format!("`{} {}`", command_name, usage);
+
+                            embed = embed.field("Usage", value, true);
                         }
 
                         if let Some(ref example) = command.example {
-                            embed = embed.field(|f| {
-                                f.name("Sample usage")
-                                    .value(&format!("`{} {}`", command_name, example))
-                            });
+                            let value = format!("`{} {}`", command_name, example);
+
+                            embed = embed.field("Sample usage", value, true);
                         }
 
                         if group_name != "Ungrouped" {
-                            embed = embed.field(|f| f.name("Group").value(&group_name));
+                            embed = embed.field("Group", group_name, true);
                         }
 
                         if !command.aliases.is_empty() {
                             let aliases = command.aliases.join(", ");
-                            embed = embed.field(|f| f.name("Aliases").value(&aliases));
+
+                            embed = embed.field("Aliases", aliases, true);
                         }
 
                         let available = if command.dm_only {
@@ -187,7 +186,7 @@ pub fn with_embeds(_: &mut Context,
                             "In DM and guilds"
                         };
 
-                        embed = embed.field(|f| f.name("Available").value(available));
+                        embed = embed.field("Available", available, true);
 
                         embed
                     })
@@ -240,7 +239,7 @@ pub fn with_embeds(_: &mut Context,
                 }
 
                 if has_commands {
-                    e = e.field(|f| f.name(group_name).value(&desc));
+                    e = e.field(&group_name[..], &desc[..], true);
                 }
             }
             e

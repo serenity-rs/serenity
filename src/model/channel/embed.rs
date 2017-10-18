@@ -83,10 +83,7 @@ impl Embed {
     /// let embed = Embed::fake(|e| e
     ///     .title("Embed title")
     ///     .description("Making a basic embed")
-    ///     .field(|f| f
-    ///         .name("A field")
-    ///         .value("Has some content.")
-    ///         .inline(false)));
+    ///     .field("A field", "Has some content.", false));
     /// ```
     #[inline]
     pub fn fake<F>(f: F) -> Value
@@ -125,6 +122,24 @@ pub struct EmbedField {
     ///
     /// The maxiumum length of this field is 1024 unicode codepoints.
     pub value: String,
+}
+
+impl EmbedField {
+    /// Creates a new embed field.
+    ///
+    /// **Note**: Refer to the [`name`] and [`value`] documentation for maximum
+    /// lengths.
+    ///
+    /// [`name`]: #structfield.name
+    /// [`value`]: #structfield.value
+    pub fn new<T, U>(name: T, value: U, inline: bool) -> Self
+        where T: Into<String>, U: Into<String> {
+        Self {
+            name: name.into(),
+            value: value.into(),
+            inline,
+        }
+    }
 }
 
 /// Footer information for an embed.

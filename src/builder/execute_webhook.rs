@@ -35,14 +35,8 @@ use std::default::Default;
 ///     .title("Rust Resources")
 ///     .description("A few resources to help with learning Rust")
 ///     .colour(0xDEA584)
-///     .field(|f| f
-///         .inline(false)
-///         .name("The Rust Book")
-///         .value("A comprehensive resource for all topics related to Rust"))
-///     .field(|f| f
-///         .inline(false)
-///         .name("Rust by Example")
-///         .value("A collection of Rust examples on topics, useable in-browser")));
+///     .field("The Rust Book", "A comprehensive resource for Rust.", false)
+///     .field("Rust by Example", "A collection of Rust examples", false));
 ///
 /// let _ = webhook.execute(false, |w| w
 ///     .content("Here's some information on Rust:")

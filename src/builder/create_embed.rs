@@ -117,50 +117,35 @@ impl CreateEmbed {
     /// name and 1024 in a field value and a field is inline by default.
     ///
     /// [`CreateEmbedField`]: struct.CreateEmbedField.html
-    pub fn field<F>(mut self, f: F) -> Self
-        where F: FnOnce(CreateEmbedField) -> CreateEmbedField {
-        let map = utils::hashmap_to_json_map(f(CreateEmbedField::default()).0);
-
+    pub fn field<T, U>(mut self, name: T, value: U, inline: bool) -> Self
+        where T: Into<String>, U: Into<String> {
         {
-            let entry = self.0.remove("fields").unwrap_or_else(|| Value::Array(vec![]));
-            let mut arr = match entry {
-                Value::Array(inner) => inner,
-                _ => {
-                    // The type of `entry` should always be a `Value::Array`.
-                    //
-                    // Theoretically this never happens, but you never know.
-                    //
-                    // In the event that it does, just return the current value.
-                    return CreateEmbed(self.0);
-                },
-            };
-            arr.push(Value::Object(map));
+            let entry = self.0
+                .entry("fields")
+                .or_insert_with(|| Value::Array(vec![]));
 
-            self.0.insert("fields", Value::Array(arr));
+            if let Value::Array(ref mut inner) = *entry {
+                inner.push(json!({
+                    "inline": inline,
+                    "name": name.into(),
+                    "value": value.into(),
+                }));
+            }
         }
 
-        CreateEmbed(self.0)
+        self
     }
 
     /// Adds multiple fields at once.
-    pub fn fields<It: IntoIterator<Item=CreateEmbedField>>(mut self, fields: It) -> Self {
-        let fields = fields
-            .into_iter()
-            .map(|m| Value::Object(utils::hashmap_to_json_map(m.0)))
-            .collect::<Vec<Value>>();
-
-        {
-            let entry = self.0.remove("fields").unwrap_or_else(|| Value::Array(vec![]));
-            let mut arr = match entry {
-                Value::Array(inner) => inner,
-                _ => return CreateEmbed(self.0),
-            };
-            arr.extend(fields);
-
-            self.0.insert("fields", Value::Array(arr));
+    pub fn fields<T, U, It>(mut self, fields: It) -> Self
+        where It: IntoIterator<Item=(T, U, bool)>,
+              T: Into<String>,
+              U: Into<String> {
+        for field in fields {
+            self = self.field(field.0.into(), field.1.into(), field.2);
         }
 
-        CreateEmbed(self.0)
+        self
     }
 
     /// Set the footer of the embed.
@@ -352,9 +337,7 @@ impl From<Embed> for CreateEmbed {
         }
 
         for field in embed.fields {
-            b = b.field(move |f| {
-                f.inline(field.inline).name(&field.name).value(&field.value)
-            });
+            b = b.field(field.name, field.value, field.inline);
         }
 
         if let Some(image) = embed.image {
@@ -412,51 +395,6 @@ impl CreateEmbedAuthor {
         self.0.insert("url", Value::String(url.to_string()));
 
         self
-    }
-}
-
-/// A builder to create a fake [`Embed`] object's field, for use with the
-/// [`CreateEmbed::field`] method.
-///
-/// This does not require any field be set. `inline` is set to `true` by
-/// default.
-///
-/// [`Embed`]: ../model/struct.Embed.html
-/// [`CreateEmbed::field`]: struct.CreateEmbed.html#method.field
-#[derive(Clone, Debug)]
-pub struct CreateEmbedField(pub HashMap<&'static str, Value>);
-
-impl CreateEmbedField {
-    /// Set whether the field is inlined. Set to true by default.
-    pub fn inline(mut self, inline: bool) -> Self {
-        self.0.insert("inline", Value::Bool(inline));
-
-        self
-    }
-
-    /// Set the field's name. It can't be longer than 256 characters.
-    pub fn name<D: Display>(mut self, name: D) -> Self {
-        self.0.insert("name", Value::String(format!("{}", name)));
-
-        self
-    }
-
-    /// Set the field's value. It can't be longer than 1024 characters.
-    pub fn value<D: Display>(mut self, value: D) -> Self {
-        self.0.insert("value", Value::String(format!("{}", value)));
-
-        self
-    }
-}
-
-impl Default for CreateEmbedField {
-    /// Creates a builder with default values, setting the value of `inline` to
-    /// `true`.
-    fn default() -> CreateEmbedField {
-        let mut map = HashMap::new();
-        map.insert("inline", Value::Bool(true));
-
-        CreateEmbedField(map)
     }
 }
 
