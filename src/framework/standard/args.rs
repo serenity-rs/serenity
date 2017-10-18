@@ -330,6 +330,7 @@ impl<'a> PartialEq<[&'a str]> for Args {
         for (s, o) in self.delimiter_split.iter().zip(other.iter()) {
             if s != o {
                 b = false;
+                break;
             }
         }
         
