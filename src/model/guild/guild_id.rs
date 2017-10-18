@@ -304,7 +304,7 @@ impl GuildId {
     }
 
     /// Edits the order of [`Role`]s
-    /// Requires the [Mange Roles] permission.
+    /// Requires the [Manage Roles] permission.
     ///
     /// # Examples
     ///
@@ -318,8 +318,9 @@ impl GuildId {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
-    pub fn edit_role_position(&self, role_id: u64, position: u64) -> Result<Vec<Role>> {
-        http::edit_role_position(self.0, role_id, position)
+    pub fn edit_role_position<R>(&self, role_id: R, position: u64) -> Result<Vec<Role>>
+        where R: Into<RoleId> {
+        http::edit_role_position(self.0, role_id.into().0, position)
     }
 
 

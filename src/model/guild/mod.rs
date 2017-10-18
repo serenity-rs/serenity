@@ -597,6 +597,26 @@ impl Guild {
         self.id.edit_role(role_id, f)
     }
 
+    /// Edits the order of [`Role`]s
+    /// Requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Change the order of a role:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::RoleId;
+    /// guild.edit_role_position(RoleId(8), 2);
+    /// ```
+    ///
+    /// [`Role`]: struct.Role.html
+    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[inline]
+    pub fn edit_role_position<R>(&self, role_id: R, position: u64) -> Result<Vec<Role>>
+        where R: Into<RoleId> {
+        self.id.edit_role_position(role_id, position)
+    }
+
     /// Gets a partial amount of guild data by its Id.
     ///
     /// Requires that the current user be in the guild.
