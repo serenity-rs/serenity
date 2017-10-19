@@ -1051,12 +1051,14 @@ fn build_gateway_url(base: &str) -> Result<Url> {
 =======
 /// Tries to connect and upon failure, retries.
 fn connecting() -> WsClient {
+    let waiting_time = 120;
+
     loop {
         match connect("") {
             Ok(client) => return client,
             Err(_) => {
-                warn!("Connecting failed, will retry in 30 seconds.");
-                thread::sleep(StdDuration::from_secs(30));
+                warn!("Connecting failed, will retry in {} seconds.", waiting_time);
+                thread::sleep(StdDuration::from_secs(waiting_time));
             },
         };
     }
