@@ -5,6 +5,7 @@ use std::io::Write;
 use std::net::Shutdown;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration as StdDuration, Instant};
+use std::thread;
 use super::{ConnectionStage, GatewayError};
 use websocket::client::Url;
 use websocket::message::{CloseData, OwnedMessage};
@@ -1044,6 +1045,47 @@ fn build_gateway_url(base: &str) -> Result<Url> {
         .map_err(|why| {
             warn!("Error building gateway URL with base `{}`: {:?}", base, why);
 
+<<<<<<< HEAD
             Error::Gateway(GatewayError::BuildingUrl)
         })
+=======
+/// Tries to connect and upon failure, retries.
+fn connecting() -> WsClient {
+    loop {
+        match connect(&String::new()) {
+            Ok(client) => return client,
+            Err(_) => {
+                warn!("Connecting failed, will retry in 30 seconds.");
+                thread::sleep(StdDuration::from_secs(30));
+            },
+        };
+    }
+}
+
+impl Default for Shard {
+    fn default() -> Self {
+        #[cfg(feature = "voice")]
+        let (tx, rx) = mpsc::channel();
+        #[cfg(feature = "voice")]
+        let user = http::get_current_user().unwrap();
+
+        Shard {
+            client: connecting(),
+            current_presence: (None, OnlineStatus::Online, false),
+            heartbeat_instants: (None, None),
+            heartbeat_interval: None,
+            last_heartbeat_acknowledged: true,
+            seq: 0,
+            stage: ConnectionStage::Handshake,
+            token: Arc::new(Mutex::new(String::new())),
+            session_id: None,
+            shard_info: [0; 2],
+            ws_url: Arc::new(Mutex::new(String::new())),
+            #[cfg(feature = "voice")]
+            manager: VoiceManager::new(tx, user.id),
+            #[cfg(feature = "voice")]
+            manager_rx: rx,
+        }
+    }
+>>>>>>> If a guild's emojis are being altered, Serenity will straight up use the new `HashMap` instead of just extending.
 }
