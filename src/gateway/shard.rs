@@ -1052,7 +1052,7 @@ fn build_gateway_url(base: &str) -> Result<Url> {
 /// Tries to connect and upon failure, retries.
 fn connecting() -> WsClient {
     loop {
-        match connect(&String::new()) {
+        match connect("") {
             Ok(client) => return client,
             Err(_) => {
                 warn!("Connecting failed, will retry in 30 seconds.");
