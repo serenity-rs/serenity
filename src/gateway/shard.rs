@@ -32,7 +32,7 @@ use utils;
 
 pub type WsClient = Client<TlsStream<TcpStream>>;
 
-type CurrentPresence = (Option<Game>, OnlineStatus, bool);
+type CurrentPresence = (Option<Game>, OnlineStatus);
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the
@@ -143,7 +143,7 @@ impl Shard {
                -> Result<Shard> {
         let client = connect(&*ws_url.lock())?;
 
-        let current_presence = (None, OnlineStatus::Online, false);
+        let current_presence = (None, OnlineStatus::Online);
         let heartbeat_instants = (None, None);
         let heartbeat_interval = None;
         let last_heartbeat_acknowledged = true;
@@ -225,16 +225,6 @@ impl Shard {
     /// # }
     /// ```
     pub fn shard_info(&self) -> [u64; 2] { self.shard_info }
-
-    /// Sets whether the current user is afk. This helps Discord determine where
-    /// to send notifications.
-    ///
-    /// Other presence settings are maintained.
-    pub fn set_afk(&mut self, afk: bool) {
-        self.current_presence.2 = afk;
-
-        self.update_presence();
-    }
 
     /// Sets the user's current game, if any.
     ///
@@ -329,8 +319,8 @@ impl Shard {
     ///
     /// # Examples
     ///
-    /// Set the current user as playing `"Heroes of the Storm"`, being online,
-    /// and not being afk:
+    /// Set the current user as playing `"Heroes of the Storm"` and being
+    /// online:
     ///
     /// ```rust,no_run
     /// # extern crate parking_lot;
@@ -348,8 +338,7 @@ impl Shard {
     /// #
     /// use serenity::model::{Game, OnlineStatus};
     ///
-    /// shard.set_presence(Some(Game::playing("Heroes of the Storm")), OnlineStatus::Online,
-    /// false);
+    /// shard.set_presence(Some(Game::playing("Heroes of the Storm")), OnlineStatus::Online);
     /// #     Ok(())
     /// # }
     /// #
@@ -357,12 +346,12 @@ impl Shard {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn set_presence(&mut self, game: Option<Game>, mut status: OnlineStatus, afk: bool) {
+    pub fn set_presence(&mut self, game: Option<Game>, mut status: OnlineStatus) {
         if status == OnlineStatus::Offline {
             status = OnlineStatus::Invisible;
         }
 
-        self.current_presence = (game, status, afk);
+        self.current_presence = (game, status);
 
         self.update_presence();
     }
@@ -1087,13 +1076,13 @@ impl Shard {
     }
 
     fn update_presence(&mut self) {
-        let (ref game, status, afk) = self.current_presence;
+        let (ref game, status) = self.current_presence;
         let now = Utc::now().timestamp() as u64;
 
         let msg = json!({
             "op": OpCode::StatusUpdate.num(),
             "d": {
-                "afk": afk,
+                "afk": false,
                 "since": now,
                 "status": status.name(),
                 "game": game.as_ref().map(|x| json!({

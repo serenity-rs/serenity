@@ -254,7 +254,7 @@ impl Context {
     /// [`set_presence`]: #method.set_presence
     pub fn reset_presence(&self) {
         let mut shard = self.shard.lock();
-        shard.set_presence(None, OnlineStatus::Online, false)
+        shard.set_presence(None, OnlineStatus::Online);
     }
 
     /// Sets the current game, defaulting to an online status of [`Online`].
@@ -289,7 +289,7 @@ impl Context {
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     pub fn set_game(&self, game: Game) {
         let mut shard = self.shard.lock();
-        shard.set_presence(Some(game), OnlineStatus::Online, false);
+        shard.set_presence(Some(game), OnlineStatus::Online);
     }
 
     /// Sets the current game, passing in only its name. This will automatically
@@ -335,7 +335,7 @@ impl Context {
         };
 
         let mut shard = self.shard.lock();
-        shard.set_presence(Some(game), OnlineStatus::Online, false);
+        shard.set_presence(Some(game), OnlineStatus::Online);
     }
 
     /// Sets the current user's presence, providing all fields to be passed.
@@ -354,7 +354,7 @@ impl Context {
     ///     fn on_ready(&self, ctx: Context, _: Ready) {
     ///         use serenity::model::OnlineStatus;
     ///
-    ///         ctx.set_presence(None, OnlineStatus::Idle, false);
+    ///         ctx.set_presence(None, OnlineStatus::Idle);
     ///     }
     /// }
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
@@ -376,7 +376,7 @@ impl Context {
     ///         let game = Game::playing("Heroes of the Storm");
     ///         let status = OnlineStatus::DoNotDisturb;
     ///
-    ///         context.set_presence(Some(game), status, false);
+    ///         context.set_presence(Some(game), status);
     ///     }
     /// }
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
@@ -384,9 +384,9 @@ impl Context {
     ///
     /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
     /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
-    pub fn set_presence(&self, game: Option<Game>, status: OnlineStatus, afk: bool) {
+    pub fn set_presence(&self, game: Option<Game>, status: OnlineStatus) {
         let mut shard = self.shard.lock();
-        shard.set_presence(game, status, afk)
+        shard.set_presence(game, status);
     }
 
     /// Disconnects the shard from the websocket, essentially "quiting" it.
