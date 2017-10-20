@@ -113,8 +113,7 @@ pub fn with_embeds(_: &mut Context,
                         CommandOrAlias::Command(ref cmd) => {
                             if has_all_requirements(cmd, msg) {
                                 found = Some((command_name, cmd));
-                            }
-                            else {
+                            } else {
                                 break;
                             }
                         },
@@ -125,8 +124,7 @@ pub fn with_embeds(_: &mut Context,
                                 CommandOrAlias::Command(ref cmd) => {
                                     if has_all_requirements(cmd, msg) {
                                         found = Some((name, cmd));
-                                    }
-                                    else {
+                                    } else {
                                         break;
                                     }
                                 },

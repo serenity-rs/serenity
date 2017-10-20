@@ -127,7 +127,7 @@ impl Shard {
                token: Arc<Mutex<String>>,
                shard_info: [u64; 2])
                -> Result<Shard> {
-        let client = connect(&*ws_url.lock().unwrap())?;
+        let client = connecting(&*ws_url.lock().unwrap());
 
         let current_presence = (None, OnlineStatus::Online, false);
         let heartbeat_instants = (None, None);
@@ -1045,49 +1045,21 @@ fn build_gateway_url(base: &str) -> Result<Url> {
         .map_err(|why| {
             warn!("Error building gateway URL with base `{}`: {:?}", base, why);
 
-<<<<<<< HEAD
             Error::Gateway(GatewayError::BuildingUrl)
         })
-=======
+}
+
 /// Tries to connect and upon failure, retries.
-fn connecting() -> WsClient {
-    let waiting_time = 120;
+fn connecting(uri: &str) -> WsClient {
+    let waiting_time = 30;
 
     loop {
-        match connect("") {
+        match connect(&uri) {
             Ok(client) => return client,
-            Err(_) => {
-                warn!("Connecting failed, will retry in {} seconds.", waiting_time);
+            Err(why) => {
+                warn!("Connecting failed: {:?}\n Will retry in {} seconds.", why, waiting_time);
                 thread::sleep(StdDuration::from_secs(waiting_time));
             },
         };
     }
-}
-
-impl Default for Shard {
-    fn default() -> Self {
-        #[cfg(feature = "voice")]
-        let (tx, rx) = mpsc::channel();
-        #[cfg(feature = "voice")]
-        let user = http::get_current_user().unwrap();
-
-        Shard {
-            client: connecting(),
-            current_presence: (None, OnlineStatus::Online, false),
-            heartbeat_instants: (None, None),
-            heartbeat_interval: None,
-            last_heartbeat_acknowledged: true,
-            seq: 0,
-            stage: ConnectionStage::Handshake,
-            token: Arc::new(Mutex::new(String::new())),
-            session_id: None,
-            shard_info: [0; 2],
-            ws_url: Arc::new(Mutex::new(String::new())),
-            #[cfg(feature = "voice")]
-            manager: VoiceManager::new(tx, user.id),
-            #[cfg(feature = "voice")]
-            manager_rx: rx,
-        }
-    }
->>>>>>> If a guild's emojis are being altered, Serenity will straight up use the new `HashMap` instead of just extending.
 }
