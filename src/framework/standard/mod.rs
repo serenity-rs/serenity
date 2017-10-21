@@ -14,7 +14,7 @@ pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
-pub use self::args::{Args, Error as ArgError};
+pub use self::args::{Args, Iter, FromStrZc, Error as ArgError};
 
 use self::command::{AfterHook, BeforeHook};
 use std::collections::HashMap;
