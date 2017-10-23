@@ -431,7 +431,7 @@ impl GuildChannel {
     /// use serenity::CACHE;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///     fn message(&self, _: Context, msg: Message) {
     ///         let channel = match CACHE.read().guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
@@ -459,7 +459,7 @@ impl GuildChannel {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///     fn message(&self, _: Context, msg: Message) {
     ///         let channel = match CACHE.read().guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,

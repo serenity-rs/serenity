@@ -7,7 +7,7 @@ use std::env;
 struct Handler;
 
 impl EventHandler for Handler {
-    fn on_message(&self, _: Context, msg: Message) {
+    fn message(&self, _: Context, msg: Message) {
         if msg.content == "!messageme" {
             // If the `methods` feature is enabled, then model structs will
             // have a lot of useful methods implemented, to avoid using an
@@ -23,7 +23,7 @@ impl EventHandler for Handler {
         }
     }
 
-    fn on_ready(&self, _: Context, ready: Ready) {
+    fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }

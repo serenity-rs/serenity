@@ -19,7 +19,7 @@ use internal::prelude::*;
 /// struct Handler;
 ///
 /// impl EventHandler for Handler {
-///     fn on_message(&self, _: Context, msg: Message) {
+///     fn message(&self, _: Context, msg: Message) {
 ///         use serenity::client::CACHE;
 ///         if msg.content == "!createinvite" {
 ///             let channel = match CACHE.read().guild_channel(msg.channel_id) {

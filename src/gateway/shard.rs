@@ -610,7 +610,7 @@ impl Shard {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, ctx: Context, msg: Message) {
+    ///     fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~ping" {
     ///             if let Some(latency) = ctx.shard.lock().latency() {
     ///                 let s = format!("{}.{}s", latency.as_secs(), latency.subsec_nanos());

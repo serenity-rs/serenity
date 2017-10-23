@@ -11,12 +11,12 @@ use std::env;
 struct Handler;
 
 impl EventHandler for Handler {
-    fn on_ready(&self, _: Context, ready: Ready) {
+    fn ready(&self, _: Context, ready: Ready) {
         // Log at the INFO level. This is a macro from the `log` crate.
         info!("{} is connected!", ready.user.name);
     }
 
-    fn on_resume(&self, _: Context, resume: ResumedEvent) {
+    fn resume(&self, _: Context, resume: ResumedEvent) {
         // Log at the DEBUG level.
         //
         // In this example, this will not show up in the logs because DEBUG is

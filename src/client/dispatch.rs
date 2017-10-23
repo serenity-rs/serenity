@@ -87,7 +87,7 @@ fn dispatch_message<H>(
         message.transform_content();
     }
 
-    event_handler.on_message(context, message);
+    event_handler.message(context, message);
 }
 
 #[allow(cyclomatic_complexity, unused_assignments, unused_mut)]
@@ -120,14 +120,14 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
             // So in short, only exists to reduce unnecessary clutter.
             match event.channel {
                 Channel::Private(channel) => {
-                    event_handler.on_private_channel_create(context, channel);
+                    event_handler.private_channel_create(context, channel);
                 },
                 Channel::Group(_) => {},
                 Channel::Guild(channel) => {
-                    event_handler.on_channel_create(context, channel);
+                    event_handler.channel_create(context, channel);
                 },
                 Channel::Category(channel) => {
-                    event_handler.on_category_create(context, channel);
+                    event_handler.category_create(context, channel);
                 },
             }
         },
@@ -139,31 +139,31 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
             match event.channel {
                 Channel::Private(_) | Channel::Group(_) => {},
                 Channel::Guild(channel) => {
-                    event_handler.on_channel_delete(context, channel);
+                    event_handler.channel_delete(context, channel);
                 },
                 Channel::Category(channel) => {
-                    event_handler.on_category_delete(context, channel);
+                    event_handler.category_delete(context, channel);
                 },
             }
         },
         Event::ChannelPinsUpdate(mut event) => {
             let context = context(conn, data);
 
-            event_handler.on_channel_pins_update(context, event);
+            event_handler.channel_pins_update(context, event);
         },
         Event::ChannelRecipientAdd(mut event) => {
             update!(event);
 
             let context = context(conn, data);
 
-            event_handler.on_channel_recipient_addition(context, event.channel_id, event.user);
+            event_handler.channel_recipient_addition(context, event.channel_id, event.user);
         },
         Event::ChannelRecipientRemove(mut event) => {
             update!(event);
 
             let context = context(conn, data);
 
-            event_handler.on_channel_recipient_removal(context, event.channel_id, event.user);
+            event_handler.channel_recipient_removal(context, event.channel_id, event.user);
         },
         Event::ChannelUpdate(mut event) => {
             update!(event);
@@ -172,20 +172,20 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
 
             feature_cache! {{
                 let before = CACHE.read().channel(event.channel.id());
-                event_handler.on_channel_update(context, before, event.channel);
+                event_handler.channel_update(context, before, event.channel);
             } else {
-                event_handler.on_channel_update(context, event.channel);
+                event_handler.channel_update(context, event.channel);
             }}
         },
         Event::GuildBanAdd(mut event) => {
             let context = context(conn, data);
 
-                event_handler.on_guild_ban_addition(context, event.guild_id, event.user);
+                event_handler.guild_ban_addition(context, event.guild_id, event.user);
         },
         Event::GuildBanRemove(mut event) => {
             let context = context(conn, data);
 
-            event_handler.on_guild_ban_removal(context, event.guild_id, event.user);
+            event_handler.guild_ban_removal(context, event.guild_id, event.user);
         },
         Event::GuildCreate(mut event) => {
             #[cfg(feature = "cache")]
@@ -212,16 +212,16 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                         .map(|(&id, _)| id)
                         .collect::<Vec<GuildId>>();
 
-                    event_handler.on_cached(context, guild_amount);
+                    event_handler.cached(context, guild_amount);
                 }
             }
 
             let context = context(conn, data);
 
             feature_cache! {{
-                event_handler.on_guild_create(context, event.guild, _is_new);
+                event_handler.guild_create(context, event.guild, _is_new);
             } else {
-                event_handler.on_guild_create(context, event.guild);
+                event_handler.guild_create(context, event.guild);
             }}
         },
         Event::GuildDelete(mut event) => {
@@ -229,9 +229,9 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
             let context = context(conn, data);
 
             feature_cache! {{
-                event_handler.on_guild_delete(context, event.guild, _full);
+                event_handler.guild_delete(context, event.guild, _full);
             } else {
-                event_handler.on_guild_delete(context, event.guild);
+                event_handler.guild_delete(context, event.guild);
             }}
         },
         Event::GuildEmojisUpdate(mut event) => {
@@ -239,28 +239,28 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
 
             let context = context(conn, data);
 
-            event_handler.on_guild_emojis_update(context, event.guild_id, event.emojis);
+            event_handler.guild_emojis_update(context, event.guild_id, event.emojis);
         },
         Event::GuildIntegrationsUpdate(mut event) => {
             let context = context(conn, data);
 
-            event_handler.on_guild_integrations_update(context, event.guild_id);
+            event_handler.guild_integrations_update(context, event.guild_id);
         },
         Event::GuildMemberAdd(mut event) => {
             update!(event);
 
             let context = context(conn, data);
 
-            event_handler.on_guild_member_addition(context, event.guild_id, event.member);
+            event_handler.guild_member_addition(context, event.guild_id, event.member);
         },
         Event::GuildMemberRemove(mut event) => {
             let _member = update!(event);
             let context = context(conn, data);
 
             feature_cache! {{
-                event_handler.on_guild_member_removal(context, event.guild_id, event.user, _member);
+                event_handler.guild_member_removal(context, event.guild_id, event.user, _member);
             } else {
-                event_handler.on_guild_member_removal(context, event.guild_id, event.user);
+                event_handler.guild_member_removal(context, event.guild_id, event.user);
             }}
         },
         Event::GuildMemberUpdate(mut event) => {
@@ -276,9 +276,9 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                     .unwrap()
                     .clone();
 
-                event_handler.on_guild_member_update(context, _before, after);
+                event_handler.guild_member_update(context, _before, after);
             } else {
-                event_handler.on_guild_member_update(context, event);
+                event_handler.guild_member_update(context, event);
             }}
         },
         Event::GuildMembersChunk(mut event) => {
@@ -286,23 +286,23 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
 
             let context = context(conn, data);
 
-            event_handler.on_guild_members_chunk(context, event.guild_id, event.members);
+            event_handler.guild_members_chunk(context, event.guild_id, event.members);
         },
         Event::GuildRoleCreate(mut event) => {
             update!(event);
 
             let context = context(conn, data);
 
-            event_handler.on_guild_role_create(context, event.guild_id, event.role);
+            event_handler.guild_role_create(context, event.guild_id, event.role);
         },
         Event::GuildRoleDelete(mut event) => {
             let _role = update!(event);
             let context = context(conn, data);
 
             feature_cache! {{
-                event_handler.on_guild_role_delete(context, event.guild_id, event.role_id, _role);
+                event_handler.guild_role_delete(context, event.guild_id, event.role_id, _role);
             } else {
-                event_handler.on_guild_role_delete(context, event.guild_id, event.role_id);
+                event_handler.guild_role_delete(context, event.guild_id, event.role_id);
             }}
         },
         Event::GuildRoleUpdate(mut event) => {
@@ -310,9 +310,9 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
             let context = context(conn, data);
 
             feature_cache! {{
-                event_handler.on_guild_role_update(context, event.guild_id, _before, event.role);
+                event_handler.guild_role_update(context, event.guild_id, _before, event.role);
             } else {
-                event_handler.on_guild_role_update(context, event.guild_id, event.role);
+                event_handler.guild_role_update(context, event.guild_id, event.role);
             }}
         },
         Event::GuildUnavailable(mut event) => {
@@ -320,7 +320,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
 
             let context = context(conn, data);
 
-            event_handler.on_guild_unavailable(context, event.guild_id);
+            event_handler.guild_unavailable(context, event.guild_id);
         },
         Event::GuildUpdate(mut event) => {
             update!(event);
@@ -333,9 +333,9 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                     .get(&event.guild.id)
                     .cloned();
 
-                event_handler.on_guild_update(context, before, event.guild);
+                event_handler.guild_update(context, before, event.guild);
             } else {
-                event_handler.on_guild_update(context, event.guild);
+                event_handler.guild_update(context, event.guild);
             }}
         },
         // Already handled by the framework check macro
@@ -343,46 +343,46 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
         Event::MessageDeleteBulk(mut event) => {
             let context = context(conn, data);
 
-            event_handler.on_message_delete_bulk(context, event.channel_id, event.ids);
+            event_handler.message_delete_bulk(context, event.channel_id, event.ids);
         },
         Event::MessageDelete(mut event) => {
             let context = context(conn, data);
 
-            event_handler.on_message_delete(context, event.channel_id, event.message_id);
+            event_handler.message_delete(context, event.channel_id, event.message_id);
         },
         Event::MessageUpdate(mut event) => {
             let context = context(conn, data);
 
-            event_handler.on_message_update(context, event);
+            event_handler.message_update(context, event);
         },
         Event::PresencesReplace(mut event) => {
             update!(event);
 
             let context = context(conn, data);
 
-            event_handler.on_presence_replace(context, event.presences);
+            event_handler.presence_replace(context, event.presences);
         },
         Event::PresenceUpdate(mut event) => {
             update!(event);
 
             let context = context(conn, data);
 
-            event_handler.on_presence_update(context, event);
+            event_handler.presence_update(context, event);
         },
         Event::ReactionAdd(mut event) => {
             let context = context(conn, data);
 
-            event_handler.on_reaction_add(context, event.reaction);
+            event_handler.reaction_add(context, event.reaction);
         },
         Event::ReactionRemove(mut event) => {
             let context = context(conn, data);
 
-            event_handler.on_reaction_remove(context, event.reaction);
+            event_handler.reaction_remove(context, event.reaction);
         },
         Event::ReactionRemoveAll(mut event) => {
             let context = context(conn, data);
 
-            event_handler.on_reaction_remove_all(context, event.channel_id, event.message_id);
+            event_handler.reaction_remove_all(context, event.channel_id, event.message_id);
         },
         Event::Ready(mut event) => {
             update!(event);
@@ -395,56 +395,56 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                         .map(move |_| {
                             let context = context(conn, data);
 
-                            event_handler.on_ready(context, event.ready);
+                            event_handler.ready(context, event.ready);
                         });
                 } else {
                     let context = context(conn, data);
 
-                    event_handler.on_ready(context, event.ready);
+                    event_handler.ready(context, event.ready);
                 }
             }
         },
         Event::Resumed(mut event) => {
             let context = context(conn, data);
 
-            event_handler.on_resume(context, event);
+            event_handler.resume(context, event);
         },
         Event::TypingStart(mut event) => {
             let context = context(conn, data);
 
-            event_handler.on_typing_start(context, event);
+            event_handler.typing_start(context, event);
         },
         Event::Unknown(mut event) => {
             let context = context(conn, data);
 
-            event_handler.on_unknown(context, event.kind, event.value);
+            event_handler.unknown(context, event.kind, event.value);
         },
         Event::UserUpdate(mut event) => {
             let _before = update!(event);
             let context = context(conn, data);
 
             feature_cache! {{
-                event_handler.on_user_update(context, _before.unwrap(), event.current_user);
+                event_handler.user_update(context, _before.unwrap(), event.current_user);
             } else {
-                event_handler.on_user_update(context, event.current_user);
+                event_handler.user_update(context, event.current_user);
             }}
         },
         Event::VoiceServerUpdate(mut event) => {
             let context = context(conn, data);
 
-            event_handler.on_voice_server_update(context, event);
+            event_handler.voice_server_update(context, event);
         },
         Event::VoiceStateUpdate(mut event) => {
             update!(event);
 
             let context = context(conn, data);
 
-            event_handler.on_voice_state_update(context, event.guild_id, event.voice_state);
+            event_handler.voice_state_update(context, event.guild_id, event.voice_state);
         },
         Event::WebhookUpdate(mut event) => {
             let context = context(conn, data);
 
-            event_handler.on_webhook_update(context, event.guild_id, event.channel_id);
+            event_handler.webhook_update(context, event.guild_id, event.channel_id);
         },
     }
 }

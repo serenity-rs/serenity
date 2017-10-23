@@ -12,7 +12,7 @@ impl EventHandler for Handler {
     //
     // Event handlers are dispatched through multi-threading, and so multiple
     // of a single event can be dispatched simultaneously.
-    fn on_message(&self, _: Context, msg: Message) {
+    fn message(&self, _: Context, msg: Message) {
         if msg.content == "!ping" {
             // Sending a message can fail, due to a network error, an
             // authentication error, or lack of permissions to post in the
@@ -30,7 +30,7 @@ impl EventHandler for Handler {
     // private channels, and more.
     //
     // In this case, just print what the current user's username is.
-    fn on_ready(&self, _: Context, ready: Ready) {
+    fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }

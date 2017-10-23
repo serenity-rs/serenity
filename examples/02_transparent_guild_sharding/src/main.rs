@@ -25,7 +25,7 @@ use std::env;
 struct Handler;
 
 impl EventHandler for Handler {
-    fn on_message(&self, ctx: Context, msg: Message) {
+    fn message(&self, ctx: Context, msg: Message) {
        if msg.content == "!ping" {
             // The current shard needs to be unlocked so it can be read from, as
             // multiple threads may otherwise attempt to read from or mutate it
@@ -39,10 +39,10 @@ impl EventHandler for Handler {
             if let Err(why) = msg.channel_id.say("Pong!") {
                 println!("Error sending message: {:?}", why);
             }
-        } 
+        }
     }
 
-    fn on_ready(&self, _: Context, ready: Ready) {
+    fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }

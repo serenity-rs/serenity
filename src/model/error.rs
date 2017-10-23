@@ -27,7 +27,7 @@ use super::Permissions;
 /// struct Handler;
 ///
 /// impl EventHandler for Handler {
-///     fn on_guild_ban_removal(&self, context: Context, guild_id: GuildId, user: User) {
+///     fn guild_ban_removal(&self, context: Context, guild_id: GuildId, user: User) {
 ///         // If the user has an even discriminator, don't re-ban them.
 ///         if user.discriminator % 2 == 0 {
 ///             return;

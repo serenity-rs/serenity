@@ -54,7 +54,7 @@ impl Attachment {
     ///
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, message: Message) {
+    ///     fn message(&self, _: Context, message: Message) {
     ///         for attachment in message.attachments {
     ///             let content = match attachment.download() {
     ///                 Ok(content) => content,
@@ -86,7 +86,7 @@ impl Attachment {
     ///         }
     ///     }
     ///
-    ///     fn on_ready(&self, _: Context, ready: Ready) {
+    ///     fn ready(&self, _: Context, ready: Ready) {
     ///         println!("{} is connected!", ready.user.name);
     ///     }
     /// }

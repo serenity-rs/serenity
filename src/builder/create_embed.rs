@@ -208,7 +208,7 @@ impl CreateEmbed {
     /// #
     /// struct Handler;
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///     fn message(&self, _: Context, msg: Message) {
     ///         if msg.content == "~embed" {
     ///             let _ = msg.channel_id.send_message(|m| m
     ///              .embed(|e| e
@@ -231,7 +231,7 @@ impl CreateEmbed {
     /// #
     /// struct Handler;
     /// impl EventHandler for Handler {
-    ///     fn on_guild_member_addition(&self, _: Context, guild_id: GuildId, member: Member) {
+    ///     fn guild_member_addition(&self, _: Context, guild_id: GuildId, member: Member) {
     ///         use serenity::client::CACHE;
     ///         let cache = CACHE.read();
     ///

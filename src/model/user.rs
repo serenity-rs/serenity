@@ -414,7 +414,7 @@ impl User {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///     fn message(&self, _: Context, msg: Message) {
     ///         if msg.content == "~help" {
     ///             let cache = CACHE.read();
     ///
@@ -610,7 +610,7 @@ impl User {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, _: Message) {
+    ///     fn message(&self, _: Context, _: Message) {
     ///         // normal message handling here
     ///     }
     /// }
@@ -681,7 +681,7 @@ impl User {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///     fn message(&self, _: Context, msg: Message) {
     ///         if msg.content == "!mytag" {
     ///             let content = MessageBuilder::new()
     ///                 .push("Your tag is ")

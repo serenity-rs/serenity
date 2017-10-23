@@ -1286,7 +1286,7 @@ impl Guild {
     /// use serenity::CACHE;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///     fn message(&self, _: Context, msg: Message) {
     ///         if let Some(arc) = msg.guild_id().unwrap().find() {
     ///             if let Some(role) = arc.read().role_by_name("role_name") {
     ///                 println!("{:?}", role);
