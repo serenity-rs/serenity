@@ -404,7 +404,9 @@ impl CacheUpdate for GuildEmojisUpdateEvent {
 
     fn update(&mut self, cache: &mut Cache) -> Option<()> {
         cache.guilds.get_mut(&self.guild_id).map(|guild| {
-            guild.with_mut(|g| g.emojis.extend(self.emojis.clone()))
+            guild.with_mut(|g| {
+                g.emojis.clone_from(&self.emojis)
+            });
         });
 
         None

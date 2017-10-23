@@ -5,6 +5,7 @@ use std::io::Write;
 use std::net::Shutdown;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration as StdDuration, Instant};
+use std::thread;
 use super::{ConnectionStage, GatewayError};
 use websocket::client::Url;
 use websocket::message::{CloseData, OwnedMessage};
@@ -126,7 +127,7 @@ impl Shard {
                token: Arc<Mutex<String>>,
                shard_info: [u64; 2])
                -> Result<Shard> {
-        let client = connect(&*ws_url.lock().unwrap())?;
+        let client = connecting(&*ws_url.lock().unwrap());
 
         let current_presence = (None, OnlineStatus::Online, false);
         let heartbeat_instants = (None, None);
@@ -1046,4 +1047,19 @@ fn build_gateway_url(base: &str) -> Result<Url> {
 
             Error::Gateway(GatewayError::BuildingUrl)
         })
+}
+
+/// Tries to connect and upon failure, retries.
+fn connecting(uri: &str) -> WsClient {
+    let waiting_time = 30;
+
+    loop {
+        match connect(&uri) {
+            Ok(client) => return client,
+            Err(why) => {
+                warn!("Connecting failed: {:?}\n Will retry in {} seconds.", why, waiting_time);
+                thread::sleep(StdDuration::from_secs(waiting_time));
+            },
+        };
+    }
 }
