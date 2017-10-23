@@ -138,6 +138,31 @@ pub enum DispatchError {
     WebhookAuthor,
 }
 
+use std::fmt;
+
+impl fmt::Debug for DispatchError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use self::DispatchError::*;
+        
+        match *self {
+            CheckFailed(..) => write!(f, "DispatchError::CheckFailed"),
+            CommandDisabled(ref s) => f.debug_tuple("DispatchError::CommandDisabled").field(&s).finish(),
+            BlockedUser => write!(f, "DispatchError::BlockedUser"),
+            BlockedGuild => write!(f, "DispatchError::BlockedGuild"),
+            LackOfPermissions(ref perms) => f.debug_tuple("DispatchError::LackOfPermissions").field(&perms).finish(),
+            RateLimited(ref num) => f.debug_tuple("DispatchError::RateLimited").field(&num).finish(),
+            OnlyForDM => write!(f, "DispatchError::OnlyForDM"),
+            OnlyForOwners => write!(f, "DispatchError::OnlyForOwners"),
+            OnlyForGuilds => write!(f, "DispatchError::OnlyForGuilds"),
+            LackingRole => write!(f, "DispatchError::LackingRole"),
+            NotEnoughArguments { ref min, ref given } => f.debug_struct("DispatchError::NotEnoughArguments").field("min", &min).field("given", &given).finish(),
+            TooManyArguments { ref max, ref given } => f.debug_struct("DispatchError::TooManyArguments").field("max", &max).field("given", &given).finish(),
+            IgnoredBot => write!(f, "DispatchError::IgnoredBot"),
+            WebhookAuthor => write!(f, "DispatchError::WebhookAuthor"),
+        }
+    }
+}
+
 type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;
 
 /// A utility for easily managing dispatches to commands.
