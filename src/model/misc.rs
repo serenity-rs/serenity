@@ -125,9 +125,10 @@ impl FromStr for UserId {
     type Err = UserIdParseError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        utils::parse_username(s)
-            .ok_or_else(|| UserIdParseError::InvalidFormat)
-            .map(UserId)
+        Ok(match utils::parse_username(s)
+            Some(id) => UserId(id),
+            None => s.parse::<u64>().map(UserId).map_err(|_| UserIdParseError::InvalidFormat)
+        })
     }
 }
 
