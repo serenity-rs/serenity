@@ -125,9 +125,9 @@ impl FromStr for UserId {
     type Err = UserIdParseError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        Ok(match utils::parse_username(s)
+        Ok(match utils::parse_username(s) {
             Some(id) => UserId(id),
-            None => s.parse::<u64>().map(UserId).map_err(|_| UserIdParseError::InvalidFormat)
+            None => s.parse::<u64>().map(UserId).map_err(|_| UserIdParseError::InvalidFormat)?,
         })
     }
 }
@@ -174,7 +174,7 @@ impl FromStr for Role {
 #[cfg(all(feature = "model", feature = "utils"))]
 #[derive(Debug)]
 pub enum RoleIdParseError {
-    NotPresentInCache,
+    InvalidFormat,
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
@@ -188,7 +188,7 @@ impl StdError for RoleIdParseError {
         use self::RoleIdParseError::*;
 
         match *self {
-            NotPresentInCache => "not present in cache",
+            InvalidFormat => "invalid role id format",
         }
     }
 }
@@ -198,9 +198,10 @@ impl FromStr for RoleId {
     type Err = RoleIdParseError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        utils::parse_role(s)
-            .ok_or_else(|| RoleIdParseError::NotPresentInCache)
-            .map(RoleId)
+        Ok(match utils::parse_role(s) {
+            Some(id) => RoleId(id),
+            None => s.parse::<u64>().map(RoleId).map_err(|_| RoleIdParseError::InvalidFormat)?,
+        })
     }
 }
 
