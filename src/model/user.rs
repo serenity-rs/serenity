@@ -599,7 +599,11 @@ impl User {
                         .unwrap()
                         .guilds
                         .get(&_guild_id)
-                        .map(|g| g.read().unwrap().roles.contains_key(&role_id))
+                        .map(|g| {
+                            g.read().unwrap().members.get(&self.id)
+                                .map(|m| m.roles.contains(&role_id))
+                                .unwrap_or(false)
+                        })
                         .unwrap_or(false)
                 } else {
                     true
