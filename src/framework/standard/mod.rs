@@ -14,7 +14,7 @@ pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
-pub use self::args::{Args, Error as ArgError};
+pub use self::args::{Args, Iter, FromStrZc, Error as ArgError};
 
 use self::command::{AfterHook, BeforeHook};
 use std::collections::HashMap;
@@ -136,6 +136,31 @@ pub enum DispatchError {
     IgnoredBot,
     /// When the bot ignores webhooks and a command was issued by one.
     WebhookAuthor,
+}
+
+use std::fmt;
+
+impl fmt::Debug for DispatchError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use self::DispatchError::*;
+        
+        match *self {
+            CheckFailed(..) => write!(f, "DispatchError::CheckFailed"),
+            CommandDisabled(ref s) => f.debug_tuple("DispatchError::CommandDisabled").field(&s).finish(),
+            BlockedUser => write!(f, "DispatchError::BlockedUser"),
+            BlockedGuild => write!(f, "DispatchError::BlockedGuild"),
+            LackOfPermissions(ref perms) => f.debug_tuple("DispatchError::LackOfPermissions").field(&perms).finish(),
+            RateLimited(ref num) => f.debug_tuple("DispatchError::RateLimited").field(&num).finish(),
+            OnlyForDM => write!(f, "DispatchError::OnlyForDM"),
+            OnlyForOwners => write!(f, "DispatchError::OnlyForOwners"),
+            OnlyForGuilds => write!(f, "DispatchError::OnlyForGuilds"),
+            LackingRole => write!(f, "DispatchError::LackingRole"),
+            NotEnoughArguments { ref min, ref given } => f.debug_struct("DispatchError::NotEnoughArguments").field("min", &min).field("given", &given).finish(),
+            TooManyArguments { ref max, ref given } => f.debug_struct("DispatchError::TooManyArguments").field("max", &max).field("given", &given).finish(),
+            IgnoredBot => write!(f, "DispatchError::IgnoredBot"),
+            WebhookAuthor => write!(f, "DispatchError::WebhookAuthor"),
+        }
+    }
 }
 
 type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;

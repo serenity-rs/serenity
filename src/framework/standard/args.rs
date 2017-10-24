@@ -83,6 +83,17 @@ impl Args {
     }
 
     /// Removes the first element, parses it to a specific type if necessary, returns.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    /// 
+    /// let mut args = Args::new("42 69", " ");
+    /// 
+    /// assert_eq!(args.single::<i32>().unwrap(), 42);
+    /// assert_eq!(args, ["69"]);
+    /// ```
     pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
         if self.delimiter_split.is_empty() {
@@ -95,8 +106,49 @@ impl Args {
             .parse::<T>()?)
     }
 
+    /// Like [`single`], but does "zero-copy" parsing.
+    ///
+    /// Refer to [`FromStrZc`]'s example on how to use this method.
+    ///
+    /// [`single`]: #method.single
+    /// [`FromStrZc`]: trait.FromStrZc.html
+    pub fn single_zc<'a, T: FromStrZc<'a> + 'a>(&'a mut self) -> Result<T, T::Err> 
+        where T::Err: StdError {
+        
+        // This is a hack as to mitigate some nasty lifetime errors.
+        //
+        // (Culprit `Vec::remove`s return type)
+        fn get_and_remove(b: &mut Vec<String>) -> Option<&str> {
+            struct GetThenRemove<'a>(&'a mut Vec<String>);
+    
+            impl<'a> Drop for GetThenRemove<'a> {
+                fn drop(&mut self) {
+                    if !self.0.is_empty() { 
+                        self.0.remove(0);
+                    }
+                }
+            }
+
+            GetThenRemove(b).0.get(0).map(|s| s.as_str())
+        }
+
+        let a = get_and_remove(&mut self.delimiter_split).ok_or(Error::Eos)?;
+        Ok(FromStrZc::from_str(a)?)
+    }
+
     /// Like [`single`], but doesn't remove the element.
     ///
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    /// 
+    /// let args = Args::new("42 69", " ");
+    /// 
+    /// assert_eq!(args.single_n::<i32>().unwrap(), 42);
+    /// assert_eq!(args, ["42", "69"]);
+    /// ```
+    /// 
     /// [`single`]: #method.single
     pub fn single_n<T: FromStr>(&self) -> Result<T, T::Err>
         where T::Err: StdError {
@@ -111,10 +163,31 @@ impl Args {
     }
 
     /// Skips if there's a first element, but also returns it.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    /// 
+    /// let mut args = Args::new("42 69", " ");
+    /// 
+    /// assert_eq!(args.skip().unwrap(), "42");
+    /// assert_eq!(args, ["69"]);
+    /// ```
     pub fn skip(&mut self) -> Option<String> { self.delimiter_split.shift() }
 
     /// Like [`skip`], but allows for multiple at once.
     ///
+    /// # Examples
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    /// 
+    /// let mut args = Args::new("42 69 88 99", " ");
+    /// 
+    /// assert_eq!(*args.skip_for(3).unwrap(), ["42".to_string(), "69".to_string(), "88".to_string()]);
+    /// assert_eq!(args, ["99"]);
+    /// ```
+    /// 
     /// [`skip`]: #method.skip
     pub fn skip_for(&mut self, i: u32) -> Option<Vec<String>> {
         let mut vec = Vec::with_capacity(i as usize);
@@ -127,7 +200,18 @@ impl Args {
     }
 
     /// Like [`single`], but takes quotes into account.
-    ///
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    /// 
+    /// let mut args = Args::new(r#""42"#, " ");
+    /// 
+    /// assert_eq!(args.single_quoted::<i32>().unwrap(), 42);
+    /// assert!(args.is_empty());
+    /// ```
+    /// 
     /// [`single`]: #method.single
     pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
@@ -162,20 +246,62 @@ impl Args {
     }
 
     /// Empty outs the internal vector while parsing (if necessary) and returning them
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    /// 
+    /// let mut args = Args::new("42 69", " ");
+    /// 
+    /// assert_eq!(*args.list::<i32>().unwrap(), [42, 69]);
+    /// ``` 
     pub fn list<T: FromStr>(mut self) -> Result<Vec<T>, T::Err>
         where T::Err: StdError {
         Iter::<T>::new(&mut self).collect()
     }
 
     /// Provides an iterator of items: (`T: FromStr`) `Result<T, T::Err>`.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    /// 
+    /// let mut args = Args::new("3 4", " ");
+    /// 
+    /// assert_eq!(*args.iter::<i32>().map(|num| num.unwrap().pow(2)).collect::<Vec<_>>(), [9, 16]);
+    /// assert!(args.is_empty());
+    /// ```
     pub fn iter<T: FromStr>(&mut self) -> Iter<T> where T::Err: StdError  {
         Iter::new(self)
     }
 
     /// This method is just `internal_vector.join(delimiter)`
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    /// 
+    /// let mut args = Args::new("42 69", " ");
+    /// 
+    /// assert_eq!(args.full(), "42 69");
+    /// ```
     pub fn full(&self) -> String { self.delimiter_split.join(&self.delimiter) }
 
     /// Returns the first argument that can be converted and removes it from the list.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    /// 
+    /// let mut args = Args::new("c47 69", " ");
+    /// 
+    /// assert_eq!(args.find::<i32>().unwrap(), 69);
+    /// assert_eq!(args, ["c47"]);
+    /// ```
     pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
         if self.delimiter_split.is_empty() {
@@ -201,6 +327,17 @@ impl Args {
     }
 
     /// Returns the first argument that can be converted and does not remove it from the list.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    /// 
+    /// let args = Args::new("c47 69", " ");
+    /// 
+    /// assert_eq!(args.find_n::<i32>().unwrap(), 69);
+    /// assert_eq!(args, ["c47", "69"]);
+    /// ```
     pub fn find_n<T: FromStr>(&self) -> Result<T, T::Err>
         where T::Err: StdError {
         if self.delimiter_split.is_empty() {
@@ -215,11 +352,110 @@ impl Args {
     }
 }
 
+/// A version of `FromStr` that allows for "zero-copy" parsing.
+/// 
+/// # Examples
+/// 
+/// ```rust,ignore
+/// use serenity::framework::standard::{Args, FromStrZc};
+/// use std::fmt;
+/// 
+/// struct NameDiscrim<'a>(&'a str, Option<&'a str>);
+/// 
+/// #[derive(Debug)]
+/// struct Error(&'static str);
+/// 
+/// impl std::error::Error for Error {
+///     fn description(&self) -> &str { self.0 }
+/// }
+/// 
+/// impl fmt::Display for Error {
+///     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.0) }
+/// }
+/// 
+/// impl<'a> FromStrZc<'a> for NameDiscrim<'a> {
+///     type Err = Error;
+/// 
+///     fn from_str(s: &'a str) -> Result<NameDiscrim<'a>, Error> {
+///         let mut it = s.split("#");
+///         let name = it.next().ok_or(Error("name must be specified"))?;
+///         let discrim = it.next();
+///         Ok(NameDiscrim(name, discrim))
+///     }
+/// }
+/// 
+/// let mut args = Args::new("abc#1234", " ");
+/// let NameDiscrim(name, discrim) = args.single_zc::<NameDiscrim>().unwrap();
+/// 
+/// assert_eq!(name, "abc");
+/// assert_eq!(discrim, Some("1234"));
+/// ``` 
+pub trait FromStrZc<'a>: Sized {
+    type Err;
+    
+    fn from_str(s: &'a str) -> ::std::result::Result<Self, Self::Err>;
+}
+
+impl<'a, T: FromStr> FromStrZc<'a> for T {
+    type Err = T::Err;
+
+    fn from_str(s: &'a str) -> ::std::result::Result<Self, Self::Err> {
+        <T as FromStr>::from_str(s)
+    }
+}
+
 impl ::std::ops::Deref for Args {
     type Target = [String];
 
     fn deref(&self) -> &Self::Target { &self.delimiter_split }
 }
+
+impl<'a> PartialEq<[&'a str]> for Args {
+    fn eq(&self, other: &[&str]) -> bool {
+        let mut b = true;
+        
+        for (s, o) in self.delimiter_split.iter().zip(other.iter()) {
+            if s != o {
+                b = false;
+                break;
+            }
+        }
+        
+        b
+    }
+}
+
+macro_rules! impl_slices {
+    ($($num:expr),*) => {
+        impl<'a> PartialEq<[&'a str; 0]> for Args {
+            fn eq(&self, _: &[&str; 0]) -> bool {
+                self.delimiter_split.is_empty()
+            }
+        }
+        
+        $(
+            impl<'a> PartialEq<[&'a str; $num]> for Args {
+                fn eq(&self, other: &[&str; $num]) -> bool {
+                    <Args as PartialEq<[&str]>>::eq(self, &other[..])
+                }
+            }
+        )*
+    }
+}
+
+impl_slices! {
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+    29, 30, 31, 32
+}
+
+impl PartialEq for Args {
+    fn eq(&self, other: &Self) -> bool {
+        self.delimiter_split == other.delimiter_split
+    }
+}
+
+impl Eq for Args {}
 
 use std::marker::PhantomData;
 

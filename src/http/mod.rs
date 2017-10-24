@@ -820,6 +820,24 @@ pub fn edit_role(guild_id: u64, role_id: u64, map: &JsonMap) -> Result<Role> {
         .map_err(From::from)
 }
 
+/// Changes the position of a role in a guild.
+pub fn edit_role_position(guild_id: u64, role_id: u64, position: u64) -> Result<Vec<Role>> {
+    let body = serde_json::to_string(&json!({
+        "id": role_id,
+        "position": position,
+    }))?;
+    let response = request!(
+        Route::GuildsIdRolesId(guild_id),
+        patch(body),
+        "/guilds/{}/roles/{}",
+        guild_id,
+        role_id
+    );
+
+    serde_json::from_reader::<HyperResponse, Vec<Role>>(response)
+        .map_err(From::from)
+}
+
 /// Edits a the webhook with the given data.
 ///
 /// The Value is a map with optional values of:

@@ -349,7 +349,7 @@ impl Default for OnlineStatus {
 }
 
 /// Information about a user.
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's
     /// cration date.
@@ -369,6 +369,22 @@ pub struct User {
     /// change if the username+discriminator pair becomes non-unique.
     #[serde(rename = "username")]
     pub name: String,
+}
+
+use std::hash::{Hash, Hasher};
+
+impl PartialEq for User {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for User {}
+
+impl Hash for User {
+    fn hash<H: Hasher>(&self, hasher: &mut H) {
+        self.id.hash(hasher);
+    }
 }
 
 #[cfg(feature = "model")]
@@ -584,7 +600,11 @@ impl User {
                     CACHE.read()
                         .guilds
                         .get(&_guild_id)
-                        .map(|g| g.read().roles.contains_key(&role_id))
+                        .map(|g| {
+                            g.read().unwrap().members.get(&self.id)
+                                .map(|m| m.roles.contains(&role_id))
+                                .unwrap_or(false)
+                        })
                         .unwrap_or(false)
                 } else {
                     true

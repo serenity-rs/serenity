@@ -67,6 +67,7 @@ impl Channel {
     /// [`Message::react`]: struct.Message.html#method.react
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     #[cfg(feature = "model")]
+    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
@@ -110,6 +111,7 @@ impl Channel {
     /// [`Message::delete`]: struct.Message.html#method.delete
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[cfg(feature = "model")]
+    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.id().delete_message(message_id)
@@ -123,6 +125,7 @@ impl Channel {
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[cfg(feature = "model")]
+    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn delete_reaction<M, R>(&self,
                                  message_id: M,
@@ -154,6 +157,7 @@ impl Channel {
     /// [`Message`]: struct.Message.html
     /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
     #[cfg(feature = "model")]
+    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
@@ -181,6 +185,7 @@ impl Channel {
     ///
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[cfg(feature = "model")]
+    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         self.id().message(message_id)
@@ -203,6 +208,7 @@ impl Channel {
     ///
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[cfg(feature = "model")]
+    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
@@ -226,6 +232,7 @@ impl Channel {
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[cfg(feature = "model")]
+    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn reaction_users<M, R, U>(&self,
                                    message_id: M,
@@ -264,6 +271,7 @@ impl Channel {
     /// [`ChannelId`]: struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[cfg(feature = "model")]
+    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn say(&self, content: &str) -> Result<Message> { self.id().say(content) }
 
@@ -286,6 +294,7 @@ impl Channel {
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[cfg(feature = "model")]
+    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
@@ -312,6 +321,7 @@ impl Channel {
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[cfg(feature = "model")]
+    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn send_message<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
@@ -325,6 +335,7 @@ impl Channel {
     /// [`Message`]: struct.Message.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[cfg(feature = "model")]
+    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.id().unpin(message_id)

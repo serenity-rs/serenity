@@ -124,10 +124,14 @@ impl ChannelId {
             .into_iter()
             .map(|message_id| message_id.as_ref().0)
             .collect::<Vec<u64>>();
+        
+        if ids.len() == 1 {
+            self.delete_message(ids[0])
+        } else {
+            let map = json!({ "messages": ids });
 
-        let map = json!({ "messages": ids });
-
-        http::delete_messages(self.0, &map)
+            http::delete_messages(self.0, &map)
+        }
     }
 
     /// Deletes all permission overrides in the channel from a member or role.

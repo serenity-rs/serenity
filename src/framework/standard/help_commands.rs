@@ -62,9 +62,9 @@ pub fn has_all_requirements(cmd: &Command, msg: &Message) -> bool {
             if let Ok(permissions) = member.permissions() {
 
                 if cmd.allowed_roles.is_empty() {
-                    return permissions.administrator() || has_correct_permissions(&cmd, &msg);
+                    return permissions.administrator() || has_correct_permissions(cmd, msg);
                 } else {
-                    return permissions.administrator() || (has_correct_roles(&cmd, &guild, &member) && has_correct_permissions(cmd, msg));
+                    return permissions.administrator() || (has_correct_roles(cmd, &guild, member) && has_correct_permissions(cmd, msg));
                 }
             }
         }
@@ -111,22 +111,20 @@ pub fn with_embeds(_: &mut Context,
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
-                            if has_all_requirements(&cmd, &msg) {
+                            if has_all_requirements(cmd, msg) {
                                 found = Some((command_name, cmd));
-                            }
-                            else {
+                            } else {
                                 break;
                             }
                         },
                         CommandOrAlias::Alias(ref name) => {
-                            let actual_command = group.commands.get(name).unwrap();
+                            let actual_command = &group.commands[name];
 
                             match *actual_command {
                                 CommandOrAlias::Command(ref cmd) => {
-                                    if has_all_requirements(&cmd, &msg) {
+                                    if has_all_requirements(cmd, msg) {
                                         found = Some((name, cmd));
-                                    }
-                                    else {
+                                    } else {
                                         break;
                                     }
                                 },
@@ -229,12 +227,9 @@ pub fn with_embeds(_: &mut Context,
                 for name in command_names {
                     let cmd = &commands[name];
 
-                    if cmd.help_available {
-
-                        if cmd.help_available && has_all_requirements(&cmd, &msg) {
-                            let _ = write!(desc, "`{}`\n", name);
-                            has_commands = true;
-                        }
+                    if cmd.help_available && has_all_requirements(cmd, msg) {
+                        let _ = write!(desc, "`{}`\n", name);
+                        has_commands = true;
                     }
                 }
 
@@ -288,7 +283,7 @@ pub fn plain(_: &mut Context,
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
-                            if has_all_requirements(&cmd, &msg) {
+                            if has_all_requirements(cmd, msg) {
                                 found = Some((command_name, cmd));
                             }
                             else {
@@ -296,11 +291,11 @@ pub fn plain(_: &mut Context,
                             }
                         },
                         CommandOrAlias::Alias(ref name) => {
-                            let actual_command = group.commands.get(name).unwrap();
+                            let actual_command = &group.commands[name];
 
                             match *actual_command {
                                 CommandOrAlias::Command(ref cmd) => {
-                                    if has_all_requirements(&cmd, &msg) {
+                                    if has_all_requirements(cmd, msg) {
                                         found = Some((name, cmd));
                                     }
                                     else {
@@ -389,7 +384,7 @@ pub fn plain(_: &mut Context,
         for name in command_names {
             let cmd = &commands[name];
 
-            if cmd.help_available && has_all_requirements(&cmd, &msg) {
+            if cmd.help_available && has_all_requirements(cmd, msg) {
                 let _ = write!(group_help, "`{}` ", name);
             }
         }
