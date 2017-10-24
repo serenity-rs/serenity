@@ -601,7 +601,7 @@ impl User {
                         .guilds
                         .get(&_guild_id)
                         .map(|g| {
-                            g.read().unwrap().members.get(&self.id)
+                            g.read().members.get(&self.id)
                                 .map(|m| m.roles.contains(&role_id))
                                 .unwrap_or(false)
                         })

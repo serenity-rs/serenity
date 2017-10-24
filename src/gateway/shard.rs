@@ -142,7 +142,7 @@ impl Shard {
                token: Arc<Mutex<String>>,
                shard_info: [u64; 2])
                -> Result<Shard> {
-        let client = connecting(&*ws_url.lock().unwrap());
+        let client = connecting(&*ws_url.lock());
 
         let current_presence = (None, OnlineStatus::Online);
         let heartbeat_instants = (None, None);
