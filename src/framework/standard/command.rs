@@ -131,6 +131,7 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
 
         if let Some(mention_end) = find_mention_end(&msg.content, conf) {
             positions.push(mention_end);
+            return Some(positions);
         } else if let Some(ref func) = conf.dynamic_prefix {
             if let Some(x) = func(ctx, msg) {
                 if msg.content.starts_with(&x) {
@@ -155,22 +156,18 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
             return None;
         }
 
-        if conf.allow_whitespace {
-            let pos = *unsafe { positions.get_unchecked(0) };
+        let pos = *unsafe { positions.get_unchecked(0) };
 
-            positions.insert(0, pos + 1);
+        if conf.allow_whitespace {
+            positions.insert(0, find_end_of_prefix_with_whitespace(&msg.content, pos).unwrap_or(pos));
+        } else if find_end_of_prefix_with_whitespace(&msg.content, pos).is_some() {
+            return None;
         }
 
         Some(positions)
     } else if conf.on_mention.is_some() {
         find_mention_end(&msg.content, conf).map(|mention_end| {
-            let mut positions = vec![mention_end];
-
-            if conf.allow_whitespace {
-                positions.insert(0, mention_end + 1);
-            }
-
-            positions
+            vec![mention_end] // This can simply be returned without trying to find the end whitespaces as trim will remove it later
         })
     } else {
         None
@@ -184,4 +181,24 @@ fn find_mention_end(content: &str, conf: &Configuration) -> Option<usize> {
             .find(|mention| content.starts_with(&mention[..]))
             .map(|m| m.len())
     })
+}
+
+// Finds the end of the first continuous block of whitespace after the prefix
+fn find_end_of_prefix_with_whitespace(content: &str, position: usize) -> Option<usize> {
+    let mut ws_split = content.split_whitespace();
+    if let Some(cmd) = ws_split.nth(1) {
+        if let Some(index_of_cmd) = content.find(cmd) {
+            if index_of_cmd > position && index_of_cmd <= content.len() {
+                let slice = unsafe { content.slice_unchecked(position, index_of_cmd) }.as_bytes();
+                for byte in slice.iter() {
+                    // 0x20 is ASCII for space
+                    if *byte != 0x20u8 {
+                        return None;
+                    }
+                }
+                return Some(index_of_cmd);
+            }
+        }
+    }
+    None
 }
