@@ -131,6 +131,7 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
 
         if let Some(mention_end) = find_mention_end(&msg.content, conf) {
             positions.push(mention_end);
+            return Some(positions);
         } else if let Some(ref func) = conf.dynamic_prefix {
             if let Some(x) = func(ctx, msg) {
                 if msg.content.starts_with(&x) {
@@ -166,7 +167,7 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
         Some(positions)
     } else if conf.on_mention.is_some() {
         find_mention_end(&msg.content, conf).map(|mention_end| {
-            vec![find_end_of_prefix_with_whitespace(&msg.content, mention_end).unwrap_or(mention_end)]
+            vec![mention_end] // This can simply be returned without trying to find the end whitespaces as trim will remove it later
         })
     } else {
         None
