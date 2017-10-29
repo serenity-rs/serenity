@@ -155,10 +155,12 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
             return None;
         }
 
-        if conf.allow_whitespace {
-            let pos = *unsafe { positions.get_unchecked(0) };
+        let pos = *unsafe { positions.get_unchecked(0) };
 
+        if conf.allow_whitespace {
             positions.insert(0, find_end_of_prefix_with_whitespace(&msg.content, pos).unwrap_or(pos));
+        } else if find_end_of_prefix_with_whitespace(&msg.content, pos).is_some() {
+            return None;
         }
 
         Some(positions)
