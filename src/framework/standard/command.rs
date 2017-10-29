@@ -158,7 +158,7 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
         if conf.allow_whitespace {
             let pos = *unsafe { positions.get_unchecked(0) };
 
-            positions.insert(0, pos + 1);
+            positions.insert(0, find_end_of_prefix_with_whitespace(&msg.content, pos).unwrap_or(pos));
         }
 
         Some(positions)
