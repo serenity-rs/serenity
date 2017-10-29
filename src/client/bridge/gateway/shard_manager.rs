@@ -174,13 +174,17 @@ impl ShardManager {
     }
 
     fn shutdown(&mut self, shard_id: ShardId) {
-        info!("Shutting down shard {}", shard_id);
-
         if let Some(runner) = self.runners.lock().get(&shard_id) {
-            let msg = ShardManagerMessage::Shutdown(shard_id);
+            let is_shutdown = runner.shard.lock().is_shutdown();
 
-            if let Err(why) = runner.runner_tx.send(msg) {
-                warn!("Failed to cleanly shutdown shard {}: {:?}", shard_id, why);
+            if !is_shutdown {
+                info!("Shutting down shard {}", shard_id);
+
+                let msg = ShardManagerMessage::Shutdown(shard_id);
+
+                if let Err(why) = runner.runner_tx.send(msg) {
+                    warn!("Failed to cleanly shutdown shard {}: {:?}", shard_id, why);
+                }
             }
         }
 

@@ -89,6 +89,8 @@ pub struct Shard {
     seq: u64,
     session_id: Option<String>,
     shard_info: [u64; 2],
+    /// Whether the shard has permanently shutdown.
+    shutdown: bool,
     stage: ConnectionStage,
     token: Arc<Mutex<String>>,
     ws_url: Arc<Mutex<String>>,
@@ -144,6 +146,7 @@ impl Shard {
                 let user = http::get_current_user()?;
 
                 Shard {
+                    shutdown: false,
                     client,
                     current_presence,
                     heartbeat_instants,
@@ -160,6 +163,7 @@ impl Shard {
                 }
             } else {
                 Shard {
+                    shutdown: false,
                     client,
                     current_presence,
                     heartbeat_instants,
@@ -174,6 +178,18 @@ impl Shard {
                 }
             }
         })
+    }
+
+    /// Whether the shard has permanently shutdown.
+    ///
+    /// This should normally happen due to manual calling of [`shutdown`] or
+    /// [`shutdown_clean`].
+    ///
+    /// [`shutdown`]: #method.shutdown
+    /// [`shutdown_clean`]: #method.shutdown_clean
+    #[inline]
+    pub fn is_shutdown(&self) -> bool {
+        self.shutdown
     }
 
     /// Retrieves a copy of the current shard information.
@@ -604,6 +620,7 @@ impl Shard {
         stream.flush()?;
         stream.shutdown(Shutdown::Both)?;
 
+        self.shutdown = true;
         debug!("[Shard {:?}] Cleanly shutdown shard", self.shard_info);
 
         Ok(())
@@ -615,6 +632,8 @@ impl Shard {
 
         stream.flush()?;
         stream.shutdown(Shutdown::Both)?;
+
+        self.shutdown = true;
 
         Ok(())
     }
