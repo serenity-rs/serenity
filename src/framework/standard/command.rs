@@ -185,3 +185,23 @@ fn find_mention_end(content: &str, conf: &Configuration) -> Option<usize> {
             .map(|m| m.len())
     })
 }
+
+// Finds the end of the first continuous block of whitespace after the prefix
+fn find_end_of_prefix_with_whitespace(content: &str, position: usize) -> Option<usize> {
+    let mut ws_split = content.split_whitespace();
+    if let Some(cmd) = ws_split.nth(1) {
+        if let Some(index_of_cmd) = content.find(cmd) {
+            if index_of_cmd > position && index_of_cmd <= content.len() {
+                let slice = unsafe { content.slice_unchecked(position, index_of_cmd) }.as_bytes();
+                for byte in slice.iter() {
+                    // 0x20 is ASCII for space
+                    if *byte != 0x20u8 {
+                        return None;
+                    }
+                }
+                return Some(index_of_cmd);
+            }
+        }
+    }
+    None
+}
