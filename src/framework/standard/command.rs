@@ -164,13 +164,7 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
         Some(positions)
     } else if conf.on_mention.is_some() {
         find_mention_end(&msg.content, conf).map(|mention_end| {
-            let mut positions = vec![mention_end];
-
-            if conf.allow_whitespace {
-                positions.insert(0, mention_end + 1);
-            }
-
-            positions
+            vec![find_end_of_prefix_with_whitespace(&msg.content, mention_end).unwrap_or(mention_end)]
         })
     } else {
         None
