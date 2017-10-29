@@ -21,6 +21,8 @@ use serenity::framework::StandardFramework;
 use serenity::model::event::ResumedEvent;
 use serenity::model::Ready;
 use serenity::prelude::*;
+use serenity::http;
+use std::collections::HashSet;
 use std::env;
 
 struct Handler;
@@ -48,11 +50,26 @@ fn main() {
 
     let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
 
+    let owners = match http::get_current_application_info() {
+        Ok(info) => {
+            let mut set = HashSet::new();
+            set.insert(info.owner.id);
+
+            set
+        },
+        Err(why) => panic!("Couldn't get application info: {:?}", why),
+    };
+
     client.with_framework(StandardFramework::new()
-        .configure(|c| c.prefix("~"))
+        .configure(|c| c
+            .owners(owners)
+            .prefix("~"))
         .command("ping", |c| c.exec(commands::meta::ping))
         .command("latency", |c| c.exec(commands::meta::latency))
-        .command("multiply", |c| c.exec(commands::math::multiply)));
+        .command("multiply", |c| c.exec(commands::math::multiply))
+        .command("quit", |c| c
+            .exec(commands::owner::quit)
+            .owners_only(true)));
 
     if let Err(why) = client.start() {
         error!("Client error: {:?}", why);
