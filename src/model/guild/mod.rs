@@ -1004,6 +1004,57 @@ impl Guild {
         }
     }
 
+    /// Calculate a [`Member`]'s permissions in the guild.
+    ///
+    /// [`Member`]: struct.Member.html
+    pub fn member_permissions<U>(&self, user_id: U) -> Permissions
+        where U: Into<UserId> {
+        let user_id = user_id.into();
+
+        if user_id == self.owner_id {
+            return Permissions::all();
+        }
+
+        let everyone = match self.roles.get(&RoleId(self.id.0)) {
+            Some(everyone) => everyone,
+            None => {
+                error!(
+                    "(╯°□°）╯︵ ┻━┻ @everyone role ({}) missing in '{}'",
+                    self.id,
+                    self.name,
+                );
+
+                return Permissions::empty();
+            },
+        };
+
+        let member = match self.members.get(&user_id) {
+            Some(member) => member,
+            None => return everyone.permissions,
+        };
+
+        let mut permissions = everyone.permissions;
+
+        for role in &member.roles {
+            if let Some(role) = self.roles.get(&role) {
+                if role.permissions.contains(Permissions::ADMINISTRATOR) {
+                    return Permissions::all();
+                }
+
+                permissions |= role.permissions;
+            } else {
+                warn!(
+                    "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
+                    member.user.read().unwrap().id,
+                    self.id,
+                    role,
+                );
+            }
+        }
+
+        permissions
+    }
+
     /// Moves a member to a specific voice channel.
     ///
     /// Requires the [Move Members] permission.
