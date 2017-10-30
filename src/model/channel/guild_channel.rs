@@ -512,7 +512,7 @@ impl GuildChannel {
     pub fn permissions_for<U: Into<UserId>>(&self, user_id: U) -> Result<Permissions> {
         self.guild()
             .ok_or_else(|| Error::Model(ModelError::GuildNotFound))
-            .map(|g| g.read().unwrap().permissions_for(self.id, user_id))
+            .map(|g| g.read().unwrap().permissions_in(self.id, user_id))
     }
 
     /// Pins a [`Message`] to the channel.

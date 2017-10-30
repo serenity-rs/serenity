@@ -132,7 +132,7 @@ impl Guild {
         let uid = CACHE.read().unwrap().user.id;
 
         for (cid, channel) in &self.channels {
-            if self.permissions_for(*cid, uid).read_messages() {
+            if self.permissions_in(*cid, uid).read_messages() {
                 return Some(channel.read().unwrap().clone());
             }
         }
@@ -148,7 +148,7 @@ impl Guild {
     pub fn default_channel_guaranteed(&self) -> Option<GuildChannel> {
         for (cid, channel) in &self.channels {
             for memid in self.members.keys() {
-                if self.permissions_for(*cid, *memid).read_messages() {
+                if self.permissions_in(*cid, *memid).read_messages() {
                     return Some(channel.read().unwrap().clone());
                 }
             }
@@ -1058,10 +1058,21 @@ impl Guild {
         self.id.move_member(user_id, channel_id)
     }
 
+    /// Alias for [`permissions_in`].
+    ///
+    /// [`permissions_in`]: #method.permissions_in
+    #[deprecated(since = "0.4.3",
+                 note = "This will serve a different purpose in 0.5")]
+    #[inline]
+    pub fn permissions_for<C, U>(&self, channel_id: C, user_id: U)
+        -> Permissions where C: Into<ChannelId>, U: Into<UserId> {
+        self.permissions_in(channel_id, user_id)
+    }
+
     /// Calculate a [`User`]'s permissions in a given channel in the guild.
     ///
     /// [`User`]: struct.User.html
-    pub fn permissions_for<C, U>(&self, channel_id: C, user_id: U) -> Permissions
+    pub fn permissions_in<C, U>(&self, channel_id: C, user_id: U) -> Permissions
         where C: Into<ChannelId>, U: Into<UserId> {
         let user_id = user_id.into();
 

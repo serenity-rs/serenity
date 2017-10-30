@@ -257,7 +257,7 @@ impl Member {
                 .get(&self.guild_id)
                 .map(|guild| guild.read().unwrap().has_perms(req));
 
-            if let Some(Ok(false)) = has_perms {
+            if let Some(false) = has_perms {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -301,7 +301,7 @@ impl Member {
 
         Ok(
             guild
-                .permissions_for(default_channel.id, self.user.read().unwrap().id),
+                .permissions_in(default_channel.id, self.user.read().unwrap().id),
         )
     }
 

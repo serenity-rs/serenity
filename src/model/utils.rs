@@ -180,7 +180,7 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
     let perms = guild
         .read()
         .unwrap()
-        .permissions_for(channel_id, current_user.id);
+        .permissions_in(channel_id, current_user.id);
 
     permissions.remove(perms);
 

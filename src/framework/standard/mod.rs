@@ -972,7 +972,7 @@ pub fn has_correct_permissions(command: &Command, message: &Message) -> bool {
     if !command.required_permissions.is_empty() {
         if let Some(guild) = message.guild() {
             let perms = guild
-                .with(|g| g.permissions_for(message.channel_id, message.author.id));
+                .with(|g| g.permissions_in(message.channel_id, message.author.id));
 
             return perms.contains(command.required_permissions);
         }
