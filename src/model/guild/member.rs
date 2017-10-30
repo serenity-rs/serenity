@@ -16,6 +16,7 @@ use builder::EditMember;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use utils::Colour;
 
+/// A trait for allowing both u8 or &str or (u8, &str) to be passed into the `ban` methods in `Guild` and `Member`.
 pub trait BanOptions {
     fn dmd(&self) -> u8 { 0 }
     fn reason(&self) -> &str { "" }
