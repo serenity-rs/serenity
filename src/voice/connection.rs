@@ -44,6 +44,7 @@ struct ThreadItems {
 }
 
 #[allow(dead_code)]
+#[derive(Debug)]
 pub struct Connection {
     audio_timer: Timer,
     client: Arc<Mutex<Client>>,

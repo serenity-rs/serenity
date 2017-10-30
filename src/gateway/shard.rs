@@ -68,6 +68,7 @@ type CurrentPresence = (Option<Game>, OnlineStatus, bool);
 /// [`receive`]: #method.receive
 /// [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 /// [module docs]: index.html#sharding
+
 pub struct Shard {
     pub client: WsClient,
     current_presence: CurrentPresence,

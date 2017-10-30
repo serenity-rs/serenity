@@ -42,6 +42,7 @@ impl Display for ShardId {
     }
 }
 
+#[derive(Debug)]
 pub struct ShardRunnerInfo {
     pub runner_tx: Sender<ShardManagerMessage>,
     pub shard: Arc<Mutex<Shard>>,
