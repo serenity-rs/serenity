@@ -158,21 +158,13 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
-    fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
-        let member = match self.members.get(&CACHE.read().unwrap().user.id) {
-            Some(member) => member,
-            None => return Err(Error::Model(ModelError::ItemMissing)),
-        };
+    fn has_perms(&self, mut permissions: Permissions) -> bool {
+        let user_id = CACHE.read().unwrap().user.id;
 
-        let default_channel = match self.default_channel() {
-            Some(dc) => dc,
-            None => return Err(Error::Model(ModelError::ItemMissing)),
-        };
-
-        let perms = self.permissions_for(default_channel.id, member.user.read().unwrap().id);
+        let perms = self.member_permissions(user_id);
         permissions.remove(perms);
 
-        Ok(permissions.is_empty())
+        permissions.is_empty()
     }
 
     /// Ban a [`User`] from the guild. All messages by the
@@ -210,7 +202,7 @@ impl Guild {
         {
             let req = Permissions::BAN_MEMBERS;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -235,7 +227,7 @@ impl Guild {
         {
             let req = Permissions::BAN_MEMBERS;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -317,7 +309,7 @@ impl Guild {
         {
             let req = Permissions::MANAGE_CHANNELS;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -388,7 +380,7 @@ impl Guild {
         {
             let req = Permissions::MANAGE_ROLES;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -490,7 +482,7 @@ impl Guild {
         {
             let req = Permissions::MANAGE_GUILD;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -570,7 +562,7 @@ impl Guild {
         {
             let req = Permissions::CHANGE_NICKNAME;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -652,7 +644,7 @@ impl Guild {
         {
             let req = Permissions::MANAGE_GUILD;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -1217,7 +1209,7 @@ impl Guild {
         {
             let req = Permissions::KICK_MEMBERS;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -1300,7 +1292,7 @@ impl Guild {
         {
             let req = Permissions::KICK_MEMBERS;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -1325,7 +1317,7 @@ impl Guild {
         {
             let req = Permissions::BAN_MEMBERS;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
