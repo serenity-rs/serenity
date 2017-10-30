@@ -143,7 +143,7 @@ use std::fmt;
 impl fmt::Debug for DispatchError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use self::DispatchError::*;
-        
+
         match *self {
             CheckFailed(..) => write!(f, "DispatchError::CheckFailed"),
             CommandDisabled(ref s) => f.debug_tuple("DispatchError::CommandDisabled").field(&s).finish(),
