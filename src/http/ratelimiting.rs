@@ -339,8 +339,8 @@ pub enum Route {
     VoiceRegions,
     /// Route for the `/webhooks/:webhook_id` path.
     WebhooksId,
-    /// Route where no ratelimit headers are in place (i.e. user account-only
-    /// routes).
+    /// Route where no ratelimit headers are in place (e.g. current application
+    /// info retrieval).
     ///
     /// This is a special case, in that if the route is `None` then pre- and
     /// post-hooks are not executed.
