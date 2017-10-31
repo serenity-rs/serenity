@@ -265,7 +265,7 @@ impl Member {
         self.guild_id.kick(self.user.read().unwrap().id)
     }
 
-    /// Returns the permissions for the member.
+    /// Returns the guild-level permissions for the member.
     ///
     /// # Examples
     ///
@@ -292,17 +292,9 @@ impl Member {
             None => return Err(From::from(ModelError::GuildNotFound)),
         };
 
-        let guild = guild.read().unwrap();
+        let reader = guild.read().unwrap();
 
-        let default_channel = match guild.default_channel() {
-            Some(dc) => dc,
-            None => return Err(From::from(ModelError::ItemMissing)),
-        };
-
-        Ok(
-            guild
-                .permissions_in(default_channel.id, self.user.read().unwrap().id),
-        )
+        Ok(reader.member_permissions(self.user.read().unwrap().id))
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the
