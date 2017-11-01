@@ -266,12 +266,14 @@ impl Cache {
     /// use serenity::CACHE;
     ///
     /// struct Handler;
+    ///
     /// impl EventHandler for Handler {
     ///     fn on_ready(&self, _: Context, _: Ready) {
-    ///         println!("Guilds in the Cache: {:?}", CACHE.read().unwrap().all_guilds());
+    ///         let guilds = CACHE.read().unwrap().guilds.len();
+    ///
+    ///         println!("Guilds in the Cache: {}", guilds);
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler);
     /// # }
     /// #
     /// # #[cfg(not(feature = "client"))]

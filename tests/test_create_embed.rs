@@ -1,5 +1,5 @@
 #![cfg_attr(feature = "cargo-clippy", allow(unreadable_literal))]
-#![cfg(feature = "utils")]
+#![cfg(all(feature = "builder", feature = "utils"))]
 
 #[macro_use]
 extern crate serde_json;

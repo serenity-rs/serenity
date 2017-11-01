@@ -13,10 +13,10 @@ use super::Permissions;
 /// re-ban all members with an odd discriminator:
 ///
 /// ```rust,no_run
-/// # #[cfg(feature="client")]
+/// # #[cfg(all(feature = "client", feature = "model"))]
 /// # use std::error::Error;
 /// #
-/// # #[cfg(feature="client")]
+/// # #[cfg(all(feature = "client", feature = "model"))]
 /// # fn try_main() -> Result<(), Box<Error>> {
 /// use serenity::prelude::*;
 /// use serenity::model::*;
@@ -51,12 +51,12 @@ use super::Permissions;
 /// #     Ok(())
 /// # }
 /// #
-/// # #[cfg(feature="client")]
+/// # #[cfg(all(feature = "client", feature = "model"))]
 /// # fn main() {
 /// #     try_main().unwrap();
 /// # }
 /// #
-/// # #[cfg(not(feature="client"))]
+/// # #[cfg(not(all(feature="client", feature = "model")))]
 /// # fn main() { }
 /// ```
 ///

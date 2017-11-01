@@ -235,6 +235,8 @@ impl Shard {
     /// Setting the current game to playing `"Heroes of the Storm"`:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "model")]
+    /// # fn main() {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
@@ -245,6 +247,10 @@ impl Shard {
     /// use serenity::model::Game;
     ///
     /// shard.set_game(Some(Game::playing("Heroes of the Storm")));
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "model"))]
+    /// # fn main() { }
     /// ```
     pub fn set_game(&mut self, game: Option<Game>) {
         self.current_presence.0 = game;
@@ -299,6 +305,8 @@ impl Shard {
     /// and not being afk:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "model")]
+    /// # fn main() {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
@@ -308,8 +316,11 @@ impl Shard {
     /// #
     /// use serenity::model::{Game, OnlineStatus};
     ///
-    /// shard.set_presence(Some(Game::playing("Heroes of the Storm")), OnlineStatus::Online,
-    /// false);
+    /// shard.set_presence(Some(Game::playing("Heroes of the Storm")), OnlineStatus::Online, false);
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "model"))]
+    /// # fn main() { }
     /// ```
     pub fn set_presence(&mut self, game: Option<Game>, mut status: OnlineStatus, afk: bool) {
         if status == OnlineStatus::Offline {
@@ -569,6 +580,8 @@ impl Shard {
     /// message handled through [`Client::on_message`].
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "model")]
+    /// # fn main() {
     /// # use serenity::prelude::*;
     /// # use serenity::model::*;
     /// struct Handler;
@@ -587,6 +600,10 @@ impl Shard {
     ///     }
     /// }
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "model"))]
+    /// # fn main() { }
     /// ```
     ///
     /// [`Client`]: ../struct.Client.html
