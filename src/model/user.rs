@@ -44,7 +44,7 @@ impl CurrentUser {
     /// Print out the current user's avatar url if one is set:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// #
     /// # let cache = CACHE.read().unwrap();
     /// #
@@ -121,7 +121,7 @@ impl CurrentUser {
     /// Print out the names of all guilds the current user is in:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// #
     /// # let cache = CACHE.read().unwrap();
     /// #
@@ -149,7 +149,7 @@ impl CurrentUser {
     /// Get the invite url with no permissions set:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// #
     /// # let mut cache = CACHE.write().unwrap();
     ///
@@ -172,7 +172,7 @@ impl CurrentUser {
     /// Get the invite url with some basic permissions set:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// #
     /// # let mut cache = CACHE.write().unwrap();
     ///
@@ -228,7 +228,7 @@ impl CurrentUser {
     /// Print out the current user's static avatar url if one is set:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// #
     /// # let cache = CACHE.read().unwrap();
     /// #
@@ -252,7 +252,7 @@ impl CurrentUser {
     /// Print out the current user's distinct identifier (e.g., Username#1234):
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// #
     /// # let cache = CACHE.read().unwrap();
     /// #

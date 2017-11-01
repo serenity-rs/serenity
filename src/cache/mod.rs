@@ -169,7 +169,9 @@ impl Cache {
     /// # use serenity::prelude::*;
     /// # use serenity::model::*;
     /// #
-    /// use serenity::client::CACHE;
+    /// # #[cfg(feature = "client")]
+    /// # fn main() {
+    /// use serenity::CACHE;
     /// use std::thread;
     /// use std::time::Duration;
     ///
@@ -193,6 +195,10 @@ impl Cache {
     /// }
     ///
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "client"))]
+    /// # fn main() { }
     /// ```
     ///
     /// [`Member`]: ../model/struct.Member.html
@@ -225,7 +231,7 @@ impl Cache {
     /// Printing the count of all private channels and groups:
     ///
     /// ```rust,no_run
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let amount = CACHE.read().unwrap().all_private_channels().len();
     ///
@@ -252,10 +258,12 @@ impl Cache {
     /// Print all of the Ids of guilds in the Cache:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "client")]
+    /// # fn main() {
     /// # use serenity::prelude::*;
     /// # use serenity::model::*;
     /// #
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// struct Handler;
     /// impl EventHandler for Handler {
@@ -264,6 +272,10 @@ impl Cache {
     ///     }
     /// }
     /// let mut client = Client::new("token", Handler);
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "client"))]
+    /// # fn main() { }
     /// ```
     ///
     /// [`Context`]: ../client/struct.Context.html
@@ -330,7 +342,7 @@ impl Cache {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let cache = CACHE.read()?;
     ///
@@ -361,10 +373,12 @@ impl Cache {
     /// [`Client::on_message`] event dispatch:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "client")]
+    /// # fn main() {
     /// # use serenity::prelude::*;
     /// # use serenity::model::*;
     /// #
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// struct Handler;
     ///
@@ -387,6 +401,10 @@ impl Cache {
     /// }
     ///
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "client"))]
+    /// # fn main() { }
     /// ```
     ///
     /// [`ChannelId`]: ../model/struct.ChannelId.html
@@ -415,7 +433,7 @@ impl Cache {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let cache = CACHE.read()?;
     ///
@@ -494,18 +512,22 @@ impl Cache {
     ///
     /// # Examples
     ///
-    /// Retrieve a private channel from the cache and send a message:
+    /// Retrieve a private channel from the cache and print its recipient's
+    /// name:
     ///
     /// ```rust,no_run
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let cache = CACHE.read()?;
     ///
     /// if let Some(channel) = cache.private_channel(7) {
-    ///     channel.read().unwrap().say("Hello there!");
+    ///     let channel_reader = channel.read().unwrap();
+    ///     let user_reader = channel_reader.recipient.read().unwrap();
+    ///
+    ///     println!("The recipient is {}", user_reader.name);
     /// }
     /// #     Ok(())
     /// # }
@@ -537,7 +559,7 @@ impl Cache {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let cache = CACHE.read()?;
     ///
@@ -574,7 +596,7 @@ impl Cache {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let cache = CACHE.read()?;
     ///

@@ -19,7 +19,7 @@ use internal::prelude::*;
 ///
 /// impl EventHandler for Handler {
 ///     fn on_message(&self, _: Context, msg: Message) {
-///         use serenity::client::CACHE;
+///         use serenity::CACHE;
 ///         if msg.content == "!createinvite" {
 ///             let channel = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
 ///                 Some(channel) => channel,
@@ -72,7 +72,7 @@ impl CreateInvite {
     /// Create an invite with a max age of `3600` seconds, or 1 hour:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// # use serenity::model::ChannelId;
     /// # use std::error::Error;
     /// #
@@ -106,7 +106,7 @@ impl CreateInvite {
     /// Create an invite with a max use limit of `5`:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// # use serenity::model::ChannelId;
     /// # use std::error::Error;
     /// #
@@ -138,7 +138,7 @@ impl CreateInvite {
     /// Create an invite which is temporary:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// # use serenity::model::ChannelId;
     /// # use std::error::Error;
     /// #
@@ -170,7 +170,7 @@ impl CreateInvite {
     /// Create an invite which is unique:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// # use serenity::model::ChannelId;
     /// # use std::error::Error;
     /// #
