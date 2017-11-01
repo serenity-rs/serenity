@@ -685,7 +685,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
+    /// let token = env::var("DISCORD_TOKEN").unwrap();
     /// let mut client = Client::new(&token, Handler);
     ///
     /// let _ = client.start_shard_range([4, 7], 10);

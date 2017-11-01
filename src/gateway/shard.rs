@@ -116,7 +116,7 @@ impl Shard {
     /// use serenity::http;
     /// use std::env;
     ///
-    /// let token = env::var("DISCORD_BOT_TOKEN").expect("Token in environment");
+    /// let token = env::var("DISCORD_TOKEN").expect("Token in environment");
     /// // retrieve the gateway response, which contains the URL to connect to
     /// let gateway = http::get_gateway().expect("Valid gateway response").url;
     /// let shard = Shard::new(&gateway, &token, None)

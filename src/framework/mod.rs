@@ -36,7 +36,7 @@
 //! use serenity::model::Message;
 //! use std::env;
 //!
-//! let mut client = Client::new(&env::var("DISCORD_BOT_TOKEN").unwrap());
+//! let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
 //!
 //! client.with_framework(|f| f
 //!     .configure(|c| c.prefix("~"))

@@ -24,7 +24,7 @@ use model::{GuildId, Message, UserId};
 /// use std::env;
 /// use serenity::framework::StandardFramework;
 ///
-/// let mut client = Client::new(&env::var("DISCORD_BOT_TOKEN").unwrap(), Handler);
+/// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
 ///
 /// client.with_framework(StandardFramework::new()
 ///     .configure(|c| c.on_mention(true).prefix("~")));
