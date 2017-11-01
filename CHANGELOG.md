@@ -3,14 +3,47 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.4.3] - 2017-11-01
+
+This release contains bugfixes and marks the final release of the v0.4.x branch.
+Future development will continue on the v0.5.x branch.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@ThatsNoMoon]
+- [@zeyla]
+
+### Added
+
+- [model] Add `Guild::member_permissions` ([@zeyla]) [c:2ba4d03]
+
+### Changed
+
+- [model] Rename `Guild::permissions_for` to `Guild::permissions_in`, keep an
+  alias ([@zeyla]) [c:dcac271]
+
+### Fixed
+
+- [model] Make `Member::permissions` return guild-level permissions ([@zeyla])
+  [c:d3eddc6]
+
+### Misc.
+
+- [model] Add some docs to `BanOptions` ([@acdenisSK]) [c:c99091d]
+- [model] Have `Guild::has_perms` use `Guild::member_permissions` ([@zeyla])
+  [c:1b7101f]
+- [http] Slightly clarify ratelimiting documentation ([@zeyla]) [c:3be6e2e]
+- [docs] Fix ping bot example ([@ThatsNoMoon]) [c:800e58f]
+- [docs] Use consistent token names in examples ([@zeyla]) [c:e219a6a]
+
 ## [0.4.2] - 2017-10-29
 
-This release contains the regular bugfixes, new features and slight behaviour changes.
-
+This release contains the regular bugfixes, new features and slight behaviour
+changes.
 
 Thanks to the following people for their contributions:
 
-- [@zeyla]
 - [@acdenisSK]
 - [@efyang]
 - [@Caemor]
@@ -18,6 +51,7 @@ Thanks to the following people for their contributions:
 - [@hsiW]
 - [@Lakelezz]
 - [@UninterestinAcc]
+- [@zeyla]
 
 ### Added
 
@@ -1477,6 +1511,8 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.4.3]: https://github.com/zeyla/serenity/compare/v0.4.2...v0.4.3
+[0.4.2]: https://github.com/zeyla/serenity/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/zeyla/serenity/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/zeyla/serenity/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/zeyla/serenity/compare/v0.2.0...v0.3.0
@@ -1521,9 +1557,19 @@ Initial commit.
 [@Roughsketch]: https://github.com/Roughsketch
 [@sschroe]: https://github.com/sschroe
 [@SunDwarf]: https://github.com/SunDwarf
+[@ThatsNoMoon]: https://github.com/ThatsNoMoon
 [@UninterestinAcc]: https://github.com/UninterestinAcc
 [@xentec]: https://github.com/xentec
 [@zeyla]: https://github.com/zeyla
+
+[c:1b7101f]: https://github.com/zeyla/serenity/commit/1b7101fe71335c0e18bf855c0703acc23d87e427
+[c:2ba4d03]: https://github.com/zeyla/serenity/commit/2ba4d03f15d57d9f0fb1cc4d4f4355ebbc483d0a
+[c:3be6e2e]: https://github.com/zeyla/serenity/commit/3be6e2e28b0c3e9baaef19f405c463e3a41fed25
+[c:800e58f]: https://github.com/zeyla/serenity/commit/800e58f4603ce99ab69569b30cbec756301a6a63
+[c:c99091d]: https://github.com/zeyla/serenity/commit/c99091d241f240c6b76ac969655a8ec4423aaf80
+[c:d3eddc6]: https://github.com/zeyla/serenity/commit/d3eddc68e07bbc31e2043577cbf48741f0547ed3
+[c:dcac271]: https://github.com/zeyla/serenity/commit/dcac27168915b4f22745950ec0ef0c0af696774e
+[c:e219a6a]: https://github.com/zeyla/serenity/commit/e219a6a9d6a890b008fc390a909ae504a0c1a329
 
 [c:002ce3a]: https://github.com/zeyla/serenity/commit/002ce3aa272fa51b84e820f12db39cb87a461a83
 [c:022e35d]: https://github.com/zeyla/serenity/commit/022e35d5b12322bd77bbe74a1a3b2ad319977390
