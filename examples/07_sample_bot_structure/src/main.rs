@@ -21,7 +21,9 @@ use std::env;
 struct Handler; impl EventHandler for Handler {}
 
 fn main() {
-    let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
+    let token = env::var("DISCORD_TOKEN")
+        .expect("Expected a token in the environment");
+    let mut client = Client::new(&token, Handler).expect("Err creating client");
 
     client.with_framework(StandardFramework::new()
         .configure(|c| c.prefix("~"))

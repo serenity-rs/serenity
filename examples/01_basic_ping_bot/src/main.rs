@@ -43,7 +43,7 @@ fn main() {
     // Create a new instance of the Client, logging in as a bot. This will
     // automatically prepend your bot token with "Bot ", which is a requirement
     // by Discord for bot users.
-    let mut client = Client::new(&token, Handler);
+    let mut client = Client::new(&token, Handler).expect("Err creating client");
 
     // Finally, start a single shard, and start listening to events.
     //

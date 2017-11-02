@@ -30,7 +30,7 @@ fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
-    let mut client = Client::new(&token, Handler);
+    let mut client = Client::new(&token, Handler).expect("Err creating client");
 
     client.with_framework(StandardFramework::new()
         .configure(|c| c

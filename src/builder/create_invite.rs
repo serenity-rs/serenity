@@ -53,7 +53,10 @@ use internal::prelude::*;
 ///         }
 ///     }
 /// }
-/// let mut client = Client::new("token", Handler); client.start().unwrap();
+///
+/// let mut client = Client::new("token", Handler).unwrap();
+///
+/// client.start().unwrap();
 /// ```
 ///
 /// [`GuildChannel::create_invite`]: ../model/struct.GuildChannel.html#method.create_invite

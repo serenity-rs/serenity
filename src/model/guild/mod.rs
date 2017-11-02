@@ -1320,7 +1320,7 @@ impl Guild {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler);
+    /// let mut client = Client::new("token", Handler).unwrap();
     ///
     /// client.start().unwrap();
     /// ```

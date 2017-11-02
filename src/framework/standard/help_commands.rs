@@ -83,7 +83,7 @@ pub fn has_all_requirements(cmd: &Command, msg: &Message) -> bool {
 /// # struct Handler;
 /// #
 /// # impl EventHandler for Handler {}
-/// # let mut client = Client::new("token", Handler);
+/// # let mut client = Client::new("token", Handler).unwrap();
 /// #
 /// use serenity::framework::standard::{StandardFramework, help_commands};
 ///
@@ -255,7 +255,7 @@ pub fn with_embeds(_: &mut Context,
 /// # struct Handler;
 /// #
 /// # impl EventHandler for Handler {}
-/// # let mut client = Client::new("token", Handler);
+/// # let mut client = Client::new("token", Handler).unwrap();
 /// #
 /// use serenity::framework::standard::{StandardFramework, help_commands};
 ///

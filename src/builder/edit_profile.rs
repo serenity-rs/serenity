@@ -24,6 +24,7 @@ impl EditProfile {
     /// # use serenity::model::*;
     /// #
     /// # struct Handler;
+    ///
     /// # impl EventHandler for Handler {
     ///    # fn message(&self, context: Context, _: Message) {
     ///         use serenity::utils;
@@ -38,8 +39,10 @@ impl EditProfile {
     ///         });
     ///    # }
     /// }
-
-    /// # let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// #
+    /// # let mut client = Client::new("token", Handler).unwrap();
+    /// #
+    /// # client.start().unwrap();
     /// ```
     ///
     /// [`utils::read_image`]: ../fn.read_image.html

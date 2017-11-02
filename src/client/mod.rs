@@ -222,7 +222,7 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     ///
     /// impl EventHandler for Handler { }
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
     ///
     /// let shard_runners = client.shard_runners.clone();
     ///
@@ -275,7 +275,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_TOKEN")?;
-    /// let client = Client::new(&token, Handler);
+    /// let client = Client::new(&token, Handler)?;
     /// # Ok(())
     /// # }
     /// #
@@ -283,7 +283,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// #    try_main().unwrap();
     /// # }
     /// ```
-    pub fn new(token: &str, handler: H) -> Self {
+    pub fn new(token: &str, handler: H) -> Result<Self> {
         let token = if token.starts_with("Bot ") {
             token.to_string()
         } else {
@@ -296,7 +296,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
         let name = "serenity client".to_owned();
         let threadpool = ThreadPool::with_name(name, 5);
 
-        feature_framework! {{
+        Ok(feature_framework! {{
             Client {
                 data: Arc::new(Mutex::new(ShareMap::custom())),
                 event_handler: Arc::new(handler),
@@ -313,7 +313,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
                 threadpool,
                 token: locked,
             }
-        }}
+        }})
     }
 
     /// Sets a framework to be used with the client. All message events will be
@@ -340,7 +340,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
     /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
     ///     .command("ping", |c| c.exec_str("Pong!")));
@@ -392,12 +392,11 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     ///
     /// impl EventHandler for Handler {}
     ///
-    ///
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
+    /// let mut client = Client::new(&token, Handler).unwrap();
     /// client.with_framework(MyFramework { commands: {
     ///     let mut map = HashMap::new();
     ///     map.insert("ping".to_string(), Box::new(|msg, _| msg.channel_id.say("pong!")));
@@ -447,7 +446,8 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// use serenity::client::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
+    /// let token = env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::new(&token, Handler).unwrap();
     ///
     /// if let Err(why) = client.start() {
     ///     println!("Err with client: {:?}", why);
@@ -492,7 +492,8 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// use serenity::client::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
+    /// let token = env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::new(&token, Handler).unwrap();
     ///
     /// if let Err(why) = client.start_autosharded() {
     ///     println!("Err with client: {:?}", why);
@@ -551,7 +552,8 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// use serenity::client::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
+    /// let token = env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::new(&token, Handler).unwrap();
     ///
     /// if let Err(why) = client.start_shard(3, 5) {
     ///     println!("Err with client: {:?}", why);
@@ -578,7 +580,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// use serenity::client::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
     ///
     /// if let Err(why) = client.start_shard(0, 1) {
     ///     println!("Err with client: {:?}", why);
@@ -631,7 +633,8 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// use serenity::client::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
+    /// let token = env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::new(&token, Handler).unwrap();
     ///
     /// if let Err(why) = client.start_shards(8) {
     ///     println!("Err with client: {:?}", why);
@@ -702,7 +705,8 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// use serenity::client::Client;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
+    /// let token = env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::new(&token, Handler).unwrap();
     ///
     /// if let Err(why) = client.start_shard_range([4, 7], 10) {
     ///     println!("Err with client: {:?}", why);

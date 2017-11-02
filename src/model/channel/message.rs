@@ -88,7 +88,7 @@ impl Message {
     /// #   struct Handler;
     /// #
     /// #   impl EventHandler for Handler {}
-    /// #   let mut client = Client::new("token", Handler);
+    /// #   let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::model::Channel;
     /// use serenity::framework::StandardFramework;

@@ -47,7 +47,8 @@ impl CreateCommand {
     /// use std::env;
     /// use std::sync::Arc;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
+    /// let token = env::var("DISCORD_TOKEN").unwrap();
+    /// let mut client = Client::new(&token, Handler).unwrap();
     ///
     /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
@@ -117,7 +118,7 @@ impl CreateCommand {
     /// command.
     ///
     /// You can return `Err(From::from(string))` if there's an error.
-    pub fn exec_help(mut self, f: 
+    pub fn exec_help(mut self, f:
                     fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
                     -> Result<(), CommandError>) -> Self {
         self.0.exec = CommandType::WithCommands(f);

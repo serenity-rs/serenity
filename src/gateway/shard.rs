@@ -623,7 +623,9 @@ impl Shard {
     ///         }
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// [`Client`]: ../struct.Client.html

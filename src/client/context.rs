@@ -77,7 +77,9 @@ impl Context {
     ///         }
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     #[cfg(feature = "builder")]
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser> {
@@ -128,7 +130,10 @@ impl Context {
     ///         }
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    ///
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
@@ -157,7 +162,9 @@ impl Context {
     ///         }
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
@@ -186,7 +193,9 @@ impl Context {
     ///         }
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
@@ -215,7 +224,9 @@ impl Context {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
@@ -246,7 +257,9 @@ impl Context {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// [`Event::Resumed`]: ../model/event/enum.Event.html#variant.Resumed
@@ -271,6 +284,7 @@ impl Context {
     /// use serenity::model::Game;
     ///
     /// struct Handler;
+    ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, ctx: Context, msg: Message) {
     ///         let args = msg.content.splitn(2, ' ').collect::<Vec<&str>>();
@@ -283,7 +297,9 @@ impl Context {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
@@ -317,7 +333,8 @@ impl Context {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    /// client.start().unwrap();
     /// ```
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
@@ -357,7 +374,9 @@ impl Context {
     ///         ctx.set_presence(None, OnlineStatus::Idle);
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// Setting the current user as playing `"Heroes of the Storm"`, while being
@@ -379,7 +398,10 @@ impl Context {
     ///         context.set_presence(Some(game), status);
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    ///
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb

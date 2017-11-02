@@ -47,7 +47,9 @@ use super::Permissions;
 ///     }
 /// }
 /// let token = env::var("DISCORD_BOT_TOKEN")?;
-/// let mut client = Client::new(&token, Handler); client.start()?;
+/// let mut client = Client::new(&token, Handler).unwrap();
+///
+/// client.start()?;
 /// #     Ok(())
 /// # }
 /// #

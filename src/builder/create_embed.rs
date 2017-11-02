@@ -207,6 +207,7 @@ impl CreateEmbed {
     /// # use serenity::model::*;
     /// #
     /// struct Handler;
+    ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
     ///         if msg.content == "~embed" {
@@ -218,7 +219,9 @@ impl CreateEmbed {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// Creating a join-log:
@@ -230,6 +233,7 @@ impl CreateEmbed {
     /// # use serenity::model::*;
     /// #
     /// struct Handler;
+    ///
     /// impl EventHandler for Handler {
     ///     fn guild_member_addition(&self, _: Context, guild_id: GuildId, member: Member) {
     ///         use serenity::client::CACHE;
@@ -263,7 +267,9 @@ impl CreateEmbed {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     pub fn timestamp<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
         self.0

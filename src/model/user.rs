@@ -634,7 +634,8 @@ impl User {
     ///         // normal message handling here
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler);
+    ///
+    /// let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::model::UserId;
     /// use serenity::CACHE;
@@ -712,7 +713,9 @@ impl User {
     ///         }
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     #[inline]
     pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }

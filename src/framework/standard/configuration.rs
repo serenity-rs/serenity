@@ -20,11 +20,13 @@ use model::{GuildId, Message, UserId};
 /// struct Handler;
 ///
 /// impl EventHandler for Handler {}
+///
 /// use serenity::Client;
 /// use std::env;
 /// use serenity::framework::StandardFramework;
 ///
-/// let mut client = Client::new(&env::var("DISCORD_BOT_TOKEN").unwrap(), Handler);
+/// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
+/// let mut client = Client::new(&token, Handler).unwrap();
 ///
 /// client.with_framework(StandardFramework::new()
 ///     .configure(|c| c.on_mention(true).prefix("~")));
@@ -98,7 +100,7 @@ impl Configuration {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// use serenity::model::GuildId;
     /// use serenity::framework::StandardFramework;
     ///
@@ -123,7 +125,7 @@ impl Configuration {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// use serenity::model::UserId;
     /// use serenity::framework::StandardFramework;
     ///
@@ -161,7 +163,7 @@ impl Configuration {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// use serenity::framework::StandardFramework;
     ///
     /// let disabled = vec!["ping"].into_iter().map(|x| x.to_string()).collect();
@@ -191,7 +193,7 @@ impl Configuration {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// use serenity::framework::StandardFramework;
     ///
     /// client.with_framework(StandardFramework::new()
@@ -276,7 +278,7 @@ impl Configuration {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// use serenity::model::UserId;
     /// use serenity::framework::StandardFramework;
     ///
@@ -291,7 +293,7 @@ impl Configuration {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// use serenity::model::UserId;
     /// use std::collections::HashSet;
     /// use serenity::framework::StandardFramework;
@@ -320,7 +322,7 @@ impl Configuration {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::framework::StandardFramework;
     ///
@@ -345,7 +347,7 @@ impl Configuration {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::framework::StandardFramework;
     ///
@@ -369,7 +371,7 @@ impl Configuration {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::framework::StandardFramework;
     ///
@@ -394,7 +396,7 @@ impl Configuration {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::framework::StandardFramework;
     ///

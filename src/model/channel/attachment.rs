@@ -91,7 +91,9 @@ impl Attachment {
     ///     }
     /// }
     /// let token = env::var("DISCORD_TOKEN").expect("token in environment");
-    /// let mut client = Client::new(&token, Handler); client.start().unwrap();
+    /// let mut client = Client::new(&token, Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// # Errors

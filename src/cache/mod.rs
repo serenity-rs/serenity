@@ -194,7 +194,9 @@ impl Cache {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// [`Member`]: ../model/struct.Member.html
@@ -386,7 +388,9 @@ impl Cache {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// [`ChannelId`]: ../model/struct.ChannelId.html

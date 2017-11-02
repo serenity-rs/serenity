@@ -37,7 +37,7 @@ fn main() {
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
 
-    let mut client = Client::new(&token, Handler);
+    let mut client = Client::new(&token, Handler).expect("Err creating client");
 
     if let Err(why) = client.start() {
         error!("Client error: {:?}", why);

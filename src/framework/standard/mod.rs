@@ -143,7 +143,7 @@ use std::fmt;
 impl fmt::Debug for DispatchError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use self::DispatchError::*;
-        
+
         match *self {
             CheckFailed(..) => write!(f, "DispatchError::CheckFailed"),
             CommandDisabled(ref s) => f.debug_tuple("DispatchError::CommandDisabled").field(&s).finish(),
@@ -218,7 +218,8 @@ impl StandardFramework {
     /// use serenity::framework::StandardFramework;
     /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
+    /// let token = env::var("DISCORD_TOKEN").unwrap();
+    /// let mut client = Client::new(&token, Handler).unwrap();
     /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c
     ///         .depth(3)
@@ -251,7 +252,7 @@ impl StandardFramework {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::framework::StandardFramework;
     ///
@@ -287,7 +288,7 @@ impl StandardFramework {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::framework::StandardFramework;
     ///
@@ -396,7 +397,7 @@ impl StandardFramework {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::framework::StandardFramework;
     ///
@@ -592,7 +593,7 @@ impl StandardFramework {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::framework::StandardFramework;
     ///
@@ -684,7 +685,7 @@ impl StandardFramework {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::framework::StandardFramework;
     ///
@@ -717,7 +718,7 @@ impl StandardFramework {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// use serenity::framework::standard::DispatchError::{NotEnoughArguments,
     /// TooManyArguments};
     /// use serenity::framework::StandardFramework;
@@ -758,7 +759,7 @@ impl StandardFramework {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::framework::StandardFramework;
     ///
@@ -776,7 +777,7 @@ impl StandardFramework {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::framework::StandardFramework;
     ///
@@ -814,7 +815,7 @@ impl StandardFramework {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::framework::StandardFramework;
     ///

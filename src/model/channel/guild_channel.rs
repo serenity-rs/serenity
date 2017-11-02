@@ -442,7 +442,9 @@ impl GuildChannel {
     ///         println!("The user's permissions: {:?}", permissions);
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// Check if the current user has the [Attach Files] and [Send Messages]
@@ -488,7 +490,9 @@ impl GuildChannel {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// # Errors
