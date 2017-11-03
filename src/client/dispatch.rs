@@ -1,9 +1,10 @@
 use std::sync::Arc;
 use parking_lot::Mutex;
+use super::bridge::gateway::ShardClientMessage;
 use super::event_handler::EventHandler;
 use super::Context;
+use std::sync::mpsc::Sender;
 use typemap::ShareMap;
-use gateway::Shard;
 use model::event::Event;
 use model::{Channel, Message};
 
@@ -35,19 +36,26 @@ macro_rules! now {
     () => (Utc::now().time().second() * 1000)
 }
 
-fn context(conn: Arc<Mutex<Shard>>, data: Arc<Mutex<ShareMap>>) -> Context {
-    Context::new(conn, data)
+fn context(
+    data: Arc<Mutex<ShareMap>>,
+    runner_tx: Sender<ShardClientMessage>,
+    shard_id: u64,
+) -> Context {
+    Context::new(data, runner_tx, shard_id)
 }
 
 #[cfg(feature = "framework")]
-pub fn dispatch<H: EventHandler + 'static>(event: Event,
-                                           conn: Arc<Mutex<Shard>>,
-                                           framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
-                                           data: Arc<Mutex<ShareMap>>,
-                                           event_handler: Arc<H>) {
+pub fn dispatch<H: EventHandler + 'static>(
+    event: Event,
+    framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
+    data: Arc<Mutex<ShareMap>>,
+    event_handler: Arc<H>,
+    runner_tx: Sender<ShardClientMessage>,
+    shard_id: u64,
+) {
     match event {
         Event::MessageCreate(event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
             dispatch_message(
                 context.clone(),
                 event.message.clone(),
@@ -58,21 +66,24 @@ pub fn dispatch<H: EventHandler + 'static>(event: Event,
                 framework.dispatch(context, event.message);
             }
         },
-        other => handle_event(other, conn, data, event_handler),
+        other => handle_event(other, data, event_handler, runner_tx, shard_id),
     }
 }
 
 #[cfg(not(feature = "framework"))]
-pub fn dispatch<H: EventHandler + 'static>(event: Event,
-                                           conn: Arc<Mutex<Shard>>,
-                                           data: Arc<Mutex<ShareMap>>,
-                                           event_handler: Arc<H>) {
+pub fn dispatch<H: EventHandler + 'static>(
+    event: Event,
+    data: Arc<Mutex<ShareMap>>,
+    event_handler: Arc<H>,
+    runner_tx: Sender<ShardClientMessage>,
+    shard_id: u64,
+) {
     match event {
         Event::MessageCreate(event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
             dispatch_message(context, event.message, event_handler);
         },
-        other => handle_event(other, conn, data, event_handler),
+        other => handle_event(other, data, event_handler, runner_tx, shard_id),
     }
 }
 
@@ -91,10 +102,13 @@ fn dispatch_message<H>(
 }
 
 #[allow(cyclomatic_complexity, unused_assignments, unused_mut)]
-fn handle_event<H: EventHandler + 'static>(event: Event,
-                                           conn: Arc<Mutex<Shard>>,
-                                           data: Arc<Mutex<ShareMap>>,
-                                           event_handler: Arc<H>) {
+fn handle_event<H: EventHandler + 'static>(
+    event: Event,
+    data: Arc<Mutex<ShareMap>>,
+    event_handler: Arc<H>,
+    runner_tx: Sender<ShardClientMessage>,
+    shard_id: u64,
+) {
     #[cfg(feature = "cache")]
     let mut last_guild_create_time = now!();
 
@@ -113,7 +127,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
         Event::ChannelCreate(mut event) => {
             update!(event);
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             // This different channel_create dispatching is only due to the fact that
             // each time the bot receives a dm, this event is also fired.
@@ -134,7 +148,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
         Event::ChannelDelete(mut event) => {
             update!(event);
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             match event.channel {
                 Channel::Private(_) | Channel::Group(_) => {},
@@ -147,28 +161,28 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
             }
         },
         Event::ChannelPinsUpdate(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.channel_pins_update(context, event);
         },
         Event::ChannelRecipientAdd(mut event) => {
             update!(event);
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.channel_recipient_addition(context, event.channel_id, event.user);
         },
         Event::ChannelRecipientRemove(mut event) => {
             update!(event);
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.channel_recipient_removal(context, event.channel_id, event.user);
         },
         Event::ChannelUpdate(mut event) => {
             update!(event);
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             feature_cache! {{
                 let before = CACHE.read().channel(event.channel.id());
@@ -178,12 +192,12 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
             }}
         },
         Event::GuildBanAdd(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
                 event_handler.guild_ban_addition(context, event.guild_id, event.user);
         },
         Event::GuildBanRemove(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.guild_ban_removal(context, event.guild_id, event.user);
         },
@@ -204,7 +218,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                 let cache = CACHE.read();
 
                 if cache.unavailable_guilds.is_empty() {
-                    let context = context(Arc::clone(&conn), Arc::clone(&data));
+                    let context = context(Arc::clone(&data), runner_tx.clone(), shard_id);
 
                     let guild_amount = cache
                         .guilds
@@ -216,7 +230,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                 }
             }
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             feature_cache! {{
                 event_handler.guild_create(context, event.guild, _is_new);
@@ -226,7 +240,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
         },
         Event::GuildDelete(mut event) => {
             let _full = update!(event);
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             feature_cache! {{
                 event_handler.guild_delete(context, event.guild, _full);
@@ -237,25 +251,25 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
         Event::GuildEmojisUpdate(mut event) => {
             update!(event);
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.guild_emojis_update(context, event.guild_id, event.emojis);
         },
         Event::GuildIntegrationsUpdate(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.guild_integrations_update(context, event.guild_id);
         },
         Event::GuildMemberAdd(mut event) => {
             update!(event);
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.guild_member_addition(context, event.guild_id, event.member);
         },
         Event::GuildMemberRemove(mut event) => {
             let _member = update!(event);
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             feature_cache! {{
                 event_handler.guild_member_removal(context, event.guild_id, event.user, _member);
@@ -265,7 +279,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
         },
         Event::GuildMemberUpdate(mut event) => {
             let _before = update!(event);
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             feature_cache! {{
                 // This is safe to unwrap, as the update would have created
@@ -284,20 +298,20 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
         Event::GuildMembersChunk(mut event) => {
             update!(event);
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.guild_members_chunk(context, event.guild_id, event.members);
         },
         Event::GuildRoleCreate(mut event) => {
             update!(event);
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.guild_role_create(context, event.guild_id, event.role);
         },
         Event::GuildRoleDelete(mut event) => {
             let _role = update!(event);
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             feature_cache! {{
                 event_handler.guild_role_delete(context, event.guild_id, event.role_id, _role);
@@ -307,7 +321,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
         },
         Event::GuildRoleUpdate(mut event) => {
             let _before = update!(event);
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             feature_cache! {{
                 event_handler.guild_role_update(context, event.guild_id, _before, event.role);
@@ -318,14 +332,14 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
         Event::GuildUnavailable(mut event) => {
             update!(event);
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.guild_unavailable(context, event.guild_id);
         },
         Event::GuildUpdate(mut event) => {
             update!(event);
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             feature_cache! {{
                 let before = CACHE.read()
@@ -341,46 +355,46 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
         // Already handled by the framework check macro
         Event::MessageCreate(_) => {},
         Event::MessageDeleteBulk(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.message_delete_bulk(context, event.channel_id, event.ids);
         },
         Event::MessageDelete(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.message_delete(context, event.channel_id, event.message_id);
         },
         Event::MessageUpdate(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.message_update(context, event);
         },
         Event::PresencesReplace(mut event) => {
             update!(event);
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.presence_replace(context, event.presences);
         },
         Event::PresenceUpdate(mut event) => {
             update!(event);
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.presence_update(context, event);
         },
         Event::ReactionAdd(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.reaction_add(context, event.reaction);
         },
         Event::ReactionRemove(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.reaction_remove(context, event.reaction);
         },
         Event::ReactionRemoveAll(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.reaction_remove_all(context, event.channel_id, event.message_id);
         },
@@ -393,35 +407,35 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
 
                     let _ = wait_for_guilds()
                         .map(move |_| {
-                            let context = context(conn, data);
+                            let context = context(data, runner_tx, shard_id);
 
                             event_handler.ready(context, event.ready);
                         });
                 } else {
-                    let context = context(conn, data);
+                    let context = context(data, runner_tx, shard_id);
 
                     event_handler.ready(context, event.ready);
                 }
             }
         },
         Event::Resumed(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.resume(context, event);
         },
         Event::TypingStart(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.typing_start(context, event);
         },
         Event::Unknown(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.unknown(context, event.kind, event.value);
         },
         Event::UserUpdate(mut event) => {
             let _before = update!(event);
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             feature_cache! {{
                 event_handler.user_update(context, _before.unwrap(), event.current_user);
@@ -430,19 +444,19 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
             }}
         },
         Event::VoiceServerUpdate(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.voice_server_update(context, event);
         },
         Event::VoiceStateUpdate(mut event) => {
             update!(event);
 
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.voice_state_update(context, event.guild_id, event.voice_state);
         },
         Event::WebhookUpdate(mut event) => {
-            let context = context(conn, data);
+            let context = context(data, runner_tx, shard_id);
 
             event_handler.webhook_update(context, event.guild_id, event.channel_id);
         },

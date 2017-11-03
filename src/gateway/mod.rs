@@ -51,9 +51,18 @@
 
 mod error;
 mod shard;
+mod ws_client_ext;
 
 pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
+pub use self::ws_client_ext::WebSocketGatewayClientExt;
+
+use model::{Game, OnlineStatus};
+use websocket::sync::client::Client;
+use websocket::sync::stream::{TcpStream, TlsStream};
+
+pub type CurrentPresence = (Option<Game>, OnlineStatus);
+pub type WsClient = Client<TlsStream<TcpStream>>;
 
 /// Indicates the current connection stage of a [`Shard`].
 ///
@@ -135,4 +144,12 @@ impl ConnectionStage {
             _ => false,
         }
     }
+}
+
+pub enum ShardAction {
+    Autoreconnect,
+    Heartbeat,
+    Identify,
+    Reconnect,
+    Resume,
 }

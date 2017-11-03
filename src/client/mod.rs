@@ -37,13 +37,11 @@ pub use http as rest;
 #[cfg(feature = "cache")]
 pub use CACHE;
 
-use self::bridge::gateway::{ShardId, ShardManager, ShardRunnerInfo};
+use self::bridge::gateway::{ShardManager, ShardManagerMonitor};
 use self::dispatch::dispatch;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering, ATOMIC_BOOL_INIT};
 use parking_lot::Mutex;
-use std::collections::HashMap;
-use std::mem;
 use threadpool::ThreadPool;
 use typemap::ShareMap;
 use http;
@@ -103,8 +101,7 @@ impl CloseHandle {
 /// [`on_message`]: #method.on_message
 /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
 /// [sharding docs]: gateway/index.html#sharding
-#[derive(Clone)]
-pub struct Client<H: EventHandler + Send + Sync + 'static> {
+pub struct Client {
     /// A ShareMap which requires types to be Send + Sync. This is a map that
     /// can be safely shared across contexts.
     ///
@@ -191,7 +188,6 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`on_ready`]: #method.on_ready
-    event_handler: Arc<H>,
     #[cfg(feature = "framework")] framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
     /// A HashMap of all shards instantiated by the Client.
     ///
@@ -224,12 +220,12 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     ///
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
     ///
-    /// let shard_runners = client.shard_runners.clone();
+    /// let shard_manager = client.shard_manager.clone();
     ///
     /// thread::spawn(move || {
     ///     loop {
     ///         println!("Shard count instantiated: {}",
-    ///                  shard_runners.lock().len());
+    ///                  shard_manager.lock().shards_instantiated().len());
     ///
     ///         thread::sleep(Duration::from_millis(5000));
     ///     }
@@ -244,16 +240,26 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     ///
     /// [`Client::start_shard`]: #method.start_shard
     /// [`Client::start_shards`]: #method.start_shards
-    pub shard_runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
+    pub shard_manager: Arc<Mutex<ShardManager>>,
+    shard_manager_worker: ShardManagerMonitor,
     /// The threadpool shared by all shards.
     ///
     /// Defaults to 5 threads, which should suffice small bots. Consider
     /// increasing this number as your bot grows.
     pub threadpool: ThreadPool,
-    token: Arc<Mutex<String>>,
+    /// The token in use by the client.
+    pub token: Arc<Mutex<String>>,
+    /// URI that the client's shards will use to connect to the gateway.
+    ///
+    /// This is likely not important for production usage and is, at best, used
+    /// for debugging.
+    ///
+    /// This is wrapped in an `Arc<Mutex<T>>` so all shards will have an updated
+    /// value available.
+    pub ws_uri: Arc<Mutex<String>>,
 }
 
-impl<H: EventHandler + Send + Sync + 'static> Client<H> {
+impl Client {
     /// Creates a Client for a bot user.
     ///
     /// Discord has a requirement of prefixing bot tokens with `"Bot "`, which
@@ -283,7 +289,8 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// #    try_main().unwrap();
     /// # }
     /// ```
-    pub fn new(token: &str, handler: H) -> Result<Self> {
+    pub fn new<H>(token: &str, handler: H) -> Result<Self>
+        where H: EventHandler + Send + Sync + 'static {
         let token = if token.starts_with("Bot ") {
             token.to_string()
         } else {
@@ -295,23 +302,53 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
 
         let name = "serenity client".to_owned();
         let threadpool = ThreadPool::with_name(name, 5);
+        let url = Arc::new(Mutex::new(http::get_gateway()?.url));
+        let data = Arc::new(Mutex::new(ShareMap::custom()));
+        let event_handler = Arc::new(handler);
 
         Ok(feature_framework! {{
+            let framework = Arc::new(Mutex::new(None));
+
+            let (shard_manager, shard_manager_worker) = ShardManager::new(
+                0,
+                0,
+                0,
+                Arc::clone(&url),
+                Arc::clone(&locked),
+                Arc::clone(&data),
+                Arc::clone(&event_handler),
+                Arc::clone(&framework),
+                threadpool.clone(),
+            );
+
             Client {
-                data: Arc::new(Mutex::new(ShareMap::custom())),
-                event_handler: Arc::new(handler),
                 framework: Arc::new(Mutex::new(None)),
-                shard_runners: Arc::new(Mutex::new(HashMap::new())),
-                threadpool,
                 token: locked,
+                ws_uri: url,
+                data,
+                shard_manager,
+                shard_manager_worker,
+                threadpool,
             }
         } else {
+            let (shard_manager, shard_manager_worker) = ShardManager::new(
+                0,
+                0,
+                0,
+                Arc::clone(&url),
+                locked.clone(),
+                data.clone(),
+                Arc::clone(&event_handler),
+                threadpool.clone(),
+            );
+
             Client {
-                data: Arc::new(Mutex::new(ShareMap::custom())),
-                event_handler: Arc::new(handler),
-                shard_runners: Arc::new(Mutex::new(HashMap::new())),
-                threadpool,
                 token: locked,
+                ws_uri: url,
+                data,
+                shard_manager,
+                shard_manager_worker,
+                threadpool,
             }
         }})
     }
@@ -462,7 +499,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     ///
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start(&mut self) -> Result<()> {
-        self.start_connection([0, 0, 1], http::get_gateway()?.url)
+        self.start_connection([0, 0, 1])
     }
 
     /// Establish the connection(s) and start listening for events.
@@ -514,15 +551,13 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start_autosharded(&mut self) -> Result<()> {
-        let mut res = http::get_bot_gateway()?;
+        let (x, y) = {
+            let res = http::get_bot_gateway()?;
 
-        let x = res.shards as u64 - 1;
-        let y = res.shards as u64;
-        let url = mem::replace(&mut res.url, String::default());
+            (res.shards as u64 - 1, res.shards as u64)
+        };
 
-        drop(res);
-
-        self.start_connection([0, x, y], url)
+        self.start_connection([0, x, y])
     }
 
     /// Establish a sharded connection and start listening for events.
@@ -603,7 +638,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// [`start_autosharded`]: #method.start_autosharded
     /// [gateway docs]: gateway/index.html#sharding
     pub fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
-        self.start_connection([shard, shard, shards], http::get_gateway()?.url)
+        self.start_connection([shard, shard, shards])
     }
 
     /// Establish sharded connections and start listening for events.
@@ -657,10 +692,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// [`start_shard_range`]: #method.start_shard_range
     /// [Gateway docs]: gateway/index.html#sharding
     pub fn start_shards(&mut self, total_shards: u64) -> Result<()> {
-        self.start_connection(
-            [0, total_shards - 1, total_shards],
-            http::get_gateway()?.url,
-        )
+        self.start_connection([0, total_shards - 1, total_shards])
     }
 
     /// Establish a range of sharded connections and start listening for events.
@@ -730,7 +762,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// [`start_shards`]: #method.start_shards
     /// [Gateway docs]: gateway/index.html#sharding
     pub fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64) -> Result<()> {
-        self.start_connection([range[0], range[1], total_shards], http::get_gateway()?.url)
+        self.start_connection([range[0], range[1], total_shards])
     }
 
     /// Returns a thread-safe handle for closing shards.
@@ -749,7 +781,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     // an error.
     //
     // [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
-    fn start_connection(&mut self, shard_data: [u64; 3], url: String) -> Result<()> {
+    fn start_connection(&mut self, shard_data: [u64; 3]) -> Result<()> {
         HANDLE_STILL.store(true, Ordering::Relaxed);
 
         // Update the framework's current user if the feature is enabled.
@@ -764,39 +796,37 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
             }
         }
 
-        let gateway_url = Arc::new(Mutex::new(url));
+        {
+            let mut manager = self.shard_manager.lock();
 
-        let mut manager = ShardManager::new(
-            shard_data[0],
-            shard_data[1] - shard_data[0] + 1,
-            shard_data[2],
-            Arc::clone(&gateway_url),
-            Arc::clone(&self.token),
-            Arc::clone(&self.data),
-            Arc::clone(&self.event_handler),
-            #[cfg(feature = "framework")]
-            Arc::clone(&self.framework),
-            self.threadpool.clone(),
-        );
+            let init = shard_data[1] - shard_data[0] + 1;
 
-        self.shard_runners = Arc::clone(&manager.runners);
+            manager.set_shards(shard_data[0], init, shard_data[2]);
 
-        if let Err(why) = manager.initialize() {
-            error!("Failed to boot a shard: {:?}", why);
-            info!("Shutting down all shards");
+            debug!(
+                "Initializing shard info: {} - {}/{}",
+                shard_data[0],
+                init,
+                shard_data[2],
+            );
 
-            manager.shutdown_all();
+            if let Err(why) = manager.initialize() {
+                error!("Failed to boot a shard: {:?}", why);
+                info!("Shutting down all shards");
 
-            return Err(Error::Client(ClientError::ShardBootFailure));
+                manager.shutdown_all();
+
+                return Err(Error::Client(ClientError::ShardBootFailure));
+            }
         }
 
-        manager.run();
+        self.shard_manager_worker.run();
 
         Err(Error::Client(ClientError::Shutdown))
     }
 }
 
-impl<H: EventHandler + Send + Sync + 'static> Drop for Client<H> {
+impl Drop for Client {
     fn drop(&mut self) { self.close_handle().close(); }
 }
 

@@ -27,14 +27,7 @@ struct Handler;
 impl EventHandler for Handler {
     fn message(&self, ctx: Context, msg: Message) {
        if msg.content == "!ping" {
-            // The current shard needs to be unlocked so it can be read from, as
-            // multiple threads may otherwise attempt to read from or mutate it
-            // concurrently.
-            {
-                let shard = ctx.shard.lock();
-                let shard_info = shard.shard_info();
-                println!("Shard {}", shard_info[0]);
-            }
+            println!("Shard {}", ctx.shard_id);
 
             if let Err(why) = msg.channel_id.say("Pong!") {
                 println!("Error sending message: {:?}", why);

@@ -1,7 +1,7 @@
-use Result;
+use client::bridge::gateway::{ShardClientMessage, ShardMessenger};
+use std::sync::mpsc::Sender;
 use std::sync::Arc;
 use typemap::ShareMap;
-use gateway::Shard;
 use model::*;
 use parking_lot::Mutex;
 
@@ -12,7 +12,7 @@ use internal::prelude::*;
 #[cfg(feature = "builder")]
 use builder::EditProfile;
 #[cfg(feature = "builder")]
-use {http, utils};
+use {Result, http, utils};
 #[cfg(feature = "builder")]
 use std::collections::HashMap;
 
@@ -38,21 +38,23 @@ pub struct Context {
     ///
     /// [`Client::data`]: struct.Client.html#structfield.data
     pub data: Arc<Mutex<ShareMap>>,
-    /// The associated shard which dispatched the event handler.
-    ///
-    /// Note that if you are sharding, in relevant terms, this is the shard
-    /// which received the event being dispatched.
-    pub shard: Arc<Mutex<Shard>>,
+    /// The messenger to communicate with the shard runner.
+    pub shard: ShardMessenger,
+    /// The ID of the shard this context is related to.
+    pub shard_id: u64,
 }
 
 impl Context {
     /// Create a new Context to be passed to an event handler.
-    pub(crate) fn new(shard: Arc<Mutex<Shard>>,
-                      data: Arc<Mutex<ShareMap>>)
-                      -> Context {
+    pub(crate) fn new(
+        data: Arc<Mutex<ShareMap>>,
+        runner_tx: Sender<ShardClientMessage>,
+        shard_id: u64,
+    ) -> Context {
         Context {
+            shard: ShardMessenger::new(runner_tx),
+            shard_id,
             data,
-            shard,
         }
     }
 
@@ -110,6 +112,7 @@ impl Context {
         http::edit_profile(&edited)
     }
 
+
     /// Sets the current user as being [`Online`]. This maintains the current
     /// game.
     ///
@@ -137,9 +140,9 @@ impl Context {
     /// ```
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
+    #[inline]
     pub fn online(&self) {
-        let mut shard = self.shard.lock();
-        shard.set_status(OnlineStatus::Online);
+        self.shard.set_status(OnlineStatus::Online);
     }
 
     /// Sets the current user as being [`Idle`]. This maintains the current
@@ -168,9 +171,9 @@ impl Context {
     /// ```
     ///
     /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
+    #[inline]
     pub fn idle(&self) {
-        let mut shard = self.shard.lock();
-        shard.set_status(OnlineStatus::Idle);
+        self.shard.set_status(OnlineStatus::Idle);
     }
 
     /// Sets the current user as being [`DoNotDisturb`]. This maintains the
@@ -199,9 +202,9 @@ impl Context {
     /// ```
     ///
     /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
+    #[inline]
     pub fn dnd(&self) {
-        let mut shard = self.shard.lock();
-        shard.set_status(OnlineStatus::DoNotDisturb);
+        self.shard.set_status(OnlineStatus::DoNotDisturb);
     }
 
     /// Sets the current user as being [`Invisible`]. This maintains the current
@@ -231,9 +234,9 @@ impl Context {
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`Invisible`]: ../model/enum.OnlineStatus.html#variant.Invisible
+    #[inline]
     pub fn invisible(&self) {
-        let mut shard = self.shard.lock();
-        shard.set_status(OnlineStatus::Invisible);
+        self.shard.set_status(OnlineStatus::Invisible);
     }
 
     /// "Resets" the current user's presence, by setting the game to `None` and
@@ -265,9 +268,9 @@ impl Context {
     /// [`Event::Resumed`]: ../model/event/enum.Event.html#variant.Resumed
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
     /// [`set_presence`]: #method.set_presence
+    #[inline]
     pub fn reset_presence(&self) {
-        let mut shard = self.shard.lock();
-        shard.set_presence(None, OnlineStatus::Online);
+        self.shard.set_presence(None, OnlineStatus::Online);
     }
 
     /// Sets the current game, defaulting to an online status of [`Online`].
@@ -303,9 +306,9 @@ impl Context {
     /// ```
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
+    #[inline]
     pub fn set_game(&self, game: Game) {
-        let mut shard = self.shard.lock();
-        shard.set_presence(Some(game), OnlineStatus::Online);
+        self.shard.set_presence(Some(game), OnlineStatus::Online);
     }
 
     /// Sets the current game, passing in only its name. This will automatically
@@ -351,8 +354,7 @@ impl Context {
             url: None,
         };
 
-        let mut shard = self.shard.lock();
-        shard.set_presence(Some(game), OnlineStatus::Online);
+        self.shard.set_presence(Some(game), OnlineStatus::Online);
     }
 
     /// Sets the current user's presence, providing all fields to be passed.
@@ -406,9 +408,9 @@ impl Context {
     ///
     /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
     /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
+    #[inline]
     pub fn set_presence(&self, game: Option<Game>, status: OnlineStatus) {
-        let mut shard = self.shard.lock();
-        shard.set_presence(game, status);
+        self.shard.set_presence(game, status);
     }
 
     /// Disconnects the shard from the websocket, essentially "quiting" it.
@@ -417,9 +419,8 @@ impl Context {
     /// until [`Client::start`] and vice versa are called again.
     ///
     /// [`Client::start`]: ./struct.Client.html#method.start
-    pub fn quit(&self) -> Result<()> {
-        let mut shard = self.shard.lock();
-
-        shard.shutdown_clean()
+    #[inline]
+    pub fn quit(&self) {
+        self.shard.shutdown_clean();
     }
 }
