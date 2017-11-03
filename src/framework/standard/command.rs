@@ -85,7 +85,8 @@ pub struct Command {
     pub guild_only: bool,
     /// Whether command can only be used by owners or not.
     pub owners_only: bool,
-    pub(crate) aliases: Vec<String>,
+    /// Other names that can be used to call this command instead.
+    pub aliases: Vec<String>,
 }
 
 impl Command {
