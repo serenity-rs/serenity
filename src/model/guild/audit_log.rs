@@ -173,7 +173,7 @@ fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Err
         }
     }
 
-    de.deserialize_i32(ActionVisitor)
+    de.deserialize_u8(ActionVisitor)
 }
 
 impl<'de> Deserialize<'de> for AuditLogs {
