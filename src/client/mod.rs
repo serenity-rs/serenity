@@ -322,9 +322,9 @@ impl Client {
             );
 
             Client {
-                framework: Arc::new(Mutex::new(None)),
                 token: locked,
                 ws_uri: url,
+                framework,
                 data,
                 shard_manager,
                 shard_manager_worker,
@@ -453,7 +453,7 @@ impl Client {
     /// [framework docs]: ../framework/index.html
     #[cfg(feature = "framework")]
     pub fn with_framework<F: Framework + Send + 'static>(&mut self, f: F) {
-        self.framework = Arc::new(Mutex::new(Some(Box::new(f))));
+        *self.framework.lock() = Some(Box::new(f));
     }
 
     /// Establish the connection and start listening for events.
