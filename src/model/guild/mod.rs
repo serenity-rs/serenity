@@ -136,7 +136,7 @@ impl Guild {
     pub fn default_channel(&self, uid: UserId) -> Option<Arc<RwLock<GuildChannel>>> {
         for (cid, channel) in &self.channels {
             if self.permissions_in(*cid, uid).read_messages() {
-                return Some(channel.read().unwrap().clone());
+                return Some(Arc::clone(&channel));
             }
         }
 
@@ -152,7 +152,7 @@ impl Guild {
         for (cid, channel) in &self.channels {
             for memid in self.members.keys() {
                 if self.permissions_in(*cid, *memid).read_messages() {
-                    return Some(channel.read().unwrap().clone());
+                    return Some(Arc::clone(&channel));
                 }
             }
         }
@@ -162,7 +162,7 @@ impl Guild {
 
     #[cfg(feature = "cache")]
     fn has_perms(&self, mut permissions: Permissions) -> bool {
-        let user_id = CACHE.read().unwrap().user.id;
+        let user_id = CACHE.read().user.id;
 
         let perms = self.member_permissions(user_id);
         permissions.remove(perms);
@@ -1040,7 +1040,7 @@ impl Guild {
             } else {
                 warn!(
                     "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
-                    member.user.read().unwrap().id,
+                    member.user.read().id,
                     self.id,
                     role,
                 );

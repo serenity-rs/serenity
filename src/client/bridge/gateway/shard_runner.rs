@@ -422,11 +422,4 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 
         Ok(())
     }
-
-    fn request_shutdown(&self) -> Result<()> {
-        debug!("[ShardRunner {:?}] Requesting shutdown", self.shard_info);
-        let _ = self.manager_tx.send(ShardManagerMessage::ShutdownAll);
-
-        Ok(())
-    }
 }

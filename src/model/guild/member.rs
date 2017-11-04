@@ -188,7 +188,7 @@ impl Member {
         let reader = guild.read();
 
         for (cid, channel) in &reader.channels {
-            if reader.permissions_for(*cid, self.user.read().id).read_messages() {
+            if reader.permissions_in(*cid, self.user.read().id).read_messages() {
                 return Some(channel.clone());
             }
         }
@@ -311,9 +311,9 @@ impl Member {
             None => return Err(From::from(ModelError::GuildNotFound)),
         };
 
-        let reader = guild.read().unwrap();
+        let reader = guild.read();
 
-        Ok(reader.member_permissions(self.user.read().unwrap().id))
+        Ok(reader.member_permissions(self.user.read().id))
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the

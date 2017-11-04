@@ -1,5 +1,7 @@
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
+use std::str::FromStr;
+use std::error::Error as StdError;
 use internal::prelude::*;
 use model::*;
 
@@ -275,6 +277,31 @@ impl<'a> From<&'a str> for ReactionType {
     /// foo("🍎");
     /// ```
     fn from(unicode: &str) -> ReactionType { ReactionType::Unicode(unicode.to_string()) }
+}
+
+// TODO: Change this to `!` once it becomes stable.
+
+#[derive(Debug)]
+pub struct NeverFails;
+
+impl Display for NeverFails {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        write!(f, "never fails")
+    }
+}
+
+impl StdError for NeverFails {
+    fn description(&self) -> &str {
+        "never fails"
+    }
+}
+
+impl FromStr for ReactionType {
+    type Err = NeverFails;
+
+    fn from_str(s: &str) -> ::std::result::Result<Self, Self::Err> {
+        Ok(ReactionType::from(s))
+    }
 }
 
 impl Display for ReactionType {

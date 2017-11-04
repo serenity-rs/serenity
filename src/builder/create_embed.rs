@@ -235,15 +235,9 @@ impl CreateEmbed {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-<<<<<<< HEAD
-    ///     fn guild_member_addition(&self, _: Context, guild_id: GuildId, member: Member) {
-    ///         use serenity::client::CACHE;
-    ///         let cache = CACHE.read();
-=======
     ///     fn on_guild_member_addition(&self, _: Context, guild_id: GuildId, member: Member) {
     ///         use serenity::CACHE;
     ///         let cache = CACHE.read().unwrap();
->>>>>>> v0.4.3
     ///
     ///         if let Some(guild) = cache.guild(guild_id) {
     ///             let guild = guild.read();
