@@ -82,6 +82,8 @@ pub struct Shard {
     seq: u64,
     session_id: Option<String>,
     shard_info: [u64; 2],
+    /// Whether the shard has permanently shutdown.
+    shutdown: bool,
     stage: ConnectionStage,
     pub token: Arc<Mutex<String>>,
     ws_url: Arc<Mutex<String>>,
@@ -154,8 +156,12 @@ impl Shard {
                 let user = http::get_current_user()?;
 
                 Shard {
+<<<<<<< HEAD
                     manager: VoiceManager::new(tx, user.id),
                     manager_rx: rx,
+=======
+                    shutdown: false,
+>>>>>>> v0.4.3
                     client,
                     current_presence,
                     heartbeat_instants,
@@ -170,6 +176,7 @@ impl Shard {
                 }
             } else {
                 Shard {
+                    shutdown: false,
                     client,
                     current_presence,
                     heartbeat_instants,
@@ -186,11 +193,49 @@ impl Shard {
         })
     }
 
+<<<<<<< HEAD
     /// Retrieves the current presence of the shard.
     #[inline]
     pub fn current_presence(&self) -> &CurrentPresence {
         &self.current_presence
     }
+=======
+    /// Whether the shard has permanently shutdown.
+    ///
+    /// This should normally happen due to manual calling of [`shutdown`] or
+    /// [`shutdown_clean`].
+    ///
+    /// [`shutdown`]: #method.shutdown
+    /// [`shutdown_clean`]: #method.shutdown_clean
+    #[inline]
+    pub fn is_shutdown(&self) -> bool {
+        self.shutdown
+    }
+
+    /// Retrieves a copy of the current shard information.
+    ///
+    /// The first element is the _current_ shard - 0-indexed - while the second
+    /// element is the _total number_ of shards -- 1-indexed.
+    ///
+    /// For example, if using 3 shards in total, and if this is shard 1, then it
+    /// can be read as "the second of three shards".
+    ///
+    /// # Examples
+    ///
+    /// Retrieving the shard info for the second shard, out of two shards total:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::gateway::Shard;
+    /// # use std::sync::{Arc, Mutex};
+    /// #
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
+    /// #
+    /// # let shard = Shard::new(mutex.clone(), mutex, [1, 2]).unwrap();
+    /// #
+    /// assert_eq!(shard.shard_info(), [1, 2]);
+    /// ```
+    pub fn shard_info(&self) -> [u64; 2] { self.shard_info }
+>>>>>>> v0.4.3
 
     /// Retrieves the heartbeat instants of the shard.
     ///
@@ -220,6 +265,7 @@ impl Shard {
     ///
     /// # Errors
     ///
+<<<<<<< HEAD
     /// Returns [`GatewayError::HeartbeatFailed`] if there was an error sending
     /// a heartbeat.
     ///
@@ -272,6 +318,26 @@ impl Shard {
     }
 
     #[inline]
+=======
+    /// ```rust,no_run
+    /// # #[cfg(feature = "model")]
+    /// # fn main() {
+    /// # use serenity::client::gateway::Shard;
+    /// # use std::sync::{Arc, Mutex};
+    /// #
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
+    /// #
+    /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
+    /// #
+    /// use serenity::model::Game;
+    ///
+    /// shard.set_game(Some(Game::playing("Heroes of the Storm")));
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "model"))]
+    /// # fn main() { }
+    /// ```
+>>>>>>> v0.4.3
     pub fn set_game(&mut self, game: Option<Game>) {
         self.current_presence.0 = game;
     }
@@ -304,10 +370,15 @@ impl Shard {
     /// Retrieving the shard info for the second shard, out of two shards total:
     ///
     /// ```rust,no_run
+<<<<<<< HEAD
     /// # extern crate parking_lot;
     /// # extern crate serenity;
     /// #
     /// # use parking_lot::Mutex;
+=======
+    /// # #[cfg(feature = "model")]
+    /// # fn main() {
+>>>>>>> v0.4.3
     /// # use serenity::client::gateway::Shard;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
@@ -317,6 +388,7 @@ impl Shard {
     /// #
     /// #     let shard = Shard::new(mutex.clone(), mutex, [1, 2]).unwrap();
     /// #
+<<<<<<< HEAD
     /// assert_eq!(shard.shard_info(), [1, 2]);
     /// #     Ok(())
     /// # }
@@ -324,6 +396,15 @@ impl Shard {
     /// # fn main() {
     /// #     try_main().unwrap();
     /// # }
+=======
+    /// use serenity::model::{Game, OnlineStatus};
+    ///
+    /// shard.set_presence(Some(Game::playing("Heroes of the Storm")), OnlineStatus::Online, false);
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "model"))]
+    /// # fn main() { }
+>>>>>>> v0.4.3
     /// ```
     pub fn shard_info(&self) -> [u64; 2] { self.shard_info }
 
@@ -614,6 +695,44 @@ impl Shard {
     }
 
     /// Calculates the heartbeat latency between the shard and the gateway.
+<<<<<<< HEAD
+=======
+    ///
+    /// # Examples
+    ///
+    /// When using the [`Client`], output the latency in response to a `"~ping"`
+    /// message handled through [`Client::on_message`].
+    ///
+    /// ```rust,no_run
+    /// # #[cfg(feature = "model")]
+    /// # fn main() {
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::*;
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {
+    ///     fn on_message(&self, ctx: Context, msg: Message) {
+    ///         if msg.content == "~ping" {
+    ///             if let Some(latency) = ctx.shard.lock().latency() {
+    ///                 let s = format!("{}.{}s", latency.as_secs(), latency.subsec_nanos());
+    ///
+    ///                 let _ = msg.channel_id.say(&s);
+    ///             } else {
+    ///                 let _ = msg.channel_id.say("N/A");
+    ///             }
+    ///         }
+    ///     }
+    /// }
+    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "model"))]
+    /// # fn main() { }
+    /// ```
+    ///
+    /// [`Client`]: ../struct.Client.html
+    /// [`EventHandler::on_message`]: ../event_handler/trait.EventHandler.html#method.on_message
+>>>>>>> v0.4.3
     // Shamelessly stolen from brayzure's commit in eris:
     // <https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6>
     pub fn latency(&self) -> Option<StdDuration> {
@@ -647,9 +766,14 @@ impl Shard {
     pub(crate) fn cycle_voice_recv(&mut self) -> Vec<Value> {
         let mut messages = vec![];
 
+<<<<<<< HEAD
         while let Ok(v) = self.manager_rx.try_recv() {
             messages.push(v);
         }
+=======
+        self.shutdown = true;
+        debug!("[Shard {:?}] Cleanly shutdown shard", self.shard_info);
+>>>>>>> v0.4.3
 
         messages
     }
@@ -684,8 +808,14 @@ impl Shard {
                 self.shard_info,
             );
 
+<<<<<<< HEAD
             self.reconnect()
         }
+=======
+        self.shutdown = true;
+
+        Ok(())
+>>>>>>> v0.4.3
     }
 
     /// Requests that one or multiple [`Guild`]s be chunked.

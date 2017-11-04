@@ -3,6 +3,11 @@ name = "07_sample_bot_structure"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 
+[dependencies]
+env_logger = "~0.4"
+kankyo = "~0.1"
+log = "~0.3"
+
 [dependencies.serenity]
 features = ["cache", "framework", "standard_framework"]
 path = "../../"

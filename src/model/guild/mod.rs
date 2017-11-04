@@ -135,8 +135,8 @@ impl Guild {
     /// returns `None`)
     pub fn default_channel(&self, uid: UserId) -> Option<Arc<RwLock<GuildChannel>>> {
         for (cid, channel) in &self.channels {
-            if self.permissions_for(*cid, uid).read_messages() {
-                return Some(channel.clone());
+            if self.permissions_in(*cid, uid).read_messages() {
+                return Some(channel.read().unwrap().clone());
             }
         }
 
@@ -151,8 +151,8 @@ impl Guild {
     pub fn default_channel_guaranteed(&self) -> Option<Arc<RwLock<GuildChannel>>> {
         for (cid, channel) in &self.channels {
             for memid in self.members.keys() {
-                if self.permissions_for(*cid, *memid).read_messages() {
-                    return Some(channel.clone());
+                if self.permissions_in(*cid, *memid).read_messages() {
+                    return Some(channel.read().unwrap().clone());
                 }
             }
         }
@@ -161,21 +161,13 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
-    fn has_perms(&self, mut permissions: Permissions) -> Result<bool> {
-        let member = match self.members.get(&CACHE.read().user.id) {
-            Some(member) => member,
-            None => return Err(Error::Model(ModelError::ItemMissing)),
-        };
+    fn has_perms(&self, mut permissions: Permissions) -> bool {
+        let user_id = CACHE.read().unwrap().user.id;
 
-        let default_channel = match self.default_channel(member.user.read().id) {
-            Some(dc) => dc,
-            None => return Err(Error::Model(ModelError::ItemMissing)),
-        };
-
-        let perms = self.permissions_for(default_channel.read().id, member.user.read().id);
+        let perms = self.member_permissions(user_id);
         permissions.remove(perms);
 
-        Ok(permissions.is_empty())
+        permissions.is_empty()
     }
 
     /// Ban a [`User`] from the guild. All messages by the
@@ -213,7 +205,7 @@ impl Guild {
         {
             let req = Permissions::BAN_MEMBERS;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -238,7 +230,7 @@ impl Guild {
         {
             let req = Permissions::BAN_MEMBERS;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -325,7 +317,7 @@ impl Guild {
         {
             let req = Permissions::MANAGE_CHANNELS;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -396,7 +388,7 @@ impl Guild {
         {
             let req = Permissions::MANAGE_ROLES;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -498,7 +490,7 @@ impl Guild {
         {
             let req = Permissions::MANAGE_GUILD;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -578,7 +570,7 @@ impl Guild {
         {
             let req = Permissions::CHANGE_NICKNAME;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -660,7 +652,7 @@ impl Guild {
         {
             let req = Permissions::MANAGE_GUILD;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -1007,6 +999,57 @@ impl Guild {
         }
     }
 
+    /// Calculate a [`Member`]'s permissions in the guild.
+    ///
+    /// [`Member`]: struct.Member.html
+    pub fn member_permissions<U>(&self, user_id: U) -> Permissions
+        where U: Into<UserId> {
+        let user_id = user_id.into();
+
+        if user_id == self.owner_id {
+            return Permissions::all();
+        }
+
+        let everyone = match self.roles.get(&RoleId(self.id.0)) {
+            Some(everyone) => everyone,
+            None => {
+                error!(
+                    "(╯°□°）╯︵ ┻━┻ @everyone role ({}) missing in '{}'",
+                    self.id,
+                    self.name,
+                );
+
+                return Permissions::empty();
+            },
+        };
+
+        let member = match self.members.get(&user_id) {
+            Some(member) => member,
+            None => return everyone.permissions,
+        };
+
+        let mut permissions = everyone.permissions;
+
+        for role in &member.roles {
+            if let Some(role) = self.roles.get(&role) {
+                if role.permissions.contains(Permissions::ADMINISTRATOR) {
+                    return Permissions::all();
+                }
+
+                permissions |= role.permissions;
+            } else {
+                warn!(
+                    "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
+                    member.user.read().unwrap().id,
+                    self.id,
+                    role,
+                );
+            }
+        }
+
+        permissions
+    }
+
     /// Moves a member to a specific voice channel.
     ///
     /// Requires the [Move Members] permission.
@@ -1018,10 +1061,21 @@ impl Guild {
         self.id.move_member(user_id, channel_id)
     }
 
+    /// Alias for [`permissions_in`].
+    ///
+    /// [`permissions_in`]: #method.permissions_in
+    #[deprecated(since = "0.4.3",
+                 note = "This will serve a different purpose in 0.5")]
+    #[inline]
+    pub fn permissions_for<C, U>(&self, channel_id: C, user_id: U)
+        -> Permissions where C: Into<ChannelId>, U: Into<UserId> {
+        self.permissions_in(channel_id, user_id)
+    }
+
     /// Calculate a [`User`]'s permissions in a given channel in the guild.
     ///
     /// [`User`]: struct.User.html
-    pub fn permissions_for<C, U>(&self, channel_id: C, user_id: U) -> Permissions
+    pub fn permissions_in<C, U>(&self, channel_id: C, user_id: U) -> Permissions
         where C: Into<ChannelId>, U: Into<UserId> {
         let user_id = user_id.into();
 
@@ -1169,7 +1223,7 @@ impl Guild {
         {
             let req = Permissions::KICK_MEMBERS;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -1252,7 +1306,7 @@ impl Guild {
         {
             let req = Permissions::KICK_MEMBERS;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -1277,7 +1331,7 @@ impl Guild {
         {
             let req = Permissions::BAN_MEMBERS;
 
-            if !self.has_perms(req)? {
+            if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }

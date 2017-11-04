@@ -14,6 +14,7 @@ use utils::Colour;
 #[cfg(all(feature = "cache", feature = "model"))]
 use {CACHE, http, utils};
 
+/// A trait for allowing both u8 or &str or (u8, &str) to be passed into the `ban` methods in `Guild` and `Member`.
 pub trait BanOptions {
     fn dmd(&self) -> u8 { 0 }
     fn reason(&self) -> &str { "" }
@@ -275,7 +276,7 @@ impl Member {
                 .get(&self.guild_id)
                 .map(|guild| guild.read().has_perms(req));
 
-            if let Some(Ok(false)) = has_perms {
+            if let Some(false) = has_perms {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -283,7 +284,7 @@ impl Member {
         self.guild_id.kick(self.user.read().id)
     }
 
-    /// Returns the permissions for the member.
+    /// Returns the guild-level permissions for the member.
     ///
     /// # Examples
     ///
@@ -310,19 +311,9 @@ impl Member {
             None => return Err(From::from(ModelError::GuildNotFound)),
         };
 
-        let guild = guild.read();
+        let reader = guild.read().unwrap();
 
-        let default_channel = match guild.default_channel(self.user.read().id) {
-            Some(dc) => dc,
-            None => return Err(From::from(ModelError::ItemMissing)),
-        };
-
-        let default_channel_reader = default_channel.read();
-
-        Ok(
-            guild
-                .permissions_for(default_channel_reader.id, self.user.read().id),
-        )
+        Ok(reader.member_permissions(self.user.read().unwrap().id))
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the

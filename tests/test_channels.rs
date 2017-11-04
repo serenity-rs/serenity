@@ -1,3 +1,5 @@
+#![cfg(feature = "model")]
+
 extern crate parking_lot;
 extern crate serenity;
 

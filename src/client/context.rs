@@ -281,6 +281,8 @@ impl Context {
     /// playing:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "model")]
+    /// # fn main() {
     /// # use serenity::prelude::*;
     /// # use serenity::model::*;
     /// #
@@ -303,6 +305,10 @@ impl Context {
     /// let mut client = Client::new("token", Handler).unwrap();
     ///
     /// client.start().unwrap();
+    /// # }
+    /// 
+    /// # #[cfg(not(feature = "model"))]
+    /// # fn main() {}
     /// ```
     ///
     /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
