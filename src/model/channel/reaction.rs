@@ -282,7 +282,7 @@ impl<'a> From<&'a str> for ReactionType {
 // TODO: Change this to `!` once it becomes stable.
 
 #[derive(Debug)]
-pub struct NeverFails;
+pub enum NeverFails {}
 
 impl Display for NeverFails {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
