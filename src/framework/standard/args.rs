@@ -254,9 +254,9 @@ impl Args {
     ///
     /// let mut args = Args::new("42 69", vec![" ".to_owned()]);
     ///
-    /// assert_eq!(*args.list::<i32>().unwrap(), [42, 69]);
+    /// assert_eq!(*args.multiple::<i32>().unwrap(), [42, 69]);
     /// ```
-    pub fn list<T: FromStr>(mut self) -> Result<Vec<T>, T::Err>
+    pub fn multiple<T: FromStr>(mut self) -> Result<Vec<T>, T::Err>
         where T::Err: StdError {
         Iter::<T>::new(&mut self).collect()
     }
