@@ -187,6 +187,7 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
     Ok(permissions.is_empty())
 }
 
+#[derive(Debug)]
 pub struct U16Visitor;
 
 impl<'de> Visitor<'de> for U16Visitor {
@@ -216,6 +217,7 @@ impl<'de> Visitor<'de> for U16Visitor {
     fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> { Ok(v as u16) }
 }
 
+#[derive(Debug)]
 pub struct U64Visitor;
 
 impl<'de> Visitor<'de> for U64Visitor {

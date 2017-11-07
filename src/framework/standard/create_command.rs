@@ -5,6 +5,7 @@ use std::sync::Arc;
 use client::Context;
 use model::{Message, Permissions};
 
+#[derive(Debug)]
 pub struct CreateCommand(pub Command);
 
 impl CreateCommand {

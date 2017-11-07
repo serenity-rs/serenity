@@ -17,6 +17,7 @@ pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), Error>) + Send 
 pub(crate) type InternalCommand = Arc<Command>;
 pub type PrefixCheck = Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
 
+#[derive(Debug)]
 pub enum CommandOrAlias {
     Alias(String),
     Command(InternalCommand),
@@ -41,6 +42,7 @@ pub enum CommandType {
     WithCommands(Help),
 }
 
+#[derive(Debug)]
 pub struct CommandGroup {
     pub prefix: Option<String>,
     pub commands: HashMap<String, CommandOrAlias>,
@@ -95,6 +97,25 @@ impl Command {
             exec: CommandType::Basic(f),
             ..Command::default()
         }
+    }
+}
+
+impl fmt::Debug for Command {
+    // TODO: add Command::checks somehow?
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        fmt.debug_struct("Command")
+            .field("bucket", &self.bucket)
+            .field("desc", &self.desc)
+            .field("example", &self.example)
+            .field("usage", &self.usage)
+            .field("min_args", &self.min_args)
+            .field("required_permissions", &self.required_permissions)
+            .field("allowed_roles", &self.allowed_roles)
+            .field("help_available", &self.help_available)
+            .field("dm_only", &self.dm_only)
+            .field("guild_only", &self.guild_only)
+            .field("owners_only", &self.owners_only)
+            .finish()
     }
 }
 
