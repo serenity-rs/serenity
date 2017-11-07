@@ -118,7 +118,7 @@ impl CreateEmbed {
     ///
     /// [`CreateEmbedField`]: struct.CreateEmbedField.html
     pub fn field<T, U>(mut self, name: T, value: U, inline: bool) -> Self
-        where T: Into<String>, U: Into<String> {
+        where T: Display, U: Display {
         {
             let entry = self.0
                 .entry("fields")
@@ -127,8 +127,8 @@ impl CreateEmbed {
             if let Value::Array(ref mut inner) = *entry {
                 inner.push(json!({
                     "inline": inline,
-                    "name": name.into(),
-                    "value": value.into(),
+                    "name": name.to_string(),
+                    "value": value.to_string(),
                 }));
             }
         }
@@ -139,10 +139,10 @@ impl CreateEmbed {
     /// Adds multiple fields at once.
     pub fn fields<T, U, It>(mut self, fields: It) -> Self
         where It: IntoIterator<Item=(T, U, bool)>,
-              T: Into<String>,
-              U: Into<String> {
+              T: Display,
+              U: Display {
         for field in fields {
-            self = self.field(field.0.into(), field.1.into(), field.2);
+            self = self.field(field.0.to_string(), field.1.to_string(), field.2);
         }
 
         self
