@@ -272,8 +272,8 @@ impl Cache {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_ready(&self, _: Context, _: Ready) {
-    ///         let guilds = CACHE.read().unwrap().guilds.len();
+    ///     fn ready(&self, _: Context, _: Ready) {
+    ///         let guilds = CACHE.read().guilds.len();
     ///
     ///         println!("Guilds in the Cache: {}", guilds);
     ///     }
@@ -525,11 +525,11 @@ impl Cache {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// use serenity::CACHE;
     ///
-    /// let cache = CACHE.read()?;
+    /// let cache = CACHE.read();
     ///
     /// if let Some(channel) = cache.private_channel(7) {
-    ///     let channel_reader = channel.read().unwrap();
-    ///     let user_reader = channel_reader.recipient.read().unwrap();
+    ///     let channel_reader = channel.read();
+    ///     let user_reader = channel_reader.recipient.read();
     ///
     ///     println!("The recipient is {}", user_reader.name);
     /// }

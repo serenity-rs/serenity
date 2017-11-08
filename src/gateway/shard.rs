@@ -290,7 +290,8 @@ impl Shard {
     /// # #[cfg(feature = "model")]
     /// # fn main() {
     /// # use serenity::client::gateway::Shard;
-    /// # use std::sync::{Arc, Mutex};
+    /// # use std::sync::Arc;
+    /// # use serenity::prelude::Mutex;
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
@@ -337,28 +338,24 @@ impl Shard {
     /// Retrieving the shard info for the second shard, out of two shards total:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
     /// # extern crate serenity;
-    /// #
-    /// # use parking_lot::Mutex;
     /// # #[cfg(feature = "model")]
     /// # fn main() {
     /// # use serenity::client::gateway::Shard;
+    /// # use serenity::prelude::Mutex;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let shard = Shard::new(mutex.clone(), mutex, [1, 2]).unwrap();
+    /// # let shard = Shard::new(mutex.clone(), mutex, [1, 2]).unwrap();
     /// #
     /// assert_eq!(shard.shard_info(), [1, 2]);
     /// #     Ok(())
     /// # }
     /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
+    /// # #[cfg(not(feature = "model")]
+    /// # fn main() {}
     /// ```
     pub fn shard_info(&self) -> [u64; 2] { self.shard_info }
 
@@ -649,41 +646,6 @@ impl Shard {
     }
 
     /// Calculates the heartbeat latency between the shard and the gateway.
-    ///
-    /// # Examples
-    ///
-    /// When using the [`Client`], output the latency in response to a `"~ping"`
-    /// message handled through [`Client::on_message`].
-    ///
-    /// ```rust,no_run
-    /// # #[cfg(feature = "model")]
-    /// # fn main() {
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {
-    ///     fn on_message(&self, ctx: Context, msg: Message) {
-    ///         if msg.content == "~ping" {
-    ///             if let Some(latency) = ctx.shard.lock().latency() {
-    ///                 let s = format!("{}.{}s", latency.as_secs(), latency.subsec_nanos());
-    ///
-    ///                 let _ = msg.channel_id.say(&s);
-    ///             } else {
-    ///                 let _ = msg.channel_id.say("N/A");
-    ///             }
-    ///         }
-    ///     }
-    /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
-    /// # }
-    /// #
-    /// # #[cfg(not(feature = "model"))]
-    /// # fn main() { }
-    /// ```
-    ///
-    /// [`Client`]: ../struct.Client.html
-    /// [`EventHandler::on_message`]: ../event_handler/trait.EventHandler.html#method.on_message
     // Shamelessly stolen from brayzure's commit in eris:
     // <https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6>
     pub fn latency(&self) -> Option<StdDuration> {
