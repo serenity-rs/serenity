@@ -343,7 +343,6 @@ impl Shard {
     /// # fn main() {
     /// # use serenity::client::gateway::Shard;
     /// # use serenity::prelude::Mutex;
-    /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
@@ -351,10 +350,9 @@ impl Shard {
     /// # let shard = Shard::new(mutex.clone(), mutex, [1, 2]).unwrap();
     /// #
     /// assert_eq!(shard.shard_info(), [1, 2]);
-    /// #     Ok(())
     /// # }
     /// #
-    /// # #[cfg(not(feature = "model")]
+    /// # #[cfg(not(feature = "model"))]
     /// # fn main() {}
     /// ```
     pub fn shard_info(&self) -> [u64; 2] { self.shard_info }
