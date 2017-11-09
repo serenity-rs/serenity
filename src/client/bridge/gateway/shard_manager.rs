@@ -93,7 +93,11 @@ use framework::Framework;
 #[derive(Debug)]
 pub struct ShardManager {
     /// The shard runners currently managed.
-    runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
+    ///
+    /// **Note**: It is highly unrecommended to mutate this yourself unless you
+    /// need to. Instead prefer to use methods on this struct that are provided
+    /// where possible.
+    pub runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
     /// The index of the first shard to initialize, 0-indexed.
     shard_index: u64,
     /// The number of shards to initialize.
