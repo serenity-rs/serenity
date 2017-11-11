@@ -1,3 +1,7 @@
+use constants::{self, close_codes};
+use internal::prelude::*;
+use model::event::{Event, GatewayEvent};
+use model::{Game, GuildId, OnlineStatus};
 use parking_lot::Mutex;
 use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
@@ -13,10 +17,6 @@ use websocket::client::Url;
 use websocket::stream::sync::AsTcpStream;
 use websocket::sync::client::ClientBuilder;
 use websocket::WebSocketError;
-use constants::{self, close_codes};
-use internal::prelude::*;
-use model::event::{Event, GatewayEvent};
-use model::{Game, GuildId, OnlineStatus};
 
 #[cfg(feature = "voice")]
 use serde_json::Value;

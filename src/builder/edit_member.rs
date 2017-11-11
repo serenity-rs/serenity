@@ -1,5 +1,5 @@
-use model::{ChannelId, RoleId};
 use internal::prelude::*;
+use model::{ChannelId, RoleId};
 use std::collections::HashMap;
 
 /// A builder which edits the properties of a [`Member`], to be used in

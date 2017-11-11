@@ -2,15 +2,13 @@ use super::*;
 use internal::RwLockExt;
 
 #[cfg(all(feature = "model", feature = "utils"))]
-use std::result::Result as StdResult;
-#[cfg(all(feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
+#[cfg(all(feature = "model", feature = "utils"))]
+use std::result::Result as StdResult;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::str::FromStr;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::fmt;
-#[cfg(all(feature = "model", feature = "utils"))]
-use std::error::Error;
 #[cfg(all(feature = "model", any(feature = "cache", feature = "utils")))]
 use utils;
 

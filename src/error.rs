@@ -1,10 +1,10 @@
-use serde_json::Error as JsonError;
-use std::io::Error as IoError;
-use std::error::Error as StdError;
-use std::fmt::{self, Display, Error as FormatError};
-use std::num::ParseIntError;
 use internal::prelude::*;
 use model::ModelError;
+use serde_json::Error as JsonError;
+use std::error::Error as StdError;
+use std::fmt::{self, Display, Error as FormatError};
+use std::io::Error as IoError;
+use std::num::ParseIntError;
 
 #[cfg(feature = "hyper")]
 use hyper::Error as HyperError;

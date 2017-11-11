@@ -1,7 +1,7 @@
+use model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 use std::default::Default;
 use std::fmt::{self, Display, Write};
 use std::ops::Add;
-use model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 
 /// The Message Builder is an ergonomic utility to easily build a message,
 /// by adding text and mentioning mentionable structs.

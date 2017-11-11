@@ -30,6 +30,7 @@ mod error;
 pub use self::error::Error as HttpError;
 pub use hyper::status::{StatusClass, StatusCode};
 
+use constants;
 use hyper::client::{Client as HyperClient, Request, RequestBuilder, Response as HyperResponse};
 use hyper::header::ContentType;
 use hyper::method::Method;
@@ -37,6 +38,8 @@ use hyper::mime::{Mime, SubLevel, TopLevel};
 use hyper::net::HttpsConnector;
 use hyper::{header, Error as HyperError, Result as HyperResult, Url};
 use hyper_native_tls::NativeTlsClient;
+use internal::prelude::*;
+use model::*;
 use multipart::client::Multipart;
 use parking_lot::Mutex;
 use self::ratelimiting::Route;
@@ -48,9 +51,6 @@ use std::fs::File;
 use std::io::{ErrorKind as IoErrorKind, Read};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use constants;
-use internal::prelude::*;
-use model::*;
 
 /// An method used for ratelimiting special routes.
 ///
@@ -1055,10 +1055,10 @@ pub fn get_bans(guild_id: u64) -> Result<Vec<Ban>> {
 }
 
 /// Gets all audit logs in a specific guild.
-pub fn get_audit_logs(guild_id: u64, 
-                      action_type: Option<u8>, 
-                      user_id: Option<u64>, 
-                      before: Option<u64>, 
+pub fn get_audit_logs(guild_id: u64,
+                      action_type: Option<u8>,
+                      user_id: Option<u64>,
+                      before: Option<u64>,
                       limit: Option<u8>) -> Result<AuditLogs> {
     let response = request!(
         Route::GuildsIdAuditLogs(guild_id),

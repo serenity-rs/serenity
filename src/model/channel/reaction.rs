@@ -1,9 +1,9 @@
+use model::*;
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
+use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 use std::str::FromStr;
-use std::error::Error as StdError;
 use internal::prelude::*;
-use model::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;

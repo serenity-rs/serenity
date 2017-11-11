@@ -1,3 +1,5 @@
+use model::event::Event;
+use model::{Channel, Message};
 use std::sync::Arc;
 use parking_lot::Mutex;
 use super::bridge::gateway::ShardClientMessage;
@@ -5,8 +7,6 @@ use super::event_handler::EventHandler;
 use super::Context;
 use std::sync::mpsc::Sender;
 use typemap::ShareMap;
-use model::event::Event;
-use model::{Channel, Message};
 
 #[cfg(feature = "cache")]
 use chrono::{Timelike, Utc};

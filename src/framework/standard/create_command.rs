@@ -1,9 +1,9 @@
 pub use super::{Args, Command, CommandGroup, CommandType, CommandError};
 
-use std::collections::HashMap;
-use std::sync::Arc;
 use client::Context;
 use model::{Message, Permissions};
+use std::collections::HashMap;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct CreateCommand(pub Command);

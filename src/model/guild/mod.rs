@@ -15,10 +15,10 @@ pub use self::role::*;
 pub use self::audit_log::*;
 
 use chrono::{DateTime, FixedOffset};
+use model::*;
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::*;
-use model::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
@@ -242,11 +242,11 @@ impl Guild {
     ///
     /// [`AuditLogs`]: audit_log/struct.AuditLogs.html
     #[inline]
-    pub fn audit_logs(&self, action_type: Option<u8>, 
-                             user_id: Option<UserId>, 
+    pub fn audit_logs(&self, action_type: Option<u8>,
+                             user_id: Option<UserId>,
                              before: Option<AuditLogEntryId>,
-                             limit: Option<u8>) -> Result<AuditLogs> { 
-        self.id.audit_logs(action_type, user_id, before, limit) 
+                             limit: Option<u8>) -> Result<AuditLogs> {
+        self.id.audit_logs(action_type, user_id, before, limit)
     }
 
     /// Gets all of the guild's channels over the REST API.

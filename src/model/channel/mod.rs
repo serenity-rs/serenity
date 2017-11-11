@@ -19,17 +19,17 @@ pub use self::reaction::*;
 pub use self::channel_category::*;
 
 use internal::RwLockExt;
+use model::*;
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::deserialize_u64;
-use model::*;
 
-#[cfg(feature = "model")]
-use std::fmt::{Display, Formatter, Result as FmtResult};
 #[cfg(feature = "model")]
 use builder::{CreateMessage, GetMessages};
 #[cfg(feature = "model")]
 use http::AttachmentType;
+#[cfg(feature = "model")]
+use std::fmt::{Display, Formatter, Result as FmtResult};
 
 /// A container for any channel.
 #[derive(Clone, Debug)]

@@ -1,8 +1,8 @@
-use vec_shift::Shift;
 use std::str::FromStr;
 use std::error::Error as StdError;
 use std::fmt;
 use utils::parse_quotes;
+use vec_shift::Shift;
 
 /// Defines how an operation on an `Args` method failed.
 #[derive(Debug)]

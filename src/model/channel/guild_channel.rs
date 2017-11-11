@@ -1,10 +1,6 @@
 use chrono::{DateTime, FixedOffset};
 use model::*;
 
-#[cfg(feature = "model")]
-use std::fmt::{Display, Formatter, Result as FmtResult};
-#[cfg(feature = "model")]
-use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
@@ -13,6 +9,10 @@ use builder::{CreateInvite, CreateMessage, EditChannel, GetMessages};
 use http::{self, AttachmentType};
 #[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
+#[cfg(feature = "model")]
+use std::fmt::{Display, Formatter, Result as FmtResult};
+#[cfg(feature = "model")]
+use std::mem;
 #[cfg(all(feature = "model", feature = "utils"))]
 use utils as serenity_utils;
 

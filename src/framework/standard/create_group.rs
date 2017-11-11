@@ -3,11 +3,11 @@ pub(crate) use super::command::CommandOrAlias;
 pub use super::create_command::CreateCommand;
 pub use super::Args;
 
-use std::default::Default;
-use std::sync::Arc;
 use client::Context;
 use model::{Message, Permissions};
 use std::collections::HashMap;
+use std::default::Default;
+use std::sync::Arc;
 
 /// Used to create command groups
 ///

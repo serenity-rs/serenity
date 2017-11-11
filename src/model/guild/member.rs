@@ -1,14 +1,14 @@
+use model::*;
 use chrono::{DateTime, FixedOffset};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_sync_user;
-use model::*;
 
-#[cfg(feature = "model")]
-use std::borrow::Cow;
-#[cfg(all(feature = "cache", feature = "model"))]
-use internal::prelude::*;
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
 use builder::EditMember;
+#[cfg(all(feature = "cache", feature = "model"))]
+use internal::prelude::*;
+#[cfg(feature = "model")]
+use std::borrow::Cow;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use utils::Colour;
 #[cfg(all(feature = "cache", feature = "model"))]

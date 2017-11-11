@@ -2,7 +2,6 @@
 //! fully use the library.
 
 mod colour;
-
 mod message_builder;
 
 pub use self::colour::Colour;

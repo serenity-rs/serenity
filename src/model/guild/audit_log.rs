@@ -1,8 +1,8 @@
-use super::super::{AuditLogEntryId, User, UserId, ChannelId, Webhook};
 use serde::de::{self, Deserialize, Deserializer, MapAccess, Visitor};
-use std::fmt;
+use super::super::{AuditLogEntryId, User, UserId, ChannelId, Webhook};
 use std::collections::HashMap;
 use std::mem::transmute;
+use std::fmt;
 
 /// Determines to what entity an action was used on.
 #[derive(Debug)]

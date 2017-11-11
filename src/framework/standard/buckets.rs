@@ -1,8 +1,8 @@
 use chrono::Utc;
-use std::collections::HashMap;
-use std::default::Default;
 use client::Context;
 use model::{ChannelId, GuildId, UserId};
+use std::collections::HashMap;
+use std::default::Default;
 
 #[cfg(feature = "cache")]
 type Check = Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static;

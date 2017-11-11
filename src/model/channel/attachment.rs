@@ -1,9 +1,9 @@
 #[cfg(feature = "model")]
 use hyper::Client as HyperClient;
 #[cfg(feature = "model")]
-use std::io::Read;
-#[cfg(feature = "model")]
 use internal::prelude::*;
+#[cfg(feature = "model")]
+use std::io::Read;
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///

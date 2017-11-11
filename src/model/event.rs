@@ -10,19 +10,19 @@ use super::utils::deserialize_emojis;
 use super::*;
 use constants::VoiceOpCode;
 use internal::prelude::*;
+
 #[cfg(feature = "cache")]
 use cache::{Cache, CacheUpdate};
-#[cfg(feature = "cache")]
-use internal::RwLockExt;
-#[cfg(feature = "cache")]
-use std::mem;
-#[cfg(feature = "cache")]
-use std::collections::hash_map::Entry;
-
 #[cfg(feature = "gateway")]
 use constants::OpCode;
 #[cfg(feature = "gateway")]
 use gateway::GatewayError;
+#[cfg(feature = "cache")]
+use internal::RwLockExt;
+#[cfg(feature = "cache")]
+use std::collections::hash_map::Entry;
+#[cfg(feature = "cache")]
+use std::mem;
 
 /// Event data for the channel creation event.
 ///

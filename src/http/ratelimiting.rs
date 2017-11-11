@@ -44,13 +44,13 @@ use chrono::Utc;
 use hyper::client::{RequestBuilder, Response};
 use hyper::header::Headers;
 use hyper::status::StatusCode;
+use internal::prelude::*;
 use parking_lot::Mutex;
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
 use std::{str, thread, i64};
 use super::{HttpError, LightMethod};
-use internal::prelude::*;
 
 lazy_static! {
     /// The global mutex is a mutex unlocked and then immediately re-locked

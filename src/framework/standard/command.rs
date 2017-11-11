@@ -1,9 +1,9 @@
-use std::sync::Arc;
-use super::{Args, Configuration};
 use client::Context;
 use model::{Message, Permissions};
 use std::collections::HashMap;
 use std::fmt;
+use std::sync::Arc;
+use super::{Args, Configuration};
 
 pub type Check = Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool
                      + Send

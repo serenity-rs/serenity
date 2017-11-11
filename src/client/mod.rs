@@ -37,15 +37,15 @@ pub use http as rest;
 #[cfg(feature = "cache")]
 pub use CACHE;
 
+use http;
+use internal::prelude::*;
+use parking_lot::Mutex;
 use self::bridge::gateway::{ShardManager, ShardManagerMonitor};
 use self::dispatch::dispatch;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering, ATOMIC_BOOL_INIT};
-use parking_lot::Mutex;
 use threadpool::ThreadPool;
 use typemap::ShareMap;
-use http;
-use internal::prelude::*;
 
 #[cfg(feature = "framework")]
 use framework::Framework;
@@ -158,7 +158,7 @@ pub struct Client {
     ///         reg!(ctx "MessageDelete") }
     ///     fn on_message_delete_bulk(&self, ctx: Context, _: ChannelId, _: Vec<MessageId>) {
     ///         reg!(ctx "MessageDeleteBulk") }
-    ///     fn on_message_update(&self, ctx: Context, _: ChannelId, _: MessageId) { 
+    ///     fn on_message_update(&self, ctx: Context, _: ChannelId, _: MessageId) {
     ///         reg!(ctx "MessageUpdate") }
     /// }
     ///

@@ -1,7 +1,7 @@
 use chrono::{DateTime, FixedOffset};
+use model::*;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_single_recipient;
-use model::*;
 
 #[cfg(feature = "model")]
 use builder::{CreateMessage, GetMessages};

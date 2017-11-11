@@ -1,9 +1,9 @@
-use std::collections::HashSet;
-use std::default::Default;
-use super::command::PrefixCheck;
 use client::Context;
 use http;
 use model::{GuildId, Message, UserId};
+use std::collections::HashSet;
+use std::default::Default;
+use super::command::PrefixCheck;
 
 /// The configuration to use for a [`Framework`] associated with a [`Client`]
 /// instance.

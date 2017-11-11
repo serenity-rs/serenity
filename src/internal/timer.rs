@@ -1,6 +1,6 @@
 use chrono::{DateTime, Duration, Utc};
-use std::thread;
 use std::time::Duration as StdDuration;
+use std::thread;
 
 #[derive(Debug)]
 pub struct Timer {

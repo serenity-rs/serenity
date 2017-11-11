@@ -1,9 +1,9 @@
-#[cfg(feature = "utils")]
-use utils::Colour;
-#[cfg(feature = "model")]
-use internal::prelude::*;
 #[cfg(feature = "model")]
 use builder::CreateEmbed;
+#[cfg(feature = "model")]
+use internal::prelude::*;
+#[cfg(feature = "utils")]
+use utils::Colour;
 #[cfg(feature = "model")]
 use utils;
 

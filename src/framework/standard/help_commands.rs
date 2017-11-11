@@ -23,15 +23,15 @@
 //! [`plain`]: fn.plain.html
 //! [`with_embeds`]: fn.with_embeds.html
 
+use client::Context;
+use framework::standard::{has_correct_roles, has_correct_permissions};
+use model::{ChannelId, Message};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::fmt::Write;
 use super::command::InternalCommand;
 use super::{Args, Command, CommandGroup, CommandOrAlias, CommandError};
-use client::Context;
-use model::{ChannelId, Message};
 use utils::Colour;
-use framework::standard::{has_correct_roles, has_correct_permissions};
 
 fn error_embed(channel_id: &ChannelId, input: &str) {
     let _ = channel_id.send_message(|m| {

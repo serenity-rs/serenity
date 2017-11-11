@@ -16,12 +16,12 @@
 //! [here]: https://discordapp.com/developers/docs/resources/channel#embed-object
 
 use chrono::{DateTime, TimeZone};
+use internal::prelude::*;
+use model::Embed;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::default::Default;
 use std::fmt::Display;
-use internal::prelude::*;
-use model::Embed;
 use utils;
 
 #[cfg(feature = "utils")]

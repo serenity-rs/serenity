@@ -32,13 +32,13 @@ pub use self::voice::*;
 pub use self::webhook::*;
 
 use chrono::NaiveDateTime;
+use internal::prelude::*;
 use parking_lot::RwLock;
 use self::utils::*;
 use serde::de::Visitor;
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::sync::Arc;
-use internal::prelude::*;
 
 #[cfg(feature = "utils")]
 use utils::Colour;

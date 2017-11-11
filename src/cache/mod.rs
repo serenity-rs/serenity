@@ -42,12 +42,12 @@
 //! [`CACHE`]: ../struct.CACHE.html
 //! [`http`]: ../http/index.html
 
+use model::*;
 use parking_lot::RwLock;
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
 use std::default::Default;
 use std::sync::Arc;
-use model::*;
 
 mod cache_update;
 
@@ -196,8 +196,8 @@ impl Cache {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap(); 
-    /// 
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
     /// client.start().unwrap();
     /// # }
     /// #
@@ -405,7 +405,7 @@ impl Cache {
     /// }
     ///
     /// let mut client = Client::new("token", Handler).unwrap();
-    /// 
+    ///
     /// client.start().unwrap();
     /// # }
     /// #

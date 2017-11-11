@@ -1,20 +1,20 @@
 use client::bridge::gateway::{ShardClientMessage, ShardMessenger};
+use model::*;
+use parking_lot::Mutex;
 use std::sync::mpsc::Sender;
 use std::sync::Arc;
 use typemap::ShareMap;
-use model::*;
-use parking_lot::Mutex;
 
-#[cfg(all(feature = "builder", feature = "cache"))]
-use super::CACHE;
-#[cfg(feature = "builder")]
-use internal::prelude::*;
 #[cfg(feature = "builder")]
 use builder::EditProfile;
 #[cfg(feature = "builder")]
-use {Result, http, utils};
+use internal::prelude::*;
 #[cfg(feature = "builder")]
 use std::collections::HashMap;
+#[cfg(all(feature = "builder", feature = "cache"))]
+use super::CACHE;
+#[cfg(feature = "builder")]
+use {Result, http, utils};
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
@@ -306,7 +306,7 @@ impl Context {
     ///
     /// client.start().unwrap();
     /// # }
-    /// 
+    ///
     /// # #[cfg(not(feature = "model"))]
     /// # fn main() {}
     /// ```

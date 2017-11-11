@@ -1,9 +1,9 @@
-use super::CreateEmbed;
-use model::ReactionType;
 use internal::prelude::*;
-use utils;
+use model::ReactionType;
 use std::collections::HashMap;
 use std::fmt::Display;
+use super::CreateEmbed;
+use utils;
 
 /// A builder to specify the contents of an [`http::send_message`] request,
 /// primarily meant for use through [`ChannelId::send_message`].

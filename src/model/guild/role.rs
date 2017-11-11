@@ -1,14 +1,12 @@
-use std::cmp::Ordering;
 use model::*;
+use std::cmp::Ordering;
 
-#[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
 use builder::EditRole;
 #[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
-use http;
+use {CACHE, http};
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has

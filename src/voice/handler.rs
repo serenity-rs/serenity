@@ -1,11 +1,9 @@
-use serde_json::Value;
-use std::sync::mpsc::{self, Sender as MpscSender};
-use super::{AudioReceiver, AudioSource};
-use super::connection_info::ConnectionInfo;
-use super::Status as VoiceStatus;
 use constants::VoiceOpCode;
 use model::{ChannelId, GuildId, UserId, VoiceState};
-use super::threading;
+use serde_json::Value;
+use std::sync::mpsc::{self, Sender as MpscSender};
+use super::connection_info::ConnectionInfo;
+use super::{AudioReceiver, AudioSource, Status as VoiceStatus, threading};
 
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.

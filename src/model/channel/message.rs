@@ -1,21 +1,17 @@
 use chrono::{DateTime, FixedOffset};
-use serde_json::Value;
 use model::*;
+use serde_json::Value;
 
+#[cfg(feature = "model")]
+use builder::{CreateEmbed, CreateMessage};
+#[cfg(all(feature = "cache", feature = "model"))]
+use CACHE;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 #[cfg(feature = "model")]
 use std::mem;
 #[cfg(feature = "model")]
-use builder::{CreateEmbed, CreateMessage};
-#[cfg(feature = "model")]
-use constants;
-#[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
-#[cfg(feature = "model")]
-use http;
-#[cfg(feature = "model")]
-use utils as serenity_utils;
+use {constants, http, utils as serenity_utils};
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.

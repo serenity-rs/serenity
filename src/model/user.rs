@@ -5,8 +5,14 @@ use super::*;
 use internal::prelude::*;
 use model::misc::Mentionable;
 
+#[cfg(all(feature = "cache", feature = "model"))]
+use CACHE;
+#[cfg(feature = "model")]
+use builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
 use chrono::NaiveDateTime;
+#[cfg(feature = "model")]
+use http::{self, GuildPagination};
 #[cfg(all(feature = "cache", feature = "model"))]
 use parking_lot::RwLock;
 #[cfg(feature = "model")]
@@ -15,12 +21,6 @@ use std::fmt::Write;
 use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
-#[cfg(feature = "model")]
-use builder::{CreateMessage, EditProfile};
-#[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
-#[cfg(feature = "model")]
-use http::{self, GuildPagination};
 #[cfg(feature = "model")]
 use utils;
 

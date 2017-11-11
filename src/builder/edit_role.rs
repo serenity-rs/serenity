@@ -1,7 +1,7 @@
-use std::default::Default;
 use internal::prelude::*;
-use model::{permissions, Permissions, Role};
 use std::collections::HashMap;
+use std::default::Default;
+use model::{permissions, Permissions, Role};
 
 /// A builer to create or edit a [`Role`] for use via a number of model methods.
 ///

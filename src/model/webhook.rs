@@ -1,11 +1,11 @@
 use super::*;
 
 #[cfg(feature = "model")]
-use std::mem;
-#[cfg(feature = "model")]
 use builder::ExecuteWebhook;
 #[cfg(feature = "model")]
 use internal::prelude::*;
+#[cfg(feature = "model")]
+use std::mem;
 #[cfg(feature = "model")]
 use {http, utils};
 

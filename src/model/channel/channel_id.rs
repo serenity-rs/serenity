@@ -1,5 +1,5 @@
-use model::*;
 use internal::RwLockExt;
+use model::*;
 
 #[cfg(feature = "model")]
 use std::borrow::Cow;
@@ -124,7 +124,7 @@ impl ChannelId {
             .into_iter()
             .map(|message_id| message_id.as_ref().0)
             .collect::<Vec<u64>>();
-        
+
         if ids.len() == 1 {
             self.delete_message(ids[0])
         } else {

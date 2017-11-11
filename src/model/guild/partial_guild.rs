@@ -1,5 +1,5 @@
-use super::super::utils::{deserialize_emojis, deserialize_roles};
 use model::*;
+use super::super::utils::{deserialize_emojis, deserialize_roles};
 
 #[cfg(feature = "model")]
 use builder::{EditGuild, EditMember, EditRole};

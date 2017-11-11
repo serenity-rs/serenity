@@ -1,5 +1,9 @@
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
-use parking_lot::Mutex;
+use internal::prelude::*;
+use internal::ws_impl::{ReceiverExt, SenderExt};
+use internal::Timer;
+use model::event::VoiceEvent;
+use model::UserId;
 use opus::{
     packet as opus_packet,
     Application as CodingMode,
@@ -7,6 +11,7 @@ use opus::{
     Decoder as OpusDecoder,
     Encoder as OpusEncoder,
 };
+use parking_lot::Mutex;
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
 use std::collections::HashMap;
 use std::io::Write;
@@ -22,11 +27,6 @@ use websocket::client::Url as WebsocketUrl;
 use websocket::sync::client::ClientBuilder;
 use websocket::sync::stream::{AsTcpStream, TcpStream, TlsStream};
 use websocket::sync::Client as WsClient;
-use internal::prelude::*;
-use internal::ws_impl::{ReceiverExt, SenderExt};
-use internal::Timer;
-use model::event::VoiceEvent;
-use model::UserId;
 
 type Client = WsClient<TlsStream<TcpStream>>;
 

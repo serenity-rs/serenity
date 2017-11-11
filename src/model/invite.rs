@@ -1,12 +1,12 @@
 use chrono::{DateTime, FixedOffset};
 use super::*;
 
-#[cfg(all(feature = "cache", feature = "model"))]
-use super::{Permissions, utils as model_utils};
 #[cfg(feature = "model")]
 use builder::CreateInvite;
 #[cfg(feature = "model")]
 use internal::prelude::*;
+#[cfg(all(feature = "cache", feature = "model"))]
+use super::{Permissions, utils as model_utils};
 #[cfg(feature = "model")]
 use {http, utils};
 
