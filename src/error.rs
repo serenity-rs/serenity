@@ -154,17 +154,7 @@ impl From<WebSocketError> for Error {
 
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Error::Io(ref inner) => inner.fmt(f),
-            Error::Json(ref inner) => inner.fmt(f),
-            #[cfg(feature = "http")]
-            Error::Hyper(ref inner) => inner.fmt(f),
-            #[cfg(feature = "gateway")]
-            Error::WebSocket(ref inner) => inner.fmt(f),
-            #[cfg(feature = "voice")]
-            Error::Opus(ref inner) => inner.fmt(f),
-            _ => f.write_str(self.description()),
-        }
+        f.write_str(self.description())
     }
 }
 
