@@ -208,12 +208,9 @@ fn find_end_of_prefix_with_whitespace(content: &str, position: usize) -> Option<
 
     let slice = unsafe { content.slice_unchecked(position, content_len) }.as_bytes();
     for i in 0..slice.len() {
-        // 0x20 is ASCII for space
         match slice[i] {
-            0x09 => {} // \t
-            0x0a => {} // \n
-            0x0d => {} // \r
-            0x20 => {} // [space]
+            // \t \n \r [space]
+            0x09 | 0x0a | 0x0d | 0x20 => {}
             _ => return if i == 0 { None } else { Some(position + i) }
         }
     }
