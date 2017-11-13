@@ -25,6 +25,7 @@ use std::collections::HashMap;
 use std::default::Default;
 use std::sync::Arc;
 use super::Framework;
+use threadpool::ThreadPool;
 
 #[cfg(feature = "cache")]
 use client::CACHE;
@@ -836,7 +837,12 @@ impl StandardFramework {
 }
 
 impl Framework for StandardFramework {
-    fn dispatch(&mut self, mut context: Context, message: Message) {
+    fn dispatch(
+        &mut self,
+        mut context: Context,
+        message: Message,
+        threadpool: &ThreadPool,
+    ) {
         let res = command::positions(&mut context, &message, &self.configuration);
 
         let positions = match res {
@@ -926,27 +932,29 @@ impl Framework for StandardFramework {
                             return;
                         }
 
-                        if let Some(before) = before {
-                            if !(before)(&mut context, &message, &built) {
-                                return;
+                        threadpool.execute(move || {
+                            if let Some(before) = before {
+                                if !(before)(&mut context, &message, &built) {
+                                    return;
+                                }
                             }
-                        }
 
-                        let result = match command.exec {
-                            CommandType::StringResponse(ref x) => {
-                                let _ = message.channel_id.say(x);
+                            let result = match command.exec {
+                                CommandType::StringResponse(ref x) => {
+                                    let _ = message.channel_id.say(x);
 
-                                Ok(())
-                            },
-                            CommandType::Basic(ref x) => (x)(&mut context, &message, args),
-                            CommandType::WithCommands(ref x) => {
-                                (x)(&mut context, &message, groups, args)
-                            },
-                        };
+                                    Ok(())
+                                },
+                                CommandType::Basic(ref x) => (x)(&mut context, &message, args),
+                                CommandType::WithCommands(ref x) => {
+                                    (x)(&mut context, &message, groups, args)
+                                },
+                            };
 
-                        if let Some(after) = after {
-                            (after)(&mut context, &message, &built, result);
-                        }
+                            if let Some(after) = after {
+                                (after)(&mut context, &message, &built, result);
+                            }
+                        });
 
                         return;
                     }
