@@ -255,6 +255,24 @@ impl From<Emoji> for ReactionType {
     }
 }
 
+impl From<EmojiId> for ReactionType {
+    fn from(emoji_id: EmojiId) -> ReactionType {
+        ReactionType::Custom {
+            id: emoji_id,
+            name: None
+        }
+    }
+}
+
+impl From<EmojiIdentifier> for ReactionType {
+    fn from(emoji_id: EmojiIdentifier) -> ReactionType {
+        ReactionType::Custom {
+            id: emoji_id.id,
+            name: Some(emoji_id.name)
+        }
+    }
+}
+
 impl From<String> for ReactionType {
     fn from(unicode: String) -> ReactionType { ReactionType::Unicode(unicode) }
 }

@@ -219,7 +219,7 @@ impl PrivateChannel {
     /// [`ChannelId`]: ../model/struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
-    pub fn say(&self, content: &str) -> Result<Message> { self.id.say(content) }
+    pub fn say<D: ::std::fmt::Display>(&self, content: D) -> Result<Message> { self.id.say(content) }
 
     /// Sends (a) file(s) along with optional message contents.
     ///

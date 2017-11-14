@@ -203,36 +203,18 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
         false
     }
 
+    #[inline]
     fn dispatch(&self, event: Event) {
-        let data = Arc::clone(&self.data);
-        let event_handler = Arc::clone(&self.event_handler);
-        let runner_tx = self.runner_tx.clone();
-        let shard_id = self.shard.shard_info()[0];
-
-        feature_framework! {{
-            let framework = Arc::clone(&self.framework);
-
-            self.threadpool.execute(move || {
-                dispatch(
-                    event,
-                    framework,
-                    data,
-                    event_handler,
-                    runner_tx,
-                    shard_id,
-                );
-            });
-        } else {
-            self.threadpool.execute(move || {
-                dispatch(
-                    event,
-                    data,
-                    event_handler,
-                    runner_tx,
-                    shard_id,
-                );
-            });
-        }}
+        dispatch(
+            event,
+            #[cfg(feature = "framework")]
+            &self.framework,
+            &self.data,
+            &self.event_handler,
+            &self.runner_tx,
+            &self.threadpool,
+            self.shard.shard_info()[0],
+        );
     }
 
     // Handles a received value over the shard runner rx channel.
