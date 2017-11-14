@@ -1,12 +1,10 @@
-pub use super::{Args, Command, CommandGroup, CommandType, CommandError};
+pub use super::{Args, Command, CommandGroup, CommandOptions, CommandError};
 
 use client::Context;
 use model::{Message, Permissions};
-use std::collections::HashMap;
 use std::sync::Arc;
 
-#[derive(Debug)]
-pub struct CreateCommand(pub Command);
+pub struct CreateCommand(pub CommandOptions, pub fn(&mut Context, &Message, Args) -> Result<(), CommandError>);
 
 impl CreateCommand {
     /// Adds multiple aliases.
@@ -40,13 +38,12 @@ impl CreateCommand {
     /// use serenity::client::{Client, Context};
     /// use serenity::framework::standard::{
     ///     Args,
-    ///     Command,
+    ///     CommandOptions,
     ///     CommandError,
     ///     StandardFramework,
     /// };
     /// use serenity::model::Message;
     /// use std::env;
-    /// use std::sync::Arc;
     ///
     /// let token = env::var("DISCORD_TOKEN").unwrap();
     /// let mut client = Client::new(&token, Handler).unwrap();
@@ -66,13 +63,13 @@ impl CreateCommand {
     /// }
     ///
     /// fn owner_check(_context: &mut Context, message: &Message, _: &mut Args, _:
-    /// &Arc<Command>) -> bool {
+    /// &Arc<CommandOptions>) -> bool {
     ///     // replace with your user ID
     ///     message.author.id == 7
     /// }
     /// ```
     pub fn check<F>(mut self, check: F) -> Self
-        where F: Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool
+        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
                      + Send
                      + Sync
                      + 'static {
@@ -104,42 +101,8 @@ impl CreateCommand {
 
     /// A function that can be called when a command is received.
     /// You can return `Err(string)` if there's an error.
-    ///
-    /// See [`exec_str`] if you _only_ need to return a string on command use.
-    ///
-    /// [`exec_str`]: #method.exec_str
     pub fn exec(mut self, func: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> Self {
-        self.0.exec = CommandType::Basic(func);
-
-        self
-    }
-
-    /// Sets a function that's called when a command is called that can access
-    /// the internal HashMap of commands, used specifically for creating a help
-    /// command.
-    ///
-    /// You can return `Err(From::from(string))` if there's an error.
-    pub fn exec_help(mut self, f:
-                    fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
-                    -> Result<(), CommandError>) -> Self {
-        self.0.exec = CommandType::WithCommands(f);
-
-        self
-    }
-
-    /// Sets a string to be sent in the channel of context on command. This can
-    /// be useful for an `about`, `invite`, `ping`, etc. command.
-    ///
-    /// # Examples
-    ///
-    /// Create a command named "ping" that returns "Pong!":
-    ///
-    /// ```rust,ignore
-    /// client.with_framework(|f| f
-    ///     .command("ping", |c| c.exec_str("Pong!")));
-    /// ```
-    pub fn exec_str(mut self, content: &str) -> Self {
-        self.0.exec = CommandType::StringResponse(content.to_string());
+        self.1 = func;
 
         self
     }
@@ -214,6 +177,22 @@ impl CreateCommand {
         self.0.allowed_roles = allowed_roles.into_iter().map(|x| x.to_string()).collect();
 
         self
+    }
+
+    pub(crate) fn finish(self) -> Arc<Command> {
+        let CreateCommand(options, func) = self;
+
+        struct A(Arc<CommandOptions>, fn(&mut Context, &Message, Args) -> Result<(), CommandError>);
+
+        impl Command for A {
+            fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), CommandError> {
+                (self.1)(c, m, a)
+            }
+
+            fn options(&self) -> Arc<CommandOptions> { Arc::clone(&self.0) }
+        }
+
+        Arc::new(A(Arc::new(options), func))
     }
 }
 

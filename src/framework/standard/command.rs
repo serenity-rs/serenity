@@ -5,11 +5,10 @@ use std::fmt;
 use std::sync::Arc;
 use super::{Args, Configuration};
 
-pub type Check = Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool
+pub type Check = Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
                      + Send
                      + Sync
                      + 'static;
-pub type Exec = fn(&mut Context, &Message, Args) -> Result<(), Error>;
 pub type Help = fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
                    -> Result<(), Error>;
 pub type BeforeHook = Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static;
@@ -17,10 +16,18 @@ pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), Error>) + Send 
 pub(crate) type InternalCommand = Arc<Command>;
 pub type PrefixCheck = Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
 
-#[derive(Debug)]
 pub enum CommandOrAlias {
     Alias(String),
     Command(InternalCommand),
+}
+
+impl fmt::Debug for CommandOrAlias {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            CommandOrAlias::Alias(ref s) => f.debug_tuple("CommandOrAlias::Alias").field(&s).finish(),
+            _ => Ok(())
+        }
+    }
 }
 
 /// An error from a command.
@@ -30,16 +37,8 @@ pub struct Error(pub String);
 // TODO: Have seperate `From<(&)String>` and `From<&str>` impls via specialization
 impl<D: fmt::Display> From<D> for Error {
     fn from(d: D) -> Self {
-        Error(format!("{}", d))
+        Error(d.to_string())
     }
-}
-
-/// Command function type. Allows to access internal framework things inside
-/// your commands.
-pub enum CommandType {
-    StringResponse(String),
-    Basic(Exec),
-    WithCommands(Help),
 }
 
 #[derive(Debug)]
@@ -56,13 +55,27 @@ pub struct CommandGroup {
     pub owners_only: bool,
 }
 
-/// Command struct used to store commands internally.
-pub struct Command {
+impl Default for CommandGroup {
+    fn default() -> CommandGroup {
+        CommandGroup {
+            prefix: None,
+            commands: HashMap::new(),
+            bucket: None,
+            required_permissions: Permissions::empty(),
+            dm_only: false,
+            guild_only: false,
+            help_available: true,
+            owners_only: false,
+            allowed_roles: Vec::new(),
+        }
+    }
+}
+
+
+pub struct CommandOptions {
     /// A set of checks to be called prior to executing the command. The checks
     /// will short-circuit on the first check that returns `false`.
     pub checks: Vec<Box<Check>>,
-    /// Function called when the command is called.
-    pub exec: CommandType,
     /// Ratelimit bucket.
     pub bucket: Option<String>,
     /// Command description, used by other commands.
@@ -91,19 +104,51 @@ pub struct Command {
     pub aliases: Vec<String>,
 }
 
-impl Command {
-    pub fn new(f: fn(&mut Context, &Message, Args) -> Result<(), Error>) -> Self {
-        Command {
-            exec: CommandType::Basic(f),
-            ..Command::default()
-        }
+lazy_static! {
+    static ref DEFAULT_OPTIONS: Arc<CommandOptions> = Arc::new(CommandOptions::default());
+}
+
+/// A framework command.
+pub trait Command: Send + Sync + 'static {
+    fn execute(&self, &mut Context, &Message, Args) -> Result<(), Error>;
+
+    fn options(&self) -> Arc<CommandOptions> {
+        Arc::clone(&DEFAULT_OPTIONS)
     }
 }
 
-impl fmt::Debug for Command {
-    // TODO: add Command::checks somehow?
+impl Command for Arc<Command> {
+    fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), Error> {
+        (**self).execute(c, m, a)
+    }
+
+    fn options(&self) -> Arc<CommandOptions> {
+        (**self).options()
+    }
+}
+
+impl Command for Box<Command> {
+    fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), Error> {
+        (**self).execute(c, m, a)
+    }
+
+    fn options(&self) -> Arc<CommandOptions> {
+        (**self).options()
+    }
+}
+
+pub(crate) struct A(pub fn(&mut Context, &Message, Args) -> Result<(), Error>);
+
+impl Command for A {
+    fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), Error> {
+        (self.0)(c, m, a)
+    }
+}
+
+impl fmt::Debug for CommandOptions {
+    // TODO: add CommandOptions::checks somehow?
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        fmt.debug_struct("Command")
+        fmt.debug_struct("CommandOptions")
             .field("bucket", &self.bucket)
             .field("desc", &self.desc)
             .field("example", &self.example)
@@ -119,12 +164,11 @@ impl fmt::Debug for Command {
     }
 }
 
-impl Default for Command {
-    fn default() -> Command {
-        Command {
+impl Default for CommandOptions {
+    fn default() -> CommandOptions {
+        CommandOptions {
             aliases: Vec::new(),
             checks: Vec::default(),
-            exec: CommandType::Basic(|_, _, _| Ok(())),
             desc: None,
             usage: None,
             example: None,

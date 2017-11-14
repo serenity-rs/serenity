@@ -30,7 +30,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::fmt::Write;
 use super::command::InternalCommand;
-use super::{Args, Command, CommandGroup, CommandOrAlias, CommandError};
+use super::{Args, CommandGroup, CommandOrAlias, CommandOptions, CommandError};
 use utils::Colour;
 
 fn error_embed(channel_id: &ChannelId, input: &str) {
@@ -53,7 +53,7 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 
 /// Checks whether a user is member of required roles
 /// and given the required permissions.
-pub fn has_all_requirements(cmd: &Command, msg: &Message) -> bool {
+pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
     if let Some(guild) = msg.guild() {
         let guild = guild.read();
 
@@ -111,7 +111,7 @@ pub fn with_embeds(_: &mut Context,
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
-                            if has_all_requirements(cmd, msg) {
+                            if has_all_requirements(&cmd.options(), msg) {
                                 found = Some((command_name, cmd));
                             } else {
                                 break;
@@ -122,7 +122,7 @@ pub fn with_embeds(_: &mut Context,
 
                             match *actual_command {
                                 CommandOrAlias::Command(ref cmd) => {
-                                    if has_all_requirements(cmd, msg) {
+                                    if has_all_requirements(&cmd.options(), msg) {
                                         found = Some((name, cmd));
                                     } else {
                                         break;
@@ -140,6 +140,7 @@ pub fn with_embeds(_: &mut Context,
             }
 
             if let Some((command_name, command)) = found {
+                let command = command.options();
                 if !command.help_available {
                     error_embed(&msg.channel_id, "**Error**: No help available.");
 
@@ -226,8 +227,9 @@ pub fn with_embeds(_: &mut Context,
 
                 for name in command_names {
                     let cmd = &commands[name];
+                    let cmd = cmd.options();
 
-                    if cmd.help_available && has_all_requirements(cmd, msg) {
+                    if cmd.help_available && has_all_requirements(&cmd, msg) {
                         let _ = write!(desc, "`{}`\n", name);
                         has_commands = true;
                     }
@@ -271,7 +273,7 @@ pub fn plain(_: &mut Context,
         let name = args.full();
 
         for (group_name, group) in groups {
-            let mut found: Option<(&String, &Command)> = None;
+            let mut found: Option<(&String, &InternalCommand)> = None;
 
             for (command_name, command) in &group.commands {
                 let with_prefix = if let Some(ref prefix) = group.prefix {
@@ -283,7 +285,7 @@ pub fn plain(_: &mut Context,
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
-                            if has_all_requirements(cmd, msg) {
+                            if has_all_requirements(&cmd.options(), msg) {
                                 found = Some((command_name, cmd));
                             }
                             else {
@@ -295,7 +297,7 @@ pub fn plain(_: &mut Context,
 
                             match *actual_command {
                                 CommandOrAlias::Command(ref cmd) => {
-                                    if has_all_requirements(cmd, msg) {
+                                    if has_all_requirements(&cmd.options(), msg) {
                                         found = Some((name, cmd));
                                     }
                                     else {
@@ -314,6 +316,8 @@ pub fn plain(_: &mut Context,
             }
 
             if let Some((command_name, command)) = found {
+                let command = command.options();
+
                 if !command.help_available {
                     let _ = msg.channel_id.say("**Error**: No help available.");
                     return Ok(());
@@ -383,8 +387,9 @@ pub fn plain(_: &mut Context,
 
         for name in command_names {
             let cmd = &commands[name];
+            let cmd = cmd.options();
 
-            if cmd.help_available && has_all_requirements(cmd, msg) {
+            if cmd.help_available && has_all_requirements(&cmd, msg) {
                 let _ = write!(group_help, "`{}` ", name);
             }
         }
