@@ -7,11 +7,11 @@ use std::env;
 struct Handler;
 
 impl EventHandler for Handler {
-    // Set a handler for the `on_message` event - so that whenever a new message
+    // Set a handler for the `message` event - so that whenever a new message
     // is received - the closure (or function) passed will be called.
     //
-    // Event handlers are dispatched through multi-threading, and so multiple
-    // of a single event can be dispatched simultaneously.
+    // Event handlers are dispatched through a threadpool, and so multiple
+    // events can be dispatched simultaneously.
     fn message(&self, _: Context, msg: Message) {
         if msg.content == "!ping" {
             // Sending a message can fail, due to a network error, an
@@ -24,7 +24,7 @@ impl EventHandler for Handler {
         }
     }
 
-    // Set a handler to be called on the `on_ready` event. This is called when a
+    // Set a handler to be called on the `ready` event. This is called when a
     // shard is booted, and a READY payload is sent by Discord. This payload
     // contains data like the current user's guild Ids, current user data,
     // private channels, and more.
