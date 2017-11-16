@@ -65,7 +65,7 @@ impl CreateCommand {
     /// }
     ///
     /// fn owner_check(_context: &mut Context, message: &Message, _: &mut Args, _:
-    /// &Arc<CommandOptions>) -> bool {
+    /// &CommandOptions) -> bool {
     ///     // replace with your user ID
     ///     message.author.id == 7
     /// }

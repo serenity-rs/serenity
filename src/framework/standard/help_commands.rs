@@ -88,7 +88,7 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
 /// use serenity::framework::standard::{StandardFramework, help_commands};
 ///
 /// client.with_framework(StandardFramework::new()
-///     .command("help", |c| c.exec_help(help_commands::with_embeds)));
+///     .help(help_commands::with_embeds));
 /// ```
 pub fn with_embeds(_: &mut Context,
                    msg: &Message,
@@ -262,7 +262,7 @@ pub fn with_embeds(_: &mut Context,
 /// use serenity::framework::standard::{StandardFramework, help_commands};
 ///
 /// client.with_framework(StandardFramework::new()
-///     .command("help", |c| c.exec_help(help_commands::plain)));
+///     .help(help_commands::plain));
 /// ```
 pub fn plain(_: &mut Context,
              msg: &Message,

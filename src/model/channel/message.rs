@@ -80,7 +80,6 @@ impl Message {
     /// #
     /// # fn main() {
     /// #   use serenity::prelude::*;
-    /// #   use serenity::framework::standard::Args;
     /// #   struct Handler;
     /// #
     /// #   impl EventHandler for Handler {}
@@ -91,7 +90,7 @@ impl Message {
     ///
     /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
-    ///     .command("channelname", |c| c.exec(channel_name)));
+    ///     .cmd("channelname", channel_name));
     ///
     /// command!(channel_name(_ctx, msg) {
     ///     let _ = match msg.channel() {

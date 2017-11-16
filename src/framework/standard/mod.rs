@@ -283,7 +283,11 @@ impl StandardFramework {
     ///     .bucket("basic", 2, 10, 3)
     ///     .command("ping", |c| c
     ///         .bucket("basic")
-    ///         .exec_str("pong!")));
+    ///         .exec(|_, msg, _| {
+    ///             msg.channel_id.say("pong!")?;
+    ///
+    ///             Ok(())
+    ///         })));
     /// ```
     pub fn bucket(mut self, s: &str, delay: i64, time_span: i64, limit: i32) -> Self {
         self.buckets.insert(
@@ -325,7 +329,11 @@ impl StandardFramework {
     ///     })
     ///     .command("ping", |c| c
     ///         .bucket("basic")
-    ///         .exec_str("pong!")));
+    ///         .exec(|_, msg, _| {
+    ///             msg.channel_id.say("pong!")?;
+    ///
+    ///             Ok(())
+    ///         })));
     /// ```
     ///
     /// [`bucket`]: #method.bucket
@@ -425,7 +433,7 @@ impl StandardFramework {
     ///     .simple_bucket("simple", 2)
     ///     .command("ping", |c| c
     ///         .bucket("simple")
-    ///         .exec_str("pong!")));
+    ///         .exec(|_, msg, _| { msg.channel_id.say("pong!")?; Ok(()) })));
     /// ```
     pub fn simple_bucket<S>(mut self, s: &str, delay: i64) -> Self {
         self.buckets.insert(
@@ -616,7 +624,7 @@ impl StandardFramework {
     /// #
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new().on("ping", ping));
+    /// client.with_framework(StandardFramework::new().cmd("ping", ping));
     ///
     /// command!(ping(_ctx, msg) {
     ///     let _ = msg.channel_id.say("pong!");
@@ -739,8 +747,8 @@ impl StandardFramework {
     ///
     /// client.with_framework(StandardFramework::new()
     ///     .group("ping-pong", |g| g
-    ///         .command("ping", |c| c.exec_str("pong!"))
-    ///         .command("pong", |c| c.exec_str("ping!"))));
+    ///         .on("ping", |_, msg, _| { msg.channel_id.say("pong!")?; Ok(()) })
+    ///         .on("pong", |_, msg, _| { msg.channel_id.say("ping!")?; Ok(()) })));
     /// ```
     pub fn group<F, S>(mut self, group_name: S, f: F) -> Self
         where F: FnOnce(CreateGroup) -> CreateGroup, S: Into<String> {

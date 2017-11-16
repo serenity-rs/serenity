@@ -380,7 +380,11 @@ impl Client {
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
     /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
-    ///     .command("ping", |c| c.exec_str("Pong!")));
+    ///     .on("ping", |_, msg, _| {
+    ///         msg.channel_id.say("Pong!")?;
+    ///         
+    ///         Ok(())
+    ///      ));
     /// # Ok(())
     /// # }
     /// #
