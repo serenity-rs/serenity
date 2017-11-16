@@ -1893,6 +1893,12 @@ impl<'a> From<&'a str> for AttachmentType<'a> {
     fn from(s: &'a str) -> AttachmentType { AttachmentType::Path(Path::new(s)) }
 }
 
+impl<'a> From<&'a Path> for AttachmentType<'a> {
+    fn from(path: &'a Path) -> AttachmentType {
+        AttachmentType::Path(path)
+    }
+}
+
 impl<'a> From<&'a PathBuf> for AttachmentType<'a> {
     fn from(pathbuf: &'a PathBuf) -> AttachmentType { AttachmentType::Path(pathbuf.as_path()) }
 }
