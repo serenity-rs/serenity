@@ -140,8 +140,16 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
                 }}
             }
 
-            if !successful && !self.shard.lock().stage().is_connecting() {
-                return self.request_restart();
+            {
+                let shard = self.shard.lock();
+
+                if !successful && !shard.stage().is_connecting() {
+                    return self.request_restart();
+                }
+
+                if shard.is_shutdown() {
+                    return self.request_shutdown();
+                }
             }
         }
     }
@@ -216,6 +224,13 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
         debug!("[ShardRunner {:?}] Requesting restart", self.shard_info);
         let msg = ShardManagerMessage::Restart(ShardId(self.shard_info[0]));
         let _ = self.manager_tx.send(msg);
+
+        Ok(())
+    }
+
+    fn request_shutdown(&self) -> Result<()> {
+        debug!("[ShardRunner {:?}] Requesting shutdown", self.shard_info);
+        let _ = self.manager_tx.send(ShardManagerMessage::ShutdownAll);
 
         Ok(())
     }

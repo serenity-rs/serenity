@@ -132,7 +132,7 @@ impl ConnectionStage {
 
         match *self {
             Connecting | Handshake | Identifying | Resuming => true,
-            _ => false,
+            Connected | Disconnected => false,
         }
     }
 }
