@@ -113,3 +113,6 @@ standard_framework = ["framework", "vec_shift"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "sodiumoxide"]
 websocket = ["evzht9h3nznqzwl"]
+
+[package.metadata.docs.rs]
+all-features = true
