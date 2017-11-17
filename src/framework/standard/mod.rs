@@ -435,7 +435,7 @@ impl StandardFramework {
     ///         .bucket("simple")
     ///         .exec(|_, msg, _| { msg.channel_id.say("pong!")?; Ok(()) })));
     /// ```
-    pub fn simple_bucket<S>(mut self, s: &str, delay: i64) -> Self {
+    pub fn simple_bucket(mut self, s: &str, delay: i64) -> Self {
         self.buckets.insert(
             s.to_string(),
             Bucket {
@@ -631,31 +631,21 @@ impl StandardFramework {
     /// });
     /// # }
     /// ```
-    pub fn on(mut self, name: &str,
+    pub fn on(self, name: &str,
             f: fn(&mut Context, &Message, Args)
             -> Result<(), CommandError>) -> Self {
-        {
-            let ungrouped = self.groups
-                .entry("Ungrouped".to_string())
-                .or_insert_with(|| Arc::new(CommandGroup::default()));
-
-            if let Some(ref mut group) = Arc::get_mut(ungrouped) {
-                group
-                    .commands
-                    .insert(name.to_string(), CommandOrAlias::Command(Arc::new(A(f))));
-            }
-        }
-
-        self.initialized = true;
-
-        self
+        self._cmd(name, A(f))
     }
 
     /// Same as [`on`], but accepts a [`Command`] directly.
     /// 
     /// [`on`]: #method.on
     /// [`Command`]: trait.Command.html
-    pub fn cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
+    pub fn cmd<C: Command + 'static>(self, name: &str, c: C) -> Self {
+        self._cmd(name, c)
+    }
+
+    fn _cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
         {
             let ungrouped = self.groups
                 .entry("Ungrouped".to_string())
@@ -684,7 +674,7 @@ impl StandardFramework {
     ///         let _ = ctx.say("pong");
     ///     }));
     /// ```
-    pub fn command<F, S>(mut self, command_name: &str, f: F) -> Self
+    pub fn command<F>(mut self, command_name: &str, f: F) -> Self
         where F: FnOnce(CreateCommand) -> CreateCommand {
         {
             let ungrouped = self.groups
@@ -750,8 +740,8 @@ impl StandardFramework {
     ///         .on("ping", |_, msg, _| { msg.channel_id.say("pong!")?; Ok(()) })
     ///         .on("pong", |_, msg, _| { msg.channel_id.say("ping!")?; Ok(()) })));
     /// ```
-    pub fn group<F, S>(mut self, group_name: S, f: F) -> Self
-        where F: FnOnce(CreateGroup) -> CreateGroup, S: Into<String> {
+    pub fn group<F>(mut self, group_name: &str, f: F) -> Self
+        where F: FnOnce(CreateGroup) -> CreateGroup {
         let group = f(CreateGroup(CommandGroup::default())).0;
 
         self.groups.insert(group_name.into(), Arc::new(group));
