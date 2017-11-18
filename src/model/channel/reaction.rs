@@ -116,6 +116,16 @@ impl Reaction {
             after.map(|u| u.into().0),
         )
     }
+
+    /// Retrieves the [`Message`] associated with this reaction.
+    ///
+    /// Requires the [Read Message History] permission.
+    ///
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [`Message`]: struct.Message.html
+    pub fn message(&self) -> Result<Message> {
+        self.channel_id.message(self.message_id)
+    }
 }
 
 /// The type of a [`Reaction`] sent.
