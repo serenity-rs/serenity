@@ -382,9 +382,9 @@ impl Client {
     ///     .configure(|c| c.prefix("~"))
     ///     .on("ping", |_, msg, _| {
     ///         msg.channel_id.say("Pong!")?;
-    ///         
+    ///
     ///         Ok(())
-    ///      ));
+    ///      }));
     /// # Ok(())
     /// # }
     /// #

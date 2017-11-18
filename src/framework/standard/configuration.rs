@@ -171,9 +171,9 @@ impl Configuration {
     /// client.with_framework(StandardFramework::new()
     ///     .on("ping", |_, msg, _| {
     ///         msg.channel_id.say("Pong!")?;
-    ///         
+    ///
     ///         Ok(())
-    ///     ))
+    ///     })
     ///     .configure(|c| c.disabled_commands(disabled)));
     /// ```
     pub fn disabled_commands(mut self, commands: HashSet<String>) -> Self {
@@ -203,9 +203,9 @@ impl Configuration {
     /// client.with_framework(StandardFramework::new()
     ///     .on("ping", |_, msg, _| {
     ///         msg.channel_id.say("Pong!")?;
-    ///         
+    ///
     ///         Ok(())
-    ///      ))
+    ///      })
     ///     .configure(|c| c.dynamic_prefix(|_, msg| {
     ///         Some(if msg.channel_id.0 % 5 == 0 {
     ///             "!"
