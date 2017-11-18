@@ -4,7 +4,12 @@ use client::Context;
 use model::{Message, Permissions};
 use std::sync::Arc;
 
-pub struct CreateCommand(pub CommandOptions, pub fn(&mut Context, &Message, Args) -> Result<(), CommandError>);
+pub enum FnOrCommand {
+    Fn(fn(&mut Context, &Message, Args) -> Result<(), CommandError>),
+    Command(Arc<Command>),
+}
+
+pub struct CreateCommand(pub CommandOptions, pub FnOrCommand);
 
 impl CreateCommand {
     /// Adds multiple aliases.
@@ -104,8 +109,17 @@ impl CreateCommand {
     /// A function that can be called when a command is received.
     /// You can return `Err(string)` if there's an error.
     pub fn exec(mut self, func: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> Self {
-        self.1 = func;
+        self.1 = FnOrCommand::Fn(func);
 
+        self
+    }
+    
+    /// Like [`exec`] but accepts a `Command` directly.
+    ///
+    /// [`exec`]: #method.exec
+    pub fn cmd<C: Command + 'static>(mut self, c: C) -> Self {
+        self.1 = FnOrCommand::Command(Arc::new(c));
+        
         self
     }
 
@@ -182,19 +196,24 @@ impl CreateCommand {
     }
 
     pub(crate) fn finish(self) -> Arc<Command> {
-        let CreateCommand(options, func) = self;
+        let CreateCommand(options, fc) = self;
 
-        struct A(Arc<CommandOptions>, fn(&mut Context, &Message, Args) -> Result<(), CommandError>);
+        match fc {
+            FnOrCommand::Fn(func) => {
+                struct A(Arc<CommandOptions>, fn(&mut Context, &Message, Args) -> Result<(), CommandError>);
 
-        impl Command for A {
-            fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), CommandError> {
-                (self.1)(c, m, a)
-            }
+                impl Command for A {
+                    fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), CommandError> {
+                        (self.1)(c, m, a)
+                    }
 
-            fn options(&self) -> Arc<CommandOptions> { Arc::clone(&self.0) }
+                    fn options(&self) -> Arc<CommandOptions> { Arc::clone(&self.0) }
+                }
+
+                Arc::new(A(Arc::new(options), func))
+            },
+            FnOrCommand::Command(cmd) => cmd,
         }
-
-        Arc::new(A(Arc::new(options), func))
     }
 }
 

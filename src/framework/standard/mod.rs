@@ -14,7 +14,7 @@ pub(crate) use self::command::{A, Help};
 pub use self::command::{Command, CommandGroup, CommandOptions, Error as CommandError};
 pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
-pub use self::create_command::CreateCommand;
+pub use self::create_command::{CreateCommand, FnOrCommand};
 pub use self::create_group::CreateGroup;
 
 use client::Context;
@@ -682,7 +682,7 @@ impl StandardFramework {
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
-                let cmd = f(CreateCommand(CommandOptions::default(), |_, _, _| Ok(()))).finish();
+                let cmd = f(CreateCommand(CommandOptions::default(), FnOrCommand::Fn(|_, _, _| Ok(())))).finish();
                 let name = command_name.to_string();
 
                 if let Some(ref prefix) = group.prefix {

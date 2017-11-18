@@ -1,7 +1,7 @@
 pub use super::command::{Command, CommandGroup, CommandOptions, Error as CommandError};
 pub(crate) use super::command::CommandOrAlias;
 pub(crate) use super::command::A;
-pub use super::create_command::CreateCommand;
+pub use super::create_command::{CreateCommand, FnOrCommand};
 pub use super::Args;
 
 use client::Context;
@@ -27,7 +27,7 @@ pub struct CreateGroup(pub CommandGroup);
 
 impl CreateGroup {
     fn build_command(&self) -> CreateCommand {
-        let mut cmd = CreateCommand(CommandOptions::default(), |_, _, _| Ok(()))
+        let mut cmd = CreateCommand(CommandOptions::default(), FnOrCommand::Fn(|_, _, _| Ok(())))
             .required_permissions(self.0.required_permissions)
             .dm_only(self.0.dm_only)
             .guild_only(self.0.guild_only)
@@ -70,16 +70,27 @@ impl CreateGroup {
 
     /// Adds a command to group with simplified API.
     /// You can return Err(From::from(string)) if there's an error.
-    pub fn on(mut self, name: &str,
+    pub fn on(self, name: &str,
             f: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> Self {
-        let cmd = Arc::new(A(f));
-
+        self._cmd(name, A(f))
+    }
+    
+    /// Like [`on`], but accepts a `Command` directly.
+    ///
+    /// [`on`]: #method.on
+    pub fn cmd<C: Command + 'static>(self, name: &str, c: C) -> Self {
+        self._cmd(name, c)
+    }    
+    
+    fn _cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
+        let cmd = Arc::new(c);
+        
         self.0
             .commands
             .insert(name.to_string(), CommandOrAlias::Command(cmd));
 
         self
-    }
+    }    
 
     /// If prefix is set, it will be required before all command names.
     /// For example, if bot prefix is "~" and group prefix is "image"
