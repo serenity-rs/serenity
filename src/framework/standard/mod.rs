@@ -70,7 +70,7 @@ use model::Channel;
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
         #[allow(non_camel_case_types)]
-        struct $fname;
+        pub struct $fname;
 
         impl $crate::framework::standard::Command for $fname {
             #[allow(unreachable_code, unused_mut)]
@@ -87,7 +87,7 @@ macro_rules! command {
     };
     ($fname:ident($c:ident, $m:ident) $b:block) => {
         #[allow(non_camel_case_types)]
-        struct $fname;
+        pub struct $fname;
 
         impl $crate::framework::standard::Command for $fname {
             #[allow(unreachable_code, unused_mut)]
@@ -104,7 +104,7 @@ macro_rules! command {
     };
     ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
         #[allow(non_camel_case_types)]
-        struct $fname;
+        pub struct $fname;
 
         impl $crate::framework::standard::Command for $fname {
             #[allow(unreachable_code, unused_mut)]
