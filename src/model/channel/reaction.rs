@@ -35,7 +35,7 @@ impl Reaction {
     /// Deletes the reaction, but only if the current user is the user who made
     /// the reaction or has permission to.
     ///
-    /// **Note**: Requires the [Manage Messages] permission, _if_ the current
+    /// Requires the [Manage Messages] permission, _if_ the current
     /// user did not perform the reaction.
     ///
     /// # Errors
@@ -89,7 +89,9 @@ impl Reaction {
     /// The optional `after` attribute is to retrieve the users after a certain
     /// user. This is useful for pagination.
     ///
-    /// **Note**: Requires the [Read Message History] permission.
+    /// Requires the [Read Message History] permission.
+    ///
+    /// **Note**: This will send a request to the REST API.
     ///
     /// # Errors
     ///
@@ -120,6 +122,10 @@ impl Reaction {
     /// Retrieves the [`Message`] associated with this reaction.
     ///
     /// Requires the [Read Message History] permission.
+    ///
+    /// **Note**: This will send a request to the REST API. Prefer maintaining
+    /// your own message cache or otherwise having the message available if
+    /// possible.
     ///
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     /// [`Message`]: struct.Message.html
