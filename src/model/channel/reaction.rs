@@ -34,9 +34,9 @@ pub struct Reaction {
 impl Reaction {
     /// Retrieves the associated the reaction was made in.
     ///
-    /// If the cache is enabled, this will search for the alread-cached channel.
-    /// If not - or the channel was not found - this will perform a request over
-    /// the REST API for the channel.
+    /// If the cache is enabled, this will search for the already-cached
+    /// channel. If not - or the channel was not found - this will perform a
+    /// request over the REST API for the channel.
     ///
     /// Requires the [Read Message History] permission.
     ///
@@ -106,6 +106,16 @@ impl Reaction {
     #[inline]
     pub fn message(&self) -> Result<Message> {
         self.channel_id.message(self.message_id)
+    }
+
+    /// Retrieves the user that made the reaction.
+    ///
+    /// If the cache is enabled, this will search for the already-cached user.
+    /// If not - or the user was not found - this will perform a request over
+    /// the REST API for the user.
+    #[inline]
+    pub fn user(&self) -> Result<User> {
+        self.user_id.get()
     }
 
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
