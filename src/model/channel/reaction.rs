@@ -79,6 +79,20 @@ impl Reaction {
         http::delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
     }
 
+    /// Retrieves the [`Message`] associated with this reaction.
+    ///
+    /// Requires the [Read Message History] permission.
+    ///
+    /// **Note**: This will send a request to the REST API. Prefer maintaining
+    /// your own message cache or otherwise having the message available if
+    /// possible.
+    ///
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [`Message`]: struct.Message.html
+    pub fn message(&self) -> Result<Message> {
+        self.channel_id.message(self.message_id)
+    }
+
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
     ///
@@ -117,20 +131,6 @@ impl Reaction {
             limit.unwrap_or(50),
             after.map(|u| u.into().0),
         )
-    }
-
-    /// Retrieves the [`Message`] associated with this reaction.
-    ///
-    /// Requires the [Read Message History] permission.
-    ///
-    /// **Note**: This will send a request to the REST API. Prefer maintaining
-    /// your own message cache or otherwise having the message available if
-    /// possible.
-    ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    /// [`Message`]: struct.Message.html
-    pub fn message(&self) -> Result<Message> {
-        self.channel_id.message(self.message_id)
     }
 }
 
