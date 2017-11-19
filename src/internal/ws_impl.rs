@@ -7,8 +7,7 @@ use websocket::sync::stream::{TcpStream, TlsStream};
 use websocket::sync::Client as WsClient;
 
 pub trait ReceiverExt {
-    fn recv_json<F, T>(&mut self, decode: F) -> Result<Option<T>>
-        where F: Fn(Value) -> Result<T>;
+    fn recv_json(&mut self) -> Result<Option<Value>>;
 }
 
 pub trait SenderExt {
@@ -16,29 +15,14 @@ pub trait SenderExt {
 }
 
 impl ReceiverExt for WsClient<TlsStream<TcpStream>> {
-    fn recv_json<F, T>(&mut self, decode: F) -> Result<Option<T>>
-        where F: Fn(Value) -> Result<T> {
+    fn recv_json(&mut self) -> Result<Option<Value>> {
         Ok(match self.recv_message()? {
             OwnedMessage::Binary(bytes) => {
-                let value = serde_json::from_reader(ZlibDecoder::new(&bytes[..]))?;
-
-                Some(decode(value).map_err(|why| {
-                    let s = String::from_utf8_lossy(&bytes);
-
-                    warn!("(╯°□°）╯︵ ┻━┻ Error decoding: {}", s);
-
-                    why
-                })?)
+                serde_json::from_reader(ZlibDecoder::new(&bytes[..])).map(Some)?
             },
             OwnedMessage::Close(data) => return Err(Error::Gateway(GatewayError::Closed(data))),
             OwnedMessage::Text(payload) => {
-                let value = serde_json::from_str(&payload)?;
-
-                Some(decode(value).map_err(|why| {
-                    warn!("(╯°□°）╯︵ ┻━┻ Error decoding: {}", payload);
-
-                    why
-                })?)
+                serde_json::from_str(&payload).map(Some)?
             },
             OwnedMessage::Ping(x) => {
                 self.send_message(&OwnedMessage::Pong(x))

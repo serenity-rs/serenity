@@ -3,6 +3,7 @@ use internal::prelude::*;
 use internal::ws_impl::ReceiverExt;
 use model::event::{Event, GatewayEvent};
 use parking_lot::Mutex;
+use serde::Deserialize;
 use std::sync::mpsc::{self, Receiver, Sender, TryRecvError};
 use std::sync::Arc;
 use super::super::super::{EventHandler, dispatch};
@@ -329,7 +330,11 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
     /// Returns a received event, as well as whether reading the potentially
     /// present event was successful.
     fn recv_event(&mut self) -> (Option<Event>, Option<ShardAction>, bool) {
-        let gw_event = match self.shard.client.recv_json(GatewayEvent::decode) {
+        let gw_event = match self.shard.client.recv_json() {
+            Ok(Some(value)) => {
+                GatewayEvent::deserialize(value).map(Some).map_err(From::from)
+            },
+            Ok(None) => Ok(None),
             Err(Error::WebSocket(WebSocketError::IoError(_))) => {
                 // Check that an amount of time at least double the
                 // heartbeat_interval has passed.
@@ -366,7 +371,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
                 // hit every iteration.
                 return (None, None, false);
             },
-            other => other,
+            Err(why) => Err(why),
         };
 
         let event = match gw_event {
