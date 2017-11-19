@@ -32,6 +32,20 @@ pub struct Reaction {
 
 #[cfg(feature = "model")]
 impl Reaction {
+    /// Retrieves the associated the reaction was made in.
+    ///
+    /// If the cache is enabled, this will search for the alread-cached channel.
+    /// If not - or the channel was not found - this will perform a request over
+    /// the REST API for the channel.
+    ///
+    /// Requires the [Read Message History] permission.
+    ///
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    #[inline]
+    pub fn channel(&self) -> Result<Channel> {
+        self.channel_id.get()
+    }
+
     /// Deletes the reaction, but only if the current user is the user who made
     /// the reaction or has permission to.
     ///
@@ -89,6 +103,7 @@ impl Reaction {
     ///
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     /// [`Message`]: struct.Message.html
+    #[inline]
     pub fn message(&self) -> Result<Message> {
         self.channel_id.message(self.message_id)
     }
