@@ -10,7 +10,7 @@ mod args;
 
 pub use self::args::{Args, Iter, FromStrZc, Error as ArgError};
 pub(crate) use self::buckets::{Bucket, Ratelimit};
-pub(crate) use self::command::Help;
+pub(crate) use self::command::{Help, HelpFunction};
 pub use self::command::{Command, CommandGroup, CommandOptions, Error as CommandError};
 pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
@@ -78,7 +78,7 @@ macro_rules! command {
                       _: &$crate::model::Message,
                       _: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
-                
+
                 $b
 
                 Ok(())
@@ -95,7 +95,7 @@ macro_rules! command {
                       $m: &$crate::model::Message,
                       _: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
-                
+
                 $b
 
                 Ok(())
@@ -112,7 +112,7 @@ macro_rules! command {
                       $m: &$crate::model::Message,
                       mut $a: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
-                
+
                 $b
 
                 Ok(())
@@ -126,7 +126,7 @@ macro_rules! command {
 pub enum DispatchError {
     /// When a custom function check has failed.
     //
-    // TODO: Bring back `Arc<Command>` as `CommandOptions` here somehow? 
+    // TODO: Bring back `Arc<Command>` as `CommandOptions` here somehow?
     CheckFailed,
     /// When the requested command is disabled in bot configuration.
     CommandDisabled(String),
@@ -638,7 +638,7 @@ impl StandardFramework {
     }
 
     /// Same as [`on`], but accepts a [`Command`] directly.
-    /// 
+    ///
     /// [`on`]: #method.on
     /// [`Command`]: trait.Command.html
     pub fn cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
@@ -708,9 +708,9 @@ impl StandardFramework {
     }
 
     /// Sets what code should be execute when a user requests for `(prefix)help`.
-    pub fn help(mut self, f: Help) -> Self {
-        self.help = Some(Arc::new(f));
-        
+    pub fn help(mut self, f: HelpFunction) -> Self {
+        self.help = Some(Arc::new(Help(f)));
+
         self
     }
 
@@ -956,7 +956,7 @@ impl Framework for StandardFramework {
                     let after = self.after.clone();
 
                     // This is a special case.
-                    if to_check == "help" {                        
+                    if to_check == "help" {
                         let help = self.help.clone();
                         if let Some(help) = help {
                             let groups = self.groups.clone();
@@ -967,7 +967,7 @@ impl Framework for StandardFramework {
                                     }
                                 }
 
-                                let result = (help)(&mut context, &message, groups, args);
+                                let result = (help.0)(&mut context, &message, groups, args);
 
                                 if let Some(after) = after {
                                     (after)(&mut context, &message, &built, result);
