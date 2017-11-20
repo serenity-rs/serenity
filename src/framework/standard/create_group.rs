@@ -1,6 +1,5 @@
 pub use super::command::{Command, CommandGroup, CommandOptions, Error as CommandError};
 pub(crate) use super::command::CommandOrAlias;
-pub(crate) use super::command::A;
 pub use super::create_command::{CreateCommand, FnOrCommand};
 pub use super::Args;
 
@@ -68,21 +67,17 @@ impl CreateGroup {
         self
     }
 
-    /// Adds a command to group with simplified API.
+    /// Adds a command to group with a simplified API.
     /// You can return Err(From::from(string)) if there's an error.
     pub fn on(self, name: &str,
             f: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> Self {
-        self._cmd(name, A(f))
+        self.cmd(name, f)
     }
     
     /// Like [`on`], but accepts a `Command` directly.
     ///
     /// [`on`]: #method.on
-    pub fn cmd<C: Command + 'static>(self, name: &str, c: C) -> Self {
-        self._cmd(name, c)
-    }    
-    
-    fn _cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
+    pub fn cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
         let cmd = Arc::new(c);
         
         self.0
@@ -90,7 +85,7 @@ impl CreateGroup {
             .insert(name.to_string(), CommandOrAlias::Command(cmd));
 
         self
-    }    
+    }
 
     /// If prefix is set, it will be required before all command names.
     /// For example, if bot prefix is "~" and group prefix is "image"
