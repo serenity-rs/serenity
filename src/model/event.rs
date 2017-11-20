@@ -6,13 +6,11 @@ use serde_json;
 use std::collections::HashMap;
 use super::utils::deserialize_emojis;
 use super::*;
-use constants::VoiceOpCode;
+use constants::{OpCode, VoiceOpCode};
 use internal::prelude::*;
 
 #[cfg(feature = "cache")]
 use cache::{Cache, CacheUpdate};
-#[cfg(feature = "gateway")]
-use constants::OpCode;
 #[cfg(feature = "cache")]
 use internal::RwLockExt;
 #[cfg(feature = "cache")]
