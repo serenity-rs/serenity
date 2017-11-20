@@ -2,6 +2,7 @@ use client::Context;
 use model::{Message, Permissions};
 use std::collections::HashMap;
 use std::fmt;
+use std::fmt::{Debug, Formatter};
 use std::sync::Arc;
 use super::{Args, Configuration};
 
@@ -9,8 +10,18 @@ pub type Check = Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
                      + Send
                      + Sync
                      + 'static;
-pub type Help = fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
+
+pub type HelpFunction = fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
                    -> Result<(), Error>;
+
+pub struct Help(pub HelpFunction);
+
+impl Debug for Help {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "fn()")
+    }
+}
+
 pub type BeforeHook = Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static;
 pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), Error>) + Send + Sync + 'static;
 pub(crate) type InternalCommand = Arc<Command>;
@@ -53,6 +64,7 @@ pub struct CommandGroup {
     pub dm_only: bool,
     pub guild_only: bool,
     pub owners_only: bool,
+    pub help: Option<Arc<Help>>,
 }
 
 impl Default for CommandGroup {
@@ -67,6 +79,7 @@ impl Default for CommandGroup {
             help_available: true,
             owners_only: false,
             allowed_roles: Vec::new(),
+            help: None,
         }
     }
 }

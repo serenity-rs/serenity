@@ -1,6 +1,6 @@
 pub use super::command::{Command, CommandGroup, CommandOptions, Error as CommandError};
 pub(crate) use super::command::CommandOrAlias;
-pub(crate) use super::command::A;
+pub(crate) use super::command::{A, Help, HelpFunction};
 pub use super::create_command::{CreateCommand, FnOrCommand};
 pub use super::Args;
 
@@ -74,23 +74,30 @@ impl CreateGroup {
             f: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> Self {
         self._cmd(name, A(f))
     }
-    
+
     /// Like [`on`], but accepts a `Command` directly.
     ///
     /// [`on`]: #method.on
     pub fn cmd<C: Command + 'static>(self, name: &str, c: C) -> Self {
         self._cmd(name, c)
-    }    
-    
+    }
+
     fn _cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
         let cmd = Arc::new(c);
-        
+
         self.0
             .commands
             .insert(name.to_string(), CommandOrAlias::Command(cmd));
 
         self
-    }    
+    }
+
+    /// Sets what code should be execute when a user requests for `(prefix)help`.
+    pub fn help(mut self, f: HelpFunction) -> Self {
+        self.0.help = Some(Arc::new(Help(f)));
+
+        self
+    }
 
     /// If prefix is set, it will be required before all command names.
     /// For example, if bot prefix is "~" and group prefix is "image"
