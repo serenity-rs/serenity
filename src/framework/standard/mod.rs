@@ -10,7 +10,7 @@ mod args;
 
 pub use self::args::{Args, Iter, FromStrZc, Error as ArgError};
 pub(crate) use self::buckets::{Bucket, Ratelimit};
-pub(crate) use self::command::{A, Help, HelpFunction};
+pub(crate) use self::command::{Help, HelpFunction};
 pub use self::command::{Command, CommandGroup, CommandOptions, Error as CommandError};
 pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
@@ -634,18 +634,14 @@ impl StandardFramework {
     pub fn on(self, name: &str,
             f: fn(&mut Context, &Message, Args)
             -> Result<(), CommandError>) -> Self {
-        self._cmd(name, A(f))
+        self.cmd(name, f)
     }
 
     /// Same as [`on`], but accepts a [`Command`] directly.
     ///
     /// [`on`]: #method.on
     /// [`Command`]: trait.Command.html
-    pub fn cmd<C: Command + 'static>(self, name: &str, c: C) -> Self {
-        self._cmd(name, c)
-    }
-
-    fn _cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
+    pub fn cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
         {
             let ungrouped = self.groups
                 .entry("Ungrouped".to_string())

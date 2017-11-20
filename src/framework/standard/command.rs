@@ -150,11 +150,13 @@ impl Command for Box<Command> {
     }
 }
 
-pub(crate) struct A(pub fn(&mut Context, &Message, Args) -> Result<(), Error>);
-
-impl Command for A {
+impl<F> Command for F where F: Fn(&mut Context, &Message, Args) -> Result<(), Error> 
+    + Send 
+    + Sync 
+    + ?Sized
+    + 'static {
     fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), Error> {
-        (self.0)(c, m, a)
+        (*self)(c, m, a)
     }
 }
 
