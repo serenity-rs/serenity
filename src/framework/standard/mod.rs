@@ -624,11 +624,11 @@ impl StandardFramework {
     /// #
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new().cmd("ping", ping));
+    /// client.with_framework(StandardFramework::new().on("ping", |_, msg, _| {
+    ///     msg.channel_id.say("pong!")?;
     ///
-    /// command!(ping(_ctx, msg) {
-    ///     let _ = msg.channel_id.say("pong!");
-    /// });
+    ///     Ok(())
+    /// }));
     /// # }
     /// ```
     pub fn on(self, name: &str,
