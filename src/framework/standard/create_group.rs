@@ -79,11 +79,13 @@ impl CreateGroup {
     ///
     /// [`on`]: #method.on
     pub fn cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
-        let cmd = Arc::new(c);
+        let cmd: Arc<Command> = Arc::new(c);
 
         self.0
             .commands
-            .insert(name.to_string(), CommandOrAlias::Command(cmd));
+            .insert(name.to_string(), CommandOrAlias::Command(Arc::clone(&cmd)));
+
+        cmd.init();
 
         self
     }

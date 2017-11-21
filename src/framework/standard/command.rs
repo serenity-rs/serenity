@@ -128,6 +128,9 @@ pub trait Command: Send + Sync + 'static {
     fn options(&self) -> Arc<CommandOptions> {
         Arc::clone(&DEFAULT_OPTIONS)
     }
+
+    /// Called when the command gets registered.
+    fn init(&self) {}
 }
 
 impl Command for Arc<Command> {

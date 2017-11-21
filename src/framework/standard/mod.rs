@@ -648,9 +648,13 @@ impl StandardFramework {
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
+                let cmd: Arc<Command> = Arc::new(c);
+
                 group
                     .commands
-                    .insert(name.to_string(), CommandOrAlias::Command(Arc::new(c)));
+                    .insert(name.to_string(), CommandOrAlias::Command(Arc::clone(&cmd)));
+                
+                cmd.init();
             }
         }
 
@@ -698,7 +702,9 @@ impl StandardFramework {
 
                 group
                     .commands
-                    .insert(name, CommandOrAlias::Command(cmd));
+                    .insert(name, CommandOrAlias::Command(Arc::clone(&cmd)));
+                
+                cmd.init();
             }
         }
 
