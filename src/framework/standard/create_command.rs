@@ -212,11 +212,7 @@ impl CreateCommand {
 
                 Arc::new(A(Arc::new(options), func))
             },
-            FnOrCommand::Command(cmd) => {
-                cmd.init();
-
-                cmd
-            },
+            FnOrCommand::Command(cmd) => cmd,
         }
     }
 }
