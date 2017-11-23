@@ -1009,8 +1009,14 @@ impl Framework for StandardFramework {
                                 }
                             }
 
+                            if !command.before(&mut context, &message) {
+                                return;
+                            }
+
                             let result = command.execute(&mut context, &message, args);
 
+                            command.after(&mut context, &message, &result);
+                            
                             if let Some(after) = after {
                                 (after)(&mut context, &message, &built, result);
                             }

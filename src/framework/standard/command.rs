@@ -84,7 +84,6 @@ impl Default for CommandGroup {
     }
 }
 
-
 pub struct CommandOptions {
     /// A set of checks to be called prior to executing the command. The checks
     /// will short-circuit on the first check that returns `false`.
@@ -131,6 +130,12 @@ pub trait Command: Send + Sync + 'static {
 
     /// Called when the command gets registered.
     fn init(&self) {}
+
+    /// "before" middleware. Is called alongside the global middleware in the framework.
+    fn before(&self, &mut Context, &Message) -> bool { true }
+
+    /// "after" middleware. Is called alongside the global middleware in the framework.
+    fn after(&self, &mut Context, &Message, &Result<(), Error>) { }
 }
 
 impl Command for Arc<Command> {
@@ -141,6 +146,18 @@ impl Command for Arc<Command> {
     fn options(&self) -> Arc<CommandOptions> {
         (**self).options()
     }
+
+    fn init(&self) {
+        (**self).init()
+    }
+
+    fn before(&self, c: &mut Context, m: &Message) -> bool { 
+        (**self).before(c, m)
+    }
+
+    fn after(&self, c: &mut Context, m: &Message, res: &Result<(), Error>) {
+        (**self).after(c, m, res)
+    }
 }
 
 impl Command for Box<Command> {
@@ -150,6 +167,18 @@ impl Command for Box<Command> {
 
     fn options(&self) -> Arc<CommandOptions> {
         (**self).options()
+    }
+
+    fn init(&self) {
+        (**self).init()
+    }
+
+    fn before(&self, c: &mut Context, m: &Message) -> bool { 
+        (**self).before(c, m)
+    }
+
+    fn after(&self, c: &mut Context, m: &Message, res: &Result<(), Error>) {
+        (**self).after(c, m, res)
     }
 }
 
