@@ -193,7 +193,7 @@ impl Args {
         let mut vec = Vec::with_capacity(i as usize);
 
         for _ in 0..i {
-            vec.push(try_opt!(self.delimiter_split.shift()));
+            vec.push(self.delimiter_split.shift()?);
         }
 
         Some(vec)
