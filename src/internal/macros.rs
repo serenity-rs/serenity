@@ -181,11 +181,3 @@ macro_rules! enum_number {
         }
     }
 }
-
-#[allow(unused_macros)]
-macro_rules! try_opt {
-    ($x:expr) => (match $x {
-        Some(v) => v,
-        None => return None,
-    });
-}

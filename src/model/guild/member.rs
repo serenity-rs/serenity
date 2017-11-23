@@ -159,7 +159,7 @@ impl Member {
     #[cfg(all(feature = "cache", feature = "utils"))]
     pub fn colour(&self) -> Option<Colour> {
         let cache = CACHE.read();
-        let guild = try_opt!(cache.guilds.get(&self.guild_id)).read();
+        let guild = cache.guilds.get(&self.guild_id)?.read();
 
         let mut roles = self.roles
             .iter()
