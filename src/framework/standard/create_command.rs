@@ -7,6 +7,7 @@ use std::sync::Arc;
 pub enum FnOrCommand {
     Fn(fn(&mut Context, &Message, Args) -> Result<(), CommandError>),
     Command(Arc<Command>),
+    CommandWithOptions(Arc<Command>),
 }
 
 pub struct CreateCommand(pub CommandOptions, pub FnOrCommand);
@@ -122,6 +123,15 @@ impl CreateCommand {
         
         self
     }
+    
+    /// Like [`cmd`] but says to the builder to use this command's options instead of its own.
+    ///
+    /// [`cmd`]: #method.cmd
+    pub fn cmd_with_options<C: Command + 'static>(mut self, c: C) -> Self {
+        self.1 = FnOrCommand::CommandWithOptions(Arc::new(c));
+        
+        self
+    }
 
     /// Whether command can be used only in guilds or not.
     pub fn guild_only(mut self, guild_only: bool) -> Self {
@@ -212,7 +222,20 @@ impl CreateCommand {
 
                 Arc::new(A(Arc::new(options), func))
             },
-            FnOrCommand::Command(cmd) => cmd,
+            FnOrCommand::Command(cmd) => {
+                struct A(Arc<CommandOptions>, Arc<Command>);
+
+                impl Command for A {
+                    fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), CommandError> {
+                        self.1.execute(c, m, a)
+                    }
+
+                    fn options(&self) -> Arc<CommandOptions> { Arc::clone(&self.0) }
+                }
+
+                Arc::new(A(Arc::new(options), cmd))
+            },
+            FnOrCommand::CommandWithOptions(cmd) => cmd,
         }
     }
 }
