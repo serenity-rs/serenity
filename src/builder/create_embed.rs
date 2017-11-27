@@ -101,7 +101,7 @@ impl CreateEmbed {
     pub fn description<D: Display>(mut self, description: D) -> Self {
         self.0.insert(
             "description",
-            Value::String(format!("{}", description)),
+            Value::String(description.to_string()),
         );
 
         CreateEmbed(self.0)
@@ -281,7 +281,7 @@ impl CreateEmbed {
     /// Set the title of the embed.
     pub fn title<D: Display>(mut self, title: D) -> Self {
         self.0
-            .insert("title", Value::String(format!("{}", title)));
+            .insert("title", Value::String(title.to_string()));
 
         CreateEmbed(self.0)
     }
@@ -424,7 +424,7 @@ impl CreateEmbedFooter {
 
     /// Set the footer's text.
     pub fn text<D: Display>(mut self, text: D) -> Self {
-        self.0.insert("text", Value::String(format!("{}", text)));
+        self.0.insert("text", Value::String(text.to_string()));
 
         self
     }
