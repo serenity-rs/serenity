@@ -123,6 +123,7 @@ pub struct CommandOptions {
     pub aliases: Vec<String>,
 }
 
+#[derive(Debug)]
 pub struct HelpOptions {
     /// Suggests a command's name.
     pub suggestion_text: String,
@@ -184,34 +185,6 @@ pub trait HelpCommand: Send + Sync + 'static {
 impl HelpCommand for Arc<Help> {
     fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions, hm: HashMap<String, Arc<CommandGroup>>, a: Args) -> Result<(), Error> {
         (self.0)(c, m, ho, hm, a)
-    }
-}
-
-impl fmt::Debug for HelpOptions {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        fmt.debug_struct("HelpOptions")
-            .field("suggestion_text", &self.suggestion_text)
-            .field("no_help_available_text", &self.no_help_available_text)
-            .field("usage_label", &self.usage_label)
-            .field("usage_sample_label", &self.usage_sample_label)
-            .field("ungrouped_label", &self.ungrouped_label)
-            .field("grouped_label", &self.grouped_label)
-            .field("aliases_label", &self.aliases_label)
-            .field("description_label", &self.description_label)
-            .field("guild_only_text", &self.guild_only_text)
-            .field("dm_only_text", &self.dm_only_text)
-            .field("dm_and_guilds_text", &self.dm_and_guild_text)
-            .field("available_text", &self.available_text)
-            .field("command_not_found_text", &self.command_not_found_text)
-            .field("individual_command_tip", &self.individual_command_tip)
-            .field("group_prefix", &self.suggestion_text)
-            .field("striked_commands_tips", &self.striked_commands_tip)
-            .field("lacking_role", &self.lacking_role)
-            .field("lacking_permissions", &self.lacking_permissions)
-            .field("wrong_channel", &self.wrong_channel)
-            .field("embed_error_colour", &self.embed_error_colour)
-            .field("embed_success_colour", &self.embed_success_colour)
-            .finish()
     }
 }
 
