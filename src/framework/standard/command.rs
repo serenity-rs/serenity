@@ -129,9 +129,9 @@ pub struct HelpOptions {
     pub suggestion_text: String,
     /// If no help is available, this text will be displayed.
     pub no_help_available_text: String,
-    /// How to use a command, `{usage_embed_label}: {command_name} {args}`
+    /// How to use a command, `{usage_label}: {command_name} {args}`
     pub usage_label: String,
-    /// Actual sample label, `{sample_embed_label}: {command_name} {args}`
+    /// Actual sample label, `{usage_sample_label}: {command_name} {args}`
     pub usage_sample_label: String,
     /// Text labeling ungrouped commands, `{ungrouped_label}: ...`
     pub ungrouped_label: String,
