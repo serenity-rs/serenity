@@ -4,21 +4,28 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fmt::{Debug, Formatter};
 use std::sync::Arc;
-use super::{Args, Configuration};
+use utils::Colour;
+use super::{Args, Configuration, HelpBehaviour};
 
 pub type Check = Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
                      + Send
                      + Sync
                      + 'static;
 
-pub type HelpFunction = fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
+pub type HelpFunction = fn(&mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, Args)
                    -> Result<(), Error>;
 
-pub struct Help(pub HelpFunction);
+pub struct Help(pub HelpFunction, pub Arc<HelpOptions>);
 
 impl Debug for Help {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f, "fn()")
+    }
+}
+
+impl HelpCommand for Help {
+    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions,hm: HashMap<String, Arc<CommandGroup>>, a: Args) -> Result<(), Error> {
+        (self.0)(c, m, ho, hm, a)
     }
 }
 
@@ -116,6 +123,128 @@ pub struct CommandOptions {
     pub aliases: Vec<String>,
 }
 
+pub struct HelpOptions {
+    /// Suggests a command's name.
+    pub suggestion_text: String,
+    /// If no help is available, this text will be displayed.
+    pub no_help_available_text: String,
+    /// How to use a command, `{usage_embed_label}: {command_name} {args}`
+    pub usage_label: String,
+    /// Actual sample label, `{sample_embed_label}: {command_name} {args}`
+    pub usage_sample_label: String,
+    /// Text labeling ungrouped commands, `{ungrouped_label}: ...`
+    pub ungrouped_label: String,
+    /// Text labeling the start of the description.
+    pub description_label: String,
+    /// Text labeling grouped commands, `{grouped_label} {group_name}: ...`
+    pub grouped_label: String,
+    /// Text labeling a command's alternative names (aliases).
+    pub aliases_label: String,
+    /// Text specifying that a command is only usable in a guild.
+    pub guild_only_text: String,
+    /// Text specifying that a command is only usable in via DM.
+    pub dm_only_text: String,
+    /// Text specifying that a command can be used via DM and in guilds.
+    pub dm_and_guild_text: String,
+    /// Text expressing that a command is available.
+    pub available_text: String,
+    /// Error-message once a command could not be found.
+    /// Output-example (without whitespace between both substitutions: `{command_not_found_text}{command_name}`
+    /// `{command_name}` describes user's input as in: `{prefix}help {command_name}`.
+    pub command_not_found_text: String,
+    /// Explains the user on how to use access a single command's details.
+    pub individual_command_tip: String,
+    /// Explains reasoning behind striked commands, see fields requiring `HelpBehaviour` for further information.
+    /// If `HelpBehaviour::Strike` is unused, this field will evaluate to `None` during creation
+    /// inside of `CreateHelpCommand`.
+    pub striked_commands_tip: Option<String>,
+    /// Announcing a group's prefix as in: {group_prefix} {prefix}.
+    pub group_prefix: String,
+    /// If a user lacks required roles, this will treat how these commands will be displayed.
+    pub lacking_role: HelpBehaviour,
+    /// If a user lacks permissions, this will treat how these commands will be displayed.
+    pub lacking_permissions: HelpBehaviour,
+    /// If a user is using the help-command in a channel where a command is not available,
+    /// this behaviour will be executed.
+    pub wrong_channel: HelpBehaviour,
+    /// Colour help-embed will use upon encountering an error.
+    pub embed_error_colour: Colour,
+    /// Colour help-embed will use if no error occured.
+    pub embed_success_colour: Colour,
+}
+
+pub trait HelpCommand: Send + Sync + 'static {
+    fn execute(&self, &mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, Args) -> Result<(), Error>;
+
+    fn options(&self) -> Arc<CommandOptions> {
+        Arc::clone(&DEFAULT_OPTIONS)
+    }
+}
+
+impl HelpCommand for Arc<Help> {
+    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions, hm: HashMap<String, Arc<CommandGroup>>, a: Args) -> Result<(), Error> {
+        (self.0)(c, m, ho, hm, a)
+    }
+}
+
+impl fmt::Debug for HelpOptions {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        fmt.debug_struct("HelpOptions")
+            .field("suggestion_text", &self.suggestion_text)
+            .field("no_help_available_text", &self.no_help_available_text)
+            .field("usage_label", &self.usage_label)
+            .field("usage_sample_label", &self.usage_sample_label)
+            .field("ungrouped_label", &self.ungrouped_label)
+            .field("grouped_label", &self.grouped_label)
+            .field("aliases_label", &self.aliases_label)
+            .field("description_label", &self.description_label)
+            .field("guild_only_text", &self.guild_only_text)
+            .field("dm_only_text", &self.dm_only_text)
+            .field("dm_and_guilds_text", &self.dm_and_guild_text)
+            .field("available_text", &self.available_text)
+            .field("command_not_found_text", &self.command_not_found_text)
+            .field("individual_command_tip", &self.individual_command_tip)
+            .field("group_prefix", &self.suggestion_text)
+            .field("striked_commands_tips", &self.striked_commands_tip)
+            .field("lacking_role", &self.lacking_role)
+            .field("lacking_permissions", &self.lacking_permissions)
+            .field("wrong_channel", &self.wrong_channel)
+            .field("embed_error_colour", &self.embed_error_colour)
+            .field("embed_success_colour", &self.embed_success_colour)
+            .finish()
+    }
+}
+
+impl Default for HelpOptions {
+    fn default() -> HelpOptions {
+        HelpOptions {
+            suggestion_text: "Did you mean {}?".to_string(),
+            no_help_available_text: "**Error**: No help available.".to_string(),
+            usage_label: "Usage".to_string(),
+            usage_sample_label: "Sample usage".to_string(),
+            ungrouped_label: "Ungrouped".to_string(),
+            grouped_label: "Group".to_string(),
+            aliases_label: "Aliases".to_string(),
+            description_label: "Description".to_string(),
+            guild_only_text: "Only in guilds".to_string(),
+            dm_only_text: "Only in DM".to_string(),
+            dm_and_guild_text: "In DM and guilds".to_string(),
+            available_text: "Available".to_string(),
+            command_not_found_text: "**Error**: Command `{}` not found.".to_string(),
+            individual_command_tip: "To get help with an individual command, pass its \
+                 name as an argument to this command.".to_string(),
+            group_prefix: "Prefix".to_string(),
+            striked_commands_tip: Some(String::new()),
+            lacking_role: HelpBehaviour::Strike,
+            lacking_permissions: HelpBehaviour::Strike,
+            wrong_channel: HelpBehaviour::Strike,
+            embed_error_colour: Colour::dark_red(),
+            embed_success_colour: Colour::rosewater(),
+        }
+    }
+}
+
+
 lazy_static! {
     static ref DEFAULT_OPTIONS: Arc<CommandOptions> = Arc::new(CommandOptions::default());
 }
@@ -151,7 +280,7 @@ impl Command for Arc<Command> {
         (**self).init()
     }
 
-    fn before(&self, c: &mut Context, m: &Message) -> bool { 
+    fn before(&self, c: &mut Context, m: &Message) -> bool {
         (**self).before(c, m)
     }
 
@@ -173,7 +302,7 @@ impl Command for Box<Command> {
         (**self).init()
     }
 
-    fn before(&self, c: &mut Context, m: &Message) -> bool { 
+    fn before(&self, c: &mut Context, m: &Message) -> bool {
         (**self).before(c, m)
     }
 
@@ -182,9 +311,9 @@ impl Command for Box<Command> {
     }
 }
 
-impl<F> Command for F where F: Fn(&mut Context, &Message, Args) -> Result<(), Error> 
-    + Send 
-    + Sync 
+impl<F> Command for F where F: Fn(&mut Context, &Message, Args) -> Result<(), Error>
+    + Send
+    + Sync
     + ?Sized
     + 'static {
     fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), Error> {

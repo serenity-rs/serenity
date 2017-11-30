@@ -114,22 +114,22 @@ impl CreateCommand {
 
         self
     }
-    
+
     /// Like [`exec`] but accepts a `Command` directly.
     ///
     /// [`exec`]: #method.exec
     pub fn cmd<C: Command + 'static>(mut self, c: C) -> Self {
         self.1 = FnOrCommand::Command(Arc::new(c));
-        
+
         self
     }
-    
+
     /// Like [`cmd`] but says to the builder to use this command's options instead of its own.
     ///
     /// [`cmd`]: #method.cmd
     pub fn cmd_with_options<C: Command + 'static>(mut self, c: C) -> Self {
         self.1 = FnOrCommand::CommandWithOptions(Arc::new(c));
-        
+
         self
     }
 

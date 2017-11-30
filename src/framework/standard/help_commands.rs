@@ -29,13 +29,13 @@ use model::{ChannelId, Message};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::fmt::Write;
-use super::command::InternalCommand;
-use super::{Args, CommandGroup, CommandOrAlias, CommandOptions, CommandError};
+use super::command::{InternalCommand};
+use super::{Args, CommandGroup, CommandOrAlias, HelpOptions, CommandOptions, CommandError, HelpBehaviour};
 use utils::Colour;
 
-fn error_embed(channel_id: &ChannelId, input: &str) {
+fn error_embed(channel_id: &ChannelId, input: &str, colour: Colour) {
     let _ = channel_id.send_message(|m| {
-        m.embed(|e| e.colour(Colour::dark_red()).description(input))
+        m.embed(|e| e.colour(colour).description(input))
     });
 }
 
@@ -92,6 +92,7 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
 /// ```
 pub fn with_embeds(_: &mut Context,
                    msg: &Message,
+                   help_options: &HelpOptions,
                    groups: HashMap<String, Arc<CommandGroup>>,
                    args: Args)
                    -> Result<(), CommandError> {
@@ -130,7 +131,7 @@ pub fn with_embeds(_: &mut Context,
                                 },
 
                                 CommandOrAlias::Alias(ref name) => {
-                                    let _ = msg.channel_id.say(&format!("Did you mean {:?}?", name));
+                                    let _ = msg.channel_id.say(help_options.suggestion_text.replace("{}", name));
                                     return Ok(());
                                 },
                             }
@@ -142,50 +143,50 @@ pub fn with_embeds(_: &mut Context,
             if let Some((command_name, command)) = found {
                 let command = command.options();
                 if !command.help_available {
-                    error_embed(&msg.channel_id, "**Error**: No help available.");
+                    error_embed(&msg.channel_id, &help_options.no_help_available_text, help_options.embed_error_colour);
 
                     return Ok(());
                 }
 
                 let _ = msg.channel_id.send_message(|m| {
                     m.embed(|e| {
-                        let mut embed = e.colour(Colour::rosewater()).title(command_name);
+                        let mut embed = e.colour(help_options.embed_success_colour.clone()).title(command_name.clone());
 
                         if let Some(ref desc) = command.desc {
                             embed = embed.description(desc);
                         }
 
                         if let Some(ref usage) = command.usage {
-                            let value = format!("`{} {}`", command_name, usage);
+                            let value = format!("`{} {}`", command_name.clone(), usage);
 
-                            embed = embed.field("Usage", value, true);
+                            embed = embed.field(&help_options.usage_label, value, true);
                         }
 
                         if let Some(ref example) = command.example {
-                            let value = format!("`{} {}`", command_name, example);
+                            let value = format!("`{} {}`", command_name.clone(), example);
 
-                            embed = embed.field("Sample usage", value, true);
+                            embed = embed.field(&help_options.usage_sample_label, value, true);
                         }
 
                         if group_name != "Ungrouped" {
-                            embed = embed.field("Group", group_name, true);
+                            embed = embed.field(&help_options.grouped_label, group_name, true);
                         }
 
                         if !command.aliases.is_empty() {
                             let aliases = command.aliases.join(", ");
 
-                            embed = embed.field("Aliases", aliases, true);
+                            embed = embed.field(&help_options.aliases_label, aliases, true);
                         }
 
                         let available = if command.dm_only {
-                            "Only in DM"
+                            &help_options.dm_only_text
                         } else if command.guild_only {
-                            "Only in guilds"
+                            &help_options.guild_only_text
                         } else {
-                            "In DM and guilds"
+                            &help_options.dm_and_guild_text
                         };
 
-                        embed = embed.field("Available", available, true);
+                        embed = embed.field(&help_options.available_text, available, true);
 
                         embed
                     })
@@ -195,18 +196,24 @@ pub fn with_embeds(_: &mut Context,
             }
         }
 
-        let error_msg = format!("**Error**: Command `{}` not found.", name);
-        error_embed(&msg.channel_id, &error_msg);
+        let error_msg = help_options.command_not_found_text.replace("{}", &name);
+        error_embed(&msg.channel_id, &error_msg, help_options.embed_error_colour);
 
         return Ok(());
     }
 
     let _ = msg.channel_id.send_message(|m| {
         m.embed(|mut e| {
-            e = e.colour(Colour::rosewater()).description(
-                "To get help with an individual command, pass its \
-                 name as an argument to this command.",
-            );
+
+            if let Some(striked_command_text) = help_options.striked_commands_tip.clone() {
+                e = e.colour(help_options.embed_success_colour).description(
+                    format!("{}\n{}", &help_options.individual_command_tip, &striked_command_text),
+                );
+            } else {
+                e = e.colour(help_options.embed_success_colour).description(
+                    &help_options.individual_command_tip,
+                );
+            }
 
             let mut group_names = groups.keys().collect::<Vec<_>>();
             group_names.sort();
@@ -216,7 +223,7 @@ pub fn with_embeds(_: &mut Context,
                 let mut desc = String::new();
 
                 if let Some(ref x) = group.prefix {
-                    let _ = write!(desc, "Prefix: {}\n", x);
+                    let _ = write!(desc, "{}: `{}`\n", &help_options.group_prefix, x);
                 }
 
                 let mut has_commands = false;
@@ -229,9 +236,41 @@ pub fn with_embeds(_: &mut Context,
                     let cmd = &commands[name];
                     let cmd = cmd.options();
 
-                    if cmd.help_available && has_all_requirements(&cmd, msg) {
-                        let _ = write!(desc, "`{}`\n", name);
-                        has_commands = true;
+                    if !cmd.dm_only && !cmd.guild_only || cmd.dm_only && msg.is_private() || cmd.guild_only && !msg.is_private() {
+                        if cmd.help_available && has_correct_permissions(&cmd, msg) {
+                            let _ = write!(desc, "`{}`\n", name);
+                            has_commands = true;
+                        } else {
+                            match help_options.lacking_permissions {
+                                HelpBehaviour::Strike => {
+                                    let name = format!("~~`{}`~~", &name);
+                                    let _ = write!(desc, "{}\n", name);
+                                    has_commands = true;
+                                },
+                                HelpBehaviour::Nothing => {
+                                    let _ = write!(desc, "`{}`\n", name);
+                                    has_commands = true;
+                                },
+                                HelpBehaviour::Hide => {
+                                    continue;
+                                },
+                            }
+                        }
+                    } else {
+                        match help_options.wrong_channel {
+                            HelpBehaviour::Strike => {
+                                let name = format!("~~`{}`~~", &name);
+                                let _ = write!(desc, "{}\n", name);
+                                has_commands = true;
+                            },
+                            HelpBehaviour::Nothing => {
+                                let _ = write!(desc, "`{}`\n", name);
+                                has_commands = true;
+                            },
+                            HelpBehaviour::Hide => {
+                                continue;
+                            },
+                        }
                     }
                 }
 
@@ -266,6 +305,7 @@ pub fn with_embeds(_: &mut Context,
 /// ```
 pub fn plain(_: &mut Context,
              msg: &Message,
+             help_options: &HelpOptions,
              groups: HashMap<String, Arc<CommandGroup>>,
              args: Args)
              -> Result<(), CommandError> {
@@ -306,7 +346,7 @@ pub fn plain(_: &mut Context,
                                 },
 
                                 CommandOrAlias::Alias(ref name) => {
-                                    let _ = msg.channel_id.say(&format!("Did you mean {:?}?", name));
+                                    let _ = msg.channel_id.say(help_options.suggestion_text.replace("{}", name));
                                     return Ok(());
                                 },
                             }
@@ -319,7 +359,7 @@ pub fn plain(_: &mut Context,
                 let command = command.options();
 
                 if !command.help_available {
-                    let _ = msg.channel_id.say("**Error**: No help available.");
+                    let _ = msg.channel_id.say(&help_options.no_help_available_text);
                     return Ok(());
                 }
 
@@ -327,36 +367,36 @@ pub fn plain(_: &mut Context,
 
                 if !command.aliases.is_empty() {
                     let aliases = command.aliases.join("`, `");
-                    let _ = write!(result, "**Aliases:** `{}`\n", aliases);
+                    let _ = write!(result, "**{}:** `{}`\n", help_options.aliases_label, aliases);
                 }
 
                 if let Some(ref desc) = command.desc {
-                    let _ = write!(result, "**Description:** {}\n", desc);
+                    let _ = write!(result, "**{}:** {}\n", help_options.description_label, desc);
                 }
 
                 if let Some(ref usage) = command.usage {
-                    let _ = write!(result, "**Usage:** `{} {}`\n", command_name, usage);
+                    let _ = write!(result, "**{}:** `{} {}`\n", help_options.usage_label, command_name, usage);
                 }
 
                 if let Some(ref example) = command.example {
-                    let _ = write!(result, "**Sample usage:** `{} {}`\n", command_name, example);
+                    let _ = write!(result, "**{}:** `{} {}`\n", help_options.usage_sample_label, command_name, example);
                 }
 
                 if group_name != "Ungrouped" {
-                    let _ = write!(result, "**Group:** {}\n", group_name);
+                    let _ = write!(result, "**{}:** {}\n", help_options.grouped_label, group_name);
                 }
 
                 let only = if command.dm_only {
-                    "Only in DM"
+                    &help_options.dm_only_text
                 } else if command.guild_only {
-                    "Only in guilds"
+                    &help_options.guild_only_text
                 } else {
-                    "In DM and guilds"
+                    &help_options.dm_and_guild_text
                 };
 
-                result.push_str("**Available:** ");
+                result.push_str(&format!("**{}:** ", &help_options.available_text));
                 result.push_str(only);
-                result.push_str("\n");
+                result.push_str(".\n");
 
                 let _ = msg.channel_id.say(&result);
 
@@ -365,13 +405,12 @@ pub fn plain(_: &mut Context,
         }
 
         let _ = msg.channel_id
-            .say(&format!("**Error**: Command `{}` not found.", name));
+            .say(&help_options.suggestion_text.replace("{}", &name));
 
         return Ok(());
     }
 
-    let mut result = "**Commands**\nTo get help with an individual command, pass its \
-                      name as an argument to this command.\n\n"
+    let mut result = format!("**Commands**\n{}\n\n", help_options.individual_command_tip)
         .to_string();
 
     let mut group_names = groups.keys().collect::<Vec<_>>();
@@ -398,7 +437,7 @@ pub fn plain(_: &mut Context,
             let _ = write!(result, "**{}:** ", group_name);
 
             if let Some(ref x) = group.prefix {
-                let _ = write!(result, "(prefix: `{}`): ", x);
+                let _ = write!(result, "({}: `{}`): ", help_options.group_prefix, x);
             }
 
             result.push_str(&group_help);
