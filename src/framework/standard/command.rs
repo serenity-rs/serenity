@@ -182,9 +182,9 @@ pub trait HelpCommand: Send + Sync + 'static {
     }
 }
 
-impl HelpCommand for Arc<Help> {
+impl HelpCommand for Arc<HelpCommand> {
     fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions, hm: HashMap<String, Arc<CommandGroup>>, a: Args) -> Result<(), Error> {
-        (self.0)(c, m, ho, hm, a)
+        (**self).execute(c, m, ho, hm, a)
     }
 }
 
