@@ -179,7 +179,7 @@ impl CreateHelpCommand {
             let mut concat_with_comma = false;
 
             if self.0.lacking_permissions == HelpBehaviour::Strike {
-                let _ = write!(strike_text, "require permissions");
+                let _ = write!(strike_text, " require permissions");
                 concat_with_comma = true;
             }
 
@@ -196,7 +196,7 @@ impl CreateHelpCommand {
             if self.0.wrong_channel == HelpBehaviour::Strike {
 
                 if concat_with_comma {
-                    let _ = write!(strike_text, " and are limited to DM/guilds");
+                    let _ = write!(strike_text, " or are limited to DM/guilds");
                 } else {
                     let _ = write!(strike_text, " are limited to DM/guilds");
                 }
