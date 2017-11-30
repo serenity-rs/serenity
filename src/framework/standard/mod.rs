@@ -4,16 +4,18 @@ pub mod help_commands;
 mod command;
 mod configuration;
 mod create_command;
+mod create_help_command;
 mod create_group;
 mod buckets;
 mod args;
 
 pub use self::args::{Args, Iter, FromStrZc, Error as ArgError};
 pub(crate) use self::buckets::{Bucket, Ratelimit};
-pub(crate) use self::command::{Help, HelpFunction};
-pub use self::command::{Command, CommandGroup, CommandOptions, Error as CommandError};
+pub(crate) use self::command::{Help};
+pub use self::command::{HelpFunction, HelpOptions, Command, CommandGroup, CommandOptions, Error as CommandError};
 pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
+pub use self::create_help_command::CreateHelpCommand;
 pub use self::create_command::{CreateCommand, FnOrCommand};
 pub use self::create_group::CreateGroup;
 
@@ -653,7 +655,7 @@ impl StandardFramework {
                 group
                     .commands
                     .insert(name.to_string(), CommandOrAlias::Command(Arc::clone(&cmd)));
-                
+
                 cmd.init();
             }
         }
@@ -703,19 +705,12 @@ impl StandardFramework {
                 group
                     .commands
                     .insert(name, CommandOrAlias::Command(Arc::clone(&cmd)));
-                
+
                 cmd.init();
             }
         }
 
         self.initialized = true;
-
-        self
-    }
-
-    /// Sets what code should be execute when a user requests for `(prefix)help`.
-    pub fn help(mut self, f: HelpFunction) -> Self {
-        self.help = Some(Arc::new(Help(f)));
 
         self
     }
@@ -881,6 +876,27 @@ impl StandardFramework {
 
         self
     }
+
+    /// Sets what code should be executed when a user sends `(prefix)help`.
+    pub fn help(mut self, f: HelpFunction) -> Self {
+        let a = CreateHelpCommand(HelpOptions::default(), f).finish();
+
+        self.help = Some(a);
+
+        self
+    }
+
+    /// Sets what code should be executed when sends `(prefix)help`.
+    /// Additionally takes a closure with a `CreateHelpCommand` in order
+    /// to alter help-commands.
+    pub fn customised_help<F>(mut self, f: HelpFunction, c: F) -> Self
+        where F: FnOnce(CreateHelpCommand) -> CreateHelpCommand {
+        let a = c(CreateHelpCommand(HelpOptions::default(), f));
+
+        self.help = Some(a.finish());
+
+        self
+    }
 }
 
 impl Framework for StandardFramework {
@@ -964,16 +980,19 @@ impl Framework for StandardFramework {
                     // This is a special case.
                     if to_check == "help" {
                         let help = self.help.clone();
+
                         if let Some(help) = help {
                             let groups = self.groups.clone();
                             threadpool.execute(move || {
+
                                 if let Some(before) = before {
+
                                     if !(before)(&mut context, &message, &built) {
                                         return;
                                     }
                                 }
 
-                                let result = (help.0)(&mut context, &message, groups, args);
+                                let result = (help.0)(&mut context, &message, &help.1, groups, args);
 
                                 if let Some(after) = after {
                                     (after)(&mut context, &message, &built, result);
@@ -1016,7 +1035,7 @@ impl Framework for StandardFramework {
                             let result = command.execute(&mut context, &message, args);
 
                             command.after(&mut context, &message, &result);
-                            
+
                             if let Some(after) = after {
                                 (after)(&mut context, &message, &built, result);
                             }
@@ -1054,4 +1073,29 @@ pub fn has_correct_roles(cmd: &Arc<CommandOptions>, guild: &Guild, member: &Memb
             .iter()
             .flat_map(|r| guild.role_by_name(r))
             .any(|g| member.roles.contains(&g.id))
+}
+
+/// Describes the behaviour the help-command shall execute once it encounters
+/// a command which the user or command fails to meet following criteria :
+/// Lacking required permissions to execute the command.
+/// Lacking required roles to execute the command.
+/// The command can't be used in the current channel (as in `DM only` or `guild only`).
+#[derive(PartialEq, Debug)]
+pub enum HelpBehaviour {
+    /// Strikes a command by applying `~~{comand_name}~~`.
+    Strike,
+    /// Does not list a command in the help-menu.
+    Hide,
+    /// The command will be displayed, hence nothing will be done.
+    Nothing
+}
+
+impl fmt::Display for HelpBehaviour {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+       match *self {
+           HelpBehaviour::Strike => write!(f, "HelpBehaviour::Strike"),
+           HelpBehaviour::Hide => write!(f, "HelpBehaviour::Hide"),
+           HelpBehaviour::Nothing => write!(f, "HelBehaviour::Nothing"),
+       }
+    }
 }

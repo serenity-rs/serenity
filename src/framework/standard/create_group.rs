@@ -1,6 +1,6 @@
 pub use super::command::{Command, CommandGroup, CommandOptions, Error as CommandError};
 pub(crate) use super::command::CommandOrAlias;
-pub(crate) use super::command::{Help, HelpFunction};
+pub use super::create_help_command::{CreateHelpCommand};
 pub use super::create_command::{CreateCommand, FnOrCommand};
 pub use super::Args;
 
@@ -86,13 +86,6 @@ impl CreateGroup {
             .insert(name.to_string(), CommandOrAlias::Command(Arc::clone(&cmd)));
 
         cmd.init();
-
-        self
-    }
-
-    /// Sets what code should be execute when a user requests for `(prefix)help`.
-    pub fn help(mut self, f: HelpFunction) -> Self {
-        self.0.help = Some(Arc::new(Help(f)));
 
         self
     }
