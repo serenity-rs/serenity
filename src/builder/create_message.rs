@@ -48,7 +48,7 @@ impl CreateMessage {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     pub fn content<D: Display>(mut self, content: D) -> Self {
-        self.0.insert("content", Value::String(format!("{}", content)));
+        self.0.insert("content", Value::String(content.to_string()));
 
         CreateMessage(self.0, self.1)
     }

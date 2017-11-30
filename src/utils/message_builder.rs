@@ -934,7 +934,7 @@ impl<T: fmt::Display> I for T {
             italic: false,
             bold: false,
             strikethrough: false,
-            inner: format!("{}", self),
+            inner: self.to_string(),
             code: false,
             underline: false,
         }
