@@ -294,7 +294,7 @@ impl Permissions {
     pub fn connect(&self) -> bool { self.contains(Self::CONNECT) }
 
     /// Shorthand for checking that the set of permissions contains the
-    /// [View Audit Log] permissions.
+    /// [View Audit Log] permission.
     ///
     /// [View Audit Log]: constant.VIEW_AUDIT_LOG.html
     pub fn view_audit_log(&self) -> bool { self.contains(Self::VIEW_AUDIT_LOG) }
