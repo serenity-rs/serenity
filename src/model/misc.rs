@@ -228,25 +228,74 @@ impl FromStr for EmojiIdentifier {
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
-impl FromStr for ChannelId {
-    type Err = ();
+#[derive(Debug)]
+pub enum ChannelIdParseError {
+    InvalidFormat,
+}
 
-    fn from_str(s: &str) -> StdResult<Self, ()> {
-        utils::parse_channel(s).ok_or_else(|| ()).map(ChannelId)
+#[cfg(all(feature = "model", feature = "utils"))]
+impl fmt::Display for ChannelIdParseError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.description()) }
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl StdError for ChannelIdParseError {
+    fn description(&self) -> &str {
+        use self::ChannelIdParseError::*;
+
+        match *self {
+            InvalidFormat => "invalid channel id format",
+        }
+    }
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl FromStr for ChannelId {
+    type Err = ChannelIdParseError;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        Ok(match utils::parse_channel(s) {
+            Some(channel) => ChannelId(channel),
+            None => s.parse::<u64>().map(ChannelId).map_err(|_| ChannelIdParseError::InvalidFormat)?,
+        })
+    }
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+#[derive(Debug)]
+pub enum ChannelParseError {
+    NotPresentInCache,
+    InvalidChannel,
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+impl fmt::Display for ChannelParseError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.description()) }
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+impl StdError for ChannelParseError {
+    fn description(&self) -> &str {
+        use self::ChannelParseError::*;
+
+        match *self {
+            NotPresentInCache => "not present in cache",
+            InvalidChannel => "invalid channel",
+        }
     }
 }
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 impl FromStr for Channel {
-    type Err = ();
+    type Err = ChannelParseError;
 
-    fn from_str(s: &str) -> StdResult<Self, ()> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match utils::parse_channel(s) {
             Some(x) => match ChannelId(x).find() {
                 Some(channel) => Ok(channel),
-                _ => Err(()),
+                _ => Err(ChannelParseError::NotPresentInCache),
             },
-            _ => Err(()),
+            _ => Err(ChannelParseError::InvalidChannel),
         }
     }
 }
