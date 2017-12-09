@@ -67,7 +67,7 @@ macro_rules! id_u64 {
                     self
                 }
             }
-            
+
             impl From<u64> for $name {
                 fn from(id_as_u64: u64) -> $name {
                     $name(id_as_u64)
@@ -94,7 +94,7 @@ macro_rules! id_u64 {
 
             impl<'de> Deserialize<'de> for $name {
                 fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-                    deserializer.deserialize_u64(U64Visitor).map($name)
+                    deserializer.deserialize_any(U64Visitor).map($name)
                 }
             }
         )*
