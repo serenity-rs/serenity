@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.4.4] - 2017-12-09
+
+This release contains a hotfix for snowflake deserialization on `serde_json`
+v1.0.8. Primary development is continuing on the v0.5.x branch and the
+[library organization].
+
+### Fixed
+
+- [model] Fix snowflake deserializer [c:77f462e]
+
 ## [0.4.3] - 2017-11-01
 
 This release contains bugfixes and marks the final release of the v0.4.x branch.
@@ -1511,6 +1521,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.4.4]: https://github.com/zeyla/serenity/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/zeyla/serenity/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/zeyla/serenity/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/zeyla/serenity/compare/v0.4.0...v0.4.1
@@ -1524,6 +1535,7 @@ Initial commit.
 [0.1.1]: https://github.com/zeyla/serenity/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/zeyla/serenity/tree/403d65d5e98bdfa9f0c018610000c4a0b0c7d8d5
 [crates.io listing]: https://crates.io/crates/serenity
+[library organization]: https://github.com/serenity-rs
 [semver]: http://semver.org
 
 [issue:56]: https://github.com/zeyla/serenity/issues/56
@@ -1561,6 +1573,8 @@ Initial commit.
 [@UninterestinAcc]: https://github.com/UninterestinAcc
 [@xentec]: https://github.com/xentec
 [@zeyla]: https://github.com/zeyla
+
+[c:77f462e]: https://github.com/zeyla/serenity/commit/77f462ea2044ef7d2d12fd1289ea75a6a33cb5dd
 
 [c:1b7101f]: https://github.com/zeyla/serenity/commit/1b7101fe71335c0e18bf855c0703acc23d87e427
 [c:2ba4d03]: https://github.com/zeyla/serenity/commit/2ba4d03f15d57d9f0fb1cc4d4f4355ebbc483d0a
