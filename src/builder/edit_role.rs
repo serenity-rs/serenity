@@ -38,7 +38,7 @@ use model::{permissions, Permissions, Role};
 /// [`GuildId::edit_role`]: ../model/struct.GuildId.html#method.edit_role
 /// [`Role`]: ../model/struct.Role.html
 /// [`Role::edit`]: ../model/struct.Role.html#method.edit
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct EditRole(pub JsonMap);
 
 impl EditRole {
@@ -126,33 +126,5 @@ impl EditRole {
             .insert("position".to_string(), Value::Number(Number::from(position)));
 
         self
-    }
-}
-
-impl Default for EditRole {
-    /// Creates a builder with default parameters.
-    ///
-    /// The defaults are:
-    ///
-    /// - **color**: 10070709
-    /// - **hoist**: false
-    /// - **mentionable**: false
-    /// - **name**: new role
-    /// - **permissions**: the [general permissions set]
-    /// - **position**: 1
-    ///
-    /// [general permissions set]: ../model/permissions/constant.PRESET_GENERAL.html
-    fn default() -> EditRole {
-        let mut map = Map::new();
-        let permissions = Number::from(permissions::PRESET_GENERAL.bits());
-
-        map.insert("color".to_string(), Value::Number(Number::from(10_070_709)));
-        map.insert("hoist".to_string(), Value::Bool(false));
-        map.insert("mentionable".to_string(), Value::Bool(false));
-        map.insert("name".to_string(), Value::String("new role".to_string()));
-        map.insert("permissions".to_string(), Value::Number(permissions));
-        map.insert("position".to_string(), Value::Number(Number::from(1)));
-
-        EditRole(map)
     }
 }
