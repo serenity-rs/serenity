@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.4.5] - 2017-12-09
+
+This release contains a hotfix for the hotfix release, as well as a slight
+behaviour change to the `EditRole` builder.
+
+The last release contained a deserialization implementation fix which seemed to
+work after running tests, but it turns out that not all deserialization issues
+were fixed.
+
+The `EditRole` builder's Default implementation no longer sets a value for each
+field, as this causes problems with stateless editing of roles.
+
+### Fixed
+
+- [model] Fix remaining deserializers [c:52403a5]
+
+### Changed
+
+- [builder] Remove `EditRole::default` implementation [c:795eaa1]
+
 ## [0.4.4] - 2017-12-09
 
 This release contains a hotfix for snowflake deserialization on `serde_json`
@@ -1573,6 +1593,9 @@ Initial commit.
 [@UninterestinAcc]: https://github.com/UninterestinAcc
 [@xentec]: https://github.com/xentec
 [@zeyla]: https://github.com/zeyla
+
+[c:52403a5]: https://github.com/zeyla/serenity/commit/52403a5084ed7f0589bde3351844907a92de2d62
+[c:795eaa1]: https://github.com/zeyla/serenity/commit/795eaa15bca61116fbde9c2482c765f2d47a7696
 
 [c:77f462e]: https://github.com/zeyla/serenity/commit/77f462ea2044ef7d2d12fd1289ea75a6a33cb5dd
 
