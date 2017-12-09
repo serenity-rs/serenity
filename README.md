@@ -82,7 +82,7 @@ serenity = "0.4"
 
 and to the top of your `main.rs`:
 
-```rs
+```rust,ignore
 #[macro_use] extern crate serenity;
 ```
 
