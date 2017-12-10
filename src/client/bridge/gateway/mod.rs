@@ -99,6 +99,10 @@ pub enum ShardManagerMessage {
     /// [`ShardManager`]: struct.ShardManager.html
     /// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html
     ShutdownAll,
+    /// Indicator that a [`ShardManager`] has initiated a shutdown, and for the
+    /// component that receives this to also shutdown with no further action
+    /// taken.
+    ShutdownInitiated,
 }
 
 /// A message to be sent to the [`ShardQueuer`].

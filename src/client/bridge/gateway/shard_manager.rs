@@ -92,6 +92,7 @@ use framework::Framework;
 /// [`Client`]: ../../struct.Client.html
 #[derive(Debug)]
 pub struct ShardManager {
+    monitor_tx: Sender<ShardManagerMessage>,
     /// The shard runners currently managed.
     ///
     /// **Note**: It is highly unrecommended to mutate this yourself unless you
@@ -146,6 +147,7 @@ impl ShardManager {
         });
 
         let manager = Arc::new(Mutex::new(Self {
+            monitor_tx: thread_tx,
             shard_queuer: shard_queue_tx,
             runners,
             shard_index,
@@ -194,6 +196,7 @@ impl ShardManager {
         });
 
         let manager = Arc::new(Mutex::new(Self {
+            monitor_tx: thread_tx,
             shard_queuer: shard_queue_tx,
             runners,
             shard_index,
@@ -352,6 +355,9 @@ impl ShardManager {
         for shard_id in keys {
             self.shutdown(shard_id);
         }
+
+        let _ = self.shard_queuer.send(ShardQueuerMessage::Shutdown);
+        let _ = self.monitor_tx.send(ShardManagerMessage::ShutdownInitiated);
     }
 
     fn boot(&mut self, shard_info: [ShardId; 2]) {

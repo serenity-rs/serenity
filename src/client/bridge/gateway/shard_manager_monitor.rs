@@ -48,6 +48,7 @@ impl ShardManagerMonitor {
 
                     break;
                 },
+                ShardManagerMessage::ShutdownInitiated => break,
             }
         }
     }

@@ -849,7 +849,7 @@ impl Client {
 
         self.shard_manager_worker.run();
 
-        Err(Error::Client(ClientError::Shutdown))
+        Ok(())
     }
 }
 

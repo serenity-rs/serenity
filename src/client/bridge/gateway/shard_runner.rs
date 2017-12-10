@@ -240,6 +240,11 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 
                     true
                 },
+                ShardManagerMessage::ShutdownInitiated => {
+                    // nb: not sent here
+
+                    true
+                },
             }
             ShardClientMessage::Runner(x) => match x {
                 ShardRunnerMessage::ChunkGuilds { guild_ids, limit, query } => {
