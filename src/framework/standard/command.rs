@@ -262,28 +262,6 @@ impl Command for Arc<Command> {
     }
 }
 
-impl Command for Box<Command> {
-    fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), Error> {
-        (**self).execute(c, m, a)
-    }
-
-    fn options(&self) -> Arc<CommandOptions> {
-        (**self).options()
-    }
-
-    fn init(&self) {
-        (**self).init()
-    }
-
-    fn before(&self, c: &mut Context, m: &Message) -> bool {
-        (**self).before(c, m)
-    }
-
-    fn after(&self, c: &mut Context, m: &Message, res: &Result<(), Error>) {
-        (**self).after(c, m, res)
-    }
-}
-
 impl<F> Command for F where F: Fn(&mut Context, &Message, Args) -> Result<(), Error>
     + Send
     + Sync
