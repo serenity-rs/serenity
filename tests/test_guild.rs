@@ -92,10 +92,4 @@ mod model {
         gen_member().display_name() );
     }
 
-    #[test]
-
-    fn member_named_explicit_nickname() {
-        assert_eq!( gen().member_named(&"aaaa#nick".to_string()).unwrap().display_name(), 
-        gen_member().display_name() );
-    }
 }

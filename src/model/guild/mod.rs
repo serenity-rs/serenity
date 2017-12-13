@@ -762,7 +762,6 @@ impl Guild {
     ///
     /// - **username**: "zey"
     /// - **username and discriminator**: "zey#5479"
-    /// - **nickname**: "zeyla" or "zeylas#nick"
     ///
     /// [`Member`]: struct.Member.html
     pub fn member_named(&self, name: &str) -> Option<&Member> {
