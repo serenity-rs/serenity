@@ -48,6 +48,8 @@ pub struct Guild {
     /// The amount of seconds a user can not show any activity in a voice
     /// channel before being moved to an AFK channel -- if one exists.
     pub afk_timeout: u64,
+    /// Application ID of the guild creator if it is bot-created.
+    pub application_id: Option<u64>,
     /// All voice and text channels contained within a guild.
     ///
     /// This contains all channels regardless of permissions (i.e. the ability
@@ -58,6 +60,8 @@ pub struct Guild {
     pub default_message_notifications: u64,
     /// All of the guild's custom emojis.
     pub emojis: HashMap<EmojiId, Emoji>,
+    /// Default explicit content filter level.
+    pub explicit_content_filter: ExplicitContentFilter,
     /// VIP features enabled for the guild. Can be obtained through the
     /// [Discord Partnership] website.
     ///
@@ -120,6 +124,8 @@ pub struct Guild {
     ///
     /// [`InviteSplash`]: enum.Feature.html#variant.InviteSplash
     pub splash: Option<String>,
+    /// The ID of the channel to which system messages are sent.
+    pub system_channel_id: Option<ChannelId>,
     /// Indicator of the current verification level of the guild.
     pub verification_level: VerificationLevel,
     /// A mapping of of [`User`]s to their current voice state.
@@ -1420,6 +1426,11 @@ impl<'de> Deserialize<'de> for Guild {
             .ok_or_else(|| DeError::custom("expected guild afk_timeout"))
             .and_then(u64::deserialize)
             .map_err(DeError::custom)?;
+        let application_id = match map.remove("application_id") {
+            Some(v) => serde_json::from_value::<Option<u64>>(v)
+                .map_err(DeError::custom)?,
+            None => None,
+        };
         let channels = map.remove("channels")
             .ok_or_else(|| DeError::custom("expected guild channels"))
             .and_then(deserialize_guild_channels)
@@ -1433,6 +1444,12 @@ impl<'de> Deserialize<'de> for Guild {
         let emojis = map.remove("emojis")
             .ok_or_else(|| DeError::custom("expected guild emojis"))
             .and_then(deserialize_emojis)
+            .map_err(DeError::custom)?;
+        let explicit_content_filter = map.remove("explicit_content_filter")
+            .ok_or_else(|| DeError::custom(
+                "expected guild explicit_content_filter"
+            ))
+            .and_then(ExplicitContentFilter::deserialize)
             .map_err(DeError::custom)?;
         let features = map.remove("features")
             .ok_or_else(|| DeError::custom("expected guild features"))
@@ -1490,6 +1507,10 @@ impl<'de> Deserialize<'de> for Guild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
+        let system_channel_id = map.remove("system_channel_id")
+            .ok_or_else(|| DeError::custom("expected guild system_channel_id"))
+            .and_then(Option::<ChannelId>::deserialize)
+            .map_err(DeError::custom)?;
         let verification_level = map.remove("verification_level")
             .ok_or_else(|| DeError::custom("expected guild verification_level"))
             .and_then(VerificationLevel::deserialize)
@@ -1501,10 +1522,12 @@ impl<'de> Deserialize<'de> for Guild {
 
         Ok(Self {
             afk_channel_id: afk_channel_id,
+            application_id: application_id,
             afk_timeout: afk_timeout,
             channels: channels,
             default_message_notifications: default_message_notifications,
             emojis: emojis,
+            explicit_content_filter: explicit_content_filter,
             features: features,
             icon: icon,
             id: id,
@@ -1519,6 +1542,7 @@ impl<'de> Deserialize<'de> for Guild {
             region: region,
             roles: roles,
             splash: splash,
+            system_channel_id: system_channel_id,
             verification_level: verification_level,
             voice_states: voice_states,
         })
@@ -1659,6 +1683,28 @@ impl GuildStatus {
             GuildStatus::Offline(offline) => offline.id,
             GuildStatus::OnlineGuild(ref guild) => guild.id,
             GuildStatus::OnlinePartialGuild(ref partial_guild) => partial_guild.id,
+        }
+    }
+}
+
+enum_number!(
+    /// Setting used to filter explicit messages from members.
+    ExplicitContentFilter {
+        /// Don't scan any messages.
+        None = 0,
+        /// Scan messages from members without a role.
+        WithoutRole = 1,
+        /// Scan messages sent by all members.
+        All = 2,
+    }
+);
+
+impl ExplicitContentFilter {
+    pub fn num(&self) -> u64 {
+        match *self {
+            ExplicitContentFilter::None => 0,
+            ExplicitContentFilter::WithoutRole => 1,
+            ExplicitContentFilter::All => 2,
         }
     }
 }
