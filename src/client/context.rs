@@ -85,7 +85,7 @@ impl Context {
     /// ```
     #[cfg(feature = "builder")]
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser> {
-        let mut map = HashMap::new();
+        let mut map = HashMap::with_capacity(2);
 
         feature_cache! {
             {
@@ -101,8 +101,8 @@ impl Context {
 
                 map.insert("username", Value::String(user.name.clone()));
 
-                if let Some(email) = user.email.as_ref() {
-                    map.insert("email", Value::String(email.clone()));
+                if let Some(email) = user.email {
+                    map.insert("email", Value::String(email));
                 }
             }
         }
