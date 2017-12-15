@@ -58,6 +58,12 @@ fn guild_channel_1_rest() {
     p!(GuildChannel, "guild_channel_rest_1");
 }
 
+// A guild that has some application ID.
+#[test]
+fn guild_some_application_id() {
+    p!(Guild, "guild_some_application_id");
+}
+
 // A Discord API GUILD_CREATE.
 #[test]
 fn guild_create() {

@@ -105,6 +105,8 @@ macro_rules! id_u64 {
 }
 
 id_u64! {
+    /// An identifier for an Application.
+    ApplicationId;
     /// An identifier for a Channel
     ChannelId;
     /// An identifier for an Emoji

@@ -49,7 +49,7 @@ pub struct Guild {
     /// channel before being moved to an AFK channel -- if one exists.
     pub afk_timeout: u64,
     /// Application ID of the guild creator if it is bot-created.
-    pub application_id: Option<u64>,
+    pub application_id: Option<ApplicationId>,
     /// All voice and text channels contained within a guild.
     ///
     /// This contains all channels regardless of permissions (i.e. the ability
@@ -1427,7 +1427,7 @@ impl<'de> Deserialize<'de> for Guild {
             .and_then(u64::deserialize)
             .map_err(DeError::custom)?;
         let application_id = match map.remove("application_id") {
-            Some(v) => serde_json::from_value::<Option<u64>>(v)
+            Some(v) => serde_json::from_value::<Option<ApplicationId>>(v)
                 .map_err(DeError::custom)?,
             None => None,
         };
