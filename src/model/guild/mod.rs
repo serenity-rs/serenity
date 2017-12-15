@@ -57,7 +57,7 @@ pub struct Guild {
     pub channels: HashMap<ChannelId, Arc<RwLock<GuildChannel>>>,
     /// Indicator of whether notifications for all messages are enabled by
     /// default in the guild.
-    pub default_message_notifications: u64,
+    pub default_message_notifications: DefaultMessageNotificationLevel,
     /// All of the guild's custom emojis.
     pub emojis: HashMap<EmojiId, Emoji>,
     /// Default explicit content filter level.
@@ -102,7 +102,7 @@ pub struct Guild {
     ///
     /// [`Role`]: struct.Role.html
     /// [`User`]: struct.User.html
-    pub mfa_level: u64,
+    pub mfa_level: MfaLevel,
     /// The name of the guild.
     pub name: String,
     /// The Id of the [`User`] who owns the guild.
@@ -1439,7 +1439,7 @@ impl<'de> Deserialize<'de> for Guild {
             .ok_or_else(|| {
                 DeError::custom("expected guild default_message_notifications")
             })
-            .and_then(u64::deserialize)
+            .and_then(DefaultMessageNotificationLevel::deserialize)
             .map_err(DeError::custom)?;
         let emojis = map.remove("emojis")
             .ok_or_else(|| DeError::custom("expected guild emojis"))
@@ -1481,7 +1481,7 @@ impl<'de> Deserialize<'de> for Guild {
             .map_err(DeError::custom)?;
         let mfa_level = map.remove("mfa_level")
             .ok_or_else(|| DeError::custom("expected guild mfa_level"))
-            .and_then(u64::deserialize)
+            .and_then(MfaLevel::deserialize)
             .map_err(DeError::custom)?;
         let name = map.remove("name")
             .ok_or_else(|| DeError::custom("expected guild name"))
@@ -1688,6 +1688,25 @@ impl GuildStatus {
 }
 
 enum_number!(
+    /// Default message notification level for a guild.
+    DefaultMessageNotificationLevel {
+        /// Receive notifications for everything.
+        All = 0,
+        /// Receive only mentions.
+        Mentions = 1,
+    }
+);
+
+impl DefaultMessageNotificationLevel {
+    pub fn num(&self) -> u64 {
+        match *self {
+            DefaultMessageNotificationLevel::All => 0,
+            DefaultMessageNotificationLevel::Mentions => 1,
+        }
+    }
+}
+
+enum_number!(
     /// Setting used to filter explicit messages from members.
     ExplicitContentFilter {
         /// Don't scan any messages.
@@ -1705,6 +1724,25 @@ impl ExplicitContentFilter {
             ExplicitContentFilter::None => 0,
             ExplicitContentFilter::WithoutRole => 1,
             ExplicitContentFilter::All => 2,
+        }
+    }
+}
+
+enum_number!(
+    /// Multi-Factor Authentication level for guild moderators.
+    MfaLevel {
+        /// MFA is disabled.
+        None = 0,
+        /// MFA is enabled.
+        Elevated = 1,
+    }
+);
+
+impl MfaLevel {
+    pub fn num(&self) -> u64 {
+        match *self {
+            MfaLevel::None => 0,
+            MfaLevel::Elevated => 1,
         }
     }
 }

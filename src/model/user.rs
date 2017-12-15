@@ -300,20 +300,6 @@ impl DefaultAvatar {
     pub fn name(&self) -> Result<String> { serde_json::to_string(self).map_err(From::from) }
 }
 
-enum_number!(
-    /// Identifier for the notification level of a channel.
-    NotificationLevel {
-        /// Receive notifications for everything.
-        All = 0,
-        /// Receive only mentions.
-        Mentions = 1,
-        /// Receive no notifications.
-        Nothing = 2,
-        /// Inherit the notification level from the parent setting.
-        Parent = 3,
-    }
-);
-
 /// The representation of a user's status.
 ///
 /// # Examples

@@ -13,7 +13,7 @@ pub struct PartialGuild {
     pub id: GuildId,
     pub afk_channel_id: Option<ChannelId>,
     pub afk_timeout: u64,
-    pub default_message_notifications: u64,
+    pub default_message_notifications: DefaultMessageNotificationLevel,
     pub embed_channel_id: Option<ChannelId>,
     pub embed_enabled: bool,
     #[serde(deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
@@ -24,7 +24,7 @@ pub struct PartialGuild {
     /// [`Guild::features`]: struct.Guild.html#structfield.features
     pub features: Vec<String>,
     pub icon: Option<String>,
-    pub mfa_level: u64,
+    pub mfa_level: MfaLevel,
     pub name: String,
     pub owner_id: UserId,
     pub region: String,
