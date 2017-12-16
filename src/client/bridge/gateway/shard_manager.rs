@@ -1,6 +1,6 @@
 use internal::prelude::*;
 use parking_lot::Mutex;
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::sync::mpsc::{self, Sender};
 use std::sync::Arc;
 use std::thread;
@@ -135,6 +135,7 @@ impl ShardManager {
             framework: Arc::clone(&framework),
             last_start: None,
             manager_tx: thread_tx.clone(),
+            queue: VecDeque::new(),
             runners: Arc::clone(&runners),
             rx: shard_queue_rx,
             token: Arc::clone(&token),
@@ -184,6 +185,7 @@ impl ShardManager {
             event_handler: Arc::clone(&event_handler),
             last_start: None,
             manager_tx: thread_tx.clone(),
+            queue: VecDeque::new(),
             runners: Arc::clone(&runners),
             rx: shard_queue_rx,
             token: Arc::clone(&token),
