@@ -144,7 +144,7 @@ impl Guild {
     pub fn default_channel(&self, uid: UserId) -> Option<Arc<RwLock<GuildChannel>>> {
         for (cid, channel) in &self.channels {
             if self.permissions_in(*cid, uid).read_messages() {
-                return Some(Arc::clone(&channel));
+                return Some(Arc::clone(channel));
             }
         }
 
@@ -160,7 +160,7 @@ impl Guild {
         for (cid, channel) in &self.channels {
             for memid in self.members.keys() {
                 if self.permissions_in(*cid, *memid).read_messages() {
-                    return Some(Arc::clone(&channel));
+                    return Some(Arc::clone(channel));
                 }
             }
         }
@@ -208,7 +208,7 @@ impl Guild {
     /// [`Guild::ban`]: struct.Guild.html#method.ban
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: BO) -> Result<()> {
+    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: &BO) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::BAN_MEMBERS;
@@ -1039,7 +1039,7 @@ impl Guild {
         let mut permissions = everyone.permissions;
 
         for role in &member.roles {
-            if let Some(role) = self.roles.get(&role) {
+            if let Some(role) = self.roles.get(role) {
                 if role.permissions.contains(Permissions::ADMINISTRATOR) {
                     return Permissions::all();
                 }

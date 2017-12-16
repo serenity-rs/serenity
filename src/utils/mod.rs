@@ -18,7 +18,7 @@ use model::misc::EmojiIdentifier;
 use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::fs::File;
-use std::hash::Hash;
+use std::hash::{BuildHasher, Hash};
 use std::io::Read;
 use std::path::Path;
 
@@ -28,11 +28,11 @@ use cache::Cache;
 use CACHE;
 
 /// Converts a HashMap into a final `serde_json::Map` representation.
-pub fn hashmap_to_json_map<T>(map: HashMap<T, Value>) -> Map<String, Value>
-    where T: Eq + Hash + ToString {
+pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>)
+    -> Map<String, Value> where H: BuildHasher, T: Eq + Hash + ToString {
     let mut json_map = Map::new();
 
-    for (key, value) in map.into_iter() {
+    for (key, value) in map {
         json_map.insert(key.to_string(), value);
     }
 

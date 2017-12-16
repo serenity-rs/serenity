@@ -66,7 +66,7 @@ impl PartialGuild {
             ));
         }
 
-        self.id.ban(user, delete_message_days)
+        self.id.ban(user, &delete_message_days)
     }
 
     /// Gets a list of the guild's bans.

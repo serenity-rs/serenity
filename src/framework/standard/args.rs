@@ -55,7 +55,7 @@ fn second_quote_occurence(s: &str) -> Option<usize> {
     s.chars().enumerate().filter(|&(_, c)| c == '"').nth(1).map(|(pos, _)| pos)
 }
 
-fn parse_quotes<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err> 
+fn parse_quotes<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err>
     where T::Err: StdError {
 
     // Fall back to `parse` if there're no quotes at the start.
@@ -63,28 +63,28 @@ fn parse_quotes<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err
         return parse::<T>(s, delimiter);
     }
 
-    let mut pos = second_quote_occurence(&s).unwrap_or(s.len());
+    let mut pos = second_quote_occurence(s).unwrap_or_else(|| s.len());
     let res = (&s[1..pos]).parse::<T>().map_err(Error::Parse);
     // +1 is for the quote
     if pos < s.len() {
         pos += 1;
     }
-    
+
     s.drain(..pos);
 
     res
 }
 
-fn parse<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err> 
+fn parse<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err>
     where T::Err: StdError {
-    let mut pos = s.find(delimiter).unwrap_or(s.len());
+    let mut pos = s.find(delimiter).unwrap_or_else(|| s.len());
 
     let res = (&s[..pos]).parse::<T>().map_err(Error::Parse);
     // +1 is for the delimiter
     if pos < s.len() {
         pos += 1;
     }
-    
+
     s.drain(..pos);
     res
 }
@@ -100,7 +100,7 @@ pub struct Args {
 }
 
 impl Args {
-    pub fn new(message: &str, possible_delimiters: Vec<String>) -> Self {
+    pub fn new(message: &str, possible_delimiters: &[String]) -> Self {
         let delimiter = possible_delimiters
             .iter()
             .find(|&d| message.contains(d))
@@ -145,7 +145,10 @@ impl Args {
             return Err(Error::Eos);
         }
 
-        let pos = self.message.find(&self.delimiter).unwrap_or(self.message.len());
+        let pos = self
+            .message
+            .find(&self.delimiter)
+            .unwrap_or_else(|| self.message.len());
 
         fn parse_then_remove(msg: &mut String, pos: usize) -> &str {
             struct ParseThenRemove<'a>(&'a mut String, usize);
@@ -355,7 +358,7 @@ impl Args {
         }
 
         // TODO: Make this efficient
-        
+
         let pos = self.message
             .split(&self.delimiter)
             .position(|e| e.parse::<T>().is_ok());

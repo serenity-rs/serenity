@@ -117,11 +117,11 @@ impl ShardManager {
         shard_index: u64,
         shard_init: u64,
         shard_total: u64,
-        ws_url: Arc<Mutex<String>>,
-        token: Arc<Mutex<String>>,
-        data: Arc<Mutex<ShareMap>>,
-        event_handler: Arc<H>,
-        framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
+        ws_url: &Arc<Mutex<String>>,
+        token: &Arc<Mutex<String>>,
+        data: &Arc<Mutex<ShareMap>>,
+        event_handler: &Arc<H>,
+        framework: &Arc<Mutex<Option<Box<Framework + Send>>>>,
         threadpool: ThreadPool,
     ) -> (Arc<Mutex<Self>>, ShardManagerMonitor) where H: EventHandler + Send + Sync + 'static {
         let (thread_tx, thread_rx) = mpsc::channel();
@@ -130,16 +130,16 @@ impl ShardManager {
         let runners = Arc::new(Mutex::new(HashMap::new()));
 
         let mut shard_queuer = ShardQueuer {
-            data: Arc::clone(&data),
-            event_handler: Arc::clone(&event_handler),
-            framework: Arc::clone(&framework),
+            data: Arc::clone(data),
+            event_handler: Arc::clone(event_handler),
+            framework: Arc::clone(framework),
             last_start: None,
             manager_tx: thread_tx.clone(),
             queue: VecDeque::new(),
             runners: Arc::clone(&runners),
             rx: shard_queue_rx,
-            token: Arc::clone(&token),
-            ws_url: Arc::clone(&ws_url),
+            token: Arc::clone(token),
+            ws_url: Arc::clone(ws_url),
             threadpool,
         };
 

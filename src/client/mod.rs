@@ -341,11 +341,11 @@ impl Client {
                 0,
                 0,
                 0,
-                Arc::clone(&url),
-                Arc::clone(&locked),
-                Arc::clone(&data),
-                Arc::clone(&event_handler),
-                Arc::clone(&framework),
+                &url,
+                &locked,
+                &data,
+                &event_handler,
+                &framework,
                 threadpool.clone(),
             );
 

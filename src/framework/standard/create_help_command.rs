@@ -173,6 +173,7 @@ impl CreateHelpCommand {
     /// Finishes the creation of a help-command, returning `Help`.
     /// If `Some(String)` was set as `striked_commands_tip` and the `String` is empty,
     /// the creator will substitute content based on the `HelpBehaviour`-settings.
+    #[cfg_attr(feature = "cargo-clippy", allow(useless_if_let_seq))]
     pub(crate) fn finish(self) -> Arc<Help> {
         if self.0.striked_commands_tip == Some(String::new()) {
             let mut strike_text = String::from("~~`Striked commands`~~ are unavailable because they");

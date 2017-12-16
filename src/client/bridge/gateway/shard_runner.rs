@@ -143,7 +143,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 
             let (event, action, successful) = self.recv_event();
 
-            if let Some(action) = action {
+            if let Some(ref action) = action {
                 let _ = self.action(action);
             }
 
@@ -171,8 +171,8 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
     /// # Errors
     ///
     /// Returns
-    fn action(&mut self, action: ShardAction) -> Result<()> {
-        match action {
+    fn action(&mut self, action: &ShardAction) -> Result<()> {
+        match *action {
             ShardAction::Autoreconnect => self.shard.autoreconnect(),
             ShardAction::Heartbeat => self.shard.heartbeat(),
             ShardAction::Identify => self.shard.identify(),

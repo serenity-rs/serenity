@@ -28,6 +28,7 @@ use framework::standard::{has_correct_roles, has_correct_permissions};
 use model::channel::Message;
 use model::id::ChannelId;
 use std::collections::HashMap;
+use std::hash::BuildHasher;
 use std::sync::Arc;
 use std::fmt::Write;
 use super::command::{InternalCommand};
@@ -91,12 +92,13 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
 /// client.with_framework(StandardFramework::new()
 ///     .help(help_commands::with_embeds));
 /// ```
-pub fn with_embeds(_: &mut Context,
-                   msg: &Message,
-                   help_options: &HelpOptions,
-                   groups: HashMap<String, Arc<CommandGroup>>,
-                   args: Args)
-                   -> Result<(), CommandError> {
+pub fn with_embeds<H: BuildHasher>(
+    _: &mut Context,
+    msg: &Message,
+    help_options: &HelpOptions,
+    groups: HashMap<String, Arc<CommandGroup>, H>,
+    args: &Args
+) -> Result<(), CommandError> {
     if !args.is_empty() {
         let name = args.full();
 
@@ -151,7 +153,7 @@ pub fn with_embeds(_: &mut Context,
 
                 let _ = msg.channel_id.send_message(|m| {
                     m.embed(|e| {
-                        let mut embed = e.colour(help_options.embed_success_colour.clone()).title(command_name.clone());
+                        let mut embed = e.colour(help_options.embed_success_colour).title(command_name.clone());
 
                         if let Some(ref desc) = command.desc {
                             embed = embed.description(desc);
@@ -197,7 +199,7 @@ pub fn with_embeds(_: &mut Context,
             }
         }
 
-        let error_msg = help_options.command_not_found_text.replace("{}", &name);
+        let error_msg = help_options.command_not_found_text.replace("{}", name);
         error_embed(&msg.channel_id, &error_msg, help_options.embed_error_colour);
 
         return Ok(());
@@ -304,12 +306,13 @@ pub fn with_embeds(_: &mut Context,
 /// client.with_framework(StandardFramework::new()
 ///     .help(help_commands::plain));
 /// ```
-pub fn plain(_: &mut Context,
-             msg: &Message,
-             help_options: &HelpOptions,
-             groups: HashMap<String, Arc<CommandGroup>>,
-             args: Args)
-             -> Result<(), CommandError> {
+pub fn plain<H: BuildHasher>(
+    _: &mut Context,
+    msg: &Message,
+    help_options: &HelpOptions,
+    groups: HashMap<String, Arc<CommandGroup>, H>,
+    args: &Args
+) -> Result<(), CommandError> {
     if !args.is_empty() {
         let name = args.full();
 
@@ -406,7 +409,7 @@ pub fn plain(_: &mut Context,
         }
 
         let _ = msg.channel_id
-            .say(&help_options.suggestion_text.replace("{}", &name));
+            .say(&help_options.suggestion_text.replace("{}", name));
 
         return Ok(());
     }

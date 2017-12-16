@@ -48,7 +48,8 @@ impl GuildId {
     /// [`Guild::ban`]: struct.Guild.html#method.ban
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, ban_options: BO) -> Result<()> {
+    pub fn ban<U, BO>(&self, user: U, ban_options: &BO) -> Result<()>
+        where U: Into<UserId>, BO: BanOptions {
         let dmd = ban_options.dmd();
         if dmd > 7 {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));

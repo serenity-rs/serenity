@@ -973,7 +973,7 @@ impl Framework for StandardFramework {
                         let mut content = message.content[position..].trim();
                         content = content[command_length..].trim();
 
-                        Args::new(&content, self.configuration.delimiters.clone())
+                        Args::new(content, &self.configuration.delimiters)
                     };
 
                     let before = self.before.clone();
@@ -994,7 +994,7 @@ impl Framework for StandardFramework {
                                     }
                                 }
 
-                                let result = (help.0)(&mut context, &message, &help.1, groups, args);
+                                let result = (help.0)(&mut context, &message, &help.1, groups, &args);
 
                                 if let Some(after) = after {
                                     (after)(&mut context, &message, &built, result);
