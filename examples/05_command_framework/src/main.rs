@@ -13,9 +13,11 @@
 extern crate serenity;
 extern crate typemap;
 
-use serenity::prelude::*;
-use serenity::model::*;
 use serenity::framework::standard::{Args, DispatchError, StandardFramework, HelpBehaviour, CommandOptions, help_commands};
+use serenity::model::channel::Message;
+use serenity::model::gateway::Ready;
+use serenity::model::Permissions;
+use serenity::prelude::*;
 use std::collections::HashMap;
 use std::env;
 use std::fmt::Write;

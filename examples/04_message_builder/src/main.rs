@@ -1,7 +1,8 @@
 extern crate serenity;
 
+use serenity::model::channel::Message;
+use serenity::model::gateway::Ready;
 use serenity::prelude::*;
-use serenity::model::*;
 use serenity::utils::MessageBuilder;
 use std::env;
 
