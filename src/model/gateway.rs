@@ -52,7 +52,7 @@ impl Game {
     /// use serenity::model::Game;
     ///
     /// command!(game(ctx, _msg, args) {
-    ///     let name = args.join(" ");
+    ///     let name = args.full();
     ///     ctx.set_game(Game::playing(&name));
     /// });
     /// #
@@ -112,7 +112,7 @@ impl Game {
     /// use serenity::model::Game;
     ///
     /// command!(listen(ctx, _msg, args) {
-    ///     let name = args.join(" ");
+    ///     let name = args.full();
     ///     ctx.set_game(Game::listening(&name));
     /// });
     /// #
@@ -141,7 +141,7 @@ impl Game {
     /// use serenity::model::Game;
     ///
     /// command!(watch(ctx, _msg, args) {
-    ///     let name = args.join(" ");
+    ///     let name = args.full();
     ///     ctx.set_game(Game::watching(&name));
     /// });
     /// #

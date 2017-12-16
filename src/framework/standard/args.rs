@@ -1,8 +1,6 @@
 use std::str::FromStr;
 use std::error::Error as StdError;
 use std::fmt;
-use utils::parse_quotes;
-use vec_shift::Shift;
 
 /// Defines how an operation on an `Args` method failed.
 #[derive(Debug)]
@@ -53,6 +51,44 @@ impl<E: StdError> fmt::Display for Error<E> {
 
 type Result<T, E> = ::std::result::Result<T, Error<E>>;
 
+fn second_quote_occurence(s: &str) -> Option<usize> {
+    s.chars().enumerate().filter(|&(_, c)| c == '"').nth(1).map(|(pos, _)| pos)
+}
+
+fn parse_quotes<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err> 
+    where T::Err: StdError {
+
+    // Fall back to `parse` if there're no quotes at the start.
+    if s.chars().next().unwrap() != '"' {
+        return parse::<T>(s, delimiter);
+    }
+
+    let mut pos = second_quote_occurence(&s).unwrap_or(s.len());
+    let res = (&s[1..pos]).parse::<T>().map_err(Error::Parse);
+    // +1 is for the quote
+    if pos < s.len() {
+        pos += 1;
+    }
+    
+    s.drain(..pos);
+
+    res
+}
+
+fn parse<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err> 
+    where T::Err: StdError {
+    let mut pos = s.find(delimiter).unwrap_or(s.len());
+
+    let res = (&s[..pos]).parse::<T>().map_err(Error::Parse);
+    // +1 is for the delimiter
+    if pos < s.len() {
+        pos += 1;
+    }
+    
+    s.drain(..pos);
+    res
+}
+
 /// A utility struct for handling arguments of a command.
 ///
 /// General functionality is done via removing an item, parsing it, then returning it; this however
@@ -60,7 +96,7 @@ type Result<T, E> = ::std::result::Result<T, Error<E>>;
 #[derive(Clone, Debug)]
 pub struct Args {
     delimiter: String,
-    delimiter_split: Vec<String>,
+    message: String,
 }
 
 impl Args {
@@ -70,15 +106,9 @@ impl Args {
             .find(|&d| message.contains(d))
             .map_or(possible_delimiters[0].as_str(), |s| s.as_str());
 
-        let split = if message.trim().is_empty() {
-            Vec::new()
-        } else {
-            message.split(delimiter).map(|s| s.to_string()).collect()
-        };
-
         Args {
             delimiter: delimiter.to_string(),
-            delimiter_split: split,
+            message: message.to_string(),
         }
     }
 
@@ -92,18 +122,15 @@ impl Args {
     /// let mut args = Args::new("42 69", vec![" ".to_owned()]);
     ///
     /// assert_eq!(args.single::<i32>().unwrap(), 42);
-    /// assert_eq!(args, ["69"]);
+    /// assert_eq!(args, "69");
     /// ```
     pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
-        if self.delimiter_split.is_empty() {
+        if self.message.is_empty() {
             return Err(Error::Eos);
         }
 
-        Ok(self.delimiter_split
-            .shift()
-            .ok_or(Error::Eos)?
-            .parse::<T>()?)
+        parse::<T>(&mut self.message, &self.delimiter)
     }
 
     /// Like [`single`], but does "zero-copy" parsing.
@@ -114,26 +141,28 @@ impl Args {
     /// [`FromStrZc`]: trait.FromStrZc.html
     pub fn single_zc<'a, T: FromStrZc<'a> + 'a>(&'a mut self) -> Result<T, T::Err>
         where T::Err: StdError {
+        if self.message.is_empty() {
+            return Err(Error::Eos);
+        }
 
-        // This is a hack as to mitigate some nasty lifetime errors.
-        //
-        // (Culprit `Vec::remove`s return type)
-        fn get_and_remove(b: &mut Vec<String>) -> Option<&str> {
-            struct GetThenRemove<'a>(&'a mut Vec<String>);
+        let pos = self.message.find(&self.delimiter).unwrap_or(self.message.len());
 
-            impl<'a> Drop for GetThenRemove<'a> {
+        fn parse_then_remove(msg: &mut String, pos: usize) -> &str {
+            struct ParseThenRemove<'a>(&'a mut String, usize);
+
+            impl<'a> Drop for ParseThenRemove<'a> {
                 fn drop(&mut self) {
                     if !self.0.is_empty() {
-                        self.0.remove(0);
+                        self.0.drain(..self.1 + 1);
                     }
                 }
             }
 
-            GetThenRemove(b).0.get(0).map(|s| s.as_str())
+            (ParseThenRemove(msg, pos).0).as_str()
         }
 
-        let a = get_and_remove(&mut self.delimiter_split).ok_or(Error::Eos)?;
-        Ok(FromStrZc::from_str(a)?)
+        let string = parse_then_remove(&mut self.message, pos);
+        FromStrZc::from_str(&string[..pos]).map_err(Error::Parse)
     }
 
     /// Like [`single`], but doesn't remove the element.
@@ -146,21 +175,31 @@ impl Args {
     /// let args = Args::new("42 69", vec![" ".to_owned()]);
     ///
     /// assert_eq!(args.single_n::<i32>().unwrap(), 42);
-    /// assert_eq!(args, ["42", "69"]);
+    /// assert_eq!(args, "42 69");
     /// ```
     ///
     /// [`single`]: #method.single
     pub fn single_n<T: FromStr>(&self) -> Result<T, T::Err>
         where T::Err: StdError {
-        if self.delimiter_split.is_empty() {
+        if self.message.is_empty() {
             return Err(Error::Eos);
         }
 
-        Ok(self.delimiter_split
-            .get(0)
-            .ok_or(Error::Eos)?
-            .parse::<T>()?)
+        parse::<T>(&mut self.message.clone(), &self.delimiter)
     }
+
+    /// Accesses the current state of the internal string.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("42 69", vec![" ".to_owned()]);
+    ///
+    /// assert_eq!(args.full(), "42 69");
+    /// ```
+    pub fn full(&self) -> &str { &self.message }
 
     /// Skips if there's a first element, but also returns it.
     ///
@@ -172,9 +211,9 @@ impl Args {
     /// let mut args = Args::new("42 69", vec![" ".to_owned()]);
     ///
     /// assert_eq!(args.skip().unwrap(), "42");
-    /// assert_eq!(args, ["69"]);
+    /// assert_eq!(args, "69");
     /// ```
-    pub fn skip(&mut self) -> Option<String> { self.delimiter_split.shift() }
+    pub fn skip(&mut self) -> Option<String> { parse::<String>(&mut self.message, &self.delimiter).ok() }
 
     /// Like [`skip`], but allows for multiple at once.
     ///
@@ -185,7 +224,7 @@ impl Args {
     /// let mut args = Args::new("42 69 88 99", vec![" ".to_owned()]);
     ///
     /// assert_eq!(*args.skip_for(3).unwrap(), ["42".to_string(), "69".to_string(), "88".to_string()]);
-    /// assert_eq!(args, ["99"]);
+    /// assert_eq!(args, "99");
     /// ```
     ///
     /// [`skip`]: #method.skip
@@ -193,7 +232,7 @@ impl Args {
         let mut vec = Vec::with_capacity(i as usize);
 
         for _ in 0..i {
-            vec.push(self.delimiter_split.shift()?);
+            vec.push(self.skip()?);
         }
 
         Some(vec)
@@ -206,43 +245,63 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new(r#""42"#, vec![" ".to_owned()]);
+    /// let mut args = Args::new(r#""42 69"#, vec![" ".to_owned()]);
     ///
-    /// assert_eq!(args.single_quoted::<i32>().unwrap(), 42);
+    /// assert_eq!(args.single_quoted::<String>().unwrap(), "42 69");
     /// assert!(args.is_empty());
     /// ```
     ///
     /// [`single`]: #method.single
     pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
-        Ok(parse_quotes(&self.delimiter_split.shift().ok_or(Error::Eos)?)
-            .remove(0)
-            .parse::<T>()?)
+        parse_quotes::<T>(&mut self.message, &self.delimiter)
     }
 
     /// Like [`single_quoted`], but doesn't remove the element.
     ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new(r#""42 69"#, vec![" ".to_owned()]);
+    ///
+    /// assert_eq!(args.single_quoted_n::<String>().unwrap(), "42 69");
+    /// assert_eq!(args, r#""42 69"#);
+    /// ```
+    ///
     /// [`single_quoted`]: #method.single_quoted
     pub fn single_quoted_n<T: FromStr>(&self) -> Result<T, T::Err>
         where T::Err: StdError {
-        Ok(parse_quotes(self.delimiter_split.get(0).ok_or(Error::Eos)?)
-            .remove(0)
-            .parse::<T>()?)
+        parse_quotes::<T>(&mut self.message.clone(), &self.delimiter)
     }
 
-    /// Like [`list`], but takes quotes into account.
+    // Fix this.
+
+    /// Like [`multiple`], but takes quotes into account.
     ///
-    /// [`list`]: #method.list
-    pub fn multiple_quoted<T: FromStr>(self) -> Result<Vec<T>, T::Err>
+    /// # Examples
+    ///
+    /// ```rust,ignore
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new(r#""42" "69""#, vec![" ".to_owned()]);
+    ///
+    /// assert_eq!(*args.multiple_quoted::<i32>().unwrap(), [42, 69]);
+    /// ```
+    ///
+    /// [`multiple`]: #method.multiple
+    pub fn multiple_quoted<T: FromStr>(mut self) -> Result<Vec<T>, T::Err>
         where T::Err: StdError {
-        if self.delimiter_split.is_empty() {
-            return Err(Error::Eos);
+        let mut res = Vec::new();
+
+        let count = self.message.chars().filter(|&c| c == '"').count() / 2;
+
+        for _ in 0..count {
+            res.push(parse_quotes::<T>(&mut self.message, &self.delimiter)?);
         }
 
-        parse_quotes(&self.delimiter_split.join(&self.delimiter))
-            .into_iter()
-            .map(|s| s.parse::<T>().map_err(Error::Parse))
-            .collect()
+        Ok(res)
     }
 
     /// Empty outs the internal vector while parsing (if necessary) and returning them
@@ -277,19 +336,6 @@ impl Args {
         Iter::new(self)
     }
 
-    /// This method is just `internal_vector.join(delimiter)`
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use serenity::framework::standard::Args;
-    ///
-    /// let mut args = Args::new("42 69", vec![" ".to_owned()]);
-    ///
-    /// assert_eq!(args.full(), "42 69");
-    /// ```
-    pub fn full(&self) -> String { self.delimiter_split.join(&self.delimiter) }
-
     /// Returns the first argument that can be converted and removes it from the list.
     ///
     /// # Examples
@@ -300,29 +346,29 @@ impl Args {
     /// let mut args = Args::new("c47 69", vec![" ".to_owned()]);
     ///
     /// assert_eq!(args.find::<i32>().unwrap(), 69);
-    /// assert_eq!(args, ["c47"]);
+    /// assert_eq!(args, "c47");
     /// ```
     pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
-        if self.delimiter_split.is_empty() {
+        if self.message.is_empty() {
             return Err(Error::Eos);
         }
 
-        match self.delimiter_split
-                  .iter()
-                  .position(|e| e.parse::<T>().is_ok())
-        {
+        // TODO: Make this efficient
+        
+        let pos = self.message
+            .split(&self.delimiter)
+            .position(|e| e.parse::<T>().is_ok());
+
+        match pos {
             Some(index) => {
-                let value = self.delimiter_split
-                    .get(index)
-                    .ok_or(Error::Eos)?
-                    .parse::<T>()?;
-
-                self.delimiter_split.remove(index);
-
-                Ok(value)
+                let mut vec = self.message.split(&self.delimiter).map(|s| s.to_string()).collect::<Vec<_>>();
+                let mut ss = vec.remove(index);
+                let res = parse::<T>(&mut ss, &self.delimiter);
+                self.message = vec.join(&self.delimiter);
+                res
             },
-            _ => Err(Error::Eos),
+            None => Err(Error::Eos),
         }
     }
 
@@ -336,21 +382,31 @@ impl Args {
     /// let args = Args::new("c47 69", vec![" ".to_owned()]);
     ///
     /// assert_eq!(args.find_n::<i32>().unwrap(), 69);
-    /// assert_eq!(args, ["c47", "69"]);
+    /// assert_eq!(args, "c47 69");
     /// ```
     pub fn find_n<T: FromStr>(&self) -> Result<T, T::Err>
         where T::Err: StdError {
-        if self.delimiter_split.is_empty() {
+        if self.message.is_empty() {
             return Err(Error::Eos);
         }
 
-        Ok(self.delimiter_split
-            .iter()
-            .find(|e| e.parse::<T>().is_ok())
-            .ok_or(Error::Eos)?
-            .parse::<T>()?)
+        // Same here.
+        let pos = self.message
+            .split(&self.delimiter)
+            .position(|e| e.parse::<T>().is_ok());
+
+        match pos {
+            Some(index) => {
+                let mut vec = self.message.split(&self.delimiter).map(|s| s.to_string()).collect::<Vec<_>>();
+                let mut ss = vec.remove(index);
+                parse::<T>(&mut ss, &self.delimiter)
+            },
+            None => Err(Error::Eos),
+        }
     }
 }
+
+// Fix this.
 
 /// A version of `FromStr` that allows for "zero-copy" parsing.
 ///
@@ -405,53 +461,27 @@ impl<'a, T: FromStr> FromStrZc<'a> for T {
 }
 
 impl ::std::ops::Deref for Args {
-    type Target = [String];
+    type Target = str;
 
-    fn deref(&self) -> &Self::Target { &self.delimiter_split }
+    fn deref(&self) -> &Self::Target { self.full() }
 }
 
-impl<'a> PartialEq<[&'a str]> for Args {
-    fn eq(&self, other: &[&str]) -> bool {
-        let mut b = true;
-
-        for (s, o) in self.delimiter_split.iter().zip(other.iter()) {
-            if s != o {
-                b = false;
-                break;
-            }
-        }
-
-        b
+impl PartialEq<str> for Args {
+    fn eq(&self, other: &str) -> bool {
+        self.message == other
     }
 }
 
-macro_rules! impl_slices {
-    ($($num:expr),*) => {
-        impl<'a> PartialEq<[&'a str; 0]> for Args {
-            fn eq(&self, _: &[&str; 0]) -> bool {
-                self.delimiter_split.is_empty()
-            }
-        }
-
-        $(
-            impl<'a> PartialEq<[&'a str; $num]> for Args {
-                fn eq(&self, other: &[&str; $num]) -> bool {
-                    <Args as PartialEq<[&str]>>::eq(self, &other[..])
-                }
-            }
-        )*
+impl<'a> PartialEq<&'a str> for Args {
+    fn eq(&self, other: &&'a str) -> bool {
+        self.message == *other
     }
 }
 
-impl_slices! {
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
-    29, 30, 31, 32
-}
 
 impl PartialEq for Args {
     fn eq(&self, other: &Self) -> bool {
-        self.delimiter_split == other.delimiter_split
+        self.message == *other.message
     }
 }
 
