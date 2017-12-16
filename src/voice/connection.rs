@@ -3,7 +3,7 @@ use internal::prelude::*;
 use internal::ws_impl::{ReceiverExt, SenderExt};
 use internal::Timer;
 use model::event::VoiceEvent;
-use model::UserId;
+use model::id::UserId;
 use opus::{
     packet as opus_packet,
     Application as CodingMode,
