@@ -4,9 +4,8 @@ extern crate serenity;
 
 use serenity::utils::MessageBuilder;
 use serenity::utils::ContentModifier::*;
-use serenity::model::Emoji;
-use serenity::model::EmojiId;
-use serenity::model::UserId;
+use serenity::model::guild::Emoji;
+use serenity::model::id::{EmojiId, UserId};
 
 #[test]
 fn code_blocks() {

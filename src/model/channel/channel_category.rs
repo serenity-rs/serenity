@@ -1,4 +1,4 @@
-use model::*;
+use model::prelude::*;
 
 #[cfg(all(feature = "builder", feature = "model"))]
 use builder::EditChannel;

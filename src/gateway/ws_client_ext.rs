@@ -3,7 +3,7 @@ use constants::{self, OpCode};
 use gateway::{CurrentPresence, WsClient};
 use internal::prelude::*;
 use internal::ws_impl::SenderExt;
-use model::GuildId;
+use model::id::GuildId;
 use std::env::consts;
 
 pub trait WebSocketGatewayClientExt {

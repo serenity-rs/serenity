@@ -6,7 +6,7 @@ extern crate serenity;
 #[cfg(feature = "utils")]
 mod utils {
     use parking_lot::RwLock;
-    use serenity::model::*;
+    use serenity::model::prelude::*;
     use std::collections::HashMap;
     use std::sync::Arc;
 

@@ -1,5 +1,6 @@
 use client::Context;
-use model::{Message, Permissions};
+use model::channel::Message;
+use model::Permissions;
 use std::collections::HashMap;
 use std::fmt;
 use std::fmt::{Debug, Formatter};

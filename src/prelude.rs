@@ -15,7 +15,7 @@
 //! [`serenity::Error`]: ../enum.Error.html
 
 pub use error::Error as SerenityError;
-pub use model::Mentionable;
+pub use model::misc::Mentionable;
 pub use parking_lot::{Mutex, RwLock};
 
 #[cfg(feature = "client")]

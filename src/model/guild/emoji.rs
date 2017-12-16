@@ -1,5 +1,5 @@
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
-use super::super::{EmojiId, RoleId};
+use super::super::id::{EmojiId, RoleId};
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
@@ -51,7 +51,8 @@ impl Emoji {
     /// Delete a given emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{Emoji, EmojiId};
+    /// # use serenity::model::guild::Emoji;
+    /// # use serenity::model::id::EmojiId;
     /// #
     /// # let mut emoji = Emoji {
     /// #     id: EmojiId(7),
@@ -88,7 +89,8 @@ impl Emoji {
     /// Change the name of an emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{Emoji, EmojiId};
+    /// # use serenity::model::guild::Emoji;
+    /// # use serenity::model::id::EmojiId;
     /// #
     /// # let mut emoji = Emoji {
     /// #     id: EmojiId(7),
@@ -132,7 +134,8 @@ impl Emoji {
     /// Print the guild id that owns this emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{Emoji, EmojiId};
+    /// # use serenity::model::guild::Emoji;
+    /// # use serenity::model::id::EmojiId;
     /// #
     /// # let mut emoji = Emoji {
     /// #     id: EmojiId(7),
@@ -167,7 +170,8 @@ impl Emoji {
     /// Print the direct link to the given emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{Emoji, EmojiId};
+    /// # use serenity::model::guild::Emoji;
+    /// # use serenity::model::id::EmojiId;
     /// #
     /// # let mut emoji = Emoji {
     /// #     id: EmojiId(7),

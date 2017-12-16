@@ -1,7 +1,9 @@
 use constants::{self, close_codes};
 use internal::prelude::*;
 use model::event::{Event, GatewayEvent};
-use model::{Game, GuildId, OnlineStatus};
+use model::gateway::Game;
+use model::id::GuildId;
+use model::user::OnlineStatus;
 use parking_lot::Mutex;
 use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
@@ -297,7 +299,7 @@ impl Shard {
     /// #
     /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
-    /// use serenity::model::Game;
+    /// use serenity::model::gateway::Game;
     ///
     /// shard.set_game(Some(Game::playing("Heroes of the Storm")));
     /// # }
@@ -755,7 +757,7 @@ impl Shard {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1])?;
     /// #
-    /// use serenity::model::GuildId;
+    /// use serenity::model::id::GuildId;
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
@@ -785,7 +787,7 @@ impl Shard {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1])?;
     /// #
-    /// use serenity::model::GuildId;
+    /// use serenity::model::id::GuildId;
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///

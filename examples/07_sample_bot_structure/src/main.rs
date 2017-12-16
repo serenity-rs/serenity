@@ -19,7 +19,7 @@ mod commands;
 
 use serenity::framework::StandardFramework;
 use serenity::model::event::ResumedEvent;
-use serenity::model::Ready;
+use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use serenity::http;
 use std::collections::HashSet;

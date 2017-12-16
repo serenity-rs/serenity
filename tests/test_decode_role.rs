@@ -2,7 +2,7 @@ extern crate serde_json;
 extern crate serenity;
 
 use serde_json::Value;
-use serenity::model::{Guild, Role};
+use serenity::model::guild::{Guild, Role};
 
 #[test]
 fn decode_negative_one_role_position() {

@@ -5,7 +5,8 @@ pub use super::create_command::{CreateCommand, FnOrCommand};
 pub use super::Args;
 
 use client::Context;
-use model::{Message, Permissions};
+use model::channel::Message;
+use model::Permissions;
 use std::sync::Arc;
 
 /// Used to create command groups

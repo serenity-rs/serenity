@@ -1,4 +1,4 @@
-use model::{Game, GuildId, OnlineStatus};
+use model::prelude::*;
 use super::{ShardClientMessage, ShardRunnerMessage};
 use std::sync::mpsc::{SendError, Sender};
 use websocket::message::OwnedMessage;
@@ -62,7 +62,7 @@ impl ShardMessenger {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1])?;
     /// #
-    /// use serenity::model::GuildId;
+    /// use serenity::model::id::GuildId;
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
@@ -92,7 +92,7 @@ impl ShardMessenger {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1])?;
     /// #
-    /// use serenity::model::GuildId;
+    /// use serenity::model::id::GuildId;
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
@@ -146,7 +146,7 @@ impl ShardMessenger {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
-    /// use serenity::model::Game;
+    /// use serenity::model::gateway::Game;
     ///
     /// shard.set_game(Some(Game::playing("Heroes of the Storm")));
     /// #     Ok(())
@@ -227,7 +227,7 @@ impl ShardMessenger {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
-    /// use serenity::model::OnlineStatus;
+    /// use serenity::model::user::OnlineStatus;
     ///
     /// shard.set_status(OnlineStatus::DoNotDisturb);
     /// #     Ok(())

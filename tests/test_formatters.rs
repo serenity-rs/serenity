@@ -1,7 +1,7 @@
 extern crate parking_lot;
 extern crate serenity;
 
-use serenity::model::*;
+use serenity::model::prelude::*;
 
 #[test]
 fn test_formatters() {

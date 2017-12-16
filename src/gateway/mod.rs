@@ -57,7 +57,8 @@ pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
 pub use self::ws_client_ext::WebSocketGatewayClientExt;
 
-use model::{Game, OnlineStatus};
+use model::gateway::Game;
+use model::user::OnlineStatus;
 use websocket::sync::client::Client;
 use websocket::sync::stream::{TcpStream, TlsStream};
 

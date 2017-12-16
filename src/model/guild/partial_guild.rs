@@ -1,4 +1,4 @@
-use model::*;
+use model::prelude::*;
 use super::super::utils::{deserialize_emojis, deserialize_roles};
 
 #[cfg(feature = "model")]
@@ -448,7 +448,7 @@ impl PartialGuild {
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
-    /// use serenity::model::*;
+    /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
@@ -457,8 +457,10 @@ impl PartialGuild {
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
-    ///         if let Some(role) =
-    ///            msg.guild_id().unwrap().get().unwrap().role_by_name("role_name") {
+    ///         let guild = msg.guild_id().unwrap().get().unwrap();
+    ///         let possible_role = guild.role_by_name("role_name");
+    ///
+    ///         if let Some(role) = possible_role {
     ///             println!("Obtained role's reference: {:?}", role);
     ///         }
     ///     }

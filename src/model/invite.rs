@@ -1,5 +1,7 @@
+//! Models for server and channel invites.
+
 use chrono::{DateTime, FixedOffset};
-use super::*;
+use super::prelude::*;
 
 #[cfg(feature = "model")]
 use builder::CreateInvite;
@@ -123,7 +125,7 @@ impl Invite {
     /// Retrieve the URL for an invite with the code `WxZumR`:
     ///
     /// ```rust
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # let invite = Invite {
     /// #     approximate_member_count: Some(1812),
@@ -289,7 +291,7 @@ impl RichInvite {
     /// Retrieve the URL for an invite with the code `WxZumR`:
     ///
     /// ```rust
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # let invite = RichInvite {
     /// #     code: "WxZumR".to_string(),

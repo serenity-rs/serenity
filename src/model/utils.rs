@@ -2,7 +2,7 @@ use parking_lot::RwLock;
 use serde::de::Error as DeError;
 use std::collections::HashMap;
 use std::sync::Arc;
-use super::*;
+use super::prelude::*;
 
 #[cfg(feature = "cache")]
 use internal::prelude::*;
@@ -11,6 +11,10 @@ use internal::prelude::*;
 use super::permissions::Permissions;
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
+
+pub fn default_true() -> bool {
+    true
+}
 
 pub fn deserialize_emojis<'de, D: Deserializer<'de>>(
     deserializer: D)
@@ -110,6 +114,11 @@ pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
     };
 
     Ok(Arc::new(RwLock::new(user)))
+}
+
+pub fn deserialize_sync_user<'de, D>(deserializer: D)
+    -> StdResult<Arc<RwLock<User>>, D::Error> where D: Deserializer<'de> {
+    Ok(Arc::new(RwLock::new(User::deserialize(deserializer)?)))
 }
 
 pub fn deserialize_users<'de, D: Deserializer<'de>>(

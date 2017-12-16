@@ -1,7 +1,8 @@
 pub use super::{Args, Command, CommandGroup, CommandOptions, CommandError};
 
 use client::Context;
-use model::{Message, Permissions};
+use model::channel::Message;
+use model::Permissions;
 use std::sync::Arc;
 
 pub enum FnOrCommand {
@@ -50,7 +51,7 @@ impl CreateCommand {
     ///     CommandError,
     ///     StandardFramework,
     /// };
-    /// use serenity::model::Message;
+    /// use serenity::model::channel::Message;
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_TOKEN").unwrap();

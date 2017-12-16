@@ -1,4 +1,4 @@
-use model::*;
+use model::prelude::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
@@ -73,11 +73,11 @@ impl GuildId {
 
     /// Gets a list of the guild's audit log entries
     #[inline]
-    pub fn audit_logs(&self, action_type: Option<u8>, 
-                             user_id: Option<UserId>, 
+    pub fn audit_logs(&self, action_type: Option<u8>,
+                             user_id: Option<UserId>,
                              before: Option<AuditLogEntryId>,
-                             limit: Option<u8>) -> Result<AuditLogs> { 
-        http::get_audit_logs(self.0, action_type, user_id.map(|u| u.0), before.map(|a| a.0), limit) 
+                             limit: Option<u8>) -> Result<AuditLogs> {
+        http::get_audit_logs(self.0, action_type, user_id.map(|u| u.0), before.map(|a| a.0), limit)
     }
 
     /// Gets all of the guild's channels over the REST API.

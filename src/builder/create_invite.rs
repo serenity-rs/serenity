@@ -14,7 +14,7 @@ use std::default::Default;
 ///
 /// ```rust,no_run
 /// # use serenity::prelude::*;
-/// # use serenity::model::*;
+/// # use serenity::model::prelude::*;
 ///
 /// struct Handler;
 ///
@@ -77,7 +77,7 @@ impl CreateInvite {
     ///
     /// ```rust,no_run
     /// # use serenity::CACHE;
-    /// # use serenity::model::ChannelId;
+    /// # use serenity::model::id::ChannelId;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -110,7 +110,7 @@ impl CreateInvite {
     ///
     /// ```rust,no_run
     /// # use serenity::CACHE;
-    /// # use serenity::model::ChannelId;
+    /// # use serenity::model::id::ChannelId;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -141,7 +141,7 @@ impl CreateInvite {
     ///
     /// ```rust,no_run
     /// # use serenity::CACHE;
-    /// # use serenity::model::ChannelId;
+    /// # use serenity::model::id::ChannelId;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -172,7 +172,7 @@ impl CreateInvite {
     ///
     /// ```rust,no_run
     /// # use serenity::CACHE;
-    /// # use serenity::model::ChannelId;
+    /// # use serenity::model::id::ChannelId;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {

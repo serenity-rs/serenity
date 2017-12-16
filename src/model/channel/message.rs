@@ -1,5 +1,7 @@
+//! Models relating to Discord channels.
+
 use chrono::{DateTime, FixedOffset};
-use model::*;
+use model::prelude::*;
 use serde_json::Value;
 
 #[cfg(feature = "model")]
@@ -85,7 +87,7 @@ impl Message {
     /// #   impl EventHandler for Handler {}
     /// #   let mut client = Client::new("token", Handler).unwrap();
     /// #
-    /// use serenity::model::Channel;
+    /// use serenity::model::channel::Channel;
     /// use serenity::framework::StandardFramework;
     ///
     /// client.with_framework(StandardFramework::new()

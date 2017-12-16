@@ -1,5 +1,5 @@
 use model::event::Event;
-use model::{Channel, Message};
+use model::channel::{Channel, Message};
 use std::sync::Arc;
 use parking_lot::Mutex;
 use super::bridge::gateway::ShardClientMessage;
@@ -14,7 +14,7 @@ use chrono::{Timelike, Utc};
 #[cfg(feature = "framework")]
 use framework::Framework;
 #[cfg(feature = "cache")]
-use model::GuildId;
+use model::id::GuildId;
 #[cfg(feature = "cache")]
 use std::{thread, time};
 

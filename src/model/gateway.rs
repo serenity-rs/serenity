@@ -1,9 +1,11 @@
+//! Models pertaining to the gateway.
+
 use parking_lot::RwLock;
 use serde::de::Error as DeError;
 use serde_json;
 use std::sync::Arc;
 use super::utils::*;
-use super::*;
+use super::prelude::*;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///
@@ -49,7 +51,7 @@ impl Game {
     /// # #[macro_use] extern crate serenity;
     /// #
     /// use serenity::framework::standard::Args;
-    /// use serenity::model::Game;
+    /// use serenity::model::gateway::Game;
     ///
     /// command!(game(ctx, _msg, args) {
     ///     let name = args.full();
@@ -78,7 +80,7 @@ impl Game {
     /// # #[macro_use] extern crate serenity;
     /// #
     /// use serenity::framework::standard::Args;
-    /// use serenity::model::Game;
+    /// use serenity::model::gateway::Game;
     ///
     /// // Assumes command has min_args set to 2.
     /// command!(stream(ctx, _msg, args) {
@@ -109,7 +111,7 @@ impl Game {
     /// # #[macro_use] extern crate serenity;
     /// #
     /// use serenity::framework::standard::Args;
-    /// use serenity::model::Game;
+    /// use serenity::model::gateway::Game;
     ///
     /// command!(listen(ctx, _msg, args) {
     ///     let name = args.full();
@@ -138,7 +140,7 @@ impl Game {
     /// # #[macro_use] extern crate serenity;
     /// #
     /// use serenity::framework::standard::Args;
-    /// use serenity::model::Game;
+    /// use serenity::model::gateway::Game;
     ///
     /// command!(watch(ctx, _msg, args) {
     ///     let name = args.full();

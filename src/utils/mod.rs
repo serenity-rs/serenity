@@ -13,7 +13,8 @@ pub use super::builder;
 
 use base64;
 use internal::prelude::*;
-use model::{EmojiId, EmojiIdentifier};
+use model::id::EmojiId;
+use model::misc::EmojiIdentifier;
 use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::fs::File;
@@ -267,7 +268,8 @@ pub fn parse_channel(mention: &str) -> Option<u64> {
 /// Ensure that a valid [`Emoji`] usage is correctly parsed:
 ///
 /// ```rust
-/// use serenity::model::{EmojiId, EmojiIdentifier};
+/// use serenity::model::id::{EmojiId, GuildId};
+/// use serenity::model::misc::EmojiIdentifier;
 /// use serenity::utils::parse_emoji;
 ///
 /// let expected = EmojiIdentifier {

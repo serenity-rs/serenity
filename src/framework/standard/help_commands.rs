@@ -25,7 +25,8 @@
 
 use client::Context;
 use framework::standard::{has_correct_roles, has_correct_permissions};
-use model::{ChannelId, Message};
+use model::channel::Message;
+use model::id::ChannelId;
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::fmt::Write;

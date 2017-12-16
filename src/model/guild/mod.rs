@@ -1,3 +1,5 @@
+//! Models relating to guilds and types that it owns.
+
 mod emoji;
 mod guild_id;
 mod integration;
@@ -15,7 +17,7 @@ pub use self::role::*;
 pub use self::audit_log::*;
 
 use chrono::{DateTime, FixedOffset};
-use model::*;
+use model::prelude::*;
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::*;
@@ -1363,7 +1365,7 @@ impl Guild {
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
-    /// use serenity::model::*;
+    /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
@@ -1583,6 +1585,19 @@ fn closest_to_origin(origin: &str, word_a: &str, word_b: &str) -> std::cmp::Orde
     value_a.cmp(&value_b)
 }
 
+/// A container for guilds.
+///
+/// This is used to differentiate whether a guild itself can be used or whether
+/// a guild needs to be retrieved from the cache.
+#[allow(large_enum_variant)]
+#[derive(Clone, Debug)]
+pub enum GuildContainer {
+    /// A guild which can have its contents directly searched.
+    Guild(PartialGuild),
+    /// A guild's id, which can be used to search the cache for a guild.
+    Id(GuildId),
+}
+
 /// Information relating to a guild's widget embed.
 #[derive(Clone, Copy, Debug, Deserialize)]
 pub struct GuildEmbed {
@@ -1743,6 +1758,46 @@ impl MfaLevel {
         match *self {
             MfaLevel::None => 0,
             MfaLevel::Elevated => 1,
+        }
+    }
+}
+
+/// The name of a region that a voice server can be located in.
+#[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub enum Region {
+    #[serde(rename = "amsterdam")] Amsterdam,
+    #[serde(rename = "brazil")] Brazil,
+    #[serde(rename = "eu-central")] EuCentral,
+    #[serde(rename = "eu-west")] EuWest,
+    #[serde(rename = "frankfurt")] Frankfurt,
+    #[serde(rename = "london")] London,
+    #[serde(rename = "sydney")] Sydney,
+    #[serde(rename = "us-central")] UsCentral,
+    #[serde(rename = "us-east")] UsEast,
+    #[serde(rename = "us-south")] UsSouth,
+    #[serde(rename = "us-west")] UsWest,
+    #[serde(rename = "vip-amsterdam")] VipAmsterdam,
+    #[serde(rename = "vip-us-east")] VipUsEast,
+    #[serde(rename = "vip-us-west")] VipUsWest,
+}
+
+impl Region {
+    pub fn name(&self) -> &str {
+        match *self {
+            Region::Amsterdam => "amsterdam",
+            Region::Brazil => "brazil",
+            Region::EuCentral => "eu-central",
+            Region::EuWest => "eu-west",
+            Region::Frankfurt => "frankfurt",
+            Region::London => "london",
+            Region::Sydney => "sydney",
+            Region::UsCentral => "us-central",
+            Region::UsEast => "us-east",
+            Region::UsSouth => "us-south",
+            Region::UsWest => "us-west",
+            Region::VipAmsterdam => "vip-amsterdam",
+            Region::VipUsEast => "vip-us-east",
+            Region::VipUsWest => "vip-us-west",
         }
     }
 }

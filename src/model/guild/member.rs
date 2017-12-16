@@ -1,4 +1,4 @@
-use model::*;
+use model::prelude::*;
 use chrono::{DateTime, FixedOffset};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_sync_user;
