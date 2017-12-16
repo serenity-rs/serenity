@@ -59,7 +59,7 @@ fn parse_quotes<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err
     where T::Err: StdError {
 
     // Fall back to `parse` if there're no quotes at the start.
-    if s.chars().next().unwrap() != '"' {
+    if !s.starts_with('"') {
         return parse::<T>(s, delimiter);
     }
 
