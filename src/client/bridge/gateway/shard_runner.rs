@@ -254,7 +254,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 
                     true
                 },
-            }
+            },
             ShardClientMessage::Runner(x) => match x {
                 ShardRunnerMessage::ChunkGuilds { guild_ids, limit, query } => {
                     self.shard.chunk_guilds(
