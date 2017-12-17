@@ -319,6 +319,8 @@ impl Client {
     /// ```
     pub fn new<H>(token: &str, handler: H) -> Result<Self>
         where H: EventHandler + Send + Sync + 'static {
+        let token = token.trim();
+
         let token = if token.starts_with("Bot ") {
             token.to_string()
         } else {
