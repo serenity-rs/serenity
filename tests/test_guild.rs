@@ -4,7 +4,7 @@ extern crate chrono;
 #[cfg(feature = "model")]
 mod model {
     use serenity::prelude::*;
-    use serenity::model::*;
+    use serenity::model::prelude::*;
     use chrono::prelude::*;
     use std::sync::Arc;
     use std::collections::*;
@@ -56,7 +56,7 @@ mod model {
             afk_channel_id: Some(ChannelId(0)),
             afk_timeout: 0,
             channels: hm1,
-            default_message_notifications: 0,
+            default_message_notifications: DefaultMessageNotificationLevel::All,
             emojis: hm2,
             features: vec1,
             icon: Some("/avatars/210/a_aaa.webp?size=1024".to_string()),
@@ -65,7 +65,7 @@ mod model {
             large: false,
             member_count: 1,
             members: hm3,
-            mfa_level: 0,
+            mfa_level: MfaLevel::Elevated,
             name: "Spaghetti".to_string(),
             owner_id: UserId(210),
             presences: hm4,
@@ -74,6 +74,9 @@ mod model {
             splash: Some("asdf".to_string()),
             verification_level: VerificationLevel::None,
             voice_states: hm6,
+            application_id: Some(ApplicationId(0)),
+            explicit_content_filter: ExplicitContentFilter::None,
+            system_channel_id: Some(ChannelId(0)),
         }
     }
 
