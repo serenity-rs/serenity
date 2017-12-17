@@ -1,20 +1,18 @@
+use model::prelude::*;
 use chrono::{DateTime, FixedOffset};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_sync_user;
-use model::*;
 
-#[cfg(feature = "model")]
-use std::borrow::Cow;
-#[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
-#[cfg(all(feature = "cache", feature = "model"))]
-use internal::prelude::*;
-#[cfg(all(feature = "cache", feature = "model"))]
-use http;
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
 use builder::EditMember;
+#[cfg(all(feature = "cache", feature = "model"))]
+use internal::prelude::*;
+#[cfg(feature = "model")]
+use std::borrow::Cow;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use utils::Colour;
+#[cfg(all(feature = "cache", feature = "model"))]
+use {CACHE, http, utils};
 
 /// A trait for allowing both u8 or &str or (u8, &str) to be passed into the `ban` methods in `Guild` and `Member`.
 pub trait BanOptions {
@@ -89,7 +87,7 @@ impl Member {
             return Ok(());
         }
 
-        match http::add_member_role(self.guild_id.0, self.user.read().unwrap().id.0, role_id.0) {
+        match http::add_member_role(self.guild_id.0, self.user.read().id.0, role_id.0) {
             Ok(()) => {
                 self.roles.push(role_id);
 
@@ -110,9 +108,10 @@ impl Member {
     pub fn add_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         self.roles.extend_from_slice(role_ids);
 
-        let map = EditMember::default().roles(&self.roles).0;
+        let builder = EditMember::default().roles(&self.roles);
+        let map = utils::hashmap_to_json_map(builder.0);
 
-        match http::edit_member(self.guild_id.0, self.user.read().unwrap().id.0, &map) {
+        match http::edit_member(self.guild_id.0, self.user.read().id.0, &map) {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.retain(|r| !role_ids.contains(r));
@@ -136,7 +135,7 @@ impl Member {
     ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature = "cache")]
-    pub fn ban<BO: BanOptions>(&self, ban_options: BO) -> Result<()> {
+    pub fn ban<BO: BanOptions>(&self, ban_options: &BO) -> Result<()> {
         let dmd = ban_options.dmd();
         if dmd > 7 {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
@@ -150,7 +149,7 @@ impl Member {
 
         http::ban_user(
             self.guild_id.0,
-            self.user.read().unwrap().id.0,
+            self.user.read().id.0,
             dmd,
             &*reason,
         )
@@ -159,8 +158,8 @@ impl Member {
     /// Determines the member's colour.
     #[cfg(all(feature = "cache", feature = "utils"))]
     pub fn colour(&self) -> Option<Colour> {
-        let cache = CACHE.read().unwrap();
-        let guild = try_opt!(cache.guilds.get(&self.guild_id)).read().unwrap();
+        let cache = CACHE.read();
+        let guild = cache.guilds.get(&self.guild_id)?.read();
 
         let mut roles = self.roles
             .iter()
@@ -176,6 +175,27 @@ impl Member {
             .map(|r| r.colour)
     }
 
+    /// Returns the "default channel" of the guild for the member.
+    /// (This returns the first channel that can be read by the member, if there isn't
+    /// one returns `None`)
+    #[cfg(feature = "cache")]
+    pub fn default_channel(&self) -> Option<Arc<RwLock<GuildChannel>>> {
+        let guild = match self.guild_id.find() {
+            Some(guild) => guild,
+            None => return None,
+        };
+
+        let reader = guild.read();
+
+        for (cid, channel) in &reader.channels {
+            if reader.permissions_in(*cid, self.user.read().id).read_messages() {
+                return Some(Arc::clone(channel));
+            }
+        }
+
+        None
+    }
+
     /// Calculates the member's display name.
     ///
     /// The nickname takes priority over the member's username if it exists.
@@ -184,7 +204,7 @@ impl Member {
         self.nick
             .as_ref()
             .map(Cow::Borrowed)
-            .unwrap_or_else(|| Cow::Owned(self.user.read().unwrap().name.clone()))
+            .unwrap_or_else(|| Cow::Owned(self.user.read().name.clone()))
     }
 
     /// Returns the DiscordTag of a Member, taking possible nickname into account.
@@ -193,7 +213,7 @@ impl Member {
         format!(
             "{}#{}",
             self.display_name(),
-            self.user.read().unwrap().discriminator
+            self.user.read().discriminator
         )
     }
 
@@ -207,9 +227,9 @@ impl Member {
     /// [`EditMember`]: ../builder/struct.EditMember.html
     #[cfg(feature = "cache")]
     pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F) -> Result<()> {
-        let map = f(EditMember::default()).0;
+        let map = utils::hashmap_to_json_map(f(EditMember::default()).0);
 
-        http::edit_member(self.guild_id.0, self.user.read().unwrap().id.0, &map)
+        http::edit_member(self.guild_id.0, self.user.read().id.0, &map)
     }
 
     /// Kick the member from the guild.
@@ -252,17 +272,16 @@ impl Member {
 
             let has_perms = CACHE
                 .read()
-                .unwrap()
                 .guilds
                 .get(&self.guild_id)
-                .map(|guild| guild.read().unwrap().has_perms(req));
+                .map(|guild| guild.read().has_perms(req));
 
             if let Some(false) = has_perms {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
 
-        self.guild_id.kick(self.user.read().unwrap().id)
+        self.guild_id.kick(self.user.read().id)
     }
 
     /// Returns the guild-level permissions for the member.
@@ -292,9 +311,9 @@ impl Member {
             None => return Err(From::from(ModelError::GuildNotFound)),
         };
 
-        let reader = guild.read().unwrap();
+        let reader = guild.read();
 
-        Ok(reader.member_permissions(self.user.read().unwrap().id))
+        Ok(reader.member_permissions(self.user.read().id))
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the
@@ -312,7 +331,7 @@ impl Member {
             return Ok(());
         }
 
-        match http::remove_member_role(self.guild_id.0, self.user.read().unwrap().id.0, role_id.0) {
+        match http::remove_member_role(self.guild_id.0, self.user.read().id.0, role_id.0) {
             Ok(()) => {
                 self.roles.retain(|r| r.0 != role_id.0);
 
@@ -332,9 +351,10 @@ impl Member {
     pub fn remove_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         self.roles.retain(|r| !role_ids.contains(r));
 
-        let map = EditMember::default().roles(&self.roles).0;
+        let builder = EditMember::default().roles(&self.roles);
+        let map = utils::hashmap_to_json_map(builder.0);
 
-        match http::edit_member(self.guild_id.0, self.user.read().unwrap().id.0, &map) {
+        match http::edit_member(self.guild_id.0, self.user.read().id.0, &map) {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);
@@ -356,7 +376,6 @@ impl Member {
             .find()
             .map(|g| g
                 .read()
-                .unwrap()
                 .roles
                 .values()
                 .filter(|role| self.roles.contains(&role.id))
@@ -378,7 +397,7 @@ impl Member {
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature = "cache")]
     pub fn unban(&self) -> Result<()> {
-        http::remove_ban(self.guild_id.0, self.user.read().unwrap().id.0)
+        http::remove_ban(self.guild_id.0, self.user.read().id.0)
     }
 }
 
@@ -394,6 +413,6 @@ impl Display for Member {
     ///
     // This is in the format of `<@USER_ID>`.
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        Display::fmt(&self.user.read().unwrap().mention(), f)
+        Display::fmt(&self.user.read().mention(), f)
     }
 }

@@ -12,7 +12,8 @@ extern crate serenity;
 
 use serenity::client::CACHE;
 use serenity::framework::StandardFramework;
-use serenity::model::*;
+use serenity::model::gateway::Ready;
+use serenity::model::id::ChannelId;
 use serenity::prelude::*;
 use serenity::voice;
 use serenity::Result as SerenityResult;
@@ -21,7 +22,7 @@ use std::env;
 struct Handler;
 
 impl EventHandler for Handler {
-    fn on_ready(&self, _: Context, ready: Ready) {
+    fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }
@@ -30,7 +31,7 @@ fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
-    let mut client = Client::new(&token, Handler);
+    let mut client = Client::new(&token, Handler).expect("Err creating client");
 
     client.with_framework(StandardFramework::new()
         .configure(|c| c
@@ -49,8 +50,8 @@ fn main() {
 }
 
 command!(deafen(ctx, msg) {
-    let guild_id = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().unwrap().guild_id,
+    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Groups and DMs not supported"));
 
@@ -95,8 +96,8 @@ command!(join(ctx, msg, args) {
         },
     };
 
-    let guild_id = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().unwrap().guild_id,
+    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Groups and DMs not supported"));
 
@@ -111,8 +112,8 @@ command!(join(ctx, msg, args) {
 });
 
 command!(leave(ctx, msg) {
-    let guild_id = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().unwrap().guild_id,
+    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Groups and DMs not supported"));
 
@@ -133,8 +134,8 @@ command!(leave(ctx, msg) {
 });
 
 command!(mute(ctx, msg) {
-    let guild_id = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().unwrap().guild_id,
+    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Groups and DMs not supported"));
 
@@ -182,8 +183,8 @@ command!(play(ctx, msg, args) {
         return Ok(());
     }
 
-    let guild_id = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().unwrap().guild_id,
+    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Error finding channel info"));
 
@@ -212,8 +213,8 @@ command!(play(ctx, msg, args) {
 });
 
 command!(undeafen(ctx, msg) {
-    let guild_id = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().unwrap().guild_id,
+    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Error finding channel info"));
 
@@ -231,8 +232,8 @@ command!(undeafen(ctx, msg) {
 });
 
 command!(unmute(ctx, msg) {
-    let guild_id = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().unwrap().guild_id,
+    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Error finding channel info"));
 

@@ -2,7 +2,6 @@
 //! fully use the library.
 
 mod colour;
-
 mod message_builder;
 
 pub use self::colour::Colour;
@@ -13,17 +12,32 @@ pub use self::message_builder::{Content, ContentModifier, MessageBuilder};
 pub use super::builder;
 
 use base64;
+use internal::prelude::*;
+use model::id::EmojiId;
+use model::misc::EmojiIdentifier;
+use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::fs::File;
+use std::hash::{BuildHasher, Hash};
 use std::io::Read;
 use std::path::Path;
-use internal::prelude::*;
-use model::{EmojiId, EmojiIdentifier};
 
 #[cfg(feature = "cache")]
 use cache::Cache;
 #[cfg(feature = "cache")]
 use CACHE;
+
+/// Converts a HashMap into a final `serde_json::Map` representation.
+pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>)
+    -> Map<String, Value> where H: BuildHasher, T: Eq + Hash + ToString {
+    let mut json_map = Map::new();
+
+    for (key, value) in map {
+        json_map.insert(key.to_string(), value);
+    }
+
+    json_map
+}
 
 /// Determines if a name is NSFW.
 ///
@@ -254,7 +268,8 @@ pub fn parse_channel(mention: &str) -> Option<u64> {
 /// Ensure that a valid [`Emoji`] usage is correctly parsed:
 ///
 /// ```rust
-/// use serenity::model::{EmojiId, EmojiIdentifier};
+/// use serenity::model::id::{EmojiId, GuildId};
+/// use serenity::model::misc::EmojiIdentifier;
 /// use serenity::utils::parse_emoji;
 ///
 /// let expected = EmojiIdentifier {
@@ -455,7 +470,7 @@ pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % sha
 #[cfg(feature = "cache")]
 pub fn with_cache<T, F>(f: F) -> T
     where F: Fn(&Cache) -> T {
-    let cache = CACHE.read().unwrap();
+    let cache = CACHE.read();
     f(&cache)
 }
 
@@ -476,6 +491,6 @@ pub fn with_cache<T, F>(f: F) -> T
 #[cfg(feature = "cache")]
 pub fn with_cache_mut<T, F>(mut f: F) -> T
     where F: FnMut(&mut Cache) -> T {
-    let mut cache = CACHE.write().unwrap();
+    let mut cache = CACHE.write();
     f(&mut cache)
 }

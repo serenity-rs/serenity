@@ -51,9 +51,19 @@
 
 mod error;
 mod shard;
+mod ws_client_ext;
 
 pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
+pub use self::ws_client_ext::WebSocketGatewayClientExt;
+
+use model::gateway::Game;
+use model::user::OnlineStatus;
+use websocket::sync::client::Client;
+use websocket::sync::stream::{TcpStream, TlsStream};
+
+pub type CurrentPresence = (Option<Game>, OnlineStatus);
+pub type WsClient = Client<TlsStream<TcpStream>>;
 
 /// Indicates the current connection stage of a [`Shard`].
 ///
@@ -135,4 +145,18 @@ impl ConnectionStage {
             Connected | Disconnected => false,
         }
     }
+}
+
+pub enum ShardAction {
+    Heartbeat,
+    Identify,
+    Reconnect(ReconnectType),
+}
+
+/// The type of reconnection that should be performed.
+pub enum ReconnectType {
+    /// Indicator that a new connection should be made by sending an IDENTIFY.
+    Reidentify,
+    /// Indicator that a new connection should be made by sending a RESUME.
+    Resume,
 }

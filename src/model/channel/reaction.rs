@@ -1,7 +1,9 @@
+use model::prelude::*;
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
+use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
+use std::str::FromStr;
 use internal::prelude::*;
-use model::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
@@ -30,10 +32,24 @@ pub struct Reaction {
 
 #[cfg(feature = "model")]
 impl Reaction {
+    /// Retrieves the associated the reaction was made in.
+    ///
+    /// If the cache is enabled, this will search for the already-cached
+    /// channel. If not - or the channel was not found - this will perform a
+    /// request over the REST API for the channel.
+    ///
+    /// Requires the [Read Message History] permission.
+    ///
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    #[inline]
+    pub fn channel(&self) -> Result<Channel> {
+        self.channel_id.get()
+    }
+
     /// Deletes the reaction, but only if the current user is the user who made
     /// the reaction or has permission to.
     ///
-    /// **Note**: Requires the [Manage Messages] permission, _if_ the current
+    /// Requires the [Manage Messages] permission, _if_ the current
     /// user did not perform the reaction.
     ///
     /// # Errors
@@ -48,7 +64,7 @@ impl Reaction {
     pub fn delete(&self) -> Result<()> {
         let user_id = feature_cache! {
             {
-                let user = if self.user_id == CACHE.read().unwrap().user.id {
+                let user = if self.user_id == CACHE.read().user.id {
                     None
                 } else {
                     Some(self.user_id.0)
@@ -77,6 +93,31 @@ impl Reaction {
         http::delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
     }
 
+    /// Retrieves the [`Message`] associated with this reaction.
+    ///
+    /// Requires the [Read Message History] permission.
+    ///
+    /// **Note**: This will send a request to the REST API. Prefer maintaining
+    /// your own message cache or otherwise having the message available if
+    /// possible.
+    ///
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [`Message`]: struct.Message.html
+    #[inline]
+    pub fn message(&self) -> Result<Message> {
+        self.channel_id.message(self.message_id)
+    }
+
+    /// Retrieves the user that made the reaction.
+    ///
+    /// If the cache is enabled, this will search for the already-cached user.
+    /// If not - or the user was not found - this will perform a request over
+    /// the REST API for the user.
+    #[inline]
+    pub fn user(&self) -> Result<User> {
+        self.user_id.get()
+    }
+
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
     ///
@@ -87,7 +128,9 @@ impl Reaction {
     /// The optional `after` attribute is to retrieve the users after a certain
     /// user. This is useful for pagination.
     ///
-    /// **Note**: Requires the [Read Message History] permission.
+    /// Requires the [Read Message History] permission.
+    ///
+    /// **Note**: This will send a request to the REST API.
     ///
     /// # Errors
     ///
@@ -227,7 +270,7 @@ impl From<char> for ReactionType {
     /// Reacting to a message with an apple:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::ChannelId;
+    /// # use serenity::model::id::ChannelId;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -253,6 +296,24 @@ impl From<Emoji> for ReactionType {
     }
 }
 
+impl From<EmojiId> for ReactionType {
+    fn from(emoji_id: EmojiId) -> ReactionType {
+        ReactionType::Custom {
+            id: emoji_id,
+            name: None
+        }
+    }
+}
+
+impl From<EmojiIdentifier> for ReactionType {
+    fn from(emoji_id: EmojiIdentifier) -> ReactionType {
+        ReactionType::Custom {
+            id: emoji_id.id,
+            name: Some(emoji_id.name)
+        }
+    }
+}
+
 impl From<String> for ReactionType {
     fn from(unicode: String) -> ReactionType { ReactionType::Unicode(unicode) }
 }
@@ -266,7 +327,7 @@ impl<'a> From<&'a str> for ReactionType {
     /// rest of the library:
     ///
     /// ```rust
-    /// use serenity::model::ReactionType;
+    /// use serenity::model::channel::ReactionType;
     ///
     /// fn foo<R: Into<ReactionType>>(bar: R) {
     ///     println!("{:?}", bar.into());
@@ -275,6 +336,31 @@ impl<'a> From<&'a str> for ReactionType {
     /// foo("🍎");
     /// ```
     fn from(unicode: &str) -> ReactionType { ReactionType::Unicode(unicode.to_string()) }
+}
+
+// TODO: Change this to `!` once it becomes stable.
+
+#[derive(Debug)]
+pub enum NeverFails {}
+
+impl Display for NeverFails {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        write!(f, "never fails")
+    }
+}
+
+impl StdError for NeverFails {
+    fn description(&self) -> &str {
+        "never fails"
+    }
+}
+
+impl FromStr for ReactionType {
+    type Err = NeverFails;
+
+    fn from_str(s: &str) -> ::std::result::Result<Self, Self::Err> {
+        Ok(ReactionType::from(s))
+    }
 }
 
 impl Display for ReactionType {

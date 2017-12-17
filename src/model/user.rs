@@ -1,24 +1,30 @@
+//! User information-related models.
+
 use serde_json;
 use std::fmt;
 use super::utils::deserialize_u16;
-use super::*;
+use super::prelude::*;
 use internal::prelude::*;
 use model::misc::Mentionable;
 
+#[cfg(all(feature = "cache", feature = "model"))]
+use CACHE;
+#[cfg(feature = "model")]
+use builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
 use chrono::NaiveDateTime;
+#[cfg(feature = "model")]
+use http::{self, GuildPagination};
+#[cfg(all(feature = "cache", feature = "model"))]
+use parking_lot::RwLock;
 #[cfg(feature = "model")]
 use std::fmt::Write;
 #[cfg(feature = "model")]
 use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 #[cfg(feature = "model")]
-use builder::{CreateMessage, EditProfile};
-#[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
-#[cfg(feature = "model")]
-use http::{self, GuildPagination};
+use utils;
 
 /// Information about the current user.
 #[derive(Clone, Default, Debug, Deserialize)]
@@ -46,7 +52,7 @@ impl CurrentUser {
     /// ```rust,no_run
     /// # use serenity::CACHE;
     /// #
-    /// # let cache = CACHE.read().unwrap();
+    /// # let cache = CACHE.read();
     /// #
     /// // assuming the cache has been unlocked
     /// let user = &cache.user;
@@ -80,18 +86,20 @@ impl CurrentUser {
     ///
     /// let avatar = serenity::utils::read_image("./avatar.png").unwrap();
     ///
-    /// CACHE.write().unwrap().user.edit(|p| p.avatar(Some(&avatar)));
+    /// CACHE.write().user.edit(|p| p.avatar(Some(&avatar)));
     /// ```
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
-        let mut map = Map::new();
-        map.insert("username".to_string(), Value::String(self.name.clone()));
+        let mut map = HashMap::new();
+        map.insert("username", Value::String(self.name.clone()));
 
         if let Some(email) = self.email.as_ref() {
-            map.insert("email".to_string(), Value::String(email.clone()));
+            map.insert("email", Value::String(email.clone()));
         }
 
-        match http::edit_profile(&f(EditProfile(map)).0) {
+        let map = utils::hashmap_to_json_map(f(EditProfile(map)).0);
+
+        match http::edit_profile(&map) {
             Ok(new) => {
                 let _ = mem::replace(self, new);
 
@@ -123,7 +131,7 @@ impl CurrentUser {
     /// ```rust,no_run
     /// # use serenity::CACHE;
     /// #
-    /// # let cache = CACHE.read().unwrap();
+    /// # let cache = CACHE.read();
     /// #
     /// // assuming the cache has been unlocked
     /// let user = &cache.user;
@@ -151,9 +159,9 @@ impl CurrentUser {
     /// ```rust,no_run
     /// # use serenity::CACHE;
     /// #
-    /// # let mut cache = CACHE.write().unwrap();
+    /// # let mut cache = CACHE.write();
     ///
-    /// use serenity::model::permissions::Permissions;
+    /// use serenity::model::Permissions;
     ///
     /// // assuming the cache has been unlocked
     /// let url = match cache.user.invite_url(Permissions::empty()) {
@@ -174,7 +182,7 @@ impl CurrentUser {
     /// ```rust,no_run
     /// # use serenity::CACHE;
     /// #
-    /// # let mut cache = CACHE.write().unwrap();
+    /// # let mut cache = CACHE.write();
     ///
     /// use serenity::model::Permissions;
     ///
@@ -230,7 +238,7 @@ impl CurrentUser {
     /// ```rust,no_run
     /// # use serenity::CACHE;
     /// #
-    /// # let cache = CACHE.read().unwrap();
+    /// # let cache = CACHE.read();
     /// #
     /// // assuming the cache has been unlocked
     /// let user = &cache.user;
@@ -254,7 +262,7 @@ impl CurrentUser {
     /// ```rust,no_run
     /// # use serenity::CACHE;
     /// #
-    /// # let cache = CACHE.read().unwrap();
+    /// # let cache = CACHE.read();
     /// #
     /// // assuming the cache has been unlocked
     /// println!("The current user's distinct identifier is {}", cache.user.tag());
@@ -293,20 +301,6 @@ impl DefaultAvatar {
     /// Retrieves the String hash of the default avatar.
     pub fn name(&self) -> Result<String> { serde_json::to_string(self).map_err(From::from) }
 }
-
-enum_number!(
-    /// Identifier for the notification level of a channel.
-    NotificationLevel {
-        /// Receive notifications for everything.
-        All = 0,
-        /// Receive only mentions.
-        Mentions = 1,
-        /// Receive no notifications.
-        Nothing = 2,
-        /// Inherit the notification level from the parent setting.
-        Parent = 3,
-    }
-);
 
 /// The representation of a user's status.
 ///
@@ -416,7 +410,7 @@ impl User {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// use serenity::model::Permissions;
     /// use serenity::CACHE;
@@ -424,27 +418,23 @@ impl User {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///     fn message(&self, _: Context, msg: Message) {
     ///         if msg.content == "~help" {
-    ///             let url = match CACHE.read() {
-    ///                 Ok(v) => {
-    ///                     match v.user.invite_url(Permissions::empty()) {
-    ///                         Ok(v) => v,
-    ///                         Err(why) => {
-    ///                             println!("Error creating invite url: {:?}", why);
+    ///             let cache = CACHE.read();
     ///
-    ///                             return;
-    ///                         },
-    ///                     }
-    ///                 },
+    ///             let url = match cache.user.invite_url(Permissions::empty()) {
+    ///                 Ok(v) => v,
     ///                 Err(why) => {
-    ///                     println!("Error reading from CACHE: {:?}", why);
+    ///                     println!("Error creating invite url: {:?}", why);
     ///
     ///                     return;
-    ///                 }
+    ///                 },
     ///             };
-    /// let help = format!("Helpful info here. Invite me with this link: <{}>",
-    /// url);
+    ///
+    ///             let help = format!(
+    ///                 "Helpful info here. Invite me with this link: <{}>",
+    ///                 url,
+    ///             );
     ///
     ///             match msg.author.direct_message(|m| m.content(&help)) {
     ///                 Ok(_) => {
@@ -496,12 +486,12 @@ impl User {
         let private_channel_id = feature_cache! {
             {
                 let finding = {
-                    let cache = CACHE.read().unwrap();
+                    let cache = CACHE.read();
 
                     let finding = cache.private_channels
                         .values()
-                        .map(|ch| ch.read().unwrap())
-                        .find(|ch| ch.recipient.read().unwrap().id == self.id)
+                        .map(|ch| ch.read())
+                        .find(|ch| ch.recipient.read().id == self.id)
                         .map(|ch| ch.id);
 
                     finding
@@ -596,11 +586,10 @@ impl User {
             GuildContainer::Id(_guild_id) => {
                 feature_cache! {{
                     CACHE.read()
-                        .unwrap()
                         .guilds
                         .get(&_guild_id)
                         .map(|g| {
-                            g.read().unwrap().members.get(&self.id)
+                            g.read().members.get(&self.id)
                                 .map(|m| m.roles.contains(&role_id))
                                 .unwrap_or(false)
                         })
@@ -624,18 +613,19 @@ impl User {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, _: Message) {
+    ///     fn message(&self, _: Context, _: Message) {
     ///         // normal message handling here
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler);
+    ///
+    /// let mut client = Client::new("token", Handler).unwrap();
     /// #
-    /// use serenity::model::UserId;
+    /// use serenity::model::id::UserId;
     /// use serenity::CACHE;
     /// use std::thread;
     /// use std::time::Duration;
@@ -651,11 +641,11 @@ impl User {
     ///     loop {
     ///         thread::sleep(duration);
     ///
-    ///         let cache = CACHE.read().unwrap();
+    ///         let cache = CACHE.read();
     ///
     ///         for id in &special_users {
     ///             if let Some(user) = cache.user(*id) {
-    ///                 if let Err(why) = user.write().unwrap().refresh() {
+    ///                 if let Err(why) = user.write().refresh() {
     ///                     println!("Error refreshing {}: {:?}", id, why);
     ///                 }
     ///             }
@@ -692,7 +682,7 @@ impl User {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// use serenity::utils::MessageBuilder;
     /// use serenity::utils::ContentModifier::Bold;
@@ -700,7 +690,7 @@ impl User {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, msg: Message) {
+    ///     fn message(&self, _: Context, msg: Message) {
     ///         if msg.content == "!mytag" {
     ///             let content = MessageBuilder::new()
     ///                 .push("Your tag is ")
@@ -711,7 +701,9 @@ impl User {
     ///         }
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     #[inline]
     pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }
@@ -741,7 +733,7 @@ impl UserId {
 
     /// Search the cache for the user with the Id.
     #[cfg(feature = "cache")]
-    pub fn find(&self) -> Option<Arc<RwLock<User>>> { CACHE.read().unwrap().user(*self) }
+    pub fn find(&self) -> Option<Arc<RwLock<User>>> { CACHE.read().user(*self) }
 
     /// Gets a user by its Id over the REST API.
     ///
@@ -750,8 +742,8 @@ impl UserId {
     pub fn get(&self) -> Result<User> {
         #[cfg(feature = "cache")]
         {
-            if let Some(user) = CACHE.read().unwrap().user(*self) {
-                return Ok(user.read().unwrap().clone());
+            if let Some(user) = CACHE.read().user(*self) {
+                return Ok(user.read().clone());
             }
         }
 
@@ -771,12 +763,12 @@ impl<'a> From<&'a CurrentUser> for UserId {
 
 impl From<Member> for UserId {
     /// Gets the Id of a `Member`.
-    fn from(member: Member) -> UserId { member.user.read().unwrap().id }
+    fn from(member: Member) -> UserId { member.user.read().id }
 }
 
 impl<'a> From<&'a Member> for UserId {
     /// Gets the Id of a `Member`.
-    fn from(member: &Member) -> UserId { member.user.read().unwrap().id }
+    fn from(member: &Member) -> UserId { member.user.read().id }
 }
 
 impl From<User> for UserId {

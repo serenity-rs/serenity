@@ -1,14 +1,16 @@
-use chrono::{DateTime, FixedOffset};
-use super::*;
+//! Models for server and channel invites.
 
-#[cfg(all(feature = "cache", feature = "model"))]
-use super::{Permissions, utils as model_utils};
+use chrono::{DateTime, FixedOffset};
+use super::prelude::*;
+
 #[cfg(feature = "model")]
 use builder::CreateInvite;
 #[cfg(feature = "model")]
-use http;
-#[cfg(feature = "model")]
 use internal::prelude::*;
+#[cfg(all(feature = "cache", feature = "model"))]
+use super::{Permissions, utils as model_utils};
+#[cfg(feature = "model")]
+use {http, utils};
 
 /// Information about an invite code.
 ///
@@ -73,7 +75,9 @@ impl Invite {
             }
         }
 
-        http::create_invite(channel_id.0, &f(CreateInvite::default()).0)
+        let map = utils::hashmap_to_json_map(f(CreateInvite::default()).0);
+
+        http::create_invite(channel_id.0, &map)
     }
 
     /// Deletes the invite.
@@ -121,7 +125,7 @@ impl Invite {
     /// Retrieve the URL for an invite with the code `WxZumR`:
     ///
     /// ```rust
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # let invite = Invite {
     /// #     approximate_member_count: Some(1812),
@@ -287,7 +291,7 @@ impl RichInvite {
     /// Retrieve the URL for an invite with the code `WxZumR`:
     ///
     /// ```rust
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # let invite = RichInvite {
     /// #     code: "WxZumR".to_string(),

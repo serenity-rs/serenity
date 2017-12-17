@@ -1,7 +1,8 @@
 extern crate serenity;
 
 use serenity::prelude::*;
-use serenity::model::*;
+use serenity::model::channel::Message;
+use serenity::model::gateway::Ready;
 use std::env;
 
 // Serenity implements transparent sharding in a way that you do not need to
@@ -25,24 +26,17 @@ use std::env;
 struct Handler;
 
 impl EventHandler for Handler {
-    fn on_message(&self, ctx: Context, msg: Message) {
+    fn message(&self, ctx: Context, msg: Message) {
        if msg.content == "!ping" {
-            // The current shard needs to be unlocked so it can be read from, as
-            // multiple threads may otherwise attempt to read from or mutate it
-            // concurrently.
-            {
-                let shard = ctx.shard.lock();
-                let shard_info = shard.shard_info();
-                println!("Shard {}", shard_info[0]);
-            }
+            println!("Shard {}", ctx.shard_id);
 
             if let Err(why) = msg.channel_id.say("Pong!") {
                 println!("Error sending message: {:?}", why);
             }
-        } 
+        }
     }
 
-    fn on_ready(&self, _: Context, ready: Ready) {
+    fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }
@@ -52,7 +46,7 @@ fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
-    let mut client = Client::new(&token, Handler);
+    let mut client = Client::new(&token, Handler).expect("Err creating client");
 
     // The total number of shards to use. The "current shard number" of a
     // shard - that is, the shard it is assigned to - is indexed at 0,

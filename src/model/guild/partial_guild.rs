@@ -1,5 +1,5 @@
+use model::prelude::*;
 use super::super::utils::{deserialize_emojis, deserialize_roles};
-use model::*;
 
 #[cfg(feature = "model")]
 use builder::{EditGuild, EditMember, EditRole};
@@ -13,13 +13,18 @@ pub struct PartialGuild {
     pub id: GuildId,
     pub afk_channel_id: Option<ChannelId>,
     pub afk_timeout: u64,
-    pub default_message_notifications: u64,
+    pub default_message_notifications: DefaultMessageNotificationLevel,
     pub embed_channel_id: Option<ChannelId>,
     pub embed_enabled: bool,
     #[serde(deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
-    pub features: Vec<Feature>,
+    /// Features enabled for the guild.
+    ///
+    /// Refer to [`Guild::features`] for more information.
+    ///
+    /// [`Guild::features`]: struct.Guild.html#structfield.features
+    pub features: Vec<String>,
     pub icon: Option<String>,
-    pub mfa_level: u64,
+    pub mfa_level: MfaLevel,
     pub name: String,
     pub owner_id: UserId,
     pub region: String,
@@ -61,7 +66,7 @@ impl PartialGuild {
             ));
         }
 
-        self.id.ban(user, delete_message_days)
+        self.id.ban(user, &delete_message_days)
     }
 
     /// Gets a list of the guild's bans.
@@ -443,7 +448,7 @@ impl PartialGuild {
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
-    /// use serenity::model::*;
+    /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
@@ -451,15 +456,17 @@ impl PartialGuild {
     /// use serenity::CACHE;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, msg: Message) {
-    ///         if let Some(role) =
-    ///            msg.guild_id().unwrap().get().unwrap().role_by_name("role_name") {
+    ///     fn message(&self, _: Context, msg: Message) {
+    ///         let guild = msg.guild_id().unwrap().get().unwrap();
+    ///         let possible_role = guild.role_by_name("role_name");
+    ///
+    ///         if let Some(role) = possible_role {
     ///             println!("Obtained role's reference: {:?}", role);
     ///         }
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler);
+    /// let mut client = Client::new("token", Handler).unwrap();
     ///
     /// client.start().unwrap();
     /// ```

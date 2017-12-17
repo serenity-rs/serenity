@@ -1,12 +1,14 @@
 #![cfg(feature = "model")]
 
+extern crate parking_lot;
 extern crate serenity;
 
 #[cfg(feature = "utils")]
 mod utils {
-    use serenity::model::*;
+    use parking_lot::RwLock;
+    use serenity::model::prelude::*;
     use std::collections::HashMap;
-    use std::sync::{Arc, RwLock};
+    use std::sync::Arc;
 
     fn group() -> Group {
         Group {

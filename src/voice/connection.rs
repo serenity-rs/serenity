@@ -1,4 +1,9 @@
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
+use internal::prelude::*;
+use internal::ws_impl::{ReceiverExt, SenderExt};
+use internal::Timer;
+use model::event::VoiceEvent;
+use model::id::UserId;
 use opus::{
     packet as opus_packet,
     Application as CodingMode,
@@ -6,12 +11,14 @@ use opus::{
     Decoder as OpusDecoder,
     Encoder as OpusEncoder,
 };
+use parking_lot::Mutex;
+use serde::Deserialize;
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
 use std::collections::HashMap;
 use std::io::Write;
 use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
 use std::sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender};
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::thread::{self, Builder as ThreadBuilder, JoinHandle};
 use std::time::Duration;
 use super::audio::{AudioReceiver, AudioSource, AudioType, HEADER_LEN, SAMPLE_RATE};
@@ -21,11 +28,6 @@ use websocket::client::Url as WebsocketUrl;
 use websocket::sync::client::ClientBuilder;
 use websocket::sync::stream::{AsTcpStream, TcpStream, TlsStream};
 use websocket::sync::Client as WsClient;
-use internal::prelude::*;
-use internal::ws_impl::{ReceiverExt, SenderExt};
-use internal::Timer;
-use model::event::VoiceEvent;
-use model::UserId;
 
 type Client = WsClient<TlsStream<TcpStream>>;
 
@@ -68,15 +70,19 @@ impl Connection {
         let url = generate_url(&mut info.endpoint)?;
 
         let mut client = ClientBuilder::from_url(&url).connect_secure(None)?;
-
         client.send_json(&payload::build_identify(&info))?;
 
         let hello = loop {
-            match client.recv_json(VoiceEvent::decode)? {
-                Some(VoiceEvent::Hello(received_hello)) => {
+            let value = match client.recv_json()? {
+                Some(value) => value,
+                None => continue,
+            };
+
+            match VoiceEvent::deserialize(value)? {
+                VoiceEvent::Hello(received_hello) => {
                     break received_hello;
                 },
-                Some(VoiceEvent::Heartbeat(_)) => continue,
+                VoiceEvent::Heartbeat(_) => continue,
                 other => {
                     debug!("[Voice] Expected hello/heartbeat; got: {:?}", other);
 
@@ -223,10 +229,7 @@ impl Connection {
 
         // Send the voice websocket keepalive if it's time
         if self.keepalive_timer.check() {
-            self.client
-                .lock()
-                .unwrap()
-                .send_json(&payload::build_keepalive())?;
+            self.client.lock().send_json(&payload::build_keepalive())?;
         }
 
         // Send UDP keepalive if it's time
@@ -357,10 +360,7 @@ impl Connection {
 
         self.speaking = speaking;
 
-        self.client
-            .lock()
-            .unwrap()
-            .send_json(&payload::build_speaking(speaking))
+        self.client.lock().send_json(&payload::build_speaking(speaking))
     }
 }
 
@@ -387,8 +387,13 @@ fn generate_url(endpoint: &mut String) -> Result<WebsocketUrl> {
 #[inline]
 fn encryption_key(client: &mut Client) -> Result<Key> {
     loop {
-        match client.recv_json(VoiceEvent::decode)? {
-            Some(VoiceEvent::Ready(ready)) => {
+        let value = match client.recv_json()? {
+            Some(value) => value,
+            None => continue,
+        };
+
+        match VoiceEvent::deserialize(value)? {
+            VoiceEvent::Ready(ready) => {
                 if ready.mode != CRYPTO_MODE {
                     return Err(Error::Voice(VoiceError::VoiceModeInvalid));
                 }
@@ -396,7 +401,7 @@ fn encryption_key(client: &mut Client) -> Result<Key> {
                 return Key::from_slice(&ready.secret_key)
                     .ok_or(Error::Voice(VoiceError::KeyGen));
             },
-            Some(VoiceEvent::Unknown(op, value)) => {
+            VoiceEvent::Unknown(op, value) => {
                 debug!(
                     "[Voice] Expected ready for key; got: op{}/v{:?}",
                     op.num(),
@@ -452,7 +457,16 @@ fn start_threads(client: Arc<Mutex<Client>>, udp: &UdpSocket) -> Result<ThreadIt
     let ws_thread = ThreadBuilder::new()
         .name(format!("{} WS", thread_name))
         .spawn(move || loop {
-            while let Ok(Some(msg)) = client.lock().unwrap().recv_json(VoiceEvent::decode) {
+            while let Ok(Some(value)) = client.lock().recv_json() {
+                let msg = match VoiceEvent::deserialize(value) {
+                    Ok(msg) => msg,
+                    Err(why) => {
+                        warn!("Error deserializing voice event: {:?}", why);
+
+                        break;
+                    },
+                };
+
                 if tx_clone.send(ReceiverStatus::Websocket(msg)).is_ok() {
                     return;
                 }

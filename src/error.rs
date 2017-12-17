@@ -1,10 +1,10 @@
-use serde_json::Error as JsonError;
-use std::io::Error as IoError;
-use std::error::Error as StdError;
-use std::fmt::{self, Display, Error as FormatError};
-use std::num::ParseIntError;
 use internal::prelude::*;
 use model::ModelError;
+use serde_json::Error as JsonError;
+use std::error::Error as StdError;
+use std::fmt::{self, Display, Error as FormatError};
+use std::io::Error as IoError;
+use std::num::ParseIntError;
 
 #[cfg(feature = "hyper")]
 use hyper::Error as HyperError;
@@ -154,17 +154,7 @@ impl From<WebSocketError> for Error {
 
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Error::Io(ref inner) => inner.fmt(f),
-            Error::Json(ref inner) => inner.fmt(f),
-            #[cfg(feature = "http")]
-            Error::Hyper(ref inner) => inner.fmt(f),
-            #[cfg(feature = "gateway")]
-            Error::WebSocket(ref inner) => inner.fmt(f),
-            #[cfg(feature = "voice")]
-            Error::Opus(ref inner) => inner.fmt(f),
-            _ => f.write_str(self.description()),
-        }
+        f.write_str(self.description())
     }
 }
 

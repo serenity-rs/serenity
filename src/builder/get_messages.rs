@@ -1,5 +1,5 @@
-use std::collections::BTreeMap;
-use model::MessageId;
+use model::id::MessageId;
+use std::collections::HashMap;
 
 /// Builds a request for a request to the API to retrieve messages.
 ///
@@ -29,8 +29,8 @@ use model::MessageId;
 /// # use std::error::Error;
 /// #
 /// # fn try_main() -> Result<(), Box<Error>> {
-/// use serenity::model::{ChannelId, MessageId};
 /// use serenity::builder::GetMessages;
+/// use serenity::model::id::{ChannelId, MessageId};
 ///
 /// let retriever = GetMessages::default()
 ///     .after(MessageId(158339864557912064))
@@ -50,13 +50,13 @@ use model::MessageId;
 ///
 /// [`GuildChannel::messages`]: ../model/struct.GuildChannel.html#method.messages
 #[derive(Clone, Debug, Default)]
-pub struct GetMessages(pub BTreeMap<String, u64>);
+pub struct GetMessages(pub HashMap<&'static str, u64>);
 
 impl GetMessages {
     /// Indicates to retrieve the messages after a specific message, given by
     /// its Id.
     pub fn after<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("after".to_string(), message_id.into().0);
+        self.0.insert("after", message_id.into().0);
 
         self
     }
@@ -64,7 +64,7 @@ impl GetMessages {
     /// Indicates to retrieve the messages _around_ a specific message in either
     /// direction (before+after) the given message.
     pub fn around<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("around".to_string(), message_id.into().0);
+        self.0.insert("around", message_id.into().0);
 
         self
     }
@@ -72,7 +72,7 @@ impl GetMessages {
     /// Indicates to retrieve the messages before a specific message, given by
     /// its Id.
     pub fn before<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("before".to_string(), message_id.into().0);
+        self.0.insert("before", message_id.into().0);
 
         self
     }
@@ -86,7 +86,7 @@ impl GetMessages {
     /// reduced.
     pub fn limit(mut self, limit: u64) -> Self {
         self.0
-            .insert("limit".to_string(), if limit > 100 { 100 } else { limit });
+            .insert("limit", if limit > 100 { 100 } else { limit });
 
         self
     }

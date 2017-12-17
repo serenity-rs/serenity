@@ -1,5 +1,6 @@
-use model::{ChannelId, RoleId};
 use internal::prelude::*;
+use model::id::{ChannelId, RoleId};
+use std::collections::HashMap;
 
 /// A builder which edits the properties of a [`Member`], to be used in
 /// conjunction with [`Member::edit`].
@@ -7,7 +8,7 @@ use internal::prelude::*;
 /// [`Member`]: ../model/struct.Member.html
 /// [`Member::edit`]: ../model/struct.Member.html#method.edit
 #[derive(Clone, Debug, Default)]
-pub struct EditMember(pub JsonMap);
+pub struct EditMember(pub HashMap<&'static str, Value>);
 
 impl EditMember {
     /// Whether to deafen the member.
@@ -16,7 +17,7 @@ impl EditMember {
     ///
     /// [Deafen Members]: ../model/permissions/constant.DEAFEN_MEMBERS.html
     pub fn deafen(mut self, deafen: bool) -> Self {
-        self.0.insert("deaf".to_string(), Value::Bool(deafen));
+        self.0.insert("deaf", Value::Bool(deafen));
 
         self
     }
@@ -27,7 +28,7 @@ impl EditMember {
     ///
     /// [Mute Members]: ../model/permissions/constant.MUTE_MEMBERS.html
     pub fn mute(mut self, mute: bool) -> Self {
-        self.0.insert("mute".to_string(), Value::Bool(mute));
+        self.0.insert("mute", Value::Bool(mute));
 
         self
     }
@@ -39,8 +40,7 @@ impl EditMember {
     ///
     /// [Manage Nicknames]: ../model/permissions/constant.MANAGE_NICKNAMES.html
     pub fn nickname(mut self, nickname: &str) -> Self {
-        self.0
-            .insert("nick".to_string(), Value::String(nickname.to_string()));
+        self.0.insert("nick", Value::String(nickname.to_string()));
 
         self
     }
@@ -56,7 +56,7 @@ impl EditMember {
             .map(|x| Value::Number(Number::from(x.as_ref().0)))
             .collect();
 
-        self.0.insert("roles".to_string(), Value::Array(role_ids));
+        self.0.insert("roles", Value::Array(role_ids));
 
         self
     }
@@ -67,10 +67,8 @@ impl EditMember {
     ///
     /// [Move Members]: ../model/permissions/constant.MOVE_MEMBERS.html
     pub fn voice_channel<C: Into<ChannelId>>(mut self, channel_id: C) -> Self {
-        self.0.insert(
-            "channel_id".to_string(),
-            Value::Number(Number::from(channel_id.into().0)),
-        );
+        let num = Value::Number(Number::from(channel_id.into().0));
+        self.0.insert("channel_id", num);
 
         self
     }

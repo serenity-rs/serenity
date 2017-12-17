@@ -1,3 +1,5 @@
+//! Models relating to channels and types within channels.
+
 mod attachment;
 mod channel_id;
 mod embed;
@@ -19,17 +21,17 @@ pub use self::reaction::*;
 pub use self::channel_category::*;
 
 use internal::RwLockExt;
+use model::prelude::*;
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::deserialize_u64;
-use model::*;
 
-#[cfg(feature = "model")]
-use std::fmt::{Display, Formatter, Result as FmtResult};
 #[cfg(feature = "model")]
 use builder::{CreateMessage, GetMessages};
 #[cfg(feature = "model")]
 use http::AttachmentType;
+#[cfg(feature = "model")]
+use std::fmt::{Display, Formatter, Result as FmtResult};
 
 /// A container for any channel.
 #[derive(Clone, Debug)]
@@ -84,16 +86,16 @@ impl Channel {
     pub fn delete(&self) -> Result<()> {
         match *self {
             Channel::Group(ref group) => {
-                let _ = group.read().unwrap().leave()?;
+                let _ = group.read().leave()?;
             },
             Channel::Guild(ref public_channel) => {
-                let _ = public_channel.read().unwrap().delete()?;
+                let _ = public_channel.read().delete()?;
             },
             Channel::Private(ref private_channel) => {
-                let _ = private_channel.read().unwrap().delete()?;
+                let _ = private_channel.read().delete()?;
             },
             Channel::Category(ref category) => {
-                category.read().unwrap().delete()?;
+                category.read().delete()?;
             },
         }
 
@@ -386,15 +388,15 @@ impl Display for Channel {
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         match *self {
-            Channel::Group(ref group) => Display::fmt(&group.read().unwrap().name(), f),
-            Channel::Guild(ref ch) => Display::fmt(&ch.read().unwrap().id.mention(), f),
+            Channel::Group(ref group) => Display::fmt(&group.read().name(), f),
+            Channel::Guild(ref ch) => Display::fmt(&ch.read().id.mention(), f),
             Channel::Private(ref ch) => {
-                let channel = ch.read().unwrap();
-                let recipient = channel.recipient.read().unwrap();
+                let channel = ch.read();
+                let recipient = channel.recipient.read();
 
                 Display::fmt(&recipient.name, f)
             },
-            Channel::Category(ref category) => Display::fmt(&category.read().unwrap().name, f),
+            Channel::Category(ref category) => Display::fmt(&category.read().name, f),
         }
     }
 }

@@ -1,3 +1,4 @@
+use parking_lot::RwLock as ParkingLotRwLock;
 use std::sync::{Arc, RwLock};
 
 pub trait RwLockExt<T> {
@@ -13,6 +14,18 @@ impl<T> RwLockExt<T> for Arc<RwLock<T>> {
 
     fn with_mut<Y, F: FnMut(&mut T) -> Y>(&self, mut f: F) -> Y {
         let mut w = self.write().unwrap();
+        f(&mut w)
+    }
+}
+
+impl<T> RwLockExt<T> for Arc<ParkingLotRwLock<T>> {
+    fn with<Y, F: Fn(&T) -> Y>(&self, f: F) -> Y {
+        let r = self.read();
+        f(&r)
+    }
+
+    fn with_mut<Y, F: FnMut(&mut T) -> Y>(&self, mut f: F) -> Y {
+        let mut w = self.write();
         f(&mut w)
     }
 }

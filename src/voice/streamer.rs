@@ -1,13 +1,12 @@
 use byteorder::{LittleEndian, ReadBytesExt};
+use internal::prelude::*;
 use serde_json;
 use std::ffi::OsStr;
+use std::fs::File;
 use std::io::{BufReader, ErrorKind as IoErrorKind, Read, Result as IoResult};
 use std::process::{Child, Command, Stdio};
-use super::{AudioSource, AudioType, DcaError, DcaMetadata, VoiceError};
-use internal::prelude::*;
-
-use std::fs::File;
 use std::result::Result as StdResult;
+use super::{AudioSource, AudioType, DcaError, DcaMetadata, VoiceError};
 
 struct ChildContainer(Child);
 

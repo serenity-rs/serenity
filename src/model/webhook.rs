@@ -1,13 +1,17 @@
-use super::*;
+//! Webhook model and implementations.
 
-#[cfg(feature = "model")]
-use std::mem;
+use super::channel::Message;
+use super::id::{ChannelId, GuildId, WebhookId};
+use super::user::User;
+
 #[cfg(feature = "model")]
 use builder::ExecuteWebhook;
 #[cfg(feature = "model")]
 use internal::prelude::*;
 #[cfg(feature = "model")]
-use http;
+use std::mem;
+#[cfg(feature = "model")]
+use {http, utils};
 
 /// A representation of a webhook, which is a low-effort way to post messages to
 /// channels. They do not necessarily require a bot user or authentication to
@@ -157,7 +161,7 @@ impl Webhook {
     ///
     /// ```rust,no_run
     /// use serenity::http;
-    /// use serenity::model::Embed;
+    /// use serenity::model::channel::Embed;
     ///
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
@@ -183,12 +187,9 @@ impl Webhook {
                                                                 wait: bool,
                                                                 f: F)
                                                                 -> Result<Option<Message>> {
-        http::execute_webhook(
-            self.id.0,
-            &self.token,
-            wait,
-            &f(ExecuteWebhook::default()).0,
-        )
+        let map = utils::hashmap_to_json_map(f(ExecuteWebhook::default()).0);
+
+        http::execute_webhook(self.id.0, &self.token, wait, &map)
     }
 
     /// Retrieves the latest information about the webhook, editing the

@@ -1,7 +1,8 @@
+use parking_lot::RwLock;
 use serde::de::Error as DeError;
 use std::collections::HashMap;
-use std::sync::{Arc, RwLock};
-use super::*;
+use std::sync::Arc;
+use super::prelude::*;
 
 #[cfg(feature = "cache")]
 use internal::prelude::*;
@@ -10,6 +11,10 @@ use internal::prelude::*;
 use super::permissions::Permissions;
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
+
+pub fn default_true() -> bool {
+    true
+}
 
 pub fn deserialize_emojis<'de, D: Deserializer<'de>>(
     deserializer: D)
@@ -44,7 +49,7 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
     let mut members = HashMap::new();
 
     for member in vec {
-        let user_id = member.user.read().unwrap().id;
+        let user_id = member.user.read().id;
 
         members.insert(user_id, member);
     }
@@ -73,8 +78,8 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
 
     for private_channel in vec {
         let id = match private_channel {
-            Channel::Group(ref group) => group.read().unwrap().channel_id,
-            Channel::Private(ref channel) => channel.read().unwrap().id,
+            Channel::Group(ref group) => group.read().channel_id,
+            Channel::Private(ref channel) => channel.read().id,
             Channel::Guild(_) => unreachable!("Guild private channel decode"),
             Channel::Category(_) => unreachable!("Channel category private channel decode"),
         };
@@ -109,6 +114,11 @@ pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
     };
 
     Ok(Arc::new(RwLock::new(user)))
+}
+
+pub fn deserialize_sync_user<'de, D>(deserializer: D)
+    -> StdResult<Arc<RwLock<User>>, D::Error> where D: Deserializer<'de> {
+    Ok(Arc::new(RwLock::new(User::deserialize(deserializer)?)))
 }
 
 pub fn deserialize_users<'de, D: Deserializer<'de>>(
@@ -147,7 +157,7 @@ pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
 
 #[cfg(all(feature = "cache", feature = "model"))]
 pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Result<bool> {
-    let cache = CACHE.read().unwrap();
+    let cache = CACHE.read();
     let current_user = &cache.user;
 
     let channel = match cache.channel(channel_id) {
@@ -156,7 +166,7 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
     };
 
     let guild_id = match channel {
-        Channel::Guild(channel) => channel.read().unwrap().guild_id,
+        Channel::Guild(channel) => channel.read().guild_id,
         Channel::Group(_) | Channel::Private(_) | Channel::Category(_) => {
             // Both users in DMs, and all users in groups and maybe all channels in categories will
             // have the same
@@ -179,7 +189,6 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
 
     let perms = guild
         .read()
-        .unwrap()
         .permissions_in(channel_id, current_user.id);
 
     permissions.remove(perms);
@@ -187,60 +196,37 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
     Ok(permissions.is_empty())
 }
 
-pub struct U16Visitor;
+macro_rules! num_visitors {
+    ($($visitor:ident: $type:ty),*) => {
+        $(
+            #[derive(Debug)]
+            pub struct $visitor;
 
-impl<'de> Visitor<'de> for U16Visitor {
-    type Value = u16;
+            impl<'de> Visitor<'de> for $visitor {
+                type Value = $type;
 
-    fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
-        formatter.write_str("identifier")
+                fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
+                    formatter.write_str("identifier")
+                }
+
+                fn visit_str<E: DeError>(self, v: &str) -> StdResult<Self::Value, E> {
+                    v.parse::<$type>().map_err(|_| {
+                        let mut s = String::with_capacity(32);
+                        s.push_str("Unknown ");
+                        s.push_str(stringify!($type));
+                        s.push_str(" value: ");
+                        s.push_str(v);
+
+                        DeError::custom(s)
+                    })
+                }
+
+                fn visit_i64<E: DeError>(self, v: i64) -> StdResult<Self::Value, E> { Ok(v as $type) }
+
+                fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> { Ok(v as $type) }
+            }
+        )*
     }
-
-    fn visit_str<E: DeError>(self, v: &str) -> StdResult<Self::Value, E> {
-        match v.parse::<u16>() {
-            Ok(v) => Ok(v),
-            Err(_) => {
-                let mut s = String::new();
-                s.push_str("Unknown ");
-                s.push_str(stringify!($name));
-                s.push_str(" value: ");
-                s.push_str(v);
-
-                Err(DeError::custom(s))
-            },
-        }
-    }
-
-    fn visit_i64<E: DeError>(self, v: i64) -> StdResult<Self::Value, E> { Ok(v as u16) }
-
-    fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> { Ok(v as u16) }
 }
 
-pub struct U64Visitor;
-
-impl<'de> Visitor<'de> for U64Visitor {
-    type Value = u64;
-
-    fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
-        formatter.write_str("identifier")
-    }
-
-    fn visit_str<E: DeError>(self, v: &str) -> StdResult<Self::Value, E> {
-        match v.parse::<u64>() {
-            Ok(v) => Ok(v),
-            Err(_) => {
-                let mut s = String::new();
-                s.push_str("Unknown ");
-                s.push_str(stringify!($name));
-                s.push_str(" value: ");
-                s.push_str(v);
-
-                Err(DeError::custom(s))
-            },
-        }
-    }
-
-    fn visit_i64<E: DeError>(self, v: i64) -> StdResult<Self::Value, E> { Ok(v as u64) }
-
-    fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> { Ok(v) }
-}
+num_visitors!(U16Visitor: u16, U64Visitor: u64);

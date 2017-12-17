@@ -1,3 +1,5 @@
+//! Error enum definition wrapping potential model implementation errors.
+
 use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::Permissions;
@@ -19,7 +21,7 @@ use super::Permissions;
 /// # #[cfg(all(feature = "client", feature = "model"))]
 /// # fn try_main() -> Result<(), Box<Error>> {
 /// use serenity::prelude::*;
-/// use serenity::model::*;
+/// use serenity::model::prelude::*;
 /// use serenity::Error;
 /// use serenity::model::ModelError;
 /// use std::env;
@@ -27,13 +29,13 @@ use super::Permissions;
 /// struct Handler;
 ///
 /// impl EventHandler for Handler {
-///     fn on_guild_ban_removal(&self, context: Context, guild_id: GuildId, user: User) {
+///     fn guild_ban_removal(&self, context: Context, guild_id: GuildId, user: User) {
 ///         // If the user has an even discriminator, don't re-ban them.
 ///         if user.discriminator % 2 == 0 {
 ///             return;
 ///         }
 ///
-///      match guild_id.ban(user, 8) {
+///      match guild_id.ban(user, &8) {
 ///             Ok(()) => {
 ///                 // Ban successful.
 ///             },
@@ -46,8 +48,10 @@ use super::Permissions;
 ///         }
 ///     }
 /// }
-/// let token = env::var("DISCORD_TOKEN")?;
-/// let mut client = Client::new(&token, Handler); client.start()?;
+/// let token = env::var("DISCORD_BOT_TOKEN")?;
+/// let mut client = Client::new(&token, Handler).unwrap();
+///
+/// client.start()?;
 /// #     Ok(())
 /// # }
 /// #

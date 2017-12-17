@@ -1,8 +1,11 @@
+//! Models pertaining to the gateway.
+
+use parking_lot::RwLock;
 use serde::de::Error as DeError;
 use serde_json;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 use super::utils::*;
-use super::*;
+use super::prelude::*;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///
@@ -48,10 +51,10 @@ impl Game {
     /// # #[macro_use] extern crate serenity;
     /// #
     /// use serenity::framework::standard::Args;
-    /// use serenity::model::Game;
+    /// use serenity::model::gateway::Game;
     ///
     /// command!(game(ctx, _msg, args) {
-    ///     let name = args.join(" ");
+    ///     let name = args.full();
     ///     ctx.set_game(Game::playing(&name));
     /// });
     /// #
@@ -77,7 +80,7 @@ impl Game {
     /// # #[macro_use] extern crate serenity;
     /// #
     /// use serenity::framework::standard::Args;
-    /// use serenity::model::Game;
+    /// use serenity::model::gateway::Game;
     ///
     /// // Assumes command has min_args set to 2.
     /// command!(stream(ctx, _msg, args) {
@@ -93,6 +96,64 @@ impl Game {
             kind: GameType::Streaming,
             name: name.to_string(),
             url: Some(url.to_string()),
+        }
+    }
+
+    /// Creates a `Game` struct that appears as a `Listening to <name>` status.
+    ///
+    /// **Note**: Maximum `name` length is 128.
+    ///
+    /// # Examples
+    ///
+    /// Create a command that sets the current game being played:
+    ///
+    /// ```rust,no_run
+    /// # #[macro_use] extern crate serenity;
+    /// #
+    /// use serenity::framework::standard::Args;
+    /// use serenity::model::gateway::Game;
+    ///
+    /// command!(listen(ctx, _msg, args) {
+    ///     let name = args.full();
+    ///     ctx.set_game(Game::listening(&name));
+    /// });
+    /// #
+    /// # fn main() {}
+    /// ```
+    pub fn listening(name: &str) -> Game {
+        Game {
+            kind: GameType::Listening,
+            name: name.to_string(),
+            url: None,
+        }
+    }
+
+    /// Creates a `Game` struct that appears as a `Watching <name>` status.
+    ///
+    /// **Note**: Maximum `name` length is 128.
+    ///
+    /// # Examples
+    ///
+    /// Create a command that sets the current game being played:
+    ///
+    /// ```rust,no_run
+    /// # #[macro_use] extern crate serenity;
+    /// #
+    /// use serenity::framework::standard::Args;
+    /// use serenity::model::gateway::Game;
+    ///
+    /// command!(watch(ctx, _msg, args) {
+    ///     let name = args.full();
+    ///     ctx.set_game(Game::watching(&name));
+    /// });
+    /// #
+    /// # fn main() {}
+    /// ```
+    pub fn watching(name: &str) -> Game {
+        Game {
+            kind: GameType::Watching,
+            name: name.to_string(),
+            url: None,
         }
     }
 }
@@ -124,6 +185,10 @@ enum_number!(
         Playing = 0,
         /// An indicator that the user is streaming to a service.
         Streaming = 1,
+        /// An indicator that the user is listening to something.
+        Listening = 2,
+        /// An indicator that the user is watching something.
+        Watching = 3,
     }
 );
 

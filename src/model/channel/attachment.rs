@@ -1,9 +1,9 @@
 #[cfg(feature = "model")]
 use hyper::Client as HyperClient;
 #[cfg(feature = "model")]
-use std::io::Read;
-#[cfg(feature = "model")]
 use internal::prelude::*;
+#[cfg(feature = "model")]
+use std::io::Read;
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///
@@ -43,8 +43,8 @@ impl Attachment {
     /// Download all of the attachments associated with a [`Message`]:
     ///
     /// ```rust,no_run
+    /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
-    /// use serenity::model::*;
     /// use std::env;
     /// use std::fs::File;
     /// use std::io::Write;
@@ -52,9 +52,8 @@ impl Attachment {
     ///
     /// struct Handler;
     ///
-    ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, message: Message) {
+    ///     fn message(&self, _: Context, message: Message) {
     ///         for attachment in message.attachments {
     ///             let content = match attachment.download() {
     ///                 Ok(content) => content,
@@ -86,12 +85,14 @@ impl Attachment {
     ///         }
     ///     }
     ///
-    ///     fn on_ready(&self, _: Context, ready: Ready) {
+    ///     fn ready(&self, _: Context, ready: Ready) {
     ///         println!("{} is connected!", ready.user.name);
     ///     }
     /// }
     /// let token = env::var("DISCORD_TOKEN").expect("token in environment");
-    /// let mut client = Client::new(&token, Handler); client.start().unwrap();
+    /// let mut client = Client::new(&token, Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// # Errors

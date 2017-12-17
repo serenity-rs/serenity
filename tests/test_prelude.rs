@@ -1,8 +1,11 @@
+#![allow(unused_imports)]
+
 extern crate serenity;
 
-#[allow(unused_imports)]
 use serenity::prelude::{Mentionable, SerenityError};
 
-#[allow(unused_imports)]
 #[cfg(feature = "client")]
 use serenity::prelude::{Client, ClientError};
+
+// parking_lot re-exports
+use serenity::prelude::{Mutex, RwLock};

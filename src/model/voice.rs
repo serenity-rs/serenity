@@ -1,4 +1,6 @@
-use super::*;
+//! Representations of voice information.
+
+use super::id::{ChannelId, UserId};
 
 /// Information about an available voice region.
 #[derive(Clone, Debug, Deserialize)]

@@ -4,8 +4,7 @@ extern crate serenity;
 
 use serde::de::Deserialize;
 use serde_json::Value;
-use serenity::model::event::*;
-use serenity::model::*;
+use serenity::model::prelude::*;
 use std::fs::File;
 
 macro_rules! p {
@@ -56,6 +55,12 @@ fn guild_ban_remove() {
 #[test]
 fn guild_channel_1_rest() {
     p!(GuildChannel, "guild_channel_rest_1");
+}
+
+// A guild that has some application ID.
+#[test]
+fn guild_some_application_id() {
+    p!(Guild, "guild_some_application_id");
 }
 
 // A Discord API GUILD_CREATE.
@@ -164,4 +169,12 @@ fn webhooks_update() {
 #[test]
 fn message_type_7() {
     p!(MessageCreateEvent, "message_type_7");
+}
+
+// Ensure string features are properly deserialized.
+//
+// Change made due to a new feature being added and not being in the enum.
+#[test]
+fn guild_features_deser() {
+    p!(GuildCreateEvent, "guild_create_features");
 }

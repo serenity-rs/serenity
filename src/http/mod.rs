@@ -30,6 +30,7 @@ mod error;
 pub use self::error::Error as HttpError;
 pub use hyper::status::{StatusClass, StatusCode};
 
+use constants;
 use hyper::client::{Client as HyperClient, Request, RequestBuilder, Response as HyperResponse};
 use hyper::header::ContentType;
 use hyper::method::Method;
@@ -37,7 +38,10 @@ use hyper::mime::{Mime, SubLevel, TopLevel};
 use hyper::net::HttpsConnector;
 use hyper::{header, Error as HyperError, Result as HyperResult, Url};
 use hyper_native_tls::NativeTlsClient;
+use internal::prelude::*;
+use model::prelude::*;
 use multipart::client::Multipart;
+use parking_lot::Mutex;
 use self::ratelimiting::Route;
 use serde_json;
 use std::collections::BTreeMap;
@@ -46,10 +50,7 @@ use std::fmt::Write as FmtWrite;
 use std::fs::File;
 use std::io::{ErrorKind as IoErrorKind, Read};
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, Mutex};
-use constants;
-use internal::prelude::*;
-use model::*;
+use std::sync::Arc;
 
 /// An method used for ratelimiting special routes.
 ///
@@ -98,7 +99,7 @@ lazy_static! {
 /// # fn main() {
 /// #     try_main().unwrap();
 /// # }
-pub fn set_token(token: &str) { TOKEN.lock().unwrap().clone_from(&token.to_string()); }
+pub fn set_token(token: &str) { TOKEN.lock().clone_from(&token.to_string()); }
 
 /// Adds a [`User`] as a recipient to a [`Group`].
 ///
@@ -523,7 +524,7 @@ pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
 ///
 /// ```rust,no_run
 /// use serenity::http;
-/// use serenity::model::{ChannelId, MessageId};
+/// use serenity::model::id::{ChannelId, MessageId};
 ///
 /// let channel_id = ChannelId(7);
 /// let message_id = MessageId(8);
@@ -625,7 +626,12 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 pub fn delete_webhook(webhook_id: u64) -> Result<()> {
     verify(
         204,
-        request!(Route::WebhooksId, delete, "/webhooks/{}", webhook_id),
+        request!(
+            Route::WebhooksId(webhook_id),
+            delete,
+            "/webhooks/{}",
+            webhook_id,
+        ),
     )
 }
 
@@ -788,7 +794,7 @@ pub fn edit_profile(map: &JsonMap) -> Result<CurrentUser> {
     let mut value = serde_json::from_reader::<HyperResponse, Value>(response)?;
 
     if let Some(map) = value.as_object_mut() {
-        if !TOKEN.lock().unwrap().starts_with("Bot ") {
+        if !TOKEN.lock().starts_with("Bot ") {
             if let Some(Value::String(token)) = map.remove("token") {
                 set_token(&token);
             }
@@ -873,7 +879,12 @@ pub fn edit_role_position(guild_id: u64, role_id: u64, position: u64) -> Result<
 // external crates being incredibly messy and misleading in the end user's view.
 pub fn edit_webhook(webhook_id: u64, map: &Value) -> Result<Webhook> {
     let body = map.to_string();
-    let response = request!(Route::WebhooksId, patch(body), "/webhooks/{}", webhook_id);
+    let response = request!(
+        Route::WebhooksId(webhook_id),
+        patch(body),
+        "/webhooks/{}",
+        webhook_id,
+    );
 
     serde_json::from_reader::<HyperResponse, Webhook>(response)
         .map_err(From::from)
@@ -1044,12 +1055,20 @@ pub fn get_bans(guild_id: u64) -> Result<Vec<Ban>> {
 }
 
 /// Gets all audit logs in a specific guild.
-pub fn get_audit_logs(guild_id: u64) -> Result<AuditLogs> {
+pub fn get_audit_logs(guild_id: u64,
+                      action_type: Option<u8>,
+                      user_id: Option<u64>,
+                      before: Option<u64>,
+                      limit: Option<u8>) -> Result<AuditLogs> {
     let response = request!(
         Route::GuildsIdAuditLogs(guild_id),
         get,
-        "/guilds/{}/audit-logs",
-        guild_id
+        "/guilds/{}/audit-logs?user_id={}&action_type={}&before={}&limit={}",
+        guild_id,
+        user_id.unwrap_or(0),
+        action_type.unwrap_or(0),
+        before.unwrap_or(0),
+        limit.unwrap_or(50),
     );
 
     serde_json::from_reader::<HyperResponse, AuditLogs>(response)
@@ -1323,7 +1342,7 @@ pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
 ///
 /// ```rust,no_run
 /// use serenity::http::{GuildPagination, get_guilds};
-/// use serenity::model::GuildId;
+/// use serenity::model::id::GuildId;
 ///
 /// let guild_id = GuildId(81384788765712384);
 ///
@@ -1536,7 +1555,12 @@ pub fn get_voice_regions() -> Result<Vec<VoiceRegion>> {
 ///
 /// [`get_webhook_with_token`]: fn.get_webhook_with_token.html
 pub fn get_webhook(webhook_id: u64) -> Result<Webhook> {
-    let response = request!(Route::WebhooksId, get, "/webhooks/{}", webhook_id);
+    let response = request!(
+        Route::WebhooksId(webhook_id),
+        get,
+        "/webhooks/{}",
+        webhook_id,
+    );
 
     serde_json::from_reader::<HyperResponse, Webhook>(response)
         .map_err(From::from)
@@ -1642,7 +1666,7 @@ pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, m
     let mut request = Request::with_connector(Method::Post, url, &connector)?;
     request
         .headers_mut()
-        .set(header::Authorization(TOKEN.lock().unwrap().clone()));
+        .set(header::Authorization(TOKEN.lock().clone()));
     request
         .headers_mut()
         .set(header::UserAgent(constants::USER_AGENT.to_string()));
@@ -1801,7 +1825,7 @@ pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
 fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
     where F: Fn() -> RequestBuilder<'a> {
     let response = ratelimiting::perform(route, || {
-        f().header(header::Authorization(TOKEN.lock().unwrap().clone()))
+        f().header(header::Authorization(TOKEN.lock().clone()))
             .header(header::ContentType::json())
     })?;
 
@@ -1867,6 +1891,12 @@ impl<'a> From<(&'a [u8], &'a str)> for AttachmentType<'a> {
 
 impl<'a> From<&'a str> for AttachmentType<'a> {
     fn from(s: &'a str) -> AttachmentType { AttachmentType::Path(Path::new(s)) }
+}
+
+impl<'a> From<&'a Path> for AttachmentType<'a> {
+    fn from(path: &'a Path) -> AttachmentType {
+        AttachmentType::Path(path)
+    }
 }
 
 impl<'a> From<&'a PathBuf> for AttachmentType<'a> {

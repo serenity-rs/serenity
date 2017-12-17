@@ -1,10 +1,6 @@
 use chrono::{DateTime, FixedOffset};
-use model::*;
+use model::prelude::*;
 
-#[cfg(feature = "model")]
-use std::fmt::{Display, Formatter, Result as FmtResult};
-#[cfg(feature = "model")]
-use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
@@ -13,6 +9,10 @@ use builder::{CreateInvite, CreateMessage, EditChannel, GetMessages};
 use http::{self, AttachmentType};
 #[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
+#[cfg(feature = "model")]
+use std::fmt::{Display, Formatter, Result as FmtResult};
+#[cfg(feature = "model")]
+use std::mem;
 #[cfg(all(feature = "model", feature = "utils"))]
 use utils as serenity_utils;
 
@@ -116,7 +116,9 @@ impl GuildChannel {
             }
         }
 
-        http::create_invite(self.id.0, &f(CreateInvite::default()).0)
+        let map = serenity_utils::hashmap_to_json_map(f(CreateInvite::default()).0);
+
+        http::create_invite(self.id.0, &map)
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -135,18 +137,17 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{ChannelId, Permissions, UserId};
+    /// # use serenity::model::id::{ChannelId, UserId};
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
-    /// use serenity::model::{
-    ///     ModelError,
+    /// use serenity::model::channel::{
     ///     PermissionOverwrite,
     ///     PermissionOverwriteType,
-    ///     permissions,
     /// };
+    /// use serenity::model::{ModelError, Permissions};
     /// use serenity::CACHE;
     ///
     /// let allow = Permissions::SEND_MESSAGES;
@@ -157,12 +158,12 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     ///
-    /// let cache = CACHE.read().unwrap();
+    /// let cache = CACHE.read();
     /// let channel = cache
     ///     .guild_channel(channel_id)
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.read().unwrap().create_permission(&overwrite)?;
+    /// channel.read().create_permission(&overwrite)?;
     /// #     Ok(())
     /// # }
     /// #
@@ -177,18 +178,17 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{ChannelId, Permissions, UserId};
+    /// # use serenity::model::id::{ChannelId, UserId};
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
-    /// use serenity::model::{
-    ///     ModelError,
+    /// use serenity::model::channel::{
     ///     PermissionOverwrite,
     ///     PermissionOverwriteType,
-    ///     permissions,
     /// };
+    /// use serenity::model::{ModelError, Permissions};
     /// use serenity::CACHE;
     ///
     /// let allow = Permissions::SEND_MESSAGES;
@@ -199,12 +199,12 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     ///
-    /// let cache = CACHE.read().unwrap();
+    /// let cache = CACHE.read();
     /// let channel = cache
     ///     .guild_channel(channel_id)
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.read().unwrap().create_permission(&overwrite)?;
+    /// channel.read().create_permission(&overwrite)?;
     /// #     Ok(())
     /// # }
     /// #
@@ -312,18 +312,12 @@ impl GuildChannel {
             }
         }
 
-        let mut map = Map::new();
-        map.insert("name".to_string(), Value::String(self.name.clone()));
-        map.insert(
-            "position".to_string(),
-            Value::Number(Number::from(self.position)),
-        );
-        map.insert(
-            "type".to_string(),
-            Value::String(self.kind.name().to_string()),
-        );
+        let mut map = HashMap::new();
+        map.insert("name", Value::String(self.name.clone()));
+        map.insert("position", Value::Number(Number::from(self.position)));
+        map.insert("type", Value::String(self.kind.name().to_string()));
 
-        let edited = f(EditChannel(map)).0;
+        let edited = serenity_utils::hashmap_to_json_map(f(EditChannel(map)).0);
 
         match http::edit_channel(self.id.0, &edited) {
             Ok(channel) => {
@@ -365,7 +359,7 @@ impl GuildChannel {
     /// **Note**: Right now this performs a clone of the guild. This will be
     /// optimized in the future.
     #[cfg(feature = "cache")]
-    pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().unwrap().guild(self.guild_id) }
+    pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().guild(self.guild_id) }
 
     /// Gets all of the channel's invites.
     ///
@@ -429,24 +423,26 @@ impl GuildChannel {
     ///
     /// ```rust,no_run
     /// use serenity::prelude::*;
-    /// use serenity::model::*;
+    /// use serenity::model::prelude::*;
     /// struct Handler;
     ///
     /// use serenity::CACHE;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, msg: Message) {
-    ///         let channel = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
+    ///     fn message(&self, _: Context, msg: Message) {
+    ///         let channel = match CACHE.read().guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
-    ///         let permissions = channel.read().unwrap().permissions_for(&msg.author).unwrap();
+    ///         let permissions = channel.read().permissions_for(&msg.author).unwrap();
     ///
     ///         println!("The user's permissions: {:?}", permissions);
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// Check if the current user has the [Attach Files] and [Send Messages]
@@ -454,27 +450,25 @@ impl GuildChannel {
     /// for demonstrative purposes):
     ///
     /// ```rust,no_run
-    /// use serenity::prelude::*;
-    /// use serenity::model::*;
     /// use serenity::CACHE;
-    /// use serenity::model::permissions;
+    /// use serenity::prelude::*;
+    /// use serenity::model::prelude::*;
     /// use std::fs::File;
     ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, _: Context, msg: Message) {
-    ///         let channel = match CACHE.read().unwrap().guild_channel(msg.channel_id) {
+    ///     fn message(&self, _: Context, msg: Message) {
+    ///         let channel = match CACHE.read().guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
-    ///         let current_user_id = CACHE.read().unwrap().user.id;
-    /// let permissions =
-    /// channel.read().unwrap().permissions_for(current_user_id).unwrap();
+    ///         let current_user_id = CACHE.read().user.id;
+    ///         let permissions =
+    ///             channel.read().permissions_for(current_user_id).unwrap();
     ///
-    /// if !permissions.contains(Permissions::ATTACH_FILES |
-    /// Permissions::SEND_MESSAGES) {
+    ///         if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
     ///             return;
     ///         }
     ///
@@ -487,12 +481,14 @@ impl GuildChannel {
     ///             },
     ///         };
     ///
-    /// let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m|
-    /// m.content("here's a cat"));
+    ///         let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m|
+    ///             m.content("here's a cat"));
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// ```
     ///
     /// # Errors
@@ -512,7 +508,7 @@ impl GuildChannel {
     pub fn permissions_for<U: Into<UserId>>(&self, user_id: U) -> Result<Permissions> {
         self.guild()
             .ok_or_else(|| Error::Model(ModelError::GuildNotFound))
-            .map(|g| g.read().unwrap().permissions_in(self.id, user_id))
+            .map(|g| g.read().permissions_in(self.id, user_id))
     }
 
     /// Pins a [`Message`] to the channel.

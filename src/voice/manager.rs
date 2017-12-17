@@ -1,8 +1,8 @@
+use model::id::{ChannelId, GuildId, UserId};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::sync::mpsc::Sender as MpscSender;
 use super::Handler;
-use model::{ChannelId, GuildId, UserId};
 
 /// A manager is a struct responsible for managing [`Handler`]s which belong to
 /// a single [`Shard`]. This is a fairly complex key-value store,

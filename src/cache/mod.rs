@@ -41,11 +41,13 @@
 //! [`Role`]: ../model/struct.Role.html
 //! [`CACHE`]: ../struct.CACHE.html
 //! [`http`]: ../http/index.html
+
+use model::prelude::*;
+use parking_lot::RwLock;
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
 use std::default::Default;
-use std::sync::{Arc, RwLock};
-use model::*;
+use std::sync::Arc;
 
 mod cache_update;
 
@@ -166,8 +168,8 @@ impl Cache {
     /// used to determine how many members have not yet been received.
     ///
     /// ```rust,no_run
+    /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
     /// #
     /// # #[cfg(feature = "client")]
     /// # fn main() {
@@ -178,7 +180,7 @@ impl Cache {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_ready(&self, ctx: Context, _: Ready) {
+    ///     fn ready(&self, ctx: Context, _: Ready) {
     ///          // Wait some time for guilds to be received.
     ///         //
     ///         // You should keep track of this in a better fashion by tracking how
@@ -190,11 +192,13 @@ impl Cache {
     ///         // seconds.
     ///         thread::sleep(Duration::from_secs(5));
     ///
-    ///         println!("{} unknown members", CACHE.read().unwrap().unknown_members());
+    ///         println!("{} unknown members", CACHE.read().unknown_members());
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// # }
     /// #
     /// # #[cfg(not(feature = "client"))]
@@ -208,7 +212,7 @@ impl Cache {
         let mut total = 0;
 
         for guild in self.guilds.values() {
-            let guild = guild.read().unwrap();
+            let guild = guild.read();
 
             let members = guild.members.len() as u64;
 
@@ -233,7 +237,7 @@ impl Cache {
     /// ```rust,no_run
     /// use serenity::CACHE;
     ///
-    /// let amount = CACHE.read().unwrap().all_private_channels().len();
+    /// let amount = CACHE.read().all_private_channels().len();
     ///
     /// println!("There are {} private channels", amount);
     /// ```
@@ -260,16 +264,16 @@ impl Cache {
     /// ```rust,no_run
     /// # #[cfg(feature = "client")]
     /// # fn main() {
+    /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
     /// #
     /// use serenity::CACHE;
     ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_ready(&self, _: Context, _: Ready) {
-    ///         let guilds = CACHE.read().unwrap().guilds.len();
+    ///     fn ready(&self, _: Context, _: Ready) {
+    ///         let guilds = CACHE.read().guilds.len();
     ///
     ///         println!("Guilds in the Cache: {}", guilds);
     ///     }
@@ -346,10 +350,8 @@ impl Cache {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// use serenity::CACHE;
     ///
-    /// let cache = CACHE.read()?;
-    ///
-    /// if let Some(guild) = cache.guild(7) {
-    ///     println!("Guild name: {}", guild.read().unwrap().name);
+    /// if let Some(guild) = CACHE.read().guild(7) {
+    ///     println!("Guild name: {}", guild.read().name);
     /// }
     /// #   Ok(())
     /// # }
@@ -377,16 +379,16 @@ impl Cache {
     /// ```rust,no_run
     /// # #[cfg(feature = "client")]
     /// # fn main() {
+    /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
     /// #
     /// use serenity::CACHE;
     ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, ctx: Context, message: Message) {
-    ///         let cache = CACHE.read().unwrap();
+    ///     fn message(&self, ctx: Context, message: Message) {
+    ///         let cache = CACHE.read();
     ///
     ///         let channel = match cache.guild_channel(message.channel_id) {
     ///             Some(channel) => channel,
@@ -402,7 +404,9 @@ impl Cache {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
     /// # }
     /// #
     /// # #[cfg(not(feature = "client"))]
@@ -437,10 +441,8 @@ impl Cache {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// use serenity::CACHE;
     ///
-    /// let cache = CACHE.read()?;
-    ///
-    /// if let Some(group) = cache.group(7) {
-    ///     println!("Owner Id: {}", group.read().unwrap().owner_id);
+    /// if let Some(group) = CACHE.read().group(7) {
+    ///     println!("Owner Id: {}", group.read().owner_id);
     /// }
     /// #     Ok(())
     /// # }
@@ -468,7 +470,7 @@ impl Cache {
     /// ```rust,ignore
     /// use serenity::CACHE;
     ///
-    /// let cache = CACHE.read().unwrap();
+    /// let cache = CACHE.read();
     /// let member = {
     ///     let channel = match cache.guild_channel(message.channel_id) {
     ///         Some(channel) => channel,
@@ -502,7 +504,7 @@ impl Cache {
     pub fn member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
         where G: Into<GuildId>, U: Into<UserId> {
         self.guilds.get(&guild_id.into()).and_then(|guild| {
-            guild.read().unwrap().members.get(&user_id.into()).cloned()
+            guild.read().members.get(&user_id.into()).cloned()
         })
     }
 
@@ -523,11 +525,11 @@ impl Cache {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// use serenity::CACHE;
     ///
-    /// let cache = CACHE.read()?;
+    /// let cache = CACHE.read();
     ///
     /// if let Some(channel) = cache.private_channel(7) {
-    ///     let channel_reader = channel.read().unwrap();
-    ///     let user_reader = channel_reader.recipient.read().unwrap();
+    ///     let channel_reader = channel.read();
+    ///     let user_reader = channel_reader.recipient.read();
     ///
     ///     println!("The recipient is {}", user_reader.name);
     /// }
@@ -563,9 +565,7 @@ impl Cache {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// use serenity::CACHE;
     ///
-    /// let cache = CACHE.read()?;
-    ///
-    /// if let Some(role) = cache.role(7, 77) {
+    /// if let Some(role) = CACHE.read().role(7, 77) {
     ///     println!("Role with Id 77 is called {}", role.name);
     /// }
     /// #     Ok(())
@@ -579,7 +579,7 @@ impl Cache {
         where G: Into<GuildId>, R: Into<RoleId> {
         self.guilds
             .get(&guild_id.into())
-            .and_then(|g| g.read().unwrap().roles.get(&role_id.into()).cloned())
+            .and_then(|g| g.read().roles.get(&role_id.into()).cloned())
     }
 
     /// Retrieves a `User` from the cache's [`users`] map, if it exists.
@@ -600,10 +600,8 @@ impl Cache {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// use serenity::CACHE;
     ///
-    /// let cache = CACHE.read()?;
-    ///
-    /// if let Some(user) = cache.user(7) {
-    ///     println!("User with Id 7 is currently named {}", user.read().unwrap().name);
+    /// if let Some(user) = CACHE.read().user(7) {
+    ///     println!("User with Id 7 is currently named {}", user.read().name);
     /// }
     /// #     Ok(())
     /// # }
@@ -635,7 +633,7 @@ impl Cache {
                 e.insert(Arc::new(RwLock::new(user.clone())));
             },
             Entry::Occupied(mut e) => {
-                e.get_mut().write().unwrap().clone_from(user);
+                e.get_mut().write().clone_from(user);
             },
         }
     }

@@ -1,7 +1,7 @@
 use chrono::{DateTime, FixedOffset};
+use model::prelude::*;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_single_recipient;
-use model::*;
 
 #[cfg(feature = "model")]
 use builder::{CreateMessage, GetMessages};
@@ -78,7 +78,7 @@ impl PrivateChannel {
     /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn delete_messages<'a, It: IntoIterator<Item=&'a MessageId>>(&self, message_ids: It) -> Result<()> {
+    pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, message_ids: It) -> Result<()> {
         self.id.delete_messages(message_ids)
     }
 
@@ -219,7 +219,7 @@ impl PrivateChannel {
     /// [`ChannelId`]: ../model/struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
-    pub fn say(&self, content: &str) -> Result<Message> { self.id.say(content) }
+    pub fn say<D: ::std::fmt::Display>(&self, content: D) -> Result<Message> { self.id.say(content) }
 
     /// Sends (a) file(s) along with optional message contents.
     ///
@@ -279,6 +279,6 @@ impl PrivateChannel {
 impl Display for PrivateChannel {
     /// Formats the private channel, displaying the recipient's username.
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        f.write_str(&self.recipient.read().unwrap().name)
+        f.write_str(&self.recipient.read().name)
     }
 }

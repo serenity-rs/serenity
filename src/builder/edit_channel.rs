@@ -1,4 +1,5 @@
 use internal::prelude::*;
+use std::collections::HashMap;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]
 ///
@@ -18,7 +19,7 @@ use internal::prelude::*;
 /// [`GuildChannel`]: ../model/struct.GuildChannel.html
 /// [`GuildChannel::edit`]: ../model/struct.GuildChannel.html#method.edit
 #[derive(Clone, Debug, Default)]
-pub struct EditChannel(pub JsonMap);
+pub struct EditChannel(pub HashMap<&'static str, Value>);
 
 impl EditChannel {
     /// The bitrate of the channel in bits.
@@ -27,8 +28,7 @@ impl EditChannel {
     ///
     /// [voice]: ../model/enum.ChannelType.html#variant.Voice
     pub fn bitrate(mut self, bitrate: u64) -> Self {
-        self.0
-            .insert("bitrate".to_string(), Value::Number(Number::from(bitrate)));
+        self.0.insert("bitrate", Value::Number(Number::from(bitrate)));
 
         self
     }
@@ -37,16 +37,14 @@ impl EditChannel {
     ///
     /// Must be between 2 and 100 characters long.
     pub fn name(mut self, name: &str) -> Self {
-        self.0
-            .insert("name".to_string(), Value::String(name.to_string()));
+        self.0.insert("name", Value::String(name.to_string()));
 
         self
     }
 
     /// The position of the channel in the channel list.
     pub fn position(mut self, position: u64) -> Self {
-        self.0
-            .insert("position".to_string(), Value::Number(Number::from(position)));
+        self.0.insert("position", Value::Number(Number::from(position)));
 
         self
     }
@@ -59,8 +57,7 @@ impl EditChannel {
     ///
     /// [text]: ../model/enum.ChannelType.html#variant.Text
     pub fn topic(mut self, topic: &str) -> Self {
-        self.0
-            .insert("topic".to_string(), Value::String(topic.to_string()));
+        self.0.insert("topic", Value::String(topic.to_string()));
 
         self
     }
@@ -71,10 +68,7 @@ impl EditChannel {
     ///
     /// [voice]: ../model/enum.ChannelType.html#variant.Voice
     pub fn user_limit(mut self, user_limit: u64) -> Self {
-        self.0.insert(
-            "user_limit".to_string(),
-            Value::Number(Number::from(user_limit)),
-        );
+        self.0.insert("user_limit", Value::Number(Number::from(user_limit)));
 
         self
     }

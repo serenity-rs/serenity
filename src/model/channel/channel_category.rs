@@ -1,4 +1,4 @@
-use model::*;
+use model::prelude::*;
 
 #[cfg(all(feature = "builder", feature = "model"))]
 use builder::EditChannel;
@@ -93,20 +93,14 @@ impl ChannelCategory {
             }
         }
 
-        let mut map = Map::new();
-        map.insert("name".to_string(), Value::String(self.name.clone()));
-        map.insert(
-            "position".to_string(),
-            Value::Number(Number::from(self.position)),
-        );
-        map.insert(
-            "type".to_string(),
-            Value::String(self.kind.name().to_string()),
-        );
+        let mut map = HashMap::new();
+        map.insert("name", Value::String(self.name.clone()));
+        map.insert("position", Value::Number(Number::from(self.position)));
+        map.insert("type", Value::String(self.kind.name().to_string()));
 
-        let edited = f(EditChannel(map)).0;
+        let map = serenity_utils::hashmap_to_json_map(f(EditChannel(map)).0);
 
-        http::edit_channel(self.id.0, &edited).map(|channel| {
+        http::edit_channel(self.id.0, &map).map(|channel| {
             let GuildChannel {
                 id,
                 category_id,

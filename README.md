@@ -1,4 +1,4 @@
-[![ci-badge][]][ci] [![docs-badge][]][docs]
+[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild]
 
 # serenity
 
@@ -172,6 +172,8 @@ Voice+youtube-dl:
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
 [examples]: https://github.com/zeyla/serenity/tree/master/examples
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
+[guild]: https://discord.gg/WBdGJCc
+[guild-badge]: https://discordapp.com/api/guilds/381880193251409931/widget.png
 [library:Discord.net]: https://github.com/RogueException/Discord.Net
 [library:JDA]: https://github.com/DV8FromTheWorld/JDA
 [library:disco]: https://github.com/b1naryth1ef/disco

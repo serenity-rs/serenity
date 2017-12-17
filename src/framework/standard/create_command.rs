@@ -1,11 +1,17 @@
-pub use super::{Args, Command, CommandGroup, CommandType, CommandError};
+pub use super::{Args, Command, CommandGroup, CommandOptions, CommandError};
 
-use std::collections::HashMap;
-use std::sync::Arc;
 use client::Context;
-use model::{Message, Permissions};
+use model::channel::Message;
+use model::Permissions;
+use std::sync::Arc;
 
-pub struct CreateCommand(pub Command);
+pub enum FnOrCommand {
+    Fn(fn(&mut Context, &Message, Args) -> Result<(), CommandError>),
+    Command(Arc<Command>),
+    CommandWithOptions(Arc<Command>),
+}
+
+pub struct CreateCommand(pub CommandOptions, pub FnOrCommand);
 
 impl CreateCommand {
     /// Adds multiple aliases.
@@ -27,6 +33,8 @@ impl CreateCommand {
     /// Adds a "check" to a command, which checks whether or not the command's
     /// function should be called.
     ///
+    /// These checks are bypassed for commands sent by the application owner.
+    ///
     /// # Examples
     ///
     /// Ensure that the user who created a message, calling a "ping" command,
@@ -39,15 +47,15 @@ impl CreateCommand {
     /// use serenity::client::{Client, Context};
     /// use serenity::framework::standard::{
     ///     Args,
-    ///     Command,
+    ///     CommandOptions,
     ///     CommandError,
     ///     StandardFramework,
     /// };
-    /// use serenity::model::Message;
+    /// use serenity::model::channel::Message;
     /// use std::env;
-    /// use std::sync::Arc;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
+    /// let token = env::var("DISCORD_TOKEN").unwrap();
+    /// let mut client = Client::new(&token, Handler).unwrap();
     ///
     /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
@@ -64,13 +72,13 @@ impl CreateCommand {
     /// }
     ///
     /// fn owner_check(_context: &mut Context, message: &Message, _: &mut Args, _:
-    /// &Arc<Command>) -> bool {
+    /// &CommandOptions) -> bool {
     ///     // replace with your user ID
     ///     message.author.id == 7
     /// }
     /// ```
     pub fn check<F>(mut self, check: F) -> Self
-        where F: Fn(&mut Context, &Message, &mut Args, &Arc<Command>) -> bool
+        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
                      + Send
                      + Sync
                      + 'static {
@@ -102,46 +110,26 @@ impl CreateCommand {
 
     /// A function that can be called when a command is received.
     /// You can return `Err(string)` if there's an error.
-    ///
-    /// See [`exec_str`] if you _only_ need to return a string on command use.
-    ///
-    /// [`exec_str`]: #method.exec_str
-    pub fn exec<F>(mut self, func: F) -> Self
-        where F: Fn(&mut Context, &Message, Args) -> Result<(), CommandError> + Send + Sync + 'static {
-        self.0.exec = CommandType::Basic(Box::new(func));
+    pub fn exec(mut self, func: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> Self {
+        self.1 = FnOrCommand::Fn(func);
 
         self
     }
 
-    /// Sets a function that's called when a command is called that can access
-    /// the internal HashMap of commands, used specifically for creating a help
-    /// command.
+    /// Like [`exec`] but accepts a `Command` directly.
     ///
-    /// You can return `Err(Custom(string))` if there's an error.
-    pub fn exec_help<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &Message, HashMap<String, Arc<CommandGroup>>, Args)
-                    -> Result<(), CommandError>
-                     + Send
-                     + Sync
-                     + 'static {
-        self.0.exec = CommandType::WithCommands(Box::new(f));
+    /// [`exec`]: #method.exec
+    pub fn cmd<C: Command + 'static>(mut self, c: C) -> Self {
+        self.1 = FnOrCommand::Command(Arc::new(c));
 
         self
     }
 
-    /// Sets a string to be sent in the channel of context on command. This can
-    /// be useful for an `about`, `invite`, `ping`, etc. command.
+    /// Like [`cmd`] but says to the builder to use this command's options instead of its own.
     ///
-    /// # Examples
-    ///
-    /// Create a command named "ping" that returns "Pong!":
-    ///
-    /// ```rust,ignore
-    /// client.with_framework(|f| f
-    ///     .command("ping", |c| c.exec_str("Pong!")));
-    /// ```
-    pub fn exec_str(mut self, content: &str) -> Self {
-        self.0.exec = CommandType::StringResponse(content.to_string());
+    /// [`cmd`]: #method.cmd
+    pub fn cmd_with_options<C: Command + 'static>(mut self, c: C) -> Self {
+        self.1 = FnOrCommand::CommandWithOptions(Arc::new(c));
 
         self
     }
@@ -216,6 +204,40 @@ impl CreateCommand {
         self.0.allowed_roles = allowed_roles.into_iter().map(|x| x.to_string()).collect();
 
         self
+    }
+
+    pub(crate) fn finish(self) -> Arc<Command> {
+        let CreateCommand(options, fc) = self;
+
+        match fc {
+            FnOrCommand::Fn(func) => {
+                struct A(Arc<CommandOptions>, fn(&mut Context, &Message, Args) -> Result<(), CommandError>);
+
+                impl Command for A {
+                    fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), CommandError> {
+                        (self.1)(c, m, a)
+                    }
+
+                    fn options(&self) -> Arc<CommandOptions> { Arc::clone(&self.0) }
+                }
+
+                Arc::new(A(Arc::new(options), func))
+            },
+            FnOrCommand::Command(cmd) => {
+                struct A(Arc<CommandOptions>, Arc<Command>);
+
+                impl Command for A {
+                    fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), CommandError> {
+                        self.1.execute(c, m, a)
+                    }
+
+                    fn options(&self) -> Arc<CommandOptions> { Arc::clone(&self.0) }
+                }
+
+                Arc::new(A(Arc::new(options), cmd))
+            },
+            FnOrCommand::CommandWithOptions(cmd) => cmd,
+        }
     }
 }
 

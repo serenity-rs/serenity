@@ -1,14 +1,12 @@
+use model::prelude::*;
 use std::cmp::Ordering;
-use model::*;
 
-#[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
 use builder::EditRole;
 #[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
-use http;
+use {CACHE, http};
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
@@ -81,7 +79,7 @@ impl Role {
     /// Make a role hoisted:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::RoleId;
+    /// # use serenity::model::id::RoleId;
     /// # let role = RoleId(7).find().unwrap();
     /// // assuming a `role` has already been bound
     //
@@ -106,8 +104,8 @@ impl Role {
     /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
     #[cfg(feature = "cache")]
     pub fn find_guild(&self) -> Result<GuildId> {
-        for guild in CACHE.read().unwrap().guilds.values() {
-            let guild = guild.read().unwrap();
+        for guild in CACHE.read().guilds.values() {
+            let guild = guild.read();
 
             if guild.roles.contains_key(&RoleId(self.id.0)) {
                 return Ok(guild.id);
@@ -168,10 +166,10 @@ impl RoleId {
     /// Search the cache for the role.
     #[cfg(feature = "cache")]
     pub fn find(&self) -> Option<Role> {
-        let cache = CACHE.read().unwrap();
+        let cache = CACHE.read();
 
         for guild in cache.guilds.values() {
-            let guild = guild.read().unwrap();
+            let guild = guild.read();
 
             if !guild.roles.contains_key(self) {
                 continue;

@@ -1,13 +1,14 @@
 extern crate serenity;
 
 use serenity::prelude::*;
-use serenity::model::*;
+use serenity::model::channel::Message;
+use serenity::model::gateway::Ready;
 use std::env;
 
 struct Handler;
 
 impl EventHandler for Handler {
-    fn on_message(&self, _: Context, msg: Message) {
+    fn message(&self, _: Context, msg: Message) {
         if msg.content == "!messageme" {
             // If the `methods` feature is enabled, then model structs will
             // have a lot of useful methods implemented, to avoid using an
@@ -23,7 +24,7 @@ impl EventHandler for Handler {
         }
     }
 
-    fn on_ready(&self, _: Context, ready: Ready) {
+    fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }
@@ -32,7 +33,7 @@ fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
-    let mut client = Client::new(&token, Handler);
+    let mut client = Client::new(&token, Handler).expect("Err creating client");
 
     if let Err(why) = client.start() {
         println!("Client error: {:?}", why);

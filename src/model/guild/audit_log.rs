@@ -1,12 +1,13 @@
-use super::super::{AuditLogEntryId, UserId};
+use internal::prelude::*;
 use serde::de::{self, Deserialize, Deserializer, MapAccess, Visitor};
-use std::fmt;
+use super::super::prelude::*;
 use std::collections::HashMap;
 use std::mem::transmute;
+use std::fmt;
 
 /// Determines to what entity an action was used on.
 #[derive(Debug)]
-#[repr(i32)]
+#[repr(u8)]
 pub enum Target {
     Guild = 10,
     Channel = 20,
@@ -28,10 +29,11 @@ pub enum Action {
     Invite(ActionInvite),
     Webhook(ActionWebhook),
     Emoji(ActionEmoji),
+    MessageDelete,
 }
 
 #[derive(Debug)]
-#[repr(i32)]
+#[repr(u8)]
 pub enum ActionChannel {
     Create = 10,
     Update = 11,
@@ -39,7 +41,7 @@ pub enum ActionChannel {
 }
 
 #[derive(Debug)]
-#[repr(i32)]
+#[repr(u8)]
 pub enum ActionChannelOverwrite {
     Create = 13,
     Update = 14,
@@ -47,7 +49,7 @@ pub enum ActionChannelOverwrite {
 }
 
 #[derive(Debug)]
-#[repr(i32)]
+#[repr(u8)]
 pub enum ActionMember {
     Kick = 20,
     Prune = 21,
@@ -58,7 +60,7 @@ pub enum ActionMember {
 }
 
 #[derive(Debug)]
-#[repr(i32)]
+#[repr(u8)]
 pub enum ActionRole {
     Create = 30,
     Update = 31,
@@ -66,7 +68,7 @@ pub enum ActionRole {
 }
 
 #[derive(Debug)]
-#[repr(i32)]
+#[repr(u8)]
 pub enum ActionInvite {
     Create = 40,
     Update = 41,
@@ -74,7 +76,7 @@ pub enum ActionInvite {
 }
 
 #[derive(Debug)]
-#[repr(i32)]
+#[repr(u8)]
 pub enum ActionWebhook {
     Create = 50,
     Update = 51,
@@ -82,7 +84,7 @@ pub enum ActionWebhook {
 }
 
 #[derive(Debug)]
-#[repr(i32)]
+#[repr(u8)]
 pub enum ActionEmoji {
     Create = 60,
     Delete = 61,
@@ -92,6 +94,7 @@ pub enum ActionEmoji {
 #[derive(Debug, Deserialize)]
 pub struct Change {
     #[serde(rename = "key")] pub name: String,
+    // TODO: Change these to an actual type.
     #[serde(rename = "old_value")] pub old: String,
     #[serde(rename = "new_value")] pub new: String,
 }
@@ -99,6 +102,8 @@ pub struct Change {
 #[derive(Debug)]
 pub struct AuditLogs {
     pub entries: HashMap<AuditLogEntryId, AuditLogEntry>,
+    pub webhooks: Vec<Webhook>,
+    pub users: Vec<User>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -106,8 +111,7 @@ pub struct AuditLogEntry {
     /// Determines to what entity an [`action`] was used on.
     ///
     /// [`action`]: #structfield.action
-    #[serde(deserialize_with = "deserialize_target", rename = "target_type")]
-    pub target: Target,
+    pub target_id: u64,
     /// Determines what action was done on a [`target`]
     ///
     /// [`target`]: #structfield.target
@@ -118,43 +122,43 @@ pub struct AuditLogEntry {
     /// The user that did this action on a target.
     pub user_id: UserId,
     /// What changes were made.
-    pub changes: Vec<Change>,
+    pub changes: Option<Vec<Change>>,
     /// The id of this entry.
     pub id: AuditLogEntryId,
+    /// Some optional data assosiated with this entry.
+    pub options: Option<Options>,
 }
 
-fn deserialize_target<'de, D: Deserializer<'de>>(de: D) -> Result<Target, D::Error> {
-    struct TargetVisitor;
+#[derive(Debug, Deserialize)]
+pub struct Options {
+    /// Number of days after which inactive members were kicked.
+    pub delete_member_days: String,
+    /// Number of members removed by the prune
+    pub members_removed: String,
+    /// Channel in which the messages were deleted
+    pub channel_id: ChannelId,
+    /// Number of deleted messages.
+    pub count: u32,
+    /// Id of the overwritten entity
+    pub id: u64,
+    /// Type of overwritten entity ("member" or "role").
+    #[serde(rename = "type")] pub kind: String,
+    /// Name of the role if type is "role"
+    pub role_name: String,
 
-    impl<'de> Visitor<'de> for TargetVisitor {
-        type Value = Target;
-
-        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-            formatter.write_str("an integer between 0 to 70")
-        }
-
-        fn visit_i32<E: de::Error>(self, value: i32) -> Result<Target, E> {
-            Ok(match value {
-                10...70 => unsafe { transmute(value) },
-                _ => return Err(E::custom(format!("unexpected target number: {}", value))),
-            })
-        }
-    }
-
-    de.deserialize_i32(TargetVisitor)
 }
 
-fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Error> {
+fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> StdResult<Action, D::Error> {
     struct ActionVisitor;
 
     impl<'de> Visitor<'de> for ActionVisitor {
         type Value = Action;
 
         fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-            formatter.write_str("an integer between 1 to 62")
+            formatter.write_str("an integer between 1 to 72")
         }
 
-        fn visit_i32<E: de::Error>(self, value: i32) -> Result<Action, E> {
+        fn visit_u8<E: de::Error>(self, value: u8) -> StdResult<Action, E> {
             Ok(match value {
                 1 => Action::GuildUpdate,
                 10...12 => Action::Channel(unsafe { transmute(value) }),
@@ -164,20 +168,23 @@ fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Err
                 40...42 => Action::Invite(unsafe { transmute(value) }),
                 50...52 => Action::Webhook(unsafe { transmute(value) }),
                 60...62 => Action::Emoji(unsafe { transmute(value) }),
+                72 => Action::MessageDelete,
                 _ => return Err(E::custom(format!("Unexpected action number: {}", value))),
             })
         }
     }
 
-    de.deserialize_i32(ActionVisitor)
+    de.deserialize_u8(ActionVisitor)
 }
 
 impl<'de> Deserialize<'de> for AuditLogs {
-    fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
+    fn deserialize<D: Deserializer<'de>>(de: D) -> StdResult<Self, D::Error> {
         #[derive(Deserialize)]
         #[serde(field_identifier)]
         enum Field {
             #[serde(rename = "audit_log_entries")] Entries,
+            #[serde(rename = "webhooks")] Webhooks,
+            #[serde(rename = "users")] Users,
         }
 
         struct EntriesVisitor;
@@ -189,23 +196,50 @@ impl<'de> Deserialize<'de> for AuditLogs {
                 formatter.write_str("audit log entries")
             }
 
-            fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> Result<AuditLogs, V::Error> {
-                let audit_log_entries = loop {
-                    if let Some(Field::Entries) = map.next_key()? {
-                        break map.next_value::<Vec<AuditLogEntry>>()?;
+            fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> StdResult<AuditLogs, V::Error> {
+                let mut audit_log_entries = None;
+                let mut users = None;
+                let mut webhooks = None;
+
+                while let Some(field) = map.next_key()? {
+                    match field {
+                        Field::Entries => {
+                            if audit_log_entries.is_some() {
+                                return Err(de::Error::duplicate_field("entries"));
+                            }
+
+                            audit_log_entries = Some(map.next_value::<Vec<AuditLogEntry>>()?);
+                        },
+                        Field::Webhooks => {
+                            if webhooks.is_some() {
+                                return Err(de::Error::duplicate_field("webhooks"));
+                            }
+
+                            webhooks = Some(map.next_value::<Vec<Webhook>>()?);
+                        },
+                        Field::Users => {
+                            if users.is_some() {
+                                return Err(de::Error::duplicate_field("users"));
+                            }
+
+                            users = Some(map.next_value::<Vec<User>>()?);
+                        },
                     }
-                };
+                }
 
                 Ok(AuditLogs {
                     entries: audit_log_entries
+                        .unwrap()
                         .into_iter()
                         .map(|entry| (entry.id, entry))
                         .collect(),
+                    webhooks: webhooks.unwrap(),
+                    users: users.unwrap(),
                 })
             }
         }
 
-        const FIELD: &'static [&'static str] = &["audit_log_entries"];
+        const FIELD: &[&str] = &["audit_log_entries"];
         de.deserialize_struct("AuditLogs", FIELD, EntriesVisitor)
     }
 }
