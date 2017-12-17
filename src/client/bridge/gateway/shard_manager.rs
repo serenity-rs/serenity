@@ -69,11 +69,11 @@ use framework::Framework;
 ///     0, // the shard index to start initiating from
 ///     3, // the number of shards to initiate (this initiates 0, 1, and 2)
 ///     5, // the total number of shards in use
-///     gateway_url,
-///     token,
-///     data,
-///     event_handler,
-///     framework,
+///     &gateway_url,
+///     &token,
+///     &data,
+///     &event_handler,
+///     &framework,
 ///     threadpool,
 /// );
 /// #     Ok(())

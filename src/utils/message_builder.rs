@@ -33,9 +33,9 @@ use std::ops::Add;
 ///
 /// let content = MessageBuilder::new()
 ///     .push("You sent a message, ")
-///     .mention(user)
+///     .mention(&user)
 ///     .push("! ")
-///     .mention(emoji)
+///     .mention(&emoji)
 ///     .build();
 /// ```
 ///
@@ -154,7 +154,7 @@ impl MessageBuilder {
     ///
     /// let message = MessageBuilder::new()
     ///     .push("foo ")
-    ///     .emoji(emoji)
+    ///     .emoji(&emoji)
     ///     .push(".")
     ///     .build();
     ///

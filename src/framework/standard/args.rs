@@ -119,7 +119,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69", vec![" ".to_owned()]);
+    /// let mut args = Args::new("42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.single::<i32>().unwrap(), 42);
     /// assert_eq!(args, "69");
@@ -156,7 +156,11 @@ impl Args {
             impl<'a> Drop for ParseThenRemove<'a> {
                 fn drop(&mut self) {
                     if !self.0.is_empty() {
-                        self.0.drain(..self.1 + 1);
+                        if self.1 < self.0.len() {
+                            self.1 += 1;
+                        }
+
+                        self.0.drain(..self.1);
                     }
                 }
             }
@@ -175,7 +179,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let args = Args::new("42 69", vec![" ".to_owned()]);
+    /// let args = Args::new("42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.single_n::<i32>().unwrap(), 42);
     /// assert_eq!(args, "42 69");
@@ -198,7 +202,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69", vec![" ".to_owned()]);
+    /// let mut args = Args::new("42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.full(), "42 69");
     /// ```
@@ -211,7 +215,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69", vec![" ".to_owned()]);
+    /// let mut args = Args::new("42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.skip().unwrap(), "42");
     /// assert_eq!(args, "69");
@@ -224,7 +228,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69 88 99", vec![" ".to_owned()]);
+    /// let mut args = Args::new("42 69 88 99", &[" ".to_string()]);
     ///
     /// assert_eq!(*args.skip_for(3).unwrap(), ["42".to_string(), "69".to_string(), "88".to_string()]);
     /// assert_eq!(args, "99");
@@ -248,7 +252,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new(r#""42 69"#, vec![" ".to_owned()]);
+    /// let mut args = Args::new(r#""42 69"#, &[" ".to_string()]);
     ///
     /// assert_eq!(args.single_quoted::<String>().unwrap(), "42 69");
     /// assert!(args.is_empty());
@@ -267,7 +271,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new(r#""42 69"#, vec![" ".to_owned()]);
+    /// let mut args = Args::new(r#""42 69"#, &[" ".to_string()]);
     ///
     /// assert_eq!(args.single_quoted_n::<String>().unwrap(), "42 69");
     /// assert_eq!(args, r#""42 69"#);
@@ -288,7 +292,7 @@ impl Args {
     /// ```rust,ignore
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new(r#""42" "69""#, vec![" ".to_owned()]);
+    /// let mut args = Args::new(r#""42" "69""#, &[" ".to_string()]);
     ///
     /// assert_eq!(*args.multiple_quoted::<i32>().unwrap(), [42, 69]);
     /// ```
@@ -314,7 +318,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69", vec![" ".to_owned()]);
+    /// let mut args = Args::new("42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(*args.multiple::<i32>().unwrap(), [42, 69]);
     /// ```
@@ -330,7 +334,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("3 4", vec![" ".to_owned()]);
+    /// let mut args = Args::new("3 4", &[" ".to_string()]);
     ///
     /// assert_eq!(*args.iter::<i32>().map(|num| num.unwrap().pow(2)).collect::<Vec<_>>(), [9, 16]);
     /// assert!(args.is_empty());
@@ -346,7 +350,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("c47 69", vec![" ".to_owned()]);
+    /// let mut args = Args::new("c47 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.find::<i32>().unwrap(), 69);
     /// assert_eq!(args, "c47");
@@ -382,7 +386,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let args = Args::new("c47 69", vec![" ".to_owned()]);
+    /// let args = Args::new("c47 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.find_n::<i32>().unwrap(), 69);
     /// assert_eq!(args, "c47 69");
@@ -409,13 +413,11 @@ impl Args {
     }
 }
 
-// Fix this.
-
 /// A version of `FromStr` that allows for "zero-copy" parsing.
 ///
 /// # Examples
 ///
-/// ```rust,ignore
+/// ```rust
 /// use serenity::framework::standard::{Args, FromStrZc};
 /// use std::fmt;
 ///
@@ -443,7 +445,7 @@ impl Args {
 ///     }
 /// }
 ///
-/// let mut args = Args::new("abc#1234", vec![" ".to_owned()]);
+/// let mut args = Args::new("abc#1234", &[" ".to_string()]);
 /// let NameDiscrim(name, discrim) = args.single_zc::<NameDiscrim>().unwrap();
 ///
 /// assert_eq!(name, "abc");
