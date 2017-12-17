@@ -1,4 +1,4 @@
-use gateway::{Shard, ShardAction};
+use gateway::{ReconnectType, Shard, ShardAction};
 use internal::prelude::*;
 use internal::ws_impl::ReceiverExt;
 use model::event::{Event, GatewayEvent};
@@ -143,8 +143,14 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 
             let (event, action, successful) = self.recv_event();
 
-            if let Some(ref action) = action {
-                let _ = self.action(action);
+            match action {
+                Some(ShardAction::Reconnect(ReconnectType::Reidentify)) => {
+                    return self.request_restart()
+                },
+                Some(other) => {
+                    let _ = self.action(&other);
+                },
+                None => {},
             }
 
             if let Some(event) = event {
@@ -173,11 +179,14 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
     /// Returns
     fn action(&mut self, action: &ShardAction) -> Result<()> {
         match *action {
-            ShardAction::Autoreconnect => self.shard.autoreconnect(),
+            ShardAction::Reconnect(ReconnectType::Reidentify) => {
+                self.request_restart()
+            },
+            ShardAction::Reconnect(ReconnectType::Resume) => {
+                self.shard.resume()
+            },
             ShardAction::Heartbeat => self.shard.heartbeat(),
             ShardAction::Identify => self.shard.identify(),
-            ShardAction::Reconnect => self.shard.reconnect(),
-            ShardAction::Resume => self.shard.resume(),
         }
     }
 
@@ -365,8 +374,15 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 
                 debug!("Attempting to auto-reconnect");
 
-                if let Err(why) = self.shard.autoreconnect() {
-                    error!("Failed to auto-reconnect: {:?}", why);
+                match self.shard.reconnection_type() {
+                    ReconnectType::Reidentify => return (None, None, false),
+                    ReconnectType::Resume => {
+                        if let Err(why) = self.shard.resume() {
+                            warn!("Failed to resume: {:?}", why);
+
+                            return (None, None, false);
+                        }
+                    },
                 }
 
                 return (None, None, true);

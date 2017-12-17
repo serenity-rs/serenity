@@ -148,9 +148,15 @@ impl ConnectionStage {
 }
 
 pub enum ShardAction {
-    Autoreconnect,
     Heartbeat,
     Identify,
-    Reconnect,
+    Reconnect(ReconnectType),
+}
+
+/// The type of reconnection that should be performed.
+pub enum ReconnectType {
+    /// Indicator that a new connection should be made by sending an IDENTIFY.
+    Reidentify,
+    /// Indicator that a new connection should be made by sending a RESUME.
     Resume,
 }
