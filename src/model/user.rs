@@ -340,7 +340,7 @@ impl Default for OnlineStatus {
 #[derive(Clone, Debug, Deserialize)]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's
-    /// cration date.
+    /// creation date.
     pub id: UserId,
     /// Optional avatar hash.
     pub avatar: Option<String>,
