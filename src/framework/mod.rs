@@ -61,11 +61,11 @@ pub mod standard;
 pub use self::standard::StandardFramework;
 
 use client::Context;
-use model::Message;
+use model::channel::Message;
 use threadpool::ThreadPool;
 
 #[cfg(feature = "standard_framework")]
-use model::UserId;
+use model::id::UserId;
 
 /// This trait allows for serenity to either use its builtin framework, or yours.
 pub trait Framework {

@@ -134,8 +134,6 @@ extern crate sodiumoxide;
 extern crate threadpool;
 #[cfg(feature = "typemap")]
 extern crate typemap;
-#[cfg(feature = "vec_shift")]
-extern crate vec_shift;
 #[cfg(feature = "evzht9h3nznqzwl")]
 extern crate evzht9h3nznqzwl as websocket;
 

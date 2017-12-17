@@ -1,4 +1,6 @@
-use super::*;
+//! Miscellaneous helper traits, enums, and structs for models.
+
+use super::prelude::*;
 use internal::RwLockExt;
 
 #[cfg(all(feature = "model", feature = "utils"))]

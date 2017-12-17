@@ -17,7 +17,7 @@ use std::default::Default;
 ///
 /// ```rust,no_run
 /// use serenity::http;
-/// use serenity::model::Embed;
+/// use serenity::model::channel::Embed;
 /// use serenity::utils::Colour;
 ///
 /// let id = 245037420704169985;

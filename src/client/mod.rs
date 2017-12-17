@@ -319,6 +319,8 @@ impl Client {
     /// ```
     pub fn new<H>(token: &str, handler: H) -> Result<Self>
         where H: EventHandler + Send + Sync + 'static {
+        let token = token.trim();
+
         let token = if token.starts_with("Bot ") {
             token.to_string()
         } else {
@@ -341,11 +343,11 @@ impl Client {
                 0,
                 0,
                 0,
-                Arc::clone(&url),
-                Arc::clone(&locked),
-                Arc::clone(&data),
-                Arc::clone(&event_handler),
-                Arc::clone(&framework),
+                &url,
+                &locked,
+                &data,
+                &event_handler,
+                &framework,
                 threadpool.clone(),
             );
 

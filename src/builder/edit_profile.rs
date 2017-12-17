@@ -21,7 +21,7 @@ impl EditProfile {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # struct Handler;
     ///

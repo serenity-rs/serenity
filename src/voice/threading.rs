@@ -1,5 +1,5 @@
 use internal::Timer;
-use model::GuildId;
+use model::id::GuildId;
 use std::sync::mpsc::{Receiver as MpscReceiver, TryRecvError};
 use std::thread::Builder as ThreadBuilder;
 use super::connection::Connection;

@@ -1,4 +1,6 @@
-use model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
+use model::guild::Emoji;
+use model::id::{ChannelId, RoleId, UserId};
+use model::misc::Mentionable;
 use std::default::Default;
 use std::fmt::{self, Display, Write};
 use std::ops::Add;
@@ -14,7 +16,7 @@ use std::ops::Add;
 /// value:
 ///
 /// ```rust,no_run
-/// # use serenity::model::{Emoji, EmojiId, UserId};
+/// # use serenity::model::prelude::*;
 /// #
 /// # let user = UserId(1);
 /// # let emoji = Emoji {
@@ -31,9 +33,9 @@ use std::ops::Add;
 ///
 /// let content = MessageBuilder::new()
 ///     .push("You sent a message, ")
-///     .mention(user)
+///     .mention(&user)
 ///     .push("! ")
-///     .mention(emoji)
+///     .mention(&emoji)
 ///     .build();
 /// ```
 ///
@@ -68,7 +70,7 @@ impl MessageBuilder {
     /// and finally building it to retrieve the inner String:
     ///
     /// ```rust
-    /// use serenity::model::ChannelId;
+    /// use serenity::model::id::ChannelId;
     /// use serenity::utils::MessageBuilder;
     ///
     /// let channel_id = ChannelId(81384788765712384);
@@ -105,7 +107,7 @@ impl MessageBuilder {
     /// Mentioning a [`Channel`] by Id:
     ///
     /// ```rust
-    /// use serenity::model::ChannelId;
+    /// use serenity::model::id::ChannelId;
     /// use serenity::utils::MessageBuilder;
     ///
     /// let channel_id = ChannelId(81384788765712384);
@@ -138,7 +140,8 @@ impl MessageBuilder {
     /// Mention an emoji in a message's content:
     ///
     /// ```rust
-    /// use serenity::model::{Emoji, EmojiId};
+    /// use serenity::model::guild::Emoji;
+    /// use serenity::model::id::EmojiId;
     /// use serenity::utils::MessageBuilder;
     ///
     /// let emoji = Emoji {
@@ -151,7 +154,7 @@ impl MessageBuilder {
     ///
     /// let message = MessageBuilder::new()
     ///     .push("foo ")
-    ///     .emoji(emoji)
+    ///     .emoji(&emoji)
     ///     .push(".")
     ///     .build();
     ///
@@ -159,7 +162,7 @@ impl MessageBuilder {
     /// ```
     ///
     /// [Display implementation]: ../model/struct.Emoji.html#method.fmt
-    pub fn emoji(mut self, emoji: Emoji) -> Self {
+    pub fn emoji(mut self, emoji: &Emoji) -> Self {
         let _ = write!(self.0, "{}", emoji);
 
         self
@@ -168,7 +171,7 @@ impl MessageBuilder {
     /// Mentions something that implements the [`Mentionable`] trait.
     ///
     /// [`Mentionable`]: ../model/trait.Mentionable.html
-    pub fn mention<M: Mentionable>(mut self, item: M) -> Self {
+    pub fn mention<M: Mentionable>(mut self, item: &M) -> Self {
         let _ = write!(self.0, "{}", item.mention());
 
         self

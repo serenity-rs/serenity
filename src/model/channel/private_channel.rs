@@ -1,5 +1,5 @@
 use chrono::{DateTime, FixedOffset};
-use model::*;
+use model::prelude::*;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_single_recipient;
 

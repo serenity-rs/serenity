@@ -1,4 +1,8 @@
-use super::*;
+//! Webhook model and implementations.
+
+use super::channel::Message;
+use super::id::{ChannelId, GuildId, WebhookId};
+use super::user::User;
 
 #[cfg(feature = "model")]
 use builder::ExecuteWebhook;
@@ -157,7 +161,7 @@ impl Webhook {
     ///
     /// ```rust,no_run
     /// use serenity::http;
-    /// use serenity::model::Embed;
+    /// use serenity::model::channel::Embed;
     ///
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";

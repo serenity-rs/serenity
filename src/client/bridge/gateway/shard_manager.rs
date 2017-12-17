@@ -1,6 +1,6 @@
 use internal::prelude::*;
 use parking_lot::Mutex;
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::sync::mpsc::{self, Sender};
 use std::sync::Arc;
 use std::thread;
@@ -69,11 +69,11 @@ use framework::Framework;
 ///     0, // the shard index to start initiating from
 ///     3, // the number of shards to initiate (this initiates 0, 1, and 2)
 ///     5, // the total number of shards in use
-///     gateway_url,
-///     token,
-///     data,
-///     event_handler,
-///     framework,
+///     &gateway_url,
+///     &token,
+///     &data,
+///     &event_handler,
+///     &framework,
 ///     threadpool,
 /// );
 /// #     Ok(())
@@ -117,11 +117,11 @@ impl ShardManager {
         shard_index: u64,
         shard_init: u64,
         shard_total: u64,
-        ws_url: Arc<Mutex<String>>,
-        token: Arc<Mutex<String>>,
-        data: Arc<Mutex<ShareMap>>,
-        event_handler: Arc<H>,
-        framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
+        ws_url: &Arc<Mutex<String>>,
+        token: &Arc<Mutex<String>>,
+        data: &Arc<Mutex<ShareMap>>,
+        event_handler: &Arc<H>,
+        framework: &Arc<Mutex<Option<Box<Framework + Send>>>>,
         threadpool: ThreadPool,
     ) -> (Arc<Mutex<Self>>, ShardManagerMonitor) where H: EventHandler + Send + Sync + 'static {
         let (thread_tx, thread_rx) = mpsc::channel();
@@ -130,15 +130,16 @@ impl ShardManager {
         let runners = Arc::new(Mutex::new(HashMap::new()));
 
         let mut shard_queuer = ShardQueuer {
-            data: Arc::clone(&data),
-            event_handler: Arc::clone(&event_handler),
-            framework: Arc::clone(&framework),
+            data: Arc::clone(data),
+            event_handler: Arc::clone(event_handler),
+            framework: Arc::clone(framework),
             last_start: None,
             manager_tx: thread_tx.clone(),
+            queue: VecDeque::new(),
             runners: Arc::clone(&runners),
             rx: shard_queue_rx,
-            token: Arc::clone(&token),
-            ws_url: Arc::clone(&ws_url),
+            token: Arc::clone(token),
+            ws_url: Arc::clone(ws_url),
             threadpool,
         };
 
@@ -184,6 +185,7 @@ impl ShardManager {
             event_handler: Arc::clone(&event_handler),
             last_start: None,
             manager_tx: thread_tx.clone(),
+            queue: VecDeque::new(),
             runners: Arc::clone(&runners),
             rx: shard_queue_rx,
             token: Arc::clone(&token),

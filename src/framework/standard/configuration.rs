@@ -1,6 +1,7 @@
 use client::Context;
 use http;
-use model::{GuildId, Message, UserId};
+use model::channel::Message;
+use model::id::{GuildId, UserId};
 use std::collections::HashSet;
 use std::default::Default;
 use super::command::PrefixCheck;
@@ -101,7 +102,7 @@ impl Configuration {
     /// #
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler).unwrap();
-    /// use serenity::model::GuildId;
+    /// use serenity::model::id::GuildId;
     /// use serenity::framework::StandardFramework;
     ///
     /// client.with_framework(StandardFramework::new().configure(|c| c
@@ -126,7 +127,7 @@ impl Configuration {
     /// #
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler).unwrap();
-    /// use serenity::model::UserId;
+    /// use serenity::model::id::UserId;
     /// use serenity::framework::StandardFramework;
     ///
     /// client.with_framework(StandardFramework::new().configure(|c| c
@@ -287,7 +288,7 @@ impl Configuration {
     /// #
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler).unwrap();
-    /// use serenity::model::UserId;
+    /// use serenity::model::id::UserId;
     /// use serenity::framework::StandardFramework;
     ///
     /// client.with_framework(StandardFramework::new().configure(|c| c
@@ -302,7 +303,7 @@ impl Configuration {
     /// #
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler).unwrap();
-    /// use serenity::model::UserId;
+    /// use serenity::model::id::UserId;
     /// use std::collections::HashSet;
     /// use serenity::framework::StandardFramework;
     ///

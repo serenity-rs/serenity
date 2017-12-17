@@ -1,5 +1,5 @@
 use internal::prelude::*;
-use model::ReactionType;
+use model::channel::ReactionType;
 use std::collections::HashMap;
 use std::fmt::Display;
 use super::CreateEmbed;
@@ -23,7 +23,7 @@ use utils;
 /// Sending a message with a content of `"test"` and applying text-to-speech:
 ///
 /// ```rust,no_run
-/// use serenity::model::ChannelId;
+/// use serenity::model::id::ChannelId;
 ///
 /// let channel_id = ChannelId(7);
 ///

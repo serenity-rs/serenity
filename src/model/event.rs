@@ -5,7 +5,7 @@ use serde::de::Error as DeError;
 use serde_json;
 use std::collections::HashMap;
 use super::utils::deserialize_emojis;
-use super::*;
+use super::prelude::*;
 use constants::{OpCode, VoiceOpCode};
 use internal::prelude::*;
 

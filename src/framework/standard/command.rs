@@ -1,5 +1,6 @@
 use client::Context;
-use model::{Message, Permissions};
+use model::channel::Message;
+use model::Permissions;
 use std::collections::HashMap;
 use std::fmt;
 use std::fmt::{Debug, Formatter};
@@ -12,7 +13,7 @@ pub type Check = Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
                      + Sync
                      + 'static;
 
-pub type HelpFunction = fn(&mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, Args)
+pub type HelpFunction = fn(&mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, &Args)
                    -> Result<(), Error>;
 
 pub struct Help(pub HelpFunction, pub Arc<HelpOptions>);
@@ -24,7 +25,7 @@ impl Debug for Help {
 }
 
 impl HelpCommand for Help {
-    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions,hm: HashMap<String, Arc<CommandGroup>>, a: Args) -> Result<(), Error> {
+    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions,hm: HashMap<String, Arc<CommandGroup>>, a: &Args) -> Result<(), Error> {
         (self.0)(c, m, ho, hm, a)
     }
 }
@@ -175,7 +176,7 @@ pub struct HelpOptions {
 }
 
 pub trait HelpCommand: Send + Sync + 'static {
-    fn execute(&self, &mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, Args) -> Result<(), Error>;
+    fn execute(&self, &mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, &Args) -> Result<(), Error>;
 
     fn options(&self) -> Arc<CommandOptions> {
         Arc::clone(&DEFAULT_OPTIONS)
@@ -183,7 +184,7 @@ pub trait HelpCommand: Send + Sync + 'static {
 }
 
 impl HelpCommand for Arc<HelpCommand> {
-    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions, hm: HashMap<String, Arc<CommandGroup>>, a: Args) -> Result<(), Error> {
+    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions, hm: HashMap<String, Arc<CommandGroup>>, a: &Args) -> Result<(), Error> {
         (**self).execute(c, m, ho, hm, a)
     }
 }

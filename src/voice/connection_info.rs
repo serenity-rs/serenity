@@ -1,4 +1,4 @@
-use model::{GuildId, UserId};
+use model::id::{GuildId, UserId};
 
 #[derive(Clone, Debug)]
 pub struct ConnectionInfo {

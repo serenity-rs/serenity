@@ -1,5 +1,6 @@
+use internal::prelude::*;
 use serde::de::{self, Deserialize, Deserializer, MapAccess, Visitor};
-use super::super::{AuditLogEntryId, User, UserId, ChannelId, Webhook};
+use super::super::prelude::*;
 use std::collections::HashMap;
 use std::mem::transmute;
 use std::fmt;
@@ -147,7 +148,7 @@ pub struct Options {
 
 }
 
-fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Error> {
+fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> StdResult<Action, D::Error> {
     struct ActionVisitor;
 
     impl<'de> Visitor<'de> for ActionVisitor {
@@ -157,7 +158,7 @@ fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Err
             formatter.write_str("an integer between 1 to 72")
         }
 
-        fn visit_u8<E: de::Error>(self, value: u8) -> Result<Action, E> {
+        fn visit_u8<E: de::Error>(self, value: u8) -> StdResult<Action, E> {
             Ok(match value {
                 1 => Action::GuildUpdate,
                 10...12 => Action::Channel(unsafe { transmute(value) }),
@@ -177,7 +178,7 @@ fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Err
 }
 
 impl<'de> Deserialize<'de> for AuditLogs {
-    fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
+    fn deserialize<D: Deserializer<'de>>(de: D) -> StdResult<Self, D::Error> {
         #[derive(Deserialize)]
         #[serde(field_identifier)]
         enum Field {
@@ -195,7 +196,7 @@ impl<'de> Deserialize<'de> for AuditLogs {
                 formatter.write_str("audit log entries")
             }
 
-            fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> Result<AuditLogs, V::Error> {
+            fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> StdResult<AuditLogs, V::Error> {
                 let mut audit_log_entries = None;
                 let mut users = None;
                 let mut webhooks = None;

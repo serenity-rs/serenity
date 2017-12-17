@@ -1,7 +1,8 @@
 extern crate serenity;
 
 use serenity::prelude::*;
-use serenity::model::*;
+use serenity::model::channel::Message;
+use serenity::model::gateway::Ready;
 use std::env;
 
 struct Handler;

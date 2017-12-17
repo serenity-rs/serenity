@@ -1,6 +1,7 @@
 use internal::prelude::*;
 use std::collections::HashMap;
-use model::{Permissions, Role};
+use model::guild::Role;
+use model::Permissions;
 
 /// A builer to create or edit a [`Role`] for use via a number of model methods.
 ///
@@ -20,7 +21,7 @@ use model::{Permissions, Role};
 /// Create a hoisted, mentionable role named `"a test role"`:
 ///
 /// ```rust,no_run
-/// # use serenity::model::{ChannelId, GuildId};
+/// # use serenity::model::id::{ChannelId, GuildId};
 /// # let (channel_id, guild_id) = (ChannelId(1), GuildId(2));
 /// #
 /// // assuming a `channel_id` and `guild_id` has been bound

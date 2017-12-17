@@ -73,10 +73,6 @@ version = "~1.7"
 optional = true
 version = "~0.3"
 
-[dependencies.vec_shift]
-optional = true
-version = "0.1.0"
-
 [dependencies.evzht9h3nznqzwl]
 default-features = false
 features = ["sync-ssl"]
@@ -109,7 +105,7 @@ framework = ["client", "model", "utils"]
 gateway = ["flate2", "http", "websocket", "utils"]
 http = ["hyper", "hyper-native-tls", "lazy_static", "multipart", "native-tls"]
 model = ["builder", "http"]
-standard_framework = ["framework", "vec_shift"]
+standard_framework = ["framework"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "sodiumoxide"]
 websocket = ["evzht9h3nznqzwl"]

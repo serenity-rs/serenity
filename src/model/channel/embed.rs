@@ -78,7 +78,7 @@ impl Embed {
     /// Create an embed:
     ///
     /// ```rust,no_run
-    /// use serenity::model::Embed;
+    /// use serenity::model::channel::Embed;
     ///
     /// let embed = Embed::fake(|e| e
     ///     .title("Embed title")

@@ -1,4 +1,4 @@
-use model::*;
+use model::prelude::*;
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
@@ -270,7 +270,7 @@ impl From<char> for ReactionType {
     /// Reacting to a message with an apple:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::ChannelId;
+    /// # use serenity::model::id::ChannelId;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -327,7 +327,7 @@ impl<'a> From<&'a str> for ReactionType {
     /// rest of the library:
     ///
     /// ```rust
-    /// use serenity::model::ReactionType;
+    /// use serenity::model::channel::ReactionType;
     ///
     /// fn foo<R: Into<ReactionType>>(bar: R) {
     ///     println!("{:?}", bar.into());

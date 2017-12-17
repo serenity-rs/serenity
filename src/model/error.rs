@@ -1,3 +1,5 @@
+//! Error enum definition wrapping potential model implementation errors.
+
 use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::Permissions;
@@ -19,7 +21,7 @@ use super::Permissions;
 /// # #[cfg(all(feature = "client", feature = "model"))]
 /// # fn try_main() -> Result<(), Box<Error>> {
 /// use serenity::prelude::*;
-/// use serenity::model::*;
+/// use serenity::model::prelude::*;
 /// use serenity::Error;
 /// use serenity::model::ModelError;
 /// use std::env;
@@ -33,7 +35,7 @@ use super::Permissions;
 ///             return;
 ///         }
 ///
-///      match guild_id.ban(user, 8) {
+///      match guild_id.ban(user, &8) {
 ///             Ok(()) => {
 ///                 // Ban successful.
 ///             },

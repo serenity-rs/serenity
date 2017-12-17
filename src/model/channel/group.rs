@@ -1,5 +1,5 @@
 use chrono::{DateTime, FixedOffset};
-use model::*;
+use model::prelude::*;
 
 #[cfg(feature = "model")]
 use builder::{CreateMessage, GetMessages};

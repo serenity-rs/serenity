@@ -1,7 +1,8 @@
 extern crate serenity;
 
+use serenity::model::channel::Message;
+use serenity::model::gateway::Ready;
 use serenity::prelude::*;
-use serenity::model::*;
 use serenity::utils::MessageBuilder;
 use std::env;
 
@@ -27,7 +28,7 @@ impl EventHandler for Handler {
                 .push("User ")
                 .push_bold_safe(msg.author.name)
                 .push(" used the 'ping' command in the ")
-                .mention(channel)
+                .mention(&channel)
                 .push(" channel")
                 .build();
 

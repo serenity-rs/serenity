@@ -1,7 +1,9 @@
 use constants::{self, close_codes};
 use internal::prelude::*;
 use model::event::{Event, GatewayEvent};
-use model::{Game, GuildId, OnlineStatus};
+use model::gateway::Game;
+use model::id::GuildId;
+use model::user::OnlineStatus;
 use parking_lot::Mutex;
 use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
@@ -10,6 +12,7 @@ use super::{
     CurrentPresence,
     ShardAction,
     GatewayError,
+    ReconnectType,
     WsClient,
     WebSocketGatewayClientExt,
 };
@@ -297,7 +300,7 @@ impl Shard {
     /// #
     /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
-    /// use serenity::model::Game;
+    /// use serenity::model::gateway::Game;
     ///
     /// shard.set_game(Some(Game::playing("Heroes of the Storm")));
     /// # }
@@ -448,7 +451,7 @@ impl Shard {
                             self.shard_info
                         );
 
-                        return Ok(Some(ShardAction::Autoreconnect));
+                        return Ok(Some(ShardAction::Reconnect(self.reconnection_type())));
                     }
                 }
 
@@ -481,7 +484,7 @@ impl Shard {
                     debug!("[Shard {:?}] Received late Hello; autoreconnecting",
                            self.shard_info);
 
-                    ShardAction::Autoreconnect
+                    ShardAction::Reconnect(self.reconnection_type())
                 }))
             },
             Ok(GatewayEvent::InvalidateSession(resumable)) => {
@@ -491,12 +494,14 @@ impl Shard {
                 );
 
                 Ok(Some(if resumable {
-                    ShardAction::Resume
+                    ShardAction::Reconnect(ReconnectType::Resume)
                 } else {
-                    ShardAction::Reconnect
+                    ShardAction::Reconnect(ReconnectType::Reidentify)
                 }))
             },
-            Ok(GatewayEvent::Reconnect) => Ok(Some(ShardAction::Reconnect)),
+            Ok(GatewayEvent::Reconnect) => {
+                Ok(Some(ShardAction::Reconnect(ReconnectType::Reidentify)))
+            },
             Err(Error::Gateway(GatewayError::Closed(ref data))) => {
                 let num = data.as_ref().map(|d| d.status_code);
                 let clean = num == Some(1000);
@@ -570,9 +575,9 @@ impl Shard {
                 }).unwrap_or(true);
 
                 Ok(Some(if resume {
-                    ShardAction::Resume
+                    ShardAction::Reconnect(ReconnectType::Resume)
                 } else {
-                    ShardAction::Reconnect
+                    ShardAction::Reconnect(ReconnectType::Reidentify)
                 }))
             },
             Err(Error::WebSocket(ref why)) => {
@@ -588,7 +593,7 @@ impl Shard {
                 info!("[Shard {:?}] Will attempt to auto-reconnect",
                       self.shard_info);
 
-                Ok(Some(ShardAction::Autoreconnect))
+                Ok(Some(ShardAction::Reconnect(self.reconnection_type())))
             },
             _ => Ok(None),
         }
@@ -698,29 +703,20 @@ impl Shard {
     ///
     /// [`ConnectionStage::Connecting`]: ../../../gateway/enum.ConnectionStage.html#variant.Connecting
     /// [`session_id`]: ../../../gateway/struct.Shard.html#method.session_id
-    pub fn autoreconnect(&mut self) -> Result<()> {
+    pub fn should_reconnect(&mut self) -> Option<ReconnectType> {
         if self.stage == ConnectionStage::Connecting {
-            return Ok(());
+            return None;
         }
 
+        Some(self.reconnection_type())
+    }
+
+    pub fn reconnection_type(&self) -> ReconnectType {
         if self.session_id().is_some() {
-            debug!(
-                "[Shard {:?}] Autoreconnector choosing to resume",
-                self.shard_info,
-            );
-
-            self.resume()?;
+            ReconnectType::Resume
         } else {
-            debug!(
-                "[Shard {:?}] Autoreconnector choosing to reconnect",
-                self.shard_info,
-            );
-
-            self.reconnect()?;
+            ReconnectType::Reidentify
         }
-        self.shutdown = true;
-
-        Ok(())
     }
 
     /// Requests that one or multiple [`Guild`]s be chunked.
@@ -755,7 +751,7 @@ impl Shard {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1])?;
     /// #
-    /// use serenity::model::GuildId;
+    /// use serenity::model::id::GuildId;
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
@@ -785,7 +781,7 @@ impl Shard {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1])?;
     /// #
-    /// use serenity::model::GuildId;
+    /// use serenity::model::id::GuildId;
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///

@@ -1,7 +1,9 @@
+//! User information-related models.
+
 use serde_json;
 use std::fmt;
 use super::utils::deserialize_u16;
-use super::*;
+use super::prelude::*;
 use internal::prelude::*;
 use model::misc::Mentionable;
 
@@ -159,7 +161,7 @@ impl CurrentUser {
     /// #
     /// # let mut cache = CACHE.write();
     ///
-    /// use serenity::model::permissions::Permissions;
+    /// use serenity::model::Permissions;
     ///
     /// // assuming the cache has been unlocked
     /// let url = match cache.user.invite_url(Permissions::empty()) {
@@ -300,20 +302,6 @@ impl DefaultAvatar {
     pub fn name(&self) -> Result<String> { serde_json::to_string(self).map_err(From::from) }
 }
 
-enum_number!(
-    /// Identifier for the notification level of a channel.
-    NotificationLevel {
-        /// Receive notifications for everything.
-        All = 0,
-        /// Receive only mentions.
-        Mentions = 1,
-        /// Receive no notifications.
-        Nothing = 2,
-        /// Inherit the notification level from the parent setting.
-        Parent = 3,
-    }
-);
-
 /// The representation of a user's status.
 ///
 /// # Examples
@@ -422,7 +410,7 @@ impl User {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// use serenity::model::Permissions;
     /// use serenity::CACHE;
@@ -625,7 +613,7 @@ impl User {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// struct Handler;
     ///
@@ -637,7 +625,7 @@ impl User {
     ///
     /// let mut client = Client::new("token", Handler).unwrap();
     /// #
-    /// use serenity::model::UserId;
+    /// use serenity::model::id::UserId;
     /// use serenity::CACHE;
     /// use std::thread;
     /// use std::time::Duration;
@@ -694,7 +682,7 @@ impl User {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// use serenity::utils::MessageBuilder;
     /// use serenity::utils::ContentModifier::Bold;

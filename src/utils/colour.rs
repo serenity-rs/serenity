@@ -28,8 +28,9 @@ macro_rules! colour {
 /// via [`g`]:
 ///
 /// ```rust
-/// # use serenity::model::{Role, RoleId, permissions};
-/// use serenity::utils::Colour;
+/// # use serenity::model::guild::Role;
+/// # use serenity::model::id::RoleId;
+/// # use serenity::model::permissions;
 /// #
 /// # let role = Role {
 /// #     colour: Colour::blurple(),
@@ -41,6 +42,8 @@ macro_rules! colour {
 /// #     permissions: permissions::PRESET_GENERAL,
 /// #     position: 7,
 /// # };
+/// #
+/// use serenity::utils::Colour;
 ///
 /// // assuming a `role` has already been bound
 ///

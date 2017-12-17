@@ -21,8 +21,10 @@ pub use self::create_group::CreateGroup;
 
 use client::Context;
 use internal::RwLockExt;
-use model::{ChannelId, GuildId, Guild, Member, Message, UserId};
-use model::permissions::Permissions;
+use model::channel::Message;
+use model::guild::{Guild, Member};
+use model::id::{ChannelId, GuildId, UserId};
+use model::Permissions;
 use self::command::{AfterHook, BeforeHook};
 use std::collections::HashMap;
 use std::default::Default;
@@ -33,7 +35,7 @@ use threadpool::ThreadPool;
 #[cfg(feature = "cache")]
 use client::CACHE;
 #[cfg(feature = "cache")]
-use model::Channel;
+use model::channel::Channel;
 
 /// A macro to generate "named parameters". This is useful to avoid manually
 /// using the "arguments" parameter and manually parsing types.
@@ -77,7 +79,7 @@ macro_rules! command {
         impl $crate::framework::standard::Command for $fname {
             #[allow(unreachable_code, unused_mut)]
             fn execute(&self, mut $c: &mut $crate::client::Context,
-                      _: &$crate::model::Message,
+                      _: &$crate::model::channel::Message,
                       _: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
 
@@ -94,7 +96,7 @@ macro_rules! command {
         impl $crate::framework::standard::Command for $fname {
             #[allow(unreachable_code, unused_mut)]
             fn execute(&self, mut $c: &mut $crate::client::Context,
-                      $m: &$crate::model::Message,
+                      $m: &$crate::model::channel::Message,
                       _: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
 
@@ -111,7 +113,7 @@ macro_rules! command {
         impl $crate::framework::standard::Command for $fname {
             #[allow(unreachable_code, unused_mut)]
             fn execute(&self, mut $c: &mut $crate::client::Context,
-                      $m: &$crate::model::Message,
+                      $m: &$crate::model::channel::Message,
                       mut $a: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
 
@@ -971,7 +973,7 @@ impl Framework for StandardFramework {
                         let mut content = message.content[position..].trim();
                         content = content[command_length..].trim();
 
-                        Args::new(&content, self.configuration.delimiters.clone())
+                        Args::new(content, &self.configuration.delimiters)
                     };
 
                     let before = self.before.clone();
@@ -992,7 +994,7 @@ impl Framework for StandardFramework {
                                     }
                                 }
 
-                                let result = (help.0)(&mut context, &message, &help.1, groups, args);
+                                let result = (help.0)(&mut context, &message, &help.1, groups, &args);
 
                                 if let Some(after) = after {
                                     (after)(&mut context, &message, &built, result);

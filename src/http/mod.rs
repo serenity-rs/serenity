@@ -39,7 +39,7 @@ use hyper::net::HttpsConnector;
 use hyper::{header, Error as HyperError, Result as HyperResult, Url};
 use hyper_native_tls::NativeTlsClient;
 use internal::prelude::*;
-use model::*;
+use model::prelude::*;
 use multipart::client::Multipart;
 use parking_lot::Mutex;
 use self::ratelimiting::Route;
@@ -524,7 +524,7 @@ pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
 ///
 /// ```rust,no_run
 /// use serenity::http;
-/// use serenity::model::{ChannelId, MessageId};
+/// use serenity::model::id::{ChannelId, MessageId};
 ///
 /// let channel_id = ChannelId(7);
 /// let message_id = MessageId(8);
@@ -1342,7 +1342,7 @@ pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
 ///
 /// ```rust,no_run
 /// use serenity::http::{GuildPagination, get_guilds};
-/// use serenity::model::GuildId;
+/// use serenity::model::id::GuildId;
 ///
 /// let guild_id = GuildId(81384788765712384);
 ///
@@ -1674,7 +1674,7 @@ pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, m
     let mut request = Multipart::from_request(request)?;
     let mut file_num = "0".to_string();
 
-    for file in files.into_iter() {
+    for file in files {
         match file.into() {
             AttachmentType::Bytes((mut bytes, filename)) => {
                 request

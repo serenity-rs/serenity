@@ -19,7 +19,7 @@ mod commands;
 
 use serenity::framework::StandardFramework;
 use serenity::model::event::ResumedEvent;
-use serenity::model::Ready;
+use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use serenity::http;
 use std::collections::HashSet;
@@ -28,11 +28,11 @@ use std::env;
 struct Handler;
 
 impl EventHandler for Handler {
-    fn on_ready(&self, _: Context, ready: Ready) {
+    fn ready(&self, _: Context, ready: Ready) {
         info!("Connected as {}", ready.user.name);
     }
 
-    fn on_resume(&self, _: Context, _: ResumedEvent) {
+    fn resume(&self, _: Context, _: ResumedEvent) {
         info!("Resumed");
     }
 }
@@ -67,11 +67,10 @@ fn main() {
         .configure(|c| c
             .owners(owners)
             .prefix("~"))
-        .command("ping", |c| c.exec(commands::meta::ping))
-        .command("latency", |c| c.exec(commands::meta::latency))
-        .command("multiply", |c| c.exec(commands::math::multiply))
+        .command("ping", |c| c.cmd(commands::meta::ping))
+        .command("multiply", |c| c.cmd(commands::math::multiply))
         .command("quit", |c| c
-            .exec(commands::owner::quit)
+            .cmd(commands::owner::quit)
             .owners_only(true)));
 
     if let Err(why) = client.start() {

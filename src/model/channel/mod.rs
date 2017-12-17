@@ -1,3 +1,5 @@
+//! Models relating to channels and types within channels.
+
 mod attachment;
 mod channel_id;
 mod embed;
@@ -19,7 +21,7 @@ pub use self::reaction::*;
 pub use self::channel_category::*;
 
 use internal::RwLockExt;
-use model::*;
+use model::prelude::*;
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::deserialize_u64;

@@ -1,5 +1,5 @@
 use chrono::{DateTime, FixedOffset};
-use model::*;
+use model::prelude::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
@@ -137,18 +137,17 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{ChannelId, Permissions, UserId};
+    /// # use serenity::model::id::{ChannelId, UserId};
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
-    /// use serenity::model::{
-    ///     ModelError,
+    /// use serenity::model::channel::{
     ///     PermissionOverwrite,
     ///     PermissionOverwriteType,
-    ///     permissions,
     /// };
+    /// use serenity::model::{ModelError, Permissions};
     /// use serenity::CACHE;
     ///
     /// let allow = Permissions::SEND_MESSAGES;
@@ -179,18 +178,17 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{ChannelId, Permissions, UserId};
+    /// # use serenity::model::id::{ChannelId, UserId};
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
-    /// use serenity::model::{
-    ///     ModelError,
+    /// use serenity::model::channel::{
     ///     PermissionOverwrite,
     ///     PermissionOverwriteType,
-    ///     permissions,
     /// };
+    /// use serenity::model::{ModelError, Permissions};
     /// use serenity::CACHE;
     ///
     /// let allow = Permissions::SEND_MESSAGES;
@@ -425,7 +423,7 @@ impl GuildChannel {
     ///
     /// ```rust,no_run
     /// use serenity::prelude::*;
-    /// use serenity::model::*;
+    /// use serenity::model::prelude::*;
     /// struct Handler;
     ///
     /// use serenity::CACHE;
@@ -452,10 +450,9 @@ impl GuildChannel {
     /// for demonstrative purposes):
     ///
     /// ```rust,no_run
-    /// use serenity::prelude::*;
-    /// use serenity::model::*;
     /// use serenity::CACHE;
-    /// use serenity::model::permissions;
+    /// use serenity::prelude::*;
+    /// use serenity::model::prelude::*;
     /// use std::fs::File;
     ///
     /// struct Handler;
@@ -468,11 +465,10 @@ impl GuildChannel {
     ///         };
     ///
     ///         let current_user_id = CACHE.read().user.id;
-    /// let permissions =
-    /// channel.read().permissions_for(current_user_id).unwrap();
+    ///         let permissions =
+    ///             channel.read().permissions_for(current_user_id).unwrap();
     ///
-    /// if !permissions.contains(Permissions::ATTACH_FILES |
-    /// Permissions::SEND_MESSAGES) {
+    ///         if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
     ///             return;
     ///         }
     ///
@@ -485,8 +481,8 @@ impl GuildChannel {
     ///             },
     ///         };
     ///
-    /// let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m|
-    /// m.content("here's a cat"));
+    ///         let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m|
+    ///             m.content("here's a cat"));
     ///     }
     /// }
     ///
