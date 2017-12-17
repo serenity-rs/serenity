@@ -138,7 +138,7 @@ impl Connection {
             .set_read_timeout(Some(Duration::from_millis(25)));
 
         let mutexed_client = Arc::new(Mutex::new(client));
-        let thread_items = start_threads(mutexed_client.clone(), &udp)?;
+        let thread_items = start_threads(Arc::clone(&mutexed_client), &udp)?;
 
         info!("[Voice] Connected to: {}", info.endpoint);
 
@@ -409,7 +409,12 @@ fn encryption_key(client: &mut Client) -> Result<Key> {
 }
 
 #[inline]
-fn has_valid_mode(modes: &[String]) -> bool { modes.iter().any(|s| s == CRYPTO_MODE) }
+fn has_valid_mode<T, It> (modes: It) -> bool
+where T: for<'a> PartialEq<&'a str>,
+      It : IntoIterator<Item=T>
+{
+    modes.into_iter().any(|s| s == CRYPTO_MODE)
+}
 
 #[inline]
 fn start_threads(client: Arc<Mutex<Client>>, udp: &UdpSocket) -> Result<ThreadItems> {

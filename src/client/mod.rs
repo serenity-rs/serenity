@@ -19,7 +19,8 @@
 //! [Client examples]: struct.Client.html#examples
 #![allow(zero_ptr)]
 
-mod bridge;
+pub mod bridge;
+
 mod context;
 mod dispatch;
 mod error;
@@ -36,14 +37,14 @@ pub use http as rest;
 #[cfg(feature = "cache")]
 pub use CACHE;
 
-use self::bridge::gateway::ShardManager;
+use self::bridge::gateway::{ShardId, ShardManager, ShardRunnerInfo};
 use self::dispatch::dispatch;
 use std::sync::{self, Arc};
 use std::sync::atomic::{AtomicBool, Ordering, ATOMIC_BOOL_INIT};
 use parking_lot::Mutex;
 use std::collections::HashMap;
 use std::mem;
-use super::gateway::Shard;
+use threadpool::ThreadPool;
 use typemap::ShareMap;
 use http;
 use internal::prelude::*;
@@ -223,11 +224,12 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     ///
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler);
     ///
-    /// let shards = client.shards.clone();
+    /// let shard_runners = client.shard_runners.clone();
     ///
     /// thread::spawn(move || {
     ///     loop {
-    ///         println!("Shard count instantiated: {}", shards.lock().len());
+    ///         println!("Shard count instantiated: {}",
+    ///                  shard_runners.lock().len());
     ///
     ///         thread::sleep(Duration::from_millis(5000));
     ///     }
@@ -242,7 +244,12 @@ pub struct Client<H: EventHandler + Send + Sync + 'static> {
     ///
     /// [`Client::start_shard`]: #method.start_shard
     /// [`Client::start_shards`]: #method.start_shards
-    pub shards: Arc<Mutex<HashMap<u64, Arc<Mutex<Shard>>>>>,
+    pub shard_runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
+    /// The threadpool shared by all shards.
+    ///
+    /// Defaults to 5 threads, which should suffice small bots. Consider
+    /// increasing this number as your bot grows.
+    pub threadpool: ThreadPool,
     token: Arc<sync::Mutex<String>>,
 }
 
@@ -278,7 +285,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// ```
     pub fn new(token: &str, handler: H) -> Self {
         let token = if token.starts_with("Bot ") {
-            token.to_owned()
+            token.to_string()
         } else {
             format!("Bot {}", token)
         };
@@ -286,19 +293,24 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
         http::set_token(&token);
         let locked = Arc::new(sync::Mutex::new(token));
 
+        let name = "serenity client".to_owned();
+        let threadpool = ThreadPool::with_name(name, 5);
+
         feature_framework! {{
             Client {
                 data: Arc::new(Mutex::new(ShareMap::custom())),
                 event_handler: Arc::new(handler),
                 framework: Arc::new(sync::Mutex::new(None)),
-                shards: Arc::new(Mutex::new(HashMap::new())),
+                shard_runners: Arc::new(Mutex::new(HashMap::new())),
+                threadpool,
                 token: locked,
             }
         } else {
             Client {
                 data: Arc::new(Mutex::new(ShareMap::custom())),
                 event_handler: Arc::new(handler),
-                shards: Arc::new(Mutex::new(HashMap::new())),
+                shard_runners: Arc::new(Mutex::new(HashMap::new())),
+                threadpool,
                 token: locked,
             }
         }}
@@ -673,7 +685,7 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
     /// use serenity::Client;
     /// use std::env;
     ///
-    /// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
+    /// let token = env::var("DISCORD_TOKEN").unwrap();
     /// let mut client = Client::new(&token, Handler);
     ///
     /// let _ = client.start_shard_range([4, 7], 10);
@@ -754,12 +766,16 @@ impl<H: EventHandler + Send + Sync + 'static> Client<H> {
             shard_data[0],
             shard_data[1] - shard_data[0] + 1,
             shard_data[2],
-            gateway_url.clone(),
-            self.token.clone(),
-            self.data.clone(),
-            self.event_handler.clone(),
-            self.framework.clone(),
+            Arc::clone(&gateway_url),
+            Arc::clone(&self.token),
+            Arc::clone(&self.data),
+            Arc::clone(&self.event_handler),
+            #[cfg(feature = "framework")]
+            Arc::clone(&self.framework),
+            self.threadpool.clone(),
         );
+
+        self.shard_runners = Arc::clone(&manager.runners);
 
         if let Err(why) = manager.initialize() {
             error!("Failed to boot a shard: {:?}", why);

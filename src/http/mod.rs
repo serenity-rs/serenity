@@ -98,7 +98,7 @@ lazy_static! {
 /// # fn main() {
 /// #     try_main().unwrap();
 /// # }
-pub fn set_token(token: &str) { TOKEN.lock().unwrap().clone_from(&token.to_owned()); }
+pub fn set_token(token: &str) { TOKEN.lock().unwrap().clone_from(&token.to_string()); }
 
 /// Adds a [`User`] as a recipient to a [`Group`].
 ///
@@ -814,6 +814,24 @@ pub fn edit_role(guild_id: u64, role_id: u64, map: &JsonMap) -> Result<Role> {
         .map_err(From::from)
 }
 
+/// Changes the position of a role in a guild.
+pub fn edit_role_position(guild_id: u64, role_id: u64, position: u64) -> Result<Vec<Role>> {
+    let body = serde_json::to_string(&json!({
+        "id": role_id,
+        "position": position,
+    }))?;
+    let response = request!(
+        Route::GuildsIdRolesId(guild_id),
+        patch(body),
+        "/guilds/{}/roles/{}",
+        guild_id,
+        role_id
+    );
+
+    serde_json::from_reader::<HyperResponse, Vec<Role>>(response)
+        .map_err(From::from)
+}
+
 /// Edits a the webhook with the given data.
 ///
 /// The Value is a map with optional values of:
@@ -1210,7 +1228,7 @@ pub fn get_guild_members(guild_id: u64,
 
         for value in values {
             if let Some(element) = value.as_object_mut() {
-                element.insert("guild_id".to_owned(), num.clone());
+                element.insert("guild_id".to_string(), num.clone());
             }
         }
     }
@@ -1366,7 +1384,7 @@ pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
     let mut v = serde_json::from_reader::<HyperResponse, Value>(response)?;
 
     if let Some(map) = v.as_object_mut() {
-        map.insert("guild_id".to_owned(), Value::Number(Number::from(guild_id)));
+        map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
     }
 
     serde_json::from_value::<Member>(v).map_err(From::from)
@@ -1611,7 +1629,7 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 /// if the file is too large to send.
 ///
 /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
-pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap) -> Result<Message>
+pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, map: JsonMap) -> Result<Message>
     where T: Into<AttachmentType<'a>> {
     let uri = format!(api!("/channels/{}/messages"), channel_id);
     let url = match Url::parse(&uri) {
@@ -1627,10 +1645,10 @@ pub fn send_files<'a, T>(channel_id: u64, files: Vec<T>, map: JsonMap) -> Result
         .set(header::Authorization(TOKEN.lock().unwrap().clone()));
     request
         .headers_mut()
-        .set(header::UserAgent(constants::USER_AGENT.to_owned()));
+        .set(header::UserAgent(constants::USER_AGENT.to_string()));
 
     let mut request = Multipart::from_request(request)?;
-    let mut file_num = "0".to_owned();
+    let mut file_num = "0".to_string();
 
     for file in files {
         match file.into() {
@@ -1797,7 +1815,7 @@ fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
 pub(crate) fn retry<'a, F>(f: F) -> HyperResult<HyperResponse>
     where F: Fn() -> RequestBuilder<'a> {
     let req = || {
-        f().header(header::UserAgent(constants::USER_AGENT.to_owned()))
+        f().header(header::UserAgent(constants::USER_AGENT.to_string()))
             .send()
     };
 

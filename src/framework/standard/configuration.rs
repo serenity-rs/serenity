@@ -24,7 +24,7 @@ use model::{GuildId, Message, UserId};
 /// use std::env;
 /// use serenity::framework::StandardFramework;
 ///
-/// let mut client = Client::new(&env::var("DISCORD_BOT_TOKEN").unwrap(), Handler);
+/// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
 ///
 /// client.with_framework(StandardFramework::new()
 ///     .configure(|c| c.on_mention(true).prefix("~")));
@@ -164,7 +164,7 @@ impl Configuration {
     /// # let mut client = Client::new("token", Handler);
     /// use serenity::framework::StandardFramework;
     ///
-    /// let disabled = vec!["ping"].into_iter().map(|x| x.to_owned()).collect();
+    /// let disabled = vec!["ping"].into_iter().map(|x| x.to_string()).collect();
     ///
     /// client.with_framework(StandardFramework::new()
     ///     .command("ping", |c| c.exec_str("pong!"))
@@ -201,7 +201,7 @@ impl Configuration {
     ///             "!"
     ///         } else {
     ///             "~"
-    ///         }.to_owned())
+    ///         }.to_string())
     ///     })));
     /// ```
     pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
@@ -328,7 +328,7 @@ impl Configuration {
     ///     .prefix("!")));
     /// ```
     pub fn prefix(mut self, prefix: &str) -> Self {
-        self.prefixes = vec![prefix.to_owned()];
+        self.prefixes = vec![prefix.to_string()];
 
         self
     }
@@ -352,8 +352,8 @@ impl Configuration {
     /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .prefixes(vec!["!", ">", "+"])));
     /// ```
-    pub fn prefixes(mut self, prefixes: Vec<&str>) -> Self {
-        self.prefixes = prefixes.iter().map(|x| x.to_string()).collect();
+    pub fn prefixes<T: ToString, It: IntoIterator<Item=T>>(mut self, prefixes: It) -> Self {
+        self.prefixes = prefixes.into_iter().map(|x| x.to_string()).collect();
 
         self
     }
@@ -401,7 +401,7 @@ impl Configuration {
     /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .delimiters(vec![", ", " "])));
     /// ```
-    pub fn delimiters(mut self, delimiters: Vec<&str>) -> Self {
+    pub fn delimiters<T: ToString, It: IntoIterator<Item=T>>(mut self, delimiters: It) -> Self {
         self.delimiters.clear();
         self.delimiters
             .extend(delimiters.into_iter().map(|s| s.to_string()));

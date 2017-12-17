@@ -47,7 +47,7 @@ impl CreateMessage {
     /// **Note**: Message contents must be under 2000 unicode code points.
     pub fn content<D: Display>(mut self, content: D) -> Self {
         self.0
-            .insert("content".to_owned(), Value::String(format!("{}", content)));
+            .insert("content".to_string(), Value::String(format!("{}", content)));
 
         CreateMessage(self.0, self.1)
     }
@@ -57,7 +57,7 @@ impl CreateMessage {
         where F: FnOnce(CreateEmbed) -> CreateEmbed {
         let embed = Value::Object(f(CreateEmbed::default()).0);
 
-        self.0.insert("embed".to_owned(), embed);
+        self.0.insert("embed".to_string(), embed);
 
         CreateMessage(self.0, self.1)
     }
@@ -68,13 +68,13 @@ impl CreateMessage {
     ///
     /// Defaults to `false`.
     pub fn tts(mut self, tts: bool) -> Self {
-        self.0.insert("tts".to_owned(), Value::Bool(tts));
+        self.0.insert("tts".to_string(), Value::Bool(tts));
 
         CreateMessage(self.0, self.1)
     }
 
     /// Adds a list of reactions to create after the message's sent.
-    pub fn reactions<R: Into<ReactionType>>(mut self, reactions: Vec<R>) -> Self {
+    pub fn reactions<R: Into<ReactionType>, It: IntoIterator<Item=R>>(mut self, reactions: It) -> Self {
         self.1 = Some(reactions.into_iter().map(|r| r.into()).collect());
 
         CreateMessage(self.0, self.1)
@@ -89,7 +89,7 @@ impl Default for CreateMessage {
     /// [`tts`]: #method.tts
     fn default() -> CreateMessage {
         let mut map = Map::default();
-        map.insert("tts".to_owned(), Value::Bool(false));
+        map.insert("tts".to_string(), Value::Bool(false));
 
         CreateMessage(map, None)
     }

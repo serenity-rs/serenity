@@ -258,7 +258,7 @@ impl GuildChannel {
     /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn delete_messages(&self, message_ids: &[MessageId]) -> Result<()> {
+    pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, message_ids: It) -> Result<()> {
         self.id.delete_messages(message_ids)
     }
 
@@ -313,14 +313,14 @@ impl GuildChannel {
         }
 
         let mut map = Map::new();
-        map.insert("name".to_owned(), Value::String(self.name.clone()));
+        map.insert("name".to_string(), Value::String(self.name.clone()));
         map.insert(
-            "position".to_owned(),
+            "position".to_string(),
             Value::Number(Number::from(self.position)),
         );
         map.insert(
-            "type".to_owned(),
-            Value::String(self.kind.name().to_owned()),
+            "type".to_string(),
+            Value::String(self.kind.name().to_string()),
         );
 
         let edited = f(EditChannel(map)).0;
@@ -512,7 +512,7 @@ impl GuildChannel {
     pub fn permissions_for<U: Into<UserId>>(&self, user_id: U) -> Result<Permissions> {
         self.guild()
             .ok_or_else(|| Error::Model(ModelError::GuildNotFound))
-            .map(|g| g.read().unwrap().permissions_for(self.id, user_id))
+            .map(|g| g.read().unwrap().permissions_in(self.id, user_id))
     }
 
     /// Pins a [`Message`] to the channel.
@@ -578,7 +578,7 @@ impl GuildChannel {
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
-    pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
+    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         self.id.send_files(files, f)
     }

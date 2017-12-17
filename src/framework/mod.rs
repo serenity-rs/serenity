@@ -36,7 +36,7 @@
 //! use serenity::model::Message;
 //! use std::env;
 //!
-//! let mut client = Client::new(&env::var("DISCORD_BOT_TOKEN").unwrap());
+//! let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
 //!
 //! client.with_framework(|f| f
 //!     .configure(|c| c.prefix("~"))
@@ -67,17 +67,33 @@ use model::Message;
 use model::UserId;
 
 /// This trait allows for serenity to either use its builtin framework, or yours.
-///
-/// When implementing, be sure to use `tokio_handle.spawn_fn(|| ...; Ok())` when dispatching
-/// commands.
-///
-/// Note that you may see some other methods in here as well, but they're meant to be internal only
-/// for the builtin framework.
 pub trait Framework {
     fn dispatch(&mut self, Context, Message);
 
+    #[doc(hidden)]
     #[cfg(feature = "standard_framework")]
     fn update_current_user(&mut self, UserId, bool) {}
-    #[cfg(feature = "standard_framework")]
-    fn initialized(&self) -> bool { false }
 }
+
+impl<F: Framework + ?Sized> Framework for Box<F> {
+    fn dispatch(&mut self, ctx: Context, msg: Message) {
+        (**self).dispatch(ctx, msg);
+    }
+
+    #[cfg(feature = "standard_framework")]
+    fn update_current_user(&mut self, id: UserId, is_bot: bool) {
+        (**self).update_current_user(id, is_bot);
+    }
+}
+
+impl<'a, F: Framework + ?Sized> Framework for &'a mut F {
+    fn dispatch(&mut self, ctx: Context, msg: Message) {
+        (**self).dispatch(ctx, msg);
+    }
+
+    #[cfg(feature = "standard_framework")]
+    fn update_current_user(&mut self, id: UserId, is_bot: bool) {
+        (**self).update_current_user(id, is_bot);
+    }
+}
+

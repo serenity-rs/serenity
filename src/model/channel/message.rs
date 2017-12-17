@@ -257,7 +257,7 @@ impl Message {
                 self.content = if chosen.contains("$user") {
                     chosen.replace("$user", &self.author.mention())
                 } else {
-                    chosen.to_owned()
+                    chosen.to_string()
                 };
             },
             _ => {},
@@ -370,7 +370,7 @@ impl Message {
         // Check if the content is over the maximum number of unicode code
         // points.
         let count = content.chars().count() as i64;
-        let diff = count - (constants::MESSAGE_CODE_LIMIT as i64);
+        let diff = count - i64::from(constants::MESSAGE_CODE_LIMIT);
 
         if diff > 0 {
             Some(diff as u64)
@@ -561,7 +561,7 @@ impl Message {
         if total <= constants::EMBED_MAX_LENGTH as usize {
             Ok(())
         } else {
-            let overflow = total as u64 - constants::EMBED_MAX_LENGTH as u64;
+            let overflow = total as u64 - u64::from(constants::EMBED_MAX_LENGTH);
 
             Err(Error::Model(ModelError::EmbedTooLarge(overflow)))
         }

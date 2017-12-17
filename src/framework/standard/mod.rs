@@ -14,7 +14,7 @@ pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
 pub use self::create_command::CreateCommand;
 pub use self::create_group::CreateGroup;
-pub use self::args::{Args, Error as ArgError};
+pub use self::args::{Args, Iter, FromStrZc, Error as ArgError};
 
 use self::command::{AfterHook, BeforeHook};
 use std::collections::HashMap;
@@ -22,7 +22,7 @@ use std::default::Default;
 use std::sync::Arc;
 use client::Context;
 use super::Framework;
-use model::{ChannelId, GuildId, Message, UserId};
+use model::{ChannelId, GuildId, Guild, Member, Message, UserId};
 use model::permissions::Permissions;
 use internal::RwLockExt;
 
@@ -53,8 +53,8 @@ use model::Channel;
 ///
 /// ```rust,ignore
 /// command!(multiply(_context, message, args) {
-///     let first = args.single::<i32>().unwrap();
-///     let second = args.single::<i32>().unwrap();
+///     let first = args.single::<f64>().unwrap();
+///     let second = args.single::<f64>().unwrap();
 ///     let product = first * second;
 ///
 ///     if let Err(why) = message.reply(&product.to_string()) {
@@ -136,6 +136,31 @@ pub enum DispatchError {
     IgnoredBot,
     /// When the bot ignores webhooks and a command was issued by one.
     WebhookAuthor,
+}
+
+use std::fmt;
+
+impl fmt::Debug for DispatchError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use self::DispatchError::*;
+
+        match *self {
+            CheckFailed(..) => write!(f, "DispatchError::CheckFailed"),
+            CommandDisabled(ref s) => f.debug_tuple("DispatchError::CommandDisabled").field(&s).finish(),
+            BlockedUser => write!(f, "DispatchError::BlockedUser"),
+            BlockedGuild => write!(f, "DispatchError::BlockedGuild"),
+            LackOfPermissions(ref perms) => f.debug_tuple("DispatchError::LackOfPermissions").field(&perms).finish(),
+            RateLimited(ref num) => f.debug_tuple("DispatchError::RateLimited").field(&num).finish(),
+            OnlyForDM => write!(f, "DispatchError::OnlyForDM"),
+            OnlyForOwners => write!(f, "DispatchError::OnlyForOwners"),
+            OnlyForGuilds => write!(f, "DispatchError::OnlyForGuilds"),
+            LackingRole => write!(f, "DispatchError::LackingRole"),
+            NotEnoughArguments { ref min, ref given } => f.debug_struct("DispatchError::NotEnoughArguments").field("min", &min).field("given", &given).finish(),
+            TooManyArguments { ref max, ref given } => f.debug_struct("DispatchError::TooManyArguments").field("max", &max).field("given", &given).finish(),
+            IgnoredBot => write!(f, "DispatchError::IgnoredBot"),
+            WebhookAuthor => write!(f, "DispatchError::WebhookAuthor"),
+        }
+    }
 }
 
 type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;
@@ -416,21 +441,8 @@ impl StandardFramework {
         false
     }
 
-    #[cfg(feature = "cache")]
-    fn has_correct_permissions(&self, command: &Arc<Command>, message: &Message) -> bool {
-        if !command.required_permissions.is_empty() {
-            if let Some(guild) = message.guild() {
-                let perms = guild
-                    .with(|g| g.permissions_for(message.channel_id, message.author.id));
-
-                return perms.contains(command.required_permissions);
-            }
-        }
-
-        true
-    }
-
     #[allow(too_many_arguments)]
+    #[cfg_attr(feature = "cargo-clippy", allow(cyclomatic_complexity))]
     fn should_fail(&mut self,
                    mut context: &mut Context,
                    message: &Message,
@@ -495,7 +507,7 @@ impl StandardFramework {
                     return Some(DispatchError::BlockedGuild);
                 }
 
-                if !self.has_correct_permissions(command, message) {
+                if !has_correct_permissions(command, message) {
                     return Some(DispatchError::LackOfPermissions(
                         command.required_permissions,
                     ));
@@ -518,24 +530,19 @@ impl StandardFramework {
                    .contains(&message.author.id) {
                 Some(DispatchError::BlockedUser)
             } else if self.configuration.disabled_commands.contains(to_check) {
-                Some(DispatchError::CommandDisabled(to_check.to_owned()))
+                Some(DispatchError::CommandDisabled(to_check.to_string()))
             } else if self.configuration.disabled_commands.contains(built) {
-                Some(DispatchError::CommandDisabled(built.to_owned()))
+                Some(DispatchError::CommandDisabled(built.to_string()))
             } else {
                 if !command.allowed_roles.is_empty() {
                     if let Some(guild) = message.guild() {
                         let guild = guild.read().unwrap();
+
                         if let Some(member) = guild.members.get(&message.author.id) {
                             if let Ok(permissions) = member.permissions() {
-                                if !permissions.administrator() {
-                                    let right_role = command
-                                        .allowed_roles
-                                        .iter()
-                                        .flat_map(|r| guild.role_by_name(&r))
-                                        .any(|g| member.roles.contains(&g.id));
-                                    if !right_role {
-                                        return Some(DispatchError::LackingRole);
-                                    }
+                                if !permissions.administrator()
+                                    && !has_correct_roles(command, &guild, member) {
+                                    return Some(DispatchError::LackingRole);
                                 }
                             }
                         }
@@ -550,7 +557,7 @@ impl StandardFramework {
                 if all_passed {
                     None
                 } else {
-                    Some(DispatchError::CheckFailed(command.to_owned()))
+                    Some(DispatchError::CheckFailed(Arc::clone(command)))
                 }
             }
         }
@@ -601,7 +608,7 @@ impl StandardFramework {
               S: Into<String> {
         {
             let ungrouped = self.groups
-                .entry("Ungrouped".to_owned())
+                .entry("Ungrouped".to_string())
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
@@ -633,7 +640,7 @@ impl StandardFramework {
         where F: FnOnce(CreateCommand) -> CreateCommand, S: Into<String> {
         {
             let ungrouped = self.groups
-                .entry("Ungrouped".to_owned())
+                .entry("Ungrouped".to_string())
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
@@ -651,7 +658,7 @@ impl StandardFramework {
                     for v in &cmd.aliases {
                         group
                             .commands
-                            .insert(v.to_owned(), CommandOrAlias::Alias(name.clone()));
+                            .insert(v.to_string(), CommandOrAlias::Alias(name.clone()));
                     }
                 }
 
@@ -853,7 +860,7 @@ impl Framework for StandardFramework {
         'outer: for position in positions {
             let mut built = String::new();
             let round = message.content.chars().skip(position).collect::<String>();
-            let round = round.trim().split_whitespace().collect::<Vec<&str>>();
+            let round = round.trim().split_whitespace().collect::<Vec<&str>>(); // Call to `trim` causes the related bug under the main bug #206 - where the whitespace settings are ignored. The fix is implemented as an additional check inside command::positions
 
             for i in 0..self.configuration.depth {
                 if i != 0 {
@@ -873,12 +880,12 @@ impl Framework for StandardFramework {
                     let cmd = group.commands.get(&built);
 
                     if let Some(&CommandOrAlias::Alias(ref points_to)) = cmd {
-                        built = points_to.to_owned();
+                        built = points_to.to_string();
                     }
 
                     let mut to_check = if let Some(ref prefix) = group.prefix {
                         if built.starts_with(prefix) && command_length > prefix.len() + 1 {
-                            built[(prefix.len() + 1)..].to_owned()
+                            built[(prefix.len() + 1)..].to_string()
                         } else {
                             continue;
                         }
@@ -895,7 +902,7 @@ impl Framework for StandardFramework {
                     if let Some(&CommandOrAlias::Command(ref command)) =
                         group.commands.get(&to_check) {
                         let before = self.before.clone();
-                        let command = command.clone();
+                        let command = Arc::clone(command);
                         let after = self.after.clone();
                         let groups = self.groups.clone();
 
@@ -909,7 +916,7 @@ impl Framework for StandardFramework {
                                 .find(|&d| content.contains(d))
                                 .map_or(" ", |s| s.as_str());
 
-                            Args::new(&content, delimiter)
+                            Args::new(content, delimiter)
                         };
 
                         if let Some(error) = self.should_fail(
@@ -958,6 +965,26 @@ impl Framework for StandardFramework {
     fn update_current_user(&mut self, user_id: UserId, is_bot: bool) {
         self.user_info = (user_id.0, is_bot);
     }
+}
 
-    fn initialized(&self) -> bool { self.initialized }
+#[cfg(feature = "cache")]
+pub fn has_correct_permissions(command: &Command, message: &Message) -> bool {
+    if !command.required_permissions.is_empty() {
+        if let Some(guild) = message.guild() {
+            let perms = guild
+                .with(|g| g.permissions_in(message.channel_id, message.author.id));
+
+            return perms.contains(command.required_permissions);
+        }
+    }
+
+    true
+}
+
+#[cfg(feature = "cache")]
+pub fn has_correct_roles(cmd: &Command, guild: &Guild, member: &Member) -> bool {
+    cmd.allowed_roles
+            .iter()
+            .flat_map(|r| guild.role_by_name(r))
+            .any(|g| member.roles.contains(&g.id))
 }

@@ -78,7 +78,7 @@ impl PrivateChannel {
     /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn delete_messages(&self, message_ids: &[MessageId]) -> Result<()> {
+    pub fn delete_messages<'a, It: IntoIterator<Item=&'a MessageId>>(&self, message_ids: It) -> Result<()> {
         self.id.delete_messages(message_ids)
     }
 
@@ -240,7 +240,7 @@ impl PrivateChannel {
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
-    pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
+    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         self.id.send_files(files, f)
     }

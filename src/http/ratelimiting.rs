@@ -339,8 +339,8 @@ pub enum Route {
     VoiceRegions,
     /// Route for the `/webhooks/:webhook_id` path.
     WebhooksId,
-    /// Route where no ratelimit headers are in place (i.e. user account-only
-    /// routes).
+    /// Route where no ratelimit headers are in place (e.g. current application
+    /// info retrieval).
     ///
     /// This is a special case, in that if the route is `None` then pre- and
     /// post-hooks are not executed.
@@ -362,7 +362,7 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
         // - get the global rate;
         // - sleep if there is 0 remaining
         // - then, perform the request
-        let bucket = ROUTES
+        let bucket = Arc::clone(ROUTES
             .lock()
             .expect("routes poisoned")
             .entry(route)
@@ -372,8 +372,7 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
                     remaining: i64::MAX,
                     reset: i64::MAX,
                 }))
-            })
-            .clone();
+            }));
 
         let mut lock = bucket.lock().unwrap();
         lock.pre_hook(&route);
@@ -510,7 +509,7 @@ fn parse_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
             .map_err(|_| Error::Http(HttpError::RateLimitUtf8))
             .and_then(|v| {
                 v.parse::<i64>()
-                    .map(|v| Some(v))
+                    .map(Some)
                     .map_err(|_| Error::Http(HttpError::RateLimitI64))
             })
     })

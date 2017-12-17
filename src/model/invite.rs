@@ -126,16 +126,16 @@ impl Invite {
     /// # let invite = Invite {
     /// #     approximate_member_count: Some(1812),
     /// #     approximate_presence_count: Some(717),
-    /// #     code: "WxZumR".to_owned(),
+    /// #     code: "WxZumR".to_string(),
     /// #     channel: InviteChannel {
     /// #         id: ChannelId(1),
-    /// #         name: "foo".to_owned(),
+    /// #         name: "foo".to_string(),
     /// #         kind: ChannelType::Text,
     /// #     },
     /// #     guild: InviteGuild {
     /// #         id: GuildId(2),
     /// #         icon: None,
-    /// #         name: "bar".to_owned(),
+    /// #         name: "bar".to_string(),
     /// #         splash_hash: None,
     /// #         text_channel_count: Some(7),
     /// #         voice_channel_count: Some(3),
@@ -290,17 +290,17 @@ impl RichInvite {
     /// # use serenity::model::*;
     /// #
     /// # let invite = RichInvite {
-    /// #     code: "WxZumR".to_owned(),
+    /// #     code: "WxZumR".to_string(),
     /// #     channel: InviteChannel {
     /// #         id: ChannelId(1),
-    /// #         name: "foo".to_owned(),
+    /// #         name: "foo".to_string(),
     /// #         kind: ChannelType::Text,
     /// #     },
     /// #     created_at: "2017-01-29T15:35:17.136000+00:00".parse().unwrap(),
     /// #     guild: InviteGuild {
     /// #         id: GuildId(2),
     /// #         icon: None,
-    /// #         name: "baz".to_owned(),
+    /// #         name: "baz".to_string(),
     /// #         splash_hash: None,
     /// #         text_channel_count: None,
     /// #         voice_channel_count: None,
@@ -310,7 +310,7 @@ impl RichInvite {
     /// #         bot: false,
     /// #         discriminator: 3,
     /// #         id: UserId(4),
-    /// #         name: "qux".to_owned(),
+    /// #         name: "qux".to_string(),
     /// #     },
     /// #     max_age: 5,
     /// #     max_uses: 6,

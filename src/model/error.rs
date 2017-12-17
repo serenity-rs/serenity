@@ -13,10 +13,10 @@ use super::Permissions;
 /// re-ban all members with an odd discriminator:
 ///
 /// ```rust,no_run
-/// # #[cfg(feature="client")]
+/// # #[cfg(all(feature = "client", feature = "model"))]
 /// # use std::error::Error;
 /// #
-/// # #[cfg(feature="client")]
+/// # #[cfg(all(feature = "client", feature = "model"))]
 /// # fn try_main() -> Result<(), Box<Error>> {
 /// use serenity::prelude::*;
 /// use serenity::model::*;
@@ -46,17 +46,17 @@ use super::Permissions;
 ///         }
 ///     }
 /// }
-/// let token = env::var("DISCORD_BOT_TOKEN")?;
+/// let token = env::var("DISCORD_TOKEN")?;
 /// let mut client = Client::new(&token, Handler); client.start()?;
 /// #     Ok(())
 /// # }
 /// #
-/// # #[cfg(feature="client")]
+/// # #[cfg(all(feature = "client", feature = "model"))]
 /// # fn main() {
 /// #     try_main().unwrap();
 /// # }
 /// #
-/// # #[cfg(not(feature="client"))]
+/// # #[cfg(not(all(feature="client", feature = "model")))]
 /// # fn main() { }
 /// ```
 ///

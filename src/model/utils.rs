@@ -125,11 +125,11 @@ pub fn deserialize_users<'de, D: Deserializer<'de>>(
 }
 
 pub fn deserialize_u16<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u16, D::Error> {
-    deserializer.deserialize_u16(U16Visitor)
+    deserializer.deserialize_any(U16Visitor)
 }
 
 pub fn deserialize_u64<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u64, D::Error> {
-    deserializer.deserialize_u64(U64Visitor)
+    deserializer.deserialize_any(U64Visitor)
 }
 
 pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
@@ -180,7 +180,7 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
     let perms = guild
         .read()
         .unwrap()
-        .permissions_for(channel_id, current_user.id);
+        .permissions_in(channel_id, current_user.id);
 
     permissions.remove(perms);
 

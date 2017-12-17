@@ -1,5 +1,5 @@
-#![allow(unreadable_literal)]
-#![cfg(feature = "utils")]
+#![cfg_attr(feature = "cargo-clippy", allow(unreadable_literal))]
+#![cfg(all(feature = "builder", feature = "utils"))]
 
 #[macro_use]
 extern crate serde_json;
@@ -15,32 +15,32 @@ fn test_from_embed() {
     let embed = Embed {
         author: None,
         colour: Colour::new(0xFF0011),
-        description: Some("This is a test description".to_owned()),
+        description: Some("This is a test description".to_string()),
         fields: vec![
             EmbedField {
                 inline: false,
-                name: "a".to_owned(),
-                value: "b".to_owned(),
+                name: "a".to_string(),
+                value: "b".to_string(),
             },
             EmbedField {
                 inline: true,
-                name: "c".to_owned(),
-                value: "z".to_owned(),
+                name: "c".to_string(),
+                value: "z".to_string(),
             },
         ],
         footer: None,
         image: Some(EmbedImage {
             height: 213,
-            proxy_url: "a".to_owned(),
-            url: "https://i.imgur.com/XfWpfCV.gif".to_owned(),
+            proxy_url: "a".to_string(),
+            url: "https://i.imgur.com/XfWpfCV.gif".to_string(),
             width: 224,
         }),
-        kind: "rich".to_owned(),
+        kind: "rich".to_string(),
         provider: None,
         thumbnail: None,
         timestamp: None,
-        title: Some("hakase".to_owned()),
-        url: Some("https://i.imgur.com/XfWpfCV.gif".to_owned()),
+        title: Some("hakase".to_string()),
+        url: Some("https://i.imgur.com/XfWpfCV.gif".to_string()),
         video: None,
     };
 

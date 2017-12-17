@@ -48,7 +48,7 @@ macro_rules! id_u64 {
     ($(#[$attr:meta] $name:ident;)*) => {
         $(
             #[$attr]
-            #[derive(Copy, Clone, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
+            #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
             #[allow(derive_hash_xor_eq)]
             pub struct $name(pub u64);
 
@@ -58,6 +58,13 @@ macro_rules! id_u64 {
                     let offset = (self.0 >> 22) / 1000;
 
                     NaiveDateTime::from_timestamp(1_420_070_400 + offset as i64, 0)
+                }
+            }
+
+            // This is a hack so that functions can accept `IntoIterator<Item=IdType>`, and or `IntoIterator<Item=&IdType>`
+            impl AsRef<$name> for $name {
+                fn as_ref(&self) -> &Self {
+                    self
                 }
             }
 
@@ -87,7 +94,7 @@ macro_rules! id_u64 {
 
             impl<'de> Deserialize<'de> for $name {
                 fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-                    deserializer.deserialize_u64(U64Visitor).map($name)
+                    deserializer.deserialize_any(U64Visitor).map($name)
                 }
             }
         )*

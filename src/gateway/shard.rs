@@ -5,6 +5,7 @@ use std::io::Write;
 use std::net::Shutdown;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration as StdDuration, Instant};
+use std::thread;
 use super::{ConnectionStage, GatewayError};
 use websocket::client::Url;
 use websocket::message::{CloseData, OwnedMessage};
@@ -88,6 +89,8 @@ pub struct Shard {
     seq: u64,
     session_id: Option<String>,
     shard_info: [u64; 2],
+    /// Whether the shard has permanently shutdown.
+    shutdown: bool,
     stage: ConnectionStage,
     token: Arc<Mutex<String>>,
     ws_url: Arc<Mutex<String>>,
@@ -113,7 +116,7 @@ impl Shard {
     /// use serenity::http;
     /// use std::env;
     ///
-    /// let token = env::var("DISCORD_BOT_TOKEN").expect("Token in environment");
+    /// let token = env::var("DISCORD_TOKEN").expect("Token in environment");
     /// // retrieve the gateway response, which contains the URL to connect to
     /// let gateway = http::get_gateway().expect("Valid gateway response").url;
     /// let shard = Shard::new(&gateway, &token, None)
@@ -126,7 +129,7 @@ impl Shard {
                token: Arc<Mutex<String>>,
                shard_info: [u64; 2])
                -> Result<Shard> {
-        let client = connect(&*ws_url.lock().unwrap())?;
+        let client = connecting(&*ws_url.lock().unwrap());
 
         let current_presence = (None, OnlineStatus::Online, false);
         let heartbeat_instants = (None, None);
@@ -136,13 +139,14 @@ impl Shard {
         let stage = ConnectionStage::Handshake;
         let session_id = None;
 
-        let mut shard = feature_voice! {
+        Ok(feature_voice! {
             {
                 let (tx, rx) = mpsc::channel();
 
                 let user = http::get_current_user()?;
 
                 Shard {
+                    shutdown: false,
                     client,
                     current_presence,
                     heartbeat_instants,
@@ -151,14 +155,15 @@ impl Shard {
                     seq,
                     stage,
                     token,
-                    session_id,
                     shard_info,
+                    session_id,
                     ws_url,
                     manager: VoiceManager::new(tx, user.id),
                     manager_rx: rx,
                 }
             } else {
                 Shard {
+                    shutdown: false,
                     client,
                     current_presence,
                     heartbeat_instants,
@@ -172,11 +177,19 @@ impl Shard {
                     ws_url,
                 }
             }
-        };
+        })
+    }
 
-        shard.identify()?;
-
-        Ok(shard)
+    /// Whether the shard has permanently shutdown.
+    ///
+    /// This should normally happen due to manual calling of [`shutdown`] or
+    /// [`shutdown_clean`].
+    ///
+    /// [`shutdown`]: #method.shutdown
+    /// [`shutdown_clean`]: #method.shutdown_clean
+    #[inline]
+    pub fn is_shutdown(&self) -> bool {
+        self.shutdown
     }
 
     /// Retrieves a copy of the current shard information.
@@ -195,7 +208,7 @@ impl Shard {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_owned()));
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
     /// # let shard = Shard::new(mutex.clone(), mutex, [1, 2]).unwrap();
     /// #
@@ -222,16 +235,22 @@ impl Shard {
     /// Setting the current game to playing `"Heroes of the Storm"`:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "model")]
+    /// # fn main() {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_owned()));
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
     /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
     /// use serenity::model::Game;
     ///
     /// shard.set_game(Some(Game::playing("Heroes of the Storm")));
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "model"))]
+    /// # fn main() { }
     /// ```
     pub fn set_game(&mut self, game: Option<Game>) {
         self.current_presence.0 = game;
@@ -254,7 +273,7 @@ impl Shard {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_owned()));
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
     /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
@@ -286,17 +305,22 @@ impl Shard {
     /// and not being afk:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "model")]
+    /// # fn main() {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_owned()));
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
     /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
     /// use serenity::model::{Game, OnlineStatus};
     ///
-    /// shard.set_presence(Some(Game::playing("Heroes of the Storm")), OnlineStatus::Online,
-    /// false);
+    /// shard.set_presence(Some(Game::playing("Heroes of the Storm")), OnlineStatus::Online, false);
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "model"))]
+    /// # fn main() { }
     /// ```
     pub fn set_presence(&mut self, game: Option<Game>, mut status: OnlineStatus, afk: bool) {
         if status == OnlineStatus::Offline {
@@ -306,6 +330,11 @@ impl Shard {
         self.current_presence = (game, status, afk);
 
         self.update_presence();
+    }
+
+    /// Returns the current connection stage of the shard.
+    pub fn stage(&self) -> ConnectionStage {
+        self.stage
     }
 
     /// Handles an event from the gateway over the receiver, requiring the
@@ -342,6 +371,8 @@ impl Shard {
 
                 match event {
                     Event::Ready(ref ready) => {
+                        debug!("[Shard {:?}] Received Ready", self.shard_info);
+
                         self.session_id = Some(ready.ready.session_id.clone());
                         self.stage = ConnectionStage::Connected;
 
@@ -351,6 +382,8 @@ impl Shard {
                         info!("[Shard {:?}] Resumed", self.shard_info);
 
                         self.stage = ConnectionStage::Connected;
+                        self.last_heartbeat_acknowledged = true;
+                        self.heartbeat_instants = (Some(Instant::now()), None);
                     },
                     #[cfg_attr(rustfmt, rustfmt_skip)]
                     ref _other => {
@@ -403,20 +436,29 @@ impl Shard {
                 self.heartbeat_instants.1 = Some(Instant::now());
                 self.last_heartbeat_acknowledged = true;
 
-                trace!("[Shard {}] Received heartbeat ack", self.shard_info[0]);
+                trace!("[Shard {:?}] Received heartbeat ack", self.shard_info);
 
                 Ok(None)
             },
             Ok(GatewayEvent::Hello(interval)) => {
+                debug!("[Shard {:?}] Received a Hello; interval: {}",
+                       self.shard_info,
+                       interval);
+
+                if self.stage == ConnectionStage::Resuming {
+                    return Ok(None);
+                }
+
                 if interval > 0 {
                     self.heartbeat_interval = Some(interval);
                 }
 
                 if self.stage == ConnectionStage::Handshake {
-                    self.stage = ConnectionStage::Identifying;
-
-                    Ok(None)
+                    self.identify().and(Ok(None))
                 } else {
+                    debug!("[Shard {:?}] Received late Hello; autoreconnecting",
+                           self.shard_info);
+
                     self.autoreconnect().and(Ok(None))
                 }
             },
@@ -429,9 +471,7 @@ impl Shard {
                 self.seq = 0;
                 self.session_id = None;
 
-                self.identify()?;
-
-                Ok(None)
+                self.identify().and(Ok(None))
             },
             Ok(GatewayEvent::Reconnect) => self.reconnect().and(Ok(None)),
             Err(Error::Gateway(GatewayError::Closed(data))) => {
@@ -439,23 +479,18 @@ impl Shard {
                 let reason = data.map(|d| d.reason);
                 let clean = num == Some(1000);
 
-                {
-                    let kind = if clean { "Cleanly" } else { "Uncleanly" };
-
-                    info!(
-                        "[Shard {:?}] {} closing with {:?}: {:?}",
-                        self.shard_info,
-                        kind,
-                        num,
-                        reason
-                    );
-                }
-
                 match num {
-                    Some(close_codes::UNKNOWN_OPCODE) => warn!("Sent invalid opcode"),
-                    Some(close_codes::DECODE_ERROR) => warn!("Sent invalid message"),
+                    Some(close_codes::UNKNOWN_OPCODE) => {
+                        warn!("[Shard {:?}] Sent invalid opcode",
+                              self.shard_info);
+                    },
+                    Some(close_codes::DECODE_ERROR) => {
+                        warn!("[Shard {:?}] Sent invalid message",
+                              self.shard_info);
+                    },
                     Some(close_codes::NOT_AUTHENTICATED) => {
-                        warn!("Sent no authentication");
+                        warn!("[Shard {:?}] Sent no authentication",
+                              self.shard_info);
 
                         return Err(Error::Gateway(GatewayError::NoAuthentication));
                     },
@@ -464,24 +499,30 @@ impl Shard {
 
                         return Err(Error::Gateway(GatewayError::InvalidAuthentication));
                     },
-                    Some(close_codes::ALREADY_AUTHENTICATED) => warn!("Already authenticated"),
+                    Some(close_codes::ALREADY_AUTHENTICATED) => {
+                        warn!("[Shard {:?}] Already authenticated",
+                              self.shard_info);
+                    },
                     Some(close_codes::INVALID_SEQUENCE) => {
-                        warn!(
-                            "[Shard {:?}] Sent invalid seq: {}",
-                            self.shard_info,
-                            self.seq
-                        );
+                        warn!("[Shard {:?}] Sent invalid seq: {}",
+                              self.shard_info,
+                              self.seq);
 
                         self.seq = 0;
                     },
-                    Some(close_codes::RATE_LIMITED) => warn!("Gateway ratelimited"),
+                    Some(close_codes::RATE_LIMITED) => {
+                        warn!("[Shard {:?}] Gateway ratelimited",
+                              self.shard_info);
+                    },
                     Some(close_codes::INVALID_SHARD) => {
-                        warn!("Sent invalid shard data");
+                        warn!("[Shard {:?}] Sent invalid shard data",
+                              self.shard_info);
 
                         return Err(Error::Gateway(GatewayError::InvalidShardData));
                     },
                     Some(close_codes::SHARDING_REQUIRED) => {
-                        error!("Shard has too many guilds");
+                        error!("[Shard {:?}] Shard has too many guilds",
+                               self.shard_info);
 
                         return Err(Error::Gateway(GatewayError::OverloadedShard));
                     },
@@ -502,9 +543,9 @@ impl Shard {
                 }
 
                 let resume = num.map(|x| {
-                    x != 1000 && x != close_codes::AUTHENTICATION_FAILED &&
+                    x != close_codes::AUTHENTICATION_FAILED &&
                     self.session_id.is_some()
-                }).unwrap_or(false);
+                }).unwrap_or(true);
 
                 if resume {
                     self.resume().or_else(|_| self.reconnect()).and(Ok(None))
@@ -519,11 +560,11 @@ impl Shard {
                     }
                 }
 
-                warn!("[Shard {:?}] Websocket error: {:?}", self.shard_info, why);
-                info!(
-                    "[Shard {:?}] Will attempt to auto-reconnect",
-                    self.shard_info
-                );
+                warn!("[Shard {:?}] Websocket error: {:?}",
+                      self.shard_info,
+                      why);
+                info!("[Shard {:?}] Will attempt to auto-reconnect",
+                      self.shard_info);
 
                 self.autoreconnect().and(Ok(None))
             },
@@ -539,6 +580,8 @@ impl Shard {
     /// message handled through [`Client::on_message`].
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "model")]
+    /// # fn main() {
     /// # use serenity::prelude::*;
     /// # use serenity::model::*;
     /// struct Handler;
@@ -557,6 +600,10 @@ impl Shard {
     ///     }
     /// }
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "model"))]
+    /// # fn main() { }
     /// ```
     ///
     /// [`Client`]: ../struct.Client.html
@@ -590,6 +637,7 @@ impl Shard {
         stream.flush()?;
         stream.shutdown(Shutdown::Both)?;
 
+        self.shutdown = true;
         debug!("[Shard {:?}] Cleanly shutdown shard", self.shard_info);
 
         Ok(())
@@ -601,6 +649,8 @@ impl Shard {
 
         stream.flush()?;
         stream.shutdown(Shutdown::Both)?;
+
+        self.shutdown = true;
 
         Ok(())
     }
@@ -627,7 +677,7 @@ impl Shard {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_owned()));
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
     /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
@@ -645,7 +695,7 @@ impl Shard {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_owned()));
+    /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
     /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
@@ -660,11 +710,14 @@ impl Shard {
     /// ../../model/event/enum.Event.html#variant.GuildMembersChunk
     /// [`Guild`]: ../../model/struct.Guild.html
     /// [`Member`]: ../../model/struct.Member.html
-    pub fn chunk_guilds(&mut self, guild_ids: &[GuildId], limit: Option<u16>, query: Option<&str>) {
+    pub fn chunk_guilds<T: AsRef<GuildId>, It>(&mut self, guild_ids: It, limit: Option<u16>, query: Option<&str>)
+        where It: IntoIterator<Item=T> {
+        debug!("[Shard {:?}] Requesting member chunks", self.shard_info);
+
         let msg = json!({
             "op": OpCode::GetGuildMembers.num(),
             "d": {
-                "guild_id": guild_ids.iter().map(|x| x.0).collect::<Vec<u64>>(),
+                "guild_id": guild_ids.into_iter().map(|x| x.as_ref().0).collect::<Vec<u64>>(),
                 "limit": limit.unwrap_or(0),
                 "query": query.unwrap_or(""),
             },
@@ -688,7 +741,7 @@ impl Shard {
     /// # use serenity::client::gateway::Shard;
     /// # use std::sync::{Arc, Mutex};
     /// #
-    /// # let mutex = Arc::new(Mutex::new("will anyone read this".to_owned()));
+    /// # let mutex = Arc::new(Mutex::new("will anyone read this".to_string()));
     /// #
     /// # let shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
@@ -738,11 +791,9 @@ impl Shard {
     pub(crate) fn cycle_voice_recv(&mut self) {
         if let Ok(v) = self.manager_rx.try_recv() {
             if let Err(why) = self.client.send_json(&v) {
-                warn!(
-                    "[Shard {:?}] Err sending voice msg: {:?}",
-                    self.shard_info,
-                    why
-                );
+                warn!("[Shard {:?}] Err sending voice msg: {:?}",
+                      self.shard_info,
+                      why);
             }
         }
     }
@@ -753,36 +804,31 @@ impl Shard {
             "op": OpCode::Heartbeat.num(),
         });
 
-        trace!(
-            "[Shard {:?}] Sending heartbeat d: {}",
-            self.shard_info,
-            self.seq
-        );
+        trace!("[Shard {:?}] Sending heartbeat d: {}",
+               self.shard_info,
+               self.seq);
 
         match self.client.send_json(&map) {
             Ok(_) => {
                 self.heartbeat_instants.0 = Some(Instant::now());
                 self.last_heartbeat_acknowledged = false;
 
-                trace!("[{:02}] successfully heartbeated", self.shard_info[0]);
+                trace!("[Shard {:?}] Successfully heartbeated",
+                       self.shard_info);
 
                 Ok(())
             },
             Err(why) => {
                 match why {
                     Error::WebSocket(WebSocketError::IoError(err)) => if err.raw_os_error() != Some(32) {
-                        debug!(
-                            "[Shard {:?}] Err w/ heartbeating: {:?}",
-                            self.shard_info,
-                            err
-                        );
+                        debug!("[Shard {:?}] Err heartbeating: {:?}",
+                               self.shard_info,
+                               err);
                     },
                     other => {
-                        warn!(
-                            "[Shard {:?}] Other err w/ keepalive: {:?}",
-                            self.shard_info,
-                            other
-                        );
+                        warn!("[Shard {:?}] Other err w/ keepalive: {:?}",
+                              self.shard_info,
+                              other);
                     },
                 }
 
@@ -812,14 +858,14 @@ impl Shard {
         if !self.last_heartbeat_acknowledged {
             debug!(
                 "[Shard {:?}] Last heartbeat not acknowledged; re-connecting",
-                self.shard_info
+                self.shard_info,
             );
 
             return self.reconnect().map_err(|why| {
                 warn!(
                     "[Shard {:?}] Err auto-reconnecting from heartbeat check: {:?}",
                     self.shard_info,
-                    why
+                    why,
                 );
 
                 why
@@ -827,14 +873,14 @@ impl Shard {
         }
 
         // Otherwise, we're good to heartbeat.
-        trace!("[{:02}] heartbeating", self.shard_info[0]);
+        trace!("[Shard {:?}] Heartbeating", self.shard_info);
 
         if let Err(why) = self.heartbeat() {
             warn!("[Shard {:?}] Err heartbeating: {:?}", self.shard_info, why);
 
             self.reconnect()
         } else {
-            trace!("[{:02}] heartbeated", self.shard_info[0]);
+            trace!("[Shard {:?}] Heartbeated", self.shard_info);
             self.heartbeat_instants.0 = Some(Instant::now());
 
             Ok(())
@@ -847,17 +893,13 @@ impl Shard {
         }
 
         if self.session_id.is_some() {
-            debug!(
-                "[Shard {:?}] Autoreconnector choosing to resume",
-                self.shard_info
-            );
+            debug!("[Shard {:?}] Autoreconnector choosing to resume",
+                   self.shard_info);
 
             self.resume()
         } else {
-            debug!(
-                "[Shard {:?}] Autoreconnector choosing to reconnect",
-                self.shard_info
-            );
+            debug!("[Shard {:?}] Autoreconnector choosing to reconnect",
+                   self.shard_info);
 
             self.reconnect()
         }
@@ -865,11 +907,15 @@ impl Shard {
 
     /// Retrieves the `heartbeat_interval`.
     #[inline]
-    pub(crate) fn heartbeat_interval(&self) -> Option<u64> { self.heartbeat_interval }
+    pub(crate) fn heartbeat_interval(&self) -> Option<u64> {
+        self.heartbeat_interval
+    }
 
     /// Retrieves the value of when the last heartbeat ack was received.
     #[inline]
-    pub(crate) fn last_heartbeat_ack(&self) -> Option<Instant> { self.heartbeat_instants.1 }
+    pub(crate) fn last_heartbeat_ack(&self) -> Option<Instant> {
+        self.heartbeat_instants.1
+    }
 
     fn reconnect(&mut self) -> Result<()> {
         info!("[Shard {:?}] Attempting to reconnect", self.shard_info);
@@ -887,8 +933,15 @@ impl Shard {
     //
     // [`reconnect`]: #method.reconnect
     fn resume(&mut self) -> Result<()> {
+        debug!("Shard {:?}] Attempting to resume", self.shard_info);
+
+        self.initialize()?;
+        self.stage = ConnectionStage::Resuming;
+
         self.send_resume().or_else(|why| {
-            warn!("Err sending resume: {:?}", why);
+            warn!("[Shard {:?}] Err sending resume: {:?}",
+                  self.shard_info,
+                  why);
 
             self.reconnect()
         })
@@ -900,6 +953,10 @@ impl Shard {
             None => return Err(Error::Gateway(GatewayError::NoSessionId)),
         };
 
+        debug!("[Shard {:?}] Sending resume; seq: {}",
+               self.shard_info,
+               self.seq);
+
         self.client.send_json(&json!({
             "op": OpCode::Resume.num(),
             "d": {
@@ -910,11 +967,26 @@ impl Shard {
         }))
     }
 
+    /// Initializes a new WebSocket client.
+    ///
+    /// This will set the stage of the shard before and after instantiation of
+    /// the client.
     fn initialize(&mut self) -> Result<()> {
+        debug!("[Shard {:?}] Initializing", self.shard_info);
+
+        // We need to do two, sort of three things here:
+        //
+        // - set the stage of the shard as opening the websocket connection
+        // - open the websocket connection
+        // - if successful, set the current stage as Handshaking
+        //
+        // This is used to accurately assess whether the state of the shard is
+        // accurate when a Hello is received.
         self.stage = ConnectionStage::Connecting;
         self.client = connect(&self.ws_url.lock().unwrap())?;
+        self.stage = ConnectionStage::Handshake;
 
-        self.identify()
+        Ok(())
     }
 
     fn identify(&mut self) -> Result<()> {
@@ -935,6 +1007,9 @@ impl Shard {
         });
 
         self.heartbeat_instants.0 = Some(Instant::now());
+        self.stage = ConnectionStage::Identifying;
+
+        debug!("[Shard {:?}] Identifying", self.shard_info);
 
         self.client.send_json(&identification)
     }
@@ -965,12 +1040,12 @@ impl Shard {
             },
         });
 
+        debug!("[Shard {:?}] Sending presence update", self.shard_info);
+
         if let Err(why) = self.client.send_json(&msg) {
-            warn!(
-                "[Shard {:?}] Err sending presence update: {:?}",
-                self.shard_info,
-                why
-            );
+            warn!("[Shard {:?}] Err sending presence update: {:?}",
+                  self.shard_info,
+                  why);
         }
 
         #[cfg(feature = "cache")]
@@ -1003,5 +1078,24 @@ fn set_client_timeout(client: &mut WsClient) -> Result<()> {
 
 fn build_gateway_url(base: &str) -> Result<Url> {
     Url::parse(&format!("{}?v={}", base, constants::GATEWAY_VERSION))
-        .map_err(|_| Error::Gateway(GatewayError::BuildingUrl))
+        .map_err(|why| {
+            warn!("Error building gateway URL with base `{}`: {:?}", base, why);
+
+            Error::Gateway(GatewayError::BuildingUrl)
+        })
+}
+
+/// Tries to connect and upon failure, retries.
+fn connecting(uri: &str) -> WsClient {
+    let waiting_time = 30;
+
+    loop {
+        match connect(&uri) {
+            Ok(client) => return client,
+            Err(why) => {
+                warn!("Connecting failed: {:?}\n Will retry in {} seconds.", why, waiting_time);
+                thread::sleep(StdDuration::from_secs(waiting_time));
+            },
+        };
+    }
 }

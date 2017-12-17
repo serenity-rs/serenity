@@ -43,5 +43,6 @@ impl Display for ShardId {
 }
 
 pub struct ShardRunnerInfo {
-    runner_tx: Sender<ShardManagerMessage>,
+    pub runner_tx: Sender<ShardManagerMessage>,
+    pub shard: Arc<Mutex<Shard>>,
 }

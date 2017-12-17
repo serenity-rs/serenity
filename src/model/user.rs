@@ -21,7 +21,7 @@ use CACHE;
 use http::{self, GuildPagination};
 
 /// Information about the current user.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Default, Debug, Deserialize)]
 pub struct CurrentUser {
     pub id: UserId,
     pub avatar: Option<String>,
@@ -44,7 +44,7 @@ impl CurrentUser {
     /// Print out the current user's avatar url if one is set:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// #
     /// # let cache = CACHE.read().unwrap();
     /// #
@@ -85,10 +85,10 @@ impl CurrentUser {
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
         let mut map = Map::new();
-        map.insert("username".to_owned(), Value::String(self.name.clone()));
+        map.insert("username".to_string(), Value::String(self.name.clone()));
 
         if let Some(email) = self.email.as_ref() {
-            map.insert("email".to_owned(), Value::String(email.clone()));
+            map.insert("email".to_string(), Value::String(email.clone()));
         }
 
         match http::edit_profile(&f(EditProfile(map)).0) {
@@ -121,7 +121,7 @@ impl CurrentUser {
     /// Print out the names of all guilds the current user is in:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// #
     /// # let cache = CACHE.read().unwrap();
     /// #
@@ -149,7 +149,7 @@ impl CurrentUser {
     /// Get the invite url with no permissions set:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// #
     /// # let mut cache = CACHE.write().unwrap();
     ///
@@ -172,7 +172,7 @@ impl CurrentUser {
     /// Get the invite url with some basic permissions set:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// #
     /// # let mut cache = CACHE.write().unwrap();
     ///
@@ -228,7 +228,7 @@ impl CurrentUser {
     /// Print out the current user's static avatar url if one is set:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// #
     /// # let cache = CACHE.read().unwrap();
     /// #
@@ -252,7 +252,7 @@ impl CurrentUser {
     /// Print out the current user's distinct identifier (e.g., Username#1234):
     ///
     /// ```rust,no_run
-    /// # use serenity::client::CACHE;
+    /// # use serenity::CACHE;
     /// #
     /// # let cache = CACHE.read().unwrap();
     /// #
@@ -343,7 +343,7 @@ impl Default for OnlineStatus {
 }
 
 /// Information about a user.
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's
     /// cration date.
@@ -363,6 +363,22 @@ pub struct User {
     /// change if the username+discriminator pair becomes non-unique.
     #[serde(rename = "username")]
     pub name: String,
+}
+
+use std::hash::{Hash, Hasher};
+
+impl PartialEq for User {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for User {}
+
+impl Hash for User {
+    fn hash<H: Hasher>(&self, hasher: &mut H) {
+        self.id.hash(hasher);
+    }
 }
 
 #[cfg(feature = "model")]
@@ -583,7 +599,11 @@ impl User {
                         .unwrap()
                         .guilds
                         .get(&_guild_id)
-                        .map(|g| g.read().unwrap().roles.contains_key(&role_id))
+                        .map(|g| {
+                            g.read().unwrap().members.get(&self.id)
+                                .map(|m| m.roles.contains(&role_id))
+                                .unwrap_or(false)
+                        })
                         .unwrap_or(false)
                 } else {
                     true
@@ -800,7 +820,7 @@ fn tag(name: &str, discriminator: u16) -> String {
     let mut tag = String::with_capacity(37);
     tag.push_str(name);
     tag.push('#');
-    let _ = write!(tag, "{}", discriminator);
+    let _ = write!(tag, "{:04}", discriminator);
 
     tag
 }

@@ -1,3 +1,5 @@
+#![cfg(feature = "model")]
+
 extern crate serenity;
 
 #[cfg(feature = "utils")]
@@ -27,7 +29,7 @@ mod utils {
             kind: ChannelType::Text,
             last_message_id: None,
             last_pin_timestamp: None,
-            name: "nsfw-stuff".to_owned(),
+            name: "nsfw-stuff".to_string(),
             permission_overwrites: vec![],
             position: 0,
             topic: None,
@@ -47,7 +49,7 @@ mod utils {
                 avatar: None,
                 bot: false,
                 discriminator: 1,
-                name: "ab".to_owned(),
+                name: "ab".to_string(),
             })),
         }
     }
@@ -60,16 +62,16 @@ mod utils {
         assert!(!channel.is_nsfw());
 
         channel.kind = ChannelType::Text;
-        channel.name = "nsfw-".to_owned();
+        channel.name = "nsfw-".to_string();
         assert!(channel.is_nsfw());
 
-        channel.name = "nsfw".to_owned();
+        channel.name = "nsfw".to_string();
         assert!(channel.is_nsfw());
         channel.kind = ChannelType::Voice;
         assert!(!channel.is_nsfw());
         channel.kind = ChannelType::Text;
 
-        channel.name = "nsf".to_owned();
+        channel.name = "nsf".to_string();
         channel.nsfw = true;
         assert!(channel.is_nsfw());
         channel.nsfw = false;

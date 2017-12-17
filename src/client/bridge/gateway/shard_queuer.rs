@@ -1,4 +1,3 @@
-use framework::Framework;
 use gateway::Shard;
 use internal::prelude::*;
 use parking_lot::Mutex as ParkingLotMutex;
@@ -15,7 +14,11 @@ use super::{
     ShardRunner,
     ShardRunnerInfo,
 };
+use threadpool::ThreadPool;
 use typemap::ShareMap;
+
+#[cfg(feature = "framework")]
+use framework::Framework;
 
 /// The shard queuer is a simple loop that runs indefinitely to manage the
 /// startup of shards.
@@ -32,20 +35,14 @@ pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static> {
     pub manager_tx: Sender<ShardManagerMessage>,
     pub runners: Arc<ParkingLotMutex<HashMap<ShardId, ShardRunnerInfo>>>,
     pub rx: Receiver<ShardQueuerMessage>,
+    pub threadpool: ThreadPool,
     pub token: Arc<Mutex<String>>,
     pub ws_url: Arc<Mutex<String>>,
 }
 
 impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
     pub fn run(&mut self) {
-        loop {
-            let msg = match self.rx.recv() {
-                Ok(msg) => msg,
-                Err(_) => {
-                    break;
-                }
-            };
-
+        while let Ok(msg) = self.rx.recv() {
             match msg {
                 ShardQueuerMessage::Shutdown => break,
                 ShardQueuerMessage::Start(shard_id, shard_total) => {
@@ -83,16 +80,21 @@ impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
 
     fn start(&mut self, shard_id: ShardId, shard_total: ShardId) -> Result<()> {
         let shard_info = [shard_id.0, shard_total.0];
-        let shard = Shard::new(self.ws_url.clone(), self.token.clone(), shard_info)?;
+        let shard = Shard::new(
+            Arc::clone(&self.ws_url),
+            Arc::clone(&self.token),
+            shard_info,
+        )?;
         let locked = Arc::new(ParkingLotMutex::new(shard));
 
         let mut runner = feature_framework! {{
             ShardRunner::new(
-                locked.clone(),
+                Arc::clone(&locked),
                 self.manager_tx.clone(),
-                self.framework.clone(),
-                self.data.clone(),
-                self.event_handler.clone(),
+                Arc::clone(&self.framework),
+                Arc::clone(&self.data),
+                Arc::clone(&self.event_handler),
+                self.threadpool.clone(),
             )
         } else {
             ShardRunner::new(
@@ -100,11 +102,13 @@ impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
                 self.manager_tx.clone(),
                 self.data.clone(),
                 self.event_handler.clone(),
+                self.threadpool.clone(),
             )
         }};
 
         let runner_info = ShardRunnerInfo {
             runner_tx: runner.runner_tx(),
+            shard: locked,
         };
 
         thread::spawn(move || {

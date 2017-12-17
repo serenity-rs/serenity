@@ -24,7 +24,7 @@ impl EditGuild {
     /// [`afk_timeout`]: #method.afk_timeout
     pub fn afk_channel<C: Into<ChannelId>>(mut self, channel: Option<C>) -> Self {
         self.0.insert(
-            "afk_channel_id".to_owned(),
+            "afk_channel_id".to_string(),
             match channel {
                 Some(channel) => Value::Number(Number::from(channel.into().0)),
                 None => Value::Null,
@@ -40,7 +40,7 @@ impl EditGuild {
     /// [`afk_channel`]: #method.afk_channel
     pub fn afk_timeout(mut self, timeout: u64) -> Self {
         self.0.insert(
-            "afk_timeout".to_owned(),
+            "afk_timeout".to_string(),
             Value::Number(Number::from(timeout)),
         );
 
@@ -78,8 +78,8 @@ impl EditGuild {
     /// [`utils::read_image`]: ../utils/fn.read_image.html
     pub fn icon(mut self, icon: Option<&str>) -> Self {
         self.0.insert(
-            "icon".to_owned(),
-            icon.map_or_else(|| Value::Null, |x| Value::String(x.to_owned())),
+            "icon".to_string(),
+            icon.map_or_else(|| Value::Null, |x| Value::String(x.to_string())),
         );
 
         self
@@ -90,7 +90,7 @@ impl EditGuild {
     /// **Note**: Must be between (and including) 2-100 chracters.
     pub fn name(mut self, name: &str) -> Self {
         self.0
-            .insert("name".to_owned(), Value::String(name.to_owned()));
+            .insert("name".to_string(), Value::String(name.to_string()));
 
         self
     }
@@ -100,7 +100,7 @@ impl EditGuild {
     /// **Note**: The current user must be the owner of the guild.
     pub fn owner<U: Into<UserId>>(mut self, user_id: U) -> Self {
         self.0.insert(
-            "owner_id".to_owned(),
+            "owner_id".to_string(),
             Value::Number(Number::from(user_id.into().0)),
         );
 
@@ -135,7 +135,7 @@ impl EditGuild {
     /// [`Region::UsWest`]: ../model/enum.Region.html#variant.UsWest
     pub fn region(mut self, region: Region) -> Self {
         self.0
-            .insert("region".to_owned(), Value::String(region.name().to_owned()));
+            .insert("region".to_string(), Value::String(region.name().to_string()));
 
         self
     }
@@ -148,9 +148,9 @@ impl EditGuild {
     /// [`InviteSplash`]: ../model/enum.Feature.html#variant.InviteSplash
     /// [`features`]: ../model/struct.LiveGuild.html#structfield.features
     pub fn splash(mut self, splash: Option<&str>) -> Self {
-        let splash = splash.map_or(Value::Null, |x| Value::String(x.to_owned()));
+        let splash = splash.map_or(Value::Null, |x| Value::String(x.to_string()));
 
-        self.0.insert("splash".to_owned(), splash);
+        self.0.insert("splash".to_string(), splash);
 
         self
     }
@@ -189,7 +189,7 @@ impl EditGuild {
         where V: Into<VerificationLevel> {
         let num = Value::Number(Number::from(verification_level.into().num()));
 
-        self.0.insert("verification_level".to_owned(), num);
+        self.0.insert("verification_level".to_string(), num);
 
         self
     }

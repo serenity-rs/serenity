@@ -94,7 +94,7 @@ fn main() {
             // value of 0.
             let mut data = ctx.data.lock();
             let counter = data.get_mut::<CommandCounter>().unwrap();
-            let entry = counter.entry(command_name.to_owned()).or_insert(0);
+            let entry = counter.entry(command_name.to_string()).or_insert(0);
             *entry += 1;
 
             true // if `before` returns false, command processing doesn't happen.
@@ -163,7 +163,7 @@ fn main() {
 // "multiply" command below for some of the power that the `command!` macro can
 // bring.
 command!(commands(ctx, msg, _args) {
-    let mut contents = "Commands used:\n".to_owned();
+    let mut contents = "Commands used:\n".to_string();
 
     let data = ctx.data.lock();
     let counter = data.get::<CommandCounter>().unwrap();

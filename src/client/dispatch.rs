@@ -37,16 +37,16 @@ macro_rules! now {
     () => (Utc::now().time().second() * 1000)
 }
 
-fn context(conn: &Arc<Mutex<Shard>>, data: &Arc<Mutex<ShareMap>>) -> Context {
-    Context::new(conn.clone(), data.clone())
+fn context(conn: Arc<Mutex<Shard>>, data: Arc<Mutex<ShareMap>>) -> Context {
+    Context::new(conn, data)
 }
 
 #[cfg(feature = "framework")]
 pub fn dispatch<H: EventHandler + 'static>(event: Event,
-                                           conn: &Arc<Mutex<Shard>>,
-                                           framework: &Arc<sync::Mutex<Option<Box<Framework + Send>>>>,
-                                           data: &Arc<Mutex<ShareMap>>,
-                                           event_handler: &Arc<H>) {
+                                           conn: Arc<Mutex<Shard>>,
+                                           framework: Arc<sync::Mutex<Option<Box<Framework + Send>>>>,
+                                           data: Arc<Mutex<ShareMap>>,
+                                           event_handler: Arc<H>) {
     match event {
         Event::MessageCreate(event) => {
             let context = context(conn, data);
@@ -66,9 +66,9 @@ pub fn dispatch<H: EventHandler + 'static>(event: Event,
 
 #[cfg(not(feature = "framework"))]
 pub fn dispatch<H: EventHandler + 'static>(event: Event,
-                                           conn: &Arc<Mutex<Shard>>,
-                                           data: &Arc<Mutex<ShareMap>>,
-                                           event_handler: &Arc<H>) {
+                                           conn: Arc<Mutex<Shard>>,
+                                           data: Arc<Mutex<ShareMap>>,
+                                           event_handler: Arc<H>) {
     match event {
         Event::MessageCreate(event) => {
             let context = context(conn, data);
@@ -79,10 +79,11 @@ pub fn dispatch<H: EventHandler + 'static>(event: Event,
 }
 
 #[allow(unused_mut)]
-fn dispatch_message<H: EventHandler + 'static>(context: Context,
-                                               mut message: Message,
-                                               event_handler: &Arc<H>) {
-
+fn dispatch_message<H>(
+    context: Context,
+    mut message: Message,
+    event_handler: Arc<H>
+) where H: EventHandler + 'static {
     #[cfg(feature = "model")]
     {
         message.transform_content();
@@ -93,9 +94,9 @@ fn dispatch_message<H: EventHandler + 'static>(context: Context,
 
 #[allow(cyclomatic_complexity, unused_assignments, unused_mut)]
 fn handle_event<H: EventHandler + 'static>(event: Event,
-                                           conn: &Arc<Mutex<Shard>>,
-                                           data: &Arc<Mutex<ShareMap>>,
-                                           event_handler: &Arc<H>) {
+                                           conn: Arc<Mutex<Shard>>,
+                                           data: Arc<Mutex<ShareMap>>,
+                                           event_handler: Arc<H>) {
     #[cfg(feature = "cache")]
     let mut last_guild_create_time = now!();
 
@@ -205,7 +206,7 @@ fn handle_event<H: EventHandler + 'static>(event: Event,
                 let cache = CACHE.read().unwrap();
 
                 if cache.unavailable_guilds.is_empty() {
-                    let context = context(conn, data);
+                    let context = context(Arc::clone(&conn), Arc::clone(&data));
 
                     let guild_amount = cache
                         .guilds

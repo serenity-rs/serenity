@@ -9,27 +9,69 @@
 //! features = ["framework", "standard_framework"]
 //! ```
 
-#[macro_use]
-extern crate serenity;
+#[macro_use] extern crate log;
+#[macro_use] extern crate serenity;
+
+extern crate env_logger;
+extern crate kankyo;
 
 mod commands;
 
-use serenity::prelude::*;
 use serenity::framework::StandardFramework;
+use serenity::model::event::ResumedEvent;
+use serenity::model::Ready;
+use serenity::prelude::*;
+use serenity::http;
+use std::collections::HashSet;
 use std::env;
 
-struct Handler; impl EventHandler for Handler {}
+struct Handler;
+
+impl EventHandler for Handler {
+    fn on_ready(&self, _: Context, ready: Ready) {
+        info!("Connected as {}", ready.user.name);
+    }
+
+    fn on_resume(&self, _: Context, _: ResumedEvent) {
+        info!("Resumed");
+    }
+}
 
 fn main() {
+    // This will load the environment variables located at `./.env`, relative to
+    // the CWD. See `./.env.example` for an example on how to structure this.
+    kankyo::load().expect("Failed to load .env file");
+
+    // Initialize the logger to use environment variables.
+    //
+    // In this case, a good default is setting the environment variable
+    // `RUST_LOG` to debug`.
+    env_logger::init().expect("Failed to initialize env_logger");
+
     let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
 
+    let owners = match http::get_current_application_info() {
+        Ok(info) => {
+            let mut set = HashSet::new();
+            set.insert(info.owner.id);
+
+            set
+        },
+        Err(why) => panic!("Couldn't get application info: {:?}", why),
+    };
+
     client.with_framework(StandardFramework::new()
-        .configure(|c| c.prefix("~"))
+        .configure(|c| c
+            .owners(owners)
+            .prefix("~"))
         .command("ping", |c| c.exec(commands::meta::ping))
         .command("latency", |c| c.exec(commands::meta::latency))
-        .command("multiply", |c| c.exec(commands::math::multiply)));
+        .command("multiply", |c| c.exec(commands::math::multiply))
+        .command("quit", |c| c
+            .exec(commands::owner::quit)
+            .owners_only(true)));
 
     if let Err(why) = client.start() {
-        println!("Client error: {:?}", why);
+        error!("Client error: {:?}", why);
     }
 }

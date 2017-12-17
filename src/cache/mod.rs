@@ -169,7 +169,9 @@ impl Cache {
     /// # use serenity::prelude::*;
     /// # use serenity::model::*;
     /// #
-    /// use serenity::client::CACHE;
+    /// # #[cfg(feature = "client")]
+    /// # fn main() {
+    /// use serenity::CACHE;
     /// use std::thread;
     /// use std::time::Duration;
     ///
@@ -193,6 +195,10 @@ impl Cache {
     /// }
     ///
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "client"))]
+    /// # fn main() { }
     /// ```
     ///
     /// [`Member`]: ../model/struct.Member.html
@@ -225,7 +231,7 @@ impl Cache {
     /// Printing the count of all private channels and groups:
     ///
     /// ```rust,no_run
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let amount = CACHE.read().unwrap().all_private_channels().len();
     ///
@@ -252,18 +258,26 @@ impl Cache {
     /// Print all of the Ids of guilds in the Cache:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "client")]
+    /// # fn main() {
     /// # use serenity::prelude::*;
     /// # use serenity::model::*;
     /// #
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// struct Handler;
+    ///
     /// impl EventHandler for Handler {
     ///     fn on_ready(&self, _: Context, _: Ready) {
-    ///         println!("Guilds in the Cache: {:?}", CACHE.read().unwrap().all_guilds());
+    ///         let guilds = CACHE.read().unwrap().guilds.len();
+    ///
+    ///         println!("Guilds in the Cache: {}", guilds);
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler);
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "client"))]
+    /// # fn main() { }
     /// ```
     ///
     /// [`Context`]: ../client/struct.Context.html
@@ -301,15 +315,15 @@ impl Cache {
         let id = id.into();
 
         if let Some(channel) = self.channels.get(&id) {
-            return Some(Channel::Guild(channel.clone()));
+            return Some(Channel::Guild(Arc::clone(channel)));
         }
 
         if let Some(private_channel) = self.private_channels.get(&id) {
-            return Some(Channel::Private(private_channel.clone()));
+            return Some(Channel::Private(Arc::clone(private_channel)));
         }
 
         if let Some(group) = self.groups.get(&id) {
-            return Some(Channel::Group(group.clone()));
+            return Some(Channel::Group(Arc::clone(group)));
         }
 
         None
@@ -330,7 +344,7 @@ impl Cache {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let cache = CACHE.read()?;
     ///
@@ -361,10 +375,12 @@ impl Cache {
     /// [`Client::on_message`] event dispatch:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "client")]
+    /// # fn main() {
     /// # use serenity::prelude::*;
     /// # use serenity::model::*;
     /// #
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// struct Handler;
     ///
@@ -387,6 +403,10 @@ impl Cache {
     /// }
     ///
     /// let mut client = Client::new("token", Handler); client.start().unwrap();
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "client"))]
+    /// # fn main() { }
     /// ```
     ///
     /// [`ChannelId`]: ../model/struct.ChannelId.html
@@ -415,7 +435,7 @@ impl Cache {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let cache = CACHE.read()?;
     ///
@@ -494,18 +514,22 @@ impl Cache {
     ///
     /// # Examples
     ///
-    /// Retrieve a private channel from the cache and send a message:
+    /// Retrieve a private channel from the cache and print its recipient's
+    /// name:
     ///
     /// ```rust,no_run
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let cache = CACHE.read()?;
     ///
     /// if let Some(channel) = cache.private_channel(7) {
-    ///     channel.read().unwrap().say("Hello there!");
+    ///     let channel_reader = channel.read().unwrap();
+    ///     let user_reader = channel_reader.recipient.read().unwrap();
+    ///
+    ///     println!("The recipient is {}", user_reader.name);
     /// }
     /// #     Ok(())
     /// # }
@@ -537,7 +561,7 @@ impl Cache {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let cache = CACHE.read()?;
     ///
@@ -574,7 +598,7 @@ impl Cache {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::CACHE;
+    /// use serenity::CACHE;
     ///
     /// let cache = CACHE.read()?;
     ///
@@ -629,16 +653,7 @@ impl Default for Cache {
             private_channels: HashMap::with_capacity(128),
             shard_count: 1,
             unavailable_guilds: HashSet::default(),
-            user: CurrentUser {
-                avatar: None,
-                bot: false,
-                discriminator: 0,
-                email: None,
-                id: UserId(0),
-                mfa_enabled: false,
-                name: String::default(),
-                verified: false,
-            },
+            user: CurrentUser::default(),
             users: HashMap::default(),
         }
     }

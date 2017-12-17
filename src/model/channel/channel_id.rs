@@ -117,15 +117,19 @@ impl ChannelId {
     ///
     /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    pub fn delete_messages(&self, message_ids: &[MessageId]) -> Result<()> {
+    pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, message_ids: It) -> Result<()> {
         let ids = message_ids
             .into_iter()
-            .map(|message_id| message_id.0)
+            .map(|message_id| message_id.as_ref().0)
             .collect::<Vec<u64>>();
+        
+        if ids.len() == 1 {
+            self.delete_message(ids[0])
+        } else {
+            let map = json!({ "messages": ids });
 
-        let map = json!({ "messages": ids });
-
-        http::delete_messages(self.0, &map)
+            http::delete_messages(self.0, &map)
+        }
     }
 
     /// Deletes all permission overrides in the channel from a member or role.
@@ -439,7 +443,7 @@ impl ChannelId {
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    pub fn send_files<'a, F, T>(&self, files: Vec<T>, f: F) -> Result<Message>
+    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         let mut map = f(CreateMessage::default()).0;
 

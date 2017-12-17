@@ -16,6 +16,7 @@ use builder::EditMember;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use utils::Colour;
 
+/// A trait for allowing both u8 or &str or (u8, &str) to be passed into the `ban` methods in `Guild` and `Member`.
 pub trait BanOptions {
     fn dmd(&self) -> u8 { 0 }
     fn reason(&self) -> &str { "" }
@@ -26,6 +27,10 @@ impl BanOptions for u8 {
 }
 
 impl BanOptions for str {
+    fn reason(&self) -> &str { self }
+}
+
+impl<'a> BanOptions for &'a str {
     fn reason(&self) -> &str { self }
 }
 
@@ -155,10 +160,7 @@ impl Member {
     #[cfg(all(feature = "cache", feature = "utils"))]
     pub fn colour(&self) -> Option<Colour> {
         let cache = CACHE.read().unwrap();
-        let guild = match cache.guilds.get(&self.guild_id) {
-            Some(guild) => guild.read().unwrap(),
-            None => return None,
-        };
+        let guild = try_opt!(cache.guilds.get(&self.guild_id)).read().unwrap();
 
         let mut roles = self.roles
             .iter()
@@ -255,7 +257,7 @@ impl Member {
                 .get(&self.guild_id)
                 .map(|guild| guild.read().unwrap().has_perms(req));
 
-            if let Some(Ok(false)) = has_perms {
+            if let Some(false) = has_perms {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -263,7 +265,7 @@ impl Member {
         self.guild_id.kick(self.user.read().unwrap().id)
     }
 
-    /// Returns the permissions for the member.
+    /// Returns the guild-level permissions for the member.
     ///
     /// # Examples
     ///
@@ -290,17 +292,9 @@ impl Member {
             None => return Err(From::from(ModelError::GuildNotFound)),
         };
 
-        let guild = guild.read().unwrap();
+        let reader = guild.read().unwrap();
 
-        let default_channel = match guild.default_channel() {
-            Some(dc) => dc,
-            None => return Err(From::from(ModelError::ItemMissing)),
-        };
-
-        Ok(
-            guild
-                .permissions_for(default_channel.id, self.user.read().unwrap().id),
-        )
+        Ok(reader.member_permissions(self.user.read().unwrap().id))
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the
@@ -357,27 +351,17 @@ impl Member {
     /// If role data can not be found for the member, then `None` is returned.
     #[cfg(feature = "cache")]
     pub fn roles(&self) -> Option<Vec<Role>> {
-        CACHE
-            .read()
-            .unwrap()
-            .guilds
-            .values()
-            .find(|guild| {
-                guild.read().unwrap().members.values().any(|m| {
-                    m.user.read().unwrap().id == self.user.read().unwrap().id &&
-                    m.joined_at == self.joined_at
-                })
-            })
-            .map(|guild| {
-                guild
-                    .read()
-                    .unwrap()
-                    .roles
-                    .values()
-                    .filter(|role| self.roles.contains(&role.id))
-                    .cloned()
-                    .collect()
-            })
+        self
+            .guild_id
+            .find()
+            .map(|g| g
+                .read()
+                .unwrap()
+                .roles
+                .values()
+                .filter(|role| self.roles.contains(&role.id))
+                .cloned()
+                .collect())
     }
 
     /// Unbans the [`User`] from the guild.

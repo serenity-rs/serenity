@@ -108,17 +108,17 @@ impl Webhook {
 
         if let Some(avatar) = avatar {
             map.insert(
-                "avatar".to_owned(),
+                "avatar".to_string(),
                 if avatar.is_empty() {
                     Value::Null
                 } else {
-                    Value::String(avatar.to_owned())
+                    Value::String(avatar.to_string())
                 },
             );
         }
 
         if let Some(name) = name {
-            map.insert("name".to_owned(), Value::String(name.to_owned()));
+            map.insert("name".to_string(), Value::String(name.to_string()));
         }
 
         match http::edit_webhook_with_token(self.id.0, &self.token, &map) {

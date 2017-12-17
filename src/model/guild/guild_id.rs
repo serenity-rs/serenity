@@ -110,7 +110,7 @@ impl GuildId {
     pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
         let map = json!({
             "name": name,
-            "type": kind.name(),
+            "type": kind as u8,
         });
 
         http::create_channel(self.0, &map)
@@ -303,6 +303,27 @@ impl GuildId {
         http::edit_role(self.0, role_id.into().0, &f(EditRole::default()).0)
     }
 
+    /// Edits the order of [`Role`]s
+    /// Requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Change the order of a role:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::{GuildId, RoleId};
+    /// GuildId(7).edit_role_position(RoleId(8), 2);
+    /// ```
+    ///
+    /// [`Role`]: struct.Role.html
+    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    #[inline]
+    pub fn edit_role_position<R>(&self, role_id: R, position: u64) -> Result<Vec<Role>>
+        where R: Into<RoleId> {
+        http::edit_role_position(self.0, role_id.into().0, position)
+    }
+
+
     /// Search the cache for the guild.
     #[cfg(feature = "cache")]
     pub fn find(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().unwrap().guild(*self) }
@@ -374,7 +395,7 @@ impl GuildId {
         where C: Into<ChannelId>, U: Into<UserId> {
         let mut map = Map::new();
         map.insert(
-            "channel_id".to_owned(),
+            "channel_id".to_string(),
             Value::Number(Number::from(channel_id.into().0)),
         );
 
