@@ -208,6 +208,23 @@ impl Args {
     /// ```
     pub fn full(&self) -> &str { &self.message }
 
+    /// The amount of args.
+    /// 
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    ///
+    /// assert_eq!(args.len(), 2); // `2` because `["42", "69"]`
+    /// ```
+    pub fn len(&self) -> usize {
+        // TODO: Handle quotes too.
+
+        self.message.split(&self.delimiter).count()
+    }
+
     /// Skips if there's a first element, but also returns it.
     ///
     /// # Examples
