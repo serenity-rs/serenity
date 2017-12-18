@@ -178,3 +178,10 @@ fn message_type_7() {
 fn guild_features_deser() {
     p!(GuildCreateEvent, "guild_create_features");
 }
+
+// Ensure that `Guild`s still deserialize despite the `system_channel_id` key
+// missing.
+#[test]
+fn guild_system_channel_id_missing() {
+    p!(Guild, "guild_system_channel_id_missing");
+}
