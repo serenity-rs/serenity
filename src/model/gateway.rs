@@ -286,13 +286,15 @@ impl<'de> Deserialize<'de> for Presence {
 #[derive(Clone, Debug, Deserialize)]
 pub struct Ready {
     pub guilds: Vec<GuildStatus>,
-    #[serde(deserialize_with = "deserialize_presences")] pub presences: HashMap<UserId, Presence>,
-    #[serde(deserialize_with = "deserialize_private_channels")]
-    pub private_channels:
-        HashMap<ChannelId, Channel>,
+    #[serde(default, deserialize_with = "deserialize_presences")]
+    pub presences: HashMap<UserId, Presence>,
+    #[serde(default, deserialize_with = "deserialize_private_channels")]
+    pub private_channels: HashMap<ChannelId, Channel>,
     pub session_id: String,
     pub shard: Option<[u64; 2]>,
-    #[serde(default, rename = "_trace")] pub trace: Vec<String>,
+    #[serde(default, rename = "_trace")]
+    pub trace: Vec<String>,
     pub user: CurrentUser,
-    #[serde(rename = "v")] pub version: u64,
+    #[serde(rename = "v")]
+    pub version: u64,
 }
