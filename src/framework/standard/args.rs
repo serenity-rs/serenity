@@ -79,15 +79,10 @@ fn parse<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err>
     where T::Err: StdError {
     let mut pos = s.find(delimiter).unwrap_or_else(|| s.len());
 
-
     let res = (&s[..pos]).parse::<T>().map_err(Error::Parse);
-    // First find out whether the delimiter is 2 chars or longer, 
-    // if so add those extras to the position.
-    // Otherwise just add `1` for 1 char delimiters.
-    if delimiter.len() > 1 {
+
+    if pos < s.len() {
         pos += delimiter.len();
-    } else if pos < s.len() {
-        pos += 1;
     }
 
     s.drain(..pos);
@@ -214,7 +209,7 @@ impl Args {
     pub fn full(&self) -> &str { &self.message }
 
     /// The amount of args.
-    /// 
+    ///
     /// # Examples
     ///
     /// ```rust
