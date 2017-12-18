@@ -79,11 +79,16 @@ fn parse<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err>
     where T::Err: StdError {
     let mut pos = s.find(delimiter).unwrap_or_else(|| s.len());
 
+
     let res = (&s[..pos]).parse::<T>().map_err(Error::Parse);
-    // +1 is for the delimiter
-    if pos < s.len() {
-        pos += 1;
-    }
+    // First find out whether the delimiter is 2 chars or longer, 
+    // if so add those extras to the position.
+    // Otherwise just add `1` for 1 char delimiters.
+    pos += if delimiter.len() > 1 {
+        delimiter.len()
+    } else {
+        1
+    };
 
     s.drain(..pos);
     res
