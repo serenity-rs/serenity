@@ -84,11 +84,11 @@ fn parse<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err>
     // First find out whether the delimiter is 2 chars or longer, 
     // if so add those extras to the position.
     // Otherwise just add `1` for 1 char delimiters.
-    pos += if delimiter.len() > 1 {
-        delimiter.len()
-    } else {
-        1
-    };
+    if delimiter.len() > 1 {
+        pos += delimiter.len();
+    } else if pos < s.len() {
+        pos += 1;
+    }
 
     s.drain(..pos);
     res
@@ -340,7 +340,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    /// let args = Args::new("42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(*args.multiple::<i32>().unwrap(), [42, 69]);
     /// ```
