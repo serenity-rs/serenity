@@ -19,6 +19,9 @@ use super::super::GuildId;
 /// guild it was created in.
 #[derive(Clone, Debug, Deserialize)]
 pub struct Emoji {
+    /// Whether the emoji is animated.
+    #[serde(default)]
+    pub animated: bool,
     /// The Id of the emoji.
     pub id: EmojiId,
     /// The name of the emoji. It must be at least 2 characters long and can
@@ -56,6 +59,7 @@ impl Emoji {
     /// # use serenity::model::{Emoji, EmojiId};
     /// #
     /// # let mut emoji = Emoji {
+    /// #     animated: false,
     /// #     id: EmojiId(7),
     /// #     name: String::from("blobface"),
     /// #     managed: false,
@@ -93,6 +97,7 @@ impl Emoji {
     /// # use serenity::model::{Emoji, EmojiId};
     /// #
     /// # let mut emoji = Emoji {
+    /// #     animated: false,
     /// #     id: EmojiId(7),
     /// #     name: String::from("blobface"),
     /// #     managed: false,
@@ -137,6 +142,7 @@ impl Emoji {
     /// # use serenity::model::{Emoji, EmojiId};
     /// #
     /// # let mut emoji = Emoji {
+    /// #     animated: false,
     /// #     id: EmojiId(7),
     /// #     name: String::from("blobface"),
     /// #     managed: false,
@@ -172,6 +178,7 @@ impl Emoji {
     /// # use serenity::model::{Emoji, EmojiId};
     /// #
     /// # let mut emoji = Emoji {
+    /// #     animated: false,
     /// #     id: EmojiId(7),
     /// #     name: String::from("blobface"),
     /// #     managed: false,
