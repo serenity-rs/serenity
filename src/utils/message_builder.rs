@@ -20,6 +20,7 @@ use std::ops::Add;
 /// #
 /// # let user = UserId(1);
 /// # let emoji = Emoji {
+/// #     animated: false,
 /// #     id: EmojiId(2),
 /// #     name: "test".to_string(),
 /// #     managed: false,
@@ -145,6 +146,7 @@ impl MessageBuilder {
     /// use serenity::utils::MessageBuilder;
     ///
     /// let emoji = Emoji {
+    ///     animated: false,
     ///     id: EmojiId(302516740095606785),
     ///     managed: true,
     ///     name: "smugAnimeFace".to_string(),

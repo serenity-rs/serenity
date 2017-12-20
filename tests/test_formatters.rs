@@ -35,6 +35,7 @@ fn test_mention() {
         nsfw: false,
     })));
     let emoji = Emoji {
+        animated: false,
         id: EmojiId(5),
         name: "a".to_string(),
         managed: true,

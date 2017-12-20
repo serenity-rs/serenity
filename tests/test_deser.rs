@@ -35,6 +35,11 @@ fn channel_update() {
     p!(ChannelUpdateEvent, "channel_update_1");
 }
 
+#[test]
+fn emoji_animated() {
+    p!(Emoji, "emoji_animated");
+}
+
 // A game with null type.
 #[test]
 fn game() {
