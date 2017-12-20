@@ -57,7 +57,8 @@ pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
 pub use self::ws_client_ext::WebSocketGatewayClientExt;
 
-use model::{Game, OnlineStatus};
+use model::gateway::Game;
+use model::user::OnlineStatus;
 use websocket::sync::client::Client;
 use websocket::sync::stream::{TcpStream, TlsStream};
 
@@ -147,9 +148,15 @@ impl ConnectionStage {
 }
 
 pub enum ShardAction {
-    Autoreconnect,
     Heartbeat,
     Identify,
-    Reconnect,
+    Reconnect(ReconnectType),
+}
+
+/// The type of reconnection that should be performed.
+pub enum ReconnectType {
+    /// Indicator that a new connection should be made by sending an IDENTIFY.
+    Reidentify,
+    /// Indicator that a new connection should be made by sending a RESUME.
     Resume,
 }

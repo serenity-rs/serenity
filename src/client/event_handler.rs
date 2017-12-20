@@ -1,5 +1,4 @@
-use model::event::*;
-use model::*;
+use model::prelude::*;
 use parking_lot::RwLock;
 use serde_json::Value;
 use std::collections::HashMap;

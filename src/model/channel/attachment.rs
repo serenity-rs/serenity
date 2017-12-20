@@ -43,15 +43,14 @@ impl Attachment {
     /// Download all of the attachments associated with a [`Message`]:
     ///
     /// ```rust,no_run
+    /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
-    /// use serenity::model::*;
     /// use std::env;
     /// use std::fs::File;
     /// use std::io::Write;
     /// use std::path::Path;
     ///
     /// struct Handler;
-    ///
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, message: Message) {

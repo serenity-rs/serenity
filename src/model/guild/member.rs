@@ -1,4 +1,4 @@
-use model::*;
+use model::prelude::*;
 use chrono::{DateTime, FixedOffset};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_sync_user;
@@ -135,7 +135,7 @@ impl Member {
     ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature = "cache")]
-    pub fn ban<BO: BanOptions>(&self, ban_options: BO) -> Result<()> {
+    pub fn ban<BO: BanOptions>(&self, ban_options: &BO) -> Result<()> {
         let dmd = ban_options.dmd();
         if dmd > 7 {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
@@ -159,7 +159,7 @@ impl Member {
     #[cfg(all(feature = "cache", feature = "utils"))]
     pub fn colour(&self) -> Option<Colour> {
         let cache = CACHE.read();
-        let guild = try_opt!(cache.guilds.get(&self.guild_id)).read();
+        let guild = cache.guilds.get(&self.guild_id)?.read();
 
         let mut roles = self.roles
             .iter()
@@ -189,7 +189,7 @@ impl Member {
 
         for (cid, channel) in &reader.channels {
             if reader.permissions_in(*cid, self.user.read().id).read_messages() {
-                return Some(channel.clone());
+                return Some(Arc::clone(channel));
             }
         }
 

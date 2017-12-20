@@ -2,7 +2,7 @@ use parking_lot::RwLock;
 use serde::de::Error as DeError;
 use std::collections::HashMap;
 use std::sync::Arc;
-use super::*;
+use super::prelude::*;
 
 #[cfg(feature = "cache")]
 use internal::prelude::*;
@@ -11,6 +11,10 @@ use internal::prelude::*;
 use super::permissions::Permissions;
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
+
+pub fn default_true() -> bool {
+    true
+}
 
 pub fn deserialize_emojis<'de, D: Deserializer<'de>>(
     deserializer: D)
@@ -112,6 +116,11 @@ pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
     Ok(Arc::new(RwLock::new(user)))
 }
 
+pub fn deserialize_sync_user<'de, D>(deserializer: D)
+    -> StdResult<Arc<RwLock<User>>, D::Error> where D: Deserializer<'de> {
+    Ok(Arc::new(RwLock::new(User::deserialize(deserializer)?)))
+}
+
 pub fn deserialize_users<'de, D: Deserializer<'de>>(
     deserializer: D)
     -> StdResult<HashMap<UserId, Arc<RwLock<User>>>, D::Error> {
@@ -126,11 +135,11 @@ pub fn deserialize_users<'de, D: Deserializer<'de>>(
 }
 
 pub fn deserialize_u16<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u16, D::Error> {
-    deserializer.deserialize_u16(U16Visitor)
+    deserializer.deserialize_any(U16Visitor)
 }
 
 pub fn deserialize_u64<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u64, D::Error> {
-    deserializer.deserialize_u64(U64Visitor)
+    deserializer.deserialize_any(U64Visitor)
 }
 
 pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
@@ -187,62 +196,37 @@ pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Re
     Ok(permissions.is_empty())
 }
 
-#[derive(Debug)]
-pub struct U16Visitor;
+macro_rules! num_visitors {
+    ($($visitor:ident: $type:ty),*) => {
+        $(
+            #[derive(Debug)]
+            pub struct $visitor;
 
-impl<'de> Visitor<'de> for U16Visitor {
-    type Value = u16;
+            impl<'de> Visitor<'de> for $visitor {
+                type Value = $type;
 
-    fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
-        formatter.write_str("identifier")
+                fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
+                    formatter.write_str("identifier")
+                }
+
+                fn visit_str<E: DeError>(self, v: &str) -> StdResult<Self::Value, E> {
+                    v.parse::<$type>().map_err(|_| {
+                        let mut s = String::with_capacity(32);
+                        s.push_str("Unknown ");
+                        s.push_str(stringify!($type));
+                        s.push_str(" value: ");
+                        s.push_str(v);
+
+                        DeError::custom(s)
+                    })
+                }
+
+                fn visit_i64<E: DeError>(self, v: i64) -> StdResult<Self::Value, E> { Ok(v as $type) }
+
+                fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> { Ok(v as $type) }
+            }
+        )*
     }
-
-    fn visit_str<E: DeError>(self, v: &str) -> StdResult<Self::Value, E> {
-        match v.parse::<u16>() {
-            Ok(v) => Ok(v),
-            Err(_) => {
-                let mut s = String::new();
-                s.push_str("Unknown ");
-                s.push_str(stringify!($name));
-                s.push_str(" value: ");
-                s.push_str(v);
-
-                Err(DeError::custom(s))
-            },
-        }
-    }
-
-    fn visit_i64<E: DeError>(self, v: i64) -> StdResult<Self::Value, E> { Ok(v as u16) }
-
-    fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> { Ok(v as u16) }
 }
 
-#[derive(Debug)]
-pub struct U64Visitor;
-
-impl<'de> Visitor<'de> for U64Visitor {
-    type Value = u64;
-
-    fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
-        formatter.write_str("identifier")
-    }
-
-    fn visit_str<E: DeError>(self, v: &str) -> StdResult<Self::Value, E> {
-        match v.parse::<u64>() {
-            Ok(v) => Ok(v),
-            Err(_) => {
-                let mut s = String::new();
-                s.push_str("Unknown ");
-                s.push_str(stringify!($name));
-                s.push_str(" value: ");
-                s.push_str(v);
-
-                Err(DeError::custom(s))
-            },
-        }
-    }
-
-    fn visit_i64<E: DeError>(self, v: i64) -> StdResult<Self::Value, E> { Ok(v as u64) }
-
-    fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> { Ok(v) }
-}
+num_visitors!(U16Visitor: u16, U64Visitor: u64);

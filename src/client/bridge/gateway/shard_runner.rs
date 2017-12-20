@@ -1,8 +1,9 @@
-use gateway::{Shard, ShardAction};
+use gateway::{ReconnectType, Shard, ShardAction};
 use internal::prelude::*;
 use internal::ws_impl::ReceiverExt;
 use model::event::{Event, GatewayEvent};
 use parking_lot::Mutex;
+use serde::Deserialize;
 use std::sync::mpsc::{self, Receiver, Sender, TryRecvError};
 use std::sync::Arc;
 use super::super::super::{EventHandler, dispatch};
@@ -142,8 +143,14 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 
             let (event, action, successful) = self.recv_event();
 
-            if let Some(action) = action {
-                let _ = self.action(action);
+            match action {
+                Some(ShardAction::Reconnect(ReconnectType::Reidentify)) => {
+                    return self.request_restart()
+                },
+                Some(other) => {
+                    let _ = self.action(&other);
+                },
+                None => {},
             }
 
             if let Some(event) = event {
@@ -170,13 +177,16 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
     /// # Errors
     ///
     /// Returns
-    fn action(&mut self, action: ShardAction) -> Result<()> {
-        match action {
-            ShardAction::Autoreconnect => self.shard.autoreconnect(),
+    fn action(&mut self, action: &ShardAction) -> Result<()> {
+        match *action {
+            ShardAction::Reconnect(ReconnectType::Reidentify) => {
+                self.request_restart()
+            },
+            ShardAction::Reconnect(ReconnectType::Resume) => {
+                self.shard.resume()
+            },
             ShardAction::Heartbeat => self.shard.heartbeat(),
             ShardAction::Identify => self.shard.identify(),
-            ShardAction::Reconnect => self.shard.reconnect(),
-            ShardAction::Resume => self.shard.resume(),
         }
     }
 
@@ -239,7 +249,12 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 
                     true
                 },
-            }
+                ShardManagerMessage::ShutdownInitiated => {
+                    // nb: not sent here
+
+                    true
+                },
+            },
             ShardClientMessage::Runner(x) => match x {
                 ShardRunnerMessage::ChunkGuilds { guild_ids, limit, query } => {
                     self.shard.chunk_guilds(
@@ -329,7 +344,11 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
     /// Returns a received event, as well as whether reading the potentially
     /// present event was successful.
     fn recv_event(&mut self) -> (Option<Event>, Option<ShardAction>, bool) {
-        let gw_event = match self.shard.client.recv_json(GatewayEvent::decode) {
+        let gw_event = match self.shard.client.recv_json() {
+            Ok(Some(value)) => {
+                GatewayEvent::deserialize(value).map(Some).map_err(From::from)
+            },
+            Ok(None) => Ok(None),
             Err(Error::WebSocket(WebSocketError::IoError(_))) => {
                 // Check that an amount of time at least double the
                 // heartbeat_interval has passed.
@@ -355,8 +374,15 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 
                 debug!("Attempting to auto-reconnect");
 
-                if let Err(why) = self.shard.autoreconnect() {
-                    error!("Failed to auto-reconnect: {:?}", why);
+                match self.shard.reconnection_type() {
+                    ReconnectType::Reidentify => return (None, None, false),
+                    ReconnectType::Resume => {
+                        if let Err(why) = self.shard.resume() {
+                            warn!("Failed to resume: {:?}", why);
+
+                            return (None, None, false);
+                        }
+                    },
                 }
 
                 return (None, None, true);
@@ -366,7 +392,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
                 // hit every iteration.
                 return (None, None, false);
             },
-            other => other,
+            Err(why) => Err(why),
         };
 
         let event = match gw_event {

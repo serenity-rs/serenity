@@ -1,5 +1,6 @@
 use constants::VoiceOpCode;
-use model::{ChannelId, GuildId, UserId, VoiceState};
+use model::id::{ChannelId, GuildId, UserId};
+use model::voice::VoiceState;
 use serde_json::Value;
 use std::sync::mpsc::{self, Sender as MpscSender};
 use super::connection_info::ConnectionInfo;

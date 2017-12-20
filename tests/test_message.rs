@@ -4,7 +4,7 @@ extern crate serenity;
 
 use serde::de::Deserialize;
 use serde_json::Value;
-use serenity::model::Message;
+use serenity::model::channel::Message;
 use std::fs::File;
 
 macro_rules! p {

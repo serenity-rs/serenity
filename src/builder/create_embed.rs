@@ -17,7 +17,7 @@
 
 use chrono::{DateTime, TimeZone};
 use internal::prelude::*;
-use model::Embed;
+use model::channel::Embed;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::default::Default;
@@ -101,7 +101,7 @@ impl CreateEmbed {
     pub fn description<D: Display>(mut self, description: D) -> Self {
         self.0.insert(
             "description",
-            Value::String(format!("{}", description)),
+            Value::String(description.to_string()),
         );
 
         CreateEmbed(self.0)
@@ -203,9 +203,9 @@ impl CreateEmbed {
     /// Passing a string timestamp:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
-    /// #
+    /// use serenity::prelude::*;
+    /// use serenity::model::channel::Message;
+    ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
@@ -229,9 +229,10 @@ impl CreateEmbed {
     /// Note: this example isn't efficient and is for demonstrative purposes.
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
-    /// #
+    /// use serenity::prelude::*;
+    /// use serenity::model::guild::Member;
+    /// use serenity::model::id::GuildId;
+    ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
@@ -281,7 +282,7 @@ impl CreateEmbed {
     /// Set the title of the embed.
     pub fn title<D: Display>(mut self, title: D) -> Self {
         self.0
-            .insert("title", Value::String(format!("{}", title)));
+            .insert("title", Value::String(title.to_string()));
 
         CreateEmbed(self.0)
     }
@@ -424,7 +425,7 @@ impl CreateEmbedFooter {
 
     /// Set the footer's text.
     pub fn text<D: Display>(mut self, text: D) -> Self {
-        self.0.insert("text", Value::String(format!("{}", text)));
+        self.0.insert("text", Value::String(text.to_string()));
 
         self
     }

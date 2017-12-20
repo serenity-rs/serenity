@@ -1,4 +1,4 @@
-use model::{ChannelId, GuildId, UserId};
+use model::id::{ChannelId, GuildId, UserId};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::sync::mpsc::Sender as MpscSender;

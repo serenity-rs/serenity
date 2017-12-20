@@ -1,12 +1,12 @@
-pub use super::command::{Command, CommandGroup, CommandType, Error as CommandError};
+pub use super::command::{Command, CommandGroup, CommandOptions, Error as CommandError};
 pub(crate) use super::command::CommandOrAlias;
-pub use super::create_command::CreateCommand;
+pub use super::create_help_command::{CreateHelpCommand};
+pub use super::create_command::{CreateCommand, FnOrCommand};
 pub use super::Args;
 
 use client::Context;
-use model::{Message, Permissions};
-use std::collections::HashMap;
-use std::default::Default;
+use model::channel::Message;
+use model::Permissions;
 use std::sync::Arc;
 
 /// Used to create command groups
@@ -28,7 +28,7 @@ pub struct CreateGroup(pub CommandGroup);
 
 impl CreateGroup {
     fn build_command(&self) -> CreateCommand {
-        let mut cmd = CreateCommand(Command::default())
+        let mut cmd = CreateCommand(CommandOptions::default(), FnOrCommand::Fn(|_, _, _| Ok(())))
             .required_permissions(self.0.required_permissions)
             .dm_only(self.0.dm_only)
             .guild_only(self.0.guild_only)
@@ -45,9 +45,9 @@ impl CreateGroup {
     /// Adds a command to group.
     pub fn command<F>(mut self, command_name: &str, f: F) -> Self
         where F: FnOnce(CreateCommand) -> CreateCommand {
-        let cmd = f(self.build_command()).0;
+        let cmd = f(self.build_command()).finish();
 
-        for n in &cmd.aliases {
+        for n in &cmd.options().aliases {
             if let Some(ref prefix) = self.0.prefix {
                 self.0.commands.insert(
                     format!("{} {}", prefix, n.to_string()),
@@ -63,21 +63,30 @@ impl CreateGroup {
 
         self.0.commands.insert(
             command_name.to_string(),
-            CommandOrAlias::Command(Arc::new(cmd)),
+            CommandOrAlias::Command(cmd),
         );
 
         self
     }
 
-    /// Adds a command to group with simplified API.
+    /// Adds a command to group with a simplified API.
     /// You can return Err(From::from(string)) if there's an error.
-    pub fn on(mut self, name: &str,
+    pub fn on(self, name: &str,
             f: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> Self {
-        let cmd = Arc::new(Command::new(f));
+        self.cmd(name, f)
+    }
+
+    /// Like [`on`], but accepts a `Command` directly.
+    ///
+    /// [`on`]: #method.on
+    pub fn cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
+        let cmd: Arc<Command> = Arc::new(c);
 
         self.0
             .commands
-            .insert(name.to_string(), CommandOrAlias::Command(cmd));
+            .insert(name.to_string(), CommandOrAlias::Command(Arc::clone(&cmd)));
+
+        cmd.init();
 
         self
     }
@@ -143,21 +152,5 @@ impl CreateGroup {
         self.0.allowed_roles = allowed_roles.into_iter().map(|x| x.to_string()).collect();
 
         self
-    }
-}
-
-impl Default for CommandGroup {
-    fn default() -> CommandGroup {
-        CommandGroup {
-            prefix: None,
-            commands: HashMap::new(),
-            bucket: None,
-            required_permissions: Permissions::empty(),
-            dm_only: false,
-            guild_only: false,
-            help_available: true,
-            owners_only: false,
-            allowed_roles: Vec::new(),
-        }
     }
 }

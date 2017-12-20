@@ -5,7 +5,7 @@ extern crate serenity;
 
 use serenity::prelude::*;
 use serenity::model::event::ResumedEvent;
-use serenity::model::Ready;
+use serenity::model::gateway::Ready;
 use std::env;
 
 struct Handler;

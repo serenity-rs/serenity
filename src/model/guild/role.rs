@@ -1,4 +1,4 @@
-use model::*;
+use model::prelude::*;
 use std::cmp::Ordering;
 
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
@@ -79,7 +79,7 @@ impl Role {
     /// Make a role hoisted:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::RoleId;
+    /// # use serenity::model::id::RoleId;
     /// # let role = RoleId(7).find().unwrap();
     /// // assuming a `role` has already been bound
     //

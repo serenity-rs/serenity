@@ -4,9 +4,8 @@ extern crate serenity;
 
 use serenity::utils::MessageBuilder;
 use serenity::utils::ContentModifier::*;
-use serenity::model::Emoji;
-use serenity::model::EmojiId;
-use serenity::model::UserId;
+use serenity::model::guild::Emoji;
+use serenity::model::id::{EmojiId, UserId};
 
 #[test]
 fn code_blocks() {
@@ -33,7 +32,7 @@ fn no_free_formatting() {
 #[test]
 fn mentions() {
     let content_emoji = MessageBuilder::new()
-        .emoji(Emoji {
+        .emoji(&Emoji {
             id: EmojiId(32),
             name: "Rohrkatze".to_string(),
             managed: false,
@@ -43,7 +42,7 @@ fn mentions() {
         .build();
     let content_mentions = MessageBuilder::new()
         .channel(1)
-        .mention(UserId(2))
+        .mention(&UserId(2))
         .role(3)
         .user(4)
         .build();

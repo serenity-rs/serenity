@@ -13,7 +13,7 @@ version = "0.5.0"
 [dependencies]
 bitflags = "^1.0"
 log = "~0.3"
-parking_lot = "^0.4"
+parking_lot = "^0.5"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
@@ -24,7 +24,7 @@ version = "~0.7"
 
 [dependencies.byteorder]
 optional = true
-version = "^1.0"
+version = "^1.1"
 
 [dependencies.chrono]
 features = ["serde"]
@@ -73,15 +73,11 @@ version = "~1.7"
 optional = true
 version = "~0.3"
 
-[dependencies.vec_shift]
-optional = true
-version = "0.1.0"
-
 [dependencies.evzht9h3nznqzwl]
 default-features = false
 features = ["sync-ssl"]
 optional = true
-version = "0.0.2"
+version = "0.0.3"
 
 [features]
 default = [
@@ -109,7 +105,10 @@ framework = ["client", "model", "utils"]
 gateway = ["flate2", "http", "websocket", "utils"]
 http = ["hyper", "hyper-native-tls", "lazy_static", "multipart", "native-tls"]
 model = ["builder", "http"]
-standard_framework = ["framework", "vec_shift"]
+standard_framework = ["framework"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "sodiumoxide"]
 websocket = ["evzht9h3nznqzwl"]
+
+[package.metadata.docs.rs]
+all-features = true

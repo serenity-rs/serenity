@@ -12,7 +12,8 @@ extern crate serenity;
 
 use serenity::client::CACHE;
 use serenity::framework::StandardFramework;
-use serenity::model::*;
+use serenity::model::gateway::Ready;
+use serenity::model::id::ChannelId;
 use serenity::prelude::*;
 use serenity::voice;
 use serenity::Result as SerenityResult;

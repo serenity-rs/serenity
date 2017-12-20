@@ -1,5 +1,5 @@
 use chrono::{DateTime, FixedOffset};
-use model::*;
+use model::prelude::*;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_single_recipient;
 
@@ -78,7 +78,7 @@ impl PrivateChannel {
     /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn delete_messages<'a, It: IntoIterator<Item=&'a MessageId>>(&self, message_ids: It) -> Result<()> {
+    pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, message_ids: It) -> Result<()> {
         self.id.delete_messages(message_ids)
     }
 

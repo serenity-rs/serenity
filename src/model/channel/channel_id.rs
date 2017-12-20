@@ -1,5 +1,5 @@
 use internal::RwLockExt;
-use model::*;
+use model::prelude::*;
 
 #[cfg(feature = "model")]
 use std::borrow::Cow;
@@ -408,7 +408,7 @@ impl ChannelId {
     /// Send files with the paths `/path/to/file.jpg` and `/path/to/file2.jpg`:
     ///
     /// ```rust,no_run
-    /// use serenity::model::ChannelId;
+    /// use serenity::model::id::ChannelId;
     ///
     /// let channel_id = ChannelId(7);
     ///
@@ -420,7 +420,7 @@ impl ChannelId {
     /// Send files using `File`:
     ///
     /// ```rust,no_run
-    /// use serenity::model::ChannelId;
+    /// use serenity::model::id::ChannelId;
     /// use std::fs::File;
     ///
     /// let channel_id = ChannelId(7);

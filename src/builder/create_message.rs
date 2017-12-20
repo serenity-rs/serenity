@@ -1,5 +1,5 @@
 use internal::prelude::*;
-use model::ReactionType;
+use model::channel::ReactionType;
 use std::collections::HashMap;
 use std::fmt::Display;
 use super::CreateEmbed;
@@ -23,7 +23,7 @@ use utils;
 /// Sending a message with a content of `"test"` and applying text-to-speech:
 ///
 /// ```rust,no_run
-/// use serenity::model::ChannelId;
+/// use serenity::model::id::ChannelId;
 ///
 /// let channel_id = ChannelId(7);
 ///
@@ -48,7 +48,7 @@ impl CreateMessage {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     pub fn content<D: Display>(mut self, content: D) -> Self {
-        self.0.insert("content", Value::String(format!("{}", content)));
+        self.0.insert("content", Value::String(content.to_string()));
 
         CreateMessage(self.0, self.1)
     }

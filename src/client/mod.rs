@@ -43,21 +43,11 @@ use parking_lot::Mutex;
 use self::bridge::gateway::{ShardManager, ShardManagerMonitor};
 use self::dispatch::dispatch;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering, ATOMIC_BOOL_INIT};
 use threadpool::ThreadPool;
 use typemap::ShareMap;
 
 #[cfg(feature = "framework")]
 use framework::Framework;
-
-static HANDLE_STILL: AtomicBool = ATOMIC_BOOL_INIT;
-
-#[derive(Copy, Clone)]
-pub struct CloseHandle;
-
-impl CloseHandle {
-    pub fn close(self) { HANDLE_STILL.store(false, Ordering::Relaxed); }
-}
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
@@ -238,6 +228,44 @@ pub struct Client {
     /// # }
     /// ```
     ///
+    /// Shutting down all connections after one minute of operation:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// use serenity::client::{Client, EventHandler};
+    /// use std::time::Duration;
+    /// use std::{env, thread};
+    ///
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler { }
+    ///
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
+    ///
+    /// // Create a clone of the `Arc` containing the shard manager.
+    /// let shard_manager = client.shard_manager.clone();
+    ///
+    /// // Create a thread which will sleep for 60 seconds and then have the
+    /// // shard manager shutdown.
+    /// thread::spawn(move || {
+    ///     thread::sleep(Duration::from_secs(60));
+    ///
+    ///     shard_manager.lock().shutdown_all();
+    ///
+    ///     println!("Shutdown shard manager!");
+    /// });
+    ///
+    /// println!("Client shutdown: {:?}", client.start());
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    /// ```
+    ///
     /// [`Client::start_shard`]: #method.start_shard
     /// [`Client::start_shards`]: #method.start_shards
     pub shard_manager: Arc<Mutex<ShardManager>>,
@@ -291,6 +319,8 @@ impl Client {
     /// ```
     pub fn new<H>(token: &str, handler: H) -> Result<Self>
         where H: EventHandler + Send + Sync + 'static {
+        let token = token.trim();
+
         let token = if token.starts_with("Bot ") {
             token.to_string()
         } else {
@@ -313,11 +343,11 @@ impl Client {
                 0,
                 0,
                 0,
-                Arc::clone(&url),
-                Arc::clone(&locked),
-                Arc::clone(&data),
-                Arc::clone(&event_handler),
-                Arc::clone(&framework),
+                &url,
+                &locked,
+                &data,
+                &event_handler,
+                &framework,
                 threadpool.clone(),
             );
 
@@ -380,7 +410,11 @@ impl Client {
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
     /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
-    ///     .command("ping", |c| c.exec_str("Pong!")));
+    ///     .on("ping", |_, msg, _| {
+    ///         msg.channel_id.say("Pong!")?;
+    ///
+    ///         Ok(())
+    ///      }));
     /// # Ok(())
     /// # }
     /// #
@@ -765,9 +799,6 @@ impl Client {
         self.start_connection([range[0], range[1], total_shards])
     }
 
-    /// Returns a thread-safe handle for closing shards.
-    pub fn close_handle(&self) -> CloseHandle { CloseHandle }
-
     // Shard data layout is:
     // 0: first shard number to initialize
     // 1: shard number to initialize up to and including
@@ -782,8 +813,6 @@ impl Client {
     //
     // [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     fn start_connection(&mut self, shard_data: [u64; 3]) -> Result<()> {
-        HANDLE_STILL.store(true, Ordering::Relaxed);
-
         // Update the framework's current user if the feature is enabled.
         //
         // This also acts as a form of check to ensure the token is correct.
@@ -822,12 +851,8 @@ impl Client {
 
         self.shard_manager_worker.run();
 
-        Err(Error::Client(ClientError::Shutdown))
+        Ok(())
     }
-}
-
-impl Drop for Client {
-    fn drop(&mut self) { self.close_handle().close(); }
 }
 
 /// Validates that a token is likely in a valid format.

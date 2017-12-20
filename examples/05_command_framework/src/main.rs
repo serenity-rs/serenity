@@ -13,13 +13,14 @@
 extern crate serenity;
 extern crate typemap;
 
+use serenity::framework::standard::{Args, DispatchError, StandardFramework, HelpBehaviour, CommandOptions, help_commands};
+use serenity::model::channel::Message;
+use serenity::model::gateway::Ready;
+use serenity::model::Permissions;
 use serenity::prelude::*;
-use serenity::model::*;
-use serenity::framework::standard::{Args, Command, DispatchError, StandardFramework, help_commands};
 use std::collections::HashMap;
 use std::env;
 use std::fmt::Write;
-use std::sync::Arc;
 use typemap::Key;
 
 struct CommandCounter;
@@ -119,36 +120,61 @@ fn main() {
         .simple_bucket("emoji", 5)
         // Can't be used more than 2 times per 30 seconds, with a 5 second delay:
         .bucket("complicated", 5, 30, 2)
-        .command("about", |c| c.exec_str("A test bot"))
-        .command("help", |c| c.exec_help(help_commands::plain))
+        .command("about", |c| c.cmd(about))
+        // You can use the simple `help(help_commands::with_embeds)` or
+        // customise your help-menu via `customised_help()`.
+        .customised_help(help_commands::with_embeds, |c| {
+                // This replaces the information that a user can pass
+                // a command-name as argument to gain specific information about it.
+                c.individual_command_tip("Hello! こんにちは！Hola! Bonjour! 您好!\n\
+                If you want more information about a specific command, just pass the command as argument.")
+                // Some commands require a `{}` to replace it by the actual name.
+                // In this case it's the command's name.
+                .command_not_found_text("Could not {}, I'm sorry : (")
+                // This is the second command requiring `{}` to replace the actual name.
+                .suggestion_text("How about this command: {}, it's numero uno on the market...!")
+                // On another note, you can set up the help-menu-filter-behaviour.
+                // Here are all possible settings shown on all possible cases.
+                // First case is if a user lacks permissions for a command, we can hide the command.
+                .lacking_permissions(HelpBehaviour::Hide)
+                // If the user is nothing but lacking a certain role, we just display it hence do `Nothing`.
+                .lacking_role(HelpBehaviour::Nothing)
+                // The last `enum`-variant is `Strike`, which ~~strikes~~ a command.
+                .wrong_channel(HelpBehaviour::Strike)
+                // Serenity will automatically analyse and generate a hint/tip explaining the possible
+                // cases of a command being ~~striked~~, but only  if
+                // `striked_commands_tip(Some(""))` keeps `Some()` wrapping an empty `String`, which is the default value.
+                // If the `String` is not empty, your given `String` will be used instead.
+                // If you pass in a `None`, no hint will be displayed at all.
+                 })
         .command("commands", |c| c
             // Make this command use the "complicated" bucket.
             .bucket("complicated")
-            .exec(commands))
+            .cmd(commands))
         .group("Emoji", |g| g
             .prefix("emoji")
             .command("cat", |c| c
                 .desc("Sends an emoji with a cat.")
                 .batch_known_as(vec!["kitty", "neko"]) // Adds multiple aliases
                 .bucket("emoji") // Make this command use the "emoji" bucket.
-                .exec_str(":cat:")
+                .cmd(cat)
                  // Allow only administrators to call this:
                 .required_permissions(Permissions::ADMINISTRATOR))
             .command("dog", |c| c
                 .desc("Sends an emoji with a dog.")
                 .bucket("emoji")
-                .exec_str(":dog:")))
+                .cmd(dog)))
         .command("multiply", |c| c
             .known_as("*") // Lets us call ~* instead of ~multiply
-            .exec(multiply))
+            .cmd(multiply))
         .command("ping", |c| c
             .check(owner_check)
-            .exec_str("Pong!"))
+            .cmd(ping))
         .command("role", |c| c
-            .exec(about_role)
+            .cmd(about_role)
             // Limits the usage of this command to roles named:
             .allowed_roles(vec!["mods", "ultimate neko"]))
-        .command("some long command", |c| c.exec(some_long_command)),
+        .command("some long command", |c| c.cmd(some_long_command)),
     );
 
     if let Err(why) = client.start() {
@@ -182,7 +208,7 @@ command!(commands(ctx, msg, _args) {
 // In this case, this command checks to ensure you are the owner of the message
 // in order for the command to be executed. If the check fails, the command is
 // not called.
-fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &Arc<Command>) -> bool {
+fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> bool {
     // Replace 7 with your ID
     msg.author.id == 7
 }
@@ -242,5 +268,29 @@ command!(multiply(_ctx, msg, args) {
 
     if let Err(why) = msg.channel_id.say(&res.to_string()) {
         println!("Err sending product of {} and {}: {:?}", first, second, why);
+    }
+});
+
+command!(about(_ctx, msg, _args) {
+    if let Err(why) = msg.channel_id.say("This is a small test-bot! : )") {
+        println!("Error sending message: {:?}", why);
+    }
+});
+
+command!(ping(_ctx, msg, _args) {
+    if let Err(why) = msg.channel_id.say("Pong! : )") {
+        println!("Error sending message: {:?}", why);
+    }
+});
+
+command!(dog(_ctx, msg, _args) {
+    if let Err(why) = msg.channel_id.say(":dog:") {
+        println!("Error sending message: {:?}", why);
+    }
+});
+
+command!(cat(_ctx, msg, _args) {
+    if let Err(why) = msg.channel_id.say(":cat:") {
+        println!("Error sending message: {:?}", why);
     }
 });

@@ -1,4 +1,4 @@
-use model::MessageId;
+use model::id::MessageId;
 use std::collections::HashMap;
 
 /// Builds a request for a request to the API to retrieve messages.
@@ -29,8 +29,8 @@ use std::collections::HashMap;
 /// # use std::error::Error;
 /// #
 /// # fn try_main() -> Result<(), Box<Error>> {
-/// use serenity::model::{ChannelId, MessageId};
 /// use serenity::builder::GetMessages;
+/// use serenity::model::id::{ChannelId, MessageId};
 ///
 /// let retriever = GetMessages::default()
 ///     .after(MessageId(158339864557912064))

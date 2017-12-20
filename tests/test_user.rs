@@ -2,7 +2,8 @@ extern crate serenity;
 
 #[cfg(feature = "model")]
 mod model {
-    use serenity::model::{User, UserId};
+    use serenity::model::id::UserId;
+    use serenity::model::user::User;
 
     fn gen() -> User {
         User {
