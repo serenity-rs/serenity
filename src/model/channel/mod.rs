@@ -56,6 +56,139 @@ pub enum Channel {
 }
 
 impl Channel {
+
+    /////////////////////////////////////////////////////////////////////////
+    // Adapter for each variant
+    /////////////////////////////////////////////////////////////////////////
+
+    /// Converts from `Channel` to `Option<Arc<RwLock<Group>>>`.
+    ///
+    /// Converts `self` into an `Option<Arc<RwLock<Group>>>`, consuming `self`,
+    /// and discarding a GuildChannel, PrivateChannel, or ChannelCategory, if any.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust,no_run
+    /// # extern crate serenity;
+    /// # use self::serenity::model::id::ChannelId;
+    /// # fn main() {
+    /// # let channel = ChannelId(0).get().unwrap();
+    /// match channel.group() {
+    ///     Some(group_lock) => {
+    ///         if let Some(ref name) = group_lock.read().name {
+    ///             println!("It's a group named {}!", name);
+    ///         } else {
+    ///              println!("It's an unnamed group!");
+    ///         }
+    ///     },
+    ///     None => { println!("It's not a group!"); },
+    /// }
+    /// # }
+    /// ```
+
+
+    pub fn group(self) -> Option<Arc<RwLock<Group>>> {
+        match self {
+            Channel::Group(lock) => Some(lock),
+            _ => None,
+        }
+    }
+
+    /// Converts from `Channel` to `Option<Arc<RwLock<GuildChannel>>>`.
+    ///
+    /// Converts `self` into an `Option<Arc<RwLock<GuildChannel>>>`, consuming `self`,
+    /// and discarding a Group, PrivateChannel, or ChannelCategory, if any.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust,no_run
+    /// # extern crate serenity;
+    /// # use self::serenity::model::id::ChannelId;
+    /// # fn main() {
+    /// let channel = ChannelId(0).get().unwrap();
+    /// match channel.guild() {
+    ///     Some(guild_lock) => {
+    ///         println!("It's a guild named {}!", guild_lock.read().name);
+    ///     },
+    ///     None => { println!("It's not a guild!"); },
+    /// }
+    /// # }
+    /// ```
+
+    pub fn guild(self) -> Option<Arc<RwLock<GuildChannel>>> {
+        match self {
+            Channel::Guild(lock) => Some(lock),
+            _ => None,
+        }
+    }
+
+    /// Converts from `Channel` to `Option<Arc<RwLock<PrivateChannel>>>`.
+    ///
+    /// Converts `self` into an `Option<Arc<RwLock<PrivateChannel>>>`, consuming `self`,
+    /// and discarding a Group, GuildChannel, or ChannelCategory, if any.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust,no_run
+    /// # extern crate serenity;
+    /// # use self::serenity::model::id::ChannelId;
+    /// # fn main() {
+    /// # let channel = ChannelId(0).get().unwrap();
+    /// match channel.private() {
+    ///     Some(private_lock) => {
+    ///         let private = private_lock.read();
+    ///         let recipient_lock = &private.recipient;
+    ///         let recipient = recipient_lock.read();
+    ///         println!("It's a private channel with {}!", recipient.name);
+    ///     },
+    ///     None => { println!("It's not a private channel!"); },
+    /// }
+    /// # }
+    /// ```
+
+    pub fn private(self) -> Option<Arc<RwLock<PrivateChannel>>> {
+        match self {
+            Channel::Private(lock) => Some(lock),
+            _ => None,
+        }
+    }
+
+    /// Converts from `Channel` to `Option<Arc<RwLock<ChannelCategory>>>`.
+    ///
+    /// Converts `self` into an `Option<Arc<RwLock<ChannelCategory>>>`, consuming `self`,
+    /// and discarding a Group, GuildChannel, or PrivateChannel, if any.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust,no_run
+    /// # extern crate serenity;
+    /// # use self::serenity::model::id::ChannelId;
+    /// # fn main() {
+    /// # let channel = ChannelId(0).get().unwrap();
+    /// match channel.category() {
+    ///     Some(category_lock) => {
+    ///         println!("It's a category named {}!", category_lock.read().name);
+    ///     },
+    ///     None => { println!("It's not a category!"); },
+    /// }
+    /// # }
+    /// ```
+
+    pub fn category(self) -> Option<Arc<RwLock<ChannelCategory>>> {
+        match self {
+            Channel::Category(lock) => Some(lock),
+            _ => None,
+        }
+    }
+
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
     ///
     /// [`Message::react`] may be a more suited method of reacting in most
