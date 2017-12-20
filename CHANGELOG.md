@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.4.6] - 2017-12-20
+
+This release contains a fix for deserializing `Emoji`s and `ReactionType`s, due
+to the new `animated` payload key.
+
+### Fixed
+
+- [model] Fix Emoji and ReactionType deserialization [c:5286949]
+
 ## [0.4.5] - 2017-12-09
 
 This release contains a hotfix for the hotfix release, as well as a slight
@@ -1541,6 +1550,8 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.4.6]: https://github.com/zeyla/serenity/compare/v0.4.5...v0.4.6
+[0.4.5]: https://github.com/zeyla/serenity/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/zeyla/serenity/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/zeyla/serenity/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/zeyla/serenity/compare/v0.4.1...v0.4.2
@@ -1593,6 +1604,8 @@ Initial commit.
 [@UninterestinAcc]: https://github.com/UninterestinAcc
 [@xentec]: https://github.com/xentec
 [@zeyla]: https://github.com/zeyla
+
+[c:5286949]: https://github.com/zeyla/serenity/commit/5286949f424e824784344ebb7b7af4e52fb819c3
 
 [c:52403a5]: https://github.com/zeyla/serenity/commit/52403a5084ed7f0589bde3351844907a92de2d62
 [c:795eaa1]: https://github.com/zeyla/serenity/commit/795eaa15bca61116fbde9c2482c765f2d47a7696
