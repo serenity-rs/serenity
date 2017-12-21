@@ -35,6 +35,11 @@ fn channel_update() {
     p!(ChannelUpdateEvent, "channel_update_1");
 }
 
+#[test]
+fn emoji_animated() {
+    p!(Emoji, "emoji_animated");
+}
+
 // A game with null type.
 #[test]
 fn game() {
@@ -177,4 +182,11 @@ fn message_type_7() {
 #[test]
 fn guild_features_deser() {
     p!(GuildCreateEvent, "guild_create_features");
+}
+
+// Ensure that `Guild`s still deserialize despite the `system_channel_id` key
+// missing.
+#[test]
+fn guild_system_channel_id_missing() {
+    p!(Guild, "guild_system_channel_id_missing");
 }

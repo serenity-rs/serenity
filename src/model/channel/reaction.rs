@@ -170,6 +170,8 @@ pub enum ReactionType {
     /// [`Emoji`]: struct.Emoji.html
     /// [`Guild`]: struct.Guild.html
     Custom {
+        /// Whether the emoji is animated.
+        animated: bool,
         /// The Id of the custom [`Emoji`].
         ///
         /// [`Emoji`]: struct.Emoji.html
@@ -187,6 +189,7 @@ impl<'de> Deserialize<'de> for ReactionType {
         #[derive(Deserialize)]
         #[serde(field_identifier, rename_all = "snake_case")]
         enum Field {
+            Animated,
             Id,
             Name,
         }
@@ -201,11 +204,19 @@ impl<'de> Deserialize<'de> for ReactionType {
             }
 
             fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> StdResult<Self::Value, V::Error> {
+                let mut animated = None;
                 let mut id = None;
                 let mut name = None;
 
                 while let Some(key) = map.next_key()? {
                     match key {
+                        Field::Animated => {
+                            if animated.is_some() {
+                                return Err(DeError::duplicate_field("animated"));
+                            }
+
+                            animated = Some(map.next_value()?);
+                        },
                         Field::Id => {
                             if id.is_some() {
                                 return Err(DeError::duplicate_field("id"));
@@ -225,12 +236,14 @@ impl<'de> Deserialize<'de> for ReactionType {
                     }
                 }
 
+                let animated = animated.unwrap_or(false);
                 let name = name.ok_or_else(|| DeError::missing_field("name"))?;
 
                 Ok(if let Some(id) = id {
                     ReactionType::Custom {
-                        id: id,
-                        name: name,
+                        animated,
+                        id,
+                        name,
                     }
                 } else {
                     ReactionType::Unicode(name.unwrap())
@@ -255,6 +268,7 @@ impl ReactionType {
             ReactionType::Custom {
                 id,
                 ref name,
+                ..
             } => format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id),
             ReactionType::Unicode(ref unicode) => unicode.clone(),
         }
@@ -290,6 +304,7 @@ impl From<char> for ReactionType {
 impl From<Emoji> for ReactionType {
     fn from(emoji: Emoji) -> ReactionType {
         ReactionType::Custom {
+            animated: emoji.animated,
             id: emoji.id,
             name: Some(emoji.name),
         }
@@ -299,6 +314,7 @@ impl From<Emoji> for ReactionType {
 impl From<EmojiId> for ReactionType {
     fn from(emoji_id: EmojiId) -> ReactionType {
         ReactionType::Custom {
+            animated: false,
             id: emoji_id,
             name: None
         }
@@ -308,6 +324,7 @@ impl From<EmojiId> for ReactionType {
 impl From<EmojiIdentifier> for ReactionType {
     fn from(emoji_id: EmojiIdentifier) -> ReactionType {
         ReactionType::Custom {
+            animated: false,
             id: emoji_id.id,
             name: Some(emoji_id.name)
         }
@@ -380,6 +397,7 @@ impl Display for ReactionType {
             ReactionType::Custom {
                 id,
                 ref name,
+                ..
             } => {
                 f.write_char('<')?;
                 f.write_char(':')?;

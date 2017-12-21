@@ -33,6 +33,7 @@ fn no_free_formatting() {
 fn mentions() {
     let content_emoji = MessageBuilder::new()
         .emoji(&Emoji {
+            animated: false,
             id: EmojiId(32),
             name: "Rohrkatze".to_string(),
             managed: false,

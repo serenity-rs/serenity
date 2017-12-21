@@ -1516,10 +1516,10 @@ impl<'de> Deserialize<'de> for Guild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
-        let system_channel_id = map.remove("system_channel_id")
-            .ok_or_else(|| DeError::custom("expected guild system_channel_id"))
-            .and_then(Option::<ChannelId>::deserialize)
-            .map_err(DeError::custom)?;
+        let system_channel_id = match map.remove("system_channel_id") {
+            Some(v) => Option::<ChannelId>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
         let verification_level = map.remove("verification_level")
             .ok_or_else(|| DeError::custom("expected guild verification_level"))
             .and_then(VerificationLevel::deserialize)

@@ -80,9 +80,9 @@ fn parse<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err>
     let mut pos = s.find(delimiter).unwrap_or_else(|| s.len());
 
     let res = (&s[..pos]).parse::<T>().map_err(Error::Parse);
-    // +1 is for the delimiter
+
     if pos < s.len() {
-        pos += 1;
+        pos += delimiter.len();
     }
 
     s.drain(..pos);
@@ -208,6 +208,23 @@ impl Args {
     /// ```
     pub fn full(&self) -> &str { &self.message }
 
+    /// The amount of args.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    ///
+    /// assert_eq!(args.len(), 2); // `2` because `["42", "69"]`
+    /// ```
+    pub fn len(&self) -> usize {
+        // TODO: Handle quotes too.
+
+        self.message.split(&self.delimiter).count()
+    }
+
     /// Skips if there's a first element, but also returns it.
     ///
     /// # Examples
@@ -318,7 +335,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    /// let args = Args::new("42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(*args.multiple::<i32>().unwrap(), [42, 69]);
     /// ```

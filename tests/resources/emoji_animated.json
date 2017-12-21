@@ -1,0 +1,14 @@
+{
+  "managed": false,
+  "name": "abc",
+  "roles": [],
+  "user": {
+    "username": "zeyla",
+    "discriminator": "5479",
+    "id": "114941315417899012",
+    "avatar": "d8c3dacd468ef9e48ca28add856fbfe2"
+  },
+  "require_colons": true,
+  "animated": false,
+  "id": "300000000000000000"
+}

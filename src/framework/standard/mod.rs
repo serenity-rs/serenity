@@ -513,22 +513,22 @@ impl StandardFramework {
                 }
             }
 
-            let arg_len = args.len();
-
+            let len = args.len();
+            
             if let Some(x) = command.min_args {
-                if arg_len < x as usize {
+                if len < x as usize {
                     return Some(DispatchError::NotEnoughArguments {
                         min: x,
-                        given: arg_len,
+                        given: len,
                     });
                 }
             }
 
             if let Some(x) = command.max_args {
-                if arg_len > x as usize {
+                if len > x as usize {
                     return Some(DispatchError::TooManyArguments {
                         max: x,
-                        given: arg_len,
+                        given: len,
                     });
                 }
             }
