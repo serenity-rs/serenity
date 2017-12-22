@@ -60,7 +60,7 @@ fn single_quote_chaining() {
 }
 
 #[test]
-fn single_quote_and_single() {
+fn single_quoted_and_single_chaining() {
     let mut args = Args::new(r#""1, 2" "2" "3" 4"#, &[" ".to_string()]);
 
     assert_eq!(args.single_quoted::<String>().unwrap(), "1, 2");
