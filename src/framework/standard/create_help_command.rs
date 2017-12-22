@@ -177,12 +177,13 @@ impl CreateHelpCommand {
     pub(crate) fn finish(self) -> Arc<Help> {
         if self.0.striked_commands_tip == Some(String::new()) {
             let mut strike_text = String::from("~~`Striked commands`~~ are unavailable because they");
-            let mut concat_with_comma = false;
 
-            if self.0.lacking_permissions == HelpBehaviour::Strike {
+            let mut concat_with_comma = if self.0.lacking_permissions == HelpBehaviour::Strike {
                 let _ = write!(strike_text, " require permissions");
-                concat_with_comma = true;
-            }
+                true
+            } else {
+                false
+            };
 
             if self.0.lacking_role == HelpBehaviour::Strike {
 
