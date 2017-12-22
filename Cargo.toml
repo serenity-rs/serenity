@@ -79,6 +79,9 @@ features = ["sync-ssl"]
 optional = true
 version = "0.0.3"
 
+[dev-dependencies.matches]
+version = "0.1.6"
+
 [features]
 default = [
     "builder",
