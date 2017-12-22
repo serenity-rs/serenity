@@ -10,6 +10,12 @@ pub enum Error<E: StdError> {
     /// A parsing operation failed; the error in it can be of any returned from the `FromStr`
     /// trait.
     Parse(E),
+    /// Occurs if e.g. `multiple_quoted` is used but the input starts with not the expected
+    /// value.
+    /// It contains how many bytes have to be removed until the first `"` appears.
+    InvalidStart(usize),
+    /// If the string contains no quote.
+    NoQuote,
 }
 
 impl<E: StdError> From<E> for Error<E> {
@@ -25,6 +31,8 @@ impl<E: StdError> StdError for Error<E> {
         match *self {
             Eos => "end-of-string",
             Parse(ref e) => e.description(),
+            InvalidStart(_) => "Invalid Start",
+            NoQuote => "No quote exists",
         }
     }
 
@@ -45,6 +53,8 @@ impl<E: StdError> fmt::Display for Error<E> {
         match *self {
             Eos => write!(f, "end of string"),
             Parse(ref e) => fmt::Display::fmt(&e, f),
+            InvalidStart(pos) => write!(f, "Invalid Start, {} bytes until first `\"`.", pos),
+            NoQuote => write!(f, "No quote exists"),
         }
     }
 }
@@ -55,19 +65,29 @@ fn second_quote_occurence(s: &str) -> Option<usize> {
     s.chars().enumerate().filter(|&(_, c)| c == '"').nth(1).map(|(pos, _)| pos)
 }
 
-fn parse_quotes<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err>
+fn parse_quotes<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
     where T::Err: StdError {
 
     // Fall back to `parse` if there're no quotes at the start.
     if !s.starts_with('"') {
-        return parse::<T>(s, delimiter);
+        if let Some(pos) = s.find('"') {
+            return Err(Error::InvalidStart(pos));
+        } else {
+            return Err(Error::NoQuote);
+        }
     }
 
     let mut pos = second_quote_occurence(s).unwrap_or_else(|| s.len());
     let res = (&s[1..pos]).parse::<T>().map_err(Error::Parse);
-    // +1 is for the quote
-    if pos < s.len() {
-        pos += 1;
+
+    pos += '"'.len_utf8();
+
+    for delimiter in delimiters {
+
+        if s[pos..].starts_with(delimiter) {
+            pos += delimiter.len();
+            break;
+        }
     }
 
     s.drain(..pos);
@@ -75,18 +95,43 @@ fn parse_quotes<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err
     res
 }
 
-fn parse<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err>
+
+fn parse<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
     where T::Err: StdError {
-    let mut pos = s.find(delimiter).unwrap_or_else(|| s.len());
 
-    let res = (&s[..pos]).parse::<T>().map_err(Error::Parse);
+    if delimiters.len() == 1 {
+        let mut pos = s.find(&delimiters[0]).unwrap_or_else(|| s.len());
+        let res = (&s[..pos]).parse::<T>().map_err(Error::Parse);
 
-    if pos < s.len() {
-        pos += delimiter.len();
+        if pos < s.len() {
+            pos += delimiters[0].len();
+        }
+
+        s.drain(..pos);
+        res
+    } else {
+        let mut smallest_pos = s.len();
+        let mut delimiter_len: usize = 0;
+
+        for delimiter in delimiters {
+            let other_pos = s.find(delimiter).unwrap_or_else(|| s.len());
+
+            if smallest_pos > other_pos {
+                smallest_pos = other_pos;
+                delimiter_len = delimiter.len();
+            }
+        }
+
+        let res = (&s[..smallest_pos]).parse::<T>().map_err(Error::Parse);
+
+        if smallest_pos < s.len() {
+            smallest_pos += delimiter_len;
+        }
+
+        s.drain(..smallest_pos);
+
+        res
     }
-
-    s.drain(..pos);
-    res
 }
 
 /// A utility struct for handling arguments of a command.
@@ -95,20 +140,21 @@ fn parse<T: FromStr>(s: &mut String, delimiter: &str) -> Result<T, T::Err>
 /// can be mitigated with the `*_n` methods, which just parse and return.
 #[derive(Clone, Debug)]
 pub struct Args {
-    delimiter: String,
+    delimiters: Vec<String>,
     message: String,
+    len: Option<usize>,
+    len_quoted: Option<usize>,
 }
 
 impl Args {
     pub fn new(message: &str, possible_delimiters: &[String]) -> Self {
-        let delimiter = possible_delimiters
-            .iter()
-            .find(|&d| message.contains(d))
-            .map_or(possible_delimiters[0].as_str(), |s| s.as_str());
-
         Args {
-            delimiter: delimiter.to_string(),
+            delimiters: possible_delimiters
+                .iter()
+                .filter(|&d| message.contains(d)).cloned().collect(),
             message: message.to_string(),
+            len: None,
+            len_quoted: None,
         }
     }
 
@@ -130,46 +176,11 @@ impl Args {
             return Err(Error::Eos);
         }
 
-        parse::<T>(&mut self.message, &self.delimiter)
-    }
+        if let Some(ref mut val) = self.len {
+            *val -= 1
+        };
 
-    /// Like [`single`], but does "zero-copy" parsing.
-    ///
-    /// Refer to [`FromStrZc`]'s example on how to use this method.
-    ///
-    /// [`single`]: #method.single
-    /// [`FromStrZc`]: trait.FromStrZc.html
-    pub fn single_zc<'a, T: FromStrZc<'a> + 'a>(&'a mut self) -> Result<T, T::Err>
-        where T::Err: StdError {
-        if self.message.is_empty() {
-            return Err(Error::Eos);
-        }
-
-        let pos = self
-            .message
-            .find(&self.delimiter)
-            .unwrap_or_else(|| self.message.len());
-
-        fn parse_then_remove(msg: &mut String, pos: usize) -> &str {
-            struct ParseThenRemove<'a>(&'a mut String, usize);
-
-            impl<'a> Drop for ParseThenRemove<'a> {
-                fn drop(&mut self) {
-                    if !self.0.is_empty() {
-                        if self.1 < self.0.len() {
-                            self.1 += 1;
-                        }
-
-                        self.0.drain(..self.1);
-                    }
-                }
-            }
-
-            (ParseThenRemove(msg, pos).0).as_str()
-        }
-
-        let string = parse_then_remove(&mut self.message, pos);
-        FromStrZc::from_str(&string[..pos]).map_err(Error::Parse)
+        parse::<T>(&mut self.message, &self.delimiters)
     }
 
     /// Like [`single`], but doesn't remove the element.
@@ -192,7 +203,7 @@ impl Args {
             return Err(Error::Eos);
         }
 
-        parse::<T>(&mut self.message.clone(), &self.delimiter)
+        parse::<T>(&mut self.message.clone(), &self.delimiters)
     }
 
     /// Accesses the current state of the internal string.
@@ -219,10 +230,72 @@ impl Args {
     ///
     /// assert_eq!(args.len(), 2); // `2` because `["42", "69"]`
     /// ```
-    pub fn len(&self) -> usize {
-        // TODO: Handle quotes too.
+    pub fn len(&mut self) -> usize {
+        if let Some(len) = self.len {
+            len
 
-        self.message.split(&self.delimiter).count()
+        } else if self.message.is_empty() {
+                0
+        } else {
+            let mut words: Box<Iterator<Item = &str>> = Box::new(Some(&self.message[..]).into_iter());
+
+            for delimiter in &self.delimiters {
+                words = Box::new(words.flat_map(move |x| x.split(delimiter)));
+            }
+
+            let len = words.count();
+            self.len = Some(len);
+            len
+        }
+    }
+
+    /// Returns true if the string is empty or else false.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("", &[" ".to_string()]);
+    ///
+    /// assert!(args.is_empty()); // `true` because passed message is empty.
+    /// ```
+    pub fn is_empty(&self) -> bool {
+        self.message.is_empty()
+    }
+
+    /// Like [`len`], but takes quotes into account.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new(r#""42" "69""#, &[" ".to_string()]);
+    ///
+    /// assert_eq!(args.len_quoted(), 2); // `2` because `["42", "69"]`
+    /// ```
+    pub fn len_quoted(&mut self) -> usize {
+        if self.message.is_empty() {
+                0
+        } else if let Some(len_quoted) = self.len_quoted {
+                len_quoted
+        } else {
+            let mut message = self.message.clone();
+            let count = message.chars().filter(|&c| c == '"').count() / 2;
+            let mut len_counter = 0;
+
+            for _ in 0..count {
+
+                if parse_quotes::<String>(&mut message, &self.delimiters).is_ok() {
+                    len_counter += 1;
+                } else {
+                    return len_counter;
+                }
+            }
+
+            len_counter
+        }
     }
 
     /// Skips if there's a first element, but also returns it.
@@ -235,9 +308,18 @@ impl Args {
     /// let mut args = Args::new("42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.skip().unwrap(), "42");
-    /// assert_eq!(args, "69");
+    /// assert_eq!(args.full(), "69");
     /// ```
-    pub fn skip(&mut self) -> Option<String> { parse::<String>(&mut self.message, &self.delimiter).ok() }
+    pub fn skip(&mut self) -> Option<String> {
+        if let Some(ref mut val) = self.len {
+
+            if 1 <= *val {
+                *val -= 1
+            }
+        };
+
+        parse::<String>(&mut self.message, &self.delimiters).ok()
+    }
 
     /// Like [`skip`], but allows for multiple at once.
     ///
@@ -259,6 +341,15 @@ impl Args {
             vec.push(self.skip()?);
         }
 
+        if let Some(ref mut val) = self.len {
+
+            if i as usize <= *val {
+                *val -= i as usize
+            } else {
+                *val = 0
+            }
+        };
+
         Some(vec)
     }
 
@@ -269,7 +360,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new(r#""42 69"#, &[" ".to_string()]);
+    /// let mut args = Args::new(r#""42 69""#, &[" ".to_string()]);
     ///
     /// assert_eq!(args.single_quoted::<String>().unwrap(), "42 69");
     /// assert!(args.is_empty());
@@ -278,7 +369,11 @@ impl Args {
     /// [`single`]: #method.single
     pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
-        parse_quotes::<T>(&mut self.message, &self.delimiter)
+        if let Some(ref mut val) = self.len_quoted {
+            *val -= 1
+        };
+
+        parse_quotes::<T>(&mut self.message, &self.delimiters)
     }
 
     /// Like [`single_quoted`], but doesn't remove the element.
@@ -288,19 +383,17 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new(r#""42 69"#, &[" ".to_string()]);
+    /// let mut args = Args::new(r#""42 69""#, &[" ".to_string()]);
     ///
     /// assert_eq!(args.single_quoted_n::<String>().unwrap(), "42 69");
-    /// assert_eq!(args, r#""42 69"#);
+    /// assert_eq!(args.full(), r#""42 69""#);
     /// ```
     ///
     /// [`single_quoted`]: #method.single_quoted
     pub fn single_quoted_n<T: FromStr>(&self) -> Result<T, T::Err>
         where T::Err: StdError {
-        parse_quotes::<T>(&mut self.message.clone(), &self.delimiter)
+        parse_quotes::<T>(&mut self.message.clone(), &self.delimiters)
     }
-
-    // Fix this.
 
     /// Like [`multiple`], but takes quotes into account.
     ///
@@ -322,13 +415,13 @@ impl Args {
         let count = self.message.chars().filter(|&c| c == '"').count() / 2;
 
         for _ in 0..count {
-            res.push(parse_quotes::<T>(&mut self.message, &self.delimiter)?);
+            res.push(parse_quotes::<T>(&mut self.message, &self.delimiters)?);
         }
 
         Ok(res)
     }
 
-    /// Empty outs the internal vector while parsing (if necessary) and returning them
+    /// Empty outs the internal vector while parsing (if necessary) and returning them.
     ///
     /// # Examples
     ///
@@ -362,6 +455,9 @@ impl Args {
 
     /// Returns the first argument that can be converted and removes it from the list.
     ///
+    /// **Note**: This replaces all delimiters within the message
+    /// by the first set in your framework-config to win performance.
+    ///
     /// # Examples
     ///
     /// ```rust
@@ -370,7 +466,7 @@ impl Args {
     /// let mut args = Args::new("c47 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.find::<i32>().unwrap(), 69);
-    /// assert_eq!(args, "c47");
+    /// assert_eq!(args.full(), "c47");
     /// ```
     pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
@@ -380,19 +476,42 @@ impl Args {
 
         // TODO: Make this efficient
 
-        let pos = self.message
-            .split(&self.delimiter)
-            .position(|e| e.parse::<T>().is_ok());
+        if self.delimiters.len() == 1 as usize {
 
-        match pos {
-            Some(index) => {
-                let mut vec = self.message.split(&self.delimiter).map(|s| s.to_string()).collect::<Vec<_>>();
-                let mut ss = vec.remove(index);
-                let res = parse::<T>(&mut ss, &self.delimiter);
-                self.message = vec.join(&self.delimiter);
-                res
-            },
-            None => Err(Error::Eos),
+            match self.message.split(&self.delimiters[0]).position(|e| e.parse::<T>().is_ok()) {
+                Some(index) => {
+                    let mut vec = self.message.split(self.delimiters[0].as_str()).map(|s| s.to_string()).collect::<Vec<_>>();
+                    let mut ss = vec.remove(index);
+                    let res = parse::<T>(&mut ss, &self.delimiters);
+                    self.message = vec.join(&self.delimiters[0]);
+                    if let Some(ref mut val) = self.len { if 1 <= *val { *val -= 1 } };
+                    res
+                },
+                None => Err(Error::Eos),
+            }
+        } else {
+            let msg = self.message.clone();
+            let mut words: Box<Iterator<Item = &str>> = Box::new(Some(&msg[..]).into_iter());
+
+            for delimiter in &self.delimiters {
+                words = Box::new(words.flat_map(move |x| x.split(delimiter)));
+            }
+
+            let mut words: Vec<&str> = words.collect();
+            let pos = words.iter().position(|e| e.parse::<T>().is_ok());
+            if let Some(ref mut val) = self.len { if 1 <= *val { *val -= 1 } };
+
+            match pos {
+                Some(index) => {
+                    let ss = words.remove(index);
+
+                    let res = parse::<T>(&mut ss.to_string(), &self.delimiters);
+                    self.len = Some(words.len());
+                    self.message = words.join(&self.delimiters[0]);
+                    res
+                },
+                None => Err(Error::Eos),
+            }
         }
     }
 
@@ -403,82 +522,49 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let args = Args::new("c47 69", &[" ".to_string()]);
+    /// let mut args = Args::new("c47 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.find_n::<i32>().unwrap(), 69);
-    /// assert_eq!(args, "c47 69");
+    /// assert_eq!(args.full(), "c47 69");
     /// ```
-    pub fn find_n<T: FromStr>(&self) -> Result<T, T::Err>
+    pub fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
         if self.message.is_empty() {
             return Err(Error::Eos);
         }
 
         // Same here.
-        let pos = self.message
-            .split(&self.delimiter)
-            .position(|e| e.parse::<T>().is_ok());
+        if self.delimiters.len() == 1 {
+            let pos = self.message
+                .split(&self.delimiters[0])
+                .position(|e| e.parse::<T>().is_ok());
 
-        match pos {
-            Some(index) => {
-                let mut vec = self.message.split(&self.delimiter).map(|s| s.to_string()).collect::<Vec<_>>();
-                let mut ss = vec.remove(index);
-                parse::<T>(&mut ss, &self.delimiter)
-            },
-            None => Err(Error::Eos),
+            match pos {
+                Some(index) => {
+                    let mut vec = self.message.split(&self.delimiters[0]).map(|s| s.to_string()).collect::<Vec<_>>();
+                    let mut ss = vec.remove(index);
+                    parse::<T>(&mut ss, &self.delimiters)
+                },
+                None => Err(Error::Eos),
+            }
+        } else {
+            let mut words: Box<Iterator<Item = &str>> = Box::new(Some(&self.message[..]).into_iter());
+            for delimiter in &self.delimiters {
+                words = Box::new(words.flat_map(move |x| x.split(delimiter)));
+            }
+
+            let pos = words.position(|e| e.parse::<T>().is_ok());
+            let mut words: Vec<&str> = words.collect();
+
+            match pos {
+                Some(index) => {
+                    let ss = words.remove(index);
+                    self.len = Some(words.len());
+                    parse::<T>(&mut ss.to_string(), &self.delimiters)
+                },
+                None => Err(Error::Eos),
+            }
         }
-    }
-}
-
-/// A version of `FromStr` that allows for "zero-copy" parsing.
-///
-/// # Examples
-///
-/// ```rust
-/// use serenity::framework::standard::{Args, FromStrZc};
-/// use std::fmt;
-///
-/// struct NameDiscrim<'a>(&'a str, Option<&'a str>);
-///
-/// #[derive(Debug)]
-/// struct Error(&'static str);
-///
-/// impl std::error::Error for Error {
-///     fn description(&self) -> &str { self.0 }
-/// }
-///
-/// impl fmt::Display for Error {
-///     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.0) }
-/// }
-///
-/// impl<'a> FromStrZc<'a> for NameDiscrim<'a> {
-///     type Err = Error;
-///
-///     fn from_str(s: &'a str) -> Result<NameDiscrim<'a>, Error> {
-///         let mut it = s.split("#");
-///         let name = it.next().ok_or(Error("name must be specified"))?;
-///         let discrim = it.next();
-///         Ok(NameDiscrim(name, discrim))
-///     }
-/// }
-///
-/// let mut args = Args::new("abc#1234", &[" ".to_string()]);
-/// let NameDiscrim(name, discrim) = args.single_zc::<NameDiscrim>().unwrap();
-///
-/// assert_eq!(name, "abc");
-/// assert_eq!(discrim, Some("1234"));
-/// ```
-pub trait FromStrZc<'a>: Sized {
-    type Err;
-
-    fn from_str(s: &'a str) -> ::std::result::Result<Self, Self::Err>;
-}
-
-impl<'a, T: FromStr> FromStrZc<'a> for T {
-    type Err = T::Err;
-
-    fn from_str(s: &'a str) -> ::std::result::Result<Self, Self::Err> {
-        <T as FromStr>::from_str(s)
     }
 }
 
@@ -499,7 +585,6 @@ impl<'a> PartialEq<&'a str> for Args {
         self.message == *other
     }
 }
-
 
 impl PartialEq for Args {
     fn eq(&self, other: &Self) -> bool {

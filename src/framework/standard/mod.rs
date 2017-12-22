@@ -9,7 +9,7 @@ mod create_group;
 mod buckets;
 mod args;
 
-pub use self::args::{Args, Iter, FromStrZc, Error as ArgError};
+pub use self::args::{Args, Iter, Error as ArgError};
 pub(crate) use self::buckets::{Bucket, Ratelimit};
 pub(crate) use self::command::{Help};
 pub use self::command::{HelpFunction, HelpOptions, Command, CommandGroup, CommandOptions, Error as CommandError};
@@ -514,7 +514,7 @@ impl StandardFramework {
             }
 
             let len = args.len();
-            
+
             if let Some(x) = command.min_args {
                 if len < x as usize {
                     return Some(DispatchError::NotEnoughArguments {
