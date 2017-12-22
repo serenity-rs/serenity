@@ -51,7 +51,7 @@ fn single_i32_n() {
 }
 
 #[test]
-fn single_quote_chaining() {
+fn single_quoted_chaining() {
     let mut args = Args::new(r#""1, 2" "2" """#, &[" ".to_string()]);
 
     assert_eq!(args.single_quoted::<String>().unwrap(), "1, 2");
@@ -328,4 +328,13 @@ fn single_after_failed_single() {
 
     assert_matches!(args.single::<i32>().unwrap_err(), ArgError::Parse(_));
     assert_eq!(args.full(), "2");
+}
+
+#[test]
+fn len_after_failed_single_quoted() {
+    let mut args = Args::new("b a", &[" ".to_string()]);
+
+    assert_eq!(args.len_quoted(), 0);
+    assert_matches!(args.single_quoted::<i32>().unwrap_err(), ArgError::NoQuote);
+    assert_eq!(args.len_quoted(), 0);
 }
