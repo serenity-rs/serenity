@@ -97,5 +97,5 @@ fn member_named_username() {
 fn member_named_nickname() {
     let lhs = gen().member_named("aaaa").unwrap().display_name();
 
-    assert_eq!(lhs, gen_member.display_name());
+    assert_eq!(lhs, gen_member().display_name());
 }
