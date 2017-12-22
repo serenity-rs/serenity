@@ -297,30 +297,35 @@ fn len_before_and_after_find_n() {
 #[test]
 fn multiple_strings_with_one_delimiter() {
     let args = Args::new("hello, my name is cake 2", &[" ".to_string()]);
+
     assert_eq!(args.multiple::<String>().unwrap(), ["hello,", "my", "name", "is", "cake", "2"]);
 }
 
 #[test]
 fn multiple_i32_with_one_delimiter() {
     let args = Args::new("1 2 3", &[" ".to_string()]);
+
     assert_eq!(args.multiple::<i32>().unwrap(), [1, 2, 3]);
 }
 
 #[test]
 fn multiple_i32_with_one_delimiter_and_parse_error() {
     let args = Args::new("1 2 3 abc", &[" ".to_string()]);
+
     assert_matches!(args.multiple::<i32>().unwrap_err(), ArgError::Parse(_));
 }
 
 #[test]
 fn multiple_i32_with_three_delimiters() {
     let args = Args::new("1 2 3", &[" ".to_string(), ",".to_string()]);
+
     assert_eq!(args.multiple::<i32>().unwrap(), [1, 2, 3]);
 }
 
 #[test]
 fn single_after_failed_single() {
     let mut args = Args::new("b 2", &[" ".to_string()]);
+
     assert_matches!(args.single::<i32>().unwrap_err(), ArgError::Parse(_));
     assert_eq!(args.full(), "2");
 }
