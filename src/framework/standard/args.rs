@@ -80,20 +80,13 @@ fn parse_quotes<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, 
     let mut pos = second_quote_occurence(s).unwrap_or_else(|| s.len());
     let res = (&s[1..pos]).parse::<T>().map_err(Error::Parse);
 
-    pos += "\"".len();
+    pos += '"'.len_utf8();
 
-    if delimiters.len() == 1 {
-        if s[pos..].starts_with(&delimiters[0]) {
-            pos += delimiters[0].len();
-        }
+    for delimiter in delimiters {
 
-    } else {
-        for delimiter in delimiters {
-
-            if s[pos..].starts_with(delimiter) {
-                pos += delimiter.len();
-                break;
-            }
+        if s[pos..].starts_with(delimiter) {
+            pos += delimiter.len();
+            break;
         }
     }
 
@@ -136,6 +129,7 @@ fn parse<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
         }
 
         s.drain(..smallest_pos);
+
         res
     }
 }
@@ -148,13 +142,12 @@ fn parse<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
 pub struct Args {
     delimiters: Vec<String>,
     message: String,
-    len : Option<usize>,
-    len_quoted : Option<usize>,
+    len: Option<usize>,
+    len_quoted: Option<usize>,
 }
 
 impl Args {
     pub fn new(message: &str, possible_delimiters: &[String]) -> Self {
-
         Args {
             delimiters: possible_delimiters
                 .iter()
@@ -183,7 +176,10 @@ impl Args {
             return Err(Error::Eos);
         }
 
-        if let Some(ref mut val) = self.len { *val -= 1 };
+        if let Some(ref mut val) = self.len {
+            *val -= 1
+        };
+
         parse::<T>(&mut self.message, &self.delimiters)
     }
 
@@ -235,14 +231,9 @@ impl Args {
     /// assert_eq!(args.len(), 2); // `2` because `["42", "69"]`
     /// ```
     pub fn len(&mut self) -> usize {
-
         if let Some(len) = self.len {
             len
 
-        } else if self.delimiters.len() == 1 {
-                let len = self.message.split(&self.delimiters[0]).count();
-                self.len = Some(len);
-                len
         } else if self.message.is_empty() {
                 0
         } else {
@@ -258,8 +249,7 @@ impl Args {
         }
     }
 
-
-    /// If the string is empty.
+    /// Returns true if the string is empty or else false.
     ///
     /// # Examples
     ///
@@ -286,10 +276,8 @@ impl Args {
     /// assert_eq!(args.len_quoted(), 2); // `2` because `["42", "69"]`
     /// ```
     pub fn len_quoted(&mut self) -> usize {
-
         if self.message.is_empty() {
                 0
-
         } else if let Some(len_quoted) = self.len_quoted {
                 len_quoted
         } else {
@@ -298,6 +286,7 @@ impl Args {
             let mut len_counter = 0;
 
             for _ in 0..count {
+
                 if parse_quotes::<String>(&mut message, &self.delimiters).is_ok() {
                     len_counter += 1;
                 } else {
@@ -322,8 +311,13 @@ impl Args {
     /// assert_eq!(args.full(), "69");
     /// ```
     pub fn skip(&mut self) -> Option<String> {
+        if let Some(ref mut val) = self.len {
 
-        if let Some(ref mut val) = self.len { if 1 <= *val { *val -= 1 } };
+            if 1 <= *val {
+                *val -= 1
+            }
+        };
+
         parse::<String>(&mut self.message, &self.delimiters).ok()
     }
 
@@ -347,7 +341,15 @@ impl Args {
             vec.push(self.skip()?);
         }
 
-        if let Some(ref mut val) = self.len { if i as usize <= *val { *val -= i as usize } else { *val = 0 } };
+        if let Some(ref mut val) = self.len {
+
+            if i as usize <= *val {
+                *val -= i as usize
+            } else {
+                *val = 0
+            }
+        };
+
         Some(vec)
     }
 
@@ -367,8 +369,10 @@ impl Args {
     /// [`single`]: #method.single
     pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
+        if let Some(ref mut val) = self.len_quoted {
+            *val -= 1
+        };
 
-        if let Some(ref mut val) = self.len_quoted { *val -= 1 };
         parse_quotes::<T>(&mut self.message, &self.delimiters)
     }
 
