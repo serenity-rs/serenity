@@ -85,7 +85,8 @@ fn gen() -> Guild {
 
 #[test]
 fn member_named_username() {
-    let lhs = gen()
+    let guild = gen();
+    let lhs = guild
         .member_named("test#1432")
         .unwrap()
         .display_name();
@@ -95,7 +96,8 @@ fn member_named_username() {
 
 #[test]
 fn member_named_nickname() {
-    let lhs = gen().member_named("aaaa").unwrap().display_name();
+    let guild = gen();
+    let lhs = guild.member_named("aaaa").unwrap().display_name();
 
     assert_eq!(lhs, gen_member().display_name());
 }
