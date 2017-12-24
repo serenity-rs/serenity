@@ -10,12 +10,6 @@ pub enum Error<E: StdError> {
     /// A parsing operation failed; the error in it can be of any returned from the `FromStr`
     /// trait.
     Parse(E),
-    /// Occurs if e.g. `multiple_quoted` is used but the input starts with not the expected
-    /// value.
-    /// It contains how many bytes have to be removed until the first `"` appears.
-    InvalidStart(usize),
-    /// If the string contains no quote.
-    NoQuote,
 }
 
 impl<E: StdError> From<E> for Error<E> {
@@ -31,8 +25,6 @@ impl<E: StdError> StdError for Error<E> {
         match *self {
             Eos => "end-of-string",
             Parse(ref e) => e.description(),
-            InvalidStart(_) => "Invalid Start",
-            NoQuote => "No quote exists",
         }
     }
 
@@ -53,8 +45,6 @@ impl<E: StdError> fmt::Display for Error<E> {
         match *self {
             Eos => write!(f, "end of string"),
             Parse(ref e) => fmt::Display::fmt(&e, f),
-            InvalidStart(pos) => write!(f, "Invalid Start, {} bytes until first `\"`.", pos),
-            NoQuote => write!(f, "No quote exists"),
         }
     }
 }
@@ -68,31 +58,33 @@ fn second_quote_occurence(s: &str) -> Option<usize> {
 fn parse_quotes<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
     where T::Err: StdError {
 
-    // Fall back to `parse` if there're no quotes at the start.
-    if !s.starts_with('"') {
-        if let Some(pos) = s.find('"') {
-            return Err(Error::InvalidStart(pos));
+    // Fall back to `parse` if there're no quotes at the start
+    // or if there is no closing one as well.
+    if let Some(mut pos) = second_quote_occurence(s) {
+
+        if s.starts_with('"') {
+            let res = (&s[1..pos]).parse::<T>().map_err(Error::Parse);
+
+            pos += '"'.len_utf8();
+
+            for delimiter in delimiters {
+
+                if s[pos..].starts_with(delimiter) {
+                    pos += delimiter.len();
+                    break;
+                }
+            }
+
+            s.drain(..pos);
+
+            res
         } else {
-            return Err(Error::NoQuote);
+            return parse::<T>(s, delimiters)
         }
+
+    } else {
+        return parse::<T>(s, delimiters)
     }
-
-    let mut pos = second_quote_occurence(s).unwrap_or_else(|| s.len());
-    let res = (&s[1..pos]).parse::<T>().map_err(Error::Parse);
-
-    pos += '"'.len_utf8();
-
-    for delimiter in delimiters {
-
-        if s[pos..].starts_with(delimiter) {
-            pos += delimiter.len();
-            break;
-        }
-    }
-
-    s.drain(..pos);
-
-    res
 }
 
 
@@ -281,20 +273,13 @@ impl Args {
         } else if let Some(len_quoted) = self.len_quoted {
                 len_quoted
         } else {
-            let mut message = self.message.clone();
-            let count = message.chars().filter(|&c| c == '"').count() / 2;
-            let mut len_counter = 0;
+            let countable_self = self.clone();
 
-            for _ in 0..count {
-
-                if parse_quotes::<String>(&mut message, &self.delimiters).is_ok() {
-                    len_counter += 1;
-                } else {
-                    return len_counter;
-                }
+            if let Ok(ref vec) = countable_self.multiple_quoted::<String>() {
+                vec.iter().count()
+            } else {
+                0
             }
-
-            len_counter
         }
     }
 
@@ -410,15 +395,7 @@ impl Args {
     /// [`multiple`]: #method.multiple
     pub fn multiple_quoted<T: FromStr>(mut self) -> Result<Vec<T>, T::Err>
         where T::Err: StdError {
-        let mut res = Vec::new();
-
-        let count = self.message.chars().filter(|&c| c == '"').count() / 2;
-
-        for _ in 0..count {
-            res.push(parse_quotes::<T>(&mut self.message, &self.delimiters)?);
-        }
-
-        Ok(res)
+        IterQuoted::<T>::new(&mut self).collect()
     }
 
     /// Empty outs the internal vector while parsing (if necessary) and returning them.
@@ -616,6 +593,30 @@ impl<'a, T: FromStr> Iterator for Iter<'a, T> where T::Err: StdError  {
             None
         } else {
             Some(self.args.single::<T>())
+        }
+    }
+}
+
+// Same as `Iter`, but considers quotes.
+pub struct IterQuoted<'a, T: FromStr> where T::Err: StdError {
+    args: &'a mut Args,
+    _marker: PhantomData<T>,
+}
+
+impl<'a, T: FromStr> IterQuoted<'a, T> where T::Err: StdError {
+    fn new(args: &'a mut Args) -> Self {
+        IterQuoted { args, _marker: PhantomData }
+    }
+}
+
+impl<'a, T: FromStr> Iterator for IterQuoted<'a, T> where T::Err: StdError  {
+    type Item = Result<T, T::Err>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.args.is_empty() {
+            None
+        } else {
+            Some(self.args.single_quoted::<T>())
         }
     }
 }
