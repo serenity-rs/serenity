@@ -82,14 +82,14 @@ fn full_on_args() {
 fn multiple_quoted_strings_one_delimiter() {
     let args = Args::new(r#""1, 2" "a" "3" 4 "5"#, &[" ".to_string()]);
 
-    assert_eq!(args.multiple_quoted::<String>().unwrap(), ["1, 2", "a", "3"]);
+    assert_eq!(args.multiple_quoted::<String>().unwrap(), ["1, 2", "a", "3", "4", "\"5"]);
 }
 
 #[test]
 fn multiple_quoted_strings_with_multiple_delimiter() {
     let args = Args::new(r#""1, 2" "a","3"4 "5"#, &[" ".to_string(), ",".to_string()]);
 
-    assert_eq!(args.multiple_quoted::<String>().unwrap(), ["1, 2", "a", "3"]);
+    assert_eq!(args.multiple_quoted::<String>().unwrap(), ["1, 2", "a", "3", "4", "\"5"]);
 }
 
 #[test]
@@ -103,28 +103,43 @@ fn multiple_quoted_strings_with_multiple_delimiters() {
 fn multiple_quoted_i32() {
     let args = Args::new(r#""1" "2" 3"#, &[" ".to_string()]);
 
-    assert_eq!(args.multiple_quoted::<i32>().unwrap(), [1, 2]);
+    assert_eq!(args.multiple_quoted::<i32>().unwrap(), [1, 2, 3]);
 }
 
 #[test]
-fn multiple_quoted_missing_quote() {
-    let args = Args::new(r#"hello, my name is cake" "2"#, &[",".to_string(), " ".to_string()]);
+fn multiple_quoted_quote_appears_without_delimiter_in_front() {
+    let args = Args::new(r#"hello, my name is cake" 2"#, &[",".to_string(), " ".to_string()]);
 
-    assert_matches!(args.multiple_quoted::<String>().unwrap_err(), ArgError::InvalidStart(22));
+    assert_eq!(args.multiple_quoted::<String>().unwrap(), ["hello", "", "my", "name", "is", "cake\"", "2"]);
 }
+
+#[test]
+fn multiple_quoted_single_quote() {
+    let args = Args::new(r#"hello "2 b"#, &[",".to_string(), " ".to_string()]);
+
+    assert_eq!(args.multiple_quoted::<String>().unwrap(), ["hello", "\"2", "b"]);
+}
+
+#[test]
+fn multiple_quoted_one_quote_pair() {
+    let args = Args::new(r#"hello "2 b""#, &[",".to_string(), " ".to_string()]);
+
+    assert_eq!(args.multiple_quoted::<String>().unwrap(), ["hello", "2 b"]);
+}
+
 
 #[test]
 fn delimiter_before_multiple_quoted() {
     let args = Args::new(r#","hello, my name is cake" "2""#, &[",".to_string(), " ".to_string()]);
 
-    assert_matches!(args.multiple_quoted::<String>().unwrap_err(), ArgError::InvalidStart(1));
+    assert_eq!(args.multiple_quoted::<String>().unwrap(), ["", "hello, my name is cake", "2"]);
 }
 
 #[test]
 fn no_quote() {
     let args = Args::new("hello, my name is cake", &[",".to_string(), " ".to_string()]);
 
-    assert_matches!(args.single_quoted_n::<String>().unwrap_err(), ArgError::NoQuote);
+    assert_eq!(args.single_quoted_n::<String>().unwrap(), "hello");
 }
 
 #[test]
@@ -331,10 +346,10 @@ fn single_after_failed_single() {
 }
 
 #[test]
-fn len_after_failed_single_quoted() {
+fn len_quoted_after_failed_single_quoted() {
     let mut args = Args::new("b a", &[" ".to_string()]);
 
-    assert_eq!(args.len_quoted(), 0);
-    assert_matches!(args.single_quoted::<i32>().unwrap_err(), ArgError::NoQuote);
-    assert_eq!(args.len_quoted(), 0);
+    assert_eq!(args.len_quoted(), 2);
+    assert_matches!(args.single_quoted::<i32>().unwrap_err(), ArgError::Parse(_));
+    assert_eq!(args.len_quoted(), 1);
 }
