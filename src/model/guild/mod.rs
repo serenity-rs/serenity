@@ -737,15 +737,22 @@ impl Guild {
     ///
     /// - **username**: "zey"
     /// - **username and discriminator**: "zey#5479"
-    /// - **nickname**: "zeyla" or "zeylas#nick"
     ///
     /// [`Member`]: struct.Member.html
     pub fn member_named(&self, name: &str) -> Option<&Member> {
-        let (name, discrim) = if let Some(pos) = name.find('#') {
-            let split = name.split_at(pos);
+        let (name, discrim) = if let Some(pos) = name.rfind('#') {
+            let split = name.split_at(pos + 1);
 
-            match split.1.parse::<u16>() {
-                Ok(discrim_int) => (split.0, Some(discrim_int)),
+            let split2 = (
+                match split.0.get(0..split.0.len() - 1) {
+                    Some(s) => s,
+                    None => "",
+                },
+                split.1,
+            );
+
+            match split2.1.parse::<u16>() {
+                Ok(discrim_int) => (split2.0, Some(discrim_int)),
                 Err(_) => (name, None),
             }
         } else {
@@ -764,9 +771,9 @@ impl Guild {
                 name_matches && discrim_matches
             })
             .or_else(|| {
-                self.members.values().find(|member| {
-                    member.nick.as_ref().map_or(false, |nick| nick == name)
-                })
+                self.members
+                    .values()
+                    .find(|member| member.nick.as_ref().map_or(false, |nick| nick == name))
             })
     }
 
