@@ -61,7 +61,6 @@ fn parse_quotes<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, 
     // Fall back to `parse` if there're no quotes at the start
     // or if there is no closing one as well.
     if let Some(mut pos) = second_quote_occurence(s) {
-
         if s.starts_with('"') {
             let res = (&s[1..pos]).parse::<T>().map_err(Error::Parse);
             pos += '"'.len_utf8();
@@ -76,14 +75,11 @@ fn parse_quotes<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, 
 
             s.drain(..pos);
 
-            res
-        } else {
-            return parse::<T>(s, delimiters)
+            return res;
         }
-
-    } else {
-        return parse::<T>(s, delimiters)
     }
+
+    parse::<T>(s, delimiters)
 }
 
 
@@ -383,7 +379,7 @@ impl Args {
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
+    /// ```rust
     /// use serenity::framework::standard::Args;
     ///
     /// let mut args = Args::new(r#""42" "69""#, &[" ".to_string()]);
@@ -395,6 +391,25 @@ impl Args {
     pub fn multiple_quoted<T: FromStr>(mut self) -> Result<Vec<T>, T::Err>
         where T::Err: StdError {
         IterQuoted::<T>::new(&mut self).collect()
+    }
+
+    /// Like [`iter`], but takes quotes into account
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new(r#""2" "5""#, &[" ".to_string()]);
+    /// 
+    /// assert_eq!(*args.iter_quoted::<i32>().map(|n| n.unwrap().pow(2)).collect::<Vec<_>>(), [4, 25]);
+    /// assert!(args.is_empty());
+    /// ```
+    /// 
+    /// [`iter`]: #method.iter
+    pub fn iter_quoted<T: FromStr>(&mut self) -> IterQuoted<T>
+        where T::Err: StdError {
+        IterQuoted::new(self)
     }
 
     /// Empty outs the internal vector while parsing (if necessary) and returning them.
@@ -425,7 +440,8 @@ impl Args {
     /// assert_eq!(*args.iter::<i32>().map(|num| num.unwrap().pow(2)).collect::<Vec<_>>(), [9, 16]);
     /// assert!(args.is_empty());
     /// ```
-    pub fn iter<T: FromStr>(&mut self) -> Iter<T> where T::Err: StdError  {
+    pub fn iter<T: FromStr>(&mut self) -> Iter<T> 
+        where T::Err: StdError  {
         Iter::new(self)
     }
 
@@ -596,7 +612,9 @@ impl<'a, T: FromStr> Iterator for Iter<'a, T> where T::Err: StdError  {
     }
 }
 
-// Same as `Iter`, but considers quotes.
+/// Same as [`Iter`], but considers quotes.
+/// 
+/// [`Iter`]: #struct.Iter.html
 pub struct IterQuoted<'a, T: FromStr> where T::Err: StdError {
     args: &'a mut Args,
     _marker: PhantomData<T>,
