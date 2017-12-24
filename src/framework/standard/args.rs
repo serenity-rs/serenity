@@ -64,7 +64,6 @@ fn parse_quotes<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, 
 
         if s.starts_with('"') {
             let res = (&s[1..pos]).parse::<T>().map_err(Error::Parse);
-
             pos += '"'.len_utf8();
 
             for delimiter in delimiters {
