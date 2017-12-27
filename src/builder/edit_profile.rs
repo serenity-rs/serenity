@@ -1,12 +1,12 @@
 use internal::prelude::*;
-use std::collections::HashMap;
+use super::VecMap;
 
 /// A builder to edit the current user's settings, to be used in conjunction
 /// with [`CurrentUser::edit`].
 ///
 /// [`CurrentUser::edit`]: ../model/struct.CurrentUser.html#method.edit
 #[derive(Clone, Debug, Default)]
-pub struct EditProfile(pub HashMap<&'static str, Value>);
+pub struct EditProfile(pub VecMap<&'static str, Value>);
 
 impl EditProfile {
     /// Sets the avatar of the current user. `None` can be passed to remove an

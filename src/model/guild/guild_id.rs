@@ -174,7 +174,7 @@ impl GuildId {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
     pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
-        let map = utils::hashmap_to_json_map(f(EditRole::default()).0);
+        let map = utils::vecmap_to_json_map(f(EditRole::default()).0);
 
         http::create_role(self.0, &map)
     }
@@ -237,7 +237,7 @@ impl GuildId {
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
     pub fn edit<F: FnOnce(EditGuild) -> EditGuild>(&mut self, f: F) -> Result<PartialGuild> {
-        let map = utils::hashmap_to_json_map(f(EditGuild::default()).0);
+        let map = utils::vecmap_to_json_map(f(EditGuild::default()).0);
 
         http::edit_guild(self.0, &map)
     }
@@ -276,7 +276,7 @@ impl GuildId {
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
         where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
-        let map = utils::hashmap_to_json_map(f(EditMember::default()).0);
+        let map = utils::vecmap_to_json_map(f(EditMember::default()).0);
 
         http::edit_member(self.0, user_id.into().0, &map)
     }
@@ -312,7 +312,7 @@ impl GuildId {
     #[inline]
     pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
-        let map = utils::hashmap_to_json_map(f(EditRole::default()).0);
+        let map = utils::vecmap_to_json_map(f(EditRole::default()).0);
 
         http::edit_role(self.0, role_id.into().0, &map)
     }

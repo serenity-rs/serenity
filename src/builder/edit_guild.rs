@@ -1,6 +1,6 @@
 use internal::prelude::*;
 use model::prelude::*;
-use std::collections::HashMap;
+use super::VecMap;
 
 /// A builder to optionally edit certain fields of a [`Guild`]. This is meant
 /// for usage with [`Guild::edit`].
@@ -12,7 +12,7 @@ use std::collections::HashMap;
 /// [`Guild`]: ../model/struct.Guild.html
 /// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
 #[derive(Clone, Debug, Default)]
-pub struct EditGuild(pub HashMap<&'static str, Value>);
+pub struct EditGuild(pub VecMap<&'static str, Value>);
 
 impl EditGuild {
     /// Set the "AFK voice channel" that users are to move to if they have been

@@ -1,6 +1,6 @@
 use serde_json::Value;
-use std::collections::HashMap;
 use std::default::Default;
+use super::VecMap;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
 ///
@@ -47,7 +47,7 @@ use std::default::Default;
 /// [`Webhook::execute`]: ../model/struct.Webhook.html#method.execute
 /// [`execute_webhook`]: ../http/fn.execute_webhook.html
 #[derive(Clone, Debug)]
-pub struct ExecuteWebhook(pub HashMap<&'static str, Value>);
+pub struct ExecuteWebhook(pub VecMap<&'static str, Value>);
 
 impl ExecuteWebhook {
     /// Override the default avatar of the webhook with an image URL.
@@ -179,7 +179,7 @@ impl Default for ExecuteWebhook {
     /// [`Webhook`]: ../model/struct.Webhook.html
     /// [`tts`]: #method.tts
     fn default() -> ExecuteWebhook {
-        let mut map = HashMap::new();
+        let mut map = VecMap::new();
         map.insert("tts", Value::Bool(false));
 
         ExecuteWebhook(map)

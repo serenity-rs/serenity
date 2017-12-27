@@ -109,7 +109,7 @@ impl Member {
         self.roles.extend_from_slice(role_ids);
 
         let builder = EditMember::default().roles(&self.roles);
-        let map = utils::hashmap_to_json_map(builder.0);
+        let map = utils::vecmap_to_json_map(builder.0);
 
         match http::edit_member(self.guild_id.0, self.user.read().id.0, &map) {
             Ok(()) => Ok(()),
@@ -227,7 +227,7 @@ impl Member {
     /// [`EditMember`]: ../builder/struct.EditMember.html
     #[cfg(feature = "cache")]
     pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F) -> Result<()> {
-        let map = utils::hashmap_to_json_map(f(EditMember::default()).0);
+        let map = utils::vecmap_to_json_map(f(EditMember::default()).0);
 
         http::edit_member(self.guild_id.0, self.user.read().id.0, &map)
     }
@@ -352,7 +352,7 @@ impl Member {
         self.roles.retain(|r| !role_ids.contains(r));
 
         let builder = EditMember::default().roles(&self.roles);
-        let map = utils::hashmap_to_json_map(builder.0);
+        let map = utils::vecmap_to_json_map(builder.0);
 
         match http::edit_member(self.guild_id.0, self.user.read().id.0, &map) {
             Ok(()) => Ok(()),

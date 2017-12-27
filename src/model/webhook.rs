@@ -187,7 +187,7 @@ impl Webhook {
                                                                 wait: bool,
                                                                 f: F)
                                                                 -> Result<Option<Message>> {
-        let map = utils::hashmap_to_json_map(f(ExecuteWebhook::default()).0);
+        let map = utils::vecmap_to_json_map(f(ExecuteWebhook::default()).0);
 
         http::execute_webhook(self.id.0, &self.token, wait, &map)
     }

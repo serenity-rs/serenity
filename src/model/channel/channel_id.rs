@@ -191,7 +191,7 @@ impl ChannelId {
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
     pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel> {
-        let map = utils::hashmap_to_json_map(f(EditChannel::default()).0);
+        let map = utils::vecmap_to_json_map(f(EditChannel::default()).0);
 
         http::edit_channel(self.0, &map)
     }
@@ -219,7 +219,7 @@ impl ChannelId {
         where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
         let msg = f(CreateMessage::default());
 
-        if let Some(content) = msg.0.get("content") {
+        if let Some(content) = msg.0.get(&"content") {
             if let Value::String(ref content) = *content {
                 if let Some(length_over) = Message::overflow_length(content) {
                     return Err(Error::Model(ModelError::MessageTooLong(length_over)));
@@ -227,7 +227,7 @@ impl ChannelId {
             }
         }
 
-        let map = utils::hashmap_to_json_map(msg.0);
+        let map = utils::vecmap_to_json_map(msg.0);
 
         http::edit_message(self.0, message_id.into().0, &Value::Object(map))
     }
@@ -282,13 +282,13 @@ impl ChannelId {
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
         let mut map = f(GetMessages::default()).0;
-        let mut query = format!("?limit={}", map.remove("limit").unwrap_or(50));
+        let mut query = format!("?limit={}", map.remove(&"limit").unwrap_or(50));
 
-        if let Some(after) = map.remove("after") {
+        if let Some(after) = map.remove(&"after") {
             write!(query, "&after={}", after)?;
-        } else if let Some(around) = map.remove("around") {
+        } else if let Some(around) = map.remove(&"around") {
             write!(query, "&around={}", around)?;
-        } else if let Some(before) = map.remove("before") {
+        } else if let Some(before) = map.remove(&"before") {
             write!(query, "&before={}", before)?;
         }
 
@@ -453,7 +453,7 @@ impl ChannelId {
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         let mut msg = f(CreateMessage::default());
 
-        if let Some(content) = msg.0.get("content") {
+        if let Some(content) = msg.0.get(&"content") {
             if let Value::String(ref content) = *content {
                 if let Some(length_over) = Message::overflow_length(content) {
                     return Err(Error::Model(ModelError::MessageTooLong(length_over)));
@@ -461,8 +461,8 @@ impl ChannelId {
             }
         }
 
-        let _ = msg.0.remove("embed");
-        let map = utils::hashmap_to_json_map(msg.0);
+        let _ = msg.0.remove(&"embed");
+        let map = utils::vecmap_to_json_map(msg.0);
 
         http::send_files(self.0, files, map)
     }
@@ -489,7 +489,7 @@ impl ChannelId {
     pub fn send_message<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
         let msg = f(CreateMessage::default());
-        let map = utils::hashmap_to_json_map(msg.0);
+        let map = utils::vecmap_to_json_map(msg.0);
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;

@@ -1,7 +1,7 @@
 use internal::prelude::*;
-use std::collections::HashMap;
 use model::guild::Role;
 use model::Permissions;
+use super::VecMap;
 
 /// A builer to create or edit a [`Role`] for use via a number of model methods.
 ///
@@ -40,14 +40,14 @@ use model::Permissions;
 /// [`Role`]: ../model/struct.Role.html
 /// [`Role::edit`]: ../model/struct.Role.html#method.edit
 #[derive(Clone, Debug, Default)]
-pub struct EditRole(pub HashMap<&'static str, Value>);
+pub struct EditRole(pub VecMap<&'static str, Value>);
 
 impl EditRole {
     /// Creates a new builder with the values of the given [`Role`].
     ///
     /// [`Role`]: ../model/struct.Role.html
     pub fn new(role: &Role) -> Self {
-        let mut map = HashMap::new();
+        let mut map = VecMap::with_capacity(8);
 
         #[cfg(feature = "utils")]
         {

@@ -10,7 +10,7 @@ use model::misc::Mentionable;
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
-use builder::{CreateMessage, EditProfile};
+use builder::{VecMap, CreateMessage, EditProfile};
 #[cfg(feature = "model")]
 use chrono::NaiveDateTime;
 #[cfg(feature = "model")]
@@ -90,14 +90,14 @@ impl CurrentUser {
     /// ```
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
-        let mut map = HashMap::new();
+        let mut map = VecMap::new();
         map.insert("username", Value::String(self.name.clone()));
 
         if let Some(email) = self.email.as_ref() {
             map.insert("email", Value::String(email.clone()));
         }
 
-        let map = utils::hashmap_to_json_map(f(EditProfile(map)).0);
+        let map = utils::vecmap_to_json_map(f(EditProfile(map)).0);
 
         match http::edit_profile(&map) {
             Ok(new) => {

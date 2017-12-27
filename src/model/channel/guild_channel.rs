@@ -4,7 +4,7 @@ use model::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
-use builder::{CreateInvite, CreateMessage, EditChannel, GetMessages};
+use builder::{VecMap, CreateInvite, CreateMessage, EditChannel, GetMessages};
 #[cfg(feature = "model")]
 use http::{self, AttachmentType};
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -116,7 +116,7 @@ impl GuildChannel {
             }
         }
 
-        let map = serenity_utils::hashmap_to_json_map(f(CreateInvite::default()).0);
+        let map = serenity_utils::vecmap_to_json_map(f(CreateInvite::default()).0);
 
         http::create_invite(self.id.0, &map)
     }
@@ -312,12 +312,12 @@ impl GuildChannel {
             }
         }
 
-        let mut map = HashMap::new();
+        let mut map = VecMap::new();
         map.insert("name", Value::String(self.name.clone()));
         map.insert("position", Value::Number(Number::from(self.position)));
         map.insert("type", Value::String(self.kind.name().to_string()));
 
-        let edited = serenity_utils::hashmap_to_json_map(f(EditChannel(map)).0);
+        let edited = serenity_utils::vecmap_to_json_map(f(EditChannel(map)).0);
 
         match http::edit_channel(self.id.0, &edited) {
             Ok(channel) => {

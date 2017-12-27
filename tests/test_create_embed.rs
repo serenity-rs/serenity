@@ -51,7 +51,7 @@ fn test_from_embed() {
         .title("still a hakase")
         .url("https://i.imgur.com/XfWpfCV.gif");
 
-    let built = Value::Object(utils::hashmap_to_json_map(builder.0));
+    let built = Value::Object(utils::vecmap_to_json_map(builder.0));
 
     let obj = json!({
         "color": 0xFF0011,

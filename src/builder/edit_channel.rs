@@ -1,5 +1,5 @@
 use internal::prelude::*;
-use std::collections::HashMap;
+use super::VecMap;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]
 ///
@@ -19,7 +19,7 @@ use std::collections::HashMap;
 /// [`GuildChannel`]: ../model/struct.GuildChannel.html
 /// [`GuildChannel::edit`]: ../model/struct.GuildChannel.html#method.edit
 #[derive(Clone, Debug, Default)]
-pub struct EditChannel(pub HashMap<&'static str, Value>);
+pub struct EditChannel(pub VecMap<&'static str, Value>);
 
 impl EditChannel {
     /// The bitrate of the channel in bits.

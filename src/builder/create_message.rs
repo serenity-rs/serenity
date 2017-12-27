@@ -1,8 +1,7 @@
 use internal::prelude::*;
 use model::channel::ReactionType;
-use std::collections::HashMap;
 use std::fmt::Display;
-use super::CreateEmbed;
+use super::{CreateEmbed, VecMap};
 use utils;
 
 /// A builder to specify the contents of an [`http::send_message`] request,
@@ -41,7 +40,7 @@ use utils;
 /// [`embed`]: #method.embed
 /// [`http::send_message`]: ../http/fn.send_message.html
 #[derive(Clone, Debug)]
-pub struct CreateMessage(pub HashMap<&'static str, Value>, pub Option<Vec<ReactionType>>);
+pub struct CreateMessage(pub VecMap<&'static str, Value>, pub Option<Vec<ReactionType>>);
 
 impl CreateMessage {
     /// Set the content of the message.
@@ -56,7 +55,7 @@ impl CreateMessage {
     /// Set an embed for the message.
     pub fn embed<F>(mut self, f: F) -> Self
         where F: FnOnce(CreateEmbed) -> CreateEmbed {
-        let map = utils::hashmap_to_json_map(f(CreateEmbed::default()).0);
+        let map = utils::vecmap_to_json_map(f(CreateEmbed::default()).0);
         let embed = Value::Object(map);
 
         self.0.insert("embed", embed);
@@ -90,7 +89,7 @@ impl Default for CreateMessage {
     /// [`Message`]: ../model/struct.Message.html
     /// [`tts`]: #method.tts
     fn default() -> CreateMessage {
-        let mut map = HashMap::default();
+        let mut map = VecMap::new();
         map.insert("tts", Value::Bool(false));
 
         CreateMessage(map, None)

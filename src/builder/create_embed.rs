@@ -19,10 +19,10 @@ use chrono::{DateTime, TimeZone};
 use internal::prelude::*;
 use model::channel::Embed;
 use serde_json::Value;
-use std::collections::HashMap;
 use std::default::Default;
 use std::fmt::Display;
 use utils;
+use super::VecMap;
 
 #[cfg(feature = "utils")]
 use utils::Colour;
@@ -39,7 +39,7 @@ use utils::Colour;
 /// [`Embed`]: ../model/struct.Embed.html
 /// [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
 #[derive(Clone, Debug)]
-pub struct CreateEmbed(pub HashMap<&'static str, Value>);
+pub struct CreateEmbed(pub VecMap<&'static str, Value>);
 
 impl CreateEmbed {
     /// Set the author of the embed.
@@ -50,7 +50,7 @@ impl CreateEmbed {
     /// [`CreateEmbedAuthor`]: struct.CreateEmbedAuthor.html
     pub fn author<F>(mut self, f: F) -> Self
         where F: FnOnce(CreateEmbedAuthor) -> CreateEmbedAuthor {
-        let map = utils::hashmap_to_json_map(f(CreateEmbedAuthor::default()).0);
+        let map = utils::vecmap_to_json_map(f(CreateEmbedAuthor::default()).0);
 
         self.0.insert("author", Value::Object(map));
 
@@ -157,7 +157,7 @@ impl CreateEmbed {
     pub fn footer<F>(mut self, f: F) -> Self
         where F: FnOnce(CreateEmbedFooter) -> CreateEmbedFooter {
         let footer = f(CreateEmbedFooter::default()).0;
-        let map = utils::hashmap_to_json_map(footer);
+        let map = utils::vecmap_to_json_map(footer);
 
         self.0.insert("footer", Value::Object(map));
 
@@ -309,7 +309,7 @@ impl CreateEmbed {
 impl Default for CreateEmbed {
     /// Creates a builder with default values, setting the `type` to `rich`.
     fn default() -> CreateEmbed {
-        let mut map = HashMap::new();
+        let mut map = VecMap::new();
         map.insert("type", Value::String("rich".to_string()));
 
         CreateEmbed(map)
@@ -380,7 +380,7 @@ impl From<Embed> for CreateEmbed {
 /// [`CreateEmbed::author`]: struct.CreateEmbed.html#method.author
 /// [`name`]: #method.name
 #[derive(Clone, Debug, Default)]
-pub struct CreateEmbedAuthor(pub HashMap<&'static str, Value>);
+pub struct CreateEmbedAuthor(pub VecMap<&'static str, Value>);
 
 impl CreateEmbedAuthor {
     /// Set the URL of the author's icon.
@@ -413,7 +413,7 @@ impl CreateEmbedAuthor {
 /// [`Embed`]: ../model/struct.Embed.html
 /// [`CreateEmbed::footer`]: struct.CreateEmbed.html#method.footer
 #[derive(Clone, Debug, Default)]
-pub struct CreateEmbedFooter(pub HashMap<&'static str, Value>);
+pub struct CreateEmbedFooter(pub VecMap<&'static str, Value>);
 
 impl CreateEmbedFooter {
     /// Set the icon URL's value. This only supports HTTP(S).

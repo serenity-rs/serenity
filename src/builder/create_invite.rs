@@ -1,7 +1,7 @@
 use internal::prelude::*;
 use serde_json::Value;
-use std::collections::HashMap;
 use std::default::Default;
+use super::VecMap;
 
 /// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
 ///
@@ -62,7 +62,7 @@ use std::default::Default;
 /// [`GuildChannel::create_invite`]: ../model/struct.GuildChannel.html#method.create_invite
 /// [`RichInvite`]: ../model/struct.Invite.html
 #[derive(Clone, Debug)]
-pub struct CreateInvite(pub HashMap<&'static str, Value>);
+pub struct CreateInvite(pub VecMap<&'static str, Value>);
 
 impl CreateInvite {
     /// The duration that the invite will be valid for.
@@ -207,7 +207,7 @@ impl Default for CreateInvite {
     /// let invite_builder = CreateInvite::default();
     /// ```
     fn default() -> CreateInvite {
-        let mut map = HashMap::new();
+        let mut map = VecMap::new();
         map.insert("validate", Value::Null);
 
         CreateInvite(map)

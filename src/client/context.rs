@@ -10,7 +10,7 @@ use builder::EditProfile;
 #[cfg(feature = "builder")]
 use internal::prelude::*;
 #[cfg(feature = "builder")]
-use std::collections::HashMap;
+use builder::VecMap;
 #[cfg(all(feature = "builder", feature = "cache"))]
 use super::CACHE;
 #[cfg(feature = "builder")]
@@ -85,7 +85,7 @@ impl Context {
     /// ```
     #[cfg(feature = "builder")]
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser> {
-        let mut map = HashMap::with_capacity(2);
+        let mut map = VecMap::with_capacity(2);
 
         feature_cache! {
             {
@@ -107,7 +107,7 @@ impl Context {
             }
         }
 
-        let edited = utils::hashmap_to_json_map(f(EditProfile(map)).0);
+        let edited = utils::vecmap_to_json_map(f(EditProfile(map)).0);
 
         http::edit_profile(&edited)
     }
