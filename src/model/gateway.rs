@@ -192,6 +192,19 @@ enum_number!(
     }
 );
 
+impl GameType {
+    pub fn num(&self) -> u64 {
+        use self::GameType::*;
+
+        match *self {
+            Playing => 0,
+            Streaming => 1,
+            Listening => 2,
+            Watching => 3,
+        }
+    }
+}
+
 impl Default for GameType {
     fn default() -> Self { GameType::Playing }
 }

@@ -570,6 +570,16 @@ impl ChannelType {
             ChannelType::Category => "category",
         }
     }
+
+    pub fn num(&self) -> u64 {
+        match *self {
+            ChannelType::Text => 0,
+            ChannelType::Private => 1,
+            ChannelType::Voice => 2,
+            ChannelType::Group => 3,
+            ChannelType::Category => 4,
+        }
+    }
 }
 
 #[derive(Deserialize)]

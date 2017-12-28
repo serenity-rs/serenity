@@ -617,3 +617,20 @@ enum_number!(
         MemberJoin = 7,
     }
 );
+
+impl MessageType {
+    pub fn num(&self) -> u64 {
+        use self::MessageType::*;
+
+        match *self {
+            Regular => 0,
+            GroupRecipientAddition => 1,
+            GroupRecipientRemoval => 2,
+            GroupCallCreation => 3,
+            GroupNameUpdate => 4,
+            GroupIconUpdate => 5,
+            PinsAdd => 6,
+            MemberJoin => 7,
+        }
+    }
+}
