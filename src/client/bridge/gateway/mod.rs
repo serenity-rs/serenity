@@ -63,6 +63,8 @@ pub use self::shard_runner_message::ShardRunnerMessage;
 
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::sync::mpsc::Sender;
+use std::time::Duration as StdDuration;
+use ::gateway::ConnectionStage;
 
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].
 ///
@@ -88,6 +90,12 @@ pub enum ShardManagerMessage {
     ///
     /// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html
     Restart(ShardId),
+    /// An update from a shard runner,
+    ShardUpdate {
+        id: ShardId,
+        latency: Option<StdDuration>,
+        stage: ConnectionStage,
+    },
     /// Indicator that a [`ShardManagerMonitor`] should fully shutdown a shard
     /// without bringing it back up.
     ///
@@ -140,7 +148,12 @@ impl Display for ShardId {
 /// [`ShardRunner`]: struct.ShardRunner.html
 #[derive(Debug)]
 pub struct ShardRunnerInfo {
+    /// The latency between when a heartbeat was sent and when the
+    /// acknowledgement was received.
+    pub latency: Option<StdDuration>,
     /// The channel used to communicate with the shard runner, telling it
     /// what to do with regards to its status.
     pub runner_tx: Sender<ShardClientMessage>,
+    /// The current connection stage of the shard.
+    pub stage: ConnectionStage,
 }

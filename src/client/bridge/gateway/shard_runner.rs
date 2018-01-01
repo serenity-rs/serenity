@@ -141,7 +141,15 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
                 }
             }
 
+            let pre = self.shard.stage();
+
             let (event, action, successful) = self.recv_event();
+
+            let post = self.shard.stage();
+
+            if post != pre {
+                self.update_manager();
+            }
 
             match action {
                 Some(ShardAction::Reconnect(ReconnectType::Reidentify)) => {
@@ -249,7 +257,8 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 
                     true
                 },
-                ShardManagerMessage::ShutdownInitiated => {
+                ShardManagerMessage::ShardUpdate { .. }
+                    | ShardManagerMessage::ShutdownInitiated => {
                     // nb: not sent here
 
                     true
@@ -411,6 +420,13 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             },
         };
 
+        match event {
+            Ok(GatewayEvent::HeartbeatAck) => {
+                self.update_manager();
+            },
+            _ => {},
+        }
+
         let event = match event {
             Ok(GatewayEvent::Dispatch(_, event)) => Some(event),
             _ => None,
@@ -420,6 +436,8 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
     }
 
     fn request_restart(&self) -> Result<()> {
+        self.update_manager();
+
         debug!(
             "[ShardRunner {:?}] Requesting restart",
             self.shard.shard_info(),
@@ -429,5 +447,13 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
         let _ = self.manager_tx.send(msg);
 
         Ok(())
+    }
+
+    fn update_manager(&self) {
+        let _ = self.manager_tx.send(ShardManagerMessage::ShardUpdate {
+            id: ShardId(self.shard.shard_info()[0]),
+            latency: self.shard.latency(),
+            stage: self.shard.stage(),
+        });
     }
 }

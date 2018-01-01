@@ -16,6 +16,7 @@ use super::{
 };
 use threadpool::ThreadPool;
 use typemap::ShareMap;
+use ::gateway::ConnectionStage;
 
 #[cfg(feature = "framework")]
 use framework::Framework;
@@ -184,7 +185,9 @@ impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
         }};
 
         let runner_info = ShardRunnerInfo {
+            latency: None,
             runner_tx: runner.runner_tx(),
+            stage: ConnectionStage::Disconnected,
         };
 
         thread::spawn(move || {
