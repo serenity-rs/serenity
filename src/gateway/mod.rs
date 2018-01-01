@@ -59,6 +59,7 @@ pub use self::ws_client_ext::WebSocketGatewayClientExt;
 
 use model::gateway::Game;
 use model::user::OnlineStatus;
+use std::fmt::{Display, Formatter, Result as FmtResult};
 use websocket::sync::client::Client;
 use websocket::sync::stream::{TcpStream, TlsStream};
 
@@ -70,7 +71,7 @@ pub type WsClient = Client<TlsStream<TcpStream>>;
 /// This can be useful for knowing which shards are currently "down"/"up".
 ///
 /// [`Shard`]: struct.Shard.html
-#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum ConnectionStage {
     /// Indicator that the [`Shard`] is normally connected and is not in, e.g.,
     /// a resume phase.
@@ -144,6 +145,21 @@ impl ConnectionStage {
             Connecting | Handshake | Identifying | Resuming => true,
             Connected | Disconnected => false,
         }
+    }
+}
+
+impl Display for ConnectionStage {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        use self::ConnectionStage::*;
+
+        f.write_str(match *self {
+            Connected => "connected",
+            Connecting => "connecting",
+            Disconnected => "disconnected",
+            Handshake => "handshaking",
+            Identifying => "identifying",
+            Resuming => "resuming",
+        })
     }
 }
 
