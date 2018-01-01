@@ -17,7 +17,7 @@ use std::fmt::Write as FmtWrite;
 ///
 /// [`Guild`]: struct.Guild.html
 /// [`User`]: struct.User.html
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Group {
     /// The Id of the group channel.
     #[serde(rename = "id")]
@@ -33,7 +33,8 @@ pub struct Group {
     /// The Id of the group owner.
     pub owner_id: UserId,
     /// A map of the group's recipients.
-    #[serde(deserialize_with = "deserialize_users")]
+    #[serde(deserialize_with = "deserialize_users",
+            serialize_with = "serialize_users")]
     pub recipients: HashMap<UserId, Arc<RwLock<User>>>,
 }
 

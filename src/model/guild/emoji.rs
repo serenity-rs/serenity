@@ -15,7 +15,7 @@ use {CACHE, http};
 /// Represents a custom guild emoji, which can either be created using the API,
 /// or via an integration. Emojis created using the API only work within the
 /// guild it was created in.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Emoji {
     /// Whether the emoji is animated.
     #[serde(default)]

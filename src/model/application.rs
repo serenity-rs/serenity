@@ -6,7 +6,7 @@ use super::utils::default_true;
 
 /// Information about a user's application. An application does not necessarily
 /// have an associated bot user.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ApplicationInfo {
     /// The bot user associated with the application. See [`BotApplication`] for
     /// more information.
@@ -47,7 +47,7 @@ pub struct ApplicationInfo {
 }
 
 /// Information about an application with an application's bot user.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BotApplication {
     /// The unique Id of the bot user.
     pub id: UserId,
@@ -73,7 +73,7 @@ pub struct BotApplication {
 }
 
 /// Information about the current application and its owner.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct CurrentApplicationInfo {
     pub description: String,
     pub icon: Option<String>,

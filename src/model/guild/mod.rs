@@ -34,7 +34,7 @@ use constants::LARGE_THRESHOLD;
 use std;
 
 /// A representation of a banning of a user.
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash, Serialize)]
 pub struct Ban {
     /// The reason given for this ban.
     pub reason: Option<String>,
@@ -43,7 +43,7 @@ pub struct Ban {
 }
 
 /// Information about a Discord guild, such as channels, emojis, etc.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct Guild {
     /// Id of a voice channel that's considered the AFK channel.
     pub afk_channel_id: Option<ChannelId>,
@@ -56,11 +56,13 @@ pub struct Guild {
     ///
     /// This contains all channels regardless of permissions (i.e. the ability
     /// of the bot to read from or connect to them).
+    #[serde(serialize_with = "serialize_gen_locked_map")]
     pub channels: HashMap<ChannelId, Arc<RwLock<GuildChannel>>>,
     /// Indicator of whether notifications for all messages are enabled by
     /// default in the guild.
     pub default_message_notifications: DefaultMessageNotificationLevel,
     /// All of the guild's custom emojis.
+    #[serde(serialize_with = "serialize_gen_map")]
     pub emojis: HashMap<EmojiId, Emoji>,
     /// Default explicit content filter level.
     pub explicit_content_filter: ExplicitContentFilter,
@@ -98,6 +100,7 @@ pub struct Guild {
     /// the library.
     ///
     /// [`ReadyEvent`]: events/struct.ReadyEvent.html
+    #[serde(serialize_with = "serialize_gen_map")]
     pub members: HashMap<UserId, Member>,
     /// Indicator of whether the guild requires multi-factor authentication for
     /// [`Role`]s or [`User`]s with moderation permissions.
@@ -114,10 +117,12 @@ pub struct Guild {
     /// A mapping of [`User`]s' Ids to their current presences.
     ///
     /// [`User`]: struct.User.html
+    #[serde(serialize_with = "serialize_gen_map")]
     pub presences: HashMap<UserId, Presence>,
     /// The region that the voice servers that the guild uses are located in.
     pub region: String,
     /// A mapping of the guild's roles.
+    #[serde(serialize_with = "serialize_gen_map")]
     pub roles: HashMap<RoleId, Role>,
     /// An identifying hash of the guild's splash icon.
     ///
@@ -133,6 +138,7 @@ pub struct Guild {
     /// A mapping of of [`User`]s to their current voice state.
     ///
     /// [`User`]: struct.User.html
+    #[serde(serialize_with = "serialize_gen_map")]
     pub voice_states: HashMap<UserId, VoiceState>,
 }
 
@@ -1606,7 +1612,7 @@ pub enum GuildContainer {
 }
 
 /// Information relating to a guild's widget embed.
-#[derive(Clone, Copy, Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct GuildEmbed {
     /// The Id of the channel to show the embed for.
     pub channel_id: ChannelId,
@@ -1616,14 +1622,14 @@ pub struct GuildEmbed {
 
 /// Representation of the number of members that would be pruned by a guild
 /// prune operation.
-#[derive(Clone, Copy, Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct GuildPrune {
     /// The number of members that would be pruned by the operation.
     pub pruned: u64,
 }
 
 /// Basic information about a guild.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildInfo {
     /// The unique Id of the guild.
     ///
@@ -1674,7 +1680,7 @@ impl InviteGuild {
 }
 
 /// Data for an unavailable guild.
-#[derive(Clone, Copy, Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct GuildUnavailable {
     /// The Id of the [`Guild`] that is unavailable.
     ///
@@ -1687,7 +1693,7 @@ pub struct GuildUnavailable {
 }
 
 #[allow(large_enum_variant)]
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum GuildStatus {
     OnlinePartialGuild(PartialGuild),

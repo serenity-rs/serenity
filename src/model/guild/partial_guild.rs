@@ -8,7 +8,7 @@ use builder::{EditGuild, EditMember, EditRole};
 /// like member data.
 ///
 /// [`Guild`]: struct.Guild.html
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PartialGuild {
     pub id: GuildId,
     pub afk_channel_id: Option<ChannelId>,

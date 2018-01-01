@@ -16,7 +16,7 @@ use {http, utils};
 /// A representation of a webhook, which is a low-effort way to post messages to
 /// channels. They do not necessarily require a bot user or authentication to
 /// use.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Webhook {
     /// The unique Id.
     ///

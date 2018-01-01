@@ -17,7 +17,7 @@ use {constants, http, utils as serenity_utils};
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Message {
     /// The unique Id of the message. Can be used to calculate the creation date
     /// of the message.
@@ -584,7 +584,7 @@ impl<'a> From<&'a Message> for MessageId {
 ///
 /// [`count`]: #structfield.count
 /// [reaction type]: enum.ReactionType.html
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct MessageReaction {
     /// The amount of the type of reaction that have been sent for the
     /// associated message.

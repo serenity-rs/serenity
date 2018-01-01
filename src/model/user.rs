@@ -27,7 +27,7 @@ use std::sync::Arc;
 use utils;
 
 /// Information about the current user.
-#[derive(Clone, Default, Debug, Deserialize)]
+#[derive(Clone, Default, Debug, Deserialize, Serialize)]
 pub struct CurrentUser {
     pub id: UserId,
     pub avatar: Option<String>,
@@ -337,7 +337,7 @@ impl Default for OnlineStatus {
 }
 
 /// Information about a user.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's
     /// creation date.

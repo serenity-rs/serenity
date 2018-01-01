@@ -1,7 +1,7 @@
 use super::*;
 
 /// Various information about integrations.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Integration {
     pub id: IntegrationId,
     pub account: IntegrationAccount,
@@ -22,7 +22,7 @@ impl From<Integration> for IntegrationId {
 }
 
 /// Integration account object.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct IntegrationAccount {
     pub id: String,
     pub name: String,

@@ -19,7 +19,7 @@ fn decode_negative_one_role_position() {
 
     let value: Value = serde_json::from_str(json).unwrap();
 
-    assert!(serde_json::from_value::<Role>(value).is_ok());
+    serde_json::from_value::<Role>(value).unwrap();
 }
 
 #[test]

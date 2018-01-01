@@ -17,7 +17,7 @@ use utils;
 /// 1024 in a field value, and 2048 in a description.
 ///
 /// [slack's attachments]: https://api.slack.com/docs/message-attachments
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Embed {
     /// Information about the author of the embed.
     pub author: Option<EmbedAuthor>,
@@ -95,7 +95,7 @@ impl Embed {
 }
 
 /// An author object in an embed.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct EmbedAuthor {
     /// The URL of the author icon.
     ///
@@ -110,7 +110,7 @@ pub struct EmbedAuthor {
 }
 
 /// A field object in an embed.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct EmbedField {
     /// Indicator of whether the field should display as inline.
     pub inline: bool,
@@ -143,7 +143,7 @@ impl EmbedField {
 }
 
 /// Footer information for an embed.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct EmbedFooter {
     /// The URL of the footer icon.
     ///
@@ -156,7 +156,7 @@ pub struct EmbedFooter {
 }
 
 /// An image object in an embed.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct EmbedImage {
     /// The height of the image.
     pub height: u64,
@@ -171,7 +171,7 @@ pub struct EmbedImage {
 }
 
 /// The provider of an embed.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct EmbedProvider {
     /// The name of the provider.
     pub name: String,
@@ -180,7 +180,7 @@ pub struct EmbedProvider {
 }
 
 /// The dimensions and URL of an embed thumbnail.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct EmbedThumbnail {
     /// The height of the thumbnail in pixels.
     pub height: u64,
@@ -195,7 +195,7 @@ pub struct EmbedThumbnail {
 }
 
 /// Video information for an embed.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct EmbedVideo {
     /// The height of the video in pixels.
     pub height: u64,

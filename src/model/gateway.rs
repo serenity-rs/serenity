@@ -2,6 +2,7 @@
 
 use parking_lot::RwLock;
 use serde::de::Error as DeError;
+use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
 use std::sync::Arc;
 use super::utils::*;
@@ -13,7 +14,7 @@ use super::prelude::*;
 /// shards that Discord recommends to use for a bot user.
 ///
 /// This is only applicable to bot users.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BotGateway {
     /// The number of shards that is recommended to be used by the current bot
     /// user.
@@ -24,9 +25,10 @@ pub struct BotGateway {
 
 /// Representation of a game that a [`User`] is playing -- or streaming in the
 /// case that a stream URL is provided.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct Game {
     /// The type of game status.
+    #[serde(default, rename = "type")]
     pub kind: GameType,
     /// The name of the game being played.
     pub name: String,
@@ -214,7 +216,7 @@ impl Default for GameType {
 /// For the bot-specific gateway, refer to [`BotGateway`].
 ///
 /// [`BotGateway`]: struct.BotGateway.html
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Gateway {
     /// The gateway to connect to.
     pub url: String,
@@ -295,8 +297,34 @@ impl<'de> Deserialize<'de> for Presence {
     }
 }
 
+impl Serialize for Presence {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        #[derive(Serialize)]
+        struct UserId {
+            id: u64,
+        }
+
+        let mut state = serializer.serialize_struct("Presence", 5)?;
+        state.serialize_field("game", &self.game)?;
+        state.serialize_field("last_modified", &self.last_modified)?;
+        state.serialize_field("nick", &self.nick)?;
+        state.serialize_field("status", &self.status)?;
+
+        if let Some(ref user) = self.user {
+            state.serialize_field("user", &*user.read())?;
+        } else {
+            state.serialize_field("user", &UserId {
+                id: self.user_id.0,
+            })?;
+        }
+
+        state.end()
+    }
+}
+
 /// An initial set of information given after IDENTIFYing to the gateway.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Ready {
     pub guilds: Vec<GuildStatus>,
     #[serde(default, deserialize_with = "deserialize_presences")]

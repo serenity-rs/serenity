@@ -11,7 +11,7 @@ use http::AttachmentType;
 use internal::RwLockExt;
 
 /// A Direct Message text channel with another user.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PrivateChannel {
     /// The unique Id of the private channel.
     ///
@@ -31,7 +31,9 @@ pub struct PrivateChannel {
     #[serde(rename = "type")]
     pub kind: ChannelType,
     /// The recipient to the private channel.
-    #[serde(deserialize_with = "deserialize_single_recipient", rename = "recipients")]
+    #[serde(deserialize_with = "deserialize_single_recipient",
+            rename = "recipients",
+            serialize_with = "serialize_sync_user")]
     pub recipient: Arc<RwLock<User>>,
 }
 

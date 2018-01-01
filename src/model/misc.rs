@@ -220,7 +220,7 @@ impl FromStr for EmojiIdentifier {
 /// A component that was affected during a service incident.
 ///
 /// This is pulled from the Discord status page.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct AffectedComponent {
     pub name: String,
 }
@@ -228,7 +228,7 @@ pub struct AffectedComponent {
 /// An incident retrieved from the Discord status page.
 ///
 /// This is not necessarily a representation of an ongoing incident.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Incident {
     pub created_at: String,
     pub id: String,
@@ -247,7 +247,7 @@ pub struct Incident {
 ///
 /// This will typically state what new information has been discovered about an
 /// incident.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct IncidentUpdate {
     pub affected_components: Vec<AffectedComponent>,
     pub body: String,
@@ -272,7 +272,7 @@ pub enum IncidentStatus {
 
 /// A Discord status maintenance message. This can be either for active
 /// maintenances or for scheduled maintenances.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Maintenance {
     pub description: String,
     pub id: String,

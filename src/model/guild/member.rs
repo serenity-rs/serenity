@@ -49,7 +49,7 @@ impl BanOptions for (u8, String) {
 }
 
 /// Information about a member of a guild.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Member {
     /// Indicator of whether the member can hear in voice channels.
     pub deaf: bool,
@@ -66,7 +66,8 @@ pub struct Member {
     /// Vector of Ids of [`Role`]s given to the member.
     pub roles: Vec<RoleId>,
     /// Attached User struct.
-    #[serde(deserialize_with = "deserialize_sync_user")]
+    #[serde(deserialize_with = "deserialize_sync_user",
+            serialize_with = "serialize_sync_user")]
     pub user: Arc<RwLock<User>>,
 }
 

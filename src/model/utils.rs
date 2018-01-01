@@ -1,6 +1,8 @@
 use parking_lot::RwLock;
 use serde::de::Error as DeError;
+use serde::ser::{SerializeSeq, Serialize, Serializer};
 use std::collections::HashMap;
+use std::hash::Hash;
 use std::sync::Arc;
 use super::prelude::*;
 
@@ -121,6 +123,13 @@ pub fn deserialize_sync_user<'de, D>(deserializer: D)
     Ok(Arc::new(RwLock::new(User::deserialize(deserializer)?)))
 }
 
+pub fn serialize_sync_user<S: Serializer>(
+    user: &Arc<RwLock<User>>,
+    serializer: S,
+) -> StdResult<S::Ok, S::Error> {
+    User::serialize(&*user.read(), serializer)
+}
+
 pub fn deserialize_users<'de, D: Deserializer<'de>>(
     deserializer: D)
     -> StdResult<HashMap<UserId, Arc<RwLock<User>>>, D::Error> {
@@ -132,6 +141,19 @@ pub fn deserialize_users<'de, D: Deserializer<'de>>(
     }
 
     Ok(users)
+}
+
+pub fn serialize_users<S: Serializer>(
+    users: &HashMap<UserId, Arc<RwLock<User>>>,
+    serializer: S
+) -> StdResult<S::Ok, S::Error> {
+    let mut seq = serializer.serialize_seq(Some(users.len()))?;
+
+    for user in users.values() {
+        seq.serialize_element(&*user.read())?;
+    }
+
+    seq.end()
 }
 
 pub fn deserialize_u16<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u16, D::Error> {
@@ -153,6 +175,32 @@ pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
     }
 
     Ok(voice_states)
+}
+
+pub fn serialize_gen_map<K: Eq + Hash, S: Serializer, V: Serialize>(
+    map: &HashMap<K, V>,
+    serializer: S,
+) -> StdResult<S::Ok, S::Error> {
+    let mut seq = serializer.serialize_seq(Some(map.len()))?;
+
+    for value in map.values() {
+        seq.serialize_element(&value)?;
+    }
+
+    seq.end()
+}
+
+pub fn serialize_gen_locked_map<K: Eq + Hash, S: Serializer, V: Serialize>(
+    map: &HashMap<K, Arc<RwLock<V>>>,
+    serializer: S,
+) -> StdResult<S::Ok, S::Error> {
+    let mut seq = serializer.serialize_seq(Some(map.len()))?;
+
+    for value in map.values() {
+        seq.serialize_element(&*value.read())?;
+    }
+
+    seq.end()
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]

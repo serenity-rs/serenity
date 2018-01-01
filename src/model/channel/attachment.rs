@@ -8,7 +8,7 @@ use std::io::Read;
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///
 /// [`Embed`]: struct.Embed.html
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Attachment {
     /// The unique ID given to this attachment.
     pub id: String,

@@ -18,7 +18,7 @@ use utils as serenity_utils;
 
 /// Represents a guild's text or voice channel. Some methods are available only
 /// for voice channels and some are only available for text channels.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildChannel {
     /// The unique Id of the channel.
     ///

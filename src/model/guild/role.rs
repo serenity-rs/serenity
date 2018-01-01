@@ -14,7 +14,7 @@ use {CACHE, http};
 /// are unique per guild and do not cross over to other guilds in any way, and
 /// can have channel-specific permission overrides in addition to guild-level
 /// permissions.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Role {
     /// The Id of the role. Can be used to calculate the role's creation date.
     pub id: RoleId,

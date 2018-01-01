@@ -12,7 +12,7 @@ use utils as serenity_utils;
 /// A category of [`GuildChannel`]s.
 ///
 /// [`GuildChannel`]: struct.GuildChannel.html
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ChannelCategory {
     /// Id of this category.
     pub id: ChannelId,

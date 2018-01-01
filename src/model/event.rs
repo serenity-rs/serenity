@@ -2,6 +2,7 @@
 
 use chrono::{DateTime, FixedOffset};
 use serde::de::Error as DeError;
+use serde::ser::{Serialize, SerializeSeq, Serializer};
 use serde_json;
 use std::collections::HashMap;
 use super::utils::deserialize_emojis;
@@ -41,6 +42,13 @@ impl<'de> Deserialize<'de> for ChannelCreateEvent {
         Ok(Self {
             channel: Channel::deserialize(deserializer)?,
         })
+    }
+}
+
+impl Serialize for ChannelCreateEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        Channel::serialize(&self.channel, serializer)
     }
 }
 
@@ -153,7 +161,14 @@ impl<'de> Deserialize<'de> for ChannelDeleteEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+impl Serialize for ChannelDeleteEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        Channel::serialize(&self.channel, serializer)
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ChannelPinsUpdateEvent {
     pub channel_id: ChannelId,
     pub last_pin_timestamp: Option<DateTime<FixedOffset>>,
@@ -193,7 +208,7 @@ impl CacheUpdate for ChannelPinsUpdateEvent {
 }
 
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ChannelRecipientAddEvent {
     pub channel_id: ChannelId,
     pub user: User,
@@ -216,7 +231,7 @@ impl CacheUpdate for ChannelRecipientAddEvent {
 }
 
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ChannelRecipientRemoveEvent {
     pub channel_id: ChannelId,
     pub user: User,
@@ -234,8 +249,6 @@ impl CacheUpdate for ChannelRecipientRemoveEvent {
         None
     }
 }
-
-
 
 #[derive(Clone, Debug)]
 pub struct ChannelUpdateEvent {
@@ -306,14 +319,20 @@ impl<'de> Deserialize<'de> for ChannelUpdateEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+impl Serialize for ChannelUpdateEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        Channel::serialize(&self.channel, serializer)
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildBanAddEvent {
     pub guild_id: GuildId,
     pub user: User,
 }
 
-
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildBanRemoveEvent {
     pub guild_id: GuildId,
     pub user: User,
@@ -357,6 +376,13 @@ impl<'de> Deserialize<'de> for GuildCreateEvent {
     }
 }
 
+impl Serialize for GuildCreateEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        Guild::serialize(&self.guild, serializer)
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct GuildDeleteEvent {
     pub guild: PartialGuild,
@@ -386,7 +412,14 @@ impl<'de> Deserialize<'de> for GuildDeleteEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+impl Serialize for GuildDeleteEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        PartialGuild::serialize(&self.guild, serializer)
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildEmojisUpdateEvent {
     #[serde(deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
     pub guild_id: GuildId,
@@ -407,12 +440,12 @@ impl CacheUpdate for GuildEmojisUpdateEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildIntegrationsUpdateEvent {
     pub guild_id: GuildId,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct GuildMemberAddEvent {
     pub guild_id: GuildId,
     pub member: Member,
@@ -440,7 +473,6 @@ impl CacheUpdate for GuildMemberAddEvent {
     }
 }
 
-
 impl<'de> Deserialize<'de> for GuildMemberAddEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let map = JsonMap::deserialize(deserializer)?;
@@ -458,7 +490,7 @@ impl<'de> Deserialize<'de> for GuildMemberAddEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildMemberRemoveEvent {
     pub guild_id: GuildId,
     pub user: User,
@@ -478,7 +510,7 @@ impl CacheUpdate for GuildMemberRemoveEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildMemberUpdateEvent {
     pub guild_id: GuildId,
     pub nick: Option<String>,
@@ -534,7 +566,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct GuildMembersChunkEvent {
     pub guild_id: GuildId,
     pub members: HashMap<UserId, Member>,
@@ -589,7 +621,7 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildRoleCreateEvent {
     pub guild_id: GuildId,
     pub role: Role,
@@ -611,7 +643,7 @@ impl CacheUpdate for GuildRoleCreateEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildRoleDeleteEvent {
     pub guild_id: GuildId,
     pub role_id: RoleId,
@@ -629,7 +661,7 @@ impl CacheUpdate for GuildRoleDeleteEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildRoleUpdateEvent {
     pub guild_id: GuildId,
     pub role: Role,
@@ -650,7 +682,7 @@ impl CacheUpdate for GuildRoleUpdateEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildUnavailableEvent {
     #[serde(rename = "id")] pub guild_id: GuildId,
 }
@@ -702,6 +734,13 @@ impl<'de> Deserialize<'de> for GuildUpdateEvent {
     }
 }
 
+impl Serialize for GuildUpdateEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        PartialGuild::serialize(&self.guild, serializer)
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct MessageCreateEvent {
     pub message: Message,
@@ -715,19 +754,26 @@ impl<'de> Deserialize<'de> for MessageCreateEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+impl Serialize for MessageCreateEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        Message::serialize(&self.message, serializer)
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct MessageDeleteBulkEvent {
     pub channel_id: ChannelId,
     pub ids: Vec<MessageId>,
 }
 
-#[derive(Clone, Copy, Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct MessageDeleteEvent {
     pub channel_id: ChannelId,
     #[serde(rename = "id")] pub message_id: MessageId,
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct MessageUpdateEvent {
     pub id: MessageId,
     pub channel_id: ChannelId,
@@ -746,7 +792,7 @@ pub struct MessageUpdateEvent {
     pub embeds: Option<Vec<Value>>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct PresenceUpdateEvent {
     pub guild_id: Option<GuildId>,
     pub presence: Presence,
@@ -849,6 +895,19 @@ impl<'de> Deserialize<'de> for PresencesReplaceEvent {
     }
 }
 
+impl Serialize for PresencesReplaceEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        let mut seq = serializer.serialize_seq(Some(self.presences.len()))?;
+
+        for value in &self.presences {
+            seq.serialize_element(value)?;
+        }
+
+        seq.end()
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct ReactionAddEvent {
     pub reaction: Reaction,
@@ -859,6 +918,13 @@ impl<'de> Deserialize<'de> for ReactionAddEvent {
         Ok(Self {
             reaction: Reaction::deserialize(deserializer)?,
         })
+    }
+}
+
+impl Serialize for ReactionAddEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        Reaction::serialize(&self.reaction, serializer)
     }
 }
 
@@ -875,7 +941,14 @@ impl<'de> Deserialize<'de> for ReactionRemoveEvent {
     }
 }
 
-#[derive(Clone, Copy, Debug, Deserialize)]
+impl Serialize for ReactionRemoveEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        Reaction::serialize(&self.reaction, serializer)
+    }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct ReactionRemoveAllEvent {
     pub channel_id: ChannelId,
     pub message_id: MessageId,
@@ -935,19 +1008,26 @@ impl<'de> Deserialize<'de> for ReadyEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+impl Serialize for ReadyEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        Ready::serialize(&self.ready, serializer)
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ResumedEvent {
     #[serde(rename = "_trace")] pub trace: Vec<Option<String>>,
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TypingStartEvent {
     pub channel_id: ChannelId,
     pub timestamp: u64,
     pub user_id: UserId,
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct UnknownEvent {
     pub kind: String,
     pub value: Value,
@@ -975,7 +1055,14 @@ impl<'de> Deserialize<'de> for UserUpdateEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+impl Serialize for UserUpdateEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        CurrentUser::serialize(&self.current_user, serializer)
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct VoiceServerUpdateEvent {
     pub channel_id: Option<ChannelId>,
     pub endpoint: Option<String>,
@@ -983,7 +1070,7 @@ pub struct VoiceServerUpdateEvent {
     pub token: String,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct VoiceStateUpdateEvent {
     pub guild_id: Option<GuildId>,
     pub voice_state: VoiceState,
@@ -1042,14 +1129,15 @@ impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct WebhookUpdateEvent {
     pub channel_id: ChannelId,
     pub guild_id: GuildId,
 }
 
 #[allow(large_enum_variant)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
+#[serde(untagged)]
 pub enum GatewayEvent {
     Dispatch(u64, Event),
     Heartbeat(u64),
@@ -1128,7 +1216,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 
 /// Event received over a websocket connection
 #[allow(large_enum_variant)]
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum Event {
     /// A [`Channel`] was created.
     ///
@@ -1668,13 +1756,13 @@ impl<'de> Deserialize<'de> for EventType {
 }
 
 #[allow(missing_docs)]
-#[derive(Clone, Copy, Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct VoiceHeartbeat {
     pub heartbeat_interval: u64,
 }
 
 #[allow(missing_docs)]
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct VoiceHello {
     pub heartbeat_interval: u64,
     pub ip: String,
@@ -1684,14 +1772,14 @@ pub struct VoiceHello {
 }
 
 #[allow(missing_docs)]
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct VoiceSessionDescription {
     pub mode: String,
     pub secret_key: Vec<u8>,
 }
 
 #[allow(missing_docs)]
-#[derive(Clone, Copy, Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct VoiceSpeaking {
     pub speaking: bool,
     pub ssrc: u32,
@@ -1701,7 +1789,8 @@ pub struct VoiceSpeaking {
 /// A representation of data received for [`voice`] events.
 ///
 /// [`voice`]: ../../voice/index.html
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
 pub enum VoiceEvent {
     /// A voice heartbeat.
     Heartbeat(VoiceHeartbeat),

@@ -1,5 +1,6 @@
 use model::prelude::*;
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
+use serde::ser::{SerializeMap, Serialize, Serializer};
 use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 use std::str::FromStr;
@@ -11,7 +12,7 @@ use CACHE;
 use http;
 
 /// An emoji reaction to a message.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Reaction {
     /// The [`Channel`] of the associated [`Message`].
     ///
@@ -252,6 +253,30 @@ impl<'de> Deserialize<'de> for ReactionType {
         }
 
         deserializer.deserialize_map(ReactionTypeVisitor)
+    }
+}
+
+impl Serialize for ReactionType {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        match *self {
+            ReactionType::Custom { animated, id, ref name } => {
+                let mut map = serializer.serialize_map(Some(3))?;
+
+                map.serialize_entry("animated", &animated)?;
+                map.serialize_entry("id", &id.0)?;
+                map.serialize_entry("name", &name)?;
+
+                map.end()
+            },
+            ReactionType::Unicode(ref name) => {
+                let mut map = serializer.serialize_map(Some(1))?;
+
+                map.serialize_entry("name", &name)?;
+
+                map.end()
+            },
+        }
     }
 }
 

@@ -15,7 +15,7 @@ use {http, utils};
 /// Information about an invite code.
 ///
 /// Information can not be accessed for guilds the current user is banned from.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Invite {
     /// The approximate number of [`Member`]s in the related [`Guild`].
     ///
@@ -152,7 +152,7 @@ impl Invite {
 }
 
 /// A inimal information about the channel an invite points to.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InviteChannel {
     pub id: ChannelId,
     pub name: String,
@@ -160,7 +160,7 @@ pub struct InviteChannel {
 }
 
 /// A minimal amount of information about the guild an invite points to.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InviteGuild {
     pub id: GuildId,
     pub icon: Option<String>,
@@ -218,7 +218,7 @@ impl InviteGuild {
 ///
 /// [`Invite`]: struct.Invite.html
 /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct RichInvite {
     /// A representation of the minimal amount of information needed about the
     /// channel being invited to.

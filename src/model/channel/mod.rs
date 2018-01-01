@@ -23,6 +23,7 @@ pub use self::channel_category::*;
 use internal::RwLockExt;
 use model::prelude::*;
 use serde::de::Error as DeError;
+use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
 use super::utils::deserialize_u64;
 
@@ -504,6 +505,26 @@ impl<'de> Deserialize<'de> for Channel {
     }
 }
 
+impl Serialize for Channel {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        match *self {
+            Channel::Category(ref c) => {
+                ChannelCategory::serialize(&*c.read(), serializer)
+            },
+            Channel::Group(ref c) => {
+                Group::serialize(&*c.read(), serializer)
+            },
+            Channel::Guild(ref c) => {
+                GuildChannel::serialize(&*c.read(), serializer)
+            },
+            Channel::Private(ref c) => {
+                PrivateChannel::serialize(&*c.read(), serializer)
+            },
+        }
+    }
+}
+
 #[cfg(feature = "model")]
 impl Display for Channel {
     /// Formats the channel into a "mentioned" string.
@@ -582,7 +603,7 @@ impl ChannelType {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 struct PermissionOverwriteData {
     allow: Permissions,
     deny: Permissions,
@@ -614,6 +635,24 @@ impl<'de> Deserialize<'de> for PermissionOverwrite {
             deny: data.deny,
             kind: kind,
         })
+    }
+}
+
+impl Serialize for PermissionOverwrite {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        let (id, kind) = match self.kind {
+            PermissionOverwriteType::Member(id) => (id.0, "member"),
+            PermissionOverwriteType::Role(id) => (id.0, "role"),
+        };
+
+        let mut state = serializer.serialize_struct("PermissionOverwrite", 4)?;
+        state.serialize_field("allow", &self.allow.bits())?;
+        state.serialize_field("deny", &self.deny.bits())?;
+        state.serialize_field("id", &id)?;
+        state.serialize_field("type", kind)?;
+
+        state.end()
     }
 }
 
