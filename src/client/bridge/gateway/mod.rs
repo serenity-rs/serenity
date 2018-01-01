@@ -47,6 +47,8 @@
 //! [`ShardQueuer`]: struct.ShardQueuer.html
 //! [`ShardRunner`]: struct.ShardRunner.html
 
+pub mod event;
+
 mod shard_manager;
 mod shard_manager_monitor;
 mod shard_messenger;

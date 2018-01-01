@@ -6,7 +6,9 @@ use parking_lot::Mutex;
 use serde::Deserialize;
 use std::sync::mpsc::{self, Receiver, Sender, TryRecvError};
 use std::sync::Arc;
-use super::super::super::{EventHandler, dispatch};
+use super::super::super::dispatch::{DispatchEvent, dispatch};
+use super::super::super::EventHandler;
+use super::event::{ClientEvent, ShardStageUpdateEvent};
 use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
 use threadpool::ThreadPool;
 use typemap::ShareMap;
@@ -149,6 +151,13 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 
             if post != pre {
                 self.update_manager();
+
+                let e = ClientEvent::ShardStageUpdate(ShardStageUpdateEvent {
+                    new: post,
+                    old: pre,
+                    shard_id: ShardId(self.shard.shard_info()[0]),
+                });
+                self.dispatch(DispatchEvent::Client(e));
             }
 
             match action {
@@ -162,7 +171,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             }
 
             if let Some(event) = event {
-                self.dispatch(event);
+                self.dispatch(DispatchEvent::Model(event));
             }
 
             if !successful && !self.shard.stage().is_connecting() {
@@ -222,7 +231,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
     }
 
     #[inline]
-    fn dispatch(&self, event: Event) {
+    fn dispatch(&self, event: DispatchEvent) {
         dispatch(
             event,
             #[cfg(feature = "framework")]

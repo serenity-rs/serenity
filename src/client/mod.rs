@@ -41,7 +41,6 @@ use http;
 use internal::prelude::*;
 use parking_lot::Mutex;
 use self::bridge::gateway::{ShardManager, ShardManagerMonitor};
-use self::dispatch::dispatch;
 use std::sync::Arc;
 use threadpool::ThreadPool;
 use typemap::ShareMap;
