@@ -1,5 +1,5 @@
 use internal::prelude::*;
-use super::VecMap;
+use utils::VecMap;
 
 /// A builder to edit the current user's settings, to be used in conjunction
 /// with [`CurrentUser::edit`].

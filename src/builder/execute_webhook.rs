@@ -1,6 +1,6 @@
 use serde_json::Value;
 use std::default::Default;
-use super::VecMap;
+use utils::VecMap;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
 ///

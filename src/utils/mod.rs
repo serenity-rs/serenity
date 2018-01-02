@@ -3,11 +3,12 @@
 
 mod colour;
 mod message_builder;
+mod vec_map;
 
 pub use self::colour::Colour;
 pub use self::message_builder::{Content, ContentModifier, MessageBuilder};
+pub use self::vec_map::VecMap;
 
-use builder::VecMap;
 use base64;
 use internal::prelude::*;
 use model::id::EmojiId;

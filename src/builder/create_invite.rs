@@ -1,7 +1,7 @@
 use internal::prelude::*;
 use serde_json::Value;
 use std::default::Default;
-use super::VecMap;
+use utils::VecMap;
 
 /// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
 ///

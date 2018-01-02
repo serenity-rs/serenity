@@ -9,12 +9,12 @@ use typemap::ShareMap;
 use builder::EditProfile;
 #[cfg(feature = "builder")]
 use internal::prelude::*;
-#[cfg(feature = "builder")]
-use builder::VecMap;
 #[cfg(all(feature = "builder", feature = "cache"))]
 use super::CACHE;
 #[cfg(feature = "builder")]
-use {Result, http, utils};
+use {Result, http};
+#[cfg(feature = "builder")]
+use utils::{self, VecMap};
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.

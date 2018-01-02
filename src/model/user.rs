@@ -10,7 +10,7 @@ use model::misc::Mentionable;
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
-use builder::{VecMap, CreateMessage, EditProfile};
+use builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
 use chrono::NaiveDateTime;
 #[cfg(feature = "model")]
@@ -24,7 +24,7 @@ use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
 #[cfg(feature = "model")]
-use utils;
+use utils::{self, VecMap};
 
 /// Information about the current user.
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]

@@ -1,13 +1,11 @@
 use model::prelude::*;
-#[cfg(feature = "model")]
-use builder::VecMap;
 
 #[cfg(all(feature = "builder", feature = "model"))]
 use builder::EditChannel;
 #[cfg(all(feature = "builder", feature = "model"))]
 use http;
 #[cfg(all(feature = "model", feature = "utils"))]
-use utils as serenity_utils;
+use utils::{self as serenity_utils, VecMap};
 
 /// A category of [`GuildChannel`]s.
 ///

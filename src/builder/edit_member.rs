@@ -1,6 +1,6 @@
 use internal::prelude::*;
 use model::id::{ChannelId, RoleId};
-use super::VecMap;
+use utils::VecMap;
 
 /// A builder which edits the properties of a [`Member`], to be used in
 /// conjunction with [`Member::edit`].

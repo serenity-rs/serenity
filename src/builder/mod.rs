@@ -15,9 +15,7 @@ mod edit_profile;
 mod edit_role;
 mod execute_webhook;
 mod get_messages;
-mod vec_map;
 
-pub use self::vec_map::VecMap;
 pub use self::create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter};
 pub use self::create_invite::CreateInvite;
 pub use self::create_message::CreateMessage;

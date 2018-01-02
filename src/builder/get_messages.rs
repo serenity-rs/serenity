@@ -1,5 +1,5 @@
 use model::id::MessageId;
-use super::VecMap;
+use utils::VecMap;
 
 /// Builds a request for a request to the API to retrieve messages.
 ///

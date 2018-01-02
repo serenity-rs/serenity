@@ -1,5 +1,5 @@
 use internal::prelude::*;
-use super::VecMap;
+use utils::VecMap;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]
 ///

@@ -22,7 +22,7 @@ use serde_json::Value;
 use std::default::Default;
 use std::fmt::Display;
 use utils;
-use super::VecMap;
+use utils::VecMap;
 
 #[cfg(feature = "utils")]
 use utils::Colour;

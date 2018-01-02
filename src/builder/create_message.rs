@@ -1,8 +1,8 @@
 use internal::prelude::*;
 use model::channel::ReactionType;
 use std::fmt::Display;
-use super::{CreateEmbed, VecMap};
-use utils;
+use super::CreateEmbed;
+use utils::{self, VecMap};
 
 /// A builder to specify the contents of an [`http::send_message`] request,
 /// primarily meant for use through [`ChannelId::send_message`].

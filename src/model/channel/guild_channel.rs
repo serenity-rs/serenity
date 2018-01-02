@@ -4,7 +4,7 @@ use model::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
-use builder::{VecMap, CreateInvite, CreateMessage, EditChannel, GetMessages};
+use builder::{CreateInvite, CreateMessage, EditChannel, GetMessages};
 #[cfg(feature = "model")]
 use http::{self, AttachmentType};
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -14,7 +14,7 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 #[cfg(feature = "model")]
 use std::mem;
 #[cfg(all(feature = "model", feature = "utils"))]
-use utils as serenity_utils;
+use utils::{self as serenity_utils, VecMap};
 
 /// Represents a guild's text or voice channel. Some methods are available only
 /// for voice channels and some are only available for text channels.

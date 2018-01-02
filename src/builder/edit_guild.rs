@@ -1,6 +1,6 @@
 use internal::prelude::*;
 use model::prelude::*;
-use super::VecMap;
+use utils::VecMap;
 
 /// A builder to optionally edit certain fields of a [`Guild`]. This is meant
 /// for usage with [`Guild::edit`].
