@@ -571,19 +571,20 @@ impl User {
     /// given [`Role`].
     ///
     /// Three forms of data may be passed in to the guild parameter: either a
-    /// [`Guild`] itself, a [`GuildId`], or a `u64`.
+    /// [`PartialGuild`], a [`GuildId`], or a `u64`.
     ///
     /// # Examples
     ///
     /// Check if a guild has a [`Role`] by Id:
     ///
     /// ```rust,ignore
-    /// // Assumes a 'guild' and `role_id` have already been bound
-    /// let _ = message.author.has_role(guild, role_id);
+    /// // Assumes a 'guild_id' and `role_id` have already been bound
+    /// let _ = message.author.has_role(guild_id, role_id);
     /// ```
     ///
     /// [`Guild`]: struct.Guild.html
     /// [`GuildId`]: struct.GuildId.html
+    /// [`PartialGuild`]: struct.PartialGuild.html
     /// [`Role`]: struct.Role.html
     /// [`Cache`]: ../cache/struct.Cache.html
     // no-cache would warn on guild_id.
