@@ -171,7 +171,7 @@ impl Default for ExecuteWebhook {
     /// Creating an `ExecuteWebhook` builder:
     ///
     /// ```rust
-    /// use serenity::utils::builder::ExecuteWebhook;
+    /// use serenity::builder::ExecuteWebhook;
     ///
     /// let executer = ExecuteWebhook::default();
     /// ```

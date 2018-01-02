@@ -7,7 +7,7 @@ extern crate serenity;
 
 use serde_json::Value;
 use serenity::model::channel::{Embed, EmbedField, EmbedImage};
-use serenity::utils::builder::CreateEmbed;
+use serenity::builder::CreateEmbed;
 use serenity::utils::{self, Colour};
 
 #[test]

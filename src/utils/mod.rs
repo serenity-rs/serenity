@@ -7,10 +7,6 @@ mod message_builder;
 pub use self::colour::Colour;
 pub use self::message_builder::{Content, ContentModifier, MessageBuilder};
 
-// Note: Here for BC purposes.
-#[cfg(feature = "builder")]
-pub use super::builder;
-
 use builder::VecMap;
 use base64;
 use internal::prelude::*;

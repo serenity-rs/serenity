@@ -202,7 +202,7 @@ impl Default for CreateInvite {
     /// Create a default `CreateInvite` builder:
     ///
     /// ```rust
-    /// use serenity::utils::builder::CreateInvite;
+    /// use serenity::builder::CreateInvite;
     ///
     /// let invite_builder = CreateInvite::default();
     /// ```
