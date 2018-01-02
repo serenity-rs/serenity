@@ -97,7 +97,7 @@ pub fn dispatch<H: EventHandler + Send + Sync + 'static>(
     shard_id: u64,
 ) {
     match event {
-        DispatchEvent::Model(MessageCreate(event)) => {
+        DispatchEvent::Model(Event::MessageCreate(event)) => {
             let context = context(data, runner_tx, shard_id);
             dispatch_message(context, event.message, event_handler, threadpool);
         },
