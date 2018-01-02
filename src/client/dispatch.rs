@@ -88,7 +88,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
 }
 
 #[cfg(not(feature = "framework"))]
-pub fn dispatch<H: EventHandler + Send + Sync + 'static>(
+pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     data: &Arc<Mutex<ShareMap>>,
     event_handler: &Arc<H>,
@@ -570,7 +570,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                     });
             } else {
                 let context = context(data, runner_tx, shard_id);
-                let event_handler = Arc::clone(event_handler);
+                let event_handler = Arc::clone(&event_handler);
 
                 threadpool.execute(move || {
                     event_handler.ready(context, event.ready);
