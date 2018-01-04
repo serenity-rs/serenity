@@ -6,7 +6,7 @@ extern crate serde_json;
 extern crate serenity;
 
 use serde_json::Value;
-use serenity::model::channel::{Embed, EmbedField, EmbedImage};
+use serenity::model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage};
 use serenity::builder::CreateEmbed;
 use serenity::utils::{self, Colour};
 
@@ -28,7 +28,11 @@ fn test_from_embed() {
                 value: "z".to_string(),
             },
         ],
-        footer: None,
+        footer: Some(EmbedFooter {
+            icon_url: Some("https://i.imgur.com/XfWpfCV.gif".to_string()),
+            proxy_icon_url: None,
+            text: "This is a hakase footer".to_string(),
+        }),
         image: Some(EmbedImage {
             height: 213,
             proxy_url: "a".to_string(),
@@ -74,6 +78,10 @@ fn test_from_embed() {
         "image": {
             "url": "https://i.imgur.com/XfWpfCV.gif",
         },
+        "footer": {
+            "text": "This is a hakase footer",
+            "icon_url": "https://i.imgur.com/XfWpfCV.gif",
+        }
     });
 
     assert_eq!(built, obj);

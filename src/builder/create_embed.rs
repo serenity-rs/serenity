@@ -367,6 +367,18 @@ impl From<Embed> for CreateEmbed {
             b = b.title(&title);
         }
 
+        if let Some(footer) = embed.footer {
+            b = b.footer(move |mut f| {
+                f = f.text(&footer.text);
+
+                if let Some(icon_url) = footer.icon_url {
+                    f = f.icon_url(&icon_url);
+                }
+
+                f
+            });
+        }
+
         b
     }
 }
