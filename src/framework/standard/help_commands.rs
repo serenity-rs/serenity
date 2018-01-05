@@ -414,8 +414,13 @@ pub fn plain<H: BuildHasher>(
         return Ok(());
     }
 
-    let mut result = format!("**Commands**\n{}\n\n", help_options.individual_command_tip)
-        .to_string();
+    let mut result = "**Commands**\n".to_string();
+
+    if let Some(striked_command_text) = help_options.striked_commands_tip.clone() {
+        let _ = write!(result, "{}\n{}\n\n", &help_options.individual_command_tip, &striked_command_text);
+    } else {
+        let _ = write!(result, "{}\n\n", &help_options.individual_command_tip);
+    }
 
     let mut group_names = groups.keys().collect::<Vec<_>>();
     group_names.sort();
@@ -432,8 +437,36 @@ pub fn plain<H: BuildHasher>(
             let cmd = &commands[name];
             let cmd = cmd.options();
 
-            if cmd.help_available && has_all_requirements(&cmd, msg) {
-                let _ = write!(group_help, "`{}` ", name);
+            if !cmd.dm_only && !cmd.guild_only || cmd.dm_only && msg.is_private() || cmd.guild_only && !msg.is_private() {
+                if cmd.help_available && has_correct_permissions(&cmd, msg) {
+                    let _ = write!(group_help, "`{}` ", name);
+                } else {
+                    match help_options.lacking_permissions {
+                        HelpBehaviour::Strike => {
+                            let name = format!("~~`{}`~~", &name);
+                            let _ = write!(group_help, "{} ", name);
+                        },
+                        HelpBehaviour::Nothing => {
+                            let _ = write!(group_help, "`{}` ", name);
+                        },
+                        HelpBehaviour::Hide => {
+                            continue;
+                        },
+                    }
+                }
+            } else {
+                match help_options.wrong_channel {
+                    HelpBehaviour::Strike => {
+                        let name = format!("~~`{}`~~", &name);
+                        let _ = write!(group_help, "{} ", name);
+                    },
+                    HelpBehaviour::Nothing => {
+                        let _ = write!(group_help, "`{}` ", name);
+                    },
+                    HelpBehaviour::Hide => {
+                        continue;
+                    },
+                }
             }
         }
 
