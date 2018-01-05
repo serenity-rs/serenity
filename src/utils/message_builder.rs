@@ -18,6 +18,7 @@ use model::{ChannelId, Emoji, Mentionable, RoleId, UserId};
 /// #
 /// # let user = UserId(1);
 /// # let emoji = Emoji {
+/// #     animated: false,
 /// #     id: EmojiId(2),
 /// #     name: "test".to_string(),
 /// #     managed: false,
@@ -142,6 +143,7 @@ impl MessageBuilder {
     /// use serenity::utils::MessageBuilder;
     ///
     /// let emoji = Emoji {
+    ///     animated: false,
     ///     id: EmojiId(302516740095606785),
     ///     managed: true,
     ///     name: "smugAnimeFace".to_string(),
@@ -912,15 +914,15 @@ impl From<ContentModifier> for Content {
 mod private {
     use super::{Content, ContentModifier};
     use std::fmt;
-    
+
     pub trait A {}
-    
+
     impl A for ContentModifier {}
     impl A for Content {}
     impl<T: fmt::Display> A for T {}
 }
 
-    
+
 /// This trait only exists as way to bypass the shouting of the compiler. Specifically "conflicting
 /// implementations in core" and alike.
 /// However is not meant to be used outside.
@@ -940,7 +942,7 @@ impl<T: fmt::Display> I for T {
         }
     }
 }
-    
+
 impl I for ContentModifier {
     fn into(self) -> Content { self.to_content() }
 }
