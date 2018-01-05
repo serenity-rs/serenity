@@ -69,7 +69,7 @@ pub fn has_all_requirements(cmd: &Command, msg: &Message) -> bool {
             }
         }
     }
-    false
+    !cmd.guild_only
 }
 
 /// Posts an embed showing each individual command group and its commands.
