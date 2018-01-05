@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.4.7] - 2018-1-5
+
+This release contains a behaviour hotfix for the framework's help-commands.
+
+### Fixed
+
+- [framework] Fix `has_all_requirements` [c:d0de766]
+
 ## [0.4.6] - 2017-12-20
 
 This release contains a fix for deserializing `Emoji`s and `ReactionType`s, due
@@ -1550,6 +1558,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.4.7]: https://github.com/zeyla/serenity/compare/v0.4.6...v0.4.7
 [0.4.6]: https://github.com/zeyla/serenity/compare/v0.4.5...v0.4.6
 [0.4.5]: https://github.com/zeyla/serenity/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/zeyla/serenity/compare/v0.4.3...v0.4.4
@@ -1604,6 +1613,8 @@ Initial commit.
 [@UninterestinAcc]: https://github.com/UninterestinAcc
 [@xentec]: https://github.com/xentec
 [@zeyla]: https://github.com/zeyla
+
+[c:d0de766]: https://github.com/zeyla/serenity/commit/d0de766123d822ddb5223e66389b4217a90aae2b
 
 [c:5286949]: https://github.com/zeyla/serenity/commit/5286949f424e824784344ebb7b7af4e52fb819c3
 
