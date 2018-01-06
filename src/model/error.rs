@@ -86,6 +86,14 @@ pub enum Error {
     /// [`GuildId`]: ../model/struct.GuildId.html
     /// [`Cache`]: ../cache/struct.Cache.html
     GuildNotFound,
+    /// Indicates that there are hierarchy problems restricting an action.
+    ///
+    /// For example, when banning a user, if the other user has a role with an
+    /// equal to or higher position, then they can not be banned.
+    ///
+    /// When editing a role, if the role is higher in position than the current
+    /// user's highest role, then the role can not be edited.
+    Hierarchy,
     /// Indicates that you do not have the required permissions to perform an
     /// operation.
     ///
@@ -126,6 +134,7 @@ impl StdError for Error {
             Error::DeleteMessageDaysAmount(_) => "Invalid delete message days",
             Error::EmbedTooLarge(_) => "Embed too large",
             Error::GuildNotFound => "Guild not found in the cache",
+            Error::Hierarchy => "Role hierarchy prevents this action",
             Error::InvalidPermissions(_) => "Invalid permissions",
             Error::InvalidUser => "The current user can not perform the action",
             Error::ItemMissing => "The required item is missing from the cache",

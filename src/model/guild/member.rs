@@ -309,16 +309,18 @@ impl Member {
     pub fn kick(&self) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::KICK_MEMBERS;
+            let cache = CACHE.read();
 
-            let has_perms = CACHE
-                .read()
-                .guilds
-                .get(&self.guild_id)
-                .map(|guild| guild.read().has_perms(req));
+            if let Some(guild) = self.guilds.get(&self.guild_id) {
+                let reader = guild.read();
 
-            if let Some(false) = has_perms {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !guild.has_perms(req) {
+                    let req = Permissions::KICK_MEMBERS;
+
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
+
+                guild.check_hierarchy(&self.user.read().id)?;
             }
         }
 

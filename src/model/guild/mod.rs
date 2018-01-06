@@ -144,6 +144,19 @@ pub struct Guild {
 
 #[cfg(feature = "model")]
 impl Guild {
+    #[cfg(feature = "cache")]
+    fn check_hierarchy(&self, other_user: UserId) -> Result<()> {
+        let current_id = CACHE.read().user.id;
+
+        if let Some(higher) = self.greater_member_hierarchy(user, current_id) {
+            if higher != current_id {
+                return Err(Error::Model(ModelError::Hierarchy));
+            }
+        }
+
+        Ok(())
+    }
+
     /// Returns the "default" channel of the guild for the passed user id.
     /// (This returns the first channel that can be read by the user, if there isn't one,
     /// returns `None`)
@@ -215,6 +228,8 @@ impl Guild {
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: &BO) -> Result<()> {
+        let user = user.into();
+
         #[cfg(feature = "cache")]
         {
             let req = Permissions::BAN_MEMBERS;
@@ -222,6 +237,8 @@ impl Guild {
             if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
+
+            self.check_hierarchy(user)?;
         }
 
         self.id.ban(user, options)
