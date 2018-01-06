@@ -233,6 +233,46 @@ impl Member {
         http::edit_member(self.guild_id.0, self.user.read().id.0, &map)
     }
 
+    /// Retrieves the ID and position of the member's highest role in the
+    /// hierarchy, if they have one.
+    ///
+    /// This _may_ return `None` if the user has roles, but they are not present
+    /// in the cache for cache inconsistency reasons.
+    ///
+    /// The "highest role in hierarchy" is defined as the role with the highest
+    /// position. If two or more roles have the same highest position, then the
+    /// role with the lowest ID is the highest.
+    ///
+    /// # Deadlocking
+    ///
+    /// This function will deadlock if you have a write lock to the member's
+    /// guild.
+    #[cfg(feature = "cache")]
+    pub fn highest_role_info(&self) -> Option<(RoleId, i64)> {
+        let guild = self.guild_id.find()?;
+        let reader = guild.read();
+
+        let mut highest = None;
+
+        for role_id in &self.roles {
+            if let Some(role) = reader.roles.get(&role_id) {
+                // Skip this role if this role in iteration has:
+                //
+                // - a position less than the recorded highest
+                // - a position equal to the recorded, but a higher ID
+                if let Some((id, pos)) = highest {
+                    if role.position < pos || (role.position == pos && role.id > id) {
+                        continue;
+                    }
+                }
+
+                highest = Some((role.id, role.position));
+            }
+        }
+
+        highest
+    }
+
     /// Kick the member from the guild.
     ///
     /// **Note**: Requires the [Kick Members] permission.
