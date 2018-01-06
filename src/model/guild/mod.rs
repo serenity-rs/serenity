@@ -1167,6 +1167,8 @@ impl Guild {
             // First apply the denied permission overwrites for each, then apply
             // the allowed.
 
+            let mut data = Vec::with_capacity(member.roles.len());
+
             // Roles
             for overwrite in &channel.permission_overwrites {
                 if let PermissionOverwriteType::Role(role) = overwrite.kind {
@@ -1174,8 +1176,16 @@ impl Guild {
                         continue;
                     }
 
-                    permissions = (permissions & !overwrite.deny) | overwrite.allow;
+                    if let Some(role) = self.roles.get(&role) {
+                        data.push((role.position, overwrite.deny, overwrite.allow));
+                    }
                 }
+            }
+
+            data.sort_by(|a, b| a.0.cmp(&b.0));
+
+            for overwrite in data {
+                permissions = (permissions & !overwrite.1) | overwrite.2;
             }
 
             // Member
