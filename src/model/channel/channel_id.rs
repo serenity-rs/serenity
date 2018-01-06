@@ -358,12 +358,13 @@ impl ChannelId {
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     pub fn reaction_users<M, R, U>(&self,
-                                   message_id: M,
-                                   reaction_type: R,
-                                   limit: Option<u8>,
-                                   after: Option<U>)
-                                   -> Result<Vec<User>>
-        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
+        message_id: M,
+        reaction_type: R,
+        limit: Option<u8>,
+        after: U,
+    ) -> Result<Vec<User>> where M: Into<MessageId>,
+                                 R: Into<ReactionType>,
+                                 U: Into<Option<UserId>> {
         let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
 
         http::get_reaction_users(
@@ -371,7 +372,7 @@ impl ChannelId {
             message_id.into().0,
             &reaction_type.into(),
             limit,
-            after.map(|u| u.into().0),
+            after.into().map(|x| x.0),
         )
     }
 

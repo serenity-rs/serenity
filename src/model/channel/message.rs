@@ -313,14 +313,14 @@ impl Message {
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn reaction_users<R, U>(&self,
-                                reaction_type: R,
-                                limit: Option<u8>,
-                                after: Option<U>)
-                                -> Result<Vec<User>>
-        where R: Into<ReactionType>, U: Into<UserId> {
-        self.channel_id
-            .reaction_users(self.id, reaction_type, limit, after)
+    pub fn reaction_users<R, U>(
+        &self,
+        reaction_type: R,
+        limit: Option<u8>,
+        after: U,
+    ) -> Result<Vec<User>> where R: Into<ReactionType>,
+                                 U: Into<Option<UserId>> {
+        self.channel_id.reaction_users(self.id, reaction_type, limit, after)
     }
 
     /// Returns the associated `Guild` for the message if one is in the cache.

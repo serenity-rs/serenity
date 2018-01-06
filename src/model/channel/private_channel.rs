@@ -189,14 +189,14 @@ impl PrivateChannel {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn reaction_users<M, R, U>(&self,
-                                   message_id: M,
-                                   reaction_type: R,
-                                   limit: Option<u8>,
-                                   after: Option<U>)
-                                   -> Result<Vec<User>>
-        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id
-            .reaction_users(message_id, reaction_type, limit, after)
+        message_id: M,
+        reaction_type: R,
+        limit: Option<u8>,
+        after: U,
+    ) -> Result<Vec<User>> where M: Into<MessageId>,
+                                 R: Into<ReactionType>,
+                                 U: Into<Option<UserId>> {
+        self.id.reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Pins a [`Message`] to the channel.

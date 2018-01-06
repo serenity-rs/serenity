@@ -238,15 +238,16 @@ impl Group {
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn reaction_users<M, R, U>(&self,
-                                   message_id: M,
-                                   reaction_type: R,
-                                   limit: Option<u8>,
-                                   after: Option<U>)
-                                   -> Result<Vec<User>>
-        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.channel_id
-            .reaction_users(message_id, reaction_type, limit, after)
+    pub fn reaction_users<M, R, U>(
+        &self,
+        message_id: M,
+        reaction_type: R,
+        limit: Option<u8>,
+        after: U,
+    ) -> Result<Vec<User>> where M: Into<MessageId>,
+                                 R: Into<ReactionType>,
+                                 U: Into<Option<UserId>> {
+        self.channel_id.reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Removes a recipient from the group. If the recipient is already not in

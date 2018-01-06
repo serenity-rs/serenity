@@ -371,14 +371,14 @@ impl Channel {
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn reaction_users<M, R, U>(&self,
-                                   message_id: M,
-                                   reaction_type: R,
-                                   limit: Option<u8>,
-                                   after: Option<U>)
-                                   -> Result<Vec<User>>
-        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id()
-            .reaction_users(message_id, reaction_type, limit, after)
+        message_id: M,
+        reaction_type: R,
+        limit: Option<u8>,
+        after: U,
+    ) -> Result<Vec<User>> where M: Into<MessageId>,
+                                 R: Into<ReactionType>,
+                                 U: Into<Option<UserId>> {
+        self.id().reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Retrieves the Id of the inner [`Group`], [`GuildChannel`], or
