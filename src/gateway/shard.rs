@@ -652,11 +652,13 @@ impl Shard {
     // Shamelessly stolen from brayzure's commit in eris:
     // <https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6>
     pub fn latency(&self) -> Option<StdDuration> {
-        if let (Some(received), Some(sent)) = self.heartbeat_instants {
-            Some(sent - received)
-        } else {
-            None
+        if let (Some(sent), Some(received)) = self.heartbeat_instants {
+            if received > sent {
+                return Some(received - sent);
+            }
         }
+
+        None
     }
 
     #[cfg(feature = "voice")]
