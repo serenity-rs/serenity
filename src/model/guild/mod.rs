@@ -637,6 +637,53 @@ impl Guild {
     #[inline]
     pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> { guild_id.into().get() }
 
+    /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
+    ///
+    /// Hierarchy is essentially who has the [`Role`] with the highest
+    /// [`position`].
+    ///
+    /// Returns [`None`] if at least one of the given users' member instances
+    /// is not present. Returns `None` if the users have the same hierarchy, as
+    /// neither are greater than the other.
+    pub fn greater_member_hierarchy<T, U>(&self, lhs_id: T, rhs_id: U)
+        -> Option<UserId> where T: Into<UserId>, U: Into<UserId> {
+        let lhs_id = lhs_id.into();
+        let rhs_id = rhs_id.into();
+
+        let lhs = self.members.get(&lhs_id)?
+            .highest_role_info()
+            .unwrap_or((RoleId(0), 0));
+        let rhs = self.members.get(&rhs_id)?
+            .highest_role_info()
+            .unwrap_or((RoleId(0), 0));
+
+        // If LHS and RHS both have no top position or have the same role ID,
+        // then no one wins.
+        if (lhs.1 == 0 && rhs.1 == 0) || (lhs.0 == rhs.0) {
+            return None;
+        }
+
+        // If LHS's top position is higher than RHS, then LHS wins.
+        if lhs.1 > rhs.1 {
+            return Some(lhs_id)
+        }
+
+        // If RHS's top position is higher than LHS, then RHS wins.
+        if rhs.1 > lhs.1 {
+            return Some(rhs_id);
+        }
+
+        // If LHS and RHS both have the same position, but LHS has the lower
+        // role ID, then LHS wins.
+        //
+        // If RHS has the higher role ID, then RHS wins.
+        if lhs.1 == rhs.1 && lhs.0 < rhs.0 {
+            Some(lhs_id)
+        } else {
+            Some(rhs_id)
+        }
+    }
+
     /// Returns the formatted URL of the guild's icon, if one exists.
     pub fn icon_url(&self) -> Option<String> {
         self.icon
