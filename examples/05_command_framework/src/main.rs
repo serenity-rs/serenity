@@ -13,15 +13,27 @@
 extern crate serenity;
 extern crate typemap;
 
+use serenity::client::bridge::gateway::{ShardId, ShardManager};
 use serenity::framework::standard::{Args, DispatchError, StandardFramework, HelpBehaviour, CommandOptions, help_commands};
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::model::Permissions;
+use serenity::prelude::Mutex;
 use serenity::prelude::*;
 use std::collections::HashMap;
 use std::env;
 use std::fmt::Write;
+use std::sync::Arc;
 use typemap::Key;
+
+// A container type is created for inserting into the Client's `data`, which
+// allows for data to be accessible across all events and framework commands, or
+// anywhere else that has a copy of the `data` Arc.
+struct ShardManagerContainer;
+
+impl Key for ShardManagerContainer {
+    type Value = Arc<Mutex<ShardManager>>;
+}
 
 struct CommandCounter;
 
@@ -47,6 +59,7 @@ fn main() {
     {
         let mut data = client.data.lock();
         data.insert::<CommandCounter>(HashMap::default());
+        data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
     }
 
     // Commands are equivalent to:
@@ -167,6 +180,8 @@ fn main() {
         .command("multiply", |c| c
             .known_as("*") // Lets us call ~* instead of ~multiply
             .cmd(multiply))
+        .command("latency", |c| c
+            .cmd(latency))
         .command("ping", |c| c
             .check(owner_check)
             .cmd(ping))
@@ -275,6 +290,38 @@ command!(about(_ctx, msg, _args) {
     if let Err(why) = msg.channel_id.say("This is a small test-bot! : )") {
         println!("Error sending message: {:?}", why);
     }
+});
+
+command!(latency(ctx, msg, _args) {
+    // The shard manager is an interface for mutating, stopping, restarting, and
+    // retrieving information about shards.
+    let data = ctx.data.lock();
+
+    let shard_manager = match data.get::<ShardManagerContainer>() {
+        Some(v) => v,
+        None => {
+            let _ = msg.reply("There was a problem getting the shard manager");
+
+            return Ok(());
+        },
+    };
+
+    let manager = shard_manager.lock();
+    let runners = manager.runners.lock();
+
+    // Shards are backed by a "shard runner" responsible for processing events
+    // over the shard, so we'll get the information about the shard runner for
+    // the shard this command was sent over.
+    let runner = match runners.get(&ShardId(ctx.shard_id)) {
+        Some(runner) => runner,
+        None => {
+            let _ = msg.reply("No shard found");
+
+            return Ok(());
+        },
+    };
+
+    let _ = msg.reply(&format!("The shard latency is {:?}", runner.latency));
 });
 
 command!(ping(_ctx, msg, _args) {
