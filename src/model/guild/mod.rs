@@ -148,7 +148,7 @@ impl Guild {
     fn check_hierarchy(&self, other_user: UserId) -> Result<()> {
         let current_id = CACHE.read().user.id;
 
-        if let Some(higher) = self.greater_member_hierarchy(user, current_id) {
+        if let Some(higher) = self.greater_member_hierarchy(other_user, current_id) {
             if higher != current_id {
                 return Err(Error::Model(ModelError::Hierarchy));
             }

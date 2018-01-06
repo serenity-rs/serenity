@@ -311,16 +311,15 @@ impl Member {
         {
             let cache = CACHE.read();
 
-            if let Some(guild) = self.guilds.get(&self.guild_id) {
+            if let Some(guild) = cache.guilds.get(&self.guild_id) {
+                let req = Permissions::KICK_MEMBERS;
                 let reader = guild.read();
 
-                if !guild.has_perms(req) {
-                    let req = Permissions::KICK_MEMBERS;
-
+                if !reader.has_perms(req) {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
 
-                guild.check_hierarchy(&self.user.read().id)?;
+                reader.check_hierarchy(self.user.read().id)?;
             }
         }
 
