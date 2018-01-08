@@ -332,7 +332,7 @@ impl Guild {
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// let _ = guild.create_channel("my-test-channel", ChannelType::Text);
+    /// let _ = guild.create_channel("my-test-channel", ChannelType::Text, None);
     /// ```
     ///
     /// # Errors
@@ -343,7 +343,8 @@ impl Guild {
     /// [`Channel`]: struct.Channel.html
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
-    pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
+    pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
+        where C: Into<Option<ChannelId>> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
@@ -353,7 +354,7 @@ impl Guild {
             }
         }
 
-        self.id.create_channel(name, kind)
+        self.id.create_channel(name, kind, category)
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image. The
