@@ -107,16 +107,18 @@ impl GuildId {
     /// ```rust,ignore
     /// use serenity::model::{ChannelType, GuildId};
     ///
-    /// let _channel = GuildId(7).create_channel("test", ChannelType::Voice);
+    /// let _channel = GuildId(7).create_channel("test", ChannelType::Voice, None);
     /// ```
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`http::create_channel`]: ../http/fn.create_channel.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
-    pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
+    pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
+        where C: Into<Option<ChannelId>> {
         let map = json!({
             "name": name,
             "type": kind as u8,
+            "parent_id": category.into().map(|c| c.0)
         });
 
         http::create_channel(self.0, &map)

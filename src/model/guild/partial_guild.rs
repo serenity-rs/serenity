@@ -96,15 +96,16 @@ impl PartialGuild {
     /// ```rust,ignore
     /// use serenity::model::ChannelType;
     ///
-    /// guild.create_channel("test", ChannelType::Voice);
+    /// guild.create_channel("test", ChannelType::Voice, None);
     /// ```
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`http::create_channel`]: ../http/fn.create_channel.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
-    pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
-        self.id.create_channel(name, kind)
+    pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
+        where C: Into<Option<ChannelId>> {
+        self.id.create_channel(name, kind, category)
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
