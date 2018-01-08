@@ -8,6 +8,7 @@ os:
   - osx
 cache:
   cargo: true
+  timeout: 900
 matrix:
   allow_failures:
     - nightly
