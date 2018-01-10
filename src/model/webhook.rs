@@ -1,6 +1,5 @@
 //! Webhook model and implementations.
 
-use super::channel::Message;
 use super::id::{ChannelId, GuildId, WebhookId};
 use super::user::User;
 
@@ -10,6 +9,8 @@ use builder::ExecuteWebhook;
 use internal::prelude::*;
 #[cfg(feature = "model")]
 use std::mem;
+#[cfg(feature = "model")]
+use super::channel::Message;
 #[cfg(feature = "model")]
 use {http, utils};
 

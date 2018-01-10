@@ -42,7 +42,6 @@ pub use self::permissions::Permissions;
 
 use internal::prelude::*;
 use parking_lot::RwLock;
-use self::id::GuildId;
 use self::utils::*;
 use serde::de::Visitor;
 use std::collections::HashMap;

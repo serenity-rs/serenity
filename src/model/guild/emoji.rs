@@ -8,7 +8,7 @@ use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::super::ModelError;
 #[cfg(all(feature = "cache", feature = "model"))]
-use super::super::GuildId;
+use super::super::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
 use {CACHE, http};
 
