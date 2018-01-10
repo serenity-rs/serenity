@@ -820,7 +820,7 @@ impl Client {
             let user = http::get_current_user()?;
 
             if let Some(ref mut framework) = *self.framework.lock() {
-                framework.update_current_user(user.id, user.bot);
+                framework.update_current_user(user.id);
             }
         }
 

@@ -222,7 +222,7 @@ pub struct StandardFramework {
     /// ../client/event_handler/trait.EventHandler.html#method.on_message
     /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
     pub initialized: bool,
-    user_info: (u64, bool),
+    user_id: u64,
 }
 
 impl StandardFramework {
@@ -1050,8 +1050,8 @@ impl Framework for StandardFramework {
         }
     }
 
-    fn update_current_user(&mut self, user_id: UserId, is_bot: bool) {
-        self.user_info = (user_id.0, is_bot);
+    fn update_current_user(&mut self, user_id: UserId) {
+        self.user_id = user_id.0;
     }
 }
 

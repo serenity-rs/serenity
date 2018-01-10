@@ -73,7 +73,7 @@ pub trait Framework {
 
     #[doc(hidden)]
     #[cfg(feature = "standard_framework")]
-    fn update_current_user(&mut self, UserId, bool) {}
+    fn update_current_user(&mut self, UserId) {}
 }
 
 impl<F: Framework + ?Sized> Framework for Box<F> {
@@ -82,8 +82,8 @@ impl<F: Framework + ?Sized> Framework for Box<F> {
     }
 
     #[cfg(feature = "standard_framework")]
-    fn update_current_user(&mut self, id: UserId, is_bot: bool) {
-        (**self).update_current_user(id, is_bot);
+    fn update_current_user(&mut self, id: UserId) {
+        (**self).update_current_user(id);
     }
 }
 
@@ -93,8 +93,8 @@ impl<'a, F: Framework + ?Sized> Framework for &'a mut F {
     }
 
     #[cfg(feature = "standard_framework")]
-    fn update_current_user(&mut self, id: UserId, is_bot: bool) {
-        (**self).update_current_user(id, is_bot);
+    fn update_current_user(&mut self, id: UserId) {
+        (**self).update_current_user(id);
     }
 }
 
