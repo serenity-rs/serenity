@@ -240,9 +240,38 @@ pub fn with_embeds<H: BuildHasher>(
                     let cmd = cmd.options();
 
                     if !cmd.dm_only && !cmd.guild_only || cmd.dm_only && msg.is_private() || cmd.guild_only && !msg.is_private() {
+
                         if cmd.help_available && has_correct_permissions(&cmd, msg) {
-                            let _ = write!(desc, "`{}`\n", name);
-                            has_commands = true;
+
+                            if let Some(guild) = msg.guild() {
+                                let guild = guild.read();
+
+                                if let Some(member) = guild.members.get(&msg.author.id) {
+
+                                    if has_correct_roles(&cmd, &guild, &member) {
+                                        let _ = write!(desc, "`{}`\n", name);
+                                        has_commands = true;
+                                    } else {
+                                        match help_options.lacking_role {
+                                            HelpBehaviour::Strike => {
+                                                let name = format!("~~`{}`~~", &name);
+                                                let _ = write!(desc, "{}\n", name);
+                                                has_commands = true;
+                                            },
+                                                HelpBehaviour::Nothing => {
+                                                let _ = write!(desc, "`{}`\n", name);
+                                                has_commands = true;
+                                            },
+                                                HelpBehaviour::Hide => {
+                                                continue;
+                                            },
+                                        }
+                                    }
+                                }
+                            } else {
+                                let _ = write!(desc, "`{}`\n", name);
+                                has_commands = true;
+                            }
                         } else {
                             match help_options.lacking_permissions {
                                 HelpBehaviour::Strike => {
@@ -439,7 +468,32 @@ pub fn plain<H: BuildHasher>(
 
             if !cmd.dm_only && !cmd.guild_only || cmd.dm_only && msg.is_private() || cmd.guild_only && !msg.is_private() {
                 if cmd.help_available && has_correct_permissions(&cmd, msg) {
-                    let _ = write!(group_help, "`{}` ", name);
+
+                    if let Some(guild) = msg.guild() {
+                        let guild = guild.read();
+
+                        if let Some(member) = guild.members.get(&msg.author.id) {
+
+                            if has_correct_roles(&cmd, &guild, &member) {
+                                let _ = write!(group_help, "`{}` ", name);
+                            } else {
+                                match help_options.lacking_role {
+                                    HelpBehaviour::Strike => {
+                                        let name = format!("~~`{}`~~", &name);
+                                        let _ = write!(group_help, "{} ", name);
+                                    },
+                                    HelpBehaviour::Nothing => {
+                                        let _ = write!(group_help, "`{}` ", name);
+                                    },
+                                    HelpBehaviour::Hide => {
+                                        continue;
+                                    },
+                                }
+                            }
+                        }
+                    } else {
+                        let _ = write!(group_help, "`{}` ", name);
+                    }
                 } else {
                     match help_options.lacking_permissions {
                         HelpBehaviour::Strike => {
