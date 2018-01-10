@@ -39,6 +39,7 @@ pub use CACHE;
 
 use http;
 use internal::prelude::*;
+use model::id::UserId;
 use parking_lot::Mutex;
 use self::bridge::gateway::{ShardManager, ShardManagerMonitor};
 use std::sync::Arc;
@@ -276,6 +277,10 @@ pub struct Client {
     pub threadpool: ThreadPool,
     /// The token in use by the client.
     pub token: Arc<Mutex<String>>,
+    /// The ID of the user for this client.
+    ///
+    /// This is retrieved when the client is created using the given token.
+    pub user_id: UserId,
     /// URI that the client's shards will use to connect to the gateway.
     ///
     /// This is likely not important for production usage and is, at best, used
@@ -327,6 +332,8 @@ impl Client {
         };
 
         http::set_token(&token);
+        let user_id = http::get_current_user()?.id;
+
         let locked = Arc::new(Mutex::new(token));
 
         let name = "serenity client".to_owned();
@@ -358,6 +365,7 @@ impl Client {
                 shard_manager,
                 shard_manager_worker,
                 threadpool,
+                user_id,
             }
         } else {
             let (shard_manager, shard_manager_worker) = ShardManager::new(
@@ -378,6 +386,7 @@ impl Client {
                 shard_manager,
                 shard_manager_worker,
                 threadpool,
+                user_id,
             }
         }})
     }
@@ -817,10 +826,8 @@ impl Client {
         // This also acts as a form of check to ensure the token is correct.
         #[cfg(all(feature = "standard_framework", feature = "framework"))]
         {
-            let user = http::get_current_user()?;
-
             if let Some(ref mut framework) = *self.framework.lock() {
-                framework.update_current_user(user.id);
+                framework.update_current_user(self.user_id);
             }
         }
 
