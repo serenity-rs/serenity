@@ -1071,10 +1071,14 @@ pub fn has_correct_permissions(command: &Arc<CommandOptions>, message: &Message)
 
 #[cfg(feature = "cache")]
 pub fn has_correct_roles(cmd: &Arc<CommandOptions>, guild: &Guild, member: &Member) -> bool {
-    cmd.allowed_roles
+    if cmd.allowed_roles.is_empty() {
+        true
+    } else {
+        cmd.allowed_roles
             .iter()
             .flat_map(|r| guild.role_by_name(r))
             .any(|g| member.roles.contains(&g.id))
+    }
 }
 
 /// Describes the behaviour the help-command shall execute once it encounters
