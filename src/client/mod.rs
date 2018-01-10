@@ -41,7 +41,7 @@ use http;
 use internal::prelude::*;
 use model::id::UserId;
 use parking_lot::Mutex;
-use self::bridge::gateway::{ShardManager, ShardManagerMonitor};
+use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptions};
 use std::sync::Arc;
 use threadpool::ThreadPool;
 use typemap::ShareMap;
@@ -342,53 +342,34 @@ impl Client {
         let data = Arc::new(Mutex::new(ShareMap::custom()));
         let event_handler = Arc::new(handler);
 
-        Ok(feature_framework! {{
-            let framework = Arc::new(Mutex::new(None));
+        #[cfg(feature = "framework")]
+        let framework = Arc::new(Mutex::new(None));
+        let (shard_manager, shard_manager_worker) = {
+            ShardManager::new(ShardManagerOptions {
+                data: &data,
+                event_handler: &event_handler,
+                #[cfg(feature = "framework")]
+                framework: &framework,
+                shard_index: 0,
+                shard_init: 0,
+                shard_total: 0,
+                threadpool: threadpool.clone(),
+                token: &locked,
+                ws_url: &url,
+            })
+        };
 
-            let (shard_manager, shard_manager_worker) = ShardManager::new(
-                0,
-                0,
-                0,
-                &url,
-                &locked,
-                &data,
-                &event_handler,
-                &framework,
-                threadpool.clone(),
-            );
-
-            Client {
-                token: locked,
-                ws_uri: url,
-                framework,
-                data,
-                shard_manager,
-                shard_manager_worker,
-                threadpool,
-                user_id,
-            }
-        } else {
-            let (shard_manager, shard_manager_worker) = ShardManager::new(
-                0,
-                0,
-                0,
-                Arc::clone(&url),
-                locked.clone(),
-                data.clone(),
-                Arc::clone(&event_handler),
-                threadpool.clone(),
-            );
-
-            Client {
-                token: locked,
-                ws_uri: url,
-                data,
-                shard_manager,
-                shard_manager_worker,
-                threadpool,
-                user_id,
-            }
-        }})
+        Ok(Client {
+            token: locked,
+            ws_uri: url,
+            #[cfg(feature = "framework")]
+            framework,
+            data,
+            shard_manager,
+            shard_manager_worker,
+            threadpool,
+            user_id,
+        })
     }
 
     /// Sets a framework to be used with the client. All message events will be

@@ -56,7 +56,7 @@ mod shard_queuer;
 mod shard_runner;
 mod shard_runner_message;
 
-pub use self::shard_manager::ShardManager;
+pub use self::shard_manager::{ShardManager, ShardManagerOptions};
 pub use self::shard_manager_monitor::ShardManagerMonitor;
 pub use self::shard_messenger::ShardMessenger;
 pub use self::shard_queuer::ShardQueuer;
