@@ -43,7 +43,7 @@ use framework::Framework;
 /// # fn try_main() -> Result<(), Box<Error>> {
 /// #
 /// use parking_lot::Mutex;
-/// use serenity::client::bridge::gateway::ShardManager;
+/// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::client::EventHandler;
 /// use serenity::http;
 /// use std::sync::Arc;
@@ -65,17 +65,20 @@ use framework::Framework;
 /// let framework = Arc::new(Mutex::new(None));
 /// let threadpool = ThreadPool::with_name("my threadpool".to_owned(), 5);
 ///
-/// ShardManager::new(
-///     0, // the shard index to start initiating from
-///     3, // the number of shards to initiate (this initiates 0, 1, and 2)
-///     5, // the total number of shards in use
-///     &gateway_url,
-///     &token,
-///     &data,
-///     &event_handler,
-///     &framework,
+/// ShardManager::new(ShardManagerOptions {
+///     data: &data,
+///     event_handler: &event_handler,
+///     framework: &framework,
+///     // the shard index to start initiating from
+///     shard_index: 0,
+///     // the number of shards to initiate (this initiates 0, 1, and 2)
+///     shard_init: 3,
+///     // the total number of shards in use
+///     shard_total: 5,
+///     token: &token,
 ///     threadpool,
-/// );
+///     ws_url: &gateway_url,
+/// });
 /// #     Ok(())
 /// # }
 /// #
