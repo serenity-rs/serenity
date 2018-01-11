@@ -207,33 +207,23 @@ impl CreateCommand {
     }
 
     pub(crate) fn finish(self) -> Arc<Command> {
+        struct A<C: Command>(Arc<CommandOptions>, C);
+
+        impl<C: Command> Command for A<C> {
+            fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), CommandError> {
+                self.1.execute(c, m, a)
+            }
+
+            fn options(&self) -> Arc<CommandOptions> { Arc::clone(&self.0) }
+        }
+
         let CreateCommand(options, fc) = self;
 
         match fc {
             FnOrCommand::Fn(func) => {
-                struct A(Arc<CommandOptions>, fn(&mut Context, &Message, Args) -> Result<(), CommandError>);
-
-                impl Command for A {
-                    fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), CommandError> {
-                        (self.1)(c, m, a)
-                    }
-
-                    fn options(&self) -> Arc<CommandOptions> { Arc::clone(&self.0) }
-                }
-
                 Arc::new(A(Arc::new(options), func))
             },
             FnOrCommand::Command(cmd) => {
-                struct A(Arc<CommandOptions>, Arc<Command>);
-
-                impl Command for A {
-                    fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), CommandError> {
-                        self.1.execute(c, m, a)
-                    }
-
-                    fn options(&self) -> Arc<CommandOptions> { Arc::clone(&self.0) }
-                }
-
                 Arc::new(A(Arc::new(options), cmd))
             },
             FnOrCommand::CommandWithOptions(cmd) => cmd,
