@@ -823,6 +823,25 @@ impl CacheUpdate for PresenceUpdateEvent {
                         .presences
                         .insert(self.presence.user_id, self.presence.clone());
                 }
+
+                // Create a partial member instance out of the presence update
+                // data. This includes everything but `deaf`, `mute`, and
+                // `joined_at`.
+                if !guild.members.contains_key(&self.presence.user_id) {
+                    if let Some(user) = self.presence.user.as_ref() {
+                        let roles = self.roles.clone().unwrap_or_default();
+
+                        guild.members.insert(self.presence.user_id, Member {
+                            deaf: false,
+                            guild_id: guild_id,
+                            joined_at: None,
+                            mute: false,
+                            nick: self.presence.nick.clone(),
+                            user: Arc::clone(&user),
+                            roles,
+                        });
+                    }
+                }
             }
         } else if self.presence.status == OnlineStatus::Offline {
             cache.presences.remove(&self.presence.user_id);
