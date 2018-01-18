@@ -5,7 +5,7 @@ use model::prelude::*;
 use serde_json::Value;
 
 #[cfg(feature = "model")]
-use builder::{CreateEmbed, CreateMessage};
+use builder::{CreateEmbed, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -178,7 +178,7 @@ impl Message {
     ///
     /// Message editing preserves all unchanged message data.
     ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// Refer to the documentation for [`EditMessage`] for more information
     /// regarding message restrictions and requirements.
     ///
     /// **Note**: Requires that the current user be the author of the message.
@@ -204,10 +204,10 @@ impl Message {
     ///
     /// [`ModelError::InvalidUser`]: enum.ModelError.html#variant.InvalidUser
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
-    /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
+    /// [`EditMessage`]: ../builder/struct.EditMessage.html
+    /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
+        where F: FnOnce(EditMessage) -> EditMessage {
         #[cfg(feature = "cache")]
         {
             if self.author.id != CACHE.read().user.id {
@@ -215,7 +215,7 @@ impl Message {
             }
         }
 
-        let mut builder = CreateMessage::default();
+        let mut builder = EditMessage::default();
 
         if !self.content.is_empty() {
             builder = builder.content(&self.content);
@@ -223,10 +223,6 @@ impl Message {
 
         if let Some(embed) = self.embeds.get(0) {
             builder = builder.embed(|_| CreateEmbed::from(embed.clone()));
-        }
-
-        if self.tts {
-            builder = builder.tts(true);
         }
 
         let map = serenity_utils::vecmap_to_json_map(f(builder).0);

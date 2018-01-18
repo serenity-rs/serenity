@@ -6,7 +6,7 @@ use std::borrow::Cow;
 #[cfg(feature = "model")]
 use std::fmt::Write as FmtWrite;
 #[cfg(feature = "model")]
-use builder::{CreateMessage, EditChannel, GetMessages};
+use builder::{CreateMessage, EditChannel, EditMessage, GetMessages};
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
@@ -200,7 +200,7 @@ impl ChannelId {
     ///
     /// Message editing preserves all unchanged message data.
     ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// Refer to the documentation for [`EditMessage`] for more information
     /// regarding message restrictions and requirements.
     ///
     /// **Note**: Requires that the current user be the author of the message.
@@ -212,12 +212,12 @@ impl ChannelId {
     /// over the limit.
     ///
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
+    /// [`EditMessage`]: ../builder/struct.EditMessage.html
     /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
+    /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
-        let msg = f(CreateMessage::default());
+        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
+        let msg = f(EditMessage::default());
 
         if let Some(content) = msg.0.get(&"content") {
             if let Value::String(ref content) = *content {

@@ -4,7 +4,7 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_single_recipient;
 
 #[cfg(feature = "model")]
-use builder::{CreateMessage, GetMessages};
+use builder::{CreateMessage, EditMessage, GetMessages};
 #[cfg(feature = "model")]
 use http::AttachmentType;
 #[cfg(feature = "model")]
@@ -116,7 +116,7 @@ impl PrivateChannel {
     ///
     /// Message editing preserves all unchanged message data.
     ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// Refer to the documentation for [`EditMessage`] for more information
     /// regarding message restrictions and requirements.
     ///
     /// **Note**: Requires that the current user be the author of the message.
@@ -128,12 +128,12 @@ impl PrivateChannel {
     /// over the limit.
     ///
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
+    /// [`EditMessage`]: ../builder/struct.EditMessage.html
     /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
+    /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
+        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
         self.id.edit_message(message_id, f)
     }
 
