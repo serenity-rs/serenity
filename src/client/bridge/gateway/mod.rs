@@ -60,7 +60,7 @@ pub use self::shard_manager::{ShardManager, ShardManagerOptions};
 pub use self::shard_manager_monitor::ShardManagerMonitor;
 pub use self::shard_messenger::ShardMessenger;
 pub use self::shard_queuer::ShardQueuer;
-pub use self::shard_runner::ShardRunner;
+pub use self::shard_runner::{ShardRunner, ShardRunnerOptions};
 pub use self::shard_runner_message::ShardRunnerMessage;
 
 use std::fmt::{Display, Formatter, Result as FmtResult};

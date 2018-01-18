@@ -47,6 +47,10 @@ use typemap::ShareMap;
 
 #[cfg(feature = "framework")]
 use framework::Framework;
+#[cfg(feature = "voice")]
+use model::id::UserId;
+#[cfg(feature = "voice")]
+use self::bridge::voice::ClientVoiceManager;
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
@@ -276,6 +280,12 @@ pub struct Client {
     pub threadpool: ThreadPool,
     /// The token in use by the client.
     pub token: Arc<Mutex<String>>,
+    /// The voice manager for the client.
+    ///
+    /// This is an ergonomic structure for interfacing over shards' voice
+    /// connections.
+    #[cfg(feature = "voice")]
+    pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
     /// URI that the client's shards will use to connect to the gateway.
     ///
     /// This is likely not important for production usage and is, at best, used
@@ -337,6 +347,12 @@ impl Client {
 
         #[cfg(feature = "framework")]
         let framework = Arc::new(Mutex::new(None));
+        #[cfg(feature = "voice")]
+        let voice_manager = Arc::new(Mutex::new(ClientVoiceManager::new(
+            0,
+            UserId(0),
+        )));
+
         let (shard_manager, shard_manager_worker) = {
             ShardManager::new(ShardManagerOptions {
                 data: &data,
@@ -348,6 +364,8 @@ impl Client {
                 shard_total: 0,
                 threadpool: threadpool.clone(),
                 token: &locked,
+                #[cfg(feature = "voice")]
+                voice_manager: &voice_manager,
                 ws_url: &url,
             })
         };
@@ -361,6 +379,8 @@ impl Client {
             shard_manager,
             shard_manager_worker,
             threadpool,
+            #[cfg(feature = "voice")]
+            voice_manager,
         })
     }
 
@@ -794,15 +814,31 @@ impl Client {
     //
     // [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     fn start_connection(&mut self, shard_data: [u64; 3]) -> Result<()> {
-        // Update the framework's current user if the feature is enabled.
+        #[cfg(feature = "voice")]
+        self.voice_manager.lock().set_shard_count(shard_data[2]);
+
+        // This is kind of gross, but oh well.
         //
-        // This also acts as a form of check to ensure the token is correct.
-        #[cfg(all(feature = "standard_framework", feature = "framework"))]
+        // Both the framework and voice bridge need the user's ID, so we'll only
+        // retrieve it over REST if at least one of those are enabled.
+        #[cfg(any(all(feature = "standard_framework", feature = "framework"),
+                  feature = "voice"))]
         {
             let user = http::get_current_user()?;
 
-            if let Some(ref mut framework) = *self.framework.lock() {
-                framework.update_current_user(user.id);
+            // Update the framework's current user if the feature is enabled.
+            //
+            // This also acts as a form of check to ensure the token is correct.
+            #[cfg(all(feature = "standard_framework", feature = "framework"))]
+            {
+                if let Some(ref mut framework) = *self.framework.lock() {
+                    framework.update_current_user(user.id);
+                }
+            }
+
+            #[cfg(feature = "voice")]
+            {
+                self.voice_manager.lock().set_user_id(user.id);
             }
         }
 

@@ -13,11 +13,14 @@ use super::{
     ShardQueuerMessage,
     ShardRunner,
     ShardRunnerInfo,
+    ShardRunnerOptions,
 };
 use threadpool::ThreadPool;
 use typemap::ShareMap;
 use ::gateway::ConnectionStage;
 
+#[cfg(feature = "voice")]
+use client::bridge::voice::ClientVoiceManager;
 #[cfg(feature = "framework")]
 use framework::Framework;
 
@@ -70,6 +73,9 @@ pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static> {
     pub threadpool: ThreadPool,
     /// A copy of the token to connect with.
     pub token: Arc<Mutex<String>>,
+    /// A copy of the client's voice manager.
+    #[cfg(feature = "voice")]
+    pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
     /// A copy of the URI to use to connect to the gateway.
     pub ws_url: Arc<Mutex<String>>,
 }
@@ -165,24 +171,17 @@ impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
             shard_info,
         )?;
 
-        let mut runner = feature_framework! {{
-            ShardRunner::new(
-                shard,
-                self.manager_tx.clone(),
-                Arc::clone(&self.framework),
-                Arc::clone(&self.data),
-                Arc::clone(&self.event_handler),
-                self.threadpool.clone(),
-            )
-        } else {
-            ShardRunner::new(
-                shard,
-                self.manager_tx.clone(),
-                self.data.clone(),
-                self.event_handler.clone(),
-                self.threadpool.clone(),
-            )
-        }};
+        let mut runner = ShardRunner::new(ShardRunnerOptions {
+            data: Arc::clone(&self.data),
+            event_handler: Arc::clone(&self.event_handler),
+            #[cfg(feature = "framework")]
+            framework: Arc::clone(&self.framework),
+            manager_tx: self.manager_tx.clone(),
+            threadpool: self.threadpool.clone(),
+            #[cfg(feature = "voice")]
+            voice_manager: Arc::clone(&self.voice_manager),
+            shard,
+        });
 
         let runner_info = ShardRunnerInfo {
             latency: None,

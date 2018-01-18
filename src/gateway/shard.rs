@@ -21,17 +21,6 @@ use websocket::stream::sync::AsTcpStream;
 use websocket::sync::client::ClientBuilder;
 use websocket::WebSocketError;
 
-#[cfg(feature = "voice")]
-use serde_json::Value;
-#[cfg(feature = "voice")]
-use std::sync::mpsc::{self, Receiver as MpscReceiver};
-#[cfg(feature = "voice")]
-use super::InterMessage;
-#[cfg(feature = "voice")]
-use voice::Manager as VoiceManager;
-#[cfg(feature = "voice")]
-use http;
-
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the
 /// websocket, such as setting the active game, reconnecting, syncing guilds,
@@ -92,12 +81,6 @@ pub struct Shard {
     stage: ConnectionStage,
     pub token: Arc<Mutex<String>>,
     ws_url: Arc<Mutex<String>>,
-    /// The voice connections that this Shard is responsible for. The Shard will
-    /// update the voice connections' states.
-    #[cfg(feature = "voice")]
-    pub manager: VoiceManager,
-    #[cfg(feature = "voice")]
-    manager_rx: MpscReceiver<InterMessage>,
 }
 
 impl Shard {
@@ -155,44 +138,19 @@ impl Shard {
         let stage = ConnectionStage::Handshake;
         let session_id = None;
 
-        Ok(feature_voice! {
-            {
-                let (tx, rx) = mpsc::channel();
-
-                let user = http::get_current_user()?;
-
-                Shard {
-                    manager: VoiceManager::new(tx, user.id),
-                    manager_rx: rx,
-                    shutdown: false,
-                    client,
-                    current_presence,
-                    heartbeat_instants,
-                    heartbeat_interval,
-                    last_heartbeat_acknowledged,
-                    seq,
-                    stage,
-                    token,
-                    shard_info,
-                    session_id,
-                    ws_url,
-                }
-            } else {
-                Shard {
-                    shutdown: false,
-                    client,
-                    current_presence,
-                    heartbeat_instants,
-                    heartbeat_interval,
-                    last_heartbeat_acknowledged,
-                    seq,
-                    stage,
-                    token,
-                    session_id,
-                    shard_info,
-                    ws_url,
-                }
-            }
+        Ok(Shard {
+            shutdown: false,
+            client,
+            current_presence,
+            heartbeat_instants,
+            heartbeat_interval,
+            last_heartbeat_acknowledged,
+            seq,
+            stage,
+            token,
+            session_id,
+            shard_info,
+            ws_url,
         })
     }
 
@@ -407,10 +365,6 @@ impl Shard {
 
                         self.session_id = Some(ready.ready.session_id.clone());
                         self.stage = ConnectionStage::Connected;
-
-                        /*
-                        set_client_timeout(&mut self.client)?;
-                        */
                     },
                     Event::Resumed(_) => {
                         info!("[Shard {:?}] Resumed", self.shard_info);
@@ -419,13 +373,7 @@ impl Shard {
                         self.last_heartbeat_acknowledged = true;
                         self.heartbeat_instants = (Some(Instant::now()), None);
                     },
-                    #[cfg_attr(rustfmt, rustfmt_skip)]
-                    ref _other => {
-                        #[cfg(feature = "voice")]
-                        {
-                            self.voice_dispatch(_other);
-                        }
-                    },
+                    _ => {},
                 }
 
                 self.seq = seq;
@@ -662,39 +610,6 @@ impl Shard {
         }
 
         None
-    }
-
-    #[cfg(feature = "voice")]
-    fn voice_dispatch(&mut self, event: &Event) {
-        if let Event::VoiceStateUpdate(ref update) = *event {
-            if let Some(guild_id) = update.guild_id {
-                if let Some(handler) = self.manager.get(guild_id) {
-                    handler.update_state(&update.voice_state);
-                }
-            }
-        }
-
-        if let Event::VoiceServerUpdate(ref update) = *event {
-            if let Some(guild_id) = update.guild_id {
-                if let Some(handler) = self.manager.get(guild_id) {
-                    handler.update_server(&update.endpoint, &update.token);
-                }
-            }
-        }
-    }
-
-    #[cfg(feature = "voice")]
-    pub(crate) fn cycle_voice_recv(&mut self) -> Vec<Value> {
-        let mut messages = vec![];
-
-        while let Ok(InterMessage::Json(v)) = self.manager_rx.try_recv() {
-            messages.push(v);
-        }
-
-        self.shutdown = true;
-        debug!("[Shard {:?}] Cleanly shutdown shard", self.shard_info);
-
-        messages
     }
 
     /// Performs a deterministic reconnect.

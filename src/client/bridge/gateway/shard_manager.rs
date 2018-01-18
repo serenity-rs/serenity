@@ -20,6 +20,8 @@ use typemap::ShareMap;
 
 #[cfg(feature = "framework")]
 use framework::Framework;
+#[cfg(feature = "voice")]
+use client::bridge::voice::ClientVoiceManager;
 
 /// A manager for handling the status of shards by starting them, restarting
 /// them, and stopping them when required.
@@ -39,6 +41,11 @@ use framework::Framework;
 /// extern crate typemap;
 ///
 /// # use std::error::Error;
+/// #
+/// # #[cfg(feature = "voice")]
+/// # use serenity::client::bridge::voice::ClientVoiceManager;
+/// # #[cfg(feature = "voice")]
+/// # use serenity::model::id::UserId;
 /// #
 /// # #[cfg(feature = "framework")]
 /// # fn try_main() -> Result<(), Box<Error>> {
@@ -78,6 +85,8 @@ use framework::Framework;
 ///     shard_total: 5,
 ///     token: &token,
 ///     threadpool,
+///     # #[cfg(feature = "voice")]
+///     # voice_manager: &Arc::new(Mutex::new(ClientVoiceManager::new(0, UserId(0)))),
 ///     ws_url: &gateway_url,
 /// });
 /// #     Ok(())
@@ -135,6 +144,8 @@ impl ShardManager {
             rx: shard_queue_rx,
             threadpool: opt.threadpool,
             token: Arc::clone(opt.token),
+            #[cfg(feature = "voice")]
+            voice_manager: Arc::clone(opt.voice_manager),
             ws_url: Arc::clone(opt.ws_url),
         };
 
@@ -343,5 +354,7 @@ pub struct ShardManagerOptions<'a, H: EventHandler + Send + Sync + 'static> {
     pub shard_total: u64,
     pub threadpool: ThreadPool,
     pub token: &'a Arc<Mutex<String>>,
+    #[cfg(feature = "voice")]
+    pub voice_manager: &'a Arc<Mutex<ClientVoiceManager>>,
     pub ws_url: &'a Arc<Mutex<String>>,
 }

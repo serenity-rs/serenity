@@ -7,17 +7,38 @@
 //! features = ["cache", "framework", "standard_framework", "voice"]
 //! ```
 
-#[macro_use]
-extern crate serenity;
+#[macro_use] extern crate serenity;
 
-use serenity::client::CACHE;
+extern crate typemap;
+
+// Import the client's bridge to the voice manager. Since voice is a standalone
+// feature, it's not as ergonomic to work with as it could be. The client
+// provides a clean bridged integration with voice.
+use serenity::client::bridge::voice::ClientVoiceManager;
+use serenity::client::{CACHE, Client, Context, EventHandler};
 use serenity::framework::StandardFramework;
+use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::model::id::ChannelId;
-use serenity::prelude::*;
+use serenity::model::misc::Mentionable;
+// Import the `Context` from the client and `parking_lot`'s `Mutex`.
+//
+// `parking_lot` offers much more efficient implementations of `std::sync`'s
+// types. You can read more about it here:
+//
+// <https://github.com/Amanieu/parking_lot#features>
+use serenity::prelude::Mutex;
 use serenity::voice;
 use serenity::Result as SerenityResult;
 use std::env;
+use std::sync::Arc;
+use typemap::Key;
+
+struct VoiceManager;
+
+impl Key for VoiceManager {
+    type Value = Arc<Mutex<ClientVoiceManager>>;
+}
 
 struct Handler;
 
@@ -33,18 +54,26 @@ fn main() {
         .expect("Expected a token in the environment");
     let mut client = Client::new(&token, Handler).expect("Err creating client");
 
+    // Obtain a lock to the data owned by the client, and insert the client's
+    // voice manager into it. This allows the voice manager to be accessible by
+    // event handlers and framework commands.
+    {
+        let mut data = client.data.lock();
+        data.insert::<VoiceManager>(Arc::clone(&client.voice_manager));
+    }
+
     client.with_framework(StandardFramework::new()
         .configure(|c| c
             .prefix("~")
             .on_mention(true))
-        .on("deafen", deafen)
-        .on("join", join)
-        .on("leave", leave)
-        .on("mute", mute)
-        .on("play", play)
-        .on("ping", ping)
-        .on("undeafen", undeafen)
-        .on("unmute", unmute));
+        .cmd("deafen", deafen)
+        .cmd("join", join)
+        .cmd("leave", leave)
+        .cmd("mute", mute)
+        .cmd("play", play)
+        .cmd("ping", ping)
+        .cmd("undeafen", undeafen)
+        .cmd("unmute", unmute));
 
     let _ = client.start().map_err(|why| println!("Client ended: {:?}", why));
 }
@@ -59,9 +88,10 @@ command!(deafen(ctx, msg) {
         },
     };
 
-    let mut shard = ctx.shard.lock();
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager = manager_lock.lock();
 
-    let handler = match shard.manager.get(guild_id) {
+    let handler = match manager.get_mut(guild_id) {
         Some(handler) => handler,
         None => {
             check_msg(msg.reply("Not in a voice channel"));
@@ -80,17 +110,10 @@ command!(deafen(ctx, msg) {
 });
 
 command!(join(ctx, msg, args) {
-    let connect_to = match args.get(0) {
-        Some(arg) => match arg.parse::<u64>() {
-            Ok(id) => ChannelId(id),
-            Err(_why) => {
-                check_msg(msg.reply("Invalid voice channel ID given"));
-
-                return Ok(());
-            },
-        },
-        None => {
-            check_msg(msg.reply("Requires a voice channel ID be given"));
+    let connect_to = match args.single::<u64>() {
+        Ok(id) => ChannelId(id),
+        Err(_) => {
+            check_msg(msg.reply("Requires a valid voice channel ID be given"));
 
             return Ok(());
         },
@@ -105,10 +128,14 @@ command!(join(ctx, msg, args) {
         },
     };
 
-    let mut shard = ctx.shard.lock();
-    shard.manager.join(guild_id, connect_to);
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager = manager_lock.lock();
 
-    check_msg(msg.channel_id.say(&format!("Joined {}", connect_to.mention())));
+    if manager.join(guild_id, connect_to).is_some() {
+        check_msg(msg.channel_id.say(&format!("Joined {}", connect_to.mention())));
+    } else {
+        check_msg(msg.channel_id.say("Error joining the channel"));
+    }
 });
 
 command!(leave(ctx, msg) {
@@ -121,11 +148,12 @@ command!(leave(ctx, msg) {
         },
     };
 
-    let mut shard = ctx.shard.lock();
-    let has_handler = shard.manager.get(guild_id).is_some();
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager = manager_lock.lock();
+    let has_handler = manager.get(guild_id).is_some();
 
     if has_handler {
-        shard.manager.remove(guild_id);
+        manager.remove(guild_id);
 
         check_msg(msg.channel_id.say("Left voice channel"));
     } else {
@@ -143,9 +171,10 @@ command!(mute(ctx, msg) {
         },
     };
 
-    let mut shard = ctx.shard.lock();
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager = manager_lock.lock();
 
-    let handler = match shard.manager.get(guild_id) {
+    let handler = match manager.get_mut(guild_id) {
         Some(handler) => handler,
         None => {
             check_msg(msg.reply("Not in a voice channel"));
@@ -168,9 +197,9 @@ command!(ping(_context, msg) {
 });
 
 command!(play(ctx, msg, args) {
-    let url = match args.get(0) {
-        Some(url) => url,
-        None => {
+    let url = match args.single::<String>() {
+        Ok(url) => url,
+        Err(_) => {
             check_msg(msg.channel_id.say("Must provide a URL to a video or audio"));
 
             return Ok(());
@@ -192,8 +221,11 @@ command!(play(ctx, msg, args) {
         },
     };
 
-    if let Some(handler) = ctx.shard.lock().manager.get(guild_id) {
-        let source = match voice::ytdl(url) {
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager = manager_lock.lock();
+
+    if let Some(handler) = manager.get_mut(guild_id) {
+        let source = match voice::ytdl(&url) {
             Ok(source) => source,
             Err(why) => {
                 println!("Err starting source: {:?}", why);
@@ -222,7 +254,10 @@ command!(undeafen(ctx, msg) {
         },
     };
 
-    if let Some(handler) = ctx.shard.lock().manager.get(guild_id) {
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager = manager_lock.lock();
+
+    if let Some(handler) = manager.get_mut(guild_id) {
         handler.deafen(false);
 
         check_msg(msg.channel_id.say("Undeafened"));
@@ -240,8 +275,10 @@ command!(unmute(ctx, msg) {
             return Ok(());
         },
     };
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager = manager_lock.lock();
 
-    if let Some(handler) = ctx.shard.lock().manager.get(guild_id) {
+    if let Some(handler) = manager.get_mut(guild_id) {
         handler.mute(false);
 
         check_msg(msg.channel_id.say("Unmuted"));

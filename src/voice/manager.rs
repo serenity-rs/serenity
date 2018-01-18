@@ -36,8 +36,14 @@ impl Manager {
         }
     }
 
+    /// Retrieves an immutable handler for the given target, if one exists.
+    pub fn get<G: Into<GuildId>>(&self, guild_id: G) -> Option<&Handler> {
+        self.handlers.get(&guild_id.into())
+    }
+
     /// Retrieves a mutable handler for the given target, if one exists.
-    pub fn get<G: Into<GuildId>>(&mut self, guild_id: G) -> Option<&mut Handler> {
+    pub fn get_mut<G: Into<GuildId>>(&mut self, guild_id: G)
+        -> Option<&mut Handler> {
         self.handlers.get_mut(&guild_id.into())
     }
 

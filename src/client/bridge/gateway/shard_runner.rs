@@ -17,6 +17,8 @@ use websocket::WebSocketError;
 
 #[cfg(feature = "framework")]
 use framework::Framework;
+#[cfg(feature = "voice")]
+use super::super::voice::ClientVoiceManager;
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 ///
@@ -33,53 +35,27 @@ pub struct ShardRunner<H: EventHandler + Send + Sync + 'static> {
     runner_tx: Sender<InterMessage>,
     shard: Shard,
     threadpool: ThreadPool,
+    #[cfg(feature = "voice")]
+    voice_manager: Arc<Mutex<ClientVoiceManager>>,
 }
 
 impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
     /// Creates a new runner for a Shard.
-    #[allow(too_many_arguments)]
-    #[cfg(feature = "framework")]
-    pub fn new(
-        shard: Shard,
-        manager_tx: Sender<ShardManagerMessage>,
-        framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
-        data: Arc<Mutex<ShareMap>>,
-        event_handler: Arc<H>,
-        threadpool: ThreadPool,
-    ) -> Self {
+    pub fn new(opt: ShardRunnerOptions<H>) -> Self {
         let (tx, rx) = mpsc::channel();
 
         Self {
             runner_rx: rx,
             runner_tx: tx,
-            data,
-            event_handler,
-            framework,
-            manager_tx,
-            shard,
-            threadpool,
-        }
-    }
-
-    /// Creates a new runner for a Shard.
-    #[cfg(not(feature = "framework"))]
-    pub fn new(
-        shard: Shard,
-        manager_tx: Sender<ShardManagerMessage>,
-        data: Arc<Mutex<ShareMap>>,
-        event_handler: Arc<H>,
-        threadpool: ThreadPool,
-    ) -> Self {
-        let (tx, rx) = mpsc::channel();
-
-        Self {
-            runner_rx: rx,
-            runner_tx: tx,
-            data,
-            event_handler,
-            manager_tx,
-            shard,
-            threadpool,
+            data: opt.data,
+            event_handler: opt.event_handler,
+            #[cfg(feature = "framework")]
+            framework: opt.framework,
+            manager_tx: opt.manager_tx,
+            shard: opt.shard,
+            threadpool: opt.threadpool,
+            #[cfg(feature = "voice")]
+            voice_manager: opt.voice_manager,
         }
     }
 
@@ -132,19 +108,8 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
                 return self.request_restart();
             }
 
-            #[cfg(feature = "voice")]
-            {
-                for message in self.shard.cycle_voice_recv() {
-                    if let Err(why) = self.shard.client.send_json(&message) {
-                        println!("Err sending from voice over WS: {:?}", why);
-                    }
-                }
-            }
-
             let pre = self.shard.stage();
-
             let (event, action, successful) = self.recv_event();
-
             let post = self.shard.stage();
 
             if post != pre {
@@ -325,6 +290,39 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
         }
     }
 
+    #[cfg(feature = "voice")]
+    fn handle_voice_event(&self, event: &Event) {
+        match *event {
+            Event::Ready(_) => {
+                self.voice_manager.lock().set(
+                    self.shard.shard_info()[0],
+                    self.runner_tx.clone(),
+                );
+            },
+            Event::VoiceServerUpdate(ref event) => {
+                if let Some(guild_id) = event.guild_id {
+                    let mut manager = self.voice_manager.lock();
+                    let mut search = manager.get_mut(guild_id);
+
+                    if let Some(handler) = search {
+                        handler.update_server(&event.endpoint, &event.token);
+                    }
+                }
+            },
+            Event::VoiceStateUpdate(ref event) => {
+                if let Some(guild_id) = event.guild_id {
+                    let mut manager = self.voice_manager.lock();
+                    let mut search = manager.get_mut(guild_id);
+
+                    if let Some(handler) = search {
+                        handler.update_state(&event.voice_state);
+                    }
+                }
+            },
+            _ => {},
+        }
+    }
+
     // Receives values over the internal shard runner rx channel and handles
     // them.
     //
@@ -431,11 +429,15 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             },
         };
 
-        match event {
-            Ok(GatewayEvent::HeartbeatAck) => {
-                self.update_manager();
-            },
-            _ => {},
+        if let Ok(GatewayEvent::HeartbeatAck) = event {
+            self.update_manager();
+        }
+
+        #[cfg(feature = "voice")]
+        {
+            if let Ok(GatewayEvent::Dispatch(_, ref event)) = event {
+                self.handle_voice_event(&event);
+            }
         }
 
         let event = match event {
@@ -457,6 +459,11 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
         let msg = ShardManagerMessage::Restart(shard_id);
         let _ = self.manager_tx.send(msg);
 
+        #[cfg(feature = "voice")]
+        {
+            self.voice_manager.lock().manager_remove(&shard_id.0);
+        }
+
         Ok(())
     }
 
@@ -467,4 +474,19 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             stage: self.shard.stage(),
         });
     }
+}
+
+/// Options to be passed to [`ShardRunner::new`].
+///
+/// [`ShardRunner::new`]: struct.ShardRunner.html#method.new
+pub struct ShardRunnerOptions<H: EventHandler + Send + Sync + 'static> {
+    pub data: Arc<Mutex<ShareMap>>,
+    pub event_handler: Arc<H>,
+    #[cfg(feature = "framework")]
+    pub framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
+    pub manager_tx: Sender<ShardManagerMessage>,
+    pub shard: Shard,
+    pub threadpool: ThreadPool,
+    #[cfg(feature = "voice")]
+    pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
 }
