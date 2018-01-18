@@ -1,9 +1,9 @@
+use gateway::InterMessage;
 use model::event::Event;
 use model::channel::{Channel, Message};
 use std::sync::Arc;
 use parking_lot::Mutex;
 use super::bridge::gateway::event::ClientEvent;
-use super::bridge::gateway::ShardClientMessage;
 use super::event_handler::EventHandler;
 use super::Context;
 use std::sync::mpsc::Sender;
@@ -40,7 +40,7 @@ macro_rules! now {
 
 fn context(
     data: &Arc<Mutex<ShareMap>>,
-    runner_tx: &Sender<ShardClientMessage>,
+    runner_tx: &Sender<InterMessage>,
     shard_id: u64,
 ) -> Context {
     Context::new(Arc::clone(data), runner_tx.clone(), shard_id)
@@ -58,7 +58,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     framework: &Arc<Mutex<Option<Box<Framework + Send>>>>,
     data: &Arc<Mutex<ShareMap>>,
     event_handler: &Arc<H>,
-    runner_tx: &Sender<ShardClientMessage>,
+    runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
     shard_id: u64,
 ) {
@@ -92,7 +92,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     data: &Arc<Mutex<ShareMap>>,
     event_handler: &Arc<H>,
-    runner_tx: &Sender<ShardClientMessage>,
+    runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
     shard_id: u64,
 ) {
@@ -136,7 +136,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     data: &Arc<Mutex<ShareMap>>,
     event_handler: &Arc<H>,
-    runner_tx: &Sender<ShardClientMessage>,
+    runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
     shard_id: u64,
 ) {

@@ -1,4 +1,5 @@
-use client::bridge::gateway::{ShardClientMessage, ShardMessenger};
+use client::bridge::gateway::ShardMessenger;
+use gateway::InterMessage;
 use model::prelude::*;
 use parking_lot::Mutex;
 use std::sync::mpsc::Sender;
@@ -48,7 +49,7 @@ impl Context {
     /// Create a new Context to be passed to an event handler.
     pub(crate) fn new(
         data: Arc<Mutex<ShareMap>>,
-        runner_tx: Sender<ShardClientMessage>,
+        runner_tx: Sender<InterMessage>,
         shard_id: u64,
     ) -> Context {
         Context {

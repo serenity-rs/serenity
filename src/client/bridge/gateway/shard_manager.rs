@@ -1,3 +1,4 @@
+use gateway::InterMessage;
 use internal::prelude::*;
 use parking_lot::Mutex;
 use std::collections::{HashMap, VecDeque};
@@ -264,7 +265,8 @@ impl ShardManager {
 
         if let Some(runner) = self.runners.lock().get(&shard_id) {
             let shutdown = ShardManagerMessage::Shutdown(shard_id);
-            let msg = ShardClientMessage::Manager(shutdown);
+            let client_msg = ShardClientMessage::Manager(shutdown);
+            let msg = InterMessage::Client(client_msg);
 
             if let Err(why) = runner.runner_tx.send(msg) {
                 warn!(

@@ -1,5 +1,5 @@
+use gateway::InterMessage;
 use model::id::{ChannelId, GuildId, UserId};
-use serde_json::Value;
 use std::collections::HashMap;
 use std::sync::mpsc::Sender as MpscSender;
 use super::Handler;
@@ -24,11 +24,11 @@ use super::Handler;
 pub struct Manager {
     handlers: HashMap<GuildId, Handler>,
     user_id: UserId,
-    ws: MpscSender<Value>,
+    ws: MpscSender<InterMessage>,
 }
 
 impl Manager {
-    pub(crate) fn new(ws: MpscSender<Value>, user_id: UserId) -> Manager {
+    pub(crate) fn new(ws: MpscSender<InterMessage>, user_id: UserId) -> Manager {
         Manager {
             handlers: HashMap::new(),
             user_id: user_id,

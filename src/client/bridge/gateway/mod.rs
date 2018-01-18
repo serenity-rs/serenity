@@ -66,12 +66,13 @@ pub use self::shard_runner_message::ShardRunnerMessage;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::sync::mpsc::Sender;
 use std::time::Duration as StdDuration;
-use ::gateway::ConnectionStage;
+use ::gateway::{ConnectionStage, InterMessage};
 
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].
 ///
 /// [`ShardManager`]: struct.ShardManager.html
 /// [`ShardRunner`]: struct.ShardRunner.html
+#[derive(Clone, Debug)]
 pub enum ShardClientMessage {
     /// A message intended to be worked with by a [`ShardManager`].
     ///
@@ -155,7 +156,7 @@ pub struct ShardRunnerInfo {
     pub latency: Option<StdDuration>,
     /// The channel used to communicate with the shard runner, telling it
     /// what to do with regards to its status.
-    pub runner_tx: Sender<ShardClientMessage>,
+    pub runner_tx: Sender<InterMessage>,
     /// The current connection stage of the shard.
     pub stage: ConnectionStage,
 }

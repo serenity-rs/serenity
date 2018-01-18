@@ -1,6 +1,6 @@
-use gateway::{ReconnectType, Shard, ShardAction};
+use gateway::{InterMessage, ReconnectType, Shard, ShardAction};
 use internal::prelude::*;
-use internal::ws_impl::ReceiverExt;
+use internal::ws_impl::{ReceiverExt, SenderExt};
 use model::event::{Event, GatewayEvent};
 use parking_lot::Mutex;
 use serde::Deserialize;
@@ -17,8 +17,6 @@ use websocket::WebSocketError;
 
 #[cfg(feature = "framework")]
 use framework::Framework;
-#[cfg(feature = "voice")]
-use internal::ws_impl::SenderExt;
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 ///
@@ -30,9 +28,9 @@ pub struct ShardRunner<H: EventHandler + Send + Sync + 'static> {
     framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
     manager_tx: Sender<ShardManagerMessage>,
     // channel to receive messages from the shard manager and dispatches
-    runner_rx: Receiver<ShardClientMessage>,
+    runner_rx: Receiver<InterMessage>,
     // channel to send messages to the shard runner from the shard manager
-    runner_tx: Sender<ShardClientMessage>,
+    runner_tx: Sender<InterMessage>,
     shard: Shard,
     threadpool: ThreadPool,
 }
@@ -181,7 +179,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
     }
 
     /// Clones the internal copy of the Sender to the shard runner.
-    pub(super) fn runner_tx(&self) -> Sender<ShardClientMessage> {
+    pub(super) fn runner_tx(&self) -> Sender<InterMessage> {
         self.runner_tx.clone()
     }
 
@@ -250,9 +248,9 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
     //
     // This always returns true, except in the case that the shard manager asked
     // the runner to shutdown.
-    fn handle_rx_value(&mut self, value: ShardClientMessage) -> bool {
+    fn handle_rx_value(&mut self, value: InterMessage) -> bool {
         match value {
-            ShardClientMessage::Manager(x) => match x {
+            InterMessage::Client(ShardClientMessage::Manager(x)) => match x {
                 ShardManagerMessage::Restart(id) |
                 ShardManagerMessage::Shutdown(id) => {
                     self.checked_shutdown(id)
@@ -273,7 +271,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
                     true
                 },
             },
-            ShardClientMessage::Runner(x) => match x {
+            InterMessage::Client(ShardClientMessage::Runner(x)) => match x {
                 ShardRunnerMessage::ChunkGuilds { guild_ids, limit, query } => {
                     self.shard.chunk_guilds(
                         guild_ids,
@@ -319,6 +317,10 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 
                     self.shard.update_presence().is_ok()
                 },
+            },
+            InterMessage::Json(value) => {
+                // Value must be forwarded over the websocket
+                self.shard.client.send_json(&value).is_ok()
             },
         }
     }

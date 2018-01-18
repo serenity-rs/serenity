@@ -1,3 +1,4 @@
+use gateway::InterMessage;
 use model::prelude::*;
 use super::{ShardClientMessage, ShardRunnerMessage};
 use std::sync::mpsc::{SendError, Sender};
@@ -14,7 +15,7 @@ use websocket::message::OwnedMessage;
 /// [`shutdown`]: #method.shutdown
 #[derive(Clone, Debug)]
 pub struct ShardMessenger {
-    tx: Sender<ShardClientMessage>,
+    tx: Sender<InterMessage>,
 }
 
 impl ShardMessenger {
@@ -24,7 +25,7 @@ impl ShardMessenger {
     ///
     /// [`Client`]: ../../struct.Client.html
     #[inline]
-    pub fn new(tx: Sender<ShardClientMessage>) -> Self {
+    pub fn new(tx: Sender<InterMessage>) -> Self {
         Self {
             tx,
         }
@@ -270,7 +271,7 @@ impl ShardMessenger {
 
     #[inline]
     fn send(&self, msg: ShardRunnerMessage)
-        -> Result<(), SendError<ShardClientMessage>> {
-        self.tx.send(ShardClientMessage::Runner(msg))
+        -> Result<(), SendError<InterMessage>> {
+        self.tx.send(InterMessage::Client(ShardClientMessage::Runner(msg)))
     }
 }

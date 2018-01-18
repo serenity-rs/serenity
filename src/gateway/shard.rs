@@ -26,6 +26,8 @@ use serde_json::Value;
 #[cfg(feature = "voice")]
 use std::sync::mpsc::{self, Receiver as MpscReceiver};
 #[cfg(feature = "voice")]
+use super::InterMessage;
+#[cfg(feature = "voice")]
 use voice::Manager as VoiceManager;
 #[cfg(feature = "voice")]
 use http;
@@ -94,7 +96,8 @@ pub struct Shard {
     /// update the voice connections' states.
     #[cfg(feature = "voice")]
     pub manager: VoiceManager,
-    #[cfg(feature = "voice")] manager_rx: MpscReceiver<Value>,
+    #[cfg(feature = "voice")]
+    manager_rx: MpscReceiver<InterMessage>,
 }
 
 impl Shard {
@@ -684,9 +687,10 @@ impl Shard {
     pub(crate) fn cycle_voice_recv(&mut self) -> Vec<Value> {
         let mut messages = vec![];
 
-        while let Ok(v) = self.manager_rx.try_recv() {
+        while let Ok(InterMessage::Json(v)) = self.manager_rx.try_recv() {
             messages.push(v);
         }
+
         self.shutdown = true;
         debug!("[Shard {:?}] Cleanly shutdown shard", self.shard_info);
 
