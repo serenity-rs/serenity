@@ -810,7 +810,7 @@ impl StandardFramework {
     ///
     /// client.with_framework(StandardFramework::new()
     ///     .before(|ctx, msg, cmd_name| {
-///         println!("Running command {}", cmd_name);
+    ///         println!("Running command {}", cmd_name);
     ///         true
     ///     }));
     /// ```
