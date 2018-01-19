@@ -141,7 +141,7 @@ Per [c:aad4744], the framework's `Args::list` function has been renamed to
 `Args::multiple` for consistency.
 
 Per [c:f10b9d7], [c:1fd652b], [c:0aa55a2], the framework has been reworked to
-be trait-based.
+be trait-based; thus as per [c:f61816c], [c:4e20277], allowed more useful functionality to commands.
 
 Per [c:05f6ed4], the [client's close handle] has been removed, in favour of
 doing so through the `ShardManager`.
