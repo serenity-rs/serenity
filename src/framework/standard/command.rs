@@ -325,19 +325,19 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
         } else if let Some(ref func) = conf.dynamic_prefix {
             if let Some(x) = func(ctx, msg) {
                 if msg.content.starts_with(&x) {
-                    positions.push(x.len());
+                    positions.push(x.chars().count());
                 }
             } else {
                 for n in &conf.prefixes {
                     if msg.content.starts_with(n) {
-                        positions.push(n.len());
+                        positions.push(n.chars().count());
                     }
                 }
             }
         } else {
             for n in &conf.prefixes {
                 if msg.content.starts_with(n) {
-                    positions.push(n.len());
+                    positions.push(n.chars().count());
                 }
             }
         };
@@ -378,11 +378,12 @@ fn find_end_of_prefix_with_whitespace(content: &str, position: usize) -> Option<
     let content_len = content.len();
     if position >= content_len { return None; }
 
-    let slice = unsafe { content.slice_unchecked(position, content_len) }.as_bytes();
-    for i in 0..slice.len() {
-        match slice[i] {
+    let mut i = 0;
+    let chars = content.chars().skip(position);
+    for char in chars {
+        match char {
             // \t \n \r [space]
-            0x09 | 0x0a | 0x0d | 0x20 => {}
+            '\t' | '\n' | '\r' | ' ' => i += 1,
             _ => return if i == 0 { None } else { Some(position + i) }
         }
     }
