@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
-## [0.5.0] - 2018-01-19
+## [0.5.0] - 2018-01-20
 
 This release is a rewrite of the client and gateway internals with a minimal
 amount of breaking changes for userland code. These changes are mainly to
@@ -36,7 +36,8 @@ Thanks to the following for their contributions:
 ### Upgrade Path
 
 Per [c:91c8ec4], the `Guild::default_channel` and
-`Guild::default_channel_guarenteed` methods now return `Option<Arc<Mutex<GuildChannel>>>` instead of `Option<GuildChannel>`. This
+`Guild::default_channel_guarenteed` methods now return
+`Option<Arc<Mutex<GuildChannel>>>` instead of `Option<GuildChannel>`. This
 avoids a clone. To access the channel, you just have to retrieve a read or write
 lock by doing `guild.default_channel()?.read()` or
 `guild.default_channel()?.write()`.
@@ -277,6 +278,8 @@ building ([@zeyla]) [c:7566f32]
 - [model] Add some role hierarchy position checks ([@zeyla]) [c:222382c]
 - [framework] Add missing `correct roles` checks in help commands ([@Lakelezz])
 [c:470f366]
+- [framework] Fix multibyte character-based prefixes ([@UninterestinAcc])
+[c:e611776]
 
 ### Changed
 
@@ -1876,7 +1879,8 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
-[0.4.7]: https://github.com/zeyla/serenity/compare/v0.4.7...v0.5,0
+[0.5.0]: https://github.com/zeyla/serenity/compare/v0.4.7...v0.5.0
+[0.4.5]: https://github.com/zeyla/serenity/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/zeyla/serenity/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/zeyla/serenity/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/zeyla/serenity/compare/v0.4.1...v0.4.2
@@ -2036,6 +2040,7 @@ Initial commit.
 [c:e02a842]: https://github.com/zeyla/serenity/commit/e02a842fb76b1e591287395ac223cc1c04913820
 [c:e0e7617]: https://github.com/zeyla/serenity/commit/e0e76173f63b6071b9df3ff8f53371b4b6c4ee1e
 [c:e5a6f3a]: https://github.com/zeyla/serenity/commit/e5a6f3a8ed367bd3d780fd23a0a27f8a80567879
+[c:e611776]: https://github.com/zeyla/serenity/commit/e6117760e3c020ed41d643a8b34d7bfeb62d3bfa
 [c:e678883]: https://github.com/zeyla/serenity/commit/e6788838556d13d4a4f19253ce297ca2f72168ee
 [c:e748d1f]: https://github.com/zeyla/serenity/commit/e748d1ff80dbbeb82b23f8ac9fec9cf8c7e4a69e
 [c:eb9e8df]: https://github.com/zeyla/serenity/commit/eb9e8dfbc9d778de405d7369579d90c49a2bf90c

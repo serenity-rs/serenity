@@ -52,7 +52,7 @@ impl EventHandler for Handler {}
 
 fn main() {
     // Login with a bot token from the environment
-    let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"), dler)
+    let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"), Handler)
         .expect("Error creating client");
     client.with_framework(StandardFramework::new()
         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
@@ -80,7 +80,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-serenity = "0.4"
+serenity = "0.5"
 ```
 
 and to the top of your `main.rs`:
@@ -98,9 +98,9 @@ Cargo.toml:
 
 ```toml
 [dependencies.serenity]
-git = "https://github.com/zeyla/serenity.git"
 default-features = false
 features = ["pick", "your", "feature", "names", "here"]
+version = "0.5"
 ```
 
 The following is a full list of features:
