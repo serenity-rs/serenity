@@ -663,6 +663,7 @@ impl Guild {
     /// Returns [`None`] if at least one of the given users' member instances
     /// is not present. Returns `None` if the users have the same hierarchy, as
     /// neither are greater than the other.
+    #[cfg(feature = "cache")]
     pub fn greater_member_hierarchy<T, U>(&self, lhs_id: T, rhs_id: U)
         -> Option<UserId> where T: Into<UserId>, U: Into<UserId> {
         let lhs_id = lhs_id.into();
