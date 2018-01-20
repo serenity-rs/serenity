@@ -189,6 +189,7 @@ impl ChannelId {
     ///
     /// [`Channel`]: enum.Channel.html
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
+    #[cfg(feature = "utils")]
     #[inline]
     pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel> {
         let map = utils::vecmap_to_json_map(f(EditChannel::default()).0);
@@ -215,6 +216,7 @@ impl ChannelId {
     /// [`EditMessage`]: ../builder/struct.EditMessage.html
     /// [`Message`]: struct.Message.html
     /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
+    #[cfg(feature = "utils")]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
         where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
         let msg = f(EditMessage::default());
@@ -450,6 +452,7 @@ impl ChannelId {
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[cfg(feature = "utils")]
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         let mut msg = f(CreateMessage::default());
@@ -487,6 +490,7 @@ impl ChannelId {
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[cfg(feature = "utils")]
     pub fn send_message<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
         let msg = f(CreateMessage::default());

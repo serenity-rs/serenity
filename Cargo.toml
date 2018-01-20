@@ -94,7 +94,7 @@ default = [
     "standard_framework",
     "utils"
 ]
-builder = []
+builder = ["utils"]
 cache = ["lazy_static"]
 client = [
     "gateway",

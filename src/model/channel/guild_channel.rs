@@ -105,6 +105,7 @@ impl GuildChannel {
     /// ```rust,ignore
     /// let invite = channel.create_invite(|i| i.max_uses(5));
     /// ```
+    #[cfg(feature = "utils")]
     pub fn create_invite<F>(&self, f: F) -> Result<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
         #[cfg(feature = "cache")]
@@ -301,6 +302,7 @@ impl GuildChannel {
     /// ```rust,ignore
     /// channel.edit(|c| c.name("test").bitrate(86400));
     /// ```
+    #[cfg(feature = "utils")]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
         #[cfg(feature = "cache")]
