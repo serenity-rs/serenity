@@ -970,10 +970,10 @@ impl Framework for StandardFramework {
                     };
 
                     let mut args = {
-                        let mut content = message.content[position..].trim();
-                        content = content[command_length..].trim();
+                        let mut content = message.content.chars().skip(position).collect::<String>();
+                        content = content[command_length..].trim().to_string();
 
-                        Args::new(content, &self.configuration.delimiters)
+                        Args::new(&content, &self.configuration.delimiters)
                     };
 
                     let before = self.before.clone();
