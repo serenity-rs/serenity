@@ -971,7 +971,7 @@ impl Framework for StandardFramework {
 
                     let mut args = {
                         let mut content = message.content.chars().skip(position).collect::<String>();
-                        content = content[command_length..].trim().to_string();
+                        content = content.chars().skip(built.chars().count()).collect::<String>().trim().to_string();
 
                         Args::new(&content, &self.configuration.delimiters)
                     };
