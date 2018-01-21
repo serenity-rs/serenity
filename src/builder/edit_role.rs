@@ -1,7 +1,7 @@
 use internal::prelude::*;
-use std::collections::HashMap;
-use std::default::Default;
-use model::{permissions, Permissions, Role};
+use model::guild::Role;
+use model::Permissions;
+use utils::VecMap;
 
 /// A builer to create or edit a [`Role`] for use via a number of model methods.
 ///
@@ -21,7 +21,7 @@ use model::{permissions, Permissions, Role};
 /// Create a hoisted, mentionable role named `"a test role"`:
 ///
 /// ```rust,no_run
-/// # use serenity::model::{ChannelId, GuildId};
+/// # use serenity::model::id::{ChannelId, GuildId};
 /// # let (channel_id, guild_id) = (ChannelId(1), GuildId(2));
 /// #
 /// // assuming a `channel_id` and `guild_id` has been bound
@@ -39,15 +39,15 @@ use model::{permissions, Permissions, Role};
 /// [`GuildId::edit_role`]: ../model/struct.GuildId.html#method.edit_role
 /// [`Role`]: ../model/struct.Role.html
 /// [`Role::edit`]: ../model/struct.Role.html#method.edit
-#[derive(Clone, Debug)]
-pub struct EditRole(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default)]
+pub struct EditRole(pub VecMap<&'static str, Value>);
 
 impl EditRole {
     /// Creates a new builder with the values of the given [`Role`].
     ///
     /// [`Role`]: ../model/struct.Role.html
     pub fn new(role: &Role) -> Self {
-        let mut map = HashMap::new();
+        let mut map = VecMap::with_capacity(8);
 
         #[cfg(feature = "utils")]
         {
@@ -112,33 +112,5 @@ impl EditRole {
         self.0.insert("position", Value::Number(Number::from(position)));
 
         self
-    }
-}
-
-impl Default for EditRole {
-    /// Creates a builder with default parameters.
-    ///
-    /// The defaults are:
-    ///
-    /// - **color**: 10070709
-    /// - **hoist**: false
-    /// - **mentionable**: false
-    /// - **name**: new role
-    /// - **permissions**: the [general permissions set]
-    /// - **position**: 1
-    ///
-    /// [general permissions set]: ../model/permissions/constant.PRESET_GENERAL.html
-    fn default() -> EditRole {
-        let mut map = HashMap::new();
-        let permissions = Number::from(permissions::PRESET_GENERAL.bits());
-
-        map.insert("color", Value::Number(Number::from(10_070_709)));
-        map.insert("hoist", Value::Bool(false));
-        map.insert("mentionable", Value::Bool(false));
-        map.insert("name", Value::String("new role".to_string()));
-        map.insert("permissions", Value::Number(permissions));
-        map.insert("position", Value::Number(Number::from(1)));
-
-        EditRole(map)
     }
 }

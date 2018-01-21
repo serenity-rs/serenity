@@ -1,5 +1,5 @@
-use model::MessageId;
-use std::collections::HashMap;
+use model::id::MessageId;
+use utils::VecMap;
 
 /// Builds a request for a request to the API to retrieve messages.
 ///
@@ -29,8 +29,8 @@ use std::collections::HashMap;
 /// # use std::error::Error;
 /// #
 /// # fn try_main() -> Result<(), Box<Error>> {
-/// use serenity::model::{ChannelId, MessageId};
 /// use serenity::builder::GetMessages;
+/// use serenity::model::id::{ChannelId, MessageId};
 ///
 /// let retriever = GetMessages::default()
 ///     .after(MessageId(158339864557912064))
@@ -50,7 +50,7 @@ use std::collections::HashMap;
 ///
 /// [`GuildChannel::messages`]: ../model/struct.GuildChannel.html#method.messages
 #[derive(Clone, Debug, Default)]
-pub struct GetMessages(pub HashMap<&'static str, u64>);
+pub struct GetMessages(pub VecMap<&'static str, u64>);
 
 impl GetMessages {
     /// Indicates to retrieve the messages after a specific message, given by

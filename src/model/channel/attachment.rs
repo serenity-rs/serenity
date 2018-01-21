@@ -8,7 +8,7 @@ use std::io::Read;
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///
 /// [`Embed`]: struct.Embed.html
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Attachment {
     /// The unique ID given to this attachment.
     pub id: String,
@@ -43,15 +43,14 @@ impl Attachment {
     /// Download all of the attachments associated with a [`Message`]:
     ///
     /// ```rust,no_run
+    /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
-    /// use serenity::model::*;
     /// use std::env;
     /// use std::fs::File;
     /// use std::io::Write;
     /// use std::path::Path;
     ///
     /// struct Handler;
-    ///
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, message: Message) {

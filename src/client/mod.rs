@@ -40,24 +40,17 @@ pub use CACHE;
 use http;
 use internal::prelude::*;
 use parking_lot::Mutex;
-use self::bridge::gateway::{ShardManager, ShardManagerMonitor};
-use self::dispatch::dispatch;
+use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptions};
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering, ATOMIC_BOOL_INIT};
 use threadpool::ThreadPool;
 use typemap::ShareMap;
 
 #[cfg(feature = "framework")]
 use framework::Framework;
-
-static HANDLE_STILL: AtomicBool = ATOMIC_BOOL_INIT;
-
-#[derive(Copy, Clone)]
-pub struct CloseHandle;
-
-impl CloseHandle {
-    pub fn close(self) { HANDLE_STILL.store(false, Ordering::Relaxed); }
-}
+#[cfg(feature = "voice")]
+use model::id::UserId;
+#[cfg(feature = "voice")]
+use self::bridge::voice::ClientVoiceManager;
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
@@ -238,6 +231,44 @@ pub struct Client {
     /// # }
     /// ```
     ///
+    /// Shutting down all connections after one minute of operation:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// use serenity::client::{Client, EventHandler};
+    /// use std::time::Duration;
+    /// use std::{env, thread};
+    ///
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler { }
+    ///
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
+    ///
+    /// // Create a clone of the `Arc` containing the shard manager.
+    /// let shard_manager = client.shard_manager.clone();
+    ///
+    /// // Create a thread which will sleep for 60 seconds and then have the
+    /// // shard manager shutdown.
+    /// thread::spawn(move || {
+    ///     thread::sleep(Duration::from_secs(60));
+    ///
+    ///     shard_manager.lock().shutdown_all();
+    ///
+    ///     println!("Shutdown shard manager!");
+    /// });
+    ///
+    /// println!("Client shutdown: {:?}", client.start());
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    /// ```
+    ///
     /// [`Client::start_shard`]: #method.start_shard
     /// [`Client::start_shards`]: #method.start_shards
     pub shard_manager: Arc<Mutex<ShardManager>>,
@@ -249,6 +280,12 @@ pub struct Client {
     pub threadpool: ThreadPool,
     /// The token in use by the client.
     pub token: Arc<Mutex<String>>,
+    /// The voice manager for the client.
+    ///
+    /// This is an ergonomic structure for interfacing over shards' voice
+    /// connections.
+    #[cfg(feature = "voice")]
+    pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
     /// URI that the client's shards will use to connect to the gateway.
     ///
     /// This is likely not important for production usage and is, at best, used
@@ -291,6 +328,8 @@ impl Client {
     /// ```
     pub fn new<H>(token: &str, handler: H) -> Result<Self>
         where H: EventHandler + Send + Sync + 'static {
+        let token = token.trim();
+
         let token = if token.starts_with("Bot ") {
             token.to_string()
         } else {
@@ -306,51 +345,43 @@ impl Client {
         let data = Arc::new(Mutex::new(ShareMap::custom()));
         let event_handler = Arc::new(handler);
 
-        Ok(feature_framework! {{
-            let framework = Arc::new(Mutex::new(None));
+        #[cfg(feature = "framework")]
+        let framework = Arc::new(Mutex::new(None));
+        #[cfg(feature = "voice")]
+        let voice_manager = Arc::new(Mutex::new(ClientVoiceManager::new(
+            0,
+            UserId(0),
+        )));
 
-            let (shard_manager, shard_manager_worker) = ShardManager::new(
-                0,
-                0,
-                0,
-                Arc::clone(&url),
-                Arc::clone(&locked),
-                Arc::clone(&data),
-                Arc::clone(&event_handler),
-                Arc::clone(&framework),
-                threadpool.clone(),
-            );
+        let (shard_manager, shard_manager_worker) = {
+            ShardManager::new(ShardManagerOptions {
+                data: &data,
+                event_handler: &event_handler,
+                #[cfg(feature = "framework")]
+                framework: &framework,
+                shard_index: 0,
+                shard_init: 0,
+                shard_total: 0,
+                threadpool: threadpool.clone(),
+                token: &locked,
+                #[cfg(feature = "voice")]
+                voice_manager: &voice_manager,
+                ws_url: &url,
+            })
+        };
 
-            Client {
-                token: locked,
-                ws_uri: url,
-                framework,
-                data,
-                shard_manager,
-                shard_manager_worker,
-                threadpool,
-            }
-        } else {
-            let (shard_manager, shard_manager_worker) = ShardManager::new(
-                0,
-                0,
-                0,
-                Arc::clone(&url),
-                locked.clone(),
-                data.clone(),
-                Arc::clone(&event_handler),
-                threadpool.clone(),
-            );
-
-            Client {
-                token: locked,
-                ws_uri: url,
-                data,
-                shard_manager,
-                shard_manager_worker,
-                threadpool,
-            }
-        }})
+        Ok(Client {
+            token: locked,
+            ws_uri: url,
+            #[cfg(feature = "framework")]
+            framework,
+            data,
+            shard_manager,
+            shard_manager_worker,
+            threadpool,
+            #[cfg(feature = "voice")]
+            voice_manager,
+        })
     }
 
     /// Sets a framework to be used with the client. All message events will be
@@ -380,7 +411,11 @@ impl Client {
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
     /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
-    ///     .command("ping", |c| c.exec_str("Pong!")));
+    ///     .on("ping", |_, msg, _| {
+    ///         msg.channel_id.say("Pong!")?;
+    ///
+    ///         Ok(())
+    ///      }));
     /// # Ok(())
     /// # }
     /// #
@@ -765,9 +800,6 @@ impl Client {
         self.start_connection([range[0], range[1], total_shards])
     }
 
-    /// Returns a thread-safe handle for closing shards.
-    pub fn close_handle(&self) -> CloseHandle { CloseHandle }
-
     // Shard data layout is:
     // 0: first shard number to initialize
     // 1: shard number to initialize up to and including
@@ -782,17 +814,31 @@ impl Client {
     //
     // [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     fn start_connection(&mut self, shard_data: [u64; 3]) -> Result<()> {
-        HANDLE_STILL.store(true, Ordering::Relaxed);
+        #[cfg(feature = "voice")]
+        self.voice_manager.lock().set_shard_count(shard_data[2]);
 
-        // Update the framework's current user if the feature is enabled.
+        // This is kind of gross, but oh well.
         //
-        // This also acts as a form of check to ensure the token is correct.
-        #[cfg(all(feature = "standard_framework", feature = "framework"))]
+        // Both the framework and voice bridge need the user's ID, so we'll only
+        // retrieve it over REST if at least one of those are enabled.
+        #[cfg(any(all(feature = "standard_framework", feature = "framework"),
+                  feature = "voice"))]
         {
             let user = http::get_current_user()?;
 
-            if let Some(ref mut framework) = *self.framework.lock() {
-                framework.update_current_user(user.id, user.bot);
+            // Update the framework's current user if the feature is enabled.
+            //
+            // This also acts as a form of check to ensure the token is correct.
+            #[cfg(all(feature = "standard_framework", feature = "framework"))]
+            {
+                if let Some(ref mut framework) = *self.framework.lock() {
+                    framework.update_current_user(user.id);
+                }
+            }
+
+            #[cfg(feature = "voice")]
+            {
+                self.voice_manager.lock().set_user_id(user.id);
             }
         }
 
@@ -822,12 +868,8 @@ impl Client {
 
         self.shard_manager_worker.run();
 
-        Err(Error::Client(ClientError::Shutdown))
+        Ok(())
     }
-}
-
-impl Drop for Client {
-    fn drop(&mut self) { self.close_handle().close(); }
 }
 
 /// Validates that a token is likely in a valid format.

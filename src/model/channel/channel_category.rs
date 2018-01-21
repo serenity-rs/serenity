@@ -1,16 +1,16 @@
-use model::*;
+use model::prelude::*;
 
 #[cfg(all(feature = "builder", feature = "model"))]
 use builder::EditChannel;
 #[cfg(all(feature = "builder", feature = "model"))]
 use http;
 #[cfg(all(feature = "model", feature = "utils"))]
-use utils as serenity_utils;
+use utils::{self as serenity_utils, VecMap};
 
 /// A category of [`GuildChannel`]s.
 ///
 /// [`GuildChannel`]: struct.GuildChannel.html
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ChannelCategory {
     /// Id of this category.
     pub id: ChannelId,
@@ -81,7 +81,7 @@ impl ChannelCategory {
     /// ```rust,ignore
     /// category.edit(|c| c.name("test").bitrate(86400));
     /// ```
-    #[cfg(all(feature = "builder", feature = "model"))]
+    #[cfg(all(feature = "builder", feature = "model", feature = "utils"))]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
         #[cfg(feature = "cache")]
@@ -93,12 +93,12 @@ impl ChannelCategory {
             }
         }
 
-        let mut map = HashMap::new();
+        let mut map = VecMap::new();
         map.insert("name", Value::String(self.name.clone()));
         map.insert("position", Value::Number(Number::from(self.position)));
         map.insert("type", Value::String(self.kind.name().to_string()));
 
-        let map = serenity_utils::hashmap_to_json_map(f(EditChannel(map)).0);
+        let map = serenity_utils::vecmap_to_json_map(f(EditChannel(map)).0);
 
         http::edit_channel(self.id.0, &map).map(|channel| {
             let GuildChannel {

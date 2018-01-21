@@ -3,6 +3,374 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.5.0] - 2018-01-20
+
+This release is a rewrite of the client and gateway internals with a minimal
+amount of breaking changes for userland code. These changes are mainly to
+prepare for Tokio and to reduce the number of atomic operations per received
+event, reducing the number of atomic operations by roughly 85%. The framework
+has also seen a rewrite, and is now centered around a trait-based design.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@Caemor]
+- [@drklee3]
+- [@fenhl]
+- [@Flat]
+- [@ftriquet]
+- [@hsiW]
+- [@indiv0]
+- [@jhelwig]
+- [@jkcclemens]
+- [@Lakelezz]
+- [@MOZGIII]
+- [@nabijaczleweli]
+- [@Roughsketch]
+- [@tahahawa]
+- [@thelearnerofcode]
+- [@timotree3]
+- [@UninterestinAcc]
+- [@zeyla]
+
+### Upgrade Path
+
+Per [c:91c8ec4], the `Guild::default_channel` and
+`Guild::default_channel_guarenteed` methods now return
+`Option<Arc<Mutex<GuildChannel>>>` instead of `Option<GuildChannel>`. This
+avoids a clone. To access the channel, you just have to retrieve a read or write
+lock by doing `guild.default_channel()?.read()` or
+`guild.default_channel()?.write()`.
+
+Per [c:14b9222], there is a new `Member::default_channel()` function that
+returns the default channel for the user. This no longer returns the channel
+with the same ID as the guild itself, as this behaviour was changed by Discord.
+A member's "default channel" is now the top-most channel that it has permission
+to view. Accordingly, `Guild::default_channel` matches this behaviour.
+
+Per [c:93e0a42], the library now uses the `parking_lot` crate's `Mutex` and
+`RwLock` implementations over the stdlib's. `parking_lot`s implementations are
+more efficient, do not poison due to lock drops on unwinding, and implement
+eventual fairness.
+
+To account for this, change all `Mutex` lock retrievals and `RwLock` read and
+write lock retrievals to not unwrap. `parking_lot`'s `Mutex::lock`,
+`RwLock::read`, and `RwLock::write` don't return Results, unlike the `stdlib`'s.
+
+Per [c:78c6df9], the `Guild::features` structfield is no longer a
+`Vec<Feature>`. Discord adds guild features over time, which can cause guilds
+with those new features to fail in deserialization. Instead, we're
+future-proofing by making this a `Vec<String>`.
+
+Per [c:65e3279], the `CreateEmbed` builder's `field` and `fields` functions no
+longer take a builder as the argument, and instead take 3 arguments. For
+example, code like this:
+
+```rust
+channel.send_message(|m| m
+    .embed(|e| e
+        .title("This is an embed")
+        .field(|f| f
+            .name("Test field")
+            .value("Test value")
+            .inline(true))));
+```
+
+Would now be this:
+
+```rust
+channel.send_message(|m| m
+    .embed(|e| e
+        .title("This is an embed")
+        .field("Test field", "Test value", true)))
+```
+
+Per [c:ad0dcb3], shards can no longer have their `afk` property set, as this was
+a leftover from user account support. This removes the `afk` parameter of the
+`Context::set_presence` function, removal of the parameter from the
+`Shard::set_presence` function, and the `Shard::set_afk` function.
+
+Per [c:b328b3e], the `client::EventHandler` no longer prefixes all trait methods
+with `on_`. An implementation that looks like this:
+
+```rust
+use serenity::client::{Context, EventHandler};
+use serenity::model::Message;
+
+struct Handler;
+
+impl EventHandler for Handler {
+    fn on_message(&self, _: Context, msg: Message) {
+        // ...
+    }
+}
+```
+
+Now looks like this:
+
+```rust
+use serenity::client::{Context, EventHandler};
+use serenity::model::channel::Message;
+
+struct Handler;
+
+impl EventHandler for Handler {
+    fn message(&self, _: Context, msg: Message) {
+        // ...
+    }
+}
+```
+
+(a note on the `serenity::model::channel::Message` import later.)
+
+Per [c:b19b031], `Client::new` returns a `Result`, as it now creates some
+essential information on instantiation instead of deferring it to when a
+connection is started. You can probably just unwrap this Result.
+
+Per [c:b8efeaf], [c:d5a9aa8], and [c:65233ad], the client and gateway internals
+have been rebuilt to significantly reduce the number of atomic operations
+(upwards of ~85%). This means that retrieval of shard information (like the
+shard latency to the Discord gateway or the current connection status) are
+retrieved via the encompassing [`ShardManager`][0.5.0:ShardManager] located on
+the client. This can be inserted into the client's `data` structfield if you
+need to access that information in event or framework command handlers. See
+[this example][0.5.0:example-09] for more information. Additionally,
+`Context::quit` to shutdown the shard no longer exists; go through the
+`ShardManager` instead.
+
+Per [c:aad4744], the framework's `Args::list` function has been renamed to
+`Args::multiple` for consistency.
+
+Per [c:f10b9d7], [c:1fd652b], [c:0aa55a2], the framework has been reworked to
+be trait-based; thus as per [c:f61816c], [c:4e20277], allowed more useful functionality to commands.
+
+Per [c:05f6ed4], the [client's close handle] has been removed, in favour of
+doing so through the `ShardManager`.
+
+Per [c:8c9baa7], the `Guild::default_message_notifications`, `Guild::mfa_level`,
+`PartialGuild::default_message_notifications`, and `PartialGuild::mfa_level`
+structfields are now enums to represent a stronger type, instead of `u64`s.
+
+Per [c:bcd16dd], the `model` module has been broken up: instead of a giant root
+module full of imports, types have been moved to where they fit. For example,
+the `Message`, `Reaction`, and `Channel` structs are now in the `model::channel`
+module. The `RichInvite`, `Member`, `Role`, and `MfaLevel` types are now in
+`model::guild`. Refer to the commit message or the
+[`model` module docs][0.5.0:model] for more information.
+
+Per [c:be43836], the `http::HttpError` enum's `InvalidRequest` variant no longer
+gives just the HTTP status code of the response. It now includes the full
+Response instance.
+
+Per [c:2edba81], the `builder` re-export in the `utils` module no longer exists
+after being there in deprecation for a long time. Please import it like so:
+
+```rust
+// old
+use serenity::utils::builder;
+
+// new
+use serenity::builder;
+```
+
+### Added
+
+- [framework] Make the framework error's internal String public ([@acdenisSK])
+[c:3b9f0f8]
+- [client, gateway] Improve shard and shard runner logging ([@zeyla])
+[c:f0ee805]
+- [gateway] Have `ConnectionStage` derive `Copy` ([@acdenisSK]) [c:551f166]
+- [builder, framework, http, model] Replace `Vec<T>` parameter with more generic
+`IntoIterator<Item=T>` ([@ftriquet]) [c:b146501], [c:934eb3a]
+- [builder, gateway, model, voice] Make more parameters generic with trait
+bounds of `AsRef` ([@acdenisSK]) [c:e0e7617], [c:b62dfd4]
+- [framework, model] Add help command filtering, member prefix searching
+([@Lakelezz]) [c:ee207b3]
+- [model] Add guild member filtering functions ([@Lakelezz]) [c:f26dad8]
+- [model] `impl BanOptions for &str` ([@acdenisSK]) [c:7c911d5]
+- [model] Derive `Default` on IDs and `CurrentUser` ([@acdenisSK]) [c:0881e18]
+- [client] Add a threadpool for event dispatches ([@zeyla]) [c:1fa83f7],
+[c:3e14067], [c:f2c21ef]
+- [model] Fall back to `str::parse` if `parse_username` fails ([@acdenisSK])
+[c:8c85664]
+- [model] Add a parsing fallback for `RoleId` ([@acdenisSK]) [c:5d4301b]
+- [http, model] Expand Audit Log support ([@acdenisSK]) [c:f491809]
+- [framework] Make `Command::aliases` public ([@acdenisSK]) [c:8c83866]
+- [model] `impl FromStr for ReactionType` ([@acdenisSK]) [c:2032a40],
+[c:84706f1]
+- [builder] Make trait bounds more generic, from `Into<String>` to `Display`
+([@acdenisSK]) [c:05dad71]
+- [framework, internal, model, utils] Derive `Debug` on more public types
+([@thelearnerofcode]) [c:e5a6f3a]
+- [model] Change `PrivateChannel::say` to accept a more generic argument
+([@fenhl]) [c:a359f77]
+- [model] `impl From<EmojiId, EmojiIdentifier> for ReactionType` ([@fenhl])
+[c:68156c9]
+- [http] `impl From<&Path> for AttachmentType` ([@zeyla]) [c:7a5aa3c]
+- [model] Add `GameType::Listening` ([@hsiW], [@zeyla]) [c:40c5c12], [c:a17fea7]
+- [framework] Add `cmd` function to `CreateCommand` and `CreateGroup`
+([@acdenisSK]) [c:e748d1f]
+- [model] Add `Reaction::message` function ([@Roughsketch]) [c:fd19446]
+- [model] Add `Reaction::channel` function ([@zeyla]) [c:e02a842]
+- [model] Add `Reaction::user` function ([@zeyla]) [c:82b87f1]
+- [model] Implement `Deserialize` for `{,Gateway,Voice}Event` ([@zeyla])
+[c:c3aa63f]
+- [framework] Add `help()` to `CreateGroup` ([@Lakelezz]) [c:39a1435]
+- [framework] Add a way to execute code when a command is registered
+([@acdenisSK]) [c:f61816c]
+- [framework] Add `before`/`after` middleware to `Command` ([@acdenisSK])
+[c:4e20277]
+- [general] Switch from `try_opt!` macro to using `?` operator ([@hsiW])
+[c:2d23d8b]
+- [framework] Make help commands customizable ([@Lakelezz]) [c:031fc92]
+- [model] Add `VIEW_AUDIT_LOG` permission ([@Lakelezz]) [c:612e973]
+- [model] Fallback to `str::parse` on `ChannelId` `FromStr` impl ([@acdenisSK])
+[c:0525ede]
+- [model] Add missing fields to `Guild` ([@zeyla]) [c:3d24033], [c:99d17d2],
+[c:2abeea5]
+- [framework] Add `Args::len` ([@acdenisSK]) [c:2c9b682], [c:b60d037],
+[c:143fddd]
+- [model] Add variant adapters to `Channel` ([@timotree3]) [c:f0a56f4]
+- [model] Add `animated` field to `Emoji` and `ReactionType` ([@zeyla])
+[c:f2fa349]
+- [framework] Better support for multiple delimiters on `Args` ([@Lakelezz])
+[c:62647f5]
+- [model] Update `Region` to include new voice regions ([@Flat]) [c:d264cc3]
+- [framework] Add `Args::iter_quoted` ([@acdenisSK]) [c:032c5a7]
+- [model] Add missing `num` implementations on models ([@zeyla]) [c:0b1f684]
+- [client] Add an event for shard connection changes ([@zeyla]) [c:7e46d8f]
+- [model] Implement or derive `serde::Serialize` on all models ([@zeyla])
+[c:25dddb6]
+- [model] Further generic-ify `reaction_users`' `after` parameter ([@zeyla])
+[c:85d7d5f]
+- [model] Add `Member::highest_role` ([@zeyla]) [c:b7542f4]
+- [model] Add `Guild::greater_member_hierarchy` ([@zeyla]) [c:84ff27b]
+- [model] Allow channels to be moved in and out of a category ([@jkcclemens])
+[c:6587655]
+- [cache, model] Create partial member instances for users without a Member
+instance ([@zeyla]) [c:d1113c0]
+
+### Fixed
+
+- [gateway] Improve shard reconnection logic ([@zeyla]) [c:45c1f27]
+- [gateway] Reset shard heartbeat state on resume ([@zeyla]) [c:ae50886]
+- [http] Make `webhook_id` a majour parameter in ratelimiting ([@zeyla])
+[c:1735e57]
+- [gateway] Resume on resumable session invalidations ([@zeyla]) [c:eb9e8df]
+- [client] Fix setting of framework ([@zeyla]) [c:12317b9]
+- [framework] Fix help commands to list all eligible commands in DMs
+([@Lakelezz]) [c:114e43a]
+- [framework] Fix command parsing behaviour when prefix has spaces
+([@UninterestinAcc]) [c:10c56a9]
+- [client] Attempt to restart failed shard boots ([@zeyla]) [c:8d68503]
+- [client, gateway] Fix shards attempting to re-identify on their own ([@zeyla])
+[c:e678883]
+- [framework] Fix multiple char delimiters ([@zeyla]) [c:08febb0]
+- [framework] Fix `multiple_quoted` ([@Lakelezz]) [c:9aad1aa]
+- [model] Fix `#` finding in `Guild::member_named` ([@tahahawa]) [c:a7b67df]
+- [builder] Convert embed footers for `impl Form<Embed> for CreateEmbed`
+([@drklee3]) [c:9aaa555]
+- [framework] Fix plain help command ([@Lakelezz]) [c:4bd223a]
+- [model] Correctly iterate over channel permission overwrites in permission
+building ([@zeyla]) [c:7566f32]
+- [model] Compare instants in `Shard::latency`, avoiding panics ([@zeyla])
+[c:08db9fa]
+- [model] Add some role hierarchy position checks ([@zeyla]) [c:222382c]
+- [framework] Add missing `correct roles` checks in help commands ([@Lakelezz])
+[c:470f366]
+- [framework] Fix multibyte character-based prefixes ([@UninterestinAcc])
+[c:e611776]
+
+### Changed
+
+- [framework] Change the way users' command handlers are stored ([@acdenisSK])
+[c:d90b90c]
+- [model] `Guild::{default_channel, default_channel_guarenteed}` now return
+an `Arc<Mutex<GuildChannel>>` instead of a clone of the channel ([@acdenisSK])
+[c:91c8ec4]
+- [framework] Don't default command argument delimiter to `" "` ([@jhelwig])
+[c:3a4cb18]
+- [model] Change behaviour of `default_channel` to match Discord's new
+behaviour ([@hsiW]) [c:14b9222]
+- [utils] Disallow Message Builder `I` from being user-implemented
+([@acdenisSK]) [c:7cf1e52]
+- [general] Switch to `parking_lot::{Mutex, RwLock}` ([@zeyla]) [c:93e0a42]
+- [model] Make `{Guild, PartialGuild}::features` a `Vec<String>` ([@zeyla])
+[c:78c6df9]
+- [builder] Slightly change performance of builders by using `&'static str`s and
+a `VecMap` ([@acdenisSK], [@zeyla]) [c:9908999], [c:3a0c890], [c:26fe139]
+- [builder] Change `CreateEmbed::field{,s}` to not take builders ([@zeyla])
+[c:65e3279]
+- [client, gateway] Remove setting of a shard's `afk` field ([@zeyla])
+[c:ad0dcb3]
+- [client] Remove `on_` prefix to `EventHandler` tymethods ([@zeyla])
+[c:b328b3e]
+- [client] Make the Client return a result [c:b19b031]
+- [client, gateway] Redo client+gateway internals to reduce atomic operations
+([@zeyla]) [c:b8efeaf], [c:d5a9aa8], [c:65233ad]
+- [framework] Rename `Args::list` -> `Args::multiple` ([@acdenisSK]) [c:aad4744]
+- [framework] Make framework use trait-based commands ([@acdenisSK])
+[c:f10b9d7], [c:1fd652b], [c:0aa55a2]
+- [client] Remove client close handle ([@zeyla]) [c:05f6ed4]
+- [model] Change types of some `Guild` and `PartialGuild` structfields
+([@zeyla]) [c:8c9baa7]
+- [model] Break up the model module ([@zeyla]) [c:bcd16dd]
+- [http] Give the full hyper Response in HTTP errors ([@zeyla]) [c:be43836]
+- [utils] Remove `builder` module re-export ([@zeyla]) [c:2edba81]
+- [framework] Remove `is_bot` state boolean ([@zeyla]) [c:524b8f8]
+- [client, framework, gateway, voice] Use an encompassing `InterMessage` enum to
+communicate over the gateway ([@zeyla]) [c:9232b8f]
+
+### Misc.
+
+- [general] Simplify `Error`'s `Display` impl ([@zeyla]) [c:ee2bbca]
+- [framework] Document that application owners bypass checks ([@fenhl])
+[c:b215457]
+- [general] Compile all features for docs.rs ([@zeyla]) [c:a96be90]
+- [model] Document that `Reaction::{message, users}` methods hit the API
+([@zeyla]) [c:141bbfc]
+- [builder] Use `ToString` blanket impl for `Display`s ([@acdenisSK])
+[c:3ca7e15]
+- [framework] Avoid an unwrap in `Args::parse_quotes` ([@zeyla]) [c:60613ef]
+- [client] Trim token given in `Client::new` ([@zeyla]) [c:25d79ac]
+- [model] Fix a doc typo on `User` ([@Lakelezz]) [c:9da642a]
+- [model] Fix docs for `User::has_role` ([@zeyla]) [c:b52eb9f]
+
+[client's close handle]: https://docs.rs/serenity/0.4.7/serenity/client/struct.CloseHandle.html
+[0.5.0:ShardManager]: https://docs.rs/serenity/0.5.0/serenity/client/bridge/gateway/struct.ShardManager.html
+[0.5.0:example-09]: https://github.com/zeyla/serenity/blob/91cf5cd401d09a3bca7c2573b88f2e3beb9c0948/examples/09_shard_manager/src/main.rs
+[0.5.0:model]: https://docs.rs/serenity/0.5.0/serenity/model/index.html
+
+## [0.4.5] - 2017-12-09
+
+This release contains a hotfix for the hotfix release, as well as a slight
+behaviour change to the `EditRole` builder.
+
+The last release contained a deserialization implementation fix which seemed to
+work after running tests, but it turns out that not all deserialization issues
+were fixed.
+
+The `EditRole` builder's Default implementation no longer sets a value for each
+field, as this causes problems with stateless editing of roles.
+
+### Fixed
+
+- [model] Fix remaining deserializers [c:52403a5]
+
+### Changed
+
+- [builder] Remove `EditRole::default` implementation [c:795eaa1]
+
+## [0.4.4] - 2017-12-09
+
+This release contains a hotfix for snowflake deserialization on `serde_json`
+v1.0.8. Primary development is continuing on the v0.5.x branch and the
+[library organization].
+
+### Fixed
+
+- [model] Fix snowflake deserializer [c:77f462e]
+
 ## [0.4.3] - 2017-11-01
 
 This release contains bugfixes and marks the final release of the v0.4.x branch.
@@ -1511,6 +1879,9 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.5.0]: https://github.com/zeyla/serenity/compare/v0.4.7...v0.5.0
+[0.4.5]: https://github.com/zeyla/serenity/compare/v0.4.4...v0.4.5
+[0.4.4]: https://github.com/zeyla/serenity/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/zeyla/serenity/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/zeyla/serenity/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/zeyla/serenity/compare/v0.4.0...v0.4.1
@@ -1524,6 +1895,7 @@ Initial commit.
 [0.1.1]: https://github.com/zeyla/serenity/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/zeyla/serenity/tree/403d65d5e98bdfa9f0c018610000c4a0b0c7d8d5
 [crates.io listing]: https://crates.io/crates/serenity
+[library organization]: https://github.com/serenity-rs
 [semver]: http://semver.org
 
 [issue:56]: https://github.com/zeyla/serenity/issues/56
@@ -1538,9 +1910,11 @@ Initial commit.
 [@blaenk]: https://github.com/blaenk
 [@Caemor]: https://github.com/Caemor
 [@DeltaEvo]: https://github.com/DeltaEvo
+[@drklee3]: https://github.com/drklee3
 [@eLunate]: https://github.com/eLunate
 [@emoticon]: https://github.com/emoticon
 [@efyang]: https://github.com/efyang
+[@fenhl]: https://github.com/fenhl
 [@Flat]: https://github.com/Flat
 [@foxbot]: https://github.com/foxbot
 [@ftriquet]: https://github.com/ftriquet
@@ -1550,17 +1924,141 @@ Initial commit.
 [@iCrawl]: https://github.com/iCrawl
 [@imnotbad]: https://github.com/imnotbad
 [@indiv0]: https://github.com/indiv0
+[@jhelwig]: https://github.com/jhelwig
+[@jkcclemens]: https://github.com/jkcclemens
 [@joek13]: https://github.com/joek13
 [@Lakelezz]: https://github.com/Lakelezz
 [@lolzballs]: https://github.com/lolzballs
 [@khazhyk]: https://github.com/khazhyk
+[@MOZGIII]: https://github.com/MOZGIII
+[@nabijaczleweli]: https://github.com/nabijaczleweli
 [@Roughsketch]: https://github.com/Roughsketch
 [@sschroe]: https://github.com/sschroe
 [@SunDwarf]: https://github.com/SunDwarf
+[@tahahawa]: https://github.com/tahahawa
 [@ThatsNoMoon]: https://github.com/ThatsNoMoon
+[@thelearnerofcode]: https://github.com/thelearnerofcode
+[@timotree3]: https://github.com/timotree3
 [@UninterestinAcc]: https://github.com/UninterestinAcc
 [@xentec]: https://github.com/xentec
 [@zeyla]: https://github.com/zeyla
+
+[c:031fc92]: https://github.com/zeyla/serenity/commit/031fc92e02c314cce9fc8febcc7900fa2d885941
+[c:032c5a7]: https://github.com/zeyla/serenity/commit/032c5a75620c3ff185a749113d93fb3051b38acb
+[c:0525ede]: https://github.com/zeyla/serenity/commit/0525ede086ccffa5781c9a1876a368ac3531813e
+[c:05f6ed4]: https://github.com/zeyla/serenity/commit/05f6ed429aeac1920307ea692fef122bbd2dffff
+[c:0881e18]: https://github.com/zeyla/serenity/commit/0881e18c07113cc7b2f6cec38cadcb1ea03dda12
+[c:08db9fa]: https://github.com/zeyla/serenity/commit/08db9fa2adef141743ab9681c46dd91489278063
+[c:08febb0]: https://github.com/zeyla/serenity/commit/08febb0d8d95bbbae9861130a756e842eae40eef
+[c:0aa55a2]: https://github.com/zeyla/serenity/commit/0aa55a2b9b757321d5b8bb9e512813aa9d0a62ca
+[c:0b1f684]: https://github.com/zeyla/serenity/commit/0b1f684106031657d6bf581206c06e5443d06da9
+[c:10c56a9]: https://github.com/zeyla/serenity/commit/10c56a9385c0d410241d33525f8f49242daced2d
+[c:114e43a]: https://github.com/zeyla/serenity/commit/114e43a3d0079072593588ad7b2de9f8588e041d
+[c:12317b9]: https://github.com/zeyla/serenity/commit/12317b98a0cc145e717e9da3cdbe8bc1ff8fc4f1
+[c:141bbfc]: https://github.com/zeyla/serenity/commit/141bbfcb1e4843eaeb55bf07e10e2c0aa4bbe1e4
+[c:143fddd]: https://github.com/zeyla/serenity/commit/143fddd83f1fc93c070e36bf31906d2631c68f97
+[c:14b9222]: https://github.com/zeyla/serenity/commit/14b92221184fcaca0f4a60a3b31d5a9470b14b1f
+[c:1735e57]: https://github.com/zeyla/serenity/commit/1735e57ea57bcd4d75b73ac9398e13bee5198c5b
+[c:1fa83f7]: https://github.com/zeyla/serenity/commit/1fa83f73577d926664518d849bc26e46087611b4
+[c:1fd652b]: https://github.com/zeyla/serenity/commit/1fd652be41f4de96d26efaf20055cf7a80e42bf1
+[c:2032a40]: https://github.com/zeyla/serenity/commit/2032a402c387b1310f2ae62621f3e07c86b76aef
+[c:222382c]: https://github.com/zeyla/serenity/commit/222382ca48cb9786aaf5d0b5fc16958e482e7c5f
+[c:25d79ac]: https://github.com/zeyla/serenity/commit/25d79ac7e07654dbf77166d46db33d186faf9885
+[c:25dddb6]: https://github.com/zeyla/serenity/commit/25dddb6695109eeead9e19593cb85a22096c2c7a
+[c:26fe139]: https://github.com/zeyla/serenity/commit/26fe139363a847542bbe609fe4d15accbf4fef14
+[c:2abeea5]: https://github.com/zeyla/serenity/commit/2abeea53745b5ddfce33d9e1160c682888850344
+[c:2c9b682]: https://github.com/zeyla/serenity/commit/2c9b6824a7bf6231a08d5c5465c1db5417ea5d8a
+[c:2d23d8b]: https://github.com/zeyla/serenity/commit/2d23d8b50386e38fece6987286bd0b3d56d1cada
+[c:2edba81]: https://github.com/zeyla/serenity/commit/2edba816f6901db46e7fc0f6664058033a56d5e7
+[c:39a1435]: https://github.com/zeyla/serenity/commit/39a1435be57335e99039ddea731032221eb6d96e
+[c:3a0c890]: https://github.com/zeyla/serenity/commit/3a0c8908ce837f6fe64f865a1a7a9de63cbd237c
+[c:3a4cb18]: https://github.com/zeyla/serenity/commit/3a4cb18be8ca33d507cbfc88fec79b2a6c5d8bfc
+[c:3b9f0f8]: https://github.com/zeyla/serenity/commit/3b9f0f8501f7581d710e3f7ebbfcd3176d14a9b1
+[c:3ca7e15]: https://github.com/zeyla/serenity/commit/3ca7e15e55de640200edb3898a33b838946a506c
+[c:3d24033]: https://github.com/zeyla/serenity/commit/3d24033f550623f78ad71a37f6ec847e7d0a2c78
+[c:3e14067]: https://github.com/zeyla/serenity/commit/3e1406764cf655694fef0e04e43324d58499bba3
+[c:40c5c12]: https://github.com/zeyla/serenity/commit/40c5c12373e2a2c7acd3501f43c79f9bf3e7c685
+[c:45c1f27]: https://github.com/zeyla/serenity/commit/45c1f27edbeedcb30aa3e9daa78eba44817f7260
+[c:470f366]: https://github.com/zeyla/serenity/commit/470f366000b3d3f8080e02b185f0f7fef592a736
+[c:4bd223a]: https://github.com/zeyla/serenity/commit/4bd223a88cfacc335814ef3ddc0c1aaa88fc05f7
+[c:4e20277]: https://github.com/zeyla/serenity/commit/4e20277de4f164705074ba41199e4530332056b3
+[c:524b8f8]: https://github.com/zeyla/serenity/commit/524b8f8ab5153e20ad86be2df7fba6bbed159b7c
+[c:551f166]: https://github.com/zeyla/serenity/commit/551f16673fe775a80a1da788fd7e1db20f6eae29
+[c:5d4301b]: https://github.com/zeyla/serenity/commit/5d4301bbd2aaa4abe47fbbc2a7a2853ba9b728f2
+[c:60613ef]: https://github.com/zeyla/serenity/commit/60613ef696b093dbbac3a4e9e033c226c5d358ea
+[c:612e973]: https://github.com/zeyla/serenity/commit/612e973f286ba6b711824333551b07b88df6740c
+[c:62647f5]: https://github.com/zeyla/serenity/commit/62647f53fd01a670cf5ad01c7d0a68cb69bf92cf
+[c:65233ad]: https://github.com/zeyla/serenity/commit/65233ad6f3d002f72942aaf811514fa9d29ad068
+[c:65e3279]: https://github.com/zeyla/serenity/commit/65e3279ce7b3c4807e8b1310551e9493d3868b94
+[c:68156c9]: https://github.com/zeyla/serenity/commit/68156c9ce93edc86a70f50cf10986615cfb9f93a
+[c:7566f32]: https://github.com/zeyla/serenity/commit/7566f32c194bc4e62e89adc57bfb6104cc99458e
+[c:78c6df9]: https://github.com/zeyla/serenity/commit/78c6df9ed3640c097ef088519ec99a6a01796bfc
+[c:7a5aa3c]: https://github.com/zeyla/serenity/commit/7a5aa3c57951ee5c7267fabf38f2729b06629b34
+[c:7c911d5]: https://github.com/zeyla/serenity/commit/7c911d57eb3db3ac51cfc51cf9b3a5884e0f4ea3
+[c:7cf1e52]: https://github.com/zeyla/serenity/commit/7cf1e523f0c0bee1b7ec11ff6e6565c68f9d173e
+[c:7e46d8f]: https://github.com/zeyla/serenity/commit/7e46d8f3ac5a968df9a05f8f0006522ad14891ef
+[c:82b87f1]: https://github.com/zeyla/serenity/commit/82b87f196425ff8553bc9dcb84ddac9764b971e4
+[c:84706f1]: https://github.com/zeyla/serenity/commit/84706f1fc0a934a851d57f524697da5b177b9be8
+[c:84ff27b]: https://github.com/zeyla/serenity/commit/84ff27be8455d9ec885b190150a2b592cffdf2a2
+[c:85d7d5f]: https://github.com/zeyla/serenity/commit/85d7d5f6a6df9841659bc7ad8e392f31c1aae46c
+[c:8c83866]: https://github.com/zeyla/serenity/commit/8c83866748bf7bf339df9a234c3297c8008ffa46
+[c:8c85664]: https://github.com/zeyla/serenity/commit/8c85664a94f7439ab4bc3a132f313a9e26d94fe7
+[c:8c9baa7]: https://github.com/zeyla/serenity/commit/8c9baa74c2716d62c405d909bb453ffea636c94d
+[c:8d68503]: https://github.com/zeyla/serenity/commit/8d685039d89fd2130e88c9a9e0421492a3e99da6
+[c:91c8ec4]: https://github.com/zeyla/serenity/commit/91c8ec4ae7540956a714ce9584074538b45467cc
+[c:9232b8f]: https://github.com/zeyla/serenity/commit/9232b8f065deb4637a74e7f85ab617bb527c51be
+[c:934eb3a]: https://github.com/zeyla/serenity/commit/934eb3aa0b1f9c0aaad003627bd65932114654c1
+[c:93e0a42]: https://github.com/zeyla/serenity/commit/93e0a4215c915b98cf433ac6d0bcfbc60f0168ec
+[c:9908999]: https://github.com/zeyla/serenity/commit/9908999a6bae1585bb70b7814f13b49bf99b6c32
+[c:99d17d2]: https://github.com/zeyla/serenity/commit/99d17d2975143b0d588c969f7ae6f8d11e62a9e1
+[c:9aaa555]: https://github.com/zeyla/serenity/commit/9aaa55542d6bee1e953a080612ee6af765b8a5a5
+[c:9aad1aa]: https://github.com/zeyla/serenity/commit/9aad1aa375168d6131cb6f68d6998b2af6fb00a3
+[c:9da642a]: https://github.com/zeyla/serenity/commit/9da642a5bea8b4ac2d291058ad22e4cbe27b1f94
+[c:a17fea7]: https://github.com/zeyla/serenity/commit/a17fea783cd91b2adcd1330b7038cf3ca2d79a85
+[c:a359f77]: https://github.com/zeyla/serenity/commit/a359f77d1fd03def94fc08367132a616ec2ea599
+[c:a7b67df]: https://github.com/zeyla/serenity/commit/a7b67df6d77f5acacf83710807b231866397d551
+[c:a96be90]: https://github.com/zeyla/serenity/commit/a96be90385b58a9098b918e0fd17288d89229752
+[c:aad4744]: https://github.com/zeyla/serenity/commit/aad4744fb751e3e1147f085781323172755d4ef2
+[c:ad0dcb3]: https://github.com/zeyla/serenity/commit/ad0dcb305d959a2bb273a63dd2dd1b5594f5c49d
+[c:ae50886]: https://github.com/zeyla/serenity/commit/ae50886a1a8f69c114d9e99a0913c878aaaaabe2
+[c:b146501]: https://github.com/zeyla/serenity/commit/b14650193342297746f985f8794e4b93ceeac52b
+[c:b19b031]: https://github.com/zeyla/serenity/commit/b19b031a5052a268f323a116403ea66ca71ea575
+[c:b215457]: https://github.com/zeyla/serenity/commit/b215457ab46c9d10bf47300d6525f9a2641d3b17
+[c:b328b3e]: https://github.com/zeyla/serenity/commit/b328b3e09b0095abb54530dc4d50db6b4e3e1779
+[c:b52eb9f]: https://github.com/zeyla/serenity/commit/b52eb9f108fb7af182e0cf29259cd4d522ed7f89
+[c:b60d037]: https://github.com/zeyla/serenity/commit/b60d0378548a53ffefda17aab403c073d3438cf6
+[c:b62dfd4]: https://github.com/zeyla/serenity/commit/b62dfd431668b4bdb6021d21120da05d17ab77d5
+[c:b7542f4]: https://github.com/zeyla/serenity/commit/b7542f44306fedb7f79f7b8cd5c8d6afd6ccb7ad
+[c:b8efeaf]: https://github.com/zeyla/serenity/commit/b8efeaf5e920cbfc775cdee70f23aa41ab7b9dd5
+[c:bcd16dd]: https://github.com/zeyla/serenity/commit/bcd16dddb8cc3086a13524c79676f3a8bebbc524
+[c:be43836]: https://github.com/zeyla/serenity/commit/be43836839a31714f58e3ffe81dd4b0aeab2ab59
+[c:c3aa63f]: https://github.com/zeyla/serenity/commit/c3aa63faee8b3ae6d5126aa27a74876766c61e4c
+[c:d1113c0]: https://github.com/zeyla/serenity/commit/d1113c07f061149b5d090c1f15c3c03806f8b0cf
+[c:d264cc3]: https://github.com/zeyla/serenity/commit/d264cc3496f56d2757cf9c1735d5d8a68577c2f5
+[c:d5a9aa8]: https://github.com/zeyla/serenity/commit/d5a9aa8b1e0a94094ef5bda98a76dd259a6e7a3a
+[c:d90b90c]: https://github.com/zeyla/serenity/commit/d90b90c7f3d8a368acbab46150f199866562229a
+[c:e02a842]: https://github.com/zeyla/serenity/commit/e02a842fb76b1e591287395ac223cc1c04913820
+[c:e0e7617]: https://github.com/zeyla/serenity/commit/e0e76173f63b6071b9df3ff8f53371b4b6c4ee1e
+[c:e5a6f3a]: https://github.com/zeyla/serenity/commit/e5a6f3a8ed367bd3d780fd23a0a27f8a80567879
+[c:e611776]: https://github.com/zeyla/serenity/commit/e6117760e3c020ed41d643a8b34d7bfeb62d3bfa
+[c:e678883]: https://github.com/zeyla/serenity/commit/e6788838556d13d4a4f19253ce297ca2f72168ee
+[c:e748d1f]: https://github.com/zeyla/serenity/commit/e748d1ff80dbbeb82b23f8ac9fec9cf8c7e4a69e
+[c:eb9e8df]: https://github.com/zeyla/serenity/commit/eb9e8dfbc9d778de405d7369579d90c49a2bf90c
+[c:ee207b3]: https://github.com/zeyla/serenity/commit/ee207b331d571d5afb5c35c8f119937d0196663a
+[c:ee2bbca]: https://github.com/zeyla/serenity/commit/ee2bbcaa0b62c09a6c0df352bfddcbf99d06e61d
+[c:f0a56f4]: https://github.com/zeyla/serenity/commit/f0a56f46ce7ef6c2a65d64d8953ac43e0b7b5b4d
+[c:f0ee805]: https://github.com/zeyla/serenity/commit/f0ee805a8ee20b6180b9f54d5096a8a9b73b4be2
+[c:f10b9d7]: https://github.com/zeyla/serenity/commit/f10b9d77f0b94864fa20688e3c99de6cec7ca6f9
+[c:f26dad8]: https://github.com/zeyla/serenity/commit/f26dad86aea82070aab9cc081f50d0144ee4c778
+[c:f2c21ef]: https://github.com/zeyla/serenity/commit/f2c21ef5b15ef1f345cdc30f4b793e55905f15f4
+[c:f2fa349]: https://github.com/zeyla/serenity/commit/f2fa349d831c1db59993341284049ffbd56dde3b
+[c:f61816c]: https://github.com/zeyla/serenity/commit/f61816ca141add5024e36e073764b7c824872ca4
+[c:fd19446]: https://github.com/zeyla/serenity/commit/fd19446fcc4c7ad2c9f634c97fa1c056440a6abd
+
+[c:52403a5]: https://github.com/zeyla/serenity/commit/52403a5084ed7f0589bde3351844907a92de2d62
+[c:795eaa1]: https://github.com/zeyla/serenity/commit/795eaa15bca61116fbde9c2482c765f2d47a7696
+
+[c:77f462e]: https://github.com/zeyla/serenity/commit/77f462ea2044ef7d2d12fd1289ea75a6a33cb5dd
 
 [c:1b7101f]: https://github.com/zeyla/serenity/commit/1b7101fe71335c0e18bf855c0703acc23d87e427
 [c:2ba4d03]: https://github.com/zeyla/serenity/commit/2ba4d03f15d57d9f0fb1cc4d4f4355ebbc483d0a

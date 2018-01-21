@@ -1,4 +1,6 @@
-use super::*;
+//! Miscellaneous helper traits, enums, and structs for models.
+
+use super::prelude::*;
 use internal::RwLockExt;
 
 #[cfg(all(feature = "model", feature = "utils"))]
@@ -96,111 +98,98 @@ impl FromStr for User {
     }
 }
 
-#[cfg(all(feature = "model", feature = "utils"))]
-#[derive(Debug)]
-pub enum UserIdParseError {
-    InvalidFormat,
+macro_rules! impl_from_str {
+    (id: $($id:tt, $err:ident;)*) => {
+        $(
+            #[cfg(all(feature = "model", feature = "utils"))]
+            #[derive(Debug)]
+            pub enum $err {
+                InvalidFormat,
+            }
+
+            #[cfg(all(feature = "model", feature = "utils"))]
+            impl fmt::Display for $err {
+                fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.description()) }
+            }
+
+            #[cfg(all(feature = "model", feature = "utils"))]
+            impl StdError for $err {
+                fn description(&self) -> &str {
+                    use self::$err::*;
+
+                    match *self {
+                        InvalidFormat => "invalid id format",
+                    }
+                }
+            }
+
+            #[cfg(all(feature = "model", feature = "utils"))]
+            impl FromStr for $id {
+                type Err = $err;
+
+                fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+                    Ok(match utils::parse_username(s) {
+                        Some(id) => $id(id),
+                        None => s.parse::<u64>().map($id).map_err(|_| $err::InvalidFormat)?,
+                    })
+                }
+            }
+        )*
+    };
+
+    (struct: $($struct:ty, $id:tt, $err:ident, $invalid_variant:tt, $parse_fn:ident, $desc:expr;)*) => {
+        $(
+            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+            #[derive(Debug)]
+            pub enum $err {
+                NotPresentInCache,
+                $invalid_variant,
+            }
+
+            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+            impl fmt::Display for $err {
+                fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.description()) }
+            }
+
+            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+            impl StdError for $err {
+                fn description(&self) -> &str {
+                    use self::$err::*;
+
+                    match *self {
+                        NotPresentInCache => "not present in cache",
+                        $invalid_variant => $desc,
+                    }
+                }
+            }
+
+            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+            impl FromStr for $struct {
+                type Err = $err;
+
+                fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+                    match utils::$parse_fn(s) {
+                        Some(x) => match $id(x).find() {
+                            Some(user) => Ok(user),
+                            _ => Err($err::NotPresentInCache),
+                        },
+                        _ => Err($err::$invalid_variant),
+                    }
+                }
+            }
+        )*
+    };
 }
 
-#[cfg(all(feature = "model", feature = "utils"))]
-impl fmt::Display for UserIdParseError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.description()) }
+impl_from_str! { id:
+    UserId, UserIdParseError;
+    RoleId, RoleIdParseError;
+    ChannelId, ChannelIdParseError;
 }
 
-#[cfg(all(feature = "model", feature = "utils"))]
-impl StdError for UserIdParseError {
-    fn description(&self) -> &str {
-        use self::UserIdParseError::*;
-
-        match *self {
-            InvalidFormat => "invalid user id format",
-        }
-    }
-}
-
-#[cfg(all(feature = "model", feature = "utils"))]
-impl FromStr for UserId {
-    type Err = UserIdParseError;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        Ok(match utils::parse_username(s) {
-            Some(id) => UserId(id),
-            None => s.parse::<u64>().map(UserId).map_err(|_| UserIdParseError::InvalidFormat)?,
-        })
-    }
-}
-
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-#[derive(Debug)]
-pub enum RoleParseError {
-    NotPresentInCache,
-    InvalidRole,
-}
-
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-impl fmt::Display for RoleParseError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.description()) }
-}
-
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-impl StdError for RoleParseError {
-    fn description(&self) -> &str {
-        use self::RoleParseError::*;
-
-        match *self {
-            NotPresentInCache => "not present in cache",
-            InvalidRole => "invalid role",
-        }
-    }
-}
-
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-impl FromStr for Role {
-    type Err = RoleParseError;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        match utils::parse_role(s) {
-            Some(x) => match RoleId(x).find() {
-                Some(user) => Ok(user),
-                _ => Err(RoleParseError::NotPresentInCache),
-            },
-            _ => Err(RoleParseError::InvalidRole),
-        }
-    }
-}
-
-#[cfg(all(feature = "model", feature = "utils"))]
-#[derive(Debug)]
-pub enum RoleIdParseError {
-    InvalidFormat,
-}
-
-#[cfg(all(feature = "model", feature = "utils"))]
-impl fmt::Display for RoleIdParseError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.description()) }
-}
-
-#[cfg(all(feature = "model", feature = "utils"))]
-impl StdError for RoleIdParseError {
-    fn description(&self) -> &str {
-        use self::RoleIdParseError::*;
-
-        match *self {
-            InvalidFormat => "invalid role id format",
-        }
-    }
-}
-
-#[cfg(all(feature = "model", feature = "utils"))]
-impl FromStr for RoleId {
-    type Err = RoleIdParseError;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        Ok(match utils::parse_role(s) {
-            Some(id) => RoleId(id),
-            None => s.parse::<u64>().map(RoleId).map_err(|_| RoleIdParseError::InvalidFormat)?,
-        })
-    }
+impl_from_str! { struct:
+    Channel, ChannelId, ChannelParseError, InvalidChannel, parse_channel, "invalid channel";
+    Role, RoleId, RoleParseError, InvalidRole, parse_role, "invalid role";
 }
 
 /// A version of an emoji used only when solely the Id and name are known.
@@ -227,34 +216,11 @@ impl FromStr for EmojiIdentifier {
     fn from_str(s: &str) -> StdResult<Self, ()> { utils::parse_emoji(s).ok_or_else(|| ()) }
 }
 
-#[cfg(all(feature = "model", feature = "utils"))]
-impl FromStr for ChannelId {
-    type Err = ();
-
-    fn from_str(s: &str) -> StdResult<Self, ()> {
-        utils::parse_channel(s).ok_or_else(|| ()).map(ChannelId)
-    }
-}
-
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-impl FromStr for Channel {
-    type Err = ();
-
-    fn from_str(s: &str) -> StdResult<Self, ()> {
-        match utils::parse_channel(s) {
-            Some(x) => match ChannelId(x).find() {
-                Some(channel) => Ok(channel),
-                _ => Err(()),
-            },
-            _ => Err(()),
-        }
-    }
-}
 
 /// A component that was affected during a service incident.
 ///
 /// This is pulled from the Discord status page.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct AffectedComponent {
     pub name: String,
 }
@@ -262,7 +228,7 @@ pub struct AffectedComponent {
 /// An incident retrieved from the Discord status page.
 ///
 /// This is not necessarily a representation of an ongoing incident.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Incident {
     pub created_at: String,
     pub id: String,
@@ -281,7 +247,7 @@ pub struct Incident {
 ///
 /// This will typically state what new information has been discovered about an
 /// incident.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct IncidentUpdate {
     pub affected_components: Vec<AffectedComponent>,
     pub body: String,
@@ -306,7 +272,7 @@ pub enum IncidentStatus {
 
 /// A Discord status maintenance message. This can be either for active
 /// maintenances or for scheduled maintenances.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Maintenance {
     pub description: String,
     pub id: String,

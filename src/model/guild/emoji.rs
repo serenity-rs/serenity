@@ -1,5 +1,5 @@
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
-use super::super::{EmojiId, RoleId};
+use super::super::id::{EmojiId, RoleId};
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
@@ -8,15 +8,18 @@ use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::super::ModelError;
 #[cfg(all(feature = "cache", feature = "model"))]
-use super::super::GuildId;
+use super::super::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
 use {CACHE, http};
 
 /// Represents a custom guild emoji, which can either be created using the API,
 /// or via an integration. Emojis created using the API only work within the
 /// guild it was created in.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Emoji {
+    /// Whether the emoji is animated.
+    #[serde(default)]
+    pub animated: bool,
     /// The Id of the emoji.
     pub id: EmojiId,
     /// The name of the emoji. It must be at least 2 characters long and can
@@ -51,9 +54,11 @@ impl Emoji {
     /// Delete a given emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{Emoji, EmojiId};
+    /// # use serenity::model::guild::Emoji;
+    /// # use serenity::model::id::EmojiId;
     /// #
     /// # let mut emoji = Emoji {
+    /// #     animated: false,
     /// #     id: EmojiId(7),
     /// #     name: String::from("blobface"),
     /// #     managed: false,
@@ -88,9 +93,11 @@ impl Emoji {
     /// Change the name of an emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{Emoji, EmojiId};
+    /// # use serenity::model::guild::Emoji;
+    /// # use serenity::model::id::EmojiId;
     /// #
     /// # let mut emoji = Emoji {
+    /// #     animated: false,
     /// #     id: EmojiId(7),
     /// #     name: String::from("blobface"),
     /// #     managed: false,
@@ -132,9 +139,11 @@ impl Emoji {
     /// Print the guild id that owns this emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{Emoji, EmojiId};
+    /// # use serenity::model::guild::Emoji;
+    /// # use serenity::model::id::EmojiId;
     /// #
     /// # let mut emoji = Emoji {
+    /// #     animated: false,
     /// #     id: EmojiId(7),
     /// #     name: String::from("blobface"),
     /// #     managed: false,
@@ -167,9 +176,11 @@ impl Emoji {
     /// Print the direct link to the given emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{Emoji, EmojiId};
+    /// # use serenity::model::guild::Emoji;
+    /// # use serenity::model::id::EmojiId;
     /// #
     /// # let mut emoji = Emoji {
+    /// #     animated: false,
     /// #     id: EmojiId(7),
     /// #     name: String::from("blobface"),
     /// #     managed: false,

@@ -39,7 +39,7 @@ use hyper::net::HttpsConnector;
 use hyper::{header, Error as HyperError, Result as HyperResult, Url};
 use hyper_native_tls::NativeTlsClient;
 use internal::prelude::*;
-use model::*;
+use model::prelude::*;
 use multipart::client::Multipart;
 use parking_lot::Mutex;
 use self::ratelimiting::Route;
@@ -48,7 +48,7 @@ use std::collections::BTreeMap;
 use std::default::Default;
 use std::fmt::Write as FmtWrite;
 use std::fs::File;
-use std::io::{ErrorKind as IoErrorKind, Read};
+use std::io::ErrorKind as IoErrorKind;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
@@ -524,7 +524,7 @@ pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
 ///
 /// ```rust,no_run
 /// use serenity::http;
-/// use serenity::model::{ChannelId, MessageId};
+/// use serenity::model::id::{ChannelId, MessageId};
 ///
 /// let channel_id = ChannelId(7);
 /// let message_id = MessageId(8);
@@ -1342,7 +1342,7 @@ pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
 ///
 /// ```rust,no_run
 /// use serenity::http::{GuildPagination, get_guilds};
-/// use serenity::model::GuildId;
+/// use serenity::model::id::GuildId;
 ///
 /// let guild_id = GuildId(81384788765712384);
 ///
@@ -1674,7 +1674,7 @@ pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, m
     let mut request = Multipart::from_request(request)?;
     let mut file_num = "0".to_string();
 
-    for file in files.into_iter() {
+    for file in files {
         match file.into() {
             AttachmentType::Bytes((mut bytes, filename)) => {
                 request
@@ -1708,7 +1708,7 @@ pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, m
     let response = request.send()?;
 
     if response.status.class() != StatusClass::Success {
-        return Err(Error::Http(HttpError::InvalidRequest(response.status)));
+        return Err(Error::Http(HttpError::UnsuccessfulRequest(response)));
     }
 
     serde_json::from_reader::<HyperResponse, Message>(response)
@@ -1832,7 +1832,7 @@ fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
     if response.status.class() == StatusClass::Success {
         Ok(response)
     } else {
-        Err(Error::Http(HttpError::InvalidRequest(response.status)))
+        Err(Error::Http(HttpError::UnsuccessfulRequest(response)))
     }
 }
 
@@ -1849,30 +1849,15 @@ pub(crate) fn retry<'a, F>(f: F) -> HyperResult<HyperResponse>
     }
 }
 
-fn verify(expected_status_code: u16, mut response: HyperResponse) -> Result<()> {
-    let expected_status = match expected_status_code {
-        200 => StatusCode::Ok,
-        204 => StatusCode::NoContent,
-        401 => StatusCode::Unauthorized,
-        _ => {
-            let client_error = HttpError::UnknownStatus(expected_status_code);
-
-            return Err(Error::Http(client_error));
-        },
-    };
-
-    if response.status == expected_status {
+fn verify(expected: u16, response: HyperResponse) -> Result<()> {
+    if response.status.to_u16() == expected {
         return Ok(());
     }
 
-    debug!("Expected {}, got {}", expected_status_code, response.status);
+    debug!("Expected {}, got {}", expected, response.status);
+    trace!("Unsuccessful response: {:?}", response);
 
-    let mut s = String::default();
-    response.read_to_string(&mut s)?;
-
-    debug!("Content: {}", s);
-
-    Err(Error::Http(HttpError::InvalidRequest(response.status)))
+    Err(Error::Http(HttpError::UnsuccessfulRequest(response)))
 }
 
 /// Enum that allows a user to pass a `Path` or a `File` type to `send_files`
@@ -1891,6 +1876,12 @@ impl<'a> From<(&'a [u8], &'a str)> for AttachmentType<'a> {
 
 impl<'a> From<&'a str> for AttachmentType<'a> {
     fn from(s: &'a str) -> AttachmentType { AttachmentType::Path(Path::new(s)) }
+}
+
+impl<'a> From<&'a Path> for AttachmentType<'a> {
+    fn from(path: &'a Path) -> AttachmentType {
+        AttachmentType::Path(path)
+    }
 }
 
 impl<'a> From<&'a PathBuf> for AttachmentType<'a> {

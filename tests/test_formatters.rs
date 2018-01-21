@@ -1,7 +1,7 @@
 extern crate parking_lot;
 extern crate serenity;
 
-use serenity::model::*;
+use serenity::model::prelude::*;
 
 #[test]
 fn test_formatters() {
@@ -35,6 +35,7 @@ fn test_mention() {
         nsfw: false,
     })));
     let emoji = Emoji {
+        animated: false,
         id: EmojiId(5),
         name: "a".to_string(),
         managed: true,

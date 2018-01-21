@@ -4,32 +4,38 @@ pub mod help_commands;
 mod command;
 mod configuration;
 mod create_command;
+mod create_help_command;
 mod create_group;
 mod buckets;
 mod args;
 
-pub use self::args::{Args, Iter, FromStrZc, Error as ArgError};
+pub use self::args::{Args, Iter, Error as ArgError};
 pub(crate) use self::buckets::{Bucket, Ratelimit};
-pub use self::command::{Command, CommandGroup, CommandType, Error as CommandError};
+pub(crate) use self::command::{Help};
+pub use self::command::{HelpFunction, HelpOptions, Command, CommandGroup, CommandOptions, Error as CommandError};
 pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
-pub use self::create_command::CreateCommand;
+pub use self::create_help_command::CreateHelpCommand;
+pub use self::create_command::{CreateCommand, FnOrCommand};
 pub use self::create_group::CreateGroup;
 
 use client::Context;
 use internal::RwLockExt;
-use model::{ChannelId, GuildId, Guild, Member, Message, UserId};
-use model::permissions::Permissions;
+use model::channel::Message;
+use model::guild::{Guild, Member};
+use model::id::{ChannelId, GuildId, UserId};
+use model::Permissions;
 use self::command::{AfterHook, BeforeHook};
 use std::collections::HashMap;
 use std::default::Default;
 use std::sync::Arc;
 use super::Framework;
+use threadpool::ThreadPool;
 
 #[cfg(feature = "cache")]
 use client::CACHE;
 #[cfg(feature = "cache")]
-use model::Channel;
+use model::channel::Channel;
 
 /// A macro to generate "named parameters". This is useful to avoid manually
 /// using the "arguments" parameter and manually parsing types.
@@ -67,45 +73,65 @@ use model::Channel;
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
-        #[allow(unreachable_code, unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context,
-                      _: &$crate::model::Message,
+        #[allow(non_camel_case_types)]
+        pub struct $fname;
+
+        impl $crate::framework::standard::Command for $fname {
+            #[allow(unreachable_code, unused_mut)]
+            fn execute(&self, mut $c: &mut $crate::client::Context,
+                      _: &$crate::model::channel::Message,
                       _: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
-            $b
 
-            Ok(())
+                $b
+
+                Ok(())
+            }
         }
     };
     ($fname:ident($c:ident, $m:ident) $b:block) => {
-        #[allow(unreachable_code, unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context,
-                      $m: &$crate::model::Message,
+        #[allow(non_camel_case_types)]
+        pub struct $fname;
+
+        impl $crate::framework::standard::Command for $fname {
+            #[allow(unreachable_code, unused_mut)]
+            fn execute(&self, mut $c: &mut $crate::client::Context,
+                      $m: &$crate::model::channel::Message,
                       _: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
-            $b
 
-            Ok(())
+                $b
+
+                Ok(())
+            }
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
-        #[allow(unreachable_code, unused_mut)]
-        pub fn $fname(mut $c: &mut $crate::client::Context,
-                      $m: &$crate::model::Message,
+        #[allow(non_camel_case_types)]
+        pub struct $fname;
+
+        impl $crate::framework::standard::Command for $fname {
+            #[allow(unreachable_code, unused_mut)]
+            fn execute(&self, mut $c: &mut $crate::client::Context,
+                      $m: &$crate::model::channel::Message,
                       mut $a: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
-            $b
 
-            Ok(())
+                $b
+
+                Ok(())
+            }
         }
     };
 }
 
-/// A enum representing all possible fail conditions under which a command won't
+/// An enum representing all possible fail conditions under which a command won't
 /// be executed.
 pub enum DispatchError {
     /// When a custom function check has failed.
-    CheckFailed(Arc<Command>),
+    //
+    // TODO: Bring back `Arc<Command>` as `CommandOptions` here somehow?
+    CheckFailed,
     /// When the requested command is disabled in bot configuration.
     CommandDisabled(String),
     /// When the user is blocked in bot configuration.
@@ -145,7 +171,7 @@ impl fmt::Debug for DispatchError {
         use self::DispatchError::*;
 
         match *self {
-            CheckFailed(..) => write!(f, "DispatchError::CheckFailed"),
+            CheckFailed => write!(f, "DispatchError::CheckFailed"),
             CommandDisabled(ref s) => f.debug_tuple("DispatchError::CommandDisabled").field(&s).finish(),
             BlockedUser => write!(f, "DispatchError::BlockedUser"),
             BlockedGuild => write!(f, "DispatchError::BlockedGuild"),
@@ -174,6 +200,7 @@ type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'st
 pub struct StandardFramework {
     configuration: Configuration,
     groups: HashMap<String, Arc<CommandGroup>>,
+    help: Option<Arc<Help>>,
     before: Option<Arc<BeforeHook>>,
     dispatch_error_handler: Option<Arc<DispatchErrorHook>>,
     buckets: HashMap<String, Bucket>,
@@ -195,7 +222,7 @@ pub struct StandardFramework {
     /// ../client/event_handler/trait.EventHandler.html#method.on_message
     /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
     pub initialized: bool,
-    user_info: (u64, bool),
+    user_id: u64,
 }
 
 impl StandardFramework {
@@ -260,12 +287,15 @@ impl StandardFramework {
     ///     .bucket("basic", 2, 10, 3)
     ///     .command("ping", |c| c
     ///         .bucket("basic")
-    ///         .exec_str("pong!")));
+    ///         .exec(|_, msg, _| {
+    ///             msg.channel_id.say("pong!")?;
+    ///
+    ///             Ok(())
+    ///         })));
     /// ```
-    pub fn bucket<S>(mut self, s: S, delay: i64, time_span: i64, limit: i32) -> Self
-        where S: Into<String> {
+    pub fn bucket(mut self, s: &str, delay: i64, time_span: i64, limit: i32) -> Self {
         self.buckets.insert(
-            s.into(),
+            s.to_string(),
             Bucket {
                 ratelimit: Ratelimit {
                     delay: delay,
@@ -303,13 +333,17 @@ impl StandardFramework {
     ///     })
     ///     .command("ping", |c| c
     ///         .bucket("basic")
-    ///         .exec_str("pong!")));
+    ///         .exec(|_, msg, _| {
+    ///             msg.channel_id.say("pong!")?;
+    ///
+    ///             Ok(())
+    ///         })));
     /// ```
     ///
     /// [`bucket`]: #method.bucket
     #[cfg(feature = "cache")]
-    pub fn complex_bucket<S, Check>(mut self,
-                                    s: S,
+    pub fn complex_bucket<Check>(mut self,
+                                    s: &str,
                                     delay: i64,
                                     time_span: i64,
                                     limit: i32,
@@ -318,10 +352,9 @@ impl StandardFramework {
         where Check: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool
                          + Send
                          + Sync
-                         + 'static,
-              S: Into<String> {
+                         + 'static {
         self.buckets.insert(
-            s.into(),
+            s.to_string(),
             Bucket {
                 ratelimit: Ratelimit {
                     delay,
@@ -362,17 +395,16 @@ impl StandardFramework {
     ///
     /// [`bucket`]: #method.bucket
     #[cfg(not(feature = "cache"))]
-    pub fn complex_bucket<S, Check>(mut self,
-                                    s: S,
+    pub fn complex_bucket<Check>(mut self,
+                                    s: &str,
                                     delay: i64,
                                     time_span: i64,
                                     limit: i32,
                                     check: Check)
                                     -> Self
-        where Check: Fn(&mut Context, ChannelId, UserId) -> bool + Send + Sync + 'static,
-              S: Into<String> {
+        where Check: Fn(&mut Context, ChannelId, UserId) -> bool + Send + Sync + 'static {
         self.buckets.insert(
-            s.into(),
+            s.to_string(),
             Bucket {
                 ratelimit: Ratelimit {
                     delay,
@@ -405,12 +437,11 @@ impl StandardFramework {
     ///     .simple_bucket("simple", 2)
     ///     .command("ping", |c| c
     ///         .bucket("simple")
-    ///         .exec_str("pong!")));
+    ///         .exec(|_, msg, _| { msg.channel_id.say("pong!")?; Ok(()) })));
     /// ```
-    pub fn simple_bucket<S>(mut self, s: S, delay: i64) -> Self
-        where S: Into<String> {
+    pub fn simple_bucket(mut self, s: &str, delay: i64) -> Self {
         self.buckets.insert(
-            s.into(),
+            s.to_string(),
             Bucket {
                 ratelimit: Ratelimit {
                     delay: delay,
@@ -447,7 +478,7 @@ impl StandardFramework {
     fn should_fail(&mut self,
                    mut context: &mut Context,
                    message: &Message,
-                   command: &Arc<Command>,
+                   command: &Arc<CommandOptions>,
                    args: &mut Args,
                    to_check: &str,
                    built: &str)
@@ -482,22 +513,22 @@ impl StandardFramework {
                 }
             }
 
-            let arg_len = args.len();
+            let len = args.len();
 
             if let Some(x) = command.min_args {
-                if arg_len < x as usize {
+                if len < x as usize {
                     return Some(DispatchError::NotEnoughArguments {
                         min: x,
-                        given: arg_len,
+                        given: len,
                     });
                 }
             }
 
             if let Some(x) = command.max_args {
-                if arg_len > x as usize {
+                if len > x as usize {
                     return Some(DispatchError::TooManyArguments {
                         max: x,
-                        given: arg_len,
+                        given: len,
                     });
                 }
             }
@@ -558,7 +589,7 @@ impl StandardFramework {
                 if all_passed {
                     None
                 } else {
-                    Some(DispatchError::CheckFailed(Arc::clone(command)))
+                    Some(DispatchError::CheckFailed)
                 }
             }
         }
@@ -597,25 +628,37 @@ impl StandardFramework {
     /// #
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new().on("ping", ping));
+    /// client.with_framework(StandardFramework::new().on("ping", |_, msg, _| {
+    ///     msg.channel_id.say("pong!")?;
     ///
-    /// command!(ping(_ctx, msg) {
-    ///     let _ = msg.channel_id.say("pong!");
-    /// });
+    ///     Ok(())
+    /// }));
     /// # }
     /// ```
-    pub fn on(mut self, name: &str,
+    pub fn on(self, name: &str,
             f: fn(&mut Context, &Message, Args)
             -> Result<(), CommandError>) -> Self {
+        self.cmd(name, f)
+    }
+
+    /// Same as [`on`], but accepts a [`Command`] directly.
+    ///
+    /// [`on`]: #method.on
+    /// [`Command`]: trait.Command.html
+    pub fn cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
         {
             let ungrouped = self.groups
                 .entry("Ungrouped".to_string())
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
+                let cmd: Arc<Command> = Arc::new(c);
+
                 group
                     .commands
-                    .insert(name.to_string(), CommandOrAlias::Command(Arc::new(Command::new(f))));
+                    .insert(name.to_string(), CommandOrAlias::Command(Arc::clone(&cmd)));
+
+                cmd.init();
             }
         }
 
@@ -635,26 +678,26 @@ impl StandardFramework {
     ///         let _ = ctx.say("pong");
     ///     }));
     /// ```
-    pub fn command<F, S>(mut self, command_name: S, f: F) -> Self
-        where F: FnOnce(CreateCommand) -> CreateCommand, S: Into<String> {
+    pub fn command<F>(mut self, command_name: &str, f: F) -> Self
+        where F: FnOnce(CreateCommand) -> CreateCommand {
         {
             let ungrouped = self.groups
                 .entry("Ungrouped".to_string())
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
-                let cmd = f(CreateCommand(Command::default())).0;
-                let name = command_name.into();
+                let cmd = f(CreateCommand(CommandOptions::default(), FnOrCommand::Fn(|_, _, _| Ok(())))).finish();
+                let name = command_name.to_string();
 
                 if let Some(ref prefix) = group.prefix {
-                    for v in &cmd.aliases {
+                    for v in &cmd.options().aliases {
                         group.commands.insert(
                             format!("{} {}", prefix, v),
                             CommandOrAlias::Alias(format!("{} {}", prefix, name)),
                         );
                     }
                 } else {
-                    for v in &cmd.aliases {
+                    for v in &cmd.options().aliases {
                         group
                             .commands
                             .insert(v.to_string(), CommandOrAlias::Alias(name.clone()));
@@ -663,7 +706,9 @@ impl StandardFramework {
 
                 group
                     .commands
-                    .insert(name, CommandOrAlias::Command(Arc::new(cmd)));
+                    .insert(name, CommandOrAlias::Command(Arc::clone(&cmd)));
+
+                cmd.init();
             }
         }
 
@@ -691,11 +736,11 @@ impl StandardFramework {
     ///
     /// client.with_framework(StandardFramework::new()
     ///     .group("ping-pong", |g| g
-    ///         .command("ping", |c| c.exec_str("pong!"))
-    ///         .command("pong", |c| c.exec_str("ping!"))));
+    ///         .on("ping", |_, msg, _| { msg.channel_id.say("pong!")?; Ok(()) })
+    ///         .on("pong", |_, msg, _| { msg.channel_id.say("ping!")?; Ok(()) })));
     /// ```
-    pub fn group<F, S>(mut self, group_name: S, f: F) -> Self
-        where F: FnOnce(CreateGroup) -> CreateGroup, S: Into<String> {
+    pub fn group<F>(mut self, group_name: &str, f: F) -> Self
+        where F: FnOnce(CreateGroup) -> CreateGroup {
         let group = f(CreateGroup(CommandGroup::default())).0;
 
         self.groups.insert(group_name.into(), Arc::new(group));
@@ -833,10 +878,36 @@ impl StandardFramework {
 
         self
     }
+
+    /// Sets what code should be executed when a user sends `(prefix)help`.
+    pub fn help(mut self, f: HelpFunction) -> Self {
+        let a = CreateHelpCommand(HelpOptions::default(), f).finish();
+
+        self.help = Some(a);
+
+        self
+    }
+
+    /// Sets what code should be executed when sends `(prefix)help`.
+    /// Additionally takes a closure with a `CreateHelpCommand` in order
+    /// to alter help-commands.
+    pub fn customised_help<F>(mut self, f: HelpFunction, c: F) -> Self
+        where F: FnOnce(CreateHelpCommand) -> CreateHelpCommand {
+        let a = c(CreateHelpCommand(HelpOptions::default(), f));
+
+        self.help = Some(a.finish());
+
+        self
+    }
 }
 
 impl Framework for StandardFramework {
-    fn dispatch(&mut self, mut context: Context, message: Message) {
+    fn dispatch(
+        &mut self,
+        mut context: Context,
+        message: Message,
+        threadpool: &ThreadPool,
+    ) {
         let res = command::positions(&mut context, &message, &self.configuration);
 
         let positions = match res {
@@ -898,24 +969,50 @@ impl Framework for StandardFramework {
                         to_check
                     };
 
+                    let mut args = {
+                        let mut content = message.content.chars().skip(position).collect::<String>();
+                        content = content[command_length..].trim().to_string();
+
+                        Args::new(&content, &self.configuration.delimiters)
+                    };
+
+                    let before = self.before.clone();
+                    let after = self.after.clone();
+
+                    // This is a special case.
+                    if to_check == "help" {
+                        let help = self.help.clone();
+
+                        if let Some(help) = help {
+                            let groups = self.groups.clone();
+                            threadpool.execute(move || {
+
+                                if let Some(before) = before {
+
+                                    if !(before)(&mut context, &message, &built) {
+                                        return;
+                                    }
+                                }
+
+                                let result = (help.0)(&mut context, &message, &help.1, groups, &args);
+
+                                if let Some(after) = after {
+                                    (after)(&mut context, &message, &built, result);
+                                }
+                            });
+                            return;
+                        }
+
+                        return;
+                    }
+
                     if let Some(&CommandOrAlias::Command(ref command)) =
                         group.commands.get(&to_check) {
-                        let before = self.before.clone();
                         let command = Arc::clone(command);
-                        let after = self.after.clone();
-                        let groups = self.groups.clone();
-
-                        let mut args = {
-                            let mut content = message.content[position..].trim();
-                            content = content[command_length..].trim();
-
-                            Args::new(&content, self.configuration.delimiters.clone())
-                        };
-
                         if let Some(error) = self.should_fail(
                             &mut context,
                             &message,
-                            &command,
+                            &command.options(),
                             &mut args,
                             &to_check,
                             &built,
@@ -926,27 +1023,25 @@ impl Framework for StandardFramework {
                             return;
                         }
 
-                        if let Some(before) = before {
-                            if !(before)(&mut context, &message, &built) {
+                        threadpool.execute(move || {
+                            if let Some(before) = before {
+                                if !(before)(&mut context, &message, &built) {
+                                    return;
+                                }
+                            }
+
+                            if !command.before(&mut context, &message) {
                                 return;
                             }
-                        }
 
-                        let result = match command.exec {
-                            CommandType::StringResponse(ref x) => {
-                                let _ = message.channel_id.say(x);
+                            let result = command.execute(&mut context, &message, args);
 
-                                Ok(())
-                            },
-                            CommandType::Basic(ref x) => (x)(&mut context, &message, args),
-                            CommandType::WithCommands(ref x) => {
-                                (x)(&mut context, &message, groups, args)
-                            },
-                        };
+                            command.after(&mut context, &message, &result);
 
-                        if let Some(after) = after {
-                            (after)(&mut context, &message, &built, result);
-                        }
+                            if let Some(after) = after {
+                                (after)(&mut context, &message, &built, result);
+                            }
+                        });
 
                         return;
                     }
@@ -955,13 +1050,13 @@ impl Framework for StandardFramework {
         }
     }
 
-    fn update_current_user(&mut self, user_id: UserId, is_bot: bool) {
-        self.user_info = (user_id.0, is_bot);
+    fn update_current_user(&mut self, user_id: UserId) {
+        self.user_id = user_id.0;
     }
 }
 
 #[cfg(feature = "cache")]
-pub fn has_correct_permissions(command: &Command, message: &Message) -> bool {
+pub fn has_correct_permissions(command: &Arc<CommandOptions>, message: &Message) -> bool {
     if !command.required_permissions.is_empty() {
         if let Some(guild) = message.guild() {
             let perms = guild
@@ -975,9 +1070,38 @@ pub fn has_correct_permissions(command: &Command, message: &Message) -> bool {
 }
 
 #[cfg(feature = "cache")]
-pub fn has_correct_roles(cmd: &Command, guild: &Guild, member: &Member) -> bool {
-    cmd.allowed_roles
+pub fn has_correct_roles(cmd: &Arc<CommandOptions>, guild: &Guild, member: &Member) -> bool {
+    if cmd.allowed_roles.is_empty() {
+        true
+    } else {
+        cmd.allowed_roles
             .iter()
             .flat_map(|r| guild.role_by_name(r))
             .any(|g| member.roles.contains(&g.id))
+    }
+}
+
+/// Describes the behaviour the help-command shall execute once it encounters
+/// a command which the user or command fails to meet following criteria :
+/// Lacking required permissions to execute the command.
+/// Lacking required roles to execute the command.
+/// The command can't be used in the current channel (as in `DM only` or `guild only`).
+#[derive(PartialEq, Debug)]
+pub enum HelpBehaviour {
+    /// Strikes a command by applying `~~{comand_name}~~`.
+    Strike,
+    /// Does not list a command in the help-menu.
+    Hide,
+    /// The command will be displayed, hence nothing will be done.
+    Nothing
+}
+
+impl fmt::Display for HelpBehaviour {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+       match *self {
+           HelpBehaviour::Strike => write!(f, "HelpBehaviour::Strike"),
+           HelpBehaviour::Hide => write!(f, "HelpBehaviour::Hide"),
+           HelpBehaviour::Nothing => write!(f, "HelBehaviour::Nothing"),
+       }
+    }
 }

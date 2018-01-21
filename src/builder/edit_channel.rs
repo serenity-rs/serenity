@@ -1,5 +1,6 @@
 use internal::prelude::*;
-use std::collections::HashMap;
+use utils::VecMap;
+use model::id::ChannelId;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]
 ///
@@ -19,7 +20,7 @@ use std::collections::HashMap;
 /// [`GuildChannel`]: ../model/struct.GuildChannel.html
 /// [`GuildChannel::edit`]: ../model/struct.GuildChannel.html#method.edit
 #[derive(Clone, Debug, Default)]
-pub struct EditChannel(pub HashMap<&'static str, Value>);
+pub struct EditChannel(pub VecMap<&'static str, Value>);
 
 impl EditChannel {
     /// The bitrate of the channel in bits.
@@ -69,6 +70,23 @@ impl EditChannel {
     /// [voice]: ../model/enum.ChannelType.html#variant.Voice
     pub fn user_limit(mut self, user_limit: u64) -> Self {
         self.0.insert("user_limit", Value::Number(Number::from(user_limit)));
+
+        self
+    }
+
+    /// The parent category of the channel.
+    ///
+    /// This is for [text] and [voice] channels only.
+    ///
+    /// [text]: ../model/enum.ChannelType.html#variant.Text
+    /// [voice]: ../model/enum.ChannelType.html#variant.Voice
+    pub fn category<C>(mut self, category: C) -> Self
+        where C: Into<Option<ChannelId>> {
+        let parent_id = match category.into() {
+            Some(c) => Value::Number(Number::from(c.0)),
+            None => Value::Null
+        };
+        self.0.insert("parent_id", parent_id);
 
         self
     }

@@ -1,7 +1,7 @@
 use internal::prelude::*;
 use serde_json::Value;
-use std::collections::HashMap;
 use std::default::Default;
+use utils::VecMap;
 
 /// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
 ///
@@ -14,7 +14,7 @@ use std::default::Default;
 ///
 /// ```rust,no_run
 /// # use serenity::prelude::*;
-/// # use serenity::model::*;
+/// # use serenity::model::prelude::*;
 ///
 /// struct Handler;
 ///
@@ -62,7 +62,7 @@ use std::default::Default;
 /// [`GuildChannel::create_invite`]: ../model/struct.GuildChannel.html#method.create_invite
 /// [`RichInvite`]: ../model/struct.Invite.html
 #[derive(Clone, Debug)]
-pub struct CreateInvite(pub HashMap<&'static str, Value>);
+pub struct CreateInvite(pub VecMap<&'static str, Value>);
 
 impl CreateInvite {
     /// The duration that the invite will be valid for.
@@ -77,7 +77,7 @@ impl CreateInvite {
     ///
     /// ```rust,no_run
     /// # use serenity::CACHE;
-    /// # use serenity::model::ChannelId;
+    /// # use serenity::model::id::ChannelId;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -110,7 +110,7 @@ impl CreateInvite {
     ///
     /// ```rust,no_run
     /// # use serenity::CACHE;
-    /// # use serenity::model::ChannelId;
+    /// # use serenity::model::id::ChannelId;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -141,7 +141,7 @@ impl CreateInvite {
     ///
     /// ```rust,no_run
     /// # use serenity::CACHE;
-    /// # use serenity::model::ChannelId;
+    /// # use serenity::model::id::ChannelId;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -172,7 +172,7 @@ impl CreateInvite {
     ///
     /// ```rust,no_run
     /// # use serenity::CACHE;
-    /// # use serenity::model::ChannelId;
+    /// # use serenity::model::id::ChannelId;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -202,12 +202,12 @@ impl Default for CreateInvite {
     /// Create a default `CreateInvite` builder:
     ///
     /// ```rust
-    /// use serenity::utils::builder::CreateInvite;
+    /// use serenity::builder::CreateInvite;
     ///
     /// let invite_builder = CreateInvite::default();
     /// ```
     fn default() -> CreateInvite {
-        let mut map = HashMap::new();
+        let mut map = VecMap::new();
         map.insert("validate", Value::Null);
 
         CreateInvite(map)

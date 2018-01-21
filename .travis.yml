@@ -8,6 +8,10 @@ os:
   - osx
 cache:
   cargo: true
+  timeout: 900
+before_cache:
+  # Travis can't cache files that are not readable by "others"
+  - chmod -R a+r $HOME/.cargo
 matrix:
   allow_failures:
     - nightly

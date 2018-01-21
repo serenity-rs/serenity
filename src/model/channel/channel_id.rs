@@ -1,12 +1,12 @@
 use internal::RwLockExt;
-use model::*;
+use model::prelude::*;
 
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 #[cfg(feature = "model")]
 use std::fmt::Write as FmtWrite;
 #[cfg(feature = "model")]
-use builder::{CreateMessage, EditChannel, GetMessages};
+use builder::{CreateMessage, EditChannel, EditMessage, GetMessages};
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
@@ -189,9 +189,10 @@ impl ChannelId {
     ///
     /// [`Channel`]: enum.Channel.html
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
+    #[cfg(feature = "utils")]
     #[inline]
     pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel> {
-        let map = utils::hashmap_to_json_map(f(EditChannel::default()).0);
+        let map = utils::vecmap_to_json_map(f(EditChannel::default()).0);
 
         http::edit_channel(self.0, &map)
     }
@@ -200,7 +201,7 @@ impl ChannelId {
     ///
     /// Message editing preserves all unchanged message data.
     ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// Refer to the documentation for [`EditMessage`] for more information
     /// regarding message restrictions and requirements.
     ///
     /// **Note**: Requires that the current user be the author of the message.
@@ -212,14 +213,15 @@ impl ChannelId {
     /// over the limit.
     ///
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
+    /// [`EditMessage`]: ../builder/struct.EditMessage.html
     /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
+    /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
+    #[cfg(feature = "utils")]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
-        let msg = f(CreateMessage::default());
+        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
+        let msg = f(EditMessage::default());
 
-        if let Some(content) = msg.0.get("content") {
+        if let Some(content) = msg.0.get(&"content") {
             if let Value::String(ref content) = *content {
                 if let Some(length_over) = Message::overflow_length(content) {
                     return Err(Error::Model(ModelError::MessageTooLong(length_over)));
@@ -227,7 +229,7 @@ impl ChannelId {
             }
         }
 
-        let map = utils::hashmap_to_json_map(msg.0);
+        let map = utils::vecmap_to_json_map(msg.0);
 
         http::edit_message(self.0, message_id.into().0, &Value::Object(map))
     }
@@ -282,13 +284,13 @@ impl ChannelId {
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
         let mut map = f(GetMessages::default()).0;
-        let mut query = format!("?limit={}", map.remove("limit").unwrap_or(50));
+        let mut query = format!("?limit={}", map.remove(&"limit").unwrap_or(50));
 
-        if let Some(after) = map.remove("after") {
+        if let Some(after) = map.remove(&"after") {
             write!(query, "&after={}", after)?;
-        } else if let Some(around) = map.remove("around") {
+        } else if let Some(around) = map.remove(&"around") {
             write!(query, "&around={}", around)?;
-        } else if let Some(before) = map.remove("before") {
+        } else if let Some(before) = map.remove(&"before") {
             write!(query, "&before={}", before)?;
         }
 
@@ -358,12 +360,13 @@ impl ChannelId {
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     pub fn reaction_users<M, R, U>(&self,
-                                   message_id: M,
-                                   reaction_type: R,
-                                   limit: Option<u8>,
-                                   after: Option<U>)
-                                   -> Result<Vec<User>>
-        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
+        message_id: M,
+        reaction_type: R,
+        limit: Option<u8>,
+        after: U,
+    ) -> Result<Vec<User>> where M: Into<MessageId>,
+                                 R: Into<ReactionType>,
+                                 U: Into<Option<UserId>> {
         let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
 
         http::get_reaction_users(
@@ -371,7 +374,7 @@ impl ChannelId {
             message_id.into().0,
             &reaction_type.into(),
             limit,
-            after.map(|u| u.into().0),
+            after.into().map(|x| x.0),
         )
     }
 
@@ -408,7 +411,7 @@ impl ChannelId {
     /// Send files with the paths `/path/to/file.jpg` and `/path/to/file2.jpg`:
     ///
     /// ```rust,no_run
-    /// use serenity::model::ChannelId;
+    /// use serenity::model::id::ChannelId;
     ///
     /// let channel_id = ChannelId(7);
     ///
@@ -420,7 +423,7 @@ impl ChannelId {
     /// Send files using `File`:
     ///
     /// ```rust,no_run
-    /// use serenity::model::ChannelId;
+    /// use serenity::model::id::ChannelId;
     /// use std::fs::File;
     ///
     /// let channel_id = ChannelId(7);
@@ -449,11 +452,12 @@ impl ChannelId {
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[cfg(feature = "utils")]
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
         let mut msg = f(CreateMessage::default());
 
-        if let Some(content) = msg.0.get("content") {
+        if let Some(content) = msg.0.get(&"content") {
             if let Value::String(ref content) = *content {
                 if let Some(length_over) = Message::overflow_length(content) {
                     return Err(Error::Model(ModelError::MessageTooLong(length_over)));
@@ -461,8 +465,8 @@ impl ChannelId {
             }
         }
 
-        let _ = msg.0.remove("embed");
-        let map = utils::hashmap_to_json_map(msg.0);
+        let _ = msg.0.remove(&"embed");
+        let map = utils::vecmap_to_json_map(msg.0);
 
         http::send_files(self.0, files, map)
     }
@@ -486,10 +490,11 @@ impl ChannelId {
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    #[cfg(feature = "utils")]
     pub fn send_message<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
         let msg = f(CreateMessage::default());
-        let map = utils::hashmap_to_json_map(msg.0);
+        let map = utils::vecmap_to_json_map(msg.0);
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;

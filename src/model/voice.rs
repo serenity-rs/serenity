@@ -1,7 +1,9 @@
-use super::*;
+//! Representations of voice information.
+
+use super::id::{ChannelId, UserId};
 
 /// Information about an available voice region.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct VoiceRegion {
     /// Whether it is a custom voice region, which is used for events.
     pub custom: bool,
@@ -22,7 +24,7 @@ pub struct VoiceRegion {
 }
 
 /// A user's state within a voice channel.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct VoiceState {
     pub channel_id: Option<ChannelId>,
     pub deaf: bool,

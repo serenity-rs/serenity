@@ -1,5 +1,5 @@
-use model::{ChannelId, GuildId, UserId};
-use serde_json::Value;
+use gateway::InterMessage;
+use model::id::{ChannelId, GuildId, UserId};
 use std::collections::HashMap;
 use std::sync::mpsc::Sender as MpscSender;
 use super::Handler;
@@ -24,11 +24,11 @@ use super::Handler;
 pub struct Manager {
     handlers: HashMap<GuildId, Handler>,
     user_id: UserId,
-    ws: MpscSender<Value>,
+    ws: MpscSender<InterMessage>,
 }
 
 impl Manager {
-    pub(crate) fn new(ws: MpscSender<Value>, user_id: UserId) -> Manager {
+    pub(crate) fn new(ws: MpscSender<InterMessage>, user_id: UserId) -> Manager {
         Manager {
             handlers: HashMap::new(),
             user_id: user_id,
@@ -36,8 +36,14 @@ impl Manager {
         }
     }
 
+    /// Retrieves an immutable handler for the given target, if one exists.
+    pub fn get<G: Into<GuildId>>(&self, guild_id: G) -> Option<&Handler> {
+        self.handlers.get(&guild_id.into())
+    }
+
     /// Retrieves a mutable handler for the given target, if one exists.
-    pub fn get<G: Into<GuildId>>(&mut self, guild_id: G) -> Option<&mut Handler> {
+    pub fn get_mut<G: Into<GuildId>>(&mut self, guild_id: G)
+        -> Option<&mut Handler> {
         self.handlers.get_mut(&guild_id.into())
     }
 

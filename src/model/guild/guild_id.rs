@@ -1,4 +1,4 @@
-use model::*;
+use model::prelude::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
@@ -48,7 +48,8 @@ impl GuildId {
     /// [`Guild::ban`]: struct.Guild.html#method.ban
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, ban_options: BO) -> Result<()> {
+    pub fn ban<U, BO>(&self, user: U, ban_options: &BO) -> Result<()>
+        where U: Into<UserId>, BO: BanOptions {
         let dmd = ban_options.dmd();
         if dmd > 7 {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
@@ -73,11 +74,11 @@ impl GuildId {
 
     /// Gets a list of the guild's audit log entries
     #[inline]
-    pub fn audit_logs(&self, action_type: Option<u8>, 
-                             user_id: Option<UserId>, 
+    pub fn audit_logs(&self, action_type: Option<u8>,
+                             user_id: Option<UserId>,
                              before: Option<AuditLogEntryId>,
-                             limit: Option<u8>) -> Result<AuditLogs> { 
-        http::get_audit_logs(self.0, action_type, user_id.map(|u| u.0), before.map(|a| a.0), limit) 
+                             limit: Option<u8>) -> Result<AuditLogs> {
+        http::get_audit_logs(self.0, action_type, user_id.map(|u| u.0), before.map(|a| a.0), limit)
     }
 
     /// Gets all of the guild's channels over the REST API.
@@ -106,16 +107,18 @@ impl GuildId {
     /// ```rust,ignore
     /// use serenity::model::{ChannelType, GuildId};
     ///
-    /// let _channel = GuildId(7).create_channel("test", ChannelType::Voice);
+    /// let _channel = GuildId(7).create_channel("test", ChannelType::Voice, None);
     /// ```
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`http::create_channel`]: ../http/fn.create_channel.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
-    pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
+    pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
+        where C: Into<Option<ChannelId>> {
         let map = json!({
             "name": name,
             "type": kind as u8,
+            "parent_id": category.into().map(|c| c.0)
         });
 
         http::create_channel(self.0, &map)
@@ -173,7 +176,7 @@ impl GuildId {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
     pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
-        let map = utils::hashmap_to_json_map(f(EditRole::default()).0);
+        let map = utils::vecmap_to_json_map(f(EditRole::default()).0);
 
         http::create_role(self.0, &map)
     }
@@ -236,7 +239,7 @@ impl GuildId {
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
     pub fn edit<F: FnOnce(EditGuild) -> EditGuild>(&mut self, f: F) -> Result<PartialGuild> {
-        let map = utils::hashmap_to_json_map(f(EditGuild::default()).0);
+        let map = utils::vecmap_to_json_map(f(EditGuild::default()).0);
 
         http::edit_guild(self.0, &map)
     }
@@ -275,7 +278,7 @@ impl GuildId {
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
         where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
-        let map = utils::hashmap_to_json_map(f(EditMember::default()).0);
+        let map = utils::vecmap_to_json_map(f(EditMember::default()).0);
 
         http::edit_member(self.0, user_id.into().0, &map)
     }
@@ -311,7 +314,7 @@ impl GuildId {
     #[inline]
     pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
-        let map = utils::hashmap_to_json_map(f(EditRole::default()).0);
+        let map = utils::vecmap_to_json_map(f(EditRole::default()).0);
 
         http::edit_role(self.0, role_id.into().0, &map)
     }

@@ -1,5 +1,6 @@
-use model::*;
+use model::prelude::*;
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
+use serde::ser::{SerializeMap, Serialize, Serializer};
 use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 use std::str::FromStr;
@@ -11,7 +12,7 @@ use CACHE;
 use http;
 
 /// An emoji reaction to a message.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Reaction {
     /// The [`Channel`] of the associated [`Message`].
     ///
@@ -32,10 +33,24 @@ pub struct Reaction {
 
 #[cfg(feature = "model")]
 impl Reaction {
+    /// Retrieves the associated the reaction was made in.
+    ///
+    /// If the cache is enabled, this will search for the already-cached
+    /// channel. If not - or the channel was not found - this will perform a
+    /// request over the REST API for the channel.
+    ///
+    /// Requires the [Read Message History] permission.
+    ///
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    #[inline]
+    pub fn channel(&self) -> Result<Channel> {
+        self.channel_id.get()
+    }
+
     /// Deletes the reaction, but only if the current user is the user who made
     /// the reaction or has permission to.
     ///
-    /// **Note**: Requires the [Manage Messages] permission, _if_ the current
+    /// Requires the [Manage Messages] permission, _if_ the current
     /// user did not perform the reaction.
     ///
     /// # Errors
@@ -79,6 +94,31 @@ impl Reaction {
         http::delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
     }
 
+    /// Retrieves the [`Message`] associated with this reaction.
+    ///
+    /// Requires the [Read Message History] permission.
+    ///
+    /// **Note**: This will send a request to the REST API. Prefer maintaining
+    /// your own message cache or otherwise having the message available if
+    /// possible.
+    ///
+    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [`Message`]: struct.Message.html
+    #[inline]
+    pub fn message(&self) -> Result<Message> {
+        self.channel_id.message(self.message_id)
+    }
+
+    /// Retrieves the user that made the reaction.
+    ///
+    /// If the cache is enabled, this will search for the already-cached user.
+    /// If not - or the user was not found - this will perform a request over
+    /// the REST API for the user.
+    #[inline]
+    pub fn user(&self) -> Result<User> {
+        self.user_id.get()
+    }
+
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
     ///
@@ -89,7 +129,9 @@ impl Reaction {
     /// The optional `after` attribute is to retrieve the users after a certain
     /// user. This is useful for pagination.
     ///
-    /// **Note**: Requires the [Read Message History] permission.
+    /// Requires the [Read Message History] permission.
+    ///
+    /// **Note**: This will send a request to the REST API.
     ///
     /// # Errors
     ///
@@ -129,6 +171,8 @@ pub enum ReactionType {
     /// [`Emoji`]: struct.Emoji.html
     /// [`Guild`]: struct.Guild.html
     Custom {
+        /// Whether the emoji is animated.
+        animated: bool,
         /// The Id of the custom [`Emoji`].
         ///
         /// [`Emoji`]: struct.Emoji.html
@@ -146,6 +190,7 @@ impl<'de> Deserialize<'de> for ReactionType {
         #[derive(Deserialize)]
         #[serde(field_identifier, rename_all = "snake_case")]
         enum Field {
+            Animated,
             Id,
             Name,
         }
@@ -160,11 +205,19 @@ impl<'de> Deserialize<'de> for ReactionType {
             }
 
             fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> StdResult<Self::Value, V::Error> {
+                let mut animated = None;
                 let mut id = None;
                 let mut name = None;
 
                 while let Some(key) = map.next_key()? {
                     match key {
+                        Field::Animated => {
+                            if animated.is_some() {
+                                return Err(DeError::duplicate_field("animated"));
+                            }
+
+                            animated = Some(map.next_value()?);
+                        },
                         Field::Id => {
                             if id.is_some() {
                                 return Err(DeError::duplicate_field("id"));
@@ -184,12 +237,14 @@ impl<'de> Deserialize<'de> for ReactionType {
                     }
                 }
 
+                let animated = animated.unwrap_or(false);
                 let name = name.ok_or_else(|| DeError::missing_field("name"))?;
 
                 Ok(if let Some(id) = id {
                     ReactionType::Custom {
-                        id: id,
-                        name: name,
+                        animated,
+                        id,
+                        name,
                     }
                 } else {
                     ReactionType::Unicode(name.unwrap())
@@ -198,6 +253,30 @@ impl<'de> Deserialize<'de> for ReactionType {
         }
 
         deserializer.deserialize_map(ReactionTypeVisitor)
+    }
+}
+
+impl Serialize for ReactionType {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        match *self {
+            ReactionType::Custom { animated, id, ref name } => {
+                let mut map = serializer.serialize_map(Some(3))?;
+
+                map.serialize_entry("animated", &animated)?;
+                map.serialize_entry("id", &id.0)?;
+                map.serialize_entry("name", &name)?;
+
+                map.end()
+            },
+            ReactionType::Unicode(ref name) => {
+                let mut map = serializer.serialize_map(Some(1))?;
+
+                map.serialize_entry("name", &name)?;
+
+                map.end()
+            },
+        }
     }
 }
 
@@ -214,6 +293,7 @@ impl ReactionType {
             ReactionType::Custom {
                 id,
                 ref name,
+                ..
             } => format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id),
             ReactionType::Unicode(ref unicode) => unicode.clone(),
         }
@@ -229,7 +309,7 @@ impl From<char> for ReactionType {
     /// Reacting to a message with an apple:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::ChannelId;
+    /// # use serenity::model::id::ChannelId;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -249,8 +329,29 @@ impl From<char> for ReactionType {
 impl From<Emoji> for ReactionType {
     fn from(emoji: Emoji) -> ReactionType {
         ReactionType::Custom {
+            animated: emoji.animated,
             id: emoji.id,
             name: Some(emoji.name),
+        }
+    }
+}
+
+impl From<EmojiId> for ReactionType {
+    fn from(emoji_id: EmojiId) -> ReactionType {
+        ReactionType::Custom {
+            animated: false,
+            id: emoji_id,
+            name: None
+        }
+    }
+}
+
+impl From<EmojiIdentifier> for ReactionType {
+    fn from(emoji_id: EmojiIdentifier) -> ReactionType {
+        ReactionType::Custom {
+            animated: false,
+            id: emoji_id.id,
+            name: Some(emoji_id.name)
         }
     }
 }
@@ -268,7 +369,7 @@ impl<'a> From<&'a str> for ReactionType {
     /// rest of the library:
     ///
     /// ```rust
-    /// use serenity::model::ReactionType;
+    /// use serenity::model::channel::ReactionType;
     ///
     /// fn foo<R: Into<ReactionType>>(bar: R) {
     ///     println!("{:?}", bar.into());
@@ -321,6 +422,7 @@ impl Display for ReactionType {
             ReactionType::Custom {
                 id,
                 ref name,
+                ..
             } => {
                 f.write_char('<')?;
                 f.write_char(':')?;

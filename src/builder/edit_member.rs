@@ -1,6 +1,6 @@
 use internal::prelude::*;
-use model::{ChannelId, RoleId};
-use std::collections::HashMap;
+use model::id::{ChannelId, RoleId};
+use utils::VecMap;
 
 /// A builder which edits the properties of a [`Member`], to be used in
 /// conjunction with [`Member::edit`].
@@ -8,7 +8,7 @@ use std::collections::HashMap;
 /// [`Member`]: ../model/struct.Member.html
 /// [`Member::edit`]: ../model/struct.Member.html#method.edit
 #[derive(Clone, Debug, Default)]
-pub struct EditMember(pub HashMap<&'static str, Value>);
+pub struct EditMember(pub VecMap<&'static str, Value>);
 
 impl EditMember {
     /// Whether to deafen the member.

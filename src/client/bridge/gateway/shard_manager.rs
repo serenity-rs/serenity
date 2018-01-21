@@ -1,6 +1,7 @@
+use gateway::InterMessage;
 use internal::prelude::*;
 use parking_lot::Mutex;
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::sync::mpsc::{self, Sender};
 use std::sync::Arc;
 use std::thread;
@@ -19,6 +20,8 @@ use typemap::ShareMap;
 
 #[cfg(feature = "framework")]
 use framework::Framework;
+#[cfg(feature = "voice")]
+use client::bridge::voice::ClientVoiceManager;
 
 /// A manager for handling the status of shards by starting them, restarting
 /// them, and stopping them when required.
@@ -39,11 +42,16 @@ use framework::Framework;
 ///
 /// # use std::error::Error;
 /// #
+/// # #[cfg(feature = "voice")]
+/// # use serenity::client::bridge::voice::ClientVoiceManager;
+/// # #[cfg(feature = "voice")]
+/// # use serenity::model::id::UserId;
+/// #
 /// # #[cfg(feature = "framework")]
 /// # fn try_main() -> Result<(), Box<Error>> {
 /// #
 /// use parking_lot::Mutex;
-/// use serenity::client::bridge::gateway::ShardManager;
+/// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::client::EventHandler;
 /// use serenity::http;
 /// use std::sync::Arc;
@@ -65,17 +73,22 @@ use framework::Framework;
 /// let framework = Arc::new(Mutex::new(None));
 /// let threadpool = ThreadPool::with_name("my threadpool".to_owned(), 5);
 ///
-/// ShardManager::new(
-///     0, // the shard index to start initiating from
-///     3, // the number of shards to initiate (this initiates 0, 1, and 2)
-///     5, // the total number of shards in use
-///     gateway_url,
-///     token,
-///     data,
-///     event_handler,
-///     framework,
+/// ShardManager::new(ShardManagerOptions {
+///     data: &data,
+///     event_handler: &event_handler,
+///     framework: &framework,
+///     // the shard index to start initiating from
+///     shard_index: 0,
+///     // the number of shards to initiate (this initiates 0, 1, and 2)
+///     shard_init: 3,
+///     // the total number of shards in use
+///     shard_total: 5,
+///     token: &token,
 ///     threadpool,
-/// );
+///     # #[cfg(feature = "voice")]
+///     # voice_manager: &Arc::new(Mutex::new(ClientVoiceManager::new(0, UserId(0)))),
+///     ws_url: &gateway_url,
+/// });
 /// #     Ok(())
 /// # }
 /// #
@@ -92,6 +105,7 @@ use framework::Framework;
 /// [`Client`]: ../../struct.Client.html
 #[derive(Debug)]
 pub struct ShardManager {
+    monitor_tx: Sender<ShardManagerMessage>,
     /// The shard runners currently managed.
     ///
     /// **Note**: It is highly unrecommended to mutate this yourself unless you
@@ -110,18 +124,8 @@ pub struct ShardManager {
 impl ShardManager {
     /// Creates a new shard manager, returning both the manager and a monitor
     /// for usage in a separate thread.
-    #[cfg(feature = "framework")]
-    #[cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))]
-    pub fn new<H>(
-        shard_index: u64,
-        shard_init: u64,
-        shard_total: u64,
-        ws_url: Arc<Mutex<String>>,
-        token: Arc<Mutex<String>>,
-        data: Arc<Mutex<ShareMap>>,
-        event_handler: Arc<H>,
-        framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
-        threadpool: ThreadPool,
+    pub fn new<'a, H>(
+        opt: ShardManagerOptions<'a, H>,
     ) -> (Arc<Mutex<Self>>, ShardManagerMonitor) where H: EventHandler + Send + Sync + 'static {
         let (thread_tx, thread_rx) = mpsc::channel();
         let (shard_queue_tx, shard_queue_rx) = mpsc::channel();
@@ -129,16 +133,20 @@ impl ShardManager {
         let runners = Arc::new(Mutex::new(HashMap::new()));
 
         let mut shard_queuer = ShardQueuer {
-            data: Arc::clone(&data),
-            event_handler: Arc::clone(&event_handler),
-            framework: Arc::clone(&framework),
+            data: Arc::clone(opt.data),
+            event_handler: Arc::clone(opt.event_handler),
+            #[cfg(feature = "framework")]
+            framework: Arc::clone(opt.framework),
             last_start: None,
             manager_tx: thread_tx.clone(),
+            queue: VecDeque::new(),
             runners: Arc::clone(&runners),
             rx: shard_queue_rx,
-            token: Arc::clone(&token),
-            ws_url: Arc::clone(&ws_url),
-            threadpool,
+            threadpool: opt.threadpool,
+            token: Arc::clone(opt.token),
+            #[cfg(feature = "voice")]
+            voice_manager: Arc::clone(opt.voice_manager),
+            ws_url: Arc::clone(opt.ws_url),
         };
 
         thread::spawn(move || {
@@ -146,59 +154,12 @@ impl ShardManager {
         });
 
         let manager = Arc::new(Mutex::new(Self {
+            monitor_tx: thread_tx,
+            shard_index: opt.shard_index,
+            shard_init: opt.shard_init,
             shard_queuer: shard_queue_tx,
+            shard_total: opt.shard_total,
             runners,
-            shard_index,
-            shard_init,
-            shard_total,
-        }));
-
-        (Arc::clone(&manager), ShardManagerMonitor {
-            rx: thread_rx,
-            manager,
-        })
-    }
-
-    /// Creates a new shard manager, returning both the manager and a monitor
-    /// for usage in a separate thread.
-    #[cfg(not(feature = "framework"))]
-    pub fn new<H>(
-        shard_index: u64,
-        shard_init: u64,
-        shard_total: u64,
-        ws_url: Arc<Mutex<String>>,
-        token: Arc<Mutex<String>>,
-        data: Arc<Mutex<ShareMap>>,
-        event_handler: Arc<H>,
-        threadpool: ThreadPool,
-    ) -> (Arc<Mutex<Self>>, ShardManagerMonitor) where H: EventHandler + Send + Sync + 'static {
-        let (thread_tx, thread_rx) = mpsc::channel();
-        let (shard_queue_tx, shard_queue_rx) = mpsc::channel();
-
-        let runners = Arc::new(Mutex::new(HashMap::new()));
-
-        let mut shard_queuer = ShardQueuer {
-            data: Arc::clone(&data),
-            event_handler: Arc::clone(&event_handler),
-            last_start: None,
-            manager_tx: thread_tx.clone(),
-            runners: Arc::clone(&runners),
-            rx: shard_queue_rx,
-            token: Arc::clone(&token),
-            ws_url: Arc::clone(&ws_url),
-            threadpool,
-        };
-
-        thread::spawn(move || {
-            shard_queuer.run();
-        });
-
-        let manager = Arc::new(Mutex::new(Self {
-            shard_queuer: shard_queue_tx,
-            runners,
-            shard_index,
-            shard_init,
-            shard_total,
         }));
 
         (Arc::clone(&manager), ShardManagerMonitor {
@@ -315,7 +276,8 @@ impl ShardManager {
 
         if let Some(runner) = self.runners.lock().get(&shard_id) {
             let shutdown = ShardManagerMessage::Shutdown(shard_id);
-            let msg = ShardClientMessage::Manager(shutdown);
+            let client_msg = ShardClientMessage::Manager(shutdown);
+            let msg = InterMessage::Client(client_msg);
 
             if let Err(why) = runner.runner_tx.send(msg) {
                 warn!(
@@ -352,6 +314,9 @@ impl ShardManager {
         for shard_id in keys {
             self.shutdown(shard_id);
         }
+
+        let _ = self.shard_queuer.send(ShardQueuerMessage::Shutdown);
+        let _ = self.monitor_tx.send(ShardManagerMessage::ShutdownInitiated);
     }
 
     fn boot(&mut self, shard_info: [ShardId; 2]) {
@@ -377,4 +342,19 @@ impl Drop for ShardManager {
             warn!("Failed to send shutdown to shard queuer: {:?}", why);
         }
     }
+}
+
+pub struct ShardManagerOptions<'a, H: EventHandler + Send + Sync + 'static> {
+    pub data: &'a Arc<Mutex<ShareMap>>,
+    pub event_handler: &'a Arc<H>,
+    #[cfg(feature = "framework")]
+    pub framework: &'a Arc<Mutex<Option<Box<Framework + Send>>>>,
+    pub shard_index: u64,
+    pub shard_init: u64,
+    pub shard_total: u64,
+    pub threadpool: ThreadPool,
+    pub token: &'a Arc<Mutex<String>>,
+    #[cfg(feature = "voice")]
+    pub voice_manager: &'a Arc<Mutex<ClientVoiceManager>>,
+    pub ws_url: &'a Arc<Mutex<String>>,
 }

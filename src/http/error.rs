@@ -1,20 +1,17 @@
-use hyper::status::StatusCode;
+use hyper::client::Response;
 use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Debug)]
 pub enum Error {
-    /// When a status code was unexpectedly received for a request's status.
-    InvalidRequest(StatusCode),
+    /// When a non-successful status code was received for a request.
+    UnsuccessfulRequest(Response),
     /// When the decoding of a ratelimit header could not be properly decoded
     /// into an `i64`.
     RateLimitI64,
     /// When the decoding of a ratelimit header could not be properly decoded
     /// from UTF-8.
     RateLimitUtf8,
-    /// When a status is received, but the verification to ensure the response
-    /// is valid does not recognize the status.
-    UnknownStatus(u16),
 }
 
 impl Display for Error {
@@ -24,10 +21,11 @@ impl Display for Error {
 impl StdError for Error {
     fn description(&self) -> &str {
         match *self {
-            Error::InvalidRequest(_) => "Received an unexpected status code",
+            Error::UnsuccessfulRequest(_) => {
+                "A non-successful response status code was received"
+            },
             Error::RateLimitI64 => "Error decoding a header into an i64",
             Error::RateLimitUtf8 => "Error decoding a header from UTF-8",
-            Error::UnknownStatus(_) => "Verification does not understand status",
         }
     }
 }

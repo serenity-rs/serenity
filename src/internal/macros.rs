@@ -89,37 +89,8 @@ macro_rules! feature_cache {
     }
 }
 
-// Enable/disable check for framework
-#[cfg(all(feature = "client", feature = "framework"))]
-macro_rules! feature_framework {
-    ($enabled:block else $disabled:block) => {
-        {
-            $enabled
-        }
-    }
-}
-
 #[cfg(all(feature = "client", not(feature = "framework")))]
 macro_rules! feature_framework {
-    ($enabled:block else $disabled:block) => {
-        {
-            $disabled
-        }
-    }
-}
-
-// Enable/disable check for voice
-#[cfg(all(feature = "gateway", feature = "voice"))]
-macro_rules! feature_voice {
-    ($enabled:block else $disabled:block) => {
-        {
-            $enabled
-        }
-    }
-}
-
-#[cfg(all(feature = "gateway", not(feature = "voice")))]
-macro_rules! feature_voice {
     ($enabled:block else $disabled:block) => {
         {
             $disabled
@@ -180,12 +151,4 @@ macro_rules! enum_number {
             }
         }
     }
-}
-
-#[allow(unused_macros)]
-macro_rules! try_opt {
-    ($x:expr) => (match $x {
-        Some(v) => v,
-        None => return None,
-    });
 }

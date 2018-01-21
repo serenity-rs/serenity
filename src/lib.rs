@@ -29,7 +29,7 @@
 //!
 //! A basic ping-pong bot looks like:
 //!
-//! ```rust,ignore
+//! ```rust,no_run
 //! #[macro_use] extern crate serenity;
 //!
 //! use serenity::client::Client;
@@ -43,13 +43,16 @@
 //!
 //! fn main() {
 //!     // Login with a bot token from the environment
-//!     let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"), Handler);
+//!     let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"), Handler)
+//!         .expect("Error creating client");
 //!     client.with_framework(StandardFramework::new()
 //!         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
-//!         .on("ping", ping));
+//!         .cmd("ping", ping));
 //!
 //!     // start listening for events by starting a single shard
-//!     let _ = client.start();
+//!     if let Err(why) = client.start() {
+//!         println!("An error occurred while running the client: {:?}", why);
+//!     }
 //! }
 //!
 //! command!(ping(_context, message) {
@@ -68,7 +71,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serenity = "0.4"
+//! serenity = "0.5"
 //! ```
 //!
 //! and to the top of your `main.rs`:
@@ -134,8 +137,6 @@ extern crate sodiumoxide;
 extern crate threadpool;
 #[cfg(feature = "typemap")]
 extern crate typemap;
-#[cfg(feature = "vec_shift")]
-extern crate vec_shift;
 #[cfg(feature = "evzht9h3nznqzwl")]
 extern crate evzht9h3nznqzwl as websocket;
 

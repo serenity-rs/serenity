@@ -47,6 +47,8 @@
 //! [`ShardQueuer`]: struct.ShardQueuer.html
 //! [`ShardRunner`]: struct.ShardRunner.html
 
+pub mod event;
+
 mod shard_manager;
 mod shard_manager_monitor;
 mod shard_messenger;
@@ -54,20 +56,23 @@ mod shard_queuer;
 mod shard_runner;
 mod shard_runner_message;
 
-pub use self::shard_manager::ShardManager;
+pub use self::shard_manager::{ShardManager, ShardManagerOptions};
 pub use self::shard_manager_monitor::ShardManagerMonitor;
 pub use self::shard_messenger::ShardMessenger;
 pub use self::shard_queuer::ShardQueuer;
-pub use self::shard_runner::ShardRunner;
+pub use self::shard_runner::{ShardRunner, ShardRunnerOptions};
 pub use self::shard_runner_message::ShardRunnerMessage;
 
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::sync::mpsc::Sender;
+use std::time::Duration as StdDuration;
+use ::gateway::{ConnectionStage, InterMessage};
 
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].
 ///
 /// [`ShardManager`]: struct.ShardManager.html
 /// [`ShardRunner`]: struct.ShardRunner.html
+#[derive(Clone, Debug)]
 pub enum ShardClientMessage {
     /// A message intended to be worked with by a [`ShardManager`].
     ///
@@ -88,6 +93,12 @@ pub enum ShardManagerMessage {
     ///
     /// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html
     Restart(ShardId),
+    /// An update from a shard runner,
+    ShardUpdate {
+        id: ShardId,
+        latency: Option<StdDuration>,
+        stage: ConnectionStage,
+    },
     /// Indicator that a [`ShardManagerMonitor`] should fully shutdown a shard
     /// without bringing it back up.
     ///
@@ -99,6 +110,10 @@ pub enum ShardManagerMessage {
     /// [`ShardManager`]: struct.ShardManager.html
     /// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html
     ShutdownAll,
+    /// Indicator that a [`ShardManager`] has initiated a shutdown, and for the
+    /// component that receives this to also shutdown with no further action
+    /// taken.
+    ShutdownInitiated,
 }
 
 /// A message to be sent to the [`ShardQueuer`].
@@ -136,7 +151,12 @@ impl Display for ShardId {
 /// [`ShardRunner`]: struct.ShardRunner.html
 #[derive(Debug)]
 pub struct ShardRunnerInfo {
+    /// The latency between when a heartbeat was sent and when the
+    /// acknowledgement was received.
+    pub latency: Option<StdDuration>,
     /// The channel used to communicate with the shard runner, telling it
     /// what to do with regards to its status.
-    pub runner_tx: Sender<ShardClientMessage>,
+    pub runner_tx: Sender<InterMessage>,
+    /// The current connection stage of the shard.
+    pub stage: ConnectionStage,
 }

@@ -1,17 +1,17 @@
 use chrono::{DateTime, FixedOffset};
-use model::*;
+use model::prelude::*;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_single_recipient;
 
 #[cfg(feature = "model")]
-use builder::{CreateMessage, GetMessages};
+use builder::{CreateMessage, EditMessage, GetMessages};
 #[cfg(feature = "model")]
 use http::AttachmentType;
 #[cfg(feature = "model")]
 use internal::RwLockExt;
 
 /// A Direct Message text channel with another user.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PrivateChannel {
     /// The unique Id of the private channel.
     ///
@@ -31,7 +31,9 @@ pub struct PrivateChannel {
     #[serde(rename = "type")]
     pub kind: ChannelType,
     /// The recipient to the private channel.
-    #[serde(deserialize_with = "deserialize_single_recipient", rename = "recipients")]
+    #[serde(deserialize_with = "deserialize_single_recipient",
+            rename = "recipients",
+            serialize_with = "serialize_sync_user")]
     pub recipient: Arc<RwLock<User>>,
 }
 
@@ -78,7 +80,7 @@ impl PrivateChannel {
     /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn delete_messages<'a, It: IntoIterator<Item=&'a MessageId>>(&self, message_ids: It) -> Result<()> {
+    pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, message_ids: It) -> Result<()> {
         self.id.delete_messages(message_ids)
     }
 
@@ -114,7 +116,7 @@ impl PrivateChannel {
     ///
     /// Message editing preserves all unchanged message data.
     ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// Refer to the documentation for [`EditMessage`] for more information
     /// regarding message restrictions and requirements.
     ///
     /// **Note**: Requires that the current user be the author of the message.
@@ -126,12 +128,12 @@ impl PrivateChannel {
     /// over the limit.
     ///
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
+    /// [`EditMessage`]: ../builder/struct.EditMessage.html
     /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
+    /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
+        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
         self.id.edit_message(message_id, f)
     }
 
@@ -187,14 +189,14 @@ impl PrivateChannel {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn reaction_users<M, R, U>(&self,
-                                   message_id: M,
-                                   reaction_type: R,
-                                   limit: Option<u8>,
-                                   after: Option<U>)
-                                   -> Result<Vec<User>>
-        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id
-            .reaction_users(message_id, reaction_type, limit, after)
+        message_id: M,
+        reaction_type: R,
+        limit: Option<u8>,
+        after: U,
+    ) -> Result<Vec<User>> where M: Into<MessageId>,
+                                 R: Into<ReactionType>,
+                                 U: Into<Option<UserId>> {
+        self.id.reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Pins a [`Message`] to the channel.

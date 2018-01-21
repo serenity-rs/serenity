@@ -1,8 +1,8 @@
 use chrono::{DateTime, FixedOffset};
-use model::*;
+use model::prelude::*;
 
 #[cfg(feature = "model")]
-use builder::{CreateMessage, GetMessages};
+use builder::{CreateMessage, EditMessage, GetMessages};
 #[cfg(feature = "model")]
 use http::{self, AttachmentType};
 #[cfg(feature = "model")]
@@ -17,7 +17,7 @@ use std::fmt::Write as FmtWrite;
 ///
 /// [`Guild`]: struct.Guild.html
 /// [`User`]: struct.User.html
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Group {
     /// The Id of the group channel.
     #[serde(rename = "id")]
@@ -33,7 +33,8 @@ pub struct Group {
     /// The Id of the group owner.
     pub owner_id: UserId,
     /// A map of the group's recipients.
-    #[serde(deserialize_with = "deserialize_users")]
+    #[serde(deserialize_with = "deserialize_users",
+            serialize_with = "serialize_users")]
     pub recipients: HashMap<UserId, Arc<RwLock<User>>>,
 }
 
@@ -133,7 +134,7 @@ impl Group {
     ///
     /// Message editing preserves all unchanged message data.
     ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// Refer to the documentation for [`EditMessage`] for more information
     /// regarding message restrictions and requirements.
     ///
     /// **Note**: Requires that the current user be the author of the message.
@@ -145,12 +146,12 @@ impl Group {
     /// over the limit.
     ///
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
+    /// [`EditMessage`]: ../builder/struct.EditMessage.html
     /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
+    /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
+        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
         self.channel_id.edit_message(message_id, f)
     }
 
@@ -237,15 +238,16 @@ impl Group {
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn reaction_users<M, R, U>(&self,
-                                   message_id: M,
-                                   reaction_type: R,
-                                   limit: Option<u8>,
-                                   after: Option<U>)
-                                   -> Result<Vec<User>>
-        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.channel_id
-            .reaction_users(message_id, reaction_type, limit, after)
+    pub fn reaction_users<M, R, U>(
+        &self,
+        message_id: M,
+        reaction_type: R,
+        limit: Option<u8>,
+        after: U,
+    ) -> Result<Vec<User>> where M: Into<MessageId>,
+                                 R: Into<ReactionType>,
+                                 U: Into<Option<UserId>> {
+        self.channel_id.reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Removes a recipient from the group. If the recipient is already not in

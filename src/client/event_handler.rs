@@ -1,10 +1,10 @@
-use model::event::*;
-use model::*;
+use model::prelude::*;
 use parking_lot::RwLock;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::sync::Arc;
 use super::context::Context;
+use ::client::bridge::gateway::event::*;
 
 pub trait EventHandler {
     #[cfg(feature = "cache")]
@@ -68,6 +68,11 @@ pub trait EventHandler {
     fn presence_update(&self, _: Context, _: PresenceUpdateEvent) {}
     fn ready(&self, _: Context, _: Ready) {}
     fn resume(&self, _: Context, _: ResumedEvent) {}
+
+    /// Called when a shard's connection stage is updated, providing the context
+    /// of the shard and the event information about the update.
+    fn shard_stage_update(&self, _: Context, _: ShardStageUpdateEvent) {}
+
     fn typing_start(&self, _: Context, _: TypingStartEvent) {}
     fn unknown(&self, _: Context, _: String, _: Value) {}
     #[cfg(feature = "cache")]

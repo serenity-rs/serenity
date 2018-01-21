@@ -1,9 +1,12 @@
+//! Models pertaining to the gateway.
+
 use parking_lot::RwLock;
 use serde::de::Error as DeError;
+use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
 use std::sync::Arc;
 use super::utils::*;
-use super::*;
+use super::prelude::*;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///
@@ -11,7 +14,7 @@ use super::*;
 /// shards that Discord recommends to use for a bot user.
 ///
 /// This is only applicable to bot users.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BotGateway {
     /// The number of shards that is recommended to be used by the current bot
     /// user.
@@ -22,9 +25,10 @@ pub struct BotGateway {
 
 /// Representation of a game that a [`User`] is playing -- or streaming in the
 /// case that a stream URL is provided.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct Game {
     /// The type of game status.
+    #[serde(default, rename = "type")]
     pub kind: GameType,
     /// The name of the game being played.
     pub name: String,
@@ -49,10 +53,10 @@ impl Game {
     /// # #[macro_use] extern crate serenity;
     /// #
     /// use serenity::framework::standard::Args;
-    /// use serenity::model::Game;
+    /// use serenity::model::gateway::Game;
     ///
     /// command!(game(ctx, _msg, args) {
-    ///     let name = args.join(" ");
+    ///     let name = args.full();
     ///     ctx.set_game(Game::playing(&name));
     /// });
     /// #
@@ -78,7 +82,7 @@ impl Game {
     /// # #[macro_use] extern crate serenity;
     /// #
     /// use serenity::framework::standard::Args;
-    /// use serenity::model::Game;
+    /// use serenity::model::gateway::Game;
     ///
     /// // Assumes command has min_args set to 2.
     /// command!(stream(ctx, _msg, args) {
@@ -94,6 +98,35 @@ impl Game {
             kind: GameType::Streaming,
             name: name.to_string(),
             url: Some(url.to_string()),
+        }
+    }
+
+    /// Creates a `Game` struct that appears as a `Listening to <name>` status.
+    ///
+    /// **Note**: Maximum `name` length is 128.
+    ///
+    /// # Examples
+    ///
+    /// Create a command that sets the current game being played:
+    ///
+    /// ```rust,no_run
+    /// # #[macro_use] extern crate serenity;
+    /// #
+    /// use serenity::framework::standard::Args;
+    /// use serenity::model::gateway::Game;
+    ///
+    /// command!(listen(ctx, _msg, args) {
+    ///     let name = args.full();
+    ///     ctx.set_game(Game::listening(&name));
+    /// });
+    /// #
+    /// # fn main() {}
+    /// ```
+    pub fn listening(name: &str) -> Game {
+        Game {
+            kind: GameType::Listening,
+            name: name.to_string(),
+            url: None,
         }
     }
 }
@@ -125,8 +158,22 @@ enum_number!(
         Playing = 0,
         /// An indicator that the user is streaming to a service.
         Streaming = 1,
+        /// An indicator that the user is listening to something.
+        Listening = 2,
     }
 );
+
+impl GameType {
+    pub fn num(&self) -> u64 {
+        use self::GameType::*;
+
+        match *self {
+            Playing => 0,
+            Streaming => 1,
+            Listening => 2,
+        }
+    }
+}
 
 impl Default for GameType {
     fn default() -> Self { GameType::Playing }
@@ -137,7 +184,7 @@ impl Default for GameType {
 /// For the bot-specific gateway, refer to [`BotGateway`].
 ///
 /// [`BotGateway`]: struct.BotGateway.html
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Gateway {
     /// The gateway to connect to.
     pub url: String,
@@ -218,17 +265,45 @@ impl<'de> Deserialize<'de> for Presence {
     }
 }
 
+impl Serialize for Presence {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        #[derive(Serialize)]
+        struct UserId {
+            id: u64,
+        }
+
+        let mut state = serializer.serialize_struct("Presence", 5)?;
+        state.serialize_field("game", &self.game)?;
+        state.serialize_field("last_modified", &self.last_modified)?;
+        state.serialize_field("nick", &self.nick)?;
+        state.serialize_field("status", &self.status)?;
+
+        if let Some(ref user) = self.user {
+            state.serialize_field("user", &*user.read())?;
+        } else {
+            state.serialize_field("user", &UserId {
+                id: self.user_id.0,
+            })?;
+        }
+
+        state.end()
+    }
+}
+
 /// An initial set of information given after IDENTIFYing to the gateway.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Ready {
     pub guilds: Vec<GuildStatus>,
-    #[serde(deserialize_with = "deserialize_presences")] pub presences: HashMap<UserId, Presence>,
-    #[serde(deserialize_with = "deserialize_private_channels")]
-    pub private_channels:
-        HashMap<ChannelId, Channel>,
+    #[serde(default, deserialize_with = "deserialize_presences")]
+    pub presences: HashMap<UserId, Presence>,
+    #[serde(default, deserialize_with = "deserialize_private_channels")]
+    pub private_channels: HashMap<ChannelId, Channel>,
     pub session_id: String,
     pub shard: Option<[u64; 2]>,
-    #[serde(default, rename = "_trace")] pub trace: Vec<String>,
+    #[serde(default, rename = "_trace")]
+    pub trace: Vec<String>,
     pub user: CurrentUser,
-    #[serde(rename = "v")] pub version: u64,
+    #[serde(rename = "v")]
+    pub version: u64,
 }

@@ -8,3 +8,6 @@
 //! [`client`]: ../
 
 pub mod gateway;
+
+#[cfg(feature = "voice")]
+pub mod voice;

@@ -1,4 +1,4 @@
-use model::*;
+use model::prelude::*;
 use chrono::{DateTime, FixedOffset};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::deserialize_sync_user;
@@ -49,7 +49,7 @@ impl BanOptions for (u8, String) {
 }
 
 /// Information about a member of a guild.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Member {
     /// Indicator of whether the member can hear in voice channels.
     pub deaf: bool,
@@ -66,7 +66,8 @@ pub struct Member {
     /// Vector of Ids of [`Role`]s given to the member.
     pub roles: Vec<RoleId>,
     /// Attached User struct.
-    #[serde(deserialize_with = "deserialize_sync_user")]
+    #[serde(deserialize_with = "deserialize_sync_user",
+            serialize_with = "serialize_sync_user")]
     pub user: Arc<RwLock<User>>,
 }
 
@@ -109,7 +110,7 @@ impl Member {
         self.roles.extend_from_slice(role_ids);
 
         let builder = EditMember::default().roles(&self.roles);
-        let map = utils::hashmap_to_json_map(builder.0);
+        let map = utils::vecmap_to_json_map(builder.0);
 
         match http::edit_member(self.guild_id.0, self.user.read().id.0, &map) {
             Ok(()) => Ok(()),
@@ -135,7 +136,7 @@ impl Member {
     ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature = "cache")]
-    pub fn ban<BO: BanOptions>(&self, ban_options: BO) -> Result<()> {
+    pub fn ban<BO: BanOptions>(&self, ban_options: &BO) -> Result<()> {
         let dmd = ban_options.dmd();
         if dmd > 7 {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
@@ -159,7 +160,7 @@ impl Member {
     #[cfg(all(feature = "cache", feature = "utils"))]
     pub fn colour(&self) -> Option<Colour> {
         let cache = CACHE.read();
-        let guild = try_opt!(cache.guilds.get(&self.guild_id)).read();
+        let guild = cache.guilds.get(&self.guild_id)?.read();
 
         let mut roles = self.roles
             .iter()
@@ -189,7 +190,7 @@ impl Member {
 
         for (cid, channel) in &reader.channels {
             if reader.permissions_in(*cid, self.user.read().id).read_messages() {
-                return Some(channel.clone());
+                return Some(Arc::clone(channel));
             }
         }
 
@@ -227,9 +228,49 @@ impl Member {
     /// [`EditMember`]: ../builder/struct.EditMember.html
     #[cfg(feature = "cache")]
     pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F) -> Result<()> {
-        let map = utils::hashmap_to_json_map(f(EditMember::default()).0);
+        let map = utils::vecmap_to_json_map(f(EditMember::default()).0);
 
         http::edit_member(self.guild_id.0, self.user.read().id.0, &map)
+    }
+
+    /// Retrieves the ID and position of the member's highest role in the
+    /// hierarchy, if they have one.
+    ///
+    /// This _may_ return `None` if the user has roles, but they are not present
+    /// in the cache for cache inconsistency reasons.
+    ///
+    /// The "highest role in hierarchy" is defined as the role with the highest
+    /// position. If two or more roles have the same highest position, then the
+    /// role with the lowest ID is the highest.
+    ///
+    /// # Deadlocking
+    ///
+    /// This function will deadlock if you have a write lock to the member's
+    /// guild.
+    #[cfg(feature = "cache")]
+    pub fn highest_role_info(&self) -> Option<(RoleId, i64)> {
+        let guild = self.guild_id.find()?;
+        let reader = guild.read();
+
+        let mut highest = None;
+
+        for role_id in &self.roles {
+            if let Some(role) = reader.roles.get(&role_id) {
+                // Skip this role if this role in iteration has:
+                //
+                // - a position less than the recorded highest
+                // - a position equal to the recorded, but a higher ID
+                if let Some((id, pos)) = highest {
+                    if role.position < pos || (role.position == pos && role.id > id) {
+                        continue;
+                    }
+                }
+
+                highest = Some((role.id, role.position));
+            }
+        }
+
+        highest
     }
 
     /// Kick the member from the guild.
@@ -268,16 +309,17 @@ impl Member {
     pub fn kick(&self) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::KICK_MEMBERS;
+            let cache = CACHE.read();
 
-            let has_perms = CACHE
-                .read()
-                .guilds
-                .get(&self.guild_id)
-                .map(|guild| guild.read().has_perms(req));
+            if let Some(guild) = cache.guilds.get(&self.guild_id) {
+                let req = Permissions::KICK_MEMBERS;
+                let reader = guild.read();
 
-            if let Some(false) = has_perms {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !reader.has_perms(req) {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
+
+                reader.check_hierarchy(self.user.read().id)?;
             }
         }
 
@@ -352,7 +394,7 @@ impl Member {
         self.roles.retain(|r| !role_ids.contains(r));
 
         let builder = EditMember::default().roles(&self.roles);
-        let map = utils::hashmap_to_json_map(builder.0);
+        let map = utils::vecmap_to_json_map(builder.0);
 
         match http::edit_member(self.guild_id.0, self.user.read().id.0, &map) {
             Ok(()) => Ok(()),

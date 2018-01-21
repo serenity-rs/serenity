@@ -1,7 +1,10 @@
-use model::{Game, GuildId, OnlineStatus};
+use model::gateway::Game;
+use model::user::OnlineStatus;
+use model::id::GuildId;
 use websocket::message::OwnedMessage;
 
 /// A message to send from a shard over a WebSocket.
+#[derive(Clone, Debug)]
 pub enum ShardRunnerMessage {
     /// Indicates that the client is to send a member chunk message.
     ChunkGuilds {

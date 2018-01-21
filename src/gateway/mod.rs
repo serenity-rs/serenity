@@ -57,9 +57,15 @@ pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
 pub use self::ws_client_ext::WebSocketGatewayClientExt;
 
-use model::{Game, OnlineStatus};
+use model::gateway::Game;
+use model::user::OnlineStatus;
+use serde_json::Value;
+use std::fmt::{Display, Formatter, Result as FmtResult};
 use websocket::sync::client::Client;
 use websocket::sync::stream::{TcpStream, TlsStream};
+
+#[cfg(feature = "client")]
+use client::bridge::gateway::ShardClientMessage;
 
 pub type CurrentPresence = (Option<Game>, OnlineStatus);
 pub type WsClient = Client<TlsStream<TcpStream>>;
@@ -69,7 +75,7 @@ pub type WsClient = Client<TlsStream<TcpStream>>;
 /// This can be useful for knowing which shards are currently "down"/"up".
 ///
 /// [`Shard`]: struct.Shard.html
-#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum ConnectionStage {
     /// Indicator that the [`Shard`] is normally connected and is not in, e.g.,
     /// a resume phase.
@@ -146,10 +152,43 @@ impl ConnectionStage {
     }
 }
 
+impl Display for ConnectionStage {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        use self::ConnectionStage::*;
+
+        f.write_str(match *self {
+            Connected => "connected",
+            Connecting => "connecting",
+            Disconnected => "disconnected",
+            Handshake => "handshaking",
+            Identifying => "identifying",
+            Resuming => "resuming",
+        })
+    }
+}
+
+/// A message to be passed around within the library.
+///
+/// As a user you usually don't need to worry about this, but when working with
+/// the lower-level internals of the `client`, `gateway, and `voice` modules it
+/// may be necessary.
+#[derive(Clone, Debug)]
+pub enum InterMessage {
+    #[cfg(feature = "client")]
+    Client(ShardClientMessage),
+    Json(Value),
+}
+
 pub enum ShardAction {
-    Autoreconnect,
     Heartbeat,
     Identify,
-    Reconnect,
+    Reconnect(ReconnectType),
+}
+
+/// The type of reconnection that should be performed.
+pub enum ReconnectType {
+    /// Indicator that a new connection should be made by sending an IDENTIFY.
+    Reidentify,
+    /// Indicator that a new connection should be made by sending a RESUME.
     Resume,
 }

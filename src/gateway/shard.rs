@@ -1,7 +1,9 @@
 use constants::{self, close_codes};
 use internal::prelude::*;
 use model::event::{Event, GatewayEvent};
-use model::{Game, GuildId, OnlineStatus};
+use model::gateway::Game;
+use model::id::GuildId;
+use model::user::OnlineStatus;
 use parking_lot::Mutex;
 use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
@@ -10,6 +12,7 @@ use super::{
     CurrentPresence,
     ShardAction,
     GatewayError,
+    ReconnectType,
     WsClient,
     WebSocketGatewayClientExt,
 };
@@ -17,15 +20,6 @@ use websocket::client::Url;
 use websocket::stream::sync::AsTcpStream;
 use websocket::sync::client::ClientBuilder;
 use websocket::WebSocketError;
-
-#[cfg(feature = "voice")]
-use serde_json::Value;
-#[cfg(feature = "voice")]
-use std::sync::mpsc::{self, Receiver as MpscReceiver};
-#[cfg(feature = "voice")]
-use voice::Manager as VoiceManager;
-#[cfg(feature = "voice")]
-use http;
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the
@@ -87,11 +81,6 @@ pub struct Shard {
     stage: ConnectionStage,
     pub token: Arc<Mutex<String>>,
     ws_url: Arc<Mutex<String>>,
-    /// The voice connections that this Shard is responsible for. The Shard will
-    /// update the voice connections' states.
-    #[cfg(feature = "voice")]
-    pub manager: VoiceManager,
-    #[cfg(feature = "voice")] manager_rx: MpscReceiver<Value>,
 }
 
 impl Shard {
@@ -149,44 +138,19 @@ impl Shard {
         let stage = ConnectionStage::Handshake;
         let session_id = None;
 
-        Ok(feature_voice! {
-            {
-                let (tx, rx) = mpsc::channel();
-
-                let user = http::get_current_user()?;
-
-                Shard {
-                    manager: VoiceManager::new(tx, user.id),
-                    manager_rx: rx,
-                    shutdown: false,
-                    client,
-                    current_presence,
-                    heartbeat_instants,
-                    heartbeat_interval,
-                    last_heartbeat_acknowledged,
-                    seq,
-                    stage,
-                    token,
-                    shard_info,
-                    session_id,
-                    ws_url,
-                }
-            } else {
-                Shard {
-                    shutdown: false,
-                    client,
-                    current_presence,
-                    heartbeat_instants,
-                    heartbeat_interval,
-                    last_heartbeat_acknowledged,
-                    seq,
-                    stage,
-                    token,
-                    session_id,
-                    shard_info,
-                    ws_url,
-                }
-            }
+        Ok(Shard {
+            shutdown: false,
+            client,
+            current_presence,
+            heartbeat_instants,
+            heartbeat_interval,
+            last_heartbeat_acknowledged,
+            seq,
+            stage,
+            token,
+            session_id,
+            shard_info,
+            ws_url,
         })
     }
 
@@ -297,7 +261,7 @@ impl Shard {
     /// #
     /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
-    /// use serenity::model::Game;
+    /// use serenity::model::gateway::Game;
     ///
     /// shard.set_game(Some(Game::playing("Heroes of the Storm")));
     /// # }
@@ -401,10 +365,6 @@ impl Shard {
 
                         self.session_id = Some(ready.ready.session_id.clone());
                         self.stage = ConnectionStage::Connected;
-
-                        /*
-                        set_client_timeout(&mut self.client)?;
-                        */
                     },
                     Event::Resumed(_) => {
                         info!("[Shard {:?}] Resumed", self.shard_info);
@@ -413,13 +373,7 @@ impl Shard {
                         self.last_heartbeat_acknowledged = true;
                         self.heartbeat_instants = (Some(Instant::now()), None);
                     },
-                    #[cfg_attr(rustfmt, rustfmt_skip)]
-                    ref _other => {
-                        #[cfg(feature = "voice")]
-                        {
-                            self.voice_dispatch(_other);
-                        }
-                    },
+                    _ => {},
                 }
 
                 self.seq = seq;
@@ -448,7 +402,7 @@ impl Shard {
                             self.shard_info
                         );
 
-                        return Ok(Some(ShardAction::Autoreconnect));
+                        return Ok(Some(ShardAction::Reconnect(self.reconnection_type())));
                     }
                 }
 
@@ -481,7 +435,7 @@ impl Shard {
                     debug!("[Shard {:?}] Received late Hello; autoreconnecting",
                            self.shard_info);
 
-                    ShardAction::Autoreconnect
+                    ShardAction::Reconnect(self.reconnection_type())
                 }))
             },
             Ok(GatewayEvent::InvalidateSession(resumable)) => {
@@ -491,12 +445,14 @@ impl Shard {
                 );
 
                 Ok(Some(if resumable {
-                    ShardAction::Resume
+                    ShardAction::Reconnect(ReconnectType::Resume)
                 } else {
-                    ShardAction::Reconnect
+                    ShardAction::Reconnect(ReconnectType::Reidentify)
                 }))
             },
-            Ok(GatewayEvent::Reconnect) => Ok(Some(ShardAction::Reconnect)),
+            Ok(GatewayEvent::Reconnect) => {
+                Ok(Some(ShardAction::Reconnect(ReconnectType::Reidentify)))
+            },
             Err(Error::Gateway(GatewayError::Closed(ref data))) => {
                 let num = data.as_ref().map(|d| d.status_code);
                 let clean = num == Some(1000);
@@ -570,9 +526,9 @@ impl Shard {
                 }).unwrap_or(true);
 
                 Ok(Some(if resume {
-                    ShardAction::Resume
+                    ShardAction::Reconnect(ReconnectType::Resume)
                 } else {
-                    ShardAction::Reconnect
+                    ShardAction::Reconnect(ReconnectType::Reidentify)
                 }))
             },
             Err(Error::WebSocket(ref why)) => {
@@ -588,7 +544,7 @@ impl Shard {
                 info!("[Shard {:?}] Will attempt to auto-reconnect",
                       self.shard_info);
 
-                Ok(Some(ShardAction::Autoreconnect))
+                Ok(Some(ShardAction::Reconnect(self.reconnection_type())))
             },
             _ => Ok(None),
         }
@@ -647,43 +603,13 @@ impl Shard {
     // Shamelessly stolen from brayzure's commit in eris:
     // <https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6>
     pub fn latency(&self) -> Option<StdDuration> {
-        if let (Some(received), Some(sent)) = self.heartbeat_instants {
-            Some(sent - received)
-        } else {
-            None
-        }
-    }
-
-    #[cfg(feature = "voice")]
-    fn voice_dispatch(&mut self, event: &Event) {
-        if let Event::VoiceStateUpdate(ref update) = *event {
-            if let Some(guild_id) = update.guild_id {
-                if let Some(handler) = self.manager.get(guild_id) {
-                    handler.update_state(&update.voice_state);
-                }
+        if let (Some(sent), Some(received)) = self.heartbeat_instants {
+            if received > sent {
+                return Some(received - sent);
             }
         }
 
-        if let Event::VoiceServerUpdate(ref update) = *event {
-            if let Some(guild_id) = update.guild_id {
-                if let Some(handler) = self.manager.get(guild_id) {
-                    handler.update_server(&update.endpoint, &update.token);
-                }
-            }
-        }
-    }
-
-    #[cfg(feature = "voice")]
-    pub(crate) fn cycle_voice_recv(&mut self) -> Vec<Value> {
-        let mut messages = vec![];
-
-        while let Ok(v) = self.manager_rx.try_recv() {
-            messages.push(v);
-        }
-        self.shutdown = true;
-        debug!("[Shard {:?}] Cleanly shutdown shard", self.shard_info);
-
-        messages
+        None
     }
 
     /// Performs a deterministic reconnect.
@@ -698,29 +624,20 @@ impl Shard {
     ///
     /// [`ConnectionStage::Connecting`]: ../../../gateway/enum.ConnectionStage.html#variant.Connecting
     /// [`session_id`]: ../../../gateway/struct.Shard.html#method.session_id
-    pub fn autoreconnect(&mut self) -> Result<()> {
+    pub fn should_reconnect(&mut self) -> Option<ReconnectType> {
         if self.stage == ConnectionStage::Connecting {
-            return Ok(());
+            return None;
         }
 
+        Some(self.reconnection_type())
+    }
+
+    pub fn reconnection_type(&self) -> ReconnectType {
         if self.session_id().is_some() {
-            debug!(
-                "[Shard {:?}] Autoreconnector choosing to resume",
-                self.shard_info,
-            );
-
-            self.resume()?;
+            ReconnectType::Resume
         } else {
-            debug!(
-                "[Shard {:?}] Autoreconnector choosing to reconnect",
-                self.shard_info,
-            );
-
-            self.reconnect()?;
+            ReconnectType::Reidentify
         }
-        self.shutdown = true;
-
-        Ok(())
     }
 
     /// Requests that one or multiple [`Guild`]s be chunked.
@@ -755,7 +672,7 @@ impl Shard {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1])?;
     /// #
-    /// use serenity::model::GuildId;
+    /// use serenity::model::id::GuildId;
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
@@ -785,7 +702,7 @@ impl Shard {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1])?;
     /// #
-    /// use serenity::model::GuildId;
+    /// use serenity::model::id::GuildId;
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///

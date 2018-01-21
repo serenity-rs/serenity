@@ -1,5 +1,7 @@
+//! Models for server and channel invites.
+
 use chrono::{DateTime, FixedOffset};
-use super::*;
+use super::prelude::*;
 
 #[cfg(feature = "model")]
 use builder::CreateInvite;
@@ -13,7 +15,7 @@ use {http, utils};
 /// Information about an invite code.
 ///
 /// Information can not be accessed for guilds the current user is banned from.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Invite {
     /// The approximate number of [`Member`]s in the related [`Guild`].
     ///
@@ -73,7 +75,7 @@ impl Invite {
             }
         }
 
-        let map = utils::hashmap_to_json_map(f(CreateInvite::default()).0);
+        let map = utils::vecmap_to_json_map(f(CreateInvite::default()).0);
 
         http::create_invite(channel_id.0, &map)
     }
@@ -123,7 +125,7 @@ impl Invite {
     /// Retrieve the URL for an invite with the code `WxZumR`:
     ///
     /// ```rust
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # let invite = Invite {
     /// #     approximate_member_count: Some(1812),
@@ -150,7 +152,7 @@ impl Invite {
 }
 
 /// A inimal information about the channel an invite points to.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InviteChannel {
     pub id: ChannelId,
     pub name: String,
@@ -158,7 +160,7 @@ pub struct InviteChannel {
 }
 
 /// A minimal amount of information about the guild an invite points to.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InviteGuild {
     pub id: GuildId,
     pub icon: Option<String>,
@@ -216,7 +218,7 @@ impl InviteGuild {
 ///
 /// [`Invite`]: struct.Invite.html
 /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct RichInvite {
     /// A representation of the minimal amount of information needed about the
     /// channel being invited to.
@@ -289,7 +291,7 @@ impl RichInvite {
     /// Retrieve the URL for an invite with the code `WxZumR`:
     ///
     /// ```rust
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # let invite = RichInvite {
     /// #     code: "WxZumR".to_string(),

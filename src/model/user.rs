@@ -1,7 +1,9 @@
+//! User information-related models.
+
 use serde_json;
 use std::fmt;
 use super::utils::deserialize_u16;
-use super::*;
+use super::prelude::*;
 use internal::prelude::*;
 use model::misc::Mentionable;
 
@@ -22,10 +24,10 @@ use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
 #[cfg(feature = "model")]
-use utils;
+use utils::{self, VecMap};
 
 /// Information about the current user.
-#[derive(Clone, Default, Debug, Deserialize)]
+#[derive(Clone, Default, Debug, Deserialize, Serialize)]
 pub struct CurrentUser {
     pub id: UserId,
     pub avatar: Option<String>,
@@ -88,14 +90,14 @@ impl CurrentUser {
     /// ```
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
-        let mut map = HashMap::new();
+        let mut map = VecMap::new();
         map.insert("username", Value::String(self.name.clone()));
 
         if let Some(email) = self.email.as_ref() {
             map.insert("email", Value::String(email.clone()));
         }
 
-        let map = utils::hashmap_to_json_map(f(EditProfile(map)).0);
+        let map = utils::vecmap_to_json_map(f(EditProfile(map)).0);
 
         match http::edit_profile(&map) {
             Ok(new) => {
@@ -159,7 +161,7 @@ impl CurrentUser {
     /// #
     /// # let mut cache = CACHE.write();
     ///
-    /// use serenity::model::permissions::Permissions;
+    /// use serenity::model::Permissions;
     ///
     /// // assuming the cache has been unlocked
     /// let url = match cache.user.invite_url(Permissions::empty()) {
@@ -300,20 +302,6 @@ impl DefaultAvatar {
     pub fn name(&self) -> Result<String> { serde_json::to_string(self).map_err(From::from) }
 }
 
-enum_number!(
-    /// Identifier for the notification level of a channel.
-    NotificationLevel {
-        /// Receive notifications for everything.
-        All = 0,
-        /// Receive only mentions.
-        Mentions = 1,
-        /// Receive no notifications.
-        Nothing = 2,
-        /// Inherit the notification level from the parent setting.
-        Parent = 3,
-    }
-);
-
 /// The representation of a user's status.
 ///
 /// # Examples
@@ -349,10 +337,10 @@ impl Default for OnlineStatus {
 }
 
 /// Information about a user.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's
-    /// cration date.
+    /// creation date.
     pub id: UserId,
     /// Optional avatar hash.
     pub avatar: Option<String>,
@@ -422,7 +410,7 @@ impl User {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// use serenity::model::Permissions;
     /// use serenity::CACHE;
@@ -573,19 +561,20 @@ impl User {
     /// given [`Role`].
     ///
     /// Three forms of data may be passed in to the guild parameter: either a
-    /// [`Guild`] itself, a [`GuildId`], or a `u64`.
+    /// [`PartialGuild`], a [`GuildId`], or a `u64`.
     ///
     /// # Examples
     ///
     /// Check if a guild has a [`Role`] by Id:
     ///
     /// ```rust,ignore
-    /// // Assumes a 'guild' and `role_id` have already been bound
-    /// let _ = message.author.has_role(guild, role_id);
+    /// // Assumes a 'guild_id' and `role_id` have already been bound
+    /// let _ = message.author.has_role(guild_id, role_id);
     /// ```
     ///
     /// [`Guild`]: struct.Guild.html
     /// [`GuildId`]: struct.GuildId.html
+    /// [`PartialGuild`]: struct.PartialGuild.html
     /// [`Role`]: struct.Role.html
     /// [`Cache`]: ../cache/struct.Cache.html
     // no-cache would warn on guild_id.
@@ -625,7 +614,7 @@ impl User {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// struct Handler;
     ///
@@ -637,7 +626,7 @@ impl User {
     ///
     /// let mut client = Client::new("token", Handler).unwrap();
     /// #
-    /// use serenity::model::UserId;
+    /// use serenity::model::id::UserId;
     /// use serenity::CACHE;
     /// use std::thread;
     /// use std::time::Duration;
@@ -694,7 +683,7 @@ impl User {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::prelude::*;
     /// #
     /// use serenity::utils::MessageBuilder;
     /// use serenity::utils::ContentModifier::Bold;

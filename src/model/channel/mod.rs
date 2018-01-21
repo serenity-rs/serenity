@@ -1,3 +1,5 @@
+//! Models relating to channels and types within channels.
+
 mod attachment;
 mod channel_id;
 mod embed;
@@ -19,13 +21,14 @@ pub use self::reaction::*;
 pub use self::channel_category::*;
 
 use internal::RwLockExt;
-use model::*;
+use model::prelude::*;
 use serde::de::Error as DeError;
+use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
 use super::utils::deserialize_u64;
 
 #[cfg(feature = "model")]
-use builder::{CreateMessage, GetMessages};
+use builder::{CreateMessage, EditMessage, GetMessages};
 #[cfg(feature = "model")]
 use http::AttachmentType;
 #[cfg(feature = "model")]
@@ -54,6 +57,139 @@ pub enum Channel {
 }
 
 impl Channel {
+
+    /////////////////////////////////////////////////////////////////////////
+    // Adapter for each variant
+    /////////////////////////////////////////////////////////////////////////
+
+    /// Converts from `Channel` to `Option<Arc<RwLock<Group>>>`.
+    ///
+    /// Converts `self` into an `Option<Arc<RwLock<Group>>>`, consuming `self`,
+    /// and discarding a GuildChannel, PrivateChannel, or ChannelCategory, if any.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust,no_run
+    /// # extern crate serenity;
+    /// # use self::serenity::model::id::ChannelId;
+    /// # fn main() {
+    /// # let channel = ChannelId(0).get().unwrap();
+    /// match channel.group() {
+    ///     Some(group_lock) => {
+    ///         if let Some(ref name) = group_lock.read().name {
+    ///             println!("It's a group named {}!", name);
+    ///         } else {
+    ///              println!("It's an unnamed group!");
+    ///         }
+    ///     },
+    ///     None => { println!("It's not a group!"); },
+    /// }
+    /// # }
+    /// ```
+
+
+    pub fn group(self) -> Option<Arc<RwLock<Group>>> {
+        match self {
+            Channel::Group(lock) => Some(lock),
+            _ => None,
+        }
+    }
+
+    /// Converts from `Channel` to `Option<Arc<RwLock<GuildChannel>>>`.
+    ///
+    /// Converts `self` into an `Option<Arc<RwLock<GuildChannel>>>`, consuming `self`,
+    /// and discarding a Group, PrivateChannel, or ChannelCategory, if any.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust,no_run
+    /// # extern crate serenity;
+    /// # use self::serenity::model::id::ChannelId;
+    /// # fn main() {
+    /// let channel = ChannelId(0).get().unwrap();
+    /// match channel.guild() {
+    ///     Some(guild_lock) => {
+    ///         println!("It's a guild named {}!", guild_lock.read().name);
+    ///     },
+    ///     None => { println!("It's not a guild!"); },
+    /// }
+    /// # }
+    /// ```
+
+    pub fn guild(self) -> Option<Arc<RwLock<GuildChannel>>> {
+        match self {
+            Channel::Guild(lock) => Some(lock),
+            _ => None,
+        }
+    }
+
+    /// Converts from `Channel` to `Option<Arc<RwLock<PrivateChannel>>>`.
+    ///
+    /// Converts `self` into an `Option<Arc<RwLock<PrivateChannel>>>`, consuming `self`,
+    /// and discarding a Group, GuildChannel, or ChannelCategory, if any.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust,no_run
+    /// # extern crate serenity;
+    /// # use self::serenity::model::id::ChannelId;
+    /// # fn main() {
+    /// # let channel = ChannelId(0).get().unwrap();
+    /// match channel.private() {
+    ///     Some(private_lock) => {
+    ///         let private = private_lock.read();
+    ///         let recipient_lock = &private.recipient;
+    ///         let recipient = recipient_lock.read();
+    ///         println!("It's a private channel with {}!", recipient.name);
+    ///     },
+    ///     None => { println!("It's not a private channel!"); },
+    /// }
+    /// # }
+    /// ```
+
+    pub fn private(self) -> Option<Arc<RwLock<PrivateChannel>>> {
+        match self {
+            Channel::Private(lock) => Some(lock),
+            _ => None,
+        }
+    }
+
+    /// Converts from `Channel` to `Option<Arc<RwLock<ChannelCategory>>>`.
+    ///
+    /// Converts `self` into an `Option<Arc<RwLock<ChannelCategory>>>`, consuming `self`,
+    /// and discarding a Group, GuildChannel, or PrivateChannel, if any.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust,no_run
+    /// # extern crate serenity;
+    /// # use self::serenity::model::id::ChannelId;
+    /// # fn main() {
+    /// # let channel = ChannelId(0).get().unwrap();
+    /// match channel.category() {
+    ///     Some(category_lock) => {
+    ///         println!("It's a category named {}!", category_lock.read().name);
+    ///     },
+    ///     None => { println!("It's not a category!"); },
+    /// }
+    /// # }
+    /// ```
+
+    pub fn category(self) -> Option<Arc<RwLock<ChannelCategory>>> {
+        match self {
+            Channel::Category(lock) => Some(lock),
+            _ => None,
+        }
+    }
+
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
     ///
     /// [`Message::react`] may be a more suited method of reacting in most
@@ -141,7 +277,7 @@ impl Channel {
     ///
     /// Message editing preserves all unchanged message data.
     ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// Refer to the documentation for [`EditMessage`] for more information
     /// regarding message restrictions and requirements.
     ///
     /// **Note**: Requires that the current user be the author of the message.
@@ -153,14 +289,14 @@ impl Channel {
     /// over the limit.
     ///
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
+    /// [`EditMessage`]: ../builder/struct.EditMessage.html
     /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
+    /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
+        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
         self.id().edit_message(message_id, f)
     }
 
@@ -235,14 +371,14 @@ impl Channel {
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn reaction_users<M, R, U>(&self,
-                                   message_id: M,
-                                   reaction_type: R,
-                                   limit: Option<u8>,
-                                   after: Option<U>)
-                                   -> Result<Vec<User>>
-        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id()
-            .reaction_users(message_id, reaction_type, limit, after)
+        message_id: M,
+        reaction_type: R,
+        limit: Option<u8>,
+        after: U,
+    ) -> Result<Vec<User>> where M: Into<MessageId>,
+                                 R: Into<ReactionType>,
+                                 U: Into<Option<UserId>> {
+        self.id().reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Retrieves the Id of the inner [`Group`], [`GuildChannel`], or
@@ -369,6 +505,26 @@ impl<'de> Deserialize<'de> for Channel {
     }
 }
 
+impl Serialize for Channel {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        match *self {
+            Channel::Category(ref c) => {
+                ChannelCategory::serialize(&*c.read(), serializer)
+            },
+            Channel::Group(ref c) => {
+                Group::serialize(&*c.read(), serializer)
+            },
+            Channel::Guild(ref c) => {
+                GuildChannel::serialize(&*c.read(), serializer)
+            },
+            Channel::Private(ref c) => {
+                PrivateChannel::serialize(&*c.read(), serializer)
+            },
+        }
+    }
+}
+
 #[cfg(feature = "model")]
 impl Display for Channel {
     /// Formats the channel into a "mentioned" string.
@@ -435,9 +591,19 @@ impl ChannelType {
             ChannelType::Category => "category",
         }
     }
+
+    pub fn num(&self) -> u64 {
+        match *self {
+            ChannelType::Text => 0,
+            ChannelType::Private => 1,
+            ChannelType::Voice => 2,
+            ChannelType::Group => 3,
+            ChannelType::Category => 4,
+        }
+    }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 struct PermissionOverwriteData {
     allow: Permissions,
     deny: Permissions,
@@ -469,6 +635,24 @@ impl<'de> Deserialize<'de> for PermissionOverwrite {
             deny: data.deny,
             kind: kind,
         })
+    }
+}
+
+impl Serialize for PermissionOverwrite {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        let (id, kind) = match self.kind {
+            PermissionOverwriteType::Member(id) => (id.0, "member"),
+            PermissionOverwriteType::Role(id) => (id.0, "role"),
+        };
+
+        let mut state = serializer.serialize_struct("PermissionOverwrite", 4)?;
+        state.serialize_field("allow", &self.allow.bits())?;
+        state.serialize_field("deny", &self.deny.bits())?;
+        state.serialize_field("id", &id)?;
+        state.serialize_field("type", kind)?;
+
+        state.end()
     }
 }
 

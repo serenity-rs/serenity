@@ -1,5 +1,6 @@
-use client::bridge::gateway::{ShardClientMessage, ShardMessenger};
-use model::*;
+use client::bridge::gateway::ShardMessenger;
+use gateway::InterMessage;
+use model::prelude::*;
 use parking_lot::Mutex;
 use std::sync::mpsc::Sender;
 use std::sync::Arc;
@@ -9,12 +10,12 @@ use typemap::ShareMap;
 use builder::EditProfile;
 #[cfg(feature = "builder")]
 use internal::prelude::*;
-#[cfg(feature = "builder")]
-use std::collections::HashMap;
 #[cfg(all(feature = "builder", feature = "cache"))]
 use super::CACHE;
 #[cfg(feature = "builder")]
-use {Result, http, utils};
+use {Result, http};
+#[cfg(feature = "builder")]
+use utils::{self, VecMap};
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
@@ -48,7 +49,7 @@ impl Context {
     /// Create a new Context to be passed to an event handler.
     pub(crate) fn new(
         data: Arc<Mutex<ShareMap>>,
-        runner_tx: Sender<ShardClientMessage>,
+        runner_tx: Sender<InterMessage>,
         shard_id: u64,
     ) -> Context {
         Context {
@@ -68,7 +69,7 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::channel::Message;
     /// #
     /// struct Handler;
     ///
@@ -85,7 +86,7 @@ impl Context {
     /// ```
     #[cfg(feature = "builder")]
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser> {
-        let mut map = HashMap::new();
+        let mut map = VecMap::with_capacity(2);
 
         feature_cache! {
             {
@@ -101,13 +102,13 @@ impl Context {
 
                 map.insert("username", Value::String(user.name.clone()));
 
-                if let Some(email) = user.email.as_ref() {
-                    map.insert("email", Value::String(email.clone()));
+                if let Some(email) = user.email {
+                    map.insert("email", Value::String(email));
                 }
             }
         }
 
-        let edited = utils::hashmap_to_json_map(f(EditProfile(map)).0);
+        let edited = utils::vecmap_to_json_map(f(EditProfile(map)).0);
 
         http::edit_profile(&edited)
     }
@@ -122,7 +123,7 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::channel::Message;
     /// #
     /// struct Handler;
     ///
@@ -154,7 +155,7 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::channel::Message;
     /// #
     /// struct Handler;
     ///
@@ -185,7 +186,7 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::channel::Message;
     /// #
     /// struct Handler;
     ///
@@ -217,7 +218,7 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::gateway::Ready;
     /// #
     /// struct Handler;
     ///
@@ -284,9 +285,9 @@ impl Context {
     /// # #[cfg(feature = "model")]
     /// # fn main() {
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::channel::Message;
     /// #
-    /// use serenity::model::Game;
+    /// use serenity::model::gateway::Game;
     ///
     /// struct Handler;
     ///
@@ -332,7 +333,7 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::gateway::Ready;
     /// #
     /// struct Handler;
     ///
@@ -371,13 +372,13 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::gateway::Ready;
     /// #
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
     ///     fn ready(&self, ctx: Context, _: Ready) {
-    ///         use serenity::model::OnlineStatus;
+    ///         use serenity::model::user::OnlineStatus;
     ///
     ///         ctx.set_presence(None, OnlineStatus::Idle);
     ///     }
@@ -392,13 +393,14 @@ impl Context {
     ///
     /// ```rust,ignore
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
+    /// # use serenity::model::gateway::Ready;
     /// #
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
     ///     fn ready(&self, context: Context, _: Ready) {
-    ///         use serenity::model::{Game, OnlineStatus};
+    ///         use serenity::model::gateway::Game;
+    ///         use serenity::model::user::OnlineStatus;
     ///
     ///         let game = Game::playing("Heroes of the Storm");
     ///         let status = OnlineStatus::DoNotDisturb;

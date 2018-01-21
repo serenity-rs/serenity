@@ -2,7 +2,7 @@ extern crate serde_json;
 extern crate serenity;
 
 use serde_json::Value;
-use serenity::model::{Guild, Role};
+use serenity::model::guild::{Guild, Role};
 
 #[test]
 fn decode_negative_one_role_position() {
@@ -19,7 +19,7 @@ fn decode_negative_one_role_position() {
 
     let value: Value = serde_json::from_str(json).unwrap();
 
-    assert!(serde_json::from_value::<Role>(value).is_ok());
+    serde_json::from_value::<Role>(value).unwrap();
 }
 
 #[test]
@@ -27,6 +27,7 @@ fn decode_guild_with_n1_role_position() {
     let json = r#"{
     "voice_states": [],
     "verification_level": 0,
+    "explicit_content_filter": 0,
     "unavailable": false,
     "splash": null,
     "roles": [
@@ -291,10 +292,11 @@ fn decode_guild_with_n1_role_position() {
       }
     ],
     "afk_timeout": 900,
-    "afk_channel_id": "23432423423"
+    "afk_channel_id": "23432423423",
+    "system_channel_id": null
   }"#;
 
     let value: Value = serde_json::from_str(json).unwrap();
 
-    assert!(serde_json::from_value::<Guild>(value).is_ok());
+    serde_json::from_value::<Guild>(value).unwrap();
 }

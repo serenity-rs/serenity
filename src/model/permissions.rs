@@ -44,10 +44,9 @@
 //! [Manage Roles]: constant.MANAGE_ROLES.html
 //! [Manage Webhooks]: constant.MANAGE_WEBHOOKS.html
 
-use serde::de::{Error as DeError, Visitor};
-use serde::{Deserialize, Deserializer};
-use std::fmt::{Formatter, Result as FmtResult};
-use std::result::Result as StdResult;
+use serde::de::{Deserialize, Deserializer};
+use serde::ser::{Serialize, Serializer};
+use super::utils::U64Visitor;
 
 /// Returns a set of permissions with the original @everyone permissions set
 /// to true.
@@ -189,6 +188,8 @@ bitflags! {
         /// [`Message`]: ../struct.Message.html
         /// [`Reaction`]: ../struct.Reaction.html
         const ADD_REACTIONS = 0b0000_0000_0000_0000_0000_0000_0100_0000;
+        // Allows viewing a guild's audit logs.
+        const VIEW_AUDIT_LOG = 0b0000_0000_0000_0000_0000_0000_1000_0000;
         /// Allows reading messages in a guild channel. If a user does not have
         /// this permission, then they will not be able to see the channel.
         const READ_MESSAGES = 0b0000_0000_0000_0000_0000_0100_0000_0000;
@@ -290,6 +291,12 @@ impl Permissions {
     ///
     /// [Connect]: constant.CONNECT.html
     pub fn connect(&self) -> bool { self.contains(Self::CONNECT) }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [View Audit Log] permission.
+    ///
+    /// [View Audit Log]: constant.VIEW_AUDIT_LOG.html
+    pub fn view_audit_log(&self) -> bool { self.contains(Self::VIEW_AUDIT_LOG) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Create Invite] permission.
@@ -425,27 +432,16 @@ impl Permissions {
 }
 
 impl<'de> Deserialize<'de> for Permissions {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         Ok(Permissions::from_bits_truncate(
             deserializer.deserialize_u64(U64Visitor)?,
         ))
     }
 }
 
-struct U64Visitor;
-
-impl<'de> Visitor<'de> for U64Visitor {
-    type Value = u64;
-
-    fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
-        formatter.write_str("an unsigned 64-bit integer")
+impl Serialize for Permissions {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where S: Serializer {
+        serializer.serialize_u64(self.bits())
     }
-
-    fn visit_i32<E: DeError>(self, value: i32) -> StdResult<u64, E> { Ok(value as u64) }
-
-    fn visit_i64<E: DeError>(self, value: i64) -> StdResult<u64, E> { Ok(value as u64) }
-
-    fn visit_u32<E: DeError>(self, value: u32) -> StdResult<u64, E> { Ok(u64::from(value)) }
-
-    fn visit_u64<E: DeError>(self, value: u64) -> StdResult<u64, E> { Ok(value) }
 }

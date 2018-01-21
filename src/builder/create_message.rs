@@ -1,9 +1,8 @@
 use internal::prelude::*;
-use model::ReactionType;
-use std::collections::HashMap;
+use model::channel::ReactionType;
 use std::fmt::Display;
 use super::CreateEmbed;
-use utils;
+use utils::{self, VecMap};
 
 /// A builder to specify the contents of an [`http::send_message`] request,
 /// primarily meant for use through [`ChannelId::send_message`].
@@ -23,7 +22,7 @@ use utils;
 /// Sending a message with a content of `"test"` and applying text-to-speech:
 ///
 /// ```rust,no_run
-/// use serenity::model::ChannelId;
+/// use serenity::model::id::ChannelId;
 ///
 /// let channel_id = ChannelId(7);
 ///
@@ -41,14 +40,14 @@ use utils;
 /// [`embed`]: #method.embed
 /// [`http::send_message`]: ../http/fn.send_message.html
 #[derive(Clone, Debug)]
-pub struct CreateMessage(pub HashMap<&'static str, Value>, pub Option<Vec<ReactionType>>);
+pub struct CreateMessage(pub VecMap<&'static str, Value>, pub Option<Vec<ReactionType>>);
 
 impl CreateMessage {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     pub fn content<D: Display>(mut self, content: D) -> Self {
-        self.0.insert("content", Value::String(format!("{}", content)));
+        self.0.insert("content", Value::String(content.to_string()));
 
         CreateMessage(self.0, self.1)
     }
@@ -56,7 +55,7 @@ impl CreateMessage {
     /// Set an embed for the message.
     pub fn embed<F>(mut self, f: F) -> Self
         where F: FnOnce(CreateEmbed) -> CreateEmbed {
-        let map = utils::hashmap_to_json_map(f(CreateEmbed::default()).0);
+        let map = utils::vecmap_to_json_map(f(CreateEmbed::default()).0);
         let embed = Value::Object(map);
 
         self.0.insert("embed", embed);
@@ -90,7 +89,7 @@ impl Default for CreateMessage {
     /// [`Message`]: ../model/struct.Message.html
     /// [`tts`]: #method.tts
     fn default() -> CreateMessage {
-        let mut map = HashMap::default();
+        let mut map = VecMap::new();
         map.insert("tts", Value::Bool(false));
 
         CreateMessage(map, None)

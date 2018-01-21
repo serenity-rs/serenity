@@ -1,3 +1,5 @@
+//! Models relating to guilds and types that it owns.
+
 mod emoji;
 mod guild_id;
 mod integration;
@@ -15,7 +17,7 @@ pub use self::role::*;
 pub use self::audit_log::*;
 
 use chrono::{DateTime, FixedOffset};
-use model::*;
+use model::prelude::*;
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::*;
@@ -32,7 +34,7 @@ use constants::LARGE_THRESHOLD;
 use std;
 
 /// A representation of a banning of a user.
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash, Serialize)]
 pub struct Ban {
     /// The reason given for this ban.
     pub reason: Option<String>,
@@ -41,23 +43,29 @@ pub struct Ban {
 }
 
 /// Information about a Discord guild, such as channels, emojis, etc.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct Guild {
     /// Id of a voice channel that's considered the AFK channel.
     pub afk_channel_id: Option<ChannelId>,
     /// The amount of seconds a user can not show any activity in a voice
     /// channel before being moved to an AFK channel -- if one exists.
     pub afk_timeout: u64,
+    /// Application ID of the guild creator if it is bot-created.
+    pub application_id: Option<ApplicationId>,
     /// All voice and text channels contained within a guild.
     ///
     /// This contains all channels regardless of permissions (i.e. the ability
     /// of the bot to read from or connect to them).
+    #[serde(serialize_with = "serialize_gen_locked_map")]
     pub channels: HashMap<ChannelId, Arc<RwLock<GuildChannel>>>,
     /// Indicator of whether notifications for all messages are enabled by
     /// default in the guild.
-    pub default_message_notifications: u64,
+    pub default_message_notifications: DefaultMessageNotificationLevel,
     /// All of the guild's custom emojis.
+    #[serde(serialize_with = "serialize_gen_map")]
     pub emojis: HashMap<EmojiId, Emoji>,
+    /// Default explicit content filter level.
+    pub explicit_content_filter: ExplicitContentFilter,
     /// VIP features enabled for the guild. Can be obtained through the
     /// [Discord Partnership] website.
     ///
@@ -92,13 +100,14 @@ pub struct Guild {
     /// the library.
     ///
     /// [`ReadyEvent`]: events/struct.ReadyEvent.html
+    #[serde(serialize_with = "serialize_gen_map")]
     pub members: HashMap<UserId, Member>,
     /// Indicator of whether the guild requires multi-factor authentication for
     /// [`Role`]s or [`User`]s with moderation permissions.
     ///
     /// [`Role`]: struct.Role.html
     /// [`User`]: struct.User.html
-    pub mfa_level: u64,
+    pub mfa_level: MfaLevel,
     /// The name of the guild.
     pub name: String,
     /// The Id of the [`User`] who owns the guild.
@@ -108,10 +117,12 @@ pub struct Guild {
     /// A mapping of [`User`]s' Ids to their current presences.
     ///
     /// [`User`]: struct.User.html
+    #[serde(serialize_with = "serialize_gen_map")]
     pub presences: HashMap<UserId, Presence>,
     /// The region that the voice servers that the guild uses are located in.
     pub region: String,
     /// A mapping of the guild's roles.
+    #[serde(serialize_with = "serialize_gen_map")]
     pub roles: HashMap<RoleId, Role>,
     /// An identifying hash of the guild's splash icon.
     ///
@@ -120,23 +131,39 @@ pub struct Guild {
     ///
     /// [`InviteSplash`]: enum.Feature.html#variant.InviteSplash
     pub splash: Option<String>,
+    /// The ID of the channel to which system messages are sent.
+    pub system_channel_id: Option<ChannelId>,
     /// Indicator of the current verification level of the guild.
     pub verification_level: VerificationLevel,
     /// A mapping of of [`User`]s to their current voice state.
     ///
     /// [`User`]: struct.User.html
+    #[serde(serialize_with = "serialize_gen_map")]
     pub voice_states: HashMap<UserId, VoiceState>,
 }
 
 #[cfg(feature = "model")]
 impl Guild {
+    #[cfg(feature = "cache")]
+    fn check_hierarchy(&self, other_user: UserId) -> Result<()> {
+        let current_id = CACHE.read().user.id;
+
+        if let Some(higher) = self.greater_member_hierarchy(other_user, current_id) {
+            if higher != current_id {
+                return Err(Error::Model(ModelError::Hierarchy));
+            }
+        }
+
+        Ok(())
+    }
+
     /// Returns the "default" channel of the guild for the passed user id.
     /// (This returns the first channel that can be read by the user, if there isn't one,
     /// returns `None`)
     pub fn default_channel(&self, uid: UserId) -> Option<Arc<RwLock<GuildChannel>>> {
         for (cid, channel) in &self.channels {
             if self.permissions_in(*cid, uid).read_messages() {
-                return Some(Arc::clone(&channel));
+                return Some(Arc::clone(channel));
             }
         }
 
@@ -152,7 +179,7 @@ impl Guild {
         for (cid, channel) in &self.channels {
             for memid in self.members.keys() {
                 if self.permissions_in(*cid, *memid).read_messages() {
-                    return Some(Arc::clone(&channel));
+                    return Some(Arc::clone(channel));
                 }
             }
         }
@@ -200,7 +227,9 @@ impl Guild {
     /// [`Guild::ban`]: struct.Guild.html#method.ban
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: BO) -> Result<()> {
+    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: &BO) -> Result<()> {
+        let user = user.into();
+
         #[cfg(feature = "cache")]
         {
             let req = Permissions::BAN_MEMBERS;
@@ -208,6 +237,8 @@ impl Guild {
             if !self.has_perms(req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
+
+            self.check_hierarchy(user)?;
         }
 
         self.id.ban(user, options)
@@ -301,7 +332,7 @@ impl Guild {
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// let _ = guild.create_channel("my-test-channel", ChannelType::Text);
+    /// let _ = guild.create_channel("my-test-channel", ChannelType::Text, None);
     /// ```
     ///
     /// # Errors
@@ -312,7 +343,8 @@ impl Guild {
     /// [`Channel`]: struct.Channel.html
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
-    pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
+    pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
+        where C: Into<Option<ChannelId>> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
@@ -322,7 +354,7 @@ impl Guild {
             }
         }
 
-        self.id.create_channel(name, kind)
+        self.id.create_channel(name, kind, category)
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image. The
@@ -623,6 +655,54 @@ impl Guild {
     #[inline]
     pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> { guild_id.into().get() }
 
+    /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
+    ///
+    /// Hierarchy is essentially who has the [`Role`] with the highest
+    /// [`position`].
+    ///
+    /// Returns [`None`] if at least one of the given users' member instances
+    /// is not present. Returns `None` if the users have the same hierarchy, as
+    /// neither are greater than the other.
+    #[cfg(feature = "cache")]
+    pub fn greater_member_hierarchy<T, U>(&self, lhs_id: T, rhs_id: U)
+        -> Option<UserId> where T: Into<UserId>, U: Into<UserId> {
+        let lhs_id = lhs_id.into();
+        let rhs_id = rhs_id.into();
+
+        let lhs = self.members.get(&lhs_id)?
+            .highest_role_info()
+            .unwrap_or((RoleId(0), 0));
+        let rhs = self.members.get(&rhs_id)?
+            .highest_role_info()
+            .unwrap_or((RoleId(0), 0));
+
+        // If LHS and RHS both have no top position or have the same role ID,
+        // then no one wins.
+        if (lhs.1 == 0 && rhs.1 == 0) || (lhs.0 == rhs.0) {
+            return None;
+        }
+
+        // If LHS's top position is higher than RHS, then LHS wins.
+        if lhs.1 > rhs.1 {
+            return Some(lhs_id)
+        }
+
+        // If RHS's top position is higher than LHS, then RHS wins.
+        if rhs.1 > lhs.1 {
+            return Some(rhs_id);
+        }
+
+        // If LHS and RHS both have the same position, but LHS has the lower
+        // role ID, then LHS wins.
+        //
+        // If RHS has the higher role ID, then RHS wins.
+        if lhs.1 == rhs.1 && lhs.0 < rhs.0 {
+            Some(lhs_id)
+        } else {
+            Some(rhs_id)
+        }
+    }
+
     /// Returns the formatted URL of the guild's icon, if one exists.
     pub fn icon_url(&self) -> Option<String> {
         self.icon
@@ -729,15 +809,22 @@ impl Guild {
     ///
     /// - **username**: "zey"
     /// - **username and discriminator**: "zey#5479"
-    /// - **nickname**: "zeyla" or "zeylas#nick"
     ///
     /// [`Member`]: struct.Member.html
     pub fn member_named(&self, name: &str) -> Option<&Member> {
-        let (name, discrim) = if let Some(pos) = name.find('#') {
-            let split = name.split_at(pos);
+        let (name, discrim) = if let Some(pos) = name.rfind('#') {
+            let split = name.split_at(pos + 1);
 
-            match split.1.parse::<u16>() {
-                Ok(discrim_int) => (split.0, Some(discrim_int)),
+            let split2 = (
+                match split.0.get(0..split.0.len() - 1) {
+                    Some(s) => s,
+                    None => "",
+                },
+                split.1,
+            );
+
+            match split2.1.parse::<u16>() {
+                Ok(discrim_int) => (split2.0, Some(discrim_int)),
                 Err(_) => (name, None),
             }
         } else {
@@ -756,9 +843,9 @@ impl Guild {
                 name_matches && discrim_matches
             })
             .or_else(|| {
-                self.members.values().find(|member| {
-                    member.nick.as_ref().map_or(false, |nick| nick == name)
-                })
+                self.members
+                    .values()
+                    .find(|member| member.nick.as_ref().map_or(false, |nick| nick == name))
             })
     }
 
@@ -1031,7 +1118,7 @@ impl Guild {
         let mut permissions = everyone.permissions;
 
         for role in &member.roles {
-            if let Some(role) = self.roles.get(&role) {
+            if let Some(role) = self.roles.get(role) {
                 if role.permissions.contains(Permissions::ADMINISTRATOR) {
                     return Permissions::all();
                 }
@@ -1146,6 +1233,8 @@ impl Guild {
             // First apply the denied permission overwrites for each, then apply
             // the allowed.
 
+            let mut data = Vec::with_capacity(member.roles.len());
+
             // Roles
             for overwrite in &channel.permission_overwrites {
                 if let PermissionOverwriteType::Role(role) = overwrite.kind {
@@ -1153,8 +1242,16 @@ impl Guild {
                         continue;
                     }
 
-                    permissions = (permissions & !overwrite.deny) | overwrite.allow;
+                    if let Some(role) = self.roles.get(&role) {
+                        data.push((role.position, overwrite.deny, overwrite.allow));
+                    }
                 }
+            }
+
+            data.sort_by(|a, b| a.0.cmp(&b.0));
+
+            for overwrite in data {
+                permissions = (permissions & !overwrite.1) | overwrite.2;
             }
 
             // Member
@@ -1357,7 +1454,7 @@ impl Guild {
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
-    /// use serenity::model::*;
+    /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
@@ -1420,6 +1517,11 @@ impl<'de> Deserialize<'de> for Guild {
             .ok_or_else(|| DeError::custom("expected guild afk_timeout"))
             .and_then(u64::deserialize)
             .map_err(DeError::custom)?;
+        let application_id = match map.remove("application_id") {
+            Some(v) => serde_json::from_value::<Option<ApplicationId>>(v)
+                .map_err(DeError::custom)?,
+            None => None,
+        };
         let channels = map.remove("channels")
             .ok_or_else(|| DeError::custom("expected guild channels"))
             .and_then(deserialize_guild_channels)
@@ -1428,11 +1530,17 @@ impl<'de> Deserialize<'de> for Guild {
             .ok_or_else(|| {
                 DeError::custom("expected guild default_message_notifications")
             })
-            .and_then(u64::deserialize)
+            .and_then(DefaultMessageNotificationLevel::deserialize)
             .map_err(DeError::custom)?;
         let emojis = map.remove("emojis")
             .ok_or_else(|| DeError::custom("expected guild emojis"))
             .and_then(deserialize_emojis)
+            .map_err(DeError::custom)?;
+        let explicit_content_filter = map.remove("explicit_content_filter")
+            .ok_or_else(|| DeError::custom(
+                "expected guild explicit_content_filter"
+            ))
+            .and_then(ExplicitContentFilter::deserialize)
             .map_err(DeError::custom)?;
         let features = map.remove("features")
             .ok_or_else(|| DeError::custom("expected guild features"))
@@ -1464,7 +1572,7 @@ impl<'de> Deserialize<'de> for Guild {
             .map_err(DeError::custom)?;
         let mfa_level = map.remove("mfa_level")
             .ok_or_else(|| DeError::custom("expected guild mfa_level"))
-            .and_then(u64::deserialize)
+            .and_then(MfaLevel::deserialize)
             .map_err(DeError::custom)?;
         let name = map.remove("name")
             .ok_or_else(|| DeError::custom("expected guild name"))
@@ -1490,6 +1598,10 @@ impl<'de> Deserialize<'de> for Guild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
+        let system_channel_id = match map.remove("system_channel_id") {
+            Some(v) => Option::<ChannelId>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
         let verification_level = map.remove("verification_level")
             .ok_or_else(|| DeError::custom("expected guild verification_level"))
             .and_then(VerificationLevel::deserialize)
@@ -1501,10 +1613,12 @@ impl<'de> Deserialize<'de> for Guild {
 
         Ok(Self {
             afk_channel_id: afk_channel_id,
+            application_id: application_id,
             afk_timeout: afk_timeout,
             channels: channels,
             default_message_notifications: default_message_notifications,
             emojis: emojis,
+            explicit_content_filter: explicit_content_filter,
             features: features,
             icon: icon,
             id: id,
@@ -1519,6 +1633,7 @@ impl<'de> Deserialize<'de> for Guild {
             region: region,
             roles: roles,
             splash: splash,
+            system_channel_id: system_channel_id,
             verification_level: verification_level,
             voice_states: voice_states,
         })
@@ -1559,8 +1674,21 @@ fn closest_to_origin(origin: &str, word_a: &str, word_b: &str) -> std::cmp::Orde
     value_a.cmp(&value_b)
 }
 
+/// A container for guilds.
+///
+/// This is used to differentiate whether a guild itself can be used or whether
+/// a guild needs to be retrieved from the cache.
+#[allow(large_enum_variant)]
+#[derive(Clone, Debug)]
+pub enum GuildContainer {
+    /// A guild which can have its contents directly searched.
+    Guild(PartialGuild),
+    /// A guild's id, which can be used to search the cache for a guild.
+    Id(GuildId),
+}
+
 /// Information relating to a guild's widget embed.
-#[derive(Clone, Copy, Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct GuildEmbed {
     /// The Id of the channel to show the embed for.
     pub channel_id: ChannelId,
@@ -1570,14 +1698,14 @@ pub struct GuildEmbed {
 
 /// Representation of the number of members that would be pruned by a guild
 /// prune operation.
-#[derive(Clone, Copy, Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct GuildPrune {
     /// The number of members that would be pruned by the operation.
     pub pruned: u64,
 }
 
 /// Basic information about a guild.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildInfo {
     /// The unique Id of the guild.
     ///
@@ -1628,7 +1756,7 @@ impl InviteGuild {
 }
 
 /// Data for an unavailable guild.
-#[derive(Clone, Copy, Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct GuildUnavailable {
     /// The Id of the [`Guild`] that is unavailable.
     ///
@@ -1641,7 +1769,7 @@ pub struct GuildUnavailable {
 }
 
 #[allow(large_enum_variant)]
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum GuildStatus {
     OnlinePartialGuild(PartialGuild),
@@ -1659,6 +1787,114 @@ impl GuildStatus {
             GuildStatus::Offline(offline) => offline.id,
             GuildStatus::OnlineGuild(ref guild) => guild.id,
             GuildStatus::OnlinePartialGuild(ref partial_guild) => partial_guild.id,
+        }
+    }
+}
+
+enum_number!(
+    /// Default message notification level for a guild.
+    DefaultMessageNotificationLevel {
+        /// Receive notifications for everything.
+        All = 0,
+        /// Receive only mentions.
+        Mentions = 1,
+    }
+);
+
+impl DefaultMessageNotificationLevel {
+    pub fn num(&self) -> u64 {
+        match *self {
+            DefaultMessageNotificationLevel::All => 0,
+            DefaultMessageNotificationLevel::Mentions => 1,
+        }
+    }
+}
+
+enum_number!(
+    /// Setting used to filter explicit messages from members.
+    ExplicitContentFilter {
+        /// Don't scan any messages.
+        None = 0,
+        /// Scan messages from members without a role.
+        WithoutRole = 1,
+        /// Scan messages sent by all members.
+        All = 2,
+    }
+);
+
+impl ExplicitContentFilter {
+    pub fn num(&self) -> u64 {
+        match *self {
+            ExplicitContentFilter::None => 0,
+            ExplicitContentFilter::WithoutRole => 1,
+            ExplicitContentFilter::All => 2,
+        }
+    }
+}
+
+enum_number!(
+    /// Multi-Factor Authentication level for guild moderators.
+    MfaLevel {
+        /// MFA is disabled.
+        None = 0,
+        /// MFA is enabled.
+        Elevated = 1,
+    }
+);
+
+impl MfaLevel {
+    pub fn num(&self) -> u64 {
+        match *self {
+            MfaLevel::None => 0,
+            MfaLevel::Elevated => 1,
+        }
+    }
+}
+
+/// The name of a region that a voice server can be located in.
+#[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub enum Region {
+    #[serde(rename = "amsterdam")] Amsterdam,
+    #[serde(rename = "brazil")] Brazil,
+    #[serde(rename = "eu-central")] EuCentral,
+    #[serde(rename = "eu-west")] EuWest,
+    #[serde(rename = "frankfurt")] Frankfurt,
+    #[serde(rename = "hongkong")] HongKong,
+    #[serde(rename = "japan")] Japan,
+    #[serde(rename = "london")] London,
+    #[serde(rename = "russia")] Russia,
+    #[serde(rename = "singapore")] Singapore,
+    #[serde(rename = "sydney")] Sydney,
+    #[serde(rename = "us-central")] UsCentral,
+    #[serde(rename = "us-east")] UsEast,
+    #[serde(rename = "us-south")] UsSouth,
+    #[serde(rename = "us-west")] UsWest,
+    #[serde(rename = "vip-amsterdam")] VipAmsterdam,
+    #[serde(rename = "vip-us-east")] VipUsEast,
+    #[serde(rename = "vip-us-west")] VipUsWest,
+}
+
+impl Region {
+    pub fn name(&self) -> &str {
+        match *self {
+            Region::Amsterdam => "amsterdam",
+            Region::Brazil => "brazil",
+            Region::EuCentral => "eu-central",
+            Region::EuWest => "eu-west",
+            Region::Frankfurt => "frankfurt",
+            Region::HongKong => "hongkong",
+            Region::Japan => "Japan",
+            Region::London => "london",
+            Region::Russia => "russia",
+            Region::Singapore => "singapore",
+            Region::Sydney => "sydney",
+            Region::UsCentral => "us-central",
+            Region::UsEast => "us-east",
+            Region::UsSouth => "us-south",
+            Region::UsWest => "us-west",
+            Region::VipAmsterdam => "vip-amsterdam",
+            Region::VipUsEast => "vip-us-east",
+            Region::VipUsWest => "vip-us-west",
         }
     }
 }

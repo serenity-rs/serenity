@@ -1,5 +1,7 @@
+use internal::prelude::*;
 use serde::de::{self, Deserialize, Deserializer, MapAccess, Visitor};
-use super::super::{AuditLogEntryId, User, UserId, ChannelId, Webhook};
+use serde::ser::Serializer;
+use super::super::prelude::*;
 use std::collections::HashMap;
 use std::mem::transmute;
 use std::fmt;
@@ -31,6 +33,24 @@ pub enum Action {
     MessageDelete,
 }
 
+impl Action {
+    pub fn num(&self) -> u8 {
+        use self::Action::*;
+
+        match *self {
+            GuildUpdate => 1,
+            Action::Channel(ref x) => x.num(),
+            Action::ChannelOverwrite(ref x) => x.num(),
+            Action::Member(ref x) => x.num(),
+            Action::Role(ref x) => x.num(),
+            Action::Invite(ref x) => x.num(),
+            Action::Webhook(ref x) => x.num(),
+            Action::Emoji(ref x) => x.num(),
+            Action::MessageDelete => 72,
+        }
+    }
+}
+
 #[derive(Debug)]
 #[repr(u8)]
 pub enum ActionChannel {
@@ -39,12 +59,32 @@ pub enum ActionChannel {
     Delete = 12,
 }
 
+impl ActionChannel {
+    pub fn num(&self) -> u8 {
+        match *self {
+            ActionChannel::Create => 10,
+            ActionChannel::Update => 11,
+            ActionChannel::Delete => 12,
+        }
+    }
+}
+
 #[derive(Debug)]
 #[repr(u8)]
 pub enum ActionChannelOverwrite {
     Create = 13,
     Update = 14,
     Delete = 15,
+}
+
+impl ActionChannelOverwrite {
+    pub fn num(&self) -> u8 {
+        match *self {
+            ActionChannelOverwrite::Create => 13,
+            ActionChannelOverwrite::Update => 14,
+            ActionChannelOverwrite::Delete => 15,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -58,12 +98,35 @@ pub enum ActionMember {
     RoleUpdate = 25,
 }
 
+impl ActionMember {
+    pub fn num(&self) -> u8 {
+        match *self {
+            ActionMember::Kick => 20,
+            ActionMember::Prune => 21,
+            ActionMember::BanAdd => 22,
+            ActionMember::BanRemove => 23,
+            ActionMember::Update => 24,
+            ActionMember::RoleUpdate => 25,
+        }
+    }
+}
+
 #[derive(Debug)]
 #[repr(u8)]
 pub enum ActionRole {
     Create = 30,
     Update = 31,
     Delete = 32,
+}
+
+impl ActionRole {
+    pub fn num(&self) -> u8 {
+        match *self {
+            ActionRole::Create => 30,
+            ActionRole::Update => 31,
+            ActionRole::Delete => 32,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -74,12 +137,32 @@ pub enum ActionInvite {
     Delete = 42,
 }
 
+impl ActionInvite {
+    pub fn num(&self) -> u8 {
+        match *self {
+            ActionInvite::Create => 40,
+            ActionInvite::Update => 41,
+            ActionInvite::Delete => 42,
+        }
+    }
+}
+
 #[derive(Debug)]
 #[repr(u8)]
 pub enum ActionWebhook {
     Create = 50,
     Update = 51,
     Delete = 52,
+}
+
+impl ActionWebhook {
+    pub fn num(&self) -> u8 {
+        match *self {
+            ActionWebhook::Create => 50,
+            ActionWebhook::Update => 51,
+            ActionWebhook::Delete => 52,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -90,7 +173,17 @@ pub enum ActionEmoji {
     Update = 62,
 }
 
-#[derive(Debug, Deserialize)]
+impl ActionEmoji {
+    pub fn num(&self) -> u8 {
+        match *self {
+            ActionEmoji::Create => 60,
+            ActionEmoji::Update => 61,
+            ActionEmoji::Delete => 62,
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Change {
     #[serde(rename = "key")] pub name: String,
     // TODO: Change these to an actual type.
@@ -105,7 +198,7 @@ pub struct AuditLogs {
     pub users: Vec<User>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct AuditLogEntry {
     /// Determines to what entity an [`action`] was used on.
     ///
@@ -114,7 +207,9 @@ pub struct AuditLogEntry {
     /// Determines what action was done on a [`target`]
     ///
     /// [`target`]: #structfield.target
-    #[serde(deserialize_with = "deserialize_action", rename = "action_type")]
+    #[serde(deserialize_with = "deserialize_action",
+            rename = "action_type",
+            serialize_with = "serialize_action")]
     pub action: Action,
     /// What was the reasoning by doing an action on a target? If there was one.
     pub reason: Option<String>,
@@ -128,7 +223,7 @@ pub struct AuditLogEntry {
     pub options: Option<Options>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Options {
     /// Number of days after which inactive members were kicked.
     pub delete_member_days: String,
@@ -144,10 +239,9 @@ pub struct Options {
     #[serde(rename = "type")] pub kind: String,
     /// Name of the role if type is "role"
     pub role_name: String,
-
 }
 
-fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Error> {
+fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> StdResult<Action, D::Error> {
     struct ActionVisitor;
 
     impl<'de> Visitor<'de> for ActionVisitor {
@@ -157,7 +251,7 @@ fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Err
             formatter.write_str("an integer between 1 to 72")
         }
 
-        fn visit_u8<E: de::Error>(self, value: u8) -> Result<Action, E> {
+        fn visit_u8<E: de::Error>(self, value: u8) -> StdResult<Action, E> {
             Ok(match value {
                 1 => Action::GuildUpdate,
                 10...12 => Action::Channel(unsafe { transmute(value) }),
@@ -176,8 +270,15 @@ fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> Result<Action, D::Err
     de.deserialize_u8(ActionVisitor)
 }
 
+fn serialize_action<S: Serializer>(
+    action: &Action,
+    serializer: S,
+) -> StdResult<S::Ok, S::Error> {
+    serializer.serialize_u8(action.num())
+}
+
 impl<'de> Deserialize<'de> for AuditLogs {
-    fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
+    fn deserialize<D: Deserializer<'de>>(de: D) -> StdResult<Self, D::Error> {
         #[derive(Deserialize)]
         #[serde(field_identifier)]
         enum Field {
@@ -195,7 +296,7 @@ impl<'de> Deserialize<'de> for AuditLogs {
                 formatter.write_str("audit log entries")
             }
 
-            fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> Result<AuditLogs, V::Error> {
+            fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> StdResult<AuditLogs, V::Error> {
                 let mut audit_log_entries = None;
                 let mut users = None;
                 let mut webhooks = None;

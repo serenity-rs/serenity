@@ -1,4 +1,4 @@
-use model::*;
+use model::prelude::*;
 use super::super::utils::{deserialize_emojis, deserialize_roles};
 
 #[cfg(feature = "model")]
@@ -8,12 +8,12 @@ use builder::{EditGuild, EditMember, EditRole};
 /// like member data.
 ///
 /// [`Guild`]: struct.Guild.html
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PartialGuild {
     pub id: GuildId,
     pub afk_channel_id: Option<ChannelId>,
     pub afk_timeout: u64,
-    pub default_message_notifications: u64,
+    pub default_message_notifications: DefaultMessageNotificationLevel,
     pub embed_channel_id: Option<ChannelId>,
     pub embed_enabled: bool,
     #[serde(deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
@@ -24,7 +24,7 @@ pub struct PartialGuild {
     /// [`Guild::features`]: struct.Guild.html#structfield.features
     pub features: Vec<String>,
     pub icon: Option<String>,
-    pub mfa_level: u64,
+    pub mfa_level: MfaLevel,
     pub name: String,
     pub owner_id: UserId,
     pub region: String,
@@ -66,7 +66,7 @@ impl PartialGuild {
             ));
         }
 
-        self.id.ban(user, delete_message_days)
+        self.id.ban(user, &delete_message_days)
     }
 
     /// Gets a list of the guild's bans.
@@ -96,15 +96,16 @@ impl PartialGuild {
     /// ```rust,ignore
     /// use serenity::model::ChannelType;
     ///
-    /// guild.create_channel("test", ChannelType::Voice);
+    /// guild.create_channel("test", ChannelType::Voice, None);
     /// ```
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`http::create_channel`]: ../http/fn.create_channel.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
-    pub fn create_channel(&self, name: &str, kind: ChannelType) -> Result<GuildChannel> {
-        self.id.create_channel(name, kind)
+    pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
+        where C: Into<Option<ChannelId>> {
+        self.id.create_channel(name, kind, category)
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
@@ -448,7 +449,7 @@ impl PartialGuild {
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
-    /// use serenity::model::*;
+    /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
@@ -457,8 +458,10 @@ impl PartialGuild {
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
-    ///         if let Some(role) =
-    ///            msg.guild_id().unwrap().get().unwrap().role_by_name("role_name") {
+    ///         let guild = msg.guild_id().unwrap().get().unwrap();
+    ///         let possible_role = guild.role_by_name("role_name");
+    ///
+    ///         if let Some(role) = possible_role {
     ///             println!("Obtained role's reference: {:?}", role);
     ///         }
     ///     }

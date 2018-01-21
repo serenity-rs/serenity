@@ -1,6 +1,6 @@
 use internal::prelude::*;
-use model::{ChannelId, Region, UserId, VerificationLevel};
-use std::collections::HashMap;
+use model::prelude::*;
+use utils::VecMap;
 
 /// A builder to optionally edit certain fields of a [`Guild`]. This is meant
 /// for usage with [`Guild::edit`].
@@ -12,7 +12,7 @@ use std::collections::HashMap;
 /// [`Guild`]: ../model/struct.Guild.html
 /// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
 #[derive(Clone, Debug, Default)]
-pub struct EditGuild(pub HashMap<&'static str, Value>);
+pub struct EditGuild(pub VecMap<&'static str, Value>);
 
 impl EditGuild {
     /// Set the "AFK voice channel" that users are to move to if they have been
@@ -56,7 +56,7 @@ impl EditGuild {
     /// from the cwd and encode it in base64 to send to Discord.
     ///
     /// ```rust,no_run
-    /// # use serenity::model::GuildId;
+    /// # use serenity::model::id::GuildId;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -112,12 +112,12 @@ impl EditGuild {
     /// Setting the region to [`Region::UsWest`]:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::GuildId;
+    /// # use serenity::model::id::GuildId;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let mut guild = GuildId(0).get()?;
-    /// use serenity::model::Region;
+    /// use serenity::model::guild::Region;
     ///
     /// // assuming a `guild` has already been bound
     ///
@@ -163,7 +163,7 @@ impl EditGuild {
     /// Setting the verification level to [`High`][`VerificationLevel::High`]:
     ///
     /// ```rust,ignore
-    /// use serenity::model::VerificationLevel;
+    /// use serenity::model::guild::VerificationLevel;
     ///
     /// // assuming a `guild` has already been bound
     ///

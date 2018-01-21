@@ -1,10 +1,10 @@
 use chrono::{DateTime, FixedOffset};
-use model::*;
+use model::prelude::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(feature = "model")]
-use builder::{CreateInvite, CreateMessage, EditChannel, GetMessages};
+use builder::{CreateInvite, CreateMessage, EditChannel, EditMessage, GetMessages};
 #[cfg(feature = "model")]
 use http::{self, AttachmentType};
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -14,11 +14,11 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 #[cfg(feature = "model")]
 use std::mem;
 #[cfg(all(feature = "model", feature = "utils"))]
-use utils as serenity_utils;
+use utils::{self as serenity_utils, VecMap};
 
 /// Represents a guild's text or voice channel. Some methods are available only
 /// for voice channels and some are only available for text channels.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildChannel {
     /// The unique Id of the channel.
     ///
@@ -105,6 +105,7 @@ impl GuildChannel {
     /// ```rust,ignore
     /// let invite = channel.create_invite(|i| i.max_uses(5));
     /// ```
+    #[cfg(feature = "utils")]
     pub fn create_invite<F>(&self, f: F) -> Result<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
         #[cfg(feature = "cache")]
@@ -116,7 +117,7 @@ impl GuildChannel {
             }
         }
 
-        let map = serenity_utils::hashmap_to_json_map(f(CreateInvite::default()).0);
+        let map = serenity_utils::vecmap_to_json_map(f(CreateInvite::default()).0);
 
         http::create_invite(self.id.0, &map)
     }
@@ -137,18 +138,17 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{ChannelId, Permissions, UserId};
+    /// # use serenity::model::id::{ChannelId, UserId};
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
-    /// use serenity::model::{
-    ///     ModelError,
+    /// use serenity::model::channel::{
     ///     PermissionOverwrite,
     ///     PermissionOverwriteType,
-    ///     permissions,
     /// };
+    /// use serenity::model::{ModelError, Permissions};
     /// use serenity::CACHE;
     ///
     /// let allow = Permissions::SEND_MESSAGES;
@@ -179,18 +179,17 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{ChannelId, Permissions, UserId};
+    /// # use serenity::model::id::{ChannelId, UserId};
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
-    /// use serenity::model::{
-    ///     ModelError,
+    /// use serenity::model::channel::{
     ///     PermissionOverwrite,
     ///     PermissionOverwriteType,
-    ///     permissions,
     /// };
+    /// use serenity::model::{ModelError, Permissions};
     /// use serenity::CACHE;
     ///
     /// let allow = Permissions::SEND_MESSAGES;
@@ -303,6 +302,7 @@ impl GuildChannel {
     /// ```rust,ignore
     /// channel.edit(|c| c.name("test").bitrate(86400));
     /// ```
+    #[cfg(feature = "utils")]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
         #[cfg(feature = "cache")]
@@ -314,12 +314,12 @@ impl GuildChannel {
             }
         }
 
-        let mut map = HashMap::new();
+        let mut map = VecMap::new();
         map.insert("name", Value::String(self.name.clone()));
         map.insert("position", Value::Number(Number::from(self.position)));
         map.insert("type", Value::String(self.kind.name().to_string()));
 
-        let edited = serenity_utils::hashmap_to_json_map(f(EditChannel(map)).0);
+        let edited = serenity_utils::vecmap_to_json_map(f(EditChannel(map)).0);
 
         match http::edit_channel(self.id.0, &edited) {
             Ok(channel) => {
@@ -335,7 +335,7 @@ impl GuildChannel {
     ///
     /// Message editing preserves all unchanged message data.
     ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// Refer to the documentation for [`EditMessage`] for more information
     /// regarding message restrictions and requirements.
     ///
     /// **Note**: Requires that the current user be the author of the message.
@@ -347,12 +347,12 @@ impl GuildChannel {
     /// over the limit.
     ///
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
+    /// [`EditMessage`]: ../builder/struct.EditMessage.html
     /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
+    /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, M: Into<MessageId> {
+        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
         self.id.edit_message(message_id, f)
     }
 
@@ -425,7 +425,7 @@ impl GuildChannel {
     ///
     /// ```rust,no_run
     /// use serenity::prelude::*;
-    /// use serenity::model::*;
+    /// use serenity::model::prelude::*;
     /// struct Handler;
     ///
     /// use serenity::CACHE;
@@ -452,10 +452,9 @@ impl GuildChannel {
     /// for demonstrative purposes):
     ///
     /// ```rust,no_run
-    /// use serenity::prelude::*;
-    /// use serenity::model::*;
     /// use serenity::CACHE;
-    /// use serenity::model::permissions;
+    /// use serenity::prelude::*;
+    /// use serenity::model::prelude::*;
     /// use std::fs::File;
     ///
     /// struct Handler;
@@ -468,11 +467,10 @@ impl GuildChannel {
     ///         };
     ///
     ///         let current_user_id = CACHE.read().user.id;
-    /// let permissions =
-    /// channel.read().permissions_for(current_user_id).unwrap();
+    ///         let permissions =
+    ///             channel.read().permissions_for(current_user_id).unwrap();
     ///
-    /// if !permissions.contains(Permissions::ATTACH_FILES |
-    /// Permissions::SEND_MESSAGES) {
+    ///         if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
     ///             return;
     ///         }
     ///
@@ -485,8 +483,8 @@ impl GuildChannel {
     ///             },
     ///         };
     ///
-    /// let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m|
-    /// m.content("here's a cat"));
+    ///         let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m|
+    ///             m.content("here's a cat"));
     ///     }
     /// }
     ///
@@ -535,15 +533,16 @@ impl GuildChannel {
     /// [`Message`]: struct.Message.html
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    pub fn reaction_users<M, R, U>(&self,
-                                   message_id: M,
-                                   reaction_type: R,
-                                   limit: Option<u8>,
-                                   after: Option<U>)
-                                   -> Result<Vec<User>>
-        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<UserId> {
-        self.id
-            .reaction_users(message_id, reaction_type, limit, after)
+    pub fn reaction_users<M, R, U>(
+        &self,
+        message_id: M,
+        reaction_type: R,
+        limit: Option<u8>,
+        after: U,
+    ) -> Result<Vec<User>> where M: Into<MessageId>,
+                                 R: Into<ReactionType>,
+                                 U: Into<Option<UserId>> {
+        self.id.reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Sends a message with just the given message content in the channel.

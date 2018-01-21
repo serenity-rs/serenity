@@ -1,9 +1,11 @@
+//! Models relating to Discord channels.
+
 use chrono::{DateTime, FixedOffset};
-use model::*;
+use model::prelude::*;
 use serde_json::Value;
 
 #[cfg(feature = "model")]
-use builder::{CreateEmbed, CreateMessage};
+use builder::{CreateEmbed, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
 use CACHE;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -15,7 +17,7 @@ use {constants, http, utils as serenity_utils};
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Message {
     /// The unique Id of the message. Can be used to calculate the creation date
     /// of the message.
@@ -80,18 +82,17 @@ impl Message {
     /// #
     /// # fn main() {
     /// #   use serenity::prelude::*;
-    /// #   use serenity::framework::standard::Args;
     /// #   struct Handler;
     /// #
     /// #   impl EventHandler for Handler {}
     /// #   let mut client = Client::new("token", Handler).unwrap();
     /// #
-    /// use serenity::model::Channel;
+    /// use serenity::model::channel::Channel;
     /// use serenity::framework::StandardFramework;
     ///
     /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
-    ///     .command("channelname", |c| c.exec(channel_name)));
+    ///     .cmd("channelname", channel_name));
     ///
     /// command!(channel_name(_ctx, msg) {
     ///     let _ = match msg.channel() {
@@ -177,7 +178,7 @@ impl Message {
     ///
     /// Message editing preserves all unchanged message data.
     ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
+    /// Refer to the documentation for [`EditMessage`] for more information
     /// regarding message restrictions and requirements.
     ///
     /// **Note**: Requires that the current user be the author of the message.
@@ -203,10 +204,10 @@ impl Message {
     ///
     /// [`ModelError::InvalidUser`]: enum.ModelError.html#variant.InvalidUser
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
-    /// [`the limit`]: ../builder/struct.CreateMessage.html#method.content
+    /// [`EditMessage`]: ../builder/struct.EditMessage.html
+    /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
+        where F: FnOnce(EditMessage) -> EditMessage {
         #[cfg(feature = "cache")]
         {
             if self.author.id != CACHE.read().user.id {
@@ -214,7 +215,7 @@ impl Message {
             }
         }
 
-        let mut builder = CreateMessage::default();
+        let mut builder = EditMessage::default();
 
         if !self.content.is_empty() {
             builder = builder.content(&self.content);
@@ -224,11 +225,7 @@ impl Message {
             builder = builder.embed(|_| CreateEmbed::from(embed.clone()));
         }
 
-        if self.tts {
-            builder = builder.tts(true);
-        }
-
-        let map = serenity_utils::hashmap_to_json_map(f(builder).0);
+        let map = serenity_utils::vecmap_to_json_map(f(builder).0);
 
         match http::edit_message(self.channel_id.0, self.id.0, &Value::Object(map)) {
             Ok(edited) => {
@@ -312,14 +309,14 @@ impl Message {
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn reaction_users<R, U>(&self,
-                                reaction_type: R,
-                                limit: Option<u8>,
-                                after: Option<U>)
-                                -> Result<Vec<User>>
-        where R: Into<ReactionType>, U: Into<UserId> {
-        self.channel_id
-            .reaction_users(self.id, reaction_type, limit, after)
+    pub fn reaction_users<R, U>(
+        &self,
+        reaction_type: R,
+        limit: Option<u8>,
+        after: U,
+    ) -> Result<Vec<User>> where R: Into<ReactionType>,
+                                 U: Into<Option<UserId>> {
+        self.channel_id.reaction_users(self.id, reaction_type, limit, after)
     }
 
     /// Returns the associated `Guild` for the message if one is in the cache.
@@ -583,7 +580,7 @@ impl<'a> From<&'a Message> for MessageId {
 ///
 /// [`count`]: #structfield.count
 /// [reaction type]: enum.ReactionType.html
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct MessageReaction {
     /// The amount of the type of reaction that have been sent for the
     /// associated message.
@@ -616,3 +613,20 @@ enum_number!(
         MemberJoin = 7,
     }
 );
+
+impl MessageType {
+    pub fn num(&self) -> u64 {
+        use self::MessageType::*;
+
+        match *self {
+            Regular => 0,
+            GroupRecipientAddition => 1,
+            GroupRecipientRemoval => 2,
+            GroupCallCreation => 3,
+            GroupNameUpdate => 4,
+            GroupIconUpdate => 5,
+            PinsAdd => 6,
+            MemberJoin => 7,
+        }
+    }
+}

@@ -1,4 +1,4 @@
-[![ci-badge][]][ci] [![docs-badge][]][docs]
+[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild]
 
 # serenity
 
@@ -52,13 +52,16 @@ impl EventHandler for Handler {}
 
 fn main() {
     // Login with a bot token from the environment
-    let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"), Handler);
+    let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"), Handler)
+        .expect("Error creating client");
     client.with_framework(StandardFramework::new()
         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
-        .on("ping", ping));
+        .cmd("ping", ping));
 
     // start listening for events by starting a single shard
-    let _ = client.start();
+    if let Err(why) = client.start() {
+        println!("An error occurred while running the client: {:?}", why);
+    }
 }
 
 command!(ping(_context, message) {
@@ -77,12 +80,12 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-serenity = "0.4"
+serenity = "0.5"
 ```
 
 and to the top of your `main.rs`:
 
-```rs
+```rust,ignore
 #[macro_use] extern crate serenity;
 ```
 
@@ -95,9 +98,9 @@ Cargo.toml:
 
 ```toml
 [dependencies.serenity]
-git = "https://github.com/zeyla/serenity.git"
 default-features = false
 features = ["pick", "your", "feature", "names", "here"]
+version = "0.5"
 ```
 
 The following is a full list of features:
@@ -172,6 +175,8 @@ Voice+youtube-dl:
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
 [examples]: https://github.com/zeyla/serenity/tree/master/examples
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
+[guild]: https://discord.gg/WBdGJCc
+[guild-badge]: https://discordapp.com/api/guilds/381880193251409931/widget.png
 [library:Discord.net]: https://github.com/RogueException/Discord.Net
 [library:JDA]: https://github.com/DV8FromTheWorld/JDA
 [library:disco]: https://github.com/b1naryth1ef/disco

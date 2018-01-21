@@ -42,7 +42,7 @@
 //! [`CACHE`]: ../struct.CACHE.html
 //! [`http`]: ../http/index.html
 
-use model::*;
+use model::prelude::*;
 use parking_lot::RwLock;
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
@@ -168,8 +168,8 @@ impl Cache {
     /// used to determine how many members have not yet been received.
     ///
     /// ```rust,no_run
+    /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
     /// #
     /// # #[cfg(feature = "client")]
     /// # fn main() {
@@ -264,8 +264,8 @@ impl Cache {
     /// ```rust,no_run
     /// # #[cfg(feature = "client")]
     /// # fn main() {
+    /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
     /// #
     /// use serenity::CACHE;
     ///
@@ -379,8 +379,8 @@ impl Cache {
     /// ```rust,no_run
     /// # #[cfg(feature = "client")]
     /// # fn main() {
+    /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
-    /// # use serenity::model::*;
     /// #
     /// use serenity::CACHE;
     ///

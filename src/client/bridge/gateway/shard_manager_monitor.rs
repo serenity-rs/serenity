@@ -40,6 +40,15 @@ impl ShardManagerMonitor {
                 ShardManagerMessage::Restart(shard_id) => {
                     self.manager.lock().restart(shard_id);
                 },
+                ShardManagerMessage::ShardUpdate { id, latency, stage } => {
+                    let manager = self.manager.lock();
+                    let mut runners = manager.runners.lock();
+
+                    runners.get_mut(&id).map(|runner| {
+                        runner.latency = latency;
+                        runner.stage = stage;
+                    });
+                }
                 ShardManagerMessage::Shutdown(shard_id) => {
                     self.manager.lock().shutdown(shard_id);
                 },
@@ -48,6 +57,7 @@ impl ShardManagerMonitor {
 
                     break;
                 },
+                ShardManagerMessage::ShutdownInitiated => break,
             }
         }
     }
