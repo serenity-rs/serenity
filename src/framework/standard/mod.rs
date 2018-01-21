@@ -971,9 +971,9 @@ impl Framework for StandardFramework {
 
                     let mut args = {
                         let mut content = message.content.chars().skip(position).collect::<String>();
-                        content = content.chars().skip(built.chars().count()).collect::<String>().trim().to_string();
+                        content = content.chars().skip(built.chars().count()).collect::<String>();
 
-                        Args::new(&content, &self.configuration.delimiters)
+                        Args::new(content.trim(), &self.configuration.delimiters)
                     };
 
                     let before = self.before.clone();
