@@ -22,6 +22,7 @@ use std::default::Default;
 use std::sync::Arc;
 use client::Context;
 use super::Framework;
+use threadpool::ThreadPool;
 use model::{ChannelId, GuildId, Guild, Member, Message, UserId};
 use model::permissions::Permissions;
 use internal::RwLockExt;
@@ -195,6 +196,7 @@ pub struct StandardFramework {
     /// ../client/event_handler/trait.EventHandler.html#method.on_message
     /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
     pub initialized: bool,
+    threadpool: ThreadPool,
     user_info: (u64, bool),
 }
 
@@ -933,27 +935,29 @@ impl Framework for StandardFramework {
                             return;
                         }
 
-                        if let Some(before) = before {
-                            if !(before)(&mut context, &message, &built) {
-                                return;
+                        self.threadpool.execute(move || {
+                            if let Some(before) = before {
+                                if !(before)(&mut context, &message, &built) {
+                                    return;
+                                }
                             }
-                        }
 
-                        let result = match command.exec {
-                            CommandType::StringResponse(ref x) => {
-                                let _ = message.channel_id.say(x);
+                            let result = match command.exec {
+                                CommandType::StringResponse(ref x) => {
+                                    let _ = message.channel_id.say(x);
 
-                                Ok(())
-                            },
-                            CommandType::Basic(ref x) => (x)(&mut context, &message, args),
-                            CommandType::WithCommands(ref x) => {
-                                (x)(&mut context, &message, groups, args)
-                            },
-                        };
+                                    Ok(())
+                                },
+                                CommandType::Basic(ref x) => (x)(&mut context, &message, args),
+                                CommandType::WithCommands(ref x) => {
+                                    (x)(&mut context, &message, groups, args)
+                                },
+                            };
 
-                        if let Some(after) = after {
-                            (after)(&mut context, &message, &built, result);
-                        }
+                            if let Some(after) = after {
+                                (after)(&mut context, &message, &built, result);
+                            }
+                        });
 
                         return;
                     }
