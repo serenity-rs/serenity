@@ -970,7 +970,7 @@ impl Framework for StandardFramework {
                     };
 
                     let mut args = {
-                        let mut content = content.chars().skip(position + built.chars().count()).collect::<String>();
+                        let content = content.chars().skip(position + built.chars().count()).collect::<String>();
 
                         Args::new(content.trim(), &self.configuration.delimiters)
                     };
