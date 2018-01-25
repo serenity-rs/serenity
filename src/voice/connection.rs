@@ -489,7 +489,7 @@ fn start_threads(client: Arc<Mutex<Client>>, udp: &UdpSocket) -> Result<ThreadIt
                     },
                 };
 
-                if tx_clone.send(ReceiverStatus::Websocket(msg)).is_ok() {
+                if tx_clone.send(ReceiverStatus::Websocket(msg)).is_err() {
                     return;
                 }
             }
