@@ -1,4 +1,4 @@
-use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{BigEndian, ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 use internal::prelude::*;
 use internal::ws_impl::{ReceiverExt, SenderExt};
 use internal::Timer;
@@ -192,7 +192,7 @@ impl Connection {
                         nonce.0[..HEADER_LEN]
                             .clone_from_slice(&packet[..HEADER_LEN]);
 
-                        if let Ok(decrypted) =
+                        if let Ok(mut decrypted) =
                             secretbox::open(&packet[HEADER_LEN..], &nonce, &self.key) {
                             let channels = opus_packet::get_nb_channels(&decrypted)?;
 
@@ -200,6 +200,28 @@ impl Connection {
                                 self.decoder_map.entry((ssrc, channels)).or_insert_with(
                                     || OpusDecoder::new(SAMPLE_RATE, channels).unwrap(),
                                 );
+
+                            // Strip RTP Header Extensions (one-byte)
+                            if decrypted[0] == 0xBE && decrypted[1] == 0xDE {
+                                // Read the length bytes as a big-endian u16.
+                                let header_extension_len = BigEndian::read_u16(&decrypted[2..4]);
+                                let mut offset = 4;
+                                for _ in 0..header_extension_len {
+                                    let byte = decrypted[offset];
+                                    offset += 1;
+                                    if byte == 0 {
+                                        continue;
+                                    }
+
+                                    offset += 1 + (0b1111 & (byte >> 4)) as usize;
+                                }
+
+                                while decrypted[offset] == 0 {
+                                    offset += 1;
+                                }
+
+                                decrypted = decrypted.split_off(offset);
+                            }
 
                             let len = entry.decode(&decrypted, &mut buffer, false)?;
 
