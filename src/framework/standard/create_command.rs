@@ -11,7 +11,25 @@ pub enum FnOrCommand {
     CommandWithOptions(Arc<Command>),
 }
 
-pub struct CreateCommand(pub CommandOptions, pub FnOrCommand);
+impl Default for FnOrCommand {
+    fn default() -> Self {
+        FnOrCommand::Fn(|_, _, _| Ok(()))
+    }
+}
+
+type Init = Fn() + Send + Sync + 'static;
+type Before = Fn(&mut Context, &Message) -> bool + Send + Sync + 'static;
+type After = Fn(&mut Context, &Message, &Result<(), CommandError>) + Send + Sync + 'static;
+
+#[derive(Default)]
+pub struct Handlers {
+    init: Option<Arc<Init>>,
+    before: Option<Arc<Before>>,
+    after: Option<Arc<After>>,
+}
+
+#[derive(Default)]
+pub struct CreateCommand(pub CommandOptions, pub FnOrCommand, pub Handlers);
 
 impl CreateCommand {
     /// Adds multiple aliases.
@@ -206,8 +224,37 @@ impl CreateCommand {
         self
     }
 
+    /// Sets an initialise middleware to be called upon the command's actual registration.
+    /// 
+    /// This is similiar to implementing the `init` function on `Command`.
+    pub fn init<F: Fn() + Send + Sync + 'static>(mut self, f: F) -> Self {
+        self.2.init = Some(Arc::new(f));
+
+        self
+    }
+
+    /// Sets a before middleware to be called before the command's execution.
+    /// 
+    /// This is similiar to implementing the `before` function on `Command`.
+    pub fn before<F: Send + Sync + 'static>(mut self, f: F) -> Self 
+        where F: Fn(&mut Context, &Message) -> bool {
+        self.2.before = Some(Arc::new(f));
+
+        self
+    }
+
+    /// Sets an after middleware to be called after the command's execution.
+    /// 
+    /// This is similiar to implementing the `after` function on `Command`.
+    pub fn after<F: Send + Sync + 'static>(mut self, f: F) -> Self 
+        where F: Fn(&mut Context, &Message, &Result<(), CommandError>) {
+        self.2.after = Some(Arc::new(f));
+
+        self
+    }
+
     pub(crate) fn finish(self) -> Arc<Command> {
-        struct A<C: Command>(Arc<CommandOptions>, C);
+        struct A<C: Command>(Arc<CommandOptions>, C, Handlers);
 
         impl<C: Command> Command for A<C> {
             fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), CommandError> {
@@ -215,16 +262,36 @@ impl CreateCommand {
             }
 
             fn options(&self) -> Arc<CommandOptions> { Arc::clone(&self.0) }
+
+            fn init(&self) {
+                if let Some(ref init) = self.2.init {
+                    (init)();
+                }
+            }
+
+            fn before(&self, c: &mut Context, m: &Message) -> bool {
+                if let Some(ref before) = self.2.before {
+                    return (before)(c, m);
+                }
+
+                true
+            }
+
+            fn after(&self, c: &mut Context, m: &Message, res: &Result<(), CommandError>) {
+                if let Some(ref after) = self.2.after {
+                    (after)(c, m, res);
+                }
+            }
         }
 
-        let CreateCommand(options, fc) = self;
+        let CreateCommand(options, fc, handlers) = self;
 
         match fc {
             FnOrCommand::Fn(func) => {
-                Arc::new(A(Arc::new(options), func))
+                Arc::new(A(Arc::new(options), func, handlers))
             },
             FnOrCommand::Command(cmd) => {
-                Arc::new(A(Arc::new(options), cmd))
+                Arc::new(A(Arc::new(options), cmd, handlers))
             },
             FnOrCommand::CommandWithOptions(cmd) => cmd,
         }

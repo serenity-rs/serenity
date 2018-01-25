@@ -28,7 +28,7 @@ pub struct CreateGroup(pub CommandGroup);
 
 impl CreateGroup {
     fn build_command(&self) -> CreateCommand {
-        let mut cmd = CreateCommand(CommandOptions::default(), FnOrCommand::Fn(|_, _, _| Ok(())))
+        let mut cmd = CreateCommand::default()
             .required_permissions(self.0.required_permissions)
             .dm_only(self.0.dm_only)
             .guild_only(self.0.guild_only)

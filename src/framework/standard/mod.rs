@@ -686,7 +686,7 @@ impl StandardFramework {
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
-                let cmd = f(CreateCommand(CommandOptions::default(), FnOrCommand::Fn(|_, _, _| Ok(())))).finish();
+                let cmd = f(CreateCommand::default()).finish();
                 let name = command_name.to_string();
 
                 if let Some(ref prefix) = group.prefix {
