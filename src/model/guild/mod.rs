@@ -663,11 +663,26 @@ impl Guild {
     /// Returns [`None`] if at least one of the given users' member instances
     /// is not present. Returns `None` if the users have the same hierarchy, as
     /// neither are greater than the other.
+    ///
+    /// If both user IDs are the same, `None` is returned. If one of the users
+    /// is the guild owner, their ID is returned.
     #[cfg(feature = "cache")]
     pub fn greater_member_hierarchy<T, U>(&self, lhs_id: T, rhs_id: U)
         -> Option<UserId> where T: Into<UserId>, U: Into<UserId> {
         let lhs_id = lhs_id.into();
         let rhs_id = rhs_id.into();
+
+        // Check that the IDs are the same. If they are, neither is greater.
+        if lhs_id == rhs_id {
+            return None;
+        }
+
+        // Check if either user is the guild owner.
+        if lhs_id == self.owner_id {
+            return Some(lhs_id);
+        } else if rhs_id == self.owner_id {
+            return Some(rhs_id);
+        }
 
         let lhs = self.members.get(&lhs_id)?
             .highest_role_info()
