@@ -433,6 +433,24 @@ impl GuildId {
         http::get_guild_prune_count(self.0, &map)
     }
 
+    /// Re-orders the channels of the guild.
+    ///
+    /// Accepts an iterator of a tuple of the channel ID to modify and its new
+    /// position.
+    ///
+    /// Although not required, you should specify all channels' positions,
+    /// regardless of whether they were updated. Otherwise, positioning can
+    /// sometimes get weird.
+    pub fn reorder_channels<It>(&self, channels: It) -> Result<()>
+        where It: IntoIterator<Item = (ChannelId, u64)> {
+        let items = channels.into_iter().map(|(id, pos)| json!({
+            "id": id,
+            "position": pos,
+        })).collect();
+
+        http::edit_guild_channel_positions(self.0, &Value::Array(items))
+    }
+
     /// Returns the Id of the shard associated with the guild.
     ///
     /// When the cache is enabled this will automatically retrieve the total

@@ -708,6 +708,22 @@ pub fn edit_guild(guild_id: u64, map: &JsonMap) -> Result<PartialGuild> {
         .map_err(From::from)
 }
 
+/// Edits the positions of a guild's channels.
+pub fn edit_guild_channel_positions(guild_id: u64, value: &Value)
+    -> Result<()> {
+    let body = serde_json::to_string(value)?;
+
+    verify(
+        204,
+        request!(
+            Route::GuildsIdChannels(guild_id),
+            patch(body),
+            "/guilds/{}/channels",
+            guild_id,
+        ),
+    )
+}
+
 /// Edits a [`Guild`]'s embed setting.
 ///
 /// [`Guild`]: ../model/struct.Guild.html

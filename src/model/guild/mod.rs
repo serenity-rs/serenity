@@ -1343,6 +1343,16 @@ impl Guild {
         self.id.prune_count(days)
     }
 
+    /// Re-orders the channels of the guild.
+    ///
+    /// Although not required, you should specify all channels' positions,
+    /// regardless of whether they were updated. Otherwise, positioning can
+    /// sometimes get weird.
+    pub fn reorder_channels<It>(&self, channels: It) -> Result<()>
+        where It: IntoIterator<Item = (ChannelId, u64)> {
+        self.id.reorder_channels(channels)
+    }
+
     /// Returns the Id of the shard associated with the guild.
     ///
     /// When the cache is enabled this will automatically retrieve the total
