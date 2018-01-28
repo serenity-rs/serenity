@@ -355,6 +355,19 @@ impl Message {
         }
     }
 
+    /// Retrieves a clone of the author's Member instance, if this message was
+    /// sent in a guild.
+    ///
+    /// Note that since this clones, it is preferable performance-wise to
+    /// manually retrieve the guild from the cache and access
+    /// [`Guild::members`].
+    ///
+    /// [`Guild::members`]: ../guild/struct.Guild.html#structfield.members
+    #[cfg(feature = "cache")]
+    pub fn member(&self) -> Option<Member> {
+        self.guild().and_then(|g| g.read().members.get(&self.author.id).cloned())
+    }
+
     /// Checks the length of a string to ensure that it is within Discord's
     /// maximum message length limit.
     ///
