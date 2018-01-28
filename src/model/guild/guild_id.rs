@@ -178,7 +178,13 @@ impl GuildId {
     pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
         let map = utils::vecmap_to_json_map(f(EditRole::default()).0);
 
-        http::create_role(self.0, &map)
+        let role = http::create_role(self.0, &map)?;
+
+        if let Some(position) = map.get("position").and_then(Value::as_u64) {
+            self.edit_role_position(role.id, position)?;
+        }
+
+        Ok(role)
     }
 
     /// Deletes the current guild if the current account is the owner of the
