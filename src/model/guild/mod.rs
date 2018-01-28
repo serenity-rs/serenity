@@ -32,6 +32,8 @@ use builder::{EditGuild, EditMember, EditRole};
 use constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
 use std;
+#[cfg(feature = "model")]
+use std::borrow::Cow;
 
 /// A representation of a banning of a user.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash, Serialize)]
@@ -900,23 +902,23 @@ impl Guild {
                     let name_a = match a.nick {
                         Some(ref nick) => {
                             if contains_case_insensitive(&a.user.read().name[..], prefix) {
-                                a.user.read().name.clone()
+                                Cow::Owned(a.user.read().name.clone())
                             } else {
-                                nick.clone()
+                                Cow::Borrowed(nick)
                             }
                         },
-                        None => a.user.read().name.clone(),
+                        None => Cow::Owned(a.user.read().name.clone()),
                     };
 
                     let name_b = match b.nick {
                         Some(ref nick) => {
                             if contains_case_insensitive(&b.user.read().name[..], prefix) {
-                                b.user.read().name.clone()
+                                Cow::Owned(b.user.read().name.clone())
                             } else {
-                                nick.clone()
+                                Cow::Borrowed(nick)
                             }
                         },
-                        None => b.user.read().name.clone(),
+                        None => Cow::Owned(b.user.read().name.clone()),
                     };
 
                     closest_to_origin(prefix, &name_a[..], &name_b[..])
@@ -976,23 +978,23 @@ impl Guild {
                     let name_a = match a.nick {
                         Some(ref nick) => {
                             if contains_case_insensitive(&a.user.read().name[..], substring) {
-                                a.user.read().name.clone()
+                                Cow::Owned(a.user.read().name.clone())
                             } else {
-                                nick.clone()
+                                Cow::Borrowed(nick)
                             }
                         },
-                        None => a.user.read().name.clone(),
+                        None => Cow::Owned(a.user.read().name.clone()),
                     };
 
                     let name_b = match b.nick {
                         Some(ref nick) => {
                             if contains_case_insensitive(&b.user.read().name[..], substring) {
-                                b.user.read().name.clone()
+                                Cow::Owned(b.user.read().name.clone())
                             } else {
-                                nick.clone()
+                                Cow::Borrowed(nick)
                             }
                         },
-                        None => b.user.read().name.clone(),
+                        None => Cow::Owned(b.user.read().name.clone()),
                     };
 
                     closest_to_origin(substring, &name_a[..], &name_b[..])
@@ -1081,16 +1083,16 @@ impl Guild {
                 .sort_by(|a, b| {
                     let name_a = match a.nick {
                         Some(ref nick) => {
-                            nick.clone()
+                            Cow::Borrowed(nick)
                         },
-                        None => a.user.read().name.clone(),
+                        None => Cow::Owned(a.user.read().name.clone()),
                     };
 
                     let name_b = match b.nick {
                         Some(ref nick) => {
-                                nick.clone()
+                                Cow::Borrowed(nick)
                             },
-                        None => b.user.read().name.clone(),
+                        None => Cow::Owned(b.user.read().name.clone()),
                     };
 
                     closest_to_origin(substring, &name_a[..], &name_b[..])

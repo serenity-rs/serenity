@@ -25,7 +25,7 @@ struct InputSource<R: Read + Send + 'static> {
 impl<R: Read + Send> AudioSource for InputSource<R> {
     fn is_stereo(&mut self) -> bool { self.stereo }
 
-    fn get_type(&self) -> AudioType { self.kind.clone() }
+    fn get_type(&self) -> AudioType { self.kind }
 
     fn read_pcm_frame(&mut self, buffer: &mut [i16]) -> Option<usize> {
         for (i, v) in buffer.iter_mut().enumerate() {
