@@ -112,20 +112,27 @@ impl ChannelId {
     ///
     /// Requires the [Manage Messages] permission.
     ///
-    /// **Note**: This uses bulk delete endpoint which is not available
-    /// for user accounts.
+    /// **Note**: Messages that are older than 2 weeks can't be deleted using
+    /// this method.
     ///
-    /// **Note**: Messages that are older than 2 weeks can't be deleted using this method.
+    /// # Errors
+    ///
+    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to
+    /// delete either 0 or more than 100 messages.
     ///
     /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
+    /// [`ModelError::BulkDeleteAmount`]: ../enum.ModelError.html#variant.BulkDeleteAmount
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, message_ids: It) -> Result<()> {
         let ids = message_ids
             .into_iter()
             .map(|message_id| message_id.as_ref().0)
             .collect::<Vec<u64>>();
+        let len = ids.len();
 
-        if ids.len() == 1 {
+        if len == 0 || len > 100 {
+            return Err(Error::Model(ModelError::BulkDeleteAmount));
+        } else if ids.len() == 1 {
             self.delete_message(ids[0])
         } else {
             let map = json!({ "messages": ids });
