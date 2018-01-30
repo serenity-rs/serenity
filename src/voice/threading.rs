@@ -42,6 +42,9 @@ fn runner(rx: &MpscReceiver<Status>) {
                 Ok(Status::SetSender(s)) => {
                     sender = s;
                 },
+                Ok(Status::AddSender(s)) => {
+                    unimplemented!();
+                },
                 Err(TryRecvError::Empty) => {
                     // If we receieved nothing, then we can perform an update.
                     break;

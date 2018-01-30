@@ -2,9 +2,11 @@ use constants::VoiceOpCode;
 use gateway::InterMessage;
 use model::id::{ChannelId, GuildId, UserId};
 use model::voice::VoiceState;
+use parking_lot::Mutex;
+use std::sync::Arc;
 use std::sync::mpsc::{self, Sender as MpscSender};
 use super::connection_info::ConnectionInfo;
-use super::{AudioReceiver, AudioSource, Status as VoiceStatus, threading};
+use super::{Audio, AudioReceiver, AudioSource, Status as VoiceStatus, threading};
 
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.
@@ -254,8 +256,10 @@ impl Handler {
     ///
     /// [`voice::ffmpeg`]: fn.ffmpeg.html
     /// [`voice::ytdl`]: fn.ytdl.html
-    pub fn play(&mut self, source: Box<AudioSource>) {
-        self.send(VoiceStatus::SetSender(Some(source)))
+    pub fn play(&mut self, source: Box<AudioSource>) -> Arc<Mutex<Audio>> {
+        let player = Arc::new(Mutex::new(Audio::new(Some(source))));
+        self.send(VoiceStatus::AddSender(player.clone()));
+        player
     }
 
     /// Stops playing audio from a source, if one is set.

@@ -29,3 +29,34 @@ pub enum AudioType {
     Opus,
     Pcm,
 }
+
+/// Control object for audio playback.
+/// Accessed by both commands and the playback code -- as such, access is
+/// always guarded by [`RwLock`]s.
+pub struct Audio {
+    pub playing: bool,
+    pub volume: f32,
+
+    pub src: Option<Box<AudioSource>>,
+}
+
+impl Audio {
+    pub fn new(source: Option<Box<AudioSource>>) -> Self {
+        Self {
+            playing: true,
+            volume: 1.0,
+
+            src: source,
+        }
+    }
+
+    pub fn play(&mut self) -> &mut Self {
+        self.playing = true;
+        self
+    }
+
+    pub fn pause(&mut self) -> &mut Self {
+        self.playing = false;
+        self
+    }
+}

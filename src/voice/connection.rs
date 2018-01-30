@@ -22,7 +22,7 @@ use std::sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender};
 use std::sync::Arc;
 use std::thread::{self, Builder as ThreadBuilder, JoinHandle};
 use std::time::Duration;
-use super::audio::{AudioReceiver, AudioSource, AudioType, HEADER_LEN, SAMPLE_RATE};
+use super::audio::{Audio, AudioReceiver, AudioSource, AudioType, HEADER_LEN, SAMPLE_RATE};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
 use websocket::client::Url as WebsocketUrl;
