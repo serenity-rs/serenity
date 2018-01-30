@@ -62,6 +62,11 @@ impl Audio {
         self.playing = false;
         self
     }
+
+    pub fn volume(&mut self, volume: f32) -> &mut Self {
+        self.volume = volume;
+        self
+    }
 }
 
 /// Threadsafe form of the `Audio` object.

@@ -15,6 +15,7 @@ use opus::{
 use parking_lot::Mutex;
 use serde::Deserialize;
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
+use std::cmp::max;
 use std::collections::HashMap;
 use std::io::Write;
 use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
@@ -182,6 +183,7 @@ impl Connection {
                  audio_timer: &mut Timer)
                  -> Result<()> {
         let mut buffer = [0i16; 960 * 2];
+        let mut mix_buffer = [0f32; 960 * 2];
         let mut packet = [0u8; 512];
         let mut nonce = secretbox::Nonce([0; 24]);
 
@@ -271,48 +273,48 @@ impl Connection {
 
         let mut len = 0;
 
-        if sources.len() > 0 {
+        // Walk over all the audio files, removing those which have finished.
+        // For this purpose, we need a while loop in Rust.
+        let mut i = 0;
 
-            let aud_l = (&sources[0]).clone();
-            let mut aud = aud_l.lock();
+        while i < sources.len() {
+            let aud_lock = (&sources[i]).clone();
+            let mut aud = aud_lock.lock();
             let stream = &mut aud.src;
 
-            // len = match source.as_mut() {
-                // Some(stream) => {
-                    let is_stereo = stream.is_stereo();
+            let is_stereo = stream.is_stereo();
 
-                    if is_stereo != self.encoder_stereo {
-                        let channels = if is_stereo {
-                            Channels::Stereo
-                        } else {
-                            Channels::Mono
-                        };
-                        self.encoder = OpusEncoder::new(SAMPLE_RATE, channels, CodingMode::Audio)?;
-                        self.encoder_stereo = is_stereo;
+            if is_stereo != self.encoder_stereo {
+                let channels = if is_stereo {
+                    Channels::Stereo
+                } else {
+                    Channels::Mono
+                };
+                self.encoder = OpusEncoder::new(SAMPLE_RATE, channels, CodingMode::Audio)?;
+                self.encoder_stereo = is_stereo;
+            }
+
+            let temp_len = match stream.get_type() {
+                AudioType::Opus => match stream.read_opus_frame() {
+                    Some(frame) => {
+                        opus_frame = frame;
+                        opus_frame.len()
+                    },
+                    None => 0,
+                },
+                AudioType::Pcm => {
+                    let buffer_len = if is_stereo { 960 * 2 } else { 960 };
+
+                    match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
+                        Some(len) => len,
+                        None => 0,
                     }
+                },
+            };
 
-                    len = match stream.get_type() {
-                        AudioType::Opus => match stream.read_opus_frame() {
-                            Some(frame) => {
-                                opus_frame = frame;
-                                opus_frame.len()
-                            },
-                            None => 0,
-                        },
-                        AudioType::Pcm => {
-                            let buffer_len = if is_stereo { 960 * 2 } else { 960 };
-
-                            match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
-                                Some(len) => len,
-                                None => 0,
-                            }
-                        },
-                    }
-                // },
-                // None => 0,
-            // };
-
-        }
+            len = max(len, temp_len);
+            i += if temp_len > 0 {1} else {sources.remove(i); 0};
+        };
 
         if len == 0 {
             if self.silence_frames > 0 {
