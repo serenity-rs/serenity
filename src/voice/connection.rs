@@ -1,4 +1,5 @@
 use byteorder::{BigEndian, ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
+use constants::VOICE_GATEWAY_VERSION;
 use internal::prelude::*;
 use internal::ws_impl::{ReceiverExt, SenderExt};
 use internal::Timer;
@@ -150,6 +151,10 @@ impl Connection {
 
         let encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Mono, CodingMode::Audio)?;
 
+        // Per discord dev team's current recommendations:
+        // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
+        let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;
+
         Ok(Connection {
             audio_timer: Timer::new(1000 * 60 * 4),
             client: mutexed_client,
@@ -158,7 +163,7 @@ impl Connection {
             encoder: encoder,
             encoder_stereo: false,
             key: key,
-            keepalive_timer: Timer::new(hello.heartbeat_interval),
+            keepalive_timer: Timer::new(temp_heartbeat),
             udp: udp,
             sequence: 0,
             silence_frames: 0,
@@ -300,8 +305,6 @@ impl Connection {
         };
 
         if len == 0 {
-            self.set_speaking(false)?;
-
             if self.silence_frames > 0 {
                 self.silence_frames -= 1;
 
@@ -309,6 +312,9 @@ impl Connection {
                     *value = 0;
                 }
             } else {
+                // Per official guidelines, send 5x silence BEFORE we stop speaking.
+                self.set_speaking(false)?;
+
                 audio_timer.await();
 
                 return Ok(());
@@ -402,7 +408,7 @@ fn generate_url(endpoint: &mut String) -> Result<WebsocketUrl> {
         endpoint.truncate(len - 3);
     }
 
-    WebsocketUrl::parse(&format!("wss://{}", endpoint))
+    WebsocketUrl::parse(&format!("wss://{}/?v={}", endpoint, VOICE_GATEWAY_VERSION))
         .or(Err(Error::Voice(VoiceError::EndpointUrl)))
 }
 
