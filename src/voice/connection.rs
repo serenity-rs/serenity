@@ -22,7 +22,7 @@ use std::sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender};
 use std::sync::Arc;
 use std::thread::{self, Builder as ThreadBuilder, JoinHandle};
 use std::time::Duration;
-use super::audio::{Audio, AudioReceiver, AudioSource, AudioType, HEADER_LEN, SAMPLE_RATE};
+use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, TSAudio};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
 use websocket::client::Url as WebsocketUrl;
@@ -177,7 +177,7 @@ impl Connection {
 
     #[allow(unused_variables)]
     pub fn cycle(&mut self,
-                 source: &mut Option<Box<AudioSource>>,
+                 sources: &mut Vec<TSAudio>,
                  receiver: &mut Option<Box<AudioReceiver>>,
                  audio_timer: &mut Timer)
                  -> Result<()> {
@@ -269,40 +269,50 @@ impl Connection {
 
         let mut opus_frame = Vec::new();
 
-        let len = match source.as_mut() {
-            Some(stream) => {
-                let is_stereo = stream.is_stereo();
+        let mut len = 0;
 
-                if is_stereo != self.encoder_stereo {
-                    let channels = if is_stereo {
-                        Channels::Stereo
-                    } else {
-                        Channels::Mono
-                    };
-                    self.encoder = OpusEncoder::new(SAMPLE_RATE, channels, CodingMode::Audio)?;
-                    self.encoder_stereo = is_stereo;
-                }
+        if sources.len() > 0 {
 
-                match stream.get_type() {
-                    AudioType::Opus => match stream.read_opus_frame() {
-                        Some(frame) => {
-                            opus_frame = frame;
-                            opus_frame.len()
-                        },
-                        None => 0,
-                    },
-                    AudioType::Pcm => {
-                        let buffer_len = if is_stereo { 960 * 2 } else { 960 };
+            let aud_l = (&sources[0]).clone();
+            let mut aud = aud_l.lock();
+            let stream = &mut aud.src;
 
-                        match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
-                            Some(len) => len,
+            // len = match source.as_mut() {
+                // Some(stream) => {
+                    let is_stereo = stream.is_stereo();
+
+                    if is_stereo != self.encoder_stereo {
+                        let channels = if is_stereo {
+                            Channels::Stereo
+                        } else {
+                            Channels::Mono
+                        };
+                        self.encoder = OpusEncoder::new(SAMPLE_RATE, channels, CodingMode::Audio)?;
+                        self.encoder_stereo = is_stereo;
+                    }
+
+                    len = match stream.get_type() {
+                        AudioType::Opus => match stream.read_opus_frame() {
+                            Some(frame) => {
+                                opus_frame = frame;
+                                opus_frame.len()
+                            },
                             None => 0,
-                        }
-                    },
-                }
-            },
-            None => 0,
-        };
+                        },
+                        AudioType::Pcm => {
+                            let buffer_len = if is_stereo { 960 * 2 } else { 960 };
+
+                            match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
+                                Some(len) => len,
+                                None => 0,
+                            }
+                        },
+                    }
+                // },
+                // None => 0,
+            // };
+
+        }
 
         if len == 0 {
             if self.silence_frames > 0 {

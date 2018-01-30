@@ -6,7 +6,7 @@ use parking_lot::Mutex;
 use std::sync::Arc;
 use std::sync::mpsc::{self, Sender as MpscSender};
 use super::connection_info::ConnectionInfo;
-use super::{Audio, AudioReceiver, AudioSource, Status as VoiceStatus, threading};
+use super::{Audio, AudioReceiver, AudioSource, Status as VoiceStatus, threading, TSAudio};
 
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.
@@ -256,9 +256,20 @@ impl Handler {
     ///
     /// [`voice::ffmpeg`]: fn.ffmpeg.html
     /// [`voice::ytdl`]: fn.ytdl.html
-    pub fn play(&mut self, source: Box<AudioSource>) -> Arc<Mutex<Audio>> {
-        let player = Arc::new(Mutex::new(Audio::new(Some(source))));
+    pub fn play(&mut self, source: Box<AudioSource>) -> TSAudio {
+        let player = Arc::new(Mutex::new(Audio::new(source)));
         self.send(VoiceStatus::AddSender(player.clone()));
+        player
+    }
+
+    /// Plays audio from a source.
+    /// Unlike `play`, this stops all other sources attached
+    /// to the channel.
+    ///
+    /// [`play`]: #method.play
+    pub fn play_only(&mut self, source: Box<AudioSource>) -> TSAudio {
+        let player = Arc::new(Mutex::new(Audio::new(source)));
+        self.send(VoiceStatus::SetSender(Some(player.clone())));
         player
     }
 

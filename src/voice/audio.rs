@@ -1,3 +1,6 @@
+use parking_lot::Mutex;
+use std::sync::Arc;
+
 pub const HEADER_LEN: usize = 12;
 pub const SAMPLE_RATE: u32 = 48_000;
 
@@ -32,16 +35,16 @@ pub enum AudioType {
 
 /// Control object for audio playback.
 /// Accessed by both commands and the playback code -- as such, access is
-/// always guarded by [`RwLock`]s.
+/// always guarded.
 pub struct Audio {
     pub playing: bool,
     pub volume: f32,
 
-    pub src: Option<Box<AudioSource>>,
+    pub src: Box<AudioSource>,
 }
 
 impl Audio {
-    pub fn new(source: Option<Box<AudioSource>>) -> Self {
+    pub fn new(source: Box<AudioSource>) -> Self {
         Self {
             playing: true,
             volume: 1.0,
@@ -60,3 +63,8 @@ impl Audio {
         self
     }
 }
+
+/// Threadsafe form of the `Audio` object.
+///
+/// [`Audio`]: #Audio
+pub type TSAudio = Arc<Mutex<Audio>>;
