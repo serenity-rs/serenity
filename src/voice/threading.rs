@@ -15,7 +15,7 @@ pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
 }
 
 fn runner(rx: &MpscReceiver<Status>) {
-    let mut sender = None;
+    let mut senders = Vec::new();
     let mut receiver = None;
     let mut connection = None;
     let mut timer = Timer::new(20);
@@ -40,7 +40,14 @@ fn runner(rx: &MpscReceiver<Status>) {
                     receiver = r;
                 },
                 Ok(Status::SetSender(s)) => {
-                    sender = s;
+                    senders.clear();
+
+                    if let Some(aud) = s {
+                        senders.push(aud);
+                    }
+                },
+                Ok(Status::AddSender(s)) => {
+                    senders.push(s);
                 },
                 Err(TryRecvError::Empty) => {
                     // If we receieved nothing, then we can perform an update.
@@ -62,7 +69,7 @@ fn runner(rx: &MpscReceiver<Status>) {
         // another event.
         let error = match connection.as_mut() {
             Some(connection) => {
-                let cycle = connection.cycle(&mut sender, &mut receiver, &mut timer);
+                let cycle = connection.cycle(&mut senders, &mut receiver, &mut timer);
 
                 match cycle {
                     Ok(()) => false,

@@ -1,4 +1,5 @@
 use byteorder::{BigEndian, ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
+use constants::VOICE_GATEWAY_VERSION;
 use internal::prelude::*;
 use internal::ws_impl::{ReceiverExt, SenderExt};
 use internal::Timer;
@@ -21,7 +22,7 @@ use std::sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender};
 use std::sync::Arc;
 use std::thread::{self, Builder as ThreadBuilder, JoinHandle};
 use std::time::Duration;
-use super::audio::{AudioReceiver, AudioSource, AudioType, HEADER_LEN, SAMPLE_RATE};
+use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, LockedAudio};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
 use websocket::client::Url as WebsocketUrl;
@@ -150,6 +151,10 @@ impl Connection {
 
         let encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Mono, CodingMode::Audio)?;
 
+        // Per discord dev team's current recommendations:
+        // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
+        let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;
+
         Ok(Connection {
             audio_timer: Timer::new(1000 * 60 * 4),
             client: mutexed_client,
@@ -158,7 +163,7 @@ impl Connection {
             encoder: encoder,
             encoder_stereo: false,
             key: key,
-            keepalive_timer: Timer::new(hello.heartbeat_interval),
+            keepalive_timer: Timer::new(temp_heartbeat),
             udp: udp,
             sequence: 0,
             silence_frames: 0,
@@ -172,11 +177,12 @@ impl Connection {
 
     #[allow(unused_variables)]
     pub fn cycle(&mut self,
-                 source: &mut Option<Box<AudioSource>>,
+                 sources: &mut Vec<LockedAudio>,
                  receiver: &mut Option<Box<AudioReceiver>>,
                  audio_timer: &mut Timer)
                  -> Result<()> {
         let mut buffer = [0i16; 960 * 2];
+        let mut mix_buffer = [0f32; 960 * 2];
         let mut packet = [0u8; 512];
         let mut nonce = secretbox::Nonce([0; 24]);
 
@@ -264,9 +270,35 @@ impl Connection {
 
         let mut opus_frame = Vec::new();
 
-        let len = match source.as_mut() {
-            Some(stream) => {
-                let is_stereo = stream.is_stereo();
+        let mut len = 0;
+
+        // Walk over all the audio files, removing those which have finished.
+        // For this purpose, we need a while loop in Rust.
+        let mut i = 0;
+
+        while i < sources.len() {
+            let mut finished = false;
+
+            let aud_lock = (&sources[i]).clone();
+            let mut aud = aud_lock.lock();
+
+            let vol = aud.volume;
+            let skip = !aud.playing;
+
+            {
+                let stream = &mut aud.source;
+
+                if skip {
+                    i += 1;
+
+                    continue;
+                }
+
+                // Assume this for now, at least.
+                // We'll be fusing streams, so we can either keep
+                // as stereo or downmix to mono.
+                let is_stereo = true;
+                let source_stereo = stream.is_stereo();
 
                 if is_stereo != self.encoder_stereo {
                     let channels = if is_stereo {
@@ -278,7 +310,8 @@ impl Connection {
                     self.encoder_stereo = is_stereo;
                 }
 
-                match stream.get_type() {
+                let temp_len = match stream.get_type() {
+                    // TODO: decode back to raw, then include.
                     AudioType::Opus => match stream.read_opus_frame() {
                         Some(frame) => {
                             opus_frame = frame;
@@ -287,28 +320,42 @@ impl Connection {
                         None => 0,
                     },
                     AudioType::Pcm => {
-                        let buffer_len = if is_stereo { 960 * 2 } else { 960 };
+                        let buffer_len = if source_stereo { 960 * 2 } else { 960 };
 
                         match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
                             Some(len) => len,
                             None => 0,
                         }
                     },
-                }
-            },
-            None => 0,
+                };
+
+                // May need to force interleave/copy.
+                combine_audio(buffer, &mut mix_buffer, source_stereo, vol);
+
+                len = len.max(temp_len);
+                i += if temp_len > 0 {
+                    1
+                } else {
+                    sources.remove(i);
+                    finished = true;
+
+                    0
+                };
+            }
+
+            aud.finished = finished;
         };
 
         if len == 0 {
-            self.set_speaking(false)?;
-
             if self.silence_frames > 0 {
                 self.silence_frames -= 1;
 
-                for value in &mut buffer[..] {
-                    *value = 0;
-                }
+                // Explicit "Silence" frame.
+                opus_frame.extend_from_slice(&[0xf, 0x8, 0xf, 0xf, 0xf, 0xe]);
             } else {
+                // Per official guidelines, send 5x silence BEFORE we stop speaking.
+                self.set_speaking(false)?;
+
                 audio_timer.await();
 
                 return Ok(());
@@ -323,7 +370,7 @@ impl Connection {
 
         self.set_speaking(true)?;
 
-        let index = self.prep_packet(&mut packet, buffer, &opus_frame, nonce)?;
+        let index = self.prep_packet(&mut packet, mix_buffer, &opus_frame, nonce)?;
         audio_timer.await();
 
         self.udp.send_to(&packet[..index], self.destination)?;
@@ -334,7 +381,7 @@ impl Connection {
 
     fn prep_packet(&mut self,
                    packet: &mut [u8; 512],
-                   buffer: [i16; 1920],
+                   buffer: [f32; 1920],
                    opus_frame: &[u8],
                    mut nonce: Nonce)
                    -> Result<usize> {
@@ -354,7 +401,7 @@ impl Connection {
 
         let len = if opus_frame.is_empty() {
             self.encoder
-                .encode(&buffer[..buffer_len], &mut packet[HEADER_LEN..sl_index])?
+                .encode_float(&buffer[..buffer_len], &mut packet[HEADER_LEN..sl_index])?
         } else {
             let len = opus_frame.len();
             packet[HEADER_LEN..HEADER_LEN + len]
@@ -395,6 +442,21 @@ impl Drop for Connection {
     }
 }
 
+#[inline]
+fn combine_audio(
+    raw_buffer: [i16; 1920],
+    float_buffer: &mut [f32; 1920],
+    true_stereo: bool,
+    volume: f32,
+) {
+    for i in 0..1920 {
+        let sample_index = if true_stereo { i } else { i/2 };
+        let sample = (raw_buffer[sample_index] as f32) / 32768.0;
+
+        float_buffer[i] = (float_buffer[i] + sample*volume).max(-1.0).min(1.0);
+    }
+}
+
 fn generate_url(endpoint: &mut String) -> Result<WebsocketUrl> {
     if endpoint.ends_with(":80") {
         let len = endpoint.len();
@@ -402,7 +464,7 @@ fn generate_url(endpoint: &mut String) -> Result<WebsocketUrl> {
         endpoint.truncate(len - 3);
     }
 
-    WebsocketUrl::parse(&format!("wss://{}", endpoint))
+    WebsocketUrl::parse(&format!("wss://{}/?v={}", endpoint, VOICE_GATEWAY_VERSION))
         .or(Err(Error::Voice(VoiceError::EndpointUrl)))
 }
 

@@ -1,3 +1,6 @@
+use parking_lot::Mutex;
+use std::sync::Arc;
+
 pub const HEADER_LEN: usize = 12;
 pub const SAMPLE_RATE: u32 = 48_000;
 
@@ -29,3 +32,49 @@ pub enum AudioType {
     Opus,
     Pcm,
 }
+
+/// Control object for audio playback.
+///
+/// Accessed by both commands and the playback code -- as such, access is
+/// always guarded.
+pub struct Audio {
+    pub playing: bool,
+    pub volume: f32,
+    pub finished: bool,
+    pub source: Box<AudioSource>,
+}
+
+impl Audio {
+    pub fn new(source: Box<AudioSource>) -> Self {
+        Self {
+            playing: true,
+            volume: 1.0,
+            finished: false,
+            source,
+        }
+    }
+
+    pub fn play(&mut self) -> &mut Self {
+        self.playing = true;
+
+        self
+    }
+
+    pub fn pause(&mut self) -> &mut Self {
+        self.playing = false;
+
+        self
+    }
+
+    pub fn volume(&mut self, volume: f32) -> &mut Self {
+        self.volume = volume;
+
+        self
+    }
+}
+
+/// Threadsafe form of an instance of the [`Audio`] struct, locked behind a
+/// Mutex.
+///
+/// [`Audio`]: struct.Audio.html
+pub type LockedAudio = Arc<Mutex<Audio>>;

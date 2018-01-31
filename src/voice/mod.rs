@@ -11,7 +11,7 @@ mod payload;
 mod streamer;
 mod threading;
 
-pub use self::audio::{AudioReceiver, AudioSource, AudioType};
+pub use self::audio::{Audio, AudioReceiver, AudioSource, AudioType, LockedAudio};
 pub use self::dca::DcaMetadata;
 pub use self::error::{DcaError, VoiceError};
 pub use self::handler::Handler;
@@ -26,5 +26,6 @@ pub(crate) enum Status {
     Connect(ConnectionInfo),
     #[allow(dead_code)] Disconnect,
     SetReceiver(Option<Box<AudioReceiver>>),
-    SetSender(Option<Box<AudioSource>>),
+    SetSender(Option<LockedAudio>),
+    AddSender(LockedAudio),
 }
