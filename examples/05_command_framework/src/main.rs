@@ -141,16 +141,16 @@ fn main() {
                 // a command-name as argument to gain specific information about it.
                 c.individual_command_tip("Hello! こんにちは！Hola! Bonjour! 您好!\n\
                 If you want more information about a specific command, just pass the command as argument.")
-                // Some commands require a `{}` to replace it by the actual name.
-                // In this case it's the command's name.
+                // Some arguments require a `{}` in order to replace it with contextual information.
+                // In this case our `{}` refers to a command's name.
                 .command_not_found_text("Could not {}, I'm sorry : (")
-                // This is the second command requiring `{}` to replace the actual name.
+                // Another argument requiring `{}`, again replaced with the command's name.
                 .suggestion_text("How about this command: {}, it's numero uno on the market...!")
                 // On another note, you can set up the help-menu-filter-behaviour.
-                // Here are all possible settings shown on all possible cases.
+                // Here are all possible settings shown on all possible options.
                 // First case is if a user lacks permissions for a command, we can hide the command.
                 .lacking_permissions(HelpBehaviour::Hide)
-                // If the user is nothing but lacking a certain role, we just display it hence do `Nothing`.
+                // If the user is nothing but lacking a certain role, we just display it hence our variant is `Nothing`.
                 .lacking_role(HelpBehaviour::Nothing)
                 // The last `enum`-variant is `Strike`, which ~~strikes~~ a command.
                 .wrong_channel(HelpBehaviour::Strike)
