@@ -32,20 +32,20 @@ use utils::VecMap;
 ///     .name("a test role"));
 /// ```
 ///
-/// [`PartialGuild::create_role`]: ../model/struct.PartialGuild.html#method.create_role
-/// [`Guild::create_role`]: ../model/struct.Guild.html#method.create_role
-/// [`Guild::edit_role`]: ../model/struct.Guild.html#method.edit_role
-/// [`GuildId::create_role`]: ../model/struct.GuildId.html#method.create_role
-/// [`GuildId::edit_role`]: ../model/struct.GuildId.html#method.edit_role
-/// [`Role`]: ../model/struct.Role.html
-/// [`Role::edit`]: ../model/struct.Role.html#method.edit
+/// [`PartialGuild::create_role`]: ../model/guild/struct.PartialGuild.html#method.create_role
+/// [`Guild::create_role`]: ../model/guild/struct.Guild.html#method.create_role
+/// [`Guild::edit_role`]: ../model/guild/struct.Guild.html#method.edit_role
+/// [`GuildId::create_role`]: ../model/id/struct.GuildId.html#method.create_role
+/// [`GuildId::edit_role`]: ../model/id/struct.GuildId.html#method.edit_role
+/// [`Role`]: ../model/guild/struct.Role.html
+/// [`Role::edit`]: ../model/guild/struct.Role.html#method.edit
 #[derive(Clone, Debug, Default)]
 pub struct EditRole(pub VecMap<&'static str, Value>);
 
 impl EditRole {
     /// Creates a new builder with the values of the given [`Role`].
     ///
-    /// [`Role`]: ../model/struct.Role.html
+    /// [`Role`]: ../model/guild/struct.Role.html
     pub fn new(role: &Role) -> Self {
         let mut map = VecMap::with_capacity(8);
 

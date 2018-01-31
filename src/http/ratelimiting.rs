@@ -104,31 +104,31 @@ pub enum Route {
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
     ChannelsId(u64),
     /// Route for the `/channels/:channel_id/invites` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
     ChannelsIdInvites(u64),
     /// Route for the `/channels/:channel_id/messages` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
     ChannelsIdMessages(u64),
     /// Route for the `/channels/:channel_id/messages/bulk-delete` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
     ChannelsIdMessagesBulkDelete(u64),
     /// Route for the `/channels/:channel_id/messages/:message_id` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
     // This route is a unique case. The ratelimit for message _deletions_ is
     // different than the overall route ratelimit.
     //
@@ -143,14 +143,14 @@ pub enum Route {
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
     ChannelsIdMessagesIdAck(u64),
     /// Route for the `/channels/:channel_id/messages/:message_id/reactions`
     /// path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
     ChannelsIdMessagesIdReactions(u64),
     /// Route for the
     /// `/channels/:channel_id/messages/:message_id/reactions/:reaction/@me`
@@ -158,37 +158,37 @@ pub enum Route {
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
     ChannelsIdMessagesIdReactionsUserIdType(u64),
     /// Route for the `/channels/:channel_id/permissions/:target_id` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
     ChannelsIdPermissionsOverwriteId(u64),
     /// Route for the `/channels/:channel_id/pins` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
     ChannelsIdPins(u64),
     /// Route for the `/channels/:channel_id/pins/:message_id` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
     ChannelsIdPinsMessageId(u64),
     /// Route for the `/channels/:channel_id/typing` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
     ChannelsIdTyping(u64),
     /// Route for the `/channels/:channel_id/webhooks` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
     ChannelsIdWebhooks(u64),
     /// Route for the `/gateway` path.
     Gateway,

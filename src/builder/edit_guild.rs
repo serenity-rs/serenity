@@ -8,8 +8,8 @@ use utils::VecMap;
 /// **Note**: Editing a guild requires that the current user have the
 /// [Manage Guild] permission.
 ///
-/// [`Guild::edit`]: ../model/struct.Guild.html#method.edit
-/// [`Guild`]: ../model/struct.Guild.html
+/// [`Guild::edit`]: ../model/guild/struct.Guild.html#method.edit
+/// [`Guild`]: ../model/guild/struct.Guild.html
 /// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
 #[derive(Clone, Debug, Default)]
 pub struct EditGuild(pub VecMap<&'static str, Value>);
@@ -130,7 +130,7 @@ impl EditGuild {
     /// # }
     /// ```
     ///
-    /// [`Region::UsWest`]: ../model/enum.Region.html#variant.UsWest
+    /// [`Region::UsWest`]: ../model/guild/enum.Region.html#variant.UsWest
     pub fn region(mut self, region: Region) -> Self {
         self.0.insert("region", Value::String(region.name().to_string()));
 
@@ -139,11 +139,10 @@ impl EditGuild {
 
     /// Set the splash image of the guild on the invitation page.
     ///
-    /// Requires that the guild have the [`InviteSplash`] feature enabled.
+    /// Requires that the guild have the `INVITE_SPLASH` feature enabled.
     /// You can check this through a guild's [`features`] list.
     ///
-    /// [`InviteSplash`]: ../model/enum.Feature.html#variant.InviteSplash
-    /// [`features`]: ../model/struct.LiveGuild.html#structfield.features
+    /// [`features`]: ../model/guild/struct.Guild.html#structfield.features
     pub fn splash(mut self, splash: Option<&str>) -> Self {
         let splash = splash.map_or(Value::Null, |x| Value::String(x.to_string()));
         self.0.insert("splash", splash);
@@ -179,8 +178,8 @@ impl EditGuild {
     /// }
     /// ```
     ///
-    /// [`VerificationLevel`]: ../model/enum.VerificationLevel.html
-    /// [`VerificationLevel::High`]: ../model/enum.VerificationLevel.html#variant.High
+    /// [`VerificationLevel`]: ../model/guild/enum.VerificationLevel.html
+    /// [`VerificationLevel::High`]: ../model/guild/enum.VerificationLevel.html#variant.High
     pub fn verification_level<V>(mut self, verification_level: V) -> Self
         where V: Into<VerificationLevel> {
         let num = Value::Number(Number::from(verification_level.into().num()));

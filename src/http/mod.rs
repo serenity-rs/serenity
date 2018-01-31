@@ -105,9 +105,9 @@ pub fn set_token(token: &str) { TOKEN.lock().clone_from(&token.to_string()); }
 ///
 /// **Note**: Groups have a limit of 10 recipients, including the current user.
 ///
-/// [`Group`]: ../model/struct.Group.html
-/// [`Group::add_recipient`]: ../model/struct.Group.html#method.add_recipient
-/// [`User`]: ../model/struct.User.html
+/// [`Group`]: ../model/channel/struct.Group.html
+/// [`Group::add_recipient`]: ../model/channel/struct.Group.html#method.add_recipient
+/// [`User`]: ../model/user/struct.User.html
 pub fn add_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
     verify(
         204,
@@ -126,9 +126,9 @@ pub fn add_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 /// **Note**: Requires the [Manage Roles] permission and respect of role
 /// hierarchy.
 ///
-/// [`Guild`]: ../model/struct.Guild.html
-/// [`Member`]: ../model/struct.Member.html
-/// [`Role`]: ../model/struct.Role.html
+/// [`Guild`]: ../model/guild/struct.Guild.html
+/// [`Member`]: ../model/guild/struct.Member.html
+/// [`Role`]: ../model/guild/struct.Role.html
 /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
 pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
     verify(
@@ -152,8 +152,8 @@ pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> 
 ///
 /// **Note**: Requires that you have the [Ban Members] permission.
 ///
-/// [`Guild`]: ../model/struct.Guild.html
-/// [`User`]: ../model/struct.User.html
+/// [`Guild`]: ../model/guild/struct.Guild.html
+/// [`User`]: ../model/user/struct.User.html
 /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
 pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
     verify(
@@ -178,7 +178,7 @@ pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &s
 /// This should rarely be used for bots, although it is a good indicator that a
 /// long-running command is still being processed.
 ///
-/// [`Channel`]: ../model/enum.Channel.html
+/// [`Channel`]: ../model/channel/enum.Channel.html
 pub fn broadcast_typing(channel_id: u64) -> Result<()> {
     verify(
         204,
@@ -197,8 +197,8 @@ pub fn broadcast_typing(channel_id: u64) -> Result<()> {
 ///
 /// **Note**: Requires the [Manage Channels] permission.
 ///
-/// [`Guild`]: ../model/struct.Guild.html
-/// [`GuildChannel`]: ../model/struct.GuildChannel.html
+/// [`Guild`]: ../model/guild/struct.Guild.html
+/// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-channel
 /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
 pub fn create_channel(guild_id: u64, map: &Value) -> Result<GuildChannel> {
@@ -222,7 +222,7 @@ pub fn create_channel(guild_id: u64, map: &Value) -> Result<GuildChannel> {
 /// **Note**: Requires the [Manage Emojis] permission.
 ///
 /// [`Context::create_emoji`]: ../struct.Context.html#method.create_emoji
-/// [`Guild`]: ../model/struct.Guild.html
+/// [`Guild`]: ../model/guild/struct.Guild.html
 /// [Manage Emojis]: ../model/permissions/constant.MANAGE_EMOJIS.html
 pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
     let body = map.to_string();
@@ -265,11 +265,11 @@ pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
 /// let _result = http::create_guild(map);
 /// ```
 ///
-/// [`Guild`]: ../model/struct.Guild.html
-/// [`PartialGuild`]: ../model/struct.PartialGuild.html
+/// [`Guild`]: ../model/guild/struct.Guild.html
+/// [`PartialGuild`]: ../model/guild/struct.PartialGuild.html
 /// [`Shard`]: ../gateway/struct.Shard.html
 /// [GameBridge]: https://discordapp.com/developers/docs/topics/gamebridge
-/// [US West Region]: ../model/enum.Region.html#variant.UsWest
+/// [US West Region]: ../model/guild/enum.Region.html#variant.UsWest
 /// [documentation on this endpoint]:
 /// https://discordapp.com/developers/docs/resources/guild#create-guild
 /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
@@ -287,8 +287,8 @@ pub fn create_guild(map: &Value) -> Result<PartialGuild> {
 ///
 /// **Note**: Requires the [Manage Guild] permission.
 ///
-/// [`Guild`]: ../model/struct.Guild.html
-/// [`Integration`]: ../model/struct.Integration.html
+/// [`Guild`]: ../model/guild/struct.Guild.html
+/// [`Integration`]: ../model/guild/struct.Integration.html
 /// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-integration
 pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: &Value) -> Result<()> {
@@ -314,8 +314,8 @@ pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: &Value)
 ///
 /// **Note**: Requires the [Create Invite] permission.
 ///
-/// [`GuildChannel`]: ../model/struct.GuildChannel.html
-/// [`RichInvite`]: ../model/struct.RichInvite.html
+/// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
+/// [`RichInvite`]: ../model/guild/struct.RichInvite.html
 /// [Create Invite]: ../model/permissions/constant.CREATE_INVITE.html
 /// [docs]: https://discordapp.com/developers/docs/resources/channel#create-channel-invite
 pub fn create_invite(channel_id: u64, map: &JsonMap) -> Result<RichInvite> {
@@ -417,7 +417,7 @@ pub fn create_role(guild_id: u64, map: &JsonMap) -> Result<Role> {
 /// let webhook = http::create_webhook(channel_id, map).expect("Error creating");
 /// ```
 ///
-/// [`GuildChannel`]: ../model/struct.GuildChannel.html
+/// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
 pub fn create_webhook(channel_id: u64, map: &Value) -> Result<Webhook> {
     let body = map.to_string();
     let response = request!(
@@ -533,8 +533,8 @@ pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
 ///     .expect("Error deleting reactions");
 /// ```
 ///
-/// [`Message`]: ../model/struct.Message.html
-/// [`Reaction`]: ../model/struct.Reaction.html
+/// [`Message`]: ../model/channel/struct.Message.html
+/// [`Reaction`]: ../model/channel/struct.Reaction.html
 pub fn delete_message_reactions(channel_id: u64, message_id: u64) -> Result<()> {
     verify(
         204,
@@ -621,7 +621,7 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 /// http::delete_webhook(245037420704169985).expect("Error deleting webhook");
 /// ```
 ///
-/// [`Webhook`]: ../model/struct.Webhook.html
+/// [`Webhook`]: ../model/webhook/struct.Webhook.html
 /// [`delete_webhook_with_token`]: fn.delete_webhook_with_token.html
 pub fn delete_webhook(webhook_id: u64) -> Result<()> {
     verify(
@@ -652,7 +652,7 @@ pub fn delete_webhook(webhook_id: u64) -> Result<()> {
 /// http::delete_webhook_with_token(id, token).expect("Error deleting webhook");
 /// ```
 ///
-/// [`Webhook`]: ../model/struct.Webhook.html
+/// [`Webhook`]: ../model/webhook/struct.Webhook.html
 pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
     let client = request_client!();
 
@@ -726,7 +726,7 @@ pub fn edit_guild_channel_positions(guild_id: u64, value: &Value)
 
 /// Edits a [`Guild`]'s embed setting.
 ///
-/// [`Guild`]: ../model/struct.Guild.html
+/// [`Guild`]: ../model/guild/struct.Guild.html
 pub fn edit_guild_embed(guild_id: u64, map: &Value) -> Result<GuildEmbed> {
     let body = map.to_string();
     let response = request!(
@@ -777,7 +777,7 @@ pub fn edit_message(channel_id: u64, message_id: u64, map: &Value) -> Result<Mes
 ///
 /// Pass `None` to reset the nickname.
 ///
-/// [`Guild`]: ../model/struct.Guild.html
+/// [`Guild`]: ../model/guild/struct.Guild.html
 pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
     let map = json!({ "nick": new_nickname });
     let body = map.to_string();
@@ -1003,8 +1003,8 @@ pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &JsonMap) -> R
 /// };
 /// ```
 ///
-/// [`Channel`]: ../model/enum.Channel.html
-/// [`Message`]: ../model/struct.Message.html
+/// [`Channel`]: ../model/channel/enum.Channel.html
+/// [`Message`]: ../model/channel/struct.Message.html
 /// [Discord docs]: https://discordapp.com/developers/docs/resources/webhook#querystring-params
 pub fn execute_webhook(webhook_id: u64,
                        token: &str,
@@ -1129,7 +1129,7 @@ pub fn get_channel_invites(channel_id: u64) -> Result<Vec<RichInvite>> {
 ///     .expect("Error getting channel webhooks");
 /// ```
 ///
-/// [`GuildChannel`]: ../model/struct.GuildChannel.html
+/// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
 pub fn get_channel_webhooks(channel_id: u64) -> Result<Vec<Webhook>> {
     let response = request!(
         Route::ChannelsIdWebhooks(channel_id),
@@ -1285,10 +1285,8 @@ pub fn get_guild_prune_count(guild_id: u64, map: &Value) -> Result<GuildPrune> {
         .map_err(From::from)
 }
 
-/// Gets regions that a guild can use. If a guild has [`Feature::VipRegions`]
+/// Gets regions that a guild can use. If a guild has the `VIP_REGIONS` feature
 /// enabled, then additional VIP-only regions are returned.
-///
-/// [`Feature::VipRegions`]: ../model/enum.Feature.html#variant.VipRegions
 pub fn get_guild_regions(guild_id: u64) -> Result<Vec<VoiceRegion>> {
     let response = request!(
         Route::GuildsIdRegions(guild_id),
@@ -1303,7 +1301,7 @@ pub fn get_guild_regions(guild_id: u64) -> Result<Vec<VoiceRegion>> {
 
 /// Retrieves a list of roles in a [`Guild`].
 ///
-/// [`Guild`]: ../model/struct.Guild.html
+/// [`Guild`]: ../model/guild/struct.Guild.html
 pub fn get_guild_roles(guild_id: u64) -> Result<Vec<Role>> {
     let response = request!(
         Route::GuildsIdRoles(guild_id),
@@ -1333,7 +1331,7 @@ pub fn get_guild_roles(guild_id: u64) -> Result<Vec<Role>> {
 ///     .expect("Error getting guild webhooks");
 /// ```
 ///
-/// [`Guild`]: ../model/struct.Guild.html
+/// [`Guild`]: ../model/guild/struct.Guild.html
 pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
     let response = request!(
         Route::GuildsIdWebhooks(guild_id),
@@ -1778,9 +1776,9 @@ pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
 /// **Note**: Requires the [Manage Roles] permission and respect of role
 /// hierarchy.
 ///
-/// [`Guild`]: ../model/struct.Guild.html
-/// [`Member`]: ../model/struct.Member.html
-/// [`Role`]: ../model/struct.Role.html
+/// [`Guild`]: ../model/guild/struct.Guild.html
+/// [`Member`]: ../model/guild/struct.Member.html
+/// [`Role`]: ../model/guild/struct.Role.html
 /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
 pub fn remove_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
     verify(

@@ -121,10 +121,10 @@ impl MessageBuilder {
     /// assert_eq!(content, "The channel is: <#81384788765712384>");
     /// ```
     ///
-    /// [`Channel`]: ../model/enum.Channel.html
-    /// [`ChannelId`]: ../model/struct.ChannelId.html
-    /// [`GuildChannel`]: ../model/struct.GuildChannel.html
-    /// [Display implementation]: ../model/struct.ChannelId.html#method.fmt-1
+    /// [`Channel`]: ../model/channel/enum.Channel.html
+    /// [`ChannelId`]: ../model/id/struct.ChannelId.html
+    /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
+    /// [Display implementation]: ../model/id/struct.ChannelId.html#method.fmt-1
     pub fn channel<C: Into<ChannelId>>(mut self, channel: C) -> Self {
         let _ = write!(self.0, "{}", channel.into().mention());
 
@@ -163,7 +163,7 @@ impl MessageBuilder {
     /// assert_eq!(message, "foo <:smugAnimeFace:302516740095606785>.");
     /// ```
     ///
-    /// [Display implementation]: ../model/struct.Emoji.html#method.fmt
+    /// [Display implementation]: ../model/guild/struct.Emoji.html#method.fmt
     pub fn emoji(mut self, emoji: &Emoji) -> Self {
         let _ = write!(self.0, "{}", emoji);
 
@@ -703,9 +703,9 @@ impl MessageBuilder {
     /// Refer to `RoleId`'s [Display implementation] for more information on how
     /// this is formatted.
     ///
-    /// [`Role`]: ../model/struct.Role.html
-    /// [`RoleId`]: ../model/struct.RoleId.html
-    /// [Display implementation]: ../model/struct.RoleId.html#method.fmt-1
+    /// [`Role`]: ../model/guild/struct.Role.html
+    /// [`RoleId`]: ../model/id/struct.RoleId.html
+    /// [Display implementation]: ../model/id/struct.RoleId.html#method.fmt-1
     pub fn role<R: Into<RoleId>>(mut self, role: R) -> Self {
         let _ = write!(self.0, "{}", role.into().mention());
 
@@ -720,9 +720,9 @@ impl MessageBuilder {
     /// Refer to `UserId`'s [Display implementation] for more information on how
     /// this is formatted.
     ///
-    /// [`User`]: ../model/struct.User.html
-    /// [`UserId`]: ../model/struct.UserId.html
-    /// [Display implementation]: ../model/struct.UserId.html#method.fmt-1
+    /// [`User`]: ../model/user/struct.User.html
+    /// [`UserId`]: ../model/id/struct.UserId.html
+    /// [Display implementation]: ../model/id/struct.UserId.html#method.fmt-1
     pub fn user<U: Into<UserId>>(mut self, user: U) -> Self {
         let _ = write!(self.0, "{}", user.into().mention());
 

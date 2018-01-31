@@ -221,7 +221,7 @@ impl PrivateChannel {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ChannelId`]: ../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../model/id/struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
     pub fn say<D: ::std::fmt::Display>(&self, content: D) -> Result<Message> { self.id.say(content) }

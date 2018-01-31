@@ -48,7 +48,7 @@ use utils::VecMap;
 /// # }
 /// ```
 ///
-/// [`GuildChannel::messages`]: ../model/struct.GuildChannel.html#method.messages
+/// [`GuildChannel::messages`]: ../model/channel/struct.GuildChannel.html#method.messages
 #[derive(Clone, Debug, Default)]
 pub struct GetMessages(pub VecMap<&'static str, u64>);
 

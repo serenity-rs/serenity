@@ -75,7 +75,7 @@ macro_rules! colour {
 /// assert!(blitz_blue > fooyoo);
 /// ```
 ///
-/// [`Role`]: ../model/struct.Role.html
+/// [`Role`]: ../model/guild/struct.Role.html
 /// [`dark_teal`]: #method.dark_teal
 /// [`g`]: #method.g
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
