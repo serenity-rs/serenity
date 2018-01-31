@@ -3,7 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
-## [0.4.7] - 2018-1-5
+## [0.4.8] - 2018-01-31
+
+This release contains a fix for managing panics in framework command dispatches.
+A threadpool is now used, just like for event dispatches.
+
+### Fixed
+
+- [framework] Execute framework commands in a ThreadPool ([@zeyla]) [c:5138193]
+
+## [0.4.7] - 2018-01-05
 
 This release contains a behaviour hotfix for the framework's help-commands.
 
@@ -1558,6 +1567,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.4.8]: https://github.com/zeyla/serenity/compare/v0.4.7...v0.4.8
 [0.4.7]: https://github.com/zeyla/serenity/compare/v0.4.6...v0.4.7
 [0.4.6]: https://github.com/zeyla/serenity/compare/v0.4.5...v0.4.6
 [0.4.5]: https://github.com/zeyla/serenity/compare/v0.4.4...v0.4.5
@@ -1613,6 +1623,8 @@ Initial commit.
 [@UninterestinAcc]: https://github.com/UninterestinAcc
 [@xentec]: https://github.com/xentec
 [@zeyla]: https://github.com/zeyla
+
+[c:5138193]: https://github.com/zeyla/serenity/commit/5138193c001b8d99f707dffb254b71ce8cefa182
 
 [c:d0de766]: https://github.com/zeyla/serenity/commit/d0de766123d822ddb5223e66389b4217a90aae2b
 
