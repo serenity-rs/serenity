@@ -348,9 +348,8 @@ impl Connection {
             if self.silence_frames > 0 {
                 self.silence_frames -= 1;
 
-                for value in &mut buffer[..] {
-                    *value = 0;
-                }
+                // Explicit "Silence" frame.
+                opus_frame.extend_from_slice(&[0xf, 0x8, 0xf, 0xf, 0xf, 0xe]);
             } else {
                 // Per official guidelines, send 5x silence BEFORE we stop speaking.
                 self.set_speaking(false)?;
