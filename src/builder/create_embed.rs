@@ -10,7 +10,7 @@
 //!
 //! Documentation for embeds can be found [here].
 //!
-//! [`ChannelId::send_message`]: ../model/struct.ChannelId.html#method.send_message
+//! [`ChannelId::send_message`]: ../model/id/struct.ChannelId.html#method.send_message
 //! [`CreateEmbed`]: struct.CreateEmbed.html
 //! [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
 //! [here]: https://discordapp.com/developers/docs/resources/channel#embed-object
@@ -35,8 +35,8 @@ use utils::Colour;
 /// Refer to the documentation for [`ChannelId::send_message`] for a very in-depth
 /// example on how to use this.
 ///
-/// [`ChannelId::send_message`]: ../model/struct.ChannelId.html#method.send_message
-/// [`Embed`]: ../model/struct.Embed.html
+/// [`ChannelId::send_message`]: ../model/id/struct.ChannelId.html#method.send_message
+/// [`Embed`]: ../model/channel/struct.Embed.html
 /// [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
 #[derive(Clone, Debug)]
 pub struct CreateEmbed(pub VecMap<&'static str, Value>);
@@ -300,7 +300,7 @@ impl CreateEmbed {
     /// Note however, you have to be sure you set an attachment (with [`ChannelId::send_files`])
     /// with the provided filename. Or else this won't work.
     ///
-    /// [`ChannelId::send_files`]: ../model/struct.ChannelId.html#send_files
+    /// [`ChannelId::send_files`]: ../model/id/struct.ChannelId.html#send_files
     pub fn attachment(self, filename: &str) -> Self {
         self.image(&format!("attachment://{}", filename))
     }
@@ -388,7 +388,7 @@ impl From<Embed> for CreateEmbed {
 ///
 /// Requires that you specify a [`name`].
 ///
-/// [`Embed`]: ../model/struct.Embed.html
+/// [`Embed`]: ../model/channel/struct.Embed.html
 /// [`CreateEmbed::author`]: struct.CreateEmbed.html#method.author
 /// [`name`]: #method.name
 #[derive(Clone, Debug, Default)]
@@ -422,7 +422,7 @@ impl CreateEmbedAuthor {
 ///
 /// This does not require any field be set.
 ///
-/// [`Embed`]: ../model/struct.Embed.html
+/// [`Embed`]: ../model/channel/struct.Embed.html
 /// [`CreateEmbed::footer`]: struct.CreateEmbed.html#method.footer
 #[derive(Clone, Debug, Default)]
 pub struct CreateEmbedFooter(pub VecMap<&'static str, Value>);

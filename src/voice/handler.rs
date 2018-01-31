@@ -40,25 +40,16 @@ use super::{Audio, AudioReceiver, AudioSource, Status as VoiceStatus, threading,
 pub struct Handler {
     /// The ChannelId to be connected to, if any.
     ///
-    /// Note that when connected to a voice channel, while the `ChannelId` will
-    /// not be `None`, the [`guild_id`] can, in the event of [`Group`] or
-    /// 1-on-1 [`Call`]s.
-    ///
     /// **Note**: This _must not_ be manually mutated. Call [`switch_to`] to
     /// mutate this value.
     ///
-    /// [`Call`]: ../../model/struct.Call.html
-    /// [`Group`]: ../../model/struct.Group.html
+    /// [`Group`]: ../../model/channel/struct.Group.html
     /// [`guild`]: #structfield.guild
     /// [`switch_to`]: #method.switch_to
     pub channel_id: Option<ChannelId>,
     /// The voice server endpoint.
     pub endpoint: Option<String>,
-    /// The GuildId to be connected to, if any. Can be normally `None` in the
-    /// event of playing audio to a one-on-one [`Call`] or [`Group`].
-    ///
-    /// [`Call`]: ../../model/struct.Call.html
-    /// [`Group`]: ../../model/struct.Group.html
+    /// The Id of the guild to be connected to.
     pub guild_id: GuildId,
     /// Whether the current handler is set to deafen voice connections.
     ///
@@ -193,11 +184,6 @@ impl Handler {
     }
 
     /// Connect - or switch - to the given voice channel by its Id.
-    ///
-    /// **Note**: This is not necessary for [`Group`] or direct [call][`Call`]s.
-    ///
-    /// [`Call`]: ../../model/struct.Call.html
-    /// [`Group`]: ../../model/struct.Group.html
     pub fn join(&mut self, channel_id: ChannelId) {
         self.channel_id = Some(channel_id);
 

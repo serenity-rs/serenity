@@ -16,9 +16,9 @@ use super::Handler;
 /// If a `guild_id` is provided, then the target is the guild, as a user
 /// can not be connected to two channels within one guild simultaneously.
 ///
-/// [`Group`]: ../../model/struct.Group.html
+/// [`Group`]: ../../model/channel/struct.Group.html
 /// [`Handler`]: struct.Handler.html
-/// [guild's channel]: ../../model/enum.ChannelType.html#variant.Voice
+/// [guild's channel]: ../../model/channel/enum.ChannelType.html#variant.Voice
 /// [`Shard`]: ../gateway/struct.Shard.html
 #[derive(Clone, Debug)]
 pub struct Manager {

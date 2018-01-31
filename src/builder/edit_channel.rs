@@ -17,8 +17,8 @@ use model::id::ChannelId;
 /// }
 /// ```
 ///
-/// [`GuildChannel`]: ../model/struct.GuildChannel.html
-/// [`GuildChannel::edit`]: ../model/struct.GuildChannel.html#method.edit
+/// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
+/// [`GuildChannel::edit`]: ../model/channel/struct.GuildChannel.html#method.edit
 #[derive(Clone, Debug, Default)]
 pub struct EditChannel(pub VecMap<&'static str, Value>);
 
@@ -27,7 +27,7 @@ impl EditChannel {
     ///
     /// This is for [voice] channels only.
     ///
-    /// [voice]: ../model/enum.ChannelType.html#variant.Voice
+    /// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice
     pub fn bitrate(mut self, bitrate: u64) -> Self {
         self.0.insert("bitrate", Value::Number(Number::from(bitrate)));
 
@@ -56,7 +56,7 @@ impl EditChannel {
     ///
     /// This is for [text] channels only.
     ///
-    /// [text]: ../model/enum.ChannelType.html#variant.Text
+    /// [text]: ../model/channel/enum.ChannelType.html#variant.Text
     pub fn topic(mut self, topic: &str) -> Self {
         self.0.insert("topic", Value::String(topic.to_string()));
 
@@ -67,7 +67,7 @@ impl EditChannel {
     ///
     /// This is for [voice] channels only.
     ///
-    /// [voice]: ../model/enum.ChannelType.html#variant.Voice
+    /// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice
     pub fn user_limit(mut self, user_limit: u64) -> Self {
         self.0.insert("user_limit", Value::Number(Number::from(user_limit)));
 
@@ -78,8 +78,8 @@ impl EditChannel {
     ///
     /// This is for [text] and [voice] channels only.
     ///
-    /// [text]: ../model/enum.ChannelType.html#variant.Text
-    /// [voice]: ../model/enum.ChannelType.html#variant.Voice
+    /// [text]: ../model/channel/enum.ChannelType.html#variant.Text
+    /// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice
     pub fn category<C>(mut self, category: C) -> Self
         where C: Into<Option<ChannelId>> {
         let parent_id = match category.into() {

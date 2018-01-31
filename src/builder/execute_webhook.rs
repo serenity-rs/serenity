@@ -43,8 +43,8 @@ use utils::VecMap;
 ///     .embeds(vec![website, resources]));
 /// ```
 ///
-/// [`Webhook`]: ../model/struct.Webhook.html
-/// [`Webhook::execute`]: ../model/struct.Webhook.html#method.execute
+/// [`Webhook`]: ../model/webhook/struct.Webhook.html
+/// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute
 /// [`execute_webhook`]: ../http/fn.execute_webhook.html
 #[derive(Clone, Debug)]
 pub struct ExecuteWebhook(pub VecMap<&'static str, Value>);
@@ -109,8 +109,8 @@ impl ExecuteWebhook {
     /// Refer to the [struct-level documentation] for an example on how to use
     /// embeds.
     ///
-    /// [`Embed::fake`]: ../model/struct.Embed.html#method.fake
-    /// [`Webhook::execute`]: ../model/struct.Webhook.html#method.execute
+    /// [`Embed::fake`]: ../model/channel/struct.Embed.html#method.fake
+    /// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute
     /// [struct-level documentation]: #examples
     pub fn embeds(mut self, embeds: Vec<Value>) -> Self {
         self.0.insert("embeds", Value::Array(embeds));
@@ -176,7 +176,7 @@ impl Default for ExecuteWebhook {
     /// let executer = ExecuteWebhook::default();
     /// ```
     ///
-    /// [`Webhook`]: ../model/struct.Webhook.html
+    /// [`Webhook`]: ../model/webhook/struct.Webhook.html
     /// [`tts`]: #method.tts
     fn default() -> ExecuteWebhook {
         let mut map = VecMap::new();

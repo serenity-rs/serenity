@@ -9,7 +9,7 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 /// [`Client`]: struct.Client.html
 /// [`Error`]: ../enum.Error.html
 /// [`Error::Client`]: ../enum.Error.html#variant.Client
-/// [`GuildId::ban`]: ../model/struct.GuildId.html#method.ban
+/// [`GuildId::ban`]: ../model/id/struct.GuildId.html#method.ban
 #[allow(enum_variant_names)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Error {

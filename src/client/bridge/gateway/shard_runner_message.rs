@@ -10,7 +10,7 @@ pub enum ShardRunnerMessage {
     ChunkGuilds {
         /// The IDs of the [`Guild`]s to chunk.
         ///
-        /// [`Guild`]: ../../../model/struct.Guild.html
+        /// [`Guild`]: ../../../model/guild/struct.Guild.html
         guild_ids: Vec<GuildId>,
         /// The maximum number of members to receive [`GuildMembersChunkEvent`]s
         /// for.
@@ -22,7 +22,7 @@ pub enum ShardRunnerMessage {
         /// For example, a query of `"s"` will cause only [`Member`]s whose
         /// usernames start with `"s"` to be chunked.
         ///
-        /// [`Member`]: ../../../model/struct.Member.html
+        /// [`Member`]: ../../../model/guild/struct.Member.html
         query: Option<String>,
     },
     /// Indicates that the client is to close with the given status code and

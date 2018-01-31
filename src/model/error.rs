@@ -82,8 +82,8 @@ pub enum Error {
     /// An indication that a [guild][`Guild`] could not be found by
     /// [Id][`GuildId`] in the [`Cache`].
     ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`GuildId`]: ../model/struct.GuildId.html
+    /// [`Guild`]: ../model/guild/struct.Guild.html
+    /// [`GuildId`]: ../model/id/struct.GuildId.html
     /// [`Cache`]: ../cache/struct.Cache.html
     GuildNotFound,
     /// Indicates that there are hierarchy problems restricting an action.
@@ -104,7 +104,7 @@ pub enum Error {
     InvalidPermissions(Permissions),
     /// An indicator that the [current user] can not perform an action.
     ///
-    /// [current user]: ../model/struct.CurrentUser.html
+    /// [current user]: ../model/user/struct.CurrentUser.html
     InvalidUser,
     /// An indicator that an item is missing from the [`Cache`], and the action
     /// can not be continued.
@@ -116,7 +116,7 @@ pub enum Error {
     ///
     /// The number of bytes larger than the limit is provided.
     ///
-    /// [`Message`]: ../model/struct.Message.html
+    /// [`Message`]: ../model/channel/struct.Message.html
     MessageTooLong(u64),
     /// Indicates that the current user is attempting to Direct Message another
     /// bot user, which is disallowed by the API.

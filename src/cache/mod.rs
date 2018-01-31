@@ -16,12 +16,12 @@
 //! Most models of Discord objects, such as the [`Message`], [`PublicChannel`],
 //! or [`Emoji`], have methods for interacting with that single instance. This
 //! feature is only compiled if the `methods` feature is enabled. An example of
-//! this is [`LiveGuild::edit`], which performs a check to ensure that the
-//! current user is the owner of the guild, prior to actually performing the
-//! HTTP request. The cache is involved due to the function's use of unlocking
-//! the cache and retrieving the Id of the current user, and comparing it to
-//! the Id of the user that owns the guild. This is an inexpensive method of
-//! being able to access data required by these sugary methods.
+//! this is [`Guild::edit`], which performs a check to ensure that the current
+//! user is the owner of the guild, prior to actually performing the HTTP
+//! request. The cache is involved due to the function's use of unlocking the
+//! cache and retrieving the Id of the current user, and comparing it to the Id
+//! of the user that owns the guild. This is an inexpensive method of being able
+//! to access data required by these sugary methods.
 //!
 //! # Do I need the Cache?
 //!
@@ -32,13 +32,13 @@
 //! while needing to hit the REST API as little as possible, then the answer
 //! is "yes".
 //!
-//! [`Emoji`]: ../model/struct.Emoji.html
-//! [`Group`]: ../model/struct.Group.html
-//! [`LiveGuild`]: ../model/struct.LiveGuild.html
-//! [`LiveGuild::edit`]: ../model/struct.LiveGuild.html#method.edit
-//! [`Message`]: ../model/struct.Message.html
-//! [`PublicChannel`]: ../model/struct.PublicChannel.html
-//! [`Role`]: ../model/struct.Role.html
+//! [`Emoji`]: ../model/guild/struct.Emoji.html
+//! [`Group`]: ../model/channel/struct.Group.html
+//! [`Guild`]: ../model/guild/struct.Guild.html
+//! [`Guild::edit`]: ../model/guild/struct.Guild.html#method.edit
+//! [`Message`]: ../model/channel/struct.Message.html
+//! [`PublicChannel`]: ../model/channel/struct.PublicChannel.html
+//! [`Role`]: ../model/guild/struct.Role.html
 //! [`CACHE`]: ../struct.CACHE.html
 //! [`http`]: ../http/index.html
 
@@ -76,7 +76,7 @@ pub struct Cache {
     ///
     /// [`Event::GuildDelete`]: ../model/event/struct.GuildDeleteEvent.html
     /// [`Event::GuildUnavailable`]: ../model/event/struct.GuildUnavailableEvent.html
-    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`Guild`]: ../model/guild/struct.Guild.html
     pub channels: HashMap<ChannelId, Arc<RwLock<GuildChannel>>>,
     /// A map of channel categories.
     pub categories: HashMap<ChannelId, Arc<RwLock<ChannelCategory>>>,
@@ -89,8 +89,8 @@ pub struct Cache {
     /// A map of guilds with full data available. This includes data like
     /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
     ///
-    /// [`Emoji`]: ../model/struct.Emoji.html
-    /// [`Role`]: ../model/struct.Role.html
+    /// [`Emoji`]: ../model/guild/struct.Emoji.html
+    /// [`Role`]: ../model/guild/struct.Role.html
     pub guilds: HashMap<GuildId, Arc<RwLock<Guild>>>,
     /// A map of notes that a user has made for individual users.
     ///
@@ -115,8 +115,8 @@ pub struct Cache {
     /// is received. Guilds are "sent in" over time through the receiving of
     /// [`Event::GuildCreate`]s.
     ///
-    /// [`Event::GuildCreate`]: ../model/enum.Event.html#variant.GuildCreate
-    /// [`Event::GuildUnavailable`]: ../model/enum.Event.html#variant.GuildUnavailable
+    /// [`Event::GuildCreate`]: ../model/event/enum.Event.html#variant.GuildCreate
+    /// [`Event::GuildUnavailable`]: ../model/event/enum.Event.html#variant.GuildUnavailable
     pub unavailable_guilds: HashSet<GuildId>,
     /// The current user "logged in" and for which events are being received
     /// for.
@@ -126,8 +126,8 @@ pub struct Cache {
     ///
     /// Refer to the documentation for [`CurrentUser`] for more information.
     ///
-    /// [`CurrentUser`]: ../model/struct.CurrentUser.html
-    /// [`User`]: ../model/struct.User.html
+    /// [`CurrentUser`]: ../model/user/struct.CurrentUser.html
+    /// [`User`]: ../model/user/struct.User.html
     pub user: CurrentUser,
     /// A map of users that the current user sees.
     ///
@@ -205,9 +205,9 @@ impl Cache {
     /// # fn main() { }
     /// ```
     ///
-    /// [`Member`]: ../model/struct.Member.html
+    /// [`Member`]: ../model/guild/struct.Member.html
     /// [`Shard::chunk_guilds`]: ../gateway/struct.Shard.html#method.chunk_guilds
-    /// [`User`]: ../model/struct.User.html
+    /// [`User`]: ../model/user/struct.User.html
     pub fn unknown_members(&self) -> u64 {
         let mut total = 0;
 
@@ -242,8 +242,8 @@ impl Cache {
     /// println!("There are {} private channels", amount);
     /// ```
     ///
-    /// [`Group`]: ../model/struct.Group.html
-    /// [`PrivateChannel`]: ../model/struct.PrivateChannel.html
+    /// [`Group`]: ../model/channel/struct.Group.html
+    /// [`PrivateChannel`]: ../model/channel/struct.PrivateChannel.html
     pub fn all_private_channels(&self) -> Vec<&ChannelId> {
         self.groups
             .keys()
@@ -285,7 +285,7 @@ impl Cache {
     /// ```
     ///
     /// [`Context`]: ../client/struct.Context.html
-    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [`Shard`]: ../gateway/struct.Shard.html
     pub fn all_guilds(&self) -> Vec<&GuildId> {
         self.guilds
@@ -306,9 +306,9 @@ impl Cache {
     /// - [`PrivateChannel`]: [`private_channel`] or [`private_channels`]
     /// - [`Group`]: [`group`] or [`groups`]
     ///
-    /// [`Channel`]: ../model/enum.Channel.html
-    /// [`Group`]: ../model/struct.Group.html
-    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`Channel`]: ../model/channel/enum.Channel.html
+    /// [`Group`]: ../model/channel/struct.Group.html
+    /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [`channels`]: #structfield.channels
     /// [`group`]: #method.group
     /// [`guild_channel`]: #method.guild_channel
@@ -338,7 +338,7 @@ impl Cache {
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`GuildId`].
     ///
-    /// [`GuildId`]: ../model/struct.GuildId.html
+    /// [`GuildId`]: ../model/guild/struct.GuildId.html
     ///
     /// # Examples
     ///
@@ -413,9 +413,9 @@ impl Cache {
     /// # fn main() { }
     /// ```
     ///
-    /// [`ChannelId`]: ../model/struct.ChannelId.html
+    /// [`ChannelId`]: ../model/id/struct.ChannelId.html
     /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
-    /// [`Guild`]: ../model/struct.Guild.html
+    /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [`channel`]: #method.channel
     #[inline]
     pub fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<GuildChannel>>> {
@@ -428,8 +428,8 @@ impl Cache {
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../model/struct.ChannelId.html
-    /// [`Group`]: ../model/struct.Group.html
+    /// [`ChannelId`]: ../model/id/struct.ChannelId.html
+    /// [`Group`]: ../model/channel/struct.Group.html
     ///
     /// # Examples
     ///
@@ -499,8 +499,8 @@ impl Cache {
     /// ```
     ///
     /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`members`]: ../model/struct.Guild.html#structfield.members
+    /// [`Guild`]: ../model/guild/struct.Guild.html
+    /// [`members`]: ../model/guild/struct.Guild.html#structfield.members
     pub fn member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
         where G: Into<GuildId>, U: Into<UserId> {
         self.guilds.get(&guild_id.into()).and_then(|guild| {
@@ -552,8 +552,8 @@ impl Cache {
     /// **Note**: This will clone the entire role. Instead, retrieve the guild
     /// and retrieve from the guild's [`roles`] map to avoid this.
     ///
-    /// [`Guild`]: ../model/struct.Guild.html
-    /// [`roles`]: ../model/struct.Guild.html#structfield.roles
+    /// [`Guild`]: ../model/guild/struct.Guild.html
+    /// [`roles`]: ../model/guild/struct.Guild.html#structfield.roles
     ///
     /// # Examples
     ///
@@ -587,7 +587,7 @@ impl Cache {
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`UserId`].
     ///
-    /// [`UserId`]: ../model/struct.UserId.html
+    /// [`UserId`]: ../model/user/struct.UserId.html
     /// [`users`]: #structfield.users
     ///
     /// # Examples

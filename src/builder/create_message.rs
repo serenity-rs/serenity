@@ -34,8 +34,8 @@ use utils::{self, VecMap};
 ///         .description("With a description")));
 /// ```
 ///
-/// [`ChannelId::say`]: ../model/struct.ChannelId.html#method.say
-/// [`ChannelId::send_message`]: ../model/struct.ChannelId.html#method.send_message
+/// [`ChannelId::say`]: ../model/id/struct.ChannelId.html#method.say
+/// [`ChannelId::send_message`]: ../model/id/struct.ChannelId.html#method.send_message
 /// [`content`]: #method.content
 /// [`embed`]: #method.embed
 /// [`http::send_message`]: ../http/fn.send_message.html
@@ -86,7 +86,7 @@ impl Default for CreateMessage {
     /// Creates a map for sending a [`Message`], setting [`tts`] to `false` by
     /// default.
     ///
-    /// [`Message`]: ../model/struct.Message.html
+    /// [`Message`]: ../model/channel/struct.Message.html
     /// [`tts`]: #method.tts
     fn default() -> CreateMessage {
         let mut map = VecMap::new();

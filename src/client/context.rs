@@ -140,7 +140,7 @@ impl Context {
     /// client.start().unwrap();
     /// ```
     ///
-    /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
+    /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
     #[inline]
     pub fn online(&self) {
         self.shard.set_status(OnlineStatus::Online);
@@ -171,7 +171,7 @@ impl Context {
     /// client.start().unwrap();
     /// ```
     ///
-    /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
+    /// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle
     #[inline]
     pub fn idle(&self) {
         self.shard.set_status(OnlineStatus::Idle);
@@ -202,7 +202,7 @@ impl Context {
     /// client.start().unwrap();
     /// ```
     ///
-    /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
+    /// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
     #[inline]
     pub fn dnd(&self) {
         self.shard.set_status(OnlineStatus::DoNotDisturb);
@@ -234,7 +234,7 @@ impl Context {
     /// ```
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
-    /// [`Invisible`]: ../model/enum.OnlineStatus.html#variant.Invisible
+    /// [`Invisible`]: ../model/user/enum.OnlineStatus.html#variant.Invisible
     #[inline]
     pub fn invisible(&self) {
         self.shard.set_status(OnlineStatus::Invisible);
@@ -267,7 +267,7 @@ impl Context {
     /// ```
     ///
     /// [`Event::Resumed`]: ../model/event/enum.Event.html#variant.Resumed
-    /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
+    /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
     /// [`set_presence`]: #method.set_presence
     #[inline]
     pub fn reset_presence(&self) {
@@ -312,7 +312,7 @@ impl Context {
     /// # fn main() {}
     /// ```
     ///
-    /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
+    /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
     #[inline]
     pub fn set_game(&self, game: Game) {
         self.shard.set_presence(Some(game), OnlineStatus::Online);
@@ -348,10 +348,10 @@ impl Context {
     /// ```
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
-    /// [`GameType`]: ../model/enum.GameType.html
-    /// [`Online`]: ../model/enum.OnlineStatus.html#variant.Online
-    /// [`OnlineStatus`]: ../model/enum.OnlineStatus.html
-    /// [`Playing`]: ../model/enum.GameType.html#variant.Playing
+    /// [`GameType`]: ../model/gateway/enum.GameType.html
+    /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
+    /// [`OnlineStatus`]: ../model/user/enum.OnlineStatus.html
+    /// [`Playing`]: ../model/gateway/enum.GameType.html#variant.Playing
     /// [`reset_presence`]: #method.reset_presence
     /// [`set_presence`]: #method.set_presence
     pub fn set_game_name(&self, game_name: &str) {
@@ -414,8 +414,8 @@ impl Context {
     /// client.start().unwrap();
     /// ```
     ///
-    /// [`DoNotDisturb`]: ../model/enum.OnlineStatus.html#variant.DoNotDisturb
-    /// [`Idle`]: ../model/enum.OnlineStatus.html#variant.Idle
+    /// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
+    /// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle
     #[inline]
     pub fn set_presence(&self, game: Option<Game>, status: OnlineStatus) {
         self.shard.set_presence(game, status);

@@ -224,7 +224,7 @@ impl Member {
     /// See [`EditMember`] for the permission(s) required for separate builder
     /// methods, as well as usage of this.
     ///
-    /// [`Guild::edit_member`]: ../model/struct.Guild.html#method.edit_member
+    /// [`Guild::edit_member`]: ../model/guild/struct.Guild.html#method.edit_member
     /// [`EditMember`]: ../builder/struct.EditMember.html
     #[cfg(feature = "cache")]
     pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F) -> Result<()> {

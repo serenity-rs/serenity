@@ -5,8 +5,8 @@ use utils::VecMap;
 /// A builder which edits the properties of a [`Member`], to be used in
 /// conjunction with [`Member::edit`].
 ///
-/// [`Member`]: ../model/struct.Member.html
-/// [`Member::edit`]: ../model/struct.Member.html#method.edit
+/// [`Member`]: ../model/guild/struct.Member.html
+/// [`Member::edit`]: ../model/guild/struct.Member.html#method.edit
 #[derive(Clone, Debug, Default)]
 pub struct EditMember(pub VecMap<&'static str, Value>);
 

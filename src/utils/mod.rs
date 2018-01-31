@@ -137,7 +137,7 @@ pub fn is_nsfw(name: &str) -> bool {
 /// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
 /// ```
 ///
-/// [`RichInvite`]: ../model/struct.RichInvite.html
+/// [`RichInvite`]: ../model/guild/struct.RichInvite.html
 pub fn parse_invite(code: &str) -> &str {
     if code.starts_with("https://discord.gg/") {
         &code[19..]
@@ -177,7 +177,7 @@ pub fn parse_invite(code: &str) -> &str {
 /// assert!(parse_username("<@!11494131541789a90b1c2").is_none());
 /// ```
 ///
-/// [`User`]: ../model/struct.User.html
+/// [`User`]: ../model/user/struct.User.html
 pub fn parse_username(mention: &str) -> Option<u64> {
     if mention.len() < 4 {
         return None;
@@ -216,7 +216,7 @@ pub fn parse_username(mention: &str) -> Option<u64> {
 /// assert!(parse_role("<@&136107769680887808").is_none());
 /// ```
 ///
-/// [`Role`]: ../model/struct.Role.html
+/// [`Role`]: ../model/guild/struct.Role.html
 pub fn parse_role(mention: &str) -> Option<u64> {
     if mention.len() < 4 {
         return None;
@@ -253,7 +253,7 @@ pub fn parse_role(mention: &str) -> Option<u64> {
 /// assert!(parse_channel("<#81384788765712384").is_none());
 /// ```
 ///
-/// [`Channel`]: ../model/enum.Channel.html
+/// [`Channel`]: ../model/channel/enum.Channel.html
 pub fn parse_channel(mention: &str) -> Option<u64> {
     if mention.len() < 4 {
         return None;
@@ -297,7 +297,7 @@ pub fn parse_channel(mention: &str) -> Option<u64> {
 /// assert!(parse_emoji("<:smugAnimeFace:302516740095606785").is_none());
 /// ```
 ///
-/// [`Emoji`]: ../model/struct.Emoji.html
+/// [`Emoji`]: ../model/guild/struct.Emoji.html
 pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
     let len = mention.len();
 

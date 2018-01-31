@@ -717,8 +717,8 @@ impl Shard {
     ///
     /// [`Event::GuildMembersChunk`]:
     /// ../../model/event/enum.Event.html#variant.GuildMembersChunk
-    /// [`Guild`]: ../../model/struct.Guild.html
-    /// [`Member`]: ../../model/struct.Member.html
+    /// [`Guild`]: ../../model/guild/struct.Guild.html
+    /// [`Member`]: ../../model/guild/struct.Member.html
     pub fn chunk_guilds<It>(
         &mut self,
         guild_ids: It,
