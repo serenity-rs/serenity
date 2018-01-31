@@ -3,6 +3,59 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.5.1] - 2018-01-31
+
+This release contains a number of fixes, a few more model helper methods, and
+additional framework features.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@ConcurrentMarxistGC]
+- [@FelixMcFelix]
+- [@indiv0]
+- [@Lakelezz]
+- [@perryprog]
+- [@zeyla]
+
+### Added
+
+- [framework] Add way to register middleware functions directly on
+  `CreateCommand` ([@acdenisSK]) [c:d193975]
+- [model] Add `Message::member` ([@zeyla]) [c:ce2952a]
+- [http, model] Add functions to reorder a guild's channels ([@zeyla])
+  [c:ab1f11a]
+- [voice] Add multiple audio stream playback, volume control, and pausing
+  ([@FelixMcfelix]) [c:324a288]
+
+### Fixed
+
+- [framework] Fix incorrect skipping for some prefixes ([@ConcurrentMarxistGC])
+  [c:76bcf7d]
+- [framework] Trim content after prefix mentions ([@Lakelezz]) [c:27c83e8]
+- [voice] Strip RTP header extensions if present ([@indiv0]) [c:e4612ac]
+- [voice] Fix voice websocket loop termination ([@indiv0]) [c:55fa37a]
+- [model] Account for guild owners in member hierarchy check ([@zeyla])
+  [c:03a7e3e]
+- [model] Check message ID count in `delete_messages` ([@zeyla]) [c:92c91b8]
+- [model] Correctly set newly created roles' positions on new roles ([@zeyla])
+  [c:5a0b8a6]
+- [voice] Fix an odd-to-use `Into<Option<Box<T>>>` bound ([@zeyla]) [c:eee3168]
+- [framework] Fix case insensitivity for aliases ([@Lakelezz]) [c:d240074]
+- [docs] Fix broken docs links caused by model module changes ([@zeyla])
+  [c:8578d5f]
+
+### Changed
+
+### Misc.
+
+- [general] Reduce number of clones in the library ([@zeyla]) [c:13b0de1]
+- [example] Add voice receive example (example 10) ([@zeyla]) [c:b9a7e50]
+- [examples, framework] Add docs for customised help functions ([@Lakelezz])
+  [c:7912f23]
+- [example] Add another message embed builder example ([@perryprog])
+  [c:aba1ba6]
+
 ## [0.5.0] - 2018-01-20
 
 This release is a rewrite of the client and gateway internals with a minimal
@@ -15,6 +68,7 @@ Thanks to the following for their contributions:
 
 - [@acdenisSK]
 - [@Caemor]
+- [@ConcurrentMarxistGC]
 - [@drklee3]
 - [@fenhl]
 - [@Flat]
@@ -30,7 +84,6 @@ Thanks to the following for their contributions:
 - [@tahahawa]
 - [@thelearnerofcode]
 - [@timotree3]
-- [@UninterestinAcc]
 - [@zeyla]
 
 ### Upgrade Path
@@ -261,7 +314,7 @@ instance ([@zeyla]) [c:d1113c0]
 - [framework] Fix help commands to list all eligible commands in DMs
 ([@Lakelezz]) [c:114e43a]
 - [framework] Fix command parsing behaviour when prefix has spaces
-([@UninterestinAcc]) [c:10c56a9]
+([@ConcurrentMarxistGC]) [c:10c56a9]
 - [client] Attempt to restart failed shard boots ([@zeyla]) [c:8d68503]
 - [client, gateway] Fix shards attempting to re-identify on their own ([@zeyla])
 [c:e678883]
@@ -278,7 +331,7 @@ building ([@zeyla]) [c:7566f32]
 - [model] Add some role hierarchy position checks ([@zeyla]) [c:222382c]
 - [framework] Add missing `correct roles` checks in help commands ([@Lakelezz])
 [c:470f366]
-- [framework] Fix multibyte character-based prefixes ([@UninterestinAcc])
+- [framework] Fix multibyte character-based prefixes ([@ConcurrentMarxistGC])
 [c:e611776]
 
 ### Changed
@@ -418,7 +471,7 @@ Thanks to the following people for their contributions:
 - [@Flat]
 - [@hsiW]
 - [@Lakelezz]
-- [@UninterestinAcc]
+- [@ConcurrentMarxistGC]
 - [@zeyla]
 
 ### Added
@@ -437,7 +490,7 @@ Thanks to the following people for their contributions:
 - [model] Fix `User::has_role` ([@zeyla]) [c:d3015a0ff]
 - [gateway] Fix shard connection ([@zeyla]) [c:585ac6e]
 - [gateway] Fix shard shutdown via `Context` ([@zeyla]) [c:3616585]
-- [framework] Fix `allow_whitespace` ([@UninterestinAcc]) [c:e694766]
+- [framework] Fix `allow_whitespace` ([@ConcurrentMarxistGC]) [c:e694766]
 - [framework, gateway, cache] Properly update emojis in the cache, fix shard re-tries and do some cleanup to `help_commands.rs` ([@Lakelezz]) [c:e02d5fb]
 
 ### Changed
@@ -1879,6 +1932,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.5.1]: https://github.com/zeyla/serenity/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/zeyla/serenity/compare/v0.4.7...v0.5.0
 [0.4.5]: https://github.com/zeyla/serenity/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/zeyla/serenity/compare/v0.4.3...v0.4.4
@@ -1915,6 +1969,7 @@ Initial commit.
 [@emoticon]: https://github.com/emoticon
 [@efyang]: https://github.com/efyang
 [@fenhl]: https://github.com/fenhl
+[@FelixMcFelix]: https://github.com/FelixMcFelix
 [@Flat]: https://github.com/Flat
 [@foxbot]: https://github.com/foxbot
 [@ftriquet]: https://github.com/ftriquet
@@ -1932,6 +1987,7 @@ Initial commit.
 [@khazhyk]: https://github.com/khazhyk
 [@MOZGIII]: https://github.com/MOZGIII
 [@nabijaczleweli]: https://github.com/nabijaczleweli
+[@perryprog]: https://github.com/perryprog
 [@Roughsketch]: https://github.com/Roughsketch
 [@sschroe]: https://github.com/sschroe
 [@SunDwarf]: https://github.com/SunDwarf
@@ -1939,9 +1995,28 @@ Initial commit.
 [@ThatsNoMoon]: https://github.com/ThatsNoMoon
 [@thelearnerofcode]: https://github.com/thelearnerofcode
 [@timotree3]: https://github.com/timotree3
-[@UninterestinAcc]: https://github.com/UninterestinAcc
+[@ConcurrentMarxistGC]: https://github.com/ConcurrentMarxistGC
 [@xentec]: https://github.com/xentec
 [@zeyla]: https://github.com/zeyla
+
+[c:03a7e3e]: https://github.com/zeyla/serenity/commit/03a7e3e1d82ca667ca065367d2cf21b847f984ac
+[c:13b0de1]: https://github.com/zeyla/serenity/commit/13b0de121eda30e59849fd442c8a0926a63df2b8
+[c:27c83e8]: https://github.com/zeyla/serenity/commit/27c83e8ef0def0a62e8a5ce5bfd4849892749c83
+[c:324a288]: https://github.com/zeyla/serenity/commit/324a288fbb0dd7d135aa9aab876cf39dabb6a02e
+[c:5a0b8a6]: https://github.com/zeyla/serenity/commit/5a0b8a68c133c3093260a5aeb08b02eb3595c18d
+[c:55fa37a]: https://github.com/zeyla/serenity/commit/55fa37ade187aa68ef3eec519d22767920aae4ab
+[c:76bcf7d]: https://github.com/zeyla/serenity/commit/76bcf7dcef91fd2658fb3348acf6df0ecc33fcdf
+[c:7912f23]: https://github.com/zeyla/serenity/commit/7912f23bed7ddc540c46aee0ecd64c6b60daa0f4
+[c:8578d5f]: https://github.com/zeyla/serenity/commit/8578d5fe6e3bdc2842cda9417c242169f93b1a99
+[c:92c91b8]: https://github.com/zeyla/serenity/commit/92c91b81490b621de4519e0d87830dbce53dd689
+[c:ab1f11a]: https://github.com/zeyla/serenity/commit/ab1f11a37d64166c08f833042d7b3bcde2ea586d
+[c:aba1ba6]: https://github.com/zeyla/serenity/commit/aba1ba67dc78a0c14e5de3c8ac650829e436e96f
+[c:b9a7e50]: https://github.com/zeyla/serenity/commit/b9a7e50579718a20e60a19f0c0d410661ee3e77a
+[c:ce2952a]: https://github.com/zeyla/serenity/commit/ce2952ad0d783b4a256171e48602c6caf1125c61
+[c:d193975]: https://github.com/zeyla/serenity/commit/d1939756f6bf4b4bb3c60fbb81a397c218492d62
+[c:d240074]: https://github.com/zeyla/serenity/commit/d2400742f657d9f8c432a440810d49e63339f5aa
+[c:e4612ac]: https://github.com/zeyla/serenity/commit/e4612acf58dc42fdc32094426c14274bd61203dd
+[c:eee3168]: https://github.com/zeyla/serenity/commit/eee3168b4ed266001571abe4e1a6ae4ef06b93e0
 
 [c:031fc92]: https://github.com/zeyla/serenity/commit/031fc92e02c314cce9fc8febcc7900fa2d885941
 [c:032c5a7]: https://github.com/zeyla/serenity/commit/032c5a75620c3ff185a749113d93fb3051b38acb
