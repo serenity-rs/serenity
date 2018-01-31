@@ -27,7 +27,7 @@ pub trait AudioReceiver: Send {
                     data: &[i16]);
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub enum AudioType {
     Opus,
     Pcm,

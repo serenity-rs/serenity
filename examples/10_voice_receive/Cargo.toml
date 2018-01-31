@@ -1,0 +1,13 @@
+[package]
+name = "10_voice_receive"
+version = "0.1.0"
+authors = ["my name <my@email.address>"]
+
+[dependencies]
+env_logger = "~0.4"
+log = "~0.4"
+typemap = "~0.3"
+
+[dependencies.serenity]
+features = ["client", "standard_framework", "voice"]
+path = "../../"
