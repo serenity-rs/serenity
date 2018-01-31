@@ -156,14 +156,14 @@ impl CreateHelpCommand {
         self
     }
 
-    /// Sets the colour for the embed if an error occured.
+    /// Sets the colour for the embed if no error occured.
     pub fn embed_success_colour(mut self, colour: Colour) -> Self {
         self.0.embed_success_colour = colour;
 
         self
     }
 
-    /// Sets the colour for the embed if no error occured.
+    /// Sets the colour for the embed if an error occured.
     pub fn embed_error_colour(mut self, colour: Colour) -> Self {
         self.0.embed_error_colour = colour;
 
