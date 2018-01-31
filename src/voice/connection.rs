@@ -351,7 +351,7 @@ impl Connection {
                 self.silence_frames -= 1;
 
                 // Explicit "Silence" frame.
-                opus_frame.extend_from_slice(&[0xf, 0x8, 0xf, 0xf, 0xf, 0xe]);
+                opus_frame.extend_from_slice(&[0xf8, 0xff, 0xfe]);
             } else {
                 // Per official guidelines, send 5x silence BEFORE we stop speaking.
                 self.set_speaking(false)?;
