@@ -5,6 +5,8 @@ pub const EMBED_MAX_LENGTH: u16 = 6000;
 /// The gateway version used by the library. The gateway URI is retrieved via
 /// the REST API.
 pub const GATEWAY_VERSION: u8 = 6;
+/// The voice gateway version used by the library.
+pub const VOICE_GATEWAY_VERSION: u8 = 3;
 /// The large threshold to send on identify.
 pub const LARGE_THRESHOLD: u8 = 250;
 /// The maximum unicode code points allowed within a message by Discord.

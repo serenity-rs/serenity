@@ -2,9 +2,11 @@ use constants::VoiceOpCode;
 use gateway::InterMessage;
 use model::id::{ChannelId, GuildId, UserId};
 use model::voice::VoiceState;
+use parking_lot::Mutex;
+use std::sync::Arc;
 use std::sync::mpsc::{self, Sender as MpscSender};
 use super::connection_info::ConnectionInfo;
-use super::{AudioReceiver, AudioSource, Status as VoiceStatus, threading};
+use super::{Audio, AudioReceiver, AudioSource, Status as VoiceStatus, threading, LockedAudio};
 
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.
@@ -249,13 +251,35 @@ impl Handler {
         }
     }
 
-    /// Plays audio from a source. This can be a source created via
-    /// [`voice::ffmpeg`] or [`voice::ytdl`].
+    /// Plays audio from a source.
+    ///
+    /// This can be a source created via [`voice::ffmpeg`] or [`voice::ytdl`].
     ///
     /// [`voice::ffmpeg`]: fn.ffmpeg.html
     /// [`voice::ytdl`]: fn.ytdl.html
     pub fn play(&mut self, source: Box<AudioSource>) {
-        self.send(VoiceStatus::SetSender(Some(source)))
+        self.play_returning(source);
+    }
+
+    /// Plays audio from a source, returning the locked audio source.
+    pub fn play_returning(&mut self, source: Box<AudioSource>) -> LockedAudio {
+        let player = Arc::new(Mutex::new(Audio::new(source)));
+        self.send(VoiceStatus::AddSender(player.clone()));
+
+        player
+    }
+
+    /// Plays audio from a source.
+    ///
+    /// Unlike `play`, this stops all other sources attached
+    /// to the channel.
+    ///
+    /// [`play`]: #method.play
+    pub fn play_only(&mut self, source: Box<AudioSource>) -> LockedAudio {
+        let player = Arc::new(Mutex::new(Audio::new(source)));
+        self.send(VoiceStatus::SetSender(Some(player.clone())));
+
+        player
     }
 
     /// Stops playing audio from a source, if one is set.
