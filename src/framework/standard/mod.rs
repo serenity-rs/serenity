@@ -947,6 +947,12 @@ impl Framework for StandardFramework {
                 for group in groups.values() {
                     let command_length = built.len();
 
+                    built = if self.configuration.case_insensitive {
+                        built.to_lowercase()
+                    } else {
+                        built
+                    };
+
                     let cmd = group.commands.get(&built);
 
                     if let Some(&CommandOrAlias::Alias(ref points_to)) = cmd {
@@ -961,12 +967,6 @@ impl Framework for StandardFramework {
                         }
                     } else {
                         built.clone()
-                    };
-
-                    to_check = if self.configuration.case_insensitive {
-                        to_check.to_lowercase()
-                    } else {
-                        to_check
                     };
 
                     let mut args = {
@@ -1009,6 +1009,7 @@ impl Framework for StandardFramework {
                     if let Some(&CommandOrAlias::Command(ref command)) =
                         group.commands.get(&to_check) {
                         let command = Arc::clone(command);
+
                         if let Some(error) = self.should_fail(
                             &mut context,
                             &message,
