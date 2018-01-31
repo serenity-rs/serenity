@@ -15,7 +15,6 @@ use opus::{
 use parking_lot::Mutex;
 use serde::Deserialize;
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
-use std::cmp::max;
 use std::collections::HashMap;
 use std::io::Write;
 use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
@@ -278,42 +277,71 @@ impl Connection {
         let mut i = 0;
 
         while i < sources.len() {
+            let mut finished = false;
+
             let aud_lock = (&sources[i]).clone();
             let mut aud = aud_lock.lock();
-            let stream = &mut aud.src;
 
-            let is_stereo = stream.is_stereo();
+            let vol = aud.volume;
+            let skip = !aud.playing;
 
-            if is_stereo != self.encoder_stereo {
-                let channels = if is_stereo {
-                    Channels::Stereo
-                } else {
-                    Channels::Mono
+            {
+                let stream = &mut aud.src;
+            
+                if skip {
+                    i += 1;
+                    continue;
+                }
+    
+                // Assume this for now, at least.
+                // We'll be fusing streams, so we can either keep
+                // as stereo or downmix to mono.
+                let is_stereo = true; //stream.is_stereo();
+                let source_stereo = stream.is_stereo();
+    
+                if is_stereo != self.encoder_stereo {
+                    let channels = if is_stereo {
+                        Channels::Stereo
+                    } else {
+                        Channels::Mono
+                    };
+                    self.encoder = OpusEncoder::new(SAMPLE_RATE, channels, CodingMode::Audio)?;
+                    self.encoder_stereo = is_stereo;
+                }
+    
+                let temp_len = match stream.get_type() {
+                    // TODO: decode back to raw, then include.
+                    AudioType::Opus => match stream.read_opus_frame() {
+                        Some(frame) => {
+                            opus_frame = frame;
+                            opus_frame.len()
+                        },
+                        None => 0,
+                    },
+                    AudioType::Pcm => {
+                        let buffer_len = if source_stereo { 960 * 2 } else { 960 };
+    
+                        match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
+                            Some(len) => len,
+                            None => 0,
+                        }
+                    },
                 };
-                self.encoder = OpusEncoder::new(SAMPLE_RATE, channels, CodingMode::Audio)?;
-                self.encoder_stereo = is_stereo;
+    
+                // May need to force interleave/copy.
+                combine_audio(buffer, &mut mix_buffer, source_stereo, vol);
+    
+                len = len.max(temp_len);
+                i += if temp_len > 0 {
+                    1
+                } else {
+                    sources.remove(i);
+                    finished = true;
+                    0
+                };
             }
 
-            let temp_len = match stream.get_type() {
-                AudioType::Opus => match stream.read_opus_frame() {
-                    Some(frame) => {
-                        opus_frame = frame;
-                        opus_frame.len()
-                    },
-                    None => 0,
-                },
-                AudioType::Pcm => {
-                    let buffer_len = if is_stereo { 960 * 2 } else { 960 };
-
-                    match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
-                        Some(len) => len,
-                        None => 0,
-                    }
-                },
-            };
-
-            len = max(len, temp_len);
-            i += if temp_len > 0 {1} else {sources.remove(i); 0};
+            aud.finished = finished;
         };
 
         if len == 0 {
@@ -341,18 +369,18 @@ impl Connection {
 
         self.set_speaking(true)?;
 
-        let index = self.prep_packet(&mut packet, buffer, &opus_frame, nonce)?;
+        let index = self.prep_packet(&mut packet, mix_buffer, &opus_frame, nonce)?;
         audio_timer.await();
 
         self.udp.send_to(&packet[..index], self.destination)?;
         self.audio_timer.reset();
 
         Ok(())
-    }
+    }    
 
     fn prep_packet(&mut self,
                    packet: &mut [u8; 512],
-                   buffer: [i16; 1920],
+                   buffer: [f32; 1920],
                    opus_frame: &[u8],
                    mut nonce: Nonce)
                    -> Result<usize> {
@@ -372,7 +400,7 @@ impl Connection {
 
         let len = if opus_frame.is_empty() {
             self.encoder
-                .encode(&buffer[..buffer_len], &mut packet[HEADER_LEN..sl_index])?
+                .encode_float(&buffer[..buffer_len], &mut packet[HEADER_LEN..sl_index])?
         } else {
             let len = opus_frame.len();
             packet[HEADER_LEN..HEADER_LEN + len]
@@ -410,6 +438,20 @@ impl Drop for Connection {
         let _ = self.thread_items.ws_close_sender.send(0);
 
         info!("[Voice] Disconnected");
+    }
+}
+
+#[inline]
+fn combine_audio(raw_buffer: [i16; 1920],
+        float_buffer: &mut [f32; 1920],
+        true_stereo: bool,
+        volume: f32)
+{
+    for i in 0..1920 {
+        let sample_index = if true_stereo {i} else {i/2};
+        let sample = (raw_buffer[sample_index] as f32) / 32768.0;
+
+        float_buffer[i] = (float_buffer[i] + sample*volume).max(-1.0).min(1.0);
     }
 }
 

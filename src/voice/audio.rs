@@ -39,6 +39,7 @@ pub enum AudioType {
 pub struct Audio {
     pub playing: bool,
     pub volume: f32,
+    pub finished: bool,
 
     pub src: Box<AudioSource>,
 }
@@ -48,6 +49,7 @@ impl Audio {
         Self {
             playing: true,
             volume: 1.0,
+            finished: false,
 
             src: source,
         }
