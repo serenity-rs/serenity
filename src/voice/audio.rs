@@ -34,14 +34,14 @@ pub enum AudioType {
 }
 
 /// Control object for audio playback.
+///
 /// Accessed by both commands and the playback code -- as such, access is
 /// always guarded.
 pub struct Audio {
     pub playing: bool,
     pub volume: f32,
     pub finished: bool,
-
-    pub src: Box<AudioSource>,
+    pub source: Box<AudioSource>,
 }
 
 impl Audio {
@@ -50,28 +50,31 @@ impl Audio {
             playing: true,
             volume: 1.0,
             finished: false,
-
-            src: source,
+            source,
         }
     }
 
     pub fn play(&mut self) -> &mut Self {
         self.playing = true;
+
         self
     }
 
     pub fn pause(&mut self) -> &mut Self {
         self.playing = false;
+
         self
     }
 
     pub fn volume(&mut self, volume: f32) -> &mut Self {
         self.volume = volume;
+
         self
     }
 }
 
-/// Threadsafe form of the `Audio` object.
+/// Threadsafe form of an instance of the [`Audio`] struct, locked behind a
+/// Mutex.
 ///
-/// [`Audio`]: #Audio
-pub type TSAudio = Arc<Mutex<Audio>>;
+/// [`Audio`]: struct.Audio.html
+pub type LockedAudio = Arc<Mutex<Audio>>;

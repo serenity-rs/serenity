@@ -22,7 +22,7 @@ use std::sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender};
 use std::sync::Arc;
 use std::thread::{self, Builder as ThreadBuilder, JoinHandle};
 use std::time::Duration;
-use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, TSAudio};
+use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, LockedAudio};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
 use websocket::client::Url as WebsocketUrl;
@@ -177,7 +177,7 @@ impl Connection {
 
     #[allow(unused_variables)]
     pub fn cycle(&mut self,
-                 sources: &mut Vec<TSAudio>,
+                 sources: &mut Vec<LockedAudio>,
                  receiver: &mut Option<Box<AudioReceiver>>,
                  audio_timer: &mut Timer)
                  -> Result<()> {
@@ -286,19 +286,20 @@ impl Connection {
             let skip = !aud.playing;
 
             {
-                let stream = &mut aud.src;
-            
+                let stream = &mut aud.source;
+
                 if skip {
                     i += 1;
+
                     continue;
                 }
-    
+
                 // Assume this for now, at least.
                 // We'll be fusing streams, so we can either keep
                 // as stereo or downmix to mono.
-                let is_stereo = true; //stream.is_stereo();
+                let is_stereo = true;
                 let source_stereo = stream.is_stereo();
-    
+
                 if is_stereo != self.encoder_stereo {
                     let channels = if is_stereo {
                         Channels::Stereo
@@ -308,7 +309,7 @@ impl Connection {
                     self.encoder = OpusEncoder::new(SAMPLE_RATE, channels, CodingMode::Audio)?;
                     self.encoder_stereo = is_stereo;
                 }
-    
+
                 let temp_len = match stream.get_type() {
                     // TODO: decode back to raw, then include.
                     AudioType::Opus => match stream.read_opus_frame() {
@@ -320,23 +321,24 @@ impl Connection {
                     },
                     AudioType::Pcm => {
                         let buffer_len = if source_stereo { 960 * 2 } else { 960 };
-    
+
                         match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
                             Some(len) => len,
                             None => 0,
                         }
                     },
                 };
-    
+
                 // May need to force interleave/copy.
                 combine_audio(buffer, &mut mix_buffer, source_stereo, vol);
-    
+
                 len = len.max(temp_len);
                 i += if temp_len > 0 {
                     1
                 } else {
                     sources.remove(i);
                     finished = true;
+
                     0
                 };
             }
@@ -375,7 +377,7 @@ impl Connection {
         self.audio_timer.reset();
 
         Ok(())
-    }    
+    }
 
     fn prep_packet(&mut self,
                    packet: &mut [u8; 512],
@@ -441,13 +443,14 @@ impl Drop for Connection {
 }
 
 #[inline]
-fn combine_audio(raw_buffer: [i16; 1920],
-        float_buffer: &mut [f32; 1920],
-        true_stereo: bool,
-        volume: f32)
-{
+fn combine_audio(
+    raw_buffer: [i16; 1920],
+    float_buffer: &mut [f32; 1920],
+    true_stereo: bool,
+    volume: f32,
+) {
     for i in 0..1920 {
-        let sample_index = if true_stereo {i} else {i/2};
+        let sample_index = if true_stereo { i } else { i/2 };
         let sample = (raw_buffer[sample_index] as f32) / 32768.0;
 
         float_buffer[i] = (float_buffer[i] + sample*volume).max(-1.0).min(1.0);
