@@ -344,6 +344,9 @@ impl Connection {
             }
 
             aud.finished = finished;
+            if !finished {
+                aud.step_frame();
+            }
         };
 
         if len == 0 {

@@ -1,3 +1,4 @@
+use std::time::Duration;
 use parking_lot::Mutex;
 use std::sync::Arc;
 
@@ -42,6 +43,8 @@ pub struct Audio {
     pub volume: f32,
     pub finished: bool,
     pub source: Box<AudioSource>,
+    pub position: Duration,
+    pub position_modified: bool,
 }
 
 impl Audio {
@@ -51,6 +54,8 @@ impl Audio {
             volume: 1.0,
             finished: false,
             source,
+            position: Duration::new(0, 0),
+            position_modified: false,
         }
     }
 
@@ -70,6 +75,18 @@ impl Audio {
         self.volume = volume;
 
         self
+    }
+
+    pub fn position(&mut self, position: Duration) -> &mut Self {
+        self.position = position;
+        self.position_modified = true;
+
+        self
+    }
+
+    pub fn step_frame(&mut self) {
+        self.position += Duration::from_millis(20);
+        self.position_modified = false;
     }
 }
 
