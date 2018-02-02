@@ -6,7 +6,7 @@ extern crate serde_json;
 extern crate serenity;
 
 use serde_json::Value;
-use serenity::model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage};
+use serenity::model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo};
 use serenity::builder::CreateEmbed;
 use serenity::utils::{self, Colour};
 
@@ -45,13 +45,18 @@ fn test_from_embed() {
         timestamp: None,
         title: Some("hakase".to_string()),
         url: Some("https://i.imgur.com/XfWpfCV.gif".to_string()),
-        video: None,
+        video: Some(EmbedVideo {
+            height: 213,
+            url: "https://i.imgur.com/XfWpfCV.mp4".to_string(),
+            width: 224,
+        }),
     };
 
     let builder = CreateEmbed::from(embed)
         .colour(0xFF0011)
         .description("This is a hakase description")
         .image("https://i.imgur.com/XfWpfCV.gif")
+        .video("https://i.imgur.com/XfWpfCV.mp4")
         .title("still a hakase")
         .url("https://i.imgur.com/XfWpfCV.gif");
 
@@ -77,6 +82,9 @@ fn test_from_embed() {
         ],
         "image": {
             "url": "https://i.imgur.com/XfWpfCV.gif",
+        },
+        "video": {
+            "url": "https://i.imgur.com/XfWpfCV.mp4",
         },
         "footer": {
             "text": "This is a hakase footer",
