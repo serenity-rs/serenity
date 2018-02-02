@@ -1,12 +1,19 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 use internal::prelude::*;
+use opus::{
+    Channels,
+    Decoder as OpusDecoder,
+    Result as OResult,
+};
+use parking_lot::Mutex;
 use serde_json;
 use std::ffi::OsStr;
 use std::fs::File;
 use std::io::{BufReader, ErrorKind as IoErrorKind, Read, Result as IoResult};
 use std::process::{Child, Command, Stdio};
 use std::result::Result as StdResult;
-use super::{AudioSource, AudioType, DcaError, DcaMetadata, VoiceError};
+use std::sync::Arc;
+use super::{AudioSource, AudioType, DcaError, DcaMetadata, VoiceError, audio};
 
 struct ChildContainer(Child);
 
@@ -16,10 +23,24 @@ impl Read for ChildContainer {
     }
 }
 
+// Since each audio item needs its own decoder, we need to
+// work around the fact that OpusDecoders aint sendable.
+struct SendDecoder(OpusDecoder);
+
+impl SendDecoder {
+    fn decode_float(&mut self, input: &[u8], output: &mut [f32], fec: bool) -> OResult<usize> {
+        let &mut SendDecoder(ref mut sd) = self;
+        sd.decode_float(input, output, fec)
+    }
+}
+
+unsafe impl Send for SendDecoder {}
+
 struct InputSource<R: Read + Send + 'static> {
     stereo: bool,
     reader: R,
     kind: AudioType,
+    decoder: Option<Arc<Mutex<SendDecoder>>>,
 }
 
 impl<R: Read + Send> AudioSource for InputSource<R> {
@@ -70,6 +91,24 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
                 None
             },
         }
+    }
+
+    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize> {
+        let decoder_lock = self.decoder.as_mut()?.clone();
+        let frame = self.read_opus_frame()?;
+        let mut local_buf = [0f32; 960 * 2];
+
+        let count = {
+            let mut decoder = decoder_lock.lock();
+
+            decoder.decode_float(frame.as_slice(), &mut local_buf, false)
+        }.ok()?;
+
+        for i in 0..1920 {
+            float_buffer[i] += local_buf[i] * volume;
+        }
+
+        Some(count)
     }
 }
 
@@ -147,11 +186,23 @@ pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Box<AudioSource>, DcaError> {
 }
 
 /// Creates an Opus audio source.
+/// This makes certain assumptions: namely, that the input stream
+/// is composed ONLY of opus frames of the variety that Discord expects.
+///
+/// If you want to decode a `.opus` file, use [`ffmpeg`]
+///
+/// [`ffmpeg`]: fn.ffmpeg.html
 pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,
         reader: reader,
         kind: AudioType::Opus,
+        decoder: Some(
+            Arc::new(Mutex::new(
+                // We always want to decode *to* stereo, for mixing reasons.
+                SendDecoder(OpusDecoder::new(audio::SAMPLE_RATE, Channels::Stereo).unwrap())
+            ))
+        ),
     })
 }
 
@@ -161,6 +212,7 @@ pub fn pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSou
         stereo: is_stereo,
         reader: reader,
         kind: AudioType::Pcm,
+        decoder: None,
     })
 }
 

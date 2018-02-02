@@ -1,6 +1,6 @@
-use std::time::Duration;
 use parking_lot::Mutex;
 use std::sync::Arc;
+use std::time::Duration;
 
 pub const HEADER_LEN: usize = 12;
 pub const SAMPLE_RATE: u32 = 48_000;
@@ -14,6 +14,8 @@ pub trait AudioSource: Send {
     fn read_pcm_frame(&mut self, buffer: &mut [i16]) -> Option<usize>;
 
     fn read_opus_frame(&mut self) -> Option<Vec<u8>>;
+
+    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize>;
 }
 
 /// A receiver for incoming audio.

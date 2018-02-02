@@ -311,10 +311,8 @@ impl Connection {
                 }
 
                 let temp_len = match stream.get_type() {
-                    // TODO: decode back to raw, then include.
-                    AudioType::Opus => match stream.read_opus_frame() {
+                    AudioType::Opus => match stream.decode_and_add_opus_frame(&mut mix_buffer, vol) {
                         Some(frame) => {
-                            opus_frame = frame;
                             opus_frame.len()
                         },
                         None => 0,
