@@ -164,26 +164,29 @@ impl CreateEmbed {
         CreateEmbed(self.0)
     }
 
-    /// Set the image associated with the embed. This only supports HTTP(S).
-    pub fn image(mut self, url: &str) -> Self {
-        let image = json!({
+    fn url_object(mut self, name: &'static str, url: &str) -> Self {
+        let obj = json!({
             "url": url.to_string()
         });
 
-        self.0.insert("image", image);
+        self.0.insert(name, obj);
 
         CreateEmbed(self.0)
     }
 
+    /// Set the image associated with the embed. This only supports HTTP(S).
+    pub fn image(self, url: &str) -> Self {
+        self.url_object("image", url)
+    }
+
+    /// Set the video associated with the embed. This only supports HTTP(S).
+    pub fn video(self, url: &str) -> Self {
+        self.url_object("video", url)
+    }
+
     /// Set the thumbnail of the embed. This only supports HTTP(S).
-    pub fn thumbnail(mut self, url: &str) -> Self {
-        let thumbnail = json!({
-            "url": url.to_string(),
-        });
-
-        self.0.insert("thumbnail", thumbnail);
-
-        CreateEmbed(self.0)
+    pub fn thumbnail(self, url: &str) -> Self {
+        self.url_object("thumbnail", url)
     }
 
     /// Set the timestamp.
