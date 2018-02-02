@@ -11,6 +11,7 @@ use opus::{
     Channels,
     Decoder as OpusDecoder,
     Encoder as OpusEncoder,
+    SoftClip,
 };
 use parking_lot::Mutex;
 use serde::Deserialize;
@@ -56,6 +57,7 @@ pub struct Connection {
     encoder_stereo: bool,
     keepalive_timer: Timer,
     key: Key,
+    soft_clip: SoftClip,
     sequence: u16,
     silence_frames: u8,
     speaking: bool,
@@ -149,7 +151,9 @@ impl Connection {
 
         info!("[Voice] Connected to: {}", info.endpoint);
 
-        let encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Mono, CodingMode::Audio)?;
+        // Encode for Discord in Stereo, as required.
+        let encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Stereo, CodingMode::Audio)?;
+        let soft_clip = SoftClip::new(Channels::Stereo);
 
         // Per discord dev team's current recommendations:
         // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
@@ -159,17 +163,18 @@ impl Connection {
             audio_timer: Timer::new(1000 * 60 * 4),
             client: mutexed_client,
             decoder_map: HashMap::new(),
-            destination: destination,
-            encoder: encoder,
+            destination,
+            encoder,
             encoder_stereo: false,
-            key: key,
+            key,
             keepalive_timer: Timer::new(temp_heartbeat),
-            udp: udp,
+            udp,
             sequence: 0,
             silence_frames: 0,
+            soft_clip,
             speaking: false,
             ssrc: hello.ssrc,
-            thread_items: thread_items,
+            thread_items,
             timestamp: 0,
             user_id: info.user_id,
         })
@@ -347,6 +352,8 @@ impl Connection {
             }
         };
 
+        self.soft_clip.apply(&mut mix_buffer);
+
         if len == 0 {
             if self.silence_frames > 0 {
                 self.silence_frames -= 1;
@@ -454,7 +461,7 @@ fn combine_audio(
         let sample_index = if true_stereo { i } else { i/2 };
         let sample = (raw_buffer[sample_index] as f32) / 32768.0;
 
-        float_buffer[i] = (float_buffer[i] + sample*volume).max(-1.0).min(1.0);
+        float_buffer[i] = float_buffer[i] + sample*volume;
     }
 }
 
