@@ -175,16 +175,19 @@ impl CreateEmbed {
     }
 
     /// Set the image associated with the embed. This only supports HTTP(S).
+    #[inline]
     pub fn image(self, url: &str) -> Self {
         self.url_object("image", url)
     }
 
     /// Set the video associated with the embed. This only supports HTTP(S).
+    #[inline]
     pub fn video(self, url: &str) -> Self {
         self.url_object("video", url)
     }
 
     /// Set the thumbnail of the embed. This only supports HTTP(S).
+    #[inline]
     pub fn thumbnail(self, url: &str) -> Self {
         self.url_object("thumbnail", url)
     }
