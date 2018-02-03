@@ -40,14 +40,16 @@ pub enum AudioType {
 ///
 /// Accessed by both commands and the playback code -- as such, access is
 /// always guarded. In particular, you should expect to receive
-/// a [`LockedAudio`] when calling [`Handler::play()`].
+/// a [`LockedAudio`] when calling [`Handler::play_returning()`] or
+/// [`Handler::play_only()`].
 ///
 /// # Example
 /// ```rust, no-run
-/// use serenity::voice::{Handler, LockedAudio};
+/// use serenity::voice::{Handler, LockedAudio, ffmpeg};
 ///
 /// let handler: Handler = /* ... */;
-/// let safe_audio: LockedAudio = handler.play();
+/// let source = ffmpeg("../audio/my-favourite-song.mp3")?;
+/// let safe_audio: LockedAudio = handler.play_only();
 /// {
 ///     let audio_lock = safe_audio_control.clone();
 ///     let mut audio = audio_lock.lock();
@@ -56,7 +58,8 @@ pub enum AudioType {
 /// }
 /// ```
 /// [`LockedAudio`]: type.LockedAudio.html
-/// [`Handler::play()`]: struct.Handler.html#method.play
+/// [`Handler::play_only()`]: struct.Handler.html#method.play_only
+/// [`Handler::play_returning()`]: struct.Handler.html#method.play_returning
 pub struct Audio {
     /// Whether or not this sound is currently playing.
     /// Can be controlled with [`.play()`] or [`.pause()`]
