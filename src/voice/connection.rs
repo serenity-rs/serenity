@@ -8,6 +8,7 @@ use model::id::UserId;
 use opus::{
     packet as opus_packet,
     Application as CodingMode,
+    Bitrate,
     Channels,
     Decoder as OpusDecoder,
     Encoder as OpusEncoder,
@@ -23,7 +24,7 @@ use std::sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender};
 use std::sync::Arc;
 use std::thread::{self, Builder as ThreadBuilder, JoinHandle};
 use std::time::Duration;
-use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, LockedAudio};
+use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
 use websocket::client::Url as WebsocketUrl;
@@ -152,7 +153,8 @@ impl Connection {
         info!("[Voice] Connected to: {}", info.endpoint);
 
         // Encode for Discord in Stereo, as required.
-        let encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Stereo, CodingMode::Audio)?;
+        let mut encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Stereo, CodingMode::Audio)?;
+        encoder.set_bitrate(Bitrate::Bits(DEFAULT_BITRATE))?;
         let soft_clip = SoftClip::new(Channels::Stereo);
 
         // Per discord dev team's current recommendations:
@@ -184,11 +186,20 @@ impl Connection {
     pub fn cycle(&mut self,
                  sources: &mut Vec<LockedAudio>,
                  receiver: &mut Option<Box<AudioReceiver>>,
-                 audio_timer: &mut Timer)
+                 audio_timer: &mut Timer,
+                 bitrate: Bitrate)
                  -> Result<()> {
+        // We need to actually reserve enough space for the desired bitrate.
+        let size = match bitrate {
+            // If user specified, we can calculate. 20ms means 50fps.
+            Bitrate::Bits(b) => b.abs()/50,
+            // Otherwise, just have a lot preallocated.
+            _ => 5120,
+        } + 16;
+
         let mut buffer = [0i16; 960 * 2];
         let mut mix_buffer = [0f32; 960 * 2];
-        let mut packet = [0u8; 512];
+        let mut packet = vec![0u8; size as usize].into_boxed_slice();
         let mut nonce = secretbox::Nonce([0; 24]);
 
         if let Some(receiver) = receiver.as_mut() {
@@ -272,6 +283,13 @@ impl Connection {
             self.udp.send_to(&bytes, self.destination)?;
         }
 
+        // Reconfigure encoder bitrate.
+        // From my testing, it seemed like this needed to be set every cycle.
+        // -- FelixMCFelix
+        match self.encoder.set_bitrate(bitrate) {
+            Ok(_) => {},
+            Err(e) => {println!("Bitrate set unsuccessfully: {:?}", e);},
+        }
 
         let mut opus_frame = Vec::new();
 
@@ -388,7 +406,7 @@ impl Connection {
     }
 
     fn prep_packet(&mut self,
-                   packet: &mut [u8; 512],
+                   packet: &mut [u8],
                    buffer: [f32; 1920],
                    opus_frame: &[u8],
                    mut nonce: Nonce)
