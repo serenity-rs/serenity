@@ -111,8 +111,14 @@ enum_number!(
         Speaking = 5,
         /// Heartbeat ACK, received by the client to show the server's receipt of a heartbeat.
         HeartbeatAck = 6,
-        /// Used to determin how often the client must send a heartbeat.
+        /// Sent after a disconnect to attempt to resume a session.
+        Resume = 7,
+        /// Used to determine how often the client must send a heartbeat.
         Hello = 8,
+        /// Sent by the server if a session coulkd successfully be resumed.
+        Resumed = 9,
+        /// Message indicating that another user has disconnected from the voice channel.
+        ClientDisconnect = 13,
     }
 );
 
@@ -126,7 +132,10 @@ impl VoiceOpCode {
             VoiceOpCode::SessionDescription => 4,
             VoiceOpCode::Speaking => 5,
             VoiceOpCode::HeartbeatAck => 6,
+            VoiceOpCode::Resume => 7,
             VoiceOpCode::Hello => 8,
+            VoiceOpCode::Resumed => 9,
+            VoiceOpCode::ClientDisconnect => 13,
         }
     }
 }
