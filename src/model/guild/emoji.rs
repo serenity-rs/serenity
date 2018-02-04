@@ -1,16 +1,17 @@
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 use super::super::id::{EmojiId, RoleId};
+use super::super::WrappedClient;
 
+#[cfg(feature = "cache")]
+use futures::{Future, future};
 #[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
-#[cfg(all(feature = "cache", feature = "model"))]
-use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::super::ModelError;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::super::id::GuildId;
-#[cfg(all(feature = "cache", feature = "model"))]
-use {CACHE, http};
+#[cfg(feature = "cache")]
+use ::FutureResult;
 
 /// Represents a custom guild emoji, which can either be created using the API,
 /// or via an integration. Emojis created using the API only work within the
@@ -37,6 +38,8 @@ pub struct Emoji {
     ///
     /// [`Role`]: struct.Role.html
     pub roles: Vec<RoleId>,
+    #[serde(skip)]
+    pub(crate) client: WrappedClient,
 }
 
 #[cfg(feature = "model")]
@@ -73,11 +76,15 @@ impl Emoji {
     /// }
     /// ```
     #[cfg(feature = "cache")]
-    pub fn delete(&self) -> Result<()> {
-        match self.find_guild_id() {
-            Some(guild_id) => http::delete_emoji(guild_id.0, self.id.0),
-            None => Err(Error::Model(ModelError::ItemMissing)),
-        }
+    pub fn delete(&self) -> FutureResult<()> {
+        let guild_id = match self.find_guild_id() {
+            Some(guild_id) => guild_id,
+            None => return Box::new(future::err(Error::Model(
+                ModelError::ItemMissing,
+            ))),
+        };
+
+        ftryopt!(self.client).http.delete_emoji(guild_id.0, self.id.0)
     }
 
     /// Edits the emoji by updating it with a new name.
@@ -110,24 +117,16 @@ impl Emoji {
     /// assert_eq!(emoji.name, "blobuwu");
     /// ```
     #[cfg(feature = "cache")]
-    pub fn edit(&mut self, name: &str) -> Result<()> {
-        match self.find_guild_id() {
-            Some(guild_id) => {
-                let map = json!({
-                    "name": name,
-                });
+    pub fn edit<'a>(&'a mut self, name: &'a str)
+        -> Box<Future<Item = Emoji, Error = Error> + 'a> {
+        let guild_id = match self.find_guild_id() {
+            Some(guild_id) => guild_id,
+            None => return Box::new(future::err(Error::Model(
+                ModelError::ItemMissing,
+            ))),
+        };
 
-                match http::edit_emoji(guild_id.0, self.id.0, &map) {
-                    Ok(emoji) => {
-                        mem::replace(self, emoji);
-
-                        Ok(())
-                    },
-                    Err(why) => Err(why),
-                }
-            },
-            None => Err(Error::Model(ModelError::ItemMissing)),
-        }
+        ftryopt!(self.client).http.edit_emoji(guild_id.0, self.id.0, name)
     }
 
     /// Finds the [`Guild`] that owns the emoji by looking through the Cache.
@@ -158,8 +157,8 @@ impl Emoji {
     /// ```
     #[cfg(feature = "cache")]
     pub fn find_guild_id(&self) -> Option<GuildId> {
-        for guild in CACHE.read().guilds.values() {
-            let guild = guild.read();
+        for guild in self.client.as_ref()?.cache.borrow().guilds.values() {
+            let guild = guild.borrow();
 
             if guild.emojis.contains_key(&self.id) {
                 return Some(guild.id);

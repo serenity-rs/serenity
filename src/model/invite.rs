@@ -1,16 +1,13 @@
 //! Models for server and channel invites.
 
 use chrono::{DateTime, FixedOffset};
+use futures::future;
 use super::prelude::*;
+use super::WrappedClient;
+use ::FutureResult;
 
-#[cfg(feature = "model")]
-use builder::CreateInvite;
-#[cfg(feature = "model")]
-use internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
-use super::{Permissions, utils as model_utils};
-#[cfg(feature = "model")]
-use {http, utils};
+use super::Permissions;
 
 /// Information about an invite code.
 ///
@@ -40,46 +37,12 @@ pub struct Invite {
     /// a representation of the minimal amount of information needed about the
     /// [`Guild`] being invited to.
     pub guild: InviteGuild,
+    #[serde(skip)]
+    pub(crate) client: WrappedClient,
 }
 
 #[cfg(feature = "model")]
 impl Invite {
-    /// Creates an invite for a [`GuildChannel`], providing a builder so that
-    /// fields may optionally be set.
-    ///
-    /// See the documentation for the [`CreateInvite`] builder for information
-    /// on how to use this and the default values that it provides.
-    ///
-    /// Requires the [Create Invite] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have the required [permission].
-    ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`CreateInvite`]: ../builder/struct.CreateInvite.html
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [Create Invite]: permissions/constant.CREATE_INVITE.html
-    /// [permission]: permissions/index.html
-    pub fn create<C, F>(channel_id: C, f: F) -> Result<RichInvite>
-        where C: Into<ChannelId>, F: FnOnce(CreateInvite) -> CreateInvite {
-        let channel_id = channel_id.into();
-
-        #[cfg(feature = "cache")]
-        {
-            let req = Permissions::CREATE_INVITE;
-
-            if !model_utils::user_has_perms(channel_id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
-            }
-        }
-
-        let map = utils::vecmap_to_json_map(f(CreateInvite::default()).0);
-
-        http::create_invite(channel_id.0, &map)
-    }
-
     /// Deletes the invite.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
@@ -92,30 +55,23 @@ impl Invite {
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     /// [permission]: permissions/index.html
-    pub fn delete(&self) -> Result<Invite> {
+    pub fn delete(&self) -> FutureResult<Invite> {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
+            let cache = ftry!(client.cache.try_borrow());
+
             let req = Permissions::MANAGE_GUILD;
 
-            if !model_utils::user_has_perms(self.channel.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+            if !ftry!(cache.user_has_perms(self.channel.id, req)) {
+                return Box::new(future::err(Error::Model(
+                    ModelError::InvalidPermissions(req),
+                )));
             }
         }
 
-        http::delete_invite(&self.code)
-    }
-
-    /// Gets the information about an invite.
-    #[allow(unused_mut)]
-    pub fn get(code: &str, stats: bool) -> Result<Invite> {
-        let mut invite = code;
-
-        #[cfg(feature = "utils")]
-        {
-            invite = ::utils::parse_invite(invite);
-        }
-
-        http::get_invite(invite, stats)
+        ftryopt!(self.client).http.delete_invite(&self.code)
     }
 
     /// Returns a URL to use for the invite.
@@ -177,20 +133,6 @@ impl InviteGuild {
     /// When the cache is enabled this will automatically retrieve the total
     /// number of shards.
     ///
-    /// **Note**: When the cache is enabled, this function unlocks the cache to
-    /// retrieve the total number of shards in use. If you already have the
-    /// total, consider using [`utils::shard_id`].
-    ///
-    /// [`utils::shard_id`]: ../utils/fn.shard_id.html
-    #[cfg(all(feature = "cache", feature = "utils"))]
-    #[inline]
-    pub fn shard_id(&self) -> u64 { self.id.shard_id() }
-
-    /// Returns the Id of the shard associated with the guild.
-    ///
-    /// When the cache is enabled this will automatically retrieve the total
-    /// number of shards.
-    ///
     /// When the cache is not enabled, the total number of shards being used
     /// will need to be passed.
     ///
@@ -206,9 +148,11 @@ impl InviteGuild {
     ///
     /// assert_eq!(guild.shard_id(17), 7);
     /// ```
-    #[cfg(all(feature = "utils", not(feature = "cache")))]
+    #[cfg(feature = "utils")]
     #[inline]
-    pub fn shard_id(&self, shard_count: u64) -> u64 { self.id.shard_id(shard_count) }
+    pub fn shard_id(&self, shard_count: u64) -> u64 {
+        self.id.shard_id(shard_count)
+    }
 }
 
 /// Detailed information about an invite.
@@ -250,6 +194,8 @@ pub struct RichInvite {
     pub temporary: bool,
     /// The amount of times that an invite has been used.
     pub uses: u64,
+    #[serde(skip)]
+    pub(crate) client: WrappedClient,
 }
 
 #[cfg(feature = "model")]
@@ -271,17 +217,23 @@ impl RichInvite {
     /// [`http::delete_invite`]: ../http/fn.delete_invite.html
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     /// [permission]: permissions/index.html
-    pub fn delete(&self) -> Result<Invite> {
+    pub fn delete(&self) -> FutureResult<Invite> {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
+            let cache = ftry!(client.cache.try_borrow());
+
             let req = Permissions::MANAGE_GUILD;
 
-            if !model_utils::user_has_perms(self.channel.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+            if !ftry!(cache.user_has_perms(self.channel.id, req)) {
+                return Box::new(future::err(Error::Model(
+                    ModelError::InvalidPermissions(req),
+                )));
             }
         }
 
-        http::delete_invite(&self.code)
+        ftryopt!(self.client).http.delete_invite(&self.code)
     }
 
     /// Returns a URL to use for the invite.

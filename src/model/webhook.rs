@@ -1,18 +1,17 @@
 //! Webhook model and implementations.
 
+use futures::Future;
 use super::id::{ChannelId, GuildId, WebhookId};
 use super::user::User;
+use super::WrappedClient;
+use ::FutureResult;
 
 #[cfg(feature = "model")]
 use builder::ExecuteWebhook;
 #[cfg(feature = "model")]
 use internal::prelude::*;
 #[cfg(feature = "model")]
-use std::mem;
-#[cfg(feature = "model")]
 use super::channel::Message;
-#[cfg(feature = "model")]
-use {http, utils};
 
 /// A representation of a webhook, which is a low-effort way to post messages to
 /// channels. They do not necessarily require a bot user or authentication to
@@ -45,6 +44,8 @@ pub struct Webhook {
     ///
     /// **Note**: This is not received when getting a webhook by its token.
     pub user: Option<User>,
+    #[serde(skip)]
+    pub(crate) client: WrappedClient,
 }
 
 #[cfg(feature = "model")]
@@ -56,7 +57,13 @@ impl Webhook {
     ///
     /// [`http::delete_webhook_with_token`]: ../http/fn.delete_webhook_with_token.html
     #[inline]
-    pub fn delete(&self) -> Result<()> { http::delete_webhook_with_token(self.id.0, &self.token) }
+    pub fn delete(&self) -> FutureResult<()> {
+        let done = ftryopt!(self.client)
+            .http
+            .delete_webhook_with_token(self.id.0, &self.token);
+
+        Box::new(done)
+    }
 
     ///
     /// Edits the webhook in-place. All fields are optional.
@@ -104,36 +111,13 @@ impl Webhook {
     ///
     /// [`http::edit_webhook`]: ../http/fn.edit_webhook.html
     /// [`http::edit_webhook_with_token`]: ../http/fn.edit_webhook_with_token.html
-    pub fn edit(&mut self, name: Option<&str>, avatar: Option<&str>) -> Result<()> {
-        if name.is_none() && avatar.is_none() {
-            return Ok(());
-        }
+    pub fn edit(&mut self, name: Option<&str>, avatar: Option<&str>)
+        -> Box<Future<Item = Webhook, Error = Error>> {
+        let done = ftryopt!(self.client)
+            .http
+            .edit_webhook_with_token(self.id.0, &self.token, name, avatar);
 
-        let mut map = Map::new();
-
-        if let Some(avatar) = avatar {
-            map.insert(
-                "avatar".to_string(),
-                if avatar.is_empty() {
-                    Value::Null
-                } else {
-                    Value::String(avatar.to_string())
-                },
-            );
-        }
-
-        if let Some(name) = name {
-            map.insert("name".to_string(), Value::String(name.to_string()));
-        }
-
-        match http::edit_webhook_with_token(self.id.0, &self.token, &map) {
-            Ok(replacement) => {
-                mem::replace(self, replacement);
-
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        Box::new(done)
     }
 
     /// Executes a webhook with the fields set via the given builder.
@@ -184,41 +168,15 @@ impl Webhook {
     ///     .expect("Error executing");
     /// ```
     #[inline]
-    pub fn execute<F: FnOnce(ExecuteWebhook) -> ExecuteWebhook>(&self,
-                                                                wait: bool,
-                                                                f: F)
-                                                                -> Result<Option<Message>> {
-        let map = utils::vecmap_to_json_map(f(ExecuteWebhook::default()).0);
+    pub fn execute<'a, F: FnOnce(ExecuteWebhook) -> ExecuteWebhook>(
+        &'a self,
+        wait: bool,
+        f: F,
+    ) -> Box<Future<Item = Option<Message>, Error = Error> + 'a> {
+        let done = ftryopt!(self.client)
+            .http
+            .execute_webhook(self.id.0, &self.token, wait, f);
 
-        http::execute_webhook(self.id.0, &self.token, wait, &map)
+        Box::new(done)
     }
-
-    /// Retrieves the latest information about the webhook, editing the
-    /// webhook in-place.
-    ///
-    /// As this calls the [`http::get_webhook_with_token`] function,
-    /// authentication is not required.
-    ///
-    /// [`http::get_webhook_with_token`]: ../http/fn.get_webhook_with_token.html
-    pub fn refresh(&mut self) -> Result<()> {
-        match http::get_webhook_with_token(self.id.0, &self.token) {
-            Ok(replacement) => {
-                let _ = mem::replace(self, replacement);
-
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
-    }
-}
-
-#[cfg(feature = "model")]
-impl WebhookId {
-    /// Retrieves the webhook by the Id.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
-    #[inline]
-    pub fn get(&self) -> Result<Webhook> { http::get_webhook(self.0) }
 }

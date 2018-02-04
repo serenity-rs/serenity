@@ -1,5 +1,10 @@
+use futures::{Future, future};
 use model::prelude::*;
+use std::cell::RefCell;
+use std::rc::Rc;
 use super::super::utils::{deserialize_emojis, deserialize_roles};
+use super::super::WrappedClient;
+use ::FutureResult;
 
 #[cfg(feature = "model")]
 use builder::{EditGuild, EditMember, EditRole};
@@ -28,9 +33,13 @@ pub struct PartialGuild {
     pub name: String,
     pub owner_id: UserId,
     pub region: String,
-    #[serde(deserialize_with = "deserialize_roles")] pub roles: HashMap<RoleId, Role>,
+    #[serde(deserialize_with = "deserialize_roles",
+            serialize_with = "serialize_gen_rc_map")]
+    pub roles: HashMap<RoleId, Rc<RefCell<Role>>>,
     pub splash: Option<String>,
     pub verification_level: VerificationLevel,
+    #[serde(skip)]
+    pub(crate) client: WrappedClient,
 }
 
 #[cfg(feature = "model")]
@@ -59,14 +68,21 @@ impl PartialGuild {
     /// enum.ModelError.html#variant.DeleteMessageDaysAmount
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8) -> Result<()> {
+    // todo: add ban reason
+    pub fn ban<U: Into<UserId>>(&self, user_id: U, delete_message_days: u8)
+        -> FutureResult<()> {
         if delete_message_days > 7 {
-            return Err(Error::Model(
+            return Box::new(future::err(Error::Model(
                 ModelError::DeleteMessageDaysAmount(delete_message_days),
-            ));
+            )));
         }
 
-        self.id.ban(user, &delete_message_days)
+        Box::new(ftryopt!(self.client).http.ban_user(
+            self.id.0,
+            user_id.into().0,
+            delete_message_days,
+            "",
+        ))
     }
 
     /// Gets a list of the guild's bans.
@@ -75,13 +91,30 @@ impl PartialGuild {
     ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[inline]
-    pub fn bans(&self) -> Result<Vec<Ban>> { self.id.bans() }
+    pub fn bans(&self) -> FutureResult<Vec<Ban>> {
+        ftryopt!(self.client).http.get_bans(self.id.0)
+    }
 
     /// Gets all of the guild's channels over the REST API.
     ///
     /// [`Guild`]: struct.Guild.html
     #[inline]
-    pub fn channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> { self.id.channels() }
+    pub fn channels(&self) -> FutureResult<HashMap<ChannelId, GuildChannel>> {
+        let done = ftryopt!(self.client)
+            .http
+            .get_channels(self.id.0)
+            .map(|channels| {
+                let mut map = HashMap::with_capacity(channels.len());
+
+                for channel in channels {
+                    map.insert(channel.id, channel);
+                }
+
+                map
+            });
+
+        Box::new(done)
+    }
 
     /// Creates a [`GuildChannel`] in the guild.
     ///
@@ -103,9 +136,14 @@ impl PartialGuild {
     /// [`http::create_channel`]: ../http/fn.create_channel.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
-    pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
-        where C: Into<Option<ChannelId>> {
-        self.id.create_channel(name, kind, category)
+    pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C)
+        -> FutureResult<GuildChannel> where C: Into<Option<ChannelId>> {
+        ftryopt!(self.client).http.create_channel(
+            self.id.0,
+            name,
+            kind,
+            category.into().map(|x| x.0),
+        )
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
@@ -126,8 +164,8 @@ impl PartialGuild {
     /// [`utils::read_image`]: ../utils/fn.read_image.html
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     #[inline]
-    pub fn create_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
-        self.id.create_emoji(name, image)
+    pub fn create_emoji(&self, name: &str, image: &str) -> FutureResult<Emoji> {
+        ftryopt!(self.client).http.create_emoji(self.id.0, name, image)
     }
 
     /// Creates an integration for the guild.
@@ -136,9 +174,13 @@ impl PartialGuild {
     ///
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
-    pub fn create_integration<I>(&self, integration_id: I, kind: &str) -> Result<()>
-        where I: Into<IntegrationId> {
-        self.id.create_integration(integration_id, kind)
+    pub fn create_integration<I>(&self, integration_id: I, kind: &str)
+        -> FutureResult<()> where I: Into<IntegrationId> {
+        ftryopt!(self.client).http.create_guild_integration(
+            self.id.0,
+            integration_id.into().0,
+            kind,
+        )
     }
 
     /// Creates a new role in the guild with the data set, if any.
@@ -156,8 +198,9 @@ impl PartialGuild {
     /// [`Guild::create_role`]: struct.Guild.html#method.create_role
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
-    pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
-        self.id.create_role(f)
+    pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F)
+        -> FutureResult<Role> {
+        ftryopt!(self.client).http.create_role(self.id.0, f)
     }
 
     /// Deletes the current guild if the current user is the owner of the
@@ -165,7 +208,9 @@ impl PartialGuild {
     ///
     /// **Note**: Requires the current user to be the owner of the guild.
     #[inline]
-    pub fn delete(&self) -> Result<PartialGuild> { self.id.delete() }
+    pub fn delete(&self) -> FutureResult<PartialGuild> {
+        ftryopt!(self.client).http.delete_guild(self.id.0)
+    }
 
     /// Deletes an [`Emoji`] from the guild.
     ///
@@ -174,8 +219,9 @@ impl PartialGuild {
     /// [`Emoji`]: struct.Emoji.html
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     #[inline]
-    pub fn delete_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<()> {
-        self.id.delete_emoji(emoji_id)
+    pub fn delete_emoji<E: Into<EmojiId>>(&self, emoji_id: E)
+        -> FutureResult<()> {
+        ftryopt!(self.client).http.delete_emoji(self.id.0, emoji_id.into().0)
     }
 
     /// Deletes an integration by Id from the guild.
@@ -184,8 +230,12 @@ impl PartialGuild {
     ///
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
-    pub fn delete_integration<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
-        self.id.delete_integration(integration_id)
+    pub fn delete_integration<I: Into<IntegrationId>>(&self, integration_id: I)
+        -> FutureResult<()> {
+        ftryopt!(self.client).http.delete_guild_integration(
+            self.id.0,
+            integration_id.into().0,
+        )
     }
 
     /// Deletes a [`Role`] by Id from the guild.
@@ -199,8 +249,10 @@ impl PartialGuild {
     /// [`Role::delete`]: struct.Role.html#method.delete
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
-    pub fn delete_role<R: Into<RoleId>>(&self, role_id: R) -> Result<()> {
-        self.id.delete_role(role_id)
+    pub fn delete_role<R: Into<RoleId>>(&self, role_id: R) -> FutureResult<()> {
+        let role_id = role_id.into().0;
+
+        ftryopt!(self.client).http.delete_role(self.id.0, role_id)
     }
 
     /// Edits the current guild with new data where specified.
@@ -209,28 +261,9 @@ impl PartialGuild {
     /// permission.
     ///
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(EditGuild) -> EditGuild {
-        match self.id.edit(f) {
-            Ok(guild) => {
-                self.afk_channel_id = guild.afk_channel_id;
-                self.afk_timeout = guild.afk_timeout;
-                self.default_message_notifications = guild.default_message_notifications;
-                self.emojis = guild.emojis;
-                self.features = guild.features;
-                self.icon = guild.icon;
-                self.mfa_level = guild.mfa_level;
-                self.name = guild.name;
-                self.owner_id = guild.owner_id;
-                self.region = guild.region;
-                self.roles = guild.roles;
-                self.splash = guild.splash;
-                self.verification_level = guild.verification_level;
-
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+    pub fn edit<'a, F: FnOnce(EditGuild) -> EditGuild>(&self, f: F)
+        -> FutureResult<PartialGuild> {
+        ftryopt!(self.client).http.edit_guild(self.id.0, f)
     }
 
     /// Edits an [`Emoji`]'s name in the guild.
@@ -244,8 +277,11 @@ impl PartialGuild {
     /// [`Emoji::edit`]: struct.Emoji.html#method.edit
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     #[inline]
-    pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str) -> Result<Emoji> {
-        self.id.edit_emoji(emoji_id, name)
+    pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str)
+        -> FutureResult<Emoji> {
+        ftryopt!(self.client)
+            .http
+            .edit_emoji(self.id.0, emoji_id.into().0, name)
     }
 
     /// Edits the properties of member of the guild, such as muting or
@@ -264,9 +300,9 @@ impl PartialGuild {
     /// GuildId(7).edit_member(user_id, |m| m.mute(true).roles(&vec![role_id]));
     /// ```
     #[inline]
-    pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
+    pub fn edit_member<F, U>(&self, user_id: U, f: F) -> FutureResult<()>
         where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
-        self.id.edit_member(user_id, f)
+        ftryopt!(self.client).http.edit_member(self.id.0, user_id.into().0, f)
     }
 
     /// Edits the current user's nickname for the guild.
@@ -284,15 +320,10 @@ impl PartialGuild {
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
     #[inline]
-    pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
-        self.id.edit_nickname(new_nickname)
+    pub fn edit_nickname(&self, new_nickname: Option<&str>)
+        -> FutureResult<()> {
+        ftryopt!(self.client).http.edit_nickname(self.id.0, new_nickname)
     }
-
-    /// Gets a partial amount of guild data by its Id.
-    ///
-    /// Requires that the current user be in the guild.
-    #[inline]
-    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> { guild_id.into().get() }
 
     /// Kicks a [`Member`] from the guild.
     ///
@@ -301,7 +332,9 @@ impl PartialGuild {
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     #[inline]
-    pub fn kick<U: Into<UserId>>(&self, user_id: U) -> Result<()> { self.id.kick(user_id) }
+    pub fn kick<U: Into<UserId>>(&self, user_id: U) -> FutureResult<()> {
+        ftryopt!(self.client).http.kick_member(self.id.0, user_id.into().0)
+    }
 
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
@@ -314,7 +347,9 @@ impl PartialGuild {
     ///
     /// This performs a request over the REST API.
     #[inline]
-    pub fn integrations(&self) -> Result<Vec<Integration>> { self.id.integrations() }
+    pub fn integrations(&self) -> FutureResult<Vec<Integration>> {
+        ftryopt!(self.client).http.get_guild_integrations(self.id.0)
+    }
 
     /// Gets all of the guild's invites.
     ///
@@ -322,17 +357,23 @@ impl PartialGuild {
     ///
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
-    pub fn invites(&self) -> Result<Vec<RichInvite>> { self.id.invites() }
+    pub fn invites(&self) -> FutureResult<Vec<RichInvite>> {
+        ftryopt!(self.client).http.get_guild_invites(self.id.0)
+    }
 
     /// Leaves the guild.
     #[inline]
-    pub fn leave(&self) -> Result<()> { self.id.leave() }
+    pub fn leave(&self) -> FutureResult<()> {
+        ftryopt!(self.client).http.leave_guild(self.id.0)
+    }
 
     /// Gets a user's [`Member`] for the guild by Id.
     ///
     /// [`Guild`]: struct.Guild.html
     /// [`Member`]: struct.Member.html
-    pub fn member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> { self.id.member(user_id) }
+    pub fn member<U: Into<UserId>>(&self, user_id: U) -> FutureResult<Member> {
+        ftryopt!(self.client).http.get_member(self.id.0, user_id.into().0)
+    }
 
     /// Gets a list of the guild's members.
     ///
@@ -341,9 +382,11 @@ impl PartialGuild {
     /// [`User`]'s Id.
     ///
     /// [`User`]: struct.User.html
-    pub fn members<U>(&self, limit: Option<u64>, after: Option<U>) -> Result<Vec<Member>>
-        where U: Into<UserId> {
-        self.id.members(limit, after)
+    pub fn members<U: Into<UserId>>(&self, limit: Option<u64>, after: Option<U>)
+        -> FutureResult<Vec<Member>> {
+        let after = after.map(Into::into).map(|x| x.0);
+
+        ftryopt!(self.client).http.get_guild_members(self.id.0, limit, after)
     }
 
     /// Moves a member to a specific voice channel.
@@ -352,9 +395,12 @@ impl PartialGuild {
     ///
     /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
     #[inline]
-    pub fn move_member<C, U>(&self, user_id: U, channel_id: C) -> Result<()>
-        where C: Into<ChannelId>, U: Into<UserId> {
-        self.id.move_member(user_id, channel_id)
+    pub fn move_member<C, U>(&self, user_id: U, channel_id: C)
+        -> FutureResult<()> where C: Into<ChannelId>, U: Into<UserId> {
+        ftryopt!(self.client)
+            .http
+            .edit_member(self.id.0, user_id.into().0, |f| f
+                .voice_channel(channel_id.into().0))
     }
 
     /// Gets the number of [`Member`]s that would be pruned with the given
@@ -365,21 +411,9 @@ impl PartialGuild {
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
     #[inline]
-    pub fn prune_count(&self, days: u16) -> Result<GuildPrune> { self.id.prune_count(days) }
-
-    /// Returns the Id of the shard associated with the guild.
-    ///
-    /// When the cache is enabled this will automatically retrieve the total
-    /// number of shards.
-    ///
-    /// **Note**: When the cache is enabled, this function unlocks the cache to
-    /// retrieve the total number of shards in use. If you already have the
-    /// total, consider using [`utils::shard_id`].
-    ///
-    /// [`utils::shard_id`]: ../utils/fn.shard_id.html
-    #[cfg(all(feature = "cache", feature = "utils"))]
-    #[inline]
-    pub fn shard_id(&self) -> u64 { self.id.shard_id() }
+    pub fn prune_count(&self, days: u16) -> FutureResult<GuildPrune> {
+        ftryopt!(self.client).http.get_guild_prune_count(self.id.0, days)
+    }
 
     /// Returns the Id of the shard associated with the guild.
     ///
@@ -401,7 +435,7 @@ impl PartialGuild {
     ///
     /// assert_eq!(guild.shard_id(17), 7);
     /// ```
-    #[cfg(all(feature = "utils", not(feature = "cache")))]
+    #[cfg(feature = "utils")]
     #[inline]
     pub fn shard_id(&self, shard_count: u64) -> u64 { self.id.shard_id(shard_count) }
 
@@ -418,8 +452,11 @@ impl PartialGuild {
     ///
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
-    pub fn start_integration_sync<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
-        self.id.start_integration_sync(integration_id)
+    pub fn start_integration_sync<I>(&self, integration_id: I)
+        -> FutureResult<()> where I: Into<IntegrationId> {
+        ftryopt!(self.client)
+            .http
+            .start_integration_sync(self.id.0, integration_id.into().0)
     }
 
     /// Unbans a [`User`] from the guild.
@@ -429,7 +466,9 @@ impl PartialGuild {
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[inline]
-    pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> { self.id.unban(user_id) }
+    pub fn unban<U: Into<UserId>>(&self, user_id: U) -> FutureResult<()> {
+        ftryopt!(self.client).http.remove_ban(self.id.0, user_id.into().0)
+    }
 
     /// Retrieves the guild's webhooks.
     ///
@@ -437,7 +476,9 @@ impl PartialGuild {
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[inline]
-    pub fn webhooks(&self) -> Result<Vec<Webhook>> { self.id.webhooks() }
+    pub fn webhooks(&self) -> FutureResult<Vec<Webhook>> {
+        ftryopt!(self.client).http.get_guild_webhooks(self.id.0)
+    }
 
     /// Obtain a reference to a role by its name.
     ///
@@ -471,7 +512,7 @@ impl PartialGuild {
     ///
     /// client.start().unwrap();
     /// ```
-    pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
-        self.roles.values().find(|role| role_name == role.name)
+    pub fn role_by_name(&self, role_name: &str) -> Option<&Rc<RefCell<Role>>> {
+        self.roles.values().find(|role| role_name == role.borrow().name)
     }
 }

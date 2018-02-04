@@ -1,7 +1,10 @@
-use model::prelude::*;
 use chrono::{DateTime, FixedOffset};
-use std::fmt::{Display, Formatter, Result as FmtResult};
-use super::deserialize_sync_user;
+use futures::future;
+use model::prelude::*;
+use std::cell::RefCell;
+use super::super::WrappedClient;
+use super::deserialize_user;
+use ::FutureResult;
 
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
 use builder::EditMember;
@@ -11,8 +14,6 @@ use internal::prelude::*;
 use std::borrow::Cow;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use utils::Colour;
-#[cfg(all(feature = "cache", feature = "model"))]
-use {CACHE, http, utils};
 
 /// A trait for allowing both u8 or &str or (u8, &str) to be passed into the `ban` methods in `Guild` and `Member`.
 pub trait BanOptions {
@@ -66,60 +67,53 @@ pub struct Member {
     /// Vector of Ids of [`Role`]s given to the member.
     pub roles: Vec<RoleId>,
     /// Attached User struct.
-    #[serde(deserialize_with = "deserialize_sync_user",
-            serialize_with = "serialize_sync_user")]
-    pub user: Arc<RwLock<User>>,
+    #[serde(deserialize_with = "deserialize_user",
+            serialize_with = "serialize_user")]
+    pub user: Rc<RefCell<User>>,
+    #[serde(skip)]
+    pub(crate) client: WrappedClient,
 }
 
 #[cfg(feature = "model")]
 impl Member {
-    /// Adds a [`Role`] to the member, editing its roles in-place if the request
-    /// was successful.
+    /// Adds a [`Role`] to the member.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature = "cache")]
-    pub fn add_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
+    pub fn add_role<R: Into<RoleId>>(&mut self, role_id: R)
+        -> FutureResult<()> {
         let role_id = role_id.into();
 
         if self.roles.contains(&role_id) {
-            return Ok(());
+            return Box::new(future::ok(()));
         }
 
-        match http::add_member_role(self.guild_id.0, self.user.read().id.0, role_id.0) {
-            Ok(()) => {
-                self.roles.push(role_id);
-
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        ftryopt!(self.client).http.add_member_role(
+            self.guild_id.0,
+            self.user.borrow().id.0,
+            role_id.0,
+        )
     }
 
-    /// Adds one or multiple [`Role`]s to the member, editing
-    /// its roles in-place if the request was successful.
+    /// Adds one or multiple [`Role`]s to the member.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature = "cache")]
-    pub fn add_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
-        self.roles.extend_from_slice(role_ids);
+    pub fn add_roles(&mut self, role_ids: &[RoleId]) -> FutureResult<()> {
+        let mut roles = self.roles.clone();
+        roles.extend(role_ids);
 
-        let builder = EditMember::default().roles(&self.roles);
-        let map = utils::vecmap_to_json_map(builder.0);
-
-        match http::edit_member(self.guild_id.0, self.user.read().id.0, &map) {
-            Ok(()) => Ok(()),
-            Err(why) => {
-                self.roles.retain(|r| !role_ids.contains(r));
-
-                Err(why)
-            },
-        }
+        ftryopt!(self.client).http.edit_member(
+            self.guild_id.0,
+            self.user.borrow().id.0,
+            |f| f.roles(roles),
+        )
     }
 
     /// Ban the member from its guild, deleting the last X number of
@@ -136,21 +130,27 @@ impl Member {
     ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature = "cache")]
-    pub fn ban<BO: BanOptions>(&self, ban_options: &BO) -> Result<()> {
+    pub fn ban<BO: BanOptions>(&self, ban_options: &BO) -> FutureResult<()> {
         let dmd = ban_options.dmd();
+
         if dmd > 7 {
-            return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
+            return Box::new(future::err(Error::Model(
+                ModelError::DeleteMessageDaysAmount(dmd),
+            )));
         }
 
         let reason = ban_options.reason();
 
         if reason.len() > 512 {
-            return Err(Error::ExceededLimit(reason.to_string(), 512));
+            return Box::new(future::err(Error::ExceededLimit(
+                reason.to_string(),
+                512,
+            )));
         }
 
-        http::ban_user(
+        ftryopt!(self.client).http.ban_user(
             self.guild_id.0,
-            self.user.read().id.0,
+            self.user.borrow().id.0,
             dmd,
             &*reason,
         )
@@ -159,38 +159,37 @@ impl Member {
     /// Determines the member's colour.
     #[cfg(all(feature = "cache", feature = "utils"))]
     pub fn colour(&self) -> Option<Colour> {
-        let cache = CACHE.read();
-        let guild = cache.guilds.get(&self.guild_id)?.read();
+        let client = self.client.as_ref()?;
+        let cache = client.cache.try_borrow().ok()?;
+        let guild = cache.guild(self.guild_id)?;
+        let guild = guild.borrow();
 
         let mut roles = self.roles
             .iter()
             .filter_map(|role_id| guild.roles.get(role_id))
-            .collect::<Vec<&Role>>();
+            .collect::<Vec<&Rc<RefCell<Role>>>>();
         roles.sort_by(|a, b| b.cmp(a));
 
         let default = Colour::default();
 
         roles
             .iter()
-            .find(|r| r.colour.0 != default.0)
-            .map(|r| r.colour)
+            .find(|r| r.borrow().colour.0 != default.0)
+            .map(|r| r.borrow().colour)
     }
 
     /// Returns the "default channel" of the guild for the member.
     /// (This returns the first channel that can be read by the member, if there isn't
     /// one returns `None`)
     #[cfg(feature = "cache")]
-    pub fn default_channel(&self) -> Option<Arc<RwLock<GuildChannel>>> {
-        let guild = match self.guild_id.find() {
-            Some(guild) => guild,
-            None => return None,
-        };
-
-        let reader = guild.read();
+    pub fn default_channel(&self) -> Option<Rc<RefCell<GuildChannel>>> {
+        let cache = self.client.as_ref()?.cache.borrow();
+        let guild = cache.guild(self.guild_id)?;
+        let reader = guild.borrow();
 
         for (cid, channel) in &reader.channels {
-            if reader.permissions_in(*cid, self.user.read().id).read_messages() {
-                return Some(Arc::clone(channel));
+            if reader.permissions_in(*cid, self.user.borrow().id).read_messages() {
+                return Some(Rc::clone(channel));
             }
         }
 
@@ -205,17 +204,23 @@ impl Member {
         self.nick
             .as_ref()
             .map(Cow::Borrowed)
-            .unwrap_or_else(|| Cow::Owned(self.user.read().name.clone()))
+            .unwrap_or_else(|| {
+                Cow::Owned(unsafe { (*self.user.as_ptr()).name.clone() })
+            })
     }
 
     /// Returns the DiscordTag of a Member, taking possible nickname into account.
     #[inline]
     pub fn distinct(&self) -> String {
-        format!(
-            "{}#{}",
-            self.display_name(),
-            self.user.read().discriminator
-        )
+        unsafe {
+            let user = &*self.user.as_ptr();
+
+            format!(
+                "{}#{}",
+                self.display_name(),
+                user.discriminator,
+            )
+        }
     }
 
     /// Edits the member with the given data. See [`Guild::edit_member`] for
@@ -227,10 +232,13 @@ impl Member {
     /// [`Guild::edit_member`]: ../model/guild/struct.Guild.html#method.edit_member
     /// [`EditMember`]: ../builder/struct.EditMember.html
     #[cfg(feature = "cache")]
-    pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F) -> Result<()> {
-        let map = utils::vecmap_to_json_map(f(EditMember::default()).0);
-
-        http::edit_member(self.guild_id.0, self.user.read().id.0, &map)
+    pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F)
+        -> FutureResult<()> {
+        ftryopt!(self.client).http.edit_member(
+            self.guild_id.0,
+            self.user.borrow().id.0,
+            f,
+        )
     }
 
     /// Retrieves the ID and position of the member's highest role in the
@@ -249,13 +257,18 @@ impl Member {
     /// guild.
     #[cfg(feature = "cache")]
     pub fn highest_role_info(&self) -> Option<(RoleId, i64)> {
-        let guild = self.guild_id.find()?;
-        let reader = guild.read();
+        let cache = self.client.as_ref()?.cache.try_borrow().ok()?;
+        let guild = cache.guild(self.guild_id)?;
+        let reader = guild.borrow();
 
         let mut highest = None;
 
         for role_id in &self.roles {
-            if let Some(role) = reader.roles.get(&role_id) {
+            let role = reader.roles
+                .get(&role_id)
+                .and_then(|x| x.try_borrow().ok());
+
+            if let Some(role) = role {
                 // Skip this role if this role in iteration has:
                 //
                 // - a position less than the recorded highest
@@ -306,24 +319,30 @@ impl Member {
     /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
-    pub fn kick(&self) -> Result<()> {
+    pub fn kick(&self) -> FutureResult<()> {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
-            let cache = CACHE.read();
+            let cache = ftry!(client.cache.try_borrow());
 
             if let Some(guild) = cache.guilds.get(&self.guild_id) {
                 let req = Permissions::KICK_MEMBERS;
-                let reader = guild.read();
+                let reader = ftry!(guild.try_borrow());
 
                 if !reader.has_perms(req) {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                    return Box::new(future::err(Error::Model(
+                        ModelError::InvalidPermissions(req),
+                    )));
                 }
 
-                reader.check_hierarchy(self.user.read().id)?;
+                ftry!(reader.check_hierarchy(ftry!(self.user.try_borrow()).id));
             }
         }
 
-        self.guild_id.kick(self.user.read().id)
+        let user_id = ftry!(self.user.try_borrow()).id.0;
+
+        ftryopt!(self.client).http.kick_member(self.guild_id.0, user_id)
     }
 
     /// Returns the guild-level permissions for the member.
@@ -348,39 +367,39 @@ impl Member {
     /// [`ModelError::ItemMissing`]: enum.ModelError.html#variant.ItemMissing
     #[cfg(feature = "cache")]
     pub fn permissions(&self) -> Result<Permissions> {
-        let guild = match self.guild_id.find() {
+        let client = self.client.as_ref().ok_or_else(|| {
+            Error::Model(ModelError::ClientNotPresent)
+        })?;
+        let cache = client.cache.try_borrow()?;
+        let guild = match cache.guilds.get(&self.guild_id) {
             Some(guild) => guild,
             None => return Err(From::from(ModelError::GuildNotFound)),
         };
 
-        let reader = guild.read();
+        let guild = guild.try_borrow()?;
 
-        Ok(reader.member_permissions(self.user.read().id))
+        Ok(guild.member_permissions(self.user.try_borrow()?.id))
     }
 
-    /// Removes a [`Role`] from the member, editing its roles in-place if the
-    /// request was successful.
+    /// Removes a [`Role`] from the member.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature = "cache")]
-    pub fn remove_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
+    pub fn remove_role<R: Into<RoleId>>(&mut self, role_id: R) -> FutureResult<()> {
         let role_id = role_id.into();
 
         if !self.roles.contains(&role_id) {
-            return Ok(());
+            return Box::new(future::ok(()));
         }
 
-        match http::remove_member_role(self.guild_id.0, self.user.read().id.0, role_id.0) {
-            Ok(()) => {
-                self.roles.retain(|r| r.0 != role_id.0);
-
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        ftryopt!(self.client).http.remove_member_role(
+            self.guild_id.0,
+            self.user.borrow().id.0,
+            role_id.0,
+        )
     }
 
     /// Removes one or multiple [`Role`]s from the member.
@@ -390,20 +409,15 @@ impl Member {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature = "cache")]
-    pub fn remove_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
-        self.roles.retain(|r| !role_ids.contains(r));
+    pub fn remove_roles(&mut self, role_ids: &[RoleId]) -> FutureResult<()> {
+        let mut roles = self.roles.clone();
+        roles.retain(|r| !role_ids.contains(r));
 
-        let builder = EditMember::default().roles(&self.roles);
-        let map = utils::vecmap_to_json_map(builder.0);
-
-        match http::edit_member(self.guild_id.0, self.user.read().id.0, &map) {
-            Ok(()) => Ok(()),
-            Err(why) => {
-                self.roles.extend_from_slice(role_ids);
-
-                Err(why)
-            },
-        }
+        ftryopt!(self.client).http.edit_member(
+            self.guild_id.0,
+            self.user.borrow().id.0,
+            |f| f.roles(roles),
+        )
     }
 
     /// Retrieves the full role data for the user's roles.
@@ -412,17 +426,29 @@ impl Member {
     ///
     /// If role data can not be found for the member, then `None` is returned.
     #[cfg(feature = "cache")]
-    pub fn roles(&self) -> Option<Vec<Role>> {
-        self
-            .guild_id
-            .find()
-            .map(|g| g
-                .read()
+    pub fn roles(&self) -> Option<Vec<Rc<RefCell<Role>>>> {
+        let client = self.client.as_ref()?;
+        let cache = client.cache.try_borrow().ok()?;
+
+        cache.guilds.get(&self.guild_id).and_then(|guild| {
+            let guild = guild.try_borrow().ok()?;
+
+            let roles = guild
                 .roles
                 .values()
-                .filter(|role| self.roles.contains(&role.id))
+                .filter(|role| {
+                    let role = match role.try_borrow() {
+                        Ok(role) => role,
+                        Err(_) => return false,
+                    };
+
+                    self.roles.contains(&role.id)
+                })
                 .cloned()
-                .collect())
+                .collect();
+
+            Some(roles)
+        })
     }
 
     /// Unbans the [`User`] from the guild.
@@ -438,23 +464,10 @@ impl Member {
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature = "cache")]
-    pub fn unban(&self) -> Result<()> {
-        http::remove_ban(self.guild_id.0, self.user.read().id.0)
-    }
-}
-
-impl Display for Member {
-    /// Mentions the user so that they receive a notification.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// // assumes a `member` has already been bound
-    /// println!("{} is a member!", member);
-    /// ```
-    ///
-    // This is in the format of `<@USER_ID>`.
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        Display::fmt(&self.user.read().mention(), f)
+    pub fn unban(&self) -> FutureResult<()> {
+        ftryopt!(self.client).http.remove_ban(
+            self.guild_id.0,
+            self.user.borrow().id.0,
+        )
     }
 }

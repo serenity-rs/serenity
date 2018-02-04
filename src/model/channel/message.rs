@@ -1,19 +1,20 @@
 //! Models relating to Discord channels.
 
 use chrono::{DateTime, FixedOffset};
+use futures::future;
 use model::prelude::*;
 use serde_json::Value;
+use std::cell::RefCell;
+use std::rc::Rc;
+use super::super::WrappedClient;
+use ::FutureResult;
 
 #[cfg(feature = "model")]
-use builder::{CreateEmbed, EditMessage};
-#[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
+use builder::EditMessage;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 #[cfg(feature = "model")]
-use std::mem;
-#[cfg(feature = "model")]
-use {constants, http, utils as serenity_utils};
+use constants;
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
@@ -65,6 +66,8 @@ pub struct Message {
     pub tts: bool,
     /// The Id of the webhook that sent this message, if one did.
     pub webhook_id: Option<WebhookId>,
+    #[serde(skip)]
+    pub(crate) client: WrappedClient,
 }
 
 #[cfg(feature = "model")]
@@ -111,13 +114,20 @@ impl Message {
     /// # }
     /// ```
     #[cfg(feature = "cache")]
-    #[inline]
-    pub fn channel(&self) -> Option<Channel> { CACHE.read().channel(self.channel_id) }
+    pub fn channel(&self) -> Option<Channel> {
+        self.client.as_ref()?.cache.try_borrow().ok()?.channel(self.channel_id)
+    }
 
     /// A util function for determining whether this message was sent by someone else, or the
     /// bot.
     #[cfg(all(feature = "cache", feature = "utils"))]
-    pub fn is_own(&self) -> bool { self.author.id == CACHE.read().user.id }
+    pub fn is_own(&self) -> Result<bool> {
+        let client = self.client.as_ref().ok_or_else(|| {
+            Error::Model(ModelError::ClientNotPresent)
+        })?;
+
+        Ok(self.author.id == client.cache.try_borrow()?.user.id)
+    }
 
     /// Deletes the message.
     ///
@@ -133,19 +143,24 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`ModelError::InvalidUser`]: enum.ModelError.html#variant.InvalidUser
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    pub fn delete(&self) -> Result<()> {
+    pub fn delete(&self) -> FutureResult<()> {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
+            let cache = ftry!(client.cache.try_borrow());
             let req = Permissions::MANAGE_MESSAGES;
-            let is_author = self.author.id == CACHE.read().user.id;
-            let has_perms = utils::user_has_perms(self.channel_id, req)?;
+            let is_author = self.author.id == cache.user.id;
+            let has_perms = ftry!(cache.user_has_perms(self.channel_id, req));
 
             if !is_author && !has_perms {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                return Box::new(future::err(Error::Model(
+                    ModelError::InvalidPermissions(req),
+                )));
             }
         }
 
-        self.channel_id.delete_message(self.id)
+        client.http.delete_message(self.channel_id.0, self.id.0)
     }
 
     /// Deletes all of the [`Reaction`]s associated with the message.
@@ -161,17 +176,24 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    pub fn delete_reactions(&self) -> Result<()> {
+    pub fn delete_reactions(&self) -> FutureResult<()> {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_MESSAGES;
 
-            if !utils::user_has_perms(self.channel_id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+            if !ftry!(client.cache.borrow().user_has_perms(self.channel_id, req)) {
+                return Box::new(future::err(Error::Model(
+                    ModelError::InvalidPermissions(req),
+                )));
             }
         }
 
-        http::delete_message_reactions(self.channel_id.0, self.id.0)
+        client.http.delete_message_reactions(
+            self.channel_id.0,
+            self.id.0,
+        )
     }
 
     /// Edits this message, replacing the original content with new content.
@@ -206,35 +228,18 @@ impl Message {
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     /// [`EditMessage`]: ../builder/struct.EditMessage.html
     /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
-    pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(EditMessage) -> EditMessage {
+    pub fn edit<F: FnOnce(EditMessage) -> EditMessage>(&self, f: F)
+        -> FutureResult<Message> {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
-            if self.author.id != CACHE.read().user.id {
-                return Err(Error::Model(ModelError::InvalidUser));
+            if self.author.id != ftry!(client.cache.try_borrow()).user.id {
+                return Box::new(future::err(Error::Model(ModelError::InvalidUser)));
             }
         }
 
-        let mut builder = EditMessage::default();
-
-        if !self.content.is_empty() {
-            builder = builder.content(&self.content);
-        }
-
-        if let Some(embed) = self.embeds.get(0) {
-            builder = builder.embed(|_| CreateEmbed::from(embed.clone()));
-        }
-
-        let map = serenity_utils::vecmap_to_json_map(f(builder).0);
-
-        match http::edit_message(self.channel_id.0, self.id.0, &Value::Object(map)) {
-            Ok(edited) => {
-                mem::replace(self, edited);
-
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        ftryopt!(self.client).http.edit_message(self.channel_id.0, self.id.0, f)
     }
 
     pub(crate) fn transform_content(&mut self) {
@@ -275,14 +280,21 @@ impl Message {
             result = result.replace(&u.mention(), &at_distinct);
         }
 
-        // Then replace all role mentions.
-        for id in &self.mention_roles {
-            let mention = id.mention();
+        if let Some(guild) = self.guild() {
+            if let Some(guild) = guild.try_borrow().ok() {
+                // Then replace all role mentions.
+                for id in &self.mention_roles {
+                    let mention = id.mention();
 
-            if let Some(role) = id.find() {
-                result = result.replace(&mention, &format!("@{}", role.name));
-            } else {
-                result = result.replace(&mention, "@deleted-role");
+                    if let Some(role) = guild.roles.get(id).and_then(|r| r.try_borrow().ok()) {
+                        result = result.replace(
+                            &mention,
+                            &format!("@{}", role.name),
+                        );
+                    } else {
+                        result = result.replace(&mention, "@deleted-role");
+                    }
+                }
             }
         }
 
@@ -314,9 +326,15 @@ impl Message {
         reaction_type: R,
         limit: Option<u8>,
         after: U,
-    ) -> Result<Vec<User>> where R: Into<ReactionType>,
-                                 U: Into<Option<UserId>> {
-        self.channel_id.reaction_users(self.id, reaction_type, limit, after)
+    ) -> FutureResult<Vec<User>>
+        where R: Into<ReactionType>, U: Into<Option<UserId>> {
+        ftryopt!(self.client).http.get_reaction_users(
+            self.channel_id.0,
+            self.id.0,
+            &reaction_type.into(),
+            limit,
+            after.into().map(|x| x.0),
+        )
     }
 
     /// Returns the associated `Guild` for the message if one is in the cache.
@@ -328,9 +346,10 @@ impl Message {
     ///
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature = "cache")]
-    pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> {
-        self.guild_id()
-            .and_then(|guild_id| CACHE.read().guild(guild_id))
+    pub fn guild(&self) -> Option<Rc<RefCell<Guild>>> {
+        self.guild_id().and_then(|guild_id| {
+            self.client.as_ref()?.cache.try_borrow().ok()?.guild(guild_id)
+        })
     }
 
     /// Retrieves the Id of the guild that the message was sent in, if sent in
@@ -340,19 +359,25 @@ impl Message {
     /// cache.
     #[cfg(feature = "cache")]
     pub fn guild_id(&self) -> Option<GuildId> {
-        match CACHE.read().channel(self.channel_id) {
-            Some(Channel::Guild(ch)) => Some(ch.read().guild_id),
+        match self.client.as_ref()?.cache.try_borrow().ok()?.channel(self.channel_id) {
+            Some(Channel::Guild(ch)) => Some(ch.borrow().guild_id),
             _ => None,
         }
     }
 
     /// True if message was sent using direct messages.
+    ///
+    /// Returns `false` if a client is not present on the model.
     #[cfg(feature = "cache")]
     pub fn is_private(&self) -> bool {
-        match CACHE.read().channel(self.channel_id) {
-            Some(Channel::Group(_)) | Some(Channel::Private(_)) => true,
-            _ => false,
-        }
+        self.client.as_ref().map(|client| {
+            let cache = client.cache.borrow();
+
+            match cache.channel(self.channel_id) {
+                Some(Channel::Group(_)) | Some(Channel::Private(_)) => true,
+                _ => false,
+            }
+        }).unwrap_or(false)
     }
 
     /// Retrieves a clone of the author's Member instance, if this message was
@@ -364,8 +389,10 @@ impl Message {
     ///
     /// [`Guild::members`]: ../guild/struct.Guild.html#structfield.members
     #[cfg(feature = "cache")]
-    pub fn member(&self) -> Option<Member> {
-        self.guild().and_then(|g| g.read().members.get(&self.author.id).cloned())
+    pub fn member(&self) -> Option<Rc<RefCell<Member>>> {
+        self.guild().and_then(|guild| {
+            guild.try_borrow().ok()?.members.get(&self.author.id).cloned()
+        })
     }
 
     /// Checks the length of a string to ensure that it is within Discord's
@@ -399,17 +426,21 @@ impl Message {
     ///
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    pub fn pin(&self) -> Result<()> {
+    pub fn pin(&self) -> FutureResult<()> {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_MESSAGES;
 
-            if !utils::user_has_perms(self.channel_id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+            if !ftry!(client.cache.borrow().user_has_perms(self.channel_id, req)) {
+                return Box::new(future::err(Error::Model(
+                    ModelError::InvalidPermissions(req),
+                )));
             }
         }
 
-        self.channel_id.pin(self.id.0)
+        client.http.pin_message(self.channel_id.0, self.id.0)
     }
 
     /// React to the message with a custom [`Emoji`] or unicode character.
@@ -426,17 +457,26 @@ impl Message {
     /// [`Emoji`]: struct.Emoji.html
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     /// [permissions]: permissions
-    pub fn react<R: Into<ReactionType>>(&self, reaction_type: R) -> Result<()> {
+    pub fn react<R: Into<ReactionType>>(&self, reaction_type: R)
+        -> FutureResult<()> {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
             let req = Permissions::ADD_REACTIONS;
 
-            if !utils::user_has_perms(self.channel_id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+            if !ftry!(client.cache.borrow().user_has_perms(self.channel_id, req)) {
+                return Box::new(future::err(Error::Model(
+                    ModelError::InvalidPermissions(req),
+                )));
             }
         }
 
-        http::create_reaction(self.channel_id.0, self.id.0, &reaction_type.into())
+        client.http.create_reaction(
+            self.channel_id.0,
+            self.id.0,
+            &reaction_type.into(),
+        )
     }
 
     /// Replies to the user, mentioning them prior to the content in the form
@@ -461,17 +501,23 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    pub fn reply(&self, content: &str) -> Result<Message> {
+    pub fn reply(&self, content: &str) -> FutureResult<Message> {
         if let Some(length_over) = Message::overflow_length(content) {
-            return Err(Error::Model(ModelError::MessageTooLong(length_over)));
+            return Box::new(future::err(Error::Model(
+                ModelError::MessageTooLong(length_over),
+            )));
         }
+
+        let client = ftryopt!(self.client);
 
         #[cfg(feature = "cache")]
         {
             let req = Permissions::SEND_MESSAGES;
 
-            if !utils::user_has_perms(self.channel_id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+            if !ftry!(client.cache.borrow().user_has_perms(self.channel_id, req)) {
+                return Box::new(future::err(Error::Model(
+                    ModelError::InvalidPermissions(req),
+                )));
             }
         }
 
@@ -479,12 +525,12 @@ impl Message {
         gen.push_str(": ");
         gen.push_str(content);
 
-        let map = json!({
-            "content": gen,
-            "tts": false,
-        });
+        let done = client.http.send_message(
+            self.channel_id.0,
+            |f| f.content(gen).tts(false),
+        );
 
-        http::send_message(self.channel_id.0, &map)
+        Box::new(done)
     }
 
     /// Unpins the message from its channel.
@@ -499,17 +545,21 @@ impl Message {
     ///
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    pub fn unpin(&self) -> Result<()> {
+    pub fn unpin(&self) -> FutureResult<()> {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_MESSAGES;
 
-            if !utils::user_has_perms(self.channel_id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+            if !ftry!(client.cache.borrow().user_has_perms(self.channel_id, req)) {
+                return Box::new(future::err(Error::Model(
+                    ModelError::InvalidPermissions(req),
+                )));
             }
         }
 
-        http::unpin_message(self.channel_id.0, self.id.0)
+        client.http.unpin_message(self.channel_id.0, self.id.0)
     }
 
     pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {

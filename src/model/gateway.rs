@@ -1,10 +1,10 @@
 //! Models pertaining to the gateway.
 
-use parking_lot::RwLock;
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
-use std::sync::Arc;
+use std::cell::RefCell;
+use std::rc::Rc;
 use super::utils::*;
 use super::prelude::*;
 
@@ -209,7 +209,7 @@ pub struct Presence {
     /// date.
     pub user_id: UserId,
     /// The associated user instance.
-    pub user: Option<Arc<RwLock<User>>>,
+    pub user: Option<Rc<RefCell<User>>>,
 }
 
 impl<'de> Deserialize<'de> for Presence {
@@ -224,7 +224,7 @@ impl<'de> Deserialize<'de> for Presence {
             let user = User::deserialize(Value::Object(user_map))
                 .map_err(DeError::custom)?;
 
-            (user.id, Some(Arc::new(RwLock::new(user))))
+            (user.id, Some(Rc::new(RefCell::new(user))))
         } else {
             let user_id = user_map
                 .remove("id")
@@ -280,7 +280,7 @@ impl Serialize for Presence {
         state.serialize_field("status", &self.status)?;
 
         if let Some(ref user) = self.user {
-            state.serialize_field("user", &*user.read())?;
+            state.serialize_field("user", &*user.borrow())?;
         } else {
             state.serialize_field("user", &UserId {
                 id: self.user_id.0,
@@ -295,10 +295,14 @@ impl Serialize for Presence {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Ready {
     pub guilds: Vec<GuildStatus>,
-    #[serde(default, deserialize_with = "deserialize_presences")]
-    pub presences: HashMap<UserId, Presence>,
-    #[serde(default, deserialize_with = "deserialize_private_channels")]
-    pub private_channels: HashMap<ChannelId, Channel>,
+    #[serde(default,
+            deserialize_with = "deserialize_presences",
+            serialize_with = "serialize_gen_rc_map")]
+    pub presences: HashMap<UserId, Rc<RefCell<Presence>>>,
+    #[serde(default,
+            deserialize_with = "deserialize_private_channels",
+            serialize_with = "serialize_gen_rc_map")]
+    pub private_channels: HashMap<ChannelId, Rc<RefCell<Channel>>>,
     pub session_id: String,
     pub shard: Option<[u64; 2]>,
     #[serde(default, rename = "_trace")]

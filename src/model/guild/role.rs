@@ -1,12 +1,12 @@
 use model::prelude::*;
 use std::cmp::Ordering;
+use super::super::WrappedClient;
+use ::FutureResult;
 
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
 use builder::EditRole;
 #[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
-#[cfg(all(feature = "cache", feature = "model"))]
-use {CACHE, http};
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
@@ -57,6 +57,8 @@ pub struct Role {
     ///
     /// The `@everyone` role is usually either `-1` or `0`.
     pub position: i64,
+    #[serde(skip)]
+    pub(crate) client: WrappedClient,
 }
 
 #[cfg(feature = "model")]
@@ -68,7 +70,11 @@ impl Role {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn delete(&self) -> Result<()> { http::delete_role(self.find_guild()?.0, self.id.0) }
+    pub fn delete(&self) -> FutureResult<()> {
+        let guild_id = ftry!(self.find_guild());
+
+        ftryopt!(self.client).http.delete_role(guild_id.0, self.id.0)
+    }
 
     /// Edits a [`Role`], optionally setting its new fields.
     ///
@@ -89,9 +95,11 @@ impl Role {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(all(feature = "builder", feature = "cache"))]
-    pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
-        self.find_guild()
-            .and_then(|guild_id| guild_id.edit_role(self.id, f))
+    pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, f: F)
+        -> FutureResult<Role> {
+        let guild_id = ftry!(self.find_guild());
+
+        ftryopt!(self.client).http.edit_role(guild_id.0, self.id.0, f)
     }
 
     /// Searches the cache for the guild that owns the role.
@@ -104,8 +112,12 @@ impl Role {
     /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
     #[cfg(feature = "cache")]
     pub fn find_guild(&self) -> Result<GuildId> {
-        for guild in CACHE.read().guilds.values() {
-            let guild = guild.read();
+        let client = self.client.as_ref().ok_or_else(|| {
+            Error::Model(ModelError::ClientNotPresent)
+        })?;
+
+        for guild in client.cache.borrow().guilds.values() {
+            let guild = guild.borrow();
 
             if guild.roles.contains_key(&RoleId(self.id.0)) {
                 return Ok(guild.id);
@@ -159,29 +171,6 @@ impl PartialEq for Role {
 
 impl PartialOrd for Role {
     fn partial_cmp(&self, other: &Role) -> Option<Ordering> { Some(self.cmp(other)) }
-}
-
-#[cfg(feature = "model")]
-impl RoleId {
-    /// Search the cache for the role.
-    #[cfg(feature = "cache")]
-    pub fn find(&self) -> Option<Role> {
-        let cache = CACHE.read();
-
-        for guild in cache.guilds.values() {
-            let guild = guild.read();
-
-            if !guild.roles.contains_key(self) {
-                continue;
-            }
-
-            if let Some(role) = guild.roles.get(self) {
-                return Some(role.clone());
-            }
-        }
-
-        None
-    }
 }
 
 impl From<Role> for RoleId {

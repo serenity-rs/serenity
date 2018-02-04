@@ -1,20 +1,18 @@
 use chrono::{DateTime, FixedOffset};
+use futures::{Future, future};
 use model::prelude::*;
+use std::cell::RefCell;
+use super::super::WrappedClient;
+use ::FutureResult;
 
-#[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
 #[cfg(feature = "model")]
 use builder::{CreateInvite, CreateMessage, EditChannel, EditMessage, GetMessages};
-#[cfg(feature = "model")]
-use http::{self, AttachmentType};
 #[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
 #[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
-#[cfg(feature = "model")]
-use std::mem;
 #[cfg(all(feature = "model", feature = "utils"))]
-use utils::{self as serenity_utils, VecMap};
+use utils as serenity_utils;
 
 /// Represents a guild's text or voice channel. Some methods are available only
 /// for voice channels and some are only available for text channels.
@@ -77,6 +75,8 @@ pub struct GuildChannel {
     // default to `false`.
     #[serde(default)]
     pub nsfw: bool,
+    #[serde(skip)]
+    pub(crate) client: WrappedClient,
 }
 
 #[cfg(feature = "model")]
@@ -94,7 +94,9 @@ impl GuildChannel {
     ///
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    pub fn broadcast_typing(&self) -> Result<()> { self.id.broadcast_typing() }
+    pub fn broadcast_typing(&self) -> FutureResult<()> {
+        ftryopt!(self.client).http.broadcast_typing(self.id.0)
+    }
 
     /// Creates an invite leading to the given channel.
     ///
@@ -106,20 +108,22 @@ impl GuildChannel {
     /// let invite = channel.create_invite(|i| i.max_uses(5));
     /// ```
     #[cfg(feature = "utils")]
-    pub fn create_invite<F>(&self, f: F) -> Result<RichInvite>
+    pub fn create_invite<F>(&self, f: F) -> FutureResult<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
             let req = Permissions::CREATE_INVITE;
 
-            if !utils::user_has_perms(self.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+            if !ftry!(client.cache.borrow().user_has_perms(self.id, req)) {
+                return Box::new(future::err(Error::Model(
+                    ModelError::InvalidPermissions(req),
+                )));
             }
         }
 
-        let map = serenity_utils::vecmap_to_json_map(f(CreateInvite::default()).0);
-
-        http::create_invite(self.id.0, &map)
+        client.http.create_invite(self.id.0, f)
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -226,22 +230,27 @@ impl GuildChannel {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     /// [Send TTS Messages]: permissions/constant.SEND_TTS_MESSAGES.html
     #[inline]
-    pub fn create_permission(&self, target: &PermissionOverwrite) -> Result<()> {
-        self.id.create_permission(target)
+    pub fn create_permission(&self, target: &PermissionOverwrite)
+        -> FutureResult<()> {
+        ftryopt!(self.client).http.create_permission(self.id.0, target)
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
-    pub fn delete(&self) -> Result<Channel> {
+    pub fn delete(&self) -> FutureResult<Channel> {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
 
-            if !utils::user_has_perms(self.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+            if !ftry!(client.cache.borrow().user_has_perms(self.id, req)) {
+                return Box::new(future::err(Error::Model(
+                    ModelError::InvalidPermissions(req),
+                )));
             }
         }
 
-        self.id.delete()
+        client.http.delete_channel(self.id.0)
     }
 
     /// Deletes all messages by Ids from the given vector in the channel.
@@ -262,8 +271,9 @@ impl GuildChannel {
     /// [`ModelError::BulkDeleteAmount`]: ../enum.ModelError.html#variant.BulkDeleteAmount
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, message_ids: It) -> Result<()> {
-        self.id.delete_messages(message_ids)
+    pub fn delete_messages<T, It>(&self, message_ids: It) -> FutureResult<()>
+        where T: AsRef<MessageId>, It: IntoIterator<Item=T> {
+        ftryopt!(self.client).http.delete_messages(self.id.0, message_ids)
     }
 
     /// Deletes all permission overrides in the channel from a member
@@ -273,8 +283,14 @@ impl GuildChannel {
     ///
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
-    pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
-        self.id.delete_permission(permission_type)
+    pub fn delete_permission(&self, permission_type: PermissionOverwriteType)
+        -> FutureResult<()> {
+        let overwrite_id = match permission_type {
+            PermissionOverwriteType::Member(id) => id.0,
+            PermissionOverwriteType::Role(id) => id.0,
+        };
+
+        ftryopt!(self.client).http.delete_permission(self.id.0, overwrite_id)
     }
 
     /// Deletes the given [`Reaction`] from the channel.
@@ -285,13 +301,18 @@ impl GuildChannel {
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn delete_reaction<M, R>(&self,
-                                 message_id: M,
-                                 user_id: Option<UserId>,
-                                 reaction_type: R)
-                                 -> Result<()>
-        where M: Into<MessageId>, R: Into<ReactionType> {
-        self.id.delete_reaction(message_id, user_id, reaction_type)
+    pub fn delete_reaction<M, R>(
+        &self,
+        message_id: M,
+        user_id: Option<UserId>,
+        reaction_type: R,
+    ) -> FutureResult<()> where M: Into<MessageId>, R: Into<ReactionType> {
+        ftryopt!(self.client).http.delete_reaction(
+            self.id.0,
+            message_id.into().0,
+            user_id.map(|x| x.0),
+            &reaction_type.into(),
+        )
     }
 
     /// Modifies a channel's settings, such as its position or name.
@@ -306,32 +327,22 @@ impl GuildChannel {
     /// channel.edit(|c| c.name("test").bitrate(86400));
     /// ```
     #[cfg(feature = "utils")]
-    pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(EditChannel) -> EditChannel {
+    pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F)
+        -> FutureResult<GuildChannel> {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
 
-            if !utils::user_has_perms(self.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+            if !ftry!(client.cache.borrow().user_has_perms(self.id, req)) {
+                return Box::new(future::err(Error::Model(
+                    ModelError::InvalidPermissions(req),
+                )));
             }
         }
 
-        let mut map = VecMap::new();
-        map.insert("name", Value::String(self.name.clone()));
-        map.insert("position", Value::Number(Number::from(self.position)));
-        map.insert("type", Value::String(self.kind.name().to_string()));
-
-        let edited = serenity_utils::vecmap_to_json_map(f(EditChannel(map)).0);
-
-        match http::edit_channel(self.id.0, &edited) {
-            Ok(channel) => {
-                mem::replace(self, channel);
-
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        client.http.edit_channel(self.id.0, f)
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -354,9 +365,14 @@ impl GuildChannel {
     /// [`Message`]: struct.Message.html
     /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
     #[inline]
-    pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
+    pub fn edit_message<F, M>(&self, message_id: M, f: F)
+        -> FutureResult<Message>
         where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
-        self.id.edit_message(message_id, f)
+        ftryopt!(self.client).http.edit_message(
+            self.id.0,
+            message_id.into().0,
+            f,
+        )
     }
 
     /// Attempts to find this channel's guild in the Cache.
@@ -364,14 +380,20 @@ impl GuildChannel {
     /// **Note**: Right now this performs a clone of the guild. This will be
     /// optimized in the future.
     #[cfg(feature = "cache")]
-    pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().guild(self.guild_id) }
+    pub fn guild(&self) -> Option<Rc<RefCell<Guild>>> {
+        self.client.as_ref()?.cache.try_borrow().ok().and_then(|cache| {
+            cache.guild(self.guild_id)
+        })
+    }
 
     /// Gets all of the channel's invites.
     ///
     /// Requires the [Manage Channels] permission.
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
-    pub fn invites(&self) -> Result<Vec<RichInvite>> { self.id.invites() }
+    pub fn invites(&self) -> FutureResult<Vec<RichInvite>> {
+        ftryopt!(self.client).http.get_channel_invites(self.id.0)
+    }
 
     /// Determines if the channel is NSFW.
     ///
@@ -395,8 +417,9 @@ impl GuildChannel {
     ///
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        self.id.message(message_id)
+    pub fn message<M: Into<MessageId>>(&self, message_id: M)
+        -> FutureResult<Message> {
+        ftryopt!(self.client).http.get_message(self.id.0, message_id.into().0)
     }
 
     /// Gets messages from the channel.
@@ -408,9 +431,9 @@ impl GuildChannel {
     /// [`Channel::messages`]: enum.Channel.html#method.messages
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-        where F: FnOnce(GetMessages) -> GetMessages {
-        self.id.messages(f)
+    pub fn messages<'a, F: FnOnce(GetMessages) -> GetMessages>(&'a self, f: F)
+        -> Box<Future<Item = Vec<Message>, Error = Error> + 'a> {
+        ftryopt!(self.client).http.get_messages(self.id.0, f)
     }
 
     /// Returns the name of the guild channel.
@@ -510,19 +533,24 @@ impl GuildChannel {
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[cfg(feature = "cache")]
-    pub fn permissions_for<U: Into<UserId>>(&self, user_id: U) -> Result<Permissions> {
+    pub fn permissions_for<U: Into<UserId>>(&self, user_id: U)
+        -> Result<Permissions> {
         self.guild()
             .ok_or_else(|| Error::Model(ModelError::GuildNotFound))
-            .map(|g| g.read().permissions_in(self.id, user_id))
+            .map(|g| g.borrow().permissions_in(self.id, user_id))
     }
 
     /// Pins a [`Message`] to the channel.
     #[inline]
-    pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> { self.id.pin(message_id) }
+    pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> FutureResult<()> {
+        ftryopt!(self.client).http.pin_message(self.id.0, message_id.into().0)
+    }
 
     /// Gets all channel's pins.
     #[inline]
-    pub fn pins(&self) -> Result<Vec<Message>> { self.id.pins() }
+    pub fn pins(&self) -> FutureResult<Vec<Message>> {
+        ftryopt!(self.client).http.get_pins(self.id.0)
+    }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
@@ -542,10 +570,15 @@ impl GuildChannel {
         reaction_type: R,
         limit: Option<u8>,
         after: U,
-    ) -> Result<Vec<User>> where M: Into<MessageId>,
-                                 R: Into<ReactionType>,
-                                 U: Into<Option<UserId>> {
-        self.id.reaction_users(message_id, reaction_type, limit, after)
+    ) -> FutureResult<Vec<User>>
+        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<Option<UserId>> {
+        ftryopt!(self.client).http.get_reaction_users(
+            self.id.0,
+            message_id.into().0,
+            &reaction_type.into(),
+            limit,
+            after.into().map(|x| x.0),
+        )
     }
 
     /// Sends a message with just the given message content in the channel.
@@ -559,7 +592,11 @@ impl GuildChannel {
     /// [`ChannelId`]: struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
-    pub fn say(&self, content: &str) -> Result<Message> { self.id.say(content) }
+    pub fn say(&self, content: &str) -> FutureResult<Message> {
+        ftryopt!(self.client)
+            .http
+            .send_message(self.id.0, |m| m.content(content))
+    }
 
     /// Sends (a) file(s) along with optional message contents.
     ///
@@ -579,11 +616,15 @@ impl GuildChannel {
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    #[inline]
-    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
-        self.id.send_files(files, f)
-    }
+    // todo
+    // #[inline]
+    // pub fn send_files<'a, F, T, It>(&self, files: It, f: F)
+    //     -> FutureResult<Message>
+    //     where F: FnOnce(CreateMessage) -> CreateMessage,
+    //           T: Into<AttachmentType<'a>>,
+    //           It: IntoIterator<Item=T> {
+    //     ftryopt!(self.client).http.send_files(self.id.0, files, f)
+    // }
 
     /// Sends a message to the channel with the given content.
     ///
@@ -604,17 +645,22 @@ impl GuildChannel {
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     /// [`Message`]: struct.Message.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F)
+        -> FutureResult<Message> {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
             let req = Permissions::SEND_MESSAGES;
 
-            if !utils::user_has_perms(self.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+            if !ftry!(client.cache.borrow().user_has_perms(self.id, req)) {
+                return Box::new(future::err(Error::Model(
+                    ModelError::InvalidPermissions(req),
+                )));
             }
         }
 
-        self.id.send_message(f)
+        client.http.send_message(self.id.0, f)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.
@@ -624,8 +670,8 @@ impl GuildChannel {
     /// [`Message`]: struct.Message.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        self.id.unpin(message_id)
+    pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> FutureResult<()> {
+        ftryopt!(self.client).http.unpin_message(self.id.0, message_id.into().0)
     }
 
     /// Retrieves the channel's webhooks.
@@ -634,7 +680,9 @@ impl GuildChannel {
     ///
     /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
     #[inline]
-    pub fn webhooks(&self) -> Result<Vec<Webhook>> { self.id.webhooks() }
+    pub fn webhooks(&self) -> FutureResult<Vec<Webhook>> {
+        ftryopt!(self.client).http.get_channel_webhooks(self.id.0)
+    }
 }
 
 #[cfg(feature = "model")]

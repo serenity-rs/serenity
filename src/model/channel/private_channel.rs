@@ -1,14 +1,15 @@
 use chrono::{DateTime, FixedOffset};
+use futures::Future;
 use model::prelude::*;
+use std::cell::RefCell;
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::rc::Rc;
+use super::super::WrappedClient;
 use super::deserialize_single_recipient;
+use ::FutureResult;
 
 #[cfg(feature = "model")]
 use builder::{CreateMessage, EditMessage, GetMessages};
-#[cfg(feature = "model")]
-use http::AttachmentType;
-#[cfg(feature = "model")]
-use internal::RwLockExt;
 
 /// A Direct Message text channel with another user.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -33,14 +34,18 @@ pub struct PrivateChannel {
     /// The recipient to the private channel.
     #[serde(deserialize_with = "deserialize_single_recipient",
             rename = "recipients",
-            serialize_with = "serialize_sync_user")]
-    pub recipient: Arc<RwLock<User>>,
+            serialize_with = "serialize_user")]
+    pub recipient: Rc<RefCell<User>>,
+    #[serde(skip)]
+    pub(crate) client: WrappedClient,
 }
 
 #[cfg(feature = "model")]
 impl PrivateChannel {
     /// Broadcasts that the current user is typing to the recipient.
-    pub fn broadcast_typing(&self) -> Result<()> { self.id.broadcast_typing() }
+    pub fn broadcast_typing(&self) -> FutureResult<()> {
+        ftryopt!(self.client).http.broadcast_typing(self.id.0)
+    }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
     ///
@@ -54,16 +59,22 @@ impl PrivateChannel {
     /// [`Message`]: struct.Message.html
     /// [`Message::react`]: struct.Message.html#method.react
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
-    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
-        where M: Into<MessageId>, R: Into<ReactionType> {
-        self.id.create_reaction(message_id, reaction_type)
+    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R)
+        -> FutureResult<()> where M: Into<MessageId>, R: Into<ReactionType> {
+        ftryopt!(self.client).http.create_reaction(
+            self.id.0,
+            message_id.into().0,
+            &reaction_type.into(),
+        )
     }
 
     /// Deletes the channel. This does not delete the contents of the channel,
     /// and is equivalent to closing a private channel on the client, which can
     /// be re-opened.
     #[inline]
-    pub fn delete(&self) -> Result<Channel> { self.id.delete() }
+    pub fn delete(&self) -> FutureResult<Channel> {
+        ftryopt!(self.client).http.delete_channel(self.id.0)
+    }
 
     /// Deletes all messages by Ids from the given vector in the channel.
     ///
@@ -83,8 +94,11 @@ impl PrivateChannel {
     /// [`ModelError::BulkDeleteAmount`]: ../enum.ModelError.html#variant.BulkDeleteAmount
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, message_ids: It) -> Result<()> {
-        self.id.delete_messages(message_ids)
+    pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(
+        &self,
+        message_ids: It,
+    ) -> FutureResult<()> {
+        ftryopt!(self.client).http.delete_messages(self.id.0, message_ids)
     }
 
     /// Deletes all permission overrides in the channel from a member
@@ -94,8 +108,14 @@ impl PrivateChannel {
     ///
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
-    pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
-        self.id.delete_permission(permission_type)
+    pub fn delete_permission(&self, permission_type: PermissionOverwriteType)
+        -> FutureResult<()> {
+        let overwrite_id = match permission_type {
+            PermissionOverwriteType::Member(id) => id.0,
+            PermissionOverwriteType::Role(id) => id.0,
+        };
+
+        ftryopt!(self.client).http.delete_permission(self.id.0, overwrite_id)
     }
 
     /// Deletes the given [`Reaction`] from the channel.
@@ -106,13 +126,18 @@ impl PrivateChannel {
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn delete_reaction<M, R>(&self,
-                                 message_id: M,
-                                 user_id: Option<UserId>,
-                                 reaction_type: R)
-                                 -> Result<()>
-        where M: Into<MessageId>, R: Into<ReactionType> {
-        self.id.delete_reaction(message_id, user_id, reaction_type)
+    pub fn delete_reaction<M: Into<MessageId>, R: Into<ReactionType>>(
+        &self,
+        message_id: M,
+        user_id: Option<UserId>,
+        reaction_type: R,
+    ) -> FutureResult<()> {
+        ftryopt!(self.client).http.delete_reaction(
+            self.id.0,
+            message_id.into().0,
+            user_id.map(|x| x.0),
+            &reaction_type.into(),
+        )
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -135,9 +160,14 @@ impl PrivateChannel {
     /// [`Message`]: struct.Message.html
     /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
     #[inline]
-    pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
+    pub fn edit_message<F, M>(&self, message_id: M, f: F)
+        -> FutureResult<Message>
         where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
-        self.id.edit_message(message_id, f)
+        ftryopt!(self.client).http.edit_message(
+            self.id.0,
+            message_id.into().0,
+            f,
+        )
     }
 
     /// Determines if the channel is NSFW.
@@ -157,8 +187,9 @@ impl PrivateChannel {
     ///
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        self.id.message(message_id)
+    pub fn message<M: Into<MessageId>>(&self, message_id: M)
+        -> FutureResult<Message> {
+        ftryopt!(self.client).http.get_message(self.id.0, message_id.into().0)
     }
 
     /// Gets messages from the channel.
@@ -170,13 +201,15 @@ impl PrivateChannel {
     /// [`Channel::messages`]: enum.Channel.html#method.messages
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-        where F: FnOnce(GetMessages) -> GetMessages {
-        self.id.messages(f)
+    pub fn messages<'a, F: FnOnce(GetMessages) -> GetMessages>(&'a self, f: F)
+        -> Box<Future<Item = Vec<Message>, Error = Error> + 'a> {
+        ftryopt!(self.client).http.get_messages(self.id.0, f)
     }
 
     /// Returns "DM with $username#discriminator".
-    pub fn name(&self) -> String { format!("DM with {}", self.recipient.with(|r| r.tag())) }
+    pub fn name(&self) -> String {
+        format!("DM with {}", self.recipient.borrow().tag())
+    }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
@@ -191,27 +224,37 @@ impl PrivateChannel {
     /// [`User`]: struct.User.html
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
-    pub fn reaction_users<M, R, U>(&self,
+    pub fn reaction_users<M, R, U>(
+        &self,
         message_id: M,
         reaction_type: R,
         limit: Option<u8>,
         after: U,
-    ) -> Result<Vec<User>> where M: Into<MessageId>,
-                                 R: Into<ReactionType>,
-                                 U: Into<Option<UserId>> {
-        self.id.reaction_users(message_id, reaction_type, limit, after)
+    ) -> FutureResult<Vec<User>>
+        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<Option<UserId>> {
+        ftryopt!(self.client).http.get_reaction_users(
+            self.id.0,
+            message_id.into().0,
+            &reaction_type.into(),
+            limit,
+            after.into().map(|x| x.0),
+        )
     }
 
     /// Pins a [`Message`] to the channel.
     ///
     /// [`Message`]: struct.Message.html
     #[inline]
-    pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> { self.id.pin(message_id) }
+    pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> FutureResult<()> {
+        ftryopt!(self.client).http.pin_message(self.id.0, message_id.into().0)
+    }
 
     /// Retrieves the list of messages that have been pinned in the private
     /// channel.
     #[inline]
-    pub fn pins(&self) -> Result<Vec<Message>> { self.id.pins() }
+    pub fn pins(&self) -> FutureResult<Vec<Message>> {
+        ftryopt!(self.client).http.get_pins(self.id.0)
+    }
 
     /// Sends a message with just the given message content in the channel.
     ///
@@ -224,7 +267,12 @@ impl PrivateChannel {
     /// [`ChannelId`]: ../model/id/struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
-    pub fn say<D: ::std::fmt::Display>(&self, content: D) -> Result<Message> { self.id.say(content) }
+    pub fn say<D: ::std::fmt::Display>(&self, content: D)
+        -> FutureResult<Message> {
+        ftryopt!(self.client)
+            .http
+            .send_message(self.id.0, |m| m.content(content))
+    }
 
     /// Sends (a) file(s) along with optional message contents.
     ///
@@ -244,11 +292,15 @@ impl PrivateChannel {
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    #[inline]
-    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
-        self.id.send_files(files, f)
-    }
+    // todo
+    // #[inline]
+    // pub fn send_files<'a, F, T, It>(&self, files: It, f: F)
+    //     -> FutureResult<Message>
+    //     where F: FnOnce(CreateMessage) -> CreateMessage,
+    //           T: Into<AttachmentType<'a>>,
+    //           It: IntoIterator<Item=T> {
+    //     ftryopt!(self.client).http.send_files(self.id.0, files, f)
+    // }
 
     /// Sends a message to the channel with the given content.
     ///
@@ -265,8 +317,9 @@ impl PrivateChannel {
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
     #[inline]
-    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
-        self.id.send_message(f)
+    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F)
+        -> FutureResult<Message> {
+        ftryopt!(self.client).http.send_message(self.id.0, f)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.
@@ -276,14 +329,14 @@ impl PrivateChannel {
     /// [`Message`]: struct.Message.html
     /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
     #[inline]
-    pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        self.id.unpin(message_id)
+    pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> FutureResult<()> {
+        ftryopt!(self.client).http.unpin_message(self.id.0, message_id.into().0)
     }
 }
 
 impl Display for PrivateChannel {
     /// Formats the private channel, displaying the recipient's username.
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        f.write_str(&self.recipient.read().name)
+        f.write_str(&self.recipient.borrow().name)
     }
 }

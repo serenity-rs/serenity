@@ -20,17 +20,18 @@ pub use self::private_channel::*;
 pub use self::reaction::*;
 pub use self::channel_category::*;
 
-use internal::RwLockExt;
+use futures::Future;
 use model::prelude::*;
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
+use std::cell::RefCell;
+use std::rc::Rc;
 use super::utils::deserialize_u64;
+use ::FutureResult;
 
 #[cfg(feature = "model")]
-use builder::{CreateMessage, EditMessage, GetMessages};
-#[cfg(feature = "model")]
-use http::AttachmentType;
+use builder::{CreateMessage, EditMessage};
 #[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
@@ -38,30 +39,25 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 #[derive(Clone, Debug)]
 pub enum Channel {
     /// A group. A group comprises of only one channel.
-    Group(Arc<RwLock<Group>>),
+    Group(Rc<RefCell<Group>>),
     /// A [text] or [voice] channel within a [`Guild`].
     ///
     /// [`Guild`]: struct.Guild.html
     /// [text]: enum.ChannelType.html#variant.Text
     /// [voice]: enum.ChannelType.html#variant.Voice
-    Guild(Arc<RwLock<GuildChannel>>),
+    Guild(Rc<RefCell<GuildChannel>>),
     /// A private channel to another [`User`]. No other users may access the
     /// channel. For multi-user "private channels", use a group.
     ///
     /// [`User`]: struct.User.html
-    Private(Arc<RwLock<PrivateChannel>>),
+    Private(Rc<RefCell<PrivateChannel>>),
     /// A category of [`GuildChannel`]s
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
-    Category(Arc<RwLock<ChannelCategory>>),
+    Category(Rc<RefCell<ChannelCategory>>),
 }
 
 impl Channel {
-
-    /////////////////////////////////////////////////////////////////////////
-    // Adapter for each variant
-    /////////////////////////////////////////////////////////////////////////
-
     /// Converts from `Channel` to `Option<Arc<RwLock<Group>>>`.
     ///
     /// Converts `self` into an `Option<Arc<RwLock<Group>>>`, consuming `self`,
@@ -88,9 +84,7 @@ impl Channel {
     /// }
     /// # }
     /// ```
-
-
-    pub fn group(self) -> Option<Arc<RwLock<Group>>> {
+    pub fn group(self) -> Option<Rc<RefCell<Group>>> {
         match self {
             Channel::Group(lock) => Some(lock),
             _ => None,
@@ -119,8 +113,7 @@ impl Channel {
     /// }
     /// # }
     /// ```
-
-    pub fn guild(self) -> Option<Arc<RwLock<GuildChannel>>> {
+    pub fn guild(self) -> Option<Rc<RefCell<GuildChannel>>> {
         match self {
             Channel::Guild(lock) => Some(lock),
             _ => None,
@@ -152,8 +145,7 @@ impl Channel {
     /// }
     /// # }
     /// ```
-
-    pub fn private(self) -> Option<Arc<RwLock<PrivateChannel>>> {
+    pub fn private(self) -> Option<Rc<RefCell<PrivateChannel>>> {
         match self {
             Channel::Private(lock) => Some(lock),
             _ => None,
@@ -182,8 +174,7 @@ impl Channel {
     /// }
     /// # }
     /// ```
-
-    pub fn category(self) -> Option<Arc<RwLock<ChannelCategory>>> {
+    pub fn category(self) -> Option<Rc<RefCell<ChannelCategory>>> {
         match self {
             Channel::Category(lock) => Some(lock),
             _ => None,
@@ -205,9 +196,13 @@ impl Channel {
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
-    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
-        where M: Into<MessageId>, R: Into<ReactionType> {
-        self.id().create_reaction(message_id, reaction_type)
+    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R)
+        -> FutureResult<()> where M: Into<MessageId>, R: Into<ReactionType> {
+        ftryopt!(ftry!(self.client())).http.create_reaction(
+            self.id().0,
+            message_id.into().0,
+            &reaction_type.into(),
+        )
     }
 
     /// Deletes the inner channel.
@@ -217,23 +212,21 @@ impl Channel {
     ///
     /// [`Group`]: struct.Group.html
     #[cfg(feature = "model")]
-    pub fn delete(&self) -> Result<()> {
+    pub fn delete(&self) -> FutureResult<()> {
         match *self {
             Channel::Group(ref group) => {
-                let _ = group.read().leave()?;
+                Box::new(group.borrow().leave())
             },
             Channel::Guild(ref public_channel) => {
-                let _ = public_channel.read().delete()?;
+                Box::new(public_channel.borrow().delete().map(|_| ()))
             },
             Channel::Private(ref private_channel) => {
-                let _ = private_channel.read().delete()?;
+                Box::new(private_channel.borrow().delete().map(|_| ()))
             },
             Channel::Category(ref category) => {
-                category.read().delete()?;
+                Box::new(category.borrow().delete())
             },
         }
-
-        Ok(())
     }
 
     /// Deletes a [`Message`] given its Id.
@@ -249,8 +242,12 @@ impl Channel {
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
-    pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        self.id().delete_message(message_id)
+    pub fn delete_message<M>(&self, message_id: M) -> FutureResult<()>
+        where M: Into<MessageId> {
+        ftryopt!(ftry!(self.client())).http.delete_message(
+            self.id().0,
+            message_id.into().0,
+        )
     }
 
     /// Deletes the given [`Reaction`] from the channel.
@@ -263,14 +260,18 @@ impl Channel {
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
-    pub fn delete_reaction<M, R>(&self,
-                                 message_id: M,
-                                 user_id: Option<UserId>,
-                                 reaction_type: R)
-                                 -> Result<()>
-        where M: Into<MessageId>, R: Into<ReactionType> {
-        self.id()
-            .delete_reaction(message_id, user_id, reaction_type)
+    pub fn delete_reaction<M, R>(
+        &self,
+        message_id: M,
+        user_id: Option<UserId>,
+        reaction_type: R,
+    ) -> FutureResult<()> where M: Into<MessageId>, R: Into<ReactionType> {
+        ftryopt!(ftry!(self.client())).http.delete_reaction(
+            self.id().0,
+            message_id.into().0,
+            user_id.map(|x| x.0),
+            &reaction_type.into(),
+        )
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -295,9 +296,14 @@ impl Channel {
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
-    pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
+    pub fn edit_message<F, M>(&self, message_id: M, f: F)
+        -> FutureResult<Message>
         where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
-        self.id().edit_message(message_id, f)
+        ftryopt!(ftry!(self.client())).http.edit_message(
+            self.id().0,
+            message_id.into().0,
+            f,
+        )
     }
 
     /// Determines if the channel is NSFW.
@@ -309,8 +315,8 @@ impl Channel {
     #[inline]
     pub fn is_nsfw(&self) -> bool {
         match *self {
-            Channel::Guild(ref channel) => channel.with(|c| c.is_nsfw()),
-            Channel::Category(ref category) => category.with(|c| c.is_nsfw()),
+            Channel::Guild(ref channel) => channel.borrow().is_nsfw(),
+            Channel::Category(ref category) => category.borrow().is_nsfw(),
             Channel::Group(_) | Channel::Private(_) => false,
         }
     }
@@ -323,32 +329,12 @@ impl Channel {
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
-    pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        self.id().message(message_id)
-    }
-
-    /// Gets messages from the channel.
-    ///
-    /// Requires the [Read Message History] permission.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// use serenity::model::MessageId;
-    ///
-    /// let id = MessageId(81392407232380928);
-    ///
-    /// // Maximum is 100.
-    /// let _messages = channel.messages(|g| g.after(id).limit(100));
-    /// ```
-    ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-        where F: FnOnce(GetMessages) -> GetMessages {
-        self.id().messages(f)
+    pub fn message<M>(&self, message_id: M) -> FutureResult<Message>
+        where M: Into<MessageId> {
+        ftryopt!(ftry!(self.client())).http.get_message(
+            self.id().0,
+            message_id.into().0,
+        )
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
@@ -375,10 +361,15 @@ impl Channel {
         reaction_type: R,
         limit: Option<u8>,
         after: U,
-    ) -> Result<Vec<User>> where M: Into<MessageId>,
-                                 R: Into<ReactionType>,
-                                 U: Into<Option<UserId>> {
-        self.id().reaction_users(message_id, reaction_type, limit, after)
+    ) -> FutureResult<Vec<User>>
+        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<Option<UserId>> {
+        ftryopt!(ftry!(self.client())).http.get_reaction_users(
+            self.id().0,
+            message_id.into().0,
+            &reaction_type.into(),
+            limit,
+            after.into().map(|x| x.0),
+        )
     }
 
     /// Retrieves the Id of the inner [`Group`], [`GuildChannel`], or
@@ -389,10 +380,10 @@ impl Channel {
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     pub fn id(&self) -> ChannelId {
         match *self {
-            Channel::Group(ref group) => group.with(|g| g.channel_id),
-            Channel::Guild(ref ch) => ch.with(|c| c.id),
-            Channel::Private(ref ch) => ch.with(|c| c.id),
-            Channel::Category(ref category) => category.with(|c| c.id),
+            Channel::Group(ref group) => group.borrow().channel_id,
+            Channel::Guild(ref ch) => ch.borrow().id,
+            Channel::Private(ref ch) => ch.borrow().id,
+            Channel::Category(ref category) => category.borrow().id,
         }
     }
 
@@ -409,7 +400,10 @@ impl Channel {
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
-    pub fn say(&self, content: &str) -> Result<Message> { self.id().say(content) }
+    pub fn say(&self, content: &str) -> FutureResult<Message> {
+        ftryopt!(ftry!(self.client())).http.send_message(self.id().0, |f|
+            f.content(content))
+    }
 
     /// Sends (a) file(s) along with optional message contents.
     ///
@@ -429,13 +423,17 @@ impl Channel {
     /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
-        self.id().send_files(files, f)
-    }
+    // todo
+    // #[cfg(feature = "model")]
+    // #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
+    // #[inline]
+    // pub fn send_files<'a, F, T, It>(&self, files: It, f: F)
+    //     -> FutureResult<Message>
+    //     where F: FnOnce(CreateMessage) -> CreateMessage,
+    //           T: Into<AttachmentType<'a>>,
+    //           It: IntoIterator<Item = T> {
+    //     ftryopt!(ftry!(self.client())).http.send_files(self.id(), files, f)
+    // }
 
     /// Sends a message to the channel.
     ///
@@ -459,9 +457,9 @@ impl Channel {
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
-    pub fn send_message<F>(&self, f: F) -> Result<Message>
+    pub fn send_message<F>(&self, f: F) -> FutureResult<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
-        self.id().send_message(f)
+        ftryopt!(ftry!(self.client())).http.send_message(self.id().0, f)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.
@@ -473,8 +471,20 @@ impl Channel {
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
-    pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        self.id().unpin(message_id)
+    pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> FutureResult<()> {
+        let retrieve = ftry!(self.client());
+        let obtained = ftryopt!(retrieve);
+
+        obtained.http.unpin_message(self.id().0, message_id.into().0)
+    }
+
+    fn client(&self) -> Result<WrappedClient> {
+        Ok(match *self {
+            Channel::Category(ref c) => c.try_borrow()?.client.as_ref().map(Rc::clone),
+            Channel::Group(ref c) => c.try_borrow()?.client.as_ref().map(Rc::clone),
+            Channel::Guild(ref c) => c.try_borrow()?.client.as_ref().map(Rc::clone),
+            Channel::Private(ref c) => c.try_borrow()?.client.as_ref().map(Rc::clone),
+        })
     }
 }
 
@@ -489,16 +499,16 @@ impl<'de> Deserialize<'de> for Channel {
 
         match kind {
             0 | 2 => serde_json::from_value::<GuildChannel>(Value::Object(v))
-                .map(|x| Channel::Guild(Arc::new(RwLock::new(x))))
+                .map(|x| Channel::Guild(Rc::new(RefCell::new(x))))
                 .map_err(DeError::custom),
             1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
-                .map(|x| Channel::Private(Arc::new(RwLock::new(x))))
+                .map(|x| Channel::Private(Rc::new(RefCell::new(x))))
                 .map_err(DeError::custom),
             3 => serde_json::from_value::<Group>(Value::Object(v))
-                .map(|x| Channel::Group(Arc::new(RwLock::new(x))))
+                .map(|x| Channel::Group(Rc::new(RefCell::new(x))))
                 .map_err(DeError::custom),
             4 => serde_json::from_value::<ChannelCategory>(Value::Object(v))
-                .map(|x| Channel::Category(Arc::new(RwLock::new(x))))
+                .map(|x| Channel::Category(Rc::new(RefCell::new(x))))
                 .map_err(DeError::custom),
             _ => Err(DeError::custom("Unknown channel type")),
         }
@@ -510,16 +520,16 @@ impl Serialize for Channel {
         where S: Serializer {
         match *self {
             Channel::Category(ref c) => {
-                ChannelCategory::serialize(&*c.read(), serializer)
+                ChannelCategory::serialize(&*c.borrow(), serializer)
             },
             Channel::Group(ref c) => {
-                Group::serialize(&*c.read(), serializer)
+                Group::serialize(&*c.borrow(), serializer)
             },
             Channel::Guild(ref c) => {
-                GuildChannel::serialize(&*c.read(), serializer)
+                GuildChannel::serialize(&*c.borrow(), serializer)
             },
             Channel::Private(ref c) => {
-                PrivateChannel::serialize(&*c.read(), serializer)
+                PrivateChannel::serialize(&*c.borrow(), serializer)
             },
         }
     }
@@ -542,15 +552,15 @@ impl Display for Channel {
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         match *self {
-            Channel::Group(ref group) => Display::fmt(&group.read().name(), f),
-            Channel::Guild(ref ch) => Display::fmt(&ch.read().id.mention(), f),
+            Channel::Group(ref group) => Display::fmt(&group.borrow().name(), f),
+            Channel::Guild(ref ch) => Display::fmt(&ch.borrow().id.mention(), f),
             Channel::Private(ref ch) => {
-                let channel = ch.read();
-                let recipient = channel.recipient.read();
+                let channel = ch.borrow();
+                let recipient = channel.recipient.borrow();
 
                 Display::fmt(&recipient.name, f)
             },
-            Channel::Category(ref category) => Display::fmt(&category.read().name, f),
+            Channel::Category(ref category) => Display::fmt(&category.borrow().name, f),
         }
     }
 }

@@ -8,15 +8,19 @@ license = "ISC"
 name = "serenity"
 readme = "README.md"
 repository = "https://github.com/zeyla/serenity.git"
-version = "0.5.1"
+version = "0.6.0"
 
 [dependencies]
 bitflags = "^1.0"
+futures = "~0.1"
 log = "~0.4"
-parking_lot = "^0.5"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
+tokio-core = "~0.1"
+tokio-timer = "~0.1"
+tokio-tls = "~0.1"
+url = "^1.6"
 
 [dependencies.base64]
 optional = true
@@ -36,25 +40,11 @@ version = "^1.0"
 
 [dependencies.hyper]
 optional = true
-version = "~0.10"
+version = "~0.11"
 
-[dependencies.hyper-native-tls]
+[dependencies.hyper-tls]
 optional = true
-version = "0.2.4"
-
-[dependencies.lazy_static]
-optional = true
-version = "^1.0"
-
-[dependencies.multipart]
-default-features = false
-features = ["client", "hyper", "safemem"]
-optional = true
-version = "0.13"
-
-[dependencies.native-tls]
-optional = true
-version = "0.1"
+version = "~0.1"
 
 [dependencies.opus]
 optional = true
@@ -65,19 +55,13 @@ default-features = false
 optional = true
 version = "0.0.14"
 
-[dependencies.threadpool]
+[dependencies.tokio-tungstenite]
 optional = true
-version = "~1.7"
+version = "~0.4"
 
-[dependencies.typemap]
+[dependencies.tungstenite]
 optional = true
-version = "~0.3"
-
-[dependencies.evzht9h3nznqzwl]
-default-features = false
-features = ["sync-ssl"]
-optional = true
-version = "0.0.3"
+version = "~0.5"
 
 [dev-dependencies.matches]
 version = "0.1.6"
@@ -87,31 +71,22 @@ default = [
     "builder",
     "cache",
     "client",
-    "framework",
     "gateway",
-    "model",
     "http",
-    "standard_framework",
-    "utils"
+    "model",
+    "utils",
 ]
 builder = ["utils"]
-cache = ["lazy_static"]
-client = [
-    "gateway",
-    "http",
-    "lazy_static",
-    "threadpool",
-    "typemap",
-]
+cache = []
+client = ["gateway", "http"]
 extras = []
 framework = ["client", "model", "utils"]
-gateway = ["flate2", "http", "websocket", "utils"]
-http = ["hyper", "hyper-native-tls", "lazy_static", "multipart", "native-tls"]
+gateway = ["flate2", "http", "tokio-tungstenite", "tungstenite", "utils"]
+http = ["builder", "hyper", "hyper-tls", "utils"]
 model = ["builder", "http"]
 standard_framework = ["framework"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "sodiumoxide"]
-websocket = ["evzht9h3nznqzwl"]
 
 [package.metadata.docs.rs]
 all-features = true

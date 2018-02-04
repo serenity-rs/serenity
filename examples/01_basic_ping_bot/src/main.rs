@@ -1,56 +1,60 @@
+#![feature(proc_macro, conservative_impl_trait, generators)]
+
+extern crate futures_await as futures;
 extern crate serenity;
+extern crate tokio_core;
 
-use serenity::prelude::*;
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
+use futures::prelude::*;
+use serenity::gateway::Shard;
+use serenity::model::event::{Event, GatewayEvent};
+use serenity::model::gateway::Game;
+use serenity::model::user::OnlineStatus;
+use std::error::Error;
 use std::env;
-
-struct Handler;
-
-impl EventHandler for Handler {
-    // Set a handler for the `message` event - so that whenever a new message
-    // is received - the closure (or function) passed will be called.
-    //
-    // Event handlers are dispatched through a threadpool, and so multiple
-    // events can be dispatched simultaneously.
-    fn message(&self, _: Context, msg: Message) {
-        if msg.content == "!ping" {
-            // Sending a message can fail, due to a network error, an
-            // authentication error, or lack of permissions to post in the
-            // channel, so log to stdout when some error happens, with a
-            // description of it.
-            if let Err(why) = msg.channel_id.say("Pong!") {
-                println!("Error sending message: {:?}", why);
-            }
-        }
-    }
-
-    // Set a handler to be called on the `ready` event. This is called when a
-    // shard is booted, and a READY payload is sent by Discord. This payload
-    // contains data like the current user's guild Ids, current user data,
-    // private channels, and more.
-    //
-    // In this case, just print what the current user's username is.
-    fn ready(&self, _: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
-    }
-}
+use tokio_core::reactor::{Core, Handle};
 
 fn main() {
+    let mut core = Core::new().expect("Error creating event loop");
+    let future = try_main(core.handle());
+
+    core.run(future).expect("Error running event loop");
+}
+
+#[async]
+fn try_main(handle: Handle) -> Result<(), Box<Error + 'static>> {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
 
-    // Create a new instance of the Client, logging in as a bot. This will
-    // automatically prepend your bot token with "Bot ", which is a requirement
-    // by Discord for bot users.
-    let mut client = Client::new(&token, Handler).expect("Err creating client");
+    // Create a new shard, specifying the token, the ID of the shard (0 of 1),
+    // and a handle to the event loop
+    let mut shard = await!(Shard::new(token, [0, 1], handle))?;
 
-    // Finally, start a single shard, and start listening to events.
-    //
-    // Shards will automatically attempt to reconnect, and will perform
-    // exponential backoff until it reconnects.
-    if let Err(why) = client.start() {
-        println!("Client error: {:?}", why);
+    // Loop over websocket messages.
+    #[async]
+    for message in shard.messages() {
+        // Parse the websocket message into a serenity GatewayEvent.
+        let event = shard.parse(message)?;
+
+        // Have the shard process the WebSocket event, in case it needs to
+        // mutate its state, send a packet, etc.
+        shard.process(&event);
+
+        // Now you can do whatever you want with the event.
+        match event {
+            GatewayEvent::Dispatch(_, Event::MessageCreate(ev)) => {
+                if ev.message.content == "!ping" {
+                    println!("Pong!");
+                }
+            },
+            GatewayEvent::Dispatch(_, Event::Ready(_)) => {
+                println!("Connected to Discord!");
+            },
+            _ => {
+                // Ignore all other messages.
+            },
+        }
     }
+
+    Ok(())
 }

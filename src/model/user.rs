@@ -1,28 +1,23 @@
 //! User information-related models.
 
+use futures::{Future, future};
 use serde_json;
 use std::fmt;
 use super::utils::deserialize_u16;
 use super::prelude::*;
+use super::WrappedClient;
+use ::FutureResult;
 use internal::prelude::*;
 use model::misc::Mentionable;
 
-#[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
 #[cfg(feature = "model")]
 use builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
 use chrono::NaiveDateTime;
 #[cfg(feature = "model")]
-use http::{self, GuildPagination};
-#[cfg(all(feature = "cache", feature = "model"))]
-use parking_lot::RwLock;
+use http::GuildPagination;
 #[cfg(feature = "model")]
 use std::fmt::Write;
-#[cfg(feature = "model")]
-use std::mem;
-#[cfg(all(feature = "cache", feature = "model"))]
-use std::sync::Arc;
 #[cfg(feature = "model")]
 use utils::{self, VecMap};
 
@@ -37,6 +32,8 @@ pub struct CurrentUser {
     pub mfa_enabled: bool,
     #[serde(rename = "username")] pub name: String,
     pub verified: bool,
+    #[serde(skip)]
+    pub(crate) client: WrappedClient,
 }
 
 #[cfg(feature = "model")]
@@ -88,8 +85,8 @@ impl CurrentUser {
     ///
     /// CACHE.write().user.edit(|p| p.avatar(Some(&avatar)));
     /// ```
-    pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(EditProfile) -> EditProfile {
+    pub fn edit<F: FnOnce(EditProfile) -> EditProfile>(&mut self, f: F)
+        -> Box<Future<Item = CurrentUser, Error = Error>> {
         let mut map = VecMap::new();
         map.insert("username", Value::String(self.name.clone()));
 
@@ -98,15 +95,9 @@ impl CurrentUser {
         }
 
         let map = utils::vecmap_to_json_map(f(EditProfile(map)).0);
+        let value = Value::Object(map);
 
-        match http::edit_profile(&map) {
-            Ok(new) => {
-                let _ = mem::replace(self, new);
-
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        ftryopt!(self.client).http.edit_profile(&value)
     }
 
     /// Retrieves the URL to the current user's avatar, falling back to the
@@ -142,8 +133,10 @@ impl CurrentUser {
     ///     }
     /// }
     /// ```
-    pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
-        http::get_guilds(&GuildPagination::After(GuildId(1)), 100)
+    pub fn guilds(&self) -> FutureResult<Vec<GuildInfo>> {
+        ftryopt!(self.client)
+            .http
+            .get_guilds(&GuildPagination::After(GuildId(1)), 100)
     }
 
     /// Returns the invite url for the bot with the given permissions.
@@ -211,20 +204,26 @@ impl CurrentUser {
     ///
     /// [`Error::Format`]: ../enum.Error.html#variant.Format
     /// [`HttpError::InvalidRequest`]: ../http/enum.HttpError.html#variant.InvalidRequest
-    pub fn invite_url(&self, permissions: Permissions) -> Result<String> {
+    pub fn invite_url(&self, permissions: Permissions) -> FutureResult<String> {
         let bits = permissions.bits();
-        let client_id = http::get_current_application_info().map(|v| v.id)?;
 
-        let mut url = format!(
-            "https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot",
-            client_id
-        );
+        let done = ftryopt!(self.client)
+            .http
+            .get_current_application_info()
+            .map(move |app| {
+                let mut url = format!(
+                    "https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot",
+                    app.id,
+                );
 
-        if bits != 0 {
-            write!(url, "&permissions={}", bits)?;
-        }
+                if bits != 0 {
+                    let _ = write!(url, "&permissions={}", bits);
+                }
 
-        Ok(url)
+                url
+            });
+
+        Box::new(done)
     }
 
     /// Returns a static formatted URL of the user's icon, if one exists.
@@ -357,6 +356,8 @@ pub struct User {
     /// change if the username+discriminator pair becomes non-unique.
     #[serde(rename = "username")]
     pub name: String,
+    #[serde(skip)]
+    pub(crate) client: WrappedClient,
 }
 
 use std::hash::{Hash, Hasher};
@@ -388,7 +389,9 @@ impl User {
     ///
     /// [current user]: struct.CurrentUser.html
     #[inline]
-    pub fn create_dm_channel(&self) -> Result<PrivateChannel> { self.id.create_dm_channel() }
+    pub fn create_dm_channel(&self) -> FutureResult<PrivateChannel> {
+        ftryopt!(self.client).http.create_private_channel(self.id.0)
+    }
 
     /// Retrieves the time that this user was created at.
     #[inline]
@@ -477,45 +480,56 @@ impl User {
     // (AKA: Clippy is wrong and so we have to mark as allowing this lint.)
     #[allow(let_and_return)]
     #[cfg(feature = "builder")]
-    pub fn direct_message<F>(&self, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
+    pub fn direct_message<'a, F: 'a + FnOnce(CreateMessage) -> CreateMessage>(
+        &'a self,
+        f: F,
+    ) -> Box<Future<Item = Message, Error = Error> + 'a> {
         if self.bot {
-            return Err(Error::Model(ModelError::MessagingBot));
+            return Box::new(future::err(Error::Model(
+                ModelError::MessagingBot,
+            )));
         }
 
-        let private_channel_id = feature_cache! {
-            {
-                let finding = {
-                    let cache = CACHE.read();
+        let client = ftryopt!(self.client);
 
-                    let finding = cache.private_channels
-                        .values()
-                        .map(|ch| ch.read())
-                        .find(|ch| ch.recipient.read().id == self.id)
-                        .map(|ch| ch.id);
+        let private_channel_id = feature_cache! {{
+            let finding = {
+                let cache = client.cache.borrow();
 
-                    finding
-                };
+                let finding = cache.private_channels
+                    .values()
+                    .find(|ch| {
+                        let ch = ch.borrow();
+                        let recipient = ch.recipient.borrow();
 
-                if let Some(finding) = finding {
-                    finding
-                } else {
-                    let map = json!({
-                        "recipient_id": self.id.0,
-                    });
+                        recipient.id == self.id
+                    })
+                    .map(|ch| ch.borrow().id);
 
-                    http::create_private_channel(&map)?.id
-                }
+                finding
+            };
+
+            if let Some(finding) = finding {
+                return Box::new(client.http.send_message(finding.0, f));
             } else {
-                let map = json!({
-                    "recipient_id": self.id.0,
-                });
+                let done = client
+                    .http
+                    .create_private_channel(self.id.0)
+                    .map(|channel| channel.id);
 
-                http::create_private_channel(&map)?.id
+                Box::new(done)
             }
-        };
+        } else {
+            let done = ftryopt!(self.client)
+                .http
+                .create_private_channel(self.id.0)
+                .map(|channel| channel.id);
 
-        private_channel_id.send_message(f)
+            Box::new(done)
+        }};
+
+        Box::new(private_channel_id
+            .and_then(move |id| client.http.send_message(id.0, f)))
     }
 
     /// This is an alias of [direct_message].
@@ -539,7 +553,10 @@ impl User {
     /// [direct_message]: #method.direct_message
     #[cfg(feature = "builder")]
     #[inline]
-    pub fn dm<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+    pub fn dm<'a, F: 'a + FnOnce(CreateMessage) -> CreateMessage>(
+        &'a self,
+        f: F,
+    ) -> Box<Future<Item = Message, Error = Error> + 'a> {
         self.direct_message(f)
     }
 
@@ -586,12 +603,19 @@ impl User {
             GuildContainer::Guild(guild) => guild.roles.contains_key(&role_id),
             GuildContainer::Id(_guild_id) => {
                 feature_cache! {{
-                    CACHE.read()
+                    let client = match self.client.as_ref() {
+                        Some(client) => client,
+                        None => return false,
+                    };
+
+                    let cache = client.cache.borrow();
+
+                    cache
                         .guilds
                         .get(&_guild_id)
                         .map(|g| {
-                            g.read().members.get(&self.id)
-                                .map(|m| m.roles.contains(&role_id))
+                            g.borrow().members.get(&self.id)
+                                .map(|m| m.borrow().roles.contains(&role_id))
                                 .unwrap_or(false)
                         })
                         .unwrap_or(false)
@@ -601,69 +625,6 @@ impl User {
             },
         }
     }
-
-    /// Refreshes the information about the user.
-    ///
-    /// Replaces the instance with the data retrieved over the REST API.
-    ///
-    /// # Examples
-    ///
-    /// If maintaing a very long-running bot, you may want to periodically
-    /// refresh information about certain users if the state becomes
-    /// out-of-sync:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::prelude::*;
-    /// #
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, _: Message) {
-    ///         // normal message handling here
-    ///     }
-    /// }
-    ///
-    /// let mut client = Client::new("token", Handler).unwrap();
-    /// #
-    /// use serenity::model::id::UserId;
-    /// use serenity::CACHE;
-    /// use std::thread;
-    /// use std::time::Duration;
-    ///
-    /// let special_users = vec![UserId(114941315417899012), UserId(87600987040120832)];
-    ///
-    /// // start a new thread to periodically refresh the special users' data
-    /// // every 12 hours
-    /// let handle = thread::spawn(move || {
-    ///     // 12 hours in seconds
-    ///     let duration = Duration::from_secs(43200);
-    ///
-    ///     loop {
-    ///         thread::sleep(duration);
-    ///
-    ///         let cache = CACHE.read();
-    ///
-    ///         for id in &special_users {
-    ///             if let Some(user) = cache.user(*id) {
-    ///                 if let Err(why) = user.write().refresh() {
-    ///                     println!("Error refreshing {}: {:?}", id, why);
-    ///                 }
-    ///             }
-    ///         }
-    ///     }
-    /// });
-    ///
-    /// println!("{:?}", client.start());
-    /// ```
-    pub fn refresh(&mut self) -> Result<()> {
-        self.id.get().map(|replacement| {
-            mem::replace(self, replacement);
-
-            ()
-        })
-    }
-
 
     /// Returns a static formatted URL of the user's icon, if one exists.
     ///
@@ -718,40 +679,6 @@ impl fmt::Display for User {
     }
 }
 
-#[cfg(feature = "model")]
-impl UserId {
-    /// Creates a direct message channel between the [current user] and the
-    /// user. This can also retrieve the channel if one already exists.
-    ///
-    /// [current user]: struct.CurrentUser.html
-    pub fn create_dm_channel(&self) -> Result<PrivateChannel> {
-        let map = json!({
-            "recipient_id": self.0,
-        });
-
-        http::create_private_channel(&map)
-    }
-
-    /// Search the cache for the user with the Id.
-    #[cfg(feature = "cache")]
-    pub fn find(&self) -> Option<Arc<RwLock<User>>> { CACHE.read().user(*self) }
-
-    /// Gets a user by its Id over the REST API.
-    ///
-    /// **Note**: The current user must be a bot user.
-    #[inline]
-    pub fn get(&self) -> Result<User> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(user) = CACHE.read().user(*self) {
-                return Ok(user.read().clone());
-            }
-        }
-
-        http::get_user(self.0)
-    }
-}
-
 impl From<CurrentUser> for UserId {
     /// Gets the Id of a `CurrentUser` struct.
     fn from(current_user: CurrentUser) -> UserId { current_user.id }
@@ -760,16 +687,6 @@ impl From<CurrentUser> for UserId {
 impl<'a> From<&'a CurrentUser> for UserId {
     /// Gets the Id of a `CurrentUser` struct.
     fn from(current_user: &CurrentUser) -> UserId { current_user.id }
-}
-
-impl From<Member> for UserId {
-    /// Gets the Id of a `Member`.
-    fn from(member: Member) -> UserId { member.user.read().id }
-}
-
-impl<'a> From<&'a Member> for UserId {
-    /// Gets the Id of a `Member`.
-    fn from(member: &Member) -> UserId { member.user.read().id }
 }
 
 impl From<User> for UserId {

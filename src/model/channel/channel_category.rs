@@ -1,11 +1,13 @@
+use client::Client;
+use futures::{Future, future};
 use model::prelude::*;
+use std::rc::Rc;
+use ::FutureResult;
 
 #[cfg(all(feature = "builder", feature = "model"))]
 use builder::EditChannel;
-#[cfg(all(feature = "builder", feature = "model"))]
-use http;
-#[cfg(all(feature = "model", feature = "utils"))]
-use utils::{self as serenity_utils, VecMap};
+#[cfg(feature = "utils")]
+use utils as serenity_utils;
 
 /// A category of [`GuildChannel`]s.
 ///
@@ -35,14 +37,17 @@ pub struct ChannelCategory {
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     pub permission_overwrites: Vec<PermissionOverwrite>,
+    #[serde(skip)]
+    pub(crate) client: Option<Rc<Client>>,
 }
 
-#[cfg(feature = "model")]
 impl ChannelCategory {
     /// Adds a permission overwrite to the category's channels.
     #[inline]
-    pub fn create_permission(&self, target: &PermissionOverwrite) -> Result<()> {
-        self.id.create_permission(target)
+    pub fn create_permission(&self, target: &PermissionOverwrite) -> FutureResult<()> {
+        ftryopt!(self.client)
+            .http
+            .create_permission(self.id.0, target)
     }
 
     /// Deletes all permission overrides in the category from the channels.
@@ -51,23 +56,39 @@ impl ChannelCategory {
     ///
     /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
     #[inline]
-    pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
-        self.id.delete_permission(permission_type)
+    pub fn delete_permission(&self, permission_type: PermissionOverwriteType)
+        -> FutureResult<()> {
+        let id = match permission_type {
+            PermissionOverwriteType::Member(id) => id.0,
+            PermissionOverwriteType::Role(id) => id.0,
+        };
+
+        let done = ftryopt!(self.client)
+            .http
+            .delete_permission(self.id.0, id);
+
+        Box::new(done)
     }
 
     /// Deletes this category.
     #[inline]
-    pub fn delete(&self) -> Result<()> {
+    pub fn delete(&self) -> FutureResult<()> {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
 
-            if !utils::user_has_perms(self.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+            if !ftry!(client.cache.borrow().user_has_perms(self.id, req)) {
+                return Box::new(future::err(Error::Model(
+                    ModelError::InvalidPermissions(req),
+                )));
             }
         }
 
-        self.id.delete().map(|_| ())
+        let done = client.http.delete_channel(self.id.0).map(|_| ());
+
+        Box::new(done)
     }
 
     /// Modifies the category's settings, such as its position or name.
@@ -82,47 +103,22 @@ impl ChannelCategory {
     /// category.edit(|c| c.name("test").bitrate(86400));
     /// ```
     #[cfg(all(feature = "builder", feature = "model", feature = "utils"))]
-    pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(EditChannel) -> EditChannel {
+    pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F)
+        -> FutureResult<GuildChannel> {
+        let client = ftryopt!(self.client);
+
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
 
-            if !utils::user_has_perms(self.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+            if !ftry!(client.cache.borrow().user_has_perms(self.id, req)) {
+                return Box::new(future::err(Error::Model(
+                    ModelError::InvalidPermissions(req),
+                )));
             }
         }
 
-        let mut map = VecMap::new();
-        map.insert("name", Value::String(self.name.clone()));
-        map.insert("position", Value::Number(Number::from(self.position)));
-        map.insert("type", Value::String(self.kind.name().to_string()));
-
-        let map = serenity_utils::vecmap_to_json_map(f(EditChannel(map)).0);
-
-        http::edit_channel(self.id.0, &map).map(|channel| {
-            let GuildChannel {
-                id,
-                category_id,
-                permission_overwrites,
-                nsfw,
-                name,
-                position,
-                kind,
-                ..
-            } = channel;
-
-            *self = ChannelCategory {
-                id,
-                category_id,
-                permission_overwrites,
-                nsfw,
-                name,
-                position,
-                kind,
-            };
-            ()
-        })
+        ftryopt!(self.client).http.edit_channel(self.id.0, f)
     }
 
     #[cfg(feature = "utils")]
