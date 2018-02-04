@@ -112,6 +112,7 @@ extern crate serde_json;
 extern crate lazy_static;
 
 extern crate chrono;
+extern crate rand;
 extern crate parking_lot;
 extern crate serde;
 

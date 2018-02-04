@@ -15,6 +15,7 @@ use opus::{
     SoftClip,
 };
 use parking_lot::Mutex;
+use rand::random;
 use serde::Deserialize;
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
 use std::collections::HashMap;
@@ -58,6 +59,7 @@ pub struct Connection {
     encoder_stereo: bool,
     keepalive_timer: Timer,
     key: Key,
+    last_heartbeat_nonce: Option<u64>,
     soft_clip: SoftClip,
     sequence: u16,
     silence_frames: u8,
@@ -74,32 +76,43 @@ impl Connection {
         let url = generate_url(&mut info.endpoint)?;
 
         let mut client = ClientBuilder::from_url(&url).connect_secure(None)?;
+        let mut hello = None;
+        let mut ready = None;
         client.send_json(&payload::build_identify(&info))?;
 
-        let hello = loop {
+        loop {
+            if hello.is_some() && ready.is_some() {
+                break;
+            }
+
             let value = match client.recv_json()? {
                 Some(value) => value,
                 None => continue,
             };
 
             match VoiceEvent::deserialize(value)? {
-                VoiceEvent::Hello(received_hello) => {
-                    break received_hello;
+                VoiceEvent::Ready(r) => {
+                    ready = Some(r);
                 },
-                VoiceEvent::Heartbeat(_) => continue,
+                VoiceEvent::Hello(h) => {
+                    hello = Some(h);
+                },
                 other => {
-                    debug!("[Voice] Expected hello/heartbeat; got: {:?}", other);
+                    debug!("[Voice] Expected ready/hello; got: {:?}", other);
 
                     return Err(Error::Voice(VoiceError::ExpectedHandshake));
                 },
             }
         };
 
-        if !has_valid_mode(&hello.modes) {
+        let hello = hello.unwrap();
+        let ready = ready.unwrap();
+
+        if !has_valid_mode(&ready.modes) {
             return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
         }
 
-        let destination = (&info.endpoint[..], hello.port)
+        let destination = (&info.endpoint[..], ready.port)
             .to_socket_addrs()?
             .next()
             .ok_or(Error::Voice(VoiceError::HostnameResolve))?;
@@ -117,7 +130,7 @@ impl Connection {
         {
             let mut bytes = [0; 70];
 
-            (&mut bytes[..]).write_u32::<BigEndian>(hello.ssrc)?;
+            (&mut bytes[..]).write_u32::<BigEndian>(ready.ssrc)?;
             udp.send_to(&bytes, destination)?;
 
             let mut bytes = [0; 256];
@@ -170,12 +183,13 @@ impl Connection {
             encoder_stereo: false,
             key,
             keepalive_timer: Timer::new(temp_heartbeat),
+            last_heartbeat_nonce: None,
             udp,
             sequence: 0,
             silence_frames: 0,
             soft_clip,
             speaking: false,
-            ssrc: hello.ssrc,
+            ssrc: ready.ssrc,
             thread_items,
             timestamp: 0,
             user_id: info.user_id,
@@ -258,6 +272,17 @@ impl Connection {
                     ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
                         receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
                     },
+                    ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
+                        match self.last_heartbeat_nonce {
+                            Some(nonce) => {
+                                if ev.nonce != nonce {
+                                    warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                                }
+                                self.last_heartbeat_nonce = None;
+                            },
+                            None => {},
+                        }
+                    },
                     ReceiverStatus::Websocket(other) => {
                         info!("[Voice] Received other websocket data: {:?}", other);
                     },
@@ -273,7 +298,9 @@ impl Connection {
 
         // Send the voice websocket keepalive if it's time
         if self.keepalive_timer.check() {
-            self.client.lock().send_json(&payload::build_keepalive())?;
+            let nonce = random::<u64>();
+            self.last_heartbeat_nonce = Some(nonce);
+            self.client.lock().send_json(&payload::build_heartbeat(nonce))?;
         }
 
         // Send UDP keepalive if it's time
@@ -503,12 +530,12 @@ fn encryption_key(client: &mut Client) -> Result<Key> {
         };
 
         match VoiceEvent::deserialize(value)? {
-            VoiceEvent::Ready(ready) => {
-                if ready.mode != CRYPTO_MODE {
+            VoiceEvent::SessionDescription(desc) => {
+                if desc.mode != CRYPTO_MODE {
                     return Err(Error::Voice(VoiceError::VoiceModeInvalid));
                 }
 
-                return Key::from_slice(&ready.secret_key)
+                return Key::from_slice(&desc.secret_key)
                     .ok_or(Error::Voice(VoiceError::KeyGen));
             },
             VoiceEvent::Unknown(op, value) => {

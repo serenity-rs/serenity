@@ -102,15 +102,17 @@ enum_number!(
         /// Used to select the voice protocol.
         SelectProtocol = 1,
         /// Used to complete the websocket handshake.
-        Hello = 2,
+        Ready = 2,
         /// Used to keep the websocket connection alive.
-        KeepAlive = 3,
+        Heartbeat = 3,
         /// Used to describe the session.
         SessionDescription = 4,
         /// Used to indicate which users are speaking.
         Speaking = 5,
-        /// Used to heartbeat.
-        Heartbeat = 8,
+        /// Heartbeat ACK, received by the client to show the server's receipt of a heartbeat.
+        HeartbeatAck = 6,
+        /// Used to determin how often the client must send a heartbeat.
+        Hello = 8,
     }
 );
 
@@ -119,11 +121,12 @@ impl VoiceOpCode {
         match *self {
             VoiceOpCode::Identify => 0,
             VoiceOpCode::SelectProtocol => 1,
-            VoiceOpCode::Hello => 2,
-            VoiceOpCode::KeepAlive => 3,
+            VoiceOpCode::Ready => 2,
+            VoiceOpCode::Heartbeat => 3,
             VoiceOpCode::SessionDescription => 4,
             VoiceOpCode::Speaking => 5,
-            VoiceOpCode::Heartbeat => 8,
+            VoiceOpCode::HeartbeatAck => 6,
+            VoiceOpCode::Hello => 8,
         }
     }
 }
