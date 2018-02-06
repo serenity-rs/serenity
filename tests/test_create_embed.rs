@@ -82,9 +82,6 @@ fn test_from_embed() {
         "image": {
             "url": "https://i.imgur.com/XfWpfCV.gif",
         },
-        "video": {
-            "url": "https://i.imgur.com/XfWpfCV.mp4",
-        },
         "footer": {
             "text": "This is a hakase footer",
             "icon_url": "https://i.imgur.com/XfWpfCV.gif",
