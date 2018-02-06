@@ -56,7 +56,6 @@ fn test_from_embed() {
         .colour(0xFF0011)
         .description("This is a hakase description")
         .image("https://i.imgur.com/XfWpfCV.gif")
-        .video("https://i.imgur.com/XfWpfCV.mp4")
         .title("still a hakase")
         .url("https://i.imgur.com/XfWpfCV.gif");
 
