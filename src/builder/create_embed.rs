@@ -176,14 +176,14 @@ impl CreateEmbed {
 
     /// Set the image associated with the embed. This only supports HTTP(S).
     #[inline]
-    pub fn image(self, url: &str) -> Self {
-        self.url_object("image", url)
+    pub fn image<S: AsRef<str>>(self, url: S) -> Self {
+        self.url_object("image", url.as_ref())
     }
 
     /// Set the thumbnail of the embed. This only supports HTTP(S).
     #[inline]
-    pub fn thumbnail(self, url: &str) -> Self {
-        self.url_object("thumbnail", url)
+    pub fn thumbnail<S: AsRef<str>>(self, url: S) -> Self {
+        self.url_object("thumbnail", url.as_ref())
     }
 
     /// Set the timestamp.
@@ -288,9 +288,9 @@ impl CreateEmbed {
     }
 
     /// Set the URL to direct to when clicking on the title.
-    pub fn url(mut self, url: &str) -> Self {
+    pub fn url<S: AsRef<str>>(mut self, url: S) -> Self {
         self.0
-            .insert("url", Value::String(url.to_string()));
+            .insert("url", Value::String(url.as_ref().to_string()));
 
         CreateEmbed(self.0)
     }
@@ -301,8 +301,8 @@ impl CreateEmbed {
     /// with the provided filename. Or else this won't work.
     ///
     /// [`ChannelId::send_files`]: ../model/id/struct.ChannelId.html#send_files
-    pub fn attachment(self, filename: &str) -> Self {
-        self.image(&format!("attachment://{}", filename))
+    pub fn attachment<S: AsRef<str>>(self, filename: S) -> Self {
+        self.image(&format!("attachment://{}", filename.as_ref()))
     }
 }
 
