@@ -1355,6 +1355,16 @@ impl Guild {
         self.id.reorder_channels(channels)
     }
 
+    /// Re-orders the roles of the guild.
+    ///
+    /// Although not required, you should specify all roles' positions,
+    /// regardless of whether they were updated. Otherwise, positioning can
+    /// sometimes get weird.
+    pub fn reorder_roles<It>(&self, roles: It) -> Result<Vec<Role>>
+        where It: IntoIterator<Item = (RoleId, u64)> {
+        self.id.reorder_roles(roles)
+    }
+
     /// Returns the Id of the shard associated with the guild.
     ///
     /// When the cache is enabled this will automatically retrieve the total

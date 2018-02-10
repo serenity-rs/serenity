@@ -457,6 +457,24 @@ impl GuildId {
         http::edit_guild_channel_positions(self.0, &Value::Array(items))
     }
 
+    /// Re-orders the roles of the guild.
+    ///
+    /// Accepts an iterator of a tuple of the role ID to modify and its new
+    /// position.
+    ///
+    /// Although not required, you should specify all roles' positions,
+    /// regardless of whether they were updated. Otherwise, positioning can
+    /// sometimes get weird.
+    pub fn reorder_roles<It>(&self, roles: It) -> Result<Vec<Role>>
+        where It: IntoIterator<Item = (RoleId, u64)> {
+        let items = roles.into_iter().map(|(id, pos)| json!({
+            "id": id,
+            "position": pos,
+        })).collect();
+
+        http::edit_role_positions(self.0, &Value::Array(items))
+    }
+
     /// Returns the Id of the shard associated with the guild.
     ///
     /// When the cache is enabled this will automatically retrieve the total
