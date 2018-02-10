@@ -431,6 +431,16 @@ impl PartialGuild {
     #[inline]
     pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> { self.id.unban(user_id) }
 
+    /// Retrieve's the guild's vanity URL.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[inline]
+    pub fn vanity_url(&self) -> Result<String> {
+        self.id.vanity_url()
+    }
+
     /// Retrieves the guild's webhooks.
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.

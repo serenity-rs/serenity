@@ -1241,6 +1241,25 @@ pub fn get_guild_invites(guild_id: u64) -> Result<Vec<RichInvite>> {
         .map_err(From::from)
 }
 
+/// Gets a guild's vanity URL if it has one.
+pub fn get_guild_vanity_url(guild_id: u64) -> Result<String> {
+    #[derive(Deserialize)]
+    struct GuildVanityUrl {
+        code: String,
+    }
+
+    let response = request!(
+        Route::GuildsIdVanityUrl(guild_id),
+        get,
+        "/guilds/{}/vanity-url",
+        guild_id
+    );
+
+    serde_json::from_reader::<HyperResponse, GuildVanityUrl>(response)
+        .map(|x| x.code)
+        .map_err(From::from)
+}
+
 /// Gets the members of a guild. Optionally pass a `limit` and the Id of the
 /// user to offset the result by.
 pub fn get_guild_members(guild_id: u64,

@@ -535,6 +535,16 @@ impl GuildId {
         http::remove_ban(self.0, user_id.into().0)
     }
 
+    /// Retrieve's the guild's vanity URL.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[inline]
+    pub fn vanity_url(&self) -> Result<String> {
+        http::get_guild_vanity_url(self.0)
+    }
+
     /// Retrieves the guild's webhooks.
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.

@@ -316,6 +316,12 @@ pub enum Route {
     ///
     /// [`GuildId`]: struct.GuildId.html
     GuildsIdRolesId(u64),
+    /// Route for the `/guilds/:guild_id/vanity-url` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: struct.GuildId.html
+    GuildsIdVanityUrl(u64),
     /// Route for the `/guilds/:guild_id/webhooks` path.
     ///
     /// The data is the relevant [`GuildId`].
