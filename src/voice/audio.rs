@@ -58,12 +58,14 @@ pub enum AudioType {
 ///     audio.volume(0.5);
 /// }
 /// ```
+///
 /// [`LockedAudio`]: type.LockedAudio.html
 /// [`Handler::play_only`]: struct.Handler.html#method.play_only
 /// [`Handler::play_returning`]: struct.Handler.html#method.play_returning
 pub struct Audio {
 
     /// Whether or not this sound is currently playing.
+    ///
     /// Can be controlled with [`.play`] or [`.pause`]
     /// if chaining is desired.
     ///
@@ -72,6 +74,7 @@ pub struct Audio {
     pub playing: bool,
 
     /// The desired volume for playback.
+    ///
     /// Sensible values fall between `0.0` and `1.0`.
     /// Can be controlled with [`.volume`] if chaining is desired.
     ///
@@ -79,14 +82,17 @@ pub struct Audio {
     pub volume: f32,
 
     /// Whether or not the sound has finished, or reached the end of its stream.
+    ///
     /// ***Read-only*** for now.
     pub finished: bool,
 
     /// Underlying data access object.
+    ///
     /// *Calling code is not expected to use this.*
     pub source: Box<AudioSource>,
 
     /// The current position for playback.
+    ///
     /// Consider the position fields **read-only** for now.
     pub position: Duration,
     pub position_modified: bool,
@@ -131,7 +137,9 @@ impl Audio {
         self
     }
 
-    /// Change the position in the stream for subsequent playback. Currently a No-op.
+    /// Change the position in the stream for subsequent playback.
+    ///
+    /// Currently a No-op.
     pub fn position(&mut self, position: Duration) -> &mut Self {
         self.position = position;
         self.position_modified = true;
@@ -140,6 +148,7 @@ impl Audio {
     }
 
     /// Steps playback location forward by one frame.
+    ///
     /// *Used internally*, although in future this might affect seek position.
     pub(crate) fn step_frame(&mut self) {
         self.position += Duration::from_millis(20);

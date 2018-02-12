@@ -270,7 +270,9 @@ impl Handler {
     }
 
     /// Sets the bitrate for encoding Opus packets sent along
-    /// the channel being managed. The default rate is 128 kbps.
+    /// the channel being managed.
+    ///
+    /// The default rate is 128 kbps.
     /// Sensible values range between `Bits(512)` and `Bits(512_000)`
     /// bits per second.
     /// Alternatively, `Auto` and `Max` remain available.
