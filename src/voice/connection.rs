@@ -81,10 +81,6 @@ impl Connection {
         client.send_json(&payload::build_identify(&info))?;
 
         loop {
-            if hello.is_some() && ready.is_some() {
-                break;
-            }
-
             let value = match client.recv_json()? {
                 Some(value) => value,
                 None => continue,
@@ -93,9 +89,15 @@ impl Connection {
             match VoiceEvent::deserialize(value)? {
                 VoiceEvent::Ready(r) => {
                     ready = Some(r);
+                    if hello.is_some(){
+                        break;
+                    }
                 },
                 VoiceEvent::Hello(h) => {
                     hello = Some(h);
+                    if ready.is_some() {
+                        break;
+                    }
                 },
                 other => {
                     debug!("[Voice] Expected ready/hello; got: {:?}", other);
@@ -105,8 +107,8 @@ impl Connection {
             }
         };
 
-        let hello = hello.unwrap();
-        let ready = ready.unwrap();
+        let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
+        let ready = ready.expect("[Voice] Ready packet expected in connection initialisation, but not found.");
 
         if !has_valid_mode(&ready.modes) {
             return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
@@ -206,7 +208,7 @@ impl Connection {
         // We need to actually reserve enough space for the desired bitrate.
         let size = match bitrate {
             // If user specified, we can calculate. 20ms means 50fps.
-            Bitrate::Bits(b) => b.abs()/50,
+            Bitrate::Bits(b) => b.abs() / 50,
             // Otherwise, just have a lot preallocated.
             _ => 5120,
         } + 16;
@@ -278,6 +280,7 @@ impl Connection {
                                 if ev.nonce != nonce {
                                     warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
                                 }
+
                                 self.last_heartbeat_nonce = None;
                             },
                             None => {},
@@ -312,10 +315,8 @@ impl Connection {
 
         // Reconfigure encoder bitrate.
         // From my testing, it seemed like this needed to be set every cycle.
-        // -- FelixMCFelix
-        match self.encoder.set_bitrate(bitrate) {
-            Ok(_) => {},
-            Err(e) => {println!("Bitrate set unsuccessfully: {:?}", e);},
+        if let Err(e) = self.encoder.set_bitrate(bitrate) {
+            warn!("[Voice] Bitrate set unsuccessfully: {:?}", e);
         }
 
         let mut opus_frame = Vec::new();
@@ -392,6 +393,7 @@ impl Connection {
             }
 
             aud.finished = finished;
+
             if !finished {
                 aud.step_frame();
             }
@@ -506,7 +508,7 @@ fn combine_audio(
         let sample_index = if true_stereo { i } else { i/2 };
         let sample = (raw_buffer[sample_index] as f32) / 32768.0;
 
-        float_buffer[i] = float_buffer[i] + sample*volume;
+        float_buffer[i] = float_buffer[i] + sample * volume;
     }
 }
 

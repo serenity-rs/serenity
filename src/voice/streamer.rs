@@ -3,7 +3,7 @@ use internal::prelude::*;
 use opus::{
     Channels,
     Decoder as OpusDecoder,
-    Result as OResult,
+    Result as OpusResult,
 };
 use parking_lot::Mutex;
 use serde_json;
@@ -28,7 +28,7 @@ impl Read for ChildContainer {
 struct SendDecoder(OpusDecoder);
 
 impl SendDecoder {
-    fn decode_float(&mut self, input: &[u8], output: &mut [f32], fec: bool) -> OResult<usize> {
+    fn decode_float(&mut self, input: &[u8], output: &mut [f32], fec: bool) -> OpusResult<usize> {
         let &mut SendDecoder(ref mut sd) = self;
         sd.decode_float(input, output, fec)
     }
@@ -101,8 +101,8 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
         let count = {
             let mut decoder = decoder_lock.lock();
 
-            decoder.decode_float(frame.as_slice(), &mut local_buf, false)
-        }.ok()?;
+            decoder.decode_float(frame.as_slice(), &mut local_buf, false).ok()?
+        };
 
         for i in 0..1920 {
             float_buffer[i] += local_buf[i] * volume;
@@ -185,8 +185,7 @@ pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Box<AudioSource>, DcaError> {
     Ok(opus(metadata.is_stereo(), reader))
 }
 
-/// Creates an Opus audio source.
-/// This makes certain assumptions: namely, that the input stream
+/// Creates an Opus audio source. This makes certain assumptions: namely, that the input stream
 /// is composed ONLY of opus frames of the variety that Discord expects.
 ///
 /// If you want to decode a `.opus` file, use [`ffmpeg`]

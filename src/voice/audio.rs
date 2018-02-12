@@ -41,8 +41,8 @@ pub enum AudioType {
 ///
 /// Accessed by both commands and the playback code -- as such, access is
 /// always guarded. In particular, you should expect to receive
-/// a [`LockedAudio`] when calling [`Handler::play_returning()`] or
-/// [`Handler::play_only()`].
+/// a [`LockedAudio`] when calling [`Handler::play_returning`] or
+/// [`Handler::play_only`].
 ///
 /// # Example
 /// ```rust, no-run
@@ -59,30 +59,33 @@ pub enum AudioType {
 /// }
 /// ```
 /// [`LockedAudio`]: type.LockedAudio.html
-/// [`Handler::play_only()`]: struct.Handler.html#method.play_only
-/// [`Handler::play_returning()`]: struct.Handler.html#method.play_returning
+/// [`Handler::play_only`]: struct.Handler.html#method.play_only
+/// [`Handler::play_returning`]: struct.Handler.html#method.play_returning
 pub struct Audio {
+
     /// Whether or not this sound is currently playing.
-    /// Can be controlled with [`.play()`] or [`.pause()`]
+    /// Can be controlled with [`.play`] or [`.pause`]
     /// if chaining is desired.
     ///
-    /// [`.play()`]: #method.play
-    /// [`.pause()`]: #method.pause
+    /// [`.play`]: #method.play
+    /// [`.pause`]: #method.pause
     pub playing: bool,
+
     /// The desired volume for playback.
     /// Sensible values fall between `0.0` and `1.0`.
-    /// Can be controlled with [`.volume()`]
-    /// if chaining is desired.
+    /// Can be controlled with [`.volume`] if chaining is desired.
     ///
-    /// [`.volume()`]: #method.volume
+    /// [`.volume`]: #method.volume
     pub volume: f32,
-    /// Whether or not the sound has finished,
-    /// or reached the end of its stream.
+
+    /// Whether or not the sound has finished, or reached the end of its stream.
     /// ***Read-only*** for now.
     pub finished: bool,
+
     /// Underlying data access object.
     /// *Calling code is not expected to use this.*
     pub source: Box<AudioSource>,
+
     /// The current position for playback.
     /// Consider the position fields **read-only** for now.
     pub position: Duration,
@@ -128,8 +131,7 @@ impl Audio {
         self
     }
 
-    /// Change the in the stream for subsequent playback.
-    /// Currently a No-op.
+    /// Change the position in the stream for subsequent playback. Currently a No-op.
     pub fn position(&mut self, position: Duration) -> &mut Self {
         self.position = position;
         self.position_modified = true;
@@ -138,11 +140,12 @@ impl Audio {
     }
 
     /// Steps playback location forward by one frame.
-    /// *Used internally.*
-    pub fn step_frame(&mut self) {
+    /// *Used internally*, although in future this might affect seek position.
+    pub(crate) fn step_frame(&mut self) {
         self.position += Duration::from_millis(20);
         self.position_modified = false;
     }
+
 }
 
 /// Threadsafe form of an instance of the [`Audio`] struct, locked behind a
