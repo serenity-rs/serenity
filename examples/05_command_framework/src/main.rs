@@ -148,9 +148,13 @@ fn main() {
                 If you want more information about a specific command, just pass the command as argument.")
                 // Some arguments require a `{}` in order to replace it with contextual information.
                 // In this case our `{}` refers to a command's name.
-                .command_not_found_text("Could not {}, I'm sorry : (")
+                .command_not_found_text("Could not find {}, I'm sorry : (")
+                // If you want your help to display similar command-names upon failure matching.
+                .find_similar_commands(true)
+                // Sets Levenshtein distance, if a command is less than or equal to your value, it will be considered similar.
+                .max_edit_distance(2)
                 // Another argument requiring `{}`, again replaced with the command's name.
-                .suggestion_text("How about this command: {}, it's numero uno on the market...!")
+                .suggestion_text("Could not find your command, how about one of these: {}")
                 // On another note, you can set up the help-menu-filter-behaviour.
                 // Here are all possible settings shown on all possible options.
                 // If a user lacks permissions for a command, we can `Hide` the command.
@@ -179,6 +183,9 @@ fn main() {
                 .batch_known_as(vec!["kitty", "neko"]) // Adds multiple aliases
                 .bucket("emoji") // Make this command use the "emoji" bucket.
                 .cmd(cat)
+                // By default commands will be listed in the help-command for similar
+                // command-names (if criteria is met), this overrides it for this command.
+                .suggest(false)
                  // Allow only administrators to call this:
                 .required_permissions(Permissions::ADMINISTRATOR))
             .command("dog", |c| c
