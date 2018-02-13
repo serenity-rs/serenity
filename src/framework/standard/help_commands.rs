@@ -135,7 +135,7 @@ fn find_similar_commands<H: BuildHasher>(searched_command_name: &str, msg: &Mess
             match *command {
                 CommandOrAlias::Command(ref cmd) => {
                     let command_options = cmd.options();
-                    if !command_options.suggested { continue };
+                    if !command_options.help_suggested { continue };
 
                     analyse_command_for_suggestion(&mut result, msg, &command_options, help_options, command_name);
                 },
@@ -143,7 +143,7 @@ fn find_similar_commands<H: BuildHasher>(searched_command_name: &str, msg: &Mess
                     match group.commands[name] {
                         CommandOrAlias::Command(ref cmd) => {
                         let command_options = cmd.options();
-                        if !command_options.suggested { continue };
+                        if !command_options.help_suggested { continue };
 
                         analyse_command_for_suggestion(&mut result, msg, &command_options, help_options, command_name);
                     },

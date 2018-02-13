@@ -220,7 +220,7 @@ impl CreateCommand {
     /// Specifies whether the command should be listed below
     /// similar commands if criteria is met.
     pub fn help_suggested(mut self, is_suggested: bool) -> Self {
-        self.0.suggested = is_suggested;
+        self.0.help_suggested = is_suggested;
 
         self
     }
