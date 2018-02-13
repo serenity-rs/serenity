@@ -130,7 +130,7 @@ fn find_similar_commands<H: BuildHasher>(searched_command_name: &str, msg: &Mess
 
         for (command_name, command) in &group.commands {
 
-            if edit_distance::edit_distance(command_name, &searched_command_name) > help_options.max_edit_distance { continue };
+            if edit_distance(command_name, &searched_command_name) > help_options.max_edit_distance { continue };
 
             match *command {
                 CommandOrAlias::Command(ref cmd) => {
