@@ -34,6 +34,7 @@ use std::fmt::Write;
 use super::command::{InternalCommand};
 use super::{Args, CommandGroup, CommandOrAlias, HelpOptions, CommandOptions, CommandError, HelpBehaviour};
 use utils::Colour;
+use edit_distance;
 
 fn error_embed(channel_id: &ChannelId, input: &str, colour: Colour) {
     let _ = channel_id.send_message(|mut m| {
@@ -81,6 +82,95 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
     !cmd.guild_only
 }
 
+fn analyse_command_for_suggestion(result: &mut Vec<String>, msg: &Message, command_options: &Arc<CommandOptions>, help_options: &HelpOptions, command_name: &str) {
+    if !command_options.dm_only && !command_options.guild_only
+    || command_options.dm_only && msg.is_private()
+    || command_options.guild_only && !msg.is_private() {
+
+        if let Some(guild) = msg.guild() {
+            let guild = guild.read();
+
+            if let Some(member) = guild.members.get(&msg.author.id) {
+
+                if command_options.help_available && has_correct_permissions(command_options, msg) {
+
+                    if has_correct_roles(command_options, &guild, &member) {
+                        result.push(format!("`{}`", command_name.clone()));
+                    } else {
+                        match help_options.lacking_role {
+                            HelpBehaviour::Strike => result.push(format!("~~`{}`~~", command_name.clone())),
+                            HelpBehaviour::Nothing => result.push(format!("`{}`", command_name.clone())),
+                            HelpBehaviour::Hide => (),
+                        }
+                    }
+                }
+            } else {
+                match help_options.lacking_permissions {
+                    HelpBehaviour::Strike => result.push(format!("~~`{}`~~", command_name.clone())),
+                    HelpBehaviour::Nothing => result.push(format!("`{}`", command_name.clone())),
+                    HelpBehaviour::Hide => (),
+                }
+            }
+        } else {
+            result.push(format!("`{}`", command_name.clone()));
+        }
+    } else {
+        match help_options.wrong_channel {
+            HelpBehaviour::Strike => result.push(format!("~~`{}`~~", command_name)),
+            HelpBehaviour::Nothing => result.push(format!("`{}`", command_name.clone())),
+            HelpBehaviour::Hide => (),
+        }
+    }
+}
+
+fn find_similar_commands<H: BuildHasher>(searched_command_name: &str, msg: &Message, groups: &HashMap<String, Arc<CommandGroup>, H>, help_options: &HelpOptions) -> Vec<String> {
+    let mut result = Vec::new();
+
+    for (_, group) in groups {
+
+        for (command_name, command) in &group.commands {
+
+            if edit_distance::edit_distance(command_name, &searched_command_name) > help_options.max_edit_distance { continue };
+
+            match *command {
+                CommandOrAlias::Command(ref cmd) => {
+                    let command_options = cmd.options();
+                    if !command_options.suggested { continue };
+
+                    analyse_command_for_suggestion(&mut result, msg, &command_options, help_options, command_name);
+                },
+                CommandOrAlias::Alias(ref name) => {
+                    match group.commands[name] {
+                        CommandOrAlias::Command(ref cmd) => {
+                        let command_options = cmd.options();
+                        if !command_options.suggested { continue };
+
+                        analyse_command_for_suggestion(&mut result, msg, &command_options, help_options, command_name);
+                    },
+                    _ => continue,
+                    }
+                }
+            }
+        }
+    }
+
+    result
+}
+
+fn generate_similar_commands_message<H: BuildHasher>(searched_command_name: &str, msg: &Message, help_options: &HelpOptions, groups: &HashMap<String, Arc<CommandGroup>, H>) -> String {
+    if help_options.find_similar_commands {
+        let similar_commands = &find_similar_commands(searched_command_name, msg, groups, help_options);
+
+        if similar_commands.is_empty() {
+                help_options.command_not_found_text.replace("{}", &format!("`{}`", searched_command_name))
+        } else {
+                help_options.suggestion_text.replace("{}", &similar_commands.join(" "))
+        }
+    } else {
+        help_options.command_not_found_text.replace("{}", &format!("`{}`", searched_command_name))
+    }
+}
+
 /// Posts an embed showing each individual command group and its commands.
 ///
 /// # Examples
@@ -110,7 +200,7 @@ pub fn with_embeds<H: BuildHasher>(
     if !args.is_empty() {
         let name = args.full();
 
-        for (group_name, group) in groups {
+        for (group_name, group) in &groups {
             let mut found: Option<(&String, &InternalCommand)> = None;
 
             for (command_name, command) in &group.commands {
@@ -211,7 +301,8 @@ pub fn with_embeds<H: BuildHasher>(
             }
         }
 
-        let error_msg = help_options.command_not_found_text.replace("{}", name);
+        let error_msg = generate_similar_commands_message(&name, &msg, &help_options, &groups);
+
         error_embed(&msg.channel_id, &error_msg, help_options.embed_error_colour);
 
         return Ok(());
