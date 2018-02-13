@@ -124,12 +124,18 @@ pub struct CommandOptions {
     pub owners_only: bool,
     /// Other names that can be used to call this command instead.
     pub aliases: Vec<String>,
+    /// Decides whether a command should be displayed in help's suggested commands for similar names.
+    pub help_suggested: bool,
 }
 
 #[derive(Debug)]
 pub struct HelpOptions {
-    /// Suggests a command's name.
+    /// If this is `true`, the help-commands will provide a `suggestion_text`.
+    pub find_similar_commands: bool,
+    /// Suggests names of similar commands if help-command failed finding a match.
     pub suggestion_text: String,
+    /// Maximum Levenshtein distance to find similar commands, used for `suggestion_text`.
+    pub max_edit_distance: usize,
     /// If no help is available, this text will be displayed.
     pub no_help_available_text: String,
     /// How to use a command, `{usage_label}: {command_name} {args}`
@@ -196,6 +202,8 @@ impl HelpCommand for Arc<HelpCommand> {
 impl Default for HelpOptions {
     fn default() -> HelpOptions {
         HelpOptions {
+            find_similar_commands: true,
+            max_edit_distance: 1,
             suggestion_text: "Did you mean {}?".to_string(),
             no_help_available_text: "**Error**: No help available.".to_string(),
             usage_label: "Usage".to_string(),
@@ -314,6 +322,7 @@ impl Default for CommandOptions {
             help_available: true,
             owners_only: false,
             allowed_roles: Vec::new(),
+            help_suggested: true,
         }
     }
 }

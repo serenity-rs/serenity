@@ -8,6 +8,13 @@ use std::sync::Arc;
 pub struct CreateHelpCommand(pub HelpOptions, pub HelpFunction);
 
 impl CreateHelpCommand {
+    /// Sets whether the help-command shall try to find similar commands via Levenshtein distance.
+    pub fn find_similar_commands(mut self, status: bool) -> Self {
+        self.0.find_similar_commands = status;
+
+        self
+    }
+
     /// Sets a message displaying if input could not be found
     /// but a similar command is available.
     ///
@@ -15,6 +22,13 @@ impl CreateHelpCommand {
     /// Hence no `{}` results in no command-name.
     pub fn suggestion_text(mut self, text: &str) -> Self {
         self.0.suggestion_text = text.to_string();
+
+        self
+    }
+
+    /// Sets the maximum Levenshtein distance a command for it to be considered similar.
+    pub fn max_edit_distance(mut self, max_edit_distance: usize) -> Self {
+        self.0.max_edit_distance = max_edit_distance;
 
         self
     }
