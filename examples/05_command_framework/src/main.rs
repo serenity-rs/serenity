@@ -121,6 +121,11 @@ fn main() {
                 Err(why) => println!("Command '{}' returned error {:?}", command_name, why),
             }
         })
+        // Set a function that's called whenever an attempted command-call's
+        // command could not be found.
+        .unrecognised_command(|_, _, unknown_command_name| {
+            println!("Could not find command named '{}'", unknown_command_name);
+        })
         // Set a function that's called whenever a command's execution didn't complete for one
         // reason or another. For example, when a user has exceeded a rate-limit or a command
         // can only be performed by the bot owner.
