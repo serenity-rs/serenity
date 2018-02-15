@@ -25,7 +25,7 @@ use model::channel::Message;
 use model::guild::{Guild, Member};
 use model::id::{ChannelId, GuildId, UserId};
 use model::Permissions;
-use self::command::{AfterHook, BeforeHook};
+use self::command::{AfterHook, BeforeHook, UnrecognisedCommandHook};
 use std::collections::HashMap;
 use std::default::Default;
 use std::sync::Arc;
@@ -205,6 +205,7 @@ pub struct StandardFramework {
     dispatch_error_handler: Option<Arc<DispatchErrorHook>>,
     buckets: HashMap<String, Bucket>,
     after: Option<Arc<AfterHook>>,
+    unrecognised_command: Option<Arc<UnrecognisedCommandHook>>,
     /// Whether the framework has been "initialized".
     ///
     /// The framework is initialized once one of the following occurs:
@@ -879,6 +880,31 @@ impl StandardFramework {
         self
     }
 
+    /// Specify the function to be called if no command could be dispatched.
+    ///
+    /// # Examples
+    ///
+    /// Using `unrecognised_command`:
+    ///
+    /// ```rust
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler).unwrap();
+    /// #
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// client.with_framework(StandardFramework::new()
+    ///     .unrecognised_command(|ctx, msg| { }));
+    /// ```
+    pub fn unrecognised_command<F>(mut self, f: F) -> Self
+        where F: Fn(&mut Context, &Message, &str) + Send + Sync + 'static {
+        self.unrecognised_command = Some(Arc::new(f));
+
+        self
+    }
+
     /// Sets what code should be executed when a user sends `(prefix)help`.
     pub fn help(mut self, f: HelpFunction) -> Self {
         let a = CreateHelpCommand(HelpOptions::default(), f).finish();
@@ -909,6 +935,7 @@ impl Framework for StandardFramework {
         threadpool: &ThreadPool,
     ) {
         let res = command::positions(&mut context, &message, &self.configuration);
+        let mut unrecognised_command_name = String::from("");
 
         let positions = match res {
             Some(mut positions) => {
@@ -953,13 +980,14 @@ impl Framework for StandardFramework {
                         built
                     };
 
+                    unrecognised_command_name = built.clone();
                     let cmd = group.commands.get(&built);
 
                     if let Some(&CommandOrAlias::Alias(ref points_to)) = cmd {
                         built = points_to.to_string();
                     }
 
-                    let mut to_check = if let Some(ref prefix) = group.prefix {
+                    let to_check = if let Some(ref prefix) = group.prefix {
                         if built.starts_with(prefix) && command_length > prefix.len() + 1 {
                             built[(prefix.len() + 1)..].to_string()
                         } else {
@@ -1049,6 +1077,14 @@ impl Framework for StandardFramework {
                 }
             }
         }
+
+        let unrecognised_command = self.unrecognised_command.clone();
+
+        threadpool.execute(move || {
+            if let Some(unrecognised_command) = unrecognised_command {
+                (unrecognised_command)(&mut context, &message, &unrecognised_command_name);
+            }
+        });
     }
 
     fn update_current_user(&mut self, user_id: UserId) {
