@@ -896,7 +896,7 @@ impl StandardFramework {
     /// use serenity::framework::StandardFramework;
     ///
     /// client.with_framework(StandardFramework::new()
-    ///     .unrecognised_command(|ctx, msg| { }));
+    ///     .unrecognised_command(|ctx, msg, unrecognised_command_name| { }));
     /// ```
     pub fn unrecognised_command<F>(mut self, f: F) -> Self
         where F: Fn(&mut Context, &Message, &str) + Send + Sync + 'static {
