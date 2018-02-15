@@ -926,7 +926,7 @@ impl StandardFramework {
     ///
     /// Using `unrecognised_command`:
     ///
-    /// ```rust,no_run
+    /// ```rust
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
