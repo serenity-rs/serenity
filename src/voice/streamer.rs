@@ -18,7 +18,9 @@ impl Read for ChildContainer {
 
 impl Drop for ChildContainer {
     fn drop (&mut self) {
-        self.0.wait().expect("couldn't drop child process -- not running?");
+        if let Err(e) = self.0.wait() {
+            debug!("[Voice] Error awaiting child process: {:?}", e);
+        }
     }
 }
 
