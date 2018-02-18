@@ -1,4 +1,3 @@
-
 pub mod help_commands;
 
 mod command;
@@ -10,18 +9,18 @@ mod buckets;
 mod args;
 
 pub use self::args::{
-    Args, 
-    Iter, 
+    Args,
+    Iter,
     Error as ArgError
 };
 pub(crate) use self::buckets::{Bucket, Ratelimit};
 pub(crate) use self::command::Help;
 pub use self::command::{
-    HelpFunction, 
-    HelpOptions, 
-    Command, 
-    CommandGroup, 
-    CommandOptions, 
+    HelpFunction,
+    HelpOptions,
+    Command,
+    CommandGroup,
+    CommandOptions,
     Error as CommandError
 };
 pub use self::command::CommandOrAlias;
@@ -42,7 +41,8 @@ use self::command::{AfterHook, BeforeHook, UnrecognisedCommandHook};
 use std::{
     collections::HashMap,
     default::Default,
-    sync::Arc
+    ops,
+    sync::Arc,
 };
 use super::Framework;
 use threadpool::ThreadPool;
@@ -933,7 +933,7 @@ impl StandardFramework {
     /// Sets what code should be executed when a user sends `(prefix)help`.
     ///
     /// If a command named `help` was set with [`command`], then this takes precendence first.
-    /// 
+    ///
     /// [`command`]: #method.command
     pub fn help(mut self, f: HelpFunction) -> Self {
         let a = CreateHelpCommand(HelpOptions::default(), f).finish();
@@ -1041,6 +1041,7 @@ impl Framework for StandardFramework {
 
                         if let Some(help) = help {
                             let groups = self.groups.clone();
+                            let owners = self.configuration.owners.clone();
                             threadpool.execute(move || {
 
                                 if let Some(before) = before {
@@ -1050,7 +1051,7 @@ impl Framework for StandardFramework {
                                     }
                                 }
 
-                                let result = (help.0)(&mut context, &message, &help.1, groups, &args);
+                                let result = (help.0)(&mut context, &message, &help.1, groups, owners, &args);
 
                                 if let Some(after) = after {
                                     (after)(&mut context, &message, &built, result);
@@ -1143,11 +1144,11 @@ pub fn has_correct_roles(cmd: &Arc<CommandOptions>, guild: &Guild, member: &Memb
 }
 
 /// Describes the behaviour the help-command shall execute once it encounters
-/// a command which the user or command fails to meet following criteria :
-/// Lacking required permissions to execute the command.
-/// Lacking required roles to execute the command.
-/// The command can't be used in the current channel (as in `DM only` or `guild only`).
-#[derive(PartialEq, Debug)]
+/// a command which the user or command fails to meet following criteria:
+/// - Lacking required permissions to execute the command.
+/// - Lacking required roles to execute the command.
+/// - The command can't be used in the current channel (as in "DM only" or "guild only").
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum HelpBehaviour {
     /// Strikes a command by applying `~~{comand_name}~~`.
     Strike,
@@ -1164,5 +1165,37 @@ impl fmt::Display for HelpBehaviour {
            HelpBehaviour::Hide => write!(f, "HelpBehaviour::Hide"),
            HelpBehaviour::Nothing => write!(f, "HelBehaviour::Nothing"),
        }
+    }
+}
+
+/// Compares two help behaviours and merges them, preserving stronger behaviour
+/// (`Hide` being stronger than `Strike`, and `Strike` being stronger than
+/// `Nothing`).
+impl ops::Add for HelpBehaviour {
+    type Output = HelpBehaviour;
+    fn add(self, other: HelpBehaviour) -> HelpBehaviour {
+        match self {
+            HelpBehaviour::Strike => match other {
+                HelpBehaviour::Strike => HelpBehaviour::Strike,
+                HelpBehaviour::Nothing => HelpBehaviour::Strike,
+                HelpBehaviour::Hide => HelpBehaviour::Hide,
+            }
+            HelpBehaviour::Nothing => other,
+            HelpBehaviour::Hide => HelpBehaviour::Hide,
+        }
+    }
+}
+
+impl ops::AddAssign for HelpBehaviour {
+    fn add_assign(&mut self, other: HelpBehaviour) {
+        match *self {
+            HelpBehaviour::Strike => match other {
+                HelpBehaviour::Strike => (),
+                HelpBehaviour::Nothing => *self = HelpBehaviour::Strike,
+                HelpBehaviour::Hide => (),
+            }
+            HelpBehaviour::Nothing => *self = other,
+            HelpBehaviour::Hide => (),
+        }
     }
 }

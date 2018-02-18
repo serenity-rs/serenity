@@ -1,15 +1,5 @@
-use super::command::{
-    Help, 
-    HelpOptions, 
-    HelpFunction
-};
-pub use super::{
-    Args, 
-    CommandGroup, 
-    CommandOptions, 
-    CommandError, 
-    HelpBehaviour
-};
+use super::command::{Help, HelpFunction, HelpOptions};
+use super::HelpBehaviour;
 
 use utils::Colour;
 use std::{
@@ -20,7 +10,6 @@ use std::{
 pub struct CreateHelpCommand(pub HelpOptions, pub HelpFunction);
 
 impl CreateHelpCommand {
-
     /// Sets a message displaying if input could not be found
     /// but a similar command is available.
     ///
@@ -141,10 +130,18 @@ impl CreateHelpCommand {
         self
     }
 
-    /// Sets how a command requiring permission, that a user is lacking,
+    /// Sets how a command requiring permissions, that a user is lacking,
     /// shall be appear in the help-menu.
     pub fn lacking_permissions(mut self, behaviour: HelpBehaviour) -> Self {
         self.0.lacking_permissions = behaviour;
+
+        self
+    }
+
+    /// Sets how a command requiring ownership, that a user is lacking,
+    /// shall be appear in the help-menu.
+    pub fn lacking_ownership(mut self, behaviour: HelpBehaviour) -> Self {
+        self.0.lacking_ownership = behaviour;
 
         self
     }
@@ -188,40 +185,40 @@ impl CreateHelpCommand {
     #[cfg_attr(feature = "cargo-clippy", allow(useless_if_let_seq))]
     pub(crate) fn finish(self) -> Arc<Help> {
         if self.0.striked_commands_tip == Some(String::new()) {
-            let mut strike_text = String::from("~~`Striked commands`~~ are unavailable because they");
+            let mut strike_text =
+                String::from("~~`Striked commands`~~ are unavailable because they");
 
-            let mut concat_with_comma = if self.0.lacking_permissions == HelpBehaviour::Strike {
-                let _ = write!(strike_text, " require permissions");
-                true
-            } else {
-                false
-            };
-
-            if self.0.lacking_role == HelpBehaviour::Strike {
-
-                if concat_with_comma {
-                    let _ = write!(strike_text, ", require a specific role");
-                } else {
-                    let _ = write!(strike_text, " require a specific role");
-                    concat_with_comma = true;
-                }
-            }
-
-            if self.0.wrong_channel == HelpBehaviour::Strike {
-
-                if concat_with_comma {
-                    let _ = write!(strike_text, " or are limited to DM/guilds");
-                } else {
-                    let _ = write!(strike_text, " are limited to DM/guilds");
+            let reasons = [
+                (self.0.lacking_permissions, "require permissions"),
+                (self.0.lacking_role, "require a specific role"),
+                (self.0.lacking_ownership, "require ownership"),
+                (self.0.wrong_channel, "are limited to DM/guilds"),
+            ];
+            {
+                let mut concat_with_comma = false;
+                let mut iter = reasons
+                    .iter()
+                    .filter(|r| r.0 == HelpBehaviour::Strike)
+                    .map(|r| r.1)
+                    .peekable();
+                while let Some(text) = iter.next() {
+                    if concat_with_comma {
+                        let sep = if let None = iter.peek() { ", or" } else { "," };
+                        let _ = write!(strike_text, "{}", sep);
+                    } else {
+                        concat_with_comma = true;
+                    }
+                    let _ = write!(strike_text, " {}", text);
                 }
             }
 
             let _ = write!(strike_text, ".");
             let CreateHelpCommand(options, function) = self.striked_commands_tip(Some(strike_text));
-            return Arc::new(Help(function, Arc::new(options)))
-        }
-        let CreateHelpCommand(options, function) = self;
+            Arc::new(Help(function, Arc::new(options)))
+        } else {
+            let CreateHelpCommand(options, function) = self;
 
-        Arc::new(Help(function, Arc::new(options)))
+            Arc::new(Help(function, Arc::new(options)))
+        }
     }
 }
