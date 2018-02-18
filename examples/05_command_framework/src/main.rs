@@ -151,11 +151,14 @@ fn main() {
                 .command_not_found_text("Could not find: `{}`.")
                 // On another note, you can set up the help-menu-filter-behaviour.
                 // Here are all possible settings shown on all possible options.
-                // First case is if a user lacks permissions for a command, we can hide the command.
+                // If a user lacks permissions for a command, we can `Hide` the command.
                 .lacking_permissions(HelpBehaviour::Hide)
-                // If the user is nothing but lacking a certain role, we just display it hence our variant is `Nothing`.
+                // If a user lacks a certain role for a command, we can do `Nothing` to its listing
+                // and display it.
                 .lacking_role(HelpBehaviour::Nothing)
-                // The last `enum`-variant is `Strike`, which ~~strikes~~ a command.
+                // If a user lacks bot ownership for an owners-only command, we can ~~`Strike`~~ it.
+                .lacking_ownership(HelpBehaviour::Strike)
+                // If a user is in the wrong channel for a command, we can ~~`Strike`~~ it.
                 .wrong_channel(HelpBehaviour::Strike)
                 // Serenity will automatically analyse and generate a hint/tip explaining the possible
                 // cases of ~~strikethrough-commands~~, but only if

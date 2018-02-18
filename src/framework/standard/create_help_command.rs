@@ -20,7 +20,6 @@ use std::{
 pub struct CreateHelpCommand(pub HelpOptions, pub HelpFunction);
 
 impl CreateHelpCommand {
-
     /// Sets a message displaying if input could not be found
     /// but a similar command is available.
     ///
@@ -141,10 +140,18 @@ impl CreateHelpCommand {
         self
     }
 
-    /// Sets how a command requiring permission, that a user is lacking,
+    /// Sets how a command requiring permissions, that a user is lacking,
     /// shall be appear in the help-menu.
     pub fn lacking_permissions(mut self, behaviour: HelpBehaviour) -> Self {
         self.0.lacking_permissions = behaviour;
+
+        self
+    }
+
+    /// Sets how a command requiring ownership, that a user is lacking,
+    /// shall be appear in the help-menu.
+    pub fn lacking_ownership(mut self, behaviour: HelpBehaviour) -> Self {
+        self.0.lacking_ownership = behaviour;
 
         self
     }

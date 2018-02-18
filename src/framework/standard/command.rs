@@ -4,13 +4,13 @@ use model::{
         Message,
         Channel,
     },
+    id::UserId,
     Permissions
 };
 use std::{
-    collections::HashMap,
-    fmt,
-    fmt::{Debug, Formatter},
-    sync::Arc
+    collections::{HashMap, HashSet},
+    fmt::{self, Debug, Formatter},
+    sync::Arc,
 };
 use utils::Colour;
 use super::{Args, Configuration, HelpBehaviour};
@@ -38,7 +38,7 @@ impl Debug for Check {
     }
 }
 
-pub type HelpFunction = fn(&mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, &Args)
+pub type HelpFunction = fn(&mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, HashSet<UserId>, &Args)
                    -> Result<(), Error>;
 
 pub struct Help(pub HelpFunction, pub Arc<HelpOptions>);
@@ -52,8 +52,8 @@ impl Debug for Help {
 }
 
 impl HelpCommand for Help {
-    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions,hm: HashMap<String, Arc<CommandGroup>>, a: &Args) -> Result<(), Error> {
-        (self.0)(c, m, ho, hm, a)
+    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions, gs: HashMap<String, Arc<CommandGroup>>, os: HashSet<UserId>, a: &Args) -> Result<(), Error> {
+        (self.0)(c, m, ho, gs, os, a)
     }
 }
 
@@ -209,6 +209,8 @@ pub struct HelpOptions {
     pub lacking_role: HelpBehaviour,
     /// If a user lacks permissions, this will treat how these commands will be displayed.
     pub lacking_permissions: HelpBehaviour,
+    /// If a user isn't the owner, this will treat how these commands will be displayed.
+    pub lacking_ownership: HelpBehaviour,
     /// If a user is using the help-command in a channel where a command is not available,
     /// this behaviour will be executed.
     pub wrong_channel: HelpBehaviour,
@@ -219,7 +221,7 @@ pub struct HelpOptions {
 }
 
 pub trait HelpCommand: Send + Sync + 'static {
-    fn execute(&self, &mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, &Args) -> Result<(), Error>;
+    fn execute(&self, &mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, HashSet<UserId>, &Args) -> Result<(), Error>;
 
     fn options(&self) -> Arc<CommandOptions> {
         Arc::clone(&DEFAULT_OPTIONS)
@@ -227,8 +229,8 @@ pub trait HelpCommand: Send + Sync + 'static {
 }
 
 impl HelpCommand for Arc<HelpCommand> {
-    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions, hm: HashMap<String, Arc<CommandGroup>>, a: &Args) -> Result<(), Error> {
-        (**self).execute(c, m, ho, hm, a)
+    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions, gs: HashMap<String, Arc<CommandGroup>>, os: HashSet<UserId>, a: &Args) -> Result<(), Error> {
+        (**self).execute(c, m, ho, gs, os, a)
     }
 }
 
@@ -255,6 +257,7 @@ impl Default for HelpOptions {
             striked_commands_tip_in_guild: Some(String::new()),
             lacking_role: HelpBehaviour::Strike,
             lacking_permissions: HelpBehaviour::Strike,
+            lacking_ownership: HelpBehaviour::Hide,
             wrong_channel: HelpBehaviour::Strike,
             embed_error_colour: Colour::DARK_RED,
             embed_success_colour: Colour::ROSEWATER,

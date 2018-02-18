@@ -28,13 +28,13 @@ use client::Context;
 use framework::standard::{has_correct_roles, has_correct_permissions};
 use model::{
     channel::Message,
-    id::ChannelId,
+    id::{ChannelId, UserId},
 };
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
+    fmt::Write,
     hash::BuildHasher,
     sync::Arc,
-    fmt::Write,
 };
 use super::command::InternalCommand;
 use super::{
@@ -150,6 +150,7 @@ pub fn with_embeds<H: BuildHasher>(
     msg: &Message,
     help_options: &HelpOptions,
     groups: HashMap<String, Arc<CommandGroup>, H>,
+    owners: HashSet<UserId>,
     args: &Args
 ) -> Result<(), CommandError> {
     if !args.is_empty() {
@@ -297,6 +298,8 @@ pub fn with_embeds<H: BuildHasher>(
                     let cmd = &commands[name];
                     let cmd = cmd.options();
 
+                    let mut display = HelpBehaviour::Nothing;
+
                     if !cmd.dm_only && !cmd.guild_only || cmd.dm_only && msg.is_private() || cmd.guild_only && !msg.is_private() {
 
                         if cmd.help_available && has_correct_permissions(&cmd, msg) {
@@ -362,6 +365,10 @@ pub fn with_embeds<H: BuildHasher>(
                             },
                         }
                     }
+
+                    if cmd.owners_only && !owners.contains(&msg.author.id) {
+                        let _ = writeln!(desc, "{}", help_options.lacking_ownership);
+                    }
                 }
 
                 if has_commands {
@@ -399,6 +406,7 @@ pub fn plain<H: BuildHasher>(
     msg: &Message,
     help_options: &HelpOptions,
     groups: HashMap<String, Arc<CommandGroup>, H>,
+    _owners: HashSet<UserId>,
     args: &Args
 ) -> Result<(), CommandError> {
     if !args.is_empty() {
