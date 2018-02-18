@@ -36,15 +36,15 @@ use std::{
     hash::BuildHasher,
     sync::Arc,
 };
-use super::command::InternalCommand;
+use super::command::{InternalCommand};
 use super::{
     Args,
-    CommandGroup,
-    CommandOrAlias,
-    HelpOptions,
-    CommandOptions,
     CommandError,
-    HelpBehaviour
+    CommandGroup,
+    CommandOptions,
+    CommandOrAlias,
+    HelpBehaviour,
+    HelpOptions,
 };
 use utils::Colour;
 

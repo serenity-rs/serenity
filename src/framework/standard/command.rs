@@ -2,7 +2,7 @@ use client::Context;
 use model::{
     channel::Message,
     id::UserId,
-    Permissions
+    Permissions,
 };
 use std::{
     collections::{HashMap, HashSet},
