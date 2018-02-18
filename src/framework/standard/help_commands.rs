@@ -28,13 +28,13 @@ use client::Context;
 use framework::standard::{has_correct_roles, has_correct_permissions};
 use model::{
     channel::Message,
-    id::ChannelId
+    id::{ChannelId, UserId},
 };
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
+    fmt::Write,
     hash::BuildHasher,
     sync::Arc,
-    fmt::Write
 };
 use super::command::InternalCommand;
 use super::{
@@ -112,6 +112,7 @@ pub fn with_embeds<H: BuildHasher>(
     msg: &Message,
     help_options: &HelpOptions,
     groups: HashMap<String, Arc<CommandGroup>, H>,
+    owners: HashSet<UserId>,
     args: &Args
 ) -> Result<(), CommandError> {
     if !args.is_empty() {
@@ -259,6 +260,8 @@ pub fn with_embeds<H: BuildHasher>(
                     let cmd = &commands[name];
                     let cmd = cmd.options();
 
+                    let mut display = HelpBehaviour::Nothing;
+
                     if !cmd.dm_only && !cmd.guild_only || cmd.dm_only && msg.is_private() || cmd.guild_only && !msg.is_private() {
 
                         if cmd.help_available && has_correct_permissions(&cmd, msg) {
@@ -268,61 +271,33 @@ pub fn with_embeds<H: BuildHasher>(
 
                                 if let Some(member) = guild.members.get(&msg.author.id) {
 
-                                    if has_correct_roles(&cmd, &guild, &member) {
-                                        let _ = write!(desc, "`{}`\n", name);
-                                        has_commands = true;
-                                    } else {
-                                        match help_options.lacking_role {
-                                            HelpBehaviour::Strike => {
-                                                let name = format!("~~`{}`~~", &name);
-                                                let _ = write!(desc, "{}\n", name);
-                                                has_commands = true;
-                                            },
-                                                HelpBehaviour::Nothing => {
-                                                let _ = write!(desc, "`{}`\n", name);
-                                                has_commands = true;
-                                            },
-                                                HelpBehaviour::Hide => {
-                                                continue;
-                                            },
-                                        }
+                                    if !has_correct_roles(&cmd, &guild, &member) {
+                                        display = help_options.lacking_role;
                                     }
                                 }
-                            } else {
-                                let _ = write!(desc, "`{}`\n", name);
-                                has_commands = true;
                             }
                         } else {
-                            match help_options.lacking_permissions {
-                                HelpBehaviour::Strike => {
-                                    let name = format!("~~`{}`~~", &name);
-                                    let _ = write!(desc, "{}\n", name);
-                                    has_commands = true;
-                                },
-                                HelpBehaviour::Nothing => {
-                                    let _ = write!(desc, "`{}`\n", name);
-                                    has_commands = true;
-                                },
-                                HelpBehaviour::Hide => {
-                                    continue;
-                                },
-                            }
+                            display = help_options.lacking_permissions;
                         }
                     } else {
-                        match help_options.wrong_channel {
-                            HelpBehaviour::Strike => {
-                                let name = format!("~~`{}`~~", &name);
-                                let _ = write!(desc, "{}\n", name);
-                                has_commands = true;
-                            },
-                            HelpBehaviour::Nothing => {
-                                let _ = write!(desc, "`{}`\n", name);
-                                has_commands = true;
-                            },
-                            HelpBehaviour::Hide => {
-                                continue;
-                            },
-                        }
+                        display = help_options.wrong_channel;
+                    }
+
+                    if cmd.owners_only && !owners.contains(&msg.author.id) {
+                        display += help_options.lacking_ownership;
+                    }
+
+                    match display {
+                        HelpBehaviour::Strike => {
+                            let name = format!("~~`{}`~~", &name);
+                            let _ = write!(desc, "{}\n", name);
+                            has_commands = true;
+                        },
+                        HelpBehaviour::Nothing => {
+                            let _ = write!(desc, "`{}`\n", name);
+                            has_commands = true;
+                        },
+                        HelpBehaviour::Hide => {}
                     }
                 }
 
@@ -361,6 +336,7 @@ pub fn plain<H: BuildHasher>(
     msg: &Message,
     help_options: &HelpOptions,
     groups: HashMap<String, Arc<CommandGroup>, H>,
+    _owners: HashSet<UserId>,
     args: &Args
 ) -> Result<(), CommandError> {
     if !args.is_empty() {

@@ -20,7 +20,6 @@ use std::{
 pub struct CreateHelpCommand(pub HelpOptions, pub HelpFunction);
 
 impl CreateHelpCommand {
-
     /// Sets a message displaying if input could not be found
     /// but a similar command is available.
     ///
@@ -141,10 +140,18 @@ impl CreateHelpCommand {
         self
     }
 
-    /// Sets how a command requiring permission, that a user is lacking,
+    /// Sets how a command requiring permissions, that a user is lacking,
     /// shall be appear in the help-menu.
     pub fn lacking_permissions(mut self, behaviour: HelpBehaviour) -> Self {
         self.0.lacking_permissions = behaviour;
+
+        self
+    }
+
+    /// Sets how a command requiring ownership, that a user is lacking,
+    /// shall be appear in the help-menu.
+    pub fn lacking_ownership(mut self, behaviour: HelpBehaviour) -> Self {
+        self.0.lacking_ownership = behaviour;
 
         self
     }
@@ -264,7 +271,6 @@ impl CreateHelpCommand {
     /// If `Some(String)` was set as `striked_commands_tip` and the `String` is empty,
     /// the creator will substitute content based on the `HelpBehaviour`-settings.
     pub(crate) fn finish(mut self) -> Arc<Help> {
-
         if &self.0.striked_commands_tip_in_dm == &Some(String::new()) {
             self.0.striked_commands_tip_in_dm = self.produce_strike_text("direct messages");
         }
