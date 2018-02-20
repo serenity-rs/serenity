@@ -41,6 +41,14 @@ impl Drop for ChildContainer {
     }
 }
 
+impl Drop for ChildContainer {
+    fn drop (&mut self) {
+        if let Err(e) = self.0.wait() {
+            debug!("[Voice] Error awaiting child process: {:?}", e);
+        }
+    }
+}
+
 struct InputSource<R: Read + Send + 'static> {
     stereo: bool,
     reader: R,
