@@ -45,7 +45,7 @@ pub enum AudioType {
 /// [`Handler::play_only`].
 ///
 /// # Example
-/// ```rust, compile_fail, no_run
+/// ```rust,ignore 
 /// use serenity::voice::{Handler, LockedAudio, ffmpeg};
 ///
 /// let handler: Handler = /* ... */;
