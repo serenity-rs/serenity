@@ -271,7 +271,7 @@ fn len_before_and_after_skip_empty_string() {
     let mut args = Args::new("", &[" ".to_string()]);
 
     assert_eq!(args.len(), 0);
-    assert_eq!(args.skip().unwrap(), "");
+    assert_eq!(args.skip(), None);
     assert_eq!(args.len(), 0);
 }
 
@@ -280,7 +280,8 @@ fn len_before_and_after_skip_for() {
     let mut args = Args::new("1 2", &[" ".to_string()]);
 
     assert_eq!(args.len(), 2);
-    assert_eq!(args.skip_for(4), Some(vec!["1".to_string(), "2".to_string(), "".to_string(), "".to_string()]));
+    assert_eq!(args.skip_for(2), Some(vec!["1".to_string(), "2".to_string()]));
+    assert_eq!(args.skip_for(2), None);
     assert_eq!(args.len(), 0);
 }
 
