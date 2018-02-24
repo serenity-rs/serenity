@@ -271,7 +271,7 @@ impl Message {
             at_distinct.push('@');
             at_distinct.push_str(&u.name);
             at_distinct.push('#');
-            let _ = write!(at_distinct, "{}", u.discriminator);
+            let _ = write!(at_distinct, "{:04}", u.discriminator);
             result = result.replace(&u.mention(), &at_distinct);
         }
 
