@@ -14,7 +14,6 @@ fn single_with_empty_message() {
 
 #[test]
 fn single_n_with_empty_message() {
-
     let args = Args::new("", &["".to_string()]);
     assert_matches!(args.single_n::<String>().unwrap_err(), ArgError::Eos);
 
