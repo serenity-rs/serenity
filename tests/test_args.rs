@@ -4,6 +4,76 @@ extern crate serenity;
 use serenity::framework::standard::{Args, ArgError};
 
 #[test]
+fn single_with_empty_message() {
+    let mut args = Args::new("", &["".to_string()]);
+    assert_matches!(args.single::<String>().unwrap_err(), ArgError::Eos);
+
+    let mut args = Args::new("", &[",".to_string()]);
+    assert_matches!(args.single::<String>().unwrap_err(), ArgError::Eos);
+}
+
+#[test]
+fn single_n_with_empty_message() {
+
+    let args = Args::new("", &["".to_string()]);
+    assert_matches!(args.single_n::<String>().unwrap_err(), ArgError::Eos);
+
+    let args = Args::new("", &[",".to_string()]);
+    assert_matches!(args.single_n::<String>().unwrap_err(), ArgError::Eos);
+}
+
+#[test]
+fn single_quoted_with_empty_message() {
+    let mut args = Args::new("", &["".to_string()]);
+    assert_matches!(args.single_quoted::<String>().unwrap_err(), ArgError::Eos);
+
+    let mut args = Args::new("", &[",".to_string()]);
+    assert_matches!(args.single_quoted::<String>().unwrap_err(), ArgError::Eos);
+}
+
+#[test]
+fn multiple_with_empty_message() {
+    let args = Args::new("", &["".to_string()]);
+    assert_matches!(args.multiple::<String>().unwrap_err(), ArgError::Eos);
+
+    let args = Args::new("", &[",".to_string()]);
+    assert_matches!(args.multiple::<String>().unwrap_err(), ArgError::Eos);
+}
+
+#[test]
+fn multiple_quoted_with_empty_message() {
+    let args = Args::new("", &["".to_string()]);
+    assert_matches!(args.multiple_quoted::<String>().unwrap_err(), ArgError::Eos);
+
+    let args = Args::new("", &[",".to_string()]);
+    assert_matches!(args.multiple_quoted::<String>().unwrap_err(), ArgError::Eos);
+}
+
+#[test]
+fn skip_with_empty_message() {
+    let mut args = Args::new("", &["".to_string()]);
+    assert_matches!(args.skip(), None);
+
+    let mut args = Args::new("", &[",".to_string()]);
+    assert_matches!(args.skip(), None);
+}
+
+#[test]
+fn skip_for_with_empty_message() {
+    let mut args = Args::new("", &["".to_string()]);
+    assert_matches!(args.skip_for(0), None);
+
+    let mut args = Args::new("", &["".to_string()]);
+    assert_matches!(args.skip_for(5), None);
+
+    let mut args = Args::new("", &[",".to_string()]);
+    assert_matches!(args.skip_for(0), None);
+
+    let mut args = Args::new("", &[",".to_string()]);
+    assert_matches!(args.skip_for(5), None);
+}
+
+#[test]
 fn single_i32_with_2_bytes_long_delimiter() {
     let mut args = Args::new("1, 2", &[", ".to_string()]);
 
