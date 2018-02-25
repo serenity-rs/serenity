@@ -513,7 +513,7 @@ impl StandardFramework {
                 }
             }
 
-            let len = args.len();
+            let len = args.len_quoted();
 
             if let Some(x) = command.min_args {
                 if len < x as usize {
