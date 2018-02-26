@@ -1,4 +1,3 @@
-
 pub mod help_commands;
 
 mod command;
@@ -25,9 +24,10 @@ use model::channel::Message;
 use model::guild::{Guild, Member};
 use model::id::{ChannelId, GuildId, UserId};
 use model::Permissions;
-use self::command::{AfterHook, BeforeHook};
+use self::command::{AfterHook, BeforeHook, UnrecognisedCommandHook};
 use std::collections::HashMap;
 use std::default::Default;
+use std::ops;
 use std::sync::Arc;
 use super::Framework;
 use threadpool::ThreadPool;
@@ -205,6 +205,7 @@ pub struct StandardFramework {
     dispatch_error_handler: Option<Arc<DispatchErrorHook>>,
     buckets: HashMap<String, Bucket>,
     after: Option<Arc<AfterHook>>,
+    unrecognised_command: Option<Arc<UnrecognisedCommandHook>>,
     /// Whether the framework has been "initialized".
     ///
     /// The framework is initialized once one of the following occurs:
@@ -513,7 +514,7 @@ impl StandardFramework {
                 }
             }
 
-            let len = args.len();
+            let len = args.len_quoted();
 
             if let Some(x) = command.min_args {
                 if len < x as usize {
@@ -879,6 +880,31 @@ impl StandardFramework {
         self
     }
 
+    /// Specify the function to be called if no command could be dispatched.
+    ///
+    /// # Examples
+    ///
+    /// Using `unrecognised_command`:
+    ///
+    /// ```rust
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler).unwrap();
+    /// #
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// client.with_framework(StandardFramework::new()
+    ///     .unrecognised_command(|ctx, msg, unrecognised_command_name| { }));
+    /// ```
+    pub fn unrecognised_command<F>(mut self, f: F) -> Self
+        where F: Fn(&mut Context, &Message, &str) + Send + Sync + 'static {
+        self.unrecognised_command = Some(Arc::new(f));
+
+        self
+    }
+
     /// Sets what code should be executed when a user sends `(prefix)help`.
     pub fn help(mut self, f: HelpFunction) -> Self {
         let a = CreateHelpCommand(HelpOptions::default(), f).finish();
@@ -909,6 +935,7 @@ impl Framework for StandardFramework {
         threadpool: &ThreadPool,
     ) {
         let res = command::positions(&mut context, &message, &self.configuration);
+        let mut unrecognised_command_name = String::from("");
 
         let positions = match res {
             Some(mut positions) => {
@@ -953,13 +980,14 @@ impl Framework for StandardFramework {
                         built
                     };
 
+                    unrecognised_command_name = built.clone();
                     let cmd = group.commands.get(&built);
 
                     if let Some(&CommandOrAlias::Alias(ref points_to)) = cmd {
                         built = points_to.to_string();
                     }
 
-                    let mut to_check = if let Some(ref prefix) = group.prefix {
+                    let to_check = if let Some(ref prefix) = group.prefix {
                         if built.starts_with(prefix) && command_length > prefix.len() + 1 {
                             built[(prefix.len() + 1)..].to_string()
                         } else {
@@ -985,6 +1013,7 @@ impl Framework for StandardFramework {
 
                         if let Some(help) = help {
                             let groups = self.groups.clone();
+                            let owners = self.configuration.owners.clone();
                             threadpool.execute(move || {
 
                                 if let Some(before) = before {
@@ -994,7 +1023,7 @@ impl Framework for StandardFramework {
                                     }
                                 }
 
-                                let result = (help.0)(&mut context, &message, &help.1, groups, &args);
+                                let result = (help.0)(&mut context, &message, &help.1, groups, owners, &args);
 
                                 if let Some(after) = after {
                                     (after)(&mut context, &message, &built, result);
@@ -1049,6 +1078,14 @@ impl Framework for StandardFramework {
                 }
             }
         }
+
+        let unrecognised_command = self.unrecognised_command.clone();
+
+        threadpool.execute(move || {
+            if let Some(unrecognised_command) = unrecognised_command {
+                (unrecognised_command)(&mut context, &message, &unrecognised_command_name);
+            }
+        });
     }
 
     fn update_current_user(&mut self, user_id: UserId) {
@@ -1083,11 +1120,11 @@ pub fn has_correct_roles(cmd: &Arc<CommandOptions>, guild: &Guild, member: &Memb
 }
 
 /// Describes the behaviour the help-command shall execute once it encounters
-/// a command which the user or command fails to meet following criteria :
-/// Lacking required permissions to execute the command.
-/// Lacking required roles to execute the command.
-/// The command can't be used in the current channel (as in `DM only` or `guild only`).
-#[derive(PartialEq, Debug)]
+/// a command which the user or command fails to meet following criteria:
+/// - Lacking required permissions to execute the command.
+/// - Lacking required roles to execute the command.
+/// - The command can't be used in the current channel (as in "DM only" or "guild only").
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum HelpBehaviour {
     /// Strikes a command by applying `~~{comand_name}~~`.
     Strike,
@@ -1104,5 +1141,37 @@ impl fmt::Display for HelpBehaviour {
            HelpBehaviour::Hide => write!(f, "HelpBehaviour::Hide"),
            HelpBehaviour::Nothing => write!(f, "HelBehaviour::Nothing"),
        }
+    }
+}
+
+/// Compares two help behaviours and merges them, preserving stronger behaviour
+/// (`Hide` being stronger than `Strike`, and `Strike` being stronger than
+/// `Nothing`).
+impl ops::Add for HelpBehaviour {
+    type Output = HelpBehaviour;
+    fn add(self, other: HelpBehaviour) -> HelpBehaviour {
+        match self {
+            HelpBehaviour::Strike => match other {
+                HelpBehaviour::Strike => HelpBehaviour::Strike,
+                HelpBehaviour::Nothing => HelpBehaviour::Strike,
+                HelpBehaviour::Hide => HelpBehaviour::Hide,
+            }
+            HelpBehaviour::Nothing => other,
+            HelpBehaviour::Hide => HelpBehaviour::Hide,
+        }
+    }
+}
+
+impl ops::AddAssign for HelpBehaviour {
+    fn add_assign(&mut self, other: HelpBehaviour) {
+        match *self {
+            HelpBehaviour::Strike => match other {
+                HelpBehaviour::Strike => (),
+                HelpBehaviour::Nothing => *self = HelpBehaviour::Strike,
+                HelpBehaviour::Hide => (),
+            }
+            HelpBehaviour::Nothing => *self = other,
+            HelpBehaviour::Hide => (),
+        }
     }
 }

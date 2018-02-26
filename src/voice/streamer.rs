@@ -23,6 +23,14 @@ impl Read for ChildContainer {
     }
 }
 
+impl Drop for ChildContainer {
+    fn drop (&mut self) {
+        if let Err(e) = self.0.wait() {
+            debug!("[Voice] Error awaiting child process: {:?}", e);
+        }
+    }
+}
+
 // Since each audio item needs its own decoder, we need to
 // work around the fact that OpusDecoders aint sendable.
 struct SendDecoder(OpusDecoder);

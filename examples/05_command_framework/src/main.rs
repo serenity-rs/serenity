@@ -121,6 +121,11 @@ fn main() {
                 Err(why) => println!("Command '{}' returned error {:?}", command_name, why),
             }
         })
+        // Set a function that's called whenever an attempted command-call's
+        // command could not be found.
+        .unrecognised_command(|_, _, unknown_command_name| {
+            println!("Could not find command named '{}'", unknown_command_name);
+        })
         // Set a function that's called whenever a command's execution didn't complete for one
         // reason or another. For example, when a user has exceeded a rate-limit or a command
         // can only be performed by the bot owner.
@@ -148,17 +153,20 @@ fn main() {
                 .suggestion_text("How about this command: {}, it's numero uno on the market...!")
                 // On another note, you can set up the help-menu-filter-behaviour.
                 // Here are all possible settings shown on all possible options.
-                // First case is if a user lacks permissions for a command, we can hide the command.
+                // If a user lacks permissions for a command, we can `Hide` the command.
                 .lacking_permissions(HelpBehaviour::Hide)
-                // If the user is nothing but lacking a certain role, we just display it hence our variant is `Nothing`.
+                // If a user lacks a certain role for a command, we can do `Nothing` to its listing
+                // and display it.
                 .lacking_role(HelpBehaviour::Nothing)
-                // The last `enum`-variant is `Strike`, which ~~strikes~~ a command.
+                // If a user lacks bot ownership for an owners-only command, we can ~~`Strike`~~ it.
+                .lacking_ownership(HelpBehaviour::Strike)
+                // If a user is in the wrong channel for a command, we can ~~`Strike`~~ it.
                 .wrong_channel(HelpBehaviour::Strike)
-                // Serenity will automatically analyse and generate a hint/tip explaining the possible
-                // cases of a command being ~~striked~~, but only  if
-                // `striked_commands_tip(Some(""))` keeps `Some()` wrapping an empty `String`, which is the default value.
-                // If the `String` is not empty, your given `String` will be used instead.
-                // If you pass in a `None`, no hint will be displayed at all.
+                // Serenity will automatically analyse and generate a hint/tip explaining the
+                // possible cases of a command being ~~striked~~, but only  if
+                // `striked_commands_tip(Some(""))` keeps `Some()` wrapping an empty `String`, which
+                // is the default value.  If the `String` is not empty, your given `String` will be
+                // used instead.  If you pass in a `None`, no hint will be displayed at all.
                  })
         .command("commands", |c| c
             // Make this command use the "complicated" bucket.
