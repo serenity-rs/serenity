@@ -1,5 +1,11 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 use internal::prelude::*;
+use opus::{
+    Channels,
+    Decoder as OpusDecoder,
+    Result as OpusResult,
+};
+use parking_lot::Mutex;
 use serde_json;
 use std::{
     ffi::OsStr,
@@ -15,14 +21,16 @@ use std::{
         Command,
         Stdio
     },
-    result::Result as StdResult
+    result::Result as StdResult,
+    sync::Arc,
 };
 use super::{
     AudioSource,
     AudioType,
     DcaError,
     DcaMetadata,
-    VoiceError
+    VoiceError,
+    audio,
 };
 
 struct ChildContainer(Child);
@@ -41,10 +49,32 @@ impl Drop for ChildContainer {
     }
 }
 
+impl Drop for ChildContainer {
+    fn drop (&mut self) {
+        if let Err(e) = self.0.wait() {
+            debug!("[Voice] Error awaiting child process: {:?}", e);
+        }
+    }
+}
+
+// Since each audio item needs its own decoder, we need to
+// work around the fact that OpusDecoders aint sendable.
+struct SendDecoder(OpusDecoder);
+
+impl SendDecoder {
+    fn decode_float(&mut self, input: &[u8], output: &mut [f32], fec: bool) -> OpusResult<usize> {
+        let &mut SendDecoder(ref mut sd) = self;
+        sd.decode_float(input, output, fec)
+    }
+}
+
+unsafe impl Send for SendDecoder {}
+
 struct InputSource<R: Read + Send + 'static> {
     stereo: bool,
     reader: R,
     kind: AudioType,
+    decoder: Option<Arc<Mutex<SendDecoder>>>,
 }
 
 impl<R: Read + Send> AudioSource for InputSource<R> {
@@ -95,6 +125,24 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
                 None
             },
         }
+    }
+
+    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize> {
+        let decoder_lock = self.decoder.as_mut()?.clone();
+        let frame = self.read_opus_frame()?;
+        let mut local_buf = [0f32; 960 * 2];
+
+        let count = {
+            let mut decoder = decoder_lock.lock();
+
+            decoder.decode_float(frame.as_slice(), &mut local_buf, false).ok()?
+        };
+
+        for i in 0..1920 {
+            float_buffer[i] += local_buf[i] * volume;
+        }
+
+        Some(count)
     }
 }
 
@@ -225,6 +273,12 @@ pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSo
         stereo: is_stereo,
         reader,
         kind: AudioType::Opus,
+        decoder: Some(
+            Arc::new(Mutex::new(
+                // We always want to decode *to* stereo, for mixing reasons.
+                SendDecoder(OpusDecoder::new(audio::SAMPLE_RATE, Channels::Stereo).unwrap())
+            ))
+        ),
     })
 }
 
@@ -234,6 +288,7 @@ pub fn pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSou
         stereo: is_stereo,
         reader,
         kind: AudioType::Pcm,
+        decoder: None,
     })
 }
 
