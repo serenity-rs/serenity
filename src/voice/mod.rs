@@ -12,24 +12,12 @@ mod streamer;
 mod threading;
 
 pub use self::{
-    audio::{
-        Audio,
-        AudioReceiver,
-        AudioSource,
-        AudioType,
-        LockedAudio
-    },
+    audio::{Audio, AudioReceiver, AudioSource, AudioType, LockedAudio},
     dca::DcaMetadata,
     error::{DcaError, VoiceError},
     handler::Handler,
     manager::Manager,
-    streamer::{
-        dca,
-        ffmpeg,
-        opus,
-        pcm,
-        ytdl
-    }
+    streamer::{dca, ffmpeg, opus, pcm, ytdl},
 };
 pub use opus::Bitrate;
 
