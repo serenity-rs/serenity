@@ -17,6 +17,7 @@ pub use self::error::{DcaError, VoiceError};
 pub use self::handler::Handler;
 pub use self::manager::Manager;
 pub use self::streamer::{dca, ffmpeg, opus, pcm, ytdl};
+pub use opus::Bitrate;
 
 use self::connection_info::ConnectionInfo;
 
@@ -28,4 +29,5 @@ pub(crate) enum Status {
     SetReceiver(Option<Box<AudioReceiver>>),
     SetSender(Option<LockedAudio>),
     AddSender(LockedAudio),
+    SetBitrate(Bitrate),
 }
