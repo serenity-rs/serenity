@@ -2,12 +2,10 @@ use internal::Timer;
 use model::id::GuildId;
 use std::{
     sync::mpsc::{Receiver as MpscReceiver, TryRecvError},
-    thread::Builder as ThreadBuilder
+    thread::Builder as ThreadBuilder,
 };
-use super::{
-    connection::Connection,
-    Status
-};
+use super::connection::Connection;
+use super::{Bitrate, Status, audio};
 
 pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
     let name = format!("Serenity Voice (G{})", guild_id);
@@ -23,6 +21,7 @@ fn runner(rx: &MpscReceiver<Status>) {
     let mut receiver = None;
     let mut connection = None;
     let mut timer = Timer::new(20);
+    let mut bitrate = Bitrate::Bits(audio::DEFAULT_BITRATE);
 
     'runner: loop {
         loop {
@@ -53,6 +52,9 @@ fn runner(rx: &MpscReceiver<Status>) {
                 Ok(Status::AddSender(s)) => {
                     senders.push(s);
                 },
+                Ok(Status::SetBitrate(b)) => {
+                    bitrate = b;
+                },
                 Err(TryRecvError::Empty) => {
                     // If we receieved nothing, then we can perform an update.
                     break;
@@ -73,7 +75,7 @@ fn runner(rx: &MpscReceiver<Status>) {
         // another event.
         let error = match connection.as_mut() {
             Some(connection) => {
-                let cycle = connection.cycle(&mut senders, &mut receiver, &mut timer);
+                let cycle = connection.cycle(&mut senders, &mut receiver, &mut timer, bitrate);
 
                 match cycle {
                     Ok(()) => false,
