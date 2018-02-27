@@ -47,7 +47,7 @@ use std::{
     },
     time::Duration
 };
-use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, LockedAudio};
+use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
 use websocket::{
@@ -217,12 +217,13 @@ impl Connection {
             encoder_stereo: false,
             key,
             keepalive_timer: Timer::new(temp_heartbeat),
+            last_heartbeat_nonce: None,
             udp,
             sequence: 0,
             silence_frames: 0,
             soft_clip,
             speaking: false,
-            ssrc: hello.ssrc,
+            ssrc: ready.ssrc,
             thread_items,
             timestamp: 0,
             user_id: info.user_id,
