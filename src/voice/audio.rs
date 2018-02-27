@@ -17,6 +17,8 @@ pub trait AudioSource: Send {
     fn read_pcm_frame(&mut self, buffer: &mut [i16]) -> Option<usize>;
 
     fn read_opus_frame(&mut self) -> Option<Vec<u8>>;
+
+    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize>;
 }
 
 /// A receiver for incoming audio.
@@ -46,7 +48,7 @@ pub enum AudioType {
 ///
 /// # Example
 ///
-/// ```rust,ignore 
+/// ```rust,ignore
 /// use serenity::voice::{Handler, LockedAudio, ffmpeg};
 ///
 /// let handler: Handler = /* ... */;
