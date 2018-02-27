@@ -10,28 +10,12 @@ use serde_json;
 use std::{
     ffi::OsStr,
     fs::File,
-    io::{
-        BufReader,
-        ErrorKind as IoErrorKind,
-        Read,
-        Result as IoResult
-    },
-    process::{
-        Child,
-        Command,
-        Stdio
-    },
+    io::{BufReader, ErrorKind as IoErrorKind, Read, Result as IoResult},
+    process::{Child, Command, Stdio},
     result::Result as StdResult,
     sync::Arc,
 };
-use super::{
-    AudioSource,
-    AudioType,
-    DcaError,
-    DcaMetadata,
-    VoiceError,
-    audio,
-};
+use super::{AudioSource, AudioType, DcaError, DcaMetadata, VoiceError, audio};
 
 struct ChildContainer(Child);
 
@@ -44,14 +28,6 @@ impl Read for ChildContainer {
 impl Drop for ChildContainer {
     fn drop (&mut self) {
         if let Err(e) = self.0.kill() {
-            debug!("[Voice] Error awaiting child process: {:?}", e);
-        }
-    }
-}
-
-impl Drop for ChildContainer {
-    fn drop (&mut self) {
-        if let Err(e) = self.0.wait() {
             debug!("[Voice] Error awaiting child process: {:?}", e);
         }
     }
