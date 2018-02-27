@@ -16,10 +16,10 @@ pub fn build_identify(info: &ConnectionInfo) -> Value {
 }
 
 #[inline]
-pub fn build_keepalive() -> Value {
+pub fn build_heartbeat(nonce: u64) -> Value {
     json!({
-        "op": VoiceOpCode::KeepAlive.num(),
-        "d": Value::Null,
+        "op": VoiceOpCode::Heartbeat.num(),
+        "d": nonce,
     })
 }
 

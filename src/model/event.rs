@@ -1874,17 +1874,28 @@ impl<'de> Deserialize<'de> for EventType {
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct VoiceHeartbeat {
+    pub nonce: u64,
+}
+
+#[allow(missing_docs)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+pub struct VoiceHeartbeatAck {
+    pub nonce: u64,
+}
+
+#[allow(missing_docs)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct VoiceReady {
     pub heartbeat_interval: u64,
+    pub modes: Vec<String>,
+    pub port: u16,
+    pub ssrc: u32,
 }
 
 #[allow(missing_docs)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct VoiceHello {
     pub heartbeat_interval: u64,
-    pub ip: String,
-    pub modes: Vec<String>,
-    pub port: u16,
-    pub ssrc: u32,
 }
 
 #[allow(missing_docs)]
@@ -1902,25 +1913,48 @@ pub struct VoiceSpeaking {
     pub user_id: UserId,
 }
 
+#[allow(missing_docs)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct VoiceResume {
+    pub server_id: String,
+    pub session_id: String,
+    pub token: String,
+}
+
+#[allow(missing_docs)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+pub struct VoiceClientDisconnect {
+    pub user_id: UserId,
+}
+
 /// A representation of data received for [`voice`] events.
 ///
 /// [`voice`]: ../../voice/index.html
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
 pub enum VoiceEvent {
-    /// A voice heartbeat.
-    Heartbeat(VoiceHeartbeat),
+    /// Server's response to the client's Identify operation.
+    /// Contains session-specific information, e.g.
+    /// [`ssrc`] and supported encryption modes.
+    ///
+    /// [`ssrc`]: struct.VoiceReady.html#structfield.ssrc
+    Ready(VoiceReady),
+    /// A voice event describing the current session.
+    SessionDescription(VoiceSessionDescription),
+    /// A voice event denoting that someone is speaking.
+    Speaking(VoiceSpeaking),
+    /// Acknowledgement from the server for a prior voice heartbeat.
+    HeartbeatAck(VoiceHeartbeatAck),
     /// A "hello" was received with initial voice data, such as the
-    /// [`heartbeat_interval`].
+    /// true [`heartbeat_interval`].
     ///
     /// [`heartbeat_interval`]: struct.VoiceHello.html#structfield.heartbeat_interval
     Hello(VoiceHello),
-    /// A simple keepalive event.
-    KeepAlive,
-    /// A voice event describing the current session.
-    Ready(VoiceSessionDescription),
-    /// A voice event denoting that someone is speaking.
-    Speaking(VoiceSpeaking),
+    /// Message received if a Resume reques was successful.
+    Resumed,
+    /// Status update in the current channel, indicating that a user has
+    /// disconnected.
+    ClientDisconnect(VoiceClientDisconnect),
     /// An unknown voice event not registered.
     Unknown(VoiceOpCode, Value),
 }
@@ -1941,27 +1975,37 @@ impl<'de> Deserialize<'de> for VoiceEvent {
             .map_err(DeError::custom)?;
 
         Ok(match op {
-            VoiceOpCode::Heartbeat => {
+            VoiceOpCode::HeartbeatAck => {
                 let v = serde_json::from_value(v).map_err(DeError::custom)?;
 
-                VoiceEvent::Heartbeat(v)
+                VoiceEvent::HeartbeatAck(v)
+            },
+            VoiceOpCode::Ready => {
+                let v = VoiceReady::deserialize(v).map_err(DeError::custom)?;
+
+                VoiceEvent::Ready(v)
             },
             VoiceOpCode::Hello => {
-                let v = VoiceHello::deserialize(v).map_err(DeError::custom)?;
+                let v = serde_json::from_value(v).map_err(DeError::custom)?;
 
                 VoiceEvent::Hello(v)
             },
-            VoiceOpCode::KeepAlive => VoiceEvent::KeepAlive,
             VoiceOpCode::SessionDescription => {
                 let v = VoiceSessionDescription::deserialize(v)
                     .map_err(DeError::custom)?;
 
-                VoiceEvent::Ready(v)
+                VoiceEvent::SessionDescription(v)
             },
             VoiceOpCode::Speaking => {
                 let v = VoiceSpeaking::deserialize(v).map_err(DeError::custom)?;
 
                 VoiceEvent::Speaking(v)
+            },
+            VoiceOpCode::Resumed => VoiceEvent::Resumed,
+            VoiceOpCode::ClientDisconnect => {
+                let v = VoiceClientDisconnect::deserialize(v).map_err(DeError::custom)?;
+
+                VoiceEvent::ClientDisconnect(v)
             },
             other => VoiceEvent::Unknown(other, v),
         })

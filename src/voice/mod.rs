@@ -32,6 +32,7 @@ pub use self::{
         ytdl
     }
 };
+pub use opus::Bitrate;
 
 use self::connection_info::ConnectionInfo;
 
@@ -43,4 +44,5 @@ pub(crate) enum Status {
     SetReceiver(Option<Box<AudioReceiver>>),
     SetSender(Option<LockedAudio>),
     AddSender(LockedAudio),
+    SetBitrate(Bitrate),
 }
