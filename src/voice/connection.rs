@@ -11,7 +11,7 @@ use opus::{
     Channels,
     Decoder as OpusDecoder,
     Encoder as OpusEncoder,
-    SoftClip
+    SoftClip,
 };
 use parking_lot::Mutex;
 use serde::Deserialize;
