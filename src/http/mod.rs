@@ -1734,6 +1734,7 @@ pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, m
             Value::Bool(true) => request.write_text(&k, "true")?,
             Value::Number(inner) => request.write_text(&k, inner.to_string())?,
             Value::String(inner) => request.write_text(&k, inner)?,
+            Value::Object(inner) => request.write_text(&k, serde_json::to_string(&inner)?)?,
             _ => continue,
         };
     }
