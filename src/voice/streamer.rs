@@ -154,7 +154,12 @@ pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Box<AudioSource>, DcaError> {
     Ok(opus(metadata.is_stereo(), reader))
 }
 
-/// Creates an Opus audio source.
+/// Creates an Opus audio source. This makes certain assumptions: namely, that the input stream
+/// is composed ONLY of opus frames of the variety that Discord expects.
+///
+/// If you want to decode a `.opus` file, use [`ffmpeg`]
+///
+/// [`ffmpeg`]: fn.ffmpeg.html
 pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,

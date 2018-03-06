@@ -11,6 +11,7 @@ use opus::{
     Channels,
     Decoder as OpusDecoder,
     Encoder as OpusEncoder,
+    SoftClip,
 };
 use parking_lot::Mutex;
 use serde::Deserialize;
@@ -58,6 +59,7 @@ pub struct Connection {
     key: Key,
     sequence: u16,
     silence_frames: u8,
+    soft_clip: SoftClip,
     speaking: bool,
     ssrc: u32,
     thread_items: ThreadItems,
@@ -151,6 +153,8 @@ impl Connection {
 
         let encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Mono, CodingMode::Audio)?;
 
+        let soft_clip = SoftClip::new(Channels::Stereo);
+
         // Per discord dev team's current recommendations:
         // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
         let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;
@@ -159,17 +163,18 @@ impl Connection {
             audio_timer: Timer::new(1000 * 60 * 4),
             client: mutexed_client,
             decoder_map: HashMap::new(),
-            destination: destination,
-            encoder: encoder,
+            destination,
+            encoder,
             encoder_stereo: false,
-            key: key,
+            key,
             keepalive_timer: Timer::new(temp_heartbeat),
-            udp: udp,
+            udp,
             sequence: 0,
             silence_frames: 0,
+            soft_clip,
             speaking: false,
             ssrc: hello.ssrc,
-            thread_items: thread_items,
+            thread_items,
             timestamp: 0,
             user_id: info.user_id,
         })
@@ -344,14 +349,20 @@ impl Connection {
             }
 
             aud.finished = finished;
+
+            if !finished {
+                aud.step_frame();
+            }
         };
+
+        self.soft_clip.apply(&mut mix_buffer);
 
         if len == 0 {
             if self.silence_frames > 0 {
                 self.silence_frames -= 1;
 
                 // Explicit "Silence" frame.
-                opus_frame.extend_from_slice(&[0xf, 0x8, 0xf, 0xf, 0xf, 0xe]);
+                opus_frame.extend_from_slice(&[0xf8, 0xff, 0xfe]);
             } else {
                 // Per official guidelines, send 5x silence BEFORE we stop speaking.
                 self.set_speaking(false)?;
@@ -453,7 +464,7 @@ fn combine_audio(
         let sample_index = if true_stereo { i } else { i/2 };
         let sample = (raw_buffer[sample_index] as f32) / 32768.0;
 
-        float_buffer[i] = (float_buffer[i] + sample*volume).max(-1.0).min(1.0);
+        float_buffer[i] = float_buffer[i] + sample * volume;
     }
 }
 
