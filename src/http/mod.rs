@@ -93,6 +93,7 @@ lazy_static! {
 }
 
 /// Enum that allows a user to pass a `Path` or a `File` type to `send_files`
+#[derive(Clone, Debug)]
 pub enum AttachmentType<'a> {
     /// Indicates that the `AttachmentType` is a byte slice with a filename.
     Bytes((&'a [u8], &'a str)),
