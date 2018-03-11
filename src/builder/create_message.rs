@@ -82,9 +82,26 @@ impl<'a> CreateMessage<'a> {
         CreateMessage(self.0, self.1, self.2)
     }
 
-    /// Adds a list of files to the message.
-    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(mut self, files: It) -> Self {
+    /// Appends a file to the message.
+    pub fn add_file<T: Into<AttachmentType<'a>>>(mut self, file: T) -> Self {
+        self.2.push(file.into());
+
+        CreateMessage(self.0, self.1, self.2)
+    }
+
+    /// Appends a list of files to the message.
+    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(mut self, files: It) -> Self {
         self.2.extend(files.into_iter().map(|f| f.into()));
+
+        CreateMessage(self.0, self.1, self.2)
+    }
+
+    /// Adds a list of files to the message.
+    /// 
+    /// Calling this multiple times with overwrite the file list. To append
+    /// files individually, call `add_file`.
+    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(mut self, files: It) -> Self {
+        self.2 = files.into_iter().map(|f| f.into()).collect();
 
         CreateMessage(self.0, self.1, self.2)
     }
