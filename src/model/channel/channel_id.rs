@@ -500,13 +500,24 @@ impl ChannelId {
     #[cfg(feature = "utils")]
     pub fn send_message<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
-        let msg = f(CreateMessage::default());
+        let mut msg = f(CreateMessage::default());
+
+        if !msg.2.is_empty() {
+            if let Some(e) = msg.0.remove(&"embed") {
+                msg.0.insert("payload_json", json!({ "embed": e }));
+            }
+        }
+
         let map = utils::vecmap_to_json_map(msg.0);
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        let message = http::send_message(self.0, &Value::Object(map))?;
+        let message = if msg.2.is_empty() {
+            http::send_message(self.0, &Value::Object(map))?
+        } else {
+            http::send_files(self.0, msg.2, map)?
+        };
 
         if let Some(reactions) = msg.1 {
             for reaction in reactions {
