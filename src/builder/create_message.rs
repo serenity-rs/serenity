@@ -84,7 +84,7 @@ impl<'a> CreateMessage<'a> {
 
     /// Adds a list of files to the message.
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(mut self, files: It) -> Self {
-        self.2 = files.into_iter().map(|f| f.into()).collect();
+        self.2.extend(files.into_iter().map(|f| f.into()));
 
         CreateMessage(self.0, self.1, self.2)
     }
