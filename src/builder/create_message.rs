@@ -2,7 +2,6 @@ use internal::prelude::*;
 use http::AttachmentType;
 use model::channel::ReactionType;
 use std::fmt::Display;
-use std::iter::Iterator;
 use super::CreateEmbed;
 use utils::{self, VecMap};
 
