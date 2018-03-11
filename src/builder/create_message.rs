@@ -96,10 +96,10 @@ impl<'a> CreateMessage<'a> {
         CreateMessage(self.0, self.1, self.2)
     }
 
-    /// Adds a list of files to the message.
+    /// Sets a list of files to include in the message.
     /// 
-    /// Calling this multiple times with overwrite the file list. To append
-    /// files individually, call `add_file`.
+    /// Calling this multiple times will overwrite the file list. 
+    /// To append files, call `add_file` or `add_files` instead.
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(mut self, files: It) -> Self {
         self.2 = files.into_iter().map(|f| f.into()).collect();
 
