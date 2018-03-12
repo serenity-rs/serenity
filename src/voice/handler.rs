@@ -6,7 +6,7 @@ use parking_lot::Mutex;
 use std::sync::Arc;
 use std::sync::mpsc::{self, Sender as MpscSender};
 use super::connection_info::ConnectionInfo;
-use super::{Audio, AudioReceiver, AudioSource, Status as VoiceStatus, threading, LockedAudio};
+use super::{Audio, AudioReceiver, AudioSource, Bitrate, Status as VoiceStatus, threading, LockedAudio};
 
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.
@@ -267,6 +267,17 @@ impl Handler {
         self.send(VoiceStatus::SetSender(Some(player.clone())));
 
         player
+    }
+
+    /// Sets the bitrate for encoding Opus packets sent along
+    /// the channel being managed.
+    ///
+    /// The default rate is 128 kbps.
+    /// Sensible values range between `Bits(512)` and `Bits(512_000)`
+    /// bits per second.
+    /// Alternatively, `Auto` and `Max` remain available.
+    pub fn set_bitrate(&mut self, bitrate: Bitrate) {
+        self.send(VoiceStatus::SetBitrate(bitrate))
     }
 
     /// Stops playing audio from a source, if one is set.
