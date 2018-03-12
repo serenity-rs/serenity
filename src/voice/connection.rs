@@ -63,7 +63,6 @@ pub struct Connection {
     soft_clip: SoftClip,
     sequence: u16,
     silence_frames: u8,
-    soft_clip: SoftClip,
     speaking: bool,
     ssrc: u32,
     thread_items: ThreadItems,
