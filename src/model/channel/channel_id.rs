@@ -406,9 +406,6 @@ impl ChannelId {
     /// Message contents may be passed by using the [`CreateMessage::content`]
     /// method.
     ///
-    /// An embed can _not_ be sent when sending a file. If you set one, it will
-    /// be automatically removed.
-    ///
     /// The [Attach Files] and [Send Messages] permissions are required.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
@@ -472,9 +469,11 @@ impl ChannelId {
             }
         }
 
-        let _ = msg.0.remove(&"embed");
-        let map = utils::vecmap_to_json_map(msg.0);
+        if let Some(e) = msg.0.remove(&"embed") {
+            msg.0.insert("payload_json", json!({ "embed": e }));
+        }
 
+        let map = utils::vecmap_to_json_map(msg.0);
         http::send_files(self.0, files, map)
     }
 
