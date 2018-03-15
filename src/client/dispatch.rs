@@ -25,7 +25,7 @@ use super::CACHE;
 macro_rules! update {
     ($event:expr) => {
         {
-            #[cfg(feature="cache")]
+            #[cfg(feature = "cache")]
             {
                 CACHE.write().update(&mut $event)
             }
