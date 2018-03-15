@@ -218,6 +218,7 @@ impl CreateCommand {
     }
 
     /// Sets roles that are allowed to use the command.
+    #[cfg(feature="cache")]
     pub fn allowed_roles<T: ToString, It: IntoIterator<Item=T>>(mut self, allowed_roles: It) -> Self {
         self.0.allowed_roles = allowed_roles.into_iter().map(|x| x.to_string()).collect();
 
@@ -225,7 +226,7 @@ impl CreateCommand {
     }
 
     /// Sets an initialise middleware to be called upon the command's actual registration.
-    /// 
+    ///
     /// This is similiar to implementing the `init` function on `Command`.
     pub fn init<F: Fn() + Send + Sync + 'static>(mut self, f: F) -> Self {
         self.2.init = Some(Arc::new(f));
@@ -234,9 +235,9 @@ impl CreateCommand {
     }
 
     /// Sets a before middleware to be called before the command's execution.
-    /// 
+    ///
     /// This is similiar to implementing the `before` function on `Command`.
-    pub fn before<F: Send + Sync + 'static>(mut self, f: F) -> Self 
+    pub fn before<F: Send + Sync + 'static>(mut self, f: F) -> Self
         where F: Fn(&mut Context, &Message) -> bool {
         self.2.before = Some(Arc::new(f));
 
@@ -244,9 +245,9 @@ impl CreateCommand {
     }
 
     /// Sets an after middleware to be called after the command's execution.
-    /// 
+    ///
     /// This is similiar to implementing the `after` function on `Command`.
-    pub fn after<F: Send + Sync + 'static>(mut self, f: F) -> Self 
+    pub fn after<F: Send + Sync + 'static>(mut self, f: F) -> Self
         where F: Fn(&mut Context, &Message, &Result<(), CommandError>) {
         self.2.after = Some(Arc::new(f));
 

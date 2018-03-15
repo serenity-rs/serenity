@@ -148,6 +148,7 @@ impl CreateGroup {
     }
 
     /// Sets roles that are allowed to use the command.
+    #[cfg(feature = "cache")]
     pub fn allowed_roles<T: ToString, It: IntoIterator<Item=T>>(mut self, allowed_roles: It) -> Self {
         self.0.allowed_roles = allowed_roles.into_iter().map(|x| x.to_string()).collect();
 

@@ -24,6 +24,7 @@
 //! [`with_embeds`]: fn.with_embeds.html
 
 use client::Context;
+#[cfg(feature = "cache")]
 use framework::standard::{has_correct_roles, has_correct_permissions};
 use model::channel::Message;
 use model::id::ChannelId;
@@ -55,6 +56,7 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 
 /// Checks whether a user is member of required roles
 /// and given the required permissions.
+#[cfg(feature = "cache")]
 pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
     if let Some(guild) = msg.guild() {
         let guild = guild.read();
@@ -92,6 +94,7 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
 /// client.with_framework(StandardFramework::new()
 ///     .help(help_commands::with_embeds));
 /// ```
+#[cfg(feature = "cache")]
 pub fn with_embeds<H: BuildHasher>(
     _: &mut Context,
     msg: &Message,
@@ -335,6 +338,7 @@ pub fn with_embeds<H: BuildHasher>(
 /// client.with_framework(StandardFramework::new()
 ///     .help(help_commands::plain));
 /// ```
+#[cfg(feature = "cache")]
 pub fn plain<H: BuildHasher>(
     _: &mut Context,
     msg: &Message,

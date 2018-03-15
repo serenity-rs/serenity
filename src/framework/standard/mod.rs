@@ -567,15 +567,19 @@ impl StandardFramework {
             } else if self.configuration.disabled_commands.contains(built) {
                 Some(DispatchError::CommandDisabled(built.to_string()))
             } else {
-                if !command.allowed_roles.is_empty() {
-                    if let Some(guild) = message.guild() {
-                        let guild = guild.read();
 
-                        if let Some(member) = guild.members.get(&message.author.id) {
-                            if let Ok(permissions) = member.permissions() {
-                                if !permissions.administrator()
-                                    && !has_correct_roles(command, &guild, member) {
-                                    return Some(DispatchError::LackingRole);
+                #[cfg(feature = "cache")] {
+                    if !command.allowed_roles.is_empty() {
+                        if let Some(guild) = message.guild() {
+                            let guild = guild.read();
+
+                            if let Some(member) = guild.members.get(&message.author.id) {
+                                if let Ok(permissions) = member.permissions() {
+
+                                    if !permissions.administrator()
+                                        && !has_correct_roles(command, &guild, member) {
+                                        return Some(DispatchError::LackingRole);
+                                    }
                                 }
                             }
                         }
@@ -1091,7 +1095,6 @@ impl Framework for StandardFramework {
         self.user_id = user_id.0;
     }
 }
-
 #[cfg(feature = "cache")]
 pub fn has_correct_permissions(command: &Arc<CommandOptions>, message: &Message) -> bool {
     if !command.required_permissions.is_empty() {
@@ -1106,7 +1109,6 @@ pub fn has_correct_permissions(command: &Arc<CommandOptions>, message: &Message)
     true
 }
 
-#[cfg(feature = "cache")]
 pub fn has_correct_roles(cmd: &Arc<CommandOptions>, guild: &Guild, member: &Member) -> bool {
     if cmd.allowed_roles.is_empty() {
         true
