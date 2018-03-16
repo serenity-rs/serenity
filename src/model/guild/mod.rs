@@ -1627,10 +1627,13 @@ impl<'de> Deserialize<'de> for Guild {
             .ok_or_else(|| DeError::custom("expected guild region"))
             .and_then(String::deserialize)
             .map_err(DeError::custom)?;
-        let roles = map.remove("roles")
+        let mut roles = map.remove("roles")
             .ok_or_else(|| DeError::custom("expected guild roles"))
             .and_then(deserialize_roles)
             .map_err(DeError::custom)?;
+        for (_, role) in roles.iter_mut() {
+            role.guild_id = id;
+        }
         let splash = match map.remove("splash") {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
