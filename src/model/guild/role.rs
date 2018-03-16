@@ -70,7 +70,7 @@ impl Role {
     ///
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
-    pub fn delete(&self) -> Result<()> { http::delete_role(self.guild_id().0, self.id.0) }
+    pub fn delete(&self) -> Result<()> { http::delete_role(self.guild_id.0, self.id.0) }
 
     /// Edits a [`Role`], optionally setting its new fields.
     ///
@@ -115,11 +115,6 @@ impl Role {
         }
 
         Err(Error::Model(ModelError::GuildNotFound))
-    }
-
-    /// Get the id of the guild that owns this role.
-    pub fn guild_id(&self) -> GuildId {
-        self.guild_id
     }
 
     /// Check that the role has the given permission.
