@@ -621,10 +621,33 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct GuildRoleCreateEvent {
     pub guild_id: GuildId,
     pub role: Role,
+}
+
+impl<'de> Deserialize<'de> for GuildRoleCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut map = JsonMap::deserialize(deserializer)?;
+
+        let id = map.remove("guild_id")
+            .ok_or_else(|| DeError::custom("expected guild id"))
+            .and_then(GuildId::deserialize)
+            .map_err(DeError::custom)?;
+        
+        let mut role = map.remove("role")
+            .ok_or_else(|| DeError::custom("expected guild role"))
+            .and_then(Role::deserialize)
+            .map_err(DeError::custom)?;
+
+        role.guild_id = id;
+        
+        Ok(GuildRoleCreateEvent {
+            guild_id: id,
+            role: role,
+        })
+    }
 }
 
 #[cfg(feature = "cache")]
