@@ -1625,7 +1625,6 @@ impl<'de> Deserialize<'de> for Guild {
             .and_then(deserialize_voice_states)
             .map_err(DeError::custom)?;
 
-
         for (_, channel) in &channels {
             channel.write().guild_id = id;
         }
