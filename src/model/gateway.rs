@@ -229,7 +229,7 @@ impl<'de> Deserialize<'de> for Presence {
             let user_id = user_map
                 .remove("id")
                 .ok_or_else(|| DeError::custom("Missing presence user id"))
-                .and_then(|x| UserId::deserialize(x.clone()))
+                .and_then(|x| UserId::deserialize(x))
                 .map_err(DeError::custom)?;
 
             (user_id, None)
