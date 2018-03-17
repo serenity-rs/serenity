@@ -100,7 +100,7 @@ impl Context {
             } else {
                 let user = http::get_current_user()?;
 
-                map.insert("username", Value::String(user.name.clone()));
+                map.insert("username", Value::String(user.name));
 
                 if let Some(email) = user.email {
                     map.insert("email", Value::String(email));

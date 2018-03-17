@@ -156,20 +156,20 @@ pub fn with_embeds<H: BuildHasher>(
 
                 let _ = msg.channel_id.send_message(|m| {
                     m.embed(|e| {
-                        let mut embed = e.colour(help_options.embed_success_colour).title(command_name.clone());
+                        let mut embed = e.colour(help_options.embed_success_colour).title(command_name);
 
                         if let Some(ref desc) = command.desc {
                             embed = embed.description(desc);
                         }
 
                         if let Some(ref usage) = command.usage {
-                            let value = format!("`{} {}`", command_name.clone(), usage);
+                            let value = format!("`{} {}`", command_name, usage);
 
                             embed = embed.field(&help_options.usage_label, value, true);
                         }
 
                         if let Some(ref example) = command.example {
-                            let value = format!("`{} {}`", command_name.clone(), example);
+                            let value = format!("`{} {}`", command_name, example);
 
                             embed = embed.field(&help_options.usage_sample_label, value, true);
                         }
@@ -211,9 +211,9 @@ pub fn with_embeds<H: BuildHasher>(
     let _ = msg.channel_id.send_message(|m| {
         m.embed(|mut e| {
 
-            if let Some(striked_command_text) = help_options.striked_commands_tip.clone() {
+            if let Some(ref striked_command_text) = help_options.striked_commands_tip {
                 e = e.colour(help_options.embed_success_colour).description(
-                    format!("{}\n{}", &help_options.individual_command_tip, &striked_command_text),
+                    format!("{}\n{}", &help_options.individual_command_tip, striked_command_text),
                 );
             } else {
                 e = e.colour(help_options.embed_success_colour).description(
@@ -449,8 +449,8 @@ pub fn plain<H: BuildHasher>(
 
     let mut result = "**Commands**\n".to_string();
 
-    if let Some(striked_command_text) = help_options.striked_commands_tip.clone() {
-        let _ = write!(result, "{}\n{}\n\n", &help_options.individual_command_tip, &striked_command_text);
+    if let Some(ref striked_command_text) = help_options.striked_commands_tip {
+        let _ = write!(result, "{}\n{}\n\n", &help_options.individual_command_tip, striked_command_text);
     } else {
         let _ = write!(result, "{}\n\n", &help_options.individual_command_tip);
     }
