@@ -598,21 +598,17 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
             .and_then(|v| GuildId::deserialize(v.clone()))
             .map_err(DeError::custom)?;
 
-        let mut members = map.remove("members")
-            .ok_or_else(|| DeError::custom("missing member chunk members"))?;
-
-        if let Some(members) = members.as_array_mut() {
-            let num = Value::Number(Number::from(guild_id.0));
-
-            for member in members {
-                if let Some(map) = member.as_object_mut() {
-                    map.insert("guild_id".to_string(), num.clone());
+        let members = map.remove("members")
+            .ok_or_else(|| DeError::custom("missing member chunk members"))
+            .and_then(Deserialize::deserialize)
+            .map_err(DeError::custom)
+            .and_then(|mut members: HashMap<UserId, Member>| {
+                for (_, member) in members.iter_mut() {
+                    member.guild_id = guild_id;
                 }
-            }
-        }
 
-        let members: HashMap<UserId, Member> =
-            Deserialize::deserialize(members).map_err(DeError::custom)?;
+                Ok(members)
+            })?;
 
         Ok(GuildMembersChunkEvent {
             guild_id: guild_id,
