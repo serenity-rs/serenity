@@ -29,11 +29,12 @@ macro_rules! colour {
 ///
 /// ```rust
 /// # use serenity::model::guild::Role;
-/// # use serenity::model::id::RoleId;
+/// # use serenity::model::id::{GuildId, RoleId};
 /// # use serenity::model::permissions;
 /// #
 /// # let role = Role {
 /// #     colour: Colour::blurple(),
+/// #     guild_id: GuildId(2),
 /// #     hoist: false,
 /// #     id: RoleId(1),
 /// #     managed: false,

@@ -1521,29 +1521,10 @@ impl<'de> Deserialize<'de> for Guild {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let id = map.get("id")
-            .and_then(|x| x.as_str())
-            .and_then(|x| x.parse::<u64>().ok());
-
-        if let Some(guild_id) = id {
-            if let Some(array) = map.get_mut("channels").and_then(|x| x.as_array_mut()) {
-                for value in array {
-                    if let Some(channel) = value.as_object_mut() {
-                        channel
-                            .insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
-                    }
-                }
-            }
-
-            if let Some(array) = map.get_mut("members").and_then(|x| x.as_array_mut()) {
-                for value in array {
-                    if let Some(member) = value.as_object_mut() {
-                        member
-                            .insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
-                    }
-                }
-            }
-        }
+        let id = map.remove("id")
+            .ok_or_else(|| DeError::custom("expected guild id"))
+            .and_then(GuildId::deserialize)
+            .map_err(DeError::custom)?;
 
         let afk_channel_id = match map.remove("afk_channel_id") {
             Some(v) => serde_json::from_value::<Option<ChannelId>>(v)
@@ -1587,10 +1568,6 @@ impl<'de> Deserialize<'de> for Guild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
-        let id = map.remove("id")
-            .ok_or_else(|| DeError::custom("expected guild id"))
-            .and_then(GuildId::deserialize)
-            .map_err(DeError::custom)?;
         let joined_at = map.remove("joined_at")
             .ok_or_else(|| DeError::custom("expected guild joined_at"))
             .and_then(DateTime::deserialize)
@@ -1603,7 +1580,7 @@ impl<'de> Deserialize<'de> for Guild {
             .ok_or_else(|| DeError::custom("expected guild member_count"))
             .and_then(u64::deserialize)
             .map_err(DeError::custom)?;
-        let members = map.remove("members")
+        let mut members = map.remove("members")
             .ok_or_else(|| DeError::custom("expected guild members"))
             .and_then(deserialize_members)
             .map_err(DeError::custom)?;
@@ -1627,7 +1604,7 @@ impl<'de> Deserialize<'de> for Guild {
             .ok_or_else(|| DeError::custom("expected guild region"))
             .and_then(String::deserialize)
             .map_err(DeError::custom)?;
-        let roles = map.remove("roles")
+        let mut roles = map.remove("roles")
             .ok_or_else(|| DeError::custom("expected guild roles"))
             .and_then(deserialize_roles)
             .map_err(DeError::custom)?;
@@ -1647,6 +1624,18 @@ impl<'de> Deserialize<'de> for Guild {
             .ok_or_else(|| DeError::custom("expected guild voice_states"))
             .and_then(deserialize_voice_states)
             .map_err(DeError::custom)?;
+
+        for (_, channel) in &channels {
+            channel.write().guild_id = id;
+        }
+
+        for (_, member) in members.iter_mut() {
+            member.guild_id = id;
+        }
+
+        for (_, role) in roles.iter_mut() {
+            role.guild_id = id;
+        }
 
         Ok(Self {
             afk_channel_id: afk_channel_id,

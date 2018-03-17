@@ -57,6 +57,9 @@ pub struct Role {
     ///
     /// The `@everyone` role is usually either `-1` or `0`.
     pub position: i64,
+    /// The guild id that this role is associated with.
+    #[serde(skip)]
+    pub guild_id: GuildId,
 }
 
 #[cfg(feature = "model")]
@@ -66,9 +69,8 @@ impl Role {
     /// **Note** Requires the [Manage Roles] permission.
     ///
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature = "cache")]
     #[inline]
-    pub fn delete(&self) -> Result<()> { http::delete_role(self.find_guild()?.0, self.id.0) }
+    pub fn delete(&self) -> Result<()> { http::delete_role(self.guild_id.0, self.id.0) }
 
     /// Edits a [`Role`], optionally setting its new fields.
     ///
@@ -90,8 +92,7 @@ impl Role {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(all(feature = "builder", feature = "cache"))]
     pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
-        self.find_guild()
-            .and_then(|guild_id| guild_id.edit_role(self.id, f))
+        self.guild_id.edit_role(self.id, f)
     }
 
     /// Searches the cache for the guild that owns the role.
@@ -103,6 +104,7 @@ impl Role {
     ///
     /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
     #[cfg(feature = "cache")]
+    #[deprecated(since="0.6.0", note="Replaced by `guild_id`")]
     pub fn find_guild(&self) -> Result<GuildId> {
         for guild in CACHE.read().guilds.values() {
             let guild = guild.read();

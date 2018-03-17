@@ -212,6 +212,10 @@ pub fn create_channel(guild_id: u64, map: &Value) -> Result<GuildChannel> {
 
     serde_json::from_reader::<HyperResponse, GuildChannel>(response)
         .map_err(From::from)
+        .and_then(|mut channel| {
+            channel.guild_id = GuildId(guild_id);
+            Ok(channel)
+        })
 }
 
 /// Creates an emoji in the given [`Guild`] with the given data.
@@ -1164,8 +1168,17 @@ pub fn get_channels(guild_id: u64) -> Result<Vec<GuildChannel>> {
         guild_id
     );
 
+    let gid = GuildId(guild_id);
+
     serde_json::from_reader::<HyperResponse, Vec<GuildChannel>>(response)
         .map_err(From::from)
+        .and_then(|mut channels| {
+            for channel in channels.iter_mut() {
+                channel.guild_id = gid;
+            }
+
+            Ok(channels)
+        })
 }
 
 /// Gets information about the current application.
@@ -1275,19 +1288,18 @@ pub fn get_guild_members(guild_id: u64,
         after.unwrap_or(0)
     );
 
-    let mut v = serde_json::from_reader::<HyperResponse, Value>(response)?;
-
-    if let Some(values) = v.as_array_mut() {
-        let num = Value::Number(Number::from(guild_id));
-
-        for value in values {
-            if let Some(element) = value.as_object_mut() {
-                element.insert("guild_id".to_string(), num.clone());
+    let gid = GuildId(guild_id);
+    let v = serde_json::from_reader::<HyperResponse, Value>(response)?;
+    
+    serde_json::from_value::<Vec<Member>>(v)
+        .map_err(From::from)
+        .and_then(|mut members| {
+            for member in members.iter_mut() {
+                member.guild_id = gid;
             }
-        }
-    }
 
-    serde_json::from_value::<Vec<Member>>(v).map_err(From::from)
+            Ok(members)
+        })
 }
 
 /// Gets the amount of users that can be pruned.
@@ -1433,13 +1445,14 @@ pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
         user_id
     );
 
-    let mut v = serde_json::from_reader::<HyperResponse, Value>(response)?;
+    let v = serde_json::from_reader::<HyperResponse, Value>(response)?;
 
-    if let Some(map) = v.as_object_mut() {
-        map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
-    }
-
-    serde_json::from_value::<Member>(v).map_err(From::from)
+    serde_json::from_value::<Member>(v)
+        .map_err(From::from)
+        .and_then(|mut member| {
+            member.guild_id = GuildId(guild_id);
+            Ok(member)
+        })
 }
 
 /// Gets a message by an Id, bots only.
