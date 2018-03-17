@@ -213,7 +213,7 @@ pub fn create_channel(guild_id: u64, map: &Value) -> Result<GuildChannel> {
     serde_json::from_reader::<HyperResponse, GuildChannel>(response)
         .map_err(From::from)
         .and_then(|mut channel| {
-            channel.guild_id = guild_id;
+            channel.guild_id = GuildId(guild_id);
             Ok(channel)
         })
 }
@@ -1168,12 +1168,16 @@ pub fn get_channels(guild_id: u64) -> Result<Vec<GuildChannel>> {
         guild_id
     );
 
+    let gid = GuildId(guild_id);
+
     serde_json::from_reader::<HyperResponse, Vec<GuildChannel>>(response)
         .map_err(From::from)
         .and_then(|mut channels| {
             for channel in channels.iter_mut() {
-                channel.guild_id = guild_id;
+                channel.guild_id = gid;
             }
+
+            Ok(channels)
         })
 }
 
