@@ -275,7 +275,7 @@ impl StandardFramework {
     /// Create and use a bucket that limits a command to 3 uses per 10 seconds with
     /// a 2 second delay inbetween invocations:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -314,7 +314,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -373,7 +373,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -425,7 +425,7 @@ impl StandardFramework {
     ///
     /// Create and use a simple bucket that has a 2 second delay between invocations:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -620,7 +620,7 @@ impl StandardFramework {
     ///
     /// Create and use a simple command:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # #[macro_use] extern crate serenity;
     /// #
     /// # fn main() {
@@ -730,7 +730,7 @@ impl StandardFramework {
     ///
     /// Creating a simple group:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -763,7 +763,7 @@ impl StandardFramework {
     ///
     /// Making a simple argument error responder:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -804,7 +804,7 @@ impl StandardFramework {
     ///
     /// Using `before` to log command usage:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -822,7 +822,7 @@ impl StandardFramework {
     ///
     /// Using before to prevent command usage:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -860,7 +860,7 @@ impl StandardFramework {
     ///
     /// Using `after` to log command usage:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -890,7 +890,7 @@ impl StandardFramework {
     ///
     /// Using `unrecognised_command`:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #

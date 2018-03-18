@@ -96,7 +96,7 @@ impl Configuration {
     ///
     /// Create a HashSet in-place:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -121,7 +121,7 @@ impl Configuration {
     ///
     /// Create a HashSet in-place:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -159,7 +159,7 @@ impl Configuration {
     ///
     /// Ignore a set of commands, assuming they exist:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -282,7 +282,7 @@ impl Configuration {
     ///
     /// Create a HashSet in-place:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -297,7 +297,7 @@ impl Configuration {
     ///
     /// Create a HashSet beforehand:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -326,7 +326,7 @@ impl Configuration {
     ///
     /// Assign a basic prefix:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -351,7 +351,7 @@ impl Configuration {
     ///
     /// Assign a set of prefixes the bot can respond to:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -375,7 +375,7 @@ impl Configuration {
     ///
     /// Have the args be seperated by a comma and a space:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -400,7 +400,7 @@ impl Configuration {
     ///
     /// Have the args be seperated by a comma and a space; and a regular space:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #

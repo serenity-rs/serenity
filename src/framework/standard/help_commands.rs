@@ -82,7 +82,7 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
 ///
 /// Use the command with `exec_help`:
 ///
-/// ```rust
+/// ```rust,no_run
 /// # use serenity::prelude::*;
 /// # struct Handler;
 /// #
@@ -326,7 +326,7 @@ pub fn with_embeds<H: BuildHasher>(
 ///
 /// Use the command with `exec_help`:
 ///
-/// ```rust
+/// ```rust,no_run
 /// # use serenity::prelude::*;
 /// # struct Handler;
 /// #
