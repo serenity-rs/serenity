@@ -49,7 +49,7 @@ impl CreateMessage {
     pub fn content<D: Display>(mut self, content: D) -> Self {
         self.0.insert("content", Value::String(content.to_string()));
 
-        CreateMessage(self.0, self.1)
+        self
     }
 
     /// Set an embed for the message.
@@ -60,7 +60,7 @@ impl CreateMessage {
 
         self.0.insert("embed", embed);
 
-        CreateMessage(self.0, self.1)
+        self
     }
 
     /// Set whether the message is text-to-speech.
@@ -71,14 +71,14 @@ impl CreateMessage {
     pub fn tts(mut self, tts: bool) -> Self {
         self.0.insert("tts", Value::Bool(tts));
 
-        CreateMessage(self.0, self.1)
+        self
     }
 
     /// Adds a list of reactions to create after the message's sent.
     pub fn reactions<R: Into<ReactionType>, It: IntoIterator<Item=R>>(mut self, reactions: It) -> Self {
         self.1 = Some(reactions.into_iter().map(|r| r.into()).collect());
 
-        CreateMessage(self.0, self.1)
+        self
     }
 }
 

@@ -54,7 +54,7 @@ impl CreateEmbed {
 
         self.0.insert("author", Value::Object(map));
 
-        CreateEmbed(self.0)
+        self
     }
 
     /// Set the colour of the left-hand side of the embed.
@@ -74,7 +74,7 @@ impl CreateEmbed {
             Value::Number(Number::from(u64::from(colour.into().0))),
         );
 
-        CreateEmbed(self.0)
+        self
     }
 
     /// Set the colour of the left-hand side of the embed.
@@ -92,7 +92,7 @@ impl CreateEmbed {
         self.0
             .insert("color", Value::Number(Number::from(colour)));
 
-        CreateEmbed(self.0)
+        self
     }
 
     /// Set the description of the embed.
@@ -104,7 +104,7 @@ impl CreateEmbed {
             Value::String(description.to_string()),
         );
 
-        CreateEmbed(self.0)
+        self
     }
 
     /// Set a field. Note that this will not overwrite other fields, and will
@@ -161,7 +161,7 @@ impl CreateEmbed {
 
         self.0.insert("footer", Value::Object(map));
 
-        CreateEmbed(self.0)
+        self
     }
 
     fn url_object(mut self, name: &'static str, url: &str) -> Self {
@@ -171,7 +171,7 @@ impl CreateEmbed {
 
         self.0.insert(name, obj);
 
-        CreateEmbed(self.0)
+        self
     }
 
     /// Set the image associated with the embed. This only supports HTTP(S).
@@ -276,7 +276,7 @@ impl CreateEmbed {
         self.0
             .insert("timestamp", Value::String(timestamp.into().ts));
 
-        CreateEmbed(self.0)
+        self
     }
 
     /// Set the title of the embed.
@@ -284,7 +284,7 @@ impl CreateEmbed {
         self.0
             .insert("title", Value::String(title.to_string()));
 
-        CreateEmbed(self.0)
+        self
     }
 
     /// Set the URL to direct to when clicking on the title.
@@ -292,7 +292,7 @@ impl CreateEmbed {
         self.0
             .insert("url", Value::String(url.as_ref().to_string()));
 
-        CreateEmbed(self.0)
+        self
     }
 
     /// Same as calling [`image`] with "attachment://filename.(jpg, png)".
