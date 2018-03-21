@@ -483,7 +483,7 @@ impl<'de> Deserialize<'de> for GuildMemberAddEvent {
             .map_err(DeError::custom)?;
 
         Ok(GuildMemberAddEvent {
-            guild_id: guild_id,
+            guild_id,
             member: Member::deserialize(Value::Object(map))
                 .map_err(DeError::custom)?,
         })
@@ -615,8 +615,8 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
             Deserialize::deserialize(members).map_err(DeError::custom)?;
 
         Ok(GuildMembersChunkEvent {
-            guild_id: guild_id,
-            members: members,
+            guild_id,
+            members,
         })
     }
 }
@@ -833,7 +833,7 @@ impl CacheUpdate for PresenceUpdateEvent {
 
                         guild.members.insert(self.presence.user_id, Member {
                             deaf: false,
-                            guild_id: guild_id,
+                            guild_id,
                             joined_at: None,
                             mute: false,
                             nick: self.presence.nick.clone(),
@@ -873,9 +873,9 @@ impl<'de> Deserialize<'de> for PresenceUpdateEvent {
             .map_err(DeError::custom)?;
 
         Ok(Self {
-            guild_id: guild_id,
-            presence: presence,
-            roles: roles,
+            guild_id,
+            presence,
+            roles,
         })
     }
 }
@@ -909,7 +909,7 @@ impl<'de> Deserialize<'de> for PresencesReplaceEvent {
         let presences: Vec<Presence> = Deserialize::deserialize(deserializer)?;
 
         Ok(Self {
-            presences: presences,
+            presences,
         })
     }
 }
@@ -1141,7 +1141,7 @@ impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
         };
 
         Ok(VoiceStateUpdateEvent {
-            guild_id: guild_id,
+            guild_id,
             voice_state: VoiceState::deserialize(Value::Object(map))
                 .map_err(DeError::custom)?,
         })

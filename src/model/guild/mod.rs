@@ -1649,30 +1649,30 @@ impl<'de> Deserialize<'de> for Guild {
             .map_err(DeError::custom)?;
 
         Ok(Self {
-            afk_channel_id: afk_channel_id,
-            application_id: application_id,
-            afk_timeout: afk_timeout,
-            channels: channels,
-            default_message_notifications: default_message_notifications,
-            emojis: emojis,
-            explicit_content_filter: explicit_content_filter,
-            features: features,
-            icon: icon,
-            id: id,
-            joined_at: joined_at,
-            large: large,
-            member_count: member_count,
-            members: members,
-            mfa_level: mfa_level,
-            name: name,
-            owner_id: owner_id,
-            presences: presences,
-            region: region,
-            roles: roles,
-            splash: splash,
-            system_channel_id: system_channel_id,
-            verification_level: verification_level,
-            voice_states: voice_states,
+            afk_channel_id,
+            application_id,
+            afk_timeout,
+            channels,
+            default_message_notifications,
+            emojis,
+            explicit_content_filter,
+            features,
+            icon,
+            id,
+            joined_at,
+            large,
+            member_count,
+            members,
+            mfa_level,
+            name,
+            owner_id,
+            presences,
+            region,
+            roles,
+            splash,
+            system_channel_id,
+            verification_level,
+            voice_states,
         })
     }
 }
@@ -1828,12 +1828,18 @@ impl GuildStatus {
     }
 }
 
+/// Default message notification level for a guild.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub enum DefaultMessageNotificationLevel {
+    /// Receive notifications for everything.
+    All = 0,
+    /// Receive only mentions.
+    Mentions = 1,
+}
+
 enum_number!(
-    /// Default message notification level for a guild.
     DefaultMessageNotificationLevel {
-        /// Receive notifications for everything.
         All = 0,
-        /// Receive only mentions.
         Mentions = 1,
     }
 );
@@ -1847,14 +1853,21 @@ impl DefaultMessageNotificationLevel {
     }
 }
 
+/// Setting used to filter explicit messages from members.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub enum ExplicitContentFilter {
+    /// Don't scan any messages.
+    None = 0,
+    /// Scan messages from members without a role.
+    WithoutRole = 1,
+    /// Scan messages sent by all members.
+    All = 2,
+}
+
 enum_number!(
-    /// Setting used to filter explicit messages from members.
     ExplicitContentFilter {
-        /// Don't scan any messages.
         None = 0,
-        /// Scan messages from members without a role.
         WithoutRole = 1,
-        /// Scan messages sent by all members.
         All = 2,
     }
 );
@@ -1869,12 +1882,18 @@ impl ExplicitContentFilter {
     }
 }
 
+/// Multi-Factor Authentication level for guild moderators.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub enum MfaLevel {
+    /// MFA is disabled.
+    None = 0,
+    /// MFA is enabled.
+    Elevated = 1,
+}
+
 enum_number!(
-    /// Multi-Factor Authentication level for guild moderators.
     MfaLevel {
-        /// MFA is disabled.
         None = 0,
-        /// MFA is enabled.
         Elevated = 1,
     }
 );
@@ -1936,21 +1955,30 @@ impl Region {
     }
 }
 
-enum_number!(
-    #[doc="The level to set as criteria prior to a user being able to send
+#[doc="The level to set as criteria prior to a user being able to send
     messages in a [`Guild`].
 
     [`Guild`]: struct.Guild.html"]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub enum VerificationLevel {
+    /// Does not require any verification.
+    None = 0,
+    /// Must have a verified email on the user's Discord account.
+    Low = 1,
+    /// Must also be a registered user on Discord for longer than 5 minutes.
+    Medium = 2,
+    /// Must also be a member of the guild for longer than 10 minutes.
+    High = 3,
+    /// Must have a verified phone on the user's Discord account.
+    Higher = 4,
+}
+
+enum_number!(
     VerificationLevel {
-        /// Does not require any verification.
         None = 0,
-        /// Must have a verified email on the user's Discord account.
         Low = 1,
-        /// Must also be a registered user on Discord for longer than 5 minutes.
         Medium = 2,
-        /// Must also be a member of the guild for longer than 10 minutes.
         High = 3,
-        /// Must have a verified phone on the user's Discord account.
         Higher = 4,
     }
 );

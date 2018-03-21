@@ -14,6 +14,7 @@ use std::fmt::Write;
 use std::mem;
 #[cfg(feature = "model")]
 use {constants, http, utils as serenity_utils};
+use std::{i64, u64};
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
@@ -605,24 +606,36 @@ pub struct MessageReaction {
     pub reaction_type: ReactionType,
 }
 
+/// Differentiates between regular and different types of system messages.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub enum MessageType {
+    /// A regular message.
+    Regular = 0,
+    /// An indicator that a recipient was added by the author.
+    GroupRecipientAddition = 1,
+    /// An indicator that a recipient was removed by the author.
+    GroupRecipientRemoval = 2,
+    /// An indicator that a call was started by the author.
+    GroupCallCreation = 3,
+    /// An indicator that the group name was modified by the author.
+    GroupNameUpdate = 4,
+    /// An indicator that the group icon was modified by the author.
+    GroupIconUpdate = 5,
+    /// An indicator that a message was pinned by the author.
+    PinsAdd = 6,
+    /// An indicator that a member joined the guild.
+    MemberJoin = 7,
+}
+
 enum_number!(
-    /// Differentiates between regular and different types of system messages.
     MessageType {
-        /// A regular message.
         Regular = 0,
-        /// An indicator that a recipient was added by the author.
         GroupRecipientAddition = 1,
-        /// An indicator that a recipient was removed by the author.
         GroupRecipientRemoval = 2,
-        /// An indicator that a call was started by the author.
         GroupCallCreation = 3,
-        /// An indicator that the group name was modified by the author.
         GroupNameUpdate = 4,
-        /// An indicator that the group icon was modified by the author.
         GroupIconUpdate = 5,
-        /// An indicator that a message was pinned by the author.
         PinsAdd = 6,
-        /// An indicator that a member joined the guild.
         MemberJoin = 7,
     }
 );

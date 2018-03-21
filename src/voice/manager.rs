@@ -31,8 +31,8 @@ impl Manager {
     pub(crate) fn new(ws: MpscSender<InterMessage>, user_id: UserId) -> Manager {
         Manager {
             handlers: HashMap::new(),
-            user_id: user_id,
-            ws: ws,
+            user_id,
+            ws,
         }
     }
 

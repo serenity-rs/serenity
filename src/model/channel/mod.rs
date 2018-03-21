@@ -555,28 +555,37 @@ impl Display for Channel {
     }
 }
 
-enum_number!(
-    /// A representation of a type of channel.
-    ChannelType {
-        #[doc="An indicator that the channel is a text [`GuildChannel`].
+/// A representation of a type of channel.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub enum ChannelType {
+    #[doc="An indicator that the channel is a text [`GuildChannel`].
 
 [`GuildChannel`]: struct.GuildChannel.html"]
-        Text = 0,
-        #[doc="An indicator that the channel is a [`PrivateChannel`].
+    Text = 0,
+    #[doc="An indicator that the channel is a [`PrivateChannel`].
 
 [`PrivateChannel`]: struct.PrivateChannel.html"]
-        Private = 1,
-        #[doc="An indicator that the channel is a voice [`GuildChannel`].
+    Private = 1,
+    #[doc="An indicator that the channel is a voice [`GuildChannel`].
 
 [`GuildChannel`]: struct.GuildChannel.html"]
-        Voice = 2,
-        #[doc="An indicator that the channel is the channel of a [`Group`].
+    Voice = 2,
+    #[doc="An indicator that the channel is the channel of a [`Group`].
 
 [`Group`]: struct.Group.html"]
-        Group = 3,
-        #[doc="An indicator that the channel is the channel of a [`ChannelCategory`].
+    Group = 3,
+    #[doc="An indicator that the channel is the channel of a [`ChannelCategory`].
 
 [`ChannelCategory`]: struct.ChannelCategory.html"]
+    Category = 4,
+}
+
+enum_number!(
+    ChannelType {
+        Text = 0,
+        Private = 1,
+        Voice = 2,
+        Group = 3,
         Category = 4,
     }
 );
@@ -633,7 +642,7 @@ impl<'de> Deserialize<'de> for PermissionOverwrite {
         Ok(PermissionOverwrite {
             allow: data.allow,
             deny: data.deny,
-            kind: kind,
+            kind,
         })
     }
 }

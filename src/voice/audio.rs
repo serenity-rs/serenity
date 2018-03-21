@@ -7,7 +7,7 @@ pub const SAMPLE_RATE: u32 = 48_000;
 
 /// A readable audio source.
 pub trait AudioSource: Send {
-    fn is_stereo(&mut self) -> bool;
+    fn is_stereo(&self) -> bool;
 
     fn get_type(&self) -> AudioType;
 

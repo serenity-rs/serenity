@@ -31,7 +31,7 @@ struct InputSource<R: Read + Send + 'static> {
 }
 
 impl<R: Read + Send> AudioSource for InputSource<R> {
-    fn is_stereo(&mut self) -> bool { self.stereo }
+    fn is_stereo(&self) -> bool { self.stereo }
 
     fn get_type(&self) -> AudioType { self.kind }
 
@@ -163,7 +163,7 @@ pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Box<AudioSource>, DcaError> {
 pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,
-        reader: reader,
+        reader,
         kind: AudioType::Opus,
     })
 }
@@ -172,7 +172,7 @@ pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSo
 pub fn pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,
-        reader: reader,
+        reader,
         kind: AudioType::Pcm,
     })
 }

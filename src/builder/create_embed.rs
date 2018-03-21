@@ -26,6 +26,7 @@ use utils::VecMap;
 
 #[cfg(feature = "utils")]
 use utils::Colour;
+use std::u64;
 
 /// A builder to create a fake [`Embed`] object, for use with the
 /// [`ChannelId::send_message`] and [`ExecuteWebhook::embeds`] methods.
@@ -451,7 +452,7 @@ pub struct Timestamp {
 impl From<String> for Timestamp {
     fn from(ts: String) -> Self {
         Timestamp {
-            ts: ts,
+            ts,
         }
     }
 }

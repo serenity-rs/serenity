@@ -144,21 +144,30 @@ impl<'de> Deserialize<'de> for Game {
             .and_then(|v| serde_json::from_value::<String>(v).ok());
 
         Ok(Game {
-            kind: kind,
-            name: name,
-            url: url,
+            kind,
+            name,
+            url,
         })
     }
 }
 
+
+
+/// The type of activity that is being performed when playing a game.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub enum GameType {
+    /// An indicator that the user is playing a game.
+    Playing = 0,
+    /// An indicator that the user is streaming to a service.
+    Streaming = 1,
+    /// An indicator that the user is listening to something.
+    Listening = 2,
+}
+
 enum_number!(
-    /// The type of activity that is being performed when playing a game.
     GameType {
-        /// An indicator that the user is playing a game.
         Playing = 0,
-        /// An indicator that the user is streaming to a service.
         Streaming = 1,
-        /// An indicator that the user is listening to something.
         Listening = 2,
     }
 );
@@ -255,12 +264,12 @@ impl<'de> Deserialize<'de> for Presence {
             .map_err(DeError::custom)?;
 
         Ok(Presence {
-            game: game,
-            last_modified: last_modified,
-            nick: nick,
-            status: status,
-            user: user,
-            user_id: user_id,
+            game,
+            last_modified,
+            nick,
+            status,
+            user,
+            user_id,
         })
     }
 }
