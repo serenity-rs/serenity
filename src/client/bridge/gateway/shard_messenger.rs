@@ -3,7 +3,6 @@ use model::prelude::*;
 use super::{ShardClientMessage, ShardRunnerMessage};
 use std::sync::mpsc::{SendError, Sender};
 use websocket::message::OwnedMessage;
-use std::result::Result;
 
 /// A lightweight wrapper around an mpsc sender.
 ///

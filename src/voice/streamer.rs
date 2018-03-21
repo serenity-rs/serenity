@@ -31,7 +31,7 @@ struct InputSource<R: Read + Send + 'static> {
 }
 
 impl<R: Read + Send> AudioSource for InputSource<R> {
-    fn is_stereo(&self) -> bool { self.stereo }
+    fn is_stereo(&mut self) -> bool { self.stereo }
 
     fn get_type(&self) -> AudioType { self.kind }
 

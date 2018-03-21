@@ -76,18 +76,18 @@ pub enum OpCode {
 
 enum_number!(
     OpCode {
-        Event = 0,
-        Heartbeat = 1,
-        Identify = 2,
-        StatusUpdate = 3,
-        VoiceStateUpdate = 4,
-        VoiceServerPing = 5,
-        Resume = 6,
-        Reconnect = 7,
-        GetGuildMembers = 8,
-        InvalidSession = 9,
-        Hello = 10,
-        HeartbeatAck = 11,
+        Event,
+        Heartbeat,
+        Identify,
+        StatusUpdate,
+        VoiceStateUpdate,
+        VoiceServerPing,
+        Resume,
+        Reconnect,
+        GetGuildMembers,
+        InvalidSession,
+        Hello,
+        HeartbeatAck,
     }
 );
 
@@ -132,13 +132,13 @@ pub enum VoiceOpCode {
 
 enum_number!(
     VoiceOpCode {
-        Identify = 0,
-        SelectProtocol = 1,
-        Hello = 2,
-        KeepAlive = 3,
-        SessionDescription = 4,
-        Speaking = 5,
-        Heartbeat = 8,
+        Identify,
+        SelectProtocol,
+        Hello,
+        KeepAlive,
+        SessionDescription,
+        Speaking,
+        Heartbeat,
     }
 );
 

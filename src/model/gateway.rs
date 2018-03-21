@@ -166,9 +166,9 @@ pub enum GameType {
 
 enum_number!(
     GameType {
-        Playing = 0,
-        Streaming = 1,
-        Listening = 2,
+        Playing,
+        Streaming,
+        Listening,
     }
 );
 

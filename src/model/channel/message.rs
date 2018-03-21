@@ -14,7 +14,6 @@ use std::fmt::Write;
 use std::mem;
 #[cfg(feature = "model")]
 use {constants, http, utils as serenity_utils};
-use std::{i64, u64};
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
@@ -629,14 +628,14 @@ pub enum MessageType {
 
 enum_number!(
     MessageType {
-        Regular = 0,
-        GroupRecipientAddition = 1,
-        GroupRecipientRemoval = 2,
-        GroupCallCreation = 3,
-        GroupNameUpdate = 4,
-        GroupIconUpdate = 5,
-        PinsAdd = 6,
-        MemberJoin = 7,
+        Regular,
+        GroupRecipientAddition,
+        GroupRecipientRemoval,
+        GroupCallCreation,
+        GroupNameUpdate,
+        GroupIconUpdate,
+        PinsAdd,
+        MemberJoin,
     }
 );
 

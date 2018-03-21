@@ -1839,8 +1839,8 @@ pub enum DefaultMessageNotificationLevel {
 
 enum_number!(
     DefaultMessageNotificationLevel {
-        All = 0,
-        Mentions = 1,
+        All,
+        Mentions,
     }
 );
 
@@ -1866,9 +1866,9 @@ pub enum ExplicitContentFilter {
 
 enum_number!(
     ExplicitContentFilter {
-        None = 0,
-        WithoutRole = 1,
-        All = 2,
+        None,
+        WithoutRole,
+        All,
     }
 );
 
@@ -1893,8 +1893,8 @@ pub enum MfaLevel {
 
 enum_number!(
     MfaLevel {
-        None = 0,
-        Elevated = 1,
+        None,
+        Elevated,
     }
 );
 
@@ -1975,11 +1975,11 @@ pub enum VerificationLevel {
 
 enum_number!(
     VerificationLevel {
-        None = 0,
-        Low = 1,
-        Medium = 2,
-        High = 3,
-        Higher = 4,
+        None,
+        Low,
+        Medium,
+        High,
+        Higher,
     }
 );
 
