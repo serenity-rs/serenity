@@ -14,7 +14,7 @@ impl Timer {
 
         Timer {
             due: Utc::now() + duration,
-            duration: duration,
+            duration,
         }
     }
 

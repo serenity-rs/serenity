@@ -163,7 +163,7 @@ pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Box<AudioSource>, DcaError> {
 pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,
-        reader: reader,
+        reader,
         kind: AudioType::Opus,
     })
 }
@@ -172,7 +172,7 @@ pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSo
 pub fn pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,
-        reader: reader,
+        reader,
         kind: AudioType::Pcm,
     })
 }

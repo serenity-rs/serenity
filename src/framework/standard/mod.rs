@@ -299,7 +299,7 @@ impl StandardFramework {
             s.to_string(),
             Bucket {
                 ratelimit: Ratelimit {
-                    delay: delay,
+                    delay,
                     limit: Some((time_span, limit)),
                 },
                 users: HashMap::new(),
@@ -445,7 +445,7 @@ impl StandardFramework {
             s.to_string(),
             Bucket {
                 ratelimit: Ratelimit {
-                    delay: delay,
+                    delay,
                     limit: None,
                 },
                 users: HashMap::new(),

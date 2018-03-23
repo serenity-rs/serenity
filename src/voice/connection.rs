@@ -575,10 +575,10 @@ fn start_threads(client: Arc<Mutex<Client>>, udp: &UdpSocket) -> Result<ThreadIt
         })?;
 
     Ok(ThreadItems {
-        rx: rx,
-        udp_close_sender: udp_close_sender,
-        udp_thread: udp_thread,
-        ws_close_sender: ws_close_sender,
-        ws_thread: ws_thread,
+        rx,
+        udp_close_sender,
+        udp_thread,
+        ws_close_sender,
+        ws_thread,
     })
 }

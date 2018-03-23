@@ -451,7 +451,7 @@ pub struct Timestamp {
 impl From<String> for Timestamp {
     fn from(ts: String) -> Self {
         Timestamp {
-            ts: ts,
+            ts,
         }
     }
 }
