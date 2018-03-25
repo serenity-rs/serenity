@@ -910,6 +910,10 @@ impl StandardFramework {
     }
 
     /// Sets what code should be executed when a user sends `(prefix)help`.
+    ///
+    /// If a command named `help` was set with [`command`], then this takes precendence first.
+    /// 
+    /// [`command`]: #method.command
     pub fn help(mut self, f: HelpFunction) -> Self {
         let a = CreateHelpCommand(HelpOptions::default(), f).finish();
 
@@ -1011,7 +1015,6 @@ impl Framework for StandardFramework {
                     let before = self.before.clone();
                     let after = self.after.clone();
 
-                    // This is a special case.
                     if to_check == "help" {
                         let help = self.help.clone();
 
@@ -1034,8 +1037,6 @@ impl Framework for StandardFramework {
                             });
                             return;
                         }
-
-                        return;
                     }
 
                     if let Some(&CommandOrAlias::Command(ref command)) =
