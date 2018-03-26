@@ -176,7 +176,7 @@ impl<'de> Deserialize<'de> for GuildMemberAddEvent {
 
         let guild_id = map.get("guild_id")
             .ok_or_else(|| DeError::custom("missing member add guild id"))
-            .and_then(|v| GuildId::deserialize(v.clone()))
+            .and_then(|v| GuildId::deserialize(v))
             .map_err(DeError::custom)?;
 
         Ok(GuildMemberAddEvent {
@@ -213,7 +213,7 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
 
         let guild_id = map.get("guild_id")
             .ok_or_else(|| DeError::custom("missing member chunk guild id"))
-            .and_then(|v| GuildId::deserialize(v.clone()))
+            .and_then(|v| GuildId::deserialize(v))
             .map_err(DeError::custom)?;
 
         let mut members = map.remove("members")
@@ -516,7 +516,7 @@ impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let map = JsonMap::deserialize(deserializer)?;
         let guild_id = match map.get("guild_id") {
-            Some(v) => Some(GuildId::deserialize(v.clone()).map_err(DeError::custom)?),
+            Some(v) => Some(GuildId::deserialize(v).map_err(DeError::custom)?),
             None => None,
         };
 

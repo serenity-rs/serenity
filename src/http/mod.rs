@@ -1054,6 +1054,23 @@ impl Client {
         self.get(Route::GetGuildRoles { guild_id })
     }
 
+    /// Gets a guild's vanity URL if it has one.
+    pub fn get_guild_vanity_url(&self, guild_id: u64)
+        -> FutureResult<String> {
+        #[derive(Deserialize)]
+        struct GuildVanityUrl {
+            code: String,
+        }
+
+        let done = self.get::<GuildVanityUrl>(
+            Route::GetGuildVanityUrl { guild_id },
+        ).map(|resp| {
+            resp.code
+        });
+
+        Box::new(done)
+    }
+
     /// Retrieves the webhooks for the given [guild][`Guild`]'s Id.
     ///
     /// This method requires authentication.
@@ -1366,6 +1383,7 @@ impl Client {
     //             Value::Bool(true) => request.write_text(&k, "true")?,
     //             Value::Number(inner) => request.write_text(&k, inner.to_string())?,
     //             Value::String(inner) => request.write_text(&k, inner)?,
+    //             Value::Object(inner) => request.write_text(&k, serde_json::to_string(&inner)?)?,
     //             _ => continue,
     //         };
     //     }

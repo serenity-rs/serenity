@@ -227,6 +227,12 @@ pub enum Path {
     ///
     /// [`GuildId`]: struct.GuildId.html
     GuildsIdRolesId(u64),
+    /// Route for the `/guilds/:guild_id/vanity-url` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: struct.GuildId.html
+    GuildsIdVanityUrl(u64),
     /// Route for the `/guilds/:guild_id/webhooks` path.
     ///
     /// The data is the relevant [`GuildId`].
@@ -501,6 +507,10 @@ impl Path {
         format!(api!("/guilds/{}/roles"), guild_id)
     }
 
+    pub fn guild_vanity_url(guild_id: u64) -> String {
+        format!(api!("/guilds/{}/vanity-url"), guild_id)
+    }
+
     pub fn guild_webhooks(guild_id: u64) -> String {
         format!(api!("/guilds/{}/webhooks"), guild_id)
     }
@@ -632,6 +642,7 @@ impl Path {
             GuildsIdRegions(_) => "/guilds/{}/regions",
             GuildsIdRoles(_) => "/guilds/{}/roles",
             GuildsIdRolesId(_) => "/guilds/{}/roles/{}",
+            GuildsIdVanityUrl(_) => "/guilds/{}/vanity-url",
             GuildsIdWebhooks(_) => "/guilds/{}/webhooks",
             InvitesCode => "/invites/{}",
             StatusMaintenancesActive => "/scheduled-maintenances/active.json",
@@ -850,6 +861,9 @@ pub enum Route<'a> {
         guild_id: u64,
     },
     GetGuildRoles {
+        guild_id: u64,
+    },
+    GetGuildVanityUrl {
         guild_id: u64,
     },
     GetGuildWebhooks {
@@ -1275,6 +1289,11 @@ impl<'a> Route<'a> {
                 LightMethod::Get,
                 Path::GuildsIdRoles(guild_id),
                 Cow::from(Path::guild_roles(guild_id)),
+            ),
+            Route::GetGuildVanityUrl { guild_id } => (
+                LightMethod::Get,
+                Path::GuildsIdVanityUrl(guild_id),
+                Cow::from(Path::guild_vanity_url(guild_id)),
             ),
             Route::GetGuildWebhooks { guild_id } => (
                 LightMethod::Get,

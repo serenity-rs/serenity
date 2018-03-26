@@ -25,7 +25,7 @@ use model::channel::Message;
 use model::guild::{Guild, Member};
 use model::id::{ChannelId, GuildId, UserId};
 use model::Permissions;
-use self::command::{AfterHook, BeforeHook};
+use self::command::{AfterHook, BeforeHook, UnrecognisedCommandHook};
 use std::collections::HashMap;
 use std::default::Default;
 use std::sync::Arc;
@@ -205,6 +205,7 @@ pub struct StandardFramework {
     dispatch_error_handler: Option<Arc<DispatchErrorHook>>,
     buckets: HashMap<String, Bucket>,
     after: Option<Arc<AfterHook>>,
+    unrecognised_command: Option<Arc<UnrecognisedCommandHook>>,
     /// Whether the framework has been "initialized".
     ///
     /// The framework is initialized once one of the following occurs:
@@ -566,15 +567,19 @@ impl StandardFramework {
             } else if self.configuration.disabled_commands.contains(built) {
                 Some(DispatchError::CommandDisabled(built.to_string()))
             } else {
-                if !command.allowed_roles.is_empty() {
-                    if let Some(guild) = message.guild() {
-                        let guild = guild.read();
 
-                        if let Some(member) = guild.members.get(&message.author.id) {
-                            if let Ok(permissions) = member.permissions() {
-                                if !permissions.administrator()
-                                    && !has_correct_roles(command, &guild, member) {
-                                    return Some(DispatchError::LackingRole);
+                #[cfg(feature = "cache")] {
+                    if !command.allowed_roles.is_empty() {
+                        if let Some(guild) = message.guild() {
+                            let guild = guild.read();
+
+                            if let Some(member) = guild.members.get(&message.author.id) {
+                                if let Ok(permissions) = member.permissions() {
+
+                                    if !permissions.administrator()
+                                        && !has_correct_roles(command, &guild, member) {
+                                        return Some(DispatchError::LackingRole);
+                                    }
                                 }
                             }
                         }
@@ -879,6 +884,31 @@ impl StandardFramework {
         self
     }
 
+    /// Specify the function to be called if no command could be dispatched.
+    ///
+    /// # Examples
+    ///
+    /// Using `unrecognised_command`:
+    ///
+    /// ```rust
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler).unwrap();
+    /// #
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// client.with_framework(StandardFramework::new()
+    ///     .unrecognised_command(|ctx, msg, unrecognised_command_name| { }));
+    /// ```
+    pub fn unrecognised_command<F>(mut self, f: F) -> Self
+        where F: Fn(&mut Context, &Message, &str) + Send + Sync + 'static {
+        self.unrecognised_command = Some(Arc::new(f));
+
+        self
+    }
+
     /// Sets what code should be executed when a user sends `(prefix)help`.
     pub fn help(mut self, f: HelpFunction) -> Self {
         let a = CreateHelpCommand(HelpOptions::default(), f).finish();
@@ -909,6 +939,7 @@ impl Framework for StandardFramework {
         threadpool: &ThreadPool,
     ) {
         let res = command::positions(&mut context, &message, &self.configuration);
+        let mut unrecognised_command_name = String::from("");
 
         let positions = match res {
             Some(mut positions) => {
@@ -953,13 +984,17 @@ impl Framework for StandardFramework {
                         built
                     };
 
+<<<<<<< HEAD
+=======
+                    unrecognised_command_name = built.clone();
+>>>>>>> master
                     let cmd = group.commands.get(&built);
 
                     if let Some(&CommandOrAlias::Alias(ref points_to)) = cmd {
                         built = points_to.to_string();
                     }
 
-                    let mut to_check = if let Some(ref prefix) = group.prefix {
+                    let to_check = if let Some(ref prefix) = group.prefix {
                         if built.starts_with(prefix) && command_length > prefix.len() + 1 {
                             built[(prefix.len() + 1)..].to_string()
                         } else {
@@ -1049,13 +1084,20 @@ impl Framework for StandardFramework {
                 }
             }
         }
+
+        let unrecognised_command = self.unrecognised_command.clone();
+
+        threadpool.execute(move || {
+            if let Some(unrecognised_command) = unrecognised_command {
+                (unrecognised_command)(&mut context, &message, &unrecognised_command_name);
+            }
+        });
     }
 
     fn update_current_user(&mut self, user_id: UserId) {
         self.user_id = user_id.0;
     }
 }
-
 #[cfg(feature = "cache")]
 pub fn has_correct_permissions(command: &Arc<CommandOptions>, message: &Message) -> bool {
     if !command.required_permissions.is_empty() {
@@ -1070,7 +1112,6 @@ pub fn has_correct_permissions(command: &Arc<CommandOptions>, message: &Message)
     true
 }
 
-#[cfg(feature = "cache")]
 pub fn has_correct_roles(cmd: &Arc<CommandOptions>, guild: &Guild, member: &Member) -> bool {
     if cmd.allowed_roles.is_empty() {
         true

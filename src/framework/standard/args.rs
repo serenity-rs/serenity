@@ -159,7 +159,7 @@ impl Args {
     /// ```
     pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
-        if self.message.is_empty() {
+        if self.is_empty() {
             return Err(Error::Eos);
         }
 
@@ -186,7 +186,7 @@ impl Args {
     /// [`single`]: #method.single
     pub fn single_n<T: FromStr>(&self) -> Result<T, T::Err>
         where T::Err: StdError {
-        if self.message.is_empty() {
+        if self.is_empty() {
             return Err(Error::Eos);
         }
 
@@ -221,7 +221,7 @@ impl Args {
         if let Some(len) = self.len {
             len
 
-        } else if self.message.is_empty() {
+        } else if self.is_empty() {
                 0
         } else {
             let mut words: Box<Iterator<Item = &str>> = Box::new(Some(&self.message[..]).into_iter());
@@ -263,7 +263,7 @@ impl Args {
     /// assert_eq!(args.len_quoted(), 2); // `2` because `["42", "69"]`
     /// ```
     pub fn len_quoted(&mut self) -> usize {
-        if self.message.is_empty() {
+        if self.is_empty() {
                 0
         } else if let Some(len_quoted) = self.len_quoted {
                 len_quoted
@@ -291,6 +291,10 @@ impl Args {
     /// assert_eq!(args.full(), "69");
     /// ```
     pub fn skip(&mut self) -> Option<String> {
+        if self.is_empty() {
+            return None;
+        }
+
         if let Some(ref mut val) = self.len {
 
             if 1 <= *val {
@@ -315,6 +319,10 @@ impl Args {
     ///
     /// [`skip`]: #method.skip
     pub fn skip_for(&mut self, i: u32) -> Option<Vec<String>> {
+        if self.is_empty() {
+            return None;
+        }
+
         let mut vec = Vec::with_capacity(i as usize);
 
         for _ in 0..i {
@@ -349,6 +357,10 @@ impl Args {
     /// [`single`]: #method.single
     pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
+        if self.is_empty() {
+            return Err(Error::Eos);
+        }
+
         if let Some(ref mut val) = self.len_quoted {
             *val -= 1
         };
@@ -372,6 +384,10 @@ impl Args {
     /// [`single_quoted`]: #method.single_quoted
     pub fn single_quoted_n<T: FromStr>(&self) -> Result<T, T::Err>
         where T::Err: StdError {
+        if self.is_empty() {
+            return Err(Error::Eos);
+        }
+
         parse_quotes::<T>(&mut self.message.clone(), &self.delimiters)
     }
 
@@ -390,6 +406,10 @@ impl Args {
     /// [`multiple`]: #method.multiple
     pub fn multiple_quoted<T: FromStr>(mut self) -> Result<Vec<T>, T::Err>
         where T::Err: StdError {
+        if self.is_empty() {
+            return Err(Error::Eos);
+        }
+
         IterQuoted::<T>::new(&mut self).collect()
     }
 
@@ -425,6 +445,10 @@ impl Args {
     /// ```
     pub fn multiple<T: FromStr>(mut self) -> Result<Vec<T>, T::Err>
         where T::Err: StdError {
+        if self.is_empty() {
+            return Err(Error::Eos);
+        }
+
         Iter::<T>::new(&mut self).collect()
     }
 
@@ -441,7 +465,7 @@ impl Args {
     /// assert!(args.is_empty());
     /// ```
     pub fn iter<T: FromStr>(&mut self) -> Iter<T> 
-        where T::Err: StdError  {
+        where T::Err: StdError {
         Iter::new(self)
     }
 
@@ -462,7 +486,7 @@ impl Args {
     /// ```
     pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
-        if self.message.is_empty() {
+        if self.is_empty() {
             return Err(Error::Eos);
         }
 
@@ -521,7 +545,7 @@ impl Args {
     /// ```
     pub fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
-        if self.message.is_empty() {
+        if self.is_empty() {
             return Err(Error::Eos);
         }
 
