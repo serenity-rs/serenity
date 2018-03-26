@@ -221,7 +221,6 @@ impl Shard {
                 }
             },
             GatewayEvent::Reconnect => {
-                debug!("7");
                 self.reconnect().unwrap();
             },
         }
@@ -366,7 +365,6 @@ impl Shard {
         if self.session_id.is_some() {
             self.resume()
         } else {
-            debug!("6");
             self.reconnect()
         }
     }
