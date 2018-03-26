@@ -40,7 +40,6 @@ pub mod webhook;
 pub use self::error::Error as ModelError;
 pub use self::permissions::Permissions;
 
-use client::Client;
 use internal::prelude::*;
 use self::utils::*;
 use serde::de::Visitor;
@@ -52,5 +51,3 @@ use std::result::Result as StdResult;
 
 #[cfg(feature = "utils")]
 use utils::Colour;
-
-type WrappedClient = Option<Rc<Client>>;

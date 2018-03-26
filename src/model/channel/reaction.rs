@@ -1,12 +1,9 @@
-use futures::future;
 use model::prelude::*;
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use serde::ser::{SerializeMap, Serialize, Serializer};
 use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 use std::str::FromStr;
-use super::super::WrappedClient;
-use ::FutureResult;
 use internal::prelude::*;
 
 /// An emoji reaction to a message.
@@ -27,150 +24,6 @@ pub struct Reaction {
     ///
     /// [`User`]: struct.User.html
     pub user_id: UserId,
-    #[serde(skip)]
-    pub(crate) client: WrappedClient,
-}
-
-#[cfg(feature = "model")]
-impl Reaction {
-    /// Retrieves the associated the reaction was made in.
-    ///
-    /// If the cache is enabled, this will search for the already-cached
-    /// channel. If not - or the channel was not found - this will perform a
-    /// request over the REST API for the channel.
-    ///
-    /// Requires the [Read Message History] permission.
-    ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[inline]
-    pub fn channel(&self) -> FutureResult<Channel> {
-        ftryopt!(self.client).http.get_channel(self.channel_id.0)
-    }
-
-    /// Deletes the reaction, but only if the current user is the user who made
-    /// the reaction or has permission to.
-    ///
-    /// Requires the [Manage Messages] permission, _if_ the current
-    /// user did not perform the reaction.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, then returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required [permissions].
-    ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    /// [permissions]: permissions
-    pub fn delete(&self) -> FutureResult<()> {
-        let client = ftryopt!(self.client);
-
-        let user_id = feature_cache! {{
-            let cache = ftry!(client.cache.try_borrow());
-
-            let user = if self.user_id == cache.user.id {
-                None
-            } else {
-                Some(self.user_id.0)
-            };
-
-            // If the reaction is one _not_ made by the current user, then ensure
-            // that the current user has permission* to delete the reaction.
-            //
-            // Normally, users can only delete their own reactions.
-            //
-            // * The `Manage Messages` permission.
-            if user.is_some() {
-                let req = Permissions::MANAGE_MESSAGES;
-
-                if !cache.user_has_perms(self.channel_id, req).unwrap_or(true) {
-                    return Box::new(future::err(Error::Model(
-                        ModelError::InvalidPermissions(req),
-                    )));
-                }
-            }
-
-            user
-        } else {
-            Some(self.user_id.0)
-        }};
-
-        ftryopt!(self.client).http.delete_reaction(
-            self.channel_id.0,
-            self.message_id.0,
-            user_id,
-            &self.emoji,
-        )
-    }
-
-    /// Retrieves the [`Message`] associated with this reaction.
-    ///
-    /// Requires the [Read Message History] permission.
-    ///
-    /// **Note**: This will send a request to the REST API. Prefer maintaining
-    /// your own message cache or otherwise having the message available if
-    /// possible.
-    ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    /// [`Message`]: struct.Message.html
-    #[inline]
-    pub fn message(&self) -> FutureResult<Message> {
-        ftryopt!(self.client).http.get_message(
-            self.channel_id.0,
-            self.message_id.0,
-        )
-    }
-
-    /// Retrieves the user that made the reaction.
-    ///
-    /// If the cache is enabled, this will search for the already-cached user.
-    /// If not - or the user was not found - this will perform a request over
-    /// the REST API for the user.
-    #[inline]
-    pub fn user(&self) -> FutureResult<User> {
-        ftryopt!(self.client).http.get_user(self.user_id.0)
-    }
-
-    /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
-    /// certain [`Emoji`].
-    ///
-    /// The default `limit` is `50` - specify otherwise to receive a different
-    /// maximum number of users. The maximum that may be retrieve at a time is
-    /// `100`, if a greater number is provided then it is automatically reduced.
-    ///
-    /// The optional `after` attribute is to retrieve the users after a certain
-    /// user. This is useful for pagination.
-    ///
-    /// Requires the [Read Message History] permission.
-    ///
-    /// **Note**: This will send a request to the REST API.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::InvalidPermissions`] if the current user does
-    /// not have the required [permissions].
-    ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`Emoji`]: struct.Emoji.html
-    /// [`Message`]: struct.Message.html
-    /// [`User`]: struct.User.html
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    /// [permissions]: permissions
-    pub fn users<R, U>(
-        &self,
-        reaction_type: R,
-        limit: Option<u8>,
-        after: Option<U>,
-    ) -> FutureResult<Vec<User>>
-        where R: Into<ReactionType>, U: Into<UserId> {
-        ftryopt!(self.client).http.get_reaction_users(
-            self.channel_id.0,
-            self.message_id.0,
-            &reaction_type.into(),
-            limit,
-            after.map(|u| u.into().0),
-        )
-    }
 }
 
 /// The type of a [`Reaction`] sent.
@@ -313,7 +166,6 @@ impl ReactionType {
     }
 }
 
-#[cfg(feature = "model")]
 impl From<char> for ReactionType {
     /// Creates a `ReactionType` from a `char`.
     ///

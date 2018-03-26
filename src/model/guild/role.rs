@@ -1,12 +1,5 @@
 use model::prelude::*;
 use std::cmp::Ordering;
-use super::super::WrappedClient;
-use ::FutureResult;
-
-#[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
-use builder::EditRole;
-#[cfg(all(feature = "cache", feature = "model"))]
-use internal::prelude::*;
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
@@ -57,76 +50,9 @@ pub struct Role {
     ///
     /// The `@everyone` role is usually either `-1` or `0`.
     pub position: i64,
-    #[serde(skip)]
-    pub(crate) client: WrappedClient,
 }
 
-#[cfg(feature = "model")]
 impl Role {
-    /// Deletes the role.
-    ///
-    /// **Note** Requires the [Manage Roles] permission.
-    ///
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(feature = "cache")]
-    #[inline]
-    pub fn delete(&self) -> FutureResult<()> {
-        let guild_id = ftry!(self.find_guild());
-
-        ftryopt!(self.client).http.delete_role(guild_id.0, self.id.0)
-    }
-
-    /// Edits a [`Role`], optionally setting its new fields.
-    ///
-    /// Requires the [Manage Roles] permission.
-    ///
-    /// # Examples
-    ///
-    /// Make a role hoisted:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::id::RoleId;
-    /// # let role = RoleId(7).find().unwrap();
-    /// // assuming a `role` has already been bound
-    //
-    /// role.edit(|r| r.hoist(true));
-    /// ```
-    ///
-    /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[cfg(all(feature = "builder", feature = "cache"))]
-    pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, f: F)
-        -> FutureResult<Role> {
-        let guild_id = ftry!(self.find_guild());
-
-        ftryopt!(self.client).http.edit_role(guild_id.0, self.id.0, f)
-    }
-
-    /// Searches the cache for the guild that owns the role.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::GuildNotFound`] if a guild is not in the cache
-    /// that contains the role.
-    ///
-    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
-    #[cfg(feature = "cache")]
-    pub fn find_guild(&self) -> Result<GuildId> {
-        let client = self.client.as_ref().ok_or_else(|| {
-            Error::Model(ModelError::ClientNotPresent)
-        })?;
-
-        for guild in client.cache.borrow().guilds.values() {
-            let guild = guild.borrow();
-
-            if guild.roles.contains_key(&RoleId(self.id.0)) {
-                return Ok(guild.id);
-            }
-        }
-
-        Err(Error::Model(ModelError::GuildNotFound))
-    }
-
     /// Check that the role has the given permission.
     #[inline]
     pub fn has_permission(&self, permission: Permissions) -> bool {

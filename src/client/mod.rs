@@ -29,7 +29,6 @@ use hyper::client::{Client as HyperClient, HttpConnector};
 use hyper::Body;
 use hyper_tls::HttpsConnector;
 use self::shard_manager::{ShardManager, ShardManagerOptions, ShardingStrategy};
-use std::cell::RefCell;
 use std::rc::Rc;
 use super::http::Client as HttpClient;
 use super::FutureResult;

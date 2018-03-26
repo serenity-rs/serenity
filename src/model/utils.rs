@@ -258,17 +258,6 @@ impl PermissionCheck for Cache {
     }
 }
 
-macro_rules! ftryopt {
-    ($code:expr) => {
-        match $code {
-            Some(ref v) => v,
-            None => return Box::new(::futures::future::err(::Error::Model(
-                ::model::ModelError::ClientNotPresent,
-            ))),
-        }
-    };
-}
-
 macro_rules! num_visitors {
     ($($visitor:ident: $type:ty),*) => {
         $(

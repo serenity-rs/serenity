@@ -20,20 +20,14 @@ pub use self::private_channel::*;
 pub use self::reaction::*;
 pub use self::channel_category::*;
 
-use futures::Future;
 use model::prelude::*;
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
 use std::cell::RefCell;
+use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::rc::Rc;
 use super::utils::deserialize_u64;
-use ::FutureResult;
-
-#[cfg(feature = "model")]
-use builder::{CreateMessage, EditMessage};
-#[cfg(feature = "model")]
-use std::fmt::{Display, Formatter, Result as FmtResult};
 
 /// A container for any channel.
 #[derive(Clone, Debug)]
@@ -181,131 +175,6 @@ impl Channel {
         }
     }
 
-    /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
-    ///
-    /// [`Message::react`] may be a more suited method of reacting in most
-    /// cases.
-    ///
-    /// Requires the [Add Reactions] permission, _if_ the current user is the
-    /// first user to perform a react with a certain emoji.
-    ///
-    /// [`Emoji`]: struct.Emoji.html
-    /// [`Message`]: struct.Message.html
-    /// [`Message::react`]: struct.Message.html#method.react
-    /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R)
-        -> FutureResult<()> where M: Into<MessageId>, R: Into<ReactionType> {
-        ftryopt!(ftry!(self.client())).http.create_reaction(
-            self.id().0,
-            message_id.into().0,
-            &reaction_type.into(),
-        )
-    }
-
-    /// Deletes the inner channel.
-    ///
-    /// **Note**: There is no real function as _deleting_ a [`Group`]. The
-    /// closest functionality is leaving it.
-    ///
-    /// [`Group`]: struct.Group.html
-    #[cfg(feature = "model")]
-    pub fn delete(&self) -> FutureResult<()> {
-        match *self {
-            Channel::Group(ref group) => {
-                Box::new(group.borrow().leave())
-            },
-            Channel::Guild(ref public_channel) => {
-                Box::new(public_channel.borrow().delete().map(|_| ()))
-            },
-            Channel::Private(ref private_channel) => {
-                Box::new(private_channel.borrow().delete().map(|_| ()))
-            },
-            Channel::Category(ref category) => {
-                Box::new(category.borrow().delete())
-            },
-        }
-    }
-
-    /// Deletes a [`Message`] given its Id.
-    ///
-    /// Refer to [`Message::delete`] for more information.
-    ///
-    /// Requires the [Manage Messages] permission, if the current user is not
-    /// the author of the message.
-    ///
-    /// [`Message`]: struct.Message.html
-    /// [`Message::delete`]: struct.Message.html#method.delete
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn delete_message<M>(&self, message_id: M) -> FutureResult<()>
-        where M: Into<MessageId> {
-        ftryopt!(ftry!(self.client())).http.delete_message(
-            self.id().0,
-            message_id.into().0,
-        )
-    }
-
-    /// Deletes the given [`Reaction`] from the channel.
-    ///
-    /// **Note**: Requires the [Manage Messages] permission, _if_ the current
-    /// user did not perform the reaction.
-    ///
-    /// [`Reaction`]: struct.Reaction.html
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn delete_reaction<M, R>(
-        &self,
-        message_id: M,
-        user_id: Option<UserId>,
-        reaction_type: R,
-    ) -> FutureResult<()> where M: Into<MessageId>, R: Into<ReactionType> {
-        ftryopt!(ftry!(self.client())).http.delete_reaction(
-            self.id().0,
-            message_id.into().0,
-            user_id.map(|x| x.0),
-            &reaction_type.into(),
-        )
-    }
-
-    /// Edits a [`Message`] in the channel given its Id.
-    ///
-    /// Message editing preserves all unchanged message data.
-    ///
-    /// Refer to the documentation for [`EditMessage`] for more information
-    /// regarding message restrictions and requirements.
-    ///
-    /// **Note**: Requires that the current user be the author of the message.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the [`the limit`], containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`EditMessage`]: ../builder/struct.EditMessage.html
-    /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn edit_message<F, M>(&self, message_id: M, f: F)
-        -> FutureResult<Message>
-        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
-        ftryopt!(ftry!(self.client())).http.edit_message(
-            self.id().0,
-            message_id.into().0,
-            f,
-        )
-    }
-
     /// Determines if the channel is NSFW.
     ///
     /// Refer to [`utils::is_nsfw`] for more details.
@@ -321,57 +190,6 @@ impl Channel {
         }
     }
 
-    /// Gets a message from the channel.
-    ///
-    /// Requires the [Read Message History] permission.
-    ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn message<M>(&self, message_id: M) -> FutureResult<Message>
-        where M: Into<MessageId> {
-        ftryopt!(ftry!(self.client())).http.get_message(
-            self.id().0,
-            message_id.into().0,
-        )
-    }
-
-    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
-    /// certain [`Emoji`].
-    ///
-    /// The default `limit` is `50` - specify otherwise to receive a different
-    /// maximum number of users. The maximum that may be retrieve at a time is
-    /// `100`, if a greater number is provided then it is automatically reduced.
-    ///
-    /// The optional `after` attribute is to retrieve the users after a certain
-    /// user. This is useful for pagination.
-    ///
-    /// **Note**: Requires the [Read Message History] permission.
-    ///
-    /// [`Emoji`]: struct.Emoji.html
-    /// [`Message`]: struct.Message.html
-    /// [`User`]: struct.User.html
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn reaction_users<M, R, U>(&self,
-        message_id: M,
-        reaction_type: R,
-        limit: Option<u8>,
-        after: U,
-    ) -> FutureResult<Vec<User>>
-        where M: Into<MessageId>, R: Into<ReactionType>, U: Into<Option<UserId>> {
-        ftryopt!(ftry!(self.client())).http.get_reaction_users(
-            self.id().0,
-            message_id.into().0,
-            &reaction_type.into(),
-            limit,
-            after.into().map(|x| x.0),
-        )
-    }
-
     /// Retrieves the Id of the inner [`Group`], [`GuildChannel`], or
     /// [`PrivateChannel`].
     ///
@@ -385,106 +203,6 @@ impl Channel {
             Channel::Private(ref ch) => ch.borrow().id,
             Channel::Category(ref category) => category.borrow().id,
         }
-    }
-
-    /// Sends a message with just the given message content in the channel.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// [`ChannelId`]: struct.ChannelId.html
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn say(&self, content: &str) -> FutureResult<Message> {
-        ftryopt!(ftry!(self.client())).http.send_message(self.id().0, |f|
-            f.content(content))
-    }
-
-    /// Sends (a) file(s) along with optional message contents.
-    ///
-    /// Refer to [`ChannelId::send_files`] for examples and more information.
-    ///
-    /// The [Attach Files] and [Send Messages] permissions are required.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// If the content of the message is over the above limit, then a
-    /// [`ClientError::MessageTooLong`] will be returned, containing the number
-    /// of unicode code points over the limit.
-    ///
-    /// [`ChannelId::send_files`]: struct.ChannelId.html#method.send_files
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    // todo
-    // #[cfg(feature = "model")]
-    // #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    // #[inline]
-    // pub fn send_files<'a, F, T, It>(&self, files: It, f: F)
-    //     -> FutureResult<Message>
-    //     where F: FnOnce(CreateMessage) -> CreateMessage,
-    //           T: Into<AttachmentType<'a>>,
-    //           It: IntoIterator<Item = T> {
-    //     ftryopt!(ftry!(self.client())).http.send_files(self.id(), files, f)
-    // }
-
-    /// Sends a message to the channel.
-    ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
-    /// regarding message restrictions and requirements.
-    ///
-    /// The [Send Messages] permission is required.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// [`Channel`]: enum.Channel.html
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn send_message<F>(&self, f: F) -> FutureResult<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
-        ftryopt!(ftry!(self.client())).http.send_message(self.id().0, f)
-    }
-
-    /// Unpins a [`Message`] in the channel given by its Id.
-    ///
-    /// Requires the [Manage Messages] permission.
-    ///
-    /// [`Message`]: struct.Message.html
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> FutureResult<()> {
-        let retrieve = ftry!(self.client());
-        let obtained = ftryopt!(retrieve);
-
-        obtained.http.unpin_message(self.id().0, message_id.into().0)
-    }
-
-    fn client(&self) -> Result<WrappedClient> {
-        Ok(match *self {
-            Channel::Category(ref c) => c.try_borrow()?.client.as_ref().map(Rc::clone),
-            Channel::Group(ref c) => c.try_borrow()?.client.as_ref().map(Rc::clone),
-            Channel::Guild(ref c) => c.try_borrow()?.client.as_ref().map(Rc::clone),
-            Channel::Private(ref c) => c.try_borrow()?.client.as_ref().map(Rc::clone),
-        })
     }
 }
 
@@ -535,7 +253,6 @@ impl Serialize for Channel {
     }
 }
 
-#[cfg(feature = "model")]
 impl Display for Channel {
     /// Formats the channel into a "mentioned" string.
     ///

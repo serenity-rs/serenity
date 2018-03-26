@@ -39,7 +39,6 @@ pub struct Game {
     pub url: Option<String>,
 }
 
-#[cfg(feature = "model")]
 impl Game {
     /// Creates a `Game` struct that appears as a `Playing <name>` status.
     ///

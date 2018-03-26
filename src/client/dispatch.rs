@@ -119,10 +119,7 @@ fn dispatch_message<H>(
     event_handler: &Arc<H>,
     threadpool: &ThreadPool,
 ) where H: EventHandler + Send + Sync + 'static {
-    #[cfg(feature = "model")]
-    {
-        message.transform_content();
-    }
+    message.transform_content();
 
     let event_handler = Arc::clone(event_handler);
 

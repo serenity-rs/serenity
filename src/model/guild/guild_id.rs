@@ -1,6 +1,5 @@
 use model::prelude::*;
 
-#[cfg(feature = "model")]
 impl GuildId {
     /// Converts the guild Id into the default channel's Id.
     #[inline]

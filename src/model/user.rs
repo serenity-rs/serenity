@@ -1,25 +1,14 @@
 //! User information-related models.
 
-use futures::{Future, future};
 use serde_json;
 use std::fmt;
 use super::utils::deserialize_u16;
 use super::prelude::*;
-use super::WrappedClient;
-use ::FutureResult;
 use internal::prelude::*;
 use model::misc::Mentionable;
 
-#[cfg(feature = "model")]
-use builder::{CreateMessage, EditProfile};
-#[cfg(feature = "model")]
 use chrono::NaiveDateTime;
-#[cfg(feature = "model")]
-use http::GuildPagination;
-#[cfg(feature = "model")]
 use std::fmt::Write;
-#[cfg(feature = "model")]
-use utils::{self, VecMap};
 
 /// Information about the current user.
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]
@@ -32,11 +21,8 @@ pub struct CurrentUser {
     pub mfa_enabled: bool,
     #[serde(rename = "username")] pub name: String,
     pub verified: bool,
-    #[serde(skip)]
-    pub(crate) client: WrappedClient,
 }
 
-#[cfg(feature = "model")]
 impl CurrentUser {
     /// Returns the formatted URL of the user's icon, if one exists.
     ///
@@ -68,38 +54,6 @@ impl CurrentUser {
     #[inline]
     pub fn default_avatar_url(&self) -> String { default_avatar_url(self.discriminator) }
 
-    /// Edits the current user's profile settings.
-    ///
-    /// This mutates the current user in-place.
-    ///
-    /// Refer to `EditProfile`'s documentation for its methods.
-    ///
-    /// # Examples
-    ///
-    /// Change the avatar:
-    ///
-    /// ```rust,ignore
-    /// use serenity::CACHE;
-    ///
-    /// let avatar = serenity::utils::read_image("./avatar.png").unwrap();
-    ///
-    /// CACHE.write().user.edit(|p| p.avatar(Some(&avatar)));
-    /// ```
-    pub fn edit<F: FnOnce(EditProfile) -> EditProfile>(&mut self, f: F)
-        -> Box<Future<Item = CurrentUser, Error = Error>> {
-        let mut map = VecMap::new();
-        map.insert("username", Value::String(self.name.clone()));
-
-        if let Some(email) = self.email.as_ref() {
-            map.insert("email", Value::String(email.clone()));
-        }
-
-        let map = utils::vecmap_to_json_map(f(EditProfile(map)).0);
-        let value = Value::Object(map);
-
-        ftryopt!(self.client).http.edit_profile(&value)
-    }
-
     /// Retrieves the URL to the current user's avatar, falling back to the
     /// default avatar if needed.
     ///
@@ -111,119 +65,6 @@ impl CurrentUser {
     pub fn face(&self) -> String {
         self.avatar_url()
             .unwrap_or_else(|| self.default_avatar_url())
-    }
-
-    /// Gets a list of guilds that the current user is in.
-    ///
-    /// # Examples
-    ///
-    /// Print out the names of all guilds the current user is in:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::CACHE;
-    /// #
-    /// # let cache = CACHE.read();
-    /// #
-    /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
-    ///
-    /// if let Ok(guilds) = user.guilds() {
-    ///     for (index, guild) in guilds.into_iter().enumerate() {
-    ///         println!("{}: {}", index, guild.name);
-    ///     }
-    /// }
-    /// ```
-    pub fn guilds(&self) -> FutureResult<Vec<GuildInfo>> {
-        ftryopt!(self.client)
-            .http
-            .get_guilds(&GuildPagination::After(GuildId(1)), 100)
-    }
-
-    /// Returns the invite url for the bot with the given permissions.
-    ///
-    /// This queries the REST API for the client id.
-    ///
-    /// If the permissions passed are empty, the permissions part will be dropped.
-    ///
-    /// # Examples
-    ///
-    /// Get the invite url with no permissions set:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::CACHE;
-    /// #
-    /// # let mut cache = CACHE.write();
-    ///
-    /// use serenity::model::Permissions;
-    ///
-    /// // assuming the cache has been unlocked
-    /// let url = match cache.user.invite_url(Permissions::empty()) {
-    ///     Ok(v) => v,
-    ///     Err(why) => {
-    ///         println!("Error getting invite url: {:?}", why);
-    ///
-    ///         return;
-    ///     },
-    /// };
-    ///
-    /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize? \
-    ///                  client_id=249608697955745802&scope=bot");
-    /// ```
-    ///
-    /// Get the invite url with some basic permissions set:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::CACHE;
-    /// #
-    /// # let mut cache = CACHE.write();
-    ///
-    /// use serenity::model::Permissions;
-    ///
-    /// // assuming the cache has been unlocked
-    /// let url = match cache.user.invite_url(Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS) {
-    ///     Ok(v) => v,
-    ///     Err(why) => {
-    ///         println!("Error getting invite url: {:?}", why);
-    ///
-    ///         return;
-    ///     },
-    /// };
-    ///
-    /// assert_eq!(url,
-    /// "https://discordapp.
-    /// com/api/oauth2/authorize?client_id=249608697955745802&scope=bot&permissions=19456");
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns an
-    /// [`HttpError::InvalidRequest(Unauthorized)`][`HttpError::InvalidRequest`]
-    /// If the user is not authorized for this end point.
-    ///
-    /// May return [`Error::Format`] while writing url to the buffer.
-    ///
-    /// [`Error::Format`]: ../enum.Error.html#variant.Format
-    /// [`HttpError::InvalidRequest`]: ../http/enum.HttpError.html#variant.InvalidRequest
-    pub fn invite_url(&self, permissions: Permissions) -> FutureResult<String> {
-        let bits = permissions.bits();
-
-        let done = ftryopt!(self.client)
-            .http
-            .get_current_application_info()
-            .map(move |app| {
-                let mut url = format!(
-                    "https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot",
-                    app.id,
-                );
-
-                if bits != 0 {
-                    let _ = write!(url, "&permissions={}", bits);
-                }
-
-                url
-            });
-
-        Box::new(done)
     }
 
     /// Returns a static formatted URL of the user's icon, if one exists.
@@ -356,8 +197,6 @@ pub struct User {
     /// change if the username+discriminator pair becomes non-unique.
     #[serde(rename = "username")]
     pub name: String,
-    #[serde(skip)]
-    pub(crate) client: WrappedClient,
 }
 
 use std::hash::{Hash, Hasher};
@@ -376,22 +215,12 @@ impl Hash for User {
     }
 }
 
-#[cfg(feature = "model")]
 impl User {
     /// Returns the formatted URL of the user's icon, if one exists.
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
     #[inline]
     pub fn avatar_url(&self) -> Option<String> { avatar_url(self.id, self.avatar.as_ref()) }
-
-    /// Creates a direct message channel between the [current user] and the
-    /// user. This can also retrieve the channel if one already exists.
-    ///
-    /// [current user]: struct.CurrentUser.html
-    #[inline]
-    pub fn create_dm_channel(&self) -> FutureResult<PrivateChannel> {
-        ftryopt!(self.client).http.create_private_channel(self.id.0)
-    }
 
     /// Retrieves the time that this user was created at.
     #[inline]
@@ -402,163 +231,6 @@ impl User {
     /// This will produce a PNG URL.
     #[inline]
     pub fn default_avatar_url(&self) -> String { default_avatar_url(self.discriminator) }
-
-    /// Sends a message to a user through a direct message channel. This is a
-    /// channel that can only be accessed by you and the recipient.
-    ///
-    /// # Examples
-    ///
-    /// When a user sends a message with a content of `"~help"`, DM the author a
-    /// help message, and then react with `'👌'` to verify message sending:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::prelude::*;
-    /// #
-    /// use serenity::model::Permissions;
-    /// use serenity::CACHE;
-    ///
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, msg: Message) {
-    ///         if msg.content == "~help" {
-    ///             let cache = CACHE.read();
-    ///
-    ///             let url = match cache.user.invite_url(Permissions::empty()) {
-    ///                 Ok(v) => v,
-    ///                 Err(why) => {
-    ///                     println!("Error creating invite url: {:?}", why);
-    ///
-    ///                     return;
-    ///                 },
-    ///             };
-    ///
-    ///             let help = format!(
-    ///                 "Helpful info here. Invite me with this link: <{}>",
-    ///                 url,
-    ///             );
-    ///
-    ///             match msg.author.direct_message(|m| m.content(&help)) {
-    ///                 Ok(_) => {
-    ///                     let _ = msg.react('👌');
-    ///                 },
-    ///                 Err(why) => {
-    ///                     println!("Err sending help: {:?}", why);
-    ///
-    ///                     let _ = msg.reply("There was an error DMing you help.");
-    ///                 },
-    ///             };
-    ///         }
-    ///     }
-    /// }
-    ///
-    /// let mut client = Client::new("token", Handler);
-    /// ```
-    ///
-    /// # Examples
-    ///
-    /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
-    /// is a bot user.
-    ///
-    /// [`ModelError::MessagingBot`]: enum.ModelError.html#variant.MessagingBot
-    /// [`PrivateChannel`]: struct.PrivateChannel.html
-    /// [`User::dm`]: struct.User.html#method.dm
-    // A tale with Clippy:
-    //
-    // A person named Clippy once asked you to unlock a box and take something
-    // from it, but you never re-locked it, so you'll die and the universe will
-    // implode because the box must remain locked unless you're there, and you
-    // can't just borrow that item from it and take it with you forever.
-    //
-    // Instead what you do is unlock the box, take the item out of it, make a
-    // copy of said item, and then re-lock the box, and take your copy of the
-    // item with you.
-    //
-    // The universe is still fine, and nothing implodes.
-    //
-    // (AKA: Clippy is wrong and so we have to mark as allowing this lint.)
-    #[allow(let_and_return)]
-    #[cfg(feature = "builder")]
-    pub fn direct_message<'a, F: 'a + FnOnce(CreateMessage) -> CreateMessage>(
-        &'a self,
-        f: F,
-    ) -> Box<Future<Item = Message, Error = Error> + 'a> {
-        if self.bot {
-            return Box::new(future::err(Error::Model(
-                ModelError::MessagingBot,
-            )));
-        }
-
-        let client = ftryopt!(self.client);
-
-        let private_channel_id = feature_cache! {{
-            let finding = {
-                let cache = client.cache.borrow();
-
-                let finding = cache.private_channels
-                    .values()
-                    .find(|ch| {
-                        let ch = ch.borrow();
-                        let recipient = ch.recipient.borrow();
-
-                        recipient.id == self.id
-                    })
-                    .map(|ch| ch.borrow().id);
-
-                finding
-            };
-
-            if let Some(finding) = finding {
-                return Box::new(client.http.send_message(finding.0, f));
-            } else {
-                let done = client
-                    .http
-                    .create_private_channel(self.id.0)
-                    .map(|channel| channel.id);
-
-                Box::new(done)
-            }
-        } else {
-            let done = ftryopt!(self.client)
-                .http
-                .create_private_channel(self.id.0)
-                .map(|channel| channel.id);
-
-            Box::new(done)
-        }};
-
-        Box::new(private_channel_id
-            .and_then(move |id| client.http.send_message(id.0, f)))
-    }
-
-    /// This is an alias of [direct_message].
-    ///
-    /// # Examples
-    ///
-    /// Sending a message:
-    ///
-    /// ```rust,ignore
-    /// // assuming you are in a context
-    ///
-    /// let _ = message.author.dm("Hello!");
-    /// ```
-    ///
-    /// # Examples
-    ///
-    /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
-    /// is a bot user.
-    ///
-    /// [`ModelError::MessagingBot`]: enum.ModelError.html#variant.MessagingBot
-    /// [direct_message]: #method.direct_message
-    #[cfg(feature = "builder")]
-    #[inline]
-    pub fn dm<'a, F: 'a + FnOnce(CreateMessage) -> CreateMessage>(
-        &'a self,
-        f: F,
-    ) -> Box<Future<Item = Message, Error = Error> + 'a> {
-        self.direct_message(f)
-    }
 
     /// Retrieves the URL to the user's avatar, falling back to the default
     /// avatar if needed.
@@ -571,59 +243,6 @@ impl User {
     pub fn face(&self) -> String {
         self.avatar_url()
             .unwrap_or_else(|| self.default_avatar_url())
-    }
-
-    /// Check if a user has a [`Role`]. This will retrieve the [`Guild`] from
-    /// the [`Cache`] if it is available, and then check if that guild has the
-    /// given [`Role`].
-    ///
-    /// Three forms of data may be passed in to the guild parameter: either a
-    /// [`PartialGuild`], a [`GuildId`], or a `u64`.
-    ///
-    /// # Examples
-    ///
-    /// Check if a guild has a [`Role`] by Id:
-    ///
-    /// ```rust,ignore
-    /// // Assumes a 'guild_id' and `role_id` have already been bound
-    /// let _ = message.author.has_role(guild_id, role_id);
-    /// ```
-    ///
-    /// [`Guild`]: struct.Guild.html
-    /// [`GuildId`]: struct.GuildId.html
-    /// [`PartialGuild`]: struct.PartialGuild.html
-    /// [`Role`]: struct.Role.html
-    /// [`Cache`]: ../cache/struct.Cache.html
-    // no-cache would warn on guild_id.
-    pub fn has_role<G, R>(&self, guild: G, role: R) -> bool
-        where G: Into<GuildContainer>, R: Into<RoleId> {
-        let role_id = role.into();
-
-        match guild.into() {
-            GuildContainer::Guild(guild) => guild.roles.contains_key(&role_id),
-            GuildContainer::Id(_guild_id) => {
-                feature_cache! {{
-                    let client = match self.client.as_ref() {
-                        Some(client) => client,
-                        None => return false,
-                    };
-
-                    let cache = client.cache.borrow();
-
-                    cache
-                        .guilds
-                        .get(&_guild_id)
-                        .map(|g| {
-                            g.borrow().members.get(&self.id)
-                                .map(|m| m.borrow().roles.contains(&role_id))
-                                .unwrap_or(false)
-                        })
-                        .unwrap_or(false)
-                } else {
-                    true
-                }}
-            },
-        }
     }
 
     /// Returns a static formatted URL of the user's icon, if one exists.
@@ -699,7 +318,6 @@ impl<'a> From<&'a User> for UserId {
     fn from(user: &User) -> UserId { user.id }
 }
 
-#[cfg(feature = "model")]
 fn avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
     hash.map(|hash| {
         let ext = if hash.starts_with("a_") {
@@ -712,17 +330,14 @@ fn avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
     })
 }
 
-#[cfg(feature = "model")]
 fn default_avatar_url(discriminator: u16) -> String {
     cdn!("/embed/avatars/{}.png", discriminator % 5u16)
 }
 
-#[cfg(feature = "model")]
 fn static_avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
     hash.map(|hash| cdn!("/avatars/{}/{}.webp?size=1024", user_id, hash))
 }
 
-#[cfg(feature = "model")]
 fn tag(name: &str, discriminator: u16) -> String {
     // 32: max length of username
     // 1: `#`

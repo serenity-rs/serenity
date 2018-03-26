@@ -16,6 +16,7 @@
 
 pub use error::Error as SerenityError;
 pub use model::misc::Mentionable;
+pub use model::ModelError;
 
 // todo re-add EventHandler, Context re-exports
 #[cfg(feature = "client")]
@@ -24,7 +25,5 @@ pub use client::{Client, ClientError as ClientError};
 pub use gateway::GatewayError;
 #[cfg(feature = "http")]
 pub use http::HttpError;
-#[cfg(feature = "model")]
-pub use model::ModelError;
 #[cfg(feature = "voice")]
 pub use voice::VoiceError;

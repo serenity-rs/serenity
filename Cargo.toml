@@ -69,21 +69,17 @@ version = "0.1.6"
 [features]
 default = [
     "builder",
-    "cache",
     "client",
     "gateway",
     "http",
-    "model",
     "utils",
 ]
 builder = ["utils"]
-cache = []
 client = ["gateway", "http"]
 extras = []
-framework = ["client", "model", "utils"]
+framework = ["client", "utils"]
 gateway = ["flate2", "http", "tokio-tungstenite", "tungstenite", "utils"]
 http = ["builder", "hyper", "hyper-tls", "utils"]
-model = ["builder", "http"]
 standard_framework = ["framework"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "sodiumoxide"]

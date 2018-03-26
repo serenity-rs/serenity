@@ -5,7 +5,7 @@ use std::rc::Rc;
 use std::mem;
 use super::Cache;
 
-pub(crate) trait CacheUpdate {
+pub trait CacheUpdate {
     type Output;
 
     fn update(&mut self, &mut Cache) -> Option<Self::Output>;
@@ -363,7 +363,6 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                 guild.members.insert(
                     self.user.id,
                     Rc::new(RefCell::new(Member {
-                        client: None,
                         deaf: false,
                         guild_id: self.guild_id,
                         joined_at: None,
@@ -521,7 +520,6 @@ impl CacheUpdate for PresenceUpdateEvent {
                         let roles = self.roles.clone().unwrap_or_default();
 
                         guild.members.insert(self.presence.user_id, Rc::new(RefCell::new(Member {
-                            client: None,
                             deaf: false,
                             guild_id: guild_id,
                             joined_at: None,

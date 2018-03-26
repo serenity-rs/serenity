@@ -10,34 +10,6 @@ macro_rules! cdn {
     };
 }
 
-// Enable/disable check for cache
-#[cfg(any(all(feature = "cache", any(feature = "client", feature = "model"))))]
-macro_rules! feature_cache {
-    ($enabled:block else $disabled:block) => {
-        {
-            $enabled
-        }
-    }
-}
-
-#[cfg(any(all(not(feature = "cache"), any(feature = "client", feature = "model"))))]
-macro_rules! feature_cache {
-    ($enabled:block else $disabled:block) => {
-        {
-            $disabled
-        }
-    }
-}
-
-macro_rules! ftry {
-    ($code:expr) => {
-        match $code {
-            Ok(v) => v,
-            Err(why) => return Box::new(::futures::future::err(From::from(why))),
-        }
-    }
-}
-
 macro_rules! enum_number {
     (#[$attr_:meta] $name:ident { $(#[$attr:meta] $variant:ident = $value:expr, )* }) => {
         #[$attr_]

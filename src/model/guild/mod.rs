@@ -17,24 +17,15 @@ pub use self::role::*;
 pub use self::audit_log::*;
 
 use chrono::{DateTime, FixedOffset};
-use futures::{Future, future};
+use constants::LARGE_THRESHOLD;
 use model::prelude::*;
 use serde::de::Error as DeError;
 use serde_json;
+use std::borrow::Cow;
 use std::cell::RefCell;
 use std::rc::Rc;
-use super::utils::*;
-use super::WrappedClient;
-use ::FutureResult;
-
-#[cfg(feature = "model")]
-use builder::{EditGuild, EditMember, EditRole};
-#[cfg(feature = "model")]
-use constants::LARGE_THRESHOLD;
-#[cfg(feature = "model")]
 use std;
-#[cfg(feature = "model")]
-use std::borrow::Cow;
+use super::utils::*;
 
 /// A representation of a banning of a user.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash, Serialize)]
@@ -143,29 +134,9 @@ pub struct Guild {
     /// [`User`]: struct.User.html
     #[serde(serialize_with = "serialize_gen_map")]
     pub voice_states: HashMap<UserId, VoiceState>,
-    #[serde(skip)]
-    pub(crate) client: WrappedClient,
 }
 
-#[cfg(feature = "model")]
 impl Guild {
-    #[cfg(feature = "cache")]
-    fn check_hierarchy(&self, other_user: UserId) -> Result<()> {
-        let client = self.client.as_ref().ok_or_else(|| {
-            Error::Model(ModelError::ClientNotPresent)
-        })?;
-
-        let current_id = client.cache.try_borrow()?.user.id;
-
-        if let Some(higher) = self.greater_member_hierarchy(other_user, current_id) {
-            if higher != current_id {
-                return Err(Error::Model(ModelError::Hierarchy));
-            }
-        }
-
-        Ok(())
-    }
-
     /// Returns the "default" channel of the guild for the passed user id.
     /// (This returns the first channel that can be read by the user, if there isn't one,
     /// returns `None`)
@@ -196,569 +167,6 @@ impl Guild {
         None
     }
 
-    #[cfg(feature = "cache")]
-    fn has_perms(&self, mut permissions: Permissions) -> bool {
-        let client = match self.client.as_ref() {
-            Some(client) => client,
-            None => return true,
-        };
-        let cache = match client.cache.try_borrow() {
-            Ok(cache) => cache,
-            Err(_) => return true,
-        };
-
-        let user_id = cache.user.id;
-
-        let perms = self.member_permissions(user_id);
-        permissions.remove(perms);
-
-        permissions.is_empty()
-    }
-
-    /// Ban a [`User`] from the guild. All messages by the
-    /// user within the last given number of days given will be deleted.
-    ///
-    /// Refer to the documentation for [`Guild::ban`] for more information.
-    ///
-    /// **Note**: Requires the [Ban Members] permission.
-    ///
-    /// # Examples
-    ///
-    /// Ban a member and remove all messages they've sent in the last 4 days:
-    ///
-    /// ```rust,ignore
-    /// // assumes a `user` and `guild` have already been bound
-    /// let _ = guild.ban(user, 4);
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::InvalidPermissions`] if the current user does
-    /// not have permission to perform bans.
-    ///
-    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
-    /// days' worth of messages to delete is over the maximum.
-    ///
-    /// [`ModelError::DeleteMessageDaysAmount`]:
-    /// enum.ModelError.html#variant.DeleteMessageDaysAmount
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`Guild::ban`]: struct.Guild.html#method.ban
-    /// [`User`]: struct.User.html
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: &BO)
-        -> FutureResult<()> {
-        let user = user.into();
-
-        #[cfg(feature = "cache")]
-        {
-            let req = Permissions::BAN_MEMBERS;
-
-            if !self.has_perms(req) {
-                return Box::new(future::err(Error::Model(
-                    ModelError::InvalidPermissions(req),
-                )));
-            }
-
-            ftry!(self.check_hierarchy(user));
-        }
-
-        let dmd = options.dmd();
-        if dmd > 7 {
-            return Box::new(future::err(Error::Model(
-                ModelError::DeleteMessageDaysAmount(dmd),
-            )));
-        }
-
-        let reason = options.reason();
-
-        if reason.len() > 512 {
-            return Box::new(future::err(Error::ExceededLimit(
-                reason.to_string(),
-                512,
-            )));
-        }
-
-        ftryopt!(self.client)
-            .http
-            .ban_user(self.id.0, user.0, dmd, reason)
-    }
-
-    /// Retrieves a list of [`Ban`]s for the guild.
-    ///
-    /// **Note**: Requires the [Ban Members] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans.
-    ///
-    /// [`Ban`]: struct.Ban.html
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    pub fn bans(&self) -> FutureResult<Vec<Ban>> {
-        #[cfg(feature = "cache")]
-        {
-            let req = Permissions::BAN_MEMBERS;
-
-            if !self.has_perms(req) {
-                return Box::new(future::err(Error::Model(
-                    ModelError::InvalidPermissions(req),
-                )));
-            }
-        }
-
-        ftryopt!(self.client).http.get_bans(self.id.0)
-    }
-
-    /// Retrieves a list of [`AuditLogs`] for the guild.
-    ///
-    /// [`AuditLogs`]: audit_log/struct.AuditLogs.html
-    #[inline]
-    pub fn audit_logs(
-        &self,
-        action_type: Option<u8>,
-        user_id: Option<UserId>,
-        before: Option<AuditLogEntryId>,
-        limit: Option<u8>,
-    ) -> FutureResult<AuditLogs> {
-        ftryopt!(self.client).http.get_audit_logs(
-            self.id.0,
-            action_type,
-            user_id.map(|x| x.0),
-            before.map(|x| x.0),
-            limit,
-        )
-    }
-
-    /// Gets all of the guild's channels over the REST API.
-    ///
-    /// [`Guild`]: struct.Guild.html
-    #[inline]
-    pub fn channels(&self) -> FutureResult<HashMap<ChannelId, GuildChannel>> {
-        let done = ftryopt!(self.client)
-            .http
-            .get_channels(self.id.0)
-            .map(|channels| {
-                let mut map = HashMap::with_capacity(channels.len());
-
-                for channel in channels {
-                    map.insert(channel.id, channel);
-                }
-
-                map
-            });
-
-        Box::new(done)
-    }
-
-    /// Creates a new [`Channel`] in the guild.
-    ///
-    /// **Note**: Requires the [Manage Channels] permission.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// use serenity::model::ChannelType;
-    ///
-    /// // assuming a `guild` has already been bound
-    ///
-    /// let _ = guild.create_channel("my-test-channel", ChannelType::Text, None);
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans.
-    ///
-    /// [`Channel`]: struct.Channel.html
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
-    pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C)
-        -> FutureResult<GuildChannel> where C: Into<Option<ChannelId>> {
-        #[cfg(feature = "cache")]
-        {
-            let req = Permissions::MANAGE_CHANNELS;
-
-            if !self.has_perms(req) {
-                return Box::new(future::err(Error::Model(
-                    ModelError::InvalidPermissions(req),
-                )));
-            }
-        }
-
-        ftryopt!(self.client).http.create_channel(
-            self.id.0,
-            name,
-            kind,
-            category.into().map(|x| x.0),
-        )
-    }
-
-    /// Creates an emoji in the guild with a name and base64-encoded image. The
-    /// [`utils::read_image`] function is provided for you as a simple method to
-    /// read an image and encode it into base64, if you are reading from the
-    /// filesystem.
-    ///
-    /// The name of the emoji must be at least 2 characters long and can only
-    /// contain alphanumeric characters and underscores.
-    ///
-    /// Requires the [Manage Emojis] permission.
-    ///
-    /// # Examples
-    ///
-    /// See the [`EditProfile::avatar`] example for an in-depth example as to
-    /// how to read an image from the filesystem and encode it as base64. Most
-    /// of the example can be applied similarly for this method.
-    ///
-    /// [`EditProfile::avatar`]: ../builder/struct.EditProfile.html#method.avatar
-    /// [`utils::read_image`]: ../fn.read_image.html
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
-    #[inline]
-    pub fn create_emoji(&self, name: &str, image: &str) -> FutureResult<Emoji> {
-        ftryopt!(self.client).http.create_emoji(self.id.0, name, image)
-    }
-
-    /// Creates an integration for the guild.
-    ///
-    /// Requires the [Manage Guild] permission.
-    ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    #[inline]
-    pub fn create_integration<I>(&self, integration_id: I, kind: &str)
-        -> FutureResult<()> where I: Into<IntegrationId> {
-        ftryopt!(self.client).http.create_guild_integration(
-            self.id.0,
-            integration_id.into().0,
-            kind,
-        )
-    }
-
-    /// Creates a new role in the guild with the data set, if any.
-    ///
-    /// **Note**: Requires the [Manage Roles] permission.
-    ///
-    /// # Examples
-    ///
-    /// Create a role which can be mentioned, with the name 'test':
-    ///
-    /// ```rust,ignore
-    /// // assuming a `guild` has been bound
-    ///
-    /// let role = guild.create_role(|r| r.hoist(true).name("role"));
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans.
-    ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    pub fn create_role<F>(&self, f: F) -> FutureResult<Role>
-        where F: FnOnce(EditRole) -> EditRole {
-        #[cfg(feature = "cache")]
-        {
-            let req = Permissions::MANAGE_ROLES;
-
-            if !self.has_perms(req) {
-                return Box::new(future::err(Error::Model(
-                    ModelError::InvalidPermissions(req),
-                )));
-            }
-        }
-
-        ftryopt!(self.client).http.create_role(self.id.0, f)
-    }
-
-    /// Deletes the current guild if the current user is the owner of the
-    /// guild.
-    ///
-    /// **Note**: Requires the current user to be the owner of the guild.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, then returns a [`ModelError::InvalidUser`]
-    /// if the current user is not the guild owner.
-    ///
-    /// [`ModelError::InvalidUser`]: enum.ModelError.html#variant.InvalidUser
-    pub fn delete(&self) -> FutureResult<PartialGuild> {
-        let client = ftryopt!(self.client);
-
-        #[cfg(feature = "cache")]
-        {
-            let cache = ftry!(client.cache.try_borrow());
-
-            if self.owner_id != cache.user.id {
-                let req = Permissions::MANAGE_GUILD;
-
-                return Box::new(future::err(Error::Model(
-                    ModelError::InvalidPermissions(req),
-                )));
-            }
-        }
-
-        ftryopt!(self.client).http.delete_guild(self.id.0)
-    }
-
-    /// Deletes an [`Emoji`] from the guild.
-    ///
-    /// Requires the [Manage Emojis] permission.
-    ///
-    /// [`Emoji`]: struct.Emoji.html
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
-    #[inline]
-    pub fn delete_emoji<E: Into<EmojiId>>(&self, emoji_id: E)
-        -> FutureResult<()> {
-        ftryopt!(self.client).http.delete_emoji(self.id.0, emoji_id.into().0)
-    }
-
-    /// Deletes an integration by Id from the guild.
-    ///
-    /// Requires the [Manage Guild] permission.
-    ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    #[inline]
-    pub fn delete_integration<I: Into<IntegrationId>>(&self, integration_id: I)
-        -> FutureResult<()> {
-        ftryopt!(self.client).http.delete_guild_integration(
-            self.id.0,
-            integration_id.into().0,
-        )
-    }
-
-    /// Deletes a [`Role`] by Id from the guild.
-    ///
-    /// Also see [`Role::delete`] if you have the `cache` and `methods` features
-    /// enabled.
-    ///
-    /// Requires the [Manage Roles] permission.
-    ///
-    /// [`Role`]: struct.Role.html
-    /// [`Role::delete`]: struct.Role.html#method.delete
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[inline]
-    pub fn delete_role<R: Into<RoleId>>(&self, role_id: R) -> FutureResult<()> {
-        ftryopt!(self.client).http.delete_role(self.id.0, role_id.into().0)
-    }
-
-    /// Edits the current guild with new data where specified.
-    ///
-    /// Refer to `EditGuild`'s documentation for a full list of methods.
-    ///
-    /// **Note**: Requires the current user to have the [Manage Guild]
-    /// permission.
-    ///
-    /// # Examples
-    ///
-    /// Change a guild's icon using a file name "icon.png":
-    ///
-    /// ```rust,ignore
-    /// use serenity::utils;
-    ///
-    /// // We are using read_image helper function from utils.
-    /// let base64_icon = utils::read_image("./icon.png")
-    ///     .expect("Failed to read image");
-    ///
-    /// guild.edit(|g| g.icon(base64_icon));
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans.
-    ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    pub fn edit<F: FnOnce(EditGuild) -> EditGuild>(&self, f: F)
-        -> FutureResult<PartialGuild> {
-        #[cfg(feature = "cache")]
-        {
-            let req = Permissions::MANAGE_GUILD;
-
-            if !self.has_perms(req) {
-                return Box::new(future::err(Error::Model(
-                    ModelError::InvalidPermissions(req),
-                )));
-            }
-        }
-
-        ftryopt!(self.client).http.edit_guild(self.id.0, f)
-    }
-
-    /// Edits an [`Emoji`]'s name in the guild.
-    ///
-    /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features
-    /// enabled.
-    ///
-    /// Requires the [Manage Emojis] permission.
-    ///
-    /// [`Emoji`]: struct.Emoji.html
-    /// [`Emoji::edit`]: struct.Emoji.html#method.edit
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
-    #[inline]
-    pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str)
-        -> FutureResult<Emoji> {
-        let emoji_id = emoji_id.into().0;
-
-        ftryopt!(self.client).http.edit_emoji(self.id.0, emoji_id, name)
-    }
-
-    /// Edits the properties of member of the guild, such as muting or
-    /// nicknaming them.
-    ///
-    /// Refer to `EditMember`'s documentation for a full list of methods and
-    /// permission restrictions.
-    ///
-    /// # Examples
-    ///
-    /// Mute a member and set their roles to just one role with a predefined Id:
-    ///
-    /// ```rust,ignore
-    /// guild.edit_member(user_id, |m| m.mute(true).roles(&vec![role_id]));
-    /// ```
-    #[inline]
-    pub fn edit_member<F, U>(&self, user_id: U, f: F) -> FutureResult<()>
-        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
-        ftryopt!(self.client).http.edit_member(self.id.0, user_id.into().0, f)
-    }
-
-    /// Edits the current user's nickname for the guild.
-    ///
-    /// Pass `None` to reset the nickname.
-    ///
-    /// **Note**: Requires the [Change Nickname] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to change their own
-    /// nickname.
-    ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
-    pub fn edit_nickname(&self, new_nickname: Option<&str>)
-        -> FutureResult<()> {
-        #[cfg(feature = "cache")]
-        {
-            let req = Permissions::CHANGE_NICKNAME;
-
-            if !self.has_perms(req) {
-                return Box::new(future::err(Error::Model(
-                    ModelError::InvalidPermissions(req),
-                )));
-            }
-        }
-
-        ftryopt!(self.client).http.edit_nickname(self.id.0, new_nickname)
-    }
-
-    /// Edits a role, optionally setting its fields.
-    ///
-    /// Requires the [Manage Roles] permission.
-    ///
-    /// # Examples
-    ///
-    /// Make a role hoisted:
-    ///
-    /// ```rust,ignore
-    /// guild.edit_role(RoleId(7), |r| r.hoist(true));
-    /// ```
-    ///
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[inline]
-    pub fn edit_role<F, R>(&self, role_id: R, f: F) -> FutureResult<Role>
-        where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
-        ftryopt!(self.client).http.edit_role(self.id.0, role_id.into().0, f)
-    }
-
-    /// Edits the order of [`Role`]s
-    /// Requires the [Manage Roles] permission.
-    ///
-    /// # Examples
-    ///
-    /// Change the order of a role:
-    ///
-    /// ```rust,ignore
-    /// use serenity::model::RoleId;
-    /// guild.edit_role_position(RoleId(8), 2);
-    /// ```
-    ///
-    /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
-    #[inline]
-    pub fn edit_role_position<R>(&self, role_id: R, position: u64)
-        -> FutureResult<Vec<Role>> where R: Into<RoleId> {
-        ftryopt!(self.client)
-            .http
-            .edit_role_position(self.id.0, role_id.into().0, position)
-    }
-
-    /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
-    ///
-    /// Hierarchy is essentially who has the [`Role`] with the highest
-    /// [`position`].
-    ///
-    /// Returns [`None`] if at least one of the given users' member instances
-    /// is not present. Returns `None` if the users have the same hierarchy, as
-    /// neither are greater than the other.
-    ///
-    /// If both user IDs are the same, `None` is returned. If one of the users
-    /// is the guild owner, their ID is returned.
-    #[cfg(feature = "cache")]
-    pub fn greater_member_hierarchy<T, U>(&self, lhs_id: T, rhs_id: U)
-        -> Option<UserId> where T: Into<UserId>, U: Into<UserId> {
-        let lhs_id = lhs_id.into();
-        let rhs_id = rhs_id.into();
-
-        // Check that the IDs are the same. If they are, neither is greater.
-        if lhs_id == rhs_id {
-            return None;
-        }
-
-        // Check if either user is the guild owner.
-        if lhs_id == self.owner_id {
-            return Some(lhs_id);
-        } else if rhs_id == self.owner_id {
-            return Some(rhs_id);
-        }
-
-        let lhs = self.members.get(&lhs_id)?
-            .borrow()
-            .highest_role_info()
-            .unwrap_or((RoleId(0), 0));
-        let rhs = self.members.get(&rhs_id)?
-            .borrow()
-            .highest_role_info()
-            .unwrap_or((RoleId(0), 0));
-
-        // If LHS and RHS both have no top position or have the same role ID,
-        // then no one wins.
-        if (lhs.1 == 0 && rhs.1 == 0) || (lhs.0 == rhs.0) {
-            return None;
-        }
-
-        // If LHS's top position is higher than RHS, then LHS wins.
-        if lhs.1 > rhs.1 {
-            return Some(lhs_id)
-        }
-
-        // If RHS's top position is higher than LHS, then RHS wins.
-        if rhs.1 > lhs.1 {
-            return Some(rhs_id);
-        }
-
-        // If LHS and RHS both have the same position, but LHS has the lower
-        // role ID, then LHS wins.
-        //
-        // If RHS has the higher role ID, then RHS wins.
-        if lhs.1 == rhs.1 && lhs.0 < rhs.0 {
-            Some(lhs_id)
-        } else {
-            Some(rhs_id)
-        }
-    }
-
     /// Returns the formatted URL of the guild's icon, if one exists.
     pub fn icon_url(&self) -> Option<String> {
         self.icon
@@ -766,86 +174,11 @@ impl Guild {
             .map(|icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
     }
 
-    /// Gets all integration of the guild.
-    ///
-    /// This performs a request over the REST API.
-    #[inline]
-    pub fn integrations(&self) -> FutureResult<Vec<Integration>> {
-        ftryopt!(self.client).http.get_guild_integrations(self.id.0)
-    }
-
-    /// Retrieves the active invites for the guild.
-    ///
-    /// **Note**: Requires the [Manage Guild] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans.
-    ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    pub fn invites(&self) -> FutureResult<Vec<RichInvite>> {
-        #[cfg(feature = "cache")]
-        {
-            let req = Permissions::MANAGE_GUILD;
-
-            if !self.has_perms(req) {
-                return Box::new(future::err(Error::Model(
-                    ModelError::InvalidPermissions(req),
-                )));
-            }
-        }
-
-        ftryopt!(self.client).http.get_guild_invites(self.id.0)
-    }
-
     /// Checks if the guild is 'large'. A guild is considered large if it has
     /// more than 250 members.
     #[inline]
     pub fn is_large(&self) -> bool {
         self.members.len() > LARGE_THRESHOLD as usize
-    }
-
-    /// Kicks a [`Member`] from the guild.
-    ///
-    /// Requires the [Kick Members] permission.
-    ///
-    /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
-    #[inline]
-    pub fn kick<U: Into<UserId>>(&self, user_id: U) -> FutureResult<()> {
-        ftryopt!(self.client).http.kick_member(self.id.0, user_id.into().0)
-    }
-
-    /// Leaves the guild.
-    #[inline]
-    pub fn leave(&self) -> FutureResult<()> {
-        ftryopt!(self.client).http.leave_guild(self.id.0)
-    }
-
-    /// Gets a user's [`Member`] for the guild by Id.
-    ///
-    /// [`Guild`]: struct.Guild.html
-    /// [`Member`]: struct.Member.html
-    #[inline]
-    pub fn member<U: Into<UserId>>(&self, user_id: U) -> FutureResult<Member> {
-        ftryopt!(self.client).http.get_member(self.id.0, user_id.into().0)
-    }
-
-    /// Gets a list of the guild's members.
-    ///
-    /// Optionally pass in the `limit` to limit the number of results. Maximum
-    /// value is 1000. Optionally pass in `after` to offset the results by a
-    /// [`User`]'s Id.
-    ///
-    /// [`User`]: struct.User.html
-    #[inline]
-    pub fn members<U>(&self, limit: Option<u64>, after: Option<U>)
-        -> FutureResult<Vec<Member>> where U: Into<UserId> {
-        let after = after.map(Into::into).map(|x| x.0);
-
-        ftryopt!(self.client).http.get_guild_members(self.id.0, limit, after)
     }
 
     /// Gets a list of all the members (satisfying the status provided to the function) in this
@@ -1251,21 +584,6 @@ impl Guild {
         permissions
     }
 
-    /// Moves a member to a specific voice channel.
-    ///
-    /// Requires the [Move Members] permission.
-    ///
-    /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
-    #[inline]
-    pub fn move_member<C, U>(&self, user_id: U, channel_id: C)
-        -> FutureResult<()> where C: Into<ChannelId>, U: Into<UserId> {
-        ftryopt!(self.client).http.edit_member(
-            self.id.0,
-            user_id.into().0,
-            |f| f.voice_channel(channel_id.into().0),
-        )
-    }
-
     /// Alias for [`permissions_in`].
     ///
     /// [`permissions_in`]: #method.permissions_in
@@ -1417,50 +735,6 @@ impl Guild {
         permissions
     }
 
-    /// Retrieves the count of the number of [`Member`]s that would be pruned
-    /// with the number of given days.
-    ///
-    /// See the documentation on [`GuildPrune`] for more information.
-    ///
-    /// **Note**: Requires the [Kick Members] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans.
-    ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`GuildPrune`]: struct.GuildPrune.html
-    /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
-    pub fn prune_count(&self, days: u16) -> FutureResult<GuildPrune> {
-        #[cfg(feature = "cache")]
-        {
-            let req = Permissions::KICK_MEMBERS;
-
-            if !self.has_perms(req) {
-                return Box::new(future::err(Error::Model(
-                    ModelError::InvalidPermissions(req),
-                )));
-            }
-        }
-
-        ftryopt!(self.client).http.get_guild_prune_count(self.id.0, days)
-    }
-
-    /// Re-orders the channels of the guild.
-    ///
-    /// Although not required, you should specify all channels' positions,
-    /// regardless of whether they were updated. Otherwise, positioning can
-    /// sometimes get weird.
-    pub fn reorder_channels<It>(&self, channels: It) -> FutureResult<()>
-        where It: IntoIterator<Item = (ChannelId, u64)> {
-        ftryopt!(self.client).http.edit_guild_channel_positions(
-            self.id.0,
-            channels,
-        )
-    }
-
     /// Returns the Id of the shard associated with the guild.
     ///
     /// When the cache is enabled this will automatically retrieve the total
@@ -1490,87 +764,6 @@ impl Guild {
         self.icon
             .as_ref()
             .map(|icon| format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
-    }
-
-    /// Starts an integration sync for the given integration Id.
-    ///
-    /// Requires the [Manage Guild] permission.
-    ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    #[inline]
-    pub fn start_integration_sync<I>(&self, integration_id: I)
-        -> FutureResult<()> where I: Into<IntegrationId> {
-        ftryopt!(self.client).http.start_integration_sync(
-            self.id.0,
-            integration_id.into().0,
-        )
-    }
-
-    /// Starts a prune of [`Member`]s.
-    ///
-    /// See the documentation on [`GuildPrune`] for more information.
-    ///
-    /// **Note**: Requires the [Kick Members] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans.
-    ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`GuildPrune`]: struct.GuildPrune.html
-    /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
-    pub fn start_prune(&self, days: u16) -> FutureResult<GuildPrune> {
-        #[cfg(feature = "cache")]
-        {
-            let req = Permissions::KICK_MEMBERS;
-
-            if !self.has_perms(req) {
-                return Box::new(future::err(Error::Model(
-                    ModelError::InvalidPermissions(req),
-                )));
-            }
-        }
-
-        ftryopt!(self.client).http.start_guild_prune(self.id.0, days)
-    }
-
-    /// Unbans the given [`User`] from the guild.
-    ///
-    /// **Note**: Requires the [Ban Members] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans.
-    ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`User`]: struct.User.html
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
-    pub fn unban<U: Into<UserId>>(&self, user_id: U) -> FutureResult<()> {
-        #[cfg(feature = "cache")]
-        {
-            let req = Permissions::BAN_MEMBERS;
-
-            if !self.has_perms(req) {
-                return Box::new(future::err(Error::Model(
-                    ModelError::InvalidPermissions(req),
-                )));
-            }
-        }
-
-        ftryopt!(self.client).http.remove_ban(self.id.0, user_id.into().0)
-    }
-
-    /// Retrieves the guild's webhooks.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
-    #[inline]
-    pub fn webhooks(&self) -> FutureResult<Vec<Webhook>> {
-        ftryopt!(self.client).http.get_guild_webhooks(self.id.0)
     }
 
     /// Obtain a reference to a role by its name.
@@ -1752,7 +945,6 @@ impl<'de> Deserialize<'de> for Guild {
             application_id: application_id,
             afk_timeout: afk_timeout,
             channels: channels,
-            client: None,
             default_message_notifications: default_message_notifications,
             emojis: emojis,
             explicit_content_filter: explicit_content_filter,
@@ -1778,13 +970,11 @@ impl<'de> Deserialize<'de> for Guild {
 }
 
 /// Checks if a `&str` contains another `&str`.
-#[cfg(feature = "model")]
 fn contains_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
     to_look_at.to_lowercase().contains(to_find)
 }
 
 /// Checks if a `&str` starts with another `&str`.
-#[cfg(feature = "model")]
 fn starts_with_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
     to_look_at.to_lowercase().starts_with(to_find)
 }
@@ -1796,7 +986,6 @@ fn starts_with_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
 /// expected to contain `origin` as substring.
 /// If not, using `closest_to_origin` would sort these
 /// the end.
-#[cfg(feature = "model")]
 fn closest_to_origin(origin: &str, word_a: &str, word_b: &str) -> std::cmp::Ordering {
     let value_a = match word_a.find(origin) {
         Some(value) => value + word_a.len(),
@@ -1882,7 +1071,6 @@ impl From<u64> for GuildContainer {
     fn from(id: u64) -> GuildContainer { GuildContainer::Id(GuildId(id)) }
 }
 
-#[cfg(feature = "model")]
 impl InviteGuild {
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
@@ -1914,7 +1102,6 @@ pub enum GuildStatus {
     Offline(GuildUnavailable),
 }
 
-#[cfg(feature = "model")]
 impl GuildStatus {
     /// Retrieves the Id of the inner [`Guild`].
     ///

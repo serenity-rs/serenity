@@ -42,16 +42,15 @@
 //! [`CACHE`]: ../struct.CACHE.html
 //! [`http`]: ../http/index.html
 
+pub mod cache_update;
+
 use model::prelude::*;
+use self::cache_update::CacheUpdate;
 use std::cell::RefCell;
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
 use std::default::Default;
 use std::rc::Rc;
-
-mod cache_update;
-
-pub(crate) use self::cache_update::*;
 
 /// A cache of all events received over a [`Shard`], where storing at least
 /// some data from the event is possible.
@@ -624,8 +623,7 @@ impl Cache {
         self.categories.get(&channel_id.into()).cloned()
     }
 
-    #[cfg(feature = "client")]
-    pub(crate) fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
+    pub fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
         e.update(self)
     }
 

@@ -1,13 +1,7 @@
 //! Models for server and channel invites.
 
 use chrono::{DateTime, FixedOffset};
-use futures::future;
 use super::prelude::*;
-use super::WrappedClient;
-use ::FutureResult;
-
-#[cfg(all(feature = "cache", feature = "model"))]
-use super::Permissions;
 
 /// Information about an invite code.
 ///
@@ -37,43 +31,9 @@ pub struct Invite {
     /// a representation of the minimal amount of information needed about the
     /// [`Guild`] being invited to.
     pub guild: InviteGuild,
-    #[serde(skip)]
-    pub(crate) client: WrappedClient,
 }
 
-#[cfg(feature = "model")]
 impl Invite {
-    /// Deletes the invite.
-    ///
-    /// **Note**: Requires the [Manage Guild] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have the required [permission].
-    ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    /// [permission]: permissions/index.html
-    pub fn delete(&self) -> FutureResult<Invite> {
-        let client = ftryopt!(self.client);
-
-        #[cfg(feature = "cache")]
-        {
-            let cache = ftry!(client.cache.try_borrow());
-
-            let req = Permissions::MANAGE_GUILD;
-
-            if !ftry!(cache.user_has_perms(self.channel.id, req)) {
-                return Box::new(future::err(Error::Model(
-                    ModelError::InvalidPermissions(req),
-                )));
-            }
-        }
-
-        ftryopt!(self.client).http.delete_invite(&self.code)
-    }
-
     /// Returns a URL to use for the invite.
     ///
     /// # Examples
@@ -126,7 +86,6 @@ pub struct InviteGuild {
     pub voice_channel_count: Option<u64>,
 }
 
-#[cfg(feature = "model")]
 impl InviteGuild {
     /// Returns the Id of the shard associated with the guild.
     ///
@@ -194,48 +153,9 @@ pub struct RichInvite {
     pub temporary: bool,
     /// The amount of times that an invite has been used.
     pub uses: u64,
-    #[serde(skip)]
-    pub(crate) client: WrappedClient,
 }
 
-#[cfg(feature = "model")]
 impl RichInvite {
-    /// Deletes the invite.
-    ///
-    /// Refer to [`http::delete_invite`] for more information.
-    ///
-    /// **Note**: Requires the [Manage Guild] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` feature is enabled, then this returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required [permission].
-    ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`Invite::delete`]: struct.Invite.html#method.delete
-    /// [`http::delete_invite`]: ../http/fn.delete_invite.html
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    /// [permission]: permissions/index.html
-    pub fn delete(&self) -> FutureResult<Invite> {
-        let client = ftryopt!(self.client);
-
-        #[cfg(feature = "cache")]
-        {
-            let cache = ftry!(client.cache.try_borrow());
-
-            let req = Permissions::MANAGE_GUILD;
-
-            if !ftry!(cache.user_has_perms(self.channel.id, req)) {
-                return Box::new(future::err(Error::Model(
-                    ModelError::InvalidPermissions(req),
-                )));
-            }
-        }
-
-        ftryopt!(self.client).http.delete_invite(&self.code)
-    }
-
     /// Returns a URL to use for the invite.
     ///
     /// # Examples
