@@ -52,7 +52,7 @@ use std::rc::Rc;
 use std::str::FromStr;
 use tokio_core::reactor::Handle;
 use ::builder::*;
-use ::{Error, utils as serenity_utils};
+use ::{Error, FutureResult, utils as serenity_utils};
 
 macro_rules! ftry {
     ($code:expr) => {
@@ -62,8 +62,6 @@ macro_rules! ftry {
         }
     }
 }
-
-pub type FutureResult<T> = Box<Future<Item = T, Error = Error>>;
 
 /// An method used for ratelimiting special routes.
 ///
