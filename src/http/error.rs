@@ -1,6 +1,7 @@
 use futures::Canceled;
 use hyper::Response;
 use hyper::error::{Error as HyperError, UriError};
+use native_tls::Error as TlsError;
 use serde_json::Error as JsonError;
 use std::cell::BorrowMutError;
 use std::error::Error as StdError;
@@ -34,6 +35,8 @@ pub enum Error {
     RateLimit(RateLimitError),
     /// An error occurred while creating a timer.
     Timer(TimerError),
+    /// An error from the `native_tls` crate.
+    Tls(TlsError),
     /// When a status is received, but the verification to ensure the response
     /// is valid does not recognize the status.
     UnknownStatus(u16),
@@ -57,6 +60,7 @@ impl StdError for Error {
             Error::Json(ref inner) => inner.description(),
             Error::RateLimit(ref inner) => inner.description(),
             Error::Timer(ref inner) => inner.description(),
+            Error::Tls(ref inner) => inner.description(),
             Error::UnknownStatus(_) => "Verification does not understand status",
             Error::Uri(ref inner) => inner.description(),
         }
@@ -108,5 +112,11 @@ impl From<RateLimitError> for Error {
 impl From<TimerError> for Error {
     fn from(err: TimerError) -> Self {
         Error::Timer(err)
+    }
+}
+
+impl From<TlsError> for Error {
+    fn from(err: TlsError) -> Self {
+        Error::Tls(err)
     }
 }

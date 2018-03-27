@@ -64,3 +64,12 @@ macro_rules! enum_number {
         }
     }
 }
+
+macro_rules! ftry {
+    ($code:expr) => {
+        match $code {
+            Ok(v) => v,
+            Err(why) => return Box::new(::futures::future::err(From::from(why))),
+        }
+    }
+}

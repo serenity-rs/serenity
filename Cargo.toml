@@ -42,7 +42,15 @@ version = "^1.0"
 optional = true
 version = "~0.11"
 
+[dependencies.hyper-multipart-rfc7578]
+optional = true
+version = "0.1.0-alpha3"
+
 [dependencies.hyper-tls]
+optional = true
+version = "~0.1"
+
+[dependencies.native-tls]
 optional = true
 version = "~0.1"
 
@@ -79,7 +87,7 @@ client = ["gateway", "http"]
 extras = []
 framework = ["client", "utils"]
 gateway = ["flate2", "http", "tokio-tungstenite", "tungstenite", "utils"]
-http = ["builder", "hyper", "hyper-tls", "utils"]
+http = ["builder", "hyper", "hyper-multipart-rfc7578", "hyper-tls", "native-tls", "utils"]
 standard_framework = ["framework"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "sodiumoxide"]

@@ -70,11 +70,11 @@ impl Client {
 
         let h2 = options.handle.clone();
         let strategy = options.sharding;
-        let client = Rc::new(HttpClient::new(
+        let client = Rc::new(ftry!(HttpClient::new(
             options.http_client,
             options.handle.clone(),
             Rc::clone(&token),
-        ));
+        )));
 
         let done = client.get_bot_gateway().map(move |gateway| {
             let uri = Rc::new(gateway.url);

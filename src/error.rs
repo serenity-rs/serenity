@@ -146,6 +146,11 @@ impl From<GatewayError> for Error {
     fn from(e: GatewayError) -> Error { Error::Gateway(e) }
 }
 
+#[cfg(feature = "http")]
+impl From<HttpError> for Error {
+    fn from(e: HttpError) -> Error { Error::Http(e) }
+}
+
 #[cfg(feature = "hyper")]
 impl From<HyperError> for Error {
     fn from(e: HyperError) -> Error { Error::Hyper(e) }

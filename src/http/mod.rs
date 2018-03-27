@@ -36,9 +36,10 @@ pub use self::error::{Error as HttpError, Result};
 pub use self::routing::{Path, Route};
 
 use futures::{Future, Stream, future};
-use hyper::client::{Client as HyperClient, HttpConnector};
+use hyper::client::{Client as HyperClient, Config as HyperConfig, HttpConnector};
 use hyper::header::{Authorization, ContentType};
 use hyper::{Body, Method, Request, Response};
+use hyper_multipart_rfc7578::client::multipart::{Body as MultipartBody, Form};
 use hyper_tls::HttpsConnector;
 use model::prelude::*;
 use self::ratelimiting::RateLimiter;
@@ -47,21 +48,12 @@ use serde_json::{self, Number, Value};
 use std::cell::RefCell;
 use std::fmt::Write;
 use std::fs::File;
-use std::path::{Path as StdPath, PathBuf};
+use std::io::Cursor;
 use std::rc::Rc;
 use std::str::FromStr;
 use tokio_core::reactor::Handle;
 use ::builder::*;
 use ::{Error, FutureResult, utils as serenity_utils};
-
-macro_rules! ftry {
-    ($code:expr) => {
-        match $code {
-            Ok(v) => v,
-            Err(why) => return Box::new(future::err(From::from(why))),
-        }
-    }
-}
 
 /// An method used for ratelimiting special routes.
 ///
@@ -96,6 +88,7 @@ impl LightMethod {
 pub struct Client {
     pub client: Rc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
     pub handle: Handle,
+    pub multiparter: Rc<HyperClient<HttpsConnector<HttpConnector>, MultipartBody>>,
     pub ratelimiter: Rc<RefCell<RateLimiter>>,
     pub token: Rc<String>,
 }
@@ -105,13 +98,22 @@ impl Client {
         client: Rc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
         handle: Handle,
         token: Rc<String>,
-    ) -> Self {
-        Self {
+    ) -> Result<Self> {
+        let connector = HttpsConnector::new(4, &handle)?;
+
+        let multiparter = Rc::new(HyperConfig::default()
+            .body::<MultipartBody>()
+            .connector(connector)
+            .keep_alive(true)
+            .build(&handle));
+
+        Ok(Self {
             ratelimiter: Rc::new(RefCell::new(RateLimiter::new(handle.clone()))),
-            token,
             client,
             handle,
-        }
+            multiparter,
+            token,
+        })
     }
 
     pub fn set_token(&mut self, token: Rc<String>) {
@@ -1335,68 +1337,70 @@ impl Client {
     // /// if the file is too large to send.
     // ///
     // /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
-    // pub fn send_files<'a, F, T, It>(
-    //     &self,
-    //     channel_id: u64,
-    //     files: It,
-    //     f: F,
-    // ) -> FutureResult<Message>
-    //     where F: FnOnce(CreateMessage) -> CreateMessage,
-    //           T: Into<AttachmentType<'a>>,
-    //           It: IntoIterator<Item = T> {
-    //     let msg = f(CreateMessage::default());
-    //     let map = Value::Object(serenity_utils::vecmap_to_json_map(msg.0));
+    pub fn send_files<F, T, It>(
+        &self,
+        channel_id: u64,
+        files: It,
+        f: F,
+    ) -> Box<Future<Item = Message, Error = Error>>
+        where F: FnOnce(CreateMessage) -> CreateMessage,
+              T: Into<AttachmentType>,
+              It: IntoIterator<Item = T> {
+        let msg = f(CreateMessage::default());
+        let map = serenity_utils::vecmap_to_json_map(msg.0);
 
-    //     let uri = format!(api!("/channels/{}/messages"), channel_id);
-    //     let url = match Url::parse(&uri) {
-    //         Ok(url) => url,
-    //         Err(_) => return Err(Error::Url(uri)),
-    //     };
+        let uri = try_uri!(Path::channel_messages(channel_id).as_ref());
+        let mut form = Form::default();
+        let mut file_num = "0".to_string();
 
-    //     let mut request = Multipart::from_request(request)?;
-    //     let mut file_num = "0".to_string();
+        for file in files {
+            match file.into() {
+                AttachmentType::Bytes((mut bytes, filename)) => {
+                    form.add_reader_file(
+                        file_num.to_owned(),
+                        Cursor::new(bytes),
+                        filename,
+                    );
+                },
+                AttachmentType::File((mut f, filename)) => {
+                    form.add_reader_file(
+                        file_num.to_owned(),
+                        f,
+                        filename,
+                    );
+                },
+            }
 
-    //     for file in files {
-    //         match file.into() {
-    //             AttachmentType::Bytes((mut bytes, filename)) => {
-    //                 request
-    //                     .write_stream(&file_num, &mut bytes, Some(filename), None)?;
-    //             },
-    //             AttachmentType::File((mut f, filename)) => {
-    //                 request
-    //                     .write_stream(&file_num, &mut f, Some(filename), None)?;
-    //             },
-    //             AttachmentType::Path(p) => {
-    //                 request.write_file(&file_num, &p)?;
-    //             },
-    //         }
+            unsafe {
+                let vec = file_num.as_mut_vec();
+                vec[0] += 1;
+            }
+        }
 
-    //         unsafe {
-    //             let vec = file_num.as_mut_vec();
-    //             vec[0] += 1;
-    //         }
-    //     }
+        for (k, v) in map.into_iter() {
+            match v {
+                Value::Bool(false) => form.add_text(k, "false"),
+                Value::Bool(true) => form.add_text(k, "true"),
+                Value::Number(inner) => form.add_text(k, inner.to_string()),
+                Value::String(inner) => form.add_text(k, inner),
+                Value::Object(inner) => form.add_text(k, ftry!(serde_json::to_string(&inner))),
+                _ => continue,
+            }
+        }
 
-    //     for (k, v) in map {
-    //         match v {
-    //             Value::Bool(false) => request.write_text(&k, "false")?,
-    //             Value::Bool(true) => request.write_text(&k, "true")?,
-    //             Value::Number(inner) => request.write_text(&k, inner.to_string())?,
-    //             Value::String(inner) => request.write_text(&k, inner)?,
-    //             Value::Object(inner) => request.write_text(&k, serde_json::to_string(&inner)?)?,
-    //             _ => continue,
-    //         };
-    //     }
+        let mut request = Request::new(Method::Get, uri);
+        form.set_body(&mut request);
 
-    //     let response = request.send()?;
+        let client = Rc::clone(&self.multiparter);
 
-    //     if response.status.class() != StatusClass::Success {
-    //         return Err(Error::InvalidRequest(response.status));
-    //     }
+        let done = client.request(request)
+            .from_err()
+            .and_then(verify_status)
+            .and_then(|res| res.body().concat2().map_err(From::from))
+            .and_then(|body| serde_json::from_slice(&body).map_err(From::from));
 
-    //     serde_json::from_reader::<HyperResponse, Message>(response)
-    //         .map_err(From::from)
-    // }
+        Box::new(done)
+    }
 
     /// Sends a message to a channel.
     pub fn send_message<F>(&self, channel_id: u64, f: F) -> FutureResult<Message>
@@ -1591,35 +1595,23 @@ fn verify_status(response: Response) ->
 }
 
 /// Enum that allows a user to pass a `Path` or a `File` type to `send_files`
-pub enum AttachmentType<'a> {
+pub enum AttachmentType {
     /// Indicates that the `AttachmentType` is a byte slice with a filename.
-    Bytes((&'a [u8], &'a str)),
+    Bytes((Vec<u8>, String)),
     /// Indicates that the `AttachmentType` is a `File`
-    File((&'a File, &'a str)),
-    /// Indicates that the `AttachmentType` is a `Path`
-    Path(&'a StdPath),
+    File((File, String)),
 }
 
-impl<'a> From<(&'a [u8], &'a str)> for AttachmentType<'a> {
-    fn from(params: (&'a [u8], &'a str)) -> AttachmentType { AttachmentType::Bytes(params) }
-}
-
-impl<'a> From<&'a str> for AttachmentType<'a> {
-    fn from(s: &'a str) -> AttachmentType { AttachmentType::Path(StdPath::new(s)) }
-}
-
-impl<'a> From<&'a StdPath> for AttachmentType<'a> {
-    fn from(path: &'a StdPath) -> AttachmentType {
-        AttachmentType::Path(path)
+impl From<(Vec<u8>, String)> for AttachmentType {
+    fn from(params: (Vec<u8>, String)) -> AttachmentType {
+        AttachmentType::Bytes(params)
     }
 }
 
-impl<'a> From<&'a PathBuf> for AttachmentType<'a> {
-    fn from(pathbuf: &'a PathBuf) -> AttachmentType { AttachmentType::Path(pathbuf.as_path()) }
-}
-
-impl<'a> From<(&'a File, &'a str)> for AttachmentType<'a> {
-    fn from(f: (&'a File, &'a str)) -> AttachmentType<'a> { AttachmentType::File((f.0, f.1)) }
+impl From<(File, String)> for AttachmentType {
+    fn from(f: (File, String)) -> AttachmentType {
+        AttachmentType::File((f.0, f.1))
+    }
 }
 
 /// Representation of the method of a query to send for the [`get_guilds`]
