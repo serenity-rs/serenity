@@ -550,11 +550,24 @@ impl Shard {
         }
     }
 
-    pub fn check_heartbeat(&mut self) -> Result<()> {
+    /// Checks whether a heartbeat needs to be sent, as well as whether a
+    /// heartbeat acknowledgement was received.
+    ///
+    /// `true` is returned under one of the following conditions:
+    ///
+    /// - the heartbeat interval has not elapsed
+    /// - a heartbeat was successfully sent
+    /// - there is no known heartbeat interval yet
+    ///
+    /// `false` is returned under one of the following conditions:
+    ///
+    /// - a heartbeat acknowledgement was not received in time
+    /// - an error occurred while heartbeating
+    pub fn check_heartbeat(&mut self) -> bool {
         let wait = {
             let heartbeat_interval = match self.heartbeat_interval {
                 Some(heartbeat_interval) => heartbeat_interval,
-                None => return Ok(()),
+                None => return true,
             };
 
             StdDuration::from_secs(heartbeat_interval / 1000)
@@ -564,7 +577,7 @@ impl Shard {
         // then don't perform a keepalive or attempt to reconnect.
         if let Some(last_sent) = self.heartbeat_instants.0 {
             if last_sent.elapsed() <= wait {
-                return Ok(());
+                return true;
             }
         }
 
@@ -572,30 +585,22 @@ impl Shard {
         // auto-reconnect.
         if !self.last_heartbeat_acknowledged {
             debug!(
-                "[Shard {:?}] Last heartbeat not acknowledged; re-connecting",
+                "[Shard {:?}] Last heartbeat not acknowledged",
                 self.shard_info,
             );
 
-            return self.reconnect().map_err(|why| {
-                warn!(
-                    "[Shard {:?}] Err auto-reconnecting from heartbeat check: {:?}",
-                    self.shard_info,
-                    why,
-                );
-
-                why
-            });
+            return false;
         }
 
         // Otherwise, we're good to heartbeat.
         if let Err(why) = self.heartbeat() {
             warn!("[Shard {:?}] Err heartbeating: {:?}", self.shard_info, why);
 
-            self.reconnect()
+            false
         } else {
             trace!("[Shard {:?}] Heartbeated", self.shard_info);
 
-            Ok(())
+            true
         }
     }
 

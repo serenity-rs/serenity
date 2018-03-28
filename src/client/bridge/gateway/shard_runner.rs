@@ -94,14 +94,9 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             }
 
             // check heartbeat
-            if let Err(why) = self.shard.check_heartbeat() {
+            if !self.shard.check_heartbeat() {
                 warn!(
-                    "[ShardRunner {:?}] Error heartbeating: {:?}",
-                    self.shard.shard_info(),
-                    why,
-                );
-                debug!(
-                    "[ShardRunner {:?}] Requesting restart",
+                    "[ShardRunner {:?}] Error heartbeating",
                     self.shard.shard_info(),
                 );
 
