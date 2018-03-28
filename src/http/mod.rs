@@ -793,16 +793,10 @@ pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
 
 /// Edits the current user's profile settings.
 ///
-/// For bot users, the password is optional.
+/// Refer to Discord's [docs] for field information.
 ///
-/// # User Accounts
-///
-/// If a new token is received due to a password change, then the stored token
-/// internally will be updated.
-///
-/// **Note**: this token change may cause requests made between the actual token
-/// change and when the token is internally changed to be invalid requests, as
-/// the token may be outdated.
+/// [docs]: https://discordapp.com/developers/docs/resources/user#modify-current-user
+
 pub fn edit_profile(map: &JsonMap) -> Result<CurrentUser> {
     let body = serde_json::to_string(map)?;
     let response = request!(Route::UsersMe, patch(body), "/users/@me");
