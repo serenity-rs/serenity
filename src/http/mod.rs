@@ -796,7 +796,6 @@ pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
 /// Refer to Discord's [docs] for field information.
 ///
 /// [docs]: https://discordapp.com/developers/docs/resources/user#modify-current-user
-
 pub fn edit_profile(map: &JsonMap) -> Result<CurrentUser> {
     let body = serde_json::to_string(map)?;
     let response = request!(Route::UsersMe, patch(body), "/users/@me");
