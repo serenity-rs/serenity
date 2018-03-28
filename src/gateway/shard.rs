@@ -79,6 +79,10 @@ pub struct Shard {
     /// Whether the shard has permanently shutdown.
     shutdown: bool,
     stage: ConnectionStage,
+    /// Instant of when the shard was started.
+    // This acts as a timeout to determine if the shard has - for some reason -
+    // not started within a decent amount of time.
+    pub started: Instant,
     pub token: Arc<Mutex<String>>,
     ws_url: Arc<Mutex<String>>,
 }
@@ -147,6 +151,7 @@ impl Shard {
             last_heartbeat_acknowledged,
             seq,
             stage,
+            started: Instant::now(),
             token,
             session_id,
             shard_info,
@@ -567,7 +572,9 @@ impl Shard {
         let wait = {
             let heartbeat_interval = match self.heartbeat_interval {
                 Some(heartbeat_interval) => heartbeat_interval,
-                None => return true,
+                None => {
+                    return self.started.elapsed() < StdDuration::from_secs(15);
+                },
             };
 
             StdDuration::from_secs(heartbeat_interval / 1000)
@@ -769,6 +776,7 @@ impl Shard {
         // This is used to accurately assess whether the state of the shard is
         // accurate when a Hello is received.
         self.stage = ConnectionStage::Connecting;
+        self.started = Instant::now();
         let mut client = connect(&self.ws_url.lock())?;
         self.stage = ConnectionStage::Handshake;
 
