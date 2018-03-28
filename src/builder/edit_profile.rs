@@ -53,22 +53,6 @@ impl EditProfile {
         self
     }
 
-    /// Modifies the current user's email address.
-    ///
-    /// Note that when modifying the email address, the current password must
-    /// also be [provided].
-    ///
-    /// No validation is performed on this by the library.
-    ///
-    /// **Note**: This can only be used by user accounts.
-    ///
-    /// [provided]: #method.password
-    pub fn email(mut self, email: &str) -> Self {
-        self.0.insert("email", Value::String(email.to_string()));
-
-        self
-    }
-
     /// Modifies the current user's password.
     ///
     /// Note that when modifying the password, the current password must also be
