@@ -53,16 +53,22 @@ mod error;
 mod shard;
 mod ws_client_ext;
 
-pub use self::error::Error as GatewayError;
-pub use self::shard::Shard;
-pub use self::ws_client_ext::WebSocketGatewayClientExt;
+pub use self::{
+    error::Error as GatewayError,
+    shard::Shard,
+    ws_client_ext::WebSocketGatewayClientExt
+};
 
-use model::gateway::Game;
-use model::user::OnlineStatus;
+use model::{
+    gateway::Game,
+    user::OnlineStatus
+};
 use serde_json::Value;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use websocket::sync::client::Client;
-use websocket::sync::stream::{TcpStream, TlsStream};
+use websocket::sync::{
+    client::Client,
+    stream::{TcpStream, TlsStream}
+};
 
 #[cfg(feature = "client")]
 use client::bridge::gateway::ShardClientMessage;

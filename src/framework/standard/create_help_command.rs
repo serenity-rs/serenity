@@ -1,9 +1,21 @@
-use super::command::{Help, HelpOptions, HelpFunction};
-pub use super::{Args, CommandGroup, CommandOptions, CommandError, HelpBehaviour};
+use super::command::{
+    Help, 
+    HelpOptions, 
+    HelpFunction
+};
+pub use super::{
+    Args, 
+    CommandGroup, 
+    CommandOptions, 
+    CommandError, 
+    HelpBehaviour
+};
 
 use utils::Colour;
-use std::fmt::Write;
-use std::sync::Arc;
+use std::{
+    fmt::Write,
+    sync::Arc
+};
 
 pub struct CreateHelpCommand(pub HelpOptions, pub HelpFunction);
 

@@ -1,6 +1,8 @@
-use std::str::FromStr;
-use std::error::Error as StdError;
-use std::fmt;
+use std::{
+    str::FromStr,
+    error::Error as StdError,
+    fmt
+};
 
 /// Defines how an operation on an `Args` method failed.
 #[derive(Debug)]

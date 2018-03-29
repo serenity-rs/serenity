@@ -1,8 +1,15 @@
-pub use super::command::{Command, CommandGroup, CommandOptions, Error as CommandError};
+pub use super::command::{
+    Command, 
+    CommandGroup, 
+    CommandOptions, 
+    Error as CommandError
+};
 pub(crate) use super::command::CommandOrAlias;
-pub use super::create_help_command::{CreateHelpCommand};
-pub use super::create_command::{CreateCommand, FnOrCommand};
-pub use super::Args;
+pub use super::{
+    create_help_command::CreateHelpCommand,
+    create_command::{CreateCommand, FnOrCommand},
+    Args
+};
 
 use client::Context;
 use model::channel::Message;

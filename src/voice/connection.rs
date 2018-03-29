@@ -1,10 +1,20 @@
-use byteorder::{BigEndian, ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{
+    BigEndian, 
+    ByteOrder, 
+    LittleEndian, 
+    ReadBytesExt, 
+    WriteBytesExt
+};
 use constants::VOICE_GATEWAY_VERSION;
 use internal::prelude::*;
-use internal::ws_impl::{ReceiverExt, SenderExt};
-use internal::Timer;
-use model::event::VoiceEvent;
-use model::id::UserId;
+use internal::{
+    ws_impl::{ReceiverExt, SenderExt},
+    Timer
+};
+use model::{
+    event::VoiceEvent,
+    id::UserId
+};
 use opus::{
     packet as opus_packet,
     Application as CodingMode,
@@ -16,20 +26,40 @@ use opus::{
 use parking_lot::Mutex;
 use serde::Deserialize;
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
-use std::collections::HashMap;
-use std::io::Write;
-use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
-use std::sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender};
-use std::sync::Arc;
-use std::thread::{self, Builder as ThreadBuilder, JoinHandle};
-use std::time::Duration;
+use std::{
+    collections::HashMap,
+    io::Write,
+    net::{SocketAddr, ToSocketAddrs, UdpSocket},
+    sync::{
+        mpsc::{
+            self, 
+            Receiver as MpscReceiver, 
+            Sender as MpscSender
+        },
+        Arc,
+    },
+    thread::{
+        self, 
+        Builder as ThreadBuilder, 
+        JoinHandle
+    },
+    time::Duration
+};
 use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, LockedAudio};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
-use websocket::client::Url as WebsocketUrl;
-use websocket::sync::client::ClientBuilder;
-use websocket::sync::stream::{AsTcpStream, TcpStream, TlsStream};
-use websocket::sync::Client as WsClient;
+use websocket::{
+    client::Url as WebsocketUrl,
+    sync::{
+        client::ClientBuilder,
+        stream::{
+            AsTcpStream, 
+            TcpStream, 
+            TlsStream
+        },
+    },
+    sync::Client as WsClient
+};
 
 type Client = WsClient<TlsStream<TcpStream>>;
 

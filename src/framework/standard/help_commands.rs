@@ -26,14 +26,26 @@
 use client::Context;
 #[cfg(feature = "cache")]
 use framework::standard::{has_correct_roles, has_correct_permissions};
-use model::channel::Message;
-use model::id::ChannelId;
-use std::collections::HashMap;
-use std::hash::BuildHasher;
-use std::sync::Arc;
-use std::fmt::Write;
-use super::command::{InternalCommand};
-use super::{Args, CommandGroup, CommandOrAlias, HelpOptions, CommandOptions, CommandError, HelpBehaviour};
+use model::{
+    channel::Message,
+    id::ChannelId
+};
+use std::{
+    collections::HashMap,
+    hash::BuildHasher,
+    sync::Arc,
+    fmt::Write
+};
+use super::command::InternalCommand;
+use super::{
+    Args, 
+    CommandGroup, 
+    CommandOrAlias, 
+    HelpOptions, 
+    CommandOptions, 
+    CommandError, 
+    HelpBehaviour
+};
 use utils::Colour;
 
 fn error_embed(channel_id: &ChannelId, input: &str, colour: Colour) {

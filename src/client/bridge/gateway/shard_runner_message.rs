@@ -1,6 +1,8 @@
-use model::gateway::Game;
-use model::user::OnlineStatus;
-use model::id::GuildId;
+use model::{
+    gateway::Game,
+    user::OnlineStatus,
+    id::GuildId
+};
 use websocket::message::OwnedMessage;
 
 /// A message to send from a shard over a WebSocket.

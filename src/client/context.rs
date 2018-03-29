@@ -2,8 +2,10 @@ use client::bridge::gateway::ShardMessenger;
 use gateway::InterMessage;
 use model::prelude::*;
 use parking_lot::Mutex;
-use std::sync::mpsc::Sender;
-use std::sync::Arc;
+use std::sync::{
+    mpsc::Sender,
+    Arc
+};
 use typemap::ShareMap;
 
 #[cfg(feature = "builder")]

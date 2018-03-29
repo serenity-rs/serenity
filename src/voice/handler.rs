@@ -1,10 +1,18 @@
 use constants::VoiceOpCode;
 use gateway::InterMessage;
-use model::id::{ChannelId, GuildId, UserId};
-use model::voice::VoiceState;
+use model::{
+    id::{
+        ChannelId, 
+        GuildId, 
+        UserId
+    },
+    voice::VoiceState
+};
 use parking_lot::Mutex;
-use std::sync::Arc;
-use std::sync::mpsc::{self, Sender as MpscSender};
+use std::sync::{
+    mpsc::{self, Sender as MpscSender},
+    Arc
+};
 use super::connection_info::ConnectionInfo;
 use super::{Audio, AudioReceiver, AudioSource, Status as VoiceStatus, threading, LockedAudio};
 

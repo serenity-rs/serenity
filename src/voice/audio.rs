@@ -1,6 +1,8 @@
 use parking_lot::Mutex;
-use std::sync::Arc;
-use std::time::Duration;
+use std::{
+    sync::Arc,
+    time::Duration
+};
 
 pub const HEADER_LEN: usize = 12;
 pub const SAMPLE_RATE: u32 = 48_000;

@@ -1,12 +1,16 @@
 use constants::{self, close_codes};
 use internal::prelude::*;
-use model::event::{Event, GatewayEvent};
-use model::gateway::Game;
-use model::id::GuildId;
-use model::user::OnlineStatus;
+use model::{
+    event::{Event, GatewayEvent},
+    gateway::Game,
+    id::GuildId,
+    user::OnlineStatus
+};
 use parking_lot::Mutex;
-use std::sync::Arc;
-use std::time::{Duration as StdDuration, Instant};
+use std::{
+    sync::Arc,
+    time::{Duration as StdDuration, Instant}
+};
 use super::{
     ConnectionStage,
     CurrentPresence,
@@ -16,10 +20,12 @@ use super::{
     WsClient,
     WebSocketGatewayClientExt,
 };
-use websocket::client::Url;
-use websocket::stream::sync::AsTcpStream;
-use websocket::sync::client::ClientBuilder;
-use websocket::WebSocketError;
+use websocket::{
+    client::Url,
+    stream::sync::AsTcpStream,
+    sync::client::ClientBuilder,
+    WebSocketError
+};
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the

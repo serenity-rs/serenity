@@ -1,9 +1,13 @@
 use internal::Timer;
 use model::id::GuildId;
-use std::sync::mpsc::{Receiver as MpscReceiver, TryRecvError};
-use std::thread::Builder as ThreadBuilder;
-use super::connection::Connection;
-use super::Status;
+use std::{
+    sync::mpsc::{Receiver as MpscReceiver, TryRecvError},
+    thread::Builder as ThreadBuilder
+};
+use super::{
+    connection::Connection,
+    Status
+};
 
 pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
     let name = format!("Serenity Voice (G{})", guild_id);

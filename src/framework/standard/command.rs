@@ -1,10 +1,14 @@
 use client::Context;
-use model::channel::Message;
-use model::Permissions;
-use std::collections::HashMap;
-use std::fmt;
-use std::fmt::{Debug, Formatter};
-use std::sync::Arc;
+use model::{
+    channel::Message,
+    Permissions
+};
+use std::{
+    collections::HashMap,
+    fmt,
+    fmt::{Debug, Formatter},
+    sync::Arc
+};
 use utils::Colour;
 use super::{Args, Configuration, HelpBehaviour};
 

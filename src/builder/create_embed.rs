@@ -19,10 +19,11 @@ use chrono::{DateTime, TimeZone};
 use internal::prelude::*;
 use model::channel::Embed;
 use serde_json::Value;
-use std::default::Default;
-use std::fmt::Display;
-use utils;
-use utils::VecMap;
+use std::{
+    default::Default,
+    fmt::Display
+};
+use utils::{self, VecMap};
 
 #[cfg(feature = "utils")]
 use utils::Colour;

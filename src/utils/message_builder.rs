@@ -1,9 +1,13 @@
-use model::guild::Emoji;
-use model::id::{ChannelId, RoleId, UserId};
-use model::misc::Mentionable;
-use std::default::Default;
-use std::fmt::{self, Display, Write};
-use std::ops::Add;
+use model::{
+    guild::Emoji,
+    id::{ChannelId, RoleId, UserId},
+    misc::Mentionable
+};
+use std::{
+    default::Default,
+    fmt::{self, Display, Write},
+    ops::Add
+};
 
 /// The Message Builder is an ergonomic utility to easily build a message,
 /// by adding text and mentioning mentionable structs.

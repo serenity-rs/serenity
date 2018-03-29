@@ -1,8 +1,10 @@
 //! Models about OAuth2 applications.
 
-use super::id::UserId;
-use super::user::User;
-use super::utils::default_true;
+use super::{
+    id::UserId,
+    user::User,
+    utils::default_true
+};
 
 /// Information about a user's application. An application does not necessarily
 /// have an associated bot user.

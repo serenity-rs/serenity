@@ -1,9 +1,11 @@
 use parking_lot::RwLock;
 use serde::de::Error as DeError;
 use serde::ser::{SerializeSeq, Serialize, Serializer};
-use std::collections::HashMap;
-use std::hash::Hash;
-use std::sync::Arc;
+use std::{
+    collections::HashMap,
+    hash::Hash,
+    sync::Arc
+};
 use super::prelude::*;
 
 #[cfg(feature = "cache")]

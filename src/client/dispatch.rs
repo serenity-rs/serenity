@@ -1,11 +1,15 @@
 use gateway::InterMessage;
-use model::event::Event;
-use model::channel::{Channel, Message};
+use model::{
+    event::Event,
+    channel::{Channel, Message}
+};
 use std::sync::Arc;
 use parking_lot::Mutex;
-use super::bridge::gateway::event::ClientEvent;
-use super::event_handler::EventHandler;
-use super::Context;
+use super::{
+    bridge::gateway::event::ClientEvent,
+    event_handler::EventHandler,
+    Context
+};
 use std::sync::mpsc::Sender;
 use threadpool::ThreadPool;
 use typemap::ShareMap;

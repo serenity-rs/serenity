@@ -4,16 +4,25 @@ use internal::ws_impl::{ReceiverExt, SenderExt};
 use model::event::{Event, GatewayEvent};
 use parking_lot::Mutex;
 use serde::Deserialize;
-use std::sync::mpsc::{self, Receiver, Sender, TryRecvError};
-use std::sync::Arc;
+use std::sync::{
+    mpsc::{
+        self, 
+        Receiver, 
+        Sender, 
+        TryRecvError
+    },
+    Arc
+};
 use super::super::super::dispatch::{DispatchEvent, dispatch};
 use super::super::super::EventHandler;
 use super::event::{ClientEvent, ShardStageUpdateEvent};
 use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
 use threadpool::ThreadPool;
 use typemap::ShareMap;
-use websocket::message::{CloseData, OwnedMessage};
-use websocket::WebSocketError;
+use websocket::{
+    message::{CloseData, OwnedMessage},
+    WebSocketError
+};
 
 #[cfg(feature = "framework")]
 use framework::Framework;

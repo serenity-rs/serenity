@@ -2,7 +2,11 @@ use chrono::{DateTime, FixedOffset};
 use model::prelude::*;
 
 #[cfg(feature = "model")]
-use builder::{CreateMessage, EditMessage, GetMessages};
+use builder::{
+    CreateMessage, 
+    EditMessage, 
+    GetMessages
+};
 #[cfg(feature = "model")]
 use http::{self, AttachmentType};
 #[cfg(feature = "model")]

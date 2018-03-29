@@ -1,10 +1,18 @@
 use chrono::{DateTime, FixedOffset};
 use model::prelude::*;
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::fmt::{
+    Display, 
+    Formatter, 
+    Result as FmtResult
+};
 use super::deserialize_single_recipient;
 
 #[cfg(feature = "model")]
-use builder::{CreateMessage, EditMessage, GetMessages};
+use builder::{
+    CreateMessage, 
+    EditMessage,
+    GetMessages
+};
 #[cfg(feature = "model")]
 use http::AttachmentType;
 #[cfg(feature = "model")]

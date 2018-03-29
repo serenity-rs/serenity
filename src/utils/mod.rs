@@ -5,20 +5,24 @@ mod colour;
 mod message_builder;
 mod vec_map;
 
-pub use self::colour::Colour;
-pub use self::message_builder::{Content, ContentModifier, MessageBuilder};
-pub use self::vec_map::VecMap;
+pub use self::{
+    colour::Colour,
+    message_builder::{Content, ContentModifier, MessageBuilder},
+    vec_map::VecMap
+};
 
 use base64;
 use internal::prelude::*;
 use model::id::EmojiId;
 use model::misc::EmojiIdentifier;
-use std::collections::HashMap;
-use std::ffi::OsStr;
-use std::fs::File;
-use std::hash::{BuildHasher, Hash};
-use std::io::Read;
-use std::path::Path;
+use std::{
+    collections::HashMap,
+    ffi::OsStr,
+    fs::File,
+    hash::{BuildHasher, Hash},
+    io::Read,
+    path::Path
+};
 
 #[cfg(feature = "cache")]
 use cache::Cache;

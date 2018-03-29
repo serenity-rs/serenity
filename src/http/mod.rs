@@ -31,12 +31,22 @@ pub use self::error::Error as HttpError;
 pub use hyper::status::{StatusClass, StatusCode};
 
 use constants;
-use hyper::client::{Client as HyperClient, Request, RequestBuilder, Response as HyperResponse};
-use hyper::header::ContentType;
-use hyper::method::Method;
-use hyper::mime::{Mime, SubLevel, TopLevel};
-use hyper::net::HttpsConnector;
-use hyper::{header, Error as HyperError, Result as HyperResult, Url};
+use hyper::{
+    client::{
+        Client as HyperClient, 
+        Request, 
+        RequestBuilder, 
+        Response as HyperResponse
+    },
+    header::ContentType,
+    method::Method,
+    mime::{Mime, SubLevel, TopLevel},
+    net::HttpsConnector,
+    header, 
+    Error as HyperError, 
+    Result as HyperResult, 
+    Url
+};
 use hyper_native_tls::NativeTlsClient;
 use internal::prelude::*;
 use model::prelude::*;
@@ -44,13 +54,15 @@ use multipart::client::Multipart;
 use parking_lot::Mutex;
 use self::ratelimiting::Route;
 use serde_json;
-use std::collections::BTreeMap;
-use std::default::Default;
-use std::fmt::Write as FmtWrite;
-use std::fs::File;
-use std::io::ErrorKind as IoErrorKind;
-use std::path::{Path, PathBuf};
-use std::sync::Arc;
+use std::{
+    collections::BTreeMap,
+    default::Default,
+    fmt::Write as FmtWrite,
+    fs::File,
+    io::ErrorKind as IoErrorKind,
+    path::{Path, PathBuf},
+    sync::Arc
+};
 
 /// An method used for ratelimiting special routes.
 ///

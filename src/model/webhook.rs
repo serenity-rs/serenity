@@ -1,7 +1,13 @@
 //! Webhook model and implementations.
 
-use super::id::{ChannelId, GuildId, WebhookId};
-use super::user::User;
+use super::{
+    id::{
+        ChannelId, 
+        GuildId, 
+        WebhookId
+    },
+    user::User
+};
 
 #[cfg(feature = "model")]
 use builder::ExecuteWebhook;

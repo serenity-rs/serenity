@@ -26,9 +26,11 @@ mod dispatch;
 mod error;
 mod event_handler;
 
-pub use self::context::Context;
-pub use self::error::Error as ClientError;
-pub use self::event_handler::EventHandler;
+pub use self::{
+    context::Context,
+    error::Error as ClientError,
+    event_handler::EventHandler
+};
 
 // Note: the following re-exports are here for backwards compatibility
 pub use gateway;

@@ -46,10 +46,14 @@ use hyper::header::Headers;
 use hyper::status::StatusCode;
 use internal::prelude::*;
 use parking_lot::Mutex;
-use std::collections::HashMap;
-use std::sync::Arc;
-use std::time::Duration;
-use std::{str, thread, i64};
+use std::{
+    collections::HashMap,
+    sync::Arc,
+    time::Duration,
+    str, 
+    thread, 
+    i64
+};
 use super::{HttpError, LightMethod};
 
 lazy_static! {

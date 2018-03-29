@@ -1,10 +1,18 @@
 use internal::prelude::*;
-use serde::de::{self, Deserialize, Deserializer, MapAccess, Visitor};
+use serde::de::{
+    self, 
+    Deserialize, 
+    Deserializer, 
+    MapAccess, 
+    Visitor
+};
 use serde::ser::Serializer;
 use super::super::prelude::*;
-use std::collections::HashMap;
-use std::mem::transmute;
-use std::fmt;
+use std::{
+    collections::HashMap,
+    mem::transmute,
+    fmt
+};
 
 /// Determines to what entity an action was used on.
 #[derive(Debug)]

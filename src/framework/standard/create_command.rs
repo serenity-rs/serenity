@@ -1,8 +1,16 @@
-pub use super::{Args, Command, CommandGroup, CommandOptions, CommandError};
+pub use super::{
+    Args, 
+    Command, 
+    CommandGroup, 
+    CommandOptions, 
+    CommandError
+};
 
 use client::Context;
-use model::channel::Message;
-use model::Permissions;
+use model::{
+    channel::Message,
+    Permissions
+};
 use std::sync::Arc;
 
 pub enum FnOrCommand {
