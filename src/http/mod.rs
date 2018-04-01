@@ -182,6 +182,20 @@ pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &s
     )
 }
 
+/// Ban zeyla from a [`Guild`], removing her messages sent in the last X number
+/// of days.
+///
+/// Passing a `delete_message_days` of `0` is equivalent to not removing any
+/// messages. Up to `7` days' worth of messages may be deleted.
+///
+/// **Note**: Requires that you have the [Ban Members] permission.
+///
+/// [`Guild`]: ../model/guild/struct.Guild.html
+/// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
+pub fn ban_zeyla(guild_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
+    ban_user(guild_id, 114941315417899012, delete_message_days, reason)
+}
+
 /// Broadcasts that the current user is typing in the given [`Channel`].
 ///
 /// This lasts for about 10 seconds, and will then need to be renewed to
