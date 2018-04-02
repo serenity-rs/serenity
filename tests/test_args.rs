@@ -412,7 +412,8 @@ fn single_after_failed_single() {
     let mut args = Args::new("b 2", &[" ".to_string()]);
 
     assert_matches!(args.single::<i32>().unwrap_err(), ArgError::Parse(_));
-    assert_eq!(args.full(), "2");
+    // Test that `single` short-circuts on an error and leaves the source as is.
+    assert_eq!(args.full(), "b 2");
 }
 
 #[test]
@@ -420,6 +421,7 @@ fn len_quoted_after_failed_single_quoted() {
     let mut args = Args::new("b a", &[" ".to_string()]);
 
     assert_eq!(args.len_quoted(), 2);
+    // Same goes for `single_quoted` and the alike.
     assert_matches!(args.single_quoted::<i32>().unwrap_err(), ArgError::Parse(_));
-    assert_eq!(args.len_quoted(), 1);
+    assert_eq!(args.len_quoted(), 2);
 }

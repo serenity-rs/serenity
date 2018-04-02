@@ -59,12 +59,16 @@ fn second_quote_occurence(s: &str) -> Option<usize> {
 
 fn parse_quotes<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
     where T::Err: StdError {
+    
+    if s.is_empty() {
+        return Err(Error::Eos);
+    }
 
     // Fall back to `parse` if there're no quotes at the start
     // or if there is no closing one as well.
     if let Some(mut pos) = second_quote_occurence(s) {
         if s.starts_with('"') {
-            let res = (&s[1..pos]).parse::<T>().map_err(Error::Parse);
+            let res = (&s[1..pos]).parse::<T>().map_err(Error::Parse)?;
             pos += '"'.len_utf8();
 
             for delimiter in delimiters {
@@ -77,7 +81,7 @@ fn parse_quotes<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, 
 
             s.drain(..pos);
 
-            return res;
+            return Ok(res);
         }
     }
 
@@ -87,17 +91,20 @@ fn parse_quotes<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, 
 
 fn parse<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
     where T::Err: StdError {
+    if s.is_empty() {
+        return Err(Error::Eos);
+    }
 
     if delimiters.len() == 1 {
         let mut pos = s.find(&delimiters[0]).unwrap_or_else(|| s.len());
-        let res = (&s[..pos]).parse::<T>().map_err(Error::Parse);
+        let res = (&s[..pos]).parse::<T>().map_err(Error::Parse)?;
 
         if pos < s.len() {
             pos += delimiters[0].len();
         }
 
         s.drain(..pos);
-        res
+        Ok(res)
     } else {
         let mut smallest_pos = s.len();
         let mut delimiter_len: usize = 0;
@@ -111,7 +118,7 @@ fn parse<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
             }
         }
 
-        let res = (&s[..smallest_pos]).parse::<T>().map_err(Error::Parse);
+        let res = (&s[..smallest_pos]).parse::<T>().map_err(Error::Parse)?;
 
         if smallest_pos < s.len() {
             smallest_pos += delimiter_len;
@@ -119,7 +126,7 @@ fn parse<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
 
         s.drain(..smallest_pos);
 
-        res
+        Ok(res)
     }
 }
 
@@ -161,10 +168,6 @@ impl Args {
     /// ```
     pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
-        if self.is_empty() {
-            return Err(Error::Eos);
-        }
-
         if let Some(ref mut val) = self.len {
             *val -= 1
         };
@@ -188,10 +191,6 @@ impl Args {
     /// [`single`]: #method.single
     pub fn single_n<T: FromStr>(&self) -> Result<T, T::Err>
         where T::Err: StdError {
-        if self.is_empty() {
-            return Err(Error::Eos);
-        }
-
         parse::<T>(&mut self.message.clone(), &self.delimiters)
     }
 
@@ -222,7 +221,6 @@ impl Args {
     pub fn len(&mut self) -> usize {
         if let Some(len) = self.len {
             len
-
         } else if self.is_empty() {
                 0
         } else {
@@ -293,12 +291,7 @@ impl Args {
     /// assert_eq!(args.full(), "69");
     /// ```
     pub fn skip(&mut self) -> Option<String> {
-        if self.is_empty() {
-            return None;
-        }
-
         if let Some(ref mut val) = self.len {
-
             if 1 <= *val {
                 *val -= 1
             }
@@ -359,10 +352,6 @@ impl Args {
     /// [`single`]: #method.single
     pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
-        if self.is_empty() {
-            return Err(Error::Eos);
-        }
-
         if let Some(ref mut val) = self.len_quoted {
             *val -= 1
         };
@@ -386,10 +375,6 @@ impl Args {
     /// [`single_quoted`]: #method.single_quoted
     pub fn single_quoted_n<T: FromStr>(&self) -> Result<T, T::Err>
         where T::Err: StdError {
-        if self.is_empty() {
-            return Err(Error::Eos);
-        }
-
         parse_quotes::<T>(&mut self.message.clone(), &self.delimiters)
     }
 
@@ -411,7 +396,7 @@ impl Args {
         if self.is_empty() {
             return Err(Error::Eos);
         }
-
+        
         IterQuoted::<T>::new(&mut self).collect()
     }
 
@@ -488,10 +473,6 @@ impl Args {
     /// ```
     pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
-        if self.is_empty() {
-            return Err(Error::Eos);
-        }
-
         // TODO: Make this efficient
 
         if self.delimiters.len() == 1 as usize {
@@ -547,10 +528,6 @@ impl Args {
     /// ```
     pub fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
-        if self.is_empty() {
-            return Err(Error::Eos);
-        }
-
         // Same here.
         if self.delimiters.len() == 1 {
             let pos = self.message
