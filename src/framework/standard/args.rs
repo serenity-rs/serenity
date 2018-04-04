@@ -72,7 +72,6 @@ fn parse_quotes<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, 
             pos += '"'.len_utf8();
 
             for delimiter in delimiters {
-
                 if s[pos..].starts_with(delimiter) {
                     pos += delimiter.len();
                     break;
@@ -96,27 +95,27 @@ fn parse<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
     }
 
     if delimiters.len() == 1 {
-        let mut pos = s.find(&delimiters[0]).unwrap_or_else(|| s.len());
+        let delim = &delimiters[0];
+        let mut pos = s.find(delim).unwrap_or_else(|| s.len());
         let res = (&s[..pos]).parse::<T>().map_err(Error::Parse)?;
 
         if pos < s.len() {
-            pos += delimiters[0].len();
+            pos += delim.len();
         }
 
         s.drain(..pos);
         Ok(res)
     } else {
-        let mut smallest_pos = s.len();
-        let mut delimiter_len: usize = 0;
+        let (mut smallest_pos, delimiter_len) = delimiters.iter().fold((s.len(), 0usize), |mut acc, delim| {
+            let other_pos = s.find(delim).unwrap_or_else(|| s.len());
 
-        for delimiter in delimiters {
-            let other_pos = s.find(delimiter).unwrap_or_else(|| s.len());
-
-            if smallest_pos > other_pos {
-                smallest_pos = other_pos;
-                delimiter_len = delimiter.len();
+            if acc.0 > other_pos {
+                acc.0 = other_pos;
+                acc.1 = delim.len();
             }
-        }
+
+            acc
+        });
 
         let res = (&s[..smallest_pos]).parse::<T>().map_err(Error::Parse)?;
 
@@ -168,9 +167,13 @@ impl Args {
     /// ```
     pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
+        if self.is_empty() {
+            return Err(Error::Eos);
+        }
+
         if let Some(ref mut val) = self.len {
             *val -= 1
-        };
+        }
 
         parse::<T>(&mut self.message, &self.delimiters)
     }
@@ -222,7 +225,7 @@ impl Args {
         if let Some(len) = self.len {
             len
         } else if self.is_empty() {
-                0
+            0
         } else {
             let mut words: Box<Iterator<Item = &str>> = Box::new(Some(&self.message[..]).into_iter());
 
@@ -264,9 +267,9 @@ impl Args {
     /// ```
     pub fn len_quoted(&mut self) -> usize {
         if self.is_empty() {
-                0
+            0
         } else if let Some(len_quoted) = self.len_quoted {
-                len_quoted
+            len_quoted
         } else {
             let countable_self = self.clone();
 
@@ -291,6 +294,10 @@ impl Args {
     /// assert_eq!(args.full(), "69");
     /// ```
     pub fn skip(&mut self) -> Option<String> {
+        if self.is_empty() {
+            return None;
+        }
+
         if let Some(ref mut val) = self.len {
             if 1 <= *val {
                 *val -= 1
@@ -331,7 +338,7 @@ impl Args {
             } else {
                 *val = 0
             }
-        };
+        }
 
         Some(vec)
     }
@@ -352,9 +359,13 @@ impl Args {
     /// [`single`]: #method.single
     pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
+        if self.is_empty() {
+            return Err(Error::Eos);
+        }
+
         if let Some(ref mut val) = self.len_quoted {
             *val -= 1
-        };
+        }
 
         parse_quotes::<T>(&mut self.message, &self.delimiters)
     }
@@ -397,7 +408,7 @@ impl Args {
             return Err(Error::Eos);
         }
         
-        IterQuoted::<T>::new(&mut self).collect()
+        self.iter_quoted::<T>().collect()
     }
 
     /// Like [`iter`], but takes quotes into account
@@ -436,7 +447,7 @@ impl Args {
             return Err(Error::Eos);
         }
 
-        Iter::<T>::new(&mut self).collect()
+        self.iter::<T>().collect()
     }
 
     /// Provides an iterator of items: (`T: FromStr`) `Result<T, T::Err>`.
