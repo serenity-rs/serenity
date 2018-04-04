@@ -3,8 +3,8 @@ use model::prelude::*;
 
 #[cfg(feature = "model")]
 use builder::{
-    CreateMessage, 
-    EditMessage, 
+    CreateMessage,
+    EditMessage,
     GetMessages
 };
 #[cfg(feature = "model")]
@@ -176,7 +176,7 @@ impl Group {
     /// **Note**: This method is for consistency. This will always return
     /// `false`, due to groups not being considered NSFW.
     ///
-    /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
+    /// [`utils::is_nsfw`]: ../../utils/fn.is_nsfw.html
     #[inline]
     pub fn is_nsfw(&self) -> bool { false }
 
