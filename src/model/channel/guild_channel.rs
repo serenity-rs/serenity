@@ -5,10 +5,10 @@ use model::prelude::*;
 use CACHE;
 #[cfg(feature = "model")]
 use builder::{
-    CreateInvite, 
-    CreateMessage, 
-    EditChannel, 
-    EditMessage, 
+    CreateInvite,
+    CreateMessage,
+    EditChannel,
+    EditMessage,
     GetMessages
 };
 #[cfg(feature = "model")]
@@ -17,8 +17,8 @@ use http::{self, AttachmentType};
 use internal::prelude::*;
 #[cfg(feature = "model")]
 use std::fmt::{
-    Display, 
-    Formatter, 
+    Display,
+    Formatter,
     Result as FmtResult
 };
 #[cfg(feature = "model")]
@@ -392,7 +392,7 @@ impl GuildChannel {
     ///
     /// [`ChannelType::Text`]: enum.ChannelType.html#variant.Text
     /// [`ChannelType::Voice`]: enum.ChannelType.html#variant.Voice
-    /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
+    /// [`utils::is_nsfw`]: ../../utils/fn.is_nsfw.html
     #[cfg(feature = "utils")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {

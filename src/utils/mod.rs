@@ -57,10 +57,6 @@ pub fn vecmap_to_json_map<K: PartialEq + ToString>(map: VecMap<K, Value>) -> Map
 /// This checks that the name is either `"nsfw"` or, for names longer than that,
 /// is prefixed with `"nsfw"`.
 ///
-/// **Note**: Whether a channel is NSFW is done client-side, as a field for the
-/// NSFW-ness of a channel is not sent to clients. Discord's requirements for
-/// defining a channel as NSFW can change at any time.
-///
 /// # Examples
 ///
 /// Check that a channel named `"nsfw"` is in fact NSFW:
