@@ -204,11 +204,62 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    /// let args = Args::new("42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.full(), "42 69");
     /// ```
     pub fn full(&self) -> &str { &self.message }
+
+    /// Accesses the current state of the internal string, but 
+    /// with quotes removed if it has both opening and closing quotes;
+    /// otherwise returns the string as is.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let args = Args::new("\"42 69\"", &[" ".to_string()]);
+    ///
+    /// assert_eq!(args.full_quoted(), "42 69");
+    /// ```
+    /// 
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    /// 
+    /// let args = Args::new("\"42 69", &[" ".to_string()]);
+    ///
+    /// assert_eq!(args.full_quoted(), "\"42 69");
+    /// ```
+    /// 
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    /// 
+    /// let args = Args::new("42 69\"", &[" ".to_string()]);
+    ///
+    /// assert_eq!(args.full_quoted(), "42 69\"");
+    /// ```
+    pub fn full_quoted(&self) -> &str {
+        let s = &self.message;
+
+        if !s.starts_with('"') {
+            return s;
+        }
+    
+        let end = s.rfind('"');
+        if end.is_none() {
+            return s;
+        }
+
+        let end = end.unwrap();
+    
+        // If it got the quote at the start, then there's no closing quote.
+        if end == 0 {
+            return s;
+        }
+    
+        &s[1..end]
+    }
 
     /// The amount of args.
     ///
