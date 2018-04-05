@@ -43,12 +43,12 @@ pub struct Shard {
     shard_info: [u64; 2],
     stage: ConnectionStage,
     stream: Option<ShardStream>,
-    token: String,
+    token: Rc<String>,
     tx: UnboundedSender<TungsteniteMessage>,
 }
 
 impl Shard {
-    pub fn new(token: String, shard_info: [u64; 2], handle: Handle)
+    pub fn new(token: Rc<String>, shard_info: [u64; 2], handle: Handle)
         -> Box<Future<Item = Shard, Error = Error>> {
         let done = connect_async(Url::from_str(CONNECTION).unwrap(), handle.remote().clone())
             .map(move |(duplex, _)| {
@@ -394,7 +394,7 @@ impl Shard {
                 "compression": false,
                 "large_threshold": LARGE_THRESHOLD,
                 "shard": self.shard_info,
-                "token": self.token,
+                "token": *self.token,
                 "v": GATEWAY_VERSION,
                 "properties": {
                     "$browser": "test",
@@ -454,7 +454,7 @@ impl Shard {
             "d": {
                 "session_id": self.session_id,
                 "seq": self.heartbeat_info.borrow().seq,
-                "token": self.token,
+                "token": *self.token,
             },
         });
 

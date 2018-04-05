@@ -51,9 +51,11 @@
 
 mod error;
 mod shard;
+mod shard_manager;
 
 pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
+pub use self::shard_manager::{ShardManager, ShardingStrategy, ShardManagerOptions, MessageStream};
 
 use futures::stream::SplitStream;
 use model::gateway::Game;
