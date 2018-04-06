@@ -2,10 +2,8 @@ extern crate futures;
 extern crate serenity;
 extern crate tokio_core;
 
-use serenity::gateway::{Shard, ShardingStrategy, ShardManager, ShardManagerOptions};
+use serenity::gateway::{ShardingStrategy, ShardManager, ShardManagerOptions};
 use serenity::model::event::{Event, GatewayEvent};
-use serenity::model::user::OnlineStatus;
-use std::error::Error;
 use std::env;
 use std::rc::Rc;
 use tokio_core::reactor::{Core, Handle};
@@ -34,13 +32,14 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
 
     handle.spawn(future);
 
-    let future = shard_manager.messages().for_each(|(shard, message)| {
+    let future = shard_manager.messages().for_each(move |(shard, message)| {
         let mut shard = shard.borrow_mut();
         
         let event = shard.parse(message)
             .expect("Could not parse shard stream message");
 
         shard.process(&event);
+        shard_manager.process(&event);
 
         match event {
             GatewayEvent::Dispatch(_, Event::MessageCreate(ev)) => {

@@ -4,11 +4,12 @@ use std::collections::{VecDeque, HashMap};
 use std::rc::Rc;
 use std::cell::RefCell;
 use gateway::shard::Shard;
+use model::event::{Event, GatewayEvent};
 use tokio_core::reactor::Handle;
 use futures::sync::mpsc::{
     unbounded, UnboundedSender, UnboundedReceiver, SendError
 };
-use tungstenite::{Message, Error as TungsteniteError};
+use tungstenite::{Message as TungsteniteMessage, Error as TungsteniteError};
 
 #[derive(Clone, Copy, Debug)]
 pub enum ShardingStrategy {
@@ -47,17 +48,20 @@ pub struct ShardManagerOptions {
     pub ws_uri: Rc<String>,
 }
 
-pub type MessageStream = UnboundedReceiver<(Rc<RefCell<Shard>>, Message)>;
+pub type WrappedShard = Rc<RefCell<Shard>>;
+pub type Message = (WrappedShard, TungsteniteMessage);
+pub type MessageStream = UnboundedReceiver<Message>;
 
 pub struct ShardManager {
     pub queue: VecDeque<u64>,
-    pub shards: Rc<RefCell<HashMap<u64, Rc<RefCell<Shard>>>>>,
+    pub shards: Rc<RefCell<HashMap<u64, WrappedShard>>>,
     pub strategy: ShardingStrategy,
     pub token: Rc<String>,
     pub ws_uri: Rc<String>,
-    non_exhaustive: (),
     handle: Handle,
     message_stream: Option<MessageStream>,
+    #[allow(dead_code)]
+    non_exhaustive: (),
 }
 
 impl ShardManager {
@@ -68,9 +72,9 @@ impl ShardManager {
             strategy: options.strategy,
             token: options.token,
             ws_uri: options.ws_uri,
-            non_exhaustive: (),
             handle,
             message_stream: None,
+            non_exhaustive: (),
         }
     }
 
@@ -92,7 +96,7 @@ impl ShardManager {
             let sender = sender.clone();
             let handle = self.handle.clone();
 
-            let future: Box<Future<Item = (), Error = ()>> = Box::new(Shard::new(self.token.clone(), [shard_id, shards_total], handle.clone()) 
+            let future = Box::new(Shard::new(self.token.clone(), [shard_id, shards_total], handle.clone()) 
                 .then(move |result| {
                     let shard = match result {
                         Ok(shard) => Rc::new(RefCell::new(shard)),
@@ -106,18 +110,18 @@ impl ShardManager {
                         sender,
                     };
 
-                    let future: Box<Future<Item = (), Error = ()>> = Box::new(shard.borrow_mut()
+                    let future = Box::new(shard.borrow_mut()
                         .messages()
                         .map_err(MessageSinkError::from)
                         .forward(sink)
                         .map(|_| ())
-                        .map_err(|e: MessageSinkError| error!("Error forwarding shard messages to sink: {:?}", e)));
+                        .map_err(|e| error!("Error forwarding shard messages to sink: {:?}", e)));
 
                     handle.spawn(future);
                     shards_map.borrow_mut().insert(shard_id, shard);
                     future::ok(())
                 })
-                .map_err(|e: Error| error!("Error starting shard: {:?}", e)));
+                .map_err(|e| error!("Error starting shard: {:?}", e)));
 
             self.handle.spawn(future);
         }
@@ -125,20 +129,32 @@ impl ShardManager {
         Box::new(future::ok(()))
     }
 
-    // takes the message stream
-    // panics if already taken
     pub fn messages(&mut self) -> MessageStream {
         self.message_stream.take().unwrap() 
+    }
+
+    pub fn process(&mut self, event: &GatewayEvent) {
+        if let GatewayEvent::Dispatch(_, Event::Ready(event)) = event {
+            let shard_id = match &event.ready.shard {
+                Some(shard) => shard[0],
+                None => {
+                    error!("ready event has no shard id");
+                    return;
+                }
+            };
+
+            println!("shard id {} has started", shard_id);
+        }
     }
 }
 
 pub enum MessageSinkError {
-    MpscSend(SendError<(Rc<RefCell<Shard>>, Message)>),
+    MpscSend(SendError<Message>),
     Tungstenite(TungsteniteError),
 }
 
-impl From<SendError<(Rc<RefCell<Shard>>, Message)>> for MessageSinkError {
-    fn from(e: SendError<(Rc<RefCell<Shard>>, Message)>) -> Self {
+impl From<SendError<Message>> for MessageSinkError {
+    fn from(e: SendError<Message>) -> Self {
         MessageSinkError::MpscSend(e)
     }
 }
@@ -161,12 +177,12 @@ impl ::std::fmt::Debug for MessageSinkError {
 }
 
 struct MessageSink {
-    shard: Rc<RefCell<Shard>>,
-    sender: UnboundedSender<(Rc<RefCell<Shard>>, Message)>,
+    shard: WrappedShard,
+    sender: UnboundedSender<Message>,
 }
 
 impl Sink for MessageSink {
-    type SinkItem = Message;
+    type SinkItem = TungsteniteMessage;
     type SinkError = MessageSinkError;
 
     fn start_send(&mut self, item: Self::SinkItem) -> StartSend<Self::SinkItem, Self::SinkError> {
