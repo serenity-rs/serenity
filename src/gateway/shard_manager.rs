@@ -51,10 +51,11 @@ pub struct ShardManagerOptions {
 pub type WrappedShard = Rc<RefCell<Shard>>;
 pub type Message = (WrappedShard, TungsteniteMessage);
 pub type MessageStream = UnboundedReceiver<Message>;
+type ShardsMap = Rc<RefCell<HashMap<u64, WrappedShard>>>;
 
 pub struct ShardManager {
     pub queue: VecDeque<u64>,
-    pub shards: Rc<RefCell<HashMap<u64, WrappedShard>>>,
+    shards: ShardsMap,
     pub strategy: ShardingStrategy,
     pub token: Rc<String>,
     pub ws_uri: Rc<String>,
@@ -92,36 +93,14 @@ impl ShardManager {
         self.message_stream = Some(receiver);
 
         for shard_id in shards_index..shards_count {
-            let shards_map = self.shards.clone();
-            let sender = sender.clone();
-            let handle = self.handle.clone();
-
-            let future = Box::new(Shard::new(self.token.clone(), [shard_id, shards_total], handle.clone()) 
-                .then(move |result| {
-                    let shard = match result {
-                        Ok(shard) => Rc::new(RefCell::new(shard)),
-                        Err(e) => {
-                            return future::err(Error::from(e));
-                        },
-                    };
-
-                    let sink = MessageSink {
-                        shard: shard.clone(), 
-                        sender,
-                    };
-
-                    let future = Box::new(shard.borrow_mut()
-                        .messages()
-                        .map_err(MessageSinkError::from)
-                        .forward(sink)
-                        .map(|_| ())
-                        .map_err(|e| error!("Error forwarding shard messages to sink: {:?}", e)));
-
-                    handle.spawn(future);
-                    shards_map.borrow_mut().insert(shard_id, shard);
-                    future::ok(())
-                })
-                .map_err(|e| error!("Error starting shard: {:?}", e)));
+            let future = start_shard(
+                self.token.clone(),
+                shard_id,
+                shards_total,
+                self.handle.clone(),
+                self.shards.clone(),
+                sender.clone(),
+            );
 
             self.handle.spawn(future);
         }
@@ -146,6 +125,42 @@ impl ShardManager {
             println!("shard id {} has started", shard_id);
         }
     }
+}
+
+fn start_shard(
+    token: Rc<String>, 
+    shard_id: u64, 
+    shards_total: u64, 
+    handle: Handle, 
+    shards_map: ShardsMap,
+    sender: UnboundedSender<Message>,
+) -> impl Future<Item = (), Error = ()> {
+    Shard::new(token, [shard_id, shards_total], handle.clone())
+        .then(move |result| {
+            let shard = match result {
+                Ok(shard) => Rc::new(RefCell::new(shard)),
+                Err(e) => {
+                    return future::err(Error::from(e));
+                },
+             };
+
+            let sink = MessageSink {
+                shard: shard.clone(), 
+                sender,
+            };
+
+            let future = Box::new(shard.borrow_mut()
+                .messages()
+                .map_err(MessageSinkError::from)
+                .forward(sink)
+                .map(|_| ())
+                .map_err(|e| error!("Error forwarding shard messages to sink: {:?}", e)));
+
+            handle.spawn(future);
+            shards_map.borrow_mut().insert(shard_id, shard);
+            future::ok(())
+        })
+        .map_err(|e| error!("Error starting shard: {:?}", e))
 }
 
 pub enum MessageSinkError {
