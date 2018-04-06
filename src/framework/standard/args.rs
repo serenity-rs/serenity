@@ -140,8 +140,10 @@ fn parse<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
 /// Majority of the methods here remove the argument as to advance to further arguments.
 /// If you do not wish for this behaviour, use the suffixed `*_n` methods instead. 
 /// 
+///
 /// `Args` provides parsing arguments inside quotes too (for which case, delimiters don't matter), via the suffixed `*_quoted` methods.
-/// *note: these fall back to the normal methods' behaviour if the quotes are malformed; i.e missing an opening or closing quote* 
+///
+/// **Note**: these fall back to the normal methods' behaviour if the quotes are malformed; i.e missing an opening or closing quote.
 #[derive(Clone, Debug)]
 pub struct Args {
     delimiters: Vec<String>,
