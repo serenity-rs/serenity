@@ -131,8 +131,17 @@ fn parse<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
 
 /// A utility struct for handling arguments of a command.
 ///
-/// General functionality is done via removing an item, parsing it, then returning it; this however
-/// can be mitigated with the `*_n` methods, which just parse and return.
+/// An "argument" is a part of the message up until the end of the message or at one of the specified delimiters.
+/// (E.g.: delim: " ", message: "ab cd"; 1th arg is "ab")
+/// 
+/// The general functionality provided by this struct is to not only make arguments convenient to handle,
+/// but to handle parsing them to a specifc type as well.
+/// 
+/// Majority of the methods here remove the argument as to advance to further arguments.
+/// If you do not wish for this behaviour, use the suffixed `*_n` methods instead. 
+/// 
+/// `Args` provides parsing arguments inside quotes too (for which case, delimiters don't matter), via the suffixed `*_quoted` methods.
+/// *note: these fall back to the normal methods' behaviour if the quotes are malformed; i.e missing an opening or closing quote* 
 #[derive(Clone, Debug)]
 pub struct Args {
     delimiters: Vec<String>,
@@ -153,7 +162,7 @@ impl Args {
         }
     }
 
-    /// Removes the first element, parses it to a specific type if necessary, returns.
+    /// Parses the current argument and advances.
     ///
     /// # Examples
     ///
@@ -163,7 +172,7 @@ impl Args {
     /// let mut args = Args::new("42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.single::<i32>().unwrap(), 42);
-    /// assert_eq!(args, "69");
+    /// assert_eq!(args.full(), "69");
     /// ```
     pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
@@ -178,7 +187,7 @@ impl Args {
         parse::<T>(&mut self.message, &self.delimiters)
     }
 
-    /// Like [`single`], but doesn't remove the element.
+    /// Like [`single`], but doesn't advance.
     ///
     /// # Examples
     ///
@@ -197,7 +206,7 @@ impl Args {
         parse::<T>(&mut self.message.clone(), &self.delimiters)
     }
 
-    /// Accesses the current state of the internal string.
+    /// Accesses the current state of the internally-stored message.
     ///
     /// # Examples
     ///
@@ -210,9 +219,9 @@ impl Args {
     /// ```
     pub fn full(&self) -> &str { &self.message }
 
-    /// Accesses the current state of the internal string, but 
-    /// with quotes removed if it has both opening and closing quotes;
-    /// otherwise returns the string as is.
+    /// Accesses the current state of the internally-stored message, 
+    /// removing quotes if it contains the opening and closing ones,
+    /// but otherwise returns the string as is.
     /// 
     /// # Examples
     /// 
@@ -305,7 +314,7 @@ impl Args {
         self.message.is_empty()
     }
 
-    /// Like [`len`], but takes quotes into account.
+    /// Like [`len`], but accounts quotes.
     ///
     /// # Examples
     ///
@@ -332,7 +341,9 @@ impl Args {
         }
     }
 
-    /// Skips if there's a first element, but also returns it.
+    /// Returns the argument as a string (thus sort-of skipping it).
+    /// 
+    /// *This is sugar for `args.single::<String>().ok()`*
     ///
     /// # Examples
     ///
@@ -361,6 +372,7 @@ impl Args {
     /// Like [`skip`], but allows for multiple at once.
     ///
     /// # Examples
+    /// 
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
@@ -394,7 +406,7 @@ impl Args {
         Some(vec)
     }
 
-    /// Like [`single`], but takes quotes into account.
+    /// Like [`single`], but accounts quotes.
     ///
     /// # Examples
     ///
@@ -421,7 +433,7 @@ impl Args {
         parse_quotes::<T>(&mut self.message, &self.delimiters)
     }
 
-    /// Like [`single_quoted`], but doesn't remove the element.
+    /// Like [`single_quoted`], but doesn't advance.
     ///
     /// # Examples
     ///
@@ -440,7 +452,7 @@ impl Args {
         parse_quotes::<T>(&mut self.message.clone(), &self.delimiters)
     }
 
-    /// Like [`multiple`], but takes quotes into account.
+    /// Like [`multiple`], but accounts quotes.
     ///
     /// # Examples
     ///
@@ -462,7 +474,7 @@ impl Args {
         self.iter_quoted::<T>().collect()
     }
 
-    /// Like [`iter`], but takes quotes into account
+    /// Like [`iter`], but accounts quotes.
     /// 
     /// # Examples
     /// 
@@ -481,7 +493,9 @@ impl Args {
         IterQuoted::new(self)
     }
 
-    /// Empty outs the internal vector while parsing (if necessary) and returning them.
+    /// This is a convenience function for parsing until the end of the message and returning the parsed results in a `Vec`.
+    /// 
+    /// *This is sugar for `args.iter().collect::<Vec<_>>()`*
     ///
     /// # Examples
     ///
@@ -501,7 +515,7 @@ impl Args {
         self.iter::<T>().collect()
     }
 
-    /// Provides an iterator of items: (`T: FromStr`) `Result<T, T::Err>`.
+    /// Provides an arguments iterator up until the end of the message.
     ///
     /// # Examples
     ///
@@ -518,7 +532,8 @@ impl Args {
         Iter::new(self)
     }
 
-    /// Returns the first argument that can be converted and removes it from the list.
+    /// Returns the first argument that can be parsed and removes it from the message. The suitable argument 
+    /// can be in an arbitrary position in the message.
     ///
     /// **Note**: This replaces all delimiters within the message
     /// by the first set in your framework-config to win performance.
@@ -576,7 +591,7 @@ impl Args {
         }
     }
 
-    /// Returns the first argument that can be converted and does not remove it from the list.
+    /// Like [`find`], but does not remove it.
     ///
     /// # Examples
     ///
@@ -588,6 +603,8 @@ impl Args {
     /// assert_eq!(args.find_n::<i32>().unwrap(), 69);
     /// assert_eq!(args.full(), "c47 69");
     /// ```
+    /// 
+    /// [`find`]: #method.find
     pub fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
         // Same here.
