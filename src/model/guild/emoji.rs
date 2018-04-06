@@ -50,8 +50,6 @@ impl Emoji {
     ///
     /// **Note**: The [Manage Emojis] permission is required.
     ///
-    /// **Note**: Only user accounts may use this method.
-    ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     ///
     /// # Examples
@@ -88,8 +86,6 @@ impl Emoji {
     /// Edits the emoji by updating it with a new name.
     ///
     /// **Note**: The [Manage Emojis] permission is required.
-    ///
-    /// **Note**: Only user accounts may use this method.
     ///
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     ///

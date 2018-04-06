@@ -38,8 +38,6 @@
 //! instance. This should be used when you, for example, want to split 10 shards
 //! across 3 instances.
 //!
-//! **Note**: User accounts can not shard. Use [`Client::start`].
-//!
 //! [`Bot`]: ../enum.LoginType.html#variant.Bot
 //! [`Client`]: ../struct.Client.html
 //! [`Client::start`]: ../struct.Client.html#method.start
