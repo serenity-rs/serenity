@@ -41,42 +41,42 @@ pub struct Emoji {
 
 #[cfg(feature = "model")]
 impl Emoji {
-   /// Deletes the emoji.
-   ///
-   /// **Note**: The [Manage Emojis] permission is required.
-   ///
-   /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
-   ///
-   /// # Examples
-   ///
-   /// Delete a given emoji:
-   ///
-   /// ```rust,no_run
-   /// # use serenity::model::guild::Emoji;
-   /// # use serenity::model::id::EmojiId;
-   /// #
-   /// # let mut emoji = Emoji {
-   /// #     animated: false,
-   /// #     id: EmojiId(7),
-   /// #     name: String::from("blobface"),
-   /// #     managed: false,
-   /// #     require_colons: false,
-   /// #     roles: vec![],
-   /// # };
-   /// #
-   /// // assuming emoji has been set already
-   /// match emoji.delete() {
-   ///     Ok(()) => println!("Emoji deleted."),
-   ///     Err(_) => println!("Could not delete emoji.")
-   /// }
-   /// ```
-   #[cfg(feature = "cache")]
-   pub fn delete(&self) -> Result<()> {
-       match self.find_guild_id() {
-           Some(guild_id) => http::delete_emoji(guild_id.0, self.id.0),
-           None => Err(Error::Model(ModelError::ItemMissing)),
-       }
-   }
+    /// Deletes the emoji.
+    ///
+    /// **Note**: The [Manage Emojis] permission is required.
+    ///
+    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    ///
+    /// # Examples
+    ///
+    /// Delete a given emoji:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::model::guild::Emoji;
+    /// # use serenity::model::id::EmojiId;
+    /// #
+    /// # let mut emoji = Emoji {
+    /// #     animated: false,
+    /// #     id: EmojiId(7),
+    /// #     name: String::from("blobface"),
+    /// #     managed: false,
+    /// #     require_colons: false,
+    /// #     roles: vec![],
+    /// # };
+    /// #
+    /// // assuming emoji has been set already
+    /// match emoji.delete() {
+    ///     Ok(()) => println!("Emoji deleted."),
+    ///     Err(_) => println!("Could not delete emoji.")
+    /// }
+    /// ```
+    #[cfg(feature = "cache")]
+    pub fn delete(&self) -> Result<()> {
+        match self.find_guild_id() {
+            Some(guild_id) => http::delete_emoji(guild_id.0, self.id.0),
+            None => Err(Error::Model(ModelError::ItemMissing)),
+        }
+    }
 
     /// Edits the emoji by updating it with a new name.
     ///
