@@ -7,3 +7,5 @@ authors = ["my name <my@email.address>"]
 serenity = { path = "../../", default-features = true }
 tokio-core = "~0.1"
 futures = "~0.1"
+env_logger = "~0.4"
+

@@ -1,6 +1,7 @@
 extern crate futures;
 extern crate serenity;
 extern crate tokio_core;
+extern crate env_logger;
 
 use serenity::gateway::{ShardingStrategy, ShardManager, ShardManagerOptions};
 use serenity::model::event::{Event, GatewayEvent};
@@ -10,6 +11,8 @@ use tokio_core::reactor::{Core, Handle};
 use futures::{future, Future, Stream};
 
 fn main() {
+    env_logger::init().expect("Error initializing env_logger");
+
     let mut core = Core::new().expect("Error creating event loop");
     let future = try_main(core.handle());
 
@@ -21,7 +24,7 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
         .expect("Expected a token in the environment");
 
     let opts = ShardManagerOptions {
-        strategy: ShardingStrategy::simple(),
+        strategy: ShardingStrategy::multi(4),
         token: Rc::new(token),
         ws_uri: Rc::new(String::from("nothing")),
     }; 

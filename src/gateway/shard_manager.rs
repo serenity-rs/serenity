@@ -3,11 +3,15 @@ use ::Error;
 use std::collections::{VecDeque, HashMap};
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::time::Duration;
 use gateway::shard::Shard;
 use model::event::{Event, GatewayEvent};
 use tokio_core::reactor::Handle;
+use tokio_timer::Timer;
 use futures::sync::mpsc::{
-    unbounded, UnboundedSender, UnboundedReceiver, SendError
+    unbounded, UnboundedSender, UnboundedReceiver, 
+    channel, Sender as MpscSender, Receiver as MpscReceiver,
+    SendError,
 };
 use tungstenite::{Message as TungsteniteMessage, Error as TungsteniteError};
 
@@ -61,12 +65,17 @@ pub struct ShardManager {
     pub ws_uri: Rc<String>,
     handle: Handle,
     message_stream: Option<MessageStream>,
+    queue_sender: MpscSender<u64>,
+    queue_receiver: Option<MpscReceiver<u64>>,
     #[allow(dead_code)]
     non_exhaustive: (),
 }
 
 impl ShardManager {
     pub fn new(options: ShardManagerOptions, handle: Handle) -> Self {
+        // buffer size of 0 as each sender already incremenets buffer by 1 
+        let (queue_sender, queue_receiver) = channel(10);
+
         Self {
             queue: VecDeque::new(),
             shards: Rc::new(RefCell::new(HashMap::new())),
@@ -75,6 +84,8 @@ impl ShardManager {
             ws_uri: options.ws_uri,
             handle,
             message_stream: None,
+            queue_sender,
+            queue_receiver: Some(queue_receiver),
             non_exhaustive: (),
         }
     }
@@ -93,17 +104,41 @@ impl ShardManager {
         self.message_stream = Some(receiver);
 
         for shard_id in shards_index..shards_count {
-            let future = start_shard(
-                self.token.clone(),
-                shard_id,
-                shards_total,
-                self.handle.clone(),
-                self.shards.clone(),
-                sender.clone(),
-            );
-
-            self.handle.spawn(future);
+            trace!("pushing shard id {} to back of queue", &shard_id);
+            self.queue.push_back(shard_id);
         }
+
+        let first_shard_id = self.queue.pop_front()
+            .expect("shard start queue is empty");
+        
+        let token = self.token.clone();
+        let shards_map = self.shards.clone();
+        let handle = self.handle.clone();
+
+        /*let future = start_shard(
+            token.clone(),
+            first_shard_id,
+            shards_total,
+            handle.clone(),
+            sender.clone(),
+        ).map(move |shard| {
+            shards_map.borrow_mut().insert(first_shard_id, shard);
+        });*/
+
+        //self.handle.spawn(future);
+
+        let future = process_queue(
+            self.queue_receiver.take().unwrap(),
+            token.clone(),
+            shards_total,
+            handle.clone(),
+            sender.clone(),
+            self.shards.clone(),
+        );
+
+        self.queue_sender.try_send(first_shard_id).expect("could not send first shard to start");
+
+        self.handle.spawn(future);
 
         Box::new(future::ok(()))
     }
@@ -122,9 +157,53 @@ impl ShardManager {
                 }
             };
 
-            println!("shard id {} has started", shard_id);
+            println!("shard id {} has started", &shard_id);
+
+            if let Err(e) = self.queue_sender.try_send(shard_id) {
+                error!("could not send shard id to queue mpsc receiver: {:?}", e);
+            }
         }
     }
+}
+
+fn process_queue(
+    queue_receiver: MpscReceiver<u64>,
+    token: Rc<String>,
+    shards_total: u64,
+    handle: Handle,
+    sender: UnboundedSender<Message>,
+    shards_map: ShardsMap,
+) -> impl Future<Item = (), Error = ()> {
+    let timer = Timer::default();
+
+    queue_receiver
+        .map(move |shard_id| {
+            trace!("received message to start shard {}", &shard_id);
+            let token = token.clone();
+            let handle = handle.clone();
+            let sender = sender.clone();
+            let shards_map = shards_map.clone();
+            let sleep_future = timer.sleep(Duration::from_secs(6));
+
+            sleep_future
+                .map_err(|e| error!("Error sleeping before starting next shard: {:?}", e))
+                .and_then(move |_| {
+                    start_shard(token, shard_id, shards_total, handle.clone(), sender)
+                        .map(move |shard| {
+                            shards_map.borrow_mut().insert(shard_id.clone(), shard);
+                        }) 
+
+                    /*let future = start_shard(token, shard_id, shards_total, handle.clone(), sender)
+                        .map(move |shard| {
+                            shards_map.borrow_mut().insert(shard_id.clone(), shard);
+                        });
+
+                    handle.spawn(future);*/
+                })
+        })
+        .into_future()
+        .map(|_| ())
+        .map_err(|_| ())
 }
 
 fn start_shard(
@@ -132,9 +211,8 @@ fn start_shard(
     shard_id: u64, 
     shards_total: u64, 
     handle: Handle, 
-    shards_map: ShardsMap,
     sender: UnboundedSender<Message>,
-) -> impl Future<Item = (), Error = ()> {
+) -> impl Future<Item = WrappedShard, Error = ()> {
     Shard::new(token, [shard_id, shards_total], handle.clone())
         .then(move |result| {
             let shard = match result {
@@ -157,8 +235,7 @@ fn start_shard(
                 .map_err(|e| error!("Error forwarding shard messages to sink: {:?}", e)));
 
             handle.spawn(future);
-            shards_map.borrow_mut().insert(shard_id, shard);
-            future::ok(())
+            future::ok(shard)
         })
         .map_err(|e| error!("Error starting shard: {:?}", e))
 }
