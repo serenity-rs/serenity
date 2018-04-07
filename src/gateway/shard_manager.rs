@@ -73,8 +73,7 @@ pub struct ShardManager {
 
 impl ShardManager {
     pub fn new(options: ShardManagerOptions, handle: Handle) -> Self {
-        // buffer size of 0 as each sender already incremenets buffer by 1 
-        let (queue_sender, queue_receiver) = channel(10);
+        let (queue_sender, queue_receiver) = channel(0);
 
         Self {
             queue: VecDeque::new(),
@@ -175,11 +174,6 @@ fn process_queue(
             sleep_future
                 .map_err(|e| error!("Error sleeping before starting next shard: {:?}", e))
                 .and_then(move |_| {
-                    /*start_shard(token, shard_id, shards_total, handle.clone(), sender)
-                        .map(move |shard| {
-                            shards_map.borrow_mut().insert(shard_id.clone(), shard);
-                        })*/ 
-
                     let future = start_shard(token, shard_id, shards_total, handle.clone(), sender)
                         .map(move |shard| {
                             shards_map.borrow_mut().insert(shard_id.clone(), shard);
