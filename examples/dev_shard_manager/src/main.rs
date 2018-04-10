@@ -31,7 +31,7 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
 
     let mut shard_manager = ShardManager::new(opts, handle.clone());
     let future = shard_manager.start()
-        .map_err(|e| println!("oh no! {:?}", e));
+        .map_err(|e| println!("Error starting shard manager: {:?}", e));
 
     handle.spawn(future);
 
