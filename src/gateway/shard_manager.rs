@@ -159,10 +159,10 @@ fn process_queue(
     handle: Handle,
     sender: UnboundedSender<Message>,
     shards_map: ShardsMap,
-) -> impl Future<Item = (), Error = ()> {
+) -> Box<Future<Item = (), Error = ()>> {
     let timer = Timer::default();
 
-    queue_receiver
+    Box::new(queue_receiver
         .for_each(move |shard_id| {
             trace!("received message to start shard {}", &shard_id);
             let token = token.clone();
@@ -183,7 +183,7 @@ fn process_queue(
                     future::ok(())
                 })
         })
-        .map_err(|_| ())
+        .map_err(|_| ()))
 }
 
 fn start_shard(
@@ -192,8 +192,8 @@ fn start_shard(
     shards_total: u64, 
     handle: Handle, 
     sender: UnboundedSender<Message>,
-) -> impl Future<Item = WrappedShard, Error = ()> {
-    Shard::new(token, [shard_id, shards_total], handle.clone())
+) -> Box<Future<Item = WrappedShard, Error = ()>> {
+    Box::new(Shard::new(token, [shard_id, shards_total], handle.clone())
         .then(move |result| {
             let shard = match result {
                 Ok(shard) => Rc::new(RefCell::new(shard)),
@@ -217,7 +217,7 @@ fn start_shard(
             handle.spawn(future);
             future::ok(shard)
         })
-        .map_err(|e| error!("Error starting shard: {:?}", e))
+        .map_err(|e| error!("Error starting shard: {:?}", e)))
 }
 
 pub enum MessageSinkError {

@@ -52,6 +52,7 @@
 mod error;
 mod shard;
 mod shard_manager;
+mod queue;
 
 pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
