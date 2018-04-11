@@ -1,9 +1,9 @@
 use internal::prelude::*;
 use serde::de::{
-    self, 
-    Deserialize, 
-    Deserializer, 
-    MapAccess, 
+    self,
+    Deserialize,
+    Deserializer,
+    MapAccess,
     Visitor
 };
 use serde::ser::Serializer;
@@ -236,22 +236,30 @@ pub struct AuditLogEntry {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Options {
     /// Number of days after which inactive members were kicked.
-    #[serde(with = "u64_handler")]
-    pub delete_member_days: u64,
+    #[serde(default)]
+    #[serde(with = "option_u64_handler")]
+    pub delete_member_days: Option<u64>,
     /// Number of members removed by the prune
-    #[serde(with = "u64_handler")]
-    pub members_removed: u64,
+    #[serde(default)]
+    #[serde(with = "option_u64_handler")]
+    pub members_removed: Option<u64>,
     /// Channel in which the messages were deleted
-    pub channel_id: ChannelId,
+    pub channel_id: Option<ChannelId>,
     /// Number of deleted messages.
-    #[serde(with = "u64_handler")]
-    pub count: u64,
+    #[serde(default)]
+    #[serde(with = "option_u64_handler")]
+    pub count: Option<u64>,
     /// Id of the overwritten entity
-    pub id: u64,
+    #[serde(default)]
+    #[serde(with = "option_u64_handler")]
+    pub id: Option<u64>,
     /// Type of overwritten entity ("member" or "role").
-    #[serde(rename = "type")] pub kind: String,
+    #[serde(default)]
+    #[serde(rename = "type")]
+    pub kind: Option<String>,
     /// Name of the role if type is "role"
-    pub role_name: String,
+    #[serde(default)]
+    pub role_name: Option<String>,
 }
 
 mod u64_handler {
@@ -282,6 +290,26 @@ mod u64_handler {
 
     pub fn serialize<S: Serializer>(num: &u64, s: S) -> StdResult<S::Ok, S::Error> {
         s.serialize_u64(*num)
+    }
+}
+
+mod option_u64_handler {
+    use super::*;
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(des: D) -> StdResult<Option<u64>, D::Error> {
+        let s: Option<String> = Option::deserialize(des)?;
+        if let Some(s) = s {
+            return Ok(s.parse().map(Some).map_err(|e| de::Error::custom(e))?);
+        }
+
+        Ok(None)
+    }
+
+    pub fn serialize<S: Serializer>(num: &Option<u64>, s: S) -> StdResult<S::Ok, S::Error> {
+        match num {
+            Some(n) => s.serialize_u64(*n),
+            None => s.serialize_none(),
+        }
     }
 }
 
