@@ -6,7 +6,10 @@ use serde::de::{
     MapAccess,
     Visitor
 };
-use serde::ser::Serializer;
+use serde::ser::{
+    Serialize,
+    Serializer
+};
 use super::super::prelude::*;
 use std::{
     collections::HashMap,
@@ -306,10 +309,7 @@ mod option_u64_handler {
     }
 
     pub fn serialize<S: Serializer>(num: &Option<u64>, s: S) -> StdResult<S::Ok, S::Error> {
-        match num {
-            Some(n) => s.serialize_u64(*n),
-            None => s.serialize_none(),
-        }
+        Option::serialize(num, s)
     }
 }
 
