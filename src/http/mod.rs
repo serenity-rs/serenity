@@ -1085,7 +1085,8 @@ pub fn get_audit_logs(guild_id: u64,
         get,
         "/guilds/{}/audit-logs{}",
         guild_id,
-        query_string);
+        query_string
+    );
 
     serde_json::from_reader::<HyperResponse, AuditLogs>(response)
         .map_err(From::from)
