@@ -216,9 +216,10 @@ pub struct AuditLogEntry {
     /// Determines what action was done on a [`target`]
     ///
     /// [`target`]: #structfield.target
-    #[serde(deserialize_with = "deserialize_action",
-            rename = "action_type",
-            serialize_with = "serialize_action")]
+    #[serde(
+        with = "action_handler",
+        rename = "action_type"
+    )]
     pub action: Action,
     /// What was the reasoning by doing an action on a target? If there was one.
     pub reason: Option<String>,
@@ -235,13 +236,16 @@ pub struct AuditLogEntry {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Options {
     /// Number of days after which inactive members were kicked.
-    pub delete_member_days: String,
+    #[serde(with = "u64_handler")]
+    pub delete_member_days: u64,
     /// Number of members removed by the prune
-    pub members_removed: String,
+    #[serde(with = "u64_handler")]
+    pub members_removed: u64,
     /// Channel in which the messages were deleted
     pub channel_id: ChannelId,
     /// Number of deleted messages.
-    pub count: u32,
+    #[serde(with = "u64_handler")]
+    pub count: u64,
     /// Id of the overwritten entity
     pub id: u64,
     /// Type of overwritten entity ("member" or "role").
@@ -281,45 +285,48 @@ mod u64_handler {
     }
 }
 
-fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> StdResult<Action, D::Error> {
-    struct ActionVisitor;
+mod action_handler {
+    use super::*;
 
-    impl<'de> Visitor<'de> for ActionVisitor {
-        type Value = Action;
+    pub fn deserialize<'de, D: Deserializer<'de>>(de: D) -> StdResult<Action, D::Error> {
+        struct ActionVisitor;
 
-        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-            formatter.write_str("an integer between 1 to 72")
+        impl<'de> Visitor<'de> for ActionVisitor {
+            type Value = Action;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("an integer between 1 to 72")
+            }
+
+            // NOTE: Serde internally delegates number types below `u64` to it.
+            fn visit_u64<E: de::Error>(self, value: u64) -> StdResult<Action, E> {
+                let value = value as u8;
+
+                Ok(match value {
+                    1 => Action::GuildUpdate,
+                    10...12 => Action::Channel(unsafe { transmute(value) }),
+                    13...15 => Action::ChannelOverwrite(unsafe { transmute(value) }),
+                    20...25 => Action::Member(unsafe { transmute(value) }),
+                    30...32 => Action::Role(unsafe { transmute(value) }),
+                    40...42 => Action::Invite(unsafe { transmute(value) }),
+                    50...52 => Action::Webhook(unsafe { transmute(value) }),
+                    60...62 => Action::Emoji(unsafe { transmute(value) }),
+                    72 => Action::MessageDelete,
+                    _ => return Err(E::custom(format!("Unexpected action number: {}", value))),
+                })
+            }
         }
 
-        // NOTE: Serde internally delegates number types below `u64` to it.
-        fn visit_u64<E: de::Error>(self, value: u64) -> StdResult<Action, E> {
-            let value = value as u8;
-
-            Ok(match value {
-                1 => Action::GuildUpdate,
-                10...12 => Action::Channel(unsafe { transmute(value) }),
-                13...15 => Action::ChannelOverwrite(unsafe { transmute(value) }),
-                20...25 => Action::Member(unsafe { transmute(value) }),
-                30...32 => Action::Role(unsafe { transmute(value) }),
-                40...42 => Action::Invite(unsafe { transmute(value) }),
-                50...52 => Action::Webhook(unsafe { transmute(value) }),
-                60...62 => Action::Emoji(unsafe { transmute(value) }),
-                72 => Action::MessageDelete,
-                _ => return Err(E::custom(format!("Unexpected action number: {}", value))),
-            })
-        }
+        de.deserialize_any(ActionVisitor)
     }
 
-    de.deserialize_any(ActionVisitor)
+    pub fn serialize<S: Serializer>(
+        action: &Action,
+        serializer: S,
+    ) -> StdResult<S::Ok, S::Error> {
+        serializer.serialize_u8(action.num())
+    }
 }
-
-fn serialize_action<S: Serializer>(
-    action: &Action,
-    serializer: S,
-) -> StdResult<S::Ok, S::Error> {
-    serializer.serialize_u8(action.num())
-}
-
 impl<'de> Deserialize<'de> for AuditLogs {
     fn deserialize<D: Deserializer<'de>>(de: D) -> StdResult<Self, D::Error> {
         #[derive(Deserialize)]
