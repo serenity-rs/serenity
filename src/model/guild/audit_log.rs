@@ -211,6 +211,7 @@ pub struct AuditLogEntry {
     /// Determines to what entity an [`action`] was used on.
     ///
     /// [`action`]: #structfield.action
+    #[serde(with = "u64_handler")]
     pub target_id: u64,
     /// Determines what action was done on a [`target`]
     ///
@@ -249,6 +250,37 @@ pub struct Options {
     pub role_name: String,
 }
 
+mod u64_handler {
+    use super::*;
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(des: D) -> StdResult<u64, D::Error> {
+        struct U64Visitor;
+
+        impl<'de> Visitor<'de> for U64Visitor {
+            type Value = u64;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("an integer or a string with a valid number inside")
+            }
+
+            // NOTE: Serde internally delegates number types below `u64` to it.
+            fn visit_u64<E: de::Error>(self, val: u64) -> StdResult<u64, E> {
+                Ok(val)
+            }
+
+            fn visit_str<E: de::Error>(self, string: &str) -> StdResult<u64, E> {
+                string.parse().map_err(|e| de::Error::custom(e))
+            }
+        }
+
+        des.deserialize_any(U64Visitor)
+    }
+
+    pub fn serialize<S: Serializer>(num: &u64, s: S) -> StdResult<S::Ok, S::Error> {
+        s.serialize_u64(*num)
+    }
+}
+
 fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> StdResult<Action, D::Error> {
     struct ActionVisitor;
 
@@ -259,7 +291,10 @@ fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> StdResult<Action, D::
             formatter.write_str("an integer between 1 to 72")
         }
 
-        fn visit_u8<E: de::Error>(self, value: u8) -> StdResult<Action, E> {
+        // NOTE: Serde internally delegates number types below `u64` to it.
+        fn visit_u64<E: de::Error>(self, value: u64) -> StdResult<Action, E> {
+            let value = value as u8;
+
             Ok(match value {
                 1 => Action::GuildUpdate,
                 10...12 => Action::Channel(unsafe { transmute(value) }),
@@ -275,7 +310,7 @@ fn deserialize_action<'de, D: Deserializer<'de>>(de: D) -> StdResult<Action, D::
         }
     }
 
-    de.deserialize_u8(ActionVisitor)
+    de.deserialize_any(ActionVisitor)
 }
 
 fn serialize_action<S: Serializer>(
