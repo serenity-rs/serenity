@@ -1,12 +1,15 @@
 use internal::prelude::*;
 use serde::de::{
-    self, 
-    Deserialize, 
-    Deserializer, 
-    MapAccess, 
+    self,
+    Deserialize,
+    Deserializer,
+    MapAccess,
     Visitor
 };
-use serde::ser::Serializer;
+use serde::ser::{
+    Serialize,
+    Serializer
+};
 use super::super::prelude::*;
 use std::{
     collections::HashMap,
@@ -236,22 +239,26 @@ pub struct AuditLogEntry {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Options {
     /// Number of days after which inactive members were kicked.
-    #[serde(with = "u64_handler")]
-    pub delete_member_days: u64,
+    #[serde(default, with = "option_u64_handler")]
+    pub delete_member_days: Option<u64>,
     /// Number of members removed by the prune
-    #[serde(with = "u64_handler")]
-    pub members_removed: u64,
+    #[serde(default, with = "option_u64_handler")]
+    pub members_removed: Option<u64>,
     /// Channel in which the messages were deleted
-    pub channel_id: ChannelId,
+    #[serde(default)]
+    pub channel_id: Option<ChannelId>,
     /// Number of deleted messages.
-    #[serde(with = "u64_handler")]
-    pub count: u64,
+    #[serde(default, with = "option_u64_handler")]
+    pub count: Option<u64>,
     /// Id of the overwritten entity
-    pub id: u64,
+    #[serde(default, with = "option_u64_handler")]
+    pub id: Option<u64>,
     /// Type of overwritten entity ("member" or "role").
-    #[serde(rename = "type")] pub kind: String,
+    #[serde(default, rename = "type")]
+    pub kind: Option<String>,
     /// Name of the role if type is "role"
-    pub role_name: String,
+    #[serde(default)]
+    pub role_name: Option<String>,
 }
 
 mod u64_handler {
@@ -282,6 +289,44 @@ mod u64_handler {
 
     pub fn serialize<S: Serializer>(num: &u64, s: S) -> StdResult<S::Ok, S::Error> {
         s.serialize_u64(*num)
+    }
+}
+
+mod option_u64_handler {
+    use super::*;
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(des: D) -> StdResult<Option<u64>, D::Error> {
+        struct OptionU64Visitor;
+
+        impl<'de> Visitor<'de> for OptionU64Visitor {
+            type Value = Option<u64>;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("an optional integer or a string with a valid number inside")
+            }
+
+            fn visit_some<D: Deserializer<'de>>(self, deserializer: D) -> StdResult<Self::Value, D::Error> {
+                deserializer.deserialize_any(OptionU64Visitor)
+            }
+
+            fn visit_none<E: de::Error>(self) -> StdResult<Self::Value, E> {
+                Ok(None)
+            }
+
+            fn visit_u64<E: de::Error>(self, val: u64) -> StdResult<Option<u64>, E> {
+                Ok(Some(val))
+            }
+
+            fn visit_str<E: de::Error>(self, string: &str) -> StdResult<Option<u64>, E> {
+                string.parse().map(Some).map_err(|e| de::Error::custom(e))
+            }
+        }
+
+        des.deserialize_option(OptionU64Visitor)
+    }
+
+    pub fn serialize<S: Serializer>(num: &Option<u64>, s: S) -> StdResult<S::Ok, S::Error> {
+        Option::serialize(num, s)
     }
 }
 
