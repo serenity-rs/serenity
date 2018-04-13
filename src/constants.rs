@@ -45,6 +45,8 @@ pub static JOIN_MESSAGES: &'static [&'static str] = &[
     "$user just showed up. Hold my beer.",
 ];
 
+pub static SILENT_FRAME: [u8; 3] = [0xf8,0xff,0xfe];
+
 /// Enum to map gateway opcodes.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum OpCode {
