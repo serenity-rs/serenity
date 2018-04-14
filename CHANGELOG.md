@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.5.2] - 2018-04-14
+
+This release contains the usual bugfixes and helper methods.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@FelixMcFelix]
+- [@ForsakenHarmony]
+- [@jkcclemens]
+- [@Lakelezz]
+- [@megumisonoda]
+- [@Roughsketch]
+- [@Scetch]
+- [@xentec]
+- [@zeyla]
+
+### Added
+
+- [builder] Generalize `CreateEmbed` method parameters ([@acdenisSK])
+  [c:f115c17]
+- [http] Add 'Get Guild Vanity Url' endpoint ([@zeyla]) [c:dbfc06e]
+- [framework] Add `unrecognized_command` method ([@Lakelezz]) [c:2937792]
+- [client] Add documentation to `EventHandler` ([@acdenisSK]) [c:80dfcb0]
+- [http] Support sending files with an embed ([@Scetch]) [c:7e0d908]
+
+### Fixed
+
+- [voice] Add `Drop` impl for ffmpeg container ([@FelixMcFelix]) [c:3d67a4e]
+- [model] Pad user discrims in `content_safe` ([@megumisonoda]) [c:2ab714f]
+- [framework] Properly check if `Args` input is empty ([@acdenisSK])
+  [c:beebff5]
+- [voice] Backport [c:7d162b9] (voice fixes) ([@FelixMcFelix]) [c:9baf167]
+- [framework] Fix no-cache StandardFramework compilations ([@Lakelezz])
+  [c:02dc506]
+- [builder] Make `CreateEmbed` and `CreateMessage` consistent ([@acdenisSK])
+  [c:77c399b]
+- [framework] Fix `help` command precedence ([@acdenisSK]) [c:c6a5fe4]
+- [gateway] Fix heartbeat checking ([@zeyla]) [c:21fe999]
+- [framework] Fix `Args::is_empty` behaviour ([@acdenisSK]) [c:e5bcee7]
+- [framework] Add `Args::full_quotes` ([@acdenisSK]) [c:24d2233]
+- [http] Do not include Optional params if None for audit logs ([@jkcclemens])
+  [c:bd195de]
+- [model] Handle deserializing `AuditLogEntry::target_id` ([@acdenisSK])
+  [c:0d779ba]
+- [model] Fix `AuditLogOptions` to be correct types ([@acdenisSK], [@jkcclemens]) [c:217e1c6], [c:2791ed7]
+
+### Misc.
+
+- [builder] DRY in `CreateEmbed` builder methods
+  ([@xentec], [@acdenisSK], [@zeyla]) [c:2e1eb4c] [c:d8c9d89], [c:a4cc582],
+  [c:ffc5ea1]
+- [builder] Inline some CreateEmbed builder methods ([@acdenisSK]) [c:e814e9a]
+- [framework] Add tests for empty messages ([@Lakelezz]) [c:d0ae9bb]
+- [general] Remove useless clones ([@Roughsketch]) [c:b71d99f]
+- [framework] Add `no_run` to doctests that instantiate a Client
+  ([@Roughsketch]) [c:003dc2e]
+- [general] Don't create enums and IDs via macros ([@ForsakenHarmony])
+  [c:fdcf44e]
+- [framework] Short-circuit on errors ([@acdenisSK]) [c:82e21a6]
+- [model, utils] Fix nsfw related docs ([@Lakelezz]) [c:7f09642]
+- [framework] Improve docs for `Args` ([@acdenisSK]) [c:b9fa745]
+- [general] Fix some documentatoin typos ([@Lakelezz]) [c:e506e9f]
+
 ## [0.5.1] - 2018-01-31
 
 This release contains a number of fixes, a few more model helper methods, and
@@ -1932,6 +1996,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.5.2]: https://github.com/zeyla/serenity/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/zeyla/serenity/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/zeyla/serenity/compare/v0.4.7...v0.5.0
 [0.4.5]: https://github.com/zeyla/serenity/compare/v0.4.4...v0.4.5
@@ -1971,6 +2036,7 @@ Initial commit.
 [@fenhl]: https://github.com/fenhl
 [@FelixMcFelix]: https://github.com/FelixMcFelix
 [@Flat]: https://github.com/Flat
+[@ForsakenHarmony]: https://github.com/ForsakenHarmony
 [@foxbot]: https://github.com/foxbot
 [@ftriquet]: https://github.com/ftriquet
 [@fwrs]: https://github.com/fwrs
@@ -1985,10 +2051,12 @@ Initial commit.
 [@Lakelezz]: https://github.com/Lakelezz
 [@lolzballs]: https://github.com/lolzballs
 [@khazhyk]: https://github.com/khazhyk
+[@megumisonoda]: https://github.com/megumisonoda
 [@MOZGIII]: https://github.com/MOZGIII
 [@nabijaczleweli]: https://github.com/nabijaczleweli
 [@perryprog]: https://github.com/perryprog
 [@Roughsketch]: https://github.com/Roughsketch
+[@Scetch]: https://github.com/Scetch
 [@sschroe]: https://github.com/sschroe
 [@SunDwarf]: https://github.com/SunDwarf
 [@tahahawa]: https://github.com/tahahawa
@@ -1998,6 +2066,41 @@ Initial commit.
 [@ConcurrentMarxistGC]: https://github.com/ConcurrentMarxistGC
 [@xentec]: https://github.com/xentec
 [@zeyla]: https://github.com/zeyla
+
+[c:003dc2e]: https://github.com/zeyla/serenity/commit/003dc2eed0f09cd214373f1581b7794d1483a689
+[c:02dc506]: https://github.com/zeyla/serenity/commit/02dc5064d9402f73ef514c9b8ffa318f5d4235ff
+[c:0d779ba]: https://github.com/zeyla/serenity/commit/0d779ba85ad43eb7e95be3844ad3fcd74335b47c
+[c:21fe999]: https://github.com/zeyla/serenity/commit/21fe999d23cb0e4e76812537b48edadeab5a1540
+[c:217e1c6]: https://github.com/zeyla/serenity/commit/217e1c6ebd9577fa5a538b4ecd3c1303ee034462
+[c:24d2233]: https://github.com/zeyla/serenity/commit/24d2233ba583221b35eca02cf321e7a4a1adf76d
+[c:2791ed7]: https://github.com/zeyla/serenity/commit/2791ed78df18f2721264352611b1ba26b3077196
+[c:2937792]: https://github.com/zeyla/serenity/commit/29377922d3d79848efcb8d3bd0fbd52c21e81c5d
+[c:2ab714f]: https://github.com/zeyla/serenity/commit/2ab714f9c3683db83eba1f6fe7bb3887a47d4f3f
+[c:2e1eb4c]: https://github.com/zeyla/serenity/commit/2e1eb4c35b488ac68a33e76502d0c8f56a72c4b6
+[c:3d67a4e]: https://github.com/zeyla/serenity/commit/3d67a4e2cd33b17747c7499e07d0a0e05fe73253
+[c:5166a0a]: https://github.com/zeyla/serenity/commit/5166a0a81bac494b0e337d00f946a85d65e4bbbd
+[c:77c399b]: https://github.com/zeyla/serenity/commit/77c399ba7b3bff0cf3180df5edad5d6ff6dcb10d
+[c:7d162b9]: https://github.com/zeyla/serenity/commit/7d162b96686a56eed052984c18f22f54ad76f780
+[c:7e0d908]: https://github.com/zeyla/serenity/commit/7e0d9082fe0262c7b4c4668ca1e1208dffa4796f
+[c:7f09642]: https://github.com/zeyla/serenity/commit/7f09642fa66517fc983f63bb2e414638382a6512
+[c:80dfcb0]: https://github.com/zeyla/serenity/commit/80dfcb0539c88e9434dc4875d5af55df1aafa725
+[c:82e21a6]: https://github.com/zeyla/serenity/commit/82e21a61ae17d8466834f486108d1ace2791efc4
+[c:9baf167]: https://github.com/zeyla/serenity/commit/9baf1675b0d1837fe010cfbadac8e80fd9d53898
+[c:a4cc582]: https://github.com/zeyla/serenity/commit/a4cc5821c0ca194d321141985cfaf30241f54acf
+[c:b71d99f]: https://github.com/zeyla/serenity/commit/b71d99fde84135fa66f73c4817d340ffbe8bddae
+[c:b9fa745]: https://github.com/zeyla/serenity/commit/b9fa7457c2011130b28f5eca063f88bdf72be544
+[c:bd195de]: https://github.com/zeyla/serenity/commit/bd195dea4422f516b727868209116ff868e3941b
+[c:beebff5]: https://github.com/zeyla/serenity/commit/beebff50eb4f447f41162299fde81cb6fa9b336d
+[c:c6a5fe4]: https://github.com/zeyla/serenity/commit/c6a5fe4ef9dc07b9b14f742440a35ba6ea02058b
+[c:d0ae9bb]: https://github.com/zeyla/serenity/commit/d0ae9bba89d5e66129da7bed7faf39abfd4fb17d
+[c:d8c9d89]: https://github.com/zeyla/serenity/commit/d8c9d89c80ffb0ae95b91c4dcc593fd70fa976d8
+[c:dbfc06e]: https://github.com/zeyla/serenity/commit/dbfc06e9c6df506839fb178eaeb9db704aefd357
+[c:e506e9f]: https://github.com/zeyla/serenity/commit/e506e9f30584d0fd67bf28a33b1033c4f1e5cd8b
+[c:e5bcee7]: https://github.com/zeyla/serenity/commit/e5bcee7b2c2d2ff873982c6a3bf39ab16ec4e1e3
+[c:e814e9a]: https://github.com/zeyla/serenity/commit/e814e9aa9b6117defa4f885ef0027e61706112d5
+[c:f115c17]: https://github.com/zeyla/serenity/commit/f115c177def1a35fc532c896713a187bb468088e
+[c:fdcf44e]: https://github.com/zeyla/serenity/commit/fdcf44e1463e708cd8b612c183e302db9af0febd
+[c:ffc5ea1]: https://github.com/zeyla/serenity/commit/ffc5ea1da38cb7d9c302fa8d5614253c1f361311
 
 [c:03a7e3e]: https://github.com/zeyla/serenity/commit/03a7e3e1d82ca667ca065367d2cf21b847f984ac
 [c:13b0de1]: https://github.com/zeyla/serenity/commit/13b0de121eda30e59849fd442c8a0926a63df2b8
