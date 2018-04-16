@@ -4,7 +4,10 @@ use std::collections::{VecDeque, HashMap};
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::time::Duration;
-use gateway::shard::Shard;
+use gateway::{
+    shard::Shard,
+    queue::ReconnectQueue,
+};
 use model::event::{Event, GatewayEvent};
 use tokio_core::reactor::Handle;
 use tokio_timer::Timer;
@@ -46,10 +49,11 @@ impl Default for ShardingStrategy {
 }
 
 #[derive(Clone, Debug, Default)]
-pub struct ShardManagerOptions {
+pub struct ShardManagerOptions<T: ReconnectQueue> {
     pub strategy: ShardingStrategy,
     pub token: Rc<String>,
     pub ws_uri: Rc<String>,
+    pub queue: T,
 }
 
 pub type WrappedShard = Rc<RefCell<Shard>>;
@@ -57,8 +61,9 @@ pub type Message = (WrappedShard, TungsteniteMessage);
 pub type MessageStream = UnboundedReceiver<Message>;
 type ShardsMap = Rc<RefCell<HashMap<u64, WrappedShard>>>;
 
-pub struct ShardManager {
+pub struct ShardManager<T: ReconnectQueue> {
     pub queue: VecDeque<u64>,
+    reconnect_queue: T,
     shards: ShardsMap,
     pub strategy: ShardingStrategy,
     pub token: Rc<String>,
@@ -71,12 +76,13 @@ pub struct ShardManager {
     non_exhaustive: (),
 }
 
-impl ShardManager {
-    pub fn new(options: ShardManagerOptions, handle: Handle) -> Self {
+impl<T: ReconnectQueue> ShardManager<T> {
+    pub fn new(options: ShardManagerOptions<T>, handle: Handle) -> Self {
         let (queue_sender, queue_receiver) = channel(0);
 
         Self {
             queue: VecDeque::new(),
+            reconnect_queue: options.queue,
             shards: Rc::new(RefCell::new(HashMap::new())),
             strategy: options.strategy,
             token: options.token,
@@ -104,23 +110,40 @@ impl ShardManager {
 
         for shard_id in shards_index..shards_count {
             trace!("pushing shard id {} to back of queue", &shard_id);
-            self.queue.push_back(shard_id);
-        } 
-         
-        let future = process_queue(
-            self.queue_receiver.take().unwrap(),
-            self.token.clone(),
-            shards_total,
-            self.handle.clone(),
-            sender.clone(),
-            self.shards.clone(),
-        );
 
-        let first_shard_id = self.queue.pop_front()
-            .expect("shard start queue is empty");
+            let future = self.reconnect_queue.push_back(shard_id)
+                .map_err(|_| error!("Error pushing shard to reconnect queue"));
 
-        self.queue_sender.try_send(first_shard_id)
-            .expect("could not send first shard to start");
+            self.handle.spawn(future);
+        }
+        
+        let mut queue_sender = self.queue_sender.clone();
+        let queue_receiver = self.queue_receiver.take().unwrap();
+        let token = self.token.clone();
+        let handle = self.handle.clone();
+        let sender_1 = sender.clone();
+        let shards = self.shards.clone();
+
+        let future = self.reconnect_queue.pop_front()
+            .and_then(move |shard_id| {
+                let shard_id = shard_id.expect("shard start queue is empty");
+
+                queue_sender.try_send(shard_id)
+                    .expect("could not send first shard to start");
+                
+                future::ok(())
+            })
+            .map_err(|_| error!("error popping front of reconnect queue"))
+            .and_then(move |_| {
+                process_queue(
+                    queue_receiver,
+                    token,
+                    shards_total,
+                    handle,
+                    sender_1,
+                    shards,
+                )
+            });
 
         self.handle.spawn(future);
 
@@ -132,8 +155,8 @@ impl ShardManager {
     }
 
     pub fn process(&mut self, event: &GatewayEvent) {
-        if let GatewayEvent::Dispatch(_, Event::Ready(event)) = event {
-            let shard_id = match &event.ready.shard {
+        if let &GatewayEvent::Dispatch(_, Event::Ready(ref event)) = event {
+            let shard_id = match event.ready.shard {
                 Some(shard) => shard[0],
                 None => {
                     error!("ready event has no shard id");
@@ -143,11 +166,20 @@ impl ShardManager {
 
             println!("shard id {} has started", &shard_id);
 
-            if let Some(next_shard_id) = self.queue.pop_front() {
-                if let Err(e) = self.queue_sender.try_send(next_shard_id) {
-                    error!("could not send shard id to queue mpsc receiver: {:?}", e);
-                }
-            }
+            let mut queue_sender = self.queue_sender.clone();
+            let future = self.reconnect_queue.pop_front()
+                .and_then(move |shard_id| {
+                    if let Some(next_shard_id) = shard_id {
+                        if let Err(e) = queue_sender.try_send(next_shard_id) {
+                            error!("could not send shard id to queue mpsc receiver: {:?}", e);
+                        }
+                    }
+
+                    future::ok(())
+                })
+                .map_err(|_| error!("error popping front of reconnect queue"));
+
+            self.handle.spawn(future);
         }
     }
 }

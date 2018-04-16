@@ -3,10 +3,22 @@ extern crate serenity;
 extern crate tokio_core;
 extern crate env_logger;
 
-use serenity::gateway::{ShardingStrategy, ShardManager, ShardManagerOptions};
-use serenity::model::event::{Event, GatewayEvent};
-use std::env;
-use std::rc::Rc;
+use serenity::{
+    gateway::{
+        ShardingStrategy,
+        ShardManager,
+        ShardManagerOptions,
+        SimpleReconnectQueue,
+    },
+    model::event::{
+        Event,
+        GatewayEvent,
+    },
+};
+use std::{
+    env, 
+    rc::Rc,
+};
 use tokio_core::reactor::{Core, Handle};
 use futures::{future, Future, Stream};
 
@@ -19,7 +31,7 @@ fn main() {
     core.run(future).expect("Error running event loop");
 }
 
-fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
+fn try_main(handle: Handle) -> Box<Future<Item = (), Error = ()>> {
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
 
@@ -27,6 +39,7 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
         strategy: ShardingStrategy::multi(4),
         token: Rc::new(token),
         ws_uri: Rc::new(String::from("nothing")),
+        queue: SimpleReconnectQueue::new(4),
     }; 
 
     let mut shard_manager = ShardManager::new(opts, handle.clone());
@@ -61,5 +74,5 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
         future::ok(())
     });
 
-    future
+    Box::new(future)
 }

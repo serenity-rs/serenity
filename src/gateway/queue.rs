@@ -1,48 +1,27 @@
-use futures::{
-    future, 
-    Future, 
-    Stream,
-};
-use futures::sync::mpsc::{
-        channel, 
-        Sender as MpscSender, 
-        Receiver as MpscReceiver, 
-        SendError,
-        TrySendError,
-};
+use futures::{future, Future};
+use std::collections::VecDeque;
 
 pub trait ReconnectQueue {
-    type Error;
+    type Error: 'static;
 
     fn push_back(&mut self, shard_id: u64) -> Box<Future<Item = (), Error = Self::Error>>;
 
-    fn stream(&mut self) -> Box<Future<Item = u64, Error = ()>>;
+    fn pop_front(&mut self) -> Box<Future<Item = Option<u64>, Error = Self::Error>>;
 }
 
-use std::collections::VecDeque;
-
-type Sender = MpscSender<u64>;
-type Receiver = MpscSender<u64>;
-
-struct ShardReconnectQueue {
+pub struct SimpleReconnectQueue {
     queue: VecDeque<u64>,
-    pub sender: Sender,
-    receiver: Option<Receiver>,
 }
 
-impl ShardReconnectQueue {
-    pub fn new() -> Self {
-        let (sender, receiver) = channel(0);
-
+impl SimpleReconnectQueue {
+    pub fn new(shard_total: usize) -> Self {
         Self {
-            sender,
-            recever: Some(receiver),
-            .. Default::default()
+            queue: VecDeque::with_capacity(shard_total),
         }
     }
 }
 
-impl ReconnectQueue for ShardReconnectQueue {
+impl ReconnectQueue for SimpleReconnectQueue {
     type Error = ();
 
     fn push_back(&mut self, shard_id: u64) -> Box<Future<Item = (), Error = Self::Error>> {
@@ -50,7 +29,7 @@ impl ReconnectQueue for ShardReconnectQueue {
         Box::new(future::ok(()))
     } 
 
-    fn stream(&mut self) -> Box<Future<Item = u64, Error = ()>> {
-        Box::new(self.receiver.take().unwrap())
+    fn pop_front(&mut self) -> Box<Future<Item = Option<u64>, Error = Self::Error>> {
+        Box::new(future::ok(self.queue.pop_front()))
     }
 }
