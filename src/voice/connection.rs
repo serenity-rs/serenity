@@ -5,7 +5,7 @@ use byteorder::{
     ReadBytesExt, 
     WriteBytesExt
 };
-use constants::{VOICE_GATEWAY_VERSION, SILENT_FRAME};
+use constants::VOICE_GATEWAY_VERSION;
 use internal::prelude::*;
 use internal::{
     ws_impl::{ReceiverExt, SenderExt},
@@ -45,7 +45,7 @@ use std::{
     },
     time::Duration
 };
-use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, LockedAudio};
+use super::audio::{AudioReceiver, AudioType, LockedAudio, HEADER_LEN, SAMPLE_RATE, SILENT_FRAME};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
 use websocket::{
