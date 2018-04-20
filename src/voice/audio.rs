@@ -6,6 +6,7 @@ use std::{
 
 pub const HEADER_LEN: usize = 12;
 pub const SAMPLE_RATE: u32 = 48_000;
+pub static SILENT_FRAME: [u8; 3] = [0xf8, 0xff, 0xfe];
 
 /// A readable audio source.
 pub trait AudioSource: Send {

@@ -45,7 +45,7 @@ use std::{
     },
     time::Duration
 };
-use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, LockedAudio};
+use super::audio::{AudioReceiver, AudioType, LockedAudio, HEADER_LEN, SAMPLE_RATE, SILENT_FRAME};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
 use websocket::{
@@ -200,7 +200,8 @@ impl Connection {
             keepalive_timer: Timer::new(temp_heartbeat),
             udp,
             sequence: 0,
-            silence_frames: 0,
+            // We need to send some frames to receive any audio.
+            silence_frames: 100,
             soft_clip,
             speaking: false,
             ssrc: hello.ssrc,
@@ -392,7 +393,7 @@ impl Connection {
                 self.silence_frames -= 1;
 
                 // Explicit "Silence" frame.
-                opus_frame.extend_from_slice(&[0xf8, 0xff, 0xfe]);
+                opus_frame.extend_from_slice(&SILENT_FRAME);
             } else {
                 // Per official guidelines, send 5x silence BEFORE we stop speaking.
                 self.set_speaking(false)?;
