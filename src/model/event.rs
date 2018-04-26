@@ -615,8 +615,17 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
             }
         }
 
-        let members: HashMap<UserId, Member> =
-            Deserialize::deserialize(members).map_err(DeError::custom)?;
+        let members = serde_json::from_value::<Vec<Member>>(members)
+            .map(|members| members
+                .into_iter()
+                .fold(HashMap::new(), |mut acc, member| {
+                    let id = member.user.read().id;
+
+                    acc.insert(id, member);
+
+                    acc
+                }))
+            .map_err(DeError::custom)?;
 
         Ok(GuildMembersChunkEvent {
             guild_id,
