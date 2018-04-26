@@ -35,7 +35,7 @@ impl Read for ChildContainer {
 
 impl Drop for ChildContainer {
     fn drop (&mut self) {
-        if let Err(e) = self.0.wait() {
+        if let Err(e) = self.0.kill() {
             debug!("[Voice] Error awaiting child process: {:?}", e);
         }
     }
