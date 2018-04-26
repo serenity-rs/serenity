@@ -6,9 +6,9 @@ use parking_lot::Mutex;
 use serde::Deserialize;
 use std::sync::{
     mpsc::{
-        self, 
-        Receiver, 
-        Sender, 
+        self,
+        Receiver,
+        Sender,
         TryRecvError
     },
     Arc

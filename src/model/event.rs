@@ -3,7 +3,7 @@
 use chrono::{DateTime, FixedOffset};
 use serde::de::Error as DeError;
 use serde::ser::{
-    Serialize, 
+    Serialize,
     SerializeSeq,
     Serializer
 };
