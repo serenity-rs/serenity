@@ -96,8 +96,8 @@ impl Context {
 
                 map.insert("username", Value::String(cache.user.name.clone()));
 
-                if let Some(email) = cache.user.email.as_ref() {
-                    map.insert("email", Value::String(email.clone()));
+                if let Some(email) = cache.user.email.clone() {
+                    map.insert("email", Value::String(email));
                 }
             } else {
                 let user = http::get_current_user()?;
