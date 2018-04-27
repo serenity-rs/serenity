@@ -40,7 +40,7 @@
 //! [Taken from]: https://discordapp.com/developers/docs/topics/rate-limits#rate-limits
 #![allow(zero_ptr)]
 
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use hyper::client::{RequestBuilder, Response};
 use hyper::header::Headers;
 use hyper::status::StatusCode;
@@ -55,6 +55,22 @@ use std::{
     i64
 };
 use super::{HttpError, LightMethod};
+
+/// The calculated offset of the time difference between Discord and the client
+/// in seconds.
+///
+/// This does not have millisecond precision as calculating that isn't
+/// realistic.
+///
+/// This is used in ratelimiting to help determine how long to wait for
+/// pre-emptive ratelimits. For example, if the client is 2 seconds ahead, then
+/// the client would think the ratelimit is over 2 seconds before it actually is
+/// and would then send off queued requests. Using an offset, we can know that
+/// there's actually still 2 seconds left (+/- some milliseconds).
+///
+/// This isn't a definitive solution to fix all problems, but it can help with
+/// some precision gains.
+static mut OFFSET: Option<i64> = None;
 
 lazy_static! {
     /// The global mutex is a mutex unlocked and then immediately re-locked
@@ -387,6 +403,17 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
 
         let response = super::retry(&f)?;
 
+        // Check if an offset has been calculated yet to determine the time
+        // difference from Discord can the client.
+        //
+        // Refer to the documentation for `OFFSET` for more information.
+        //
+        // This should probably only be a one-time check, although we may want
+        // to choose to check this often in the future.
+        if unsafe { OFFSET }.is_none() {
+            calculate_offset(response.headers.get_raw("date"));
+        }
+
         // Check if the request got ratelimited by checking for status 429,
         // and if so, sleep for the value of the header 'retry-after' -
         // which is in milliseconds - and then `continue` to try again
@@ -458,7 +485,9 @@ impl RateLimit {
             return;
         }
 
-        let current_time = Utc::now().timestamp();
+        let offset = unsafe { OFFSET }.unwrap_or(0);
+        let now = Utc::now().timestamp();
+        let current_time = now - offset;
 
         // The reset was in the past, so we're probably good.
         if current_time > self.reset {
@@ -508,6 +537,36 @@ impl RateLimit {
         } else {
             false
         })
+    }
+}
+
+fn calculate_offset(header: Option<&[Vec<u8>]>) {
+    // Get the current time as soon as possible.
+    let now = Utc::now().timestamp();
+
+    // First get the `Date` header's value and parse it as UTF8.
+    let header = header
+        .and_then(|h| h.get(0))
+        .and_then(|x| str::from_utf8(x).ok());
+
+    if let Some(date) = header {
+        // Replace the `GMT` timezone with an offset, and then parse it
+        // into a chrono DateTime. If it parses correctly, calculate the
+        // diff and then set it as the offset.
+        let s = date.replace("GMT", "+0000");
+        let parsed = DateTime::parse_from_str(&s, "%a, %d %b %Y %T %z");
+
+        if let Ok(parsed) = parsed {
+            let offset = parsed.timestamp();
+
+            let diff = offset - now;
+
+            unsafe {
+                OFFSET = Some(diff);
+
+                debug!("[ratelimiting] Set the ratelimit offset to {}", diff);
+            }
+        }
     }
 }
 
