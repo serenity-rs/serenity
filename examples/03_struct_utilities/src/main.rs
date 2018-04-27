@@ -20,7 +20,13 @@ impl EventHandler for Handler {
             // In this case, you can direct message a User directly by simply
             // calling a method on its instance, with the content of the
             // message.
-            if let Err(why) = msg.author.dm(|m| m.content("Hello!")) {
+            let dm = msg.author.dm(|mut m| {
+                m.content("Hello!");
+
+                m
+            });
+
+            if let Err(why) = dm {
                 println!("Error when direct messaging user: {:?}", why);
             }
         }

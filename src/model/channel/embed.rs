@@ -84,10 +84,13 @@ impl Embed {
     /// ```rust,no_run
     /// use serenity::model::channel::Embed;
     ///
-    /// let embed = Embed::fake(|e| e
-    ///     .title("Embed title")
-    ///     .description("Making a basic embed")
-    ///     .field("A field", "Has some content.", false));
+    /// let embed = Embed::fake(|mut e| {
+    ///     e.title("Embed title");
+    ///     e.description("Making a basic embed");
+    ///     e.field("A field", "Has some content.", false);
+    ///
+    ///     e
+    /// });
     /// ```
     #[inline]
     pub fn fake<F>(f: F) -> Value

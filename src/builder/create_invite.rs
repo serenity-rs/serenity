@@ -35,7 +35,14 @@ use utils::VecMap;
 ///             if let Channel::Guild(channel) = channel {
 ///                 let channel = channel.read();
 ///
-///             let invite = match channel.create_invite(|i| i.max_age(3600).max_uses(10)) {
+///             let creation = reader.create_invite(|mut i| {
+///                 i.max_age(3600);
+///                 i.max_uses(10);
+///
+///                 i
+///             });
+///
+///             let invite = match creation {
 ///                 Ok(invite) => invite,
 ///                 Err(why) => {
 ///                     println!("Err creating invite: {:?}", why);
@@ -92,6 +99,11 @@ impl CreateInvite {
     /// let invite = guild_channel.create_invite(|i| i.max_age(3600))?;
     /// #     }
     /// #
+    /// let invite = channel.create_invite(|mut i| {
+    ///     i.max_age(3600);
+    ///
+    ///     i
+    /// })?;
     /// #     Ok(())
     /// # }
     /// #
@@ -99,10 +111,8 @@ impl CreateInvite {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn max_age(mut self, max_age: u64) -> Self {
+    pub fn max_age(&mut self, max_age: u64) {
         self.0.insert("max_age", Value::Number(Number::from(max_age)));
-
-        self
     }
 
     /// The number of uses that the invite will be valid for.
@@ -123,10 +133,11 @@ impl CreateInvite {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let channel = ChannelId(81384788765712384).to_channel().unwrap();
     /// #
-    /// #       if let Channel::Guild(channel) = channel {
-    /// #           let channel = channel.read();
-    /// let invite = channel.create_invite(|i| i.max_uses(5))?;
-    /// #       }
+    /// let invite = channel.create_invite(|mut i| {
+    ///     i.max_uses(5);
+    ///
+    ///     i
+    /// })?;
     /// #     Ok(())
     /// # }
     /// #
@@ -134,10 +145,8 @@ impl CreateInvite {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn max_uses(mut self, max_uses: u64) -> Self {
+    pub fn max_uses(&mut self, max_uses: u64) {
         self.0.insert("max_uses", Value::Number(Number::from(max_uses)));
-
-        self
     }
 
     /// Whether an invite grants a temporary membership.
@@ -159,9 +168,11 @@ impl CreateInvite {
     /// #     if let Channel::Guild(channel) = channel {
     /// #         let channel = channel.read();
     /// #
-    /// let invite = channel.create_invite(|i| i.temporary(true))?;
-    /// #     }
-    /// #
+    /// let invite = channel.create_invite(|mut i| {
+    ///     i.temporary(true);
+    ///
+    ///     i
+    /// })?;
     /// #     Ok(())
     /// # }
     /// #
@@ -169,10 +180,8 @@ impl CreateInvite {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn temporary(mut self, temporary: bool) -> Self {
+    pub fn temporary(&mut self, temporary: bool) {
         self.0.insert("temporary", Value::Bool(temporary));
-
-        self
     }
 
     /// Whether or not to try to reuse a similar invite.
@@ -191,10 +200,11 @@ impl CreateInvite {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let channel = ChannelId(81384788765712384).to_channel().unwrap();
     /// #
-    /// # if let Channel::Guild(channel) = channel {
-    /// #    let channel = channel.read();
-    /// let invite = channel.create_invite(|i| i.unique(true))?;
-    /// # }
+    /// let invite = channel.create_invite(|mut i| {
+    ///     i.unique(true);
+    ///
+    ///     i
+    /// })?;
     /// #     Ok(())
     /// # }
     /// #
@@ -202,10 +212,8 @@ impl CreateInvite {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn unique(mut self, unique: bool) -> Self {
+    pub fn unique(&mut self, unique: bool) {
         self.0.insert("unique", Value::Bool(unique));
-
-        self
     }
 }
 
