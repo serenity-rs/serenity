@@ -25,7 +25,7 @@ use utils::{self, VecMap};
 /// [`Shard`] which received the event, or the low-level [`http`] module.
 ///
 /// The context contains "shortcuts", like for interacting with the shard.
-/// Methods like [`set_game`] will unlock the shard and perform an update for
+/// Methods like [`set_activity`] will unlock the shard and perform an update for
 /// you to save a bit of work.
 ///
 /// A context will only live for the event it was dispatched for. After the
@@ -33,7 +33,7 @@ use utils::{self, VecMap};
 ///
 /// [`Shard`]: ../gateway/struct.Shard.html
 /// [`http`]: ../http/index.html
-/// [`set_game`]: #method.set_game
+/// [`set_activity`]: #method.set_activity
 #[derive(Clone)]
 pub struct Context {
     /// A clone of [`Client::data`]. Refer to its documentation for more
@@ -121,7 +121,7 @@ impl Context {
 
 
     /// Sets the current user as being [`Online`]. This maintains the current
-    /// game.
+    /// activity.
     ///
     /// # Examples
     ///
@@ -153,7 +153,7 @@ impl Context {
     }
 
     /// Sets the current user as being [`Idle`]. This maintains the current
-    /// game.
+    /// activity.
     ///
     /// # Examples
     ///
@@ -184,7 +184,7 @@ impl Context {
     }
 
     /// Sets the current user as being [`DoNotDisturb`]. This maintains the
-    /// current game.
+    /// current activity.
     ///
     /// # Examples
     ///
@@ -215,7 +215,7 @@ impl Context {
     }
 
     /// Sets the current user as being [`Invisible`]. This maintains the current
-    /// game.
+    /// activity.
     ///
     /// # Examples
     ///
@@ -246,8 +246,8 @@ impl Context {
         self.shard.set_status(OnlineStatus::Invisible);
     }
 
-    /// "Resets" the current user's presence, by setting the game to `None` and
-    /// the online status to [`Online`].
+    /// "Resets" the current user's presence, by setting the activity to `None`
+    /// and the online status to [`Online`].
     ///
     /// Use [`set_presence`] for fine-grained control over individual details.
     ///
@@ -280,7 +280,7 @@ impl Context {
         self.shard.set_presence(None, OnlineStatus::Online);
     }
 
-    /// Sets the current game, defaulting to an online status of [`Online`].
+    /// Sets the current activity, defaulting to an online status of [`Online`].
     ///
     /// # Examples
     ///
@@ -293,7 +293,7 @@ impl Context {
     /// # use serenity::prelude::*;
     /// # use serenity::model::channel::Message;
     /// #
-    /// use serenity::model::gateway::Game;
+    /// use serenity::model::gateway::Activity;
     ///
     /// struct Handler;
     ///
@@ -305,7 +305,7 @@ impl Context {
     ///             return;
     ///         }
     ///
-    ///         ctx.set_game(Game::playing(*unsafe { args.get_unchecked(1) }));
+    ///         ctx.set_activity(Activity::playing(*unsafe { args.get_unchecked(1) }));
     ///     }
     /// }
     ///
@@ -320,22 +320,22 @@ impl Context {
     ///
     /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
     #[inline]
-    pub fn set_game(&self, game: Game) {
-        self.shard.set_presence(Some(game), OnlineStatus::Online);
+    pub fn set_activity(&self, activity: Activity) {
+        self.shard.set_presence(Some(activity), OnlineStatus::Online);
     }
 
-    /// Sets the current game, passing in only its name. This will automatically
-    /// set the current user's [`OnlineStatus`] to [`Online`], and its
-    /// [`GameType`] as [`Playing`].
+    /// Sets the current activity, passing in only its name. This will
+    /// automatically set the current user's [`OnlineStatus`] to [`Online`], and
+    /// its [`ActivityType`] as [`Playing`].
     ///
-    /// Use [`reset_presence`] to clear the current game, or [`set_presence`]
-    /// for more fine-grained control.
+    /// Use [`reset_presence`] to clear the current activity, or
+    /// [`set_presence`] for more fine-grained control.
     ///
     /// **Note**: Maximum length is 128.
     ///
     /// # Examples
     ///
-    /// When an [`Event::Ready`] is received, set the game name to `"test"`:
+    /// When an [`Event::Ready`] is received, set the activity name to `"test"`:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -354,27 +354,23 @@ impl Context {
     /// ```
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
-    /// [`GameType`]: ../model/gateway/enum.GameType.html
+    /// [`ActivityType`]: ../model/gateway/enum.ActivityType.html
     /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
     /// [`OnlineStatus`]: ../model/user/enum.OnlineStatus.html
-    /// [`Playing`]: ../model/gateway/enum.GameType.html#variant.Playing
+    /// [`Playing`]: ../model/gateway/enum.ActivityType.html#variant.Playing
     /// [`reset_presence`]: #method.reset_presence
     /// [`set_presence`]: #method.set_presence
     pub fn set_game_name(&self, game_name: &str) {
-        let game = Game {
-            kind: GameType::Playing,
-            name: game_name.to_string(),
-            url: None,
-        };
+        let activity = Activity::playing(game_name);
 
-        self.shard.set_presence(Some(game), OnlineStatus::Online);
+        self.shard.set_presence(Some(activity), OnlineStatus::Online);
     }
 
     /// Sets the current user's presence, providing all fields to be passed.
     ///
     /// # Examples
     ///
-    /// Setting the current user as having no game and being [`Idle`]:
+    /// Setting the current user as having no activity and being [`Idle`]:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -405,13 +401,13 @@ impl Context {
     ///
     /// impl EventHandler for Handler {
     ///     fn ready(&self, context: Context, _: Ready) {
-    ///         use serenity::model::gateway::Game;
+    ///         use serenity::model::gateway::Activity;
     ///         use serenity::model::user::OnlineStatus;
     ///
-    ///         let game = Game::playing("Heroes of the Storm");
+    ///         let activity = Activity::playing("Heroes of the Storm");
     ///         let status = OnlineStatus::DoNotDisturb;
     ///
-    ///         context.set_presence(Some(game), status);
+    ///         context.set_presence(Some(activity), status);
     ///     }
     /// }
     ///
@@ -423,8 +419,8 @@ impl Context {
     /// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
     /// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle
     #[inline]
-    pub fn set_presence(&self, game: Option<Game>, status: OnlineStatus) {
-        self.shard.set_presence(game, status);
+    pub fn set_presence(&self, activity: Option<Activity>, status: OnlineStatus) {
+        self.shard.set_presence(activity, status);
     }
 
     /// Disconnects the shard from the websocket, essentially "quiting" it.

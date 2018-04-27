@@ -7,11 +7,11 @@ use websocket::message::OwnedMessage;
 /// A lightweight wrapper around an mpsc sender.
 ///
 /// This is used to cleanly communicate with a shard's respective
-/// [`ShardRunner`]. This can be used for actions such as setting the game via
-/// [`set_game`] or shutting down via [`shutdown`].
+/// [`ShardRunner`]. This can be used for actions such as setting the activity
+/// via [`set_activity`] or shutting down via [`shutdown`].
 ///
 /// [`ShardRunner`]: struct.ShardRunner.html
-/// [`set_game`]: #method.set_game
+/// [`set_activity`]: #method.set_activity
 /// [`shutdown`]: #method.shutdown
 #[derive(Clone, Debug)]
 pub struct ShardMessenger {
@@ -125,13 +125,13 @@ impl ShardMessenger {
         });
     }
 
-    /// Sets the user's current game, if any.
+    /// Sets the user's current activity, if any.
     ///
     /// Other presence settings are maintained.
     ///
     /// # Examples
     ///
-    /// Setting the current game to playing `"Heroes of the Storm"`:
+    /// Setting the current activity to playing `"Heroes of the Storm"`:
     ///
     /// ```rust,no_run
     /// # extern crate parking_lot;
@@ -147,9 +147,9 @@ impl ShardMessenger {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
-    /// use serenity::model::gateway::Game;
+    /// use serenity::model::gateway::Activity;
     ///
-    /// shard.set_game(Some(Game::playing("Heroes of the Storm")));
+    /// shard.set_activity(Some(Activity::playing("Heroes of the Storm")));
     /// #     Ok(())
     /// # }
     /// #
@@ -157,8 +157,8 @@ impl ShardMessenger {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn set_game(&self, game: Option<Game>) {
-        let _ = self.send(ShardRunnerMessage::SetGame(game));
+    pub fn set_activity(&self, activity: Option<Activity>) {
+        let _ = self.send(ShardRunnerMessage::SetActivity(activity));
     }
 
     /// Sets the user's full presence information.
@@ -185,9 +185,9 @@ impl ShardMessenger {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
-    /// use serenity::model::{Game, OnlineStatus};
+    /// use serenity::model::{Activity, OnlineStatus};
     ///
-    /// shard.set_presence(Some(Game::playing("Heroes of the Storm")), OnlineStatus::Online);
+    /// shard.set_presence(Some(Activity::playing("Heroes of the Storm")), OnlineStatus::Online);
     /// #     Ok(())
     /// # }
     /// #
@@ -195,12 +195,12 @@ impl ShardMessenger {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn set_presence(&self, game: Option<Game>, mut status: OnlineStatus) {
+    pub fn set_presence(&self, activity: Option<Activity>, mut status: OnlineStatus) {
         if status == OnlineStatus::Offline {
             status = OnlineStatus::Invisible;
         }
 
-        let _ = self.send(ShardRunnerMessage::SetPresence(status, game));
+        let _ = self.send(ShardRunnerMessage::SetPresence(status, activity));
     }
 
     /// Sets the user's current online status.

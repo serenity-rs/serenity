@@ -2,9 +2,9 @@ use constants::{self, close_codes};
 use internal::prelude::*;
 use model::{
     event::{Event, GatewayEvent},
-    gateway::Game,
+    gateway::Activity,
     id::GuildId,
-    user::OnlineStatus
+    user::OnlineStatus,
 };
 use parking_lot::Mutex;
 use std::{
@@ -29,8 +29,8 @@ use websocket::{
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the
-/// websocket, such as setting the active game, reconnecting, syncing guilds,
-/// and more.
+/// websocket, such as setting the active activity, reconnecting, syncing
+/// guilds, and more.
 ///
 /// Refer to the [module-level documentation][module docs] for information on
 /// effectively using multiple shards, if you need to.
@@ -272,22 +272,22 @@ impl Shard {
     /// #
     /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
-    /// use serenity::model::gateway::Game;
+    /// use serenity::model::gateway::Activity;
     ///
-    /// shard.set_game(Some(Game::playing("Heroes of the Storm")));
+    /// shard.set_activity(Some(Activity::playing("Heroes of the Storm")));
     /// # }
     /// #
     /// # #[cfg(not(feature = "model"))]
     /// # fn main() { }
     /// ```
     #[inline]
-    pub fn set_game(&mut self, game: Option<Game>) {
-        self.current_presence.0 = game;
+    pub fn set_activity(&mut self, activity: Option<Activity>) {
+        self.current_presence.0 = activity;
     }
 
     #[inline]
-    pub fn set_presence(&mut self, status: OnlineStatus, game: Option<Game>) {
-        self.set_game(game);
+    pub fn set_presence(&mut self, status: OnlineStatus, activity: Option<Activity>) {
+        self.set_activity(activity);
         self.set_status(status);
     }
 
