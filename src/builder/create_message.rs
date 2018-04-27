@@ -27,12 +27,19 @@ use utils::{self, VecMap};
 ///
 /// let channel_id = ChannelId(7);
 ///
-/// let _ = channel_id.send_message(|m| m
-///     .content("test")
-///     .tts(true)
-///     .embed(|e| e
-///         .title("This is an embed")
-///         .description("With a description")));
+/// let _ = channel_id.send_message(|mut m| {
+///     m.content("test");
+///     m.tts(true);
+///
+///     m.embed(|mut e| {
+///         e.title("This is an embed");
+///         e.description("With a description");
+///
+///         e
+///     });
+///
+///     m
+/// });
 /// ```
 ///
 /// [`ChannelId::say`]: ../model/id/struct.ChannelId.html#method.say
@@ -48,25 +55,20 @@ impl<'a> CreateMessage<'a> {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content<D: Display>(self, content: D) -> Self {
-        self._content(content.to_string())
+    pub fn content<D: Display>(&mut self, content: D) {
+        self._content(content.to_string());
     }
 
-    fn _content(mut self, content: String) -> Self {
+    fn _content(&mut self, content: String) {
         self.0.insert("content", Value::String(content));
-
-        self
     }
 
     /// Set an embed for the message.
-    pub fn embed<F>(mut self, f: F) -> Self
-        where F: FnOnce(CreateEmbed) -> CreateEmbed {
+    pub fn embed<F: FnOnce(CreateEmbed) -> CreateEmbed>(&mut self, f: F) {
         let map = utils::vecmap_to_json_map(f(CreateEmbed::default()).0);
         let embed = Value::Object(map);
 
         self.0.insert("embed", embed);
-
-        self
     }
 
     /// Set whether the message is text-to-speech.
@@ -74,46 +76,36 @@ impl<'a> CreateMessage<'a> {
     /// Think carefully before setting this to `true`.
     ///
     /// Defaults to `false`.
-    pub fn tts(mut self, tts: bool) -> Self {
+    pub fn tts(&mut self, tts: bool) {
         self.0.insert("tts", Value::Bool(tts));
-
-        self
     }
 
     /// Adds a list of reactions to create after the message's sent.
     #[inline]
-    pub fn reactions<R: Into<ReactionType>, It: IntoIterator<Item=R>>(self, reactions: It) -> Self {
-        self._reactions(reactions.into_iter().map(Into::into).collect())
+    pub fn reactions<R: Into<ReactionType>, It: IntoIterator<Item=R>>(&mut self, reactions: It) {
+        self._reactions(reactions.into_iter().map(Into::into).collect());
     }
 
-    fn _reactions(mut self, reactions: Vec<ReactionType>) -> Self {
+    fn _reactions(&mut self, reactions: Vec<ReactionType>) {
         self.1 = Some(reactions);
-
-        self
     }
 
     /// Appends a file to the message.
-    pub fn add_file<T: Into<AttachmentType<'a>>>(mut self, file: T) -> Self {
+    pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) {
         self.2.push(file.into());
-
-        self
     }
 
     /// Appends a list of files to the message.
-    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(mut self, files: It) -> Self {
+    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) {
         self.2.extend(files.into_iter().map(|f| f.into()));
-
-        self
     }
 
     /// Sets a list of files to include in the message.
     ///
     /// Calling this multiple times will overwrite the file list.
     /// To append files, call `add_file` or `add_files` instead.
-    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(mut self, files: It) -> Self {
+    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) {
         self.2 = files.into_iter().map(|f| f.into()).collect();
-
-        self
     }
 }
 

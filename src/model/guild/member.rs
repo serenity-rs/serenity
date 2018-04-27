@@ -117,7 +117,8 @@ impl Member {
     pub fn add_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         self.roles.extend_from_slice(role_ids);
 
-        let builder = EditMember::default().roles(&self.roles);
+        let mut builder = EditMember::default();
+        builder.roles(&self.roles);
         let map = utils::vecmap_to_json_map(builder.0);
 
         match http::edit_member(self.guild_id.0, self.user.read().id.0, &map) {
@@ -406,7 +407,8 @@ impl Member {
     pub fn remove_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         self.roles.retain(|r| !role_ids.contains(r));
 
-        let builder = EditMember::default().roles(&self.roles);
+        let mut builder = EditMember::default();
+        builder.roles(&self.roles);
         let map = utils::vecmap_to_json_map(builder.0);
 
         match http::edit_member(self.guild_id.0, self.user.read().id.0, &map) {

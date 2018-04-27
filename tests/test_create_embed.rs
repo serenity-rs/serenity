@@ -52,12 +52,12 @@ fn test_from_embed() {
         }),
     };
 
-    let builder = CreateEmbed::from(embed)
-        .colour(0xFF0011)
-        .description("This is a hakase description")
-        .image("https://i.imgur.com/XfWpfCV.gif")
-        .title("still a hakase")
-        .url("https://i.imgur.com/XfWpfCV.gif");
+    let mut builder = CreateEmbed::from(embed);
+    builder.colour(0xFF0011);
+    builder.description("This is a hakase description");
+    builder.image("https://i.imgur.com/XfWpfCV.gif");
+    builder.title("still a hakase");
+    builder.url("https://i.imgur.com/XfWpfCV.gif");
 
     let built = Value::Object(utils::vecmap_to_json_map(builder.0));
 

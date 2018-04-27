@@ -24,11 +24,11 @@ impl EditGuild {
     ///
     /// [`afk_timeout`]: #method.afk_timeout
     #[inline]
-    pub fn afk_channel<C: Into<ChannelId>>(self, channel: Option<C>) -> Self {
-        self._afk_channel(channel.map(Into::into))
+    pub fn afk_channel<C: Into<ChannelId>>(&mut self, channel: Option<C>) {
+        self._afk_channel(channel.map(Into::into));
     }
 
-    fn _afk_channel(mut self, channel: Option<ChannelId>) -> Self {
+    fn _afk_channel(&mut self, channel: Option<ChannelId>) {
         self.0.insert(
             "afk_channel_id",
             match channel {
@@ -36,21 +36,17 @@ impl EditGuild {
                 None => Value::Null,
             },
         );
-
-        self
     }
 
     /// Set the amount of time a user is to be moved to the AFK channel -
     /// configured via [`afk_channel`] - after being AFK.
     ///
     /// [`afk_channel`]: #method.afk_channel
-    pub fn afk_timeout(mut self, timeout: u64) -> Self {
+    pub fn afk_timeout(&mut self, timeout: u64) {
         self.0.insert(
             "afk_timeout",
             Value::Number(Number::from(timeout)),
         );
-
-        self
     }
 
     /// Set the icon of the guild. Pass `None` to remove the icon.
@@ -72,7 +68,11 @@ impl EditGuild {
     ///
     /// let base64_icon = utils::read_image("./guild_icon.png")?;
     ///
-    /// guild.edit(|g| g.icon(Some(&base64_icon)))?;
+    /// guild.edit(|mut g| {
+    ///     g.icon(Some(&base64_icon));
+    ///
+    ///     g
+    /// })?;
     /// #     Ok(())
     /// # }
     /// #
@@ -82,37 +82,31 @@ impl EditGuild {
     /// ```
     ///
     /// [`utils::read_image`]: ../utils/fn.read_image.html
-    pub fn icon(mut self, icon: Option<&str>) -> Self {
+    pub fn icon(&mut self, icon: Option<&str>) {
         self.0.insert(
             "icon",
             icon.map_or_else(|| Value::Null, |x| Value::String(x.to_string())),
         );
-
-        self
     }
 
     /// Set the name of the guild.
     ///
     /// **Note**: Must be between (and including) 2-100 chracters.
-    pub fn name(mut self, name: &str) -> Self {
+    pub fn name(&mut self, name: &str) {
         self.0.insert("name", Value::String(name.to_string()));
-
-        self
     }
 
     /// Transfers the ownership of the guild to another user by Id.
     ///
     /// **Note**: The current user must be the owner of the guild.
     #[inline]
-    pub fn owner<U: Into<UserId>>(self, user_id: U) -> Self {
-        self._owner(user_id.into())
+    pub fn owner<U: Into<UserId>>(&mut self, user_id: U) {
+        self._owner(user_id.into());
     }
 
-    fn _owner(mut self, user_id: UserId) -> Self {
+    fn _owner(&mut self, user_id: UserId) {
         let id = Value::Number(Number::from(user_id.0));
         self.0.insert("owner_id", id);
-
-        self
     }
 
     /// Set the voice region of the server.
@@ -131,7 +125,11 @@ impl EditGuild {
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// guild.edit(|g| g.region(Region::UsWest))?;
+    /// guild.edit(|mut g| {
+    ///     g.region(Region::UsWest);
+    ///
+    ///     g
+    /// })?;
     /// #     Ok(())
     /// # }
     /// #
@@ -141,10 +139,8 @@ impl EditGuild {
     /// ```
     ///
     /// [`Region::UsWest`]: ../model/guild/enum.Region.html#variant.UsWest
-    pub fn region(mut self, region: Region) -> Self {
+    pub fn region(&mut self, region: Region) {
         self.0.insert("region", Value::String(region.name().to_string()));
-
-        self
     }
 
     /// Set the splash image of the guild on the invitation page.
@@ -153,11 +149,9 @@ impl EditGuild {
     /// You can check this through a guild's [`features`] list.
     ///
     /// [`features`]: ../model/guild/struct.Guild.html#structfield.features
-    pub fn splash(mut self, splash: Option<&str>) -> Self {
+    pub fn splash(&mut self, splash: Option<&str>) {
         let splash = splash.map_or(Value::Null, |x| Value::String(x.to_string()));
         self.0.insert("splash", splash);
-
-        self
     }
 
     /// Set the verification level of the guild. This can restrict what a
@@ -176,14 +170,26 @@ impl EditGuild {
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// if let Err(why) = guild.edit(|g| g.verification_level(VerificationLevel::High)) {
+    /// let edit = guild.edit(|mut g| {
+    ///     g.verification_level(VerificationLevel::High);
+    ///
+    ///     g
+    /// });
+    ///
+    /// if let Err(why) = edit {
     ///     println!("Error setting verification level: {:?}", why);
     /// }
     ///
     /// // additionally, you may pass in just an integer of the verification
     /// // level
     ///
-    /// if let Err(why) = guild.edit(|g| g.verification_level(3)) {
+    /// let edit = guild.edit(|mut g| {
+    ///     g.verification_level(3);
+    ///
+    ///     g
+    /// });
+    ///
+    /// if let Err(why) = edit {
     ///     println!("Error setting verification level: {:?}", why);
     /// }
     /// ```
@@ -191,15 +197,13 @@ impl EditGuild {
     /// [`VerificationLevel`]: ../model/guild/enum.VerificationLevel.html
     /// [`VerificationLevel::High`]: ../model/guild/enum.VerificationLevel.html#variant.High
     #[inline]
-    pub fn verification_level<V>(self, verification_level: V) -> Self
+    pub fn verification_level<V>(&mut self, verification_level: V)
         where V: Into<VerificationLevel> {
-        self._verification_level(verification_level.into())
+        self._verification_level(verification_level.into());
     }
 
-    fn _verification_level(mut self, verification_level: VerificationLevel) -> Self {
+    fn _verification_level(&mut self, verification_level: VerificationLevel) {
         let num = Value::Number(Number::from(verification_level.num()));
         self.0.insert("verification_level", num);
-
-        self
     }
 }
