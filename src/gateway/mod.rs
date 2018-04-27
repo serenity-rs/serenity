@@ -55,7 +55,7 @@ pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
 pub use self::ws_client_ext::WebSocketGatewayClientExt;
 
-use model::gateway::Game;
+use model::gateway::Activity;
 use model::user::OnlineStatus;
 use serde_json::Value;
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -65,7 +65,7 @@ use websocket::sync::stream::{TcpStream, TlsStream};
 #[cfg(feature = "client")]
 use client::bridge::gateway::ShardClientMessage;
 
-pub type CurrentPresence = (Option<Game>, OnlineStatus);
+pub type CurrentPresence = (Option<Activity>, OnlineStatus);
 pub type WsClient = Client<TlsStream<TcpStream>>;
 
 /// Indicates the current connection stage of a [`Shard`].

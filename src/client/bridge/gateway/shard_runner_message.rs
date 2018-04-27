@@ -1,4 +1,4 @@
-use model::gateway::Game;
+use model::gateway::Activity;
 use model::user::OnlineStatus;
 use model::id::GuildId;
 use websocket::message::OwnedMessage;
@@ -36,11 +36,11 @@ pub enum ShardRunnerMessage {
     Close(u16, Option<String>),
     /// Indicates that the client is to send a custom WebSocket message.
     Message(OwnedMessage),
-    /// Indicates that the client is to update the shard's presence's game.
-    SetGame(Option<Game>),
+    /// Indicates that the client is to update the shard's presence's activity.
+    SetActivity(Option<Activity>),
     /// Indicates that the client is to update the shard's presence in its
     /// entirity.
-    SetPresence(OnlineStatus, Option<Game>),
+    SetPresence(OnlineStatus, Option<Activity>),
     /// Indicates that the client is to update the shard's presence's status.
     SetStatus(OnlineStatus),
 }
