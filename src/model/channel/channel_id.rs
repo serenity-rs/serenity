@@ -495,7 +495,11 @@ impl ChannelId {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[inline]
     pub fn say<D: ::std::fmt::Display>(&self, content: D) -> Result<Message> {
-        self.send_message(|m| m.content(content))
+        self.send_message(|mut m| {
+            m.content(content);
+
+            m
+        })
     }
 
     /// Sends a file along with optional message contents. The filename _must_
@@ -519,7 +523,11 @@ impl ChannelId {
     ///
     /// let paths = vec!["/path/to/file.jpg", "path/to/file2.jpg"];
     ///
-    /// let _ = channel_id.send_files(paths, |m| m.content("a file"));
+    /// let _ = channel_id.send_files(paths, |mut m| {
+    ///     m.content("a file");
+    ///
+    ///     m
+    /// });
     /// ```
     ///
     /// Send files using `File`:
@@ -535,7 +543,11 @@ impl ChannelId {
     ///
     /// let files = vec![(&f1, "my_file.jpg"), (&f2, "my_file2.jpg")];
     ///
-    /// let _ = channel_id.send_files(files, |m| m.content("a file"));
+    /// let _ = channel_id.send_files(files, |mut m| {
+    ///     m.content("a file");
+    ///
+    ///     m
+    /// });
     /// ```
     ///
     /// # Errors
