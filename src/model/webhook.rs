@@ -154,7 +154,11 @@ impl Webhook {
     /// let mut webhook = http::get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
-    /// let _ = webhook.execute(false, |w| w.content("test")).expect("Error executing");
+    /// let _ = webhook.execute(false, |mut w| {
+    ///     w.content("test");
+    ///
+    ///     w
+    /// });
     /// ```
     ///
     /// Execute a webhook with message content of `test`, overriding the
@@ -170,18 +174,23 @@ impl Webhook {
     /// let mut webhook = http::get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
-    /// let embed = Embed::fake(|e| e
-    ///     .title("Rust's website")
-    ///     .description("Rust is a systems programming language that runs
-    ///                   blazingly fast, prevents segfaults, and guarantees
-    ///                   thread safety.")
-    ///     .url("https://rust-lang.org"));
+    /// let embed = Embed::fake(|mut e| {
+    ///     e.title("Rust's website");
+    ///     e.description("Rust is a systems programming language that runs
+    ///                    blazingly fast, prevents segfaults, and guarantees
+    ///                    thread safety.");
+    ///     e.url("https://rust-lang.org");
     ///
-    /// let _ = webhook.execute(false, |w| w
-    ///     .content("test")
-    ///     .username("serenity")
-    ///     .embeds(vec![embed]))
-    ///     .expect("Error executing");
+    ///     e
+    /// });
+    ///
+    /// let _ = webhook.execute(false, |mut w| {
+    ///     w.content("test");
+    ///     w.username("serenity");
+    ///     w.embeds(vec![embed]);
+    ///
+    ///     w
+    /// });
     /// ```
     #[inline]
     pub fn execute<F: FnOnce(ExecuteWebhook) -> ExecuteWebhook>(&self,

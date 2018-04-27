@@ -76,7 +76,11 @@ impl Context {
     /// impl EventHandler for Handler {
     ///     fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!changename" {
-    ///             ctx.edit_profile(|e| e.username("Edward Elric"));
+    ///             ctx.edit_profile(|mut e| {
+    ///                 e.username("Edward Elric");
+    ///
+    ///                 e
+    ///             });
     ///         }
     ///     }
     /// }
