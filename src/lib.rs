@@ -114,6 +114,7 @@ extern crate tokio_core;
 extern crate tokio_timer;
 extern crate tokio_tls;
 extern crate tokio_tungstenite;
+extern crate tokio_udp;
 extern crate tungstenite;
 extern crate url;
 

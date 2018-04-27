@@ -32,10 +32,11 @@ use opus::{
 use parking_lot::Mutex;
 use rand::random;
 use serde::Deserialize;
+use serde_json::from_string;
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
 use std::collections::HashMap;
 use std::io::Write;
-use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
+use std::net::{SocketAddr, ToSocketAddrs};
 use std::sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender};
 use std::sync::Arc;
 use std::thread::{self, Builder as ThreadBuilder, JoinHandle};
@@ -43,6 +44,7 @@ use std::time::Duration;
 use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
+use tokio_udp::UdpSocket;
 use tokio_core::reactor::{Core, Handle};
 use tokio_tungstenite::{connect_async, WebSocketStream};
 use tungstenite::Message;
@@ -59,9 +61,28 @@ enum ReceiverStatus {
     Websocket(VoiceEvent),
 }
 
-struct VoiceHandshake<S> {
+struct ProgressingVoiceHandshake<S> {
     hello: Option<VoiceHello>,
     ready: Option<VoiceReady>,
+    ws: WebSocketStream<S>,
+}
+
+impl<S> ProgressingVoiceHandshake<S> {
+    fn finalize(self) -> Result<VoiceHandshake<S>> {
+        let ready = self.ready.ok_or(Error::Voice(VoiceError::ExpectedHandshake))?;
+        let hello = self.hello.ok_or(Error::Voice(VoiceError::ExpectedHandshake))?;
+
+        Ok(VoiceHandshake {
+            ready,
+            hello,
+            ws: self.ws,
+        })
+    }
+}
+
+struct VoiceHandshake<S> {
+    hello: VoiceHello,
+    ready: VoiceReady,
     ws: WebSocketStream<S>,
 }
 
@@ -104,97 +125,113 @@ impl Connection {
         let mut core = Core::new().unwrap();
         let handle = core.handle();
 
-
         let url = generate_url(&mut info.endpoint);
         let local_remote = handle.remote().clone();
 
         let done = result(url)
+            // Build a (TLS'd) websocket.
             .and_then(move |url| connect_async(url, local_remote).map_err(|e| e.into()))
+            // Our init of the handshake.
             .and_then(|(ws, _)| ws.send(payload::build_identify(&info)).map_err(|e| e.into()))
-            .and_then(|ws|
-                loop_fn(VoiceHandshake {None, None, ws}, |state| {
-                    ws.into_future()
+            // The reply has TWO PARTS, which can come in any order.
+            .and_then(|ws| {
+                loop_fn(ProgressingVoiceHandshake {ready: None, hello: None, ws}, |state| {
+                    state.ws.into_future()
+                        .map_err(|(e, _)| e.into())
                         .and_then(|(el, ws)| {
                             let value_wrap = el.ok_or(Error::Voice(VoiceError::ExpectedHandshake))?;
-                            let value = value_wrap.into_text()?;
+                            let value = from_string(value_wrap.into_text()?)?;
 
                             match VoiceEvent::deserialize(value)? {
                                 VoiceEvent::Ready(r) => {
                                     state.ready = Some(r);
                                     if state.hello.is_some(){
-                                        Ok(Loop::Break(state))
+                                        return Ok(Loop::Break(state));
                                     }
                                 },
                                 VoiceEvent::Hello(h) => {
                                     state.hello = Some(h);
                                     if state.ready.is_some() {
-                                        Ok(Loop::Break(state))
+                                        return Ok(Loop::Break(state));
                                     }
                                 },
                                 other => {
                                     debug!("[Voice] Expected ready/hello; got: {:?}", other);
 
-                                    Err(Error::Voice(VoiceError::ExpectedHandshake))
+                                    return Err(Error::Voice(VoiceError::ExpectedHandshake));
                                 },
                             }
 
                             Ok(Loop::Continue(state))
                         })
-                }));
+                })
+            })
+            .and_then(|state| {
+                let handshake = state.finalize()?;
+
+                if !has_valid_mode(&handshake.ready.modes) {
+                    return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
+                }
+
+                let destination = (&info.endpoint[..], handshake.ready.port)
+                    .to_socket_addrs()?
+                    .next()
+                    .ok_or(Error::Voice(VoiceError::HostnameResolve))?;
+
+                // Important to note here: the length of the packet can be of either 4
+                // or 70 bytes. If it is 4 bytes, then we need to send a 70-byte packet
+                // to determine the IP.
+                //
+                // Past the initial 4 bytes, the packet _must_ be completely empty data.
+                //
+                // The returned packet will be a null-terminated string of the IP, and
+                // the port encoded in LE in the last two bytes of the packet.
+
+                // TODO: compute local socket addr as a lazy static
+                let local = "0.0.0.0:0"
+                    .to_socket_addrs()?
+                    .next()
+                    .ok_or(Error::Voice(VoiceError::HostnameResolve))?;
+
+                let udp = UdpSocket::bind(&local)?;
+
+                let mut bytes = [0u8; 70];
+                let mut write_bytes = [0u8; 256];
+                (&mut bytes[..]).write_u32::<BigEndian>(handshake.ready.ssrc)?;
+
+                Ok(udp.send_dgram(&bytes[..], &destination)
+                    .and_then(|(udp, _)| udp.recv_dgram(vec![0u8; 256]))
+                    .map_err(|e| e.into())
+                    .and_then(move |(udp, data, _, _)| {
+                        // Find the position in the bytes that contains the first byte of 0,
+                        // indicating the "end of the address".
+                        let index = data.iter()
+                            .skip(4)
+                            .position(|&x| x == 0)
+                            .ok_or(Error::Voice(VoiceError::FindingByte))?;
+
+                        let pos = 4 + index;
+                        let addr = String::from_utf8_lossy(&bytes[4..pos]);
+                        let port_pos = len - 2;
+                        let port = (&bytes[port_pos..]).read_u16::<LittleEndian>()?;
+
+                        Ok(handshake.ws.send(payload::build_select_protocol(addr, port))
+                            .map_err(|e| e.into())
+                            .map(|_| (handshake, udp)))
+                    })
+                )
+            })
+            .and_then(|internal| internal)
+            .and_then(|internal| internal)
+            .and_then(|(handshake, udp)| {
+                encryption_key(handshake.ws)
+            });
 
         core.run(done).unwrap();
 
         ()
 
         // return Box::new(done);
-
-        // let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
-        // let ready = ready.expect("[Voice] Ready packet expected in connection initialisation, but not found.");
-
-        // if !has_valid_mode(&ready.modes) {
-        //     return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
-        // }
-
-        // let destination = (&info.endpoint[..], ready.port)
-        //     .to_socket_addrs()?
-        //     .next()
-        //     .ok_or(Error::Voice(VoiceError::HostnameResolve))?;
-
-        // // Important to note here: the length of the packet can be of either 4
-        // // or 70 bytes. If it is 4 bytes, then we need to send a 70-byte packet
-        // // to determine the IP.
-        // //
-        // // Past the initial 4 bytes, the packet _must_ be completely empty data.
-        // //
-        // // The returned packet will be a null-terminated string of the IP, and
-        // // the port encoded in LE in the last two bytes of the packet.
-        // let udp = UdpSocket::bind("0.0.0.0:0")?;
-
-        // {
-        //     let mut bytes = [0; 70];
-
-        //     (&mut bytes[..]).write_u32::<BigEndian>(ready.ssrc)?;
-        //     udp.send_to(&bytes, destination)?;
-
-        //     let mut bytes = [0; 256];
-        //     let (len, _addr) = udp.recv_from(&mut bytes)?;
-
-        //     // Find the position in the bytes that contains the first byte of 0,
-        //     // indicating the "end of the address".
-        //     let index = bytes
-        //         .iter()
-        //         .skip(4)
-        //         .position(|&x| x == 0)
-        //         .ok_or(Error::Voice(VoiceError::FindingByte))?;
-
-        //     let pos = 4 + index;
-        //     let addr = String::from_utf8_lossy(&bytes[4..pos]);
-        //     let port_pos = len - 2;
-        //     let port = (&bytes[port_pos..]).read_u16::<LittleEndian>()?;
-
-        //     client
-        //         .send_json(&payload::build_select_protocol(addr, port))?;
-        // }
 
         // let key = encryption_key(&mut client)?;
 
@@ -567,32 +604,39 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
 }
 
 #[inline]
-fn encryption_key(client: &mut Client) -> Result<Key> {
-    loop {
-        let value = match client.recv_json()? {
-            Some(value) => value,
-            None => continue,
-        };
+fn encryption_key<S>(ws: WebSocketStream<S>) -> Box<Future<Item=(Key, WebSocketStream<S>), Error=Error>> {//Result<Key> {
+    loop_fn(ws, |ws| {
+        ws.into_future()
+            .map_err(|(e, _)| e.into())
+            .and_then(|(el, ws)| {
+                let value = match el {
+                    Some(value) => from_string(value.into_text()?)?,
+                    None => {return Ok(Loop::Continue(ws))},
+                };
 
-        match VoiceEvent::deserialize(value)? {
-            VoiceEvent::SessionDescription(desc) => {
-                if desc.mode != CRYPTO_MODE {
-                    return Err(Error::Voice(VoiceError::VoiceModeInvalid));
+                match VoiceEvent::deserialize(value)? {
+                    VoiceEvent::SessionDescription(desc) => {
+                        if desc.mode != CRYPTO_MODE {
+                            return Err(Error::Voice(VoiceError::VoiceModeInvalid));
+                        }
+
+                        let key = Key::from_slice(&desc.secret_key)
+                            .ok_or(Error::Voice(VoiceError::KeyGen))?;
+
+                        return Ok(Loop::Break((key, ws)))
+                    },
+                    VoiceEvent::Unknown(op, value) => {
+                        debug!(
+                            "[Voice] Expected ready for key; got: op{}/v{:?}",
+                            op.num(),
+                            value
+                        );
+                    },
                 }
 
-                return Key::from_slice(&desc.secret_key)
-                    .ok_or(Error::Voice(VoiceError::KeyGen));
-            },
-            VoiceEvent::Unknown(op, value) => {
-                debug!(
-                    "[Voice] Expected ready for key; got: op{}/v{:?}",
-                    op.num(),
-                    value
-                );
-            },
-            _ => {},
-        }
-    }
+                Ok(Loop::Continue(state))
+            })
+    })
 }
 
 #[inline]
