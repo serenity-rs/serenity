@@ -1,7 +1,8 @@
 use gateway::InterMessage;
 use model::{
+    channel::{Channel, Message},
     event::Event,
-    channel::{Channel, Message}
+    guild::Member,
 };
 use std::sync::Arc;
 use parking_lot::Mutex;
@@ -391,20 +392,21 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
         },
         DispatchEvent::Model(Event::GuildMemberUpdate(mut event)) => {
             let _before = update!(event);
+
+            let _after: Option<Member> = feature_cache! {{
+                CACHE.read().member(event.guild_id, event.user.id)
+            } else {
+                None
+            }};
+
             let context = context(data, runner_tx, shard_id);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    // This is safe to unwrap, as the update would have created
-                    // the member if it did not exist. So, there is be _no_ way
-                    // that this could fail under any circumstance.
-                    let after = CACHE.read()
-                        .member(event.guild_id, event.user.id)
-                        .unwrap()
-                        .clone();
-
-                    event_handler.guild_member_update(context, _before, after);
+                    if let Some(after) = _after {
+                        event_handler.guild_member_update(context, _before, after);
+                    }
                 } else {
                     event_handler.guild_member_update(context, event);
                 }}
