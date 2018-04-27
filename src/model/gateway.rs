@@ -1,5 +1,6 @@
 //! Models pertaining to the gateway.
 
+use chrono::{DateTime, Utc};
 use parking_lot::RwLock;
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
@@ -26,82 +27,116 @@ pub struct BotGateway {
     pub url: String,
 }
 
-/// Representation of a game that a [`User`] is playing -- or streaming in the
-/// case that a stream URL is provided.
-///
-/// [`User`]: ../user/struct.User.html
+/// Representation of an activity that a [`User`] is performing.
 #[derive(Clone, Debug, Serialize)]
-pub struct Game {
-    /// The type of game status.
-    #[serde(default, rename = "type")]
-    pub kind: GameType,
-    /// The name of the game being played.
+pub struct Activity {
+    /// The ID of the application for the activity.
+    pub application_id: Option<ApplicationId>,
+    /// Images for the presence and their texts.
+    pub assets: Option<ActivityAssets>,
+    /// What the user is doing.
+    pub details: Option<String>,
+    /// Activity flags describing what the payload includes.
+    pub flags: Option<ActivityFlags>,
+    /// Whether or not the activity is an instanced game session.
+    pub instance: Option<bool>,
+    /// The type of activity being performed
+    #[serde(default = "ActivityType::default", rename = "type")]
+    pub kind: ActivityType,
+    /// The name of the activity.
     pub name: String,
-    /// The Stream URL if [`kind`] is [`GameType::Streaming`].
+    /// Information about the user's current party.
+    pub party: Option<ActivityParty>,
+    /// Secrets for Rich Presence joining and spectating.
+    pub secrets: Option<ActivitySecrets>,
+    /// The user's current party status.
+    pub state: Option<String>,
+    /// Unix timestamps for the start and/or end times of the activity.
+    pub timestamps: Option<ActivityTimestamps>,
+    /// The Stream URL if [`kind`] is [`ActivityType::Streaming`].
     ///
-    /// [`GameType::Streaming`]: enum.GameType.html#variant.Streaming
+    /// [`ActivityType::Streaming`]: enum.ActivityType.html#variant.Streaming
     /// [`kind`]: #structfield.kind
     pub url: Option<String>,
 }
 
 #[cfg(feature = "model")]
-impl Game {
+impl Activity {
     /// Creates a `Game` struct that appears as a `Playing <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
     /// # Examples
     ///
-    /// Create a command that sets the current game being played:
+    /// Create a command that sets the current activity:
     ///
     /// ```rust,no_run
     /// # #[macro_use] extern crate serenity;
     /// #
     /// use serenity::framework::standard::Args;
-    /// use serenity::model::gateway::Game;
+    /// use serenity::model::gateway::Activity;
     ///
-    /// command!(game(ctx, _msg, args) {
+    /// command!(activity(ctx, _msg, args) {
     ///     let name = args.full();
-    ///     ctx.set_game(Game::playing(&name));
+    ///     ctx.set_activity(Activity::playing(&name));
     /// });
     /// #
     /// # fn main() {}
     /// ```
-    pub fn playing(name: &str) -> Game {
-        Game {
-            kind: GameType::Playing,
+    pub fn playing(name: &str) -> Activity {
+        Activity {
+            application_id: None,
+            assets: None,
+            details: None,
+            flags: None,
+            instance: None,
+            kind: ActivityType::Playing,
             name: name.to_string(),
+            party: None,
+            secrets: None,
+            state: None,
+            timestamps: None,
             url: None,
         }
     }
 
-    /// Creates a `Game` struct that appears as a `Streaming <name>` status.
+    /// Creates an `Activity` struct that appears as a `Streaming <name>`
+    /// status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
     /// # Examples
     ///
-    /// Create a command that sets the current game and stream:
+    /// Create a command that sets the current streaming status:
     ///
     /// ```rust,no_run
     /// # #[macro_use] extern crate serenity;
     /// #
     /// use serenity::framework::standard::Args;
-    /// use serenity::model::gateway::Game;
+    /// use serenity::model::gateway::Activity;
     ///
     /// // Assumes command has min_args set to 2.
     /// command!(stream(ctx, _msg, args) {
     ///     # let stream_url = String::from("");
     ///     let name = args.full();
-    ///     ctx.set_game(Game::streaming(&name, &stream_url));
+    ///     ctx.set_activity(Activity::streaming(&name, &stream_url));
     /// });
     /// #
     /// # fn main() {}
     /// ```
-    pub fn streaming(name: &str, url: &str) -> Game {
-        Game {
-            kind: GameType::Streaming,
+    pub fn streaming(name: &str, url: &str) -> Activity {
+        Activity {
+            application_id: None,
+            assets: None,
+            details: None,
+            flags: None,
+            instance: None,
+            kind: ActivityType::Streaming,
             name: name.to_string(),
+            party: None,
+            secrets: None,
+            state: None,
+            timestamps: None,
             url: Some(url.to_string()),
         }
     }
@@ -112,115 +147,159 @@ impl Game {
     ///
     /// # Examples
     ///
-    /// Create a command that sets the current game being played:
+    /// Create a command that sets the current listening status:
     ///
     /// ```rust,no_run
     /// # #[macro_use] extern crate serenity;
     /// #
     /// use serenity::framework::standard::Args;
-    /// use serenity::model::gateway::Game;
+    /// use serenity::model::gateway::Activity;
     ///
     /// command!(listen(ctx, _msg, args) {
     ///     let name = args.full();
-    ///     ctx.set_game(Game::listening(&name));
+    ///     ctx.set_activity(Activity::listening(&name));
     /// });
     /// #
     /// # fn main() {}
     /// ```
-    pub fn listening(name: &str) -> Game {
-        Game {
-            kind: GameType::Listening,
+    pub fn listening(name: &str) -> Activity {
+        Activity {
+            application_id: None,
+            assets: None,
+            details: None,
+            flags: None,
+            instance: None,
+            kind: ActivityType::Listening,
             name: name.to_string(),
+            party: None,
+            secrets: None,
+            state: None,
+            timestamps: None,
             url: None,
         }
     }
 }
 
-impl<'a> From<&'a str> for Game {
-    fn from(name: &'a str) -> Self {
-        Game {
-            kind: GameType::Playing,
-            name: name.to_owned(),
-            url: None,
-        }
-    }
-}
-
-impl From<String> for Game {
-    fn from(name: String) -> Self {
-        Game {
-            kind: GameType::Playing,
-            url: None,
-            name,
-        }
-    }
-}
-
-impl<'a> From<(String, GameType)> for Game {
-    fn from((name, kind): (String, GameType)) -> Self {
-        Self {
-            url: None,
-            kind,
-            name,
-        }
-    }
-}
-
-impl<'a> From<(&'a str, &'a str)> for Game {
-    fn from((name, url): (&'a str, &'a str)) -> Self {
-        Self {
-            kind: GameType::Streaming,
-            name: name.to_owned(),
-            url: Some(url.to_owned()),
-        }
-    }
-}
-
-impl From<(String, String)> for Game {
-    fn from((name, url): (String, String)) -> Self {
-        Self {
-            kind: GameType::Streaming,
-            url: Some(url),
-            name,
-        }
-    }
-}
-
-impl From<(String, GameType, String)> for Game {
-    fn from((name, kind, url): (String, GameType, String)) -> Self {
-        Self {
-            url: Some(url),
-            kind,
-            name,
-        }
-    }
-}
-
-impl<'de> Deserialize<'de> for Game {
+impl<'de> Deserialize<'de> for Activity {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
+        let application_id = match map.remove("application_id") {
+            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let assets = match map.remove("assets") {
+            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let details = match map.remove("details") {
+            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let flags = match map.remove("flags") {
+            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let instance = match map.remove("instance") {
+            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            None => None,
+        };
         let kind = map.remove("type")
-            .and_then(|v| GameType::deserialize(v).ok())
-            .unwrap_or(GameType::Playing);
+            .and_then(|v| ActivityType::deserialize(v).ok())
+            .unwrap_or(ActivityType::Playing);
         let name = map.remove("name")
             .and_then(|v| String::deserialize(v).ok())
             .unwrap_or_else(String::new);
+        let party = match map.remove("party") {
+            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let secrets = match map.remove("secrets") {
+            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let state = match map.remove("state") {
+            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let timestamps = match map.remove("timestamps") {
+            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            None => None,
+        };
         let url = map.remove("url")
             .and_then(|v| serde_json::from_value::<String>(v).ok());
 
-        Ok(Game {
+        Ok(Activity {
+            application_id,
+            assets,
+            details,
+            flags,
+            instance,
             kind,
             name,
+            party,
+            secrets,
+            state,
+            timestamps,
             url,
         })
     }
 }
 
+/// The assets for an activity.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ActivityAssets {
+    /// The ID for a large asset of the activity, usually a snowflake.
+    pub large_image: Option<String>,
+    /// Text displayed when hovering over the large image of the activity.
+    pub large_text: Option<String>,
+    /// The ID for a small asset of the activity, usually a snowflake.
+    pub small_image: Option<String>,
+    /// Text displayed when hovering over the small image of the activity.
+    pub small_text: Option<String>,
+}
 
+bitflags! {
+    /// A set of flags defining what is in an activity's payload.
+    #[derive(Deserialize, Serialize)]
+    pub struct ActivityFlags: u64 {
+        /// Whether the activity is an instance activity.
+        const INSTANCE = 0b001;
+        /// Whether the activity is joinable.
+        const JOIN = 0b010;
+        /// Whether the activity can be spectated.
+        const SPECTATE = 0b011;
+        /// Whether a request can be sent to join the user's party.
+        const JOIN_REQUEST = 0b100;
+        /// Whether the activity can be synced.
+        const SYNC = 0b101;
+        /// Whether the activity can be played.
+        const PLAY = 0b110;
+    }
+}
 
-/// The type of activity that is being performed when playing a game.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
-pub enum GameType {
+/// Information about an activity's party.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ActivityParty {
+    /// The ID of the party.
+    pub id: Option<String>,
+    /// Used to show the party's current and maximum size.
+    pub size: [u64; 2],
+}
+
+/// Secrets for an activity.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ActivitySecrets {
+    /// The secret for joining a party.
+    pub join: Option<String>,
+    /// The secret for a specific instanced match.
+    #[serde(rename = "match")]
+    pub match_: Option<String>,
+    /// The secret for spectating an activity.
+    pub spectate: Option<String>,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum ActivityType {
     /// An indicator that the user is playing a game.
     Playing = 0,
     /// An indicator that the user is streaming to a service.
@@ -230,16 +309,16 @@ pub enum GameType {
 }
 
 enum_number!(
-    GameType {
+    ActivityType {
         Playing,
         Streaming,
         Listening,
     }
 );
 
-impl GameType {
+impl ActivityType {
     pub fn num(&self) -> u64 {
-        use self::GameType::*;
+        use self::ActivityType::*;
 
         match *self {
             Playing => 0,
@@ -249,8 +328,8 @@ impl GameType {
     }
 }
 
-impl Default for GameType {
-    fn default() -> Self { GameType::Playing }
+impl Default for ActivityType {
+    fn default() -> Self { ActivityType::Playing }
 }
 
 /// A representation of the data retrieved from the gateway endpoint.
@@ -269,10 +348,10 @@ pub struct Gateway {
 /// [`User`]: ../user/struct.User.html
 #[derive(Clone, Debug)]
 pub struct Presence {
-    /// The game that a [`User`] is current playing.
+    /// The activity that a [`User`] is performing.
     ///
-    /// [`User`]: ../user/struct.User.html
-    pub game: Option<Game>,
+    /// [`User`]: struct.User.html
+    pub activity: Option<Activity>,
     /// The date of the last presence update.
     pub last_modified: Option<u64>,
     /// The nickname of the member, if applicable.
@@ -309,8 +388,8 @@ impl<'de> Deserialize<'de> for Presence {
             (user_id, None)
         };
 
-        let game = match map.remove("game") {
-            Some(v) => serde_json::from_value::<Option<Game>>(v)
+        let activity = match map.remove("game") {
+            Some(v) => serde_json::from_value::<Option<Activity>>(v)
                 .map_err(DeError::custom)?,
             None => None,
         };
@@ -329,12 +408,12 @@ impl<'de> Deserialize<'de> for Presence {
             .map_err(DeError::custom)?;
 
         Ok(Presence {
-            game,
-            last_modified,
-            nick,
-            status,
-            user,
-            user_id,
+            activity: activity,
+            last_modified: last_modified,
+            nick: nick,
+            status: status,
+            user: user,
+            user_id: user_id,
         })
     }
 }
@@ -348,7 +427,7 @@ impl Serialize for Presence {
         }
 
         let mut state = serializer.serialize_struct("Presence", 5)?;
-        state.serialize_field("game", &self.game)?;
+        state.serialize_field("game", &self.activity)?;
         state.serialize_field("last_modified", &self.last_modified)?;
         state.serialize_field("nick", &self.nick)?;
         state.serialize_field("status", &self.status)?;
@@ -393,4 +472,10 @@ pub struct SessionStartLimit {
     pub reset_after: u64,
     /// The total number of session starts within the ratelimit period allowed.
     pub total: u64,
+}
+/// Timestamps of when a user started and/or is ending their activity.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ActivityTimestamps {
+    pub end: Option<DateTime<Utc>>,
+    pub start: Option<DateTime<Utc>>,
 }

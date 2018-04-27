@@ -57,8 +57,8 @@ pub use self::{
 };
 
 use model::{
-    gateway::Game,
-    user::OnlineStatus
+    gateway::Activity,
+    user::OnlineStatus,
 };
 use serde_json::Value;
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -70,7 +70,7 @@ use websocket::sync::{
 #[cfg(feature = "client")]
 use client::bridge::gateway::ShardClientMessage;
 
-pub type CurrentPresence = (Option<Game>, OnlineStatus);
+pub type CurrentPresence = (Option<Activity>, OnlineStatus);
 pub type WsClient = Client<TlsStream<TcpStream>>;
 
 /// Indicates the current connection stage of a [`Shard`].
