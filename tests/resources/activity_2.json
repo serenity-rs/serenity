@@ -1,0 +1,26 @@
+{
+  "user": {
+    "id": "210141176211177474"
+  },
+  "status": "idle",
+  "game": {
+    "type": 2,
+    "timestamps": {
+      "start": 1524840854122,
+      "end": 1524841056674
+    },
+    "sync_id": "3MzqPLieWzTj5NW6WEzICu",
+    "state": "I Fight Dragons",
+    "session_id": "f737b052de95d8199723b92c1457463e",
+    "party": {
+      "id": "spotify:210141176211177474"
+    },
+    "name": "Spotify",
+    "flags": 48,
+    "details": "Pretend",
+    "assets": {
+      "large_text": "The Near Future",
+      "large_image": "spotify:a253f70af71e454b1021f8323357f6f983d622ed"
+    }
+  }
+}
