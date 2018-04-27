@@ -18,12 +18,10 @@ impl ReceiverExt for WsClient<TlsStream<TcpStream>> {
     fn recv_json(&mut self) -> Result<Option<Value>> {
         Ok(match self.recv_message()? {
             OwnedMessage::Binary(bytes) => {
-                println!("{:?}", bytes);
                 serde_json::from_reader(ZlibDecoder::new(&bytes[..])).map(Some)?
             },
             OwnedMessage::Close(data) => return Err(Error::Gateway(GatewayError::Closed(data))),
             OwnedMessage::Text(payload) => {
-                println!("{}", payload);
                 serde_json::from_str(&payload).map(Some)?
             },
             OwnedMessage::Ping(x) => {
