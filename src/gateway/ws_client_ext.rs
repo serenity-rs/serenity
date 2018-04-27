@@ -92,7 +92,7 @@ impl WebSocketGatewayClientExt for WsClient {
         shard_info: &[u64; 2],
         current_presence: &CurrentPresence,
     ) -> Result<()> {
-        let &(ref game, ref status) = current_presence;
+        let &(ref activity, ref status) = current_presence;
         let now = Utc::now().timestamp() as u64;
 
         debug!("[Shard {:?}] Sending presence update", shard_info);
@@ -103,7 +103,7 @@ impl WebSocketGatewayClientExt for WsClient {
                 "afk": false,
                 "since": now,
                 "status": status.name(),
-                "game": game.as_ref().map(|x| json!({
+                "game": activity.as_ref().map(|x| json!({
                     "name": x.name,
                     "type": x.kind,
                     "url": x.url,
