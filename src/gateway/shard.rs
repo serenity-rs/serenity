@@ -4,7 +4,7 @@ use model::{
     event::{Event, GatewayEvent},
     gateway::Activity,
     id::GuildId,
-    user::OnlineStatus
+    user::OnlineStatus,
 };
 use parking_lot::Mutex;
 use std::{

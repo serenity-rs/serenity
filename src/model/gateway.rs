@@ -295,14 +295,15 @@ pub struct ActivitySecrets {
     pub spectate: Option<String>,
 }
 
-#[derive(Clone, Copy, Debug)]
+/// The type of an activity.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum ActivityType {
     /// An indicator that the user is playing a game.
-    Playing = 0,
+    Playing,
     /// An indicator that the user is streaming to a service.
-    Streaming = 1,
+    Streaming,
     /// An indicator that the user is listening to something.
-    Listening = 2,
+    Listening,
 }
 
 enum_number!(
@@ -405,12 +406,12 @@ impl<'de> Deserialize<'de> for Presence {
             .map_err(DeError::custom)?;
 
         Ok(Presence {
-            activity: activity,
-            last_modified: last_modified,
-            nick: nick,
-            status: status,
-            user: user,
-            user_id: user_id,
+            activity,
+            last_modified,
+            nick,
+            status,
+            user,
+            user_id,
         })
     }
 }
