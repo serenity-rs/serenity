@@ -984,10 +984,8 @@ impl Framework for StandardFramework {
                         built
                     };
 
-<<<<<<< HEAD
-=======
                     unrecognised_command_name = built.clone();
->>>>>>> master
+
                     let cmd = group.commands.get(&built);
 
                     if let Some(&CommandOrAlias::Alias(ref points_to)) = cmd {

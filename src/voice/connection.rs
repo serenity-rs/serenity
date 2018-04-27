@@ -1,9 +1,24 @@
 use byteorder::{BigEndian, ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 use constants::VOICE_GATEWAY_VERSION;
+use futures::{
+    future::{
+        loop_fn,
+        ok,
+        result,
+        Future,
+        Loop,
+    },
+    Sink,
+    Stream,
+};
 use internal::prelude::*;
 use internal::ws_impl::{ReceiverExt, SenderExt};
 use internal::Timer;
-use model::event::VoiceEvent;
+use model::event::{
+    VoiceEvent,
+    VoiceHello,
+    VoiceReady,
+};
 use model::id::UserId;
 use opus::{
     packet as opus_packet,
@@ -28,16 +43,26 @@ use std::time::Duration;
 use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
-use websocket::client::Url as WebsocketUrl;
-use websocket::sync::client::ClientBuilder;
-use websocket::sync::stream::{AsTcpStream, TcpStream, TlsStream};
-use websocket::sync::Client as WsClient;
+use tokio_core::reactor::{Core, Handle};
+use tokio_tungstenite::{connect_async, WebSocketStream};
+use tungstenite::Message;
+use url::Url;
+// use websocket::client::Url as WebsocketUrl;
+// use websocket::sync::client::ClientBuilder;
+// use websocket::sync::stream::{AsTcpStream, TcpStream, TlsStream};
+// use websocket::sync::Client as WsClient;
 
-type Client = WsClient<TlsStream<TcpStream>>;
+// type Client = WsClient<TlsStream<TcpStream>>;
 
 enum ReceiverStatus {
     Udp(Vec<u8>),
     Websocket(VoiceEvent),
+}
+
+struct VoiceHandshake<S> {
+    hello: Option<VoiceHello>,
+    ready: Option<VoiceReady>,
+    ws: WebSocketStream<S>,
 }
 
 #[allow(dead_code)]
@@ -60,7 +85,6 @@ pub struct Connection {
     keepalive_timer: Timer,
     key: Key,
     last_heartbeat_nonce: Option<u64>,
-    soft_clip: SoftClip,
     sequence: u16,
     silence_frames: u8,
     soft_clip: SoftClip,
@@ -73,132 +97,148 @@ pub struct Connection {
 }
 
 impl Connection {
-    pub fn new(mut info: ConnectionInfo) -> Result<Connection> {
-        let url = generate_url(&mut info.endpoint)?;
+    pub fn new(mut info: ConnectionInfo)//, handle: Handle)
+            -> () { //Box<Future<Item = (),//Connection,
+            //Error = Error>> {
 
-        let mut client = ClientBuilder::from_url(&url).connect_secure(None)?;
-        let mut hello = None;
-        let mut ready = None;
-        client.send_json(&payload::build_identify(&info))?;
+        let mut core = Core::new().unwrap();
+        let handle = core.handle();
 
-        loop {
-            let value = match client.recv_json()? {
-                Some(value) => value,
-                None => continue,
-            };
 
-            match VoiceEvent::deserialize(value)? {
-                VoiceEvent::Ready(r) => {
-                    ready = Some(r);
-                    if hello.is_some(){
-                        break;
-                    }
-                },
-                VoiceEvent::Hello(h) => {
-                    hello = Some(h);
-                    if ready.is_some() {
-                        break;
-                    }
-                },
-                other => {
-                    debug!("[Voice] Expected ready/hello; got: {:?}", other);
+        let url = generate_url(&mut info.endpoint);
+        let local_remote = handle.remote().clone();
 
-                    return Err(Error::Voice(VoiceError::ExpectedHandshake));
-                },
-            }
-        };
+        let done = result(url)
+            .and_then(move |url| connect_async(url, local_remote).map_err(|e| e.into()))
+            .and_then(|(ws, _)| ws.send(payload::build_identify(&info)).map_err(|e| e.into()))
+            .and_then(|ws|
+                loop_fn(VoiceHandshake {None, None, ws}, |state| {
+                    ws.into_future()
+                        .and_then(|(el, ws)| {
+                            let value_wrap = el.ok_or(Error::Voice(VoiceError::ExpectedHandshake))?;
+                            let value = value_wrap.into_text()?;
 
-        let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
-        let ready = ready.expect("[Voice] Ready packet expected in connection initialisation, but not found.");
+                            match VoiceEvent::deserialize(value)? {
+                                VoiceEvent::Ready(r) => {
+                                    state.ready = Some(r);
+                                    if state.hello.is_some(){
+                                        Ok(Loop::Break(state))
+                                    }
+                                },
+                                VoiceEvent::Hello(h) => {
+                                    state.hello = Some(h);
+                                    if state.ready.is_some() {
+                                        Ok(Loop::Break(state))
+                                    }
+                                },
+                                other => {
+                                    debug!("[Voice] Expected ready/hello; got: {:?}", other);
 
-        if !has_valid_mode(&ready.modes) {
-            return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
-        }
+                                    Err(Error::Voice(VoiceError::ExpectedHandshake))
+                                },
+                            }
 
-        let destination = (&info.endpoint[..], ready.port)
-            .to_socket_addrs()?
-            .next()
-            .ok_or(Error::Voice(VoiceError::HostnameResolve))?;
+                            Ok(Loop::Continue(state))
+                        })
+                }));
 
-        // Important to note here: the length of the packet can be of either 4
-        // or 70 bytes. If it is 4 bytes, then we need to send a 70-byte packet
-        // to determine the IP.
-        //
-        // Past the initial 4 bytes, the packet _must_ be completely empty data.
-        //
-        // The returned packet will be a null-terminated string of the IP, and
-        // the port encoded in LE in the last two bytes of the packet.
-        let udp = UdpSocket::bind("0.0.0.0:0")?;
+        core.run(done).unwrap();
 
-        {
-            let mut bytes = [0; 70];
+        ()
 
-            (&mut bytes[..]).write_u32::<BigEndian>(ready.ssrc)?;
-            udp.send_to(&bytes, destination)?;
+        // return Box::new(done);
 
-            let mut bytes = [0; 256];
-            let (len, _addr) = udp.recv_from(&mut bytes)?;
+        // let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
+        // let ready = ready.expect("[Voice] Ready packet expected in connection initialisation, but not found.");
 
-            // Find the position in the bytes that contains the first byte of 0,
-            // indicating the "end of the address".
-            let index = bytes
-                .iter()
-                .skip(4)
-                .position(|&x| x == 0)
-                .ok_or(Error::Voice(VoiceError::FindingByte))?;
+        // if !has_valid_mode(&ready.modes) {
+        //     return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
+        // }
 
-            let pos = 4 + index;
-            let addr = String::from_utf8_lossy(&bytes[4..pos]);
-            let port_pos = len - 2;
-            let port = (&bytes[port_pos..]).read_u16::<LittleEndian>()?;
+        // let destination = (&info.endpoint[..], ready.port)
+        //     .to_socket_addrs()?
+        //     .next()
+        //     .ok_or(Error::Voice(VoiceError::HostnameResolve))?;
 
-            client
-                .send_json(&payload::build_select_protocol(addr, port))?;
-        }
+        // // Important to note here: the length of the packet can be of either 4
+        // // or 70 bytes. If it is 4 bytes, then we need to send a 70-byte packet
+        // // to determine the IP.
+        // //
+        // // Past the initial 4 bytes, the packet _must_ be completely empty data.
+        // //
+        // // The returned packet will be a null-terminated string of the IP, and
+        // // the port encoded in LE in the last two bytes of the packet.
+        // let udp = UdpSocket::bind("0.0.0.0:0")?;
 
-        let key = encryption_key(&mut client)?;
+        // {
+        //     let mut bytes = [0; 70];
 
-        let _ = client
-            .stream_ref()
-            .as_tcp()
-            .set_read_timeout(Some(Duration::from_millis(25)));
+        //     (&mut bytes[..]).write_u32::<BigEndian>(ready.ssrc)?;
+        //     udp.send_to(&bytes, destination)?;
 
-        let mutexed_client = Arc::new(Mutex::new(client));
-        let thread_items = start_threads(Arc::clone(&mutexed_client), &udp)?;
+        //     let mut bytes = [0; 256];
+        //     let (len, _addr) = udp.recv_from(&mut bytes)?;
 
-        info!("[Voice] Connected to: {}", info.endpoint);
+        //     // Find the position in the bytes that contains the first byte of 0,
+        //     // indicating the "end of the address".
+        //     let index = bytes
+        //         .iter()
+        //         .skip(4)
+        //         .position(|&x| x == 0)
+        //         .ok_or(Error::Voice(VoiceError::FindingByte))?;
 
-        // Encode for Discord in Stereo, as required.
-        let mut encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Stereo, CodingMode::Audio)?;
-        encoder.set_bitrate(Bitrate::Bits(DEFAULT_BITRATE))?;
-        let soft_clip = SoftClip::new(Channels::Stereo);
+        //     let pos = 4 + index;
+        //     let addr = String::from_utf8_lossy(&bytes[4..pos]);
+        //     let port_pos = len - 2;
+        //     let port = (&bytes[port_pos..]).read_u16::<LittleEndian>()?;
 
-        let soft_clip = SoftClip::new(Channels::Stereo);
+        //     client
+        //         .send_json(&payload::build_select_protocol(addr, port))?;
+        // }
 
-        // Per discord dev team's current recommendations:
-        // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
-        let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;
+        // let key = encryption_key(&mut client)?;
 
-        Ok(Connection {
-            audio_timer: Timer::new(1000 * 60 * 4),
-            client: mutexed_client,
-            decoder_map: HashMap::new(),
-            destination,
-            encoder,
-            encoder_stereo: false,
-            key,
-            keepalive_timer: Timer::new(temp_heartbeat),
-            last_heartbeat_nonce: None,
-            udp,
-            sequence: 0,
-            silence_frames: 0,
-            soft_clip,
-            speaking: false,
-            ssrc: ready.ssrc,
-            thread_items,
-            timestamp: 0,
-            user_id: info.user_id,
-        })
+        // let _ = client
+        //     .stream_ref()
+        //     .as_tcp()
+        //     .set_read_timeout(Some(Duration::from_millis(25)));
+
+        // let mutexed_client = Arc::new(Mutex::new(client));
+        // let thread_items = start_threads(Arc::clone(&mutexed_client), &udp)?;
+
+        // info!("[Voice] Connected to: {}", info.endpoint);
+
+        // // Encode for Discord in Stereo, as required.
+        // let mut encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Stereo, CodingMode::Audio)?;
+        // encoder.set_bitrate(Bitrate::Bits(DEFAULT_BITRATE))?;
+        // let soft_clip = SoftClip::new(Channels::Stereo);
+
+        // let soft_clip = SoftClip::new(Channels::Stereo);
+
+        // // Per discord dev team's current recommendations:
+        // // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
+        // let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;
+
+        // Ok(Connection {
+        //     audio_timer: Timer::new(1000 * 60 * 4),
+        //     client: mutexed_client,
+        //     decoder_map: HashMap::new(),
+        //     destination,
+        //     encoder,
+        //     encoder_stereo: false,
+        //     key,
+        //     keepalive_timer: Timer::new(temp_heartbeat),
+        //     last_heartbeat_nonce: None,
+        //     udp,
+        //     sequence: 0,
+        //     silence_frames: 0,
+        //     soft_clip,
+        //     speaking: false,
+        //     ssrc: ready.ssrc,
+        //     thread_items,
+        //     timestamp: 0,
+        //     user_id: info.user_id,
+        // })
     }
 
     #[allow(unused_variables)]
@@ -515,14 +555,14 @@ fn combine_audio(
     }
 }
 
-fn generate_url(endpoint: &mut String) -> Result<WebsocketUrl> {
+fn generate_url(endpoint: &mut String) -> Result<Url> {
     if endpoint.ends_with(":80") {
         let len = endpoint.len();
 
         endpoint.truncate(len - 3);
     }
 
-    WebsocketUrl::parse(&format!("wss://{}/?v={}", endpoint, VOICE_GATEWAY_VERSION))
+    Url::parse(&format!("wss://{}/?v={}", endpoint, VOICE_GATEWAY_VERSION))
         .or(Err(Error::Voice(VoiceError::EndpointUrl)))
 }
 
