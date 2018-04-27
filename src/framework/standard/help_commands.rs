@@ -240,7 +240,7 @@ pub fn with_embeds<H: BuildHasher>(
                 &help_options.striked_commands_tip_in_dm
             };
 
-            if let Some(ref striked_command_text) = striked_command_tip{
+            if let Some(ref striked_command_text) = striked_command_tip {
                 embed.colour(help_options.embed_success_colour);
                 embed.description(format!(
                     "{}\n{}",
