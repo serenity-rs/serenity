@@ -83,7 +83,11 @@ impl Role {
     /// # let role = RoleId(7).find().unwrap();
     /// // assuming a `role` has already been bound
     //
-    /// role.edit(|r| r.hoist(true));
+    /// role.edit(|mut r| {
+    ///     r.hoist(true);
+    ///
+    ///     r
+    /// });
     /// ```
     ///
     /// [`Role`]: struct.Role.html
