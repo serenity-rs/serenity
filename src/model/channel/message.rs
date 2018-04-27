@@ -221,11 +221,11 @@ impl Message {
         let mut builder = EditMessage::default();
 
         if !self.content.is_empty() {
-            builder = builder.content(&self.content);
+            builder.content(&self.content);
         }
 
         if let Some(embed) = self.embeds.get(0) {
-            builder = builder.embed(|_| CreateEmbed::from(embed.clone()));
+            builder.embed(|_| CreateEmbed::from(embed.clone()));
         }
 
         let map = serenity_utils::vecmap_to_json_map(f(builder).0);

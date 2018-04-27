@@ -49,8 +49,15 @@ use super::{
 use utils::Colour;
 
 fn error_embed(channel_id: &ChannelId, input: &str, colour: Colour) {
-    let _ = channel_id.send_message(|m| {
-        m.embed(|e| e.colour(colour).description(input))
+    let _ = channel_id.send_message(|mut m| {
+        m.embed(|mut e| {
+            e.colour(colour);
+            e.description(input);
+
+            e
+        });
+
+        m
     });
 }
 
@@ -167,34 +174,36 @@ pub fn with_embeds<H: BuildHasher>(
                     return Ok(());
                 }
 
-                let _ = msg.channel_id.send_message(|m| {
-                    m.embed(|e| {
-                        let mut embed = e.colour(help_options.embed_success_colour).title(command_name);
+                let _ = msg.channel_id.send_message(|mut m| {
+                    m.embed(|mut embed| {
+                        embed.colour(help_options.embed_success_colour);
+
+                        embed.title(command_name.clone());
 
                         if let Some(ref desc) = command.desc {
-                            embed = embed.description(desc);
+                            embed.description(desc);
                         }
 
                         if let Some(ref usage) = command.usage {
                             let value = format!("`{} {}`", command_name, usage);
 
-                            embed = embed.field(&help_options.usage_label, value, true);
+                            embed.field(&help_options.usage_label, value, true);
                         }
 
                         if let Some(ref example) = command.example {
                             let value = format!("`{} {}`", command_name, example);
 
-                            embed = embed.field(&help_options.usage_sample_label, value, true);
+                            embed.field(&help_options.usage_sample_label, value, true);
                         }
 
                         if group_name != "Ungrouped" {
-                            embed = embed.field(&help_options.grouped_label, group_name, true);
+                            embed.field(&help_options.grouped_label, group_name, true);
                         }
 
                         if !command.aliases.is_empty() {
                             let aliases = command.aliases.join(", ");
 
-                            embed = embed.field(&help_options.aliases_label, aliases, true);
+                            embed.field(&help_options.aliases_label, aliases, true);
                         }
 
                         let available = if command.dm_only {
@@ -205,10 +214,12 @@ pub fn with_embeds<H: BuildHasher>(
                             &help_options.dm_and_guild_text
                         };
 
-                        embed = embed.field(&help_options.available_text, available, true);
+                        embed.field(&help_options.available_text, available, true);
 
                         embed
-                    })
+                    });
+
+                    m
                 });
 
                 return Ok(());
@@ -221,22 +232,24 @@ pub fn with_embeds<H: BuildHasher>(
         return Ok(());
     }
 
-    let _ = msg.channel_id.send_message(|m| {
-        m.embed(|mut e| {
+    let _ = msg.channel_id.send_message(|mut m| {
+        m.embed(|mut embed| {
             let striked_command_tip = if msg.is_private() {
-                    &help_options.striked_commands_tip_in_guild
-                } else {
-                    &help_options.striked_commands_tip_in_dm
-                };
-
-            if let Some(ref striked_command_text) = striked_command_tip {
-                e = e.colour(help_options.embed_success_colour).description(
-                    format!("{}\n{}", &help_options.individual_command_tip, striked_command_text),
-                );
+                &help_options.striked_commands_tip_in_guild
             } else {
-                e = e.colour(help_options.embed_success_colour).description(
+                &help_options.striked_commands_tip_in_dm
+            };
+
+            if let Some(ref striked_command_text) = striked_command_tip{
+                embed.colour(help_options.embed_success_colour);
+                embed.description(format!(
+                    "{}\n{}",
                     &help_options.individual_command_tip,
-                );
+                    &striked_command_text,
+                ));
+            } else {
+                embed.colour(help_options.embed_success_colour);
+                embed.description(&help_options.individual_command_tip);
             }
 
             let mut group_names = groups.keys().collect::<Vec<_>>();
@@ -302,11 +315,14 @@ pub fn with_embeds<H: BuildHasher>(
                 }
 
                 if has_commands {
-                    e = e.field(&group_name[..], &desc[..], true);
+                    embed.field(&group_name[..], &desc[..], true);
                 }
             }
-            e
-        })
+
+            embed
+        });
+
+        m
     });
 
     Ok(())
