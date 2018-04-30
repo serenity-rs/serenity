@@ -131,11 +131,11 @@ impl Connection {
         let handle = core.handle();
 
         let url = generate_url(&mut info.endpoint);
-        let local_remote = handle.remote().clone();
+        let local_remote_ws = handle.remote().clone();
 
         let done = result(url)
             // Build a (TLS'd) websocket.
-            .and_then(move |url| connect_async(url, local_remote).map_err(|e| e.into()))
+            .and_then(move |url| connect_async(url, local_remote_ws).map_err(|e| e.into()))
             // Our init of the handshake.
             .and_then(|(ws, _)| ws.send_json(&payload::build_identify(&info)))//ws.send(payload::build_identify(&info)).map_err(|e| e.into()))
             // The reply has TWO PARTS, which can come in any order.
@@ -144,6 +144,8 @@ impl Connection {
                     state.ws.recv_json()
                         .map_err(|(err, _)| err)
                         .and_then(move |(value_wrap, ws)| {
+                            state.ws = ws;
+
                             let value = match value_wrap {
                                 Some(json_value) => json_value,
                                 None => {return Ok(Loop::Continue(state));},
@@ -200,13 +202,13 @@ impl Connection {
                     .next()
                     .ok_or(Error::Voice(VoiceError::HostnameResolve))?;
 
-                let udp = UdpSocket::bind(&local)?;
+                let udp = UdpSocket::bind(&local, &handle)?;
 
                 let mut bytes = [0u8; 70];
                 let mut write_bytes = [0u8; 256];
                 (&mut bytes[..]).write_u32::<BigEndian>(handshake.ready.ssrc)?;
 
-                Ok(udp.send_dgram(&bytes[..], &destination)
+                Ok(udp.send_dgram(&bytes[..], destination)
                     .and_then(|(udp, _)| udp.recv_dgram(vec![0u8; 256]))
                     .map_err(|e| e.into())
                     .and_then(move |(udp, data, len, _)| {
@@ -222,16 +224,28 @@ impl Connection {
                         let port_pos = len - 2;
                         let port = (&bytes[port_pos..]).read_u16::<LittleEndian>()?;
 
-                        Ok(handshake.ws.send(payload::build_select_protocol(addr, port))
+                        Ok(handshake.ws.send_json(&payload::build_select_protocol(addr, port))
                             .map_err(|e| e.into())
-                            .map(|_| (handshake, udp)))
+                            .map(move |ws| {
+                                handshake.ws = ws;
+                                (handshake, udp)
+                            }))
                     })
                 )
             })
             .and_then(|internal| internal)
             .and_then(|internal| internal)
             .and_then(|(handshake, udp)| {
-                encryption_key(handshake.ws)
+                Ok(encryption_key(handshake.ws)
+                    .map(move |(key, ws)| {
+                        handshake.ws = ws;
+                        (handshake, udp, key)
+                    })
+                )
+            })
+            .and_then(|internal| internal)
+            .and_then(|(handshake, udp, key)| {
+                Ok(())
             });
 
         core.run(done).unwrap();
@@ -255,8 +269,6 @@ impl Connection {
         // // Encode for Discord in Stereo, as required.
         // let mut encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Stereo, CodingMode::Audio)?;
         // encoder.set_bitrate(Bitrate::Bits(DEFAULT_BITRATE))?;
-        // let soft_clip = SoftClip::new(Channels::Stereo);
-
         // let soft_clip = SoftClip::new(Channels::Stereo);
 
         // // Per discord dev team's current recommendations:
@@ -611,14 +623,14 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
 }
 
 #[inline]
-fn encryption_key(ws: WsClient) -> IntoFuture<Item=(Key, WsClient), Error=Error> {//Result<Key> {
-    loop_fn(ws, |ws| {
+fn encryption_key(ws: WsClient) -> Box<Future<Item=(Key, WsClient), Error=Error>> {
+    let out = loop_fn(ws, |ws| {
         ws.recv_json()
             .map_err(|(err, _)| err)
             .and_then(|(value_wrap, ws)| {
                 let value = match value_wrap {
                     Some(json_value) => json_value,
-                    None => {return Ok(Loop::Continue(state));},
+                    None => {return Ok(Loop::Continue(ws));},
                 };
 
                 match VoiceEvent::deserialize(value)? {
@@ -643,7 +655,9 @@ fn encryption_key(ws: WsClient) -> IntoFuture<Item=(Key, WsClient), Error=Error>
 
                 Ok(Loop::Continue(ws))
             })
-    })
+    });
+
+    Box::new(out)
 }
 
 #[inline]
