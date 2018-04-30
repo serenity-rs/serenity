@@ -137,15 +137,17 @@ impl Connection {
             // Build a (TLS'd) websocket.
             .and_then(move |url| connect_async(url, local_remote).map_err(|e| e.into()))
             // Our init of the handshake.
-            .and_then(|(ws, _)| ws.send(payload::build_identify(&info)).map_err(|e| e.into()))
+            .and_then(|(ws, _)| ws.send_json(&payload::build_identify(&info)))//ws.send(payload::build_identify(&info)).map_err(|e| e.into()))
             // The reply has TWO PARTS, which can come in any order.
             .and_then(|ws| {
                 loop_fn(ProgressingVoiceHandshake {ready: None, hello: None, ws}, |state| {
-                    state.ws.into_future()
-                        .map_err(|(e, _)| e.into())
-                        .and_then(|(el, ws)| {
-                            let value_wrap = el.ok_or(Error::Voice(VoiceError::ExpectedHandshake))?;
-                            let value = from_string(value_wrap.into_text()?)?;
+                    state.ws.recv_json()
+                        .map_err(|(err, _)| err)
+                        .and_then(move |(value_wrap, ws)| {
+                            let value = match value_wrap {
+                                Some(json_value) => json_value,
+                                None => {return Ok(Loop::Continue(state));},
+                            };
 
                             match VoiceEvent::deserialize(value)? {
                                 VoiceEvent::Ready(r) => {
@@ -207,7 +209,7 @@ impl Connection {
                 Ok(udp.send_dgram(&bytes[..], &destination)
                     .and_then(|(udp, _)| udp.recv_dgram(vec![0u8; 256]))
                     .map_err(|e| e.into())
-                    .and_then(move |(udp, data, _, _)| {
+                    .and_then(move |(udp, data, len, _)| {
                         // Find the position in the bytes that contains the first byte of 0,
                         // indicating the "end of the address".
                         let index = data.iter()
@@ -611,12 +613,12 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
 #[inline]
 fn encryption_key(ws: WsClient) -> IntoFuture<Item=(Key, WsClient), Error=Error> {//Result<Key> {
     loop_fn(ws, |ws| {
-        ws.into_future()
-            .map_err(|(e, _)| e.into())
-            .and_then(|(el, ws)| {
-                let value = match el {
-                    Some(value) => from_string(value.into_text()?)?,
-                    None => {return Ok(Loop::Continue(ws))},
+        ws.recv_json()
+            .map_err(|(err, _)| err)
+            .and_then(|(value_wrap, ws)| {
+                let value = match value_wrap {
+                    Some(json_value) => json_value,
+                    None => {return Ok(Loop::Continue(state));},
                 };
 
                 match VoiceEvent::deserialize(value)? {
