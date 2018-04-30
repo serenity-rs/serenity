@@ -12,7 +12,11 @@ use futures::{
     Stream,
 };
 use internal::prelude::*;
-use internal::ws_impl::{ReceiverExt, SenderExt};
+use internal::ws_ext::{
+    ReceiverExt,
+    SenderExt,
+    WsClient,
+};
 use internal::Timer;
 use model::event::{
     VoiceEvent,
@@ -32,7 +36,6 @@ use opus::{
 use parking_lot::Mutex;
 use rand::random;
 use serde::Deserialize;
-use serde_json::from_string;
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
 use std::collections::HashMap;
 use std::io::Write;
@@ -44,8 +47,10 @@ use std::time::Duration;
 use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
-use tokio_udp::UdpSocket;
-use tokio_core::reactor::{Core, Handle};
+use tokio_core::{
+    net::{TcpStream, UdpSocket},
+    reactor::{Core, Handle},
+};
 use tokio_tungstenite::{connect_async, WebSocketStream};
 use tungstenite::Message;
 use url::Url;
@@ -61,14 +66,14 @@ enum ReceiverStatus {
     Websocket(VoiceEvent),
 }
 
-struct ProgressingVoiceHandshake<S> {
+struct ProgressingVoiceHandshake {
     hello: Option<VoiceHello>,
     ready: Option<VoiceReady>,
-    ws: WebSocketStream<S>,
+    ws: WsClient,
 }
 
-impl<S> ProgressingVoiceHandshake<S> {
-    fn finalize(self) -> Result<VoiceHandshake<S>> {
+impl ProgressingVoiceHandshake {
+    fn finalize(self) -> Result<VoiceHandshake> {
         let ready = self.ready.ok_or(Error::Voice(VoiceError::ExpectedHandshake))?;
         let hello = self.hello.ok_or(Error::Voice(VoiceError::ExpectedHandshake))?;
 
@@ -80,10 +85,10 @@ impl<S> ProgressingVoiceHandshake<S> {
     }
 }
 
-struct VoiceHandshake<S> {
+struct VoiceHandshake {
     hello: VoiceHello,
     ready: VoiceReady,
-    ws: WebSocketStream<S>,
+    ws: WsClient,
 }
 
 #[allow(dead_code)]
@@ -604,7 +609,7 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
 }
 
 #[inline]
-fn encryption_key<S>(ws: WebSocketStream<S>) -> Box<Future<Item=(Key, WebSocketStream<S>), Error=Error>> {//Result<Key> {
+fn encryption_key(ws: WsClient) -> IntoFuture<Item=(Key, WsClient), Error=Error> {//Result<Key> {
     loop_fn(ws, |ws| {
         ws.into_future()
             .map_err(|(e, _)| e.into())
@@ -634,7 +639,7 @@ fn encryption_key<S>(ws: WebSocketStream<S>) -> Box<Future<Item=(Key, WebSocketS
                     },
                 }
 
-                Ok(Loop::Continue(state))
+                Ok(Loop::Continue(ws))
             })
     })
 }
