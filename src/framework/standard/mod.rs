@@ -52,17 +52,19 @@ use client::CACHE;
 #[cfg(feature = "cache")]
 use model::channel::Channel;
 
-/// A macro to generate "named parameters". This is useful to avoid manually
-/// using the "arguments" parameter and manually parsing types.
+/// A convenience macro for generating a struct fulfilling the [`Command`] trait.
 ///
-/// This is meant for use with the command [`Framework`].
+/// This is meant for use with the [`Framework`], specifically `Framework`::{[`cmd`]/[`command`]}.
+///
+///
+/// If you're just looking for a simple "register this function as a command", use [`Framework::on`].
 ///
 /// # Examples
 ///
 /// Create a regular `ping` command which takes no arguments:
 ///
 /// ```rust,ignore
-/// command!(ping(_context, message, _args) {
+/// command!(ping(_context, message) {
 ///     if let Err(why) = message.reply("Pong!") {
 ///         println!("Error sending pong: {:?}", why);
 ///     }
@@ -85,6 +87,10 @@ use model::channel::Channel;
 /// ```
 ///
 /// [`Framework`]: framework/index.html
+/// [`cmd`]: struct.Framework.html#method.cmd
+/// [`command`]: struct.Framework.html#method.command
+/// [`Framework::on`]: struct.Framework.html#method.on
+/// [`Command`]: trait.Command.html
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
