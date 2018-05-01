@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.5.3] - 2018-05-01
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@FelixMcFelix]
+- [@Lakelezz]
+- [@zeyla]
+
+### Added
+
+- [http] Take `Date` header into account when ratelimiting ([@zeyla])
+  [c:40db3c0]
+- [general] Add new join messages ([@zeyla]) [c:36d7a54]
+
+### Fixed
+
+- [voice] Send silence frames upon connection ([@FelixMcFelix]) [c:83a0c85]
+- [general] Remove spurious import warning ([@acdenisSK]) [c:64dcced]
+- [docs] Fix dead link ([@Lakelezz]) [c:42063a2]
+- [model] Fix "Guild Member Chunk" deserializations ([@zeyla]) [c:fd77a91]
+- [voice] Fix voice hang ([@FelixMcFelix]) [c:e546fa2]
+- [client] Fix panics on some guild member updates in certain situations
+  ([@zeyla]) [c:526c366]
+
+### Misc.
+
+- [gateway] Clarify shard sequence-off log ([@zeyla]) [c:7f9c01e]
+- [client] Log more information about failed deserializations ([@zeyla])
+- [framework] Reword command macro docs ([@acdenisSK]) [c:a481df6]
+
 ## [0.5.2] - 2018-04-14
 
 This release contains the usual bugfixes and helper methods.
@@ -1996,6 +2027,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.5.3]: https://github.com/zeyla/serenity/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/zeyla/serenity/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/zeyla/serenity/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/zeyla/serenity/compare/v0.4.7...v0.5.0
@@ -2066,6 +2098,18 @@ Initial commit.
 [@ConcurrentMarxistGC]: https://github.com/ConcurrentMarxistGC
 [@xentec]: https://github.com/xentec
 [@zeyla]: https://github.com/zeyla
+
+[c:36d7a54]: https://github.com/zeyla/serenity/commit/36d7a541ec53051007fee74f621919bea721c8f2
+[c:40db3c0]: https://github.com/zeyla/serenity/commit/40db3c024dd5e13c5a02e10ab4f7a7e9c31a6876
+[c:42063a2]: https://github.com/zeyla/serenity/commit/42063a240682f0cfa93b7dce9fcb79b2dfe7ef99
+[c:526c366]: https://github.com/zeyla/serenity/commit/526c366eb355ff2cdfd5769621448d35926fe123
+[c:64dcced]: https://github.com/zeyla/serenity/commit/64dccedc999b6f2cdf4b60830d4c5fb1126bd37c
+[c:7b6b601]: https://github.com/zeyla/serenity/commit/7b6b6016078c3492d2873d3eed0ddb39323079ab
+[c:7f9c01e]: https://github.com/zeyla/serenity/commit/7f9c01e4e4d413979e2e66eea1d3cdf9157c4dc5
+[c:83a0c85]: https://github.com/zeyla/serenity/commit/83a0c85b0bf87cb4272b5d6e189d139fc31a6d23
+[c:a481df6]: https://github.com/zeyla/serenity/commit/a481df6e67d83216617a40d07991ba8ea04d0075
+[c:e546fa2]: https://github.com/zeyla/serenity/commit/e546fa2a32a05a9bbc351b9aa789233ee71e88f0
+[c:fd77a91]: https://github.com/zeyla/serenity/commit/fd77a91f2ba7c782f3e0e67ecee19df17bb31e26
 
 [c:003dc2e]: https://github.com/zeyla/serenity/commit/003dc2eed0f09cd214373f1581b7794d1483a689
 [c:02dc506]: https://github.com/zeyla/serenity/commit/02dc5064d9402f73ef514c9b8ffa318f5d4235ff
