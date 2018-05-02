@@ -108,6 +108,7 @@ extern crate serde_derive;
 extern crate serde_json;
 
 extern crate chrono;
+extern crate future_utils;
 extern crate futures;
 extern crate serde;
 extern crate tokio_core;

@@ -1,4 +1,8 @@
-use futures::{Canceled, Future};
+use futures::{
+    sync::mpsc::TrySendError as FutureMpscTrySendError,
+    Canceled,
+    Future
+};
 use hyper::error::UriError;
 use internal::prelude::*;
 use model::ModelError;
@@ -64,6 +68,9 @@ pub enum Error {
     Decode(&'static str, Value),
     /// There was an error with a format.
     Format(FormatError),
+    /// An error while trying to send over a future-compatible
+    /// MPSC.
+    FutureMpsc(&'static str),
     /// An `std::io` error.
     Io(IoError),
     /// An error from the `serde_json` crate.
@@ -215,6 +222,7 @@ impl StdError for Error {
             Error::Decode(msg, _) | Error::Other(msg) => msg,
             Error::ExceededLimit(..) => "Input exceeded a limit",
             Error::Format(ref inner) => inner.description(),
+            Error::FutureMpsc(ref inner) => inner,
             Error::Io(ref inner) => inner.description(),
             Error::Json(ref inner) => inner.description(),
             Error::Model(ref inner) => inner.description(),

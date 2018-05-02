@@ -1,5 +1,9 @@
 use byteorder::{BigEndian, ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 use constants::VOICE_GATEWAY_VERSION;
+use future_utils::{
+    mpsc::{unbounded, UnboundedReceiver, UnboundedSender},
+    StreamExt,
+};
 use futures::{
     future::{
         loop_fn,
@@ -8,11 +12,27 @@ use futures::{
         Future,
         Loop,
     },
+    stream::{
+        SplitSink,
+        SplitStream,
+    },
+    sync::{
+        mpsc::{
+            self as future_mpsc,
+            Receiver as FutureMpscReceiver,
+            Sender as FutureMpscSender,
+        },
+        oneshot::{
+            channel as oneshot_channel,
+            Sender as OneShotSender,
+        },
+    },
     Sink,
     Stream,
 };
 use internal::prelude::*;
 use internal::ws_ext::{
+    message_to_json,
     ReceiverExt,
     SenderExt,
     WsClient,
@@ -37,19 +57,26 @@ use parking_lot::Mutex;
 use rand::random;
 use serde::Deserialize;
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
-use std::collections::HashMap;
-use std::io::Write;
-use std::net::{SocketAddr, ToSocketAddrs};
-use std::sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender};
-use std::sync::Arc;
-use std::thread::{self, Builder as ThreadBuilder, JoinHandle};
-use std::time::Duration;
+use std::{
+    collections::HashMap,
+    io::{Error as IoError, Write},
+    net::{SocketAddr, ToSocketAddrs},
+    sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender},
+    sync::Arc,
+    thread::{self, Builder as ThreadBuilder, JoinHandle},
+    time::Duration,
+};
 use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
 use tokio_core::{
-    net::{TcpStream, UdpSocket},
-    reactor::{Core, Handle},
+    net::{
+        TcpStream,
+        UdpCodec,
+        UdpFramed,
+        UdpSocket,
+    },
+    reactor::{Core, Handle, Remote},
 };
 use tokio_tungstenite::{connect_async, WebSocketStream};
 use tungstenite::Message;
@@ -91,53 +118,69 @@ struct VoiceHandshake {
     ws: WsClient,
 }
 
-#[allow(dead_code)]
-struct ThreadItems {
-    rx: MpscReceiver<ReceiverStatus>,
-    udp_close_sender: MpscSender<i32>,
-    udp_thread: JoinHandle<()>,
-    ws_close_sender: MpscSender<i32>,
-    ws_thread: JoinHandle<()>,
+struct ListenerItems {
+    close_sender: OneShotSender<i32>,
+    rx: UnboundedReceiver<ReceiverStatus>,
+    rx_pong: UnboundedReceiver<Vec<u8>>,
+}
+
+struct VoiceCodec {
+    destination: SocketAddr,
+    key: Key,
+    sequence: u16,
+    ssrc: u32,
+    timestamp: u32,
+}
+
+impl UdpCodec for VoiceCodec {
+    type In = Vec<u8>;
+    type Out = Vec<u8>;
+
+    // TODO: Implement!
+
+    fn decode(&mut self, src: &SocketAddr, buf: &[u8]) -> StdResult<Self::In, IoError> {
+        Ok(vec![0u8])
+    }
+
+    fn encode(&mut self, msg: Self::Out, buf: &mut Vec<u8>) -> SocketAddr {
+        self.destination
+    }
 }
 
 #[allow(dead_code)]
 pub struct Connection {
     audio_timer: Timer,
-    client: Arc<Mutex<Client>>,
     decoder_map: HashMap<(u32, Channels), OpusDecoder>,
     destination: SocketAddr,
     encoder: OpusEncoder,
     encoder_stereo: bool,
     keepalive_timer: Timer,
-    key: Key,
     last_heartbeat_nonce: Option<u64>,
-    sequence: u16,
+    listener_items: ListenerItems,
+    udp_send: SplitSink<UdpFramed<VoiceCodec>>,
     silence_frames: u8,
     soft_clip: SoftClip,
     speaking: bool,
-    ssrc: u32,
-    thread_items: ThreadItems,
-    timestamp: u32,
-    udp: UdpSocket,
     user_id: UserId,
+    ws_send: SplitSink<WsClient>,
 }
 
 impl Connection {
     pub fn new(mut info: ConnectionInfo)//, handle: Handle)
-            -> () { //Box<Future<Item = (),//Connection,
-            //Error = Error>> {
+            -> Box<Future<Item = Connection, Error = Error>> {
 
         let mut core = Core::new().unwrap();
         let handle = core.handle();
 
         let url = generate_url(&mut info.endpoint);
         let local_remote_ws = handle.remote().clone();
+        let local_remote_listeners = handle.remote().clone();
 
         let done = result(url)
             // Build a (TLS'd) websocket.
-            .and_then(move |url| connect_async(url, local_remote_ws).map_err(|e| e.into()))
+            .and_then(move |url| connect_async(url, local_remote_ws).map_err(Error::from))
             // Our init of the handshake.
-            .and_then(|(ws, _)| ws.send_json(&payload::build_identify(&info)))//ws.send(payload::build_identify(&info)).map_err(|e| e.into()))
+            .and_then(|(ws, _)| ws.send_json(&payload::build_identify(&info)))
             // The reply has TWO PARTS, which can come in any order.
             .and_then(|ws| {
                 loop_fn(ProgressingVoiceHandshake {ready: None, hello: None, ws}, |state| {
@@ -210,7 +253,7 @@ impl Connection {
 
                 Ok(udp.send_dgram(&bytes[..], destination)
                     .and_then(|(udp, _)| udp.recv_dgram(vec![0u8; 256]))
-                    .map_err(|e| e.into())
+                    .map_err(Error::from)
                     .and_then(move |(udp, data, len, _)| {
                         // Find the position in the bytes that contains the first byte of 0,
                         // indicating the "end of the address".
@@ -225,76 +268,70 @@ impl Connection {
                         let port = (&bytes[port_pos..]).read_u16::<LittleEndian>()?;
 
                         Ok(handshake.ws.send_json(&payload::build_select_protocol(addr, port))
-                            .map_err(|e| e.into())
+                            .map_err(Error::from)
                             .map(move |ws| {
                                 handshake.ws = ws;
-                                (handshake, udp)
+                                (handshake, udp, destination)
                             }))
                     })
                 )
             })
-            .and_then(|internal| internal)
-            .and_then(|internal| internal)
-            .and_then(|(handshake, udp)| {
+            .flatten()
+            .flatten()
+            .and_then(|(handshake, udp, destination)| {
                 Ok(encryption_key(handshake.ws)
                     .map(move |(key, ws)| {
                         handshake.ws = ws;
-                        (handshake, udp, key)
+                        (handshake, udp, key, destination)
                     })
                 )
             })
-            .and_then(|internal| internal)
-            .and_then(|(handshake, udp, key)| {
-                Ok(())
+            .flatten()
+            .and_then(|(handshake, udp, key, destination)| {
+                let VoiceHandshake { hello, ready, ws } = handshake;
+                let codec = VoiceCodec {
+                    destination,
+                    key,
+                    sequence: 0,
+                    ssrc: ready.ssrc,
+                    timestamp: 0,
+                };
+
+                let (ws_send, ws_reader) = ws.split();
+                let (udp_send, udp_reader) = udp.framed(codec).split();
+
+                let listener_items = spawn_receive_handlers(ws_reader, udp_reader, &local_remote_listeners);
+
+                info!("[Voice] Connected to: {}", info.endpoint);
+
+                // Encode for Discord in Stereo, as required.
+                let mut encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Stereo, CodingMode::Audio)?;
+                encoder.set_bitrate(Bitrate::Bits(DEFAULT_BITRATE))?;
+                let soft_clip = SoftClip::new(Channels::Stereo);
+
+                // Per discord dev team's current recommendations:
+                // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
+                let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;
+
+                Ok(Connection {
+                    audio_timer: Timer::new(1000 * 60 * 4),
+                    decoder_map: HashMap::new(),
+                    destination,
+                    encoder,
+                    encoder_stereo: false,
+                    keepalive_timer: Timer::new(temp_heartbeat),
+                    last_heartbeat_nonce: None,
+                    listener_items,
+                    udp_send,
+                    silence_frames: 100,
+                    soft_clip,
+                    speaking: false,
+                    user_id: info.user_id,
+                    ws_send,
+                })
             });
 
-        core.run(done).unwrap();
-
-        ()
-
-        // return Box::new(done);
-
-        // let key = encryption_key(&mut client)?;
-
-        // let _ = client
-        //     .stream_ref()
-        //     .as_tcp()
-        //     .set_read_timeout(Some(Duration::from_millis(25)));
-
-        // let mutexed_client = Arc::new(Mutex::new(client));
-        // let thread_items = start_threads(Arc::clone(&mutexed_client), &udp)?;
-
-        // info!("[Voice] Connected to: {}", info.endpoint);
-
-        // // Encode for Discord in Stereo, as required.
-        // let mut encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Stereo, CodingMode::Audio)?;
-        // encoder.set_bitrate(Bitrate::Bits(DEFAULT_BITRATE))?;
-        // let soft_clip = SoftClip::new(Channels::Stereo);
-
-        // // Per discord dev team's current recommendations:
-        // // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
-        // let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;
-
-        // Ok(Connection {
-        //     audio_timer: Timer::new(1000 * 60 * 4),
-        //     client: mutexed_client,
-        //     decoder_map: HashMap::new(),
-        //     destination,
-        //     encoder,
-        //     encoder_stereo: false,
-        //     key,
-        //     keepalive_timer: Timer::new(temp_heartbeat),
-        //     last_heartbeat_nonce: None,
-        //     udp,
-        //     sequence: 0,
-        //     silence_frames: 0,
-        //     soft_clip,
-        //     speaking: false,
-        //     ssrc: ready.ssrc,
-        //     thread_items,
-        //     timestamp: 0,
-        //     user_id: info.user_id,
-        // })
+        return Box::new(done);
     }
 
     #[allow(unused_variables)]
@@ -669,68 +706,49 @@ where T: for<'a> PartialEq<&'a str>,
 }
 
 #[inline]
-fn start_threads(client: Arc<Mutex<Client>>, udp: &UdpSocket) -> Result<ThreadItems> {
-    let (udp_close_sender, udp_close_reader) = mpsc::channel();
-    let (ws_close_sender, ws_close_reader) = mpsc::channel();
+fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<VoiceCodec>>, context: &Remote) -> ListenerItems {
+    let (close_sender, close_reader) = oneshot_channel();
 
-    let current_thread = thread::current();
-    let thread_name = current_thread.name().unwrap_or("serenity voice");
+    let close_reader = close_reader;
+    let close_reader1 = close_reader.shared();
+    let close_reader2 = close_reader1.clone();
 
-    let (tx, rx) = mpsc::channel();
+    let (tx, rx) = unbounded();
     let tx_clone = tx.clone();
-    let udp_clone = udp.try_clone()?;
 
-    let udp_thread = ThreadBuilder::new()
-        .name(format!("{} UDP", thread_name))
-        .spawn(move || {
-            let _ = udp_clone.set_read_timeout(Some(Duration::from_millis(250)));
+    let (tx_pong, rx_pong) = unbounded();
 
-            let mut buffer = [0; 512];
+    context.spawn(move |_|
+        ws.until(close_reader1)
+            .for_each(|message| {
+                message_to_json(message, tx_pong).and_then(
+                    |maybe_value| match maybe_value {
+                        Some(value) => match VoiceEvent::deserialize(value) {
+                            Ok(msg) => tx.unbounded_send(ReceiverStatus::Websocket(msg))
+                                .map_err(|e| Error::FutureMpsc("[voice] WS event receiver hung up.")),
+                            Err(why) => {
+                                warn!("Error deserializing voice event: {:?}", why);
 
-            loop {
-                if let Ok((len, _)) = udp_clone.recv_from(&mut buffer) {
-                    let piece = buffer[..len].to_vec();
-                    let send = tx.send(ReceiverStatus::Udp(piece));
-
-                    if send.is_err() {
-                        return;
+                                Err(Error::Json(why))
+                            },
+                        },
+                        None => Ok(()),
                     }
-                } else if udp_close_reader.try_recv().is_ok() {
-                    return;
-                }
-            }
-        })?;
+                )
+            })
+    );
 
-    let ws_thread = ThreadBuilder::new()
-        .name(format!("{} WS", thread_name))
-        .spawn(move || loop {
-            while let Ok(Some(value)) = client.lock().recv_json() {
-                let msg = match VoiceEvent::deserialize(value) {
-                    Ok(msg) => msg,
-                    Err(why) => {
-                        warn!("Error deserializing voice event: {:?}", why);
+    context.spawn(move |_|
+        udp.until(close_reader2)
+            .for_each(|voice_frame|
+                tx_clone.unbounded_send(ReceiverStatus::Udp(voice_frame))
+                    .map_err(|e| Error::FutureMpsc("[voice] UDP event receiver hung up."))
+            )
+    );
 
-                        break;
-                    },
-                };
-
-                if tx_clone.send(ReceiverStatus::Websocket(msg)).is_err() {
-                    return;
-                }
-            }
-
-            if ws_close_reader.try_recv().is_ok() {
-                return;
-            }
-
-            thread::sleep(Duration::from_millis(25));
-        })?;
-
-    Ok(ThreadItems {
-        rx: rx,
-        udp_close_sender: udp_close_sender,
-        udp_thread: udp_thread,
-        ws_close_sender: ws_close_sender,
-        ws_thread: ws_thread,
-    })
+    ListenerItems {
+        close_sender,
+        rx,
+        rx_pong,
+    }
 }

@@ -1,9 +1,11 @@
 use flate2::read::ZlibDecoder;
+use future_utils::mpsc::UnboundedSender;
 use futures::{
     future::{
-        done,
+        result,
         ok,
     },
+    sync::mpsc::Sender as FutureMpscSender,
     Future,
     Poll,
     IntoFuture,
@@ -69,25 +71,25 @@ impl ReceiverExt for WsClient {
             .and_then(|(message, ws)| {
                 match message {
                     Message::Binary(bytes) => {
-                        let handle = done(serde_json::from_reader(ZlibDecoder::new(&bytes[..])).map(Some))
+                        let done = result(serde_json::from_reader(ZlibDecoder::new(&bytes[..])).map(Some))
                             .map_err(move |err| (err.into(), ws))
                             .map(move |val| (val, ws));
 
-                        Either4::One(handle)
+                        Either4::One(done)
                     },
                     Message::Text(payload) => {
-                        let handle = done(serde_json::from_str(&payload).map(Some))
+                        let done = result(serde_json::from_str(&payload).map(Some))
                             .map_err(move |err| (err.into(), ws))
                             .map(move |val| (val, ws));
 
-                        Either4::Two(handle)
+                        Either4::Two(done)
                     },
                     Message::Ping(x) => {
-                        let handle = ws.send(Message::Pong(x))
+                        let done = ws.send(Message::Pong(x))
                             .map_err(move |err| (err.into(), ws))
                             .map(|ws| (None, ws));
 
-                        Either4::Three(handle)
+                        Either4::Three(done)
                     },
                     Message::Pong(_) => Either4::Four(ok((None, ws))),
                 }
@@ -98,13 +100,29 @@ impl ReceiverExt for WsClient {
     }
 }
 
+pub fn message_to_json(message: Message, notifier: UnboundedSender<Vec<u8>>) -> Result<Option<Value>> {
+    // This is like the above, except in the case where the sender and receiver have been split.
+    // It doesn't seem like Stream + Sink allows .shared() to be called, so here we are...
+    // Telling the holder of the send side that they're obliged to Pong.
+    match message {
+        Message::Binary(bytes) => serde_json::from_reader(ZlibDecoder::new(&bytes[..])).map(Some).map_err(Error::from),
+        Message::Text(payload) => serde_json::from_str(&payload).map(Some).map_err(Error::from),
+        Message::Ping(x) => {
+            notifier.unbounded_send(x);
+
+            Ok(None)
+        },
+        Message::Pong(_) => Ok(None),
+    }
+}
+
 impl SenderExt for WsClient {
     fn send_json(self, value: &Value) -> Box<Future<Item = Self, Error = Error>> {
         let text = serde_json::to_string(value)
             .map(Message::Text)
             .map_err(Error::from);
 
-        let out = done(text)
+        let out = result(text)
             .and_then(|data| self.send(data).map_err(Error::from));
 
         Box::new(out)
