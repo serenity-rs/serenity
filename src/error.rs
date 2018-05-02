@@ -1,5 +1,5 @@
 use futures::{
-    sync::mpsc::TrySendError as FutureMpscTrySendError,
+    future::SharedError,
     Canceled,
     Future
 };
@@ -189,6 +189,11 @@ impl From<SendError<TungsteniteMessage>> for Error {
     fn from(err: SendError<TungsteniteMessage>) -> Self {
         Error::WebSocketSend(err)
     }
+}
+
+impl<T> From<SharedError<T>> for Error
+        where Error: From<T> {
+    fn from(e: SharedError<T>) -> Error { Error::from(*e) }
 }
 
 #[cfg(feature = "native-tls")]

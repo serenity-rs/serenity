@@ -38,6 +38,7 @@ use internal::ws_ext::{
     WsClient,
 };
 use internal::Timer;
+use log::LogLevel;
 use model::event::{
     VoiceEvent,
     VoiceHello,
@@ -119,7 +120,7 @@ struct VoiceHandshake {
 }
 
 struct ListenerItems {
-    close_sender: OneShotSender<i32>,
+    close_sender: OneShotSender<()>,
     rx: UnboundedReceiver<ReceiverStatus>,
     rx_pong: UnboundedReceiver<Vec<u8>>,
 }
@@ -137,11 +138,13 @@ impl UdpCodec for VoiceCodec {
     type Out = Vec<u8>;
 
     // TODO: Implement!
-
     fn decode(&mut self, src: &SocketAddr, buf: &[u8]) -> StdResult<Self::In, IoError> {
         Ok(vec![0u8])
     }
 
+    // TODO: Implement.
+    // User will either send a heartbeat or audio of variable length.
+    // Make an Enum for this I guess?
     fn encode(&mut self, msg: Self::Out, buf: &mut Vec<u8>) -> SocketAddr {
         self.destination
     }
@@ -357,6 +360,7 @@ impl Connection {
         if let Some(receiver) = receiver.as_mut() {
             while let Ok(status) = self.thread_items.rx.try_recv() {
                 match status {
+                    // TODO: move to codec.
                     ReceiverStatus::Udp(packet) => {
                         let mut handle = &packet[2..];
                         let seq = handle.read_u16::<BigEndian>()?;
@@ -442,6 +446,7 @@ impl Connection {
             self.client.lock().send_json(&payload::build_heartbeat(nonce))?;
         }
 
+        // TODO: move to codec
         // Send UDP keepalive if it's time
         if self.audio_timer.check() {
             let mut bytes = [0; 4];
@@ -458,6 +463,9 @@ impl Connection {
         let mut opus_frame = Vec::new();
 
         let mut len = 0;
+
+        // TODO: Could we parallelise this across futures?
+        // It's multiple I/O operations, potentially.
 
         // Walk over all the audio files, removing those which have finished.
         // For this purpose, we need a while loop in Rust.
@@ -570,6 +578,7 @@ impl Connection {
         Ok(())
     }
 
+    // TODO: move to codec.
     fn prep_packet(&mut self,
                    packet: &mut [u8],
                    buffer: [f32; 1920],
@@ -707,7 +716,7 @@ where T: for<'a> PartialEq<&'a str>,
 
 #[inline]
 fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<VoiceCodec>>, context: &Remote) -> ListenerItems {
-    let (close_sender, close_reader) = oneshot_channel();
+    let (close_sender, close_reader) = oneshot_channel::<()>();
 
     let close_reader = close_reader;
     let close_reader1 = close_reader.shared();
@@ -719,13 +728,14 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
     let (tx_pong, rx_pong) = unbounded();
 
     context.spawn(move |_|
-        ws.until(close_reader1)
+        ws.map_err(Error::from)
+            .until(close_reader1.map(|v| *v))
             .for_each(|message| {
                 message_to_json(message, tx_pong).and_then(
                     |maybe_value| match maybe_value {
                         Some(value) => match VoiceEvent::deserialize(value) {
                             Ok(msg) => tx.unbounded_send(ReceiverStatus::Websocket(msg))
-                                .map_err(|e| Error::FutureMpsc("[voice] WS event receiver hung up.")),
+                                .map_err(|e| Error::FutureMpsc("WS event receiver hung up.")),
                             Err(why) => {
                                 warn!("Error deserializing voice event: {:?}", why);
 
@@ -733,17 +743,27 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
                             },
                         },
                         None => Ok(()),
-                    }
-                )
+                    })
+            })
+            .map_err(|e| {
+                warn!("[voice] {}", e);
+
+                ()
             })
     );
 
     context.spawn(move |_|
-        udp.until(close_reader2)
+        udp.map_err(Error::from)
+            .until(close_reader2.map(|v| *v))
             .for_each(|voice_frame|
                 tx_clone.unbounded_send(ReceiverStatus::Udp(voice_frame))
                     .map_err(|e| Error::FutureMpsc("[voice] UDP event receiver hung up."))
             )
+            .map_err(|e| {
+                warn!("[voice] {}", e);
+
+                ()
+            })
     );
 
     ListenerItems {
