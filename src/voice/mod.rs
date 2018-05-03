@@ -1,6 +1,7 @@
 //! A module for connecting to voice channels.
 
 mod audio;
+mod codec;
 mod connection;
 mod connection_info;
 mod dca;

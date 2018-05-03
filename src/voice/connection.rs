@@ -1,4 +1,4 @@
-use byteorder::{BigEndian, ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{NetworkEndian, ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 use constants::VOICE_GATEWAY_VERSION;
 use future_utils::{
     mpsc::{unbounded, UnboundedReceiver, UnboundedSender},
@@ -38,7 +38,6 @@ use internal::ws_ext::{
     WsClient,
 };
 use internal::Timer;
-use log::LogLevel;
 use model::event::{
     VoiceEvent,
     VoiceHello,
@@ -67,9 +66,24 @@ use std::{
     thread::{self, Builder as ThreadBuilder, JoinHandle},
     time::Duration,
 };
-use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
-use super::connection_info::ConnectionInfo;
-use super::{payload, VoiceError, CRYPTO_MODE};
+use super::{
+    audio::{
+        AudioReceiver,
+        AudioType,
+        HEADER_LEN,
+        SAMPLE_RATE,
+        DEFAULT_BITRATE,
+        LockedAudio,
+    },
+    codec::{
+        VoiceCodec,
+        VoicePacket,
+    },
+    connection_info::ConnectionInfo,
+    payload,
+    CRYPTO_MODE,
+    VoiceError, 
+};
 use tokio_core::{
     net::{
         TcpStream,
@@ -82,12 +96,6 @@ use tokio_core::{
 use tokio_tungstenite::{connect_async, WebSocketStream};
 use tungstenite::Message;
 use url::Url;
-// use websocket::client::Url as WebsocketUrl;
-// use websocket::sync::client::ClientBuilder;
-// use websocket::sync::stream::{AsTcpStream, TcpStream, TlsStream};
-// use websocket::sync::Client as WsClient;
-
-// type Client = WsClient<TlsStream<TcpStream>>;
 
 enum ReceiverStatus {
     Udp(Vec<u8>),
@@ -125,38 +133,10 @@ struct ListenerItems {
     rx_pong: UnboundedReceiver<Vec<u8>>,
 }
 
-struct VoiceCodec {
-    destination: SocketAddr,
-    key: Key,
-    sequence: u16,
-    ssrc: u32,
-    timestamp: u32,
-}
-
-impl UdpCodec for VoiceCodec {
-    type In = Vec<u8>;
-    type Out = Vec<u8>;
-
-    // TODO: Implement!
-    fn decode(&mut self, src: &SocketAddr, buf: &[u8]) -> StdResult<Self::In, IoError> {
-        Ok(vec![0u8])
-    }
-
-    // TODO: Implement.
-    // User will either send a heartbeat or audio of variable length.
-    // Make an Enum for this I guess?
-    fn encode(&mut self, msg: Self::Out, buf: &mut Vec<u8>) -> SocketAddr {
-        self.destination
-    }
-}
-
 #[allow(dead_code)]
 pub struct Connection {
     audio_timer: Timer,
-    decoder_map: HashMap<(u32, Channels), OpusDecoder>,
     destination: SocketAddr,
-    encoder: OpusEncoder,
-    encoder_stereo: bool,
     keepalive_timer: Timer,
     last_heartbeat_nonce: Option<u64>,
     listener_items: ListenerItems,
@@ -252,7 +232,7 @@ impl Connection {
 
                 let mut bytes = [0u8; 70];
                 let mut write_bytes = [0u8; 256];
-                (&mut bytes[..]).write_u32::<BigEndian>(handshake.ready.ssrc)?;
+                (&mut bytes[..]).write_u32::<NetworkEndian>(handshake.ready.ssrc)?;
 
                 Ok(udp.send_dgram(&bytes[..], destination)
                     .and_then(|(udp, _)| udp.recv_dgram(vec![0u8; 256]))
@@ -292,13 +272,7 @@ impl Connection {
             .flatten()
             .and_then(|(handshake, udp, key, destination)| {
                 let VoiceHandshake { hello, ready, ws } = handshake;
-                let codec = VoiceCodec {
-                    destination,
-                    key,
-                    sequence: 0,
-                    ssrc: ready.ssrc,
-                    timestamp: 0,
-                };
+                let codec = VoiceCodec::new(destination, key, ready.ssrc)?;
 
                 let (ws_send, ws_reader) = ws.split();
                 let (udp_send, udp_reader) = udp.framed(codec).split();
@@ -308,8 +282,6 @@ impl Connection {
                 info!("[Voice] Connected to: {}", info.endpoint);
 
                 // Encode for Discord in Stereo, as required.
-                let mut encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Stereo, CodingMode::Audio)?;
-                encoder.set_bitrate(Bitrate::Bits(DEFAULT_BITRATE))?;
                 let soft_clip = SoftClip::new(Channels::Stereo);
 
                 // Per discord dev team's current recommendations:
@@ -318,10 +290,7 @@ impl Connection {
 
                 Ok(Connection {
                     audio_timer: Timer::new(1000 * 60 * 4),
-                    decoder_map: HashMap::new(),
                     destination,
-                    encoder,
-                    encoder_stereo: false,
                     keepalive_timer: Timer::new(temp_heartbeat),
                     last_heartbeat_nonce: None,
                     listener_items,
@@ -355,7 +324,6 @@ impl Connection {
         let mut buffer = [0i16; 960 * 2];
         let mut mix_buffer = [0f32; 960 * 2];
         let mut packet = vec![0u8; size as usize].into_boxed_slice();
-        let mut nonce = secretbox::Nonce([0; 24]);
 
         if let Some(receiver) = receiver.as_mut() {
             while let Ok(status) = self.thread_items.rx.try_recv() {
@@ -363,9 +331,9 @@ impl Connection {
                     // TODO: move to codec.
                     ReceiverStatus::Udp(packet) => {
                         let mut handle = &packet[2..];
-                        let seq = handle.read_u16::<BigEndian>()?;
-                        let timestamp = handle.read_u32::<BigEndian>()?;
-                        let ssrc = handle.read_u32::<BigEndian>()?;
+                        let seq = handle.read_u16::<NetworkEndian>()?;
+                        let timestamp = handle.read_u32::<NetworkEndian>()?;
+                        let ssrc = handle.read_u32::<NetworkEndian>()?;
 
                         nonce.0[..HEADER_LEN]
                             .clone_from_slice(&packet[..HEADER_LEN]);
@@ -382,7 +350,7 @@ impl Connection {
                             // Strip RTP Header Extensions (one-byte)
                             if decrypted[0] == 0xBE && decrypted[1] == 0xDE {
                                 // Read the length bytes as a big-endian u16.
-                                let header_extension_len = BigEndian::read_u16(&decrypted[2..4]);
+                                let header_extension_len = NetworkEndian::read_u16(&decrypted[2..4]);
                                 let mut offset = 4;
                                 for _ in 0..header_extension_len {
                                     let byte = decrypted[offset];
@@ -446,18 +414,10 @@ impl Connection {
             self.client.lock().send_json(&payload::build_heartbeat(nonce))?;
         }
 
-        // TODO: move to codec
+        // TODO: call stream to send VoicePacket::KeepAlive
         // Send UDP keepalive if it's time
         if self.audio_timer.check() {
-            let mut bytes = [0; 4];
-            (&mut bytes[..]).write_u32::<BigEndian>(self.ssrc)?;
-            self.udp.send_to(&bytes, self.destination)?;
-        }
-
-        // Reconfigure encoder bitrate.
-        // From my testing, it seemed like this needed to be set every cycle.
-        if let Err(e) = self.encoder.set_bitrate(bitrate) {
-            warn!("[Voice] Bitrate set unsuccessfully: {:?}", e);
+            // unimpl'd
         }
 
         let mut opus_frame = Vec::new();
@@ -487,22 +447,6 @@ impl Connection {
                     i += 1;
 
                     continue;
-                }
-
-                // Assume this for now, at least.
-                // We'll be fusing streams, so we can either keep
-                // as stereo or downmix to mono.
-                let is_stereo = true;
-                let source_stereo = stream.is_stereo();
-
-                if is_stereo != self.encoder_stereo {
-                    let channels = if is_stereo {
-                        Channels::Stereo
-                    } else {
-                        Channels::Mono
-                    };
-                    self.encoder = OpusEncoder::new(SAMPLE_RATE, channels, CodingMode::Audio)?;
-                    self.encoder_stereo = is_stereo;
                 }
 
                 let temp_len = match stream.get_type() {
@@ -569,7 +513,6 @@ impl Connection {
 
         self.set_speaking(true)?;
 
-        let index = self.prep_packet(&mut packet, mix_buffer, &opus_frame, nonce)?;
         audio_timer.await();
 
         self.udp.send_to(&packet[..index], self.destination)?;
@@ -578,49 +521,6 @@ impl Connection {
         Ok(())
     }
 
-    // TODO: move to codec.
-    fn prep_packet(&mut self,
-                   packet: &mut [u8],
-                   buffer: [f32; 1920],
-                   opus_frame: &[u8],
-                   mut nonce: Nonce)
-                   -> Result<usize> {
-        {
-            let mut cursor = &mut packet[..HEADER_LEN];
-            cursor.write_all(&[0x80, 0x78])?;
-            cursor.write_u16::<BigEndian>(self.sequence)?;
-            cursor.write_u32::<BigEndian>(self.timestamp)?;
-            cursor.write_u32::<BigEndian>(self.ssrc)?;
-        }
-
-        nonce.0[..HEADER_LEN]
-            .clone_from_slice(&packet[..HEADER_LEN]);
-
-        let sl_index = packet.len() - 16;
-        let buffer_len = if self.encoder_stereo { 960 * 2 } else { 960 };
-
-        let len = if opus_frame.is_empty() {
-            self.encoder
-                .encode_float(&buffer[..buffer_len], &mut packet[HEADER_LEN..sl_index])?
-        } else {
-            let len = opus_frame.len();
-            packet[HEADER_LEN..HEADER_LEN + len]
-                .clone_from_slice(opus_frame);
-            len
-        };
-
-        let crypted = {
-            let slice = &packet[HEADER_LEN..HEADER_LEN + len];
-            secretbox::seal(slice, &nonce, &self.key)
-        };
-        let index = HEADER_LEN + crypted.len();
-        packet[HEADER_LEN..index].clone_from_slice(&crypted);
-
-        self.sequence = self.sequence.wrapping_add(1);
-        self.timestamp = self.timestamp.wrapping_add(960);
-
-        Ok(HEADER_LEN + crypted.len())
-    }
 
     fn set_speaking(&mut self, speaking: bool) -> Result<()> {
         if self.speaking == speaking {
@@ -757,7 +657,7 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
             .until(close_reader2.map(|v| *v))
             .for_each(|voice_frame|
                 tx_clone.unbounded_send(ReceiverStatus::Udp(voice_frame))
-                    .map_err(|e| Error::FutureMpsc("[voice] UDP event receiver hung up."))
+                    .map_err(|e| Error::FutureMpsc("UDP event receiver hung up."))
             )
             .map_err(|e| {
                 warn!("[voice] {}", e);

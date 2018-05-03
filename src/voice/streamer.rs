@@ -1,8 +1,10 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 use internal::prelude::*;
 use opus::{
+    Bitrate,
     Channels,
     Decoder as OpusDecoder,
+    Encoder as OpusEncoder,
     Result as OpusResult,
 };
 use parking_lot::Mutex;
@@ -25,7 +27,7 @@ impl Read for ChildContainer {
 
 impl Drop for ChildContainer {
     fn drop (&mut self) {
-        if let Err(e) = self.0.wait() {
+        if let Err(e) = self.0.kill() {
             debug!("[Voice] Error awaiting child process: {:?}", e);
         }
     }
@@ -33,16 +35,40 @@ impl Drop for ChildContainer {
 
 // Since each audio item needs its own decoder, we need to
 // work around the fact that OpusDecoders aint sendable.
-struct SendDecoder(OpusDecoder);
+pub(crate) struct SendDecoder(OpusDecoder);
 
 impl SendDecoder {
-    fn decode_float(&mut self, input: &[u8], output: &mut [f32], fec: bool) -> OpusResult<usize> {
+    pub(crate) fn new(decoder: OpusDecoder) -> SendDecoder {
+        SendDecoder(decoder)
+    }
+
+    pub(crate) fn decode_float(&mut self, input: &[u8], output: &mut [f32], fec: bool) -> OpusResult<usize> {
         let &mut SendDecoder(ref mut sd) = self;
         sd.decode_float(input, output, fec)
     }
 }
 
 unsafe impl Send for SendDecoder {}
+
+pub(crate) struct SendEncoder(OpusEncoder);
+
+impl SendEncoder {
+    pub(crate) fn new(encoder: OpusEncoder) -> SendEncoder {
+        SendEncoder(encoder)
+    }
+
+    pub(crate) fn encode_float(&mut self, input: &[f32], output: &mut [u8]) -> OpusResult<usize> {
+        let &mut SendEncoder(ref mut se) = self;
+        se.encode_float(input, output)
+    }
+
+    pub(crate) fn set_bitrate(&mut self, value: Bitrate) -> OpusResult<()> {
+        let &mut SendEncoder(ref mut se) = self;
+        se.set_bitrate(value)
+    }
+}
+
+unsafe impl Send for SendEncoder {}
 
 struct InputSource<R: Read + Send + 'static> {
     stereo: bool,
