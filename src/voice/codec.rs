@@ -37,7 +37,15 @@ use super::{
 };
 use tokio_core::net::UdpCodec;
 
-pub(crate) enum VoicePacket<'a> {
+pub(crate) struct RxVoicePacket {
+    is_stereo: bool,
+    seq: u16,
+    ssrc: u32,
+    timestamp: u32,
+    voice: [i16; 1920],
+}
+
+pub(crate) enum TxVoicePacket<'a> {
     KeepAlive,
     Audio(&'a[f32], Bitrate),
 }
@@ -76,10 +84,9 @@ impl VoiceCodec {
 }
 
 impl UdpCodec for VoiceCodec {
-    type In = (u32, u16, u32, bool, &'static[i16]);
-    type Out = VoicePacket<'static>;
+    type In = RxVoicePacket;
+    type Out = TxVoicePacket<'static>;
 
-    // TODO: Implement!
     fn decode(&mut self, src: &SocketAddr, buf: &[u8]) -> StdResult<Self::In, IoError> {
         let mut buffer = [0i16; 960 * 2];
 
@@ -128,11 +135,13 @@ impl UdpCodec for VoiceCodec {
                 let len = entry.decode(&decrypted, &mut buffer, false)
                     .or(Err(()))?;
 
-                let is_stereo = channels == Channels::Stereo;
-
-                let b = if is_stereo { len * 2 } else { len };
-
-                Ok((ssrc, seq, timestamp, is_stereo, &buffer[..b]))
+                Ok(RxVoicePacket {
+                    is_stereo: channels == Channels::Stereo,
+                    seq,
+                    ssrc,
+                    timestamp,
+                    voice: buffer,
+                })
             })
             .map_err(|_| IoError::new(IoErrorKind::InvalidData, "[voice] Couldn't decode Opus frames."))
     }
@@ -140,10 +149,10 @@ impl UdpCodec for VoiceCodec {
     // User will either send a heartbeat or audio of variable length.
     fn encode(&mut self, msg: Self::Out, buf: &mut Vec<u8>) -> SocketAddr {
         match msg {
-            VoicePacket::KeepAlive => {
+            TxVoicePacket::KeepAlive => {
                 buf.extend_from_slice(&self.ssrc);
             },
-            VoicePacket::Audio(audio, bitrate) => {
+            TxVoicePacket::Audio(audio, bitrate) => {
                 // Reconfigure encoder bitrate.
                 // From my testing, it seemed like this needed to be set every cycle.
                 if let Err(e) = self.encoder.set_bitrate(bitrate) {

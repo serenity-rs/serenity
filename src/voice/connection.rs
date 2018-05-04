@@ -78,7 +78,8 @@ use super::{
     },
     codec::{
         VoiceCodec,
-        VoicePacket,
+        TxVoicePacket,
+        RxVoicePacket,
     },
     connection_info::ConnectionInfo,
     payload,
@@ -329,8 +330,16 @@ impl Connection {
         if let Some(receiver) = receiver.as_mut() {
             while let Ok(status) = self.thread_items.rx.try_recv() {
                 match status {
-                    ReceiverStatus::Udp((ssrc, seq, timestamp, is_stereo, buffer)) => {
-                        receiver.voice_packet(ssrc, seq, timestamp, is_stereo, buffer);
+                    ReceiverStatus::Udp(packet) => {
+                        let RxVoicePacket {
+                            is_stereo,
+                            seq,
+                            ssrc,
+                            timestamp,
+                            voice,
+                        } = packet;
+
+                        receiver.voice_packet(ssrc, seq, timestamp, is_stereo, &voice);
                     },
                     ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
                         receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
@@ -367,7 +376,7 @@ impl Connection {
             self.client.lock().send_json(&payload::build_heartbeat(nonce))?;
         }
 
-        // TODO: call stream to send VoicePacket::KeepAlive
+        // TODO: call stream to send TxVoicePacket::KeepAlive
         // Send UDP keepalive if it's time
         if self.audio_timer.check() {
             // unimpl'd
