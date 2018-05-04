@@ -1,9 +1,12 @@
 use internal::Timer;
+use futures::future::Future;
 use model::id::GuildId;
 use std::sync::mpsc::{Receiver as MpscReceiver, TryRecvError};
 use std::thread::Builder as ThreadBuilder;
+use std::time::{Duration, Instant};
 use super::connection::Connection;
 use super::{Bitrate, Status, audio};
+use tokio_timer::{Delay, Interval};
 
 pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
     let name = format!("Serenity Voice (G{})", guild_id);
@@ -14,12 +17,17 @@ pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
         .expect(&format!("[Voice] Error starting guild: {:?}", guild_id));
 }
 
-fn runner(rx: &MpscReceiver<Status>) {
+fn runner(rx: MpscReceiver<Status>) {
     let mut senders = Vec::new();
     let mut receiver = None;
     let mut connection = None;
     let mut timer = Timer::new(20);
     let mut bitrate = Bitrate::Bits(audio::DEFAULT_BITRATE);
+
+    let out = Interval::new(Instant::now(), Duration::from_millis(20))
+        .for_each(|_instant| {
+            
+        });
 
     'runner: loop {
         loop {

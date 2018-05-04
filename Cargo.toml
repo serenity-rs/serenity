@@ -59,6 +59,10 @@ version = "~0.1"
 optional = true
 version = "0.2"
 
+[dependencies.parking_lot]
+optional = true
+version = "~0.5"
+
 [dependencies.rand]
 optional = true
 version = "^0.4"
@@ -95,7 +99,7 @@ gateway = ["flate2", "http", "tokio-tungstenite", "tungstenite", "utils"]
 http = ["builder", "hyper", "hyper-multipart-rfc7578", "hyper-tls", "native-tls", "utils"]
 standard_framework = ["framework"]
 utils = ["base64"]
-voice = ["byteorder", "gateway", "opus", "rand", "sodiumoxide"]
+voice = ["byteorder", "gateway", "opus", "parking_lot", "rand", "sodiumoxide"]
 
 [package.metadata.docs.rs]
 all-features = true

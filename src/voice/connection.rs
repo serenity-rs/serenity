@@ -95,6 +95,7 @@ use tokio_core::{
     },
     reactor::{Core, Handle, Remote},
 };
+use tokio_timer::{Delay, Interval};
 use tokio_tungstenite::{connect_async, WebSocketStream};
 use tungstenite::Message;
 use url::Url;
@@ -151,11 +152,11 @@ pub struct Connection {
 }
 
 impl Connection {
-    pub fn new(mut info: ConnectionInfo)//, handle: Handle)
+    pub fn new(mut info: ConnectionInfo, handle: Handle)
             -> Box<Future<Item = Connection, Error = Error>> {
 
-        let mut core = Core::new().unwrap();
-        let handle = core.handle();
+        // let mut core = Core::new().unwrap();
+        // let handle = core.handle();
 
         let url = generate_url(&mut info.endpoint);
         let local_remote_ws = handle.remote().clone();
@@ -339,7 +340,9 @@ impl Connection {
                             voice,
                         } = packet;
 
-                        receiver.voice_packet(ssrc, seq, timestamp, is_stereo, &voice);
+                        let len = if is_stereo { 960 * 2 } else { 960 };
+
+                        receiver.voice_packet(ssrc, seq, timestamp, is_stereo, &voice[..len]);
                     },
                     ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
                         receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
