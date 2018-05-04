@@ -70,10 +70,11 @@ use super::{
     audio::{
         AudioReceiver,
         AudioType,
-        HEADER_LEN,
-        SAMPLE_RATE,
         DEFAULT_BITRATE,
+        HEADER_LEN,
         LockedAudio,
+        SAMPLE_RATE,
+        SILENT_FRAME,
     },
     codec::{
         VoiceCodec,
@@ -98,7 +99,7 @@ use tungstenite::Message;
 use url::Url;
 
 enum ReceiverStatus {
-    Udp(Vec<u8>),
+    Udp(<VoiceCodec as UdpCodec>::In),
     Websocket(VoiceEvent),
 }
 
@@ -140,10 +141,10 @@ pub struct Connection {
     keepalive_timer: Timer,
     last_heartbeat_nonce: Option<u64>,
     listener_items: ListenerItems,
-    udp_send: SplitSink<UdpFramed<VoiceCodec>>,
     silence_frames: u8,
     soft_clip: SoftClip,
     speaking: bool,
+    udp_send: SplitSink<UdpFramed<VoiceCodec>>,
     user_id: UserId,
     ws_send: SplitSink<WsClient>,
 }
@@ -328,56 +329,8 @@ impl Connection {
         if let Some(receiver) = receiver.as_mut() {
             while let Ok(status) = self.thread_items.rx.try_recv() {
                 match status {
-                    // TODO: move to codec.
-                    ReceiverStatus::Udp(packet) => {
-                        let mut handle = &packet[2..];
-                        let seq = handle.read_u16::<NetworkEndian>()?;
-                        let timestamp = handle.read_u32::<NetworkEndian>()?;
-                        let ssrc = handle.read_u32::<NetworkEndian>()?;
-
-                        nonce.0[..HEADER_LEN]
-                            .clone_from_slice(&packet[..HEADER_LEN]);
-
-                        if let Ok(mut decrypted) =
-                            secretbox::open(&packet[HEADER_LEN..], &nonce, &self.key) {
-                            let channels = opus_packet::get_nb_channels(&decrypted)?;
-
-                            let entry =
-                                self.decoder_map.entry((ssrc, channels)).or_insert_with(
-                                    || OpusDecoder::new(SAMPLE_RATE, channels).unwrap(),
-                                );
-
-                            // Strip RTP Header Extensions (one-byte)
-                            if decrypted[0] == 0xBE && decrypted[1] == 0xDE {
-                                // Read the length bytes as a big-endian u16.
-                                let header_extension_len = NetworkEndian::read_u16(&decrypted[2..4]);
-                                let mut offset = 4;
-                                for _ in 0..header_extension_len {
-                                    let byte = decrypted[offset];
-                                    offset += 1;
-                                    if byte == 0 {
-                                        continue;
-                                    }
-
-                                    offset += 1 + (0b1111 & (byte >> 4)) as usize;
-                                }
-
-                                while decrypted[offset] == 0 {
-                                    offset += 1;
-                                }
-
-                                decrypted = decrypted.split_off(offset);
-                            }
-
-                            let len = entry.decode(&decrypted, &mut buffer, false)?;
-
-                            let is_stereo = channels == Channels::Stereo;
-
-                            let b = if is_stereo { len * 2 } else { len };
-
-                            receiver
-                                .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b]);
-                        }
+                    ReceiverStatus::Udp((ssrc, seq, timestamp, is_stereo, buffer)) => {
+                        receiver.voice_packet(ssrc, seq, timestamp, is_stereo, buffer);
                     },
                     ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
                         receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
@@ -418,6 +371,7 @@ impl Connection {
         // Send UDP keepalive if it's time
         if self.audio_timer.check() {
             // unimpl'd
+            // udp.send.....
         }
 
         let mut opus_frame = Vec::new();
@@ -457,7 +411,7 @@ impl Connection {
                         None => 0,
                     },
                     AudioType::Pcm => {
-                        let buffer_len = if source_stereo { 960 * 2 } else { 960 };
+                        let buffer_len = 960 * 2;
 
                         match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
                             Some(len) => len,
@@ -467,7 +421,7 @@ impl Connection {
                 };
 
                 // May need to force interleave/copy.
-                combine_audio(buffer, &mut mix_buffer, source_stereo, vol);
+                combine_audio(&buffer, &mut mix_buffer, vol);
 
                 len = len.max(temp_len);
                 i += if temp_len > 0 {
@@ -494,7 +448,7 @@ impl Connection {
                 self.silence_frames -= 1;
 
                 // Explicit "Silence" frame.
-                opus_frame.extend_from_slice(&[0xf8, 0xff, 0xfe]);
+                opus_frame.extend_from_slice(&SILENT_FRAME);
             } else {
                 // Per official guidelines, send 5x silence BEFORE we stop speaking.
                 self.set_speaking(false)?;
@@ -518,6 +472,8 @@ impl Connection {
         self.udp.send_to(&packet[..index], self.destination)?;
         self.audio_timer.reset();
 
+        // TODO: actually  send here w/ codec.
+
         Ok(())
     }
 
@@ -535,8 +491,7 @@ impl Connection {
 
 impl Drop for Connection {
     fn drop(&mut self) {
-        let _ = self.thread_items.udp_close_sender.send(0);
-        let _ = self.thread_items.ws_close_sender.send(0);
+        let _ = self.listener_items.close_sender.send(());
 
         info!("[Voice] Disconnected");
     }
@@ -544,14 +499,12 @@ impl Drop for Connection {
 
 #[inline]
 fn combine_audio(
-    raw_buffer: [i16; 1920],
+    raw_buffer: &[i16; 1920],
     float_buffer: &mut [f32; 1920],
-    true_stereo: bool,
     volume: f32,
 ) {
     for i in 0..1920 {
-        let sample_index = if true_stereo { i } else { i/2 };
-        let sample = (raw_buffer[sample_index] as f32) / 32768.0;
+        let sample = (raw_buffer[i] as f32) / 32768.0;
 
         float_buffer[i] = float_buffer[i] + sample * volume;
     }

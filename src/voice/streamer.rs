@@ -42,6 +42,11 @@ impl SendDecoder {
         SendDecoder(decoder)
     }
 
+    pub(crate) fn decode(&mut self, input: &[u8], output: &mut [i16], fec: bool) -> OpusResult<usize> {
+        let &mut SendDecoder(ref mut sd) = self;
+        sd.decode(input, output, fec)
+    }
+
     pub(crate) fn decode_float(&mut self, input: &[u8], output: &mut [f32], fec: bool) -> OpusResult<usize> {
         let &mut SendDecoder(ref mut sd) = self;
         sd.decode_float(input, output, fec)

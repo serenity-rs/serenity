@@ -5,7 +5,6 @@ use futures::{
         result,
         ok,
     },
-    sync::mpsc::Sender as FutureMpscSender,
     Future,
     Poll,
     IntoFuture,
