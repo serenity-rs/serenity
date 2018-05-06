@@ -29,6 +29,7 @@ use super::{
         DEFAULT_BITRATE,
         HEADER_LEN,
         SAMPLE_RATE,
+        SILENT_FRAME,
     },
     streamer::{
         SendDecoder,
@@ -48,6 +49,7 @@ pub(crate) struct RxVoicePacket {
 pub(crate) enum TxVoicePacket<'a> {
     KeepAlive,
     Audio(&'a[f32], Bitrate),
+    Silence,
 }
 
 pub(crate) struct VoiceCodec {
@@ -59,6 +61,8 @@ pub(crate) struct VoiceCodec {
     ssrc: [u8; 4],
     timestamp: u32,
 }
+
+const AUDIO_POSITION: usize = HEADER_LEN + MACBYTES;
 
 impl VoiceCodec {
     pub(crate) fn new(destination: SocketAddr, key: Key, ssrc_in: u32) -> Result<VoiceCodec> {
@@ -80,6 +84,37 @@ impl VoiceCodec {
         (&mut out.ssrc[..]).write_u32::<NetworkEndian>(ssrc_in)?;
 
         Ok(out)
+    }
+
+    fn write_header(&self, buf: &mut Vec<u8>, audio_packet_length: usize) {
+        let total_size = AUDIO_POSITION + audio_packet_length;
+
+        buf.reserve_exact(total_size);
+
+        buf.extend_from_slice(&[0x80, 0x78]);
+        buf.write_u16::<NetworkEndian>(self.sequence)
+            .expect("[voice] Cannot fail to append to Vec.");
+        buf.write_u32::<NetworkEndian>(self.timestamp)
+            .expect("[voice] Cannot fail to append to Vec.");
+        buf.extend_from_slice(&self.ssrc);
+        buf.extend_from_slice(&[0u8; 12]);
+
+        // the resize is free, because we already pre alloc'd.
+        buf.resize(total_size, 0);
+    }
+
+    fn finalize(&mut self, buf: &mut Vec<u8>) {
+        let nonce = Nonce::from_slice(&buf[..HEADER_LEN])
+            .expect("[voice] Nonce should be guaranteed from 24-byte slice.");
+
+        // If sodiumoxide 0.1.16 worked on stable, then we could encrypt in place.
+        // For now, we have to copy I guess...
+        // Unless someone's willing to play with unsafe wizardy.
+        let crypt = secretbox::seal(&buf[AUDIO_POSITION..], &nonce, &self.key);
+        (&mut buf[HEADER_LEN..]).write(&crypt);
+
+        self.sequence = self.sequence.wrapping_add(1);
+        self.timestamp = self.timestamp.wrapping_add(960);
     }
 }
 
@@ -167,34 +202,20 @@ impl UdpCodec for VoiceCodec {
                     _ => 4096,
                 } as usize;
 
-                buf.reserve_exact(size);
+                self.write_header(buf, size);
 
-                buf.extend_from_slice(&[0x80, 0x78]);
-                buf.write_u16::<NetworkEndian>(self.sequence)
-                    .expect("[voice] Cannot fail to append to Vec.");
-                buf.write_u32::<NetworkEndian>(self.timestamp)
-                    .expect("[voice] Cannot fail to append to Vec.");
-                buf.extend_from_slice(&self.ssrc);
-                buf.extend_from_slice(&[0u8; 12]);
-
-                // the resize is free, because we already pre alloc'd.
-                buf.resize(size, 0);
-
-                let nonce = Nonce::from_slice(&buf[..HEADER_LEN])
-                    .expect("[voice] Nonce should be guaranteed from 24-byte slice.");
-
-                let len = self.encoder.encode_float(audio, &mut buf[HEADER_LEN + MACBYTES..])
+                let len = self.encoder.encode_float(audio, &mut buf[AUDIO_POSITION..])
                     .expect("[voice] Encoding packet somehow failed.");
 
-                // If sodiumoxide 0.1.16 worked on stable, then we could encrypt in place.
-                // For now, we have to copy I guess...
-                // Unless someone's willing to play with unsafe wizardy.
-                let crypt = secretbox::seal(&buf[HEADER_LEN..len], &nonce, &self.key);
-                (&mut buf[HEADER_LEN..HEADER_LEN + MACBYTES]).write(&crypt);
-
-                self.sequence = self.sequence.wrapping_add(1);
-                self.timestamp = self.timestamp.wrapping_add(960);
+                self.finalize(buf);
             },
+            TxVoicePacket::Silence => {
+                self.write_header(buf, SILENT_FRAME.len());
+
+                (&mut buf[AUDIO_POSITION..]).write(&SILENT_FRAME);
+
+                self.finalize(buf);
+            }
         }
 
         self.destination

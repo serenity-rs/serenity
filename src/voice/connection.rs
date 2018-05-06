@@ -1,4 +1,4 @@
-use byteorder::{NetworkEndian, ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{ByteOrder, LittleEndian, NetworkEndian, ReadBytesExt, WriteBytesExt};
 use constants::VOICE_GATEWAY_VERSION;
 use future_utils::{
     mpsc::{unbounded, UnboundedReceiver, UnboundedSender},
@@ -6,9 +6,11 @@ use future_utils::{
 };
 use futures::{
     future::{
+        err,
         loop_fn,
         ok,
         result,
+        Either,
         Future,
         Loop,
     },
@@ -37,7 +39,7 @@ use internal::ws_ext::{
     SenderExt,
     WsClient,
 };
-use internal::Timer;
+use internal::Delay;
 use model::event::{
     VoiceEvent,
     VoiceHello,
@@ -61,10 +63,10 @@ use std::{
     collections::HashMap,
     io::{Error as IoError, Write},
     net::{SocketAddr, ToSocketAddrs},
-    sync::mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender},
+    sync::mpsc::{self, Receiver, Sender},
     sync::Arc,
     thread::{self, Builder as ThreadBuilder, JoinHandle},
-    time::Duration,
+    time::{Duration, Instant},
 };
 use super::{
     audio::{
@@ -95,7 +97,6 @@ use tokio_core::{
     },
     reactor::{Core, Handle, Remote},
 };
-use tokio_timer::{Delay, Interval};
 use tokio_tungstenite::{connect_async, WebSocketStream};
 use tungstenite::Message;
 use url::Url;
@@ -132,22 +133,23 @@ struct VoiceHandshake {
 
 struct ListenerItems {
     close_sender: OneShotSender<()>,
-    rx: UnboundedReceiver<ReceiverStatus>,
-    rx_pong: UnboundedReceiver<Vec<u8>>,
+    rx: Receiver<ReceiverStatus>,
+    rx_pong: Receiver<Vec<u8>>,
 }
 
 #[allow(dead_code)]
 pub struct Connection {
-    audio_timer: Timer,
+    connection_info: ConnectionInfo,
     destination: SocketAddr,
-    keepalive_timer: Timer,
     last_heartbeat_nonce: Option<u64>,
     listener_items: ListenerItems,
     silence_frames: u8,
     soft_clip: SoftClip,
     speaking: bool,
+    udp_keepalive_timer: Delay,
     udp_send: SplitSink<UdpFramed<VoiceCodec>>,
     user_id: UserId,
+    ws_keepalive_timer: Delay,
     ws_send: SplitSink<WsClient>,
 }
 
@@ -204,6 +206,8 @@ impl Connection {
                         })
                 })
             })
+            // With the ws handshake, we need to open a UDP voice channel.
+            // 
             .and_then(|state| {
                 let handshake = state.finalize()?;
 
@@ -291,213 +295,258 @@ impl Connection {
                 // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
                 let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;
 
+                // Putting most of the timeout events onto the old-style tokio timer wheel
+                // means we either need a HUGE wheel to avoid collision, or multiple wheels.
+                //
+                // Just put in some simple checks since we run the update loop every 20ms anyhow.
                 Ok(Connection {
-                    audio_timer: Timer::new(1000 * 60 * 4),
+                    connection_info: info,
                     destination,
-                    keepalive_timer: Timer::new(temp_heartbeat),
                     last_heartbeat_nonce: None,
                     listener_items,
-                    udp_send,
                     silence_frames: 100,
                     soft_clip,
                     speaking: false,
+                    udp_keepalive_timer: Delay::new(1000 * 60 * 4),
+                    udp_send,
                     user_id: info.user_id,
+                    ws_keepalive_timer: Delay::new(temp_heartbeat),
                     ws_send,
                 })
             });
 
-        return Box::new(done);
+        Box::new(done)
+    }
+
+    pub fn reconnect(self, handle: Handle) -> Box<Future<Item = Connection, Error = Error>> {
+        // A few steps to this.
+        //  * Unconditionally terminate the voice and udp connections.
+        //  * Rebuild those connections (and listeners).
+        //  * Send Resume, await Resumed.
+        //  * If conneciton closed, start a new connection.
+
+        // TODO.
+        // Need to figure out the interaction with kick/ban etc.
+        Box::new(err(Error::Voice(VoiceError::VoiceModeUnavailable)))
     }
 
     #[allow(unused_variables)]
     pub fn cycle(&mut self,
-                 sources: &mut Vec<LockedAudio>,
+                 sources: &'static mut Vec<LockedAudio>,
                  receiver: &mut Option<Box<AudioReceiver>>,
-                 audio_timer: &mut Timer,
                  bitrate: Bitrate)
-                 -> Result<()> {
-        // We need to actually reserve enough space for the desired bitrate.
-        let size = match bitrate {
-            // If user specified, we can calculate. 20ms means 50fps.
-            Bitrate::Bits(b) => b.abs() / 50,
-            // Otherwise, just have a lot preallocated.
-            _ => 5120,
-        } + 16;
+                 -> Box<Future<Item = (), Error = Error>> {
 
         let mut buffer = [0i16; 960 * 2];
         let mut mix_buffer = [0f32; 960 * 2];
-        let mut packet = vec![0u8; size as usize].into_boxed_slice();
 
-        if let Some(receiver) = receiver.as_mut() {
-            while let Ok(status) = self.thread_items.rx.try_recv() {
-                match status {
-                    ReceiverStatus::Udp(packet) => {
-                        let RxVoicePacket {
-                            is_stereo,
-                            seq,
-                            ssrc,
-                            timestamp,
-                            voice,
-                        } = packet;
+        // Process events the listeners have batched out.
+        let client_receiver = receiver.as_mut();
+        let forward_events = client_receiver.is_some();
 
-                        let len = if is_stereo { 960 * 2 } else { 960 };
+        while let Ok(status) = self.listener_items.rx.try_recv() {
+            match status {
+                ReceiverStatus::Udp(packet) if forward_events => {
+                    let RxVoicePacket {
+                        is_stereo,
+                        seq,
+                        ssrc,
+                        timestamp,
+                        voice,
+                    } = packet;
 
-                        receiver.voice_packet(ssrc, seq, timestamp, is_stereo, &voice[..len]);
-                    },
-                    ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
-                        receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
-                    },
-                    ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
-                        match self.last_heartbeat_nonce {
-                            Some(nonce) => {
-                                if ev.nonce != nonce {
-                                    warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
-                                }
+                    let len = if is_stereo { 960 * 2 } else { 960 };
 
-                                self.last_heartbeat_nonce = None;
-                            },
-                            None => {},
-                        }
-                    },
-                    ReceiverStatus::Websocket(other) => {
-                        info!("[Voice] Received other websocket data: {:?}", other);
-                    },
-                }
-            }
-        } else {
-            loop {
-                if self.thread_items.rx.try_recv().is_err() {
-                    break;
-                }
-            }
-        }
+                    client_receiver.expect("Receiver is already 'Some'")
+                        .voice_packet(ssrc, seq, timestamp, is_stereo, &voice[..len]);
+                },
+                ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) if forward_events => {
+                    client_receiver.expect("Receiver is already 'Some'")
+                        .speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
+                },
+                ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
+                    match self.last_heartbeat_nonce {
+                        Some(nonce) => {
+                            if ev.nonce != nonce {
+                                warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                            }
 
-        // Send the voice websocket keepalive if it's time
-        if self.keepalive_timer.check() {
-            let nonce = random::<u64>();
-            self.last_heartbeat_nonce = Some(nonce);
-            self.client.lock().send_json(&payload::build_heartbeat(nonce))?;
-        }
-
-        // TODO: call stream to send TxVoicePacket::KeepAlive
-        // Send UDP keepalive if it's time
-        if self.audio_timer.check() {
-            // unimpl'd
-            // udp.send.....
-        }
-
-        let mut opus_frame = Vec::new();
-
-        let mut len = 0;
-
-        // TODO: Could we parallelise this across futures?
-        // It's multiple I/O operations, potentially.
-
-        // Walk over all the audio files, removing those which have finished.
-        // For this purpose, we need a while loop in Rust.
-        let mut i = 0;
-
-        while i < sources.len() {
-            let mut finished = false;
-
-            let aud_lock = (&sources[i]).clone();
-            let mut aud = aud_lock.lock();
-
-            let vol = aud.volume;
-            let skip = !aud.playing;
-
-            {
-                let stream = &mut aud.source;
-
-                if skip {
-                    i += 1;
-
-                    continue;
-                }
-
-                let temp_len = match stream.get_type() {
-                    AudioType::Opus => match stream.decode_and_add_opus_frame(&mut mix_buffer, vol) {
-                        Some(frame) => {
-                            opus_frame.len()
+                            self.last_heartbeat_nonce = None;
                         },
-                        None => 0,
-                    },
-                    AudioType::Pcm => {
-                        let buffer_len = 960 * 2;
+                        None => {},
+                    }
+                },
+                ReceiverStatus::Websocket(other) => {
+                    info!("[Voice] Received other websocket data: {:?}", other);
+                },
+            }
+        }
 
-                        match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
-                            Some(len) => len,
-                            None => 0,
-                        }
-                    },
-                };
+        let now = Instant::now();
 
-                // May need to force interleave/copy.
-                combine_audio(&buffer, &mut mix_buffer, vol);
+        // https://tools.ietf.org/html/rfc6455#section-5.5.3
+        // "the endpoint MAY elect to send a Pong frame
+        // for only the most recently processed Ping frame."
+        let ws_ping = {
+            let pong = None;
 
-                len = len.max(temp_len);
-                i += if temp_len > 0 {
-                    1
-                } else {
-                    sources.remove(i);
-                    finished = true;
-
-                    0
-                };
+            while let Ok(data) = self.listener_items.rx_pong.try_recv() {
+                pong = Some(data);
             }
 
-            aud.finished = finished;
-
-            if !finished {
-                aud.step_frame();
-            }
+            pong
         };
 
-        self.soft_clip.apply(&mut mix_buffer);
+        // Send WS pong if need be.
+        let prepped_ws = match ws_ping {
+            Some(data) => Either::A(self.ws_send.send(Message::Pong(data))),
+            None => Either::B(ok(self.ws_send))
+        };
 
-        if len == 0 {
-            if self.silence_frames > 0 {
-                self.silence_frames -= 1;
+        let out = prepped_ws
+            .map_err(Error::from)
+            .and_then(|ws_send| {
+                // Send the voice websocket keepalive if it's time
+                match self.ws_keepalive_timer.is_elapsed(now) {
+                    true => {
+                        let nonce = random::<u64>();
+                        self.last_heartbeat_nonce = Some(nonce);
 
-                // Explicit "Silence" frame.
-                opus_frame.extend_from_slice(&SILENT_FRAME);
-            } else {
-                // Per official guidelines, send 5x silence BEFORE we stop speaking.
-                self.set_speaking(false)?;
+                        self.ws_keepalive_timer.reset();
+                        Either::A(
+                            self.ws_send.send_json(&payload::build_heartbeat(nonce))
+                                .map_err(Error::from)
+                        )
+                    },
+                    false => {
+                        Either::B(ok(self.ws_send))
+                    },
+                }
+            })
+            .and_then(|ws_send| {
+                // Send UDP keepalive if it's time
+                match self.udp_keepalive_timer.is_elapsed(now) {
+                    true => {
+                        self.udp_keepalive_timer.reset();
+                        Either::A(
+                            self.udp_send.send(TxVoicePacket::KeepAlive)
+                                .map_err(Error::from)
+                        )
+                    },
+                    false => Either::B(ok(self.udp_send)),
+                }
+            })
+            .and_then(|udp_send| {
+                let mut len = 0;
 
-                audio_timer.await();
+                // TODO: Could we parallelise this across futures?
+                // It's multiple I/O operations, potentially.
 
-                return Ok(());
-            }
-        } else {
-            self.silence_frames = 5;
+                // Walk over all the audio files, removing those which have finished.
+                let mut i = 0;
 
-            for value in &mut buffer[len..] {
-                *value = 0;
-            }
-        }
+                while i < sources.len() {
+                    let mut finished = false;
 
-        self.set_speaking(true)?;
+                    let aud_lock = (&sources[i]).clone();
+                    let mut aud = aud_lock.lock();
 
-        audio_timer.await();
+                    let vol = aud.volume;
+                    let skip = !aud.playing;
 
-        self.udp.send_to(&packet[..index], self.destination)?;
-        self.audio_timer.reset();
+                    {
+                        let stream = &mut aud.source;
 
-        // TODO: actually  send here w/ codec.
+                        if skip {
+                            i += 1;
 
-        Ok(())
+                            continue;
+                        }
+
+                        let temp_len = match stream.get_type() {
+                            AudioType::Opus => match stream.decode_and_add_opus_frame(&mut mix_buffer, vol) {
+                                Some(len) => len,
+                                None => 0,
+                            },
+                            AudioType::Pcm => {
+                                let buffer_len = 960 * 2;
+
+                                match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
+                                    Some(len) => len,
+                                    None => 0,
+                                }
+                            },
+                        };
+
+                        // May need to force interleave/copy.
+                        combine_audio(&buffer, &mut mix_buffer, vol);
+
+                        len = len.max(temp_len);
+                        i += if temp_len > 0 {
+                            1
+                        } else {
+                            sources.remove(i);
+                            finished = true;
+
+                            0
+                        };
+                    }
+
+                    aud.finished = finished;
+
+                    if !finished {
+                        aud.step_frame();
+                    }
+                };
+
+                let tx_packet = if len == 0 {
+                    if self.silence_frames > 0 {
+                        // Per official guidelines, send 5x silence BEFORE we stop speaking.
+                        self.silence_frames -= 1;
+                        Some(TxVoicePacket::Silence)
+                    } else {
+                        // Okay, NOW we stop speaking.
+                        None
+                    }
+                } else {
+                    self.silence_frames = 5;
+
+                    self.soft_clip.apply(&mut mix_buffer);
+                    Some(TxVoicePacket::Audio(&mix_buffer[..len], bitrate))
+                };
+
+
+                self.set_speaking(tx_packet.is_some())
+                    .and_then(|ws_send| {
+                        self.udp_keepalive_timer.reset();
+                        match tx_packet {
+                            Some(packet) => Either::A(
+                                self.udp_send.send(packet)
+                                    .map_err(Error::from)
+                                    .map(|_| ())
+                            ),
+                            None => Either::B(ok(())),
+                        }
+                    })
+            });
+
+        Box::new(out)
     }
 
+    fn set_speaking(&mut self, speaking: bool) -> Box<Future<Item = SplitSink<WsClient>, Error = Error>> {
+        let out = match self.speaking == speaking {
+            true => Either::A(ok(self.ws_send)),
+            false => {
+                self.speaking = speaking;
+                self.ws_keepalive_timer.reset();
+                Either::B(
+                    self.ws_send.send_json(&payload::build_speaking(speaking))
+                        .map_err(Error::from)
+                )
+            },
+        };
 
-    fn set_speaking(&mut self, speaking: bool) -> Result<()> {
-        if self.speaking == speaking {
-            return Ok(());
-        }
-
-        self.speaking = speaking;
-
-        self.client.lock().send_json(&payload::build_speaking(speaking))
+        Box::new(out)
     }
 }
 
@@ -587,10 +636,10 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
     let close_reader1 = close_reader.shared();
     let close_reader2 = close_reader1.clone();
 
-    let (tx, rx) = unbounded();
+    let (tx, rx) = mpsc::channel();
     let tx_clone = tx.clone();
 
-    let (tx_pong, rx_pong) = unbounded();
+    let (tx_pong, rx_pong) = mpsc::channel();
 
     context.spawn(move |_|
         ws.map_err(Error::from)
@@ -599,7 +648,7 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
                 message_to_json(message, tx_pong).and_then(
                     |maybe_value| match maybe_value {
                         Some(value) => match VoiceEvent::deserialize(value) {
-                            Ok(msg) => tx.unbounded_send(ReceiverStatus::Websocket(msg))
+                            Ok(msg) => tx.send(ReceiverStatus::Websocket(msg))
                                 .map_err(|e| Error::FutureMpsc("WS event receiver hung up.")),
                             Err(why) => {
                                 warn!("Error deserializing voice event: {:?}", why);
@@ -621,7 +670,7 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
         udp.map_err(Error::from)
             .until(close_reader2.map(|v| *v))
             .for_each(|voice_frame|
-                tx_clone.unbounded_send(ReceiverStatus::Udp(voice_frame))
+                tx_clone.send(ReceiverStatus::Udp(voice_frame))
                     .map_err(|e| Error::FutureMpsc("UDP event receiver hung up."))
             )
             .map_err(|e| {

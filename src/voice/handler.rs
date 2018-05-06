@@ -1,5 +1,9 @@
+// ToDo: fix intermessage not being a thing.
+// uncomment what had to be removed
+// i.e. updates in handler.rs, init of handler in manager.rs
+
 use constants::VoiceOpCode;
-use gateway::InterMessage;
+// use gateway::InterMessage;
 use model::id::{ChannelId, GuildId, UserId};
 use model::voice::VoiceState;
 use parking_lot::Mutex;
@@ -91,7 +95,10 @@ pub struct Handler {
     ///
     /// When set via [`standalone`][`Handler::standalone`], it will not be
     /// present.
-    ws: Option<MpscSender<InterMessage>>,
+    ws: Option<MpscSender<
+        // InterMessage
+        String
+    >>,
 }
 
 impl Handler {
@@ -99,10 +106,13 @@ impl Handler {
     #[inline]
     pub(crate) fn new(
         guild_id: GuildId,
-        ws: MpscSender<InterMessage>,
+        // ws: MpscSender<InterMessage>,
         user_id: UserId,
     ) -> Self {
-        Self::new_raw(guild_id, Some(ws), user_id)
+        Self::new_raw(guild_id,
+            // Some(ws),
+            None,
+            user_id)
     }
 
     /// Creates a new, standalone Handler which is not connected to the primary
@@ -374,7 +384,10 @@ impl Handler {
 
     fn new_raw(
         guild_id: GuildId,
-        ws: Option<MpscSender<InterMessage>>,
+        ws: Option<MpscSender<
+            // InterMessage
+            String
+        >>,
         user_id: UserId,
     ) -> Self {
         let (tx, rx) = mpsc::channel();
@@ -391,7 +404,8 @@ impl Handler {
             session_id: None,
             token: None,
             user_id: user_id,
-            ws: ws,
+            // ws: ws,
+            ws: None
         }
     }
 
@@ -426,19 +440,19 @@ impl Handler {
     ///
     /// [`standalone`]: #method.standalone
     fn update(&self) {
-        if let Some(ref ws) = self.ws {
-            let map = json!({
-                "op": VoiceOpCode::SessionDescription.num(),
-                "d": {
-                    "channel_id": self.channel_id.map(|c| c.0),
-                    "guild_id": self.guild_id.0,
-                    "self_deaf": self.self_deaf,
-                    "self_mute": self.self_mute,
-                }
-            });
+        // if let Some(ref ws) = self.ws {
+        //     let map = json!({
+        //         "op": VoiceOpCode::SessionDescription.num(),
+        //         "d": {
+        //             "channel_id": self.channel_id.map(|c| c.0),
+        //             "guild_id": self.guild_id.0,
+        //             "self_deaf": self.self_deaf,
+        //             "self_mute": self.self_mute,
+        //         }
+        //     });
 
-            let _ = ws.send(InterMessage::Json(map));
-        }
+        //     let _ = ws.send(InterMessage::Json(map));
+        // }
     }
 }
 

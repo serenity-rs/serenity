@@ -16,6 +16,18 @@ pub fn build_identify(info: &ConnectionInfo) -> Value {
 }
 
 #[inline]
+pub fn build_resume(info: &ConnectionInfo) -> Value {
+    json!({
+        "op": VoiceOpCode::Resume.num(),
+        "d": {
+            "server_id": info.guild_id.0,
+            "session_id": &info.session_id,
+            "token": &info.token,
+        }
+    })
+}
+
+#[inline]
 pub fn build_heartbeat(nonce: u64) -> Value {
     json!({
         "op": VoiceOpCode::Heartbeat.num(),

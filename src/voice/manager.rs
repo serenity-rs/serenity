@@ -1,4 +1,8 @@
-use gateway::InterMessage;
+// ToDo: fix intermessage not being a thing.
+// uncomment what had to be removed
+// i.e. updates in handler.rs, init of handler in manager.rs
+
+// use gateway::InterMessage;
 use model::id::{ChannelId, GuildId, UserId};
 use std::collections::HashMap;
 use std::sync::mpsc::Sender as MpscSender;
@@ -24,15 +28,16 @@ use super::Handler;
 pub struct Manager {
     handlers: HashMap<GuildId, Handler>,
     user_id: UserId,
-    ws: MpscSender<InterMessage>,
+    // ws: MpscSender<InterMessage>,
 }
 
 impl Manager {
-    pub(crate) fn new(ws: MpscSender<InterMessage>, user_id: UserId) -> Manager {
+    pub(crate) fn new(//ws: MpscSender<InterMessage>,
+        user_id: UserId) -> Manager {
         Manager {
             handlers: HashMap::new(),
             user_id: user_id,
-            ws: ws,
+            // ws: ws,
         }
     }
 
@@ -89,7 +94,9 @@ impl Manager {
             }
         }
 
-        let mut handler = Handler::new(guild_id, self.ws.clone(), self.user_id);
+        let mut handler = Handler::new(guild_id,
+            // self.ws.clone(),
+            self.user_id);
         handler.join(channel_id);
 
         self.handlers.insert(guild_id, handler);
