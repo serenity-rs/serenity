@@ -63,6 +63,7 @@ use std::{
     collections::HashMap,
     io::{Error as IoError, Write},
     net::{SocketAddr, ToSocketAddrs},
+    rc::Rc,
     sync::mpsc::{self, Receiver, Sender},
     sync::Arc,
     thread::{self, Builder as ThreadBuilder, JoinHandle},
@@ -107,9 +108,10 @@ enum ReceiverStatus {
 }
 
 struct ProgressingVoiceHandshake {
+    connection_info: ConnectionInfo,
     hello: Option<VoiceHello>,
     ready: Option<VoiceReady>,
-    ws: WsClient,
+    // ws: WsClient,
 }
 
 impl ProgressingVoiceHandshake {
@@ -118,17 +120,19 @@ impl ProgressingVoiceHandshake {
         let hello = self.hello.ok_or(Error::Voice(VoiceError::ExpectedHandshake))?;
 
         Ok(VoiceHandshake {
+            connection_info: self.connection_info,
             ready,
             hello,
-            ws: self.ws,
+            // ws: self.ws,
         })
     }
 }
 
 struct VoiceHandshake {
+    connection_info: ConnectionInfo,
     hello: VoiceHello,
     ready: VoiceReady,
-    ws: WsClient,
+    // ws: WsClient,
 }
 
 struct ListenerItems {
@@ -148,7 +152,6 @@ pub struct Connection {
     speaking: bool,
     udp_keepalive_timer: Delay,
     udp_send: SplitSink<UdpFramed<VoiceCodec>>,
-    user_id: UserId,
     ws_keepalive_timer: Delay,
     ws_send: SplitSink<WsClient>,
 }
@@ -168,31 +171,33 @@ impl Connection {
             // Build a (TLS'd) websocket.
             .and_then(move |url| connect_async(url, local_remote_ws).map_err(Error::from))
             // Our init of the handshake.
-            .and_then(|(ws, _)| ws.send_json(&payload::build_identify(&info)))
+            .and_then(move |(ws, _)| {
+                ws.send_json(&payload::build_identify(&info))
+                    .map(|ws| (ws, info))
+            })
             // The reply has TWO PARTS, which can come in any order.
-            .and_then(|ws| {
-                loop_fn(ProgressingVoiceHandshake {ready: None, hello: None, ws}, |state| {
-                    state.ws.recv_json()
-                        .map_err(|(err, _)| err)
+            .and_then(|(ws, connection_info)| {
+                loop_fn((ProgressingVoiceHandshake {connection_info, ready: None, hello: None}, ws),
+                        |(mut state, ws)| {
+                    ws.recv_json()
                         .and_then(move |(value_wrap, ws)| {
-                            state.ws = ws;
 
                             let value = match value_wrap {
                                 Some(json_value) => json_value,
-                                None => {return Ok(Loop::Continue(state));},
+                                None => {return Ok(Loop::Continue((state, ws)));},
                             };
 
                             match VoiceEvent::deserialize(value)? {
                                 VoiceEvent::Ready(r) => {
                                     state.ready = Some(r);
                                     if state.hello.is_some(){
-                                        return Ok(Loop::Break(state));
+                                        return Ok(Loop::Break((state, ws)));
                                     }
                                 },
                                 VoiceEvent::Hello(h) => {
                                     state.hello = Some(h);
                                     if state.ready.is_some() {
-                                        return Ok(Loop::Break(state));
+                                        return Ok(Loop::Break((state, ws)));
                                     }
                                 },
                                 other => {
@@ -202,20 +207,20 @@ impl Connection {
                                 },
                             }
 
-                            Ok(Loop::Continue(state))
+                            Ok(Loop::Continue((state, ws)))
                         })
                 })
             })
             // With the ws handshake, we need to open a UDP voice channel.
             // 
-            .and_then(|state| {
+            .and_then(move |(state, ws)| {
                 let handshake = state.finalize()?;
 
                 if !has_valid_mode(&handshake.ready.modes) {
                     return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
                 }
 
-                let destination = (&info.endpoint[..], handshake.ready.port)
+                let destination = (&handshake.connection_info.endpoint[..], handshake.ready.port)
                     .to_socket_addrs()?
                     .next()
                     .ok_or(Error::Voice(VoiceError::HostnameResolve))?;
@@ -237,48 +242,47 @@ impl Connection {
 
                 let udp = UdpSocket::bind(&local, &handle)?;
 
-                let mut bytes = [0u8; 70];
-                let mut write_bytes = [0u8; 256];
-                (&mut bytes[..]).write_u32::<NetworkEndian>(handshake.ready.ssrc)?;
+                let mut bytes = Vec::with_capacity(70);
+                bytes.write_u32::<NetworkEndian>(handshake.ready.ssrc)?;
+                bytes.resize(70, 0u8);
 
-                Ok(udp.send_dgram(&bytes[..], destination)
-                    .and_then(|(udp, _)| udp.recv_dgram(vec![0u8; 256]))
-                    .map_err(Error::from)
-                    .and_then(move |(udp, data, len, _)| {
-                        // Find the position in the bytes that contains the first byte of 0,
-                        // indicating the "end of the address".
-                        let index = data.iter()
-                            .skip(4)
-                            .position(|&x| x == 0)
-                            .ok_or(Error::Voice(VoiceError::FindingByte))?;
+                Ok(
+                    udp.send_dgram(bytes, destination)
+                        .and_then(|(udp, _)| udp.recv_dgram(vec![0u8; 256]))
+                        .map_err(Error::from)
+                        .and_then(move |(udp, data, len, _)| {
+                            // Find the position in the bytes that contains the first byte of 0,
+                            // indicating the "end of the address".
+                            let index = data.iter()
+                                .skip(4)
+                                .position(|&x| x == 0)
+                                .ok_or(Error::Voice(VoiceError::FindingByte))?;
 
-                        let pos = 4 + index;
-                        let addr = String::from_utf8_lossy(&bytes[4..pos]);
-                        let port_pos = len - 2;
-                        let port = (&bytes[port_pos..]).read_u16::<LittleEndian>()?;
+                            let pos = 4 + index;
+                            let addr = String::from_utf8_lossy(&data[4..pos]);
+                            let port_pos = len - 2;
+                            let port = (&data[port_pos..]).read_u16::<LittleEndian>()?;
 
-                        Ok(handshake.ws.send_json(&payload::build_select_protocol(addr, port))
-                            .map_err(Error::from)
-                            .map(move |ws| {
-                                handshake.ws = ws;
-                                (handshake, udp, destination)
-                            }))
+                            Ok(ws.send_json(&payload::build_select_protocol(addr, port))
+                                .map_err(Error::from)
+                                .map(move |ws| {
+                                    (handshake, ws, udp, destination)
+                                }))
                     })
                 )
             })
             .flatten()
             .flatten()
-            .and_then(|(handshake, udp, destination)| {
-                Ok(encryption_key(handshake.ws)
+            .and_then(|(handshake, ws, udp, destination)| {
+                Ok(encryption_key(ws)
                     .map(move |(key, ws)| {
-                        handshake.ws = ws;
-                        (handshake, udp, key, destination)
+                        (handshake, ws, udp, key, destination)
                     })
                 )
             })
             .flatten()
-            .and_then(|(handshake, udp, key, destination)| {
-                let VoiceHandshake { hello, ready, ws } = handshake;
+            .and_then(move |(handshake, ws, udp, key, destination)| {
+                let VoiceHandshake { connection_info, hello, ready } = handshake;
                 let codec = VoiceCodec::new(destination, key, ready.ssrc)?;
 
                 let (ws_send, ws_reader) = ws.split();
@@ -286,7 +290,7 @@ impl Connection {
 
                 let listener_items = spawn_receive_handlers(ws_reader, udp_reader, &local_remote_listeners);
 
-                info!("[Voice] Connected to: {}", info.endpoint);
+                info!("[Voice] Connected to: {}", &connection_info.endpoint);
 
                 // Encode for Discord in Stereo, as required.
                 let soft_clip = SoftClip::new(Channels::Stereo);
@@ -300,7 +304,7 @@ impl Connection {
                 //
                 // Just put in some simple checks since we run the update loop every 20ms anyhow.
                 Ok(Connection {
-                    connection_info: info,
+                    connection_info,
                     destination,
                     last_heartbeat_nonce: None,
                     listener_items,
@@ -309,7 +313,6 @@ impl Connection {
                     speaking: false,
                     udp_keepalive_timer: Delay::new(1000 * 60 * 4),
                     udp_send,
-                    user_id: info.user_id,
                     ws_keepalive_timer: Delay::new(temp_heartbeat),
                     ws_send,
                 })
@@ -331,64 +334,71 @@ impl Connection {
     }
 
     #[allow(unused_variables)]
-    pub fn cycle(&mut self,
-                 sources: &'static mut Vec<LockedAudio>,
-                 receiver: &mut Option<Box<AudioReceiver>>,
+    pub fn cycle(mut self,
+                 // sources: &'static mut Vec<LockedAudio>,
+                 sources: Arc<Mutex<Vec<LockedAudio>>>,
+                 // receiver: &mut Option<Box<AudioReceiver>>,
+                 receiver: Arc<Mutex<Option<Box<AudioReceiver>>>>,
                  bitrate: Bitrate)
                  -> Box<Future<Item = (), Error = Error>> {
-
-        let mut buffer = [0i16; 960 * 2];
-        let mut mix_buffer = [0f32; 960 * 2];
-
         // Process events the listeners have batched out.
-        let client_receiver = receiver.as_mut();
-        let forward_events = client_receiver.is_some();
+        // let client_receiver = receiver.as_mut();
 
-        while let Ok(status) = self.listener_items.rx.try_recv() {
-            match status {
-                ReceiverStatus::Udp(packet) if forward_events => {
-                    let RxVoicePacket {
-                        is_stereo,
-                        seq,
-                        ssrc,
-                        timestamp,
-                        voice,
-                    } = packet;
+        {
+            let mut client_receiver = receiver.lock();
+            let forward_events = client_receiver.is_some();
 
-                    let len = if is_stereo { 960 * 2 } else { 960 };
+            while let Ok(status) = self.listener_items.rx.try_recv() {
+                match status {
+                    ReceiverStatus::Udp(packet) => {
+                        if forward_events {
+                            let RxVoicePacket {
+                                is_stereo,
+                                seq,
+                                ssrc,
+                                timestamp,
+                                voice,
+                            } = packet;
 
-                    client_receiver.expect("Receiver is already 'Some'")
-                        .voice_packet(ssrc, seq, timestamp, is_stereo, &voice[..len]);
-                },
-                ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) if forward_events => {
-                    client_receiver.expect("Receiver is already 'Some'")
-                        .speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
-                },
-                ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
-                    match self.last_heartbeat_nonce {
-                        Some(nonce) => {
-                            if ev.nonce != nonce {
-                                warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
-                            }
+                            let len = if is_stereo { 960 * 2 } else { 960 };
 
-                            self.last_heartbeat_nonce = None;
-                        },
-                        None => {},
-                    }
-                },
-                ReceiverStatus::Websocket(other) => {
-                    info!("[Voice] Received other websocket data: {:?}", other);
-                },
+                            client_receiver.as_mut().expect("Receiver is already 'Some'")
+                                .voice_packet(ssrc, seq, timestamp, is_stereo, &voice[..len]);
+                        }
+                    },
+                    ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
+                        if forward_events {
+                            client_receiver.as_mut().expect("Receiver is already 'Some'")
+                                .speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
+                        }
+                    },
+                    ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
+                        match self.last_heartbeat_nonce {
+                            Some(nonce) => {
+                                if ev.nonce != nonce {
+                                    warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                                }
+
+                                self.last_heartbeat_nonce = None;
+                            },
+                            None => {},
+                        }
+                    },
+                    ReceiverStatus::Websocket(other) => {
+                        info!("[Voice] Received other websocket data: {:?}", other);
+                    },
+                }
             }
         }
 
-        let now = Instant::now();
+        let udp_now = Instant::now();
+        let ws_now = udp_now.clone();
 
         // https://tools.ietf.org/html/rfc6455#section-5.5.3
         // "the endpoint MAY elect to send a Pong frame
         // for only the most recently processed Ping frame."
         let ws_ping = {
-            let pong = None;
+            let mut pong = None;
 
             while let Ok(data) = self.listener_items.rx_pong.try_recv() {
                 pong = Some(data);
@@ -405,9 +415,9 @@ impl Connection {
 
         let out = prepped_ws
             .map_err(Error::from)
-            .and_then(|ws_send| {
+            .and_then(move |ws_send| {
                 // Send the voice websocket keepalive if it's time
-                match self.ws_keepalive_timer.is_elapsed(now) {
+                match self.ws_keepalive_timer.is_elapsed(ws_now) {
                     true => {
                         let nonce = random::<u64>();
                         self.last_heartbeat_nonce = Some(nonce);
@@ -423,9 +433,9 @@ impl Connection {
                     },
                 }
             })
-            .and_then(|ws_send| {
+            .and_then(move |ws_send| {
                 // Send UDP keepalive if it's time
-                match self.udp_keepalive_timer.is_elapsed(now) {
+                match self.udp_keepalive_timer.is_elapsed(udp_now) {
                     true => {
                         self.udp_keepalive_timer.reset();
                         Either::A(
@@ -436,7 +446,9 @@ impl Connection {
                     false => Either::B(ok(self.udp_send)),
                 }
             })
-            .and_then(|udp_send| {
+            .and_then(move |udp_send| {
+                let mut buffer = [0i16; 960 * 2];
+                let mut mix_buffer = [0f32; 960 * 2];
                 let mut len = 0;
 
                 // TODO: Could we parallelise this across futures?
@@ -444,6 +456,8 @@ impl Connection {
 
                 // Walk over all the audio files, removing those which have finished.
                 let mut i = 0;
+
+                let sources = sources.lock();
 
                 while i < sources.len() {
                     let mut finished = false;
@@ -586,7 +600,6 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
 fn encryption_key(ws: WsClient) -> Box<Future<Item=(Key, WsClient), Error=Error>> {
     let out = loop_fn(ws, |ws| {
         ws.recv_json()
-            .map_err(|(err, _)| err)
             .and_then(|(value_wrap, ws)| {
                 let value = match value_wrap {
                     Some(json_value) => json_value,
@@ -611,6 +624,7 @@ fn encryption_key(ws: WsClient) -> Box<Future<Item=(Key, WsClient), Error=Error>
                             value
                         );
                     },
+                    _ => {},
                 }
 
                 Ok(Loop::Continue(ws))

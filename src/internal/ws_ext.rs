@@ -1,14 +1,10 @@
 use flate2::read::ZlibDecoder;
-use future_utils::mpsc::UnboundedSender;
 use futures::{
     future::{
         result,
         ok,
     },
-    stream::SplitSink,
     Future,
-    Poll,
-    IntoFuture,
     Sink,
     Stream,
 };
@@ -17,7 +13,7 @@ use internal::{
     prelude::*,
 };
 use serde_json;
-use std::sync::mpsc::{self, Sender};
+use std::sync::mpsc::Sender;
 use tokio_core::net::TcpStream;
 use tokio_tls::TlsStream;
 use tokio_tungstenite::{
@@ -32,7 +28,7 @@ use tungstenite::{
 pub type WsClient = WebSocketStream<StreamSwitcher<TcpStream, TlsStream<TcpStream>>>;
 
 pub trait ReceiverExt {
-    fn recv_json(self) -> Box<Future<Item = (Option<Value>, Self), Error = (Error, Self)>>;
+    fn recv_json(self) -> Box<Future<Item = (Option<Value>, Self), Error = Error>>;
 }
 
 pub trait SenderExt {
@@ -40,40 +36,39 @@ pub trait SenderExt {
 }
 
 impl ReceiverExt for WsClient {
-    fn recv_json(self) -> Box<Future<Item = (Option<Value>, WsClient), Error = (Error, WsClient)>> {
+    fn recv_json(self) -> Box<Future<Item = (Option<Value>, WsClient), Error = Error>> {
         let out = self.into_future()
-            .map_err(|(err, ws)| (err.into(), ws))
+            .map_err(|(e, _)| e.into())
             .and_then(|(value, ws)| match value {
                 Some(message) => Ok((message, ws)),
-                None => Err((Error::Tungstenite(TungsteniteError::ConnectionClosed(None)), ws))
+                None => Err(Error::Tungstenite(TungsteniteError::ConnectionClosed(None)))
             })
             .and_then(|(message, ws)| {
                 match message {
                     Message::Binary(bytes) => {
                         let done = result(serde_json::from_reader(ZlibDecoder::new(&bytes[..])).map(Some))
-                            .map_err(move |err| (err.into(), ws))
+                            .map_err(Error::from)
                             .map(move |val| (val, ws));
 
                         Either4::One(done)
                     },
                     Message::Text(payload) => {
                         let done = result(serde_json::from_str(&payload).map(Some))
-                            .map_err(move |err| (err.into(), ws))
+                            .map_err(Error::from)
                             .map(move |val| (val, ws));
 
                         Either4::Two(done)
                     },
                     Message::Ping(x) => {
                         let done = ws.send(Message::Pong(x))
-                            .map_err(move |err| (err.into(), ws))
+                            .map_err(Error::from)
                             .map(|ws| (None, ws));
 
                         Either4::Three(done)
                     },
                     Message::Pong(_) => Either4::Four(ok((None, ws))),
                 }
-            })
-            .map_err(|(err, ws)| (err.into(), ws));
+            });
 
         Box::new(out)
     }

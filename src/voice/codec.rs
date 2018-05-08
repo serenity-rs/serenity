@@ -39,11 +39,11 @@ use super::{
 use tokio_core::net::UdpCodec;
 
 pub(crate) struct RxVoicePacket {
-    is_stereo: bool,
-    seq: u16,
-    ssrc: u32,
-    timestamp: u32,
-    voice: [i16; 1920],
+    pub is_stereo: bool,
+    pub seq: u16,
+    pub ssrc: u32,
+    pub timestamp: u32,
+    pub voice: [i16; 1920],
 }
 
 pub(crate) enum TxVoicePacket<'a> {
@@ -122,7 +122,7 @@ impl UdpCodec for VoiceCodec {
     type In = RxVoicePacket;
     type Out = TxVoicePacket<'static>;
 
-    fn decode(&mut self, src: &SocketAddr, buf: &[u8]) -> StdResult<Self::In, IoError> {
+    fn decode(&mut self, _src: &SocketAddr, buf: &[u8]) -> StdResult<Self::In, IoError> {
         let mut buffer = [0i16; 960 * 2];
 
         let nonce = Nonce::from_slice(&buf[..NONCEBYTES])
@@ -134,7 +134,7 @@ impl UdpCodec for VoiceCodec {
         let ssrc = handle.read_u32::<NetworkEndian>()?;
 
         secretbox::open(&buf[HEADER_LEN..], &nonce, &self.key)
-            .and_then(|decrypted| {
+            .and_then(|mut decrypted| {
                 let channels = opus_packet::get_nb_channels(&decrypted)
                     .or(Err(()))?;
 
@@ -167,7 +167,7 @@ impl UdpCodec for VoiceCodec {
                     decrypted = decrypted.split_off(offset);
                 }
 
-                let len = entry.decode(&decrypted, &mut buffer, false)
+                let _len = entry.decode(&decrypted, &mut buffer, false)
                     .or(Err(()))?;
 
                 Ok(RxVoicePacket {
@@ -204,7 +204,7 @@ impl UdpCodec for VoiceCodec {
 
                 self.write_header(buf, size);
 
-                let len = self.encoder.encode_float(audio, &mut buf[AUDIO_POSITION..])
+                let _len = self.encoder.encode_float(audio, &mut buf[AUDIO_POSITION..])
                     .expect("[voice] Encoding packet somehow failed.");
 
                 self.finalize(buf);

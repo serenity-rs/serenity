@@ -192,8 +192,8 @@ impl From<SendError<TungsteniteMessage>> for Error {
 }
 
 impl<T> From<SharedError<T>> for Error
-        where Error: From<T> {
-    fn from(e: SharedError<T>) -> Error { Error::from(*e) }
+        where Error: From<T>, T: Clone {
+    fn from(e: SharedError<T>) -> Error { Error::from((*e).clone()) }
 }
 
 #[cfg(feature = "native-tls")]

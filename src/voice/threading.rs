@@ -1,14 +1,15 @@
-use futures::{future::ok, Future, Stream};
+use futures::{future::{err, ok}, Future, Stream};
 use internal::{
-    either_n::Either3,
+    either_n::{Either3, Either4},
     prelude::*,
 };
 use model::id::GuildId;
-use std::sync::mpsc::{Receiver as MpscReceiver, TryRecvError};
+use parking_lot::Mutex;
+use std::sync::{mpsc::{Receiver as MpscReceiver, TryRecvError}, Arc,};
 use std::thread::Builder as ThreadBuilder;
 use std::time::{Duration, Instant};
 use super::connection::Connection;
-use super::{audio, Bitrate, Status};
+use super::{audio, error::VoiceError, Bitrate, Status};
 use tokio_core::reactor::{Core, Handle, Remote};
 use tokio_timer::{wheel, Timer};
 
@@ -24,11 +25,14 @@ pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
 }
 
 fn runner(rx: MpscReceiver<Status>, timer: Timer) -> Box<Future<Item = (), Error = ()>>{
-    let mut senders = Vec::new();
-    let mut receiver = None;
+    let mut senders = Arc::new(Mutex::new(Vec::new()));
+    let mut receiver = Arc::new(Mutex::new(None));
     let mut connection: Option<Connection> = None;
     let mut bitrate = Bitrate::Bits(audio::DEFAULT_BITRATE);
     let mut cycle_error = false;
+
+    let mut senders_cycle = senders.clone();
+    let mut receiver_cycle = receiver.clone();
 
     // TEMP: FIX ME
     let mut core = Core::new().unwrap();
@@ -55,9 +59,12 @@ fn runner(rx: MpscReceiver<Status>, timer: Timer) -> Box<Future<Item = (), Error
                         should_disconnect = true;
                     },
                     Ok(Status::SetReceiver(r)) => {
-                        receiver = r;
+                        let mut receiver = receiver.lock();
+                        *receiver = r;
                     },
                     Ok(Status::SetSender(s)) => {
+                        let senders = senders.lock();
+
                         senders.clear();
 
                         if let Some(aud) = s {
@@ -65,6 +72,8 @@ fn runner(rx: MpscReceiver<Status>, timer: Timer) -> Box<Future<Item = (), Error
                         }
                     },
                     Ok(Status::AddSender(s)) => {
+                        let senders = senders.lock();
+
                         senders.push(s);
                     },
                     Ok(Status::SetBitrate(b)) => {
@@ -92,15 +101,15 @@ fn runner(rx: MpscReceiver<Status>, timer: Timer) -> Box<Future<Item = (), Error
             //  * We want to make a new connection.
 
             let conn_future = match connection {
-                Some(connection) if cycle_error =>
-                    Either3::One(connection.reconnect(handle)),
-                Some(connection) =>
-                    Either3::Two(ok(connection)),
-                None if received_info.is_some() => {
-                    let info = received_info
-                        .expect("Connection info guaranteed to exist");
-
-                    Either3::Three(Connection::new(info, handle))
+                Some(connection) => if cycle_error {
+                        Either4::One(connection.reconnect(handle))
+                    } else {
+                        Either4::Two(ok(connection))
+                    },
+                None => if let Some(info) = received_info {
+                    Either4::Three(Connection::new(info, handle))
+                } else {
+                    Either4::Four(err(Error::Voice(VoiceError::VoiceModeInvalid)))
                 },
             };
 
@@ -109,7 +118,7 @@ fn runner(rx: MpscReceiver<Status>, timer: Timer) -> Box<Future<Item = (), Error
                     connection = Some(conn);
                     cycle_error = false;
 
-                    conn.cycle(&mut senders, &mut receiver, bitrate)
+                    conn.cycle(senders_cycle, receiver_cycle, bitrate)
                 })
                 .map_err(|why| {
                     error!(
