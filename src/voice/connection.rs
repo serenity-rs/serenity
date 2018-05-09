@@ -55,13 +55,14 @@ use opus::{
     Encoder as OpusEncoder,
     SoftClip,
 };
-use parking_lot::Mutex;
+use parking_lot::{Mutex, MutexGuard};
 use rand::random;
 use serde::Deserialize;
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
 use std::{
     collections::HashMap,
     io::{Error as IoError, Write},
+    mem,
     net::{SocketAddr, ToSocketAddrs},
     rc::Rc,
     sync::mpsc::{self, Receiver, Sender},
@@ -86,8 +87,9 @@ use super::{
     },
     connection_info::ConnectionInfo,
     payload,
-    CRYPTO_MODE,
+    threading::TaskState,
     VoiceError, 
+    CRYPTO_MODE,
 };
 use tokio_core::{
     net::{
@@ -151,9 +153,9 @@ pub struct Connection {
     soft_clip: SoftClip,
     speaking: bool,
     udp_keepalive_timer: Delay,
-    udp_send: SplitSink<UdpFramed<VoiceCodec>>,
+    udp_send: Option<SplitSink<UdpFramed<VoiceCodec>>>,
     ws_keepalive_timer: Delay,
-    ws_send: SplitSink<WsClient>,
+    ws_send: Option<SplitSink<WsClient>>,
 }
 
 impl Connection {
@@ -288,6 +290,9 @@ impl Connection {
                 let (ws_send, ws_reader) = ws.split();
                 let (udp_send, udp_reader) = udp.framed(codec).split();
 
+                let ws_send = Some(ws_send);
+                let udp_send = Some(udp_send);
+
                 let listener_items = spawn_receive_handlers(ws_reader, udp_reader, &local_remote_listeners);
 
                 info!("[Voice] Connected to: {}", &connection_info.endpoint);
@@ -321,6 +326,26 @@ impl Connection {
         Box::new(done)
     }
 
+    fn ws(&mut self) -> SplitSink<WsClient> {
+        mem::replace(&mut self.ws_send, None)
+            .expect("[voice] Failed to get websocket...")
+    }
+
+    fn restore_ws(mut self, ws: SplitSink<WsClient>) -> Self {
+        self.ws_send = Some(ws);
+        self
+    }
+
+    fn udp(&mut self) -> SplitSink<UdpFramed<VoiceCodec>> {
+        mem::replace(&mut self.udp_send, None)
+            .expect("[voice] Failed to get udp...")
+    }
+
+    fn restore_udp(mut self, udp: SplitSink<UdpFramed<VoiceCodec>>) -> Self {
+        self.udp_send = Some(udp);
+        self
+    }
+
     pub fn reconnect(self, handle: Handle) -> Box<Future<Item = Connection, Error = Error>> {
         // A few steps to this.
         //  * Unconditionally terminate the voice and udp connections.
@@ -334,62 +359,61 @@ impl Connection {
     }
 
     #[allow(unused_variables)]
-    pub fn cycle(mut self,
+    pub(crate) fn cycle(mut self,
                  // sources: &'static mut Vec<LockedAudio>,
-                 sources: Arc<Mutex<Vec<LockedAudio>>>,
+                 // sources: Vec<LockedAudio>,
                  // receiver: &mut Option<Box<AudioReceiver>>,
-                 receiver: Arc<Mutex<Option<Box<AudioReceiver>>>>,
-                 bitrate: Bitrate)
+                 // receiver: Option<Box<AudioReceiver>>,
+                 // bitrate: Bitrate
+                 mut state: MutexGuard<'static, TaskState>)
                  -> Box<Future<Item = (), Error = Error>> {
+
         // Process events the listeners have batched out.
-        // let client_receiver = receiver.as_mut();
+        let client_receiver = &state.receiver.as_mut();
+        let forward_events = client_receiver.is_some();
 
-        {
-            let mut client_receiver = receiver.lock();
-            let forward_events = client_receiver.is_some();
+        while let Ok(status) = self.listener_items.rx.try_recv() {
+            match status {
+                ReceiverStatus::Udp(packet) => {
+                    if forward_events {
+                        let RxVoicePacket {
+                            is_stereo,
+                            seq,
+                            ssrc,
+                            timestamp,
+                            voice,
+                        } = packet;
 
-            while let Ok(status) = self.listener_items.rx.try_recv() {
-                match status {
-                    ReceiverStatus::Udp(packet) => {
-                        if forward_events {
-                            let RxVoicePacket {
-                                is_stereo,
-                                seq,
-                                ssrc,
-                                timestamp,
-                                voice,
-                            } = packet;
+                        let len = if is_stereo { 960 * 2 } else { 960 };
 
-                            let len = if is_stereo { 960 * 2 } else { 960 };
+                        client_receiver.as_mut().expect("Receiver is already 'Some'")
+                            .voice_packet(ssrc, seq, timestamp, is_stereo, &voice[..len]);
+                    }
+                },
+                ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
+                    if forward_events {
+                        client_receiver.as_mut().expect("Receiver is already 'Some'")
+                            .speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
+                    }
+                },
+                ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
+                    match self.last_heartbeat_nonce {
+                        Some(nonce) => {
+                            if ev.nonce != nonce {
+                                warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                            }
 
-                            client_receiver.as_mut().expect("Receiver is already 'Some'")
-                                .voice_packet(ssrc, seq, timestamp, is_stereo, &voice[..len]);
-                        }
-                    },
-                    ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
-                        if forward_events {
-                            client_receiver.as_mut().expect("Receiver is already 'Some'")
-                                .speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
-                        }
-                    },
-                    ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
-                        match self.last_heartbeat_nonce {
-                            Some(nonce) => {
-                                if ev.nonce != nonce {
-                                    warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
-                                }
-
-                                self.last_heartbeat_nonce = None;
-                            },
-                            None => {},
-                        }
-                    },
-                    ReceiverStatus::Websocket(other) => {
-                        info!("[Voice] Received other websocket data: {:?}", other);
-                    },
-                }
+                            self.last_heartbeat_nonce = None;
+                        },
+                        None => {},
+                    }
+                },
+                ReceiverStatus::Websocket(other) => {
+                    info!("[Voice] Received other websocket data: {:?}", other);
+                },
             }
         }
+        
 
         let udp_now = Instant::now();
         let ws_now = udp_now.clone();
@@ -409,46 +433,53 @@ impl Connection {
 
         // Send WS pong if need be.
         let prepped_ws = match ws_ping {
-            Some(data) => Either::A(self.ws_send.send(Message::Pong(data))),
-            None => Either::B(ok(self.ws_send))
+            Some(data) => Either::A(
+                self.ws().send(Message::Pong(data))
+                    .map(move |ws| self.restore_ws(ws))
+            ),
+            None => Either::B(
+                ok(self)
+            )
         };
 
         let out = prepped_ws
             .map_err(Error::from)
-            .and_then(move |ws_send| {
+            .and_then(move |mut conn| {
                 // Send the voice websocket keepalive if it's time
-                match self.ws_keepalive_timer.is_elapsed(ws_now) {
+                match conn.ws_keepalive_timer.is_elapsed(ws_now) {
                     true => {
                         let nonce = random::<u64>();
-                        self.last_heartbeat_nonce = Some(nonce);
+                        conn.last_heartbeat_nonce = Some(nonce);
 
-                        self.ws_keepalive_timer.reset();
+                        conn.ws_keepalive_timer.reset();
                         Either::A(
-                            self.ws_send.send_json(&payload::build_heartbeat(nonce))
+                            conn.ws().send_json(&payload::build_heartbeat(nonce))
                                 .map_err(Error::from)
+                                .map(move |ws| conn.restore_ws(ws))
                         )
                     },
                     false => {
-                        Either::B(ok(self.ws_send))
+                        Either::B(ok(conn))
                     },
                 }
             })
-            .and_then(move |ws_send| {
+            .and_then(move |mut conn| {
                 // Send UDP keepalive if it's time
-                match self.udp_keepalive_timer.is_elapsed(udp_now) {
+                match conn.udp_keepalive_timer.is_elapsed(udp_now) {
                     true => {
-                        self.udp_keepalive_timer.reset();
+                        conn.udp_keepalive_timer.reset();
                         Either::A(
-                            self.udp_send.send(TxVoicePacket::KeepAlive)
+                            conn.udp().send(TxVoicePacket::KeepAlive)
                                 .map_err(Error::from)
+                                .map(move |udp| self.restore_udp(udp))
                         )
                     },
-                    false => Either::B(ok(self.udp_send)),
+                    false => Either::B(ok(conn)),
                 }
             })
-            .and_then(move |udp_send| {
+            .and_then(move |mut conn| {
                 let mut buffer = [0i16; 960 * 2];
-                let mut mix_buffer = [0f32; 960 * 2];
+                let mut mix_buffer = vec![0f32; 960 * 2];
                 let mut len = 0;
 
                 // TODO: Could we parallelise this across futures?
@@ -457,7 +488,7 @@ impl Connection {
                 // Walk over all the audio files, removing those which have finished.
                 let mut i = 0;
 
-                let sources = sources.lock();
+                let sources = &mut state.senders;
 
                 while i < sources.len() {
                     let mut finished = false;
@@ -514,48 +545,55 @@ impl Connection {
                 };
 
                 let tx_packet = if len == 0 {
-                    if self.silence_frames > 0 {
+                    if conn.silence_frames > 0 {
                         // Per official guidelines, send 5x silence BEFORE we stop speaking.
-                        self.silence_frames -= 1;
+                        conn.silence_frames -= 1;
                         Some(TxVoicePacket::Silence)
                     } else {
                         // Okay, NOW we stop speaking.
                         None
                     }
                 } else {
-                    self.silence_frames = 5;
+                    conn.silence_frames = 5;
 
-                    self.soft_clip.apply(&mut mix_buffer);
-                    Some(TxVoicePacket::Audio(&mix_buffer[..len], bitrate))
+                    conn.soft_clip.apply(&mut mix_buffer);
+                    Some(TxVoicePacket::Audio(&mix_buffer[..len], state.bitrate))
                 };
 
 
-                self.set_speaking(tx_packet.is_some())
-                    .and_then(|ws_send| {
-                        self.udp_keepalive_timer.reset();
+                conn.set_speaking(tx_packet.is_some())
+                    .and_then(move |mut conn| {
+                        conn.udp_keepalive_timer.reset();
                         match tx_packet {
                             Some(packet) => Either::A(
-                                self.udp_send.send(packet)
+                                conn.udp().send(packet)
                                     .map_err(Error::from)
-                                    .map(|_| ())
+                                    .map(|udp|
+                                        conn.restore_udp(udp)
+                                    )
                             ),
-                            None => Either::B(ok(())),
+                            None => Either::B(ok(conn)),
                         }
+                    })
+                    .map(|conn| {
+                        MutexGuard::map(state, |a| a.restore_conn(conn));
+                        ()
                     })
             });
 
         Box::new(out)
     }
 
-    fn set_speaking(&mut self, speaking: bool) -> Box<Future<Item = SplitSink<WsClient>, Error = Error>> {
+    fn set_speaking(mut self, speaking: bool) -> Box<Future<Item = Connection, Error = Error>> {
         let out = match self.speaking == speaking {
-            true => Either::A(ok(self.ws_send)),
+            true => Either::A(ok(self)),
             false => {
                 self.speaking = speaking;
                 self.ws_keepalive_timer.reset();
                 Either::B(
-                    self.ws_send.send_json(&payload::build_speaking(speaking))
+                    self.ws().send_json(&payload::build_speaking(speaking))
                         .map_err(Error::from)
+                        .map(|ws| self.restore_ws(ws))
                 )
             },
         };
@@ -658,7 +696,7 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
     context.spawn(move |_|
         ws.map_err(Error::from)
             .until(close_reader1.map(|v| *v))
-            .for_each(|message| {
+            .for_each(move |message| {
                 message_to_json(message, tx_pong).and_then(
                     |maybe_value| match maybe_value {
                         Some(value) => match VoiceEvent::deserialize(value) {
@@ -683,7 +721,7 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
     context.spawn(move |_|
         udp.map_err(Error::from)
             .until(close_reader2.map(|v| *v))
-            .for_each(|voice_frame|
+            .for_each(move |voice_frame|
                 tx_clone.send(ReceiverStatus::Udp(voice_frame))
                     .map_err(|e| Error::FutureMpsc("UDP event receiver hung up."))
             )
