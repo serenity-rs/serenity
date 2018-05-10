@@ -132,7 +132,7 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
         }
     }
 
-    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize> {
+    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut Vec<f32>, volume: f32) -> Option<usize> {
         let decoder_lock = self.decoder.as_mut()?.clone();
         let frame = self.read_opus_frame()?;
         let mut local_buf = [0f32; 960 * 2];

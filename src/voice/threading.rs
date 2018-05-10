@@ -56,7 +56,7 @@ pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
     runner(rx, timer);
 }
 
-fn runner(rx: MpscReceiver<Status>, timer: Timer) -> Box<Future<Item = (), Error = ()>>{
+fn runner(rx: MpscReceiver<Status>, timer: Timer) -> impl Future<Item = (), Error = ()>{
     let (kill_tx, kill_rx) = oneshot::channel();
 
     let mut state_lock = Arc::new(Mutex::new(TaskState {

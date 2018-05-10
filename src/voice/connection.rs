@@ -138,9 +138,19 @@ struct VoiceHandshake {
 }
 
 struct ListenerItems {
-    close_sender: OneShotSender<()>,
+    close_sender: Option<OneShotSender<()>>,
     rx: Receiver<ReceiverStatus>,
     rx_pong: Receiver<Vec<u8>>,
+}
+
+impl Drop for ListenerItems {
+    fn drop(&mut self) {
+        mem::replace(&mut self.close_sender, None)
+            .expect("Formality to appease the borrow-lord.")
+            .send(());
+
+        info!("[Voice] Disconnected");
+    }
 }
 
 #[allow(dead_code)]
@@ -160,7 +170,7 @@ pub struct Connection {
 
 impl Connection {
     pub fn new(mut info: ConnectionInfo, handle: Handle)
-            -> Box<Future<Item = Connection, Error = Error>> {
+            -> impl Future<Item = Connection, Error = Error> {
 
         // let mut core = Core::new().unwrap();
         // let handle = core.handle();
@@ -169,7 +179,7 @@ impl Connection {
         let local_remote_ws = handle.remote().clone();
         let local_remote_listeners = handle.remote().clone();
 
-        let done = result(url)
+        result(url)
             // Build a (TLS'd) websocket.
             .and_then(move |url| connect_async(url, local_remote_ws).map_err(Error::from))
             // Our init of the handshake.
@@ -321,9 +331,7 @@ impl Connection {
                     ws_keepalive_timer: Delay::new(temp_heartbeat),
                     ws_send,
                 })
-            });
-
-        Box::new(done)
+            })
     }
 
     fn ws(&mut self) -> SplitSink<WsClient> {
@@ -346,7 +354,7 @@ impl Connection {
         self
     }
 
-    pub fn reconnect(self, handle: Handle) -> Box<Future<Item = Connection, Error = Error>> {
+    pub fn reconnect(self, handle: Handle) -> impl Future<Item = Connection, Error = Error> {
         // A few steps to this.
         //  * Unconditionally terminate the voice and udp connections.
         //  * Rebuild those connections (and listeners).
@@ -355,7 +363,7 @@ impl Connection {
 
         // TODO.
         // Need to figure out the interaction with kick/ban etc.
-        Box::new(err(Error::Voice(VoiceError::VoiceModeUnavailable)))
+        err(Error::Voice(VoiceError::VoiceModeUnavailable))
     }
 
     #[allow(unused_variables)]
@@ -366,54 +374,55 @@ impl Connection {
                  // receiver: Option<Box<AudioReceiver>>,
                  // bitrate: Bitrate
                  mut state: MutexGuard<'static, TaskState>)
-                 -> Box<Future<Item = (), Error = Error>> {
+                 -> impl Future<Item = (), Error = Error> {
 
-        // Process events the listeners have batched out.
-        let client_receiver = &state.receiver.as_mut();
-        let forward_events = client_receiver.is_some();
+        {
+            // Process events the listeners have batched out.
+            let client_receiver = &mut state.receiver.as_mut();
+            let forward_events = client_receiver.is_some();
 
-        while let Ok(status) = self.listener_items.rx.try_recv() {
-            match status {
-                ReceiverStatus::Udp(packet) => {
-                    if forward_events {
-                        let RxVoicePacket {
-                            is_stereo,
-                            seq,
-                            ssrc,
-                            timestamp,
-                            voice,
-                        } = packet;
+            while let Ok(status) = self.listener_items.rx.try_recv() {
+                match status {
+                    ReceiverStatus::Udp(packet) => {
+                        if forward_events {
+                            let RxVoicePacket {
+                                is_stereo,
+                                seq,
+                                ssrc,
+                                timestamp,
+                                voice,
+                            } = packet;
 
-                        let len = if is_stereo { 960 * 2 } else { 960 };
+                            let len = if is_stereo { 960 * 2 } else { 960 };
 
-                        client_receiver.as_mut().expect("Receiver is already 'Some'")
-                            .voice_packet(ssrc, seq, timestamp, is_stereo, &voice[..len]);
-                    }
-                },
-                ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
-                    if forward_events {
-                        client_receiver.as_mut().expect("Receiver is already 'Some'")
-                            .speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
-                    }
-                },
-                ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
-                    match self.last_heartbeat_nonce {
-                        Some(nonce) => {
-                            if ev.nonce != nonce {
-                                warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
-                            }
+                            client_receiver.as_mut().expect("Receiver is already 'Some'")
+                                .voice_packet(ssrc, seq, timestamp, is_stereo, &voice[..len]);
+                        }
+                    },
+                    ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
+                        if forward_events {
+                            client_receiver.as_mut().expect("Receiver is already 'Some'")
+                                .speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
+                        }
+                    },
+                    ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
+                        match self.last_heartbeat_nonce {
+                            Some(nonce) => {
+                                if ev.nonce != nonce {
+                                    warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                                }
 
-                            self.last_heartbeat_nonce = None;
-                        },
-                        None => {},
-                    }
-                },
-                ReceiverStatus::Websocket(other) => {
-                    info!("[Voice] Received other websocket data: {:?}", other);
-                },
+                                self.last_heartbeat_nonce = None;
+                            },
+                            None => {},
+                        }
+                    },
+                    ReceiverStatus::Websocket(other) => {
+                        info!("[Voice] Received other websocket data: {:?}", other);
+                    },
+                }
             }
         }
-        
 
         let udp_now = Instant::now();
         let ws_now = udp_now.clone();
@@ -442,7 +451,7 @@ impl Connection {
             )
         };
 
-        let out = prepped_ws
+        prepped_ws
             .map_err(Error::from)
             .and_then(move |mut conn| {
                 // Send the voice websocket keepalive if it's time
@@ -471,7 +480,7 @@ impl Connection {
                         Either::A(
                             conn.udp().send(TxVoicePacket::KeepAlive)
                                 .map_err(Error::from)
-                                .map(move |udp| self.restore_udp(udp))
+                                .map(move |udp| conn.restore_udp(udp))
                         )
                     },
                     false => Either::B(ok(conn)),
@@ -485,64 +494,66 @@ impl Connection {
                 // TODO: Could we parallelise this across futures?
                 // It's multiple I/O operations, potentially.
 
-                // Walk over all the audio files, removing those which have finished.
-                let mut i = 0;
+                {
+                    // Walk over all the audio files, removing those which have finished.
+                    let mut i = 0;
 
-                let sources = &mut state.senders;
+                    let sources = &mut state.senders;
 
-                while i < sources.len() {
-                    let mut finished = false;
+                    while i < sources.len() {
+                        let mut finished = false;
 
-                    let aud_lock = (&sources[i]).clone();
-                    let mut aud = aud_lock.lock();
+                        let aud_lock = (&sources[i]).clone();
+                        let mut aud = aud_lock.lock();
 
-                    let vol = aud.volume;
-                    let skip = !aud.playing;
+                        let vol = aud.volume;
+                        let skip = !aud.playing;
 
-                    {
-                        let stream = &mut aud.source;
+                        {
+                            let stream = &mut aud.source;
 
-                        if skip {
-                            i += 1;
+                            if skip {
+                                i += 1;
 
-                            continue;
-                        }
+                                continue;
+                            }
 
-                        let temp_len = match stream.get_type() {
-                            AudioType::Opus => match stream.decode_and_add_opus_frame(&mut mix_buffer, vol) {
-                                Some(len) => len,
-                                None => 0,
-                            },
-                            AudioType::Pcm => {
-                                let buffer_len = 960 * 2;
-
-                                match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
+                            let temp_len = match stream.get_type() {
+                                AudioType::Opus => match stream.decode_and_add_opus_frame(&mut mix_buffer, vol) {
                                     Some(len) => len,
                                     None => 0,
-                                }
-                            },
-                        };
+                                },
+                                AudioType::Pcm => {
+                                    let buffer_len = 960 * 2;
 
-                        // May need to force interleave/copy.
-                        combine_audio(&buffer, &mut mix_buffer, vol);
+                                    match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
+                                        Some(len) => len,
+                                        None => 0,
+                                    }
+                                },
+                            };
 
-                        len = len.max(temp_len);
-                        i += if temp_len > 0 {
-                            1
-                        } else {
-                            sources.remove(i);
-                            finished = true;
+                            // May need to force interleave/copy.
+                            combine_audio(&buffer, &mut mix_buffer, vol);
 
-                            0
-                        };
-                    }
+                            len = len.max(temp_len);
+                            i += if temp_len > 0 {
+                                1
+                            } else {
+                                sources.remove(i);
+                                finished = true;
 
-                    aud.finished = finished;
+                                0
+                            };
+                        }
 
-                    if !finished {
-                        aud.step_frame();
-                    }
-                };
+                        aud.finished = finished;
+
+                        if !finished {
+                            aud.step_frame();
+                        }
+                    };
+                }
 
                 let tx_packet = if len == 0 {
                     if conn.silence_frames > 0 {
@@ -557,7 +568,7 @@ impl Connection {
                     conn.silence_frames = 5;
 
                     conn.soft_clip.apply(&mut mix_buffer);
-                    Some(TxVoicePacket::Audio(&mix_buffer[..len], state.bitrate))
+                    Some(TxVoicePacket::Audio(mix_buffer, len, state.bitrate))
                 };
 
 
@@ -579,9 +590,7 @@ impl Connection {
                         MutexGuard::map(state, |a| a.restore_conn(conn));
                         ()
                     })
-            });
-
-        Box::new(out)
+            })
     }
 
     fn set_speaking(mut self, speaking: bool) -> Box<Future<Item = Connection, Error = Error>> {
@@ -602,18 +611,10 @@ impl Connection {
     }
 }
 
-impl Drop for Connection {
-    fn drop(&mut self) {
-        let _ = self.listener_items.close_sender.send(());
-
-        info!("[Voice] Disconnected");
-    }
-}
-
 #[inline]
 fn combine_audio(
     raw_buffer: &[i16; 1920],
-    float_buffer: &mut [f32; 1920],
+    float_buffer: &mut Vec<f32>,
     volume: f32,
 ) {
     for i in 0..1920 {
@@ -635,7 +636,7 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
 }
 
 #[inline]
-fn encryption_key(ws: WsClient) -> Box<Future<Item=(Key, WsClient), Error=Error>> {
+fn encryption_key(ws: WsClient) -> impl Future<Item=(Key, WsClient), Error=Error> {
     let out = loop_fn(ws, |ws| {
         ws.recv_json()
             .and_then(|(value_wrap, ws)| {
@@ -693,11 +694,13 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
 
     let (tx_pong, rx_pong) = mpsc::channel();
 
+    let tx_pong_shared = Arc::new(Mutex::new(tx_pong));
+
     context.spawn(move |_|
         ws.map_err(Error::from)
             .until(close_reader1.map(|v| *v))
             .for_each(move |message| {
-                message_to_json(message, tx_pong).and_then(
+                message_to_json(message, tx_pong_shared).and_then(
                     |maybe_value| match maybe_value {
                         Some(value) => match VoiceEvent::deserialize(value) {
                             Ok(msg) => tx.send(ReceiverStatus::Websocket(msg))
@@ -733,7 +736,7 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
     );
 
     ListenerItems {
-        close_sender,
+        close_sender: Some(close_sender),
         rx,
         rx_pong,
     }

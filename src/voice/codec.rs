@@ -46,9 +46,9 @@ pub(crate) struct RxVoicePacket {
     pub voice: [i16; 1920],
 }
 
-pub(crate) enum TxVoicePacket<'a> {
+pub(crate) enum TxVoicePacket {
     KeepAlive,
-    Audio(&'a[f32], Bitrate),
+    Audio(Vec<f32>, usize, Bitrate),
     Silence,
 }
 
@@ -120,7 +120,7 @@ impl VoiceCodec {
 
 impl UdpCodec for VoiceCodec {
     type In = RxVoicePacket;
-    type Out = TxVoicePacket<'static>;
+    type Out = TxVoicePacket;
 
     fn decode(&mut self, _src: &SocketAddr, buf: &[u8]) -> StdResult<Self::In, IoError> {
         let mut buffer = [0i16; 960 * 2];
@@ -187,7 +187,7 @@ impl UdpCodec for VoiceCodec {
             TxVoicePacket::KeepAlive => {
                 buf.extend_from_slice(&self.ssrc);
             },
-            TxVoicePacket::Audio(audio, bitrate) => {
+            TxVoicePacket::Audio(audio, len, bitrate) => {
                 // Reconfigure encoder bitrate.
                 // From my testing, it seemed like this needed to be set every cycle.
                 if let Err(e) = self.encoder.set_bitrate(bitrate) {
@@ -204,7 +204,7 @@ impl UdpCodec for VoiceCodec {
 
                 self.write_header(buf, size);
 
-                let _len = self.encoder.encode_float(audio, &mut buf[AUDIO_POSITION..])
+                let _len = self.encoder.encode_float(&audio[..len], &mut buf[AUDIO_POSITION..])
                     .expect("[voice] Encoding packet somehow failed.");
 
                 self.finalize(buf);

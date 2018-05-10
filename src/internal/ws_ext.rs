@@ -12,8 +12,9 @@ use internal::{
     either_n::Either4,
     prelude::*,
 };
+use parking_lot::Mutex;
 use serde_json;
-use std::sync::mpsc::Sender;
+use std::sync::{mpsc::Sender, Arc};
 use tokio_core::net::TcpStream;
 use tokio_tls::TlsStream;
 use tokio_tungstenite::{
@@ -74,7 +75,7 @@ impl ReceiverExt for WsClient {
     }
 }
 
-pub fn message_to_json(message: Message, notifier: Sender<Vec<u8>>) -> Result<Option<Value>> {
+pub fn message_to_json(message: Message, notifier_lock: Arc<Mutex<Sender<Vec<u8>>>>) -> Result<Option<Value>> {
     // This is like the above, except in the case where the sender and receiver have been split.
     // It doesn't seem like Stream + Sink allows .shared() to be called, so here we are...
     // Telling the holder of the send side that they're obliged to Pong.
@@ -82,6 +83,7 @@ pub fn message_to_json(message: Message, notifier: Sender<Vec<u8>>) -> Result<Op
         Message::Binary(bytes) => serde_json::from_reader(ZlibDecoder::new(&bytes[..])).map(Some).map_err(Error::from),
         Message::Text(payload) => serde_json::from_str(&payload).map(Some).map_err(Error::from),
         Message::Ping(x) => {
+            let notifier = notifier_lock.lock();
             notifier.send(x);
 
             Ok(None)

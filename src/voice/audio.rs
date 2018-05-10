@@ -17,7 +17,7 @@ pub trait AudioSource: Send {
 
     fn read_opus_frame(&mut self) -> Option<Vec<u8>>;
 
-    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize>;
+    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut Vec<f32>, volume: f32) -> Option<usize>;
 }
 
 /// A receiver for incoming audio.
