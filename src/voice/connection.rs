@@ -15,6 +15,7 @@ use futures::{
         Loop,
     },
     stream::{
+        repeat,
         SplitSink,
         SplitStream,
     },
@@ -694,13 +695,14 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
 
     let (tx_pong, rx_pong) = mpsc::channel();
 
-    let tx_pong_shared = Arc::new(Mutex::new(tx_pong));
+    let tx_pong_shared = repeat(Arc::new(Mutex::new(tx_pong)));
 
     context.spawn(move |_|
         ws.map_err(Error::from)
+            .zip(tx_pong_shared)
             .until(close_reader1.map(|v| *v))
-            .for_each(move |message| {
-                message_to_json(message, tx_pong_shared).and_then(
+            .for_each(move |(message, tx_pong_lock)| {
+                message_to_json(message, tx_pong_lock).and_then(
                     |maybe_value| match maybe_value {
                         Some(value) => match VoiceEvent::deserialize(value) {
                             Ok(msg) => tx.send(ReceiverStatus::Websocket(msg))
