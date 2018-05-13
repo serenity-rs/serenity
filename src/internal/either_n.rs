@@ -3,10 +3,11 @@ use futures::{
     Poll,
 };
 
+#[allow(dead_code)]
 pub enum Either3<A, B, C> {
-    One(A),
-    Two(B),
-    Three(C),
+    A(A),
+    B(B),
+    C(C),
 }
 
 impl<A, B, C> Future for Either3<A, B, C>
@@ -18,18 +19,19 @@ impl<A, B, C> Future for Either3<A, B, C>
 
     fn poll(&mut self) -> Poll<A::Item, A::Error> {
         match *self {
-            Either3::One(ref mut a) => a.poll(),
-            Either3::Two(ref mut b) => b.poll(),
-            Either3::Three(ref mut c) => c.poll(),
+            Either3::A(ref mut a) => a.poll(),
+            Either3::B(ref mut b) => b.poll(),
+            Either3::C(ref mut c) => c.poll(),
         }
     }
 }
 
+#[allow(dead_code)]
 pub enum Either4<A, B, C, D> {
-    One(A),
-    Two(B),
-    Three(C),
-    Four(D),
+    A(A),
+    B(B),
+    C(C),
+    D(D),
 }
 
 impl<A, B, C, D> Future for Either4<A, B, C, D>
@@ -42,10 +44,10 @@ impl<A, B, C, D> Future for Either4<A, B, C, D>
 
     fn poll(&mut self) -> Poll<A::Item, A::Error> {
         match *self {
-            Either4::One(ref mut a) => a.poll(),
-            Either4::Two(ref mut b) => b.poll(),
-            Either4::Three(ref mut c) => c.poll(),
-            Either4::Four(ref mut d) => d.poll(),
+            Either4::A(ref mut a) => a.poll(),
+            Either4::B(ref mut b) => b.poll(),
+            Either4::C(ref mut c) => c.poll(),
+            Either4::D(ref mut d) => d.poll(),
         }
     }
 }

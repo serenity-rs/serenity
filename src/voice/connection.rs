@@ -1,9 +1,6 @@
-use byteorder::{ByteOrder, LittleEndian, NetworkEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{LittleEndian, NetworkEndian, ReadBytesExt, WriteBytesExt};
 use constants::VOICE_GATEWAY_VERSION;
-use future_utils::{
-    mpsc::{unbounded, UnboundedReceiver, UnboundedSender},
-    StreamExt,
-};
+use future_utils::StreamExt;
 use futures::{
     future::{
         err,
@@ -19,67 +16,47 @@ use futures::{
         SplitSink,
         SplitStream,
     },
-    sync::{
-        mpsc::{
-            self as future_mpsc,
-            Receiver as FutureMpscReceiver,
-            Sender as FutureMpscSender,
-        },
-        oneshot::{
-            channel as oneshot_channel,
-            Sender as OneShotSender,
-        },
+    sync::oneshot::{
+        channel as oneshot_channel,
+        Sender as OneShotSender,
     },
     Sink,
     Stream,
 };
-use internal::prelude::*;
-use internal::ws_ext::{
-    message_to_json,
-    ReceiverExt,
-    SenderExt,
-    WsClient,
+use internal::{
+    long_lock::LongLock,
+    prelude::*,
+    ws_ext::{
+        message_to_json,
+        ReceiverExt,
+        SenderExt,
+        WsClient,
+    },
+    Delay
 };
-use internal::Delay;
 use model::event::{
     VoiceEvent,
     VoiceHello,
     VoiceReady,
 };
-use model::id::UserId;
 use opus::{
-    packet as opus_packet,
-    Application as CodingMode,
-    Bitrate,
     Channels,
-    Decoder as OpusDecoder,
-    Encoder as OpusEncoder,
     SoftClip,
 };
-use parking_lot::{Mutex, MutexGuard};
+use parking_lot::Mutex;
 use rand::random;
 use serde::Deserialize;
-use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
+use sodiumoxide::crypto::secretbox::Key;
 use std::{
-    collections::HashMap,
-    io::{Error as IoError, Write},
     mem,
     net::{SocketAddr, ToSocketAddrs},
-    rc::Rc,
-    sync::mpsc::{self, Receiver, Sender},
+    sync::mpsc::{self, Receiver},
     sync::Arc,
-    thread::{self, Builder as ThreadBuilder, JoinHandle},
-    time::{Duration, Instant},
+    time::Instant,
 };
 use super::{
     audio::{
-        AudioReceiver,
         AudioType,
-        DEFAULT_BITRATE,
-        HEADER_LEN,
-        LockedAudio,
-        SAMPLE_RATE,
-        SILENT_FRAME,
     },
     codec::{
         VoiceCodec,
@@ -94,14 +71,13 @@ use super::{
 };
 use tokio_core::{
     net::{
-        TcpStream,
         UdpCodec,
         UdpFramed,
         UdpSocket,
     },
-    reactor::{Core, Handle, Remote},
+    reactor::{Handle, Remote},
 };
-use tokio_tungstenite::{connect_async, WebSocketStream};
+use tokio_tungstenite::connect_async;
 use tungstenite::Message;
 use url::Url;
 
@@ -146,7 +122,7 @@ struct ListenerItems {
 
 impl Drop for ListenerItems {
     fn drop(&mut self) {
-        mem::replace(&mut self.close_sender, None)
+        let _ = mem::replace(&mut self.close_sender, None)
             .expect("Formality to appease the borrow-lord.")
             .send(());
 
@@ -368,14 +344,11 @@ impl Connection {
     }
 
     #[allow(unused_variables)]
-    pub(crate) fn cycle(mut self,
-                 // sources: &'static mut Vec<LockedAudio>,
-                 // sources: Vec<LockedAudio>,
-                 // receiver: &mut Option<Box<AudioReceiver>>,
-                 // receiver: Option<Box<AudioReceiver>>,
-                 // bitrate: Bitrate
-                 mut state: MutexGuard<'static, TaskState>)
-                 -> impl Future<Item = (), Error = Error> {
+    pub(crate) fn cycle(mut self, now: Instant, mut state: LongLock<TaskState>)
+            -> impl Future<Item = (), Error = Error> {
+
+    // On success, this is unset.
+    state.cycle_error = true;
 
         {
             // Process events the listeners have batched out.
@@ -425,9 +398,6 @@ impl Connection {
             }
         }
 
-        let udp_now = Instant::now();
-        let ws_now = udp_now.clone();
-
         // https://tools.ietf.org/html/rfc6455#section-5.5.3
         // "the endpoint MAY elect to send a Pong frame
         // for only the most recently processed Ping frame."
@@ -456,7 +426,7 @@ impl Connection {
             .map_err(Error::from)
             .and_then(move |mut conn| {
                 // Send the voice websocket keepalive if it's time
-                match conn.ws_keepalive_timer.is_elapsed(ws_now) {
+                match conn.ws_keepalive_timer.is_elapsed(now) {
                     true => {
                         let nonce = random::<u64>();
                         conn.last_heartbeat_nonce = Some(nonce);
@@ -475,7 +445,7 @@ impl Connection {
             })
             .and_then(move |mut conn| {
                 // Send UDP keepalive if it's time
-                match conn.udp_keepalive_timer.is_elapsed(udp_now) {
+                match conn.udp_keepalive_timer.is_elapsed(now) {
                     true => {
                         conn.udp_keepalive_timer.reset();
                         Either::A(
@@ -494,7 +464,6 @@ impl Connection {
 
                 // TODO: Could we parallelise this across futures?
                 // It's multiple I/O operations, potentially.
-
                 {
                     // Walk over all the audio files, removing those which have finished.
                     let mut i = 0;
@@ -587,8 +556,11 @@ impl Connection {
                             None => Either::B(ok(conn)),
                         }
                     })
-                    .map(|conn| {
-                        MutexGuard::map(state, |a| a.restore_conn(conn));
+                    .map(move |conn| {
+                        // MutexGuard::map(state, |a| a.restore_conn(conn));
+                        // IMPORTANT
+                        state.cycle_error = false;
+                        state.restore_conn(conn);
                         ()
                     })
             })
@@ -706,7 +678,7 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
                     |maybe_value| match maybe_value {
                         Some(value) => match VoiceEvent::deserialize(value) {
                             Ok(msg) => tx.send(ReceiverStatus::Websocket(msg))
-                                .map_err(|e| Error::FutureMpsc("WS event receiver hung up.")),
+                                .map_err(|_| Error::FutureMpsc("WS event receiver hung up.")),
                             Err(why) => {
                                 warn!("Error deserializing voice event: {:?}", why);
 
@@ -728,7 +700,7 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
             .until(close_reader2.map(|v| *v))
             .for_each(move |voice_frame|
                 tx_clone.send(ReceiverStatus::Udp(voice_frame))
-                    .map_err(|e| Error::FutureMpsc("UDP event receiver hung up."))
+                    .map_err(|_| Error::FutureMpsc("UDP event receiver hung up."))
             )
             .map_err(|e| {
                 warn!("[voice] {}", e);

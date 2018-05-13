@@ -111,7 +111,8 @@ impl VoiceCodec {
         // For now, we have to copy I guess...
         // Unless someone's willing to play with unsafe wizardy.
         let crypt = secretbox::seal(&buf[AUDIO_POSITION..], &nonce, &self.key);
-        (&mut buf[HEADER_LEN..]).write(&crypt);
+        (&mut buf[HEADER_LEN..]).write(&crypt)
+            .expect("[voice] Write of frame into unbounded vec should not fail.");
 
         self.sequence = self.sequence.wrapping_add(1);
         self.timestamp = self.timestamp.wrapping_add(960);
@@ -212,7 +213,8 @@ impl UdpCodec for VoiceCodec {
             TxVoicePacket::Silence => {
                 self.write_header(buf, SILENT_FRAME.len());
 
-                (&mut buf[AUDIO_POSITION..]).write(&SILENT_FRAME);
+                (&mut buf[AUDIO_POSITION..]).write(&SILENT_FRAME)
+                    .expect("[voice] Write of frame into unbounded vec should not fail.");
 
                 self.finalize(buf);
             }

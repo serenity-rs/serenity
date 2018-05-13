@@ -7,24 +7,28 @@ use futures::{
     Stream,
 };
 use internal::{
-    either_n::{Either3, Either4},
+    either_n::Either4,
+    long_lock::long_lock,
     prelude::*,
 };
 use model::id::GuildId;
-use parking_lot::{Mutex, MutexGuard};
-use std::mem;
-use std::sync::{mpsc::{Receiver as MpscReceiver, TryRecvError}, Arc,};
-use std::thread::Builder as ThreadBuilder;
-use std::time::{Duration, Instant};
-use super::connection::Connection;
-use super::{audio, error::VoiceError, Bitrate, Status};
-use tokio_core::reactor::{Core, Handle, Remote};
+use parking_lot::Mutex;
+use std::{
+    mem,
+    sync::{
+        mpsc::{Receiver as MpscReceiver, TryRecvError},
+        Arc
+    },
+    time::{Duration, Instant}
+};
+use super::{audio, connection::Connection, error::VoiceError, Bitrate, Status};
+use tokio_core::reactor::Core;
 use tokio_timer::{wheel, Timer};
 
 pub(crate) struct TaskState {
     pub bitrate: Bitrate,
     connection: Option<Connection>,
-    cycle_error: bool,
+    pub cycle_error: bool,
     kill_tx: Option<oneshot::Sender<()>>,
     pub receiver: Option<Box<audio::AudioReceiver>>,
     rx: MpscReceiver<Status>,
@@ -32,11 +36,6 @@ pub(crate) struct TaskState {
 }
 
 impl TaskState {
-    pub fn conn(&mut self) -> Connection {
-        self.maybe_conn()
-            .expect("[voice] Failed to get udp...")
-    }
-
     pub fn maybe_conn(&mut self) -> Option<Connection> {
         mem::replace(&mut self.connection, None)
     }
@@ -48,7 +47,7 @@ impl TaskState {
 
     pub fn kill_loop(&mut self) -> StdResult<(),()> {
         match mem::replace(&mut self.kill_tx, None) {
-            Some(tx) => {tx.send(());},
+            Some(tx) => {let _ = tx.send(());},
             None => {},
         };
 
@@ -57,8 +56,6 @@ impl TaskState {
 }
 
 pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
-    let name = format!("Serenity Voice (G{})", guild_id);
-
     let timer = wheel()
         .tick_duration(Duration::from_millis(20))
         .build();
@@ -102,13 +99,11 @@ fn runner(rx: MpscReceiver<Status>, timer: Timer) -> impl Future<Item = (), Erro
                 let mut should_disconnect = false;
                 let conn_handle = handle.clone();
 
-                let state_lock_ref = &state_lock;
-                let mut state = state_lock.lock();
+                let mut state = long_lock(state_lock);
 
                 // Handle any control messages, drain them all synchronously.
                 // All are obvious, except connection state changes, which
-                // we want to collect to minimise spurious sub-frame channel changes.            
-
+                // we want to collect to minimise spurious sub-frame channel changes.
                 loop {
                     match state.rx.try_recv() {
                         Ok(Status::Connect(info)) => {
@@ -158,27 +153,22 @@ fn runner(rx: MpscReceiver<Status>, timer: Timer) -> impl Future<Item = (), Erro
                 //  * We want to make a new connection.
                 let conn_future = match state.maybe_conn() {
                     Some(connection) => if state.cycle_error {
-                            Either4::One(connection.reconnect(conn_handle)
-                                .map(|conn| MutexGuard::map(state, |a| a.restore_conn(conn))))
+                            Either4::A(connection.reconnect(conn_handle))
                         } else {
-                            Either4::Two(ok(MutexGuard::map(state, |a| a.restore_conn(connection))))
+                            Either4::B(ok(connection))
                         },
                     None => if let Some(info) = received_info {
-                        Either4::Three(Connection::new(info, conn_handle)
-                            .map(|conn| MutexGuard::map(state, |a| a.restore_conn(conn))))
+                        Either4::C(Connection::new(info, conn_handle))
                     } else {
-                        Either4::Four(err(Error::Voice(VoiceError::VoiceModeInvalid)))
+                        Either4::D(err(Error::Voice(VoiceError::VoiceModeInvalid)))
                     },
                 };
 
                 Either::B(conn_future
-                    .and_then(move |mut state| {
-                        let state_lock_ref = state_lock_ref;
-                        // TODO: set this on error
-                        state.cycle_error = false;
-
-                        // This drops the lock.
-                        state.conn().cycle(state)
+                    .and_then(move |conn| {
+                        // This drops the lock on completion.
+                        // The cycle is responsible for setting/unsetting the error flag.
+                        conn.cycle(instant, state)
                     })
                     .map_err(|why| {
                         error!(

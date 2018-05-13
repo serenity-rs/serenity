@@ -16,6 +16,7 @@ pub enum VoiceError {
     Streams,
     #[doc(hidden)] VoiceModeInvalid,
     #[doc(hidden)] VoiceModeUnavailable,
+    #[doc(hidden)] WsChannelHangup,
     /// An error occurred while running `youtube-dl`.
     YouTubeDLRun(Output),
     /// An error occurred while processing the JSON output from `youtube-dl`.

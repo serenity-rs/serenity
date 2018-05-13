@@ -136,6 +136,8 @@ extern crate multipart;
 extern crate native_tls;
 #[cfg(feature = "opus")]
 extern crate opus;
+#[cfg(feature = "owning_ref")]
+extern crate owning_ref;
 #[cfg(feature = "parking_lot")]
 extern crate parking_lot;
 #[cfg(feature = "rand")]

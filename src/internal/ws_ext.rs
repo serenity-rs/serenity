@@ -25,6 +25,7 @@ use tungstenite::{
     error::Error as TungsteniteError,
     Message
 };
+use voice::VoiceError;
 
 pub type WsClient = WebSocketStream<StreamSwitcher<TcpStream, TlsStream<TcpStream>>>;
 
@@ -51,23 +52,23 @@ impl ReceiverExt for WsClient {
                             .map_err(Error::from)
                             .map(move |val| (val, ws));
 
-                        Either4::One(done)
+                        Either4::A(done)
                     },
                     Message::Text(payload) => {
                         let done = result(serde_json::from_str(&payload).map(Some))
                             .map_err(Error::from)
                             .map(move |val| (val, ws));
 
-                        Either4::Two(done)
+                        Either4::B(done)
                     },
                     Message::Ping(x) => {
                         let done = ws.send(Message::Pong(x))
                             .map_err(Error::from)
                             .map(|ws| (None, ws));
 
-                        Either4::Three(done)
+                        Either4::C(done)
                     },
-                    Message::Pong(_) => Either4::Four(ok((None, ws))),
+                    Message::Pong(_) => Either4::D(ok((None, ws))),
                 }
             });
 
@@ -84,7 +85,7 @@ pub fn message_to_json(message: Message, notifier_lock: Arc<Mutex<Sender<Vec<u8>
         Message::Text(payload) => serde_json::from_str(&payload).map(Some).map_err(Error::from),
         Message::Ping(x) => {
             let notifier = notifier_lock.lock();
-            notifier.send(x);
+            notifier.send(x).map_err(|_| Error::Voice(VoiceError::WsChannelHangup))?;
 
             Ok(None)
         },
