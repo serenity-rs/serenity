@@ -3,7 +3,6 @@ use constants::VOICE_GATEWAY_VERSION;
 use future_utils::StreamExt;
 use futures::{
     future::{
-        err,
         loop_fn,
         ok,
         result,
@@ -115,14 +114,18 @@ struct VoiceHandshake {
 }
 
 struct ListenerItems {
-    close_sender: Option<OneShotSender<()>>,
+    close_sender_ws: Option<OneShotSender<()>>,
+    close_sender_udp: Option<OneShotSender<()>>,
     rx: Receiver<ReceiverStatus>,
     rx_pong: Receiver<Vec<u8>>,
 }
 
 impl Drop for ListenerItems {
     fn drop(&mut self) {
-        let _ = mem::replace(&mut self.close_sender, None)
+        let _ = mem::replace(&mut self.close_sender_ws, None)
+            .expect("Formality to appease the borrow-lord.")
+            .send(());
+        let _ = mem::replace(&mut self.close_sender_udp, None)
             .expect("Formality to appease the borrow-lord.")
             .send(());
 
@@ -146,12 +149,7 @@ pub struct Connection {
 }
 
 impl Connection {
-    pub fn new(mut info: ConnectionInfo, handle: Handle)
-            -> impl Future<Item = Connection, Error = Error> {
-
-        // let mut core = Core::new().unwrap();
-        // let handle = core.handle();
-
+    pub fn new(mut info: ConnectionInfo, handle: Handle) -> impl Future<Item = Self, Error = Error> {
         let url = generate_url(&mut info.endpoint);
         let local_remote_ws = handle.remote().clone();
         let local_remote_listeners = handle.remote().clone();
@@ -280,16 +278,12 @@ impl Connection {
                 let ws_send = Some(ws_send);
                 let udp_send = Some(udp_send);
 
-                let listener_items = spawn_receive_handlers(ws_reader, udp_reader, &local_remote_listeners);
+                let listener_items = spawn_receive_handlers(ws_reader, Some(udp_reader), &local_remote_listeners);
 
                 info!("[Voice] Connected to: {}", &connection_info.endpoint);
 
                 // Encode for Discord in Stereo, as required.
                 let soft_clip = SoftClip::new(Channels::Stereo);
-
-                // Per discord dev team's current recommendations:
-                // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
-                let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;
 
                 // Putting most of the timeout events onto the old-style tokio timer wheel
                 // means we either need a HUGE wheel to avoid collision, or multiple wheels.
@@ -305,7 +299,7 @@ impl Connection {
                     speaking: false,
                     udp_keepalive_timer: Delay::new(1000 * 60 * 4),
                     udp_send,
-                    ws_keepalive_timer: Delay::new(temp_heartbeat),
+                    ws_keepalive_timer: read_heartbeat_time(hello),
                     ws_send,
                 })
             })
@@ -331,22 +325,57 @@ impl Connection {
         self
     }
 
-    pub fn reconnect(self, handle: Handle) -> impl Future<Item = Connection, Error = Error> {
+    pub fn reconnect(mut self, handle: Handle) -> impl Future<Item = Self, Error = Error> {
         // A few steps to this.
-        //  * Unconditionally terminate the voice and udp connections.
-        //  * Rebuild those connections (and listeners).
-        //  * Send Resume, await Resumed.
-        //  * If conneciton closed, start a new connection.
+        //  * Unconditionally terminate the voice ws connection, by dropping it.
+        //  * Rebuild that connection (and listener).
+        //  * Send Resume, await Resumed and Hello.
+        //  * If connection closed/error, start a new connection.
 
-        // TODO.
-        // Need to figure out the interaction with kick/ban etc.
-        err(Error::Voice(VoiceError::VoiceModeUnavailable))
+        let url = generate_url(&mut self.connection_info.endpoint);
+        let local_remote_ws = handle.remote().clone();
+        let local_remote_listeners = handle.remote().clone();
+
+        let backup_info = self.connection_info.clone();
+        let saved_udp = mem::replace(&mut self.listener_items.close_sender_udp, None);
+
+        let _ = mem::replace(&mut self.listener_items.close_sender_ws, None)
+            .expect("Formality to appease the borrow-lord.")
+            .send(());
+        let _ = self.ws();
+
+        result(url)
+            .and_then(move |url| connect_async(url, local_remote_ws).map_err(Error::from))
+            .and_then(move |(ws, _)| ws
+                .send_json(&payload::build_resume(&self.connection_info))
+                .map(|ws| (ws, self)))
+            .and_then(|(ws, conn)|
+                expect_resumed(ws)
+                    .map(|ws| (ws, conn)))
+            .and_then(|(ws, mut conn)|
+                expect_hello(ws)
+                    .map(|(ws, delay)| {
+                        conn.ws_keepalive_timer = delay;
+                        (ws, conn)
+                    }))
+            .and_then(move |(ws, mut conn)| {
+                let (ws_send, ws_reader) = ws.split();
+
+                let mut listener_items = spawn_receive_handlers(ws_reader, None, &local_remote_listeners);
+
+                // Swap the old udp handler over to the new struct, then swap the new struct in.
+                mem::swap(&mut conn.listener_items.close_sender_udp, &mut listener_items.close_sender_udp);
+                conn.listener_items = listener_items;
+
+                Ok(conn.restore_ws(ws_send))
+            })
+            .or_else(move |_| Connection::new(backup_info, handle))
     }
 
     #[allow(unused_variables)]
     pub(crate) fn cycle(mut self, now: Instant, mut state: LongLock<TaskState>)
-            -> impl Future<Item = (), Error = Error> {
-
+        -> impl Future<Item = (), Error = Error>
+    {
     // On success, this is unset.
     state.cycle_error = true;
 
@@ -557,8 +586,6 @@ impl Connection {
                         }
                     })
                     .map(move |conn| {
-                        // MutexGuard::map(state, |a| a.restore_conn(conn));
-                        // IMPORTANT
                         state.cycle_error = false;
                         state.restore_conn(conn);
                         ()
@@ -608,9 +635,11 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
         .or(Err(Error::Voice(VoiceError::EndpointUrl)))
 }
 
+// Maybe TODO: autogenerate these with a macro or something.
+
 #[inline]
 fn encryption_key(ws: WsClient) -> impl Future<Item=(Key, WsClient), Error=Error> {
-    let out = loop_fn(ws, |ws| {
+    loop_fn(ws, |ws| {
         ws.recv_json()
             .and_then(|(value_wrap, ws)| {
                 let value = match value_wrap {
@@ -641,10 +670,75 @@ fn encryption_key(ws: WsClient) -> impl Future<Item=(Key, WsClient), Error=Error
 
                 Ok(Loop::Continue(ws))
             })
-    });
-
-    Box::new(out)
+    })
 }
+
+#[inline]
+fn expect_resumed(ws: WsClient) -> impl Future<Item = WsClient, Error = Error> {
+    loop_fn(ws, |ws| {
+        ws.recv_json()
+            .and_then(|(value_wrap, ws)| {
+                let value = match value_wrap {
+                    Some(json_value) => json_value,
+                    None => {return Ok(Loop::Continue(ws));},
+                };
+
+                match VoiceEvent::deserialize(value)? {
+                    VoiceEvent::Resumed => {
+                        return Ok(Loop::Break(ws))
+                    },
+                    VoiceEvent::Unknown(op, value) => {
+                        debug!(
+                            "[Voice] Expected ready for key; got: op{}/v{:?}",
+                            op.num(),
+                            value
+                        );
+                    },
+                    _ => {},
+                }
+
+                Ok(Loop::Continue(ws))
+            })
+    })
+}
+
+#[inline]
+fn expect_hello(ws: WsClient) -> impl Future<Item = (WsClient, Delay), Error = Error> {
+    loop_fn(ws, |ws| {
+        ws.recv_json()
+            .and_then(|(value_wrap, ws)| {
+                let value = match value_wrap {
+                    Some(json_value) => json_value,
+                    None => {return Ok(Loop::Continue(ws));},
+                };
+
+                match VoiceEvent::deserialize(value)? {
+                    VoiceEvent::Hello(h) => {
+                        return Ok(Loop::Break((ws, read_heartbeat_time(h))));
+                    },
+                    VoiceEvent::Unknown(op, value) => {
+                        debug!(
+                            "[Voice] Expected ready for key; got: op{}/v{:?}",
+                            op.num(),
+                            value
+                        );
+                    },
+                    _ => {},
+                }
+
+                Ok(Loop::Continue(ws))
+            })
+    })
+}
+
+#[inline]
+fn read_heartbeat_time(hello: VoiceHello) -> Delay {
+    // Per discord dev team's current recommendations:
+    // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
+    // Multiply by 0.75.
+    Delay::new((hello.heartbeat_interval as f64 * 0.75) as u64)
+}
+
 
 #[inline]
 fn has_valid_mode<T, It> (modes: It) -> bool
@@ -654,13 +748,11 @@ where T: for<'a> PartialEq<&'a str>,
     modes.into_iter().any(|s| s == CRYPTO_MODE)
 }
 
+// The UDP param is only dropped in the event of a reconnection (where the full UDP pipeline exists and
+// should still be alive)
 #[inline]
-fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<VoiceCodec>>, context: &Remote) -> ListenerItems {
-    let (close_sender, close_reader) = oneshot_channel::<()>();
-
-    let close_reader = close_reader;
-    let close_reader1 = close_reader.shared();
-    let close_reader2 = close_reader1.clone();
+fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp_maybe: Option<SplitStream<UdpFramed<VoiceCodec>>>, context: &Remote) -> ListenerItems {
+    let (close_sender_ws, close_reader_ws) = oneshot_channel::<()>();
 
     let (tx, rx) = mpsc::channel();
     let tx_clone = tx.clone();
@@ -672,7 +764,7 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
     context.spawn(move |_|
         ws.map_err(Error::from)
             .zip(tx_pong_shared)
-            .until(close_reader1.map(|v| *v))
+            .until(close_reader_ws)
             .for_each(move |(message, tx_pong_lock)| {
                 message_to_json(message, tx_pong_lock).and_then(
                     |maybe_value| match maybe_value {
@@ -695,22 +787,31 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp: SplitStream<UdpFramed<
             })
     );
 
-    context.spawn(move |_|
-        udp.map_err(Error::from)
-            .until(close_reader2.map(|v| *v))
-            .for_each(move |voice_frame|
-                tx_clone.send(ReceiverStatus::Udp(voice_frame))
-                    .map_err(|_| Error::FutureMpsc("UDP event receiver hung up."))
-            )
-            .map_err(|e| {
-                warn!("[voice] {}", e);
+    let close_sender_udp = if let Some(udp) = udp_maybe {
+        let (close_sender_udp, close_reader_udp) = oneshot_channel::<()>();
 
-                ()
-            })
-    );
+        context.spawn(move |_|
+            udp.map_err(Error::from)
+                .until(close_reader_udp)
+                .for_each(move |voice_frame|
+                    tx_clone.send(ReceiverStatus::Udp(voice_frame))
+                        .map_err(|_| Error::FutureMpsc("UDP event receiver hung up."))
+                )
+                .map_err(|e| {
+                    warn!("[voice] {}", e);
+
+                    ()
+                })
+        );
+
+        Some(close_sender_udp)
+    } else {
+        None
+    };
 
     ListenerItems {
-        close_sender: Some(close_sender),
+        close_sender_ws: Some(close_sender_ws),
+        close_sender_udp,
         rx,
         rx_pong,
     }
