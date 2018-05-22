@@ -194,8 +194,6 @@ impl Connection {
         encoder.set_bitrate(Bitrate::Bits(DEFAULT_BITRATE))?;
         let soft_clip = SoftClip::new(Channels::Stereo);
 
-        let soft_clip = SoftClip::new(Channels::Stereo);
-
         // Per discord dev team's current recommendations:
         // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
         let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;

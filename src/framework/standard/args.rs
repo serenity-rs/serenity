@@ -59,7 +59,7 @@ fn second_quote_occurence(s: &str) -> Option<usize> {
 
 fn parse_quotes<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
     where T::Err: StdError {
-    
+
     if s.is_empty() {
         return Err(Error::Eos);
     }
@@ -133,13 +133,13 @@ fn parse<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
 ///
 /// An "argument" is a part of the message up until the end of the message or at one of the specified delimiters.
 /// (E.g.: delim: " ", message: "ab cd"; 1th arg is "ab")
-/// 
+///
 /// The general functionality provided by this struct is to not only make arguments convenient to handle,
 /// but to handle parsing them to a specifc type as well.
-/// 
+///
 /// Majority of the methods here remove the argument as to advance to further arguments.
-/// If you do not wish for this behaviour, use the suffixed `*_n` methods instead. 
-/// 
+/// If you do not wish for this behaviour, use the suffixed `*_n` methods instead.
+///
 ///
 /// `Args` provides parsing arguments inside quotes too (for which case, delimiters don't matter), via the suffixed `*_quoted` methods.
 ///
@@ -221,12 +221,12 @@ impl Args {
     /// ```
     pub fn full(&self) -> &str { &self.message }
 
-    /// Accesses the current state of the internally-stored message, 
+    /// Accesses the current state of the internally-stored message,
     /// removing quotes if it contains the opening and closing ones,
     /// but otherwise returns the string as is.
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
@@ -234,18 +234,18 @@ impl Args {
     ///
     /// assert_eq!(args.full_quoted(), "42 69");
     /// ```
-    /// 
+    ///
     /// ```rust
     /// use serenity::framework::standard::Args;
-    /// 
+    ///
     /// let args = Args::new("\"42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.full_quoted(), "\"42 69");
     /// ```
-    /// 
+    ///
     /// ```rust
     /// use serenity::framework::standard::Args;
-    /// 
+    ///
     /// let args = Args::new("42 69\"", &[" ".to_string()]);
     ///
     /// assert_eq!(args.full_quoted(), "42 69\"");
@@ -256,19 +256,19 @@ impl Args {
         if !s.starts_with('"') {
             return s;
         }
-    
+
         let end = s.rfind('"');
         if end.is_none() {
             return s;
         }
 
         let end = end.unwrap();
-    
+
         // If it got the quote at the start, then there's no closing quote.
         if end == 0 {
             return s;
         }
-    
+
         &s[1..end]
     }
 
@@ -344,7 +344,7 @@ impl Args {
     }
 
     /// Returns the argument as a string (thus sort-of skipping it).
-    /// 
+    ///
     /// *This is sugar for `args.single::<String>().ok()`*
     ///
     /// # Examples
@@ -374,7 +374,7 @@ impl Args {
     /// Like [`skip`], but allows for multiple at once.
     ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
@@ -451,6 +451,10 @@ impl Args {
     /// [`single_quoted`]: #method.single_quoted
     pub fn single_quoted_n<T: FromStr>(&self) -> Result<T, T::Err>
         where T::Err: StdError {
+        if self.is_empty() {
+            return Err(Error::Eos);
+        }
+
         parse_quotes::<T>(&mut self.message.clone(), &self.delimiters)
     }
 
@@ -472,23 +476,23 @@ impl Args {
         if self.is_empty() {
             return Err(Error::Eos);
         }
-        
+
         self.iter_quoted::<T>().collect()
     }
 
     /// Like [`iter`], but accounts quotes.
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
     /// let mut args = Args::new(r#""2" "5""#, &[" ".to_string()]);
-    /// 
+    ///
     /// assert_eq!(*args.iter_quoted::<i32>().map(|n| n.unwrap().pow(2)).collect::<Vec<_>>(), [4, 25]);
     /// assert!(args.is_empty());
     /// ```
-    /// 
+    ///
     /// [`iter`]: #method.iter
     pub fn iter_quoted<T: FromStr>(&mut self) -> IterQuoted<T>
         where T::Err: StdError {
@@ -496,7 +500,7 @@ impl Args {
     }
 
     /// This is a convenience function for parsing until the end of the message and returning the parsed results in a `Vec`.
-    /// 
+    ///
     /// *This is sugar for `args.iter().collect::<Vec<_>>()`*
     ///
     /// # Examples
@@ -529,12 +533,12 @@ impl Args {
     /// assert_eq!(*args.iter::<i32>().map(|num| num.unwrap().pow(2)).collect::<Vec<_>>(), [9, 16]);
     /// assert!(args.is_empty());
     /// ```
-    pub fn iter<T: FromStr>(&mut self) -> Iter<T> 
+    pub fn iter<T: FromStr>(&mut self) -> Iter<T>
         where T::Err: StdError {
         Iter::new(self)
     }
 
-    /// Returns the first argument that can be parsed and removes it from the message. The suitable argument 
+    /// Returns the first argument that can be parsed and removes it from the message. The suitable argument
     /// can be in an arbitrary position in the message.
     ///
     /// **Note**: This replaces all delimiters within the message
@@ -605,7 +609,7 @@ impl Args {
     /// assert_eq!(args.find_n::<i32>().unwrap(), 69);
     /// assert_eq!(args.full(), "c47 69");
     /// ```
-    /// 
+    ///
     /// [`find`]: #method.find
     pub fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
@@ -697,7 +701,7 @@ impl<'a, T: FromStr> Iterator for Iter<'a, T> where T::Err: StdError  {
 }
 
 /// Same as [`Iter`], but considers quotes.
-/// 
+///
 /// [`Iter`]: #struct.Iter.html
 pub struct IterQuoted<'a, T: FromStr> where T::Err: StdError {
     args: &'a mut Args,
