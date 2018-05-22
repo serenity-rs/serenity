@@ -40,6 +40,9 @@ pub struct Message {
     /// message or a system message.
     #[serde(rename = "type")]
     pub kind: MessageType,
+    /// A partial amount of data about the user's member data, if this message
+    /// was sent in a guild.
+    pub member: Option<PartialMember>,
     /// Indicator of whether the message mentions everyone.
     pub mention_everyone: bool,
     /// Array of [`Role`]s' Ids mentioned in the message.
