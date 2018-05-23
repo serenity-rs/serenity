@@ -166,8 +166,8 @@ Voice+youtube-dl:
 [`rest`]: https://docs.rs/serenity/*/serenity/client/rest/index.html
 [`validate_token`]: https://docs.rs/serenity/*/serenity/client/fn.validate_token.html
 [cache docs]: https://docs.rs/serenity/*/serenity/cache/index.html
-[ci]: https://travis-ci.org/zeyla/serenity
-[ci-badge]: https://travis-ci.org/zeyla/serenity.svg?branch=master
+[ci]: https://travis-ci.org/serenity-rs/serenity
+[ci-badge]: https://travis-ci.org/serenity-rs/serenity.svg?branch=master
 [client's module-level documentation]: https://docs.rs/serenity/*/serenity/client/index.html
 [discord docs]: https://discordapp.com/developers/docs/intro
 [docs]: https://docs.rs/serenity
