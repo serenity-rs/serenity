@@ -141,8 +141,6 @@ extern crate threadpool;
 extern crate typemap;
 #[cfg(feature = "evzht9h3nznqzwl")]
 extern crate evzht9h3nznqzwl as websocket;
-#[cfg(feature = "edit-distance")]
-extern crate edit_distance;
 
 #[macro_use]
 mod internal;
