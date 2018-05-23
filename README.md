@@ -162,7 +162,7 @@ Voice+youtube-dl:
 [`Event`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html
 [`Event::MessageCreate`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html#variant.MessageCreatef
 [`Shard`]: https://docs.rs/serenity/*/serenity/gateway/struct.Shard.html
-[`examples`]: https://github.com/zeyla/serenity/blob/master/examples
+[`examples`]: https://github.com/serenity-rs/serenity/blob/master/examples
 [`rest`]: https://docs.rs/serenity/*/serenity/client/rest/index.html
 [`validate_token`]: https://docs.rs/serenity/*/serenity/client/fn.validate_token.html
 [cache docs]: https://docs.rs/serenity/*/serenity/cache/index.html
@@ -172,7 +172,7 @@ Voice+youtube-dl:
 [discord docs]: https://discordapp.com/developers/docs/intro
 [docs]: https://docs.rs/serenity
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
-[examples]: https://github.com/zeyla/serenity/tree/master/examples
+[examples]: https://github.com/serenity-rs/serenity/tree/master/examples
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
 [guild]: https://discord.gg/WBdGJCc
 [guild-badge]: https://discordapp.com/api/guilds/381880193251409931/widget.png
