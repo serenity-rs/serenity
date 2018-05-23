@@ -1,6 +1,8 @@
 use parking_lot::Mutex;
-use std::sync::Arc;
-use std::time::Duration;
+use std::{
+    sync::Arc,
+    time::Duration,
+};
 
 pub const HEADER_LEN: usize = 12;
 pub const SAMPLE_RATE: u32 = 48_000;
@@ -45,7 +47,8 @@ pub enum AudioType {
 /// [`Handler::play_only`].
 ///
 /// # Example
-/// ```rust,ignore 
+///
+/// ```rust,ignore
 /// use serenity::voice::{Handler, LockedAudio, ffmpeg};
 ///
 /// let handler: Handler = /* ... */;
@@ -66,19 +69,19 @@ pub struct Audio {
 
     /// Whether or not this sound is currently playing.
     ///
-    /// Can be controlled with [`.play`] or [`.pause`]
-    /// if chaining is desired.
+    /// Can be controlled with [`play`] or [`pause`] if chaining is desired.
     ///
-    /// [`.play`]: #method.play
-    /// [`.pause`]: #method.pause
+    /// [`play`]: #method.play
+    /// [`pause`]: #method.pause
     pub playing: bool,
 
     /// The desired volume for playback.
     ///
     /// Sensible values fall between `0.0` and `1.0`.
-    /// Can be controlled with [`.volume`] if chaining is desired.
     ///
-    /// [`.volume`]: #method.volume
+    /// Can be controlled with [`volume`] if chaining is desired.
+    ///
+    /// [`volume`]: #method.volume
     pub volume: f32,
 
     /// Whether or not the sound has finished, or reached the end of its stream.

@@ -1,5 +1,11 @@
-use std::error::Error as StdError;
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::{
+    error::Error as StdError,
+    fmt::{
+        Display, 
+        Formatter, 
+        Result as FmtResult
+    }
+};
 use websocket::message::CloseData;
 
 /// An error that occurred while attempting to deal with the gateway.

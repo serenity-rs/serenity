@@ -1,6 +1,8 @@
 use parking_lot::Mutex;
-use std::sync::mpsc::Receiver;
-use std::sync::Arc;
+use std::sync::{
+    mpsc::Receiver,
+    Arc
+};
 use super::{ShardManager, ShardManagerMessage};
 
 /// The shard manager monitor does what it says on the tin -- it monitors the

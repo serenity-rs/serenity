@@ -1,6 +1,12 @@
 use hyper::client::Response;
-use std::error::Error as StdError;
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::{
+    error::Error as StdError,
+    fmt::{
+        Display, 
+        Formatter, 
+        Result as FmtResult
+    }
+};
 
 #[derive(Debug)]
 pub enum Error {

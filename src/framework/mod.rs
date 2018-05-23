@@ -40,15 +40,21 @@
 //!
 //! client.with_framework(|f| f
 //!     .configure(|c| c.prefix("~"))
-//!     .command("about", |c| c.exec_str("A simple test bot"))
-//!     .command("ping", |c| c.exec(ping)));
+//!     .on("about", |_, msg, _| {
+//!         msg.channel_id.say("A simple test bot")?;
+//!         
+//!         // The `command!` macro implicitly puts an `Ok(())` at the end of each command definiton;
+//!         // signifying successful execution.
+//!         //
+//!         // However since we're using `on` that requires a function with the definition `Fn(Context, Message, Args) -> Result<(), _>`,
+//!         // we need to manually put the `Ok` ourselves.
+//!         Ok(())
+//!     })
+//!     .cmd("ping", ping));
 //!
-//! command!(about(_context, message) {
-//!     let _ = message.channel_id.say("A simple test bot");
-//! });
 //!
 //! command!(ping(_context, message) {
-//!     let _ = message.channel_id.say("Pong!");
+//!     message.channel_id.say("Pong!")?;
 //! });
 //! ```
 //!

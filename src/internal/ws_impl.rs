@@ -2,9 +2,11 @@ use flate2::read::ZlibDecoder;
 use gateway::GatewayError;
 use internal::prelude::*;
 use serde_json;
-use websocket::message::OwnedMessage;
-use websocket::sync::stream::{TcpStream, TlsStream};
-use websocket::sync::Client as WsClient;
+use websocket::{
+    message::OwnedMessage,
+    sync::stream::{TcpStream, TlsStream},
+    sync::Client as WsClient
+};
 
 pub trait ReceiverExt {
     fn recv_json(&mut self) -> Result<Option<Value>>;

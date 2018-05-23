@@ -44,12 +44,18 @@ use internal::prelude::*;
 use parking_lot::RwLock;
 use self::utils::*;
 use serde::de::Visitor;
-use std::collections::HashMap;
-use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::sync::Arc;
+use std::{
+    collections::HashMap,
+    fmt::{
+        Display, 
+        Formatter, 
+        Result as FmtResult
+    },
+    sync::Arc,
+    result::Result as StdResult
+};
 
 #[cfg(feature = "utils")]
 use utils::Colour;
 
 use serde::{Deserialize, Deserializer};
-use std::result::Result as StdResult;

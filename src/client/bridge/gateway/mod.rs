@@ -63,9 +63,15 @@ pub use self::shard_queuer::ShardQueuer;
 pub use self::shard_runner::{ShardRunner, ShardRunnerOptions};
 pub use self::shard_runner_message::ShardRunnerMessage;
 
-use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::sync::mpsc::Sender;
-use std::time::Duration as StdDuration;
+use std::{
+    fmt::{
+        Display, 
+        Formatter, 
+        Result as FmtResult
+    },
+    sync::mpsc::Sender,
+    time::Duration as StdDuration
+};
 use ::gateway::{ConnectionStage, InterMessage};
 
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].

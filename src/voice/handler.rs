@@ -1,10 +1,18 @@
 use constants::VoiceOpCode;
 use gateway::InterMessage;
-use model::id::{ChannelId, GuildId, UserId};
-use model::voice::VoiceState;
+use model::{
+    id::{
+        ChannelId, 
+        GuildId, 
+        UserId
+    },
+    voice::VoiceState
+};
 use parking_lot::Mutex;
-use std::sync::Arc;
-use std::sync::mpsc::{self, Sender as MpscSender};
+use std::sync::{
+    mpsc::{self, Sender as MpscSender},
+    Arc
+};
 use super::connection_info::ConnectionInfo;
 use super::{Audio, AudioReceiver, AudioSource, Bitrate, Status as VoiceStatus, threading, LockedAudio};
 
@@ -149,11 +157,11 @@ impl Handler {
 
         // Safe as all of these being present was already checked.
         self.send(VoiceStatus::Connect(ConnectionInfo {
-            endpoint: endpoint,
-            guild_id: guild_id,
-            session_id: session_id,
-            token: token,
-            user_id: user_id,
+            endpoint,
+            guild_id,
+            session_id,
+            token,
+            user_id,
         }));
 
         true
@@ -384,14 +392,14 @@ impl Handler {
         Handler {
             channel_id: None,
             endpoint: None,
-            guild_id: guild_id,
+            guild_id,
             self_deaf: false,
             self_mute: false,
             sender: tx,
             session_id: None,
             token: None,
-            user_id: user_id,
-            ws: ws,
+            user_id,
+            ws,
         }
     }
 

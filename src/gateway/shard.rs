@@ -1,12 +1,16 @@
 use constants::{self, close_codes};
 use internal::prelude::*;
-use model::event::{Event, GatewayEvent};
-use model::gateway::Activity;
-use model::id::GuildId;
-use model::user::OnlineStatus;
+use model::{
+    event::{Event, GatewayEvent},
+    gateway::Activity,
+    id::GuildId,
+    user::OnlineStatus,
+};
 use parking_lot::Mutex;
-use std::sync::Arc;
-use std::time::{Duration as StdDuration, Instant};
+use std::{
+    sync::Arc,
+    time::{Duration as StdDuration, Instant}
+};
 use super::{
     ConnectionStage,
     CurrentPresence,
@@ -16,10 +20,12 @@ use super::{
     WsClient,
     WebSocketGatewayClientExt,
 };
-use websocket::client::Url;
-use websocket::stream::sync::AsTcpStream;
-use websocket::sync::client::ClientBuilder;
-use websocket::WebSocketError;
+use websocket::{
+    client::Url,
+    stream::sync::AsTcpStream,
+    sync::client::ClientBuilder,
+    WebSocketError
+};
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the
@@ -79,6 +85,10 @@ pub struct Shard {
     /// Whether the shard has permanently shutdown.
     shutdown: bool,
     stage: ConnectionStage,
+    /// Instant of when the shard was started.
+    // This acts as a timeout to determine if the shard has - for some reason -
+    // not started within a decent amount of time.
+    pub started: Instant,
     pub token: Arc<Mutex<String>>,
     ws_url: Arc<Mutex<String>>,
 }
@@ -147,6 +157,7 @@ impl Shard {
             last_heartbeat_acknowledged,
             seq,
             stage,
+            started: Instant::now(),
             token,
             session_id,
             shard_info,
@@ -356,7 +367,7 @@ impl Shard {
         match *event {
             Ok(GatewayEvent::Dispatch(seq, ref event)) => {
                 if seq > self.seq + 1 {
-                    warn!("[Shard {:?}] Heartbeat off; them: {}, us: {}", self.shard_info, seq, self.seq);
+                    warn!("[Shard {:?}] Sequence off; them: {}, us: {}", self.shard_info, seq, self.seq);
                 }
 
                 match *event {
@@ -550,11 +561,26 @@ impl Shard {
         }
     }
 
-    pub fn check_heartbeat(&mut self) -> Result<()> {
+    /// Checks whether a heartbeat needs to be sent, as well as whether a
+    /// heartbeat acknowledgement was received.
+    ///
+    /// `true` is returned under one of the following conditions:
+    ///
+    /// - the heartbeat interval has not elapsed
+    /// - a heartbeat was successfully sent
+    /// - there is no known heartbeat interval yet
+    ///
+    /// `false` is returned under one of the following conditions:
+    ///
+    /// - a heartbeat acknowledgement was not received in time
+    /// - an error occurred while heartbeating
+    pub fn check_heartbeat(&mut self) -> bool {
         let wait = {
             let heartbeat_interval = match self.heartbeat_interval {
                 Some(heartbeat_interval) => heartbeat_interval,
-                None => return Ok(()),
+                None => {
+                    return self.started.elapsed() < StdDuration::from_secs(15);
+                },
             };
 
             StdDuration::from_secs(heartbeat_interval / 1000)
@@ -564,7 +590,7 @@ impl Shard {
         // then don't perform a keepalive or attempt to reconnect.
         if let Some(last_sent) = self.heartbeat_instants.0 {
             if last_sent.elapsed() <= wait {
-                return Ok(());
+                return true;
             }
         }
 
@@ -572,30 +598,22 @@ impl Shard {
         // auto-reconnect.
         if !self.last_heartbeat_acknowledged {
             debug!(
-                "[Shard {:?}] Last heartbeat not acknowledged; re-connecting",
+                "[Shard {:?}] Last heartbeat not acknowledged",
                 self.shard_info,
             );
 
-            return self.reconnect().map_err(|why| {
-                warn!(
-                    "[Shard {:?}] Err auto-reconnecting from heartbeat check: {:?}",
-                    self.shard_info,
-                    why,
-                );
-
-                why
-            });
+            return false;
         }
 
         // Otherwise, we're good to heartbeat.
         if let Err(why) = self.heartbeat() {
             warn!("[Shard {:?}] Err heartbeating: {:?}", self.shard_info, why);
 
-            self.reconnect()
+            false
         } else {
             trace!("[Shard {:?}] Heartbeated", self.shard_info);
 
-            Ok(())
+            true
         }
     }
 
@@ -764,6 +782,7 @@ impl Shard {
         // This is used to accurately assess whether the state of the shard is
         // accurate when a Hello is received.
         self.stage = ConnectionStage::Connecting;
+        self.started = Instant::now();
         let mut client = connect(&self.ws_url.lock())?;
         self.stage = ConnectionStage::Handshake;
 

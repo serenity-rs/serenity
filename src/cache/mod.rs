@@ -44,10 +44,15 @@
 
 use model::prelude::*;
 use parking_lot::RwLock;
-use std::collections::hash_map::Entry;
-use std::collections::{HashMap, HashSet};
-use std::default::Default;
-use std::sync::Arc;
+use std::collections::{
+    hash_map::Entry, 
+    HashMap, 
+    HashSet
+};
+use std::{
+    default::Default,
+    sync::Arc
+};
 
 mod cache_update;
 

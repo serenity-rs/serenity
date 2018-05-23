@@ -1,6 +1,8 @@
 use internal::prelude::*;
-use model::guild::Role;
-use model::Permissions;
+use model::{
+    guild::Role,
+    Permissions
+};
 use utils::VecMap;
 
 /// A builer to create or edit a [`Role`] for use via a number of model methods.

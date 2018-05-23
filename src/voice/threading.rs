@@ -1,7 +1,9 @@
 use internal::Timer;
 use model::id::GuildId;
-use std::sync::mpsc::{Receiver as MpscReceiver, TryRecvError};
-use std::thread::Builder as ThreadBuilder;
+use std::{
+    sync::mpsc::{Receiver as MpscReceiver, TryRecvError},
+    thread::Builder as ThreadBuilder,
+};
 use super::connection::Connection;
 use super::{Bitrate, Status, audio};
 

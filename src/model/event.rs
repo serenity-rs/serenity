@@ -2,7 +2,11 @@
 
 use chrono::{DateTime, FixedOffset};
 use serde::de::Error as DeError;
-use serde::ser::{Serialize, SerializeSeq, Serializer};
+use serde::ser::{
+    Serialize,
+    SerializeSeq,
+    Serializer
+};
 use serde_json;
 use std::collections::HashMap;
 use super::utils::deserialize_emojis;
@@ -479,11 +483,11 @@ impl<'de> Deserialize<'de> for GuildMemberAddEvent {
 
         let guild_id = map.get("guild_id")
             .ok_or_else(|| DeError::custom("missing member add guild id"))
-            .and_then(|v| GuildId::deserialize(v.clone()))
+            .and_then(|v| GuildId::deserialize(v))
             .map_err(DeError::custom)?;
 
         Ok(GuildMemberAddEvent {
-            guild_id: guild_id,
+            guild_id,
             member: Member::deserialize(Value::Object(map))
                 .map_err(DeError::custom)?,
         })
@@ -595,7 +599,7 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
 
         let guild_id = map.get("guild_id")
             .ok_or_else(|| DeError::custom("missing member chunk guild id"))
-            .and_then(|v| GuildId::deserialize(v.clone()))
+            .and_then(|v| GuildId::deserialize(v))
             .map_err(DeError::custom)?;
 
         let mut members = map.remove("members")
@@ -611,12 +615,21 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
             }
         }
 
-        let members: HashMap<UserId, Member> =
-            Deserialize::deserialize(members).map_err(DeError::custom)?;
+        let members = serde_json::from_value::<Vec<Member>>(members)
+            .map(|members| members
+                .into_iter()
+                .fold(HashMap::new(), |mut acc, member| {
+                    let id = member.user.read().id;
+
+                    acc.insert(id, member);
+
+                    acc
+                }))
+            .map_err(DeError::custom)?;
 
         Ok(GuildMembersChunkEvent {
-            guild_id: guild_id,
-            members: members,
+            guild_id,
+            members,
         })
     }
 }
@@ -833,7 +846,7 @@ impl CacheUpdate for PresenceUpdateEvent {
 
                         guild.members.insert(self.presence.user_id, Member {
                             deaf: false,
-                            guild_id: guild_id,
+                            guild_id,
                             joined_at: None,
                             mute: false,
                             nick: self.presence.nick.clone(),
@@ -873,9 +886,9 @@ impl<'de> Deserialize<'de> for PresenceUpdateEvent {
             .map_err(DeError::custom)?;
 
         Ok(Self {
-            guild_id: guild_id,
-            presence: presence,
-            roles: roles,
+            guild_id,
+            presence,
+            roles,
         })
     }
 }
@@ -909,7 +922,7 @@ impl<'de> Deserialize<'de> for PresencesReplaceEvent {
         let presences: Vec<Presence> = Deserialize::deserialize(deserializer)?;
 
         Ok(Self {
-            presences: presences,
+            presences,
         })
     }
 }
@@ -1136,12 +1149,12 @@ impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let map = JsonMap::deserialize(deserializer)?;
         let guild_id = match map.get("guild_id") {
-            Some(v) => Some(GuildId::deserialize(v.clone()).map_err(DeError::custom)?),
+            Some(v) => Some(GuildId::deserialize(v).map_err(DeError::custom)?),
             None => None,
         };
 
         Ok(VoiceStateUpdateEvent {
-            guild_id: guild_id,
+            guild_id,
             voice_state: VoiceState::deserialize(Value::Object(map))
                 .map_err(DeError::custom)?,
         })

@@ -1,7 +1,9 @@
 use gateway::InterMessage;
 use model::id::{ChannelId, GuildId, UserId};
-use std::collections::HashMap;
-use std::sync::mpsc::Sender as MpscSender;
+use std::{
+    collections::HashMap,
+    sync::mpsc::Sender as MpscSender
+};
 use super::Handler;
 
 /// A manager is a struct responsible for managing [`Handler`]s which belong to
@@ -31,8 +33,8 @@ impl Manager {
     pub(crate) fn new(ws: MpscSender<InterMessage>, user_id: UserId) -> Manager {
         Manager {
             handlers: HashMap::new(),
-            user_id: user_id,
-            ws: ws,
+            user_id,
+            ws,
         }
     }
 

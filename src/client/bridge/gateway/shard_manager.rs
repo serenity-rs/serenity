@@ -1,10 +1,14 @@
 use gateway::InterMessage;
 use internal::prelude::*;
 use parking_lot::Mutex;
-use std::collections::{HashMap, VecDeque};
-use std::sync::mpsc::{self, Sender};
-use std::sync::Arc;
-use std::thread;
+use std::{
+    collections::{HashMap, VecDeque},
+    sync::{
+        mpsc::{self, Sender},
+        Arc
+    },
+    thread
+};
 use super::super::super::EventHandler;
 use super::{
     ShardClientMessage,

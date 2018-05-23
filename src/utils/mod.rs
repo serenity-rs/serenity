@@ -5,20 +5,24 @@ mod colour;
 mod message_builder;
 mod vec_map;
 
-pub use self::colour::Colour;
-pub use self::message_builder::{Content, ContentModifier, MessageBuilder};
-pub use self::vec_map::VecMap;
+pub use self::{
+    colour::Colour,
+    message_builder::{Content, ContentModifier, MessageBuilder},
+    vec_map::VecMap
+};
 
 use base64;
 use internal::prelude::*;
 use model::id::EmojiId;
 use model::misc::EmojiIdentifier;
-use std::collections::HashMap;
-use std::ffi::OsStr;
-use std::fs::File;
-use std::hash::{BuildHasher, Hash};
-use std::io::Read;
-use std::path::Path;
+use std::{
+    collections::HashMap,
+    ffi::OsStr,
+    fs::File,
+    hash::{BuildHasher, Hash},
+    io::Read,
+    path::Path
+};
 
 #[cfg(feature = "cache")]
 use cache::Cache;
@@ -52,10 +56,6 @@ pub fn vecmap_to_json_map<K: PartialEq + ToString>(map: VecMap<K, Value>) -> Map
 ///
 /// This checks that the name is either `"nsfw"` or, for names longer than that,
 /// is prefixed with `"nsfw"`.
-///
-/// **Note**: Whether a channel is NSFW is done client-side, as a field for the
-/// NSFW-ness of a channel is not sent to clients. Discord's requirements for
-/// defining a channel as NSFW can change at any time.
 ///
 /// # Examples
 ///
@@ -150,7 +150,7 @@ pub fn parse_invite(code: &str) -> &str {
     }
 }
 
-/// Retreives an Id from a user mention.
+/// Retrieves an Id from a user mention.
 ///
 /// If the mention is invalid, then `None` is returned.
 ///
@@ -194,7 +194,7 @@ pub fn parse_username(mention: &str) -> Option<u64> {
     }
 }
 
-/// Retreives an Id from a role mention.
+/// Retrieves an Id from a role mention.
 ///
 /// If the mention is invalid, then `None` is returned.
 ///
@@ -230,7 +230,7 @@ pub fn parse_role(mention: &str) -> Option<u64> {
     }
 }
 
-/// Retreives an Id from a channel mention.
+/// Retrieves an Id from a channel mention.
 ///
 /// If the channel mention is invalid, then `None` is returned.
 ///
@@ -267,7 +267,7 @@ pub fn parse_channel(mention: &str) -> Option<u64> {
     }
 }
 
-/// Retreives the name and Id from an emoji mention, in the form of an
+/// Retrieves the name and Id from an emoji mention, in the form of an
 /// `EmojiIdentifier`.
 ///
 /// If the emoji usage is invalid, then `None` is returned.
@@ -329,7 +329,7 @@ pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
 
         match id.parse::<u64>() {
             Ok(x) => Some(EmojiIdentifier {
-                name: name,
+                name,
                 id: EmojiId(x),
             }),
             _ => None,

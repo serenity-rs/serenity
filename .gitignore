@@ -9,5 +9,6 @@ target/
 Cargo.lock
 
 # Misc
+rls/
 *.iml
 .env

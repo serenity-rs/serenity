@@ -1,10 +1,18 @@
 use chrono::{DateTime, FixedOffset};
 use model::prelude::*;
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::fmt::{
+    Display,
+    Formatter,
+    Result as FmtResult
+};
 use super::deserialize_single_recipient;
 
 #[cfg(feature = "model")]
-use builder::{CreateMessage, EditMessage, GetMessages};
+use builder::{
+    CreateMessage,
+    EditMessage,
+    GetMessages
+};
 #[cfg(feature = "model")]
 use http::AttachmentType;
 #[cfg(feature = "model")]
@@ -147,7 +155,7 @@ impl PrivateChannel {
     /// **Note**: This method is for consistency. This will always return
     /// `false`, due to DMs not being considered NSFW.
     ///
-    /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
+    /// [`utils::is_nsfw`]: ../../utils/fn.is_nsfw.html
     #[inline]
     pub fn is_nsfw(&self) -> bool { false }
 

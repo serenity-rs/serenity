@@ -154,7 +154,6 @@ Voice+youtube-dl:
 - [discordrb][library:discordrb]
 - [discord.js][library:discord.js]
 - [discord.py][library:discord.py]
-- [discord-rs][library:discord-rs]
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
 [`Client::new`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.new
@@ -183,5 +182,4 @@ Voice+youtube-dl:
 [library:discordrb]: https://github.com/meew0/discordrb
 [library:discord.js]: https://github.com/hydrabolt/discord.js
 [library:discord.py]: https://github.com/Rapptz/discord.py
-[library:discord-rs]: https://github.com/SpaceManiac/discord-rs
 [logo]: https://zey.moe/assets/serenity_logo.png

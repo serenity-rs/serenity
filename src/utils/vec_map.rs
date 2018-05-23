@@ -29,11 +29,11 @@ impl<K: PartialEq, V> VecMap<K, V> {
         match self.pos(&key) {
             Some(pos) => Entry::Occupied(OccupiedEntry {
                 vec: &mut self.0,
-                pos: pos,
+                pos,
             }),
             None => Entry::Vacant(VacantEntry {
                 vec: &mut self.0,
-                key: key,
+                key,
             })
         }
     }

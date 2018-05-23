@@ -4,16 +4,25 @@ use internal::ws_impl::{ReceiverExt, SenderExt};
 use model::event::{Event, GatewayEvent};
 use parking_lot::Mutex;
 use serde::Deserialize;
-use std::sync::mpsc::{self, Receiver, Sender, TryRecvError};
-use std::sync::Arc;
+use std::sync::{
+    mpsc::{
+        self,
+        Receiver,
+        Sender,
+        TryRecvError
+    },
+    Arc
+};
 use super::super::super::dispatch::{DispatchEvent, dispatch};
 use super::super::super::EventHandler;
 use super::event::{ClientEvent, ShardStageUpdateEvent};
 use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
 use threadpool::ThreadPool;
 use typemap::ShareMap;
-use websocket::message::{CloseData, OwnedMessage};
-use websocket::WebSocketError;
+use websocket::{
+    message::{CloseData, OwnedMessage},
+    WebSocketError
+};
 
 #[cfg(feature = "framework")]
 use framework::Framework;
@@ -94,14 +103,9 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             }
 
             // check heartbeat
-            if let Err(why) = self.shard.check_heartbeat() {
+            if !self.shard.check_heartbeat() {
                 warn!(
-                    "[ShardRunner {:?}] Error heartbeating: {:?}",
-                    self.shard.shard_info(),
-                    why,
-                );
-                debug!(
-                    "[ShardRunner {:?}] Requesting restart",
+                    "[ShardRunner {:?}] Error heartbeating",
                     self.shard.shard_info(),
                 );
 

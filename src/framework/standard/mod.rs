@@ -8,10 +8,21 @@ mod create_group;
 mod buckets;
 mod args;
 
-pub use self::args::{Args, Iter, Error as ArgError};
+pub use self::args::{
+    Args,
+    Iter,
+    Error as ArgError
+};
 pub(crate) use self::buckets::{Bucket, Ratelimit};
-pub(crate) use self::command::{Help};
-pub use self::command::{HelpFunction, HelpOptions, Command, CommandGroup, CommandOptions, Error as CommandError};
+pub(crate) use self::command::Help;
+pub use self::command::{
+    HelpFunction,
+    HelpOptions,
+    Command,
+    CommandGroup,
+    CommandOptions,
+    Error as CommandError
+};
 pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
 pub use self::create_help_command::CreateHelpCommand;
@@ -20,15 +31,19 @@ pub use self::create_group::CreateGroup;
 
 use client::Context;
 use internal::RwLockExt;
-use model::channel::Message;
-use model::guild::{Guild, Member};
-use model::id::{ChannelId, GuildId, UserId};
-use model::Permissions;
+use model::{
+    channel::Message,
+    guild::{Guild, Member},
+    id::{ChannelId, GuildId, UserId},
+    Permissions
+};
 use self::command::{AfterHook, BeforeHook, UnrecognisedCommandHook};
-use std::collections::HashMap;
-use std::default::Default;
-use std::ops;
-use std::sync::Arc;
+use std::{
+    collections::HashMap,
+    default::Default,
+    ops,
+    sync::Arc,
+};
 use super::Framework;
 use threadpool::ThreadPool;
 
@@ -37,17 +52,19 @@ use client::CACHE;
 #[cfg(feature = "cache")]
 use model::channel::Channel;
 
-/// A macro to generate "named parameters". This is useful to avoid manually
-/// using the "arguments" parameter and manually parsing types.
+/// A convenience macro for generating a struct fulfilling the [`Command`] trait.
 ///
-/// This is meant for use with the command [`Framework`].
+/// This is meant for use with the [`Framework`], specifically `Framework`::{[`cmd`]/[`command`]}.
+///
+///
+/// If you're just looking for a simple "register this function as a command", use [`Framework::on`].
 ///
 /// # Examples
 ///
 /// Create a regular `ping` command which takes no arguments:
 ///
 /// ```rust,ignore
-/// command!(ping(_context, message, _args) {
+/// command!(ping(_context, message) {
 ///     if let Err(why) = message.reply("Pong!") {
 ///         println!("Error sending pong: {:?}", why);
 ///     }
@@ -70,6 +87,10 @@ use model::channel::Channel;
 /// ```
 ///
 /// [`Framework`]: framework/index.html
+/// [`cmd`]: struct.Framework.html#method.cmd
+/// [`command`]: struct.Framework.html#method.command
+/// [`Framework::on`]: struct.Framework.html#method.on
+/// [`Command`]: trait.Command.html
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
@@ -275,7 +296,7 @@ impl StandardFramework {
     /// Create and use a bucket that limits a command to 3 uses per 10 seconds with
     /// a 2 second delay inbetween invocations:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -299,7 +320,7 @@ impl StandardFramework {
             s.to_string(),
             Bucket {
                 ratelimit: Ratelimit {
-                    delay: delay,
+                    delay,
                     limit: Some((time_span, limit)),
                 },
                 users: HashMap::new(),
@@ -314,7 +335,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -373,7 +394,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -425,7 +446,7 @@ impl StandardFramework {
     ///
     /// Create and use a simple bucket that has a 2 second delay between invocations:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -445,7 +466,7 @@ impl StandardFramework {
             s.to_string(),
             Bucket {
                 ratelimit: Ratelimit {
-                    delay: delay,
+                    delay,
                     limit: None,
                 },
                 users: HashMap::new(),
@@ -567,15 +588,19 @@ impl StandardFramework {
             } else if self.configuration.disabled_commands.contains(built) {
                 Some(DispatchError::CommandDisabled(built.to_string()))
             } else {
-                if !command.allowed_roles.is_empty() {
-                    if let Some(guild) = message.guild() {
-                        let guild = guild.read();
 
-                        if let Some(member) = guild.members.get(&message.author.id) {
-                            if let Ok(permissions) = member.permissions() {
-                                if !permissions.administrator()
-                                    && !has_correct_roles(command, &guild, member) {
-                                    return Some(DispatchError::LackingRole);
+                #[cfg(feature = "cache")] {
+                    if !command.allowed_roles.is_empty() {
+                        if let Some(guild) = message.guild() {
+                            let guild = guild.read();
+
+                            if let Some(member) = guild.members.get(&message.author.id) {
+                                if let Ok(permissions) = member.permissions() {
+
+                                    if !permissions.administrator()
+                                        && !has_correct_roles(command, &guild, member) {
+                                        return Some(DispatchError::LackingRole);
+                                    }
                                 }
                             }
                         }
@@ -616,7 +641,7 @@ impl StandardFramework {
     ///
     /// Create and use a simple command:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # #[macro_use] extern crate serenity;
     /// #
     /// # fn main() {
@@ -726,7 +751,7 @@ impl StandardFramework {
     ///
     /// Creating a simple group:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -759,7 +784,7 @@ impl StandardFramework {
     ///
     /// Making a simple argument error responder:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -800,7 +825,7 @@ impl StandardFramework {
     ///
     /// Using `before` to log command usage:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -818,7 +843,7 @@ impl StandardFramework {
     ///
     /// Using before to prevent command usage:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -856,7 +881,7 @@ impl StandardFramework {
     ///
     /// Using `after` to log command usage:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -886,7 +911,7 @@ impl StandardFramework {
     ///
     /// Using `unrecognised_command`:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -906,6 +931,10 @@ impl StandardFramework {
     }
 
     /// Sets what code should be executed when a user sends `(prefix)help`.
+    ///
+    /// If a command named `help` was set with [`command`], then this takes precendence first.
+    ///
+    /// [`command`]: #method.command
     pub fn help(mut self, f: HelpFunction) -> Self {
         let a = CreateHelpCommand(HelpOptions::default(), f).finish();
 
@@ -1007,7 +1036,6 @@ impl Framework for StandardFramework {
                     let before = self.before.clone();
                     let after = self.after.clone();
 
-                    // This is a special case.
                     if to_check == "help" {
                         let help = self.help.clone();
 
@@ -1031,8 +1059,6 @@ impl Framework for StandardFramework {
                             });
                             return;
                         }
-
-                        return;
                     }
 
                     if let Some(&CommandOrAlias::Command(ref command)) =
@@ -1092,7 +1118,6 @@ impl Framework for StandardFramework {
         self.user_id = user_id.0;
     }
 }
-
 #[cfg(feature = "cache")]
 pub fn has_correct_permissions(command: &Arc<CommandOptions>, message: &Message) -> bool {
     if !command.required_permissions.is_empty() {
@@ -1107,7 +1132,6 @@ pub fn has_correct_permissions(command: &Arc<CommandOptions>, message: &Message)
     true
 }
 
-#[cfg(feature = "cache")]
 pub fn has_correct_roles(cmd: &Arc<CommandOptions>, guild: &Guild, member: &Member) -> bool {
     if cmd.allowed_roles.is_empty() {
         true

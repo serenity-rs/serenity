@@ -2,8 +2,10 @@ use client::bridge::gateway::ShardMessenger;
 use gateway::InterMessage;
 use model::prelude::*;
 use parking_lot::Mutex;
-use std::sync::mpsc::Sender;
-use std::sync::Arc;
+use std::sync::{
+    mpsc::Sender,
+    Arc
+};
 use typemap::ShareMap;
 
 #[cfg(feature = "builder")]
@@ -98,13 +100,13 @@ impl Context {
 
                 map.insert("username", Value::String(cache.user.name.clone()));
 
-                if let Some(email) = cache.user.email.as_ref() {
-                    map.insert("email", Value::String(email.clone()));
+                if let Some(email) = cache.user.email.clone() {
+                    map.insert("email", Value::String(email));
                 }
             } else {
                 let user = http::get_current_user()?;
 
-                map.insert("username", Value::String(user.name.clone()));
+                map.insert("username", Value::String(user.name));
 
                 if let Some(email) = user.email {
                     map.insert("email", Value::String(email));

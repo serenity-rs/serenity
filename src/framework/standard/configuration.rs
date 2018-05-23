@@ -1,9 +1,13 @@
 use client::Context;
 use http;
-use model::channel::Message;
-use model::id::{GuildId, UserId};
-use std::collections::HashSet;
-use std::default::Default;
+use model::{
+    channel::Message,
+    id::{GuildId, UserId}
+};
+use std::{
+    collections::HashSet,
+    default::Default
+};
 use super::command::PrefixCheck;
 
 /// The configuration to use for a [`Framework`] associated with a [`Client`]
@@ -96,7 +100,7 @@ impl Configuration {
     ///
     /// Create a HashSet in-place:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -121,7 +125,7 @@ impl Configuration {
     ///
     /// Create a HashSet in-place:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -159,7 +163,7 @@ impl Configuration {
     ///
     /// Ignore a set of commands, assuming they exist:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -282,7 +286,7 @@ impl Configuration {
     ///
     /// Create a HashSet in-place:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -297,7 +301,7 @@ impl Configuration {
     ///
     /// Create a HashSet beforehand:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -326,7 +330,7 @@ impl Configuration {
     ///
     /// Assign a basic prefix:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -351,7 +355,7 @@ impl Configuration {
     ///
     /// Assign a set of prefixes the bot can respond to:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -375,7 +379,7 @@ impl Configuration {
     ///
     /// Have the args be seperated by a comma and a space:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -400,7 +404,7 @@ impl Configuration {
     ///
     /// Have the args be seperated by a comma and a space; and a regular space:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #

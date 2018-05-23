@@ -11,12 +11,14 @@ mod payload;
 mod streamer;
 mod threading;
 
-pub use self::audio::{Audio, AudioReceiver, AudioSource, AudioType, LockedAudio};
-pub use self::dca::DcaMetadata;
-pub use self::error::{DcaError, VoiceError};
-pub use self::handler::Handler;
-pub use self::manager::Manager;
-pub use self::streamer::{dca, ffmpeg, opus, pcm, ytdl};
+pub use self::{
+    audio::{Audio, AudioReceiver, AudioSource, AudioType, LockedAudio},
+    dca::DcaMetadata,
+    error::{DcaError, VoiceError},
+    handler::Handler,
+    manager::Manager,
+    streamer::{dca, ffmpeg, opus, pcm, ytdl},
+};
 pub use opus::Bitrate;
 
 use self::connection_info::ConnectionInfo;

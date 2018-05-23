@@ -1,11 +1,18 @@
 use gateway::Shard;
 use internal::prelude::*;
 use parking_lot::Mutex;
-use std::collections::{HashMap, VecDeque};
-use std::sync::mpsc::{Receiver, RecvTimeoutError, Sender};
-use std::sync::Arc;
-use std::thread;
-use std::time::{Duration, Instant};
+use std::{
+    collections::{HashMap, VecDeque},
+    sync::{
+        mpsc::{
+            Receiver, 
+            RecvTimeoutError, 
+            Sender},
+        Arc
+    },
+    thread,
+    time::{Duration, Instant}
+};
 use super::super::super::EventHandler;
 use super::{
     ShardId,

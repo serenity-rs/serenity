@@ -295,15 +295,22 @@ pub struct ActivitySecrets {
     pub spectate: Option<String>,
 }
 
+/// The type of an activity.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub enum ActivityType {
+    /// An indicator that the user is playing a game.
+    Playing,
+    /// An indicator that the user is streaming to a service.
+    Streaming,
+    /// An indicator that the user is listening to something.
+    Listening,
+}
+
 enum_number!(
-    /// The type of activity that is being performed.
     ActivityType {
-        /// An indicator that the user is playing a game.
-        Playing = 0,
-        /// An indicator that the user is streaming to a service.
-        Streaming = 1,
-        /// An indicator that the user is listening to something.
-        Listening = 2,
+        Playing,
+        Streaming,
+        Listening,
     }
 );
 
@@ -373,7 +380,7 @@ impl<'de> Deserialize<'de> for Presence {
             let user_id = user_map
                 .remove("id")
                 .ok_or_else(|| DeError::custom("Missing presence user id"))
-                .and_then(|x| UserId::deserialize(x.clone()))
+                .and_then(|x| UserId::deserialize(x))
                 .map_err(DeError::custom)?;
 
             (user_id, None)
@@ -399,12 +406,12 @@ impl<'de> Deserialize<'de> for Presence {
             .map_err(DeError::custom)?;
 
         Ok(Presence {
-            activity: activity,
-            last_modified: last_modified,
-            nick: nick,
-            status: status,
-            user: user,
-            user_id: user_id,
+            activity,
+            last_modified,
+            nick,
+            status,
+            user,
+            user_id,
         })
     }
 }

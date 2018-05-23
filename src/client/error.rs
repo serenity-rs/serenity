@@ -1,5 +1,11 @@
-use std::error::Error as StdError;
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::{
+    error::Error as StdError,
+    fmt::{
+        Display,
+        Formatter, 
+        Result as FmtResult
+    }
+};
 
 /// An error returned from the [`Client`].
 ///

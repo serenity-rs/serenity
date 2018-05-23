@@ -1,8 +1,15 @@
-pub use super::command::{Command, CommandGroup, CommandOptions, Error as CommandError};
+pub use super::command::{
+    Command, 
+    CommandGroup, 
+    CommandOptions, 
+    Error as CommandError
+};
 pub(crate) use super::command::CommandOrAlias;
-pub use super::create_help_command::{CreateHelpCommand};
-pub use super::create_command::{CreateCommand, FnOrCommand};
-pub use super::Args;
+pub use super::{
+    create_help_command::CreateHelpCommand,
+    create_command::{CreateCommand, FnOrCommand},
+    Args
+};
 
 use client::Context;
 use model::channel::Message;
@@ -148,6 +155,7 @@ impl CreateGroup {
     }
 
     /// Sets roles that are allowed to use the command.
+    #[cfg(feature = "cache")]
     pub fn allowed_roles<T: ToString, It: IntoIterator<Item=T>>(mut self, allowed_roles: It) -> Self {
         self.0.allowed_roles = allowed_roles.into_iter().map(|x| x.to_string()).collect();
 
