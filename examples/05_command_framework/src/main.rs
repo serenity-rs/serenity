@@ -15,6 +15,7 @@ extern crate typemap;
 
 use serenity::client::bridge::gateway::{ShardId, ShardManager};
 use serenity::framework::standard::{Args, DispatchError, StandardFramework, HelpBehaviour, CommandOptions, help_commands};
+use serenity::framework::standard::help_commands::find_similar_commands;
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::model::Permissions;
@@ -184,9 +185,9 @@ fn main() {
                 .bucket("emoji") // Make this command use the "emoji" bucket.
                 .cmd(cat)
                 // By default commands will be listed in the help-command for similar
-                // command-names (if criteria is met), this overrides it for this command.
-                .suggest(false)
-                 // Allow only administrators to call this:
+                // command-names (if edit-distance criteria is met), this overrides it per command.
+                .help_suggested(false)
+                // Allow only administrators to call this:
                 .required_permissions(Permissions::ADMINISTRATOR))
             .command("dog", |c| c
                 .desc("Sends an emoji with a dog.")
