@@ -31,10 +31,21 @@ use std::collections::{HashMap, HashSet};
 use std::hash::BuildHasher;
 use std::sync::Arc;
 use std::fmt::Write;
+use std::ops::{Index, IndexMut};
 use super::command::{InternalCommand};
 use super::{Args, CommandGroup, CommandOrAlias, HelpOptions, CommandOptions, CommandError, HelpBehaviour};
 use utils::Colour;
-use edit_distance;
+
+/// Macro to format a command according to a `HelpBehaviour`.
+macro_rules! format_command_name {
+    ($behaviour:expr, $command_name:expr) => {
+        match $behaviour {
+            HelpBehaviour::Strike => Some(format!("~~`{}`~~", $command_name)),
+            HelpBehaviour::Nothing => Some(format!("`{}`", $command_name)),
+            HelpBehaviour::Hide => None,
+        }
+    };
+}
 
 fn error_embed(channel_id: &ChannelId, input: &str, colour: Colour) {
     let _ = channel_id.send_message(|mut m| {
@@ -47,6 +58,72 @@ fn error_embed(channel_id: &ChannelId, input: &str, colour: Colour) {
 
         m
     });
+}
+
+/// Wraps around a `Vec<Vec<T>>` and provides access
+/// via indexing of tuples representing x and y.
+#[derive(Debug)]
+struct Matrix {
+    vec: Vec<usize>,
+    width: usize,
+}
+
+impl Matrix {
+    fn new(columns: usize, rows: usize) -> Matrix {
+        Matrix {
+            vec: vec![0; columns * rows],
+            width: rows,
+        }
+    }
+}
+
+impl Index<(usize, usize)> for Matrix {
+    type Output = usize;
+
+    fn index(&self, matrix_entry: (usize, usize)) -> &usize {
+        &self.vec[matrix_entry.1 * self.width + matrix_entry.0]
+    }
+}
+
+impl IndexMut<(usize, usize)> for Matrix {
+    fn index_mut(&mut self, matrix_entry: (usize, usize)) -> &mut usize {
+        &mut self.vec[matrix_entry.1 * self.width + matrix_entry.0]
+    }
+}
+
+/// Calculates and returns levenshtein distance between
+/// two passed words.
+pub(crate) fn levenshtein_distance(word_a: &str, word_b: &str) -> usize {
+    let len_a = word_a.chars().count();
+    let len_b = word_b.chars().count();
+
+    if len_a == 0 {
+        return len_b;
+    } else if len_b == 0 {
+        return len_a;
+    }
+
+    let mut matrix = Matrix::new(len_b + 1, len_a + 1);
+
+    for x in 0..len_a {
+        matrix[(x + 1, 0)] = matrix[(x, 0)] + 1;
+    }
+
+    for y in 0..len_b {
+        matrix[(0, y + 1)] = matrix[(0, y)] + 1;
+    }
+
+    for (x, char_a) in word_a.chars().enumerate() {
+
+        for (y, char_b) in word_b.chars().enumerate() {
+
+            matrix[(x + 1, y + 1)] = (matrix[(x, y + 1)] + 1)
+                .min(matrix[(x + 1, y)] + 1)
+                .min(matrix[(x, y)] + if char_a == char_b { 0 } else { 1 });
+        }
+    }
+
+    matrix[(len_a, len_b)]
 }
 
 fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &InternalCommand> {
@@ -82,7 +159,9 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
     !cmd.guild_only
 }
 
-fn analyse_command_for_suggestion(result: &mut Vec<String>, msg: &Message, command_options: &Arc<CommandOptions>, help_options: &HelpOptions, command_name: &str) {
+/// Formats a command's name according to `HelpOptions` set
+/// in the framework.
+fn format_command_name(msg: &Message, command_options: &Arc<CommandOptions>, help_options: &HelpOptions, command_name: &str) -> Option<String> {
     if !command_options.dm_only && !command_options.guild_only
     || command_options.dm_only && msg.is_private()
     || command_options.guild_only && !msg.is_private() {
@@ -95,64 +174,63 @@ fn analyse_command_for_suggestion(result: &mut Vec<String>, msg: &Message, comma
                 if command_options.help_available && has_correct_permissions(command_options, msg) {
 
                     if has_correct_roles(command_options, &guild, &member) {
-                        result.push(format!("`{}`", command_name.clone()));
+                       return Some(format!("`{}`", &command_name));
                     } else {
-                        match help_options.lacking_role {
-                            HelpBehaviour::Strike => result.push(format!("~~`{}`~~", command_name.clone())),
-                            HelpBehaviour::Nothing => result.push(format!("`{}`", command_name.clone())),
-                            HelpBehaviour::Hide => (),
-                        }
+                        return format_command_name!(help_options.lacking_role, command_name)
                     }
                 }
             } else {
-                match help_options.lacking_permissions {
-                    HelpBehaviour::Strike => result.push(format!("~~`{}`~~", command_name.clone())),
-                    HelpBehaviour::Nothing => result.push(format!("`{}`", command_name.clone())),
-                    HelpBehaviour::Hide => (),
-                }
+                return format_command_name!(help_options.lacking_permissions, command_name)
             }
         } else {
-            result.push(format!("`{}`", command_name.clone()));
+            return Some(format!("`{}`", &command_name));
         }
     } else {
-        match help_options.wrong_channel {
-            HelpBehaviour::Strike => result.push(format!("~~`{}`~~", command_name)),
-            HelpBehaviour::Nothing => result.push(format!("`{}`", command_name.clone())),
-            HelpBehaviour::Hide => (),
-        }
+        return format_command_name!(help_options.lacking_role, command_name);
     }
+
+    None
 }
 
-fn find_similar_commands<H: BuildHasher>(searched_command_name: &str, msg: &Message, groups: &HashMap<String, Arc<CommandGroup>, H>, help_options: &HelpOptions) -> Vec<String> {
+fn find_similar_commands<H: BuildHasher>(searched_command_name: &str, msg: &Message, groups: &HashMap<String, Arc<CommandGroup>, H>, help_options: &HelpOptions) -> Vec<(String, usize)> {
     let mut result = Vec::new();
 
     for (_, group) in groups {
 
         for (command_name, command) in &group.commands {
-
-            if edit_distance(command_name, &searched_command_name) > help_options.max_edit_distance { continue };
+            let distance = levenshtein_distance(&command_name, &searched_command_name);
+            if distance > help_options.max_edit_distance { continue };
 
             match *command {
                 CommandOrAlias::Command(ref cmd) => {
                     let command_options = cmd.options();
                     if !command_options.help_suggested { continue };
 
-                    analyse_command_for_suggestion(&mut result, msg, &command_options, help_options, command_name);
+                    if let Some(similar_command) = format_command_name(msg, &command_options, help_options, command_name) {
+                        result.push((similar_command, distance));
+                    }
                 },
                 CommandOrAlias::Alias(ref name) => {
-                    match group.commands[name] {
-                        CommandOrAlias::Command(ref cmd) => {
-                        let command_options = cmd.options();
-                        if !command_options.help_suggested { continue };
+                    if let Some(actual_name) = group.commands.get(name) {
 
-                        analyse_command_for_suggestion(&mut result, msg, &command_options, help_options, command_name);
-                    },
-                    _ => continue,
+                        match actual_name {
+                            CommandOrAlias::Command(ref cmd) => {
+                            let command_options = cmd.options();
+                            if !command_options.help_suggested { continue };
+
+                            if let Some(similar_command) = format_command_name(msg, &command_options, help_options, command_name) {
+                                result.push((similar_command, distance));
+                            }
+                        },
+                        _ => continue,
+                        }
                     }
                 }
             }
         }
     }
+
+    result.sort_unstable_by(|a, b| a.1.cmp(&b.1));
 
     result
 }
@@ -162,9 +240,24 @@ fn generate_similar_commands_message<H: BuildHasher>(searched_command_name: &str
         let similar_commands = &find_similar_commands(searched_command_name, msg, groups, help_options);
 
         if similar_commands.is_empty() {
-                help_options.command_not_found_text.replace("{}", &format!("`{}`", searched_command_name))
+            help_options.command_not_found_text.replace("{}", &format!("`{}`", searched_command_name))
         } else {
-                help_options.suggestion_text.replace("{}", &similar_commands.join(" "))
+            let seperator = ", ";
+            let mut capacity = similar_commands.iter().fold(0, |acc, x| acc + x.0.len());
+            capacity += (similar_commands.len() - 1) * seperator.len();
+
+            let a = similar_commands
+                .iter()
+                .map(|&(ref s, _)| s)
+                .enumerate()
+                .fold(String::with_capacity(capacity), |mut acc, (i, s)|
+                if i == 0 {
+                    s.to_owned()
+                } else {
+                    acc.push_str(&seperator); acc.push_str(s); acc.to_owned()
+                });
+
+            help_options.suggestion_text.replace("{}", &a)
         }
     } else {
         help_options.command_not_found_text.replace("{}", &format!("`{}`", searched_command_name))
@@ -253,20 +346,20 @@ pub fn with_embeds<H: BuildHasher>(
                     m.embed(|mut embed| {
                         embed.colour(help_options.embed_success_colour);
 
-                        embed.title(command_name.clone());
+                        embed.title(&command_name);
 
                         if let Some(ref desc) = command.desc {
                             embed.description(desc);
                         }
 
                         if let Some(ref usage) = command.usage {
-                            let value = format!("`{} {}`", command_name.clone(), usage);
+                            let value = format!("`{} {}`", command_name, usage);
 
                             embed.field(&help_options.usage_label, value, true);
                         }
 
                         if let Some(ref example) = command.example {
-                            let value = format!("`{} {}`", command_name.clone(), example);
+                            let value = format!("`{} {}`", &command_name, example);
 
                             embed.field(&help_options.usage_sample_label, value, true);
                         }
@@ -310,7 +403,7 @@ pub fn with_embeds<H: BuildHasher>(
 
     let _ = msg.channel_id.send_message(|mut m| {
         m.embed(|mut embed| {
-            if let Some(striked_command_text) = help_options.striked_commands_tip.clone() {
+            if let &Some(ref striked_command_text) = &help_options.striked_commands_tip {
                 embed.colour(help_options.embed_success_colour);
                 embed.description(format!(
                     "{}\n{}",
@@ -527,7 +620,7 @@ pub fn plain<H: BuildHasher>(
 
     let mut result = "**Commands**\n".to_string();
 
-    if let Some(striked_command_text) = help_options.striked_commands_tip.clone() {
+    if let &Some(ref striked_command_text) = &help_options.striked_commands_tip {
         let _ = write!(result, "{}\n{}\n\n", &help_options.individual_command_tip, &striked_command_text);
     } else {
         let _ = write!(result, "{}\n\n", &help_options.individual_command_tip);
@@ -621,4 +714,55 @@ pub fn plain<H: BuildHasher>(
     let _ = msg.channel_id.say(&result);
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn levenshtein_distance_reflexive() {
+        let word_a = "rusty ferris";
+        let word_b = "rusty ferris";
+        assert_eq!(0, levenshtein_distance(&word_a, &word_b));
+
+        let word_a = "rusty ferris";
+        let word_b = "RuSty FerriS";
+        assert_eq!(4, levenshtein_distance(&word_a, &word_b));
+
+        let word_a = "";
+        let word_b = "";
+        assert_eq!(0, levenshtein_distance(&word_a, &word_b));
+    }
+
+    #[test]
+    fn levenshtein_distance_symmetric() {
+        let word_a = "ferris";
+        let word_b = "rusty ferris";
+        assert_eq!(6, levenshtein_distance(&word_a, &word_b));
+
+        let word_a = "rusty ferris";
+        let word_b = "ferris";
+        assert_eq!(6, levenshtein_distance(&word_a, &word_b));
+
+        let word_a = "";
+        let word_b = "ferris";
+        assert_eq!(6, levenshtein_distance(&word_a, &word_b));
+
+        let word_a = "ferris";
+        let word_b = "";
+        assert_eq!(6, levenshtein_distance(&word_a, &word_b));
+    }
+
+    #[test]
+    fn levenshtein_distance_transitive() {
+        let word_a = "ferris";
+        let word_b = "turbo fish";
+        let word_c = "unsafe";
+        let distance_of_a_c = levenshtein_distance(&word_a, &word_c);
+        let distance_of_a_b = levenshtein_distance(&word_a, &word_b);
+        let distance_of_b_c = levenshtein_distance(&word_b, &word_c);
+
+        assert!(distance_of_a_c <= (distance_of_a_b + distance_of_b_c));
+    }
 }
