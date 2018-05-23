@@ -34,7 +34,7 @@ use std::{
     collections::{HashMap, HashSet},
     fmt::Write,
     hash::BuildHasher,
-    ops::{Index, IndexMut}
+    ops::{Index, IndexMut},
     sync::Arc,
 };
 use super::command::{InternalCommand};
