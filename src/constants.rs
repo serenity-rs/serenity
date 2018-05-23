@@ -15,7 +15,7 @@ pub const MESSAGE_CODE_LIMIT: u16 = 2000;
 ///
 /// [UserAgent]: ../hyper/header/struct.UserAgent.html
 pub const USER_AGENT: &str = concat!(
-    "DiscordBot (https://github.com/zeyla/serenity, ",
+    "DiscordBot (https://github.com/serenity-rs/serenity, ",
     env!("CARGO_PKG_VERSION"),
     ")"
 );

@@ -2,12 +2,12 @@
 authors = ["alex <acdenissk69@gmail.com>", "Zeyla Hellyer <zey@zey.moe>"]
 description = "A Rust library for the Discord API."
 documentation = "https://docs.rs/serenity"
-homepage = "https://github.com/zeyla/serenity"
+homepage = "https://github.com/serenity-rs/serenity"
 keywords = ["discord", "api"]
 license = "ISC"
 name = "serenity"
 readme = "README.md"
-repository = "https://github.com/zeyla/serenity.git"
+repository = "https://github.com/serenity-rs/serenity.git"
 version = "0.5.3"
 
 [dependencies]
