@@ -159,6 +159,8 @@ pub enum DispatchError {
     BlockedUser,
     /// When the guild or its owner is blocked in bot configuration.
     BlockedGuild,
+    /// When the channel blocked in bot configuration.
+    BlockedChannel,
     /// When the command requester lacks specific required permissions.
     LackOfPermissions(Permissions),
     /// When the command requester has exceeded a ratelimit bucket. The attached
@@ -196,6 +198,7 @@ impl fmt::Debug for DispatchError {
             CommandDisabled(ref s) => f.debug_tuple("DispatchError::CommandDisabled").field(&s).finish(),
             BlockedUser => write!(f, "DispatchError::BlockedUser"),
             BlockedGuild => write!(f, "DispatchError::BlockedGuild"),
+            BlockedChannel => write!(f, "DispatchError::BlockedChannel"),
             LackOfPermissions(ref perms) => f.debug_tuple("DispatchError::LackOfPermissions").field(&perms).finish(),
             RateLimited(ref num) => f.debug_tuple("DispatchError::RateLimited").field(&num).finish(),
             OnlyForDM => write!(f, "DispatchError::OnlyForDM"),
@@ -495,6 +498,14 @@ impl StandardFramework {
         false
     }
 
+    #[cfg(feature = "cache")]
+    fn is_blocked_channel(&self, message: &Message) -> bool {
+        !self.configuration.allowed_channels.is_empty()
+            && !self.configuration
+                .allowed_channels
+                .contains(&message.channel_id)
+    }
+
     #[allow(too_many_arguments)]
     #[cfg_attr(feature = "cargo-clippy", allow(cyclomatic_complexity))]
     fn should_fail(&mut self,
@@ -559,6 +570,10 @@ impl StandardFramework {
             {
                 if self.is_blocked_guild(message) {
                     return Some(DispatchError::BlockedGuild);
+                }
+
+                if self.is_blocked_channel(message) {
+                    return Some(DispatchError::BlockedChannel);
                 }
 
                 if !has_correct_permissions(command, message) {
