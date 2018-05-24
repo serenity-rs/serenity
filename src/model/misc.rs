@@ -36,6 +36,12 @@ impl Mentionable for Channel {
     }
 }
 
+impl Mentionable for CurrentUser {
+    fn mention(&self) -> String {
+        format!("<@{}>", self.id.0)
+    }
+}
+
 impl Mentionable for Emoji {
     fn mention(&self) -> String { format!("<:{}:{}>", self.name, self.id.0) }
 }
