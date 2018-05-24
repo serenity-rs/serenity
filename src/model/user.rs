@@ -752,6 +752,30 @@ impl UserId {
     }
 }
 
+impl From<CurrentUser> for User {
+    fn from(user: CurrentUser) -> Self {
+        Self {
+            avatar: user.avatar,
+            bot: user.bot,
+            discriminator: user.discriminator,
+            id: user.id,
+            name: user.name,
+        }
+    }
+}
+
+impl<'a> From<&'a CurrentUser> for User {
+    fn from(user: &'a CurrentUser) -> Self {
+        Self {
+            avatar: user.avatar.clone(),
+            bot: user.bot,
+            discriminator: user.discriminator,
+            id: user.id,
+            name: user.name.clone(),
+        }
+    }
+}
+
 impl From<CurrentUser> for UserId {
     /// Gets the Id of a `CurrentUser` struct.
     fn from(current_user: CurrentUser) -> UserId { current_user.id }
