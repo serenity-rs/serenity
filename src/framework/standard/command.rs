@@ -161,10 +161,18 @@ pub struct HelpOptions {
     pub command_not_found_text: String,
     /// Explains the user on how to use access a single command's details.
     pub individual_command_tip: String,
-    /// Explains reasoning behind striked commands, see fields requiring `HelpBehaviour` for further information.
+    /// Explains reasoning behind strikethrough-commands, see fields requiring `HelpBehaviour` for further information.
     /// If `HelpBehaviour::Strike` is unused, this field will evaluate to `None` during creation
     /// inside of `CreateHelpCommand`.
-    pub striked_commands_tip: Option<String>,
+    ///
+    /// **Note**: Text is only used in direct messages.
+    pub striked_commands_tip_in_dm: Option<String>,
+    /// Explains reasoning behind strikethrough-commands, see fields requiring `HelpBehaviour` for further information.
+    /// If `HelpBehaviour::Strike` is unused, this field will evaluate to `None` during creation
+    /// inside of `CreateHelpCommand`.
+    ///
+    /// **Note**: Text is only used in guilds.
+    pub striked_commands_tip_in_guild: Option<String>,
     /// Announcing a group's prefix as in: {group_prefix} {prefix}.
     pub group_prefix: String,
     /// If a user lacks required roles, this will treat how these commands will be displayed.
@@ -213,7 +221,8 @@ impl Default for HelpOptions {
             individual_command_tip: "To get help with an individual command, pass its \
                  name as an argument to this command.".to_string(),
             group_prefix: "Prefix".to_string(),
-            striked_commands_tip: Some(String::new()),
+            striked_commands_tip_in_dm: Some(String::new()),
+            striked_commands_tip_in_guild: Some(String::new()),
             lacking_role: HelpBehaviour::Strike,
             lacking_permissions: HelpBehaviour::Strike,
             wrong_channel: HelpBehaviour::Strike,

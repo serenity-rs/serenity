@@ -38,12 +38,12 @@ use std::{
 };
 use super::command::InternalCommand;
 use super::{
-    Args, 
-    CommandGroup, 
-    CommandOrAlias, 
-    HelpOptions, 
-    CommandOptions, 
-    CommandError, 
+    Args,
+    CommandGroup,
+    CommandOrAlias,
+    HelpOptions,
+    CommandOptions,
+    CommandError,
     HelpBehaviour
 };
 use utils::Colour;
@@ -222,8 +222,13 @@ pub fn with_embeds<H: BuildHasher>(
 
     let _ = msg.channel_id.send_message(|m| {
         m.embed(|mut e| {
+            let striked_command_tip = if msg.is_private() {
+                    &help_options.striked_commands_tip_in_guild
+                } else {
+                    &help_options.striked_commands_tip_in_dm
+                };
 
-            if let Some(ref striked_command_text) = help_options.striked_commands_tip {
+            if let Some(ref striked_command_text) = striked_command_tip {
                 e = e.colour(help_options.embed_success_colour).description(
                     format!("{}\n{}", &help_options.individual_command_tip, striked_command_text),
                 );
@@ -461,7 +466,13 @@ pub fn plain<H: BuildHasher>(
 
     let mut result = "**Commands**\n".to_string();
 
-    if let Some(ref striked_command_text) = help_options.striked_commands_tip {
+    let striked_command_tip = if msg.is_private() {
+            &help_options.striked_commands_tip_in_guild
+        } else {
+            &help_options.striked_commands_tip_in_dm
+    };
+
+    if let Some(ref striked_command_text) = striked_command_tip {
         let _ = write!(result, "{}\n{}\n\n", &help_options.individual_command_tip, striked_command_text);
     } else {
         let _ = write!(result, "{}\n\n", &help_options.individual_command_tip);
