@@ -219,7 +219,7 @@ impl CreateHelpCommand {
     }
 
     fn produce_strike_text(&self, dm_or_guild: &str) -> String {
-        let mut strike_text = String::from("~~`Striked commands`~~ are unavailable because they");
+        let mut strike_text = String::from("~~`Strikethrough commands`~~ are unavailable because they");
 
         let mut concat_with_comma = if self.0.lacking_permissions == HelpBehaviour::Strike {
             let _ = write!(strike_text, " require permissions");
