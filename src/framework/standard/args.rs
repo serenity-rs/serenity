@@ -94,39 +94,26 @@ fn parse<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
         return Err(Error::Eos);
     }
 
-    if delimiters.len() == 1 {
-        let delim = &delimiters[0];
-        let mut pos = s.find(delim).unwrap_or_else(|| s.len());
-        let res = (&s[..pos]).parse::<T>().map_err(Error::Parse)?;
+    let (mut smallest_pos, delimiter_len) = delimiters.iter().fold((s.len(), 0usize), |mut acc, delim| {
+        let other_pos = s.find(delim).unwrap_or_else(|| s.len());
 
-        if pos < s.len() {
-            pos += delim.len();
+        if acc.0 > other_pos {
+            acc.0 = other_pos;
+            acc.1 = delim.len();
         }
 
-        s.drain(..pos);
-        Ok(res)
-    } else {
-        let (mut smallest_pos, delimiter_len) = delimiters.iter().fold((s.len(), 0usize), |mut acc, delim| {
-            let other_pos = s.find(delim).unwrap_or_else(|| s.len());
+        acc
+    });
 
-            if acc.0 > other_pos {
-                acc.0 = other_pos;
-                acc.1 = delim.len();
-            }
+    let res = (&s[..smallest_pos]).parse::<T>().map_err(Error::Parse)?;
 
-            acc
-        });
-
-        let res = (&s[..smallest_pos]).parse::<T>().map_err(Error::Parse)?;
-
-        if smallest_pos < s.len() {
-            smallest_pos += delimiter_len;
-        }
-
-        s.drain(..smallest_pos);
-
-        Ok(res)
+    if smallest_pos < s.len() {
+        smallest_pos += delimiter_len;
     }
+
+    s.drain(..smallest_pos);
+
+    Ok(res)
 }
 
 /// A utility struct for handling arguments of a command.
@@ -555,7 +542,6 @@ impl Args {
         // TODO: Make this efficient
 
         if self.delimiters.len() == 1 as usize {
-
             match self.message.split(&self.delimiters[0]).position(|e| e.parse::<T>().is_ok()) {
                 Some(index) => {
                     let mut vec = self.message.split(self.delimiters[0].as_str()).map(|s| s.to_string()).collect::<Vec<_>>();
