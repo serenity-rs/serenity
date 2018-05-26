@@ -54,7 +54,7 @@ impl<E: StdError> fmt::Display for Error<E> {
 type Result<T, E> = ::std::result::Result<T, Error<E>>;
 
 fn second_quote_occurence(s: &str) -> Option<usize> {
-    s.chars().enumerate().filter(|&(_, c)| c == '"').nth(1).map(|(pos, _)| pos)
+    s.match_indices('"').nth(1).map(|(pos, _)| pos)
 }
 
 fn parse_quotes<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
