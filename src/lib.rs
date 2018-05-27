@@ -170,7 +170,7 @@ pub mod voice;
 
 mod error;
 
-pub use error::{Error, FutureResult, Result};
+pub use error::{Error, Result};
 
 #[cfg(feature = "client")]
 pub use client::Client;

@@ -1,4 +1,4 @@
-use futures::{Canceled, Future};
+use futures::Canceled;
 use hyper::error::UriError;
 use internal::prelude::*;
 use model::ModelError;
@@ -37,8 +37,6 @@ use voice::VoiceError;
 ///
 /// [`Error`]: enum.Error.html
 pub type Result<T> = StdResult<T, Error>;
-
-pub type FutureResult<T> = Box<Future<Item = T, Error = Error>>;
 
 /// A common error enum returned by most of the library's functionality within a
 /// custom [`Result`].
