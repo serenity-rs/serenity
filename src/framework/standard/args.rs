@@ -543,14 +543,24 @@ impl Args {
         where T::Err: StdError {
         // TODO: Make this efficient
 
-        if self.delimiters.len() == 1 as usize {
+        if self.delimiters.len() == 1 {
             match self.message.split(&self.delimiters[0]).position(|e| e.parse::<T>().is_ok()) {
                 Some(index) => {
-                    let mut vec = self.message.split(self.delimiters[0].as_str()).map(|s| s.to_string()).collect::<Vec<_>>();
-                    let mut ss = vec.remove(index);
-                    let res = parse::<T>(&mut ss, &self.delimiters);
-                    self.message = vec.join(&self.delimiters[0]);
+                    fn do_stuff(msg: &str, delim: &str, index: usize) -> (String, String) {
+                        let mut vec = msg.split(delim).collect::<Vec<_>>();
+
+                        let found = vec.remove(index);
+                        let new_state = vec.join(delim);
+
+                        (found.to_string(), new_state)
+                    }
+
+                    let (mut s, msg) = do_stuff(&self.message, &self.delimiters[0], index);
+                    let res = parse::<T>(&mut s, &self.delimiters);
+                    self.message = msg;
+
                     if let Some(ref mut val) = self.len { if 1 <= *val { *val -= 1 } };
+
                     res
                 },
                 None => Err(Error::Eos),
@@ -605,9 +615,8 @@ impl Args {
 
             match pos {
                 Some(index) => {
-                    let mut vec = self.message.split(&self.delimiters[0]).map(|s| s.to_string()).collect::<Vec<_>>();
-                    let mut ss = vec.remove(index);
-                    parse::<T>(&mut ss, &self.delimiters)
+                    let ss = self.message.split(&self.delimiters[0]).nth(index).unwrap();
+                    parse::<T>(&mut ss.to_string(), &self.delimiters)
                 },
                 None => Err(Error::Eos),
             }
