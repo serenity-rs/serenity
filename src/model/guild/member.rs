@@ -240,21 +240,19 @@ impl Member {
     /// Retrieves the ID and position of the member's highest role in the
     /// hierarchy, if they have one.
     ///
-    /// This _may_ return `None` if the user has roles, but they are not present
-    /// in the cache for cache inconsistency reasons.
+    /// This _may_ return `None` if:
+    ///
+    /// - the user has roles, but they are not present in the cache for cache
+    /// inconsistency reasons
+    /// - you already have a write lock to the member's guild
     ///
     /// The "highest role in hierarchy" is defined as the role with the highest
     /// position. If two or more roles have the same highest position, then the
     /// role with the lowest ID is the highest.
-    ///
-    /// # Deadlocking
-    ///
-    /// This function will deadlock if you have a write lock to the member's
-    /// guild.
     #[cfg(feature = "cache")]
     pub fn highest_role_info(&self) -> Option<(RoleId, i64)> {
         let guild = self.guild_id.find()?;
-        let reader = guild.read();
+        let reader = guild.try_read()?;
 
         let mut highest = None;
 
