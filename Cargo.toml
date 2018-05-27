@@ -20,7 +20,7 @@ serde_json = "^1.0"
 tokio-core = "~0.1"
 tokio-timer = "~0.1"
 tokio-tls = "~0.1"
-url = "^1.6"
+url = "^1.0"
 
 [dependencies.base64]
 optional = true
@@ -28,7 +28,7 @@ version = "~0.9"
 
 [dependencies.byteorder]
 optional = true
-version = "^1.2"
+version = "^1.0"
 
 [dependencies.chrono]
 features = ["serde"]
@@ -65,7 +65,7 @@ version = "0.0.14"
 
 [dependencies.tokio-tungstenite]
 optional = true
-version = "~0.4"
+version = "~0.5"
 
 [dependencies.tungstenite]
 optional = true
