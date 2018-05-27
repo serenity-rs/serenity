@@ -10,18 +10,18 @@ mod buckets;
 mod args;
 
 pub use self::args::{
-    Args, 
-    Iter, 
+    Args,
+    Iter,
     Error as ArgError
 };
 pub(crate) use self::buckets::{Bucket, Ratelimit};
 pub(crate) use self::command::Help;
 pub use self::command::{
-    HelpFunction, 
-    HelpOptions, 
-    Command, 
-    CommandGroup, 
-    CommandOptions, 
+    HelpFunction,
+    HelpOptions,
+    Command,
+    CommandGroup,
+    CommandOptions,
     Error as CommandError
 };
 pub use self::command::CommandOrAlias;
@@ -948,7 +948,7 @@ impl StandardFramework {
     /// Sets what code should be executed when a user sends `(prefix)help`.
     ///
     /// If a command named `help` was set with [`command`], then this takes precendence first.
-    /// 
+    ///
     /// [`command`]: #method.command
     pub fn help(mut self, f: HelpFunction) -> Self {
         let a = CreateHelpCommand(HelpOptions::default(), f).finish();
@@ -1119,13 +1119,12 @@ impl Framework for StandardFramework {
             }
         }
 
-        let unrecognised_command = self.unrecognised_command.clone();
-
-        threadpool.execute(move || {
-            if let Some(unrecognised_command) = unrecognised_command {
+        if let Some(unrecognised_command) = &self.unrecognised_command {
+            let unrecognised_command = unrecognised_command.clone();
+            threadpool.execute(move || {
                 (unrecognised_command)(&mut context, &message, &unrecognised_command_name);
-            }
-        });
+            });
+        }
     }
 
     fn update_current_user(&mut self, user_id: UserId) {
