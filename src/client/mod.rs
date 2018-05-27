@@ -81,7 +81,8 @@ impl Client {
 
             Self {
                 #[cfg(feature = "cache")]
-                cache: Rc::new(RefCell::new(Cache::default())),                handle: h2,
+                cache: Rc::new(RefCell::new(Cache::default())),
+                handle: h2,
                 http: client,
                 shard_manager: ShardManager::new(ShardManagerOptions {
                     strategy: strategy,
