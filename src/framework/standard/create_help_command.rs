@@ -218,17 +218,21 @@ impl CreateHelpCommand {
         self
     }
 
-    fn produce_strike_text(&self, dm_or_guild: &str) -> String {
+    fn produce_strike_text(&self, dm_or_guild: &str) -> Option<String> {
         let mut strike_text = String::from("~~`Strikethrough commands`~~ are unavailable because they");
+        let mut is_any_option_strike = false;
 
         let mut concat_with_comma = if self.0.lacking_permissions == HelpBehaviour::Strike {
+            is_any_option_strike = true;
             let _ = write!(strike_text, " require permissions");
+
             true
         } else {
             false
         };
 
         if self.0.lacking_role == HelpBehaviour::Strike {
+            is_any_option_strike = true;
 
             if concat_with_comma {
                 let _ = write!(strike_text, ", require a specific role");
@@ -239,6 +243,7 @@ impl CreateHelpCommand {
         }
 
         if self.0.wrong_channel == HelpBehaviour::Strike {
+            is_any_option_strike = true;
 
             if concat_with_comma {
                 strike_text.push_str(&format!(", or are limited to {}", dm_or_guild));
@@ -247,7 +252,12 @@ impl CreateHelpCommand {
             }
         }
         let _ = write!(strike_text, ".");
-        strike_text
+
+        if is_any_option_strike {
+            Some(strike_text)
+        } else {
+            None
+        }
     }
 
     /// Finishes the creation of a help-command, returning `Help`.
@@ -256,13 +266,11 @@ impl CreateHelpCommand {
     pub(crate) fn finish(mut self) -> Arc<Help> {
 
         if &self.0.striked_commands_tip_in_dm == &Some(String::new()) {
-            let strike_text = self.produce_strike_text("direct messages");
-            self.0.striked_commands_tip_in_dm = Some(strike_text);
+            self.0.striked_commands_tip_in_dm = self.produce_strike_text("direct messages");
         }
 
         if self.0.striked_commands_tip_in_guild == Some(String::new()) {
-            let strike_text = self.produce_strike_text("guild messages");
-            self.0.striked_commands_tip_in_guild = Some(strike_text);
+            self.0.striked_commands_tip_in_guild = self.produce_strike_text("guild messages");
         }
 
         let CreateHelpCommand(options, function) = self;
