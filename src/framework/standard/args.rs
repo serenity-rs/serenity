@@ -119,18 +119,20 @@ fn parse<T: FromStr>(s: &mut String, delimiters: &[String]) -> Result<T, T::Err>
 /// A utility struct for handling arguments of a command.
 ///
 /// An "argument" is a part of the message up until the end of the message or at one of the specified delimiters.
-/// (E.g.: delim: " ", message: "ab cd"; 1th arg is "ab")
+/// For instance, with a space delimiter (" ") in a message like "ab cd", we would get the argument "ab", and then "cd".
 /// 
-/// The general functionality provided by this struct is to not only make arguments convenient to handle,
-/// but to handle parsing them to a specifc type as well.
-/// 
-/// Majority of the methods here remove the argument as to advance to further arguments.
-/// If you do not wish for this behaviour, use the suffixed `*_n` methods instead. 
-/// 
+/// For the most part, almost all methods provided by this struct not only make arguments convenient to handle,
+/// they'll also parse your argument to a specific type if you need to work with the type itself and not some shady string.
 ///
-/// `Args` provides parsing arguments inside quotes too (for which case, delimiters don't matter), via the suffixed `*_quoted` methods.
-///
-/// **Note**: these fall back to the normal methods' behaviour if the quotes are malformed; i.e missing an opening or closing quote.
+/// And for another part, in case you need multiple things, whether delimited or not, gobled in one argument,
+/// you can utilize the `*_quoted` methods that will extract anything inside quotes for you.
+/// Though they'll fall back to the original behaviour of, for example, `single`, 
+/// on the occasion that the quotes are malformed (missing a starting or ending quote).  
+///  
+/// # Catch regarding how `Args` functions
+/// 
+/// Majority of the methods here internally chop of the argument (i.e you won't encounter it anymore), to advance to further arguments.
+/// If you do not desire for this behaviour, consider using the suffixed `*_n` methods instead.
 #[derive(Clone, Debug)]
 pub struct Args {
     delimiters: Vec<String>,
