@@ -12,3 +12,4 @@ Cargo.lock
 rls/
 *.iml
 .env
+*.swp

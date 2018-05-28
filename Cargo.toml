@@ -8,15 +8,19 @@ license = "ISC"
 name = "serenity"
 readme = "README.md"
 repository = "https://github.com/serenity-rs/serenity.git"
-version = "0.5.3"
+version = "0.6.0"
 
 [dependencies]
 bitflags = "^1.0"
+futures = "~0.1"
 log = "~0.4"
-parking_lot = "^0.5"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
+tokio-core = "~0.1"
+tokio-timer = "~0.1"
+tokio-tls = "~0.1"
+url = "^1.0"
 
 [dependencies.base64]
 optional = true
@@ -24,7 +28,7 @@ version = "~0.9"
 
 [dependencies.byteorder]
 optional = true
-version = "^1.2"
+version = "^1.0"
 
 [dependencies.chrono]
 features = ["serde"]
@@ -36,25 +40,19 @@ version = "^1.0"
 
 [dependencies.hyper]
 optional = true
-version = "~0.10"
+version = "~0.11"
 
-[dependencies.hyper-native-tls]
+[dependencies.hyper-multipart-rfc7578]
 optional = true
-version = "0.2.4"
+version = "0.1.0-alpha3"
 
-[dependencies.lazy_static]
+[dependencies.hyper-tls]
 optional = true
-version = "^1.0"
-
-[dependencies.multipart]
-default-features = false
-features = ["client", "hyper", "safemem"]
-optional = true
-version = "0.13"
+version = "~0.1"
 
 [dependencies.native-tls]
 optional = true
-version = "0.1"
+version = "~0.1"
 
 [dependencies.opus]
 optional = true
@@ -69,19 +67,13 @@ default-features = false
 optional = true
 version = "0.0.14"
 
-[dependencies.threadpool]
+[dependencies.tokio-tungstenite]
 optional = true
-version = "~1.7"
+version = "~0.5"
 
-[dependencies.typemap]
+[dependencies.tungstenite]
 optional = true
-version = "~0.3"
-
-[dependencies.evzht9h3nznqzwl]
-default-features = false
-features = ["sync-ssl"]
-optional = true
-version = "0.0.3"
+version = "~0.5"
 
 [dev-dependencies.matches]
 version = "0.1.6"
@@ -89,33 +81,20 @@ version = "0.1.6"
 [features]
 default = [
     "builder",
-    "cache",
     "client",
-    "framework",
     "gateway",
-    "model",
     "http",
-    "standard_framework",
-    "utils"
+    "utils",
 ]
 builder = ["utils"]
-cache = ["lazy_static"]
-client = [
-    "gateway",
-    "http",
-    "lazy_static",
-    "threadpool",
-    "typemap",
-]
+client = ["gateway", "http"]
 extras = []
-framework = ["client", "model", "utils"]
-gateway = ["flate2", "http", "websocket", "utils"]
-http = ["hyper", "hyper-native-tls", "lazy_static", "multipart", "native-tls"]
-model = ["builder", "http"]
+framework = ["client", "utils"]
+gateway = ["flate2", "http", "tokio-tungstenite", "tungstenite", "utils"]
+http = ["builder", "hyper", "hyper-multipart-rfc7578", "hyper-tls", "native-tls", "utils"]
 standard_framework = ["framework"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "rand", "sodiumoxide"]
-websocket = ["evzht9h3nznqzwl"]
 
 [package.metadata.docs.rs]
 all-features = true

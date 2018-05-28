@@ -47,10 +47,10 @@ use utils::{self, VecMap};
 /// [`content`]: #method.content
 /// [`embed`]: #method.embed
 /// [`http::send_message`]: ../http/fn.send_message.html
-#[derive(Clone, Debug)]
-pub struct CreateMessage<'a>(pub VecMap<&'static str, Value>, pub Option<Vec<ReactionType>>, pub Vec<AttachmentType<'a>>);
+#[derive(Debug)]
+pub struct CreateMessage(pub VecMap<&'static str, Value>, pub Option<Vec<ReactionType>>, pub Vec<AttachmentType>);
 
-impl<'a> CreateMessage<'a> {
+impl CreateMessage {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
@@ -81,12 +81,12 @@ impl<'a> CreateMessage<'a> {
     }
 
     /// Appends a file to the message.
-    pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) {
+    pub fn add_file<T: Into<AttachmentType>>(&mut self, file: T) {
         self.2.push(file.into());
     }
 
     /// Appends a list of files to the message.
-    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) {
+    pub fn add_files<T: Into<AttachmentType>, It: IntoIterator<Item=T>>(&mut self, files: It) {
         self.2.extend(files.into_iter().map(|f| f.into()));
     }
 
@@ -94,18 +94,18 @@ impl<'a> CreateMessage<'a> {
     ///
     /// Calling this multiple times will overwrite the file list.
     /// To append files, call `add_file` or `add_files` instead.
-    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) {
+    pub fn files<T: Into<AttachmentType>, It: IntoIterator<Item=T>>(&mut self, files: It) {
         self.2 = files.into_iter().map(|f| f.into()).collect();
     }
 }
 
-impl<'a> Default for CreateMessage<'a> {
+impl Default for CreateMessage {
     /// Creates a map for sending a [`Message`], setting [`tts`] to `false` by
     /// default.
     ///
     /// [`Message`]: ../model/channel/struct.Message.html
     /// [`tts`]: #method.tts
-    fn default() -> CreateMessage<'a> {
+    fn default() -> CreateMessage {
         let mut map = VecMap::new();
         map.insert("tts", Value::Bool(false));
 

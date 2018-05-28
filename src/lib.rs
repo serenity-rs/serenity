@@ -107,13 +107,15 @@ extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
 
-#[cfg(feature = "lazy_static")]
-#[macro_use]
-extern crate lazy_static;
-
 extern crate chrono;
-extern crate parking_lot;
+extern crate futures;
 extern crate serde;
+extern crate tokio_core;
+extern crate tokio_timer;
+extern crate tokio_tls;
+extern crate tokio_tungstenite;
+extern crate tungstenite;
+extern crate url;
 
 #[cfg(feature = "base64")]
 extern crate base64;
@@ -123,8 +125,10 @@ extern crate byteorder;
 extern crate flate2;
 #[cfg(feature = "hyper")]
 extern crate hyper;
-#[cfg(feature = "hyper-native-tls")]
-extern crate hyper_native_tls;
+#[cfg(feature = "hyper-multipart-rfc7578")]
+extern crate hyper_multipart_rfc7578;
+#[cfg(feature = "hyper-tls")]
+extern crate hyper_tls;
 #[cfg(feature = "multipart")]
 extern crate multipart;
 #[cfg(feature = "native-tls")]
@@ -172,40 +176,3 @@ pub use error::{Error, Result};
 
 #[cfg(feature = "client")]
 pub use client::Client;
-
-#[cfg(feature = "cache")]
-use cache::Cache;
-#[cfg(feature = "cache")]
-use parking_lot::RwLock;
-
-#[cfg(feature = "cache")]
-lazy_static! {
-    /// A mutable and lazily-initialized static binding. It can be accessed
-    /// across any function and in any context.
-    ///
-    /// This [`Cache`] instance is updated for every event received, so you do
-    /// not need to maintain your own cache.
-    ///
-    /// See the [cache module documentation] for more details.
-    ///
-    /// The Cache itself is wrapped within an `RwLock`, which allows for
-    /// multiple readers or at most one writer at a time across threads. This
-    /// means that you may have multiple commands reading from the Cache
-    /// concurrently.
-    ///
-    /// # Examples
-    ///
-    /// Retrieve the [current user][`CurrentUser`]'s Id, by opening a Read
-    /// guard:
-    ///
-    /// ```rust,ignore
-    /// use serenity::CACHE;
-    ///
-    /// println!("{}", CACHE.read().user.id);
-    /// ```
-    ///
-    /// [`CurrentUser`]: model/struct.CurrentUser.html
-    /// [`Cache`]: cache/struct.Cache.html
-    /// [cache module documentation]: cache/index.html
-    pub static ref CACHE: RwLock<Cache> = RwLock::new(Cache::default());
-}

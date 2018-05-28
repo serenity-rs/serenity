@@ -260,7 +260,6 @@ __impl_bitflags! {
     }
 }
 
-#[cfg(feature = "model")]
 impl Permissions {
     /// Shorthand for checking that the set of permissions contains the
     /// [Add Reactions] permission.

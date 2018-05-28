@@ -16,15 +16,12 @@
 
 pub use error::Error as SerenityError;
 pub use model::misc::Mentionable;
-pub use parking_lot::{Mutex, RwLock};
+pub use model::ModelError;
 
+// todo re-add EventHandler, Context re-exports
 #[cfg(feature = "client")]
-pub use client::{Client, ClientError as ClientError, Context, EventHandler};
-#[cfg(feature = "gateway")]
-pub use gateway::GatewayError;
+pub use client::{Client, ClientError as ClientError};
 #[cfg(feature = "http")]
 pub use http::HttpError;
-#[cfg(feature = "model")]
-pub use model::ModelError;
 #[cfg(feature = "voice")]
 pub use voice::VoiceError;

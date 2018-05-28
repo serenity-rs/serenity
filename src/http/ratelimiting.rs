@@ -38,41 +38,156 @@
 //! differentiating between different ratelimits.
 //!
 //! [Taken from]: https://discordapp.com/developers/docs/topics/rate-limits#rate-limits
-#![allow(zero_ptr)]
+#![cfg_attr(feature = "cargo-clippy", allow(zero_ptr))]
 
 use chrono::{DateTime, Utc};
-use hyper::client::{RequestBuilder, Response};
+use futures::sync::oneshot::{self, Receiver, Sender};
+use futures::{Future, future};
+use hyper::client::{Response};
 use hyper::header::Headers;
-use hyper::status::StatusCode;
-use internal::prelude::*;
-use parking_lot::Mutex;
-use std::{
-    collections::HashMap,
-    sync::Arc,
-    time::Duration,
-    str, 
-    thread, 
-    i64
-};
-use super::{HttpError, LightMethod};
+use hyper::StatusCode;
+use std::cell::RefCell;
+use std::collections::{HashMap, VecDeque};
+use std::error::Error as StdError;
+use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::rc::Rc;
+use std::time::Duration;
+use std::{i64, str, u8};
+use super::{Error, Path, Result};
+use tokio_core::reactor::Handle;
+use tokio_timer::Timer;
 
-/// The calculated offset of the time difference between Discord and the client
-/// in seconds.
-///
-/// This does not have millisecond precision as calculating that isn't
-/// realistic.
-///
-/// This is used in ratelimiting to help determine how long to wait for
-/// pre-emptive ratelimits. For example, if the client is 2 seconds ahead, then
-/// the client would think the ratelimit is over 2 seconds before it actually is
-/// and would then send off queued requests. Using an offset, we can know that
-/// there's actually still 2 seconds left (+/- some milliseconds).
-///
-/// This isn't a definitive solution to fix all problems, but it can help with
-/// some precision gains.
-static mut OFFSET: Option<i64> = None;
+#[derive(Debug)]
+pub enum RateLimitError {
+    /// When the decoding of a header could not be properly decoded as UTF-8.
+    DecodingUtf8,
+    /// When the decoding of a header could not be properly decoded as an `i64`.
+    DecodingInteger,
+}
 
-lazy_static! {
+impl Display for RateLimitError {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        f.write_str(self.description())
+    }
+}
+
+impl StdError for RateLimitError {
+    fn description(&self) -> &str {
+        use self::RateLimitError::*;
+
+        match *self {
+            DecodingInteger => "Error decoding a header into an i64",
+            DecodingUtf8 => "Error decoding a header from UTF-8",
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum RateLimit {
+    Global(i64),
+    NotReached(RateLimitHeaders),
+    Reached(i64),
+}
+
+impl RateLimit {
+    fn from_headers(headers: &Headers) -> Result<Self> {
+        if headers.get_raw("x-ratelimit-global").is_some() {
+            if let Some(retry_after) = parse_header(headers, "retry-after")? {
+                debug!("Global ratelimited for {}ms", retry_after);
+
+                return Ok(RateLimit::Global(retry_after));
+            }
+
+            warn!("Globally ratelimited with no retry-after? Skipping...");
+        }
+
+        if let Some(retry_after) = parse_header(headers, "retry-after")? {
+            return Ok(RateLimit::Reached(retry_after));
+        }
+
+        let limit = parse_header(headers, "x-ratelimit-limit")?.map(|x| x as u8);
+        let remaining = parse_header(headers, "x-ratelimit-remaining")?.map(|x| x as u8);
+        let reset = parse_header(headers, "x-ratelimit-remaining")?;
+
+        Ok(RateLimit::NotReached(RateLimitHeaders {
+            limit,
+            remaining,
+            reset,
+        }))
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct RateLimitHeaders {
+    pub limit: Option<u8>,
+    pub remaining: Option<u8>,
+    pub reset: Option<i64>,
+}
+
+/// A set of data containing information about the ratelimits for a particular
+/// [`Route`], which is stored in the [`ROUTES`] mutex.
+///
+/// See the [Discord docs] on ratelimits for more information.
+///
+/// **Note**: You should _not_ mutate any of the fields, as this can cause 429s.
+///
+/// [`ROUTES`]: struct.ROUTES.html
+/// [`Route`]: enum.Route.html
+/// [Discord docs]: https://discordapp.com/developers/docs/topics/rate-limits
+// todo: impl Debug
+#[derive(Debug)]
+pub struct Bucket {
+    /// The total number of requests that can be made in a period of time.
+    pub limit: i64,
+    /// A queue of requests that were held back due to a pre-emptive ratelimit.
+    pub queue: VecDeque<Sender<()>>,
+    /// The number of requests remaining in the period of time.
+    pub remaining: i64,
+    /// When the interval resets and the [`limit`] resets to the value of
+    /// [`remaining`].
+    ///
+    /// [`limit`]: #structfield.limit
+    /// [`remaining`]: #structfield.remaining
+    pub reset: i64,
+    /// Whether the bucket has a timeout in the background to release (part of)
+    /// the queue.
+    pub timeout: bool,
+}
+
+impl Default for Bucket {
+    fn default() -> Self {
+        Self {
+            limit: i64::MAX,
+            queue: VecDeque::new(),
+            remaining: i64::MAX,
+            reset: i64::MAX,
+            timeout: false,
+        }
+    }
+}
+
+impl Bucket {
+    fn take(&mut self) -> Option<Receiver<()>> {
+        if self.reset == 0 {
+            let (tx, rx) = oneshot::channel();
+
+            self.queue.push_back(tx);
+
+            Some(rx)
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct Global {
+    pub blocked: bool,
+    pub queue: Rc<RefCell<VecDeque<Receiver<()>>>>,
+}
+
+#[derive(Clone, Debug)]
+pub struct RateLimiter {
     /// The global mutex is a mutex unlocked and then immediately re-locked
     /// prior to every request, to abide by Discord's global ratelimit.
     ///
@@ -87,7 +202,24 @@ lazy_static! {
     /// The only reason that you would need to use the global mutex is to
     /// block requests yourself. This has the side-effect of potentially
     /// blocking many of your event handlers or framework commands.
-    pub static ref GLOBAL: Arc<Mutex<()>> = Arc::new(Mutex::new(()));
+    pub global: Rc<RefCell<Global>>,
+    /// A handle to the core that this is running on.
+    pub handle: Handle,
+    /// The calculated offset of the time difference between Discord and the client
+    /// in seconds.
+    ///
+    /// This does not have millisecond precision as calculating that isn't
+    /// realistic.
+    ///
+    /// This is used in ratelimiting to help determine how long to wait for
+    /// pre-emptive ratelimits. For example, if the client is 2 seconds ahead, then
+    /// the client would think the ratelimit is over 2 seconds before it actually is
+    /// and would then send off queued requests. Using an offset, we can know that
+    /// there's actually still 2 seconds left (+/- some milliseconds).
+    ///
+    /// This isn't a definitive solution to fix all problems, but it can help with
+    /// some precision gains.
+    offset: Option<i64>,
     /// The routes mutex is a HashMap of each [`Route`] and their respective
     /// ratelimit information.
     ///
@@ -108,269 +240,122 @@ lazy_static! {
     ///
     /// [`RateLimit`]: struct.RateLimit.html
     /// [`Route`]: enum.Route.html
-    pub static ref ROUTES: Arc<Mutex<HashMap<Route, Arc<Mutex<RateLimit>>>>> = {
-        Arc::new(Mutex::new(HashMap::default()))
-    };
+    pub routes: Rc<RefCell<HashMap<Path, Bucket>>>,
 }
 
-/// A representation of all routes registered within the library. These are safe
-/// and memory-efficient representations of each path that functions exist for
-/// in the [`http`] module.
-///
-/// [`http`]: ../index.html
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub enum Route {
-    /// Route for the `/channels/:channel_id` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsId(u64),
-    /// Route for the `/channels/:channel_id/invites` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdInvites(u64),
-    /// Route for the `/channels/:channel_id/messages` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdMessages(u64),
-    /// Route for the `/channels/:channel_id/messages/bulk-delete` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdMessagesBulkDelete(u64),
-    /// Route for the `/channels/:channel_id/messages/:message_id` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    // This route is a unique case. The ratelimit for message _deletions_ is
-    // different than the overall route ratelimit.
-    //
-    // Refer to the docs on [Rate Limits] in the yellow warning section.
-    //
-    // Additionally, this needs to be a `LightMethod` from the parent module
-    // and _not_ a `hyper` `Method` due to `hyper`'s not deriving `Copy`.
-    //
-    // [Rate Limits]: https://discordapp.com/developers/docs/topics/rate-limits
-    ChannelsIdMessagesId(LightMethod, u64),
-    /// Route for the `/channels/:channel_id/messages/:message_id/ack` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdMessagesIdAck(u64),
-    /// Route for the `/channels/:channel_id/messages/:message_id/reactions`
-    /// path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdMessagesIdReactions(u64),
-    /// Route for the
-    /// `/channels/:channel_id/messages/:message_id/reactions/:reaction/@me`
-    /// path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdMessagesIdReactionsUserIdType(u64),
-    /// Route for the `/channels/:channel_id/permissions/:target_id` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdPermissionsOverwriteId(u64),
-    /// Route for the `/channels/:channel_id/pins` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdPins(u64),
-    /// Route for the `/channels/:channel_id/pins/:message_id` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdPinsMessageId(u64),
-    /// Route for the `/channels/:channel_id/typing` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdTyping(u64),
-    /// Route for the `/channels/:channel_id/webhooks` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdWebhooks(u64),
-    /// Route for the `/gateway` path.
-    Gateway,
-    /// Route for the `/gateway/bot` path.
-    GatewayBot,
-    /// Route for the `/guilds` path.
-    Guilds,
-    /// Route for the `/guilds/:guild_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsId(u64),
-    /// Route for the `/guilds/:guild_id/bans` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdBans(u64),
-    /// Route for the `/guilds/:guild_id/audit-logs` path.
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdAuditLogs(u64),
-    /// Route for the `/guilds/:guild_id/bans/:user_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdBansUserId(u64),
-    /// Route for the `/guilds/:guild_id/channels/:channel_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdChannels(u64),
-    /// Route for the `/guilds/:guild_id/embed` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdEmbed(u64),
-    /// Route for the `/guilds/:guild_id/emojis` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdEmojis(u64),
-    /// Route for the `/guilds/:guild_id/emojis/:emoji_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdEmojisId(u64),
-    /// Route for the `/guilds/:guild_id/integrations` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdIntegrations(u64),
-    /// Route for the `/guilds/:guild_id/integrations/:integration_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdIntegrationsId(u64),
-    /// Route for the `/guilds/:guild_id/integrations/:integration_id/sync`
-    /// path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdIntegrationsIdSync(u64),
-    /// Route for the `/guilds/:guild_id/invites` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdInvites(u64),
-    /// Route for the `/guilds/:guild_id/members` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdMembers(u64),
-    /// Route for the `/guilds/:guild_id/members/:user_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdMembersId(u64),
-    /// Route for the `/guilds/:guild_id/members/:user_id/roles/:role_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdMembersIdRolesId(u64),
-    /// Route for the `/guilds/:guild_id/members/@me/nick` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdMembersMeNick(u64),
-    /// Route for the `/guilds/:guild_id/prune` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdPrune(u64),
-    /// Route for the `/guilds/:guild_id/regions` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdRegions(u64),
-    /// Route for the `/guilds/:guild_id/roles` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdRoles(u64),
-    /// Route for the `/guilds/:guild_id/roles/:role_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdRolesId(u64),
-    /// Route for the `/guilds/:guild_id/vanity-url` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdVanityUrl(u64),
-    /// Route for the `/guilds/:guild_id/webhooks` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdWebhooks(u64),
-    /// Route for the `/invites/:code` path.
-    InvitesCode,
-    /// Route for the `/users/:user_id` path.
-    UsersId,
-    /// Route for the `/users/@me` path.
-    UsersMe,
-    /// Route for the `/users/@me/channels` path.
-    UsersMeChannels,
-    /// Route for the `/users/@me/guilds` path.
-    UsersMeGuilds,
-    /// Route for the `/users/@me/guilds/:guild_id` path.
-    UsersMeGuildsId,
-    /// Route for the `/voice/regions` path.
-    VoiceRegions,
-    /// Route for the `/webhooks/:webhook_id` path.
-    WebhooksId(u64),
-    /// Route where no ratelimit headers are in place.
-    ///
-    /// This is a special case, in that if the route is `None` then pre- and
-    /// post-hooks are not executed.
-    None,
+impl RateLimiter {
+    pub fn new(handle: Handle) -> Self {
+        Self {
+            global: Rc::new(RefCell::new(Global::default())),
+            offset: None,
+            routes: Rc::new(RefCell::new(HashMap::new())),
+            handle,
+        }
+    }
+
+    pub fn take(&mut self, route: &Path)
+        -> Box<Future<Item = (), Error = Error>> {
+        // TODO: handle global
+        let mut routes = self.routes.borrow_mut();
+        let bucket = routes.entry(*route).or_insert_with(Default::default);
+        let take = bucket.take();
+
+        match take {
+            Some(rx) => {
+                if !bucket.timeout {
+                    let reset_ms = (bucket.reset * 1000) as u64;
+                    let now = Utc::now();
+                    let now_millis = now.timestamp_subsec_millis() as i64;
+                    let now_ms = (now.timestamp() * 1000) + now_millis;
+                    let wait_ms = reset_ms.saturating_sub(now_ms as u64);
+                    let duration = Duration::from_millis(wait_ms as u64);
+
+                    let done = Timer::default()
+                        .sleep(duration)
+                        .map(|_| {
+                            ()
+                        }).map_err(|why| {
+                            warn!("Err with pre-ratelimit sleep: {:?}", why);
+
+                            ()
+                        });
+
+                    self.handle.spawn(done);
+                }
+
+                Box::new(rx.from_err())
+            },
+            None => Box::new(future::ok(())),
+        }
+    }
+
+    pub fn handle<'a>(&'a mut self, route: &'a Path, response: &'a Response)
+        -> Result<Option<Box<Future<Item = (), Error = ()>>>> {
+        let mut routes = self.routes.borrow_mut();
+        let bucket = routes.entry(*route).or_insert_with(Default::default);
+
+        if response.status() != StatusCode::TooManyRequests {
+            return Ok(None);
+        }
+
+        Ok(match RateLimit::from_headers(&response.headers())? {
+            RateLimit::Global(millis) => {
+                debug!("Globally ratelimited for {:?}ms", millis);
+
+                self.global.borrow_mut().blocked = true;
+                let global = Rc::clone(&self.global);
+
+                let done = Timer::default()
+                    .sleep(Duration::from_millis(millis as u64))
+                    .map(move |_| {
+                        let mut global = global.borrow_mut();
+                        global.blocked = false;
+                    })
+                    .map_err(|why| {
+                        warn!("Err with global ratelimit timer: {:?}", why);
+
+                        ()
+                    });
+
+                Some(Box::new(done))
+            },
+            RateLimit::NotReached(headers) => {
+                let RateLimitHeaders { limit, remaining, reset } = headers;
+
+                if let Some(reset) = reset {
+                    if reset != bucket.reset {
+                        bucket.reset = reset;
+
+                        if let Some(limit) = limit {
+                            bucket.limit = limit as i64;
+                        }
+
+                        if let Some(remaining) = remaining {
+                            bucket.remaining = remaining as i64;
+                        }
+                    }
+                }
+
+                None
+            },
+            RateLimit::Reached(millis) => {
+                debug!("Ratelimited on route {:?} for {:?}ms", route, millis);
+
+                let done = Timer::default()
+                    .sleep(Duration::from_millis(millis as u64))
+                    .map_err(|why| {
+                        warn!("Err with ratelimited timer: {:?}", why);
+
+                        ()
+                    });
+
+                Some(Box::new(done))
+            },
+        })
+    }
 }
 
+/*
 pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
     where F: Fn() -> RequestBuilder<'a> {
     loop {
@@ -538,8 +523,11 @@ impl RateLimit {
         })
     }
 }
+*/
 
-fn calculate_offset(header: Option<&[Vec<u8>]>) {
+#[allow(dead_code)]
+// todo
+fn calculate_offset(header: Option<&[Vec<u8>]>) -> Option<i64> {
     // Get the current time as soon as possible.
     let now = Utc::now().timestamp();
 
@@ -560,23 +548,32 @@ fn calculate_offset(header: Option<&[Vec<u8>]>) {
 
             let diff = offset - now;
 
-            unsafe {
-                OFFSET = Some(diff);
+            debug!("[ratelimiting] Set the ratelimit offset to {}", diff);
 
-                debug!("[ratelimiting] Set the ratelimit offset to {}", diff);
-            }
+            return Some(diff);
         }
     }
+
+    None
 }
 
-fn parse_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
-    headers.get_raw(header).map_or(Ok(None), |header| {
+fn parse_header(headers: &Headers, header_raw: &str) -> Result<Option<i64>> {
+    headers.get_raw(header_raw).map_or(Ok(None), |header| {
         str::from_utf8(&header[0])
-            .map_err(|_| Error::Http(HttpError::RateLimitUtf8))
+            .map_err(|why| {
+                warn!("Error parsing {} as utf8: {:?}", header_raw, why);
+
+                RateLimitError::DecodingUtf8
+            })
             .and_then(|v| {
                 v.parse::<i64>()
                     .map(Some)
-                    .map_err(|_| Error::Http(HttpError::RateLimitI64))
+                    .map_err(|why| {
+                        warn!("Error parsing {}: {:?} to i64", header_raw, why);
+
+                        RateLimitError::DecodingInteger
+                    })
             })
+            .map_err(From::from)
     })
 }

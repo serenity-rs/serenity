@@ -1,11 +1,7 @@
 use model::prelude::*;
 
-#[cfg(all(feature = "builder", feature = "model"))]
-use builder::EditChannel;
-#[cfg(all(feature = "builder", feature = "model"))]
-use http;
-#[cfg(all(feature = "model", feature = "utils"))]
-use utils::{self as serenity_utils, VecMap};
+#[cfg(feature = "utils")]
+use utils as serenity_utils;
 
 /// A category of [`GuildChannel`]s.
 ///
@@ -37,94 +33,7 @@ pub struct ChannelCategory {
     pub permission_overwrites: Vec<PermissionOverwrite>,
 }
 
-#[cfg(feature = "model")]
 impl ChannelCategory {
-    /// Adds a permission overwrite to the category's channels.
-    #[inline]
-    pub fn create_permission(&self, target: &PermissionOverwrite) -> Result<()> {
-        self.id.create_permission(target)
-    }
-
-    /// Deletes all permission overrides in the category from the channels.
-    ///
-    /// **Note**: Requires the [Manage Channel] permission.
-    ///
-    /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
-    #[inline]
-    pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
-        self.id.delete_permission(permission_type)
-    }
-
-    /// Deletes this category.
-    #[inline]
-    pub fn delete(&self) -> Result<()> {
-        #[cfg(feature = "cache")]
-        {
-            let req = Permissions::MANAGE_CHANNELS;
-
-            if !utils::user_has_perms(self.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
-            }
-        }
-
-        self.id.delete().map(|_| ())
-    }
-
-    /// Modifies the category's settings, such as its position or name.
-    ///
-    /// Refer to `EditChannel`s documentation for a full list of methods.
-    ///
-    /// # Examples
-    ///
-    /// Change a voice channels name and bitrate:
-    ///
-    /// ```rust,ignore
-    /// category.edit(|c| c.name("test").bitrate(86400));
-    /// ```
-    #[cfg(all(feature = "builder", feature = "model", feature = "utils"))]
-    pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(EditChannel) -> EditChannel {
-        #[cfg(feature = "cache")]
-        {
-            let req = Permissions::MANAGE_CHANNELS;
-
-            if !utils::user_has_perms(self.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
-            }
-        }
-
-        let mut map = VecMap::new();
-        map.insert("name", Value::String(self.name.clone()));
-        map.insert("position", Value::Number(Number::from(self.position)));
-        map.insert("type", Value::String(self.kind.name().to_string()));
-
-        let map = serenity_utils::vecmap_to_json_map(f(EditChannel(map)).0);
-
-        http::edit_channel(self.id.0, &map).map(|channel| {
-            let GuildChannel {
-                id,
-                category_id,
-                permission_overwrites,
-                nsfw,
-                name,
-                position,
-                kind,
-                ..
-            } = channel;
-
-            *self = ChannelCategory {
-                id,
-                category_id,
-                permission_overwrites,
-                nsfw,
-                name,
-                position,
-                kind,
-            };
-            ()
-        })
-    }
-
     #[cfg(feature = "utils")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {

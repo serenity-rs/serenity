@@ -79,6 +79,9 @@ pub enum Error {
     /// When attempting to delete below or above the minimum and maximum allowed
     /// number of messages.
     BulkDeleteAmount,
+    /// The client wasn't present on the model when it was expected to be, e.g.
+    /// when performing a cache or HTTP operation on it.
+    ClientNotPresent,
     /// When attempting to delete a number of days' worth of messages that is
     /// not allowed.
     DeleteMessageDaysAmount(u8),
@@ -137,6 +140,7 @@ impl StdError for Error {
     fn description(&self) -> &str {
         match *self {
             Error::BulkDeleteAmount => "Too few/many messages to bulk delete",
+            Error::ClientNotPresent => "The client wasn't present on the model",
             Error::DeleteMessageDaysAmount(_) => "Invalid delete message days",
             Error::EmbedTooLarge(_) => "Embed too large",
             Error::GuildNotFound => "Guild not found in the cache",

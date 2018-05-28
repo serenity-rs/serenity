@@ -1,7 +1,6 @@
 //! Miscellaneous helper traits, enums, and structs for models.
 
 use super::prelude::*;
-use internal::RwLockExt;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
@@ -28,9 +27,9 @@ impl Mentionable for ChannelId {
 impl Mentionable for Channel {
     fn mention(&self) -> String {
         match *self {
-            Channel::Guild(ref x) => format!("<#{}>", x.with(|x| x.id.0)),
-            Channel::Private(ref x) => format!("<#{}>", x.with(|x| x.id.0)),
-            Channel::Group(ref x) => format!("<#{}>", x.with(|x| x.channel_id.0)),
+            Channel::Guild(ref x) => format!("<#{}>", x.borrow().id.0),
+            Channel::Private(ref x) => format!("<#{}>", x.borrow().id.0),
+            Channel::Group(ref x) => format!("<#{}>", x.borrow().channel_id.0),
             Channel::Category(_) => panic!("Categories can't be mentioned"),
         }
     }
@@ -44,10 +43,6 @@ impl Mentionable for CurrentUser {
 
 impl Mentionable for Emoji {
     fn mention(&self) -> String { format!("<:{}:{}>", self.name, self.id.0) }
-}
-
-impl Mentionable for Member {
-    fn mention(&self) -> String { format!("<@{}>", self.user.with(|u| u.id.0)) }
 }
 
 impl Mentionable for RoleId {
@@ -90,20 +85,6 @@ impl StdError for UserParseError {
     }
 }
 
-#[cfg(all(feature = "model", feature = "utils"))]
-impl FromStr for User {
-    type Err = UserParseError;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        match utils::parse_username(s) {
-            Some(x) => UserId(x as u64)
-                .get()
-                .map_err(|e| UserParseError::Rest(Box::new(e))),
-            _ => Err(UserParseError::InvalidUsername),
-        }
-    }
-}
-
 macro_rules! impl_from_str {
     (id: $($id:tt, $err:ident;)*) => {
         $(
@@ -142,60 +123,12 @@ macro_rules! impl_from_str {
             }
         )*
     };
-
-    (struct: $($struct:ty, $id:tt, $err:ident, $invalid_variant:tt, $parse_fn:ident, $desc:expr;)*) => {
-        $(
-            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-            #[derive(Debug)]
-            pub enum $err {
-                NotPresentInCache,
-                $invalid_variant,
-            }
-
-            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-            impl fmt::Display for $err {
-                fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.description()) }
-            }
-
-            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-            impl StdError for $err {
-                fn description(&self) -> &str {
-                    use self::$err::*;
-
-                    match *self {
-                        NotPresentInCache => "not present in cache",
-                        $invalid_variant => $desc,
-                    }
-                }
-            }
-
-            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-            impl FromStr for $struct {
-                type Err = $err;
-
-                fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-                    match utils::$parse_fn(s) {
-                        Some(x) => match $id(x).find() {
-                            Some(user) => Ok(user),
-                            _ => Err($err::NotPresentInCache),
-                        },
-                        _ => Err($err::$invalid_variant),
-                    }
-                }
-            }
-        )*
-    };
 }
 
 impl_from_str! { id:
     UserId, UserIdParseError;
     RoleId, RoleIdParseError;
     ChannelId, ChannelIdParseError;
-}
-
-impl_from_str! { struct:
-    Channel, ChannelId, ChannelParseError, InvalidChannel, parse_channel, "invalid channel";
-    Role, RoleId, RoleParseError, InvalidRole, parse_role, "invalid role";
 }
 
 /// A version of an emoji used only when solely the Id and name are known.

@@ -47,32 +47,26 @@
 //! [`Client::start_shards`]: ../struct.Client.html#method.start_shards
 //! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 
-mod error;
 mod shard;
-mod ws_client_ext;
+mod shard_manager;
+mod queue;
 
-pub use self::{
-    error::Error as GatewayError,
-    shard::Shard,
-    ws_client_ext::WebSocketGatewayClientExt
-};
+pub use self::shard::Shard;
+pub use self::shard_manager::{ShardManager, ShardingStrategy, ShardManagerOptions, MessageStream};
+pub use self::queue::{ReconnectQueue, SimpleReconnectQueue};
 
-use model::{
-    gateway::Activity,
-    user::OnlineStatus,
-};
-use serde_json::Value;
+use futures::stream::SplitStream;
+use model::gateway::Activity;
+use model::user::OnlineStatus;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use websocket::sync::{
-    client::Client,
-    stream::{TcpStream, TlsStream}
-};
-
-#[cfg(feature = "client")]
-use client::bridge::gateway::ShardClientMessage;
+use tokio_core::net::TcpStream;
+use tokio_tls::TlsStream;
+use tokio_tungstenite::stream::Stream;
+use tokio_tungstenite::WebSocketStream;
 
 pub type CurrentPresence = (Option<Activity>, OnlineStatus);
-pub type WsClient = Client<TlsStream<TcpStream>>;
+pub type ShardStream =
+    SplitStream<WebSocketStream<Stream<TcpStream, TlsStream<TcpStream>>>>;
 
 /// Indicates the current connection stage of a [`Shard`].
 ///
@@ -169,18 +163,6 @@ impl Display for ConnectionStage {
             Resuming => "resuming",
         })
     }
-}
-
-/// A message to be passed around within the library.
-///
-/// As a user you usually don't need to worry about this, but when working with
-/// the lower-level internals of the `client`, `gateway, and `voice` modules it
-/// may be necessary.
-#[derive(Clone, Debug)]
-pub enum InterMessage {
-    #[cfg(feature = "client")]
-    Client(ShardClientMessage),
-    Json(Value),
 }
 
 pub enum ShardAction {

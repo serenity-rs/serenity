@@ -1,29 +1,28 @@
+use futures::Canceled;
+use hyper::error::UriError;
 use internal::prelude::*;
 use model::ModelError;
 use serde_json::Error as JsonError;
 use std::{
+    cell::{BorrowError, BorrowMutError},
     error::Error as StdError,
-    fmt::{
-        self, 
-        Display, 
-        Error as FormatError
-    },
+    fmt::{self, Display, Error as FormatError},
     io::Error as IoError,
-    num::ParseIntError
+    num::ParseIntError,
 };
 
+#[cfg(feature = "tungstenite")]
+use futures::sync::mpsc::SendError;
 #[cfg(feature = "hyper")]
 use hyper::Error as HyperError;
 #[cfg(feature = "native-tls")]
 use native_tls::Error as TlsError;
 #[cfg(feature = "voice")]
 use opus::Error as OpusError;
-#[cfg(feature = "websocket")]
-use websocket::result::WebSocketError;
+#[cfg(feature = "tungstenite")]
+use tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage};
 #[cfg(feature = "client")]
 use client::ClientError;
-#[cfg(feature = "gateway")]
-use gateway::GatewayError;
 #[cfg(feature = "http")]
 use http::HttpError;
 #[cfg(feature = "voice")]
@@ -53,6 +52,12 @@ pub type Result<T> = StdResult<T, Error>;
 /// [`Result`]: type.Result.html
 #[derive(Debug)]
 pub enum Error {
+    /// A cell could not be immutably borrowed.
+    Borrow(BorrowError),
+    /// An error occurred while mutably borrowing from an `std::cell::RefCell`.
+    BorrowMut(BorrowMutError),
+    /// A future was canceled, most likely reading from an mpsc channel.
+    Canceled(Canceled),
     /// An error while decoding a payload.
     Decode(&'static str, Value),
     /// There was an error with a format.
@@ -79,6 +84,8 @@ pub enum Error {
     ///
     /// [`Error::Decode`]: #variant.Decode
     Other(&'static str),
+    /// A `hyper` error while parsing a Uri.
+    Uri(UriError),
     /// An error from the `url` crate.
     Url(String),
     /// A [client] error.
@@ -86,9 +93,6 @@ pub enum Error {
     /// [client]: client/index.html
     #[cfg(feature = "client")]
     Client(ClientError),
-    /// An error from the `gateway` module.
-    #[cfg(feature = "gateway")]
-    Gateway(GatewayError),
     /// An error from the [`http`] module.
     ///
     /// [`http`]: http/index.html
@@ -100,9 +104,12 @@ pub enum Error {
     /// An error from the `native-tls` crate.
     #[cfg(feature = "native-tls")]
     Tls(TlsError),
-    /// An error from the `rust-websocket` crate.
-    #[cfg(feature = "gateway")]
-    WebSocket(WebSocketError),
+    /// An error while sending a message over a WebSocket.
+    #[cfg(feature = "tungstenite")]
+    WebSocketSend(SendError<TungsteniteMessage>),
+    /// An error from the `tungstenite` crate.
+    #[cfg(feature = "tungstenite")]
+    Tungstenite(TungsteniteError),
     /// An error from the `opus` crate.
     #[cfg(feature = "voice")]
     Opus(OpusError),
@@ -113,13 +120,25 @@ pub enum Error {
     Voice(VoiceError),
 }
 
+impl From<BorrowError> for Error {
+    fn from(e: BorrowError) -> Error { Error::Borrow(e) }
+}
+
+impl From<BorrowMutError> for Error {
+    fn from(e: BorrowMutError) -> Error { Error::BorrowMut(e) }
+}
+
+impl From<Canceled> for Error {
+    fn from(e: Canceled) -> Error { Error::Canceled(e) }
+}
+
 impl From<FormatError> for Error {
     fn from(e: FormatError) -> Error { Error::Format(e) }
 }
 
-#[cfg(feature = "gateway")]
-impl From<GatewayError> for Error {
-    fn from(e: GatewayError) -> Error { Error::Gateway(e) }
+#[cfg(feature = "http")]
+impl From<HttpError> for Error {
+    fn from(e: HttpError) -> Error { Error::Http(e) }
 }
 
 #[cfg(feature = "hyper")]
@@ -148,14 +167,27 @@ impl From<OpusError> for Error {
     fn from(e: OpusError) -> Error { Error::Opus(e) }
 }
 
+#[cfg(feature = "tungstenite")]
+impl From<SendError<TungsteniteMessage>> for Error {
+    fn from(err: SendError<TungsteniteMessage>) -> Self {
+        Error::WebSocketSend(err)
+    }
+}
+
 #[cfg(feature = "native-tls")]
 impl From<TlsError> for Error {
     fn from(e: TlsError) -> Error { Error::Tls(e) }
 }
 
-#[cfg(feature = "gateway")]
-impl From<WebSocketError> for Error {
-    fn from(e: WebSocketError) -> Error { Error::WebSocket(e) }
+#[cfg(feature = "tungstenite")]
+impl From<TungsteniteError> for Error {
+    fn from(err: TungsteniteError) -> Self {
+        Error::Tungstenite(err)
+    }
+}
+
+impl From<UriError> for Error {
+    fn from(e: UriError) -> Error { Error::Uri(e) }
 }
 
 impl Display for Error {
@@ -167,6 +199,9 @@ impl Display for Error {
 impl StdError for Error {
     fn description(&self) -> &str {
         match *self {
+            Error::Borrow(ref inner) => inner.description(),
+            Error::BorrowMut(ref inner) => inner.description(),
+            Error::Canceled(ref inner) => inner.description(),
             Error::Decode(msg, _) | Error::Other(msg) => msg,
             Error::ExceededLimit(..) => "Input exceeded a limit",
             Error::Format(ref inner) => inner.description(),
@@ -175,10 +210,9 @@ impl StdError for Error {
             Error::Model(ref inner) => inner.description(),
             Error::Num(ref inner) => inner.description(),
             Error::Url(ref inner) => inner,
+            Error::Uri(ref inner) => inner.description(),
             #[cfg(feature = "client")]
             Error::Client(ref inner) => inner.description(),
-            #[cfg(feature = "gateway")]
-            Error::Gateway(ref inner) => inner.description(),
             #[cfg(feature = "http")]
             Error::Http(ref inner) => inner.description(),
             #[cfg(feature = "http")]
@@ -187,10 +221,12 @@ impl StdError for Error {
             Error::Opus(ref inner) => inner.description(),
             #[cfg(feature = "native-tls")]
             Error::Tls(ref inner) => inner.description(),
+            #[cfg(feature = "tungstenite")]
+            Error::Tungstenite(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Voice(_) => "Voice error",
-            #[cfg(feature = "gateway")]
-            Error::WebSocket(ref inner) => inner.description(),
+            #[cfg(feature = "tungstenite")]
+            Error::WebSocketSend(ref inner) => inner.description(),
         }
     }
 
@@ -200,8 +236,6 @@ impl StdError for Error {
             Error::Hyper(ref inner) => Some(inner),
             Error::Json(ref inner) => Some(inner),
             Error::Io(ref inner) => Some(inner),
-            #[cfg(feature = "gateway")]
-            Error::WebSocket(ref inner) => Some(inner),
             _ => None,
         }
     }

@@ -24,11 +24,6 @@ use std::{
     path::Path
 };
 
-#[cfg(feature = "cache")]
-use cache::Cache;
-#[cfg(feature = "cache")]
-use CACHE;
-
 /// Converts a HashMap into a final `serde_json::Map` representation.
 pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>)
     -> Map<String, Value> where H: BuildHasher, T: Eq + Hash + ToString {
@@ -461,45 +456,3 @@ pub fn parse_quotes(s: &str) -> Vec<String> {
 /// ```
 #[inline]
 pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % shard_count }
-
-/// A function for doing automatic `read`ing (and the releasing of the guard as well)
-/// This is particularly useful if you just want to use the cache for this one time,
-/// or don't want to be messing with the `RwLock` directly.
-///
-/// # Examples
-///
-/// Return the bot's id
-///
-/// ```rust,ignore
-/// use serenity::utils;
-///
-/// // assuming that the id is `1234`:
-/// assert_eq!(1234, utils::with_cache(|cache| cache.user.id));
-/// ```
-#[cfg(feature = "cache")]
-pub fn with_cache<T, F>(f: F) -> T
-    where F: Fn(&Cache) -> T {
-    let cache = CACHE.read();
-    f(&cache)
-}
-
-/// Like [`with_cache`] but as the name says, allows for modifications to be done.
-///
-/// # Examples
-///
-/// Return the bot's id, and changes the shard count
-///
-/// ```rust,ignore
-/// use serenity::utils;
-///
-/// // assuming that the id is `1234`:
-/// assert_eq!(1234, utils::with_cache_mut(|cache| { cache.shard_count = 8; cache.user.id }));
-/// ```
-///
-/// [`with_cache`]: #fn.with_cache
-#[cfg(feature = "cache")]
-pub fn with_cache_mut<T, F>(mut f: F) -> T
-    where F: FnMut(&mut Cache) -> T {
-    let mut cache = CACHE.write();
-    f(&mut cache)
-}

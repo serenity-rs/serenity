@@ -42,21 +42,20 @@
 //! [`CACHE`]: ../struct.CACHE.html
 //! [`http`]: ../http/index.html
 
+pub mod cache_update;
+
 use model::prelude::*;
-use parking_lot::RwLock;
-use std::collections::{
-    hash_map::Entry, 
-    HashMap, 
-    HashSet
-};
+use self::cache_update::CacheUpdate;
 use std::{
+    cell::RefCell,
+    collections::{
+        hash_map::Entry,
+        HashMap,
+        HashSet,
+    },
     default::Default,
-    sync::Arc
+    rc::Rc,
 };
-
-mod cache_update;
-
-pub(crate) use self::cache_update::*;
 
 /// A cache of all events received over a [`Shard`], where storing at least
 /// some data from the event is possible.
@@ -82,21 +81,21 @@ pub struct Cache {
     /// [`Event::GuildDelete`]: ../model/event/struct.GuildDeleteEvent.html
     /// [`Event::GuildUnavailable`]: ../model/event/struct.GuildUnavailableEvent.html
     /// [`Guild`]: ../model/guild/struct.Guild.html
-    pub channels: HashMap<ChannelId, Arc<RwLock<GuildChannel>>>,
+    pub channels: HashMap<ChannelId, Rc<RefCell<GuildChannel>>>,
     /// A map of channel categories.
-    pub categories: HashMap<ChannelId, Arc<RwLock<ChannelCategory>>>,
+    pub categories: HashMap<ChannelId, Rc<RefCell<ChannelCategory>>>,
     /// A map of the groups that the current user is in.
     ///
     /// For bot users this will always be empty, except for in [special cases].
     ///
     /// [special cases]: index.html#special-cases-in-the-cache
-    pub groups: HashMap<ChannelId, Arc<RwLock<Group>>>,
+    pub groups: HashMap<ChannelId, Rc<RefCell<Group>>>,
     /// A map of guilds with full data available. This includes data like
     /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
     ///
     /// [`Emoji`]: ../model/guild/struct.Emoji.html
     /// [`Role`]: ../model/guild/struct.Role.html
-    pub guilds: HashMap<GuildId, Arc<RwLock<Guild>>>,
+    pub guilds: HashMap<GuildId, Rc<RefCell<Guild>>>,
     /// A map of notes that a user has made for individual users.
     ///
     /// An empty note is equivalent to having no note, and creating an empty
@@ -107,10 +106,10 @@ pub struct Cache {
     /// A map of users' presences. This is updated in real-time. Note that
     /// status updates are often "eaten" by the gateway, and this should not
     /// be treated as being entirely 100% accurate.
-    pub presences: HashMap<UserId, Presence>,
+    pub presences: HashMap<UserId, Rc<RefCell<Presence>>>,
     /// A map of direct message channels that the current user has open with
     /// other users.
-    pub private_channels: HashMap<ChannelId, Arc<RwLock<PrivateChannel>>>,
+    pub private_channels: HashMap<ChannelId, Rc<RefCell<PrivateChannel>>>,
     /// The total number of shards being used by the bot.
     pub shard_count: u64,
     /// A list of guilds which are "unavailable". Refer to the documentation for
@@ -159,7 +158,7 @@ pub struct Cache {
     /// [`GuildSyncEvent`]: ../model/event/struct.GuildSyncEvent.html
     /// [`PresenceUpdateEvent`]: ../model/event/struct.PresenceUpdateEvent.html
     /// [`ReadyEvent`]: ../model/event/struct.ReadyEvent.html
-    pub users: HashMap<UserId, Arc<RwLock<User>>>,
+    pub users: HashMap<UserId, Rc<RefCell<User>>>,
 }
 
 impl Cache {
@@ -217,7 +216,7 @@ impl Cache {
         let mut total = 0;
 
         for guild in self.guilds.values() {
-            let guild = guild.read();
+            let guild = guild.borrow();
 
             let members = guild.members.len() as u64;
 
@@ -324,15 +323,15 @@ impl Cache {
         let id = id.into();
 
         if let Some(channel) = self.channels.get(&id) {
-            return Some(Channel::Guild(Arc::clone(channel)));
+            return Some(Channel::Guild(Rc::clone(channel)));
         }
 
         if let Some(private_channel) = self.private_channels.get(&id) {
-            return Some(Channel::Private(Arc::clone(private_channel)));
+            return Some(Channel::Private(Rc::clone(private_channel)));
         }
 
         if let Some(group) = self.groups.get(&id) {
-            return Some(Channel::Group(Arc::clone(group)));
+            return Some(Channel::Group(Rc::clone(group)));
         }
 
         None
@@ -366,7 +365,7 @@ impl Cache {
     /// # }
     /// ```
     #[inline]
-    pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<Arc<RwLock<Guild>>> {
+    pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<Rc<RefCell<Guild>>> {
         self.guilds.get(&id.into()).cloned()
     }
 
@@ -423,7 +422,7 @@ impl Cache {
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [`channel`]: #method.channel
     #[inline]
-    pub fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<GuildChannel>>> {
+    pub fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Rc<RefCell<GuildChannel>>> {
         self.channels.get(&id.into()).cloned()
     }
 
@@ -457,7 +456,7 @@ impl Cache {
     /// # }
     /// ```
     #[inline]
-    pub fn group<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<Group>>> {
+    pub fn group<C: Into<ChannelId>>(&self, id: C) -> Option<Rc<RefCell<Group>>> {
         self.groups.get(&id.into()).cloned()
     }
 
@@ -506,10 +505,13 @@ impl Cache {
     /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [`members`]: ../model/guild/struct.Guild.html#structfield.members
-    pub fn member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
-        where G: Into<GuildId>, U: Into<UserId> {
+    pub fn member<G: Into<GuildId>, U: Into<UserId>>(
+        &self,
+        guild_id: G,
+        user_id: U,
+    ) -> Option<Rc<RefCell<Member>>> {
         self.guilds.get(&guild_id.into()).and_then(|guild| {
-            guild.read().members.get(&user_id.into()).cloned()
+            guild.borrow().members.get(&user_id.into()).cloned()
         })
     }
 
@@ -548,7 +550,7 @@ impl Cache {
     #[inline]
     pub fn private_channel<C: Into<ChannelId>>(&self,
                                                channel_id: C)
-                                               -> Option<Arc<RwLock<PrivateChannel>>> {
+                                               -> Option<Rc<RefCell<PrivateChannel>>> {
         self.private_channels.get(&channel_id.into()).cloned()
     }
 
@@ -580,11 +582,11 @@ impl Cache {
     /// #   try_main().unwrap();
     /// # }
     /// ```
-    pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
-        where G: Into<GuildId>, R: Into<RoleId> {
+    pub fn role<G: Into<GuildId>, R: Into<RoleId>>(&self, guild_id: G, role_id: R)
+        -> Option<Rc<RefCell<Role>>> {
         self.guilds
             .get(&guild_id.into())
-            .and_then(|g| g.read().roles.get(&role_id.into()).cloned())
+            .and_then(|g| g.borrow().roles.get(&role_id.into()).cloned())
     }
 
     /// Retrieves a `User` from the cache's [`users`] map, if it exists.
@@ -616,29 +618,27 @@ impl Cache {
     /// # }
     /// ```
     #[inline]
-    pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<Arc<RwLock<User>>> {
+    pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<Rc<RefCell<User>>> {
         self.users.get(&user_id.into()).cloned()
     }
 
     #[inline]
-    pub fn categories<C: Into<ChannelId>>(&self,
-                                          channel_id: C)
-                                          -> Option<Arc<RwLock<ChannelCategory>>> {
+    pub fn category<C: Into<ChannelId>>(&self, channel_id: C)
+        -> Option<Rc<RefCell<ChannelCategory>>> {
         self.categories.get(&channel_id.into()).cloned()
     }
 
-    #[cfg(feature = "client")]
-    pub(crate) fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
+    pub fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
         e.update(self)
     }
 
     pub(crate) fn update_user_entry(&mut self, user: &User) {
         match self.users.entry(user.id) {
             Entry::Vacant(e) => {
-                e.insert(Arc::new(RwLock::new(user.clone())));
+                e.insert(Rc::new(RefCell::new(user.clone())));
             },
-            Entry::Occupied(mut e) => {
-                e.get_mut().write().clone_from(user);
+            Entry::Occupied(e) => {
+                e.get().borrow_mut().clone_from(user);
             },
         }
     }

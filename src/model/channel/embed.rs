@@ -1,11 +1,9 @@
-#[cfg(feature = "model")]
 use builder::CreateEmbed;
-#[cfg(feature = "model")]
 use internal::prelude::*;
+use utils;
+
 #[cfg(feature = "utils")]
 use utils::Colour;
-#[cfg(feature = "model")]
-use utils;
 
 /// Represents a rich embed which allows using richer markdown, multiple fields
 /// and more. This was heavily inspired by [slack's attachments].
@@ -65,7 +63,6 @@ pub struct Embed {
     pub video: Option<EmbedVideo>,
 }
 
-#[cfg(feature = "model")]
 impl Embed {
     /// Creates a fake Embed, giving back a `serde_json` map.
     ///
