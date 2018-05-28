@@ -130,11 +130,11 @@ impl MessageBuilder {
     /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
     /// [Display implementation]: ../model/id/struct.ChannelId.html#method.fmt-1
     #[inline]
-    pub fn channel<C: Into<ChannelId>>(self, channel: C) -> Self {
+    pub fn channel<C: Into<ChannelId>>(&mut self, channel: C) -> &mut Self {
         self._channel(channel.into())
     }
 
-    fn _channel(mut self, channel: ChannelId) -> Self {
+    fn _channel(&mut self, channel: ChannelId) -> &mut Self {
         let _ = write!(self.0, "{}", channel.mention());
 
         self
@@ -173,7 +173,7 @@ impl MessageBuilder {
     /// ```
     ///
     /// [Display implementation]: ../model/guild/struct.Emoji.html#method.fmt
-    pub fn emoji(mut self, emoji: &Emoji) -> Self {
+    pub fn emoji(&mut self, emoji: &Emoji) -> &mut Self {
         let _ = write!(self.0, "{}", emoji);
 
         self
@@ -182,7 +182,7 @@ impl MessageBuilder {
     /// Mentions something that implements the [`Mentionable`] trait.
     ///
     /// [`Mentionable`]: ../model/misc/trait.Mentionable.html
-    pub fn mention<M: Mentionable>(mut self, item: &M) -> Self {
+    pub fn mention<M: Mentionable>(&mut self, item: &M) -> &mut Self {
         let _ = write!(self.0, "{}", item.mention());
 
         self
@@ -204,11 +204,11 @@ impl MessageBuilder {
     /// assert_eq!(message.push("ing").0, "testing");
     /// ```
     #[inline]
-    pub fn push<D: I>(self, content: D) -> Self {
+    pub fn push<D: I>(&mut self, content: D) -> &mut Self {
         self._push(&content.into().to_string())
     }
 
-    fn _push(mut self, content: &str) -> Self {
+    fn _push(&mut self, content: &str) -> &mut Self {
         self.0.push_str(content);
 
         self
@@ -253,7 +253,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "```\nhello\n```");
     /// ```
-    pub fn push_codeblock<D: I>(mut self, content: D, language: Option<&str>) -> Self {
+    pub fn push_codeblock<D: I>(&mut self, content: D, language: Option<&str>) -> &mut Self {
         self.0.push_str("```");
 
         if let Some(language) = language {
@@ -293,7 +293,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, expected);
     /// ```
-    pub fn push_mono<D: I>(mut self, content: D) -> Self {
+    pub fn push_mono<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push('`');
         self.0.push_str(&content.into().to_string());
         self.0.push('`');
@@ -322,7 +322,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, expected);
     /// ```
-    pub fn push_italic<D: I>(mut self, content: D) -> Self {
+    pub fn push_italic<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push('_');
         self.0.push_str(&content.into().to_string());
         self.0.push('_');
@@ -331,7 +331,7 @@ impl MessageBuilder {
     }
 
     /// Pushes an inline bold text to the content.
-    pub fn push_bold<D: I>(mut self, content: D) -> Self {
+    pub fn push_bold<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push_str("**");
         self.0.push_str(&content.into().to_string());
         self.0.push_str("**");
@@ -340,7 +340,7 @@ impl MessageBuilder {
     }
 
     /// Pushes an underlined inline text to the content.
-    pub fn push_underline<D: I>(mut self, content: D) -> Self {
+    pub fn push_underline<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push_str("__");
         self.0.push_str(&content.into().to_string());
         self.0.push_str("__");
@@ -349,7 +349,7 @@ impl MessageBuilder {
     }
 
     /// Pushes a strikethrough inline text to the content.
-    pub fn push_strike<D: I>(mut self, content: D) -> Self {
+    pub fn push_strike<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push_str("~~");
         self.0.push_str(&content.into().to_string());
         self.0.push_str("~~");
@@ -379,8 +379,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "hello\nworld");
     /// ```
-    pub fn push_line<D: I>(mut self, content: D) -> Self {
-        self = self.push(content);
+    pub fn push_line<D: I>(&mut self, content: D) -> &mut Self {
+        self.push(content);
         self.0.push('\n');
 
         self
@@ -399,8 +399,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "`hello`\nworld");
     /// ```
-    pub fn push_mono_line<D: I>(mut self, content: D) -> Self {
-        self = self.push_mono(content);
+    pub fn push_mono_line<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_mono(content);
         self.0.push('\n');
 
         self
@@ -419,8 +419,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "_hello_\nworld");
     /// ```
-    pub fn push_italic_line<D: I>(mut self, content: D) -> Self {
-        self = self.push_italic(content);
+    pub fn push_italic_line<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_italic(content);
         self.0.push('\n');
 
         self
@@ -439,8 +439,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "**hello**\nworld");
     /// ```
-    pub fn push_bold_line<D: I>(mut self, content: D) -> Self {
-        self = self.push_bold(content);
+    pub fn push_bold_line<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_bold(content);
         self.0.push('\n');
 
         self
@@ -459,8 +459,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "__hello__\nworld");
     /// ```
-    pub fn push_underline_line<D: I>(mut self, content: D) -> Self {
-        self = self.push_underline(content);
+    pub fn push_underline_line<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_underline(content);
         self.0.push('\n');
 
         self
@@ -479,8 +479,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "~~hello~~\nworld");
     /// ```
-    pub fn push_strike_line<D: I>(mut self, content: D) -> Self {
-        self = self.push_strike(content);
+    pub fn push_strike_line<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_strike(content);
         self.0.push('\n');
 
         self
@@ -508,7 +508,7 @@ impl MessageBuilder {
 
     /// Pushes text to your message, but normalizing content - that means
     /// ensuring that there's no unwanted formatting, mention spam etc.
-    pub fn push_safe<C: I>(mut self, content: C) -> Self {
+    pub fn push_safe<C: I>(&mut self, content: C) -> &mut Self {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner)
@@ -523,7 +523,7 @@ impl MessageBuilder {
     }
 
     /// Pushes a code-block to your message normalizing content.
-    pub fn push_codeblock_safe<D: I>(mut self, content: D, language: Option<&str>) -> Self {
+    pub fn push_codeblock_safe<D: I>(&mut self, content: D, language: Option<&str>) -> &mut Self {
         self.0.push_str("```");
 
         if let Some(language) = language {
@@ -543,7 +543,7 @@ impl MessageBuilder {
     }
 
     /// Pushes an inline monospaced text to the content normalizing content.
-    pub fn push_mono_safe<D: I>(mut self, content: D) -> Self {
+    pub fn push_mono_safe<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push('`');
         {
             let mut c = content.into();
@@ -556,7 +556,7 @@ impl MessageBuilder {
     }
 
     /// Pushes an inline italicized text to the content normalizing content.
-    pub fn push_italic_safe<D: I>(mut self, content: D) -> Self {
+    pub fn push_italic_safe<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push('_');
         {
             let mut c = content.into();
@@ -569,7 +569,7 @@ impl MessageBuilder {
     }
 
     /// Pushes an inline bold text to the content normalizing content.
-    pub fn push_bold_safe<D: I>(mut self, content: D) -> Self {
+    pub fn push_bold_safe<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push_str("**");
         {
             let mut c = content.into();
@@ -582,7 +582,7 @@ impl MessageBuilder {
     }
 
     /// Pushes an underlined inline text to the content normalizing content.
-    pub fn push_underline_safe<D: I>(mut self, content: D) -> Self {
+    pub fn push_underline_safe<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push_str("__");
         {
             let mut c = content.into();
@@ -595,7 +595,7 @@ impl MessageBuilder {
     }
 
     /// Pushes a strikethrough inline text to the content normalizing content.
-    pub fn push_strike_safe<D: I>(mut self, content: D) -> Self {
+    pub fn push_strike_safe<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push_str("~~");
         {
             let mut c = content.into();
@@ -635,8 +635,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "Hello @\u{200B}everyone\nHow are you?");
     /// ```
-    pub fn push_line_safe<D: I>(mut self, content: D) -> Self {
-        self = self.push_safe(content);
+    pub fn push_line_safe<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_safe(content);
         self.0.push('\n');
 
         self
@@ -657,8 +657,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "`'hello @\u{200B}everyone'`\nworld");
     /// ```
-    pub fn push_mono_line_safe<D: I>(mut self, content: D) -> Self {
-        self = self.push_mono_safe(content);
+    pub fn push_mono_line_safe<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_mono_safe(content);
         self.0.push('\n');
 
         self
@@ -679,8 +679,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "_@\u{200B}everyone_\nIsn't a mention.");
     /// ```
-    pub fn push_italic_line_safe<D: I>(mut self, content: D) -> Self {
-        self = self.push_italic_safe(content);
+    pub fn push_italic_line_safe<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_italic_safe(content);
         self.0.push('\n');
 
         self
@@ -701,8 +701,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "**@\u{200B}everyone**\nIsn't a mention.");
     /// ```
-    pub fn push_bold_line_safe<D: I>(mut self, content: D) -> Self {
-        self = self.push_bold_safe(content);
+    pub fn push_bold_line_safe<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_bold_safe(content);
         self.0.push('\n');
 
         self
@@ -723,8 +723,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "__@\u{200B}everyone__\nIsn't a mention.");
     /// ```
-    pub fn push_underline_line_safe<D: I>(mut self, content: D) -> Self {
-        self = self.push_underline_safe(content);
+    pub fn push_underline_line_safe<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_underline_safe(content);
         self.0.push('\n');
 
         self
@@ -746,8 +746,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "~~@\u{200B}everyone~~\nIsn't a mention.");
     /// ```
-    pub fn push_strike_line_safe<D: I>(mut self, content: D) -> Self {
-        self = self.push_strike_safe(content);
+    pub fn push_strike_line_safe<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_strike_safe(content);
         self.0.push('\n');
 
         self
@@ -787,7 +787,7 @@ impl MessageBuilder {
     /// [`Role`]: ../model/guild/struct.Role.html
     /// [`RoleId`]: ../model/id/struct.RoleId.html
     /// [Display implementation]: ../model/id/struct.RoleId.html#method.fmt-1
-    pub fn role<R: Into<RoleId>>(mut self, role: R) -> Self {
+    pub fn role<R: Into<RoleId>>(&mut self, role: R) -> &mut Self {
         let _ = write!(self.0, "{}", role.into().mention());
 
         self
@@ -804,7 +804,7 @@ impl MessageBuilder {
     /// [`User`]: ../model/user/struct.User.html
     /// [`UserId`]: ../model/id/struct.UserId.html
     /// [Display implementation]: ../model/id/struct.UserId.html#method.fmt-1
-    pub fn user<U: Into<UserId>>(mut self, user: U) -> Self {
+    pub fn user<U: Into<UserId>>(&mut self, user: U) -> &mut Self {
         let _ = write!(self.0, "{}", user.into().mention());
 
         self
