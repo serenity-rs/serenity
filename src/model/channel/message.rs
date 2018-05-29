@@ -490,16 +490,18 @@ impl Message {
         http::send_message(self.channel_id.0, &map)
     }
 
-    /// Checks whether the message mentions the user of given Id.
-    pub fn mentions_user_id(&self, id: u64) -> bool {
-        let search_for = vec![format!("<@{}>", id), format!("<@!{}>", id)];
-
-        search_for.iter().any(|ref mention| self.content.contains(mention.as_str()))
+    /// Checks whether the message mentions the user of given [`UserId`].
+    ///
+    /// [`UserId`]: ../model/user/struct.UserId.html
+    pub fn mentions_user_id(&self, user_id_to_find: &UserId) -> bool {
+        self.mentions.iter().any(|mentioned_user| mentioned_user.id.0 == user_id_to_find.0)
     }
 
-    /// Checks whether the message mentions `User`.
-    pub fn mentions_user(&self, user: User) -> bool {
-        self.mentions_user_id(user.id.0)
+    /// Checks whether the message mentions passed [`User`].
+    ///
+    /// [`User`]: ../model/user/struct.User.html
+    pub fn mentions_user(&self, user: &User) -> bool {
+        self.mentions_user_id(&user.id)
     }
 
     /// Unpins the message from its channel.
