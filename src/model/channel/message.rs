@@ -490,18 +490,19 @@ impl Message {
         http::send_message(self.channel_id.0, &map)
     }
 
-    /// Checks whether the message mentions the user of given [`UserId`].
+    /// Checks whether the message mentions passed [`UserId`].
     ///
-    /// [`UserId`]: ../model/user/struct.UserId.html
-    pub fn mentions_user_id(&self, user_id_to_find: &UserId) -> bool {
+    /// [`UserId`]: ../../model/id/struct.UserId.html
+    pub fn mentions_user_id<I: Into<UserId>>(&self, id: I) -> bool {
+        let user_id_to_find = id.into();
         self.mentions.iter().any(|mentioned_user| mentioned_user.id.0 == user_id_to_find.0)
     }
 
     /// Checks whether the message mentions passed [`User`].
     ///
-    /// [`User`]: ../model/user/struct.User.html
+    /// [`User`]: ../user/struct.User.html
     pub fn mentions_user(&self, user: &User) -> bool {
-        self.mentions_user_id(&user.id)
+        self.mentions_user_id(user.id)
     }
 
     /// Unpins the message from its channel.
