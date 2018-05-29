@@ -5,7 +5,7 @@
 //!
 //! ```toml
 //! [dependencies.serenity]
-//! git = "https://github.com/zeyla/serenity.git"
+//! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["framework", "standard_framework"]
 //! ```
 
@@ -148,19 +148,20 @@ fn main() {
                 If you want more information about a specific command, just pass the command as argument.")
                 // Some arguments require a `{}` in order to replace it with contextual information.
                 // In this case our `{}` refers to a command's name.
-                .command_not_found_text("Could not {}, I'm sorry : (")
-                // Another argument requiring `{}`, again replaced with the command's name.
-                .suggestion_text("How about this command: {}, it's numero uno on the market...!")
+                .command_not_found_text("Could not find: `{}`.")
                 // On another note, you can set up the help-menu-filter-behaviour.
                 // Here are all possible settings shown on all possible options.
-                // First case is if a user lacks permissions for a command, we can hide the command.
+                // If a user lacks permissions for a command, we can `Hide` the command.
                 .lacking_permissions(HelpBehaviour::Hide)
-                // If the user is nothing but lacking a certain role, we just display it hence our variant is `Nothing`.
+                // If a user lacks a certain role for a command, we can do `Nothing` to its listing
+                // and display it.
                 .lacking_role(HelpBehaviour::Nothing)
-                // The last `enum`-variant is `Strike`, which ~~strikes~~ a command.
+                // If a user lacks bot ownership for an owners-only command, we can ~~`Strike`~~ it.
+                .lacking_ownership(HelpBehaviour::Strike)
+                // If a user is in the wrong channel for a command, we can ~~`Strike`~~ it.
                 .wrong_channel(HelpBehaviour::Strike)
                 // Serenity will automatically analyse and generate a hint/tip explaining the possible
-                // cases of a command being ~~striked~~, but only  if
+                // cases of ~~strikethrough-commands~~, but only if
                 // `striked_commands_tip(Some(""))` keeps `Some()` wrapping an empty `String`, which is the default value.
                 // If the `String` is not empty, your given `String` will be used instead.
                 // If you pass in a `None`, no hint will be displayed at all.

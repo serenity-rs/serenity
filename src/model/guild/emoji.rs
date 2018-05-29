@@ -1,4 +1,9 @@
-use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
+use std::fmt::{
+    Display,
+    Formatter,
+    Result as FmtResult,
+    Write as FmtWrite
+};
 use super::super::id::{EmojiId, RoleId};
 
 /// Represents a custom guild emoji, which can either be created using the API,

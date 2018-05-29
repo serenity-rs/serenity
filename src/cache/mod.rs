@@ -46,11 +46,16 @@ pub mod cache_update;
 
 use model::prelude::*;
 use self::cache_update::CacheUpdate;
-use std::cell::RefCell;
-use std::collections::hash_map::Entry;
-use std::collections::{HashMap, HashSet};
-use std::default::Default;
-use std::rc::Rc;
+use std::{
+    cell::RefCell,
+    collections::{
+        hash_map::Entry,
+        HashMap,
+        HashSet,
+    },
+    default::Default,
+    rc::Rc,
+};
 
 /// A cache of all events received over a [`Shard`], where storing at least
 /// some data from the event is possible.

@@ -21,8 +21,6 @@ pub use model::ModelError;
 // todo re-add EventHandler, Context re-exports
 #[cfg(feature = "client")]
 pub use client::{Client, ClientError as ClientError};
-#[cfg(feature = "gateway")]
-pub use gateway::GatewayError;
 #[cfg(feature = "http")]
 pub use http::HttpError;
 #[cfg(feature = "voice")]

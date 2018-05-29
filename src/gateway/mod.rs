@@ -38,8 +38,6 @@
 //! instance. This should be used when you, for example, want to split 10 shards
 //! across 3 instances.
 //!
-//! **Note**: User accounts can not shard. Use [`Client::start`].
-//!
 //! [`Bot`]: ../enum.LoginType.html#variant.Bot
 //! [`Client`]: ../struct.Client.html
 //! [`Client::start`]: ../struct.Client.html#method.start
@@ -49,14 +47,16 @@
 //! [`Client::start_shards`]: ../struct.Client.html#method.start_shards
 //! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 
-mod error;
 mod shard;
+mod shard_manager;
+mod queue;
 
-pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
+pub use self::shard_manager::{ShardManager, ShardingStrategy, ShardManagerOptions, MessageStream};
+pub use self::queue::{ReconnectQueue, SimpleReconnectQueue};
 
 use futures::stream::SplitStream;
-use model::gateway::Game;
+use model::gateway::Activity;
 use model::user::OnlineStatus;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use tokio_core::net::TcpStream;
@@ -64,7 +64,7 @@ use tokio_tls::TlsStream;
 use tokio_tungstenite::stream::Stream;
 use tokio_tungstenite::WebSocketStream;
 
-pub type CurrentPresence = (Option<Game>, OnlineStatus);
+pub type CurrentPresence = (Option<Activity>, OnlineStatus);
 pub type ShardStream =
     SplitStream<WebSocketStream<Stream<TcpStream, TlsStream<TcpStream>>>>;
 

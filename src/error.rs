@@ -7,11 +7,13 @@ use hyper::error::UriError;
 use internal::prelude::*;
 use model::ModelError;
 use serde_json::Error as JsonError;
-use std::cell::{BorrowError, BorrowMutError};
-use std::error::Error as StdError;
-use std::fmt::{self, Display, Error as FormatError};
-use std::io::Error as IoError;
-use std::num::ParseIntError;
+use std::{
+    cell::{BorrowError, BorrowMutError},
+    error::Error as StdError,
+    fmt::{self, Display, Error as FormatError},
+    io::Error as IoError,
+    num::ParseIntError,
+};
 
 #[cfg(feature = "tungstenite")]
 use futures::sync::mpsc::SendError;
@@ -25,8 +27,6 @@ use opus::Error as OpusError;
 use tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage};
 #[cfg(feature = "client")]
 use client::ClientError;
-#[cfg(feature = "gateway")]
-use gateway::GatewayError;
 #[cfg(feature = "http")]
 use http::HttpError;
 #[cfg(feature = "voice")]
@@ -41,8 +41,6 @@ use voice::VoiceError;
 ///
 /// [`Error`]: enum.Error.html
 pub type Result<T> = StdResult<T, Error>;
-
-pub type FutureResult<T> = Box<Future<Item = T, Error = Error>>;
 
 /// A common error enum returned by most of the library's functionality within a
 /// custom [`Result`].
@@ -102,9 +100,6 @@ pub enum Error {
     /// [client]: client/index.html
     #[cfg(feature = "client")]
     Client(ClientError),
-    /// An error from the `gateway` module.
-    #[cfg(feature = "gateway")]
-    Gateway(GatewayError),
     /// An error from the [`http`] module.
     ///
     /// [`http`]: http/index.html
@@ -146,11 +141,6 @@ impl From<Canceled> for Error {
 
 impl From<FormatError> for Error {
     fn from(e: FormatError) -> Error { Error::Format(e) }
-}
-
-#[cfg(feature = "gateway")]
-impl From<GatewayError> for Error {
-    fn from(e: GatewayError) -> Error { Error::Gateway(e) }
 }
 
 #[cfg(feature = "http")]
@@ -236,8 +226,6 @@ impl StdError for Error {
             Error::Uri(ref inner) => inner.description(),
             #[cfg(feature = "client")]
             Error::Client(ref inner) => inner.description(),
-            #[cfg(feature = "gateway")]
-            Error::Gateway(ref inner) => inner.description(),
             #[cfg(feature = "http")]
             Error::Http(ref inner) => inner.description(),
             #[cfg(feature = "http")]

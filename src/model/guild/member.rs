@@ -89,3 +89,21 @@ impl Member {
         }
     }
 }
+
+/// A partial amount of data for a member.
+///
+/// This is used in [`Message`]s from [`Guild`]s.
+///
+/// [`Guild`]: struct.Guild.html
+/// [`Message`]: ../channel/struct.Message.html
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct PartialMember {
+    /// Indicator of whether the member can hear in voice channels.
+    pub deaf: bool,
+    /// Timestamp representing the date when the member joined.
+    pub joined_at: Option<DateTime<FixedOffset>>,
+    /// Indicator of whether the member can speak in voice channels.
+    pub mute: bool,
+    /// Vector of Ids of [`Role`]s given to the member.
+    pub roles: Vec<RoleId>,
+}

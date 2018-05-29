@@ -17,14 +17,16 @@ mod edit_role;
 mod execute_webhook;
 mod get_messages;
 
-pub use self::create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter};
-pub use self::create_invite::CreateInvite;
-pub use self::create_message::CreateMessage;
-pub use self::edit_channel::EditChannel;
-pub use self::edit_guild::EditGuild;
-pub use self::edit_member::EditMember;
-pub use self::edit_message::EditMessage;
-pub use self::edit_profile::EditProfile;
-pub use self::edit_role::EditRole;
-pub use self::execute_webhook::ExecuteWebhook;
-pub use self::get_messages::GetMessages;
+pub use self::{
+    create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter},
+    create_invite::CreateInvite,
+    create_message::CreateMessage,
+    edit_channel::EditChannel,
+    edit_guild::EditGuild,
+    edit_member::EditMember,
+    edit_message::EditMessage,
+    edit_profile::EditProfile,
+    edit_role::EditRole,
+    execute_webhook::ExecuteWebhook,
+    get_messages::GetMessages
+};

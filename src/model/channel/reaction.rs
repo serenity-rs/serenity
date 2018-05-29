@@ -1,9 +1,16 @@
 use model::prelude::*;
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use serde::ser::{SerializeMap, Serialize, Serializer};
-use std::error::Error as StdError;
-use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
-use std::str::FromStr;
+use std::{
+    error::Error as StdError,
+    fmt::{
+        Display, 
+        Formatter, 
+        Result as FmtResult, 
+        Write as FmtWrite
+    },
+    str::FromStr
+};
 use internal::prelude::*;
 
 /// An emoji reaction to a message.

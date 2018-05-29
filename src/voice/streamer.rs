@@ -9,12 +9,14 @@ use opus::{
 };
 use parking_lot::Mutex;
 use serde_json;
-use std::ffi::OsStr;
-use std::fs::File;
-use std::io::{BufReader, ErrorKind as IoErrorKind, Read, Result as IoResult};
-use std::process::{Child, Command, Stdio};
-use std::result::Result as StdResult;
-use std::sync::Arc;
+use std::{
+    ffi::OsStr,
+    fs::File,
+    io::{BufReader, ErrorKind as IoErrorKind, Read, Result as IoResult},
+    process::{Child, Command, Stdio},
+    result::Result as StdResult,
+    sync::Arc,
+};
 use super::{AudioSource, AudioType, DcaError, DcaMetadata, VoiceError, audio};
 
 struct ChildContainer(Child);
@@ -233,7 +235,7 @@ pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Box<AudioSource>, DcaError> {
 pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,
-        reader: reader,
+        reader,
         kind: AudioType::Opus,
         decoder: Some(
             Arc::new(Mutex::new(
@@ -248,7 +250,7 @@ pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSo
 pub fn pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,
-        reader: reader,
+        reader,
         kind: AudioType::Pcm,
         decoder: None,
     })

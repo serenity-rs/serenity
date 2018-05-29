@@ -1,4 +1,3 @@
-
 pub mod help_commands;
 
 mod command;
@@ -9,10 +8,21 @@ mod create_group;
 mod buckets;
 mod args;
 
-pub use self::args::{Args, Iter, Error as ArgError};
+pub use self::args::{
+    Args,
+    Iter,
+    Error as ArgError
+};
 pub(crate) use self::buckets::{Bucket, Ratelimit};
-pub(crate) use self::command::{Help};
-pub use self::command::{HelpFunction, HelpOptions, Command, CommandGroup, CommandOptions, Error as CommandError};
+pub(crate) use self::command::Help;
+pub use self::command::{
+    HelpFunction,
+    HelpOptions,
+    Command,
+    CommandGroup,
+    CommandOptions,
+    Error as CommandError
+};
 pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
 pub use self::create_help_command::CreateHelpCommand;
@@ -21,14 +31,19 @@ pub use self::create_group::CreateGroup;
 
 use client::Context;
 use internal::RwLockExt;
-use model::channel::Message;
-use model::guild::{Guild, Member};
-use model::id::{ChannelId, GuildId, UserId};
-use model::Permissions;
+use model::{
+    channel::Message,
+    guild::{Guild, Member},
+    id::{ChannelId, GuildId, UserId},
+    Permissions
+};
 use self::command::{AfterHook, BeforeHook, UnrecognisedCommandHook};
-use std::collections::HashMap;
-use std::default::Default;
-use std::sync::Arc;
+use std::{
+    collections::HashMap,
+    default::Default,
+    ops,
+    sync::Arc,
+};
 use super::Framework;
 use threadpool::ThreadPool;
 
@@ -37,17 +52,19 @@ use client::CACHE;
 #[cfg(feature = "cache")]
 use model::channel::Channel;
 
-/// A macro to generate "named parameters". This is useful to avoid manually
-/// using the "arguments" parameter and manually parsing types.
+/// A convenience macro for generating a struct fulfilling the [`Command`] trait.
 ///
-/// This is meant for use with the command [`Framework`].
+/// This is meant for use with the [`Framework`], specifically `Framework`::{[`cmd`]/[`command`]}.
+///
+///
+/// If you're just looking for a simple "register this function as a command", use [`Framework::on`].
 ///
 /// # Examples
 ///
 /// Create a regular `ping` command which takes no arguments:
 ///
 /// ```rust,ignore
-/// command!(ping(_context, message, _args) {
+/// command!(ping(_context, message) {
 ///     if let Err(why) = message.reply("Pong!") {
 ///         println!("Error sending pong: {:?}", why);
 ///     }
@@ -70,6 +87,10 @@ use model::channel::Channel;
 /// ```
 ///
 /// [`Framework`]: framework/index.html
+/// [`cmd`]: struct.Framework.html#method.cmd
+/// [`command`]: struct.Framework.html#method.command
+/// [`Framework::on`]: struct.Framework.html#method.on
+/// [`Command`]: trait.Command.html
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
@@ -138,6 +159,8 @@ pub enum DispatchError {
     BlockedUser,
     /// When the guild or its owner is blocked in bot configuration.
     BlockedGuild,
+    /// When the channel blocked in bot configuration.
+    BlockedChannel,
     /// When the command requester lacks specific required permissions.
     LackOfPermissions(Permissions),
     /// When the command requester has exceeded a ratelimit bucket. The attached
@@ -175,6 +198,7 @@ impl fmt::Debug for DispatchError {
             CommandDisabled(ref s) => f.debug_tuple("DispatchError::CommandDisabled").field(&s).finish(),
             BlockedUser => write!(f, "DispatchError::BlockedUser"),
             BlockedGuild => write!(f, "DispatchError::BlockedGuild"),
+            BlockedChannel => write!(f, "DispatchError::BlockedChannel"),
             LackOfPermissions(ref perms) => f.debug_tuple("DispatchError::LackOfPermissions").field(&perms).finish(),
             RateLimited(ref num) => f.debug_tuple("DispatchError::RateLimited").field(&num).finish(),
             OnlyForDM => write!(f, "DispatchError::OnlyForDM"),
@@ -275,7 +299,7 @@ impl StandardFramework {
     /// Create and use a bucket that limits a command to 3 uses per 10 seconds with
     /// a 2 second delay inbetween invocations:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -299,7 +323,7 @@ impl StandardFramework {
             s.to_string(),
             Bucket {
                 ratelimit: Ratelimit {
-                    delay: delay,
+                    delay,
                     limit: Some((time_span, limit)),
                 },
                 users: HashMap::new(),
@@ -314,7 +338,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -373,7 +397,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -425,7 +449,7 @@ impl StandardFramework {
     ///
     /// Create and use a simple bucket that has a 2 second delay between invocations:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -445,7 +469,7 @@ impl StandardFramework {
             s.to_string(),
             Bucket {
                 ratelimit: Ratelimit {
-                    delay: delay,
+                    delay,
                     limit: None,
                 },
                 users: HashMap::new(),
@@ -472,6 +496,14 @@ impl StandardFramework {
         }
 
         false
+    }
+
+    #[cfg(feature = "cache")]
+    fn is_blocked_channel(&self, message: &Message) -> bool {
+        !self.configuration.allowed_channels.is_empty()
+            && !self.configuration
+                .allowed_channels
+                .contains(&message.channel_id)
     }
 
     #[allow(too_many_arguments)]
@@ -514,7 +546,7 @@ impl StandardFramework {
                 }
             }
 
-            let len = args.len();
+            let len = args.len_quoted();
 
             if let Some(x) = command.min_args {
                 if len < x as usize {
@@ -538,6 +570,10 @@ impl StandardFramework {
             {
                 if self.is_blocked_guild(message) {
                     return Some(DispatchError::BlockedGuild);
+                }
+
+                if self.is_blocked_channel(message) {
+                    return Some(DispatchError::BlockedChannel);
                 }
 
                 if !has_correct_permissions(command, message) {
@@ -620,7 +656,7 @@ impl StandardFramework {
     ///
     /// Create and use a simple command:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # #[macro_use] extern crate serenity;
     /// #
     /// # fn main() {
@@ -730,7 +766,7 @@ impl StandardFramework {
     ///
     /// Creating a simple group:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -763,7 +799,7 @@ impl StandardFramework {
     ///
     /// Making a simple argument error responder:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -804,7 +840,7 @@ impl StandardFramework {
     ///
     /// Using `before` to log command usage:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -822,7 +858,7 @@ impl StandardFramework {
     ///
     /// Using before to prevent command usage:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -860,7 +896,7 @@ impl StandardFramework {
     ///
     /// Using `after` to log command usage:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -910,6 +946,10 @@ impl StandardFramework {
     }
 
     /// Sets what code should be executed when a user sends `(prefix)help`.
+    ///
+    /// If a command named `help` was set with [`command`], then this takes precendence first.
+    ///
+    /// [`command`]: #method.command
     pub fn help(mut self, f: HelpFunction) -> Self {
         let a = CreateHelpCommand(HelpOptions::default(), f).finish();
 
@@ -1012,12 +1052,12 @@ impl Framework for StandardFramework {
                     let before = self.before.clone();
                     let after = self.after.clone();
 
-                    // This is a special case.
                     if to_check == "help" {
                         let help = self.help.clone();
 
                         if let Some(help) = help {
                             let groups = self.groups.clone();
+                            let owners = self.configuration.owners.clone();
                             threadpool.execute(move || {
 
                                 if let Some(before) = before {
@@ -1027,7 +1067,7 @@ impl Framework for StandardFramework {
                                     }
                                 }
 
-                                let result = (help.0)(&mut context, &message, &help.1, groups, &args);
+                                let result = (help.0)(&mut context, &message, &help.1, groups, owners, &args);
 
                                 if let Some(after) = after {
                                     (after)(&mut context, &message, &built, result);
@@ -1035,8 +1075,6 @@ impl Framework for StandardFramework {
                             });
                             return;
                         }
-
-                        return;
                     }
 
                     if let Some(&CommandOrAlias::Command(ref command)) =
@@ -1083,13 +1121,12 @@ impl Framework for StandardFramework {
             }
         }
 
-        let unrecognised_command = self.unrecognised_command.clone();
-
-        threadpool.execute(move || {
-            if let Some(unrecognised_command) = unrecognised_command {
+        if let Some(unrecognised_command) = &self.unrecognised_command {
+            let unrecognised_command = unrecognised_command.clone();
+            threadpool.execute(move || {
                 (unrecognised_command)(&mut context, &message, &unrecognised_command_name);
-            }
-        });
+            });
+        }
     }
 
     fn update_current_user(&mut self, user_id: UserId) {
@@ -1122,11 +1159,11 @@ pub fn has_correct_roles(cmd: &Arc<CommandOptions>, guild: &Guild, member: &Memb
 }
 
 /// Describes the behaviour the help-command shall execute once it encounters
-/// a command which the user or command fails to meet following criteria :
-/// Lacking required permissions to execute the command.
-/// Lacking required roles to execute the command.
-/// The command can't be used in the current channel (as in `DM only` or `guild only`).
-#[derive(PartialEq, Debug)]
+/// a command which the user or command fails to meet following criteria:
+/// - Lacking required permissions to execute the command.
+/// - Lacking required roles to execute the command.
+/// - The command can't be used in the current channel (as in "DM only" or "guild only").
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum HelpBehaviour {
     /// Strikes a command by applying `~~{comand_name}~~`.
     Strike,
@@ -1143,5 +1180,37 @@ impl fmt::Display for HelpBehaviour {
            HelpBehaviour::Hide => write!(f, "HelpBehaviour::Hide"),
            HelpBehaviour::Nothing => write!(f, "HelBehaviour::Nothing"),
        }
+    }
+}
+
+/// Compares two help behaviours and merges them, preserving stronger behaviour
+/// (`Hide` being stronger than `Strike`, and `Strike` being stronger than
+/// `Nothing`).
+impl ops::Add for HelpBehaviour {
+    type Output = HelpBehaviour;
+    fn add(self, other: HelpBehaviour) -> HelpBehaviour {
+        match self {
+            HelpBehaviour::Strike => match other {
+                HelpBehaviour::Strike => HelpBehaviour::Strike,
+                HelpBehaviour::Nothing => HelpBehaviour::Strike,
+                HelpBehaviour::Hide => HelpBehaviour::Hide,
+            }
+            HelpBehaviour::Nothing => other,
+            HelpBehaviour::Hide => HelpBehaviour::Hide,
+        }
+    }
+}
+
+impl ops::AddAssign for HelpBehaviour {
+    fn add_assign(&mut self, other: HelpBehaviour) {
+        match *self {
+            HelpBehaviour::Strike => match other {
+                HelpBehaviour::Strike => (),
+                HelpBehaviour::Nothing => *self = HelpBehaviour::Strike,
+                HelpBehaviour::Hide => (),
+            }
+            HelpBehaviour::Nothing => *self = other,
+            HelpBehaviour::Hide => (),
+        }
     }
 }

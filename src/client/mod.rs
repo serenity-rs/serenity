@@ -31,8 +31,8 @@ use hyper_tls::HttpsConnector;
 use self::shard_manager::{ShardManager, ShardManagerOptions, ShardingStrategy};
 use std::rc::Rc;
 use super::http::Client as HttpClient;
-use super::FutureResult;
 use tokio_core::reactor::Handle;
+use Error;
 
 #[cfg(feature = "cache")]
 use cache::Cache;
@@ -57,7 +57,7 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn new(options: ClientOptions) -> FutureResult<Self> {
+    pub fn new(options: ClientOptions) -> Box<Future<Item = Self, Error = Error>> {
         let token = {
             let trimmed = options.token.trim();
 
@@ -79,9 +79,10 @@ impl Client {
         let done = client.get_bot_gateway().map(move |gateway| {
             let uri = Rc::new(gateway.url);
 
-            Client {
+            Self {
                 #[cfg(feature = "cache")]
-                cache: Rc::new(RefCell::new(Cache::default())),                handle: h2,
+                cache: Rc::new(RefCell::new(Cache::default())),
+                handle: h2,
                 http: client,
                 shard_manager: ShardManager::new(ShardManagerOptions {
                     strategy: strategy,

@@ -15,7 +15,7 @@ pub const MESSAGE_CODE_LIMIT: u16 = 2000;
 ///
 /// [UserAgent]: ../hyper/header/struct.UserAgent.html
 pub const USER_AGENT: &str = concat!(
-    "DiscordBot (https://github.com/zeyla/serenity, ",
+    "DiscordBot (https://github.com/serenity-rs/serenity, ",
     env!("CARGO_PKG_VERSION"),
     ")"
 );
@@ -43,35 +43,69 @@ pub static JOIN_MESSAGES: &'static [&'static str] = &[
     "Where’s $user? In the server!",
     "$user hopped into the server. Kangaroo!!",
     "$user just showed up. Hold my beer.",
+    "Challenger approaching - $user has appeared!",
+    "It's a bird! It's a plane! Nevermind, it's just $user.",
+    r"It's $user! Praise the sun! \[T]/",
+    "Never gonna give $user up. Never gonna let $user down.",
+    "Ha! $user has joined! You activated my trap card!",
+    "Cheers, love! $user's here!",
+    "Hey! Listen! $user has joined!",
+    "We've been expecting you $user",
+    "It's dangerous to go alone, take $user!",
+    "$user has joined the server! It's super effective!",
+    "Cheers, love! $user is here!",
+    "$user is here, as the prophecy foretold.",
+    "$user has arrived. Party's over.",
+    "Ready player $user",
+    "$user is here to kick butt and chew bubblegum. And $user is all out of gum.",
+    "Hello. Is it $user you're looking for?",
+    "$user has joined. Stay a while and listen!",
+    "Roses are red, violets are blue, $user joined this server with you",
 ];
 
+/// Enum to map gateway opcodes.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub enum OpCode {
+    /// Dispatches an event.
+    Event = 0,
+    /// Used for ping checking.
+    Heartbeat = 1,
+    /// Used for client handshake.
+    Identify = 2,
+    /// Used to update the client status.
+    StatusUpdate = 3,
+    /// Used to join/move/leave voice channels.
+    VoiceStateUpdate = 4,
+    /// Used for voice ping checking.
+    VoiceServerPing = 5,
+    /// Used to resume a closed connection.
+    Resume = 6,
+    /// Used to tell clients to reconnect to the gateway.
+    Reconnect = 7,
+    /// Used to request guild members.
+    GetGuildMembers = 8,
+    /// Used to notify clients that they have an invalid session Id.
+    InvalidSession = 9,
+    /// Sent immediately after connection, contains heartbeat + server info.
+    Hello = 10,
+    /// Sent immediately following a client heartbeat that was received.
+    HeartbeatAck = 11,
+}
+
 enum_number!(
-    /// Enum to map gateway opcodes.
     OpCode {
-        /// Dispatches an event.
-        Event = 0,
-        /// Used for ping checking.
-        Heartbeat = 1,
-        /// Used for client handshake.
-        Identify = 2,
-        /// Used to update the client status.
-        StatusUpdate = 3,
-        /// Used to join/move/leave voice channels.
-        VoiceStateUpdate = 4,
-        /// Used for voice ping checking.
-        VoiceServerPing = 5,
-        /// Used to resume a closed connection.
-        Resume = 6,
-        /// Used to tell clients to reconnect to the gateway.
-        Reconnect = 7,
-        /// Used to request guild members.
-        GetGuildMembers = 8,
-        /// Used to notify clients that they have an invalid session Id.
-        InvalidSession = 9,
-        /// Sent immediately after connection, contains heartbeat + server info.
-        Hello = 10,
-        /// Sent immediately following a client heartbeat that was received.
-        HeartbeatAck = 11,
+        Event,
+        Heartbeat,
+        Identify,
+        StatusUpdate,
+        VoiceStateUpdate,
+        VoiceServerPing,
+        Resume,
+        Reconnect,
+        GetGuildMembers,
+        InvalidSession,
+        Hello,
+        HeartbeatAck,
     }
 );
 
@@ -94,31 +128,47 @@ impl OpCode {
     }
 }
 
+
+/// Enum to map voice opcodes.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub enum VoiceOpCode {
+    /// Used to begin a voice websocket connection.
+    Identify = 0,
+    /// Used to select the voice protocol.
+    SelectProtocol = 1,
+    /// Used to complete the websocket handshake.
+    Ready = 2,
+    /// Used to keep the websocket connection alive.
+    Heartbeat = 3,
+    /// Used to describe the session.
+    SessionDescription = 4,
+    /// Used to indicate which users are speaking.
+    Speaking = 5,
+    /// Heartbeat ACK, received by the client to show the server's receipt of a heartbeat.
+    HeartbeatAck = 6,
+    /// Sent after a disconnect to attempt to resume a session.
+    Resume = 7,
+    /// Used to determine how often the client must send a heartbeat.
+    Hello = 8,
+    /// Sent by the server if a session coulkd successfully be resumed.
+    Resumed = 9,
+    /// Message indicating that another user has disconnected from the voice channel.
+    ClientDisconnect = 13,
+}
+
 enum_number!(
-    /// Enum to map voice opcodes.
     VoiceOpCode {
-        /// Used to begin a voice websocket connection.
-        Identify = 0,
-        /// Used to select the voice protocol.
-        SelectProtocol = 1,
-        /// Used to complete the websocket handshake.
-        Ready = 2,
-        /// Used to keep the websocket connection alive.
-        Heartbeat = 3,
-        /// Used to describe the session.
-        SessionDescription = 4,
-        /// Used to indicate which users are speaking.
-        Speaking = 5,
-        /// Heartbeat ACK, received by the client to show the server's receipt of a heartbeat.
-        HeartbeatAck = 6,
-        /// Sent after a disconnect to attempt to resume a session.
-        Resume = 7,
-        /// Used to determine how often the client must send a heartbeat.
-        Hello = 8,
-        /// Sent by the server if a session coulkd successfully be resumed.
-        Resumed = 9,
-        /// Message indicating that another user has disconnected from the voice channel.
-        ClientDisconnect = 13,
+        Identify,
+        SelectProtocol,
+        Ready,
+        Heartbeat,
+        SessionDescription,
+        Speaking,
+        HeartbeatAck,
+        Resume,
+        Hello,
+        Resumed,
+        ClientDisconnect,
     }
 );
 

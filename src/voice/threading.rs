@@ -19,9 +19,15 @@ use std::{
         mpsc::{Receiver as MpscReceiver, TryRecvError},
         Arc
     },
-    time::{Duration, Instant}
+    time::{Duration, Instant},
 };
-use super::{audio, connection::Connection, error::VoiceError, Bitrate, Status};
+use super::{
+    audio,
+    connection::Connection,
+    error::VoiceError,
+    Bitrate,
+    Status
+};
 use tokio_core::reactor::Core;
 use tokio_timer::{wheel, Timer};
 

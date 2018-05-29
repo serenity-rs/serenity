@@ -1,9 +1,11 @@
 use serde::de::Error as DeError;
 use serde::ser::{SerializeSeq, Serialize, Serializer};
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::hash::Hash;
-use std::rc::Rc;
+use std::{
+    cell::RefCell,
+    collections::HashMap,
+    hash::Hash,
+    rc::Rc,
+};
 use super::prelude::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]

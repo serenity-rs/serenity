@@ -420,6 +420,18 @@ impl Connection {
                             None => {},
                         }
                     },
+                    ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
+                        match self.last_heartbeat_nonce {
+                            Some(nonce) => {
+                                if ev.nonce != nonce {
+                                    warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                                }
+
+                                self.last_heartbeat_nonce = None;
+                            },
+                            None => {},
+                        }
+                    },
                     ReceiverStatus::Websocket(other) => {
                         info!("[Voice] Received other websocket data: {:?}", other);
                     },

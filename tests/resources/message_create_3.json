@@ -1,0 +1,29 @@
+{
+    "type": 0,
+    "tts": false,
+    "timestamp": "2017-01-01T01:01:01.100000+00:00",
+    "pinned": false,
+    "nonce": -6000000000000000,
+    "mentions": [],
+    "mention_roles": [],
+    "mention_everyone": false,
+    "id": "300000000000000000",
+    "embeds": [],
+    "edited_timestamp": null,
+    "content": "fake",
+    "channel_id": "100000000000000000",
+    "author": {
+      "username": "fake",
+      "id": "300000000000000000",
+      "discriminator": "1234",
+      "bot": true,
+      "avatar": "f133549aac3208319a9fbc3c12345678"
+    },
+    "member": {
+        "joined_at": "2017-11-19T18:55:33.00000+00:00",
+        "roles": [381891844067557378, 391753382181863425, 381925348956438528],
+        "deaf": false,
+        "mute": false
+    },
+    "attachments": []
+  }

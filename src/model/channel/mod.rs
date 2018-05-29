@@ -179,7 +179,7 @@ impl Channel {
     ///
     /// Refer to [`utils::is_nsfw`] for more details.
     ///
-    /// [`utils::is_nsfw`]: ../utils/fn.is_nsfw.html
+    /// [`utils::is_nsfw`]: ../../utils/fn.is_nsfw.html
     #[cfg(all(feature = "model", feature = "utils"))]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
@@ -282,29 +282,38 @@ impl Display for Channel {
     }
 }
 
+/// A representation of a type of channel.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub enum ChannelType {
+    /// An indicator that the channel is a text [`GuildChannel`].
+    ///
+    /// [`GuildChannel`]: struct.GuildChannel.html
+    Text = 0,
+    /// An indicator that the channel is a [`PrivateChannel`].
+    ///
+    /// [`PrivateChannel`]: struct.PrivateChannel.html
+    Private = 1,
+    /// An indicator that the channel is a voice [`GuildChannel`].
+    ///
+    /// [`GuildChannel`]: struct.GuildChannel.html
+    Voice = 2,
+    /// An indicator that the channel is the channel of a [`Group`].
+    ///
+    /// [`Group`]: struct.Group.html
+    Group = 3,
+    /// An indicator that the channel is the channel of a [`ChannelCategory`].
+    ///
+    /// [`ChannelCategory`]: struct.ChannelCategory.html
+    Category = 4,
+}
+
 enum_number!(
-    /// A representation of a type of channel.
     ChannelType {
-        #[doc="An indicator that the channel is a text [`GuildChannel`].
-
-[`GuildChannel`]: struct.GuildChannel.html"]
-        Text = 0,
-        #[doc="An indicator that the channel is a [`PrivateChannel`].
-
-[`PrivateChannel`]: struct.PrivateChannel.html"]
-        Private = 1,
-        #[doc="An indicator that the channel is a voice [`GuildChannel`].
-
-[`GuildChannel`]: struct.GuildChannel.html"]
-        Voice = 2,
-        #[doc="An indicator that the channel is the channel of a [`Group`].
-
-[`Group`]: struct.Group.html"]
-        Group = 3,
-        #[doc="An indicator that the channel is the channel of a [`ChannelCategory`].
-
-[`ChannelCategory`]: struct.ChannelCategory.html"]
-        Category = 4,
+        Text,
+        Private,
+        Voice,
+        Group,
+        Category,
     }
 );
 
@@ -360,7 +369,7 @@ impl<'de> Deserialize<'de> for PermissionOverwrite {
         Ok(PermissionOverwrite {
             allow: data.allow,
             deny: data.deny,
-            kind: kind,
+            kind,
         })
     }
 }

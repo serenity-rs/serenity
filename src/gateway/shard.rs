@@ -6,7 +6,7 @@ use futures::stream::Stream as FuturesStream;
 use futures::sync::mpsc::{self, UnboundedSender};
 use futures::Sink;
 use model::event::{Event, GatewayEvent};
-use model::gateway::Game;
+use model::gateway::Activity;
 use model::id::GuildId;
 use model::user::OnlineStatus;
 use serde_json::{self, Error as JsonError, Value};
@@ -43,12 +43,12 @@ pub struct Shard {
     shard_info: [u64; 2],
     stage: ConnectionStage,
     stream: Option<ShardStream>,
-    token: String,
+    token: Rc<String>,
     tx: UnboundedSender<TungsteniteMessage>,
 }
 
 impl Shard {
-    pub fn new(token: String, shard_info: [u64; 2], handle: Handle)
+    pub fn new(token: Rc<String>, shard_info: [u64; 2], handle: Handle)
         -> Box<Future<Item = Shard, Error = Error>> {
         let done = connect_async(Url::from_str(CONNECTION).unwrap(), handle.remote().clone())
             .map(move |(duplex, _)| {
@@ -115,7 +115,7 @@ impl Shard {
 
                 if seq > self_seq + 1 {
                     warn!(
-                        "[Shard {:?}] Heartbeat off; them: {}, us: {}",
+                        "[Shard {:?}] Sequence off; them: {}, us: {}",
                         self.shard_info,
                         seq,
                         self_seq,
@@ -335,15 +335,15 @@ impl Shard {
         }))
     }
 
-    pub fn set_game(&mut self, game: Option<Game>) -> Result<(), Error> {
-        self._set_game(game);
+    pub fn set_activity(&mut self, activity: Option<Activity>) -> Result<(), Error> {
+        self._set_activity(activity);
 
         self.presence_update()
     }
 
-    pub fn set_presence(&mut self, status: OnlineStatus, game: Option<Game>)
+    pub fn set_presence(&mut self, status: OnlineStatus, activity: Option<Activity>)
         -> Result<(), Error> {
-        self._set_game(game);
+        self._set_activity(activity);
         self._set_status(status);
 
         self.presence_update()
@@ -394,7 +394,7 @@ impl Shard {
                 "compression": false,
                 "large_threshold": LARGE_THRESHOLD,
                 "shard": self.shard_info,
-                "token": self.token,
+                "token": *self.token,
                 "v": GATEWAY_VERSION,
                 "properties": {
                     "$browser": "test",
@@ -413,7 +413,7 @@ impl Shard {
         let now = Utc::now().timestamp() as u64;
 
         let v = {
-            let &(ref game, ref status) = &self.current_presence;
+            let &(ref activity, ref status) = &self.current_presence;
 
             json!({
                 "op": OpCode::StatusUpdate.num(),
@@ -421,7 +421,7 @@ impl Shard {
                     "afk": false,
                     "since": now,
                     "status": status.name(),
-                    "game": game.as_ref().map(|x| json!({
+                    "game": activity.as_ref().map(|x| json!({
                         "name": x.name,
                         "type": x.kind,
                         "url": x.url,
@@ -454,7 +454,7 @@ impl Shard {
             "d": {
                 "session_id": self.session_id,
                 "seq": self.heartbeat_info.borrow().seq,
-                "token": self.token,
+                "token": *self.token,
             },
         });
 
@@ -467,8 +467,8 @@ impl Shard {
         send(&mut self.tx, TungsteniteMessage::Text(json))
     }
 
-    fn _set_game(&mut self, game: Option<Game>) {
-        self.current_presence.0 = game;
+    fn _set_activity(&mut self, activity: Option<Activity>) {
+        self.current_presence.0 = activity;
     }
 
     fn _set_status(&mut self, mut status: OnlineStatus) {

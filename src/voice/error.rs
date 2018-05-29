@@ -1,6 +1,8 @@
 use serde_json::{Error as JsonError, Value};
-use std::io::Error as IoError;
-use std::process::Output;
+use std::{
+    io::Error as IoError,
+    process::Output
+};
 
 /// An error returned from the voice module.
 // Errors which are not visible to the end user are hidden.

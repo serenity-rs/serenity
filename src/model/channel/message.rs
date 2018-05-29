@@ -30,6 +30,9 @@ pub struct Message {
     /// message or a system message.
     #[serde(rename = "type")]
     pub kind: MessageType,
+    /// A partial amount of data about the user's member data, if this message
+    /// was sent in a guild.
+    pub member: Option<PartialMember>,
     /// Indicator of whether the message mentions everyone.
     pub mention_everyone: bool,
     /// Array of [`Role`]s' Ids mentioned in the message.
@@ -192,25 +195,37 @@ pub struct MessageReaction {
     pub reaction_type: ReactionType,
 }
 
+/// Differentiates between regular and different types of system messages.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub enum MessageType {
+    /// A regular message.
+    Regular = 0,
+    /// An indicator that a recipient was added by the author.
+    GroupRecipientAddition = 1,
+    /// An indicator that a recipient was removed by the author.
+    GroupRecipientRemoval = 2,
+    /// An indicator that a call was started by the author.
+    GroupCallCreation = 3,
+    /// An indicator that the group name was modified by the author.
+    GroupNameUpdate = 4,
+    /// An indicator that the group icon was modified by the author.
+    GroupIconUpdate = 5,
+    /// An indicator that a message was pinned by the author.
+    PinsAdd = 6,
+    /// An indicator that a member joined the guild.
+    MemberJoin = 7,
+}
+
 enum_number!(
-    /// Differentiates between regular and different types of system messages.
     MessageType {
-        /// A regular message.
-        Regular = 0,
-        /// An indicator that a recipient was added by the author.
-        GroupRecipientAddition = 1,
-        /// An indicator that a recipient was removed by the author.
-        GroupRecipientRemoval = 2,
-        /// An indicator that a call was started by the author.
-        GroupCallCreation = 3,
-        /// An indicator that the group name was modified by the author.
-        GroupNameUpdate = 4,
-        /// An indicator that the group icon was modified by the author.
-        GroupIconUpdate = 5,
-        /// An indicator that a message was pinned by the author.
-        PinsAdd = 6,
-        /// An indicator that a member joined the guild.
-        MemberJoin = 7,
+        Regular,
+        GroupRecipientAddition,
+        GroupRecipientRemoval,
+        GroupCallCreation,
+        GroupNameUpdate,
+        GroupIconUpdate,
+        PinsAdd,
+        MemberJoin,
     }
 );
 

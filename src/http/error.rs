@@ -1,13 +1,17 @@
 use futures::Canceled;
-use hyper::Response;
-use hyper::error::{Error as HyperError, UriError};
+use hyper::{
+    error::{Error as HyperError, UriError},
+    Response,
+};
 use native_tls::Error as TlsError;
 use serde_json::Error as JsonError;
-use std::cell::BorrowMutError;
-use std::error::Error as StdError;
-use std::fmt::{Display, Error as FmtError, Formatter, Result as FmtResult};
-use std::io::Error as IoError;
-use std::result::Result as StdResult;
+use std::{
+    cell::BorrowMutError,
+    error::Error as StdError,
+    fmt::{Display, Error as FmtError, Formatter, Result as FmtResult},
+    io::Error as IoError,
+    result::Result as StdResult,
+};
 use super::ratelimiting::RateLimitError;
 use tokio_timer::TimerError;
 

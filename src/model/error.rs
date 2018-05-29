@@ -1,7 +1,13 @@
 //! Error enum definition wrapping potential model implementation errors.
 
-use std::error::Error as StdError;
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::{
+    error::Error as StdError,
+    fmt::{
+        Display, 
+        Formatter, 
+        Result as FmtResult
+    }
+};
 use super::Permissions;
 
 /// An error returned from the [`model`] module.

@@ -44,10 +44,12 @@ use internal::prelude::*;
 use self::utils::*;
 use serde::de::Visitor;
 use serde::{Deserialize, Deserializer};
-use std::collections::HashMap;
-use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::rc::Rc;
-use std::result::Result as StdResult;
+use std::{
+    collections::HashMap,
+    fmt::{Display, Formatter, Result as FmtResult},
+    rc::Rc,
+    result::Result as StdResult,
+};
 
 #[cfg(feature = "utils")]
 use utils::Colour;

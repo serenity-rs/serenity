@@ -15,6 +15,13 @@ macro_rules! p {
     };
 }
 
+// An activity with null type.
+#[test]
+fn activity() {
+    p!(Activity, "activity_1");
+    p!(Activity, "activity_2");
+}
+
 #[test]
 fn channel_create() {
     p!(ChannelCreateEvent, "channel_create_1");
@@ -38,12 +45,6 @@ fn channel_update() {
 #[test]
 fn emoji_animated() {
     p!(Emoji, "emoji_animated");
-}
-
-// A game with null type.
-#[test]
-fn game() {
-    p!(Game, "game_1");
 }
 
 #[test]
@@ -126,6 +127,9 @@ fn message_create() {
 
     // negative nonce
     p!(MessageCreateEvent, "message_create_2");
+
+    // message from guild with partial member data
+    p!(MessageCreateEvent, "message_create_3");
 }
 
 #[test]

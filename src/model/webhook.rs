@@ -1,7 +1,13 @@
 //! Webhook model and implementations.
 
-use super::id::{ChannelId, GuildId, WebhookId};
-use super::user::User;
+use super::{
+    id::{
+        ChannelId,
+        GuildId,
+        WebhookId
+    },
+    user::User
+};
 
 /// A representation of a webhook, which is a low-effort way to post messages to
 /// channels. They do not necessarily require a bot user or authentication to

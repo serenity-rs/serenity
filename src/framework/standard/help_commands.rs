@@ -26,19 +26,38 @@
 use client::Context;
 #[cfg(feature = "cache")]
 use framework::standard::{has_correct_roles, has_correct_permissions};
-use model::channel::Message;
-use model::id::ChannelId;
-use std::collections::HashMap;
-use std::hash::BuildHasher;
-use std::sync::Arc;
-use std::fmt::Write;
+use model::{
+    channel::Message,
+    id::{ChannelId, UserId},
+};
+use std::{
+    collections::{HashMap, HashSet},
+    fmt::Write,
+    hash::BuildHasher,
+    sync::Arc,
+};
 use super::command::{InternalCommand};
-use super::{Args, CommandGroup, CommandOrAlias, HelpOptions, CommandOptions, CommandError, HelpBehaviour};
+use super::{
+    Args,
+    CommandError,
+    CommandGroup,
+    CommandOptions,
+    CommandOrAlias,
+    HelpBehaviour,
+    HelpOptions,
+};
 use utils::Colour;
 
 fn error_embed(channel_id: &ChannelId, input: &str, colour: Colour) {
-    let _ = channel_id.send_message(|m| {
-        m.embed(|e| e.colour(colour).description(input))
+    let _ = channel_id.send_message(|mut m| {
+        m.embed(|mut e| {
+            e.colour(colour);
+            e.description(input);
+
+            e
+        });
+
+        m
     });
 }
 
@@ -82,7 +101,7 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
 ///
 /// Use the command with `exec_help`:
 ///
-/// ```rust
+/// ```rust,no_run
 /// # use serenity::prelude::*;
 /// # struct Handler;
 /// #
@@ -100,6 +119,7 @@ pub fn with_embeds<H: BuildHasher>(
     msg: &Message,
     help_options: &HelpOptions,
     groups: HashMap<String, Arc<CommandGroup>, H>,
+    owners: HashSet<UserId>,
     args: &Args
 ) -> Result<(), CommandError> {
     if !args.is_empty() {
@@ -154,34 +174,36 @@ pub fn with_embeds<H: BuildHasher>(
                     return Ok(());
                 }
 
-                let _ = msg.channel_id.send_message(|m| {
-                    m.embed(|e| {
-                        let mut embed = e.colour(help_options.embed_success_colour).title(command_name);
+                let _ = msg.channel_id.send_message(|mut m| {
+                    m.embed(|mut embed| {
+                        embed.colour(help_options.embed_success_colour);
+
+                        embed.title(command_name.clone());
 
                         if let Some(ref desc) = command.desc {
-                            embed = embed.description(desc);
+                            embed.description(desc);
                         }
 
                         if let Some(ref usage) = command.usage {
                             let value = format!("`{} {}`", command_name, usage);
 
-                            embed = embed.field(&help_options.usage_label, value, true);
+                            embed.field(&help_options.usage_label, value, true);
                         }
 
                         if let Some(ref example) = command.example {
                             let value = format!("`{} {}`", command_name, example);
 
-                            embed = embed.field(&help_options.usage_sample_label, value, true);
+                            embed.field(&help_options.usage_sample_label, value, true);
                         }
 
                         if group_name != "Ungrouped" {
-                            embed = embed.field(&help_options.grouped_label, group_name, true);
+                            embed.field(&help_options.grouped_label, group_name, true);
                         }
 
                         if !command.aliases.is_empty() {
                             let aliases = command.aliases.join(", ");
 
-                            embed = embed.field(&help_options.aliases_label, aliases, true);
+                            embed.field(&help_options.aliases_label, aliases, true);
                         }
 
                         let available = if command.dm_only {
@@ -192,10 +214,12 @@ pub fn with_embeds<H: BuildHasher>(
                             &help_options.dm_and_guild_text
                         };
 
-                        embed = embed.field(&help_options.available_text, available, true);
+                        embed.field(&help_options.available_text, available, true);
 
                         embed
-                    })
+                    });
+
+                    m
                 });
 
                 return Ok(());
@@ -208,17 +232,24 @@ pub fn with_embeds<H: BuildHasher>(
         return Ok(());
     }
 
-    let _ = msg.channel_id.send_message(|m| {
-        m.embed(|mut e| {
-
-            if let Some(ref striked_command_text) = help_options.striked_commands_tip {
-                e = e.colour(help_options.embed_success_colour).description(
-                    format!("{}\n{}", &help_options.individual_command_tip, striked_command_text),
-                );
+    let _ = msg.channel_id.send_message(|mut m| {
+        m.embed(|mut embed| {
+            let striked_command_tip = if msg.is_private() {
+                &help_options.striked_commands_tip_in_guild
             } else {
-                e = e.colour(help_options.embed_success_colour).description(
+                &help_options.striked_commands_tip_in_dm
+            };
+
+            if let Some(ref striked_command_text) = striked_command_tip {
+                embed.colour(help_options.embed_success_colour);
+                embed.description(format!(
+                    "{}\n{}",
                     &help_options.individual_command_tip,
-                );
+                    &striked_command_text,
+                ));
+            } else {
+                embed.colour(help_options.embed_success_colour);
+                embed.description(&help_options.individual_command_tip);
             }
 
             let mut group_names = groups.keys().collect::<Vec<_>>();
@@ -242,6 +273,8 @@ pub fn with_embeds<H: BuildHasher>(
                     let cmd = &commands[name];
                     let cmd = cmd.options();
 
+                    let mut display = HelpBehaviour::Nothing;
+
                     if !cmd.dm_only && !cmd.guild_only || cmd.dm_only && msg.is_private() || cmd.guild_only && !msg.is_private() {
 
                         if cmd.help_available && has_correct_permissions(&cmd, msg) {
@@ -251,70 +284,45 @@ pub fn with_embeds<H: BuildHasher>(
 
                                 if let Some(member) = guild.members.get(&msg.author.id) {
 
-                                    if has_correct_roles(&cmd, &guild, &member) {
-                                        let _ = write!(desc, "`{}`\n", name);
-                                        has_commands = true;
-                                    } else {
-                                        match help_options.lacking_role {
-                                            HelpBehaviour::Strike => {
-                                                let name = format!("~~`{}`~~", &name);
-                                                let _ = write!(desc, "{}\n", name);
-                                                has_commands = true;
-                                            },
-                                                HelpBehaviour::Nothing => {
-                                                let _ = write!(desc, "`{}`\n", name);
-                                                has_commands = true;
-                                            },
-                                                HelpBehaviour::Hide => {
-                                                continue;
-                                            },
-                                        }
+                                    if !has_correct_roles(&cmd, &guild, &member) {
+                                        display = help_options.lacking_role;
                                     }
                                 }
-                            } else {
-                                let _ = write!(desc, "`{}`\n", name);
-                                has_commands = true;
                             }
                         } else {
-                            match help_options.lacking_permissions {
-                                HelpBehaviour::Strike => {
-                                    let name = format!("~~`{}`~~", &name);
-                                    let _ = write!(desc, "{}\n", name);
-                                    has_commands = true;
-                                },
-                                HelpBehaviour::Nothing => {
-                                    let _ = write!(desc, "`{}`\n", name);
-                                    has_commands = true;
-                                },
-                                HelpBehaviour::Hide => {
-                                    continue;
-                                },
-                            }
+                            display = help_options.lacking_permissions;
                         }
                     } else {
-                        match help_options.wrong_channel {
-                            HelpBehaviour::Strike => {
-                                let name = format!("~~`{}`~~", &name);
-                                let _ = write!(desc, "{}\n", name);
-                                has_commands = true;
-                            },
-                            HelpBehaviour::Nothing => {
-                                let _ = write!(desc, "`{}`\n", name);
-                                has_commands = true;
-                            },
-                            HelpBehaviour::Hide => {
-                                continue;
-                            },
-                        }
+                        display = help_options.wrong_channel;
+                    }
+
+                    if cmd.owners_only && !owners.contains(&msg.author.id) {
+                        display += help_options.lacking_ownership;
+                    }
+
+                    match display {
+                        HelpBehaviour::Strike => {
+                            let name = format!("~~`{}`~~", &name);
+                            let _ = write!(desc, "{}\n", name);
+                            has_commands = true;
+                        },
+                        HelpBehaviour::Nothing => {
+                            let _ = write!(desc, "`{}`\n", name);
+                            has_commands = true;
+                        },
+                        HelpBehaviour::Hide => {}
                     }
                 }
 
                 if has_commands {
-                    e = e.field(&group_name[..], &desc[..], true);
+                    embed.field(&group_name[..], &desc[..], true);
                 }
             }
-            e
-        })
+
+            embed
+        });
+
+        m
     });
 
     Ok(())
@@ -326,7 +334,7 @@ pub fn with_embeds<H: BuildHasher>(
 ///
 /// Use the command with `exec_help`:
 ///
-/// ```rust
+/// ```rust,no_run
 /// # use serenity::prelude::*;
 /// # struct Handler;
 /// #
@@ -344,6 +352,7 @@ pub fn plain<H: BuildHasher>(
     msg: &Message,
     help_options: &HelpOptions,
     groups: HashMap<String, Arc<CommandGroup>, H>,
+    _owners: HashSet<UserId>,
     args: &Args
 ) -> Result<(), CommandError> {
     if !args.is_empty() {
@@ -449,7 +458,13 @@ pub fn plain<H: BuildHasher>(
 
     let mut result = "**Commands**\n".to_string();
 
-    if let Some(ref striked_command_text) = help_options.striked_commands_tip {
+    let striked_command_tip = if msg.is_private() {
+            &help_options.striked_commands_tip_in_guild
+        } else {
+            &help_options.striked_commands_tip_in_dm
+    };
+
+    if let Some(ref striked_command_text) = striked_command_tip {
         let _ = write!(result, "{}\n{}\n\n", &help_options.individual_command_tip, striked_command_text);
     } else {
         let _ = write!(result, "{}\n\n", &help_options.individual_command_tip);

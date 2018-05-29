@@ -1,9 +1,13 @@
 use client::Context;
 use http;
-use model::channel::Message;
-use model::id::{GuildId, UserId};
-use std::collections::HashSet;
-use std::default::Default;
+use model::{
+    channel::Message,
+    id::{ChannelId, GuildId, UserId}
+};
+use std::{
+    collections::HashSet,
+    default::Default
+};
 use super::command::PrefixCheck;
 
 /// The configuration to use for a [`Framework`] associated with a [`Client`]
@@ -40,6 +44,7 @@ pub struct Configuration {
     #[doc(hidden)] pub allow_whitespace: bool,
     #[doc(hidden)] pub blocked_guilds: HashSet<GuildId>,
     #[doc(hidden)] pub blocked_users: HashSet<UserId>,
+    #[doc(hidden)] pub allowed_channels: HashSet<ChannelId>,
     #[doc(hidden)] pub depth: usize,
     #[doc(hidden)] pub disabled_commands: HashSet<String>,
     #[doc(hidden)] pub dynamic_prefix: Option<Box<PrefixCheck>>,
@@ -96,7 +101,7 @@ impl Configuration {
     ///
     /// Create a HashSet in-place:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -114,6 +119,30 @@ impl Configuration {
         self
     }
 
+    /// HashSet of channels Ids where commands will be working.
+    ///
+    /// # Examples
+    ///
+    /// Create a HashSet in-place:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler).unwrap();
+    /// use serenity::model::id::ChannelId;
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// client.with_framework(StandardFramework::new().configure(|c| c
+    ///     .allowed_channels(vec![ChannelId(7), ChannelId(77)].into_iter().collect())));
+    /// ```
+    pub fn allowed_channels(mut self, channels: HashSet<ChannelId>) -> Self {
+        self.allowed_channels = channels;
+
+        self
+    }
+
     /// HashSet of user Ids whose commands will be ignored.
     /// Guilds owned by user Ids will also be ignored.
     ///
@@ -121,7 +150,7 @@ impl Configuration {
     ///
     /// Create a HashSet in-place:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -159,7 +188,7 @@ impl Configuration {
     ///
     /// Ignore a set of commands, assuming they exist:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -282,7 +311,7 @@ impl Configuration {
     ///
     /// Create a HashSet in-place:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -297,7 +326,7 @@ impl Configuration {
     ///
     /// Create a HashSet beforehand:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -326,7 +355,7 @@ impl Configuration {
     ///
     /// Assign a basic prefix:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -351,7 +380,7 @@ impl Configuration {
     ///
     /// Assign a set of prefixes the bot can respond to:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -375,7 +404,7 @@ impl Configuration {
     ///
     /// Have the args be seperated by a comma and a space:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -400,7 +429,7 @@ impl Configuration {
     ///
     /// Have the args be seperated by a comma and a space; and a regular space:
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// #
@@ -450,6 +479,7 @@ impl Default for Configuration {
             owners: HashSet::default(),
             blocked_users: HashSet::default(),
             blocked_guilds: HashSet::default(),
+            allowed_channels: HashSet::default(),
             disabled_commands: HashSet::default(),
             allow_dm: true,
             ignore_webhooks: true,

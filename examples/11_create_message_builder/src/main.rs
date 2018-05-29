@@ -14,13 +14,25 @@ impl EventHandler for Handler {
             // using a builder syntax.
             // This example will create a message that says "Hello, World!", with an embed that has
             // a title, description, and footer.
-            if let Err(why) = msg.channel_id.send_message(|m| m
-                .content("Hello, World!")
-                .embed(|e| e
-                    .title("This is a title")
-                    .description("This is a description")
-                    .footer(|f| f
-                        .text("This is a footer")))) {
+            let msg = msg.channel_id.send_message(|mut m| {
+                m.content("Hello, World!");
+                m.embed(|mut e| {
+                    e.title("This is a title");
+                    e.description("This is a description");
+
+                    e.footer(|mut f| {
+                        f.text("This is a footer");
+
+                        f
+                    });
+
+                    e
+                });
+
+                m
+            });
+
+            if let Err(why) = msg {
                 println!("Error sending message: {:?}", why);
             }
         }
