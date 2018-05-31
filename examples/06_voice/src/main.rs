@@ -19,7 +19,6 @@ use serenity::client::{CACHE, Client, Context, EventHandler};
 use serenity::framework::StandardFramework;
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
-use serenity::model::id::ChannelId;
 use serenity::model::misc::Mentionable;
 // Import the `Context` from the client and `parking_lot`'s `Mutex`.
 //
@@ -109,16 +108,7 @@ command!(deafen(ctx, msg) {
     }
 });
 
-command!(join(ctx, msg, args) {
-    let connect_to = match args.single::<u64>() {
-        Ok(id) => ChannelId(id),
-        Err(_) => {
-            check_msg(msg.reply("Requires a valid voice channel ID be given"));
-
-            return Ok(());
-        },
-    };
-
+command!(join(ctx, msg) {
     let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
@@ -126,6 +116,24 @@ command!(join(ctx, msg, args) {
 
             return Ok(());
         },
+    };
+
+    let channel_id = CACHE.read().guild(guild_id)
+        .and_then(|guild| guild
+            .read()
+            .voice_states
+            .get(&msg.author.id)
+            .cloned()
+        )
+        .and_then(|voice_state| voice_state.channel_id);
+
+    let connect_to = match channel_id {
+        Some(channel) => channel,
+        None => {
+            check_msg(msg.reply("Not in a voice channel"));
+
+            return Ok(());
+        }
     };
 
     let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
