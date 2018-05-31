@@ -109,23 +109,22 @@ command!(deafen(ctx, msg) {
 });
 
 command!(join(ctx, msg) {
-    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().guild_id,
+    let guild = match msg.guild() {
+        Some(guild) => guild,
         None => {
             check_msg(msg.channel_id.say("Groups and DMs not supported"));
 
             return Ok(());
-        },
+        }
     };
 
-    let channel_id = CACHE.read().guild(guild_id)
-        .and_then(|guild| guild
-            .read()
-            .voice_states
-            .get(&msg.author.id)
-            .cloned()
-        )
+    let guild_id = guild.read().id;
+
+    let channel_id = guild
+        .read()
+        .voice_states.get(&msg.author.id)
         .and_then(|voice_state| voice_state.channel_id);
+
 
     let connect_to = match channel_id {
         Some(channel) => channel,
