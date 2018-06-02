@@ -195,7 +195,7 @@ impl<'a> Lexer<'a> {
 /// A utility struct for handling arguments of a command.
 ///
 /// An "argument" is a part of the message up until the end of the message or at one of the specified delimiters.
-/// For instance, in a message like "ab cd" with given a space delimiter (" "), we'd get the arguments "ab" then "cd".
+/// For instance, in a message like "ab cd" with a given space delimiter (" "), we'd get the arguments "ab" then "cd".
 /// 
 /// In addition, the methods parse your argument to a certain type you gave to improve ergonomics.
 /// To further add, for cases where you stumble upon the need for quotes, consider using the `*_quoted` methods.
