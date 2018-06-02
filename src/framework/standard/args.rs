@@ -677,8 +677,9 @@ impl Args {
     /// Returns the first argument that can be parsed and removes it from the message. The suitable argument 
     /// can be in an arbitrary position in the message.
     ///
-    /// **Note**: This replaces all delimiters within the message
-    /// by the first set in your framework-config to win performance.
+    /// **Note**: 
+    /// This method contradicts the alternatives for avoiding the catch explained for `Args`, 
+    /// as it actually removes the argument if it was found.
     ///
     /// # Examples
     ///
