@@ -359,7 +359,10 @@ impl Args {
         &s[1..end]
     }
 
-    /// The amount of arguments.
+    /// The full amount of recognized arguments.
+    ///
+    /// **Note**:
+    /// This never changes. Except for [`find`], which upon success, subtracts the length by 1. (e.g len of `3` becomes `2`) 
     ///
     /// # Examples
     ///
@@ -370,6 +373,8 @@ impl Args {
     ///
     /// assert_eq!(args.len(), 2); // `2` because `["42", "69"]`
     /// ```
+    ///
+    /// [`find`]: #method.find
     pub fn len(&self) -> usize {
         self.args.len()
     }
