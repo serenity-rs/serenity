@@ -452,7 +452,7 @@ impl Args {
     /// 
     /// let mut args = Args::new("42 69 95", &[" ".to_string()]);
     ///
-    /// // Lets parse 'em numbers!
+    /// // Let's parse 'em numbers!
     /// assert_eq!(args.single::<u32>().unwrap(), 42);
     /// assert_eq!(args.single::<u32>().unwrap(), 69);
     /// assert_eq!(args.single::<u32>().unwrap(), 95);
