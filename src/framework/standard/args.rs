@@ -459,7 +459,7 @@ impl Args {
     /// 
     /// // Oh, no! I actually wanted to multiply all of them by 2! 
     /// // I don't want to call `rewind` 3 times manually....
-    /// // Wait, i could just go entirely back! 
+    /// // Wait, I could just go entirely back! 
     /// args.restore();
     /// 
     /// assert_eq!(args.single::<u32>().unwrap() * 2, 84);
