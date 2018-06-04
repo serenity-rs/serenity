@@ -359,7 +359,7 @@ impl Args {
         &s[1..end]
     }
 
-    /// The full amount of recognized arguments.
+    /// The full amount of recognised arguments.
     ///
     /// **Note**:
     /// This never changes. Except for [`find`], which upon success, subtracts the length by 1. (e.g len of `3` becomes `2`) 
