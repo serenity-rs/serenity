@@ -417,7 +417,7 @@ impl Args {
         self.offset >= self.args.len()
     }
 
-    /// Go one step behind
+    /// Go one step behind.
     /// 
     /// # Examples
     /// 
