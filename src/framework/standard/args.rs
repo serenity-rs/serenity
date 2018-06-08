@@ -78,17 +78,19 @@ enum TokenKind {
 struct Token<'a> {
     lit: &'a str,
     kind: TokenKind,
+    pos: usize,
 }
 
 impl<'a> Token<'a> {
-    fn new(kind: TokenKind, lit: &'a str) -> Self {
-        Token { kind, lit }
+    fn new(kind: TokenKind, lit: &'a str, pos: usize) -> Self {
+        Token { kind, lit, pos }
     }
 
     fn empty() -> Self {
         Token {
             kind: TokenKind::Eof,
             lit: "",
+            pos: !0,
         }
     }
 }
@@ -97,6 +99,7 @@ impl<'a> Token<'a> {
 struct TokenOwned {
     kind: TokenKind,
     lit: String,
+    pos: usize,
 }
 
 impl<'a> Token<'a> {
@@ -104,6 +107,7 @@ impl<'a> Token<'a> {
         TokenOwned {
             kind: self.kind,
             lit: self.lit.to_string(),
+            pos: self.pos,
         }
     }
 }
@@ -160,7 +164,7 @@ impl<'a> Lexer<'a> {
         if self.current().unwrap().contains(self.delims) {
             let start = self.offset;
             self.next();
-            return Token::new(TokenKind::Delimiter, &self.msg[start..self.offset]);
+            return Token::new(TokenKind::Delimiter, &self.msg[start..self.offset], start);
         }
 
         if self.current().unwrap() == "\"" {
@@ -176,9 +180,9 @@ impl<'a> Lexer<'a> {
 
             return if self.at_end() && &self.msg[end-1..end] != "\"" {
                 // invalid, missing an end quote; view it as a normal argument instead.
-                Token::new(TokenKind::Argument, &self.msg[start..])
+                Token::new(TokenKind::Argument, &self.msg[start..], start)
             } else {
-                Token::new(TokenKind::QuotedArgument, &self.msg[start..end])
+                Token::new(TokenKind::QuotedArgument, &self.msg[start..end], start)
             };
         }
 
@@ -188,7 +192,7 @@ impl<'a> Lexer<'a> {
             self.next();
         }
 
-        Token::new(TokenKind::Argument, &self.msg[start..self.offset])
+        Token::new(TokenKind::Argument, &self.msg[start..self.offset], start)
     }
 }
 
@@ -357,6 +361,43 @@ impl Args {
         }
     
         &s[1..end]
+    }
+
+    /// Returns the message starting from the token in the current argument offset; the "rest" of the message.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    /// 
+    /// let mut args = Args::new("42 69 91", &[" ".to_string()]);
+    ///
+    /// assert_eq!(args.rest(), "42 69 91");
+    /// 
+    /// args.skip();
+    /// 
+    /// assert_eq!(args.rest(), "69 91");
+    /// 
+    /// args.skip();
+    /// 
+    /// assert_eq!(args.rest(), "91");
+    /// 
+    /// args.skip();
+    /// 
+    /// assert_eq!(args.rest(), "");
+    /// ```
+    pub fn rest(&self) -> &str {
+        if self.is_empty() {
+            return "";
+        }
+        
+        let args = &self.args[self.offset..];
+
+        if let Some(token) = args.get(0) {
+            &self.message[token.pos..]
+        } else {
+            &self.message[..]
+        }
     }
 
     /// The full amount of recognised arguments.
