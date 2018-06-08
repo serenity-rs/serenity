@@ -17,6 +17,7 @@ pub use self::args::{
 pub(crate) use self::buckets::{Bucket, Ratelimit};
 pub(crate) use self::command::Help;
 pub use self::command::{
+    Check,
     HelpFunction,
     HelpOptions,
     Command,
@@ -625,7 +626,7 @@ impl StandardFramework {
                 let all_passed = command
                     .checks
                     .iter()
-                    .all(|check| check(&mut context, message, args, command));
+                    .all(|check| (check.0)(&mut context, message, args, command));
 
                 if all_passed {
                     None

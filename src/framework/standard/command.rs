@@ -12,10 +12,28 @@ use std::{
 use utils::Colour;
 use super::{Args, Configuration, HelpBehaviour};
 
-pub type Check = Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
+type CheckFunction = Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
                      + Send
                      + Sync
                      + 'static;
+
+pub struct Check(pub(crate) Box<CheckFunction>);
+
+impl Check {
+    pub(crate) fn new<F: Send + Sync + 'static>(f: F) -> Self 
+        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool 
+    {
+        Check(Box::new(f))
+    }
+}
+
+impl Debug for Check {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        f.debug_tuple("Check")
+            .field(&"<fn>")
+            .finish()
+    }
+}
 
 pub type HelpFunction = fn(&mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, &Args)
                    -> Result<(), Error>;
@@ -24,7 +42,9 @@ pub struct Help(pub HelpFunction, pub Arc<HelpOptions>);
 
 impl Debug for Help {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "fn()")
+        f.debug_struct("Help")
+            .field("options", &self.1)
+            .finish()
     }
 }
 
@@ -49,7 +69,7 @@ impl fmt::Debug for CommandOrAlias {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             CommandOrAlias::Alias(ref s) => f.debug_tuple("CommandOrAlias::Alias").field(&s).finish(),
-            _ => Ok(())
+            CommandOrAlias::Command(ref arc) => f.debug_tuple("CommandOrAlias::Command").field(&arc.options()).finish(),
         }
     }
 }
@@ -97,10 +117,11 @@ impl Default for CommandGroup {
     }
 }
 
+#[derive(Debug)]
 pub struct CommandOptions {
     /// A set of checks to be called prior to executing the command. The checks
     /// will short-circuit on the first check that returns `false`.
-    pub checks: Vec<Box<Check>>,
+    pub checks: Vec<Check>,
     /// Ratelimit bucket.
     pub bucket: Option<String>,
     /// Command description, used by other commands.
@@ -284,25 +305,6 @@ impl<F> Command for F where F: Fn(&mut Context, &Message, Args) -> Result<(), Er
     + 'static {
     fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), Error> {
         (*self)(c, m, a)
-    }
-}
-
-impl fmt::Debug for CommandOptions {
-    // TODO: add CommandOptions::checks somehow?
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        fmt.debug_struct("CommandOptions")
-            .field("bucket", &self.bucket)
-            .field("desc", &self.desc)
-            .field("example", &self.example)
-            .field("usage", &self.usage)
-            .field("min_args", &self.min_args)
-            .field("required_permissions", &self.required_permissions)
-            .field("allowed_roles", &self.allowed_roles)
-            .field("help_available", &self.help_available)
-            .field("dm_only", &self.dm_only)
-            .field("guild_only", &self.guild_only)
-            .field("owners_only", &self.owners_only)
-            .finish()
     }
 }
 

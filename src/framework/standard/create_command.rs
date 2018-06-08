@@ -3,7 +3,8 @@ pub use super::{
     Command, 
     CommandGroup, 
     CommandOptions, 
-    CommandError
+    CommandError,
+    Check,
 };
 
 use client::Context;
@@ -108,7 +109,7 @@ impl CreateCommand {
                      + Send
                      + Sync
                      + 'static {
-        self.0.checks.push(Box::new(check));
+        self.0.checks.push(Check::new(check));
 
         self
     }
