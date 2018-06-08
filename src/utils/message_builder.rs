@@ -536,7 +536,7 @@ impl MessageBuilder {
             c.inner = normalize(&c.inner).replace("```", " ");
             self.0.push_str(&c.to_string());
         }
-        self.0.push_str("```");
+        self.0.push_str("\n```");
 
         self
     }
