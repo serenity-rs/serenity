@@ -531,7 +531,6 @@ impl MessageBuilder {
         }
 
         self.0.push('\n');
-
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("```", " ");
