@@ -16,6 +16,14 @@ fn code_blocks() {
 }
 
 #[test]
+fn safe_code_blocks() {
+    let content = MessageBuilder::new()
+        .push_codeblock_safe("test", Some("rb"))
+        .build();
+    assert_eq!(content, "```rb\ntest\n```");
+}
+
+#[test]
 fn safe_content() {
     let content = MessageBuilder::new()
         .push_safe("@everyone discord.gg/discord-api")
