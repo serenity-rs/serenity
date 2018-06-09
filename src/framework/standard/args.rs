@@ -196,20 +196,73 @@ impl<'a> Lexer<'a> {
     }
 }
 
-/// A utility struct for handling arguments of a command.
+/// A utility struct for handling "arguments" of a command.
 ///
-/// An "argument" is a part of the message up until the end of the message or at one of the specified delimiters.
-/// For instance, in a message like "ab cd" with a given space delimiter (" "), we'd get the arguments "ab" then "cd".
+/// An "argument" is a part of the message up that ends at one of the specified delimiters, or the end of the message.
 /// 
-/// In addition, the methods parse your argument to a certain type you gave to improve ergonomics.
-/// To further add, for cases where you stumble upon the need for quotes, consider using the `*_quoted` methods.
-///  
+/// # Example
 /// 
-/// # A catch about how `Args` functions
-/// Most of the methods advance to the next argument once the job on the current one is done.
-/// If this is not something you desire, you have 2 options in your arsenal:
-///     1. To not advance at all, you can use the `*_n` methods, or;
-///     2. you can go back one step with the `rewind` method, or completely (to the start) with the `restore` method. 
+/// ```rust
+/// use serenity::framework::standard::Args;
+/// 
+/// let mut args = Args::new("hello world!", &[" ".to_string()]); // A space is our delimiter.
+/// 
+/// // Parse our argument as a `String` and assert that it's the "hello" part of the message.
+/// assert_eq!(args.single::<String>().unwrap(), "hello");
+/// // Same here.
+/// assert_eq!(args.single::<String>().unwrap(), "world!");
+/// 
+/// ```
+/// 
+/// We can also parse "quoted arguments" (no pun intended): 
+/// 
+/// ```rust
+/// use serenity::framework::standard::Args;
+/// 
+/// // Let us imagine this scenario:
+/// // You have a `photo` command that grabs the avatar url of a user. This command accepts names only.
+/// // Now, one of your users wants the avatar of a user named Princess Zelda.
+/// // Problem is, her name contains a space; our delimiter. This would result in two arguments, "Princess" and "Zelda".
+/// // So how should we get around this? Through quotes! By surrounding her name in them we can perceive it as one single argument. 
+/// let mut args = Args::new("\"Princess Zelda\""#, &[" ".to_string()]);
+/// 
+/// // Hooray!
+/// assert_eq!(args.single_quoted::<String>().unwrap(), "Princess Zelda");
+/// ```
+/// 
+/// In case of a mistake, we can go back in time... er i mean, one step (or entirely):
+/// 
+/// ```rust
+/// use serenity::framework::standard::Args;
+/// 
+/// let mut args = Args::new("4 20", &[" ".to_string()]);
+/// 
+/// assert_eq!(args.single::<u32>().unwrap(), 4);
+/// 
+/// // Oh wait, oops, meant to double the 4.
+/// // But i won't able to access it now...
+/// // oh wait, i can `rewind`.
+/// args.rewind();
+/// 
+/// assert_eq!(args.single::<u32>().unwrap() * 2, 8);
+/// 
+/// // And the same for the 20
+/// assert_eq!(args.single::<u32>().unwrap() * 2, 40);
+/// 
+/// // WAIT, NO. I wanted to concatenate them into a "420" string...
+/// // Argh, what should i do now????
+/// // ....
+/// // oh, `restore`
+/// args.restore();
+/// 
+/// let res = format!("{}{}", args.single::<String>().unwrap(), args.single::<String>().unwrap());
+/// 
+/// // Yay.
+/// assert_eq!(res, "420");
+/// ```
+/// 
+/// **A category of methods not showcased as an example**: `*_n` methods. 
+/// Their docs are good enough to explain themselves. (+ don't want to clutter this doc with another Example)
 #[derive(Clone, Debug)]
 pub struct Args {
     message: String,
@@ -724,8 +777,9 @@ impl Args {
     /// can be in an arbitrary position in the message.
     ///
     /// **Note**: 
-    /// This method contradicts the alternatives for avoiding the catch explained for `Args`, 
-    /// as it actually removes the argument if it was found.
+    /// Unlike how other methods on this struct work, 
+    /// this function permantently removes the argument if it was **found** and was **succesfully** parsed.
+    /// Hence, use this with caution.
     ///
     /// # Examples
     ///
