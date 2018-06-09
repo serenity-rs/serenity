@@ -715,7 +715,7 @@ impl StandardFramework {
     ///
     /// ```rust,ignore
     /// framework.command("ping", |c| c
-    ///     .description("Responds with 'pong'.")
+    ///     .desc("Responds with 'pong'.")
     ///     .exec(|ctx, _, _| {
     ///         let _ = ctx.say("pong");
     ///     }));
