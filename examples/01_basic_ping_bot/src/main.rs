@@ -1,4 +1,4 @@
-#![feature(proc_macro, conservative_impl_trait, generators)]
+#![feature(proc_macro, generators)]
 
 extern crate futures_await as futures;
 extern crate serenity;
@@ -7,10 +7,9 @@ extern crate tokio_core;
 use futures::prelude::*;
 use serenity::gateway::Shard;
 use serenity::model::event::{Event, GatewayEvent};
-use serenity::model::gateway::Game;
-use serenity::model::user::OnlineStatus;
 use std::error::Error;
 use std::env;
+use std::rc::Rc;
 use tokio_core::reactor::{Core, Handle};
 
 fn main() {
@@ -23,8 +22,8 @@ fn main() {
 #[async]
 fn try_main(handle: Handle) -> Result<(), Box<Error + 'static>> {
     // Configure the client with your Discord bot token in the environment.
-    let token = env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment");
+    let token = Rc::new(env::var("DISCORD_TOKEN")
+        .expect("Expected a token in the environment"));
 
     // Create a new shard, specifying the token, the ID of the shard (0 of 1),
     // and a handle to the event loop
