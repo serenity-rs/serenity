@@ -149,10 +149,11 @@ macro_rules! command {
 
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
+#[derive(Debug)]
 pub enum DispatchError {
     /// When a custom function check has failed.
     //
-    // TODO: Bring back `Arc<Command>` as `CommandOptions` here somehow?
+    // TODO: Bring back `Arc<Command>` as `CommandOptions` in 0.6.x.
     CheckFailed,
     /// When the requested command is disabled in bot configuration.
     CommandDisabled(String),
@@ -186,32 +187,6 @@ pub enum DispatchError {
     IgnoredBot,
     /// When the bot ignores webhooks and a command was issued by one.
     WebhookAuthor,
-}
-
-use std::fmt;
-
-impl fmt::Debug for DispatchError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use self::DispatchError::*;
-
-        match *self {
-            CheckFailed => write!(f, "DispatchError::CheckFailed"),
-            CommandDisabled(ref s) => f.debug_tuple("DispatchError::CommandDisabled").field(&s).finish(),
-            BlockedUser => write!(f, "DispatchError::BlockedUser"),
-            BlockedGuild => write!(f, "DispatchError::BlockedGuild"),
-            BlockedChannel => write!(f, "DispatchError::BlockedChannel"),
-            LackOfPermissions(ref perms) => f.debug_tuple("DispatchError::LackOfPermissions").field(&perms).finish(),
-            RateLimited(ref num) => f.debug_tuple("DispatchError::RateLimited").field(&num).finish(),
-            OnlyForDM => write!(f, "DispatchError::OnlyForDM"),
-            OnlyForOwners => write!(f, "DispatchError::OnlyForOwners"),
-            OnlyForGuilds => write!(f, "DispatchError::OnlyForGuilds"),
-            LackingRole => write!(f, "DispatchError::LackingRole"),
-            NotEnoughArguments { ref min, ref given } => f.debug_struct("DispatchError::NotEnoughArguments").field("min", &min).field("given", &given).finish(),
-            TooManyArguments { ref max, ref given } => f.debug_struct("DispatchError::TooManyArguments").field("max", &max).field("given", &given).finish(),
-            IgnoredBot => write!(f, "DispatchError::IgnoredBot"),
-            WebhookAuthor => write!(f, "DispatchError::WebhookAuthor"),
-        }
-    }
 }
 
 type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;
@@ -1172,12 +1147,10 @@ pub enum HelpBehaviour {
     Nothing
 }
 
+use std::fmt;
+
 impl fmt::Display for HelpBehaviour {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-       match *self {
-           HelpBehaviour::Strike => write!(f, "HelpBehaviour::Strike"),
-           HelpBehaviour::Hide => write!(f, "HelpBehaviour::Hide"),
-           HelpBehaviour::Nothing => write!(f, "HelBehaviour::Nothing"),
-       }
+       fmt::Debug::fmt(self, f)
     }
 }
