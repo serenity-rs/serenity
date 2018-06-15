@@ -30,6 +30,11 @@ pub struct Message {
     ///
     /// [`Channel`]: enum.Channel.html
     pub channel_id: ChannelId,
+    /// The Id of the [`Guild`] that the message was sent in. This value will
+    /// only be present if this message was received over the gateway.
+    /// 
+    /// [`Guild`]: ../guild/struct.Guild.html
+    pub guild_id: Option<GuildId>,
     /// The content of the message.
     pub content: String,
     /// The timestamp of the last time the message was updated, if it was.
