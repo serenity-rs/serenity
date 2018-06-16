@@ -89,7 +89,7 @@ impl Role {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(all(feature = "builder", feature = "cache"))]
-    pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
+    pub fn edit<F: FnOnce(&mut EditRole)>(&self, f: F) -> Result<Role> {
         self.find_guild()
             .and_then(|guild_id| guild_id.edit_role(self.id, f))
     }

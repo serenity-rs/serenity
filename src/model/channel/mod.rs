@@ -347,7 +347,7 @@ impl Channel {
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-        where F: FnOnce(GetMessages) -> GetMessages {
+        where F: FnOnce(&mut GetMessages) {
         self.id().messages(f)
     }
 

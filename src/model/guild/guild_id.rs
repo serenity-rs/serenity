@@ -175,8 +175,10 @@ impl GuildId {
     /// [`Guild::create_role`]: struct.Guild.html#method.create_role
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
-    pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
-        let map = utils::vecmap_to_json_map(f(EditRole::default()).0);
+    pub fn create_role<F: FnOnce(&mut EditRole)>(&self, f: F) -> Result<Role> {
+        let mut e = EditRole::default();
+        f(&mut e);
+        let map = utils::vecmap_to_json_map(e.0);
 
         let role = http::create_role(self.0, &map)?;
 
@@ -244,8 +246,10 @@ impl GuildId {
     /// [`Guild::edit`]: struct.Guild.html#method.edit
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
-    pub fn edit<F: FnOnce(EditGuild) -> EditGuild>(&mut self, f: F) -> Result<PartialGuild> {
-        let map = utils::vecmap_to_json_map(f(EditGuild::default()).0);
+    pub fn edit<F: FnOnce(&mut EditGuild)>(&mut self, f: F) -> Result<PartialGuild> {
+        let mut e = EditGuild::default();
+        f(&mut e);
+        let map = utils::vecmap_to_json_map(e.0);
 
         http::edit_guild(self.0, &map)
     }
@@ -283,8 +287,10 @@ impl GuildId {
     /// ```
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
-        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
-        let map = utils::vecmap_to_json_map(f(EditMember::default()).0);
+        where F: FnOnce(&mut EditMember), U: Into<UserId> {
+        let mut e = EditMember::default();
+        f(&mut e);
+        let map = utils::vecmap_to_json_map(e.0);
 
         http::edit_member(self.0, user_id.into().0, &map)
     }
@@ -319,8 +325,10 @@ impl GuildId {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
     pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
-        where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
-        let map = utils::vecmap_to_json_map(f(EditRole::default()).0);
+        where F: FnOnce(&mut EditRole), R: Into<RoleId> {
+        let mut e = EditRole::default();
+        f(&mut e);
+        let map = utils::vecmap_to_json_map(e.0);
 
         http::edit_role(self.0, role_id.into().0, &map)
     }

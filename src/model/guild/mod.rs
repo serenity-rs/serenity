@@ -417,7 +417,7 @@ impl Guild {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     pub fn create_role<F>(&self, f: F) -> Result<Role>
-        where F: FnOnce(EditRole) -> EditRole {
+        where F: FnOnce(&mut EditRole) {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_ROLES;
@@ -519,7 +519,7 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(EditGuild) -> EditGuild {
+        where F: FnOnce(&mut EditGuild) {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_GUILD;
@@ -581,7 +581,7 @@ impl Guild {
     /// ```
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
-        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
+        where F: FnOnce(&mut EditMember), U: Into<UserId> {
         self.id.edit_member(user_id, f)
     }
 
@@ -627,7 +627,7 @@ impl Guild {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
     pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
-        where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
+        where F: FnOnce(&mut EditRole), R: Into<RoleId> {
         self.id.edit_role(role_id, f)
     }
 

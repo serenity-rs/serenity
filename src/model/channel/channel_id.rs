@@ -295,8 +295,10 @@ impl ChannelId {
     /// [`Channel::messages`]: enum.Channel.html#method.messages
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-        where F: FnOnce(GetMessages) -> GetMessages {
-        let mut map = f(GetMessages::default()).0;
+        where F: FnOnce(&mut GetMessages) {
+        let mut g = GetMessages::default();
+        f(&mut g);
+        let mut map = g.0;
         let mut query = format!("?limit={}", map.remove(&"limit").unwrap_or(50));
 
         if let Some(after) = map.remove(&"after") {

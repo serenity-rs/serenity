@@ -87,8 +87,10 @@ impl Embed {
     /// ```
     #[inline]
     pub fn fake<F>(f: F) -> Value
-        where F: FnOnce(CreateEmbed) -> CreateEmbed {
-        let map = utils::vecmap_to_json_map(f(CreateEmbed::default()).0);
+        where F: FnOnce(&mut CreateEmbed) {
+        let mut c = CreateEmbed::default();
+        f(&mut c);
+        let map = utils::vecmap_to_json_map(c.0);
 
         Value::Object(map)
     }

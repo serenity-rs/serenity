@@ -51,8 +51,10 @@ impl CreateGroup {
 
     /// Adds a command to group.
     pub fn command<F>(&mut self, command_name: &str, f: F) -> &mut Self
-        where F: FnOnce(CreateCommand) -> CreateCommand {
-        let cmd = f(self.build_command()).finish();
+        where F: FnOnce(&mut CreateCommand) {
+        let mut c = self.build_command();
+        f(&mut c);
+        let cmd = c.finish();
 
         for n in &cmd.options().aliases {
             if let Some(ref prefix) = self.0.prefix {

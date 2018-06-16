@@ -156,7 +156,7 @@ impl PartialGuild {
     /// [`Guild::create_role`]: struct.Guild.html#method.create_role
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
-    pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
+    pub fn create_role<F: FnOnce(&mut EditRole)>(&self, f: F) -> Result<Role> {
         self.id.create_role(f)
     }
 
@@ -210,7 +210,7 @@ impl PartialGuild {
     ///
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(EditGuild) -> EditGuild {
+        where F: FnOnce(&mut EditGuild) {
         match self.id.edit(f) {
             Ok(guild) => {
                 self.afk_channel_id = guild.afk_channel_id;
@@ -265,7 +265,7 @@ impl PartialGuild {
     /// ```
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
-        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
+        where F: FnOnce(&mut EditMember), U: Into<UserId> {
         self.id.edit_member(user_id, f)
     }
 

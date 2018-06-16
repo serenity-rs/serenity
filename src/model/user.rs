@@ -89,7 +89,7 @@ impl CurrentUser {
     /// CACHE.write().user.edit(|p| p.avatar(Some(&avatar)));
     /// ```
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(EditProfile) -> EditProfile {
+        where F: FnOnce(&mut EditProfile) {
         let mut map = VecMap::new();
         map.insert("username", Value::String(self.name.clone()));
 
@@ -97,7 +97,9 @@ impl CurrentUser {
             map.insert("email", Value::String(email.clone()));
         }
 
-        let map = utils::vecmap_to_json_map(f(EditProfile(map)).0);
+        let mut e = EditProfile(map);
+        f(&mut e);
+        let map = utils::vecmap_to_json_map(e.0);
 
         match http::edit_profile(&map) {
             Ok(new) => {

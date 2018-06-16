@@ -83,7 +83,7 @@ impl ChannelCategory {
     /// ```
     #[cfg(all(feature = "builder", feature = "model", feature = "utils"))]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(EditChannel) -> EditChannel {
+        where F: FnOnce(&mut EditChannel) {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
@@ -98,7 +98,9 @@ impl ChannelCategory {
         map.insert("position", Value::Number(Number::from(self.position)));
         map.insert("type", Value::String(self.kind.name().to_string()));
 
-        let map = serenity_utils::vecmap_to_json_map(f(EditChannel(map)).0);
+        let mut e = EditChannel(map);
+        f(&mut e);
+        let map = serenity_utils::vecmap_to_json_map(e.0);
 
         http::edit_channel(self.id.0, &map).map(|channel| {
             let GuildChannel {

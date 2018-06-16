@@ -117,7 +117,7 @@ impl GuildChannel {
     /// ```
     #[cfg(feature = "utils")]
     pub fn create_invite<F>(&self, f: F) -> Result<RichInvite>
-        where F: FnOnce(CreateInvite) -> CreateInvite {
+        where F: FnOnce(&mut CreateInvite) {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::CREATE_INVITE;
@@ -127,7 +127,9 @@ impl GuildChannel {
             }
         }
 
-        let map = serenity_utils::vecmap_to_json_map(f(CreateInvite::default()).0);
+        let mut c = CreateInvite::default();
+        f(&mut c);
+        let map = serenity_utils::vecmap_to_json_map(c.0);
 
         http::create_invite(self.id.0, &map)
     }
@@ -317,7 +319,7 @@ impl GuildChannel {
     /// ```
     #[cfg(feature = "utils")]
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(EditChannel) -> EditChannel {
+        where F: FnOnce(&mut EditChannel) {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
@@ -332,7 +334,9 @@ impl GuildChannel {
         map.insert("position", Value::Number(Number::from(self.position)));
         map.insert("type", Value::String(self.kind.name().to_string()));
 
-        let edited = serenity_utils::vecmap_to_json_map(f(EditChannel(map)).0);
+        let mut e = EditChannel(map);
+        f(&mut e);
+        let edited = serenity_utils::vecmap_to_json_map(e.0);
 
         match http::edit_channel(self.id.0, &edited) {
             Ok(channel) => {
@@ -419,7 +423,7 @@ impl GuildChannel {
     /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-        where F: FnOnce(GetMessages) -> GetMessages {
+        where F: FnOnce(&mut GetMessages) {
         self.id.messages(f)
     }
 

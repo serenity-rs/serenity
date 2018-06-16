@@ -696,14 +696,16 @@ impl StandardFramework {
     ///     }));
     /// ```
     pub fn command<F>(&mut self, command_name: &str, f: F) -> &mut Self
-        where F: FnOnce(CreateCommand) -> CreateCommand {
+        where F: FnOnce(&mut CreateCommand) {
         {
             let ungrouped = self.groups
                 .entry("Ungrouped".to_string())
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
-                let cmd = f(CreateCommand::default()).finish();
+                let mut e = CreateCommand::default();
+                f(&mut e);
+                let cmd = e.finish();
                 let name = command_name.to_string();
 
                 if let Some(ref prefix) = group.prefix {
@@ -757,8 +759,10 @@ impl StandardFramework {
     ///         .on("pong", |_, msg, _| { msg.channel_id.say("ping!")?; Ok(()) })));
     /// ```
     pub fn group<F>(&mut self, group_name: &str, f: F) -> &mut Self
-        where F: FnOnce(CreateGroup) -> CreateGroup {
-        let group = f(CreateGroup(CommandGroup::default())).0;
+        where F: FnOnce(&mut CreateGroup) {
+        let mut c = CreateGroup(CommandGroup::default());
+        f(&mut c);
+        let group = c.0;
 
         self.groups.insert(group_name.into(), Arc::new(group));
         self.initialized = true;
