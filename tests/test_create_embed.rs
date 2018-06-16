@@ -52,8 +52,8 @@ fn test_from_embed() {
         }),
     };
 
-    let builder = CreateEmbed::from(embed)
-        .colour(0xFF0011)
+    let mut builder = CreateEmbed::from(embed);
+    builder.colour(0xFF0011)
         .description("This is a hakase description")
         .image("https://i.imgur.com/XfWpfCV.gif")
         .title("still a hakase")

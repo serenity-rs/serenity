@@ -305,7 +305,7 @@ impl Group {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
+        where F: FnOnce(&mut CreateMessage), T: Into<AttachmentType<'a>> {
         self.channel_id.send_files(files, f)
     }
 
@@ -319,7 +319,7 @@ impl Group {
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
-    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+    pub fn send_message<F: FnOnce(&mut CreateMessage)>(&self, f: F) -> Result<Message> {
         self.channel_id.send_message(f)
     }
 

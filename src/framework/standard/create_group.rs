@@ -50,7 +50,7 @@ impl CreateGroup {
     }
 
     /// Adds a command to group.
-    pub fn command<F>(mut self, command_name: &str, f: F) -> Self
+    pub fn command<F>(&mut self, command_name: &str, f: F) -> &mut Self
         where F: FnOnce(CreateCommand) -> CreateCommand {
         let cmd = f(self.build_command()).finish();
 
@@ -78,15 +78,15 @@ impl CreateGroup {
 
     /// Adds a command to group with a simplified API.
     /// You can return Err(From::from(string)) if there's an error.
-    pub fn on(self, name: &str,
-            f: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> Self {
+    pub fn on(&mut self, name: &str,
+            f: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> &mut Self {
         self.cmd(name, f)
     }
 
     /// Like [`on`], but accepts a `Command` directly.
     ///
     /// [`on`]: #method.on
-    pub fn cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
+    pub fn cmd<C: Command + 'static>(&mut self, name: &str, c: C) -> &mut Self {
         let cmd: Arc<Command> = Arc::new(c);
 
         self.0
@@ -105,42 +105,42 @@ impl CreateGroup {
     /// **Note**: serenity automatically puts a space after group prefix.
     ///
     /// **Note**: It's suggested to call this first when making a group.
-    pub fn prefix(mut self, desc: &str) -> Self {
+    pub fn prefix(&mut self, desc: &str) -> &mut Self {
         self.0.prefix = Some(desc.to_string());
 
         self
     }
 
     /// Adds a ratelimit bucket.
-    pub fn bucket(mut self, bucket: &str) -> Self {
+    pub fn bucket(&mut self, bucket: &str) -> &mut Self {
         self.0.bucket = Some(bucket.to_string());
 
         self
     }
 
     /// Whether command can be used only privately or not.
-    pub fn dm_only(mut self, dm_only: bool) -> Self {
+    pub fn dm_only(&mut self, dm_only: bool) -> &mut Self {
         self.0.dm_only = dm_only;
 
         self
     }
 
     /// Whether command can be used only in guilds or not.
-    pub fn guild_only(mut self, guild_only: bool) -> Self {
+    pub fn guild_only(&mut self, guild_only: bool) -> &mut Self {
         self.0.guild_only = guild_only;
 
         self
     }
 
     /// Whether command should be displayed in help list or not, used by other commands.
-    pub fn help_available(mut self, help_available: bool) -> Self {
+    pub fn help_available(&mut self, help_available: bool) -> &mut Self {
         self.0.help_available = help_available;
 
         self
     }
 
     /// Whether command can be used only privately or not.
-    pub fn owners_only(mut self, owners_only: bool) -> Self {
+    pub fn owners_only(&mut self, owners_only: bool) -> &mut Self {
         self.0.owners_only = owners_only;
 
         self
@@ -148,7 +148,7 @@ impl CreateGroup {
 
     /// The permissions that a user must have in the contextual channel in order
     /// for the command to be processed.
-    pub fn required_permissions(mut self, permissions: Permissions) -> Self {
+    pub fn required_permissions(&mut self, permissions: Permissions) -> &mut Self {
         self.0.required_permissions = permissions;
 
         self
@@ -156,7 +156,7 @@ impl CreateGroup {
 
     /// Sets roles that are allowed to use the command.
     #[cfg(feature = "cache")]
-    pub fn allowed_roles<T: ToString, It: IntoIterator<Item=T>>(mut self, allowed_roles: It) -> Self {
+    pub fn allowed_roles<T: ToString, It: IntoIterator<Item=T>>(&mut self, allowed_roles: It) -> &mut Self {
         self.0.allowed_roles = allowed_roles.into_iter().map(|x| x.to_string()).collect();
 
         self

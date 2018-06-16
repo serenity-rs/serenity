@@ -254,7 +254,7 @@ impl PrivateChannel {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
+        where F: FnOnce(&mut CreateMessage), T: Into<AttachmentType<'a>> {
         self.id.send_files(files, f)
     }
 
@@ -273,7 +273,7 @@ impl PrivateChannel {
     /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
     #[inline]
-    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+    pub fn send_message<F: FnOnce(&mut CreateMessage)>(&self, f: F) -> Result<Message> {
         self.id.send_message(f)
     }
 

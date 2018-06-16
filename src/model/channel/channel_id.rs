@@ -402,7 +402,9 @@ impl ChannelId {
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     #[inline]
     pub fn say<D: ::std::fmt::Display>(&self, content: D) -> Result<Message> {
-        self.send_message(|m| m.content(content))
+        self.send_message(|m| {
+            m.content(content);
+        })
     }
 
     /// Sends a file along with optional message contents. The filename _must_
@@ -463,8 +465,9 @@ impl ChannelId {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[cfg(feature = "utils")]
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
-        let mut msg = f(CreateMessage::default());
+        where F: FnOnce(&mut CreateMessage), T: Into<AttachmentType<'a>> {
+        let mut msg = CreateMessage::default();
+        f(&mut msg);
 
         if let Some(content) = msg.0.get(&"content") {
             if let Value::String(ref content) = *content {
@@ -503,8 +506,9 @@ impl ChannelId {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[cfg(feature = "utils")]
     pub fn send_message<F>(&self, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
-        let msg = f(CreateMessage::default());
+        where F: FnOnce(&mut CreateMessage) {
+        let mut msg = CreateMessage::default();
+        f(&mut msg);
         let map = utils::vecmap_to_json_map(msg.0);
 
         Message::check_content_length(&map)?;

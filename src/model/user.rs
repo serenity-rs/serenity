@@ -478,7 +478,7 @@ impl User {
     #[allow(let_and_return)]
     #[cfg(feature = "builder")]
     pub fn direct_message<F>(&self, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
+        where F: FnOnce(&mut CreateMessage) {
         if self.bot {
             return Err(Error::Model(ModelError::MessagingBot));
         }
@@ -539,7 +539,7 @@ impl User {
     /// [direct_message]: #method.direct_message
     #[cfg(feature = "builder")]
     #[inline]
-    pub fn dm<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+    pub fn dm<F: FnOnce(&mut CreateMessage)>(&self, f: F) -> Result<Message> {
         self.direct_message(f)
     }
 

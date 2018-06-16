@@ -433,7 +433,7 @@ impl Channel {
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
+        where F: FnOnce(&mut CreateMessage), T: Into<AttachmentType<'a>> {
         self.id().send_files(files, f)
     }
 
@@ -460,7 +460,7 @@ impl Channel {
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
     pub fn send_message<F>(&self, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
+        where F: FnOnce(&mut CreateMessage) {
         self.id().send_message(f)
     }
 

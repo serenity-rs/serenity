@@ -46,16 +46,18 @@ impl CreateMessage {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    pub fn content<D: Display>(mut self, content: D) -> Self {
+    pub fn content<D: Display>(&mut self, content: D) -> &mut Self {
         self.0.insert("content", Value::String(content.to_string()));
 
         self
     }
 
     /// Set an embed for the message.
-    pub fn embed<F>(mut self, f: F) -> Self
-        where F: FnOnce(CreateEmbed) -> CreateEmbed {
-        let map = utils::vecmap_to_json_map(f(CreateEmbed::default()).0);
+    pub fn embed<F>(&mut self, f: F) -> &mut Self
+        where F: FnOnce(&mut CreateEmbed) {
+        let mut c = CreateEmbed::default();
+        f(&mut c);
+        let map = utils::vecmap_to_json_map(c.0);
         let embed = Value::Object(map);
 
         self.0.insert("embed", embed);
@@ -68,14 +70,14 @@ impl CreateMessage {
     /// Think carefully before setting this to `true`.
     ///
     /// Defaults to `false`.
-    pub fn tts(mut self, tts: bool) -> Self {
+    pub fn tts(&mut self, tts: bool) -> &mut Self {
         self.0.insert("tts", Value::Bool(tts));
 
         self
     }
 
     /// Adds a list of reactions to create after the message's sent.
-    pub fn reactions<R: Into<ReactionType>, It: IntoIterator<Item=R>>(mut self, reactions: It) -> Self {
+    pub fn reactions<R: Into<ReactionType>, It: IntoIterator<Item=R>>(&mut self, reactions: It) -> &mut Self {
         self.1 = Some(reactions.into_iter().map(|r| r.into()).collect());
 
         self

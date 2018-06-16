@@ -92,7 +92,7 @@ impl CreateInvite {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn max_age(mut self, max_age: u64) -> Self {
+    pub fn max_age(&mut self, max_age: u64) -> &mut Self {
         self.0.insert("max_age", Value::Number(Number::from(max_age)));
 
         self
@@ -125,7 +125,7 @@ impl CreateInvite {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn max_uses(mut self, max_uses: u64) -> Self {
+    pub fn max_uses(&mut self, max_uses: u64) -> &mut Self {
         self.0.insert("max_uses", Value::Number(Number::from(max_uses)));
 
         self
@@ -156,7 +156,7 @@ impl CreateInvite {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn temporary(mut self, temporary: bool) -> Self {
+    pub fn temporary(&mut self, temporary: bool) -> &mut Self {
         self.0.insert("temporary", Value::Bool(temporary));
 
         self
@@ -187,7 +187,7 @@ impl CreateInvite {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn unique(mut self, unique: bool) -> Self {
+    pub fn unique(&mut self, unique: bool) -> &mut Self {
         self.0.insert("unique", Value::Bool(unique));
 
         self

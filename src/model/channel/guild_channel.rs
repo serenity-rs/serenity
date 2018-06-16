@@ -591,7 +591,7 @@ impl GuildChannel {
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[inline]
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
+        where F: FnOnce(&mut CreateMessage), T: Into<AttachmentType<'a>> {
         self.id.send_files(files, f)
     }
 
@@ -614,7 +614,7 @@ impl GuildChannel {
     /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
     /// [`Message`]: struct.Message.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+    pub fn send_message<F: FnOnce(&mut CreateMessage)>(&self, f: F) -> Result<Message> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::SEND_MESSAGES;
