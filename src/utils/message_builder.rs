@@ -97,7 +97,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "test");
     /// ```
-    pub fn build(self) -> String { self.0 }
+    pub fn build(&mut self) -> String { self.0 }
 
     /// Mentions the [`GuildChannel`] in the built message.
     ///
