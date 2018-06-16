@@ -492,36 +492,11 @@ impl StandardFramework {
                    to_check: &str,
                    built: &str)
                    -> Option<DispatchError> {
-        if self.configuration.ignore_bots && message.author.bot {
+        if self.configuration.ignore_bots || message.author.bot {
             Some(DispatchError::IgnoredBot)
         } else if self.configuration.ignore_webhooks && message.webhook_id.is_some() {
             Some(DispatchError::WebhookAuthor)
-        } else if self.configuration.owners.contains(&message.author.id) {
-            None
         } else {
-            if let Some(ref bucket) = command.bucket {
-                if let Some(ref mut bucket) = self.buckets.get_mut(bucket) {
-                    let rate_limit = bucket.take(message.author.id.0);
-                    match bucket.check {
-                        Some(ref check) => {
-                            let apply = feature_cache! {{
-                                let guild_id = message.guild_id();
-                                (check)(context, guild_id, message.channel_id, message.author.id)
-                            } else {
-                                (check)(context, message.channel_id, message.author.id)
-                            }};
-
-                            if apply && rate_limit > 0i64 {
-                                return Some(DispatchError::RateLimited(rate_limit));
-                            }
-                        },
-                        None => if rate_limit > 0i64 {
-                            return Some(DispatchError::RateLimited(rate_limit));
-                        },
-                    }
-                }
-            }
-
             let len = args.len();
 
             if let Some(x) = command.min_args {
@@ -539,6 +514,33 @@ impl StandardFramework {
                         max: x,
                         given: len,
                     });
+                }
+            }
+
+            if self.configuration.owners.contains(&message.author.id) {
+                return None;
+            }
+
+            if let Some(ref bucket) = command.bucket {
+                if let Some(ref mut bucket) = self.buckets.get_mut(bucket) {
+                    let rate_limit = bucket.take(message.author.id.0);
+
+                    // Is there a custom check for when this bucket applies?
+                    // If not, assert that it does always.
+                    let apply = bucket.check.as_ref().map_or(true, |check| {
+                        let apply = feature_cache! {{
+                            let guild_id = message.guild_id();
+                            (check)(context, guild_id, message.channel_id, message.author.id)
+                        } else {
+                            (check)(context, message.channel_id, message.author.id)
+                        }};
+
+                        apply
+                    });
+
+                    if apply && rate_limit > 0i64 {
+                        return Some(DispatchError::RateLimited(rate_limit));
+                    }
                 }
             }
 
