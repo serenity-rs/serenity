@@ -365,7 +365,7 @@ impl GuildChannel {
     /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
+        where F: FnOnce(&mut EditMessage), M: Into<MessageId> {
         self.id.edit_message(message_id, f)
     }
 

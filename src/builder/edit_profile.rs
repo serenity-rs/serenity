@@ -46,7 +46,7 @@ impl EditProfile {
     /// ```
     ///
     /// [`utils::read_image`]: ../fn.read_image.html
-    pub fn avatar(mut self, avatar: Option<&str>) -> Self {
+    pub fn avatar(&mut self, avatar: Option<&str>) -> &mut Self {
         let avatar = avatar.map_or(Value::Null, |x| Value::String(x.to_string()));
         self.0.insert("avatar", avatar);
 
@@ -63,7 +63,7 @@ impl EditProfile {
     /// **Note**: This can only be used by user accounts.
     ///
     /// [provided]: #method.password
-    pub fn email(mut self, email: &str) -> Self {
+    pub fn email(&mut self, email: &str) -> &mut Self {
         self.0.insert("email", Value::String(email.to_string()));
 
         self
@@ -75,7 +75,7 @@ impl EditProfile {
     /// [provided].
     ///
     /// [provided]: #method.password
-    pub fn new_password(mut self, new_password: &str) -> Self {
+    pub fn new_password(&mut self, new_password: &str) -> &mut Self {
         self.0.insert("new_password", Value::String(new_password.to_string()));
 
         self
@@ -86,7 +86,7 @@ impl EditProfile {
     ///
     /// [modifying the password]: #method.new_password
     /// [modifying the associated email address]: #method.email
-    pub fn password(mut self, password: &str) -> Self {
+    pub fn password(&mut self, password: &str) -> &mut Self {
         self.0.insert("password", Value::String(password.to_string()));
 
         self
@@ -98,7 +98,7 @@ impl EditProfile {
     /// and current discriminator, a new unique discriminator will be assigned.
     /// If there are no available discriminators with the requested username,
     /// an error will occur.
-    pub fn username(mut self, username: &str) -> Self {
+    pub fn username(&mut self, username: &str) -> &mut Self {
         self.0.insert("username", Value::String(username.to_string()));
 
         self

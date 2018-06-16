@@ -230,8 +230,9 @@ impl ChannelId {
     /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
     #[cfg(feature = "utils")]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
-        let msg = f(EditMessage::default());
+        where F: FnOnce(&mut EditMessage), M: Into<MessageId> {
+        let mut msg = EditMessage::default();
+        f(&mut msg);
 
         if let Some(content) = msg.0.get(&"content") {
             if let Value::String(ref content) = *content {

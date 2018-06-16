@@ -72,7 +72,7 @@ impl EditRole {
     }
 
     /// Sets the colour of the role.
-    pub fn colour(mut self, colour: u64) -> Self {
+    pub fn colour(&mut self, colour: u64) -> &mut Self {
         self.0.insert("color", Value::Number(Number::from(colour)));
 
         self
@@ -80,21 +80,21 @@ impl EditRole {
 
     /// Whether or not to hoist the role above lower-positioned role in the user
     /// list.
-    pub fn hoist(mut self, hoist: bool) -> Self {
+    pub fn hoist(&mut self, hoist: bool) -> &mut Self {
         self.0.insert("hoist", Value::Bool(hoist));
 
         self
     }
 
     /// Whether or not to make the role mentionable, notifying its users.
-    pub fn mentionable(mut self, mentionable: bool) -> Self {
+    pub fn mentionable(&mut self, mentionable: bool) -> &mut Self {
         self.0.insert("mentionable", Value::Bool(mentionable));
 
         self
     }
 
     /// The name of the role to set.
-    pub fn name(mut self, name: &str) -> Self {
+    pub fn name(&mut self, name: &str) -> &mut Self {
         self.0
             .insert("name", Value::String(name.to_string()));
 
@@ -102,7 +102,7 @@ impl EditRole {
     }
 
     /// The set of permissions to assign the role.
-    pub fn permissions(mut self, permissions: Permissions) -> Self {
+    pub fn permissions(&mut self, permissions: Permissions) -> &mut Self {
         self.0.insert("permissions", Value::Number(Number::from(permissions.bits())));
 
         self
@@ -110,7 +110,7 @@ impl EditRole {
 
     /// The position to assign the role in the role list. This correlates to the
     /// role's position in the user list.
-    pub fn position(mut self, position: u8) -> Self {
+    pub fn position(&mut self, position: u8) -> &mut Self {
         self.0.insert("position", Value::Number(Number::from(position)));
 
         self

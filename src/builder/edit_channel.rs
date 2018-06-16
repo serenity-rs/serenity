@@ -28,7 +28,7 @@ impl EditChannel {
     /// This is for [voice] channels only.
     ///
     /// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice
-    pub fn bitrate(mut self, bitrate: u64) -> Self {
+    pub fn bitrate(&mut self, bitrate: u64) -> &mut Self {
         self.0.insert("bitrate", Value::Number(Number::from(bitrate)));
 
         self
@@ -37,14 +37,14 @@ impl EditChannel {
     /// The name of the channel.
     ///
     /// Must be between 2 and 100 characters long.
-    pub fn name(mut self, name: &str) -> Self {
+    pub fn name(&mut self, name: &str) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
 
         self
     }
 
     /// The position of the channel in the channel list.
-    pub fn position(mut self, position: u64) -> Self {
+    pub fn position(&mut self, position: u64) -> &mut Self {
         self.0.insert("position", Value::Number(Number::from(position)));
 
         self
@@ -57,7 +57,7 @@ impl EditChannel {
     /// This is for [text] channels only.
     ///
     /// [text]: ../model/channel/enum.ChannelType.html#variant.Text
-    pub fn topic(mut self, topic: &str) -> Self {
+    pub fn topic(&mut self, topic: &str) -> &mut Self {
         self.0.insert("topic", Value::String(topic.to_string()));
 
         self
@@ -68,7 +68,7 @@ impl EditChannel {
     /// This is for [voice] channels only.
     ///
     /// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice
-    pub fn user_limit(mut self, user_limit: u64) -> Self {
+    pub fn user_limit(&mut self, user_limit: u64) -> &mut Self {
         self.0.insert("user_limit", Value::Number(Number::from(user_limit)));
 
         self
@@ -80,7 +80,7 @@ impl EditChannel {
     ///
     /// [text]: ../model/channel/enum.ChannelType.html#variant.Text
     /// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice
-    pub fn category<C>(mut self, category: C) -> Self
+    pub fn category<C>(&mut self, category: C) -> &mut Self
         where C: Into<Option<ChannelId>> {
         let parent_id = match category.into() {
             Some(c) => Value::Number(Number::from(c.0)),

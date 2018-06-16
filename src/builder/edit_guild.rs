@@ -23,7 +23,7 @@ impl EditGuild {
     /// valid.
     ///
     /// [`afk_timeout`]: #method.afk_timeout
-    pub fn afk_channel<C: Into<ChannelId>>(mut self, channel: Option<C>) -> Self {
+    pub fn afk_channel<C: Into<ChannelId>>(&mut self, channel: Option<C>) -> &mut Self {
         self.0.insert(
             "afk_channel_id",
             match channel {
@@ -39,7 +39,7 @@ impl EditGuild {
     /// configured via [`afk_channel`] - after being AFK.
     ///
     /// [`afk_channel`]: #method.afk_channel
-    pub fn afk_timeout(mut self, timeout: u64) -> Self {
+    pub fn afk_timeout(&mut self, timeout: u64) -> &mut Self {
         self.0.insert(
             "afk_timeout",
             Value::Number(Number::from(timeout)),
@@ -77,7 +77,7 @@ impl EditGuild {
     /// ```
     ///
     /// [`utils::read_image`]: ../utils/fn.read_image.html
-    pub fn icon(mut self, icon: Option<&str>) -> Self {
+    pub fn icon(&mut self, icon: Option<&str>) -> &mut Self {
         self.0.insert(
             "icon",
             icon.map_or_else(|| Value::Null, |x| Value::String(x.to_string())),
@@ -89,7 +89,7 @@ impl EditGuild {
     /// Set the name of the guild.
     ///
     /// **Note**: Must be between (and including) 2-100 chracters.
-    pub fn name(mut self, name: &str) -> Self {
+    pub fn name(&mut self, name: &str) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
 
         self
@@ -98,7 +98,7 @@ impl EditGuild {
     /// Transfers the ownership of the guild to another user by Id.
     ///
     /// **Note**: The current user must be the owner of the guild.
-    pub fn owner<U: Into<UserId>>(mut self, user_id: U) -> Self {
+    pub fn owner<U: Into<UserId>>(&mut self, user_id: U) -> &mut Self {
         let id = Value::Number(Number::from(user_id.into().0));
         self.0.insert("owner_id", id);
 
@@ -131,7 +131,7 @@ impl EditGuild {
     /// ```
     ///
     /// [`Region::UsWest`]: ../model/guild/enum.Region.html#variant.UsWest
-    pub fn region(mut self, region: Region) -> Self {
+    pub fn region(&mut self, region: Region) -> &mut Self {
         self.0.insert("region", Value::String(region.name().to_string()));
 
         self
@@ -143,7 +143,7 @@ impl EditGuild {
     /// You can check this through a guild's [`features`] list.
     ///
     /// [`features`]: ../model/guild/struct.Guild.html#structfield.features
-    pub fn splash(mut self, splash: Option<&str>) -> Self {
+    pub fn splash(&mut self, splash: Option<&str>) -> &mut Self {
         let splash = splash.map_or(Value::Null, |x| Value::String(x.to_string()));
         self.0.insert("splash", splash);
 
@@ -180,7 +180,7 @@ impl EditGuild {
     ///
     /// [`VerificationLevel`]: ../model/guild/enum.VerificationLevel.html
     /// [`VerificationLevel::High`]: ../model/guild/enum.VerificationLevel.html#variant.High
-    pub fn verification_level<V>(mut self, verification_level: V) -> Self
+    pub fn verification_level<V>(&mut self, verification_level: V) -> &mut Self
         where V: Into<VerificationLevel> {
         let num = Value::Number(Number::from(verification_level.into().num()));
 

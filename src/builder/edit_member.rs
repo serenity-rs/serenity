@@ -16,7 +16,7 @@ impl EditMember {
     /// Requires the [Deafen Members] permission.
     ///
     /// [Deafen Members]: ../model/permissions/constant.DEAFEN_MEMBERS.html
-    pub fn deafen(mut self, deafen: bool) -> Self {
+    pub fn deafen(&mut self, deafen: bool) -> &mut Self {
         self.0.insert("deaf", Value::Bool(deafen));
 
         self
@@ -27,7 +27,7 @@ impl EditMember {
     /// Requires the [Mute Members] permission.
     ///
     /// [Mute Members]: ../model/permissions/constant.MUTE_MEMBERS.html
-    pub fn mute(mut self, mute: bool) -> Self {
+    pub fn mute(&mut self, mute: bool) -> &mut Self {
         self.0.insert("mute", Value::Bool(mute));
 
         self
@@ -39,7 +39,7 @@ impl EditMember {
     /// Requires the [Manage Nicknames] permission.
     ///
     /// [Manage Nicknames]: ../model/permissions/constant.MANAGE_NICKNAMES.html
-    pub fn nickname(mut self, nickname: &str) -> Self {
+    pub fn nickname(&mut self, nickname: &str) -> &mut Self {
         self.0.insert("nick", Value::String(nickname.to_string()));
 
         self
@@ -50,7 +50,7 @@ impl EditMember {
     /// Requires the [Manage Roles] permission to modify.
     ///
     /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
-    pub fn roles<T: AsRef<RoleId>, It: IntoIterator<Item=T>>(mut self, roles: It) -> Self {
+    pub fn roles<T: AsRef<RoleId>, It: IntoIterator<Item=T>>(&mut self, roles: It) -> &mut Self {
         let role_ids = roles
             .into_iter()
             .map(|x| Value::Number(Number::from(x.as_ref().0)))
@@ -66,7 +66,7 @@ impl EditMember {
     /// Requires the [Move Members] permission.
     ///
     /// [Move Members]: ../model/permissions/constant.MOVE_MEMBERS.html
-    pub fn voice_channel<C: Into<ChannelId>>(mut self, channel_id: C) -> Self {
+    pub fn voice_channel<C: Into<ChannelId>>(&mut self, channel_id: C) -> &mut Self {
         let num = Value::Number(Number::from(channel_id.into().0));
         self.0.insert("channel_id", num);
 
