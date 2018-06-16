@@ -67,7 +67,7 @@ impl MessageBuilder {
     /// ```
     pub fn new() -> MessageBuilder { MessageBuilder::default() }
 
-    /// Pulls the inner value out of the builder.
+    /// Retrieves the inner value of the builder.
     ///
     /// # Examples
     ///
