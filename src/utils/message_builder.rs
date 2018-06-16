@@ -80,10 +80,9 @@ impl MessageBuilder {
     ///
     /// let channel_id = ChannelId(81384788765712384);
     ///
-    /// let content = MessageBuilder::new()
-    ///     .channel(channel_id)
-    ///     .push("!")
-    ///     .build();
+    /// let mut builder = MessageBuilder::new();
+    /// builder.channel(channel_id).push("!");
+    /// let content = builder.build();
     ///
     /// assert_eq!(content, "<#81384788765712384>!");
     /// ```
@@ -269,13 +268,13 @@ impl MessageBuilder {
     /// let key = "prefix";
     /// let value = "&";
     ///
-    /// let content = MessageBuilder::new()
-    ///     .push("The setting ")
+    /// let mut builder = MessageBuilder::new()
+    /// builder.push("The setting ")
     ///     .push_mono(key)
     ///     .push(" for this server is ")
     ///     .push_mono(value)
-    ///     .push(".")
-    ///     .build();
+    ///     .push(".");
+    /// let content = builder.build();
     ///
     /// let expected = format!("The setting `{}` for this server is `{}`.",
     ///                        key,
@@ -376,7 +375,9 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new().push_mono_line("hello").push("world").build();
+    /// let mut builder = MessageBuilder::new();
+    /// builder.push_mono_line("hello").push("world");
+    /// let content = builder.build();
     ///
     /// assert_eq!(content, "`hello`\nworld");
     /// ```
@@ -396,7 +397,9 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new().push_italic_line("hello").push("world").build();
+    /// let mut builder = MessageBuilder::new();
+    /// builder.push_italic_line("hello").push("world")
+    /// let content = builder.build();
     ///
     /// assert_eq!(content, "_hello_\nworld");
     /// ```
@@ -416,7 +419,9 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new().push_bold_line("hello").push("world").build();
+    /// let mut builder = MessageBuilder::new();
+    /// builder.push_bold_line("hello").push("world");
+    /// let content = builder.build();
     ///
     /// assert_eq!(content, "**hello**\nworld");
     /// ```
@@ -436,7 +441,9 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new().push_underline_line("hello").push("world").build();
+    /// let mut builder = MessageBuilder::new();
+    /// builder.push_underline_line("hello").push("world");
+    /// let content = builder.build();
     ///
     /// assert_eq!(content, "__hello__\nworld");
     /// ```
@@ -456,7 +463,9 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new().push_strike_line("hello").push("world").build();
+    /// let mut builder = MessageBuilder::new();
+    /// builder.push_strike_line("hello").push("world");
+    /// let content = builder.build();
     ///
     /// assert_eq!(content, "~~hello~~\nworld");
     /// ```
@@ -575,9 +584,9 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new().push_line_safe("Hello @everyone")
-    ///                                    .push("How are you?")
-    ///                                    .build();
+    /// let mut builder = MessageBuilder::new()
+    /// builder.push_line_safe("Hello @everyone").push("How are you?")
+    /// let content = builder.build();
     ///
     /// assert_eq!(content, "Hello @\u{200B}everyone\nHow are you?");
     /// ```
@@ -597,9 +606,9 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new()
-    ///                 .push_mono_line_safe("`hello @everyone`")
-    ///                 .push("world").build();
+    /// let mut builder = MessageBuilder::new();
+    /// builder.push_mono_line_safe("`hello @everyone`").push("world");
+    /// let content = builder.build();
     ///
     /// assert_eq!(content, "`'hello @\u{200B}everyone'`\nworld");
     /// ```
@@ -619,9 +628,9 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new()
-    ///                 .push_italic_line_safe("@everyone")
-    ///                 .push("Isn't a mention.").build();
+    /// let mut builder = MessageBuilder::new();
+    /// builder.push_italic_line_safe("@everyone").push("Isn't a mention.");
+    /// let content = builder.build();
     ///
     /// assert_eq!(content, "_@\u{200B}everyone_\nIsn't a mention.");
     /// ```
@@ -641,9 +650,9 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new()
-    ///                 .push_bold_line_safe("@everyone")
-    ///                 .push("Isn't a mention.").build();
+    /// let mut builder = MessageBuilder::new();
+    /// builder.push_bold_line_safe("@everyone").push("Isn't a mention.")
+    /// let content = builder.build();
     ///
     /// assert_eq!(content, "**@\u{200B}everyone**\nIsn't a mention.");
     /// ```
@@ -663,9 +672,9 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new()
-    ///                 .push_underline_line_safe("@everyone")
-    ///                 .push("Isn't a mention.").build();
+    /// let mut builder = MessageBuilder::new();
+    /// builder.push_underline_line_safe("@everyone").push("Isn't a mention.");
+    /// let content = builder.build();
     ///
     /// assert_eq!(content, "__@\u{200B}everyone__\nIsn't a mention.");
     /// ```
@@ -686,9 +695,9 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new()
-    ///                 .push_strike_line_safe("@everyone")
-    ///                 .push("Isn't a mention.").build();
+    /// let mut builder = MessageBuilder::new();
+    /// builder.push_strike_line_safe("@everyone").push("Isn't a mention.");
+    /// let content = builder.build();
     ///
     /// assert_eq!(content, "~~@\u{200B}everyone~~\nIsn't a mention.");
     /// ```
