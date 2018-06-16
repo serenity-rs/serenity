@@ -260,9 +260,9 @@ impl StandardFramework {
     /// [`depth`]: struct.Configuration.html#method.depth
     /// [`prefix`]: struct.Configuration.html#method.prefix
     /// [allowing whitespace]: struct.Configuration.html#method.allow_whitespace
-    pub fn configure<F>(mut self, f: F) -> Self
-        where F: FnOnce(Configuration) -> Configuration {
-        self.configuration = f(self.configuration);
+    pub fn configure<F>(&mut self, f: F) -> &mut Self
+        where F: FnOnce(&mut Configuration) {
+        f(&mut self.configuration);
 
         self
     }
@@ -294,7 +294,7 @@ impl StandardFramework {
     ///             Ok(())
     ///         })));
     /// ```
-    pub fn bucket(mut self, s: &str, delay: i64, time_span: i64, limit: i32) -> Self {
+    pub fn bucket(&mut self, s: &str, delay: i64, time_span: i64, limit: i32) -> &mut Self {
         self.buckets.insert(
             s.to_string(),
             Bucket {
@@ -343,13 +343,13 @@ impl StandardFramework {
     ///
     /// [`bucket`]: #method.bucket
     #[cfg(feature = "cache")]
-    pub fn complex_bucket<Check>(mut self,
+    pub fn complex_bucket<Check>(&mut self,
                                     s: &str,
                                     delay: i64,
                                     time_span: i64,
                                     limit: i32,
                                     check: Check)
-                                    -> Self
+                                    -> &mut Self
         where Check: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool
                          + Send
                          + Sync
@@ -396,13 +396,13 @@ impl StandardFramework {
     ///
     /// [`bucket`]: #method.bucket
     #[cfg(not(feature = "cache"))]
-    pub fn complex_bucket<Check>(mut self,
+    pub fn complex_bucket<Check>(&mut self,
                                     s: &str,
                                     delay: i64,
                                     time_span: i64,
                                     limit: i32,
                                     check: Check)
-                                    -> Self
+                                    -> &mut Self
         where Check: Fn(&mut Context, ChannelId, UserId) -> bool + Send + Sync + 'static {
         self.buckets.insert(
             s.to_string(),
@@ -440,7 +440,7 @@ impl StandardFramework {
     ///         .bucket("simple")
     ///         .exec(|_, msg, _| { msg.channel_id.say("pong!")?; Ok(()) })));
     /// ```
-    pub fn simple_bucket(mut self, s: &str, delay: i64) -> Self {
+    pub fn simple_bucket(&mut self, s: &str, delay: i64) -> &mut Self {
         self.buckets.insert(
             s.to_string(),
             Bucket {
@@ -652,9 +652,9 @@ impl StandardFramework {
     /// }));
     /// # }
     /// ```
-    pub fn on(self, name: &str,
+    pub fn on(&mut self, name: &str,
             f: fn(&mut Context, &Message, Args)
-            -> Result<(), CommandError>) -> Self {
+            -> Result<(), CommandError>) -> &mut Self {
         self.cmd(name, f)
     }
 
@@ -662,7 +662,7 @@ impl StandardFramework {
     ///
     /// [`on`]: #method.on
     /// [`Command`]: trait.Command.html
-    pub fn cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
+    pub fn cmd<C: Command + 'static>(&mut self, name: &str, c: C) -> &mut Self {
         {
             let ungrouped = self.groups
                 .entry("Ungrouped".to_string())
@@ -695,7 +695,7 @@ impl StandardFramework {
     ///         let _ = ctx.say("pong");
     ///     }));
     /// ```
-    pub fn command<F>(mut self, command_name: &str, f: F) -> Self
+    pub fn command<F>(&mut self, command_name: &str, f: F) -> &mut Self
         where F: FnOnce(CreateCommand) -> CreateCommand {
         {
             let ungrouped = self.groups
@@ -756,7 +756,7 @@ impl StandardFramework {
     ///         .on("ping", |_, msg, _| { msg.channel_id.say("pong!")?; Ok(()) })
     ///         .on("pong", |_, msg, _| { msg.channel_id.say("ping!")?; Ok(()) })));
     /// ```
-    pub fn group<F>(mut self, group_name: &str, f: F) -> Self
+    pub fn group<F>(&mut self, group_name: &str, f: F) -> &mut Self
         where F: FnOnce(CreateGroup) -> CreateGroup {
         let group = f(CreateGroup(CommandGroup::default())).0;
 
@@ -802,7 +802,7 @@ impl StandardFramework {
     ///         }
     ///     }));
     /// ```
-    pub fn on_dispatch_error<F>(mut self, f: F) -> Self
+    pub fn on_dispatch_error<F>(&mut self, f: F) -> &mut Self
         where F: Fn(Context, Message, DispatchError) + Send + Sync + 'static {
         self.dispatch_error_handler = Some(Arc::new(f));
 
@@ -858,7 +858,7 @@ impl StandardFramework {
     ///     }));
     /// ```
     ///
-    pub fn before<F>(mut self, f: F) -> Self
+    pub fn before<F>(&mut self, f: F) -> &mut Self
         where F: Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static {
         self.before = Some(Arc::new(f));
 
@@ -889,7 +889,7 @@ impl StandardFramework {
     ///         }
     ///     }));
     /// ```
-    pub fn after<F>(mut self, f: F) -> Self
+    pub fn after<F>(&mut self, f: F) -> &mut Self
         where F: Fn(&mut Context, &Message, &str, Result<(), CommandError>) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
 
@@ -914,7 +914,7 @@ impl StandardFramework {
     /// client.with_framework(StandardFramework::new()
     ///     .unrecognised_command(|ctx, msg, unrecognised_command_name| { }));
     /// ```
-    pub fn unrecognised_command<F>(mut self, f: F) -> Self
+    pub fn unrecognised_command<F>(&mut self, f: F) -> &mut Self
         where F: Fn(&mut Context, &Message, &str) + Send + Sync + 'static {
         self.unrecognised_command = Some(Arc::new(f));
 
@@ -926,7 +926,7 @@ impl StandardFramework {
     /// If a command named `help` was set with [`command`], then this takes precendence first.
     ///
     /// [`command`]: #method.command
-    pub fn help(mut self, f: HelpFunction) -> Self {
+    pub fn help(&mut self, f: HelpFunction) -> &mut Self {
         let a = CreateHelpCommand(HelpOptions::default(), f).finish();
 
         self.help = Some(a);
@@ -937,11 +937,11 @@ impl StandardFramework {
     /// Sets what code should be executed when sends `(prefix)help`.
     /// Additionally takes a closure with a `CreateHelpCommand` in order
     /// to alter help-commands.
-    pub fn customised_help<F>(mut self, f: HelpFunction, c: F) -> Self
-        where F: FnOnce(CreateHelpCommand) -> CreateHelpCommand {
-        let a = c(CreateHelpCommand(HelpOptions::default(), f));
-
-        self.help = Some(a.finish());
+    pub fn customised_help<F>(&mut self, f: HelpFunction, c: F) -> &mut Self
+        where F: FnOnce(&mut CreateHelpCommand) {
+        let mut h = CreateHelpCommand(HelpOptions::default(), f);
+        c(&mut h);
+        self.help = Some(h.finish());
 
         self
     }

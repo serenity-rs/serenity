@@ -218,9 +218,10 @@ impl CreateEmbed {
     ///     fn message(&self, _: Context, msg: Message) {
     ///         if msg.content == "~embed" {
     ///             let _ = msg.channel_id.send_message(|m| m
-    ///              .embed(|e| e
-    ///                     .title("hello")
-    ///                     .timestamp("2004-06-08T16:04:23")));
+    ///              .embed(|e| {
+    ///                 e.title("hello")
+    ///                     .timestamp("2004-06-08T16:04:23"));
+    ///             });
     ///         }
     ///     }
     /// }
@@ -259,15 +260,12 @@ impl CreateEmbed {
     ///
     ///                 let _ = channel.read().send_message(|m| m
     ///                     .embed(|e| {
-    ///                         let mut e = e
-    ///                             .author(|a| a.icon_url(&user.face()).name(&user.name))
+    ///                         e.author(|a| a.icon_url(&user.face()).name(&user.name))
     ///                             .title("Member Join");
     ///
     ///                         if let Some(ref joined_at) = member.joined_at {
-    ///                             e = e.timestamp(joined_at);
+    ///                             e.timestamp(joined_at);
     ///                         }
-    ///
-    ///                         e
     ///                     }));
     ///             }
     ///         }

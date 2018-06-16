@@ -59,7 +59,7 @@ pub struct Configuration {
 
 impl Configuration {
     /// If set to false, bot will ignore any private messages.
-    pub fn allow_dm(mut self, allow_dm: bool) -> Self {
+    pub fn allow_dm(&mut self, allow_dm: bool) -> &mut Self {
         self.allow_dm = allow_dm;
 
         self
@@ -89,7 +89,7 @@ impl Configuration {
     ///
     /// // bot processes and executes the "about" command if it exists
     /// ```
-    pub fn allow_whitespace(mut self, allow_whitespace: bool) -> Self {
+    pub fn allow_whitespace(&mut self, allow_whitespace: bool) -> &mut Self {
         self.allow_whitespace = allow_whitespace;
 
         self
@@ -113,7 +113,7 @@ impl Configuration {
     /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .blocked_guilds(vec![GuildId(7), GuildId(77)].into_iter().collect())));
     /// ```
-    pub fn blocked_guilds(mut self, guilds: HashSet<GuildId>) -> Self {
+    pub fn blocked_guilds(&mut self, guilds: HashSet<GuildId>) -> &mut Self {
         self.blocked_guilds = guilds;
 
         self
@@ -137,7 +137,7 @@ impl Configuration {
     /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .allowed_channels(vec![ChannelId(7), ChannelId(77)].into_iter().collect())));
     /// ```
-    pub fn allowed_channels(mut self, channels: HashSet<ChannelId>) -> Self {
+    pub fn allowed_channels(&mut self, channels: HashSet<ChannelId>) -> &mut Self {
         self.allowed_channels = channels;
 
         self
@@ -162,7 +162,7 @@ impl Configuration {
     /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .blocked_users(vec![UserId(7), UserId(77)].into_iter().collect())));
     /// ```
-    pub fn blocked_users(mut self, users: HashSet<UserId>) -> Self {
+    pub fn blocked_users(&mut self, users: HashSet<UserId>) -> &mut Self {
         self.blocked_users = users;
 
         self
@@ -176,7 +176,7 @@ impl Configuration {
     /// If you set a depth of `1`, and make a command of `"music play"`, but
     /// not a `"music"` command, then the former command will never be
     /// triggered, as its "depth" is `2`.
-    pub fn depth(mut self, depth: u8) -> Self {
+    pub fn depth(&mut self, depth: u8) -> &mut Self {
         self.depth = depth as usize;
 
         self
@@ -206,7 +206,7 @@ impl Configuration {
     ///     })
     ///     .configure(|c| c.disabled_commands(disabled)));
     /// ```
-    pub fn disabled_commands(mut self, commands: HashSet<String>) -> Self {
+    pub fn disabled_commands(&mut self, commands: HashSet<String>) -> &mut Self {
         self.disabled_commands = commands;
 
         self
@@ -244,7 +244,7 @@ impl Configuration {
     ///         }.to_string())
     ///     })));
     /// ```
-    pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
+    pub fn dynamic_prefix<F>(&mut self, dynamic_prefix: F) -> &mut Self
         where F: Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static {
         self.dynamic_prefix = Some(Box::new(dynamic_prefix));
 
@@ -255,7 +255,7 @@ impl Configuration {
     ///
     /// For example, if this is set to false, then the bot will respond to any
     /// other bots including itself.
-    pub fn ignore_bots(mut self, ignore_bots: bool) -> Self {
+    pub fn ignore_bots(&mut self, ignore_bots: bool) -> &mut Self {
         self.ignore_bots = ignore_bots;
 
         self
@@ -263,7 +263,7 @@ impl Configuration {
 
     /// If set to true, bot will ignore all commands called by webhooks.
     /// True by default.
-    pub fn ignore_webhooks(mut self, ignore_webhooks: bool) -> Self {
+    pub fn ignore_webhooks(&mut self, ignore_webhooks: bool) -> &mut Self {
         self.ignore_webhooks = ignore_webhooks;
 
         self
@@ -290,7 +290,7 @@ impl Configuration {
     /// encourages you to ignore differentiating between the two.
     ///
     /// [`prefix`]: #method.prefix
-    pub fn on_mention(mut self, on_mention: bool) -> Self {
+    pub fn on_mention(&mut self, on_mention: bool) -> &mut Self {
         if !on_mention {
             return self;
         }
@@ -342,7 +342,7 @@ impl Configuration {
     ///
     /// client.with_framework(StandardFramework::new().configure(|c| c.owners(set)));
     /// ```
-    pub fn owners(mut self, user_ids: HashSet<UserId>) -> Self {
+    pub fn owners(&mut self, user_ids: HashSet<UserId>) -> &mut Self {
         self.owners = user_ids;
 
         self
@@ -367,7 +367,7 @@ impl Configuration {
     /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .prefix("!")));
     /// ```
-    pub fn prefix(mut self, prefix: &str) -> Self {
+    pub fn prefix(&mut self, prefix: &str) -> &mut Self {
         self.prefixes = vec![prefix.to_string()];
 
         self
@@ -392,7 +392,7 @@ impl Configuration {
     /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .prefixes(vec!["!", ">", "+"])));
     /// ```
-    pub fn prefixes<T: ToString, It: IntoIterator<Item=T>>(mut self, prefixes: It) -> Self {
+    pub fn prefixes<T: ToString, It: IntoIterator<Item=T>>(&mut self, prefixes: It) -> &mut Self {
         self.prefixes = prefixes.into_iter().map(|x| x.to_string()).collect();
 
         self
@@ -416,7 +416,7 @@ impl Configuration {
     /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .delimiter(", ")));
     /// ```
-    pub fn delimiter(mut self, delimiter: &str) -> Self {
+    pub fn delimiter(&mut self, delimiter: &str) -> &mut Self {
         self.delimiters.push(delimiter.to_string());
 
         self
@@ -441,7 +441,7 @@ impl Configuration {
     /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .delimiters(vec![", ", " "])));
     /// ```
-    pub fn delimiters<T: ToString, It: IntoIterator<Item=T>>(mut self, delimiters: It) -> Self {
+    pub fn delimiters<T: ToString, It: IntoIterator<Item=T>>(&mut self, delimiters: It) -> &mut Self {
         self.delimiters.clear();
         self.delimiters
             .extend(delimiters.into_iter().map(|s| s.to_string()));
@@ -452,7 +452,7 @@ impl Configuration {
     /// Whether the framework shouldn't care about the user's input if it's: `~command`,
     /// `~Command`, `~COMMAND`.
     /// Setting this to `true` will result in *all* command names to be case insensitive.
-    pub fn case_insensitivity(mut self, cs: bool) -> Self {
+    pub fn case_insensitivity(&mut self, cs: bool) -> &mut Self {
         self.case_insensitive = cs;
 
         self

@@ -42,7 +42,7 @@ pub struct CreateCommand(pub CommandOptions, pub FnOrCommand, pub Handlers);
 
 impl CreateCommand {
     /// Adds multiple aliases.
-    pub fn batch_known_as<T: ToString, It: IntoIterator<Item=T>>(mut self, names: It) -> Self {
+    pub fn batch_known_as<T: ToString, It: IntoIterator<Item=T>>(&mut self, names: It) -> &mut Self {
         self.0
             .aliases
             .extend(names.into_iter().map(|n| n.to_string()));
@@ -51,7 +51,7 @@ impl CreateCommand {
     }
 
     /// Adds a ratelimit bucket.
-    pub fn bucket(mut self, bucket: &str) -> Self {
+    pub fn bucket(&mut self, bucket: &str) -> &mut Self {
         self.0.bucket = Some(bucket.to_string());
 
         self
@@ -104,7 +104,7 @@ impl CreateCommand {
     ///     message.author.id == 7
     /// }
     /// ```
-    pub fn check<F>(mut self, check: F) -> Self
+    pub fn check<F>(&mut self, check: F) -> &mut Self
         where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
                      + Send
                      + Sync
@@ -115,21 +115,21 @@ impl CreateCommand {
     }
 
     /// Description, used by other commands.
-    pub fn desc(mut self, desc: &str) -> Self {
+    pub fn desc(&mut self, desc: &str) -> &mut Self {
         self.0.desc = Some(desc.to_string());
 
         self
     }
 
     /// Whether command can be used only privately or not.
-    pub fn dm_only(mut self, dm_only: bool) -> Self {
+    pub fn dm_only(&mut self, dm_only: bool) -> &mut Self {
         self.0.dm_only = dm_only;
 
         self
     }
 
     /// Example arguments, used by other commands.
-    pub fn example(mut self, example: &str) -> Self {
+    pub fn example(&mut self, example: &str) -> &mut Self {
         self.0.example = Some(example.to_string());
 
         self
@@ -137,7 +137,7 @@ impl CreateCommand {
 
     /// A function that can be called when a command is received.
     /// You can return `Err(string)` if there's an error.
-    pub fn exec(mut self, func: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> Self {
+    pub fn exec(&mut self, func: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> &mut Self {
         self.1 = FnOrCommand::Fn(func);
 
         self
@@ -146,7 +146,7 @@ impl CreateCommand {
     /// Like [`exec`] but accepts a `Command` directly.
     ///
     /// [`exec`]: #method.exec
-    pub fn cmd<C: Command + 'static>(mut self, c: C) -> Self {
+    pub fn cmd<C: Command + 'static>(&mut self, c: C) -> &mut Self {
         self.1 = FnOrCommand::Command(Arc::new(c));
 
         self
@@ -155,49 +155,49 @@ impl CreateCommand {
     /// Like [`cmd`] but says to the builder to use this command's options instead of its own.
     ///
     /// [`cmd`]: #method.cmd
-    pub fn cmd_with_options<C: Command + 'static>(mut self, c: C) -> Self {
+    pub fn cmd_with_options<C: Command + 'static>(&mut self, c: C) -> &mut Self {
         self.1 = FnOrCommand::CommandWithOptions(Arc::new(c));
 
         self
     }
 
     /// Whether command can be used only in guilds or not.
-    pub fn guild_only(mut self, guild_only: bool) -> Self {
+    pub fn guild_only(&mut self, guild_only: bool) -> &mut Self {
         self.0.guild_only = guild_only;
 
         self
     }
 
     /// Whether command should be displayed in help list or not, used by other commands.
-    pub fn help_available(mut self, help_available: bool) -> Self {
+    pub fn help_available(&mut self, help_available: bool) -> &mut Self {
         self.0.help_available = help_available;
 
         self
     }
 
     /// Adds an alias, allowing users to use the command under a different name.
-    pub fn known_as(mut self, name: &str) -> Self {
+    pub fn known_as(&mut self, name: &str) -> &mut Self {
         self.0.aliases.push(name.to_string());
 
         self
     }
 
     /// Maximum amount of arguments that can be passed.
-    pub fn max_args(mut self, max_args: i32) -> Self {
+    pub fn max_args(&mut self, max_args: i32) -> &mut Self {
         self.0.max_args = Some(max_args);
 
         self
     }
 
     /// Minumum amount of arguments that should be passed.
-    pub fn min_args(mut self, min_args: i32) -> Self {
+    pub fn min_args(&mut self, min_args: i32) -> &mut Self {
         self.0.min_args = Some(min_args);
 
         self
     }
 
     /// Exact number of arguments that should be passed.
-    pub fn num_args(mut self, num_args: i32) -> Self {
+    pub fn num_args(&mut self, num_args: i32) -> &mut Self {
         self.0.min_args = Some(num_args);
         self.0.max_args = Some(num_args);
 
@@ -205,7 +205,7 @@ impl CreateCommand {
     }
 
     /// Whether command can be used only privately or not.
-    pub fn owners_only(mut self, owners_only: bool) -> Self {
+    pub fn owners_only(&mut self, owners_only: bool) -> &mut Self {
         self.0.owners_only = owners_only;
 
         self
@@ -213,14 +213,14 @@ impl CreateCommand {
 
     /// The permissions that a user must have in the contextual channel in order
     /// for the command to be processed.
-    pub fn required_permissions(mut self, permissions: Permissions) -> Self {
+    pub fn required_permissions(&mut self, permissions: Permissions) -> &mut Self {
         self.0.required_permissions = permissions;
 
         self
     }
 
     /// Command usage schema, used by other commands.
-    pub fn usage(mut self, usage: &str) -> Self {
+    pub fn usage(&mut self, usage: &str) -> &mut Self {
         self.0.usage = Some(usage.to_string());
 
         self
@@ -228,7 +228,7 @@ impl CreateCommand {
 
     /// Sets roles that are allowed to use the command.
     #[cfg(feature="cache")]
-    pub fn allowed_roles<T: ToString, It: IntoIterator<Item=T>>(mut self, allowed_roles: It) -> Self {
+    pub fn allowed_roles<T: ToString, It: IntoIterator<Item=T>>(&mut self, allowed_roles: It) -> &mut Self {
         self.0.allowed_roles = allowed_roles.into_iter().map(|x| x.to_string()).collect();
 
         self
@@ -237,7 +237,7 @@ impl CreateCommand {
     /// Sets an initialise middleware to be called upon the command's actual registration.
     ///
     /// This is similiar to implementing the `init` function on `Command`.
-    pub fn init<F: Fn() + Send + Sync + 'static>(mut self, f: F) -> Self {
+    pub fn init<F: Fn() + Send + Sync + 'static>(&mut self, f: F) -> &mut Self {
         self.2.init = Some(Arc::new(f));
 
         self
@@ -246,7 +246,7 @@ impl CreateCommand {
     /// Sets a before middleware to be called before the command's execution.
     ///
     /// This is similiar to implementing the `before` function on `Command`.
-    pub fn before<F: Send + Sync + 'static>(mut self, f: F) -> Self
+    pub fn before<F: Send + Sync + 'static>(&mut self, f: F) -> &mut Self
         where F: Fn(&mut Context, &Message) -> bool {
         self.2.before = Some(Arc::new(f));
 
@@ -256,7 +256,7 @@ impl CreateCommand {
     /// Sets an after middleware to be called after the command's execution.
     ///
     /// This is similiar to implementing the `after` function on `Command`.
-    pub fn after<F: Send + Sync + 'static>(mut self, f: F) -> Self
+    pub fn after<F: Send + Sync + 'static>(&mut self, f: F) -> &mut Self
         where F: Fn(&mut Context, &Message, &Result<(), CommandError>) {
         self.2.after = Some(Arc::new(f));
 

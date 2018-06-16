@@ -55,7 +55,7 @@ pub struct GetMessages(pub VecMap<&'static str, u64>);
 impl GetMessages {
     /// Indicates to retrieve the messages after a specific message, given by
     /// its Id.
-    pub fn after<M: Into<MessageId>>(mut self, message_id: M) -> Self {
+    pub fn after<M: Into<MessageId>>(&mut self, message_id: M) -> &mut Self {
         self.0.insert("after", message_id.into().0);
 
         self
@@ -63,7 +63,7 @@ impl GetMessages {
 
     /// Indicates to retrieve the messages _around_ a specific message in either
     /// direction (before+after) the given message.
-    pub fn around<M: Into<MessageId>>(mut self, message_id: M) -> Self {
+    pub fn around<M: Into<MessageId>>(&mut self, message_id: M) -> &mut Self {
         self.0.insert("around", message_id.into().0);
 
         self
@@ -71,7 +71,7 @@ impl GetMessages {
 
     /// Indicates to retrieve the messages before a specific message, given by
     /// its Id.
-    pub fn before<M: Into<MessageId>>(mut self, message_id: M) -> Self {
+    pub fn before<M: Into<MessageId>>(&mut self, message_id: M) -> &mut Self {
         self.0.insert("before", message_id.into().0);
 
         self
@@ -84,7 +84,7 @@ impl GetMessages {
     /// **Note**: This field is capped to 100 messages due to a Discord
     /// limitation. If an amount larger than 100 is supplied, it will be
     /// reduced.
-    pub fn limit(mut self, limit: u64) -> Self {
+    pub fn limit(&mut self, limit: u64) -> &mut Self {
         self.0
             .insert("limit", if limit > 100 { 100 } else { limit });
 
@@ -94,5 +94,5 @@ impl GetMessages {
     /// This is a function that is here for completeness. You do not need to
     /// call this - except to clear previous calls to `after`, `around`, and
     /// `before` - as it is the default value.
-    pub fn most_recent(self) -> Self { self }
+    pub fn most_recent(&mut self) -> &mut Self { self }
 }

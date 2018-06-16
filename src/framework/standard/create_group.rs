@@ -35,15 +35,15 @@ pub struct CreateGroup(pub CommandGroup);
 
 impl CreateGroup {
     fn build_command(&self) -> CreateCommand {
-        let mut cmd = CreateCommand::default()
-            .required_permissions(self.0.required_permissions)
+        let mut cmd = CreateCommand::default();
+        cmd.required_permissions(self.0.required_permissions)
             .dm_only(self.0.dm_only)
             .guild_only(self.0.guild_only)
             .help_available(self.0.help_available)
             .owners_only(self.0.owners_only);
 
         if let Some(ref bucket) = self.0.bucket {
-            cmd = cmd.bucket(bucket);
+            cmd.bucket(bucket);
         }
         cmd.0.allowed_roles = self.0.allowed_roles.clone();
         cmd

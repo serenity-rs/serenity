@@ -67,7 +67,7 @@ impl ExecuteWebhook {
     ///     .avatar_url(avatar_url)
     ///     .content("Here's a webhook"));
     /// ```
-    pub fn avatar_url(mut self, avatar_url: &str) -> Self {
+    pub fn avatar_url(&mut self, avatar_url: &str) -> &mut Self {
         self.0.insert("avatar_url", Value::String(avatar_url.to_string()));
 
         self
@@ -93,7 +93,7 @@ impl ExecuteWebhook {
     /// ```
     ///
     /// [`embeds`]: #method.embeds
-    pub fn content(mut self, content: &str) -> Self {
+    pub fn content(&mut self, content: &str) -> &mut Self {
         self.0.insert("content", Value::String(content.to_string()));
 
         self
@@ -112,7 +112,7 @@ impl ExecuteWebhook {
     /// [`Embed::fake`]: ../model/channel/struct.Embed.html#method.fake
     /// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute
     /// [struct-level documentation]: #examples
-    pub fn embeds(mut self, embeds: Vec<Value>) -> Self {
+    pub fn embeds(&mut self, embeds: Vec<Value>) -> &mut Self {
         self.0.insert("embeds", Value::Array(embeds));
 
         self
@@ -133,7 +133,7 @@ impl ExecuteWebhook {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
     /// ```
-    pub fn tts(mut self, tts: bool) -> Self {
+    pub fn tts(&mut self, tts: bool) -> &mut Self {
         self.0.insert("tts", Value::Bool(tts));
 
         self
@@ -154,7 +154,7 @@ impl ExecuteWebhook {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
     /// ```
-    pub fn username(mut self, username: &str) -> Self {
+    pub fn username(&mut self, username: &str) -> &mut Self {
         self.0.insert("username", Value::String(username.to_string()));
 
         self
