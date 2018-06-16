@@ -651,13 +651,10 @@ impl Args {
             return Err(Error::Eos);
         }
 
-        let cur = &self.args[self.offset];
+        let current = &self.args[self.offset];
 
-        let lit = if cur.kind == TokenKind::QuotedArgument {
-            &cur.lit[1..cur.lit.len() - 1]
-        } else {
-            &cur.lit
-        };
+        // Discard quotations if present
+        let lit = quotes_extract(current);
 
         let parsed = T::from_str(&lit)?;
         self.offset += 1;
@@ -684,13 +681,9 @@ impl Args {
             return Err(Error::Eos);
         }
 
-        let cur = &self.args[self.offset];
+        let current = &self.args[self.offset];
 
-        let lit = if cur.kind == TokenKind::QuotedArgument {
-            &cur.lit[1..cur.lit.len() - 1]
-        } else {
-            &cur.lit
-        };
+        let lit = quotes_extract(current);
 
         Ok(T::from_str(&lit)?)
     }
@@ -774,7 +767,7 @@ impl Args {
     }
 
     /// Returns the first argument that can be parsed and removes it from the message. The suitable argument 
-    /// can be in an arbitrary position in the message.
+    /// can be in an arbitrary position in the message. Likewise, takes quotes into account.
     ///
     /// **Note**: 
     /// Unlike how other methods on this struct work, 
@@ -798,12 +791,12 @@ impl Args {
             return Err(Error::Eos);
         }
 
-        let pos = match self.args.iter().position(|s| s.lit.parse::<T>().is_ok()) {
+        let pos = match self.args.iter().map(|t| quotes_extract(t)).position(|s| s.parse::<T>().is_ok()) {
             Some(p) => p,
             None => return Err(Error::Eos),
         };
 
-        let parsed = T::from_str(&self.args[pos].lit)?;
+        let parsed = T::from_str(quotes_extract(&self.args[pos]))?;
         self.args.remove(pos);
         self.rewind();
 
@@ -834,12 +827,12 @@ impl Args {
             return Err(Error::Eos);
         }
 
-        let pos = match self.args.iter().position(|s| s.lit.parse::<T>().is_ok()) {
+        let pos = match self.args.iter().map(|t| quotes_extract(t)).position(|s| s.parse::<T>().is_ok()) {
             Some(p) => p,
             None => return Err(Error::Eos),
         };
 
-        Ok(T::from_str(&self.args[pos].lit)?)
+        Ok(T::from_str(quotes_extract(&self.args[pos]))?)
     }
 }
 
@@ -918,5 +911,13 @@ impl<'a, T: FromStr> Iterator for IterQuoted<'a, T> where T::Err: StdError  {
         } else {
             Some(self.args.single_quoted::<T>())
         }
+    }
+}
+
+fn quotes_extract(token: &TokenOwned) -> &str {
+    if token.kind == TokenKind::QuotedArgument {
+        &token.lit[1..token.lit.len() - 1]
+    } else {
+        &token.lit
     }
 }
