@@ -33,18 +33,18 @@ pub use hyper::status::{StatusClass, StatusCode};
 use constants;
 use hyper::{
     client::{
-        Client as HyperClient, 
-        Request, 
-        RequestBuilder, 
+        Client as HyperClient,
+        Request,
+        RequestBuilder,
         Response as HyperResponse
     },
     header::ContentType,
     method::Method,
     mime::{Mime, SubLevel, TopLevel},
     net::HttpsConnector,
-    header, 
-    Error as HyperError, 
-    Result as HyperResult, 
+    header,
+    Error as HyperError,
+    Result as HyperResult,
     Url
 };
 use hyper_native_tls::NativeTlsClient;

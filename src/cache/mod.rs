@@ -45,8 +45,8 @@
 use model::prelude::*;
 use parking_lot::RwLock;
 use std::collections::{
-    hash_map::Entry, 
-    HashMap, 
+    hash_map::Entry,
+    HashMap,
     HashSet
 };
 use std::{

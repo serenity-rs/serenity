@@ -324,7 +324,7 @@ mod option_u64_handler {
 
     pub fn serialize<S: Serializer>(num: &Option<u64>, s: S) -> StdResult<S::Ok, S::Error> {
         use serde::Serialize;
-        
+
         Option::serialize(num, s)
     }
 }

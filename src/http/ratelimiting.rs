@@ -50,8 +50,8 @@ use std::{
     collections::HashMap,
     sync::Arc,
     time::Duration,
-    str, 
-    thread, 
+    str,
+    thread,
     i64
 };
 use super::{HttpError, LightMethod};

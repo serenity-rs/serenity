@@ -7,9 +7,9 @@ use std::borrow::Cow;
 use std::fmt::Write as FmtWrite;
 #[cfg(feature = "model")]
 use builder::{
-    CreateMessage, 
-    EditChannel, 
-    EditMessage, 
+    CreateMessage,
+    EditChannel,
+    EditMessage,
     GetMessages
 };
 #[cfg(all(feature = "cache", feature = "model"))]

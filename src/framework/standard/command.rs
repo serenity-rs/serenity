@@ -20,8 +20,8 @@ type CheckFunction = Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> b
 pub struct Check(pub(crate) Box<CheckFunction>);
 
 impl Check {
-    pub(crate) fn new<F: Send + Sync + 'static>(f: F) -> Self 
-        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool 
+    pub(crate) fn new<F: Send + Sync + 'static>(f: F) -> Self
+        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
     {
         Check(Box::new(f))
     }

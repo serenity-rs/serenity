@@ -1,8 +1,8 @@
 pub use super::{
-    Args, 
-    Command, 
-    CommandGroup, 
-    CommandOptions, 
+    Args,
+    Command,
+    CommandGroup,
+    CommandOptions,
     CommandError,
     Check,
 };

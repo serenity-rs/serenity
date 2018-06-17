@@ -42,7 +42,7 @@
 //!     .configure(|c| c.prefix("~"))
 //!     .on("about", |_, msg, _| {
 //!         msg.channel_id.say("A simple test bot")?;
-//!         
+//!
 //!         // The `command!` macro implicitly puts an `Ok(())` at the end of each command definiton;
 //!         // signifying successful execution.
 //!         //

@@ -5,23 +5,23 @@ use std::{
     ffi::OsStr,
     fs::File,
     io::{
-        BufReader, 
-        ErrorKind as IoErrorKind, 
-        Read, 
+        BufReader,
+        ErrorKind as IoErrorKind,
+        Read,
         Result as IoResult
     },
     process::{
-        Child, 
-        Command, 
+        Child,
+        Command,
         Stdio
     },
     result::Result as StdResult
 };
 use super::{
-    AudioSource, 
-    AudioType, 
-    DcaError, 
-    DcaMetadata, 
+    AudioSource,
+    AudioType,
+    DcaError,
+    DcaMetadata,
     VoiceError
 };
 

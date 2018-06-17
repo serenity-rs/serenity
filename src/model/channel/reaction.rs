@@ -4,9 +4,9 @@ use serde::ser::{SerializeMap, Serialize, Serializer};
 use std::{
     error::Error as StdError,
     fmt::{
-        Display, 
-        Formatter, 
-        Result as FmtResult, 
+        Display,
+        Formatter,
+        Result as FmtResult,
         Write as FmtWrite
     },
     str::FromStr
