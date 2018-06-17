@@ -199,69 +199,69 @@ impl<'a> Lexer<'a> {
 /// A utility struct for handling "arguments" of a command.
 ///
 /// An "argument" is a part of the message up that ends at one of the specified delimiters, or the end of the message.
-/// 
+///
 /// # Example
-/// 
+///
 /// ```rust
 /// use serenity::framework::standard::Args;
-/// 
+///
 /// let mut args = Args::new("hello world!", &[" ".to_string()]); // A space is our delimiter.
-/// 
+///
 /// // Parse our argument as a `String` and assert that it's the "hello" part of the message.
 /// assert_eq!(args.single::<String>().unwrap(), "hello");
 /// // Same here.
 /// assert_eq!(args.single::<String>().unwrap(), "world!");
-/// 
+///
 /// ```
-/// 
-/// We can also parse "quoted arguments" (no pun intended): 
-/// 
+///
+/// We can also parse "quoted arguments" (no pun intended):
+///
 /// ```rust
 /// use serenity::framework::standard::Args;
-/// 
+///
 /// // Let us imagine this scenario:
 /// // You have a `photo` command that grabs the avatar url of a user. This command accepts names only.
 /// // Now, one of your users wants the avatar of a user named Princess Zelda.
 /// // Problem is, her name contains a space; our delimiter. This would result in two arguments, "Princess" and "Zelda".
-/// // So how should we get around this? Through quotes! By surrounding her name in them we can perceive it as one single argument. 
-/// let mut args = Args::new("\"Princess Zelda\""#, &[" ".to_string()]);
-/// 
+/// // So how should we get around this? Through quotes! By surrounding her name in them we can perceive it as one single argument.
+/// let mut args = Args::new(r#""Princess Zelda""#, &[" ".to_string()]);
+///
 /// // Hooray!
 /// assert_eq!(args.single_quoted::<String>().unwrap(), "Princess Zelda");
 /// ```
-/// 
+///
 /// In case of a mistake, we can go back in time... er i mean, one step (or entirely):
-/// 
+///
 /// ```rust
 /// use serenity::framework::standard::Args;
-/// 
+///
 /// let mut args = Args::new("4 20", &[" ".to_string()]);
-/// 
+///
 /// assert_eq!(args.single::<u32>().unwrap(), 4);
-/// 
+///
 /// // Oh wait, oops, meant to double the 4.
 /// // But i won't able to access it now...
 /// // oh wait, i can `rewind`.
 /// args.rewind();
-/// 
+///
 /// assert_eq!(args.single::<u32>().unwrap() * 2, 8);
-/// 
+///
 /// // And the same for the 20
 /// assert_eq!(args.single::<u32>().unwrap() * 2, 40);
-/// 
+///
 /// // WAIT, NO. I wanted to concatenate them into a "420" string...
 /// // Argh, what should i do now????
 /// // ....
 /// // oh, `restore`
 /// args.restore();
-/// 
+///
 /// let res = format!("{}{}", args.single::<String>().unwrap(), args.single::<String>().unwrap());
-/// 
+///
 /// // Yay.
 /// assert_eq!(res, "420");
 /// ```
-/// 
-/// **A category of methods not showcased as an example**: `*_n` methods. 
+///
+/// **A category of methods not showcased as an example**: `*_n` methods.
 /// Their docs are good enough to explain themselves. (+ don't want to clutter this doc with another Example)
 #[derive(Clone, Debug)]
 pub struct Args {
@@ -309,7 +309,7 @@ impl Args {
     /// let mut args = Args::new("42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.single::<u32>().unwrap(), 42);
-    /// 
+    ///
     /// // `42` is now out of the way, next we have `69`
     /// assert_eq!(args.single::<u32>().unwrap(), 69);
     /// ```
@@ -362,15 +362,15 @@ impl Args {
     ///
     /// assert_eq!(args.full(), "42 69");
     /// ```
-    pub fn full(&self) -> &str { 
-        &self.message 
+    pub fn full(&self) -> &str {
+        &self.message
     }
 
-    /// Gets the original message passed to the command, 
+    /// Gets the original message passed to the command,
     /// but without quotes (if both starting and ending quotes are present, otherwise returns as is).
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
@@ -378,18 +378,18 @@ impl Args {
     ///
     /// assert_eq!(args.full_quoted(), "42 69");
     /// ```
-    /// 
+    ///
     /// ```rust
     /// use serenity::framework::standard::Args;
-    /// 
+    ///
     /// let args = Args::new("\"42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.full_quoted(), "\"42 69");
     /// ```
-    /// 
+    ///
     /// ```rust
     /// use serenity::framework::standard::Args;
-    /// 
+    ///
     /// let args = Args::new("42 69\"", &[" ".to_string()]);
     ///
     /// assert_eq!(args.full_quoted(), "42 69\"");
@@ -400,50 +400,50 @@ impl Args {
         if !s.starts_with('"') {
             return s;
         }
-    
+
         let end = s.rfind('"');
         if end.is_none() {
             return s;
         }
 
         let end = end.unwrap();
-    
+
         // If it got the quote at the start, then there's no closing quote.
         if end == 0 {
             return s;
         }
-    
+
         &s[1..end]
     }
 
     /// Returns the message starting from the token in the current argument offset; the "rest" of the message.
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use serenity::framework::standard::Args;
-    /// 
+    ///
     /// let mut args = Args::new("42 69 91", &[" ".to_string()]);
     ///
     /// assert_eq!(args.rest(), "42 69 91");
-    /// 
+    ///
     /// args.skip();
-    /// 
+    ///
     /// assert_eq!(args.rest(), "69 91");
-    /// 
+    ///
     /// args.skip();
-    /// 
+    ///
     /// assert_eq!(args.rest(), "91");
-    /// 
+    ///
     /// args.skip();
-    /// 
+    ///
     /// assert_eq!(args.rest(), "");
     /// ```
     pub fn rest(&self) -> &str {
         if self.is_empty() {
             return "";
         }
-        
+
         let args = &self.args[self.offset..];
 
         if let Some(token) = args.get(0) {
@@ -456,7 +456,7 @@ impl Args {
     /// The full amount of recognised arguments.
     ///
     /// **Note**:
-    /// This never changes. Except for [`find`], which upon success, subtracts the length by 1. (e.g len of `3` becomes `2`) 
+    /// This never changes. Except for [`find`], which upon success, subtracts the length by 1. (e.g len of `3` becomes `2`)
     ///
     /// # Examples
     ///
@@ -483,9 +483,9 @@ impl Args {
     /// let mut args = Args::new("42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.remaining(), 2);
-    /// 
+    ///
     /// args.skip();
-    /// 
+    ///
     /// assert_eq!(args.remaining(), 1);
     /// ```
     pub fn remaining(&self) -> usize {
@@ -512,20 +512,20 @@ impl Args {
     }
 
     /// Go one step behind.
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use serenity::framework::standard::Args;
-    /// 
+    ///
     /// let mut args = Args::new("42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.single::<u32>().unwrap(), 42);
-    /// 
+    ///
     /// // By this point, we can only parse 69 now.
     /// // However, with the help of `rewind`, we can mess with 42 again.
     /// args.rewind();
-    /// 
+    ///
     /// assert_eq!(args.single::<u32>().unwrap() * 2, 84);
     /// ```
     #[inline]
@@ -538,29 +538,29 @@ impl Args {
     }
 
     /// Go back to the starting point.
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use serenity::framework::standard::Args;
-    /// 
+    ///
     /// let mut args = Args::new("42 69 95", &[" ".to_string()]);
     ///
     /// // Let's parse 'em numbers!
     /// assert_eq!(args.single::<u32>().unwrap(), 42);
     /// assert_eq!(args.single::<u32>().unwrap(), 69);
     /// assert_eq!(args.single::<u32>().unwrap(), 95);
-    /// 
-    /// // Oh, no! I actually wanted to multiply all of them by 2! 
+    ///
+    /// // Oh, no! I actually wanted to multiply all of them by 2!
     /// // I don't want to call `rewind` 3 times manually....
-    /// // Wait, I could just go entirely back! 
+    /// // Wait, I could just go entirely back!
     /// args.restore();
-    /// 
+    ///
     /// assert_eq!(args.single::<u32>().unwrap() * 2, 84);
     /// assert_eq!(args.single::<u32>().unwrap() * 2, 138);
     /// assert_eq!(args.single::<u32>().unwrap() * 2, 190);
     /// ```
-    /// 
+    ///
     #[inline]
     pub fn restore(&mut self) {
         self.offset = 0;
@@ -605,7 +605,7 @@ impl Args {
     /// Like [`skip`], but do it multiple times.
     ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
@@ -706,23 +706,23 @@ impl Args {
         if self.is_empty() {
             return Err(Error::Eos);
         }
-        
+
         self.iter_quoted::<T>().collect()
     }
 
     /// Like [`iter`], but accounts quotes.
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
     /// let mut args = Args::new(r#""2" "5""#, &[" ".to_string()]);
-    /// 
+    ///
     /// assert_eq!(*args.iter_quoted::<u32>().map(|n| n.unwrap().pow(2)).collect::<Vec<_>>(), [4, 25]);
     /// assert!(args.is_empty());
     /// ```
-    /// 
+    ///
     /// [`iter`]: #method.iter
     pub fn iter_quoted<T: FromStr>(&mut self) -> IterQuoted<T>
         where T::Err: StdError {
@@ -761,16 +761,16 @@ impl Args {
     /// assert_eq!(*args.iter::<u32>().map(|num| num.unwrap().pow(2)).collect::<Vec<_>>(), [9, 16]);
     /// assert!(args.is_empty());
     /// ```
-    pub fn iter<T: FromStr>(&mut self) -> Iter<T> 
+    pub fn iter<T: FromStr>(&mut self) -> Iter<T>
         where T::Err: StdError {
         Iter::new(self)
     }
 
-    /// Returns the first argument that can be parsed and removes it from the message. The suitable argument 
+    /// Returns the first argument that can be parsed and removes it from the message. The suitable argument
     /// can be in an arbitrary position in the message. Likewise, takes quotes into account.
     ///
-    /// **Note**: 
-    /// Unlike how other methods on this struct work, 
+    /// **Note**:
+    /// Unlike how other methods on this struct work,
     /// this function permantently removes the argument if it was **found** and was **succesfully** parsed.
     /// Hence, use this with caution.
     ///
@@ -813,13 +813,13 @@ impl Args {
     /// let mut args = Args::new("c42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.find_n::<u32>().unwrap(), 69);
-    /// 
+    ///
     /// // The `69` is still here, so let's parse it again.
     /// assert_eq!(args.single::<String>().unwrap(), "c42");
     /// assert_eq!(args.single::<u32>().unwrap(), 69);
     /// assert!(args.is_empty());
     /// ```
-    /// 
+    ///
     /// [`find`]: #method.find
     pub fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
@@ -889,7 +889,7 @@ impl<'a, T: FromStr> Iterator for Iter<'a, T> where T::Err: StdError  {
 }
 
 /// Same as [`Iter`], but considers quotes.
-/// 
+///
 /// [`Iter`]: #struct.Iter.html
 pub struct IterQuoted<'a, T: FromStr> where T::Err: StdError {
     args: &'a mut Args,
