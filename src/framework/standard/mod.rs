@@ -492,7 +492,7 @@ impl StandardFramework {
                    to_check: &str,
                    built: &str)
                    -> Option<DispatchError> {
-        if self.configuration.ignore_bots || message.author.bot {
+        if self.configuration.ignore_bots && message.author.bot {
             Some(DispatchError::IgnoredBot)
         } else if self.configuration.ignore_webhooks && message.webhook_id.is_some() {
             Some(DispatchError::WebhookAuthor)
