@@ -52,7 +52,7 @@ mod shard_manager;
 mod queue;
 
 pub use self::shard::Shard;
-pub use self::shard_manager::{ShardManager, ShardingStrategy, ShardManagerOptions, MessageStream};
+pub use self::shard_manager::{ShardManager, ShardingStrategy, ShardManagerOptions, MessageStream, WrappedShard};
 pub use self::queue::{ReconnectQueue, SimpleReconnectQueue};
 
 use futures::stream::SplitStream;
