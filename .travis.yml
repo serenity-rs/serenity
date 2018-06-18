@@ -25,5 +25,5 @@ before_script:
   - cd ..
   - export PATH="$PATH:$HOME/.cargo/bin"
 script:
-  - cargo build --all-features
-  - cargo test --all-features
+  - cargo build
+  - cargo test
