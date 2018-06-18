@@ -94,7 +94,7 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
 /// **Note**: A command is visible when it is either normally displayed or
 /// strikethrough upon requested help by a user.
 #[cfg(feature = "cache")]
-pub fn is_command_hidden(command_options: &Arc<CommandOptions>, msg: &Message, help_options: &HelpOptions) -> bool {
+pub fn is_command_visible(command_options: &Arc<CommandOptions>, msg: &Message, help_options: &HelpOptions) -> bool {
     if !command_options.dm_only && !command_options.guild_only
     || command_options.dm_only && msg.is_private()
     || command_options.guild_only && !msg.is_private() {
@@ -170,7 +170,7 @@ pub fn with_embeds<H: BuildHasher>(
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
-                            if is_command_hidden(&cmd.options(), msg, help_options) {
+                            if is_command_visible(&cmd.options(), msg, help_options) {
                                 found = Some((command_name, cmd));
                             } else {
                                 break;
@@ -181,7 +181,7 @@ pub fn with_embeds<H: BuildHasher>(
 
                             match *actual_command {
                                 CommandOrAlias::Command(ref cmd) => {
-                                    if is_command_hidden(&cmd.options(), msg, help_options) {
+                                    if is_command_visible(&cmd.options(), msg, help_options) {
                                         found = Some((name, cmd));
                                     } else {
                                         break;
@@ -419,7 +419,7 @@ pub fn plain<H: BuildHasher>(
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
-                            if is_command_hidden(&cmd.options(), msg, help_options) {
+                            if is_command_visible(&cmd.options(), msg, help_options) {
                                 found = Some((command_name, cmd));
                             }
                             else {
@@ -431,7 +431,7 @@ pub fn plain<H: BuildHasher>(
 
                             match *actual_command {
                                 CommandOrAlias::Command(ref cmd) => {
-                                    if is_command_hidden(&cmd.options(), msg, help_options) {
+                                    if is_command_visible(&cmd.options(), msg, help_options) {
                                         found = Some((name, cmd));
                                     }
                                     else {
