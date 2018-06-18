@@ -28,13 +28,13 @@ use client::Context;
 use framework::standard::{has_correct_roles, has_correct_permissions};
 use model::{
     channel::Message,
-    id::ChannelId
+    id::ChannelId,
 };
 use std::{
     collections::HashMap,
     hash::BuildHasher,
     sync::Arc,
-    fmt::Write
+    fmt::Write,
 };
 use super::command::InternalCommand;
 use super::{
@@ -44,7 +44,7 @@ use super::{
     HelpOptions,
     CommandOptions,
     CommandError,
-    HelpBehaviour
+    HelpBehaviour,
 };
 use utils::Colour;
 
@@ -86,6 +86,46 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
         }
     }
     !cmd.guild_only
+}
+
+/// Checks whether a command would be visible, takes permissions, channel sent in,
+/// and roles into consideration.
+///
+/// **Note**: A command is visible when it is either normally displayed or
+/// strikethrough upon requested help by a user.
+#[cfg(feature = "cache")]
+pub fn is_command_hidden(command_options: &Arc<CommandOptions>, msg: &Message, help_options: &HelpOptions) -> bool {
+    if !command_options.dm_only && !command_options.guild_only
+    || command_options.dm_only && msg.is_private()
+    || command_options.guild_only && !msg.is_private() {
+
+        if let Some(guild) = msg.guild() {
+            let guild = guild.read();
+
+            if let Some(member) = guild.members.get(&msg.author.id) {
+
+                if command_options.help_available {
+
+                    if has_correct_permissions(command_options, msg) {
+
+                        if has_correct_roles(command_options, &guild, &member) {
+                            return true;
+                        } else {
+                            return help_options.lacking_role != HelpBehaviour::Hide;
+                        }
+                    } else {
+                        return help_options.lacking_permissions != HelpBehaviour::Hide;
+                    }
+                } else {
+                    return help_options.lacking_permissions != HelpBehaviour::Hide;
+                }
+            }
+        }
+    } else {
+        return help_options.wrong_channel != HelpBehaviour::Hide;
+    }
+
+    return false;
 }
 
 /// Posts an embed showing each individual command group and its commands.
@@ -130,7 +170,7 @@ pub fn with_embeds<H: BuildHasher>(
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
-                            if has_all_requirements(&cmd.options(), msg) {
+                            if is_command_hidden(&cmd.options(), msg, help_options) {
                                 found = Some((command_name, cmd));
                             } else {
                                 break;
@@ -141,7 +181,7 @@ pub fn with_embeds<H: BuildHasher>(
 
                             match *actual_command {
                                 CommandOrAlias::Command(ref cmd) => {
-                                    if has_all_requirements(&cmd.options(), msg) {
+                                    if is_command_hidden(&cmd.options(), msg, help_options) {
                                         found = Some((name, cmd));
                                     } else {
                                         break;
@@ -379,7 +419,7 @@ pub fn plain<H: BuildHasher>(
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
-                            if has_all_requirements(&cmd.options(), msg) {
+                            if is_command_hidden(&cmd.options(), msg, help_options) {
                                 found = Some((command_name, cmd));
                             }
                             else {
@@ -391,7 +431,7 @@ pub fn plain<H: BuildHasher>(
 
                             match *actual_command {
                                 CommandOrAlias::Command(ref cmd) => {
-                                    if has_all_requirements(&cmd.options(), msg) {
+                                    if is_command_hidden(&cmd.options(), msg, help_options) {
                                         found = Some((name, cmd));
                                     }
                                     else {
