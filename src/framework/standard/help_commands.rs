@@ -116,8 +116,6 @@ pub fn is_command_visible(command_options: &Arc<CommandOptions>, msg: &Message, 
                     } else {
                         return help_options.lacking_permissions != HelpBehaviour::Hide;
                     }
-                } else {
-                    return help_options.lacking_permissions != HelpBehaviour::Hide;
                 }
             }
         }
@@ -125,7 +123,7 @@ pub fn is_command_visible(command_options: &Arc<CommandOptions>, msg: &Message, 
         return help_options.wrong_channel != HelpBehaviour::Hide;
     }
 
-    return false;
+    return false
 }
 
 /// Posts an embed showing each individual command group and its commands.
