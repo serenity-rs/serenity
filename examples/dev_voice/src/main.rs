@@ -6,19 +6,22 @@
 // I had to get around the manager being broken somehow, given
 // that it likes to be well-integrated with the shard runner.
 
+extern crate env_logger;
 extern crate futures;
+extern crate parking_lot;
 #[macro_use]
 extern crate serde_json;
 extern crate serenity;
 extern crate tokio_core;
-extern crate env_logger;
 extern crate tungstenite;
 
 use futures::{
     future,
+    stream,
     Future,
     Stream,
 };
+use parking_lot::Mutex;
 use serenity::{
     constants::OpCode,
     gateway::{
@@ -39,20 +42,21 @@ use serenity::{
         id::{
             ChannelId,
             GuildId,
+            UserId,
         },
         voice::VoiceState,
     },
+    voice::{self, Handler},
 };
 use std::{
-    cell::{
-        RefCell,
-        RefMut,
-    },
+    cell::{RefCell, RefMut},
+    collections::HashMap,
     env,
     fs::File,
     io::Write,
     iter::Iterator,
     rc::Rc,
+    sync::Arc,
 };
 use tokio_core::reactor::{Core, Handle};
 use tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage};
@@ -83,10 +87,14 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
 
     handle.spawn(future);
 
-    let future = shard_manager.messages().for_each(move |(shard, message)| {
+    let inner_state = stream::repeat(
+        (
+            Arc::new(Mutex::new(HashMap::new())),
+            Arc::new(Mutex::new(UserId(0)))
+        ));
+
+    let future = shard_manager.messages().zip(inner_state).for_each(move |((shard, message), (handlers, user_id))| {
         let mut shard = shard.borrow_mut();
-        
-        let bak_msg = message.clone();
         let event = shard.parse(message);
         
         let event = event.expect("Could not parse shard stream message");
@@ -96,7 +104,7 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
 
         let mut out: Box<Future<Item=(),Error=()>> = Box::new(future::ok(()));
 
-        {println!("{:?}", &event);}
+        // {println!("{:?}", &event);}
 
         match event {
             GatewayEvent::Dispatch(_, Event::MessageCreate(ev)) => {
@@ -121,12 +129,49 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
                     }
                 }
 
-                if do_voice && id!=0 {
-                    out = Box::new(try_audio_connect(id, ev.message.guild_id, shard));
+                if do_voice && id != 0 {
+                    if let Some(guild_id) = ev.message.guild_id {
+                        let handler = {
+                            let user_id = user_id.lock();
+                            send_channel_join(id, guild_id, *user_id, shard)
+                        };
+                        let mut map = handlers.lock();
+                        
+                        map.insert(guild_id, handler);
+                    }
+                    
                 }
             },
-            GatewayEvent::Dispatch(_, Event::Ready(_)) => {
+            GatewayEvent::Dispatch(_, Event::VoiceStateUpdate(ev)) => {
+                println!("{:#?}", ev);
+                let mut map = handlers.lock();
+
+                if let Some(guild_id) = ev.guild_id {
+                    if let Some(mut handler) = map.get_mut(&guild_id) {
+                        handler.update_state(&ev.voice_state);
+
+                        try_join_and_play_audio(&mut handler);
+                    }
+                }
+                
+            },
+            GatewayEvent::Dispatch(_, Event::VoiceServerUpdate(ev)) => {
+                println!("{:#?}", ev);
+                let mut map = handlers.lock();
+
+                if let Some(guild_id) = ev.guild_id {
+                    if let Some(mut handler) = map.get_mut(&guild_id) {
+                        handler.update_server(&ev.endpoint, &ev.token);
+
+                        try_join_and_play_audio(&mut handler);
+                    }
+                }
+            },
+            GatewayEvent::Dispatch(_, Event::Ready(ev)) => {
                 println!("Connected to Discord!");
+                let mut stored_id = user_id.lock();
+
+                *stored_id = ev.ready.user.id;
             },
             _ => {
                 // Ignore all other messages.
@@ -139,12 +184,7 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
     future
 }
 
-fn try_audio_connect(voice_id: u64, guild_id: Option<GuildId>, mut shard: RefMut<Shard>) -> impl Future<Item = (), Error = ()>{
-    let guild_id = match guild_id {
-        Some(GuildId(guild_id)) => guild_id,
-        _ => 0,
-    };
-
+fn send_channel_join(voice_id: u64, guild_id: GuildId, user_id: UserId, mut shard: RefMut<Shard>) -> Handler {
     let voice_update = json!({
         "op": OpCode::VoiceStateUpdate.num(),
         "d": {
@@ -157,5 +197,14 @@ fn try_audio_connect(voice_id: u64, guild_id: Option<GuildId>, mut shard: RefMut
 
     shard.send(TungsteniteMessage::Text(voice_update.to_string()));
 
-    future::ok(())
+    Handler::standalone(guild_id, user_id)
+}
+
+fn try_join_and_play_audio(handler: &mut Handler) {
+    if handler.connect() {
+        // Eine Kleine Nachtmusik
+        handler.play(
+            voice::ytdl("https://www.youtube.com/watch?v=o1FSN8_pp_o").expect("Link to video taken down.")
+        );
+    }
 }

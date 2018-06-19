@@ -9,5 +9,6 @@ serenity = { path = "../../", default-features = true, features = ["voice"] }
 tokio-core = "~0.1"
 futures = "~0.1"
 env_logger = "~0.4"
+parking_lot = "~0.5"
 tungstenite = "~0.5"
 tokio-tungstenite = "~0.5"
