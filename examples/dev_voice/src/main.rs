@@ -139,16 +139,13 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
     future
 }
 
-fn try_audio_connect(voice_id: u64, guild_id: Option<GuildId>, shard: RefMut<Shard>) -> impl Future<Item = (), Error = ()>{
-    // TODO
-    println!("{}, {:?}", voice_id, guild_id);
-
+fn try_audio_connect(voice_id: u64, guild_id: Option<GuildId>, mut shard: RefMut<Shard>) -> impl Future<Item = (), Error = ()>{
     let guild_id = match guild_id {
         Some(GuildId(guild_id)) => guild_id,
         _ => 0,
     };
 
-    let map = json!({
+    let voice_update = json!({
         "op": OpCode::VoiceStateUpdate.num(),
         "d": {
             "channel_id": voice_id,
@@ -158,9 +155,7 @@ fn try_audio_connect(voice_id: u64, guild_id: Option<GuildId>, shard: RefMut<Sha
         }
     });
 
-    println!("{}", map);
-
-    // TODo: send me.
+    shard.send(TungsteniteMessage::Text(voice_update.to_string()));
 
     future::ok(())
 }
