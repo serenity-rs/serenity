@@ -96,12 +96,14 @@ impl Manager {
             }
         }
 
-        let mut handler = Handler::new(guild_id,
+        // TODO: FIXME
+        // Needs a remote of some kind from somewhere, I'm not that far yet.
+        //let mut handler = Handler::new(guild_id,
             // self.ws.clone(),
-            self.user_id);
-        handler.join(channel_id);
+        //    self.user_id);
+        //handler.join(channel_id);
 
-        self.handlers.insert(guild_id, handler);
+        //self.handlers.insert(guild_id, handler);
 
         // Actually safe, as the key would have been inserted above.
         self.handlers.get_mut(&guild_id).unwrap()
