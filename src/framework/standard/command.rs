@@ -359,9 +359,11 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
 
         let pos = *unsafe { positions.get_unchecked(0) };
 
+        let with_whitespace = find_end_of_prefix_with_whitespace(&msg.content, pos);
+
         if conf.allow_whitespace {
-            positions.insert(0, find_end_of_prefix_with_whitespace(&msg.content, pos).unwrap_or(pos));
-        } else if find_end_of_prefix_with_whitespace(&msg.content, pos).is_some() {
+            positions.insert(0, with_whitespace.unwrap_or(pos));
+        } else if with_whitespace.is_some() {
             return None;
         }
 
