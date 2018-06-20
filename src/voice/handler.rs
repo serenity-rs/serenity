@@ -17,6 +17,7 @@ use std::sync::{
 };
 use super::connection_info::ConnectionInfo;
 use super::{Audio, AudioReceiver, AudioSource, Bitrate, Status as VoiceStatus, threading, LockedAudio};
+use tokio_core::reactor::Remote;
 
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.
@@ -61,6 +62,8 @@ pub struct Handler {
     pub endpoint: Option<String>,
     /// The Id of the guild to be connected to.
     pub guild_id: GuildId,
+    /// Internal reference to the Tokio execution context.
+    remote: Remote,
     /// Whether the current handler is set to deafen voice connections.
     ///
     /// **Note**: This _must not_ be manually mutated. Call [`deafen`] to
@@ -114,11 +117,13 @@ impl Handler {
         guild_id: GuildId,
         // ws: MpscSender<InterMessage>,
         user_id: UserId,
+        remote: Remote,
     ) -> Self {
         Self::new_raw(guild_id,
             // Some(ws),
             None,
-            user_id)
+            user_id,
+            remote)
     }
 
     /// Creates a new, standalone Handler which is not connected to the primary
@@ -131,8 +136,8 @@ impl Handler {
     /// For most use cases you do not want this. Only use it if you are using
     /// the voice component standalone from the rest of the library.
     #[inline]
-    pub fn standalone(guild_id: GuildId, user_id: UserId) -> Self {
-        Self::new_raw(guild_id, None, user_id)
+    pub fn standalone(guild_id: GuildId, user_id: UserId, remote: Remote) -> Self {
+        Self::new_raw(guild_id, None, user_id, remote)
     }
 
     /// Connects to the voice channel if the following are present:
@@ -395,21 +400,23 @@ impl Handler {
             String
         >>,
         user_id: UserId,
+        remote: Remote,
     ) -> Self {
         let (tx, rx) = mpsc::channel();
 
-        threading::start(guild_id, rx);
+        threading::start(guild_id, rx, remote.clone());
 
         Handler {
             channel_id: None,
             endpoint: None,
             guild_id,
+            remote,
             self_deaf: false,
             self_mute: false,
             sender: tx,
             session_id: None,
             token: None,
-            user_id: user_id,
+            user_id,
             // ws: ws,
             ws: None
         }
@@ -424,7 +431,7 @@ impl Handler {
             self.sender = tx;
             self.sender.send(status).unwrap();
 
-            threading::start(self.guild_id, rx);
+            threading::start(self.guild_id, rx, self.remote.clone());
 
             self.update();
         }

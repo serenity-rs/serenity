@@ -8,7 +8,7 @@ use futures::{
 };
 use internal::{
     either_n::Either4,
-    long_lock::long_lock,
+    long_lock::LongLock,
     prelude::*,
 };
 use model::id::GuildId;
@@ -28,7 +28,7 @@ use super::{
     Bitrate,
     Status
 };
-use tokio_core::reactor::Core;
+use tokio_core::reactor::{Core, Handle, Remote};
 use tokio_timer::{wheel, Timer};
 
 pub(crate) struct TaskState {
@@ -52,6 +52,7 @@ impl TaskState {
     }
 
     pub fn kill_loop(&mut self) -> StdResult<(),()> {
+        println!("Killing loop (?)");
         match mem::replace(&mut self.kill_tx, None) {
             Some(tx) => {let _ = tx.send(());},
             None => {},
@@ -61,16 +62,17 @@ impl TaskState {
     }
 }
 
-pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
+pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>, remote: Remote) {
     let timer = wheel()
         .tick_duration(Duration::from_millis(20))
         .build();
 
     // TODO: reveal to the outside world
-    runner(rx, timer);
+    println!("Built runner.");
+    remote.spawn(move |handle| runner(rx, timer, handle.remote().clone()));
 }
 
-fn runner(rx: MpscReceiver<Status>, timer: Timer) -> impl Future<Item = (), Error = ()> {
+fn runner(rx: MpscReceiver<Status>, timer: Timer, remote: Remote) -> impl Future<Item = (), Error = ()> {
     let (kill_tx, kill_rx) = oneshot::channel();
 
     let state_shared = repeat(Arc::new(Mutex::new(TaskState {
@@ -83,10 +85,6 @@ fn runner(rx: MpscReceiver<Status>, timer: Timer) -> impl Future<Item = (), Erro
         senders: Vec::new(),
     })));
 
-    // TEMP: FIX ME
-    let mut core = Core::new().unwrap();
-    let remote = core.handle().remote().clone();
-
     timer.interval_at(Instant::now(), Duration::from_millis(20))
         .map_err(|why| {error!("[voice] Timer error for running connection. {:?}", why)})
         .until(
@@ -98,6 +96,7 @@ fn runner(rx: MpscReceiver<Status>, timer: Timer) -> impl Future<Item = (), Erro
         .zip(state_shared)
         .for_each(move |(instant, state_lock)| {
             remote.spawn(move |handle| {
+                println!("tick");
                 // NOTE: might want to make late tasks die early.
                 // May need to store task spawn times etc.
 
@@ -105,7 +104,7 @@ fn runner(rx: MpscReceiver<Status>, timer: Timer) -> impl Future<Item = (), Erro
                 let mut should_disconnect = false;
                 let conn_handle = handle.clone();
 
-                let mut state = long_lock(state_lock);
+                let mut state = LongLock::new(state_lock);
 
                 // Handle any control messages, drain them all synchronously.
                 // All are obvious, except connection state changes, which
@@ -113,16 +112,20 @@ fn runner(rx: MpscReceiver<Status>, timer: Timer) -> impl Future<Item = (), Erro
                 loop {
                     match state.rx.try_recv() {
                         Ok(Status::Connect(info)) => {
+                            println!("Connection request.");
                             received_info = Some(info);
                             should_disconnect = false;
                         },
                         Ok(Status::Disconnect) => {
+                            println!("Disconnection request.");
                             should_disconnect = true;
                         },
                         Ok(Status::SetReceiver(r)) => {
+                            println!("Receiver added.");
                             state.receiver = r;
                         },
                         Ok(Status::SetSender(s)) => {
+                            println!("Sender set.");
                             state.senders.clear();
 
                             if let Some(aud) = s {
@@ -130,16 +133,20 @@ fn runner(rx: MpscReceiver<Status>, timer: Timer) -> impl Future<Item = (), Erro
                             }
                         },
                         Ok(Status::AddSender(s)) => {
+                            println!("Sender added.");
                             state.senders.push(s);
                         },
                         Ok(Status::SetBitrate(b)) => {
+                            println!("Bitrate set.");
                             state.bitrate = b;
                         },
                         Err(TryRecvError::Empty) => {
                             // If we receieved nothing, then we can perform an update.
+                            println!("Forwards!");
                             break;
                         },
                         Err(TryRecvError::Disconnected) => {
+                            println!("Rip!");
                             should_disconnect = true;
                             break;
                         },
@@ -148,6 +155,7 @@ fn runner(rx: MpscReceiver<Status>, timer: Timer) -> impl Future<Item = (), Erro
 
                 // If we *want* to disconnect, poison the stream here.
                 if should_disconnect {
+                    println!("Rip2!");
                     return Either::A(result(state.kill_loop()));
                 }
 
@@ -159,23 +167,29 @@ fn runner(rx: MpscReceiver<Status>, timer: Timer) -> impl Future<Item = (), Erro
                 //  * We want to make a new connection.
                 let conn_future = match state.maybe_conn() {
                     Some(connection) => if state.cycle_error {
-                            Either4::A(connection.reconnect(conn_handle))
+                            Either4::A(connection.reconnect(conn_handle).map(Some))
                         } else {
-                            Either4::B(ok(connection))
+                            Either4::B(ok(Some(connection)))
                         },
                     None => if let Some(info) = received_info {
-                        Either4::C(Connection::new(info, conn_handle))
+                        Either4::C(Connection::new(info, conn_handle).map(Some))
                     } else {
-                        Either4::D(err(Error::Voice(VoiceError::VoiceModeInvalid)))
+                        println!("Bad bad not good");
+                        Either4::D(ok(None))
                     },
                 };
 
                 Either::B(conn_future
                     .and_then(move |conn| {
+                        println!("About to maybe cycle...");
                         // This drops the lock on completion.
                         // The cycle is responsible for setting/unsetting the error flag.
-                        conn.cycle(instant, state)
+                        match conn {
+                            Some(conn) => Either::A(conn.cycle(instant, state)),
+                            None => Either::B(ok(state)),
+                        }
                     })
+                    .map(|state| mem::drop(state))
                     .map_err(|why| {
                         error!(
                             "(╯°□°）╯︵ ┻━┻ Error updating connection: {:?}",

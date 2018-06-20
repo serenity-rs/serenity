@@ -374,7 +374,7 @@ impl Connection {
 
     #[allow(unused_variables)]
     pub(crate) fn cycle(mut self, now: Instant, mut state: LongLock<TaskState>)
-        -> impl Future<Item = (), Error = Error>
+        -> impl Future<Item = LongLock<TaskState>, Error = Error>
     {
     // On success, this is unset.
     state.cycle_error = true;
@@ -600,7 +600,7 @@ impl Connection {
                     .map(move |conn| {
                         state.cycle_error = false;
                         state.restore_conn(conn);
-                        ()
+                        state 
                     })
             })
     }

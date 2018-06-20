@@ -58,7 +58,7 @@ use std::{
     rc::Rc,
     sync::Arc,
 };
-use tokio_core::reactor::{Core, Handle};
+use tokio_core::reactor::{Core, Handle, Remote};
 use tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage};
 
 fn main() {
@@ -104,6 +104,7 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
     }; 
 
     let mut shard_manager = ShardManager::new(opts, handle.clone());
+    let remote = handle.remote().clone();
     let future = shard_manager.start()
         .map_err(|e| println!("Error starting shard manager: {:?}", e));
 
@@ -112,10 +113,11 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
     let inner_state = stream::repeat(
         (
             Arc::new(Mutex::new(HashMap::new())),
-            Arc::new(Mutex::new(UserId(0)))
+            Arc::new(Mutex::new(UserId(0))),
+            remote,
         ));
 
-    let future = shard_manager.messages().zip(inner_state).for_each(move |((shard, message), (handlers, user_id))| {
+    let future = shard_manager.messages().zip(inner_state).for_each(move |((shard, message), (handlers, user_id, remote))| {
         let mut shard = shard.borrow_mut();
         let event = shard.parse(message);
         
@@ -126,7 +128,7 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
 
         let mut out: Box<Future<Item=(),Error=()>> = Box::new(future::ok(()));
 
-        // {println!("{:?}", &event);}
+        {println!("{:?}", &event);}
 
         match event {
             GatewayEvent::Dispatch(_, Event::MessageCreate(ev)) => {
@@ -155,7 +157,7 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
                     if let Some(guild_id) = ev.message.guild_id {
                         let handler = {
                             let user_id = user_id.lock();
-                            send_channel_join(id, guild_id, *user_id, shard)
+                            send_channel_join(id, guild_id, *user_id, shard, remote)
                         };
                         let mut map = handlers.lock();
                         
@@ -206,7 +208,7 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
     future
 }
 
-fn send_channel_join(voice_id: u64, guild_id: GuildId, user_id: UserId, mut shard: RefMut<Shard>) -> Handler {
+fn send_channel_join(voice_id: u64, guild_id: GuildId, user_id: UserId, mut shard: RefMut<Shard>, remote: Remote) -> Handler {
     let voice_update = json!({
         "op": OpCode::VoiceStateUpdate.num(),
         "d": {
@@ -219,7 +221,7 @@ fn send_channel_join(voice_id: u64, guild_id: GuildId, user_id: UserId, mut shar
 
     shard.send(TungsteniteMessage::Text(voice_update.to_string()));
 
-    Handler::standalone(guild_id, user_id)
+    Handler::standalone(guild_id, user_id, remote)
 }
 
 fn try_join_and_play_audio(handler: &mut Handler) {
