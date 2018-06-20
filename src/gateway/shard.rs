@@ -50,7 +50,7 @@ pub struct Shard {
 impl Shard {
     pub fn new(token: Rc<String>, shard_info: [u64; 2], handle: Handle)
         -> Box<Future<Item = Shard, Error = Error>> {
-        let done = connect_async(Url::from_str(CONNECTION).unwrap(), handle.remote().clone())
+        let done = connect_async(Url::from_str(CONNECTION).unwrap())
             .map(move |(duplex, _)| {
                 let (sink, stream) = duplex.split();
                 let (tx, rx) = mpsc::unbounded();

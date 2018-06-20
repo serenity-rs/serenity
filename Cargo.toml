@@ -15,11 +15,12 @@ bitflags = "^1.0"
 future-utils = "~0.9"
 futures = "~0.1"
 log = "~0.4"
+owning_ref = "0.3"
+parking_lot = "0.5"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
-tokio-core = "~0.1"
-tokio-timer = "~0.1"
+tokio = "~0.1"
 tokio-tls = "~0.1"
 url = "^1.0"
 
@@ -39,9 +40,13 @@ version = "~0.4"
 optional = true
 version = "^1.0"
 
+[dependencies.http]
+optional = true
+version = "~0.1"
+
 [dependencies.hyper]
 optional = true
-version = "~0.11"
+version = "~0.12"
 
 [dependencies.hyper-multipart-rfc7578]
 optional = true
@@ -49,7 +54,11 @@ version = "0.1.0-alpha3"
 
 [dependencies.hyper-tls]
 optional = true
-version = "~0.1"
+version = "~0.2"
+
+[dependencies.mime]
+optional = true
+version = "~0.3"
 
 [dependencies.native-tls]
 optional = true
@@ -58,14 +67,6 @@ version = "~0.1"
 [dependencies.opus]
 optional = true
 version = "0.2"
-
-[dependencies.owning_ref]
-optional = true
-version = "0.3"
-
-[dependencies.parking_lot]
-optional = true
-version = "0.5"
 
 [dependencies.rand]
 optional = true
@@ -78,7 +79,9 @@ version = "0.0.14"
 
 [dependencies.tokio-tungstenite]
 optional = true
-version = "~0.5"
+git = "https://github.com/snapview/tokio-tungstenite"
+rev = "97407110837da01a4234f4370e2a1b74b1c58154"
+#version = "~0.5"
 
 [dependencies.tungstenite]
 optional = true
@@ -96,14 +99,14 @@ default = [
     "utils",
 ]
 builder = ["utils"]
-client = ["gateway", "http"]
+client = ["gateway", "http_base"]
 extras = []
 framework = ["client", "utils"]
-gateway = ["flate2", "http", "tokio-tungstenite", "tungstenite", "utils"]
-http = ["builder", "hyper", "hyper-multipart-rfc7578", "hyper-tls", "native-tls", "utils"]
+gateway = ["flate2", "http_base", "tokio-tungstenite", "tungstenite", "utils"]
+http_base = ["builder", "http", "hyper", "hyper-multipart-rfc7578", "hyper-tls", "mime", "native-tls", "utils"]
 standard_framework = ["framework"]
 utils = ["base64"]
-voice = ["byteorder", "gateway", "opus", "owning_ref", "parking_lot", "rand", "sodiumoxide"]
+voice = ["byteorder", "gateway", "opus", "rand", "sodiumoxide"]
 
 [package.metadata.docs.rs]
 all-features = true

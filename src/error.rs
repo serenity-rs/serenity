@@ -3,7 +3,7 @@ use futures::{
     Canceled,
     Future
 };
-use hyper::error::UriError;
+use http_lib::uri::InvalidUri as UriError;
 use internal::prelude::*;
 use model::ModelError;
 use serde_json::Error as JsonError;

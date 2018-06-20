@@ -16,7 +16,7 @@ extern crate tokio_core;
 extern crate tungstenite;
 
 use futures::{
-    future,
+    future::{self, Executor,},
     stream,
     Future,
     Stream,
@@ -65,9 +65,31 @@ fn main() {
     env_logger::init().expect("Error initializing env_logger");
 
     let mut core = Core::new().expect("Error creating event loop");
-    let future = try_main(core.handle());
+    let future = try_main2(core.handle());
 
     core.run(future).expect("Error running event loop");
+}
+
+fn try_main2(handle: Handle) -> impl Future<Item = (), Error = ()> {
+    let remote = handle.remote().clone();
+
+    handle.execute(future::ok("spawn-test")
+        .map(|val| {
+            println!("Zeroth future: {}", val);
+        }));
+
+    future::ok("test")
+        .map(move |val| {
+            println!("First future: {}", val);
+            remote.spawn(move |handle| {
+                println!("Building second future...");
+                handle.spawn(future::ok("test2")
+                    .map(|val| {
+                        println!("Second future: {}", val);
+                    }));
+                Ok(())
+            });
+        })
 }
 
 fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {

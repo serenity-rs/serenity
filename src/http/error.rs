@@ -1,6 +1,10 @@
 use futures::Canceled;
+use http_lib::{
+    uri::InvalidUri as UriError,
+    Error as HttpCrateError
+};
 use hyper::{
-    error::{Error as HyperError, UriError},
+    error::Error as HyperError,
     Response,
 };
 use native_tls::Error as TlsError;
@@ -13,7 +17,7 @@ use std::{
     result::Result as StdResult,
 };
 use super::ratelimiting::RateLimitError;
-use tokio_timer::TimerError;
+use tokio::timer::Error as TimerError;
 
 pub type Result<T> = StdResult<T, Error>;
 
@@ -28,9 +32,11 @@ pub enum Error {
     /// An error from the `std::fmt` module.
     Format(FmtError),
     /// An error from the `hyper` crate.
+    Http(HttpCrateError),
+    /// An error from the `hyper` crate.
     Hyper(HyperError),
     /// When a status code was unexpectedly received for a request's status.
-    InvalidRequest(Response),
+    InvalidRequest(String),
     /// An error from the `std::io` module.
     Io(IoError),
     /// An error from the `serde_json` crate.

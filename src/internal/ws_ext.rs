@@ -15,7 +15,7 @@ use internal::{
 use parking_lot::Mutex;
 use serde_json;
 use std::sync::{mpsc::Sender, Arc};
-use tokio_core::net::TcpStream;
+use tokio::net::TcpStream;
 use tokio_tls::TlsStream;
 use tokio_tungstenite::{
     stream::Stream as StreamSwitcher,
@@ -25,7 +25,6 @@ use tungstenite::{
     error::Error as TungsteniteError,
     Message
 };
-use voice::VoiceError;
 
 pub type WsClient = WebSocketStream<StreamSwitcher<TcpStream, TlsStream<TcpStream>>>;
 
@@ -85,7 +84,7 @@ pub fn message_to_json(message: Message, notifier_lock: Arc<Mutex<Sender<Vec<u8>
         Message::Text(payload) => serde_json::from_str(&payload).map(Some).map_err(Error::from),
         Message::Ping(x) => {
             let notifier = notifier_lock.lock();
-            notifier.send(x).map_err(|_| Error::Voice(VoiceError::WsChannelHangup))?;
+            notifier.send(x).map_err(|_| Error::into)?;
 
             Ok(None)
         },

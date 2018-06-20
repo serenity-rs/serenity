@@ -36,22 +36,29 @@ pub use self::error::{Error as HttpError, Result};
 pub use self::routing::{Path, Route};
 
 use futures::{Future, Stream, future};
-use hyper::client::{Client as HyperClient, Config as HyperConfig, HttpConnector};
-use hyper::header::{Authorization, ContentType};
-use hyper::{Body, Method, Request, Response};
+use hyper::{
+    client::{Client as HyperClient, HttpConnector},
+    header::{HeaderValue, AUTHORIZATION, CONTENT_TYPE},
+    Body,
+    Error as HyperError,
+    Method,
+    Request, 
+    Response,
+};
 use hyper_multipart_rfc7578::client::multipart::{Body as MultipartBody, Form};
 use hyper_tls::HttpsConnector;
+use mime::APPLICATION_JSON;
 use model::prelude::*;
 use self::ratelimiting::RateLimiter;
 use serde::de::DeserializeOwned;
 use serde_json::{self, Number, Value};
+use std::borrow::Cow;
 use std::cell::RefCell;
-use std::fmt::Write;
+use std::fmt::{Debug, Write};
 use std::fs::File;
 use std::io::Cursor;
 use std::rc::Rc;
 use std::str::FromStr;
-use tokio_core::reactor::Handle;
 use ::builder::*;
 use ::{Error, utils as serenity_utils};
 
@@ -75,11 +82,11 @@ pub enum LightMethod {
 impl LightMethod {
     pub fn hyper_method(&self) -> Method {
         match *self {
-            LightMethod::Delete => Method::Delete,
-            LightMethod::Get => Method::Get,
-            LightMethod::Patch => Method::Patch,
-            LightMethod::Post => Method::Post,
-            LightMethod::Put => Method::Put,
+            LightMethod::Delete => Method::DELETE,
+            LightMethod::Get => Method::GET,
+            LightMethod::Patch => Method::PATCH,
+            LightMethod::Post => Method::POST,
+            LightMethod::Put => Method::PUT,
         }
     }
 }
@@ -87,7 +94,6 @@ impl LightMethod {
 #[derive(Clone, Debug)]
 pub struct Client {
     pub client: Rc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
-    pub handle: Handle,
     pub multiparter: Rc<HyperClient<HttpsConnector<HttpConnector>, MultipartBody>>,
     pub ratelimiter: Rc<RefCell<RateLimiter>>,
     pub token: Rc<String>,
@@ -96,10 +102,9 @@ pub struct Client {
 impl Client {
     pub fn new(
         client: Rc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
-        handle: Handle,
         token: Rc<String>,
     ) -> Result<Self> {
-        let connector = HttpsConnector::new(4, &handle)?;
+        let connector = HttpsConnector::new(4)?;
 
         let multiparter = Rc::new(HyperConfig::default()
             .body::<MultipartBody>()
@@ -108,9 +113,8 @@ impl Client {
             .build(&handle));
 
         Ok(Self {
-            ratelimiter: Rc::new(RefCell::new(RateLimiter::new(handle.clone()))),
+            ratelimiter: Rc::new(RefCell::new(RateLimiter::new())),
             client,
-            handle,
             multiparter,
             token,
         })
@@ -1412,7 +1416,7 @@ impl Client {
             }
         }
 
-        let mut request = Request::new(Method::Get, uri);
+        let mut request = Request::get(uri);
         form.set_body(&mut request);
 
         let client = Rc::clone(&self.multiparter);
@@ -1521,6 +1525,30 @@ impl Client {
         self.request(route, map)
     }
 
+    fn build_request(
+        &self,
+        method: LightMethod,
+        url: Cow<str>,
+        map: Option<&Value>
+    ) -> Result<Request<Body>> {
+        let built_uri = url.as_ref();
+
+        let body = if let Some(value) = map {
+            serde_json::to_string(value)?
+        } else {
+            String::new()
+        };
+
+        Request::builder()
+            .uri(built_uri)
+            .method(method.hyper_method())
+            .header(AUTHORIZATION, HeaderValue::from_str(&self.token())
+                .expect("Token being sent must be a valid HTTP-encodable string."))
+            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .body(Body::from(body))
+            .map_err(|e| HttpError::Http(e))
+    }
+
     fn request<'a, T: DeserializeOwned + 'static>(
         &self,
         route: Route<'a>,
@@ -1528,18 +1556,7 @@ impl Client {
     ) -> Box<Future<Item = T, Error = Error>> {
         let (method, path, url) = route.deconstruct();
 
-        let built_uri = try_uri!(url.as_ref());
-        let mut request = Request::new(method.hyper_method(), built_uri);
-
-        if let Some(value) = map {
-            request.set_body(ftry!(serde_json::to_string(value)));
-        }
-
-        {
-            let headers = request.headers_mut();
-            headers.set(Authorization(self.token()));
-            headers.set(ContentType::json());
-        }
+        let request = ftry!(self.build_request(method, url, map));
 
         let client = Rc::clone(&self.client);
 
@@ -1558,20 +1575,7 @@ impl Client {
     ) -> Box<Future<Item = (), Error = Error>> {
         let (method, path, url) = route.deconstruct();
 
-        let mut request = Request::new(
-            method.hyper_method(),
-            try_uri!(url.as_ref()),
-        );
-
-        if let Some(value) = map {
-            request.set_body(ftry!(serde_json::to_string(value)));
-        }
-
-        {
-            let headers = request.headers_mut();
-            headers.set(Authorization(self.token()));
-            headers.set(ContentType::json());
-        }
+        let request = ftry!(self.build_request(method, url, map));
 
         let client = Rc::clone(&self.client);
 
@@ -1609,12 +1613,12 @@ impl Client {
 /// Returns [`Error::InvalidRequest`] if the response status code is unexpected.
 ///
 /// [`Error::InvalidRequest`]: enum.Error.html#variant.InvalidRequest
-fn verify_status(response: Response) ->
-    Box<Future<Item = Response, Error = Error>> {
+fn verify_status<T: Debug>(response: Response<T>) ->
+    impl Future<Item = Response<T>, Error = Error> {
     if response.status().is_success() {
-        Box::new(future::ok(response))
+        future::ok(response)
     } else {
-        Box::new(future::err(Error::Http(HttpError::InvalidRequest(response))))
+        future::err(Error::Http(HttpError::InvalidRequest(format!("{:?}", response))))
     }
 }
 

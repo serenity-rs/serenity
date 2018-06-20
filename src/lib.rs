@@ -110,9 +110,10 @@ extern crate serde_json;
 extern crate chrono;
 extern crate future_utils;
 extern crate futures;
+extern crate owning_ref;
+extern crate parking_lot;
 extern crate serde;
-extern crate tokio_core;
-extern crate tokio_timer;
+extern crate tokio;
 extern crate tokio_tls;
 extern crate tokio_tungstenite;
 extern crate tungstenite;
@@ -124,6 +125,8 @@ extern crate base64;
 extern crate byteorder;
 #[cfg(feature = "flate2")]
 extern crate flate2;
+#[cfg(feature = "http")]
+extern crate http as http_lib;
 #[cfg(feature = "hyper")]
 extern crate hyper;
 #[cfg(feature = "hyper-multipart-rfc7578")]
@@ -136,10 +139,6 @@ extern crate multipart;
 extern crate native_tls;
 #[cfg(feature = "opus")]
 extern crate opus;
-#[cfg(feature = "owning_ref")]
-extern crate owning_ref;
-#[cfg(feature = "parking_lot")]
-extern crate parking_lot;
 #[cfg(feature = "rand")]
 extern crate rand;
 #[cfg(feature = "sodiumoxide")]

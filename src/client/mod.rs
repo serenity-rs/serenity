@@ -31,7 +31,6 @@ use hyper_tls::HttpsConnector;
 use self::shard_manager::{ShardManager, ShardManagerOptions, ShardingStrategy};
 use std::rc::Rc;
 use super::http::Client as HttpClient;
-use tokio_core::reactor::Handle;
 use Error;
 
 #[cfg(feature = "cache")]
@@ -39,7 +38,6 @@ use cache::Cache;
 
 #[derive(Debug)]
 pub struct ClientOptions {
-    pub handle: Handle,
     pub http_client: Rc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
     pub sharding: ShardingStrategy,
     pub token: String,
@@ -49,7 +47,6 @@ pub struct ClientOptions {
 pub struct Client {
     #[cfg(feature = "cache")]
     pub cache: Rc<RefCell<Cache>>,
-    pub handle: Handle,
     pub http: Rc<HttpClient>,
     pub shard_manager: ShardManager,
     token: Rc<String>,
@@ -68,11 +65,9 @@ impl Client {
             })
         };
 
-        let h2 = options.handle.clone();
         let strategy = options.sharding;
         let client = Rc::new(ftry!(HttpClient::new(
             options.http_client,
-            options.handle.clone(),
             Rc::clone(&token),
         )));
 
@@ -82,7 +77,6 @@ impl Client {
             Self {
                 #[cfg(feature = "cache")]
                 cache: Rc::new(RefCell::new(Cache::default())),
-                handle: h2,
                 http: client,
                 shard_manager: ShardManager::new(ShardManagerOptions {
                     strategy: strategy,
