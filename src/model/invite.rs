@@ -37,9 +37,15 @@ pub struct Invite {
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     pub channel: InviteChannel,
-    /// a representation of the minimal amount of information needed about the
+    /// A representation of the minimal amount of information needed about the
     /// [`Guild`] being invited to.
-    pub guild: InviteGuild,
+    ///
+    /// This can be `None` if the invite is to a [`Group`] and not to a
+    /// Guild.
+    ///
+    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`Group`]: ../channel/struct.Group.html
+    pub guild: Option<InviteGuild>,
 }
 
 #[cfg(feature = "model")]
@@ -136,14 +142,14 @@ impl Invite {
     /// #         name: "foo".to_string(),
     /// #         kind: ChannelType::Text,
     /// #     },
-    /// #     guild: InviteGuild {
+    /// #     guild: Some(InviteGuild {
     /// #         id: GuildId(2),
     /// #         icon: None,
     /// #         name: "bar".to_string(),
     /// #         splash_hash: None,
     /// #         text_channel_count: Some(7),
     /// #         voice_channel_count: Some(3),
-    /// #     },
+    /// #     }),
     /// # };
     /// #
     /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
@@ -228,8 +234,14 @@ pub struct RichInvite {
     /// When the invite was created.
     pub created_at: DateTime<FixedOffset>,
     /// A representation of the minimal amount of information needed about the
-    /// guild being invited to.
-    pub guild: InviteGuild,
+    /// [`Guild`] being invited to.
+    ///
+    /// This can be `None` if the invite is to a [`Group`] and not to a
+    /// Guild.
+    ///
+    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`Group`]: ../channel/struct.Group.html
+    pub guild: Option<InviteGuild>,
     /// The user that created the invite.
     pub inviter: User,
     /// The maximum age of the invite in seconds, from when it was created.
@@ -301,14 +313,14 @@ impl RichInvite {
     /// #         kind: ChannelType::Text,
     /// #     },
     /// #     created_at: "2017-01-29T15:35:17.136000+00:00".parse().unwrap(),
-    /// #     guild: InviteGuild {
+    /// #     guild: Some(InviteGuild {
     /// #         id: GuildId(2),
     /// #         icon: None,
     /// #         name: "baz".to_string(),
     /// #         splash_hash: None,
     /// #         text_channel_count: None,
     /// #         voice_channel_count: None,
-    /// #     },
+    /// #     }),
     /// #     inviter: User {
     /// #         avatar: None,
     /// #         bot: false,
