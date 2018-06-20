@@ -338,17 +338,12 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
         if let Some(mention_end) = find_mention_end(&msg.content, conf) {
             positions.push(mention_end);
             return Some(positions);
-        } else if let Some(ref func) = conf.dynamic_prefix {
-            if let Some(x) = func(ctx, msg) {
-                if msg.content.starts_with(&x) {
-                    positions.push(x.chars().count());
-                }
-            } else {
-                for n in &conf.prefixes {
-                    if msg.content.starts_with(n) {
-                        positions.push(n.chars().count());
-                    }
-                }
+        }
+
+        // Dynamic prefixes, if present and suitable, always have a higher priority.
+        if let Some(x) = conf.dynamic_prefix.as_ref().and_then(|f| f(ctx, msg)) {
+            if msg.content.starts_with(&x) {
+                positions.push(x.chars().count());
             }
         } else {
             for n in &conf.prefixes {
@@ -356,7 +351,7 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
                     positions.push(n.chars().count());
                 }
             }
-        };
+        }
 
         if positions.is_empty() {
             return None;
