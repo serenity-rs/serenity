@@ -1422,7 +1422,7 @@ impl Client {
         let done = client.request(request)
             .from_err()
             .and_then(verify_status)
-            .and_then(|res| res.body().concat2().map_err(From::from))
+            .and_then(|res| res.into_body().concat2().map_err(From::from))
             .and_then(|body| serde_json::from_slice(&body).map_err(From::from));
 
         Box::new(done)
@@ -1562,7 +1562,7 @@ impl Client {
             .and_then(move |_| client.request(request).map_err(From::from))
             .from_err()
             .and_then(verify_status)
-            .and_then(|res| res.body().concat2().map_err(From::from))
+            .and_then(|res| res.into_body().concat2().map_err(From::from))
             .and_then(|body| serde_json::from_slice(&body).map_err(From::from)))
     }
 

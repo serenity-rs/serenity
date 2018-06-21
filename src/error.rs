@@ -241,13 +241,16 @@ impl StdError for Error {
             Error::Json(ref inner) => inner.description(),
             Error::Model(ref inner) => inner.description(),
             Error::Num(ref inner) => inner.description(),
+            Error::SplitWebSocketSend(ref inner) => inner.description(),
             Error::Url(ref inner) => inner,
             Error::Uri(ref inner) => inner.description(),
             #[cfg(feature = "client")]
             Error::Client(ref inner) => inner.description(),
-            #[cfg(feature = "http")]
+            #[cfg(feature = "http_base")]
             Error::Http(ref inner) => inner.description(),
             #[cfg(feature = "http")]
+            Error::HttpCrate(ref inner) => inner.description(),
+            #[cfg(feature = "hyper")]
             Error::Hyper(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Opus(ref inner) => inner.description(),
@@ -264,7 +267,7 @@ impl StdError for Error {
 
     fn cause(&self) -> Option<&StdError> {
         match *self {
-            #[cfg(feature = "http")]
+            #[cfg(feature = "hyper")]
             Error::Hyper(ref inner) => Some(inner),
             Error::Json(ref inner) => Some(inner),
             Error::Io(ref inner) => Some(inner),

@@ -49,7 +49,7 @@ pub struct Shard {
 
 impl Shard {
     pub fn new(token: String, shard_info: [u64; 2])
-        -> Box<Future<Item = Shard, Error = Error>> {
+        -> Box<Future<Item = Shard, Error = Error> + Send> {
         let done = connect_async(Url::from_str(CONNECTION).unwrap())
             .map(move |(duplex, _)| {
                 let (sink, stream) = duplex.split();

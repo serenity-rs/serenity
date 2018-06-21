@@ -169,7 +169,7 @@ pub mod client;
 pub mod framework;
 #[cfg(feature = "gateway")]
 pub mod gateway;
-#[cfg(feature = "http")]
+#[cfg(feature = "http_base")]
 pub mod http;
 #[cfg(feature = "utils")]
 pub mod utils;

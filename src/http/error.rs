@@ -64,6 +64,7 @@ impl StdError for Error {
             Error::BorrowMut(ref inner) => inner.description(),
             Error::Canceled(ref inner) => inner.description(),
             Error::Format(ref inner) => inner.description(),
+            Error::Http(ref inner) => inner.description(),
             Error::Hyper(ref inner) => inner.description(),
             Error::InvalidRequest(_) => "Received an unexpected status code",
             Error::Io(ref inner) => inner.description(),

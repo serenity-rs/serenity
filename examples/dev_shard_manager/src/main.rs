@@ -43,14 +43,14 @@ fn try_main(handle: Handle) -> Box<Future<Item = (), Error = ()>> {
         queue: SimpleReconnectQueue::new(4),
     }; 
 
-    let mut shard_manager = ShardManager::new(opts, handle.clone());
+    let mut shard_manager = ShardManager::new(opts);
     let future = shard_manager.start()
         .map_err(|e| println!("Error starting shard manager: {:?}", e));
 
     handle.spawn(future);
 
     let future = shard_manager.messages().for_each(move |(shard, message)| {
-        let mut shard = shard.borrow_mut();
+        let mut shard = shard.lock();
         
         let event = shard.parse(message)
             .expect("Could not parse shard stream message");

@@ -60,7 +60,7 @@ pub struct ShardManagerOptions<T: ReconnectQueue> {
 pub type WrappedShard = Arc<Mutex<Shard>>;//Rc<RefCell<Shard>>;
 pub type Message = (WrappedShard, TungsteniteMessage);
 pub type MessageStream = UnboundedReceiver<Message>;
-type ShardsMap = Rc<RefCell<HashMap<u64, WrappedShard>>>;
+type ShardsMap = Arc<Mutex<HashMap<u64, WrappedShard>>>;//Rc<RefCell<HashMap<u64, WrappedShard>>>;
 
 pub struct ShardManager<T: ReconnectQueue> {
     pub queue: VecDeque<u64>,
@@ -83,7 +83,7 @@ impl<T: ReconnectQueue> ShardManager<T> {
         Self {
             queue: VecDeque::new(),
             reconnect_queue: options.queue,
-            shards: Rc::new(RefCell::new(HashMap::new())),
+            shards: Arc::new(Mutex::new(HashMap::new())),
             strategy: options.strategy,
             token: options.token,
             ws_uri: options.ws_uri,
@@ -202,7 +202,8 @@ fn process_queue(
                     let future = start_shard(token, shard_id, shards_total,
                      sender)
                         .map(move |shard| {
-                            shards_map.borrow_mut().insert(shard_id.clone(), shard);
+                            let mut map = shards_map.lock();
+                            map.insert(shard_id.clone(), shard);
                         });
 
                     tokio::spawn(future);
@@ -217,7 +218,7 @@ fn start_shard(
     shard_id: u64, 
     shards_total: u64, 
     sender: UnboundedSender<Message>,
-) -> Box<Future<Item = WrappedShard, Error = ()>> {
+) -> Box<Future<Item = WrappedShard, Error = ()> + Send> {
     Box::new(Shard::new(token, [shard_id, shards_total])
         .then(move |result| {
             let shard = match result {
@@ -228,13 +229,12 @@ fn start_shard(
              };
 
             let sink = MessageSink {
-                shard,
+                shard: shard.clone(),
                 sender,
             };
 
             let messages = {
-                let shard_lock = shard.clone();
-                let shard = shard_lock.lock();
+                let mut shard = shard.lock();
 
                 shard.messages()
             };
