@@ -979,14 +979,14 @@ impl Framework for StandardFramework {
         'outer: for position in positions {
             let mut built = String::new();
             let round = message.content.chars().skip(position).collect::<String>();
-            let round = round.trim().split_whitespace().collect::<Vec<&str>>(); // Call to `trim` causes the related bug under the main bug #206 - where the whitespace settings are ignored. The fix is implemented as an additional check inside command::positions
+            let mut round = round.trim().split_whitespace(); // Call to `trim` causes the related bug under the main bug #206 - where the whitespace settings are ignored. The fix is implemented as an additional check inside command::positions
 
             for i in 0..self.configuration.depth {
                 if i != 0 {
                     built.push(' ');
                 }
 
-                built.push_str(match round.get(i) {
+                built.push_str(match round.next() {
                     Some(piece) => piece,
                     None => continue 'outer,
                 });
