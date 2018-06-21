@@ -261,8 +261,26 @@ impl<'a> Lexer<'a> {
 /// assert_eq!(res, "420");
 /// ```
 ///
-/// **A category of methods not showcased as an example**: `*_n` methods.
-/// Their docs are good enough to explain themselves. (+ don't want to clutter this doc with another Example)
+/// Hmm, taking a glance at the prior example, it seems we have an issue with reading the same argument over and over.
+/// Is there a more sensible solution than rewinding...? Actually, there is! The `*_n` methods:
+///
+/// ```rust
+/// use serenity::framework::standard::Args;
+///
+/// let mut args = Args::new("four five six three", &[" ".to_string()]);
+///
+/// assert_eq!(args.single_n::<String>().unwrap(), "four");
+///
+/// // It might suggest we've lost the `four`, but in fact, we didn't! And not only that, we can do it an infinite amount of times!
+/// assert_eq!(args.single_n::<String>().unwrap(), "four");
+/// assert_eq!(args.single_n::<String>().unwrap(), "four");
+/// assert_eq!(args.single_n::<String>().unwrap(), "four");
+/// assert_eq!(args.single_n::<String>().unwrap(), "four");
+///
+/// // Only if we use its parent method will we then lose it.
+/// assert_eq!(args.single::<String>().unwrap(), "four");
+/// assert_eq!(args.single_n::<String>().unwrap(), "five");
+/// ```
 #[derive(Clone, Debug)]
 pub struct Args {
     message: String,
@@ -336,7 +354,7 @@ impl Args {
     /// let args = Args::new("42 69", &[" ".to_string()]);
     ///
     /// assert_eq!(args.single_n::<u32>().unwrap(), 42);
-    /// assert_eq!(args, "42 69");
+    /// assert_eq!(args.rest(), "42 69");
     /// ```
     ///
     /// [`single`]: #method.single
@@ -349,6 +367,260 @@ impl Args {
         let cur = &self.args[self.offset];
 
         Ok(T::from_str(&cur.lit)?)
+    }
+
+    /// "Skip" the argument (Sugar for `args.single::<String>().ok()`)
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    ///
+    /// args.skip();
+    /// assert_eq!(args.single::<u32>().unwrap(), 69);
+    /// ```
+    pub fn skip(&mut self) -> Option<String> {
+        if self.is_empty() {
+            return None;
+        }
+
+        self.single::<String>().ok()
+    }
+
+    /// Like [`skip`], but do it multiple times.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("42 69 88 99", &[" ".to_string()]);
+    ///
+    /// args.skip_for(3);
+    /// assert_eq!(args.remaining(), 1);
+    /// assert_eq!(args.single::<u32>().unwrap(), 99);
+    /// ```
+    ///
+    /// [`skip`]: #method.skip
+    pub fn skip_for(&mut self, i: u32) -> Option<Vec<String>> {
+        if self.is_empty() {
+            return None;
+        }
+
+        let mut vec = Vec::with_capacity(i as usize);
+
+        for _ in 0..i {
+            vec.push(self.skip()?);
+        }
+
+        Some(vec)
+    }
+
+
+    /// Provides an iterator that will spew arguments until the end of the message.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("3 4", &[" ".to_string()]);
+    ///
+    /// assert_eq!(*args.iter::<u32>().map(|num| num.unwrap().pow(2)).collect::<Vec<_>>(), [9, 16]);
+    /// assert!(args.is_empty());
+    /// ```
+    pub fn iter<T: FromStr>(&mut self) -> Iter<T>
+        where T::Err: StdError {
+        Iter::new(self)
+    }
+
+    /// Parses all of the remaining arguments and returns them in a `Vec` (Sugar for `args.iter().collect::<Vec<_>>()`).
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let args = Args::new("42 69", &[" ".to_string()]);
+    ///
+    /// assert_eq!(*args.multiple::<u32>().unwrap(), [42, 69]);
+    /// ```
+    pub fn multiple<T: FromStr>(mut self) -> Result<Vec<T>, T::Err>
+        where T::Err: StdError {
+        if self.is_empty() {
+            return Err(Error::Eos);
+        }
+
+        self.iter::<T>().collect()
+    }
+
+    /// Like [`single`], but accounts quotes.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new(r#""42 69""#, &[" ".to_string()]);
+    ///
+    /// assert_eq!(args.single_quoted::<String>().unwrap(), "42 69");
+    /// assert!(args.is_empty());
+    /// ```
+    ///
+    /// [`single`]: #method.single
+    pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err>
+        where T::Err: StdError {
+        if self.is_empty() {
+            return Err(Error::Eos);
+        }
+
+        let current = &self.args[self.offset];
+
+        // Discard quotations if present
+        let lit = quotes_extract(current);
+
+        let parsed = T::from_str(&lit)?;
+        self.offset += 1;
+        Ok(parsed)
+    }
+
+    /// Like [`single_quoted`], but doesn't advance.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new(r#""42 69""#, &[" ".to_string()]);
+    ///
+    /// assert_eq!(args.single_quoted_n::<String>().unwrap(), "42 69");
+    /// assert_eq!(args.rest(), r#""42 69""#);
+    /// ```
+    ///
+    /// [`single_quoted`]: #method.single_quoted
+    pub fn single_quoted_n<T: FromStr>(&self) -> Result<T, T::Err>
+        where T::Err: StdError {
+        if self.is_empty() {
+            return Err(Error::Eos);
+        }
+
+        let current = &self.args[self.offset];
+
+        let lit = quotes_extract(current);
+
+        Ok(T::from_str(&lit)?)
+    }
+
+    /// Like [`iter`], but accounts quotes.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new(r#""2" "5""#, &[" ".to_string()]);
+    ///
+    /// assert_eq!(*args.iter_quoted::<u32>().map(|n| n.unwrap().pow(2)).collect::<Vec<_>>(), [4, 25]);
+    /// assert!(args.is_empty());
+    /// ```
+    ///
+    /// [`iter`]: #method.iter
+    pub fn iter_quoted<T: FromStr>(&mut self) -> IterQuoted<T>
+        where T::Err: StdError {
+        IterQuoted::new(self)
+    }
+
+    /// Like [`multiple`], but accounts quotes.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new(r#""42" "69""#, &[" ".to_string()]);
+    ///
+    /// assert_eq!(*args.multiple_quoted::<u32>().unwrap(), [42, 69]);
+    /// ```
+    ///
+    /// [`multiple`]: #method.multiple
+    pub fn multiple_quoted<T: FromStr>(mut self) -> Result<Vec<T>, T::Err>
+        where T::Err: StdError {
+        if self.is_empty() {
+            return Err(Error::Eos);
+        }
+
+        self.iter_quoted::<T>().collect()
+    }
+
+    /// Returns the first argument that can be parsed and removes it from the message. The suitable argument
+    /// can be in an arbitrary position in the message. Likewise, takes quotes into account.
+    ///
+    /// **Note**:
+    /// Unlike how other methods on this struct work,
+    /// this function permantently removes the argument if it was **found** and was **succesfully** parsed.
+    /// Hence, use this with caution.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("c42 69", &[" ".to_string()]);
+    ///
+    /// assert_eq!(args.find::<u32>().unwrap(), 69);
+    /// assert_eq!(args.single::<String>().unwrap(), "c42");
+    /// assert!(args.is_empty());
+    /// ```
+    pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err>
+        where T::Err: StdError {
+        if self.is_empty() {
+            return Err(Error::Eos);
+        }
+
+        let pos = match self.args.iter().map(|t| quotes_extract(t)).position(|s| s.parse::<T>().is_ok()) {
+            Some(p) => p,
+            None => return Err(Error::Eos),
+        };
+
+        let parsed = T::from_str(quotes_extract(&self.args[pos]))?;
+        self.args.remove(pos);
+        self.rewind();
+
+        Ok(parsed)
+    }
+
+    /// Like [`find`], but does not remove it.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("c42 69", &[" ".to_string()]);
+    ///
+    /// assert_eq!(args.find_n::<u32>().unwrap(), 69);
+    ///
+    /// // The `69` is still here, so let's parse it again.
+    /// assert_eq!(args.single::<String>().unwrap(), "c42");
+    /// assert_eq!(args.single::<u32>().unwrap(), 69);
+    /// assert!(args.is_empty());
+    /// ```
+    ///
+    /// [`find`]: #method.find
+    pub fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err>
+        where T::Err: StdError {
+        if self.is_empty() {
+            return Err(Error::Eos);
+        }
+
+        let pos = match self.args.iter().map(|t| quotes_extract(t)).position(|s| s.parse::<T>().is_ok()) {
+            Some(p) => p,
+            None => return Err(Error::Eos),
+        };
+
+        Ok(T::from_str(quotes_extract(&self.args[pos]))?)
     }
 
     /// Gets original message passed to the command.
@@ -473,6 +745,21 @@ impl Args {
         self.args.len()
     }
 
+    /// Returns true if there are no arguments left.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("", &[" ".to_string()]);
+    ///
+    /// assert!(args.is_empty()); // `true` because passed message is empty thus no arguments.
+    /// ```
+    pub fn is_empty(&self) -> bool {
+        self.offset >= self.args.len()
+    }
+
     /// Amount of arguments still available.
     ///
     /// # Examples
@@ -494,21 +781,6 @@ impl Args {
         }
 
         self.len() - self.offset
-    }
-
-    /// Returns true if there are no arguments left.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use serenity::framework::standard::Args;
-    ///
-    /// let mut args = Args::new("", &[" ".to_string()]);
-    ///
-    /// assert!(args.is_empty()); // `true` because passed message is empty thus no arguments.
-    /// ```
-    pub fn is_empty(&self) -> bool {
-        self.offset >= self.args.len()
     }
 
     /// Go one step behind.
@@ -580,259 +852,6 @@ impl Args {
     #[deprecated(since = "0.5.3", note = "Its task was merged with `len`, please use it instead.")]
     pub fn len_quoted(&mut self) -> usize {
         self.len()
-    }
-
-    /// "Skip" the argument (Sugar for `args.single::<String>().ok()`)
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use serenity::framework::standard::Args;
-    ///
-    /// let mut args = Args::new("42 69", &[" ".to_string()]);
-    ///
-    /// args.skip();
-    /// assert_eq!(args.single::<u32>().unwrap(), 69);
-    /// ```
-    pub fn skip(&mut self) -> Option<String> {
-        if self.is_empty() {
-            return None;
-        }
-
-        self.single::<String>().ok()
-    }
-
-    /// Like [`skip`], but do it multiple times.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use serenity::framework::standard::Args;
-    ///
-    /// let mut args = Args::new("42 69 88 99", &[" ".to_string()]);
-    ///
-    /// args.skip_for(3);
-    /// assert_eq!(args.remaining(), 1);
-    /// assert_eq!(args.single::<u32>().unwrap(), 99);
-    /// ```
-    ///
-    /// [`skip`]: #method.skip
-    pub fn skip_for(&mut self, i: u32) -> Option<Vec<String>> {
-        if self.is_empty() {
-            return None;
-        }
-
-        let mut vec = Vec::with_capacity(i as usize);
-
-        for _ in 0..i {
-            vec.push(self.skip()?);
-        }
-
-        Some(vec)
-    }
-
-    /// Like [`single`], but accounts quotes.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use serenity::framework::standard::Args;
-    ///
-    /// let mut args = Args::new(r#""42 69""#, &[" ".to_string()]);
-    ///
-    /// assert_eq!(args.single_quoted::<String>().unwrap(), "42 69");
-    /// assert!(args.is_empty());
-    /// ```
-    ///
-    /// [`single`]: #method.single
-    pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err>
-        where T::Err: StdError {
-        if self.is_empty() {
-            return Err(Error::Eos);
-        }
-
-        let current = &self.args[self.offset];
-
-        // Discard quotations if present
-        let lit = quotes_extract(current);
-
-        let parsed = T::from_str(&lit)?;
-        self.offset += 1;
-        Ok(parsed)
-    }
-
-    /// Like [`single_quoted`], but doesn't advance.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use serenity::framework::standard::Args;
-    ///
-    /// let mut args = Args::new(r#""42 69""#, &[" ".to_string()]);
-    ///
-    /// assert_eq!(args.single_quoted_n::<String>().unwrap(), "42 69");
-    /// assert_eq!(args.full(), r#""42 69""#);
-    /// ```
-    ///
-    /// [`single_quoted`]: #method.single_quoted
-    pub fn single_quoted_n<T: FromStr>(&self) -> Result<T, T::Err>
-        where T::Err: StdError {
-        if self.is_empty() {
-            return Err(Error::Eos);
-        }
-
-        let current = &self.args[self.offset];
-
-        let lit = quotes_extract(current);
-
-        Ok(T::from_str(&lit)?)
-    }
-
-    /// Like [`multiple`], but accounts quotes.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use serenity::framework::standard::Args;
-    ///
-    /// let mut args = Args::new(r#""42" "69""#, &[" ".to_string()]);
-    ///
-    /// assert_eq!(*args.multiple_quoted::<u32>().unwrap(), [42, 69]);
-    /// ```
-    ///
-    /// [`multiple`]: #method.multiple
-    pub fn multiple_quoted<T: FromStr>(mut self) -> Result<Vec<T>, T::Err>
-        where T::Err: StdError {
-        if self.is_empty() {
-            return Err(Error::Eos);
-        }
-
-        self.iter_quoted::<T>().collect()
-    }
-
-    /// Like [`iter`], but accounts quotes.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use serenity::framework::standard::Args;
-    ///
-    /// let mut args = Args::new(r#""2" "5""#, &[" ".to_string()]);
-    ///
-    /// assert_eq!(*args.iter_quoted::<u32>().map(|n| n.unwrap().pow(2)).collect::<Vec<_>>(), [4, 25]);
-    /// assert!(args.is_empty());
-    /// ```
-    ///
-    /// [`iter`]: #method.iter
-    pub fn iter_quoted<T: FromStr>(&mut self) -> IterQuoted<T>
-        where T::Err: StdError {
-        IterQuoted::new(self)
-    }
-
-    /// Parses all of the remaining arguments and returns them in a `Vec` (Sugar for `args.iter().collect::<Vec<_>>()`).
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use serenity::framework::standard::Args;
-    ///
-    /// let args = Args::new("42 69", &[" ".to_string()]);
-    ///
-    /// assert_eq!(*args.multiple::<u32>().unwrap(), [42, 69]);
-    /// ```
-    pub fn multiple<T: FromStr>(mut self) -> Result<Vec<T>, T::Err>
-        where T::Err: StdError {
-        if self.is_empty() {
-            return Err(Error::Eos);
-        }
-
-        self.iter::<T>().collect()
-    }
-
-    /// Provides an iterator that will spew arguments until the end of the message.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use serenity::framework::standard::Args;
-    ///
-    /// let mut args = Args::new("3 4", &[" ".to_string()]);
-    ///
-    /// assert_eq!(*args.iter::<u32>().map(|num| num.unwrap().pow(2)).collect::<Vec<_>>(), [9, 16]);
-    /// assert!(args.is_empty());
-    /// ```
-    pub fn iter<T: FromStr>(&mut self) -> Iter<T>
-        where T::Err: StdError {
-        Iter::new(self)
-    }
-
-    /// Returns the first argument that can be parsed and removes it from the message. The suitable argument
-    /// can be in an arbitrary position in the message. Likewise, takes quotes into account.
-    ///
-    /// **Note**:
-    /// Unlike how other methods on this struct work,
-    /// this function permantently removes the argument if it was **found** and was **succesfully** parsed.
-    /// Hence, use this with caution.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use serenity::framework::standard::Args;
-    ///
-    /// let mut args = Args::new("c42 69", &[" ".to_string()]);
-    ///
-    /// assert_eq!(args.find::<u32>().unwrap(), 69);
-    /// assert_eq!(args.single::<String>().unwrap(), "c42");
-    /// assert!(args.is_empty());
-    /// ```
-    pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err>
-        where T::Err: StdError {
-        if self.is_empty() {
-            return Err(Error::Eos);
-        }
-
-        let pos = match self.args.iter().map(|t| quotes_extract(t)).position(|s| s.parse::<T>().is_ok()) {
-            Some(p) => p,
-            None => return Err(Error::Eos),
-        };
-
-        let parsed = T::from_str(quotes_extract(&self.args[pos]))?;
-        self.args.remove(pos);
-        self.rewind();
-
-        Ok(parsed)
-    }
-
-    /// Like [`find`], but does not remove it.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use serenity::framework::standard::Args;
-    ///
-    /// let mut args = Args::new("c42 69", &[" ".to_string()]);
-    ///
-    /// assert_eq!(args.find_n::<u32>().unwrap(), 69);
-    ///
-    /// // The `69` is still here, so let's parse it again.
-    /// assert_eq!(args.single::<String>().unwrap(), "c42");
-    /// assert_eq!(args.single::<u32>().unwrap(), 69);
-    /// assert!(args.is_empty());
-    /// ```
-    ///
-    /// [`find`]: #method.find
-    pub fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err>
-        where T::Err: StdError {
-        if self.is_empty() {
-            return Err(Error::Eos);
-        }
-
-        let pos = match self.args.iter().map(|t| quotes_extract(t)).position(|s| s.parse::<T>().is_ok()) {
-            Some(p) => p,
-            None => return Err(Error::Eos),
-        };
-
-        Ok(T::from_str(quotes_extract(&self.args[pos]))?)
     }
 }
 
