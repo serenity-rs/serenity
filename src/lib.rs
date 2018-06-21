@@ -133,6 +133,8 @@ extern crate hyper;
 extern crate hyper_multipart_rfc7578;
 #[cfg(feature = "hyper-tls")]
 extern crate hyper_tls;
+#[cfg(feature = "mime")]
+extern crate mime;
 #[cfg(feature = "multipart")]
 extern crate multipart;
 #[cfg(feature = "native-tls")]

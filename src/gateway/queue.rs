@@ -2,7 +2,7 @@ use futures::{future, Future};
 use std::collections::VecDeque;
 
 pub trait ReconnectQueue {
-    type Error: 'static;
+    type Error: 'static + Send;
 
     fn push_back(&mut self, shard_id: u64) -> Box<Future<Item = (), Error = Self::Error>>;
 

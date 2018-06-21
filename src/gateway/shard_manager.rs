@@ -3,13 +3,15 @@ use ::Error;
 use std::collections::{VecDeque, HashMap};
 use std::rc::Rc;
 use std::cell::RefCell;
-use std::time::Duration;
+use std::sync::Arc;
+use std::time::{Duration, Instant};
 use gateway::{
     shard::Shard,
     queue::ReconnectQueue,
 };
 use model::event::{Event, GatewayEvent};
-use tokio::{self, timer::Interval};
+use parking_lot::Mutex;
+use tokio::{self, timer::{Delay, Interval}};
 use futures::sync::mpsc::{
     unbounded, UnboundedSender, UnboundedReceiver, 
     channel, Sender as MpscSender, Receiver as MpscReceiver,
@@ -50,12 +52,12 @@ impl Default for ShardingStrategy {
 #[derive(Clone, Debug, Default)]
 pub struct ShardManagerOptions<T: ReconnectQueue> {
     pub strategy: ShardingStrategy,
-    pub token: Rc<String>,
+    pub token: String,
     pub ws_uri: Rc<String>,
     pub queue: T,
 }
 
-pub type WrappedShard = Rc<RefCell<Shard>>;
+pub type WrappedShard = Arc<Mutex<Shard>>;//Rc<RefCell<Shard>>;
 pub type Message = (WrappedShard, TungsteniteMessage);
 pub type MessageStream = UnboundedReceiver<Message>;
 type ShardsMap = Rc<RefCell<HashMap<u64, WrappedShard>>>;
@@ -65,7 +67,7 @@ pub struct ShardManager<T: ReconnectQueue> {
     reconnect_queue: T,
     shards: ShardsMap,
     pub strategy: ShardingStrategy,
-    pub token: Rc<String>,
+    pub token: String,
     pub ws_uri: Rc<String>,
     message_stream: Option<MessageStream>,
     queue_sender: MpscSender<u64>,
@@ -181,20 +183,18 @@ impl<T: ReconnectQueue> ShardManager<T> {
 
 fn process_queue(
     queue_receiver: MpscReceiver<u64>,
-    token: Rc<String>,
+    token: String,
     shards_total: u64,
     sender: UnboundedSender<Message>,
     shards_map: ShardsMap,
-) -> Box<Future<Item = (), Error = ()>> {
-    let timer = Timer::default();
-
-    Box::new(queue_receiver
+) -> impl Future<Item = (), Error = ()> {
+    queue_receiver
         .for_each(move |shard_id| {
             trace!("received message to start shard {}", &shard_id);
             let token = token.clone();
             let sender = sender.clone();
             let shards_map = shards_map.clone();
-            let sleep_future = timer.sleep(Duration::from_secs(6));
+            let sleep_future = Delay::new(Instant::now() + Duration::from_secs(6));
 
             sleep_future
                 .map_err(|e| error!("Error sleeping before starting next shard: {:?}", e))
@@ -209,11 +209,11 @@ fn process_queue(
                     future::ok(())
                 })
         })
-        .map_err(|_| ()))
+        .map_err(|_| ())
 }
 
 fn start_shard(
-    token: Rc<String>, 
+    token: String, 
     shard_id: u64, 
     shards_total: u64, 
     sender: UnboundedSender<Message>,
@@ -221,23 +221,29 @@ fn start_shard(
     Box::new(Shard::new(token, [shard_id, shards_total])
         .then(move |result| {
             let shard = match result {
-                Ok(shard) => Rc::new(RefCell::new(shard)),
+                Ok(shard) => Arc::new(Mutex::new(shard)),
                 Err(e) => {
                     return future::err(Error::from(e));
                 },
              };
 
             let sink = MessageSink {
-                shard: shard.clone(), 
+                shard,
                 sender,
             };
 
-            let future = Box::new(shard.borrow_mut()
-                .messages()
+            let messages = {
+                let shard_lock = shard.clone();
+                let shard = shard_lock.lock();
+
+                shard.messages()
+            };
+
+            let future = messages
                 .map_err(MessageSinkError::from)
                 .forward(sink)
                 .map(|_| ())
-                .map_err(|e| error!("Error forwarding shard messages to sink: {:?}", e)));
+                .map_err(|e| error!("Error forwarding shard messages to sink: {:?}", e));
 
             tokio::spawn(future);
             future::ok(shard)

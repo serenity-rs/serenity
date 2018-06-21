@@ -84,7 +84,7 @@ pub fn message_to_json(message: Message, notifier_lock: Arc<Mutex<Sender<Vec<u8>
         Message::Text(payload) => serde_json::from_str(&payload).map(Some).map_err(Error::from),
         Message::Ping(x) => {
             let notifier = notifier_lock.lock();
-            notifier.send(x).map_err(|_| Error::into)?;
+            notifier.send(x).map_err(Error::from)?;
 
             Ok(None)
         },

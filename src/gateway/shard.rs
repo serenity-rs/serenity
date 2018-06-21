@@ -1,23 +1,24 @@
 use chrono::Utc;
 use constants::{GATEWAY_VERSION, LARGE_THRESHOLD, OpCode};
-use tokio_core::reactor::Handle;
 use futures::future::Future;
-use futures::stream::Stream as FuturesStream;
+use futures::stream::{self, Stream as FuturesStream};
 use futures::sync::mpsc::{self, UnboundedSender};
 use futures::Sink;
 use model::event::{Event, GatewayEvent};
 use model::gateway::Activity;
 use model::id::GuildId;
 use model::user::OnlineStatus;
+use parking_lot::Mutex;
 use serde_json::{self, Error as JsonError, Value};
 use std::cell::RefCell;
 use std::env::consts;
 use std::io::{Error as IoError, ErrorKind as IoErrorKind};
 use std::rc::Rc;
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 use super::{ConnectionStage, CurrentPresence, ShardStream};
 use tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage};
-use tokio_timer::Timer;
+use tokio::{self, timer::Interval};
 use tokio_tungstenite::connect_async;
 use url::Url;
 use std::str::FromStr;
@@ -36,19 +37,18 @@ struct HeartbeatInfo {
 
 pub struct Shard {
     current_presence: CurrentPresence,
-    handle: Handle,
-    heartbeat_info: Rc<RefCell<HeartbeatInfo>>,
+    heartbeat_info: Arc<Mutex<HeartbeatInfo>>,
     interval: Option<u64>,
     session_id: Option<String>,
     shard_info: [u64; 2],
     stage: ConnectionStage,
     stream: Option<ShardStream>,
-    token: Rc<String>,
+    token: String,
     tx: UnboundedSender<TungsteniteMessage>,
 }
 
 impl Shard {
-    pub fn new(token: Rc<String>, shard_info: [u64; 2], handle: Handle)
+    pub fn new(token: String, shard_info: [u64; 2])
         -> Box<Future<Item = Shard, Error = Error>> {
         let done = connect_async(Url::from_str(CONNECTION).unwrap())
             .map(move |(duplex, _)| {
@@ -68,12 +68,11 @@ impl Shard {
                     .map(|_| ())
                     .map_err(|_| ());
 
-                handle.spawn(done);
+                tokio::spawn(done);
 
                 Self {
                     current_presence: (None, OnlineStatus::Online),
-                    handle: handle.clone(),
-                    heartbeat_info: Rc::new(RefCell::new(HeartbeatInfo {
+                    heartbeat_info: Arc::new(Mutex::new(HeartbeatInfo {
                         heartbeat_instants: (None, None),
                         heartbeater: false,
                         last_heartbeat_acknowledged: true,
@@ -110,7 +109,8 @@ impl Shard {
     pub fn process(&mut self, event: &GatewayEvent) {
         match *event {
             GatewayEvent::Dispatch(seq, ref event) => {
-                let mut info = self.heartbeat_info.borrow_mut();
+                let info_lock = self.heartbeat_info.clone();
+                let mut info = info_lock.lock();
                 let self_seq = info.seq;
 
                 if seq > self_seq + 1 {
@@ -144,12 +144,13 @@ impl Shard {
             GatewayEvent::Heartbeat(s) => {
                 info!("[Shard {:?}] Received shard heartbeat", self.shard_info);
 
-                if s > self.heartbeat_info.borrow().seq + 1 {
+                let seq = self.seq();
+                if s > seq + 1 {
                     info!(
                         "[Shard {:?}] Received off sequence (them: {}; us: {}); resuming",
                         self.shard_info,
                         s,
-                        self.heartbeat_info.borrow().seq
+                        seq,
                     );
                 }
 
@@ -158,7 +159,9 @@ impl Shard {
             GatewayEvent::HeartbeatAck => {
                 trace!("[Shard {:?}] Received heartbeat ack", self.shard_info);
 
-                let mut info = self.heartbeat_info.borrow_mut();
+                let info_lock = self.heartbeat_info.clone();
+                let mut info = info_lock.lock();
+
                 info.heartbeat_instants.1 = Some(Instant::now());
                 info.last_heartbeat_acknowledged = true;
             },
@@ -178,13 +181,12 @@ impl Shard {
                 }
 
                 if self.stage == ConnectionStage::Handshake {
-                    let heartbeat_info = Rc::clone(&self.heartbeat_info);
                     let mut tx = self.tx.clone();
 
-                    let done = Timer::default()
-                        .interval(Duration::from_millis(interval))
-                        .for_each(move |_| {
-                            let info = heartbeat_info.borrow();
+                    let done = Interval::new(Instant::now(), Duration::from_millis(interval))
+                        .zip(stream::repeat(self.heartbeat_info.clone()))
+                        .for_each(move |(_time, info_lock)| {
+                            let info = info_lock.lock();
 
                             heartbeat(
                                 &mut tx,
@@ -199,7 +201,7 @@ impl Shard {
                             ()
                         });
 
-                    self.handle.spawn(done);
+                    tokio::spawn(done);
 
                     self.identify().unwrap();
 
@@ -253,7 +255,10 @@ impl Shard {
     }
 
     pub fn heartbeat_instants(&self) -> (Option<Instant>, Option<Instant>) {
-        self.heartbeat_info.borrow().heartbeat_instants
+        let info_lock = self.heartbeat_info.clone();
+        let info = info_lock.lock();
+
+        info.heartbeat_instants
     }
 
     pub fn heartbeat_interval(&self) -> Option<&u64> {
@@ -261,15 +266,24 @@ impl Shard {
     }
 
     pub fn last_heartbeat_ack(&self) -> Option<Instant> {
-        self.heartbeat_info.borrow().heartbeat_instants.1
+        let info_lock = self.heartbeat_info.clone();
+        let info = info_lock.lock();
+
+        info.heartbeat_instants.1
     }
 
     pub fn last_heartbeat_acknowledged(&self) -> bool {
-        self.heartbeat_info.borrow().last_heartbeat_acknowledged
+        let info_lock = self.heartbeat_info.clone();
+        let info = info_lock.lock();
+
+        info.last_heartbeat_acknowledged
     }
 
     pub fn last_heartbeat_sent(&self) -> Option<Instant> {
-        self.heartbeat_info.borrow().heartbeat_instants.0
+        let info_lock = self.heartbeat_info.clone();
+        let info = info_lock.lock();
+
+        info.heartbeat_instants.0
     }
 
     /// Calculates the heartbeat latency between the shard and the gateway.
@@ -281,7 +295,7 @@ impl Shard {
     /// - a heartbeat was sent and the following acknowledgement has not been
     ///   received, which would result in a negative latency.
     pub fn latency(&self) -> Option<Duration> {
-        if let (Some(sent), Some(received)) = self.heartbeat_info.borrow().heartbeat_instants {
+        if let (Some(sent), Some(received)) = self.heartbeat_instants() {
             if received > sent {
                 return Some(received - sent);
             }
@@ -301,7 +315,10 @@ impl Shard {
     }
 
     pub fn seq(&self) -> u64 {
-        self.heartbeat_info.borrow().seq
+        let info_lock = self.heartbeat_info.clone();
+        let info = info_lock.lock();
+
+        info.seq
     }
 
     pub fn session_id(&self) -> Option<&str> {
@@ -370,15 +387,17 @@ impl Shard {
     }
 
     fn heartbeat(&mut self) -> Result<(), Error> {
+        let seq = self.seq();
+
         trace!(
             "[Shard {:?}] Sending heartbeat d: {:?}",
             self.shard_info,
-            self.heartbeat_info.borrow().seq,
+            seq,
         );
 
         heartbeat(
             &mut self.tx,
-            self.heartbeat_info.borrow().seq,
+            seq,
             self.shard_info,
         )
     }
@@ -443,17 +462,19 @@ impl Shard {
     fn resume(&mut self) -> Result<(), Error> {
         self.stage = ConnectionStage::Resuming;
 
+        let seq = self.seq();
+
         debug!(
             "[Shard {:?}] Sending resume; seq: {}",
             self.shard_info,
-            self.heartbeat_info.borrow().seq,
+            seq,
         );
 
         let v = json!({
             "op": OpCode::Resume.num(),
             "d": {
                 "session_id": self.session_id,
-                "seq": self.heartbeat_info.borrow().seq,
+                "seq": seq,
                 "token": *self.token,
             },
         });

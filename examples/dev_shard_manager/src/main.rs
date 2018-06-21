@@ -16,6 +16,7 @@ use serenity::{
     },
 };
 use std::{
+    borrow::Cow,
     env, 
     rc::Rc,
 };
@@ -37,7 +38,7 @@ fn try_main(handle: Handle) -> Box<Future<Item = (), Error = ()>> {
 
     let opts = ShardManagerOptions {
         strategy: ShardingStrategy::multi(4),
-        token: Rc::new(token),
+        token: token,
         ws_uri: Rc::new(String::from("nothing")),
         queue: SimpleReconnectQueue::new(4),
     }; 

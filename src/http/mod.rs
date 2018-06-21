@@ -1414,7 +1414,7 @@ impl Client {
             }
         }
 
-        let mut request = ftry!(Request::get(uri).body(Body::empty()));
+        let mut request = ftry!(Request::get(uri).body(Form::default().into()));
         form.set_body(&mut request);
 
         let client = Rc::clone(&self.multiparter);
@@ -1542,7 +1542,7 @@ impl Client {
             .method(method.hyper_method())
             .header(AUTHORIZATION, HeaderValue::from_str(&self.token())
                 .expect("Token being sent must be a valid HTTP-encodable string."))
-            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .header(CONTENT_TYPE, HeaderValue::from_static(APPLICATION_JSON.as_ref()))
             .body(Body::from(body))
             .map_err(|e| HttpError::Http(e))
     }

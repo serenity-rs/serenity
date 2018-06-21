@@ -16,10 +16,11 @@ use std::{
     fmt::{self, Display, Error as FormatError},
     io::Error as IoError,
     num::ParseIntError,
+    sync::mpsc::SendError as StdSendError,
 };
 
 #[cfg(feature = "tungstenite")]
-use futures::sync::mpsc::SendError;
+use future_utils::mpsc::SendError;
 #[cfg(feature = "hyper")]
 use hyper::Error as HyperError;
 #[cfg(feature = "native-tls")]
@@ -119,6 +120,8 @@ pub enum Error {
     /// An error while sending a message over a WebSocket.
     #[cfg(feature = "tungstenite")]
     WebSocketSend(SendError<TungsteniteMessage>),
+    /// An error while replying to a ping/pong over a WebSocket.
+    SplitWebSocketSend(StdSendError<Vec<u8>>),
     /// An error from the `tungstenite` crate.
     #[cfg(feature = "tungstenite")]
     Tungstenite(TungsteniteError),
@@ -153,6 +156,11 @@ impl From<HttpError> for Error {
     fn from(e: HttpError) -> Error { Error::Http(e) }
 }
 
+#[cfg(feature = "http")]
+impl From<HttpCrateError> for Error {
+    fn from(e: HttpCrateError) -> Error { Error::HttpCrate(e) }
+}
+
 #[cfg(feature = "hyper")]
 impl From<HyperError> for Error {
     fn from(e: HyperError) -> Error { Error::Hyper(e) }
@@ -183,6 +191,12 @@ impl From<OpusError> for Error {
 impl From<SendError<TungsteniteMessage>> for Error {
     fn from(err: SendError<TungsteniteMessage>) -> Self {
         Error::WebSocketSend(err)
+    }
+}
+
+impl From<StdSendError<Vec<u8>>> for Error {
+    fn from(err: StdSendError<Vec<u8>>) -> Self {
+        Error::SplitWebSocketSend(err)
     }
 }
 
