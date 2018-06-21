@@ -50,7 +50,9 @@ version = "~0.12"
 
 [dependencies.hyper-multipart-rfc7578]
 optional = true
-version = "0.1.0-alpha3"
+git = "https://github.com/FelixMcFelix/rust-hyper-multipart-rfc7578"
+rev = "326b956"
+#version = "0.1.0-alpha3"
 
 [dependencies.hyper-tls]
 optional = true

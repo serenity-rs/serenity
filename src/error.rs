@@ -3,7 +3,10 @@ use futures::{
     Canceled,
     Future
 };
-use http_lib::uri::InvalidUri as UriError;
+use http_lib::{
+    uri::InvalidUri as UriError,
+    Error as HttpCrateError,
+};
 use internal::prelude::*;
 use model::ModelError;
 use serde_json::Error as JsonError;
@@ -69,6 +72,8 @@ pub enum Error {
     /// An error while trying to send over a future-compatible
     /// MPSC.
     FutureMpsc(&'static str),
+    /// A `hyper` error relating to Http.
+    HttpCrate(HttpCrateError),
     /// An `std::io` error.
     Io(IoError),
     /// An error from the `serde_json` crate.

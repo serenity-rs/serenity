@@ -106,11 +106,9 @@ impl Client {
     ) -> Result<Self> {
         let connector = HttpsConnector::new(4)?;
 
-        let multiparter = Rc::new(HyperConfig::default()
-            .body::<MultipartBody>()
-            .connector(connector)
+        let multiparter = Rc::new(HyperClient::builder()
             .keep_alive(true)
-            .build(&handle));
+            .build::<_, MultipartBody>(connector));
 
         Ok(Self {
             ratelimiter: Rc::new(RefCell::new(RateLimiter::new())),
@@ -1416,7 +1414,7 @@ impl Client {
             }
         }
 
-        let mut request = Request::get(uri);
+        let mut request = ftry!(Request::get(uri).body(Body::empty()));
         form.set_body(&mut request);
 
         let client = Rc::clone(&self.multiparter);

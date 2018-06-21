@@ -95,6 +95,12 @@ impl From<FmtError> for Error {
     }
 }
 
+impl From<HttpCrateError> for Error {
+    fn from(err: HttpCrateError) -> Self {
+        Error::Http(err)
+    }
+}
+
 impl From<HyperError> for Error {
     fn from(err: HyperError) -> Self {
         Error::Hyper(err)
