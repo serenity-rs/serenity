@@ -53,7 +53,7 @@ impl Default for ShardingStrategy {
 pub struct ShardManagerOptions<T: ReconnectQueue> {
     pub strategy: ShardingStrategy,
     pub token: String,
-    pub ws_uri: Rc<String>,
+    pub ws_uri: String,
     pub queue: T,
 }
 
@@ -68,7 +68,7 @@ pub struct ShardManager<T: ReconnectQueue> {
     shards: ShardsMap,
     pub strategy: ShardingStrategy,
     pub token: String,
-    pub ws_uri: Rc<String>,
+    pub ws_uri: String,
     message_stream: Option<MessageStream>,
     queue_sender: MpscSender<u64>,
     queue_receiver: Option<MpscReceiver<u64>>,
@@ -94,7 +94,7 @@ impl<T: ReconnectQueue> ShardManager<T> {
         }
     }
 
-    pub fn start(&mut self) -> impl Future<Item = (), Error = Error> {
+    pub fn start(&mut self) -> Box<Future<Item = (), Error = Error> + Send> {
         let (
             shards_index, 
             shards_count, 
@@ -187,8 +187,8 @@ fn process_queue(
     shards_total: u64,
     sender: UnboundedSender<Message>,
     shards_map: ShardsMap,
-) -> impl Future<Item = (), Error = ()> {
-    queue_receiver
+) -> Box<Future<Item = (), Error = ()> + Send> {
+    Box::new(queue_receiver
         .for_each(move |shard_id| {
             trace!("received message to start shard {}", &shard_id);
             let token = token.clone();
@@ -210,7 +210,7 @@ fn process_queue(
                     future::ok(())
                 })
         })
-        .map_err(|_| ())
+        .map_err(|_| ()))
 }
 
 fn start_shard(
