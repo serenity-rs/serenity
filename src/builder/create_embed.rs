@@ -138,6 +138,10 @@ impl CreateEmbed {
     }
 
     /// Adds multiple fields at once.
+    ///
+    /// This is sugar to reduce the need of calling [`field`] manually multiple times.
+    ///
+    /// [`field`]: #method.field
     pub fn fields<T, U, It>(mut self, fields: It) -> Self
         where It: IntoIterator<Item=(T, U, bool)>,
               T: Display,
