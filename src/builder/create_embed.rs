@@ -112,7 +112,7 @@ impl CreateEmbed {
     /// add to them.
     ///
     /// **Note**: Maximum amount of characters you can put is 256 in a field
-    /// name and 1024 in a field value and a field is inline by default.
+    /// name and 1024 in a field value.
     pub fn field<T, U>(mut self, name: T, value: U, inline: bool) -> Self
         where T: Display, U: Display {
         {
