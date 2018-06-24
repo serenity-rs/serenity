@@ -111,13 +111,8 @@ impl CreateEmbed {
     /// Set a field. Note that this will not overwrite other fields, and will
     /// add to them.
     ///
-    /// Refer to the documentation for [`CreateEmbedField`] for more
-    /// information.
-    ///
     /// **Note**: Maximum amount of characters you can put is 256 in a field
     /// name and 1024 in a field value and a field is inline by default.
-    ///
-    /// [`CreateEmbedField`]: struct.CreateEmbedField.html
     pub fn field<T, U>(mut self, name: T, value: U, inline: bool) -> Self
         where T: Display, U: Display {
         {
