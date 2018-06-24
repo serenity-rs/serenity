@@ -1352,15 +1352,15 @@ impl Client {
         self.verify(Route::RemoveGroupRecipient { group_id, user_id }, None)
     }
 
-    // /// Sends file(s) to a channel.
-    // ///
-    // /// # Errors
-    // ///
-    // /// Returns an
-    // /// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
-    // /// if the file is too large to send.
-    // ///
-    // /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
+    /// Sends file(s) to a channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns an
+    /// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
+    /// if the file is too large to send.
+    ///
+    /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
     pub fn send_files<F, T, It>(
         &self,
         channel_id: u64,
