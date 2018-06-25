@@ -6,7 +6,7 @@ authors = ["my name <my@email.address>"]
 [dependencies]
 serde_json = "1.0"
 serenity = { path = "../../", default-features = true, features = ["voice"] }
-tokio-core = "~0.1"
+tokio = "~0.1"
 futures = "~0.1"
 env_logger = "~0.4"
 parking_lot = "~0.5"

@@ -12,7 +12,7 @@ extern crate parking_lot;
 #[macro_use]
 extern crate serde_json;
 extern crate serenity;
-extern crate tokio_core;
+extern crate tokio;
 extern crate tungstenite;
 
 use futures::{
@@ -64,32 +64,7 @@ use tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage};
 fn main() {
     env_logger::init().expect("Error initializing env_logger");
 
-    let mut core = Core::new().expect("Error creating event loop");
-    let future = try_main2(core.handle());
-
-    core.run(future).expect("Error running event loop");
-}
-
-fn try_main2(handle: Handle) -> impl Future<Item = (), Error = ()> {
-    let remote = handle.remote().clone();
-
-    handle.execute(future::ok("spawn-test")
-        .map(|val| {
-            println!("Zeroth future: {}", val);
-        }));
-
-    future::ok("test")
-        .map(move |val| {
-            println!("First future: {}", val);
-            remote.spawn(move |handle| {
-                println!("Building second future...");
-                handle.spawn(future::ok("test2")
-                    .map(|val| {
-                        println!("Second future: {}", val);
-                    }));
-                Ok(())
-            });
-        })
+    tokio::run(try_main());
 }
 
 fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
@@ -101,14 +76,7 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
         token: Rc::new(token),
         ws_uri: Rc::new(String::from("nothing")),
         queue: SimpleReconnectQueue::new(4),
-    }; 
-
-    let mut shard_manager = ShardManager::new(opts, handle.clone());
-    let remote = handle.remote().clone();
-    let future = shard_manager.start()
-        .map_err(|e| println!("Error starting shard manager: {:?}", e));
-
-    handle.spawn(future);
+    };
 
     let inner_state = stream::repeat(
         (
@@ -117,95 +85,104 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
             remote,
         ));
 
-    let future = shard_manager.messages().zip(inner_state).for_each(move |((shard, message), (handlers, user_id, remote))| {
-        let mut shard = shard.borrow_mut();
-        let event = shard.parse(message);
-        
-        let event = event.expect("Could not parse shard stream message");
+    let mut shard_manager = ShardManager::new(opts, handle.clone());
+    let remote = handle.remote().clone();
+    shard_manager.start()
+        .map_err(|e| println!("Error starting shard manager: {:?}", e))
+        .and_then(|mut shard_manager| {
+            shard_manager.messages()
+                .zip(stream::repeat(Arc::new(Mutex::new(shard_manager))))
+                .zip(inner_state)
+                .for_each(move |(((shard, message), shard_manager),
+                        (handlers, user_id, remote))| {
+                    let mut shard = shard.lock();
+                    
+                    let event = shard.parse(message)
+                        .expect("Could not parse shard stream message");
 
-        shard.process(&event);
-        shard_manager.process(&event);
+                    shard.process(&event);
+                    {
+                        let mut shard_manager = shard_manager.lock();
+                        shard_manager.process(&event);
+                    }
 
-        let mut out: Box<Future<Item=(),Error=()>> = Box::new(future::ok(()));
+                    let mut out: Box<Future<Item=(),Error=()>> = Box::new(future::ok(()));
 
-        {println!("{:?}", &event);}
+                    match event {
+                        GatewayEvent::Dispatch(_, Event::MessageCreate(ev)) => {
+                            let parts = ev.message.content.split(' ');
+                            let mut do_voice = false;
+                            let mut id = 0u64;
 
-        match event {
-            GatewayEvent::Dispatch(_, Event::MessageCreate(ev)) => {
-                let parts = ev.message.content.split(' ');
-                let mut do_voice = false;
-                let mut id = 0u64;
-
-                for (i, part) in parts.enumerate() {
-                    match i {
-                        0 => {
-                            if part != "!join" {
-                                break;
-                            } else {
-                                do_voice = true;
+                            for (i, part) in parts.enumerate() {
+                                match i {
+                                    0 => {
+                                        if part != "!join" {
+                                            break;
+                                        } else {
+                                            do_voice = true;
+                                        }
+                                    },
+                                    _ => {
+                                        if let Ok(new_id) = part.parse::<u64>() {
+                                            id = new_id;
+                                        }
+                                    },
+                                }
                             }
+
+                            if do_voice && id != 0 {
+                                if let Some(guild_id) = ev.message.guild_id {
+                                    let handler = {
+                                        let user_id = user_id.lock();
+                                        send_channel_join(id, guild_id, *user_id, shard)
+                                    };
+                                    let mut map = handlers.lock();
+                                    
+                                    map.insert(guild_id, handler);
+                                }
+                                
+                            }
+                        },
+                        GatewayEvent::Dispatch(_, Event::VoiceStateUpdate(ev)) => {
+                            println!("{:#?}", ev);
+                            let mut map = handlers.lock();
+
+                            if let Some(guild_id) = ev.guild_id {
+                                if let Some(mut handler) = map.get_mut(&guild_id) {
+                                    handler.update_state(&ev.voice_state);
+
+                                    try_join_and_play_audio(&mut handler);
+                                }
+                            }
+                            
+                        },
+                        GatewayEvent::Dispatch(_, Event::VoiceServerUpdate(ev)) => {
+                            println!("{:#?}", ev);
+                            let mut map = handlers.lock();
+
+                            if let Some(guild_id) = ev.guild_id {
+                                if let Some(mut handler) = map.get_mut(&guild_id) {
+                                    handler.update_server(&ev.endpoint, &ev.token);
+
+                                    try_join_and_play_audio(&mut handler);
+                                }
+                            }
+                        },
+                        GatewayEvent::Dispatch(_, Event::Ready(ev)) => {
+                            println!("Connected to Discord!");
+                            let mut stored_id = user_id.lock();
+
+                            *stored_id = ev.ready.user.id;
                         },
                         _ => {
-                            if let Ok(new_id) = part.parse::<u64>() {
-                                id = new_id;
-                            }
+                            // Ignore all other messages.
                         },
                     }
-                }
 
-                if do_voice && id != 0 {
-                    if let Some(guild_id) = ev.message.guild_id {
-                        let handler = {
-                            let user_id = user_id.lock();
-                            send_channel_join(id, guild_id, *user_id, shard, remote)
-                        };
-                        let mut map = handlers.lock();
-                        
-                        map.insert(guild_id, handler);
-                    }
-                    
-                }
-            },
-            GatewayEvent::Dispatch(_, Event::VoiceStateUpdate(ev)) => {
-                println!("{:#?}", ev);
-                let mut map = handlers.lock();
-
-                if let Some(guild_id) = ev.guild_id {
-                    if let Some(mut handler) = map.get_mut(&guild_id) {
-                        handler.update_state(&ev.voice_state);
-
-                        try_join_and_play_audio(&mut handler);
-                    }
-                }
-                
-            },
-            GatewayEvent::Dispatch(_, Event::VoiceServerUpdate(ev)) => {
-                println!("{:#?}", ev);
-                let mut map = handlers.lock();
-
-                if let Some(guild_id) = ev.guild_id {
-                    if let Some(mut handler) = map.get_mut(&guild_id) {
-                        handler.update_server(&ev.endpoint, &ev.token);
-
-                        try_join_and_play_audio(&mut handler);
-                    }
-                }
-            },
-            GatewayEvent::Dispatch(_, Event::Ready(ev)) => {
-                println!("Connected to Discord!");
-                let mut stored_id = user_id.lock();
-
-                *stored_id = ev.ready.user.id;
-            },
-            _ => {
-                // Ignore all other messages.
-            },
-        }
-
-        out
-    });
-
-    future
+                    out
+                })
+        })
 }
 
 fn send_channel_join(voice_id: u64, guild_id: GuildId, user_id: UserId, mut shard: RefMut<Shard>, remote: Remote) -> Handler {
@@ -221,7 +198,7 @@ fn send_channel_join(voice_id: u64, guild_id: GuildId, user_id: UserId, mut shar
 
     shard.send(TungsteniteMessage::Text(voice_update.to_string()));
 
-    Handler::standalone(guild_id, user_id, remote)
+    Handler::standalone(guild_id, user_id)
 }
 
 fn try_join_and_play_audio(handler: &mut Handler) {

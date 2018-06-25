@@ -77,6 +77,4 @@ fn try_main() -> impl Future<Item = (), Error = ()> {
                     future::ok(())
                 })
         })
-
-    // tokio::spawn(future);
 }
