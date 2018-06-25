@@ -76,7 +76,7 @@ pub struct ShardManager<T: ReconnectQueue> {
     non_exhaustive: (),
 }
 
-impl<T: ReconnectQueue> ShardManager<T> {
+impl<T: 'static + ReconnectQueue> ShardManager<T> {
     pub fn new(options: ShardManagerOptions<T>) -> Self {
         let (queue_sender, queue_receiver) = channel(0);
 
@@ -94,7 +94,7 @@ impl<T: ReconnectQueue> ShardManager<T> {
         }
     }
 
-    pub fn start(&mut self) -> Box<Future<Item = (), Error = Error> + Send> {
+    pub fn start(mut self) -> Box<Future<Item = Self, Error = Error> + Send> where Self: Send {
         let (
             shards_index, 
             shards_count, 
@@ -104,51 +104,56 @@ impl<T: ReconnectQueue> ShardManager<T> {
             ShardingStrategy::Range(i, c, t) => (i, c, t),
         };
 
-        let (sender, receiver) = unbounded();
-        self.message_stream = Some(receiver);
-
-        for shard_id in shards_index..shards_count {
-            trace!("pushing shard id {} to back of queue", &shard_id);
-
-            let future = self.reconnect_queue.push_back(shard_id)
-                .map_err(|_| error!("Error pushing shard to reconnect queue"));
-
-            tokio::spawn(future);
-        }
-        
-        let mut queue_sender = self.queue_sender.clone();
-        let queue_receiver = self.queue_receiver.take().unwrap();
-        let token = self.token.clone();
-        let sender_1 = sender.clone();
-        let shards = self.shards.clone();
-
-        let future = self.reconnect_queue.pop_front()
-            .and_then(move |shard_id| {
-                let shard_id = shard_id.expect("shard start queue is empty");
-
-                queue_sender.try_send(shard_id)
-                    .expect("could not send first shard to start");
-                
-                future::ok(())
-            })
-            .map_err(|_| error!("error popping front of reconnect queue"))
+        let future = future::ok(())
             .and_then(move |_| {
-                process_queue(
-                    queue_receiver,
-                    token,
-                    shards_total,
-                    sender_1,
-                    shards,
-                )
+                let (sender, receiver) = unbounded();
+                self.message_stream = Some(receiver);
+
+                for shard_id in shards_index..shards_count {
+                    trace!("pushing shard id {} to back of queue", &shard_id);
+
+                    let future = self.reconnect_queue.push_back(shard_id)
+                        .map_err(|_| error!("Error pushing shard to reconnect queue"));
+
+                    tokio::spawn(future);
+                }
+                
+                let mut queue_sender = self.queue_sender.clone();
+                let queue_receiver = self.queue_receiver.take().unwrap();
+                let token = self.token.clone();
+                let sender_1 = sender.clone();
+                let shards = self.shards.clone();
+
+                let future = self.reconnect_queue.pop_front()
+                    .and_then(move |shard_id| {
+                        let shard_id = shard_id.expect("shard start queue is empty");
+
+                        queue_sender.try_send(shard_id)
+                            .expect("could not send first shard to start");
+                        
+                        future::ok(())
+                    })
+                    .map_err(|_| error!("error popping front of reconnect queue"))
+                    .and_then(move |_| {
+                        process_queue(
+                            queue_receiver,
+                            token,
+                            shards_total,
+                            sender_1,
+                            shards,
+                        )
+                    });
+
+                tokio::spawn(future);
+
+                Ok(self)
             });
 
-        tokio::spawn(future);
-
-        Box::new(future::ok(()))
+        Box::new(future)
     }
 
     pub fn messages(&mut self) -> MessageStream {
-        self.message_stream.take().unwrap() 
+        self.message_stream.take().unwrap()
     }
 
     pub fn process(&mut self, event: &GatewayEvent) {

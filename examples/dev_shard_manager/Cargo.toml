@@ -8,4 +8,4 @@ serenity = { path = "../../", default-features = true }
 tokio = "~0.1"
 futures = "~0.1"
 env_logger = "~0.4"
-
+parking_lot = "~0.5"
