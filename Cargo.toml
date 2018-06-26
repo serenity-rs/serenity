@@ -23,6 +23,7 @@ tokio = "~0.1"
 tokio-tls = "~0.1"
 url = "^1.0"
 
+
 [dependencies.base64]
 optional = true
 version = "~0.9"
@@ -30,6 +31,10 @@ version = "~0.9"
 [dependencies.byteorder]
 optional = true
 version = "^1.0"
+
+[dependencies.bytes]
+optional = true
+version = "~0.4"
 
 [dependencies.chrono]
 features = ["serde"]
@@ -82,6 +87,10 @@ default-features = false
 optional = true
 version = "0.0.14"
 
+[dependencies.tokio-codec]
+optional = true
+version = "~0.1"
+
 [dependencies.tokio-tungstenite]
 optional = true
 git = "https://github.com/snapview/tokio-tungstenite"
@@ -111,7 +120,7 @@ gateway = ["flate2", "http_base", "parking_lot", "tokio-tungstenite", "tungsteni
 http_base = ["builder", "http", "hyper", "hyper-multipart-rfc7578", "hyper-tls", "mime", "native-tls", "utils"]
 standard_framework = ["framework"]
 utils = ["base64"]
-voice = ["byteorder", "gateway", "opus", "parking_lot", "rand", "sodiumoxide"]
+voice = ["bytes", "byteorder", "gateway", "opus", "parking_lot", "rand", "sodiumoxide", "tokio-codec"]
 
 [package.metadata.docs.rs]
 all-features = true

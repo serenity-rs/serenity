@@ -1,4 +1,5 @@
 use byteorder::{ByteOrder, NetworkEndian, ReadBytesExt, WriteBytesExt};
+use bytes::{BufMut, BytesMut};
 use internal::prelude::*;
 use opus::{
     packet as opus_packet,
@@ -36,7 +37,7 @@ use super::{
         SendEncoder,
     },
 };
-use tokio_core::net::UdpCodec;
+use tokio_codec::{Decoder, Encoder};
 
 pub(crate) struct RxVoicePacket {
     pub is_stereo: bool,
@@ -54,7 +55,6 @@ pub(crate) enum TxVoicePacket {
 
 pub(crate) struct VoiceCodec {
     decoder_map: HashMap<(u32, Channels), SendDecoder>,
-    destination: SocketAddr,
     encoder: SendEncoder,
     key: Key,
     sequence: u16,
@@ -65,7 +65,7 @@ pub(crate) struct VoiceCodec {
 const AUDIO_POSITION: usize = HEADER_LEN + MACBYTES;
 
 impl VoiceCodec {
-    pub(crate) fn new(destination: SocketAddr, key: Key, ssrc_in: u32) -> Result<VoiceCodec> {
+    pub(crate) fn new(key: Key, ssrc_in: u32) -> Result<VoiceCodec> {
         let mut encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Stereo, CodingMode::Audio)
             .map(SendEncoder::new)?;
 
@@ -73,7 +73,6 @@ impl VoiceCodec {
 
         let mut out = VoiceCodec {
             decoder_map: HashMap::new(),
-            destination,
             encoder: encoder,
             key,
             sequence: 0,
@@ -86,16 +85,14 @@ impl VoiceCodec {
         Ok(out)
     }
 
-    fn write_header(&self, buf: &mut Vec<u8>, audio_packet_length: usize) {
+    fn write_header(&self, buf: &mut BytesMut, audio_packet_length: usize) {
         let total_size = AUDIO_POSITION + audio_packet_length;
 
-        buf.reserve_exact(total_size);
+        buf.reserve(total_size);
 
         buf.extend_from_slice(&[0x80, 0x78]);
-        buf.write_u16::<NetworkEndian>(self.sequence)
-            .expect("[voice] Cannot fail to append to Vec.");
-        buf.write_u32::<NetworkEndian>(self.timestamp)
-            .expect("[voice] Cannot fail to append to Vec.");
+        buf.put_u16_be(self.sequence);
+        buf.put_u32_be(self.timestamp);
         buf.extend_from_slice(&self.ssrc);
         buf.extend_from_slice(&[0u8; 12]);
 
@@ -103,7 +100,7 @@ impl VoiceCodec {
         buf.resize(total_size, 0);
     }
 
-    fn finalize(&mut self, buf: &mut Vec<u8>) {
+    fn finalize(&mut self, buf: &mut BytesMut) {
         let nonce = Nonce::from_slice(&buf[..HEADER_LEN])
             .expect("[voice] Nonce should be guaranteed from 24-byte slice.");
 
@@ -119,22 +116,69 @@ impl VoiceCodec {
     }
 }
 
-impl UdpCodec for VoiceCodec {
-    type In = RxVoicePacket;
-    type Out = TxVoicePacket;
+impl Encoder for VoiceCodec {
+    type Item = TxVoicePacket;
+    type Error = IoError;
 
-    fn decode(&mut self, _src: &SocketAddr, buf: &[u8]) -> StdResult<Self::In, IoError> {
+    // User will either send a heartbeat or audio of variable length.
+    fn encode(&mut self, item: Self::Item, dst: &mut BytesMut) -> StdResult<(), Self::Error> {
+        match item {
+            TxVoicePacket::KeepAlive => {
+                dst.extend_from_slice(&self.ssrc);
+            },
+            TxVoicePacket::Audio(audio, len, bitrate) => {
+                // Reconfigure encoder bitrate.
+                // From my testing, it seemed like this needed to be set every cycle.
+                if let Err(e) = self.encoder.set_bitrate(bitrate) {
+                    warn!("[voice] Bitrate set unsuccessfully: {:?}", e);
+                }
+
+                let size = match bitrate {
+                    // If user specified, we can calculate.
+                    // bits -> bytes, then 20ms means 50fps.
+                    Bitrate::Bits(b) => b.abs() / (8 * 50),
+                    // Otherwise, just have a *lot* preallocated.
+                    _ => 4096,
+                } as usize;
+
+                self.write_header(dst, size);
+
+                let _len = self.encoder.encode_float(&audio[..len], &mut dst[AUDIO_POSITION..])
+                    .map_err(|_| IoError::new(
+                        IoErrorKind::InvalidData,
+                        "[voice] Couldn't encode voice data as Opus.")
+                    )?;
+
+                self.finalize(dst);
+            },
+            TxVoicePacket::Silence => {
+                self.write_header(dst, SILENT_FRAME.len());
+
+                (&mut dst[AUDIO_POSITION..]).write(&SILENT_FRAME)?;
+
+                self.finalize(dst);
+            }
+        }
+        Ok(())
+    }
+}
+
+impl Decoder for VoiceCodec {
+    type Item = RxVoicePacket;
+    type Error = IoError;
+
+    fn decode(&mut self, src: &mut BytesMut) -> StdResult<Option<Self::Item>, Self::Error> {
         let mut buffer = [0i16; 960 * 2];
 
-        let nonce = Nonce::from_slice(&buf[..NONCEBYTES])
+        let nonce = Nonce::from_slice(&src[..NONCEBYTES])
             .ok_or(IoErrorKind::InvalidData)?;
 
-        let mut handle = &buf[2..];
+        let mut handle = &src[2..];
         let seq = handle.read_u16::<NetworkEndian>()?;
         let timestamp = handle.read_u32::<NetworkEndian>()?;
         let ssrc = handle.read_u32::<NetworkEndian>()?;
 
-        secretbox::open(&buf[HEADER_LEN..], &nonce, &self.key)
+        secretbox::open(&src[HEADER_LEN..], &nonce, &self.key)
             .and_then(|mut decrypted| {
                 let channels = opus_packet::get_nb_channels(&decrypted)
                     .or(Err(()))?;
@@ -179,47 +223,7 @@ impl UdpCodec for VoiceCodec {
                     voice: buffer,
                 })
             })
+            .map(Some)
             .map_err(|_| IoError::new(IoErrorKind::InvalidData, "[voice] Couldn't decode Opus frames."))
-    }
-
-    // User will either send a heartbeat or audio of variable length.
-    fn encode(&mut self, msg: Self::Out, buf: &mut Vec<u8>) -> SocketAddr {
-        match msg {
-            TxVoicePacket::KeepAlive => {
-                buf.extend_from_slice(&self.ssrc);
-            },
-            TxVoicePacket::Audio(audio, len, bitrate) => {
-                // Reconfigure encoder bitrate.
-                // From my testing, it seemed like this needed to be set every cycle.
-                if let Err(e) = self.encoder.set_bitrate(bitrate) {
-                    warn!("[voice] Bitrate set unsuccessfully: {:?}", e);
-                }
-
-                let size = match bitrate {
-                    // If user specified, we can calculate.
-                    // bits -> bytes, then 20ms means 50fps.
-                    Bitrate::Bits(b) => b.abs() / (8 * 50),
-                    // Otherwise, just have a *lot* preallocated.
-                    _ => 4096,
-                } as usize;
-
-                self.write_header(buf, size);
-
-                let _len = self.encoder.encode_float(&audio[..len], &mut buf[AUDIO_POSITION..])
-                    .expect("[voice] Encoding packet somehow failed.");
-
-                self.finalize(buf);
-            },
-            TxVoicePacket::Silence => {
-                self.write_header(buf, SILENT_FRAME.len());
-
-                (&mut buf[AUDIO_POSITION..]).write(&SILENT_FRAME)
-                    .expect("[voice] Write of frame into unbounded vec should not fail.");
-
-                self.finalize(buf);
-            }
-        }
-
-        self.destination
     }
 }

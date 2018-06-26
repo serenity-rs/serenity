@@ -68,20 +68,20 @@ use super::{
     VoiceError, 
     CRYPTO_MODE,
 };
-use tokio_core::{
+use tokio::{
+    self,
     net::{
-        UdpCodec,
         UdpFramed,
         UdpSocket,
     },
-    reactor::{Handle, Remote},
 };
+use tokio_codec::Encoder;
 use tokio_tungstenite::connect_async;
 use tungstenite::Message;
 use url::Url;
 
 enum ReceiverStatus {
-    Udp(<VoiceCodec as UdpCodec>::In),
+    Udp(RxVoicePacket),
     Websocket(VoiceEvent),
 }
 
@@ -149,14 +149,12 @@ pub struct Connection {
 }
 
 impl Connection {
-    pub fn new(mut info: ConnectionInfo, handle: Handle) -> impl Future<Item = Self, Error = Error> {
+    pub fn new(mut info: ConnectionInfo) -> Box<Future<Item = Self, Error = Error> + Send> {
         let url = generate_url(&mut info.endpoint);
-        let local_remote_ws = handle.remote().clone();
-        let local_remote_listeners = handle.remote().clone();
 
-        result(url)
+        Box::new(result(url)
             // Build a (TLS'd) websocket.
-            .and_then(move |url| connect_async(url, local_remote_ws).map_err(Error::from))
+            .and_then(move |url| connect_async(url).map_err(Error::from))
             // Our init of the handshake.
             .and_then(move |(ws, _)| {
                 ws.send_json(&payload::build_identify(&info))
@@ -227,14 +225,14 @@ impl Connection {
                     .next()
                     .ok_or(Error::Voice(VoiceError::HostnameResolve))?;
 
-                let udp = UdpSocket::bind(&local, &handle)?;
+                let udp = UdpSocket::bind(&local)?;
 
                 let mut bytes = Vec::with_capacity(70);
                 bytes.write_u32::<NetworkEndian>(handshake.ready.ssrc)?;
                 bytes.resize(70, 0u8);
 
                 Ok(
-                    udp.send_dgram(bytes, destination)
+                    udp.send_dgram(bytes, &destination)
                         .and_then(|(udp, _)| udp.recv_dgram(vec![0u8; 256]))
                         .map_err(Error::from)
                         .and_then(move |(udp, data, len, _)| {
@@ -270,15 +268,15 @@ impl Connection {
             .flatten()
             .and_then(move |(handshake, ws, udp, key, destination)| {
                 let VoiceHandshake { connection_info, hello, ready } = handshake;
-                let codec = VoiceCodec::new(destination, key, ready.ssrc)?;
+                let codec = VoiceCodec::new(key, ready.ssrc)?;
 
                 let (ws_send, ws_reader) = ws.split();
-                let (udp_send, udp_reader) = udp.framed(codec).split();
+                let (udp_send, udp_reader) = UdpFramed::new(udp, codec).split();
 
                 let ws_send = Some(ws_send);
                 let udp_send = Some(udp_send);
 
-                let listener_items = spawn_receive_handlers(ws_reader, Some(udp_reader), &local_remote_listeners);
+                let listener_items = spawn_receive_handlers(ws_reader, Some(udp_reader));
 
                 info!("[Voice] Connected to: {}", &connection_info.endpoint);
 
@@ -303,10 +301,11 @@ impl Connection {
                     ws_send,
                 })
             })
+        )
     }
 
     fn ws(&mut self) -> SplitSink<WsClient> {
-        mem::replace(&mut self.ws_send, None)
+        self.ws_send.take()
             .expect("[voice] Failed to get websocket...")
     }
 
@@ -316,7 +315,7 @@ impl Connection {
     }
 
     fn udp(&mut self) -> SplitSink<UdpFramed<VoiceCodec>> {
-        mem::replace(&mut self.udp_send, None)
+        self.udp_send.take()
             .expect("[voice] Failed to get udp...")
     }
 
@@ -325,7 +324,16 @@ impl Connection {
         self
     }
 
-    pub fn reconnect(mut self, handle: Handle) -> impl Future<Item = Self, Error = Error> {
+    fn send_voice_packet(mut self, packet: TxVoicePacket) -> Box<Future<Item = Self, Error = Error> + Send> {
+        Box::new(self.udp().send((packet, self.destination))
+            .map_err(Error::from)
+            .map(|udp|
+                self.restore_udp(udp)
+            )
+        )
+    }
+
+    pub fn reconnect(mut self) -> Box<Future<Item = Self, Error = Error> + Send> {
         // A few steps to this.
         //  * Unconditionally terminate the voice ws connection, by dropping it.
         //  * Rebuild that connection (and listener).
@@ -333,9 +341,6 @@ impl Connection {
         //  * If connection closed/error, start a new connection.
 
         let url = generate_url(&mut self.connection_info.endpoint);
-        let local_remote_ws = handle.remote().clone();
-        let local_remote_listeners = handle.remote().clone();
-
         let backup_info = self.connection_info.clone();
         let saved_udp = mem::replace(&mut self.listener_items.close_sender_udp, None);
 
@@ -344,8 +349,8 @@ impl Connection {
             .send(());
         let _ = self.ws();
 
-        result(url)
-            .and_then(move |url| connect_async(url, local_remote_ws).map_err(Error::from))
+        Box::new(result(url)
+            .and_then(move |url| connect_async(url).map_err(Error::from))
             .and_then(move |(ws, _)| ws
                 .send_json(&payload::build_resume(&self.connection_info))
                 .map(|ws| (ws, self)))
@@ -361,7 +366,7 @@ impl Connection {
             .and_then(move |(ws, mut conn)| {
                 let (ws_send, ws_reader) = ws.split();
 
-                let mut listener_items = spawn_receive_handlers(ws_reader, None, &local_remote_listeners);
+                let mut listener_items = spawn_receive_handlers(ws_reader, None);
 
                 // Swap the old udp handler over to the new struct, then swap the new struct in.
                 mem::swap(&mut conn.listener_items.close_sender_udp, &mut listener_items.close_sender_udp);
@@ -369,15 +374,16 @@ impl Connection {
 
                 Ok(conn.restore_ws(ws_send))
             })
-            .or_else(move |_| Connection::new(backup_info, handle))
+            .or_else(move |_| Connection::new(backup_info))
+        )
     }
 
     #[allow(unused_variables)]
     pub(crate) fn cycle(mut self, now: Instant, mut state: LongLock<TaskState>)
-        -> impl Future<Item = LongLock<TaskState>, Error = Error>
+        -> Box<Future<Item = LongLock<TaskState>, Error = Error> + Send>
     {
-    // On success, this is unset.
-    state.cycle_error = true;
+        // On success, this is unset.
+        state.cycle_error = true;
 
         {
             // Process events the listeners have batched out.
@@ -463,7 +469,7 @@ impl Connection {
             )
         };
 
-        prepped_ws
+        Box::new(prepped_ws
             .map_err(Error::from)
             .and_then(move |mut conn| {
                 // Send the voice websocket keepalive if it's time
@@ -489,11 +495,7 @@ impl Connection {
                 match conn.udp_keepalive_timer.is_elapsed(now) {
                     true => {
                         conn.udp_keepalive_timer.reset();
-                        Either::A(
-                            conn.udp().send(TxVoicePacket::KeepAlive)
-                                .map_err(Error::from)
-                                .map(move |udp| conn.restore_udp(udp))
-                        )
+                        Either::A(conn.send_voice_packet(TxVoicePacket::KeepAlive))
                     },
                     false => Either::B(ok(conn)),
                 }
@@ -587,13 +589,7 @@ impl Connection {
                     .and_then(move |mut conn| {
                         conn.udp_keepalive_timer.reset();
                         match tx_packet {
-                            Some(packet) => Either::A(
-                                conn.udp().send(packet)
-                                    .map_err(Error::from)
-                                    .map(|udp|
-                                        conn.restore_udp(udp)
-                                    )
-                            ),
+                            Some(packet) => Either::A(conn.send_voice_packet(packet)),
                             None => Either::B(ok(conn)),
                         }
                     })
@@ -603,9 +599,10 @@ impl Connection {
                         state 
                     })
             })
+        )
     }
 
-    fn set_speaking(mut self, speaking: bool) -> Box<Future<Item = Connection, Error = Error>> {
+    fn set_speaking(mut self, speaking: bool) -> Box<Future<Item = Connection, Error = Error> + Send> {
         let out = match self.speaking == speaking {
             true => Either::A(ok(self)),
             false => {
@@ -650,8 +647,8 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
 // Maybe TODO: autogenerate these with a macro or something.
 
 #[inline]
-fn encryption_key(ws: WsClient) -> impl Future<Item=(Key, WsClient), Error=Error> {
-    loop_fn(ws, |ws| {
+fn encryption_key(ws: WsClient) -> Box<Future<Item=(Key, WsClient), Error=Error> + Send> {
+    Box::new(loop_fn(ws, |ws| {
         ws.recv_json()
             .and_then(|(value_wrap, ws)| {
                 let value = match value_wrap {
@@ -682,12 +679,12 @@ fn encryption_key(ws: WsClient) -> impl Future<Item=(Key, WsClient), Error=Error
 
                 Ok(Loop::Continue(ws))
             })
-    })
+    }))
 }
 
 #[inline]
-fn expect_resumed(ws: WsClient) -> impl Future<Item = WsClient, Error = Error> {
-    loop_fn(ws, |ws| {
+fn expect_resumed(ws: WsClient) -> Box<Future<Item = WsClient, Error = Error> + Send> {
+    Box::new(loop_fn(ws, |ws| {
         ws.recv_json()
             .and_then(|(value_wrap, ws)| {
                 let value = match value_wrap {
@@ -711,12 +708,12 @@ fn expect_resumed(ws: WsClient) -> impl Future<Item = WsClient, Error = Error> {
 
                 Ok(Loop::Continue(ws))
             })
-    })
+    }))
 }
 
 #[inline]
-fn expect_hello(ws: WsClient) -> impl Future<Item = (WsClient, Delay), Error = Error> {
-    loop_fn(ws, |ws| {
+fn expect_hello(ws: WsClient) -> Box<Future<Item = (WsClient, Delay), Error = Error> + Send> {
+    Box::new(loop_fn(ws, |ws| {
         ws.recv_json()
             .and_then(|(value_wrap, ws)| {
                 let value = match value_wrap {
@@ -740,7 +737,7 @@ fn expect_hello(ws: WsClient) -> impl Future<Item = (WsClient, Delay), Error = E
 
                 Ok(Loop::Continue(ws))
             })
-    })
+    }))
 }
 
 #[inline]
@@ -763,7 +760,7 @@ where T: for<'a> PartialEq<&'a str>,
 // The UDP param is only dropped in the event of a reconnection (where the full UDP pipeline exists and
 // should still be alive)
 #[inline]
-fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp_maybe: Option<SplitStream<UdpFramed<VoiceCodec>>>, context: &Remote) -> ListenerItems {
+fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp_maybe: Option<SplitStream<UdpFramed<VoiceCodec>>>) -> ListenerItems {
     let (close_sender_ws, close_reader_ws) = oneshot_channel::<()>();
 
     let (tx, rx) = mpsc::channel();
@@ -773,47 +770,45 @@ fn spawn_receive_handlers(ws: SplitStream<WsClient>, udp_maybe: Option<SplitStre
 
     let tx_pong_shared = repeat(Arc::new(Mutex::new(tx_pong)));
 
-    context.spawn(move |_|
-        ws.map_err(Error::from)
-            .zip(tx_pong_shared)
-            .until(close_reader_ws)
-            .for_each(move |(message, tx_pong_lock)| {
-                message_to_json(message, tx_pong_lock).and_then(
-                    |maybe_value| match maybe_value {
-                        Some(value) => match VoiceEvent::deserialize(value) {
-                            Ok(msg) => tx.send(ReceiverStatus::Websocket(msg))
-                                .map_err(|_| Error::FutureMpsc("WS event receiver hung up.")),
-                            Err(why) => {
-                                warn!("Error deserializing voice event: {:?}", why);
+    tokio::spawn(ws.map_err(Error::from)
+        .zip(tx_pong_shared)
+        .until(close_reader_ws)
+        .for_each(move |(message, tx_pong_lock)| {
+            message_to_json(message, tx_pong_lock).and_then(
+                |maybe_value| match maybe_value {
+                    Some(value) => match VoiceEvent::deserialize(value) {
+                        Ok(msg) => tx.send(ReceiverStatus::Websocket(msg))
+                            .map_err(|_| Error::FutureMpsc("WS event receiver hung up.")),
+                        Err(why) => {
+                            warn!("Error deserializing voice event: {:?}", why);
 
-                                Err(Error::Json(why))
-                            },
+                            Err(Error::Json(why))
                         },
-                        None => Ok(()),
-                    })
-            })
-            .map_err(|e| {
-                warn!("[voice] {}", e);
+                    },
+                    None => Ok(()),
+                })
+        })
+        .map_err(|e| {
+            warn!("[voice] {}", e);
 
-                ()
-            })
+            ()
+        })
     );
 
     let close_sender_udp = if let Some(udp) = udp_maybe {
         let (close_sender_udp, close_reader_udp) = oneshot_channel::<()>();
 
-        context.spawn(move |_|
-            udp.map_err(Error::from)
-                .until(close_reader_udp)
-                .for_each(move |voice_frame|
-                    tx_clone.send(ReceiverStatus::Udp(voice_frame))
-                        .map_err(|_| Error::FutureMpsc("UDP event receiver hung up."))
-                )
-                .map_err(|e| {
-                    warn!("[voice] {}", e);
+        tokio::spawn(udp.map_err(Error::from)
+            .until(close_reader_udp)
+            .for_each(move |(voice_frame, _src_addr)|
+                tx_clone.send(ReceiverStatus::Udp(voice_frame))
+                    .map_err(|_| Error::FutureMpsc("UDP event receiver hung up."))
+            )
+            .map_err(|e| {
+                warn!("[voice] {}", e);
 
-                    ()
-                })
+                ()
+            })
         );
 
         Some(close_sender_udp)

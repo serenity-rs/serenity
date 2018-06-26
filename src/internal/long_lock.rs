@@ -10,6 +10,10 @@ pub struct LongLock<T: 'static> {
     inner: LongLockInner<T>,
 }
 
+unsafe impl<T> Send for LongLock<T> {
+
+}
+
 impl<T> LongLock<T>{
     pub fn new(resource: Arc<Mutex<T>>) -> LongLock<T> {
     	let inner = OwningHandle::new_with_fn(resource, |resource_ptr| 
