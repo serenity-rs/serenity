@@ -101,7 +101,7 @@ impl VoiceCodec {
     }
 
     fn finalize(&mut self, buf: &mut BytesMut) {
-        let nonce = Nonce::from_slice(&buf[..HEADER_LEN])
+        let nonce = Nonce::from_slice(&buf[..NONCEBYTES])
             .expect("[voice] Nonce should be guaranteed from 24-byte slice.");
 
         // If sodiumoxide 0.1.16 worked on stable, then we could encrypt in place.

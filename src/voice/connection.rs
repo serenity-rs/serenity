@@ -250,7 +250,6 @@ impl Connection {
                                 )
                         )
                         .and_then(move |(udp, data, len, _)| {
-                            println!("UDP replied...");
                             // Find the position in the bytes that contains the first byte of 0,
                             // indicating the "end of the address".
                             let index = data.iter()

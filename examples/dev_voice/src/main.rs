@@ -203,7 +203,8 @@ fn try_join_and_play_audio(handler: &mut Handler) {
     if handler.connect() {
         // Eine Kleine Nachtmusik
         handler.play(
-            voice::ytdl("https://www.youtube.com/watch?v=o1FSN8_pp_o").expect("Link to video taken down.")
+            voice::ffmpeg("6383.wav").expect("It's there...")
+            //voice::ytdl("https://www.youtube.com/watch?v=o1FSN8_pp_o").expect("Link to video taken down.")
         );
     }
 }

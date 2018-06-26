@@ -96,7 +96,7 @@ fn runner(rx: MpscReceiver<Status>) -> Box<Future<Item = (), Error = ()> + Send>
 
     let state_txs = stream::repeat(state_tx);
 
-    Box::new(Interval::new(Instant::now(), Duration::from_millis(20))
+    Box::new(Interval::new(Instant::now(), Duration::from_millis(40))
         .map_err(|why| {error!("[voice] Timer error for running connection. {:?}", why)})
         .until(
             kill_rx.map_err(|why| {
@@ -106,7 +106,7 @@ fn runner(rx: MpscReceiver<Status>) -> Box<Future<Item = (), Error = ()> + Send>
         .zip(state_rx)
         .zip(state_txs)
         .for_each(move |((instant, mut state), state_tx)| {
-            println!("tick");
+            println!("tick: {:?}", &instant);
             // NOTE: might want to make late tasks die early.
             // May need to store task spawn times etc.
 
@@ -121,20 +121,16 @@ fn runner(rx: MpscReceiver<Status>) -> Box<Future<Item = (), Error = ()> + Send>
             loop {
                 match state.rx.try_recv() {
                     Ok(Status::Connect(info)) => {
-                        println!("Connection request.");
                         received_info = Some(info);
                         should_disconnect = false;
                     },
                     Ok(Status::Disconnect) => {
-                        println!("Disconnection request.");
                         should_disconnect = true;
                     },
                     Ok(Status::SetReceiver(r)) => {
-                        println!("Receiver added.");
                         state.receiver = r;
                     },
                     Ok(Status::SetSender(s)) => {
-                        println!("Sender set.");
                         state.senders.clear();
 
                         if let Some(aud) = s {
@@ -142,20 +138,16 @@ fn runner(rx: MpscReceiver<Status>) -> Box<Future<Item = (), Error = ()> + Send>
                         }
                     },
                     Ok(Status::AddSender(s)) => {
-                        println!("Sender added.");
                         state.senders.push(s);
                     },
                     Ok(Status::SetBitrate(b)) => {
-                        println!("Bitrate set.");
                         state.bitrate = b;
                     },
                     Err(TryRecvError::Empty) => {
                         // If we receieved nothing, then we can perform an update.
-                        println!("Forwards!");
                         break;
                     },
                     Err(TryRecvError::Disconnected) => {
-                        println!("Rip!");
                         should_disconnect = true;
                         break;
                     },
@@ -164,7 +156,6 @@ fn runner(rx: MpscReceiver<Status>) -> Box<Future<Item = (), Error = ()> + Send>
 
             // If we *want* to disconnect, poison the stream here.
             if should_disconnect {
-                println!("Rip2!");
                 return Either::A(result(state.kill_loop()));
             }
 
@@ -183,7 +174,6 @@ fn runner(rx: MpscReceiver<Status>) -> Box<Future<Item = (), Error = ()> + Send>
                 None => if let Some(info) = received_info {
                     Either4::C(Connection::new(info).map(Some))
                 } else {
-                    println!("Bad bad not good");
                     Either4::D(ok(None))
                 },
             };
@@ -194,7 +184,6 @@ fn runner(rx: MpscReceiver<Status>) -> Box<Future<Item = (), Error = ()> + Send>
                     Err(e) => Err((state, e)),
                 })
                 .and_then(move |(state, conn)| {
-                    println!("About to maybe cycle...");
                     // The cycle is responsible for setting/unsetting the error flag.
                     match conn {
                         Some(conn) => Either::A(conn.cycle(instant, state)),
