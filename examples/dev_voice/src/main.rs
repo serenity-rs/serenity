@@ -58,7 +58,6 @@ use std::{
     rc::Rc,
     sync::Arc,
 };
-use tokio_core::reactor::{Core, Handle, Remote};
 use tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage};
 
 fn main() {
@@ -67,14 +66,14 @@ fn main() {
     tokio::run(try_main());
 }
 
-fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
+fn try_main() -> impl Future<Item = (), Error = ()> {
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
 
     let opts = ShardManagerOptions {
         strategy: ShardingStrategy::multi(4),
-        token: Rc::new(token),
-        ws_uri: Rc::new(String::from("nothing")),
+        token: token,
+        ws_uri: String::from("nothing"),
         queue: SimpleReconnectQueue::new(4),
     };
 
@@ -82,11 +81,10 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
         (
             Arc::new(Mutex::new(HashMap::new())),
             Arc::new(Mutex::new(UserId(0))),
-            remote,
         ));
 
-    let mut shard_manager = ShardManager::new(opts, handle.clone());
-    let remote = handle.remote().clone();
+    let mut shard_manager = ShardManager::new(opts);
+
     shard_manager.start()
         .map_err(|e| println!("Error starting shard manager: {:?}", e))
         .and_then(|mut shard_manager| {
@@ -94,7 +92,7 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
                 .zip(stream::repeat(Arc::new(Mutex::new(shard_manager))))
                 .zip(inner_state)
                 .for_each(move |(((shard, message), shard_manager),
-                        (handlers, user_id, remote))| {
+                        (handlers, user_id))| {
                     let mut shard = shard.lock();
                     
                     let event = shard.parse(message)
@@ -106,7 +104,7 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
                         shard_manager.process(&event);
                     }
 
-                    let mut out: Box<Future<Item=(),Error=()>> = Box::new(future::ok(()));
+                    let mut out: Box<Future<Item=(),Error=()> + Send> = Box::new(future::ok(()));
 
                     match event {
                         GatewayEvent::Dispatch(_, Event::MessageCreate(ev)) => {
@@ -135,7 +133,7 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
                                 if let Some(guild_id) = ev.message.guild_id {
                                     let handler = {
                                         let user_id = user_id.lock();
-                                        send_channel_join(id, guild_id, *user_id, shard)
+                                        send_channel_join(id, guild_id, *user_id, &mut shard)
                                     };
                                     let mut map = handlers.lock();
                                     
@@ -185,7 +183,7 @@ fn try_main(handle: Handle) -> impl Future<Item = (), Error = ()> {
         })
 }
 
-fn send_channel_join(voice_id: u64, guild_id: GuildId, user_id: UserId, mut shard: RefMut<Shard>, remote: Remote) -> Handler {
+fn send_channel_join(voice_id: u64, guild_id: GuildId, user_id: UserId, shard: &mut Shard) -> Handler {
     let voice_update = json!({
         "op": OpCode::VoiceStateUpdate.num(),
         "d": {

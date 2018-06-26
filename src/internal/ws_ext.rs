@@ -29,15 +29,15 @@ use tungstenite::{
 pub type WsClient = WebSocketStream<StreamSwitcher<TcpStream, TlsStream<TcpStream>>>;
 
 pub trait ReceiverExt {
-    fn recv_json(self) -> Box<Future<Item = (Option<Value>, Self), Error = Error>>;
+    fn recv_json(self) -> Box<Future<Item = (Option<Value>, Self), Error = Error> + Send>;
 }
 
 pub trait SenderExt {
-    fn send_json(self, value: &Value) -> Box<Future<Item = Self, Error = Error>>;
+    fn send_json(self, value: &Value) -> Box<Future<Item = Self, Error = Error> + Send>;
 }
 
 impl ReceiverExt for WsClient {
-    fn recv_json(self) -> Box<Future<Item = (Option<Value>, WsClient), Error = Error>> {
+    fn recv_json(self) -> Box<Future<Item = (Option<Value>, WsClient), Error = Error> + Send> {
         let out = self.into_future()
             .map_err(|(e, _)| e.into())
             .and_then(|(value, ws)| match value {
@@ -93,8 +93,8 @@ pub fn message_to_json(message: Message, notifier_lock: Arc<Mutex<Sender<Vec<u8>
 }
 
 impl<T: 'static> SenderExt for T 
-        where T: Sink<SinkItem = Message, SinkError = TungsteniteError> {
-    fn send_json(self, value: &Value) -> Box<Future<Item = Self, Error = Error>> {
+        where T: Sink<SinkItem = Message, SinkError = TungsteniteError> + Send {
+    fn send_json(self, value: &Value) -> Box<Future<Item = Self, Error = Error> + Send> {
         let text = serde_json::to_string(value)
             .map(Message::Text)
             .map_err(Error::from);
