@@ -1,14 +1,14 @@
 use future_utils::StreamExt;
 use futures::{
-    future::{err, ok, result, Either},
-    stream::repeat,
-    sync::oneshot,
+    future::{self, err, ok, result, Either, IntoFuture},
+    stream,
+    sync::{mpsc, oneshot},
     Future,
+    Sink,
     Stream,
 };
 use internal::{
     either_n::Either4,
-    long_lock::LongLock,
     prelude::*,
 };
 use model::id::GuildId;
@@ -30,7 +30,7 @@ use super::{
 };
 use tokio::{
     self,
-    timer::Interval
+    timer::Interval,
 };
 
 pub(crate) struct TaskState {
@@ -73,7 +73,7 @@ pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
 fn runner(rx: MpscReceiver<Status>) -> Box<Future<Item = (), Error = ()> + Send> {
     let (kill_tx, kill_rx) = oneshot::channel();
 
-    let state_shared = repeat(Arc::new(Mutex::new(TaskState {
+    let state_shared = Box::new(TaskState {
         bitrate: Bitrate::Bits(audio::DEFAULT_BITRATE),
         connection: None,
         cycle_error: false,
@@ -81,7 +81,20 @@ fn runner(rx: MpscReceiver<Status>) -> Box<Future<Item = (), Error = ()> + Send>
         receiver: None,
         rx,
         senders: Vec::new(),
-    })));
+    });
+
+    // The voice event loop is a token-based system.
+    // One token is fed from a completed run back to the sender.
+    //
+    // So we have a stream of received packets, and a stream of channels
+    // to send along.
+    // (Might be faster to arc-mutex it in future?)
+    let (mut state_tx, state_rx) = mpsc::channel(0);
+
+    state_tx.try_send(state_shared)
+        .expect("[voice] Only one token exists, should never fail to pass it on.");
+
+    let state_txs = stream::repeat(state_tx);
 
     Box::new(Interval::new(Instant::now(), Duration::from_millis(20))
         .map_err(|why| {error!("[voice] Timer error for running connection. {:?}", why)})
@@ -90,8 +103,9 @@ fn runner(rx: MpscReceiver<Status>) -> Box<Future<Item = (), Error = ()> + Send>
                 error!("[voice] Oneshot error for voice connection poison. {:?}", why)
             })
         )
-        .zip(state_shared)
-        .for_each(move |(instant, state_lock)| {
+        .zip(state_rx)
+        .zip(state_txs)
+        .for_each(move |((instant, mut state), state_tx)| {
             println!("tick");
             // NOTE: might want to make late tasks die early.
             // May need to store task spawn times etc.
@@ -99,7 +113,7 @@ fn runner(rx: MpscReceiver<Status>) -> Box<Future<Item = (), Error = ()> + Send>
             let mut received_info = None;
             let mut should_disconnect = false;
 
-            let mut state = LongLock::new(state_lock);
+            // let mut state = LongLock::new(state_lock);
 
             // Handle any control messages, drain them all synchronously.
             // All are obvious, except connection state changes, which
@@ -175,22 +189,34 @@ fn runner(rx: MpscReceiver<Status>) -> Box<Future<Item = (), Error = ()> + Send>
             };
 
             Either::B(conn_future
-                .and_then(move |conn| {
+                .then(move |result| match result {
+                    Ok(conn) => Ok((state, conn)),
+                    Err(e) => Err((state, e)),
+                })
+                .and_then(move |(state, conn)| {
                     println!("About to maybe cycle...");
-                    // This drops the lock on completion.
                     // The cycle is responsible for setting/unsetting the error flag.
                     match conn {
                         Some(conn) => Either::A(conn.cycle(instant, state)),
                         None => Either::B(ok(state)),
                     }
                 })
-                .map(|state| mem::drop(state))
-                .map_err(|why| {
-                    error!(
-                        "(╯°□°）╯︵ ┻━┻ Error updating connection: {:?}",
-                        why
-                    )
-                }))
+                .then(move |result| {
+                    let state = match result {
+                        Ok(state) => state,
+                        Err((state, why)) => {
+                            error!(
+                                "(╯°□°）╯︵ ┻━┻ Error updating connection: {:?}",
+                                why
+                            );
+                            state
+                        }
+                    };
+
+                    state_tx.send(state)
+                })
+                .map(|_| ())
+                .map_err(|_| ()))
         })
     )
 }

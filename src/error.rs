@@ -18,6 +18,7 @@ use std::{
     num::ParseIntError,
     sync::mpsc::SendError as StdSendError,
 };
+use tokio::timer::DeadlineError;
 
 #[cfg(feature = "tungstenite")]
 use future_utils::mpsc::SendError;

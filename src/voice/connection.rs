@@ -23,7 +23,6 @@ use futures::{
     Stream,
 };
 use internal::{
-    long_lock::LongLock,
     prelude::*,
     ws_ext::{
         message_to_json,
@@ -51,7 +50,7 @@ use std::{
     net::{SocketAddr, ToSocketAddrs},
     sync::mpsc::{self, Receiver},
     sync::Arc,
-    time::Instant,
+    time::{Duration, Instant},
 };
 use super::{
     audio::{
@@ -74,6 +73,7 @@ use tokio::{
         UdpFramed,
         UdpSocket,
     },
+    util::FutureExt,
 };
 use tokio_codec::Encoder;
 use tokio_tungstenite::connect_async;
@@ -154,35 +154,42 @@ impl Connection {
 
         Box::new(result(url)
             // Build a (TLS'd) websocket.
-            .and_then(move |url| connect_async(url).map_err(Error::from))
+            .and_then(move |url|
+                connect_async(url).map_err(Error::from)
+            )
             // Our init of the handshake.
-            .and_then(move |(ws, _)| {
+            .and_then(move |(ws, _)|
                 ws.send_json(&payload::build_identify(&info))
                     .map(|ws| (ws, info))
-            })
+            )
             // The reply has TWO PARTS, which can come in any order.
             .and_then(|(ws, connection_info)| {
-                loop_fn((ProgressingVoiceHandshake {connection_info, ready: None, hello: None}, ws),
-                        |(mut state, ws)| {
+                let handshake = ProgressingVoiceHandshake {
+                    connection_info,
+                    ready: None,
+                    hello: None
+                };
+
+                loop_fn((handshake, ws), |(mut handshake, ws)| {
                     ws.recv_json()
                         .and_then(move |(value_wrap, ws)| {
 
                             let value = match value_wrap {
                                 Some(json_value) => json_value,
-                                None => {return Ok(Loop::Continue((state, ws)));},
+                                None => {return Ok(Loop::Continue((handshake, ws)));},
                             };
 
                             match VoiceEvent::deserialize(value)? {
                                 VoiceEvent::Ready(r) => {
-                                    state.ready = Some(r);
-                                    if state.hello.is_some(){
-                                        return Ok(Loop::Break((state, ws)));
+                                    handshake.ready = Some(r);
+                                    if handshake.hello.is_some(){
+                                        return Ok(Loop::Break((handshake, ws)));
                                     }
                                 },
                                 VoiceEvent::Hello(h) => {
-                                    state.hello = Some(h);
-                                    if state.ready.is_some() {
-                                        return Ok(Loop::Break((state, ws)));
+                                    handshake.hello = Some(h);
+                                    if handshake.ready.is_some() {
+                                        return Ok(Loop::Break((handshake, ws)));
                                     }
                                 },
                                 other => {
@@ -192,7 +199,7 @@ impl Connection {
                                 },
                             }
 
-                            Ok(Loop::Continue((state, ws)))
+                            Ok(Loop::Continue((handshake, ws)))
                         })
                 })
             })
@@ -233,9 +240,17 @@ impl Connection {
 
                 Ok(
                     udp.send_dgram(bytes, &destination)
-                        .and_then(|(udp, _)| udp.recv_dgram(vec![0u8; 256]))
                         .map_err(Error::from)
+                        .and_then(|(udp, _)|
+                            udp.recv_dgram(vec![0u8; 256])
+                                .map_err(Error::from)
+                                .deadline(Instant::now() + Duration::from_secs(4))
+                                .map_err(|_|
+                                    Error::Voice(VoiceError::ExpectedHandshake)
+                                )
+                        )
                         .and_then(move |(udp, data, len, _)| {
+                            println!("UDP replied...");
                             // Find the position in the bytes that contains the first byte of 0,
                             // indicating the "end of the address".
                             let index = data.iter()
@@ -250,22 +265,20 @@ impl Connection {
 
                             Ok(ws.send_json(&payload::build_select_protocol(addr, port))
                                 .map_err(Error::from)
-                                .map(move |ws| {
+                                .map(move |ws|
                                     (handshake, ws, udp, destination)
-                                }))
+                                ))
                     })
                 )
             })
             .flatten()
             .flatten()
-            .and_then(|(handshake, ws, udp, destination)| {
-                Ok(encryption_key(ws)
+            .and_then(|(handshake, ws, udp, destination)|
+                encryption_key(ws)
                     .map(move |(key, ws)| {
                         (handshake, ws, udp, key, destination)
                     })
-                )
-            })
-            .flatten()
+            )
             .and_then(move |(handshake, ws, udp, key, destination)| {
                 let VoiceHandshake { connection_info, hello, ready } = handshake;
                 let codec = VoiceCodec::new(key, ready.ssrc)?;
@@ -379,8 +392,8 @@ impl Connection {
     }
 
     #[allow(unused_variables)]
-    pub(crate) fn cycle(mut self, now: Instant, mut state: LongLock<TaskState>)
-        -> Box<Future<Item = LongLock<TaskState>, Error = Error> + Send>
+    pub(crate) fn cycle(mut self, now: Instant, mut state: Box<TaskState>)
+        -> Box<Future<Item = Box<TaskState>, Error = (Box<TaskState>, Error)> + Send>
     {
         // On success, this is unset.
         state.cycle_error = true;
@@ -469,9 +482,16 @@ impl Connection {
             )
         };
 
+        // From this point, we need to be VERY careful with the
+        // state object, so it MUST be passed along and handled
+        // for each error block.
+
         Box::new(prepped_ws
-            .map_err(Error::from)
-            .and_then(move |mut conn| {
+            .then(move |result| match result {
+                Ok(conn) => Ok((state, conn)),
+                Err(e) => Err((state, e.into())),
+            })
+            .and_then(move |(state, mut conn)| {
                 // Send the voice websocket keepalive if it's time
                 match conn.ws_keepalive_timer.is_elapsed(now) {
                     true => {
@@ -481,26 +501,34 @@ impl Connection {
                         conn.ws_keepalive_timer.reset();
                         Either::A(
                             conn.ws().send_json(&payload::build_heartbeat(nonce))
-                                .map_err(Error::from)
-                                .map(move |ws| conn.restore_ws(ws))
+                                .then(move |result| match result {
+                                    Ok(ws) => Ok((state, conn.restore_ws(ws))),
+                                    Err(e) => Err((state, e.into())),
+                                })
                         )
                     },
                     false => {
-                        Either::B(ok(conn))
+                        Either::B(ok((state, conn)))
                     },
                 }
             })
-            .and_then(move |mut conn| {
+            .and_then(move |(state, mut conn)| {
                 // Send UDP keepalive if it's time
                 match conn.udp_keepalive_timer.is_elapsed(now) {
                     true => {
                         conn.udp_keepalive_timer.reset();
-                        Either::A(conn.send_voice_packet(TxVoicePacket::KeepAlive))
+                        Either::A(
+                            conn.send_voice_packet(TxVoicePacket::KeepAlive)
+                                .then(move |result| match result {
+                                    Ok(conn) => Ok((state, conn)),
+                                    Err(e) => Err((state, e.into())),
+                                })
+                        )
                     },
-                    false => Either::B(ok(conn)),
+                    false => Either::B(ok((state, conn))),
                 }
             })
-            .and_then(move |mut conn| {
+            .and_then(move |(mut state, mut conn)| {
                 let mut buffer = [0i16; 960 * 2];
                 let mut mix_buffer = vec![0f32; 960 * 2];
                 let mut len = 0;
@@ -586,17 +614,27 @@ impl Connection {
 
 
                 conn.set_speaking(tx_packet.is_some())
-                    .and_then(move |mut conn| {
+                    .then(move |result| match result {
+                        Ok(conn) => Ok((state, conn)),
+                        Err(e) => Err((state, e.into())),
+                    })
+                    .and_then(move |(state, mut conn)| {
                         conn.udp_keepalive_timer.reset();
                         match tx_packet {
-                            Some(packet) => Either::A(conn.send_voice_packet(packet)),
-                            None => Either::B(ok(conn)),
+                            Some(packet) => Either::A(
+                                conn.send_voice_packet(packet)
+                                    .then(move |result| match result {
+                                        Ok(conn) => Ok((state, conn)),
+                                        Err(e) => Err((state, e.into())),
+                                    })
+                            ),
+                            None => Either::B(ok((state, conn))),
                         }
                     })
-                    .map(move |conn| {
+                    .map(move |(mut state, conn)| {
                         state.cycle_error = false;
                         state.restore_conn(conn);
-                        state 
+                        state
                     })
             })
         )
