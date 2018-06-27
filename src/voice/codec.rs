@@ -130,21 +130,22 @@ impl Encoder for VoiceCodec {
                     warn!("[voice] Bitrate set unsuccessfully: {:?}", e);
                 }
 
-                let size = match bitrate {
-                    // If user specified, we can calculate.
-                    // bits -> bytes, then 20ms means 50fps.
-                    Bitrate::Bits(b) => b.abs() / (8 * 50),
-                    // Otherwise, just have a *lot* preallocated.
-                    _ => 4096,
-                } as usize;
+                // While we could try and predict the required size, opus
+                // packet length oscillates around the value calculated
+                // from the bitrate (i.e., the bitrate describes an
+                // average).
+                // This is "one-size-fits all"---we chop it anyway.
+                let size = 4096 as usize; 
 
                 self.write_header(dst, size);
 
-                let _len = self.encoder.encode_float(&audio[..len], &mut dst[AUDIO_POSITION..])
+                let opus_len = self.encoder.encode_float(&audio[..len], &mut dst[AUDIO_POSITION..])
                     .map_err(|_| IoError::new(
                         IoErrorKind::InvalidData,
                         "[voice] Couldn't encode voice data as Opus.")
                     )?;
+
+                let _tail = dst.split_off(AUDIO_POSITION + opus_len); 
 
                 self.finalize(dst);
             },

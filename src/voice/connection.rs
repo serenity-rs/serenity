@@ -547,25 +547,30 @@ impl Connection {
                                 continue;
                             }
 
+                            let source_stereo = stream.is_stereo();
+                            let size_mod = if source_stereo { 2 } else { 1 };
+                            let len_mod = if source_stereo { 1 } else { 2 };
+
                             let temp_len = match stream.get_type() {
                                 AudioType::Opus => match stream.decode_and_add_opus_frame(&mut mix_buffer, vol) {
                                     Some(len) => len,
                                     None => 0,
                                 },
                                 AudioType::Pcm => {
-                                    let buffer_len = 960 * 2;
+                                    let buffer_len = 960 * size_mod;
 
-                                    match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
-                                        Some(len) => len,
+                                    let len = match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
+                                        Some(len) => len * len_mod,
                                         None => 0,
+                                    };
+
+                                    if len > 0{
+                                        combine_audio(&buffer, &mut mix_buffer, vol, source_stereo);
                                     }
+
+                                    len
                                 },
                             };
-
-                            let source_stereo = stream.is_stereo();
-
-                            // May need to force interleave/copy.
-                            combine_audio(&buffer, &mut mix_buffer, vol, source_stereo);
 
                             len = len.max(temp_len);
                             i += if temp_len > 0 {
