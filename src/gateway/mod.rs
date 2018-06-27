@@ -65,16 +65,16 @@ use model::{
 };
 use serde_json::Value;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use websocket::sync::{
-    client::Client,
-    stream::{TcpStream, TlsStream}
+use tungstenite::{
+    client::AutoStream,
+    protocol::WebSocket,
 };
 
 #[cfg(feature = "client")]
 use client::bridge::gateway::ShardClientMessage;
 
 pub type CurrentPresence = (Option<Game>, OnlineStatus);
-pub type WsClient = Client<TlsStream<TcpStream>>;
+pub type WsClient = WebSocket<AutoStream>;
 
 /// Indicates the current connection stage of a [`Shard`].
 ///

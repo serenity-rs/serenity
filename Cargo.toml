@@ -69,15 +69,17 @@ version = "0.0.14"
 optional = true
 version = "~1.7"
 
+[dependencies.tungstenite]
+optional = true
+version = "~0.5"
+
 [dependencies.typemap]
 optional = true
 version = "~0.3"
 
-[dependencies.evzht9h3nznqzwl]
-default-features = false
-features = ["sync-ssl"]
+[dependencies.url]
 optional = true
-version = "0.0.3"
+version = "^1.0"
 
 [dev-dependencies.matches]
 version = "0.1.6"
@@ -105,13 +107,12 @@ client = [
 ]
 extras = []
 framework = ["client", "model", "utils"]
-gateway = ["flate2", "http", "websocket", "utils"]
+gateway = ["flate2", "http", "tungstenite", "url", "utils"]
 http = ["hyper", "hyper-native-tls", "lazy_static", "multipart", "native-tls"]
 model = ["builder", "http"]
 standard_framework = ["framework"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "sodiumoxide"]
-websocket = ["evzht9h3nznqzwl"]
 
 [package.metadata.docs.rs]
 all-features = true

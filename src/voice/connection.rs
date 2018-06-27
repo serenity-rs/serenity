@@ -6,6 +6,7 @@ use byteorder::{
     WriteBytesExt
 };
 use constants::VOICE_GATEWAY_VERSION;
+use gateway::WsClient;
 use internal::prelude::*;
 use internal::{
     ws_impl::{ReceiverExt, SenderExt},
@@ -48,20 +49,8 @@ use std::{
 use super::audio::{AudioReceiver, AudioType, LockedAudio, HEADER_LEN, SAMPLE_RATE, SILENT_FRAME};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
-use websocket::{
-    client::Url as WebsocketUrl,
-    sync::{
-        client::ClientBuilder,
-        stream::{
-            AsTcpStream,
-            TcpStream,
-            TlsStream
-        },
-    },
-    sync::Client as WsClient
-};
-
-type Client = WsClient<TlsStream<TcpStream>>;
+use tungstenite::{self, handshake::client::Request};
+use url::Url;
 
 enum ReceiverStatus {
     Udp(Vec<u8>),
@@ -80,7 +69,7 @@ struct ThreadItems {
 #[allow(dead_code)]
 pub struct Connection {
     audio_timer: Timer,
-    client: Arc<Mutex<Client>>,
+    client: Arc<Mutex<WsClient>>,
     decoder_map: HashMap<(u32, Channels), OpusDecoder>,
     destination: SocketAddr,
     encoder: OpusEncoder,
@@ -102,7 +91,7 @@ impl Connection {
     pub fn new(mut info: ConnectionInfo) -> Result<Connection> {
         let url = generate_url(&mut info.endpoint)?;
 
-        let mut client = ClientBuilder::from_url(&url).connect_secure(None)?;
+        let mut client = tungstenite::connect(Request::from(url))?.0;
         client.send_json(&payload::build_identify(&info))?;
 
         let hello = loop {
@@ -165,16 +154,10 @@ impl Connection {
             let port_pos = len - 2;
             let port = (&bytes[port_pos..]).read_u16::<LittleEndian>()?;
 
-            client
-                .send_json(&payload::build_select_protocol(addr, port))?;
+            client.send_json(&payload::build_select_protocol(addr, port))?;
         }
 
         let key = encryption_key(&mut client)?;
-
-        let _ = client
-            .stream_ref()
-            .as_tcp()
-            .set_read_timeout(Some(Duration::from_millis(25)));
 
         let mutexed_client = Arc::new(Mutex::new(client));
         let thread_items = start_threads(Arc::clone(&mutexed_client), &udp)?;
@@ -499,19 +482,19 @@ fn combine_audio(
     }
 }
 
-fn generate_url(endpoint: &mut String) -> Result<WebsocketUrl> {
+fn generate_url(endpoint: &mut String) -> Result<Url> {
     if endpoint.ends_with(":80") {
         let len = endpoint.len();
 
         endpoint.truncate(len - 3);
     }
 
-    WebsocketUrl::parse(&format!("wss://{}/?v={}", endpoint, VOICE_GATEWAY_VERSION))
+    Url::parse(&format!("wss://{}/?v={}", endpoint, VOICE_GATEWAY_VERSION))
         .or(Err(Error::Voice(VoiceError::EndpointUrl)))
 }
 
 #[inline]
-fn encryption_key(client: &mut Client) -> Result<Key> {
+fn encryption_key(client: &mut WsClient) -> Result<Key> {
     loop {
         let value = match client.recv_json()? {
             Some(value) => value,
@@ -548,7 +531,7 @@ where T: for<'a> PartialEq<&'a str>,
 }
 
 #[inline]
-fn start_threads(client: Arc<Mutex<Client>>, udp: &UdpSocket) -> Result<ThreadItems> {
+fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<ThreadItems> {
     let (udp_close_sender, udp_close_reader) = mpsc::channel();
     let (ws_close_sender, ws_close_reader) = mpsc::channel();
 

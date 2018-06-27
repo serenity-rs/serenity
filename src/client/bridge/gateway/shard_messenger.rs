@@ -2,7 +2,7 @@ use gateway::InterMessage;
 use model::prelude::*;
 use super::{ShardClientMessage, ShardRunnerMessage};
 use std::sync::mpsc::{SendError, Sender};
-use websocket::message::OwnedMessage;
+use tungstenite::Message;
 
 /// A lightweight wrapper around an mpsc sender.
 ///
@@ -265,7 +265,7 @@ impl ShardMessenger {
     /// the [`set_presence`] method.
     ///
     /// [`set_presence`]: #method.set_presence
-    pub fn websocket_message(&self, message: OwnedMessage) {
+    pub fn websocket_message(&self, message: Message) {
         let _ = self.send(ShardRunnerMessage::Message(message));
     }
 

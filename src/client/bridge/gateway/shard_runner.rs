@@ -4,25 +4,28 @@ use internal::ws_impl::{ReceiverExt, SenderExt};
 use model::event::{Event, GatewayEvent};
 use parking_lot::Mutex;
 use serde::Deserialize;
-use std::sync::{
-    mpsc::{
-        self,
-        Receiver,
-        Sender,
-        TryRecvError
+use std::{
+    borrow::Cow,
+    sync::{
+        mpsc::{
+            self,
+            Receiver,
+            Sender,
+            TryRecvError
+        },
+        Arc,
     },
-    Arc
 };
 use super::super::super::dispatch::{DispatchEvent, dispatch};
 use super::super::super::EventHandler;
 use super::event::{ClientEvent, ShardStageUpdateEvent};
 use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
 use threadpool::ThreadPool;
-use typemap::ShareMap;
-use websocket::{
-    message::{CloseData, OwnedMessage},
-    WebSocketError
+use tungstenite::{
+    error::Error as TungsteniteError,
+    protocol::frame::CloseFrame,
 };
+use typemap::ShareMap;
 
 #[cfg(feature = "framework")]
 use framework::Framework;
@@ -190,9 +193,10 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             return true;
         }
 
-        let close_data = CloseData::new(1000, String::new());
-        let msg = OwnedMessage::Close(Some(close_data));
-        let _ = self.shard.client.send_message(&msg);
+        let _ = self.shard.client.close(Some(CloseFrame {
+            code: 1000.into(),
+            reason: Cow::from(""),
+        }));
 
         false
     }
@@ -250,13 +254,14 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
                 },
                 ShardRunnerMessage::Close(code, reason) => {
                     let reason = reason.unwrap_or_else(String::new);
-                    let data = CloseData::new(code, reason);
-                    let msg = OwnedMessage::Close(Some(data));
-
-                    self.shard.client.send_message(&msg).is_ok()
+                    let close = CloseFrame {
+                        code: code.into(),
+                        reason: Cow::from(reason),
+                    };
+                    self.shard.client.close(Some(close)).is_ok()
                 },
                 ShardRunnerMessage::Message(msg) => {
-                    self.shard.client.send_message(&msg).is_ok()
+                    self.shard.client.write_message(msg).is_ok()
                 },
                 ShardRunnerMessage::SetGame(game) => {
                     // To avoid a clone of `game`, we do a little bit of
@@ -371,7 +376,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
                 GatewayEvent::deserialize(value).map(Some).map_err(From::from)
             },
             Ok(None) => Ok(None),
-            Err(Error::WebSocket(WebSocketError::IoError(_))) => {
+            Err(Error::Tungstenite(TungsteniteError::Io(_))) => {
                 // Check that an amount of time at least double the
                 // heartbeat_interval has passed.
                 //
@@ -408,11 +413,6 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
                 }
 
                 return (None, None, true);
-            },
-            Err(Error::WebSocket(WebSocketError::NoDataAvailable)) => {
-                // This is hit when the websocket client dies this will be
-                // hit every iteration.
-                return (None, None, false);
             },
             Err(why) => Err(why),
         };

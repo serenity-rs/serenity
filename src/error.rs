@@ -18,8 +18,8 @@ use hyper::Error as HyperError;
 use native_tls::Error as TlsError;
 #[cfg(feature = "voice")]
 use opus::Error as OpusError;
-#[cfg(feature = "websocket")]
-use websocket::result::WebSocketError;
+#[cfg(feature = "tungstenite")]
+use tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "client")]
 use client::ClientError;
 #[cfg(feature = "gateway")]
@@ -100,9 +100,9 @@ pub enum Error {
     /// An error from the `native-tls` crate.
     #[cfg(feature = "native-tls")]
     Tls(TlsError),
-    /// An error from the `rust-websocket` crate.
-    #[cfg(feature = "gateway")]
-    WebSocket(WebSocketError),
+    /// An error from the `tungstenite` crate.
+    #[cfg(feature = "tungstenite")]
+    Tungstenite(TungsteniteError),
     /// An error from the `opus` crate.
     #[cfg(feature = "voice")]
     Opus(OpusError),
@@ -153,9 +153,9 @@ impl From<TlsError> for Error {
     fn from(e: TlsError) -> Error { Error::Tls(e) }
 }
 
-#[cfg(feature = "gateway")]
-impl From<WebSocketError> for Error {
-    fn from(e: WebSocketError) -> Error { Error::WebSocket(e) }
+#[cfg(feature = "tungstenite")]
+impl From<TungsteniteError> for Error {
+    fn from(e: TungsteniteError) -> Error { Error::Tungstenite(e) }
 }
 
 impl Display for Error {
@@ -187,10 +187,10 @@ impl StdError for Error {
             Error::Opus(ref inner) => inner.description(),
             #[cfg(feature = "native-tls")]
             Error::Tls(ref inner) => inner.description(),
+            #[cfg(feature = "tungstenite")]
+            Error::Tungstenite(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Voice(_) => "Voice error",
-            #[cfg(feature = "gateway")]
-            Error::WebSocket(ref inner) => inner.description(),
         }
     }
 
@@ -200,8 +200,8 @@ impl StdError for Error {
             Error::Hyper(ref inner) => Some(inner),
             Error::Json(ref inner) => Some(inner),
             Error::Io(ref inner) => Some(inner),
-            #[cfg(feature = "gateway")]
-            Error::WebSocket(ref inner) => Some(inner),
+            #[cfg(feature = "tungstenite")]
+            Error::Tungstenite(ref inner) => Some(inner),
             _ => None,
         }
     }

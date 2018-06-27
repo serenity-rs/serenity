@@ -3,7 +3,7 @@ use model::{
     user::OnlineStatus,
     id::GuildId
 };
-use websocket::message::OwnedMessage;
+use tungstenite::Message;
 
 /// A message to send from a shard over a WebSocket.
 #[derive(Clone, Debug)]
@@ -37,7 +37,7 @@ pub enum ShardRunnerMessage {
     /// [`ShardManager`]: struct.ShardManager.html
     Close(u16, Option<String>),
     /// Indicates that the client is to send a custom WebSocket message.
-    Message(OwnedMessage),
+    Message(Message),
     /// Indicates that the client is to update the shard's presence's game.
     SetGame(Option<Game>),
     /// Indicates that the client is to update the shard's presence in its
