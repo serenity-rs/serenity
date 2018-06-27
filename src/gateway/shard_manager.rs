@@ -1,17 +1,17 @@
 use futures::{future, Future, Stream, Poll, Sink, StartSend, AsyncSink};
 use ::Error;
-use std::collections::{VecDeque, HashMap};
-use std::rc::Rc;
-use std::cell::RefCell;
-use std::sync::Arc;
-use std::time::{Duration, Instant};
+use std::{
+    collections::{VecDeque, HashMap},
+    sync::Arc,
+    time::{Duration, Instant},
+};
 use gateway::{
     shard::Shard,
     queue::ReconnectQueue,
 };
 use model::event::{Event, GatewayEvent};
 use parking_lot::Mutex;
-use tokio::{self, timer::{Delay, Interval}};
+use tokio::{self, timer::{Delay}};
 use futures::sync::mpsc::{
     unbounded, UnboundedSender, UnboundedReceiver, 
     channel, Sender as MpscSender, Receiver as MpscReceiver,

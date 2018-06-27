@@ -3,10 +3,7 @@ use http_lib::{
     uri::InvalidUri as UriError,
     Error as HttpCrateError
 };
-use hyper::{
-    error::Error as HyperError,
-    Response,
-};
+use hyper::error::Error as HyperError;
 use native_tls::Error as TlsError;
 use serde_json::Error as JsonError;
 use std::{

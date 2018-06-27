@@ -1,5 +1,4 @@
-use byteorder::{ByteOrder, NetworkEndian, ReadBytesExt, WriteBytesExt};
-use bytes::{BufMut, BytesMut};
+use bytes::{Buf, BufMut, Bytes, BytesMut, IntoBuf};
 use internal::prelude::*;
 use opus::{
     packet as opus_packet,
@@ -23,7 +22,6 @@ use std::{
         ErrorKind as IoErrorKind,
         Write,
     },
-    net::SocketAddr,
 };
 use super::{
     audio::{
@@ -58,7 +56,7 @@ pub(crate) struct VoiceCodec {
     encoder: SendEncoder,
     key: Key,
     sequence: u16,
-    ssrc: [u8; 4],
+    ssrc: Bytes,
     timestamp: u32,
 }
 
@@ -71,18 +69,17 @@ impl VoiceCodec {
 
         encoder.set_bitrate(Bitrate::Bits(DEFAULT_BITRATE))?;
 
-        let mut out = VoiceCodec {
+        let mut ssrc = BytesMut::with_capacity(4);
+        ssrc.put_u32_be(ssrc_in);
+
+        Ok(VoiceCodec {
             decoder_map: HashMap::new(),
             encoder: encoder,
             key,
             sequence: 0,
-            ssrc: [0u8; 4],
+            ssrc: ssrc.freeze(),
             timestamp: 0,
-        };
-
-        (&mut out.ssrc[..]).write_u32::<NetworkEndian>(ssrc_in)?;
-
-        Ok(out)
+        })
     }
 
     fn write_header(&self, buf: &mut BytesMut, audio_packet_length: usize) {
@@ -169,16 +166,17 @@ impl Decoder for VoiceCodec {
 
     fn decode(&mut self, src: &mut BytesMut) -> StdResult<Option<Self::Item>, Self::Error> {
         let mut buffer = [0i16; 960 * 2];
+        let mut header = src.split_to(HEADER_LEN);
 
-        let nonce = Nonce::from_slice(&src[..NONCEBYTES])
-            .ok_or(IoErrorKind::InvalidData)?;
+        let mut nonce = Nonce([0; NONCEBYTES]);
+        nonce.0[..HEADER_LEN].clone_from_slice(&header);
 
-        let mut handle = &src[2..];
-        let seq = handle.read_u16::<NetworkEndian>()?;
-        let timestamp = handle.read_u32::<NetworkEndian>()?;
-        let ssrc = handle.read_u32::<NetworkEndian>()?;
+        let mut handle = header.split_off(2).into_buf();
+        let seq = handle.get_u16_be();
+        let timestamp = handle.get_u32_be();
+        let ssrc = handle.get_u32_be();
 
-        secretbox::open(&src[HEADER_LEN..], &nonce, &self.key)
+        secretbox::open(src, &nonce, &self.key)
             .and_then(|mut decrypted| {
                 let channels = opus_packet::get_nb_channels(&decrypted)
                     .or(Err(()))?;
@@ -193,7 +191,10 @@ impl Decoder for VoiceCodec {
                 // Strip RTP Header Extensions (one-byte)
                 if decrypted[0] == 0xBE && decrypted[1] == 0xDE {
                     // Read the length bytes as a big-endian u16.
-                    let header_extension_len = NetworkEndian::read_u16(&decrypted[2..4]);
+                    let header_extension_len = Bytes::from(&decrypted[2..4])
+                        .into_buf()
+                        .get_u16_be();
+
                     let mut offset = 4;
                     for _ in 0..header_extension_len {
                         let byte = decrypted[offset];

@@ -1,21 +1,25 @@
 use chrono::Utc;
 use constants::{GATEWAY_VERSION, LARGE_THRESHOLD, OpCode};
-use futures::future::Future;
-use futures::stream::{self, Stream as FuturesStream};
-use futures::sync::mpsc::{self, UnboundedSender};
-use futures::Sink;
-use model::event::{Event, GatewayEvent};
-use model::gateway::Activity;
-use model::id::GuildId;
-use model::user::OnlineStatus;
+use futures::{
+    stream::{self, Stream as FuturesStream},
+    sync::mpsc::{self, UnboundedSender},
+    Future,
+    Sink,
+};
+use model::{
+    event::{Event, GatewayEvent},
+    gateway::Activity,
+    id::GuildId,
+    user::OnlineStatus,
+};
 use parking_lot::Mutex;
 use serde_json::{self, Error as JsonError, Value};
-use std::cell::RefCell;
-use std::env::consts;
-use std::io::{Error as IoError, ErrorKind as IoErrorKind};
-use std::rc::Rc;
-use std::sync::Arc;
-use std::time::{Duration, Instant};
+use std::{
+    env::consts,
+    io::{Error as IoError, ErrorKind as IoErrorKind},
+    sync::Arc,
+    time::{Duration, Instant},
+};
 use super::{ConnectionStage, CurrentPresence, ShardStream};
 use tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage};
 use tokio::{self, timer::Interval};

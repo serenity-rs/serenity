@@ -16,7 +16,7 @@ extern crate tokio;
 extern crate tungstenite;
 
 use futures::{
-    future::{self, Executor,},
+    future,
     stream,
     Future,
     Stream,
@@ -30,35 +30,26 @@ use serenity::{
         ShardManager,
         ShardManagerOptions,
         SimpleReconnectQueue,
-        WrappedShard,
     },
     model::{
         event::{
             Event,
             GatewayEvent,
-            VoiceServerUpdateEvent,
-            VoiceStateUpdateEvent,
         },
         id::{
-            ChannelId,
             GuildId,
             UserId,
         },
-        voice::VoiceState,
     },
     voice::{self, Handler},
 };
 use std::{
-    cell::{RefCell, RefMut},
     collections::HashMap,
     env,
-    fs::File,
-    io::Write,
     iter::Iterator,
-    rc::Rc,
     sync::Arc,
 };
-use tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage};
+use tungstenite::Message as TungsteniteMessage;
 
 fn main() {
     env_logger::init().expect("Error initializing env_logger");
@@ -83,7 +74,7 @@ fn try_main() -> impl Future<Item = (), Error = ()> {
             Arc::new(Mutex::new(UserId(0))),
         ));
 
-    let mut shard_manager = ShardManager::new(opts);
+    let shard_manager = ShardManager::new(opts);
 
     shard_manager.start()
         .map_err(|e| println!("Error starting shard manager: {:?}", e))
@@ -104,7 +95,7 @@ fn try_main() -> impl Future<Item = (), Error = ()> {
                         shard_manager.process(&event);
                     }
 
-                    let mut out: Box<Future<Item=(),Error=()> + Send> = Box::new(future::ok(()));
+                    let out: Box<Future<Item=(),Error=()> + Send> = Box::new(future::ok(()));
 
                     match event {
                         GatewayEvent::Dispatch(_, Event::MessageCreate(ev)) => {
@@ -194,17 +185,17 @@ fn send_channel_join(voice_id: u64, guild_id: GuildId, user_id: UserId, shard: &
         }
     });
 
-    shard.send(TungsteniteMessage::Text(voice_update.to_string()));
+    shard.send(TungsteniteMessage::Text(voice_update.to_string()))
+        .expect("Sending voice-join attempt failed...");
 
     Handler::standalone(guild_id, user_id)
 }
 
 fn try_join_and_play_audio(handler: &mut Handler) {
     if handler.connect() {
-        // Eine Kleine Nachtmusik
+        // Pokke Village
         handler.play(
-            voice::ffmpeg("6383.wav").expect("It's there...")
-            //voice::ytdl("https://www.youtube.com/watch?v=o1FSN8_pp_o").expect("Link to video taken down.")
+            voice::ytdl("https://www.youtube.com/watch?v=__QdAxqBi5Y").expect("Link to video taken down.")
         );
     }
 }

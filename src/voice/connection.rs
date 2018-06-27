@@ -75,7 +75,6 @@ use tokio::{
     },
     util::FutureExt,
 };
-use tokio_codec::Encoder;
 use tokio_tungstenite::connect_async;
 use tungstenite::Message;
 use url::Url;
@@ -379,9 +378,11 @@ impl Connection {
                 let (ws_send, ws_reader) = ws.split();
 
                 let mut listener_items = spawn_receive_handlers(ws_reader, None);
+                let saved_udp = saved_udp;
 
                 // Swap the old udp handler over to the new struct, then swap the new struct in.
-                mem::swap(&mut conn.listener_items.close_sender_udp, &mut listener_items.close_sender_udp);
+                // Note that we kept the udp sender untouched.
+                listener_items.close_sender_udp = saved_udp;
                 conn.listener_items = listener_items;
 
                 Ok(conn.restore_ws(ws_send))
@@ -424,18 +425,6 @@ impl Connection {
                         if forward_events {
                             client_receiver.as_mut().expect("Receiver is already 'Some'")
                                 .speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
-                        }
-                    },
-                    ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
-                        match self.last_heartbeat_nonce {
-                            Some(nonce) => {
-                                if ev.nonce != nonce {
-                                    warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
-                                }
-
-                                self.last_heartbeat_nonce = None;
-                            },
-                            None => {},
                         }
                     },
                     ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
@@ -573,8 +562,10 @@ impl Connection {
                                 },
                             };
 
+                            let source_stereo = stream.is_stereo();
+
                             // May need to force interleave/copy.
-                            combine_audio(&buffer, &mut mix_buffer, vol);
+                            combine_audio(&buffer, &mut mix_buffer, vol, source_stereo);
 
                             len = len.max(temp_len);
                             i += if temp_len > 0 {
@@ -662,9 +653,11 @@ fn combine_audio(
     raw_buffer: &[i16; 1920],
     float_buffer: &mut Vec<f32>,
     volume: f32,
+    source_stereo: bool,
 ) {
     for i in 0..1920 {
-        let sample = (raw_buffer[i] as f32) / 32768.0;
+        let sample_index = if source_stereo { i } else { i/2 };
+        let sample = (raw_buffer[sample_index] as f32) / 32768.0;
 
         float_buffer[i] = float_buffer[i] + sample * volume;
     }

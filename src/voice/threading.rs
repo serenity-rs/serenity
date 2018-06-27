@@ -1,6 +1,6 @@
 use future_utils::StreamExt;
 use futures::{
-    future::{self, err, ok, result, Either, IntoFuture},
+    future::{ok, result, Either},
     stream,
     sync::{mpsc, oneshot},
     Future,
@@ -12,19 +12,14 @@ use internal::{
     prelude::*,
 };
 use model::id::GuildId;
-use parking_lot::Mutex;
 use std::{
     mem,
-    sync::{
-        mpsc::{Receiver as MpscReceiver, TryRecvError},
-        Arc
-    },
+    sync::mpsc::{Receiver as MpscReceiver, TryRecvError},
     time::{Duration, Instant},
 };
 use super::{
     audio,
     connection::Connection,
-    error::VoiceError,
     Bitrate,
     Status
 };
@@ -66,7 +61,6 @@ impl TaskState {
 
 pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
     // TODO: reveal to the outside world
-    println!("Built runner.");
     tokio::spawn(runner(rx));
 }
 
@@ -96,7 +90,7 @@ fn runner(rx: MpscReceiver<Status>) -> Box<Future<Item = (), Error = ()> + Send>
 
     let state_txs = stream::repeat(state_tx);
 
-    Box::new(Interval::new(Instant::now(), Duration::from_millis(40))
+    Box::new(Interval::new(Instant::now(), Duration::from_millis(20))
         .map_err(|why| {error!("[voice] Timer error for running connection. {:?}", why)})
         .until(
             kill_rx.map_err(|why| {
@@ -106,7 +100,6 @@ fn runner(rx: MpscReceiver<Status>) -> Box<Future<Item = (), Error = ()> + Send>
         .zip(state_rx)
         .zip(state_txs)
         .for_each(move |((instant, mut state), state_tx)| {
-            println!("tick: {:?}", &instant);
             // NOTE: might want to make late tasks die early.
             // May need to store task spawn times etc.
 

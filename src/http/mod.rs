@@ -40,7 +40,6 @@ use hyper::{
     client::{Client as HyperClient, HttpConnector},
     header::{HeaderValue, AUTHORIZATION, CONTENT_TYPE},
     Body,
-    Error as HyperError,
     Method,
     Request, 
     Response,

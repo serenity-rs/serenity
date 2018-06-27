@@ -1,7 +1,6 @@
 use futures::{
     future::SharedError,
     Canceled,
-    Future
 };
 use http_lib::{
     uri::InvalidUri as UriError,
@@ -18,7 +17,6 @@ use std::{
     num::ParseIntError,
     sync::mpsc::SendError as StdSendError,
 };
-use tokio::timer::DeadlineError;
 
 #[cfg(feature = "tungstenite")]
 use future_utils::mpsc::SendError;
