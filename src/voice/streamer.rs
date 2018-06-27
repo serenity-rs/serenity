@@ -294,7 +294,7 @@ pub fn ytdl(uri: &str) -> Result<Box<AudioSource>> {
 }
 
 fn is_stereo(path: &OsStr) -> Result<bool> {
-    let args = ["-v", "quiet", "-of", "json", "-show-streams", "-i"];
+    let args = ["-v", "quiet", "-of", "json", "-show_format", "-show_streams", "-i"];
 
     let out = Command::new("ffprobe")
         .args(&args)
