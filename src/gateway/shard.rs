@@ -578,9 +578,12 @@ impl Shard {
             StdDuration::from_secs(heartbeat_interval / 1000)
         };
 
+        trace!("Wait: {:?}", wait);
+
         // If a duration of time less than the heartbeat_interval has passed,
         // then don't perform a keepalive or attempt to reconnect.
         if let Some(last_sent) = self.heartbeat_instants.0 {
+            trace!("Elapsed: {:?}", last_sent.elapsed());
             if last_sent.elapsed() <= wait {
                 return true;
             }
