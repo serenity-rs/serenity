@@ -571,6 +571,12 @@ impl Shard {
             let heartbeat_interval = match self.heartbeat_interval {
                 Some(heartbeat_interval) => heartbeat_interval,
                 None => {
+                    trace!(
+                        "No wait: {:?}; {:?}",
+                        self.started.elapsed(),
+                        self.started,
+                    );
+                    
                     return self.started.elapsed() < StdDuration::from_secs(15);
                 },
             };
