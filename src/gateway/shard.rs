@@ -1,6 +1,5 @@
 use chrono::Utc;
 use constants::{GATEWAY_VERSION, LARGE_THRESHOLD, OpCode};
-use tokio_core::reactor::Handle;
 use futures::future::Future;
 use futures::stream::Stream as FuturesStream;
 use futures::sync::mpsc::{self, UnboundedSender};
@@ -17,8 +16,9 @@ use std::rc::Rc;
 use std::time::{Duration, Instant};
 use super::{ConnectionStage, CurrentPresence, ShardStream};
 use tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage};
-use tokio_timer::Timer;
+use tokio_timer::Interval;
 use tokio_tungstenite::connect_async;
+use tokio::executor::current_thread;
 use url::Url;
 use std::str::FromStr;
 use ::Error;
@@ -36,7 +36,6 @@ struct HeartbeatInfo {
 
 pub struct Shard {
     current_presence: CurrentPresence,
-    handle: Handle,
     heartbeat_info: Rc<RefCell<HeartbeatInfo>>,
     interval: Option<u64>,
     session_id: Option<String>,
@@ -48,9 +47,9 @@ pub struct Shard {
 }
 
 impl Shard {
-    pub fn new(token: Rc<String>, shard_info: [u64; 2], handle: Handle)
+    pub fn new(token: Rc<String>, shard_info: [u64; 2])
         -> Box<Future<Item = Shard, Error = Error>> {
-        let done = connect_async(Url::from_str(CONNECTION).unwrap(), handle.remote().clone())
+        let done = connect_async(Url::from_str(CONNECTION).unwrap())
             .map(move |(duplex, _)| {
                 let (sink, stream) = duplex.split();
                 let (tx, rx) = mpsc::unbounded();
@@ -68,11 +67,10 @@ impl Shard {
                     .map(|_| ())
                     .map_err(|_| ());
 
-                handle.spawn(done);
+                current_thread::spawn(done);
 
                 Self {
                     current_presence: (None, OnlineStatus::Online),
-                    handle: handle.clone(),
                     heartbeat_info: Rc::new(RefCell::new(HeartbeatInfo {
                         heartbeat_instants: (None, None),
                         heartbeater: false,
@@ -180,9 +178,9 @@ impl Shard {
                 if self.stage == ConnectionStage::Handshake {
                     let heartbeat_info = Rc::clone(&self.heartbeat_info);
                     let mut tx = self.tx.clone();
+                    let duration = Duration::from_millis(interval);
 
-                    let done = Timer::default()
-                        .interval(Duration::from_millis(interval))
+                    let done = Interval::new(Instant::now(), duration)
                         .for_each(move |_| {
                             let info = heartbeat_info.borrow();
 
@@ -199,7 +197,7 @@ impl Shard {
                             ()
                         });
 
-                    self.handle.spawn(done);
+                    current_thread::spawn(done);
 
                     self.identify().unwrap();
 

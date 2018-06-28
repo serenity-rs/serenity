@@ -43,9 +43,11 @@
 use chrono::{DateTime, Utc};
 use futures::sync::oneshot::{self, Receiver, Sender};
 use futures::{Future, future};
-use hyper::client::{Response};
-use hyper::header::Headers;
-use hyper::StatusCode;
+use hyper::{
+    header::HeaderMap,
+    Response,
+    StatusCode,
+};
 use std::cell::RefCell;
 use std::collections::{HashMap, VecDeque};
 use std::error::Error as StdError;
@@ -54,8 +56,8 @@ use std::rc::Rc;
 use std::time::Duration;
 use std::{i64, str, u8};
 use super::{Error, Path, Result};
-use tokio_core::reactor::Handle;
-use tokio_timer::Timer;
+use tokio::executor::current_thread;
+use tokio_timer;
 
 #[derive(Debug)]
 pub enum RateLimitError {
@@ -90,8 +92,8 @@ pub enum RateLimit {
 }
 
 impl RateLimit {
-    fn from_headers(headers: &Headers) -> Result<Self> {
-        if headers.get_raw("x-ratelimit-global").is_some() {
+    fn from_headers(headers: &HeaderMap) -> Result<Self> {
+        if headers.get("x-ratelimit-global").is_some() {
             if let Some(retry_after) = parse_header(headers, "retry-after")? {
                 debug!("Global ratelimited for {}ms", retry_after);
 
@@ -203,8 +205,6 @@ pub struct RateLimiter {
     /// block requests yourself. This has the side-effect of potentially
     /// blocking many of your event handlers or framework commands.
     pub global: Rc<RefCell<Global>>,
-    /// A handle to the core that this is running on.
-    pub handle: Handle,
     /// The calculated offset of the time difference between Discord and the client
     /// in seconds.
     ///
@@ -244,12 +244,11 @@ pub struct RateLimiter {
 }
 
 impl RateLimiter {
-    pub fn new(handle: Handle) -> Self {
+    pub fn new() -> Self {
         Self {
             global: Rc::new(RefCell::new(Global::default())),
             offset: None,
             routes: Rc::new(RefCell::new(HashMap::new())),
-            handle,
         }
     }
 
@@ -270,8 +269,7 @@ impl RateLimiter {
                     let wait_ms = reset_ms.saturating_sub(now_ms as u64);
                     let duration = Duration::from_millis(wait_ms as u64);
 
-                    let done = Timer::default()
-                        .sleep(duration)
+                    let done = tokio_timer::sleep(duration)
                         .map(|_| {
                             ()
                         }).map_err(|why| {
@@ -280,7 +278,7 @@ impl RateLimiter {
                             ()
                         });
 
-                    self.handle.spawn(done);
+                    current_thread::spawn(done);
                 }
 
                 Box::new(rx.from_err())
@@ -289,12 +287,12 @@ impl RateLimiter {
         }
     }
 
-    pub fn handle<'a>(&'a mut self, route: &'a Path, response: &'a Response)
+    pub fn handle<'a>(&'a mut self, route: &'a Path, response: &'a Response<Vec<u8>>)
         -> Result<Option<Box<Future<Item = (), Error = ()>>>> {
         let mut routes = self.routes.borrow_mut();
         let bucket = routes.entry(*route).or_insert_with(Default::default);
 
-        if response.status() != StatusCode::TooManyRequests {
+        if response.status() != StatusCode::TOO_MANY_REQUESTS {
             return Ok(None);
         }
 
@@ -305,8 +303,7 @@ impl RateLimiter {
                 self.global.borrow_mut().blocked = true;
                 let global = Rc::clone(&self.global);
 
-                let done = Timer::default()
-                    .sleep(Duration::from_millis(millis as u64))
+                let done = tokio_timer::sleep(Duration::from_millis(millis as u64))
                     .map(move |_| {
                         let mut global = global.borrow_mut();
                         global.blocked = false;
@@ -341,8 +338,7 @@ impl RateLimiter {
             RateLimit::Reached(millis) => {
                 debug!("Ratelimited on route {:?} for {:?}ms", route, millis);
 
-                let done = Timer::default()
-                    .sleep(Duration::from_millis(millis as u64))
+                let done = tokio_timer::sleep(Duration::from_millis(millis as u64))
                     .map_err(|why| {
                         warn!("Err with ratelimited timer: {:?}", why);
 
@@ -557,9 +553,9 @@ fn calculate_offset(header: Option<&[Vec<u8>]>) -> Option<i64> {
     None
 }
 
-fn parse_header(headers: &Headers, header_raw: &str) -> Result<Option<i64>> {
-    headers.get_raw(header_raw).map_or(Ok(None), |header| {
-        str::from_utf8(&header[0])
+fn parse_header(headers: &HeaderMap, header_raw: &str) -> Result<Option<i64>> {
+    headers.get(header_raw).map_or(Ok(None), |header| {
+        str::from_utf8(header.as_bytes())
             .map_err(|why| {
                 warn!("Error parsing {} as utf8: {:?}", header_raw, why);
 

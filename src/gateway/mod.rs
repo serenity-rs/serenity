@@ -59,7 +59,7 @@ use futures::stream::SplitStream;
 use model::gateway::Activity;
 use model::user::OnlineStatus;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use tokio_core::net::TcpStream;
+use tokio::net::TcpStream;
 use tokio_tls::TlsStream;
 use tokio_tungstenite::stream::Stream;
 use tokio_tungstenite::WebSocketStream;

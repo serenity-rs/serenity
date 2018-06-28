@@ -31,7 +31,7 @@ use hyper_tls::HttpsConnector;
 use self::shard_manager::{ShardManager, ShardManagerOptions, ShardingStrategy};
 use std::rc::Rc;
 use super::http::Client as HttpClient;
-use tokio_core::reactor::Handle;
+use tokio::reactor::Handle;
 use Error;
 
 #[cfg(feature = "cache")]

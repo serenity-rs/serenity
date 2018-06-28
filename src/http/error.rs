@@ -1,8 +1,6 @@
-use futures::Canceled;
-use hyper::{
-    error::{Error as HyperError, UriError},
-    Response,
-};
+use futures::sync::oneshot::Canceled;
+use http_crate::uri::InvalidUri;
+use hyper::{Body, Error as HyperError, Response};
 use native_tls::Error as TlsError;
 use serde_json::Error as JsonError;
 use std::{
@@ -13,7 +11,6 @@ use std::{
     result::Result as StdResult,
 };
 use super::ratelimiting::RateLimitError;
-use tokio_timer::TimerError;
 
 pub type Result<T> = StdResult<T, Error>;
 
@@ -30,22 +27,21 @@ pub enum Error {
     /// An error from the `hyper` crate.
     Hyper(HyperError),
     /// When a status code was unexpectedly received for a request's status.
-    InvalidRequest(Response),
+    InvalidRequest(Response<Body>),
+    /// When a given URI is invalid.
+    InvalidUri(InvalidUri),
     /// An error from the `std::io` module.
     Io(IoError),
     /// An error from the `serde_json` crate.
     Json(JsonError),
     /// An error from the `ratelimiting` module.
     RateLimit(RateLimitError),
-    /// An error occurred while creating a timer.
-    Timer(TimerError),
     /// An error from the `native_tls` crate.
     Tls(TlsError),
     /// When a status is received, but the verification to ensure the response
     /// is valid does not recognize the status.
     UnknownStatus(u16),
-    /// A `hyper` error while parsing a Uri.
-    Uri(UriError),
+    Uri,
 }
 
 impl Display for Error {
@@ -60,13 +56,13 @@ impl StdError for Error {
             Error::Format(ref inner) => inner.description(),
             Error::Hyper(ref inner) => inner.description(),
             Error::InvalidRequest(_) => "Received an unexpected status code",
+            Error::InvalidUri(ref inner) => inner.description(),
             Error::Io(ref inner) => inner.description(),
             Error::Json(ref inner) => inner.description(),
             Error::RateLimit(ref inner) => inner.description(),
-            Error::Timer(ref inner) => inner.description(),
             Error::Tls(ref inner) => inner.description(),
             Error::UnknownStatus(_) => "Verification does not understand status",
-            Error::Uri(ref inner) => inner.description(),
+            Error::Uri => "TODO",
         }
     }
 }
@@ -110,12 +106,6 @@ impl From<JsonError> for Error {
 impl From<RateLimitError> for Error {
     fn from(err: RateLimitError) -> Self {
         Error::RateLimit(err)
-    }
-}
-
-impl From<TimerError> for Error {
-    fn from(err: TimerError) -> Self {
-        Error::Timer(err)
     }
 }
 

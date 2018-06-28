@@ -1,4 +1,4 @@
-#![cfg(feature = "http")]
+#![cfg(feature = "http-client")]
 
 extern crate serenity;
 

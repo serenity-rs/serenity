@@ -115,8 +115,8 @@ handling shard events and updating the cache, if enabled.
 command parsing, before/after command execution, prefix setting, and more;
 - **gateway**: A Shard, used as a higher-level interface for communicating with
 the Discord gateway over a WebSocket client.
-- **http**: Functions providing a wrapper over Discord's REST API at a low
-enough level that optional parameters can be provided at will via a JsonMap.
+- **http-client**: Functions providing a wrapper over Discord's REST API at a
+low enough level that optional parameters can be provided at will via a JsonMap.
 - **model**: Method implementations for models, acting as helper methods over
 the HTTP functions.
 - **standard_framework**: A standard, default implementation of the Framework

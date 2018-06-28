@@ -17,8 +17,8 @@ log = "~0.4"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
-tokio-core = "~0.1"
-tokio-timer = "~0.1"
+tokio = "~0.1"
+tokio-timer = "~0.2"
 tokio-tls = "~0.1"
 url = "^1.0"
 
@@ -38,9 +38,13 @@ version = "~0.4"
 optional = true
 version = "^1.0"
 
+[dependencies.http]
+optional = true
+version = "~0.1"
+
 [dependencies.hyper]
 optional = true
-version = "~0.11"
+version = "~0.12"
 
 [dependencies.hyper-multipart-rfc7578]
 optional = true
@@ -48,7 +52,7 @@ version = "0.1.0-alpha3"
 
 [dependencies.hyper-tls]
 optional = true
-version = "~0.1"
+version = "~0.2"
 
 [dependencies.native-tls]
 optional = true
@@ -60,7 +64,7 @@ version = "0.2"
 
 [dependencies.rand]
 optional = true
-version = "^0.4"
+version = "^0.5"
 
 [dependencies.sodiumoxide]
 default-features = false
@@ -68,8 +72,8 @@ optional = true
 version = "0.0.14"
 
 [dependencies.tokio-tungstenite]
+git = "https://github.com/snapview/tokio-tungstenite"
 optional = true
-version = "~0.5"
 
 [dependencies.tungstenite]
 optional = true
@@ -83,7 +87,7 @@ default = [
     "builder",
     "client",
     "gateway",
-    "http",
+    "http-client",
     "utils",
 ]
 builder = ["utils"]
@@ -91,7 +95,7 @@ client = ["gateway", "http"]
 extras = []
 framework = ["client", "utils"]
 gateway = ["flate2", "http", "tokio-tungstenite", "tungstenite", "utils"]
-http = ["builder", "hyper", "hyper-multipart-rfc7578", "hyper-tls", "native-tls", "utils"]
+http-client = ["builder", "hyper", "hyper-multipart-rfc7578", "hyper-tls", "native-tls", "utils"]
 standard_framework = ["framework"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "rand", "sodiumoxide"]
