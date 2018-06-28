@@ -136,7 +136,9 @@ impl Shard {
         token: Arc<Mutex<String>>,
         shard_info: [u64; 2],
     ) -> Result<Shard> {
-        let client = connect(&*ws_url.lock())?;
+        let mut client = connect(&*ws_url.lock())?;
+
+        let _ = set_client_timeout(&mut client);
 
         let current_presence = (None, OnlineStatus::Online);
         let heartbeat_instants = (None, None);
@@ -571,12 +573,6 @@ impl Shard {
             let heartbeat_interval = match self.heartbeat_interval {
                 Some(heartbeat_interval) => heartbeat_interval,
                 None => {
-                    trace!(
-                        "No wait: {:?}; {:?}",
-                        self.started.elapsed(),
-                        self.started,
-                    );
-                    
                     return self.started.elapsed() < StdDuration::from_secs(15);
                 },
             };
@@ -584,12 +580,9 @@ impl Shard {
             StdDuration::from_secs(heartbeat_interval / 1000)
         };
 
-        trace!("Wait: {:?}", wait);
-
         // If a duration of time less than the heartbeat_interval has passed,
         // then don't perform a keepalive or attempt to reconnect.
         if let Some(last_sent) = self.heartbeat_instants.0 {
-            trace!("Elapsed: {:?}", last_sent.elapsed());
             if last_sent.elapsed() <= wait {
                 return true;
             }
@@ -784,8 +777,10 @@ impl Shard {
         // accurate when a Hello is received.
         self.stage = ConnectionStage::Connecting;
         self.started = Instant::now();
-        let client = connect(&self.ws_url.lock())?;
+        let mut client = connect(&self.ws_url.lock())?;
         self.stage = ConnectionStage::Handshake;
+
+        let _ = set_client_timeout(&mut client);
 
         Ok(client)
     }
@@ -840,6 +835,18 @@ fn connect(base_url: &str) -> Result<WsClient> {
     let client = tungstenite::connect(Request::from(url))?;
 
     Ok(client.0)
+}
+
+fn set_client_timeout(client: &mut WsClient) -> Result<()> {
+    let stream = match client.get_mut() {
+        tungstenite::stream::Stream::Plain(stream) => stream,
+        tungstenite::stream::Stream::Tls(stream) => stream.get_mut(),
+    };
+    
+    stream.set_read_timeout(Some(StdDuration::from_millis(500)))?;
+    stream.set_write_timeout(Some(StdDuration::from_secs(50)))?;
+
+    Ok(())
 }
 
 fn build_gateway_url(base: &str) -> Result<Url> {

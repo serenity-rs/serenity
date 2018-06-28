@@ -101,10 +101,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
         debug!("[ShardRunner {:?}] Running", self.shard.shard_info());
 
         loop {
-            trace!("[Runner] Loop");
-
             if !self.recv()? {
-                trace!("[Runner] No recv");
                 return Ok(());
             }
 
