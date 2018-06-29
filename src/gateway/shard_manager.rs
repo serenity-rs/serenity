@@ -186,8 +186,8 @@ fn process_queue(
     shards_total: u64,
     sender: UnboundedSender<Message>,
     shards_map: ShardsMap,
-) -> Box<Future<Item = (), Error = ()>> {
-    Box::new(queue_receiver
+) -> impl Future<Item = (), Error = ()> {
+    queue_receiver
         .for_each(move |shard_id| {
             trace!("received message to start shard {}", &shard_id);
             let token = token.clone();
@@ -206,7 +206,7 @@ fn process_queue(
                     future::ok(())
                 })
         })
-        .map_err(|_| ()))
+        .map_err(|_| ())
 }
 
 fn start_shard(

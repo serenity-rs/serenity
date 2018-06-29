@@ -48,8 +48,8 @@ pub struct Shard {
 
 impl Shard {
     pub fn new(token: Rc<String>, shard_info: [u64; 2])
-        -> Box<Future<Item = Shard, Error = Error>> {
-        let done = connect_async(Url::from_str(CONNECTION).unwrap())
+        -> impl Future<Item = Shard, Error = Error> {
+        connect_async(Url::from_str(CONNECTION).unwrap())
             .map(move |(duplex, _)| {
                 let (sink, stream) = duplex.split();
                 let (tx, rx) = mpsc::unbounded();
@@ -87,9 +87,7 @@ impl Shard {
                     tx,
                 }
             })
-            .map_err(From::from);
-
-        Box::new(done)
+            .map_err(From::from)
     }
 
     pub fn parse(&self, msg: TungsteniteMessage) -> Result<GatewayEvent, JsonError> {

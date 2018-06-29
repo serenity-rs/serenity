@@ -870,7 +870,7 @@ impl Client {
         token: &str,
         wait: bool,
         f: F,
-    ) -> impl Future<Item = Option<Message>, Error = Error> {
+    ) -> Box<Future<Item = Option<Message>, Error = Error>> {
         let execution = f(ExecuteWebhook::default()).0;
         let map = Value::Object(serenity_utils::vecmap_to_json_map(execution));
 
@@ -881,7 +881,7 @@ impl Client {
         };
 
         if wait {
-            self.post(route, Some(&map))
+            Box::new(self.post(route, Some(&map)))
         } else {
             Box::new(self.verify(route, Some(&map)).map(|_| None))
         }
@@ -1140,7 +1140,7 @@ impl Client {
 
     /// Gets information about a specific invite.
     pub fn get_invite<'a>(&self, code: &'a str, stats: bool)
-        -> Box<Future<Item = Invite, Error = Error> + 'a> {
+        -> impl Future<Item = Invite, Error = Error> {
         self.get(Route::GetInvite { code, stats })
     }
 
@@ -1166,11 +1166,11 @@ impl Client {
     }
 
     /// Gets X messages from a channel.
-    pub fn get_messages<'a, F: FnOnce(GetMessages) -> GetMessages>(
-        &'a self,
+    pub fn get_messages<F: FnOnce(GetMessages) -> GetMessages>(
+        &self,
         channel_id: u64,
         f: F,
-    ) -> Box<Future<Item = Vec<Message>, Error = Error> + 'a> {
+    ) -> Box<Future<Item = Vec<Message>, Error = Error>> {
         let mut map = f(GetMessages::default()).0;
 
         let limit = map.remove(&"limit").unwrap_or(50);
@@ -1188,10 +1188,10 @@ impl Client {
             ftry!(write!(query, "&before={}", before));
         }
 
-        self.get(Route::GetMessages {
+        Box::new(self.get(Route::GetMessages {
             channel_id,
             query,
-        })
+        }))
     }
 
     /// Gets all pins of a channel.
@@ -1312,7 +1312,7 @@ impl Client {
         &self,
         webhook_id: u64,
         token: &'a str,
-    ) -> Box<Future<Item = Webhook, Error = Error> + 'a> {
+    ) -> impl Future<Item = Webhook, Error = Error> {
         self.get(Route::GetWebhookWithToken { token, webhook_id })
     }
 
@@ -1486,12 +1486,12 @@ impl Client {
         &self,
         route: Route<'a>,
         map: Option<&Value>,
-    ) -> Box<Future<Item = T, Error = Error>> {
+    ) -> impl Future<Item = T, Error = Error> {
         self.request(route, map)
     }
 
     fn get<'a, T: DeserializeOwned + 'static>(&self, route: Route<'a>)
-        -> Box<Future<Item = T, Error = Error> + 'a> {
+        -> impl Future<Item = T, Error = Error> {
         self.request(route, None)
     }
 
@@ -1499,7 +1499,7 @@ impl Client {
         &self,
         route: Route<'a>,
         map: Option<&Value>,
-    ) -> Box<Future<Item = T, Error = Error>> {
+    ) -> impl Future<Item = T, Error = Error> {
         self.request(route, map)
     }
 
@@ -1507,7 +1507,7 @@ impl Client {
         &self,
         route: Route<'a>,
         map: Option<&Value>,
-    ) -> Box<Future<Item = T, Error = Error>> {
+    ) -> impl Future<Item = T, Error = Error> {
         self.request(route, map)
     }
 
