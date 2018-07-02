@@ -708,12 +708,16 @@ impl StandardFramework {
                 let cmd = f(CreateCommand::default()).finish();
                 let name = command_name.to_string();
 
-                if let Some(ref prefix) = group.prefix {
+                if let Some(ref prefixes) = group.prefixes {
+
                     for v in &cmd.options().aliases {
-                        group.commands.insert(
-                            format!("{} {}", prefix, v),
-                            CommandOrAlias::Alias(format!("{} {}", prefix, name)),
-                        );
+
+                        for prefix in prefixes {
+                            group.commands.insert(
+                                format!("{} {}", prefix, v),
+                                CommandOrAlias::Alias(format!("{} {}", prefix, name)),
+                            );
+                        }
                     }
                 } else {
                     for v in &cmd.options().aliases {
@@ -1009,9 +1013,21 @@ impl Framework for StandardFramework {
                         built = points_to.to_string();
                     }
 
-                    let to_check = if let Some(ref prefix) = group.prefix {
-                        if built.starts_with(prefix) && command_length > prefix.len() + 1 {
-                            built[(prefix.len() + 1)..].to_string()
+                    let to_check = if let Some(ref prefixes) = group.prefixes {
+                        // Once `built` starts with a set prefix,
+                        // we want to make sure that all following matching prefixes are longer
+                        // than the last matching one, this prevents picking a wrong prefix,
+                        // e.g. "f" instead of "ferris" due to "f" having a lower index in the `Vec`.
+                        let longest_matching_prefix_len = prefixes.iter().fold(0, |longest_prefix_len, prefix|
+                            if prefix.len() > longest_prefix_len && built.starts_with(prefix) && command_length > prefix.len() + 1 {
+                                prefix.len()
+                            } else {
+                                longest_prefix_len
+                            }
+                        );
+
+                        if longest_matching_prefix_len > 0 {
+                            built[(longest_matching_prefix_len + 1)..].to_string()
                         } else {
                             continue;
                         }

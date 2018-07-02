@@ -87,7 +87,7 @@ impl<D: fmt::Display> From<D> for Error {
 
 #[derive(Debug)]
 pub struct CommandGroup {
-    pub prefix: Option<String>,
+    pub prefixes: Option<Vec<String>>,
     pub commands: HashMap<String, CommandOrAlias>,
     /// Some fields taken from Command
     pub bucket: Option<String>,
@@ -103,7 +103,7 @@ pub struct CommandGroup {
 impl Default for CommandGroup {
     fn default() -> CommandGroup {
         CommandGroup {
-            prefix: None,
+            prefixes: None,
             commands: HashMap::new(),
             bucket: None,
             required_permissions: Permissions::empty(),
