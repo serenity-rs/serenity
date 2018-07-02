@@ -92,15 +92,7 @@ pub fn vecmap_to_json_map<K: PartialEq + ToString>(map: VecMap<K, Value>) -> Map
 /// assert!(!utils::is_nsfw("nsfwstuff"));
 /// ```
 pub fn is_nsfw(name: &str) -> bool {
-    let char_count = name.chars().count();
-
-    if char_count == 4 {
-        name == "nsfw"
-    } else if char_count > 5 {
-        name.starts_with("nsfw-")
-    } else {
-        false
-    }
+    name == "nsfw" || name.starts_with("nsfw-")
 }
 
 /// Retrieves the "code" part of an invite out of a URL.
