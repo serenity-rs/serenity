@@ -1,9 +1,9 @@
 use futures::Canceled;
-use http_lib::{
+use http_crate::{
     uri::InvalidUri as UriError,
     Error as HttpCrateError
 };
-use hyper::error::Error as HyperError;
+use hyper::{Body, Error as HyperError, Response};
 use native_tls::Error as TlsError;
 use serde_json::Error as JsonError;
 use std::{
@@ -33,22 +33,21 @@ pub enum Error {
     /// An error from the `hyper` crate.
     Hyper(HyperError),
     /// When a status code was unexpectedly received for a request's status.
-    InvalidRequest(String),
+    InvalidRequest(Response<Body>),
+    /// When a given URI is invalid.
+    InvalidUri(UriError),
     /// An error from the `std::io` module.
     Io(IoError),
     /// An error from the `serde_json` crate.
     Json(JsonError),
     /// An error from the `ratelimiting` module.
     RateLimit(RateLimitError),
-    /// An error occurred while creating a timer.
-    Timer(TimerError),
     /// An error from the `native_tls` crate.
     Tls(TlsError),
     /// When a status is received, but the verification to ensure the response
     /// is valid does not recognize the status.
     UnknownStatus(u16),
-    /// A `hyper` error while parsing a Uri.
-    Uri(UriError),
+    Uri,
 }
 
 impl Display for Error {
@@ -64,13 +63,13 @@ impl StdError for Error {
             Error::Http(ref inner) => inner.description(),
             Error::Hyper(ref inner) => inner.description(),
             Error::InvalidRequest(_) => "Received an unexpected status code",
+            Error::InvalidUri(ref inner) => inner.description(),
             Error::Io(ref inner) => inner.description(),
             Error::Json(ref inner) => inner.description(),
             Error::RateLimit(ref inner) => inner.description(),
-            Error::Timer(ref inner) => inner.description(),
             Error::Tls(ref inner) => inner.description(),
             Error::UnknownStatus(_) => "Verification does not understand status",
-            Error::Uri(ref inner) => inner.description(),
+            Error::Uri => "TODO",
         }
     }
 }
@@ -120,12 +119,6 @@ impl From<JsonError> for Error {
 impl From<RateLimitError> for Error {
     fn from(err: RateLimitError) -> Self {
         Error::RateLimit(err)
-    }
-}
-
-impl From<TimerError> for Error {
-    fn from(err: TimerError) -> Self {
-        Error::Timer(err)
     }
 }
 

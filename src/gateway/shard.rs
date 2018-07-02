@@ -53,8 +53,8 @@ pub struct Shard {
 
 impl Shard {
     pub fn new(token: String, shard_info: [u64; 2])
-        -> Box<Future<Item = Shard, Error = Error> + Send> {
-        Box::new(connect_async(Url::from_str(CONNECTION).unwrap())
+        -> impl Future<Item = Shard, Error = Error> + Send {
+        connect_async(Url::from_str(CONNECTION).unwrap())
             .map(move |(duplex, _)| {
                 let (sink, stream) = duplex.split();
                 let (tx, rx) = mpsc::unbounded();
@@ -92,7 +92,7 @@ impl Shard {
                     tx,
                 }
             })
-            .map_err(From::from))
+            .map_err(From::from)
     }
 
     pub fn parse(&self, msg: TungsteniteMessage) -> Result<GatewayEvent, JsonError> {
@@ -184,8 +184,9 @@ impl Shard {
 
                 if self.stage == ConnectionStage::Handshake {
                     let mut tx = self.tx.clone();
+                    let duration = Duration::from_millis(interval);
 
-                    let done = Interval::new(Instant::now(), Duration::from_millis(interval))
+                    let done = Interval::new(Instant::now(), duration)
                         .zip(stream::repeat(self.heartbeat_info.clone()))
                         .for_each(move |(_time, info_lock)| {
                             let info = info_lock.lock();

@@ -153,7 +153,7 @@ impl Serialize for ReactionType {
     }
 }
 
-#[cfg(any(feature = "model", feature = "http"))]
+#[cfg(any(feature = "model", feature = "http-client"))]
 impl ReactionType {
     /// Creates a data-esque display of the type. This is not very useful for
     /// displaying, as the primary client can not render it, but can be useful

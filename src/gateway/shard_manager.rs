@@ -13,7 +13,7 @@ use model::event::{Event, GatewayEvent};
 use parking_lot::Mutex;
 use tokio::{self, timer::{Delay}};
 use futures::sync::mpsc::{
-    unbounded, UnboundedSender, UnboundedReceiver, 
+    unbounded, UnboundedSender, UnboundedReceiver,
     channel, Sender as MpscSender, Receiver as MpscReceiver,
     SendError,
 };
@@ -57,10 +57,10 @@ pub struct ShardManagerOptions<T: ReconnectQueue> {
     pub queue: T,
 }
 
-pub type WrappedShard = Arc<Mutex<Shard>>;//Rc<RefCell<Shard>>;
+pub type WrappedShard = Arc<Mutex<Shard>>;
 pub type Message = (WrappedShard, TungsteniteMessage);
 pub type MessageStream = UnboundedReceiver<Message>;
-type ShardsMap = Arc<Mutex<HashMap<u64, WrappedShard>>>;//Rc<RefCell<HashMap<u64, WrappedShard>>>;
+type ShardsMap = Arc<Mutex<HashMap<u64, WrappedShard>>>;
 
 pub struct ShardManager<T: ReconnectQueue> {
     pub queue: VecDeque<u64>,
@@ -94,10 +94,12 @@ impl<T: 'static + ReconnectQueue> ShardManager<T> {
         }
     }
 
-    pub fn start(mut self) -> Box<Future<Item = Self, Error = Error> + Send> where Self: Send {
+    pub fn start(mut self) -> impl Future<Item = Self, Error = Error> + Send
+        where Self: Send
+    {
         let (
-            shards_index, 
-            shards_count, 
+            shards_index,
+            shards_count,
             shards_total
         ) = match self.strategy {
             ShardingStrategy::Autoshard => unimplemented!(),
@@ -149,7 +151,7 @@ impl<T: 'static + ReconnectQueue> ShardManager<T> {
                 Ok(self)
             });
 
-        Box::new(future)
+        future
     }
 
     pub fn messages(&mut self) -> MessageStream {
@@ -186,6 +188,9 @@ impl<T: 'static + ReconnectQueue> ShardManager<T> {
     }
 }
 
+// NOTE: cannot impl Future due to compiler bug #50865
+// (i.e. non-public function).
+// This applies to other deliberate choices of Box<Future<...>>
 fn process_queue(
     queue_receiver: MpscReceiver<u64>,
     token: String,
@@ -204,8 +209,7 @@ fn process_queue(
             sleep_future
                 .map_err(|e| error!("Error sleeping before starting next shard: {:?}", e))
                 .and_then(move |_| {
-                    let future = start_shard(token, shard_id, shards_total,
-                     sender)
+                    let future = start_shard(token, shard_id, shards_total, sender)
                         .map(move |shard| {
                             let mut map = shards_map.lock();
                             map.insert(shard_id.clone(), shard);

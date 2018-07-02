@@ -51,13 +51,15 @@ use model::prelude::*;
 use self::ratelimiting::RateLimiter;
 use serde::de::DeserializeOwned;
 use serde_json::{self, Number, Value};
-use std::borrow::Cow;
-use std::cell::RefCell;
-use std::fmt::{Debug, Write};
-use std::fs::File;
-use std::io::Cursor;
-use std::rc::Rc;
-use std::str::FromStr;
+use std::{
+    borrow::Cow,
+    cell::RefCell,
+    io::Cursor,
+    fmt::{Debug, Write},
+    fs::File,
+    rc::Rc,
+    str::FromStr,
+};
 use ::builder::*;
 use ::{Error, utils as serenity_utils};
 
@@ -93,7 +95,7 @@ impl LightMethod {
 #[derive(Clone, Debug)]
 pub struct Client {
     pub client: Rc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
-    pub multiparter: Rc<HyperClient<HttpsConnector<HttpConnector>, MultipartBody>>,
+    pub multiparter: Rc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
     pub ratelimiter: Rc<RefCell<RateLimiter>>,
     pub token: Rc<String>,
 }
@@ -107,7 +109,7 @@ impl Client {
 
         let multiparter = Rc::new(HyperClient::builder()
             .keep_alive(true)
-            .build::<_, MultipartBody>(connector));
+            .build(connector));
 
         Ok(Self {
             ratelimiter: Rc::new(RefCell::new(RateLimiter::new())),
@@ -883,7 +885,7 @@ impl Client {
         token: &str,
         wait: bool,
         f: F,
-    ) -> impl Future<Item = Option<Message>, Error = Error> {
+    ) -> Box<Future<Item = Option<Message>, Error = Error>> {
         let execution = f(ExecuteWebhook::default()).0;
         let map = Value::Object(serenity_utils::vecmap_to_json_map(execution));
 
@@ -894,7 +896,7 @@ impl Client {
         };
 
         if wait {
-            self.post(route, Some(&map))
+            Box::new(self.post(route, Some(&map)))
         } else {
             Box::new(self.verify(route, Some(&map)).map(|_| None))
         }
@@ -1153,7 +1155,7 @@ impl Client {
 
     /// Gets information about a specific invite.
     pub fn get_invite<'a>(&self, code: &'a str, stats: bool)
-        -> Box<Future<Item = Invite, Error = Error> + 'a> {
+        -> impl Future<Item = Invite, Error = Error> {
         self.get(Route::GetInvite { code, stats })
     }
 
@@ -1179,11 +1181,11 @@ impl Client {
     }
 
     /// Gets X messages from a channel.
-    pub fn get_messages<'a, F: FnOnce(GetMessages) -> GetMessages>(
-        &'a self,
+    pub fn get_messages<F: FnOnce(GetMessages) -> GetMessages>(
+        &self,
         channel_id: u64,
         f: F,
-    ) -> Box<Future<Item = Vec<Message>, Error = Error> + 'a> {
+    ) -> Box<Future<Item = Vec<Message>, Error = Error>> {
         let mut map = f(GetMessages::default()).0;
 
         let limit = map.remove(&"limit").unwrap_or(50);
@@ -1201,10 +1203,10 @@ impl Client {
             ftry!(write!(query, "&before={}", before));
         }
 
-        self.get(Route::GetMessages {
+        Box::new(self.get(Route::GetMessages {
             channel_id,
             query,
-        })
+        }))
     }
 
     /// Gets all pins of a channel.
@@ -1325,7 +1327,7 @@ impl Client {
         &self,
         webhook_id: u64,
         token: &'a str,
-    ) -> Box<Future<Item = Webhook, Error = Error> + 'a> {
+    ) -> impl Future<Item = Webhook, Error = Error> {
         self.get(Route::GetWebhookWithToken { token, webhook_id })
     }
 
@@ -1353,15 +1355,15 @@ impl Client {
         self.verify(Route::RemoveGroupRecipient { group_id, user_id }, None)
     }
 
-    // /// Sends file(s) to a channel.
-    // ///
-    // /// # Errors
-    // ///
-    // /// Returns an
-    // /// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
-    // /// if the file is too large to send.
-    // ///
-    // /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
+    /// Sends file(s) to a channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns an
+    /// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
+    /// if the file is too large to send.
+    ///
+    /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
     pub fn send_files<F, T, It>(
         &self,
         channel_id: u64,
@@ -1413,8 +1415,8 @@ impl Client {
             }
         }
 
-        let mut request = ftry!(Request::get(uri).body(Form::default().into()));
-        form.set_body(&mut request);
+        let mut request_base = Request::get(uri);
+        let request = ftry!(form.set_body(&mut request_base));
 
         let client = Rc::clone(&self.multiparter);
 
@@ -1497,12 +1499,12 @@ impl Client {
         &self,
         route: Route<'a>,
         map: Option<&Value>,
-    ) -> Box<Future<Item = T, Error = Error>> {
+    ) -> impl Future<Item = T, Error = Error> {
         self.request(route, map)
     }
 
     fn get<'a, T: DeserializeOwned + 'static>(&self, route: Route<'a>)
-        -> Box<Future<Item = T, Error = Error> + 'a> {
+        -> impl Future<Item = T, Error = Error> {
         self.request(route, None)
     }
 
@@ -1510,7 +1512,7 @@ impl Client {
         &self,
         route: Route<'a>,
         map: Option<&Value>,
-    ) -> Box<Future<Item = T, Error = Error>> {
+    ) -> impl Future<Item = T, Error = Error> {
         self.request(route, map)
     }
 
@@ -1518,7 +1520,7 @@ impl Client {
         &self,
         route: Route<'a>,
         map: Option<&Value>,
-    ) -> Box<Future<Item = T, Error = Error>> {
+    ) -> impl Future<Item = T, Error = Error> {
         self.request(route, map)
     }
 
@@ -1530,19 +1532,19 @@ impl Client {
     ) -> Result<Request<Body>> {
         let built_uri = url.as_ref();
 
-        let body = if let Some(value) = map {
-            serde_json::to_string(value)?
-        } else {
-            String::new()
+        let body = match map {
+            Some(value) => {
+                serde_json::to_vec(value)?
+            },
+            None => vec![],
         };
 
         Request::builder()
             .uri(built_uri)
             .method(method.hyper_method())
-            .header(AUTHORIZATION, HeaderValue::from_str(&self.token())
-                .expect("Token being sent must be a valid HTTP-encodable string."))
+            .header(AUTHORIZATION, &self.token()[..])
             .header(CONTENT_TYPE, HeaderValue::from_static(APPLICATION_JSON.as_ref()))
-            .body(Body::from(body))
+            .body(body.into())
             .map_err(|e| HttpError::Http(e))
     }
 
@@ -1610,12 +1612,12 @@ impl Client {
 /// Returns [`Error::InvalidRequest`] if the response status code is unexpected.
 ///
 /// [`Error::InvalidRequest`]: enum.Error.html#variant.InvalidRequest
-fn verify_status<T: Debug>(response: Response<T>) ->
-    impl Future<Item = Response<T>, Error = Error> {
+fn verify_status(response: Response<Body>) ->
+    Box<Future<Item = Response<Body>, Error = Error>> {
     if response.status().is_success() {
-        future::ok(response)
+        Box::new(future::ok(response))
     } else {
-        future::err(Error::Http(HttpError::InvalidRequest(format!("{:?}", response))))
+        Box::new(future::err(Error::Http(HttpError::InvalidRequest(response))))
     }
 }
 

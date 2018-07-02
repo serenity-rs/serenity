@@ -110,7 +110,6 @@ extern crate serde_json;
 extern crate chrono;
 extern crate future_utils;
 extern crate futures;
-extern crate owning_ref;
 extern crate serde;
 extern crate tokio;
 extern crate tokio_tls;
@@ -125,7 +124,7 @@ extern crate bytes;
 #[cfg(feature = "flate2")]
 extern crate flate2;
 #[cfg(feature = "http")]
-extern crate http as http_lib;
+extern crate http as http_crate;
 #[cfg(feature = "hyper")]
 extern crate hyper;
 #[cfg(feature = "hyper-multipart-rfc7578")]
@@ -176,7 +175,7 @@ pub mod client;
 pub mod framework;
 #[cfg(feature = "gateway")]
 pub mod gateway;
-#[cfg(feature = "http_base")]
+#[cfg(feature = "http-client")]
 pub mod http;
 #[cfg(feature = "utils")]
 pub mod utils;

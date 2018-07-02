@@ -15,7 +15,6 @@ bitflags = "^1.0"
 future-utils = "~0.9"
 futures = "~0.1"
 log = "~0.4"
-owning_ref = "0.3"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
@@ -54,9 +53,7 @@ version = "~0.12"
 
 [dependencies.hyper-multipart-rfc7578]
 optional = true
-git = "https://github.com/FelixMcFelix/rust-hyper-multipart-rfc7578"
-rev = "326b956"
-#version = "0.1.0-alpha3"
+version = "0.2.0-alpha2"
 
 [dependencies.hyper-tls]
 optional = true
@@ -80,7 +77,7 @@ version = "0.5"
 
 [dependencies.rand]
 optional = true
-version = "^0.4"
+version = "^0.5"
 
 [dependencies.sodiumoxide]
 default-features = false
@@ -92,10 +89,8 @@ optional = true
 version = "~0.1"
 
 [dependencies.tokio-tungstenite]
-optional = true
 git = "https://github.com/snapview/tokio-tungstenite"
-rev = "97407110837da01a4234f4370e2a1b74b1c58154"
-#version = "~0.5"
+optional = true
 
 [dependencies.tungstenite]
 optional = true
@@ -109,15 +104,15 @@ default = [
     "builder",
     "client",
     "gateway",
-    "http",
+    "http-client",
     "utils",
 ]
 builder = ["utils"]
-client = ["gateway", "http_base"]
+client = ["gateway", "http"]
 extras = []
 framework = ["client", "utils"]
-gateway = ["flate2", "http_base", "parking_lot", "tokio-tungstenite", "tungstenite", "utils"]
-http_base = ["builder", "http", "hyper", "hyper-multipart-rfc7578", "hyper-tls", "mime", "native-tls", "utils"]
+gateway = ["flate2", "http", "parking_lot", "tokio-tungstenite", "tungstenite", "utils"]
+http-client = ["builder", "http", "hyper", "hyper-multipart-rfc7578", "hyper-tls", "mime", "native-tls", "utils"]
 standard_framework = ["framework"]
 utils = ["base64"]
 voice = ["bytes", "byteorder", "gateway", "opus", "parking_lot", "rand", "sodiumoxide", "tokio-codec"]

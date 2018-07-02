@@ -2,10 +2,6 @@ use futures::{
     future::SharedError,
     Canceled,
 };
-use http_lib::{
-    uri::InvalidUri as UriError,
-    Error as HttpCrateError,
-};
 use internal::prelude::*;
 use model::ModelError;
 use serde_json::Error as JsonError;
@@ -21,17 +17,22 @@ use std::{
 #[cfg(feature = "tungstenite")]
 use future_utils::mpsc::SendError;
 #[cfg(feature = "hyper")]
-use hyper::Error as HyperError;
+use hyper::{
+    Error as HyperError,
+    header::InvalidHeaderValue,
+};
+#[cfg(feature = "http-client")]
+use http::HttpError as HttpClientError;
+#[cfg(feature = "http")]
+use http_crate::Error as HttpError;
 #[cfg(feature = "native-tls")]
 use native_tls::Error as TlsError;
-#[cfg(feature = "voice")]
+#[cfg(feature = "opus")]
 use opus::Error as OpusError;
 #[cfg(feature = "tungstenite")]
 use tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage};
 #[cfg(feature = "client")]
 use client::ClientError;
-#[cfg(feature = "http")]
-use http::HttpError;
 #[cfg(feature = "voice")]
 use voice::VoiceError;
 
@@ -72,8 +73,6 @@ pub enum Error {
     /// An error while trying to send over a future-compatible
     /// MPSC.
     FutureMpsc(&'static str),
-    /// A `hyper` error relating to Http.
-    HttpCrate(HttpCrateError),
     /// An `std::io` error.
     Io(IoError),
     /// An error from the `serde_json` crate.
@@ -96,8 +95,6 @@ pub enum Error {
     ///
     /// [`Error::Decode`]: #variant.Decode
     Other(&'static str),
-    /// A `hyper` error while parsing a Uri.
-    Uri(UriError),
     /// An error from the `url` crate.
     Url(String),
     /// A [client] error.
@@ -108,11 +105,16 @@ pub enum Error {
     /// An error from the [`http`] module.
     ///
     /// [`http`]: http/index.html
+    #[cfg(feature = "http-client")]
+    Http(HttpClientError),
+    /// An error from the `http` crate.
     #[cfg(feature = "http")]
-    Http(HttpError),
+    HttpCrate(HttpError),
     /// An error from the `hyper` crate.
     #[cfg(feature = "hyper")]
     Hyper(HyperError),
+    /// An error with a hyper header value.
+    InvalidHeaderValue(InvalidHeaderValue),
     /// An error from the `native-tls` crate.
     #[cfg(feature = "native-tls")]
     Tls(TlsError),
@@ -125,7 +127,7 @@ pub enum Error {
     #[cfg(feature = "tungstenite")]
     Tungstenite(TungsteniteError),
     /// An error from the `opus` crate.
-    #[cfg(feature = "voice")]
+    #[cfg(feature = "opus")]
     Opus(OpusError),
     /// Indicating an error within the [voice module].
     ///
@@ -150,19 +152,24 @@ impl From<FormatError> for Error {
     fn from(e: FormatError) -> Error { Error::Format(e) }
 }
 
-#[cfg(feature = "http")]
-impl From<HttpError> for Error {
-    fn from(e: HttpError) -> Error { Error::Http(e) }
+#[cfg(feature = "http-client")]
+impl From<HttpClientError> for Error {
+    fn from(e: HttpClientError) -> Error { Error::Http(e) }
 }
 
 #[cfg(feature = "http")]
-impl From<HttpCrateError> for Error {
-    fn from(e: HttpCrateError) -> Error { Error::HttpCrate(e) }
+impl From<HttpError> for Error {
+    fn from(e: HttpError) -> Error { Error::HttpCrate(e) }
 }
 
 #[cfg(feature = "hyper")]
 impl From<HyperError> for Error {
     fn from(e: HyperError) -> Error { Error::Hyper(e) }
+}
+
+#[cfg(feature = "hyper")]
+impl From<InvalidHeaderValue> for Error {
+    fn from(e: InvalidHeaderValue) -> Error { Error::InvalidHeaderValue(e) }
 }
 
 impl From<IoError> for Error {
@@ -216,10 +223,6 @@ impl From<TungsteniteError> for Error {
     }
 }
 
-impl From<UriError> for Error {
-    fn from(e: UriError) -> Error { Error::Uri(e) }
-}
-
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.write_str(self.description())
@@ -236,19 +239,19 @@ impl StdError for Error {
             Error::ExceededLimit(..) => "Input exceeded a limit",
             Error::Format(ref inner) => inner.description(),
             Error::FutureMpsc(ref inner) => inner,
+            Error::InvalidHeaderValue(ref inner) => inner.description(),
             Error::Io(ref inner) => inner.description(),
             Error::Json(ref inner) => inner.description(),
             Error::Model(ref inner) => inner.description(),
             Error::Num(ref inner) => inner.description(),
             Error::SplitWebSocketSend(ref inner) => inner.description(),
             Error::Url(ref inner) => inner,
-            Error::Uri(ref inner) => inner.description(),
             #[cfg(feature = "client")]
             Error::Client(ref inner) => inner.description(),
-            #[cfg(feature = "http_base")]
-            Error::Http(ref inner) => inner.description(),
             #[cfg(feature = "http")]
             Error::HttpCrate(ref inner) => inner.description(),
+            #[cfg(feature = "http-client")]
+            Error::Http(ref inner) => inner.description(),
             #[cfg(feature = "hyper")]
             Error::Hyper(ref inner) => inner.description(),
             #[cfg(feature = "voice")]

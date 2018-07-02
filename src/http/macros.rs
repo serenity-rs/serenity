@@ -2,7 +2,7 @@ macro_rules! try_uri {
     ($url:expr) => {{
         match ::hyper::Uri::from_str($url) {
             Ok(v) => v,
-            Err(why) => return Box::new(::futures::future::err(::Error::Uri(why))),
+            Err(why) => return Box::new(::futures::future::err($crate::Error::Http($crate::http::HttpError::InvalidUri(why)))),
         }
     }};
 }

@@ -43,7 +43,6 @@
 use chrono::{DateTime, Utc};
 use futures::sync::oneshot::{self, Receiver, Sender};
 use futures::{future::{self, Either}, Future};
-
 use hyper::{
     header::HeaderMap,
     Response,
@@ -287,8 +286,9 @@ impl RateLimiter {
         }
     }
 
-    pub fn handle<'a, T>(&'a mut self, route: &'a Path, response: &'a Response<T>)
-        -> Result<Option<impl Future<Item = (), Error = ()>>> {
+    pub fn handle<'a, T>(&'a mut self, route: &'a Path, response: &'a Response<Vec<u8>>)
+        -> Result<Option<impl Future<Item = (), Error = ()>>>
+    {
         let mut routes = self.routes.borrow_mut();
         let bucket = routes.entry(*route).or_insert_with(Default::default);
 
