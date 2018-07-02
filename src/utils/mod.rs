@@ -92,10 +92,12 @@ pub fn vecmap_to_json_map<K: PartialEq + ToString>(map: VecMap<K, Value>) -> Map
 /// assert!(!utils::is_nsfw("nsfwstuff"));
 /// ```
 pub fn is_nsfw(name: &str) -> bool {
-    if name.len() == 4 {
-        &name[..4] == "nsfw"
-    } else if name.len() > 4 {
-        &name[..5] == "nsfw-"
+    let char_count = name.chars().count();
+
+    if char_count == 4 {
+        name == "nsfw"
+    } else if char_count > 4 {
+        name.starts_with("nsfw-")
     } else {
         false
     }
