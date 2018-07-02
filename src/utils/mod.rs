@@ -96,7 +96,7 @@ pub fn is_nsfw(name: &str) -> bool {
 
     if char_count == 4 {
         name == "nsfw"
-    } else if char_count > 4 {
+    } else if char_count > 5 {
         name.starts_with("nsfw-")
     } else {
         false
