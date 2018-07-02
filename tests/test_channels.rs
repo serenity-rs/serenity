@@ -65,7 +65,7 @@ mod utils {
 
         channel.kind = ChannelType::Text;
         channel.name = "nsfw-".to_string();
-        assert!(channel.is_nsfw());
+        assert!(!channel.is_nsfw());
 
         channel.name = "nsfw".to_string();
         assert!(channel.is_nsfw());
