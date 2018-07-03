@@ -56,7 +56,7 @@ use std::{
 
 mod cache_update;
 
-pub(crate) use self::cache_update::*;
+pub use self::cache_update::CacheUpdate;
 
 /// A cache of all events received over a [`Shard`], where storing at least
 /// some data from the event is possible.
@@ -627,8 +627,18 @@ impl Cache {
         self.categories.get(&channel_id.into()).cloned()
     }
 
-    #[cfg(feature = "client")]
-    pub(crate) fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
+    /// Updates the cache with the update implementation for an event or other
+    /// custom update implementation.
+    ///
+    /// Refer to the documentation for [`CacheUpdate`] for more information.
+    ///
+    /// # Examples
+    ///
+    /// Refer to the [`CacheUpdate` examples].
+    ///
+    /// [`CacheUpdate`]: trait.CacheUpdate.html
+    /// [`CacheUpdate` examples]: trait.CacheUpdate.html#examples
+    pub fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
         e.update(self)
     }
 
