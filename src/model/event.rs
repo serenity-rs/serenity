@@ -153,6 +153,9 @@ impl CacheUpdate for ChannelDeleteEvent {
             Channel::Private(_) | Channel::Group(_) => unreachable!(),
         };
 
+        // Remove the cached messages for the channel.
+        cache.messages.remove(&self.channel.id());
+
         None
     }
 }
@@ -400,7 +403,11 @@ impl CacheUpdate for GuildDeleteEvent {
         // Remove channel entries for the guild if the guild is found.
         cache.guilds.remove(&self.guild.id).map(|guild| {
             for channel_id in guild.write().channels.keys() {
+                // Remove the channel from the cache.
                 cache.channels.remove(channel_id);
+
+                // Remove the channel's cached messages.
+                cache.messages.remove(channel_id);
             }
 
             guild
@@ -757,6 +764,40 @@ impl Serialize for GuildUpdateEvent {
 #[derive(Clone, Debug)]
 pub struct MessageCreateEvent {
     pub message: Message,
+}
+
+#[cfg(feature = "cache")]
+impl CacheUpdate for MessageCreateEvent {
+    /// The oldest message, if the channel's message cache was already full.
+    type Output = Message;
+
+    fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
+        let max = cache.settings().max_messages;
+
+        if max == 0 {
+            return None;
+        }
+
+        let messages = cache.messages
+            .entry(self.message.channel_id)
+            .or_insert_with(Default::default);
+        let queue = cache.message_queue
+            .entry(self.message.channel_id)
+            .or_insert_with(Default::default);
+
+        let mut removed_msg = None;
+
+        if messages.len() == max {
+            if let Some(id) = queue.pop_front() {
+                removed_msg = messages.remove(&id);
+            }
+        }
+
+        queue.push_back(self.message.id);
+        messages.insert(self.message.id, self.message.clone());
+
+        removed_msg
+    }
 }
 
 impl<'de> Deserialize<'de> for MessageCreateEvent {
