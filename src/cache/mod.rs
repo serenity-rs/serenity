@@ -163,6 +163,12 @@ pub struct Cache {
 }
 
 impl Cache {
+    /// Creates a new cache.
+    #[inline]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Fetches the number of [`Member`]s that have not had data received.
     ///
     /// The important detail to note here is that this is the number of
