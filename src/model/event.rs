@@ -846,6 +846,46 @@ pub struct MessageUpdateEvent {
     pub embeds: Option<Vec<Value>>,
 }
 
+#[cfg(feature = "cache")]
+impl CacheUpdate for MessageUpdateEvent {
+    type Output = ();
+
+    fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
+        let messages = cache.messages.get_mut(&self.channel_id)?;
+        let message = messages.get_mut(&self.id)?;
+
+        if let Some(attachments) = self.attachments.clone() {
+            message.attachments = attachments;
+        }
+
+        if let Some(content) = self.content.clone() {
+            message.content = content;
+        }
+
+        if let Some(edited_timestamp) = self.edited_timestamp.clone() {
+            message.edited_timestamp = Some(edited_timestamp);
+        }
+
+        if let Some(mentions) = self.mentions.clone() {
+            message.mentions = mentions;
+        }
+
+        if let Some(mention_everyone) = self.mention_everyone {
+            message.mention_everyone = mention_everyone;
+        }
+
+        if let Some(mention_roles) = self.mention_roles.clone() {
+            message.mention_roles = mention_roles;
+        }
+
+        if let Some(pinned) = self.pinned {
+            message.pinned = pinned;
+        }
+
+        None
+    }
+}
+
 #[derive(Clone, Debug, Serialize)]
 pub struct PresenceUpdateEvent {
     pub guild_id: Option<GuildId>,
