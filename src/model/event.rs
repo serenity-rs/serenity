@@ -759,6 +759,39 @@ pub struct MessageCreateEvent {
     pub message: Message,
 }
 
+#[cfg(feature = "cache")]
+impl CacheUpdate for MessageCreateEvent {
+    type Output = Message;
+
+    fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
+        let max = cache.settings().max_messages;
+
+        if max == 0 {
+            return None;
+        }
+
+        let messages = cache.messages
+            .entry(self.message.channel_id)
+            .or_insert_with(Default::default);
+        let queue = cache.message_queue
+            .entry(self.message.channel_id)
+            .or_insert_with(Default::default);
+
+        let mut removed_msg = None;
+
+        if messages.len() == max {
+            if let Some(id) = queue.pop_front() {
+                removed_msg = messages.remove(&id);
+            }
+        }
+
+        queue.push_back(self.message.id);
+        messages.insert(self.message.id, self.message.clone());
+
+        removed_msg
+    }
+}
+
 impl<'de> Deserialize<'de> for MessageCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
@@ -803,6 +836,46 @@ pub struct MessageUpdateEvent {
     pub mention_roles: Option<Vec<RoleId>>,
     pub attachments: Option<Vec<Attachment>>,
     pub embeds: Option<Vec<Value>>,
+}
+
+#[cfg(feature = "cache")]
+impl CacheUpdate for MessageUpdateEvent {
+    type Output = ();
+
+    fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
+        let messages = cache.messages.get_mut(&self.channel_id)?;
+        let message = messages.get_mut(&self.id)?;
+
+        if let Some(attachments) = self.attachments.clone() {
+            message.attachments = attachments;
+        }
+
+        if let Some(content) = self.content.clone() {
+            message.content = content;
+        }
+
+        if let Some(edited_timestamp) = self.edited_timestamp.clone() {
+            message.edited_timestamp = Some(edited_timestamp);
+        }
+
+        if let Some(mentions) = self.mentions.clone() {
+            message.mentions = mentions;
+        }
+
+        if let Some(mention_everyone) = self.mention_everyone {
+            message.mention_everyone = mention_everyone;
+        }
+
+        if let Some(mention_roles) = self.mention_roles.clone() {
+            message.mention_roles = mention_roles;
+        }
+
+        if let Some(pinned) = self.pinned {
+            message.pinned = pinned;
+        }
+
+        None
+    }
 }
 
 #[derive(Clone, Debug, Serialize)]
