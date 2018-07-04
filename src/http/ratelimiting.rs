@@ -56,20 +56,9 @@ use std::{
 };
 use super::{HttpError, LightMethod};
 
-/// The calculated offset of the time difference between Discord and the client
-/// in seconds.
+/// Refer to [`offset`].
 ///
-/// This does not have millisecond precision as calculating that isn't
-/// realistic.
-///
-/// This is used in ratelimiting to help determine how long to wait for
-/// pre-emptive ratelimits. For example, if the client is 2 seconds ahead, then
-/// the client would think the ratelimit is over 2 seconds before it actually is
-/// and would then send off queued requests. Using an offset, we can know that
-/// there's actually still 2 seconds left (+/- some milliseconds).
-///
-/// This isn't a definitive solution to fix all problems, but it can help with
-/// some precision gains.
+/// [`offset`]: fn.offset.html
 static mut OFFSET: Option<i64> = None;
 
 lazy_static! {
@@ -538,6 +527,27 @@ impl RateLimit {
             false
         })
     }
+}
+
+/// The calculated offset of the time difference between Discord and the client
+/// in seconds.
+///
+/// This does not have millisecond precision as calculating that isn't
+/// realistic.
+///
+/// This is used in ratelimiting to help determine how long to wait for
+/// pre-emptive ratelimits. For example, if the client is 2 seconds ahead, then
+/// the client would think the ratelimit is over 2 seconds before it actually is
+/// and would then send off queued requests. Using an offset, we can know that
+/// there's actually still 2 seconds left (+/- some milliseconds).
+///
+/// This isn't a definitive solution to fix all problems, but it can help with
+/// some precision gains.
+///
+/// This will return `None` if an HTTP request hasn't been made, meaning that
+/// no offset could have been calculated.
+pub fn offset() -> Option<i64> {
+    unsafe { OFFSET }
 }
 
 fn calculate_offset(header: Option<&[Vec<u8>]>) {
