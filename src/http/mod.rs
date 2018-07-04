@@ -1233,41 +1233,31 @@ impl Client {
         })
     }
 
-    // /// Gets the current unresolved incidents from Discord's Status API.
-    // ///
-    // /// Does not require authentication.
-    // pub fn get_unresolved_incidents(&self) -> impl Future<Item = Vec<Incident>, Error = Error> {
-    //     let client = request_client!();
+    /// Gets the current unresolved incidents from Discord's Status API.
+    ///
+    /// Does not require authentication.
+    pub fn get_unresolved_incidents(&self) -> impl Future<Item = Vec<Incident>, Error = Error> {
+        self.get::<HashMap<String, Value>>(Route::GetUnresolvedIncidents)
+            .and_then(|mut map| {
+                match map.remove("incidents") {
+                    Some(v) => serde_json::from_value(v).map_err(From::from),
+                    None => Ok(vec![]),
+                }
+            })
+    }
 
-    //     let response = retry(|| client.get(status!("/incidents/unresolved.json")))?;
-
-    //     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
-
-    //     match map.remove("incidents") {
-    //         Some(v) => serde_json::from_value::<Vec<Incident>>(v)
-    //             .map_err(From::from),
-    //         None => Ok(vec![]),
-    //     }
-    // }
-
-    // /// Gets the upcoming (planned) maintenances from Discord's Status API.
-    // ///
-    // /// Does not require authentication.
-    // pub fn get_upcoming_maintenances(&self) -> impl Future<Item = Vec<Maintenance>, Error = Error> {
-    //     let client = request_client!();
-
-    //     let response = retry(|| {
-    //         client.get(status!("/scheduled-maintenances/upcoming.json"))
-    //     })?;
-
-    //     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
-
-    //     match map.remove("scheduled_maintenances") {
-    //         Some(v) => serde_json::from_value::<Vec<Maintenance>>(v)
-    //             .map_err(From::from),
-    //         None => Ok(vec![]),
-    //     }
-    // }
+    /// Gets the upcoming (planned) maintenances from Discord's Status API.
+    ///
+    /// Does not require authentication.
+    pub fn get_upcoming_maintenances(&self) -> impl Future<Item = Vec<Maintenance>, Error = Error> {
+        self.get::<HashMap<String, Value>>(Route::StatusMaintenancesUpcoming)
+            .and_then(|mut map| {
+                match map.remove("scheduled_maintenances") {
+                    Some(v) => serde_json::from_value(v).map_err(From::from),
+                    None => Ok(vec![]),
+                }
+            })
+    }
 
     /// Gets a user by Id.
     pub fn get_user(&self, user_id: u64) -> impl Future<Item = User, Error = Error> {
