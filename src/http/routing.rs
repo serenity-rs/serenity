@@ -241,7 +241,12 @@ pub enum Path {
     GuildsIdWebhooks(u64),
     /// Route for the `/invites/:code` path.
     InvitesCode,
+    /// Route for the `/incidents/unresolved.json` status API path.
+    StatusIncidentsUnresolved,
+    /// Route for the `/scheduled-maintenances/active.json` status API path.
     StatusMaintenancesActive,
+    /// Route for the `/scheduled-maintenances/upcoming.json` status API path.
+    StatusMaintenancesUpcoming,
     /// Route for the `/users/:user_id` path.
     UsersId,
     /// Route for the `/users/@me` path.
@@ -645,7 +650,9 @@ impl Path {
             GuildsIdVanityUrl(_) => "/guilds/{}/vanity-url",
             GuildsIdWebhooks(_) => "/guilds/{}/webhooks",
             InvitesCode => "/invites/{}",
+            StatusIncidentsUnresolved => "/incidents/unresolved.json",
             StatusMaintenancesActive => "/scheduled-maintenances/active.json",
+            StatusMaintenancesUpcoming => "/scheduled-maintenances/upcoming.json",
             UsersId => "/users/{}",
             UsersMe => "/users/@me",
             UsersMeChannels => "/users/@me/channels",
@@ -949,6 +956,9 @@ pub enum Route<'a> {
         guild_id: u64,
         integration_id: u64,
     },
+    StatusIncidentsUnresolved,
+    StatusMaintenancesActive,
+    StatusMaintenancesUpcoming,
     UnpinMessage {
         channel_id: u64,
         message_id: u64,
@@ -1418,6 +1428,21 @@ impl<'a> Route<'a> {
                     guild_id,
                     integration_id,
                 )),
+            ),
+            Route::StatusIncidentsUnresolved => (
+                LightMethod::Get,
+                Path::StatusIncidentsUnresolved,
+                Cow::from(Path::status_incidents_unresolved()),
+            ),
+            Route::StatusMaintenancesActive => (
+                LightMethod::Get,
+                Path::StatusMaintenancesActive,
+                Cow::from(Path::status_maintenances_active()),
+            ),
+            Route::StatusMaintenancesUpcoming => (
+                LightMethod::Get,
+                Path::StatusMaintenancesUpcoming,
+                Cow::from(Path::status_maintenances_upcoming()),
             ),
             Route::UnpinMessage { channel_id, message_id } => (
                 LightMethod::Delete,
