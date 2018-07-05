@@ -520,7 +520,12 @@ impl GuildChannel {
     /// [Attach Files]: permissions/constant.ATTACH_FILES.html
     /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
     #[cfg(feature = "cache")]
+    #[inline]
     pub fn permissions_for<U: Into<UserId>>(&self, user_id: U) -> Result<Permissions> {
+        self._permissions_for(user_id.into())
+    }
+
+    fn _permissions_for(&self, user_id: UserId) -> Result<Permissions> {
         self.guild()
             .ok_or_else(|| Error::Model(ModelError::GuildNotFound))
             .map(|g| g.read().permissions_in(self.id, user_id))

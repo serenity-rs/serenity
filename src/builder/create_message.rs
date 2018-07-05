@@ -46,8 +46,13 @@ impl CreateMessage {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    pub fn content<D: Display>(mut self, content: D) -> Self {
-        self.0.insert("content", Value::String(content.to_string()));
+    #[inline]
+    pub fn content<D: Display>(self, content: D) -> Self {
+        self._content(content.to_string())
+    }
+
+    fn _content(mut self, content: String) -> Self {
+        self.0.insert("content", Value::String(content));
 
         self
     }
@@ -75,8 +80,13 @@ impl CreateMessage {
     }
 
     /// Adds a list of reactions to create after the message's sent.
-    pub fn reactions<R: Into<ReactionType>, It: IntoIterator<Item=R>>(mut self, reactions: It) -> Self {
-        self.1 = Some(reactions.into_iter().map(|r| r.into()).collect());
+    #[inline]
+    pub fn reactions<R: Into<ReactionType>, It: IntoIterator<Item=R>>(self, reactions: It) -> Self {
+        self._reactions(reactions.into_iter().map(Into::into).collect())
+    }
+
+    fn _reactions(mut self, reactions: Vec<ReactionType>) -> Self {
+        self.1 = Some(reactions);
 
         self
     }

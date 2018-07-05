@@ -32,7 +32,7 @@ pub struct Message {
     pub channel_id: ChannelId,
     /// The Id of the [`Guild`] that the message was sent in. This value will
     /// only be present if this message was received over the gateway.
-    /// 
+    ///
     /// [`Guild`]: ../guild/struct.Guild.html
     pub guild_id: Option<GuildId>,
     /// The content of the message.
@@ -434,7 +434,12 @@ impl Message {
     /// [`Emoji`]: struct.Emoji.html
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     /// [permissions]: permissions
+    #[inline]
     pub fn react<R: Into<ReactionType>>(&self, reaction_type: R) -> Result<()> {
+        self._react(&reaction_type.into())
+    }
+
+    fn _react(&self, reaction_type: &ReactionType) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::ADD_REACTIONS;
@@ -444,7 +449,7 @@ impl Message {
             }
         }
 
-        http::create_reaction(self.channel_id.0, self.id.0, &reaction_type.into())
+        http::create_reaction(self.channel_id.0, self.id.0, reaction_type)
     }
 
     /// Replies to the user, mentioning them prior to the content in the form
@@ -498,9 +503,13 @@ impl Message {
     /// Checks whether the message mentions passed [`UserId`].
     ///
     /// [`UserId`]: ../../model/id/struct.UserId.html
+    #[inline]
     pub fn mentions_user_id<I: Into<UserId>>(&self, id: I) -> bool {
-        let user_id_to_find = id.into();
-        self.mentions.iter().any(|mentioned_user| mentioned_user.id.0 == user_id_to_find.0)
+        self._mentions_user_id(id.into())
+    }
+
+    fn _mentions_user_id(&self, id: UserId) -> bool {
+        self.mentions.iter().any(|mentioned_user| mentioned_user.id.0 == id.0)
     }
 
     /// Checks whether the message mentions passed [`User`].

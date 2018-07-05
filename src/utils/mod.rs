@@ -348,9 +348,12 @@ pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
 /// ```
 ///
 /// [`EditProfile::avatar`]: ../builder/struct.EditProfile.html#method.avatar
+#[inline]
 pub fn read_image<P: AsRef<Path>>(path: P) -> Result<String> {
-    let path = path.as_ref();
+    _read_image(path.as_ref())
+}
 
+fn _read_image(path: &Path) -> Result<String> {
     let mut v = Vec::default();
     let mut f = File::open(path)?;
     let _ = f.read_to_end(&mut v);

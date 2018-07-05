@@ -80,13 +80,16 @@ impl EditChannel {
     ///
     /// [text]: ../model/channel/enum.ChannelType.html#variant.Text
     /// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice
-    pub fn category<C>(mut self, category: C) -> Self
-        where C: Into<Option<ChannelId>> {
-        let parent_id = match category.into() {
+    #[inline]
+    pub fn category<C: Into<Option<ChannelId>>>(self, category: C) -> Self {
+        self._category(category.into())
+    }
+
+    fn _category(mut self, category: Option<ChannelId>) -> Self {
+        self.0.insert("parent_id", match category {
             Some(c) => Value::Number(Number::from(c.0)),
             None => Value::Null
-        };
-        self.0.insert("parent_id", parent_id);
+        });
 
         self
     }

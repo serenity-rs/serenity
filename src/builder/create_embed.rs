@@ -65,14 +65,20 @@ impl CreateEmbed {
     /// [`colour`]: #method.colour
     #[cfg(feature = "utils")]
     #[inline]
-    pub fn color<C: Into<Colour>>(self, colour: C) -> Self { self.colour(colour.into()) }
+    pub fn color<C: Into<Colour>>(self, colour: C) -> Self { self.colour(colour) }
 
     /// Set the colour of the left-hand side of the embed.
     #[cfg(feature = "utils")]
-    pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
+    #[inline]
+    pub fn colour<C: Into<Colour>>(self, colour: C) -> Self {
+        self._colour(colour.into())
+    }
+
+    #[cfg(feature = "utils")]
+    fn _colour(mut self, colour: Colour) -> Self {
         self.0.insert(
             "color",
-            Value::Number(Number::from(u64::from(colour.into().0))),
+            Value::Number(Number::from(u64::from(colour.0))),
         );
 
         self
@@ -99,10 +105,15 @@ impl CreateEmbed {
     /// Set the description of the embed.
     ///
     /// **Note**: This can't be longer than 2048 characters.
-    pub fn description<D: Display>(mut self, description: D) -> Self {
+    #[inline]
+    pub fn description<D: Display>(self, description: D) -> Self {
+        self._description(description.to_string())
+    }
+
+    fn _description(mut self, description: String) -> Self {
         self.0.insert(
             "description",
-            Value::String(description.to_string()),
+            Value::String(description),
         );
 
         self
@@ -113,8 +124,13 @@ impl CreateEmbed {
     ///
     /// **Note**: Maximum amount of characters you can put is 256 in a field
     /// name and 1024 in a field value.
-    pub fn field<T, U>(mut self, name: T, value: U, inline: bool) -> Self
+    #[inline]
+    pub fn field<T, U>(self, name: T, value: U, inline: bool) -> Self
         where T: Display, U: Display {
+        self._field(name.to_string(), value.to_string(), inline)
+    }
+
+    fn _field(mut self, name: String, value: String, inline: bool) -> Self {
         {
             let entry = self.0
                 .entry("fields")
@@ -123,8 +139,8 @@ impl CreateEmbed {
             if let Value::Array(ref mut inner) = *entry {
                 inner.push(json!({
                     "inline": inline,
-                    "name": name.to_string(),
-                    "value": value.to_string(),
+                    "name": name,
+                    "value": value,
                 }));
             }
         }
@@ -177,13 +193,21 @@ impl CreateEmbed {
     /// Set the image associated with the embed. This only supports HTTP(S).
     #[inline]
     pub fn image<S: AsRef<str>>(self, url: S) -> Self {
-        self.url_object("image", url.as_ref())
+        self._image(url.as_ref())
+    }
+
+    fn _image(self, url: &str) -> Self {
+        self.url_object("image", url)
     }
 
     /// Set the thumbnail of the embed. This only supports HTTP(S).
     #[inline]
     pub fn thumbnail<S: AsRef<str>>(self, url: S) -> Self {
-        self.url_object("thumbnail", url.as_ref())
+        self._thumbnail(url.as_ref())
+    }
+
+    fn _thumbnail(self, url: &str) -> Self {
+        self.url_object("thumbnail", url)
     }
 
     /// Set the timestamp.
@@ -272,25 +296,37 @@ impl CreateEmbed {
     ///
     /// client.start().unwrap();
     /// ```
-    pub fn timestamp<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
-        self.0
-            .insert("timestamp", Value::String(timestamp.into().ts));
+    #[inline]
+    pub fn timestamp<T: Into<Timestamp>>(self, timestamp: T) -> Self {
+        self._timestamp(timestamp.into())
+    }
+
+    fn _timestamp(mut self, timestamp: Timestamp) -> Self {
+        self.0.insert("timestamp", Value::String(timestamp.ts));
 
         self
     }
 
     /// Set the title of the embed.
-    pub fn title<D: Display>(mut self, title: D) -> Self {
-        self.0
-            .insert("title", Value::String(title.to_string()));
+    #[inline]
+    pub fn title<D: Display>(self, title: D) -> Self {
+        self._title(title.to_string())
+    }
+
+    fn _title(mut self, title: String) -> Self {
+        self.0.insert("title", Value::String(title));
 
         self
     }
 
     /// Set the URL to direct to when clicking on the title.
-    pub fn url<S: AsRef<str>>(mut self, url: S) -> Self {
-        self.0
-            .insert("url", Value::String(url.as_ref().to_string()));
+    #[inline]
+    pub fn url<S: AsRef<str>>(self, url: S) -> Self {
+        self._url(url.as_ref())
+    }
+
+    fn _url(mut self, url: &str) -> Self {
+        self.0.insert("url", Value::String(url.to_string()));
 
         self
     }
@@ -301,8 +337,13 @@ impl CreateEmbed {
     /// with the provided filename. Or else this won't work.
     ///
     /// [`ChannelId::send_files`]: ../model/id/struct.ChannelId.html#send_files
+    #[inline]
     pub fn attachment<S: AsRef<str>>(self, filename: S) -> Self {
-        self.image(&format!("attachment://{}", filename.as_ref()))
+        self._attachment(filename.as_ref())
+    }
+
+    fn _attachment(self, filename: &str) -> Self {
+        self.image(&format!("attachment://{}", filename))
     }
 }
 

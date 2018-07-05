@@ -320,9 +320,12 @@ impl Cache {
     /// [`private_channel`]: #method.private_channel
     /// [`groups`]: #structfield.groups
     /// [`private_channels`]: #structfield.private_channels
+    #[inline]
     pub fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
-        let id = id.into();
+        self._channel(id.into())
+    }
 
+    fn _channel(&self, id: ChannelId) -> Option<Channel> {
         if let Some(channel) = self.channels.get(&id) {
             return Some(Channel::Guild(Arc::clone(channel)));
         }
@@ -367,7 +370,11 @@ impl Cache {
     /// ```
     #[inline]
     pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<Arc<RwLock<Guild>>> {
-        self.guilds.get(&id.into()).cloned()
+        self._guild(id.into())
+    }
+
+    fn _guild(&self, id: GuildId) -> Option<Arc<RwLock<Guild>>> {
+        self.guilds.get(&id).cloned()
     }
 
     /// Retrieves a reference to a [`Guild`]'s channel. Unlike [`channel`],
@@ -424,7 +431,11 @@ impl Cache {
     /// [`channel`]: #method.channel
     #[inline]
     pub fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<GuildChannel>>> {
-        self.channels.get(&id.into()).cloned()
+        self._guild_channel(id.into())
+    }
+
+    fn _guild_channel(&self, id: ChannelId) -> Option<Arc<RwLock<GuildChannel>>> {
+        self.channels.get(&id).cloned()
     }
 
     /// Retrieves a reference to a [`Group`] from the cache based on the given
@@ -458,7 +469,11 @@ impl Cache {
     /// ```
     #[inline]
     pub fn group<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<Group>>> {
-        self.groups.get(&id.into()).cloned()
+        self._group(id.into())
+    }
+
+    fn _group(&self, id: ChannelId) -> Option<Arc<RwLock<Group>>> {
+        self.groups.get(&id).cloned()
     }
 
     /// Retrieves a [`Guild`]'s member from the cache based on the guild's and
@@ -506,10 +521,15 @@ impl Cache {
     /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [`members`]: ../model/guild/struct.Guild.html#structfield.members
+    #[inline]
     pub fn member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
         where G: Into<GuildId>, U: Into<UserId> {
-        self.guilds.get(&guild_id.into()).and_then(|guild| {
-            guild.read().members.get(&user_id.into()).cloned()
+        self._member(guild_id.into(), user_id.into())
+    }
+
+    fn _member(&self, guild_id: GuildId, user_id: UserId) -> Option<Member> {
+        self.guilds.get(&guild_id).and_then(|guild| {
+            guild.read().members.get(&user_id).cloned()
         })
     }
 
@@ -549,7 +569,11 @@ impl Cache {
     pub fn private_channel<C: Into<ChannelId>>(&self,
                                                channel_id: C)
                                                -> Option<Arc<RwLock<PrivateChannel>>> {
-        self.private_channels.get(&channel_id.into()).cloned()
+        self._private_channel(channel_id.into())
+    }
+
+    fn _private_channel(&self, channel_id: ChannelId) -> Option<Arc<RwLock<PrivateChannel>>> {
+        self.private_channels.get(&channel_id).cloned()
     }
 
     /// Retrieves a [`Guild`]'s role by their Ids.
@@ -580,11 +604,16 @@ impl Cache {
     /// #   try_main().unwrap();
     /// # }
     /// ```
+    #[inline]
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
         where G: Into<GuildId>, R: Into<RoleId> {
+        self._role(guild_id.into(), role_id.into())
+    }
+
+    fn _role(&self, guild_id: GuildId, role_id: RoleId) -> Option<Role> {
         self.guilds
-            .get(&guild_id.into())
-            .and_then(|g| g.read().roles.get(&role_id.into()).cloned())
+            .get(&guild_id)
+            .and_then(|g| g.read().roles.get(&role_id).cloned())
     }
 
     /// Retrieves a `User` from the cache's [`users`] map, if it exists.
@@ -617,14 +646,22 @@ impl Cache {
     /// ```
     #[inline]
     pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<Arc<RwLock<User>>> {
-        self.users.get(&user_id.into()).cloned()
+        self._user(user_id.into())
+    }
+
+    fn _user(&self, user_id: UserId) -> Option<Arc<RwLock<User>>> {
+        self.users.get(&user_id).cloned()
     }
 
     #[inline]
     pub fn categories<C: Into<ChannelId>>(&self,
                                           channel_id: C)
                                           -> Option<Arc<RwLock<ChannelCategory>>> {
-        self.categories.get(&channel_id.into()).cloned()
+        self._categories(channel_id.into())
+    }
+
+    fn _categories(&self, channel_id: ChannelId) -> Option<Arc<RwLock<ChannelCategory>>> {
+        self.categories.get(&channel_id).cloned()
     }
 
     #[cfg(feature = "client")]

@@ -134,9 +134,13 @@ impl EmbedField {
     /// [`value`]: #structfield.value
     pub fn new<T, U>(name: T, value: U, inline: bool) -> Self
         where T: Into<String>, U: Into<String> {
+        Self::_new(name.into(), value.into(), inline)
+    }
+
+    fn _new(name: String, value: String, inline: bool) -> Self {
         Self {
-            name: name.into(),
-            value: value.into(),
+            name: name,
+            value: value,
             inline,
         }
     }
