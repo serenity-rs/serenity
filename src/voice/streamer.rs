@@ -100,8 +100,10 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
 
 /// Opens an audio file through `ffmpeg` and creates an audio source.
 pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Box<AudioSource>> {
-    let path = path.as_ref();
+    _ffmpeg(path.as_ref())
+}
 
+fn _ffmpeg(path: &OsStr) -> Result<Box<AudioSource>> {
     // Will fail if the path is not to a file on the fs. Likely a YouTube URI.
     let is_stereo = is_stereo(path).unwrap_or(false);
     let stereo_val = if is_stereo { "2" } else { "1" };
@@ -133,7 +135,11 @@ pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Box<AudioSource>> {
 /// Creates a streamed audio source from a DCA file.
 /// Currently only accepts the DCA1 format.
 pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Box<AudioSource>, DcaError> {
-    let file = File::open(path.as_ref()).map_err(DcaError::IoError)?;
+    _dca(path.as_ref())
+}
+
+fn _dca(path: &OsStr) -> StdResult<Box<AudioSource>, DcaError> {
+    let file = File::open(path).map_err(DcaError::IoError)?;
 
     let mut reader = BufReader::new(file);
 

@@ -55,24 +55,39 @@ pub struct GetMessages(pub VecMap<&'static str, u64>);
 impl GetMessages {
     /// Indicates to retrieve the messages after a specific message, given by
     /// its Id.
-    pub fn after<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("after", message_id.into().0);
+    #[inline]
+    pub fn after<M: Into<MessageId>>(self, message_id: M) -> Self {
+        self._after(message_id.into())
+    }
+
+    fn _after(mut self, message_id: MessageId) -> Self {
+        self.0.insert("after", message_id.0);
 
         self
     }
 
     /// Indicates to retrieve the messages _around_ a specific message in either
     /// direction (before+after) the given message.
-    pub fn around<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("around", message_id.into().0);
+    #[inline]
+    pub fn around<M: Into<MessageId>>(self, message_id: M) -> Self {
+        self._around(message_id.into())
+    }
+
+    fn _around(mut self, message_id: MessageId) -> Self {
+        self.0.insert("around", message_id.0);
 
         self
     }
 
     /// Indicates to retrieve the messages before a specific message, given by
     /// its Id.
-    pub fn before<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("before", message_id.into().0);
+    #[inline]
+    pub fn before<M: Into<MessageId>>(self, message_id: M) -> Self {
+        self._before(message_id.into())
+    }
+
+    fn _before(mut self, message_id: MessageId) -> Self {
+        self.0.insert("before", message_id.0);
 
         self
     }

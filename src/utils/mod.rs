@@ -92,13 +92,7 @@ pub fn vecmap_to_json_map<K: PartialEq + ToString>(map: VecMap<K, Value>) -> Map
 /// assert!(!utils::is_nsfw("nsfwstuff"));
 /// ```
 pub fn is_nsfw(name: &str) -> bool {
-    if name.len() == 4 {
-        &name[..4] == "nsfw"
-    } else if name.len() > 4 {
-        &name[..5] == "nsfw-"
-    } else {
-        false
-    }
+    name == "nsfw" || name.chars().count() > 5 && name.starts_with("nsfw-")
 }
 
 /// Retrieves the "code" part of an invite out of a URL.
@@ -354,9 +348,12 @@ pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
 /// ```
 ///
 /// [`EditProfile::avatar`]: ../builder/struct.EditProfile.html#method.avatar
+#[inline]
 pub fn read_image<P: AsRef<Path>>(path: P) -> Result<String> {
-    let path = path.as_ref();
+    _read_image(path.as_ref())
+}
 
+fn _read_image(path: &Path) -> Result<String> {
     let mut v = Vec::default();
     let mut f = File::open(path)?;
     let _ = f.read_to_end(&mut v);

@@ -48,20 +48,24 @@ impl GuildId {
     /// [`Guild::ban`]: struct.Guild.html#method.ban
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    #[inline]
     pub fn ban<U, BO>(&self, user: U, ban_options: &BO) -> Result<()>
         where U: Into<UserId>, BO: BanOptions {
-        let dmd = ban_options.dmd();
+        self._ban(user.into(), (ban_options.dmd(), ban_options.reason()))
+    }
+
+    fn _ban(&self, user: UserId, ban_options: (u8, &str)) -> Result<()> {
+        let (dmd, reason) = ban_options;
+
         if dmd > 7 {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
         }
-
-        let reason = ban_options.reason();
 
         if reason.len() > 512 {
             return Err(Error::ExceededLimit(reason.to_string(), 512));
         }
 
-        http::ban_user(self.0, user.into().0, dmd, &*reason)
+        http::ban_user(self.0, user.0, dmd, reason)
     }
 
     /// Gets a list of the guild's bans.
@@ -113,12 +117,22 @@ impl GuildId {
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`http::create_channel`]: ../http/fn.create_channel.html
     /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
+    #[inline]
     pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
         where C: Into<Option<ChannelId>> {
+        self._create_channel(name, kind, category.into())
+    }
+
+    fn _create_channel(
+        &self,
+        name: &str,
+        kind: ChannelType,
+        category: Option<ChannelId>,
+    ) -> Result<GuildChannel> {
         let map = json!({
             "name": name,
             "type": kind as u8,
-            "parent_id": category.into().map(|c| c.0)
+            "parent_id": category.map(|c| c.0)
         });
 
         http::create_channel(self.0, &map)
@@ -141,6 +155,7 @@ impl GuildId {
     /// [`Guild::create_emoji`]: struct.Guild.html#method.create_emoji
     /// [`utils::read_image`]: ../utils/fn.read_image.html
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
     pub fn create_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
         let map = json!({
             "name": name,
@@ -155,9 +170,17 @@ impl GuildId {
     /// Requires the [Manage Guild] permission.
     ///
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    #[inline]
     pub fn create_integration<I>(&self, integration_id: I, kind: &str) -> Result<()>
         where I: Into<IntegrationId> {
-        let integration_id = integration_id.into();
+        self._create_integration(integration_id.into(), kind)
+    }
+
+    fn _create_integration(
+        &self,
+        integration_id: IntegrationId,
+        kind: &str,
+    ) -> Result<()> {
         let map = json!({
             "id": integration_id.0,
             "type": kind,
@@ -206,7 +229,11 @@ impl GuildId {
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
     #[inline]
     pub fn delete_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<()> {
-        http::delete_emoji(self.0, emoji_id.into().0)
+        self._delete_emoji(emoji_id.into())
+    }
+
+    fn _delete_emoji(&self, emoji_id: EmojiId) -> Result<()> {
+        http::delete_emoji(self.0, emoji_id.0)
     }
 
     /// Deletes an integration by Id from the guild.
@@ -216,7 +243,11 @@ impl GuildId {
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
     pub fn delete_integration<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
-        http::delete_guild_integration(self.0, integration_id.into().0)
+        self._delete_integration(integration_id.into())
+    }
+
+    fn _delete_integration(&self, integration_id: IntegrationId) -> Result<()> {
+        http::delete_guild_integration(self.0, integration_id.0)
     }
 
     /// Deletes a [`Role`] by Id from the guild.
@@ -231,7 +262,11 @@ impl GuildId {
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[inline]
     pub fn delete_role<R: Into<RoleId>>(&self, role_id: R) -> Result<()> {
-        http::delete_role(self.0, role_id.into().0)
+        self._delete_role(role_id.into())
+    }
+
+    fn _delete_role(&self, role_id: RoleId) -> Result<()> {
+        http::delete_role(self.0, role_id.0)
     }
 
     /// Edits the current guild with new data where specified.
@@ -260,12 +295,17 @@ impl GuildId {
     /// [`Emoji`]: struct.Emoji.html
     /// [`Emoji::edit`]: struct.Emoji.html#method.edit
     /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    #[inline]
     pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str) -> Result<Emoji> {
+        self._edit_emoji(emoji_id.into(), name)
+    }
+
+    fn _edit_emoji(&self, emoji_id: EmojiId, name: &str) -> Result<Emoji> {
         let map = json!({
             "name": name,
         });
 
-        http::edit_emoji(self.0, emoji_id.into().0, &map)
+        http::edit_emoji(self.0, emoji_id.0, &map)
     }
 
     /// Edits the properties of member of the guild, such as muting or
@@ -284,9 +324,14 @@ impl GuildId {
     #[inline]
     pub fn edit_member<F, U>(&self, user_id: U, f: F) -> Result<()>
         where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
+        self._edit_member(user_id.into(), f)
+    }
+
+    fn _edit_member<F>(&self, user_id: UserId, f: F) -> Result<()>
+        where F: FnOnce(EditMember) -> EditMember {
         let map = utils::vecmap_to_json_map(f(EditMember::default()).0);
 
-        http::edit_member(self.0, user_id.into().0, &map)
+        http::edit_member(self.0, user_id.0, &map)
     }
 
     /// Edits the current user's nickname for the guild.
@@ -320,9 +365,14 @@ impl GuildId {
     #[inline]
     pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
+        self._edit_role(role_id.into(), f)
+    }
+
+    fn _edit_role<F>(&self, role_id: RoleId, f: F) -> Result<Role>
+        where F: FnOnce(EditRole) -> EditRole {
         let map = utils::vecmap_to_json_map(f(EditRole::default()).0);
 
-        http::edit_role(self.0, role_id.into().0, &map)
+        http::edit_role(self.0, role_id.0, &map)
     }
 
     /// Edits the order of [`Role`]s
@@ -342,7 +392,15 @@ impl GuildId {
     #[inline]
     pub fn edit_role_position<R>(&self, role_id: R, position: u64) -> Result<Vec<Role>>
         where R: Into<RoleId> {
-        http::edit_role_position(self.0, role_id.into().0, position)
+        self._edit_role_position(role_id.into(), position)
+    }
+
+    fn _edit_role_position(
+        &self,
+        role_id: RoleId,
+        position: u64,
+    ) -> Result<Vec<Role>> {
+        http::edit_role_position(self.0, role_id.0, position)
     }
 
 
@@ -392,7 +450,11 @@ impl GuildId {
     /// [`Member`]: struct.Member.html
     #[inline]
     pub fn member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
-        http::get_member(self.0, user_id.into().0)
+        self._member(user_id.into())
+    }
+
+    fn _member(&self, user_id: UserId) -> Result<Member> {
+        http::get_member(self.0, user_id.0)
     }
 
     /// Gets a list of the guild's members.
@@ -405,7 +467,11 @@ impl GuildId {
     #[inline]
     pub fn members<U>(&self, limit: Option<u64>, after: Option<U>) -> Result<Vec<Member>>
         where U: Into<UserId> {
-        http::get_guild_members(self.0, limit, after.map(|x| x.into().0))
+        self._members(limit, after.map(Into::into))
+    }
+
+    fn _members(&self, limit: Option<u64>, after: Option<UserId>) -> Result<Vec<Member>> {
+        http::get_guild_members(self.0, limit, after.map(|x| x.0))
     }
 
     /// Moves a member to a specific voice channel.
@@ -413,15 +479,24 @@ impl GuildId {
     /// Requires the [Move Members] permission.
     ///
     /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
+    #[inline]
     pub fn move_member<C, U>(&self, user_id: U, channel_id: C) -> Result<()>
         where C: Into<ChannelId>, U: Into<UserId> {
+        self._move_member(user_id.into(), channel_id.into())
+    }
+
+    fn _move_member(
+        &self,
+        user_id: UserId,
+        channel_id: ChannelId,
+    ) -> Result<()> {
         let mut map = Map::new();
         map.insert(
             "channel_id".to_string(),
-            Value::Number(Number::from(channel_id.into().0)),
+            Value::Number(Number::from(channel_id.0)),
         );
 
-        http::edit_member(self.0, user_id.into().0, &map)
+        http::edit_member(self.0, user_id.0, &map)
     }
 
     /// Gets the number of [`Member`]s that would be pruned with the given
@@ -447,8 +522,13 @@ impl GuildId {
     /// Although not required, you should specify all channels' positions,
     /// regardless of whether they were updated. Otherwise, positioning can
     /// sometimes get weird.
+    #[inline]
     pub fn reorder_channels<It>(&self, channels: It) -> Result<()>
         where It: IntoIterator<Item = (ChannelId, u64)> {
+        self._reorder_channels(channels.into_iter().collect())
+    }
+
+    fn _reorder_channels(&self, channels: Vec<(ChannelId, u64)>) -> Result<()> {
         let items = channels.into_iter().map(|(id, pos)| json!({
             "id": id,
             "position": pos,
@@ -503,7 +583,14 @@ impl GuildId {
     /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
     #[inline]
     pub fn start_integration_sync<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
-        http::start_integration_sync(self.0, integration_id.into().0)
+        self._start_integration_sync(integration_id.into())
+    }
+
+    fn _start_integration_sync(
+        &self,
+        integration_id: IntegrationId,
+    ) -> Result<()> {
+        http::start_integration_sync(self.0, integration_id.0)
     }
 
     /// Starts a prune of [`Member`]s.
@@ -532,7 +619,11 @@ impl GuildId {
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[inline]
     pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
-        http::remove_ban(self.0, user_id.into().0)
+        self._unban(user_id.into())
+    }
+
+    fn _unban(&self, user_id: UserId) -> Result<()> {
+        http::remove_ban(self.0, user_id.0)
     }
 
     /// Retrieve's the guild's vanity URL.

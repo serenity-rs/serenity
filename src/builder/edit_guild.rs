@@ -23,11 +23,16 @@ impl EditGuild {
     /// valid.
     ///
     /// [`afk_timeout`]: #method.afk_timeout
-    pub fn afk_channel<C: Into<ChannelId>>(mut self, channel: Option<C>) -> Self {
+    #[inline]
+    pub fn afk_channel<C: Into<ChannelId>>(self, channel: Option<C>) -> Self {
+        self._afk_channel(channel.map(Into::into))
+    }
+
+    fn _afk_channel(mut self, channel: Option<ChannelId>) -> Self {
         self.0.insert(
             "afk_channel_id",
             match channel {
-                Some(channel) => Value::Number(Number::from(channel.into().0)),
+                Some(channel) => Value::Number(Number::from(channel.0)),
                 None => Value::Null,
             },
         );
@@ -98,8 +103,13 @@ impl EditGuild {
     /// Transfers the ownership of the guild to another user by Id.
     ///
     /// **Note**: The current user must be the owner of the guild.
-    pub fn owner<U: Into<UserId>>(mut self, user_id: U) -> Self {
-        let id = Value::Number(Number::from(user_id.into().0));
+    #[inline]
+    pub fn owner<U: Into<UserId>>(self, user_id: U) -> Self {
+        self._owner(user_id.into())
+    }
+
+    fn _owner(mut self, user_id: UserId) -> Self {
+        let id = Value::Number(Number::from(user_id.0));
         self.0.insert("owner_id", id);
 
         self
@@ -180,10 +190,14 @@ impl EditGuild {
     ///
     /// [`VerificationLevel`]: ../model/guild/enum.VerificationLevel.html
     /// [`VerificationLevel::High`]: ../model/guild/enum.VerificationLevel.html#variant.High
-    pub fn verification_level<V>(mut self, verification_level: V) -> Self
+    #[inline]
+    pub fn verification_level<V>(self, verification_level: V) -> Self
         where V: Into<VerificationLevel> {
-        let num = Value::Number(Number::from(verification_level.into().num()));
+        self._verification_level(verification_level.into())
+    }
 
+    fn _verification_level(mut self, verification_level: VerificationLevel) -> Self {
+        let num = Value::Number(Number::from(verification_level.num()));
         self.0.insert("verification_level", num);
 
         self

@@ -85,9 +85,13 @@ impl Member {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature = "cache")]
+    #[inline]
     pub fn add_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
-        let role_id = role_id.into();
+        self._add_role(role_id.into())
+    }
 
+    #[cfg(feature = "cache")]
+    fn _add_role(&mut self, role_id: RoleId) -> Result<()> {
         if self.roles.contains(&role_id) {
             return Ok(());
         }
@@ -140,13 +144,16 @@ impl Member {
     ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature = "cache")]
+    #[inline]
     pub fn ban<BO: BanOptions>(&self, ban_options: &BO) -> Result<()> {
-        let dmd = ban_options.dmd();
+        self._ban(ban_options.dmd(), ban_options.reason())
+    }
+
+    #[cfg(feature = "cache")]
+    fn _ban(&self, dmd: u8, reason: &str) -> Result<()> {
         if dmd > 7 {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
         }
-
-        let reason = ban_options.reason();
 
         if reason.len() > 512 {
             return Err(Error::ExceededLimit(reason.to_string(), 512));
@@ -368,9 +375,13 @@ impl Member {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature = "cache")]
+    #[inline]
     pub fn remove_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
-        let role_id = role_id.into();
+        self._remove_role(role_id.into())
+    }
 
+    #[cfg(feature = "cache")]
+    fn _remove_role(&mut self, role_id: RoleId) -> Result<()> {
         if !self.roles.contains(&role_id) {
             return Ok(());
         }

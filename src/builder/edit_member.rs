@@ -50,13 +50,17 @@ impl EditMember {
     /// Requires the [Manage Roles] permission to modify.
     ///
     /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
-    pub fn roles<T: AsRef<RoleId>, It: IntoIterator<Item=T>>(mut self, roles: It) -> Self {
-        let role_ids = roles
+    pub fn roles<T: AsRef<RoleId>, It: IntoIterator<Item=T>>(self, roles: It) -> Self {
+        let roles = roles
             .into_iter()
             .map(|x| Value::Number(Number::from(x.as_ref().0)))
             .collect();
 
-        self.0.insert("roles", Value::Array(role_ids));
+        self._roles(roles)
+    }
+
+    fn _roles(mut self, roles: Vec<Value>) -> Self {
+        self.0.insert("roles", Value::Array(roles));
 
         self
     }
@@ -66,8 +70,13 @@ impl EditMember {
     /// Requires the [Move Members] permission.
     ///
     /// [Move Members]: ../model/permissions/constant.MOVE_MEMBERS.html
-    pub fn voice_channel<C: Into<ChannelId>>(mut self, channel_id: C) -> Self {
-        let num = Value::Number(Number::from(channel_id.into().0));
+    #[inline]
+    pub fn voice_channel<C: Into<ChannelId>>(self, channel_id: C) -> Self {
+        self._voice_channel(channel_id.into())
+    }
+
+    fn _voice_channel(mut self, channel_id: ChannelId) -> Self {
+        let num = Value::Number(Number::from(channel_id.0));
         self.0.insert("channel_id", num);
 
         self

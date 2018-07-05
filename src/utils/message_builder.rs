@@ -129,8 +129,13 @@ impl MessageBuilder {
     /// [`ChannelId`]: ../model/id/struct.ChannelId.html
     /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
     /// [Display implementation]: ../model/id/struct.ChannelId.html#method.fmt-1
-    pub fn channel<C: Into<ChannelId>>(mut self, channel: C) -> Self {
-        let _ = write!(self.0, "{}", channel.into().mention());
+    #[inline]
+    pub fn channel<C: Into<ChannelId>>(self, channel: C) -> Self {
+        self._channel(channel.into())
+    }
+
+    fn _channel(mut self, channel: ChannelId) -> Self {
+        let _ = write!(self.0, "{}", channel.mention());
 
         self
     }
@@ -198,8 +203,13 @@ impl MessageBuilder {
     ///
     /// assert_eq!(message.push("ing").0, "testing");
     /// ```
-    pub fn push<D: I>(mut self, content: D) -> Self {
-        self.0.push_str(&content.into().to_string());
+    #[inline]
+    pub fn push<D: I>(self, content: D) -> Self {
+        self._push(content.into().to_string())
+    }
+
+    fn _push(mut self, content: String) -> Self {
+        self.0.push_str(&content);
 
         self
     }
