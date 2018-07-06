@@ -182,4 +182,4 @@ Voice+youtube-dl:
 [library:discordrb]: https://github.com/meew0/discordrb
 [library:discord.js]: https://github.com/hydrabolt/discord.js
 [library:discord.py]: https://github.com/Rapptz/discord.py
-[logo]: https://zey.moe/assets/serenity_logo.png
+[logo]: https://raw.githubusercontent.com/serenity-rs/serenity/master/logo.png
