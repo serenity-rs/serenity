@@ -2,10 +2,16 @@
 #![allow(unreadable_literal)]
 
 macro_rules! colour {
-    ($(#[$attr:meta] $name:ident, $val:expr;)*) => {
+    ($(#[$attr:meta] $constname:ident, $name:ident, $val:expr;)*) => {
         impl Colour {
             $(
                 #[$attr]
+                pub const $constname: Colour = Colour($val);
+            )*
+
+            $(
+                #[$attr]
+                #[deprecated(note = "Use the constant instead", since = "0.5.5")]
                 pub fn $name() -> Colour {
                     Colour::new($val)
                 }
@@ -33,7 +39,7 @@ macro_rules! colour {
 /// # use serenity::model::permissions;
 /// #
 /// # let role = Role {
-/// #     colour: Colour::blurple(),
+/// #     colour: Colour::BLURPLE,
 /// #     hoist: false,
 /// #     id: RoleId(1),
 /// #     managed: false,
@@ -52,12 +58,12 @@ macro_rules! colour {
 /// println!("The green component is: {}", green);
 /// ```
 ///
-/// Creating an instance with the [`dark_teal`] presets:
+/// Creating an instance with the [`DARK_TEAL`] preset:
 ///
 /// ```rust
 /// use serenity::utils::Colour;
 ///
-/// let colour = Colour::dark_teal();
+/// let colour = Colour::DARK_TEAL;
 ///
 /// assert_eq!(colour.tuple(), (17, 128, 106));
 /// ```
@@ -67,16 +73,16 @@ macro_rules! colour {
 /// ```rust
 /// use serenity::utils::Colour;
 ///
-/// let blitz_blue = Colour::blitz_blue();
-/// let fooyoo = Colour::fooyoo();
-/// let fooyoo2 = Colour::fooyoo();
+/// let blitz_blue = Colour::BLITZ_BLUE;
+/// let fooyoo = Colour::FOOYOO;
+/// let fooyoo2 = Colour::FOOYOO;
 /// assert!(blitz_blue != fooyoo);
 /// assert_eq!(fooyoo, fooyoo2);
 /// assert!(blitz_blue > fooyoo);
 /// ```
 ///
 /// [`Role`]: ../model/guild/struct.Role.html
-/// [`dark_teal`]: #method.dark_teal
+/// [`DARK_TEAL`]: #associatedconstant.DARK_TEAL
 /// [`g`]: #method.g
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Colour(pub u32);
@@ -240,61 +246,61 @@ impl From<(u8, u8, u8)> for Colour {
 
 colour! {
     /// Creates a new `Colour`, setting its RGB value to `(111, 198, 226)`.
-    blitz_blue, 0x6FC6E2;
+    BLITZ_BLUE, blitz_blue, 0x6FC6E2;
     /// Creates a new `Colour`, setting its RGB value to `(52, 152, 219)`.
-    blue, 0x3498DB;
+    BLUE, blue, 0x3498DB;
     /// Creates a new `Colour`, setting its RGB value to `(114, 137, 218)`.
-    blurple, 0x7289DA;
+    BLURPLE, blurple, 0x7289DA;
     /// Creates a new `Colour`, setting its RGB value to `(32, 102, 148)`.
-    dark_blue, 0x206694;
+    DARK_BLUE, dark_blue, 0x206694;
     /// Creates a new `Colour`, setting its RGB value to `(194, 124, 14)`.
-    dark_gold, 0xC27C0E;
+    DARK_GOLD, dark_gold, 0xC27C0E;
     /// Creates a new `Colour`, setting its RGB value to `(31, 139, 76)`.
-    dark_green, 0x1F8B4C;
+    DARK_GREEN, dark_green, 0x1F8B4C;
     /// Creates a new `Colour`, setting its RGB value to `(96, 125, 139)`.
-    dark_grey, 0x607D8B;
+    DARK_GREY, dark_grey, 0x607D8B;
     /// Creates a new `Colour`, setting its RGB value to `(173, 20, 87)`.
-    dark_magenta, 0xAD1457;
+    DARK_MAGENTA, dark_magenta, 0xAD1457;
     /// Creates a new `Colour`, setting its RGB value to `(168, 67, 0)`.
-    dark_orange, 0xA84300;
+    DARK_ORANGE, dark_orange, 0xA84300;
     /// Creates a new `Colour`, setting its RGB value to `(113, 54, 138)`.
-    dark_purple, 0x71368A;
+    DARK_PURPLE, dark_purple, 0x71368A;
     /// Creates a new `Colour`, setting its RGB value to `(153, 45, 34)`.
-    dark_red, 0x992D22;
+    DARK_RED, dark_red, 0x992D22;
     /// Creates a new `Colour`, setting its RGB value to `(17, 128, 106)`.
-    dark_teal, 0x11806A;
+    DARK_TEAL, dark_teal, 0x11806A;
     /// Creates a new `Colour`, setting its RGB value to `(84, 110, 122)`.
-    darker_grey, 0x546E7A;
+    DARKER_GREY, darker_grey, 0x546E7A;
     /// Creates a new `Colour`, setting its RGB value to `(250, 177, 237)`.
-    fabled_pink, 0xFAB1ED;
+    FABLED_PINK, fabled_pink, 0xFAB1ED;
     /// Creates a new `Colour`, setting its RGB value to `(136, 130, 196)`.`
-    faded_purple, 0x8882C4;
+    FADED_PURPLE, faded_purple, 0x8882C4;
     /// Creates a new `Colour`, setting its RGB value to `(17, 202, 128)`.
-    fooyoo, 0x11CA80;
+    FOOYOO, fooyoo, 0x11CA80;
     /// Creates a new `Colour`, setting its RGB value to `(241, 196, 15)`.
-    gold, 0xF1C40F;
+    GOLD, gold, 0xF1C40F;
     /// Creates a new `Colour`, setting its RGB value to `(186, 218, 85)`.
-    kerbal, 0xBADA55;
+    KERBAL, kerbal, 0xBADA55;
     /// Creates a new `Colour`, setting its RGB value to `(151, 156, 159)`.
-    light_grey, 0x979C9F;
+    LIGHT_GREY, light_grey, 0x979C9F;
     /// Creates a new `Colour`, setting its RGB value to `(149, 165, 166)`.
-    lighter_grey, 0x95A5A6;
+    LIGHTER_GREY, lighter_grey, 0x95A5A6;
     /// Creates a new `Colour`, setting its RGB value to `(233, 30, 99)`.
-    magenta, 0xE91E63;
+    MAGENTA, magenta, 0xE91E63;
     /// Creates a new `Colour`, setting its RGB value to `(230, 131, 151)`.
-    meibe_pink, 0xE68397;
+    MEIBE_PINK, meibe_pink, 0xE68397;
     /// Creates a new `Colour`, setting its RGB value to `(230, 126, 34)`.
-    orange, 0xE67E22;
+    ORANGE, orange, 0xE67E22;
     /// Creates a new `Colour`, setting its RGB value to `(155, 89, 182)`.
-    purple, 0x9B59B6;
+    PURPLE, purple, 0x9B59B6;
     /// Creates a new `Colour`, setting its RGB value to `(231, 76, 60)`.
-    red, 0xE74C3C;
+    RED, red, 0xE74C3C;
     /// Creates a new `Colour`, setting its RGB value to `(117, 150, 255)`.
-    rohrkatze_blue, 0x7596FF;
+    ROHRKATZE_BLUE, rohrkatze_blue, 0x7596FF;
     /// Creates a new `Colour`, setting its RGB value to `(246, 219, 216)`.
-    rosewater, 0xF6DBD8;
+    ROSEWATER, rosewater, 0xF6DBD8;
     /// Creates a new `Colour`, setting its RGB value to `(26, 188, 156)`.
-    teal, 0x1ABC9C;
+    TEAL, teal, 0x1ABC9C;
 }
 
 impl Default for Colour {
