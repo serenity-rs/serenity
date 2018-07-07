@@ -1,6 +1,5 @@
 //! Models pertaining to the gateway.
 
-use chrono::{DateTime, Utc};
 use parking_lot::RwLock;
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
@@ -202,7 +201,11 @@ impl<'de> Deserialize<'de> for Activity {
             None => None,
         };
         let flags = match map.remove("flags") {
-            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            Some(v) => {
+                let bits = serde_json::from_value::<u64>(v).map_err(DeError::custom)?;
+
+                Some(ActivityFlags::from_bits_truncate(bits))
+            },
             None => None,
         };
         let instance = match map.remove("instance") {
@@ -482,6 +485,6 @@ pub struct SessionStartLimit {
 /// Timestamps of when a user started and/or is ending their activity.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ActivityTimestamps {
-    pub end: Option<DateTime<Utc>>,
-    pub start: Option<DateTime<Utc>>,
+    pub end: Option<u64>,
+    pub start: Option<u64>,
 }

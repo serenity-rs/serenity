@@ -74,6 +74,7 @@ fn guild_some_application_id() {
 #[test]
 fn guild_create() {
     p!(GuildCreateEvent, "guild_create_1");
+    p!(GuildCreateEvent, "guild_create_2");
 }
 
 #[test]
