@@ -282,7 +282,7 @@ pub struct ActivityParty {
     /// The ID of the party.
     pub id: Option<String>,
     /// Used to show the party's current and maximum size.
-    pub size: [u64; 2],
+    pub size: Option<[u64; 2]>,
 }
 
 /// Secrets for an activity.
