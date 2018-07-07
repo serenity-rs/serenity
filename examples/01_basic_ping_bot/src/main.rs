@@ -1,33 +1,33 @@
 #![feature(proc_macro, generators)]
 
+extern crate env_logger;
 extern crate futures_await as futures;
 extern crate serenity;
-extern crate tokio_core;
+extern crate tokio;
 
-use futures::prelude::*;
+use futures::prelude::{async, await};
 use serenity::gateway::Shard;
 use serenity::model::event::{Event, GatewayEvent};
 use std::error::Error;
 use std::env;
 use std::rc::Rc;
-use tokio_core::reactor::{Core, Handle};
+use tokio::executor::current_thread;
 
 fn main() {
-    let mut core = Core::new().expect("Error creating event loop");
-    let future = try_main(core.handle());
-
-    core.run(future).expect("Error running event loop");
+    current_thread::block_on_all(try_main()).expect("Error running event loop");
 }
 
 #[async]
-fn try_main(handle: Handle) -> Result<(), Box<Error + 'static>> {
+fn try_main() -> Result<(), Box<Error + 'static>> {
+    env_logger::init();
+
     // Configure the client with your Discord bot token in the environment.
     let token = Rc::new(env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment"));
 
     // Create a new shard, specifying the token, the ID of the shard (0 of 1),
     // and a handle to the event loop
-    let mut shard = await!(Shard::new(token, [0, 1], handle))?;
+    let mut shard = await!(Shard::new(token, [0, 1]))?;
 
     // Loop over websocket messages.
     #[async]

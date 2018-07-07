@@ -6,4 +6,5 @@ authors = ["my name <my@email.address>"]
 [dependencies]
 futures-await = "~0.1"
 serenity = { path = "../../", default-features = true }
-tokio-core = "~0.1"
+tokio = "~0.1"
+env_logger = "0.5"
