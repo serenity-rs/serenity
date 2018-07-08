@@ -44,7 +44,7 @@ fn test_mention() {
     };
     let role = Role {
         id: RoleId(2),
-        colour: Colour::rosewater(),
+        colour: Colour::ROSEWATER,
         hoist: false,
         managed: false,
         mentionable: false,
