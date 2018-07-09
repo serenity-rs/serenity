@@ -529,7 +529,7 @@ impl StandardFramework {
                     // If not, assert that it does always.
                     let apply = bucket.check.as_ref().map_or(true, |check| {
                         let apply = feature_cache! {{
-                            let guild_id = message.guild_id();
+                            let guild_id = message.guild_id;
                             (check)(context, guild_id, message.channel_id, message.author.id)
                         } else {
                             (check)(context, message.channel_id, message.author.id)
