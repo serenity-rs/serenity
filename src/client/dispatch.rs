@@ -516,7 +516,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.message_update(context, event.clone());
+                event_handler.message_update(context, event);
             });
         },
         DispatchEvent::Model(Event::PresencesReplace(mut event)) => {
