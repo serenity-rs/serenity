@@ -68,7 +68,9 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     shard_id: u64,
 ) {
     match event {
-        DispatchEvent::Model(Event::MessageCreate(event)) => {
+        DispatchEvent::Model(Event::MessageCreate(mut event)) => {
+            update!(event);
+
             let context = context(data, runner_tx, shard_id);
             dispatch_message(
                 context.clone(),
@@ -103,6 +105,8 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
 ) {
     match event {
         DispatchEvent::Model(Event::MessageCreate(event)) => {
+            update!(event);
+
             let context = context(data, runner_tx, shard_id);
             dispatch_message(context, event.message, event_handler, threadpool);
         },
@@ -506,11 +510,13 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::MessageUpdate(mut event)) => {
+            update!(event);
+
             let context = context(data, runner_tx, shard_id);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.message_update(context, event);
+                event_handler.message_update(context, event.clone());
             });
         },
         DispatchEvent::Model(Event::PresencesReplace(mut event)) => {
