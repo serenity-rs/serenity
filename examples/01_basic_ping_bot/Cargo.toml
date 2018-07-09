@@ -5,6 +5,8 @@ authors = ["my name <my@email.address>"]
 
 [dependencies]
 futures-await = "~0.1"
+serde_json = "^1.0"
 serenity = { path = "../../", default-features = true }
 tokio = "~0.1"
 env_logger = "0.5"
+tungstenite = "~0.5"
