@@ -355,7 +355,7 @@ impl Shard {
         send(&mut self.tx, msg)
     }
 
-    fn autoreconnect(&mut self) -> Result<(), Error> {
+    pub fn autoreconnect(&mut self) -> Result<(), Error> {
         info!("[Shard {:?}] Autoreconnecting", self.shard_info);
 
         if self.session_id.is_some() {
