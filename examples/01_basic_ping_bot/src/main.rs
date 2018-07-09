@@ -66,9 +66,14 @@ fn try_main() -> Result<(), Error> {
                 // Parse the websocket message into a serenity GatewayEvent.
                 let event = shard.parse(message)?;
 
-                // Have the shard process the WebSocket event, in case it needs to
-                // mutate its state, send a packet, etc.
-                shard.process(&event);
+                // Have the shard process the WebSocket event, in case it needs
+                // to mutate its state, send a packet, etc.
+                //
+                // This can give back a future in the event something needs to
+                // be done, such as waiting for a reconnection.
+                if let Some(future) = shard.process(&event) {
+                    await!(future)?;
+                }
 
                 // Now you can do whatever you want with the event.
                 match event {
@@ -107,7 +112,7 @@ fn try_main() -> Result<(), Error> {
                 },
             }
 
-            shard.autoreconnect()?;
+            await!(shard.autoreconnect())?;
         }
     }
 }
