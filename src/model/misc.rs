@@ -66,6 +66,10 @@ impl Mentionable for User {
     fn mention(&self) -> String { format!("<@{}>", self.id.0) }
 }
 
+impl Mentionable for GuildChannel {
+    fn mention(&self) -> String { format!("<#{}>", self.id.0) }
+}
+
 #[cfg(all(feature = "model", feature = "utils"))]
 #[derive(Debug)]
 pub enum UserParseError {
