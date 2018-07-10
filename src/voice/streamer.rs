@@ -134,6 +134,8 @@ fn _ffmpeg(path: &OsStr) -> Result<Box<AudioSource>> {
 /// ```rust,no_run
 /// use serenity::voice;
 ///
+/// let stereo_val = "2";
+///
 /// let streamer = voice::ffmpeg_optioned("./some_file.mp3", &[
 ///     "-f",
 ///     "s16le",
