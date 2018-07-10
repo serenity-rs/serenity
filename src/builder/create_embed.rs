@@ -337,6 +337,8 @@ impl CreateEmbed {
     /// with the provided filename. Or else this won't work.
     ///
     /// [`ChannelId::send_files`]: ../model/id/struct.ChannelId.html#send_files
+    ///
+    /// [`image`]: #method.image
     #[inline]
     pub fn attachment<S: AsRef<str>>(self, filename: S) -> Self {
         self._attachment(filename.as_ref())

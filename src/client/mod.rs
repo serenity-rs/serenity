@@ -62,8 +62,8 @@ use self::bridge::voice::ClientVoiceManager;
 /// # Event Handlers
 ///
 /// Event handlers can be configured. For example, the event handler
-/// [`EventHandler::on_message`] will be dispatched to whenever a [`Event::MessageCreate`] is
-/// received over the connection.
+/// [`EventHandler::message`] will be dispatched to whenever a
+/// [`Event::MessageCreate`] is received over the connection.
 ///
 /// Note that you do not need to manually handle events, as they are handled
 /// internally and then dispatched to your event handlers.
@@ -93,7 +93,7 @@ use self::bridge::voice::ClientVoiceManager;
 /// ```
 ///
 /// [`Shard`]: gateway/struct.Shard.html
-/// [`on_message`]: #method.on_message
+/// [`EventHandler::message`]: trait.EventHandler.html#tymethod.message
 /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
 /// [sharding docs]: gateway/index.html#sharding
 pub struct Client {

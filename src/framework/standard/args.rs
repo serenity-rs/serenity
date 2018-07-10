@@ -864,6 +864,8 @@ impl Args {
     ///
     /// assert_eq!(args.len_quoted(), 2); // `2` because `["42", "69"]`
     /// ```
+    ///
+    /// [`len`]: #method.len
     #[deprecated(since = "0.5.3", note = "Its task was merged with `len`, please use it instead.")]
     pub fn len_quoted(&mut self) -> usize {
         self.len()

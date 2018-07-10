@@ -8,7 +8,7 @@
 //! within the library. Mutate data at your own discretion.
 //!
 //! A "globally available" instance of the Cache is available at
-//! [`client::CACHE`]. This is the instance that is updated by the library,
+//! [`CACHE`]. This is the instance that is updated by the library,
 //! meaning you should _not_ need to maintain updating it yourself in any case.
 //!
 //! # Use by Models
@@ -610,6 +610,8 @@ impl Cache {
     /// #     try_main().unwrap();
     /// # }
     /// ```
+    ///
+    /// [`private_channels`]: #structfield.private_channels
     #[inline]
     pub fn private_channel<C: Into<ChannelId>>(&self,
                                                channel_id: C)

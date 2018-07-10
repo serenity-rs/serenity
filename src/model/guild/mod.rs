@@ -102,6 +102,7 @@ pub struct Guild {
     /// the library.
     ///
     /// [`ReadyEvent`]: events/struct.ReadyEvent.html
+    /// [`member_count`]: #structfield.member_count
     #[serde(serialize_with = "serialize_gen_map")]
     pub members: HashMap<UserId, Member>,
     /// Indicator of whether the guild requires multi-factor authentication for
@@ -671,6 +672,8 @@ impl Guild {
     ///
     /// If both user IDs are the same, `None` is returned. If one of the users
     /// is the guild owner, their ID is returned.
+    ///
+    /// [`position`]: struct.Role.html#structfield.position
     #[cfg(feature = "cache")]
     #[inline]
     pub fn greater_member_hierarchy<T, U>(&self, lhs_id: T, rhs_id: U)
