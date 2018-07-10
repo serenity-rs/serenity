@@ -30,17 +30,17 @@ pub struct Message {
     ///
     /// [`Channel`]: enum.Channel.html
     pub channel_id: ChannelId,
-    /// The Id of the [`Guild`] that the message was sent in. This value will
-    /// only be present if this message was received over the gateway.
-    ///
-    /// [`Guild`]: ../guild/struct.Guild.html
-    pub guild_id: Option<GuildId>,
     /// The content of the message.
     pub content: String,
     /// The timestamp of the last time the message was updated, if it was.
     pub edited_timestamp: Option<DateTime<FixedOffset>>,
     /// Array of embeds sent with the message.
     pub embeds: Vec<Embed>,
+    /// The Id of the [`Guild`] that the message was sent in. This value will
+    /// only be present if this message was received over the gateway.
+    ///
+    /// [`Guild`]: ../guild/struct.Guild.html
+    pub guild_id: Option<GuildId>,
     /// Indicator of the type of message this is, i.e. whether it is a regular
     /// message or a system message.
     #[serde(rename = "type")]
@@ -337,21 +337,18 @@ impl Message {
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature = "cache")]
     pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> {
-        self.guild_id()
-            .and_then(|guild_id| CACHE.read().guild(guild_id))
+        CACHE.read().guild(self.guild_id?)
     }
 
     /// Retrieves the Id of the guild that the message was sent in, if sent in
     /// one.
     ///
-    /// Returns `None` if the channel data or guild data does not exist in the
-    /// cache.
-    #[cfg(feature = "cache")]
+    /// Refer to [`guild_id`] for more information.
+    ///
+    /// [`guild_id`]: #structfield.guild_id
+    #[deprecated(note = "Use `guild_id` structfield instead", since = "0.5.5")]
     pub fn guild_id(&self) -> Option<GuildId> {
-        match CACHE.read().channel(self.channel_id) {
-            Some(Channel::Guild(ch)) => Some(ch.read().guild_id),
-            _ => None,
-        }
+        self.guild_id
     }
 
     /// True if message was sent using direct messages.

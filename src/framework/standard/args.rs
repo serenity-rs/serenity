@@ -53,6 +53,20 @@ impl<E: StdError> fmt::Display for Error<E> {
 
 type Result<T, E> = ::std::result::Result<T, Error<E>>;
 
+fn find_start(s: &str, i: usize) -> Option<usize> {
+    if i > s.len() {
+        return None;
+    }
+
+    let mut start = i - 1;
+
+    while !s.is_char_boundary(start) {
+        start -= 1;
+    }
+
+    Some(start)
+}
+
 fn find_end(s: &str, i: usize) -> Option<usize> {
     if i > s.len() {
         return None;
@@ -176,10 +190,11 @@ impl<'a> Lexer<'a> {
             }
 
             self.next();
+
             let end = self.offset;
 
-            return if self.at_end() && &self.msg[end-1..end] != "\"" {
-                // invalid, missing an end quote; view it as a normal argument instead.
+            return if self.at_end() && &self.msg[find_start(self.msg, end).unwrap()..end] != "\"" {
+                // We're missing an end quote. View this as a normal argument.
                 Token::new(TokenKind::Argument, &self.msg[start..], start)
             } else {
                 Token::new(TokenKind::QuotedArgument, &self.msg[start..end], start)

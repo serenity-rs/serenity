@@ -47,7 +47,8 @@ use parking_lot::RwLock;
 use std::collections::{
     hash_map::Entry,
     HashMap,
-    HashSet
+    HashSet,
+    VecDeque,
 };
 use std::{
     default::Default,
@@ -55,8 +56,12 @@ use std::{
 };
 
 mod cache_update;
+mod settings;
 
 pub use self::cache_update::CacheUpdate;
+pub use self::settings::Settings;
+
+type MessageCache = HashMap<ChannelId, HashMap<MessageId, Message>>;
 
 /// A cache of all events received over a [`Shard`], where storing at least
 /// some data from the event is possible.
@@ -97,6 +102,12 @@ pub struct Cache {
     /// [`Emoji`]: ../model/guild/struct.Emoji.html
     /// [`Role`]: ../model/guild/struct.Role.html
     pub guilds: HashMap<GuildId, Arc<RwLock<Guild>>>,
+    /// A map of channels to messages.
+    ///
+    /// This is a map of channel IDs to another map of message IDs to messages.
+    ///
+    /// This keeps only the ten most recent messages.
+    pub messages: MessageCache,
     /// A map of notes that a user has made for individual users.
     ///
     /// An empty note is equivalent to having no note, and creating an empty
@@ -160,6 +171,15 @@ pub struct Cache {
     /// [`PresenceUpdateEvent`]: ../model/event/struct.PresenceUpdateEvent.html
     /// [`ReadyEvent`]: ../model/event/struct.ReadyEvent.html
     pub users: HashMap<UserId, Arc<RwLock<User>>>,
+    /// Queue of message IDs for each channel.
+    ///
+    /// This is simply a vecdeque so we can keep track of the order of messages
+    /// inserted into the cache. When a maximum number of messages are in a
+    /// channel's cache, we can pop the front and remove that ID from the cache.
+    pub(crate) message_queue: HashMap<ChannelId, VecDeque<MessageId>>,
+    /// The settings for the cache.
+    settings: Settings,
+    __nonexhaustive: (),
 }
 
 impl Cache {
@@ -167,6 +187,25 @@ impl Cache {
     #[inline]
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Creates a new cache instance with settings applied.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::cache::{Cache, Settings};
+    ///
+    /// let mut settings = Settings::new();
+    /// settings.max_messages(10);
+    ///
+    /// let cache = Cache::new_with_settings(settings);
+    /// ```
+    pub fn new_with_settings(settings: Settings) -> Self {
+        Self {
+            settings,
+            ..Default::default()
+        }
     }
 
     /// Fetches the number of [`Member`]s that have not had data received.
@@ -622,6 +661,38 @@ impl Cache {
             .and_then(|g| g.read().roles.get(&role_id).cloned())
     }
 
+    /// Returns an immutable reference to the settings.
+    ///
+    /// # Examples
+    ///
+    /// Printing the maximum number of messages in a channel to be cached:
+    ///
+    /// ```rust
+    /// use serenity::cache::Cache;
+    ///
+    /// let mut cache = Cache::new();
+    /// println!("Max settings: {}", cache.settings().max_messages);
+    /// ```
+    pub fn settings(&self) -> &Settings {
+        &self.settings
+    }
+
+    /// Returns a mutable reference to the settings.
+    ///
+    /// # Examples
+    ///
+    /// Create a new cache and modify the settings afterwards:
+    ///
+    /// ```rust
+    /// use serenity::cache::Cache;
+    ///
+    /// let mut cache = Cache::new();
+    /// cache.settings_mut().max_messages(10);
+    /// ```
+    pub fn settings_mut(&mut self) -> &mut Settings {
+        &mut self.settings
+    }
+
     /// Retrieves a `User` from the cache's [`users`] map, if it exists.
     ///
     /// The only advantage of this method is that you can pass in anything that
@@ -704,13 +775,17 @@ impl Default for Cache {
             categories: HashMap::default(),
             groups: HashMap::with_capacity(128),
             guilds: HashMap::default(),
+            messages: HashMap::default(),
             notes: HashMap::default(),
             presences: HashMap::default(),
             private_channels: HashMap::with_capacity(128),
+            settings: Settings::default(),
             shard_count: 1,
             unavailable_guilds: HashSet::default(),
             user: CurrentUser::default(),
             users: HashMap::default(),
+            message_queue: HashMap::default(),
+            __nonexhaustive: (),
         }
     }
 }

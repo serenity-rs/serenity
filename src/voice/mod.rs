@@ -26,6 +26,7 @@ pub use self::{
     streamer::{
         dca,
         ffmpeg,
+        ffmpeg_optioned,
         opus,
         pcm,
         ytdl

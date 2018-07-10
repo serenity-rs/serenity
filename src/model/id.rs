@@ -27,6 +27,12 @@ macro_rules! id_u64 {
                 }
             }
 
+            impl<'a> From<&'a $name> for $name {
+                fn from(id: &'a $name) -> $name {
+                    id.clone()
+                }
+            }
+
             impl From<u64> for $name {
                 fn from(id_as_u64: u64) -> $name {
                     $name(id_as_u64)

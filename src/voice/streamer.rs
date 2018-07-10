@@ -108,7 +108,7 @@ fn _ffmpeg(path: &OsStr) -> Result<Box<AudioSource>> {
     let is_stereo = is_stereo(path).unwrap_or(false);
     let stereo_val = if is_stereo { "2" } else { "1" };
 
-    let args = [
+    ffmpeg_optioned(path, &[
         "-f",
         "s16le",
         "-ac",
@@ -118,12 +118,49 @@ fn _ffmpeg(path: &OsStr) -> Result<Box<AudioSource>> {
         "-acodec",
         "pcm_s16le",
         "-",
-    ];
+    ])
+}
+
+/// Opens an audio file through `ffmpeg` and creates an audio source, with
+/// user-specified arguments to pass to ffmpeg.
+///
+/// Note that this does _not_ build on the arguments passed by the [`ffmpeg`]
+/// function.
+///
+/// # Examples
+///
+/// Pass options to create a custom ffmpeg streamer:
+///
+/// ```rust,no_run
+/// use serenity::voice;
+///
+/// let stereo_val = "2";
+///
+/// let streamer = voice::ffmpeg_optioned("./some_file.mp3", &[
+///     "-f",
+///     "s16le",
+///     "-ac",
+///     stereo_val,
+///     "-ar",
+///     "48000",
+///     "-acodec",
+///     "pcm_s16le",
+///     "-",
+/// ]);
+pub fn ffmpeg_optioned<P: AsRef<OsStr>>(
+    path: P,
+    args: &[&str],
+) -> Result<Box<AudioSource>> {
+    _ffmpeg_optioned(path.as_ref(), args)
+}
+
+fn _ffmpeg_optioned(path: &OsStr, args: &[&str]) -> Result<Box<AudioSource>> {
+    let is_stereo = is_stereo(path).unwrap_or(false);
 
     let command = Command::new("ffmpeg")
         .arg("-i")
         .arg(path)
-        .args(&args)
+        .args(args)
         .stderr(Stdio::null())
         .stdin(Stdio::null())
         .stdout(Stdio::piped())

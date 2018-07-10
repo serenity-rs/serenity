@@ -247,8 +247,8 @@ impl Default for HelpOptions {
             lacking_role: HelpBehaviour::Strike,
             lacking_permissions: HelpBehaviour::Strike,
             wrong_channel: HelpBehaviour::Strike,
-            embed_error_colour: Colour::dark_red(),
-            embed_success_colour: Colour::rosewater(),
+            embed_error_colour: Colour::DARK_RED,
+            embed_success_colour: Colour::ROSEWATER,
         }
     }
 }

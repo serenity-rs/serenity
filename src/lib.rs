@@ -202,6 +202,15 @@ lazy_static! {
     /// println!("{}", CACHE.read().user.id);
     /// ```
     ///
+    /// Update the cache's settings to enable caching of channels' messages:
+    ///
+    /// ```rust
+    /// use serenity::CACHE;
+    ///
+    /// // Cache up to the 10 most recent messages per channel.
+    /// CACHE.write().settings_mut().max_messages(10);
+    /// ```
+    ///
     /// [`CurrentUser`]: model/struct.CurrentUser.html
     /// [`Cache`]: cache/struct.Cache.html
     /// [cache module documentation]: cache/index.html
