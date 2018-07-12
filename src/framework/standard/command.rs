@@ -138,6 +138,7 @@ impl fmt::Debug for CommandGroup {
     }
 }
 
+#[derive(Debug)]
 pub struct CommandOptions {
     /// A set of checks to be called prior to executing the command. The checks
     /// will short-circuit on the first check that returns `false`.
