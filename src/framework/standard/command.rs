@@ -99,7 +99,7 @@ pub struct CommandGroup {
     pub help: Option<Arc<Help>>,
     /// A set of checks to be called prior to executing the command-group. The checks
     /// will short-circuit on the first check that returns `false`.
-    pub checks: Vec<Box<Check>>,
+    pub checks: Vec<Check>,
 }
 
 impl Default for CommandGroup {
