@@ -65,7 +65,6 @@ impl<D: fmt::Display> From<D> for Error {
     }
 }
 
-#[derive(Debug)]
 pub struct CommandGroup {
     pub prefix: Option<String>,
     pub commands: HashMap<String, CommandOrAlias>,
@@ -78,6 +77,9 @@ pub struct CommandGroup {
     pub guild_only: bool,
     pub owners_only: bool,
     pub help: Option<Arc<Help>>,
+    /// A set of checks to be called prior to executing the command-group. The checks
+    /// will short-circuit on the first check that returns `false`.
+    pub checks: Vec<Box<Check>>,
 }
 
 impl Default for CommandGroup {
@@ -93,7 +95,26 @@ impl Default for CommandGroup {
             owners_only: false,
             allowed_roles: Vec::new(),
             help: None,
+            checks: Vec::new(),
         }
+    }
+}
+
+impl fmt::Debug for CommandGroup {
+    // TODO: add CommandGroup::checks somehow?
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        fmt.debug_struct("CommandGroup")
+            .field("prefix", &self.prefix)
+            .field("commands", &self.commands)
+            .field("bucket", &self.bucket)
+            .field("required_permissions", &self.required_permissions)
+            .field("allowed_roles", &self.allowed_roles)
+            .field("help_available", &self.help_available)
+            .field("dm_only", &self.dm_only)
+            .field("guild_only", &self.guild_only)
+            .field("owners_only", &self.owners_only)
+            .field("help", &self.help)
+            .finish()
     }
 }
 
@@ -222,7 +243,6 @@ impl Default for HelpOptions {
         }
     }
 }
-
 
 lazy_static! {
     static ref DEFAULT_OPTIONS: Arc<CommandOptions> = Arc::new(CommandOptions::default());

@@ -501,6 +501,7 @@ impl StandardFramework {
                    mut context: &mut Context,
                    message: &Message,
                    command: &Arc<CommandOptions>,
+                   group: &Arc<CommandGroup>,
                    args: &mut Args,
                    to_check: &str,
                    built: &str)
@@ -607,12 +608,17 @@ impl StandardFramework {
                     }
                 }
 
-                let all_passed = command
+                let all_group_checks_passed = group
                     .checks
                     .iter()
                     .all(|check| check(&mut context, message, args, command));
 
-                if all_passed {
+                let all_command_checks_passed = command
+                    .checks
+                    .iter()
+                    .all(|check| check(&mut context, message, args, command));
+
+                if all_group_checks_passed && all_command_checks_passed {
                     None
                 } else {
                     Some(DispatchError::CheckFailed)
@@ -1068,6 +1074,7 @@ impl Framework for StandardFramework {
                             &mut context,
                             &message,
                             &command.options(),
+                            &group,
                             &mut args,
                             &to_check,
                             &built,

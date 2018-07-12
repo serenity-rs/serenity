@@ -161,4 +161,18 @@ impl CreateGroup {
 
         self
     }
+
+    /// Adds a "check" to a group, which checks whether or not the groups's
+    /// commands should be called.
+    ///
+    /// **Note**: These checks are bypassed for commands sent by the application owner.
+    pub fn check<F>(mut self, check: F) -> Self
+        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
+                     + Send
+                     + Sync
+                     + 'static {
+        self.0.checks.push(Box::new(check));
+
+        self
+    }
 }
