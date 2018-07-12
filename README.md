@@ -154,7 +154,6 @@ Voice+youtube-dl:
 - [discordrb][library:discordrb]
 - [discord.js][library:discord.js]
 - [discord.py][library:discord.py]
-- [discord-rs][library:discord-rs]
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
 [`Client::new`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.new
@@ -163,17 +162,17 @@ Voice+youtube-dl:
 [`Event`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html
 [`Event::MessageCreate`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html#variant.MessageCreatef
 [`Shard`]: https://docs.rs/serenity/*/serenity/gateway/struct.Shard.html
-[`examples`]: https://github.com/zeyla/serenity/blob/master/examples
+[`examples`]: https://github.com/serenity-rs/serenity/blob/master/examples
 [`rest`]: https://docs.rs/serenity/*/serenity/client/rest/index.html
 [`validate_token`]: https://docs.rs/serenity/*/serenity/client/fn.validate_token.html
 [cache docs]: https://docs.rs/serenity/*/serenity/cache/index.html
-[ci]: https://travis-ci.org/zeyla/serenity
-[ci-badge]: https://travis-ci.org/zeyla/serenity.svg?branch=master
+[ci]: https://travis-ci.org/serenity-rs/serenity
+[ci-badge]: https://travis-ci.org/serenity-rs/serenity.svg?branch=master
 [client's module-level documentation]: https://docs.rs/serenity/*/serenity/client/index.html
 [discord docs]: https://discordapp.com/developers/docs/intro
 [docs]: https://docs.rs/serenity
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
-[examples]: https://github.com/zeyla/serenity/tree/master/examples
+[examples]: https://github.com/serenity-rs/serenity/tree/master/examples
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
 [guild]: https://discord.gg/WBdGJCc
 [guild-badge]: https://discordapp.com/api/guilds/381880193251409931/widget.png
@@ -183,5 +182,4 @@ Voice+youtube-dl:
 [library:discordrb]: https://github.com/meew0/discordrb
 [library:discord.js]: https://github.com/hydrabolt/discord.js
 [library:discord.py]: https://github.com/Rapptz/discord.py
-[library:discord-rs]: https://github.com/SpaceManiac/discord-rs
-[logo]: https://zey.moe/assets/serenity_logo.png
+[logo]: https://raw.githubusercontent.com/serenity-rs/serenity/master/logo.png

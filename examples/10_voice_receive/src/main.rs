@@ -3,7 +3,7 @@
 //!
 //! ```toml
 //! [dependencies.serenity]
-//! git = "https://github.com/zeyla/serenity.git"
+//! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["client", "standard_framework", "voice"]
 //! ```
 

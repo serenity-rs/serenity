@@ -87,11 +87,11 @@
 //! [`Event`]: model/event/enum.Event.html
 //! [`Event::MessageCreate`]: model/event/enum.Event.html#variant.MessageCreate
 //! [`Shard`]: gateway/struct.Shard.html
-//! [`examples`]: https://github.com/zeyla/serenity/blob/master/examples
+//! [`examples`]: https://github.com/serenity-rs/serenity/blob/master/examples
 //! [cache docs]: cache/index.html
 //! [client's module-level documentation]: client/index.html
 //! [docs]: https://discordapp.com/developers/docs/intro
-//! [examples]: https://github.com/zeyla/serenity/tree/master/examples
+//! [examples]: https://github.com/serenity-rs/serenity/tree/master/examples
 //! [gateway docs]: gateway/index.html
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
 #![allow(unknown_lints)]
@@ -200,6 +200,15 @@ lazy_static! {
     /// use serenity::CACHE;
     ///
     /// println!("{}", CACHE.read().user.id);
+    /// ```
+    ///
+    /// Update the cache's settings to enable caching of channels' messages:
+    ///
+    /// ```rust
+    /// use serenity::CACHE;
+    ///
+    /// // Cache up to the 10 most recent messages per channel.
+    /// CACHE.write().settings_mut().max_messages(10);
     /// ```
     ///
     /// [`CurrentUser`]: model/struct.CurrentUser.html

@@ -36,10 +36,18 @@ pub struct Message {
     pub edited_timestamp: Option<DateTime<FixedOffset>>,
     /// Array of embeds sent with the message.
     pub embeds: Vec<Embed>,
+    /// The Id of the [`Guild`] that the message was sent in. This value will
+    /// only be present if this message was received over the gateway.
+    ///
+    /// [`Guild`]: ../guild/struct.Guild.html
+    pub guild_id: Option<GuildId>,
     /// Indicator of the type of message this is, i.e. whether it is a regular
     /// message or a system message.
     #[serde(rename = "type")]
     pub kind: MessageType,
+    /// A partial amount of data about the user's member data, if this message
+    /// was sent in a guild.
+    pub member: Option<PartialMember>,
     /// Indicator of whether the message mentions everyone.
     pub mention_everyone: bool,
     /// Array of [`Role`]s' Ids mentioned in the message.
@@ -329,21 +337,18 @@ impl Message {
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature = "cache")]
     pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> {
-        self.guild_id()
-            .and_then(|guild_id| CACHE.read().guild(guild_id))
+        CACHE.read().guild(self.guild_id?)
     }
 
     /// Retrieves the Id of the guild that the message was sent in, if sent in
     /// one.
     ///
-    /// Returns `None` if the channel data or guild data does not exist in the
-    /// cache.
-    #[cfg(feature = "cache")]
+    /// Refer to [`guild_id`] for more information.
+    ///
+    /// [`guild_id`]: #structfield.guild_id
+    #[deprecated(note = "Use `guild_id` structfield instead", since = "0.5.5")]
     pub fn guild_id(&self) -> Option<GuildId> {
-        match CACHE.read().channel(self.channel_id) {
-            Some(Channel::Guild(ch)) => Some(ch.read().guild_id),
-            _ => None,
-        }
+        self.guild_id
     }
 
     /// True if message was sent using direct messages.
@@ -426,7 +431,12 @@ impl Message {
     /// [`Emoji`]: struct.Emoji.html
     /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
     /// [permissions]: permissions
+    #[inline]
     pub fn react<R: Into<ReactionType>>(&self, reaction_type: R) -> Result<()> {
+        self._react(&reaction_type.into())
+    }
+
+    fn _react(&self, reaction_type: &ReactionType) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::ADD_REACTIONS;
@@ -436,7 +446,7 @@ impl Message {
             }
         }
 
-        http::create_reaction(self.channel_id.0, self.id.0, &reaction_type.into())
+        http::create_reaction(self.channel_id.0, self.id.0, reaction_type)
     }
 
     /// Replies to the user, mentioning them prior to the content in the form
@@ -485,6 +495,25 @@ impl Message {
         });
 
         http::send_message(self.channel_id.0, &map)
+    }
+
+    /// Checks whether the message mentions passed [`UserId`].
+    ///
+    /// [`UserId`]: ../../model/id/struct.UserId.html
+    #[inline]
+    pub fn mentions_user_id<I: Into<UserId>>(&self, id: I) -> bool {
+        self._mentions_user_id(id.into())
+    }
+
+    fn _mentions_user_id(&self, id: UserId) -> bool {
+        self.mentions.iter().any(|mentioned_user| mentioned_user.id.0 == id.0)
+    }
+
+    /// Checks whether the message mentions passed [`User`].
+    ///
+    /// [`User`]: ../user/struct.User.html
+    pub fn mentions_user(&self, user: &User) -> bool {
+        self.mentions_user_id(user.id)
     }
 
     /// Unpins the message from its channel.

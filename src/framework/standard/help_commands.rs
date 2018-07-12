@@ -28,23 +28,23 @@ use client::Context;
 use framework::standard::{has_correct_roles, has_correct_permissions};
 use model::{
     channel::Message,
-    id::ChannelId
+    id::ChannelId,
 };
 use std::{
     collections::HashMap,
     hash::BuildHasher,
     sync::Arc,
-    fmt::Write
+    fmt::Write,
 };
 use super::command::InternalCommand;
 use super::{
-    Args, 
-    CommandGroup, 
-    CommandOrAlias, 
-    HelpOptions, 
-    CommandOptions, 
-    CommandError, 
-    HelpBehaviour
+    Args,
+    CommandGroup,
+    CommandOrAlias,
+    HelpOptions,
+    CommandOptions,
+    CommandError,
+    HelpBehaviour,
 };
 use utils::Colour;
 
@@ -86,6 +86,44 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
         }
     }
     !cmd.guild_only
+}
+
+/// Checks whether a command would be visible, takes permissions, channel sent in,
+/// and roles into consideration.
+///
+/// **Note**: A command is visible when it is either normally displayed or
+/// strikethrough upon requested help by a user.
+#[cfg(feature = "cache")]
+pub fn is_command_visible(command_options: &Arc<CommandOptions>, msg: &Message, help_options: &HelpOptions) -> bool {
+    if !command_options.dm_only && !command_options.guild_only
+    || command_options.dm_only && msg.is_private()
+    || command_options.guild_only && !msg.is_private() {
+
+        if let Some(guild) = msg.guild() {
+            let guild = guild.read();
+
+            if let Some(member) = guild.members.get(&msg.author.id) {
+
+                if command_options.help_available {
+
+                    if has_correct_permissions(command_options, msg) {
+
+                        if has_correct_roles(command_options, &guild, &member) {
+                            return true;
+                        } else {
+                            return help_options.lacking_role != HelpBehaviour::Hide;
+                        }
+                    } else {
+                        return help_options.lacking_permissions != HelpBehaviour::Hide;
+                    }
+                }
+            }
+        }
+    } else {
+        return help_options.wrong_channel != HelpBehaviour::Hide;
+    }
+
+    return false
 }
 
 /// Posts an embed showing each individual command group and its commands.
@@ -130,7 +168,7 @@ pub fn with_embeds<H: BuildHasher>(
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
-                            if has_all_requirements(&cmd.options(), msg) {
+                            if is_command_visible(&cmd.options(), msg, help_options) {
                                 found = Some((command_name, cmd));
                             } else {
                                 break;
@@ -141,7 +179,7 @@ pub fn with_embeds<H: BuildHasher>(
 
                             match *actual_command {
                                 CommandOrAlias::Command(ref cmd) => {
-                                    if has_all_requirements(&cmd.options(), msg) {
+                                    if is_command_visible(&cmd.options(), msg, help_options) {
                                         found = Some((name, cmd));
                                     } else {
                                         break;
@@ -222,8 +260,13 @@ pub fn with_embeds<H: BuildHasher>(
 
     let _ = msg.channel_id.send_message(|m| {
         m.embed(|mut e| {
+            let striked_command_tip = if msg.is_private() {
+                    &help_options.striked_commands_tip_in_guild
+                } else {
+                    &help_options.striked_commands_tip_in_dm
+                };
 
-            if let Some(ref striked_command_text) = help_options.striked_commands_tip {
+            if let Some(ref striked_command_text) = striked_command_tip {
                 e = e.colour(help_options.embed_success_colour).description(
                     format!("{}\n{}", &help_options.individual_command_tip, striked_command_text),
                 );
@@ -374,7 +417,7 @@ pub fn plain<H: BuildHasher>(
                 if name == with_prefix || name == *command_name {
                     match *command {
                         CommandOrAlias::Command(ref cmd) => {
-                            if has_all_requirements(&cmd.options(), msg) {
+                            if is_command_visible(&cmd.options(), msg, help_options) {
                                 found = Some((command_name, cmd));
                             }
                             else {
@@ -386,7 +429,7 @@ pub fn plain<H: BuildHasher>(
 
                             match *actual_command {
                                 CommandOrAlias::Command(ref cmd) => {
-                                    if has_all_requirements(&cmd.options(), msg) {
+                                    if is_command_visible(&cmd.options(), msg, help_options) {
                                         found = Some((name, cmd));
                                     }
                                     else {
@@ -461,7 +504,13 @@ pub fn plain<H: BuildHasher>(
 
     let mut result = "**Commands**\n".to_string();
 
-    if let Some(ref striked_command_text) = help_options.striked_commands_tip {
+    let striked_command_tip = if msg.is_private() {
+            &help_options.striked_commands_tip_in_guild
+        } else {
+            &help_options.striked_commands_tip_in_dm
+    };
+
+    if let Some(ref striked_command_text) = striked_command_tip {
         let _ = write!(result, "{}\n{}\n\n", &help_options.individual_command_tip, striked_command_text);
     } else {
         let _ = write!(result, "{}\n\n", &help_options.individual_command_tip);

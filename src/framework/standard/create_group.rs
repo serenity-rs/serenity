@@ -1,7 +1,7 @@
 pub use super::command::{
-    Command, 
-    CommandGroup, 
-    CommandOptions, 
+    Command,
+    CommandGroup,
+    CommandOptions,
     Error as CommandError
 };
 pub(crate) use super::command::CommandOrAlias;

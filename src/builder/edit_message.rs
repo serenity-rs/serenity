@@ -26,7 +26,12 @@ impl EditMessage {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    pub fn content<D: Display>(mut self, content: D) -> Self {
+    #[inline]
+    pub fn content<D: Display>(self, content: D) -> Self {
+        self._content(content.to_string())
+    }
+
+    fn _content(mut self, content: String) -> Self {
         self.0.insert("content", Value::String(content.to_string()));
 
         self

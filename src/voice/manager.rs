@@ -39,14 +39,24 @@ impl Manager {
     }
 
     /// Retrieves an immutable handler for the given target, if one exists.
+    #[inline]
     pub fn get<G: Into<GuildId>>(&self, guild_id: G) -> Option<&Handler> {
-        self.handlers.get(&guild_id.into())
+        self._get(guild_id.into())
+    }
+
+    fn _get(&self, guild_id: GuildId) -> Option<&Handler> {
+        self.handlers.get(&guild_id)
     }
 
     /// Retrieves a mutable handler for the given target, if one exists.
+    #[inline]
     pub fn get_mut<G: Into<GuildId>>(&mut self, guild_id: G)
         -> Option<&mut Handler> {
-        self.handlers.get_mut(&guild_id.into())
+        self._get_mut(guild_id.into())
+    }
+
+    fn _get_mut(&mut self, guild_id: GuildId) -> Option<&mut Handler> {
+        self.handlers.get_mut(&guild_id)
     }
 
     /// Connects to a target by retrieving its relevant [`Handler`] and
@@ -71,11 +81,17 @@ impl Manager {
     /// [`Handler`]: struct.Handler.html
     /// [`get`]: #method.get
     #[allow(map_entry)]
+    #[inline]
     pub fn join<C, G>(&mut self, guild_id: G, channel_id: C) -> &mut Handler
         where C: Into<ChannelId>, G: Into<GuildId> {
-        let channel_id = channel_id.into();
-        let guild_id = guild_id.into();
+        self._join(guild_id.into(), channel_id.into())
+    }
 
+    fn _join(
+        &mut self,
+        guild_id: GuildId,
+        channel_id: ChannelId,
+    ) -> &mut Handler {
         {
             let mut found = false;
 
@@ -111,8 +127,13 @@ impl Manager {
     /// [`Handler`]: struct.Handler.html
     /// [`get`]: #method.get
     /// [`leave`]: struct.Handler.html#method.leave
+    #[inline]
     pub fn leave<G: Into<GuildId>>(&mut self, guild_id: G) {
-        if let Some(handler) = self.handlers.get_mut(&guild_id.into()) {
+        self._leave(guild_id.into())
+    }
+
+    fn _leave(&mut self, guild_id: GuildId) {
+        if let Some(handler) = self.handlers.get_mut(&guild_id) {
             handler.leave();
         }
     }
@@ -123,9 +144,12 @@ impl Manager {
     /// The handler is then dropped, removing settings for the target.
     ///
     /// [`Handler`]: struct.Handler.html
+    #[inline]
     pub fn remove<G: Into<GuildId>>(&mut self, guild_id: G) {
-        let guild_id = guild_id.into();
+        self._remove(guild_id.into())
+    }
 
+    fn _remove(&mut self, guild_id: GuildId) {
         self.leave(guild_id);
 
         self.handlers.remove(&guild_id);

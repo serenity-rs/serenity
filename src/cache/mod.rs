@@ -8,7 +8,7 @@
 //! within the library. Mutate data at your own discretion.
 //!
 //! A "globally available" instance of the Cache is available at
-//! [`client::CACHE`]. This is the instance that is updated by the library,
+//! [`CACHE`]. This is the instance that is updated by the library,
 //! meaning you should _not_ need to maintain updating it yourself in any case.
 //!
 //! # Use by Models
@@ -45,9 +45,10 @@
 use model::prelude::*;
 use parking_lot::RwLock;
 use std::collections::{
-    hash_map::Entry, 
-    HashMap, 
-    HashSet
+    hash_map::Entry,
+    HashMap,
+    HashSet,
+    VecDeque,
 };
 use std::{
     default::Default,
@@ -55,8 +56,12 @@ use std::{
 };
 
 mod cache_update;
+mod settings;
 
-pub(crate) use self::cache_update::*;
+pub use self::cache_update::CacheUpdate;
+pub use self::settings::Settings;
+
+type MessageCache = HashMap<ChannelId, HashMap<MessageId, Message>>;
 
 /// A cache of all events received over a [`Shard`], where storing at least
 /// some data from the event is possible.
@@ -97,6 +102,12 @@ pub struct Cache {
     /// [`Emoji`]: ../model/guild/struct.Emoji.html
     /// [`Role`]: ../model/guild/struct.Role.html
     pub guilds: HashMap<GuildId, Arc<RwLock<Guild>>>,
+    /// A map of channels to messages.
+    ///
+    /// This is a map of channel IDs to another map of message IDs to messages.
+    ///
+    /// This keeps only the ten most recent messages.
+    pub messages: MessageCache,
     /// A map of notes that a user has made for individual users.
     ///
     /// An empty note is equivalent to having no note, and creating an empty
@@ -160,9 +171,43 @@ pub struct Cache {
     /// [`PresenceUpdateEvent`]: ../model/event/struct.PresenceUpdateEvent.html
     /// [`ReadyEvent`]: ../model/event/struct.ReadyEvent.html
     pub users: HashMap<UserId, Arc<RwLock<User>>>,
+    /// Queue of message IDs for each channel.
+    ///
+    /// This is simply a vecdeque so we can keep track of the order of messages
+    /// inserted into the cache. When a maximum number of messages are in a
+    /// channel's cache, we can pop the front and remove that ID from the cache.
+    pub(crate) message_queue: HashMap<ChannelId, VecDeque<MessageId>>,
+    /// The settings for the cache.
+    settings: Settings,
+    __nonexhaustive: (),
 }
 
 impl Cache {
+    /// Creates a new cache.
+    #[inline]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Creates a new cache instance with settings applied.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::cache::{Cache, Settings};
+    ///
+    /// let mut settings = Settings::new();
+    /// settings.max_messages(10);
+    ///
+    /// let cache = Cache::new_with_settings(settings);
+    /// ```
+    pub fn new_with_settings(settings: Settings) -> Self {
+        Self {
+            settings,
+            ..Default::default()
+        }
+    }
+
     /// Fetches the number of [`Member`]s that have not had data received.
     ///
     /// The important detail to note here is that this is the number of
@@ -320,9 +365,12 @@ impl Cache {
     /// [`private_channel`]: #method.private_channel
     /// [`groups`]: #structfield.groups
     /// [`private_channels`]: #structfield.private_channels
+    #[inline]
     pub fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
-        let id = id.into();
+        self._channel(id.into())
+    }
 
+    fn _channel(&self, id: ChannelId) -> Option<Channel> {
         if let Some(channel) = self.channels.get(&id) {
             return Some(Channel::Guild(Arc::clone(channel)));
         }
@@ -367,7 +415,11 @@ impl Cache {
     /// ```
     #[inline]
     pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<Arc<RwLock<Guild>>> {
-        self.guilds.get(&id.into()).cloned()
+        self._guild(id.into())
+    }
+
+    fn _guild(&self, id: GuildId) -> Option<Arc<RwLock<Guild>>> {
+        self.guilds.get(&id).cloned()
     }
 
     /// Retrieves a reference to a [`Guild`]'s channel. Unlike [`channel`],
@@ -424,7 +476,11 @@ impl Cache {
     /// [`channel`]: #method.channel
     #[inline]
     pub fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<GuildChannel>>> {
-        self.channels.get(&id.into()).cloned()
+        self._guild_channel(id.into())
+    }
+
+    fn _guild_channel(&self, id: ChannelId) -> Option<Arc<RwLock<GuildChannel>>> {
+        self.channels.get(&id).cloned()
     }
 
     /// Retrieves a reference to a [`Group`] from the cache based on the given
@@ -458,7 +514,11 @@ impl Cache {
     /// ```
     #[inline]
     pub fn group<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<Group>>> {
-        self.groups.get(&id.into()).cloned()
+        self._group(id.into())
+    }
+
+    fn _group(&self, id: ChannelId) -> Option<Arc<RwLock<Group>>> {
+        self.groups.get(&id).cloned()
     }
 
     /// Retrieves a [`Guild`]'s member from the cache based on the guild's and
@@ -506,10 +566,15 @@ impl Cache {
     /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [`members`]: ../model/guild/struct.Guild.html#structfield.members
+    #[inline]
     pub fn member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
         where G: Into<GuildId>, U: Into<UserId> {
-        self.guilds.get(&guild_id.into()).and_then(|guild| {
-            guild.read().members.get(&user_id.into()).cloned()
+        self._member(guild_id.into(), user_id.into())
+    }
+
+    fn _member(&self, guild_id: GuildId, user_id: UserId) -> Option<Member> {
+        self.guilds.get(&guild_id).and_then(|guild| {
+            guild.read().members.get(&user_id).cloned()
         })
     }
 
@@ -545,11 +610,17 @@ impl Cache {
     /// #     try_main().unwrap();
     /// # }
     /// ```
+    ///
+    /// [`private_channels`]: #structfield.private_channels
     #[inline]
     pub fn private_channel<C: Into<ChannelId>>(&self,
                                                channel_id: C)
                                                -> Option<Arc<RwLock<PrivateChannel>>> {
-        self.private_channels.get(&channel_id.into()).cloned()
+        self._private_channel(channel_id.into())
+    }
+
+    fn _private_channel(&self, channel_id: ChannelId) -> Option<Arc<RwLock<PrivateChannel>>> {
+        self.private_channels.get(&channel_id).cloned()
     }
 
     /// Retrieves a [`Guild`]'s role by their Ids.
@@ -580,11 +651,48 @@ impl Cache {
     /// #   try_main().unwrap();
     /// # }
     /// ```
+    #[inline]
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
         where G: Into<GuildId>, R: Into<RoleId> {
+        self._role(guild_id.into(), role_id.into())
+    }
+
+    fn _role(&self, guild_id: GuildId, role_id: RoleId) -> Option<Role> {
         self.guilds
-            .get(&guild_id.into())
-            .and_then(|g| g.read().roles.get(&role_id.into()).cloned())
+            .get(&guild_id)
+            .and_then(|g| g.read().roles.get(&role_id).cloned())
+    }
+
+    /// Returns an immutable reference to the settings.
+    ///
+    /// # Examples
+    ///
+    /// Printing the maximum number of messages in a channel to be cached:
+    ///
+    /// ```rust
+    /// use serenity::cache::Cache;
+    ///
+    /// let mut cache = Cache::new();
+    /// println!("Max settings: {}", cache.settings().max_messages);
+    /// ```
+    pub fn settings(&self) -> &Settings {
+        &self.settings
+    }
+
+    /// Returns a mutable reference to the settings.
+    ///
+    /// # Examples
+    ///
+    /// Create a new cache and modify the settings afterwards:
+    ///
+    /// ```rust
+    /// use serenity::cache::Cache;
+    ///
+    /// let mut cache = Cache::new();
+    /// cache.settings_mut().max_messages(10);
+    /// ```
+    pub fn settings_mut(&mut self) -> &mut Settings {
+        &mut self.settings
     }
 
     /// Retrieves a `User` from the cache's [`users`] map, if it exists.
@@ -617,18 +725,36 @@ impl Cache {
     /// ```
     #[inline]
     pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<Arc<RwLock<User>>> {
-        self.users.get(&user_id.into()).cloned()
+        self._user(user_id.into())
+    }
+
+    fn _user(&self, user_id: UserId) -> Option<Arc<RwLock<User>>> {
+        self.users.get(&user_id).cloned()
     }
 
     #[inline]
     pub fn categories<C: Into<ChannelId>>(&self,
                                           channel_id: C)
                                           -> Option<Arc<RwLock<ChannelCategory>>> {
-        self.categories.get(&channel_id.into()).cloned()
+        self._categories(channel_id.into())
     }
 
-    #[cfg(feature = "client")]
-    pub(crate) fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
+    fn _categories(&self, channel_id: ChannelId) -> Option<Arc<RwLock<ChannelCategory>>> {
+        self.categories.get(&channel_id).cloned()
+    }
+
+    /// Updates the cache with the update implementation for an event or other
+    /// custom update implementation.
+    ///
+    /// Refer to the documentation for [`CacheUpdate`] for more information.
+    ///
+    /// # Examples
+    ///
+    /// Refer to the [`CacheUpdate` examples].
+    ///
+    /// [`CacheUpdate`]: trait.CacheUpdate.html
+    /// [`CacheUpdate` examples]: trait.CacheUpdate.html#examples
+    pub fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
         e.update(self)
     }
 
@@ -651,13 +777,17 @@ impl Default for Cache {
             categories: HashMap::default(),
             groups: HashMap::with_capacity(128),
             guilds: HashMap::default(),
+            messages: HashMap::default(),
             notes: HashMap::default(),
             presences: HashMap::default(),
             private_channels: HashMap::with_capacity(128),
+            settings: Settings::default(),
             shard_count: 1,
             unavailable_guilds: HashSet::default(),
             user: CurrentUser::default(),
             users: HashMap::default(),
+            message_queue: HashMap::default(),
+            __nonexhaustive: (),
         }
     }
 }

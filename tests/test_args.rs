@@ -179,14 +179,14 @@ fn multiple_quoted_i32() {
 fn multiple_quoted_quote_appears_without_delimiter_in_front() {
     let args = Args::new(r#"hello, my name is cake" 2"#, &[",".to_string(), " ".to_string()]);
 
-    assert_eq!(args.multiple_quoted::<String>().unwrap(), ["hello", "", "my", "name", "is", "cake\"", "2"]);
+    assert_eq!(args.multiple_quoted::<String>().unwrap(), ["hello", "my", "name", "is", "cake\"", "2"]);
 }
 
 #[test]
 fn multiple_quoted_single_quote() {
     let args = Args::new(r#"hello "2 b"#, &[",".to_string(), " ".to_string()]);
 
-    assert_eq!(args.multiple_quoted::<String>().unwrap(), ["hello", "\"2", "b"]);
+    assert_eq!(args.multiple_quoted::<String>().unwrap(), ["hello", "\"2 b"]);
 }
 
 #[test]
@@ -201,7 +201,7 @@ fn multiple_quoted_one_quote_pair() {
 fn delimiter_before_multiple_quoted() {
     let args = Args::new(r#","hello, my name is cake" "2""#, &[",".to_string(), " ".to_string()]);
 
-    assert_eq!(args.multiple_quoted::<String>().unwrap(), ["", "hello, my name is cake", "2"]);
+    assert_eq!(args.multiple_quoted::<String>().unwrap(), ["hello, my name is cake", "2"]);
 }
 
 #[test]
@@ -274,7 +274,8 @@ fn skip() {
     let mut args = Args::new("1 2", &[" ".to_string()]);
 
     assert_eq!(args.skip().unwrap(), "1");
-    assert_eq!(args.full(), "2");
+    assert_eq!(args.remaining(), 1);
+    assert_eq!(args.single::<String>().unwrap(), "2");
 }
 
 #[test]
@@ -282,100 +283,102 @@ fn skip_for() {
     let mut args = Args::new("1 2 neko 100", &[" ".to_string()]);
 
     assert_eq!(args.skip_for(2).unwrap(), ["1", "2"]);
-    assert_eq!(args.full(), "neko 100");
+    assert_eq!(args.remaining(), 2);
+    assert_eq!(args.single::<String>().unwrap(), "neko");
+    assert_eq!(args.single::<String>().unwrap(), "100");
 }
 
 #[test]
 fn len_with_one_delimiter() {
-    let mut args = Args::new("1 2 neko 100", &[" ".to_string()]);
+    let args = Args::new("1 2 neko 100", &[" ".to_string()]);
 
     assert_eq!(args.len(), 4);
-    assert_eq!(args.len(), 4);
+    assert_eq!(args.remaining(), 4);
 }
 
 #[test]
 fn len_multiple_quoted() {
-    let mut args = Args::new(r#""hello, my name is cake" "2""#, &[" ".to_string()]);
-
-    assert_eq!(args.len_quoted(), 2);
-}
-
-#[test]
-fn len_before_and_after_single() {
-    let mut args = Args::new("1 2", &[" ".to_string()]);
+    let args = Args::new(r#""hello, my name is cake" "2""#, &[" ".to_string()]);
 
     assert_eq!(args.len(), 2);
-    assert_eq!(args.single::<i32>().unwrap(), 1);
-    assert_eq!(args.len(), 1);
-    assert_eq!(args.single::<i32>().unwrap(), 2);
-    assert_eq!(args.len(), 0);
 }
 
 #[test]
-fn len_before_and_after_single_quoted() {
+fn remaining_len_before_and_after_single() {
+    let mut args = Args::new("1 2", &[" ".to_string()]);
+
+    assert_eq!(args.remaining(), 2);
+    assert_eq!(args.single::<i32>().unwrap(), 1);
+    assert_eq!(args.remaining(), 1);
+    assert_eq!(args.single::<i32>().unwrap(), 2);
+    assert_eq!(args.remaining(), 0);
+}
+
+#[test]
+fn remaining_len_before_and_after_single_quoted() {
     let mut args = Args::new(r#""1" "2" "3""#, &[" ".to_string()]);
 
-    assert_eq!(args.len_quoted(), 3);
+    assert_eq!(args.remaining(), 3);
     assert_eq!(args.single_quoted::<i32>().unwrap(), 1);
-    assert_eq!(args.len_quoted(), 2);
+    assert_eq!(args.remaining(), 2);
     assert_eq!(args.single_quoted::<i32>().unwrap(), 2);
-    assert_eq!(args.len_quoted(), 1);
+    assert_eq!(args.remaining(), 1);
     assert_eq!(args.single_quoted::<i32>().unwrap(), 3);
-    assert_eq!(args.len_quoted(), 0);
+    assert_eq!(args.remaining(), 0);
 }
 
 #[test]
-fn len_before_and_after_skip() {
+fn remaining_len_before_and_after_skip() {
     let mut args = Args::new("1 2", &[" ".to_string()]);
 
-    assert_eq!(args.len(), 2);
+    assert_eq!(args.remaining(), 2);
     assert_eq!(args.skip().unwrap(), "1");
-    assert_eq!(args.len(), 1);
+    assert_eq!(args.remaining(), 1);
     assert_eq!(args.skip().unwrap(), "2");
-    assert_eq!(args.len(), 0);
+    assert_eq!(args.remaining(), 0);
 }
 
 #[test]
-fn len_before_and_after_skip_empty_string() {
+fn remaining_len_before_and_after_skip_empty_string() {
     let mut args = Args::new("", &[" ".to_string()]);
 
-    assert_eq!(args.len(), 0);
+    assert_eq!(args.remaining(), 0);
     assert_eq!(args.skip(), None);
-    assert_eq!(args.len(), 0);
+    assert_eq!(args.remaining(), 0);
 }
 
 #[test]
-fn len_before_and_after_skip_for() {
+fn remaining_len_before_and_after_skip_for() {
     let mut args = Args::new("1 2", &[" ".to_string()]);
 
-    assert_eq!(args.len(), 2);
+    assert_eq!(args.remaining(), 2);
     assert_eq!(args.skip_for(2), Some(vec!["1".to_string(), "2".to_string()]));
     assert_eq!(args.skip_for(2), None);
-    assert_eq!(args.len(), 0);
+    assert_eq!(args.remaining(), 0);
 }
 
 #[test]
-fn len_before_and_after_find() {
+fn remaining_len_before_and_after_find() {
     let mut args = Args::new("a 2 6", &[" ".to_string()]);
 
-    assert_eq!(args.len(), 3);
+    assert_eq!(args.remaining(), 3);
     assert_eq!(args.find::<i32>().unwrap(), 2);
-    assert_eq!(args.len(), 2);
+    assert_eq!(args.remaining(), 2);
     assert_eq!(args.find::<i32>().unwrap(), 6);
-    assert_eq!(args.len(), 1);
+    assert_eq!(args.remaining(), 1);
     assert_eq!(args.find::<String>().unwrap(), "a");
-    assert_eq!(args.len(), 0);
+    assert_eq!(args.remaining(), 0);
     assert_matches!(args.find::<String>().unwrap_err(), ArgError::Eos);
-    assert_eq!(args.len(), 0);
+    assert_eq!(args.remaining(), 0);
 }
 
 #[test]
-fn len_before_and_after_find_n() {
+fn remaining_len_before_and_after_find_n() {
     let mut args = Args::new("a 2 6", &[" ".to_string()]);
 
-    assert_eq!(args.len(), 3);
+    assert_eq!(args.remaining(), 3);
     assert_eq!(args.find_n::<i32>().unwrap(), 2);
-    assert_eq!(args.len(), 3);
+    assert_eq!(args.remaining(), 3);
 }
 
 
@@ -413,15 +416,17 @@ fn single_after_failed_single() {
 
     assert_matches!(args.single::<i32>().unwrap_err(), ArgError::Parse(_));
     // Test that `single` short-circuts on an error and leaves the source as is.
-    assert_eq!(args.full(), "b 2");
+    assert_eq!(args.remaining(), 2);
+    assert_eq!(args.single::<String>().unwrap(), "b");
+    assert_eq!(args.single::<String>().unwrap(), "2");
 }
 
 #[test]
-fn len_quoted_after_failed_single_quoted() {
+fn remaining_len_after_failed_single_quoted() {
     let mut args = Args::new("b a", &[" ".to_string()]);
 
-    assert_eq!(args.len_quoted(), 2);
+    assert_eq!(args.remaining(), 2);
     // Same goes for `single_quoted` and the alike.
     assert_matches!(args.single_quoted::<i32>().unwrap_err(), ArgError::Parse(_));
-    assert_eq!(args.len_quoted(), 2);
+    assert_eq!(args.remaining(), 2);
 }

@@ -4,8 +4,8 @@ use serde_json::Error as JsonError;
 use std::{
     error::Error as StdError,
     fmt::{
-        self, 
-        Display, 
+        self,
+        Display,
         Error as FormatError
     },
     io::Error as IoError,

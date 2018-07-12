@@ -13,10 +13,10 @@ mod threading;
 
 pub use self::{
     audio::{
-        Audio, 
-        AudioReceiver, 
-        AudioSource, 
-        AudioType, 
+        Audio,
+        AudioReceiver,
+        AudioSource,
+        AudioType,
         LockedAudio
     },
     dca::DcaMetadata,
@@ -24,9 +24,10 @@ pub use self::{
     handler::Handler,
     manager::Manager,
     streamer::{
-        dca, 
-        ffmpeg, 
-        opus, 
+        dca,
+        ffmpeg,
+        ffmpeg_optioned,
+        opus,
         pcm,
         ytdl
     }

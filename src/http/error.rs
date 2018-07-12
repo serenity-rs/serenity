@@ -2,8 +2,8 @@ use hyper::client::Response;
 use std::{
     error::Error as StdError,
     fmt::{
-        Display, 
-        Formatter, 
+        Display,
+        Formatter,
         Result as FmtResult
     }
 };

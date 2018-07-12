@@ -2,7 +2,7 @@ use std::{
     error::Error as StdError,
     fmt::{
         Display,
-        Formatter, 
+        Formatter,
         Result as FmtResult
     }
 };

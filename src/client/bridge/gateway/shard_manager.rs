@@ -247,6 +247,7 @@ impl ShardManager {
     ///
     /// [`ShardQueuer`]: struct.ShardQueuer.html
     /// [`ShardRunner`]: struct.ShardRunner.html
+    /// [`initialize`]: #method.initialize
     pub fn restart(&mut self, shard_id: ShardId) {
         info!("Restarting shard {}", shard_id);
         self.shutdown(shard_id);

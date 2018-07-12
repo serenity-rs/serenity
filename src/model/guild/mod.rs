@@ -102,6 +102,7 @@ pub struct Guild {
     /// the library.
     ///
     /// [`ReadyEvent`]: events/struct.ReadyEvent.html
+    /// [`member_count`]: #structfield.member_count
     #[serde(serialize_with = "serialize_gen_map")]
     pub members: HashMap<UserId, Member>,
     /// Indicator of whether the guild requires multi-factor authentication for
@@ -229,9 +230,12 @@ impl Guild {
     /// [`Guild::ban`]: struct.Guild.html#method.ban
     /// [`User`]: struct.User.html
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    #[inline]
     pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: &BO) -> Result<()> {
-        let user = user.into();
+        self._ban(user.into(), options)
+    }
 
+    fn _ban<BO: BanOptions>(&self, user: UserId, options: &BO) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::BAN_MEMBERS;
@@ -668,12 +672,21 @@ impl Guild {
     ///
     /// If both user IDs are the same, `None` is returned. If one of the users
     /// is the guild owner, their ID is returned.
+    ///
+    /// [`position`]: struct.Role.html#structfield.position
     #[cfg(feature = "cache")]
+    #[inline]
     pub fn greater_member_hierarchy<T, U>(&self, lhs_id: T, rhs_id: U)
         -> Option<UserId> where T: Into<UserId>, U: Into<UserId> {
-        let lhs_id = lhs_id.into();
-        let rhs_id = rhs_id.into();
+        self._greater_member_hierarchy(lhs_id.into(), rhs_id.into())
+    }
 
+    #[cfg(feature = "cache")]
+    fn _greater_member_hierarchy(
+        &self,
+        lhs_id: UserId,
+        rhs_id: UserId,
+    ) -> Option<UserId> {
         // Check that the IDs are the same. If they are, neither is greater.
         if lhs_id == rhs_id {
             return None;
@@ -1106,10 +1119,13 @@ impl Guild {
     /// Calculate a [`Member`]'s permissions in the guild.
     ///
     /// [`Member`]: struct.Member.html
+    #[inline]
     pub fn member_permissions<U>(&self, user_id: U) -> Permissions
         where U: Into<UserId> {
-        let user_id = user_id.into();
+        self._member_permissions(user_id.into())
+    }
 
+    fn _member_permissions(&self, user_id: UserId) -> Permissions {
         if user_id == self.owner_id {
             return Permissions::all();
         }
@@ -1179,16 +1195,21 @@ impl Guild {
     /// Calculate a [`User`]'s permissions in a given channel in the guild.
     ///
     /// [`User`]: struct.User.html
+    #[inline]
     pub fn permissions_in<C, U>(&self, channel_id: C, user_id: U) -> Permissions
         where C: Into<ChannelId>, U: Into<UserId> {
-        let user_id = user_id.into();
+        self._permissions_in(channel_id.into(), user_id.into())
+    }
 
+    fn _permissions_in(
+        &self,
+        channel_id: ChannelId,
+        user_id: UserId,
+    ) -> Permissions {
         // The owner has all permissions in all cases.
         if user_id == self.owner_id {
             return Permissions::all();
         }
-
-        let channel_id = channel_id.into();
 
         // Start by retrieving the @everyone role's permissions.
         let everyone = match self.roles.get(&RoleId(self.id.0)) {

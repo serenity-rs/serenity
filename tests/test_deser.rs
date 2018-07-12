@@ -126,6 +126,9 @@ fn message_create() {
 
     // negative nonce
     p!(MessageCreateEvent, "message_create_2");
+
+    // message from guild with partial member data
+    p!(MessageCreateEvent, "message_create_3");
 }
 
 #[test]

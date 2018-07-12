@@ -65,8 +65,8 @@ pub use self::shard_runner_message::ShardRunnerMessage;
 
 use std::{
     fmt::{
-        Display, 
-        Formatter, 
+        Display,
+        Formatter,
         Result as FmtResult
     },
     sync::mpsc::Sender,

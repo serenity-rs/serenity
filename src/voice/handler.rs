@@ -2,8 +2,8 @@ use constants::VoiceOpCode;
 use gateway::InterMessage;
 use model::{
     id::{
-        ChannelId, 
-        GuildId, 
+        ChannelId,
+        GuildId,
         UserId
     },
     voice::VoiceState

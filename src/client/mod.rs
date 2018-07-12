@@ -62,8 +62,8 @@ use self::bridge::voice::ClientVoiceManager;
 /// # Event Handlers
 ///
 /// Event handlers can be configured. For example, the event handler
-/// [`EventHandler::on_message`] will be dispatched to whenever a [`Event::MessageCreate`] is
-/// received over the connection.
+/// [`EventHandler::message`] will be dispatched to whenever a
+/// [`Event::MessageCreate`] is received over the connection.
 ///
 /// Note that you do not need to manually handle events, as they are handled
 /// internally and then dispatched to your event handlers.
@@ -93,7 +93,7 @@ use self::bridge::voice::ClientVoiceManager;
 /// ```
 ///
 /// [`Shard`]: gateway/struct.Shard.html
-/// [`on_message`]: #method.on_message
+/// [`EventHandler::message`]: trait.EventHandler.html#tymethod.message
 /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
 /// [sharding docs]: gateway/index.html#sharding
 pub struct Client {
@@ -175,7 +175,7 @@ pub struct Client {
     /// [`Event::MessageDeleteBulk`]: ../model/event/enum.Event.html#variant.MessageDeleteBulk
     /// [`Event::MessageUpdate`]: ../model/event/enum.Event.html#variant.MessageUpdate
     /// [example 05]:
-    /// https://github.com/zeyla/serenity/tree/master/examples/05_command_framework
+    /// https://github.com/serenity-rs/serenity/tree/master/examples/05_command_framework
     pub data: Arc<Mutex<ShareMap>>,
     /// A vector of all active shards that have received their [`Event::Ready`]
     /// payload, and have dispatched to [`on_ready`] if an event handler was

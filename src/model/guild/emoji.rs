@@ -1,7 +1,7 @@
 use std::fmt::{
-    Display, 
-    Formatter, 
-    Result as FmtResult, 
+    Display,
+    Formatter,
+    Result as FmtResult,
     Write as FmtWrite
 };
 use super::super::id::{EmojiId, RoleId};

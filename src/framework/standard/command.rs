@@ -12,10 +12,28 @@ use std::{
 use utils::Colour;
 use super::{Args, Configuration, HelpBehaviour};
 
-pub type Check = Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
+type CheckFunction = Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
                      + Send
                      + Sync
                      + 'static;
+
+pub struct Check(pub(crate) Box<CheckFunction>);
+
+impl Check {
+    pub(crate) fn new<F: Send + Sync + 'static>(f: F) -> Self
+        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
+    {
+        Check(Box::new(f))
+    }
+}
+
+impl Debug for Check {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        f.debug_tuple("Check")
+            .field(&"<fn>")
+            .finish()
+    }
+}
 
 pub type HelpFunction = fn(&mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, &Args)
                    -> Result<(), Error>;
@@ -24,7 +42,9 @@ pub struct Help(pub HelpFunction, pub Arc<HelpOptions>);
 
 impl Debug for Help {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "fn()")
+        f.debug_struct("Help")
+            .field("options", &self.1)
+            .finish()
     }
 }
 
@@ -49,7 +69,7 @@ impl fmt::Debug for CommandOrAlias {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             CommandOrAlias::Alias(ref s) => f.debug_tuple("CommandOrAlias::Alias").field(&s).finish(),
-            _ => Ok(())
+            CommandOrAlias::Command(ref arc) => f.debug_tuple("CommandOrAlias::Command").field(&arc.options()).finish(),
         }
     }
 }
@@ -121,7 +141,7 @@ impl fmt::Debug for CommandGroup {
 pub struct CommandOptions {
     /// A set of checks to be called prior to executing the command. The checks
     /// will short-circuit on the first check that returns `false`.
-    pub checks: Vec<Box<Check>>,
+    pub checks: Vec<Check>,
     /// Ratelimit bucket.
     pub bucket: Option<String>,
     /// Command description, used by other commands.
@@ -182,10 +202,18 @@ pub struct HelpOptions {
     pub command_not_found_text: String,
     /// Explains the user on how to use access a single command's details.
     pub individual_command_tip: String,
-    /// Explains reasoning behind striked commands, see fields requiring `HelpBehaviour` for further information.
+    /// Explains reasoning behind strikethrough-commands, see fields requiring `HelpBehaviour` for further information.
     /// If `HelpBehaviour::Strike` is unused, this field will evaluate to `None` during creation
     /// inside of `CreateHelpCommand`.
-    pub striked_commands_tip: Option<String>,
+    ///
+    /// **Note**: Text is only used in direct messages.
+    pub striked_commands_tip_in_dm: Option<String>,
+    /// Explains reasoning behind strikethrough-commands, see fields requiring `HelpBehaviour` for further information.
+    /// If `HelpBehaviour::Strike` is unused, this field will evaluate to `None` during creation
+    /// inside of `CreateHelpCommand`.
+    ///
+    /// **Note**: Text is only used in guilds.
+    pub striked_commands_tip_in_guild: Option<String>,
     /// Announcing a group's prefix as in: {group_prefix} {prefix}.
     pub group_prefix: String,
     /// If a user lacks required roles, this will treat how these commands will be displayed.
@@ -234,12 +262,13 @@ impl Default for HelpOptions {
             individual_command_tip: "To get help with an individual command, pass its \
                  name as an argument to this command.".to_string(),
             group_prefix: "Prefix".to_string(),
-            striked_commands_tip: Some(String::new()),
+            striked_commands_tip_in_dm: Some(String::new()),
+            striked_commands_tip_in_guild: Some(String::new()),
             lacking_role: HelpBehaviour::Strike,
             lacking_permissions: HelpBehaviour::Strike,
             wrong_channel: HelpBehaviour::Strike,
-            embed_error_colour: Colour::dark_red(),
-            embed_success_colour: Colour::rosewater(),
+            embed_error_colour: Colour::DARK_RED,
+            embed_success_colour: Colour::ROSEWATER,
         }
     }
 }
@@ -298,25 +327,6 @@ impl<F> Command for F where F: Fn(&mut Context, &Message, Args) -> Result<(), Er
     }
 }
 
-impl fmt::Debug for CommandOptions {
-    // TODO: add CommandOptions::checks somehow?
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        fmt.debug_struct("CommandOptions")
-            .field("bucket", &self.bucket)
-            .field("desc", &self.desc)
-            .field("example", &self.example)
-            .field("usage", &self.usage)
-            .field("min_args", &self.min_args)
-            .field("required_permissions", &self.required_permissions)
-            .field("allowed_roles", &self.allowed_roles)
-            .field("help_available", &self.help_available)
-            .field("dm_only", &self.dm_only)
-            .field("guild_only", &self.guild_only)
-            .field("owners_only", &self.owners_only)
-            .finish()
-    }
-}
-
 impl Default for CommandOptions {
     fn default() -> CommandOptions {
         CommandOptions {
@@ -347,17 +357,12 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
         if let Some(mention_end) = find_mention_end(&msg.content, conf) {
             positions.push(mention_end);
             return Some(positions);
-        } else if let Some(ref func) = conf.dynamic_prefix {
-            if let Some(x) = func(ctx, msg) {
-                if msg.content.starts_with(&x) {
-                    positions.push(x.chars().count());
-                }
-            } else {
-                for n in &conf.prefixes {
-                    if msg.content.starts_with(n) {
-                        positions.push(n.chars().count());
-                    }
-                }
+        }
+
+        // Dynamic prefixes, if present and suitable, always have a higher priority.
+        if let Some(x) = conf.dynamic_prefix.as_ref().and_then(|f| f(ctx, msg)) {
+            if msg.content.starts_with(&x) {
+                positions.push(x.chars().count());
             }
         } else {
             for n in &conf.prefixes {
@@ -365,7 +370,7 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
                     positions.push(n.chars().count());
                 }
             }
-        };
+        }
 
         if positions.is_empty() {
             return None;
@@ -373,9 +378,11 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
 
         let pos = *unsafe { positions.get_unchecked(0) };
 
+        let with_whitespace = find_end_of_prefix_with_whitespace(&msg.content, pos);
+
         if conf.allow_whitespace {
-            positions.insert(0, find_end_of_prefix_with_whitespace(&msg.content, pos).unwrap_or(pos));
-        } else if find_end_of_prefix_with_whitespace(&msg.content, pos).is_some() {
+            positions.insert(0, with_whitespace.unwrap_or(pos));
+        } else if with_whitespace.is_some() {
             return None;
         }
 

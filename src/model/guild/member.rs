@@ -1,8 +1,8 @@
 use model::prelude::*;
 use chrono::{DateTime, FixedOffset};
 use std::fmt::{
-    Display, 
-    Formatter, 
+    Display,
+    Formatter,
     Result as FmtResult
 };
 use super::deserialize_sync_user;
@@ -85,9 +85,13 @@ impl Member {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature = "cache")]
+    #[inline]
     pub fn add_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
-        let role_id = role_id.into();
+        self._add_role(role_id.into())
+    }
 
+    #[cfg(feature = "cache")]
+    fn _add_role(&mut self, role_id: RoleId) -> Result<()> {
         if self.roles.contains(&role_id) {
             return Ok(());
         }
@@ -140,13 +144,16 @@ impl Member {
     ///
     /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
     #[cfg(feature = "cache")]
+    #[inline]
     pub fn ban<BO: BanOptions>(&self, ban_options: &BO) -> Result<()> {
-        let dmd = ban_options.dmd();
+        self._ban(ban_options.dmd(), ban_options.reason())
+    }
+
+    #[cfg(feature = "cache")]
+    fn _ban(&self, dmd: u8, reason: &str) -> Result<()> {
         if dmd > 7 {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
         }
-
-        let reason = ban_options.reason();
 
         if reason.len() > 512 {
             return Err(Error::ExceededLimit(reason.to_string(), 512));
@@ -240,21 +247,19 @@ impl Member {
     /// Retrieves the ID and position of the member's highest role in the
     /// hierarchy, if they have one.
     ///
-    /// This _may_ return `None` if the user has roles, but they are not present
-    /// in the cache for cache inconsistency reasons.
+    /// This _may_ return `None` if:
+    ///
+    /// - the user has roles, but they are not present in the cache for cache
+    /// inconsistency reasons
+    /// - you already have a write lock to the member's guild
     ///
     /// The "highest role in hierarchy" is defined as the role with the highest
     /// position. If two or more roles have the same highest position, then the
     /// role with the lowest ID is the highest.
-    ///
-    /// # Deadlocking
-    ///
-    /// This function will deadlock if you have a write lock to the member's
-    /// guild.
     #[cfg(feature = "cache")]
     pub fn highest_role_info(&self) -> Option<(RoleId, i64)> {
         let guild = self.guild_id.find()?;
-        let reader = guild.read();
+        let reader = guild.try_read()?;
 
         let mut highest = None;
 
@@ -370,9 +375,13 @@ impl Member {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
     #[cfg(feature = "cache")]
+    #[inline]
     pub fn remove_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
-        let role_id = role_id.into();
+        self._remove_role(role_id.into())
+    }
 
+    #[cfg(feature = "cache")]
+    fn _remove_role(&mut self, role_id: RoleId) -> Result<()> {
         if !self.roles.contains(&role_id) {
             return Ok(());
         }
@@ -461,4 +470,22 @@ impl Display for Member {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         Display::fmt(&self.user.read().mention(), f)
     }
+}
+
+/// A partial amount of data for a member.
+///
+/// This is used in [`Message`]s from [`Guild`]s.
+///
+/// [`Guild`]: struct.Guild.html
+/// [`Message`]: ../channel/struct.Message.html
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct PartialMember {
+    /// Indicator of whether the member can hear in voice channels.
+    pub deaf: bool,
+    /// Timestamp representing the date when the member joined.
+    pub joined_at: Option<DateTime<FixedOffset>>,
+    /// Indicator of whether the member can speak in voice channels.
+    pub mute: bool,
+    /// Vector of Ids of [`Role`]s given to the member.
+    pub roles: Vec<RoleId>,
 }

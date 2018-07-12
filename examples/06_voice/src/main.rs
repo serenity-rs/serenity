@@ -3,7 +3,7 @@
 //!
 //! ```toml
 //! [dependencies.serenity]
-//! git = "https://github.com/zeyla/serenity.git"
+//! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["cache", "framework", "standard_framework", "voice"]
 //! ```
 
@@ -19,7 +19,6 @@ use serenity::client::{CACHE, Client, Context, EventHandler};
 use serenity::framework::StandardFramework;
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
-use serenity::model::id::ChannelId;
 use serenity::model::misc::Mentionable;
 // Import the `Context` from the client and `parking_lot`'s `Mutex`.
 //
@@ -109,23 +108,31 @@ command!(deafen(ctx, msg) {
     }
 });
 
-command!(join(ctx, msg, args) {
-    let connect_to = match args.single::<u64>() {
-        Ok(id) => ChannelId(id),
-        Err(_) => {
-            check_msg(msg.reply("Requires a valid voice channel ID be given"));
-
-            return Ok(());
-        },
-    };
-
-    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().guild_id,
+command!(join(ctx, msg) {
+    let guild = match msg.guild() {
+        Some(guild) => guild,
         None => {
             check_msg(msg.channel_id.say("Groups and DMs not supported"));
 
             return Ok(());
-        },
+        }
+    };
+
+    let guild_id = guild.read().id;
+
+    let channel_id = guild
+        .read()
+        .voice_states.get(&msg.author.id)
+        .and_then(|voice_state| voice_state.channel_id);
+
+
+    let connect_to = match channel_id {
+        Some(channel) => channel,
+        None => {
+            check_msg(msg.reply("Not in a voice channel"));
+
+            return Ok(());
+        }
     };
 
     let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();

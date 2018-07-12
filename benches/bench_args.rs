@@ -49,56 +49,6 @@ mod benches {
     }
 
     #[bench]
-    fn len_with_one_delimiter(b: &mut Bencher) {
-        b.iter(|| {
-            let mut args = Args::new("1,2,3,4,5,6,7,8,9,10,11,12,13,14", &[",".to_string()]);
-            args.len();
-        })
-    }
-
-    #[bench]
-    fn double_len_with_one_delimiter(b: &mut Bencher) {
-        b.iter(|| {
-            let mut args = Args::new("1,2,3,4,5,6,7,8,9,10,11,12,13,14", &[",".to_string()]);
-            args.len();
-            args.len();
-        })
-    }
-
-    #[bench]
-    fn double_len_quoted_with_one_delimiter(b: &mut Bencher) {
-        b.iter(|| {
-            let mut args = Args::new(r#""a" "a" "a" "a" "a" "a" "a" "a" "a" "a""#, &[" ".to_string()]);
-            args.len_quoted();
-            args.len_quoted();
-        })
-    }
-
-    #[bench]
-    fn len_with_three_delimiter(b: &mut Bencher) {
-        b.iter(|| {
-            let mut args = Args::new("1,2,3,4@5,6,7@8,9,10@11,12#13,14", &[",".to_string(), "@".to_string(), "#".to_string()]);
-            args.len();
-        })
-    }
-
-    #[bench]
-    fn len_quoted_with_one_delimiter(b: &mut Bencher) {
-        b.iter(|| {
-            let mut args = Args::new(r#""1","2","3","4","5","6","7","8","9","10""#, &[",".to_string()]);
-            args.len();
-        })
-    }
-
-    #[bench]
-    fn len_quoted_with_three_delimiter(b: &mut Bencher) {
-        b.iter(|| {
-            let mut args = Args::new(r#""1"-"2"<"3","4","5","6","7"<"8","9"<"10""#, &[",".to_string(), "-".to_string(), "<".to_string()]);
-            args.len();
-        })
-    }
-
-    #[bench]
     fn multiple_with_one_delimiter(b: &mut Bencher) {
         b.iter(|| {
             let args = Args::new("1,2,3,4,5,6,7,8,9,10", &[",".to_string()]);

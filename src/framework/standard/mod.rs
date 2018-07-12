@@ -10,18 +10,19 @@ mod buckets;
 mod args;
 
 pub use self::args::{
-    Args, 
-    Iter, 
+    Args,
+    Iter,
     Error as ArgError
 };
 pub(crate) use self::buckets::{Bucket, Ratelimit};
 pub(crate) use self::command::Help;
 pub use self::command::{
-    HelpFunction, 
-    HelpOptions, 
-    Command, 
-    CommandGroup, 
-    CommandOptions, 
+    Check,
+    HelpFunction,
+    HelpOptions,
+    Command,
+    CommandGroup,
+    CommandOptions,
     Error as CommandError
 };
 pub use self::command::CommandOrAlias;
@@ -148,10 +149,11 @@ macro_rules! command {
 
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
+#[derive(Debug)]
 pub enum DispatchError {
     /// When a custom function check has failed.
     //
-    // TODO: Bring back `Arc<Command>` as `CommandOptions` here somehow?
+    // TODO: Bring back `Arc<Command>` as `CommandOptions` in 0.6.x.
     CheckFailed,
     /// When the requested command is disabled in bot configuration.
     CommandDisabled(String),
@@ -159,6 +161,8 @@ pub enum DispatchError {
     BlockedUser,
     /// When the guild or its owner is blocked in bot configuration.
     BlockedGuild,
+    /// When the channel blocked in bot configuration.
+    BlockedChannel,
     /// When the command requester lacks specific required permissions.
     LackOfPermissions(Permissions),
     /// When the command requester has exceeded a ratelimit bucket. The attached
@@ -183,31 +187,6 @@ pub enum DispatchError {
     IgnoredBot,
     /// When the bot ignores webhooks and a command was issued by one.
     WebhookAuthor,
-}
-
-use std::fmt;
-
-impl fmt::Debug for DispatchError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use self::DispatchError::*;
-
-        match *self {
-            CheckFailed => write!(f, "DispatchError::CheckFailed"),
-            CommandDisabled(ref s) => f.debug_tuple("DispatchError::CommandDisabled").field(&s).finish(),
-            BlockedUser => write!(f, "DispatchError::BlockedUser"),
-            BlockedGuild => write!(f, "DispatchError::BlockedGuild"),
-            LackOfPermissions(ref perms) => f.debug_tuple("DispatchError::LackOfPermissions").field(&perms).finish(),
-            RateLimited(ref num) => f.debug_tuple("DispatchError::RateLimited").field(&num).finish(),
-            OnlyForDM => write!(f, "DispatchError::OnlyForDM"),
-            OnlyForOwners => write!(f, "DispatchError::OnlyForOwners"),
-            OnlyForGuilds => write!(f, "DispatchError::OnlyForGuilds"),
-            LackingRole => write!(f, "DispatchError::LackingRole"),
-            NotEnoughArguments { ref min, ref given } => f.debug_struct("DispatchError::NotEnoughArguments").field("min", &min).field("given", &given).finish(),
-            TooManyArguments { ref max, ref given } => f.debug_struct("DispatchError::TooManyArguments").field("max", &max).field("given", &given).finish(),
-            IgnoredBot => write!(f, "DispatchError::IgnoredBot"),
-            WebhookAuthor => write!(f, "DispatchError::WebhookAuthor"),
-        }
-    }
 }
 
 type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;
@@ -495,6 +474,14 @@ impl StandardFramework {
         false
     }
 
+    #[cfg(feature = "cache")]
+    fn is_blocked_channel(&self, message: &Message) -> bool {
+        !self.configuration.allowed_channels.is_empty()
+            && !self.configuration
+                .allowed_channels
+                .contains(&message.channel_id)
+    }
+
     #[allow(too_many_arguments)]
     #[cfg_attr(feature = "cargo-clippy", allow(cyclomatic_complexity))]
     fn should_fail(&mut self,
@@ -510,32 +497,7 @@ impl StandardFramework {
             Some(DispatchError::IgnoredBot)
         } else if self.configuration.ignore_webhooks && message.webhook_id.is_some() {
             Some(DispatchError::WebhookAuthor)
-        } else if self.configuration.owners.contains(&message.author.id) {
-            None
         } else {
-            if let Some(ref bucket) = command.bucket {
-                if let Some(ref mut bucket) = self.buckets.get_mut(bucket) {
-                    let rate_limit = bucket.take(message.author.id.0);
-                    match bucket.check {
-                        Some(ref check) => {
-                            let apply = feature_cache! {{
-                                let guild_id = message.guild_id();
-                                (check)(context, guild_id, message.channel_id, message.author.id)
-                            } else {
-                                (check)(context, message.channel_id, message.author.id)
-                            }};
-
-                            if apply && rate_limit > 0i64 {
-                                return Some(DispatchError::RateLimited(rate_limit));
-                            }
-                        },
-                        None => if rate_limit > 0i64 {
-                            return Some(DispatchError::RateLimited(rate_limit));
-                        },
-                    }
-                }
-            }
-
             let len = args.len();
 
             if let Some(x) = command.min_args {
@@ -556,10 +518,41 @@ impl StandardFramework {
                 }
             }
 
+            if self.configuration.owners.contains(&message.author.id) {
+                return None;
+            }
+
+            if let Some(ref bucket) = command.bucket {
+                if let Some(ref mut bucket) = self.buckets.get_mut(bucket) {
+                    let rate_limit = bucket.take(message.author.id.0);
+
+                    // Is there a custom check for when this bucket applies?
+                    // If not, assert that it does always.
+                    let apply = bucket.check.as_ref().map_or(true, |check| {
+                        let apply = feature_cache! {{
+                            let guild_id = message.guild_id;
+                            (check)(context, guild_id, message.channel_id, message.author.id)
+                        } else {
+                            (check)(context, message.channel_id, message.author.id)
+                        }};
+
+                        apply
+                    });
+
+                    if apply && rate_limit > 0i64 {
+                        return Some(DispatchError::RateLimited(rate_limit));
+                    }
+                }
+            }
+
             #[cfg(feature = "cache")]
             {
                 if self.is_blocked_guild(message) {
                     return Some(DispatchError::BlockedGuild);
+                }
+
+                if self.is_blocked_channel(message) {
+                    return Some(DispatchError::BlockedChannel);
                 }
 
                 if !has_correct_permissions(command, message) {
@@ -611,7 +604,7 @@ impl StandardFramework {
                 let all_group_checks_passed = group
                     .checks
                     .iter()
-                    .all(|check| check(&mut context, message, args, command));
+                    .all(|check| (check.0)(&mut context, message, args, command));
 
                 if !all_group_checks_passed {
                     return Some(DispatchError::CheckFailed);
@@ -709,7 +702,7 @@ impl StandardFramework {
     ///
     /// ```rust,ignore
     /// framework.command("ping", |c| c
-    ///     .description("Responds with 'pong'.")
+    ///     .desc("Responds with 'pong'.")
     ///     .exec(|ctx, _, _| {
     ///         let _ = ctx.say("pong");
     ///     }));
@@ -943,7 +936,7 @@ impl StandardFramework {
     /// Sets what code should be executed when a user sends `(prefix)help`.
     ///
     /// If a command named `help` was set with [`command`], then this takes precendence first.
-    /// 
+    ///
     /// [`command`]: #method.command
     pub fn help(mut self, f: HelpFunction) -> Self {
         let a = CreateHelpCommand(HelpOptions::default(), f).finish();
@@ -996,14 +989,14 @@ impl Framework for StandardFramework {
         'outer: for position in positions {
             let mut built = String::new();
             let round = message.content.chars().skip(position).collect::<String>();
-            let round = round.trim().split_whitespace().collect::<Vec<&str>>(); // Call to `trim` causes the related bug under the main bug #206 - where the whitespace settings are ignored. The fix is implemented as an additional check inside command::positions
+            let mut round = round.trim().split_whitespace(); // Call to `trim` causes the related bug under the main bug #206 - where the whitespace settings are ignored. The fix is implemented as an additional check inside command::positions
 
             for i in 0..self.configuration.depth {
                 if i != 0 {
                     built.push(' ');
                 }
 
-                built.push_str(match round.get(i) {
+                built.push_str(match round.next() {
                     Some(piece) => piece,
                     None => continue 'outer,
                 });
@@ -1115,13 +1108,12 @@ impl Framework for StandardFramework {
             }
         }
 
-        let unrecognised_command = self.unrecognised_command.clone();
-
-        threadpool.execute(move || {
-            if let Some(unrecognised_command) = unrecognised_command {
+        if let Some(unrecognised_command) = &self.unrecognised_command {
+            let unrecognised_command = unrecognised_command.clone();
+            threadpool.execute(move || {
                 (unrecognised_command)(&mut context, &message, &unrecognised_command_name);
-            }
-        });
+            });
+        }
     }
 
     fn update_current_user(&mut self, user_id: UserId) {
@@ -1168,12 +1160,10 @@ pub enum HelpBehaviour {
     Nothing
 }
 
+use std::fmt;
+
 impl fmt::Display for HelpBehaviour {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-       match *self {
-           HelpBehaviour::Strike => write!(f, "HelpBehaviour::Strike"),
-           HelpBehaviour::Hide => write!(f, "HelpBehaviour::Hide"),
-           HelpBehaviour::Nothing => write!(f, "HelBehaviour::Nothing"),
-       }
+       fmt::Debug::fmt(self, f)
     }
 }

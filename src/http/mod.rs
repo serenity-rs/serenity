@@ -33,18 +33,18 @@ pub use hyper::status::{StatusClass, StatusCode};
 use constants;
 use hyper::{
     client::{
-        Client as HyperClient, 
-        Request, 
-        RequestBuilder, 
+        Client as HyperClient,
+        Request,
+        RequestBuilder,
         Response as HyperResponse
     },
     header::ContentType,
     method::Method,
     mime::{Mime, SubLevel, TopLevel},
     net::HttpsConnector,
-    header, 
-    Error as HyperError, 
-    Result as HyperResult, 
+    header,
+    Error as HyperError,
+    Result as HyperResult,
     Url
 };
 use hyper_native_tls::NativeTlsClient;
@@ -194,6 +194,35 @@ pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &s
 /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
 pub fn ban_zeyla(guild_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
     ban_user(guild_id, 114941315417899012, delete_message_days, reason)
+}
+
+/// Ban luna from a [`Guild`], removing her messages sent in the last X number
+/// of days.
+///
+/// Passing a `delete_message_days` of `0` is equivalent to not removing any
+/// messages. Up to `7` days' worth of messages may be deleted.
+///
+/// **Note**: Requires that you have the [Ban Members] permission.
+///
+/// [`Guild`]: ../model/guild/struct.Guild.html
+/// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
+pub fn ban_luna(guild_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
+    ban_user(guild_id, 180731582049550336, delete_message_days, reason)
+}
+
+/// Ban the serenity servermoms from a [`Guild`], removing their messages
+/// sent in the last X number of days.
+///
+/// Passing a `delete_message_days` of `0` is equivalent to not removing any
+/// messages. Up to `7` days' worth of messages may be deleted.
+///
+/// **Note**: Requires that you have the [Ban Members] permission.
+///
+/// [`Guild`]: ../model/guild/struct.Guild.html
+/// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
+pub fn ban_servermoms(guild_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
+    ban_zeyla(guild_id, delete_message_days, reason)?;
+    ban_luna(guild_id, delete_message_days, reason)
 }
 
 /// Broadcasts that the current user is typing in the given [`Channel`].
