@@ -85,6 +85,7 @@ impl<D: fmt::Display> From<D> for Error {
     }
 }
 
+#[derive(Debug)]
 pub struct CommandGroup {
     pub prefix: Option<String>,
     pub commands: HashMap<String, CommandOrAlias>,
@@ -117,24 +118,6 @@ impl Default for CommandGroup {
             help: None,
             checks: Vec::new(),
         }
-    }
-}
-
-impl fmt::Debug for CommandGroup {
-    // TODO: add CommandGroup::checks somehow?
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        fmt.debug_struct("CommandGroup")
-            .field("prefix", &self.prefix)
-            .field("commands", &self.commands)
-            .field("bucket", &self.bucket)
-            .field("required_permissions", &self.required_permissions)
-            .field("allowed_roles", &self.allowed_roles)
-            .field("help_available", &self.help_available)
-            .field("dm_only", &self.dm_only)
-            .field("guild_only", &self.guild_only)
-            .field("owners_only", &self.owners_only)
-            .field("help", &self.help)
-            .finish()
     }
 }
 
