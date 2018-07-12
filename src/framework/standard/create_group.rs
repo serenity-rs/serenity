@@ -8,7 +8,8 @@ pub(crate) use super::command::CommandOrAlias;
 pub use super::{
     create_help_command::CreateHelpCommand,
     create_command::{CreateCommand, FnOrCommand},
-    Args
+    Args,
+    Check,
 };
 
 use client::Context;
@@ -171,7 +172,7 @@ impl CreateGroup {
                      + Send
                      + Sync
                      + 'static {
-        self.0.checks.push(Box::new(check));
+        self.0.checks.push(Check::new(check));
 
         self
     }
