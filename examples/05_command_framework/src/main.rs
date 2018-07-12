@@ -238,7 +238,7 @@ command!(commands(ctx, msg, _args) {
 // not called.
 fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> bool {
     // Replace 7 with your ID
-    msg.author.id == 156157433813663745
+    msg.author.id == 7
 }
 
 // A function which acts as a "check", to determine whether to call a command.
