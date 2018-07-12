@@ -613,7 +613,7 @@ impl StandardFramework {
                 let all_command_checks_passed = command
                     .checks
                     .iter()
-                    .all(|check| check(&mut context, message, args, command));
+                    .all(|check| (check.0)(&mut context, message, args, command));
 
                 if all_command_checks_passed {
                     None
