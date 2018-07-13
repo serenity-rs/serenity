@@ -51,7 +51,7 @@ impl Default for ShardingStrategy {
 #[derive(Clone, Debug, Default)]
 pub struct ShardManagerOptions<T: ReconnectQueue> {
     pub strategy: ShardingStrategy,
-    pub token: Rc<String>,
+    pub token: String,
     pub ws_uri: Rc<String>,
     pub queue: T,
 }
@@ -66,7 +66,7 @@ pub struct ShardManager<T: ReconnectQueue> {
     reconnect_queue: T,
     shards: ShardsMap,
     pub strategy: ShardingStrategy,
-    pub token: Rc<String>,
+    pub token: String,
     pub ws_uri: Rc<String>,
     message_stream: Option<MessageStream>,
     queue_sender: MpscSender<u64>,
@@ -182,7 +182,7 @@ impl<T: ReconnectQueue> ShardManager<T> {
 
 fn process_queue(
     queue_receiver: MpscReceiver<u64>,
-    token: Rc<String>,
+    token: String,
     shards_total: u64,
     sender: UnboundedSender<Message>,
     shards_map: ShardsMap,
@@ -210,12 +210,12 @@ fn process_queue(
 }
 
 fn start_shard(
-    token: Rc<String>,
+    token: String,
     shard_id: u64,
     shards_total: u64,
     sender: UnboundedSender<Message>,
 ) -> Box<Future<Item = WrappedShard, Error = ()>> {
-    Box::new(Shard::new(token, [shard_id, shards_total])
+    Box::new(Shard::new(token.clone(), [shard_id, shards_total])
         .then(move |result| {
             let shard = match result {
                 Ok(shard) => Rc::new(RefCell::new(shard)),
