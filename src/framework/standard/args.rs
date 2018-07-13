@@ -304,6 +304,33 @@ pub struct Args {
 }
 
 impl Args {
+    /// Create a new instance of `Args` for parsing arguments.
+    ///
+    /// For more reference, look at [`Args`]'s struct documentation.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new(
+    /// // Our source from where we'll parse over.
+    /// "the quick brown fox jumps over the lazy",
+    ///
+    /// // The "delimiters", or aka the separators. They denote how we distinguish arguments as their own.
+    /// // For this instance, we'll use one delimiter. The space (`0x20`), which will separate the arguments.
+    /// &[" ".to_string()],
+    /// );
+    ///
+    /// assert_eq!(args.single::<String>().unwrap(), "the");
+    /// assert_eq!(args.single::<String>().unwrap(), "quick");
+    /// assert_eq!(args.single::<String>().unwrap(), "brown");
+    ///
+    /// // We should not see `the quick brown` again.
+    /// assert_eq!(args.rest(), "fox jumps over the lazy");
+    /// ```
+    ///
+    /// [`Args`]: #struct.Args.html
     pub fn new(message: &str, possible_delimiters: &[String]) -> Self {
         let delims = possible_delimiters
             .iter()
