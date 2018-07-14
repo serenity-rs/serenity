@@ -26,7 +26,7 @@ pub enum Error {
     /// An error from the `hyper` crate.
     Hyper(HyperError),
     /// When a status code was unexpectedly received for a request's status.
-    InvalidRequest(Response<Body>),
+    InvalidRequest(Response<()>),
     /// When a given URI is invalid.
     InvalidUri(InvalidUri),
     /// An error from the `std::io` module.

@@ -1599,7 +1599,9 @@ fn verify_status(response: Response<Body>) ->
     if response.status().is_success() {
         Box::new(future::ok(response))
     } else {
-        Box::new(future::err(Error::Http(HttpError::InvalidRequest(response))))
+        let (parts, _) = response.into_parts();
+        let resp = Response::from_parts(parts, ());
+        Box::new(future::err(Error::Http(HttpError::InvalidRequest(resp))))
     }
 }
 
