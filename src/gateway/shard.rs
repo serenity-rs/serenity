@@ -8,7 +8,7 @@ use model::event::{Event, GatewayEvent};
 use model::gateway::Activity;
 use model::id::GuildId;
 use model::user::OnlineStatus;
-use serde_json::{self, Error as JsonError, Value};
+use serde_json::{self, Value};
 use std::env::consts;
 use std::io::{Error as IoError, ErrorKind as IoErrorKind};
 use std::sync::{Arc, Mutex};
@@ -80,10 +80,10 @@ impl Shard {
         }).from_err()
     }
 
-    pub fn parse(&self, msg: TungsteniteMessage) -> Result<GatewayEvent, Error> {
+    pub fn parse(&self, msg: &TungsteniteMessage) -> Result<GatewayEvent, Error> {
         match msg {
-            TungsteniteMessage::Binary(v) => serde_json::from_slice(&v),
-            TungsteniteMessage::Text(v) => serde_json::from_str(&v),
+            TungsteniteMessage::Binary(v) => serde_json::from_slice(v),
+            TungsteniteMessage::Text(v) => serde_json::from_str(v),
             _ => unreachable!("parse other"),
         }.map_err(From::from)
     }
