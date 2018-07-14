@@ -49,10 +49,6 @@ version = "~0.12"
 optional = true
 version = "~0.2"
 
-[dependencies.native-tls]
-optional = true
-version = "~0.1"
-
 [dependencies.opus]
 optional = true
 version = "0.2"
@@ -86,7 +82,7 @@ client = ["gateway", "http"]
 extras = []
 framework = ["client", "utils"]
 gateway = ["flate2", "http", "tokio-tungstenite", "utils"]
-http-client = ["builder", "hyper", "hyper-tls", "native-tls", "utils"]
+http-client = ["builder", "hyper", "hyper-tls", "utils"]
 standard_framework = ["framework"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "rand", "sodiumoxide"]

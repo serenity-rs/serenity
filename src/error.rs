@@ -22,8 +22,6 @@ use hyper::{
 use http::HttpError as HttpClientError;
 #[cfg(feature = "http")]
 use http_crate::Error as HttpError;
-#[cfg(feature = "native-tls")]
-use native_tls::Error as TlsError;
 #[cfg(feature = "opus")]
 use opus::Error as OpusError;
 #[cfg(feature = "tokio-tungstenite")]
@@ -112,9 +110,6 @@ pub enum Error {
     Hyper(HyperError),
     /// An error with a hyper header value.
     InvalidHeaderValue(InvalidHeaderValue),
-    /// An error from the `native-tls` crate.
-    #[cfg(feature = "native-tls")]
-    Tls(TlsError),
     /// An error while sending a message over a WebSocket.
     #[cfg(feature = "tokio-tungstenite")]
     WebSocketSend(SendError<TungsteniteMessage>),
@@ -195,11 +190,6 @@ impl From<SendError<TungsteniteMessage>> for Error {
     }
 }
 
-#[cfg(feature = "native-tls")]
-impl From<TlsError> for Error {
-    fn from(e: TlsError) -> Error { Error::Tls(e) }
-}
-
 #[cfg(feature = "tokio-tungstenite")]
 impl From<TungsteniteError> for Error {
     fn from(err: TungsteniteError) -> Self {
@@ -237,8 +227,6 @@ impl StdError for Error {
             Error::Hyper(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Opus(ref inner) => inner.description(),
-            #[cfg(feature = "native-tls")]
-            Error::Tls(ref inner) => inner.description(),
             #[cfg(feature = "tokio-tungstenite")]
             Error::Tungstenite(ref inner) => inner.description(),
             #[cfg(feature = "voice")]

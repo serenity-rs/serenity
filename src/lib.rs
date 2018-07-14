@@ -129,8 +129,6 @@ extern crate hyper;
 extern crate hyper_tls;
 #[cfg(feature = "multipart")]
 extern crate multipart;
-#[cfg(feature = "native-tls")]
-extern crate native_tls;
 #[cfg(feature = "opus")]
 extern crate opus;
 #[cfg(feature = "rand")]

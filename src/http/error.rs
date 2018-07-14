@@ -1,7 +1,6 @@
 use futures::sync::oneshot::Canceled;
 use http_crate::uri::InvalidUri;
 use hyper::{Body, Error as HyperError, Response};
-use native_tls::Error as TlsError;
 use serde_json::Error as JsonError;
 use std::{
     cell::BorrowMutError,
@@ -36,8 +35,6 @@ pub enum Error {
     Json(JsonError),
     /// An error from the `ratelimiting` module.
     RateLimit(RateLimitError),
-    /// An error from the `native_tls` crate.
-    Tls(TlsError),
     /// When a status is received, but the verification to ensure the response
     /// is valid does not recognize the status.
     UnknownStatus(u16),
@@ -60,7 +57,6 @@ impl StdError for Error {
             Error::Io(ref inner) => inner.description(),
             Error::Json(ref inner) => inner.description(),
             Error::RateLimit(ref inner) => inner.description(),
-            Error::Tls(ref inner) => inner.description(),
             Error::UnknownStatus(_) => "Verification does not understand status",
             Error::Uri => "TODO",
         }
@@ -106,11 +102,5 @@ impl From<JsonError> for Error {
 impl From<RateLimitError> for Error {
     fn from(err: RateLimitError) -> Self {
         Error::RateLimit(err)
-    }
-}
-
-impl From<TlsError> for Error {
-    fn from(err: TlsError) -> Self {
-        Error::Tls(err)
     }
 }
