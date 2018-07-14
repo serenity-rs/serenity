@@ -111,7 +111,6 @@ extern crate chrono;
 extern crate futures;
 extern crate serde;
 extern crate tokio;
-extern crate tokio_timer;
 extern crate tokio_tls;
 extern crate tokio_tungstenite;
 extern crate tungstenite;

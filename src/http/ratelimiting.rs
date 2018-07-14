@@ -53,11 +53,13 @@ use std::collections::{HashMap, VecDeque};
 use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::rc::Rc;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use std::{i64, str, u8};
 use super::{Error, Path, Result};
-use tokio::executor::current_thread;
-use tokio_timer;
+use tokio::{
+    executor::current_thread,
+    timer::Delay,
+};
 
 #[derive(Debug)]
 pub enum RateLimitError {
@@ -269,7 +271,7 @@ impl RateLimiter {
                     let wait_ms = reset_ms.saturating_sub(now_ms as u64);
                     let duration = Duration::from_millis(wait_ms as u64);
 
-                    let done = tokio_timer::sleep(duration)
+                    let done = Delay::new(Instant::now() + duration)
                         .map(|_| {
                             ()
                         }).map_err(|why| {
@@ -302,8 +304,10 @@ impl RateLimiter {
 
                 self.global.borrow_mut().blocked = true;
                 let global = Rc::clone(&self.global);
+                let duration = Duration::from_millis(millis as u64);
+                let delay = Delay::new(Instant::now() + duration);
 
-                let done = tokio_timer::sleep(Duration::from_millis(millis as u64))
+                let done = delay
                     .map(move |_| {
                         let mut global = global.borrow_mut();
                         global.blocked = false;
@@ -338,7 +342,9 @@ impl RateLimiter {
             RateLimit::Reached(millis) => {
                 debug!("Ratelimited on route {:?} for {:?}ms", route, millis);
 
-                let done = tokio_timer::sleep(Duration::from_millis(millis as u64))
+                let duration = Duration::from_millis(millis as u64);
+
+                let done = Delay::new(Instant::now() + duration)
                     .map_err(|why| {
                         warn!("Err with ratelimited timer: {:?}", why);
 

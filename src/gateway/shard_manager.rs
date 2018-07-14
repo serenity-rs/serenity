@@ -3,14 +3,16 @@ use ::Error;
 use std::collections::{VecDeque, HashMap};
 use std::rc::Rc;
 use std::cell::RefCell;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use gateway::{
     shard::Shard,
     queue::ReconnectQueue,
 };
 use model::event::{Event, GatewayEvent};
-use tokio::executor::current_thread;
-use tokio_timer;
+use tokio::{
+    executor::current_thread,
+    timer::Delay,
+};
 use futures::sync::mpsc::{
     unbounded, UnboundedSender, UnboundedReceiver,
     channel, Sender as MpscSender, Receiver as MpscReceiver,
@@ -194,7 +196,7 @@ fn process_queue(
             let sender = sender.clone();
             let shards_map = shards_map.clone();
 
-            tokio_timer::sleep(Duration::from_secs(6))
+            Delay::new(Instant::now() + Duration::from_secs(6))
                 .map_err(|e| error!("Error sleeping before starting next shard: {:?}", e))
                 .and_then(move |_| {
                     let future = start_shard(token, shard_id, shards_total, sender)

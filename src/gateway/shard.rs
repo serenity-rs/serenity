@@ -15,9 +15,11 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 use super::{ConnectionStage, CurrentPresence, ShardStream};
 use tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage};
-use tokio_timer::Interval;
 use tokio_tungstenite::connect_async;
-use tokio::executor::current_thread;
+use tokio::{
+    executor::current_thread,
+    timer::Interval,
+};
 use tokio;
 use url::Url;
 use std::str::FromStr;
