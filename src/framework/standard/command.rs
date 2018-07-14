@@ -365,7 +365,7 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
 
             // If the above do not fill `positions`, then that means no kind of prefix was present.
             // Check if a no-prefix-execution is applicable.
-            if conf.no_prefix && private && positions.is_empty() {
+            if conf.no_dm_prefix && private && positions.is_empty() {
                 positions.push(0);
             }
         }

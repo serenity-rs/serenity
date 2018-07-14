@@ -53,7 +53,7 @@ pub struct Configuration {
     #[doc(hidden)] pub on_mention: Option<Vec<String>>,
     #[doc(hidden)] pub owners: HashSet<UserId>,
     #[doc(hidden)] pub prefixes: Vec<String>,
-    #[doc(hidden)] pub no_prefix: bool,
+    #[doc(hidden)] pub no_dm_prefix: bool,
     #[doc(hidden)] pub delimiters: Vec<String>,
     #[doc(hidden)] pub case_insensitive: bool,
 }
@@ -403,8 +403,8 @@ impl Configuration {
     ///
     /// # Note
     /// Needs the `cache` feature to be enabled. Otherwise this does nothing.
-    pub fn no_prefix(mut self, b: bool) -> Self {
-        self.no_prefix = b;
+    pub fn no_dm_prefix(mut self, b: bool) -> Self {
+        self.no_dm_prefix = b;
 
         self
     }
@@ -477,7 +477,7 @@ impl Default for Configuration {
     /// - **depth** to `5`
     /// - **on_mention** to `false` (basically)
     /// - **prefix** to `None`
-    /// - **no_prefix** to `false`
+    /// - **no_dm_prefix** to `false`
     /// - **delimiters** to vec![" "]
     /// - **case_insensitive** to `false`
     fn default() -> Configuration {
@@ -487,7 +487,7 @@ impl Default for Configuration {
             dynamic_prefix: None,
             allow_whitespace: false,
             prefixes: vec![],
-            no_prefix: false,
+            no_dm_prefix: false,
             ignore_bots: true,
             owners: HashSet::default(),
             blocked_users: HashSet::default(),
