@@ -3,8 +3,6 @@
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
-use std::cell::RefCell;
-use std::rc::Rc;
 use super::utils::*;
 use super::prelude::*;
 
@@ -362,7 +360,7 @@ pub struct Presence {
     /// date.
     pub user_id: UserId,
     /// The associated user instance.
-    pub user: Option<Rc<RefCell<User>>>,
+    pub user: Option<User>,
 }
 
 impl<'de> Deserialize<'de> for Presence {
@@ -377,7 +375,7 @@ impl<'de> Deserialize<'de> for Presence {
             let user = User::deserialize(Value::Object(user_map))
                 .map_err(DeError::custom)?;
 
-            (user.id, Some(Rc::new(RefCell::new(user))))
+            (user.id, Some(user))
         } else {
             let user_id = user_map
                 .remove("id")
@@ -433,7 +431,7 @@ impl Serialize for Presence {
         state.serialize_field("status", &self.status)?;
 
         if let Some(ref user) = self.user {
-            state.serialize_field("user", &*user.borrow())?;
+            state.serialize_field("user", &user)?;
         } else {
             state.serialize_field("user", &UserId {
                 id: self.user_id.0,
