@@ -125,8 +125,6 @@ extern crate flate2;
 extern crate http as http_crate;
 #[cfg(feature = "hyper")]
 extern crate hyper;
-#[cfg(feature = "hyper-multipart-rfc7578")]
-extern crate hyper_multipart_rfc7578;
 #[cfg(feature = "hyper-tls")]
 extern crate hyper_tls;
 #[cfg(feature = "multipart")]
