@@ -1,6 +1,9 @@
 use client::Context;
 use model::{
-    channel::Message,
+    channel::{
+        Message,
+        Channel,
+    },
     Permissions
 };
 use std::{
@@ -350,6 +353,20 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
                 if msg.content.starts_with(n) {
                     positions.push(n.chars().count());
                 }
+            }
+        }
+
+        #[cfg(feature = "cache")]
+        {
+            let private = match msg.channel() {
+                Some(Channel::Private(_)) => true,
+                _ => false,
+            };
+
+            // If the above do not fill `positions`, then that means no kind of prefix was present.
+            // Check if a no-prefix-execution is applicable.
+            if conf.no_prefix && private && positions.is_empty() {
+                positions.push(0);
             }
         }
 
