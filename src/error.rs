@@ -11,7 +11,7 @@ use std::{
     num::ParseIntError,
 };
 
-#[cfg(feature = "tungstenite")]
+#[cfg(feature = "tokio-tungstenite")]
 use futures::sync::mpsc::SendError;
 #[cfg(feature = "hyper")]
 use hyper::{
@@ -26,8 +26,11 @@ use http_crate::Error as HttpError;
 use native_tls::Error as TlsError;
 #[cfg(feature = "opus")]
 use opus::Error as OpusError;
-#[cfg(feature = "tungstenite")]
-use tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage};
+#[cfg(feature = "tokio-tungstenite")]
+use tokio_tungstenite::tungstenite::{
+    Error as TungsteniteError,
+    Message as TungsteniteMessage,
+};
 #[cfg(feature = "client")]
 use client::ClientError;
 #[cfg(feature = "voice")]
@@ -113,10 +116,10 @@ pub enum Error {
     #[cfg(feature = "native-tls")]
     Tls(TlsError),
     /// An error while sending a message over a WebSocket.
-    #[cfg(feature = "tungstenite")]
+    #[cfg(feature = "tokio-tungstenite")]
     WebSocketSend(SendError<TungsteniteMessage>),
     /// An error from the `tungstenite` crate.
-    #[cfg(feature = "tungstenite")]
+    #[cfg(feature = "tokio-tungstenite")]
     Tungstenite(TungsteniteError),
     /// An error from the `opus` crate.
     #[cfg(feature = "opus")]
@@ -185,7 +188,7 @@ impl From<OpusError> for Error {
     fn from(e: OpusError) -> Error { Error::Opus(e) }
 }
 
-#[cfg(feature = "tungstenite")]
+#[cfg(feature = "tokio-tungstenite")]
 impl From<SendError<TungsteniteMessage>> for Error {
     fn from(err: SendError<TungsteniteMessage>) -> Self {
         Error::WebSocketSend(err)
@@ -197,7 +200,7 @@ impl From<TlsError> for Error {
     fn from(e: TlsError) -> Error { Error::Tls(e) }
 }
 
-#[cfg(feature = "tungstenite")]
+#[cfg(feature = "tokio-tungstenite")]
 impl From<TungsteniteError> for Error {
     fn from(err: TungsteniteError) -> Self {
         Error::Tungstenite(err)
@@ -236,11 +239,11 @@ impl StdError for Error {
             Error::Opus(ref inner) => inner.description(),
             #[cfg(feature = "native-tls")]
             Error::Tls(ref inner) => inner.description(),
-            #[cfg(feature = "tungstenite")]
+            #[cfg(feature = "tokio-tungstenite")]
             Error::Tungstenite(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Voice(_) => "Voice error",
-            #[cfg(feature = "tungstenite")]
+            #[cfg(feature = "tokio-tungstenite")]
             Error::WebSocketSend(ref inner) => inner.description(),
         }
     }

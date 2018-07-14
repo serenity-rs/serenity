@@ -74,10 +74,6 @@ version = "0.0.14"
 git = "https://github.com/snapview/tokio-tungstenite"
 optional = true
 
-[dependencies.tungstenite]
-optional = true
-version = "~0.5"
-
 [dev-dependencies.matches]
 version = "0.1.6"
 
@@ -93,7 +89,7 @@ builder = ["utils"]
 client = ["gateway", "http"]
 extras = []
 framework = ["client", "utils"]
-gateway = ["flate2", "http", "tokio-tungstenite", "tungstenite", "utils"]
+gateway = ["flate2", "http", "tokio-tungstenite", "utils"]
 http-client = ["builder", "hyper", "hyper-multipart-rfc7578", "hyper-tls", "native-tls", "utils"]
 standard_framework = ["framework"]
 utils = ["base64"]

@@ -113,7 +113,6 @@ extern crate serde;
 extern crate tokio;
 extern crate tokio_tls;
 extern crate tokio_tungstenite;
-extern crate tungstenite;
 extern crate url;
 
 #[cfg(feature = "base64")]

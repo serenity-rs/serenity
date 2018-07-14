@@ -18,7 +18,10 @@ use futures::sync::mpsc::{
     channel, Sender as MpscSender, Receiver as MpscReceiver,
     SendError,
 };
-use tungstenite::{Message as TungsteniteMessage, Error as TungsteniteError};
+use tokio_tungstenite::tungstenite::{
+    Error as TungsteniteError,
+    Message as TungsteniteMessage,
+};
 
 #[derive(Clone, Copy, Debug)]
 pub enum ShardingStrategy {

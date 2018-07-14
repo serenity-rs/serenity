@@ -14,8 +14,10 @@ use std::io::{Error as IoError, ErrorKind as IoErrorKind};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 use super::{ConnectionStage, CurrentPresence, ShardStream};
-use tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage};
-use tokio_tungstenite::connect_async;
+use tokio_tungstenite::{
+    tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage},
+    connect_async,
+};
 use tokio::{
     executor::current_thread,
     timer::Interval,
