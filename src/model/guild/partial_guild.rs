@@ -1,6 +1,4 @@
 use model::prelude::*;
-use std::cell::RefCell;
-use std::rc::Rc;
 use super::super::utils::{deserialize_emojis, deserialize_roles};
 
 
@@ -17,7 +15,7 @@ pub struct PartialGuild {
     pub embed_channel_id: Option<ChannelId>,
     pub embed_enabled: bool,
     #[serde(deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
-    /// Features enabled for the guild.
+    /// Features enabled for the guild.a
     ///
     /// Refer to [`Guild::features`] for more information.
     ///
@@ -29,8 +27,8 @@ pub struct PartialGuild {
     pub owner_id: UserId,
     pub region: String,
     #[serde(deserialize_with = "deserialize_roles",
-            serialize_with = "serialize_gen_rc_map")]
-    pub roles: HashMap<RoleId, Rc<RefCell<Role>>>,
+            serialize_with = "serialize_gen_map")]
+    pub roles: HashMap<RoleId, Role>,
     pub splash: Option<String>,
     pub verification_level: VerificationLevel,
 }
@@ -106,7 +104,7 @@ impl PartialGuild {
     ///
     /// client.start().unwrap();
     /// ```
-    pub fn role_by_name(&self, role_name: &str) -> Option<&Rc<RefCell<Role>>> {
-        self.roles.values().find(|role| role_name == role.borrow().name)
+    pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
+        self.roles.values().find(|role| role_name == role.name)
     }
 }

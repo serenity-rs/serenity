@@ -237,11 +237,7 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
             .map(|members| members
                 .into_iter()
                 .fold(HashMap::new(), |mut acc, member| {
-                    let id = member.user.try_borrow().ok().map(|u| u.id);
-
-                    if let Some(id) = id {
-                        acc.insert(id, member);
-                    }
+                    acc.insert(member.user.id, member);
 
                     acc
                 }))

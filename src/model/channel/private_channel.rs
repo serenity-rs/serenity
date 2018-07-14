@@ -1,8 +1,6 @@
 use chrono::{DateTime, FixedOffset};
 use model::prelude::*;
-use std::cell::RefCell;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::rc::Rc;
 use super::deserialize_single_recipient;
 
 /// A Direct Message text channel with another user.
@@ -29,19 +27,19 @@ pub struct PrivateChannel {
     #[serde(deserialize_with = "deserialize_single_recipient",
             rename = "recipients",
             serialize_with = "serialize_user")]
-    pub recipient: Rc<RefCell<User>>,
+    pub recipient: User,
 }
 
 impl PrivateChannel {
     /// Returns "DM with $username#discriminator".
     pub fn name(&self) -> String {
-        format!("DM with {}", self.recipient.borrow().tag())
+        format!("DM with {}", self.recipient.tag())
     }
 }
 
 impl Display for PrivateChannel {
     /// Formats the private channel, displaying the recipient's username.
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        f.write_str(&self.recipient.borrow().name)
+        f.write_str(&self.recipient.name)
     }
 }

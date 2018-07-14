@@ -1,9 +1,7 @@
 use chrono::{DateTime, FixedOffset};
 use model::prelude::*;
 use std::borrow::Cow;
-use std::cell::RefCell;
 use std::fmt::Write as FmtWrite;
-use std::rc::Rc;
 
 /// A group channel - potentially including other [`User`]s - separate from a
 /// [`Guild`].
@@ -28,7 +26,7 @@ pub struct Group {
     /// A map of the group's recipients.
     #[serde(deserialize_with = "deserialize_users",
             serialize_with = "serialize_users")]
-    pub recipients: HashMap<UserId, Rc<RefCell<User>>>,
+    pub recipients: HashMap<UserId, User>,
 }
 
 impl Group {
@@ -60,13 +58,11 @@ impl Group {
             Some(ref name) => Cow::Borrowed(name),
             None => {
                 let mut name = match self.recipients.values().nth(0) {
-                    Some(recipient) => recipient.borrow().name.clone(),
+                    Some(recipient) => recipient.name.clone(),
                     None => return Cow::Borrowed("Empty Group"),
                 };
 
                 for recipient in self.recipients.values().skip(1) {
-                    let recipient = recipient.borrow();
-
                     let _ = write!(name, ", {}", recipient.name);
                 }
 

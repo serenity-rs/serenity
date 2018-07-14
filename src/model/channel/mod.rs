@@ -24,31 +24,29 @@ use model::prelude::*;
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
-use std::cell::RefCell;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::rc::Rc;
 use super::utils::deserialize_u64;
 
 /// A container for any channel.
 #[derive(Clone, Debug)]
 pub enum Channel {
     /// A group. A group comprises of only one channel.
-    Group(Rc<RefCell<Group>>),
+    Group(Group),
     /// A [text] or [voice] channel within a [`Guild`].
     ///
     /// [`Guild`]: struct.Guild.html
     /// [text]: enum.ChannelType.html#variant.Text
     /// [voice]: enum.ChannelType.html#variant.Voice
-    Guild(Rc<RefCell<GuildChannel>>),
+    Guild(GuildChannel),
     /// A private channel to another [`User`]. No other users may access the
     /// channel. For multi-user "private channels", use a group.
     ///
     /// [`User`]: struct.User.html
-    Private(Rc<RefCell<PrivateChannel>>),
+    Private(PrivateChannel),
     /// A category of [`GuildChannel`]s
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
-    Category(Rc<RefCell<ChannelCategory>>),
+    Category(ChannelCategory),
 }
 
 impl Channel {
@@ -78,9 +76,9 @@ impl Channel {
     /// }
     /// # }
     /// ```
-    pub fn group(self) -> Option<Rc<RefCell<Group>>> {
+    pub fn group(self) -> Option<Group> {
         match self {
-            Channel::Group(lock) => Some(lock),
+            Channel::Group(group) => Some(group),
             _ => None,
         }
     }
@@ -107,9 +105,9 @@ impl Channel {
     /// }
     /// # }
     /// ```
-    pub fn guild(self) -> Option<Rc<RefCell<GuildChannel>>> {
+    pub fn guild(self) -> Option<GuildChannel> {
         match self {
-            Channel::Guild(lock) => Some(lock),
+            Channel::Guild(guild_channel) => Some(guild_channel),
             _ => None,
         }
     }
@@ -139,9 +137,9 @@ impl Channel {
     /// }
     /// # }
     /// ```
-    pub fn private(self) -> Option<Rc<RefCell<PrivateChannel>>> {
+    pub fn private(self) -> Option<PrivateChannel> {
         match self {
-            Channel::Private(lock) => Some(lock),
+            Channel::Private(private_channel) => Some(private_channel),
             _ => None,
         }
     }
@@ -168,9 +166,9 @@ impl Channel {
     /// }
     /// # }
     /// ```
-    pub fn category(self) -> Option<Rc<RefCell<ChannelCategory>>> {
+    pub fn category(self) -> Option<ChannelCategory> {
         match self {
-            Channel::Category(lock) => Some(lock),
+            Channel::Category(channel_category) => Some(channel_category),
             _ => None,
         }
     }
@@ -184,8 +182,8 @@ impl Channel {
     #[inline]
     pub fn is_nsfw(&self) -> bool {
         match *self {
-            Channel::Guild(ref channel) => channel.borrow().is_nsfw(),
-            Channel::Category(ref category) => category.borrow().is_nsfw(),
+            Channel::Guild(ref channel) => channel.is_nsfw(),
+            Channel::Category(ref category) => category.is_nsfw(),
             Channel::Group(_) | Channel::Private(_) => false,
         }
     }
@@ -198,10 +196,10 @@ impl Channel {
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     pub fn id(&self) -> ChannelId {
         match *self {
-            Channel::Group(ref group) => group.borrow().channel_id,
-            Channel::Guild(ref ch) => ch.borrow().id,
-            Channel::Private(ref ch) => ch.borrow().id,
-            Channel::Category(ref category) => category.borrow().id,
+            Channel::Group(ref group) => group.channel_id,
+            Channel::Guild(ref ch) => ch.id,
+            Channel::Private(ref ch) => ch.id,
+            Channel::Category(ref category) => category.id,
         }
     }
 }
@@ -217,16 +215,16 @@ impl<'de> Deserialize<'de> for Channel {
 
         match kind {
             0 | 2 => serde_json::from_value::<GuildChannel>(Value::Object(v))
-                .map(|x| Channel::Guild(Rc::new(RefCell::new(x))))
+                .map(|x| Channel::Guild(x))
                 .map_err(DeError::custom),
             1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
-                .map(|x| Channel::Private(Rc::new(RefCell::new(x))))
+                .map(|x| Channel::Private(x))
                 .map_err(DeError::custom),
             3 => serde_json::from_value::<Group>(Value::Object(v))
-                .map(|x| Channel::Group(Rc::new(RefCell::new(x))))
+                .map(|x| Channel::Group(x))
                 .map_err(DeError::custom),
             4 => serde_json::from_value::<ChannelCategory>(Value::Object(v))
-                .map(|x| Channel::Category(Rc::new(RefCell::new(x))))
+                .map(|x| Channel::Category(x))
                 .map_err(DeError::custom),
             _ => Err(DeError::custom("Unknown channel type")),
         }
@@ -238,16 +236,12 @@ impl Serialize for Channel {
         where S: Serializer {
         match *self {
             Channel::Category(ref c) => {
-                ChannelCategory::serialize(&*c.borrow(), serializer)
+                ChannelCategory::serialize(&*c, serializer)
             },
-            Channel::Group(ref c) => {
-                Group::serialize(&*c.borrow(), serializer)
-            },
-            Channel::Guild(ref c) => {
-                GuildChannel::serialize(&*c.borrow(), serializer)
-            },
+            Channel::Group(ref c) => Group::serialize(&*c, serializer),
+            Channel::Guild(ref c) => GuildChannel::serialize(&*c, serializer),
             Channel::Private(ref c) => {
-                PrivateChannel::serialize(&*c.borrow(), serializer)
+                PrivateChannel::serialize(&*c, serializer)
             },
         }
     }
@@ -269,15 +263,10 @@ impl Display for Channel {
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         match *self {
-            Channel::Group(ref group) => Display::fmt(&group.borrow().name(), f),
-            Channel::Guild(ref ch) => Display::fmt(&ch.borrow().id.mention(), f),
-            Channel::Private(ref ch) => {
-                let channel = ch.borrow();
-                let recipient = channel.recipient.borrow();
-
-                Display::fmt(&recipient.name, f)
-            },
-            Channel::Category(ref category) => Display::fmt(&category.borrow().name, f),
+            Channel::Group(ref group) => Display::fmt(&group.name(), f),
+            Channel::Guild(ref ch) => Display::fmt(&ch.id.mention(), f),
+            Channel::Private(ref ch) => Display::fmt(&ch.recipient.name, f),
+            Channel::Category(ref category) => Display::fmt(&category.name, f),
         }
     }
 }

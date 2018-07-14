@@ -1,7 +1,6 @@
 use chrono::{DateTime, FixedOffset};
 use model::prelude::*;
 use std::borrow::Cow;
-use std::cell::RefCell;
 use super::deserialize_user;
 
 /// A trait for allowing both u8 or &str or (u8, &str) to be passed into the `ban` methods in `Guild` and `Member`.
@@ -58,7 +57,7 @@ pub struct Member {
     /// Attached User struct.
     #[serde(deserialize_with = "deserialize_user",
             serialize_with = "serialize_user")]
-    pub user: Rc<RefCell<User>>,
+    pub user: User,
 }
 
 impl Member {
@@ -70,23 +69,17 @@ impl Member {
         self.nick
             .as_ref()
             .map(Cow::Borrowed)
-            .unwrap_or_else(|| {
-                Cow::Owned(unsafe { (*self.user.as_ptr()).name.clone() })
-            })
+            .unwrap_or_else(|| Cow::Owned(self.user.name.clone()))
     }
 
     /// Returns the DiscordTag of a Member, taking possible nickname into account.
     #[inline]
     pub fn distinct(&self) -> String {
-        unsafe {
-            let user = &*self.user.as_ptr();
-
-            format!(
-                "{}#{}",
-                self.display_name(),
-                user.discriminator,
-            )
-        }
+        format!(
+            "{}#{}",
+            self.display_name(),
+            self.user.discriminator,
+        )
     }
 }
 

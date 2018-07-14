@@ -27,9 +27,9 @@ impl Mentionable for ChannelId {
 impl Mentionable for Channel {
     fn mention(&self) -> String {
         match *self {
-            Channel::Guild(ref x) => format!("<#{}>", x.borrow().id.0),
-            Channel::Private(ref x) => format!("<#{}>", x.borrow().id.0),
-            Channel::Group(ref x) => format!("<#{}>", x.borrow().channel_id.0),
+            Channel::Guild(ref x) => format!("<#{}>", x.id.0),
+            Channel::Private(ref x) => format!("<#{}>", x.id.0),
+            Channel::Group(ref x) => format!("<#{}>", x.channel_id.0),
             Channel::Category(_) => panic!("Categories can't be mentioned"),
         }
     }

@@ -22,8 +22,6 @@ use model::prelude::*;
 use serde::de::Error as DeError;
 use serde_json;
 use std::borrow::Cow;
-use std::cell::RefCell;
-use std::rc::Rc;
 use std;
 use super::utils::*;
 
@@ -50,8 +48,8 @@ pub struct Guild {
     ///
     /// This contains all channels regardless of permissions (i.e. the ability
     /// of the bot to read from or connect to them).
-    #[serde(serialize_with = "serialize_gen_rc_map")]
-    pub channels: HashMap<ChannelId, Rc<RefCell<GuildChannel>>>,
+    #[serde(serialize_with = "serialize_gen_map")]
+    pub channels: HashMap<ChannelId, GuildChannel>,
     /// Indicator of whether notifications for all messages are enabled by
     /// default in the guild.
     pub default_message_notifications: DefaultMessageNotificationLevel,
@@ -94,8 +92,8 @@ pub struct Guild {
     /// the library.
     ///
     /// [`ReadyEvent`]: events/struct.ReadyEvent.html
-    #[serde(serialize_with = "serialize_gen_rc_map")]
-    pub members: HashMap<UserId, Rc<RefCell<Member>>>,
+    #[serde(serialize_with = "serialize_gen_map")]
+    pub members: HashMap<UserId, Member>,
     /// Indicator of whether the guild requires multi-factor authentication for
     /// [`Role`]s or [`User`]s with moderation permissions.
     ///
@@ -111,13 +109,13 @@ pub struct Guild {
     /// A mapping of [`User`]s' Ids to their current presences.
     ///
     /// [`User`]: struct.User.html
-    #[serde(serialize_with = "serialize_gen_rc_map")]
-    pub presences: HashMap<UserId, Rc<RefCell<Presence>>>,
+    #[serde(serialize_with = "serialize_gen_map")]
+    pub presences: HashMap<UserId, Presence>,
     /// The region that the voice servers that the guild uses are located in.
     pub region: String,
     /// A mapping of the guild's roles.
-    #[serde(serialize_with = "serialize_gen_rc_map")]
-    pub roles: HashMap<RoleId, Rc<RefCell<Role>>>,
+    #[serde(serialize_with = "serialize_gen_map")]
+    pub roles: HashMap<RoleId, Role>,
     /// An identifying hash of the guild's splash icon.
     ///
     /// If the [`InviteSplash`] feature is enabled, this can be used to generate
@@ -140,10 +138,10 @@ impl Guild {
     /// Returns the "default" channel of the guild for the passed user id.
     /// (This returns the first channel that can be read by the user, if there isn't one,
     /// returns `None`)
-    pub fn default_channel(&self, uid: UserId) -> Option<Rc<RefCell<GuildChannel>>> {
+    pub fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
         for (cid, channel) in &self.channels {
             if self.permissions_in(*cid, uid).read_messages() {
-                return Some(Rc::clone(channel));
+                return Some(channel);
             }
         }
 
@@ -155,11 +153,11 @@ impl Guild {
     /// returns `None`)
     /// Note however that this is very costy if used in a server with lots of channels,
     /// members, or both.
-    pub fn default_channel_guaranteed(&self) -> Option<Rc<RefCell<GuildChannel>>> {
+    pub fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
         for (cid, channel) in &self.channels {
             for memid in self.members.keys() {
                 if self.permissions_in(*cid, *memid).read_messages() {
-                    return Some(Rc::clone(channel));
+                    return Some(channel);
                 }
             }
         }
@@ -183,12 +181,11 @@ impl Guild {
 
     /// Gets a list of all the members (satisfying the status provided to the function) in this
     /// guild.
-    pub fn members_with_status(&self, status: OnlineStatus)
-        -> Vec<&Rc<RefCell<Member>>> {
+    pub fn members_with_status(&self, status: OnlineStatus) -> Vec<&Member> {
         let mut members = vec![];
 
         for (&id, member) in &self.members {
-            match self.presences.get(&id).and_then(|x| x.try_borrow().ok()) {
+            match self.presences.get(&id) {
                 Some(presence) => if status == presence.status {
                     members.push(member);
                 },
@@ -215,7 +212,7 @@ impl Guild {
     /// - **username and discriminator**: "zey#5479"
     ///
     /// [`Member`]: struct.Member.html
-    pub fn member_named(&self, name: &str) -> Option<&Rc<RefCell<Member>>> {
+    pub fn member_named(&self, name: &str) -> Option<&Member> {
         let (name, discrim) = if let Some(pos) = name.rfind('#') {
             let split = name.split_at(pos + 1);
 
@@ -238,18 +235,9 @@ impl Guild {
         self.members
             .values()
             .find(|member| {
-                let member = match member.try_borrow().ok() {
-                    Some(member) => member,
-                    None => return false,
-                };
-                let user = match member.user.try_borrow().ok() {
-                    Some(user) => user,
-                    None => return false,
-                };
-
-                let name_matches = user.name == name;
+                let name_matches = member.user.name == name;
                 let discrim_matches = match discrim {
-                    Some(discrim) => user.discriminator == discrim,
+                    Some(discrim) => member.user.discriminator == discrim,
                     None => true,
                 };
 
@@ -258,7 +246,7 @@ impl Guild {
             .or_else(|| {
                 self.members
                     .values()
-                    .find(|member| member.borrow().nick.as_ref().map_or(false, |nick| nick == name))
+                    .find(|member| member.nick.as_ref().map_or(false, |nick| nick == name))
             })
     }
 
@@ -272,23 +260,17 @@ impl Guild {
     /// - "zeya", "zeyaa", "zeyla", "zeyzey", "zeyzeyzey"
     ///
     /// [`Member`]: struct.Member.html
-    pub fn members_starting_with(&self, prefix: &str, case_sensitive: bool, sorted: bool) -> Vec<&Rc<RefCell<Member>>> {
-        let mut members: Vec<&Rc<RefCell<Member>>> = self.members
+    pub fn members_starting_with(&self, prefix: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
+        let mut members: Vec<&Member> = self.members
             .values()
             .filter(|member|
                 if case_sensitive {
-                    let member = member.borrow();
-                    let user = member.user.borrow();
-
-                    user.name.starts_with(prefix)
+                    member.user.name.starts_with(prefix)
                 } else {
-                    let member = member.borrow();
-                    let user = member.user.borrow();
-
-                    starts_with_case_insensitive(&user.name, prefix)
+                    starts_with_case_insensitive(&member.user.name, prefix)
                 }
 
-                || member.borrow().nick.as_ref()
+                || member.nick.as_ref()
                     .map_or(false, |nick|
 
                     if case_sensitive {
@@ -300,28 +282,26 @@ impl Guild {
         if sorted {
             members
                 .sort_by(|a, b| {
-                    let (a, b) = (a.borrow(), b.borrow());
-
                     let name_a = match a.nick {
                         Some(ref nick) => {
-                            if contains_case_insensitive(&a.user.borrow().name[..], prefix) {
-                                Cow::Owned(a.user.borrow().name.clone())
+                            if contains_case_insensitive(&a.user.name[..], prefix) {
+                                Cow::Owned(a.user.name.clone())
                             } else {
                                 Cow::Borrowed(nick)
                             }
                         },
-                        None => Cow::Owned(a.user.borrow().name.clone()),
+                        None => Cow::Owned(a.user.name.clone()),
                     };
 
                     let name_b = match b.nick {
                         Some(ref nick) => {
-                            if contains_case_insensitive(&b.user.borrow().name[..], prefix) {
-                                Cow::Owned(b.user.borrow().name.clone())
+                            if contains_case_insensitive(&b.user.name[..], prefix) {
+                                Cow::Owned(b.user.name.clone())
                             } else {
                                 Cow::Borrowed(nick)
                             }
                         },
-                        None => Cow::Owned(b.user.borrow().name.clone()),
+                        None => Cow::Owned(b.user.name.clone()),
                     };
 
                     closest_to_origin(prefix, &name_a[..], &name_b[..])
@@ -354,24 +334,18 @@ impl Guild {
     /// as both fields have to be considered again for sorting.
     ///
     /// [`Member`]: struct.Member.html
-    pub fn members_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Rc<RefCell<Member>>> {
-        let mut members: Vec<&Rc<RefCell<Member>>> = self.members
+    pub fn members_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
+        let mut members: Vec<&Member> = self.members
             .values()
             .filter(|member|
 
                 if case_sensitive {
-                    let member = member.borrow();
-                    let user = member.user.borrow();
-
-                    user.name.contains(substring)
+                    member.user.name.contains(substring)
                 } else {
-                    let member = member.borrow();
-                    let user = member.user.borrow();
-
-                    contains_case_insensitive(&user.name, substring)
+                    contains_case_insensitive(&member.user.name, substring)
                 }
 
-                || member.borrow().nick.as_ref()
+                || member.nick.as_ref()
                     .map_or(false, |nick| {
 
                         if case_sensitive {
@@ -384,28 +358,26 @@ impl Guild {
         if sorted {
             members
                 .sort_by(|a, b| {
-                    let (a, b) = (a.borrow(), b.borrow());
-
                     let name_a = match a.nick {
                         Some(ref nick) => {
-                            if contains_case_insensitive(&a.user.borrow().name[..], substring) {
-                                Cow::Owned(a.user.borrow().name.clone())
+                            if contains_case_insensitive(&a.user.name[..], substring) {
+                                Cow::Owned(a.user.name.clone())
                             } else {
                                 Cow::Borrowed(nick)
                             }
                         },
-                        None => Cow::Owned(a.user.borrow().name.clone()),
+                        None => Cow::Owned(a.user.name.clone()),
                     };
 
                     let name_b = match b.nick {
                         Some(ref nick) => {
-                            if contains_case_insensitive(&b.user.borrow().name[..], substring) {
-                                Cow::Owned(b.user.borrow().name.clone())
+                            if contains_case_insensitive(&b.user.name[..], substring) {
+                                Cow::Owned(b.user.name.clone())
                             } else {
                                 Cow::Borrowed(nick)
                             }
                         },
-                        None => Cow::Owned(b.user.borrow().name.clone()),
+                        None => Cow::Owned(b.user.name.clone()),
                     };
 
                     closest_to_origin(substring, &name_a[..], &name_b[..])
@@ -432,35 +404,21 @@ impl Guild {
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
     /// [`Member`]: struct.Member.html
-    pub fn members_username_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Rc<RefCell<Member>>> {
-        let mut members: Vec<&Rc<RefCell<Member>>> = self.members
+    pub fn members_username_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
+        let mut members: Vec<&Member> = self.members
             .values()
             .filter(|member| {
-                let member = match member.try_borrow().ok() {
-                    Some(member) => member,
-                    None => return false,
-                };
-                let user = match member.user.try_borrow().ok() {
-                    Some(user) => user,
-                    None => return false,
-                };
-
                 if case_sensitive {
-                    user.name.contains(substring)
+                    member.user.name.contains(substring)
                 } else {
-                    contains_case_insensitive(&user.name, substring)
+                    contains_case_insensitive(&member.user.name, substring)
                 }
             }).collect();
 
         if sorted {
             members
                 .sort_by(|a, b| {
-                    let (a, b) = (a.borrow(), b.borrow());
-                    let (a_user, b_user) = (a.user.borrow(), b.user.borrow());
-
-                    let name_a = &a_user.name;
-                    let name_b = &b_user.name;
-                    closest_to_origin(substring, &name_a[..], &name_b[..])
+                    closest_to_origin(substring, &a.user.name[..], &b.user.name[..])
                 });
             members
         } else {
@@ -487,15 +445,10 @@ impl Guild {
     /// a nick, the username will be used (this should never happen).
     ///
     /// [`Member`]: struct.Member.html
-    pub fn members_nick_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Rc<RefCell<Member>>> {
+    pub fn members_nick_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
         let mut members = self.members
             .values()
             .filter(|member| {
-                let member = match member.try_borrow() {
-                    Ok(member) => member,
-                    Err(_) => return false,
-                };
-
                 member.nick.as_ref()
                     .map_or(false, |nick| {
                         if case_sensitive {
@@ -504,25 +457,23 @@ impl Guild {
                             contains_case_insensitive(nick, substring)
                         }
                     })
-            }).collect::<Vec<&Rc<RefCell<Member>>>>();
+            }).collect::<Vec<&Member>>();
 
         if sorted {
             members
                 .sort_by(|a, b| {
-                    let (a, b) = (a.borrow(), b.borrow());
-
                     let name_a = match a.nick {
                         Some(ref nick) => {
                             Cow::Borrowed(nick)
                         },
-                        None => Cow::Owned(a.user.borrow().name.clone()),
+                        None => Cow::Owned(a.user.name.clone()),
                     };
 
                     let name_b = match b.nick {
                         Some(ref nick) => {
                                 Cow::Borrowed(nick)
                             },
-                        None => Cow::Owned(b.user.borrow().name.clone()),
+                        None => Cow::Owned(b.user.name.clone()),
                     };
 
                     closest_to_origin(substring, &name_a[..], &name_b[..])
@@ -544,7 +495,7 @@ impl Guild {
             return Permissions::all();
         }
 
-        let everyone = match self.roles.get(&RoleId(self.id.0)).and_then(|x| x.try_borrow().ok()) {
+        let everyone = match self.roles.get(&RoleId(self.id.0)) {
             Some(everyone) => everyone,
             None => {
                 error!(
@@ -557,7 +508,7 @@ impl Guild {
             },
         };
 
-        let member = match self.members.get(&user_id).and_then(|x| x.try_borrow().ok()) {
+        let member = match self.members.get(&user_id) {
             Some(member) => member,
             None => return everyone.permissions,
         };
@@ -565,7 +516,7 @@ impl Guild {
         let mut permissions = everyone.permissions;
 
         for role in &member.roles {
-            if let Some(role) = self.roles.get(role).and_then(|x| x.try_borrow().ok()) {
+            if let Some(role) = self.roles.get(role) {
                 if role.permissions.contains(Permissions::ADMINISTRATOR) {
                     return Permissions::all();
                 }
@@ -574,7 +525,7 @@ impl Guild {
             } else {
                 warn!(
                     "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
-                    member.user.borrow().id,
+                    member.user.id,
                     self.id,
                     role,
                 );
@@ -610,7 +561,7 @@ impl Guild {
         let channel_id = channel_id.into();
 
         // Start by retrieving the @everyone role's permissions.
-        let everyone = match self.roles.get(&RoleId(self.id.0)).and_then(|x| x.try_borrow().ok()) {
+        let everyone = match self.roles.get(&RoleId(self.id.0)) {
             Some(everyone) => everyone,
             None => {
                 error!(
@@ -626,18 +577,18 @@ impl Guild {
         // Create a base set of permissions, starting with `@everyone`s.
         let mut permissions = everyone.permissions;
 
-        let member = match self.members.get(&user_id).and_then(|x| x.try_borrow().ok()) {
+        let member = match self.members.get(&user_id) {
             Some(member) => member,
             None => return everyone.permissions,
         };
 
         for &role in &member.roles {
-            if let Some(role) = self.roles.get(&role).and_then(|x| x.try_borrow().ok()) {
+            if let Some(role) = self.roles.get(&role) {
                 permissions |= role.permissions;
             } else {
                 warn!(
                     "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
-                    member.user.borrow().id,
+                    member.user.id,
                     self.id,
                     role
                 );
@@ -650,8 +601,6 @@ impl Guild {
         }
 
         if let Some(channel) = self.channels.get(&channel_id) {
-            let channel = channel.borrow();
-
             // If this is a text channel, then throw out voice permissions.
             if channel.kind == ChannelType::Text {
                 permissions &= !(Permissions::CONNECT
@@ -678,7 +627,7 @@ impl Guild {
                         continue;
                     }
 
-                    if let Some(role) = self.roles.get(&role).and_then(|x| x.try_borrow().ok()) {
+                    if let Some(role) = self.roles.get(&role) {
                         data.push((role.position, overwrite.deny, overwrite.allow));
                     }
                 }
@@ -797,15 +746,8 @@ impl Guild {
     ///
     /// client.start().unwrap();
     /// ```
-    pub fn role_by_name(&self, role_name: &str) -> Option<&Rc<RefCell<Role>>> {
-        self.roles.values().find(|role| {
-            let role = match role.try_borrow().ok() {
-                Some(role) => role,
-                None => return false,
-            };
-
-            role_name == role.name
-        })
+    pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
+        self.roles.values().find(|role| role.name == role_name)
     }
 }
 

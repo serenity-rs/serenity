@@ -47,7 +47,6 @@ use serde::{Deserialize, Deserializer};
 use std::{
     collections::HashMap,
     fmt::{Display, Formatter, Result as FmtResult},
-    rc::Rc,
     result::Result as StdResult,
 };
 

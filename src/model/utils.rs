@@ -1,10 +1,8 @@
 use serde::de::Error as DeError;
 use serde::ser::{SerializeSeq, Serialize, Serializer};
 use std::{
-    cell::RefCell,
     collections::HashMap,
     hash::Hash,
-    rc::Rc,
 };
 use super::prelude::*;
 
@@ -36,12 +34,12 @@ pub fn deserialize_emojis<'de, D: Deserializer<'de>>(
 
 pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
     deserializer: D)
-    -> StdResult<HashMap<ChannelId, Rc<RefCell<GuildChannel>>>, D::Error> {
+    -> StdResult<HashMap<ChannelId, GuildChannel>, D::Error> {
     let vec: Vec<GuildChannel> = Deserialize::deserialize(deserializer)?;
     let mut map = HashMap::new();
 
     for channel in vec {
-        map.insert(channel.id, Rc::new(RefCell::new(channel)));
+        map.insert(channel.id, channel);
     }
 
     Ok(map)
@@ -49,14 +47,12 @@ pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
 
 pub fn deserialize_members<'de, D: Deserializer<'de>>(
     deserializer: D)
-    -> StdResult<HashMap<UserId, Rc<RefCell<Member>>>, D::Error> {
+    -> StdResult<HashMap<UserId, Member>, D::Error> {
     let vec: Vec<Member> = Deserialize::deserialize(deserializer)?;
     let mut members = HashMap::new();
 
     for member in vec {
-        let user_id = member.user.borrow().id;
-
-        members.insert(user_id, Rc::new(RefCell::new(member)));
+        members.insert(member.user.id, member);
     }
 
     Ok(members)
@@ -64,12 +60,12 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
 
 pub fn deserialize_presences<'de, D: Deserializer<'de>>(
     deserializer: D)
-    -> StdResult<HashMap<UserId, Rc<RefCell<Presence>>>, D::Error> {
+    -> StdResult<HashMap<UserId, Presence>, D::Error> {
     let vec: Vec<Presence> = Deserialize::deserialize(deserializer)?;
     let mut presences = HashMap::new();
 
     for presence in vec {
-        presences.insert(presence.user_id, Rc::new(RefCell::new(presence)));
+        presences.insert(presence.user_id, presence);
     }
 
     Ok(presences)
@@ -77,19 +73,19 @@ pub fn deserialize_presences<'de, D: Deserializer<'de>>(
 
 pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
     deserializer: D)
-    -> StdResult<HashMap<ChannelId, Rc<RefCell<Channel>>>, D::Error> {
+    -> StdResult<HashMap<ChannelId, Channel>, D::Error> {
     let vec: Vec<Channel> = Deserialize::deserialize(deserializer)?;
     let mut private_channels = HashMap::new();
 
     for private_channel in vec {
         let id = match private_channel {
-            Channel::Group(ref group) => group.borrow().channel_id,
-            Channel::Private(ref channel) => channel.borrow().id,
+            Channel::Group(ref group) => group.channel_id,
+            Channel::Private(ref channel) => channel.id,
             Channel::Guild(_) => unreachable!("Guild private channel decode"),
             Channel::Category(_) => unreachable!("Channel category private channel decode"),
         };
 
-        private_channels.insert(id, Rc::new(RefCell::new(private_channel)));
+        private_channels.insert(id, private_channel);
     }
 
     Ok(private_channels)
@@ -97,12 +93,12 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
 
 pub fn deserialize_roles<'de, D: Deserializer<'de>>(
     deserializer: D)
-    -> StdResult<HashMap<RoleId, Rc<RefCell<Role>>>, D::Error> {
+    -> StdResult<HashMap<RoleId, Role>, D::Error> {
     let vec: Vec<Role> = Deserialize::deserialize(deserializer)?;
     let mut roles = HashMap::new();
 
     for role in vec {
-        roles.insert(role.id, Rc::new(RefCell::new(role)));
+        roles.insert(role.id, role);
     }
 
     Ok(roles)
@@ -110,50 +106,49 @@ pub fn deserialize_roles<'de, D: Deserializer<'de>>(
 
 pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
     deserializer: D)
-    -> StdResult<Rc<RefCell<User>>, D::Error> {
+    -> StdResult<User, D::Error> {
     let mut users: Vec<User> = Deserialize::deserialize(deserializer)?;
-    let user = if users.is_empty() {
-        return Err(DeError::custom("Expected a single recipient"));
-    } else {
-        users.remove(0)
-    };
 
-    Ok(Rc::new(RefCell::new(user)))
+    if users.is_empty() {
+        Err(DeError::custom("Expected a single recipient"))
+    } else {
+        Ok(users.remove(0))
+    }
 }
 
 pub fn deserialize_user<'de, D>(deserializer: D)
-    -> StdResult<Rc<RefCell<User>>, D::Error> where D: Deserializer<'de> {
-    Ok(Rc::new(RefCell::new(User::deserialize(deserializer)?)))
+    -> StdResult<User, D::Error> where D: Deserializer<'de> {
+    User::deserialize(deserializer)
 }
 
 pub fn serialize_user<S: Serializer>(
-    user: &Rc<RefCell<User>>,
+    user: &User,
     serializer: S,
 ) -> StdResult<S::Ok, S::Error> {
-    User::serialize(&*user.borrow(), serializer)
+    User::serialize(user, serializer)
 }
 
 pub fn deserialize_users<'de, D: Deserializer<'de>>(
     deserializer: D)
-    -> StdResult<HashMap<UserId, Rc<RefCell<User>>>, D::Error> {
+    -> StdResult<HashMap<UserId, User>, D::Error> {
     let vec: Vec<User> = Deserialize::deserialize(deserializer)?;
     let mut users = HashMap::new();
 
     for user in vec {
-        users.insert(user.id, Rc::new(RefCell::new(user)));
+        users.insert(user.id, user);
     }
 
     Ok(users)
 }
 
 pub fn serialize_users<S: Serializer>(
-    users: &HashMap<UserId, Rc<RefCell<User>>>,
+    users: &HashMap<UserId, User>,
     serializer: S
 ) -> StdResult<S::Ok, S::Error> {
     let mut seq = serializer.serialize_seq(Some(users.len()))?;
 
     for user in users.values() {
-        seq.serialize_element(&*user.borrow())?;
+        seq.serialize_element(user)?;
     }
 
     seq.end()
@@ -188,21 +183,6 @@ pub fn serialize_gen_map<K: Eq + Hash, S: Serializer, V: Serialize>(
 
     for value in map.values() {
         seq.serialize_element(&value)?;
-    }
-
-    seq.end()
-}
-
-pub fn serialize_gen_rc_map<K: Eq + Hash, S: Serializer, V: Serialize>(
-    map: &HashMap<K, Rc<RefCell<V>>>,
-    serializer: S,
-) -> StdResult<S::Ok, S::Error> {
-    let mut seq = serializer.serialize_seq(Some(map.len()))?;
-
-    for value in map.values() {
-        if let Ok(item) = value.try_borrow() {
-            seq.serialize_element(&*item)?;
-        }
     }
 
     seq.end()

@@ -450,12 +450,12 @@ pub struct Ready {
     pub guilds: Vec<GuildStatus>,
     #[serde(default,
             deserialize_with = "deserialize_presences",
-            serialize_with = "serialize_gen_rc_map")]
-    pub presences: HashMap<UserId, Rc<RefCell<Presence>>>,
+            serialize_with = "serialize_gen_map")]
+    pub presences: HashMap<UserId, Presence>,
     #[serde(default,
             deserialize_with = "deserialize_private_channels",
-            serialize_with = "serialize_gen_rc_map")]
-    pub private_channels: HashMap<ChannelId, Rc<RefCell<Channel>>>,
+            serialize_with = "serialize_gen_map")]
+    pub private_channels: HashMap<ChannelId, Channel>,
     pub session_id: String,
     pub shard: Option<[u64; 2]>,
     #[serde(default, rename = "_trace")]
