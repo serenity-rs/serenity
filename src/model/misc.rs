@@ -52,6 +52,12 @@ impl Mentionable for Emoji {
     fn mention(&self) -> String { format!("<:{}:{}>", self.name, self.id.0) }
 }
 
+impl Mentionable for Group {
+    fn mention(&self) -> String {
+        format!("<#{}", self.channel_id.0)
+    }
+}
+
 impl Mentionable for Member {
     fn mention(&self) -> String { format!("<@{}>", self.user.with(|u| u.id.0)) }
 }
