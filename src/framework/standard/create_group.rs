@@ -8,7 +8,8 @@ pub(crate) use super::command::CommandOrAlias;
 pub use super::{
     create_help_command::CreateHelpCommand,
     create_command::{CreateCommand, FnOrCommand},
-    Args
+    Args,
+    Check,
 };
 
 use client::Context;
@@ -158,6 +159,20 @@ impl CreateGroup {
     #[cfg(feature = "cache")]
     pub fn allowed_roles<T: ToString, It: IntoIterator<Item=T>>(mut self, allowed_roles: It) -> Self {
         self.0.allowed_roles = allowed_roles.into_iter().map(|x| x.to_string()).collect();
+
+        self
+    }
+
+    /// Adds a "check" to a group, which checks whether or not the groups's
+    /// commands should be called.
+    ///
+    /// **Note**: These checks are bypassed for commands sent by the application owner.
+    pub fn check<F>(mut self, check: F) -> Self
+        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
+                     + Send
+                     + Sync
+                     + 'static {
+        self.0.checks.push(Check::new(check));
 
         self
     }

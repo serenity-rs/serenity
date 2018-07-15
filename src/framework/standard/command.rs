@@ -101,6 +101,9 @@ pub struct CommandGroup {
     pub guild_only: bool,
     pub owners_only: bool,
     pub help: Option<Arc<Help>>,
+    /// A set of checks to be called prior to executing the command-group. The checks
+    /// will short-circuit on the first check that returns `false`.
+    pub checks: Vec<Check>,
 }
 
 impl Default for CommandGroup {
@@ -116,6 +119,7 @@ impl Default for CommandGroup {
             owners_only: false,
             allowed_roles: Vec::new(),
             help: None,
+            checks: Vec::new(),
         }
     }
 }
@@ -255,7 +259,6 @@ impl Default for HelpOptions {
         }
     }
 }
-
 
 lazy_static! {
     static ref DEFAULT_OPTIONS: Arc<CommandOptions> = Arc::new(CommandOptions::default());
