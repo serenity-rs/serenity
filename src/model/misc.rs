@@ -56,6 +56,12 @@ impl Mentionable for Member {
     fn mention(&self) -> String { format!("<@{}>", self.user.with(|u| u.id.0)) }
 }
 
+impl Mentionable for PrivateChannel {
+    fn mention(&self) -> String {
+        format!("<#{}>", self.id.0)
+    }
+}
+
 impl Mentionable for RoleId {
     fn mention(&self) -> String { format!("<@&{}>", self.0) }
 }
