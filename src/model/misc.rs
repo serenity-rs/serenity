@@ -28,10 +28,10 @@ impl Mentionable for ChannelId {
 impl Mentionable for Channel {
     fn mention(&self) -> String {
         match *self {
-            Channel::Guild(ref x) => format!("<#{}>", x.with(|x| x.id.0)),
-            Channel::Private(ref x) => format!("<#{}>", x.with(|x| x.id.0)),
-            Channel::Group(ref x) => format!("<#{}>", x.with(|x| x.channel_id.0)),
-            Channel::Category(ref x) => format!("<#{}>", x.with(|x| x.id.0)),
+            Channel::Guild(ref x) => x.with(Mentionable::mention),
+            Channel::Private(ref x) => x.with(Mentionable::mention),
+            Channel::Group(ref x) => x.with(Mentionable::mention),
+            Channel::Category(ref x) => x.with(Mentionable::mention),
         }
     }
 }
