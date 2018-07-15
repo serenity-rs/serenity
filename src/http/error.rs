@@ -1,6 +1,6 @@
 use futures::sync::oneshot::Canceled;
 use http_crate::uri::InvalidUri;
-use hyper::{Body, Error as HyperError, Response};
+use hyper::{Error as HyperError, Response};
 use serde_json::Error as JsonError;
 use std::{
     cell::BorrowMutError,
