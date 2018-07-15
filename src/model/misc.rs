@@ -38,7 +38,7 @@ impl Mentionable for Channel {
 
 impl Mentionable for ChannelCategory {
     fn mention(&self) -> String {
-        format!("#{}", self.name)
+        format!("<#{}>", self.name)
     }
 }
 
@@ -54,7 +54,7 @@ impl Mentionable for Emoji {
 
 impl Mentionable for Group {
     fn mention(&self) -> String {
-        format!("<#{}", self.channel_id.0)
+        format!("<#{}>", self.channel_id.0)
     }
 }
 
