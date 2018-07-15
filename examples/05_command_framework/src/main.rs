@@ -168,6 +168,7 @@ fn main() {
             .bucket("complicated")
             .cmd(commands))
         .group("Emoji", |g| g
+            // Sets a single prefix for a group:
             .prefix("emoji")
             .command("cat", |c| c
                 .desc("Sends an emoji with a cat.")
@@ -180,9 +181,14 @@ fn main() {
                 .desc("Sends an emoji with a dog.")
                 .bucket("emoji")
                 .cmd(dog)))
-        .command("multiply", |c| c
-            .known_as("*") // Lets us call ~* instead of ~multiply
-            .cmd(multiply))
+        .group("Math", |g| g
+            // Sets multiple prefixes for a group.
+            // This requires us to call commands in this group
+            // via `~math` (or `~m`) instead of just `~`.
+            .prefixes(vec!["m", "math"])
+            .command("multiply", |c| c
+                .known_as("*") // Lets us also call `~math *` instead of just `~math multiply`.
+                .cmd(multiply)))
         .command("latency", |c| c
             .cmd(latency))
         .command("ping", |c| c

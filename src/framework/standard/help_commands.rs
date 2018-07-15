@@ -159,8 +159,8 @@ pub fn with_embeds<H: BuildHasher>(
             let mut found: Option<(&String, &InternalCommand)> = None;
 
             for (command_name, command) in &group.commands {
-                let with_prefix = if let Some(ref prefix) = group.prefix {
-                    format!("{} {}", prefix, command_name)
+                let with_prefix = if let Some(ref prefixes) = group.prefixes {
+                    format!("{} {}", prefixes.join("`, `"), command_name)
                 } else {
                     command_name.to_string()
                 };
@@ -229,7 +229,7 @@ pub fn with_embeds<H: BuildHasher>(
                         }
 
                         if !command.aliases.is_empty() {
-                            let aliases = command.aliases.join(", ");
+                            let aliases = command.aliases.join("`, `");
 
                             embed = embed.field(&help_options.aliases_label, aliases, true);
                         }
@@ -283,8 +283,8 @@ pub fn with_embeds<H: BuildHasher>(
                 let group = &groups[group_name];
                 let mut desc = String::new();
 
-                if let Some(ref x) = group.prefix {
-                    let _ = write!(desc, "{}: `{}`\n", &help_options.group_prefix, x);
+                if let Some(ref prefixes) = group.prefixes {
+                    let _ = write!(desc, "{}: `{}`\n", &help_options.group_prefix, prefixes.join("`, `"));
                 }
 
                 let mut has_commands = false;
@@ -408,8 +408,8 @@ pub fn plain<H: BuildHasher>(
             let mut found: Option<(&String, &InternalCommand)> = None;
 
             for (command_name, command) in &group.commands {
-                let with_prefix = if let Some(ref prefix) = group.prefix {
-                    format!("{} {}", prefix, command_name)
+                let with_prefix = if let Some(ref prefixes) = group.prefixes {
+                    format!("{} {}", prefixes.join("`, `"), command_name)
                 } else {
                     command_name.to_string()
                 };
@@ -592,8 +592,8 @@ pub fn plain<H: BuildHasher>(
         if !group_help.is_empty() {
             let _ = write!(result, "**{}:** ", group_name);
 
-            if let Some(ref x) = group.prefix {
-                let _ = write!(result, "({}: `{}`): ", help_options.group_prefix, x);
+            if let Some(ref prefixes) = group.prefixes {
+                let _ = write!(result, "({}: `{}`): ", help_options.group_prefix, prefixes.join("`, `"));
             }
 
             result.push_str(&group_help);
