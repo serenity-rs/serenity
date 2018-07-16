@@ -133,10 +133,10 @@ impl Colour {
     /// assert_eq!(colour.b(), 215);
     /// assert_eq!(colour.tuple(), (217, 45, 215));
     /// ```
-    pub fn from_rgb(r: u8, g: u8, b: u8) -> Colour {
-        let mut uint = u32::from(r);
-        uint = (uint << 8) | (u32::from(g));
-        uint = (uint << 8) | (u32::from(b));
+    pub fn from_rgb(red: u8, green: u8, blue: u8) -> Colour {
+        let mut uint = u32::from(red);
+        uint = (uint << 8) | (u32::from(green));
+        uint = (uint << 8) | (u32::from(blue));
 
         Colour(uint)
     }
@@ -241,7 +241,9 @@ impl From<u64> for Colour {
 
 impl From<(u8, u8, u8)> for Colour {
     /// Constructs a Colour from rgb.
-    fn from((r, g, b): (u8, u8, u8)) -> Self { Colour::from_rgb(r, g, b) }
+    fn from((red, green, blue): (u8, u8, u8)) -> Self {
+        Colour::from_rgb(red, green, blue)
+    }
 }
 
 colour! {

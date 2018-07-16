@@ -205,11 +205,11 @@ impl MessageBuilder {
     /// ```
     #[inline]
     pub fn push<D: I>(self, content: D) -> Self {
-        self._push(content.into().to_string())
+        self._push(&content.into().to_string())
     }
 
-    fn _push(mut self, content: String) -> Self {
-        self.0.push_str(&content);
+    fn _push(mut self, content: &str) -> Self {
+        self.0.push_str(content);
 
         self
     }

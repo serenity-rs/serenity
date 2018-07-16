@@ -32,7 +32,7 @@ impl EditMessage {
     }
 
     fn _content(mut self, content: String) -> Self {
-        self.0.insert("content", Value::String(content.to_string()));
+        self.0.insert("content", Value::String(content));
 
         self
     }

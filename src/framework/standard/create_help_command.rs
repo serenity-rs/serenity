@@ -264,8 +264,7 @@ impl CreateHelpCommand {
     /// If `Some(String)` was set as `striked_commands_tip` and the `String` is empty,
     /// the creator will substitute content based on the `HelpBehaviour`-settings.
     pub(crate) fn finish(mut self) -> Arc<Help> {
-
-        if &self.0.striked_commands_tip_in_dm == &Some(String::new()) {
+        if self.0.striked_commands_tip_in_dm == Some(String::new()) {
             self.0.striked_commands_tip_in_dm = self.produce_strike_text("direct messages");
         }
 

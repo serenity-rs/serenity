@@ -529,14 +529,12 @@ impl StandardFramework {
                     // Is there a custom check for when this bucket applies?
                     // If not, assert that it does always.
                     let apply = bucket.check.as_ref().map_or(true, |check| {
-                        let apply = feature_cache! {{
+                        feature_cache! {{
                             let guild_id = message.guild_id;
                             (check)(context, guild_id, message.channel_id, message.author.id)
                         } else {
                             (check)(context, message.channel_id, message.author.id)
-                        }};
-
-                        apply
+                        }}
                     });
 
                     if apply && rate_limit > 0i64 {
@@ -955,9 +953,9 @@ impl StandardFramework {
     /// to alter help-commands.
     pub fn customised_help<F>(mut self, f: HelpFunction, c: F) -> Self
         where F: FnOnce(CreateHelpCommand) -> CreateHelpCommand {
-        let a = c(CreateHelpCommand(HelpOptions::default(), f));
+        let res = c(CreateHelpCommand(HelpOptions::default(), f));
 
-        self.help = Some(a.finish());
+        self.help = Some(res.finish());
 
         self
     }

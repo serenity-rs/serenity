@@ -54,7 +54,7 @@ impl GuildId {
         self._ban(user.into(), (ban_options.dmd(), ban_options.reason()))
     }
 
-    fn _ban(&self, user: UserId, ban_options: (u8, &str)) -> Result<()> {
+    fn _ban(self, user: UserId, ban_options: (u8, &str)) -> Result<()> {
         let (dmd, reason) = ban_options;
 
         if dmd > 7 {
@@ -124,7 +124,7 @@ impl GuildId {
     }
 
     fn _create_channel(
-        &self,
+        self,
         name: &str,
         kind: ChannelType,
         category: Option<ChannelId>,
@@ -177,7 +177,7 @@ impl GuildId {
     }
 
     fn _create_integration(
-        &self,
+        self,
         integration_id: IntegrationId,
         kind: &str,
     ) -> Result<()> {
@@ -232,7 +232,7 @@ impl GuildId {
         self._delete_emoji(emoji_id.into())
     }
 
-    fn _delete_emoji(&self, emoji_id: EmojiId) -> Result<()> {
+    fn _delete_emoji(self, emoji_id: EmojiId) -> Result<()> {
         http::delete_emoji(self.0, emoji_id.0)
     }
 
@@ -246,7 +246,7 @@ impl GuildId {
         self._delete_integration(integration_id.into())
     }
 
-    fn _delete_integration(&self, integration_id: IntegrationId) -> Result<()> {
+    fn _delete_integration(self, integration_id: IntegrationId) -> Result<()> {
         http::delete_guild_integration(self.0, integration_id.0)
     }
 
@@ -265,7 +265,7 @@ impl GuildId {
         self._delete_role(role_id.into())
     }
 
-    fn _delete_role(&self, role_id: RoleId) -> Result<()> {
+    fn _delete_role(self, role_id: RoleId) -> Result<()> {
         http::delete_role(self.0, role_id.0)
     }
 
@@ -300,7 +300,7 @@ impl GuildId {
         self._edit_emoji(emoji_id.into(), name)
     }
 
-    fn _edit_emoji(&self, emoji_id: EmojiId, name: &str) -> Result<Emoji> {
+    fn _edit_emoji(self, emoji_id: EmojiId, name: &str) -> Result<Emoji> {
         let map = json!({
             "name": name,
         });
@@ -327,7 +327,7 @@ impl GuildId {
         self._edit_member(user_id.into(), f)
     }
 
-    fn _edit_member<F>(&self, user_id: UserId, f: F) -> Result<()>
+    fn _edit_member<F>(self, user_id: UserId, f: F) -> Result<()>
         where F: FnOnce(EditMember) -> EditMember {
         let map = utils::vecmap_to_json_map(f(EditMember::default()).0);
 
@@ -368,7 +368,7 @@ impl GuildId {
         self._edit_role(role_id.into(), f)
     }
 
-    fn _edit_role<F>(&self, role_id: RoleId, f: F) -> Result<Role>
+    fn _edit_role<F>(self, role_id: RoleId, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole {
         let map = utils::vecmap_to_json_map(f(EditRole::default()).0);
 
@@ -622,7 +622,7 @@ impl GuildId {
         self._unban(user_id.into())
     }
 
-    fn _unban(&self, user_id: UserId) -> Result<()> {
+    fn _unban(self, user_id: UserId) -> Result<()> {
         http::remove_ban(self.0, user_id.0)
     }
 

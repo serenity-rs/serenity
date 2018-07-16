@@ -92,7 +92,7 @@ impl ChannelId {
     }
 
     fn _create_reaction(
-        &self,
+        self,
         message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
@@ -118,7 +118,7 @@ impl ChannelId {
         self._delete_message(message_id.into())
     }
 
-    fn _delete_message(&self, message_id: MessageId) -> Result<()> {
+    fn _delete_message(self, message_id: MessageId) -> Result<()> {
         http::delete_message(self.0, message_id.0)
     }
 
@@ -146,14 +146,14 @@ impl ChannelId {
             .map(|message_id| message_id.as_ref().0)
             .collect::<Vec<u64>>();
 
-        self._delete_messages(ids)
+        self._delete_messages(&ids)
     }
 
-    fn _delete_messages(&self, ids: Vec<u64>) -> Result<()> {
+    fn _delete_messages(self, ids: &[u64]) -> Result<()> {
         let len = ids.len();
 
         if len == 0 || len > 100 {
-            return Err(Error::Model(ModelError::BulkDeleteAmount));
+            Err(Error::Model(ModelError::BulkDeleteAmount))
         } else if ids.len() == 1 {
             self.delete_message(ids[0])
         } else {
@@ -194,13 +194,13 @@ impl ChannelId {
         where M: Into<MessageId>, R: Into<ReactionType> {
         self._delete_reaction(
             message_id.into(),
-            user_id.into(),
+            user_id,
             &reaction_type.into(),
         )
     }
 
     fn _delete_reaction(
-        &self,
+        self,
         message_id: MessageId,
         user_id: Option<UserId>,
         reaction_type: &ReactionType,
@@ -266,7 +266,7 @@ impl ChannelId {
         self._edit_message(message_id.into(), f)
     }
 
-    fn _edit_message<F>(&self, message_id: MessageId, f: F) -> Result<Message>
+    fn _edit_message<F>(self, message_id: MessageId, f: F) -> Result<Message>
         where F: FnOnce(EditMessage) -> EditMessage {
         let msg = f(EditMessage::default());
 
@@ -317,13 +317,12 @@ impl ChannelId {
         self._message(message_id.into())
     }
 
-    fn _message(&self, message_id: MessageId) -> Result<Message> {
-        http::get_message(self.0, message_id.0)
-            .map(|mut msg| {
-                msg.transform_content();
+    fn _message(self, message_id: MessageId) -> Result<Message> {
+        http::get_message(self.0, message_id.0).map(|mut msg| {
+            msg.transform_content();
 
-                msg
-            })
+            msg
+        })
     }
 
     /// Gets messages from the channel.
@@ -394,7 +393,7 @@ impl ChannelId {
         self._pin(message_id.into())
     }
 
-    fn _pin(&self, message_id: MessageId) -> Result<()> {
+    fn _pin(self, message_id: MessageId) -> Result<()> {
         http::pin_message(self.0, message_id.0)
     }
 
@@ -433,7 +432,7 @@ impl ChannelId {
     }
 
     fn _reaction_users(
-        &self,
+        self,
         message_id: MessageId,
         reaction_type: &ReactionType,
         limit: Option<u8>,
@@ -592,7 +591,7 @@ impl ChannelId {
         self._unpin(message_id.into())
     }
 
-    fn _unpin(&self, message_id: MessageId) -> Result<()> {
+    fn _unpin(self, message_id: MessageId) -> Result<()> {
         http::unpin_message(self.0, message_id.0)
     }
 

@@ -584,7 +584,7 @@ impl User {
     }
 
     fn _has_role(&self, guild: GuildContainer, role: RoleId) -> bool {
-        match guild.into() {
+        match guild {
             GuildContainer::Guild(guild) => guild.roles.contains_key(&role),
             GuildContainer::Id(_guild_id) => {
                 feature_cache! {{

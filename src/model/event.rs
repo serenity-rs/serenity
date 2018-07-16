@@ -229,9 +229,9 @@ impl CacheUpdate for ChannelRecipientAddEvent {
         cache.update_user_entry(&self.user);
         let user = Arc::clone(&cache.users[&self.user.id]);
 
-        cache.groups.get_mut(&self.channel_id).map(|group| {
+        if let Some(group) = cache.groups.get_mut(&self.channel_id) {
             group.write().recipients.insert(self.user.id, user);
-        });
+        }
 
         None
     }
@@ -295,16 +295,16 @@ impl CacheUpdate for ChannelUpdateEvent {
                 let (guild_id, channel_id) = channel.with(|channel| (channel.guild_id, channel.id));
 
                 cache.channels.insert(channel_id, Arc::clone(channel));
-                cache.guilds.get_mut(&guild_id).map(|guild| {
+
+                if let Some(guild) = cache.guilds.get_mut(&guild_id) {
                     guild
-                        .with_mut(|g| g.channels.insert(channel_id, Arc::clone(channel)))
-                });
+                        .with_mut(|g| g.channels.insert(channel_id, Arc::clone(channel)));
+                }
             },
             Channel::Private(ref channel) => {
-                cache
-                    .private_channels
-                    .get_mut(&channel.read().id)
-                    .map(|private| private.clone_from(channel));
+                if let Some(private) = cache.private_channels.get_mut(&channel.read().id) {
+                    private.clone_from(channel);
+                }
             },
             Channel::Category(ref category) => {
                 cache
@@ -441,11 +441,11 @@ impl CacheUpdate for GuildEmojisUpdateEvent {
     type Output = ();
 
     fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        cache.guilds.get_mut(&self.guild_id).map(|guild| {
+        if let Some(guild) = cache.guilds.get_mut(&self.guild_id) {
             guild.with_mut(|g| {
                 g.emojis.clone_from(&self.emojis)
             });
-        });
+        }
 
         None
     }
@@ -473,12 +473,12 @@ impl CacheUpdate for GuildMemberAddEvent {
         // Always safe due to being inserted above.
         self.member.user = Arc::clone(&cache.users[&user_id]);
 
-        cache.guilds.get_mut(&self.guild_id).map(|guild| {
+        if let Some(guild) = cache.guilds.get_mut(&self.guild_id) {
             guild.with_mut(|guild| {
                 guild.member_count += 1;
                 guild.members.insert(user_id, self.member.clone());
-            })
-        });
+            });
+        }
 
         None
     }
@@ -490,7 +490,7 @@ impl<'de> Deserialize<'de> for GuildMemberAddEvent {
 
         let guild_id = map.get("guild_id")
             .ok_or_else(|| DeError::custom("missing member add guild id"))
-            .and_then(|v| GuildId::deserialize(v))
+            .and_then(GuildId::deserialize)
             .map_err(DeError::custom)?;
 
         Ok(GuildMemberAddEvent {
@@ -592,9 +592,9 @@ impl CacheUpdate for GuildMembersChunkEvent {
             cache.update_user_entry(&member.user.read());
         }
 
-        cache.guilds.get_mut(&self.guild_id).map(|guild| {
+        if let Some(guild) = cache.guilds.get_mut(&self.guild_id) {
             guild.with_mut(|g| g.members.extend(self.members.clone()))
-        });
+        }
 
         None
     }
@@ -606,7 +606,7 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
 
         let guild_id = map.get("guild_id")
             .ok_or_else(|| DeError::custom("missing member chunk guild id"))
-            .and_then(|v| GuildId::deserialize(v))
+            .and_then(GuildId::deserialize)
             .map_err(DeError::custom)?;
 
         let mut members = map.remove("members")
@@ -729,7 +729,7 @@ impl CacheUpdate for GuildUpdateEvent {
     type Output = ();
 
     fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        cache.guilds.get_mut(&self.guild.id).map(|guild| {
+        if let Some(guild) = cache.guilds.get_mut(&self.guild.id) {
             let mut guild = guild.write();
 
             guild.afk_timeout = self.guild.afk_timeout;
@@ -740,7 +740,7 @@ impl CacheUpdate for GuildUpdateEvent {
             guild.region.clone_from(&self.guild.region);
             guild.roles.clone_from(&self.guild.roles);
             guild.verification_level = self.guild.verification_level;
-        });
+        }
 
         None
     }
@@ -862,7 +862,7 @@ impl CacheUpdate for MessageUpdateEvent {
             message.content = content;
         }
 
-        if let Some(edited_timestamp) = self.edited_timestamp.clone() {
+        if let Some(edited_timestamp) = self.edited_timestamp {
             message.edited_timestamp = Some(edited_timestamp);
         }
 

@@ -127,10 +127,10 @@ impl CreateEmbed {
     #[inline]
     pub fn field<T, U>(self, name: T, value: U, inline: bool) -> Self
         where T: Display, U: Display {
-        self._field(name.to_string(), value.to_string(), inline)
+        self._field(&name.to_string(), &value.to_string(), inline)
     }
 
-    fn _field(mut self, name: String, value: String, inline: bool) -> Self {
+    fn _field(mut self, name: &str, value: &str, inline: bool) -> Self {
         {
             let entry = self.0
                 .entry("fields")
