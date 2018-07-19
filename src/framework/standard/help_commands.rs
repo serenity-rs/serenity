@@ -497,7 +497,7 @@ pub fn plain<H: BuildHasher>(
         }
 
         let _ = msg.channel_id
-            .say(&help_options.suggestion_text.replace("{}", name));
+            .say(&help_options.command_not_found_text.replace("{}", name));
 
         return Ok(());
     }
