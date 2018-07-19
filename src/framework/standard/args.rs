@@ -87,37 +87,21 @@ enum TokenKind {
     QuotedArgument,
 }
 
-#[derive(Debug)]
-struct Token<'a> {
-    lit: &'a str,
-    kind: TokenKind,
-    pos: usize,
-}
-
-impl<'a> Token<'a> {
-    fn new(kind: TokenKind, lit: &'a str, pos: usize) -> Self {
-        Token { kind, lit, pos }
-    }
-}
-
 #[derive(Debug, Clone)]
-struct TokenOwned {
+struct Token {
     kind: TokenKind,
     lit: String,
+    // start position
     pos: usize,
 }
 
-impl<'a> Token<'a> {
-    fn to_owned(&self) -> TokenOwned {
-        TokenOwned {
-            kind: self.kind,
-            lit: self.lit.to_string(),
-            pos: self.pos,
-        }
+impl Token {
+    fn new(kind: TokenKind, lit: &str, pos: usize) -> Self {
+        Token { kind, lit: lit.to_string(), pos }
     }
 }
 
-impl PartialEq<TokenKind> for TokenOwned {
+impl PartialEq<TokenKind> for Token {
     fn eq(&self, other: &TokenKind) -> bool {
         self.kind == *other
     }
@@ -161,7 +145,7 @@ impl<'a> Lexer<'a> {
         Some(())
     }
 
-    fn commit(&mut self) -> Option<Token<'a>> {
+    fn commit(&mut self) -> Option<Token> {
         if self.at_end() {
             return None;
         }
@@ -290,7 +274,7 @@ impl<'a> Lexer<'a> {
 #[derive(Clone, Debug)]
 pub struct Args {
     message: String,
-    args: Vec<TokenOwned>,
+    args: Vec<Token>,
     offset: usize,
 }
 
@@ -338,7 +322,7 @@ impl Args {
                 continue;
             }
 
-            args.push(token.to_owned());
+            args.push(token);
         }
 
         Args {
@@ -966,7 +950,7 @@ impl<'a, T: FromStr> Iterator for IterQuoted<'a, T> where T::Err: StdError  {
     }
 }
 
-fn quotes_extract(token: &TokenOwned) -> &str {
+fn quotes_extract(token: &Token) -> &str {
     if token.kind == TokenKind::QuotedArgument {
         &token.lit[1..token.lit.len() - 1]
     } else {
