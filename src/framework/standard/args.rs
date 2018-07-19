@@ -85,7 +85,6 @@ enum TokenKind {
     Delimiter,
     Argument,
     QuotedArgument,
-    Eof,
 }
 
 #[derive(Debug)]
@@ -98,14 +97,6 @@ struct Token<'a> {
 impl<'a> Token<'a> {
     fn new(kind: TokenKind, lit: &'a str, pos: usize) -> Self {
         Token { kind, lit, pos }
-    }
-
-    fn empty() -> Self {
-        Token {
-            kind: TokenKind::Eof,
-            lit: "",
-            pos: !0,
-        }
     }
 }
 
@@ -170,15 +161,15 @@ impl<'a> Lexer<'a> {
         Some(())
     }
 
-    fn commit(&mut self) -> Token<'a> {
+    fn commit(&mut self) -> Option<Token<'a>> {
         if self.at_end() {
-            return Token::empty();
+            return None;
         }
 
         if self.current().unwrap().contains(self.delims) {
             let start = self.offset;
             self.next();
-            return Token::new(TokenKind::Delimiter, &self.msg[start..self.offset], start);
+            return Some(Token::new(TokenKind::Delimiter, &self.msg[start..self.offset], start));
         }
 
         if self.current().unwrap() == "\"" {
@@ -193,12 +184,12 @@ impl<'a> Lexer<'a> {
 
             let end = self.offset;
 
-            return if self.at_end() && &self.msg[find_start(self.msg, end).unwrap()..end] != "\"" {
+            return Some(if self.at_end() && &self.msg[find_start(self.msg, end).unwrap()..end] != "\"" {
                 // We're missing an end quote. View this as a normal argument.
                 Token::new(TokenKind::Argument, &self.msg[start..], start)
             } else {
                 Token::new(TokenKind::QuotedArgument, &self.msg[start..end], start)
-            };
+            });
         }
 
         let start = self.offset;
@@ -207,7 +198,7 @@ impl<'a> Lexer<'a> {
             self.next();
         }
 
-        Token::new(TokenKind::Argument, &self.msg[start..self.offset], start)
+        Some(Token::new(TokenKind::Argument, &self.msg[start..self.offset], start))
     }
 }
 
@@ -342,9 +333,7 @@ impl Args {
 
         let mut args = Vec::new();
 
-        while !lex.at_end() {
-            let token = lex.commit();
-
+        while let Some(token) = lex.commit() {
             if token.kind == TokenKind::Delimiter {
                 continue;
             }
