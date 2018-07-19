@@ -73,6 +73,7 @@ fn find_end(s: &str, i: usize) -> Option<usize> {
     }
 
     let mut end = i + 1;
+
     while !s.is_char_boundary(end) {
         end += 1;
     }
