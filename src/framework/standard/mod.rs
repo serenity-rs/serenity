@@ -1036,7 +1036,6 @@ impl Framework for StandardFramework {
                         );
 
                         if longest_matching_prefix_len == built.len() {
-
                             String::new()
                         } else if longest_matching_prefix_len > 0 {
                             built[longest_matching_prefix_len + 1..].to_string()
