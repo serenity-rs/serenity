@@ -1020,14 +1020,14 @@ impl Framework for StandardFramework {
                     if let Some(&CommandOrAlias::Alias(ref points_to)) = cmd {
                         built = points_to.to_string();
                     }
-                    
+
                     let to_check = if let Some(ref prefixes) = group.prefixes {
                         // Once `built` starts with a set prefix,
                         // we want to make sure that all following matching prefixes are longer
                         // than the last matching one, this prevents picking a wrong prefix,
                         // e.g. "f" instead of "ferris" due to "f" having a lower index in the `Vec`.
                         let longest_matching_prefix_len = prefixes.iter().fold(0, |longest_prefix_len, prefix|
-                            if prefix.len() > longest_prefix_len && built.starts_with(prefix) 
+                            if prefix.len() > longest_prefix_len && built.starts_with(prefix)
                             && (index + 1 == positions.len() || command_length > prefix.len() + 1) {
                                 prefix.len()
                             } else {
@@ -1036,7 +1036,7 @@ impl Framework for StandardFramework {
                         );
 
                         if longest_matching_prefix_len == built.len() {
-                            
+
                             String::new()
                         } else if longest_matching_prefix_len > 0 {
                             built[longest_matching_prefix_len + 1..].to_string()
@@ -1056,12 +1056,12 @@ impl Framework for StandardFramework {
 
                     let before = self.before.clone();
                     let after = self.after.clone();
-                    
+
                     if to_check.is_empty() {
 
                         if let Some(CommandOrAlias::Command(ref command)) = &group.default_command {
                             let command = Arc::clone(command);
-                            
+
                             threadpool.execute(move || {
                                 if let Some(before) = before {
                                     if !(before)(&mut context, &message, &built) {
