@@ -104,6 +104,7 @@ pub struct CommandGroup {
     /// A set of checks to be called prior to executing the command-group. The checks
     /// will short-circuit on the first check that returns `false`.
     pub checks: Vec<Check>,
+    pub default_command: Option<CommandOrAlias>,
 }
 
 impl Default for CommandGroup {
@@ -120,6 +121,7 @@ impl Default for CommandGroup {
             allowed_roles: Vec::new(),
             help: None,
             checks: Vec::new(),
+            default_command: None,
         }
     }
 }

@@ -988,9 +988,9 @@ impl Framework for StandardFramework {
             None => return,
         };
 
-        'outer: for position in positions {
+        'outer: for (index, position) in positions.iter().enumerate() {
             let mut built = String::new();
-            let round = message.content.chars().skip(position).collect::<String>();
+            let round = message.content.chars().skip(*position).collect::<String>();
             let mut round = round.trim().split_whitespace(); // Call to `trim` causes the related bug under the main bug #206 - where the whitespace settings are ignored. The fix is implemented as an additional check inside command::positions
 
             for i in 0..self.configuration.depth {
@@ -1020,22 +1020,26 @@ impl Framework for StandardFramework {
                     if let Some(&CommandOrAlias::Alias(ref points_to)) = cmd {
                         built = points_to.to_string();
                     }
-
+                    
                     let to_check = if let Some(ref prefixes) = group.prefixes {
                         // Once `built` starts with a set prefix,
                         // we want to make sure that all following matching prefixes are longer
                         // than the last matching one, this prevents picking a wrong prefix,
                         // e.g. "f" instead of "ferris" due to "f" having a lower index in the `Vec`.
                         let longest_matching_prefix_len = prefixes.iter().fold(0, |longest_prefix_len, prefix|
-                            if prefix.len() > longest_prefix_len && built.starts_with(prefix) && command_length > prefix.len() + 1 {
+                            if prefix.len() > longest_prefix_len && built.starts_with(prefix) 
+                            && (index + 1 == positions.len() || command_length > prefix.len() + 1) {
                                 prefix.len()
                             } else {
                                 longest_prefix_len
                             }
                         );
 
-                        if longest_matching_prefix_len > 0 {
-                            built[(longest_matching_prefix_len + 1)..].to_string()
+                        if longest_matching_prefix_len == built.len() {
+                            
+                            String::new()
+                        } else if longest_matching_prefix_len > 0 {
+                            built[longest_matching_prefix_len + 1..].to_string()
                         } else {
                             continue;
                         }
@@ -1044,7 +1048,7 @@ impl Framework for StandardFramework {
                     };
 
                     let mut args = {
-                        let content = message.content.chars().skip(position).skip_while(|x| x.is_whitespace())
+                        let content = message.content.chars().skip(*position).skip_while(|x| x.is_whitespace())
                             .skip(command_length).collect::<String>();
 
                         Args::new(&content.trim(), &self.configuration.delimiters)
@@ -1052,8 +1056,35 @@ impl Framework for StandardFramework {
 
                     let before = self.before.clone();
                     let after = self.after.clone();
+                    
+                    if to_check.is_empty() {
 
-                    if to_check == "help" {
+                        if let Some(CommandOrAlias::Command(ref command)) = &group.default_command {
+                            let command = Arc::clone(command);
+                            
+                            threadpool.execute(move || {
+                                if let Some(before) = before {
+                                    if !(before)(&mut context, &message, &built) {
+                                        return;
+                                    }
+                                }
+
+                                if !command.before(&mut context, &message) {
+                                    return;
+                                }
+
+                                let result = command.execute(&mut context, &message, args);
+
+                                command.after(&mut context, &message, &result);
+
+                                if let Some(after) = after {
+                                    (after)(&mut context, &message, &built, result);
+                                }
+                            });
+
+                            return;
+                        }
+                    } else if to_check == "help" {
                         let help = self.help.clone();
 
                         if let Some(help) = help {
