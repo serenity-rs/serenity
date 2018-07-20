@@ -170,6 +170,8 @@ fn main() {
         .group("Emoji", |g| g
             // Sets a single prefix for a group:
             .prefix("emoji")
+            // Sets a command that will be executed if only a group-prefix was passed.
+            .default_cmd(dog)
             .command("cat", |c| c
                 .desc("Sends an emoji with a cat.")
                 .batch_known_as(vec!["kitty", "neko"]) // Adds multiple aliases
