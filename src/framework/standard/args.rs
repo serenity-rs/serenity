@@ -88,12 +88,6 @@ impl Token {
     }
 }
 
-impl PartialEq<TokenKind> for Token {
-    fn eq(&self, other: &TokenKind) -> bool {
-        self.kind == *other
-    }
-}
-
 #[derive(Debug)]
 struct Lexer<'a> {
     msg: &'a str,
@@ -110,6 +104,7 @@ impl<'a> Lexer<'a> {
         }
     }
 
+    #[inline]
     fn at_end(&self) -> bool {
         self.offset >= self.msg.len()
     }
@@ -137,17 +132,17 @@ impl<'a> Lexer<'a> {
             return None;
         }
 
-        if self.current().unwrap().contains(self.delims) {
+        if self.current()?.contains(self.delims) {
             let start = self.offset;
             self.next();
             return Some(Token::new(TokenKind::Delimiter, &self.msg[start..self.offset], start));
         }
 
-        if self.current().unwrap() == "\"" {
+        if self.current()? == "\"" {
             let start = self.offset;
             self.next();
 
-            while !self.at_end() && self.current().unwrap() != "\"" {
+            while !self.at_end() && self.current()? != "\"" {
                 self.next();
             }
 
@@ -166,7 +161,11 @@ impl<'a> Lexer<'a> {
 
         let start = self.offset;
 
-        while !self.at_end() && !self.current().unwrap().contains(self.delims) {
+        while !self.at_end() {
+            if self.current()?.contains(self.delims) {
+                break;
+            }
+
             self.next();
         }
 
