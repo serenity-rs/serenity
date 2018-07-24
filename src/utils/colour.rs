@@ -190,6 +190,20 @@ impl Colour {
     /// [`g`]: #method.g
     /// [`b`]: #method.b
     pub fn tuple(&self) -> (u8, u8, u8) { (self.r(), self.g(), self.b()) }
+
+    /// Returns a hexadecimal string of this Colour.
+    ///
+    /// This is equivalent to passing the integer value through `std::fmt::UpperHex` with 0 padding
+    /// and 6 width
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::utils::Colour;
+    ///
+    /// assert_eq!(Colour::new(6573123).hex(), String::from("644C43"));
+    /// ```
+    pub fn hex(&self) -> String { format!("{:06X}", self.0) }
 }
 
 impl From<i32> for Colour {
