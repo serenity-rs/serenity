@@ -20,8 +20,11 @@ matrix:
     - nightly
 
 install:
+  - chmod +x ./.travis-libsodium.sh
   - ./.travis-libsodium.sh
   - export PKG_CONFIG_PATH=$HOME/libsodium/lib/pkgconfig
   - export LD_LIBRARY_PATH=$HOME/libsodium/lib
 
-script: ./.travis.yml
+script:
+  - chmod +x ./.travis.yml
+  - ./.travis.yml
