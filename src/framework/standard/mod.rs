@@ -1032,6 +1032,7 @@ impl Framework for StandardFramework {
                         built = points_to.to_string();
                     }
 
+                    let mut check_contains_group_prefix = false;
                     let to_check = if let Some(ref prefixes) = group.prefixes {
                         // Once `built` starts with a set prefix,
                         // we want to make sure that all following matching prefixes are longer
@@ -1047,8 +1048,10 @@ impl Framework for StandardFramework {
                         );
 
                         if longest_matching_prefix_len == built.len() {
+                            check_contains_group_prefix = true;
                             String::new()
                         } else if longest_matching_prefix_len > 0 {
+                            check_contains_group_prefix = true;
                             built[longest_matching_prefix_len + 1..].to_string()
                         } else {
                             continue;
@@ -1067,8 +1070,78 @@ impl Framework for StandardFramework {
                     let before = self.before.clone();
                     let after = self.after.clone();
 
-                    if to_check.is_empty() {
+                    if to_check == "help" {
+                        let help = self.help.clone();
 
+                        if let Some(help) = help {
+                            let groups = self.groups.clone();
+                            threadpool.execute(move || {
+
+                                if let Some(before) = before {
+
+                                    if !(before)(&mut context, &message, &built) {
+                                        return;
+                                    }
+                                }
+
+                                let result = (help.0)(&mut context, &message, &help.1, groups, &args);
+
+                                if let Some(after) = after {
+                                    (after)(&mut context, &message, &built, result);
+                                }
+                            });
+                            return;
+                        }
+                    }
+
+
+                    if !to_check.is_empty() {
+
+                        if let Some(&CommandOrAlias::Command(ref command)) =
+                            group.commands.get(&to_check) {
+                            let command = Arc::clone(command);
+
+                            if let Some(error) = self.should_fail(
+                                &mut context,
+                                &message,
+                                &command.options(),
+                                &group,
+                                &mut args,
+                                &to_check,
+                                &built,
+                            ) {
+                                if let Some(ref handler) = self.dispatch_error_handler {
+                                    handler(context, message, error);
+                                }
+                                return;
+                            }
+
+                            threadpool.execute(move || {
+                                if let Some(before) = before {
+                                    if !(before)(&mut context, &message, &built) {
+                                        return;
+                                    }
+                                }
+
+                                if !command.before(&mut context, &message) {
+                                    return;
+                                }
+
+                                let result = command.execute(&mut context, &message, args);
+
+                                command.after(&mut context, &message, &result);
+
+                                if let Some(after) = after {
+                                    (after)(&mut context, &message, &built, result);
+                                }
+                            });
+
+                            return;
+
+                        }
+                    }
+
+                    if check_contains_group_prefix {
                         if let Some(CommandOrAlias::Command(ref command)) = &group.default_command {
                             let command = Arc::clone(command);
 
@@ -1094,70 +1167,6 @@ impl Framework for StandardFramework {
 
                             return;
                         }
-                    } else if to_check == "help" {
-                        let help = self.help.clone();
-
-                        if let Some(help) = help {
-                            let groups = self.groups.clone();
-                            threadpool.execute(move || {
-
-                                if let Some(before) = before {
-
-                                    if !(before)(&mut context, &message, &built) {
-                                        return;
-                                    }
-                                }
-
-                                let result = (help.0)(&mut context, &message, &help.1, groups, &args);
-
-                                if let Some(after) = after {
-                                    (after)(&mut context, &message, &built, result);
-                                }
-                            });
-                            return;
-                        }
-                    }
-
-                    if let Some(&CommandOrAlias::Command(ref command)) =
-                        group.commands.get(&to_check) {
-                        let command = Arc::clone(command);
-
-                        if let Some(error) = self.should_fail(
-                            &mut context,
-                            &message,
-                            &command.options(),
-                            &group,
-                            &mut args,
-                            &to_check,
-                            &built,
-                        ) {
-                            if let Some(ref handler) = self.dispatch_error_handler {
-                                handler(context, message, error);
-                            }
-                            return;
-                        }
-
-                        threadpool.execute(move || {
-                            if let Some(before) = before {
-                                if !(before)(&mut context, &message, &built) {
-                                    return;
-                                }
-                            }
-
-                            if !command.before(&mut context, &message) {
-                                return;
-                            }
-
-                            let result = command.execute(&mut context, &message, args);
-
-                            command.after(&mut context, &message, &result);
-
-                            if let Some(after) = after {
-                                (after)(&mut context, &message, &built, result);
-                            }
-                        });
-
-                        return;
                     }
                 }
             }
