@@ -961,6 +961,16 @@ impl StandardFramework {
     }
 }
 
+fn skip_chars_and_trim_to_new_string(str_to_transform_to_chars: &str, chars_to_skip: usize) -> String {
+    let mut chars = str_to_transform_to_chars.chars();
+
+    if chars_to_skip > 0 {
+        chars.nth(chars_to_skip - 1);
+    }
+
+    chars.as_str().trim().to_string()
+}
+
 impl Framework for StandardFramework {
     fn dispatch(
         &mut self,
@@ -988,10 +998,11 @@ impl Framework for StandardFramework {
             None => return,
         };
 
-        'outer: for (index, position) in positions.iter().enumerate() {
+        'outer: for position in positions {
             let mut built = String::new();
-            let round = message.content.chars().skip(*position).collect::<String>();
-            let mut round = round.trim().split_whitespace(); // Call to `trim` causes the related bug under the main bug #206 - where the whitespace settings are ignored. The fix is implemented as an additional check inside command::positions
+
+            let orginal_round = skip_chars_and_trim_to_new_string(&message.content, position);
+            let mut round = orginal_round.split_whitespace();
 
             for i in 0..self.configuration.depth {
                 if i != 0 {
@@ -1028,7 +1039,7 @@ impl Framework for StandardFramework {
                         // e.g. "f" instead of "ferris" due to "f" having a lower index in the `Vec`.
                         let longest_matching_prefix_len = prefixes.iter().fold(0, |longest_prefix_len, prefix|
                             if prefix.len() > longest_prefix_len && built.starts_with(prefix)
-                            && (index + 1 == positions.len() || command_length > prefix.len() + 1) {
+                            && (orginal_round.len() == built.len() || command_length > prefix.len() + 1) {
                                 prefix.len()
                             } else {
                                 longest_prefix_len
@@ -1047,7 +1058,7 @@ impl Framework for StandardFramework {
                     };
 
                     let mut args = {
-                        let content = message.content.chars().skip(*position).skip_while(|x| x.is_whitespace())
+                        let content = message.content.chars().skip(position).skip_while(|x| x.is_whitespace())
                             .skip(command_length).collect::<String>();
 
                         Args::new(&content.trim(), &self.configuration.delimiters)
