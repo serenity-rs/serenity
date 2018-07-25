@@ -557,9 +557,9 @@ impl ChannelId {
     /// over the limit.
     ///
     /// [`Channel`]: enum.Channel.html
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "utils")]
     pub fn send_message<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
