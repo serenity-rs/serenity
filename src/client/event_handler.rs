@@ -230,6 +230,13 @@ pub trait EventHandler {
     /// Dispatched when a message is updated.
     ///
     /// Provides the new data of the message.
+    #[cfg(feature = "cache")]
+    fn message_update(&self, _ctx: Context, _old_if_available: Option<Message>, _new: Message) {}
+
+    /// Dispatched when a message is updated.
+    ///
+    /// Provides the new data of the message.
+    #[cfg(not(feature = "cache"))]
     fn message_update(&self, _ctx: Context, _new_data: MessageUpdateEvent) {}
 
     fn presence_replace(&self, _ctx: Context, _: Vec<Presence>) {}

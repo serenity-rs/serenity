@@ -578,6 +578,17 @@ impl Cache {
         })
     }
 
+    #[inline]
+    pub fn message<C, M>(&self, channel_id: C, user_id: M) -> Option<Message>
+        where C: Into<ChannelId>, M: Into<MessageId> {
+        self._message(channel_id.into(), user_id.into())
+    }
+
+    fn _message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<Message> {
+        self.messages.get(&channel_id).and_then(|messages| {
+            messages.get(&message_id).cloned()
+        })
+    }
     /// Retrieves a [`PrivateChannel`] from the cache's [`private_channels`]
     /// map, if it exists.
     ///
