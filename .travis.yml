@@ -1,5 +1,5 @@
 language: rust
-sudo: false
+sudo: required
 rust:
   - stable
   - beta
@@ -17,21 +17,54 @@ before_cache:
   - chmod -R a+r $HOME/.cargo
 matrix:
   allow_failures:
-    - nightly
+    - rust: nightly
+  fast_finish: true
 
 install:
-  - if [ ! -d "$HOME/libsodium/lib" ]; then
-  -   wget https://github.com/jedisct1/libsodium/releases/download/1.0.16/libsodium-1.0.16.tar.gz
-  -   tar zxvf libsodium-1.0.16.tar.gz
-  -   cd libsodium-1.0.16
-  -   ./configure --prefix=$HOME/libsodium
-  -   make
-  -   make install
-  - else
-  -   echo 'Using cached libsodium directory'
-  - fi
-  - export PKG_CONFIG_PATH=$HOME/libsodium/lib/pkgconfig
-  - export LD_LIBRARY_PATH=$HOME/libsodium/lib
+  - sh ./.travis-install.sh
 
 script:
-  - cargo test --all-features
+  - export PKG_CONFIG_PATH=$HOME/libsodium/lib/pkgconfig
+  - export LD_LIBRARY_PATH=$HOME/libsodium/lib
+  - cargo test --all-features -j1
+
+after_failure:
+  # Borrowed from <https://github.com/rust-lang/rust/blob/master/.travis.yml>
+  - >
+    echo "#### Build failed; Disk usage after running script:";
+    df -h;
+    du . | sort -nr | head -n100
+
+  # Random attempt at debugging currently. Just poking around in here to see if
+  # anything shows up.
+
+  # Dump backtrace for macOS
+  - ls -lat $HOME/Library/Logs/DiagnosticReports/
+  - find $HOME/Library/Logs/DiagnosticReports
+      -type f
+      -name '*.crash'
+      -not -name '*.stage2-*.crash'
+      -not -name 'com.apple.CoreSimulator.CoreSimulatorService-*.crash'
+      -exec printf travis_fold":start:crashlog\n\033[31;1m%s\033[0m\n" {} \;
+      -exec head -750 {} \;
+      -exec echo travis_fold":"end:crashlog \; || true
+
+  # Dump backtrace for Linux
+  - ln -s . checkout &&
+    for CORE in obj/cores/core.*; do
+      EXE=$(echo $CORE | sed 's|obj/cores/core\.[0-9]*\.!checkout!\(.*\)|\1|;y|!|/|');
+      if [ -f "$EXE" ]; then
+        printf travis_fold":start:crashlog\n\033[31;1m%s\033[0m\n" "$CORE";
+        gdb -q -c "$CORE" "$EXE"
+          -iex 'set auto-load off'
+          -iex 'dir src/'
+          -iex 'set sysroot .'
+          -ex bt
+          -ex q;
+        echo travis_fold":"end:crashlog;
+      fi;
+    done || true
+
+  # attempt to debug anything killed by the oom killer on linux, just to see if
+  # it happened
+  - dmesg | grep -i kill
