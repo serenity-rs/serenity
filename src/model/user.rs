@@ -738,9 +738,10 @@ impl UserId {
     #[cfg(feature = "cache")]
     pub fn find(&self) -> Option<Arc<RwLock<User>>> { CACHE.read().user(*self) }
 
-    /// Gets a user by its Id over the REST API.
+    /// Gets a user by its Id from either the cache or the REST API.
     ///
-    /// **Note**: The current user must be a bot user.
+    /// Searches the cache for the user first, if the cache is enabled. If the
+    /// user was not found, then the user is searched via the REST API.
     #[inline]
     pub fn get(&self) -> Result<User> {
         #[cfg(feature = "cache")]
