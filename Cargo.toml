@@ -47,7 +47,7 @@ version = "~0.12"
 
 [dependencies.hyper-tls]
 optional = true
-version = "~0.2"
+version = "~0.3"
 
 [dependencies.opus]
 optional = true
@@ -89,3 +89,6 @@ voice = ["byteorder", "gateway", "opus", "rand", "sodiumoxide"]
 
 [package.metadata.docs.rs]
 all-features = true
+
+[patch.crates-io]
+tokio-tls = { git = "https://github.com/aep/tokio-tls.git", rev = "7865734d2167160cabd4422aca76b8478e643b41" }
