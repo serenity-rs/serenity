@@ -454,6 +454,13 @@ impl GuildId {
     }
 
     fn _member(&self, user_id: UserId) -> Result<Member> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(member) = CACHE.read().member(self.0, user_id) {
+                return Ok(member);
+            }
+        }
+
         http::get_member(self.0, user_id.0)
     }
 
