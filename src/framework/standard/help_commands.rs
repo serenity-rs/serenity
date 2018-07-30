@@ -266,7 +266,7 @@ pub fn with_embeds<H: BuildHasher>(
                     &help_options.striked_commands_tip_in_dm
                 };
 
-            if let Some(ref striked_command_text) = striked_command_tip {
+            if let &Some(ref striked_command_text) = striked_command_tip {
                 e = e.colour(help_options.embed_success_colour).description(
                     format!("{}\n{}", &help_options.individual_command_tip, striked_command_text),
                 );
@@ -510,7 +510,7 @@ pub fn plain<H: BuildHasher>(
             &help_options.striked_commands_tip_in_dm
     };
 
-    if let Some(ref striked_command_text) = striked_command_tip {
+    if let &Some(ref striked_command_text) = striked_command_tip {
         let _ = writeln!(result, "{}\n{}\n", &help_options.individual_command_tip, striked_command_text);
     } else {
         let _ = writeln!(result, "{}\n", &help_options.individual_command_tip);
