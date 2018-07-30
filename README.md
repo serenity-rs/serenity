@@ -103,6 +103,9 @@ features = ["pick", "your", "feature", "names", "here"]
 version = "0.5"
 ```
 
+The default features are: `builder`, `cache`, `client`, `framework`, `gateway`,
+`http`, `model`, `standard_framework`, and `utils`.
+
 The following is a full list of features:
 
 - **builder**: The builders used in conjunction with models' methods.
@@ -123,6 +126,24 @@ the HTTP functions.
 - **utils**: Utility functions for common use cases by users.
 - **voice**: Enables compilation of voice support, so that voice channels can be
 connected to and audio can be sent/received.
+
+If you want all of the default features except for `cache` for example, you can
+list all but that:
+
+```toml
+[dependencies.serenity]
+default-features = false
+features = [
+    "builder",
+    "client",
+    "framework",
+    "gateway",
+    "http",
+    "model",
+    "standard_framework",
+    "utils",
+]
+version = "0.5"
 
 # Dependencies
 
