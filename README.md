@@ -1,4 +1,4 @@
-[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.25+ badge]][rust 1.25+ link]
+[![ci-badge][]][ci][![docs-badge][]][docs][![guild-badge][]][guild][![crates.io version]][crates.io link][![rust 1.25+ badge]][rust 1.25+ link]
 
 # serenity
 
@@ -189,17 +189,17 @@ Voice+youtube-dl:
 [`validate_token`]: https://docs.rs/serenity/*/serenity/client/fn.validate_token.html
 [cache docs]: https://docs.rs/serenity/*/serenity/cache/index.html
 [ci]: https://travis-ci.org/serenity-rs/serenity
-[ci-badge]: https://travis-ci.org/serenity-rs/serenity.svg?branch=master
+[ci-badge]: https://img.shields.io/travis/serenity-rs/serenity.svg?style=flat-square
 [client's module-level documentation]: https://docs.rs/serenity/*/serenity/client/index.html
 [crates.io link]: https://crates.io/crates/serenity
-[crates.io version]: https://img.shields.io/crates/v/serenity.svg
+[crates.io version]: https://img.shields.io/crates/v/serenity.svg?style=flat-square
 [discord docs]: https://discordapp.com/developers/docs/intro
 [docs]: https://docs.rs/serenity
-[docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
+[docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg?style=flat-square
 [examples]: https://github.com/serenity-rs/serenity/tree/master/examples
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
 [guild]: https://discord.gg/WBdGJCc
-[guild-badge]: https://discordapp.com/api/guilds/381880193251409931/widget.png
+[guild-badge]: https://img.shields.io/discord/381880193251409931.svg?style=flat-square&colorB=7289DA
 [library:Discord.net]: https://github.com/RogueException/Discord.Net
 [library:JDA]: https://github.com/DV8FromTheWorld/JDA
 [library:disco]: https://github.com/b1naryth1ef/disco
@@ -207,5 +207,5 @@ Voice+youtube-dl:
 [library:discord.js]: https://github.com/hydrabolt/discord.js
 [library:discord.py]: https://github.com/Rapptz/discord.py
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/master/logo.png
-[rust 1.25+ badge]: https://img.shields.io/badge/rustc-1.25+-lightgray.svg?
+[rust 1.25+ badge]: https://img.shields.io/badge/rust-1.25+-93450a.svg?style=flat-square
 [rust 1.25+ link]: https://blog.rust-lang.org/2018/03/29/Rust-1.25.html
