@@ -1,4 +1,4 @@
-[![ci-badge][]][ci][![docs-badge][]][docs][![guild-badge][]][guild][![crates.io version]][crates.io link][![rust 1.25+ badge]][rust 1.25+ link]
+[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.25+ badge]][rust 1.25+ link]
 
 # serenity
 
