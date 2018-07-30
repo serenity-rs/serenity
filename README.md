@@ -144,6 +144,7 @@ features = [
     "utils",
 ]
 version = "0.5"
+```
 
 # Dependencies
 
