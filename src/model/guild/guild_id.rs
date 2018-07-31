@@ -444,7 +444,10 @@ impl GuildId {
     #[inline]
     pub fn leave(&self) -> Result<()> { http::leave_guild(self.0) }
 
-    /// Gets a user's [`Member`] for the guild by Id.
+    /// Gets a user's [`Member`] for the guild by Id. 
+    /// 
+    /// If the cache feature is enabled the cache will be checked
+    /// first. If not found it will resort to an http request.
     ///
     /// [`Guild`]: struct.Guild.html
     /// [`Member`]: struct.Member.html
@@ -454,6 +457,13 @@ impl GuildId {
     }
 
     fn _member(&self, user_id: UserId) -> Result<Member> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(member) = CACHE.read().member(self.0, user_id) {
+                return Ok(member);
+            }
+        }
+
         http::get_member(self.0, user_id.0)
     }
 
