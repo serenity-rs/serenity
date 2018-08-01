@@ -177,9 +177,9 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             let context = context(data, runner_tx, shard_id);
 
-            // This different channel_create dispatching is only due to the fact that
-            // each time the bot receives a dm, this event is also fired.
-            // So in short, only exists to reduce unnecessary clutter.
+            // Discord sends both a MessageCreate and a ChannelCreate upon a new message in a private channel.
+            // This could potentionally be annoying to handle when otherwise wanting to normally take care of a new channel.
+            // So therefore, private channels are dispatched to their own handler code.
             match event.channel {
                 Channel::Private(channel) => {
                     let event_handler = Arc::clone(event_handler);
