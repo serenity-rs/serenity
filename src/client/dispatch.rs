@@ -15,14 +15,10 @@ use std::sync::mpsc::Sender;
 use threadpool::ThreadPool;
 use typemap::ShareMap;
 
-#[cfg(feature = "cache")]
-use chrono::{Timelike, Utc};
 #[cfg(feature = "framework")]
 use framework::Framework;
 #[cfg(feature = "cache")]
 use model::id::GuildId;
-#[cfg(feature = "cache")]
-use std::{thread, time};
 
 #[cfg(feature = "cache")]
 use super::CACHE;
@@ -36,11 +32,6 @@ macro_rules! update {
             }
         }
     };
-}
-
-#[cfg(feature = "cache")]
-macro_rules! now {
-    () => (Utc::now().time().second() * 1000)
 }
 
 fn context(
@@ -149,20 +140,6 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
     threadpool: &ThreadPool,
     shard_id: u64,
 ) {
-    #[cfg(feature = "cache")]
-    let mut last_guild_create_time = now!();
-
-    #[cfg(feature = "cache")]
-    let wait_for_guilds = move || -> ::Result<()> {
-        let unavailable_guilds = CACHE.read().unavailable_guilds.len();
-
-        while unavailable_guilds != 0 && (now!() < last_guild_create_time + 2000) {
-            thread::sleep(time::Duration::from_millis(500));
-        }
-
-        Ok(())
-    };
-
     match event {
         DispatchEvent::Client(ClientEvent::ShardStageUpdate(event)) => {
             let context = context(data, runner_tx, shard_id);
@@ -309,8 +286,6 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             #[cfg(feature = "cache")]
             {
-                last_guild_create_time = now!();
-
                 let cache = CACHE.read();
 
                 if cache.unavailable_guilds.is_empty() {
@@ -566,28 +541,12 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
         DispatchEvent::Model(Event::Ready(mut event)) => {
             update!(event);
 
-            let event_handler = Arc::clone(event_handler);
+            let context = context(data, runner_tx, shard_id);
+            let event_handler = Arc::clone(&event_handler);
 
-            feature_cache! {{
-                last_guild_create_time = now!();
-
-                let _ = wait_for_guilds()
-                    .map(move |_| {
-                        let context = context(data, runner_tx, shard_id);
-                        let event_handler = Arc::clone(&event_handler);
-
-                        threadpool.execute(move || {
-                            event_handler.ready(context, event.ready);
-                        });
-                    });
-            } else {
-                let context = context(data, runner_tx, shard_id);
-                let event_handler = Arc::clone(&event_handler);
-
-                threadpool.execute(move || {
-                    event_handler.ready(context, event.ready);
-                });
-            }}
+            threadpool.execute(move || {
+                event_handler.ready(context, event.ready);
+            });
         },
         DispatchEvent::Model(Event::Resumed(mut event)) => {
             let context = context(data, runner_tx, shard_id);
