@@ -274,7 +274,7 @@ impl Context {
     /// [`set_presence`]: #method.set_presence
     #[inline]
     pub fn reset_presence(&self) {
-        self.shard.set_presence(None, OnlineStatus::Online);
+        self.shard.set_presence(None::<Game>, OnlineStatus::Online);
     }
 
     /// Sets the current game, defaulting to an online status of [`Online`].
@@ -317,7 +317,11 @@ impl Context {
     ///
     /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
     #[inline]
-    pub fn set_game(&self, game: Game) {
+    pub fn set_game<T: Into<Game>>(&self, game: T) {
+        self._set_game(game.into())
+    }
+
+    fn _set_game(&self, game: Game) {
         self.shard.set_presence(Some(game), OnlineStatus::Online);
     }
 
@@ -357,14 +361,10 @@ impl Context {
     /// [`Playing`]: ../model/gateway/enum.GameType.html#variant.Playing
     /// [`reset_presence`]: #method.reset_presence
     /// [`set_presence`]: #method.set_presence
-    pub fn set_game_name(&self, game_name: &str) {
-        let game = Game {
-            kind: GameType::Playing,
-            name: game_name.to_string(),
-            url: None,
-        };
-
-        self.shard.set_presence(Some(game), OnlineStatus::Online);
+    #[deprecated(since = "0.5.5", note = "Use Context::set_game")]
+    #[inline]
+    pub fn set_game_name<T: Into<String>>(&self, game_name: T) {
+        self.set_game(game_name.into())
     }
 
     /// Sets the current user's presence, providing all fields to be passed.

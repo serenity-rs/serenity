@@ -2022,7 +2022,6 @@ mod test {
     mod model {
         use chrono::prelude::*;
         use model::prelude::*;
-        use prelude::*;
         use std::collections::*;
         use std::sync::Arc;
 
