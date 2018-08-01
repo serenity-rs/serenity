@@ -140,6 +140,10 @@ extern crate typemap;
 #[cfg(feature = "evzht9h3nznqzwl")]
 extern crate evzht9h3nznqzwl as websocket;
 
+#[cfg(test)]
+#[macro_use]
+extern crate matches;
+
 #[macro_use]
 mod internal;
 
