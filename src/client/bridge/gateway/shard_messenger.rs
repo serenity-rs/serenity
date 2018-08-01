@@ -157,7 +157,11 @@ impl ShardMessenger {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn set_game(&self, game: Option<Game>) {
+    pub fn set_game<T: Into<Game>>(&self, game: Option<T>) {
+        self._set_game(game.map(Into::into))
+    }
+
+    fn _set_game(&self, game: Option<Game>) {
         let _ = self.send(ShardRunnerMessage::SetGame(game));
     }
 
@@ -195,7 +199,15 @@ impl ShardMessenger {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn set_presence(&self, game: Option<Game>, mut status: OnlineStatus) {
+    pub fn set_presence<T: Into<Game>>(
+        &self,
+        game: Option<T>,
+        status: OnlineStatus,
+    ) {
+        self._set_presence(game.map(Into::into), status)
+    }
+
+    fn _set_presence(&self, game: Option<Game>, mut status: OnlineStatus) {
         if status == OnlineStatus::Offline {
             status = OnlineStatus::Invisible;
         }

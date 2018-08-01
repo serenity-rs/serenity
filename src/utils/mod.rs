@@ -500,3 +500,54 @@ pub fn with_cache_mut<T, F>(mut f: F) -> T
     let mut cache = CACHE.write();
     f(&mut cache)
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_invite_parser() {
+        assert_eq!(parse_invite("https://discord.gg/abc"), "abc");
+        assert_eq!(parse_invite("http://discord.gg/abc"), "abc");
+        assert_eq!(parse_invite("discord.gg/abc"), "abc");
+    }
+
+    #[test]
+    fn test_username_parser() {
+        assert_eq!(parse_username("<@12345>").unwrap(), 12_345);
+        assert_eq!(parse_username("<@!12345>").unwrap(), 12_345);
+    }
+
+    #[test]
+    fn role_parser() {
+        assert_eq!(parse_role("<@&12345>").unwrap(), 12_345);
+    }
+
+    #[test]
+    fn test_channel_parser() {
+        assert_eq!(parse_channel("<#12345>").unwrap(), 12_345);
+    }
+
+    #[test]
+    fn test_emoji_parser() {
+        let emoji = parse_emoji("<:name:12345>").unwrap();
+        assert_eq!(emoji.name, "name");
+        assert_eq!(emoji.id, 12_345);
+    }
+
+    #[test]
+    fn test_quote_parser() {
+        let parsed = parse_quotes("a \"b c\" d\"e f\"  g");
+        assert_eq!(parsed, ["a", "b c", "d", "e f", "g"]);
+    }
+
+    #[test]
+    fn test_is_nsfw() {
+        assert!(!is_nsfw("general"));
+        assert!(is_nsfw("nsfw"));
+        assert!(is_nsfw("nsfw-test"));
+        assert!(!is_nsfw("nsfw-"));
+        assert!(!is_nsfw("général"));
+        assert!(is_nsfw("nsfw-général"));
+    }
+}

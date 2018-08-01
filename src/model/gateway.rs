@@ -131,6 +131,58 @@ impl Game {
     }
 }
 
+impl<'a> From<&'a str> for Game {
+    fn from(name: &'a str) -> Self {
+        Game::playing(name)
+    }
+}
+
+impl From<String> for Game {
+    fn from(name: String) -> Self {
+        Game::playing(&name)
+    }
+}
+
+impl<'a> From<(String, GameType)> for Game {
+    fn from((name, kind): (String, GameType)) -> Self {
+        Self {
+            url: None,
+            kind,
+            name,
+        }
+    }
+}
+
+impl<'a> From<(&'a str, &'a str)> for Game {
+    fn from((name, url): (&'a str, &'a str)) -> Self {
+        Self {
+            kind: GameType::Streaming,
+            name: name.to_owned(),
+            url: Some(url.to_owned()),
+        }
+    }
+}
+
+impl From<(String, String)> for Game {
+    fn from((name, url): (String, String)) -> Self {
+        Self {
+            kind: GameType::Streaming,
+            url: Some(url),
+            name,
+        }
+    }
+}
+
+impl From<(String, GameType, String)> for Game {
+    fn from((name, kind, url): (String, GameType, String)) -> Self {
+        Self {
+            url: Some(url),
+            kind,
+            name,
+        }
+    }
+}
+
 impl<'de> Deserialize<'de> for Game {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
