@@ -61,66 +61,6 @@ impl Context {
         }
     }
 
-    /// Edits the current user's profile settings.
-    ///
-    /// Refer to `EditProfile`'s documentation for its methods.
-    ///
-    /// # Examples
-    ///
-    /// Change the current user's username:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::channel::Message;
-    /// #
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {
-    ///     fn message(&self, ctx: Context, msg: Message) {
-    ///         if msg.content == "!changename" {
-    ///             ctx.edit_profile(|mut e| {
-    ///                 e.username("Edward Elric");
-    ///
-    ///                 e
-    ///             });
-    ///         }
-    ///     }
-    /// }
-    /// let mut client = Client::new("token", Handler).unwrap();
-    ///
-    /// client.start().unwrap();
-    /// ```
-    #[cfg(feature = "builder")]
-    #[deprecated(since = "0.5.6", note = "Use the http module instead.")]
-    pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser> {
-        let mut map = VecMap::with_capacity(2);
-
-        feature_cache! {
-            {
-                let cache = CACHE.read();
-
-                map.insert("username", Value::String(cache.user.name.clone()));
-
-                if let Some(email) = cache.user.email.clone() {
-                    map.insert("email", Value::String(email));
-                }
-            } else {
-                let user = http::get_current_user()?;
-
-                map.insert("username", Value::String(user.name));
-
-                if let Some(email) = user.email {
-                    map.insert("email", Value::String(email));
-                }
-            }
-        }
-
-        let edited = utils::vecmap_to_json_map(f(EditProfile(map)).0);
-
-        http::edit_profile(&edited)
-    }
-
-
     /// Sets the current user as being [`Online`]. This maintains the current
     /// activity.
     ///
