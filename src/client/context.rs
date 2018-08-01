@@ -87,6 +87,7 @@ impl Context {
     /// client.start().unwrap();
     /// ```
     #[cfg(feature = "builder")]
+    #[deprecated(since = "0.5.6", note = "Use the http module instead.")]
     pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser> {
         let mut map = VecMap::with_capacity(2);
 
