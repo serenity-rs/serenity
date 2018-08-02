@@ -303,7 +303,7 @@ impl Args {
         let mut args = Vec::new();
 
         // If there are no delimiters, then the only possible argument is the whole message.
-        if delims.is_empty() {
+        if delims.is_empty() && !message.is_empty() {
             args.push(Token::new(TokenKind::Argument, &message[..], 0));
         } else {
             let mut lex = Lexer::new(message, &delims);
