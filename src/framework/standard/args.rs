@@ -1381,4 +1381,13 @@ mod test {
         assert_matches!(args.single_quoted::<i32>().unwrap_err(), ArgError::Parse(_));
         assert_eq!(args.remaining(), 2);
     }
+
+    #[test]
+    fn no_delims_entire_message() {
+        let mut args = Args::new("abc", &[]);
+
+        assert_eq!(args.remaining(), 1);
+        assert_eq!(args.single::<String>().unwrap(), "abc");
+        assert_eq!(args.remaining(), 0);
+    }
 }
