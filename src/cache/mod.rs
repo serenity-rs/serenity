@@ -579,9 +579,9 @@ impl Cache {
     }
 
     #[inline]
-    pub fn message<C, M>(&self, channel_id: C, user_id: M) -> Option<Message>
+    pub fn message<C, M>(&self, channel_id: C, message_id: M) -> Option<Message>
         where C: Into<ChannelId>, M: Into<MessageId> {
-        self._message(channel_id.into(), user_id.into())
+        self._message(channel_id.into(), message_id.into())
     }
 
     fn _message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<Message> {
