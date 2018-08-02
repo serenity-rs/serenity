@@ -300,16 +300,21 @@ impl Args {
             .flat_map(|s| s.chars())
             .collect::<Vec<_>>();
 
-        let mut lex = Lexer::new(message, &delims);
-
         let mut args = Vec::new();
 
-        while let Some(token) = lex.commit() {
-            if token.kind == TokenKind::Delimiter {
-                continue;
-            }
+        // If there are no delimiters, then the only possible argument is the whole message.
+        if delims.is_empty() {
+            args.push(Token::new(TokenKind::Argument, &message[..], 0));
+        } else {
+            let mut lex = Lexer::new(message, &delims);
 
-            args.push(token);
+            while let Some(token) = lex.commit() {
+                if token.kind == TokenKind::Delimiter {
+                    continue;
+                }
+
+                args.push(token);
+            }
         }
 
         Args {
