@@ -95,7 +95,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     shard_id: u64,
 ) {
     match event {
-        DispatchEvent::Model(Event::MessageCreate(event)) => {
+        DispatchEvent::Model(Event::MessageCreate(mut event)) => {
             update!(event);
 
             let context = context(data, runner_tx, shard_id);
