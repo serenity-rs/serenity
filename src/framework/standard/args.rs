@@ -300,16 +300,21 @@ impl Args {
             .flat_map(|s| s.chars())
             .collect::<Vec<_>>();
 
-        let mut lex = Lexer::new(message, &delims);
-
         let mut args = Vec::new();
 
-        while let Some(token) = lex.commit() {
-            if token.kind == TokenKind::Delimiter {
-                continue;
-            }
+        // If there are no delimiters, then the only possible argument is the whole message.
+        if delims.is_empty() && !message.is_empty() {
+            args.push(Token::new(TokenKind::Argument, &message[..], 0));
+        } else {
+            let mut lex = Lexer::new(message, &delims);
 
-            args.push(token);
+            while let Some(token) = lex.commit() {
+                if token.kind == TokenKind::Delimiter {
+                    continue;
+                }
+
+                args.push(token);
+            }
         }
 
         Args {
@@ -1375,5 +1380,14 @@ mod test {
         // Same goes for `single_quoted` and the alike.
         assert_matches!(args.single_quoted::<i32>().unwrap_err(), ArgError::Parse(_));
         assert_eq!(args.remaining(), 2);
+    }
+
+    #[test]
+    fn no_delims_entire_message() {
+        let mut args = Args::new("abc", &[]);
+
+        assert_eq!(args.remaining(), 1);
+        assert_eq!(args.single::<String>().unwrap(), "abc");
+        assert_eq!(args.remaining(), 0);
     }
 }

@@ -263,7 +263,7 @@ fn admin_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions)
 }
 
 command!(some_long_command(_ctx, msg, args) {
-    if let Err(why) = msg.channel_id.say(&format!("Arguments: {:?}", args)) {
+    if let Err(why) = msg.channel_id.say(&format!("Arguments: {}", args.full())) {
         println!("Error sending message: {:?}", why);
     }
 });
