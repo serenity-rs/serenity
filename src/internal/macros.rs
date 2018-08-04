@@ -3,29 +3,21 @@
 #[cfg(feature = "http")]
 macro_rules! request {
     ($route:expr, $method:ident($body:expr), $url:expr, $($rest:tt)*) => {{
-        let client = request_client!();
-
-        request($route, || client
+        request($route, || CLIENT
             .$method(&format!(api!($url), $($rest)*))
             .body(&$body))?
     }};
     ($route:expr, $method:ident($body:expr), $url:expr) => {{
-        let client = request_client!();
-
-        request($route, || client
+        request($route, || CLIENT
             .$method(api!($url))
             .body(&$body))?
     }};
     ($route:expr, $method:ident, $url:expr, $($rest:tt)*) => {{
-        let client = request_client!();
-
-        request($route, || client
+        request($route, || CLIENT
             .$method(&format!(api!($url), $($rest)*)))?
     }};
     ($route:expr, $method:ident, $url:expr) => {{
-        let client = request_client!();
-
-        request($route, || client
+        request($route, || CLIENT
             .$method(api!($url)))?
     }};
 }

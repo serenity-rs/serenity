@@ -64,6 +64,15 @@ use std::{
     sync::Arc
 };
 
+lazy_static! {
+    static ref CLIENT: HyperClient = {
+        let tc = NativeTlsClient::new().expect("Unable to make http client");
+        let connector = HttpsConnector::new(tc);
+
+        HyperClient::with_connector(connector)
+    };
+}
+
 /// An method used for ratelimiting special routes.
 ///
 /// This is needed because `hyper`'s `Method` enum does not derive Copy.
@@ -709,12 +718,10 @@ pub fn delete_webhook(webhook_id: u64) -> Result<()> {
 ///
 /// [`Webhook`]: ../model/webhook/struct.Webhook.html
 pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
-    let client = request_client!();
-
     verify(
         204,
         retry(|| {
-            client
+            CLIENT
                 .delete(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
         }).map_err(Error::Hyper)?,
     )
@@ -989,10 +996,9 @@ pub fn edit_webhook(webhook_id: u64, map: &Value) -> Result<Webhook> {
 /// [`edit_webhook`]: fn.edit_webhook.html
 pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &JsonMap) -> Result<Webhook> {
     let body = serde_json::to_string(map)?;
-    let client = request_client!();
 
     let response = retry(|| {
-        client
+        CLIENT
             .patch(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
             .body(&body)
     }).map_err(Error::Hyper)?;
@@ -1068,10 +1074,8 @@ pub fn execute_webhook(webhook_id: u64,
                        -> Result<Option<Message>> {
     let body = serde_json::to_string(map)?;
 
-    let client = request_client!();
-
     let response = retry(|| {
-        client
+        CLIENT
             .post(&format!(
                 api!("/webhooks/{}/{}?wait={}"),
                 webhook_id,
@@ -1097,10 +1101,8 @@ pub fn execute_webhook(webhook_id: u64,
 ///
 /// Does not require authentication.
 pub fn get_active_maintenances() -> Result<Vec<Maintenance>> {
-    let client = request_client!();
-
     let response = retry(|| {
-        client.get(status!("/scheduled-maintenances/active.json"))
+        CLIENT.get(status!("/scheduled-maintenances/active.json"))
     })?;
 
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
@@ -1531,9 +1533,8 @@ pub fn get_message(channel_id: u64, message_id: u64) -> Result<Message> {
 /// Gets X messages from a channel.
 pub fn get_messages(channel_id: u64, query: &str) -> Result<Vec<Message>> {
     let url = format!(api!("/channels/{}/messages{}"), channel_id, query);
-    let client = request_client!();
 
-    let response = request(Route::ChannelsIdMessages(channel_id), || client.get(&url))?;
+    let response = request(Route::ChannelsIdMessages(channel_id), || CLIENT.get(&url))?;
 
     serde_json::from_reader::<HyperResponse, Vec<Message>>(response)
         .map_err(From::from)
@@ -1586,9 +1587,7 @@ pub fn get_reaction_users(channel_id: u64,
 ///
 /// Does not require authentication.
 pub fn get_unresolved_incidents() -> Result<Vec<Incident>> {
-    let client = request_client!();
-
-    let response = retry(|| client.get(status!("/incidents/unresolved.json")))?;
+    let response = retry(|| CLIENT.get(status!("/incidents/unresolved.json")))?;
 
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
@@ -1603,10 +1602,8 @@ pub fn get_unresolved_incidents() -> Result<Vec<Incident>> {
 ///
 /// Does not require authentication.
 pub fn get_upcoming_maintenances() -> Result<Vec<Maintenance>> {
-    let client = request_client!();
-
     let response = retry(|| {
-        client.get(status!("/scheduled-maintenances/upcoming.json"))
+        CLIENT.get(status!("/scheduled-maintenances/upcoming.json"))
     })?;
 
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
@@ -1689,11 +1686,8 @@ pub fn get_webhook(webhook_id: u64) -> Result<Webhook> {
 ///     .expect("Error getting webhook");
 /// ```
 pub fn get_webhook_with_token(webhook_id: u64, token: &str) -> Result<Webhook> {
-    let client = request_client!();
-
     let response = retry(|| {
-        client
-            .get(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
+        CLIENT.get(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
     }).map_err(Error::Hyper)?;
 
     serde_json::from_reader::<HyperResponse, Webhook>(response)
