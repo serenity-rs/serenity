@@ -140,13 +140,13 @@ pub fn set_token(token: &str) { TOKEN.lock().clone_from(&token.to_string()); }
 /// [`Group::add_recipient`]: ../model/channel/struct.Group.html#method.add_recipient
 /// [`User`]: ../model/user/struct.User.html
 pub fn add_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Put,
         route: Route::None,
         url: api!("/channels/{}/recipients/{}", group_id, user_id),
-    })?)
+    })
 }
 
 /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
@@ -159,13 +159,13 @@ pub fn add_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 /// [`Role`]: ../model/guild/struct.Role.html
 /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
 pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Put,
         route: Route::GuildsIdMembersIdRolesId(guild_id),
         url: api!("/guilds/{}/members/{}/roles/{}", guild_id, user_id, role_id),
-    })?)
+    })
 }
 
 /// Bans a [`User`] from a [`Guild`], removing their messages sent in the last
@@ -180,7 +180,7 @@ pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> 
 /// [`User`]: ../model/user/struct.User.html
 /// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
 pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Put,
@@ -192,7 +192,7 @@ pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &s
             delete_message_days,
             reason,
         ),
-    })?)
+    })
 }
 
 /// Ban zeyla from a [`Guild`], removing her messages sent in the last X number
@@ -248,13 +248,13 @@ pub fn ban_servermoms(guild_id: u64, delete_message_days: u8, reason: &str) -> R
 ///
 /// [`Channel`]: ../model/channel/enum.Channel.html
 pub fn broadcast_typing(channel_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Post,
         route: Route::ChannelsIdTyping(channel_id),
         url: api!("/channels/{}/typing", channel_id),
-    })?)
+    })
 }
 
 /// Creates a [`GuildChannel`] in the [`Guild`] given its Id.
@@ -354,13 +354,13 @@ pub fn create_guild(map: &Value) -> Result<PartialGuild> {
 /// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-integration
 pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: &Value) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: Some(map.to_string().into_bytes()),
         headers: None,
         method: Method::Post,
         route: Route::GuildsIdIntegrations(guild_id),
         url: api!("/guilds/{}/integrations/{}", guild_id, integration_id),
-    })?)
+    })
 }
 
 /// Creates a [`RichInvite`] for the given [channel][`GuildChannel`].
@@ -389,13 +389,13 @@ pub fn create_invite(channel_id: u64, map: &JsonMap) -> Result<RichInvite> {
 
 /// Creates a permission override for a member or a role in a channel.
 pub fn create_permission(channel_id: u64, target_id: u64, map: &Value) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: Some(map.to_string().into_bytes()),
         headers: None,
         method: Method::Put,
         route: Route::ChannelsIdPermissionsOverwriteId(channel_id),
         url: api!("/channels/{}/permissions/{}", channel_id, target_id),
-    })?)
+    })
 }
 
 /// Creates a private channel with a user.
@@ -414,7 +414,7 @@ pub fn create_reaction(channel_id: u64,
                        message_id: u64,
                        reaction_type: &ReactionType)
                        -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Put,
@@ -425,7 +425,7 @@ pub fn create_reaction(channel_id: u64,
             message_id,
             reaction_type.as_data(),
         ),
-    })?)
+    })
 }
 
 /// Creates a role.
@@ -494,13 +494,13 @@ pub fn delete_channel(channel_id: u64) -> Result<Channel> {
 
 /// Deletes an emoji from a server.
 pub fn delete_emoji(guild_id: u64, emoji_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
         route: Route::GuildsIdEmojisId(guild_id),
         url: api!("/guilds/{}/emojis/{}", guild_id, emoji_id),
-    })?)
+    })
 }
 
 /// Deletes a guild, only if connected account owns it.
@@ -516,13 +516,13 @@ pub fn delete_guild(guild_id: u64) -> Result<PartialGuild> {
 
 /// Remvoes an integration from a guild.
 pub fn delete_guild_integration(guild_id: u64, integration_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
         route: Route::GuildsIdIntegrationsId(guild_id),
         url: api!("/guilds/{}/integrations/{}", guild_id, integration_id),
-    })?)
+    })
 }
 
 /// Deletes an invite by code.
@@ -539,24 +539,24 @@ pub fn delete_invite(code: &str) -> Result<Invite> {
 /// Deletes a message if created by us or we have
 /// specific permissions.
 pub fn delete_message(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
         route: Route::ChannelsIdMessagesId(LightMethod::Delete, channel_id),
         url: api!("/channels/{}/messages/{}", channel_id, message_id),
-    })?)
+    })
 }
 
 /// Deletes a bunch of messages, only works for bots.
 pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: Some(map.to_string().into_bytes()),
         headers: None,
         method: Method::Delete,
         route: Route::ChannelsIdMessagesBulkDelete(channel_id),
         url: api!("/channels/{}/messages/bulk-delete", channel_id),
-    })?)
+    })
 }
 
 /// Deletes all of the [`Reaction`]s associated with a [`Message`].
@@ -577,24 +577,24 @@ pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
 /// [`Message`]: ../model/channel/struct.Message.html
 /// [`Reaction`]: ../model/channel/struct.Reaction.html
 pub fn delete_message_reactions(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
         route: Route::ChannelsIdMessagesIdReactions(channel_id),
         url: api!("/channels/{}/messages/{}/reactions", channel_id, message_id),
-    })?)
+    })
 }
 
 /// Deletes a permission override from a role or a member in a channel.
 pub fn delete_permission(channel_id: u64, target_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
         route: Route::ChannelsIdPermissionsOverwriteId(channel_id),
         url: api!("/channels/{}/permissions/{}", channel_id, target_id),
-    })?)
+    })
 }
 
 /// Deletes a reaction from a message if owned by us or
@@ -608,7 +608,7 @@ pub fn delete_reaction(channel_id: u64,
         .map(|uid| uid.to_string())
         .unwrap_or_else(|| "@me".to_string());
 
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
@@ -620,18 +620,18 @@ pub fn delete_reaction(channel_id: u64,
             reaction_type.as_data(),
             user,
         ),
-    })?)
+    })
 }
 
 /// Deletes a role from a server. Can't remove the default everyone role.
 pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
         route: Route::GuildsIdRolesId(guild_id),
         url: api!("/guilds/{}/roles/{}", guild_id, role_id),
-    })?)
+    })
 }
 
 /// Deletes a [`Webhook`] given its Id.
@@ -657,13 +657,13 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 /// [`Webhook`]: ../model/webhook/struct.Webhook.html
 /// [`delete_webhook_with_token`]: fn.delete_webhook_with_token.html
 pub fn delete_webhook(webhook_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
         route: Route::WebhooksId(webhook_id),
         url: api!("/webhooks/{}", webhook_id),
-    })?)
+    })
 }
 
 /// Deletes a [`Webhook`] given its Id and unique token.
@@ -685,13 +685,13 @@ pub fn delete_webhook(webhook_id: u64) -> Result<()> {
 ///
 /// [`Webhook`]: ../model/webhook/struct.Webhook.html
 pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
         route: Route::None,
         url: api!("/webhooks/{}/{}", webhook_id, token),
-    })?)
+    })
 }
 
 /// Changes channel information.
@@ -734,13 +734,13 @@ pub fn edit_guild(guild_id: u64, map: &JsonMap) -> Result<PartialGuild> {
 /// Edits the positions of a guild's channels.
 pub fn edit_guild_channel_positions(guild_id: u64, value: &Value)
     -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: Some(value.to_string().into_bytes()),
         headers: None,
         method: Method::Patch,
         route: Route::GuildsIdChannels(guild_id),
         url: api!("/guilds/{}/channels", guild_id),
-    })?)
+    })
 }
 
 /// Edits a [`Guild`]'s embed setting.
@@ -760,13 +760,13 @@ pub fn edit_guild_embed(guild_id: u64, map: &Value) -> Result<GuildEmbed> {
 pub fn edit_member(guild_id: u64, user_id: u64, map: &JsonMap) -> Result<()> {
     let body = serde_json::to_vec(map)?;
 
-    verify(204, request(Request {
+    wind(204, Request {
         body: Some(body),
         headers: None,
         method: Method::Patch,
         route: Route::GuildsIdMembersId(guild_id),
         url: api!("/guilds/{}/members/{}", guild_id, user_id),
-    })?)
+    })
 }
 
 /// Edits a message by Id.
@@ -790,13 +790,13 @@ pub fn edit_message(channel_id: u64, message_id: u64, map: &Value) -> Result<Mes
 pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
     let map = json!({ "nick": new_nickname });
 
-    verify(200, request(Request {
+    wind(200, Request {
         body: Some(map.to_string().into_bytes()),
         headers: None,
         method: Method::Patch,
         route: Route::GuildsIdMembersMeNick(guild_id),
         url: api!("/guilds/{}/members/@me/nick", guild_id),
-    })?)
+    })
 }
 
 /// Edits the current user's profile settings.
@@ -1653,13 +1653,13 @@ pub fn get_webhook_with_token(webhook_id: u64, token: &str) -> Result<Webhook> {
 
 /// Kicks a member from a guild.
 pub fn kick_member(guild_id: u64, user_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
         route: Route::GuildsIdMembersId(guild_id),
         url: api!("/guilds/{}/members/{}", guild_id, user_id),
-    })?)
+    })
 }
 
 /// Leaves a group DM.
@@ -1675,24 +1675,24 @@ pub fn leave_group(guild_id: u64) -> Result<Group> {
 
 /// Leaves a guild.
 pub fn leave_guild(guild_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
         route: Route::UsersMeGuildsId,
         url: api!("/users/@me/guilds/{}", guild_id),
-    })?)
+    })
 }
 
 /// Deletes a user from group DM.
 pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
         route: Route::None,
         url: api!("/channels/{}/recipients/{}", group_id, user_id),
-    })?)
+    })
 }
 
 /// Sends file(s) to a channel.
@@ -1779,24 +1779,24 @@ pub fn send_message(channel_id: u64, map: &Value) -> Result<Message> {
 
 /// Pins a message in a channel.
 pub fn pin_message(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Put,
         route: Route::ChannelsIdPinsMessageId(channel_id),
         url: api!("/channels/{}/pins/{}", channel_id, message_id),
-    })?)
+    })
 }
 
 /// Unbans a user from a guild.
 pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
         route: Route::GuildsIdBansUserId(guild_id),
         url: api!("/guilds/{}/bans/{}", guild_id, user_id),
-    })?)
+    })
 }
 
 /// Deletes a single [`Role`] from a [`Member`] in a [`Guild`].
@@ -1809,13 +1809,13 @@ pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
 /// [`Role`]: ../model/guild/struct.Role.html
 /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
 pub fn remove_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
         route: Route::GuildsIdMembersIdRolesId(guild_id),
         url: api!("/guilds/{}/members/{}/roles/{}", guild_id, user_id, role_id),
-    })?)
+    })
 }
 
 /// Starts removing some members from a guild based on the last time they've been online.
@@ -1831,24 +1831,24 @@ pub fn start_guild_prune(guild_id: u64, map: &Value) -> Result<GuildPrune> {
 
 /// Starts syncing an integration with a guild.
 pub fn start_integration_sync(guild_id: u64, integration_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Post,
         route: Route::GuildsIdIntegrationsIdSync(guild_id),
         url: api!("/guilds/{}/integrations/{}/sync", guild_id, integration_id),
-    })?)
+    })
 }
 
 /// Unpins a message from a channel.
 pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(204, request(Request {
+    wind(204, Request {
         body: None,
         headers: None,
         method: Method::Delete,
         route: Route::ChannelsIdPinsMessageId(channel_id),
         url: api!("/channels/{}/pins/{}", channel_id, message_id),
-    })?)
+    })
 }
 
 /// Fires off a request, deserializing the response reader via the given type
@@ -1902,7 +1902,14 @@ fn retry(req: &Request) -> HyperResult<HyperResponse> {
     build_req(req).send()
 }
 
-fn verify(expected: u16, response: HyperResponse) -> Result<()> {
+/// Performs a request and then verifies that the response status code is equal
+/// to the expected value.
+///
+/// This is a function that performs a light amount of work and returns an
+/// empty tuple, so it's called "wind" to denote that it's lightweight.
+fn wind(expected: u16, req: Request) -> Result<()> {
+    let response = request(req)?;
+
     if response.status.to_u16() == expected {
         return Ok(());
     }
