@@ -41,7 +41,7 @@
 #![allow(zero_ptr)]
 
 use chrono::{DateTime, Utc};
-use hyper::client::{RequestBuilder, Response};
+use hyper::client::Response;
 use hyper::header::Headers;
 use hyper::status::StatusCode;
 use internal::prelude::*;
@@ -54,7 +54,7 @@ use std::{
     thread,
     i64
 };
-use super::{HttpError, LightMethod};
+use super::{HttpError, LightMethod, Request};
 
 /// Refer to [`offset`].
 ///
@@ -361,8 +361,7 @@ pub enum Route {
     None,
 }
 
-pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
-    where F: Fn() -> RequestBuilder<'a> {
+pub(super) fn perform(req: Request) -> Result<Response> {
     loop {
         // This will block if another thread already has the global
         // unlocked already (due to receiving an x-ratelimit-global).
@@ -378,7 +377,7 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
         // - then, perform the request
         let bucket = Arc::clone(ROUTES
             .lock()
-            .entry(route)
+            .entry(req.route)
             .or_insert_with(|| {
                 Arc::new(Mutex::new(RateLimit {
                     limit: i64::MAX,
@@ -388,9 +387,9 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
             }));
 
         let mut lock = bucket.lock();
-        lock.pre_hook(&route);
+        lock.pre_hook(&req.route);
 
-        let response = super::retry(&f)?;
+        let response = super::retry(&req)?;
 
         // Check if an offset has been calculated yet to determine the time
         // difference from Discord can the client.
@@ -416,7 +415,7 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
         // It _may_ be possible for the limit to be raised at any time,
         // so check if it did from the value of the 'x-ratelimit-limit'
         // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
-        if route == Route::None {
+        if req.route == Route::None {
             return Ok(response);
         } else {
             let redo = if response.headers.get_raw("x-ratelimit-global").is_some() {
@@ -424,7 +423,7 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
 
                 Ok(
                     if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {
-                        debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
+                        debug!("Ratelimited on route {:?} for {:?}ms", req.route, retry_after);
                         thread::sleep(Duration::from_millis(retry_after as u64));
 
                         true
@@ -433,7 +432,7 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
                     },
                 )
             } else {
-                lock.post_hook(&response, &route)
+                lock.post_hook(&response, &req.route)
             };
 
             if !redo.unwrap_or(true) {
