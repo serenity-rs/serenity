@@ -24,6 +24,7 @@
 //! [model]: ../model/index.html
 
 pub mod ratelimiting;
+pub mod routing;
 
 mod error;
 
@@ -39,7 +40,7 @@ use hyper::{
         Request as HyperRequest,
         Response as HyperResponse
     },
-    header::{ContentType, Headers},
+    header::{Authorization, ContentType, Headers, UserAgent},
     method::Method,
     mime::{Mime, SubLevel, TopLevel},
     net::HttpsConnector,
@@ -53,13 +54,12 @@ use internal::prelude::*;
 use model::prelude::*;
 use multipart::client::Multipart;
 use parking_lot::Mutex;
-use self::ratelimiting::Route;
+use self::routing::RouteInfo;
 use serde::de::DeserializeOwned;
 use serde_json;
 use std::{
     collections::BTreeMap,
     default::Default,
-    fmt::Write as FmtWrite,
     fs::File,
     io::ErrorKind as IoErrorKind,
     path::{Path, PathBuf},
@@ -75,12 +75,42 @@ lazy_static! {
     };
 }
 
-struct Request {
-    body: Option<Vec<u8>>,
+#[derive(Clone, Debug)]
+struct Request<'a> {
+    body: Option<&'a [u8]>,
     headers: Option<Headers>,
-    method: Method,
-    route: Route,
-    url: String,
+    route: RouteInfo<'a>,
+}
+
+impl<'a> Request<'a> {
+    fn build(&'a self) -> RequestBuilder<'a> {
+        let Request {
+            body,
+            headers: request_headers,
+            route: route_info,
+        } = self;
+        let (method, _, path) = route_info.deconstruct();
+
+        let mut builder = CLIENT.request(
+            method.hyper_method(),
+            &path.into_owned(),
+        );
+
+        if let Some(bytes) = body {
+            builder = builder.body(HyperBody::BufBody(bytes, bytes.len()));
+        }
+
+        let mut headers = Headers::new();
+        headers.set(UserAgent(constants::USER_AGENT.to_string()));
+        headers.set(Authorization(TOKEN.lock().clone()));
+        headers.set(ContentType::json());
+
+        if let Some(request_headers) = request_headers.clone() {
+            headers.extend(request_headers.iter());
+        }
+
+        builder.headers(headers)
+    }
 }
 
 /// An method used for ratelimiting special routes.
@@ -88,8 +118,6 @@ struct Request {
 /// This is needed because `hyper`'s `Method` enum does not derive Copy.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum LightMethod {
-    /// Indicates that a route is for "any" method.
-    Any,
     /// Indicates that a route is for the `DELETE` method only.
     Delete,
     /// Indicates that a route is for the `GET` method only.
@@ -100,6 +128,18 @@ pub enum LightMethod {
     Post,
     /// Indicates that a route is for the `PUT` method only.
     Put,
+}
+
+impl LightMethod {
+    pub fn hyper_method(&self) -> Method {
+        match *self {
+            LightMethod::Delete => Method::Delete,
+            LightMethod::Get => Method::Get,
+            LightMethod::Patch => Method::Patch,
+            LightMethod::Post => Method::Post,
+            LightMethod::Put => Method::Put,
+        }
+    }
 }
 
 lazy_static! {
@@ -143,9 +183,7 @@ pub fn add_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Put,
-        route: Route::None,
-        url: api!("/channels/{}/recipients/{}", group_id, user_id),
+        route: RouteInfo::AddGroupRecipient { group_id, user_id },
     })
 }
 
@@ -162,9 +200,7 @@ pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> 
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Put,
-        route: Route::GuildsIdMembersIdRolesId(guild_id),
-        url: api!("/guilds/{}/members/{}/roles/{}", guild_id, user_id, role_id),
+        route: RouteInfo::AddMemberRole { guild_id, role_id, user_id },
     })
 }
 
@@ -183,15 +219,12 @@ pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &s
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Put,
-        route: Route::GuildsIdBansUserId(guild_id),
-        url: api!(
-            "/guilds/{}/bans/{}?delete_message_days={}&reason={}",
+        route: RouteInfo::GuildBanUser {
+            delete_message_days: Some(delete_message_days),
+            reason: Some(reason),
             guild_id,
             user_id,
-            delete_message_days,
-            reason,
-        ),
+        },
     })
 }
 
@@ -251,9 +284,7 @@ pub fn broadcast_typing(channel_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Post,
-        route: Route::ChannelsIdTyping(channel_id),
-        url: api!("/channels/{}/typing", channel_id),
+        route: RouteInfo::BroadcastTyping { channel_id },
     })
 }
 
@@ -269,11 +300,9 @@ pub fn broadcast_typing(channel_id: u64) -> Result<()> {
 /// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
 pub fn create_channel(guild_id: u64, map: &Value) -> Result<GuildChannel> {
     fire(Request {
-        body: Some(map.to_string().into_bytes()),
+        body: Some(map.to_string().as_bytes()),
         headers: None,
-        method: Method::Post,
-        route: Route::GuildsIdChannels(guild_id),
-        url: api!("/guilds/{}/channels", guild_id),
+        route: RouteInfo::CreateChannel { guild_id },
     })
 }
 
@@ -289,11 +318,9 @@ pub fn create_channel(guild_id: u64, map: &Value) -> Result<GuildChannel> {
 /// [Manage Emojis]: ../model/permissions/constant.MANAGE_EMOJIS.html
 pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
     fire(Request {
-        body: Some(map.to_string().into_bytes()),
+        body: Some(map.to_string().as_bytes()),
         headers: None,
-        method: Method::Post,
-        route: Route::GuildsIdEmojis(guild_id),
-        url: api!("/guilds/{}/emojis", guild_id),
+        route: RouteInfo::CreateEmoji { guild_id },
     })
 }
 
@@ -335,11 +362,9 @@ pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
 /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
 pub fn create_guild(map: &Value) -> Result<PartialGuild> {
     fire(Request {
-        body: Some(map.to_string().into_bytes()),
+        body: Some(map.to_string().as_bytes()),
         headers: None,
-        method: Method::Post,
-        route: Route::Guilds,
-        url: api!("/guilds").to_owned(),
+        route: RouteInfo::CreateGuild,
     })
 }
 
@@ -355,11 +380,9 @@ pub fn create_guild(map: &Value) -> Result<PartialGuild> {
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-integration
 pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: &Value) -> Result<()> {
     wind(204, Request {
-        body: Some(map.to_string().into_bytes()),
+        body: Some(map.to_string().as_bytes()),
         headers: None,
-        method: Method::Post,
-        route: Route::GuildsIdIntegrations(guild_id),
-        url: api!("/guilds/{}/integrations/{}", guild_id, integration_id),
+        route: RouteInfo::CreateGuildIntegration { guild_id, integration_id },
     })
 }
 
@@ -379,33 +402,31 @@ pub fn create_invite(channel_id: u64, map: &JsonMap) -> Result<RichInvite> {
     let body = serde_json::to_vec(map)?;
 
     fire(Request {
-        body: Some(body),
+        body: Some(&body),
         headers: None,
-        method: Method::Post,
-        route: Route::ChannelsIdInvites(channel_id),
-        url: api!("/channels/{}/invites", channel_id),
+        route: RouteInfo::CreateInvite { channel_id },
     })
 }
 
 /// Creates a permission override for a member or a role in a channel.
 pub fn create_permission(channel_id: u64, target_id: u64, map: &Value) -> Result<()> {
+    let body = serde_json::to_vec(map)?;
+
     wind(204, Request {
-        body: Some(map.to_string().into_bytes()),
+        body: Some(&body),
         headers: None,
-        method: Method::Put,
-        route: Route::ChannelsIdPermissionsOverwriteId(channel_id),
-        url: api!("/channels/{}/permissions/{}", channel_id, target_id),
+        route: RouteInfo::CreatePermission { channel_id, target_id },
     })
 }
 
 /// Creates a private channel with a user.
 pub fn create_private_channel(map: &Value) -> Result<PrivateChannel> {
+    let body = serde_json::to_vec(map)?;
+
     fire(Request {
-        body: Some(map.to_string().into_bytes()),
+        body: Some(&body),
         headers: None,
-        method: Method::Post,
-        route: Route::UsersMeChannels,
-        url: api!("/users/@me/channels").to_owned(),
+        route: RouteInfo::GetUserDmChannels,
     })
 }
 
@@ -417,14 +438,11 @@ pub fn create_reaction(channel_id: u64,
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Put,
-        route: Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
-        url: api!(
-            "/channels/{}/messages/{}/reactions/{}/@me",
+        route: RouteInfo::CreateReaction {
+            reaction: &reaction_type.as_data(),
             channel_id,
             message_id,
-            reaction_type.as_data(),
-        ),
+        },
     })
 }
 
@@ -433,11 +451,9 @@ pub fn create_role(guild_id: u64, map: &JsonMap) -> Result<Role> {
     let body = serde_json::to_vec(map)?;
 
     fire(Request {
-        body: Some(body),
+        body: Some(&body),
         headers: None,
-        method: Method::Post,
-        route: Route::GuildsIdRoles(guild_id),
-        url: api!("/guilds/{}/roles", guild_id),
+        route: RouteInfo::CreateRole {guild_id },
     })
 }
 
@@ -472,12 +488,12 @@ pub fn create_role(guild_id: u64, map: &JsonMap) -> Result<Role> {
 ///
 /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
 pub fn create_webhook(channel_id: u64, map: &Value) -> Result<Webhook> {
+    let body = serde_json::to_vec(map)?;
+
     fire(Request {
-        body: Some(map.to_string().into_bytes()),
+        body: Some(&body),
         headers: None,
-        method: Method::Post,
-        route: Route::ChannelsIdWebhooks(channel_id),
-        url: api!("/channels/{}/webhooks", channel_id),
+        route: RouteInfo::CreateWebhook { channel_id },
     })
 }
 
@@ -486,9 +502,7 @@ pub fn delete_channel(channel_id: u64) -> Result<Channel> {
     fire(Request {
         body: None,
         headers: None,
-        route: Route::ChannelsId(channel_id),
-        method: Method::Delete,
-        url: api!("/channels/{}", channel_id),
+        route: RouteInfo::DeleteChannel { channel_id },
     })
 }
 
@@ -497,9 +511,7 @@ pub fn delete_emoji(guild_id: u64, emoji_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::GuildsIdEmojisId(guild_id),
-        url: api!("/guilds/{}/emojis/{}", guild_id, emoji_id),
+        route: RouteInfo::DeleteEmoji { guild_id, emoji_id },
     })
 }
 
@@ -508,9 +520,7 @@ pub fn delete_guild(guild_id: u64) -> Result<PartialGuild> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::GuildsId(guild_id),
-        url: api!("/guilds/{}", guild_id),
+        route: RouteInfo::DeleteGuild { guild_id },
     })
 }
 
@@ -519,9 +529,7 @@ pub fn delete_guild_integration(guild_id: u64, integration_id: u64) -> Result<()
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::GuildsIdIntegrationsId(guild_id),
-        url: api!("/guilds/{}/integrations/{}", guild_id, integration_id),
+        route: RouteInfo::DeleteGuildIntegration { guild_id, integration_id },
     })
 }
 
@@ -530,9 +538,7 @@ pub fn delete_invite(code: &str) -> Result<Invite> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::InvitesCode,
-        url: api!("/invites/{}", code),
+        route: RouteInfo::DeleteInvite { code },
     })
 }
 
@@ -542,20 +548,16 @@ pub fn delete_message(channel_id: u64, message_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::ChannelsIdMessagesId(LightMethod::Delete, channel_id),
-        url: api!("/channels/{}/messages/{}", channel_id, message_id),
+        route: RouteInfo::DeleteMessage { channel_id, message_id },
     })
 }
 
 /// Deletes a bunch of messages, only works for bots.
 pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
     wind(204, Request {
-        body: Some(map.to_string().into_bytes()),
+        body: Some(map.to_string().as_bytes()),
         headers: None,
-        method: Method::Delete,
-        route: Route::ChannelsIdMessagesBulkDelete(channel_id),
-        url: api!("/channels/{}/messages/bulk-delete", channel_id),
+        route: RouteInfo::DeleteMessages { channel_id },
     })
 }
 
@@ -580,9 +582,7 @@ pub fn delete_message_reactions(channel_id: u64, message_id: u64) -> Result<()> 
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::ChannelsIdMessagesIdReactions(channel_id),
-        url: api!("/channels/{}/messages/{}/reactions", channel_id, message_id),
+        route: RouteInfo::DeleteMessageReactions { channel_id, message_id },
     })
 }
 
@@ -591,9 +591,7 @@ pub fn delete_permission(channel_id: u64, target_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::ChannelsIdPermissionsOverwriteId(channel_id),
-        url: api!("/channels/{}/permissions/{}", channel_id, target_id),
+        route: RouteInfo::DeletePermission { channel_id, target_id },
     })
 }
 
@@ -611,15 +609,12 @@ pub fn delete_reaction(channel_id: u64,
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
-        url: api!(
-            "/channels/{}/messages/{}/reactions/{}/{}",
+        route: RouteInfo::DeleteReaction {
+            reaction: &reaction_type.as_data(),
+            user: &user,
             channel_id,
             message_id,
-            reaction_type.as_data(),
-            user,
-        ),
+        },
     })
 }
 
@@ -628,9 +623,7 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::GuildsIdRolesId(guild_id),
-        url: api!("/guilds/{}/roles/{}", guild_id, role_id),
+        route: RouteInfo::DeleteRole { guild_id, role_id },
     })
 }
 
@@ -660,9 +653,7 @@ pub fn delete_webhook(webhook_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::WebhooksId(webhook_id),
-        url: api!("/webhooks/{}", webhook_id),
+        route: RouteInfo::DeleteWebhook { webhook_id },
     })
 }
 
@@ -688,9 +679,7 @@ pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::None,
-        url: api!("/webhooks/{}/{}", webhook_id, token),
+        route: RouteInfo::DeleteWebhookWithToken { token, webhook_id },
     })
 }
 
@@ -699,22 +688,20 @@ pub fn edit_channel(channel_id: u64, map: &JsonMap) -> Result<GuildChannel> {
     let body = serde_json::to_vec(map)?;
 
     fire(Request {
-        body: Some(body),
+        body: Some(&body),
         headers: None,
-        method: Method::Patch,
-        route: Route::ChannelsId(channel_id),
-        url: api!("/channels/{}", channel_id),
+        route: RouteInfo::EditChannel {channel_id },
     })
 }
 
 /// Changes emoji information.
 pub fn edit_emoji(guild_id: u64, emoji_id: u64, map: &Value) -> Result<Emoji> {
+    let body = serde_json::to_vec(map)?;
+
     fire(Request {
-        body: Some(map.to_string().into_bytes()),
+        body: Some(&body),
         headers: None,
-        method: Method::Patch,
-        route: Route::GuildsIdEmojisId(guild_id),
-        url: api!("/guilds/{}/emojis/{}", guild_id, emoji_id),
+        route: RouteInfo::EditEmoji { guild_id, emoji_id },
     })
 }
 
@@ -723,23 +710,21 @@ pub fn edit_guild(guild_id: u64, map: &JsonMap) -> Result<PartialGuild> {
     let body = serde_json::to_vec(map)?;
 
     fire(Request {
-        body: Some(body),
+        body: Some(&body),
         headers: None,
-        method: Method::Patch,
-        route: Route::GuildsId(guild_id),
-        url: api!("/guilds/{}", guild_id),
+        route: RouteInfo::EditGuild { guild_id },
     })
 }
 
 /// Edits the positions of a guild's channels.
 pub fn edit_guild_channel_positions(guild_id: u64, value: &Value)
     -> Result<()> {
+    let body = serde_json::to_vec(value)?;
+
     wind(204, Request {
-        body: Some(value.to_string().into_bytes()),
+        body: Some(&body),
         headers: None,
-        method: Method::Patch,
-        route: Route::GuildsIdChannels(guild_id),
-        url: api!("/guilds/{}/channels", guild_id),
+        route: RouteInfo::EditGuildChannels { guild_id },
     })
 }
 
@@ -747,12 +732,12 @@ pub fn edit_guild_channel_positions(guild_id: u64, value: &Value)
 ///
 /// [`Guild`]: ../model/guild/struct.Guild.html
 pub fn edit_guild_embed(guild_id: u64, map: &Value) -> Result<GuildEmbed> {
+    let body = serde_json::to_vec(map)?;
+
     fire(Request {
-        body: Some(map.to_string().into_bytes()),
+        body: Some(&body),
         headers: None,
-        method: Method::Patch,
-        route: Route::GuildsIdEmbed(guild_id),
-        url: api!("/guilds/{}/embed", guild_id),
+        route: RouteInfo::EditGuildEmbed { guild_id },
     })
 }
 
@@ -761,11 +746,9 @@ pub fn edit_member(guild_id: u64, user_id: u64, map: &JsonMap) -> Result<()> {
     let body = serde_json::to_vec(map)?;
 
     wind(204, Request {
-        body: Some(body),
+        body: Some(&body),
         headers: None,
-        method: Method::Patch,
-        route: Route::GuildsIdMembersId(guild_id),
-        url: api!("/guilds/{}/members/{}", guild_id, user_id),
+        route: RouteInfo::EditMember { guild_id, user_id },
     })
 }
 
@@ -773,12 +756,12 @@ pub fn edit_member(guild_id: u64, user_id: u64, map: &JsonMap) -> Result<()> {
 ///
 /// **Note**: Only the author of a message can modify it.
 pub fn edit_message(channel_id: u64, message_id: u64, map: &Value) -> Result<Message> {
+    let body = serde_json::to_vec(map)?;
+
     fire(Request {
-        body: Some(map.to_string().into_bytes()),
+        body: Some(&body),
         headers: None,
-        method: Method::Patch,
-        route: Route::ChannelsIdMessagesId(LightMethod::Any, channel_id),
-        url: api!("/channels/{}/messages/{}", channel_id, message_id),
+        route: RouteInfo::EditMessage { channel_id, message_id },
     })
 }
 
@@ -789,13 +772,12 @@ pub fn edit_message(channel_id: u64, message_id: u64, map: &Value) -> Result<Mes
 /// [`Guild`]: ../model/guild/struct.Guild.html
 pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
     let map = json!({ "nick": new_nickname });
+    let body = serde_json::to_vec(&map)?;
 
     wind(200, Request {
-        body: Some(map.to_string().into_bytes()),
+        body: Some(&body),
         headers: None,
-        method: Method::Patch,
-        route: Route::GuildsIdMembersMeNick(guild_id),
-        url: api!("/guilds/{}/members/@me/nick", guild_id),
+        route: RouteInfo::EditNickname { guild_id },
     })
 }
 
@@ -815,11 +797,9 @@ pub fn edit_profile(map: &JsonMap) -> Result<CurrentUser> {
     let body = serde_json::to_vec(map)?;
 
     let response = request(Request {
-        body: Some(body),
+        body: Some(&body),
         headers: None,
-        method: Method::Patch,
-        route: Route::UsersMe,
-        url: api!("/users/@me").to_owned(),
+        route: RouteInfo::EditProfile,
     })?;
 
     let mut value = serde_json::from_reader::<HyperResponse, Value>(response)?;
@@ -840,27 +820,23 @@ pub fn edit_role(guild_id: u64, role_id: u64, map: &JsonMap) -> Result<Role> {
     let body = serde_json::to_vec(&map)?;
 
     fire(Request {
-        body: Some(body),
+        body: Some(&body),
         headers: None,
-        method: Method::Patch,
-        route: Route::GuildsIdRolesId(guild_id),
-        url: api!("/guilds/{}/roles/{}", guild_id, role_id),
+        route: RouteInfo::EditRole { guild_id, role_id },
     })
 }
 
 /// Changes the position of a role in a guild.
 pub fn edit_role_position(guild_id: u64, role_id: u64, position: u64) -> Result<Vec<Role>> {
-    let body = serde_json::to_string(&json!({
+    let body = serde_json::to_vec(&json!({
         "id": role_id,
         "position": position,
     }))?;
 
     fire(Request {
-        body: Some(body.into_bytes()),
+        body: Some(&body),
         headers: None,
-        method: Method::Patch,
-        route: Route::GuildsIdRolesId(guild_id),
-        url: api!("/guilds/{}/roles/{}", guild_id, role_id),
+        route: RouteInfo::EditRole { guild_id, role_id },
     })
 }
 
@@ -905,11 +881,9 @@ pub fn edit_role_position(guild_id: u64, role_id: u64, position: u64) -> Result<
 // external crates being incredibly messy and misleading in the end user's view.
 pub fn edit_webhook(webhook_id: u64, map: &Value) -> Result<Webhook> {
     fire(Request {
-        body: Some(map.to_string().into_bytes()),
+        body: Some(map.to_string().as_bytes()),
         headers: None,
-        method: Method::Patch,
-        route: Route::WebhooksId(webhook_id),
-        url: api!("/webhooks/{}", webhook_id),
+        route: RouteInfo::EditWebhook { webhook_id },
     })
 }
 
@@ -943,11 +917,9 @@ pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &JsonMap) -> R
     let body = serde_json::to_vec(map)?;
 
     fire(Request {
-        body: Some(body),
+        body: Some(&body),
         headers: None,
-        method: Method::Patch,
-        route: Route::None,
-        url: api!("/webhooks/{}/{}", webhook_id, token),
+        route: RouteInfo::EditWebhookWithToken { token, webhook_id },
     })
 }
 
@@ -1024,11 +996,9 @@ pub fn execute_webhook(webhook_id: u64,
     ));
 
     let response = request(Request {
-        body: Some(body),
+        body: Some(&body),
         headers: Some(headers),
-        method: Method::Get,
-        route: Route::None,
-        url: api!("/webhooks/{}/{}?wait={}", webhook_id, token, wait),
+        route: RouteInfo::ExecuteWebhook { token, wait, webhook_id },
     })?;
 
     if response.status == StatusCode::NoContent {
@@ -1047,9 +1017,7 @@ pub fn get_active_maintenances() -> Result<Vec<Maintenance>> {
     let response = request(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::None,
-        url: status!("/scheduled-maintenances/active.json").to_owned(),
+        route: RouteInfo::GetActiveMaintenance,
     })?;
 
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
@@ -1066,9 +1034,7 @@ pub fn get_bans(guild_id: u64) -> Result<Vec<Ban>> {
     fire(Request {
         body: None,
         headers: None,
-        route: Route::GuildsIdBans(guild_id),
-        method: Method::Get,
-        url: api!("/guilds/{}/bans", guild_id),
+        route: RouteInfo::GetBans { guild_id },
     })
 }
 
@@ -1078,32 +1044,16 @@ pub fn get_audit_logs(guild_id: u64,
                       user_id: Option<u64>,
                       before: Option<u64>,
                       limit: Option<u8>) -> Result<AuditLogs> {
-    let mut params = Vec::with_capacity(4);
-
-    if let Some(action_type) = action_type {
-        params.push(format!("action_type={}", action_type));
-    }
-    if let Some(user_id) = user_id {
-        params.push(format!("user_id={}", user_id));
-    }
-    if let Some(before) = before {
-        params.push(format!("before={}", before));
-    }
-    if let Some(limit) = limit {
-        params.push(format!("limit={}", limit));
-    }
-
-    let mut query_string = params.join("&");
-    if !query_string.is_empty() {
-        query_string.insert(0, '?');
-    }
-
     fire(Request {
         body: None,
         headers: None,
-        route: Route::GuildsIdAuditLogs(guild_id),
-        method: Method::Get,
-        url: api!("/guilds/{}/audit-logs{}", guild_id, query_string),
+        route: RouteInfo::GetAuditLogs {
+            action_type,
+            before,
+            guild_id,
+            limit,
+            user_id,
+        },
     })
 }
 
@@ -1112,9 +1062,7 @@ pub fn get_bot_gateway() -> Result<BotGateway> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::GatewayBot,
-        url: api!("/gateway/bot").to_owned(),
+        route: RouteInfo::GetBotGateway,
     })
 }
 
@@ -1123,9 +1071,7 @@ pub fn get_channel_invites(channel_id: u64) -> Result<Vec<RichInvite>> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::ChannelsIdInvites(channel_id),
-        url: api!("/channels/{}/invites", channel_id),
+        route: RouteInfo::GetChannelInvites { channel_id },
     })
 }
 
@@ -1151,9 +1097,7 @@ pub fn get_channel_webhooks(channel_id: u64) -> Result<Vec<Webhook>> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::ChannelsIdWebhooks(channel_id),
-        url: api!("/channels/{}/webhooks", channel_id),
+        route: RouteInfo::GetChannelWebhooks { channel_id },
     })
 }
 
@@ -1162,9 +1106,7 @@ pub fn get_channel(channel_id: u64) -> Result<Channel> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::ChannelsId(channel_id),
-        url: api!("/channels/{}", channel_id),
+        route: RouteInfo::GetChannel { channel_id },
     })
 }
 
@@ -1173,9 +1115,7 @@ pub fn get_channels(guild_id: u64) -> Result<Vec<GuildChannel>> {
     fire(Request {
         body: None,
         headers: None,
-        route: Route::ChannelsId(guild_id),
-        method: Method::Get,
-        url: api!("/guilds/{}/channels", guild_id),
+        route: RouteInfo::GetChannels { guild_id },
     })
 }
 
@@ -1186,9 +1126,7 @@ pub fn get_current_application_info() -> Result<CurrentApplicationInfo> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::None,
-        url: api!("/oauth2/applications/@me").to_owned(),
+        route: RouteInfo::GetCurrentApplicationInfo,
     })
 }
 
@@ -1197,9 +1135,7 @@ pub fn get_current_user() -> Result<CurrentUser> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::UsersMe,
-        url: api!("/users/@me").to_owned(),
+        route: RouteInfo::GetCurrentUser,
     })
 }
 
@@ -1208,9 +1144,7 @@ pub fn get_gateway() -> Result<Gateway> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::Gateway,
-        url: api!("/gateway").to_owned(),
+        route: RouteInfo::GetGateway,
     })
 }
 
@@ -1219,9 +1153,7 @@ pub fn get_guild(guild_id: u64) -> Result<PartialGuild> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::GuildsId(guild_id),
-        url: api!("/guilds/{}", guild_id),
+        route: RouteInfo::GetGuild { guild_id },
     })
 }
 
@@ -1230,9 +1162,7 @@ pub fn get_guild_embed(guild_id: u64) -> Result<GuildEmbed> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::GuildsIdEmbed(guild_id),
-        url: api!("/guilds/{}/embeds", guild_id),
+        route: RouteInfo::GetGuildEmbed { guild_id },
     })
 }
 
@@ -1241,9 +1171,7 @@ pub fn get_guild_integrations(guild_id: u64) -> Result<Vec<Integration>> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::GuildsIdIntegrations(guild_id),
-        url: api!("/guilds/{}/integrations", guild_id),
+        route: RouteInfo::GetGuildIntegrations { guild_id },
     })
 }
 
@@ -1252,9 +1180,7 @@ pub fn get_guild_invites(guild_id: u64) -> Result<Vec<RichInvite>> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::GuildsIdInvites(guild_id),
-        url: api!("/guilds/{}/invites", guild_id),
+        route: RouteInfo::GetGuildInvites { guild_id },
     })
 }
 
@@ -1268,9 +1194,7 @@ pub fn get_guild_vanity_url(guild_id: u64) -> Result<String> {
     let response = request(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::GuildsIdVanityUrl(guild_id),
-        url: api!("/guilds/{}/vanity-url", guild_id),
+        route: RouteInfo::GetGuildVanityUrl { guild_id },
     })?;
 
     serde_json::from_reader::<HyperResponse, GuildVanityUrl>(response)
@@ -1287,14 +1211,7 @@ pub fn get_guild_members(guild_id: u64,
     let response = request(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::GuildsIdMembers(guild_id),
-        url: api!(
-            "/guilds/{}/members?limit={}&after={}",
-            guild_id,
-            limit.unwrap_or(500),
-            after.unwrap_or(0),
-        ),
+        route: RouteInfo::GetGuildMembers { after, guild_id, limit },
     })?;
 
     let mut v = serde_json::from_reader::<HyperResponse, Value>(response)?;
@@ -1314,12 +1231,21 @@ pub fn get_guild_members(guild_id: u64,
 
 /// Gets the amount of users that can be pruned.
 pub fn get_guild_prune_count(guild_id: u64, map: &Value) -> Result<GuildPrune> {
+    // Note for 0.6.x: turn this into a function parameter.
+    #[derive(Deserialize)]
+    struct GetGuildPruneCountRequest {
+        days: u64,
+    }
+
+    let req = serde_json::from_value::<GetGuildPruneCountRequest>(map.clone())?;
+
     fire(Request {
-        body: Some(map.to_string().into_bytes()),
+        body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::GuildsIdPrune(guild_id),
-        url: api!("/guilds/{}/prune", guild_id),
+        route: RouteInfo::GetGuildPruneCount {
+            days: req.days,
+            guild_id,
+        },
     })
 }
 
@@ -1329,9 +1255,7 @@ pub fn get_guild_regions(guild_id: u64) -> Result<Vec<VoiceRegion>> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::GuildsIdRegions(guild_id),
-        url: api!("/guilds/{}/regions", guild_id),
+        route: RouteInfo::GetGuildRegions { guild_id },
     })
 }
 
@@ -1342,9 +1266,7 @@ pub fn get_guild_roles(guild_id: u64) -> Result<Vec<Role>> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::GuildsIdRoles(guild_id),
-        url: api!("/guilds/{}/roles", guild_id),
+        route: RouteInfo::GetGuildRoles { guild_id },
     })
 }
 
@@ -1370,9 +1292,7 @@ pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::GuildsIdWebhooks(guild_id),
-        url: api!("/guilds/{}/webhooks", guild_id),
+        route: RouteInfo::GetGuildWebhooks { guild_id },
     })
 }
 
@@ -1397,48 +1317,30 @@ pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
 ///
 /// [docs]: https://discordapp.com/developers/docs/resources/user#get-current-user-guilds
 pub fn get_guilds(target: &GuildPagination, limit: u64) -> Result<Vec<GuildInfo>> {
-    let mut uri = format!("/users/@me/guilds?limit={}", limit);
-
-    match *target {
-        GuildPagination::After(id) => {
-            write!(uri, "&after={}", id)?;
-        },
-        GuildPagination::Before(id) => {
-            write!(uri, "&before={}", id)?;
-        },
-    }
+    let (after, before) = match *target {
+        GuildPagination::After(id) => (Some(id.0), None),
+        GuildPagination::Before(id) => (None, Some(id.0)),
+    };
 
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::UsersMeGuilds,
-        url: api!("{}", uri),
+        route: RouteInfo::GetGuilds { after, before, limit },
     })
 }
 
 /// Gets information about a specific invite.
 #[allow(unused_mut)]
-pub fn get_invite(code: &str, stats: bool) -> Result<Invite> {
-    let mut invite = code;
-
+pub fn get_invite(mut code: &str, stats: bool) -> Result<Invite> {
     #[cfg(feature = "utils")]
     {
-        invite = ::utils::parse_invite(invite);
-    }
-
-    let mut uri = format!("/invites/{}", invite);
-
-    if stats {
-        uri.push_str("?with_counts=true");
+        code = ::utils::parse_invite(code);
     }
 
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::InvitesCode,
-        url: api!("{}", uri),
+        route: RouteInfo::GetInvite { code, stats },
     })
 }
 
@@ -1447,9 +1349,7 @@ pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
     let response = request(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::GuildsIdMembersId(guild_id),
-        url: api!("/guilds/{}/members/{}", guild_id, user_id),
+        route: RouteInfo::GetMember { guild_id, user_id },
     })?;
 
     let mut v = serde_json::from_reader::<HyperResponse, Value>(response)?;
@@ -1466,9 +1366,7 @@ pub fn get_message(channel_id: u64, message_id: u64) -> Result<Message> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::ChannelsIdMessagesId(LightMethod::Any, channel_id),
-        url: api!("/channels/{}/messages/{}", channel_id, message_id),
+        route: RouteInfo::GetMessage { channel_id, message_id },
     })
 }
 
@@ -1477,9 +1375,10 @@ pub fn get_messages(channel_id: u64, query: &str) -> Result<Vec<Message>> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::ChannelsIdMessages(channel_id),
-        url: api!("/channels/{}/messages{}", channel_id, query),
+        route: RouteInfo::GetMessages {
+            query: query.to_owned(),
+            channel_id,
+        },
     })
 }
 
@@ -1488,9 +1387,7 @@ pub fn get_pins(channel_id: u64) -> Result<Vec<Message>> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::ChannelsIdPins(channel_id),
-        url: api!("/channels/{}/pins", channel_id),
+        route: RouteInfo::GetPins { channel_id },
     })
 }
 
@@ -1501,24 +1398,18 @@ pub fn get_reaction_users(channel_id: u64,
                           limit: u8,
                           after: Option<u64>)
                           -> Result<Vec<User>> {
-    let mut uri = format!(
-        "/channels/{}/messages/{}/reactions/{}?limit={}",
-        channel_id,
-        message_id,
-        reaction_type.as_data(),
-        limit
-    );
-
-    if let Some(user_id) = after {
-        write!(uri, "&after={}", user_id)?;
-    }
+    let reaction = reaction_type.as_data();
 
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
-        url: api!("{}", uri),
+        route: RouteInfo::GetReactionUsers {
+            after,
+            channel_id,
+            limit,
+            message_id,
+            reaction,
+        },
     })
 }
 
@@ -1529,9 +1420,7 @@ pub fn get_unresolved_incidents() -> Result<Vec<Incident>> {
     let response = request(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::None,
-        url: status!("/incidents/unresolved.json").to_owned(),
+        route: RouteInfo::GetUnresolvedIncidents,
     })?;
 
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
@@ -1550,9 +1439,7 @@ pub fn get_upcoming_maintenances() -> Result<Vec<Maintenance>> {
     let response = request(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::None,
-        url: status!("/scheduled-maintenances/upcoming.json").to_owned(),
+        route: RouteInfo::GetUpcomingMaintenances,
     })?;
 
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
@@ -1569,9 +1456,7 @@ pub fn get_user(user_id: u64) -> Result<User> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::UsersId,
-        url: api!("/users/{}", user_id),
+        route: RouteInfo::GetUser { user_id },
     })
 }
 
@@ -1580,9 +1465,7 @@ pub fn get_user_dm_channels() -> Result<Vec<PrivateChannel>> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::UsersMeChannels,
-        url: api!("/users/@me/channels").to_owned(),
+        route: RouteInfo::GetUserDmChannels,
     })
 }
 
@@ -1591,9 +1474,7 @@ pub fn get_voice_regions() -> Result<Vec<VoiceRegion>> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::VoiceRegions,
-        url: api!("/voice/regions").to_owned(),
+        route: RouteInfo::GetVoiceRegions,
     })
 }
 
@@ -1618,9 +1499,7 @@ pub fn get_webhook(webhook_id: u64) -> Result<Webhook> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::WebhooksId(webhook_id),
-        url: api!("/webhooks/{}", webhook_id),
+        route: RouteInfo::GetWebhook { webhook_id },
     })
 }
 
@@ -1645,9 +1524,7 @@ pub fn get_webhook_with_token(webhook_id: u64, token: &str) -> Result<Webhook> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Get,
-        route: Route::None,
-        url: api!("/webhooks/{}/{}", webhook_id, token),
+        route: RouteInfo::GetWebhookWithToken { token, webhook_id },
     })
 }
 
@@ -1656,20 +1533,16 @@ pub fn kick_member(guild_id: u64, user_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::GuildsIdMembersId(guild_id),
-        url: api!("/guilds/{}/members/{}", guild_id, user_id),
+        route: RouteInfo::KickMember { guild_id, user_id },
     })
 }
 
 /// Leaves a group DM.
-pub fn leave_group(guild_id: u64) -> Result<Group> {
+pub fn leave_group(group_id: u64) -> Result<Group> {
     fire(Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::None,
-        url: api!("/channels/{}", guild_id),
+        route: RouteInfo::LeaveGroup { group_id },
     })
 }
 
@@ -1678,9 +1551,7 @@ pub fn leave_guild(guild_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::UsersMeGuildsId,
-        url: api!("/users/@me/guilds/{}", guild_id),
+        route: RouteInfo::LeaveGuild { guild_id },
     })
 }
 
@@ -1689,9 +1560,7 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::None,
-        url: api!("/channels/{}/recipients/{}", group_id, user_id),
+        route: RouteInfo::RemoveGroupRecipient { group_id, user_id },
     })
 }
 
@@ -1768,12 +1637,12 @@ pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, m
 
 /// Sends a message to a channel.
 pub fn send_message(channel_id: u64, map: &Value) -> Result<Message> {
+    let body = serde_json::to_vec(map)?;
+
     fire(Request {
-        body: Some(map.to_string().into_bytes()),
+        body: Some(&body),
         headers: None,
-        method: Method::Post,
-        route: Route::ChannelsIdMessages(channel_id),
-        url: api!("/channels/{}/messages", channel_id),
+        route: RouteInfo::CreateMessage { channel_id },
     })
 }
 
@@ -1782,9 +1651,7 @@ pub fn pin_message(channel_id: u64, message_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Put,
-        route: Route::ChannelsIdPinsMessageId(channel_id),
-        url: api!("/channels/{}/pins/{}", channel_id, message_id),
+        route: RouteInfo::PinMessage { channel_id, message_id },
     })
 }
 
@@ -1793,9 +1660,7 @@ pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::GuildsIdBansUserId(guild_id),
-        url: api!("/guilds/{}/bans/{}", guild_id, user_id),
+        route: RouteInfo::RemoveBan { guild_id, user_id },
     })
 }
 
@@ -1812,20 +1677,27 @@ pub fn remove_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<(
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::GuildsIdMembersIdRolesId(guild_id),
-        url: api!("/guilds/{}/members/{}/roles/{}", guild_id, user_id, role_id),
+        route: RouteInfo::RemoveMemberRole { guild_id, user_id, role_id },
     })
 }
 
 /// Starts removing some members from a guild based on the last time they've been online.
 pub fn start_guild_prune(guild_id: u64, map: &Value) -> Result<GuildPrune> {
+    // Note for 0.6.x: turn this into a function parameter.
+    #[derive(Deserialize)]
+    struct StartGuildPruneRequest {
+        days: u64,
+    }
+
+    let req = serde_json::from_value::<StartGuildPruneRequest>(map.clone())?;
+
     fire(Request {
-        body: Some(map.to_string().into_bytes()),
+        body: None,
         headers: None,
-        method: Method::Post,
-        route: Route::GuildsIdPrune(guild_id),
-        url: api!("/guilds/{}/prune", guild_id),
+        route: RouteInfo::StartGuildPrune {
+            days: req.days,
+            guild_id,
+        },
     })
 }
 
@@ -1834,9 +1706,7 @@ pub fn start_integration_sync(guild_id: u64, integration_id: u64) -> Result<()> 
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Post,
-        route: Route::GuildsIdIntegrationsIdSync(guild_id),
-        url: api!("/guilds/{}/integrations/{}/sync", guild_id, integration_id),
+        route: RouteInfo::StartIntegrationSync { guild_id, integration_id },
     })
 }
 
@@ -1845,9 +1715,7 @@ pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
         headers: None,
-        method: Method::Delete,
-        route: Route::ChannelsIdPinsMessageId(channel_id),
-        url: api!("/channels/{}/pins/{}", channel_id, message_id),
+        route: RouteInfo::UnpinMessage { channel_id, message_id },
     })
 }
 
@@ -1873,33 +1741,19 @@ fn request(req: Request) -> Result<HyperResponse> {
     }
 }
 
-fn build_req(req: &Request) -> RequestBuilder {
-    let mut builder = CLIENT.request(req.method.clone(), &req.url);
-
-    if let Some(ref bytes) = req.body {
-        builder = builder.body(HyperBody::BufBody(bytes, bytes.len()));
-    }
-
-    if let Some(headers) = req.headers.clone() {
-        builder = builder.headers(headers);
-    }
-
-    builder
-}
-
-fn retry(req: &Request) -> HyperResult<HyperResponse> {
+fn retry(request: &Request) -> HyperResult<HyperResponse> {
     // Retry the request twice in a loop until it succeeds.
     //
     // If it doesn't and the loop breaks, try one last time.
     for _ in 0..=2 {
-        match build_req(req).send() {
+        match request.build().send() {
             Err(HyperError::Io(ref io))
                 if io.kind() == IoErrorKind::ConnectionAborted => continue,
             other => return other,
         }
     }
 
-    build_req(req).send()
+    request.build().send()
 }
 
 /// Performs a request and then verifies that the response status code is equal
@@ -1908,16 +1762,16 @@ fn retry(req: &Request) -> HyperResult<HyperResponse> {
 /// This is a function that performs a light amount of work and returns an
 /// empty tuple, so it's called "wind" to denote that it's lightweight.
 fn wind(expected: u16, req: Request) -> Result<()> {
-    let response = request(req)?;
+    let resp = request(req)?;
 
-    if response.status.to_u16() == expected {
+    if resp.status.to_u16() == expected {
         return Ok(());
     }
 
-    debug!("Expected {}, got {}", expected, response.status);
-    trace!("Unsuccessful response: {:?}", response);
+    debug!("Expected {}, got {}", expected, resp.status);
+    trace!("Unsuccessful response: {:?}", resp);
 
-    Err(Error::Http(HttpError::UnsuccessfulRequest(response)))
+    Err(Error::Http(HttpError::UnsuccessfulRequest(resp)))
 }
 
 /// Enum that allows a user to pass a `Path` or a `File` type to `send_files`
