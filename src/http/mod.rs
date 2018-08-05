@@ -24,23 +24,22 @@
 //! [model]: ../model/index.html
 
 pub mod ratelimiting;
+pub mod request;
 pub mod routing;
 
 mod error;
 
-pub use self::error::Error as HttpError;
 pub use hyper::status::{StatusClass, StatusCode};
+pub use self::error::Error as HttpError;
 
 use constants;
 use hyper::{
     client::{
-        Body as HyperBody,
         Client as HyperClient,
-        RequestBuilder,
         Request as HyperRequest,
         Response as HyperResponse
     },
-    header::{Authorization, ContentType, Headers, UserAgent},
+    header::{ContentType, Headers},
     method::Method,
     mime::{Mime, SubLevel, TopLevel},
     net::HttpsConnector,
@@ -54,7 +53,10 @@ use internal::prelude::*;
 use model::prelude::*;
 use multipart::client::Multipart;
 use parking_lot::Mutex;
-use self::routing::RouteInfo;
+use self::{
+    request::Request,
+    routing::RouteInfo,
+};
 use serde::de::DeserializeOwned;
 use serde_json;
 use std::{
@@ -73,44 +75,6 @@ lazy_static! {
 
         HyperClient::with_connector(connector)
     };
-}
-
-#[derive(Clone, Debug)]
-struct Request<'a> {
-    body: Option<&'a [u8]>,
-    headers: Option<Headers>,
-    route: RouteInfo<'a>,
-}
-
-impl<'a> Request<'a> {
-    fn build(&'a self) -> RequestBuilder<'a> {
-        let Request {
-            body,
-            headers: request_headers,
-            route: route_info,
-        } = self;
-        let (method, _, path) = route_info.deconstruct();
-
-        let mut builder = CLIENT.request(
-            method.hyper_method(),
-            &path.into_owned(),
-        );
-
-        if let Some(bytes) = body {
-            builder = builder.body(HyperBody::BufBody(bytes, bytes.len()));
-        }
-
-        let mut headers = Headers::new();
-        headers.set(UserAgent(constants::USER_AGENT.to_string()));
-        headers.set(Authorization(TOKEN.lock().clone()));
-        headers.set(ContentType::json());
-
-        if let Some(request_headers) = request_headers.clone() {
-            headers.extend(request_headers.iter());
-        }
-
-        builder.headers(headers)
-    }
 }
 
 /// An method used for ratelimiting special routes.
@@ -1722,16 +1686,95 @@ pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
 /// Fires off a request, deserializing the response reader via the given type
 /// bound.
 ///
-/// This is a clean wrapper around request functions manually writing this, and
-/// due to the type system can be used even further by going off the parent
-/// function's return type.
-fn fire<T: DeserializeOwned>(req: Request) -> Result<T> {
+/// If you don't need to deserialize the response and want the response instance
+/// itself, use [`request`].
+///
+/// # Examples
+///
+/// Create a new message via the [`RouteInfo::CreateMessage`] endpoint and
+/// deserialize the response into a [`Message`]:
+///
+/// ```rust,no_run
+/// # extern crate serenity;
+/// #
+/// # use std::error::Error;
+/// #
+/// # fn main() -> Result<(), Box<Error>> {
+/// #
+/// use serenity::{
+///     http::{
+///         self,
+///         request::RequestBuilder,
+///         routing::RouteInfo,
+///     },
+///     model::channel::Message,
+/// };
+///
+/// let bytes = vec![
+///     // payload bytes here
+/// ];
+/// let channel_id = 381880193700069377;
+/// let route_info = RouteInfo::CreateMessage { channel_id };
+///
+/// let mut request = RequestBuilder::new(route_info);
+/// request.body(Some(&bytes));
+///
+/// let message = http::fire::<Message>(request.build())?;
+///
+/// println!("Message content: {}", message.content);
+/// #
+/// #     Ok(())
+/// # }
+/// ```
+///
+/// [`request`]: fn.request.html
+pub fn fire<T: DeserializeOwned>(req: Request) -> Result<T> {
     let response = request(req)?;
 
     serde_json::from_reader(response).map_err(From::from)
 }
 
-fn request(req: Request) -> Result<HyperResponse> {
+/// Performs a request, ratelimiting it if necessary.
+///
+/// Returns the raw hyper Response. Use [`fire`] to deserialize the response
+/// into some type.
+///
+/// # Examples
+///
+/// Send a body of bytes over the [`RouteInfo::CreateMessage`] endpoint:
+///
+/// ```rust,no_run
+/// # extern crate serenity;
+/// #
+/// # use std::error::Error;
+/// #
+/// # fn main() -> Result<(), Box<Error>> {
+/// #
+/// use serenity::http::{
+///     self,
+///     request::RequestBuilder,
+///     routing::RouteInfo,
+/// };
+///
+/// let bytes = vec![
+///     // payload bytes here
+/// ];
+/// let channel_id = 381880193700069377;
+/// let route_info = RouteInfo::CreateMessage { channel_id };
+///
+/// let mut request = RequestBuilder::new(route_info);
+/// request.body(Some(&bytes));
+///
+/// let response = http::request(request.build())?;
+///
+/// println!("Response successful?: {}", response.status.is_success());
+/// #
+/// #     Ok(())
+/// # }
+/// ```
+///
+/// [`fire`]: fn.fire.html
+pub fn request(req: Request) -> Result<HyperResponse> {
     let response = ratelimiting::perform(req)?;
 
     if response.status.class() == StatusClass::Success {
