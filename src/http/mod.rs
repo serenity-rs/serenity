@@ -2029,7 +2029,7 @@ fn build_req(req: &Request) -> RequestBuilder {
     builder
 }
 
-fn retry<'a>(req: &Request) -> HyperResult<HyperResponse> {
+fn retry(req: &Request) -> HyperResult<HyperResponse> {
     // Retry the request twice in a loop until it succeeds.
     //
     // If it doesn't and the loop breaks, try one last time.
