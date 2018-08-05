@@ -324,6 +324,29 @@ impl Args {
         }
     }
 
+    /// Retrieves the current argument. Does not parse.
+    ///
+    /// # Note
+    ///
+    /// This borrows `Args` for the entire lifetime of the returned argument.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    ///
+    /// assert_eq!(args.current(), Some("42"));
+    /// args.next();
+    /// assert_eq!(args.current(), Some("69"));
+    /// args.next();
+    /// assert_eq!(args.current(), None);
+    /// ```
+    pub fn current(&self) -> Option<&str> {
+        self.args.get(self.offset).map(|t| t.lit.as_str())
+    }
+
     /// Parses the current argument and advances.
     ///
     /// # Examples
@@ -425,7 +448,6 @@ impl Args {
         Some(vec)
     }
 
-
     /// Provides an iterator that will spew arguments until the end of the message.
     ///
     /// # Examples
@@ -461,6 +483,30 @@ impl Args {
         }
 
         self.iter::<T>().collect()
+    }
+
+    /// Retrieves the current argument and also removes quotes around it if they're present.
+    /// Does not parse.
+    ///
+    /// # Note
+    ///
+    /// This borrows `Args` for the entire lifetime of the returned argument.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("42 \"69\"", &[" ".to_string()]);
+    ///
+    /// assert_eq!(args.current_quoted(), Some("42"));
+    /// args.next();
+    /// assert_eq!(args.current_quoted(), Some("69"));
+    /// args.next();
+    /// assert_eq!(args.current_quoted(), None);
+    /// ```
+    pub fn current_quoted(&self) -> Option<&str> {
+        self.args.get(self.offset).map(|t| quotes_extract(t))
     }
 
     /// Like [`single`], but accounts quotes.
@@ -788,6 +834,26 @@ impl Args {
         }
 
         self.len() - self.offset
+    }
+
+    /// Move to the next argument.
+    /// This increments the offset pointer.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    ///
+    /// args.next();
+    ///
+    /// assert_eq!(args.single::<u32>().unwrap(), 69);
+    /// assert!(args.is_empty());
+    /// ```
+    #[inline]
+    pub fn next(&mut self) {
+        self.offset += 1;
     }
 
     /// Go one step behind.
