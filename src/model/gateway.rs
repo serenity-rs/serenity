@@ -133,13 +133,21 @@ impl Game {
 
 impl<'a> From<&'a str> for Game {
     fn from(name: &'a str) -> Self {
-        Game::playing(name)
+        Game {
+            kind: GameType::Playing,
+            name: name.to_owned(),
+            url: None,
+        }
     }
 }
 
 impl From<String> for Game {
     fn from(name: String) -> Self {
-        Game::playing(&name)
+        Game {
+            kind: GameType::Playing,
+            url: None,
+            name,
+        }
     }
 }
 
