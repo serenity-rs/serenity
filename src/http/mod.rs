@@ -1788,7 +1788,7 @@ fn retry(request: &Request) -> HyperResult<HyperResponse> {
     // Retry the request twice in a loop until it succeeds.
     //
     // If it doesn't and the loop breaks, try one last time.
-    for _ in 0..=2 {
+    for _ in 0..3 {
         match request.build().send() {
             Err(HyperError::Io(ref io))
                 if io.kind() == IoErrorKind::ConnectionAborted => continue,
