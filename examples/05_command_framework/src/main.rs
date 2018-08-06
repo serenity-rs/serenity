@@ -168,10 +168,12 @@ fn main() {
             .bucket("complicated")
             .cmd(commands))
         .group("Emoji", |g| g
-            // Sets a single prefix for a group:
-            .prefix("emoji")
+            // Sets multiple prefixes for a group.
+            // This requires us to call commands in this group
+            // via `~emoji` (or `~e`) instead of just `~`.
+            .prefixes(vec!["emoji", "em"])
             // Sets a command that will be executed if only a group-prefix was passed.
-            .default_cmd(dog)
+            .default_cmd(bird)
             .command("cat", |c| c
                 .desc("Sends an emoji with a cat.")
                 .batch_known_as(vec!["kitty", "neko"]) // Adds multiple aliases
@@ -184,10 +186,10 @@ fn main() {
                 .bucket("emoji")
                 .cmd(dog)))
         .group("Math", |g| g
-            // Sets multiple prefixes for a group.
-            // This requires us to call commands in this group
-            // via `~math` (or `~m`) instead of just `~`.
-            .prefixes(vec!["m", "math"])
+            // Sets a single prefix for this group.
+            // So one has to call commands in this group
+            // via `~math` instead of just `~`.
+            .prefix("math")
             .command("multiply", |c| c
                 .known_as("*") // Lets us also call `~math *` instead of just `~math multiply`.
                 .cmd(multiply)))
@@ -204,7 +206,7 @@ fn main() {
         .group("Owner", |g| g
             // This check applies to every command on this group.
             // User needs to pass the test for the command to execute.
-            .check(admin_check) 
+            .check(admin_check)
             .command("am i admin", |c| c
                 .cmd(am_i_admin))
                 .guild_only(true)
@@ -249,7 +251,7 @@ fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions)
 
 // A function which acts as a "check", to determine whether to call a command.
 //
-// This check analyses whether a guild member permissions has 
+// This check analyses whether a guild member permissions has
 // administrator-permissions.
 fn admin_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> bool {
     if let Some(member) = msg.member() {
@@ -263,7 +265,7 @@ fn admin_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions)
 }
 
 command!(some_long_command(_ctx, msg, args) {
-    if let Err(why) = msg.channel_id.say(&format!("Arguments: {}", args.full())) {
+    if let Err(why) = msg.channel_id.say(&format!("Arguments: {:?}", args)) {
         println!("Error sending message: {:?}", why);
     }
 });
@@ -378,6 +380,18 @@ command!(dog(_ctx, msg, _args) {
 
 command!(cat(_ctx, msg, _args) {
     if let Err(why) = msg.channel_id.say(":cat:") {
+        println!("Error sending message: {:?}", why);
+    }
+});
+
+command!(bird(_ctx, msg, args) {
+    let say_content = if args.is_empty() {
+        ":bird: can find animals for you.".to_string()
+    } else {
+        format!(":bird: could not find animal named: `{}`.", args.full())
+    };
+
+    if let Err(why) = msg.channel_id.say(say_content) {
         println!("Error sending message: {:?}", why);
     }
 });
