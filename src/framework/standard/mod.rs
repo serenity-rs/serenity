@@ -1065,13 +1065,6 @@ impl Framework for StandardFramework {
                         built.clone()
                     };
 
-                    let mut args = {
-                        let content = message.content.chars().skip(position).skip_while(|x| x.is_whitespace())
-                            .skip(command_length).collect::<String>();
-
-                        Args::new(&content.trim(), &self.configuration.delimiters)
-                    };
-
                     let before = self.before.clone();
                     let after = self.after.clone();
 
@@ -1080,6 +1073,13 @@ impl Framework for StandardFramework {
 
                         if let Some(help) = help {
                             let groups = self.groups.clone();
+                            let mut args = {
+                                let content = message.content.chars().skip(position).skip_while(|x| x.is_whitespace())
+                                    .skip(command_length).collect::<String>();
+
+                                Args::new(&content.trim(), &self.configuration.delimiters)
+                            };
+
                             threadpool.execute(move || {
 
                                 if let Some(before) = before {
@@ -1099,12 +1099,18 @@ impl Framework for StandardFramework {
                         }
                     }
 
-
                     if !to_check.is_empty() {
 
                         if let Some(&CommandOrAlias::Command(ref command)) =
                             group.commands.get(&to_check) {
                             let command = Arc::clone(command);
+
+                            let mut args = {
+                                let content = message.content.chars().skip(position).skip_while(|x| x.is_whitespace())
+                                    .skip(command_length).collect::<String>();
+
+                                Args::new(&content.trim(), &self.configuration.delimiters)
+                            };
 
                             if let Some(error) = self.should_fail(
                                 &mut context,
@@ -1150,10 +1156,15 @@ impl Framework for StandardFramework {
 
                         if let &Some(CommandOrAlias::Command(ref command)) = &group.default_command {
                             let command = Arc::clone(command);
+                            let mut args = {
+                                let content = to_check;
+
+                                Args::new(&content.trim(), &self.configuration.delimiters)
+                            };
 
                             threadpool.execute(move || {
                                 if let Some(before) = before {
-                                    if !(before)(&mut context, &message, &to_check) {
+                                    if !(before)(&mut context, &message, &args.full()) {
                                         return;
                                     }
                                 }
