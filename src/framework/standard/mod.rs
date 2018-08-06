@@ -1146,12 +1146,13 @@ impl Framework for StandardFramework {
                     }
 
                     if check_contains_group_prefix {
+
                         if let &Some(CommandOrAlias::Command(ref command)) = &group.default_command {
                             let command = Arc::clone(command);
 
                             threadpool.execute(move || {
                                 if let Some(before) = before {
-                                    if !(before)(&mut context, &message, &built) {
+                                    if !(before)(&mut context, &message, &to_check) {
                                         return;
                                     }
                                 }
