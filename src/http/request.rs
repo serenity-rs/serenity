@@ -62,11 +62,11 @@ impl<'a> Request<'a> {
     }
 
     pub fn build(&'a self) -> HyperRequestBuilder<'a> {
-        let &Request {
+        let Request {
             body,
-            headers:ref  request_headers,
+            headers: ref request_headers,
             route: ref route_info,
-        } = self;
+        } = *self;
         let (method, _, path) = route_info.deconstruct();
 
         let mut builder = CLIENT.request(
