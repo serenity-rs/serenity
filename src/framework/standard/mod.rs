@@ -1147,7 +1147,7 @@ impl Framework for StandardFramework {
 
                     if check_contains_group_prefix {
 
-                        if let Some(CommandOrAlias::Command(ref command)) = &group.default_command {
+                        if let &Some(CommandOrAlias::Command(ref command)) = &group.default_command {
                             let command = Arc::clone(command);
 
                             threadpool.execute(move || {
@@ -1177,7 +1177,7 @@ impl Framework for StandardFramework {
             }
         }
 
-        if let Some(unrecognised_command) = &self.unrecognised_command {
+        if let &Some(ref unrecognised_command) = &self.unrecognised_command {
             let unrecognised_command = unrecognised_command.clone();
             threadpool.execute(move || {
                 (unrecognised_command)(&mut context, &message, &unrecognised_command_name);
