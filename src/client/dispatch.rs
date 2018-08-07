@@ -19,6 +19,8 @@ use typemap::ShareMap;
 use framework::Framework;
 #[cfg(feature = "cache")]
 use model::id::GuildId;
+#[cfg(feature = "cache")]
+use std::time::Duration;
 
 #[cfg(feature = "cache")]
 use super::CACHE;
@@ -28,7 +30,16 @@ macro_rules! update {
         {
             #[cfg(feature = "cache")]
             {
-                CACHE.write().update(&mut $event)
+                CACHE.try_write_for(Duration::from_millis(10))
+                    .and_then(|mut lock| lock.update(&mut $event))
+                    .or_else(|| {
+                        warn!(
+                            "[dispatch] Possible deadlock: couldn't unlock cache to update with event: {:?}",
+                            $event,
+                        );
+
+                        None
+                    })
             }
         }
     };
