@@ -726,12 +726,7 @@ impl Args {
             return s;
         }
 
-        let end = s.rfind('"');
-        if end.is_none() {
-            return s;
-        }
-
-        let end = end.unwrap();
+        let end = s.rfind('"').uwnrap();
 
         // If it got the quote at the start, then there's no closing quote.
         if end == 0 {
