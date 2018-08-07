@@ -57,15 +57,11 @@ pub enum Channel {
 }
 
 impl Channel {
-
-    /////////////////////////////////////////////////////////////////////////
-    // Adapter for each variant
-    /////////////////////////////////////////////////////////////////////////
-
     /// Converts from `Channel` to `Option<Arc<RwLock<Group>>>`.
     ///
     /// Converts `self` into an `Option<Arc<RwLock<Group>>>`, consuming `self`,
-    /// and discarding a GuildChannel, PrivateChannel, or ChannelCategory, if any.
+    /// and discarding a `GuildChannel`, `PrivateChannel`, or `ChannelCategory`,
+    /// if any.
     ///
     /// # Examples
     ///
@@ -88,8 +84,6 @@ impl Channel {
     /// }
     /// # }
     /// ```
-
-
     pub fn group(self) -> Option<Arc<RwLock<Group>>> {
         match self {
             Channel::Group(lock) => Some(lock),
@@ -99,8 +93,9 @@ impl Channel {
 
     /// Converts from `Channel` to `Option<Arc<RwLock<GuildChannel>>>`.
     ///
-    /// Converts `self` into an `Option<Arc<RwLock<GuildChannel>>>`, consuming `self`,
-    /// and discarding a Group, PrivateChannel, or ChannelCategory, if any.
+    /// Converts `self` into an `Option<Arc<RwLock<GuildChannel>>>`, consuming
+    /// `self`, and discarding a `Group`, `PrivateChannel`, or
+    /// `ChannelCategory`, if any.
     ///
     /// # Examples
     ///
@@ -119,7 +114,6 @@ impl Channel {
     /// }
     /// # }
     /// ```
-
     pub fn guild(self) -> Option<Arc<RwLock<GuildChannel>>> {
         match self {
             Channel::Guild(lock) => Some(lock),
@@ -129,8 +123,9 @@ impl Channel {
 
     /// Converts from `Channel` to `Option<Arc<RwLock<PrivateChannel>>>`.
     ///
-    /// Converts `self` into an `Option<Arc<RwLock<PrivateChannel>>>`, consuming `self`,
-    /// and discarding a Group, GuildChannel, or ChannelCategory, if any.
+    /// Converts `self` into an `Option<Arc<RwLock<PrivateChannel>>>`, consuming
+    /// `self`, and discarding a `Group`, `GuildChannel`, or `ChannelCategory`,
+    /// if any.
     ///
     /// # Examples
     ///
@@ -152,7 +147,6 @@ impl Channel {
     /// }
     /// # }
     /// ```
-
     pub fn private(self) -> Option<Arc<RwLock<PrivateChannel>>> {
         match self {
             Channel::Private(lock) => Some(lock),
@@ -162,8 +156,9 @@ impl Channel {
 
     /// Converts from `Channel` to `Option<Arc<RwLock<ChannelCategory>>>`.
     ///
-    /// Converts `self` into an `Option<Arc<RwLock<ChannelCategory>>>`, consuming `self`,
-    /// and discarding a Group, GuildChannel, or PrivateChannel, if any.
+    /// Converts `self` into an `Option<Arc<RwLock<ChannelCategory>>>`,
+    /// consuming `self`, and discarding a `Group`, `GuildChannel`, or
+    /// `PrivateChannel`, if any.
     ///
     /// # Examples
     ///
@@ -182,7 +177,6 @@ impl Channel {
     /// }
     /// # }
     /// ```
-
     pub fn category(self) -> Option<Arc<RwLock<ChannelCategory>>> {
         match self {
             Channel::Category(lock) => Some(lock),
