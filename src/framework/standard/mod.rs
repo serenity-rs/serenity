@@ -1073,6 +1073,9 @@ impl Framework for StandardFramework {
 
                         if let Some(help) = help {
                             let groups = self.groups.clone();
+
+                            // `Args`-construction here inside help-dispatch and the command-dispatch-section
+                            // shall stay identical, please update accordingly upon change.
                             let mut args = {
                                 let content = message.content.chars().skip(position).skip_while(|x| x.is_whitespace())
                                     .skip(command_length).collect::<String>();
@@ -1105,6 +1108,8 @@ impl Framework for StandardFramework {
                             group.commands.get(&to_check) {
                             let command = Arc::clone(command);
 
+                            // `Args`-construction here inside command-dispatch and the help-dispatch
+                            // shall stay identical, please update accordingly upon change.
                             let mut args = {
                                 let content = message.content.chars().skip(position).skip_while(|x| x.is_whitespace())
                                     .skip(command_length).collect::<String>();
