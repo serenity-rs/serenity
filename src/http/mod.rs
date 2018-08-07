@@ -1699,7 +1699,7 @@ pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
 /// #
 /// # use std::error::Error;
 /// #
-/// # fn main() -> Result<(), Box<Error>> {
+/// # fn try_main() -> Result<(), Box<Error>> {
 /// #
 /// use serenity::{
 ///     http::{
@@ -1725,6 +1725,10 @@ pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
 /// #
 /// #     Ok(())
 /// # }
+/// #
+/// # fn main() {
+/// #     try_main().unwrap();
+/// # }
 /// ```
 ///
 /// [`request`]: fn.request.html
@@ -1748,7 +1752,7 @@ pub fn fire<T: DeserializeOwned>(req: Request) -> Result<T> {
 /// #
 /// # use std::error::Error;
 /// #
-/// # fn main() -> Result<(), Box<Error>> {
+/// # fn try_main() -> Result<(), Box<Error>> {
 /// #
 /// use serenity::http::{
 ///     self,
@@ -1770,6 +1774,10 @@ pub fn fire<T: DeserializeOwned>(req: Request) -> Result<T> {
 /// println!("Response successful?: {}", response.status.is_success());
 /// #
 /// #     Ok(())
+/// # }
+/// #
+/// # fn main() {
+/// #     try_main().unwrap();
 /// # }
 /// ```
 ///
