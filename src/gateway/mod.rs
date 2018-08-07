@@ -3,7 +3,7 @@
 //!
 //! A shard is an interface for the lower-level receiver and sender. It provides
 //! what can otherwise be thought of as "sugar methods". A shard represents a
-//! single connection to Discord. If acting as a [`Bot`] user, you can make
+//! single connection to Discord. If acting as a [bot user], you can make
 //! use of a method named "sharding" to have multiple shards, potentially
 //! offloading some server load to another server(s).
 //!
@@ -38,15 +38,13 @@
 //! instance. This should be used when you, for example, want to split 10 shards
 //! across 3 instances.
 //!
-//! **Note**: User accounts can not shard. Use [`Client::start`].
-//!
-//! [`Bot`]: ../enum.LoginType.html#variant.Bot
-//! [`Client`]: ../struct.Client.html
-//! [`Client::start`]: ../struct.Client.html#method.start
-//! [`Client::start_autosharded`]: ../struct.Client.html#method.start_autosharded
-//! [`Client::start_shard`]: ../struct.Client.html#method.start_shard
-//! [`Client::start_shard_range`]: ../struct.Client.html#method.start_shard_range
-//! [`Client::start_shards`]: ../struct.Client.html#method.start_shards
+//! [bot user]: https://discordapp.com/developers/docs/topics/oauth2#bots
+//! [`Client`]: ../client/struct.Client.html
+//! [`Client::start`]: ../client/struct.Client.html#method.start
+//! [`Client::start_autosharded`]: ../client/struct.Client.html#method.start_autosharded
+//! [`Client::start_shard`]: ../client/struct.Client.html#method.start_shard
+//! [`Client::start_shard_range`]: ../client/struct.Client.html#method.start_shard_range
+//! [`Client::start_shards`]: ../client/struct.Client.html#method.start_shards
 //! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 
 mod error;

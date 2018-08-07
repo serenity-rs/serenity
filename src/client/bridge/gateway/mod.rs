@@ -1,4 +1,4 @@
-//! The client gateway bridge is support essential for the [`client`] module.
+//! The client gateway bridge is support essential for the [`client`](../../index.html) module.
 //!
 //! This is made available for user use if one wishes to be lower-level or avoid
 //! the higher functionality of the [`Client`].
@@ -39,12 +39,12 @@
 //! concerned about the [`ShardManager`] in this module.
 //!
 //! [`Client`]: ../../struct.Client.html
-//! [`client`]: ../..
 //! [`Shard`]: ../../../gateway/struct.Shard.html
 //! [`ShardManager`]: struct.ShardManager.html
 //! [`ShardManager::restart`]: struct.ShardManager.html#method.restart
 //! [`ShardManager::shutdown`]: struct.ShardManager.html#method.shutdown
-//! [`ShardQueuer`]: struct.ShardQueuer.html
+//! [`ShardManagerMessage`]: enum.ShardManagerMessage.html
+//! [`ShardQueue`]: struct.ShardQueuer.html
 //! [`ShardRunner`]: struct.ShardRunner.html
 
 pub mod event;
@@ -127,7 +127,7 @@ pub enum ShardManagerMessage {
 /// This should usually be wrapped in a [`ShardClientMessage`].
 ///
 /// [`ShardClientMessage`]: enum.ShardClientMessage.html
-/// [`ShardQueuer`]: enum.ShardQueuer.html
+/// [`ShardQueuer`]: struct.ShardQueuer.html
 #[derive(Clone, Debug)]
 pub enum ShardQueuerMessage {
     /// Message to start a shard, where the 0-index element is the ID of the

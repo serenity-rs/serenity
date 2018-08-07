@@ -13,7 +13,7 @@
 //!
 //! # Use by Models
 //!
-//! Most models of Discord objects, such as the [`Message`], [`PublicChannel`],
+//! Most models of Discord objects, such as the [`Message`], [`GuildChannel`],
 //! or [`Emoji`], have methods for interacting with that single instance. This
 //! feature is only compiled if the `methods` feature is enabled. An example of
 //! this is [`Guild::edit`], which performs a check to ensure that the current
@@ -37,7 +37,7 @@
 //! [`Guild`]: ../model/guild/struct.Guild.html
 //! [`Guild::edit`]: ../model/guild/struct.Guild.html#method.edit
 //! [`Message`]: ../model/channel/struct.Message.html
-//! [`PublicChannel`]: ../model/channel/struct.PublicChannel.html
+//! [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
 //! [`Role`]: ../model/guild/struct.Role.html
 //! [`CACHE`]: ../struct.CACHE.html
 //! [`http`]: ../http/index.html
@@ -154,7 +154,6 @@ pub struct Cache {
     /// - [`GuildMemberAdd`][`GuildMemberAddEvent`]
     /// - [`GuildMemberRemove`][`GuildMemberRemoveEvent`]
     /// - [`GuildMembersChunk`][`GuildMembersChunkEvent`]
-    /// - [`GuildSync`][`GuildSyncEvent`]
     /// - [`PresenceUpdate`][`PresenceUpdateEvent`]
     /// - [`Ready`][`ReadyEvent`]
     ///
@@ -167,7 +166,6 @@ pub struct Cache {
     /// [`GuildMemberRemoveEvent`]: ../model/event/struct.GuildMemberRemoveEvent.html
     /// [`GuildMemberUpdateEvent`]: ../model/event/struct.GuildMemberUpdateEvent.html
     /// [`GuildMembersChunkEvent`]: ../model/event/struct.GuildMembersChunkEvent.html
-    /// [`GuildSyncEvent`]: ../model/event/struct.GuildSyncEvent.html
     /// [`PresenceUpdateEvent`]: ../model/event/struct.PresenceUpdateEvent.html
     /// [`ReadyEvent`]: ../model/event/struct.ReadyEvent.html
     pub users: HashMap<UserId, Arc<RwLock<User>>>,
@@ -391,7 +389,7 @@ impl Cache {
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`GuildId`].
     ///
-    /// [`GuildId`]: ../model/guild/struct.GuildId.html
+    /// [`GuildId`]: ../model/id/struct.GuildId.html
     ///
     /// # Examples
     ///
@@ -700,7 +698,7 @@ impl Cache {
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`UserId`].
     ///
-    /// [`UserId`]: ../model/user/struct.UserId.html
+    /// [`UserId`]: ../model/id/struct.UserId.html
     /// [`users`]: #structfield.users
     ///
     /// # Examples

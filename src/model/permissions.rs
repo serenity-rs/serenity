@@ -243,8 +243,8 @@ __impl_bitflags! {
         ///
         /// If this is disabled, then [`Member`]s must use push-to-talk.
         ///
-        /// [`Member`]: ../struct.Member.html
-        /// [voice]: ../enum.ChannelType.html#variant.Voice
+        /// [`Member`]: ../guild/struct.Member.html
+        /// [voice]: ../channel/enum.ChannelType.html#variant.Voice
         USE_VAD = 0b0000_0010_0000_0000_0000_0000_0000_0000;
         /// Allows members to change their own nickname in the guild.
         CHANGE_NICKNAME = 0b0000_0100_0000_0000_0000_0000_0000_0000;
@@ -257,7 +257,7 @@ __impl_bitflags! {
         /// Allows management of emojis created without the use of an
         /// [`Integration`].
         ///
-        /// [`Integration`]: ../struct.Integration.html
+        /// [`Integration`]: ../guild/struct.Integration.html
         MANAGE_EMOJIS = 0b0100_0000_0000_0000_0000_0000_0000_0000;
     }
 }

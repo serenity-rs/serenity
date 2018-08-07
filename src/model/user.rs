@@ -75,7 +75,7 @@ impl CurrentUser {
     ///
     /// This mutates the current user in-place.
     ///
-    /// Refer to `EditProfile`'s documentation for its methods.
+    /// Refer to [`EditProfile`]'s documentation for its methods.
     ///
     /// # Examples
     ///
@@ -88,6 +88,8 @@ impl CurrentUser {
     ///
     /// CACHE.write().user.edit(|p| p.avatar(Some(&avatar)));
     /// ```
+    ///
+    /// [`EditProfile`]: ../../builder/struct.EditProfile.html
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
         let mut map = VecMap::new();
@@ -204,13 +206,13 @@ impl CurrentUser {
     /// # Errors
     ///
     /// Returns an
-    /// [`HttpError::InvalidRequest(Unauthorized)`][`HttpError::InvalidRequest`]
+    /// [`HttpError::UnsuccessfulRequest(Unauthorized)`][`HttpError::UnsuccessfulRequest`]
     /// If the user is not authorized for this end point.
     ///
     /// May return [`Error::Format`] while writing url to the buffer.
     ///
-    /// [`Error::Format`]: ../enum.Error.html#variant.Format
-    /// [`HttpError::InvalidRequest`]: ../http/enum.HttpError.html#variant.InvalidRequest
+    /// [`Error::Format`]: ../../enum.Error.html#variant.Format
+    /// [`HttpError::UnsuccessfulRequest`]: ../../http/enum.HttpError.html#variant.UnsuccessfulRequest
     pub fn invite_url(&self, permissions: Permissions) -> Result<String> {
         let bits = permissions.bits();
         let client_id = http::get_current_application_info().map(|v| v.id)?;
@@ -458,7 +460,7 @@ impl User {
     /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
     /// is a bot user.
     ///
-    /// [`ModelError::MessagingBot`]: enum.ModelError.html#variant.MessagingBot
+    /// [`ModelError::MessagingBot`]: error/enum.Error.html#variant.MessagingBot
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     /// [`User::dm`]: struct.User.html#method.dm
     // A tale with Clippy:
@@ -572,11 +574,11 @@ impl User {
     /// let _ = message.author.has_role(guild_id, role_id);
     /// ```
     ///
-    /// [`Guild`]: struct.Guild.html
-    /// [`GuildId`]: struct.GuildId.html
-    /// [`PartialGuild`]: struct.PartialGuild.html
-    /// [`Role`]: struct.Role.html
-    /// [`Cache`]: ../cache/struct.Cache.html
+    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`GuildId`]: ../id/struct.GuildId.html
+    /// [`PartialGuild`]: ../guild/struct.PartialGuild.html
+    /// [`Role`]: ../guild/struct.Role.html
+    /// [`Cache`]: ../../cache/struct.Cache.html
     // no-cache would warn on guild_id.
     pub fn has_role<G, R>(&self, guild: G, role: R) -> bool
         where G: Into<GuildContainer>, R: Into<RoleId> {
@@ -725,7 +727,7 @@ impl UserId {
     /// Creates a direct message channel between the [current user] and the
     /// user. This can also retrieve the channel if one already exists.
     ///
-    /// [current user]: struct.CurrentUser.html
+    /// [current user]: ../user/struct.CurrentUser.html
     pub fn create_dm_channel(&self) -> Result<PrivateChannel> {
         let map = json!({
             "recipient_id": self.0,

@@ -53,12 +53,12 @@ use client::CACHE;
 #[cfg(feature = "cache")]
 use model::channel::Channel;
 
-/// A convenience macro for generating a struct fulfilling the [`Command`] trait.
+/// A convenience macro for generating a struct fulfilling the [`Command`](framework/standard/trait.Command.html) trait.
 ///
-/// This is meant for use with the [`Framework`], specifically `Framework`::{[`cmd`]/[`command`]}.
+/// This is meant for use with the [`StandardFramework`], specifically `Framework`::{[`cmd`]/[`command`]}.
 ///
 ///
-/// If you're just looking for a simple "register this function as a command", use [`Framework::on`].
+/// If you're just looking for a simple "register this function as a command", use [`StandardFramework::on`].
 ///
 /// # Examples
 ///
@@ -87,11 +87,10 @@ use model::channel::Channel;
 /// });
 /// ```
 ///
-/// [`Framework`]: framework/index.html
-/// [`cmd`]: struct.Framework.html#method.cmd
-/// [`command`]: struct.Framework.html#method.command
-/// [`Framework::on`]: struct.Framework.html#method.on
-/// [`Command`]: trait.Command.html
+/// [`StandardFramework`]: framework/standard/struct.StandardFramework.html
+/// [`cmd`]: framework/standard/struct.StandardFramework.html#method.cmd
+/// [`command`]: framework/standard/struct.StandardFramework.html#method.command
+/// [`StandardFramework::on`]: framework/standard/struct.StandardFramework.html#method.on
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
@@ -215,13 +214,13 @@ pub struct StandardFramework {
     /// - a command check has been set.
     ///
     /// This is used internally to determine whether or not - in addition to
-    /// dispatching to the [`EventHandler::on_message`] handler - to have the
+    /// dispatching to the [`EventHandler::message`] handler - to have the
     /// framework check if a [`Event::MessageCreate`] should be processed by
     /// itself.
     ///
-    /// [`EventHandler::on_message`]:
-    /// ../client/event_handler/trait.EventHandler.html#method.on_message
-    /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
+    /// [`EventHandler::message`]:
+    /// ../../client/trait.EventHandler.html#method.message
+    /// [`Event::MessageCreate`]: ../../model/event/enum.Event.html#variant.MessageCreate
     pub initialized: bool,
     user_id: u64,
 }
@@ -255,7 +254,7 @@ impl StandardFramework {
     ///         .prefix("~")));
     /// ```
     ///
-    /// [`Client`]: ../client/struct.Client.html
+    /// [`Client`]: ../../client/struct.Client.html
     /// [`Configuration::default`]: struct.Configuration.html#method.default
     /// [`depth`]: struct.Configuration.html#method.depth
     /// [`prefix`]: struct.Configuration.html#method.prefix
