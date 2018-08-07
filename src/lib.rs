@@ -43,7 +43,7 @@
 //!
 //! impl EventHandler for Handler {}
 //!
-//! fn main() {
+//! pub fn main() {
 //!     // Login with a bot token from the environment
 //!     let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"), Handler)
 //!         .expect("Error creating client");
