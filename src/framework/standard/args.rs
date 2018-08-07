@@ -7,10 +7,9 @@ use std::{
 /// Defines how an operation on an `Args` method failed.
 #[derive(Debug)]
 pub enum Error<E: StdError> {
-    /// "END-OF-STRING", more precisely, there isn't anything to parse anymore.
+    /// "END-OF-STRING". There's nothing to parse anymore.
     Eos,
-    /// A parsing operation failed; the error in it can be of any returned from the `FromStr`
-    /// trait.
+    /// The parsing operation failed; the error can be anything returned from the `FromStr` trait.
     Parse(E),
 }
 
