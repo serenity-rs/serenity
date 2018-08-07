@@ -199,7 +199,7 @@ impl<'a> Lexer<'a> {
 /// // You have a `photo` command that grabs the avatar url of a user. This command accepts names only.
 /// // Now, one of your users wants the avatar of a user named Princess Zelda.
 /// // Problem is, her name contains a space; our delimiter. This would result in two arguments, "Princess" and "Zelda".
-/// // So how should we get around this? Through quotes! By surrounding her name in them we can perceive it as one single argument.
+/// // So how shall we get around this? Through quotes! By surrounding her name in them we can perceive it as one single argument.
 /// let mut args = Args::new(r#""Princess Zelda""#, &[" ".to_string()]);
 ///
 /// // Hooray!
@@ -211,7 +211,7 @@ impl<'a> Lexer<'a> {
 /// ```rust
 /// use serenity::framework::standard::Args;
 ///
-/// let mut args = Args::new("4 20", &[" ".to_string()]);
+/// let mut args = Args::new("4 2", &[" ".to_string()]);
 ///
 /// assert_eq!(args.single::<u32>().unwrap(), 4);
 ///
@@ -222,10 +222,10 @@ impl<'a> Lexer<'a> {
 ///
 /// assert_eq!(args.single::<u32>().unwrap() * 2, 8);
 ///
-/// // And the same for the 20
-/// assert_eq!(args.single::<u32>().unwrap() * 2, 40);
+/// // And the same for the 2
+/// assert_eq!(args.single::<u32>().unwrap() * 2, 4);
 ///
-/// // WAIT, NO. I wanted to concatenate them into a "420" string...
+/// // WAIT, NO. I wanted to concatenate them into a "42" string...
 /// // Argh, what should i do now????
 /// // ....
 /// // oh, `restore`
@@ -234,7 +234,7 @@ impl<'a> Lexer<'a> {
 /// let res = format!("{}{}", args.single::<String>().unwrap(), args.single::<String>().unwrap());
 ///
 /// // Yay.
-/// assert_eq!(res, "420");
+/// assert_eq!(res, "42");
 /// ```
 ///
 /// Hmm, taking a glance at the prior example, it seems we have an issue with reading the same argument over and over.
@@ -243,19 +243,21 @@ impl<'a> Lexer<'a> {
 /// ```rust
 /// use serenity::framework::standard::Args;
 ///
-/// let mut args = Args::new("four five six three", &[" ".to_string()]);
+/// let mut args = Args::new("trois cinq quatre six", &[" ".to_string()]);
 ///
-/// assert_eq!(args.single_n::<String>().unwrap(), "four");
+/// assert_eq!(args.single_n::<String>().unwrap(), "trois");
 ///
-/// // It might suggest we've lost the `four`, but in fact, we didn't! And not only that, we can do it an infinite amount of times!
-/// assert_eq!(args.single_n::<String>().unwrap(), "four");
-/// assert_eq!(args.single_n::<String>().unwrap(), "four");
-/// assert_eq!(args.single_n::<String>().unwrap(), "four");
-/// assert_eq!(args.single_n::<String>().unwrap(), "four");
+/// // It might suggest we've lost the `trois`. But in fact, we didn't! And not only that, we can do it an infinite amount of times!
+/// assert_eq!(args.single_n::<String>().unwrap(), "trois");
+/// assert_eq!(args.single_n::<String>().unwrap(), "trois");
+/// assert_eq!(args.single_n::<String>().unwrap(), "trois");
+/// assert_eq!(args.single_n::<String>().unwrap(), "trois");
 ///
-/// // Only if we use its parent method will we then lose it.
-/// assert_eq!(args.single::<String>().unwrap(), "four");
-/// assert_eq!(args.single_n::<String>().unwrap(), "five");
+/// // Only if we use its brother method we'll then lose it.
+/// assert_eq!(args.single::<String>().unwrap(), "trois");
+/// assert_eq!(args.single::<String>().unwrap(), "cinq");
+/// assert_eq!(args.single::<String>().unwrap(), "quatre");
+/// assert_eq!(args.single::<String>().unwrap(), "six");
 /// ```
 #[derive(Clone, Debug)]
 pub struct Args {
@@ -275,11 +277,11 @@ impl Args {
     /// use serenity::framework::standard::Args;
     ///
     /// let mut args = Args::new(
-    /// // Our source from where we'll parse over.
+    /// // Our message from which we'll parse over.
     /// "the quick brown fox jumps over the lazy",
     ///
     /// // The "delimiters", or aka the separators. They denote how we distinguish arguments as their own.
-    /// // For this instance, we'll use one delimiter. The space (`0x20`), which will separate the arguments.
+    /// // For this example, we'll use one delimiter, the space (`0x20`), which will separate the message.
     /// &[" ".to_string()],
     /// );
     ///
@@ -287,7 +289,7 @@ impl Args {
     /// assert_eq!(args.single::<String>().unwrap(), "quick");
     /// assert_eq!(args.single::<String>().unwrap(), "brown");
     ///
-    /// // We should not see `the quick brown` again.
+    /// // We shall not see `the quick brown` again.
     /// assert_eq!(args.rest(), "fox jumps over the lazy");
     /// ```
     ///
@@ -334,11 +336,11 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    /// let mut args = Args::new("4 2", &[" ".to_string()]);
     ///
-    /// assert_eq!(args.current(), Some("42"));
+    /// assert_eq!(args.current(), Some("4"));
     /// args.next();
-    /// assert_eq!(args.current(), Some("69"));
+    /// assert_eq!(args.current(), Some("2"));
     /// args.next();
     /// assert_eq!(args.current(), None);
     /// ```
@@ -353,12 +355,12 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    /// let mut args = Args::new("4 2", &[" ".to_string()]);
     ///
-    /// assert_eq!(args.single::<u32>().unwrap(), 42);
+    /// assert_eq!(args.single::<u32>().unwrap(), 4);
     ///
-    /// // `42` is now out of the way, next we have `69`
-    /// assert_eq!(args.single::<u32>().unwrap(), 69);
+    /// // `4` is now out of the way. Next we have `2`
+    /// assert_eq!(args.single::<u32>().unwrap(), 2);
     /// ```
     pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err>
         where T::Err: StdError {
@@ -380,10 +382,10 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let args = Args::new("42 69", &[" ".to_string()]);
+    /// let args = Args::new("4 2", &[" ".to_string()]);
     ///
-    /// assert_eq!(args.single_n::<u32>().unwrap(), 42);
-    /// assert_eq!(args.rest(), "42 69");
+    /// assert_eq!(args.single_n::<u32>().unwrap(), 4);
+    /// assert_eq!(args.rest(), "4 2");
     /// ```
     ///
     /// [`single`]: #method.single
@@ -398,17 +400,17 @@ impl Args {
         Ok(T::from_str(&cur.lit)?)
     }
 
-    /// "Skip" the argument (Sugar for `args.single::<String>().ok()`)
+    /// "Skip" the argument. Equivalent to `args.single::<String>().ok()`.
     ///
     /// # Examples
     ///
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    /// let mut args = Args::new("4 2", &[" ".to_string()]);
     ///
     /// args.skip();
-    /// assert_eq!(args.single::<u32>().unwrap(), 69);
+    /// assert_eq!(args.single::<u32>().unwrap(), 2);
     /// ```
     pub fn skip(&mut self) -> Option<String> {
         if self.is_empty() {
@@ -425,11 +427,11 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69 88 99", &[" ".to_string()]);
+    /// let mut args = Args::new("man of culture topknot", &[" ".to_string()]);
     ///
     /// args.skip_for(3);
     /// assert_eq!(args.remaining(), 1);
-    /// assert_eq!(args.single::<u32>().unwrap(), 99);
+    /// assert_eq!(args.single::<String>().unwrap(), "topknot");
     /// ```
     ///
     /// [`skip`]: #method.skip
@@ -447,16 +449,23 @@ impl Args {
         Some(vec)
     }
 
-    /// Provides an iterator that will spew arguments until the end of the message.
+    /// Iterate until end of message.
     ///
     /// # Examples
+    ///
+    /// Assert that all of the numbers in the message are even.
     ///
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("3 4", &[" ".to_string()]);
+    /// let mut args = Args::new("4 2", &[" ".to_string()]);
     ///
-    /// assert_eq!(*args.iter::<u32>().map(|num| num.unwrap().pow(2)).collect::<Vec<_>>(), [9, 16]);
+    /// for arg in args.iter::<u32>() {
+    ///     // Default to zero in case some linguist turns our numbers into words and can't parse those.
+    ///     let arg = arg.unwrap_or(0);
+    ///     assert!(arg % 2 == 0);
+    /// }
+    ///
     /// assert!(args.is_empty());
     /// ```
     pub fn iter<T: FromStr>(&mut self) -> Iter<T>
@@ -464,16 +473,17 @@ impl Args {
         Iter::new(self)
     }
 
-    /// Parses all of the remaining arguments and returns them in a `Vec` (Sugar for `args.iter().collect::<Vec<_>>()`).
+    /// Parses all of the remaining arguments and returns them in a `Vec`.
+    /// Equivalent to `args.iter().collect::<Vec<_>>()`.
     ///
     /// # Examples
     ///
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let args = Args::new("42 69", &[" ".to_string()]);
+    /// let args = Args::new("4 2", &[" ".to_string()]);
     ///
-    /// assert_eq!(*args.multiple::<u32>().unwrap(), [42, 69]);
+    /// assert_eq!(*args.multiple::<u32>().unwrap(), [4, 2]);
     /// ```
     pub fn multiple<T: FromStr>(mut self) -> Result<Vec<T>, T::Err>
         where T::Err: StdError {
@@ -496,11 +506,11 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 \"69\"", &[" ".to_string()]);
+    /// let mut args = Args::new("4 \"2\"", &[" ".to_string()]);
     ///
-    /// assert_eq!(args.current_quoted(), Some("42"));
+    /// assert_eq!(args.current_quoted(), Some("4"));
     /// args.next();
-    /// assert_eq!(args.current_quoted(), Some("69"));
+    /// assert_eq!(args.current_quoted(), Some("2"));
     /// args.next();
     /// assert_eq!(args.current_quoted(), None);
     /// ```
@@ -515,9 +525,9 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new(r#""42 69""#, &[" ".to_string()]);
+    /// let mut args = Args::new(r#""4 2""#, &[" ".to_string()]);
     ///
-    /// assert_eq!(args.single_quoted::<String>().unwrap(), "42 69");
+    /// assert_eq!(args.single_quoted::<String>().unwrap(), "4 2");
     /// assert!(args.is_empty());
     /// ```
     ///
@@ -545,10 +555,10 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new(r#""42 69""#, &[" ".to_string()]);
+    /// let mut args = Args::new(r#""4 2""#, &[" ".to_string()]);
     ///
-    /// assert_eq!(args.single_quoted_n::<String>().unwrap(), "42 69");
-    /// assert_eq!(args.rest(), r#""42 69""#);
+    /// assert_eq!(args.single_quoted_n::<String>().unwrap(), "4 2");
+    /// assert_eq!(args.rest(), r#""4 2""#);
     /// ```
     ///
     /// [`single_quoted`]: #method.single_quoted
@@ -569,15 +579,21 @@ impl Args {
     ///
     /// # Examples
     ///
+    /// Assert that all of the numbers in quotations in the message are odd.
+    ///
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new(r#""2" "5""#, &[" ".to_string()]);
+    /// let mut args = Args::new(r#""5" "3""#, &[" ".to_string()]);
     ///
-    /// assert_eq!(*args.iter_quoted::<u32>().map(|n| n.unwrap().pow(2)).collect::<Vec<_>>(), [4, 25]);
+    /// for arg in args.iter::<u32>() {
+    ///     // Default to zero in case some linguist turns our numbers into words and can't parse those.
+    ///     let arg = arg.unwrap_or(0);
+    ///     assert!(arg % 3 == 0);
+    /// }
+    ///
     /// assert!(args.is_empty());
     /// ```
-    ///
     /// [`iter`]: #method.iter
     pub fn iter_quoted<T: FromStr>(&mut self) -> IterQuoted<T>
         where T::Err: StdError {
@@ -591,9 +607,9 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new(r#""42" "69""#, &[" ".to_string()]);
+    /// let mut args = Args::new(r#""4" "2""#, &[" ".to_string()]);
     ///
-    /// assert_eq!(*args.multiple_quoted::<u32>().unwrap(), [42, 69]);
+    /// assert_eq!(*args.multiple_quoted::<u32>().unwrap(), [4, 2]);
     /// ```
     ///
     /// [`multiple`]: #method.multiple
@@ -609,20 +625,20 @@ impl Args {
     /// Returns the first argument that can be parsed and removes it from the message. The suitable argument
     /// can be in an arbitrary position in the message. Likewise, takes quotes into account.
     ///
-    /// **Note**:
-    /// Unlike how other methods on this struct work,
-    /// this function permantently removes the argument if it was **found** and was **succesfully** parsed.
-    /// Hence, use this with caution.
+    /// # Note
+    ///
+    /// Unlike the rest, this function permantently removes the argument if it was **found** and was **succesfully** parsed.
+    /// Hence, use with caution.
     ///
     /// # Examples
     ///
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("c42 69", &[" ".to_string()]);
+    /// let mut args = Args::new("c4 2", &[" ".to_string()]);
     ///
-    /// assert_eq!(args.find::<u32>().unwrap(), 69);
-    /// assert_eq!(args.single::<String>().unwrap(), "c42");
+    /// assert_eq!(args.find::<u32>().unwrap(), 2);
+    /// assert_eq!(args.single::<String>().unwrap(), "c4");
     /// assert!(args.is_empty());
     /// ```
     pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err>
@@ -650,13 +666,13 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("c42 69", &[" ".to_string()]);
+    /// let mut args = Args::new("c4 2", &[" ".to_string()]);
     ///
-    /// assert_eq!(args.find_n::<u32>().unwrap(), 69);
+    /// assert_eq!(args.find_n::<u32>().unwrap(), 2);
     ///
     /// // The `69` is still here, so let's parse it again.
-    /// assert_eq!(args.single::<String>().unwrap(), "c42");
-    /// assert_eq!(args.single::<u32>().unwrap(), 69);
+    /// assert_eq!(args.single::<String>().unwrap(), "c4");
+    /// assert_eq!(args.single::<u32>().unwrap(), 2);
     /// assert!(args.is_empty());
     /// ```
     ///
@@ -742,17 +758,17 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69 91", &[" ".to_string()]);
+    /// let mut args = Args::new("to tre fire", &[" ".to_string()]);
     ///
-    /// assert_eq!(args.rest(), "42 69 91");
-    ///
-    /// args.skip();
-    ///
-    /// assert_eq!(args.rest(), "69 91");
+    /// assert_eq!(args.rest(), "to tre fire");
     ///
     /// args.skip();
     ///
-    /// assert_eq!(args.rest(), "91");
+    /// assert_eq!(args.rest(), "tre fire");
+    ///
+    /// args.skip();
+    ///
+    /// assert_eq!(args.rest(), "fire");
     ///
     /// args.skip();
     ///
@@ -774,7 +790,8 @@ impl Args {
 
     /// The full amount of recognised arguments.
     ///
-    /// **Note**:
+    /// # Note
+    ///
     /// This never changes. Except for [`find`], which upon success, subtracts the length by 1. (e.g len of `3` becomes `2`)
     ///
     /// # Examples
@@ -782,9 +799,9 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    /// let mut args = Args::new("4 2", &[" ".to_string()]);
     ///
-    /// assert_eq!(args.len(), 2); // `2` because `["42", "69"]`
+    /// assert_eq!(args.len(), 2); // `2` because `["4", "2"]`
     /// ```
     ///
     /// [`find`]: #method.find
@@ -801,7 +818,8 @@ impl Args {
     ///
     /// let mut args = Args::new("", &[" ".to_string()]);
     ///
-    /// assert!(args.is_empty()); // `true` because passed message is empty thus no arguments.
+    /// // will be `true` because passed message is empty thus no arguments.
+    /// assert!(args.is_empty());
     /// ```
     pub fn is_empty(&self) -> bool {
         self.offset >= self.args.len()
@@ -814,7 +832,7 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    /// let mut args = Args::new("2 4", &[" ".to_string()]);
     ///
     /// assert_eq!(args.remaining(), 2);
     ///
@@ -838,11 +856,11 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    /// let mut args = Args::new("4 2", &[" ".to_string()]);
     ///
     /// args.next();
     ///
-    /// assert_eq!(args.single::<u32>().unwrap(), 69);
+    /// assert_eq!(args.single::<u32>().unwrap(), 2);
     /// assert!(args.is_empty());
     /// ```
     #[inline]
@@ -851,21 +869,22 @@ impl Args {
     }
 
     /// Go one step behind.
+    /// This decrements the offset pointer.
     ///
     /// # Examples
     ///
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69", &[" ".to_string()]);
+    /// let mut args = Args::new("4 2", &[" ".to_string()]);
     ///
-    /// assert_eq!(args.single::<u32>().unwrap(), 42);
+    /// assert_eq!(args.single::<u32>().unwrap(), 4);
     ///
-    /// // By this point, we can only parse 69 now.
-    /// // However, with the help of `rewind`, we can mess with 42 again.
+    /// // By this point, we can only parse 2 now.
+    /// // However, with the help of `rewind`, we can mess with 4 again.
     /// args.rewind();
     ///
-    /// assert_eq!(args.single::<u32>().unwrap() * 2, 84);
+    /// assert_eq!(args.single::<u32>().unwrap() * 2, 8);
     /// ```
     #[inline]
     pub fn rewind(&mut self) {
@@ -883,12 +902,12 @@ impl Args {
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new("42 69 95", &[" ".to_string()]);
+    /// let mut args = Args::new("42 420 69", &[" ".to_string()]);
     ///
     /// // Let's parse 'em numbers!
     /// assert_eq!(args.single::<u32>().unwrap(), 42);
+    /// assert_eq!(args.single::<u32>().unwrap(), 420);
     /// assert_eq!(args.single::<u32>().unwrap(), 69);
-    /// assert_eq!(args.single::<u32>().unwrap(), 95);
     ///
     /// // Oh, no! I actually wanted to multiply all of them by 2!
     /// // I don't want to call `rewind` 3 times manually....
@@ -896,8 +915,8 @@ impl Args {
     /// args.restore();
     ///
     /// assert_eq!(args.single::<u32>().unwrap() * 2, 84);
+    /// assert_eq!(args.single::<u32>().unwrap() * 2, 840);
     /// assert_eq!(args.single::<u32>().unwrap() * 2, 138);
-    /// assert_eq!(args.single::<u32>().unwrap() * 2, 190);
     /// ```
     ///
     #[inline]
