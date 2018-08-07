@@ -206,7 +206,7 @@ impl<'a> Lexer<'a> {
 /// assert_eq!(args.single_quoted::<String>().unwrap(), "Princess Zelda");
 /// ```
 ///
-/// In case of a mistake, we can go back in time... er i mean, one step (or entirely):
+/// In case of a mistake, we can go back in time... er I mean, one step (or entirely):
 ///
 /// ```rust
 /// use serenity::framework::standard::Args;
@@ -216,8 +216,8 @@ impl<'a> Lexer<'a> {
 /// assert_eq!(args.single::<u32>().unwrap(), 4);
 ///
 /// // Oh wait, oops, meant to double the 4.
-/// // But i won't able to access it now...
-/// // oh wait, i can `rewind`.
+/// // But I won't able to access it now...
+/// // oh wait, I can `rewind`.
 /// args.rewind();
 ///
 /// assert_eq!(args.single::<u32>().unwrap() * 2, 8);
@@ -226,7 +226,7 @@ impl<'a> Lexer<'a> {
 /// assert_eq!(args.single::<u32>().unwrap() * 2, 4);
 ///
 /// // WAIT, NO. I wanted to concatenate them into a "42" string...
-/// // Argh, what should i do now????
+/// // Argh, what should I do now????
 /// // ....
 /// // oh, `restore`
 /// args.restore();
