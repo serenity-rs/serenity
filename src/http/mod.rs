@@ -601,7 +601,7 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 /// Deletes a webhook given its Id:
 ///
 /// ```rust,no_run
-/// use serenity::{Client, http};
+/// use serenity::http;
 /// use std::env;
 ///
 /// // Due to the `delete_webhook` function requiring you to authenticate, you

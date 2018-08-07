@@ -1,6 +1,6 @@
 //! A set of macros for easily working with internals.
 
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 macro_rules! request_client {
     () => {{
         use hyper::net::HttpsConnector;
@@ -52,15 +52,6 @@ macro_rules! feature_cache {
 
 #[cfg(any(all(not(feature = "cache"), any(feature = "client", feature = "model"))))]
 macro_rules! feature_cache {
-    ($enabled:block else $disabled:block) => {
-        {
-            $disabled
-        }
-    }
-}
-
-#[cfg(all(feature = "client", not(feature = "framework")))]
-macro_rules! feature_framework {
     ($enabled:block else $disabled:block) => {
         {
             $disabled

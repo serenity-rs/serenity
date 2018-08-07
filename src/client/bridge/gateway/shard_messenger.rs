@@ -147,9 +147,19 @@ impl ShardMessenger {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
+    /// # #[cfg(feature = "model")]
     /// use serenity::model::gateway::Game;
+    /// # #[cfg(not(feature = "model"))]
+    /// use serenity::model::gateway::{Game, GameType};
     ///
+    /// # #[cfg(feature = "model")]
     /// shard.set_game(Some(Game::playing("Heroes of the Storm")));
+    /// # #[cfg(not(feature = "model"))]
+    /// shard.set_game(Some(Game {
+    ///     kind: GameType::Playing,
+    ///     name: "Heroes of the Storm".to_owned(),
+    ///     url: None,
+    /// }));
     /// #     Ok(())
     /// # }
     /// #

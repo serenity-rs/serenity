@@ -32,8 +32,10 @@
 //! ```rust,no_run
 //! #[macro_use] extern crate serenity;
 //!
-//! use serenity::client::Client;
-//! use serenity::prelude::EventHandler;
+//! # #[cfg(all(feature = "client", feature = "standard_framework"))]
+//! # mod inner {
+//! #
+//! use serenity::client::{Client, EventHandler};
 //! use serenity::framework::standard::StandardFramework;
 //! use std::env;
 //!
@@ -45,6 +47,7 @@
 //!     // Login with a bot token from the environment
 //!     let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"), Handler)
 //!         .expect("Error creating client");
+//!
 //!     client.with_framework(StandardFramework::new()
 //!         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
 //!         .cmd("ping", ping));
@@ -58,6 +61,13 @@
 //! command!(ping(_context, message) {
 //!     let _ = message.reply("Pong!");
 //! });
+//! #
+//! # }
+//! #
+//! # #[cfg(all(feature = "client", feature = "standard_framework"))]
+//! # fn main() { inner::main() }
+//! # #[cfg(not(all(feature = "client", feature = "standard_framework")))]
+//! # fn main() {}
 //! ```
 //!
 //! ### Full Examples
@@ -100,10 +110,12 @@
 
 #[macro_use]
 extern crate bitflags;
+#[allow(unused_imports)]
 #[macro_use]
 extern crate log;
 #[macro_use]
 extern crate serde_derive;
+#[allow(unused_imports)]
 #[macro_use]
 extern crate serde_json;
 
@@ -140,6 +152,7 @@ extern crate typemap;
 #[cfg(feature = "evzht9h3nznqzwl")]
 extern crate evzht9h3nznqzwl as websocket;
 
+#[allow(unused_imports)]
 #[cfg(test)]
 #[macro_use]
 extern crate matches;
