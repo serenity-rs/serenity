@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.5.7] - 2018-08-09
+
+This is a hotfix release for an incorrect warning about cache deadlocking during
+event dispatches in the client and fixing some routing method typos due to the
+HTTP rewrite.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@Lymia]
+- [@zeyla]
+
+### Fixed
+
+- [client] Fix erroneous deadlock detection messages ([@Lymia]) [c:d1266fc]
+- [http] Fix some routing issues ([@zeyla]) [c:04b410e]
+
+### Misc.
+
+- Slightly reword a cache update comment ([@acdenisSK]) [c:3a58090]
+
 ## [0.5.6] - 2018-08-07
 
 This is a bugfix release that fixes a long-standing bug causing shards to
@@ -2229,6 +2250,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.5.7]: https://github.com/serenity-rs/serenity/compare/v0.5.6...v0.5.7
 [0.5.6]: https://github.com/serenity-rs/serenity/compare/v0.5.5...v0.5.6
 [0.5.5]: https://github.com/serenity-rs/serenity/compare/v0.5.4...v0.5.5
 [0.5.4]: https://github.com/serenity-rs/serenity/compare/v0.5.3...v0.5.4
@@ -2289,6 +2311,7 @@ Initial commit.
 [@joek13]: https://github.com/joek13
 [@Lakelezz]: https://github.com/Lakelezz
 [@lolzballs]: https://github.com/lolzballs
+[@Lymia]: https://github.com/Lymia
 [@khazhyk]: https://github.com/khazhyk
 [@megumisonoda]: https://github.com/megumisonoda
 [@Mishio595]: https://github.com/Mishio595
@@ -2307,6 +2330,10 @@ Initial commit.
 [@xentec]: https://github.com/xentec
 [@vityafx]: https://github.com/vityafx
 [@zeyla]: https://github.com/zeyla
+
+[c:04b410e]: https://github.com/serenity-rs/serenity/commit/04b410ee75b2eb29f32e66fc137d3992a4972f1d
+[c:3a58090]: https://github.com/serenity-rs/serenity/commit/3a580909c489c328f3faa10741debd4b063e7fbd
+[c:d1266fc]: https://github.com/serenity-rs/serenity/commit/d1266fc3051a436f87a4778c5081c2228eb50b1c
 
 [c:01e3c33]: https://github.com/serenity-rs/serenity/commit/01e3c331ed188e2b95bafa2fa0fc63d5c0c03905
 [c:02de778]: https://github.com/serenity-rs/serenity/commit/02de7789d72141434264e8bd7cee7e1fc65a043f
