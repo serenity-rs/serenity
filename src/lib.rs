@@ -228,7 +228,7 @@ lazy_static! {
     /// CACHE.write().settings_mut().max_messages(10);
     /// ```
     ///
-    /// [`CurrentUser`]: model/struct.CurrentUser.html
+    /// [`CurrentUser`]: model/user/struct.CurrentUser.html
     /// [`Cache`]: cache/struct.Cache.html
     /// [cache module documentation]: cache/index.html
     pub static ref CACHE: RwLock<Cache> = RwLock::new(Cache::default());

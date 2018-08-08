@@ -348,7 +348,7 @@ impl Guild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`Channel`]: ../channel/struct.Channel.html
+    /// [`Channel`]: ../channel/enum.Channel.html
     /// [`ModelError::InvalidPermissions`]:
     /// ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Channels]:
@@ -1498,7 +1498,7 @@ impl Guild {
     ///
     /// [`ModelError::InvalidPermissions`]:
     /// ../error/enum.Error.html#variant.InvalidPermissions
-    /// [`User`]: struct.User.html
+    /// [`User`]: ../user/struct.User.html
     /// [Ban Members]:
     /// ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {

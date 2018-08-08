@@ -50,7 +50,7 @@ pub struct Role {
     ///
     /// See the [`permissions`] module for more information.
     ///
-    /// [`permissions`]: permissions/index.html
+    /// [`permissions`]: ../permissions/index.html
     pub permissions: Permissions,
     /// The role's position in the position list. Roles are considered higher in
     /// hierarchy if their position is higher.
@@ -65,7 +65,8 @@ impl Role {
     ///
     /// **Note** Requires the [Manage Roles] permission.
     ///
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]:
+    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "cache")]
     #[inline]
     pub fn delete(&self) -> Result<()> { http::delete_role(self.find_guild()?.0, self.id.0) }
@@ -87,7 +88,8 @@ impl Role {
     /// ```
     ///
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]:
+    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(all(feature = "builder", feature = "cache"))]
     pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
         self.find_guild()
@@ -101,7 +103,7 @@ impl Role {
     /// Returns a [`ModelError::GuildNotFound`] if a guild is not in the cache
     /// that contains the role.
     ///
-    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
+    /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     #[cfg(feature = "cache")]
     pub fn find_guild(&self) -> Result<GuildId> {
         for guild in CACHE.read().guilds.values() {

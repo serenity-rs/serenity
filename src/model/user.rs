@@ -460,7 +460,7 @@ impl User {
     /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
     /// is a bot user.
     ///
-    /// [`ModelError::MessagingBot`]: error/enum.Error.html#variant.MessagingBot
+    /// [`ModelError::MessagingBot`]: ../error/enum.Error.html#variant.MessagingBot
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     /// [`User::dm`]: struct.User.html#method.dm
     // A tale with Clippy:
@@ -537,7 +537,7 @@ impl User {
     /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
     /// is a bot user.
     ///
-    /// [`ModelError::MessagingBot`]: enum.ModelError.html#variant.MessagingBot
+    /// [`ModelError::MessagingBot`]: ../error/enum.Error.html#variant.MessagingBot
     /// [direct_message]: #method.direct_message
     #[cfg(feature = "builder")]
     #[inline]

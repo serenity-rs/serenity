@@ -20,7 +20,7 @@ pub struct ApplicationInfo {
     /// If a bot is public, anyone may invite it to their [`Guild`]. While a bot
     /// is private, only the owner may add it to a guild.
     ///
-    /// [`Guild`]: struct.Guild.html
+    /// [`Guild`]: ../guild/struct.Guild.html
     #[serde(default = "default_true")]
     pub bot_public: bool,
     /// Indicator of whether the bot requires an OAuth2 code grant.

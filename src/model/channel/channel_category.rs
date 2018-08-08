@@ -49,7 +49,8 @@ impl ChannelCategory {
     ///
     /// **Note**: Requires the [Manage Channel] permission.
     ///
-    /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
+    /// [Manage Channel]:
+    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[inline]
     pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
         self.id.delete_permission(permission_type)

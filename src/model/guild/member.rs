@@ -67,7 +67,7 @@ pub struct Member {
     ///
     /// Can't be longer than 32 characters.
     pub nick: Option<String>,
-    /// Vector of Ids of [`Role`]s given to the member.
+    /// Vector of Ids of [`Role`](struct.Role.html)s given to the member.
     pub roles: Vec<RoleId>,
     /// Attached User struct.
     #[serde(deserialize_with = "deserialize_sync_user",
@@ -83,7 +83,8 @@ impl Member {
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]:
+    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "cache")]
     #[inline]
     pub fn add_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
@@ -112,7 +113,8 @@ impl Member {
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]:
+    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "cache")]
     pub fn add_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         self.roles.extend_from_slice(role_ids);
@@ -140,9 +142,9 @@ impl Member {
     /// Returns a [`ModelError::GuildNotFound`] if the guild could not be
     /// found.
     ///
-    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
-    ///
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
+    /// [Ban Members]:
+    /// ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "cache")]
     #[inline]
     pub fn ban<BO: BanOptions>(&self, ban_options: &BO) -> Result<()> {
@@ -235,8 +237,8 @@ impl Member {
     /// See [`EditMember`] for the permission(s) required for separate builder
     /// methods, as well as usage of this.
     ///
-    /// [`Guild::edit_member`]: ../model/guild/struct.Guild.html#method.edit_member
-    /// [`EditMember`]: ../builder/struct.EditMember.html
+    /// [`Guild::edit_member`]: struct.Guild.html#method.edit_member
+    /// [`EditMember`]: ../../builder/struct.EditMember.html
     #[cfg(feature = "cache")]
     pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F) -> Result<()> {
         let map = utils::vecmap_to_json_map(f(EditMember::default()).0);
@@ -312,9 +314,10 @@ impl Member {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform the kick.
     ///
-    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Kick Members]:
+    /// ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     pub fn kick(&self) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -353,8 +356,8 @@ impl Member {
     /// And/or returns [`ModelError::ItemMissing`] if the "default channel" of the guild is not
     /// found.
     ///
-    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
-    /// [`ModelError::ItemMissing`]: enum.ModelError.html#variant.ItemMissing
+    /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
+    /// [`ModelError::ItemMissing`]: ../error/enum.Error.html#variant.ItemMissing
     #[cfg(feature = "cache")]
     pub fn permissions(&self) -> Result<Permissions> {
         let guild = match self.guild_id.find() {
@@ -373,7 +376,8 @@ impl Member {
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]:
+    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "cache")]
     #[inline]
     pub fn remove_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
@@ -401,7 +405,8 @@ impl Member {
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]:
+    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "cache")]
     pub fn remove_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         self.roles.retain(|r| !role_ids.contains(r));
@@ -447,9 +452,11 @@ impl Member {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`User`]: struct.User.html
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    /// [`ModelError::InvalidPermissions`]:
+    /// ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`User`]: ../user/struct.User.html
+    /// [Ban Members]:
+    /// ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "cache")]
     pub fn unban(&self) -> Result<()> {
         http::remove_ban(self.guild_id.0, self.user.read().id.0)

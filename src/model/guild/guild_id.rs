@@ -285,8 +285,9 @@ impl GuildId {
     /// **Note**: Requires the current user to have the [Manage Guild]
     /// permission.
     ///
-    /// [`Guild::edit`]: struct.Guild.html#method.edit
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [`Guild::edit`]: ../guild/struct.Guild.html#method.edit
+    /// [Manage Guild]:
+    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn edit<F: FnOnce(EditGuild) -> EditGuild>(&mut self, f: F) -> Result<PartialGuild> {
         let map = utils::vecmap_to_json_map(f(EditGuild::default()).0);

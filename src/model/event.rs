@@ -34,7 +34,7 @@ use std::mem;
 /// [`Channel`]: ../channel/enum.Channel.html
 /// [`Group`]: ../channel/struct.Group.html
 /// [`Guild`]: ../guild/struct.Guild.html
-/// [`PrivateChannel`]: ../struct.PrivateChannel.html
+/// [`PrivateChannel`]: ../channel/struct.PrivateChannel.html
 #[derive(Clone, Debug)]
 pub struct ChannelCreateEvent {
     /// The channel that was created.

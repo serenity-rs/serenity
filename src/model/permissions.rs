@@ -164,35 +164,35 @@ __impl_bitflags! {
     Permissions: u64 {
         /// Allows for the creation of [`RichInvite`]s.
         ///
-        /// [`RichInvite`]: ../struct.RichInvite.html
+        /// [`RichInvite`]: ../invite/struct.RichInvite.html
         CREATE_INVITE = 0b0000_0000_0000_0000_0000_0000_0000_0001;
         /// Allows for the kicking of guild [member]s.
         ///
-        /// [member]: ../struct.Member.html
+        /// [member]: ../guild/struct.Member.html
         KICK_MEMBERS = 0b0000_0000_0000_0000_0000_0000_0000_0010;
         /// Allows the banning of guild [member]s.
         ///
-        /// [member]: ../struct.Member.html
+        /// [member]: ../guild/struct.Member.html
         BAN_MEMBERS = 0b0000_0000_0000_0000_0000_0000_0000_0100;
         /// Allows all permissions, bypassing channel [permission overwrite]s.
         ///
-        /// [permission overwrite]: ../struct.PermissionOverwrite.html
+        /// [permission overwrite]: ../channel/struct.PermissionOverwrite.html
         ADMINISTRATOR = 0b0000_0000_0000_0000_0000_0000_0000_1000;
         /// Allows management and editing of guild [channel]s.
         ///
-        /// [channel]: ../struct.GuildChannel.html
+        /// [channel]: ../channel/struct.GuildChannel.html
         MANAGE_CHANNELS = 0b0000_0000_0000_0000_0000_0000_0001_0000;
         /// Allows management and editing of the [guild].
         ///
-        /// [guild]: ../struct.Guild.html
+        /// [guild]: ../guild/struct.Guild.html
         MANAGE_GUILD = 0b0000_0000_0000_0000_0000_0000_0010_0000;
         /// [`Member`]s with this permission can add new [`Reaction`]s to a
         /// [`Message`]. Members can still react using reactions already added
         /// to messages without this permission.
         ///
-        /// [`Member`]: ../struct.Member.html
-        /// [`Message`]: ../struct.Message.html
-        /// [`Reaction`]: ../struct.Reaction.html
+        /// [`Member`]: ../guild/struct.Member.html
+        /// [`Message`]: ../channel/struct.Message.html
+        /// [`Reaction`]: ../channel/struct.Reaction.html
         ADD_REACTIONS = 0b0000_0000_0000_0000_0000_0000_0100_0000;
         /// Allows viewing a guild's audit logs.
         VIEW_AUDIT_LOG = 0b0000_0000_0000_0000_0000_0000_1000_0000;
