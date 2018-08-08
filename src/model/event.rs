@@ -148,8 +148,7 @@ impl CacheUpdate for ChannelDeleteEvent {
 
                 cache.categories.remove(&channel_id);
             },
-            // We ignore these two due to the fact that the delete event for dms/groups
-            // will _not_ fire anymore.
+            // We ignore these because the delete event does not fire for these.
             Channel::Private(_) | Channel::Group(_) => unreachable!(),
         };
 
