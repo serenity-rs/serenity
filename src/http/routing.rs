@@ -921,7 +921,7 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::group_recipient(group_id, user_id)),
             ),
             RouteInfo::AddMemberRole { guild_id, role_id, user_id } => (
-                LightMethod::Delete,
+                LightMethod::Post,
                 Route::GuildsIdMembersIdRolesId(guild_id),
                 Cow::from(Route::guild_member_role(guild_id, user_id, role_id)),
             ),
@@ -932,7 +932,7 @@ impl<'a> RouteInfo<'a> {
                 user_id,
             } => (
                 // TODO
-                LightMethod::Delete,
+                LightMethod::Post,
                 Route::GuildsIdBansUserId(guild_id),
                 Cow::from(Route::guild_ban_optioned(
                     guild_id,
@@ -997,12 +997,12 @@ impl<'a> RouteInfo<'a> {
                 )),
             ),
             RouteInfo::CreateRole { guild_id } => (
-                LightMethod::Delete,
+                LightMethod::Post,
                 Route::GuildsIdRoles(guild_id),
                 Cow::from(Route::guild_roles(guild_id)),
             ),
             RouteInfo::CreateWebhook { channel_id } => (
-                LightMethod::Delete,
+                LightMethod::Post,
                 Route::ChannelsIdWebhooks(channel_id),
                 Cow::from(Route::channel_webhooks(channel_id)),
             ),
