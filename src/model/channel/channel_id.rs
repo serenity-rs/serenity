@@ -40,8 +40,7 @@ impl ChannelId {
     /// let _successful = ChannelId(7).broadcast_typing();
     /// ```
     ///
-    /// [Send Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[inline]
     pub fn broadcast_typing(&self) -> Result<()> { http::broadcast_typing(self.0) }
 
@@ -57,8 +56,7 @@ impl ChannelId {
     /// [`Member`]: ../guild/struct.Member.html
     /// [`PermissionOverwrite`]: ../channel/struct.PermissionOverwrite.html
     /// [`Role`]: ../guild/struct.Role.html
-    /// [Manage Channels]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     pub fn create_permission(&self, target: &PermissionOverwrite) -> Result<()> {
         let (id, kind) = match target.kind {
             PermissionOverwriteType::Member(id) => (id.0, "member"),
@@ -86,8 +84,7 @@ impl ChannelId {
     /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: ../channel/struct.Message.html
     /// [`Message::react`]: ../channel/struct.Message.html#method.react
-    /// [Add Reactions]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
+    /// [Add Reactions]: ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
     #[inline]
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
@@ -115,8 +112,7 @@ impl ChannelId {
     ///
     /// [`Message`]: ../channel/struct.Message.html
     /// [`Message::delete`]: ../channel/struct.Message.html#method.delete
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self._delete_message(message_id.into())
@@ -143,8 +139,7 @@ impl ChannelId {
     ///
     /// [`Channel::delete_messages`]: ../channel/enum.Channel.html#method.delete_messages
     /// [`ModelError::BulkDeleteAmount`]: ../error/enum.Error.html#variant.BulkDeleteAmount
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, message_ids: It) -> Result<()> {
         let ids = message_ids
             .into_iter()
@@ -172,8 +167,7 @@ impl ChannelId {
     ///
     /// **Note**: Requires the [Manage Channel] permission.
     ///
-    /// [Manage Channel]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
         http::delete_permission(
             self.0,
@@ -190,8 +184,7 @@ impl ChannelId {
     /// user did not perform the reaction.
     ///
     /// [`Reaction`]: ../channel/struct.Reaction.html
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn delete_reaction<M, R>(&self,
                                  message_id: M,
@@ -238,8 +231,7 @@ impl ChannelId {
     /// ```
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
-    /// [Manage Channel]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "utils")]
     #[inline]
     pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel> {
@@ -311,8 +303,7 @@ impl ChannelId {
     /// Gets all of the channel's invites.
     ///
     /// Requires the [Manage Channels] permission.
-    /// [Manage Channels]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[inline]
     pub fn invites(&self) -> Result<Vec<RichInvite>> { http::get_channel_invites(self.0) }
 
@@ -320,8 +311,7 @@ impl ChannelId {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         self._message(message_id.into())
@@ -342,8 +332,7 @@ impl ChannelId {
     /// Requires the [Read Message History] permission.
     ///
     /// [`Channel::messages`]: ../channel/enum.Channel.html#method.messages
-    /// [Read Message History]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
         let mut map = f(GetMessages::default()).0;
@@ -425,8 +414,7 @@ impl ChannelId {
     /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: ../channel/struct.Message.html
     /// [`User`]: ../user/struct.User.html
-    /// [Read Message History]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     pub fn reaction_users<M, R, U>(&self,
         message_id: M,
         reaction_type: R,
@@ -526,16 +514,12 @@ impl ChannelId {
     /// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
     /// if the file is too large to send.
     ///
-    /// [`ClientError::MessageTooLong`]:
-    /// ../../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`ClientError::MessageTooLong`]: ../../client/enum.ClientError.html#variant.MessageTooLong
     /// [`HttpError::InvalidRequest`]: ../../http/enum.HttpError.html#variant.InvalidRequest
-    /// [`CreateMessage::content`]:
-    /// ../../builder/struct.CreateMessage.html#method.content
+    /// [`CreateMessage::content`]: ../../builder/struct.CreateMessage.html#method.content
     /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [Attach Files]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
-    /// [Send Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "utils")]
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
@@ -575,8 +559,7 @@ impl ChannelId {
     /// [`Channel`]: ../channel/enum.Channel.html
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
-    /// [Send Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "utils")]
     pub fn send_message<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
@@ -602,8 +585,7 @@ impl ChannelId {
     /// Requires the [Manage Messages] permission.
     ///
     /// [`Message`]: ../channel/struct.Message.html
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self._unpin(message_id.into())
@@ -617,8 +599,7 @@ impl ChannelId {
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
-    /// [Manage Webhooks]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
+    /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> { http::get_channel_webhooks(self.0) }
 }

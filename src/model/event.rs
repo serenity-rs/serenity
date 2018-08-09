@@ -1343,16 +1343,14 @@ pub enum Event {
     /// Fires the [`Client::channel_delete`] event.
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
-    /// [`Client::channel_delete`]:
-    /// ../../client/struct.Client.html#channel_delete
+    /// [`Client::channel_delete`]: ../../client/struct.Client.html#channel_delete
     ChannelDelete(ChannelDeleteEvent),
     /// The pins for a [`Channel`] have been updated.
     ///
     /// Fires the [`Client::channel_pins_update`] event.
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
-    /// [`Client::channel_pins_update`]:
-    /// ../../client/struct.Client.html#channel_pins_update
+    /// [`Client::channel_pins_update`]: ../../client/struct.Client.html#channel_pins_update
     ChannelPinsUpdate(ChannelPinsUpdateEvent),
     /// A [`User`] has been added to a [`Group`].
     ///
@@ -1415,8 +1413,7 @@ pub enum Event {
     ///
     /// Fires the [`reaction_remove`] event handler.
     ///
-    /// [`reaction_remove`]:
-    /// ../../prelude/trait.EventHandler.html#method.reaction_remove
+    /// [`reaction_remove`]: ../../prelude/trait.EventHandler.html#method.reaction_remove
     ReactionRemove(ReactionRemoveEvent),
     /// A request was issued to remove all [`Reaction`]s from a [`Message`].
     ///

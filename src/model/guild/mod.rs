@@ -222,14 +222,11 @@ impl Guild {
     /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
     /// days' worth of messages to delete is over the maximum.
     ///
-    /// [`ModelError::DeleteMessageDaysAmount`]:
-    /// ../error/enum.Error.html#variant.DeleteMessageDaysAmount
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::DeleteMessageDaysAmount`]: ../error/enum.Error.html#variant.DeleteMessageDaysAmount
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Guild::ban`]: ../guild/struct.Guild.html#method.ban
     /// [`User`]: ../user/struct.User.html
-    /// [Ban Members]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
+    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[inline]
     pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: &BO) -> Result<()> {
         self._ban(user.into(), options)
@@ -260,10 +257,8 @@ impl Guild {
     /// if the current user does not have permission to perform bans.
     ///
     /// [`Ban`]: struct.Ban.html
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
-    /// [Ban Members]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     pub fn bans(&self) -> Result<Vec<Ban>> {
         #[cfg(feature = "cache")]
         {
@@ -349,10 +344,8 @@ impl Guild {
     /// if the current user does not have permission to perform bans.
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
-    /// [Manage Channels]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
         where C: Into<Option<ChannelId>> {
         #[cfg(feature = "cache")]
@@ -385,8 +378,7 @@ impl Guild {
     ///
     /// [`EditProfile::avatar`]: ../../builder/struct.EditProfile.html#method.avatar
     /// [`utils::read_image`]: ../../utils/fn.read_image.html
-    /// [Manage Emojis]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
+    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
     pub fn create_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
         self.id.create_emoji(name, image)
@@ -396,8 +388,7 @@ impl Guild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn create_integration<I>(&self, integration_id: I, kind: &str) -> Result<()>
         where I: Into<IntegrationId> {
@@ -423,11 +414,9 @@ impl Guild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     pub fn create_role<F>(&self, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole {
         #[cfg(feature = "cache")]
@@ -452,8 +441,7 @@ impl Guild {
     /// If the `cache` is enabled, then returns a [`ModelError::InvalidUser`]
     /// if the current user is not the guild owner.
     ///
-    /// [`ModelError::InvalidUser`]:
-    /// ../error/enum.Error.html#variant.InvalidUser
+    /// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser
     pub fn delete(&self) -> Result<PartialGuild> {
         #[cfg(feature = "cache")]
         {
@@ -472,8 +460,7 @@ impl Guild {
     /// Requires the [Manage Emojis] permission.
     ///
     /// [`Emoji`]: struct.Emoji.html
-    /// [Manage Emojis]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
+    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
     pub fn delete_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<()> {
         self.id.delete_emoji(emoji_id)
@@ -483,8 +470,7 @@ impl Guild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn delete_integration<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
         self.id.delete_integration(integration_id)
@@ -499,8 +485,7 @@ impl Guild {
     ///
     /// [`Role`]: struct.Role.html
     /// [`Role::delete`]: struct.Role.html#method.delete
-    /// [Manage Roles]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
     pub fn delete_role<R: Into<RoleId>>(&self, role_id: R) -> Result<()> {
         self.id.delete_role(role_id)
@@ -532,10 +517,8 @@ impl Guild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
-    /// [Manage Guild]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditGuild) -> EditGuild {
         #[cfg(feature = "cache")]
@@ -578,8 +561,7 @@ impl Guild {
     ///
     /// [`Emoji`]: struct.Emoji.html
     /// [`Emoji::edit`]: struct.Emoji.html#method.edit
-    /// [Manage Emojis]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
+    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
     pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str) -> Result<Emoji> {
         self.id.edit_emoji(emoji_id, name)
@@ -616,10 +598,8 @@ impl Guild {
     /// if the current user does not have permission to change their own
     /// nickname.
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
-    /// [Change Nickname]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.CHANGE_NICKNAME
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Change Nickname]: ../permissions/struct.Permissions.html#associatedconstant.CHANGE_NICKNAME
     pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -645,8 +625,7 @@ impl Guild {
     /// guild.edit_role(RoleId(7), |r| r.hoist(true));
     /// ```
     ///
-    /// [Manage Roles]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
     pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
@@ -666,8 +645,7 @@ impl Guild {
     /// ```
     ///
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
     pub fn edit_role_position<R>(&self, role_id: R, position: u64) -> Result<Vec<Role>>
         where R: Into<RoleId> {
@@ -774,10 +752,8 @@ impl Guild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
-    /// [Manage Guild]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     pub fn invites(&self) -> Result<Vec<RichInvite>> {
         #[cfg(feature = "cache")]
         {
@@ -801,8 +777,7 @@ impl Guild {
     /// Requires the [Kick Members] permission.
     ///
     /// [`Member`]: struct.Member.html
-    /// [Kick Members]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
+    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[inline]
     pub fn kick<U: Into<UserId>>(&self, user_id: U) -> Result<()> { self.id.kick(user_id) }
 
@@ -1196,8 +1171,7 @@ impl Guild {
     ///
     /// Requires the [Move Members] permission.
     ///
-    /// [Move Members]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
+    /// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
     #[inline]
     pub fn move_member<C, U>(&self, user_id: U, channel_id: C) -> Result<()>
         where C: Into<ChannelId>, U: Into<UserId> {
@@ -1372,12 +1346,10 @@ impl Guild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
-    /// [Kick Members]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
+    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     pub fn prune_count(&self, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
@@ -1450,8 +1422,7 @@ impl Guild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn start_integration_sync<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
         self.id.start_integration_sync(integration_id)
@@ -1468,12 +1439,10 @@ impl Guild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
-    /// [Kick Members]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
+    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     pub fn start_prune(&self, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
@@ -1496,11 +1465,9 @@ impl Guild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`User`]: ../user/struct.User.html
-    /// [Ban Members]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
+    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -1518,8 +1485,7 @@ impl Guild {
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn vanity_url(&self) -> Result<String> {
         self.id.vanity_url()
@@ -1529,8 +1495,7 @@ impl Guild {
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
-    /// [Manage Webhooks]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
+    /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> { self.id.webhooks() }
 

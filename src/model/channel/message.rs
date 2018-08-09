@@ -138,12 +138,9 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
-    /// [`ModelError::InvalidUser`]:
-    /// ../error/enum.Error.html#variant.InvalidUser
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     pub fn delete(&self) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -169,11 +166,9 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Reaction`]: struct.Reaction.html
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     pub fn delete_reactions(&self) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -320,8 +315,7 @@ impl Message {
     /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: struct.Message.html
     /// [`User`]: ../user/struct.User.html
-    /// [Read Message History]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn reaction_users<R, U>(
         &self,
@@ -408,10 +402,8 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES.html
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES.html
     pub fn pin(&self) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -435,8 +427,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have the
     /// required [permissions].
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [Add Reactions]: 
     /// ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
@@ -478,12 +469,9 @@ impl Message {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
-    /// [`ModelError::MessageTooLong`]:
-    /// ../error/enum.Error.html#variant.MessageTooLong
-    /// [Send Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     pub fn reply(&self, content: &str) -> Result<Message> {
         if let Some(length_over) = Message::overflow_length(content) {
             return Err(Error::Model(ModelError::MessageTooLong(length_over)));
@@ -539,10 +527,8 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     pub fn unpin(&self) -> Result<()> {
         #[cfg(feature = "cache")]
         {

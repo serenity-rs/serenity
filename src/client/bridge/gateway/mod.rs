@@ -1,4 +1,4 @@
-//! The client gateway bridge is support essential for the [`client`](../../index.html) module.
+//! The client gateway bridge is support essential for the [`client`][client] module.
 //!
 //! This is made available for user use if one wishes to be lower-level or avoid
 //! the higher functionality of the [`Client`].
@@ -38,6 +38,7 @@
 //! For almost every - if not every - use case, you only need to _possibly_ be
 //! concerned about the [`ShardManager`] in this module.
 //!
+//! [client]: ../../index.html
 //! [`Client`]: ../../struct.Client.html
 //! [`Shard`]: ../../../gateway/struct.Shard.html
 //! [`ShardManager`]: struct.ShardManager.html

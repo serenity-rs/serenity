@@ -83,8 +83,7 @@ impl Member {
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "cache")]
     #[inline]
     pub fn add_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
@@ -113,8 +112,7 @@ impl Member {
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "cache")]
     pub fn add_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         self.roles.extend_from_slice(role_ids);
@@ -143,8 +141,7 @@ impl Member {
     /// found.
     ///
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
-    /// [Ban Members]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
+    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "cache")]
     #[inline]
     pub fn ban<BO: BanOptions>(&self, ban_options: &BO) -> Result<()> {
@@ -316,8 +313,7 @@ impl Member {
     ///
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
-    /// [Kick Members]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
+    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     pub fn kick(&self) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -376,8 +372,7 @@ impl Member {
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "cache")]
     #[inline]
     pub fn remove_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
@@ -405,8 +400,7 @@ impl Member {
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "cache")]
     pub fn remove_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
         self.roles.retain(|r| !role_ids.contains(r));
@@ -452,11 +446,9 @@ impl Member {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`User`]: ../user/struct.User.html
-    /// [Ban Members]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
+    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "cache")]
     pub fn unban(&self) -> Result<()> {
         http::remove_ban(self.guild_id.0, self.user.read().id.0)

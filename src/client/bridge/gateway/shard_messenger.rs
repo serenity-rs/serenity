@@ -106,8 +106,7 @@ impl ShardMessenger {
     /// # }
     /// ```
     ///
-    /// [`Event::GuildMembersChunk`]:
-    /// ../../../model/event/enum.Event.html#variant.GuildMembersChunk
+    /// [`Event::GuildMembersChunk`]: ../../../model/event/enum.Event.html#variant.GuildMembersChunk
     /// [`Guild`]: ../../../model/guild/struct.Guild.html
     /// [`Member`]: ../../../model/guild/struct.Member.html
     pub fn chunk_guilds<It>(

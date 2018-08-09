@@ -53,7 +53,7 @@ use client::CACHE;
 #[cfg(feature = "cache")]
 use model::channel::Channel;
 
-/// A convenience macro for generating a struct fulfilling the [`Command`](framework/standard/trait.Command.html) trait.
+/// A convenience macro for generating a struct fulfilling the [`Command`][command trait] trait.
 ///
 /// This is meant for use with the [`StandardFramework`], specifically `Framework`::{[`cmd`]/[`command`]}.
 ///
@@ -87,6 +87,7 @@ use model::channel::Channel;
 /// });
 /// ```
 ///
+/// [command trait]: framework/standard/trait.Command.html
 /// [`StandardFramework`]: framework/standard/struct.StandardFramework.html
 /// [`cmd`]: framework/standard/struct.StandardFramework.html#method.cmd
 /// [`command`]: framework/standard/struct.StandardFramework.html#method.command
@@ -218,8 +219,7 @@ pub struct StandardFramework {
     /// framework check if a [`Event::MessageCreate`] should be processed by
     /// itself.
     ///
-    /// [`EventHandler::message`]:
-    /// ../../client/trait.EventHandler.html#method.message
+    /// [`EventHandler::message`]: ../../client/trait.EventHandler.html#method.message
     /// [`Event::MessageCreate`]: ../../model/event/enum.Event.html#variant.MessageCreate
     pub initialized: bool,
     user_id: u64,

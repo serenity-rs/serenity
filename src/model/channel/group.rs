@@ -82,8 +82,7 @@ impl Group {
     /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: struct.Message.html
     /// [`Message::react`]: struct.Message.html#method.react
-    /// [Add Reactions]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
+    /// [Add Reactions]: ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
     #[inline]
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
@@ -106,8 +105,7 @@ impl Group {
     ///
     /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
     /// [`ModelError::BulkDeleteAmount`]: ../error/enum.Error.html#variant.BulkDeleteAmount
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, message_ids: It) -> Result<()> {
         self.channel_id.delete_messages(message_ids)
@@ -118,8 +116,7 @@ impl Group {
     ///
     /// **Note**: Requires the [Manage Channel] permission.
     ///
-    /// [Manage Channel]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[inline]
     pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
         self.channel_id.delete_permission(permission_type)
@@ -131,8 +128,7 @@ impl Group {
     /// user did not perform the reaction.
     ///
     /// [`Reaction`]: struct.Reaction.html
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn delete_reaction<M, R>(&self,
                                  message_id: M,
@@ -195,8 +191,7 @@ impl Group {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         self.channel_id.message(message_id)
@@ -206,8 +201,7 @@ impl Group {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
@@ -252,8 +246,7 @@ impl Group {
     /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: struct.Message.html
     /// [`User`]: ../user/struct.User.html
-    /// [Read Message History]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn reaction_users<M, R, U>(
         &self,
@@ -314,10 +307,8 @@ impl Group {
     ///
     /// [`ChannelId::send_files`]: ../id/struct.ChannelId.html#method.send_files
     /// [`ClientError::MessageTooLong`]: ../../client/enum.ClientError.html#variant.MessageTooLong
-    /// [Attach Files]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
-    /// [Send Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[inline]
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
@@ -332,8 +323,7 @@ impl Group {
     /// **Note**: Requires the [Send Messages] permission.
     ///
     /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
-    /// [Send Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[inline]
     pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
         self.channel_id.send_message(f)
@@ -344,8 +334,7 @@ impl Group {
     /// Requires the [Manage Messages] permission.
     ///
     /// [`Message`]: struct.Message.html
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.channel_id.unpin(message_id)

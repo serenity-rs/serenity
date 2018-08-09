@@ -48,8 +48,7 @@ impl Reaction {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn channel(&self) -> Result<Channel> {
         self.channel_id.get()
@@ -67,10 +66,8 @@ impl Reaction {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required [permissions].
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     /// [permissions]: ../permissions/index.html
     pub fn delete(&self) -> Result<()> {
         let user_id = feature_cache! {
@@ -112,8 +109,7 @@ impl Reaction {
     /// your own message cache or otherwise having the message available if
     /// possible.
     ///
-    /// [Read Message History]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     /// [`Message`]: struct.Message.html
     #[inline]
     pub fn message(&self) -> Result<Message> {
@@ -149,13 +145,11 @@ impl Reaction {
     /// Returns a [`ModelError::InvalidPermissions`] if the current user does
     /// not have the required [permissions].
     ///
-    /// [`ModelError::InvalidPermissions`]:
-    /// ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: struct.Message.html
     /// [`User`]: ../user/struct.User.html
-    /// [Read Message History]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     /// [permissions]: ../permissions/index.html
     #[inline]
     pub fn users<R, U>(&self,

@@ -65,8 +65,7 @@ impl Role {
     ///
     /// **Note** Requires the [Manage Roles] permission.
     ///
-    /// [Manage Roles]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "cache")]
     #[inline]
     pub fn delete(&self) -> Result<()> { http::delete_role(self.find_guild()?.0, self.id.0) }
@@ -88,8 +87,7 @@ impl Role {
     /// ```
     ///
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(all(feature = "builder", feature = "cache"))]
     pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
         self.find_guild()

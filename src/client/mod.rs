@@ -174,8 +174,7 @@ pub struct Client {
     /// [`Event::MessageDelete`]: ../model/event/enum.Event.html#variant.MessageDelete
     /// [`Event::MessageDeleteBulk`]: ../model/event/enum.Event.html#variant.MessageDeleteBulk
     /// [`Event::MessageUpdate`]: ../model/event/enum.Event.html#variant.MessageUpdate
-    /// [example 05]:
-    /// https://github.com/serenity-rs/serenity/tree/master/examples/05_command_framework
+    /// [example 05]: https://github.com/serenity-rs/serenity/tree/master/examples/05_command_framework
     pub data: Arc<Mutex<ShareMap>>,
     /// A vector of all active shards that have received their [`Event::Ready`]
     /// payload, and have dispatched to [`on_ready`] if an event handler was

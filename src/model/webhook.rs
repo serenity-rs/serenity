@@ -224,8 +224,7 @@ impl WebhookId {
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
-    /// [Manage Webhooks]:
-    /// ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
+    /// [Manage Webhooks]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[inline]
     pub fn get(self) -> Result<Webhook> { http::get_webhook(self.0) }
 }

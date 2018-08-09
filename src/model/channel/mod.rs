@@ -227,8 +227,7 @@ impl Channel {
     /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: struct.Message.html
     /// [`Message::react`]: struct.Message.html#method.react
-    /// [Add Reactions]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
+    /// [Add Reactions]: ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -272,8 +271,7 @@ impl Channel {
     ///
     /// [`Message`]: struct.Message.html
     /// [`Message::delete`]: struct.Message.html#method.delete
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -287,8 +285,7 @@ impl Channel {
     /// user did not perform the reaction.
     ///
     /// [`Reaction`]: struct.Reaction.html
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -348,8 +345,7 @@ impl Channel {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -372,8 +368,7 @@ impl Channel {
     /// let _messages = channel.messages(|g| g.after(id).limit(100));
     /// ```
     ///
-    /// [Read Message History]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -397,8 +392,7 @@ impl Channel {
     /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: struct.Message.html
     /// [`User`]: ../user/struct.User.html
-    /// [Read Message History]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -458,12 +452,9 @@ impl Channel {
     /// of unicode code points over the limit.
     ///
     /// [`ChannelId::send_files`]: ../id/struct.ChannelId.html#method.send_files
-    /// [`ClientError::MessageTooLong`]:
-    /// ../../client/enum.ClientError.html#variant.MessageTooLong
-    /// [Attach Files]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
-    /// [Send Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [`ClientError::MessageTooLong`]: ../../client/enum.ClientError.html#variant.MessageTooLong
+    /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -490,8 +481,7 @@ impl Channel {
     /// [`Channel`]: enum.Channel.html
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
-    /// [Send Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -505,8 +495,7 @@ impl Channel {
     /// Requires the [Manage Messages] permission.
     ///
     /// [`Message`]: struct.Message.html
-    /// [Manage Messages]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
