@@ -916,12 +916,12 @@ impl<'a> RouteInfo<'a> {
     pub fn deconstruct(&self) -> (LightMethod, Route, Cow<str>) {
         match *self {
             RouteInfo::AddGroupRecipient { group_id, user_id } => (
-                LightMethod::Post,
+                LightMethod::Put,
                 Route::None,
                 Cow::from(Route::group_recipient(group_id, user_id)),
             ),
             RouteInfo::AddMemberRole { guild_id, role_id, user_id } => (
-                LightMethod::Post,
+                LightMethod::Put,
                 Route::GuildsIdMembersIdRolesId(guild_id),
                 Cow::from(Route::guild_member_role(guild_id, user_id, role_id)),
             ),
@@ -932,7 +932,7 @@ impl<'a> RouteInfo<'a> {
                 user_id,
             } => (
                 // TODO
-                LightMethod::Post,
+                LightMethod::Put,
                 Route::GuildsIdBansUserId(guild_id),
                 Cow::from(Route::guild_ban_optioned(
                     guild_id,
@@ -977,7 +977,7 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::channel_messages(channel_id, None)),
             ),
             RouteInfo::CreatePermission { channel_id, target_id } => (
-                LightMethod::Post,
+                LightMethod::Put,
                 Route::ChannelsIdPermissionsOverwriteId(channel_id),
                 Cow::from(Route::channel_permission(channel_id, target_id)),
             ),
