@@ -103,8 +103,8 @@ impl Attachment {
     /// Returns an [`Error::Hyper`] when there is a problem retrieving the
     /// attachment.
     ///
-    /// [`Error::Hyper`]: ../enum.Error.html#variant.Hyper
-    /// [`Error::Io`]: ../enum.Error.html#variant.Io
+    /// [`Error::Hyper`]: ../../enum.Error.html#variant.Hyper
+    /// [`Error::Io`]: ../../enum.Error.html#variant.Io
     /// [`Message`]: struct.Message.html
     pub fn download(&self) -> Result<Vec<u8>> {
         let hyper = request_client!();

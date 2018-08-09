@@ -41,14 +41,14 @@ pub enum Channel {
     Group(Arc<RwLock<Group>>),
     /// A [text] or [voice] channel within a [`Guild`].
     ///
-    /// [`Guild`]: struct.Guild.html
+    /// [`Guild`]: ../guild/struct.Guild.html
     /// [text]: enum.ChannelType.html#variant.Text
     /// [voice]: enum.ChannelType.html#variant.Voice
     Guild(Arc<RwLock<GuildChannel>>),
     /// A private channel to another [`User`]. No other users may access the
     /// channel. For multi-user "private channels", use a group.
     ///
-    /// [`User`]: struct.User.html
+    /// [`User`]: ../user/struct.User.html
     Private(Arc<RwLock<PrivateChannel>>),
     /// A category of [`GuildChannel`]s
     ///
@@ -224,10 +224,10 @@ impl Channel {
     /// Requires the [Add Reactions] permission, _if_ the current user is the
     /// first user to perform a react with a certain emoji.
     ///
-    /// [`Emoji`]: struct.Emoji.html
+    /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: struct.Message.html
     /// [`Message::react`]: struct.Message.html#method.react
-    /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
+    /// [Add Reactions]: ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -271,7 +271,7 @@ impl Channel {
     ///
     /// [`Message`]: struct.Message.html
     /// [`Message::delete`]: struct.Message.html#method.delete
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -285,7 +285,7 @@ impl Channel {
     /// user did not perform the reaction.
     ///
     /// [`Reaction`]: struct.Reaction.html
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -314,10 +314,10 @@ impl Channel {
     /// is over the [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`EditMessage`]: ../builder/struct.EditMessage.html
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
+    /// [`EditMessage`]: ../../builder/struct.EditMessage.html
     /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
+    /// [`the limit`]: ../../builder/struct.EditMessage.html#method.content
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -345,7 +345,7 @@ impl Channel {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -368,7 +368,7 @@ impl Channel {
     /// let _messages = channel.messages(|g| g.after(id).limit(100));
     /// ```
     ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -389,10 +389,10 @@ impl Channel {
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
-    /// [`Emoji`]: struct.Emoji.html
+    /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: struct.Message.html
-    /// [`User`]: struct.User.html
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [`User`]: ../user/struct.User.html
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -430,8 +430,8 @@ impl Channel {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ChannelId`]: struct.ChannelId.html
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    /// [`ChannelId`]: ../id/struct.ChannelId.html
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -451,10 +451,10 @@ impl Channel {
     /// [`ClientError::MessageTooLong`] will be returned, containing the number
     /// of unicode code points over the limit.
     ///
-    /// [`ChannelId::send_files`]: struct.ChannelId.html#method.send_files
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    /// [`ChannelId::send_files`]: ../id/struct.ChannelId.html#method.send_files
+    /// [`ClientError::MessageTooLong`]: ../../client/enum.ClientError.html#variant.MessageTooLong
+    /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -479,9 +479,9 @@ impl Channel {
     /// over the limit.
     ///
     /// [`Channel`]: enum.Channel.html
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
+    /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]
@@ -495,7 +495,7 @@ impl Channel {
     /// Requires the [Manage Messages] permission.
     ///
     /// [`Message`]: struct.Message.html
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[cfg(feature = "model")]
     #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
     #[inline]

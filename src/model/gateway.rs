@@ -261,12 +261,12 @@ pub struct Gateway {
 
 /// Information detailing the current online status of a [`User`].
 ///
-/// [`User`]: struct.User.html
+/// [`User`]: ../user/struct.User.html
 #[derive(Clone, Debug)]
 pub struct Presence {
     /// The game that a [`User`] is current playing.
     ///
-    /// [`User`]: struct.User.html
+    /// [`User`]: ../user/struct.User.html
     pub game: Option<Game>,
     /// The date of the last presence update.
     pub last_modified: Option<u64>,
@@ -274,7 +274,7 @@ pub struct Presence {
     pub nick: Option<String>,
     /// The user's online status.
     pub status: OnlineStatus,
-    /// The Id of the [`User`]. Can be used to calculate the user's creation
+    /// The Id of the [`User`](../user/struct.User.html). Can be used to calculate the user's creation
     /// date.
     pub user_id: UserId,
     /// The associated user instance.

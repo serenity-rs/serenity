@@ -59,8 +59,8 @@ use utils::VecMap;
 /// client.start().unwrap();
 /// ```
 ///
-/// [`GuildChannel::create_invite`]: ../model/guild/struct.GuildChannel.html#method.create_invite
-/// [`RichInvite`]: ../model/guild/struct.Invite.html
+/// [`GuildChannel::create_invite`]: ../model/channel/struct.GuildChannel.html#method.create_invite
+/// [`RichInvite`]: ../model/invite/struct.RichInvite.html
 #[derive(Clone, Debug)]
 pub struct CreateInvite(pub VecMap<&'static str, Value>);
 

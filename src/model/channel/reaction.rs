@@ -34,7 +34,7 @@ pub struct Reaction {
     pub message_id: MessageId,
     /// The Id of the [`User`] that sent the reaction.
     ///
-    /// [`User`]: struct.User.html
+    /// [`User`]: ../user/struct.User.html
     pub user_id: UserId,
 }
 
@@ -48,7 +48,7 @@ impl Reaction {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn channel(&self) -> Result<Channel> {
         self.channel_id.get()
@@ -66,9 +66,9 @@ impl Reaction {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required [permissions].
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
-    /// [permissions]: permissions
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [permissions]: ../permissions/index.html
     pub fn delete(&self) -> Result<()> {
         let user_id = feature_cache! {
             {
@@ -109,7 +109,7 @@ impl Reaction {
     /// your own message cache or otherwise having the message available if
     /// possible.
     ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     /// [`Message`]: struct.Message.html
     #[inline]
     pub fn message(&self) -> Result<Message> {
@@ -145,12 +145,12 @@ impl Reaction {
     /// Returns a [`ModelError::InvalidPermissions`] if the current user does
     /// not have the required [permissions].
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`Emoji`]: struct.Emoji.html
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: struct.Message.html
-    /// [`User`]: struct.User.html
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
-    /// [permissions]: permissions
+    /// [`User`]: ../user/struct.User.html
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [permissions]: ../permissions/index.html
     #[inline]
     pub fn users<R, U>(&self,
                        reaction_type: R,
@@ -185,14 +185,14 @@ pub enum ReactionType {
     /// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the
     /// guild.
     ///
-    /// [`Emoji`]: struct.Emoji.html
-    /// [`Guild`]: struct.Guild.html
+    /// [`Emoji`]: ../guild/struct.Emoji.html
+    /// [`Guild`]: ../guild/struct.Guild.html
     Custom {
         /// Whether the emoji is animated.
         animated: bool,
         /// The Id of the custom [`Emoji`].
         ///
-        /// [`Emoji`]: struct.Emoji.html
+        /// [`Emoji`]: ../guild/struct.Emoji.html
         id: EmojiId,
         /// The name of the custom emoji. This is primarily used for decoration
         /// and distinguishing the emoji client-side.
@@ -431,7 +431,7 @@ impl Display for ReactionType {
     /// displayed. Otherwise, if the type is a
     /// [unicode][`ReactionType::Unicode`], then the inner unicode is displayed.
     ///
-    /// [`Emoji::fmt`]: struct.Emoji.html#method.fmt
+    /// [`Emoji::fmt`]: ../guild/struct.Emoji.html#method.fmt
     /// [`ReactionType::Custom`]: enum.ReactionType.html#variant.Custom
     /// [`ReactionType::Unicode`]: enum.ReactionType.html#variant.Unicode
     fn fmt(&self, f: &mut Formatter) -> FmtResult {

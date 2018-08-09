@@ -13,7 +13,7 @@ pub const LARGE_THRESHOLD: u8 = 250;
 pub const MESSAGE_CODE_LIMIT: u16 = 2000;
 /// The [UserAgent] sent along with every request.
 ///
-/// [UserAgent]: ../hyper/header/struct.UserAgent.html
+/// [UserAgent]: ../../hyper/header/struct.UserAgent.html
 pub const USER_AGENT: &str = concat!(
     "DiscordBot (https://github.com/serenity-rs/serenity, ",
     env!("CARGO_PKG_VERSION"),

@@ -131,7 +131,7 @@ pub fn is_nsfw(name: &str) -> bool {
 /// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
 /// ```
 ///
-/// [`RichInvite`]: ../model/guild/struct.RichInvite.html
+/// [`RichInvite`]: ../model/invite/struct.RichInvite.html
 pub fn parse_invite(code: &str) -> &str {
     if code.starts_with("https://discord.gg/") {
         &code[19..]

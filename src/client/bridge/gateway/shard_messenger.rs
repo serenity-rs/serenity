@@ -106,10 +106,9 @@ impl ShardMessenger {
     /// # }
     /// ```
     ///
-    /// [`Event::GuildMembersChunk`]:
-    /// ../../model/event/enum.Event.html#variant.GuildMembersChunk
-    /// [`Guild`]: ../../model/guild/struct.Guild.html
-    /// [`Member`]: ../../model/guild/struct.Member.html
+    /// [`Event::GuildMembersChunk`]: ../../../model/event/enum.Event.html#variant.GuildMembersChunk
+    /// [`Guild`]: ../../../model/guild/struct.Guild.html
+    /// [`Member`]: ../../../model/guild/struct.Member.html
     pub fn chunk_guilds<It>(
         &self,
         guild_ids: It,
@@ -261,9 +260,9 @@ impl ShardMessenger {
     /// # }
     /// ```
     ///
-    /// [`DoNotDisturb`]: ../../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
-    /// [`Invisible`]: ../../model/user/enum.OnlineStatus.html#variant.Invisible
-    /// [`Offline`]: ../../model/user/enum.OnlineStatus.html#variant.Offline
+    /// [`DoNotDisturb`]: ../../../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
+    /// [`Invisible`]: ../../../model/user/enum.OnlineStatus.html#variant.Invisible
+    /// [`Offline`]: ../../../model/user/enum.OnlineStatus.html#variant.Offline
     pub fn set_status(&self, mut online_status: OnlineStatus) {
         if online_status == OnlineStatus::Offline {
             online_status = OnlineStatus::Invisible;
