@@ -586,14 +586,15 @@ impl Args {
     ///
     /// let mut args = Args::new(r#""5" "3""#, &[" ".to_string()]);
     ///
-    /// for arg in args.iter::<u32>() {
+    /// for arg in args.iter_quoted::<u32>() {
     ///     // Default to zero in case some linguist turns our numbers into words and can't parse those.
     ///     let arg = arg.unwrap_or(0);
-    ///     assert!(arg % 3 == 0);
+    ///     assert!(arg % 2 != 0);
     /// }
     ///
     /// assert!(args.is_empty());
     /// ```
+    ///
     /// [`iter`]: #method.iter
     pub fn iter_quoted<T: FromStr>(&mut self) -> IterQuoted<T>
         where T::Err: StdError {
