@@ -190,21 +190,6 @@ macro_rules! impl_from_str {
                     }
                 }
             }
-
-            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-            impl FromStr for $struct {
-                type Err = $err;
-
-                fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-                    match utils::$parse_fn(s) {
-                        Some(x) => match $id(x).find() {
-                            Some(user) => Ok(user),
-                            _ => Err($err::NotPresentInCache),
-                        },
-                        _ => Err($err::$invalid_variant),
-                    }
-                }
-            }
         )*
     };
 }

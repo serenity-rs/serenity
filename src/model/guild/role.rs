@@ -8,6 +8,13 @@ use internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use {CACHE, http};
 
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use std::str::FromStr;
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use model::misc::RoleParseError;
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use utils::parse_role;
+
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
 /// various miscellaneous configurations, such as being assigned a colour. Roles
@@ -215,4 +222,19 @@ impl From<Role> for RoleId {
 impl<'a> From<&'a Role> for RoleId {
     /// Gets the Id of a role.
     fn from(role: &Role) -> RoleId { role.id }
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+impl FromStr for Role {
+    type Err = RoleParseError;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        match parse_role(s) {
+            Some(x) => match RoleId(x).to_role_cached() {
+                Some(role) => Ok(role),
+                _ => Err(RoleParseError::NotPresentInCache),
+            },
+            _ => Err(RoleParseError::InvalidRole),
+        }
+    }
 }
