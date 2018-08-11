@@ -329,6 +329,7 @@ impl ChannelId {
     /// Gets all of the channel's invites.
     ///
     /// Requires the [Manage Channels] permission.
+    ///
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[inline]
     pub fn invites(&self) -> Result<Vec<RichInvite>> { http::get_channel_invites(self.0) }
