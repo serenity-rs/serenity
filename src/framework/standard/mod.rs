@@ -1047,12 +1047,13 @@ impl Framework for StandardFramework {
                     }
 
                     let mut check_contains_group_prefix = false;
+                    let mut longest_matching_prefix_len = 0;
                     let to_check = if let Some(ref prefixes) = group.prefixes {
                         // Once `built` starts with a set prefix,
                         // we want to make sure that all following matching prefixes are longer
                         // than the last matching one, this prevents picking a wrong prefix,
                         // e.g. "f" instead of "ferris" due to "f" having a lower index in the `Vec`.
-                        let longest_matching_prefix_len = prefixes.iter().fold(0, |longest_prefix_len, prefix|
+                        longest_matching_prefix_len = prefixes.iter().fold(0, |longest_prefix_len, prefix|
                             if prefix.len() > longest_prefix_len
                             && built.starts_with(prefix)
                             && (orginal_round.len() == prefix.len() || built.get(prefix.len()..prefix.len() + 1) == Some(" ")) {
@@ -1156,9 +1157,7 @@ impl Framework for StandardFramework {
                         if let &Some(CommandOrAlias::Command(ref command)) = &group.default_command {
                             let command = Arc::clone(command);
                             let mut args = {
-                                let content = to_check;
-
-                                Args::new(&content.trim(), &self.configuration.delimiters)
+                                Args::new(&orginal_round[longest_matching_prefix_len..], &self.configuration.delimiters)
                             };
 
                             threadpool.execute(move || {
