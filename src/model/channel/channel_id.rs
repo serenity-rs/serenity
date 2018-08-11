@@ -312,7 +312,7 @@ impl ChannelId {
     /// upon failure requests it via the REST API.
     ///
     /// **Note**: If the cache is not enabled,
-    /// REST API will be used instead.
+    /// REST API will be used only.
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
     pub fn to_channel(&self) -> Result<Channel> {
