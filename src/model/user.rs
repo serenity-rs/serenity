@@ -661,7 +661,7 @@ impl User {
     /// println!("{:?}", client.start());
     /// ```
     pub fn refresh(&mut self) -> Result<()> {
-        self.id.get().map(|replacement| {
+        self.id.to_user().map(|replacement| {
             mem::replace(self, replacement);
 
             ()

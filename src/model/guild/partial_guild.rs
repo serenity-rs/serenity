@@ -241,7 +241,7 @@ impl PartialGuild {
     ///
     /// [`Emoji`]: struct.Emoji.html
     /// [`Emoji::edit`]: struct.Emoji.html#method.edit
-    /// [Manage Emojis]: 
+    /// [Manage Emojis]:
     /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
     pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str) -> Result<Emoji> {
@@ -292,7 +292,7 @@ impl PartialGuild {
     ///
     /// Requires that the current user be in the guild.
     #[inline]
-    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> { guild_id.into().get() }
+    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> { guild_id.into().to_partial_guild() }
 
     /// Kicks a [`Member`] from the guild.
     ///
@@ -468,7 +468,7 @@ impl PartialGuild {
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
-    ///         let guild = msg.guild_id().unwrap().get().unwrap();
+    ///         let guild = msg.guild_id().unwrap().to_guild().unwrap();
     ///         let possible_role = guild.role_by_name("role_name");
     ///
     ///         if let Some(role) = possible_role {

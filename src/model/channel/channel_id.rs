@@ -390,7 +390,7 @@ impl ChannelId {
         use self::Channel::*;
 
         let finding = feature_cache! {{
-            Some(self.find())
+            Some(self.to_channel_cached())
         } else {
             None
         }};

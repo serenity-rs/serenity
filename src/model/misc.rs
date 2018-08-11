@@ -119,7 +119,7 @@ impl FromStr for User {
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match utils::parse_username(s) {
             Some(x) => UserId(x as u64)
-                .get()
+                .to_user()
                 .map_err(|e| UserParseError::Rest(Box::new(e))),
             _ => Err(UserParseError::InvalidUsername),
         }

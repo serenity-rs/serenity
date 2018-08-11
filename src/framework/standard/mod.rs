@@ -478,7 +478,7 @@ impl StandardFramework {
                 return true;
             }
 
-            if let Some(guild) = guild_id.find() {
+            if let Some(guild) = guild_id.to_guild_cached() {
                 return self.configuration
                     .blocked_users
                     .contains(&guild.with(|g| g.owner_id));
@@ -873,7 +873,7 @@ impl StandardFramework {
     ///
     /// client.with_framework(StandardFramework::new()
     ///     .before(|_, msg, cmd_name| {
-    ///         if let Ok(channel) = msg.channel_id.get() {
+    ///         if let Ok(channel) = msg.channel_id.to_channel() {
     ///             //  Don't run unless in nsfw channel
     ///             if !channel.is_nsfw() {
     ///                 return false;

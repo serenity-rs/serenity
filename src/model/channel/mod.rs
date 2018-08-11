@@ -74,7 +74,7 @@ impl Channel {
     /// #
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// #     let channel = ChannelId(0).get().unwrap();
+    /// #     let channel = ChannelId(0).to_channel().unwrap();
     /// #
     /// match channel.group() {
     ///     Some(group_lock) => {
@@ -116,7 +116,7 @@ impl Channel {
     /// #
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// #     let channel = ChannelId(0).get().unwrap();
+    /// #     let channel = ChannelId(0).to_channel().unwrap();
     /// #
     /// match channel.guild() {
     ///     Some(guild_lock) => {
@@ -154,7 +154,7 @@ impl Channel {
     /// #
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// #     let channel = ChannelId(0).get().unwrap();
+    /// #     let channel = ChannelId(0).to_channel().unwrap();
     /// #
     /// match channel.private() {
     ///     Some(private_lock) => {
@@ -195,7 +195,7 @@ impl Channel {
     /// #
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// # let channel = ChannelId(0).get().unwrap();
+    /// # let channel = ChannelId(0).to_channel().unwrap();
     /// #
     /// match channel.category() {
     ///     Some(category_lock) => {

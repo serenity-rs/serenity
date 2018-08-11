@@ -287,7 +287,7 @@ impl Message {
         for id in &self.mention_roles {
             let mention = id.mention();
 
-            if let Some(role) = id.find() {
+            if let Some(role) = id.to_role_cached() {
                 result = result.replace(&mention, &format!("@{}", role.name));
             } else {
                 result = result.replace(&mention, "@deleted-role");
@@ -429,7 +429,7 @@ impl Message {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Emoji`]: ../guild/struct.Emoji.html
-    /// [Add Reactions]: 
+    /// [Add Reactions]:
     /// ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
     /// [permissions]: ../permissions/index.html
     #[inline]

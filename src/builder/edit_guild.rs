@@ -65,7 +65,7 @@ impl EditGuild {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let mut guild = GuildId(0).get()?;
+    /// #     let mut guild = GuildId(0).to_guild()?;
     /// use serenity::utils;
     ///
     /// // assuming a `guild` has already been bound
@@ -126,7 +126,7 @@ impl EditGuild {
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let mut guild = GuildId(0).get()?;
+    /// #     let mut guild = GuildId(0).to_guild()?;
     /// use serenity::model::guild::Region;
     ///
     /// // assuming a `guild` has already been bound

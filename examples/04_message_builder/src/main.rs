@@ -11,7 +11,7 @@ struct Handler;
 impl EventHandler for Handler {
     fn message(&self, _: Context, msg: Message) {
         if msg.content == "!ping" {
-            let channel = match msg.channel_id.get() {
+            let channel = match msg.channel_id.to_channel() {
                 Ok(channel) => channel,
                 Err(why) => {
                     println!("Error getting channel: {:?}", why);

@@ -80,7 +80,7 @@ impl Role {
     ///
     /// ```rust,no_run
     /// # use serenity::model::id::RoleId;
-    /// # let role = RoleId(7).find().unwrap();
+    /// # let role = RoleId(7).to_role_cached().unwrap();
     /// // assuming a `role` has already been bound
     //
     /// role.edit(|r| r.hoist(true));
