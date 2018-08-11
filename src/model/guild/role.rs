@@ -165,7 +165,30 @@ impl PartialOrd for Role {
 impl RoleId {
     /// Search the cache for the role.
     #[cfg(feature = "cache")]
+    #[deprecated(since = "0.5.8", note = "Use the `to_role_cached`-method instead.")]
     pub fn find(&self) -> Option<Role> {
+        let cache = CACHE.read();
+
+        for guild in cache.guilds.values() {
+            let guild = guild.read();
+
+            if !guild.roles.contains_key(self) {
+                continue;
+            }
+
+            if let Some(role) = guild.roles.get(self) {
+                return Some(role.clone());
+            }
+        }
+
+        None
+    }
+
+    /// Tries to find the [`Role`] by its Id in the cache.
+    ///
+    /// [`Role`]: ../guild/struct.Role.html
+    #[cfg(feature = "cache")]
+    pub fn to_role_cached(&self) -> Option<Role> {
         let cache = CACHE.read();
 
         for guild in cache.guilds.values() {
