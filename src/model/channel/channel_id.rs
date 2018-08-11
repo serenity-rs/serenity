@@ -285,11 +285,37 @@ impl ChannelId {
 
     /// Search the cache for the channel with the Id.
     #[cfg(feature = "cache")]
+    #[deprecated(since = "0.5.8", note = "Use the `to_channel_cached`-method instead.")]
     pub fn find(&self) -> Option<Channel> { CACHE.read().channel(*self) }
+
+    /// Attempts to find a [`Channel`] by its Id in the cache.
+    ///
+    /// [`Channel`]: ../channel/enum.Channel.html
+    #[cfg(feature = "cache")]
+    pub fn to_channel_cached(&self) -> Option<Channel> { CACHE.read().channel(*self) }
 
     /// Search the cache for the channel. If it can't be found, the channel is
     /// requested over REST.
+    #[deprecated(since = "0.5.8", note = "Use the `to_channel`-method instead.")]
     pub fn get(&self) -> Result<Channel> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(channel) = CACHE.read().channel(*self) {
+                return Ok(channel);
+            }
+        }
+
+        http::get_channel(self.0)
+    }
+
+    /// First attempts to find a [`Channel`] by its Id in the cache,
+    /// upon failure requests it via the REST API.
+    ///
+    /// **Note**: If the cache is not enabled,
+    /// REST API will be used instead.
+    ///
+    /// [`Channel`]: ../channel/enum.Channel.html
+    pub fn to_channel(&self) -> Result<Channel> {
         #[cfg(feature = "cache")]
         {
             if let Some(channel) = CACHE.read().channel(*self) {
