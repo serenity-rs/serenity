@@ -147,6 +147,17 @@ macro_rules! command {
     };
 }
 
+macro_rules! command_and_help_args {
+    ($message_content:expr, $position:expr, $command_length:expr, $delimiters:expr) => {
+        {
+            let content = $message_content.chars().skip($position).skip_while(|x| x.is_whitespace())
+                .skip($command_length).collect::<String>();
+
+            Args::new(&content.trim(), $delimiters)
+        }
+    };
+}
+
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
 #[derive(Debug)]
@@ -1072,15 +1083,7 @@ impl Framework for StandardFramework {
 
                         if let Some(help) = help {
                             let groups = self.groups.clone();
-
-                            // `Args`-construction here inside help-dispatch and the command-dispatch-section
-                            // shall stay identical, please update accordingly upon change.
-                            let mut args = {
-                                let content = message.content.chars().skip(position).skip_while(|x| x.is_whitespace())
-                                    .skip(command_length).collect::<String>();
-
-                                Args::new(&content.trim(), &self.configuration.delimiters)
-                            };
+                            let mut args = command_and_help_args!(&message.content, position, command_length, &self.configuration.delimiters);
 
                             threadpool.execute(move || {
 
@@ -1106,15 +1109,7 @@ impl Framework for StandardFramework {
                         if let Some(&CommandOrAlias::Command(ref command)) =
                             group.commands.get(&to_check) {
                             let command = Arc::clone(command);
-
-                            // `Args`-construction here inside command-dispatch and the help-dispatch
-                            // shall stay identical, please update accordingly upon change.
-                            let mut args = {
-                                let content = message.content.chars().skip(position).skip_while(|x| x.is_whitespace())
-                                    .skip(command_length).collect::<String>();
-
-                                Args::new(&content.trim(), &self.configuration.delimiters)
-                            };
+                            let mut args = command_and_help_args!(&message.content, position, command_length, &self.configuration.delimiters);
 
                             if let Some(error) = self.should_fail(
                                 &mut context,
