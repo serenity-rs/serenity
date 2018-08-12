@@ -411,7 +411,7 @@ impl GuildId {
     ///
     /// [`Guild`]: ../guild/struct.Guild.html
     #[cfg(feature = "cache")]
-    pub fn to_guild_cached(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().guild(*self) }
+    pub fn to_guild_cached(self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().guild(self) }
 
     /// Requests the guild over REST.
     ///
@@ -429,7 +429,7 @@ impl GuildId {
     /// [`PartialGuild`]: ../guild/struct.PartialGuild.html
     /// [`Guild`]: ../guild/struct.Guild.html
     #[inline]
-    pub fn to_partial_guild(&self) -> Result<PartialGuild> { http::get_guild(self.0) }
+    pub fn to_partial_guild(self) -> Result<PartialGuild> { http::get_guild(self.0) }
 
     /// Gets all integration of the guild.
     ///
