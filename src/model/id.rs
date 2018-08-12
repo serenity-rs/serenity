@@ -106,7 +106,7 @@ pub struct RoleId(pub u64);
 #[allow(derive_hash_xor_eq)]
 pub struct UserId(pub u64);
 
-/// An identifier for a [`Webhook`](struct.Webhook.html).
+/// An identifier for a [`Webhook`](../webhook/struct.Webhook.html).
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
 #[allow(derive_hash_xor_eq)]
 pub struct WebhookId(pub u64);

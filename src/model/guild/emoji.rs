@@ -52,7 +52,8 @@ impl Emoji {
     ///
     /// **Note**: Only user accounts may use this method.
     ///
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    /// [Manage Emojis]: 
+    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     ///
     /// # Examples
     ///
@@ -91,7 +92,7 @@ impl Emoji {
     ///
     /// **Note**: Only user accounts may use this method.
     ///
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     ///
     /// # Examples
     ///

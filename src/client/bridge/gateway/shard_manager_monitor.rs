@@ -12,7 +12,7 @@ use super::{ShardManager, ShardManagerMessage};
 /// receiving [`ShardManagerMessage`]s, such as whether to shutdown a shard or
 /// shutdown everything entirely.
 ///
-/// [`ShardManagerMessage`]: struct.ShardManagerMessage.html
+/// [`ShardManagerMessage`]: enum.ShardManagerMessage.html
 #[derive(Debug)]
 pub struct ShardManagerMonitor {
     /// An clone of the Arc to the manager itself.

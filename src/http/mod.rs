@@ -20,25 +20,26 @@
 //! instance methods where possible, as they each offer different
 //! levels of a high-level interface to the HTTP module.
 //!
-//! [`Client`]: ../struct.Client.html
+//! [`Client`]: ../client/struct.Client.html
 //! [model]: ../model/index.html
 
 pub mod ratelimiting;
+pub mod request;
+pub mod routing;
 
 mod error;
 
-pub use self::error::Error as HttpError;
 pub use hyper::status::{StatusClass, StatusCode};
+pub use self::error::Error as HttpError;
 
 use constants;
 use hyper::{
     client::{
         Client as HyperClient,
-        Request,
-        RequestBuilder,
+        Request as HyperRequest,
         Response as HyperResponse
     },
-    header::ContentType,
+    header::{ContentType, Headers},
     method::Method,
     mime::{Mime, SubLevel, TopLevel},
     net::HttpsConnector,
@@ -52,25 +53,35 @@ use internal::prelude::*;
 use model::prelude::*;
 use multipart::client::Multipart;
 use parking_lot::Mutex;
-use self::ratelimiting::Route;
+use self::{
+    request::Request,
+    routing::RouteInfo,
+};
+use serde::de::DeserializeOwned;
 use serde_json;
 use std::{
     collections::BTreeMap,
     default::Default,
-    fmt::Write as FmtWrite,
     fs::File,
     io::ErrorKind as IoErrorKind,
     path::{Path, PathBuf},
     sync::Arc
 };
 
+lazy_static! {
+    static ref CLIENT: HyperClient = {
+        let tc = NativeTlsClient::new().expect("Unable to make http client");
+        let connector = HttpsConnector::new(tc);
+
+        HyperClient::with_connector(connector)
+    };
+}
+
 /// An method used for ratelimiting special routes.
 ///
 /// This is needed because `hyper`'s `Method` enum does not derive Copy.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum LightMethod {
-    /// Indicates that a route is for "any" method.
-    Any,
     /// Indicates that a route is for the `DELETE` method only.
     Delete,
     /// Indicates that a route is for the `GET` method only.
@@ -81,6 +92,18 @@ pub enum LightMethod {
     Post,
     /// Indicates that a route is for the `PUT` method only.
     Put,
+}
+
+impl LightMethod {
+    pub fn hyper_method(&self) -> Method {
+        match *self {
+            LightMethod::Delete => Method::Delete,
+            LightMethod::Get => Method::Get,
+            LightMethod::Patch => Method::Patch,
+            LightMethod::Post => Method::Post,
+            LightMethod::Put => Method::Put,
+        }
+    }
 }
 
 lazy_static! {
@@ -121,16 +144,11 @@ pub fn set_token(token: &str) { TOKEN.lock().clone_from(&token.to_string()); }
 /// [`Group::add_recipient`]: ../model/channel/struct.Group.html#method.add_recipient
 /// [`User`]: ../model/user/struct.User.html
 pub fn add_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::None,
-            put,
-            "/channels/{}/recipients/{}",
-            group_id,
-            user_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::AddGroupRecipient { group_id, user_id },
+    })
 }
 
 /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
@@ -141,19 +159,13 @@ pub fn add_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 /// [`Guild`]: ../model/guild/struct.Guild.html
 /// [`Member`]: ../model/guild/struct.Member.html
 /// [`Role`]: ../model/guild/struct.Role.html
-/// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
+/// [Manage Roles]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
 pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::GuildsIdMembersIdRolesId(guild_id),
-            put,
-            "/guilds/{}/members/{}/roles/{}",
-            guild_id,
-            user_id,
-            role_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::AddMemberRole { guild_id, role_id, user_id },
+    })
 }
 
 /// Bans a [`User`] from a [`Guild`], removing their messages sent in the last
@@ -166,20 +178,18 @@ pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> 
 ///
 /// [`Guild`]: ../model/guild/struct.Guild.html
 /// [`User`]: ../model/user/struct.User.html
-/// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
+/// [Ban Members]: ../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
 pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::GuildsIdBansUserId(guild_id),
-            put,
-            "/guilds/{}/bans/{}?delete_message_days={}&reason={}",
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GuildBanUser {
+            delete_message_days: Some(delete_message_days),
+            reason: Some(reason),
             guild_id,
             user_id,
-            delete_message_days,
-            reason
-        ),
-    )
+        },
+    })
 }
 
 /// Ban zeyla from a [`Guild`], removing her messages sent in the last X number
@@ -191,7 +201,7 @@ pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &s
 /// **Note**: Requires that you have the [Ban Members] permission.
 ///
 /// [`Guild`]: ../model/guild/struct.Guild.html
-/// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
+/// [Ban Members]: ../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
 pub fn ban_zeyla(guild_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
     ban_user(guild_id, 114_941_315_417_899_012, delete_message_days, reason)
 }
@@ -205,7 +215,7 @@ pub fn ban_zeyla(guild_id: u64, delete_message_days: u8, reason: &str) -> Result
 /// **Note**: Requires that you have the [Ban Members] permission.
 ///
 /// [`Guild`]: ../model/guild/struct.Guild.html
-/// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
+/// [Ban Members]: ../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
 pub fn ban_luna(guild_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
     ban_user(guild_id, 180_731_582_049_550_336, delete_message_days, reason)
 }
@@ -219,7 +229,7 @@ pub fn ban_luna(guild_id: u64, delete_message_days: u8, reason: &str) -> Result<
 /// **Note**: Requires that you have the [Ban Members] permission.
 ///
 /// [`Guild`]: ../model/guild/struct.Guild.html
-/// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
+/// [Ban Members]: ../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
 pub fn ban_servermoms(guild_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
     ban_zeyla(guild_id, delete_message_days, reason)?;
     ban_luna(guild_id, delete_message_days, reason)
@@ -235,15 +245,11 @@ pub fn ban_servermoms(guild_id: u64, delete_message_days: u8, reason: &str) -> R
 ///
 /// [`Channel`]: ../model/channel/enum.Channel.html
 pub fn broadcast_typing(channel_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::ChannelsIdTyping(channel_id),
-            post,
-            "/channels/{}/typing",
-            channel_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::BroadcastTyping { channel_id },
+    })
 }
 
 /// Creates a [`GuildChannel`] in the [`Guild`] given its Id.
@@ -255,41 +261,31 @@ pub fn broadcast_typing(channel_id: u64) -> Result<()> {
 /// [`Guild`]: ../model/guild/struct.Guild.html
 /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-channel
-/// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
+/// [Manage Channels]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
 pub fn create_channel(guild_id: u64, map: &Value) -> Result<GuildChannel> {
-    let body = map.to_string();
-    let response = request!(
-        Route::GuildsIdChannels(guild_id),
-        post(body),
-        "/guilds/{}/channels",
-        guild_id
-    );
-
-    serde_json::from_reader::<HyperResponse, GuildChannel>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(map.to_string().as_bytes()),
+        headers: None,
+        route: RouteInfo::CreateChannel { guild_id },
+    })
 }
 
 /// Creates an emoji in the given [`Guild`] with the given data.
 ///
-/// View the source code for [`Context::create_emoji`] to see what fields this
-/// requires.
+/// View the source code for [`Guild`]'s [`create_emoji`] method to see what
+/// fields this requires.
 ///
 /// **Note**: Requires the [Manage Emojis] permission.
 ///
-/// [`Context::create_emoji`]: ../struct.Context.html#method.create_emoji
+/// [`create_emoji`]: ../model/guild/struct.Guild.html#method.create_emoji
 /// [`Guild`]: ../model/guild/struct.Guild.html
-/// [Manage Emojis]: ../model/permissions/constant.MANAGE_EMOJIS.html
+/// [Manage Emojis]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
 pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
-    let body = map.to_string();
-    let response = request!(
-        Route::GuildsIdEmojis(guild_id),
-        post(body),
-        "/guilds/{}/emojis",
-        guild_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Emoji>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(map.to_string().as_bytes()),
+        headers: None,
+        route: RouteInfo::CreateEmoji { guild_id },
+    })
 }
 
 /// Creates a guild with the data provided.
@@ -329,11 +325,11 @@ pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
 /// https://discordapp.com/developers/docs/resources/guild#create-guild
 /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
 pub fn create_guild(map: &Value) -> Result<PartialGuild> {
-    let body = map.to_string();
-    let response = request!(Route::Guilds, post(body), "/guilds");
-
-    serde_json::from_reader::<HyperResponse, PartialGuild>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(map.to_string().as_bytes()),
+        headers: None,
+        route: RouteInfo::CreateGuild,
+    })
 }
 
 /// Creates an [`Integration`] for a [`Guild`].
@@ -344,21 +340,14 @@ pub fn create_guild(map: &Value) -> Result<PartialGuild> {
 ///
 /// [`Guild`]: ../model/guild/struct.Guild.html
 /// [`Integration`]: ../model/guild/struct.Integration.html
-/// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
+/// [Manage Guild]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-integration
 pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: &Value) -> Result<()> {
-    let body = map.to_string();
-
-    verify(
-        204,
-        request!(
-            Route::GuildsIdIntegrations(guild_id),
-            post(body),
-            "/guilds/{}/integrations/{}",
-            guild_id,
-            integration_id
-        ),
-    )
+    wind(204, Request {
+        body: Some(map.to_string().as_bytes()),
+        headers: None,
+        route: RouteInfo::CreateGuildIntegration { guild_id, integration_id },
+    })
 }
 
 /// Creates a [`RichInvite`] for the given [channel][`GuildChannel`].
@@ -370,45 +359,39 @@ pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: &Value)
 /// **Note**: Requires the [Create Invite] permission.
 ///
 /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
-/// [`RichInvite`]: ../model/guild/struct.RichInvite.html
-/// [Create Invite]: ../model/permissions/constant.CREATE_INVITE.html
+/// [`RichInvite`]: ../model/invite/struct.RichInvite.html
+/// [Create Invite]: ../model/permissions/struct.Permissions.html#associatedconstant.CREATE_INVITE
 /// [docs]: https://discordapp.com/developers/docs/resources/channel#create-channel-invite
 pub fn create_invite(channel_id: u64, map: &JsonMap) -> Result<RichInvite> {
-    let body = serde_json::to_string(map)?;
-    let response = request!(
-        Route::ChannelsIdInvites(channel_id),
-        post(body),
-        "/channels/{}/invites",
-        channel_id
-    );
+    let body = serde_json::to_vec(map)?;
 
-    serde_json::from_reader::<HyperResponse, RichInvite>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::CreateInvite { channel_id },
+    })
 }
 
 /// Creates a permission override for a member or a role in a channel.
 pub fn create_permission(channel_id: u64, target_id: u64, map: &Value) -> Result<()> {
-    let body = map.to_string();
+    let body = serde_json::to_vec(map)?;
 
-    verify(
-        204,
-        request!(
-            Route::ChannelsIdPermissionsOverwriteId(channel_id),
-            put(body),
-            "/channels/{}/permissions/{}",
-            channel_id,
-            target_id
-        ),
-    )
+    wind(204, Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::CreatePermission { channel_id, target_id },
+    })
 }
 
 /// Creates a private channel with a user.
 pub fn create_private_channel(map: &Value) -> Result<PrivateChannel> {
-    let body = map.to_string();
-    let response = request!(Route::UsersMeChannels, post(body), "/users/@me/channels");
+    let body = serde_json::to_vec(map)?;
 
-    serde_json::from_reader::<HyperResponse, PrivateChannel>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::GetUserDmChannels,
+    })
 }
 
 /// Reacts to a message.
@@ -416,31 +399,26 @@ pub fn create_reaction(channel_id: u64,
                        message_id: u64,
                        reaction_type: &ReactionType)
                        -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
-            put,
-            "/channels/{}/messages/{}/reactions/{}/@me",
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::CreateReaction {
+            reaction: &reaction_type.as_data(),
             channel_id,
             message_id,
-            reaction_type.as_data()
-        ),
-    )
+        },
+    })
 }
 
 /// Creates a role.
 pub fn create_role(guild_id: u64, map: &JsonMap) -> Result<Role> {
-    let body = serde_json::to_string(map)?;
-    let response = request!(
-        Route::GuildsIdRoles(guild_id),
-        post(body),
-        "/guilds/{}/roles",
-        guild_id
-    );
+    let body = serde_json::to_vec(map)?;
 
-    serde_json::from_reader::<HyperResponse, Role>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::CreateRole {guild_id },
+    })
 }
 
 /// Creates a webhook for the given [channel][`GuildChannel`]'s Id, passing in
@@ -474,103 +452,77 @@ pub fn create_role(guild_id: u64, map: &JsonMap) -> Result<Role> {
 ///
 /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
 pub fn create_webhook(channel_id: u64, map: &Value) -> Result<Webhook> {
-    let body = map.to_string();
-    let response = request!(
-        Route::ChannelsIdWebhooks(channel_id),
-        post(body),
-        "/channels/{}/webhooks",
-        channel_id
-    );
+    let body = serde_json::to_vec(map)?;
 
-    serde_json::from_reader::<HyperResponse, Webhook>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::CreateWebhook { channel_id },
+    })
 }
 
 /// Deletes a private channel or a channel in a guild.
 pub fn delete_channel(channel_id: u64) -> Result<Channel> {
-    let response = request!(
-        Route::ChannelsId(channel_id),
-        delete,
-        "/channels/{}",
-        channel_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Channel>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::DeleteChannel { channel_id },
+    })
 }
 
 /// Deletes an emoji from a server.
 pub fn delete_emoji(guild_id: u64, emoji_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::GuildsIdEmojisId(guild_id),
-            delete,
-            "/guilds/{}/emojis/{}",
-            guild_id,
-            emoji_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::DeleteEmoji { guild_id, emoji_id },
+    })
 }
 
 /// Deletes a guild, only if connected account owns it.
 pub fn delete_guild(guild_id: u64) -> Result<PartialGuild> {
-    let response = request!(Route::GuildsId(guild_id), delete, "/guilds/{}", guild_id);
-
-    serde_json::from_reader::<HyperResponse, PartialGuild>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::DeleteGuild { guild_id },
+    })
 }
 
 /// Remvoes an integration from a guild.
 pub fn delete_guild_integration(guild_id: u64, integration_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::GuildsIdIntegrationsId(guild_id),
-            delete,
-            "/guilds/{}/integrations/{}",
-            guild_id,
-            integration_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::DeleteGuildIntegration { guild_id, integration_id },
+    })
 }
 
 /// Deletes an invite by code.
 pub fn delete_invite(code: &str) -> Result<Invite> {
-    let response = request!(Route::InvitesCode, delete, "/invites/{}", code);
-
-    serde_json::from_reader::<HyperResponse, Invite>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::DeleteInvite { code },
+    })
 }
 
 /// Deletes a message if created by us or we have
 /// specific permissions.
 pub fn delete_message(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::ChannelsIdMessagesId(LightMethod::Delete, channel_id),
-            delete,
-            "/channels/{}/messages/{}",
-            channel_id,
-            message_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::DeleteMessage { channel_id, message_id },
+    })
 }
 
 /// Deletes a bunch of messages, only works for bots.
 pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
-    let body = map.to_string();
-
-    verify(
-        204,
-        request!(
-            Route::ChannelsIdMessagesBulkDelete(channel_id),
-            post(body),
-            "/channels/{}/messages/bulk-delete",
-            channel_id
-        ),
-    )
+    wind(204, Request {
+        body: Some(map.to_string().as_bytes()),
+        headers: None,
+        route: RouteInfo::DeleteMessages { channel_id },
+    })
 }
 
 /// Deletes all of the [`Reaction`]s associated with a [`Message`].
@@ -591,30 +543,20 @@ pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
 /// [`Message`]: ../model/channel/struct.Message.html
 /// [`Reaction`]: ../model/channel/struct.Reaction.html
 pub fn delete_message_reactions(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::ChannelsIdMessagesIdReactions(channel_id),
-            delete,
-            "/channels/{}/messages/{}/reactions",
-            channel_id,
-            message_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::DeleteMessageReactions { channel_id, message_id },
+    })
 }
 
 /// Deletes a permission override from a role or a member in a channel.
 pub fn delete_permission(channel_id: u64, target_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::ChannelsIdPermissionsOverwriteId(channel_id),
-            delete,
-            "/channels/{}/permissions/{}",
-            channel_id,
-            target_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::DeletePermission { channel_id, target_id },
+    })
 }
 
 /// Deletes a reaction from a message if owned by us or
@@ -628,32 +570,25 @@ pub fn delete_reaction(channel_id: u64,
         .map(|uid| uid.to_string())
         .unwrap_or_else(|| "@me".to_string());
 
-    verify(
-        204,
-        request!(
-            Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
-            delete,
-            "/channels/{}/messages/{}/reactions/{}/{}",
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::DeleteReaction {
+            reaction: &reaction_type.as_data(),
+            user: &user,
             channel_id,
             message_id,
-            reaction_type.as_data(),
-            user
-        ),
-    )
+        },
+    })
 }
 
 /// Deletes a role from a server. Can't remove the default everyone role.
 pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::GuildsIdRolesId(guild_id),
-            delete,
-            "/guilds/{}/roles/{}",
-            guild_id,
-            role_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::DeleteRole { guild_id, role_id },
+    })
 }
 
 /// Deletes a [`Webhook`] given its Id.
@@ -666,7 +601,7 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 /// Deletes a webhook given its Id:
 ///
 /// ```rust,no_run
-/// use serenity::{Client, http};
+/// use serenity::http;
 /// use std::env;
 ///
 /// // Due to the `delete_webhook` function requiring you to authenticate, you
@@ -679,15 +614,11 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 /// [`Webhook`]: ../model/webhook/struct.Webhook.html
 /// [`delete_webhook_with_token`]: fn.delete_webhook_with_token.html
 pub fn delete_webhook(webhook_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::WebhooksId(webhook_id),
-            delete,
-            "/webhooks/{}",
-            webhook_id,
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::DeleteWebhook { webhook_id },
+    })
 }
 
 /// Deletes a [`Webhook`] given its Id and unique token.
@@ -709,123 +640,93 @@ pub fn delete_webhook(webhook_id: u64) -> Result<()> {
 ///
 /// [`Webhook`]: ../model/webhook/struct.Webhook.html
 pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
-    let client = request_client!();
-
-    verify(
-        204,
-        retry(|| {
-            client
-                .delete(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
-        }).map_err(Error::Hyper)?,
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::DeleteWebhookWithToken { token, webhook_id },
+    })
 }
 
 /// Changes channel information.
 pub fn edit_channel(channel_id: u64, map: &JsonMap) -> Result<GuildChannel> {
-    let body = serde_json::to_string(map)?;
-    let response = request!(
-        Route::ChannelsId(channel_id),
-        patch(body),
-        "/channels/{}",
-        channel_id
-    );
+    let body = serde_json::to_vec(map)?;
 
-    serde_json::from_reader::<HyperResponse, GuildChannel>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::EditChannel {channel_id },
+    })
 }
 
 /// Changes emoji information.
 pub fn edit_emoji(guild_id: u64, emoji_id: u64, map: &Value) -> Result<Emoji> {
-    let body = map.to_string();
-    let response = request!(
-        Route::GuildsIdEmojisId(guild_id),
-        patch(body),
-        "/guilds/{}/emojis/{}",
-        guild_id,
-        emoji_id
-    );
+    let body = serde_json::to_vec(map)?;
 
-    serde_json::from_reader::<HyperResponse, Emoji>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::EditEmoji { guild_id, emoji_id },
+    })
 }
 
 /// Changes guild information.
 pub fn edit_guild(guild_id: u64, map: &JsonMap) -> Result<PartialGuild> {
-    let body = serde_json::to_string(map)?;
-    let response = request!(
-        Route::GuildsId(guild_id),
-        patch(body),
-        "/guilds/{}",
-        guild_id
-    );
+    let body = serde_json::to_vec(map)?;
 
-    serde_json::from_reader::<HyperResponse, PartialGuild>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::EditGuild { guild_id },
+    })
 }
 
 /// Edits the positions of a guild's channels.
 pub fn edit_guild_channel_positions(guild_id: u64, value: &Value)
     -> Result<()> {
-    let body = serde_json::to_string(value)?;
+    let body = serde_json::to_vec(value)?;
 
-    verify(
-        204,
-        request!(
-            Route::GuildsIdChannels(guild_id),
-            patch(body),
-            "/guilds/{}/channels",
-            guild_id,
-        ),
-    )
+    wind(204, Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::EditGuildChannels { guild_id },
+    })
 }
 
 /// Edits a [`Guild`]'s embed setting.
 ///
 /// [`Guild`]: ../model/guild/struct.Guild.html
 pub fn edit_guild_embed(guild_id: u64, map: &Value) -> Result<GuildEmbed> {
-    let body = map.to_string();
-    let response = request!(
-        Route::GuildsIdEmbed(guild_id),
-        patch(body),
-        "/guilds/{}/embed",
-        guild_id
-    );
+    let body = serde_json::to_vec(map)?;
 
-    serde_json::from_reader::<HyperResponse, GuildEmbed>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::EditGuildEmbed { guild_id },
+    })
 }
 
 /// Does specific actions to a member.
 pub fn edit_member(guild_id: u64, user_id: u64, map: &JsonMap) -> Result<()> {
-    let body = serde_json::to_string(map)?;
+    let body = serde_json::to_vec(map)?;
 
-    verify(
-        204,
-        request!(
-            Route::GuildsIdMembersId(guild_id),
-            patch(body),
-            "/guilds/{}/members/{}",
-            guild_id,
-            user_id
-        ),
-    )
+    wind(204, Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::EditMember { guild_id, user_id },
+    })
 }
 
 /// Edits a message by Id.
 ///
 /// **Note**: Only the author of a message can modify it.
 pub fn edit_message(channel_id: u64, message_id: u64, map: &Value) -> Result<Message> {
-    let body = map.to_string();
-    let response = request!(
-        Route::ChannelsIdMessagesId(LightMethod::Any, channel_id),
-        patch(body),
-        "/channels/{}/messages/{}",
-        channel_id,
-        message_id
-    );
+    let body = serde_json::to_vec(map)?;
 
-    serde_json::from_reader::<HyperResponse, Message>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::EditMessage { channel_id, message_id },
+    })
 }
 
 /// Edits the current user's nickname for the provided [`Guild`] via its Id.
@@ -835,15 +736,13 @@ pub fn edit_message(channel_id: u64, message_id: u64, map: &Value) -> Result<Mes
 /// [`Guild`]: ../model/guild/struct.Guild.html
 pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
     let map = json!({ "nick": new_nickname });
-    let body = map.to_string();
-    let response = request!(
-        Route::GuildsIdMembersMeNick(guild_id),
-        patch(body),
-        "/guilds/{}/members/@me/nick",
-        guild_id
-    );
+    let body = serde_json::to_vec(&map)?;
 
-    verify(200, response)
+    wind(200, Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::EditNickname { guild_id },
+    })
 }
 
 /// Edits the current user's profile settings.
@@ -859,8 +758,13 @@ pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
 /// change and when the token is internally changed to be invalid requests, as
 /// the token may be outdated.
 pub fn edit_profile(map: &JsonMap) -> Result<CurrentUser> {
-    let body = serde_json::to_string(map)?;
-    let response = request!(Route::UsersMe, patch(body), "/users/@me");
+    let body = serde_json::to_vec(map)?;
+
+    let response = request(Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::EditProfile,
+    })?;
 
     let mut value = serde_json::from_reader::<HyperResponse, Value>(response)?;
 
@@ -872,41 +776,32 @@ pub fn edit_profile(map: &JsonMap) -> Result<CurrentUser> {
         }
     }
 
-    serde_json::from_value::<CurrentUser>(value)
-        .map_err(From::from)
+    serde_json::from_value::<CurrentUser>(value).map_err(From::from)
 }
 
 /// Changes a role in a guild.
 pub fn edit_role(guild_id: u64, role_id: u64, map: &JsonMap) -> Result<Role> {
-    let body = serde_json::to_string(map)?;
-    let response = request!(
-        Route::GuildsIdRolesId(guild_id),
-        patch(body),
-        "/guilds/{}/roles/{}",
-        guild_id,
-        role_id
-    );
+    let body = serde_json::to_vec(&map)?;
 
-    serde_json::from_reader::<HyperResponse, Role>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::EditRole { guild_id, role_id },
+    })
 }
 
 /// Changes the position of a role in a guild.
 pub fn edit_role_position(guild_id: u64, role_id: u64, position: u64) -> Result<Vec<Role>> {
-    let body = serde_json::to_string(&json!({
+    let body = serde_json::to_vec(&json!({
         "id": role_id,
         "position": position,
     }))?;
-    let response = request!(
-        Route::GuildsIdRolesId(guild_id),
-        patch(body),
-        "/guilds/{}/roles/{}",
-        guild_id,
-        role_id
-    );
 
-    serde_json::from_reader::<HyperResponse, Vec<Role>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::EditRole { guild_id, role_id },
+    })
 }
 
 /// Edits a the webhook with the given data.
@@ -949,16 +844,11 @@ pub fn edit_role_position(guild_id: u64, role_id: u64, position: u64) -> Result<
 // The tests are ignored, rather than no_run'd, due to rustdoc tests with
 // external crates being incredibly messy and misleading in the end user's view.
 pub fn edit_webhook(webhook_id: u64, map: &Value) -> Result<Webhook> {
-    let body = map.to_string();
-    let response = request!(
-        Route::WebhooksId(webhook_id),
-        patch(body),
-        "/webhooks/{}",
-        webhook_id,
-    );
-
-    serde_json::from_reader::<HyperResponse, Webhook>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(map.to_string().as_bytes()),
+        headers: None,
+        route: RouteInfo::EditWebhook { webhook_id },
+    })
 }
 
 /// Edits the webhook with the given data.
@@ -988,17 +878,13 @@ pub fn edit_webhook(webhook_id: u64, map: &Value) -> Result<Webhook> {
 ///
 /// [`edit_webhook`]: fn.edit_webhook.html
 pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &JsonMap) -> Result<Webhook> {
-    let body = serde_json::to_string(map)?;
-    let client = request_client!();
+    let body = serde_json::to_vec(map)?;
 
-    let response = retry(|| {
-        client
-            .patch(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
-            .body(&body)
-    }).map_err(Error::Hyper)?;
-
-    serde_json::from_reader::<HyperResponse, Webhook>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::EditWebhookWithToken { token, webhook_id },
+    })
 }
 
 /// Executes a webhook, posting a [`Message`] in the webhook's associated
@@ -1066,23 +952,18 @@ pub fn execute_webhook(webhook_id: u64,
                        wait: bool,
                        map: &JsonMap)
                        -> Result<Option<Message>> {
-    let body = serde_json::to_string(map)?;
+    let body = serde_json::to_vec(map)?;
 
-    let client = request_client!();
+    let mut headers = Headers::new();
+    headers.set(ContentType(
+        Mime(TopLevel::Application, SubLevel::Json, vec![]),
+    ));
 
-    let response = retry(|| {
-        client
-            .post(&format!(
-                api!("/webhooks/{}/{}?wait={}"),
-                webhook_id,
-                token,
-                wait
-            ))
-            .body(&body)
-            .header(ContentType(
-                Mime(TopLevel::Application, SubLevel::Json, vec![]),
-            ))
-    }).map_err(Error::Hyper)?;
+    let response = request(Request {
+        body: Some(&body),
+        headers: Some(headers),
+        route: RouteInfo::ExecuteWebhook { token, wait, webhook_id },
+    })?;
 
     if response.status == StatusCode::NoContent {
         return Ok(None);
@@ -1097,10 +978,10 @@ pub fn execute_webhook(webhook_id: u64,
 ///
 /// Does not require authentication.
 pub fn get_active_maintenances() -> Result<Vec<Maintenance>> {
-    let client = request_client!();
-
-    let response = retry(|| {
-        client.get(status!("/scheduled-maintenances/active.json"))
+    let response = request(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetActiveMaintenance,
     })?;
 
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
@@ -1114,15 +995,11 @@ pub fn get_active_maintenances() -> Result<Vec<Maintenance>> {
 
 /// Gets all the users that are banned in specific guild.
 pub fn get_bans(guild_id: u64) -> Result<Vec<Ban>> {
-    let response = request!(
-        Route::GuildsIdBans(guild_id),
-        get,
-        "/guilds/{}/bans",
-        guild_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Vec<Ban>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetBans { guild_id },
+    })
 }
 
 /// Gets all audit logs in a specific guild.
@@ -1131,57 +1008,35 @@ pub fn get_audit_logs(guild_id: u64,
                       user_id: Option<u64>,
                       before: Option<u64>,
                       limit: Option<u8>) -> Result<AuditLogs> {
-    let mut params = Vec::with_capacity(4);
-
-    if let Some(action_type) = action_type {
-        params.push(format!("action_type={}", action_type));
-    }
-    if let Some(user_id) = user_id {
-        params.push(format!("user_id={}", user_id));
-    }
-    if let Some(before) = before {
-        params.push(format!("before={}", before));
-    }
-    if let Some(limit) = limit {
-        params.push(format!("limit={}", limit));
-    }
-
-    let mut query_string = params.join("&");
-    if !query_string.is_empty() {
-        query_string.insert(0, '?');
-    }
-
-    let response = request!(
-        Route::GuildsIdAuditLogs(guild_id),
-        get,
-        "/guilds/{}/audit-logs{}",
-        guild_id,
-        query_string
-    );
-
-    serde_json::from_reader::<HyperResponse, AuditLogs>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetAuditLogs {
+            action_type,
+            before,
+            guild_id,
+            limit,
+            user_id,
+        },
+    })
 }
 
 /// Gets current bot gateway.
 pub fn get_bot_gateway() -> Result<BotGateway> {
-    let response = request!(Route::GatewayBot, get, "/gateway/bot");
-
-    serde_json::from_reader::<HyperResponse, BotGateway>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetBotGateway,
+    })
 }
 
 /// Gets all invites for a channel.
 pub fn get_channel_invites(channel_id: u64) -> Result<Vec<RichInvite>> {
-    let response = request!(
-        Route::ChannelsIdInvites(channel_id),
-        get,
-        "/channels/{}/invites",
-        channel_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Vec<RichInvite>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetChannelInvites { channel_id },
+    })
 }
 
 /// Retrieves the webhooks for the given [channel][`GuildChannel`]'s Id.
@@ -1203,114 +1058,94 @@ pub fn get_channel_invites(channel_id: u64) -> Result<Vec<RichInvite>> {
 ///
 /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
 pub fn get_channel_webhooks(channel_id: u64) -> Result<Vec<Webhook>> {
-    let response = request!(
-        Route::ChannelsIdWebhooks(channel_id),
-        get,
-        "/channels/{}/webhooks",
-        channel_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Vec<Webhook>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetChannelWebhooks { channel_id },
+    })
 }
 
 /// Gets channel information.
 pub fn get_channel(channel_id: u64) -> Result<Channel> {
-    let response = request!(
-        Route::ChannelsId(channel_id),
-        get,
-        "/channels/{}",
-        channel_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Channel>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetChannel { channel_id },
+    })
 }
 
 /// Gets all channels in a guild.
 pub fn get_channels(guild_id: u64) -> Result<Vec<GuildChannel>> {
-    let response = request!(
-        Route::ChannelsId(guild_id),
-        get,
-        "/guilds/{}/channels",
-        guild_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Vec<GuildChannel>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetChannels { guild_id },
+    })
 }
 
 /// Gets information about the current application.
 ///
 /// **Note**: Only applications may use this endpoint.
 pub fn get_current_application_info() -> Result<CurrentApplicationInfo> {
-    let response = request!(Route::None, get, "/oauth2/applications/@me");
-
-    serde_json::from_reader::<HyperResponse, CurrentApplicationInfo>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetCurrentApplicationInfo,
+    })
 }
 
 /// Gets information about the user we're connected with.
 pub fn get_current_user() -> Result<CurrentUser> {
-    let response = request!(Route::UsersMe, get, "/users/@me");
-
-    serde_json::from_reader::<HyperResponse, CurrentUser>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetCurrentUser,
+    })
 }
 
 /// Gets current gateway.
 pub fn get_gateway() -> Result<Gateway> {
-    let response = request!(Route::Gateway, get, "/gateway");
-
-    serde_json::from_reader::<HyperResponse, Gateway>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetGateway,
+    })
 }
 
 /// Gets guild information.
 pub fn get_guild(guild_id: u64) -> Result<PartialGuild> {
-    let response = request!(Route::GuildsId(guild_id), get, "/guilds/{}", guild_id);
-
-    serde_json::from_reader::<HyperResponse, PartialGuild>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetGuild { guild_id },
+    })
 }
 
 /// Gets a guild embed information.
 pub fn get_guild_embed(guild_id: u64) -> Result<GuildEmbed> {
-    let response = request!(
-        Route::GuildsIdEmbed(guild_id),
-        get,
-        "/guilds/{}/embeds",
-        guild_id
-    );
-
-    serde_json::from_reader::<HyperResponse, GuildEmbed>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetGuildEmbed { guild_id },
+    })
 }
 
 /// Gets integrations that a guild has.
 pub fn get_guild_integrations(guild_id: u64) -> Result<Vec<Integration>> {
-    let response = request!(
-        Route::GuildsIdIntegrations(guild_id),
-        get,
-        "/guilds/{}/integrations",
-        guild_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Vec<Integration>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetGuildIntegrations { guild_id },
+    })
 }
 
 /// Gets all invites to a guild.
 pub fn get_guild_invites(guild_id: u64) -> Result<Vec<RichInvite>> {
-    let response = request!(
-        Route::GuildsIdInvites(guild_id),
-        get,
-        "/guilds/{}/invites",
-        guild_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Vec<RichInvite>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetGuildInvites { guild_id },
+    })
 }
 
 /// Gets a guild's vanity URL if it has one.
@@ -1320,12 +1155,11 @@ pub fn get_guild_vanity_url(guild_id: u64) -> Result<String> {
         code: String,
     }
 
-    let response = request!(
-        Route::GuildsIdVanityUrl(guild_id),
-        get,
-        "/guilds/{}/vanity-url",
-        guild_id
-    );
+    let response = request(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetGuildVanityUrl { guild_id },
+    })?;
 
     serde_json::from_reader::<HyperResponse, GuildVanityUrl>(response)
         .map(|x| x.code)
@@ -1338,14 +1172,11 @@ pub fn get_guild_members(guild_id: u64,
                          limit: Option<u64>,
                          after: Option<u64>)
                          -> Result<Vec<Member>> {
-    let response = request!(
-        Route::GuildsIdMembers(guild_id),
-        get,
-        "/guilds/{}/members?limit={}&after={}",
-        guild_id,
-        limit.unwrap_or(500),
-        after.unwrap_or(0)
-    );
+    let response = request(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetGuildMembers { after, guild_id, limit },
+    })?;
 
     let mut v = serde_json::from_reader::<HyperResponse, Value>(response)?;
 
@@ -1364,45 +1195,43 @@ pub fn get_guild_members(guild_id: u64,
 
 /// Gets the amount of users that can be pruned.
 pub fn get_guild_prune_count(guild_id: u64, map: &Value) -> Result<GuildPrune> {
-    let body = map.to_string();
-    let response = request!(
-        Route::GuildsIdPrune(guild_id),
-        get(body),
-        "/guilds/{}/prune",
-        guild_id
-    );
+    // Note for 0.6.x: turn this into a function parameter.
+    #[derive(Deserialize)]
+    struct GetGuildPruneCountRequest {
+        days: u64,
+    }
 
-    serde_json::from_reader::<HyperResponse, GuildPrune>(response)
-        .map_err(From::from)
+    let req = serde_json::from_value::<GetGuildPruneCountRequest>(map.clone())?;
+
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetGuildPruneCount {
+            days: req.days,
+            guild_id,
+        },
+    })
 }
 
 /// Gets regions that a guild can use. If a guild has the `VIP_REGIONS` feature
 /// enabled, then additional VIP-only regions are returned.
 pub fn get_guild_regions(guild_id: u64) -> Result<Vec<VoiceRegion>> {
-    let response = request!(
-        Route::GuildsIdRegions(guild_id),
-        get,
-        "/guilds/{}/regions",
-        guild_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Vec<VoiceRegion>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetGuildRegions { guild_id },
+    })
 }
 
 /// Retrieves a list of roles in a [`Guild`].
 ///
 /// [`Guild`]: ../model/guild/struct.Guild.html
 pub fn get_guild_roles(guild_id: u64) -> Result<Vec<Role>> {
-    let response = request!(
-        Route::GuildsIdRoles(guild_id),
-        get,
-        "/guilds/{}/roles",
-        guild_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Vec<Role>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetGuildRoles { guild_id },
+    })
 }
 
 /// Retrieves the webhooks for the given [guild][`Guild`]'s Id.
@@ -1424,15 +1253,11 @@ pub fn get_guild_roles(guild_id: u64) -> Result<Vec<Role>> {
 ///
 /// [`Guild`]: ../model/guild/struct.Guild.html
 pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
-    let response = request!(
-        Route::GuildsIdWebhooks(guild_id),
-        get,
-        "/guilds/{}/webhooks",
-        guild_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Vec<Webhook>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetGuildWebhooks { guild_id },
+    })
 }
 
 /// Gets a paginated list of the current user's guilds.
@@ -1456,54 +1281,40 @@ pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
 ///
 /// [docs]: https://discordapp.com/developers/docs/resources/user#get-current-user-guilds
 pub fn get_guilds(target: &GuildPagination, limit: u64) -> Result<Vec<GuildInfo>> {
-    let mut uri = format!("/users/@me/guilds?limit={}", limit);
+    let (after, before) = match *target {
+        GuildPagination::After(id) => (Some(id.0), None),
+        GuildPagination::Before(id) => (None, Some(id.0)),
+    };
 
-    match *target {
-        GuildPagination::After(id) => {
-            write!(uri, "&after={}", id)?;
-        },
-        GuildPagination::Before(id) => {
-            write!(uri, "&before={}", id)?;
-        },
-    }
-
-    let response = request!(Route::UsersMeGuilds, get, "{}", uri);
-
-    serde_json::from_reader::<HyperResponse, Vec<GuildInfo>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetGuilds { after, before, limit },
+    })
 }
 
 /// Gets information about a specific invite.
 #[allow(unused_mut)]
-pub fn get_invite(code: &str, stats: bool) -> Result<Invite> {
-    let mut invite = code;
-
+pub fn get_invite(mut code: &str, stats: bool) -> Result<Invite> {
     #[cfg(feature = "utils")]
     {
-        invite = ::utils::parse_invite(invite);
+        code = ::utils::parse_invite(code);
     }
 
-    let mut uri = format!("/invites/{}", invite);
-
-    if stats {
-        uri.push_str("?with_counts=true");
-    }
-
-    let response = request!(Route::InvitesCode, get, "{}", uri);
-
-    serde_json::from_reader::<HyperResponse, Invite>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetInvite { code, stats },
+    })
 }
 
 /// Gets member of a guild.
 pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
-    let response = request!(
-        Route::GuildsIdMembersId(guild_id),
-        get,
-        "/guilds/{}/members/{}",
-        guild_id,
-        user_id
-    );
+    let response = request(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetMember { guild_id, user_id },
+    })?;
 
     let mut v = serde_json::from_reader::<HyperResponse, Value>(response)?;
 
@@ -1516,40 +1327,32 @@ pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
 
 /// Gets a message by an Id, bots only.
 pub fn get_message(channel_id: u64, message_id: u64) -> Result<Message> {
-    let response = request!(
-        Route::ChannelsIdMessagesId(LightMethod::Any, channel_id),
-        get,
-        "/channels/{}/messages/{}",
-        channel_id,
-        message_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Message>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetMessage { channel_id, message_id },
+    })
 }
 
 /// Gets X messages from a channel.
 pub fn get_messages(channel_id: u64, query: &str) -> Result<Vec<Message>> {
-    let url = format!(api!("/channels/{}/messages{}"), channel_id, query);
-    let client = request_client!();
-
-    let response = request(Route::ChannelsIdMessages(channel_id), || client.get(&url))?;
-
-    serde_json::from_reader::<HyperResponse, Vec<Message>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetMessages {
+            query: query.to_owned(),
+            channel_id,
+        },
+    })
 }
 
 /// Gets all pins of a channel.
 pub fn get_pins(channel_id: u64) -> Result<Vec<Message>> {
-    let response = request!(
-        Route::ChannelsIdPins(channel_id),
-        get,
-        "/channels/{}/pins",
-        channel_id
-    );
-
-    serde_json::from_reader::<HyperResponse, Vec<Message>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetPins { channel_id },
+    })
 }
 
 /// Gets user Ids based on their reaction to a message. This endpoint is dumb.
@@ -1559,36 +1362,30 @@ pub fn get_reaction_users(channel_id: u64,
                           limit: u8,
                           after: Option<u64>)
                           -> Result<Vec<User>> {
-    let mut uri = format!(
-        "/channels/{}/messages/{}/reactions/{}?limit={}",
-        channel_id,
-        message_id,
-        reaction_type.as_data(),
-        limit
-    );
+    let reaction = reaction_type.as_data();
 
-    if let Some(user_id) = after {
-        write!(uri, "&after={}", user_id)?;
-    }
-
-    let response = request!(
-        Route::ChannelsIdMessagesIdReactionsUserIdType(channel_id),
-        get,
-        "{}",
-        uri
-    );
-
-    serde_json::from_reader::<HyperResponse, Vec<User>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetReactionUsers {
+            after,
+            channel_id,
+            limit,
+            message_id,
+            reaction,
+        },
+    })
 }
 
 /// Gets the current unresolved incidents from Discord's Status API.
 ///
 /// Does not require authentication.
 pub fn get_unresolved_incidents() -> Result<Vec<Incident>> {
-    let client = request_client!();
-
-    let response = retry(|| client.get(status!("/incidents/unresolved.json")))?;
+    let response = request(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetUnresolvedIncidents,
+    })?;
 
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
@@ -1603,10 +1400,10 @@ pub fn get_unresolved_incidents() -> Result<Vec<Incident>> {
 ///
 /// Does not require authentication.
 pub fn get_upcoming_maintenances() -> Result<Vec<Maintenance>> {
-    let client = request_client!();
-
-    let response = retry(|| {
-        client.get(status!("/scheduled-maintenances/upcoming.json"))
+    let response = request(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetUpcomingMaintenances,
     })?;
 
     let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
@@ -1620,26 +1417,29 @@ pub fn get_upcoming_maintenances() -> Result<Vec<Maintenance>> {
 
 /// Gets a user by Id.
 pub fn get_user(user_id: u64) -> Result<User> {
-    let response = request!(Route::UsersId, get, "/users/{}", user_id);
-
-    serde_json::from_reader::<HyperResponse, User>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetUser { user_id },
+    })
 }
 
 /// Gets our DM channels.
 pub fn get_user_dm_channels() -> Result<Vec<PrivateChannel>> {
-    let response = request!(Route::UsersMeChannels, get, "/users/@me/channels");
-
-    serde_json::from_reader::<HyperResponse, Vec<PrivateChannel>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetUserDmChannels,
+    })
 }
 
 /// Gets all voice regions.
 pub fn get_voice_regions() -> Result<Vec<VoiceRegion>> {
-    let response = request!(Route::VoiceRegions, get, "/voice/regions");
-
-    serde_json::from_reader::<HyperResponse, Vec<VoiceRegion>>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetVoiceRegions,
+    })
 }
 
 /// Retrieves a webhook given its Id.
@@ -1660,15 +1460,11 @@ pub fn get_voice_regions() -> Result<Vec<VoiceRegion>> {
 ///
 /// [`get_webhook_with_token`]: fn.get_webhook_with_token.html
 pub fn get_webhook(webhook_id: u64) -> Result<Webhook> {
-    let response = request!(
-        Route::WebhooksId(webhook_id),
-        get,
-        "/webhooks/{}",
-        webhook_id,
-    );
-
-    serde_json::from_reader::<HyperResponse, Webhook>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetWebhook { webhook_id },
+    })
 }
 
 /// Retrieves a webhook given its Id and unique token.
@@ -1689,64 +1485,47 @@ pub fn get_webhook(webhook_id: u64) -> Result<Webhook> {
 ///     .expect("Error getting webhook");
 /// ```
 pub fn get_webhook_with_token(webhook_id: u64, token: &str) -> Result<Webhook> {
-    let client = request_client!();
-
-    let response = retry(|| {
-        client
-            .get(&format!(api!("/webhooks/{}/{}"), webhook_id, token))
-    }).map_err(Error::Hyper)?;
-
-    serde_json::from_reader::<HyperResponse, Webhook>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::GetWebhookWithToken { token, webhook_id },
+    })
 }
 
 /// Kicks a member from a guild.
 pub fn kick_member(guild_id: u64, user_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::GuildsIdMembersId(guild_id),
-            delete,
-            "/guilds/{}/members/{}",
-            guild_id,
-            user_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::KickMember { guild_id, user_id },
+    })
 }
 
 /// Leaves a group DM.
-pub fn leave_group(guild_id: u64) -> Result<Group> {
-    let response = request!(Route::None, delete, "/channels/{}", guild_id);
-
-    serde_json::from_reader::<HyperResponse, Group>(response)
-        .map_err(From::from)
+pub fn leave_group(group_id: u64) -> Result<Group> {
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::LeaveGroup { group_id },
+    })
 }
 
 /// Leaves a guild.
 pub fn leave_guild(guild_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::UsersMeGuildsId,
-            delete,
-            "/users/@me/guilds/{}",
-            guild_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::LeaveGuild { guild_id },
+    })
 }
 
 /// Deletes a user from group DM.
 pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::None,
-            delete,
-            "/channels/{}/recipients/{}",
-            group_id,
-            user_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::RemoveGroupRecipient { group_id, user_id },
+    })
 }
 
 /// Sends file(s) to a channel.
@@ -1760,7 +1539,7 @@ pub fn remove_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
 pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, map: JsonMap) -> Result<Message>
     where T: Into<AttachmentType<'a>> {
-    let uri = format!(api!("/channels/{}/messages"), channel_id);
+    let uri = api!("/channels/{}/messages", channel_id);
     let url = match Url::parse(&uri) {
         Ok(url) => url,
         Err(_) => return Err(Error::Url(uri)),
@@ -1768,7 +1547,7 @@ pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, m
 
     let tc = NativeTlsClient::new()?;
     let connector = HttpsConnector::new(tc);
-    let mut request = Request::with_connector(Method::Post, url, &connector)?;
+    let mut request = HyperRequest::with_connector(Method::Post, url, &connector)?;
     request
         .headers_mut()
         .set(header::Authorization(TOKEN.lock().clone()));
@@ -1817,50 +1596,36 @@ pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, m
         return Err(Error::Http(HttpError::UnsuccessfulRequest(response)));
     }
 
-    serde_json::from_reader::<HyperResponse, Message>(response)
-        .map_err(From::from)
+    serde_json::from_reader(response).map_err(From::from)
 }
 
 /// Sends a message to a channel.
 pub fn send_message(channel_id: u64, map: &Value) -> Result<Message> {
-    let body = map.to_string();
-    let response = request!(
-        Route::ChannelsIdMessages(channel_id),
-        post(body),
-        "/channels/{}/messages",
-        channel_id
-    );
+    let body = serde_json::to_vec(map)?;
 
-    serde_json::from_reader::<HyperResponse, Message>(response)
-        .map_err(From::from)
+    fire(Request {
+        body: Some(&body),
+        headers: None,
+        route: RouteInfo::CreateMessage { channel_id },
+    })
 }
 
 /// Pins a message in a channel.
 pub fn pin_message(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::ChannelsIdPinsMessageId(channel_id),
-            put,
-            "/channels/{}/pins/{}",
-            channel_id,
-            message_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::PinMessage { channel_id, message_id },
+    })
 }
 
 /// Unbans a user from a guild.
 pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::GuildsIdBansUserId(guild_id),
-            delete,
-            "/guilds/{}/bans/{}",
-            guild_id,
-            user_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::RemoveBan { guild_id, user_id },
+    })
 }
 
 /// Deletes a single [`Role`] from a [`Member`] in a [`Guild`].
@@ -1871,69 +1636,154 @@ pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
 /// [`Guild`]: ../model/guild/struct.Guild.html
 /// [`Member`]: ../model/guild/struct.Member.html
 /// [`Role`]: ../model/guild/struct.Role.html
-/// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
+/// [Manage Roles]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
 pub fn remove_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::GuildsIdMembersIdRolesId(guild_id),
-            delete,
-            "/guilds/{}/members/{}/roles/{}",
-            guild_id,
-            user_id,
-            role_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::RemoveMemberRole { guild_id, user_id, role_id },
+    })
 }
 
 /// Starts removing some members from a guild based on the last time they've been online.
 pub fn start_guild_prune(guild_id: u64, map: &Value) -> Result<GuildPrune> {
-    let body = map.to_string();
-    let response = request!(
-        Route::GuildsIdPrune(guild_id),
-        post(body),
-        "/guilds/{}/prune",
-        guild_id
-    );
+    // Note for 0.6.x: turn this into a function parameter.
+    #[derive(Deserialize)]
+    struct StartGuildPruneRequest {
+        days: u64,
+    }
 
-    serde_json::from_reader::<HyperResponse, GuildPrune>(response)
-        .map_err(From::from)
+    let req = serde_json::from_value::<StartGuildPruneRequest>(map.clone())?;
+
+    fire(Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::StartGuildPrune {
+            days: req.days,
+            guild_id,
+        },
+    })
 }
 
 /// Starts syncing an integration with a guild.
 pub fn start_integration_sync(guild_id: u64, integration_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::GuildsIdIntegrationsIdSync(guild_id),
-            post,
-            "/guilds/{}/integrations/{}/sync",
-            guild_id,
-            integration_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::StartIntegrationSync { guild_id, integration_id },
+    })
 }
 
 /// Unpins a message from a channel.
 pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
-    verify(
-        204,
-        request!(
-            Route::ChannelsIdPinsMessageId(channel_id),
-            delete,
-            "/channels/{}/pins/{}",
-            channel_id,
-            message_id
-        ),
-    )
+    wind(204, Request {
+        body: None,
+        headers: None,
+        route: RouteInfo::UnpinMessage { channel_id, message_id },
+    })
 }
 
-fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
-    where F: Fn() -> RequestBuilder<'a> {
-    let response = ratelimiting::perform(route, || {
-        f().header(header::Authorization(TOKEN.lock().clone()))
-            .header(header::ContentType::json())
-    })?;
+/// Fires off a request, deserializing the response reader via the given type
+/// bound.
+///
+/// If you don't need to deserialize the response and want the response instance
+/// itself, use [`request`].
+///
+/// # Examples
+///
+/// Create a new message via the [`RouteInfo::CreateMessage`] endpoint and
+/// deserialize the response into a [`Message`]:
+///
+/// ```rust,no_run
+/// # extern crate serenity;
+/// #
+/// # use std::error::Error;
+/// #
+/// # fn try_main() -> Result<(), Box<Error>> {
+/// #
+/// use serenity::{
+///     http::{
+///         self,
+///         request::RequestBuilder,
+///         routing::RouteInfo,
+///     },
+///     model::channel::Message,
+/// };
+///
+/// let bytes = vec![
+///     // payload bytes here
+/// ];
+/// let channel_id = 381880193700069377;
+/// let route_info = RouteInfo::CreateMessage { channel_id };
+///
+/// let mut request = RequestBuilder::new(route_info);
+/// request.body(Some(&bytes));
+///
+/// let message = http::fire::<Message>(request.build())?;
+///
+/// println!("Message content: {}", message.content);
+/// #
+/// #     Ok(())
+/// # }
+/// #
+/// # fn main() {
+/// #     try_main().unwrap();
+/// # }
+/// ```
+///
+/// [`request`]: fn.request.html
+pub fn fire<T: DeserializeOwned>(req: Request) -> Result<T> {
+    let response = request(req)?;
+
+    serde_json::from_reader(response).map_err(From::from)
+}
+
+/// Performs a request, ratelimiting it if necessary.
+///
+/// Returns the raw hyper Response. Use [`fire`] to deserialize the response
+/// into some type.
+///
+/// # Examples
+///
+/// Send a body of bytes over the [`RouteInfo::CreateMessage`] endpoint:
+///
+/// ```rust,no_run
+/// # extern crate serenity;
+/// #
+/// # use std::error::Error;
+/// #
+/// # fn try_main() -> Result<(), Box<Error>> {
+/// #
+/// use serenity::http::{
+///     self,
+///     request::RequestBuilder,
+///     routing::RouteInfo,
+/// };
+///
+/// let bytes = vec![
+///     // payload bytes here
+/// ];
+/// let channel_id = 381880193700069377;
+/// let route_info = RouteInfo::CreateMessage { channel_id };
+///
+/// let mut request = RequestBuilder::new(route_info);
+/// request.body(Some(&bytes));
+///
+/// let response = http::request(request.build())?;
+///
+/// println!("Response successful?: {}", response.status.is_success());
+/// #
+/// #     Ok(())
+/// # }
+/// #
+/// # fn main() {
+/// #     try_main().unwrap();
+/// # }
+/// ```
+///
+/// [`fire`]: fn.fire.html
+pub fn request(req: Request) -> Result<HyperResponse> {
+    let response = ratelimiting::perform(req)?;
 
     if response.status.class() == StatusClass::Success {
         Ok(response)
@@ -1942,28 +1792,37 @@ fn request<'a, F>(route: Route, f: F) -> Result<HyperResponse>
     }
 }
 
-pub(crate) fn retry<'a, F>(f: F) -> HyperResult<HyperResponse>
-    where F: Fn() -> RequestBuilder<'a> {
-    let req = || {
-        f().header(header::UserAgent(constants::USER_AGENT.to_string()))
-            .send()
-    };
-
-    match req() {
-        Err(HyperError::Io(ref io)) if io.kind() == IoErrorKind::ConnectionAborted => req(),
-        other => other,
+fn retry(request: &Request) -> HyperResult<HyperResponse> {
+    // Retry the request twice in a loop until it succeeds.
+    //
+    // If it doesn't and the loop breaks, try one last time.
+    for _ in 0..3 {
+        match request.build().send() {
+            Err(HyperError::Io(ref io))
+                if io.kind() == IoErrorKind::ConnectionAborted => continue,
+            other => return other,
+        }
     }
+
+    request.build().send()
 }
 
-fn verify(expected: u16, response: HyperResponse) -> Result<()> {
-    if response.status.to_u16() == expected {
+/// Performs a request and then verifies that the response status code is equal
+/// to the expected value.
+///
+/// This is a function that performs a light amount of work and returns an
+/// empty tuple, so it's called "wind" to denote that it's lightweight.
+fn wind(expected: u16, req: Request) -> Result<()> {
+    let resp = request(req)?;
+
+    if resp.status.to_u16() == expected {
         return Ok(());
     }
 
-    debug!("Expected {}, got {}", expected, response.status);
-    trace!("Unsuccessful response: {:?}", response);
+    debug!("Expected {}, got {}", expected, resp.status);
+    trace!("Unsuccessful response: {:?}", resp);
 
-    Err(Error::Http(HttpError::UnsuccessfulRequest(response)))
+    Err(Error::Http(HttpError::UnsuccessfulRequest(resp)))
 }
 
 /// Enum that allows a user to pass a `Path` or a `File` type to `send_files`
@@ -2007,4 +1866,22 @@ pub enum GuildPagination {
     After(GuildId),
     /// The Id to get the guilds before.
     Before(GuildId),
+}
+
+#[cfg(test)]
+mod test {
+    use super::AttachmentType;
+    use std::path::Path;
+
+    #[test]
+    fn test_attachment_type() {
+        assert!(match AttachmentType::from(Path::new("./dogs/corgis/kona.png")) {
+            AttachmentType::Path(_) => true,
+            _ => false,
+        });
+        assert!(match AttachmentType::from("./cats/copycat.png") {
+            AttachmentType::Path(_) => true,
+            _ => false,
+        });
+    }
 }

@@ -106,10 +106,9 @@ impl ShardMessenger {
     /// # }
     /// ```
     ///
-    /// [`Event::GuildMembersChunk`]:
-    /// ../../model/event/enum.Event.html#variant.GuildMembersChunk
-    /// [`Guild`]: ../../model/guild/struct.Guild.html
-    /// [`Member`]: ../../model/guild/struct.Member.html
+    /// [`Event::GuildMembersChunk`]: ../../../model/event/enum.Event.html#variant.GuildMembersChunk
+    /// [`Guild`]: ../../../model/guild/struct.Guild.html
+    /// [`Member`]: ../../../model/guild/struct.Member.html
     pub fn chunk_guilds<It>(
         &self,
         guild_ids: It,
@@ -147,9 +146,19 @@ impl ShardMessenger {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
     /// #
+    /// # #[cfg(feature = "model")]
     /// use serenity::model::gateway::Game;
+    /// # #[cfg(not(feature = "model"))]
+    /// use serenity::model::gateway::{Game, GameType};
     ///
+    /// # #[cfg(feature = "model")]
     /// shard.set_game(Some(Game::playing("Heroes of the Storm")));
+    /// # #[cfg(not(feature = "model"))]
+    /// shard.set_game(Some(Game {
+    ///     kind: GameType::Playing,
+    ///     name: "Heroes of the Storm".to_owned(),
+    ///     url: None,
+    /// }));
     /// #     Ok(())
     /// # }
     /// #
@@ -157,7 +166,11 @@ impl ShardMessenger {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn set_game(&self, game: Option<Game>) {
+    pub fn set_game<T: Into<Game>>(&self, game: Option<T>) {
+        self._set_game(game.map(Into::into))
+    }
+
+    fn _set_game(&self, game: Option<Game>) {
         let _ = self.send(ShardRunnerMessage::SetGame(game));
     }
 
@@ -195,7 +208,15 @@ impl ShardMessenger {
     /// #     try_main().unwrap();
     /// # }
     /// ```
-    pub fn set_presence(&self, game: Option<Game>, mut status: OnlineStatus) {
+    pub fn set_presence<T: Into<Game>>(
+        &self,
+        game: Option<T>,
+        status: OnlineStatus,
+    ) {
+        self._set_presence(game.map(Into::into), status)
+    }
+
+    fn _set_presence(&self, game: Option<Game>, mut status: OnlineStatus) {
         if status == OnlineStatus::Offline {
             status = OnlineStatus::Invisible;
         }
@@ -239,9 +260,9 @@ impl ShardMessenger {
     /// # }
     /// ```
     ///
-    /// [`DoNotDisturb`]: ../../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
-    /// [`Invisible`]: ../../model/user/enum.OnlineStatus.html#variant.Invisible
-    /// [`Offline`]: ../../model/user/enum.OnlineStatus.html#variant.Offline
+    /// [`DoNotDisturb`]: ../../../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
+    /// [`Invisible`]: ../../../model/user/enum.OnlineStatus.html#variant.Invisible
+    /// [`Offline`]: ../../../model/user/enum.OnlineStatus.html#variant.Offline
     pub fn set_status(&self, mut online_status: OnlineStatus) {
         if online_status == OnlineStatus::Offline {
             online_status = OnlineStatus::Invisible;

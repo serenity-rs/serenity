@@ -19,8 +19,8 @@ use {http, utils};
 pub struct Invite {
     /// The approximate number of [`Member`]s in the related [`Guild`].
     ///
-    /// [`Guild`]: struct.Guild.html
-    /// [`Member`]: struct.Member.html
+    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`Member`]: ../guild/struct.Member.html
     pub approximate_member_count: Option<u64>,
     /// The approximate number of [`Member`]s with an active session in the
     /// related [`Guild`].
@@ -28,14 +28,16 @@ pub struct Invite {
     /// An active session is defined as an open, heartbeating WebSocket connection.
     /// These include [invisible][`OnlineStatus::Invisible`] members.
     ///
-    /// [`OnlineStatus::Invisible`]: enum.OnlineStatus.html#variant.Invisible
+    /// [`OnlineStatus::Invisible`]: ../user/enum.OnlineStatus.html#variant.Invisible
+    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`Member`]: ../guild/struct.Member.html
     pub approximate_presence_count: Option<u64>,
     /// The unique code for the invite.
     pub code: String,
     /// A representation of the minimal amount of information needed about the
     /// [`GuildChannel`] being invited to.
     ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
+    /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
     pub channel: InviteChannel,
     /// A representation of the minimal amount of information needed about the
     /// [`Guild`] being invited to.
@@ -63,11 +65,11 @@ impl Invite {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have the required [permission].
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`CreateInvite`]: ../builder/struct.CreateInvite.html
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [Create Invite]: permissions/constant.CREATE_INVITE.html
-    /// [permission]: permissions/index.html
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`CreateInvite`]: ../../builder/struct.CreateInvite.html
+    /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
+    /// [Create Invite]: ../permissions/struct.Permissions.html#associatedconstant.CREATE_INVITE
+    /// [permission]: ../permissions/index.html
     pub fn create<C, F>(channel_id: C, f: F) -> Result<RichInvite>
         where C: Into<ChannelId>, F: FnOnce(CreateInvite) -> CreateInvite {
         Self::_create(channel_id.into(), f)
@@ -98,9 +100,9 @@ impl Invite {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have the required [permission].
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    /// [permission]: permissions/index.html
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+    /// [permission]: ../permissions/index.html
     pub fn delete(&self) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
@@ -190,7 +192,7 @@ impl InviteGuild {
     /// retrieve the total number of shards in use. If you already have the
     /// total, consider using [`utils::shard_id`].
     ///
-    /// [`utils::shard_id`]: ../utils/fn.shard_id.html
+    /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
     pub fn shard_id(&self) -> u64 { self.id.shard_id() }
@@ -226,7 +228,7 @@ impl InviteGuild {
 /// the [`Invite`] struct.
 ///
 /// [`Invite`]: struct.Invite.html
-/// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+/// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct RichInvite {
     /// A representation of the minimal amount of information needed about the
@@ -281,11 +283,11 @@ impl RichInvite {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required [permission].
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Invite::delete`]: struct.Invite.html#method.delete
-    /// [`http::delete_invite`]: ../http/fn.delete_invite.html
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
-    /// [permission]: permissions/index.html
+    /// [`http::delete_invite`]: ../../http/fn.delete_invite.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD.html
+    /// [permission]: ../permissions/index.html
     pub fn delete(&self) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {

@@ -338,15 +338,14 @@ impl Default for CommandOptions {
 }
 
 pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Option<Vec<usize>> {
-    if !conf.prefixes.is_empty() || conf.dynamic_prefix.is_some() {
-        // Find out if they were mentioned. If not, determine if the prefix
-        // was used. If not, return None.
-        let mut positions: Vec<usize> = vec![];
+    // Mentions have the highest precedence.
+    if let Some(mention_end) = find_mention_end(&msg.content, conf) {
+        return Some(vec![mention_end]); // This can simply be returned without trying to find the end whitespaces as trim will remove it later
+    }
 
-        if let Some(mention_end) = find_mention_end(&msg.content, conf) {
-            positions.push(mention_end);
-            return Some(positions);
-        }
+    if !conf.prefixes.is_empty() || conf.dynamic_prefix.is_some() {
+        // Determine if a prefix was used. Otherwise return None.
+        let mut positions = Vec::new();
 
         // Dynamic prefixes, if present and suitable, always have a higher priority.
         if let Some(x) = conf.dynamic_prefix.as_ref().and_then(|f| f(ctx, msg)) {
@@ -390,10 +389,6 @@ pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Opti
         }
 
         Some(positions)
-    } else if conf.on_mention.is_some() {
-        find_mention_end(&msg.content, conf).map(|mention_end| {
-            vec![mention_end] // This can simply be returned without trying to find the end whitespaces as trim will remove it later
-        })
     } else {
         None
     }

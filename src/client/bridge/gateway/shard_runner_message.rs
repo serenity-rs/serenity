@@ -17,7 +17,7 @@ pub enum ShardRunnerMessage {
         /// The maximum number of members to receive [`GuildMembersChunkEvent`]s
         /// for.
         ///
-        /// [`GuildMembersChunkEvent`]: ../../../model/event/GuildMembersChunkEvent.html
+        /// [`GuildMembersChunkEvent`]: ../../../model/event/struct.GuildMembersChunkEvent.html
         limit: Option<u16>,
         /// Text to filter members by.
         ///

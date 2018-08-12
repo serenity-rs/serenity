@@ -43,11 +43,10 @@ impl GuildId {
     /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
     /// days' worth of messages to delete is over the maximum.
     ///
-    /// [`ModelError::DeleteMessageDaysAmount`]:
-    /// enum.ModelError.html#variant.DeleteMessageDaysAmount
-    /// [`Guild::ban`]: struct.Guild.html#method.ban
-    /// [`User`]: struct.User.html
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    /// [`ModelError::DeleteMessageDaysAmount`]: ../error/enum.Error.html#variant.DeleteMessageDaysAmount
+    /// [`Guild::ban`]: ../guild/struct.Guild.html#method.ban
+    /// [`User`]: ../user/struct.User.html
+    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[inline]
     pub fn ban<U, BO>(&self, user: U, ban_options: &BO) -> Result<()>
         where U: Into<UserId>, BO: BanOptions {
@@ -72,7 +71,7 @@ impl GuildId {
     ///
     /// Requires the [Ban Members] permission.
     ///
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[inline]
     pub fn bans(&self) -> Result<Vec<Ban>> { http::get_bans(self.0) }
 
@@ -87,7 +86,7 @@ impl GuildId {
 
     /// Gets all of the guild's channels over the REST API.
     ///
-    /// [`Guild`]: struct.Guild.html
+    /// [`Guild`]: ../guild/struct.Guild.html
     pub fn channels(&self) -> Result<HashMap<ChannelId, GuildChannel>> {
         let mut channels = HashMap::new();
 
@@ -114,9 +113,9 @@ impl GuildId {
     /// let _channel = GuildId(7).create_channel("test", ChannelType::Voice, None);
     /// ```
     ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`http::create_channel`]: ../http/fn.create_channel.html
-    /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
+    /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
+    /// [`http::create_channel`]: ../../http/fn.create_channel.html
+    /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[inline]
     pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
         where C: Into<Option<ChannelId>> {
@@ -151,10 +150,10 @@ impl GuildId {
     /// how to read an image from the filesystem and encode it as base64. Most
     /// of the example can be applied similarly for this method.
     ///
-    /// [`EditProfile::avatar`]: ../builder/struct.EditProfile.html#method.avatar
-    /// [`Guild::create_emoji`]: struct.Guild.html#method.create_emoji
-    /// [`utils::read_image`]: ../utils/fn.read_image.html
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    /// [`EditProfile::avatar`]: ../../builder/struct.EditProfile.html#method.avatar
+    /// [`Guild::create_emoji`]: ../guild/struct.Guild.html#method.create_emoji
+    /// [`utils::read_image`]: ../../utils/fn.read_image.html
+    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
     pub fn create_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
         let map = json!({
@@ -169,7 +168,7 @@ impl GuildId {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn create_integration<I>(&self, integration_id: I, kind: &str) -> Result<()>
         where I: Into<IntegrationId> {
@@ -195,8 +194,8 @@ impl GuildId {
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
-    /// [`Guild::create_role`]: struct.Guild.html#method.create_role
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [`Guild::create_role`]: ../guild/struct.Guild.html#method.create_role
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
     pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
         let map = utils::vecmap_to_json_map(f(EditRole::default()).0);
@@ -217,7 +216,7 @@ impl GuildId {
     ///
     /// **Note**: Requires the current user to be the owner of the guild.
     ///
-    /// [`Guild::delete`]: struct.Guild.html#method.delete
+    /// [`Guild::delete`]: ../guild/struct.Guild.html#method.delete
     #[inline]
     pub fn delete(&self) -> Result<PartialGuild> { http::delete_guild(self.0) }
 
@@ -225,8 +224,8 @@ impl GuildId {
     ///
     /// Requires the [Manage Emojis] permission.
     ///
-    /// [`Emoji`]: struct.Emoji.html
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    /// [`Emoji`]: ../guild/struct.Emoji.html
+    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
     pub fn delete_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<()> {
         self._delete_emoji(emoji_id.into())
@@ -240,7 +239,7 @@ impl GuildId {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn delete_integration<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
         self._delete_integration(integration_id.into())
@@ -257,9 +256,9 @@ impl GuildId {
     ///
     /// Requires the [Manage Roles] permission.
     ///
-    /// [`Role`]: struct.Role.html
-    /// [`Role::delete`]: struct.Role.html#method.delete
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [`Role`]: ../guild/struct.Role.html
+    /// [`Role::delete`]: ../guild/struct.Role.html#method.delete
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
     pub fn delete_role<R: Into<RoleId>>(&self, role_id: R) -> Result<()> {
         self._delete_role(role_id.into())
@@ -276,8 +275,8 @@ impl GuildId {
     /// **Note**: Requires the current user to have the [Manage Guild]
     /// permission.
     ///
-    /// [`Guild::edit`]: struct.Guild.html#method.edit
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [`Guild::edit`]: ../guild/struct.Guild.html#method.edit
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn edit<F: FnOnce(EditGuild) -> EditGuild>(&mut self, f: F) -> Result<PartialGuild> {
         let map = utils::vecmap_to_json_map(f(EditGuild::default()).0);
@@ -292,9 +291,9 @@ impl GuildId {
     ///
     /// Requires the [Manage Emojis] permission.
     ///
-    /// [`Emoji`]: struct.Emoji.html
-    /// [`Emoji::edit`]: struct.Emoji.html#method.edit
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    /// [`Emoji`]: ../guild/struct.Emoji.html
+    /// [`Emoji::edit`]: ../guild/struct.Emoji.html#method.edit
+    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
     pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str) -> Result<Emoji> {
         self._edit_emoji(emoji_id.into(), name)
@@ -340,7 +339,7 @@ impl GuildId {
     ///
     /// Requires the [Change Nickname] permission.
     ///
-    /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
+    /// [Change Nickname]: ../permissions/struct.Permissions.html#associatedconstant.CHANGE_NICKNAME
     #[inline]
     pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
         http::edit_nickname(self.0, new_nickname)
@@ -360,8 +359,8 @@ impl GuildId {
     /// GuildId(7).edit_role(RoleId(8), |r| r.hoist(true));
     /// ```
     ///
-    /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [`Role`]: ../guild/struct.Role.html
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
     pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
@@ -387,8 +386,8 @@ impl GuildId {
     /// GuildId(7).edit_role_position(RoleId(8), 2);
     /// ```
     ///
-    /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [`Role`]: ../guild/struct.Role.html
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
     pub fn edit_role_position<R>(&self, role_id: R, position: u64) -> Result<Vec<Role>>
         where R: Into<RoleId> {
@@ -425,7 +424,7 @@ impl GuildId {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/struct.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn invites(&self) -> Result<Vec<RichInvite>> { http::get_guild_invites(self.0) }
 
@@ -433,8 +432,8 @@ impl GuildId {
     ///
     /// Requires the [Kick Members] permission.
     ///
-    /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    /// [`Member`]: ../guild/struct.Member.html
+    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[inline]
     pub fn kick<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
         http::kick_member(self.0, user_id.into().0)
@@ -444,16 +443,26 @@ impl GuildId {
     #[inline]
     pub fn leave(&self) -> Result<()> { http::leave_guild(self.0) }
 
-    /// Gets a user's [`Member`] for the guild by Id.
+    /// Gets a user's [`Member`] for the guild by Id. 
+    /// 
+    /// If the cache feature is enabled the cache will be checked
+    /// first. If not found it will resort to an http request.
     ///
-    /// [`Guild`]: struct.Guild.html
-    /// [`Member`]: struct.Member.html
+    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`Member`]: ../guild/struct.Member.html
     #[inline]
     pub fn member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
         self._member(user_id.into())
     }
 
     fn _member(&self, user_id: UserId) -> Result<Member> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(member) = CACHE.read().member(self.0, user_id) {
+                return Ok(member);
+            }
+        }
+
         http::get_member(self.0, user_id.0)
     }
 
@@ -463,7 +472,7 @@ impl GuildId {
     /// value is 1000. Optionally pass in `after` to offset the results by a
     /// [`User`]'s Id.
     ///
-    /// [`User`]: struct.User.html
+    /// [`User`]: ../user/struct.User.html
     #[inline]
     pub fn members<U>(&self, limit: Option<u64>, after: Option<U>) -> Result<Vec<Member>>
         where U: Into<UserId> {
@@ -478,7 +487,7 @@ impl GuildId {
     ///
     /// Requires the [Move Members] permission.
     ///
-    /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
+    /// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
     #[inline]
     pub fn move_member<C, U>(&self, user_id: U, channel_id: C) -> Result<()>
         where C: Into<ChannelId>, U: Into<UserId> {
@@ -504,8 +513,8 @@ impl GuildId {
     ///
     /// Requires the [Kick Members] permission.
     ///
-    /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    /// [`Member`]: ../guild/struct.Member.html
+    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     pub fn prune_count(&self, days: u16) -> Result<GuildPrune> {
         let map = json!({
             "days": days,
@@ -546,7 +555,7 @@ impl GuildId {
     /// retrieve the total number of shards in use. If you already have the
     /// total, consider using [`utils::shard_id`].
     ///
-    /// [`utils::shard_id`]: ../utils/fn.shard_id.html
+    /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
     pub fn shard_id(&self) -> u64 { ::utils::shard_id(self.0, CACHE.read().shard_count) }
@@ -580,7 +589,7 @@ impl GuildId {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn start_integration_sync<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
         self._start_integration_sync(integration_id.into())
@@ -599,9 +608,9 @@ impl GuildId {
     ///
     /// **Note**: Requires the [Kick Members] permission.
     ///
-    /// [`GuildPrune`]: struct.GuildPrune.html
-    /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    /// [`GuildPrune`]: ../guild/struct.GuildPrune.html
+    /// [`Member`]: ../guild/struct.Member.html
+    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[inline]
     pub fn start_prune(&self, days: u16) -> Result<GuildPrune> {
         let map = json!({
@@ -615,8 +624,8 @@ impl GuildId {
     ///
     /// Requires the [Ban Members] permission.
     ///
-    /// [`User`]: struct.User.html
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    /// [`User`]: ../user/struct.User.html
+    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[inline]
     pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
         self._unban(user_id.into())
@@ -630,7 +639,7 @@ impl GuildId {
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn vanity_url(&self) -> Result<String> {
         http::get_guild_vanity_url(self.0)
@@ -640,7 +649,7 @@ impl GuildId {
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> { http::get_guild_webhooks(self.0) }
 }

@@ -45,7 +45,7 @@ impl EditProfile {
     /// # client.start().unwrap();
     /// ```
     ///
-    /// [`utils::read_image`]: ../fn.read_image.html
+    /// [`utils::read_image`]: ../utils/fn.read_image.html
     pub fn avatar(mut self, avatar: Option<&str>) -> Self {
         let avatar = avatar.map_or(Value::Null, |x| Value::String(x.to_string()));
         self.0.insert("avatar", avatar);

@@ -131,6 +131,66 @@ impl Game {
     }
 }
 
+impl<'a> From<&'a str> for Game {
+    fn from(name: &'a str) -> Self {
+        Game {
+            kind: GameType::Playing,
+            name: name.to_owned(),
+            url: None,
+        }
+    }
+}
+
+impl From<String> for Game {
+    fn from(name: String) -> Self {
+        Game {
+            kind: GameType::Playing,
+            url: None,
+            name,
+        }
+    }
+}
+
+impl<'a> From<(String, GameType)> for Game {
+    fn from((name, kind): (String, GameType)) -> Self {
+        Self {
+            url: None,
+            kind,
+            name,
+        }
+    }
+}
+
+impl<'a> From<(&'a str, &'a str)> for Game {
+    fn from((name, url): (&'a str, &'a str)) -> Self {
+        Self {
+            kind: GameType::Streaming,
+            name: name.to_owned(),
+            url: Some(url.to_owned()),
+        }
+    }
+}
+
+impl From<(String, String)> for Game {
+    fn from((name, url): (String, String)) -> Self {
+        Self {
+            kind: GameType::Streaming,
+            url: Some(url),
+            name,
+        }
+    }
+}
+
+impl From<(String, GameType, String)> for Game {
+    fn from((name, kind, url): (String, GameType, String)) -> Self {
+        Self {
+            url: Some(url),
+            kind,
+            name,
+        }
+    }
+}
+
 impl<'de> Deserialize<'de> for Game {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
@@ -201,12 +261,12 @@ pub struct Gateway {
 
 /// Information detailing the current online status of a [`User`].
 ///
-/// [`User`]: struct.User.html
+/// [`User`]: ../user/struct.User.html
 #[derive(Clone, Debug)]
 pub struct Presence {
     /// The game that a [`User`] is current playing.
     ///
-    /// [`User`]: struct.User.html
+    /// [`User`]: ../user/struct.User.html
     pub game: Option<Game>,
     /// The date of the last presence update.
     pub last_modified: Option<u64>,
@@ -214,7 +274,7 @@ pub struct Presence {
     pub nick: Option<String>,
     /// The user's online status.
     pub status: OnlineStatus,
-    /// The Id of the [`User`]. Can be used to calculate the user's creation
+    /// The Id of the [`User`](../user/struct.User.html). Can be used to calculate the user's creation
     /// date.
     pub user_id: UserId,
     /// The associated user instance.

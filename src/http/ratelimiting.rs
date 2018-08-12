@@ -8,7 +8,7 @@
 //! > For example, `/channels/:channel_id` and
 //! > `/channels/:channel_id/messages/:message_id` both take `channel_id` into
 //! > account when generating rate limits since it's the major parameter. The
-//! only current major parameters are `channel_id` and `guild_id`.
+//! only current major parameters are `channel_id`, `guild_id` and `webhook_id`.
 //!
 //! This results in the two URIs of `GET /channels/4/messages/7` and
 //! `GET /channels/5/messages/8` being rate limited _separately_. However, the
@@ -40,8 +40,10 @@
 //! [Taken from]: https://discordapp.com/developers/docs/topics/rate-limits#rate-limits
 #![allow(zero_ptr)]
 
+pub use super::routing::Route;
+
 use chrono::{DateTime, Utc};
-use hyper::client::{RequestBuilder, Response};
+use hyper::client::Response;
 use hyper::header::Headers;
 use hyper::status::StatusCode;
 use internal::prelude::*;
@@ -54,7 +56,7 @@ use std::{
     thread,
     i64
 };
-use super::{HttpError, LightMethod};
+use super::{HttpError, Request};
 
 /// Refer to [`offset`].
 ///
@@ -96,277 +98,27 @@ lazy_static! {
     /// ```
     ///
     /// [`RateLimit`]: struct.RateLimit.html
-    /// [`Route`]: enum.Route.html
+    /// [`Route`]: ../routing/enum.Route.html
     pub static ref ROUTES: Arc<Mutex<HashMap<Route, Arc<Mutex<RateLimit>>>>> = {
         Arc::new(Mutex::new(HashMap::default()))
     };
 }
 
-/// A representation of all routes registered within the library. These are safe
-/// and memory-efficient representations of each path that functions exist for
-/// in the [`http`] module.
-///
-/// [`http`]: ../index.html
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub enum Route {
-    /// Route for the `/channels/:channel_id` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsId(u64),
-    /// Route for the `/channels/:channel_id/invites` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdInvites(u64),
-    /// Route for the `/channels/:channel_id/messages` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdMessages(u64),
-    /// Route for the `/channels/:channel_id/messages/bulk-delete` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdMessagesBulkDelete(u64),
-    /// Route for the `/channels/:channel_id/messages/:message_id` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    // This route is a unique case. The ratelimit for message _deletions_ is
-    // different than the overall route ratelimit.
-    //
-    // Refer to the docs on [Rate Limits] in the yellow warning section.
-    //
-    // Additionally, this needs to be a `LightMethod` from the parent module
-    // and _not_ a `hyper` `Method` due to `hyper`'s not deriving `Copy`.
-    //
-    // [Rate Limits]: https://discordapp.com/developers/docs/topics/rate-limits
-    ChannelsIdMessagesId(LightMethod, u64),
-    /// Route for the `/channels/:channel_id/messages/:message_id/ack` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdMessagesIdAck(u64),
-    /// Route for the `/channels/:channel_id/messages/:message_id/reactions`
-    /// path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdMessagesIdReactions(u64),
-    /// Route for the
-    /// `/channels/:channel_id/messages/:message_id/reactions/:reaction/@me`
-    /// path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdMessagesIdReactionsUserIdType(u64),
-    /// Route for the `/channels/:channel_id/permissions/:target_id` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdPermissionsOverwriteId(u64),
-    /// Route for the `/channels/:channel_id/pins` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdPins(u64),
-    /// Route for the `/channels/:channel_id/pins/:message_id` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdPinsMessageId(u64),
-    /// Route for the `/channels/:channel_id/typing` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdTyping(u64),
-    /// Route for the `/channels/:channel_id/webhooks` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
-    ChannelsIdWebhooks(u64),
-    /// Route for the `/gateway` path.
-    Gateway,
-    /// Route for the `/gateway/bot` path.
-    GatewayBot,
-    /// Route for the `/guilds` path.
-    Guilds,
-    /// Route for the `/guilds/:guild_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsId(u64),
-    /// Route for the `/guilds/:guild_id/bans` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdBans(u64),
-    /// Route for the `/guilds/:guild_id/audit-logs` path.
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdAuditLogs(u64),
-    /// Route for the `/guilds/:guild_id/bans/:user_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdBansUserId(u64),
-    /// Route for the `/guilds/:guild_id/channels/:channel_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdChannels(u64),
-    /// Route for the `/guilds/:guild_id/embed` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdEmbed(u64),
-    /// Route for the `/guilds/:guild_id/emojis` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdEmojis(u64),
-    /// Route for the `/guilds/:guild_id/emojis/:emoji_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdEmojisId(u64),
-    /// Route for the `/guilds/:guild_id/integrations` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdIntegrations(u64),
-    /// Route for the `/guilds/:guild_id/integrations/:integration_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdIntegrationsId(u64),
-    /// Route for the `/guilds/:guild_id/integrations/:integration_id/sync`
-    /// path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdIntegrationsIdSync(u64),
-    /// Route for the `/guilds/:guild_id/invites` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdInvites(u64),
-    /// Route for the `/guilds/:guild_id/members` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdMembers(u64),
-    /// Route for the `/guilds/:guild_id/members/:user_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdMembersId(u64),
-    /// Route for the `/guilds/:guild_id/members/:user_id/roles/:role_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdMembersIdRolesId(u64),
-    /// Route for the `/guilds/:guild_id/members/@me/nick` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdMembersMeNick(u64),
-    /// Route for the `/guilds/:guild_id/prune` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdPrune(u64),
-    /// Route for the `/guilds/:guild_id/regions` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdRegions(u64),
-    /// Route for the `/guilds/:guild_id/roles` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdRoles(u64),
-    /// Route for the `/guilds/:guild_id/roles/:role_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdRolesId(u64),
-    /// Route for the `/guilds/:guild_id/vanity-url` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdVanityUrl(u64),
-    /// Route for the `/guilds/:guild_id/webhooks` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: struct.GuildId.html
-    GuildsIdWebhooks(u64),
-    /// Route for the `/invites/:code` path.
-    InvitesCode,
-    /// Route for the `/users/:user_id` path.
-    UsersId,
-    /// Route for the `/users/@me` path.
-    UsersMe,
-    /// Route for the `/users/@me/channels` path.
-    UsersMeChannels,
-    /// Route for the `/users/@me/guilds` path.
-    UsersMeGuilds,
-    /// Route for the `/users/@me/guilds/:guild_id` path.
-    UsersMeGuildsId,
-    /// Route for the `/voice/regions` path.
-    VoiceRegions,
-    /// Route for the `/webhooks/:webhook_id` path.
-    WebhooksId(u64),
-    /// Route where no ratelimit headers are in place (i.e. user account-only
-    /// routes).
-    ///
-    /// This is a special case, in that if the route is `None` then pre- and
-    /// post-hooks are not executed.
-    None,
-}
-
-pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
-    where F: Fn() -> RequestBuilder<'a> {
+pub(super) fn perform(req: Request) -> Result<Response> {
     loop {
         // This will block if another thread already has the global
         // unlocked already (due to receiving an x-ratelimit-global).
         let _ = GLOBAL.lock();
+
+        // Destructure the tuple instead of retrieving the third value to
+        // take advantage of the type system. If `RouteInfo::deconstruct`
+        // returns a different number of tuple elements in the future, directly
+        // accessing a certain index (e.g. `req.route.deconstruct().1`) would
+        // mean this code would not indicate it might need to be updated for the
+        // new tuple element amount.
+        //
+        // This isn't normally important, but might be for ratelimiting.
+        let (_, route, _) = req.route.deconstruct();
 
         // Perform pre-checking here:
         //
@@ -390,7 +142,7 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
         let mut lock = bucket.lock();
         lock.pre_hook(&route);
 
-        let response = super::retry(&f)?;
+        let response = super::retry(&req)?;
 
         // Check if an offset has been calculated yet to determine the time
         // difference from Discord can the client.
@@ -452,7 +204,7 @@ pub(crate) fn perform<'a, F>(route: Route, f: F) -> Result<Response>
 /// 429s.
 ///
 /// [`ROUTES`]: struct.ROUTES.html
-/// [`Route`]: enum.Route.html
+/// [`Route`]: ../routing/enum.Route.html
 /// [Discord docs]: https://discordapp.com/developers/docs/topics/rate-limits
 #[derive(Clone, Debug, Default)]
 pub struct RateLimit {
