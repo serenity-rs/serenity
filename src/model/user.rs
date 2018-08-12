@@ -661,7 +661,7 @@ impl User {
     /// println!("{:?}", client.start());
     /// ```
     pub fn refresh(&mut self) -> Result<()> {
-        self.id.get().map(|replacement| {
+        self.id.to_user().map(|replacement| {
             mem::replace(self, replacement);
 
             ()
@@ -738,17 +738,38 @@ impl UserId {
 
     /// Search the cache for the user with the Id.
     #[cfg(feature = "cache")]
-    pub fn find(&self) -> Option<Arc<RwLock<User>>> { CACHE.read().user(*self) }
+    #[deprecated(since = "0.5.8", note = "Use the `to_user_cached`-method instead.")]
+    pub fn find(&self) -> Option<Arc<RwLock<User>>> { self.to_user_cached() }
+
+    /// Attempts to find a [`User`] by its Id in the cache.
+    ///
+    /// [`User`]: ../user/struct.User.html
+    #[cfg(feature = "cache")]
+    #[inline]
+    pub fn to_user_cached(self) -> Option<Arc<RwLock<User>>> { CACHE.read().user(self) }
 
     /// Gets a user by its Id from either the cache or the REST API.
     ///
     /// Searches the cache for the user first, if the cache is enabled. If the
     /// user was not found, then the user is searched via the REST API.
     #[inline]
+    #[deprecated(since = "0.5.8", note = "Use the `to_user`-method instead.")]
     pub fn get(&self) -> Result<User> {
+        self.to_user()
+    }
+
+    /// First attempts to find a [`User`] by its Id in the cache,
+    /// upon failure requests it via the REST API.
+    ///
+    /// **Note**: If the cache is not enabled,
+    /// REST API will be used only.
+    ///
+    /// [`User`]: ../user/struct.User.html
+    #[inline]
+    pub fn to_user(self) -> Result<User> {
         #[cfg(feature = "cache")]
         {
-            if let Some(user) = CACHE.read().user(*self) {
+            if let Some(user) = CACHE.read().user(self) {
                 return Ok(user.read().clone());
             }
         }

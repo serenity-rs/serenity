@@ -34,6 +34,13 @@ use http::AttachmentType;
 #[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use std::str::FromStr;
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use model::misc::ChannelParseError;
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use utils::parse_channel;
+
 /// A container for any channel.
 #[derive(Clone, Debug)]
 pub enum Channel {
@@ -74,7 +81,7 @@ impl Channel {
     /// #
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// #     let channel = ChannelId(0).get().unwrap();
+    /// #     let channel = ChannelId(0).to_channel().unwrap();
     /// #
     /// match channel.group() {
     ///     Some(group_lock) => {
@@ -116,7 +123,7 @@ impl Channel {
     /// #
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// #     let channel = ChannelId(0).get().unwrap();
+    /// #     let channel = ChannelId(0).to_channel().unwrap();
     /// #
     /// match channel.guild() {
     ///     Some(guild_lock) => {
@@ -154,7 +161,7 @@ impl Channel {
     /// #
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// #     let channel = ChannelId(0).get().unwrap();
+    /// #     let channel = ChannelId(0).to_channel().unwrap();
     /// #
     /// match channel.private() {
     ///     Some(private_lock) => {
@@ -195,7 +202,7 @@ impl Channel {
     /// #
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// # let channel = ChannelId(0).get().unwrap();
+    /// # let channel = ChannelId(0).to_channel().unwrap();
     /// #
     /// match channel.category() {
     ///     Some(category_lock) => {
@@ -790,6 +797,21 @@ mod test {
 
             let private_channel = private_channel();
             assert!(!private_channel.is_nsfw());
+        }
+    }
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+impl FromStr for Channel {
+    type Err = ChannelParseError;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        match parse_channel(s) {
+            Some(x) => match ChannelId(x).to_channel_cached() {
+                Some(channel) => Ok(channel),
+                _ => Err(ChannelParseError::NotPresentInCache),
+            },
+            _ => Err(ChannelParseError::InvalidChannel),
         }
     }
 }

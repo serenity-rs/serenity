@@ -191,7 +191,7 @@ impl Member {
     /// one returns `None`)
     #[cfg(feature = "cache")]
     pub fn default_channel(&self) -> Option<Arc<RwLock<GuildChannel>>> {
-        let guild = match self.guild_id.find() {
+        let guild = match self.guild_id.to_guild_cached() {
             Some(guild) => guild,
             None => return None,
         };
@@ -257,7 +257,7 @@ impl Member {
     /// role with the lowest ID is the highest.
     #[cfg(feature = "cache")]
     pub fn highest_role_info(&self) -> Option<(RoleId, i64)> {
-        let guild = self.guild_id.find()?;
+        let guild = self.guild_id.to_guild_cached()?;
         let reader = guild.try_read()?;
 
         let mut highest = None;
@@ -356,7 +356,7 @@ impl Member {
     /// [`ModelError::ItemMissing`]: ../error/enum.Error.html#variant.ItemMissing
     #[cfg(feature = "cache")]
     pub fn permissions(&self) -> Result<Permissions> {
-        let guild = match self.guild_id.find() {
+        let guild = match self.guild_id.to_guild_cached() {
             Some(guild) => guild,
             None => return Err(From::from(ModelError::GuildNotFound)),
         };
@@ -427,7 +427,7 @@ impl Member {
     pub fn roles(&self) -> Option<Vec<Role>> {
         self
             .guild_id
-            .find()
+            .to_guild_cached()
             .map(|g| g
                 .read()
                 .roles

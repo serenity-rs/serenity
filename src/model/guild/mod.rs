@@ -656,7 +656,7 @@ impl Guild {
     ///
     /// Requires that the current user be in the guild.
     #[inline]
-    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> { guild_id.into().get() }
+    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> { guild_id.into().to_partial_guild() }
 
     /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
     ///
@@ -1518,7 +1518,7 @@ impl Guild {
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
-    ///         if let Some(arc) = msg.guild_id().unwrap().find() {
+    ///         if let Some(arc) = msg.guild_id().unwrap().to_guild_cached() {
     ///             if let Some(role) = arc.read().role_by_name("role_name") {
     ///                 println!("{:?}", role);
     ///             }

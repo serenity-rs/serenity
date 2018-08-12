@@ -8,6 +8,13 @@ use internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use {CACHE, http};
 
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use std::str::FromStr;
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use model::misc::RoleParseError;
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use utils::parse_role;
+
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
 /// various miscellaneous configurations, such as being assigned a colour. Roles
@@ -80,7 +87,7 @@ impl Role {
     ///
     /// ```rust,no_run
     /// # use serenity::model::id::RoleId;
-    /// # let role = RoleId(7).find().unwrap();
+    /// # let role = RoleId(7).to_role_cached().unwrap();
     /// // assuming a `role` has already been bound
     //
     /// role.edit(|r| r.hoist(true));
@@ -165,17 +172,26 @@ impl PartialOrd for Role {
 impl RoleId {
     /// Search the cache for the role.
     #[cfg(feature = "cache")]
+    #[deprecated(since = "0.5.8", note = "Use the `to_role_cached`-method instead.")]
     pub fn find(&self) -> Option<Role> {
+        self.to_role_cached()
+    }
+
+    /// Tries to find the [`Role`] by its Id in the cache.
+    ///
+    /// [`Role`]: ../guild/struct.Role.html
+    #[cfg(feature = "cache")]
+    pub fn to_role_cached(self) -> Option<Role> {
         let cache = CACHE.read();
 
         for guild in cache.guilds.values() {
             let guild = guild.read();
 
-            if !guild.roles.contains_key(self) {
+            if !guild.roles.contains_key(&self) {
                 continue;
             }
 
-            if let Some(role) = guild.roles.get(self) {
+            if let Some(role) = guild.roles.get(&self) {
                 return Some(role.clone());
             }
         }
@@ -192,4 +208,19 @@ impl From<Role> for RoleId {
 impl<'a> From<&'a Role> for RoleId {
     /// Gets the Id of a role.
     fn from(role: &Role) -> RoleId { role.id }
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+impl FromStr for Role {
+    type Err = RoleParseError;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        match parse_role(s) {
+            Some(x) => match RoleId(x).to_role_cached() {
+                Some(role) => Ok(role),
+                _ => Err(RoleParseError::NotPresentInCache),
+            },
+            _ => Err(RoleParseError::InvalidRole),
+        }
+    }
 }

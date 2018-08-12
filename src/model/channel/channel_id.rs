@@ -285,14 +285,35 @@ impl ChannelId {
 
     /// Search the cache for the channel with the Id.
     #[cfg(feature = "cache")]
-    pub fn find(&self) -> Option<Channel> { CACHE.read().channel(*self) }
+    #[deprecated(since = "0.5.8", note = "Use the `to_channel_cached`-method instead.")]
+    pub fn find(&self) -> Option<Channel> { self.to_channel_cached() }
+
+    /// Attempts to find a [`Channel`] by its Id in the cache.
+    ///
+    /// [`Channel`]: ../channel/enum.Channel.html
+    #[cfg(feature = "cache")]
+    #[inline]
+    pub fn to_channel_cached(self) -> Option<Channel> { CACHE.read().channel(self) }
 
     /// Search the cache for the channel. If it can't be found, the channel is
     /// requested over REST.
+    #[deprecated(since = "0.5.8", note = "Use the `to_channel`-method instead.")]
     pub fn get(&self) -> Result<Channel> {
+        self.to_channel()
+    }
+
+    /// First attempts to find a [`Channel`] by its Id in the cache,
+    /// upon failure requests it via the REST API.
+    ///
+    /// **Note**: If the cache is not enabled,
+    /// REST API will be used only.
+    ///
+    /// [`Channel`]: ../channel/enum.Channel.html
+    #[inline]
+    pub fn to_channel(self) -> Result<Channel> {
         #[cfg(feature = "cache")]
         {
-            if let Some(channel) = CACHE.read().channel(*self) {
+            if let Some(channel) = CACHE.read().channel(self) {
                 return Ok(channel);
             }
         }
@@ -303,6 +324,7 @@ impl ChannelId {
     /// Gets all of the channel's invites.
     ///
     /// Requires the [Manage Channels] permission.
+    ///
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[inline]
     pub fn invites(&self) -> Result<Vec<RichInvite>> { http::get_channel_invites(self.0) }
@@ -363,7 +385,7 @@ impl ChannelId {
         use self::Channel::*;
 
         let finding = feature_cache! {{
-            Some(self.find())
+            Some(self.to_channel_cached())
         } else {
             None
         }};

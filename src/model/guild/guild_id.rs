@@ -402,17 +402,35 @@ impl GuildId {
         http::edit_role_position(self.0, role_id.0, position)
     }
 
-
     /// Search the cache for the guild.
     #[cfg(feature = "cache")]
-    pub fn find(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().guild(*self) }
+    #[deprecated(since = "0.5.8", note = "Use the `to_guild_cached`-method instead.")]
+    pub fn find(&self) -> Option<Arc<RwLock<Guild>>> { self.to_guild_cached() }
+
+    /// Tries to find the [`Guild`] by its Id in the cache.
+    ///
+    /// [`Guild`]: ../guild/struct.Guild.html
+    #[cfg(feature = "cache")]
+    #[inline]
+    pub fn to_guild_cached(self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().guild(self) }
 
     /// Requests the guild over REST.
     ///
     /// Note that this will not be a complete guild, as REST does not send
     /// all data with a guild retrieval.
     #[inline]
-    pub fn get(&self) -> Result<PartialGuild> { http::get_guild(self.0) }
+    #[deprecated(since = "0.5.8", note = "Use the `to_partial_guild`-method instead.")]
+    pub fn get(&self) -> Result<PartialGuild> { self.to_partial_guild() }
+
+    /// Requests [`PartialGuild`] over REST API.
+    ///
+    /// **Note**: This will not be a [`Guild`], as the REST API does not send
+    /// all data with a guild retrieval.
+    ///
+    /// [`PartialGuild`]: ../guild/struct.PartialGuild.html
+    /// [`Guild`]: ../guild/struct.Guild.html
+    #[inline]
+    pub fn to_partial_guild(self) -> Result<PartialGuild> { http::get_guild(self.0) }
 
     /// Gets all integration of the guild.
     ///
@@ -443,8 +461,8 @@ impl GuildId {
     #[inline]
     pub fn leave(&self) -> Result<()> { http::leave_guild(self.0) }
 
-    /// Gets a user's [`Member`] for the guild by Id. 
-    /// 
+    /// Gets a user's [`Member`] for the guild by Id.
+    ///
     /// If the cache feature is enabled the cache will be checked
     /// first. If not found it will resort to an http request.
     ///

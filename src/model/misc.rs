@@ -119,7 +119,7 @@ impl FromStr for User {
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match utils::parse_username(s) {
             Some(x) => UserId(x as u64)
-                .get()
+                .to_user()
                 .map_err(|e| UserParseError::Rest(Box::new(e))),
             _ => Err(UserParseError::InvalidUsername),
         }
@@ -187,21 +187,6 @@ macro_rules! impl_from_str {
                     match *self {
                         NotPresentInCache => "not present in cache",
                         $invalid_variant => $desc,
-                    }
-                }
-            }
-
-            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-            impl FromStr for $struct {
-                type Err = $err;
-
-                fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-                    match utils::$parse_fn(s) {
-                        Some(x) => match $id(x).find() {
-                            Some(user) => Ok(user),
-                            _ => Err($err::NotPresentInCache),
-                        },
-                        _ => Err($err::$invalid_variant),
                     }
                 }
             }

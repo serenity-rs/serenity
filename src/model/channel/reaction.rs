@@ -51,7 +51,7 @@ impl Reaction {
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn channel(&self) -> Result<Channel> {
-        self.channel_id.get()
+        self.channel_id.to_channel()
     }
 
     /// Deletes the reaction, but only if the current user is the user who made
@@ -123,7 +123,7 @@ impl Reaction {
     /// the REST API for the user.
     #[inline]
     pub fn user(&self) -> Result<User> {
-        self.user_id.get()
+        self.user_id.to_user()
     }
 
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
