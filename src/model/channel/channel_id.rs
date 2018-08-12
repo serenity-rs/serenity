@@ -292,7 +292,7 @@ impl ChannelId {
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
     #[cfg(feature = "cache")]
-    pub fn to_channel_cached(&self) -> Option<Channel> { CACHE.read().channel(*self) }
+    pub fn to_channel_cached(self) -> Option<Channel> { CACHE.read().channel(self) }
 
     /// Search the cache for the channel. If it can't be found, the channel is
     /// requested over REST.
@@ -315,10 +315,10 @@ impl ChannelId {
     /// REST API will be used only.
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
-    pub fn to_channel(&self) -> Result<Channel> {
+    pub fn to_channel(self) -> Result<Channel> {
         #[cfg(feature = "cache")]
         {
-            if let Some(channel) = CACHE.read().channel(*self) {
+            if let Some(channel) = CACHE.read().channel(self) {
                 return Ok(channel);
             }
         }

@@ -195,17 +195,17 @@ impl RoleId {
     ///
     /// [`Role`]: ../guild/struct.Role.html
     #[cfg(feature = "cache")]
-    pub fn to_role_cached(&self) -> Option<Role> {
+    pub fn to_role_cached(self) -> Option<Role> {
         let cache = CACHE.read();
 
         for guild in cache.guilds.values() {
             let guild = guild.read();
 
-            if !guild.roles.contains_key(self) {
+            if !guild.roles.contains_key(&self) {
                 continue;
             }
 
-            if let Some(role) = guild.roles.get(self) {
+            if let Some(role) = guild.roles.get(&self) {
                 return Some(role.clone());
             }
         }

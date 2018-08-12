@@ -745,7 +745,7 @@ impl UserId {
     ///
     /// [`User`]: ../user/struct.User.html
     #[cfg(feature = "cache")]
-    pub fn to_user_cached(&self) -> Option<Arc<RwLock<User>>> { CACHE.read().user(*self) }
+    pub fn to_user_cached(self) -> Option<Arc<RwLock<User>>> { CACHE.read().user(self) }
 
     /// Gets a user by its Id from either the cache or the REST API.
     ///
@@ -772,10 +772,10 @@ impl UserId {
     ///
     /// [`User`]: ../user/struct.User.html
     #[inline]
-    pub fn to_user(&self) -> Result<User> {
+    pub fn to_user(self) -> Result<User> {
         #[cfg(feature = "cache")]
         {
-            if let Some(user) = CACHE.read().user(*self) {
+            if let Some(user) = CACHE.read().user(self) {
                 return Ok(user.read().clone());
             }
         }
