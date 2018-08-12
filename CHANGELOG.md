@@ -3,6 +3,51 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.5.8] - 2018-08-12
+
+This is a hotfix release for incorrect routing and to fix a large number of
+broken documentation links.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@Erk-]
+- [@Lakelezz]
+- [@Lymia]
+- [@Mishio595]
+- [@zeyla]
+
+
+### Upgrade Path
+
+Per [c:71edc3a], methods on ID structs like `ChannelId::find` have been
+deprecated and replace with `UserId::to_channel_cached`. Similarly, methods like
+`GuildId::get` have been replaced with `GuildId::to_partial_guild`. While the
+original methods have not been removed, they have been deprecated.
+
+### Added
+
+- [utils] Add `Colour::hex` ([@Mishio595]) [c:8bec4af]
+
+### Fixed
+
+- [http] Fix various incorrect routes ([@Lymia]) [c:826220f]
+- [docs] Fix all the dead links in the docs ([@Erk-]) [c:40053a7]
+- [voice] Stop attempting to send silent frames (reverts a commit) ([@zeyla])
+  [c:0bbe5f5]
+
+### Changed
+
+- [model] Add `to_*`, `as_*` methods on Id types, deprecate `get` and `find`
+  methods ([@Lakelezz]) [c:71edc3a]
+
+### Misc.
+
+- [framework] Fix doctest for `Args::iter_quoted` ([@acdenisSK]) [c:7b0cff6]
+- [framework] Remove some code duplication ([@Lakelezz]) [c:516ede3]
+- [framework] Don't trim command on failure in default command ([@Lakelezz])
+  [c:46b4194]
+
 ## [0.5.7] - 2018-08-09
 
 This is a hotfix release for an incorrect warning about cache deadlocking during
@@ -2250,6 +2295,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.5.8]: https://github.com/serenity-rs/serenity/compare/v0.5.7...v0.5.8
 [0.5.7]: https://github.com/serenity-rs/serenity/compare/v0.5.6...v0.5.7
 [0.5.6]: https://github.com/serenity-rs/serenity/compare/v0.5.5...v0.5.6
 [0.5.5]: https://github.com/serenity-rs/serenity/compare/v0.5.4...v0.5.5
@@ -2330,6 +2376,15 @@ Initial commit.
 [@xentec]: https://github.com/xentec
 [@vityafx]: https://github.com/vityafx
 [@zeyla]: https://github.com/zeyla
+
+[c:0bbe5f5]: https://github.com/serenity-rs/serenity/commit/0bbe5f5dde6989a8d6a4d4910bf026b1b801fef9
+[c:40053a7]: https://github.com/serenity-rs/serenity/commit/40053a71931bb63c43eb6f469ee3c94383c9e90a
+[c:46b4194]: https://github.com/serenity-rs/serenity/commit/46b419460254edc2343b5a184952ab5c6e53b287
+[c:516ede3]: https://github.com/serenity-rs/serenity/commit/516ede3649b74bca8631d05397e330cde0632fee
+[c:71edc3a]: https://github.com/serenity-rs/serenity/commit/71edc3a11ac450728bca19ca7cab7c84079d59f0
+[c:7b0cff6]: https://github.com/serenity-rs/serenity/commit/7b0cff66f483687b26f3129e7b093f6a87fb1383
+[c:826220f]: https://github.com/serenity-rs/serenity/commit/826220f351a688b2a6f1c6ec527e65a996861d22
+[c:8bec4af]: https://github.com/serenity-rs/serenity/commit/8bec4af635c3e50b111d19f6c20d56eafbb81193
 
 [c:04b410e]: https://github.com/serenity-rs/serenity/commit/04b410ee75b2eb29f32e66fc137d3992a4972f1d
 [c:3a58090]: https://github.com/serenity-rs/serenity/commit/3a580909c489c328f3faa10741debd4b063e7fbd
