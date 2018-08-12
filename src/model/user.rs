@@ -739,12 +739,13 @@ impl UserId {
     /// Search the cache for the user with the Id.
     #[cfg(feature = "cache")]
     #[deprecated(since = "0.5.8", note = "Use the `to_user_cached`-method instead.")]
-    pub fn find(&self) -> Option<Arc<RwLock<User>>> { CACHE.read().user(*self) }
+    pub fn find(&self) -> Option<Arc<RwLock<User>>> { self.to_user_cached() }
 
     /// Attempts to find a [`User`] by its Id in the cache.
     ///
     /// [`User`]: ../user/struct.User.html
     #[cfg(feature = "cache")]
+    #[inline]
     pub fn to_user_cached(self) -> Option<Arc<RwLock<User>>> { CACHE.read().user(self) }
 
     /// Gets a user by its Id from either the cache or the REST API.
@@ -754,14 +755,7 @@ impl UserId {
     #[inline]
     #[deprecated(since = "0.5.8", note = "Use the `to_user`-method instead.")]
     pub fn get(&self) -> Result<User> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(user) = CACHE.read().user(*self) {
-                return Ok(user.read().clone());
-            }
-        }
-
-        http::get_user(self.0)
+        self.to_user()
     }
 
     /// First attempts to find a [`User`] by its Id in the cache,

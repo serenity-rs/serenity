@@ -405,12 +405,13 @@ impl GuildId {
     /// Search the cache for the guild.
     #[cfg(feature = "cache")]
     #[deprecated(since = "0.5.8", note = "Use the `to_guild_cached`-method instead.")]
-    pub fn find(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().guild(*self) }
+    pub fn find(&self) -> Option<Arc<RwLock<Guild>>> { self.to_guild_cached() }
 
     /// Tries to find the [`Guild`] by its Id in the cache.
     ///
     /// [`Guild`]: ../guild/struct.Guild.html
     #[cfg(feature = "cache")]
+    #[inline]
     pub fn to_guild_cached(self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().guild(self) }
 
     /// Requests the guild over REST.
@@ -419,7 +420,7 @@ impl GuildId {
     /// all data with a guild retrieval.
     #[inline]
     #[deprecated(since = "0.5.8", note = "Use the `to_partial_guild`-method instead.")]
-    pub fn get(&self) -> Result<PartialGuild> { http::get_guild(self.0) }
+    pub fn get(&self) -> Result<PartialGuild> { self.to_partial_guild() }
 
     /// Requests [`PartialGuild`] over REST API.
     ///
