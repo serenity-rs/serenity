@@ -20,7 +20,7 @@
 //! instance methods where possible, as they each offer different
 //! levels of a high-level interface to the HTTP module.
 //!
-//! [`Client`]: ../struct.Client.html
+//! [`Client`]: ../client/struct.Client.html
 //! [model]: ../model/index.html
 
 pub mod ratelimiting;
@@ -159,7 +159,7 @@ pub fn add_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 /// [`Guild`]: ../model/guild/struct.Guild.html
 /// [`Member`]: ../model/guild/struct.Member.html
 /// [`Role`]: ../model/guild/struct.Role.html
-/// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
+/// [Manage Roles]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
 pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
@@ -178,7 +178,7 @@ pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> 
 ///
 /// [`Guild`]: ../model/guild/struct.Guild.html
 /// [`User`]: ../model/user/struct.User.html
-/// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
+/// [Ban Members]: ../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
 pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
     wind(204, Request {
         body: None,
@@ -201,7 +201,7 @@ pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &s
 /// **Note**: Requires that you have the [Ban Members] permission.
 ///
 /// [`Guild`]: ../model/guild/struct.Guild.html
-/// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
+/// [Ban Members]: ../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
 pub fn ban_zeyla(guild_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
     ban_user(guild_id, 114_941_315_417_899_012, delete_message_days, reason)
 }
@@ -215,7 +215,7 @@ pub fn ban_zeyla(guild_id: u64, delete_message_days: u8, reason: &str) -> Result
 /// **Note**: Requires that you have the [Ban Members] permission.
 ///
 /// [`Guild`]: ../model/guild/struct.Guild.html
-/// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
+/// [Ban Members]: ../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
 pub fn ban_luna(guild_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
     ban_user(guild_id, 180_731_582_049_550_336, delete_message_days, reason)
 }
@@ -229,7 +229,7 @@ pub fn ban_luna(guild_id: u64, delete_message_days: u8, reason: &str) -> Result<
 /// **Note**: Requires that you have the [Ban Members] permission.
 ///
 /// [`Guild`]: ../model/guild/struct.Guild.html
-/// [Ban Members]: ../model/permissions/constant.BAN_MEMBERS.html
+/// [Ban Members]: ../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
 pub fn ban_servermoms(guild_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
     ban_zeyla(guild_id, delete_message_days, reason)?;
     ban_luna(guild_id, delete_message_days, reason)
@@ -261,7 +261,7 @@ pub fn broadcast_typing(channel_id: u64) -> Result<()> {
 /// [`Guild`]: ../model/guild/struct.Guild.html
 /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-channel
-/// [Manage Channels]: ../model/permissions/constant.MANAGE_CHANNELS.html
+/// [Manage Channels]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
 pub fn create_channel(guild_id: u64, map: &Value) -> Result<GuildChannel> {
     fire(Request {
         body: Some(map.to_string().as_bytes()),
@@ -272,14 +272,14 @@ pub fn create_channel(guild_id: u64, map: &Value) -> Result<GuildChannel> {
 
 /// Creates an emoji in the given [`Guild`] with the given data.
 ///
-/// View the source code for [`Context::create_emoji`] to see what fields this
-/// requires.
+/// View the source code for [`Guild`]'s [`create_emoji`] method to see what
+/// fields this requires.
 ///
 /// **Note**: Requires the [Manage Emojis] permission.
 ///
-/// [`Context::create_emoji`]: ../struct.Context.html#method.create_emoji
+/// [`create_emoji`]: ../model/guild/struct.Guild.html#method.create_emoji
 /// [`Guild`]: ../model/guild/struct.Guild.html
-/// [Manage Emojis]: ../model/permissions/constant.MANAGE_EMOJIS.html
+/// [Manage Emojis]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
 pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
     fire(Request {
         body: Some(map.to_string().as_bytes()),
@@ -340,7 +340,7 @@ pub fn create_guild(map: &Value) -> Result<PartialGuild> {
 ///
 /// [`Guild`]: ../model/guild/struct.Guild.html
 /// [`Integration`]: ../model/guild/struct.Integration.html
-/// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
+/// [Manage Guild]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-integration
 pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: &Value) -> Result<()> {
     wind(204, Request {
@@ -359,8 +359,8 @@ pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: &Value)
 /// **Note**: Requires the [Create Invite] permission.
 ///
 /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
-/// [`RichInvite`]: ../model/guild/struct.RichInvite.html
-/// [Create Invite]: ../model/permissions/constant.CREATE_INVITE.html
+/// [`RichInvite`]: ../model/invite/struct.RichInvite.html
+/// [Create Invite]: ../model/permissions/struct.Permissions.html#associatedconstant.CREATE_INVITE
 /// [docs]: https://discordapp.com/developers/docs/resources/channel#create-channel-invite
 pub fn create_invite(channel_id: u64, map: &JsonMap) -> Result<RichInvite> {
     let body = serde_json::to_vec(map)?;
@@ -601,7 +601,7 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 /// Deletes a webhook given its Id:
 ///
 /// ```rust,no_run
-/// use serenity::{Client, http};
+/// use serenity::http;
 /// use std::env;
 ///
 /// // Due to the `delete_webhook` function requiring you to authenticate, you
@@ -1636,7 +1636,7 @@ pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
 /// [`Guild`]: ../model/guild/struct.Guild.html
 /// [`Member`]: ../model/guild/struct.Member.html
 /// [`Role`]: ../model/guild/struct.Role.html
-/// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
+/// [Manage Roles]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
 pub fn remove_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
@@ -1699,7 +1699,7 @@ pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
 /// #
 /// # use std::error::Error;
 /// #
-/// # fn main() -> Result<(), Box<Error>> {
+/// # fn try_main() -> Result<(), Box<Error>> {
 /// #
 /// use serenity::{
 ///     http::{
@@ -1725,6 +1725,10 @@ pub fn unpin_message(channel_id: u64, message_id: u64) -> Result<()> {
 /// #
 /// #     Ok(())
 /// # }
+/// #
+/// # fn main() {
+/// #     try_main().unwrap();
+/// # }
 /// ```
 ///
 /// [`request`]: fn.request.html
@@ -1748,7 +1752,7 @@ pub fn fire<T: DeserializeOwned>(req: Request) -> Result<T> {
 /// #
 /// # use std::error::Error;
 /// #
-/// # fn main() -> Result<(), Box<Error>> {
+/// # fn try_main() -> Result<(), Box<Error>> {
 /// #
 /// use serenity::http::{
 ///     self,
@@ -1770,6 +1774,10 @@ pub fn fire<T: DeserializeOwned>(req: Request) -> Result<T> {
 /// println!("Response successful?: {}", response.status.is_success());
 /// #
 /// #     Ok(())
+/// # }
+/// #
+/// # fn main() {
+/// #     try_main().unwrap();
 /// # }
 /// ```
 ///

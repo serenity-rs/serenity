@@ -15,7 +15,7 @@ impl EditMember {
     ///
     /// Requires the [Deafen Members] permission.
     ///
-    /// [Deafen Members]: ../model/permissions/constant.DEAFEN_MEMBERS.html
+    /// [Deafen Members]: ../model/permissions/struct.Permissions.html#associatedconstant.DEAFEN_MEMBERS
     pub fn deafen(mut self, deafen: bool) -> Self {
         self.0.insert("deaf", Value::Bool(deafen));
 
@@ -26,7 +26,7 @@ impl EditMember {
     ///
     /// Requires the [Mute Members] permission.
     ///
-    /// [Mute Members]: ../model/permissions/constant.MUTE_MEMBERS.html
+    /// [Mute Members]: ../model/permissions/struct.Permissions.html#associatedconstant.MUTE_MEMBERS
     pub fn mute(mut self, mute: bool) -> Self {
         self.0.insert("mute", Value::Bool(mute));
 
@@ -38,7 +38,7 @@ impl EditMember {
     ///
     /// Requires the [Manage Nicknames] permission.
     ///
-    /// [Manage Nicknames]: ../model/permissions/constant.MANAGE_NICKNAMES.html
+    /// [Manage Nicknames]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_NICKNAMES
     pub fn nickname(mut self, nickname: &str) -> Self {
         self.0.insert("nick", Value::String(nickname.to_string()));
 
@@ -49,7 +49,7 @@ impl EditMember {
     ///
     /// Requires the [Manage Roles] permission to modify.
     ///
-    /// [Manage Roles]: ../model/permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     pub fn roles<T: AsRef<RoleId>, It: IntoIterator<Item=T>>(self, roles: It) -> Self {
         let roles = roles
             .into_iter()
@@ -69,7 +69,7 @@ impl EditMember {
     ///
     /// Requires the [Move Members] permission.
     ///
-    /// [Move Members]: ../model/permissions/constant.MOVE_MEMBERS.html
+    /// [Move Members]: ../model/permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
     #[inline]
     pub fn voice_channel<C: Into<ChannelId>>(self, channel_id: C) -> Self {
         self._voice_channel(channel_id.into())

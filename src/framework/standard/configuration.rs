@@ -10,7 +10,7 @@ use std::{
 };
 use super::command::PrefixCheck;
 
-/// The configuration to use for a [`Framework`] associated with a [`Client`]
+/// The configuration to use for a [`StandardFramework`] associated with a [`Client`]
 /// instance.
 ///
 /// This allows setting configurations like the depth to search for commands,
@@ -40,7 +40,7 @@ use super::command::PrefixCheck;
 /// ```
 ///
 /// [`Client`]: ../../client/struct.Client.html
-/// [`Framework`]: struct.Framework.html
+/// [`StandardFramework`]: struct.StandardFramework.html
 /// [default implementation]: #impl-Default
 pub struct Configuration {
     #[doc(hidden)] pub allow_dm: bool,

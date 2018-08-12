@@ -111,133 +111,133 @@ pub enum Route {
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsId(u64),
     /// Route for the `/guilds/:guild_id/bans` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdBans(u64),
     /// Route for the `/guilds/:guild_id/audit-logs` path.
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdAuditLogs(u64),
     /// Route for the `/guilds/:guild_id/bans/:user_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdBansUserId(u64),
     /// Route for the `/guilds/:guild_id/channels/:channel_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdChannels(u64),
     /// Route for the `/guilds/:guild_id/embed` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdEmbed(u64),
     /// Route for the `/guilds/:guild_id/emojis` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdEmojis(u64),
     /// Route for the `/guilds/:guild_id/emojis/:emoji_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdEmojisId(u64),
     /// Route for the `/guilds/:guild_id/integrations` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdIntegrations(u64),
     /// Route for the `/guilds/:guild_id/integrations/:integration_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdIntegrationsId(u64),
     /// Route for the `/guilds/:guild_id/integrations/:integration_id/sync`
     /// path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdIntegrationsIdSync(u64),
     /// Route for the `/guilds/:guild_id/invites` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdInvites(u64),
     /// Route for the `/guilds/:guild_id/members` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdMembers(u64),
     /// Route for the `/guilds/:guild_id/members/:user_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdMembersId(u64),
     /// Route for the `/guilds/:guild_id/members/:user_id/roles/:role_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdMembersIdRolesId(u64),
     /// Route for the `/guilds/:guild_id/members/@me/nick` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdMembersMeNick(u64),
     /// Route for the `/guilds/:guild_id/prune` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdPrune(u64),
     /// Route for the `/guilds/:guild_id/regions` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdRegions(u64),
     /// Route for the `/guilds/:guild_id/roles` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdRoles(u64),
     /// Route for the `/guilds/:guild_id/roles/:role_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdRolesId(u64),
     /// Route for the `/guilds/:guild_id/vanity-url` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdVanityUrl(u64),
     /// Route for the `/guilds/:guild_id/webhooks` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: struct.GuildId.html
+    /// [`GuildId`]: ../../model/id/struct.GuildId.html
     GuildsIdWebhooks(u64),
     /// Route for the `/invites/:code` path.
     InvitesCode,
@@ -916,12 +916,12 @@ impl<'a> RouteInfo<'a> {
     pub fn deconstruct(&self) -> (LightMethod, Route, Cow<str>) {
         match *self {
             RouteInfo::AddGroupRecipient { group_id, user_id } => (
-                LightMethod::Post,
+                LightMethod::Put,
                 Route::None,
                 Cow::from(Route::group_recipient(group_id, user_id)),
             ),
             RouteInfo::AddMemberRole { guild_id, role_id, user_id } => (
-                LightMethod::Delete,
+                LightMethod::Put,
                 Route::GuildsIdMembersIdRolesId(guild_id),
                 Cow::from(Route::guild_member_role(guild_id, user_id, role_id)),
             ),
@@ -932,7 +932,7 @@ impl<'a> RouteInfo<'a> {
                 user_id,
             } => (
                 // TODO
-                LightMethod::Delete,
+                LightMethod::Put,
                 Route::GuildsIdBansUserId(guild_id),
                 Cow::from(Route::guild_ban_optioned(
                     guild_id,
@@ -977,7 +977,7 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::channel_messages(channel_id, None)),
             ),
             RouteInfo::CreatePermission { channel_id, target_id } => (
-                LightMethod::Post,
+                LightMethod::Put,
                 Route::ChannelsIdPermissionsOverwriteId(channel_id),
                 Cow::from(Route::channel_permission(channel_id, target_id)),
             ),
@@ -997,12 +997,12 @@ impl<'a> RouteInfo<'a> {
                 )),
             ),
             RouteInfo::CreateRole { guild_id } => (
-                LightMethod::Delete,
+                LightMethod::Post,
                 Route::GuildsIdRoles(guild_id),
                 Cow::from(Route::guild_roles(guild_id)),
             ),
             RouteInfo::CreateWebhook { channel_id } => (
-                LightMethod::Delete,
+                LightMethod::Post,
                 Route::ChannelsIdWebhooks(channel_id),
                 Cow::from(Route::channel_webhooks(channel_id)),
             ),

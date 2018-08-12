@@ -10,7 +10,7 @@ use utils::VecMap;
 ///
 /// [`Guild::edit`]: ../model/guild/struct.Guild.html#method.edit
 /// [`Guild`]: ../model/guild/struct.Guild.html
-/// [Manage Guild]: ../model/permissions/constant.MANAGE_GUILD.html
+/// [Manage Guild]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
 #[derive(Clone, Debug, Default)]
 pub struct EditGuild(pub VecMap<&'static str, Value>);
 

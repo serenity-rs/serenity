@@ -8,7 +8,7 @@
 //! > For example, `/channels/:channel_id` and
 //! > `/channels/:channel_id/messages/:message_id` both take `channel_id` into
 //! > account when generating rate limits since it's the major parameter. The
-//! only current major parameters are `channel_id` and `guild_id`.
+//! only current major parameters are `channel_id`, `guild_id` and `webhook_id`.
 //!
 //! This results in the two URIs of `GET /channels/4/messages/7` and
 //! `GET /channels/5/messages/8` being rate limited _separately_. However, the
@@ -98,7 +98,7 @@ lazy_static! {
     /// ```
     ///
     /// [`RateLimit`]: struct.RateLimit.html
-    /// [`Route`]: enum.Route.html
+    /// [`Route`]: ../routing/enum.Route.html
     pub static ref ROUTES: Arc<Mutex<HashMap<Route, Arc<Mutex<RateLimit>>>>> = {
         Arc::new(Mutex::new(HashMap::default()))
     };
@@ -204,7 +204,7 @@ pub(super) fn perform(req: Request) -> Result<Response> {
 /// 429s.
 ///
 /// [`ROUTES`]: struct.ROUTES.html
-/// [`Route`]: enum.Route.html
+/// [`Route`]: ../routing/enum.Route.html
 /// [Discord docs]: https://discordapp.com/developers/docs/topics/rate-limits
 #[derive(Clone, Debug, Default)]
 pub struct RateLimit {

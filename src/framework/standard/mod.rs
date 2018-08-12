@@ -53,12 +53,12 @@ use client::CACHE;
 #[cfg(feature = "cache")]
 use model::channel::Channel;
 
-/// A convenience macro for generating a struct fulfilling the [`Command`] trait.
+/// A convenience macro for generating a struct fulfilling the [`Command`][command trait] trait.
 ///
-/// This is meant for use with the [`Framework`], specifically `Framework`::{[`cmd`]/[`command`]}.
+/// This is meant for use with the [`StandardFramework`], specifically `Framework`::{[`cmd`]/[`command`]}.
 ///
 ///
-/// If you're just looking for a simple "register this function as a command", use [`Framework::on`].
+/// If you're just looking for a simple "register this function as a command", use [`StandardFramework::on`].
 ///
 /// # Examples
 ///
@@ -87,11 +87,11 @@ use model::channel::Channel;
 /// });
 /// ```
 ///
-/// [`Framework`]: framework/index.html
-/// [`cmd`]: struct.Framework.html#method.cmd
-/// [`command`]: struct.Framework.html#method.command
-/// [`Framework::on`]: struct.Framework.html#method.on
-/// [`Command`]: trait.Command.html
+/// [command trait]: framework/standard/trait.Command.html
+/// [`StandardFramework`]: framework/standard/struct.StandardFramework.html
+/// [`cmd`]: framework/standard/struct.StandardFramework.html#method.cmd
+/// [`command`]: framework/standard/struct.StandardFramework.html#method.command
+/// [`StandardFramework::on`]: framework/standard/struct.StandardFramework.html#method.on
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
@@ -143,6 +143,17 @@ macro_rules! command {
 
                 Ok(())
             }
+        }
+    };
+}
+
+macro_rules! command_and_help_args {
+    ($message_content:expr, $position:expr, $command_length:expr, $delimiters:expr) => {
+        {
+            let content = $message_content.chars().skip($position).skip_while(|x| x.is_whitespace())
+                .skip($command_length).collect::<String>();
+
+            Args::new(&content.trim(), $delimiters)
         }
     };
 }
@@ -215,13 +226,12 @@ pub struct StandardFramework {
     /// - a command check has been set.
     ///
     /// This is used internally to determine whether or not - in addition to
-    /// dispatching to the [`EventHandler::on_message`] handler - to have the
+    /// dispatching to the [`EventHandler::message`] handler - to have the
     /// framework check if a [`Event::MessageCreate`] should be processed by
     /// itself.
     ///
-    /// [`EventHandler::on_message`]:
-    /// ../client/event_handler/trait.EventHandler.html#method.on_message
-    /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
+    /// [`EventHandler::message`]: ../../client/trait.EventHandler.html#method.message
+    /// [`Event::MessageCreate`]: ../../model/event/enum.Event.html#variant.MessageCreate
     pub initialized: bool,
     user_id: u64,
 }
@@ -255,7 +265,7 @@ impl StandardFramework {
     ///         .prefix("~")));
     /// ```
     ///
-    /// [`Client`]: ../client/struct.Client.html
+    /// [`Client`]: ../../client/struct.Client.html
     /// [`Configuration::default`]: struct.Configuration.html#method.default
     /// [`depth`]: struct.Configuration.html#method.depth
     /// [`prefix`]: struct.Configuration.html#method.prefix
@@ -1037,12 +1047,13 @@ impl Framework for StandardFramework {
                     }
 
                     let mut check_contains_group_prefix = false;
+                    let mut longest_matching_prefix_len = 0;
                     let to_check = if let Some(ref prefixes) = group.prefixes {
                         // Once `built` starts with a set prefix,
                         // we want to make sure that all following matching prefixes are longer
                         // than the last matching one, this prevents picking a wrong prefix,
                         // e.g. "f" instead of "ferris" due to "f" having a lower index in the `Vec`.
-                        let longest_matching_prefix_len = prefixes.iter().fold(0, |longest_prefix_len, prefix|
+                        longest_matching_prefix_len = prefixes.iter().fold(0, |longest_prefix_len, prefix|
                             if prefix.len() > longest_prefix_len
                             && built.starts_with(prefix)
                             && (orginal_round.len() == prefix.len() || built.get(prefix.len()..prefix.len() + 1) == Some(" ")) {
@@ -1073,12 +1084,7 @@ impl Framework for StandardFramework {
 
                         if let Some(help) = help {
                             let groups = self.groups.clone();
-                            let mut args = {
-                                let content = message.content.chars().skip(position).skip_while(|x| x.is_whitespace())
-                                    .skip(command_length).collect::<String>();
-
-                                Args::new(&content.trim(), &self.configuration.delimiters)
-                            };
+                            let mut args = command_and_help_args!(&message.content, position, command_length, &self.configuration.delimiters);
 
                             threadpool.execute(move || {
 
@@ -1104,13 +1110,7 @@ impl Framework for StandardFramework {
                         if let Some(&CommandOrAlias::Command(ref command)) =
                             group.commands.get(&to_check) {
                             let command = Arc::clone(command);
-
-                            let mut args = {
-                                let content = message.content.chars().skip(position).skip_while(|x| x.is_whitespace())
-                                    .skip(command_length).collect::<String>();
-
-                                Args::new(&content.trim(), &self.configuration.delimiters)
-                            };
+                            let mut args = command_and_help_args!(&message.content, position, command_length, &self.configuration.delimiters);
 
                             if let Some(error) = self.should_fail(
                                 &mut context,
@@ -1157,9 +1157,7 @@ impl Framework for StandardFramework {
                         if let &Some(CommandOrAlias::Command(ref command)) = &group.default_command {
                             let command = Arc::clone(command);
                             let mut args = {
-                                let content = to_check;
-
-                                Args::new(&content.trim(), &self.configuration.delimiters)
+                                Args::new(&orginal_round[longest_matching_prefix_len..], &self.configuration.delimiters)
                             };
 
                             threadpool.execute(move || {

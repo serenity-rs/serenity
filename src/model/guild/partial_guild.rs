@@ -55,10 +55,9 @@ impl PartialGuild {
     /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
     /// days' worth of messages to delete is over the maximum.
     ///
-    /// [`ModelError::DeleteMessageDaysAmount`]:
-    /// enum.ModelError.html#variant.DeleteMessageDaysAmount
-    /// [`User`]: struct.User.html
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    /// [`ModelError::DeleteMessageDaysAmount`]: ../error/enum.Error.html#variant.DeleteMessageDaysAmount
+    /// [`User`]: ../user/struct.User.html
+    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     pub fn ban<U: Into<UserId>>(&self, user: U, delete_message_days: u8) -> Result<()> {
         if delete_message_days > 7 {
             return Err(Error::Model(
@@ -73,7 +72,7 @@ impl PartialGuild {
     ///
     /// Requires the [Ban Members] permission.
     ///
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[inline]
     pub fn bans(&self) -> Result<Vec<Ban>> { self.id.bans() }
 
@@ -99,9 +98,9 @@ impl PartialGuild {
     /// guild.create_channel("test", ChannelType::Voice, None);
     /// ```
     ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`http::create_channel`]: ../http/fn.create_channel.html
-    /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
+    /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
+    /// [`http::create_channel`]: ../../http/fn.create_channel.html
+    /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[inline]
     pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
         where C: Into<Option<ChannelId>> {
@@ -121,10 +120,10 @@ impl PartialGuild {
     /// how to read an image from the filesystem and encode it as base64. Most
     /// of the example can be applied similarly for this method.
     ///
-    /// [`EditProfile::avatar`]: ../builder/struct.EditProfile.html#method.avatar
+    /// [`EditProfile::avatar`]: ../../builder/struct.EditProfile.html#method.avatar
     /// [`Guild::create_emoji`]: struct.Guild.html#method.create_emoji
-    /// [`utils::read_image`]: ../utils/fn.read_image.html
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    /// [`utils::read_image`]: ../../utils/fn.read_image.html
+    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
     pub fn create_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
         self.id.create_emoji(name, image)
@@ -134,7 +133,7 @@ impl PartialGuild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn create_integration<I>(&self, integration_id: I, kind: &str) -> Result<()>
         where I: Into<IntegrationId> {
@@ -152,9 +151,9 @@ impl PartialGuild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Guild::create_role`]: struct.Guild.html#method.create_role
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
     pub fn create_role<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
         self.id.create_role(f)
@@ -172,7 +171,7 @@ impl PartialGuild {
     /// Requires the [Manage Emojis] permission.
     ///
     /// [`Emoji`]: struct.Emoji.html
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
     pub fn delete_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<()> {
         self.id.delete_emoji(emoji_id)
@@ -182,7 +181,7 @@ impl PartialGuild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn delete_integration<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
         self.id.delete_integration(integration_id)
@@ -197,7 +196,7 @@ impl PartialGuild {
     ///
     /// [`Role`]: struct.Role.html
     /// [`Role::delete`]: struct.Role.html#method.delete
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
     pub fn delete_role<R: Into<RoleId>>(&self, role_id: R) -> Result<()> {
         self.id.delete_role(role_id)
@@ -208,7 +207,7 @@ impl PartialGuild {
     /// **Note**: Requires the current user to have the [Manage Guild]
     /// permission.
     ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditGuild) -> EditGuild {
         match self.id.edit(f) {
@@ -242,7 +241,8 @@ impl PartialGuild {
     ///
     /// [`Emoji`]: struct.Emoji.html
     /// [`Emoji::edit`]: struct.Emoji.html#method.edit
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    /// [Manage Emojis]: 
+    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
     pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str) -> Result<Emoji> {
         self.id.edit_emoji(emoji_id, name)
@@ -281,8 +281,8 @@ impl PartialGuild {
     /// if the current user does not have permission to change their own
     /// nickname.
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Change Nickname]: ../permissions/struct.Permissions.html#associatedconstant.CHANGE_NICKNAME
     #[inline]
     pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
         self.id.edit_nickname(new_nickname)
@@ -299,7 +299,7 @@ impl PartialGuild {
     /// Requires the [Kick Members] permission.
     ///
     /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[inline]
     pub fn kick<U: Into<UserId>>(&self, user_id: U) -> Result<()> { self.id.kick(user_id) }
 
@@ -320,7 +320,7 @@ impl PartialGuild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn invites(&self) -> Result<Vec<RichInvite>> { self.id.invites() }
 
@@ -340,7 +340,7 @@ impl PartialGuild {
     /// value is 1000. Optionally pass in `after` to offset the results by a
     /// [`User`]'s Id.
     ///
-    /// [`User`]: struct.User.html
+    /// [`User`]: ../user/struct.User.html
     pub fn members<U>(&self, limit: Option<u64>, after: Option<U>) -> Result<Vec<Member>>
         where U: Into<UserId> {
         self.id.members(limit, after)
@@ -350,7 +350,7 @@ impl PartialGuild {
     ///
     /// Requires the [Move Members] permission.
     ///
-    /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
+    /// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
     #[inline]
     pub fn move_member<C, U>(&self, user_id: U, channel_id: C) -> Result<()>
         where C: Into<ChannelId>, U: Into<UserId> {
@@ -363,7 +363,7 @@ impl PartialGuild {
     /// Requires the [Kick Members] permission.
     ///
     /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[inline]
     pub fn prune_count(&self, days: u16) -> Result<GuildPrune> { self.id.prune_count(days) }
 
@@ -376,7 +376,7 @@ impl PartialGuild {
     /// retrieve the total number of shards in use. If you already have the
     /// total, consider using [`utils::shard_id`].
     ///
-    /// [`utils::shard_id`]: ../utils/fn.shard_id.html
+    /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
     pub fn shard_id(&self) -> u64 { self.id.shard_id() }
@@ -416,7 +416,7 @@ impl PartialGuild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn start_integration_sync<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
         self.id.start_integration_sync(integration_id)
@@ -426,8 +426,8 @@ impl PartialGuild {
     ///
     /// Requires the [Ban Members] permission.
     ///
-    /// [`User`]: struct.User.html
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    /// [`User`]: ../user/struct.User.html
+    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[inline]
     pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> { self.id.unban(user_id) }
 
@@ -435,7 +435,7 @@ impl PartialGuild {
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn vanity_url(&self) -> Result<String> {
         self.id.vanity_url()
@@ -445,7 +445,7 @@ impl PartialGuild {
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> { self.id.webhooks() }
 

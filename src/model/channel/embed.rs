@@ -75,7 +75,7 @@ impl Embed {
     ///
     /// This should only be useful in conjunction with [`Webhook::execute`].
     ///
-    /// [`Webhook::execute`]: struct.Webhook.html
+    /// [`Webhook::execute`]: ../webhook/struct.Webhook.html
     ///
     /// # Examples
     ///

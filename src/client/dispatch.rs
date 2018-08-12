@@ -30,16 +30,16 @@ macro_rules! update {
         {
             #[cfg(feature = "cache")]
             {
-                CACHE.try_write_for(Duration::from_millis(10))
-                    .and_then(|mut lock| lock.update(&mut $event))
-                    .or_else(|| {
-                        warn!(
-                            "[dispatch] Possible deadlock: couldn't unlock cache to update with event: {:?}",
-                            $event,
-                        );
+                if let Some(mut lock) = CACHE.try_write_for(Duration::from_millis(10)) {
+                    lock.update(&mut $event)
+                } else {
+                    warn!(
+                        "[dispatch] Possible deadlock: couldn't unlock cache to update with event: {:?}",
+                        $event,
+                    );
 
-                        None
-                    })
+                    None
+                }
             }
         }
     };
@@ -97,6 +97,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
 }
 
 #[cfg(not(feature = "framework"))]
+#[allow(unused_mut)]
 pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     data: &Arc<Mutex<ShareMap>>,

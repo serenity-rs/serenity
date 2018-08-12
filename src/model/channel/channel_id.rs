@@ -40,7 +40,7 @@ impl ChannelId {
     /// let _successful = ChannelId(7).broadcast_typing();
     /// ```
     ///
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[inline]
     pub fn broadcast_typing(&self) -> Result<()> { http::broadcast_typing(self.0) }
 
@@ -52,11 +52,11 @@ impl ChannelId {
     ///
     /// Requires the [Manage Channels] permission.
     ///
-    /// [`GuildChannel::create_permission`]: struct.GuildChannel.html#method.create_permission
-    /// [`Member`]: struct.Member.html
-    /// [`PermissionOverwrite`]: struct.PermissionOverwrite.html
-    /// [`Role`]: struct.Role.html
-    /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
+    /// [`GuildChannel::create_permission`]: ../channel/struct.GuildChannel.html#method.create_permission
+    /// [`Member`]: ../guild/struct.Member.html
+    /// [`PermissionOverwrite`]: ../channel/struct.PermissionOverwrite.html
+    /// [`Role`]: ../guild/struct.Role.html
+    /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     pub fn create_permission(&self, target: &PermissionOverwrite) -> Result<()> {
         let (id, kind) = match target.kind {
             PermissionOverwriteType::Member(id) => (id.0, "member"),
@@ -81,10 +81,10 @@ impl ChannelId {
     /// Requires the [Add Reactions] permission, _if_ the current user is the
     /// first user to perform a react with a certain emoji.
     ///
-    /// [`Emoji`]: struct.Emoji.html
-    /// [`Message`]: struct.Message.html
-    /// [`Message::react`]: struct.Message.html#method.react
-    /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
+    /// [`Emoji`]: ../guild/struct.Emoji.html
+    /// [`Message`]: ../channel/struct.Message.html
+    /// [`Message::react`]: ../channel/struct.Message.html#method.react
+    /// [Add Reactions]: ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
     #[inline]
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
@@ -110,9 +110,9 @@ impl ChannelId {
     /// Requires the [Manage Messages] permission, if the current user is not
     /// the author of the message.
     ///
-    /// [`Message`]: struct.Message.html
-    /// [`Message::delete`]: struct.Message.html#method.delete
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    /// [`Message`]: ../channel/struct.Message.html
+    /// [`Message::delete`]: ../channel/struct.Message.html#method.delete
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self._delete_message(message_id.into())
@@ -137,9 +137,9 @@ impl ChannelId {
     /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to
     /// delete either 0 or more than 100 messages.
     ///
-    /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
-    /// [`ModelError::BulkDeleteAmount`]: ../enum.ModelError.html#variant.BulkDeleteAmount
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    /// [`Channel::delete_messages`]: ../channel/enum.Channel.html#method.delete_messages
+    /// [`ModelError::BulkDeleteAmount`]: ../error/enum.Error.html#variant.BulkDeleteAmount
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, message_ids: It) -> Result<()> {
         let ids = message_ids
             .into_iter()
@@ -167,7 +167,7 @@ impl ChannelId {
     ///
     /// **Note**: Requires the [Manage Channel] permission.
     ///
-    /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
+    /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
         http::delete_permission(
             self.0,
@@ -183,8 +183,8 @@ impl ChannelId {
     /// **Note**: Requires the [Manage Messages] permission, _if_ the current
     /// user did not perform the reaction.
     ///
-    /// [`Reaction`]: struct.Reaction.html
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    /// [`Reaction`]: ../channel/struct.Reaction.html
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn delete_reaction<M, R>(&self,
                                  message_id: M,
@@ -230,8 +230,8 @@ impl ChannelId {
     /// channel_id.edit(|c| c.name("test").bitrate(64000));
     /// ```
     ///
-    /// [`Channel`]: enum.Channel.html
-    /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
+    /// [`Channel`]: ../channel/enum.Channel.html
+    /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "utils")]
     #[inline]
     pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel> {
@@ -255,10 +255,10 @@ impl ChannelId {
     /// is over the [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`EditMessage`]: ../builder/struct.EditMessage.html
-    /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
+    /// [`EditMessage`]: ../../builder/struct.EditMessage.html
+    /// [`Message`]: ../channel/struct.Message.html
+    /// [`the limit`]: ../../builder/struct.EditMessage.html#method.content
     #[cfg(feature = "utils")]
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
@@ -303,7 +303,7 @@ impl ChannelId {
     /// Gets all of the channel's invites.
     ///
     /// Requires the [Manage Channels] permission.
-    /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
+    /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[inline]
     pub fn invites(&self) -> Result<Vec<RichInvite>> { http::get_channel_invites(self.0) }
 
@@ -311,7 +311,7 @@ impl ChannelId {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         self._message(message_id.into())
@@ -331,8 +331,8 @@ impl ChannelId {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [`Channel::messages`]: enum.Channel.html#method.messages
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [`Channel::messages`]: ../channel/enum.Channel.html#method.messages
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
         let mut map = f(GetMessages::default()).0;
@@ -387,7 +387,7 @@ impl ChannelId {
 
     /// Pins a [`Message`] to the channel.
     ///
-    /// [`Message`]: struct.Message.html
+    /// [`Message`]: ../channel/struct.Message.html
     #[inline]
     pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self._pin(message_id.into())
@@ -399,7 +399,7 @@ impl ChannelId {
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
     ///
-    /// [`Message`]: struct.Message.html
+    /// [`Message`]: ../channel/struct.Message.html
     #[inline]
     pub fn pins(&self) -> Result<Vec<Message>> { http::get_pins(self.0) }
 
@@ -410,11 +410,11 @@ impl ChannelId {
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
-    /// [`Channel::reaction_users`]: enum.Channel.html#method.reaction_users
-    /// [`Emoji`]: struct.Emoji.html
-    /// [`Message`]: struct.Message.html
-    /// [`User`]: struct.User.html
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [`Channel::reaction_users`]: ../channel/enum.Channel.html#method.reaction_users
+    /// [`Emoji`]: ../guild/struct.Emoji.html
+    /// [`Message`]: ../channel/struct.Message.html
+    /// [`User`]: ../user/struct.User.html
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     pub fn reaction_users<M, R, U>(&self,
         message_id: M,
         reaction_type: R,
@@ -458,7 +458,7 @@ impl ChannelId {
     /// over the limit.
     ///
     /// [`ChannelId`]: struct.ChannelId.html
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[inline]
     pub fn say<D: ::std::fmt::Display>(&self, content: D) -> Result<Message> {
         self.send_message(|m| m.content(content))
@@ -514,12 +514,12 @@ impl ChannelId {
     /// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
     /// if the file is too large to send.
     ///
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    /// [`HttpError::InvalidRequest`]: ../http/enum.HttpError.html#variant.InvalidRequest
-    /// [`CreateMessage::content`]: ../utils/builder/struct.CreateMessage.html#method.content
+    /// [`ClientError::MessageTooLong`]: ../../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`HttpError::InvalidRequest`]: ../../http/enum.HttpError.html#variant.InvalidRequest
+    /// [`CreateMessage::content`]: ../../builder/struct.CreateMessage.html#method.content
     /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "utils")]
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
@@ -556,7 +556,7 @@ impl ChannelId {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`Channel`]: enum.Channel.html
+    /// [`Channel`]: ../channel/enum.Channel.html
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
@@ -584,8 +584,8 @@ impl ChannelId {
     ///
     /// Requires the [Manage Messages] permission.
     ///
-    /// [`Message`]: struct.Message.html
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    /// [`Message`]: ../channel/struct.Message.html
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self._unpin(message_id.into())
@@ -599,7 +599,7 @@ impl ChannelId {
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> { http::get_channel_webhooks(self.0) }
 }
