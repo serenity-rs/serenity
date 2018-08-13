@@ -390,7 +390,7 @@ pub fn create_private_channel(map: &Value) -> Result<PrivateChannel> {
     fire(Request {
         body: Some(&body),
         headers: None,
-        route: RouteInfo::GetUserDmChannels,
+        route: RouteInfo::CreatePrivateChannel,
     })
 }
 
