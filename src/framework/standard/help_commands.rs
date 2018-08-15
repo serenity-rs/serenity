@@ -98,25 +98,22 @@ pub fn is_command_visible(command_options: &Arc<CommandOptions>, msg: &Message, 
     if !command_options.dm_only && !command_options.guild_only
     || command_options.dm_only && msg.is_private()
     || command_options.guild_only && !msg.is_private() {
-
+        //  If this message is from a guild, ensure the user has the correct roles.
         if let Some(guild) = msg.guild() {
             let guild = guild.read();
 
             if let Some(member) = guild.members.get(&msg.author.id) {
-
-                if command_options.help_available {
-
-                    if has_correct_permissions(command_options, msg) {
-
-                        if has_correct_roles(command_options, &guild, &member) {
-                            return true;
-                        } else {
-                            return help_options.lacking_role != HelpBehaviour::Hide;
-                        }
-                    } else {
-                        return help_options.lacking_permissions != HelpBehaviour::Hide;
-                    }
+                if !has_correct_roles(command_options, &guild, &member) {
+                    return help_options.lacking_role != HelpBehaviour::Hide;
                 }
+            }
+        }
+
+        if command_options.help_available {
+            if has_correct_permissions(command_options, msg) {
+                return true;
+            } else {
+                return help_options.lacking_role != HelpBehaviour::Hide;
             }
         }
     } else {
