@@ -118,13 +118,11 @@ pub fn is_command_visible(command_options: &Arc<CommandOptions>, msg: &Message, 
                     }
                 }
             }
-        } else {
-            if command_options.help_available {
-                if has_correct_permissions(command_options, msg) {
-                    return true;
-                } else {
-                    return help_options.lacking_permissions != HelpBehaviour::Hide;
-                }
+        } else if command_options.help_available {
+            if has_correct_permissions(command_options, msg) {
+                return true;
+            } else {
+                return help_options.lacking_permissions != HelpBehaviour::Hide;
             }
         }
     } else {
