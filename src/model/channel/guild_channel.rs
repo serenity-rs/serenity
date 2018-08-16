@@ -230,7 +230,7 @@ impl GuildChannel {
     /// [`PermissionOverwrite::Member`]: struct.PermissionOverwrite.html#variant.Member
     /// [`PermissionOverwrite::Role`]: struct.PermissionOverwrite.html#variant.Role
     /// [`Role`]: ../guild/struct.Role.html
-    /// [Attach Files]: 
+    /// [Attach Files]:
     /// ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
@@ -526,6 +526,7 @@ impl GuildChannel {
         self._permissions_for(user_id.into())
     }
 
+    #[cfg(feature = "cache")]
     fn _permissions_for(&self, user_id: UserId) -> Result<Permissions> {
         self.guild()
             .ok_or_else(|| Error::Model(ModelError::GuildNotFound))
