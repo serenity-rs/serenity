@@ -1045,7 +1045,7 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::channel_message(channel_id, message_id)),
             ),
             RouteInfo::DeleteMessages { channel_id } => (
-                LightMethod::Delete,
+                LightMethod::Post,
                 Route::ChannelsIdMessagesBulkDelete(channel_id),
                 Cow::from(Route::channel_messages_bulk_delete(channel_id)),
             ),
