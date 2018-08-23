@@ -586,7 +586,7 @@ impl Cache {
     /// Retrieving the message object from a channel, in a
     /// [`EventHandler::message`] context:
     ///
-    /// ```rust
+    /// ```rust,ignore
     /// use serenity::CACHE;
     ///
     /// let cache = CACHE.read();
