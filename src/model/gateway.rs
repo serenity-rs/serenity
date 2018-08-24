@@ -16,6 +16,9 @@ use super::prelude::*;
 /// This is only applicable to bot users.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BotGateway {
+    /// Information describing how many gateway sessions you can initiate within
+    /// a ratelimit period.
+    pub session_start_limit: SessionStartLimit,
     /// The number of shards that is recommended to be used by the current bot
     /// user.
     pub shards: u64,
@@ -375,4 +378,17 @@ pub struct Ready {
     pub user: CurrentUser,
     #[serde(rename = "v")]
     pub version: u64,
+}
+
+/// Information describing how many gateway sessions you can initiate within a
+/// ratelimit period.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct SessionStartLimit {
+    /// The number of sessions that you can still initiate within the current
+    /// ratelimit period.
+    pub remaining: u64,
+    /// The number of milliseconds until the ratelimit period resets.
+    pub reset_after: u64,
+    /// The total number of session starts within the ratelimit period allowed.
+    pub total: u64,
 }
