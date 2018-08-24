@@ -142,7 +142,7 @@ pub(super) fn perform(req: Request) -> Result<Response> {
         let mut lock = bucket.lock();
         lock.pre_hook(&route);
 
-        let response = super::retry(&req)?;
+        let response = super::raw::retry(&req)?;
 
         // Check if an offset has been calculated yet to determine the time
         // difference from Discord can the client.
