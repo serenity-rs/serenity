@@ -28,6 +28,8 @@ pub struct BotGateway {
 
 /// Representation of a game that a [`User`] is playing -- or streaming in the
 /// case that a stream URL is provided.
+///
+/// [`User`]: ../user/struct.User.html
 #[derive(Clone, Debug, Serialize)]
 pub struct Game {
     /// The type of game status.
