@@ -1,5 +1,5 @@
 use std::collections::VecDeque;
-use std::rc::Rc;
+use std::sync::Arc;
 
 #[derive(Clone, Copy, Debug)]
 pub enum ShardingStrategy {
@@ -34,8 +34,8 @@ impl Default for ShardingStrategy {
 #[derive(Clone, Debug, Default)]
 pub struct ShardManagerOptions {
     pub strategy: ShardingStrategy,
-    pub token: Rc<String>,
-    pub ws_uri: Rc<String>,
+    pub token: Arc<String>,
+    pub ws_uri: Arc<String>,
 }
 
 #[derive(Debug)]
@@ -43,8 +43,8 @@ pub struct ShardManager {
     pub queue: VecDeque<u64>,
     pub shards: (),
     pub strategy: ShardingStrategy,
-    pub token: Rc<String>,
-    pub ws_uri: Rc<String>,
+    pub token: Arc<String>,
+    pub ws_uri: Arc<String>,
     non_exhaustive: (),
 }
 

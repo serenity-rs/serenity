@@ -109,6 +109,7 @@ extern crate serde_json;
 
 extern crate chrono;
 extern crate futures;
+extern crate parking_lot;
 extern crate serde;
 extern crate tokio;
 extern crate tokio_tls;

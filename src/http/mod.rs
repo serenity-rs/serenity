@@ -41,15 +41,15 @@ use hyper::header::{AUTHORIZATION, CONTENT_TYPE};
 use hyper::{Body, Method, Request, Response};
 use hyper_tls::HttpsConnector;
 use model::prelude::*;
+use parking_lot::Mutex;
 use self::ratelimiting::RateLimiter;
 use serde::de::DeserializeOwned;
 use serde_json::{self, Number, Value};
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt::Write;
 use std::fs::File;
-use std::rc::Rc;
 use std::str::FromStr;
+use std::sync::Arc;
 use ::builder::*;
 use ::{Error, utils as serenity_utils};
 
@@ -84,24 +84,24 @@ impl LightMethod {
 
 #[derive(Clone, Debug)]
 pub struct Client {
-    pub client: Rc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
-    pub ratelimiter: Rc<RefCell<RateLimiter>>,
-    pub token: Rc<String>,
+    pub client: Arc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
+    pub ratelimiter: Arc<Mutex<RateLimiter>>,
+    pub token: Arc<String>,
 }
 
 impl Client {
     pub fn new(
-        client: Rc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
-        token: Rc<String>,
+        client: Arc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
+        token: Arc<String>,
     ) -> Result<Self> {
         Ok(Self {
-            ratelimiter: Rc::new(RefCell::new(RateLimiter::new())),
+            ratelimiter: Arc::new(Mutex::new(RateLimiter::new())),
             client,
             token,
         })
     }
 
-    pub fn set_token(&mut self, token: Rc<String>) {
+    pub fn set_token(&mut self, token: Arc<String>) {
         self.token = token;
     }
 
@@ -1391,7 +1391,7 @@ impl Client {
         let mut request = ftry!(Request::get(uri).body(()));
         form.set_body(&mut request);
 
-        let client = Rc::clone(&self.multiparter);
+        let client = Arc::clone(&self.multiparter);
 
         let done = client.request(request)
             .from_err()
@@ -1521,9 +1521,9 @@ impl Client {
             None => ftry!(request_builder.body(vec![].into())),
         };
 
-        let client = Rc::clone(&self.client);
+        let client = Arc::clone(&self.client);
 
-        Box::new(ftry!(self.ratelimiter.try_borrow_mut()).take(&path)
+        Box::new(self.ratelimiter.lock().take(&path)
             .and_then(move |_| client.request(request).map_err(From::from))
             .from_err()
             .and_then(verify_status)
@@ -1554,9 +1554,9 @@ impl Client {
             None => ftry!(request_builder.body(vec![].into())),
         };
 
-        let client = Rc::clone(&self.client);
+        let client = Arc::clone(&self.client);
 
-        Box::new(ftry!(self.ratelimiter.try_borrow_mut()).take(&path)
+        Box::new(self.ratelimiter.lock().take(&path)
             .and_then(move |_| client.request(request).map_err(From::from))
             .map_err(From::from)
             .and_then(verify_status)
@@ -1564,13 +1564,13 @@ impl Client {
     }
 
     fn token(&self) -> String {
-        let pointer = Rc::into_raw(Rc::clone(&self.token));
+        let pointer = Arc::into_raw(Arc::clone(&self.token));
         let token = unsafe {
             (*pointer).clone()
         };
 
         unsafe {
-            drop(Rc::from_raw(pointer));
+            drop(Arc::from_raw(pointer));
         }
 
         token

@@ -1,8 +1,8 @@
 use futures::{future, Future, Stream, Poll, Sink, StartSend, AsyncSink};
 use ::Error;
+use parking_lot::{Mutex, RwLock};
 use std::collections::{VecDeque, HashMap};
-use std::rc::Rc;
-use std::cell::RefCell;
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 use gateway::{
     shard::Shard,
@@ -57,14 +57,14 @@ impl Default for ShardingStrategy {
 pub struct ShardManagerOptions<T: ReconnectQueue> {
     pub strategy: ShardingStrategy,
     pub token: String,
-    pub ws_uri: Rc<String>,
+    pub ws_uri: Arc<String>,
     pub queue: T,
 }
 
-pub type WrappedShard = Rc<RefCell<Shard>>;
+pub type WrappedShard = Arc<Mutex<Shard>>;
 pub type Message = (WrappedShard, TungsteniteMessage);
 pub type MessageStream = UnboundedReceiver<Message>;
-type ShardsMap = Rc<RefCell<HashMap<u64, WrappedShard>>>;
+type ShardsMap = Arc<RwLock<HashMap<u64, WrappedShard>>>;
 
 pub struct ShardManager<T: ReconnectQueue> {
     pub queue: VecDeque<u64>,
@@ -72,7 +72,7 @@ pub struct ShardManager<T: ReconnectQueue> {
     shards: ShardsMap,
     pub strategy: ShardingStrategy,
     pub token: String,
-    pub ws_uri: Rc<String>,
+    pub ws_uri: Arc<String>,
     message_stream: Option<MessageStream>,
     queue_sender: MpscSender<u64>,
     queue_receiver: Option<MpscReceiver<u64>>,
@@ -87,7 +87,7 @@ impl<T: ReconnectQueue> ShardManager<T> {
         Self {
             queue: VecDeque::new(),
             reconnect_queue: options.queue,
-            shards: Rc::new(RefCell::new(HashMap::new())),
+            shards: Arc::new(RwLock::new(HashMap::new())),
             strategy: options.strategy,
             token: options.token,
             ws_uri: options.ws_uri,
@@ -204,7 +204,7 @@ fn process_queue(
                 .and_then(move |_| {
                     let future = start_shard(token, shard_id, shards_total, sender)
                         .map(move |shard| {
-                            shards_map.borrow_mut().insert(shard_id.clone(), shard);
+                            shards_map.write().insert(shard_id.clone(), shard);
                         });
 
                     current_thread::spawn(future);
@@ -223,7 +223,7 @@ fn start_shard(
     Box::new(Shard::new(token.clone(), [shard_id, shards_total])
         .then(move |result| {
             let shard = match result {
-                Ok(shard) => Rc::new(RefCell::new(shard)),
+                Ok(shard) => Arc::new(Mutex::new(shard)),
                 Err(e) => {
                     return future::err(Error::from(e));
                 },
@@ -234,7 +234,7 @@ fn start_shard(
                 sender,
             };
 
-            let future = Box::new(shard.borrow_mut()
+            let future = Box::new(shard.lock()
                 .messages()
                 .map_err(MessageSinkError::from)
                 .forward(sink)

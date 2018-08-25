@@ -29,7 +29,7 @@ use hyper::client::{Client as HyperClient, HttpConnector};
 use hyper::Body;
 use hyper_tls::HttpsConnector;
 use self::shard_manager::{ShardManager, ShardManagerOptions, ShardingStrategy};
-use std::rc::Rc;
+use std::sync::Arc;
 use super::http::Client as HttpClient;
 use Error;
 
@@ -38,7 +38,7 @@ use cache::Cache;
 
 #[derive(Debug)]
 pub struct ClientOptions {
-    pub http_client: Rc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
+    pub http_client: Arc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
     pub sharding: ShardingStrategy,
     pub token: String,
 }
@@ -46,11 +46,11 @@ pub struct ClientOptions {
 #[derive(Debug)]
 pub struct Client {
     #[cfg(feature = "cache")]
-    pub cache: Rc<RefCell<Cache>>,
-    pub http: Rc<HttpClient>,
+    pub cache: Arc<RefCell<Cache>>,
+    pub http: Arc<HttpClient>,
     pub shard_manager: ShardManager,
-    token: Rc<String>,
-    ws_uri: Rc<String>,
+    token: Arc<String>,
+    ws_uri: Arc<String>,
 }
 
 impl Client {
@@ -58,7 +58,7 @@ impl Client {
         let token = {
             let trimmed = options.token.trim();
 
-            Rc::new(if trimmed.starts_with("Bot ") {
+            Arc::new(if trimmed.starts_with("Bot ") {
                 trimmed.to_string()
             } else {
                 format!("Bot {}", trimmed)
@@ -66,25 +66,25 @@ impl Client {
         };
 
         let strategy = options.sharding;
-        let client = Rc::new(ftry!(HttpClient::new(
+        let client = Arc::new(ftry!(HttpClient::new(
             options.http_client,
-            Rc::clone(&token),
+            Arc::clone(&token),
         )));
 
         let done = client.get_bot_gateway().map(move |gateway| {
-            let uri = Rc::new(gateway.url);
+            let uri = Arc::new(gateway.url);
 
             Self {
                 #[cfg(feature = "cache")]
-                cache: Rc::new(RefCell::new(Cache::default())),
+                cache: Arc::new(RefCell::new(Cache::default())),
                 http: client,
                 shard_manager: ShardManager::new(ShardManagerOptions {
                     strategy: strategy,
-                    token: Rc::clone(&token),
-                    ws_uri: Rc::clone(&uri),
+                    token: Arc::clone(&token),
+                    ws_uri: Arc::clone(&uri),
                 }),
                 token: token,
-                ws_uri: Rc::clone(&uri),
+                ws_uri: Arc::clone(&uri),
             }
         }).from_err();
 
