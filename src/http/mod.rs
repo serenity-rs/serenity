@@ -50,7 +50,6 @@ use std::fmt::Write;
 use std::fs::File;
 use std::rc::Rc;
 use std::str::FromStr;
-use tokio::reactor::Handle;
 use ::builder::*;
 use ::{Error, utils as serenity_utils};
 
@@ -86,7 +85,6 @@ impl LightMethod {
 #[derive(Clone, Debug)]
 pub struct Client {
     pub client: Rc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
-    pub handle: Handle,
     pub ratelimiter: Rc<RefCell<RateLimiter>>,
     pub token: Rc<String>,
 }
@@ -94,13 +92,11 @@ pub struct Client {
 impl Client {
     pub fn new(
         client: Rc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
-        handle: Handle,
         token: Rc<String>,
     ) -> Result<Self> {
         Ok(Self {
             ratelimiter: Rc::new(RefCell::new(RateLimiter::new())),
             client,
-            handle,
             token,
         })
     }
