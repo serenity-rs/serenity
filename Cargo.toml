@@ -18,7 +18,7 @@ serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
 tokio = "~0.1"
-tokio-tls = "~0.1"
+tokio-tls = "~0.2"
 url = "^1.0"
 
 [dependencies.base64]
@@ -63,8 +63,8 @@ optional = true
 version = "0.0.14"
 
 [dependencies.tokio-tungstenite]
-git = "https://github.com/snapview/tokio-tungstenite"
 optional = true
+version = "0.6"
 
 [dev-dependencies.matches]
 version = "0.1.6"
@@ -89,6 +89,3 @@ voice = ["byteorder", "gateway", "opus", "rand", "sodiumoxide"]
 
 [package.metadata.docs.rs]
 all-features = true
-
-[patch.crates-io]
-tokio-tls = { git = "https://github.com/aep/tokio-tls.git", rev = "7865734d2167160cabd4422aca76b8478e643b41" }
