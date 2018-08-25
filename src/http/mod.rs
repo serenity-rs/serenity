@@ -36,6 +36,7 @@ pub use self::error::{Error as HttpError, Result};
 pub use self::routing::{Path, Route};
 
 use futures::{Future, Stream, future};
+use http_crate::uri::Uri;
 use hyper::client::{Client as HyperClient, HttpConnector};
 use hyper::header::{AUTHORIZATION, CONTENT_TYPE};
 use hyper::{Body, Method, Request, Response};
@@ -114,7 +115,7 @@ impl Client {
     /// [`Group::add_recipient`]: ../model/channel/struct.Group.html#method.add_recipient
     /// [`User`]: ../model/user/struct.User.html
     pub fn add_group_recipient(&self, group_id: u64, user_id: u64)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::AddGroupRecipient { group_id, user_id }, None)
     }
 
@@ -132,7 +133,7 @@ impl Client {
         guild_id: u64,
         user_id: u64,
         role_id: u64
-    ) -> impl Future<Item = (), Error = Error> {
+    ) -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::AddMemberRole { guild_id, user_id, role_id }, None)
     }
 
@@ -153,7 +154,7 @@ impl Client {
         user_id: u64,
         delete_message_days: u8,
         reason: &str,
-    ) -> impl Future<Item = (), Error = Error> {
+    ) -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::GuildBanUser {
             delete_message_days: Some(delete_message_days),
             reason: Some(reason),
@@ -177,7 +178,7 @@ impl Client {
         guild_id: u64,
         delete_message_days: u8,
         reason: &str,
-    ) -> impl Future<Item = (), Error = Error> {
+    ) -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::GuildBanUser {
             delete_message_days: Some(delete_message_days),
             reason: Some(reason),
@@ -196,7 +197,7 @@ impl Client {
     ///
     /// [`Channel`]: ../model/channel/enum.Channel.html
     pub fn broadcast_typing(&self, channel_id: u64)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::BroadcastTyping { channel_id }, None)
     }
 
@@ -217,7 +218,7 @@ impl Client {
         name: &str,
         kind: ChannelType,
         category_id: Option<u64>,
-    ) -> impl Future<Item = GuildChannel, Error = Error> {
+    ) -> impl Future<Item = GuildChannel, Error = Error> + Send {
         self.post(Route::CreateChannel { guild_id }, Some(&json!({
             "name": name,
             "parent_id": category_id,
@@ -236,7 +237,7 @@ impl Client {
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [Manage Emojis]: ../model/permissions/constant.MANAGE_EMOJIS.html
     pub fn create_emoji(&self, guild_id: u64, name: &str, image: &str)
-        -> impl Future<Item = Emoji, Error = Error> {
+        -> impl Future<Item = Emoji, Error = Error> + Send {
         self.post(Route::CreateEmoji { guild_id }, Some(&json!({
             "image": image,
             "name": name,
@@ -280,7 +281,7 @@ impl Client {
     /// https://discordapp.com/developers/docs/resources/guild#create-guild
     /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
     pub fn create_guild(&self, map: &Value)
-        -> impl Future<Item = PartialGuild, Error = Error> {
+        -> impl Future<Item = PartialGuild, Error = Error> + Send {
         self.post(Route::CreateGuild, Some(map))
     }
 
@@ -299,7 +300,7 @@ impl Client {
         guild_id: u64,
         integration_id: u64,
         kind: &str,
-    ) -> impl Future<Item = (), Error = Error> {
+    ) -> impl Future<Item = (), Error = Error> + Send {
         let json = json!({
             "id": integration_id,
             "type": kind,
@@ -335,7 +336,7 @@ impl Client {
         &self,
         channel_id: u64,
         target: &PermissionOverwrite,
-    ) -> impl Future<Item = (), Error = Error> {
+    ) -> impl Future<Item = (), Error = Error> + Send {
         let (id, kind) = match target.kind {
             PermissionOverwriteType::Member(id) => (id.0, "member"),
             PermissionOverwriteType::Role(id) => (id.0, "role"),
@@ -355,7 +356,7 @@ impl Client {
 
     /// Creates a private channel with a user.
     pub fn create_private_channel(&self, user_id: u64)
-        -> impl Future<Item = PrivateChannel, Error = Error> {
+        -> impl Future<Item = PrivateChannel, Error = Error> + Send {
         let map = json!({
             "recipient_id": user_id,
         });
@@ -369,7 +370,7 @@ impl Client {
         channel_id: u64,
         message_id: u64,
         reaction_type: &ReactionType
-    ) -> impl Future<Item = (), Error = Error> {
+    ) -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::CreateReaction {
             reaction: &utils::reaction_type_data(reaction_type),
             channel_id,
@@ -417,24 +418,24 @@ impl Client {
     ///
     /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
     pub fn create_webhook(&self, channel_id: u64, map: &Value)
-        -> impl Future<Item = Webhook, Error = Error> {
+        -> impl Future<Item = Webhook, Error = Error> + Send {
         self.post(Route::CreateWebhook { channel_id }, Some(map))
     }
 
     /// Deletes a private channel or a channel in a guild.
-    pub fn delete_channel(&self, channel_id: u64) -> impl Future<Item = Channel, Error = Error> {
+    pub fn delete_channel(&self, channel_id: u64) -> impl Future<Item = Channel, Error = Error> + Send {
         self.delete(Route::DeleteChannel { channel_id }, None)
     }
 
     /// Deletes an emoji from a server.
     pub fn delete_emoji(&self, guild_id: u64, emoji_id: u64)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.delete(Route::DeleteEmoji { guild_id, emoji_id }, None)
     }
 
     /// Deletes a guild, only if connected account owns it.
     pub fn delete_guild(&self, guild_id: u64)
-        -> impl Future<Item = PartialGuild, Error = Error> {
+        -> impl Future<Item = PartialGuild, Error = Error> + Send {
         self.delete(Route::DeleteGuild { guild_id }, None)
     }
 
@@ -443,7 +444,7 @@ impl Client {
         &self,
         guild_id: u64,
         integration_id: u64,
-    ) -> impl Future<Item = (), Error = Error> {
+    ) -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::DeleteGuildIntegration {
             guild_id,
             integration_id,
@@ -451,13 +452,13 @@ impl Client {
     }
 
     /// Deletes an invite by code.
-    pub fn delete_invite(&self, code: &str) -> impl Future<Item = Invite, Error = Error> {
+    pub fn delete_invite(&self, code: &str) -> impl Future<Item = Invite, Error = Error> + Send {
         self.delete(Route::DeleteInvite { code }, None)
     }
 
     /// Deletes a message if created by us or we have specific permissions.
     pub fn delete_message(&self, channel_id: u64, message_id: u64)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::DeleteMessage { channel_id, message_id }, None)
     }
 
@@ -495,7 +496,7 @@ impl Client {
     /// [`Message`]: ../model/channel/struct.Message.html
     /// [`Reaction`]: ../model/channel/struct.Reaction.html
     pub fn delete_message_reactions(&self, channel_id: u64, message_id: u64)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::DeleteMessageReactions {
             channel_id,
             message_id,
@@ -504,7 +505,7 @@ impl Client {
 
     /// Deletes a permission override from a role or a member in a channel.
     pub fn delete_permission(&self, channel_id: u64, target_id: u64)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::DeletePermission { channel_id, target_id }, None)
     }
 
@@ -516,7 +517,7 @@ impl Client {
         message_id: u64,
         user_id: Option<u64>,
         reaction_type: &ReactionType,
-    ) -> impl Future<Item = (), Error = Error> {
+    ) -> impl Future<Item = (), Error = Error> + Send {
         let reaction_type = utils::reaction_type_data(reaction_type);
         let user = user_id
             .map(|uid| uid.to_string())
@@ -532,7 +533,7 @@ impl Client {
 
     /// Deletes a role from a server. Can't remove the default everyone role.
     pub fn delete_role(&self, guild_id: u64, role_id: u64)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::DeleteRole { guild_id, role_id }, None)
     }
 
@@ -559,7 +560,7 @@ impl Client {
     ///
     /// [`Webhook`]: ../model/webhook/struct.Webhook.html
     /// [`delete_webhook_with_token`]: fn.delete_webhook_with_token.html
-    pub fn delete_webhook(&self, webhook_id: u64) -> impl Future<Item = (), Error = Error> {
+    pub fn delete_webhook(&self, webhook_id: u64) -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::DeleteWebhook { webhook_id }, None)
     }
 
@@ -583,7 +584,7 @@ impl Client {
     ///
     /// [`Webhook`]: ../model/webhook/struct.Webhook.html
     pub fn delete_webhook_with_token(&self, webhook_id: u64, token: &str)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::DeleteWebhookWithToken { webhook_id, token }, None)
     }
 
@@ -599,7 +600,7 @@ impl Client {
 
     /// Changes emoji information.
     pub fn edit_emoji(&self, guild_id: u64, emoji_id: u64, name: &str)
-        -> impl Future<Item = Emoji, Error = Error> {
+        -> impl Future<Item = Emoji, Error = Error> + Send {
         let map = json!({
             "name": name,
         });
@@ -619,7 +620,7 @@ impl Client {
 
     /// Edits the positions of a guild's channels.
     pub fn edit_guild_channel_positions<It>(&self, guild_id: u64, channels: It)
-        -> impl Future<Item = (), Error = Error> where It: IntoIterator<Item = (ChannelId, u64)> {
+        -> impl Future<Item = (), Error = Error> + Send where It: IntoIterator<Item = (ChannelId, u64)> {
         let items = channels.into_iter().map(|(id, pos)| json!({
             "id": id,
             "position": pos,
@@ -635,13 +636,13 @@ impl Client {
     /// [`Guild`]: ../model/guild/struct.Guild.html
     // todo
     pub fn edit_guild_embed(&self, guild_id: u64, map: &Value)
-        -> impl Future<Item = GuildEmbed, Error = Error> {
+        -> impl Future<Item = GuildEmbed, Error = Error> + Send {
         self.patch(Route::EditGuildEmbed { guild_id }, Some(map))
     }
 
     /// Does specific actions to a member.
     pub fn edit_member<F>(&self, guild_id: u64, user_id: u64, f: F)
-        -> impl Future<Item = (), Error = Error> where F: FnOnce(EditMember) -> EditMember {
+        -> impl Future<Item = (), Error = Error> + Send where F: FnOnce(EditMember) -> EditMember {
         let member = f(EditMember::default()).0;
         let map = Value::Object(serenity_utils::vecmap_to_json_map(member));
 
@@ -656,7 +657,7 @@ impl Client {
         channel_id: u64,
         message_id: u64,
         f: F,
-    ) -> impl Future<Item = Message, Error = Error> {
+    ) -> impl Future<Item = Message, Error = Error> + Send {
         let msg = f(EditMessage::default());
         let map = Value::Object(serenity_utils::vecmap_to_json_map(msg.0));
 
@@ -669,20 +670,20 @@ impl Client {
     ///
     /// [`Guild`]: ../model/guild/struct.Guild.html
     pub fn edit_nickname(&self, guild_id: u64, new_nickname: Option<&str>)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.patch(Route::EditNickname { guild_id }, Some(&json!({
             "nick": new_nickname,
         })))
     }
 
     /// Edits the current user's profile settings.
-    pub fn edit_profile(&self, map: &Value) -> impl Future<Item = CurrentUser, Error = Error> {
+    pub fn edit_profile(&self, map: &Value) -> impl Future<Item = CurrentUser, Error = Error> + Send {
         self.patch(Route::EditProfile, Some(map))
     }
 
     /// Changes a role in a guild.
     pub fn edit_role<F>(&self, guild_id: u64, role_id: u64, f: F)
-        -> impl Future<Item = Role, Error = Error> where F: FnOnce(EditRole) -> EditRole {
+        -> impl Future<Item = Role, Error = Error> + Send where F: FnOnce(EditRole) -> EditRole {
         let role = f(EditRole::default()).0;
         let map = Value::Object(serenity_utils::vecmap_to_json_map(role));
 
@@ -695,7 +696,7 @@ impl Client {
         guild_id: u64,
         role_id: u64,
         position: u64,
-    ) -> impl Future<Item = Vec<Role>, Error = Error> {
+    ) -> impl Future<Item = Vec<Role>, Error = Error> + Send {
         self.patch(Route::EditRole { guild_id, role_id }, Some(&json!({
             "id": role_id,
             "position": position,
@@ -747,7 +748,7 @@ impl Client {
         webhook_id: u64,
         name: Option<&str>,
         avatar: Option<&str>,
-    ) -> impl Future<Item = Webhook, Error = Error> {
+    ) -> impl Future<Item = Webhook, Error = Error> + Send {
         let map = json!({
             "avatar": avatar,
             "name": name,
@@ -788,7 +789,7 @@ impl Client {
         token: &str,
         name: Option<&str>,
         avatar: Option<&str>,
-    ) -> impl Future<Item = Webhook, Error = Error> {
+    ) -> impl Future<Item = Webhook, Error = Error> + Send {
         let map = json!({
             "avatar": avatar,
             "name": name,
@@ -887,7 +888,7 @@ impl Client {
     /// Gets the active maintenances from Discord's Status API.
     ///
     /// Does not require authentication.
-    // pub fn get_active_maintenances() -> impl Future<Item = Vec<Maintenance>, Error = Error> {
+    // pub fn get_active_maintenances() -> impl Future<Item = Vec<Maintenance>, Error = Error> + Send {
     //     let client = request_client!();
 
     //     let response = retry(|| {
@@ -904,7 +905,7 @@ impl Client {
     // }
 
     /// Gets all the users that are banned in specific guild.
-    pub fn get_bans(&self, guild_id: u64) -> impl Future<Item = Vec<Ban>, Error = Error> {
+    pub fn get_bans(&self, guild_id: u64) -> impl Future<Item = Vec<Ban>, Error = Error> + Send {
         self.get(Route::GetBans { guild_id })
     }
 
@@ -916,7 +917,7 @@ impl Client {
         user_id: Option<u64>,
         before: Option<u64>,
         limit: Option<u8>,
-    ) -> impl Future<Item = AuditLogs, Error = Error> {
+    ) -> impl Future<Item = AuditLogs, Error = Error> + Send {
         self.get(Route::GetAuditLogs {
             action_type,
             before,
@@ -927,13 +928,13 @@ impl Client {
     }
 
     /// Gets current bot gateway.
-    pub fn get_bot_gateway(&self) -> impl Future<Item = BotGateway, Error = Error> {
+    pub fn get_bot_gateway(&self) -> impl Future<Item = BotGateway, Error = Error> + Send {
         self.get(Route::GetBotGateway)
     }
 
     /// Gets all invites for a channel.
     pub fn get_channel_invites(&self, channel_id: u64)
-        -> impl Future<Item = Vec<RichInvite>, Error = Error> {
+        -> impl Future<Item = Vec<RichInvite>, Error = Error> + Send {
         self.get(Route::GetChannelInvites { channel_id })
     }
 
@@ -956,18 +957,18 @@ impl Client {
     ///
     /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
     pub fn get_channel_webhooks(&self, channel_id: u64)
-        -> impl Future<Item = Vec<Webhook>, Error = Error> {
+        -> impl Future<Item = Vec<Webhook>, Error = Error> + Send {
         self.get(Route::GetChannelWebhooks { channel_id })
     }
 
     /// Gets channel information.
-    pub fn get_channel(&self, channel_id: u64) -> impl Future<Item = Channel, Error = Error> {
+    pub fn get_channel(&self, channel_id: u64) -> impl Future<Item = Channel, Error = Error> + Send {
         self.get(Route::GetChannel { channel_id })
     }
 
     /// Gets all channels in a guild.
     pub fn get_channels(&self, guild_id: u64)
-        -> impl Future<Item = Vec<GuildChannel>, Error = Error> {
+        -> impl Future<Item = Vec<GuildChannel>, Error = Error> + Send {
         self.get(Route::GetChannels { guild_id })
     }
 
@@ -975,40 +976,40 @@ impl Client {
     ///
     /// **Note**: Only applications may use this endpoint.
     pub fn get_current_application_info(&self)
-        -> impl Future<Item = CurrentApplicationInfo, Error = Error> {
+        -> impl Future<Item = CurrentApplicationInfo, Error = Error> + Send {
         self.get(Route::GetCurrentApplicationInfo)
     }
 
     /// Gets information about the user we're connected with.
-    pub fn get_current_user(&self, ) -> impl Future<Item = CurrentUser, Error = Error> {
+    pub fn get_current_user(&self, ) -> impl Future<Item = CurrentUser, Error = Error> + Send {
         self.get(Route::GetCurrentUser)
     }
 
     /// Gets current gateway.
-    pub fn get_gateway(&self) -> impl Future<Item = Gateway, Error = Error> {
+    pub fn get_gateway(&self) -> impl Future<Item = Gateway, Error = Error> + Send {
         self.get(Route::GetGateway)
     }
 
     /// Gets guild information.
-    pub fn get_guild(&self, guild_id: u64) -> impl Future<Item = PartialGuild, Error = Error> {
+    pub fn get_guild(&self, guild_id: u64) -> impl Future<Item = PartialGuild, Error = Error> + Send {
         self.get(Route::GetGuild { guild_id })
     }
 
     /// Gets a guild embed information.
     pub fn get_guild_embed(&self, guild_id: u64)
-        -> impl Future<Item = GuildEmbed, Error = Error> {
+        -> impl Future<Item = GuildEmbed, Error = Error> + Send {
         self.get(Route::GetGuildEmbed { guild_id })
     }
 
     /// Gets integrations that a guild has.
     pub fn get_guild_integrations(&self, guild_id: u64)
-        -> impl Future<Item = Vec<Integration>, Error = Error> {
+        -> impl Future<Item = Vec<Integration>, Error = Error> + Send {
         self.get(Route::GetGuildIntegrations { guild_id })
     }
 
     /// Gets all invites to a guild.
     pub fn get_guild_invites(&self, guild_id: u64)
-        -> impl Future<Item = Vec<RichInvite>, Error = Error> {
+        -> impl Future<Item = Vec<RichInvite>, Error = Error> + Send {
         self.get(Route::GetGuildInvites { guild_id })
     }
 
@@ -1019,7 +1020,7 @@ impl Client {
         guild_id: u64,
         limit: Option<u64>,
         after: Option<u64>
-    ) -> impl Future<Item = Vec<Member>, Error = Error> {
+    ) -> impl Future<Item = Vec<Member>, Error = Error> + Send {
         let done = self.get(Route::GetGuildMembers { after, guild_id, limit })
             .and_then(move |mut v: Value| {
                 if let Some(values) = v.as_array_mut() {
@@ -1040,7 +1041,7 @@ impl Client {
 
     /// Gets the amount of users that can be pruned.
     pub fn get_guild_prune_count(&self, guild_id: u64, days: u16)
-        -> impl Future<Item = GuildPrune, Error = Error> {
+        -> impl Future<Item = GuildPrune, Error = Error> + Send {
         self.get(Route::GetGuildPruneCount {
             days: days as u64,
             guild_id,
@@ -1053,7 +1054,7 @@ impl Client {
     ///
     /// [`Feature::VipRegions`]: ../model/enum.Feature.html#variant.VipRegions
     pub fn get_guild_regions(&self, guild_id: u64)
-        -> impl Future<Item = Vec<VoiceRegion>, Error = Error> {
+        -> impl Future<Item = Vec<VoiceRegion>, Error = Error> + Send {
         self.get(Route::GetGuildRegions { guild_id })
     }
 
@@ -1061,13 +1062,13 @@ impl Client {
     ///
     /// [`Guild`]: ../model/guild/struct.Guild.html
     pub fn get_guild_roles(&self, guild_id: u64)
-        -> impl Future<Item = Vec<Role>, Error = Error> {
+        -> impl Future<Item = Vec<Role>, Error = Error> + Send {
         self.get(Route::GetGuildRoles { guild_id })
     }
 
     /// Gets a guild's vanity URL if it has one.
     pub fn get_guild_vanity_url(&self, guild_id: u64)
-        -> impl Future<Item = String, Error = Error> {
+        -> impl Future<Item = String, Error = Error> + Send {
         #[derive(Deserialize)]
         struct GuildVanityUrl {
             code: String,
@@ -1101,7 +1102,7 @@ impl Client {
     ///
     /// [`Guild`]: ../model/guild/struct.Guild.html
     pub fn get_guild_webhooks(&self, guild_id: u64)
-        -> impl Future<Item = Vec<Webhook>, Error = Error> {
+        -> impl Future<Item = Vec<Webhook>, Error = Error> + Send {
         self.get(Route::GetGuildWebhooks { guild_id })
     }
 
@@ -1126,7 +1127,7 @@ impl Client {
     ///
     /// [docs]: https://discordapp.com/developers/docs/resources/user#get-current-user-guilds
     pub fn get_guilds(&self, target: &GuildPagination, limit: u64)
-        -> impl Future<Item = Vec<GuildInfo>, Error = Error> {
+        -> impl Future<Item = Vec<GuildInfo>, Error = Error> + Send {
         let (after, before) = match *target {
             GuildPagination::After(v) => (Some(v.0), None),
             GuildPagination::Before(v) => (None, Some(v.0)),
@@ -1137,13 +1138,13 @@ impl Client {
 
     /// Gets information about a specific invite.
     pub fn get_invite<'a>(&self, code: &'a str, stats: bool)
-        -> impl Future<Item = Invite, Error = Error> {
+        -> impl Future<Item = Invite, Error = Error> + Send {
         self.get(Route::GetInvite { code, stats })
     }
 
     /// Gets member of a guild.
     pub fn get_member(&self, guild_id: u64, user_id: u64)
-        -> impl Future<Item = Member, Error = Error> {
+        -> impl Future<Item = Member, Error = Error> + Send {
         let done = self.get::<Value>(Route::GetMember { guild_id, user_id })
             .and_then(move |mut v| {
                 if let Some(map) = v.as_object_mut() {
@@ -1158,7 +1159,7 @@ impl Client {
 
     /// Gets a message by an Id, bots only.
     pub fn get_message(&self, channel_id: u64, message_id: u64)
-        -> impl Future<Item = Message, Error = Error> {
+        -> impl Future<Item = Message, Error = Error> + Send {
         self.get(Route::GetMessage { channel_id, message_id })
     }
 
@@ -1192,7 +1193,7 @@ impl Client {
     }
 
     /// Gets all pins of a channel.
-    pub fn get_pins(&self, channel_id: u64) -> impl Future<Item = Vec<Message>, Error = Error> {
+    pub fn get_pins(&self, channel_id: u64) -> impl Future<Item = Vec<Message>, Error = Error> + Send {
         self.get(Route::GetPins { channel_id })
     }
 
@@ -1204,7 +1205,7 @@ impl Client {
         reaction_type: &ReactionType,
         limit: Option<u8>,
         after: Option<u64>
-    ) -> impl Future<Item = Vec<User>, Error = Error> {
+    ) -> impl Future<Item = Vec<User>, Error = Error> + Send {
         let reaction = utils::reaction_type_data(reaction_type);
         self.get(Route::GetReactionUsers {
             limit: limit.unwrap_or(50),
@@ -1218,7 +1219,7 @@ impl Client {
     /// Gets the current unresolved incidents from Discord's Status API.
     ///
     /// Does not require authentication.
-    pub fn get_unresolved_incidents(&self) -> impl Future<Item = Vec<Incident>, Error = Error> {
+    pub fn get_unresolved_incidents(&self) -> impl Future<Item = Vec<Incident>, Error = Error> + Send {
         self.get::<HashMap<String, Value>>(Route::GetUnresolvedIncidents)
             .and_then(|mut map| {
                 match map.remove("incidents") {
@@ -1231,7 +1232,7 @@ impl Client {
     /// Gets the upcoming (planned) maintenances from Discord's Status API.
     ///
     /// Does not require authentication.
-    pub fn get_upcoming_maintenances(&self) -> impl Future<Item = Vec<Maintenance>, Error = Error> {
+    pub fn get_upcoming_maintenances(&self) -> impl Future<Item = Vec<Maintenance>, Error = Error> + Send {
         self.get::<HashMap<String, Value>>(Route::StatusMaintenancesUpcoming)
             .and_then(|mut map| {
                 match map.remove("scheduled_maintenances") {
@@ -1242,18 +1243,18 @@ impl Client {
     }
 
     /// Gets a user by Id.
-    pub fn get_user(&self, user_id: u64) -> impl Future<Item = User, Error = Error> {
+    pub fn get_user(&self, user_id: u64) -> impl Future<Item = User, Error = Error> + Send {
         self.get(Route::GetUser { user_id })
     }
 
     /// Gets our DM channels.
     pub fn get_user_dm_channels(&self)
-        -> impl Future<Item = Vec<PrivateChannel>, Error = Error> {
+        -> impl Future<Item = Vec<PrivateChannel>, Error = Error> + Send {
         self.get(Route::GetUserDmChannels)
     }
 
     /// Gets all voice regions.
-    pub fn get_voice_regions(&self) -> impl Future<Item = Vec<VoiceRegion>, Error = Error> {
+    pub fn get_voice_regions(&self) -> impl Future<Item = Vec<VoiceRegion>, Error = Error> + Send {
         self.get(Route::GetVoiceRegions)
     }
 
@@ -1274,7 +1275,7 @@ impl Client {
     /// ```
     ///
     /// [`get_webhook_with_token`]: fn.get_webhook_with_token.html
-    pub fn get_webhook(&self, webhook_id: u64) -> impl Future<Item = Webhook, Error = Error> {
+    pub fn get_webhook(&self, webhook_id: u64) -> impl Future<Item = Webhook, Error = Error> + Send {
         self.get(Route::GetWebhook { webhook_id })
     }
 
@@ -1299,31 +1300,31 @@ impl Client {
         &self,
         webhook_id: u64,
         token: &'a str,
-    ) -> impl Future<Item = Webhook, Error = Error> {
+    ) -> impl Future<Item = Webhook, Error = Error> + Send {
         self.get(Route::GetWebhookWithToken { token, webhook_id })
     }
 
     /// Kicks a member from a guild.
     pub fn kick_member(&self, guild_id: u64, user_id: u64)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::KickMember { guild_id, user_id }, None)
     }
 
     /// Leaves a group DM.
-    pub fn leave_group(&self, group_id: u64) -> impl Future<Item = (), Error = Error> {
+    pub fn leave_group(&self, group_id: u64) -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::DeleteChannel {
             channel_id: group_id,
         }, None)
     }
 
     /// Leaves a guild.
-    pub fn leave_guild(&self, guild_id: u64) -> impl Future<Item = (), Error = Error> {
+    pub fn leave_guild(&self, guild_id: u64) -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::LeaveGuild { guild_id }, None)
     }
 
     /// Deletes a user from group DM.
     pub fn remove_group_recipient(&self, group_id: u64, user_id: u64)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::RemoveGroupRecipient { group_id, user_id }, None)
     }
 
@@ -1414,13 +1415,13 @@ impl Client {
 
     /// Pins a message in a channel.
     pub fn pin_message(&self, channel_id: u64, message_id: u64)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::PinMessage { channel_id, message_id }, None)
     }
 
     /// Unbans a user from a guild.
     pub fn remove_ban(&self, guild_id: u64, user_id: u64)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::RemoveBan { guild_id, user_id }, None)
     }
 
@@ -1438,7 +1439,7 @@ impl Client {
         guild_id: u64,
         user_id: u64,
         role_id: u64,
-    ) -> impl Future<Item = (), Error = Error> {
+    ) -> impl Future<Item = (), Error = Error> + Send {
         self.verify(
             Route::RemoveMemberRole { guild_id, role_id, user_id },
             None,
@@ -1447,7 +1448,7 @@ impl Client {
 
     /// Starts removing some members from a guild based on the last time they've been online.
     pub fn start_guild_prune(&self, guild_id: u64, days: u16)
-        -> impl Future<Item = GuildPrune, Error = Error> {
+        -> impl Future<Item = GuildPrune, Error = Error> + Send {
         self.post(Route::StartGuildPrune {
             days: days as u64,
             guild_id,
@@ -1456,7 +1457,7 @@ impl Client {
 
     /// Starts syncing an integration with a guild.
     pub fn start_integration_sync(&self, guild_id: u64, integration_id: u64)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.verify(
             Route::StartIntegrationSync { guild_id, integration_id },
             None,
@@ -1465,47 +1466,50 @@ impl Client {
 
     /// Unpins a message from a channel.
     pub fn unpin_message(&self, channel_id: u64, message_id: u64)
-        -> impl Future<Item = (), Error = Error> {
+        -> impl Future<Item = (), Error = Error> + Send {
         self.verify(Route::UnpinMessage { channel_id, message_id }, None)
     }
 
-    fn delete<'a, T: DeserializeOwned + 'static>(
+    fn delete<'a, T: DeserializeOwned + 'static + Send>(
         &self,
         route: Route<'a>,
         map: Option<&Value>,
-    ) -> impl Future<Item = T, Error = Error> {
+    ) -> impl Future<Item = T, Error = Error> + Send {
         self.request(route, map)
     }
 
-    fn get<'a, T: DeserializeOwned + 'static>(&self, route: Route<'a>)
-        -> impl Future<Item = T, Error = Error> {
+    fn get<'a, T: DeserializeOwned + 'static + Send>(&self, route: Route<'a>)
+        -> impl Future<Item = T, Error = Error> + Send {
         self.request(route, None)
     }
 
-    fn patch<'a, T: DeserializeOwned + 'static>(
+    fn patch<'a, T: DeserializeOwned + 'static + Send>(
         &self,
         route: Route<'a>,
         map: Option<&Value>,
-    ) -> impl Future<Item = T, Error = Error> {
+    ) -> impl Future<Item = T, Error = Error> + Send {
         self.request(route, map)
     }
 
-    fn post<'a, T: DeserializeOwned + 'static>(
+    fn post<'a, T: DeserializeOwned + 'static + Send>(
         &self,
         route: Route<'a>,
         map: Option<&Value>,
-    ) -> impl Future<Item = T, Error = Error> {
+    ) -> impl Future<Item = T, Error = Error> + Send {
         self.request(route, map)
     }
 
-    fn request<'a, T: DeserializeOwned + 'static>(
+    fn request<'a, T: DeserializeOwned + 'static + Send>(
         &self,
         route: Route<'a>,
         map: Option<&Value>,
-    ) -> Box<Future<Item = T, Error = Error>> {
+    ) -> Box<Future<Item = T, Error = Error> + Send> {
         let (method, path, url) = route.deconstruct();
 
-        let uri = try_uri!(url.as_ref());
+        let uri = match Uri::from_str(url.as_ref()) {
+            Ok(uri) => uri,
+            Err(why) => return Box::new(future::err(Error::Http(HttpError::InvalidUri(why)))),
+        };
         let mut request_builder = Request::builder();
         request_builder.method(method.hyper_method())
             .header(AUTHORIZATION, &self.token()[..])
@@ -1514,9 +1518,15 @@ impl Client {
 
         let request = match map {
             Some(value) => {
-                let body = ftry!(serde_json::to_vec(value));
+                let body = match serde_json::to_vec(value) {
+                    Ok(body) => body,
+                    Err(why) => return Box::new(future::err(Error::Json(why))),
+                };
 
-                ftry!(request_builder.body(body.into()))
+                match request_builder.body(body.into()) {
+                    Ok(body) => body,
+                    Err(why) => return Box::new(future::err(Error::HttpCrate(why))),
+                }
             },
             None => ftry!(request_builder.body(vec![].into())),
         };
@@ -1535,7 +1545,7 @@ impl Client {
         &self,
         route: Route<'a>,
         map: Option<&Value>,
-    ) -> Box<Future<Item = (), Error = Error>> {
+    ) -> Box<Future<Item = (), Error = Error> + Send> {
         let (method, path, url) = route.deconstruct();
 
         let uri = try_uri!(url.as_ref());
@@ -1591,7 +1601,7 @@ impl Client {
 ///
 /// [`Error::InvalidRequest`]: enum.Error.html#variant.InvalidRequest
 fn verify_status(response: Response<Body>) ->
-    Box<Future<Item = Response<Body>, Error = Error>> {
+    Box<Future<Item = Response<Body>, Error = Error> + Send> {
     if response.status().is_success() {
         Box::new(future::ok(response))
     } else {

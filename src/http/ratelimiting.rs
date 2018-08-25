@@ -48,11 +48,11 @@ use hyper::{
     Response,
     StatusCode,
 };
-use std::cell::RefCell;
+use parking_lot::Mutex;
 use std::collections::{HashMap, VecDeque};
 use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::rc::Rc;
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 use std::{i64, str, u8};
 use super::{Error, Path, Result};
@@ -187,7 +187,7 @@ impl Bucket {
 #[derive(Clone, Debug, Default)]
 pub struct Global {
     pub blocked: bool,
-    pub queue: Rc<RefCell<VecDeque<Receiver<()>>>>,
+    pub queue: Arc<Mutex<VecDeque<Receiver<()>>>>,
 }
 
 #[derive(Clone, Debug)]
@@ -206,7 +206,7 @@ pub struct RateLimiter {
     /// The only reason that you would need to use the global mutex is to
     /// block requests yourself. This has the side-effect of potentially
     /// blocking many of your event handlers or framework commands.
-    pub global: Rc<RefCell<Global>>,
+    pub global: Arc<Mutex<Global>>,
     /// The calculated offset of the time difference between Discord and the client
     /// in seconds.
     ///
@@ -242,22 +242,22 @@ pub struct RateLimiter {
     ///
     /// [`RateLimit`]: struct.RateLimit.html
     /// [`Route`]: enum.Route.html
-    pub routes: Rc<RefCell<HashMap<Path, Bucket>>>,
+    pub routes: Arc<Mutex<HashMap<Path, Bucket>>>,
 }
 
 impl RateLimiter {
     pub fn new() -> Self {
         Self {
-            global: Rc::new(RefCell::new(Global::default())),
+            global: Arc::new(Mutex::new(Global::default())),
             offset: None,
-            routes: Rc::new(RefCell::new(HashMap::new())),
+            routes: Arc::new(Mutex::new(HashMap::new())),
         }
     }
 
     pub fn take(&mut self, route: &Path)
-        -> Box<Future<Item = (), Error = Error>> {
+        -> Box<Future<Item = (), Error = Error> + Send> {
         // TODO: handle global
-        let mut routes = self.routes.borrow_mut();
+        let mut routes = self.routes.lock();
         let bucket = routes.entry(*route).or_insert_with(Default::default);
         let take = bucket.take();
 
@@ -290,8 +290,8 @@ impl RateLimiter {
     }
 
     pub fn handle<'a>(&'a mut self, route: &'a Path, response: &'a Response<Vec<u8>>)
-        -> Result<Option<Box<Future<Item = (), Error = ()>>>> {
-        let mut routes = self.routes.borrow_mut();
+        -> Result<Option<Box<Future<Item = (), Error = ()> + Send>>> {
+        let mut routes = self.routes.lock();
         let bucket = routes.entry(*route).or_insert_with(Default::default);
 
         if response.status() != StatusCode::TOO_MANY_REQUESTS {
@@ -302,14 +302,14 @@ impl RateLimiter {
             RateLimit::Global(millis) => {
                 debug!("Globally ratelimited for {:?}ms", millis);
 
-                self.global.borrow_mut().blocked = true;
-                let global = Rc::clone(&self.global);
+                self.global.lock().blocked = true;
+                let global = Arc::clone(&self.global);
                 let duration = Duration::from_millis(millis as u64);
                 let delay = Delay::new(Instant::now() + duration);
 
                 let done = delay
                     .map(move |_| {
-                        let mut global = global.borrow_mut();
+                        let mut global = global.lock();
                         global.blocked = false;
                     })
                     .map_err(|why| {
