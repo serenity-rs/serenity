@@ -113,7 +113,6 @@ extern crate parking_lot;
 extern crate serde;
 extern crate tokio;
 extern crate tokio_tls;
-extern crate tokio_tungstenite;
 extern crate url;
 
 #[cfg(feature = "base64")]
@@ -138,6 +137,8 @@ extern crate rand;
 extern crate sodiumoxide;
 #[cfg(feature = "threadpool")]
 extern crate threadpool;
+#[cfg(feature = "tokio_tungstenite")]
+extern crate tokio_tungstenite;
 #[cfg(feature = "typemap")]
 extern crate typemap;
 #[cfg(feature = "evzht9h3nznqzwl")]
