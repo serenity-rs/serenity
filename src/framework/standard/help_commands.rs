@@ -60,6 +60,83 @@ macro_rules! format_command_name {
     };
 }
 
+/// A single group containing its name and all related commands that are eligible
+/// in relation of help-settings measured to the user.
+#[derive(Clone, Debug, Default)]
+pub struct GroupCommandsPair<'a> {
+    name: &'a str,
+    prefixes: Vec<String>,
+    command_names: Vec<String>,
+}
+
+/// A single suggested command containing its name and Levenshtein distance
+/// to the actual user's searched command name.
+#[derive(Clone, Debug, Default)]
+struct SuggestedCommandName<'a> {
+    name: &'a str,
+    levenshtein_distance: usize,
+}
+
+/// A single command containing all related pieces of information.
+#[derive(Clone, Debug)]
+pub struct Command<'a> {
+    name: &'a str,
+    group_name: &'a str,
+    aliases: Vec<String>,
+    availability: &'a str,
+    description: Option<String>,
+    usage: Option<String>,
+}
+
+/// Contains possible suggestions in case a command could not be found
+/// but are similar enough.
+#[derive(Clone, Debug, Default)]
+pub struct Suggestions<'a>(Vec<SuggestedCommandName<'a>>);
+
+impl<'a> Suggestions<'a> {
+    /// Immutably borrow inner `Vec`.
+    #[inline]
+    fn as_vec(&self) -> &Vec<SuggestedCommandName> {
+        &self.0
+    }
+
+    /// Concat names of suggestions with a given `seperator`.
+    fn join(&self, seperator: &str) -> String {
+        let iter = self.as_vec().iter();
+        let size = self.as_vec().iter().fold(0, |total_size, size| total_size + size.name.len());
+        let byte_len_of_sep = self.as_vec().len().checked_sub(1).unwrap_or(0) * seperator.len();
+        let mut result = String::with_capacity(size + byte_len_of_sep);
+
+        for v in iter {
+            result.push_str(&*seperator);
+            result.push_str(v.name.borrow());
+        }
+
+        result
+    }
+}
+
+/// Covers possible outcomes of a help-request and
+/// yields relevant data in customised textual
+/// representation.
+#[derive(Clone, Debug)]
+pub enum CustomisedHelpData<'a> {
+    /// To display suggested commands.
+    SuggestedCommands {
+        help_description: String,
+        suggestions: Suggestions<'a>,
+    },
+    /// To display groups and their commands by name.
+    GroupedCommands {
+        help_description: String,
+        groups: Vec<GroupCommandsPair<'a>>,
+    },
+    /// To display one specific command.
+    SingleCommand { command: Command<'a> },
+    /// To display failure in finding a fitting command.
+    NoCommandFound { help_error_message: &'a str },
+}
+
 fn error_embed(channel_id: ChannelId, input: &str, colour: Colour) {
     let _ = channel_id.send_message(|m| {
         m.embed(|e| e.colour(colour).description(input))
