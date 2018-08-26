@@ -61,6 +61,14 @@ macro_rules! format_command_name {
     };
 }
 
+/// Wraps around `warn`-macro in order to keep
+/// the literal same for all formats of help.
+macro_rules! warn_about_failed_send {
+    ($customised_help:expr, $error:expr) => {
+        warn!("Failed to send {:?} because: {:?}", $customised_help, $error);
+    }
+}
+
 /// A single group containing its name and all related commands that are eligible
 /// in relation of help-settings measured to the user.
 #[derive(Clone, Debug, Default)]
