@@ -26,7 +26,8 @@ install:
 script:
   - export PKG_CONFIG_PATH=$HOME/libsodium/lib/pkgconfig
   - export LD_LIBRARY_PATH=$HOME/libsodium/lib
-  - cargo test --all-features -j1
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then sh ./test_simple.sh; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then sh ./test_all.sh; fi'
 
 after_failure:
   # Borrowed from <https://github.com/rust-lang/rust/blob/master/.travis.yml>
