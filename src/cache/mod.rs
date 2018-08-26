@@ -589,8 +589,8 @@ impl Cache {
     /// ```rust,no_run
     /// use serenity::CACHE;
     ///
-    /// # use serenity::model::id::MessageId;
-    /// # let message = MessageId(0).get().unwrap();
+    /// # use serenity::model::id::{ChannelId, MessageId};
+    /// # let message = ChannelId(0).message(MessageId(1)).unwrap();
     ///
     /// let cache = CACHE.read();
     /// let fetched_message = cache.message(message.channel_id, message.id);
