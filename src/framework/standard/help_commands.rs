@@ -30,6 +30,7 @@ use model::{
     channel::Message,
     id::ChannelId,
 };
+use Error;
 use std::{
     borrow::Borrow,
     collections::HashMap,
@@ -449,6 +450,90 @@ pub fn create_formatted_help_post<'a, H: BuildHasher>(
             groups: listed_groups,
         }
     };
+}
+
+/// Sends an embed listing all groups with their commands.
+fn send_grouped_commands_embed(
+    help_options: &HelpOptions,
+    channel_id: ChannelId,
+    help_description: &str,
+    groups: &[GroupCommandsPair],
+    colour: Colour,
+) -> Result<Message, Error> {
+    channel_id.send_message(|m| {
+        m.embed(|mut embed| {
+            embed = embed.colour(colour).description(help_description);
+
+            for group in groups {
+                let joined_command_text_body = group.command_names.join("\n");
+
+                let field_text = match group.prefixes.len() {
+                    0 => joined_command_text_body,
+                    _ => format!(
+                        "{}: `{}`\n{}",
+                        help_options.group_prefix,
+                        group.prefixes.join("`, `"),
+                        joined_command_text_body
+                    ),
+                };
+
+                embed = embed.field(group.name, field_text, true);
+            }
+
+            embed
+        })
+    })
+}
+
+/// Sends embed showcasing information about a single command.
+fn send_single_command_embed(
+    help_options: &HelpOptions,
+    channel_id: ChannelId,
+    command: &Command,
+    colour: Colour,
+) -> Result<Message, Error> {
+    channel_id.send_message(|m| {
+        m.embed(|mut embed| {
+            embed = embed.title(&command.name).colour(colour);
+
+            if let &Some(ref desc) = &command.description {
+                embed = embed.description(desc);
+            }
+
+            if let &Some(ref usage_sample) = &command.usage {
+                embed = embed.field(&help_options.usage_label, usage_sample, true);
+            }
+
+            embed = embed.field(&help_options.grouped_label, command.group_name, true);
+
+            if !command.aliases.is_empty() {
+                embed = embed.field(
+                    &help_options.aliases_label,
+                    format!("`{}`", command.aliases.join("`, `")),
+                    true,
+                );
+            }
+
+            embed.field(&help_options.available_text, &command.availability, true)
+        })
+    })
+}
+
+/// Sends embed listing commands that are similar to the sent one.
+fn send_suggestion_embed(
+    channel_id: ChannelId,
+    help_description: &str,
+    suggestions: &Suggestions,
+    colour: Colour,
+) -> Result<Message, Error> {
+    let text = format!("{}: `{}`", help_description, suggestions.join("`, `"));
+
+    channel_id.send_message(|m| m.embed(|e| e.colour(colour).description(text)))
+}
+
+/// Sends an embed explaining fetching commands failed.
+fn send_error_embed(channel_id: ChannelId, input: &str, colour: Colour) -> Result<Message, Error> {
+    channel_id.send_message(|m| m.embed(|e| e.colour(colour).description(input)))
 }
 
 /// Posts an embed showing each individual command group and its commands.
