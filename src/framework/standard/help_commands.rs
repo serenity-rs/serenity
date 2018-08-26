@@ -48,6 +48,18 @@ use super::{
 };
 use utils::Colour;
 
+/// Macro to format a command according to a `HelpBehaviour` or
+/// continue to the next command-name upon hiding.
+macro_rules! format_command_name {
+    ($behaviour:expr, $command_name:expr) => {
+        match $behaviour {
+            &HelpBehaviour::Strike => format!("~~`{}`~~", $command_name),
+            &HelpBehaviour::Nothing => format!("`{}`", $command_name),
+            &HelpBehaviour::Hide => continue,
+        }
+    };
+}
+
 fn error_embed(channel_id: ChannelId, input: &str, colour: Colour) {
     let _ = channel_id.send_message(|m| {
         m.embed(|e| e.colour(colour).description(input))
