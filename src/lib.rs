@@ -137,7 +137,7 @@ extern crate rand;
 extern crate sodiumoxide;
 #[cfg(feature = "threadpool")]
 extern crate threadpool;
-#[cfg(feature = "tokio_tungstenite")]
+#[cfg(feature = "tokio-tungstenite")]
 extern crate tokio_tungstenite;
 #[cfg(feature = "typemap")]
 extern crate typemap;
