@@ -586,8 +586,11 @@ impl Cache {
     /// Retrieving the message object from a channel, in a
     /// [`EventHandler::message`] context:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
     /// use serenity::CACHE;
+    ///
+    /// # use serenity::model::id::MessageId;
+    /// # let message = MessageId(0).get().unwrap();
     ///
     /// let cache = CACHE.read();
     /// let fetched_message = cache.message(message.channel_id, message.id);
