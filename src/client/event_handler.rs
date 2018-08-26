@@ -212,6 +212,18 @@ pub trait EventHandler {
     /// Provides the channel's id and the deleted messages' ids.
     fn message_delete_bulk(&self, _ctx: Context, _channel_id: ChannelId, _multiple_deleted_messages_ids: Vec<MessageId>) {}
 
+    /// Dispatched when a message is updated.
+    ///
+    /// Provides the old message if available and the new message.
+    #[cfg(feature = "cache")]
+    fn message_update(&self, _ctx: Context, _old_if_available: Option<Message>, _new: Message) {}
+
+    /// Dispatched when a message is updated.
+    ///
+    /// Provides the new data of the message.
+    #[cfg(not(feature = "cache"))]
+    fn message_update(&self, _ctx: Context, _new_data: MessageUpdateEvent) {}
+
     /// Dispatched when a new reaction is attached to a message.
     ///
     /// Provides the reaction's data.
@@ -226,11 +238,6 @@ pub trait EventHandler {
     ///
     /// Provides the channel's id and the message's id.
     fn reaction_remove_all(&self, _ctx: Context, _channel_id: ChannelId, _removed_from_message_id: MessageId) {}
-
-    /// Dispatched when a message is updated.
-    ///
-    /// Provides the new data of the message.
-    fn message_update(&self, _ctx: Context, _new_data: MessageUpdateEvent) {}
 
     fn presence_replace(&self, _ctx: Context, _: Vec<Presence>) {}
 
