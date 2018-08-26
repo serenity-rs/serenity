@@ -562,6 +562,41 @@ pub fn with_embeds<H: BuildHasher>(
     groups: HashMap<String, Arc<CommandGroup>, H>,
     args: &Args
 ) -> Result<(), CommandError> {
+    let formatted_help = create_formatted_help_post(&groups, args, help_options, msg);
+
+    if let Err(why) = match &formatted_help {
+        &CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
+            send_suggestion_embed(
+                msg.channel_id,
+                &help_description,
+                &suggestions,
+                help_options.embed_error_colour,
+            ),
+        &CustomisedHelpData::NoCommandFound { ref help_error_message } =>
+            send_error_embed(
+                msg.channel_id,
+                help_error_message,
+                help_options.embed_error_colour,
+            ),
+        &CustomisedHelpData::GroupedCommands { ref help_description, ref groups } =>
+            send_grouped_commands_embed(
+                &help_options,
+                msg.channel_id,
+                &help_description,
+                &groups,
+                help_options.embed_success_colour,
+            ),
+        &CustomisedHelpData::SingleCommand { ref command } =>
+            send_single_command_embed(
+                &help_options,
+                msg.channel_id,
+                &command,
+                help_options.embed_success_colour,
+            ),
+    } {
+        warn_about_failed_send!(&formatted_help, why);
+    }
+
     Ok(())
 }
 
