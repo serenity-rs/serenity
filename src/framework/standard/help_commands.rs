@@ -170,10 +170,10 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
 
             if let Ok(permissions) = member.permissions() {
 
-                if cmd.allowed_roles.is_empty() {
-                    return permissions.administrator() || has_correct_permissions(cmd, msg);
+                return if cmd.allowed_roles.is_empty() {
+                    permissions.administrator() || has_correct_permissions(cmd, msg)
                 } else {
-                    return permissions.administrator() || (has_correct_roles(cmd, &guild, member) && has_correct_permissions(cmd, msg));
+                    permissions.administrator() || (has_correct_roles(cmd, &guild, member) && has_correct_permissions(cmd, msg))
                 }
             }
         }
@@ -189,7 +189,7 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
 #[cfg(feature = "cache")]
 pub fn is_command_visible(command_options: &Arc<CommandOptions>, msg: &Message, help_options: &HelpOptions) -> bool {
     if !command_options.dm_only && !command_options.guild_only
-    || command_options.dm_only && msg.is_private()
+        || command_options.dm_only && msg.is_private()
         || command_options.guild_only && !msg.is_private()
     {
 
@@ -200,23 +200,23 @@ pub fn is_command_visible(command_options: &Arc<CommandOptions>, msg: &Message, 
 
                 if command_options.help_available {
 
-                    if has_correct_permissions(command_options, msg) {
+                    return if has_correct_permissions(command_options, msg) {
 
                         if has_correct_roles(command_options, &guild, &member) {
-                            return true;
+                            true
                         } else {
-                            return help_options.lacking_role != HelpBehaviour::Hide;
+                            help_options.lacking_role != HelpBehaviour::Hide
                         }
                     } else {
-                        return help_options.lacking_permissions != HelpBehaviour::Hide;
+                        help_options.lacking_permissions != HelpBehaviour::Hide
                     }
                 }
             }
         } else if command_options.help_available {
-            if has_correct_permissions(command_options, msg) {
-                return true;
+            return if has_correct_permissions(command_options, msg) {
+                true
             } else {
-                return help_options.lacking_permissions != HelpBehaviour::Hide;
+                help_options.lacking_permissions != HelpBehaviour::Hide
             }
         }
     } else {
@@ -345,7 +345,7 @@ fn fetch_all_eligible_commands_in_group<'a>(
                     }
                 } else {
                     let name = format_command_name!(&help_options.wrong_channel, &name);
-                        group_with_cmds.command_names.push(name);
+                    group_with_cmds.command_names.push(name);
                 }
             } else {
                 let name = format_command_name!(&help_options.lacking_permissions, &name);
