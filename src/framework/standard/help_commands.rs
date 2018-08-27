@@ -344,8 +344,7 @@ fn fetch_all_eligible_commands_in_group<'a>(
                         }
                     }
                 } else {
-                    let name = format_command_name!(&help_options.wrong_channel, &name);
-                    group_with_cmds.command_names.push(name);
+                    group_with_cmds.command_names.push(format!("`{}`", &name));
                 }
             } else {
                 let name = format_command_name!(&help_options.lacking_permissions, &name);
