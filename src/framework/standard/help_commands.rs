@@ -147,12 +147,6 @@ pub enum CustomisedHelpData<'a> {
     NoCommandFound { help_error_message: &'a str },
 }
 
-fn error_embed(channel_id: ChannelId, input: &str, colour: Colour) {
-    let _ = channel_id.send_message(|m| {
-        m.embed(|e| e.colour(colour).description(input))
-    });
-}
-
 fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &InternalCommand> {
     let mut result = HashMap::new();
 
