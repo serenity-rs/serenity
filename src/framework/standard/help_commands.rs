@@ -338,16 +338,16 @@ fn fetch_all_eligible_commands_in_group<'a>(
                         if has_correct_roles(&cmd, &guild, &member) {
                             group_with_cmds.command_names.push(format!("`{}`", &name));
                         } else {
-                            let name = format_command_name!(&help_options.wrong_channel, &name);
+                            let name = format_command_name!(&help_options.lacking_role, &name);
                             group_with_cmds.command_names.push(name);
                         }
                     }
                 } else {
                     let name = format_command_name!(&help_options.wrong_channel, &name);
-                    group_with_cmds.command_names.push(name);
+                        group_with_cmds.command_names.push(name);
                 }
             } else {
-                let name = format_command_name!(&help_options.wrong_channel, &name);
+                let name = format_command_name!(&help_options.lacking_permissions, &name);
                 group_with_cmds.command_names.push(name);
             }
         } else {
