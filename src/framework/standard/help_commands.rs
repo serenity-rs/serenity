@@ -600,6 +600,47 @@ pub fn with_embeds<H: BuildHasher>(
     Ok(())
 }
 
+/// Turns grouped commands into a `String` taking plain help format into account.
+fn grouped_commands_to_plain_string(
+    help_options: &HelpOptions,
+    help_description: &str,
+    groups: &[GroupCommandsPair]) -> String
+{
+    let mut result = "**Commands**\n".to_string();
+    let _ = writeln!(result, "{}", &help_description);
+
+    for group in groups {
+        let _ = write!(result, "\n**{}**", &group.name);
+
+        if !group.prefixes.is_empty() {
+            let _ = write!(result, " ({}: `{}`)", &help_options.group_prefix, &group.prefixes.join("`, `"));
+        }
+
+        let _ = write!(result, ": {}", group.command_names.join(" "));
+    }
+
+    result
+}
+
+/// Turns a single into a `String` taking plain help format into account.
+fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command) -> String {
+    let mut result = String::default();
+    let _ = writeln!(result, "**{}**", command.name);
+
+    if !command.aliases.is_empty() {
+        let _ = writeln!(result, "**{}**: `{}`", help_options.aliases_label, command.aliases.join("`, `"));
+    }
+
+    if let &Some(ref description) = &command.description {
+        let _ = writeln!(result, "**{}**: {}", help_options.description_label, description);
+    };
+
+    let _ = writeln!(result, "**{}**: {}", help_options.grouped_label, command.group_name);
+    let _ = writeln!(result, "**{}**: {}", help_options.available_text, command.availability);
+
+    result
+}
+
 /// Posts formatted text displaying each individual command group and its commands.
 ///
 /// # Examples
