@@ -190,7 +190,8 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
 pub fn is_command_visible(command_options: &Arc<CommandOptions>, msg: &Message, help_options: &HelpOptions) -> bool {
     if !command_options.dm_only && !command_options.guild_only
     || command_options.dm_only && msg.is_private()
-    || command_options.guild_only && !msg.is_private() {
+        || command_options.guild_only && !msg.is_private()
+    {
 
         if let Some(guild) = msg.guild() {
             let guild = guild.read();
@@ -243,6 +244,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
             };
 
             if name == with_prefix || name == *command_name {
+
                 match *command {
                     CommandOrAlias::Command(ref cmd) => {
                         if is_command_visible(&cmd.options(), msg, help_options) {
@@ -250,7 +252,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
                         } else {
                             break;
                         }
-                    }
+                    },
                     CommandOrAlias::Alias(ref name) => {
                         let actual_command = &group.commands[name];
 
@@ -261,8 +263,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
                                 } else {
                                     break;
                                 }
-                            }
-
+                            },
                             CommandOrAlias::Alias(ref name) => {
                                 return Some(CustomisedHelpData::SuggestedCommands {
                                     help_description: help_options
@@ -431,6 +432,7 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
 
     let mut group_names = groups.keys().collect::<Vec<_>>();
     group_names.sort();
+
     let listed_groups =
         create_command_group_commands_pair_from_groups(&groups, &group_names, &msg, &help_options);
 
@@ -668,13 +670,8 @@ pub fn plain<H: BuildHasher>(
             format!("{}: `{}`", help_description, suggestions.join("`, `")),
         &CustomisedHelpData::NoCommandFound { ref help_error_message } =>
             help_error_message.to_string(),
-        &CustomisedHelpData::GroupedCommands { ref help_description, ref groups } => {
-            grouped_commands_to_plain_string(
-                &help_options,
-                &help_description,
-                &groups,
-            )
-        },
+        &CustomisedHelpData::GroupedCommands { ref help_description, ref groups } =>
+            grouped_commands_to_plain_string(&help_options, &help_description, &groups),
         &CustomisedHelpData::SingleCommand { ref command } => {
             single_command_to_plain_string(&help_options, &command)
         },
