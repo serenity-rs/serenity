@@ -396,7 +396,7 @@ fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
 /// Iterates over all commands and forges them into a `CustomisedHelpData`
 /// taking `HelpOptions` into consideration when deciding on whether a command
 /// shall be picked and in what textual format.
-pub fn create_formatted_help_post<'a, H: BuildHasher>(
+pub fn create_customised_help_data<'a, H: BuildHasher>(
     groups: &'a HashMap<String, Arc<CommandGroup>, H>,
     args: &Args,
     help_options: &'a HelpOptions,
@@ -556,7 +556,7 @@ pub fn with_embeds<H: BuildHasher>(
     groups: HashMap<String, Arc<CommandGroup>, H>,
     args: &Args
 ) -> Result<(), CommandError> {
-    let formatted_help = create_formatted_help_post(&groups, args, help_options, msg);
+    let formatted_help = create_customised_help_data(&groups, args, help_options, msg);
 
     if let Err(why) = match &formatted_help {
         &CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
@@ -661,7 +661,7 @@ pub fn plain<H: BuildHasher>(
     groups: HashMap<String, Arc<CommandGroup>, H>,
     args: &Args
 ) -> Result<(), CommandError> {
-    let formatted_help = create_formatted_help_post(&groups, args, help_options, msg);
+    let formatted_help = create_customised_help_data(&groups, args, help_options, msg);
 
     let result = match &formatted_help {
         &CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
