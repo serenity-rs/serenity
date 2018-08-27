@@ -667,5 +667,28 @@ pub fn plain<H: BuildHasher>(
     groups: HashMap<String, Arc<CommandGroup>, H>,
     args: &Args
 ) -> Result<(), CommandError> {
+    let formatted_help = create_formatted_help_post(&groups, args, help_options, msg);
+
+    let result = match &formatted_help {
+        &CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
+            format!("{}: `{}`", help_description, suggestions.join("`, `")),
+        &CustomisedHelpData::NoCommandFound { ref help_error_message } =>
+            help_error_message.to_string(),
+        &CustomisedHelpData::GroupedCommands { ref help_description, ref groups } => {
+            grouped_commands_to_plain_string(
+                &help_options,
+                &help_description,
+                &groups,
+            )
+        },
+        &CustomisedHelpData::SingleCommand { ref command } => {
+            single_command_to_plain_string(&help_options, &command)
+        },
+    };
+
+    if let Err(why) = msg.channel_id.say(result) {
+        warn_about_failed_send!(&formatted_help, why);
+    };
+
     Ok(())
 }
