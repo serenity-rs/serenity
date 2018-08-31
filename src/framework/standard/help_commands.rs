@@ -35,6 +35,7 @@ use std::{
     borrow::Borrow,
     collections::HashMap,
     hash::BuildHasher,
+    ops::{Index, IndexMut},
     sync::Arc,
     fmt::Write,
 };
@@ -145,6 +146,72 @@ pub enum CustomisedHelpData<'a> {
     SingleCommand { command: Command<'a> },
     /// To display failure in finding a fitting command.
     NoCommandFound { help_error_message: &'a str },
+}
+
+/// Wraps around a `Vec<Vec<T>>` and provides access
+/// via indexing of tuples representing x and y.
+#[derive(Debug)]
+struct Matrix {
+    vec: Vec<usize>,
+    width: usize,
+}
+
+impl Matrix {
+    fn new(columns: usize, rows: usize) -> Matrix {
+        Matrix {
+            vec: vec![0; columns * rows],
+            width: rows,
+        }
+    }
+}
+
+impl Index<(usize, usize)> for Matrix {
+    type Output = usize;
+
+    fn index(&self, matrix_entry: (usize, usize)) -> &usize {
+        &self.vec[matrix_entry.1 * self.width + matrix_entry.0]
+    }
+}
+
+impl IndexMut<(usize, usize)> for Matrix {
+    fn index_mut(&mut self, matrix_entry: (usize, usize)) -> &mut usize {
+        &mut self.vec[matrix_entry.1 * self.width + matrix_entry.0]
+    }
+}
+
+/// Calculates and returns levenshtein distance between
+/// two passed words.
+pub(crate) fn levenshtein_distance(word_a: &str, word_b: &str) -> usize {
+    let len_a = word_a.chars().count();
+    let len_b = word_b.chars().count();
+
+    if len_a == 0 {
+        return len_b;
+    } else if len_b == 0 {
+        return len_a;
+    }
+
+    let mut matrix = Matrix::new(len_b + 1, len_a + 1);
+
+    for x in 0..len_a {
+        matrix[(x + 1, 0)] = matrix[(x, 0)] + 1;
+    }
+
+    for y in 0..len_b {
+        matrix[(0, y + 1)] = matrix[(0, y)] + 1;
+    }
+
+    for (x, char_a) in word_a.chars().enumerate() {
+
+        for (y, char_b) in word_b.chars().enumerate() {
+
+            matrix[(x + 1, y + 1)] = (matrix[(x, y + 1)] + 1)
+                .min(matrix[(x + 1, y)] + 1)
+                .min(matrix[(x, y)] + if char_a == char_b { 0 } else { 1 });
+        }
+    }
+
+    matrix[(len_a, len_b)]
 }
 
 fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &InternalCommand> {
