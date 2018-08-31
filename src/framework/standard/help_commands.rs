@@ -97,6 +97,7 @@ pub struct Command<'a> {
     availability: &'a str,
     description: Option<String>,
     usage: Option<String>,
+    similar_commands: Vec<SuggestedCommandName<'a>>,
 }
 
 /// Contains possible suggestions in case a command could not be found
