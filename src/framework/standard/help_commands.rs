@@ -355,7 +355,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
                 }
             } else if help_options.max_levenshtein_distance > 0 {
 
-                if let CommandOrAlias::Command(ref cmd) = command {
+                if let &CommandOrAlias::Command(ref cmd) = command {
                     let levenshtein_distance = levenshtein_distance(&command_name, &name);
 
                     if levenshtein_distance <= help_options.max_levenshtein_distance
