@@ -501,6 +501,8 @@ impl MessageBuilder {
             self.0.push_str(language);
         }
 
+        self.0.push('\n');
+
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("```", " ");
@@ -1103,23 +1105,23 @@ mod test {
     fn push_codeblock_safe() {
         assert_eq!(
             MessageBuilder::new().push_codeblock_safe("foo", Some("rs")).0,
-            "```rsfoo```",
+            "```rs\nfoo```",
         );
         assert_eq!(
             MessageBuilder::new().push_codeblock_safe("", None).0,
-            "``````",
+            "```\n```",
         );
         assert_eq!(
             MessageBuilder::new().push_codeblock_safe("1 * 2", None).0,
-            "```1 * 2```",
+            "```\n1 * 2```",
         );
         assert_eq!(
             MessageBuilder::new().push_codeblock_safe("`1 * 3`", None).0,
-            "````1 * 3````",
+            "```\n`1 * 3````",
         );
         assert_eq!(
             MessageBuilder::new().push_codeblock_safe("```.```", None).0,
-            "``` . ```",
+            "```\n . ```",
         );
     }
 
