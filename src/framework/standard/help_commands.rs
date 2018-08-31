@@ -112,16 +112,23 @@ impl<'a> Suggestions<'a> {
         &self.0
     }
 
-    /// Concat names of suggestions with a given `seperator`.
+    /// Concats names of suggestions with a given `seperator`.
     fn join(&self, seperator: &str) -> String {
-        let iter = self.as_vec().iter();
+        let mut iter = self.as_vec().iter();
+
+        let first_iter_element = match iter.next() {
+            Some(first_iter_element) => first_iter_element,
+            None => return String::new(),
+        };
+
         let size = self.as_vec().iter().fold(0, |total_size, size| total_size + size.name.len());
         let byte_len_of_sep = self.as_vec().len().checked_sub(1).unwrap_or(0) * seperator.len();
         let mut result = String::with_capacity(size + byte_len_of_sep);
+        result.push_str(first_iter_element.name.borrow());
 
-        for v in iter {
+        for element in iter {
             result.push_str(&*seperator);
-            result.push_str(v.name.borrow());
+            result.push_str(element.name.borrow());
         }
 
         result
