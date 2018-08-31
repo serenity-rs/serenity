@@ -153,7 +153,7 @@ fn main() {
                 // and commands. If the distance is lower than or equal the set distance,
                 // it will be displayed as a suggestion.
                 // Setting the distance to 0 will disable suggestions.
-                .maximum_levenshtein_distance(3)
+                .max_levenshtein_distance(3)
                 // On another note, you can set up the help-menu-filter-behaviour.
                 // Here are all possible settings shown on all possible options.
                 // First case is if a user lacks permissions for a command, we can hide the command.
