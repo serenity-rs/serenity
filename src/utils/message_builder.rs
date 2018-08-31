@@ -997,6 +997,16 @@ mod test {
         MessageBuilder,
     };
 
+    macro_rules! gen {
+        ($($fn:ident => [$($text:expr => $expected:expr),+]),+) => ({
+            $(
+                $(
+                    assert_eq!(MessageBuilder::new().$fn($text).0, $expected);
+                )+
+            )+
+        });
+    }
+
     #[test]
     fn code_blocks() {
         let content = MessageBuilder::new()
@@ -1049,6 +1059,12 @@ mod test {
     }
 
     #[test]
+    fn init() {
+        assert_eq!(MessageBuilder::new().0, "");
+        assert_eq!(MessageBuilder::default().0, "");
+    }
+
+    #[test]
     fn message_content() {
         let message_content = MessageBuilder::new()
             .push(Bold + Italic + Code + "Fun!")
@@ -1064,5 +1080,194 @@ mod test {
             .build();
 
         assert_eq!(message_content, "***test\\*\\*test***");
+    }
+
+    #[test]
+    fn push() {
+        assert_eq!(MessageBuilder::new().push('a').0, "a");
+        assert!(MessageBuilder::new().push("").0.is_empty());
+    }
+
+    #[test]
+    fn push_codeblock() {
+        let content = MessageBuilder::new().push_codeblock("foo", None).0;
+        assert_eq!(content, "```\nfoo\n```");
+
+        let content = MessageBuilder::new()
+            .push_codeblock("fn main() { }", Some("rs"))
+            .0;
+        assert_eq!(content, "```rs\nfn main() { }\n```");
+    }
+
+    #[test]
+    fn push_codeblock_safe() {
+        assert_eq!(
+            MessageBuilder::new().push_codeblock_safe("foo", Some("rs")).0,
+            "```rsfoo```",
+        );
+        assert_eq!(
+            MessageBuilder::new().push_codeblock_safe("", None).0,
+            "``````",
+        );
+        assert_eq!(
+            MessageBuilder::new().push_codeblock_safe("1 * 2", None).0,
+            "```1 * 2```",
+        );
+        assert_eq!(
+            MessageBuilder::new().push_codeblock_safe("`1 * 3`", None).0,
+            "````1 * 3````",
+        );
+        assert_eq!(
+            MessageBuilder::new().push_codeblock_safe("```.```", None).0,
+            "``` . ```",
+        );
+    }
+
+    #[test]
+    fn push_safe() {
+        gen! {
+            push_safe => [
+                "" => "",
+                "foo" => "foo",
+                "1 * 2" => "1 \\* 2"
+            ],
+            push_bold_safe => [
+                "" => "****",
+                "foo" => "**foo**",
+                "*foo*" => "***foo***",
+                "f*o**o" => "**f*o o**"
+            ],
+            push_italic_safe => [
+                "" => "__",
+                "foo" => "_foo_",
+                "f_o_o" => "_f o o_"
+            ],
+            push_mono_safe => [
+                "" => "``",
+                "foo" => "`foo`",
+                "asterisk *" => "`asterisk *`",
+                "`ticks`" => "`'ticks'`"
+            ],
+            push_strike_safe => [
+                "" => "~~~~",
+                "foo" => "~~foo~~",
+                "foo ~" => "~~foo ~~~",
+                "~~foo" => "~~ foo~~",
+                "~~fo~~o~~" => "~~ fo o ~~"
+            ],
+            push_underline_safe => [
+                "" => "____",
+                "foo" => "__foo__",
+                "foo _" => "__foo ___",
+                "__foo__ bar" => "__ foo  bar__"
+            ],
+            push_line_safe => [
+                "" => "\n",
+                "foo" => "foo\n",
+                "1 * 2" => "1 \\* 2\n"
+            ],
+            push_mono_line_safe => [
+                "" => "``\n",
+                "a ` b `" => "`a ' b '`\n"
+            ],
+            push_italic_line_safe => [
+                "" => "__\n",
+                "a * c" => "_a * c_\n"
+            ],
+            push_bold_line_safe => [
+                "" => "****\n",
+                "a ** d" => "**a   d**\n"
+            ],
+            push_underline_line_safe => [
+                "" => "____\n",
+                "a __ e" => "__a   e__\n"
+            ],
+            push_strike_line_safe => [
+                "" => "~~~~\n",
+                "a ~~ f" => "~~a   f~~\n"
+            ]
+        };
+    }
+
+    #[test]
+    fn push_unsafe() {
+        gen! {
+            push_bold => [
+                "a" => "**a**",
+                "" => "****",
+                '*' => "*****",
+                "**" => "******"
+            ],
+            push_bold_line => [
+                "" => "****\n",
+                "foo" => "**foo**\n"
+            ],
+            push_italic => [
+                "a" => "_a_",
+                "" => "__",
+                "_" => "___",
+                "__" => "____"
+            ],
+            push_italic_line => [
+                "" => "__\n",
+                "foo" => "_foo_\n",
+                "_?" => "__?_\n"
+            ],
+            push_line => [
+                "" => "\n",
+                "foo" => "foo\n",
+                "\n\n" => "\n\n\n",
+                "\nfoo\n" => "\nfoo\n\n"
+            ],
+            push_mono => [
+                "a" => "`a`",
+                "" => "``",
+                "`" => "```",
+                "``" => "````"
+            ],
+            push_mono_line => [
+                "" => "``\n",
+                "foo" => "`foo`\n",
+                "\n" => "`\n`\n",
+                "`\n`\n" => "``\n`\n`\n"
+            ],
+            push_strike => [
+                "a" => "~~a~~",
+                "" => "~~~~",
+                "~" => "~~~~~",
+                "~~" => "~~~~~~"
+            ],
+            push_strike_line => [
+                "" => "~~~~\n",
+                "foo" => "~~foo~~\n"
+            ],
+            push_underline => [
+                "a" => "__a__",
+                "" => "____",
+                "_" => "_____",
+                "__" => "______"
+            ],
+            push_underline_line => [
+                "" => "____\n",
+                "foo" => "__foo__\n"
+            ]
+        };
+    }
+
+    #[test]
+    fn normalize() {
+        assert_eq!(super::normalize("@everyone"), "@\u{200B}everyone");
+        assert_eq!(super::normalize("@here"), "@\u{200B}here");
+        assert_eq!(super::normalize("discord.gg"), "discord\u{2024}gg");
+        assert_eq!(super::normalize("discord.me"), "discord\u{2024}me");
+        assert_eq!(super::normalize("discordlist.net"), "discordlist\u{2024}net");
+        assert_eq!(super::normalize("discordservers.com"), "discordservers\u{2024}com");
+        assert_eq!(super::normalize("discordapp.com/invite"), "discordapp\u{2024}com/invite");
+        assert_eq!(super::normalize("\u{202E}"), " ");
+        assert_eq!(super::normalize("\u{200F}"), " ");
+        assert_eq!(super::normalize("\u{202B}"), " ");
+        assert_eq!(super::normalize("\u{200B}"), " ");
+        assert_eq!(super::normalize("\u{200D}"), " ");
+        assert_eq!(super::normalize("\u{200C}"), " ");
     }
 }
