@@ -208,8 +208,8 @@ fn main() {
             // User needs to pass the test for the command to execute.
             .check(admin_check)
             .command("am i admin", |c| c
-                .cmd(am_i_admin))
-                .guild_only(true)
+                .cmd(am_i_admin)
+                .guild_only(true))
         ),
     );
 
