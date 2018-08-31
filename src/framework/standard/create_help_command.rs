@@ -218,6 +218,13 @@ impl CreateHelpCommand {
         self
     }
 
+    /// Sets the maximum Levenshtein-distance to find similar commands.
+    pub fn max_levenshtein_distance(mut self, distance: usize) -> Self {
+        self.0.max_levenshtein_distance = distance;
+
+        self
+    }
+
     fn produce_strike_text(&self, dm_or_guild: &str) -> Option<String> {
         let mut strike_text = String::from("~~`Strikethrough commands`~~ are unavailable because they");
         let mut is_any_option_strike = false;
