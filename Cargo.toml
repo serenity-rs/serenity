@@ -13,7 +13,7 @@ version = "0.5.13"
 [dependencies]
 bitflags = "^1.0"
 log = "~0.4"
-parking_lot = "^0.5"
+parking_lot = "^0.6"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
@@ -50,7 +50,7 @@ version = "^1.0"
 default-features = false
 features = ["client", "hyper", "safemem"]
 optional = true
-version = "0.13"
+version = "0.15"
 
 [dependencies.native-tls]
 optional = true
