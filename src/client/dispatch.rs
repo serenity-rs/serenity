@@ -518,9 +518,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             threadpool.execute(move || {
                 feature_cache! {{
                     let after = CACHE.read().message(event.channel_id, event.id);
-                    if let Some(after) = after {
-                        event_handler.message_update(context, _before, after);
-                    }
+                    event_handler.message_update(context, _before, after, event);
                 } else {
                     event_handler.message_update(context, event);
                 }}

@@ -216,7 +216,7 @@ pub trait EventHandler {
     ///
     /// Provides the old message if available and the new message.
     #[cfg(feature = "cache")]
-    fn message_update(&self, _ctx: Context, _old_if_available: Option<Message>, _new: Message) {}
+    fn message_update(&self, _ctx: Context, _old_if_available: Option<Message>, _new: Option<Message>, _event: MessageUpdateEvent) {}
 
     /// Dispatched when a message is updated.
     ///
