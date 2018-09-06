@@ -260,7 +260,7 @@ impl Default for HelpOptions {
             wrong_channel: HelpBehaviour::Strike,
             embed_error_colour: Colour::DARK_RED,
             embed_success_colour: Colour::ROSEWATER,
-            max_levenshtein_distance: 2,
+            max_levenshtein_distance: 0,
         }
     }
 }
