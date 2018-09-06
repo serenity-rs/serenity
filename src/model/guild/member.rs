@@ -453,6 +453,20 @@ impl Member {
     pub fn unban(&self) -> Result<()> {
         http::remove_ban(self.guild_id.0, self.user.read().id.0)
     }
+
+    /// Retrieves the member's user ID.
+    ///
+    /// This is a shortcut for accessing the [`user`] structfield, retrieving a
+    /// reader guard, and then copying its ID.
+    ///
+    /// # Deadlocking
+    ///
+    /// This function can deadlock while retrieving a read guard to the user
+    /// object if your application infinitely holds a write lock elsewhere.
+    #[cfg(feature = "cache")]
+    pub fn user_id(&self) -> UserId {
+        self.user.read().id
+    }
 }
 
 impl Display for Member {
