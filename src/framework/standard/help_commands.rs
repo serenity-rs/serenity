@@ -97,7 +97,6 @@ pub struct Command<'a> {
     availability: &'a str,
     description: Option<String>,
     usage: Option<String>,
-    similar_commands: Vec<SuggestedCommandName<'a>>,
 }
 
 /// Contains possible suggestions in case a command could not be found
@@ -397,7 +396,6 @@ fn fetch_single_command<'a, H: BuildHasher>(
                     aliases: command.aliases.clone(),
                     availability: available_text,
                     usage: command.usage.clone(),
-                    similar_commands,
                 },
             });
         }
