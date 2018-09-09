@@ -115,3 +115,4 @@ websocket = ["evzht9h3nznqzwl"]
 
 [package.metadata.docs.rs]
 all-features = true
+rustdoc-args = ["--html-in-header", ".cargo/registry/src/github.com-1ecc6299db9ec823/pwnies-0.0.14/pwnies.html"]
