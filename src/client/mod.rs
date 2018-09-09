@@ -1,4 +1,4 @@
-//! The Client contains information about a single bot or user's token, as well
+//! The Client contains information about a single bot's token, as well
 //! as event handlers. Dispatching events to configured handlers and starting
 //! the shards' connections are handled directly via the client. In addition,
 //! the `http` module and `Cache` are also automatically handled by the
