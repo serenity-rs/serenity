@@ -19,10 +19,9 @@ use tokio_tungstenite::{
     connect_async,
 };
 use tokio::{
-    executor::current_thread,
+    self,
     timer::Interval,
 };
-use tokio;
 use url::Url;
 use std::str::FromStr;
 use ::Error;
@@ -64,7 +63,7 @@ pub struct Shard {
 
 impl Shard {
     pub fn new(token: String, shard_info: [u64; 2])
-        -> impl Future<Item = Shard, Error = Error> {
+        -> impl Future<Item = Shard, Error = Error> + Send {
         connect(CONNECTION).map(move |(sender, stream)| {
             Self {
                 current_presence: (None, OnlineStatus::Online),
@@ -95,7 +94,7 @@ impl Shard {
     pub fn process(
         &mut self,
         event: &GatewayEvent,
-    ) -> Option<Box<Future<Item = (), Error = Error>>> {
+    ) -> Option<Box<Future<Item = (), Error = Error> + Send>> {
         match *event {
             GatewayEvent::Dispatch(seq, ref event) => {
                 let mut info = self.heartbeat_info.lock().unwrap();
@@ -355,7 +354,7 @@ impl Shard {
         send(&self.tx, msg)
     }
 
-    pub fn autoreconnect(&mut self) -> Box<Future<Item = (), Error = Error>> {
+    pub fn autoreconnect(&mut self) -> Box<Future<Item = (), Error = Error> + Send> {
         info!("[Shard {:?}] Autoreconnecting", self.shard_info);
 
         if self.session_id.is_some() {
@@ -403,7 +402,7 @@ impl Shard {
         self.send_value(v)
     }
 
-    fn initialize(&mut self) -> impl Future<Item = (), Error = Error> {
+    fn initialize(&mut self) -> impl Future<Item = (), Error = Error> + Send {
         debug!("[Shard {:?}] Initializing", self.shard_info);
 
         *self.stage.lock().unwrap() = ConnectionStage::Connecting;
@@ -448,7 +447,7 @@ impl Shard {
         self.send_value(v)
     }
 
-    fn reconnect(&mut self) -> impl Future<Item = (), Error = Error> {
+    fn reconnect(&mut self) -> impl Future<Item = (), Error = Error> + Send {
         *self.stage.lock().unwrap() = ConnectionStage::Connecting;
         info!("[Shard {:?}] Attempting to reconnect", self.shard_info);
 
@@ -469,7 +468,7 @@ impl Shard {
         Ok(())
     }
 
-    fn resume(&mut self) -> impl Future<Item = (), Error = Error> {
+    fn resume(&mut self) -> impl Future<Item = (), Error = Error> + Send {
         let seq = self.heartbeat_info.lock().unwrap().seq;
         let session_id = self.session_id.clone();
         let shard_info = self.shard_info;
@@ -518,7 +517,9 @@ impl Shard {
     }
 }
 
-fn connect(uri: &str) -> impl Future<Item = (UnboundedSender<TungsteniteMessage>, ShardStream), Error = Error> {
+fn connect(
+    uri: &str,
+) -> impl Future<Item = (UnboundedSender<TungsteniteMessage>, ShardStream), Error = Error> + Send {
     connect_async(Url::from_str(uri).unwrap())
         .map(move |(duplex, _)| {
             let (sink, stream) = duplex.split();
@@ -537,7 +538,7 @@ fn connect(uri: &str) -> impl Future<Item = (UnboundedSender<TungsteniteMessage>
                 .map(|_| ())
                 .map_err(|_| ());
 
-            current_thread::spawn(done);
+            tokio::spawn(done);
 
             (tx, stream)
         })
