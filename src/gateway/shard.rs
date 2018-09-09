@@ -162,15 +162,25 @@ impl Shard {
                     interval,
                 );
 
+                trace!("Unlocking stage");
+
                 if self.stage.lock().unwrap().clone() == ConnectionStage::Resuming {
+                    trace!("Unlocked stage; it's a resume");
+
                     return None;
                 }
+
+                trace!("Unlocked stage");
 
                 if interval > 0 {
                     self.interval = Some(interval);
                 }
 
+                trace!("Unlocking stage to check if it's a handshake");
+
                 if self.stage.lock().unwrap().clone() == ConnectionStage::Handshake {
+                    trace!("Unlocked stage; it's a handshake");
+
                     let heartbeat_info = Arc::clone(&self.heartbeat_info);
                     let mut tx = self.tx.clone();
                     let duration = Duration::from_millis(interval);
@@ -192,12 +202,16 @@ impl Shard {
                             ()
                         });
 
-                    tokio::run(done);
+                    tokio::spawn(done);
+
+                    trace!("Identifying");
 
                     self.identify().unwrap();
 
                     return None;
                 }
+
+                trace!("Autoreconnecting");
 
                 Some(Box::new(self.autoreconnect()))
             },
@@ -564,7 +578,7 @@ fn send(
     tx: &Arc<Mutex<UnboundedSender<TungsteniteMessage>>>,
     msg: TungsteniteMessage,
 ) -> Result<(), Error> {
-    trace!("Sending message over gateway: {:?}", msg);
+    trace!("Sending message over gateway: {}", msg);
 
     tx.lock().unwrap().start_send(msg).map(|_| ()).map_err(From::from)
 }
