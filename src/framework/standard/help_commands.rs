@@ -314,13 +314,16 @@ fn fetch_single_command<'a, H: BuildHasher>(
         let mut found: Option<(&String, &InternalCommand)> = None;
 
         for (command_name, command) in &group.commands {
-            let with_prefix = if let Some(ref prefixes) = group.prefixes {
-                format!("`{}` {}", prefixes.join("`, `"), command_name)
+
+            let search_command_name_matched = if let Some(ref prefixes) = group.prefixes {
+                prefixes.iter().any(|prefix| {
+                    format!("{} {}", prefix, command_name) == name
+                })
             } else {
-                command_name.to_string()
+                name == *command_name
             };
 
-            if name == with_prefix || name == *command_name {
+            if search_command_name_matched {
 
                 match *command {
                     CommandOrAlias::Command(ref cmd) => {
