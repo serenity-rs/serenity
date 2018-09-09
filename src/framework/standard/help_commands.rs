@@ -35,6 +35,7 @@ use std::{
     borrow::Borrow,
     collections::HashMap,
     hash::BuildHasher,
+    ops::{Index, IndexMut},
     sync::Arc,
     fmt::Write,
 };
@@ -110,16 +111,23 @@ impl<'a> Suggestions<'a> {
         &self.0
     }
 
-    /// Concat names of suggestions with a given `seperator`.
+    /// Concats names of suggestions with a given `seperator`.
     fn join(&self, seperator: &str) -> String {
-        let iter = self.as_vec().iter();
+        let mut iter = self.as_vec().iter();
+
+        let first_iter_element = match iter.next() {
+            Some(first_iter_element) => first_iter_element,
+            None => return String::new(),
+        };
+
         let size = self.as_vec().iter().fold(0, |total_size, size| total_size + size.name.len());
         let byte_len_of_sep = self.as_vec().len().checked_sub(1).unwrap_or(0) * seperator.len();
         let mut result = String::with_capacity(size + byte_len_of_sep);
+        result.push_str(first_iter_element.name.borrow());
 
-        for v in iter {
+        for element in iter {
             result.push_str(&*seperator);
-            result.push_str(v.name.borrow());
+            result.push_str(element.name.borrow());
         }
 
         result
@@ -145,6 +153,72 @@ pub enum CustomisedHelpData<'a> {
     SingleCommand { command: Command<'a> },
     /// To display failure in finding a fitting command.
     NoCommandFound { help_error_message: &'a str },
+}
+
+/// Wraps around a `Vec<Vec<T>>` and provides access
+/// via indexing of tuples representing x and y.
+#[derive(Debug)]
+struct Matrix {
+    vec: Vec<usize>,
+    width: usize,
+}
+
+impl Matrix {
+    fn new(columns: usize, rows: usize) -> Matrix {
+        Matrix {
+            vec: vec![0; columns * rows],
+            width: rows,
+        }
+    }
+}
+
+impl Index<(usize, usize)> for Matrix {
+    type Output = usize;
+
+    fn index(&self, matrix_entry: (usize, usize)) -> &usize {
+        &self.vec[matrix_entry.1 * self.width + matrix_entry.0]
+    }
+}
+
+impl IndexMut<(usize, usize)> for Matrix {
+    fn index_mut(&mut self, matrix_entry: (usize, usize)) -> &mut usize {
+        &mut self.vec[matrix_entry.1 * self.width + matrix_entry.0]
+    }
+}
+
+/// Calculates and returns levenshtein distance between
+/// two passed words.
+pub(crate) fn levenshtein_distance(word_a: &str, word_b: &str) -> usize {
+    let len_a = word_a.chars().count();
+    let len_b = word_b.chars().count();
+
+    if len_a == 0 {
+        return len_b;
+    } else if len_b == 0 {
+        return len_a;
+    }
+
+    let mut matrix = Matrix::new(len_b + 1, len_a + 1);
+
+    for x in 0..len_a {
+        matrix[(x + 1, 0)] = matrix[(x, 0)] + 1;
+    }
+
+    for y in 0..len_b {
+        matrix[(0, y + 1)] = matrix[(0, y)] + 1;
+    }
+
+    for (x, char_a) in word_a.chars().enumerate() {
+
+        for (y, char_b) in word_b.chars().enumerate() {
+
+            matrix[(x + 1, y + 1)] = (matrix[(x, y + 1)] + 1)
+                .min(matrix[(x + 1, y)] + 1)
+                .min(matrix[(x, y)] + if char_a == char_b { 0 } else { 1 });
+        }
+    }
+
+    matrix[(len_a, len_b)]
 }
 
 fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &InternalCommand> {
@@ -226,13 +300,16 @@ pub fn is_command_visible(command_options: &Arc<CommandOptions>, msg: &Message, 
     false
 }
 
-/// Tries to extract a single command matching searched command name.
+/// Tries to extract a single command matching searched command name otherwise
+/// returns similar commands.
 fn fetch_single_command<'a, H: BuildHasher>(
     groups: &'a HashMap<String, Arc<CommandGroup>, H>,
     name: &str,
     help_options: &'a HelpOptions,
     msg: &Message,
-) -> Option<CustomisedHelpData<'a>> {
+) -> Result<CustomisedHelpData<'a>, Vec<SuggestedCommandName<'a>>> {
+    let mut similar_commands: Vec<SuggestedCommandName> = Vec::new();
+
     for (group_name, group) in groups {
         let mut found: Option<(&String, &InternalCommand)> = None;
 
@@ -265,7 +342,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
                                 }
                             },
                             CommandOrAlias::Alias(ref name) => {
-                                return Some(CustomisedHelpData::SuggestedCommands {
+                                return Ok(CustomisedHelpData::SuggestedCommands {
                                     help_description: help_options
                                         .suggestion_text
                                         .replace("{}", name),
@@ -275,6 +352,20 @@ fn fetch_single_command<'a, H: BuildHasher>(
                         }
                     }
                 }
+            } else if help_options.max_levenshtein_distance > 0 {
+
+                if let &CommandOrAlias::Command(ref cmd) = command {
+                    let levenshtein_distance = levenshtein_distance(&command_name, &name);
+
+                    if levenshtein_distance <= help_options.max_levenshtein_distance
+                        && is_command_visible(&cmd.options(), &msg, &help_options) {
+
+                        similar_commands.push(SuggestedCommandName {
+                            name: &command_name,
+                            levenshtein_distance,
+                        });
+                    }
+                }
             }
         }
 
@@ -282,7 +373,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
             let command = command.options();
 
             if !command.help_available {
-                return Some(CustomisedHelpData::NoCommandFound {
+                return Ok(CustomisedHelpData::NoCommandFound {
                     help_error_message: &help_options.no_help_available_text,
                 });
             }
@@ -295,7 +386,9 @@ fn fetch_single_command<'a, H: BuildHasher>(
                 &help_options.dm_and_guild_text
             };
 
-            return Some(CustomisedHelpData::SingleCommand {
+            similar_commands.sort_unstable_by(|a, b| a.levenshtein_distance.cmp(&b.levenshtein_distance));
+
+            return Ok(CustomisedHelpData::SingleCommand {
                 command: Command {
                     name: command_name,
                     description: command.desc.clone(),
@@ -308,7 +401,9 @@ fn fetch_single_command<'a, H: BuildHasher>(
         }
     }
 
-    None
+    similar_commands.sort_unstable_by(|a, b| a.levenshtein_distance.cmp(&b.levenshtein_distance));
+
+    Err(similar_commands)
 }
 
 /// Tries to extract a single command matching searched command name.
@@ -405,12 +500,20 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
     if !args.is_empty() {
         let name = args.full();
 
-        return if let Some(result) = fetch_single_command(&groups, &name, &help_options, &msg) {
-            result
-        } else {
-            CustomisedHelpData::NoCommandFound {
-                help_error_message: &help_options.no_help_available_text,
-            }
+        return match fetch_single_command(&groups, &name, &help_options, &msg) {
+            Ok(single_command) => single_command,
+            Err(suggestions) => {
+                if suggestions.is_empty() {
+                    CustomisedHelpData::NoCommandFound {
+                        help_error_message: &help_options.no_help_available_text,
+                    }
+                } else {
+                    CustomisedHelpData::SuggestedCommands {
+                        help_description: help_options.suggestion_text.clone(),
+                        suggestions: Suggestions(suggestions),
+                    }
+                }
+            },
         };
     }
 
@@ -521,7 +624,7 @@ fn send_suggestion_embed(
     suggestions: &Suggestions,
     colour: Colour,
 ) -> Result<Message, Error> {
-    let text = format!("{}: `{}`", help_description, suggestions.join("`, `"));
+    let text = format!("{}", help_description.replace("{}", &suggestions.join("`, `")));
 
     channel_id.send_message(|m| m.embed(|e| e.colour(colour).description(text)))
 }
