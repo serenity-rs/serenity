@@ -177,6 +177,9 @@ fn main() {
             // This requires us to call commands in this group
             // via `~emoji` (or `~e`) instead of just `~`.
             .prefixes(vec!["emoji", "em"])
+            // Set a description to appear if a user wants to display a single group
+            // e.g. via help using the group-name or one of its prefixes.
+            .desc("A group with commands providing an emoji as response.")
             // Sets a command that will be executed if only a group-prefix was passed.
             .default_cmd(bird)
             .command("cat", |c| c
