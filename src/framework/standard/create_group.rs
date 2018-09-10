@@ -206,4 +206,12 @@ impl CreateGroup {
 
         self
     }
+
+    /// Sets a description for the group that will be displayed if only
+    /// one specific group is requested via help.
+    pub fn desc(mut self, text: &str) -> Self {
+        self.0.description = Some(text.to_string());
+
+        self
+    }
 }
