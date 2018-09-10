@@ -364,7 +364,7 @@ impl Shard {
         self.presence_update()
     }
 
-    pub fn send(&mut self, msg: TungsteniteMessage) -> Result<(), Error> {
+    pub fn send(&self, msg: TungsteniteMessage) -> Result<(), Error> {
         send(&self.tx, msg)
     }
 
