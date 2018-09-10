@@ -83,8 +83,8 @@ pub struct GroupCommandsPair<'a> {
 /// A single suggested command containing its name and Levenshtein distance
 /// to the actual user's searched command name.
 #[derive(Clone, Debug, Default)]
-struct SuggestedCommandName<'a> {
-    name: &'a str,
+struct SuggestedCommandName {
+    name: String,
     levenshtein_distance: usize,
 }
 
@@ -102,9 +102,9 @@ pub struct Command<'a> {
 /// Contains possible suggestions in case a command could not be found
 /// but are similar enough.
 #[derive(Clone, Debug, Default)]
-pub struct Suggestions<'a>(Vec<SuggestedCommandName<'a>>);
+pub struct Suggestions(Vec<SuggestedCommandName>);
 
-impl<'a> Suggestions<'a> {
+impl Suggestions {
     /// Immutably borrow inner `Vec`.
     #[inline]
     fn as_vec(&self) -> &Vec<SuggestedCommandName> {
@@ -142,7 +142,7 @@ pub enum CustomisedHelpData<'a> {
     /// To display suggested commands.
     SuggestedCommands {
         help_description: String,
-        suggestions: Suggestions<'a>,
+        suggestions: Suggestions,
     },
     /// To display groups and their commands by name.
     GroupedCommands {
@@ -307,20 +307,23 @@ fn fetch_single_command<'a, H: BuildHasher>(
     name: &str,
     help_options: &'a HelpOptions,
     msg: &Message,
-) -> Result<CustomisedHelpData<'a>, Vec<SuggestedCommandName<'a>>> {
+) -> Result<CustomisedHelpData<'a>, Vec<SuggestedCommandName>> {
     let mut similar_commands: Vec<SuggestedCommandName> = Vec::new();
 
     for (group_name, group) in groups {
         let mut found: Option<(&String, &InternalCommand)> = None;
 
         for (command_name, command) in &group.commands {
-            let with_prefix = if let Some(ref prefixes) = group.prefixes {
-                format!("`{}` {}", prefixes.join("`, `"), command_name)
+
+            let search_command_name_matched = if let &Some(ref prefixes) = &group.prefixes {
+                prefixes.iter().any(|prefix| {
+                    format!("{} {}", prefix, command_name) == name
+                })
             } else {
-                command_name.to_string()
+                name == *command_name
             };
 
-            if name == with_prefix || name == *command_name {
+            if search_command_name_matched {
 
                 match *command {
                     CommandOrAlias::Command(ref cmd) => {
@@ -355,13 +358,24 @@ fn fetch_single_command<'a, H: BuildHasher>(
             } else if help_options.max_levenshtein_distance > 0 {
 
                 if let &CommandOrAlias::Command(ref cmd) = command {
+
+                    let command_name = if let Some(ref prefixes) = &group.prefixes {
+                        if let Some(first_prefix) = prefixes.get(0) {
+                            format!("{} {}",  &first_prefix, &command_name).to_string()
+                        } else {
+                            command_name.to_string()
+                        }
+                    } else {
+                        command_name.to_string()
+                    };
+
                     let levenshtein_distance = levenshtein_distance(&command_name, &name);
 
                     if levenshtein_distance <= help_options.max_levenshtein_distance
                         && is_command_visible(&cmd.options(), &msg, &help_options) {
 
                         similar_commands.push(SuggestedCommandName {
-                            name: &command_name,
+                            name: command_name,
                             levenshtein_distance,
                         });
                     }
