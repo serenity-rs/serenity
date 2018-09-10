@@ -359,7 +359,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
 
                 if let &CommandOrAlias::Command(ref cmd) = command {
 
-                    let command_name = if let Some(ref prefixes) = &group.prefixes {
+                    let command_name = if let &Some(ref prefixes) = &group.prefixes {
                         if let Some(first_prefix) = prefixes.get(0) {
                             format!("{} {}",  &first_prefix, &command_name).to_string()
                         } else {
