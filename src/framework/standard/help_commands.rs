@@ -479,22 +479,13 @@ fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
 
     for group_name in group_names {
         let group = &groups[&**group_name];
-        let commands = remove_aliases(&group.commands);
-        let mut command_names = commands.keys().collect::<Vec<_>>();
-        command_names.sort();
 
-        let mut group_with_cmds = fetch_all_eligible_commands_in_group(
-            &commands,
-            &command_names,
-            &help_options,
+        let group_with_cmds = create_single_group(
+            group,
+            group_name,
             &msg,
+            &help_options,
         );
-
-        group_with_cmds.name = group_name;
-
-        if let Some(ref prefixes) = group.prefixes {
-            group_with_cmds.prefixes.extend_from_slice(&prefixes);
-        }
 
         listed_groups.push(group_with_cmds);
     }
@@ -502,12 +493,39 @@ fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
     listed_groups
 }
 
+/// Fetches a single group with its commands.
+fn create_single_group<'a>(
+    group: &CommandGroup,
+    group_name: &'a str,
+    msg: &Message,
+    help_options: &'a HelpOptions,
+) -> GroupCommandsPair<'a> {
+let commands = remove_aliases(&group.commands);
+    let mut command_names = commands.keys().collect::<Vec<_>>();
+    command_names.sort();
+
+    let mut group_with_cmds = fetch_all_eligible_commands_in_group(
+        &commands,
+        &command_names,
+        &help_options,
+        &msg,
+    );
+
+    group_with_cmds.name = group_name;
+
+    if let Some(ref prefixes) = group.prefixes {
+        group_with_cmds.prefixes.extend_from_slice(&prefixes);
+    }
+
+    group_with_cmds
+}
+
 /// Iterates over all commands and forges them into a `CustomisedHelpData`
 /// taking `HelpOptions` into consideration when deciding on whether a command
 /// shall be picked and in what textual format.
 pub fn create_customised_help_data<'a, H: BuildHasher>(
     groups: &'a HashMap<String, Arc<CommandGroup>, H>,
-    args: &Args,
+    args: &'a Args,
     help_options: &'a HelpOptions,
     msg: &Message,
 ) -> CustomisedHelpData<'a> {
@@ -517,6 +535,29 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
         return match fetch_single_command(&groups, &name, &help_options, &msg) {
             Ok(single_command) => single_command,
             Err(suggestions) => {
+                let searched_named_lowercase = name.to_lowercase();
+
+                for (key, group) in groups {
+
+                    if key.to_lowercase() == searched_named_lowercase
+                        || group.prefixes.as_ref()
+                            .map(|v| v.iter().any(|prefix|
+                            *prefix == searched_named_lowercase)).unwrap_or(false) {
+
+                        let mut single_group = create_single_group(
+                            &group,
+                            &key,
+                            &msg,
+                            &help_options
+                        );
+
+                        return CustomisedHelpData::GroupedCommands {
+                            help_description: group.description.clone().unwrap_or_else(|| "".to_string()),
+                            groups: vec![single_group],
+                        };
+                    }
+                }
+
                 if suggestions.is_empty() {
                     CustomisedHelpData::NoCommandFound {
                         help_error_message: &help_options.no_help_available_text,
