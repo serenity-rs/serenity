@@ -552,7 +552,7 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
                         );
 
                         return CustomisedHelpData::GroupedCommands {
-                            help_description: group.description.clone().unwrap_or_else(|| "".to_string()),
+                            help_description: group.description.clone().unwrap_or_default(),
                             groups: vec![single_group],
                         };
                     }
