@@ -541,8 +541,8 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
 
                     if key.to_lowercase() == searched_named_lowercase
                         || group.prefixes.as_ref()
-                            .map(|v| v.iter().any(|prefix|
-                            *prefix == searched_named_lowercase)).unwrap_or(false) {
+                            .map_or(false, |v| v.iter().any(|prefix|
+                            *prefix == searched_named_lowercase)) {
 
                         let mut single_group = create_single_group(
                             &group,
