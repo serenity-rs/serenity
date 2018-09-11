@@ -897,3 +897,31 @@ mod levenshtein_tests {
         assert!(distance_of_a_c <= (distance_of_a_b + distance_of_b_c));
     }
 }
+
+#[cfg(test)]
+mod matrix_tests {
+    use super::Matrix;
+
+    #[test]
+    fn index_mut() {
+        let mut matrix = Matrix::new(5, 5);
+        assert_eq!(matrix[(1, 1)], 0);
+
+        matrix[(1, 1)] = 10;
+        assert_eq!(matrix[(1, 1)], 10);
+    }
+
+    #[test]
+    #[should_panic(expected = "the len is 4 but the index is 9")]
+    fn panic_index_too_high() {
+        let matrix = Matrix::new(2, 2);
+        matrix[(3, 3)];
+    }
+
+    #[test]
+    #[should_panic(expected = "the len is 0 but the index is 0")]
+    fn panic_indexing_when_empty() {
+        let matrix = Matrix::new(0, 0);
+        matrix[(0, 0)];
+    }
+}
