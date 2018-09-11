@@ -788,6 +788,10 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command)
         let _ = writeln!(result, "**{}**: {}", help_options.description_label, description);
     };
 
+    if let &Some(ref usage) = &command.usage {
+        let _ = writeln!(result, "**{}**: {}", help_options.usage_label, usage);
+    }
+
     let _ = writeln!(result, "**{}**: {}", help_options.grouped_label, command.group_name);
     let _ = writeln!(result, "**{}**: {}", help_options.available_text, command.availability);
 
