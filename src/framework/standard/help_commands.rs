@@ -775,7 +775,7 @@ fn grouped_commands_to_plain_string(
     result
 }
 
-/// Turns a single into a `String` taking plain help format into account.
+/// Turns a single command into a `String` taking plain help format into account.
 fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command) -> String {
     let mut result = String::default();
     let _ = writeln!(result, "**{}**", command.name);
