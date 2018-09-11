@@ -844,3 +844,56 @@ pub fn plain<H: BuildHasher>(
 
     Ok(())
 }
+
+
+#[cfg(test)]
+mod levenshtein_tests {
+    use super::levenshtein_distance;
+
+    #[test]
+    fn reflexive() {
+        let word_a = "rusty ferris";
+        let word_b = "rusty ferris";
+        assert_eq!(0, levenshtein_distance(&word_a, &word_b));
+
+        let word_a = "";
+        let word_b = "";
+        assert_eq!(0, levenshtein_distance(&word_a, &word_b));
+
+        let word_a = "rusty ferris";
+        let word_b = "RuSty FerriS";
+        assert_eq!(4, levenshtein_distance(&word_a, &word_b));
+    }
+
+    #[test]
+    fn symmetric() {
+        let word_a = "ferris";
+        let word_b = "rusty ferris";
+        assert_eq!(6, levenshtein_distance(&word_a, &word_b));
+
+        let word_a = "rusty ferris";
+        let word_b = "ferris";
+        assert_eq!(6, levenshtein_distance(&word_a, &word_b));
+
+        let word_a = "";
+        let word_b = "ferris";
+        assert_eq!(6, levenshtein_distance(&word_a, &word_b));
+
+        let word_a = "ferris";
+        let word_b = "";
+        assert_eq!(6, levenshtein_distance(&word_a, &word_b));
+    }
+
+    #[test]
+    fn transitive() {
+        let word_a = "ferris";
+        let word_b = "turbo fish";
+        let word_c = "unsafe";
+
+        let distance_of_a_c = levenshtein_distance(&word_a, &word_c);
+        let distance_of_a_b = levenshtein_distance(&word_a, &word_b);
+        let distance_of_b_c = levenshtein_distance(&word_b, &word_c);
+
+        assert!(distance_of_a_c <= (distance_of_a_b + distance_of_b_c));
+    }
+}
