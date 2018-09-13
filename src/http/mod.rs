@@ -868,7 +868,7 @@ impl Client {
         token: &str,
         wait: bool,
         f: F,
-    ) -> Box<Future<Item = Option<Message>, Error = Error>> {
+    ) -> Box<Future<Item = Option<Message>, Error = Error> + Send> {
         let execution = f(ExecuteWebhook::default()).0;
         let map = Value::Object(serenity_utils::vecmap_to_json_map(execution));
 
@@ -1168,7 +1168,7 @@ impl Client {
         &self,
         channel_id: u64,
         f: F,
-    ) -> Box<Future<Item = Vec<Message>, Error = Error>> {
+    ) -> Box<Future<Item = Vec<Message>, Error = Error> + Send> {
         let mut map = f(GetMessages::default()).0;
 
         let limit = map.remove(&"limit").unwrap_or(50);
