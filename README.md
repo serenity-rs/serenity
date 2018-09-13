@@ -184,7 +184,7 @@ Voice+youtube-dl:
 [`Event`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html
 [`Event::MessageCreate`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html#variant.MessageCreatef
 [`Shard`]: https://docs.rs/serenity/*/serenity/gateway/struct.Shard.html
-[`examples`]: https://github.com/serenity-rs/serenity/blob/master/examples
+[`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples
 [`rest`]: https://docs.rs/serenity/*/serenity/client/rest/index.html
 [`validate_token`]: https://docs.rs/serenity/*/serenity/client/fn.validate_token.html
 [cache docs]: https://docs.rs/serenity/*/serenity/cache/index.html
@@ -196,7 +196,7 @@ Voice+youtube-dl:
 [discord docs]: https://discordapp.com/developers/docs/intro
 [docs]: https://docs.rs/serenity
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg?style=flat-square
-[examples]: https://github.com/serenity-rs/serenity/tree/master/examples
+[examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
 [guild]: https://discord.gg/WBdGJCc
 [guild-badge]: https://img.shields.io/discord/381880193251409931.svg?style=flat-square&colorB=7289DA
@@ -206,6 +206,6 @@ Voice+youtube-dl:
 [library:discordrb]: https://github.com/meew0/discordrb
 [library:discord.js]: https://github.com/hydrabolt/discord.js
 [library:discord.py]: https://github.com/Rapptz/discord.py
-[logo]: https://raw.githubusercontent.com/serenity-rs/serenity/master/logo.png
+[logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
 [rust 1.25+ badge]: https://img.shields.io/badge/rust-1.25+-93450a.svg?style=flat-square
 [rust 1.25+ link]: https://blog.rust-lang.org/2018/03/29/Rust-1.25.html

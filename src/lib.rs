@@ -97,11 +97,11 @@
 //! [`Event`]: model/event/enum.Event.html
 //! [`Event::MessageCreate`]: model/event/enum.Event.html#variant.MessageCreate
 //! [`Shard`]: gateway/struct.Shard.html
-//! [`examples`]: https://github.com/serenity-rs/serenity/blob/master/examples
+//! [`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples
 //! [cache docs]: cache/index.html
 //! [client's module-level documentation]: client/index.html
 //! [docs]: https://discordapp.com/developers/docs/intro
-//! [examples]: https://github.com/serenity-rs/serenity/tree/master/examples
+//! [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 //! [gateway docs]: gateway/index.html
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
 #![allow(unknown_lints)]
