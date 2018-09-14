@@ -97,6 +97,7 @@ pub struct Command<'a> {
     availability: &'a str,
     description: Option<String>,
     usage: Option<String>,
+    usage_sample: Option<String>,
 }
 
 /// Contains possible suggestions in case a command could not be found
@@ -410,6 +411,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
                     aliases: command.aliases.clone(),
                     availability: available_text,
                     usage: command.usage.clone(),
+                    usage_sample: command.example.clone(),
                 },
             });
         }
@@ -653,8 +655,14 @@ fn send_single_command_embed(
                 embed = embed.description(desc);
             }
 
-            if let &Some(ref usage_sample) = &command.usage {
-                embed = embed.field(&help_options.usage_label, usage_sample, true);
+            if let &Some(ref usage) = &command.usage {
+                embed = embed.field(&help_options.usage_label, usage, true);
+            }
+
+            if let Some(ref usage_sample) = command.usage_sample {
+                let value = format!("`{} {}`", command.name, usage_sample);
+
+                embed = embed.field(&help_options.usage_sample_label, value, true);
             }
 
             embed = embed.field(&help_options.grouped_label, command.group_name, true);
@@ -790,6 +798,10 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command)
 
     if let &Some(ref usage) = &command.usage {
         let _ = writeln!(result, "**{}**: {}", help_options.usage_label, usage);
+    }
+
+    if let &Some(ref usage_sample) = &command.usage_sample {
+        let _ = writeln!(result, "**{}**: `{} {}`", help_options.usage_sample_label, command.name, usage_sample);
     }
 
     let _ = writeln!(result, "**{}**: {}", help_options.grouped_label, command.group_name);
