@@ -489,7 +489,9 @@ fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
             &help_options,
         );
 
-        listed_groups.push(group_with_cmds);
+        if !group_with_cmds.command_names.is_empty() {
+            listed_groups.push(group_with_cmds);
+        }
     }
 
     listed_groups
@@ -553,10 +555,12 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
                             &help_options
                         );
 
-                        return CustomisedHelpData::GroupedCommands {
-                            help_description: group.description.clone().unwrap_or_default(),
-                            groups: vec![single_group],
-                        };
+                        if !single_group.command_names.is_empty() {
+                            return CustomisedHelpData::GroupedCommands {
+                                help_description: group.description.clone().unwrap_or_default(),
+                                groups: vec![single_group],
+                            };
+                        }
                     }
                 }
 
