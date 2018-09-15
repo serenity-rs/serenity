@@ -407,10 +407,12 @@ impl Message {
     pub fn pin(&self) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::MANAGE_MESSAGES;
+            if self.guild_id.is_some() {
+                let req = Permissions::MANAGE_MESSAGES;
 
-            if !utils::user_has_perms(self.channel_id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !utils::user_has_perms(self.channel_id, req)? {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
@@ -440,10 +442,12 @@ impl Message {
     fn _react(&self, reaction_type: &ReactionType) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::ADD_REACTIONS;
+            if self.guild_id.is_some() {
+                let req = Permissions::ADD_REACTIONS;
 
-            if !utils::user_has_perms(self.channel_id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !utils::user_has_perms(self.channel_id, req)? {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
@@ -479,10 +483,12 @@ impl Message {
 
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::SEND_MESSAGES;
+            if self.guild_id.is_some() {
+                let req = Permissions::SEND_MESSAGES;
 
-            if !utils::user_has_perms(self.channel_id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !utils::user_has_perms(self.channel_id, req)? {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
@@ -532,10 +538,12 @@ impl Message {
     pub fn unpin(&self) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::MANAGE_MESSAGES;
+            if self.guild_id.is_some() {
+                let req = Permissions::MANAGE_MESSAGES;
 
-            if !utils::user_has_perms(self.channel_id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !utils::user_has_perms(self.channel_id, req)? {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
