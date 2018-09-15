@@ -3,6 +3,65 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.5.9] - 2018-09-14
+
+This is a maintenance release fixing a number of bugs with a few miscellaneous
+internal changes.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@Lakelezz]
+- [@Mishio595]
+- [@perryprog]
+- [@Roughsketch]
+- [@zeyla]
+
+### Added
+
+- [model] Add session start info in `BotGateway` ([@zeyla]) [c:12bbc1a]
+- [model] Add `Member::user_id` ([@zeyla]) [c:669da40]
+- [framework] Suggest similar commands when using help ([@Lakelezz]) [c:ce79f01]
+- [framework] add single group help ([@Lakelezz]) [c:75f6516]
+
+### Fixed
+
+- [http] Fix routing for `http::create_private_channel` (regression from 0.5.6)
+  ([@zeyla]) [c:30a325e]
+- [http] Fix `GuildChannel::_permissions_for` on no-cache builds (regression
+  from 0.5.8) ([@zeyla]) [c:e59f766]
+- [http] Change HTTP bulk delete from DELETE to POST (regression from 0.5.6)
+  ([@Mishio595]) [c:ebbc324]
+- [framework] Make `is_command_visible` work with DMs ([@Roughsketch])
+  [c:7295079]
+- [utils] Add newline in `MessageBuilder::push_codeblock_safe` ([@zeyla])
+  [c:e66812a]
+- [framework] Fix `has_correct_permissions` when no guild is available
+  ([@Lakelezz]) [c:19c65bd]
+- [framework] Check if bots are ignored before dispatching
+  `unrecognised_command` ([@Lakelezz]) [c:966cb3e]
+- [framework] Fix group prefix ambiguity in help ([@Lakelezz]) [c:f01e6e3],
+  [c:c49e02c]
+- [framework] Add missing usage on plain help ([@Lakelezz]) [c:823b829]
+- [framework] Add usage sample back to help ([@Lakelezz]) [c:82dbff2]
+- [framework] Check if group is empty and exclude if so ([@Lakelezz])
+  [c:4778e69]
+- [model] Message: avoid permission checks in non-guild channels ([@zeyla])
+  [c:3fbab76]
+
+### Misc.
+
+- [docs] Fix a broken link in README ([@Mishio595]) [c:41b6e24]
+- [docs] Properly link to User in Game docs ([@zeyla]) [c:dec3f13]
+- [http] Move low-level http functions to `http::raw` and re-export ([@zeyla])
+  [c:6157f61]
+- [utils] Add more unit tests for `MessageBuilder` ([@zeyla]) [c:14c6099]
+- [framework] Refactor help ([@Lakelezz]) [c:28cdc53]
+- [docs] Update client docs to not say user token ([@perryprog]) [c:6ca4bea]
+- [framework] Add tests for help ([@Lakelezz]) [c:79d8843]
+- [model] Remove cache requirement on `Message::is_private` ([@zeyla])
+  [c:fe69ef0]
+
 ## [0.5.8] - 2018-08-12
 
 This is a hotfix release for incorrect routing and to fix a large number of
@@ -2295,6 +2354,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.5.8]: https://github.com/serenity-rs/serenity/compare/v0.5.8...v0.5.9
 [0.5.8]: https://github.com/serenity-rs/serenity/compare/v0.5.7...v0.5.8
 [0.5.7]: https://github.com/serenity-rs/serenity/compare/v0.5.6...v0.5.7
 [0.5.6]: https://github.com/serenity-rs/serenity/compare/v0.5.5...v0.5.6
@@ -2376,6 +2436,32 @@ Initial commit.
 [@xentec]: https://github.com/xentec
 [@vityafx]: https://github.com/vityafx
 [@zeyla]: https://github.com/zeyla
+
+[c:12bbc1a]: https://github.com/serenity-rs/serenity/commit/12bbc1ab79176d39c2528cae3c762404b0d5f8ab
+[c:14c6099]: https://github.com/serenity-rs/serenity/commit/14c6099ced49623b0c3a373b9a21d0574f9294c9
+[c:19c65bd]: https://github.com/serenity-rs/serenity/commit/19c65bd27f27192cc9a8a04c1d38ec08b62652c8
+[c:28cdc53]: https://github.com/serenity-rs/serenity/commit/28cdc5328687b74772e37da89caff5751e30a2a5
+[c:30a325e]: https://github.com/serenity-rs/serenity/commit/30a325ea840755cf74f376657d9a1e9ac363e92e
+[c:3fbab76]: https://github.com/serenity-rs/serenity/commit/3fbab7638be44914a7a28ac366ca03d4d1df9bba
+[c:41b6e24]: https://github.com/serenity-rs/serenity/commit/41b6e247b0484fc2ff3e254bb61d104b2e94cbdb
+[c:4778e69]: https://github.com/serenity-rs/serenity/commit/4778e6940131e97691f5e1e3d04a28480a9066cc
+[c:6157f61]: https://github.com/serenity-rs/serenity/commit/6157f61600d656219491f21f533f63c8f362bd1b
+[c:669da40]: https://github.com/serenity-rs/serenity/commit/669da407111f924a5dc498c15c0c0b43f7b42411
+[c:6ca4bea]: https://github.com/serenity-rs/serenity/commit/6ca4bea21ac83034c3ff1d4adf79754c80df85ca
+[c:7295079]: https://github.com/serenity-rs/serenity/commit/729507947c05c313d37b4b31059f41ba8e6f147a
+[c:75f6516]: https://github.com/serenity-rs/serenity/commit/75f6516fceb6d8e124f91ae25a10f74f183337ad
+[c:79d8843]: https://github.com/serenity-rs/serenity/commit/79d8843e3640bcc6ffffc0101f3ef458f6770684
+[c:823b829]: https://github.com/serenity-rs/serenity/commit/823b8299bb88013ce900e2f8d4b5745556380c72
+[c:82dbff2]: https://github.com/serenity-rs/serenity/commit/82dbff282d4eefe7a7125f4393eef2d2eee3beb5
+[c:966cb3e]: https://github.com/serenity-rs/serenity/commit/966cb3e00a7c8a803a299db8f792d42542d5896a
+[c:c49e02c]: https://github.com/serenity-rs/serenity/commit/c49e02ca024b0263d2b7e23e67338558555101ea
+[c:ce79f01]: https://github.com/serenity-rs/serenity/commit/ce79f0183d9fc457ce0fc10fa94e3a1350f33f66
+[c:dec3f13]: https://github.com/serenity-rs/serenity/commit/dec3f13ac10b7d22a45ae8393dda95f0a796aee7
+[c:e59f766]: https://github.com/serenity-rs/serenity/commit/e59f766c24b53b9c98109e8cfeafdec36feed161
+[c:e66812a]: https://github.com/serenity-rs/serenity/commit/e66812aa3b8458634901ca7226e5547f0e4be9eb
+[c:ebbc324]: https://github.com/serenity-rs/serenity/commit/ebbc32438e1cca94da80b00ae753e3cde86fb73f
+[c:f01e6e3]: https://github.com/serenity-rs/serenity/commit/f01e6e35c42372984f52d53ae8a7d4fa4712047b
+[c:fe69ef0]: https://github.com/serenity-rs/serenity/commit/fe69ef034c2d6561e05ff67f6a419b7b4a42c04e
 
 [c:0bbe5f5]: https://github.com/serenity-rs/serenity/commit/0bbe5f5dde6989a8d6a4d4910bf026b1b801fef9
 [c:40053a7]: https://github.com/serenity-rs/serenity/commit/40053a71931bb63c43eb6f469ee3c94383c9e90a
