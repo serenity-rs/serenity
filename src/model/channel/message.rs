@@ -352,12 +352,8 @@ impl Message {
     }
 
     /// True if message was sent using direct messages.
-    #[cfg(feature = "cache")]
     pub fn is_private(&self) -> bool {
-        match CACHE.read().channel(self.channel_id) {
-            Some(Channel::Group(_)) | Some(Channel::Private(_)) => true,
-            _ => false,
-        }
+        self.guild_id.is_none()
     }
 
     /// Retrieves a clone of the author's Member instance, if this message was
