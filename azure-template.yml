@@ -1,0 +1,37 @@
+parameters:
+  name: ''  # defaults for any parameters that aren't specified
+  vmImage: ''
+  toolchain: 'stable'
+
+jobs:
+- job: ${{ parameters.name }}
+  pool: 
+    vmImage: ${{ parameters.vmImage }}
+  variables:
+    tc: ${{ parameters.toolchain }}
+    os: ${{ parameters.vmImage }}
+  steps: 
+  - bash: |
+      if [[ "$OS" == "xcode9-macos10.13" ]]; then 
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install libtool autoconf automake pkg-config
+      fi
+      git clone 'git://github.com/jedisct1/libsodium.git'
+      cd libsodium
+      ./autogen.sh
+      ./configure && make
+      sudo make install
+
+  - bash: |
+      curl -o rustup-init.sh https://sh.rustup.rs -sSf
+      sh rustup-init.sh --default-toolchain $(tc) -y
+    displayName: 'Install rust'
+
+  - bash: |
+      source $HOME/.cargo/env
+      cargo build --all-features
+    displayName: 'Build serenity'
+
+  - bash: |
+      source $HOME/.cargo/env
+      cargo test --all-features
+    displayName: 'Test serenity'
