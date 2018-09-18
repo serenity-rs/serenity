@@ -303,6 +303,7 @@ pub fn is_command_visible(command_options: &Arc<CommandOptions>, msg: &Message, 
 
 /// Tries to extract a single command matching searched command name otherwise
 /// returns similar commands.
+#[cfg(feature = "cache")]
 fn fetch_single_command<'a, H: BuildHasher>(
     groups: &'a HashMap<String, Arc<CommandGroup>, H>,
     name: &str,
@@ -423,6 +424,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
 }
 
 /// Tries to extract a single command matching searched command name.
+#[cfg(feature = "cache")]
 fn fetch_all_eligible_commands_in_group<'a>(
     commands: &HashMap<&String, &InternalCommand>,
     command_names: &[&&String],
@@ -471,6 +473,7 @@ fn fetch_all_eligible_commands_in_group<'a>(
 }
 
 /// Fetch groups with their commands.
+#[cfg(feature = "cache")]
 fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
     groups: &'a HashMap<String, Arc<CommandGroup>, H>,
     group_names: &[&'a String],
@@ -498,6 +501,7 @@ fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
 }
 
 /// Fetches a single group with its commands.
+#[cfg(feature = "cache")]
 fn create_single_group<'a>(
     group: &CommandGroup,
     group_name: &'a str,
@@ -527,6 +531,7 @@ let commands = remove_aliases(&group.commands);
 /// Iterates over all commands and forges them into a `CustomisedHelpData`
 /// taking `HelpOptions` into consideration when deciding on whether a command
 /// shall be picked and in what textual format.
+#[cfg(feature = "cache")]
 pub fn create_customised_help_data<'a, H: BuildHasher>(
     groups: &'a HashMap<String, Arc<CommandGroup>, H>,
     args: &'a Args,
