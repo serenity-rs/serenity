@@ -409,7 +409,7 @@ impl Configuration {
         self
     }
 
-    /// Sets a delimiter to be used when splitting the content after a command.
+    /// Sets a single delimiter to be used when splitting the content after a command.
     ///
     /// # Examples
     ///
@@ -428,6 +428,7 @@ impl Configuration {
     ///     .delimiter(", ")));
     /// ```
     pub fn delimiter(mut self, delimiter: &str) -> Self {
+        self.delimiters.clear();
         self.delimiters.push(delimiter.to_string());
 
         self
