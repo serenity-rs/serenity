@@ -444,7 +444,7 @@ impl Configuration {
         self
     }
 
-    /// Sets a delimiter to be used when splitting the content after a command.
+    /// Sets a single delimiter to be used when splitting the content after a command.
     ///
     /// **Note**: Defaults to a vector with a single element of `" "`.
     ///
@@ -465,6 +465,7 @@ impl Configuration {
     ///     .delimiter(", ")));
     /// ```
     pub fn delimiter(mut self, delimiter: &str) -> Self {
+        self.delimiters.clear();
         self.delimiters.push(delimiter.to_string());
 
         self
