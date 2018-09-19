@@ -348,6 +348,50 @@ impl Args {
         self.args.get(self.offset).map(|t| t.lit.as_str())
     }
 
+    /// Trims the current argument off leading and trailing whitespace.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("     42     ", &[]);
+    ///
+    /// args.trim();
+    /// assert_eq!(args.current(), Some("42"));
+    /// ```
+    pub fn trim(&mut self) {
+        if self.is_empty() {
+            return;
+        }
+
+        self.args[self.offset].lit = self.args[self.offset].lit.trim().to_string();
+    }
+
+    /// Trims all of the arguments after the offset off leading and trailing whitespace.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::Args;
+    ///
+    /// let mut args = Args::new("     42     , 84 ,\t168\t", &[",".to_string()]);
+    ///
+    /// args.trim_all();
+    /// assert_eq!(args.single::<String>().unwrap(), "42");
+    /// assert_eq!(args.single::<String>().unwrap(), "84");
+    /// assert_eq!(args.single::<String>().unwrap(), "168");
+    /// ```
+    pub fn trim_all(&mut self) {
+        if self.is_empty() {
+            return;
+        }
+
+        for token in &mut self.args[self.offset..] {
+            token.lit = token.lit.trim().to_string();
+        }
+    }
+
     /// Parses the current argument and advances.
     ///
     /// # Examples
