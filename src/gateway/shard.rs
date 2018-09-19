@@ -531,32 +531,132 @@ impl Shard {
     }
 }
 
+// Some code copy-pasted from:
+// <https://github.com/snapview/tokio-tungstenite/blob/master/src/connect.rs>
+//
+// Ignore how bad this is for now, I just wanted it working.
+
+mod encryption {
+    extern crate native_tls;
+    extern crate tokio_io;
+    extern crate tokio_tls;
+
+    use self::native_tls::TlsConnector;
+    use self::tokio_tls::{TlsConnector as TokioTlsConnector, TlsStream};
+
+    use std::io::{Read, Write, Result as IoResult};
+
+    use futures::{future, Future};
+    use self::tokio_io::{AsyncRead, AsyncWrite};
+
+    use tokio_tungstenite::tungstenite::Error;
+    use tokio_tungstenite::tungstenite::stream::Mode;
+
+    use tokio_tungstenite::stream::{NoDelay, Stream as StreamSwitcher};
+
+    /// A stream that might be protected with TLS.
+    pub type MaybeTlsStream<S> = StreamSwitcher<S, TlsStream<S>>;
+
+    pub type AutoStream<S> = MaybeTlsStream<S>;
+
+    pub fn wrap_stream<S>(socket: S, domain: String, mode: Mode)
+        -> Box<Future<Item=AutoStream<S>, Error=Error> + Send>
+    where
+        S: 'static + AsyncRead + AsyncWrite + Send,
+    {
+        match mode {
+            Mode::Plain => Box::new(future::ok(StreamSwitcher::Plain(socket))),
+            Mode::Tls => {
+                Box::new(future::result(TlsConnector::new())
+                            .map(TokioTlsConnector::from)
+                            .and_then(move |connector| connector.connect(&domain, socket))
+                            .map(|s| StreamSwitcher::Tls(s))
+                            .map_err(|e| Error::Tls(e)))
+            }
+        }
+    }
+}
+
+use tokio_tungstenite::tungstenite::handshake::client::Request;
+
+#[inline]
+fn domain(request: &Request) -> Result<String, Error> {
+    match request.url.host_str() {
+        Some(d) => Ok(d.to_string()),
+        None => Err(Error::Url("no host name in the url".into())),
+    }
+}
+
 fn connect(
     uri: &str,
-) -> impl Future<Item = (UnboundedSender<TungsteniteMessage>, ShardStream), Error = Error> + Send {
-    connect_async(Url::from_str(uri).unwrap())
-        .map(move |(duplex, _)| {
-            let (sink, stream) = duplex.split();
-            let (tx, rx) = mpsc::unbounded();
+) -> Box<Future<Item = (UnboundedSender<TungsteniteMessage>, ShardStream), Error = Error> + Send> {
+    extern crate tokio_dns;
 
-            let done = rx
-                .map_err(|why| {
-                    error!("Err select sink rx: {:?}", why);
+    use futures::future;
+    use tokio_tungstenite;
+    use tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
 
-                    TungsteniteError::Io(IoError::new(
-                        IoErrorKind::Other,
-                        "Err selecting sink rx",
-                    ))
-                })
-                .forward(sink)
-                .map(|_| ())
-                .map_err(|_| ());
+    let config = WebSocketConfig {
+        max_message_size: Some(usize::max_value()),
+        max_frame_size: Some(usize::max_value()),
+        ..Default::default()
+    };
 
-            tokio::spawn(done);
+    let url = Url::from_str(uri).expect("Err parsing url");
 
-            (tx, stream)
+    let request = Request::from(url);
+    let domain = match domain(&request) {
+        Ok(domain) => domain,
+        Err(why) => return Box::new(future::err(Error::from(why))),
+    };
+    let port = request.url.port_or_known_default().expect("Bug: port unknown");
+
+    let mode = match tokio_tungstenite::tungstenite::client::url_mode(&request.url) {
+        Ok(mode) => mode,
+        Err(why) => return Box::new(future::err(Error::from(why))),
+    };
+
+    let done = tokio_dns::TcpStream::connect((domain.as_str(), port)).map_err(|why| {
+        warn!("Err connecting to remote: {:?}", why);
+
+        why
+    }).from_err().and_then(move |stream| {
+        encryption::wrap_stream(stream, domain, mode).and_then(|mut stream| {
+            tokio_tungstenite::stream::NoDelay::set_nodelay(&mut stream, true)
+                .map(move |()| stream)
+                .map_err(|e| e.into())
         })
-        .map_err(From::from)
+    }).and_then(move |stream| {
+        debug!("Connected to remote; request: {:?}", request);
+        tokio_tungstenite::client_async_with_config(
+            request,
+            stream,
+            Some(config),
+        )
+    }).map(move |(duplex, _)| {
+        debug!("Shook hands with remote 🤝");
+        let (sink, stream) = duplex.split();
+        let (tx, rx) = mpsc::unbounded();
+
+        let done = rx
+            .map_err(|why| {
+                error!("Err select sink rx: {:?}", why);
+
+                TungsteniteError::Io(IoError::new(
+                    IoErrorKind::Other,
+                    "Err selecting sink rx",
+                ))
+            })
+            .forward(sink)
+            .map(|_| ())
+            .map_err(|_| ());
+
+        tokio::spawn(done);
+
+        (tx, stream)
+    }).from_err();
+
+    Box::new(done)
 }
 
 fn heartbeat(
