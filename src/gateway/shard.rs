@@ -371,7 +371,7 @@ impl Shard {
     pub fn autoreconnect(&mut self) -> Box<Future<Item = (), Error = Error> + Send> {
         info!("[Shard {:?}] Autoreconnecting", self.shard_info);
 
-        if self.session_id.is_some() {
+        if self.session_id.is_some() && self.seq() > 0 {
             Box::new(self.resume())
         } else {
             Box::new(self.reconnect())
