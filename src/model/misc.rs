@@ -156,7 +156,7 @@ macro_rules! impl_from_str {
                 type Err = $err;
 
                 fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-                    Ok(match utils::parse_username(s) {
+                    Ok(match utils::parse_mention(s) {
                         Some(id) => $id(id),
                         None => s.parse::<u64>().map($id).map_err(|_| $err::InvalidFormat)?,
                     })
