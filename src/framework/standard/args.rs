@@ -357,8 +357,7 @@ impl Args {
     ///
     /// let mut args = Args::new("     42     ", &[]);
     ///
-    /// args.trim();
-    /// assert_eq!(args.current(), Some("42"));
+    /// assert_eq!(args.trim().current(), Some("42"));
     /// ```
     pub fn trim(&mut self) -> &mut Self {
         if self.is_empty() {
