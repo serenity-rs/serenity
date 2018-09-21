@@ -357,15 +357,16 @@ impl Args {
     ///
     /// let mut args = Args::new("     42     ", &[]);
     ///
-    /// args.trim();
-    /// assert_eq!(args.current(), Some("42"));
+    /// assert_eq!(args.trim().current(), Some("42"));
     /// ```
-    pub fn trim(&mut self) {
+    pub fn trim(&mut self) -> &mut Self {
         if self.is_empty() {
-            return;
+            return self;
         }
 
         self.args[self.offset].lit = self.args[self.offset].lit.trim().to_string();
+
+        self
     }
 
     /// Trims all of the arguments after the offset off leading and trailing whitespace.
