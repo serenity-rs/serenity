@@ -27,9 +27,7 @@ impl Display for Error {
 impl StdError for Error {
     fn description(&self) -> &str {
         match *self {
-            Error::UnsuccessfulRequest(_) => {
-                "A non-successful response status code was received"
-            },
+            Error::UnsuccessfulRequest(_) => "A non-successful response status code was received",
             Error::RateLimitI64 => "Error decoding a header into an i64",
             Error::RateLimitUtf8 => "Error decoding a header from UTF-8",
         }
