@@ -1,9 +1,9 @@
-use builder::CreateEmbed;
 use internal::prelude::*;
-use utils;
 
+#[cfg(feature = "builder")]
+use builder::CreateEmbed;
 #[cfg(feature = "utils")]
-use utils::Colour;
+use utils::{self, Colour};
 
 /// Represents a rich embed which allows using richer markdown, multiple fields
 /// and more. This was heavily inspired by [slack's attachments].
@@ -85,6 +85,7 @@ impl Embed {
     ///     e
     /// });
     /// ```
+    #[cfg(all(feature = "builder", feature = "utils"))]
     #[inline]
     pub fn fake<F>(f: F) -> Value
         where F: FnOnce(CreateEmbed) -> CreateEmbed {

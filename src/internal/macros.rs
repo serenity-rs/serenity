@@ -1,6 +1,5 @@
 //! A set of macros for easily working with internals.
 
-#[cfg(any(feature = "model", feature = "utils"))]
 macro_rules! cdn {
     ($e:expr) => {
         concat!("https://cdn.discordapp.com", $e)

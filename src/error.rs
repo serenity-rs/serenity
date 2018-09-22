@@ -109,6 +109,7 @@ pub enum Error {
     #[cfg(feature = "hyper")]
     Hyper(HyperError),
     /// An error with a hyper header value.
+    #[cfg(feature = "hyper")]
     InvalidHeaderValue(InvalidHeaderValue),
     /// An error while sending a message over a WebSocket.
     #[cfg(feature = "tokio-tungstenite")]
@@ -212,8 +213,6 @@ impl StdError for Error {
             Error::Decode(msg, _) | Error::Other(msg) => msg,
             Error::ExceededLimit(..) => "Input exceeded a limit",
             Error::Format(ref inner) => inner.description(),
-            Error::HttpCrate(ref inner) => inner.description(),
-            Error::InvalidHeaderValue(ref inner) => inner.description(),
             Error::Io(ref inner) => inner.description(),
             Error::Json(ref inner) => inner.description(),
             Error::Model(ref inner) => inner.description(),
@@ -223,8 +222,12 @@ impl StdError for Error {
             Error::Client(ref inner) => inner.description(),
             #[cfg(feature = "http-client")]
             Error::Http(ref inner) => inner.description(),
+            #[cfg(feature = "http")]
+            Error::HttpCrate(ref inner) => inner.description(),
             #[cfg(feature = "http-client")]
             Error::Hyper(ref inner) => inner.description(),
+            #[cfg(feature = "hyper")]
+            Error::InvalidHeaderValue(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Opus(ref inner) => inner.description(),
             #[cfg(feature = "tokio-tungstenite")]
