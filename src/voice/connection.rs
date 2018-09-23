@@ -585,7 +585,7 @@ fn start_threads(client: Arc<Mutex<Client>>, udp: &UdpSocket) -> Result<ThreadIt
             while let Ok(Some(value)) = client.lock().recv_json() {
                 let msg = match VoiceEvent::deserialize(value) {
                     Ok(msg) => msg,
-                    Err(why) => break,
+                    Err(_) => break,
                 };
 
                 if tx_clone.send(ReceiverStatus::Websocket(msg)).is_err() {
