@@ -65,9 +65,9 @@ pub fn set_token(token: &str) { TOKEN.lock().clone_from(&token.to_string()); }
 ///
 /// **Note**: Groups have a limit of 10 recipients, including the current user.
 ///
-/// [`Group`]: ../model/channel/struct.Group.html
-/// [`Group::add_recipient`]: ../model/channel/struct.Group.html#method.add_recipient
-/// [`User`]: ../model/user/struct.User.html
+/// [`Group`]: ../../model/channel/struct.Group.html
+/// [`Group::add_recipient`]: ../../model/channel/struct.Group.html#method.add_recipient
+/// [`User`]: ../../model/user/struct.User.html
 pub fn add_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
@@ -81,10 +81,10 @@ pub fn add_group_recipient(group_id: u64, user_id: u64) -> Result<()> {
 /// **Note**: Requires the [Manage Roles] permission and respect of role
 /// hierarchy.
 ///
-/// [`Guild`]: ../model/guild/struct.Guild.html
-/// [`Member`]: ../model/guild/struct.Member.html
-/// [`Role`]: ../model/guild/struct.Role.html
-/// [Manage Roles]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+/// [`Guild`]: ../../model/guild/struct.Guild.html
+/// [`Member`]: ../../model/guild/struct.Member.html
+/// [`Role`]: ../../model/guild/struct.Role.html
+/// [Manage Roles]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
 pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
@@ -101,9 +101,9 @@ pub fn add_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> 
 ///
 /// **Note**: Requires that you have the [Ban Members] permission.
 ///
-/// [`Guild`]: ../model/guild/struct.Guild.html
-/// [`User`]: ../model/user/struct.User.html
-/// [Ban Members]: ../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
+/// [`Guild`]: ../../model/guild/struct.Guild.html
+/// [`User`]: ../../model/user/struct.User.html
+/// [Ban Members]: ../../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
 pub fn ban_user(guild_id: u64, user_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
     wind(204, Request {
         body: None,
@@ -168,7 +168,7 @@ pub fn ban_servermoms(guild_id: u64, delete_message_days: u8, reason: &str) -> R
 /// This should rarely be used for bots, although it is a good indicator that a
 /// long-running command is still being processed.
 ///
-/// [`Channel`]: ../model/channel/enum.Channel.html
+/// [`Channel`]: ../../model/channel/enum.Channel.html
 pub fn broadcast_typing(channel_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
@@ -183,10 +183,10 @@ pub fn broadcast_typing(channel_id: u64) -> Result<()> {
 ///
 /// **Note**: Requires the [Manage Channels] permission.
 ///
-/// [`Guild`]: ../model/guild/struct.Guild.html
-/// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
+/// [`Guild`]: ../../model/guild/struct.Guild.html
+/// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-channel
-/// [Manage Channels]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+/// [Manage Channels]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
 pub fn create_channel(guild_id: u64, map: &Value) -> Result<GuildChannel> {
     fire(Request {
         body: Some(map.to_string().as_bytes()),
@@ -202,9 +202,9 @@ pub fn create_channel(guild_id: u64, map: &Value) -> Result<GuildChannel> {
 ///
 /// **Note**: Requires the [Manage Emojis] permission.
 ///
-/// [`create_emoji`]: ../model/guild/struct.Guild.html#method.create_emoji
-/// [`Guild`]: ../model/guild/struct.Guild.html
-/// [Manage Emojis]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
+/// [`create_emoji`]: ../../model/guild/struct.Guild.html#method.create_emoji
+/// [`Guild`]: ../../model/guild/struct.Guild.html
+/// [Manage Emojis]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
 pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
     fire(Request {
         body: Some(map.to_string().as_bytes()),
@@ -241,11 +241,11 @@ pub fn create_emoji(guild_id: u64, map: &Value) -> Result<Emoji> {
 /// let _result = http::create_guild(map);
 /// ```
 ///
-/// [`Guild`]: ../model/guild/struct.Guild.html
-/// [`PartialGuild`]: ../model/guild/struct.PartialGuild.html
-/// [`Shard`]: ../gateway/struct.Shard.html
+/// [`Guild`]: ../../model/guild/struct.Guild.html
+/// [`PartialGuild`]: ../../model/guild/struct.PartialGuild.html
+/// [`Shard`]: ../../gateway/struct.Shard.html
 /// [GameBridge]: https://discordapp.com/developers/docs/topics/gamebridge
-/// [US West Region]: ../model/guild/enum.Region.html#variant.UsWest
+/// [US West Region]: ../../model/guild/enum.Region.html#variant.UsWest
 /// [documentation on this endpoint]:
 /// https://discordapp.com/developers/docs/resources/guild#create-guild
 /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
@@ -263,9 +263,9 @@ pub fn create_guild(map: &Value) -> Result<PartialGuild> {
 ///
 /// **Note**: Requires the [Manage Guild] permission.
 ///
-/// [`Guild`]: ../model/guild/struct.Guild.html
-/// [`Integration`]: ../model/guild/struct.Integration.html
-/// [Manage Guild]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+/// [`Guild`]: ../../model/guild/struct.Guild.html
+/// [`Integration`]: ../../model/guild/struct.Integration.html
+/// [Manage Guild]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
 /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-integration
 pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: &Value) -> Result<()> {
     wind(204, Request {
@@ -283,9 +283,9 @@ pub fn create_guild_integration(guild_id: u64, integration_id: u64, map: &Value)
 ///
 /// **Note**: Requires the [Create Invite] permission.
 ///
-/// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
-/// [`RichInvite`]: ../model/invite/struct.RichInvite.html
-/// [Create Invite]: ../model/permissions/struct.Permissions.html#associatedconstant.CREATE_INVITE
+/// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html
+/// [`RichInvite`]: ../../model/invite/struct.RichInvite.html
+/// [Create Invite]: ../../model/permissions/struct.Permissions.html#associatedconstant.CREATE_INVITE
 /// [docs]: https://discordapp.com/developers/docs/resources/channel#create-channel-invite
 pub fn create_invite(channel_id: u64, map: &JsonMap) -> Result<RichInvite> {
     let body = serde_json::to_vec(map)?;
@@ -375,7 +375,7 @@ pub fn create_role(guild_id: u64, map: &JsonMap) -> Result<Role> {
 /// let webhook = http::create_webhook(channel_id, map).expect("Error creating");
 /// ```
 ///
-/// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
+/// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html
 pub fn create_webhook(channel_id: u64, map: &Value) -> Result<Webhook> {
     let body = serde_json::to_vec(map)?;
 
@@ -465,8 +465,8 @@ pub fn delete_messages(channel_id: u64, map: &Value) -> Result<()> {
 ///     .expect("Error deleting reactions");
 /// ```
 ///
-/// [`Message`]: ../model/channel/struct.Message.html
-/// [`Reaction`]: ../model/channel/struct.Reaction.html
+/// [`Message`]: ../../model/channel/struct.Message.html
+/// [`Reaction`]: ../../model/channel/struct.Reaction.html
 pub fn delete_message_reactions(channel_id: u64, message_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
@@ -536,7 +536,7 @@ pub fn delete_role(guild_id: u64, role_id: u64) -> Result<()> {
 /// http::delete_webhook(245037420704169985).expect("Error deleting webhook");
 /// ```
 ///
-/// [`Webhook`]: ../model/webhook/struct.Webhook.html
+/// [`Webhook`]: ../../model/webhook/struct.Webhook.html
 /// [`delete_webhook_with_token`]: fn.delete_webhook_with_token.html
 pub fn delete_webhook(webhook_id: u64) -> Result<()> {
     wind(204, Request {
@@ -563,7 +563,7 @@ pub fn delete_webhook(webhook_id: u64) -> Result<()> {
 /// http::delete_webhook_with_token(id, token).expect("Error deleting webhook");
 /// ```
 ///
-/// [`Webhook`]: ../model/webhook/struct.Webhook.html
+/// [`Webhook`]: ../../model/webhook/struct.Webhook.html
 pub fn delete_webhook_with_token(webhook_id: u64, token: &str) -> Result<()> {
     wind(204, Request {
         body: None,
@@ -619,7 +619,7 @@ pub fn edit_guild_channel_positions(guild_id: u64, value: &Value)
 
 /// Edits a [`Guild`]'s embed setting.
 ///
-/// [`Guild`]: ../model/guild/struct.Guild.html
+/// [`Guild`]: ../../model/guild/struct.Guild.html
 pub fn edit_guild_embed(guild_id: u64, map: &Value) -> Result<GuildEmbed> {
     let body = serde_json::to_vec(map)?;
 
@@ -658,7 +658,7 @@ pub fn edit_message(channel_id: u64, message_id: u64, map: &Value) -> Result<Mes
 ///
 /// Pass `None` to reset the nickname.
 ///
-/// [`Guild`]: ../model/guild/struct.Guild.html
+/// [`Guild`]: ../../model/guild/struct.Guild.html
 pub fn edit_nickname(guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
     let map = json!({ "nick": new_nickname });
     let body = serde_json::to_vec(&map)?;
@@ -869,8 +869,8 @@ pub fn edit_webhook_with_token(webhook_id: u64, token: &str, map: &JsonMap) -> R
 /// };
 /// ```
 ///
-/// [`Channel`]: ../model/channel/enum.Channel.html
-/// [`Message`]: ../model/channel/struct.Message.html
+/// [`Channel`]: ../../model/channel/enum.Channel.html
+/// [`Message`]: ../../model/channel/struct.Message.html
 /// [Discord docs]: https://discordapp.com/developers/docs/resources/webhook#querystring-params
 pub fn execute_webhook(webhook_id: u64,
                        token: &str,
@@ -981,7 +981,7 @@ pub fn get_channel_invites(channel_id: u64) -> Result<Vec<RichInvite>> {
 ///     .expect("Error getting channel webhooks");
 /// ```
 ///
-/// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
+/// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html
 pub fn get_channel_webhooks(channel_id: u64) -> Result<Vec<Webhook>> {
     fire(Request {
         body: None,
@@ -1150,7 +1150,7 @@ pub fn get_guild_regions(guild_id: u64) -> Result<Vec<VoiceRegion>> {
 
 /// Retrieves a list of roles in a [`Guild`].
 ///
-/// [`Guild`]: ../model/guild/struct.Guild.html
+/// [`Guild`]: ../../model/guild/struct.Guild.html
 pub fn get_guild_roles(guild_id: u64) -> Result<Vec<Role>> {
     fire(Request {
         body: None,
@@ -1176,7 +1176,7 @@ pub fn get_guild_roles(guild_id: u64) -> Result<Vec<Role>> {
 ///     .expect("Error getting guild webhooks");
 /// ```
 ///
-/// [`Guild`]: ../model/guild/struct.Guild.html
+/// [`Guild`]: ../../model/guild/struct.Guild.html
 pub fn get_guild_webhooks(guild_id: u64) -> Result<Vec<Webhook>> {
     fire(Request {
         body: None,
@@ -1558,10 +1558,10 @@ pub fn remove_ban(guild_id: u64, user_id: u64) -> Result<()> {
 /// **Note**: Requires the [Manage Roles] permission and respect of role
 /// hierarchy.
 ///
-/// [`Guild`]: ../model/guild/struct.Guild.html
-/// [`Member`]: ../model/guild/struct.Member.html
-/// [`Role`]: ../model/guild/struct.Role.html
-/// [Manage Roles]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+/// [`Guild`]: ../../model/guild/struct.Guild.html
+/// [`Member`]: ../../model/guild/struct.Member.html
+/// [`Role`]: ../../model/guild/struct.Role.html
+/// [Manage Roles]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
 pub fn remove_member_role(guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,
