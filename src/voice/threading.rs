@@ -100,10 +100,13 @@ fn runner(rx: &MpscReceiver<Status>) {
             },
         };
 
-        // If there was an error, then just reset the connection and try to get
-        // another.
+        // If there was an error, then reconnect using the dedicated API path.
+        // Create a new connection if that somehow fails.
         if error {
-            connection = None;
+            let mut conn = connection.expect("[Voice] Shouldn't be able to have a voice connection error without a connection");
+            connection = conn.reconnect()
+                .ok()
+                .map(|_| conn);
         }
     }
 }
