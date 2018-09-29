@@ -776,7 +776,7 @@ fn grouped_commands_to_plain_string(
     help_description: &str,
     groups: &[GroupCommandsPair]) -> String
 {
-    let mut result = "**Commands**\n".to_string();
+    let mut result = "__**Commands**__\n".to_string();
     let _ = writeln!(result, "{}", &help_description);
 
     for group in groups {
@@ -795,7 +795,7 @@ fn grouped_commands_to_plain_string(
 /// Turns a single command into a `String` taking plain help format into account.
 fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command) -> String {
     let mut result = String::default();
-    let _ = writeln!(result, "**{}**", command.name);
+    let _ = writeln!(result, "__**{}**__", command.name);
 
     if !command.aliases.is_empty() {
         let _ = writeln!(result, "**{}**: `{}`", help_options.aliases_label, command.aliases.join("`, `"));
