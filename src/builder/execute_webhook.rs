@@ -143,7 +143,7 @@ impl ExecuteWebhook {
     ///
     /// # Examples
     ///
-    /// Overriuding the username to `"hakase"`:
+    /// Overriding the username to `"hakase"`:
     ///
     /// ```rust,no_run
     /// # use serenity::client::rest;
@@ -173,7 +173,7 @@ impl Default for ExecuteWebhook {
     /// ```rust
     /// use serenity::builder::ExecuteWebhook;
     ///
-    /// let executer = ExecuteWebhook::default();
+    /// let executor = ExecuteWebhook::default();
     /// ```
     ///
     /// [`Webhook`]: ../model/webhook/struct.Webhook.html

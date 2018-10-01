@@ -413,7 +413,7 @@ pub fn delete_guild(guild_id: u64) -> Result<PartialGuild> {
     })
 }
 
-/// Remvoes an integration from a guild.
+/// Removes an integration from a guild.
 pub fn delete_guild_integration(guild_id: u64, integration_id: u64) -> Result<()> {
     wind(204, Request {
         body: None,

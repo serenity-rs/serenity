@@ -54,7 +54,7 @@ fn runner(rx: &MpscReceiver<Status>) {
                     senders.push(s);
                 },
                 Err(TryRecvError::Empty) => {
-                    // If we receieved nothing, then we can perform an update.
+                    // If we received nothing, then we can perform an update.
                     break;
                 },
                 Err(TryRecvError::Disconnected) => {

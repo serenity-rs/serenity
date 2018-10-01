@@ -167,7 +167,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let context = context(data, runner_tx, shard_id);
 
             // Discord sends both a MessageCreate and a ChannelCreate upon a new message in a private channel.
-            // This could potentionally be annoying to handle when otherwise wanting to normally take care of a new channel.
+            // This could potentially be annoying to handle when otherwise wanting to normally take care of a new channel.
             // So therefore, private channels are dispatched to their own handler code.
             match event.channel {
                 Channel::Private(channel) => {

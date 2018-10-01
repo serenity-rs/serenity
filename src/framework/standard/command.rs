@@ -81,7 +81,7 @@ impl fmt::Debug for CommandOrAlias {
 #[derive(Clone, Debug)]
 pub struct Error(pub String);
 
-// TODO: Have seperate `From<(&)String>` and `From<&str>` impls via specialization
+// TODO: Have separate `From<(&)String>` and `From<&str>` impls via specialization
 impl<D: fmt::Display> From<D> for Error {
     fn from(d: D) -> Self {
         Error(d.to_string())
@@ -141,7 +141,7 @@ pub struct CommandOptions {
     pub example: Option<String>,
     /// Command usage schema, used by other commands.
     pub usage: Option<String>,
-    /// Minumum amount of arguments that should be passed.
+    /// Minimum amount of arguments that should be passed.
     pub min_args: Option<i32>,
     /// Maximum amount of arguments that can be passed.
     pub max_args: Option<i32>,
@@ -216,7 +216,7 @@ pub struct HelpOptions {
     pub wrong_channel: HelpBehaviour,
     /// Colour help-embed will use upon encountering an error.
     pub embed_error_colour: Colour,
-    /// Colour help-embed will use if no error occured.
+    /// Colour help-embed will use if no error occurred.
     pub embed_success_colour: Colour,
     /// If not 0, help will check whether a command is similar to searched named.
     pub max_levenshtein_distance: usize,

@@ -68,7 +68,7 @@ lazy_static! {
     /// prior to every request, to abide by Discord's global ratelimit.
     ///
     /// The global ratelimit is the total number of requests that may be made
-    /// across the entirity of the API within an amount of time. If this is
+    /// across the entirety of the API within an amount of time. If this is
     /// reached, then the global mutex is unlocked for the amount of time
     /// present in the "Retry-After" header.
     ///
@@ -82,7 +82,7 @@ lazy_static! {
     /// The routes mutex is a HashMap of each [`Route`] and their respective
     /// ratelimit information.
     ///
-    /// See the documentation for [`RateLimit`] for more infomation on how the
+    /// See the documentation for [`RateLimit`] for more information on how the
     /// library handles ratelimiting.
     ///
     /// # Examples
