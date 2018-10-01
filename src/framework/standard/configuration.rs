@@ -448,7 +448,7 @@ impl Configuration {
     ///
     /// # Examples
     ///
-    /// Have the args be seperated by a comma and a space:
+    /// Have the args be separated by a comma and a space:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -475,7 +475,7 @@ impl Configuration {
     ///
     /// # Examples
     ///
-    /// Have the args be seperated by a comma and a space; and a regular space:
+    /// Have the args be separated by a comma and a space; and a regular space:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;

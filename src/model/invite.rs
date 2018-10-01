@@ -162,7 +162,7 @@ impl Invite {
     pub fn url(&self) -> String { format!("https://discord.gg/{}", self.code) }
 }
 
-/// A inimal information about the channel an invite points to.
+/// A minimal information about the channel an invite points to.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InviteChannel {
     pub id: ChannelId,
@@ -253,7 +253,7 @@ pub struct RichInvite {
     pub max_age: u64,
     /// The maximum number of times that an invite may be used before it expires.
 
-    /// Note that this does not supercede the [`max_age`] value, if the value of
+    /// Note that this does not supersede the [`max_age`] value, if the value of
     /// [`temporary`] is `true`. If the value of `temporary` is `false`, then the
     /// invite _will_ self-expire after the given number of max uses.
 

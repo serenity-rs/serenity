@@ -9,7 +9,7 @@
 //! presets are available. These are [`PRESET_GENERAL`], [`PRESET_TEXT`], and
 //! [`PRESET_VOICE`].
 //!
-//! Permissions follow a heirarchy:
+//! Permissions follow a hierarchy:
 //!
 //! - An account can grant roles to users that are of a lower position than
 //! its highest role;

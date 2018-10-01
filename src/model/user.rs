@@ -612,7 +612,7 @@ impl User {
     ///
     /// # Examples
     ///
-    /// If maintaing a very long-running bot, you may want to periodically
+    /// If maintaining a very long-running bot, you may want to periodically
     /// refresh information about certain users if the state becomes
     /// out-of-sync:
     ///

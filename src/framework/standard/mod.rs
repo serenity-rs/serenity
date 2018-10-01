@@ -951,7 +951,7 @@ impl StandardFramework {
 
     /// Sets what code should be executed when a user sends `(prefix)help`.
     ///
-    /// If a command named `help` was set with [`command`], then this takes precendence first.
+    /// If a command named `help` was set with [`command`], then this takes precedence first.
     ///
     /// [`command`]: #method.command
     pub fn help(mut self, f: HelpFunction) -> Self {
@@ -1238,7 +1238,7 @@ pub fn has_correct_roles(cmd: &Arc<CommandOptions>, guild: &Guild, member: &Memb
 /// The command can't be used in the current channel (as in `DM only` or `guild only`).
 #[derive(PartialEq, Debug)]
 pub enum HelpBehaviour {
-    /// Strikes a command by applying `~~{comand_name}~~`.
+    /// Strikes a command by applying `~~{command_name}~~`.
     Strike,
     /// Does not list a command in the help-menu.
     Hide,

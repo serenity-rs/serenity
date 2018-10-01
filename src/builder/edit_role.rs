@@ -5,7 +5,7 @@ use model::{
 };
 use utils::VecMap;
 
-/// A builer to create or edit a [`Role`] for use via a number of model methods.
+/// A builder to create or edit a [`Role`] for use via a number of model methods.
 ///
 /// These are:
 ///

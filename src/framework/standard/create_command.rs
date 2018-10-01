@@ -189,7 +189,7 @@ impl CreateCommand {
         self
     }
 
-    /// Minumum amount of arguments that should be passed.
+    /// Minimum amount of arguments that should be passed.
     pub fn min_args(mut self, min_args: i32) -> Self {
         self.0.min_args = Some(min_args);
 
@@ -236,7 +236,7 @@ impl CreateCommand {
 
     /// Sets an initialise middleware to be called upon the command's actual registration.
     ///
-    /// This is similiar to implementing the `init` function on `Command`.
+    /// This is similar to implementing the `init` function on `Command`.
     pub fn init<F: Fn() + Send + Sync + 'static>(mut self, f: F) -> Self {
         self.2.init = Some(Arc::new(f));
 
@@ -245,7 +245,7 @@ impl CreateCommand {
 
     /// Sets a before middleware to be called before the command's execution.
     ///
-    /// This is similiar to implementing the `before` function on `Command`.
+    /// This is similar to implementing the `before` function on `Command`.
     pub fn before<F: Send + Sync + 'static>(mut self, f: F) -> Self
         where F: Fn(&mut Context, &Message) -> bool {
         self.2.before = Some(Arc::new(f));
@@ -255,7 +255,7 @@ impl CreateCommand {
 
     /// Sets an after middleware to be called after the command's execution.
     ///
-    /// This is similiar to implementing the `after` function on `Command`.
+    /// This is similar to implementing the `after` function on `Command`.
     pub fn after<F: Send + Sync + 'static>(mut self, f: F) -> Self
         where F: Fn(&mut Context, &Message, &Result<(), CommandError>) {
         self.2.after = Some(Arc::new(f));
