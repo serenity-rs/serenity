@@ -137,7 +137,7 @@ pub enum GuildPagination {
 
 #[cfg(test)]
 mod test {
-    use super::AttachmentType;
+    use super::{AttachmentType, HttpError};
     use std::path::Path;
 
     #[test]
@@ -150,5 +150,11 @@ mod test {
             AttachmentType::Path(_) => true,
             _ => false,
         });
+    }
+
+    #[test]
+    fn client_error_is_send_sync() {
+        fn accept_send_sync<T: Send + Sync>() {}
+        accept_send_sync::<HttpError>();
     }
 }

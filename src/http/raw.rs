@@ -34,6 +34,7 @@ use std::{
     collections::BTreeMap,
     io::ErrorKind as IoErrorKind,
 };
+use parking_lot::Mutex;
 
 /// Sets the token to be used across all requests which require authentication.
 ///
@@ -1518,7 +1519,7 @@ pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, m
     let response = request.send()?;
 
     if response.status.class() != StatusClass::Success {
-        return Err(Error::Http(HttpError::UnsuccessfulRequest(response)));
+        return Err(Error::Http(HttpError::UnsuccessfulRequest(Mutex::new(response))));
     }
 
     serde_json::from_reader(response).map_err(From::from)
@@ -1713,7 +1714,7 @@ pub fn request(req: Request) -> Result<HyperResponse> {
     if response.status.class() == StatusClass::Success {
         Ok(response)
     } else {
-        Err(Error::Http(HttpError::UnsuccessfulRequest(response)))
+        Err(Error::Http(HttpError::UnsuccessfulRequest(Mutex::new(response))))
     }
 }
 
@@ -1747,5 +1748,5 @@ pub(super) fn wind(expected: u16, req: Request) -> Result<()> {
     debug!("Expected {}, got {}", expected, resp.status);
     trace!("Unsuccessful response: {:?}", resp);
 
-    Err(Error::Http(HttpError::UnsuccessfulRequest(resp)))
+    Err(Error::Http(HttpError::UnsuccessfulRequest(Mutex::new(resp))))
 }

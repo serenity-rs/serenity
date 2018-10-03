@@ -5,13 +5,15 @@ use std::{
         Display,
         Formatter,
         Result as FmtResult
-    }
+    },
+    borrow::Borrow
 };
+use parking_lot::Mutex;
 
 #[derive(Debug)]
 pub enum Error {
     /// When a non-successful status code was received for a request.
-    UnsuccessfulRequest(Response),
+    UnsuccessfulRequest(Mutex<Response>),
     /// When the decoding of a ratelimit header could not be properly decoded
     /// into an `i64`.
     RateLimitI64,
@@ -21,7 +23,7 @@ pub enum Error {
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult { f.write_str(self.description()) }
+    fn fmt(&self, f: &mut Formatter) -> FmtResult { f.write_str(self.borrow().description()) }
 }
 
 impl StdError for Error {
