@@ -174,6 +174,36 @@ impl Activity {
             url: None,
         }
     }
+
+
+    /// Creates a `Game` struct that appears as a `Watching <name>` status.
+    ///
+    /// **Note**: Maximum `name` length is 128.
+    ///
+    /// # Examples
+    ///
+    /// Create a command that sets the current game being played:
+    ///
+    /// ```rust,no_run
+    /// # #[macro_use] extern crate serenity;
+    /// #
+    /// use serenity::framework::standard::Args;
+    /// use serenity::model::gateway::Game;
+    ///
+    /// command!(listen(ctx, _msg, args) {
+    ///     let name = args.full();
+    ///     ctx.set_game(Game::watching(&name));
+    /// });
+    /// #
+    /// # fn main() {}
+    /// ```
+    pub fn watching(name: &str) -> Game {
+        Game {
+            kind: GameType::Watching,
+            name: name.to_string(),
+            url: None,
+        }
+    }
 }
 
 impl<'de> Deserialize<'de> for Activity {
@@ -306,6 +336,8 @@ pub enum ActivityType {
     Streaming = 1,
     /// An indicator that the user is listening to something.
     Listening = 2,
+    /// An indicator that the user is watching something.
+    Watching = 3,
 }
 
 enum_number!(
@@ -313,6 +345,7 @@ enum_number!(
         Playing,
         Streaming,
         Listening,
+        Watching,
     }
 );
 
@@ -324,6 +357,7 @@ impl ActivityType {
             Playing => 0,
             Streaming => 1,
             Listening => 2,
+            Watching => 3,
         }
     }
 }
