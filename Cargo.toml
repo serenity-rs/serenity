@@ -62,12 +62,13 @@ version = "0.2"
 
 [dependencies.rand]
 optional = true
-version = "^0.4"
+version = "^0.5"
 
 [dependencies.sodiumoxide]
 default-features = false
+features = ["std"]
 optional = true
-version = "0.0.14"
+version = "0.1"
 
 [dependencies.threadpool]
 optional = true
@@ -84,7 +85,7 @@ optional = true
 version = "0.0.3"
 
 [dev-dependencies.matches]
-version = "0.1.6"
+version = "0.1.8"
 
 [features]
 default = [
