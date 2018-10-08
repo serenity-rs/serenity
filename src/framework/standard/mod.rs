@@ -1160,6 +1160,21 @@ impl Framework for StandardFramework {
                                 Args::new(&orginal_round[longest_matching_prefix_len..], &self.configuration.delimiters)
                             };
 
+                            if let Some(error) = self.should_fail(
+                                &mut context,
+                                &message,
+                                &command.options(),
+                                &group,
+                                &mut args,
+                                &to_check,
+                                &built,
+                            ) {
+                                if let Some(ref handler) = self.dispatch_error_handler {
+                                    handler(context, message, error);
+                                }
+                                return;
+                            }
+
                             threadpool.execute(move || {
                                 if let Some(before) = before {
                                     if !(before)(&mut context, &message, &args.full()) {
