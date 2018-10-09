@@ -14,8 +14,10 @@ pub use self::{
 use base64;
 use internal::prelude::*;
 use model::{
+    channel::Channel,
     misc::EmojiIdentifier,
     id::{
+        ChannelId,
         EmojiId,
         RoleId,
         UserId,
@@ -544,8 +546,8 @@ pub enum Discriminator {
     Hide,
 }
 
-/// Neutralises role and user mentions including `@everyone` and `@here`
-/// using the [`Cache`] only.
+/// Neutralises role, channel, and user mentions including `@everyone`
+/// and `@here` using the [`Cache`] only.
 ///
 /// `show_discriminator` can be set to
 /// [`Discriminator::Show`] to output a user's discriminator as in `@user#1234`
@@ -586,6 +588,29 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
                     s.replace(&to_replace, &role.name)
                 } else {
                     s.replace(&to_replace, &"deleted-role")
+                };
+            }
+        } else {
+            break;
+        }
+    }
+
+    while let Some(mut mention_start) = s.find("<#") {
+
+        if let Some(mut mention_end) = s[mention_start..].find(">") {
+            mention_end += mention_start;
+            mention_start += "<#".len();
+
+            if let Ok(id) =
+                ChannelId::from_str(&s[mention_start..mention_end]) {
+                let to_replace = format!("<#{}>", &id.as_u64());
+
+                s = if let Some(Channel::Guild(channel))
+                    = id.to_channel_cached() {
+                    let replacement = format!("#{}", &channel.read().name);
+                    s.replace(&to_replace, &replacement)
+                } else {
+                    s.replace(&to_replace, &"#deleted-channel")
                 };
             }
         } else {
