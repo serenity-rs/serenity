@@ -13,15 +13,22 @@ pub use self::{
 
 use base64;
 use internal::prelude::*;
-use model::id::EmojiId;
-use model::misc::EmojiIdentifier;
+use model::{
+    misc::EmojiIdentifier,
+    id::{
+        EmojiId,
+        RoleId,
+        UserId,
+    },
+};
 use std::{
     collections::HashMap,
     ffi::OsStr,
     fs::File,
     hash::{BuildHasher, Hash},
     io::Read,
-    path::Path
+    path::Path,
+    str::FromStr,
 };
 
 #[cfg(feature = "cache")]
@@ -524,6 +531,84 @@ pub fn with_cache_mut<T, F>(mut f: F) -> T
     where F: FnMut(&mut Cache) -> T {
     let mut cache = CACHE.write();
     f(&mut cache)
+}
+
+/// Neutralises role and user mentions including `@everyone` and `@here`
+/// using the Cache only.
+///
+/// **Info**:
+/// If the `String` contains a valid structure as in `<@!{id}>`
+/// but `{id}` represents an invalid identifier the constellation
+/// will be replaced with `@deleted-user` or `@deleted-role` respectively.
+///
+/// # Examples
+///
+/// Sanitise an `@everyone` mention.
+///
+/// ```rust,ignore
+/// use serenity::utils;
+///
+/// let mut everyone_mention = "@everyone".to_string();
+/// utils::content_safe(&mut everyone_mention);
+///
+/// assert_eq!("@\u{200B}everyone".to_string(), everyone_mention);
+/// ```
+#[cfg(feature = "cache")]
+pub fn content_safe(s: &mut String) {
+    while let Some(mut mention_start) = s.find("<@&") {
+
+        if let Some(mut mention_end) = s[mention_start..].find(">") {
+            mention_end += mention_start;
+            mention_start += "<@&".len();
+
+            if let Ok(role_id) = RoleId::from_str(&s[mention_start..mention_end]) {
+
+                *s = if let Some(role) = role_id.to_role_cached() {
+                    s.replace(&format!("<@&{}>", &role_id.as_u64()), &role.name)
+                } else {
+                    s.replace(&format!("<@&{}>", &role_id.as_u64()), &"deleted-role")
+                }
+            }
+        } else {
+            break;
+        }
+    }
+
+    while let Some(mut mention_start) = s.find("<@") {
+
+        if let Some(mut mention_end) = s[mention_start..].find(">") {
+            mention_end += mention_start;
+            mention_start += "<@".len();
+            let mut has_exclamation = false;
+
+            if s[mention_start..].as_bytes().get(0)
+                .map_or_else(|| false, |c| *c == b'!') {
+                mention_start += "!".len();
+                has_exclamation = true;
+            }
+
+            if let Ok(id) = UserId::from_str(&s[mention_start..mention_end]) {
+                let user = CACHE.read().users.get(&id).map(|user| user.clone());
+                let mention_start = if has_exclamation { "<@!" } else { "<@" };
+
+                *s = if let Some(user) = user {
+                    let user = user.read();
+                    let replacement = format!("@{}#{:04}", &user.name, user.discriminator);
+                    s.replace(&format!("{}{}>", mention_start, id.as_u64()), &replacement)
+                } else {
+                    s.replace(&format!("{}{}>", mention_start, id.as_u64()), &"deleted-user")
+                }
+            } else {
+                break;
+            }
+        } else {
+            break;
+        }
+    }
+
+    *s = s
+        .replace("@everyone", "@\u{200B}everyone")
+        .replace("@here", "@\u{200B}here");
 }
 
 #[cfg(test)]
