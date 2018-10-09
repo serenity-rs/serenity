@@ -535,46 +535,80 @@ pub fn with_cache_mut<T, F>(mut f: F) -> T
     f(&mut cache)
 }
 
-/// Enum to pass as setting on [`content_safe`].
-/// `Show` concatenates a user's discriminators.
-/// `Hide` outputs the defused user mention only.
+/// Struct that allows to alter [`content_safe`]'s behaviour.
 ///
 /// [`content_safe`]: fn.content_safe.html
 #[cfg(feature = "cache")]
-pub enum Discriminator {
-    Show,
-    Hide,
+pub struct ContentSafeOptions {
+    clean_role: bool,
+    clean_user: bool,
+    clean_channel: bool,
+    show_discriminator: bool,
 }
 
-/// Neutralises role, channel, and user mentions including `@everyone`
-/// and `@here` using the [`Cache`] only.
-///
-/// `show_discriminator` can be set to
-/// [`Discriminator::Show`] to output a user's discriminator as in `@user#1234`
-/// or set to [`Discriminator::Hide`] to output `@user`.
-///
-/// # Examples
-///
-/// Sanitise an `@everyone` mention.
-///
-/// ```rust,ignore
-/// use serenity::utils::{
-///     content_safe,
-///     Discriminator,
-/// };
-///
-/// let everyone_mention = "@everyone";
-/// let defused_mention = content_safe(&everyone_mention, Discriminator::Hide);
-///
-/// assert_eq!("@\u{200B}everyone".to_string(), defused_mention);
-/// ```
-/// [`Discriminator::Hide`]: enum.Discriminator.html#variant.Hide
-/// [`Discriminator::Show`]: enum.Discriminator.html#variant.Show
-/// [`Cache`]: ../cache/struct.Cache.html
 #[cfg(feature = "cache")]
-pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
-    let mut s = s.to_string();
+impl ContentSafeOptions {
+    /// [`content_safe`] will replace role mentions (`<@&{id}>`) with its name
+    /// prefixed with `@` (`@rolename`) or with `@deleted-role` if the
+    /// identifier is invalid.
+    ///
+    /// [`content_safe`]: fn.content_safe.html
+    pub fn clean_role(mut self, b: bool) -> Self {
+        self.clean_role = b;
 
+        self
+    }
+
+    /// If set to true, [`content_safe`] will replace user mentions
+    /// (`<@!{id}>` or `<@{id}>`) with the user's name prefixed with `@`
+    /// (`@username`) or with `@invalid-user` if the identifier is invalid.
+    ///
+    /// [`content_safe`]: fn.content_safe.html
+    pub fn clean_user(mut self, b: bool) -> Self {
+        self.clean_user = b;
+
+        self
+    }
+
+    /// If set to true, [`content_safe`] will replace channel mentions
+    /// (`<#{id}>`) with the channel's name prefixed with `#`
+    /// (`#channelname`) or with `#deleted-channel` if the identifier is
+    /// invalid.
+    ///
+    /// [`content_safe`]: fn.content_safe.html
+    pub fn clean_channel(mut self, b: bool) -> Self {
+        self.clean_channel = b;
+
+        self
+    }
+
+    /// If set to true, if [`content_safe`] replaces a user mention it will
+    /// add their four digit discriminator with a preceeding `#`,
+    /// turning `@username` to `@username#discriminator`.
+    ///
+    /// [`content_safe`]: fn.content_safe.html
+    pub fn show_discriminator(mut self, b: bool) -> Self {
+        self.show_discriminator = b;
+
+        self
+    }
+}
+
+#[cfg(feature = "cache")]
+impl Default for ContentSafeOptions {
+    /// Instantiates with all options set to `true`.
+    fn default() -> Self {
+        ContentSafeOptions {
+            clean_role: true,
+            clean_user: true,
+            clean_channel: true,
+            show_discriminator: true,
+        }
+    }
+}
+
+#[cfg(feature = "cache")]
+fn clean_roles(s: &mut String) {
     while let Some(mut mention_start) = s.find("<@&") {
 
         if let Some(mut mention_end) = s[mention_start..].find(">") {
@@ -584,8 +618,8 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
             if let Ok(id) = RoleId::from_str(&s[mention_start..mention_end]) {
                 let to_replace = format!("<@&{}>", &id.as_u64());
 
-                s = if let Some(role) = id.to_role_cached() {
-                    s.replace(&to_replace, &role.name)
+                *s = if let Some(role) = id.to_role_cached() {
+                    s.replace(&to_replace, &format!("@{}", &role.name))
                 } else {
                     s.replace(&to_replace, &"deleted-role")
                 };
@@ -594,7 +628,10 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
             break;
         }
     }
+}
 
+#[cfg(feature = "cache")]
+fn clean_channels(s: &mut String) {
     while let Some(mut mention_start) = s.find("<#") {
 
         if let Some(mut mention_end) = s[mention_start..].find(">") {
@@ -605,7 +642,7 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
                 ChannelId::from_str(&s[mention_start..mention_end]) {
                 let to_replace = format!("<#{}>", &id.as_u64());
 
-                s = if let Some(Channel::Guild(channel))
+                *s = if let Some(Channel::Guild(channel))
                     = id.to_channel_cached() {
                     let replacement = format!("#{}", &channel.read().name);
                     s.replace(&to_replace, &replacement)
@@ -617,7 +654,10 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
             break;
         }
     }
+}
 
+#[cfg(feature = "cache")]
+fn clean_users(s: &mut String, show_discriminator: bool) {
     while let Some(mut mention_start) = s.find("<@") {
 
         if let Some(mut mention_end) = s[mention_start..].find(">") {
@@ -636,11 +676,10 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
                 let code_start = if has_exclamation { "<@!" } else { "<@" };
                 let to_replace = format!("{}{}>", code_start, id.as_u64());
 
-                s = if let Some(user) = user {
+                *s = if let Some(user) = user {
                     let user = user.read();
 
-                    let mut replacement =
-                        if let Discriminator::Show = show_discriminator {
+                    let mut replacement = if show_discriminator {
                         format!("@{}#{:04}", user.name, user.discriminator)
                     } else {
                         format!("@{}#{:04}", user.name, user.discriminator)
@@ -654,6 +693,45 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
         } else {
             break;
         }
+    }
+}
+
+/// Neutralises role, channel, and user mentions including `@everyone`
+/// and `@here` using the [`Cache`] only.
+///
+/// [`ContentSafeOptions`] alters behaviour of this function.
+///
+/// # Examples
+///
+/// Sanitise an `@everyone` mention.
+///
+/// ```rust,ignore
+/// use serenity::utils::{
+///     content_safe,
+///     Discriminator,
+/// };
+///
+/// let everyone_mention = "@everyone";
+/// let defused_mention = content_safe(&everyone_mention, Discriminator::Hide);
+///
+/// assert_eq!("@\u{200B}everyone".to_string(), defused_mention);
+/// ```
+/// [`ContentSafeOptions`]: struct.Discriminator.html
+/// [`Cache`]: ../cache/struct.Cache.html
+#[cfg(feature = "cache")]
+pub fn content_safe(s: &str, options: ContentSafeOptions) -> String {
+    let mut s = s.to_string();
+
+    if options.clean_role {
+        clean_roles(&mut s);
+    }
+
+    if options.clean_channel {
+        clean_channels(&mut s);
+    }
+
+    if options.clean_user {
+        clean_users(&mut s, options.show_discriminator)
     }
 
     s
