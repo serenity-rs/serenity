@@ -533,13 +533,23 @@ pub fn with_cache_mut<T, F>(mut f: F) -> T
     f(&mut cache)
 }
 
-/// Neutralises role and user mentions including `@everyone` and `@here`
-/// using the Cache only.
+/// Enum to pass as setting on [`content_safe`].
+/// `Show` concatenates a user's discriminators.
+/// `Hide` outputs the defused user mention only.
 ///
-/// **Info**:
-/// If the `String` contains a valid structure as in `<@!{id}>`
-/// but `{id}` represents an invalid identifier the constellation
-/// will be replaced with `@deleted-user` or `@deleted-role` respectively.
+/// [`content_safe`]: fn.content_safe.html
+#[cfg(feature = "cache")]
+pub enum Discriminator {
+    Show,
+    Hide,
+}
+
+/// Neutralises role and user mentions including `@everyone` and `@here`
+/// using the [`Cache`] only.
+///
+/// `show_discriminator` can be set to
+/// [`Discriminator::Show`] to output a user's discriminator as in `@user#1234`
+/// or set to [`Discriminator::Hide`] to output `@user`.
 ///
 /// # Examples
 ///
@@ -549,13 +559,19 @@ pub fn with_cache_mut<T, F>(mut f: F) -> T
 /// use serenity::utils;
 ///
 /// let mut everyone_mention = "@everyone".to_string();
-/// utils::content_safe(&mut everyone_mention);
+/// utils::content_safe(&mut everyone_mention, utils::Discriminator::Hide);
 ///
 /// assert_eq!("@\u{200B}everyone".to_string(), everyone_mention);
 /// ```
+/// [`Discriminator::Hide`]: enum.Discriminator.html#variant.Hide
+/// [`Discriminator::Show`]: enum.Discriminator.html#variant.Show
+/// [`Cache`]: ../cache/struct.Cache.html
 #[cfg(feature = "cache")]
-pub fn content_safe(s: &mut String) {
-    while let Some(mut mention_start) = s.find("<@&") {
+pub fn content_safe(s: &mut String, show_discriminator: Discriminator) {
+    let mut progress = 0;
+
+    while let Some(mut mention_start) = s[progress..].find("<@&") {
+        mention_start += progress;
 
         if let Some(mut mention_end) = s[mention_start..].find(">") {
             mention_end += mention_start;
@@ -567,14 +583,21 @@ pub fn content_safe(s: &mut String) {
                     s.replace(&format!("<@&{}>", &role_id.as_u64()), &role.name)
                 } else {
                     s.replace(&format!("<@&{}>", &role_id.as_u64()), &"deleted-role")
-                }
+                };
+
+                progress = mention_end;
+            } else {
+                progress = mention_end;
             }
         } else {
             break;
         }
     }
 
-    while let Some(mut mention_start) = s.find("<@") {
+    progress = 0;
+
+    while let Some(mut mention_start) = s[progress..].find("<@") {
+        mention_start += progress;
 
         if let Some(mut mention_end) = s[mention_start..].find(">") {
             mention_end += mention_start;
@@ -593,13 +616,19 @@ pub fn content_safe(s: &mut String) {
 
                 *s = if let Some(user) = user {
                     let user = user.read();
-                    let replacement = format!("@{}#{:04}", &user.name, user.discriminator);
+                    let replacement = match show_discriminator {
+                        Discriminator::Show => format!("@{}#{:04}", &user.name, user.discriminator),
+                        Discriminator::Hide => format!("@{}", &user.name),
+                    };
+
                     s.replace(&format!("{}{}>", mention_start, id.as_u64()), &replacement)
                 } else {
-                    s.replace(&format!("{}{}>", mention_start, id.as_u64()), &"deleted-user")
-                }
+                    s.replace(&format!("{}{}>", mention_start, id.as_u64()), &"invalid-user")
+                };
+
+                progress = mention_end;
             } else {
-                break;
+                progress = mention_end;
             }
         } else {
             break;
