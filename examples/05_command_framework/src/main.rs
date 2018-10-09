@@ -254,6 +254,7 @@ command!(commands(ctx, msg, _args) {
 
 // Repeats what the user passed as argument but ensures that user and role
 // mentions are replaced with a safe textual alternative.
+// In this example channel mentions are excluded via the `ContentSafeOptions`.
 command!(say(_ctx, msg, args) {
     let mut content = content_safe(&args.full(), ContentSafeOptions::default()
         .clean_channel(false));
