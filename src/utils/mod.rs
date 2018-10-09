@@ -584,7 +584,7 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
             if let Ok(id) = RoleId::from_str(&s[mention_start..mention_end]) {
                 let to_replace = format!("<@&{}>", &id.as_u64());
 
-                if let Some(role) = id.to_role_cached() {
+                s = if let Some(role) = id.to_role_cached() {
                     s.replace(&to_replace, &role.name)
                 } else {
                     s.replace(&to_replace, &"deleted-role")
