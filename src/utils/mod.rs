@@ -700,7 +700,7 @@ fn clean_users(s: &mut String, show_discriminator: bool) {
 
                     s.replace(&to_replace, &replacement)
                 } else {
-                    s.replace(&to_replace, &"invalid-user")
+                    s.replace(&to_replace, &"@invalid-user")
                 };
             } else {
                 progress = mention_end;
