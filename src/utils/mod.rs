@@ -624,7 +624,7 @@ fn clean_roles(s: &mut String) {
                 *s = if let Some(role) = id.to_role_cached() {
                     s.replace(&to_replace, &format!("@{}", &role.name))
                 } else {
-                    s.replace(&to_replace, &"deleted-role")
+                    s.replace(&to_replace, &"@deleted-role")
                 };
             } else {
                 progress = mention_end;
