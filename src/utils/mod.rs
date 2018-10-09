@@ -558,17 +558,18 @@ pub enum Discriminator {
 /// ```rust,ignore
 /// use serenity::utils;
 ///
-/// let mut everyone_mention = "@everyone".to_string();
-/// utils::content_safe(&mut everyone_mention, utils::Discriminator::Hide);
+/// let everyone_mention = "@everyone";
+/// let defused_mention = utils::content_safe(&everyone_mention, utils::Discriminator::Hide);
 ///
-/// assert_eq!("@\u{200B}everyone".to_string(), everyone_mention);
+/// assert_eq!("@\u{200B}everyone".to_string(), defused_mention);
 /// ```
 /// [`Discriminator::Hide`]: enum.Discriminator.html#variant.Hide
 /// [`Discriminator::Show`]: enum.Discriminator.html#variant.Show
 /// [`Cache`]: ../cache/struct.Cache.html
 #[cfg(feature = "cache")]
-pub fn content_safe(s: &mut String, show_discriminator: Discriminator) {
+pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
     let mut progress = 0;
+    let mut s = s.to_string();
 
     while let Some(mut mention_start) = s[progress..].find("<@&") {
         mention_start += progress;
@@ -579,7 +580,7 @@ pub fn content_safe(s: &mut String, show_discriminator: Discriminator) {
 
             if let Ok(role_id) = RoleId::from_str(&s[mention_start..mention_end]) {
 
-                *s = if let Some(role) = role_id.to_role_cached() {
+                s = if let Some(role) = role_id.to_role_cached() {
                     s.replace(&format!("<@&{}>", &role_id.as_u64()), &role.name)
                 } else {
                     s.replace(&format!("<@&{}>", &role_id.as_u64()), &"deleted-role")
@@ -614,7 +615,7 @@ pub fn content_safe(s: &mut String, show_discriminator: Discriminator) {
                 let user = CACHE.read().users.get(&id).map(|user| user.clone());
                 let mention_start = if has_exclamation { "<@!" } else { "<@" };
 
-                *s = if let Some(user) = user {
+                s = if let Some(user) = user {
                     let user = user.read();
                     let replacement = match show_discriminator {
                         Discriminator::Show => format!("@{}#{:04}", &user.name, user.discriminator),
@@ -635,9 +636,9 @@ pub fn content_safe(s: &mut String, show_discriminator: Discriminator) {
         }
     }
 
-    *s = s
+    s
         .replace("@everyone", "@\u{200B}everyone")
-        .replace("@here", "@\u{200B}here");
+        .replace("@here", "@\u{200B}here")
 }
 
 #[cfg(test)]
