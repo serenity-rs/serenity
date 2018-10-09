@@ -609,7 +609,10 @@ impl Default for ContentSafeOptions {
 
 #[cfg(feature = "cache")]
 fn clean_roles(s: &mut String) {
-    while let Some(mut mention_start) = s.find("<@&") {
+    let mut progress = 0;
+
+    while let Some(mut mention_start) = s[progress..].find("<@&") {
+        mention_start += progress;
 
         if let Some(mut mention_end) = s[mention_start..].find(">") {
             mention_end += mention_start;
@@ -623,6 +626,8 @@ fn clean_roles(s: &mut String) {
                 } else {
                     s.replace(&to_replace, &"deleted-role")
                 };
+            } else {
+                progress = mention_end;
             }
         } else {
             break;
@@ -632,7 +637,10 @@ fn clean_roles(s: &mut String) {
 
 #[cfg(feature = "cache")]
 fn clean_channels(s: &mut String) {
-    while let Some(mut mention_start) = s.find("<#") {
+    let mut progress = 0;
+
+    while let Some(mut mention_start) = s[progress..].find("<#") {
+        mention_start += progress;
 
         if let Some(mut mention_end) = s[mention_start..].find(">") {
             mention_end += mention_start;
@@ -649,6 +657,8 @@ fn clean_channels(s: &mut String) {
                 } else {
                     s.replace(&to_replace, &"#deleted-channel")
                 };
+            } else {
+                progress = mention_end;
             }
         } else {
             break;
@@ -658,7 +668,10 @@ fn clean_channels(s: &mut String) {
 
 #[cfg(feature = "cache")]
 fn clean_users(s: &mut String, show_discriminator: bool) {
-    while let Some(mut mention_start) = s.find("<@") {
+    let mut progress = 0;
+
+    while let Some(mut mention_start) = s[progress..].find("<@") {
+        mention_start += progress;
 
         if let Some(mut mention_end) = s[mention_start..].find(">") {
             mention_end += mention_start;
@@ -689,6 +702,8 @@ fn clean_users(s: &mut String, show_discriminator: bool) {
                 } else {
                     s.replace(&to_replace, &"invalid-user")
                 };
+            } else {
+                progress = mention_end;
             }
         } else {
             break;
