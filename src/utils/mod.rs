@@ -589,11 +589,9 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
                 } else {
                     s.replace(&to_replace, &"deleted-role")
                 };
-
-                progress = mention_end;
-            } else {
-                progress = mention_end;
             }
+
+            progress = mention_end;
         } else {
             break;
         }
@@ -610,7 +608,7 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
             let mut has_exclamation = false;
 
             if s[mention_start..].as_bytes().get(0)
-                .map_or_else(|| false, |c| *c == b'!') {
+                .map_or(false, |c| *c == b'!') {
                 mention_start += "!".len();
                 has_exclamation = true;
             }
@@ -634,11 +632,9 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
                 } else {
                     s.replace(&to_replace, &"invalid-user")
                 };
-
-                progress = mention_end;
-            } else {
-                progress = mention_end;
             }
+
+            progress = mention_end;
         } else {
             break;
         }
