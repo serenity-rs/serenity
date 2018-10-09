@@ -556,10 +556,13 @@ pub enum Discriminator {
 /// Sanitise an `@everyone` mention.
 ///
 /// ```rust,ignore
-/// use serenity::utils;
+/// use serenity::utils::{
+///     content_safe,
+///     Discriminator,
+/// };
 ///
 /// let everyone_mention = "@everyone";
-/// let defused_mention = utils::content_safe(&everyone_mention, utils::Discriminator::Hide);
+/// let defused_mention = content_safe(&everyone_mention, Discriminator::Hide);
 ///
 /// assert_eq!("@\u{200B}everyone".to_string(), defused_mention);
 /// ```
@@ -578,12 +581,13 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
             mention_end += mention_start;
             mention_start += "<@&".len();
 
-            if let Ok(role_id) = RoleId::from_str(&s[mention_start..mention_end]) {
+            if let Ok(id) = RoleId::from_str(&s[mention_start..mention_end]) {
+                let to_replace = format!("<@&{}>", &id.as_u64());
 
-                s = if let Some(role) = role_id.to_role_cached() {
-                    s.replace(&format!("<@&{}>", &role_id.as_u64()), &role.name)
+                if let Some(role) = id.to_role_cached() {
+                    s.replace(&to_replace, &role.name)
                 } else {
-                    s.replace(&format!("<@&{}>", &role_id.as_u64()), &"deleted-role")
+                    s.replace(&to_replace, &"deleted-role")
                 };
 
                 progress = mention_end;
@@ -614,17 +618,21 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
             if let Ok(id) = UserId::from_str(&s[mention_start..mention_end]) {
                 let user = CACHE.read().users.get(&id).map(|user| user.clone());
                 let mention_start = if has_exclamation { "<@!" } else { "<@" };
+                let to_replace = format!("{}{}>", mention_start, id.as_u64());
 
                 s = if let Some(user) = user {
                     let user = user.read();
-                    let replacement = match show_discriminator {
-                        Discriminator::Show => format!("@{}#{:04}", &user.name, user.discriminator),
-                        Discriminator::Hide => format!("@{}", &user.name),
+
+                    let mut replacement =
+                        if let Discriminator::Show = show_discriminator {
+                        format!("@{}#{:04}", user.name, user.discriminator)
+                    } else {
+                        format!("@{}#{:04}", user.name, user.discriminator)
                     };
 
-                    s.replace(&format!("{}{}>", mention_start, id.as_u64()), &replacement)
+                    s.replace(&to_replace, &replacement)
                 } else {
-                    s.replace(&format!("{}{}>", mention_start, id.as_u64()), &"invalid-user")
+                    s.replace(&to_replace, &"invalid-user")
                 };
 
                 progress = mention_end;
