@@ -20,6 +20,7 @@ use serenity::model::gateway::Ready;
 use serenity::model::Permissions;
 use serenity::prelude::Mutex;
 use serenity::prelude::*;
+use serenity::utils::{content_safe, Discriminator};
 use std::collections::HashMap;
 use std::env;
 use std::fmt::Write;
@@ -172,6 +173,10 @@ fn main() {
             // Make this command use the "complicated" bucket.
             .bucket("complicated")
             .cmd(commands))
+        // Command that will repeat passed arguments and remove user and
+        // role mentions with safe alternative.
+        .command("say", |c| c
+            .cmd(say))
         .group("Emoji", |g| g
             // Sets multiple prefixes for a group.
             // This requires us to call commands in this group
@@ -243,6 +248,16 @@ command!(commands(ctx, msg, _args) {
     }
 
     if let Err(why) = msg.channel_id.say(&contents) {
+        println!("Error sending message: {:?}", why);
+    }
+});
+
+// Repeats what the user passed as argument but ensures that user and role
+// mentions are replaced with a safe textual alternative.
+command!(say(_ctx, msg, args) {
+    let mut content = content_safe(&args.full(), Discriminator::Show);
+
+    if let Err(why) = msg.channel_id.say(&content) {
         println!("Error sending message: {:?}", why);
     }
 });
