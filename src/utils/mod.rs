@@ -626,8 +626,17 @@ fn clean_roles(s: &mut String) {
                 } else {
                     s.replace(&to_replace, &"@deleted-role")
                 };
-            } else {
-                progress = mention_end;
+            } else  {
+                let id = &s[mention_start..mention_end].to_string();
+
+                if !id.is_empty() && id.as_bytes().iter()
+                    .all(u8::is_ascii_digit){
+                    let to_replace = format!("<@&{}>", id);
+
+                    *s = s.replace(&to_replace, &"@deleted-role");
+                } else {
+                    progress = mention_end;
+                }
             }
         } else {
             break;
@@ -657,8 +666,17 @@ fn clean_channels(s: &mut String) {
                 } else {
                     s.replace(&to_replace, &"#deleted-channel")
                 };
-            } else {
-                progress = mention_end;
+            } else  {
+                let id = &s[mention_start..mention_end].to_string();
+
+                if !id.is_empty() && id.as_bytes().iter()
+                    .all(u8::is_ascii_digit){
+                    let to_replace = format!("<#{}>", id);
+
+                    *s = s.replace(&to_replace, &"#deleted-channel");
+                } else {
+                    progress = mention_end;
+                }
             }
         } else {
             break;
@@ -702,8 +720,18 @@ fn clean_users(s: &mut String, show_discriminator: bool) {
                 } else {
                     s.replace(&to_replace, &"@invalid-user")
                 };
-            } else {
-                progress = mention_end;
+            } else  {
+                let id = &s[mention_start..mention_end].to_string();
+
+                if !id.is_empty() && id.as_bytes().iter()
+                    .all(u8::is_ascii_digit){
+                    let code_start = if has_exclamation { "<@!" } else { "<@" };
+                    let to_replace = format!("{}{}>", code_start, id);
+
+                    *s = s.replace(&to_replace, &"@invalid-user");
+                } else {
+                    progress = mention_end;
+                }
             }
         } else {
             break;
