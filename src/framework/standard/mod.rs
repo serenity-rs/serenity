@@ -1205,8 +1205,9 @@ impl Framework for StandardFramework {
 
 #[cfg(feature = "cache")]
 pub fn has_correct_permissions(command: &Arc<CommandOptions>, message: &Message) -> bool {
-    if !command.required_permissions.is_empty() {
-
+    if command.required_permissions.is_empty() {
+        true
+    } else {
         if let Some(guild) = message.guild() {
             let perms = guild
                 .with(|g| g.permissions_in(message.channel_id, message.author.id));
@@ -1215,8 +1216,6 @@ pub fn has_correct_permissions(command: &Arc<CommandOptions>, message: &Message)
         } else {
             false
         }
-    } else {
-        true
     }
 }
 
