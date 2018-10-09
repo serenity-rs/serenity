@@ -571,11 +571,9 @@ pub enum Discriminator {
 /// [`Cache`]: ../cache/struct.Cache.html
 #[cfg(feature = "cache")]
 pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
-    let mut progress = 0;
     let mut s = s.to_string();
 
-    while let Some(mut mention_start) = s[progress..].find("<@&") {
-        mention_start += progress;
+    while let Some(mut mention_start) = s.find("<@&") {
 
         if let Some(mut mention_end) = s[mention_start..].find(">") {
             mention_end += mention_start;
@@ -590,17 +588,12 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
                     s.replace(&to_replace, &"deleted-role")
                 };
             }
-
-            progress = mention_end;
         } else {
             break;
         }
     }
 
-    progress = 0;
-
-    while let Some(mut mention_start) = s[progress..].find("<@") {
-        mention_start += progress;
+    while let Some(mut mention_start) = s.find("<@") {
 
         if let Some(mut mention_end) = s[mention_start..].find(">") {
             mention_end += mention_start;
@@ -615,8 +608,8 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
 
             if let Ok(id) = UserId::from_str(&s[mention_start..mention_end]) {
                 let user = CACHE.read().users.get(&id).map(|user| user.clone());
-                let mention_start = if has_exclamation { "<@!" } else { "<@" };
-                let to_replace = format!("{}{}>", mention_start, id.as_u64());
+                let code_start = if has_exclamation { "<@!" } else { "<@" };
+                let to_replace = format!("{}{}>", code_start, id.as_u64());
 
                 s = if let Some(user) = user {
                     let user = user.read();
@@ -633,8 +626,6 @@ pub fn content_safe(s: &str, show_discriminator: Discriminator) -> String {
                     s.replace(&to_replace, &"invalid-user")
                 };
             }
-
-            progress = mention_end;
         } else {
             break;
         }
