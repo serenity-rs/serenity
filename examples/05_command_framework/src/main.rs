@@ -20,7 +20,7 @@ use serenity::model::gateway::Ready;
 use serenity::model::Permissions;
 use serenity::prelude::Mutex;
 use serenity::prelude::*;
-use serenity::utils::{content_safe, Discriminator};
+use serenity::utils::{content_safe, ContentSafeOptions};
 use std::collections::HashMap;
 use std::env;
 use std::fmt::Write;
@@ -255,7 +255,8 @@ command!(commands(ctx, msg, _args) {
 // Repeats what the user passed as argument but ensures that user and role
 // mentions are replaced with a safe textual alternative.
 command!(say(_ctx, msg, args) {
-    let mut content = content_safe(&args.full(), Discriminator::Show);
+    let mut content = content_safe(&args.full(), ContentSafeOptions::default()
+        .clean_channel(false));
 
     if let Err(why) = msg.channel_id.say(&content) {
         println!("Error sending message: {:?}", why);
