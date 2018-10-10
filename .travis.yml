@@ -26,5 +26,5 @@ before_script:
   - cd ..
   - export PATH="$PATH:$HOME/.cargo/bin"
 script:
-  - cargo build --all-features
+  - travis_wait cargo build --all-features
   - cargo test --all-features
