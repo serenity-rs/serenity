@@ -759,7 +759,7 @@ fn clean_users(s: &mut String, show_discriminator: bool) {
 ///
 /// assert_eq!("@\u{200B}everyone".to_string(), defused_mention);
 /// ```
-/// [`ContentSafeOptions`]: struct.Discriminator.html
+/// [`ContentSafeOptions`]: struct.ContentSafeOptions.html
 /// [`Cache`]: ../cache/struct.Cache.html
 #[cfg(feature = "cache")]
 pub fn content_safe(s: &str, options: ContentSafeOptions) -> String {
