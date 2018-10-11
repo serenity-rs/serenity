@@ -198,11 +198,11 @@ impl CreateGroup {
     /// Adds a command for a group that will be executed if no command-name
     /// has been passed.
     pub fn default_cmd<C: Command + 'static>(mut self, c: C) -> Self {
-        let cmd: Arc<Command> = Arc::new(c);
+        c.init();
 
-        self.0.default_command = Some(CommandOrAlias::Command(Arc::clone(&cmd)));
-
-        cmd.init();
+        let cmd_with_group_options = self.build_command().cmd(c).finish();
+        let cmd_finished = CommandOrAlias::Command(cmd_with_group_options);
+        self.0.default_command = Some(cmd_finished);
 
         self
     }
