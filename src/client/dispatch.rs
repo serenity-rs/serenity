@@ -25,15 +25,16 @@ use std::time::Duration;
 #[cfg(feature = "cache")]
 use super::CACHE;
 
+lazy_static! {
+    pub static ref CACHE_TRY_WRITE_DURATION: Duration =
+        CACHE.read().get_try_write_duration();
+}
+
 macro_rules! update {
     ($event:expr) => {
         {
             #[cfg(feature = "cache")]
             {
-                lazy_static! {
-                    pub static ref CACHE_TRY_WRITE_DURATION: Duration =
-                        CACHE.read().get_try_write_duration();
-                }
                 if let Some(mut lock) = CACHE.try_write_for(*CACHE_TRY_WRITE_DURATION) {
                     lock.update(&mut $event)
                 } else {
