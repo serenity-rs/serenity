@@ -540,6 +540,7 @@ pub fn with_cache_mut<T, F>(mut f: F) -> T
 ///
 /// [`content_safe`]: fn.content_safe.html
 #[cfg(feature = "cache")]
+#[derive(Clone, Debug)]
 pub struct ContentSafeOptions {
     clean_role: bool,
     clean_user: bool,
