@@ -70,16 +70,32 @@ impl Settings {
     ///
     /// Refer to [`cache_lock_time`] for more information.
     ///
+    /// **Note**: Should be set before the client gets started, as it can not be
+    /// changed after the first read of the duration.
+    ///
     /// # Examples
     ///
     /// Set the time that it will try to aquire a lock.
     ///
     /// ```rust
     /// use std::time::Duration;
-    /// use serenity::cache::Settings;
+    /// use serenity::prelude::*;
     ///
-    /// let mut settings = Settings::new();
-    /// settings.cache_lock_time(Duration::from_secs(1));
+    /// struct Handler;
+    ///
+    /// fn main() {
+    ///     let token = env::var("DISCORD_TOKEN")
+    ///        .expect("Expected a token in the environment");
+    ///     serenity::CACHE
+    ///        .write().settings_mut()
+    ///        .cache_lock_time(Duration::from_secs(1));
+    ///     let mut client = Client::new(&token, Handler).unwrap();
+    ///
+    ///     if let Err(why) = client.start() {
+    ///        println!("Client error: {:?}", why);
+    ///     }
+    /// }
+    /// ```
     ///
     /// [`cache_lock_time`]: #structfield.cache_lock_time
     pub fn cache_lock_time(&mut self, duration: Duration) -> &mut Self {
