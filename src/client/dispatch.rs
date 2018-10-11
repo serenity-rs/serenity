@@ -26,7 +26,7 @@ use std::time::Duration;
 use super::CACHE;
 
 lazy_static! {
-    pub static ref CACHE_TRY_WRITE_DURATION: Duration =
+    pub static ref CACHE_TRY_WRITE_DURATION: Option<Duration> =
         CACHE.read().get_try_write_duration();
 }
 
@@ -35,15 +35,19 @@ macro_rules! update {
         {
             #[cfg(feature = "cache")]
             {
-                if let Some(mut lock) = CACHE.try_write_for(*CACHE_TRY_WRITE_DURATION) {
-                    lock.update(&mut $event)
-                } else {
-                    warn!(
-                        "[dispatch] Possible deadlock: couldn't unlock cache to update with event: {:?}",
-                        $event,
-                    );
+                if let Some(dur) = *CACHE_TRY_WRITE_DURATION {
+                    CACHE.try_write_for(dur)
+                        .and_then(|mut lock| lock.update(&mut $event))
+                        .or_else(|| {
+                            warn!(
+                                "[dispatch] Possible deadlock: couldn't unlock cache to update with event: {:?}",
+                                $event,
+                            );
 
-                    None
+                            None
+                    })
+                } else {
+                    CACHE.write().update(&mut $event)
                 }
             }
         }

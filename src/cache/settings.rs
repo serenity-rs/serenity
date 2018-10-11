@@ -23,7 +23,11 @@ pub struct Settings {
     /// cache for.
     ///
     /// Defaults to 10 milliseconds.
-    pub cache_lock_time: Duration,
+    ///
+    /// **Note**:
+    /// If set to `None`, cache updates will request write-lock until available,
+    /// potentially deadlocking.
+    pub cache_lock_time: Option<Duration>,
     __nonexhaustive: (),
 }
 
@@ -31,7 +35,7 @@ impl Default for Settings {
     fn default() -> Self {
         Settings {
             max_messages: usize::default(),
-            cache_lock_time: Duration::from_millis(10),
+            cache_lock_time: Some(Duration::from_millis(10)),
             __nonexhaustive: (),
         }
     }
@@ -70,7 +74,8 @@ impl Settings {
     ///
     /// Refer to [`cache_lock_time`] for more information.
     ///
-    /// **Note**: Should be set before the client gets started, as it can not be
+    /// **Note**:
+    /// Should be set before the client gets started, as it can not be
     /// changed after the first read of the duration.
     ///
     /// # Examples
@@ -88,7 +93,7 @@ impl Settings {
     ///        .expect("Expected a token in the environment");
     ///     serenity::CACHE
     ///        .write().settings_mut()
-    ///        .cache_lock_time(Duration::from_secs(1));
+    ///        .cache_lock_time(Some(Duration::from_secs(1)));
     ///     let mut client = Client::new(&token, Handler).unwrap();
     ///
     ///     if let Err(why) = client.start() {
@@ -98,7 +103,7 @@ impl Settings {
     /// ```
     ///
     /// [`cache_lock_time`]: #structfield.cache_lock_time
-    pub fn cache_lock_time(&mut self, duration: Duration) -> &mut Self {
+    pub fn cache_lock_time(&mut self, duration: Option<Duration>) -> &mut Self {
         self.cache_lock_time = duration;
 
         self

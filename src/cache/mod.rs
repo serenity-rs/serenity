@@ -757,7 +757,12 @@ impl Cache {
         e.update(self)
     }
 
-    pub fn get_try_write_duration(&self) -> Duration {
+    /// Gets the duration it will try for when acquiring a write lock.
+    ///
+    /// Refer to the documentation for [`cache_lock_time`] for more information.
+    ///
+    /// [`cache_lock_time`]: struct.Settings.html#method.cache_lock_time
+    pub fn get_try_write_duration(&self) -> Option<Duration> {
         self.settings.cache_lock_time
     }
 
