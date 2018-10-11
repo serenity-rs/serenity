@@ -256,8 +256,22 @@ command!(commands(ctx, msg, _args) {
 // mentions are replaced with a safe textual alternative.
 // In this example channel mentions are excluded via the `ContentSafeOptions`.
 command!(say(_ctx, msg, args) {
-    let mut content = content_safe(&args.full(), ContentSafeOptions::default()
-        .clean_channel(false));
+    let mut settings = if let Some(guild_id) = msg.guild_id {
+       // By default roles, users, and channel mentions are cleaned.
+       ContentSafeOptions::default()
+            // We do not want to clean channal mentions as they
+            // do not ping users.
+            .clean_channel(false)
+            // If it's a guild channel, we want mentioned users to be displayed
+            // as their display name.
+            .display_as_member_from(guild_id)
+    } else {
+        ContentSafeOptions::default()
+            .clean_channel(false)
+            .clean_role(false)
+    };
+
+    let mut content = content_safe(&args.full(), settings);
 
     if let Err(why) = msg.channel_id.say(&content) {
         println!("Error sending message: {:?}", why);
