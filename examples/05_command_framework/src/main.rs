@@ -271,7 +271,7 @@ command!(say(_ctx, msg, args) {
             .clean_role(false)
     };
 
-    let mut content = content_safe(&args.full(), settings);
+    let mut content = content_safe(&args.full(), &settings);
 
     if let Err(why) = msg.channel_id.say(&content) {
         println!("Error sending message: {:?}", why);
