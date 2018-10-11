@@ -66,6 +66,22 @@ impl Settings {
         self
     }
 
+    /// Sets the duration that the cache will try to aquire a write lock.
+    ///
+    /// Refer to [`cache_lock_time`] for more information.
+    ///
+    /// # Examples
+    ///
+    /// Set the time that it will try to aquire a lock.
+    ///
+    /// ```rust
+    /// use std::time::Duration;
+    /// use serenity::cache::Settings;
+    ///
+    /// let mut settings = Settings::new();
+    /// settings.cache_lock_time(Duration::from_secs(1));
+    ///
+    /// [`cache_lock_time`]: #structfield.cache_lock_time
     pub fn cache_lock_time(&mut self, duration: Duration) -> &mut Self {
         self.cache_lock_time = duration;
 
