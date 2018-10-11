@@ -52,7 +52,8 @@ use std::collections::{
 };
 use std::{
     default::Default,
-    sync::Arc
+    sync::Arc,
+    time::Duration,
 };
 
 mod cache_update;
@@ -754,6 +755,10 @@ impl Cache {
     /// [`CacheUpdate` examples]: trait.CacheUpdate.html#examples
     pub fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
         e.update(self)
+    }
+
+    pub fn get_try_write_duration(&self) -> Duration {
+        self.settings.cache_lock_time
     }
 
     pub(crate) fn update_user_entry(&mut self, user: &User) {

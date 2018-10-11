@@ -30,7 +30,11 @@ macro_rules! update {
         {
             #[cfg(feature = "cache")]
             {
-                if let Some(mut lock) = CACHE.try_write_for(Duration::from_millis(10)) {
+                lazy_static! {
+                    pub static ref CACHE_TRY_WRITE_DURATION: Duration =
+                        CACHE.read().get_try_write_duration();
+                }
+                if let Some(mut lock) = CACHE.try_write_for(*CACHE_TRY_WRITE_DURATION) {
                     lock.update(&mut $event)
                 } else {
                     warn!(
