@@ -795,7 +795,7 @@ fn clean_users(s: &mut String, show_discriminator: bool, guild: Option<GuildId>)
 /// [`ContentSafeOptions`]: struct.ContentSafeOptions.html
 /// [`Cache`]: ../cache/struct.Cache.html
 #[cfg(feature = "cache")]
-pub fn content_safe(s: &str, options: ContentSafeOptions) -> String {
+pub fn content_safe(s: &str, options: &ContentSafeOptions) -> String {
     let mut s = s.to_string();
 
     if options.clean_role {
