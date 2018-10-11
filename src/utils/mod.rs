@@ -18,6 +18,7 @@ use model::{
     misc::EmojiIdentifier,
     id::{
         ChannelId,
+        GuildId,
         EmojiId,
         RoleId,
         UserId,
@@ -544,6 +545,7 @@ pub struct ContentSafeOptions {
     clean_user: bool,
     clean_channel: bool,
     show_discriminator: bool,
+    guild_reference: Option<GuildId>,
 }
 
 #[cfg(feature = "cache")]
@@ -592,6 +594,16 @@ impl ContentSafeOptions {
 
         self
     }
+
+    /// If set, [`content_safe`] will replace a user mention with the user's
+    /// display name in passed `guild`.
+    ///
+    /// [`content_safe`]: fn.content_safe.html
+    pub fn display_as_member_from<G: Into<GuildId>>(mut self, guild: G) -> Self {
+        self.guild_reference = Some(guild.into());
+
+        self
+    }
 }
 
 #[cfg(feature = "cache")]
@@ -603,6 +615,7 @@ impl Default for ContentSafeOptions {
             clean_user: true,
             clean_channel: true,
             show_discriminator: true,
+            guild_reference: None,
         }
     }
 }
@@ -685,7 +698,7 @@ fn clean_channels(s: &mut String) {
 }
 
 #[cfg(feature = "cache")]
-fn clean_users(s: &mut String, show_discriminator: bool) {
+fn clean_users(s: &mut String, show_discriminator: bool, guild: Option<GuildId>) {
     let mut progress = 0;
 
     while let Some(mut mention_start) = s[progress..].find("<@") {
@@ -703,24 +716,44 @@ fn clean_users(s: &mut String, show_discriminator: bool) {
             }
 
             if let Ok(id) = UserId::from_str(&s[mention_start..mention_end]) {
-                let user = CACHE.read().users.get(&id).map(|user| user.clone());
+                let mut replacement = if let Some(guild) = guild {
+
+                    if let Some(guild) = CACHE.read().guild(&guild) {
+
+                        if let Ok(member) = guild.read().member(&id) {
+                            if show_discriminator {
+                                format!("@{}", member.distinct())
+                            } else {
+                                format!("@{}", member.display_name())
+                            }
+                        } else {
+                            "@invalid-user".to_string()
+                        }
+                    } else {
+                        "@invalid-user".to_string()
+                    }
+                } else {
+                    let user = CACHE.read().users.get(&id)
+                        .map(|user| user.clone());
+
+                    if let Some(user) = user {
+                        let user = user.read();
+
+                        if show_discriminator {
+                            format!("@{}#{:04}", user.name, user.discriminator)
+                        } else {
+                            format!("@{}", user.name)
+                        }
+                    } else {
+                        "@invalid-user".to_string()
+                    }
+                };
+
                 let code_start = if has_exclamation { "<@!" } else { "<@" };
                 let to_replace = format!("{}{}>", code_start, id.as_u64());
 
-                *s = if let Some(user) = user {
-                    let user = user.read();
-
-                    let mut replacement = if show_discriminator {
-                        format!("@{}#{:04}", user.name, user.discriminator)
-                    } else {
-                        format!("@{}#{:04}", user.name, user.discriminator)
-                    };
-
-                    s.replace(&to_replace, &replacement)
-                } else {
-                    s.replace(&to_replace, &"@invalid-user")
-                };
-            } else  {
+                *s = s.replace(&to_replace, &replacement)
+            } else {
                 let id = &s[mention_start..mention_end].to_string();
 
                 if !id.is_empty() && id.as_bytes().iter()
@@ -774,7 +807,9 @@ pub fn content_safe(s: &str, options: ContentSafeOptions) -> String {
     }
 
     if options.clean_user {
-        clean_users(&mut s, options.show_discriminator)
+        clean_users(&mut s,
+            options.show_discriminator,
+            options.guild_reference);
     }
 
     s
