@@ -82,7 +82,7 @@ fn main() {
             .on_mention(true)
             .prefixes("~")
             // A command that will be executed
-            // if nothing but the command is passed.
+            // if nothing but a prefix is passed.
             .prefix_only_cmd(about)
             // You can set multiple delimiters via delimiters()
             // or just one via delimiter(",")
