@@ -622,6 +622,7 @@ impl Default for ContentSafeOptions {
 }
 
 #[cfg(feature = "cache")]
+#[inline]
 fn clean_roles(s: &mut String) {
     let mut progress = 0;
 
@@ -659,6 +660,7 @@ fn clean_roles(s: &mut String) {
 }
 
 #[cfg(feature = "cache")]
+#[inline]
 fn clean_channels(s: &mut String) {
     let mut progress = 0;
 
@@ -699,6 +701,7 @@ fn clean_channels(s: &mut String) {
 }
 
 #[cfg(feature = "cache")]
+#[inline]
 fn clean_users(s: &mut String, show_discriminator: bool, guild: Option<GuildId>) {
     let mut progress = 0;
 
