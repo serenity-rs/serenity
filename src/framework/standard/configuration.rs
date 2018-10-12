@@ -6,9 +6,10 @@ use model::{
 };
 use std::{
     collections::HashSet,
-    default::Default
+    default::Default,
+    sync::Arc,
 };
-use super::command::PrefixCheck;
+use super::command::{Command, InternalCommand, PrefixCheck};
 
 /// The configuration to use for a [`StandardFramework`] associated with a [`Client`]
 /// instance.
@@ -59,6 +60,7 @@ pub struct Configuration {
     #[doc(hidden)] pub no_dm_prefix: bool,
     #[doc(hidden)] pub delimiters: Vec<String>,
     #[doc(hidden)] pub case_insensitive: bool,
+    #[doc(hidden)] pub prefix_only_cmd: Option<InternalCommand>,
 }
 
 impl Configuration {
@@ -511,6 +513,15 @@ impl Configuration {
 
         self
     }
+
+    /// Sets a command to dispatch if user's input is a prefix only.
+    ///
+    /// **Note**: Defaults to no command and ignores prefix only.
+    pub fn prefix_only_cmd<C: Command + 'static>(mut self, c: C) -> Self {
+        self.prefix_only_cmd = Some(Arc::new(c));
+
+        self
+    }
 }
 
 impl Default for Configuration {
@@ -550,6 +561,7 @@ impl Default for Configuration {
             on_mention: None,
             owners: HashSet::default(),
             prefixes: vec![],
+            prefix_only_cmd: None,
         }
     }
 }
