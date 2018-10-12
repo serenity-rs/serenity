@@ -81,11 +81,14 @@ impl Settings {
     ///
     /// Set the time that it will try to aquire a lock.
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// use std::time::Duration;
+    /// use std::env;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
     ///
     /// fn main() {
     ///     let token = env::var("DISCORD_TOKEN")
