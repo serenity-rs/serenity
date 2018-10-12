@@ -35,8 +35,8 @@ macro_rules! update {
         {
             #[cfg(feature = "cache")]
             {
-                if let Some(dur) = *CACHE_TRY_WRITE_DURATION {
-                    CACHE.try_write_for(dur)
+                if let Some(duration) = *CACHE_TRY_WRITE_DURATION {
+                    CACHE.try_write_for(duration)
                         .and_then(|mut lock| lock.update(&mut $event))
                         .or_else(|| {
                             warn!(
