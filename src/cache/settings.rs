@@ -19,13 +19,12 @@ pub struct Settings {
     /// Defaults to 0.
     pub max_messages: usize,
 
-    /// The duration that the serenity will and require a write lock on the
-    /// cache for.
+    /// The Duration cache updates will try to acquire write-locks for.
     ///
     /// Defaults to 10 milliseconds.
     ///
     /// **Note**:
-    /// If set to `None`, cache updates will request write-lock until available,
+    /// If set to `None`, cache updates will acquire write-lock until available,
     /// potentially deadlocking.
     pub cache_lock_time: Option<Duration>,
     __nonexhaustive: (),
