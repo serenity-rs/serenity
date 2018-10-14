@@ -108,7 +108,8 @@ impl GuildId {
     /// Create a voice channel in a guild with the name `test`:
     ///
     /// ```rust,ignore
-    /// use serenity::model::{ChannelType, GuildId};
+    /// use serenity::model::id::GuildId;
+    /// use serenity::model::channel::ChannelType
     ///
     /// let _channel = GuildId(7).create_channel("test", ChannelType::Voice, None);
     /// ```
