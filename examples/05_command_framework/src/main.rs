@@ -80,7 +80,7 @@ fn main() {
         .configure(|c| c
             .allow_whitespace(true)
             .on_mention(true)
-            .prefixes("~")
+            .prefix("~")
             // A command that will be executed
             // if nothing but a prefix is passed.
             .prefix_only_cmd(about)
