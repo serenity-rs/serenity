@@ -334,10 +334,6 @@ impl Channel {
     }
 
     /// Determines if the channel is NSFW.
-    ///
-    /// Refer to [`utils::is_nsfw`] for more details.
-    ///
-    /// [`utils::is_nsfw`]: ../../utils/fn.is_nsfw.html
     #[cfg(all(feature = "model", feature = "utils"))]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
