@@ -43,7 +43,8 @@ impl CreateGroup {
             .dm_only(self.0.dm_only)
             .guild_only(self.0.guild_only)
             .help_available(self.0.help_available)
-            .owners_only(self.0.owners_only);
+            .owners_only(self.0.owners_only)
+            .owner_privileges(self.0.owner_privileges);
 
         if let Some(ref bucket) = self.0.bucket {
             cmd = cmd.bucket(bucket);
