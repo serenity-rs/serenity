@@ -532,7 +532,7 @@ impl StandardFramework {
                 }
             }
 
-            if self.configuration.owners.contains(&message.author.id) {
+            if command.owner_privileges && self.configuration.owners.contains(&message.author.id) {
                 return None;
             }
 
