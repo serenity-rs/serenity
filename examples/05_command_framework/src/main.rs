@@ -81,6 +81,9 @@ fn main() {
             .allow_whitespace(true)
             .on_mention(true)
             .prefix("~")
+            // A command that will be executed
+            // if nothing but a prefix is passed.
+            .prefix_only_cmd(about)
             // You can set multiple delimiters via delimiters()
             // or just one via delimiter(",")
             // If you set multiple delimiters, the order you list them

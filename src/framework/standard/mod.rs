@@ -1004,6 +1004,36 @@ impl Framework for StandardFramework {
                 // Ensure that there is _at least one_ position remaining. There
                 // is no point in continuing if there is not.
                 if positions.is_empty() {
+
+                    if let Some(ref prefix_only_cmd) =
+                        self.configuration.prefix_only_cmd {
+                        let prefix_only_cmd = Arc::clone(prefix_only_cmd);
+                        let before = self.before.clone();
+                        let after = self.after.clone();
+
+                        threadpool.execute(move || {
+                            if let Some(before) = before {
+                                if !(before)(&mut context, &message, "") {
+                                    return;
+                                }
+                            }
+
+                            if !prefix_only_cmd.before(&mut context, &message) {
+                                return;
+                            }
+
+                            let result = prefix_only_cmd.execute(&mut context,
+                                &message, Args::new("", &Vec::new()));
+
+                            prefix_only_cmd.after(&mut context, &message,
+                                &result);
+
+                            if let Some(after) = after {
+                                (after)(&mut context, &message, "", result);
+                            }
+                        });
+                    }
+
                     return;
                 }
 
