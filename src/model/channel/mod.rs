@@ -765,7 +765,7 @@ mod test {
         #[test]
         fn nsfw_checks() {
             let mut channel = guild_channel();
-            assert!(channel.is_nsfw());
+            assert!(!channel.is_nsfw());
             channel.kind = ChannelType::Voice;
             assert!(!channel.is_nsfw());
 
@@ -774,7 +774,7 @@ mod test {
             assert!(!channel.is_nsfw());
 
             channel.name = "nsfw".to_string();
-            assert!(channel.is_nsfw());
+            assert!(!channel.is_nsfw());
             channel.kind = ChannelType::Voice;
             assert!(!channel.is_nsfw());
             channel.kind = ChannelType::Text;
