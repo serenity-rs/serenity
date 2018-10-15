@@ -157,7 +157,7 @@ pub struct CommandOptions {
     pub dm_only: bool,
     /// Whether command can be used only in guilds or not.
     pub guild_only: bool,
-    /// Whether the command can be used only in NSFW channels.
+    /// Whether the command treats owners as normal users.
     pub owner_privileges: bool,
     /// Whether command can only be used by owners or not.
     pub owners_only: bool,
