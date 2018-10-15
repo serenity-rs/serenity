@@ -566,4 +566,15 @@ mod test {
         let parsed = parse_quotes("a \"b c\" d\"e f\"  g");
         assert_eq!(parsed, ["a", "b c", "d", "e f", "g"]);
     }
+
+    #[allow(deprecated)]
+    #[test]
+    fn test_is_nsfw() {
+        assert!(!is_nsfw("general"));
+        assert!(is_nsfw("nsfw"));
+        assert!(is_nsfw("nsfw-test"));
+        assert!(!is_nsfw("nsfw-"));
+        assert!(!is_nsfw("général"));
+        assert!(is_nsfw("nsfw-général"));
+    }
 }
