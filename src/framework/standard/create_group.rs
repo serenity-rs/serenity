@@ -43,7 +43,8 @@ impl CreateGroup {
             .dm_only(self.0.dm_only)
             .guild_only(self.0.guild_only)
             .help_available(self.0.help_available)
-            .owners_only(self.0.owners_only);
+            .owners_only(self.0.owners_only)
+            .owner_privileges(self.0.owner_privileges);
 
         if let Some(ref bucket) = self.0.bucket {
             cmd = cmd.bucket(bucket);
@@ -147,6 +148,14 @@ impl CreateGroup {
     /// Whether command can be used only in guilds or not.
     pub fn guild_only(mut self, guild_only: bool) -> Self {
         self.0.guild_only = guild_only;
+
+        self
+    }
+
+    /// Whether owners shall bypass buckets, missing permissions,
+    /// wrong channels, missing roles, and checks.
+    pub fn owner_privileges(mut self, owner_privileges: bool) -> Self {
+        self.0.owner_privileges = owner_privileges;
 
         self
     }

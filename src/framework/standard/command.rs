@@ -99,6 +99,7 @@ pub struct CommandGroup {
     pub help_available: bool,
     pub dm_only: bool,
     pub guild_only: bool,
+    pub owner_privileges: bool,
     pub owners_only: bool,
     pub help: Option<Arc<Help>>,
     /// A set of checks to be called prior to executing the command-group. The checks
@@ -117,6 +118,7 @@ impl Default for CommandGroup {
             required_permissions: Permissions::empty(),
             dm_only: false,
             guild_only: false,
+            owner_privileges: true,
             help_available: true,
             owners_only: false,
             allowed_roles: Vec::new(),
@@ -155,6 +157,8 @@ pub struct CommandOptions {
     pub dm_only: bool,
     /// Whether command can be used only in guilds or not.
     pub guild_only: bool,
+    /// Whether the command treats owners as normal users.
+    pub owner_privileges: bool,
     /// Whether command can only be used by owners or not.
     pub owners_only: bool,
     /// Other names that can be used to call this command instead.
@@ -335,6 +339,7 @@ impl Default for CommandOptions {
             required_permissions: Permissions::empty(),
             dm_only: false,
             guild_only: false,
+            owner_privileges: true,
             help_available: true,
             owners_only: false,
             allowed_roles: Vec::new(),
