@@ -151,6 +151,14 @@ impl CreateGroup {
         self
     }
 
+    /// Whether owners shall bypass buckets, missing permissions,
+    /// wrong channels, missing roles, and checks.
+    pub fn owner_privileges(mut self, owner_privileges: bool) -> Self {
+        self.0.owner_privileges = owner_privileges;
+
+        self
+    }
+
     /// Whether command should be displayed in help list or not, used by other commands.
     pub fn help_available(mut self, help_available: bool) -> Self {
         self.0.help_available = help_available;
