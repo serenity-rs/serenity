@@ -391,7 +391,6 @@ impl GuildChannel {
     ///
     /// [`ChannelType::Text`]: enum.ChannelType.html#variant.Text
     /// [`ChannelType::Voice`]: enum.ChannelType.html#variant.Voice
-    #[cfg(feature = "utils")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
         self.kind == ChannelType::Text && self.nsfw

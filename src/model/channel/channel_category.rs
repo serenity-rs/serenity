@@ -125,7 +125,6 @@ impl ChannelCategory {
         })
     }
 
-    #[cfg(feature = "utils")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
         self.kind == ChannelType::Text && self.nsfw
