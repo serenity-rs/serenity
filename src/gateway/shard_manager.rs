@@ -236,6 +236,7 @@ fn start_shard(
 
             let future = Box::new(shard.lock()
                 .messages()
+                .unwrap()
                 .map_err(MessageSinkError::from)
                 .forward(sink)
                 .map(|_| ())
