@@ -15,9 +15,9 @@ use std::io::{Error as IoError, ErrorKind as IoErrorKind};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use super::{ConnectionStage, CurrentPresence, ShardStream};
-use tokio_tungstenite::{
-    tungstenite::{Error as TungsteniteError, Message as TungsteniteMessage},
-    connect_async,
+use tokio_tungstenite::tungstenite::{
+    Error as TungsteniteError,
+    Message as TungsteniteMessage,
 };
 use tokio::{
     self,
@@ -539,15 +539,13 @@ mod encryption {
     use self::native_tls::TlsConnector;
     use self::tokio_tls::{TlsConnector as TokioTlsConnector, TlsStream};
 
-    use std::io::{Read, Write, Result as IoResult};
-
     use futures::{future, Future};
     use self::tokio_io::{AsyncRead, AsyncWrite};
 
     use tokio_tungstenite::tungstenite::Error;
     use tokio_tungstenite::tungstenite::stream::Mode;
 
-    use tokio_tungstenite::stream::{NoDelay, Stream as StreamSwitcher};
+    use tokio_tungstenite::stream::Stream as StreamSwitcher;
 
     /// A stream that might be protected with TLS.
     pub type MaybeTlsStream<S> = StreamSwitcher<S, TlsStream<S>>;
