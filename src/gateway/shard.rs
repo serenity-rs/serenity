@@ -29,6 +29,13 @@ use ::{Error, Result};
 
 const CONNECTION: &'static str = "wss://gateway.discord.gg/?v=6&encoding=json";
 
+pub enum Action {
+    Autoreconnect,
+    Identify,
+    Reconnect,
+    Resume,
+}
+
 #[derive(Copy, Clone, Debug)]
 struct HeartbeatInfo {
     pub heartbeat_instants: (Option<Instant>, Option<Instant>),
@@ -95,7 +102,7 @@ impl Shard {
     pub fn process(
         &mut self,
         event: &GatewayEvent,
-    ) -> Result<Option<Box<Future<Item = (), Error = Error> + Send>>> {
+    ) -> Result<Option<Action>> {
         match *event {
             GatewayEvent::Dispatch(seq, ref event) => {
                 let mut info = self.heartbeat_info.lock();
@@ -211,14 +218,12 @@ impl Shard {
 
                     trace!("Identifying");
 
-                    self.identify()?;
-
-                    return Ok(None);
+                    return Ok(Some(Action::Identify));
                 }
 
                 trace!("Autoreconnecting");
 
-                Ok(Some(Box::new(self.autoreconnect())))
+                Ok(Some(Action::Autoreconnect))
             },
             GatewayEvent::InvalidateSession(resumable) => {
                 info!(
@@ -227,15 +232,13 @@ impl Shard {
                 );
 
                 if resumable {
-                    Ok(Some(Box::new(self.resume())))
+                    Ok(Some(Action::Resume))
                 } else {
-                    self.identify()?;
-
-                    Ok(None)
+                    Ok(Some(Action::Identify))
                 }
             },
             GatewayEvent::Reconnect => {
-                Ok(Some(Box::new(self.reconnect())))
+                Ok(Some(Action::Reconnect))
             },
         }
     }
@@ -367,7 +370,7 @@ impl Shard {
         }
     }
 
-    fn heartbeat(&mut self) -> Result<()> {
+    pub fn heartbeat(&mut self) -> Result<()> {
         trace!(
             "[Shard {:?}] Sending heartbeat d: {:?}",
             self.shard_info,
@@ -381,7 +384,7 @@ impl Shard {
         )
     }
 
-    fn identify(&mut self) -> Result<()> {
+    pub fn identify(&mut self) -> Result<()> {
         *self.stage.lock() = ConnectionStage::Identifying;
 
         debug!("[Shard {:?}] Identifying", self.shard_info);
@@ -450,7 +453,7 @@ impl Shard {
         self.send_value(v)
     }
 
-    fn reconnect(&mut self) -> impl Future<Item = (), Error = Error> + Send {
+    pub fn reconnect(&mut self) -> impl Future<Item = (), Error = Error> + Send {
         *self.stage.lock() = ConnectionStage::Connecting;
         info!("[Shard {:?}] Attempting to reconnect", self.shard_info);
 
@@ -471,7 +474,7 @@ impl Shard {
         Ok(())
     }
 
-    fn resume(&mut self) -> impl Future<Item = (), Error = Error> + Send {
+    pub fn resume(&mut self) -> impl Future<Item = (), Error = Error> + Send {
         let seq = self.heartbeat_info.lock().seq;
         let session_id = self.session_id.clone();
         let shard_info = self.shard_info;
