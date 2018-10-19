@@ -334,7 +334,7 @@ impl Channel {
     }
 
     /// Determines if the channel is NSFW.
-    #[cfg(all(feature = "model", feature = "utils"))]
+    #[cfg(feature = "model")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
         match *self {
