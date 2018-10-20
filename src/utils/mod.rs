@@ -676,12 +676,10 @@ fn clean_channels(cache: &RwLock<Cache>, s: &mut String) {
             mention_end += mention_start;
             mention_start += "<#".len();
 
-            if let Ok(id) =
-                ChannelId::from_str(&s[mention_start..mention_end]) {
+            if let Ok(id) = ChannelId::from_str(&s[mention_start..mention_end]) {
                 let to_replace = format!("<#{}>", &s[mention_start..mention_end]);
 
-                *s = if let Some(Channel::Guild(channel))
-                    = id._to_channel_cached(&cache) {
+                *s = if let Some(Channel::Guild(channel)) = id._to_channel_cached(&cache) {
                     let replacement = format!("#{}", &channel.read().name);
                     s.replace(&to_replace, &replacement)
                 } else {
@@ -718,8 +716,7 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
             mention_start += "<@".len();
             let mut has_exclamation = false;
 
-            if s[mention_start..].as_bytes().get(0)
-                .map_or(false, |c| *c == b'!') {
+            if s[mention_start..].as_bytes().get(0).map_or(false, |c| *c == b'!') {
                 mention_start += "!".len();
                 has_exclamation = true;
             }
@@ -730,6 +727,7 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
                     if let Some(guild) = cache.read().guild(&guild) {
 
                         if let Some(member) = guild.read().members.get(&id) {
+
                             if show_discriminator {
                                 format!("@{}", member.distinct())
                             } else {
@@ -742,8 +740,7 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
                         "@invalid-user".to_string()
                     }
                 } else {
-                    let user = cache.read().users.get(&id)
-                        .map(|user| user.clone());
+                    let user = cache.read().users.get(&id).map(|user| user.clone());
 
                     if let Some(user) = user {
                         let user = user.read();
@@ -765,8 +762,7 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
             } else {
                 let id = &s[mention_start..mention_end].to_string();
 
-                if !id.is_empty() && id.as_bytes().iter()
-                    .all(u8::is_ascii_digit){
+                if !id.is_empty() && id.as_bytes().iter().all(u8::is_ascii_digit) {
                     let code_start = if has_exclamation { "<@!" } else { "<@" };
                     let to_replace = format!("{}{}>", code_start, id);
 
@@ -824,14 +820,11 @@ fn _content_safe(cache: &RwLock<Cache>, s: &str, options: &ContentSafeOptions) -
     }
 
     if options.clean_user {
-        clean_users(&cache, &mut s,
-            options.show_discriminator,
-            options.guild_reference);
+        clean_users(&cache, &mut s, options.show_discriminator, options.guild_reference);
     }
 
-    s
-        .replace("@everyone", "@\u{200B}everyone")
-        .replace("@here", "@\u{200B}here")
+    s.replace("@everyone", "@\u{200B}everyone")
+     .replace("@here", "@\u{200B}here")
 }
 
 #[cfg(test)]
