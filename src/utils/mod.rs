@@ -13,6 +13,7 @@ pub use self::{
 
 use base64;
 use internal::prelude::*;
+use prelude::RwLock;
 use model::{
     channel::Channel,
     misc::EmojiIdentifier,
@@ -551,6 +552,10 @@ pub struct ContentSafeOptions {
 
 #[cfg(feature = "cache")]
 impl ContentSafeOptions {
+    pub fn new() -> Self {
+        ContentSafeOptions::default()
+    }
+
     /// [`content_safe`] will replace role mentions (`<@&{id}>`) with its name
     /// prefixed with `@` (`@rolename`) or with `@deleted-role` if the
     /// identifier is invalid.
@@ -623,7 +628,7 @@ impl Default for ContentSafeOptions {
 
 #[cfg(feature = "cache")]
 #[inline]
-fn clean_roles(s: &mut String) {
+fn clean_roles(cache: &RwLock<Cache>, s: &mut String) {
     let mut progress = 0;
 
     while let Some(mut mention_start) = s[progress..].find("<@&") {
@@ -634,9 +639,9 @@ fn clean_roles(s: &mut String) {
             mention_start += "<@&".len();
 
             if let Ok(id) = RoleId::from_str(&s[mention_start..mention_end]) {
-                let to_replace = format!("<@&{}>", &id.as_u64());
+                let to_replace = format!("<@&{}>", &s[mention_start..mention_end]);
 
-                *s = if let Some(role) = id.to_role_cached() {
+                *s = if let Some(role) = id._to_role_cached(&cache) {
                     s.replace(&to_replace, &format!("@{}", &role.name))
                 } else {
                     s.replace(&to_replace, &"@deleted-role")
@@ -661,7 +666,7 @@ fn clean_roles(s: &mut String) {
 
 #[cfg(feature = "cache")]
 #[inline]
-fn clean_channels(s: &mut String) {
+fn clean_channels(cache: &RwLock<Cache>, s: &mut String) {
     let mut progress = 0;
 
     while let Some(mut mention_start) = s[progress..].find("<#") {
@@ -673,20 +678,20 @@ fn clean_channels(s: &mut String) {
 
             if let Ok(id) =
                 ChannelId::from_str(&s[mention_start..mention_end]) {
-                let to_replace = format!("<#{}>", &id.as_u64());
+                let to_replace = format!("<#{}>", &s[mention_start..mention_end]);
 
                 *s = if let Some(Channel::Guild(channel))
-                    = id.to_channel_cached() {
+                    = id._to_channel_cached(&cache) {
                     let replacement = format!("#{}", &channel.read().name);
                     s.replace(&to_replace, &replacement)
                 } else {
                     s.replace(&to_replace, &"#deleted-channel")
                 };
-            } else  {
+            } else {
                 let id = &s[mention_start..mention_end].to_string();
 
                 if !id.is_empty() && id.as_bytes().iter()
-                    .all(u8::is_ascii_digit){
+                    .all(u8::is_ascii_digit) {
                     let to_replace = format!("<#{}>", id);
 
                     *s = s.replace(&to_replace, &"#deleted-channel");
@@ -702,7 +707,7 @@ fn clean_channels(s: &mut String) {
 
 #[cfg(feature = "cache")]
 #[inline]
-fn clean_users(s: &mut String, show_discriminator: bool, guild: Option<GuildId>) {
+fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, guild: Option<GuildId>) {
     let mut progress = 0;
 
     while let Some(mut mention_start) = s[progress..].find("<@") {
@@ -722,9 +727,9 @@ fn clean_users(s: &mut String, show_discriminator: bool, guild: Option<GuildId>)
             if let Ok(id) = UserId::from_str(&s[mention_start..mention_end]) {
                 let mut replacement = if let Some(guild) = guild {
 
-                    if let Some(guild) = CACHE.read().guild(&guild) {
+                    if let Some(guild) = cache.read().guild(&guild) {
 
-                        if let Ok(member) = guild.read().member(&id) {
+                        if let Some(member) = guild.read().members.get(&id) {
                             if show_discriminator {
                                 format!("@{}", member.distinct())
                             } else {
@@ -737,7 +742,7 @@ fn clean_users(s: &mut String, show_discriminator: bool, guild: Option<GuildId>)
                         "@invalid-user".to_string()
                     }
                 } else {
-                    let user = CACHE.read().users.get(&id)
+                    let user = cache.read().users.get(&id)
                         .map(|user| user.clone());
 
                     if let Some(user) = user {
@@ -754,7 +759,7 @@ fn clean_users(s: &mut String, show_discriminator: bool, guild: Option<GuildId>)
                 };
 
                 let code_start = if has_exclamation { "<@!" } else { "<@" };
-                let to_replace = format!("{}{}>", code_start, id.as_u64());
+                let to_replace = format!("{}{}>", code_start, &s[mention_start..mention_end]);
 
                 *s = s.replace(&to_replace, &replacement)
             } else {
@@ -800,18 +805,26 @@ fn clean_users(s: &mut String, show_discriminator: bool, guild: Option<GuildId>)
 /// [`Cache`]: ../cache/struct.Cache.html
 #[cfg(feature = "cache")]
 pub fn content_safe(s: &str, options: &ContentSafeOptions) -> String {
+    let cache = &CACHE;
+
+    _content_safe(&cache, s, options)
+}
+
+
+#[cfg(feature = "cache")]
+fn _content_safe(cache: &RwLock<Cache>, s: &str, options: &ContentSafeOptions) -> String {
     let mut s = s.to_string();
 
     if options.clean_role {
-        clean_roles(&mut s);
+        clean_roles(&cache, &mut s);
     }
 
     if options.clean_channel {
-        clean_channels(&mut s);
+        clean_channels(&cache, &mut s);
     }
 
     if options.clean_user {
-        clean_users(&mut s,
+        clean_users(&cache, &mut s,
             options.show_discriminator,
             options.guild_reference);
     }
@@ -869,5 +882,175 @@ mod test {
         assert!(!is_nsfw("nsfw-"));
         assert!(!is_nsfw("général"));
         assert!(is_nsfw("nsfw-général"));
+    }
+
+    #[test]
+    fn test_content_safe() {
+        use model::{
+            user::User,
+            Permissions,
+            prelude::*,
+        };
+        use chrono::DateTime;
+        use std::{
+            collections::HashMap,
+            sync::Arc,
+        };
+
+        let user = User {
+            id: UserId(100000000000000000),
+            avatar: None,
+            bot: false,
+            discriminator: 0000,
+            name: "Crab".to_string(),
+        };
+
+        let mut guild = Guild {
+            afk_channel_id: None,
+            afk_timeout: 0,
+            application_id: None,
+            channels: HashMap::new(),
+            default_message_notifications: DefaultMessageNotificationLevel::All,
+            emojis: HashMap::new(),
+            explicit_content_filter: ExplicitContentFilter::None,
+            features: Vec::new(),
+            icon: None,
+            id: GuildId(381880193251409931),
+            joined_at: DateTime::parse_from_str(
+                "1983 Apr 13 12:09:14.274 +0000",
+                "%Y %b %d %H:%M:%S%.3f %z").unwrap(),
+            large: false,
+            member_count: 1,
+            members: HashMap::new(),
+            mfa_level: MfaLevel::None,
+            name: "serenity".to_string(),
+            owner_id: UserId(114941315417899012),
+            presences: HashMap::new(),
+            region: "Ferris Island".to_string(),
+            roles: HashMap::new(),
+            splash: None,
+            system_channel_id: None,
+            verification_level: VerificationLevel::None,
+            voice_states: HashMap::new(),
+        };
+
+        let member = Member {
+            deaf: false,
+            guild_id: guild.id,
+            joined_at: None,
+            mute: false,
+            nick: Some("Ferris".to_string()),
+            roles: Vec::new(),
+            user: Arc::new(RwLock::new(user.clone())),
+        };
+
+        let role = Role {
+            id: RoleId(333333333333333333),
+            colour: Colour::ORANGE,
+            hoist: true,
+            managed: false,
+            mentionable: true,
+            name: "ferris-club-member".to_string(),
+            permissions: Permissions::all(),
+            position: 0,
+        };
+
+        let channel = GuildChannel {
+            id: ChannelId(111880193700067777),
+            bitrate: None,
+            category_id: None,
+            guild_id: guild.id,
+            kind: ChannelType::Text,
+            last_message_id: None,
+            last_pin_timestamp: None,
+            name: "general".to_string(),
+            permission_overwrites: Vec::new(),
+            position: 0,
+            topic: None,
+            user_limit: None,
+            nsfw: false,
+        };
+
+        let cache = RwLock::new(Cache::default());
+
+        {
+            let mut cache = cache.try_write().unwrap();
+            guild.members.insert(user.id, member.clone());
+            guild.roles.insert(role.id, role.clone());
+            cache.users.insert(user.id, Arc::new(RwLock::new(user.clone())));
+            cache.guilds.insert(guild.id, Arc::new(RwLock::new(guild.clone())));
+            cache.channels.insert(channel.id, Arc::new(RwLock::new(channel.clone())));
+        }
+
+        let with_user_metions = "<@!100000000000000000> <@!000000000000000000> <@123> <@!123> \
+        <@!123123123123123123123> <@123> <@123123123123123123> <@!invalid> \
+        <@invalid> <@invalidinvalidinvlansdlkfjsldkfjalskdf> \
+        <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
+        <@123invalid> <@>";
+
+        let without_user_mentions = "@Crab#0000 @invalid-user @invalid-user @invalid-user \
+        @invalid-user @invalid-user @invalid-user <@!invalid> <@invalid> \
+        <@invalidinvalidinvlansdlkfjsldkfjalskdf> \
+        <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
+        <@123invalid> <@>";
+
+        // User mentions
+        let options = ContentSafeOptions::default();
+        assert_eq!(without_user_mentions, _content_safe(&cache, with_user_metions, &options));
+
+        let options = ContentSafeOptions::default();
+        assert_eq!(format!("@{}#{:04}", user.name, user.discriminator),
+            _content_safe(&cache, "<@!100000000000000000>", &options));
+
+        let options = ContentSafeOptions::default();
+        assert_eq!(format!("@{}#{:04}", user.name, user.discriminator),
+            _content_safe(&cache, "<@100000000000000000>", &options));
+
+        let options = options.show_discriminator(false);
+        assert_eq!(format!("@{}", user.name),
+            _content_safe(&cache, "<@!100000000000000000>", &options));
+
+        let options = options.show_discriminator(false);
+        assert_eq!(format!("@{}", user.name),
+            _content_safe(&cache, "<@100000000000000000>", &options));
+
+        let options = options.display_as_member_from(guild.id);
+        assert_eq!(format!("@{}", member.nick.unwrap()),
+            _content_safe(&cache, "<@!100000000000000000>", &options));
+
+        let options = options.clean_user(false);
+        assert_eq!(with_user_metions,
+            _content_safe(&cache, with_user_metions, &options));
+
+        // Channel mentions
+        let with_channel_mentions = "<#> <#deleted-channel> #deleted-channel <#0> \
+        #unsafe-club <#111880193700067777> <#ferrisferrisferris> \
+        <#000000000000000000>";
+
+        let without_channel_mentions = "<#> <#deleted-channel> #deleted-channel \
+        #deleted-channel #unsafe-club #general <#ferrisferrisferris> \
+        #deleted-channel";
+
+        assert_eq!(without_channel_mentions,
+            _content_safe(&cache, with_channel_mentions, &options));
+
+        let options = options.clean_channel(false);
+        assert_eq!(with_channel_mentions,
+            _content_safe(&cache, with_channel_mentions, &options));
+
+        // Role mentions
+        let with_role_mentions = "<@&> @deleted-role <@&9829> \
+        <@&333333333333333333> <@&000000000000000000>";
+
+        let without_role_mentions = "<@&> @deleted-role @deleted-role \
+        @ferris-club-member @deleted-role";
+
+        assert_eq!(without_role_mentions,
+            _content_safe(&cache, with_role_mentions, &options));
+
+        let options = options.clean_role(false);
+        assert_eq!(with_role_mentions,
+            _content_safe(&cache, with_role_mentions, &options));
+
     }
 }
