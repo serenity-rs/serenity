@@ -91,6 +91,7 @@ pub fn vecmap_to_json_map<K: PartialEq + ToString>(map: VecMap<K, Value>) -> Map
 ///
 /// assert!(!utils::is_nsfw("nsfwstuff"));
 /// ```
+#[deprecated(since = "0.5.10", note = "Discord no longer turns a channel NSFW based on its name.")]
 pub fn is_nsfw(name: &str) -> bool {
     name == "nsfw" || name.chars().count() > 5 && name.starts_with("nsfw-")
 }
@@ -566,6 +567,7 @@ mod test {
         assert_eq!(parsed, ["a", "b c", "d", "e f", "g"]);
     }
 
+    #[allow(deprecated)]
     #[test]
     fn test_is_nsfw() {
         assert!(!is_nsfw("general"));

@@ -125,10 +125,9 @@ impl ChannelCategory {
         })
     }
 
-    #[cfg(feature = "utils")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
-        self.kind == ChannelType::Text && (self.nsfw || serenity_utils::is_nsfw(&self.name))
+        self.kind == ChannelType::Text && self.nsfw
     }
 
     /// Returns the name of the category.

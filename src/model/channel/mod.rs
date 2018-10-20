@@ -334,11 +334,7 @@ impl Channel {
     }
 
     /// Determines if the channel is NSFW.
-    ///
-    /// Refer to [`utils::is_nsfw`] for more details.
-    ///
-    /// [`utils::is_nsfw`]: ../../utils/fn.is_nsfw.html
-    #[cfg(all(feature = "model", feature = "utils"))]
+    #[cfg(feature = "model")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
         match *self {
@@ -769,7 +765,7 @@ mod test {
         #[test]
         fn nsfw_checks() {
             let mut channel = guild_channel();
-            assert!(channel.is_nsfw());
+            assert!(!channel.is_nsfw());
             channel.kind = ChannelType::Voice;
             assert!(!channel.is_nsfw());
 
@@ -778,7 +774,7 @@ mod test {
             assert!(!channel.is_nsfw());
 
             channel.name = "nsfw".to_string();
-            assert!(channel.is_nsfw());
+            assert!(!channel.is_nsfw());
             channel.kind = ChannelType::Voice;
             assert!(!channel.is_nsfw());
             channel.kind = ChannelType::Text;
