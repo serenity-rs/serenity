@@ -1076,5 +1076,28 @@ mod test {
         assert_eq!(with_role_mentions,
             _content_safe(&cache, with_role_mentions, &options));
 
+        // Everyone mentions
+        let with_everyone_mention = "@everyone";
+
+        let without_everyone_mention = "@\u{200B}everyone";
+
+        assert_eq!(without_everyone_mention,
+            _content_safe(&cache, with_everyone_mention, &options));
+
+        let options = options.clean_everyone(false);
+        assert_eq!(with_everyone_mention,
+            _content_safe(&cache, with_everyone_mention, &options));
+
+        // Here mentions
+        let with_here_mention = "@here";
+
+        let without_here_mention = "@\u{200B}here";
+
+        assert_eq!(without_here_mention,
+            _content_safe(&cache, with_here_mention, &options));
+
+        let options = options.clean_here(false);
+        assert_eq!(with_here_mention,
+            _content_safe(&cache, with_here_mention, &options));
     }
 }
