@@ -1008,15 +1008,15 @@ mod test {
 
         let with_user_metions = "<@!100000000000000000> <@!000000000000000000> <@123> <@!123> \
         <@!123123123123123123123> <@123> <@123123123123123123> <@!invalid> \
-        <@invalid> <@invalidinvalidinvlansdlkfjsldkfjalskdf> \
+        <@invalid> <@日本語 한국어$§)[/__#\\(/&2032$§#> \
         <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
-        <@123invalid> <@>";
+        <@123invalid> <@> <@ ";
 
         let without_user_mentions = "@Crab#0000 @invalid-user @invalid-user @invalid-user \
-        @invalid-user @invalid-user @invalid-user <@!invalid> <@invalid> \
-        <@invalidinvalidinvlansdlkfjsldkfjalskdf> \
+        @invalid-user @invalid-user @invalid-user <@!invalid> \
+        <@invalid> <@日本語 한국어$§)[/__#\\(/&2032$§#> \
         <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
-        <@123invalid> <@>";
+        <@123invalid> <@> <@ ";
 
         // User mentions
         let options = ContentSafeOptions::default();
