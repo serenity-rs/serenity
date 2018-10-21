@@ -546,6 +546,8 @@ pub struct ContentSafeOptions {
     clean_role: bool,
     clean_user: bool,
     clean_channel: bool,
+    clean_here: bool,
+    clean_everyone: bool,
     show_discriminator: bool,
     guild_reference: Option<GuildId>,
 }
@@ -610,6 +612,26 @@ impl ContentSafeOptions {
 
         self
     }
+
+    /// If set, [`content_safe`] will replace `@here` with a non-pinging
+    /// alternative.
+    ///
+    /// [`content_safe`]: fn.content_safe.html
+    pub fn clean_here(mut self, b: bool) -> Self {
+        self.clean_here = b;
+
+        self
+    }
+
+    /// If set, [`content_safe`] will replace `@everyone` with a non-pinging
+    /// alternative.
+    ///
+    /// [`content_safe`]: fn.content_safe.html
+    pub fn clean_everyone(mut self, b: bool) -> Self {
+        self.clean_everyone = b;
+
+        self
+    }
 }
 
 #[cfg(feature = "cache")]
@@ -620,6 +642,8 @@ impl Default for ContentSafeOptions {
             clean_role: true,
             clean_user: true,
             clean_channel: true,
+            clean_here: true,
+            clean_everyone: true,
             show_discriminator: true,
             guild_reference: None,
         }
@@ -823,8 +847,15 @@ fn _content_safe(cache: &RwLock<Cache>, s: &str, options: &ContentSafeOptions) -
         clean_users(&cache, &mut s, options.show_discriminator, options.guild_reference);
     }
 
-    s.replace("@everyone", "@\u{200B}everyone")
-     .replace("@here", "@\u{200B}here")
+    if options.clean_here {
+        s = s.replace("@here", "@\u{200B}here");
+    }
+
+    if options.clean_everyone {
+        s = s.replace("@everyone", "@\u{200B}everyone");
+    }
+
+    s
 }
 
 #[cfg(test)]
