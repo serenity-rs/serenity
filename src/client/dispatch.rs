@@ -25,6 +25,7 @@ use std::time::Duration;
 #[cfg(feature = "cache")]
 use super::CACHE;
 
+#[cfg(feature = "cache")]
 lazy_static! {
     pub static ref CACHE_TRY_WRITE_DURATION: Option<Duration> =
         CACHE.read().get_try_write_duration();
