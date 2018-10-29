@@ -813,13 +813,13 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
 /// ```rust,ignore
 /// use serenity::utils::{
 ///     content_safe,
-///     Discriminator,
+///     ContentSafeOptions,
 /// };
 ///
-/// let everyone_mention = "@everyone";
-/// let defused_mention = content_safe(&everyone_mention, Discriminator::Hide);
+/// let with_mention = "@everyone";
+/// let without_mention = content_safe(&with_mention, &ContentSafeOptions::default());
 ///
-/// assert_eq!("@\u{200B}everyone".to_string(), defused_mention);
+/// assert_eq!("@\u{200B}everyone".to_string(), without_mention);
 /// ```
 /// [`ContentSafeOptions`]: struct.ContentSafeOptions.html
 /// [`Cache`]: ../cache/struct.Cache.html
