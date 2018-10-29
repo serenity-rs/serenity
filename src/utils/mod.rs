@@ -801,10 +801,11 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
     }
 }
 
-/// Neutralises role, channel, and user mentions including `@everyone`
-/// and `@here` using the [`Cache`] only.
+/// Transforms role, channel, user, `@everyone` and `@here` mentions
+/// into raw text by using the [`Cache`] only.
 ///
-/// [`ContentSafeOptions`] alters behaviour of this function.
+/// [`ContentSafeOptions`] decides what kind of mentions should be filtered
+/// and how the raw-text will be displayed.
 ///
 /// # Examples
 ///
