@@ -810,7 +810,7 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
 ///
 /// Sanitise an `@everyone` mention.
 ///
-/// ```rust,ignore
+/// ```rust
 /// use serenity::utils::{
 ///     content_safe,
 ///     ContentSafeOptions,
