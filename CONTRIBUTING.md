@@ -78,3 +78,6 @@ Add an empty line after the subject line in documentation. For example:
 /// Note the empty line after the subject, and between paragraphs.
 fn foo() { }
 ```
+
+We have an 80 characters per line soft limit, in case readability would suffer
+and to support descriptive naming, 100 characters is our hard limit.
