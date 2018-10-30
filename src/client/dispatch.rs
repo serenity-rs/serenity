@@ -36,19 +36,20 @@ macro_rules! update {
         {
             #[cfg(feature = "cache")]
             {
-                if let Some(duration) = *CACHE_TRY_WRITE_DURATION {
-                    CACHE.try_write_for(duration)
-                        .and_then(|mut lock| lock.update(&mut $event))
-                        .or_else(|| {
+                match *CACHE_TRY_WRITE_DURATION {
+                    Some(duration) => {
+                        if let Some(mut lock) = CACHE.try_write_for(duration) {
+                            lock.update(&mut $event)
+                        } else {
                             warn!(
                                 "[dispatch] Possible deadlock: couldn't unlock cache to update with event: {:?}",
                                 $event,
                             );
-
                             None
-                    })
-                } else {
-                    CACHE.write().update(&mut $event)
+                        }},
+                    None => {
+                        CACHE.write().update(&mut $event)
+                    },
                 }
             }
         }
