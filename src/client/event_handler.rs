@@ -8,6 +8,31 @@ use std::{
 use super::context::Context;
 use ::client::bridge::gateway::event::*;
 
+macro_rules! impl_event_handler {
+    (#[$doc:meta] pub trait $trait_name:ident { $($(#[$fn_item:meta])* fn $fn_name:ident(&self, $($arg_name:ident: $arg_type:ty),*) {})* }) => {
+        #[$doc]
+        pub trait $trait_name {
+            $(
+                $(#[$fn_item])*
+                fn $fn_name(&self, $($arg_name: $arg_type),*) {}
+            )*
+        }
+
+        /// A vector of boxed event handlers can be used as an event handler. Each event is sent to each element of the vector in order.
+        impl $trait_name for Vec<Box<$trait_name>> {
+            $(
+                $(#[$fn_item])*
+                fn $fn_name(&self, $($arg_name: $arg_type),*) {
+                    for inner in self {
+                        inner.$fn_name($($arg_name.clone()),*);
+                    }
+                }
+            )*
+        }
+    };
+}
+
+impl_event_handler! {
 /// The core trait for handling events by serenity.
 pub trait EventHandler {
     /// Dispatched when the cache gets full.
@@ -232,7 +257,7 @@ pub trait EventHandler {
     /// Provides the new data of the message.
     fn message_update(&self, _ctx: Context, _new_data: MessageUpdateEvent) {}
 
-    fn presence_replace(&self, _ctx: Context, _: Vec<Presence>) {}
+    fn presence_replace(&self, _ctx: Context, _presences: Vec<Presence>) {}
 
     /// Dispatched when a user's presence is updated (e.g off -> on).
     ///
@@ -245,15 +270,15 @@ pub trait EventHandler {
     fn ready(&self, _ctx: Context, _data_about_bot: Ready) {}
 
     /// Dispatched upon reconnection.
-    fn resume(&self, _ctx: Context, _: ResumedEvent) {}
+    fn resume(&self, _ctx: Context, _event: ResumedEvent) {}
 
     /// Dispatched when a shard's connection stage is updated
     ///
     /// Provides the context of the shard and the event information about the update.
-    fn shard_stage_update(&self, _ctx: Context, _: ShardStageUpdateEvent) {}
+    fn shard_stage_update(&self, _ctx: Context, _event: ShardStageUpdateEvent) {}
 
     /// Dispatched when a user starts typing.
-    fn typing_start(&self, _ctx: Context, _: TypingStartEvent) {}
+    fn typing_start(&self, _ctx: Context, _event: TypingStartEvent) {}
 
     /// Dispatched when an unknown event was sent from discord.
     ///
@@ -275,16 +300,17 @@ pub trait EventHandler {
     /// Dispatched when a guild's voice server was updated (or changed to another one).
     ///
     /// Provides the voice server's data.
-    fn voice_server_update(&self, _ctx: Context, _: VoiceServerUpdateEvent) {}
+    fn voice_server_update(&self, _ctx: Context, _event: VoiceServerUpdateEvent) {}
 
     /// Dispatched when a user joins, leaves or moves a voice channel.
     ///
     /// Provides the guild's id (if available) and
     /// the new state of the guild's voice channels.
-    fn voice_state_update(&self, _ctx: Context, _: Option<GuildId>, _: VoiceState) {}
+    fn voice_state_update(&self, _ctx: Context, _guild_id: Option<GuildId>, _voice_state: VoiceState) {}
 
     /// Dispatched when a guild's webhook is updated.
     ///
     /// Provides the guild's id and the channel's id the webhook belongs in.
     fn webhook_update(&self, _ctx: Context, _guild_id: GuildId, _belongs_to_channel_id: ChannelId) {}
+}
 }
