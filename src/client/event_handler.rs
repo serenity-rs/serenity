@@ -19,7 +19,7 @@ macro_rules! impl_event_handler {
         }
 
         /// A vector of boxed event handlers can be used as an event handler. Each event is sent to each element of the vector in order.
-        impl $trait_name for Vec<Box<$trait_name>> {
+        impl $trait_name for Vec<Box<$trait_name + Send + Sync>> {
             $(
                 $(#[$fn_item])*
                 fn $fn_name(&self, $($arg_name: $arg_type),*) {
