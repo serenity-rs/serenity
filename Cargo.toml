@@ -8,7 +8,7 @@ license = "ISC"
 name = "serenity"
 readme = "README.md"
 repository = "https://github.com/serenity-rs/serenity.git"
-version = "0.5.9"
+version = "0.5.10"
 
 [dependencies]
 bitflags = "^1.0"
