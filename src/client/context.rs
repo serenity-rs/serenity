@@ -8,17 +8,6 @@ use std::sync::{
 };
 use typemap::ShareMap;
 
-#[cfg(feature = "builder")]
-use builder::EditProfile;
-#[cfg(feature = "builder")]
-use internal::prelude::*;
-#[cfg(all(feature = "builder", feature = "cache"))]
-use super::CACHE;
-#[cfg(feature = "builder")]
-use {Result, http};
-#[cfg(feature = "builder")]
-use utils::{self, VecMap};
-
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
 /// The context also acts as a general high-level interface over the associated
@@ -218,7 +207,7 @@ impl Context {
     /// [`set_presence`]: #method.set_presence
     #[inline]
     pub fn reset_presence(&self) {
-        self.shard.set_presence(None::<Game>, OnlineStatus::Online);
+        self.shard.set_presence(None::<Activity>, OnlineStatus::Online);
     }
 
     /// Sets the current activity, defaulting to an online status of [`Online`].

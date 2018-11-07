@@ -624,9 +624,10 @@ fn send_grouped_commands_embed(
     groups: &[GroupCommandsPair],
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id.send_message(|m| {
+    channel_id.send_message(|mut m| {
         m.embed(|mut embed| {
-            embed = embed.colour(colour).description(help_description);
+            embed.colour(colour);
+            embed.description(help_description);
 
             for group in groups {
                 let joined_command_text_body = group.command_names.join("\n");
@@ -641,11 +642,12 @@ fn send_grouped_commands_embed(
                     ),
                 };
 
-                embed = embed.field(group.name, field_text, true);
+                embed.field(group.name, field_text, true);
             }
 
             embed
-        })
+        });
+        m
     })
 }
 
@@ -656,36 +658,39 @@ fn send_single_command_embed(
     command: &Command,
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id.send_message(|m| {
+    channel_id.send_message(|mut m| {
         m.embed(|mut embed| {
-            embed = embed.title(&command.name).colour(colour);
+            embed.title(&command.name);
+            embed.colour(colour);
 
             if let &Some(ref desc) = &command.description {
-                embed = embed.description(desc);
+                embed.description(desc);
             }
 
             if let &Some(ref usage) = &command.usage {
-                embed = embed.field(&help_options.usage_label, usage, true);
+                embed.field(&help_options.usage_label, usage, true);
             }
 
             if let Some(ref usage_sample) = command.usage_sample {
                 let value = format!("`{} {}`", command.name, usage_sample);
 
-                embed = embed.field(&help_options.usage_sample_label, value, true);
+                embed.field(&help_options.usage_sample_label, value, true);
             }
 
-            embed = embed.field(&help_options.grouped_label, command.group_name, true);
+            embed.field(&help_options.grouped_label, command.group_name, true);
 
             if !command.aliases.is_empty() {
-                embed = embed.field(
+                embed.field(
                     &help_options.aliases_label,
                     format!("`{}`", command.aliases.join("`, `")),
                     true,
                 );
             }
 
-            embed.field(&help_options.available_text, &command.availability, true)
-        })
+            embed.field(&help_options.available_text, &command.availability, true);
+            embed
+        });
+        m
     })
 }
 
@@ -698,12 +703,26 @@ fn send_suggestion_embed(
 ) -> Result<Message, Error> {
     let text = format!("{}", help_description.replace("{}", &suggestions.join("`, `")));
 
-    channel_id.send_message(|m| m.embed(|e| e.colour(colour).description(text)))
+    channel_id.send_message(|mut m| {
+        m.embed(|mut e|  { 
+            e.colour(colour);
+            e.description(text);
+            e
+        });
+        m
+    })
 }
 
 /// Sends an embed explaining fetching commands failed.
 fn send_error_embed(channel_id: ChannelId, input: &str, colour: Colour) -> Result<Message, Error> {
-    channel_id.send_message(|m| m.embed(|e| e.colour(colour).description(input)))
+    channel_id.send_message(|mut m| {
+        m.embed(|mut e| {
+            e.colour(colour);
+            e.description(input);
+            e
+            });
+            m
+    })
 }
 
 /// Posts an embed showing each individual command group and its commands.

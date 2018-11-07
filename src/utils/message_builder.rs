@@ -97,7 +97,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "test");
     /// ```
-    pub fn build(self) -> String { self.0 }
+    pub fn build(&mut self) -> String { self.clone().0 }
 
     /// Mentions the [`GuildChannel`] in the built message.
     ///
@@ -1091,12 +1091,12 @@ mod test {
 
     #[test]
     fn push_codeblock() {
-        let content = MessageBuilder::new().push_codeblock("foo", None).0;
+        let content = &MessageBuilder::new().push_codeblock("foo", None).0.clone();
         assert_eq!(content, "```\nfoo\n```");
 
-        let content = MessageBuilder::new()
+        let content = &MessageBuilder::new()
             .push_codeblock("fn main() { }", Some("rs"))
-            .0;
+            .0.clone();
         assert_eq!(content, "```rs\nfn main() { }\n```");
     }
 
@@ -1104,23 +1104,23 @@ mod test {
     fn push_codeblock_safe() {
         assert_eq!(
             MessageBuilder::new().push_codeblock_safe("foo", Some("rs")).0,
-            "```rs\nfoo```",
+            "```rs\nfoo\n```",
         );
         assert_eq!(
             MessageBuilder::new().push_codeblock_safe("", None).0,
-            "```\n```",
+            "```\n\n```",
         );
         assert_eq!(
             MessageBuilder::new().push_codeblock_safe("1 * 2", None).0,
-            "```\n1 * 2```",
+            "```\n1 * 2\n```",
         );
         assert_eq!(
             MessageBuilder::new().push_codeblock_safe("`1 * 3`", None).0,
-            "```\n`1 * 3````",
+            "```\n`1 * 3`\n```",
         );
         assert_eq!(
             MessageBuilder::new().push_codeblock_safe("```.```", None).0,
-            "```\n . ```",
+            "```\n . \n```",
         );
     }
 
