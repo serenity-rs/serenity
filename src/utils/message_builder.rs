@@ -93,9 +93,10 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new().push("test").0;
+    /// let mut content = MessageBuilder::new();
+    /// content.push("test");
     ///
-    /// assert_eq!(content, "test");
+    /// assert_eq!(content.build(), "test");
     /// ```
     pub fn build(&mut self) -> String { self.clone().0 }
 
@@ -199,9 +200,10 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let message = MessageBuilder::new().push("test");
+    /// let mut message = MessageBuilder::new();
+    /// message.push("test");
     ///
-    /// assert_eq!(message.push("ing").0, "testing");
+    /// assert_eq!({ message.push("ing"); message.build() }, "testing");
     /// ```
     #[inline]
     pub fn push<D: I>(&mut self, content: D) -> &mut Self {
