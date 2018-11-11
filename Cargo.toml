@@ -20,7 +20,7 @@ serde_json = "^1.0"
 
 [dependencies.base64]
 optional = true
-version = "~0.9"
+version = "0.10"
 
 [dependencies.byteorder]
 optional = true
@@ -66,8 +66,9 @@ version = "^0.4"
 
 [dependencies.sodiumoxide]
 default-features = false
+features = ["std"]
 optional = true
-version = "0.0.14"
+version = "0.1"
 
 [dependencies.threadpool]
 optional = true
