@@ -1065,7 +1065,19 @@ impl Framework for StandardFramework {
 
                 positions
             },
-            None => return,
+            None => {
+                if let &Some(ref message_without_command) = &self.message_without_command {
+
+                    if !(self.configuration.ignore_bots && message.author.bot) {
+                        let message_without_command = message_without_command.clone();
+                        threadpool.execute(move || {
+                            (message_without_command)(&mut context, &message);
+                        });
+                    }
+                }
+
+                return;
+            },
         };
 
         'outer: for position in positions {
