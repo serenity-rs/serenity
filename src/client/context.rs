@@ -1,12 +1,19 @@
+use builder::EditProfile;
+use CACHE;
 use client::bridge::gateway::ShardMessenger;
+use error::Result;
 use gateway::InterMessage;
+use http;
 use model::prelude::*;
 use parking_lot::Mutex;
+use serde_json::Value;
 use std::sync::{
-    mpsc::Sender,
-    Arc
+    Arc,
+    mpsc::Sender
 };
 use typemap::ShareMap;
+use utils::VecMap;
+use utils::vecmap_to_json_map;
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
@@ -104,7 +111,7 @@ impl Context {
             }
         }
 
-        let edited = utils::vecmap_to_json_map(f(EditProfile(map)).0);
+        let edited = vecmap_to_json_map(f(EditProfile(map)).0);
 
         http::edit_profile(&edited)
     }

@@ -34,7 +34,7 @@ impl EditProfile {
     ///         let base64 = utils::read_image("./my_image.jpg")
     ///         .expect("Failed to read image");
     ///
-    ///         let _ = serenity::http::edit_profile(|mut profile| {
+    ///         let _ = context.edit_profile(|mut profile| {
     ///             profile.avatar(Some(&base64));
     ///
     ///             profile
