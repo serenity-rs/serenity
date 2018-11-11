@@ -39,7 +39,7 @@ use model::{
     id::{ChannelId, GuildId, UserId},
     Permissions
 };
-use self::command::{AfterHook, BeforeHook, UnrecognisedCommandHook};
+use self::command::{AfterHook, BeforeHook, MessageWithoutCommandHook, UnrecognisedCommandHook};
 use std::{
     collections::HashMap,
     default::Default,
@@ -217,6 +217,7 @@ pub struct StandardFramework {
     buckets: HashMap<String, Bucket>,
     after: Option<Arc<AfterHook>>,
     unrecognised_command: Option<Arc<UnrecognisedCommandHook>>,
+    message_without_command: Option<Arc<MessageWithoutCommandHook>>,
     /// Whether the framework has been "initialized".
     ///
     /// The framework is initialized once one of the following occurs:
