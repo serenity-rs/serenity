@@ -551,8 +551,8 @@ impl Message {
     /// **Note**:
     /// If message was sent in a private channel, then the function will return
     /// `None`.
-    pub fn author_nick(self) -> Option<String> {
-        self.guild_id.and_then(|guild_id| self.author.nick_in(guild_id))
+    pub fn author_nick(&self) -> Option<String> {
+        self.guild_id.as_ref().and_then(|guild_id| self.author.nick_in(*guild_id))
     }
 
     pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {
