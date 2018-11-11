@@ -950,6 +950,31 @@ impl StandardFramework {
         self
     }
 
+    /// Specify the function to be called if a message contains no command.
+    ///
+    /// # Examples
+    ///
+    /// Using `message_without_command`:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler).unwrap();
+    /// #
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// client.with_framework(StandardFramework::new()
+    ///     .message_without_command(|ctx, msg| { }));
+    /// ```
+    pub fn message_without_command<F>(mut self, f: F) -> Self
+        where F: Fn(&mut Context, &Message) + Send + Sync + 'static {
+        self.message_without_command = Some(Arc::new(f));
+
+        self
+    }
+
     /// Sets what code should be executed when a user sends `(prefix)help`.
     ///
     /// If a command named `help` was set with [`command`], then this takes precedence first.
