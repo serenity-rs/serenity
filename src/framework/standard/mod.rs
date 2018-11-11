@@ -39,7 +39,7 @@ use model::{
     id::{ChannelId, GuildId, UserId},
     Permissions
 };
-use self::command::{AfterHook, BeforeHook, UnrecognisedCommandHook};
+use self::command::{AfterHook, BeforeHook, MessageWithoutCommandHook, UnrecognisedCommandHook};
 use std::{
     collections::HashMap,
     default::Default,
@@ -217,6 +217,7 @@ pub struct StandardFramework {
     buckets: HashMap<String, Bucket>,
     after: Option<Arc<AfterHook>>,
     unrecognised_command: Option<Arc<UnrecognisedCommandHook>>,
+    message_without_command: Option<Arc<MessageWithoutCommandHook>>,
     /// Whether the framework has been "initialized".
     ///
     /// The framework is initialized once one of the following occurs:
@@ -949,6 +950,31 @@ impl StandardFramework {
         self
     }
 
+    /// Specify the function to be called if a message contains no command.
+    ///
+    /// # Examples
+    ///
+    /// Using `message_without_command`:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler).unwrap();
+    /// #
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// client.with_framework(StandardFramework::new()
+    ///     .message_without_command(|ctx, msg| { }));
+    /// ```
+    pub fn message_without_command<F>(mut self, f: F) -> Self
+        where F: Fn(&mut Context, &Message) + Send + Sync + 'static {
+        self.message_without_command = Some(Arc::new(f));
+
+        self
+    }
+
     /// Sets what code should be executed when a user sends `(prefix)help`.
     ///
     /// If a command named `help` was set with [`command`], then this takes precedence first.
@@ -1039,7 +1065,19 @@ impl Framework for StandardFramework {
 
                 positions
             },
-            None => return,
+            None => {
+                if let &Some(ref message_without_command) = &self.message_without_command {
+
+                    if !(self.configuration.ignore_bots && message.author.bot) {
+                        let message_without_command = message_without_command.clone();
+                        threadpool.execute(move || {
+                            (message_without_command)(&mut context, &message);
+                        });
+                    }
+                }
+
+                return;
+            },
         };
 
         'outer: for position in positions {
@@ -1235,9 +1273,33 @@ impl Framework for StandardFramework {
         if !(self.configuration.ignore_bots && message.author.bot) {
 
             if let &Some(ref unrecognised_command) = &self.unrecognised_command {
-                let unrecognised_command = unrecognised_command.clone();
-                threadpool.execute(move || {
-                    (unrecognised_command)(&mut context, &message, &unrecognised_command_name);
+
+                // If both functions are set, we need to clone `Context` and
+                // `Message`, else we can avoid it.
+                if let &Some(ref message_without_command) = &self.message_without_command {
+                    let mut context_unrecognised = context.clone();
+                    let message_unrecognised = message.clone();
+
+                    let unrecognised_command = unrecognised_command.clone();
+                    threadpool.execute(move || {
+                        (unrecognised_command)(&mut context_unrecognised, &message_unrecognised,
+                        &unrecognised_command_name);
+                    });
+
+                    let message_without_command = message_without_command.clone();
+                        threadpool.execute(move || {
+                            (message_without_command)(&mut context, &message);
+                    });
+                } else {
+                    let unrecognised_command = unrecognised_command.clone();
+                    threadpool.execute(move || {
+                        (unrecognised_command)(&mut context, &message, &unrecognised_command_name);
+                    });
+                }
+            } else if let &Some(ref message_without_command) = &self.message_without_command {
+                let message_without_command = message_without_command.clone();
+                    threadpool.execute(move || {
+                        (message_without_command)(&mut context, &message);
                 });
             }
         }

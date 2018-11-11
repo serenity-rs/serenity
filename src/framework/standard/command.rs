@@ -60,6 +60,7 @@ impl HelpCommand for Help {
 pub type BeforeHook = Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static;
 pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), Error>) + Send + Sync + 'static;
 pub type UnrecognisedCommandHook = Fn(&mut Context, &Message, &str) + Send + Sync + 'static;
+pub type MessageWithoutCommandHook = Fn(&mut Context, &Message) + Send + Sync + 'static;
 pub(crate) type InternalCommand = Arc<Command>;
 pub type PrefixCheck = Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
 
