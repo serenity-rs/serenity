@@ -1273,9 +1273,33 @@ impl Framework for StandardFramework {
         if !(self.configuration.ignore_bots && message.author.bot) {
 
             if let &Some(ref unrecognised_command) = &self.unrecognised_command {
-                let unrecognised_command = unrecognised_command.clone();
-                threadpool.execute(move || {
-                    (unrecognised_command)(&mut context, &message, &unrecognised_command_name);
+
+                // If both functions are set, we need to clone `Context` and
+                // `Message`, else we can avoid it.
+                if let &Some(ref message_without_command) = &self.message_without_command {
+                    let mut context_unrecognised = context.clone();
+                    let message_unrecognised = message.clone();
+
+                    let unrecognised_command = unrecognised_command.clone();
+                    threadpool.execute(move || {
+                        (unrecognised_command)(&mut context_unrecognised, &message_unrecognised,
+                        &unrecognised_command_name);
+                    });
+
+                    let message_without_command = message_without_command.clone();
+                        threadpool.execute(move || {
+                            (message_without_command)(&mut context, &message);
+                    });
+                } else {
+                    let unrecognised_command = unrecognised_command.clone();
+                    threadpool.execute(move || {
+                        (unrecognised_command)(&mut context, &message, &unrecognised_command_name);
+                    });
+                }
+            } else if let &Some(ref message_without_command) = &self.message_without_command {
+                let message_without_command = message_without_command.clone();
+                    threadpool.execute(move || {
+                        (message_without_command)(&mut context, &message);
                 });
             }
         }
