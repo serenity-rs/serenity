@@ -546,6 +546,15 @@ impl Message {
         http::unpin_message(self.channel_id.0, self.id.0)
     }
 
+    /// Tries to return author's nickname in the current channel's guild.
+    ///
+    /// **Note**:
+    /// If message was sent in a private channel, then the function will return
+    /// `None`.
+    pub fn author_nick(&self) -> Option<String> {
+        self.guild_id.as_ref().and_then(|guild_id| self.author.nick_in(*guild_id))
+    }
+
     pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {
         if let Some(content) = map.get("content") {
             if let Value::String(ref content) = *content {
