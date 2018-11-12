@@ -8,6 +8,7 @@
 //! ```
 
 #[macro_use] extern crate serenity;
+extern crate typemap;
 
 use std::{env, sync::Arc};
 
@@ -32,8 +33,7 @@ use serenity::{
     voice,
 };
 
-// This imports `typemap`'s `Key` as `TypeMapKey`.
-use serenity::prelude::*;
+use typemap::Key;
 
 struct VoiceManager;
 

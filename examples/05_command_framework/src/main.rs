@@ -11,6 +11,7 @@
 
 #[macro_use]
 extern crate serenity;
+extern crate typemap;
 
 use std::{collections::HashMap, env, fmt::Write, sync::Arc};
 
@@ -24,8 +25,7 @@ use serenity::{
     utils::{content_safe, ContentSafeOptions},
 };
 
-// This imports `typemap`'s `Key` as `TypeMapKey`.
-use serenity::prelude::*;
+use typemap::Key;
 
 // A container type is created for inserting into the Client's `data`, which
 // allows for data to be accessible across all events and framework commands, or
