@@ -3,10 +3,12 @@
 extern crate env_logger;
 extern crate serenity;
 
-use serenity::prelude::*;
-use serenity::model::event::ResumedEvent;
-use serenity::model::gateway::Ready;
 use std::env;
+
+use serenity::{
+    model::{event::ResumedEvent, gateway::Ready},
+    prelude::*,
+};
 
 struct Handler;
 

@@ -13,18 +13,18 @@
 extern crate serenity;
 extern crate typemap;
 
-use serenity::client::bridge::gateway::{ShardId, ShardManager};
-use serenity::framework::standard::{Args, DispatchError, StandardFramework, HelpBehaviour, CommandOptions, help_commands};
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
-use serenity::model::Permissions;
-use serenity::prelude::Mutex;
-use serenity::prelude::*;
-use serenity::utils::{content_safe, ContentSafeOptions};
-use std::collections::HashMap;
-use std::env;
-use std::fmt::Write;
-use std::sync::Arc;
+use std::{collections::HashMap, env, fmt::Write, sync::Arc};
+
+use serenity::{
+    client::bridge::gateway::{ShardId, ShardManager},
+    framework::standard::{
+        help_commands, Args, CommandOptions, DispatchError, HelpBehaviour, StandardFramework,
+    },
+    model::{channel::Message, gateway::Ready, Permissions},
+    prelude::*,
+    utils::{content_safe, ContentSafeOptions},
+};
+
 use typemap::Key;
 
 // A container type is created for inserting into the Client's `data`, which

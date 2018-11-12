@@ -17,13 +17,14 @@ extern crate kankyo;
 
 mod commands;
 
-use serenity::framework::StandardFramework;
-use serenity::model::event::ResumedEvent;
-use serenity::model::gateway::Ready;
-use serenity::prelude::*;
-use serenity::http;
-use std::collections::HashSet;
-use std::env;
+use std::{collections::HashSet, env};
+
+use serenity::{
+    framework::StandardFramework,
+    model::{event::ResumedEvent, gateway::Ready},
+    prelude::*,
+    http,
+};
 
 struct Handler;
 
