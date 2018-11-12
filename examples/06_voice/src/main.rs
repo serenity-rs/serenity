@@ -8,29 +8,31 @@
 //! ```
 
 #[macro_use] extern crate serenity;
-
 extern crate typemap;
+
+use std::{env, sync::Arc};
 
 // Import the client's bridge to the voice manager. Since voice is a standalone
 // feature, it's not as ergonomic to work with as it could be. The client
 // provides a clean bridged integration with voice.
 use serenity::client::bridge::voice::ClientVoiceManager;
-use serenity::client::{CACHE, Client, Context, EventHandler};
-use serenity::framework::StandardFramework;
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
-use serenity::model::misc::Mentionable;
+
 // Import the `Context` from the client and `parking_lot`'s `Mutex`.
 //
 // `parking_lot` offers much more efficient implementations of `std::sync`'s
 // types. You can read more about it here:
 //
 // <https://github.com/Amanieu/parking_lot#features>
-use serenity::prelude::Mutex;
-use serenity::voice;
-use serenity::Result as SerenityResult;
-use std::env;
-use std::sync::Arc;
+use serenity::{client::{Context}, prelude::Mutex};
+
+use serenity::{
+    client::{CACHE, Client, EventHandler},
+    framework::StandardFramework,
+    model::{channel::Message, gateway::Ready, misc::Mentionable},
+    Result as SerenityResult,
+    voice,
+};
+
 use typemap::Key;
 
 struct VoiceManager;
@@ -135,7 +137,7 @@ command!(join(ctx, msg) {
         }
     };
 
-    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
     let mut manager = manager_lock.lock();
 
     if manager.join(guild_id, connect_to).is_some() {
@@ -155,7 +157,7 @@ command!(leave(ctx, msg) {
         },
     };
 
-    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
     let mut manager = manager_lock.lock();
     let has_handler = manager.get(guild_id).is_some();
 
@@ -178,7 +180,7 @@ command!(mute(ctx, msg) {
         },
     };
 
-    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
     let mut manager = manager_lock.lock();
 
     let handler = match manager.get_mut(guild_id) {
@@ -228,7 +230,7 @@ command!(play(ctx, msg, args) {
         },
     };
 
-    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
     let mut manager = manager_lock.lock();
 
     if let Some(handler) = manager.get_mut(guild_id) {
@@ -261,7 +263,7 @@ command!(undeafen(ctx, msg) {
         },
     };
 
-    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
     let mut manager = manager_lock.lock();
 
     if let Some(handler) = manager.get_mut(guild_id) {
@@ -282,7 +284,7 @@ command!(unmute(ctx, msg) {
             return Ok(());
         },
     };
-    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
     let mut manager = manager_lock.lock();
 
     if let Some(handler) = manager.get_mut(guild_id) {

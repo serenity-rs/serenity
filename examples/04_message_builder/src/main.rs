@@ -1,10 +1,12 @@
 extern crate serenity;
 
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
-use serenity::prelude::*;
-use serenity::utils::MessageBuilder;
 use std::env;
+
+use serenity::{
+    model::{channel::Message, gateway::Ready},
+    prelude::*,
+    utils::MessageBuilder,
+};
 
 struct Handler;
 
@@ -42,6 +44,7 @@ impl EventHandler for Handler {
         println!("{} is connected!", ready.user.name);
     }
 }
+
 fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")

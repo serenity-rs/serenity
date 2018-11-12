@@ -11,18 +11,17 @@
 
 extern crate typemap;
 
-use serenity::client::bridge::voice::ClientVoiceManager;
-use serenity::client::{CACHE, Client, Context, EventHandler};
-use serenity::framework::StandardFramework;
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
-use serenity::model::id::ChannelId;
-use serenity::model::misc::Mentionable;
-use serenity::prelude::Mutex;
-use serenity::voice::AudioReceiver;
-use serenity::Result as SerenityResult;
-use std::sync::Arc;
-use std::env;
+use std::{env, sync::Arc};
+
+use serenity::{
+    client::{bridge::voice::ClientVoiceManager, CACHE, Client, Context, EventHandler},
+    framework::StandardFramework,
+    model::{channel::Message, gateway::Ready, id::ChannelId, misc::Mentionable},
+    prelude::*,
+    voice::AudioReceiver,
+    Result as SerenityResult,
+};
+
 use typemap::Key;
 
 struct VoiceManager;
@@ -112,7 +111,7 @@ command!(join(ctx, msg, args) {
         },
     };
 
-    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
     let mut manager = manager_lock.lock();
 
     if let Some(handler) = manager.join(guild_id, connect_to) {
@@ -133,7 +132,7 @@ command!(leave(ctx, msg) {
         },
     };
 
-    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().unwrap();
+    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
     let mut manager = manager_lock.lock();
     let has_handler = manager.get(guild_id).is_some();
 

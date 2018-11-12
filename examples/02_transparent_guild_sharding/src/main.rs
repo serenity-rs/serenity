@@ -1,9 +1,11 @@
 extern crate serenity;
 
-use serenity::prelude::*;
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
 use std::env;
+
+use serenity::{
+    model::{channel::Message, gateway::Ready},
+    prelude::*,
+};
 
 // Serenity implements transparent sharding in a way that you do not need to
 // manually handle separate processes or connections manually.

@@ -25,10 +25,12 @@
 
 extern crate serenity;
 
-use serenity::prelude::*;
-use serenity::model::gateway::Ready;
-use std::time::Duration;
-use std::{env, thread};
+use std::{env, thread, time::Duration};
+
+use serenity::{
+    model::gateway::Ready,
+    prelude::*,
+};
 
 struct Handler;
 
