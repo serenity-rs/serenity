@@ -1957,7 +1957,7 @@ impl Region {
             Region::EuWest => "eu-west",
             Region::Frankfurt => "frankfurt",
             Region::HongKong => "hongkong",
-            Region::Japan => "Japan",
+            Region::Japan => "japan",
             Region::London => "london",
             Region::Russia => "russia",
             Region::Singapore => "singapore",
