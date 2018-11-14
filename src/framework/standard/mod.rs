@@ -696,6 +696,13 @@ impl StandardFramework {
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
                 let cmd: Arc<Command> = Arc::new(c);
 
+                for n in &cmd.options().aliases {
+                     group.commands.insert(
+                         n.to_string(),
+                         CommandOrAlias::Alias(name.to_string()),
+                     );
+                }
+
                 group
                     .commands
                     .insert(name.to_string(), CommandOrAlias::Command(Arc::clone(&cmd)));

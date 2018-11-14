@@ -97,6 +97,24 @@ impl CreateGroup {
     pub fn cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
         let cmd: Arc<Command> = Arc::new(c);
 
+        for n in &cmd.options().aliases {
+
+            if let Some(ref prefixes) = self.0.prefixes {
+
+                for prefix in prefixes {
+                    self.0.commands.insert(
+                        format!("{} {}", prefix, n.to_string()),
+                        CommandOrAlias::Alias(format!("{} {}", prefix, name.to_string())),
+                    );
+                }
+            } else {
+                self.0.commands.insert(
+                    n.to_string(),
+                    CommandOrAlias::Alias(name.to_string()),
+                );
+            }
+        }
+
         self.0
             .commands
             .insert(name.to_string(), CommandOrAlias::Command(Arc::clone(&cmd)));
