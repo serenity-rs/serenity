@@ -64,7 +64,7 @@ impl CreateGroup {
 
                 for prefix in prefixes {
                     self.0.commands.insert(
-                        format!("{} {}", prefix, n.to_string()),
+                        format!("{} {}", prefix, alias.to_string()),
                         CommandOrAlias::Alias(format!("{} {}", prefix, command_name.to_string())),
                     );
                 }
@@ -103,7 +103,7 @@ impl CreateGroup {
 
                 for prefix in prefixes {
                     self.0.commands.insert(
-                        format!("{} {}", prefix, n.to_string()),
+                        format!("{} {}", prefix, alias.to_string()),
                         CommandOrAlias::Alias(format!("{} {}", prefix, name.to_string())),
                     );
                 }

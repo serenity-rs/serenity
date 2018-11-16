@@ -698,7 +698,7 @@ impl StandardFramework {
 
                 for alias in &cmd.options().aliases {
                      group.commands.insert(
-                         n.to_string(),
+                         alias.to_string(),
                          CommandOrAlias::Alias(name.to_string()),
                      );
                 }
