@@ -438,7 +438,13 @@ impl User {
     ///                 url,
     ///             );
     ///
-    ///             match msg.author.direct_message(|m| m.content(&help)) {
+    ///             let dm = msg.author.direct_message(|mut m| {
+    ///                 m.content(&help);
+    ///
+    ///                 m
+    ///             });
+    ///
+    ///             match dm {
     ///                 Ok(_) => {
     ///                     let _ = msg.react('👌');
     ///                 },

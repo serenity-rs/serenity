@@ -495,7 +495,11 @@ impl ChannelId {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[inline]
     pub fn say<D: ::std::fmt::Display>(&self, content: D) -> Result<Message> {
-        self.send_message(|m| m.content(content))
+        self.send_message(|mut m| {
+            m.content(content);
+
+            m
+        })
     }
 
     /// Sends a file along with optional message contents. The filename _must_
@@ -519,7 +523,11 @@ impl ChannelId {
     ///
     /// let paths = vec!["/path/to/file.jpg", "path/to/file2.jpg"];
     ///
-    /// let _ = channel_id.send_files(paths, |m| m.content("a file"));
+    /// let _ = channel_id.send_files(paths, |mut m| {
+    ///     m.content("a file");
+    ///
+    ///     m
+    /// });
     /// ```
     ///
     /// Send files using `File`:
@@ -535,7 +543,11 @@ impl ChannelId {
     ///
     /// let files = vec![(&f1, "my_file.jpg"), (&f2, "my_file2.jpg")];
     ///
-    /// let _ = channel_id.send_files(files, |m| m.content("a file"));
+    /// let _ = channel_id.send_files(files, |mut m| {
+    ///     m.content("a file");
+    ///
+    ///     m
+    /// });
     /// ```
     ///
     /// # Errors
@@ -597,13 +609,24 @@ impl ChannelId {
     #[cfg(feature = "utils")]
     pub fn send_message<F>(&self, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage {
-        let msg = f(CreateMessage::default());
+        let mut msg = f(CreateMessage::default());
+
+        if !msg.2.is_empty() {
+            if let Some(e) = msg.0.remove(&"embed") {
+                msg.0.insert("payload_json", json!({ "embed": e }));
+            }
+        }
+
         let map = utils::vecmap_to_json_map(msg.0);
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        let message = http::send_message(self.0, &Value::Object(map))?;
+        let message = if msg.2.is_empty() {
+            http::send_message(self.0, &Value::Object(map))?
+        } else {
+            http::send_files(self.0, msg.2, map)?
+        };
 
         if let Some(reactions) = msg.1 {
             for reaction in reactions {

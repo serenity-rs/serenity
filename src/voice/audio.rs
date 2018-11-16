@@ -1,11 +1,12 @@
 use parking_lot::Mutex;
 use std::{
     sync::Arc,
-    time::Duration
+    time::Duration,
 };
 
 pub const HEADER_LEN: usize = 12;
 pub const SAMPLE_RATE: u32 = 48_000;
+pub const DEFAULT_BITRATE: i32 = 128_000;
 
 /// A readable audio source.
 pub trait AudioSource: Send {
@@ -16,6 +17,8 @@ pub trait AudioSource: Send {
     fn read_pcm_frame(&mut self, buffer: &mut [i16]) -> Option<usize>;
 
     fn read_opus_frame(&mut self) -> Option<Vec<u8>>;
+
+    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize>;
 }
 
 /// A receiver for incoming audio.
@@ -66,8 +69,7 @@ pub struct Audio {
 
     /// Whether or not this sound is currently playing.
     ///
-    /// Can be controlled with [`play`] or [`pause`]
-    /// if chaining is desired.
+    /// Can be controlled with [`play`] or [`pause`] if chaining is desired.
     ///
     /// [`play`]: #method.play
     /// [`pause`]: #method.pause
@@ -76,6 +78,7 @@ pub struct Audio {
     /// The desired volume for playback.
     ///
     /// Sensible values fall between `0.0` and `1.0`.
+    ///
     /// Can be controlled with [`volume`] if chaining is desired.
     ///
     /// [`volume`]: #method.volume

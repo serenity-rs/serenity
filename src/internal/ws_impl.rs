@@ -20,25 +20,11 @@ impl ReceiverExt for WsClient<TlsStream<TcpStream>> {
     fn recv_json(&mut self) -> Result<Option<Value>> {
         Ok(match self.recv_message()? {
             OwnedMessage::Binary(bytes) => {
-                serde_json::from_reader(ZlibDecoder::new(&bytes[..]))
-                    .map(Some)
-                    .map_err(|why| {
-                        warn!("Err deserializing bytes: {:?}; bytes: {:?}", why, bytes);
-
-                        why
-                    })?
+                serde_json::from_reader(ZlibDecoder::new(&bytes[..])).map(Some)?
             },
             OwnedMessage::Close(data) => return Err(Error::Gateway(GatewayError::Closed(data))),
             OwnedMessage::Text(payload) => {
-                serde_json::from_str(&payload).map(Some).map_err(|why| {
-                    warn!(
-                        "Err deserializing text: {:?}; text: {}",
-                        why,
-                        payload,
-                    );
-
-                    why
-                })?
+                serde_json::from_str(&payload).map(Some)?
             },
             OwnedMessage::Ping(x) => {
                 self.send_message(&OwnedMessage::Pong(x))

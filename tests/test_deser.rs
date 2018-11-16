@@ -16,6 +16,13 @@ macro_rules! p {
     }};
 }
 
+// An activity with null type.
+#[test]
+fn activity() {
+    p!(Activity, "activity_1");
+    p!(Activity, "activity_2");
+}
+
 #[test]
 fn channel_create() {
     p!(ChannelCreateEvent, "channel_create_1");
@@ -39,12 +46,6 @@ fn channel_update() {
 #[test]
 fn emoji_animated() {
     p!(Emoji, "emoji_animated");
-}
-
-// A game with null type.
-#[test]
-fn game() {
-    p!(Game, "game_1");
 }
 
 #[test]
@@ -73,6 +74,7 @@ fn guild_some_application_id() {
 #[test]
 fn guild_create() {
     p!(GuildCreateEvent, "guild_create_1");
+    p!(GuildCreateEvent, "guild_create_2");
 }
 
 #[test]
