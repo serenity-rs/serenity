@@ -58,7 +58,7 @@ impl CreateGroup {
         where F: FnOnce(CreateCommand) -> CreateCommand {
         let cmd = f(self.build_command()).finish();
 
-        for n in &cmd.options().aliases {
+        for alias in &cmd.options().aliases {
 
             if let Some(ref prefixes) = self.0.prefixes {
 
@@ -97,7 +97,7 @@ impl CreateGroup {
     pub fn cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
         let cmd: Arc<Command> = Arc::new(c);
 
-        for n in &cmd.options().aliases {
+        for alias in &cmd.options().aliases {
 
             if let Some(ref prefixes) = self.0.prefixes {
 
