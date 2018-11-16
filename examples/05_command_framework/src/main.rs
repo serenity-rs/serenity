@@ -20,7 +20,7 @@ use serenity::{
     framework::standard::{
         help_commands, Args, CommandOptions, DispatchError, HelpBehaviour, StandardFramework,
     },
-    model::{channel::Message, gateway::Ready, Permissions},
+    model::{channel::{Channel, Message}, gateway::Ready, Permissions},
     prelude::*,
     utils::{content_safe, ContentSafeOptions},
 };
@@ -230,6 +230,9 @@ fn main() {
             .command("am i admin", |c| c
                 .cmd(am_i_admin)
                 .guild_only(true))
+            .command("slow mode", |c| c
+                .cmd(slow_mode)
+                .guild_only(true))
         ),
     );
 
@@ -435,6 +438,27 @@ command!(bird(_ctx, msg, args) {
         ":bird: can find animals for you.".to_string()
     } else {
         format!(":bird: could not find animal named: `{}`.", args.full())
+    };
+
+    if let Err(why) = msg.channel_id.say(say_content) {
+        println!("Error sending message: {:?}", why);
+    }
+});
+
+command!(slow_mode(_ctx, msg, args) {
+    let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u64>() {
+
+        if let Err(why) = msg.channel_id.edit(|c| c.slow_mode_rate(slow_mode_rate_seconds)) {
+            println!("Error setting channel's slow mode rate: {:?}", why);
+
+            format!("Failed to set slow mode to `{}` seconds.", slow_mode_rate_seconds)
+        } else {
+            format!("Successfully set slow mode rate to `{}` seconds.", slow_mode_rate_seconds)
+        }
+    } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached() {
+        format!("Current slow mode rate is `{}` seconds.", channel.read().slow_mode_rate)
+    } else {
+        "Failed to find channel in cache.".to_string()
     };
 
     if let Err(why) = msg.channel_id.say(say_content) {
