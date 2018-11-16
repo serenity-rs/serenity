@@ -70,7 +70,7 @@ impl CreateGroup {
                 }
             } else {
                 self.0.commands.insert(
-                    n.to_string(),
+                    alias.to_string(),
                     CommandOrAlias::Alias(command_name.to_string()),
                 );
             }
@@ -109,7 +109,7 @@ impl CreateGroup {
                 }
             } else {
                 self.0.commands.insert(
-                    n.to_string(),
+                    alias.to_string(),
                     CommandOrAlias::Alias(name.to_string()),
                 );
             }
