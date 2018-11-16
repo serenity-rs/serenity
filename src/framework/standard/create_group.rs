@@ -58,19 +58,19 @@ impl CreateGroup {
         where F: FnOnce(CreateCommand) -> CreateCommand {
         let cmd = f(self.build_command()).finish();
 
-        for n in &cmd.options().aliases {
+        for alias in &cmd.options().aliases {
 
             if let Some(ref prefixes) = self.0.prefixes {
 
                 for prefix in prefixes {
                     self.0.commands.insert(
-                        format!("{} {}", prefix, n.to_string()),
+                        format!("{} {}", prefix, alias.to_string()),
                         CommandOrAlias::Alias(format!("{} {}", prefix, command_name.to_string())),
                     );
                 }
             } else {
                 self.0.commands.insert(
-                    n.to_string(),
+                    alias.to_string(),
                     CommandOrAlias::Alias(command_name.to_string()),
                 );
             }
@@ -96,6 +96,24 @@ impl CreateGroup {
     /// [`on`]: #method.on
     pub fn cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
         let cmd: Arc<Command> = Arc::new(c);
+
+        for alias in &cmd.options().aliases {
+
+            if let Some(ref prefixes) = self.0.prefixes {
+
+                for prefix in prefixes {
+                    self.0.commands.insert(
+                        format!("{} {}", prefix, alias.to_string()),
+                        CommandOrAlias::Alias(format!("{} {}", prefix, name.to_string())),
+                    );
+                }
+            } else {
+                self.0.commands.insert(
+                    alias.to_string(),
+                    CommandOrAlias::Alias(name.to_string()),
+                );
+            }
+        }
 
         self.0
             .commands
