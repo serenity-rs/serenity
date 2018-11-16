@@ -87,6 +87,9 @@ pub struct GuildChannel {
     // default to `false`.
     #[serde(default)]
     pub nsfw: bool,
+    /// A rate limit that applies per user and excludes bots.
+    #[serde(default, rename = "rate_limit_per_user")]
+    pub slow_mode_rate: u64,
 }
 
 #[cfg(feature = "model")]
