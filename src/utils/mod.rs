@@ -996,6 +996,7 @@ mod test {
             topic: None,
             user_limit: None,
             nsfw: false,
+            slow_mode_rate: 0,
         };
 
         let cache = RwLock::new(Cache::default());
