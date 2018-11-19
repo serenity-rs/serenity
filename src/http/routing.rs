@@ -46,7 +46,7 @@ pub enum Route {
     // Refer to the docs on [Rate Limits] in the yellow warning section.
     //
     // Additionally, this needs to be a `LightMethod` from the parent module
-    // and _not_ a `hyper` `Method` due to `hyper`'s not deriving `Copy`.
+    // and _not_ a `reqwest` `Method` due to `reqwest`'s not deriving `Copy`.
     //
     // [Rate Limits]: https://discordapp.com/developers/docs/topics/rate-limits
     ChannelsIdMessagesId(LightMethod, u64),
