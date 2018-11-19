@@ -27,7 +27,7 @@ pub enum Error {
     Url(UrlError),
     /// Header value contains invalid input.
     InvalidHeader(InvalidHeaderValue),
-    /// Reqwest's Error
+    /// Reqwest's Error contain information on why sending a request failed.
     Request(ReqwestError),
 }
 
