@@ -77,13 +77,13 @@ pub enum LightMethod {
 }
 
 impl LightMethod {
-    pub fn hyper_method(&self) -> Method {
+    pub fn reqwest_method(&self) -> Method {
         match *self {
-            LightMethod::Delete => Method::Delete,
-            LightMethod::Get => Method::Get,
-            LightMethod::Patch => Method::Patch,
-            LightMethod::Post => Method::Post,
-            LightMethod::Put => Method::Put,
+            LightMethod::Delete => Method::DELETE,
+            LightMethod::Get => Method::GET,
+            LightMethod::Patch => Method::PATCH,
+            LightMethod::Post => Method::POST,
+            LightMethod::Put => Method::PUT,
         }
     }
 }
