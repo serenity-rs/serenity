@@ -285,11 +285,6 @@ impl ChannelId {
         http::edit_message(self.0, message_id.0, &Value::Object(map))
     }
 
-    /// Search the cache for the channel with the Id.
-    #[cfg(feature = "cache")]
-    #[deprecated(since = "0.5.8", note = "Use the `to_channel_cached`-method instead.")]
-    pub fn find(&self) -> Option<Channel> { self.to_channel_cached() }
-
     /// Attempts to find a [`Channel`] by its Id in the cache.
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
@@ -304,14 +299,6 @@ impl ChannelId {
     #[inline]
     pub(crate) fn _to_channel_cached(self, cache: &RwLock<Cache>) -> Option<Channel> {
         cache.read().channel(self)
-    }
-
-
-    /// Search the cache for the channel. If it can't be found, the channel is
-    /// requested over REST.
-    #[deprecated(since = "0.5.8", note = "Use the `to_channel`-method instead.")]
-    pub fn get(&self) -> Result<Channel> {
-        self.to_channel()
     }
 
     /// First attempts to find a [`Channel`] by its Id in the cache,

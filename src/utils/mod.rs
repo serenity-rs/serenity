@@ -63,50 +63,6 @@ pub fn vecmap_to_json_map<K: PartialEq + ToString>(map: VecMap<K, Value>) -> Map
     json_map
 }
 
-/// Determines if a name is NSFW.
-///
-/// This checks that the name is either `"nsfw"` or, for names longer than that,
-/// is prefixed with `"nsfw"`.
-///
-/// # Examples
-///
-/// Check that a channel named `"nsfw"` is in fact NSFW:
-///
-/// ```rust
-/// use serenity::utils;
-///
-/// assert!(utils::is_nsfw("nsfw"));
-/// ```
-///
-/// Check that a channel named `"cats"` is _not_ NSFW:
-///
-/// ```rust
-/// use serenity::utils;
-///
-/// assert!(!utils::is_nsfw("cats"));
-/// ```
-///
-/// Check that a channel named `"nsfw-stuff"` _is_ NSFW:
-///
-/// ```rust
-/// use serenity::utils;
-///
-/// assert!(utils::is_nsfw("nsfw-stuff"));
-/// ```
-///
-/// Channels prefixed with `"nsfw"` but not the hyphen (`'-'`) are _not_
-/// considered NSFW:
-///
-/// ```rust
-/// use serenity::utils;
-///
-/// assert!(!utils::is_nsfw("nsfwstuff"));
-/// ```
-#[deprecated(since = "0.5.10", note = "Discord no longer turns a channel NSFW based on its name.")]
-pub fn is_nsfw(name: &str) -> bool {
-    name == "nsfw" || name.chars().count() > 5 && name.starts_with("nsfw-")
-}
-
 /// Retrieves the "code" part of an invite out of a URL.
 ///
 /// # Examples
@@ -900,18 +856,6 @@ mod test {
         assert_eq!(parsed, ["a", "b c", "d", "e f", "g"]);
     }
 
-    #[allow(deprecated)]
-    #[test]
-    fn test_is_nsfw() {
-        assert!(!is_nsfw("general"));
-        assert!(is_nsfw("nsfw"));
-        assert!(is_nsfw("nsfw-test"));
-        assert!(!is_nsfw("nsfw-"));
-        assert!(!is_nsfw("général"));
-        assert!(is_nsfw("nsfw-général"));
-    }
-
-    #[cfg(feature = "cache")]
     #[test]
     fn test_content_safe() {
         use model::{

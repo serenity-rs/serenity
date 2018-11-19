@@ -229,15 +229,6 @@ impl Webhook {
 
 #[cfg(feature = "model")]
 impl WebhookId {
-    /// Retrieves the webhook by the Id.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// [Manage Webhooks]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
-    #[inline]
-    #[deprecated(since = "0.5.8", note = "Use the `to_webhook`-method instead.")]
-    pub fn get(self) -> Result<Webhook> { self.to_webhook() }
-
     /// Requests [`Webhook`] over REST API.
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
