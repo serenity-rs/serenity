@@ -49,9 +49,7 @@ use std::{
 };
 
 lazy_static! {
-    static ref CLIENT: ReqwestClient = {
-        ReqwestClient::new()
-    };
+    static ref CLIENT: ReqwestClient = ReqwestClient::new();
 }
 
 /// An method used for ratelimiting special routes.
