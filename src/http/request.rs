@@ -74,7 +74,7 @@ impl<'a> Request<'a> {
 
         let mut builder = CLIENT.request(
             method.reqwest_method(),
-            Url::parse(&path.to_string())?,
+            Url::parse(&path)?,
         );
 
         if let Some(ref bytes) = body {
