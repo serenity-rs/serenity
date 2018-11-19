@@ -13,13 +13,6 @@ use {http, utils};
 
 #[cfg(feature = "model")]
 impl GuildId {
-    /// Converts the guild Id into the default channel's Id.
-    #[inline]
-    #[deprecated(note = "The concept of default channels is no more, use \
-                         `Guild::default_channel{_guaranteed}` to simulate the
-                         concept.")]
-    pub fn as_channel_id(&self) -> ChannelId { ChannelId(self.0) }
-
     /// Ban a [`User`] from the guild. All messages by the
     /// user within the last given number of days given will be deleted.
     ///
@@ -403,25 +396,12 @@ impl GuildId {
         http::edit_role_position(self.0, role_id.0, position)
     }
 
-    /// Search the cache for the guild.
-    #[cfg(feature = "cache")]
-    #[deprecated(since = "0.5.8", note = "Use the `to_guild_cached`-method instead.")]
-    pub fn find(&self) -> Option<Arc<RwLock<Guild>>> { self.to_guild_cached() }
-
     /// Tries to find the [`Guild`] by its Id in the cache.
     ///
     /// [`Guild`]: ../guild/struct.Guild.html
     #[cfg(feature = "cache")]
     #[inline]
     pub fn to_guild_cached(self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().guild(self) }
-
-    /// Requests the guild over REST.
-    ///
-    /// Note that this will not be a complete guild, as REST does not send
-    /// all data with a guild retrieval.
-    #[inline]
-    #[deprecated(since = "0.5.8", note = "Use the `to_partial_guild`-method instead.")]
-    pub fn get(&self) -> Result<PartialGuild> { self.to_partial_guild() }
 
     /// Requests [`PartialGuild`] over REST API.
     ///

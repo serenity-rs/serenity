@@ -28,10 +28,6 @@ use serde_json;
 use super::utils::deserialize_u64;
 
 #[cfg(feature = "model")]
-use builder::{CreateMessage, EditMessage, GetMessages};
-#[cfg(feature = "model")]
-use http::AttachmentType;
-#[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
@@ -223,26 +219,6 @@ impl Channel {
         }
     }
 
-    /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
-    ///
-    /// [`Message::react`] may be a more suited method of reacting in most
-    /// cases.
-    ///
-    /// Requires the [Add Reactions] permission, _if_ the current user is the
-    /// first user to perform a react with a certain emoji.
-    ///
-    /// [`Emoji`]: ../guild/struct.Emoji.html
-    /// [`Message`]: struct.Message.html
-    /// [`Message::react`]: struct.Message.html#method.react
-    /// [Add Reactions]: ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
-        where M: Into<MessageId>, R: Into<ReactionType> {
-        self.id().create_reaction(message_id, reaction_type)
-    }
-
     /// Deletes the inner channel.
     ///
     /// **Note**: There is no real function as _deleting_ a [`Group`]. The
@@ -269,70 +245,6 @@ impl Channel {
         Ok(())
     }
 
-    /// Deletes a [`Message`] given its Id.
-    ///
-    /// Refer to [`Message::delete`] for more information.
-    ///
-    /// Requires the [Manage Messages] permission, if the current user is not
-    /// the author of the message.
-    ///
-    /// [`Message`]: struct.Message.html
-    /// [`Message::delete`]: struct.Message.html#method.delete
-    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn delete_message<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        self.id().delete_message(message_id)
-    }
-
-    /// Deletes the given [`Reaction`] from the channel.
-    ///
-    /// **Note**: Requires the [Manage Messages] permission, _if_ the current
-    /// user did not perform the reaction.
-    ///
-    /// [`Reaction`]: struct.Reaction.html
-    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn delete_reaction<M, R>(&self,
-                                 message_id: M,
-                                 user_id: Option<UserId>,
-                                 reaction_type: R)
-                                 -> Result<()>
-        where M: Into<MessageId>, R: Into<ReactionType> {
-        self.id()
-            .delete_reaction(message_id, user_id, reaction_type)
-    }
-
-    /// Edits a [`Message`] in the channel given its Id.
-    ///
-    /// Message editing preserves all unchanged message data.
-    ///
-    /// Refer to the documentation for [`EditMessage`] for more information
-    /// regarding message restrictions and requirements.
-    ///
-    /// **Note**: Requires that the current user be the author of the message.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the [`the limit`], containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
-    /// [`EditMessage`]: ../../builder/struct.EditMessage.html
-    /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../../builder/struct.EditMessage.html#method.content
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
-        self.id().edit_message(message_id, f)
-    }
-
     /// Determines if the channel is NSFW.
     #[cfg(feature = "model")]
     #[inline]
@@ -342,72 +254,6 @@ impl Channel {
             Channel::Category(ref category) => category.with(|c| c.is_nsfw()),
             Channel::Group(_) | Channel::Private(_) => false,
         }
-    }
-
-    /// Gets a message from the channel.
-    ///
-    /// Requires the [Read Message History] permission.
-    ///
-    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
-        self.id().message(message_id)
-    }
-
-    /// Gets messages from the channel.
-    ///
-    /// Requires the [Read Message History] permission.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// use serenity::model::MessageId;
-    ///
-    /// let id = MessageId(81392407232380928);
-    ///
-    /// // Maximum is 100.
-    /// let _messages = channel.messages(|g| g.after(id).limit(100));
-    /// ```
-    ///
-    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-        where F: FnOnce(GetMessages) -> GetMessages {
-        self.id().messages(f)
-    }
-
-    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
-    /// certain [`Emoji`].
-    ///
-    /// The default `limit` is `50` - specify otherwise to receive a different
-    /// maximum number of users. The maximum that may be retrieve at a time is
-    /// `100`, if a greater number is provided then it is automatically reduced.
-    ///
-    /// The optional `after` attribute is to retrieve the users after a certain
-    /// user. This is useful for pagination.
-    ///
-    /// **Note**: Requires the [Read Message History] permission.
-    ///
-    /// [`Emoji`]: ../guild/struct.Emoji.html
-    /// [`Message`]: struct.Message.html
-    /// [`User`]: ../user/struct.User.html
-    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn reaction_users<M, R, U>(&self,
-        message_id: M,
-        reaction_type: R,
-        limit: Option<u8>,
-        after: U,
-    ) -> Result<Vec<User>> where M: Into<MessageId>,
-                                 R: Into<ReactionType>,
-                                 U: Into<Option<UserId>> {
-        self.id().reaction_users(message_id, reaction_type, limit, after)
     }
 
     /// Retrieves the Id of the inner [`Group`], [`GuildChannel`], or
@@ -423,87 +269,6 @@ impl Channel {
             Channel::Private(ref ch) => ch.with(|c| c.id),
             Channel::Category(ref category) => category.with(|c| c.id),
         }
-    }
-
-    /// Sends a message with just the given message content in the channel.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// [`ChannelId`]: ../id/struct.ChannelId.html
-    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn say(&self, content: &str) -> Result<Message> { self.id().say(content) }
-
-    /// Sends (a) file(s) along with optional message contents.
-    ///
-    /// Refer to [`ChannelId::send_files`] for examples and more information.
-    ///
-    /// The [Attach Files] and [Send Messages] permissions are required.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// If the content of the message is over the above limit, then a
-    /// [`ClientError::MessageTooLong`] will be returned, containing the number
-    /// of unicode code points over the limit.
-    ///
-    /// [`ChannelId::send_files`]: ../id/struct.ChannelId.html#method.send_files
-    /// [`ClientError::MessageTooLong`]: ../../client/enum.ClientError.html#variant.MessageTooLong
-    /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
-    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
-        self.id().send_files(files, f)
-    }
-
-    /// Sends a message to the channel.
-    ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
-    /// regarding message restrictions and requirements.
-    ///
-    /// The [Send Messages] permission is required.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// [`Channel`]: enum.Channel.html
-    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
-    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn send_message<F>(&self, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
-        self.id().send_message(f)
-    }
-
-    /// Unpins a [`Message`] in the channel given by its Id.
-    ///
-    /// Requires the [Manage Messages] permission.
-    ///
-    /// [`Message`]: struct.Message.html
-    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
-    #[cfg(feature = "model")]
-    #[deprecated(since = "0.4.2", note = "Use the inner channel's method")]
-    #[inline]
-    pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
-        self.id().unpin(message_id)
     }
 }
 

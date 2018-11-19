@@ -174,13 +174,6 @@ impl PartialOrd for Role {
 
 #[cfg(feature = "model")]
 impl RoleId {
-    /// Search the cache for the role.
-    #[cfg(feature = "cache")]
-    #[deprecated(since = "0.5.8", note = "Use the `to_role_cached`-method instead.")]
-    pub fn find(&self) -> Option<Role> {
-        self.to_role_cached()
-    }
-
     /// Tries to find the [`Role`] by its Id in the cache.
     ///
     /// [`Role`]: ../guild/struct.Role.html
