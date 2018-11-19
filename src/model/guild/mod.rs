@@ -1507,7 +1507,7 @@ impl Guild {
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
-    ///         if let Some(arc) = msg.guild_id().unwrap().to_guild_cached() {
+    ///         if let Some(arc) = msg.guild_id.unwrap().to_guild_cached() {
     ///             if let Some(role) = arc.read().role_by_name("role_name") {
     ///                 println!("{:?}", role);
     ///             }
