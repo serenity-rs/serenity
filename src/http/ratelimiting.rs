@@ -43,9 +43,11 @@
 pub use super::routing::Route;
 
 use chrono::{DateTime, Utc};
-use hyper::client::Response;
-use hyper::header::Headers;
-use hyper::status::StatusCode;
+use reqwest::{
+    Response,
+    header::HeaderMap as Headers,
+    StatusCode,
+};
 use internal::prelude::*;
 use parking_lot::Mutex;
 use std::{
@@ -54,7 +56,7 @@ use std::{
     time::Duration,
     str,
     thread,
-    i64
+    i64,
 };
 use super::{HttpError, Request};
 
@@ -152,7 +154,7 @@ pub(super) fn perform(req: Request) -> Result<Response> {
         // This should probably only be a one-time check, although we may want
         // to choose to check this often in the future.
         if unsafe { OFFSET }.is_none() {
-            calculate_offset(response.headers.get_raw("date"));
+            calculate_offset(&response.headers().get("date").and_then(|d| Some(d.as_bytes())));
         }
 
         // Check if the request got ratelimited by checking for status 429,
@@ -171,11 +173,11 @@ pub(super) fn perform(req: Request) -> Result<Response> {
         if route == Route::None {
             return Ok(response);
         } else {
-            let redo = if response.headers.get_raw("x-ratelimit-global").is_some() {
+            let redo = if response.headers().get("x-ratelimit-global").is_some() {
                 let _ = GLOBAL.lock();
 
                 Ok(
-                    if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {
+                    if let Some(retry_after) = parse_header(&response.headers(), "retry-after")? {
                         debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
                         thread::sleep(Duration::from_millis(retry_after as u64));
 
@@ -256,21 +258,21 @@ impl RateLimit {
     }
 
     pub(crate) fn post_hook(&mut self, response: &Response, route: &Route) -> Result<bool> {
-        if let Some(limit) = parse_header(&response.headers, "x-ratelimit-limit")? {
+        if let Some(limit) = parse_header(&response.headers(), "x-ratelimit-limit")? {
             self.limit = limit;
         }
 
-        if let Some(remaining) = parse_header(&response.headers, "x-ratelimit-remaining")? {
+        if let Some(remaining) = parse_header(&response.headers(), "x-ratelimit-remaining")? {
             self.remaining = remaining;
         }
 
-        if let Some(reset) = parse_header(&response.headers, "x-ratelimit-reset")? {
+        if let Some(reset) = parse_header(&response.headers(), "x-ratelimit-reset")? {
             self.reset = reset;
         }
 
-        Ok(if response.status != StatusCode::TooManyRequests {
+        Ok(if response.status() != StatusCode::TOO_MANY_REQUESTS {
             false
-        } else if let Some(retry_after) = parse_header(&response.headers, "retry-after")? {
+        } else if let Some(retry_after) = parse_header(&response.headers(), "retry-after")? {
             debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
             thread::sleep(Duration::from_millis(retry_after as u64));
 
@@ -302,20 +304,18 @@ pub fn offset() -> Option<i64> {
     unsafe { OFFSET }
 }
 
-fn calculate_offset(header: Option<&[Vec<u8>]>) {
+fn calculate_offset(header: &Option<&[u8]>) {
     // Get the current time as soon as possible.
     let now = Utc::now().timestamp();
 
-    // First get the `Date` header's value and parse it as UTF8.
-    let header = header
-        .and_then(|h| h.get(0))
-        .and_then(|x| str::from_utf8(x).ok());
+    let header = header.and_then(|x| str::from_utf8(x).ok());
 
-    if let Some(date) = header {
+    if let Some(header) = header {
         // Replace the `GMT` timezone with an offset, and then parse it
         // into a chrono DateTime. If it parses correctly, calculate the
         // diff and then set it as the offset.
-        let s = date.replace("GMT", "+0000");
+        let s = header.replace("GMT", "+0000");
+
         let parsed = DateTime::parse_from_str(&s, "%a, %d %b %Y %T %z");
 
         if let Ok(parsed) = parsed {
@@ -330,11 +330,12 @@ fn calculate_offset(header: Option<&[Vec<u8>]>) {
             }
         }
     }
+
 }
 
 fn parse_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
-    headers.get_raw(header).map_or(Ok(None), |header| {
-        str::from_utf8(&header[0])
+    headers.get(header).map_or(Ok(None), |header| {
+        str::from_utf8(&header.as_bytes())
             .map_err(|_| Error::Http(HttpError::RateLimitUtf8))
             .and_then(|v| {
                 v.parse::<i64>()

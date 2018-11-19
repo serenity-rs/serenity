@@ -30,16 +30,14 @@ pub mod routing;
 
 mod error;
 
-pub use hyper::status::{StatusClass, StatusCode};
+pub use reqwest::StatusCode;
 pub use self::error::Error as HttpError;
 pub use self::raw::*;
 
-use hyper::{
-    client::Client as HyperClient,
-    method::Method,
-    net::HttpsConnector,
+use reqwest::{
+    Client as ReqwestClient,
+    Method,
 };
-use hyper_native_tls::NativeTlsClient;
 use model::prelude::*;
 use parking_lot::Mutex;
 use self::{request::Request};
@@ -51,17 +49,12 @@ use std::{
 };
 
 lazy_static! {
-    static ref CLIENT: HyperClient = {
-        let tc = NativeTlsClient::new().expect("Unable to make http client");
-        let connector = HttpsConnector::new(tc);
-
-        HyperClient::with_connector(connector)
-    };
+    static ref CLIENT: ReqwestClient = ReqwestClient::new();
 }
 
 /// An method used for ratelimiting special routes.
 ///
-/// This is needed because `hyper`'s `Method` enum does not derive Copy.
+/// This is needed because `reqwest`'s `Method` enum does not derive Copy.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum LightMethod {
     /// Indicates that a route is for the `DELETE` method only.
@@ -77,13 +70,13 @@ pub enum LightMethod {
 }
 
 impl LightMethod {
-    pub fn hyper_method(&self) -> Method {
+    pub fn reqwest_method(&self) -> Method {
         match *self {
-            LightMethod::Delete => Method::Delete,
-            LightMethod::Get => Method::Get,
-            LightMethod::Patch => Method::Patch,
-            LightMethod::Post => Method::Post,
-            LightMethod::Put => Method::Put,
+            LightMethod::Delete => Method::DELETE,
+            LightMethod::Get => Method::GET,
+            LightMethod::Patch => Method::PATCH,
+            LightMethod::Post => Method::POST,
+            LightMethod::Put => Method::PUT,
         }
     }
 }

@@ -34,27 +34,13 @@ version = "~0.4"
 optional = true
 version = "^1.0"
 
-[dependencies.hyper]
+[dependencies.reqwest]
 optional = true
-version = "~0.10"
-
-[dependencies.hyper-native-tls]
-optional = true
-version = "0.2.4"
+version = "0.9"
 
 [dependencies.lazy_static]
 optional = true
 version = "^1.0"
-
-[dependencies.multipart]
-default-features = false
-features = ["client", "hyper", "safemem"]
-optional = true
-version = "0.15"
-
-[dependencies.native-tls]
-optional = true
-version = "0.1"
 
 [dependencies.opus]
 optional = true
@@ -111,7 +97,7 @@ client = [
 extras = []
 framework = ["client", "model", "utils"]
 gateway = ["flate2", "http", "websocket", "utils"]
-http = ["hyper", "hyper-native-tls", "lazy_static", "multipart", "native-tls"]
+http = ["reqwest", "lazy_static"]
 model = ["builder", "http"]
 standard_framework = ["framework"]
 utils = ["base64"]

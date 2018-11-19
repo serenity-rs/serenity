@@ -1,5 +1,5 @@
 #[cfg(feature = "model")]
-use hyper::Client as HyperClient;
+use reqwest::Client as ReqwestClient;
 #[cfg(feature = "model")]
 use internal::prelude::*;
 #[cfg(feature = "model")]
@@ -102,15 +102,15 @@ impl Attachment {
     /// Returns an [`Error::Io`] when there is a problem reading the contents
     /// of the HTTP response.
     ///
-    /// Returns an [`Error::Hyper`] when there is a problem retrieving the
+    /// Returns an [`Error::Http`] when there is a problem retrieving the
     /// attachment.
     ///
-    /// [`Error::Hyper`]: ../../enum.Error.html#variant.Hyper
+    /// [`Error::Http`]: ../../enum.Error.html#variant.Http
     /// [`Error::Io`]: ../../enum.Error.html#variant.Io
     /// [`Message`]: struct.Message.html
     pub fn download(&self) -> Result<Vec<u8>> {
-        let hyper = request_client!();
-        let mut response = hyper.get(&self.url).send()?;
+        let reqwest = ReqwestClient::new();
+        let mut response = reqwest.get(&self.url).send()?;
 
         let mut bytes = vec![];
         response.read_to_end(&mut bytes)?;
