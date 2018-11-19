@@ -1,11 +1,13 @@
 use constants;
-use hyper::{
-    client::{Body, RequestBuilder as HyperRequestBuilder},
-    header::{Authorization, ContentType, Headers, UserAgent},
+use reqwest::{
+    RequestBuilder as ReqwestRequestBuilder,
+    header::{AUTHORIZATION, CONTENT_TYPE, USER_AGENT, HeaderMap as Headers, HeaderValue},
+    Url,
 };
 use super::{
     CLIENT,
     TOKEN,
+    HttpError,
     routing::RouteInfo,
 };
 
@@ -61,33 +63,35 @@ impl<'a> Request<'a> {
         Self { body, headers, route }
     }
 
-    pub fn build(&'a self) -> HyperRequestBuilder<'a> {
+    pub fn build(&'a self) -> Result<ReqwestRequestBuilder, HttpError> {
         let Request {
             body,
             headers: ref request_headers,
             route: ref route_info,
         } = *self;
+
         let (method, _, path) = route_info.deconstruct();
 
         let mut builder = CLIENT.request(
-            method.hyper_method(),
-            &path.into_owned(),
+            method.reqwest_method(),
+            Url::parse(&path)?,
         );
 
         if let Some(ref bytes) = body {
-            builder = builder.body(Body::BufBody(bytes, bytes.len()));
+            builder = builder.body(Vec::from(*bytes));
         }
 
-        let mut headers = Headers::new();
-        headers.set(UserAgent(constants::USER_AGENT.to_string()));
-        headers.set(Authorization(TOKEN.lock().clone()));
-        headers.set(ContentType::json());
+        let mut headers = Headers::with_capacity(3);
+        headers.insert(USER_AGENT, HeaderValue::from_static(&constants::USER_AGENT));
+        headers.insert(AUTHORIZATION,
+            HeaderValue::from_str(&TOKEN.lock()).map_err(|e| HttpError::InvalidHeader(e))?);
+        headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
 
-        if let Some(request_headers) = request_headers.clone() {
-            headers.extend(request_headers.iter());
+        if let Some(ref request_headers) = request_headers {
+            headers.extend(request_headers.clone());
         }
 
-        builder.headers(headers)
+        Ok(builder.headers(headers))
     }
 
     pub fn body_ref(&self) -> &Option<&'a [u8]> {

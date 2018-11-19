@@ -1,22 +1,14 @@
 use constants;
-use hyper::{
-    client::{
-        Request as HyperRequest,
-        Response as HyperResponse
-    },
-    header::{ContentType, Headers},
-    method::Method,
-    mime::{Mime, SubLevel, TopLevel},
-    net::HttpsConnector,
-    header,
-    Error as HyperError,
-    Result as HyperResult,
-    Url
+use reqwest::{
+    Client as ReqwestClient,
+    header::{AUTHORIZATION, USER_AGENT, CONTENT_TYPE, HeaderValue, HeaderMap as Headers},
+    multipart::Part,
+    Response as ReqwestResponse,
+    StatusCode,
+    Url,
 };
-use hyper_native_tls::NativeTlsClient;
 use internal::prelude::*;
 use model::prelude::*;
-use multipart::client::Multipart;
 use super::{
     TOKEN,
     ratelimiting,
@@ -25,8 +17,6 @@ use super::{
     AttachmentType,
     GuildPagination,
     HttpError,
-    StatusClass,
-    StatusCode,
 };
 use serde::de::DeserializeOwned;
 use serde_json;
@@ -691,7 +681,7 @@ pub fn edit_profile(map: &JsonMap) -> Result<CurrentUser> {
         route: RouteInfo::EditProfile,
     })?;
 
-    let mut value = serde_json::from_reader::<HyperResponse, Value>(response)?;
+    let mut value = serde_json::from_reader::<ReqwestResponse, Value>(response)?;
 
     if let Some(map) = value.as_object_mut() {
         if !TOKEN.lock().starts_with("Bot ") {
@@ -880,9 +870,7 @@ pub fn execute_webhook(webhook_id: u64,
     let body = serde_json::to_vec(map)?;
 
     let mut headers = Headers::new();
-    headers.set(ContentType(
-        Mime(TopLevel::Application, SubLevel::Json, vec![]),
-    ));
+    headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
 
     let response = request(Request {
         body: Some(&body),
@@ -890,11 +878,11 @@ pub fn execute_webhook(webhook_id: u64,
         route: RouteInfo::ExecuteWebhook { token, wait, webhook_id },
     })?;
 
-    if response.status == StatusCode::NoContent {
+    if response.status() == StatusCode::NO_CONTENT {
         return Ok(None);
     }
 
-    serde_json::from_reader::<HyperResponse, Message>(response)
+    serde_json::from_reader::<ReqwestResponse, Message>(response)
         .map(Some)
         .map_err(From::from)
 }
@@ -1086,7 +1074,7 @@ pub fn get_guild_vanity_url(guild_id: u64) -> Result<String> {
         route: RouteInfo::GetGuildVanityUrl { guild_id },
     })?;
 
-    serde_json::from_reader::<HyperResponse, GuildVanityUrl>(response)
+    serde_json::from_reader::<ReqwestResponse, GuildVanityUrl>(response)
         .map(|x| x.code)
         .map_err(From::from)
 }
@@ -1103,7 +1091,7 @@ pub fn get_guild_members(guild_id: u64,
         route: RouteInfo::GetGuildMembers { after, guild_id, limit },
     })?;
 
-    let mut v = serde_json::from_reader::<HyperResponse, Value>(response)?;
+    let mut v = serde_json::from_reader::<ReqwestResponse, Value>(response)?;
 
     if let Some(values) = v.as_array_mut() {
         let num = Value::Number(Number::from(guild_id));
@@ -1241,7 +1229,7 @@ pub fn get_member(guild_id: u64, user_id: u64) -> Result<Member> {
         route: RouteInfo::GetMember { guild_id, user_id },
     })?;
 
-    let mut v = serde_json::from_reader::<HyperResponse, Value>(response)?;
+    let mut v = serde_json::from_reader::<ReqwestResponse, Value>(response)?;
 
     if let Some(map) = v.as_object_mut() {
         map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
@@ -1470,31 +1458,31 @@ pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, m
         Err(_) => return Err(Error::Url(uri)),
     };
 
-    let tc = NativeTlsClient::new()?;
-    let connector = HttpsConnector::new(tc);
-    let mut request = HyperRequest::with_connector(Method::Post, url, &connector)?;
-    request
-        .headers_mut()
-        .set(header::Authorization(TOKEN.lock().clone()));
-    request
-        .headers_mut()
-        .set(header::UserAgent(constants::USER_AGENT.to_string()));
+    let client = ReqwestClient::new()
+        .post(url)
+        .header(AUTHORIZATION, HeaderValue::from_str(&TOKEN.lock())?)
+        .header(USER_AGENT, HeaderValue::from_static(&constants::USER_AGENT));
 
-    let mut request = Multipart::from_request(request)?;
+    let mut multipart = reqwest::multipart::Form::new();
     let mut file_num = "0".to_string();
 
     for file in files {
+
         match file.into() {
-            AttachmentType::Bytes((mut bytes, filename)) => {
-                request
-                    .write_stream(&file_num, &mut bytes, Some(filename), None)?;
+            AttachmentType::Bytes((bytes, filename)) => {
+                multipart = multipart
+                    .part(file_num.to_string(), Part::bytes(bytes.to_vec())
+                        .file_name(filename.to_string()));
             },
-            AttachmentType::File((mut f, filename)) => {
-                request
-                    .write_stream(&file_num, &mut f, Some(filename), None)?;
+            AttachmentType::File((file, filename)) => {
+                multipart = multipart
+                    .part(file_num.to_string(),
+                        Part::reader(file.try_clone()?)
+                            .file_name(filename.to_string()));
             },
-            AttachmentType::Path(p) => {
-                request.write_file(&file_num, &p)?;
+            AttachmentType::Path(path) => {
+                multipart = multipart
+                    .file(file_num.to_string(), path)?;
             },
         }
 
@@ -1506,19 +1494,19 @@ pub fn send_files<'a, T, It: IntoIterator<Item=T>>(channel_id: u64, files: It, m
 
     for (k, v) in map {
         match v {
-            Value::Bool(false) => request.write_text(&k, "false")?,
-            Value::Bool(true) => request.write_text(&k, "true")?,
-            Value::Number(inner) => request.write_text(&k, inner.to_string())?,
-            Value::String(inner) => request.write_text(&k, inner)?,
-            Value::Object(inner) => request.write_text(&k, serde_json::to_string(&inner)?)?,
+            Value::Bool(false) => multipart = multipart.text(k.clone(), "false"),
+            Value::Bool(true) => multipart = multipart.text(k.clone(), "true"),
+            Value::Number(inner) => multipart = multipart.text(k.clone(), inner.to_string()),
+            Value::String(inner) => multipart = multipart.text(k.clone(), inner),
+            Value::Object(inner) =>multipart =  multipart.text(k.clone(), serde_json::to_string(&inner)?),
             _ => continue,
         };
     }
 
-    let response = request.send()?;
+    let response = client.multipart(multipart).send()?;
 
-    if response.status.class() != StatusClass::Success {
-        return Err(Error::Http(HttpError::UnsuccessfulRequest(response)));
+    if !response.status().is_success() {
+        return Err(HttpError::UnsuccessfulRequest(response).into());
     }
 
     serde_json::from_reader(response).map_err(From::from)
@@ -1665,7 +1653,7 @@ pub fn fire<T: DeserializeOwned>(req: Request) -> Result<T> {
 
 /// Performs a request, ratelimiting it if necessary.
 ///
-/// Returns the raw hyper Response. Use [`fire`] to deserialize the response
+/// Returns the raw reqwest Response. Use [`fire`] to deserialize the response
 /// into some type.
 ///
 /// # Examples
@@ -1696,7 +1684,7 @@ pub fn fire<T: DeserializeOwned>(req: Request) -> Result<T> {
 ///
 /// let response = http::request(request.build())?;
 ///
-/// println!("Response successful?: {}", response.status.is_success());
+/// println!("Response successful?: {}", response.status().is_success());
 /// #
 /// #     Ok(())
 /// # }
@@ -1707,29 +1695,40 @@ pub fn fire<T: DeserializeOwned>(req: Request) -> Result<T> {
 /// ```
 ///
 /// [`fire`]: fn.fire.html
-pub fn request(req: Request) -> Result<HyperResponse> {
+pub fn request(req: Request) -> Result<ReqwestResponse> {
     let response = ratelimiting::perform(req)?;
 
-    if response.status.class() == StatusClass::Success {
+    if response.status().is_success() {
         Ok(response)
     } else {
         Err(Error::Http(HttpError::UnsuccessfulRequest(response)))
     }
 }
 
-pub(super) fn retry(request: &Request) -> HyperResult<HyperResponse> {
+pub(super) fn retry(request: &Request) -> Result<ReqwestResponse> {
     // Retry the request twice in a loop until it succeeds.
     //
     // If it doesn't and the loop breaks, try one last time.
     for _ in 0..3 {
-        match request.build().send() {
-            Err(HyperError::Io(ref io))
-            if io.kind() == IoErrorKind::ConnectionAborted => continue,
-            other => return other,
+
+        match request.build()?.send() {
+            Ok(response) => return Ok(response),
+            Err(reqwest_error) => {
+                if let Some(io_error) = reqwest_error.get_ref().and_then(|e| e.downcast_ref::<std::io::Error>()) {
+
+                    if let IoErrorKind::ConnectionAborted = io_error.kind() {
+                        continue;
+                    }
+                }
+
+                return Err(reqwest_error.into());
+            },
         }
     }
 
-    request.build().send()
+    request.build()
+        .map_err(Into::into)
+        .and_then(|b| Ok(b.send()?))
 }
 
 /// Performs a request and then verifies that the response status code is equal
@@ -1740,11 +1739,11 @@ pub(super) fn retry(request: &Request) -> HyperResult<HyperResponse> {
 pub(super) fn wind(expected: u16, req: Request) -> Result<()> {
     let resp = request(req)?;
 
-    if resp.status.to_u16() == expected {
+    if resp.status().as_u16() == expected {
         return Ok(());
     }
 
-    debug!("Expected {}, got {}", expected, resp.status);
+    debug!("Expected {}, got {}", expected, resp.status());
     trace!("Unsuccessful response: {:?}", resp);
 
     Err(Error::Http(HttpError::UnsuccessfulRequest(resp)))

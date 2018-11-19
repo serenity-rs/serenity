@@ -133,14 +133,10 @@ extern crate base64;
 extern crate byteorder;
 #[cfg(feature = "flate2")]
 extern crate flate2;
-#[cfg(feature = "hyper")]
-extern crate hyper;
-#[cfg(feature = "hyper-native-tls")]
-extern crate hyper_native_tls;
-#[cfg(feature = "multipart")]
-extern crate multipart;
-#[cfg(feature = "native-tls")]
-extern crate native_tls;
+#[cfg(feature = "reqwest")]
+extern crate reqwest;
+
+
 #[cfg(feature = "opus")]
 extern crate opus;
 #[cfg(feature = "rand")]
