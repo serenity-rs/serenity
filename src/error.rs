@@ -14,8 +14,6 @@ use std::{
 
 #[cfg(feature = "reqwest")]
 use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
-#[cfg(feature = "native-tls")]
-use native_tls::Error as TlsError;
 #[cfg(feature = "voice")]
 use opus::Error as OpusError;
 #[cfg(feature = "websocket")]
@@ -94,9 +92,6 @@ pub enum Error {
     /// [`http`]: http/index.html
     #[cfg(feature = "http")]
     Http(HttpError),
-    /// An error from the `native-tls` crate.
-    #[cfg(feature = "native-tls")]
-    Tls(TlsError),
     /// An error from the `rust-websocket` crate.
     #[cfg(feature = "gateway")]
     WebSocket(WebSocketError),
@@ -138,11 +133,6 @@ impl From<ModelError> for Error {
 #[cfg(feature = "voice")]
 impl From<OpusError> for Error {
     fn from(e: OpusError) -> Error { Error::Opus(e) }
-}
-
-#[cfg(feature = "native-tls")]
-impl From<TlsError> for Error {
-    fn from(e: TlsError) -> Error { Error::Tls(e) }
 }
 
 #[cfg(feature = "gateway")]
@@ -190,8 +180,6 @@ impl StdError for Error {
             Error::Http(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Opus(ref inner) => inner.description(),
-            #[cfg(feature = "native-tls")]
-            Error::Tls(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Voice(_) => "Voice error",
             #[cfg(feature = "gateway")]

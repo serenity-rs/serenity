@@ -42,11 +42,6 @@ version = "0.9"
 optional = true
 version = "^1.0"
 
-
-[dependencies.native-tls]
-optional = true
-version = "0.1"
-
 [dependencies.opus]
 optional = true
 version = "0.2"
