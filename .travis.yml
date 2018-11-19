@@ -3,7 +3,6 @@ rust:
   - stable
   - beta
   - nightly
-  - 1.25.0
 os:
   - linux
   - osx
