@@ -765,27 +765,12 @@ impl UserId {
         http::create_private_channel(&map)
     }
 
-    /// Search the cache for the user with the Id.
-    #[cfg(feature = "cache")]
-    #[deprecated(since = "0.5.8", note = "Use the `to_user_cached`-method instead.")]
-    pub fn find(&self) -> Option<Arc<RwLock<User>>> { self.to_user_cached() }
-
     /// Attempts to find a [`User`] by its Id in the cache.
     ///
     /// [`User`]: ../user/struct.User.html
     #[cfg(feature = "cache")]
     #[inline]
     pub fn to_user_cached(self) -> Option<Arc<RwLock<User>>> { CACHE.read().user(self) }
-
-    /// Gets a user by its Id from either the cache or the REST API.
-    ///
-    /// Searches the cache for the user first, if the cache is enabled. If the
-    /// user was not found, then the user is searched via the REST API.
-    #[inline]
-    #[deprecated(since = "0.5.8", note = "Use the `to_user`-method instead.")]
-    pub fn get(&self) -> Result<User> {
-        self.to_user()
-    }
 
     /// First attempts to find a [`User`] by its Id in the cache,
     /// upon failure requests it via the REST API.

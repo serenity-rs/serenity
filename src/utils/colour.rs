@@ -8,14 +8,6 @@ macro_rules! colour {
                 #[$attr]
                 pub const $constname: Colour = Colour($val);
             )*
-
-            $(
-                #[$attr]
-                #[deprecated(note = "Use the constant instead", since = "0.5.5")]
-                pub fn $name() -> Colour {
-                    Colour::new($val)
-                }
-            )*
         }
     }
 }

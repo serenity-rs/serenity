@@ -1178,17 +1178,6 @@ impl Guild {
         self.id.move_member(user_id, channel_id)
     }
 
-    /// Alias for [`permissions_in`].
-    ///
-    /// [`permissions_in`]: #method.permissions_in
-    #[deprecated(since = "0.4.3",
-                 note = "This will serve a different purpose in 0.5")]
-    #[inline]
-    pub fn permissions_for<C, U>(&self, channel_id: C, user_id: U)
-        -> Permissions where C: Into<ChannelId>, U: Into<UserId> {
-        self.permissions_in(channel_id, user_id)
-    }
-
     /// Calculate a [`User`]'s permissions in a given channel in the guild.
     ///
     /// [`User`]: ../user/struct.User.html
@@ -1518,7 +1507,7 @@ impl Guild {
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
-    ///         if let Some(arc) = msg.guild_id().unwrap().to_guild_cached() {
+    ///         if let Some(arc) = msg.guild_id.unwrap().to_guild_cached() {
     ///             if let Some(role) = arc.read().role_by_name("role_name") {
     ///                 println!("{:?}", role);
     ///             }

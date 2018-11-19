@@ -340,17 +340,6 @@ impl Message {
         CACHE.read().guild(self.guild_id?)
     }
 
-    /// Retrieves the Id of the guild that the message was sent in, if sent in
-    /// one.
-    ///
-    /// Refer to [`guild_id`] for more information.
-    ///
-    /// [`guild_id`]: #structfield.guild_id
-    #[deprecated(note = "Use `guild_id` structfield instead", since = "0.5.5")]
-    pub fn guild_id(&self) -> Option<GuildId> {
-        self.guild_id
-    }
-
     /// True if message was sent using direct messages.
     pub fn is_private(&self) -> bool {
         self.guild_id.is_none()
