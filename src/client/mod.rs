@@ -1,4 +1,4 @@
-//! The Client contains information about a single bot or user's token, as well
+//! The Client contains information about a single bot's token, as well
 //! as event handlers. Dispatching events to configured handlers and starting
 //! the shards' connections are handled directly via the client. In addition,
 //! the `http` module and `Cache` are also automatically handled by the
@@ -62,8 +62,8 @@ use self::bridge::voice::ClientVoiceManager;
 /// # Event Handlers
 ///
 /// Event handlers can be configured. For example, the event handler
-/// [`EventHandler::on_message`] will be dispatched to whenever a [`Event::MessageCreate`] is
-/// received over the connection.
+/// [`EventHandler::message`] will be dispatched to whenever a
+/// [`Event::MessageCreate`] is received over the connection.
 ///
 /// Note that you do not need to manually handle events, as they are handled
 /// internally and then dispatched to your event handlers.
@@ -92,10 +92,10 @@ use self::bridge::voice::ClientVoiceManager;
 /// client.start();
 /// ```
 ///
-/// [`Shard`]: gateway/struct.Shard.html
-/// [`on_message`]: #method.on_message
+/// [`Shard`]: ../gateway/struct.Shard.html
+/// [`EventHandler::message`]: trait.EventHandler.html#tymethod.message
 /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
-/// [sharding docs]: gateway/index.html#sharding
+/// [sharding docs]: ../index.html#sharding
 pub struct Client {
     /// A ShareMap which requires types to be Send + Sync. This is a map that
     /// can be safely shared across contexts.
@@ -169,13 +169,12 @@ pub struct Client {
     ///
     /// Refer to [example 05] for an example on using the `data` field.
     ///
-    /// [`Context::data`]: struct.Context.html#method.data
+    /// [`Context::data`]: struct.Context.html#structfield.data
     /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
     /// [`Event::MessageDelete`]: ../model/event/enum.Event.html#variant.MessageDelete
     /// [`Event::MessageDeleteBulk`]: ../model/event/enum.Event.html#variant.MessageDeleteBulk
     /// [`Event::MessageUpdate`]: ../model/event/enum.Event.html#variant.MessageUpdate
-    /// [example 05]:
-    /// https://github.com/serenity-rs/serenity/tree/master/examples/05_command_framework
+    /// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/05_command_framework
     pub data: Arc<Mutex<ShareMap>>,
     /// A vector of all active shards that have received their [`Event::Ready`]
     /// payload, and have dispatched to [`on_ready`] if an event handler was
@@ -387,7 +386,7 @@ impl Client {
     }
 
     /// Sets a framework to be used with the client. All message events will be
-    /// passed through the framework _after_ being passed to the [`on_message`]
+    /// passed through the framework _after_ being passed to the [`message`]
     /// event handler.
     ///
     /// See the [framework module-level documentation][framework docs] for more
@@ -486,7 +485,7 @@ impl Client {
     /// Refer to the documentation for the `framework` module for more in-depth
     /// information.
     ///
-    /// [`on_message`]: #method.on_message
+    /// [`message`]: trait.EventHandler.html#method.message
     /// [framework docs]: ../framework/index.html
     #[cfg(feature = "framework")]
     pub fn with_framework<F: Framework + Send + 'static>(&mut self, f: F) {
@@ -534,7 +533,7 @@ impl Client {
     /// # }
     /// ```
     ///
-    /// [gateway docs]: gateway/index.html#sharding
+    /// [gateway docs]: ../gateway/index.html#sharding
     pub fn start(&mut self) -> Result<()> {
         self.start_connection([0, 0, 1])
     }
@@ -586,7 +585,7 @@ impl Client {
     /// an error.
     ///
     /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
-    /// [gateway docs]: gateway/index.html#sharding
+    /// [gateway docs]: ../gateway/index.html#sharding
     pub fn start_autosharded(&mut self) -> Result<()> {
         let (x, y) = {
             let res = http::get_bot_gateway()?;
@@ -673,7 +672,7 @@ impl Client {
     /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [`start`]: #method.start
     /// [`start_autosharded`]: #method.start_autosharded
-    /// [gateway docs]: gateway/index.html#sharding
+    /// [gateway docs]: ../gateway/index.html#sharding
     pub fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
         self.start_connection([shard, shard, shards])
     }
@@ -727,7 +726,7 @@ impl Client {
     /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [`start_shard`]: #method.start_shard
     /// [`start_shard_range`]: #method.start_shard_range
-    /// [Gateway docs]: gateway/index.html#sharding
+    /// [Gateway docs]: ../gateway/index.html#sharding
     pub fn start_shards(&mut self, total_shards: u64) -> Result<()> {
         self.start_connection([0, total_shards - 1, total_shards])
     }
@@ -797,7 +796,7 @@ impl Client {
     /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [`start_shard`]: #method.start_shard
     /// [`start_shards`]: #method.start_shards
-    /// [Gateway docs]: gateway/index.html#sharding
+    /// [Gateway docs]: ../gateway/index.html#sharding
     pub fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64) -> Result<()> {
         self.start_connection([range[0], range[1], total_shards])
     }

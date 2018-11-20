@@ -28,11 +28,17 @@ impl Mentionable for ChannelId {
 impl Mentionable for Channel {
     fn mention(&self) -> String {
         match *self {
-            Channel::Guild(ref x) => format!("<#{}>", x.with(|x| x.id.0)),
-            Channel::Private(ref x) => format!("<#{}>", x.with(|x| x.id.0)),
-            Channel::Group(ref x) => format!("<#{}>", x.with(|x| x.channel_id.0)),
-            Channel::Category(_) => panic!("Categories can't be mentioned"),
+            Channel::Guild(ref x) => x.with(Mentionable::mention),
+            Channel::Private(ref x) => x.with(Mentionable::mention),
+            Channel::Group(ref x) => x.with(Mentionable::mention),
+            Channel::Category(ref x) => x.with(Mentionable::mention),
         }
+    }
+}
+
+impl Mentionable for ChannelCategory {
+    fn mention(&self) -> String {
+        format!("<#{}>", self.name)
     }
 }
 
@@ -46,8 +52,20 @@ impl Mentionable for Emoji {
     fn mention(&self) -> String { format!("<:{}:{}>", self.name, self.id.0) }
 }
 
+impl Mentionable for Group {
+    fn mention(&self) -> String {
+        format!("<#{}>", self.channel_id.0)
+    }
+}
+
 impl Mentionable for Member {
     fn mention(&self) -> String { format!("<@{}>", self.user.with(|u| u.id.0)) }
+}
+
+impl Mentionable for PrivateChannel {
+    fn mention(&self) -> String {
+        format!("<#{}>", self.id.0)
+    }
 }
 
 impl Mentionable for RoleId {
@@ -64,6 +82,10 @@ impl Mentionable for UserId {
 
 impl Mentionable for User {
     fn mention(&self) -> String { format!("<@{}>", self.id.0) }
+}
+
+impl Mentionable for GuildChannel {
+    fn mention(&self) -> String { format!("<#{}>", self.id.0) }
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
@@ -97,7 +119,7 @@ impl FromStr for User {
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match utils::parse_username(s) {
             Some(x) => UserId(x as u64)
-                .get()
+                .to_user()
                 .map_err(|e| UserParseError::Rest(Box::new(e))),
             _ => Err(UserParseError::InvalidUsername),
         }
@@ -134,7 +156,7 @@ macro_rules! impl_from_str {
                 type Err = $err;
 
                 fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-                    Ok(match utils::parse_username(s) {
+                    Ok(match utils::parse_mention(s) {
                         Some(id) => $id(id),
                         None => s.parse::<u64>().map($id).map_err(|_| $err::InvalidFormat)?,
                     })
@@ -165,21 +187,6 @@ macro_rules! impl_from_str {
                     match *self {
                         NotPresentInCache => "not present in cache",
                         $invalid_variant => $desc,
-                    }
-                }
-            }
-
-            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-            impl FromStr for $struct {
-                type Err = $err;
-
-                fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-                    match utils::$parse_fn(s) {
-                        Some(x) => match $id(x).find() {
-                            Some(user) => Ok(user),
-                            _ => Err($err::NotPresentInCache),
-                        },
-                        _ => Err($err::$invalid_variant),
                     }
                 }
             }
@@ -285,4 +292,89 @@ pub struct Maintenance {
     pub name: String,
     pub start: String,
     pub stop: String,
+}
+
+#[cfg(test)]
+mod test {
+    use model::prelude::*;
+
+    #[test]
+    fn test_formatters() {
+        assert_eq!(ChannelId(1).to_string(), "1");
+        assert_eq!(EmojiId(2).to_string(), "2");
+        assert_eq!(GuildId(3).to_string(), "3");
+        assert_eq!(RoleId(4).to_string(), "4");
+        assert_eq!(UserId(5).to_string(), "5");
+    }
+
+    #[cfg(feature = "utils")]
+    mod utils {
+        use model::prelude::*;
+        use parking_lot::RwLock;
+        use std::sync::Arc;
+        use utils::Colour;
+
+        #[test]
+        fn test_mention() {
+            let channel = Channel::Guild(Arc::new(RwLock::new(GuildChannel {
+                bitrate: None,
+                category_id: None,
+                guild_id: GuildId(1),
+                kind: ChannelType::Text,
+                id: ChannelId(4),
+                last_message_id: None,
+                last_pin_timestamp: None,
+                name: "a".to_string(),
+                permission_overwrites: vec![],
+                position: 1,
+                topic: None,
+                user_limit: None,
+                nsfw: false,
+                slow_mode_rate: 0,
+            })));
+            let emoji = Emoji {
+                animated: false,
+                id: EmojiId(5),
+                name: "a".to_string(),
+                managed: true,
+                require_colons: true,
+                roles: vec![],
+            };
+            let role = Role {
+                id: RoleId(2),
+                colour: Colour::ROSEWATER,
+                hoist: false,
+                managed: false,
+                mentionable: false,
+                name: "fake role".to_string(),
+                permissions: Permissions::empty(),
+                position: 1,
+            };
+            let user = User {
+                id: UserId(6),
+                avatar: None,
+                bot: false,
+                discriminator: 4132,
+                name: "fake".to_string(),
+            };
+            let member = Member {
+                deaf: false,
+                guild_id: GuildId(2),
+                joined_at: None,
+                mute: false,
+                nick: None,
+                roles: vec![],
+                user: Arc::new(RwLock::new(user.clone())),
+            };
+
+            assert_eq!(ChannelId(1).mention(), "<#1>");
+            assert_eq!(channel.mention(), "<#4>");
+            assert_eq!(emoji.mention(), "<:a:5>");
+            assert_eq!(member.mention(), "<@6>");
+            assert_eq!(role.mention(), "<@&2>");
+            assert_eq!(role.id.mention(), "<@&2>");
+            assert_eq!(user.mention(), "<@6>");
+            assert_eq!(user.id.mention(), "<@6>");
+        }
+    }
 }

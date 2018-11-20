@@ -6,7 +6,14 @@ use builder::EditRole;
 #[cfg(all(feature = "cache", feature = "model"))]
 use internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
-use {CACHE, http};
+use {CACHE, Cache, http};
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use std::str::FromStr;
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use model::misc::RoleParseError;
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use utils::parse_role;
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
@@ -50,7 +57,7 @@ pub struct Role {
     ///
     /// See the [`permissions`] module for more information.
     ///
-    /// [`permissions`]: permissions/index.html
+    /// [`permissions`]: ../permissions/index.html
     pub permissions: Permissions,
     /// The role's position in the position list. Roles are considered higher in
     /// hierarchy if their position is higher.
@@ -65,7 +72,7 @@ impl Role {
     ///
     /// **Note** Requires the [Manage Roles] permission.
     ///
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "cache")]
     #[inline]
     pub fn delete(&self) -> Result<()> { http::delete_role(self.find_guild()?.0, self.id.0) }
@@ -80,14 +87,18 @@ impl Role {
     ///
     /// ```rust,no_run
     /// # use serenity::model::id::RoleId;
-    /// # let role = RoleId(7).find().unwrap();
+    /// # let role = RoleId(7).to_role_cached().unwrap();
     /// // assuming a `role` has already been bound
     //
-    /// role.edit(|r| r.hoist(true));
+    /// role.edit(|mut r| {
+    ///     r.hoist(true);
+    ///
+    ///     r
+    /// });
     /// ```
     ///
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(all(feature = "builder", feature = "cache"))]
     pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
         self.find_guild()
@@ -101,7 +112,7 @@ impl Role {
     /// Returns a [`ModelError::GuildNotFound`] if a guild is not in the cache
     /// that contains the role.
     ///
-    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
+    /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     #[cfg(feature = "cache")]
     pub fn find_guild(&self) -> Result<GuildId> {
         for guild in CACHE.read().guilds.values() {
@@ -163,19 +174,24 @@ impl PartialOrd for Role {
 
 #[cfg(feature = "model")]
 impl RoleId {
-    /// Search the cache for the role.
+    /// Tries to find the [`Role`] by its Id in the cache.
+    ///
+    /// [`Role`]: ../guild/struct.Role.html
     #[cfg(feature = "cache")]
-    pub fn find(&self) -> Option<Role> {
-        let cache = CACHE.read();
+    pub fn to_role_cached(self) -> Option<Role> {
+        self._to_role_cached(&CACHE)
+    }
 
-        for guild in cache.guilds.values() {
+    #[cfg(feature = "cache")]
+    pub(crate) fn _to_role_cached(self, cache: &RwLock<Cache>) -> Option<Role> {
+        for guild in cache.read().guilds.values() {
             let guild = guild.read();
 
-            if !guild.roles.contains_key(self) {
+            if !guild.roles.contains_key(&self) {
                 continue;
             }
 
-            if let Some(role) = guild.roles.get(self) {
+            if let Some(role) = guild.roles.get(&self) {
                 return Some(role.clone());
             }
         }
@@ -192,4 +208,19 @@ impl From<Role> for RoleId {
 impl<'a> From<&'a Role> for RoleId {
     /// Gets the Id of a role.
     fn from(role: &Role) -> RoleId { role.id }
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+impl FromStr for Role {
+    type Err = RoleParseError;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        match parse_role(s) {
+            Some(x) => match RoleId(x).to_role_cached() {
+                Some(role) => Ok(role),
+                _ => Err(RoleParseError::NotPresentInCache),
+            },
+            _ => Err(RoleParseError::InvalidRole),
+        }
+    }
 }

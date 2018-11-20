@@ -49,7 +49,7 @@ impl ChannelCategory {
     ///
     /// **Note**: Requires the [Manage Channel] permission.
     ///
-    /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
+    /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[inline]
     pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
         self.id.delete_permission(permission_type)
@@ -125,10 +125,9 @@ impl ChannelCategory {
         })
     }
 
-    #[cfg(feature = "utils")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
-        self.kind == ChannelType::Text && (self.nsfw || serenity_utils::is_nsfw(&self.name))
+        self.kind == ChannelType::Text && self.nsfw
     }
 
     /// Returns the name of the category.

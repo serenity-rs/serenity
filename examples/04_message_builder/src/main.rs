@@ -1,17 +1,19 @@
 extern crate serenity;
 
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
-use serenity::prelude::*;
-use serenity::utils::MessageBuilder;
 use std::env;
+
+use serenity::{
+    model::{channel::Message, gateway::Ready},
+    prelude::*,
+    utils::MessageBuilder,
+};
 
 struct Handler;
 
 impl EventHandler for Handler {
     fn message(&self, _: Context, msg: Message) {
         if msg.content == "!ping" {
-            let channel = match msg.channel_id.get() {
+            let channel = match msg.channel_id.to_channel() {
                 Ok(channel) => channel,
                 Err(why) => {
                     println!("Error getting channel: {:?}", why);
@@ -42,6 +44,7 @@ impl EventHandler for Handler {
         println!("{} is connected!", ready.user.name);
     }
 }
+
 fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")

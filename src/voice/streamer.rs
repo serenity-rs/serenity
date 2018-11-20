@@ -1,29 +1,21 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 use internal::prelude::*;
+use opus::{
+    Channels,
+    Decoder as OpusDecoder,
+    Result as OpusResult,
+};
+use parking_lot::Mutex;
 use serde_json;
 use std::{
     ffi::OsStr,
     fs::File,
-    io::{
-        BufReader,
-        ErrorKind as IoErrorKind,
-        Read,
-        Result as IoResult
-    },
-    process::{
-        Child,
-        Command,
-        Stdio
-    },
-    result::Result as StdResult
+    io::{BufReader, ErrorKind as IoErrorKind, Read, Result as IoResult},
+    process::{Child, Command, Stdio},
+    result::Result as StdResult,
+    sync::Arc,
 };
-use super::{
-    AudioSource,
-    AudioType,
-    DcaError,
-    DcaMetadata,
-    VoiceError
-};
+use super::{AudioSource, AudioType, DcaError, DcaMetadata, VoiceError, audio};
 
 struct ChildContainer(Child);
 
@@ -41,10 +33,24 @@ impl Drop for ChildContainer {
     }
 }
 
+// Since each audio item needs its own decoder, we need to
+// work around the fact that OpusDecoders aint sendable.
+struct SendDecoder(OpusDecoder);
+
+impl SendDecoder {
+    fn decode_float(&mut self, input: &[u8], output: &mut [f32], fec: bool) -> OpusResult<usize> {
+        let &mut SendDecoder(ref mut sd) = self;
+        sd.decode_float(input, output, fec)
+    }
+}
+
+unsafe impl Send for SendDecoder {}
+
 struct InputSource<R: Read + Send + 'static> {
     stereo: bool,
     reader: R,
     kind: AudioType,
+    decoder: Option<Arc<Mutex<SendDecoder>>>,
 }
 
 impl<R: Read + Send> AudioSource for InputSource<R> {
@@ -96,17 +102,37 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
             },
         }
     }
+
+    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize> {
+        let decoder_lock = self.decoder.as_mut()?.clone();
+        let frame = self.read_opus_frame()?;
+        let mut local_buf = [0f32; 960 * 2];
+
+        let count = {
+            let mut decoder = decoder_lock.lock();
+
+            decoder.decode_float(frame.as_slice(), &mut local_buf, false).ok()?
+        };
+
+        for i in 0..1920 {
+            float_buffer[i] += local_buf[i] * volume;
+        }
+
+        Some(count)
+    }
 }
 
 /// Opens an audio file through `ffmpeg` and creates an audio source.
 pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Box<AudioSource>> {
-    let path = path.as_ref();
+    _ffmpeg(path.as_ref())
+}
 
+fn _ffmpeg(path: &OsStr) -> Result<Box<AudioSource>> {
     // Will fail if the path is not to a file on the fs. Likely a YouTube URI.
     let is_stereo = is_stereo(path).unwrap_or(false);
     let stereo_val = if is_stereo { "2" } else { "1" };
 
-    let args = [
+    ffmpeg_optioned(path, &[
         "-f",
         "s16le",
         "-ac",
@@ -116,12 +142,49 @@ pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Box<AudioSource>> {
         "-acodec",
         "pcm_s16le",
         "-",
-    ];
+    ])
+}
+
+/// Opens an audio file through `ffmpeg` and creates an audio source, with
+/// user-specified arguments to pass to ffmpeg.
+///
+/// Note that this does _not_ build on the arguments passed by the [`ffmpeg`]
+/// function.
+///
+/// # Examples
+///
+/// Pass options to create a custom ffmpeg streamer:
+///
+/// ```rust,no_run
+/// use serenity::voice;
+///
+/// let stereo_val = "2";
+///
+/// let streamer = voice::ffmpeg_optioned("./some_file.mp3", &[
+///     "-f",
+///     "s16le",
+///     "-ac",
+///     stereo_val,
+///     "-ar",
+///     "48000",
+///     "-acodec",
+///     "pcm_s16le",
+///     "-",
+/// ]);
+pub fn ffmpeg_optioned<P: AsRef<OsStr>>(
+    path: P,
+    args: &[&str],
+) -> Result<Box<AudioSource>> {
+    _ffmpeg_optioned(path.as_ref(), args)
+}
+
+fn _ffmpeg_optioned(path: &OsStr, args: &[&str]) -> Result<Box<AudioSource>> {
+    let is_stereo = is_stereo(path).unwrap_or(false);
 
     let command = Command::new("ffmpeg")
         .arg("-i")
         .arg(path)
-        .args(&args)
+        .args(args)
         .stderr(Stdio::null())
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
@@ -133,7 +196,11 @@ pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Box<AudioSource>> {
 /// Creates a streamed audio source from a DCA file.
 /// Currently only accepts the DCA1 format.
 pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Box<AudioSource>, DcaError> {
-    let file = File::open(path.as_ref()).map_err(DcaError::IoError)?;
+    _dca(path.as_ref())
+}
+
+fn _dca(path: &OsStr) -> StdResult<Box<AudioSource>, DcaError> {
+    let file = File::open(path).map_err(DcaError::IoError)?;
 
     let mut reader = BufReader::new(file);
 
@@ -182,6 +249,12 @@ pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSo
         stereo: is_stereo,
         reader,
         kind: AudioType::Opus,
+        decoder: Some(
+            Arc::new(Mutex::new(
+                // We always want to decode *to* stereo, for mixing reasons.
+                SendDecoder(OpusDecoder::new(audio::SAMPLE_RATE, Channels::Stereo).unwrap())
+            ))
+        ),
     })
 }
 
@@ -191,6 +264,7 @@ pub fn pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSou
         stereo: is_stereo,
         reader,
         kind: AudioType::Pcm,
+        decoder: None,
     })
 }
 

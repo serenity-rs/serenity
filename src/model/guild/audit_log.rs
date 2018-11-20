@@ -277,7 +277,7 @@ mod u64_handler {
             }
 
             fn visit_str<E: de::Error>(self, string: &str) -> StdResult<u64, E> {
-                string.parse().map_err(|e| de::Error::custom(e))
+                string.parse().map_err(de::Error::custom)
             }
         }
 
@@ -315,7 +315,7 @@ mod option_u64_handler {
             }
 
             fn visit_str<E: de::Error>(self, string: &str) -> StdResult<Option<u64>, E> {
-                string.parse().map(Some).map_err(|e| de::Error::custom(e))
+                string.parse().map(Some).map_err(de::Error::custom)
             }
         }
 

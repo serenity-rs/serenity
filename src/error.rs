@@ -12,10 +12,8 @@ use std::{
     num::ParseIntError
 };
 
-#[cfg(feature = "hyper")]
-use hyper::Error as HyperError;
-#[cfg(feature = "native-tls")]
-use native_tls::Error as TlsError;
+#[cfg(feature = "reqwest")]
+use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
 #[cfg(feature = "voice")]
 use opus::Error as OpusError;
 #[cfg(feature = "tungstenite")]
@@ -94,12 +92,6 @@ pub enum Error {
     /// [`http`]: http/index.html
     #[cfg(feature = "http")]
     Http(HttpError),
-    /// An error from the `hyper` crate.
-    #[cfg(feature = "hyper")]
-    Hyper(HyperError),
-    /// An error from the `native-tls` crate.
-    #[cfg(feature = "native-tls")]
-    Tls(TlsError),
     /// An error from the `tungstenite` crate.
     #[cfg(feature = "tungstenite")]
     Tungstenite(TungsteniteError),
@@ -120,11 +112,6 @@ impl From<FormatError> for Error {
 #[cfg(feature = "gateway")]
 impl From<GatewayError> for Error {
     fn from(e: GatewayError) -> Error { Error::Gateway(e) }
-}
-
-#[cfg(feature = "hyper")]
-impl From<HyperError> for Error {
-    fn from(e: HyperError) -> Error { Error::Hyper(e) }
 }
 
 impl From<IoError> for Error {
@@ -148,14 +135,24 @@ impl From<OpusError> for Error {
     fn from(e: OpusError) -> Error { Error::Opus(e) }
 }
 
-#[cfg(feature = "native-tls")]
-impl From<TlsError> for Error {
-    fn from(e: TlsError) -> Error { Error::Tls(e) }
-}
-
 #[cfg(feature = "tungstenite")]
 impl From<TungsteniteError> for Error {
     fn from(e: TungsteniteError) -> Error { Error::Tungstenite(e) }
+}
+
+#[cfg(feature = "http")]
+impl From<HttpError> for Error {
+    fn from(e: HttpError) -> Error { Error::Http(e) }
+}
+
+#[cfg(feature = "http")]
+impl From<InvalidHeaderValue> for Error {
+    fn from(e: InvalidHeaderValue) -> Error { HttpError::InvalidHeader(e).into() }
+}
+
+#[cfg(feature = "http")]
+impl From<ReqwestError> for Error {
+    fn from(e: ReqwestError) -> Error { HttpError::Request(e).into() }
 }
 
 impl Display for Error {
@@ -181,12 +178,8 @@ impl StdError for Error {
             Error::Gateway(ref inner) => inner.description(),
             #[cfg(feature = "http")]
             Error::Http(ref inner) => inner.description(),
-            #[cfg(feature = "http")]
-            Error::Hyper(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Opus(ref inner) => inner.description(),
-            #[cfg(feature = "native-tls")]
-            Error::Tls(ref inner) => inner.description(),
             #[cfg(feature = "tungstenite")]
             Error::Tungstenite(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
@@ -196,8 +189,6 @@ impl StdError for Error {
 
     fn cause(&self) -> Option<&StdError> {
         match *self {
-            #[cfg(feature = "http")]
-            Error::Hyper(ref inner) => Some(inner),
             Error::Json(ref inner) => Some(inner),
             Error::Io(ref inner) => Some(inner),
             #[cfg(feature = "tungstenite")]

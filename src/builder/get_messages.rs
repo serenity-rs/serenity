@@ -29,17 +29,17 @@ use utils::VecMap;
 /// # use std::error::Error;
 /// #
 /// # fn try_main() -> Result<(), Box<Error>> {
-/// use serenity::builder::GetMessages;
 /// use serenity::model::id::{ChannelId, MessageId};
-///
-/// let retriever = GetMessages::default()
-///     .after(MessageId(158339864557912064))
-///     .limit(25);
 ///
 /// // you can then pass it into a function which retrieves messages:
 /// let channel_id = ChannelId(81384788765712384);
 ///
-/// let _messages = channel_id.messages(|_| retriever)?;
+/// let _messages = channel_id.messages(|mut retriever| {
+///     retriever.after(MessageId(158339864557912064));
+///     retriever.limit(25);
+///
+///     retriever
+/// })?;
 /// #     Ok(())
 /// # }
 /// #
@@ -55,26 +55,35 @@ pub struct GetMessages(pub VecMap<&'static str, u64>);
 impl GetMessages {
     /// Indicates to retrieve the messages after a specific message, given by
     /// its Id.
-    pub fn after<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("after", message_id.into().0);
+    #[inline]
+    pub fn after<M: Into<MessageId>>(&mut self, message_id: M) {
+        self._after(message_id.into());
+    }
 
-        self
+    fn _after(&mut self, message_id: MessageId) {
+        self.0.insert("after", message_id.0);
     }
 
     /// Indicates to retrieve the messages _around_ a specific message in either
     /// direction (before+after) the given message.
-    pub fn around<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("around", message_id.into().0);
+    #[inline]
+    pub fn around<M: Into<MessageId>>(&mut self, message_id: M) {
+        self._around(message_id.into());
+    }
 
-        self
+    fn _around(&mut self, message_id: MessageId) {
+        self.0.insert("around", message_id.0);
     }
 
     /// Indicates to retrieve the messages before a specific message, given by
     /// its Id.
-    pub fn before<M: Into<MessageId>>(mut self, message_id: M) -> Self {
-        self.0.insert("before", message_id.into().0);
+    #[inline]
+    pub fn before<M: Into<MessageId>>(&mut self, message_id: M) {
+        self._before(message_id.into());
+    }
 
-        self
+    fn _before(&mut self, message_id: MessageId) {
+        self.0.insert("before", message_id.0);
     }
 
     /// The maximum number of messages to retrieve for the query.
@@ -84,15 +93,12 @@ impl GetMessages {
     /// **Note**: This field is capped to 100 messages due to a Discord
     /// limitation. If an amount larger than 100 is supplied, it will be
     /// reduced.
-    pub fn limit(mut self, limit: u64) -> Self {
-        self.0
-            .insert("limit", if limit > 100 { 100 } else { limit });
-
-        self
+    pub fn limit(&mut self, limit: u64) {
+        self.0.insert("limit", if limit > 100 { 100 } else { limit });
     }
 
     /// This is a function that is here for completeness. You do not need to
     /// call this - except to clear previous calls to `after`, `around`, and
     /// `before` - as it is the default value.
-    pub fn most_recent(self) -> Self { self }
+    pub fn most_recent(&self) { }
 }

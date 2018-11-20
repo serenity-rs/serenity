@@ -5,7 +5,7 @@ use model::{
 };
 use utils::VecMap;
 
-/// A builer to create or edit a [`Role`] for use via a number of model methods.
+/// A builder to create or edit a [`Role`] for use via a number of model methods.
 ///
 /// These are:
 ///
@@ -28,10 +28,13 @@ use utils::VecMap;
 /// #
 /// // assuming a `channel_id` and `guild_id` has been bound
 ///
-/// let role = guild_id.create_role(|r| r
-///     .hoist(true)
-///     .mentionable(true)
-///     .name("a test role"));
+/// let role = guild_id.create_role(|mut r| {
+///     r.hoist(true);
+///     r.mentionable(true);
+///     r.name("a test role");
+///
+///     r
+/// });
 /// ```
 ///
 /// [`PartialGuild::create_role`]: ../model/guild/struct.PartialGuild.html#method.create_role
@@ -72,47 +75,37 @@ impl EditRole {
     }
 
     /// Sets the colour of the role.
-    pub fn colour(mut self, colour: u64) -> Self {
+    pub fn colour(&mut self, colour: u64) {
         self.0.insert("color", Value::Number(Number::from(colour)));
-
-        self
     }
 
     /// Whether or not to hoist the role above lower-positioned role in the user
     /// list.
-    pub fn hoist(mut self, hoist: bool) -> Self {
+    pub fn hoist(&mut self, hoist: bool) {
         self.0.insert("hoist", Value::Bool(hoist));
-
-        self
     }
 
     /// Whether or not to make the role mentionable, notifying its users.
-    pub fn mentionable(mut self, mentionable: bool) -> Self {
+    pub fn mentionable(&mut self, mentionable: bool) {
         self.0.insert("mentionable", Value::Bool(mentionable));
-
-        self
     }
 
     /// The name of the role to set.
-    pub fn name(mut self, name: &str) -> Self {
-        self.0
-            .insert("name", Value::String(name.to_string()));
-
-        self
+    pub fn name(&mut self, name: &str) {
+        self.0.insert("name", Value::String(name.to_string()));
     }
 
     /// The set of permissions to assign the role.
-    pub fn permissions(mut self, permissions: Permissions) -> Self {
-        self.0.insert("permissions", Value::Number(Number::from(permissions.bits())));
-
-        self
+    pub fn permissions(&mut self, permissions: Permissions) {
+        self.0.insert(
+            "permissions",
+            Value::Number(Number::from(permissions.bits())),
+        );
     }
 
     /// The position to assign the role in the role list. This correlates to the
     /// role's position in the user list.
-    pub fn position(mut self, position: u8) -> Self {
+    pub fn position(&mut self, position: u8) {
         self.0.insert("position", Value::Number(Number::from(position)));
-
-        self
     }
 }

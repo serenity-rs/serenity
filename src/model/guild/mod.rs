@@ -101,24 +101,25 @@ pub struct Guild {
     /// if the [`member_count`] is greater than the `LARGE_THRESHOLD` set by
     /// the library.
     ///
-    /// [`ReadyEvent`]: events/struct.ReadyEvent.html
+    /// [`ReadyEvent`]: ../event/struct.ReadyEvent.html
+    /// [`member_count`]: #structfield.member_count
     #[serde(serialize_with = "serialize_gen_map")]
     pub members: HashMap<UserId, Member>,
     /// Indicator of whether the guild requires multi-factor authentication for
     /// [`Role`]s or [`User`]s with moderation permissions.
     ///
     /// [`Role`]: struct.Role.html
-    /// [`User`]: struct.User.html
+    /// [`User`]: ../user/struct.User.html
     pub mfa_level: MfaLevel,
     /// The name of the guild.
     pub name: String,
     /// The Id of the [`User`] who owns the guild.
     ///
-    /// [`User`]: struct.User.html
+    /// [`User`]: ../user/struct.User.html
     pub owner_id: UserId,
     /// A mapping of [`User`]s' Ids to their current presences.
     ///
-    /// [`User`]: struct.User.html
+    /// [`User`]: ../user/struct.User.html
     #[serde(serialize_with = "serialize_gen_map")]
     pub presences: HashMap<UserId, Presence>,
     /// The region that the voice servers that the guild uses are located in.
@@ -128,10 +129,8 @@ pub struct Guild {
     pub roles: HashMap<RoleId, Role>,
     /// An identifying hash of the guild's splash icon.
     ///
-    /// If the [`InviteSplash`] feature is enabled, this can be used to generate
+    /// If the [`"InviteSplash"`] feature is enabled, this can be used to generate
     /// a URL to a splash image.
-    ///
-    /// [`InviteSplash`]: enum.Feature.html#variant.InviteSplash
     pub splash: Option<String>,
     /// The ID of the channel to which system messages are sent.
     pub system_channel_id: Option<ChannelId>,
@@ -139,7 +138,7 @@ pub struct Guild {
     pub verification_level: VerificationLevel,
     /// A mapping of of [`User`]s to their current voice state.
     ///
-    /// [`User`]: struct.User.html
+    /// [`User`]: ../user/struct.User.html
     #[serde(serialize_with = "serialize_gen_map")]
     pub voice_states: HashMap<UserId, VoiceState>,
 }
@@ -223,15 +222,17 @@ impl Guild {
     /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
     /// days' worth of messages to delete is over the maximum.
     ///
-    /// [`ModelError::DeleteMessageDaysAmount`]:
-    /// enum.ModelError.html#variant.DeleteMessageDaysAmount
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`Guild::ban`]: struct.Guild.html#method.ban
-    /// [`User`]: struct.User.html
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    /// [`ModelError::DeleteMessageDaysAmount`]: ../error/enum.Error.html#variant.DeleteMessageDaysAmount
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`Guild::ban`]: ../guild/struct.Guild.html#method.ban
+    /// [`User`]: ../user/struct.User.html
+    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
+    #[inline]
     pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: &BO) -> Result<()> {
-        let user = user.into();
+        self._ban(user.into(), options)
+    }
 
+    fn _ban<BO: BanOptions>(&self, user: UserId, options: &BO) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::BAN_MEMBERS;
@@ -256,8 +257,8 @@ impl Guild {
     /// if the current user does not have permission to perform bans.
     ///
     /// [`Ban`]: struct.Ban.html
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     pub fn bans(&self) -> Result<Vec<Ban>> {
         #[cfg(feature = "cache")]
         {
@@ -310,7 +311,7 @@ impl Guild {
     ///
     /// [`Guild`]: struct.Guild.html
     /// [`PartialGuild`]: struct.PartialGuild.html
-    /// [`Shard`]: ../gateway/struct.Shard.html
+    /// [`Shard`]: ../../gateway/struct.Shard.html
     /// [US West region]: enum.Region.html#variant.UsWest
     /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
     pub fn create(name: &str, region: Region, icon: Option<&str>) -> Result<PartialGuild> {
@@ -342,9 +343,9 @@ impl Guild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`Channel`]: struct.Channel.html
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
+    /// [`Channel`]: ../channel/enum.Channel.html
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
         where C: Into<Option<ChannelId>> {
         #[cfg(feature = "cache")]
@@ -375,9 +376,9 @@ impl Guild {
     /// how to read an image from the filesystem and encode it as base64. Most
     /// of the example can be applied similarly for this method.
     ///
-    /// [`EditProfile::avatar`]: ../builder/struct.EditProfile.html#method.avatar
-    /// [`utils::read_image`]: ../fn.read_image.html
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    /// [`EditProfile::avatar`]: ../../builder/struct.EditProfile.html#method.avatar
+    /// [`utils::read_image`]: ../../utils/fn.read_image.html
+    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
     pub fn create_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
         self.id.create_emoji(name, image)
@@ -387,7 +388,7 @@ impl Guild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn create_integration<I>(&self, integration_id: I, kind: &str) -> Result<()>
         where I: Into<IntegrationId> {
@@ -413,9 +414,9 @@ impl Guild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     pub fn create_role<F>(&self, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole {
         #[cfg(feature = "cache")]
@@ -440,7 +441,7 @@ impl Guild {
     /// If the `cache` is enabled, then returns a [`ModelError::InvalidUser`]
     /// if the current user is not the guild owner.
     ///
-    /// [`ModelError::InvalidUser`]: enum.ModelError.html#variant.InvalidUser
+    /// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser
     pub fn delete(&self) -> Result<PartialGuild> {
         #[cfg(feature = "cache")]
         {
@@ -459,7 +460,7 @@ impl Guild {
     /// Requires the [Manage Emojis] permission.
     ///
     /// [`Emoji`]: struct.Emoji.html
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
     pub fn delete_emoji<E: Into<EmojiId>>(&self, emoji_id: E) -> Result<()> {
         self.id.delete_emoji(emoji_id)
@@ -469,7 +470,7 @@ impl Guild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn delete_integration<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
         self.id.delete_integration(integration_id)
@@ -484,7 +485,7 @@ impl Guild {
     ///
     /// [`Role`]: struct.Role.html
     /// [`Role::delete`]: struct.Role.html#method.delete
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
     pub fn delete_role<R: Into<RoleId>>(&self, role_id: R) -> Result<()> {
         self.id.delete_role(role_id)
@@ -516,8 +517,8 @@ impl Guild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditGuild) -> EditGuild {
         #[cfg(feature = "cache")]
@@ -560,7 +561,7 @@ impl Guild {
     ///
     /// [`Emoji`]: struct.Emoji.html
     /// [`Emoji::edit`]: struct.Emoji.html#method.edit
-    /// [Manage Emojis]: permissions/constant.MANAGE_EMOJIS.html
+    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
     pub fn edit_emoji<E: Into<EmojiId>>(&self, emoji_id: E, name: &str) -> Result<Emoji> {
         self.id.edit_emoji(emoji_id, name)
@@ -597,8 +598,8 @@ impl Guild {
     /// if the current user does not have permission to change their own
     /// nickname.
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Change Nickname]: permissions/constant.CHANGE_NICKNAME.html
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Change Nickname]: ../permissions/struct.Permissions.html#associatedconstant.CHANGE_NICKNAME
     pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -624,7 +625,7 @@ impl Guild {
     /// guild.edit_role(RoleId(7), |r| r.hoist(true));
     /// ```
     ///
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
     pub fn edit_role<F, R>(&self, role_id: R, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
@@ -644,7 +645,7 @@ impl Guild {
     /// ```
     ///
     /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: permissions/constant.MANAGE_ROLES.html
+    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
     pub fn edit_role_position<R>(&self, role_id: R, position: u64) -> Result<Vec<Role>>
         where R: Into<RoleId> {
@@ -655,7 +656,7 @@ impl Guild {
     ///
     /// Requires that the current user be in the guild.
     #[inline]
-    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> { guild_id.into().get() }
+    pub fn get<G: Into<GuildId>>(guild_id: G) -> Result<PartialGuild> { guild_id.into().to_partial_guild() }
 
     /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
     ///
@@ -668,12 +669,21 @@ impl Guild {
     ///
     /// If both user IDs are the same, `None` is returned. If one of the users
     /// is the guild owner, their ID is returned.
+    ///
+    /// [`position`]: struct.Role.html#structfield.position
     #[cfg(feature = "cache")]
+    #[inline]
     pub fn greater_member_hierarchy<T, U>(&self, lhs_id: T, rhs_id: U)
         -> Option<UserId> where T: Into<UserId>, U: Into<UserId> {
-        let lhs_id = lhs_id.into();
-        let rhs_id = rhs_id.into();
+        self._greater_member_hierarchy(lhs_id.into(), rhs_id.into())
+    }
 
+    #[cfg(feature = "cache")]
+    fn _greater_member_hierarchy(
+        &self,
+        lhs_id: UserId,
+        rhs_id: UserId,
+    ) -> Option<UserId> {
         // Check that the IDs are the same. If they are, neither is greater.
         if lhs_id == rhs_id {
             return None;
@@ -742,8 +752,8 @@ impl Guild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     pub fn invites(&self) -> Result<Vec<RichInvite>> {
         #[cfg(feature = "cache")]
         {
@@ -767,7 +777,7 @@ impl Guild {
     /// Requires the [Kick Members] permission.
     ///
     /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[inline]
     pub fn kick<U: Into<UserId>>(&self, user_id: U) -> Result<()> { self.id.kick(user_id) }
 
@@ -777,7 +787,7 @@ impl Guild {
 
     /// Gets a user's [`Member`] for the guild by Id.
     ///
-    /// [`Guild`]: struct.Guild.html
+    /// [`Guild`]: ../guild/struct.Guild.html
     /// [`Member`]: struct.Member.html
     #[inline]
     pub fn member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> { self.id.member(user_id) }
@@ -788,7 +798,7 @@ impl Guild {
     /// value is 1000. Optionally pass in `after` to offset the results by a
     /// [`User`]'s Id.
     ///
-    /// [`User`]: struct.User.html
+    /// [`User`]: ../user/struct.User.html
     #[inline]
     pub fn members<U>(&self, limit: Option<u64>, after: Option<U>) -> Result<Vec<Member>>
         where U: Into<UserId> {
@@ -1106,10 +1116,13 @@ impl Guild {
     /// Calculate a [`Member`]'s permissions in the guild.
     ///
     /// [`Member`]: struct.Member.html
+    #[inline]
     pub fn member_permissions<U>(&self, user_id: U) -> Permissions
         where U: Into<UserId> {
-        let user_id = user_id.into();
+        self._member_permissions(user_id.into())
+    }
 
+    fn _member_permissions(&self, user_id: UserId) -> Permissions {
         if user_id == self.owner_id {
             return Permissions::all();
         }
@@ -1158,37 +1171,31 @@ impl Guild {
     ///
     /// Requires the [Move Members] permission.
     ///
-    /// [Move Members]: permissions/constant.MOVE_MEMBERS.html
+    /// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
     #[inline]
     pub fn move_member<C, U>(&self, user_id: U, channel_id: C) -> Result<()>
         where C: Into<ChannelId>, U: Into<UserId> {
         self.id.move_member(user_id, channel_id)
     }
 
-    /// Alias for [`permissions_in`].
-    ///
-    /// [`permissions_in`]: #method.permissions_in
-    #[deprecated(since = "0.4.3",
-                 note = "This will serve a different purpose in 0.5")]
-    #[inline]
-    pub fn permissions_for<C, U>(&self, channel_id: C, user_id: U)
-        -> Permissions where C: Into<ChannelId>, U: Into<UserId> {
-        self.permissions_in(channel_id, user_id)
-    }
-
     /// Calculate a [`User`]'s permissions in a given channel in the guild.
     ///
-    /// [`User`]: struct.User.html
+    /// [`User`]: ../user/struct.User.html
+    #[inline]
     pub fn permissions_in<C, U>(&self, channel_id: C, user_id: U) -> Permissions
         where C: Into<ChannelId>, U: Into<UserId> {
-        let user_id = user_id.into();
+        self._permissions_in(channel_id.into(), user_id.into())
+    }
 
+    fn _permissions_in(
+        &self,
+        channel_id: ChannelId,
+        user_id: UserId,
+    ) -> Permissions {
         // The owner has all permissions in all cases.
         if user_id == self.owner_id {
             return Permissions::all();
         }
-
-        let channel_id = channel_id.into();
 
         // Start by retrieving the @everyone role's permissions.
         let everyone = match self.roles.get(&RoleId(self.id.0)) {
@@ -1328,10 +1335,10 @@ impl Guild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     pub fn prune_count(&self, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
@@ -1364,7 +1371,7 @@ impl Guild {
     /// retrieve the total number of shards in use. If you already have the
     /// total, consider using [`utils::shard_id`].
     ///
-    /// [`utils::shard_id`]: ../utils/fn.shard_id.html
+    /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
     pub fn shard_id(&self) -> u64 { self.id.shard_id() }
@@ -1404,7 +1411,7 @@ impl Guild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn start_integration_sync<I: Into<IntegrationId>>(&self, integration_id: I) -> Result<()> {
         self.id.start_integration_sync(integration_id)
@@ -1421,10 +1428,10 @@ impl Guild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
-    /// [Kick Members]: permissions/constant.KICK_MEMBERS.html
+    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     pub fn start_prune(&self, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
@@ -1447,9 +1454,9 @@ impl Guild {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`User`]: struct.User.html
-    /// [Ban Members]: permissions/constant.BAN_MEMBERS.html
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`User`]: ../user/struct.User.html
+    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -1467,7 +1474,7 @@ impl Guild {
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: permissions/constant.MANAGE_GUILD.html
+    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub fn vanity_url(&self) -> Result<String> {
         self.id.vanity_url()
@@ -1477,7 +1484,7 @@ impl Guild {
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> { self.id.webhooks() }
 
@@ -1500,7 +1507,7 @@ impl Guild {
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
-    ///         if let Some(arc) = msg.guild_id().unwrap().find() {
+    ///         if let Some(arc) = msg.guild_id.unwrap().to_guild_cached() {
     ///             if let Some(role) = arc.read().role_by_name("role_name") {
     ///                 println!("{:?}", role);
     ///             }
@@ -1939,7 +1946,7 @@ impl Region {
             Region::EuWest => "eu-west",
             Region::Frankfurt => "frankfurt",
             Region::HongKong => "hongkong",
-            Region::Japan => "Japan",
+            Region::Japan => "japan",
             Region::London => "london",
             Region::Russia => "russia",
             Region::Singapore => "singapore",
@@ -1991,6 +1998,112 @@ impl VerificationLevel {
             VerificationLevel::Medium => 2,
             VerificationLevel::High => 3,
             VerificationLevel::Higher => 4,
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    #[cfg(feature = "model")]
+    mod model {
+        use chrono::prelude::*;
+        use model::prelude::*;
+        use std::collections::*;
+        use std::sync::Arc;
+
+        fn gen_user() -> User {
+            User {
+                id: UserId(210),
+                avatar: Some("abc".to_string()),
+                bot: true,
+                discriminator: 1432,
+                name: "test".to_string(),
+            }
+        }
+
+        fn gen_member() -> Member {
+            let dt: DateTime<FixedOffset> = FixedOffset::east(5 * 3600)
+                .ymd(2016, 11, 08)
+                .and_hms(0, 0, 0);
+            let vec1 = Vec::new();
+            let u = Arc::new(RwLock::new(gen_user()));
+
+            Member {
+                deaf: false,
+                guild_id: GuildId(1),
+                joined_at: Some(dt),
+                mute: false,
+                nick: Some("aaaa".to_string()),
+                roles: vec1,
+                user: u,
+            }
+        }
+
+        fn gen() -> Guild {
+            let u = gen_user();
+            let m = gen_member();
+
+            let hm1 = HashMap::new();
+            let hm2 = HashMap::new();
+            let vec1 = Vec::new();
+            let dt: DateTime<FixedOffset> = FixedOffset::east(5 * 3600)
+                .ymd(2016, 11, 08)
+                .and_hms(0, 0, 0);
+            let mut hm3 = HashMap::new();
+            let hm4 = HashMap::new();
+            let hm5 = HashMap::new();
+            let hm6 = HashMap::new();
+
+            hm3.insert(u.id, m);
+
+            let notifications = DefaultMessageNotificationLevel::All;
+
+            Guild {
+                afk_channel_id: Some(ChannelId(0)),
+                afk_timeout: 0,
+                channels: hm1,
+                default_message_notifications: notifications,
+                emojis: hm2,
+                features: vec1,
+                icon: Some("/avatars/210/a_aaa.webp?size=1024".to_string()),
+                id: GuildId(1),
+                joined_at: dt,
+                large: false,
+                member_count: 1,
+                members: hm3,
+                mfa_level: MfaLevel::Elevated,
+                name: "Spaghetti".to_string(),
+                owner_id: UserId(210),
+                presences: hm4,
+                region: "NA".to_string(),
+                roles: hm5,
+                splash: Some("asdf".to_string()),
+                verification_level: VerificationLevel::None,
+                voice_states: hm6,
+                application_id: Some(ApplicationId(0)),
+                explicit_content_filter: ExplicitContentFilter::None,
+                system_channel_id: Some(ChannelId(0)),
+            }
+        }
+
+
+        #[test]
+        fn member_named_username() {
+            let guild = gen();
+            let lhs = guild
+                .member_named("test#1432")
+                .unwrap()
+                .display_name();
+
+            assert_eq!(lhs, gen_member().display_name());
+        }
+
+        #[test]
+        fn member_named_nickname() {
+            let guild = gen();
+            let lhs = guild.member_named("aaaa").unwrap().display_name();
+
+            assert_eq!(lhs, gen_member().display_name());
         }
     }
 }

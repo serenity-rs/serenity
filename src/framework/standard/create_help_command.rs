@@ -126,7 +126,7 @@ impl CreateHelpCommand {
         self
     }
 
-    /// Sets how the group-prexix shall be labeled.
+    /// Sets how the group-prefix shall be labeled.
     pub fn group_prefix(mut self, text: &str) -> Self {
         self.0.group_prefix = text.to_string();
 
@@ -204,16 +204,23 @@ impl CreateHelpCommand {
         self
     }
 
-    /// Sets the colour for the embed if no error occured.
+    /// Sets the colour for the embed if no error occurred.
     pub fn embed_success_colour(mut self, colour: Colour) -> Self {
         self.0.embed_success_colour = colour;
 
         self
     }
 
-    /// Sets the colour for the embed if an error occured.
+    /// Sets the colour for the embed if an error occurred.
     pub fn embed_error_colour(mut self, colour: Colour) -> Self {
         self.0.embed_error_colour = colour;
+
+        self
+    }
+
+    /// Sets the maximum Levenshtein-distance to find similar commands.
+    pub fn max_levenshtein_distance(mut self, distance: usize) -> Self {
+        self.0.max_levenshtein_distance = distance;
 
         self
     }
@@ -264,8 +271,7 @@ impl CreateHelpCommand {
     /// If `Some(String)` was set as `striked_commands_tip` and the `String` is empty,
     /// the creator will substitute content based on the `HelpBehaviour`-settings.
     pub(crate) fn finish(mut self) -> Arc<Help> {
-
-        if &self.0.striked_commands_tip_in_dm == &Some(String::new()) {
+        if self.0.striked_commands_tip_in_dm == Some(String::new()) {
             self.0.striked_commands_tip_in_dm = self.produce_strike_text("direct messages");
         }
 

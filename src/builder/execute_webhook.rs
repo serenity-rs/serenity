@@ -26,21 +26,30 @@ use utils::VecMap;
 /// let webhook = http::get_webhook_with_token(id, token)
 ///     .expect("valid webhook");
 ///
-/// let website = Embed::fake(|e| e
-///     .title("The Rust Language Website")
-///     .description("Rust is a systems programming language.")
-///     .colour(Colour::from_rgb(222, 165, 132)));
+/// let website = Embed::fake(|mut e| {
+///     e.title("The Rust Language Website");
+///     e.description("Rust is a systems programming language.");
+///     e.colour(Colour::from_rgb(222, 165, 132));
 ///
-/// let resources = Embed::fake(|e| e
-///     .title("Rust Resources")
-///     .description("A few resources to help with learning Rust")
-///     .colour(0xDEA584)
-///     .field("The Rust Book", "A comprehensive resource for Rust.", false)
-///     .field("Rust by Example", "A collection of Rust examples", false));
+///     e
+/// });
 ///
-/// let _ = webhook.execute(false, |w| w
-///     .content("Here's some information on Rust:")
-///     .embeds(vec![website, resources]));
+/// let resources = Embed::fake(|mut e| {
+///     e.title("Rust Resources");
+///     e.description("A few resources to help with learning Rust");
+///     e.colour(0xDEA584);
+///     e.field("The Rust Book", "A comprehensive resource for Rust.", false);
+///     e.field("Rust by Example", "A collection of Rust examples", false);
+///
+///     e
+/// });
+///
+/// let _ = webhook.execute(false, |mut w| {
+///     w.content("Here's some information on Rust:");
+///     w.embeds(vec![website, resources]);
+///
+///     w
+/// });
 /// ```
 ///
 /// [`Webhook`]: ../model/webhook/struct.Webhook.html
@@ -63,14 +72,15 @@ impl ExecuteWebhook {
     /// #
     /// let avatar_url = "https://i.imgur.com/KTs6whd.jpg";
     ///
-    /// let _ = webhook.execute(false, |w| w
-    ///     .avatar_url(avatar_url)
-    ///     .content("Here's a webhook"));
+    /// let _ = webhook.execute(false, |mut w| {
+    ///     w.avatar_url(avatar_url);
+    ///     w.content("Here's a webhook");
+    ///
+    ///     w
+    /// });
     /// ```
-    pub fn avatar_url(mut self, avatar_url: &str) -> Self {
+    pub fn avatar_url(&mut self, avatar_url: &str) {
         self.0.insert("avatar_url", Value::String(avatar_url.to_string()));
-
-        self
     }
 
     /// Set the content of the message.
@@ -87,16 +97,20 @@ impl ExecuteWebhook {
     /// #
     /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
     /// #
-    /// if let Err(why) = webhook.execute(false, |w| w.content("foo")) {
+    /// let execution = webhook.execute(false, |mut w| {
+    ///     w.content("foo");
+    ///
+    ///     w
+    /// });
+    ///
+    /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
     /// ```
     ///
     /// [`embeds`]: #method.embeds
-    pub fn content(mut self, content: &str) -> Self {
+    pub fn content(&mut self, content: &str) {
         self.0.insert("content", Value::String(content.to_string()));
-
-        self
     }
 
     /// Set the embeds associated with the message.
@@ -112,10 +126,8 @@ impl ExecuteWebhook {
     /// [`Embed::fake`]: ../model/channel/struct.Embed.html#method.fake
     /// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute
     /// [struct-level documentation]: #examples
-    pub fn embeds(mut self, embeds: Vec<Value>) -> Self {
+    pub fn embeds(&mut self, embeds: Vec<Value>) {
         self.0.insert("embeds", Value::Array(embeds));
-
-        self
     }
 
     /// Whether the message is a text-to-speech message.
@@ -129,35 +141,45 @@ impl ExecuteWebhook {
     /// #
     /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
     /// #
-    /// if let Err(why) = webhook.execute(false, |w| w.content("hello").tts(true)) {
+    /// let execution = webhook.execute(false, |mut w| {
+    ///     w.content("hello");
+    ///     w.tts(true);
+    ///
+    ///     w
+    /// });
+    ///
+    /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
     /// ```
-    pub fn tts(mut self, tts: bool) -> Self {
+    pub fn tts(&mut self, tts: bool) {
         self.0.insert("tts", Value::Bool(tts));
-
-        self
     }
 
     /// Override the default username of the webhook.
     ///
     /// # Examples
     ///
-    /// Overriuding the username to `"hakase"`:
+    /// Overriding the username to `"hakase"`:
     ///
     /// ```rust,no_run
     /// # use serenity::client::rest;
     /// #
     /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
     /// #
-    /// if let Err(why) = webhook.execute(false, |w| w.content("hello").username("hakase")) {
+    /// let execution = webhook.execute(false, |mut w| {
+    ///     w.content("hello");
+    ///     w.username("hakase");
+    ///
+    ///     w
+    /// });
+    ///
+    /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
     /// ```
-    pub fn username(mut self, username: &str) -> Self {
+    pub fn username(&mut self, username: &str) {
         self.0.insert("username", Value::String(username.to_string()));
-
-        self
     }
 }
 
@@ -173,7 +195,7 @@ impl Default for ExecuteWebhook {
     /// ```rust
     /// use serenity::builder::ExecuteWebhook;
     ///
-    /// let executer = ExecuteWebhook::default();
+    /// let executor = ExecuteWebhook::default();
     /// ```
     ///
     /// [`Webhook`]: ../model/webhook/struct.Webhook.html

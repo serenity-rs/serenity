@@ -8,11 +8,19 @@ use serenity::model::prelude::*;
 use std::fs::File;
 
 macro_rules! p {
-    ($s:ident, $filename:expr) => {
+    ($s:ident, $filename:expr) => {{
         let f = File::open(concat!("./tests/resources/", $filename, ".json")).unwrap();
         let v = serde_json::from_reader::<File, Value>(f).unwrap();
-        let _ = $s::deserialize(v).unwrap();
-    };
+
+        $s::deserialize(v).unwrap()
+    }};
+}
+
+// An activity with null type.
+#[test]
+fn activity() {
+    p!(Activity, "activity_1");
+    p!(Activity, "activity_2");
 }
 
 #[test]
@@ -38,12 +46,6 @@ fn channel_update() {
 #[test]
 fn emoji_animated() {
     p!(Emoji, "emoji_animated");
-}
-
-// A game with null type.
-#[test]
-fn game() {
-    p!(Game, "game_1");
 }
 
 #[test]
@@ -72,6 +74,7 @@ fn guild_some_application_id() {
 #[test]
 fn guild_create() {
     p!(GuildCreateEvent, "guild_create_1");
+    p!(GuildCreateEvent, "guild_create_2");
 }
 
 #[test]
@@ -192,4 +195,26 @@ fn guild_features_deser() {
 #[test]
 fn guild_system_channel_id_missing() {
     p!(Guild, "guild_system_channel_id_missing");
+}
+
+#[test]
+fn decode_negative_one_role_position() {
+    p!(Role, "role_-1_position");
+}
+
+#[test]
+fn decode_guild_with_n1_role_position() {
+    p!(Guild, "guild_-1_role_position");
+}
+
+#[test]
+fn decode_footer_deser() {
+    let mut message = p!(Message, "message_footer_1");
+
+    assert_eq!(
+        message.embeds.remove(0).footer.unwrap().text,
+        "2005-09-26 - 2013-09-26"
+    );
+
+    p!(Message, "message_footer_2");
 }

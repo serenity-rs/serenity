@@ -33,7 +33,7 @@ pub struct Webhook {
     ///
     /// This can be modified via [`ExecuteWebhook::avatar`].
     ///
-    /// [`ExecuteWebhook::avatar`]: ../builder/struct.ExecuteWebhook.html#method.avatar
+    /// [`ExecuteWebhook::avatar`]: ../../builder/struct.ExecuteWebhook.html#method.avatar
     pub avatar: Option<String>,
     /// The Id of the channel that owns the webhook.
     pub channel_id: ChannelId,
@@ -43,7 +43,7 @@ pub struct Webhook {
     ///
     /// This can be modified via [`ExecuteWebhook::username`].
     ///
-    /// [`ExecuteWebhook::username`]: ../builder/struct.ExecuteWebhook.html#method.username
+    /// [`ExecuteWebhook::username`]: ../../builder/struct.ExecuteWebhook.html#method.username
     pub name: Option<String>,
     /// The webhook's secure token.
     pub token: String,
@@ -60,7 +60,7 @@ impl Webhook {
     /// As this calls the [`http::delete_webhook_with_token`] function,
     /// authentication is not required.
     ///
-    /// [`http::delete_webhook_with_token`]: ../http/fn.delete_webhook_with_token.html
+    /// [`http::delete_webhook_with_token`]: ../../http/fn.delete_webhook_with_token.html
     #[inline]
     pub fn delete(&self) -> Result<()> { http::delete_webhook_with_token(self.id.0, &self.token) }
 
@@ -108,8 +108,8 @@ impl Webhook {
     /// let _ = webhook.edit(None, Some(&image)).expect("Error editing");
     /// ```
     ///
-    /// [`http::edit_webhook`]: ../http/fn.edit_webhook.html
-    /// [`http::edit_webhook_with_token`]: ../http/fn.edit_webhook_with_token.html
+    /// [`http::edit_webhook`]: ../../http/fn.edit_webhook.html
+    /// [`http::edit_webhook_with_token`]: ../../http/fn.edit_webhook_with_token.html
     pub fn edit(&mut self, name: Option<&str>, avatar: Option<&str>) -> Result<()> {
         if name.is_none() && avatar.is_none() {
             return Ok(());
@@ -160,7 +160,11 @@ impl Webhook {
     /// let mut webhook = http::get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
-    /// let _ = webhook.execute(false, |w| w.content("test")).expect("Error executing");
+    /// let _ = webhook.execute(false, |mut w| {
+    ///     w.content("test");
+    ///
+    ///     w
+    /// });
     /// ```
     ///
     /// Execute a webhook with message content of `test`, overriding the
@@ -176,18 +180,23 @@ impl Webhook {
     /// let mut webhook = http::get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
-    /// let embed = Embed::fake(|e| e
-    ///     .title("Rust's website")
-    ///     .description("Rust is a systems programming language that runs
-    ///                   blazingly fast, prevents segfaults, and guarantees
-    ///                   thread safety.")
-    ///     .url("https://rust-lang.org"));
+    /// let embed = Embed::fake(|mut e| {
+    ///     e.title("Rust's website");
+    ///     e.description("Rust is a systems programming language that runs
+    ///                    blazingly fast, prevents segfaults, and guarantees
+    ///                    thread safety.");
+    ///     e.url("https://rust-lang.org");
     ///
-    /// let _ = webhook.execute(false, |w| w
-    ///     .content("test")
-    ///     .username("serenity")
-    ///     .embeds(vec![embed]))
-    ///     .expect("Error executing");
+    ///     e
+    /// });
+    ///
+    /// let _ = webhook.execute(false, |mut w| {
+    ///     w.content("test");
+    ///     w.username("serenity");
+    ///     w.embeds(vec![embed]);
+    ///
+    ///     w
+    /// });
     /// ```
     #[inline]
     pub fn execute<F: FnOnce(ExecuteWebhook) -> ExecuteWebhook>(&self,
@@ -205,7 +214,7 @@ impl Webhook {
     /// As this calls the [`http::get_webhook_with_token`] function,
     /// authentication is not required.
     ///
-    /// [`http::get_webhook_with_token`]: ../http/fn.get_webhook_with_token.html
+    /// [`http::get_webhook_with_token`]: ../../http/fn.get_webhook_with_token.html
     pub fn refresh(&mut self) -> Result<()> {
         match http::get_webhook_with_token(self.id.0, &self.token) {
             Ok(replacement) => {
@@ -220,11 +229,12 @@ impl Webhook {
 
 #[cfg(feature = "model")]
 impl WebhookId {
-    /// Retrieves the webhook by the Id.
+    /// Requests [`Webhook`] over REST API.
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    /// [`Webhook`]: struct.Webhook.html
+    /// [Manage Webhooks]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[inline]
-    pub fn get(&self) -> Result<Webhook> { http::get_webhook(self.0) }
+    pub fn to_webhook(self) -> Result<Webhook> { http::get_webhook(self.0) }
 }

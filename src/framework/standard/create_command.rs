@@ -60,7 +60,7 @@ impl CreateCommand {
     /// Adds a "check" to a command, which checks whether or not the command's
     /// function should be called.
     ///
-    /// These checks are bypassed for commands sent by the application owner.
+    /// **Note**: These checks are bypassed for commands sent by the application owner.
     ///
     /// # Examples
     ///
@@ -168,6 +168,14 @@ impl CreateCommand {
         self
     }
 
+    /// Whether owners shall bypass buckets, missing permissions,
+    /// wrong channels, missing roles, and checks.
+    pub fn owner_privileges(mut self, owner_privileges: bool) -> Self {
+        self.0.owner_privileges = owner_privileges;
+
+        self
+    }
+
     /// Whether command should be displayed in help list or not, used by other commands.
     pub fn help_available(mut self, help_available: bool) -> Self {
         self.0.help_available = help_available;
@@ -189,7 +197,7 @@ impl CreateCommand {
         self
     }
 
-    /// Minumum amount of arguments that should be passed.
+    /// Minimum amount of arguments that should be passed.
     pub fn min_args(mut self, min_args: i32) -> Self {
         self.0.min_args = Some(min_args);
 
@@ -236,7 +244,7 @@ impl CreateCommand {
 
     /// Sets an initialise middleware to be called upon the command's actual registration.
     ///
-    /// This is similiar to implementing the `init` function on `Command`.
+    /// This is similar to implementing the `init` function on `Command`.
     pub fn init<F: Fn() + Send + Sync + 'static>(mut self, f: F) -> Self {
         self.2.init = Some(Arc::new(f));
 
@@ -245,7 +253,7 @@ impl CreateCommand {
 
     /// Sets a before middleware to be called before the command's execution.
     ///
-    /// This is similiar to implementing the `before` function on `Command`.
+    /// This is similar to implementing the `before` function on `Command`.
     pub fn before<F: Send + Sync + 'static>(mut self, f: F) -> Self
         where F: Fn(&mut Context, &Message) -> bool {
         self.2.before = Some(Arc::new(f));
@@ -255,7 +263,7 @@ impl CreateCommand {
 
     /// Sets an after middleware to be called after the command's execution.
     ///
-    /// This is similiar to implementing the `after` function on `Command`.
+    /// This is similar to implementing the `after` function on `Command`.
     pub fn after<F: Send + Sync + 'static>(mut self, f: F) -> Self
         where F: Fn(&mut Context, &Message, &Result<(), CommandError>) {
         self.2.after = Some(Arc::new(f));

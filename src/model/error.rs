@@ -70,10 +70,10 @@ use super::Permissions;
 /// # fn main() { }
 /// ```
 ///
-/// [`Error`]: ../enum.Error.html
-/// [`Error::Model`]: ../enum.Error.html#variant.Model
-/// [`GuildId::ban`]: struct.GuildId.html#method.ban
-/// [`model`]: ./index.html
+/// [`Error`]: ../../enum.Error.html
+/// [`Error::Model`]: ../../enum.Error.html#variant.Model
+/// [`GuildId::ban`]: ../id/struct.GuildId.html#method.ban
+/// [`model`]: ../index.html
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Error {
     /// When attempting to delete below or above the minimum and maximum allowed
@@ -88,9 +88,9 @@ pub enum Error {
     /// An indication that a [guild][`Guild`] could not be found by
     /// [Id][`GuildId`] in the [`Cache`].
     ///
-    /// [`Guild`]: ../model/guild/struct.Guild.html
-    /// [`GuildId`]: ../model/id/struct.GuildId.html
-    /// [`Cache`]: ../cache/struct.Cache.html
+    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`GuildId`]: ../id/struct.GuildId.html
+    /// [`Cache`]: ../../cache/struct.Cache.html
     GuildNotFound,
     /// Indicates that there are hierarchy problems restricting an action.
     ///
@@ -106,23 +106,23 @@ pub enum Error {
     /// The provided [`Permission`]s is the set of required permissions
     /// required.
     ///
-    /// [`Permission`]: ../model/permissions/struct.Permissions.html
+    /// [`Permission`]: ../permissions/struct.Permissions.html
     InvalidPermissions(Permissions),
     /// An indicator that the [current user] can not perform an action.
     ///
-    /// [current user]: ../model/user/struct.CurrentUser.html
+    /// [current user]: ../user/struct.CurrentUser.html
     InvalidUser,
     /// An indicator that an item is missing from the [`Cache`], and the action
     /// can not be continued.
     ///
-    /// [`Cache`]: ../cache/struct.Cache.html
+    /// [`Cache`]: ../../cache/struct.Cache.html
     ItemMissing,
     /// Indicates that a [`Message`]s content was too long and will not
     /// successfully send, as the length is over 2000 codepoints, or 4000 bytes.
     ///
     /// The number of bytes larger than the limit is provided.
     ///
-    /// [`Message`]: ../model/channel/struct.Message.html
+    /// [`Message`]: ../channel/struct.Message.html
     MessageTooLong(u64),
     /// Indicates that the current user is attempting to Direct Message another
     /// bot user, which is disallowed by the API.

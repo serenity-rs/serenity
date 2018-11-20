@@ -19,8 +19,8 @@ use std::fmt::Write as FmtWrite;
 /// A group channel - potentially including other [`User`]s - separate from a
 /// [`Guild`].
 ///
-/// [`Guild`]: struct.Guild.html
-/// [`User`]: struct.User.html
+/// [`Guild`]: ../guild/struct.Guild.html
+/// [`User`]: ../user/struct.User.html
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Group {
     /// The Id of the group channel.
@@ -52,10 +52,13 @@ impl Group {
     /// **Note**: Groups have a limit of 10 recipients, including the current
     /// user.
     ///
-    /// [`http::add_group_recipient`]: ../http/fn.add_group_recipient.html
+    /// [`http::add_group_recipient`]: ../../http/fn.add_group_recipient.html
+    #[inline]
     pub fn add_recipient<U: Into<UserId>>(&self, user: U) -> Result<()> {
-        let user = user.into();
+        self._add_recipient(user.into())
+    }
 
+    fn _add_recipient(&self, user: UserId) -> Result<()> {
         // If the group already contains the recipient, do nothing.
         if self.recipients.contains_key(&user) {
             return Ok(());
@@ -76,10 +79,10 @@ impl Group {
     /// Requires the [Add Reactions] permission, _if_ the current user is the
     /// first user to perform a react with a certain emoji.
     ///
-    /// [`Emoji`]: struct.Emoji.html
+    /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: struct.Message.html
     /// [`Message::react`]: struct.Message.html#method.react
-    /// [Add Reactions]: permissions/constant.ADD_REACTIONS.html
+    /// [Add Reactions]: ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
     #[inline]
     pub fn create_reaction<M, R>(&self, message_id: M, reaction_type: R) -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
@@ -101,8 +104,8 @@ impl Group {
     /// delete either 0 or more than 100 messages.
     ///
     /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
-    /// [`ModelError::BulkDeleteAmount`]: ../enum.ModelError.html#variant.BulkDeleteAmount
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    /// [`ModelError::BulkDeleteAmount`]: ../error/enum.Error.html#variant.BulkDeleteAmount
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, message_ids: It) -> Result<()> {
         self.channel_id.delete_messages(message_ids)
@@ -113,7 +116,7 @@ impl Group {
     ///
     /// **Note**: Requires the [Manage Channel] permission.
     ///
-    /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
+    /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[inline]
     pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
         self.channel_id.delete_permission(permission_type)
@@ -125,7 +128,7 @@ impl Group {
     /// user did not perform the reaction.
     ///
     /// [`Reaction`]: struct.Reaction.html
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn delete_reaction<M, R>(&self,
                                  message_id: M,
@@ -152,10 +155,10 @@ impl Group {
     /// is over the [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`EditMessage`]: ../builder/struct.EditMessage.html
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
+    /// [`EditMessage`]: ../../builder/struct.EditMessage.html
     /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
+    /// [`the limit`]: ../../builder/struct.EditMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
         where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
@@ -171,12 +174,8 @@ impl Group {
 
     /// Determines if the channel is NSFW.
     ///
-    /// Refer to [`utils::is_nsfw`] for more details.
-    ///
     /// **Note**: This method is for consistency. This will always return
     /// `false`, due to groups not being considered NSFW.
-    ///
-    /// [`utils::is_nsfw`]: ../../utils/fn.is_nsfw.html
     #[inline]
     pub fn is_nsfw(&self) -> bool { false }
 
@@ -188,7 +187,7 @@ impl Group {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         self.channel_id.message(message_id)
@@ -198,7 +197,7 @@ impl Group {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
@@ -240,10 +239,10 @@ impl Group {
     /// **Note**: Requires the [Read Message History] permission.
     ///
     /// [`Channel::reaction_users`]: enum.Channel.html#method.reaction_users
-    /// [`Emoji`]: struct.Emoji.html
+    /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: struct.Message.html
-    /// [`User`]: struct.User.html
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [`User`]: ../user/struct.User.html
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn reaction_users<M, R, U>(
         &self,
@@ -261,9 +260,12 @@ impl Group {
     /// the group, then nothing is done.
     ///
     /// **Note**: This is only available to the group owner.
+    #[inline]
     pub fn remove_recipient<U: Into<UserId>>(&self, user: U) -> Result<()> {
-        let user = user.into();
+        self._remove_recipient(user.into())
+    }
 
+    fn _remove_recipient(&self, user: UserId) -> Result<()> {
         // If the group does not contain the recipient already, do nothing.
         if !self.recipients.contains_key(&user) {
             return Ok(());
@@ -280,8 +282,8 @@ impl Group {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ChannelId`]: ../model/id/struct.ChannelId.html
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    /// [`ChannelId`]: ../id/struct.ChannelId.html
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[inline]
     pub fn say(&self, content: &str) -> Result<Message> { self.channel_id.say(content) }
 
@@ -299,10 +301,10 @@ impl Group {
     /// [`ClientError::MessageTooLong`] will be returned, containing the number
     /// of unicode code points over the limit.
     ///
-    /// [`ChannelId::send_files`]: struct.ChannelId.html#method.send_files
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    /// [`ChannelId::send_files`]: ../id/struct.ChannelId.html#method.send_files
+    /// [`ClientError::MessageTooLong`]: ../../client/enum.ClientError.html#variant.MessageTooLong
+    /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[inline]
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
@@ -316,8 +318,8 @@ impl Group {
     ///
     /// **Note**: Requires the [Send Messages] permission.
     ///
-    /// [`CreateMessage`]: ../builder/struct.CreateMessage.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[inline]
     pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
         self.channel_id.send_message(f)
@@ -328,7 +330,7 @@ impl Group {
     /// Requires the [Manage Messages] permission.
     ///
     /// [`Message`]: struct.Message.html
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.channel_id.unpin(message_id)

@@ -217,12 +217,12 @@ pub trait EventHandler {
     /// Provides the reaction's data.
     fn reaction_add(&self, _ctx: Context, _add_reaction: Reaction) {}
 
-    /// Dispatched when a reaction is dettached from a message.
+    /// Dispatched when a reaction is detached from a message.
     ///
     /// Provides the reaction's data.
     fn reaction_remove(&self, _ctx: Context, _removed_reaction: Reaction) {}
 
-    /// Dispatched when all reactions of a message are dettached from a message.
+    /// Dispatched when all reactions of a message are detached from a message.
     ///
     /// Provides the channel's id and the message's id.
     fn reaction_remove_all(&self, _ctx: Context, _channel_id: ChannelId, _removed_from_message_id: MessageId) {}

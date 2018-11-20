@@ -50,6 +50,8 @@ pub struct Embed {
     ///
     /// For example, if the embed [`kind`] is `"video"`, the provider might
     /// contain information about YouTube.
+    ///
+    /// [`kind`]: #structfield.kind
     pub provider: Option<EmbedProvider>,
     /// Thumbnail information of the embed.
     pub thumbnail: Option<EmbedThumbnail>,
@@ -62,6 +64,8 @@ pub struct Embed {
     /// The embed's video information.
     ///
     /// This is present if the [`kind`] is `"video"`.
+    ///
+    /// [`kind`]: #structfield.kind
     pub video: Option<EmbedVideo>,
 }
 
@@ -71,7 +75,7 @@ impl Embed {
     ///
     /// This should only be useful in conjunction with [`Webhook::execute`].
     ///
-    /// [`Webhook::execute`]: struct.Webhook.html
+    /// [`Webhook::execute`]: ../webhook/struct.Webhook.html
     ///
     /// # Examples
     ///
@@ -80,10 +84,13 @@ impl Embed {
     /// ```rust,no_run
     /// use serenity::model::channel::Embed;
     ///
-    /// let embed = Embed::fake(|e| e
-    ///     .title("Embed title")
-    ///     .description("Making a basic embed")
-    ///     .field("A field", "Has some content.", false));
+    /// let embed = Embed::fake(|mut e| {
+    ///     e.title("Embed title");
+    ///     e.description("Making a basic embed");
+    ///     e.field("A field", "Has some content.", false);
+    ///
+    ///     e
+    /// });
     /// ```
     #[inline]
     pub fn fake<F>(f: F) -> Value
@@ -134,9 +141,13 @@ impl EmbedField {
     /// [`value`]: #structfield.value
     pub fn new<T, U>(name: T, value: U, inline: bool) -> Self
         where T: Into<String>, U: Into<String> {
+        Self::_new(name.into(), value.into(), inline)
+    }
+
+    fn _new(name: String, value: String, inline: bool) -> Self {
         Self {
-            name: name.into(),
-            value: value.into(),
+            name,
+            value,
             inline,
         }
     }

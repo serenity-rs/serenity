@@ -1,7 +1,7 @@
 use model::{
-    gateway::Game,
+    gateway::Activity,
+    id::GuildId,
     user::OnlineStatus,
-    id::GuildId
 };
 use tungstenite::Message;
 
@@ -17,7 +17,7 @@ pub enum ShardRunnerMessage {
         /// The maximum number of members to receive [`GuildMembersChunkEvent`]s
         /// for.
         ///
-        /// [`GuildMembersChunkEvent`]: ../../../model/event/GuildMembersChunkEvent.html
+        /// [`GuildMembersChunkEvent`]: ../../../model/event/struct.GuildMembersChunkEvent.html
         limit: Option<u16>,
         /// Text to filter members by.
         ///
@@ -37,12 +37,12 @@ pub enum ShardRunnerMessage {
     /// [`ShardManager`]: struct.ShardManager.html
     Close(u16, Option<String>),
     /// Indicates that the client is to send a custom WebSocket message.
-    Message(Message),
-    /// Indicates that the client is to update the shard's presence's game.
-    SetGame(Option<Game>),
+    Message(OwnedMessage),
+    /// Indicates that the client is to update the shard's presence's activity.
+    SetActivity(Option<Activity>),
     /// Indicates that the client is to update the shard's presence in its
     /// entirity.
-    SetPresence(OnlineStatus, Option<Game>),
+    SetPresence(OnlineStatus, Option<Activity>),
     /// Indicates that the client is to update the shard's presence's status.
     SetStatus(OnlineStatus),
 }

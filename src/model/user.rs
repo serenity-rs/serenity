@@ -75,7 +75,7 @@ impl CurrentUser {
     ///
     /// This mutates the current user in-place.
     ///
-    /// Refer to `EditProfile`'s documentation for its methods.
+    /// Refer to [`EditProfile`]'s documentation for its methods.
     ///
     /// # Examples
     ///
@@ -88,6 +88,8 @@ impl CurrentUser {
     ///
     /// CACHE.write().user.edit(|p| p.avatar(Some(&avatar)));
     /// ```
+    ///
+    /// [`EditProfile`]: ../../builder/struct.EditProfile.html
     pub fn edit<F>(&mut self, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
         let mut map = VecMap::new();
@@ -204,13 +206,13 @@ impl CurrentUser {
     /// # Errors
     ///
     /// Returns an
-    /// [`HttpError::InvalidRequest(Unauthorized)`][`HttpError::InvalidRequest`]
+    /// [`HttpError::UnsuccessfulRequest(Unauthorized)`][`HttpError::UnsuccessfulRequest`]
     /// If the user is not authorized for this end point.
     ///
     /// May return [`Error::Format`] while writing url to the buffer.
     ///
-    /// [`Error::Format`]: ../enum.Error.html#variant.Format
-    /// [`HttpError::InvalidRequest`]: ../http/enum.HttpError.html#variant.InvalidRequest
+    /// [`Error::Format`]: ../../enum.Error.html#variant.Format
+    /// [`HttpError::UnsuccessfulRequest`]: ../../http/enum.HttpError.html#variant.UnsuccessfulRequest
     pub fn invite_url(&self, permissions: Permissions) -> Result<String> {
         let bits = permissions.bits();
         let client_id = http::get_current_application_info().map(|v| v.id)?;
@@ -436,7 +438,13 @@ impl User {
     ///                 url,
     ///             );
     ///
-    ///             match msg.author.direct_message(|m| m.content(&help)) {
+    ///             let dm = msg.author.direct_message(|mut m| {
+    ///                 m.content(&help);
+    ///
+    ///                 m
+    ///             });
+    ///
+    ///             match dm {
     ///                 Ok(_) => {
     ///                     let _ = msg.react('👌');
     ///                 },
@@ -458,7 +466,7 @@ impl User {
     /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
     /// is a bot user.
     ///
-    /// [`ModelError::MessagingBot`]: enum.ModelError.html#variant.MessagingBot
+    /// [`ModelError::MessagingBot`]: ../error/enum.Error.html#variant.MessagingBot
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     /// [`User::dm`]: struct.User.html#method.dm
     // A tale with Clippy:
@@ -535,7 +543,7 @@ impl User {
     /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
     /// is a bot user.
     ///
-    /// [`ModelError::MessagingBot`]: enum.ModelError.html#variant.MessagingBot
+    /// [`ModelError::MessagingBot`]: ../error/enum.Error.html#variant.MessagingBot
     /// [direct_message]: #method.direct_message
     #[cfg(feature = "builder")]
     #[inline]
@@ -572,18 +580,20 @@ impl User {
     /// let _ = message.author.has_role(guild_id, role_id);
     /// ```
     ///
-    /// [`Guild`]: struct.Guild.html
-    /// [`GuildId`]: struct.GuildId.html
-    /// [`PartialGuild`]: struct.PartialGuild.html
-    /// [`Role`]: struct.Role.html
-    /// [`Cache`]: ../cache/struct.Cache.html
+    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`GuildId`]: ../id/struct.GuildId.html
+    /// [`PartialGuild`]: ../guild/struct.PartialGuild.html
+    /// [`Role`]: ../guild/struct.Role.html
+    /// [`Cache`]: ../../cache/struct.Cache.html
     // no-cache would warn on guild_id.
     pub fn has_role<G, R>(&self, guild: G, role: R) -> bool
         where G: Into<GuildContainer>, R: Into<RoleId> {
-        let role_id = role.into();
+        self._has_role(guild.into(), role.into())
+    }
 
-        match guild.into() {
-            GuildContainer::Guild(guild) => guild.roles.contains_key(&role_id),
+    fn _has_role(&self, guild: GuildContainer, role: RoleId) -> bool {
+        match guild {
+            GuildContainer::Guild(guild) => guild.roles.contains_key(&role),
             GuildContainer::Id(_guild_id) => {
                 feature_cache! {{
                     CACHE.read()
@@ -591,7 +601,7 @@ impl User {
                         .get(&_guild_id)
                         .map(|g| {
                             g.read().members.get(&self.id)
-                                .map(|m| m.roles.contains(&role_id))
+                                .map(|m| m.roles.contains(&role))
                                 .unwrap_or(false)
                         })
                         .unwrap_or(false)
@@ -608,7 +618,7 @@ impl User {
     ///
     /// # Examples
     ///
-    /// If maintaing a very long-running bot, you may want to periodically
+    /// If maintaining a very long-running bot, you may want to periodically
     /// refresh information about certain users if the state becomes
     /// out-of-sync:
     ///
@@ -657,7 +667,7 @@ impl User {
     /// println!("{:?}", client.start());
     /// ```
     pub fn refresh(&mut self) -> Result<()> {
-        self.id.get().map(|replacement| {
+        self.id.to_user().map(|replacement| {
             mem::replace(self, replacement);
 
             ()
@@ -708,6 +718,29 @@ impl User {
     /// ```
     #[inline]
     pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }
+
+    /// Returns the user's nickname in the given `guild_id`.
+    ///
+    /// If none is used, it returns `None`.
+    #[inline]
+    pub fn nick_in<G>(&self, guild_id: G) -> Option<String>
+    where G: Into<GuildId> {
+        self._nick_in(guild_id.into())
+    }
+
+    fn _nick_in(&self, guild_id: GuildId) -> Option<String> {
+        #[cfg(feature = "cache")]
+        {
+            guild_id.to_guild_cached().and_then(|guild| {
+                guild.read().members.get(&self.id).and_then(|member| member.nick.clone())
+            })
+        }
+
+        #[cfg(not(feature = "cache"))]
+        {
+            guild_id.member(&self.id).and_then(|member| member.nick.clone())
+        }
+    }
 }
 
 impl fmt::Display for User {
@@ -723,7 +756,7 @@ impl UserId {
     /// Creates a direct message channel between the [current user] and the
     /// user. This can also retrieve the channel if one already exists.
     ///
-    /// [current user]: struct.CurrentUser.html
+    /// [current user]: ../user/struct.CurrentUser.html
     pub fn create_dm_channel(&self) -> Result<PrivateChannel> {
         let map = json!({
             "recipient_id": self.0,
@@ -732,18 +765,25 @@ impl UserId {
         http::create_private_channel(&map)
     }
 
-    /// Search the cache for the user with the Id.
-    #[cfg(feature = "cache")]
-    pub fn find(&self) -> Option<Arc<RwLock<User>>> { CACHE.read().user(*self) }
-
-    /// Gets a user by its Id over the REST API.
+    /// Attempts to find a [`User`] by its Id in the cache.
     ///
-    /// **Note**: The current user must be a bot user.
+    /// [`User`]: ../user/struct.User.html
+    #[cfg(feature = "cache")]
     #[inline]
-    pub fn get(&self) -> Result<User> {
+    pub fn to_user_cached(self) -> Option<Arc<RwLock<User>>> { CACHE.read().user(self) }
+
+    /// First attempts to find a [`User`] by its Id in the cache,
+    /// upon failure requests it via the REST API.
+    ///
+    /// **Note**: If the cache is not enabled,
+    /// REST API will be used only.
+    ///
+    /// [`User`]: ../user/struct.User.html
+    #[inline]
+    pub fn to_user(self) -> Result<User> {
         #[cfg(feature = "cache")]
         {
-            if let Some(user) = CACHE.read().user(*self) {
+            if let Some(user) = CACHE.read().user(self) {
                 return Ok(user.read().clone());
             }
         }
@@ -840,4 +880,72 @@ fn tag(name: &str, discriminator: u16) -> String {
     let _ = write!(tag, "{:04}", discriminator);
 
     tag
+}
+
+#[cfg(test)]
+mod test {
+    #[cfg(feature = "model")]
+    mod model {
+        use model::id::UserId;
+        use model::user::User;
+
+        fn gen() -> User {
+            User {
+                id: UserId(210),
+                avatar: Some("abc".to_string()),
+                bot: true,
+                discriminator: 1432,
+                name: "test".to_string(),
+            }
+        }
+
+        #[test]
+        fn test_core() {
+            let mut user = gen();
+
+            assert!(
+                user.avatar_url()
+                    .unwrap()
+                    .ends_with("/avatars/210/abc.webp?size=1024")
+            );
+            assert!(
+                user.static_avatar_url()
+                    .unwrap()
+                    .ends_with("/avatars/210/abc.webp?size=1024")
+            );
+
+            user.avatar = Some("a_aaa".to_string());
+            assert!(
+                user.avatar_url()
+                    .unwrap()
+                    .ends_with("/avatars/210/a_aaa.gif?size=1024")
+            );
+            assert!(
+                user.static_avatar_url()
+                    .unwrap()
+                    .ends_with("/avatars/210/a_aaa.webp?size=1024")
+            );
+
+            user.avatar = None;
+            assert!(user.avatar_url().is_none());
+
+            assert_eq!(user.tag(), "test#1432");
+        }
+
+        #[test]
+        fn default_avatars() {
+            let mut user = gen();
+
+            user.discriminator = 0;
+            assert!(user.default_avatar_url().ends_with("0.png"));
+            user.discriminator = 1;
+            assert!(user.default_avatar_url().ends_with("1.png"));
+            user.discriminator = 2;
+            assert!(user.default_avatar_url().ends_with("2.png"));
+            user.discriminator = 3;
+            assert!(user.default_avatar_url().ends_with("3.png"));
+            user.discriminator = 4;
+            assert!(user.default_avatar_url().ends_with("4.png"));
+        }
+    }
 }

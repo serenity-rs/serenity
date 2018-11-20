@@ -12,13 +12,7 @@ mod streamer;
 mod threading;
 
 pub use self::{
-    audio::{
-        Audio,
-        AudioReceiver,
-        AudioSource,
-        AudioType,
-        LockedAudio
-    },
+    audio::{Audio, AudioReceiver, AudioSource, AudioType, LockedAudio},
     dca::DcaMetadata,
     error::{DcaError, VoiceError},
     handler::Handler,
@@ -26,11 +20,13 @@ pub use self::{
     streamer::{
         dca,
         ffmpeg,
+        ffmpeg_optioned,
         opus,
         pcm,
         ytdl
     }
 };
+pub use opus::Bitrate;
 
 use self::connection_info::ConnectionInfo;
 
@@ -42,4 +38,5 @@ pub(crate) enum Status {
     SetReceiver(Option<Box<AudioReceiver>>),
     SetSender(Option<LockedAudio>),
     AddSender(LockedAudio),
+    SetBitrate(Bitrate),
 }

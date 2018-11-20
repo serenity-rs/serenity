@@ -6,13 +6,13 @@ determined if the change is something that the community wants.
 
 There are going to (usually) be 3 primary branches:
 
-- `master`: Development branch of the _most recent_ majour version. For example,
+- `current`: Development branch of the _most recent_ majour version. For example,
 if the largest version is v0.5.3, then the v0.5.x series will be on this branch.
 Bugfixes, internal rewrites, documentation updates, new features, etc. go here
 so long as they do not introduce breaking changes.
 - `v0.Y.x`: Development branch of the _second most recent_ majour version. If
 the largest version is v0.5.X, then this will be the branch for bugfixes for the
-v0.4.x version series. Bugfixes from the `master` branch may be backported here
+v0.4.x version series. Bugfixes from the `current` branch may be backported here
 if applicable.
 - `v0.Z.x`: Development branch of the _next_ majour version. Following the same
 example, this would be for the v0.6.x version series. This is where breaking
@@ -78,3 +78,6 @@ Add an empty line after the subject line in documentation. For example:
 /// Note the empty line after the subject, and between paragraphs.
 fn foo() { }
 ```
+
+We have an 80 characters per line soft limit, in case readability would suffer
+and to support descriptive naming, 100 characters is our hard limit.

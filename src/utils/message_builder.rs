@@ -93,11 +93,12 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new().push("test").0;
+    /// let mut content = MessageBuilder::new();
+    /// content.push("test");
     ///
-    /// assert_eq!(content, "test");
+    /// assert_eq!(content.build(), "test");
     /// ```
-    pub fn build(self) -> String { self.0 }
+    pub fn build(&mut self) -> String { self.clone().0 }
 
     /// Mentions the [`GuildChannel`] in the built message.
     ///
@@ -129,8 +130,13 @@ impl MessageBuilder {
     /// [`ChannelId`]: ../model/id/struct.ChannelId.html
     /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
     /// [Display implementation]: ../model/id/struct.ChannelId.html#method.fmt-1
-    pub fn channel<C: Into<ChannelId>>(mut self, channel: C) -> Self {
-        let _ = write!(self.0, "{}", channel.into().mention());
+    #[inline]
+    pub fn channel<C: Into<ChannelId>>(&mut self, channel: C) -> &mut Self {
+        self._channel(channel.into())
+    }
+
+    fn _channel(&mut self, channel: ChannelId) -> &mut Self {
+        let _ = write!(self.0, "{}", channel.mention());
 
         self
     }
@@ -168,7 +174,7 @@ impl MessageBuilder {
     /// ```
     ///
     /// [Display implementation]: ../model/guild/struct.Emoji.html#method.fmt
-    pub fn emoji(mut self, emoji: &Emoji) -> Self {
+    pub fn emoji(&mut self, emoji: &Emoji) -> &mut Self {
         let _ = write!(self.0, "{}", emoji);
 
         self
@@ -177,7 +183,7 @@ impl MessageBuilder {
     /// Mentions something that implements the [`Mentionable`] trait.
     ///
     /// [`Mentionable`]: ../model/misc/trait.Mentionable.html
-    pub fn mention<M: Mentionable>(mut self, item: &M) -> Self {
+    pub fn mention<M: Mentionable>(&mut self, item: &M) -> &mut Self {
         let _ = write!(self.0, "{}", item.mention());
 
         self
@@ -194,12 +200,18 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let message = MessageBuilder::new().push("test");
+    /// let mut message = MessageBuilder::new();
+    /// message.push("test");
     ///
-    /// assert_eq!(message.push("ing").0, "testing");
+    /// assert_eq!({ message.push("ing"); message.build() }, "testing");
     /// ```
-    pub fn push<D: I>(mut self, content: D) -> Self {
-        self.0.push_str(&content.into().to_string());
+    #[inline]
+    pub fn push<D: I>(&mut self, content: D) -> &mut Self {
+        self._push(&content.into().to_string())
+    }
+
+    fn _push(&mut self, content: &str) -> &mut Self {
+        self.0.push_str(content);
 
         self
     }
@@ -243,7 +255,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "```\nhello\n```");
     /// ```
-    pub fn push_codeblock<D: I>(mut self, content: D, language: Option<&str>) -> Self {
+    pub fn push_codeblock<D: I>(&mut self, content: D, language: Option<&str>) -> &mut Self {
         self.0.push_str("```");
 
         if let Some(language) = language {
@@ -283,7 +295,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, expected);
     /// ```
-    pub fn push_mono<D: I>(mut self, content: D) -> Self {
+    pub fn push_mono<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push('`');
         self.0.push_str(&content.into().to_string());
         self.0.push('`');
@@ -312,7 +324,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, expected);
     /// ```
-    pub fn push_italic<D: I>(mut self, content: D) -> Self {
+    pub fn push_italic<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push('_');
         self.0.push_str(&content.into().to_string());
         self.0.push('_');
@@ -321,7 +333,7 @@ impl MessageBuilder {
     }
 
     /// Pushes an inline bold text to the content.
-    pub fn push_bold<D: I>(mut self, content: D) -> Self {
+    pub fn push_bold<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push_str("**");
         self.0.push_str(&content.into().to_string());
         self.0.push_str("**");
@@ -330,7 +342,7 @@ impl MessageBuilder {
     }
 
     /// Pushes an underlined inline text to the content.
-    pub fn push_underline<D: I>(mut self, content: D) -> Self {
+    pub fn push_underline<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push_str("__");
         self.0.push_str(&content.into().to_string());
         self.0.push_str("__");
@@ -339,7 +351,7 @@ impl MessageBuilder {
     }
 
     /// Pushes a strikethrough inline text to the content.
-    pub fn push_strike<D: I>(mut self, content: D) -> Self {
+    pub fn push_strike<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push_str("~~");
         self.0.push_str(&content.into().to_string());
         self.0.push_str("~~");
@@ -360,8 +372,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "hello\nworld");
     /// ```
-    pub fn push_line<D: I>(mut self, content: D) -> Self {
-        self = self.push(content);
+    pub fn push_line<D: I>(&mut self, content: D) -> &mut Self {
+        self.push(content);
         self.0.push('\n');
 
         self
@@ -380,8 +392,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "`hello`\nworld");
     /// ```
-    pub fn push_mono_line<D: I>(mut self, content: D) -> Self {
-        self = self.push_mono(content);
+    pub fn push_mono_line<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_mono(content);
         self.0.push('\n');
 
         self
@@ -400,8 +412,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "_hello_\nworld");
     /// ```
-    pub fn push_italic_line<D: I>(mut self, content: D) -> Self {
-        self = self.push_italic(content);
+    pub fn push_italic_line<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_italic(content);
         self.0.push('\n');
 
         self
@@ -420,8 +432,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "**hello**\nworld");
     /// ```
-    pub fn push_bold_line<D: I>(mut self, content: D) -> Self {
-        self = self.push_bold(content);
+    pub fn push_bold_line<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_bold(content);
         self.0.push('\n');
 
         self
@@ -440,8 +452,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "__hello__\nworld");
     /// ```
-    pub fn push_underline_line<D: I>(mut self, content: D) -> Self {
-        self = self.push_underline(content);
+    pub fn push_underline_line<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_underline(content);
         self.0.push('\n');
 
         self
@@ -460,8 +472,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "~~hello~~\nworld");
     /// ```
-    pub fn push_strike_line<D: I>(mut self, content: D) -> Self {
-        self = self.push_strike(content);
+    pub fn push_strike_line<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_strike(content);
         self.0.push('\n');
 
         self
@@ -469,7 +481,7 @@ impl MessageBuilder {
 
     /// Pushes text to your message, but normalizing content - that means
     /// ensuring that there's no unwanted formatting, mention spam etc.
-    pub fn push_safe<C: I>(mut self, content: C) -> Self {
+    pub fn push_safe<C: I>(&mut self, content: C) -> &mut Self {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner)
@@ -484,25 +496,26 @@ impl MessageBuilder {
     }
 
     /// Pushes a code-block to your message normalizing content.
-    pub fn push_codeblock_safe<D: I>(mut self, content: D, language: Option<&str>) -> Self {
+    pub fn push_codeblock_safe<D: I>(&mut self, content: D, language: Option<&str>) -> &mut Self {
         self.0.push_str("```");
 
         if let Some(language) = language {
             self.0.push_str(language);
         }
 
+        self.0.push('\n');
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("```", " ");
             self.0.push_str(&c.to_string());
         }
-        self.0.push_str("```");
+        self.0.push_str("\n```");
 
         self
     }
 
     /// Pushes an inline monospaced text to the content normalizing content.
-    pub fn push_mono_safe<D: I>(mut self, content: D) -> Self {
+    pub fn push_mono_safe<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push('`');
         {
             let mut c = content.into();
@@ -515,7 +528,7 @@ impl MessageBuilder {
     }
 
     /// Pushes an inline italicized text to the content normalizing content.
-    pub fn push_italic_safe<D: I>(mut self, content: D) -> Self {
+    pub fn push_italic_safe<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push('_');
         {
             let mut c = content.into();
@@ -528,7 +541,7 @@ impl MessageBuilder {
     }
 
     /// Pushes an inline bold text to the content normalizing content.
-    pub fn push_bold_safe<D: I>(mut self, content: D) -> Self {
+    pub fn push_bold_safe<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push_str("**");
         {
             let mut c = content.into();
@@ -541,7 +554,7 @@ impl MessageBuilder {
     }
 
     /// Pushes an underlined inline text to the content normalizing content.
-    pub fn push_underline_safe<D: I>(mut self, content: D) -> Self {
+    pub fn push_underline_safe<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push_str("__");
         {
             let mut c = content.into();
@@ -554,7 +567,7 @@ impl MessageBuilder {
     }
 
     /// Pushes a strikethrough inline text to the content normalizing content.
-    pub fn push_strike_safe<D: I>(mut self, content: D) -> Self {
+    pub fn push_strike_safe<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push_str("~~");
         {
             let mut c = content.into();
@@ -581,8 +594,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "Hello @\u{200B}everyone\nHow are you?");
     /// ```
-    pub fn push_line_safe<D: I>(mut self, content: D) -> Self {
-        self = self.push_safe(content);
+    pub fn push_line_safe<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_safe(content);
         self.0.push('\n');
 
         self
@@ -603,8 +616,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "`'hello @\u{200B}everyone'`\nworld");
     /// ```
-    pub fn push_mono_line_safe<D: I>(mut self, content: D) -> Self {
-        self = self.push_mono_safe(content);
+    pub fn push_mono_line_safe<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_mono_safe(content);
         self.0.push('\n');
 
         self
@@ -625,8 +638,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "_@\u{200B}everyone_\nIsn't a mention.");
     /// ```
-    pub fn push_italic_line_safe<D: I>(mut self, content: D) -> Self {
-        self = self.push_italic_safe(content);
+    pub fn push_italic_line_safe<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_italic_safe(content);
         self.0.push('\n');
 
         self
@@ -647,8 +660,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "**@\u{200B}everyone**\nIsn't a mention.");
     /// ```
-    pub fn push_bold_line_safe<D: I>(mut self, content: D) -> Self {
-        self = self.push_bold_safe(content);
+    pub fn push_bold_line_safe<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_bold_safe(content);
         self.0.push('\n');
 
         self
@@ -669,8 +682,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "__@\u{200B}everyone__\nIsn't a mention.");
     /// ```
-    pub fn push_underline_line_safe<D: I>(mut self, content: D) -> Self {
-        self = self.push_underline_safe(content);
+    pub fn push_underline_line_safe<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_underline_safe(content);
         self.0.push('\n');
 
         self
@@ -692,8 +705,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "~~@\u{200B}everyone~~\nIsn't a mention.");
     /// ```
-    pub fn push_strike_line_safe<D: I>(mut self, content: D) -> Self {
-        self = self.push_strike_safe(content);
+    pub fn push_strike_line_safe<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_strike_safe(content);
         self.0.push('\n');
 
         self
@@ -710,7 +723,7 @@ impl MessageBuilder {
     /// [`Role`]: ../model/guild/struct.Role.html
     /// [`RoleId`]: ../model/id/struct.RoleId.html
     /// [Display implementation]: ../model/id/struct.RoleId.html#method.fmt-1
-    pub fn role<R: Into<RoleId>>(mut self, role: R) -> Self {
+    pub fn role<R: Into<RoleId>>(&mut self, role: R) -> &mut Self {
         let _ = write!(self.0, "{}", role.into().mention());
 
         self
@@ -727,7 +740,7 @@ impl MessageBuilder {
     /// [`User`]: ../model/user/struct.User.html
     /// [`UserId`]: ../model/id/struct.UserId.html
     /// [Display implementation]: ../model/id/struct.UserId.html#method.fmt-1
-    pub fn user<U: Into<UserId>>(mut self, user: U) -> Self {
+    pub fn user<U: Into<UserId>>(&mut self, user: U) -> &mut Self {
         let _ = write!(self.0, "{}", user.into().mention());
 
         self
@@ -977,4 +990,287 @@ fn normalize(text: &str) -> String {
         // because it utilises it itself.
         .replace("@everyone", "@\u{200B}everyone")
         .replace("@here", "@\u{200B}here")
+}
+
+#[cfg(test)]
+mod test {
+    use model::prelude::*;
+    use super::{
+        ContentModifier::*,
+        MessageBuilder,
+    };
+
+    macro_rules! gen {
+        ($($fn:ident => [$($text:expr => $expected:expr),+]),+) => ({
+            $(
+                $(
+                    assert_eq!(MessageBuilder::new().$fn($text).0, $expected);
+                )+
+            )+
+        });
+    }
+
+    #[test]
+    fn code_blocks() {
+        let content = MessageBuilder::new()
+            .push_codeblock("test", Some("rb"))
+            .build();
+        assert_eq!(content, "```rb\ntest\n```");
+    }
+
+    #[test]
+    fn safe_content() {
+        let content = MessageBuilder::new()
+            .push_safe("@everyone discord.gg/discord-api")
+            .build();
+        assert_ne!(content, "@everyone discord.gg/discord-api");
+    }
+
+    #[test]
+    fn no_free_formatting() {
+        let content = MessageBuilder::new().push_bold_safe("test**test").build();
+        assert_ne!(content, "**test**test**");
+    }
+
+    #[test]
+    fn mentions() {
+        let content_emoji = MessageBuilder::new()
+            .emoji(&Emoji {
+                animated: false,
+                id: EmojiId(32),
+                name: "Rohrkatze".to_string(),
+                managed: false,
+                require_colons: true,
+                roles: vec![],
+            })
+            .build();
+        let content_mentions = MessageBuilder::new()
+            .channel(1)
+            .mention(&UserId(2))
+            .role(3)
+            .user(4)
+            .build();
+        assert_eq!(content_mentions, "<#1><@2><@&3><@4>");
+        assert_eq!(content_emoji, "<:Rohrkatze:32>");
+    }
+
+    #[test]
+    fn content() {
+        let content = Bold + Italic + Code + "Fun!";
+
+        assert_eq!(content.to_string(), "***`Fun!`***");
+    }
+
+    #[test]
+    fn init() {
+        assert_eq!(MessageBuilder::new().0, "");
+        assert_eq!(MessageBuilder::default().0, "");
+    }
+
+    #[test]
+    fn message_content() {
+        let message_content = MessageBuilder::new()
+            .push(Bold + Italic + Code + "Fun!")
+            .build();
+
+        assert_eq!(message_content, "***`Fun!`***");
+    }
+
+    #[test]
+    fn message_content_safe() {
+        let message_content = MessageBuilder::new()
+            .push_safe(Bold + Italic + "test**test")
+            .build();
+
+        assert_eq!(message_content, "***test\\*\\*test***");
+    }
+
+    #[test]
+    fn push() {
+        assert_eq!(MessageBuilder::new().push('a').0, "a");
+        assert!(MessageBuilder::new().push("").0.is_empty());
+    }
+
+    #[test]
+    fn push_codeblock() {
+        let content = &MessageBuilder::new().push_codeblock("foo", None).0.clone();
+        assert_eq!(content, "```\nfoo\n```");
+
+        let content = &MessageBuilder::new()
+            .push_codeblock("fn main() { }", Some("rs"))
+            .0.clone();
+        assert_eq!(content, "```rs\nfn main() { }\n```");
+    }
+
+    #[test]
+    fn push_codeblock_safe() {
+        assert_eq!(
+            MessageBuilder::new().push_codeblock_safe("foo", Some("rs")).0,
+            "```rs\nfoo\n```",
+        );
+        assert_eq!(
+            MessageBuilder::new().push_codeblock_safe("", None).0,
+            "```\n\n```",
+        );
+        assert_eq!(
+            MessageBuilder::new().push_codeblock_safe("1 * 2", None).0,
+            "```\n1 * 2\n```",
+        );
+        assert_eq!(
+            MessageBuilder::new().push_codeblock_safe("`1 * 3`", None).0,
+            "```\n`1 * 3`\n```",
+        );
+        assert_eq!(
+            MessageBuilder::new().push_codeblock_safe("```.```", None).0,
+            "```\n . \n```",
+        );
+    }
+
+    #[test]
+    fn push_safe() {
+        gen! {
+            push_safe => [
+                "" => "",
+                "foo" => "foo",
+                "1 * 2" => "1 \\* 2"
+            ],
+            push_bold_safe => [
+                "" => "****",
+                "foo" => "**foo**",
+                "*foo*" => "***foo***",
+                "f*o**o" => "**f*o o**"
+            ],
+            push_italic_safe => [
+                "" => "__",
+                "foo" => "_foo_",
+                "f_o_o" => "_f o o_"
+            ],
+            push_mono_safe => [
+                "" => "``",
+                "foo" => "`foo`",
+                "asterisk *" => "`asterisk *`",
+                "`ticks`" => "`'ticks'`"
+            ],
+            push_strike_safe => [
+                "" => "~~~~",
+                "foo" => "~~foo~~",
+                "foo ~" => "~~foo ~~~",
+                "~~foo" => "~~ foo~~",
+                "~~fo~~o~~" => "~~ fo o ~~"
+            ],
+            push_underline_safe => [
+                "" => "____",
+                "foo" => "__foo__",
+                "foo _" => "__foo ___",
+                "__foo__ bar" => "__ foo  bar__"
+            ],
+            push_line_safe => [
+                "" => "\n",
+                "foo" => "foo\n",
+                "1 * 2" => "1 \\* 2\n"
+            ],
+            push_mono_line_safe => [
+                "" => "``\n",
+                "a ` b `" => "`a ' b '`\n"
+            ],
+            push_italic_line_safe => [
+                "" => "__\n",
+                "a * c" => "_a * c_\n"
+            ],
+            push_bold_line_safe => [
+                "" => "****\n",
+                "a ** d" => "**a   d**\n"
+            ],
+            push_underline_line_safe => [
+                "" => "____\n",
+                "a __ e" => "__a   e__\n"
+            ],
+            push_strike_line_safe => [
+                "" => "~~~~\n",
+                "a ~~ f" => "~~a   f~~\n"
+            ]
+        };
+    }
+
+    #[test]
+    fn push_unsafe() {
+        gen! {
+            push_bold => [
+                "a" => "**a**",
+                "" => "****",
+                '*' => "*****",
+                "**" => "******"
+            ],
+            push_bold_line => [
+                "" => "****\n",
+                "foo" => "**foo**\n"
+            ],
+            push_italic => [
+                "a" => "_a_",
+                "" => "__",
+                "_" => "___",
+                "__" => "____"
+            ],
+            push_italic_line => [
+                "" => "__\n",
+                "foo" => "_foo_\n",
+                "_?" => "__?_\n"
+            ],
+            push_line => [
+                "" => "\n",
+                "foo" => "foo\n",
+                "\n\n" => "\n\n\n",
+                "\nfoo\n" => "\nfoo\n\n"
+            ],
+            push_mono => [
+                "a" => "`a`",
+                "" => "``",
+                "`" => "```",
+                "``" => "````"
+            ],
+            push_mono_line => [
+                "" => "``\n",
+                "foo" => "`foo`\n",
+                "\n" => "`\n`\n",
+                "`\n`\n" => "``\n`\n`\n"
+            ],
+            push_strike => [
+                "a" => "~~a~~",
+                "" => "~~~~",
+                "~" => "~~~~~",
+                "~~" => "~~~~~~"
+            ],
+            push_strike_line => [
+                "" => "~~~~\n",
+                "foo" => "~~foo~~\n"
+            ],
+            push_underline => [
+                "a" => "__a__",
+                "" => "____",
+                "_" => "_____",
+                "__" => "______"
+            ],
+            push_underline_line => [
+                "" => "____\n",
+                "foo" => "__foo__\n"
+            ]
+        };
+    }
+
+    #[test]
+    fn normalize() {
+        assert_eq!(super::normalize("@everyone"), "@\u{200B}everyone");
+        assert_eq!(super::normalize("@here"), "@\u{200B}here");
+        assert_eq!(super::normalize("discord.gg"), "discord\u{2024}gg");
+        assert_eq!(super::normalize("discord.me"), "discord\u{2024}me");
+        assert_eq!(super::normalize("discordlist.net"), "discordlist\u{2024}net");
+        assert_eq!(super::normalize("discordservers.com"), "discordservers\u{2024}com");
+        assert_eq!(super::normalize("discordapp.com/invite"), "discordapp\u{2024}com/invite");
+        assert_eq!(super::normalize("\u{202E}"), " ");
+        assert_eq!(super::normalize("\u{200F}"), " ");
+        assert_eq!(super::normalize("\u{202B}"), " ");
+        assert_eq!(super::normalize("\u{200B}"), " ");
+        assert_eq!(super::normalize("\u{200D}"), " ");
+        assert_eq!(super::normalize("\u{200C}"), " ");
+    }
 }

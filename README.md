@@ -1,4 +1,4 @@
-[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild]
+[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.25+ badge]][rust 1.25+ link]
 
 # serenity
 
@@ -14,7 +14,7 @@ You may also check your tokens prior to login via the use of
 [`validate_token`].
 
 Once logged in, you may add handlers to your client to dispatch [`Event`]s,
-by implementing the handlers in a trait, such as [`EventHandler::on_message`]. This will cause your handler to be called
+by implementing the handlers in a trait, such as [`EventHandler::message`]. This will cause your handler to be called
 when a [`Event::MessageCreate`] is received. Each handler is given a
 [`Context`], giving information about the event. See the
 [client's module-level documentation].
@@ -89,7 +89,7 @@ and to the top of your `main.rs`:
 #[macro_use] extern crate serenity;
 ```
 
-Serenity only supports the _latest_ Stable, Beta, and Nightly.
+Serenity supports a minimum of Rust 1.25.
 
 # Features
 
@@ -102,6 +102,9 @@ default-features = false
 features = ["pick", "your", "feature", "names", "here"]
 version = "0.5"
 ```
+
+The default features are: `builder`, `cache`, `client`, `framework`, `gateway`,
+`http`, `model`, `standard_framework`, and `utils`.
 
 The following is a full list of features:
 
@@ -123,6 +126,25 @@ the HTTP functions.
 - **utils**: Utility functions for common use cases by users.
 - **voice**: Enables compilation of voice support, so that voice channels can be
 connected to and audio can be sent/received.
+
+If you want all of the default features except for `cache` for example, you can
+list all but that:
+
+```toml
+[dependencies.serenity]
+default-features = false
+features = [
+    "builder",
+    "client",
+    "framework",
+    "gateway",
+    "http",
+    "model",
+    "standard_framework",
+    "utils",
+]
+version = "0.5"
+```
 
 # Dependencies
 
@@ -146,6 +168,8 @@ Voice+youtube-dl:
 
 - youtube-dl (Arch: `community/youtube-dl`)
 
+Building the `voice`-feature on Windows can be done by following these instructions: https://github.com/serenity-rs/serenity/wiki/Voice-on-Windows
+
 # Related Projects
 
 - [Discord.net][library:Discord.net]
@@ -157,29 +181,33 @@ Voice+youtube-dl:
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
 [`Client::new`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.new
-[`EventHandler::on_message`]: https://docs.rs/serenity/*/serenity/client/struct.EventHandler.html#method.on_message
+[`EventHandler::message`]: https://docs.rs/serenity/*/serenity/client/trait.EventHandler.html#method.message
 [`Context`]: https://docs.rs/serenity/*/serenity/client/struct.Context.html
 [`Event`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html
 [`Event::MessageCreate`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html#variant.MessageCreatef
 [`Shard`]: https://docs.rs/serenity/*/serenity/gateway/struct.Shard.html
-[`examples`]: https://github.com/serenity-rs/serenity/blob/master/examples
+[`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples
 [`rest`]: https://docs.rs/serenity/*/serenity/client/rest/index.html
 [`validate_token`]: https://docs.rs/serenity/*/serenity/client/fn.validate_token.html
 [cache docs]: https://docs.rs/serenity/*/serenity/cache/index.html
 [ci]: https://travis-ci.org/serenity-rs/serenity
-[ci-badge]: https://travis-ci.org/serenity-rs/serenity.svg?branch=master
+[ci-badge]: https://img.shields.io/travis/serenity-rs/serenity.svg?style=flat-square
 [client's module-level documentation]: https://docs.rs/serenity/*/serenity/client/index.html
+[crates.io link]: https://crates.io/crates/serenity
+[crates.io version]: https://img.shields.io/crates/v/serenity.svg?style=flat-square
 [discord docs]: https://discordapp.com/developers/docs/intro
 [docs]: https://docs.rs/serenity
-[docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
-[examples]: https://github.com/serenity-rs/serenity/tree/master/examples
+[docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg?style=flat-square
+[examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
 [guild]: https://discord.gg/WBdGJCc
-[guild-badge]: https://discordapp.com/api/guilds/381880193251409931/widget.png
+[guild-badge]: https://img.shields.io/discord/381880193251409931.svg?style=flat-square&colorB=7289DA
 [library:Discord.net]: https://github.com/RogueException/Discord.Net
 [library:JDA]: https://github.com/DV8FromTheWorld/JDA
 [library:disco]: https://github.com/b1naryth1ef/disco
 [library:discordrb]: https://github.com/meew0/discordrb
 [library:discord.js]: https://github.com/hydrabolt/discord.js
 [library:discord.py]: https://github.com/Rapptz/discord.py
-[logo]: https://zey.moe/assets/serenity_logo.png
+[logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
+[rust 1.25+ badge]: https://img.shields.io/badge/rust-1.25+-93450a.svg?style=flat-square
+[rust 1.25+ link]: https://blog.rust-lang.org/2018/03/29/Rust-1.25.html

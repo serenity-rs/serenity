@@ -128,8 +128,8 @@ pub struct ShardManager {
 impl ShardManager {
     /// Creates a new shard manager, returning both the manager and a monitor
     /// for usage in a separate thread.
-    pub fn new<'a, H>(
-        opt: ShardManagerOptions<'a, H>,
+    pub fn new<H>(
+        opt: ShardManagerOptions<H>,
     ) -> (Arc<Mutex<Self>>, ShardManagerMonitor) where H: EventHandler + Send + Sync + 'static {
         let (thread_tx, thread_rx) = mpsc::channel();
         let (shard_queue_tx, shard_queue_rx) = mpsc::channel();
@@ -247,6 +247,7 @@ impl ShardManager {
     ///
     /// [`ShardQueuer`]: struct.ShardQueuer.html
     /// [`ShardRunner`]: struct.ShardRunner.html
+    /// [`initialize`]: #method.initialize
     pub fn restart(&mut self, shard_id: ShardId) {
         info!("Restarting shard {}", shard_id);
         self.shutdown(shard_id);

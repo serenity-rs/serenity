@@ -15,32 +15,45 @@ use std::sync::mpsc::Sender;
 use threadpool::ThreadPool;
 use typemap::ShareMap;
 
-#[cfg(feature = "cache")]
-use chrono::{Timelike, Utc};
 #[cfg(feature = "framework")]
 use framework::Framework;
 #[cfg(feature = "cache")]
 use model::id::GuildId;
 #[cfg(feature = "cache")]
-use std::{thread, time};
+use std::time::Duration;
 
 #[cfg(feature = "cache")]
 use super::CACHE;
+
+#[cfg(feature = "cache")]
+lazy_static! {
+    pub static ref CACHE_TRY_WRITE_DURATION: Option<Duration> =
+        CACHE.read().get_try_write_duration();
+}
 
 macro_rules! update {
     ($event:expr) => {
         {
             #[cfg(feature = "cache")]
             {
-                CACHE.write().update(&mut $event)
+                match *CACHE_TRY_WRITE_DURATION {
+                    Some(duration) => {
+                        if let Some(mut lock) = CACHE.try_write_for(duration) {
+                            lock.update(&mut $event)
+                        } else {
+                            warn!(
+                                "[dispatch] Possible deadlock: couldn't unlock cache to update with event: {:?}",
+                                $event,
+                            );
+                            None
+                        }},
+                    None => {
+                        CACHE.write().update(&mut $event)
+                    },
+                }
             }
         }
     };
-}
-
-#[cfg(feature = "cache")]
-macro_rules! now {
-    () => (Utc::now().time().second() * 1000)
 }
 
 fn context(
@@ -68,7 +81,9 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     shard_id: u64,
 ) {
     match event {
-        DispatchEvent::Model(Event::MessageCreate(event)) => {
+        DispatchEvent::Model(Event::MessageCreate(mut event)) => {
+            update!(event);
+
             let context = context(data, runner_tx, shard_id);
             dispatch_message(
                 context.clone(),
@@ -93,6 +108,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
 }
 
 #[cfg(not(feature = "framework"))]
+#[allow(unused_mut)]
 pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     data: &Arc<Mutex<ShareMap>>,
@@ -102,7 +118,9 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     shard_id: u64,
 ) {
     match event {
-        DispatchEvent::Model(Event::MessageCreate(event)) => {
+        DispatchEvent::Model(Event::MessageCreate(mut event)) => {
+            update!(event);
+
             let context = context(data, runner_tx, shard_id);
             dispatch_message(context, event.message, event_handler, threadpool);
         },
@@ -145,20 +163,6 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
     threadpool: &ThreadPool,
     shard_id: u64,
 ) {
-    #[cfg(feature = "cache")]
-    let mut last_guild_create_time = now!();
-
-    #[cfg(feature = "cache")]
-    let wait_for_guilds = move || -> ::Result<()> {
-        let unavailable_guilds = CACHE.read().unavailable_guilds.len();
-
-        while unavailable_guilds != 0 && (now!() < last_guild_create_time + 2000) {
-            thread::sleep(time::Duration::from_millis(500));
-        }
-
-        Ok(())
-    };
-
     match event {
         DispatchEvent::Client(ClientEvent::ShardStageUpdate(event)) => {
             let context = context(data, runner_tx, shard_id);
@@ -173,9 +177,9 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             let context = context(data, runner_tx, shard_id);
 
-            // This different channel_create dispatching is only due to the fact that
-            // each time the bot receives a dm, this event is also fired.
-            // So in short, only exists to reduce unnecessary clutter.
+            // Discord sends both a MessageCreate and a ChannelCreate upon a new message in a private channel.
+            // This could potentially be annoying to handle when otherwise wanting to normally take care of a new channel.
+            // So therefore, private channels are dispatched to their own handler code.
             match event.channel {
                 Channel::Private(channel) => {
                     let event_handler = Arc::clone(event_handler);
@@ -305,8 +309,6 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             #[cfg(feature = "cache")]
             {
-                last_guild_create_time = now!();
-
                 let cache = CACHE.read();
 
                 if cache.unavailable_guilds.is_empty() {
@@ -506,6 +508,8 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::MessageUpdate(mut event)) => {
+            update!(event);
+
             let context = context(data, runner_tx, shard_id);
             let event_handler = Arc::clone(event_handler);
 
@@ -560,28 +564,12 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
         DispatchEvent::Model(Event::Ready(mut event)) => {
             update!(event);
 
-            let event_handler = Arc::clone(event_handler);
+            let context = context(data, runner_tx, shard_id);
+            let event_handler = Arc::clone(&event_handler);
 
-            feature_cache! {{
-                last_guild_create_time = now!();
-
-                let _ = wait_for_guilds()
-                    .map(move |_| {
-                        let context = context(data, runner_tx, shard_id);
-                        let event_handler = Arc::clone(&event_handler);
-
-                        threadpool.execute(move || {
-                            event_handler.ready(context, event.ready);
-                        });
-                    });
-            } else {
-                let context = context(data, runner_tx, shard_id);
-                let event_handler = Arc::clone(&event_handler);
-
-                threadpool.execute(move || {
-                    event_handler.ready(context, event.ready);
-                });
-            }}
+            threadpool.execute(move || {
+                event_handler.ready(context, event.ready);
+            });
         },
         DispatchEvent::Model(Event::Resumed(mut event)) => {
             let context = context(data, runner_tx, shard_id);

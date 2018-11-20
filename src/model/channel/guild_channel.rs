@@ -63,8 +63,8 @@ pub struct GuildChannel {
     pub name: String,
     /// Permission overwrites for [`Member`]s and for [`Role`]s.
     ///
-    /// [`Member`]: struct.Member.html
-    /// [`Role`]: struct.Role.html
+    /// [`Member`]: ../guild/struct.Member.html
+    /// [`Role`]: ../guild/struct.Role.html
     pub permission_overwrites: Vec<PermissionOverwrite>,
     /// The position of the channel.
     ///
@@ -87,6 +87,9 @@ pub struct GuildChannel {
     // default to `false`.
     #[serde(default)]
     pub nsfw: bool,
+    /// A rate limit that applies per user and excludes bots.
+    #[serde(default, rename = "rate_limit_per_user")]
+    pub slow_mode_rate: u64,
 }
 
 #[cfg(feature = "model")]
@@ -102,8 +105,8 @@ impl GuildChannel {
     /// Returns a [`ModelError::InvalidPermissions`] if the current user does
     /// not have the required permissions.
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     pub fn broadcast_typing(&self) -> Result<()> { self.id.broadcast_typing() }
 
     /// Creates an invite leading to the given channel.
@@ -225,16 +228,17 @@ impl GuildChannel {
     /// ```
     ///
     /// [`Channel`]: enum.Channel.html
-    /// [`Member`]: struct.Member.html
+    /// [`Member`]: ../guild/struct.Member.html
     /// [`PermissionOverwrite`]: struct.PermissionOverwrite.html
     /// [`PermissionOverwrite::Member`]: struct.PermissionOverwrite.html#variant.Member
     /// [`PermissionOverwrite::Role`]: struct.PermissionOverwrite.html#variant.Role
-    /// [`Role`]: struct.Role.html
-    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
-    /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
-    /// [Send TTS Messages]: permissions/constant.SEND_TTS_MESSAGES.html
+    /// [`Role`]: ../guild/struct.Role.html
+    /// [Attach Files]:
+    /// ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
+    /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [Send TTS Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_TTS_MESSAGES
     #[inline]
     pub fn create_permission(&self, target: &PermissionOverwrite) -> Result<()> {
         self.id.create_permission(target)
@@ -269,8 +273,8 @@ impl GuildChannel {
     /// delete either 0 or more than 100 messages.
     ///
     /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
-    /// [`ModelError::BulkDeleteAmount`]: ../enum.ModelError.html#variant.BulkDeleteAmount
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    /// [`ModelError::BulkDeleteAmount`]: ../error/enum.Error.html#variant.BulkDeleteAmount
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, message_ids: It) -> Result<()> {
         self.id.delete_messages(message_ids)
@@ -281,7 +285,7 @@ impl GuildChannel {
     ///
     /// **Note**: Requires the [Manage Channel] permission.
     ///
-    /// [Manage Channel]: permissions/constant.MANAGE_CHANNELS.html
+    /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[inline]
     pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
         self.id.delete_permission(permission_type)
@@ -293,7 +297,7 @@ impl GuildChannel {
     /// user did not perform the reaction.
     ///
     /// [`Reaction`]: struct.Reaction.html
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn delete_reaction<M, R>(&self,
                                  message_id: M,
@@ -359,10 +363,10 @@ impl GuildChannel {
     /// is over the [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
-    /// [`EditMessage`]: ../builder/struct.EditMessage.html
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
+    /// [`EditMessage`]: ../../builder/struct.EditMessage.html
     /// [`Message`]: struct.Message.html
-    /// [`the limit`]: ../builder/struct.EditMessage.html#method.content
+    /// [`the limit`]: ../../builder/struct.EditMessage.html#method.content
     #[inline]
     pub fn edit_message<F, M>(&self, message_id: M, f: F) -> Result<Message>
         where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
@@ -379,31 +383,27 @@ impl GuildChannel {
     /// Gets all of the channel's invites.
     ///
     /// Requires the [Manage Channels] permission.
-    /// [Manage Channels]: permissions/constant.MANAGE_CHANNELS.html
+    /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[inline]
     pub fn invites(&self) -> Result<Vec<RichInvite>> { self.id.invites() }
 
     /// Determines if the channel is NSFW.
-    ///
-    /// Refer to [`utils::is_nsfw`] for more details.
     ///
     /// Only [text channels][`ChannelType::Text`] are taken into consideration
     /// as being NSFW. [voice channels][`ChannelType::Voice`] are never NSFW.
     ///
     /// [`ChannelType::Text`]: enum.ChannelType.html#variant.Text
     /// [`ChannelType::Voice`]: enum.ChannelType.html#variant.Voice
-    /// [`utils::is_nsfw`]: ../../utils/fn.is_nsfw.html
-    #[cfg(feature = "utils")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
-        self.kind == ChannelType::Text && (self.nsfw || serenity_utils::is_nsfw(&self.name))
+        self.kind == ChannelType::Text && self.nsfw
     }
 
     /// Gets a message from the channel.
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn message<M: Into<MessageId>>(&self, message_id: M) -> Result<Message> {
         self.id.message(message_id)
@@ -416,7 +416,7 @@ impl GuildChannel {
     /// Requires the [Read Message History] permission.
     ///
     /// [`Channel::messages`]: enum.Channel.html#method.messages
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(GetMessages) -> GetMessages {
@@ -496,8 +496,11 @@ impl GuildChannel {
     ///             },
     ///         };
     ///
-    ///         let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m|
-    ///             m.content("here's a cat"));
+    ///         let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |mut m| {
+    ///             m.content("here's a cat");
+    ///
+    ///             m
+    ///         });
     ///     }
     /// }
     ///
@@ -511,22 +514,30 @@ impl GuildChannel {
     /// Returns a [`ModelError::GuildNotFound`] if the channel's guild could
     /// not be found in the [`Cache`].
     ///
-    /// [`Cache`]: ../cache/struct.Cache.html
-    /// [`ModelError::GuildNotFound`]: enum.ModelError.html#variant.GuildNotFound
-    /// [`Guild`]: struct.Guild.html
-    /// [`Member`]: struct.Member.html
+    /// [`Cache`]: ../../cache/struct.Cache.html
+    /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
+    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`Member`]: ../guild/struct.Member.html
     /// [`Message`]: struct.Message.html
-    /// [`User`]: struct.User.html
-    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    /// [`User`]: ../user/struct.User.html
+    /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "cache")]
+    #[inline]
     pub fn permissions_for<U: Into<UserId>>(&self, user_id: U) -> Result<Permissions> {
+        self._permissions_for(user_id.into())
+    }
+
+    #[cfg(feature = "cache")]
+    fn _permissions_for(&self, user_id: UserId) -> Result<Permissions> {
         self.guild()
             .ok_or_else(|| Error::Model(ModelError::GuildNotFound))
             .map(|g| g.read().permissions_in(self.id, user_id))
     }
 
     /// Pins a [`Message`] to the channel.
+    ///
+    /// [`Message`]: struct.Message.html
     #[inline]
     pub fn pin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> { self.id.pin(message_id) }
 
@@ -542,10 +553,10 @@ impl GuildChannel {
     /// **Note**: Requires the [Read Message History] permission.
     ///
     /// [`Channel::reaction_users`]: enum.Channel.html#method.reaction_users
-    /// [`Emoji`]: struct.Emoji.html
+    /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: struct.Message.html
-    /// [`User`]: struct.User.html
-    /// [Read Message History]: permissions/constant.READ_MESSAGE_HISTORY.html
+    /// [`User`]: ../user/struct.User.html
+    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     pub fn reaction_users<M, R, U>(
         &self,
         message_id: M,
@@ -566,8 +577,8 @@ impl GuildChannel {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ChannelId`]: struct.ChannelId.html
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    /// [`ChannelId`]: ../id/struct.ChannelId.html
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[inline]
     pub fn say(&self, content: &str) -> Result<Message> { self.id.say(content) }
 
@@ -585,10 +596,10 @@ impl GuildChannel {
     /// [`ClientError::MessageTooLong`] will be returned, containing the number
     /// of unicode code points over the limit.
     ///
-    /// [`ChannelId::send_files`]: struct.ChannelId.html#method.send_files
-    /// [`ClientError::MessageTooLong`]: ../client/enum.ClientError.html#variant.MessageTooLong
-    /// [Attach Files]: permissions/constant.ATTACH_FILES.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    /// [`ChannelId::send_files`]: ../id/struct.ChannelId.html#method.send_files
+    /// [`ClientError::MessageTooLong`]: ../../client/enum.ClientError.html#variant.MessageTooLong
+    /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[inline]
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
@@ -610,10 +621,10 @@ impl GuildChannel {
     /// Returns a [`ModelError::InvalidPermissions`] if the current user does
     /// not have the required permissions.
     ///
-    /// [`ModelError::InvalidPermissions`]: enum.ModelError.html#variant.InvalidPermissions
-    /// [`ModelError::MessageTooLong`]: enum.ModelError.html#variant.MessageTooLong
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [`Message`]: struct.Message.html
-    /// [Send Messages]: permissions/constant.SEND_MESSAGES.html
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
         #[cfg(feature = "cache")]
         {
@@ -632,7 +643,7 @@ impl GuildChannel {
     /// Requires the [Manage Messages] permission.
     ///
     /// [`Message`]: struct.Message.html
-    /// [Manage Messages]: permissions/constant.MANAGE_MESSAGES.html
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub fn unpin<M: Into<MessageId>>(&self, message_id: M) -> Result<()> {
         self.id.unpin(message_id)
@@ -642,7 +653,7 @@ impl GuildChannel {
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
-    /// [Manage Webhooks]: permissions/constant.MANAGE_WEBHOOKS.html
+    /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[inline]
     pub fn webhooks(&self) -> Result<Vec<Webhook>> { self.id.webhooks() }
 }

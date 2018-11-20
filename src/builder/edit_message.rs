@@ -14,8 +14,11 @@ use utils::{self, VecMap};
 /// #
 /// # let mut message = ChannelId(7).message(MessageId(8)).unwrap();
 /// #
+/// let _ = message.edit(|mut m| {
+///     m.content("hello");
 ///
-/// let _ = message.edit(|m| m.content("hello"));
+///     m
+/// });
 /// ```
 ///
 /// [`Message`]: ../model/channel/struct.Message.html
@@ -26,20 +29,20 @@ impl EditMessage {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    pub fn content<D: Display>(mut self, content: D) -> Self {
-        self.0.insert("content", Value::String(content.to_string()));
+    #[inline]
+    pub fn content<D: Display>(&mut self, content: D) {
+        self._content(content.to_string())
+    }
 
-        self
+    fn _content(&mut self, content: String) {
+        self.0.insert("content", Value::String(content));
     }
 
     /// Set an embed for the message.
-    pub fn embed<F>(mut self, f: F) -> Self
-        where F: FnOnce(CreateEmbed) -> CreateEmbed {
+    pub fn embed<F: FnOnce(CreateEmbed) -> CreateEmbed>(&mut self, f: F) {
         let map = utils::vecmap_to_json_map(f(CreateEmbed::default()).0);
         let embed = Value::Object(map);
 
         self.0.insert("embed", embed);
-
-        self
     }
 }
