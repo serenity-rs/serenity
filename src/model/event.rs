@@ -1349,8 +1349,8 @@ pub enum Event {
     /// Fires the [`Client::on_channel_pins_update`] event.
     ///
     /// [`Channel`]: ../enum.Channel.html
-    /// [`Client::on_channel_pins_update`]:
-    /// ../../client/struct.Client.html#on_channel_pins_update
+    /// [`Client::channel_pins_update`]:
+    /// ../../client/struct.Client.html#channel_pins_update
     ChannelPinsUpdate(ChannelPinsUpdateEvent),
     /// A [`User`] has been added to a [`Group`].
     ///
