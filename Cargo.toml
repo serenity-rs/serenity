@@ -62,7 +62,7 @@ version = "~1.7"
 
 [dependencies.tungstenite]
 optional = true
-version = "~0.5"
+version = "0.6"
 
 [dependencies.typemap]
 optional = true
