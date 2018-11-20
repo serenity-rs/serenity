@@ -95,7 +95,8 @@ impl Connection {
         let url = generate_url(&mut info.endpoint)?;
 
         let mut client = tungstenite::connect(Request::from(url))?.0;
-
+        let mut hello = None;
+        let mut ready = None;
         client.send_json(&payload::build_identify(&info))?;
 
         loop {
@@ -169,7 +170,8 @@ impl Connection {
             let port_pos = len - 2;
             let port = (&bytes[port_pos..]).read_u16::<LittleEndian>()?;
 
-            client.send_json(&payload::build_select_protocol(addr, port))?;
+            client
+                .send_json(&payload::build_select_protocol(addr, port))?;
         }
 
         let key = encryption_key(&mut client)?;
@@ -182,8 +184,6 @@ impl Connection {
         // Encode for Discord in Stereo, as required.
         let mut encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Stereo, CodingMode::Audio)?;
         encoder.set_bitrate(Bitrate::Bits(DEFAULT_BITRATE))?;
-        let soft_clip = SoftClip::new(Channels::Stereo);
-
         let soft_clip = SoftClip::new(Channels::Stereo);
 
         // Per discord dev team's current recommendations:

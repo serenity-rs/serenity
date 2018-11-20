@@ -728,7 +728,7 @@ impl CacheUpdate for GuildUpdateEvent {
     type Output = ();
 
     fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        if let Some(guild) = cache.guilds.get_mut(&self.guild.id) {
+        cache.guilds.get_mut(&self.guild.id).map(|guild| {
             let mut guild = guild.write();
 
             guild.afk_timeout = self.guild.afk_timeout;
@@ -739,7 +739,7 @@ impl CacheUpdate for GuildUpdateEvent {
             guild.region.clone_from(&self.guild.region);
             guild.roles.clone_from(&self.guild.roles);
             guild.verification_level = self.guild.verification_level;
-        }
+        });
 
         None
     }
@@ -842,7 +842,7 @@ pub struct MessageUpdateEvent {
     pub mentions: Option<Vec<User>>,
     pub mention_roles: Option<Vec<RoleId>>,
     pub attachments: Option<Vec<Attachment>>,
-    pub embeds: Option<Vec<Embed>>,
+    pub embeds: Option<Vec<Value>>,
 }
 
 #[cfg(feature = "cache")]
@@ -1346,35 +1346,32 @@ pub enum Event {
     ChannelDelete(ChannelDeleteEvent),
     /// The pins for a [`Channel`] have been updated.
     ///
-    /// Fires the [`Client::channel_pins_update`] event.
+    /// Fires the [`Client::on_channel_pins_update`] event.
     ///
-    /// [`Channel`]: ../channel/enum.Channel.html
-    /// [`Client::channel_pins_update`]: ../../client/struct.Client.html#channel_pins_update
+    /// [`Channel`]: ../enum.Channel.html
+    /// [`Client::on_channel_pins_update`]:
+    /// ../../client/struct.Client.html#on_channel_pins_update
     ChannelPinsUpdate(ChannelPinsUpdateEvent),
     /// A [`User`] has been added to a [`Group`].
     ///
-    /// Fires the [`Client::recipient_add`] event.
+    /// Fires the [`Client::on_recipient_add`] event.
     ///
-    /// [`Client::recipient_add`]: ../../client/struct.Client.html#recipient_add
-    /// [`User`]: ../user/struct.User.html
-    /// [`Group`]: ../channel/struct.Group.html
+    /// [`Client::on_recipient_add`]: ../../client/struct.Client.html#on_recipient_add
+    /// [`User`]: ../struct.User.html
     ChannelRecipientAdd(ChannelRecipientAddEvent),
     /// A [`User`] has been removed from a [`Group`].
     ///
-    /// Fires the [`Client::recipient_remove`] event.
+    /// Fires the [`Client::on_recipient_remove`] event.
     ///
-    /// [`Channel`]: ../channel/enum.Channel.html
-    /// [`Client::recipient_remove`]: ../../client/struct.Client.html#recipient_remove
-    /// [`User`]: ../user/struct.User.html
-    /// [`Group`]: ../channel/struct.Group.html
+    /// [`Client::on_recipient_remove`]: ../../client/struct.Client.html#on_recipient_remove
+    /// [`User`]: ../struct.User.html
     ChannelRecipientRemove(ChannelRecipientRemoveEvent),
     /// A [`Channel`] has been updated.
     ///
-    /// Fires the [`Client::channel_update`] event.
+    /// Fires the [`Client::on_channel_update`] event.
     ///
-    /// [`Channel`]: ../channel/enum.Channel.html
-    /// [`Client::channel_update`]: ../../client/struct.Client.html#channel_update
-    /// [`User`]: ../user/struct.User.html
+    /// [`Client::on_channel_update`]: ../../client/struct.Client.html#on_channel_update
+    /// [`User`]: ../struct.User.html
     ChannelUpdate(ChannelUpdateEvent),
     GuildBanAdd(GuildBanAddEvent),
     GuildBanRemove(GuildBanRemoveEvent),
@@ -1404,23 +1401,24 @@ pub enum Event {
     PresencesReplace(PresencesReplaceEvent),
     /// A reaction was added to a message.
     ///
-    /// Fires the [`reaction_add`] event handler.
+    /// Fires the [`on_message_reaction_add`] event handler.
     ///
-    /// [`reaction_add`]: ../../prelude/trait.EventHandler.html#method.reaction_add
+    /// [`on_message_reaction_add`]: ../client/struct.Client.html#method.on_message_reaction_add
     ReactionAdd(ReactionAddEvent),
     /// A reaction was removed to a message.
     ///
-    /// Fires the [`reaction_remove`] event handler.
+    /// Fires the [`on_message_reaction_remove`] event handler.
     ///
-    /// [`reaction_remove`]: ../../prelude/trait.EventHandler.html#method.reaction_remove
+    /// [`on_message_reaction_remove`]:
+    /// ../client/struct.Client.html#method.on_message_reaction_remove
     ReactionRemove(ReactionRemoveEvent),
     /// A request was issued to remove all [`Reaction`]s from a [`Message`].
     ///
-    /// Fires the [`reaction_remove_all`] event handler.
+    /// Fires the [`on_reaction_remove_all`] event handler.
     ///
-    /// [`Message`]: ../channel/struct.Message.html
-    /// [`Reaction`]: ../channel/struct.Reaction.html
-    /// [`reaction_remove_all`]: ../../prelude/trait.EventHandler.html#method.reaction_remove_all
+    /// [`Message`]: struct.Message.html
+    /// [`Reaction`]: struct.Reaction.html
+    /// [`on_reaction_remove_all`]: ../client/struct.Clint.html#method.on_reaction_remove_all
     ReactionRemoveAll(ReactionRemoveAllEvent),
     /// The first event in a connection, containing the initial ready cache.
     ///
@@ -1436,11 +1434,10 @@ pub enum Event {
     VoiceStateUpdate(VoiceStateUpdateEvent),
     /// Voice server information is available
     VoiceServerUpdate(VoiceServerUpdateEvent),
-    /// A webhook for a [`Channel`]-variant [`GuildChannel`] was updated in a [`Guild`].
+    /// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].
     ///
-    /// [`Channel`]: ../channel/enum.Channel.html
-    /// [`GuildChannel`]: ../channel/enum.Channel.html#variant.Guild
-    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`Guild`]: struct.Guild.html
+    /// [`GuildChannel`]: struct.GuildChannel.html
     WebhookUpdate(WebhookUpdateEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
