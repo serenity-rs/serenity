@@ -37,7 +37,7 @@ pub enum ShardRunnerMessage {
     /// [`ShardManager`]: struct.ShardManager.html
     Close(u16, Option<String>),
     /// Indicates that the client is to send a custom WebSocket message.
-    Message(OwnedMessage),
+    Message(Message),
     /// Indicates that the client is to update the shard's presence's activity.
     SetActivity(Option<Activity>),
     /// Indicates that the client is to update the shard's presence in its
