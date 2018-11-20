@@ -1401,24 +1401,24 @@ pub enum Event {
     PresencesReplace(PresencesReplaceEvent),
     /// A reaction was added to a message.
     ///
-    /// Fires the [`on_message_reaction_add`] event handler.
+    /// Fires the [`message_reaction_add`] event handler.
     ///
-    /// [`on_message_reaction_add`]: ../client/struct.Client.html#method.on_message_reaction_add
+    /// [`message_reaction_add`]: ../client/struct.Client.html#method.message_reaction_add
     ReactionAdd(ReactionAddEvent),
     /// A reaction was removed to a message.
     ///
-    /// Fires the [`on_message_reaction_remove`] event handler.
+    /// Fires the [`message_reaction_remove`] event handler.
     ///
-    /// [`on_message_reaction_remove`]:
-    /// ../client/struct.Client.html#method.on_message_reaction_remove
+    /// [`message_reaction_remove`]:
+    /// ../client/struct.Client.html#method.message_reaction_remove
     ReactionRemove(ReactionRemoveEvent),
     /// A request was issued to remove all [`Reaction`]s from a [`Message`].
     ///
-    /// Fires the [`on_reaction_remove_all`] event handler.
+    /// Fires the [`reaction_remove_all`] event handler.
     ///
     /// [`Message`]: struct.Message.html
     /// [`Reaction`]: struct.Reaction.html
-    /// [`on_reaction_remove_all`]: ../client/struct.Clint.html#method.on_reaction_remove_all
+    /// [`reaction_remove_all`]: ../client/struct.Clint.html#method.reaction_remove_all
     ReactionRemoveAll(ReactionRemoveAllEvent),
     /// The first event in a connection, containing the initial ready cache.
     ///
