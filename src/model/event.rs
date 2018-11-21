@@ -1332,45 +1332,45 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 pub enum Event {
     /// A [`Channel`] was created.
     ///
-    /// Fires the [`Client::channel_create`] event.
+    /// Fires the [`EventHandler::channel_create`] event.
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
-    /// [`Client::channel_create`]: ../../client/struct.Client.html#channel_create
+    /// [`EventHandler::channel_create`]: ../../client/trait.EventHandler.html#method.channel_create
     ChannelCreate(ChannelCreateEvent),
     /// A [`Channel`] has been deleted.
     ///
-    /// Fires the [`Client::channel_delete`] event.
+    /// Fires the [`EventHandler::channel_delete`] event.
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
-    /// [`Client::channel_delete`]: ../../client/struct.Client.html#channel_delete
+    /// [`EventHandler::channel_delete`]: ../../client/trait.EventHandler.html#method.channel_delete
     ChannelDelete(ChannelDeleteEvent),
     /// The pins for a [`Channel`] have been updated.
     ///
-    /// Fires the [`Client::on_channel_pins_update`] event.
+    /// Fires the [`EventHandler::channel_pins_update`] event.
     ///
     /// [`Channel`]: ../enum.Channel.html
-    /// [`Client::channel_pins_update`]:
-    /// ../../client/struct.Client.html#channel_pins_update
+    /// [`EventHandler::channel_pins_update`]:
+    /// ../../client/trait.EventHandler.html#method.channel_pins_update
     ChannelPinsUpdate(ChannelPinsUpdateEvent),
     /// A [`User`] has been added to a [`Group`].
     ///
-    /// Fires the [`Client::on_recipient_add`] event.
+    /// Fires the [`EventHandler::channel_recipient_addition`] event.
     ///
-    /// [`Client::on_recipient_add`]: ../../client/struct.Client.html#on_recipient_add
+    /// [`EventHandler::channel_recipient_addition`]: ../../client/trait.EventHandler.html#method.channel_recipient_addition
     /// [`User`]: ../struct.User.html
     ChannelRecipientAdd(ChannelRecipientAddEvent),
     /// A [`User`] has been removed from a [`Group`].
     ///
-    /// Fires the [`Client::on_recipient_remove`] event.
+    /// Fires the [`EventHandler::channel_recipient_removal`] event.
     ///
-    /// [`Client::on_recipient_remove`]: ../../client/struct.Client.html#on_recipient_remove
+    /// [`EventHandler::channel_recipient_removal`]: ../../client/trait.EventHandler.html#method.channel_recipient_removal
     /// [`User`]: ../struct.User.html
     ChannelRecipientRemove(ChannelRecipientRemoveEvent),
     /// A [`Channel`] has been updated.
     ///
-    /// Fires the [`Client::on_channel_update`] event.
+    /// Fires the [`EventHandler::channel_update`] event.
     ///
-    /// [`Client::on_channel_update`]: ../../client/struct.Client.html#on_channel_update
+    /// [`EventHandler::channel_update`]: ../../client/trait.EventHandler.html#method.channel_update
     /// [`User`]: ../struct.User.html
     ChannelUpdate(ChannelUpdateEvent),
     GuildBanAdd(GuildBanAddEvent),
@@ -1401,24 +1401,24 @@ pub enum Event {
     PresencesReplace(PresencesReplaceEvent),
     /// A reaction was added to a message.
     ///
-    /// Fires the [`message_reaction_add`] event handler.
+    /// Fires the [`EventHandler::reaction_add`] event handler.
     ///
-    /// [`message_reaction_add`]: ../client/struct.Client.html#method.message_reaction_add
+    /// [`EventHandler::reaction_add`]: ../../client/trait.EventHandler.html#method.reaction_add
     ReactionAdd(ReactionAddEvent),
     /// A reaction was removed to a message.
     ///
-    /// Fires the [`message_reaction_remove`] event handler.
+    /// Fires the [`EventHandler::reaction_remove`] event handler.
     ///
-    /// [`message_reaction_remove`]:
-    /// ../client/struct.Client.html#method.message_reaction_remove
+    /// [`EventHandler::reaction_remove`]:
+    /// ../../client/trait.EventHandler.html#method.reaction_remove
     ReactionRemove(ReactionRemoveEvent),
     /// A request was issued to remove all [`Reaction`]s from a [`Message`].
     ///
-    /// Fires the [`reaction_remove_all`] event handler.
+    /// Fires the [`EventHandler::reaction_remove_all`] event handler.
     ///
     /// [`Message`]: struct.Message.html
     /// [`Reaction`]: struct.Reaction.html
-    /// [`reaction_remove_all`]: ../client/struct.Clint.html#method.reaction_remove_all
+    /// [`EventHandler::reaction_remove_all`]: ../../client/trait.EventHandler.html#method.reaction_remove_all
     ReactionRemoveAll(ReactionRemoveAllEvent),
     /// The first event in a connection, containing the initial ready cache.
     ///
