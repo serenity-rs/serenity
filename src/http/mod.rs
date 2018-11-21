@@ -25,6 +25,7 @@
 
 #[macro_use] mod macros;
 
+pub mod constants;
 pub mod ratelimiting;
 
 mod error;
@@ -85,8 +86,9 @@ impl LightMethod {
 
 #[derive(Clone, Debug)]
 pub struct Client {
+    pub base: String,
     pub client: Arc<HyperClient<HttpsConnector<HttpConnector>, Body>>,
-    pub ratelimiter: Arc<Mutex<RateLimiter>>,
+    pub ratelimiter: Option<Arc<Mutex<RateLimiter>>>,
     pub token: Arc<String>,
 }
 
@@ -96,14 +98,27 @@ impl Client {
         token: Arc<String>,
     ) -> Result<Self> {
         Ok(Self {
-            ratelimiter: Arc::new(Mutex::new(RateLimiter::new())),
+            base: self::constants::API_URI_VERSIONED.to_owned(),
+            ratelimiter: Some(Arc::new(Mutex::new(RateLimiter::new()))),
             client,
             token,
         })
     }
 
+    pub fn skip_ratelimiter(&mut self) {
+        self.ratelimiter = None;
+    }
+
     pub fn set_token(&mut self, token: Arc<String>) {
         self.token = token;
+    }
+
+    pub fn set_base_url(&mut self, base_url: impl Into<String>) {
+        self._set_base_url(base_url.into())
+    }
+
+    fn _set_base_url(&mut self, base_url: String) {
+        self.base = base_url;
     }
 
     /// Adds a [`User`] as a recipient to a [`Group`].
@@ -1506,7 +1521,7 @@ impl Client {
     ) -> Box<Future<Item = T, Error = Error> + Send> {
         let (method, path, url) = route.deconstruct();
 
-        let uri = match Uri::from_str(url.as_ref()) {
+        let uri = match Uri::from_str(&format!("{}/{}", self.base, url.as_ref())) {
             Ok(uri) => uri,
             Err(why) => return Box::new(future::err(Error::Http(HttpError::InvalidUri(why)))),
         };
@@ -1533,7 +1548,7 @@ impl Client {
 
         let client = Arc::clone(&self.client);
 
-        Box::new(self.ratelimiter.lock().take(&path)
+        Box::new(self.ratelimiter.as_ref().map(|r| r.lock().take(&path).boxed()).unwrap_or(Box::new(future::ok(())))
             .and_then(move |_| client.request(request).map_err(From::from))
             .from_err()
             .and_then(verify_status)
@@ -1548,7 +1563,10 @@ impl Client {
     ) -> Box<Future<Item = (), Error = Error> + Send> {
         let (method, path, url) = route.deconstruct();
 
-        let uri = try_uri!(url.as_ref());
+        let uri = match Uri::from_str(&format!("{}/{}", self.base, url.as_ref())) {
+            Ok(uri) => uri,
+            Err(why) => return Box::new(future::err(Error::Http(HttpError::InvalidUri(why)))),
+        };
         let mut request_builder = Request::builder();
         request_builder.method(method.hyper_method())
             .header(AUTHORIZATION, &self.token()[..])
@@ -1566,7 +1584,7 @@ impl Client {
 
         let client = Arc::clone(&self.client);
 
-        Box::new(self.ratelimiter.lock().take(&path)
+        Box::new(self.ratelimiter.as_ref().map(|r| r.lock().take(&path).boxed()).unwrap_or(Box::new(future::ok(())))
             .and_then(move |_| client.request(request).map_err(From::from))
             .map_err(From::from)
             .and_then(verify_status)

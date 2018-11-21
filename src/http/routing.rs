@@ -265,15 +265,15 @@ pub enum Path {
 
 impl Path {
     pub fn channel(channel_id: u64) -> String {
-        format!(api!("/channels/{}"), channel_id)
+        format!("/channels/{}", channel_id)
     }
 
     pub fn channel_invites(channel_id: u64) -> String {
-        format!(api!("/channels/{}/invites"), channel_id)
+        format!("/channels/{}/invites", channel_id)
     }
 
     pub fn channel_message(channel_id: u64, message_id: u64) -> String {
-        format!(api!("/channels/{}/messages/{}"), channel_id, message_id)
+        format!("/channels/{}/messages/{}", channel_id, message_id)
     }
 
     pub fn channel_message_reaction<D, T>(
@@ -283,7 +283,7 @@ impl Path {
         reaction_type: T
     ) -> String where D: Display, T: Display {
         format!(
-            api!("/channels/{}/messages/{}/reactions/{}/{}"),
+            "/channels/{}/messages/{}/reactions/{}/{}",
             channel_id,
             message_id,
             reaction_type,
@@ -299,7 +299,7 @@ impl Path {
         after: Option<u64>,
     ) -> String {
         let mut uri = format!(
-            api!("/channels/{}/messages/{}/reactions/{}?limit={}"),
+            "/channels/{}/messages/{}/reactions/{}?limit={}",
             channel_id,
             message_id,
             reaction,
@@ -314,47 +314,47 @@ impl Path {
     }
 
     pub fn channel_messages(channel_id: u64) -> String {
-        format!(api!("/channels/{}/messages"), channel_id)
+        format!("/channels/{}/messages", channel_id)
     }
 
     pub fn channel_messages_bulk_delete(channel_id: u64) -> String {
-        format!(api!("/channels/{}/messages/bulk-delete"), channel_id)
+        format!("/channels/{}/messages/bulk-delete", channel_id)
     }
 
     pub fn channel_permission(channel_id: u64, target_id: u64) -> String {
-        format!(api!("/channels/{}/permissions/{}"), channel_id, target_id)
+        format!("/channels/{}/permissions/{}", channel_id, target_id)
     }
 
     pub fn channel_pin(channel_id: u64, message_id: u64) -> String {
-        format!(api!("/channels/{}/pins/{}"), channel_id, message_id)
+        format!("/channels/{}/pins/{}", channel_id, message_id)
     }
 
     pub fn channel_pins(channel_id: u64) -> String {
-        format!(api!("/channels/{}/pins"), channel_id)
+        format!("/channels/{}/pins", channel_id)
     }
 
     pub fn channel_typing(channel_id: u64) -> String {
-        format!(api!("/channels/{}/typing"), channel_id)
+        format!("/channels/{}/typing", channel_id)
     }
 
     pub fn channel_webhooks(channel_id: u64) -> String {
-        format!(api!("/channels/{}/webhooks"), channel_id)
+        format!("/channels/{}/webhooks", channel_id)
     }
 
     pub fn gateway() -> &'static str {
-        api!("/gateway")
+        "/gateway"
     }
 
     pub fn gateway_bot() -> &'static str {
-        api!("/gateway/bot")
+        "/gateway/bot"
     }
 
     pub fn group_recipient(group_id: u64, user_id: u64) -> String {
-        format!(api!("/channels/{}/recipients/{}"), group_id, user_id)
+        format!("/channels/{}/recipients/{}", group_id, user_id)
     }
 
     pub fn guild(guild_id: u64) -> String {
-        format!(api!("/guilds/{}"), guild_id)
+        format!("/guilds/{}", guild_id)
     }
 
     pub fn guild_audit_logs(
@@ -365,7 +365,7 @@ impl Path {
         limit: Option<u8>,
     ) -> String {
         let mut s = format!(
-            api!("/guilds/{}/audit-logs?"),
+            "/guilds/{}/audit-logs?",
             guild_id,
         );
 
@@ -389,7 +389,7 @@ impl Path {
     }
 
     pub fn guild_ban(guild_id: u64, user_id: u64) -> String {
-        format!(api!("/guilds/{}/bans/{}"), guild_id, user_id)
+        format!("/guilds/{}/bans/{}", guild_id, user_id)
     }
 
     pub fn guild_ban_optioned(
@@ -399,7 +399,7 @@ impl Path {
         reason: &str,
     ) -> String {
         format!(
-            api!("/guilds/{}/bans/{}?delete_message_days={}&reason={}"),
+            "/guilds/{}/bans/{}?delete_message_days={}&reason={}",
             guild_id,
             user_id,
             delete_message_days,
@@ -408,30 +408,30 @@ impl Path {
     }
 
     pub fn guild_bans(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/bans"), guild_id)
+        format!("/guilds/{}/bans", guild_id)
     }
 
     pub fn guild_channels(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/channels"), guild_id)
+        format!("/guilds/{}/channels", guild_id)
     }
 
     pub fn guild_embed(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/embed"), guild_id)
+        format!("/guilds/{}/embed", guild_id)
     }
 
     pub fn guild_emojis(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/emojis"), guild_id)
+        format!("/guilds/{}/emojis", guild_id)
     }
 
     pub fn guild_emoji(guild_id: u64, emoji_id: u64) -> String {
-        format!(api!("/guilds/{}/emojis/{}"), guild_id, emoji_id)
+        format!("/guilds/{}/emojis/{}", guild_id, emoji_id)
     }
 
     pub fn guild_integration(
         guild_id: u64,
         integration_id: u64,
     ) -> String {
-        format!(api!("/guilds/{}/integrations/{}"), guild_id, integration_id)
+        format!("/guilds/{}/integrations/{}", guild_id, integration_id)
     }
 
     pub fn guild_integration_sync(
@@ -439,22 +439,22 @@ impl Path {
         integration_id: u64,
     ) -> String {
         format!(
-            api!("/guilds/{}/integrations/{}/sync"),
+            "/guilds/{}/integrations/{}/sync",
             guild_id,
             integration_id,
         )
     }
 
     pub fn guild_integrations(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/integrations"), guild_id)
+        format!("/guilds/{}/integrations", guild_id)
     }
 
     pub fn guild_invites(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/invites"), guild_id)
+        format!("/guilds/{}/invites", guild_id)
     }
 
     pub fn guild_member(guild_id: u64, user_id: u64) -> String {
-        format!(api!("/guilds/{}/members/{}"), guild_id, user_id)
+        format!("/guilds/{}/members/{}", guild_id, user_id)
     }
 
     pub fn guild_member_role(
@@ -463,7 +463,7 @@ impl Path {
         role_id: u64,
     ) -> String {
         format!(
-            api!("/guilds/{}/members/{}/roles/{}"),
+            "/guilds/{}/members/{}/roles/{}",
             guild_id,
             user_id,
             role_id,
@@ -471,7 +471,7 @@ impl Path {
     }
 
     pub fn guild_members(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/members"), guild_id)
+        format!("/guilds/{}/members", guild_id)
     }
 
     pub fn guild_members_optioned(
@@ -479,7 +479,7 @@ impl Path {
         after: Option<u64>,
         limit: Option<u64>,
     ) -> String {
-        let mut s = format!(api!("/guilds/{}/members?"), guild_id);
+        let mut s = format!("/guilds/{}/members?", guild_id);
 
         if let Some(after) = after {
             let _ = write!(s, "&after={}", after);
@@ -493,51 +493,51 @@ impl Path {
     }
 
     pub fn guild_nickname(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/members/@me/nick"), guild_id)
+        format!("/guilds/{}/members/@me/nick", guild_id)
     }
 
     pub fn guild_prune(guild_id: u64, days: u64) -> String {
-        format!(api!("/guilds/{}/prune?days={}"), guild_id, days)
+        format!("/guilds/{}/prune?days={}", guild_id, days)
     }
 
     pub fn guild_regions(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/regions"), guild_id)
+        format!("/guilds/{}/regions", guild_id)
     }
 
     pub fn guild_role(guild_id: u64, role_id: u64) -> String {
-        format!(api!("/guilds/{}/roles/{}"), guild_id, role_id)
+        format!("/guilds/{}/roles/{}", guild_id, role_id)
     }
 
     pub fn guild_roles(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/roles"), guild_id)
+        format!("/guilds/{}/roles", guild_id)
     }
 
     pub fn guild_vanity_url(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/vanity-url"), guild_id)
+        format!("/guilds/{}/vanity-url", guild_id)
     }
 
     pub fn guild_webhooks(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/webhooks"), guild_id)
+        format!("/guilds/{}/webhooks", guild_id)
     }
 
     pub fn guilds() -> &'static str {
-        api!("/guilds")
+        "/guilds"
     }
 
     pub fn invite(code: &str) -> String {
-        format!(api!("/invites/{}"), code)
+        format!("/invites/{}", code)
     }
 
     pub fn invite_optioned(code: &str, stats: bool) -> String {
-        format!(api!("/invites/{}?with_counts={}"), code, stats)
+        format!("/invites/{}?with_counts={}", code, stats)
     }
 
     pub fn oauth2_application_current() -> &'static str {
-        api!("/oauth2/applications/@me")
+        "/oauth2/applications/@me"
     }
 
     pub fn private_channel() -> &'static str {
-        api!("/users/@me/channels")
+        "/users/@me/channels"
     }
 
     pub fn status_incidents_unresolved() -> &'static str {
@@ -553,19 +553,19 @@ impl Path {
     }
 
     pub fn user<D: Display>(target: D) -> String {
-        format!(api!("/users/{}"), target)
+        format!("/users/{}", target)
     }
 
     pub fn user_dm_channels<D: Display>(target: D) -> String {
-        format!(api!("/users/{}/channels"), target)
+        format!("/users/{}/channels", target)
     }
 
     pub fn user_guild<D: Display>(target: D, guild_id: u64) -> String {
-        format!(api!("/users/{}/guilds/{}"), target, guild_id)
+        format!("/users/{}/guilds/{}", target, guild_id)
     }
 
     pub fn user_guilds<D: Display>(target: D) -> String {
-        format!(api!("/users/{}/guilds"), target)
+        format!("/users/{}/guilds", target)
     }
 
     pub fn user_guilds_optioned<D: Display>(
@@ -574,7 +574,7 @@ impl Path {
         before: Option<u64>,
         limit: u64,
     ) -> String {
-        let mut s = format!(api!("/users/{}/guilds?limit={}&"), target, limit);
+        let mut s = format!("/users/{}/guilds?limit={}&", target, limit);
 
         if let Some(after) = after {
             let _ = write!(s, "&after={}", after);
@@ -588,21 +588,21 @@ impl Path {
     }
 
     pub fn voice_regions() -> &'static str {
-        api!("/voice/regions")
+        "/voice/regions"
     }
 
     pub fn webhook(webhook_id: u64) -> String {
-        format!(api!("/webhooks/{}"), webhook_id)
+        format!("/webhooks/{}", webhook_id)
     }
 
     pub fn webhook_with_token<D>(webhook_id: u64, token: D) -> String
         where D: Display {
-        format!(api!("/webhooks/{}/{}"), webhook_id, token)
+        format!("/webhooks/{}/{}", webhook_id, token)
     }
 
     pub fn webhook_with_token_optioned<D>(webhook_id: u64, token: D, wait: bool)
         -> String where D: Display {
-        format!(api!("/webhooks/{}/{}?wait={}"), webhook_id, token, wait)
+        format!("/webhooks/{}/{}?wait={}", webhook_id, token, wait)
     }
 
     /// Returns the path's base string without replacements.
