@@ -20,12 +20,12 @@ use super::{
     WsClient,
     WebSocketGatewayClientExt,
 };
-use websocket::{
-    client::Url,
-    stream::sync::AsTcpStream,
-    sync::client::ClientBuilder,
-    WebSocketError
+use tungstenite::{
+    self,
+    error::Error as TungsteniteError,
+    handshake::client::Request,
 };
+use url::Url;
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the
@@ -224,7 +224,7 @@ impl Shard {
             },
             Err(why) => {
                 match why {
-                    Error::WebSocket(WebSocketError::IoError(err)) => if err.raw_os_error() != Some(32) {
+                    Error::Tungstenite(TungsteniteError::Io(err)) => if err.raw_os_error() != Some(32) {
                         debug!("[Shard {:?}] Err heartbeating: {:?}",
                                self.shard_info,
                                err);
@@ -465,7 +465,7 @@ impl Shard {
                 Ok(Some(ShardAction::Reconnect(ReconnectType::Reidentify)))
             },
             Err(Error::Gateway(GatewayError::Closed(ref data))) => {
-                let num = data.as_ref().map(|d| d.status_code);
+                let num = data.as_ref().map(|d| d.code.into());
                 let clean = num == Some(1000);
 
                 match num {
@@ -542,13 +542,7 @@ impl Shard {
                     ShardAction::Reconnect(ReconnectType::Reidentify)
                 }))
             },
-            Err(Error::WebSocket(ref why)) => {
-                if let WebSocketError::NoDataAvailable = *why {
-                    if self.heartbeat_instants.1.is_none() {
-                        return Ok(None);
-                    }
-                }
-
+            Err(Error::Tungstenite(ref why)) => {
                 warn!("[Shard {:?}] Websocket error: {:?}",
                       self.shard_info,
                       why);
@@ -837,15 +831,19 @@ impl Shard {
 
 fn connect(base_url: &str) -> Result<WsClient> {
     let url = build_gateway_url(base_url)?;
-    let client = ClientBuilder::from_url(&url).connect_secure(None)?;
+    let client = tungstenite::connect(Request::from(url))?;
 
-    Ok(client)
+    Ok(client.0)
 }
 
 fn set_client_timeout(client: &mut WsClient) -> Result<()> {
-    let stream = client.stream_ref().as_tcp();
-    stream.set_read_timeout(Some(StdDuration::from_millis(100)))?;
-    stream.set_write_timeout(Some(StdDuration::from_secs(5)))?;
+    let stream = match client.get_mut() {
+        tungstenite::stream::Stream::Plain(stream) => stream,
+        tungstenite::stream::Stream::Tls(stream) => stream.get_mut(),
+    };
+    
+    stream.set_read_timeout(Some(StdDuration::from_millis(500)))?;
+    stream.set_write_timeout(Some(StdDuration::from_secs(50)))?;
 
     Ok(())
 }

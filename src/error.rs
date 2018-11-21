@@ -16,8 +16,8 @@ use std::{
 use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
 #[cfg(feature = "voice")]
 use opus::Error as OpusError;
-#[cfg(feature = "websocket")]
-use websocket::result::WebSocketError;
+#[cfg(feature = "tungstenite")]
+use tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "client")]
 use client::ClientError;
 #[cfg(feature = "gateway")]
@@ -92,9 +92,9 @@ pub enum Error {
     /// [`http`]: http/index.html
     #[cfg(feature = "http")]
     Http(HttpError),
-    /// An error from the `rust-websocket` crate.
-    #[cfg(feature = "gateway")]
-    WebSocket(WebSocketError),
+    /// An error from the `tungstenite` crate.
+    #[cfg(feature = "tungstenite")]
+    Tungstenite(TungsteniteError),
     /// An error from the `opus` crate.
     #[cfg(feature = "voice")]
     Opus(OpusError),
@@ -135,9 +135,9 @@ impl From<OpusError> for Error {
     fn from(e: OpusError) -> Error { Error::Opus(e) }
 }
 
-#[cfg(feature = "gateway")]
-impl From<WebSocketError> for Error {
-    fn from(e: WebSocketError) -> Error { Error::WebSocket(e) }
+#[cfg(feature = "tungstenite")]
+impl From<TungsteniteError> for Error {
+    fn from(e: TungsteniteError) -> Error { Error::Tungstenite(e) }
 }
 
 #[cfg(feature = "http")]
@@ -180,10 +180,10 @@ impl StdError for Error {
             Error::Http(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Opus(ref inner) => inner.description(),
+            #[cfg(feature = "tungstenite")]
+            Error::Tungstenite(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Voice(_) => "Voice error",
-            #[cfg(feature = "gateway")]
-            Error::WebSocket(ref inner) => inner.description(),
         }
     }
 
@@ -191,8 +191,8 @@ impl StdError for Error {
         match *self {
             Error::Json(ref inner) => Some(inner),
             Error::Io(ref inner) => Some(inner),
-            #[cfg(feature = "gateway")]
-            Error::WebSocket(ref inner) => Some(inner),
+            #[cfg(feature = "tungstenite")]
+            Error::Tungstenite(ref inner) => Some(inner),
             _ => None,
         }
     }
