@@ -128,7 +128,6 @@ impl OpCode {
     }
 }
 
-
 /// Enum to map voice opcodes.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum VoiceOpCode {

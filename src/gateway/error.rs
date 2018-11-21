@@ -6,7 +6,7 @@ use std::{
         Result as FmtResult
     }
 };
-use websocket::message::CloseData;
+use tungstenite::protocol::CloseFrame;
 
 /// An error that occurred while attempting to deal with the gateway.
 ///
@@ -17,7 +17,7 @@ pub enum Error {
     /// There was an error building a URL.
     BuildingUrl,
     /// The connection closed, potentially uncleanly.
-    Closed(Option<CloseData>),
+    Closed(Option<CloseFrame<'static>>),
     /// Expected a Hello during a handshake
     ExpectedHello,
     /// When there was an error sending a heartbeat.
