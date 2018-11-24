@@ -15,7 +15,7 @@ use std::{
 use utils::Colour;
 use super::{Args, Configuration, HelpBehaviour};
 
-type CheckFunction = Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
+type CheckFunction = Fn(&mut Context, &mut Message, &mut Args, &CommandOptions) -> bool
                      + Send
                      + Sync
                      + 'static;
@@ -24,7 +24,7 @@ pub struct Check(pub(crate) Box<CheckFunction>);
 
 impl Check {
     pub(crate) fn new<F: Send + Sync + 'static>(f: F) -> Self
-        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
+        where F: Fn(&mut Context, &mut Message, &mut Args, &CommandOptions) -> bool
     {
         Check(Box::new(f))
     }
@@ -38,7 +38,7 @@ impl Debug for Check {
     }
 }
 
-pub type HelpFunction = fn(&mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, &Args)
+pub type HelpFunction = fn(&mut Context, &mut Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, &Args)
                    -> Result<(), Error>;
 
 pub struct Help(pub HelpFunction, pub Arc<HelpOptions>);
@@ -52,17 +52,17 @@ impl Debug for Help {
 }
 
 impl HelpCommand for Help {
-    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions,hm: HashMap<String, Arc<CommandGroup>>, a: &Args) -> Result<(), Error> {
+    fn execute(&self, c: &mut Context, m: &mut Message, ho: &HelpOptions,hm: HashMap<String, Arc<CommandGroup>>, a: &Args) -> Result<(), Error> {
         (self.0)(c, m, ho, hm, a)
     }
 }
 
-pub type BeforeHook = Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static;
-pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), Error>) + Send + Sync + 'static;
-pub type UnrecognisedCommandHook = Fn(&mut Context, &Message, &str) + Send + Sync + 'static;
-pub type MessageWithoutCommandHook = Fn(&mut Context, &Message) + Send + Sync + 'static;
+pub type BeforeHook = Fn(&mut Context, &mut Message, &str) -> bool + Send + Sync + 'static;
+pub type AfterHook = Fn(&mut Context, &mut Message, &str, Result<(), Error>) + Send + Sync + 'static;
+pub type UnrecognisedCommandHook = Fn(&mut Context, &mut Message, &str) + Send + Sync + 'static;
+pub type MessageWithoutCommandHook = Fn(&mut Context, &mut Message) + Send + Sync + 'static;
 pub(crate) type InternalCommand = Arc<Command>;
-pub type PrefixCheck = Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
+pub type PrefixCheck = Fn(&mut Context, &mut Message) -> Option<String> + Send + Sync + 'static;
 
 pub enum CommandOrAlias {
     Alias(String),
@@ -228,7 +228,7 @@ pub struct HelpOptions {
 }
 
 pub trait HelpCommand: Send + Sync + 'static {
-    fn execute(&self, &mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, &Args) -> Result<(), Error>;
+    fn execute(&self, &mut Context, &mut Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, &Args) -> Result<(), Error>;
 
     fn options(&self) -> Arc<CommandOptions> {
         Arc::clone(&DEFAULT_OPTIONS)
@@ -236,7 +236,7 @@ pub trait HelpCommand: Send + Sync + 'static {
 }
 
 impl HelpCommand for Arc<HelpCommand> {
-    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions, hm: HashMap<String, Arc<CommandGroup>>, a: &Args) -> Result<(), Error> {
+    fn execute(&self, c: &mut Context, m: &mut Message, ho: &HelpOptions, hm: HashMap<String, Arc<CommandGroup>>, a: &Args) -> Result<(), Error> {
         (**self).execute(c, m, ho, hm, a)
     }
 }
@@ -278,7 +278,7 @@ lazy_static! {
 
 /// A framework command.
 pub trait Command: Send + Sync + 'static {
-    fn execute(&self, &mut Context, &Message, Args) -> Result<(), Error>;
+    fn execute(&self, &mut Context, &mut Message, Args) -> Result<(), Error>;
 
     fn options(&self) -> Arc<CommandOptions> {
         Arc::clone(&DEFAULT_OPTIONS)
@@ -288,14 +288,14 @@ pub trait Command: Send + Sync + 'static {
     fn init(&self) {}
 
     /// "before" middleware. Is called alongside the global middleware in the framework.
-    fn before(&self, &mut Context, &Message) -> bool { true }
+    fn before(&self, &mut Context, &mut Message) -> bool { true }
 
     /// "after" middleware. Is called alongside the global middleware in the framework.
-    fn after(&self, &mut Context, &Message, &Result<(), Error>) { }
+    fn after(&self, &mut Context, &mut Message, &Result<(), Error>) { }
 }
 
 impl Command for Arc<Command> {
-    fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), Error> {
+    fn execute(&self, c: &mut Context, m: &mut Message, a: Args) -> Result<(), Error> {
         (**self).execute(c, m, a)
     }
 
@@ -307,21 +307,21 @@ impl Command for Arc<Command> {
         (**self).init()
     }
 
-    fn before(&self, c: &mut Context, m: &Message) -> bool {
+    fn before(&self, c: &mut Context, m: &mut Message) -> bool {
         (**self).before(c, m)
     }
 
-    fn after(&self, c: &mut Context, m: &Message, res: &Result<(), Error>) {
+    fn after(&self, c: &mut Context, m: &mut Message, res: &Result<(), Error>) {
         (**self).after(c, m, res)
     }
 }
 
-impl<F> Command for F where F: Fn(&mut Context, &Message, Args) -> Result<(), Error>
+impl<F> Command for F where F: Fn(&mut Context, &mut Message, Args) -> Result<(), Error>
     + Send
     + Sync
     + ?Sized
     + 'static {
-    fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), Error> {
+    fn execute(&self, c: &mut Context, m: &mut Message, a: Args) -> Result<(), Error> {
         (*self)(c, m, a)
     }
 }
@@ -348,7 +348,7 @@ impl Default for CommandOptions {
     }
 }
 
-pub fn positions(ctx: &mut Context, msg: &Message, conf: &Configuration) -> Option<Vec<usize>> {
+pub fn positions(ctx: &mut Context, msg: &mut Message, conf: &Configuration) -> Option<Vec<usize>> {
     // Mentions have the highest precedence.
     if let Some(mention_end) = find_mention_end(&msg.content, conf) {
         return Some(vec![mention_end]); // This can simply be returned without trying to find the end whitespaces as trim will remove it later

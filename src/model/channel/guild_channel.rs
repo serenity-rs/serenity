@@ -120,7 +120,7 @@ impl GuildChannel {
     /// ```
     #[cfg(feature = "utils")]
     pub fn create_invite<F>(&self, f: F) -> Result<RichInvite>
-        where F: FnOnce(CreateInvite) -> CreateInvite {
+        where F: FnOnce(&mut CreateInvite) -> &mut CreateInvite {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::CREATE_INVITE;
@@ -129,8 +129,10 @@ impl GuildChannel {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
+        let mut invite = CreateInvite::default();
+        f(&mut invite);
 
-        let map = serenity_utils::vecmap_to_json_map(f(CreateInvite::default()).0);
+        let map = serenity_utils::vecmap_to_json_map(invite.0);
 
         http::create_invite(self.id.0, &map)
     }
@@ -418,8 +420,8 @@ impl GuildChannel {
     /// [`Channel::messages`]: enum.Channel.html#method.messages
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
-    pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-        where F: FnOnce(GetMessages) -> GetMessages {
+    pub fn messages<F>(&mut self, f: F) -> Result<Vec<Message>>
+        where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
         self.id.messages(f)
     }
 
@@ -473,7 +475,7 @@ impl GuildChannel {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, msg: Message) {
+    ///     fn message(&self, _: Context, mut msg: Message) {
     ///         let channel = match CACHE.read().guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
@@ -580,7 +582,7 @@ impl GuildChannel {
     /// [`ChannelId`]: ../id/struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[inline]
-    pub fn say(&self, content: &str) -> Result<Message> { self.id.say(content) }
+    pub fn say(&mut self, content: &str) -> Result<Message> { self.id.say(content) }
 
     /// Sends (a) file(s) along with optional message contents.
     ///
@@ -601,8 +603,8 @@ impl GuildChannel {
     /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[inline]
-    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
+    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&mut self, files: It, f: F) -> Result<Message>
+        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b>, T: Into<AttachmentType<'a>> {
         self.id.send_files(files, f)
     }
 
@@ -625,7 +627,8 @@ impl GuildChannel {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [`Message`]: struct.Message.html
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
-    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+    pub fn send_message<F>(&mut self, f: F) -> Result<Message>
+    where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::SEND_MESSAGES;

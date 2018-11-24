@@ -84,18 +84,18 @@ impl Embed {
     /// ```rust,no_run
     /// use serenity::model::channel::Embed;
     ///
-    /// let embed = Embed::fake(|mut e| {
-    ///     e.title("Embed title");
-    ///     e.description("Making a basic embed");
-    ///     e.field("A field", "Has some content.", false);
-    ///
-    ///     e
+    /// let embed = Embed::fake(|e| {
+    ///     e.title("Embed title")
+    ///         .description("Making a basic embed")
+    ///         .field("A field", "Has some content.", false)
     /// });
     /// ```
     #[inline]
     pub fn fake<F>(f: F) -> Value
-        where F: FnOnce(CreateEmbed) -> CreateEmbed {
-        let map = utils::vecmap_to_json_map(f(CreateEmbed::default()).0);
+        where F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed {
+        let mut create_embed = CreateEmbed::default();
+        f(&mut create_embed);
+        let map = utils::vecmap_to_json_map(create_embed.0);
 
         Value::Object(map)
     }

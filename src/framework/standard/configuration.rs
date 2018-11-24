@@ -219,7 +219,7 @@ impl Configuration {
     /// let disabled = vec!["ping"].into_iter().map(|x| x.to_string()).collect();
     ///
     /// client.with_framework(StandardFramework::new()
-    ///     .on("ping", |_, msg, _| {
+    ///     .on("ping", |_, mut msg, _| {
     ///         msg.channel_id.say("Pong!")?;
     ///
     ///         Ok(())
@@ -253,7 +253,7 @@ impl Configuration {
     /// use serenity::framework::StandardFramework;
     ///
     /// client.with_framework(StandardFramework::new()
-    ///     .on("ping", |_, msg, _| {
+    ///     .on("ping", |_, mut msg, _| {
     ///         msg.channel_id.say("Pong!")?;
     ///
     ///         Ok(())
@@ -267,7 +267,7 @@ impl Configuration {
     ///     })));
     /// ```
     pub fn dynamic_prefix<F>(mut self, dynamic_prefix: F) -> Self
-        where F: Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static {
+        where F: Fn(&mut Context, &mut Message) -> Option<String> + Send + Sync + 'static {
         self.dynamic_prefix = Some(Box::new(dynamic_prefix));
 
         self

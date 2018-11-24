@@ -53,7 +53,7 @@ impl Attachment {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, message: Message) {
+    ///     fn message(&self, _: Context, mut message: Message) {
     ///         for attachment in message.attachments {
     ///             let content = match attachment.download() {
     ///                 Ok(content) => content,

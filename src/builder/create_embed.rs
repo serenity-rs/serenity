@@ -49,11 +49,15 @@ impl CreateEmbed {
     /// information.
     ///
     /// [`CreateEmbedAuthor`]: struct.CreateEmbedAuthor.html
-    pub fn author<F>(&mut self, f: F)
-        where F: FnOnce(CreateEmbedAuthor) -> CreateEmbedAuthor {
-        let map = utils::vecmap_to_json_map(f(CreateEmbedAuthor::default()).0);
+    pub fn author<F>(&mut self, f: F) -> &mut Self
+        where F: FnOnce(&mut CreateEmbedAuthor) -> &mut CreateEmbedAuthor {
+        let mut author = CreateEmbedAuthor::default();
+        f(&mut author);
+
+        let map = utils::vecmap_to_json_map(author.0);
 
         self.0.insert("author", Value::Object(map));
+        self
     }
 
     /// Set the colour of the left-hand side of the embed.
@@ -63,15 +67,17 @@ impl CreateEmbed {
     /// [`colour`]: #method.colour
     #[cfg(feature = "utils")]
     #[inline]
-    pub fn color<C: Into<Colour>>(&mut self, colour: C) {
+    pub fn color<C: Into<Colour>>(&mut self, colour: C) -> &mut Self {
         self.colour(colour);
+        self
     }
 
     /// Set the colour of the left-hand side of the embed.
     #[cfg(feature = "utils")]
     #[inline]
-    pub fn colour<C: Into<Colour>>(&mut self, colour: C) {
+    pub fn colour<C: Into<Colour>>(&mut self, colour: C) -> &mut Self {
         self._colour(colour.into());
+        self
     }
 
     #[cfg(feature = "utils")]
@@ -89,22 +95,25 @@ impl CreateEmbed {
     /// [`colour`]: #method.colour
     #[cfg(not(feature = "utils"))]
     #[inline]
-    pub fn color(self, colour: u32) {
+    pub fn color(&mut self, colour: u32) -> &mut Self {
         self.colour(colour);
+        self
     }
 
     /// Set the colour of the left-hand side of the embed.
     #[cfg(not(feature = "utils"))]
-    pub fn colour(&mut self, colour: u32) {
+    pub fn colour(&mut self, colour: u32) -> &mut Self {
         self.0.insert("color", Value::Number(Number::from(colour)));
+        self
     }
 
     /// Set the description of the embed.
     ///
     /// **Note**: This can't be longer than 2048 characters.
     #[inline]
-    pub fn description<D: Display>(&mut self, description: D) {
-        self._description(description.to_string())
+    pub fn description<D: Display>(&mut self, description: D) -> &mut Self {
+        self._description(description.to_string());
+        self
     }
 
     fn _description(&mut self, description: String) {
@@ -120,9 +129,10 @@ impl CreateEmbed {
     /// **Note**: Maximum amount of characters you can put is 256 in a field
     /// name and 1024 in a field value.
     #[inline]
-    pub fn field<T, U>(&mut self, name: T, value: U, inline: bool)
+    pub fn field<T, U>(&mut self, name: T, value: U, inline: bool)  -> &mut Self
         where T: Display, U: Display {
         self._field(&name.to_string(), &value.to_string(), inline);
+        self
     }
 
     fn _field(&mut self, name: &str, value: &str, inline: bool) {
@@ -146,13 +156,14 @@ impl CreateEmbed {
     /// This is sugar to reduce the need of calling [`field`] manually multiple times.
     ///
     /// [`field`]: #method.field
-    pub fn fields<T, U, It>(&mut self, fields: It)
+    pub fn fields<T, U, It>(&mut self, fields: It) -> &mut Self
         where It: IntoIterator<Item=(T, U, bool)>,
               T: Display,
               U: Display {
         for field in fields {
             self.field(field.0.to_string(), field.1.to_string(), field.2);
         }
+        self
     }
 
     /// Set the footer of the embed.
@@ -161,26 +172,29 @@ impl CreateEmbed {
     /// information.
     ///
     /// [`CreateEmbedFooter`]: struct.CreateEmbedFooter.html
-    pub fn footer<F>(&mut self, f: F)
+    pub fn footer<F>(&mut self, f: F) -> &mut Self
         where F: FnOnce(CreateEmbedFooter) -> CreateEmbedFooter {
         let footer = f(CreateEmbedFooter::default()).0;
         let map = utils::vecmap_to_json_map(footer);
 
         self.0.insert("footer", Value::Object(map));
+        self
     }
 
-    fn url_object(&mut self, name: &'static str, url: &str) {
+    fn url_object(&mut self, name: &'static str, url: &str) -> &mut Self {
         let obj = json!({
             "url": url.to_string()
         });
 
         self.0.insert(name, obj);
+        self
     }
 
     /// Set the image associated with the embed. This only supports HTTP(S).
     #[inline]
-    pub fn image<S: AsRef<str>>(&mut self, url: S) {
+    pub fn image<S: AsRef<str>>(&mut self, url: S) -> &mut Self {
         self._image(url.as_ref());
+        self
     }
 
     fn _image(&mut self, url: &str) {
@@ -189,8 +203,9 @@ impl CreateEmbed {
 
     /// Set the thumbnail of the embed. This only supports HTTP(S).
     #[inline]
-    pub fn thumbnail<S: AsRef<str>>(&mut self, url: S) {
+    pub fn thumbnail<S: AsRef<str>>(&mut self, url: S) -> &mut Self {
         self._thumbnail(url.as_ref());
+        self
     }
 
     fn _thumbnail(&mut self, url: &str) {
@@ -220,14 +235,11 @@ impl CreateEmbed {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, msg: Message) {
+    ///     fn message(&self, _: Context, mut msg: Message) {
     ///         if msg.content == "~embed" {
-    ///             let _ = msg.channel_id.send_message(|mut m| {
-    ///                 m.embed(|mut e| {
-    ///                     e.title("hello");
-    ///                     e.timestamp("2004-06-08T16:04:23");
-    ///
-    ///                     e
+    ///             let _ = msg.channel_id.send_message(|m| {
+    ///                 m.embed(|e| {
+    ///                     e.title("hello").timestamp("2004-06-08T16:04:23")
     ///                 });
     ///
     ///                 m
@@ -268,13 +280,10 @@ impl CreateEmbed {
     ///             if let Some(channel) = channel_search {
     ///                 let user = member.user.read();
     ///
-    ///                 let _ = channel.read().send_message(|mut m| {
-    ///                     m.embed(|mut e| {
-    ///                         e.author(|mut a| {
-    ///                             a.icon_url(&user.face());
-    ///                             a.name(&user.name);
-    ///
-    ///                             a
+    ///                 let _ = channel.write().send_message(|m| {
+    ///                     m.embed(|e| {
+    ///                         e.author(|a| {
+    ///                             a.icon_url(&user.face()).name(&user.name)
     ///                         });
     ///                         e.title("Member Join");
     ///
@@ -283,9 +292,7 @@ impl CreateEmbed {
     ///                         }
     ///
     ///                         e
-    ///                     });
-    ///
-    ///                     m
+    ///                     })
     ///                 });
     ///             }
     ///         }
@@ -297,8 +304,9 @@ impl CreateEmbed {
     /// client.start().unwrap();
     /// ```
     #[inline]
-    pub fn timestamp<T: Into<Timestamp>>(&mut self, timestamp: T) {
+    pub fn timestamp<T: Into<Timestamp>>(&mut self, timestamp: T) -> &mut Self {
         self._timestamp(timestamp.into());
+        self
     }
 
     fn _timestamp(&mut self, timestamp: Timestamp) {
@@ -307,8 +315,9 @@ impl CreateEmbed {
 
     /// Set the title of the embed.
     #[inline]
-    pub fn title<D: Display>(&mut self, title: D) {
+    pub fn title<D: Display>(&mut self, title: D) -> &mut Self {
         self._title(title.to_string());
+        self
     }
 
     fn _title(&mut self, title: String) {
@@ -317,8 +326,9 @@ impl CreateEmbed {
 
     /// Set the URL to direct to when clicking on the title.
     #[inline]
-    pub fn url<S: AsRef<str>>(&mut self, url: S) {
+    pub fn url<S: AsRef<str>>(&mut self, url: S) -> &mut Self {
         self._url(url.as_ref());
+        self
     }
 
     fn _url(&mut self, url: &str) {
@@ -334,8 +344,9 @@ impl CreateEmbed {
     ///
     /// [`image`]: #method.image
     #[inline]
-    pub fn attachment<S: AsRef<str>>(&mut self, filename: S) {
+    pub fn attachment<S: AsRef<str>>(&mut self, filename: S) -> &mut Self {
         self._attachment(filename.as_ref());
+        self
     }
 
     fn _attachment(&mut self, filename: &str) {
@@ -362,7 +373,7 @@ impl From<Embed> for CreateEmbed {
         b.colour(embed.colour);
 
         if let Some(author) = embed.author {
-            b.author(move |mut a| {
+            b.author(move |a| {
                 a.name(&author.name);
 
                 if let Some(icon_url) = author.icon_url {
@@ -434,19 +445,24 @@ pub struct CreateEmbedAuthor(pub VecMap<&'static str, Value>);
 
 impl CreateEmbedAuthor {
     /// Set the URL of the author's icon.
-    pub fn icon_url(&mut self, icon_url: &str) {
+    pub fn icon_url(&mut self, icon_url: &str) -> &mut Self {
         self.0.insert("icon_url", Value::String(icon_url.to_string()));
+        self
     }
 
     /// Set the author's name.
-    pub fn name(&mut self, name: &str) {
+    pub fn name(&mut self, name: &str) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
+        self
     }
 
     /// Set the author's URL.
-    pub fn url(&mut self, url: &str) {
+    pub fn url(&mut self, url: &str) -> &mut Self {
         self.0.insert("url", Value::String(url.to_string()));
+        self
     }
+
+    pub fn build(&mut self) {}
 }
 
 /// A builder to create a fake [`Embed`] object's footer, for use with the
@@ -461,13 +477,15 @@ pub struct CreateEmbedFooter(pub VecMap<&'static str, Value>);
 
 impl CreateEmbedFooter {
     /// Set the icon URL's value. This only supports HTTP(S).
-    pub fn icon_url(&mut self, icon_url: &str) {
+    pub fn icon_url(&mut self, icon_url: &str) -> &mut Self {
         self.0.insert("icon_url", Value::String(icon_url.to_string()));
+        self
     }
 
     /// Set the footer's text.
-    pub fn text<D: Display>(&mut self, text: D) {
+    pub fn text<D: Display>(&mut self, text: D) -> &mut Self {
         self.0.insert("text", Value::String(text.to_string()));
+        self
     }
 }
 

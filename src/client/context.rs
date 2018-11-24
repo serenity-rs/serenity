@@ -88,7 +88,7 @@ impl Context {
     /// ```
     #[cfg(feature = "builder")]
     #[deprecated(since = "0.5.6", note = "Use the http module instead.")]
-    pub fn edit_profile<F: FnOnce(EditProfile) -> EditProfile>(&self, f: F) -> Result<CurrentUser> {
+    pub fn edit_profile<F: FnOnce(&mut EditProfile) -> &mut EditProfile>(&self, f: F) -> Result<CurrentUser> {
         let mut map = VecMap::with_capacity(2);
 
         feature_cache! {
@@ -111,7 +111,10 @@ impl Context {
             }
         }
 
-        let edited = vecmap_to_json_map(f(EditProfile(map)).0);
+        let mut edit_profile = EditProfile(map);
+        f(&mut edit_profile);
+
+        let edited = vecmap_to_json_map(edit_profile.0);
 
         http::edit_profile(&edited)
     }

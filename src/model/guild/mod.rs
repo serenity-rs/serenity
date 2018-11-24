@@ -417,8 +417,8 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    pub fn create_role<F>(&self, f: F) -> Result<Role>
-        where F: FnOnce(EditRole) -> EditRole {
+    pub fn create_role<F>(&mut self, f: F) -> Result<Role>
+        where F: FnOnce(&mut EditRole) -> &mut EditRole {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_ROLES;
@@ -520,7 +520,7 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(EditGuild) -> EditGuild {
+        where F: FnOnce(&mut EditGuild) -> &mut EditGuild {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_GUILD;

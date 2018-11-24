@@ -75,7 +75,7 @@ impl Activity {
     /// use serenity::framework::standard::Args;
     /// use serenity::model::gateway::Activity;
     ///
-    /// command!(activity(ctx, _msg, args) {
+    /// command!(activity(ctx, msg, args) {
     ///     let name = args.full();
     ///     ctx.set_activity(Activity::playing(&name));
     /// });
@@ -115,7 +115,7 @@ impl Activity {
     /// use serenity::model::gateway::Activity;
     ///
     /// // Assumes command has min_args set to 2.
-    /// command!(stream(ctx, _msg, args) {
+    /// command!(stream(ctx, msg, args) {
     ///     # let stream_url = String::from("");
     ///     let name = args.full();
     ///     ctx.set_activity(Activity::streaming(&name, &stream_url));

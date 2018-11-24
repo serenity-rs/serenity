@@ -420,7 +420,7 @@ impl User {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, msg: Message) {
+    ///     fn message(&self, _: Context, mut msg: Message) {
     ///         if msg.content == "~help" {
     ///             let cache = CACHE.read();
     ///
@@ -438,10 +438,8 @@ impl User {
     ///                 url,
     ///             );
     ///
-    ///             let dm = msg.author.direct_message(|mut m| {
-    ///                 m.content(&help);
-    ///
-    ///                 m
+    ///             let dm = msg.author.direct_message(|m| {
+    ///                 m.content(&help)
     ///             });
     ///
     ///             match dm {
@@ -485,13 +483,13 @@ impl User {
     // (AKA: Clippy is wrong and so we have to mark as allowing this lint.)
     #[allow(let_and_return)]
     #[cfg(feature = "builder")]
-    pub fn direct_message<F>(&self, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
+    pub fn direct_message<F>(&mut self, f: F) -> Result<Message>
+        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         if self.bot {
             return Err(Error::Model(ModelError::MessagingBot));
         }
 
-        let private_channel_id = feature_cache! {
+        let mut private_channel_id = feature_cache! {
             {
                 let finding = {
                     let cache = CACHE.read();
@@ -547,7 +545,8 @@ impl User {
     /// [direct_message]: #method.direct_message
     #[cfg(feature = "builder")]
     #[inline]
-    pub fn dm<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+    pub fn dm<F>(&mut self, f: F) -> Result<Message>
+    where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         self.direct_message(f)
     }
 
@@ -701,7 +700,7 @@ impl User {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, msg: Message) {
+    ///     fn message(&self, _: Context, mut msg: Message) {
     ///         if msg.content == "!mytag" {
     ///             let content = MessageBuilder::new()
     ///                 .push("Your tag is ")

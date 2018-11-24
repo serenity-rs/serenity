@@ -199,11 +199,13 @@ impl Webhook {
     /// });
     /// ```
     #[inline]
-    pub fn execute<F: FnOnce(ExecuteWebhook) -> ExecuteWebhook>(&self,
+    pub fn execute<F: FnOnce(&mut ExecuteWebhook) -> &mut ExecuteWebhook>(&self,
                                                                 wait: bool,
                                                                 f: F)
                                                                 -> Result<Option<Message>> {
-        let map = utils::vecmap_to_json_map(f(ExecuteWebhook::default()).0);
+        let mut execute_webhook = ExecuteWebhook::default();
+        f(&mut execute_webhook);
+        let map = utils::vecmap_to_json_map(execute_webhook.0);
 
         http::execute_webhook(self.id.0, &self.token, wait, &map)
     }

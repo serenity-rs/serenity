@@ -354,9 +354,11 @@ impl ChannelId {
     ///
     /// [`Channel::messages`]: ../channel/enum.Channel.html#method.messages
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
-    pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-        where F: FnOnce(GetMessages) -> GetMessages {
-        let mut map = f(GetMessages::default()).0;
+    pub fn messages<F>(&mut self, f: F) -> Result<Vec<Message>>
+        where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
+        let mut get_messages = GetMessages::default();
+        f(&mut get_messages);
+        let mut map = get_messages.0;
         let mut query = format!("?limit={}", map.remove(&"limit").unwrap_or(50));
 
         if let Some(after) = map.remove(&"after") {
@@ -481,11 +483,9 @@ impl ChannelId {
     /// [`ChannelId`]: struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[inline]
-    pub fn say<D: ::std::fmt::Display>(&self, content: D) -> Result<Message> {
-        self.send_message(|mut m| {
-            m.content(content);
-
-            m
+    pub fn say<D: ::std::fmt::Display>(&mut self, content: D) -> Result<Message> {
+        self.send_message(|m| {
+            m.content(content)
         })
     }
 
@@ -506,14 +506,12 @@ impl ChannelId {
     /// ```rust,no_run
     /// use serenity::model::id::ChannelId;
     ///
-    /// let channel_id = ChannelId(7);
+    /// let mut channel_id = ChannelId(7);
     ///
     /// let paths = vec!["/path/to/file.jpg", "path/to/file2.jpg"];
     ///
-    /// let _ = channel_id.send_files(paths, |mut m| {
-    ///     m.content("a file");
-    ///
-    ///     m
+    /// let _ = channel_id.send_files(paths, |m| {
+    ///     m.content("a file")
     /// });
     /// ```
     ///
@@ -523,17 +521,15 @@ impl ChannelId {
     /// use serenity::model::id::ChannelId;
     /// use std::fs::File;
     ///
-    /// let channel_id = ChannelId(7);
+    /// let mut channel_id = ChannelId(7);
     ///
     /// let f1 = File::open("my_file.jpg").unwrap();
     /// let f2 = File::open("my_file2.jpg").unwrap();
     ///
     /// let files = vec![(&f1, "my_file.jpg"), (&f2, "my_file2.jpg")];
     ///
-    /// let _ = channel_id.send_files(files, |mut m| {
-    ///     m.content("a file");
-    ///
-    ///     m
+    /// let _ = channel_id.send_files(files, |m| {
+    ///     m.content("a file")
     /// });
     /// ```
     ///
@@ -554,9 +550,11 @@ impl ChannelId {
     /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "utils")]
-    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
-        let mut msg = f(CreateMessage::default());
+    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&mut self, files: It, f: F) -> Result<Message>
+        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b>, T: Into<AttachmentType<'a>> {
+        let mut create_message = CreateMessage::default();
+        let msg = f(&mut create_message);
+
 
         if let Some(content) = msg.0.get(&"content") {
             if let Value::String(ref content) = *content {
@@ -570,7 +568,7 @@ impl ChannelId {
             msg.0.insert("payload_json", json!({ "embed": e }));
         }
 
-        let map = utils::vecmap_to_json_map(msg.0);
+        let map = utils::vecmap_to_json_map(msg.0.clone());
         http::send_files(self.0, files, map)
     }
 
@@ -594,9 +592,10 @@ impl ChannelId {
     /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "utils")]
-    pub fn send_message<F>(&self, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
-        let mut msg = f(CreateMessage::default());
+    pub fn send_message<F>(&mut self, f: F) -> Result<Message>
+        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
+        let mut create_message = CreateMessage::default();
+        let msg = f(&mut create_message);
 
         if !msg.2.is_empty() {
             if let Some(e) = msg.0.remove(&"embed") {
@@ -604,7 +603,7 @@ impl ChannelId {
             }
         }
 
-        let map = utils::vecmap_to_json_map(msg.0);
+        let map = utils::vecmap_to_json_map(msg.0.clone());
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
@@ -612,10 +611,10 @@ impl ChannelId {
         let message = if msg.2.is_empty() {
             http::send_message(self.0, &Value::Object(map))?
         } else {
-            http::send_files(self.0, msg.2, map)?
+            http::send_files(self.0, msg.2.clone(), map)?
         };
 
-        if let Some(reactions) = msg.1 {
+        if let Some(reactions) = msg.1.clone() {
             for reaction in reactions {
                 self.create_reaction(message.id, reaction)?;
             }

@@ -80,7 +80,7 @@ use self::bridge::voice::ClientVoiceManager;
 /// struct Handler;
 ///
 /// impl EventHandler for Handler {
-///     fn on_message(&self, _: Context, msg: Message) {
+///     fn on_message(&self, _: Context, mut msg: Message) {
 ///         if msg.content == "!ping" {
 ///             let _ = msg.channel_id.say("Pong!");
 ///         }
@@ -412,7 +412,7 @@ impl Client {
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
     /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
-    ///     .on("ping", |_, msg, _| {
+    ///     .on("ping", |_, mut msg, _| {
     ///         msg.channel_id.say("Pong!")?;
     ///
     ///         Ok(())

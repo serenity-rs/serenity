@@ -619,13 +619,13 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
 /// Sends an embed listing all groups with their commands.
 fn send_grouped_commands_embed(
     help_options: &HelpOptions,
-    channel_id: ChannelId,
+    mut channel_id: ChannelId,
     help_description: &str,
     groups: &[GroupCommandsPair],
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id.send_message(|mut m| {
-        m.embed(|mut embed| {
+    channel_id.send_message(|m| {
+        m.embed(|embed| {
             embed.colour(colour);
             embed.description(help_description);
 
@@ -654,12 +654,12 @@ fn send_grouped_commands_embed(
 /// Sends embed showcasing information about a single command.
 fn send_single_command_embed(
     help_options: &HelpOptions,
-    channel_id: ChannelId,
+    mut channel_id: ChannelId,
     command: &Command,
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id.send_message(|mut m| {
-        m.embed(|mut embed| {
+    channel_id.send_message(|m| {
+        m.embed(|embed| {
             embed.title(&command.name);
             embed.colour(colour);
 
@@ -696,15 +696,15 @@ fn send_single_command_embed(
 
 /// Sends embed listing commands that are similar to the sent one.
 fn send_suggestion_embed(
-    channel_id: ChannelId,
+    mut channel_id: ChannelId,
     help_description: &str,
     suggestions: &Suggestions,
     colour: Colour,
 ) -> Result<Message, Error> {
     let text = format!("{}", help_description.replace("{}", &suggestions.join("`, `")));
 
-    channel_id.send_message(|mut m| {
-        m.embed(|mut e|  { 
+    channel_id.send_message(|m| {
+        m.embed(|e|  {
             e.colour(colour);
             e.description(text);
             e
@@ -714,9 +714,9 @@ fn send_suggestion_embed(
 }
 
 /// Sends an embed explaining fetching commands failed.
-fn send_error_embed(channel_id: ChannelId, input: &str, colour: Colour) -> Result<Message, Error> {
-    channel_id.send_message(|mut m| {
-        m.embed(|mut e| {
+fn send_error_embed(mut channel_id: ChannelId, input: &str, colour: Colour) -> Result<Message, Error> {
+    channel_id.send_message(|m| {
+        m.embed(|e| {
             e.colour(colour);
             e.description(input);
             e
@@ -746,7 +746,7 @@ fn send_error_embed(channel_id: ChannelId, input: &str, colour: Colour) -> Resul
 #[cfg(feature = "cache")]
 pub fn with_embeds<H: BuildHasher>(
     _: &mut Context,
-    msg: &Message,
+    msg: &mut Message,
     help_options: &HelpOptions,
     groups: HashMap<String, Arc<CommandGroup>, H>,
     args: &Args
@@ -859,7 +859,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command)
 #[cfg(feature = "cache")]
 pub fn plain<H: BuildHasher>(
     _: &mut Context,
-    msg: &Message,
+    msg: &mut Message,
     help_options: &HelpOptions,
     groups: HashMap<String, Arc<CommandGroup>, H>,
     args: &Args

@@ -16,8 +16,9 @@ impl EditMember {
     /// Requires the [Deafen Members] permission.
     ///
     /// [Deafen Members]: ../model/permissions/struct.Permissions.html#associatedconstant.DEAFEN_MEMBERS
-    pub fn deafen(&mut self, deafen: bool) {
+    pub fn deafen(&mut self, deafen: bool) -> &mut Self {
         self.0.insert("deaf", Value::Bool(deafen));
+        self
     }
 
     /// Whether to mute the member.
@@ -25,8 +26,9 @@ impl EditMember {
     /// Requires the [Mute Members] permission.
     ///
     /// [Mute Members]: ../model/permissions/struct.Permissions.html#associatedconstant.MUTE_MEMBERS
-    pub fn mute(&mut self, mute: bool) {
+    pub fn mute(&mut self, mute: bool) -> &mut Self {
         self.0.insert("mute", Value::Bool(mute));
+        self
     }
 
     /// Changes the member's nickname. Pass an empty string to reset the
@@ -35,8 +37,9 @@ impl EditMember {
     /// Requires the [Manage Nicknames] permission.
     ///
     /// [Manage Nicknames]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_NICKNAMES
-    pub fn nickname(&mut self, nickname: &str) {
+    pub fn nickname(&mut self, nickname: &str) -> &mut Self {
         self.0.insert("nick", Value::String(nickname.to_string()));
+        self
     }
 
     /// Set the list of roles that the member should have.
@@ -44,13 +47,14 @@ impl EditMember {
     /// Requires the [Manage Roles] permission to modify.
     ///
     /// [Manage Roles]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    pub fn roles<T: AsRef<RoleId>, It: IntoIterator<Item=T>>(&mut self, roles: It) {
+    pub fn roles<T: AsRef<RoleId>, It: IntoIterator<Item=T>>(&mut self, roles: It) -> &mut Self {
         let role_ids = roles
             .into_iter()
             .map(|x| Value::Number(Number::from(x.as_ref().0)))
             .collect();
 
         self._roles(role_ids);
+        self
     }
 
     fn _roles(&mut self, roles: Vec<Value>) {
