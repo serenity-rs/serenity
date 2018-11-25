@@ -87,7 +87,7 @@ impl CreateGroup {
     /// Adds a command to group with a simplified API.
     /// You can return Err(From::from(string)) if there's an error.
     pub fn on(self, name: &str,
-            f: fn(&mut Context, &mut Message, Args) -> Result<(), CommandError>) -> Self {
+            f: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> Self {
         self.cmd(name, f)
     }
 
@@ -213,7 +213,7 @@ impl CreateGroup {
     ///
     /// **Note**: These checks are bypassed for commands sent by the application owner.
     pub fn check<F>(mut self, check: F) -> Self
-        where F: Fn(&mut Context, &mut Message, &mut Args, &CommandOptions) -> bool
+        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
                      + Send
                      + Sync
                      + 'static {

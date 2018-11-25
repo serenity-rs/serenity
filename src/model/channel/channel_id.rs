@@ -507,7 +507,7 @@ impl ChannelId {
     /// ```rust,no_run
     /// use serenity::model::id::ChannelId;
     ///
-    /// let mut channel_id = ChannelId(7);
+    /// let channel_id = ChannelId(7);
     ///
     /// let paths = vec!["/path/to/file.jpg", "path/to/file2.jpg"];
     ///
@@ -522,7 +522,7 @@ impl ChannelId {
     /// use serenity::model::id::ChannelId;
     /// use std::fs::File;
     ///
-    /// let mut channel_id = ChannelId(7);
+    /// let channel_id = ChannelId(7);
     ///
     /// let f1 = File::open("my_file.jpg").unwrap();
     /// let f2 = File::open("my_file2.jpg").unwrap();

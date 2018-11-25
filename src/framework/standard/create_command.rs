@@ -15,7 +15,7 @@ use model::{
 use std::sync::Arc;
 
 pub enum FnOrCommand {
-    Fn(fn(&mut Context, &mut Message, Args) -> Result<(), CommandError>),
+    Fn(fn(&mut Context, &Message, Args) -> Result<(), CommandError>),
     Command(Arc<Command>),
     CommandWithOptions(Arc<Command>),
 }
@@ -27,8 +27,8 @@ impl Default for FnOrCommand {
 }
 
 type Init = Fn() + Send + Sync + 'static;
-type Before = Fn(&mut Context, &mut Message) -> bool + Send + Sync + 'static;
-type After = Fn(&mut Context, &mut Message, &Result<(), CommandError>) + Send + Sync + 'static;
+type Before = Fn(&mut Context, &Message) -> bool + Send + Sync + 'static;
+type After = Fn(&mut Context, &Message, &Result<(), CommandError>) + Send + Sync + 'static;
 
 #[derive(Default)]
 pub struct Handlers {
@@ -91,21 +91,21 @@ impl CreateCommand {
     ///         .desc("Replies to a ping with a pong")
     ///         .exec(ping)));
     ///
-    /// fn ping(_context: &mut Context, mut message: &mut Message, _args: Args) -> Result<(),
+    /// fn ping(_context: &mut Context, message: &Message, _args: Args) -> Result<(),
     /// CommandError> {
     ///     message.channel_id.say("Pong!")?;
     ///
     ///     Ok(())
     /// }
     ///
-    /// fn owner_check(_context: &mut Context, message: &mut Message, _: &mut Args, _:
+    /// fn owner_check(_context: &mut Context, message: &Message, _: &mut Args, _:
     /// &CommandOptions) -> bool {
     ///     // replace with your user ID
     ///     message.author.id == 7
     /// }
     /// ```
     pub fn check<F>(mut self, check: F) -> Self
-        where F: Fn(&mut Context, &mut Message, &mut Args, &CommandOptions) -> bool
+        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
                      + Send
                      + Sync
                      + 'static {
@@ -137,7 +137,7 @@ impl CreateCommand {
 
     /// A function that can be called when a command is received.
     /// You can return `Err(string)` if there's an error.
-    pub fn exec(mut self, func: fn(&mut Context, &mut Message, Args) -> Result<(), CommandError>) -> Self {
+    pub fn exec(mut self, func: fn(&mut Context, &Message, Args) -> Result<(), CommandError>) -> Self {
         self.1 = FnOrCommand::Fn(func);
 
         self
@@ -255,7 +255,7 @@ impl CreateCommand {
     ///
     /// This is similar to implementing the `before` function on `Command`.
     pub fn before<F: Send + Sync + 'static>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &mut Message) -> bool {
+        where F: Fn(&mut Context, &Message) -> bool {
         self.2.before = Some(Arc::new(f));
 
         self
@@ -265,7 +265,7 @@ impl CreateCommand {
     ///
     /// This is similar to implementing the `after` function on `Command`.
     pub fn after<F: Send + Sync + 'static>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &mut Message, &Result<(), CommandError>) {
+        where F: Fn(&mut Context, &Message, &Result<(), CommandError>) {
         self.2.after = Some(Arc::new(f));
 
         self
@@ -275,7 +275,7 @@ impl CreateCommand {
         struct A<C: Command>(Arc<CommandOptions>, C, Handlers);
 
         impl<C: Command> Command for A<C> {
-            fn execute(&self, c: &mut Context, m: &mut Message, a: Args) -> Result<(), CommandError> {
+            fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), CommandError> {
                 self.1.execute(c, m, a)
             }
 
@@ -287,7 +287,7 @@ impl CreateCommand {
                 }
             }
 
-            fn before(&self, c: &mut Context, m: &mut Message) -> bool {
+            fn before(&self, c: &mut Context, m: &Message) -> bool {
                 if let Some(ref before) = self.2.before {
                     return (before)(c, m);
                 }
@@ -295,7 +295,7 @@ impl CreateCommand {
                 true
             }
 
-            fn after(&self, c: &mut Context, m: &mut Message, res: &Result<(), CommandError>) {
+            fn after(&self, c: &mut Context, m: &Message, res: &Result<(), CommandError>) {
                 if let Some(ref after) = self.2.after {
                     (after)(c, m, res);
                 }

@@ -199,7 +199,7 @@ impl Group {
     ///
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
-    pub fn messages<F>(&mut self, f: F) -> Result<Vec<Message>>
+    pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
         self.channel_id.messages(f)
     }

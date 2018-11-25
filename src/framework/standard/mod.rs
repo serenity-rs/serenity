@@ -101,7 +101,7 @@ macro_rules! command {
         impl $crate::framework::standard::Command for $fname {
             #[allow(unreachable_code, unused_mut)]
             fn execute(&self, mut $c: &mut $crate::client::Context,
-                      _: &mut $crate::model::channel::Message,
+                      _: &$crate::model::channel::Message,
                       _: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
 
@@ -118,7 +118,7 @@ macro_rules! command {
         impl $crate::framework::standard::Command for $fname {
             #[allow(unreachable_code, unused_mut)]
             fn execute(&self, mut $c: &mut $crate::client::Context,
-                      mut $m: &mut $crate::model::channel::Message,
+                      $m: &$crate::model::channel::Message,
                       _: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
 
@@ -135,7 +135,7 @@ macro_rules! command {
         impl $crate::framework::standard::Command for $fname {
             #[allow(unreachable_code, unused_mut)]
             fn execute(&self, mut $c: &mut $crate::client::Context,
-                      mut $m: &mut $crate::model::channel::Message,
+                      $m: &$crate::model::channel::Message,
                       mut $a: $crate::framework::standard::Args)
                       -> ::std::result::Result<(), $crate::framework::standard::CommandError> {
 
@@ -299,7 +299,7 @@ impl StandardFramework {
     ///     .bucket("basic", 2, 10, 3)
     ///     .command("ping", |c| c
     ///         .bucket("basic")
-    ///         .exec(|_, mut msg, _| {
+    ///         .exec(|_, msg, _| {
     ///             msg.channel_id.say("pong!")?;
     ///
     ///             Ok(())
@@ -343,7 +343,7 @@ impl StandardFramework {
     ///     })
     ///     .command("ping", |c| c
     ///         .bucket("basic")
-    ///         .exec(|_, mut msg, _| {
+    ///         .exec(|_, msg, _| {
     ///             msg.channel_id.say("pong!")?;
     ///
     ///             Ok(())
@@ -453,7 +453,7 @@ impl StandardFramework {
     ///     .simple_bucket("simple", 2)
     ///     .command("ping", |c| c
     ///         .bucket("simple")
-    ///         .exec(|_, mut msg, _| { msg.channel_id.say("pong!")?; Ok(()) })));
+    ///         .exec(|_, msg, _| { msg.channel_id.say("pong!")?; Ok(()) })));
     /// ```
     pub fn simple_bucket(mut self, s: &str, delay: i64) -> Self {
         self.buckets.insert(
@@ -501,7 +501,7 @@ impl StandardFramework {
     #[cfg_attr(feature = "cargo-clippy", allow(cyclomatic_complexity))]
     fn should_fail(&mut self,
                    mut context: &mut Context,
-                   message: &mut Message,
+                   message: &Message,
                    command: &Arc<CommandOptions>,
                    group: &Arc<CommandGroup>,
                    args: &mut Args,
@@ -678,7 +678,7 @@ impl StandardFramework {
     /// # }
     /// ```
     pub fn on(self, name: &str,
-            f: fn(&mut Context, &mut Message, Args)
+            f: fn(&mut Context, &Message, Args)
             -> Result<(), CommandError>) -> Self {
         self.cmd(name, f)
     }
@@ -789,8 +789,8 @@ impl StandardFramework {
     ///
     /// client.with_framework(StandardFramework::new()
     ///     .group("ping-pong", |g| g
-    ///         .on("ping", |_, mut msg, _| { msg.channel_id.say("pong!")?; Ok(()) })
-    ///         .on("pong", |_, mut msg, _| { msg.channel_id.say("ping!")?; Ok(()) })));
+    ///         .on("ping", |_, msg, _| { msg.channel_id.say("pong!")?; Ok(()) })
+    ///         .on("pong", |_, msg, _| { msg.channel_id.say("ping!")?; Ok(()) })));
     /// ```
     pub fn group<F>(mut self, group_name: &str, f: F) -> Self
         where F: FnOnce(CreateGroup) -> CreateGroup {
@@ -822,7 +822,7 @@ impl StandardFramework {
     /// use serenity::framework::StandardFramework;
     ///
     /// client.with_framework(StandardFramework::new()
-    ///     .on_dispatch_error(|_, mut msg, error| {
+    ///     .on_dispatch_error(|_, msg, error| {
     ///         match error {
     ///             NotEnoughArguments { min, given } => {
     ///                 let s = format!("Need {} arguments, but only got {}.", min, given);
@@ -895,7 +895,7 @@ impl StandardFramework {
     /// ```
     ///
     pub fn before<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &mut Message, &str) -> bool + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static {
         self.before = Some(Arc::new(f));
 
         self
@@ -926,7 +926,7 @@ impl StandardFramework {
     ///     }));
     /// ```
     pub fn after<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &mut Message, &str, Result<(), CommandError>) + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, &str, Result<(), CommandError>) + Send + Sync + 'static {
         self.after = Some(Arc::new(f));
 
         self
@@ -951,7 +951,7 @@ impl StandardFramework {
     ///     .unrecognised_command(|ctx, msg, unrecognised_command_name| { }));
     /// ```
     pub fn unrecognised_command<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &mut Message, &str) + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message, &str) + Send + Sync + 'static {
         self.unrecognised_command = Some(Arc::new(f));
 
         self
@@ -976,7 +976,7 @@ impl StandardFramework {
     ///     .message_without_command(|ctx, msg| { }));
     /// ```
     pub fn message_without_command<F>(mut self, f: F) -> Self
-        where F: Fn(&mut Context, &mut Message) + Send + Sync + 'static {
+        where F: Fn(&mut Context, &Message) + Send + Sync + 'static {
         self.message_without_command = Some(Arc::new(f));
 
         self
@@ -1022,10 +1022,10 @@ impl Framework for StandardFramework {
     fn dispatch(
         &mut self,
         mut context: Context,
-        mut message: Message,
+        message: Message,
         threadpool: &ThreadPool,
     ) {
-        let res = command::positions(&mut context, &mut message, &self.configuration);
+        let res = command::positions(&mut context, &message, &self.configuration);
         let mut unrecognised_command_name = String::from("");
 
         let positions = match res {
@@ -1046,23 +1046,23 @@ impl Framework for StandardFramework {
 
                         threadpool.execute(move || {
                             if let Some(before) = before {
-                                if !(before)(&mut context, &mut message, "") {
+                                if !(before)(&mut context, &message, "") {
                                     return;
                                 }
                             }
 
-                            if !prefix_only_cmd.before(&mut context, &mut message) {
+                            if !prefix_only_cmd.before(&mut context, &message) {
                                 return;
                             }
 
                             let result = prefix_only_cmd.execute(&mut context,
-                                &mut message, Args::new("", &Vec::new()));
+                                &message, Args::new("", &Vec::new()));
 
-                            prefix_only_cmd.after(&mut context, &mut message,
+                            prefix_only_cmd.after(&mut context, &message,
                                 &result);
 
                             if let Some(after) = after {
-                                (after)(&mut context, &mut message, "", result);
+                                (after)(&mut context, &message, "", result);
                             }
                         });
                     }
@@ -1078,7 +1078,7 @@ impl Framework for StandardFramework {
                     if !(self.configuration.ignore_bots && message.author.bot) {
                         let message_without_command = message_without_command.clone();
                         threadpool.execute(move || {
-                            (message_without_command)(&mut context, &mut message);
+                            (message_without_command)(&mut context, &message);
                         });
                     }
                 }
@@ -1165,15 +1165,15 @@ impl Framework for StandardFramework {
 
                                 if let Some(before) = before {
 
-                                    if !(before)(&mut context, &mut message, &built) {
+                                    if !(before)(&mut context, &message, &built) {
                                         return;
                                     }
                                 }
 
-                                let result = (help.0)(&mut context, &mut message, &help.1, groups, &args);
+                                let result = (help.0)(&mut context, &message, &help.1, groups, &args);
 
                                 if let Some(after) = after {
-                                    (after)(&mut context, &mut message, &built, result);
+                                    (after)(&mut context, &message, &built, result);
                                 }
                             });
                             return;
@@ -1189,7 +1189,7 @@ impl Framework for StandardFramework {
 
                             if let Some(error) = self.should_fail(
                                 &mut context,
-                                &mut message,
+                                &message,
                                 &command.options(),
                                 &group,
                                 &mut args,
@@ -1204,21 +1204,21 @@ impl Framework for StandardFramework {
 
                             threadpool.execute(move || {
                                 if let Some(before) = before {
-                                    if !(before)(&mut context, &mut message, &built) {
+                                    if !(before)(&mut context, &message, &built) {
                                         return;
                                     }
                                 }
 
-                                if !command.before(&mut context, &mut message) {
+                                if !command.before(&mut context, &message) {
                                     return;
                                 }
 
-                                let result = command.execute(&mut context, &mut message, args);
+                                let result = command.execute(&mut context, &message, args);
 
-                                command.after(&mut context, &mut message, &result);
+                                command.after(&mut context, &message, &result);
 
                                 if let Some(after) = after {
-                                    (after)(&mut context, &mut message, &built, result);
+                                    (after)(&mut context, &message, &built, result);
                                 }
                             });
 
@@ -1237,7 +1237,7 @@ impl Framework for StandardFramework {
 
                             if let Some(error) = self.should_fail(
                                 &mut context,
-                                &mut message,
+                                &message,
                                 &command.options(),
                                 &group,
                                 &mut args,
@@ -1252,21 +1252,21 @@ impl Framework for StandardFramework {
 
                             threadpool.execute(move || {
                                 if let Some(before) = before {
-                                    if !(before)(&mut context, &mut message, &args.full()) {
+                                    if !(before)(&mut context, &message, &args.full()) {
                                         return;
                                     }
                                 }
 
-                                if !command.before(&mut context, &mut message) {
+                                if !command.before(&mut context, &message) {
                                     return;
                                 }
 
-                                let result = command.execute(&mut context, &mut message, args);
+                                let result = command.execute(&mut context, &message, args);
 
-                                command.after(&mut context, &mut message, &result);
+                                command.after(&mut context, &message, &result);
 
                                 if let Some(after) = after {
-                                    (after)(&mut context, &mut message, &built, result);
+                                    (after)(&mut context, &message, &built, result);
                                 }
                             });
 
@@ -1289,24 +1289,24 @@ impl Framework for StandardFramework {
 
                     let unrecognised_command = unrecognised_command.clone();
                     threadpool.execute(move || {
-                        (unrecognised_command)(&mut context_unrecognised, &mut message_unrecognised,
+                        (unrecognised_command)(&mut context_unrecognised, &message_unrecognised,
                         &unrecognised_command_name);
                     });
 
                     let message_without_command = message_without_command.clone();
                         threadpool.execute(move || {
-                            (message_without_command)(&mut context, &mut message);
+                            (message_without_command)(&mut context, &message);
                     });
                 } else {
                     let unrecognised_command = unrecognised_command.clone();
                     threadpool.execute(move || {
-                        (unrecognised_command)(&mut context, &mut message, &unrecognised_command_name);
+                        (unrecognised_command)(&mut context, &message, &unrecognised_command_name);
                     });
                 }
             } else if let &Some(ref message_without_command) = &self.message_without_command {
                 let message_without_command = message_without_command.clone();
                     threadpool.execute(move || {
-                        (message_without_command)(&mut context, &mut message);
+                        (message_without_command)(&mut context, &message);
                 });
             }
         }

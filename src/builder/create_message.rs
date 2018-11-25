@@ -25,7 +25,7 @@ use utils::{self, VecMap};
 /// ```rust,no_run
 /// use serenity::model::id::ChannelId;
 ///
-/// let mut channel_id = ChannelId(7);
+/// let channel_id = ChannelId(7);
 ///
 /// let _ = channel_id.send_message(|m| {
 ///     m.content("test");

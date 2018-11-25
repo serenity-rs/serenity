@@ -443,7 +443,7 @@ impl Cache {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, ctx: Context, mut message: Message) {
+    ///     fn message(&self, ctx: Context, message: Message) {
     ///         let cache = CACHE.read();
     ///
     ///         let channel = match cache.guild_channel(message.channel_id) {
@@ -536,7 +536,7 @@ impl Cache {
     ///
     /// let cache = CACHE.read();
     /// let member = {
-    ///     let mut channel = match cache.guild_channel(message.channel_id) {
+    ///     let channel = match cache.guild_channel(message.channel_id) {
     ///         Some(channel) => channel,
     ///         None => {
     ///             if let Err(why) = message.channel_id.say("Error finding channel data") {

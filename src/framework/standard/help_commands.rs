@@ -746,7 +746,7 @@ fn send_error_embed(channel_id: ChannelId, input: &str, colour: Colour) -> Resul
 #[cfg(feature = "cache")]
 pub fn with_embeds<H: BuildHasher>(
     _: &mut Context,
-    msg: &mut Message,
+    msg: &Message,
     help_options: &HelpOptions,
     groups: HashMap<String, Arc<CommandGroup>, H>,
     args: &Args
@@ -859,7 +859,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command)
 #[cfg(feature = "cache")]
 pub fn plain<H: BuildHasher>(
     _: &mut Context,
-    msg: &mut Message,
+    msg: &Message,
     help_options: &HelpOptions,
     groups: HashMap<String, Arc<CommandGroup>, H>,
     args: &Args

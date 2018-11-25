@@ -417,7 +417,7 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    pub fn create_role<F>(&mut self, f: F) -> Result<Role>
+    pub fn create_role<F>(&self, f: F) -> Result<Role>
         where F: FnOnce(&mut EditRole) -> &mut EditRole {
         #[cfg(feature = "cache")]
         {

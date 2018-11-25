@@ -19,7 +19,7 @@ use utils::VecMap;
 /// struct Handler;
 ///
 /// impl EventHandler for Handler {
-///     fn message(&self, _: Context, mut msg: Message) {
+///     fn message(&self, _: Context, msg: Message) {
 ///         use serenity::CACHE;
 ///         if msg.content == "!createinvite" {
 ///             let channel = match CACHE.read().guild_channel(msg.channel_id) {
