@@ -175,7 +175,7 @@ impl PrivateChannel {
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
-        where F: FnOnce(GetMessages) -> GetMessages {
+        where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
         self.id.messages(f)
     }
 
@@ -249,8 +249,9 @@ impl PrivateChannel {
     /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[inline]
-    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage, T: Into<AttachmentType<'a>> {
+    pub fn send_files<'a, F, T, It>(&self, files: It, f: F) -> Result<Message>
+        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b>,
+              T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T> {
         self.id.send_files(files, f)
     }
 
@@ -269,7 +270,8 @@ impl PrivateChannel {
     /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
     #[inline]
-    pub fn send_message<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+    pub fn send_message<F>(&self, f: F) -> Result<Message>
+    where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         self.id.send_message(f)
     }
 

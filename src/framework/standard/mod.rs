@@ -400,7 +400,7 @@ impl StandardFramework {
     ///     })
     ///     .command("ping", |c| c
     ///         .bucket("basic")
-    ///         .exec(|_, msg, _| {
+    ///         .exec(|_, mut msg, _| {
     ///             msg.channel_id.say("pong!")?;
     ///
     ///             Ok(())
@@ -670,7 +670,7 @@ impl StandardFramework {
     /// #
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new().on("ping", |_, msg, _| {
+    /// client.with_framework(StandardFramework::new().on("ping", |_, mut msg, _| {
     ///     msg.channel_id.say("pong!")?;
     ///
     ///     Ok(())
@@ -1285,7 +1285,7 @@ impl Framework for StandardFramework {
                 // `Message`, else we can avoid it.
                 if let &Some(ref message_without_command) = &self.message_without_command {
                     let mut context_unrecognised = context.clone();
-                    let message_unrecognised = message.clone();
+                    let mut message_unrecognised = message.clone();
 
                     let unrecognised_command = unrecognised_command.clone();
                     threadpool.execute(move || {
