@@ -215,7 +215,7 @@ impl Message {
     /// [`EditMessage`]: ../../builder/struct.EditMessage.html
     /// [`the limit`]: ../../builder/struct.EditMessage.html#method.content
     pub fn edit<F>(&mut self, f: F) -> Result<()>
-        where F: FnOnce(EditMessage) -> EditMessage {
+        where F: FnOnce(&mut EditMessage) -> &mut EditMessage {
         #[cfg(feature = "cache")]
         {
             if self.author.id != CACHE.read().user.id {
@@ -230,10 +230,16 @@ impl Message {
         }
 
         if let Some(embed) = self.embeds.get(0) {
-            builder.embed(|_| CreateEmbed::from(embed.clone()));
+            let mut embed = CreateEmbed::from(embed.clone());
+            builder.embed( |e| {
+                *e = embed;
+                e
+            });
         }
 
-        let map = serenity_utils::vecmap_to_json_map(f(builder).0);
+        f(&mut builder);
+
+        let map = serenity_utils::vecmap_to_json_map(builder.0);
 
         match http::edit_message(self.channel_id.0, self.id.0, &Value::Object(map)) {
             Ok(edited) => {

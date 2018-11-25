@@ -624,8 +624,8 @@ fn send_grouped_commands_embed(
     groups: &[GroupCommandsPair],
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id.send_message(|mut m| {
-        m.embed(|mut embed| {
+    channel_id.send_message(|m| {
+        m.embed(|embed| {
             embed.colour(colour);
             embed.description(help_description);
 
@@ -658,8 +658,8 @@ fn send_single_command_embed(
     command: &Command,
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id.send_message(|mut m| {
-        m.embed(|mut embed| {
+    channel_id.send_message(|m| {
+        m.embed(|embed| {
             embed.title(&command.name);
             embed.colour(colour);
 
@@ -703,8 +703,8 @@ fn send_suggestion_embed(
 ) -> Result<Message, Error> {
     let text = format!("{}", help_description.replace("{}", &suggestions.join("`, `")));
 
-    channel_id.send_message(|mut m| {
-        m.embed(|mut e|  { 
+    channel_id.send_message(|m| {
+        m.embed(|e|  {
             e.colour(colour);
             e.description(text);
             e
@@ -715,8 +715,8 @@ fn send_suggestion_embed(
 
 /// Sends an embed explaining fetching commands failed.
 fn send_error_embed(channel_id: ChannelId, input: &str, colour: Colour) -> Result<Message, Error> {
-    channel_id.send_message(|mut m| {
-        m.embed(|mut e| {
+    channel_id.send_message(|m| {
+        m.embed(|e| {
             e.colour(colour);
             e.description(input);
             e

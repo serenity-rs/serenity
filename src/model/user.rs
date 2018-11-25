@@ -438,10 +438,8 @@ impl User {
     ///                 url,
     ///             );
     ///
-    ///             let dm = msg.author.direct_message(|mut m| {
-    ///                 m.content(&help);
-    ///
-    ///                 m
+    ///             let dm = msg.author.direct_message(|m| {
+    ///                 m.content(&help)
     ///             });
     ///
     ///             match dm {
@@ -487,7 +485,7 @@ impl User {
     #[allow(let_and_return)]
     #[cfg(feature = "builder")]
     pub fn direct_message<F>(&self, f: F) -> Result<Message>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
+        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         if self.bot {
             return Err(Error::Model(ModelError::MessagingBot));
         }
@@ -548,7 +546,8 @@ impl User {
     /// [direct_message]: #method.direct_message
     #[cfg(feature = "builder")]
     #[inline]
-    pub fn dm<F: FnOnce(CreateMessage) -> CreateMessage>(&self, f: F) -> Result<Message> {
+    pub fn dm<F>(&self, f: F) -> Result<Message>
+    where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         self.direct_message(f)
     }
 

@@ -28,12 +28,8 @@ use utils::VecMap;
 /// #
 /// // assuming a `channel_id` and `guild_id` has been bound
 ///
-/// let role = guild_id.create_role(|mut r| {
-///     r.hoist(true);
-///     r.mentionable(true);
-///     r.name("a test role");
-///
-///     r
+/// let role = guild_id.create_role(|r| {
+///     r.hoist(true).mentionable(true).name("a test role")
 /// });
 /// ```
 ///
@@ -75,37 +71,43 @@ impl EditRole {
     }
 
     /// Sets the colour of the role.
-    pub fn colour(&mut self, colour: u64) {
+    pub fn colour(&mut self, colour: u64) -> &mut Self {
         self.0.insert("color", Value::Number(Number::from(colour)));
+        self
     }
 
     /// Whether or not to hoist the role above lower-positioned role in the user
     /// list.
-    pub fn hoist(&mut self, hoist: bool) {
+    pub fn hoist(&mut self, hoist: bool) -> &mut Self {
         self.0.insert("hoist", Value::Bool(hoist));
+        self
     }
 
     /// Whether or not to make the role mentionable, notifying its users.
-    pub fn mentionable(&mut self, mentionable: bool) {
+    pub fn mentionable(&mut self, mentionable: bool) -> &mut Self {
         self.0.insert("mentionable", Value::Bool(mentionable));
+        self
     }
 
     /// The name of the role to set.
-    pub fn name(&mut self, name: &str) {
+    pub fn name(&mut self, name: &str) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
+        self
     }
 
     /// The set of permissions to assign the role.
-    pub fn permissions(&mut self, permissions: Permissions) {
+    pub fn permissions(&mut self, permissions: Permissions) -> &mut Self {
         self.0.insert(
             "permissions",
             Value::Number(Number::from(permissions.bits())),
         );
+        self
     }
 
     /// The position to assign the role in the role list. This correlates to the
     /// role's position in the user list.
-    pub fn position(&mut self, position: u8) {
+    pub fn position(&mut self, position: u8) -> &mut Self {
         self.0.insert("position", Value::Number(Number::from(position)));
+        self
     }
 }
