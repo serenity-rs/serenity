@@ -619,7 +619,7 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
 /// Sends an embed listing all groups with their commands.
 fn send_grouped_commands_embed(
     help_options: &HelpOptions,
-    mut channel_id: ChannelId,
+    channel_id: ChannelId,
     help_description: &str,
     groups: &[GroupCommandsPair],
     colour: Colour,
@@ -654,7 +654,7 @@ fn send_grouped_commands_embed(
 /// Sends embed showcasing information about a single command.
 fn send_single_command_embed(
     help_options: &HelpOptions,
-    mut channel_id: ChannelId,
+    channel_id: ChannelId,
     command: &Command,
     colour: Colour,
 ) -> Result<Message, Error> {
@@ -696,7 +696,7 @@ fn send_single_command_embed(
 
 /// Sends embed listing commands that are similar to the sent one.
 fn send_suggestion_embed(
-    mut channel_id: ChannelId,
+    channel_id: ChannelId,
     help_description: &str,
     suggestions: &Suggestions,
     colour: Colour,
@@ -714,7 +714,7 @@ fn send_suggestion_embed(
 }
 
 /// Sends an embed explaining fetching commands failed.
-fn send_error_embed(mut channel_id: ChannelId, input: &str, colour: Colour) -> Result<Message, Error> {
+fn send_error_embed(channel_id: ChannelId, input: &str, colour: Colour) -> Result<Message, Error> {
     channel_id.send_message(|m| {
         m.embed(|e| {
             e.colour(colour);

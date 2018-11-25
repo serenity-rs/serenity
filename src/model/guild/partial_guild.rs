@@ -155,7 +155,8 @@ impl PartialGuild {
     /// [`Guild::create_role`]: struct.Guild.html#method.create_role
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
-    pub fn create_role<F: FnOnce(&mut EditRole) -> &mut EditRole>(&mut self, f: F) -> Result<Role> {
+    pub fn create_role<F>(&self, f: F) -> Result<Role>
+    where F: FnOnce(&mut EditRole) -> &mut EditRole {
         self.id.create_role(f)
     }
 

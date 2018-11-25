@@ -174,7 +174,7 @@ impl PrivateChannel {
     /// [`Channel::messages`]: enum.Channel.html#method.messages
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
-    pub fn messages<F>(&mut self, f: F) -> Result<Vec<Message>>
+    pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
         self.id.messages(f)
     }
@@ -228,7 +228,7 @@ impl PrivateChannel {
     /// [`ChannelId`]: ../id/struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[inline]
-    pub fn say<D: ::std::fmt::Display>(&mut self, content: D) -> Result<Message> { self.id.say(content) }
+    pub fn say<D: ::std::fmt::Display>(&self, content: D) -> Result<Message> { self.id.say(content) }
 
     /// Sends (a) file(s) along with optional message contents.
     ///
@@ -249,8 +249,9 @@ impl PrivateChannel {
     /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[inline]
-    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&mut self, files: It, f: F) -> Result<Message>
-        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b>, T: Into<AttachmentType<'a>> {
+    pub fn send_files<'a, F, T, It>(&self, files: It, f: F) -> Result<Message>
+        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b>,
+              T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T> {
         self.id.send_files(files, f)
     }
 
@@ -269,7 +270,7 @@ impl PrivateChannel {
     /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
     #[inline]
-    pub fn send_message<F>(&mut self, f: F) -> Result<Message>
+    pub fn send_message<F>(&self, f: F) -> Result<Message>
     where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         self.id.send_message(f)
     }

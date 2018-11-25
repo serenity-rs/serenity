@@ -38,7 +38,8 @@ impl EditMessage {
     }
 
     /// Set an embed for the message.
-    pub fn embed<F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed>(&mut self, f: F) -> &mut Self {
+    pub fn embed<F>(&mut self, f: F) -> &mut Self
+    where F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed {
         let mut create_embed = CreateEmbed::default();
         f(&mut create_embed);
         let map = utils::vecmap_to_json_map(create_embed.0);

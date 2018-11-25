@@ -191,7 +191,8 @@ impl GuildId {
     /// [`Guild::create_role`]: ../guild/struct.Guild.html#method.create_role
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
-    pub fn create_role<F: FnOnce(&mut EditRole) -> &mut EditRole>(&self, f: F) -> Result<Role> {
+    pub fn create_role<F>(&self, f: F) -> Result<Role>
+    where F: FnOnce(&mut EditRole) -> &mut EditRole {
         let mut edit_role = EditRole::default();
         f(&mut edit_role);
         let map = utils::vecmap_to_json_map(edit_role.0);
@@ -274,7 +275,8 @@ impl GuildId {
     /// [`Guild::edit`]: ../guild/struct.Guild.html#method.edit
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
-    pub fn edit<F: FnOnce(&mut EditGuild) -> &mut EditGuild>(&mut self, f: F) -> Result<PartialGuild> {
+    pub fn edit<F>(&mut self, f: F) -> Result<PartialGuild>
+    where F: FnOnce(&mut EditGuild) -> &mut EditGuild{
         let mut edit_guild = EditGuild::default();
         f(&mut edit_guild);
         let map = utils::vecmap_to_json_map(edit_guild.0);

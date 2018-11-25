@@ -88,7 +88,8 @@ impl Context {
     /// ```
     #[cfg(feature = "builder")]
     #[deprecated(since = "0.5.6", note = "Use the http module instead.")]
-    pub fn edit_profile<F: FnOnce(&mut EditProfile) -> &mut EditProfile>(&self, f: F) -> Result<CurrentUser> {
+    pub fn edit_profile<F>(&self, f: F) -> Result<CurrentUser>
+    where F: FnOnce(&mut EditProfile) -> &mut EditProfile {
         let mut map = VecMap::with_capacity(2);
 
         feature_cache! {

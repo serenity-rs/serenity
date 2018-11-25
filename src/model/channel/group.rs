@@ -285,7 +285,7 @@ impl Group {
     /// [`ChannelId`]: ../id/struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[inline]
-    pub fn say(&mut self, content: &str) -> Result<Message> { self.channel_id.say(content) }
+    pub fn say(&self, content: &str) -> Result<Message> { self.channel_id.say(content) }
 
     /// Sends (a) file(s) along with optional message contents.
     ///
@@ -306,7 +306,7 @@ impl Group {
     /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[inline]
-    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&mut self, files: It, f: F) -> Result<Message>
+    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, files: It, f: F) -> Result<Message>
         where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b>, T: Into<AttachmentType<'a>> {
         self.channel_id.send_files(files, f)
     }
@@ -321,7 +321,7 @@ impl Group {
     /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[inline]
-    pub fn send_message<F>(&mut self, f: F) -> Result<Message>
+    pub fn send_message<F>(&self, f: F) -> Result<Message>
         where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         self.channel_id.send_message(f)
     }

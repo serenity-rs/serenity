@@ -354,7 +354,7 @@ impl ChannelId {
     ///
     /// [`Channel::messages`]: ../channel/enum.Channel.html#method.messages
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
-    pub fn messages<F>(&mut self, f: F) -> Result<Vec<Message>>
+    pub fn messages<F>(&self, f: F) -> Result<Vec<Message>>
         where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
         let mut get_messages = GetMessages::default();
         f(&mut get_messages);
@@ -483,7 +483,8 @@ impl ChannelId {
     /// [`ChannelId`]: struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[inline]
-    pub fn say<D: ::std::fmt::Display>(&mut self, content: D) -> Result<Message> {
+    pub fn say<D>(&self, content: D) -> Result<Message>
+    where D: ::std::fmt::Display {
         self.send_message(|m| {
             m.content(content)
         })
@@ -550,8 +551,9 @@ impl ChannelId {
     /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "utils")]
-    pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&mut self, files: It, f: F) -> Result<Message>
-        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b>, T: Into<AttachmentType<'a>> {
+    pub fn send_files<'a, F, T, It>(&self, files: It, f: F) -> Result<Message>
+        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b>,
+              T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T> {
         let mut create_message = CreateMessage::default();
         let msg = f(&mut create_message);
 
@@ -592,7 +594,7 @@ impl ChannelId {
     /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "utils")]
-    pub fn send_message<F>(&mut self, f: F) -> Result<Message>
+    pub fn send_message<F>(&self, f: F) -> Result<Message>
         where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         let mut create_message = CreateMessage::default();
         let msg = f(&mut create_message);

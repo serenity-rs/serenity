@@ -173,8 +173,10 @@ impl CreateEmbed {
     ///
     /// [`CreateEmbedFooter`]: struct.CreateEmbedFooter.html
     pub fn footer<F>(&mut self, f: F) -> &mut Self
-        where F: FnOnce(CreateEmbedFooter) -> CreateEmbedFooter {
-        let footer = f(CreateEmbedFooter::default()).0;
+        where F: FnOnce(&mut CreateEmbedFooter) -> &mut CreateEmbedFooter {
+        let mut create_embed_footer = CreateEmbedFooter::default();
+        f(&mut create_embed_footer);
+        let footer = create_embed_footer.0;
         let map = utils::vecmap_to_json_map(footer);
 
         self.0.insert("footer", Value::Object(map));
@@ -417,7 +419,7 @@ impl From<Embed> for CreateEmbed {
         }
 
         if let Some(footer) = embed.footer {
-            b.footer(move |mut f| {
+            b.footer(move |f| {
                 f.text(&footer.text);
 
                 if let Some(icon_url) = footer.icon_url {
