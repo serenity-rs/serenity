@@ -1947,7 +1947,7 @@ pub enum VoiceEvent {
     ///
     /// [`heartbeat_interval`]: struct.VoiceHello.html#structfield.heartbeat_interval
     Hello(VoiceHello),
-    /// Message received if a Resume reques was successful.
+    /// Message received if a Resume request was successful.
     Resumed,
     /// Status update in the current channel, indicating that a user has
     /// disconnected.

@@ -24,6 +24,18 @@ pub fn build_heartbeat(nonce: u64) -> Value {
 }
 
 #[inline]
+pub fn build_resume(info: &ConnectionInfo) -> Value {
+    json!({
+        "op": VoiceOpCode::Resume.num(),
+        "d": {
+            "server_id": info.guild_id.0,
+            "session_id": &info.session_id,
+            "token": &info.token,
+        },
+    })
+}
+
+#[inline]
 pub fn build_select_protocol(address: ::std::borrow::Cow<str>, port: u16) -> Value {
     json!({
         "op": VoiceOpCode::SelectProtocol.num(),

@@ -12,10 +12,7 @@ use internal::{
     ws_impl::{ReceiverExt, SenderExt},
     Timer
 };
-use model::{
-    event::VoiceEvent,
-    id::UserId
-};
+use model::event::VoiceEvent;
 use opus::{
     packet as opus_packet,
     Application as CodingMode,
@@ -62,6 +59,7 @@ enum ReceiverStatus {
 #[allow(dead_code)]
 struct ThreadItems {
     rx: MpscReceiver<ReceiverStatus>,
+    tx: MpscSender<ReceiverStatus>,
     udp_close_sender: MpscSender<i32>,
     udp_thread: JoinHandle<()>,
     ws_close_sender: MpscSender<i32>,
@@ -72,6 +70,7 @@ struct ThreadItems {
 pub struct Connection {
     audio_timer: Timer,
     client: Arc<Mutex<WsClient>>,
+    connection_info: ConnectionInfo,
     decoder_map: HashMap<(u32, Channels), OpusDecoder>,
     destination: SocketAddr,
     encoder: OpusEncoder,
@@ -87,7 +86,6 @@ pub struct Connection {
     thread_items: ThreadItems,
     timestamp: u32,
     udp: UdpSocket,
-    user_id: UserId,
 }
 
 impl Connection {
@@ -193,6 +191,7 @@ impl Connection {
         Ok(Connection {
             audio_timer: Timer::new(1000 * 60 * 4),
             client: mutexed_client,
+            connection_info: info,
             decoder_map: HashMap::new(),
             destination,
             encoder,
@@ -208,8 +207,58 @@ impl Connection {
             ssrc: ready.ssrc,
             thread_items,
             timestamp: 0,
-            user_id: info.user_id,
         })
+    }
+
+    pub fn reconnect(&mut self) -> Result<()> {
+        let url = generate_url(&mut self.connection_info.endpoint)?;
+
+        // Thread may have died, we want to send to prompt a clean exit
+        // (if at all possible) and then proceed as normal.
+        let _ = self.thread_items.ws_close_sender.send(0);
+
+        let mut client = tungstenite::connect(Request::from(url))?.0;
+        client.send_json(&payload::build_resume(&self.connection_info))?;
+
+        let mut hello = None;
+        let mut resumed = None;
+
+        loop {
+            let value = match client.recv_json()? {
+                Some(value) => value,
+                None => continue,
+            };
+
+            match VoiceEvent::deserialize(value)? {
+                VoiceEvent::Resumed => {
+                    resumed = Some(());
+                    if hello.is_some(){
+                        break;
+                    }
+                },
+                VoiceEvent::Hello(h) => {
+                    hello = Some(h);
+                    if resumed.is_some() {
+                        break;
+                    }
+                },
+                other => {
+                    debug!("[Voice] Expected resumed/hello; got: {:?}", other);
+
+                    return Err(Error::Voice(VoiceError::ExpectedHandshake));
+                },
+            }
+        };
+
+        let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
+
+        self.keepalive_timer = Timer::new((hello.heartbeat_interval as f64 * 0.75) as u64);
+
+        let mutexed_client = Arc::new(Mutex::new(client));
+        start_ws_thread(mutexed_client, &mut self.thread_items)?;
+
+        info!("[Voice] Reconnected to: {}", &self.connection_info.endpoint);
+        Ok(())
     }
 
     #[allow(unused_variables)]
@@ -583,7 +632,8 @@ fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<Thread
     let thread_name = current_thread.name().unwrap_or("serenity voice");
 
     let (tx, rx) = mpsc::channel();
-    let tx_clone = tx.clone();
+    let tx_ws = tx.clone();
+    let tx_udp = tx.clone();
     let udp_clone = udp.try_clone()?;
 
     let udp_thread = ThreadBuilder::new()
@@ -596,7 +646,7 @@ fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<Thread
             loop {
                 if let Ok((len, _)) = udp_clone.recv_from(&mut buffer) {
                     let piece = buffer[..len].to_vec();
-                    let send = tx.send(ReceiverStatus::Udp(piece));
+                    let send = tx_udp.send(ReceiverStatus::Udp(piece));
 
                     if send.is_err() {
                         return;
@@ -616,7 +666,7 @@ fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<Thread
                     Err(_) => break,
                 };
 
-                if tx_clone.send(ReceiverStatus::Websocket(msg)).is_err() {
+                if tx_ws.send(ReceiverStatus::Websocket(msg)).is_err() {
                     return;
                 }
             }
@@ -630,9 +680,49 @@ fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<Thread
 
     Ok(ThreadItems {
         rx,
+        tx,
         udp_close_sender,
         udp_thread,
         ws_close_sender,
         ws_thread,
     })
+}
+
+#[inline]
+fn start_ws_thread(client: Arc<Mutex<WsClient>>, t_items: &mut ThreadItems) -> Result<()> {
+    let current_thread = thread::current();
+    let thread_name = current_thread.name().unwrap_or("serenity voice");
+
+    let tx_ws = t_items.tx.clone();
+    let (ws_close_sender, ws_close_reader) = mpsc::channel();
+
+    let ws_thread = ThreadBuilder::new()
+        .name(format!("{} WS", thread_name))
+        .spawn(move || loop {
+            while let Ok(Some(value)) = client.lock().recv_json() {
+                let msg = match VoiceEvent::deserialize(value) {
+                    Ok(msg) => msg,
+                    Err(why) => {
+                        warn!("Error deserializing voice event: {:?}", why);
+
+                        break;
+                    },
+                };
+
+                if tx_ws.send(ReceiverStatus::Websocket(msg)).is_err() {
+                    return;
+                }
+            }
+
+            if ws_close_reader.try_recv().is_ok() {
+                return;
+            }
+
+            thread::sleep(Duration::from_millis(25));
+        })?;
+
+    t_items.ws_close_sender = ws_close_sender;
+    t_items.ws_thread = ws_thread;
+
+    Ok(())
 }
