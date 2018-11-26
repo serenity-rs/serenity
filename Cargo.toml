@@ -103,7 +103,7 @@ http = ["reqwest", "lazy_static"]
 model = ["builder", "http"]
 standard_framework = ["framework"]
 utils = ["base64"]
-voice = ["byteorder", "gateway", "opus", "sodiumoxide"]
+voice = ["byteorder", "gateway", "opus", "rand", "sodiumoxide"]
 
 [package.metadata.docs.rs]
 all-features = true
