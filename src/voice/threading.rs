@@ -103,7 +103,10 @@ fn runner(rx: &MpscReceiver<Status>) {
         // If there was an error, then just reset the connection and try to get
         // another.
         if error {
-            connection = None;
+            let mut conn = connection.expect("[Voice] Shouldn't have had a voice connection error without a connection.");
+            connection = conn.reconnect()
+                .ok()
+                .map(|_| conn);
         }
     }
 }
