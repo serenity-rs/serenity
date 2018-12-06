@@ -1,10 +1,10 @@
-use builder::EditProfile;
-use CACHE;
-use client::bridge::gateway::ShardMessenger;
-use error::Result;
-use gateway::InterMessage;
-use http;
-use model::prelude::*;
+use crate::builder::EditProfile;
+use crate::CACHE;
+use crate::client::bridge::gateway::ShardMessenger;
+use crate::error::Result;
+use crate::gateway::InterMessage;
+use crate::http;
+use crate::model::prelude::*;
 use parking_lot::Mutex;
 use serde_json::Value;
 use std::sync::{
@@ -12,8 +12,8 @@ use std::sync::{
     mpsc::Sender
 };
 use typemap::ShareMap;
-use utils::VecMap;
-use utils::vecmap_to_json_map;
+use crate::utils::VecMap;
+use crate::utils::vecmap_to_json_map;
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.

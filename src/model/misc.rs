@@ -1,7 +1,7 @@
 //! Miscellaneous helper traits, enums, and structs for models.
 
 use super::prelude::*;
-use internal::RwLockExt;
+use crate::internal::RwLockExt;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
@@ -12,7 +12,7 @@ use std::str::FromStr;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::fmt;
 #[cfg(all(feature = "model", any(feature = "cache", feature = "utils")))]
-use utils;
+use crate::utils;
 
 /// Allows something - such as a channel or role - to be mentioned in a message.
 pub trait Mentionable {
@@ -296,7 +296,7 @@ pub struct Maintenance {
 
 #[cfg(test)]
 mod test {
-    use model::prelude::*;
+    use crate::model::prelude::*;
 
     #[test]
     fn test_formatters() {
@@ -309,10 +309,10 @@ mod test {
 
     #[cfg(feature = "utils")]
     mod utils {
-        use model::prelude::*;
+        use crate::model::prelude::*;
         use parking_lot::RwLock;
         use std::sync::Arc;
-        use utils::Colour;
+        use crate::utils::Colour;
 
         #[test]
         fn test_mention() {

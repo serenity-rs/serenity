@@ -1,6 +1,6 @@
-use constants::{self, close_codes};
-use internal::prelude::*;
-use model::{
+use crate::constants::{self, close_codes};
+use crate::internal::prelude::*;
+use crate::model::{
     event::{Event, GatewayEvent},
     gateway::Activity,
     id::GuildId,

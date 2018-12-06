@@ -42,7 +42,7 @@
 //! [`CACHE`]: ../struct.CACHE.html
 //! [`http`]: ../http/index.html
 
-use model::prelude::*;
+use crate::model::prelude::*;
 use parking_lot::RwLock;
 use std::collections::{
     hash_map::Entry,
@@ -808,7 +808,7 @@ mod test {
         collections::HashMap,
         sync::Arc,
     };
-    use {
+    use crate::{
         cache::{Cache, CacheUpdate, Settings},
         model::prelude::*,
         prelude::RwLock,

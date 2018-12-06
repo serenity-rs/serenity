@@ -1,7 +1,7 @@
 //! A collection of newtypes defining type-strong IDs.
 
 use chrono::NaiveDateTime;
-use internal::prelude::*;
+use crate::internal::prelude::*;
 use serde::de::{Deserialize, Deserializer};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::utils::U64Visitor;

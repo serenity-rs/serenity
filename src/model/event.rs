@@ -11,13 +11,13 @@ use serde_json;
 use std::collections::HashMap;
 use super::utils::deserialize_emojis;
 use super::prelude::*;
-use constants::{OpCode, VoiceOpCode};
-use internal::prelude::*;
+use crate::constants::{OpCode, VoiceOpCode};
+use crate::internal::prelude::*;
 
 #[cfg(feature = "cache")]
-use cache::{Cache, CacheUpdate};
+use crate::cache::{Cache, CacheUpdate};
 #[cfg(feature = "cache")]
-use internal::RwLockExt;
+use crate::internal::RwLockExt;
 #[cfg(feature = "cache")]
 use std::collections::hash_map::Entry;
 #[cfg(feature = "cache")]

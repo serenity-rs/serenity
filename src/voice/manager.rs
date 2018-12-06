@@ -1,5 +1,5 @@
-use gateway::InterMessage;
-use model::id::{ChannelId, GuildId, UserId};
+use crate::gateway::InterMessage;
+use crate::model::id::{ChannelId, GuildId, UserId};
 use std::{
     collections::HashMap,
     sync::mpsc::Sender as MpscSender

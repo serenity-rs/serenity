@@ -48,7 +48,7 @@ use reqwest::{
     header::HeaderMap as Headers,
     StatusCode,
 };
-use internal::prelude::*;
+use crate::internal::prelude::*;
 use parking_lot::Mutex;
 use std::{
     collections::HashMap,

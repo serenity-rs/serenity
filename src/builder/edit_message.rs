@@ -1,7 +1,7 @@
-use internal::prelude::*;
+use crate::internal::prelude::*;
 use std::fmt::Display;
 use super::CreateEmbed;
-use utils::{self, VecMap};
+use crate::utils::{self, VecMap};
 
 /// A builder to specify the fields to edit in an existing message.
 ///

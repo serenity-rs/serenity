@@ -4,17 +4,17 @@ use serde_json;
 use std::fmt;
 use super::utils::deserialize_u16;
 use super::prelude::*;
-use internal::prelude::*;
-use model::misc::Mentionable;
+use crate::internal::prelude::*;
+use crate::model::misc::Mentionable;
 
 #[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
+use crate::CACHE;
 #[cfg(feature = "model")]
-use builder::{CreateMessage, EditProfile};
+use crate::builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
 use chrono::NaiveDateTime;
 #[cfg(feature = "model")]
-use http::{self, GuildPagination};
+use crate::http::{self, GuildPagination};
 #[cfg(all(feature = "cache", feature = "model"))]
 use parking_lot::RwLock;
 #[cfg(feature = "model")]
@@ -24,7 +24,7 @@ use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
 #[cfg(feature = "model")]
-use utils::{self, VecMap};
+use crate::utils::{self, VecMap};
 
 /// Information about the current user.
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]
@@ -885,8 +885,8 @@ fn tag(name: &str, discriminator: u16) -> String {
 mod test {
     #[cfg(feature = "model")]
     mod model {
-        use model::id::UserId;
-        use model::user::User;
+        use crate::model::id::UserId;
+        use crate::model::user::User;
 
         fn gen() -> User {
             User {

@@ -1,4 +1,4 @@
-use constants;
+use crate::constants;
 use reqwest::{
     RequestBuilder as ReqwestRequestBuilder,
     header::{AUTHORIZATION, CONTENT_TYPE, USER_AGENT, HeaderMap as Headers, HeaderValue},

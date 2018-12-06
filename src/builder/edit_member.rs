@@ -1,6 +1,6 @@
-use internal::prelude::*;
-use model::id::{ChannelId, RoleId};
-use utils::VecMap;
+use crate::internal::prelude::*;
+use crate::model::id::{ChannelId, RoleId};
+use crate::utils::VecMap;
 
 /// A builder which edits the properties of a [`Member`], to be used in
 /// conjunction with [`Member::edit`].

@@ -1,5 +1,5 @@
-use internal::prelude::*;
-use utils::VecMap;
+use crate::internal::prelude::*;
+use crate::utils::VecMap;
 
 /// A builder to edit the current user's settings, to be used in conjunction
 /// with [`CurrentUser::edit`].

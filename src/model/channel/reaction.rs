@@ -1,4 +1,4 @@
-use model::prelude::*;
+use crate::model::prelude::*;
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use serde::ser::{SerializeMap, Serialize, Serializer};
 use std::{
@@ -11,12 +11,12 @@ use std::{
     },
     str::FromStr
 };
-use internal::prelude::*;
+use crate::internal::prelude::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
+use crate::CACHE;
 #[cfg(feature = "model")]
-use http;
+use crate::http;
 
 /// An emoji reaction to a message.
 #[derive(Clone, Debug, Deserialize, Serialize)]

@@ -1,19 +1,19 @@
 //! Models relating to Discord channels.
 
 use chrono::{DateTime, FixedOffset};
-use model::prelude::*;
+use crate::model::prelude::*;
 use serde_json::Value;
 
 #[cfg(feature = "model")]
-use builder::{CreateEmbed, EditMessage};
+use crate::builder::{CreateEmbed, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
+use crate::CACHE;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 #[cfg(feature = "model")]
 use std::mem;
 #[cfg(feature = "model")]
-use {constants, http, utils as serenity_utils};
+use crate::{constants, http, utils as serenity_utils};
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.

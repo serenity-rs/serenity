@@ -183,13 +183,13 @@ pub mod voice;
 
 mod error;
 
-pub use error::{Error, Result};
+pub use crate::error::{Error, Result};
 
 #[cfg(feature = "client")]
-pub use client::Client;
+pub use crate::client::Client;
 
 #[cfg(feature = "cache")]
-use cache::Cache;
+use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use parking_lot::RwLock;
 

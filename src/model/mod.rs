@@ -40,7 +40,7 @@ pub mod webhook;
 pub use self::error::Error as ModelError;
 pub use self::permissions::Permissions;
 
-use internal::prelude::*;
+use crate::internal::prelude::*;
 use parking_lot::RwLock;
 use self::utils::*;
 use serde::de::Visitor;
@@ -56,6 +56,6 @@ use std::{
 };
 
 #[cfg(feature = "utils")]
-use utils::Colour;
+use crate::utils::Colour;
 
 use serde::{Deserialize, Deserializer};

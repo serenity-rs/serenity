@@ -1,16 +1,16 @@
 use chrono::{DateTime, FixedOffset};
-use model::prelude::*;
+use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
-use builder::{
+use crate::builder::{
     CreateMessage,
     EditMessage,
     GetMessages
 };
 #[cfg(feature = "model")]
-use http::{self, AttachmentType};
+use crate::http::{self, AttachmentType};
 #[cfg(feature = "model")]
-use internal::RwLockExt;
+use crate::internal::RwLockExt;
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 #[cfg(feature = "model")]

@@ -1,9 +1,9 @@
-use internal::prelude::*;
-use http::AttachmentType;
-use model::channel::ReactionType;
+use crate::internal::prelude::*;
+use crate::http::AttachmentType;
+use crate::model::channel::ReactionType;
 use std::fmt::Display;
 use super::CreateEmbed;
-use utils::{self, VecMap};
+use crate::utils::{self, VecMap};
 
 /// A builder to specify the contents of an [`http::send_message`] request,
 /// primarily meant for use through [`ChannelId::send_message`].

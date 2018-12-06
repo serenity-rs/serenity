@@ -1,6 +1,6 @@
-use client::Context;
-use http;
-use model::{
+use crate::client::Context;
+use crate::http;
+use crate::model::{
     channel::Message,
     id::{ChannelId, GuildId, UserId}
 };

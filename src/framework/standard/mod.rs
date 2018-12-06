@@ -31,9 +31,9 @@ pub use self::create_help_command::CreateHelpCommand;
 pub use self::create_command::{CreateCommand, FnOrCommand};
 pub use self::create_group::CreateGroup;
 
-use client::Context;
-use internal::RwLockExt;
-use model::{
+use crate::client::Context;
+use crate::internal::RwLockExt;
+use crate::model::{
     channel::Message,
     guild::{Guild, Member},
     id::{ChannelId, GuildId, UserId},
@@ -49,9 +49,9 @@ use super::Framework;
 use threadpool::ThreadPool;
 
 #[cfg(feature = "cache")]
-use client::CACHE;
+use crate::client::CACHE;
 #[cfg(feature = "cache")]
-use model::channel::Channel;
+use crate::model::channel::Channel;
 
 /// A convenience macro for generating a struct fulfilling the [`Command`][command trait] trait.
 ///

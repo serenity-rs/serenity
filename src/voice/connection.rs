@@ -5,14 +5,14 @@ use byteorder::{
     ReadBytesExt,
     WriteBytesExt
 };
-use constants::VOICE_GATEWAY_VERSION;
-use gateway::WsClient;
-use internal::prelude::*;
-use internal::{
+use crate::constants::VOICE_GATEWAY_VERSION;
+use crate::gateway::WsClient;
+use crate::internal::prelude::*;
+use crate::internal::{
     ws_impl::{ReceiverExt, SenderExt},
     Timer
 };
-use model::{
+use crate::model::{
     event::VoiceEvent,
     id::UserId
 };
@@ -425,7 +425,7 @@ impl Connection {
                 // Per official guidelines, send 5x silence BEFORE we stop speaking.
                 self.set_speaking(false)?;
 
-                audio_timer.await();
+                audio_timer.r#await();
 
                 return Ok(());
             }
@@ -440,7 +440,7 @@ impl Connection {
         self.set_speaking(true)?;
 
         let index = self.prep_packet(&mut packet, mix_buffer, &opus_frame, nonce)?;
-        audio_timer.await();
+        audio_timer.r#await();
 
         self.udp.send_to(&packet[..index], self.destination)?;
         self.audio_timer.reset();

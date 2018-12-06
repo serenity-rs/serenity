@@ -4,13 +4,13 @@ use chrono::{DateTime, FixedOffset};
 use super::prelude::*;
 
 #[cfg(feature = "model")]
-use builder::CreateInvite;
+use crate::builder::CreateInvite;
 #[cfg(feature = "model")]
-use internal::prelude::*;
+use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::{Permissions, utils as model_utils};
 #[cfg(feature = "model")]
-use {http, utils};
+use crate::{http, utils};
 
 /// Information about an invite code.
 ///
@@ -123,7 +123,7 @@ impl Invite {
 
         #[cfg(feature = "utils")]
         {
-            invite = ::utils::parse_invite(invite);
+            invite = crate::utils::parse_invite(invite);
         }
 
         http::get_invite(invite, stats)

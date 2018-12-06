@@ -17,19 +17,19 @@ pub use self::role::*;
 pub use self::audit_log::*;
 
 use chrono::{DateTime, FixedOffset};
-use model::prelude::*;
+use crate::model::prelude::*;
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
+use crate::CACHE;
 #[cfg(feature = "model")]
-use http;
+use crate::http;
 #[cfg(feature = "model")]
-use builder::{EditGuild, EditMember, EditRole};
+use crate::builder::{EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
-use constants::LARGE_THRESHOLD;
+use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
 use std;
 #[cfg(feature = "model")]
@@ -2007,7 +2007,7 @@ mod test {
     #[cfg(feature = "model")]
     mod model {
         use chrono::prelude::*;
-        use model::prelude::*;
+        use crate::model::prelude::*;
         use std::collections::*;
         use std::sync::Arc;
 

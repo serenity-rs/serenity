@@ -1,5 +1,5 @@
-use gateway::InterMessage;
-use model::{
+use crate::gateway::InterMessage;
+use crate::model::{
     channel::{Channel, Message},
     event::Event,
     guild::Member,
@@ -16,9 +16,9 @@ use threadpool::ThreadPool;
 use typemap::ShareMap;
 
 #[cfg(feature = "framework")]
-use framework::Framework;
+use crate::framework::Framework;
 #[cfg(feature = "cache")]
-use model::id::GuildId;
+use crate::model::id::GuildId;
 #[cfg(feature = "cache")]
 use std::time::Duration;
 

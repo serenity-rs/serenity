@@ -1,4 +1,4 @@
-use constants;
+use crate::constants;
 use reqwest::{
     Client as ReqwestClient,
     header::{AUTHORIZATION, USER_AGENT, CONTENT_TYPE, HeaderValue, HeaderMap as Headers},
@@ -7,8 +7,8 @@ use reqwest::{
     StatusCode,
     Url,
 };
-use internal::prelude::*;
-use model::prelude::*;
+use crate::internal::prelude::*;
+use crate::model::prelude::*;
 use super::{
     TOKEN,
     ratelimiting,
@@ -1211,7 +1211,7 @@ pub fn get_guilds(target: &GuildPagination, limit: u64) -> Result<Vec<GuildInfo>
 pub fn get_invite(mut code: &str, stats: bool) -> Result<Invite> {
     #[cfg(feature = "utils")]
         {
-            code = ::utils::parse_invite(code);
+            code = crate::utils::parse_invite(code);
         }
 
     fire(Request {
