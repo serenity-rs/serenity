@@ -6,14 +6,10 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["client", "standard_framework", "voice"]
 //! ```
-
-#[macro_use] extern crate serenity;
-
-extern crate typemap;
-
 use std::{env, sync::Arc};
 
 use serenity::{
+    command,
     client::{bridge::voice::ClientVoiceManager, CACHE, Client, Context, EventHandler},
     framework::StandardFramework,
     model::{channel::Message, gateway::Ready, id::ChannelId, misc::Mentionable},

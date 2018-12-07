@@ -2,7 +2,7 @@
 //! itself.
 
 use super::ShardId;
-use ::gateway::ConnectionStage;
+use crate::gateway::ConnectionStage;
 
 #[derive(Clone, Debug)]
 pub(crate) enum ClientEvent {

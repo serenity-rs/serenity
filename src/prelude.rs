@@ -14,19 +14,17 @@
 //!
 //! [`serenity::Error`]: ../enum.Error.html
 
-pub use error::Error as SerenityError;
-pub use model::misc::Mentionable;
+pub use crate::error::Error as SerenityError;
+pub use crate::model::misc::Mentionable;
 pub use parking_lot::{Mutex, RwLock};
 
 #[cfg(feature = "client")]
-pub use client::{Client, ClientError as ClientError, Context, EventHandler};
+pub use crate::client::{Client, ClientError as ClientError, Context, EventHandler};
 #[cfg(feature = "gateway")]
-pub use gateway::GatewayError;
+pub use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
-pub use http::HttpError;
+pub use crate::http::HttpError;
 #[cfg(feature = "model")]
-pub use model::ModelError;
-#[cfg(feature = "typemap")]
-pub use typemap::{Key as TypeMapKey, ShareMap};
+pub use crate::model::ModelError;
 #[cfg(feature = "voice")]
-pub use voice::VoiceError;
+pub use crate::voice::VoiceError;

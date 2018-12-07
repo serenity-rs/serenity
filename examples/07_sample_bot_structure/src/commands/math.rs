@@ -1,3 +1,5 @@
+use serenity::command;
+
 command!(multiply(_ctx, msg, args) {
     let one = args.single::<f64>().unwrap();
     let two = args.single::<f64>().unwrap();

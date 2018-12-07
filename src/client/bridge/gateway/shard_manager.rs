@@ -1,5 +1,5 @@
-use gateway::InterMessage;
-use internal::prelude::*;
+use crate::gateway::InterMessage;
+use crate::internal::prelude::*;
 use parking_lot::Mutex;
 use std::{
     collections::{HashMap, VecDeque},
@@ -23,9 +23,9 @@ use threadpool::ThreadPool;
 use typemap::ShareMap;
 
 #[cfg(feature = "framework")]
-use framework::Framework;
+use crate::framework::Framework;
 #[cfg(feature = "voice")]
-use client::bridge::voice::ClientVoiceManager;
+use crate::client::bridge::voice::ClientVoiceManager;
 
 /// A manager for handling the status of shards by starting them, restarting
 /// them, and stopping them when required.

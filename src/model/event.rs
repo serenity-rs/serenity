@@ -11,13 +11,13 @@ use serde_json;
 use std::collections::HashMap;
 use super::utils::deserialize_emojis;
 use super::prelude::*;
-use constants::{OpCode, VoiceOpCode};
-use internal::prelude::*;
+use crate::constants::{OpCode, VoiceOpCode};
+use crate::internal::prelude::*;
 
 #[cfg(feature = "cache")]
-use cache::{Cache, CacheUpdate};
+use crate::cache::{Cache, CacheUpdate};
 #[cfg(feature = "cache")]
-use internal::RwLockExt;
+use crate::internal::RwLockExt;
 #[cfg(feature = "cache")]
 use std::collections::hash_map::Entry;
 #[cfg(feature = "cache")]
@@ -1247,7 +1247,7 @@ pub struct WebhookUpdateEvent {
     pub guild_id: GuildId,
 }
 
-#[allow(large_enum_variant)]
+#[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 #[serde(untagged)]
 pub enum GatewayEvent {
@@ -1327,7 +1327,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 }
 
 /// Event received over a websocket connection
-#[allow(large_enum_variant)]
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum Event {
     /// A [`Channel`] was created.
@@ -1868,19 +1868,19 @@ impl<'de> Deserialize<'de> for EventType {
     }
 }
 
-#[allow(missing_docs)]
+#[allow(clippy::missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct VoiceHeartbeat {
     pub nonce: u64,
 }
 
-#[allow(missing_docs)]
+#[allow(clippy::missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct VoiceHeartbeatAck {
     pub nonce: u64,
 }
 
-#[allow(missing_docs)]
+#[allow(clippy::missing_docs)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct VoiceReady {
     pub heartbeat_interval: u64,
@@ -1889,20 +1889,20 @@ pub struct VoiceReady {
     pub ssrc: u32,
 }
 
-#[allow(missing_docs)]
+#[allow(clippy::missing_docs)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct VoiceHello {
     pub heartbeat_interval: u64,
 }
 
-#[allow(missing_docs)]
+#[allow(clippy::missing_docs)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct VoiceSessionDescription {
     pub mode: String,
     pub secret_key: Vec<u8>,
 }
 
-#[allow(missing_docs)]
+#[allow(clippy::missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct VoiceSpeaking {
     pub speaking: bool,
@@ -1910,7 +1910,7 @@ pub struct VoiceSpeaking {
     pub user_id: UserId,
 }
 
-#[allow(missing_docs)]
+#[allow(clippy::missing_docs)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct VoiceResume {
     pub server_id: String,
@@ -1918,7 +1918,7 @@ pub struct VoiceResume {
     pub token: String,
 }
 
-#[allow(missing_docs)]
+#[allow(clippy::missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct VoiceClientDisconnect {
     pub user_id: UserId,

@@ -1,14 +1,11 @@
-#[macro_use] extern crate log;
-
-extern crate env_logger;
-extern crate serenity;
-
 use std::env;
 
 use serenity::{
     model::{event::ResumedEvent, gateway::Ready},
     prelude::*,
 };
+
+use log::{debug, error, info};
 
 struct Handler;
 
@@ -33,7 +30,7 @@ fn main() {
     //
     // For example, you can say to log all levels INFO and up via setting the
     // environment variable `RUST_LOG` to `INFO`.
-    env_logger::init().expect("Unable to init env_logger");
+    env_logger::init();
 
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")

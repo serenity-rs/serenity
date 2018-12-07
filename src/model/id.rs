@@ -1,7 +1,7 @@
 //! A collection of newtypes defining type-strong IDs.
 
 use chrono::NaiveDateTime;
-use internal::prelude::*;
+use crate::internal::prelude::*;
 use serde::de::{Deserialize, Deserializer};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use super::utils::U64Visitor;
@@ -92,52 +92,52 @@ macro_rules! id_u64 {
 
 /// An identifier for an Application.
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(derive_hash_xor_eq)]
+#[allow(clippy::derive_hash_xor_eq)]
 pub struct ApplicationId(pub u64);
 
 /// An identifier for a Channel
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(derive_hash_xor_eq)]
+#[allow(clippy::derive_hash_xor_eq)]
 pub struct ChannelId(pub u64);
 
 /// An identifier for an Emoji
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(derive_hash_xor_eq)]
+#[allow(clippy::derive_hash_xor_eq)]
 pub struct EmojiId(pub u64);
 
 /// An identifier for a Guild
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(derive_hash_xor_eq)]
+#[allow(clippy::derive_hash_xor_eq)]
 pub struct GuildId(pub u64);
 
 /// An identifier for an Integration
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(derive_hash_xor_eq)]
+#[allow(clippy::derive_hash_xor_eq)]
 pub struct IntegrationId(pub u64);
 
 /// An identifier for a Message
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(derive_hash_xor_eq)]
+#[allow(clippy::derive_hash_xor_eq)]
 pub struct MessageId(pub u64);
 
 /// An identifier for a Role
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(derive_hash_xor_eq)]
+#[allow(clippy::derive_hash_xor_eq)]
 pub struct RoleId(pub u64);
 
 /// An identifier for a User
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(derive_hash_xor_eq)]
+#[allow(clippy::derive_hash_xor_eq)]
 pub struct UserId(pub u64);
 
 /// An identifier for a [`Webhook`](../webhook/struct.Webhook.html).
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(derive_hash_xor_eq)]
+#[allow(clippy::derive_hash_xor_eq)]
 pub struct WebhookId(pub u64);
 
 /// An identifier for an audit log entry.
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(derive_hash_xor_eq)]
+#[allow(clippy::derive_hash_xor_eq)]
 pub struct AuditLogEntryId(pub u64);
 
 id_u64! {

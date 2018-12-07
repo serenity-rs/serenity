@@ -1,8 +1,8 @@
-use model::prelude::*;
+use crate::model::prelude::*;
 use super::super::utils::{deserialize_emojis, deserialize_roles};
 
 #[cfg(feature = "model")]
-use builder::{EditGuild, EditMember, EditRole};
+use crate::builder::{EditGuild, EditMember, EditRole};
 
 /// Partial information about a [`Guild`]. This does not include information
 /// like member data.

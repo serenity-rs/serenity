@@ -66,20 +66,20 @@ pub mod standard;
 #[cfg(feature = "standard_framework")]
 pub use self::standard::StandardFramework;
 
-use client::Context;
-use model::channel::Message;
+use crate::client::Context;
+use crate::model::channel::Message;
 use threadpool::ThreadPool;
 
 #[cfg(feature = "standard_framework")]
-use model::id::UserId;
+use crate::model::id::UserId;
 
 /// This trait allows for serenity to either use its builtin framework, or yours.
 pub trait Framework {
-    fn dispatch(&mut self, Context, Message, &ThreadPool);
+    fn dispatch(&mut self, _: Context, _: Message, _: &ThreadPool);
 
     #[doc(hidden)]
     #[cfg(feature = "standard_framework")]
-    fn update_current_user(&mut self, UserId) {}
+    fn update_current_user(&mut self, _: UserId) {}
 }
 
 impl<F: Framework + ?Sized> Framework for Box<F> {

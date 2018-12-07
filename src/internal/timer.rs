@@ -20,7 +20,7 @@ impl Timer {
         }
     }
 
-    pub fn await(&mut self) {
+    pub fn r#await(&mut self) {
         let due_time = (self.due.timestamp() * 1000) + i64::from(self.due.timestamp_subsec_millis());
         let now_time = {
             let now = Utc::now();

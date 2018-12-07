@@ -1,5 +1,5 @@
-use gateway::InterMessage;
-use model::id::{ChannelId, GuildId, UserId};
+use crate::gateway::InterMessage;
+use crate::model::id::{ChannelId, GuildId, UserId};
 use std::{
     collections::HashMap,
     sync::mpsc::Sender as MpscSender
@@ -80,7 +80,7 @@ impl Manager {
     ///
     /// [`Handler`]: struct.Handler.html
     /// [`get`]: #method.get
-    #[allow(map_entry)]
+    #[allow(clippy::map_entry)]
     #[inline]
     pub fn join<C, G>(&mut self, guild_id: G, channel_id: C) -> &mut Handler
         where C: Into<ChannelId>, G: Into<GuildId> {

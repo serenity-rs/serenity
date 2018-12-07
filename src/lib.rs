@@ -105,17 +105,17 @@
 //! [gateway docs]: gateway/index.html
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
 #![allow(unknown_lints)]
-#![allow(doc_markdown, inline_always)]
-#![warn(enum_glob_use, if_not_else)]
+#![allow(clippy::doc_markdown, clippy::inline_always)]
+#![warn(clippy::enum_glob_use, clippy::if_not_else)]
 
 #[macro_use]
 extern crate bitflags;
-#[allow(unused_imports)]
+#[allow(clippy::unused_imports)]
 #[macro_use]
 extern crate log;
 #[macro_use]
 extern crate serde_derive;
-#[allow(unused_imports)]
+#[allow(clippy::unused_imports)]
 #[macro_use]
 extern crate serde_json;
 
@@ -152,7 +152,7 @@ extern crate typemap;
 #[cfg(feature = "url")]
 extern crate url;
 
-#[allow(unused_imports)]
+#[allow(clippy::unused_imports)]
 #[cfg(test)]
 #[macro_use]
 extern crate matches;
@@ -183,13 +183,13 @@ pub mod voice;
 
 mod error;
 
-pub use error::{Error, Result};
+pub use crate::error::{Error, Result};
 
 #[cfg(feature = "client")]
-pub use client::Client;
+pub use crate::client::Client;
 
 #[cfg(feature = "cache")]
-use cache::Cache;
+use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use parking_lot::RwLock;
 

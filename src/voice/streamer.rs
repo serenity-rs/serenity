@@ -1,5 +1,5 @@
 use byteorder::{LittleEndian, ReadBytesExt};
-use internal::prelude::*;
+use crate::internal::prelude::*;
 use opus::{
     Channels,
     Decoder as OpusDecoder,

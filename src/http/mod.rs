@@ -38,7 +38,7 @@ use reqwest::{
     Client as ReqwestClient,
     Method,
 };
-use model::prelude::*;
+use crate::model::prelude::*;
 use parking_lot::Mutex;
 use self::{request::Request};
 use std::{

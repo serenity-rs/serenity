@@ -1,5 +1,3 @@
-extern crate serenity;
-
 use std::env;
 
 use serenity::{

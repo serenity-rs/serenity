@@ -1,6 +1,6 @@
-use constants::VoiceOpCode;
-use gateway::InterMessage;
-use model::{
+use crate::constants::VoiceOpCode;
+use crate::gateway::InterMessage;
+use crate::model::{
     id::{
         ChannelId,
         GuildId,

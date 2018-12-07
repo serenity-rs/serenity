@@ -1,4 +1,4 @@
-use model::prelude::*;
+use crate::model::prelude::*;
 use chrono::{DateTime, FixedOffset};
 use std::fmt::{
     Display,
@@ -8,15 +8,15 @@ use std::fmt::{
 use super::deserialize_sync_user;
 
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
-use builder::EditMember;
+use crate::builder::EditMember;
 #[cfg(all(feature = "cache", feature = "model"))]
-use internal::prelude::*;
+use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use utils::Colour;
+use crate::utils::Colour;
 #[cfg(all(feature = "cache", feature = "model"))]
-use {CACHE, http, utils};
+use crate::{CACHE, http, utils};
 
 /// A trait for allowing both u8 or &str or (u8, &str) to be passed into the `ban` methods in `Guild` and `Member`.
 pub trait BanOptions {

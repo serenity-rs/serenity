@@ -1,5 +1,5 @@
-use gateway::InterMessage;
-use model::{
+use crate::gateway::InterMessage;
+use crate::model::{
     channel::{Channel, Message},
     event::Event,
     guild::Member,
@@ -16,9 +16,9 @@ use threadpool::ThreadPool;
 use typemap::ShareMap;
 
 #[cfg(feature = "framework")]
-use framework::Framework;
+use crate::framework::Framework;
 #[cfg(feature = "cache")]
-use model::id::GuildId;
+use crate::model::id::GuildId;
 #[cfg(feature = "cache")]
 use std::time::Duration;
 
@@ -70,7 +70,7 @@ pub(crate) enum DispatchEvent {
 }
 
 #[cfg(feature = "framework")]
-#[cfg_attr(feature = "cargo-clippy", allow(too_many_arguments))]
+#[clippy::too_many_arguments]
 pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     framework: &Arc<Mutex<Option<Box<Framework + Send>>>>,
@@ -108,7 +108,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
 }
 
 #[cfg(not(feature = "framework"))]
-#[allow(unused_mut)]
+#[allow(clippy::unused_mut)]
 pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     data: &Arc<Mutex<ShareMap>>,
@@ -135,7 +135,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     }
 }
 
-#[allow(unused_mut)]
+#[allow(clippy::unused_mut)]
 fn dispatch_message<H>(
     context: Context,
     mut message: Message,
@@ -154,7 +154,7 @@ fn dispatch_message<H>(
     });
 }
 
-#[allow(cyclomatic_complexity, unused_assignments, unused_mut)]
+#[allow(clippy::cyclomatic_complexity, unused_assignments, unused_mut)]
 fn handle_event<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     data: &Arc<Mutex<ShareMap>>,

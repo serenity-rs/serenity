@@ -1,7 +1,7 @@
-use gateway::{InterMessage, ReconnectType, Shard, ShardAction};
-use internal::prelude::*;
-use internal::ws_impl::{ReceiverExt, SenderExt};
-use model::event::{Event, GatewayEvent};
+use crate::gateway::{InterMessage, ReconnectType, Shard, ShardAction};
+use crate::internal::prelude::*;
+use crate::internal::ws_impl::{ReceiverExt, SenderExt};
+use crate::model::event::{Event, GatewayEvent};
 use parking_lot::Mutex;
 use serde::Deserialize;
 use std::{
@@ -28,7 +28,7 @@ use tungstenite::{
 use typemap::ShareMap;
 
 #[cfg(feature = "framework")]
-use framework::Framework;
+use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use super::super::voice::ClientVoiceManager;
 

@@ -1,5 +1,5 @@
-use model::id::MessageId;
-use utils::VecMap;
+use crate::model::id::MessageId;
+use crate::utils::VecMap;
 
 /// Builds a request for a request to the API to retrieve messages.
 ///

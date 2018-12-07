@@ -1,4 +1,4 @@
-use model::{
+use crate::model::{
     guild::Emoji,
     id::{ChannelId, RoleId, UserId},
     misc::Mentionable
@@ -1087,7 +1087,7 @@ fn normalize(text: &str) -> String {
 
 #[cfg(test)]
 mod test {
-    use model::prelude::*;
+    use crate::model::prelude::*;
     use super::{
         ContentModifier::*,
         MessageBuilder,

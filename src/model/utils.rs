@@ -10,12 +10,12 @@ use std::{
 use super::prelude::*;
 
 #[cfg(feature = "cache")]
-use internal::prelude::*;
+use crate::internal::prelude::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::permissions::Permissions;
 #[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
+use crate::CACHE;
 
 pub fn default_true() -> bool {
     true

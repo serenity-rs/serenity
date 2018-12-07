@@ -1,5 +1,5 @@
-use gateway::InterMessage;
-use model::prelude::*;
+use crate::gateway::InterMessage;
+use crate::model::prelude::*;
 use super::{ShardClientMessage, ShardRunnerMessage};
 use std::sync::mpsc::{SendError, Sender};
 use tungstenite::Message;

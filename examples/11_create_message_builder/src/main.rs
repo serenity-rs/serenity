@@ -1,5 +1,3 @@
-extern crate serenity;
-
 use std::env;
 
 use serenity::{
@@ -16,9 +14,9 @@ impl EventHandler for Handler {
             // using a builder syntax.
             // This example will create a message that says "Hello, World!", with an embed that has
             // a title, description, three fields, and a footer.
-            let msg = msg.channel_id.send_message(|mut m| {
+            let msg = msg.channel_id.send_message(|m| {
                 m.content("Hello, World!");
-                m.embed(|mut e| {
+                m.embed(|e| {
                     e.title("This is a title");
                     e.description("This is a description");
                     e.fields(vec![
@@ -26,7 +24,7 @@ impl EventHandler for Handler {
                         ("This is the second field", "Both of these fields are inline", true),
                     ]);
                     e.field("This is the third field", "This is not an inline field", false);
-                    e.footer(|mut f| {
+                    e.footer(|f| {
                         f.text("This is a footer");
 
                         f

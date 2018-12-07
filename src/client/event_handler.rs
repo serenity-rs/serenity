@@ -1,4 +1,4 @@
-use model::prelude::*;
+use crate::model::prelude::*;
 use parking_lot::RwLock;
 use serde_json::Value;
 use std::{
@@ -6,7 +6,7 @@ use std::{
     sync::Arc
 };
 use super::context::Context;
-use ::client::bridge::gateway::event::*;
+use crate::client::bridge::gateway::event::*;
 
 /// The core trait for handling events by serenity.
 pub trait EventHandler {

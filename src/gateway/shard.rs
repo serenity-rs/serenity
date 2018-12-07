@@ -1,6 +1,6 @@
-use constants::{self, close_codes};
-use internal::prelude::*;
-use model::{
+use crate::constants::{self, close_codes};
+use crate::internal::prelude::*;
+use crate::model::{
     event::{Event, GatewayEvent},
     gateway::Activity,
     id::GuildId,
@@ -361,7 +361,7 @@ impl Shard {
     ///
     /// Returns a `GatewayError::OverloadedShard` if the shard would have too
     /// many guilds assigned to it.
-    #[allow(cyclomatic_complexity)]
+    #[allow(clippy::cyclomatic_complexity)]
     pub(crate) fn handle_event(&mut self, event: &Result<GatewayEvent>)
         -> Result<Option<ShardAction>> {
         match *event {
@@ -841,7 +841,7 @@ fn set_client_timeout(client: &mut WsClient) -> Result<()> {
         tungstenite::stream::Stream::Plain(stream) => stream,
         tungstenite::stream::Stream::Tls(stream) => stream.get_mut(),
     };
-    
+
     stream.set_read_timeout(Some(StdDuration::from_millis(500)))?;
     stream.set_write_timeout(Some(StdDuration::from_secs(50)))?;
 

@@ -16,17 +16,17 @@
 //! [here]: https://discordapp.com/developers/docs/resources/channel#embed-object
 
 use chrono::{DateTime, TimeZone};
-use internal::prelude::*;
-use model::channel::Embed;
+use crate::internal::prelude::*;
+use crate::model::channel::Embed;
 use serde_json::Value;
 use std::{
     default::Default,
     fmt::Display
 };
-use utils::{self, VecMap};
+use crate::utils::{self, VecMap};
 
 #[cfg(feature = "utils")]
-use utils::Colour;
+use crate::utils::Colour;
 
 /// A builder to create a fake [`Embed`] object, for use with the
 /// [`ChannelId::send_message`] and [`ExecuteWebhook::embeds`] methods.
@@ -526,10 +526,10 @@ impl<'a, Tz: TimeZone> From<&'a DateTime<Tz>> for Timestamp
 
 #[cfg(test)]
 mod test {
-    use model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo};
+    use crate::model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo};
     use serde_json::Value;
     use super::CreateEmbed;
-    use utils::{self, Colour};
+    use crate::utils::{self, Colour};
 
     #[test]
     fn test_from_embed() {

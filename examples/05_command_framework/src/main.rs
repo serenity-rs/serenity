@@ -8,14 +8,10 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["framework", "standard_framework"]
 //! ```
-
-#[macro_use]
-extern crate serenity;
-extern crate typemap;
-
 use std::{collections::HashMap, env, fmt::Write, sync::Arc};
 
 use serenity::{
+    command,
     client::bridge::gateway::{ShardId, ShardManager},
     framework::standard::{
         help_commands, Args, CommandOptions, DispatchError, HelpBehaviour, StandardFramework,

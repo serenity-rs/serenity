@@ -1,7 +1,7 @@
 #[cfg(feature = "model")]
 use reqwest::Client as ReqwestClient;
 #[cfg(feature = "model")]
-use internal::prelude::*;
+use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use std::io::Read;
 
