@@ -1,5 +1,5 @@
 // Disable this lint to avoid it wanting to change `0xABCDEF` to `0xAB_CDEF`.
-#![allow(unreadable_literal)]
+#![allow(clippy::unreadable_literal)]
 
 macro_rules! colour {
     ($(#[$attr:meta] $constname:ident, $name:ident, $val:expr;)*) => {

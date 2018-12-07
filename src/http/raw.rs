@@ -1207,7 +1207,7 @@ pub fn get_guilds(target: &GuildPagination, limit: u64) -> Result<Vec<GuildInfo>
 }
 
 /// Gets information about a specific invite.
-#[allow(unused_mut)]
+#[allow(clippy::unused_mut)]
 pub fn get_invite(mut code: &str, stats: bool) -> Result<Invite> {
     #[cfg(feature = "utils")]
         {

@@ -317,7 +317,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
 
         for (command_name, command) in &group.commands {
 
-            let search_command_name_matched = if let &Some(ref prefixes) = &group.prefixes {
+            let search_command_name_matched = if let Some(ref prefixes) = group.prefixes {
                 prefixes.iter().any(|prefix| {
                     format!("{} {}", prefix, command_name) == name
                 })
@@ -361,7 +361,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
 
                 if let &CommandOrAlias::Command(ref cmd) = command {
 
-                    let command_name = if let &Some(ref prefixes) = &group.prefixes {
+                    let command_name = if let Some(ref prefixes) = group.prefixes {
                         if let Some(first_prefix) = prefixes.get(0) {
                             format!("{} {}",  &first_prefix, &command_name).to_string()
                         } else {
@@ -589,7 +589,7 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
         &help_options.striked_commands_tip_in_dm
     };
 
-    let description = if let &Some(ref striked_command_text) = strikethrough_command_tip {
+    let description = if let Some(ref striked_command_text) = strikethrough_command_tip {
         format!(
             "{}\n{}",
             &help_options.individual_command_tip, &striked_command_text
@@ -663,11 +663,11 @@ fn send_single_command_embed(
             embed.title(&command.name);
             embed.colour(colour);
 
-            if let &Some(ref desc) = &command.description {
+            if let Some(ref desc) = command.description {
                 embed.description(desc);
             }
 
-            if let &Some(ref usage) = &command.usage {
+            if let Some(ref usage) = command.usage {
                 embed.field(&help_options.usage_label, usage, true);
             }
 
@@ -753,21 +753,21 @@ pub fn with_embeds<H: BuildHasher>(
 ) -> Result<(), CommandError> {
     let formatted_help = create_customised_help_data(&groups, args, help_options, msg);
 
-    if let Err(why) = match &formatted_help {
-        &CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
+    if let Err(why) = match formatted_help {
+        CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
             send_suggestion_embed(
                 msg.channel_id,
                 &help_description,
                 &suggestions,
                 help_options.embed_error_colour,
             ),
-        &CustomisedHelpData::NoCommandFound { ref help_error_message } =>
+        CustomisedHelpData::NoCommandFound { ref help_error_message } =>
             send_error_embed(
                 msg.channel_id,
                 help_error_message,
                 help_options.embed_error_colour,
             ),
-        &CustomisedHelpData::GroupedCommands { ref help_description, ref groups } =>
+        CustomisedHelpData::GroupedCommands { ref help_description, ref groups } =>
             send_grouped_commands_embed(
                 &help_options,
                 msg.channel_id,
@@ -775,7 +775,7 @@ pub fn with_embeds<H: BuildHasher>(
                 &groups,
                 help_options.embed_success_colour,
             ),
-        &CustomisedHelpData::SingleCommand { ref command } =>
+        CustomisedHelpData::SingleCommand { ref command } =>
             send_single_command_embed(
                 &help_options,
                 msg.channel_id,
@@ -820,15 +820,15 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command)
         let _ = writeln!(result, "**{}**: `{}`", help_options.aliases_label, command.aliases.join("`, `"));
     }
 
-    if let &Some(ref description) = &command.description {
+    if let Some(ref description) = command.description {
         let _ = writeln!(result, "**{}**: {}", help_options.description_label, description);
     };
 
-    if let &Some(ref usage) = &command.usage {
+    if let Some(ref usage) = command.usage {
         let _ = writeln!(result, "**{}**: {}", help_options.usage_label, usage);
     }
 
-    if let &Some(ref usage_sample) = &command.usage_sample {
+    if let Some(ref usage_sample) = command.usage_sample {
         let _ = writeln!(result, "**{}**: `{} {}`", help_options.usage_sample_label, command.name, usage_sample);
     }
 
@@ -866,14 +866,14 @@ pub fn plain<H: BuildHasher>(
 ) -> Result<(), CommandError> {
     let formatted_help = create_customised_help_data(&groups, args, help_options, msg);
 
-    let result = match &formatted_help {
-        &CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
+    let result = match formatted_help {
+        CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
             format!("{}: `{}`", help_description, suggestions.join("`, `")),
-        &CustomisedHelpData::NoCommandFound { ref help_error_message } =>
+        CustomisedHelpData::NoCommandFound { ref help_error_message } =>
             help_error_message.to_string(),
-        &CustomisedHelpData::GroupedCommands { ref help_description, ref groups } =>
+        CustomisedHelpData::GroupedCommands { ref help_description, ref groups } =>
             grouped_commands_to_plain_string(&help_options, &help_description, &groups),
-        &CustomisedHelpData::SingleCommand { ref command } => {
+        CustomisedHelpData::SingleCommand { ref command } => {
             single_command_to_plain_string(&help_options, &command)
         },
     };

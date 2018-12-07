@@ -117,7 +117,7 @@ impl Invite {
     }
 
     /// Gets the information about an invite.
-    #[allow(unused_mut)]
+    #[allow(clippy::unused_mut)]
     pub fn get(code: &str, stats: bool) -> Result<Invite> {
         let mut invite = code;
 
