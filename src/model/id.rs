@@ -100,7 +100,7 @@ pub struct GuildId(pub u64);
 
 /// An identifier for an Integration
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(clippy::clippy::derive_hash_xor_eq)]
+#[allow(clippy::derive_hash_xor_eq)]
 pub struct IntegrationId(pub u64);
 
 /// An identifier for a Message
