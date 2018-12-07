@@ -17,7 +17,7 @@
 //! [`Client`]: struct.Client.html#examples
 //! [`Context`]: struct.Context.html
 //! [Client examples]: struct.Client.html#examples
-#![allow(zero_ptr)]
+#![allow(clippy::zero_ptr)]
 
 pub mod bridge;
 
@@ -33,14 +33,14 @@ pub use self::{
 };
 
 // Note: the following re-exports are here for backwards compatibility
-pub use gateway;
-pub use http as rest;
+pub use crate::gateway;
+pub use crate::http as rest;
 
 #[cfg(feature = "cache")]
-pub use CACHE;
+pub use crate::CACHE;
 
-use http;
-use internal::prelude::*;
+use crate::http;
+use crate::internal::prelude::*;
 use parking_lot::Mutex;
 use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptions};
 use std::sync::Arc;
@@ -48,9 +48,9 @@ use threadpool::ThreadPool;
 use typemap::ShareMap;
 
 #[cfg(feature = "framework")]
-use framework::Framework;
+use crate::framework::Framework;
 #[cfg(feature = "voice")]
-use model::id::UserId;
+use crate::model::id::UserId;
 #[cfg(feature = "voice")]
 use self::bridge::voice::ClientVoiceManager;
 

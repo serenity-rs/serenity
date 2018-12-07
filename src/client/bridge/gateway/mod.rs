@@ -73,7 +73,7 @@ use std::{
     sync::mpsc::Sender,
     time::Duration as StdDuration
 };
-use ::gateway::{ConnectionStage, InterMessage};
+use crate::gateway::{ConnectionStage, InterMessage};
 
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].
 ///

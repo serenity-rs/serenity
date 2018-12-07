@@ -1,15 +1,15 @@
-use model::prelude::*;
+use crate::model::prelude::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
+use crate::CACHE;
 #[cfg(feature = "model")]
-use builder::{EditGuild, EditMember, EditRole};
+use crate::builder::{EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
-use internal::prelude::*;
+use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use model::guild::BanOptions;
+use crate::model::guild::BanOptions;
 #[cfg(feature = "model")]
-use {http, utils};
+use crate::{http, utils};
 
 #[cfg(feature = "model")]
 impl GuildId {
@@ -563,7 +563,7 @@ impl GuildId {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self) -> u64 { ::utils::shard_id(self.0, CACHE.read().shard_count) }
+    pub fn shard_id(&self) -> u64 { crate::utils::shard_id(self.0, CACHE.read().shard_count) }
 
     /// Returns the Id of the shard associated with the guild.
     ///

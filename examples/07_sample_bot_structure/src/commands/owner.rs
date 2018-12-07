@@ -1,3 +1,5 @@
+use serenity::command;
+
 command!(quit(ctx, msg, _args) {
     ctx.quit();
 

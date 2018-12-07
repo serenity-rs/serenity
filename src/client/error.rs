@@ -16,7 +16,7 @@ use std::{
 /// [`Error`]: ../enum.Error.html
 /// [`Error::Client`]: ../enum.Error.html#variant.Client
 /// [`GuildId::ban`]: ../model/id/struct.GuildId.html#method.ban
-#[allow(enum_variant_names)]
+#[allow(clippy::enum_variant_names)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Error {
     /// When the token provided is invalid. This is returned when validating a

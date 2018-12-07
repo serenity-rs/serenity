@@ -1,11 +1,11 @@
-use model::prelude::*;
+use crate::model::prelude::*;
 
 #[cfg(all(feature = "builder", feature = "model"))]
-use builder::EditChannel;
+use crate::builder::EditChannel;
 #[cfg(all(feature = "builder", feature = "model"))]
-use http;
+use crate::http;
 #[cfg(all(feature = "model", feature = "utils"))]
-use utils::{self as serenity_utils, VecMap};
+use crate::utils::{self as serenity_utils, VecMap};
 
 /// A category of [`GuildChannel`]s.
 ///

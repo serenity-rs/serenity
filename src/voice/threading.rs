@@ -1,5 +1,5 @@
-use internal::Timer;
-use model::id::GuildId;
+use crate::internal::Timer;
+use crate::model::id::GuildId;
 use std::{
     sync::mpsc::{Receiver as MpscReceiver, TryRecvError},
     thread::Builder as ThreadBuilder
@@ -94,7 +94,7 @@ fn runner(rx: &MpscReceiver<Status>) {
                 }
             },
             None => {
-                timer.await();
+                timer.r#await();
 
                 false
             },

@@ -10,15 +10,15 @@ use super::{
 };
 
 #[cfg(feature = "model")]
-use builder::ExecuteWebhook;
+use crate::builder::ExecuteWebhook;
 #[cfg(feature = "model")]
-use internal::prelude::*;
+use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use std::mem;
 #[cfg(feature = "model")]
 use super::channel::Message;
 #[cfg(feature = "model")]
-use {http, utils};
+use crate::{http, utils};
 
 /// A representation of a webhook, which is a low-effort way to post messages to
 /// channels. They do not necessarily require a bot user or authentication to

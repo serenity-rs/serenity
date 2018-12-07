@@ -8,13 +8,6 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["framework", "standard_framework"]
 //! ```
-
-#[macro_use] extern crate log;
-#[macro_use] extern crate serenity;
-
-extern crate env_logger;
-extern crate kankyo;
-
 mod commands;
 
 use std::{collections::HashSet, env};
@@ -25,6 +18,8 @@ use serenity::{
     prelude::*,
     http,
 };
+
+use log::{error, info};
 
 struct Handler;
 
@@ -47,7 +42,7 @@ fn main() {
     //
     // In this case, a good default is setting the environment variable
     // `RUST_LOG` to debug`.
-    env_logger::init().expect("Failed to initialize env_logger");
+    env_logger::init();
 
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");

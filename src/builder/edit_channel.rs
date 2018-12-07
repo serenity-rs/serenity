@@ -1,6 +1,6 @@
-use internal::prelude::*;
-use utils::VecMap;
-use model::id::ChannelId;
+use crate::internal::prelude::*;
+use crate::utils::VecMap;
+use crate::model::id::ChannelId;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]
 ///

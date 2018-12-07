@@ -6,10 +6,6 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["cache", "framework", "standard_framework", "voice"]
 //! ```
-
-#[macro_use] extern crate serenity;
-extern crate typemap;
-
 use std::{env, sync::Arc};
 
 // Import the client's bridge to the voice manager. Since voice is a standalone
@@ -26,6 +22,7 @@ use serenity::client::bridge::voice::ClientVoiceManager;
 use serenity::{client::{Context}, prelude::Mutex};
 
 use serenity::{
+    command,
     client::{CACHE, Client, EventHandler},
     framework::StandardFramework,
     model::{channel::Message, gateway::Ready, misc::Mentionable},

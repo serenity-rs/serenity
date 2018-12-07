@@ -1,10 +1,10 @@
 use chrono::{DateTime, FixedOffset};
-use model::prelude::*;
+use crate::model::prelude::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
+use crate::CACHE;
 #[cfg(feature = "model")]
-use builder::{
+use crate::builder::{
     CreateInvite,
     CreateMessage,
     EditChannel,
@@ -12,9 +12,9 @@ use builder::{
     GetMessages
 };
 #[cfg(feature = "model")]
-use http::{self, AttachmentType};
+use crate::http::{self, AttachmentType};
 #[cfg(all(feature = "cache", feature = "model"))]
-use internal::prelude::*;
+use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use std::fmt::{
     Display,
@@ -24,7 +24,7 @@ use std::fmt::{
 #[cfg(feature = "model")]
 use std::mem;
 #[cfg(all(feature = "model", feature = "utils"))]
-use utils::{self as serenity_utils, VecMap};
+use crate::utils::{self as serenity_utils, VecMap};
 
 /// Represents a guild's text or voice channel. Some methods are available only
 /// for voice channels and some are only available for text channels.

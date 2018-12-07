@@ -1,6 +1,6 @@
 use chrono::Utc;
-use client::Context;
-use model::id::{ChannelId, GuildId, UserId};
+use crate::client::Context;
+use crate::model::id::{ChannelId, GuildId, UserId};
 use std::{
     collections::HashMap,
     default::Default

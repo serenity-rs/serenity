@@ -1,25 +1,25 @@
-use internal::RwLockExt;
-use model::prelude::*;
+use crate::internal::RwLockExt;
+use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 #[cfg(feature = "model")]
 use std::fmt::Write as FmtWrite;
 #[cfg(feature = "model")]
-use builder::{
+use crate::builder::{
     CreateMessage,
     EditChannel,
     EditMessage,
     GetMessages
 };
 #[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
+use crate::CACHE;
 #[cfg(all(feature = "cache", feature = "model"))]
-use Cache;
+use crate::Cache;
 #[cfg(feature = "model")]
-use http::{self, AttachmentType};
+use crate::http::{self, AttachmentType};
 #[cfg(feature = "model")]
-use utils;
+use crate::utils;
 
 #[cfg(feature = "model")]
 impl ChannelId {

@@ -38,7 +38,7 @@
 //! differentiating between different ratelimits.
 //!
 //! [Taken from]: https://discordapp.com/developers/docs/topics/rate-limits#rate-limits
-#![allow(zero_ptr)]
+#![allow(clippy::zero_ptr)]
 
 pub use super::routing::Route;
 
@@ -48,7 +48,7 @@ use reqwest::{
     header::HeaderMap as Headers,
     StatusCode,
 };
-use internal::prelude::*;
+use crate::internal::prelude::*;
 use parking_lot::Mutex;
 use std::{
     collections::HashMap,
