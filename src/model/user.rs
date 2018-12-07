@@ -481,7 +481,7 @@ impl User {
     // The universe is still fine, and nothing implodes.
     //
     // (AKA: Clippy is wrong and so we have to mark as allowing this lint.)
-    #[allow(let_and_return)]
+    #[allow(clippy::let_and_return)]
     #[cfg(feature = "builder")]
     pub fn direct_message<F>(&self, f: F) -> Result<Message>
         where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {

@@ -95,11 +95,11 @@ use crate::model::channel::Channel;
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
-        #[allow(non_camel_case_types)]
+        #[allow(clippy::non_camel_case_types)]
         pub struct $fname;
 
         impl $crate::framework::standard::Command for $fname {
-            #[allow(unreachable_code, unused_mut)]
+            #[allow(clippy::unreachable_code, unused_mut)]
             fn execute(&self, mut $c: &mut $crate::client::Context,
                       _: &$crate::model::channel::Message,
                       _: $crate::framework::standard::Args)
@@ -112,11 +112,11 @@ macro_rules! command {
         }
     };
     ($fname:ident($c:ident, $m:ident) $b:block) => {
-        #[allow(non_camel_case_types)]
+        #[allow(clippy::non_camel_case_types)]
         pub struct $fname;
 
         impl $crate::framework::standard::Command for $fname {
-            #[allow(unreachable_code, unused_mut)]
+            #[allow(clippy::unreachable_code, unused_mut)]
             fn execute(&self, mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::channel::Message,
                       _: $crate::framework::standard::Args)
@@ -129,11 +129,11 @@ macro_rules! command {
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
-        #[allow(non_camel_case_types)]
+        #[allow(clippy::non_camel_case_types)]
         pub struct $fname;
 
         impl $crate::framework::standard::Command for $fname {
-            #[allow(unreachable_code, unused_mut)]
+            #[allow(clippy::unreachable_code, unused_mut)]
             fn execute(&self, mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::channel::Message,
                       mut $a: $crate::framework::standard::Args)
@@ -497,8 +497,8 @@ impl StandardFramework {
                 .contains(&message.channel_id)
     }
 
-    #[allow(too_many_arguments)]
-    #[cfg_attr(feature = "cargo-clippy", allow(cyclomatic_complexity))]
+    #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::cyclomatic_complexity)]
     fn should_fail(&mut self,
                    mut context: &mut Context,
                    message: &Message,
