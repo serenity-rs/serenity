@@ -1073,7 +1073,7 @@ impl Framework for StandardFramework {
                 positions
             },
             None => {
-                if let &Some(ref message_without_command) = &self.message_without_command {
+                if let Some(ref message_without_command) = self.message_without_command {
 
                     if !(self.configuration.ignore_bots && message.author.bot) {
                         let message_without_command = message_without_command.clone();
@@ -1229,7 +1229,7 @@ impl Framework for StandardFramework {
 
                     if check_contains_group_prefix {
 
-                        if let &Some(CommandOrAlias::Command(ref command)) = &group.default_command {
+                        if let Some(CommandOrAlias::Command(ref command)) = group.default_command {
                             let command = Arc::clone(command);
                             let mut args = {
                                 Args::new(&orginal_round[longest_matching_prefix_len..], &self.configuration.delimiters)
@@ -1279,11 +1279,11 @@ impl Framework for StandardFramework {
 
         if !(self.configuration.ignore_bots && message.author.bot) {
 
-            if let &Some(ref unrecognised_command) = &self.unrecognised_command {
+            if let Some(ref unrecognised_command) = self.unrecognised_command {
 
                 // If both functions are set, we need to clone `Context` and
                 // `Message`, else we can avoid it.
-                if let &Some(ref message_without_command) = &self.message_without_command {
+                if let Some(ref message_without_command) = self.message_without_command {
                     let mut context_unrecognised = context.clone();
                     let mut message_unrecognised = message.clone();
 
@@ -1303,7 +1303,7 @@ impl Framework for StandardFramework {
                         (unrecognised_command)(&mut context, &message, &unrecognised_command_name);
                     });
                 }
-            } else if let &Some(ref message_without_command) = &self.message_without_command {
+            } else if let Some(ref message_without_command) = self.message_without_command {
                 let message_without_command = message_without_command.clone();
                     threadpool.execute(move || {
                         (message_without_command)(&mut context, &message);
