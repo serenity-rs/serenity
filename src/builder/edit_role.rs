@@ -1,9 +1,9 @@
-use internal::prelude::*;
-use model::{
+use crate::internal::prelude::*;
+use crate::model::{
     guild::Role,
     Permissions
 };
-use utils::VecMap;
+use crate::utils::VecMap;
 
 /// A builder to create or edit a [`Role`] for use via a number of model methods.
 ///

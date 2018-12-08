@@ -31,9 +31,9 @@ pub use self::create_help_command::CreateHelpCommand;
 pub use self::create_command::{CreateCommand, FnOrCommand};
 pub use self::create_group::CreateGroup;
 
-use client::Context;
-use internal::RwLockExt;
-use model::{
+use crate::client::Context;
+use crate::internal::RwLockExt;
+use crate::model::{
     channel::Message,
     guild::{Guild, Member},
     id::{ChannelId, GuildId, UserId},
@@ -49,9 +49,9 @@ use super::Framework;
 use threadpool::ThreadPool;
 
 #[cfg(feature = "cache")]
-use client::CACHE;
+use crate::client::CACHE;
 #[cfg(feature = "cache")]
-use model::channel::Channel;
+use crate::model::channel::Channel;
 
 /// A convenience macro for generating a struct fulfilling the [`Command`][command trait] trait.
 ///
@@ -95,11 +95,11 @@ use model::channel::Channel;
 #[macro_export]
 macro_rules! command {
     ($fname:ident($c:ident) $b:block) => {
-        #[allow(non_camel_case_types)]
+        #[allow(clippy::non_camel_case_types)]
         pub struct $fname;
 
         impl $crate::framework::standard::Command for $fname {
-            #[allow(unreachable_code, unused_mut)]
+            #[allow(clippy::unreachable_code, unused_mut)]
             fn execute(&self, mut $c: &mut $crate::client::Context,
                       _: &$crate::model::channel::Message,
                       _: $crate::framework::standard::Args)
@@ -112,11 +112,11 @@ macro_rules! command {
         }
     };
     ($fname:ident($c:ident, $m:ident) $b:block) => {
-        #[allow(non_camel_case_types)]
+        #[allow(clippy::non_camel_case_types)]
         pub struct $fname;
 
         impl $crate::framework::standard::Command for $fname {
-            #[allow(unreachable_code, unused_mut)]
+            #[allow(clippy::unreachable_code, unused_mut)]
             fn execute(&self, mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::channel::Message,
                       _: $crate::framework::standard::Args)
@@ -129,11 +129,11 @@ macro_rules! command {
         }
     };
     ($fname:ident($c:ident, $m:ident, $a:ident) $b:block) => {
-        #[allow(non_camel_case_types)]
+        #[allow(clippy::non_camel_case_types)]
         pub struct $fname;
 
         impl $crate::framework::standard::Command for $fname {
-            #[allow(unreachable_code, unused_mut)]
+            #[allow(clippy::unreachable_code, unused_mut)]
             fn execute(&self, mut $c: &mut $crate::client::Context,
                       $m: &$crate::model::channel::Message,
                       mut $a: $crate::framework::standard::Args)
@@ -497,8 +497,8 @@ impl StandardFramework {
                 .contains(&message.channel_id)
     }
 
-    #[allow(too_many_arguments)]
-    #[cfg_attr(feature = "cargo-clippy", allow(cyclomatic_complexity))]
+    #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::cyclomatic_complexity)]
     fn should_fail(&mut self,
                    mut context: &mut Context,
                    message: &Message,
@@ -1073,7 +1073,7 @@ impl Framework for StandardFramework {
                 positions
             },
             None => {
-                if let &Some(ref message_without_command) = &self.message_without_command {
+                if let Some(ref message_without_command) = self.message_without_command {
 
                     if !(self.configuration.ignore_bots && message.author.bot) {
                         let message_without_command = message_without_command.clone();
@@ -1229,7 +1229,7 @@ impl Framework for StandardFramework {
 
                     if check_contains_group_prefix {
 
-                        if let &Some(CommandOrAlias::Command(ref command)) = &group.default_command {
+                        if let Some(CommandOrAlias::Command(ref command)) = group.default_command {
                             let command = Arc::clone(command);
                             let mut args = {
                                 Args::new(&orginal_round[longest_matching_prefix_len..], &self.configuration.delimiters)
@@ -1279,11 +1279,11 @@ impl Framework for StandardFramework {
 
         if !(self.configuration.ignore_bots && message.author.bot) {
 
-            if let &Some(ref unrecognised_command) = &self.unrecognised_command {
+            if let Some(ref unrecognised_command) = self.unrecognised_command {
 
                 // If both functions are set, we need to clone `Context` and
                 // `Message`, else we can avoid it.
-                if let &Some(ref message_without_command) = &self.message_without_command {
+                if let Some(ref message_without_command) = self.message_without_command {
                     let mut context_unrecognised = context.clone();
                     let mut message_unrecognised = message.clone();
 
@@ -1303,7 +1303,7 @@ impl Framework for StandardFramework {
                         (unrecognised_command)(&mut context, &message, &unrecognised_command_name);
                     });
                 }
-            } else if let &Some(ref message_without_command) = &self.message_without_command {
+            } else if let Some(ref message_without_command) = self.message_without_command {
                 let message_without_command = message_without_command.clone();
                     threadpool.execute(move || {
                         (message_without_command)(&mut context, &message);

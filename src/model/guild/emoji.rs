@@ -7,7 +7,7 @@ use std::fmt::{
 use super::super::id::{EmojiId, RoleId};
 
 #[cfg(all(feature = "cache", feature = "model"))]
-use internal::prelude::*;
+use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -15,7 +15,7 @@ use super::super::ModelError;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::super::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
-use {CACHE, http};
+use crate::{CACHE, http};
 
 /// Represents a custom guild emoji, which can either be created using the API,
 /// or via an integration. Emojis created using the API only work within the

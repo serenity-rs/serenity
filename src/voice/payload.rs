@@ -1,4 +1,4 @@
-use constants::VoiceOpCode;
+use crate::constants::VoiceOpCode;
 use serde_json::Value;
 use super::connection_info::ConnectionInfo;
 

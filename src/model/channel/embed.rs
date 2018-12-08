@@ -1,11 +1,11 @@
 #[cfg(feature = "model")]
-use builder::CreateEmbed;
+use crate::builder::CreateEmbed;
 #[cfg(feature = "model")]
-use internal::prelude::*;
+use crate::internal::prelude::*;
 #[cfg(feature = "utils")]
-use utils::Colour;
+use crate::utils::Colour;
 #[cfg(feature = "model")]
-use utils;
+use crate::utils;
 
 /// Represents a rich embed which allows using richer markdown, multiple fields
 /// and more. This was heavily inspired by [slack's attachments].

@@ -1,5 +1,5 @@
 use chrono::{DateTime, FixedOffset};
-use model::prelude::*;
+use crate::model::prelude::*;
 use std::fmt::{
     Display,
     Formatter,
@@ -8,15 +8,15 @@ use std::fmt::{
 use super::deserialize_single_recipient;
 
 #[cfg(feature = "model")]
-use builder::{
+use crate::builder::{
     CreateMessage,
     EditMessage,
     GetMessages
 };
 #[cfg(feature = "model")]
-use http::AttachmentType;
+use crate::http::AttachmentType;
 #[cfg(feature = "model")]
-use internal::RwLockExt;
+use crate::internal::RwLockExt;
 
 /// A Direct Message text channel with another user.
 #[derive(Clone, Debug, Deserialize, Serialize)]

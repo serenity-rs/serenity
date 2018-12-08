@@ -56,7 +56,7 @@ pub use self::{
     ws_client_ext::WebSocketGatewayClientExt
 };
 
-use model::{
+use crate::model::{
     gateway::Activity,
     user::OnlineStatus,
 };
@@ -68,7 +68,7 @@ use tungstenite::{
 };
 
 #[cfg(feature = "client")]
-use client::bridge::gateway::ShardClientMessage;
+use crate::client::bridge::gateway::ShardClientMessage;
 
 pub type CurrentPresence = (Option<Activity>, OnlineStatus);
 pub type WsClient = WebSocket<AutoStream>;

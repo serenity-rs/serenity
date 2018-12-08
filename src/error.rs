@@ -1,5 +1,5 @@
-use internal::prelude::*;
-use model::ModelError;
+use crate::internal::prelude::*;
+use crate::model::ModelError;
 use serde_json::Error as JsonError;
 use std::{
     error::Error as StdError,
@@ -19,13 +19,13 @@ use opus::Error as OpusError;
 #[cfg(feature = "tungstenite")]
 use tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "client")]
-use client::ClientError;
+use crate::client::ClientError;
 #[cfg(feature = "gateway")]
-use gateway::GatewayError;
+use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
-use http::HttpError;
+use crate::http::HttpError;
 #[cfg(feature = "voice")]
-use voice::VoiceError;
+use crate::voice::VoiceError;
 
 /// The common result type between most library functions.
 ///

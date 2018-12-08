@@ -1,5 +1,5 @@
-use client::Context;
-use model::{
+use crate::client::Context;
+use crate::model::{
     channel::{
         Message,
         Channel,
@@ -12,7 +12,7 @@ use std::{
     fmt::{Debug, Formatter},
     sync::Arc
 };
-use utils::Colour;
+use crate::utils::Colour;
 use super::{Args, Configuration, HelpBehaviour};
 
 type CheckFunction = Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
@@ -228,7 +228,7 @@ pub struct HelpOptions {
 }
 
 pub trait HelpCommand: Send + Sync + 'static {
-    fn execute(&self, &mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, &Args) -> Result<(), Error>;
+    fn execute(&self, _: &mut Context, _: &Message, _: &HelpOptions, _: HashMap<String, Arc<CommandGroup>>, _: &Args) -> Result<(), Error>;
 
     fn options(&self) -> Arc<CommandOptions> {
         Arc::clone(&DEFAULT_OPTIONS)
@@ -278,7 +278,7 @@ lazy_static! {
 
 /// A framework command.
 pub trait Command: Send + Sync + 'static {
-    fn execute(&self, &mut Context, &Message, Args) -> Result<(), Error>;
+    fn execute(&self, _: &mut Context, _: &Message, _: Args) -> Result<(), Error>;
 
     fn options(&self) -> Arc<CommandOptions> {
         Arc::clone(&DEFAULT_OPTIONS)
@@ -288,10 +288,10 @@ pub trait Command: Send + Sync + 'static {
     fn init(&self) {}
 
     /// "before" middleware. Is called alongside the global middleware in the framework.
-    fn before(&self, &mut Context, &Message) -> bool { true }
+    fn before(&self, _: &mut Context, _: &Message) -> bool { true }
 
     /// "after" middleware. Is called alongside the global middleware in the framework.
-    fn after(&self, &mut Context, &Message, &Result<(), Error>) { }
+    fn after(&self, _: &mut Context, _: &Message, _: &Result<(), Error>) { }
 }
 
 impl Command for Arc<Command> {

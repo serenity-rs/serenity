@@ -1,6 +1,6 @@
 use flate2::read::ZlibDecoder;
-use gateway::WsClient;
-use internal::prelude::*;
+use crate::gateway::WsClient;
+use crate::internal::prelude::*;
 use serde_json;
 use tungstenite::Message;
 

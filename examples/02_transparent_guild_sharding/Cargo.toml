@@ -2,6 +2,7 @@
 name = "02_transparent_guild_sharding"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
+edition = "2018"
 
 [dependencies]
 serenity = { path = "../../" }

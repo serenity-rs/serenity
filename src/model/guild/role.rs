@@ -1,19 +1,19 @@
-use model::prelude::*;
+use crate::model::prelude::*;
 use std::cmp::Ordering;
 
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
-use builder::EditRole;
+use crate::builder::EditRole;
 #[cfg(all(feature = "cache", feature = "model"))]
-use internal::prelude::*;
+use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
-use {CACHE, Cache, http};
+use crate::{CACHE, Cache, http};
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use std::str::FromStr;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use model::misc::RoleParseError;
+use crate::model::misc::RoleParseError;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use utils::parse_role;
+use crate::utils::parse_role;
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has

@@ -7,8 +7,8 @@ pub use super::{
     Check,
 };
 
-use client::Context;
-use model::{
+use crate::client::Context;
+use crate::model::{
     channel::Message,
     Permissions
 };

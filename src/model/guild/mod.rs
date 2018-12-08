@@ -17,19 +17,19 @@ pub use self::role::*;
 pub use self::audit_log::*;
 
 use chrono::{DateTime, FixedOffset};
-use model::prelude::*;
+use crate::model::prelude::*;
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
-use CACHE;
+use crate::CACHE;
 #[cfg(feature = "model")]
-use http;
+use crate::http;
 #[cfg(feature = "model")]
-use builder::{EditGuild, EditMember, EditRole};
+use crate::builder::{EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
-use constants::LARGE_THRESHOLD;
+use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
 use std;
 #[cfg(feature = "model")]
@@ -1722,7 +1722,7 @@ fn closest_to_origin(origin: &str, word_a: &str, word_b: &str) -> std::cmp::Orde
 ///
 /// This is used to differentiate whether a guild itself can be used or whether
 /// a guild needs to be retrieved from the cache.
-#[allow(large_enum_variant)]
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum GuildContainer {
     /// A guild which can have its contents directly searched.
@@ -1812,7 +1812,7 @@ pub struct GuildUnavailable {
     pub unavailable: bool,
 }
 
-#[allow(large_enum_variant)]
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum GuildStatus {
@@ -2007,7 +2007,7 @@ mod test {
     #[cfg(feature = "model")]
     mod model {
         use chrono::prelude::*;
-        use model::prelude::*;
+        use crate::model::prelude::*;
         use std::collections::*;
         use std::sync::Arc;
 

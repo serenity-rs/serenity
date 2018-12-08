@@ -1,9 +1,9 @@
-use gateway::InterMessage;
+use crate::gateway::InterMessage;
 use std::collections::HashMap;
 use std::sync::mpsc::Sender as MpscSender;
-use ::model::id::{ChannelId, GuildId, UserId};
-use ::voice::{Handler, Manager};
-use ::utils;
+use crate::model::id::{ChannelId, GuildId, UserId};
+use crate::voice::{Handler, Manager};
+use crate::utils;
 
 pub struct ClientVoiceManager {
     managers: HashMap<u64, Manager>,

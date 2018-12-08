@@ -1,5 +1,5 @@
-use gateway::Shard;
-use internal::prelude::*;
+use crate::gateway::Shard;
+use crate::internal::prelude::*;
 use parking_lot::Mutex;
 use std::{
     collections::{HashMap, VecDeque},
@@ -24,12 +24,12 @@ use super::{
 };
 use threadpool::ThreadPool;
 use typemap::ShareMap;
-use ::gateway::ConnectionStage;
+use crate::gateway::ConnectionStage;
 
 #[cfg(feature = "voice")]
-use client::bridge::voice::ClientVoiceManager;
+use crate::client::bridge::voice::ClientVoiceManager;
 #[cfg(feature = "framework")]
-use framework::Framework;
+use crate::framework::Framework;
 
 const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
 

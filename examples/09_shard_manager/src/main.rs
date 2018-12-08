@@ -22,9 +22,6 @@
 //!
 //! Note that it may take a minute or more for a latency to be recorded or to
 //! update, depending on how often Discord tells the client to send a heartbeat.
-
-extern crate serenity;
-
 use std::{env, thread, time::Duration};
 
 use serenity::{

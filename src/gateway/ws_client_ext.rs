@@ -1,9 +1,9 @@
 use chrono::Utc;
-use constants::{self, OpCode};
-use gateway::{CurrentPresence, WsClient};
-use internal::prelude::*;
-use internal::ws_impl::SenderExt;
-use model::id::GuildId;
+use crate::constants::{self, OpCode};
+use crate::gateway::{CurrentPresence, WsClient};
+use crate::internal::prelude::*;
+use crate::internal::ws_impl::SenderExt;
+use crate::model::id::GuildId;
 use std::env::consts;
 
 pub trait WebSocketGatewayClientExt {
