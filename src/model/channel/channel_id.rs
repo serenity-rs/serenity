@@ -236,8 +236,11 @@ impl ChannelId {
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "utils")]
     #[inline]
-    pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel> {
-        let map = utils::vecmap_to_json_map(f(EditChannel::default()).0);
+    pub fn edit<F: FnOnce(&mut EditChannel) -> &mut EditChannel>(&self, f: F) -> Result<GuildChannel> {
+        let mut channel = EditChannel::default();
+        f(&mut channel);
+
+        let map = utils::vecmap_to_json_map(channel.0);
 
         http::edit_channel(self.0, &map)
     }
